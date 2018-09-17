@@ -170,7 +170,7 @@ def init(loop=None):
     server.app.router.add_get('/wifi/keys', wifi.list_keys)
     server.app.router.add_delete('/wifi/keys/{key_uuid}', wifi.remove_key)
     server.app.router.add_get(
-        '/wifi/eapoptions', wifi.eap_options)
+        '/wifi/eap-options', wifi.eap_options)
     server.app.router.add_post(
         '/identify', control.identify)
     server.app.router.add_get(

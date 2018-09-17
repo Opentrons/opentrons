@@ -40,76 +40,76 @@ class _EAP_OUTER_TYPES(enum.Enum):
     TLS = EAPType(
         name='tls',
         args=[{'name': 'identity',
-               'friendlyName': 'Username',
+               'displayName': 'Username',
                'nmName': 'identity',
                'required': True,
-               'type': 'str'},
+               'type': 'string'},
               {'name': 'caCert',
-               'friendlyName': 'CA Certificate File',
+               'displayName': 'CA Certificate File',
                'nmName': 'ca-cert',
                'required': False,
                'type': 'file'},
               {'name': 'clientCert',
-               'friendlyName': 'Client Certificate File',
+               'displayName': 'Client Certificate File',
                'nmName': 'client-cert',
                'required': True,
                'type': 'file'},
               {'name': 'privateKey',
-               'friendlyName': 'Private Key File',
+               'displayName': 'Private Key File',
                'nmName': 'private-key',
                'required': True,
                'type': 'file'},
               {'name': 'privateKeyPassword',
-               'friendlyName': 'Private Key Password',
+               'displayName': 'Private Key Password',
                'nmName': 'private-key-password',
                'required': False,
                'type': 'password'}])
     PEAP = EAPType(
         name='peap',
         args=[{'name': 'identity',
-               'friendlyName': 'Username',
+               'displayName': 'Username',
                'nmName': 'identity',
                'required': True,
-               'type': 'str'},
+               'type': 'string'},
               {'name': 'anonymousIdentity',
-               'friendlyName': 'Anonymous Identity',
+               'displayName': 'Anonymous Identity',
                'nmName': 'anonymous-identity',
                'required': False,
-               'type': 'str'},
+               'type': 'string'},
               {'name': 'caCert',
-               'friendlyName': 'CA Certificate File',
+               'displayName': 'CA Certificate File',
                'nmName': 'ca-cert',
                'required': False,
                'type': 'file'}])
     TTLS = EAPType(
         name='ttls',
         args=[{'name': 'identity',
-               'friendlyName': 'Username',
+               'displayName': 'Username',
                'nmName': 'identity',
                'required': True,
-               'type': 'str'},
+               'type': 'string'},
               {'name': 'anonymousIdentity',
-               'friendlyName': 'Anonymous Identity',
+               'displayName': 'Anonymous Identity',
                'nmName': 'anonymous-identity',
                'required': False,
-               'type': 'str'},
+               'type': 'string'},
               {'name': 'caCert',
-               'friendlyName': 'CA Certificate File',
+               'displayName': 'CA Certificate File',
                'nmName': 'ca-cert',
                'required': False,
                'type': 'file'},
               {'name': 'clientCert',
-               'friendlyName': 'Client Certificate File',
+               'displayName': 'Client Certificate File',
                'nmName': 'client-cert',
                'required': False,
                'type': 'file'},
               {'name': 'privateKey',
-               'friendlyName': 'Private Key File',
+               'displayName': 'Private Key File',
                'nmName': 'private-key',
                'required': False,
                'type': 'file'},
               {'name': 'privateKeyPassword',
-               'friendlyName': 'Private Key Password',
+               'displayName': 'Private Key Password',
                'nmName': 'private-key-password',
                'required': False,
                'type': 'password'}])
@@ -128,36 +128,36 @@ class _EAP_PHASE2_TYPES(enum.Enum):
     MSCHAP_V2 = EAPType(
         name='mschapv2',
         args=[{'name': 'password',
-               'friendlyName': 'Password',
+               'displayName': 'Password',
                'nmName': 'password',
                'required': True,
                'type': 'password'}])
     MD5 = EAPType(
         name='md5',
         args=[{'name': 'password',
-               'friendlyName': 'Password',
+               'displayName': 'Password',
                'nmName': 'password',
                'required': True,
                'type': 'password'}])
     TLS = EAPType(
         name='tls',
         args=[{'name': 'phase2CaCert',
-               'friendlyName': 'Inner CA Certificate File',
+               'displayName': 'Inner CA Certificate File',
                'nmName': 'phase2-ca-cert',
                'required': False,
                'type': 'file'},
               {'name': 'phase2ClientCert',
-               'friendlyName': 'Inner Client Certificate File',
+               'displayName': 'Inner Client Certificate File',
                'nmName': 'phase2-client-cert',
                'required': True,
                'type': 'file'},
               {'name': 'phase2PrivateKey',
-               'friendlyName': 'Inner Private Key File',
+               'displayName': 'Inner Private Key File',
                'nmName': 'phase2-private-key',
                'required': True,
                'type': 'file'},
               {'name': 'phase2PrivateKeyPassword',
-               'friendlyName': 'Inner Private Key Password',
+               'displayName': 'Inner Private Key Password',
                'nmName': 'phase2-private-key-password',
                'required': False,
                'type': 'password'}])
@@ -391,11 +391,11 @@ def _build_con_add_cmd(ssid: str, security_type: SECURITY_TYPES,
 
 
 async def configure(ssid: str,
-                    security_type: SECURITY_TYPES,
+                    securityType: SECURITY_TYPES,
                     psk: Optional[str] = None,
                     hidden: bool = False,
-                    eap_config: Optional[Dict[str, Any]] = None,
-                    up_retries: int = 3) -> Tuple[bool, str]:
+                    eapConfig: Optional[Dict[str, Any]] = None,
+                    upRetries: int = 2) -> Tuple[bool, str]:
     """ Configure a connection but do not bring it up (though it is configured
     for autoconnect).
 
@@ -422,7 +422,7 @@ async def configure(ssid: str,
         _1, _2 = await _call(['connection', 'delete', already])
 
     configure_cmd = _build_con_add_cmd(
-        ssid, security_type, psk, hidden, eap_config)
+        ssid, securityType, psk, hidden, eapConfig)
     res, err = await _call(configure_cmd)
 
     # nmcli connection add returns a string that looks like
@@ -436,7 +436,7 @@ async def configure(ssid: str,
         return False, err.split('\r')[-1]
     name = uuid_matches.group(1)
     uuid = uuid_matches.group(2)
-    for _ in range(up_retries):
+    for _ in range(upRetries):
         res, err = await _call(['connection', 'up', 'uuid', uuid])
         if 'Connection successfully activated' in res:
             # If we successfully added the connection, remove other wifi

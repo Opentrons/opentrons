@@ -83,7 +83,7 @@ async def test_wifi_configure(
 
     msg = "Device 'wlan0' successfully activated with '076aa998-0275-4aa0-bf85-e9629021e267'."  # noqa
 
-    async def mock_configure(ssid, security_type=None, psk=None, hidden=False):
+    async def mock_configure(ssid, securityType=None, psk=None, hidden=False):
         # Command: nmcli device wifi connect "{ssid}" password "{psk}"
         return True, msg
 
@@ -100,14 +100,14 @@ async def test_wifi_configure(
 
 def test_deduce_security():
     with pytest.raises(wifi.ConfigureArgsError):
-        wifi._deduce_security({'psk': 'hi', 'eap_config': {'hi': 'nope'}})
+        wifi._deduce_security({'psk': 'hi', 'eapConfig': {'hi': 'nope'}})
     assert wifi._deduce_security({'psk': 'test-psk'})\
         == nmcli.SECURITY_TYPES.WPA_PSK
-    assert wifi._deduce_security({'eap_config': {'hi': 'this is bad'}})\
+    assert wifi._deduce_security({'eapConfig': {'hi': 'this is bad'}})\
         == nmcli.SECURITY_TYPES.WPA_EAP
     assert wifi._deduce_security({}) == nmcli.SECURITY_TYPES.NONE
     with pytest.raises(wifi.ConfigureArgsError):
-        wifi._deduce_security({'security_type': 'this is invalid you fool'})
+        wifi._deduce_security({'securityType': 'this is invalid you fool'})
 
 
 def test_check_eap_config(wifi_keys_tempdir):
@@ -153,77 +153,55 @@ def test_eap_check_option():
     # Required arguments that are not specified should raise
     with pytest.raises(wifi.ConfigureArgsError):
         wifi._eap_check_option_ok({'name': 'test-opt', 'required': True,
-                                   'friendlyName': 'Test Option'},
+                                   'displayName': 'Test Option'},
                                   {'eapType': 'test'})
     # Non-required arguments that are not specified should not raise
     wifi._eap_check_option_ok({'name': 'test-1',
                                'required': False,
-                               'type': 'str',
-                               'friendlyName': 'Test Option'},
+                               'type': 'string',
+                               'displayName': 'Test Option'},
                               {'eapType': 'test'})
 
     # Check type mismatch detection pos and neg
     with pytest.raises(wifi.ConfigureArgsError):
         wifi._eap_check_option_ok({'name': 'identity',
-                                   'friendlyName': 'Username',
+                                   'displayName': 'Username',
                                    'required': True,
-                                   'type': 'str'},
+                                   'type': 'string'},
                                   {'identity': 2,
-                                  'eapType': 'test'})
+                                   'eapType': 'test'})
     wifi._eap_check_option_ok({'name': 'identity',
                                'required': True,
-                               'friendlyName': 'Username',
-                               'type': 'str'},
+                               'displayName': 'Username',
+                               'type': 'string'},
                               {'identity': 'hi',
-                              'eapType': 'test'})
+                               'eapType': 'test'})
     with pytest.raises(wifi.ConfigureArgsError):
         wifi._eap_check_option_ok({'name': 'password',
                                    'required': True,
-                                   'friendlyName': 'Password',
+                                   'displayName': 'Password',
                                    'type': 'password'},
                                   {'password': [2, 3],
-                                  'eapType': 'test'})
+                                   'eapType': 'test'})
     wifi._eap_check_option_ok({'name': 'password',
                                'required': True,
-                               'friendlyName': 'password',
+                               'displayName': 'password',
                                'type': 'password'},
                               {'password': 'secret',
-                              'eapType': 'test'})
+                               'eapType': 'test'})
     with pytest.raises(wifi.ConfigureArgsError):
         wifi._eap_check_option_ok({'name': 'phase2CaCert',
-                                   'friendlyName': 'some file who cares',
+                                   'displayName': 'some file who cares',
                                    'required': True,
                                    'type': 'file'},
                                   {'phase2CaCert': 2,
-                                  'eapType': 'test'})
+                                   'eapType': 'test'})
     wifi._eap_check_option_ok({'name': 'phase2CaCert',
                                'required': True,
-                               'friendlyName': 'hello',
+                               'displayName': 'hello',
                                'type': 'file'},
                               {'phase2CaCert': '82141cceaf',
-                              'eapType': 'test'})
-    with pytest.raises(wifi.ConfigureArgsError):
-        wifi._eap_check_option_ok({'name': 'some_flag',
-                                   'required': True,
-                                   'friendlyName': 'creative error',
-                                   'type': 'bool'},
-                                  {'some_flag': 'hi',
-                                  'eapType': 'test'})
-    with pytest.raises(wifi.ConfigureArgsError):
-        wifi._eap_check_option_ok({'name': 'some_choice',
-                                   'required': True,
-                                   'type': 'choice',
-                                   'friendlyName': 'Choice',
-                                   'choices': ['a', 'b', 'c']},
-                                  {'some_choice': 5,
-                                  'eapType': 'test'})
-    wifi._eap_check_option_ok({'name': 'some_choice',
-                               'required': True,
-                               'type': 'choice',
-                               'friendlyName': 'hi',
-                               'choices': ['a', 'b', 'c']},
-                              {'some_choice': 'a',
-                              'eapType': 'test'})
+                               'eapType': 'test'})
 
 
 async def test_list_keys(loop, test_client, wifi_keys_tempdir):
@@ -312,30 +290,23 @@ async def test_key_lifecycle(loop, test_client, wifi_keys_tempdir):
 async def test_eap_config_options(virtual_smoothie_env, loop, test_client):
     app = init(loop)
     cli = await loop.create_task(test_client(app))
-    resp = await cli.get('/wifi/eapoptions')
+    resp = await cli.get('/wifi/eap-options')
 
     assert resp.status == 200
 
     body = await resp.json()
     # Check that the body is shaped correctly but ignore the actual content
     assert 'options' in body
-    assert 'methods' in body
-    option_keys = ('name', 'friendlyName', 'required', 'type')
-    option_types = ('str', 'password', 'choice', 'file', 'bool')
+    option_keys = ('name', 'displayName', 'required', 'type')
+    option_types = ('string', 'password', 'file')
 
     def check_option(opt_dict):
         for key in option_keys:
             assert key in opt_dict
         assert opt_dict['type'] in option_types
-        if opt_dict['type'] == 'choice':
-            assert 'choices' in opt_dict
-            assert isinstance(opt_dict['choices'], list)
 
     for opt in body['options']:
-        check_option(opt)
-
-    for method in body['methods']:
-        assert 'name' in method
-        assert 'options' in method
-        for opt in method['options']:
-            check_option(opt)
+        assert 'name' in opt
+        assert 'options' in opt
+        for method_opt in opt['options']:
+            check_option(method_opt)

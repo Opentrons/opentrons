@@ -13,23 +13,12 @@ log = logging.getLogger(__name__)
 
 EAP_CONFIG_SHAPE = {
     'options': [
-        {
-            'name': 'eapType',
-            'friendlyName': 'EAP Type',
-            'required': True,
-            'type': 'choice',
-            'choices': [t.qualified_name() for t in nmcli.EAP_TYPES]
-        }
-    ],
-    'methods': [
         {'name': method.qualified_name(),
          'options': [{k: v for k, v in arg.items()
                       if k in ['name',
-                               'friendlyName',
+                               'displayName',
                                'required',
-                               'type',
-                               'choices',
-                               'fileType']}
+                               'type']}
                      for arg in method.args()]}
         for method in nmcli.EAP_TYPES]
 }
@@ -102,22 +91,15 @@ def _eap_check_option_ok(opt: Dict[str, str], config: Dict[str, Any]):
         if opt['required']:
             raise ConfigureArgsError(
                 'Required argument {} for eap method {} not present'
-                .format(opt['friendlyName'], config['eapType']))
+                .format(opt['displayName'], config['eapType']))
         else:
             return
     name = opt['name']
     o_type = opt['type']
     arg = config[name]
     if name in config:
-        if o_type in ('str', 'password') and not isinstance(arg, str):
+        if o_type in ('string', 'password') and not isinstance(arg, str):
             raise ConfigureArgsError('Option {} should be a str'
-                                     .format(name))
-        elif o_type == 'choice' and arg not in opt['choices']:
-            raise ConfigureArgsError('Option {} must be one of {}'
-                                     .format(name,
-                                             ','.join(opt['choices'])))
-        elif o_type == 'bool' and not isinstance(arg, bool):
-            raise ConfigureArgsError('Option {} must be a bool'
                                      .format(name))
         elif o_type == 'file' and not isinstance(arg, str):
             raise ConfigureArgsError('Option {} must be a str'
@@ -130,7 +112,7 @@ def _eap_check_config(eap_config: Dict[str, Any]) -> Dict[str, Any]:
     Similar to _check_configure_args but for only EAP.
     """
     eap_type = eap_config.get('eapType')
-    for method in EAP_CONFIG_SHAPE['methods']:
+    for method in EAP_CONFIG_SHAPE['options']:
         if method['name'] == eap_type:
             options = method['options']
             break
@@ -157,20 +139,20 @@ def _deduce_security(kwargs) -> nmcli.SECURITY_TYPES:
         'none': nmcli.SECURITY_TYPES.NONE,
         'wpa-eap': nmcli.SECURITY_TYPES.WPA_EAP,
     }
-    if not kwargs.get('security_type'):
-        if kwargs.get('psk') and kwargs.get('eap_config'):
+    if not kwargs.get('securityType'):
+        if kwargs.get('psk') and kwargs.get('eapConfig'):
             raise ConfigureArgsError(
                 'Cannot deduce security type: psk and eap both passed')
         elif kwargs.get('psk'):
-            kwargs['security_type'] = 'wpa-psk'
-        elif kwargs.get('eap_config'):
-            kwargs['security_type'] = 'wpa-eap'
+            kwargs['securityType'] = 'wpa-psk'
+        elif kwargs.get('eapConfig'):
+            kwargs['securityType'] = 'wpa-eap'
         else:
-            kwargs['security_type'] = 'none'
+            kwargs['securityType'] = 'none'
     try:
-        return sec_translation[kwargs['security_type']]
+        return sec_translation[kwargs['securityType']]
     except KeyError:
-        raise ConfigureArgsError('security_type must be one of {}'
+        raise ConfigureArgsError('securityType must be one of {}'
                                  .format(','.join(sec_translation.keys())))
 
 
@@ -189,22 +171,22 @@ def _check_configure_args(**kwargs) -> Dict[str, Any]:
     elif not isinstance(kwargs['hidden'], bool):
         raise ConfigureArgsError('If specified, hidden must be a bool')
 
-    kwargs['security_type'] = _deduce_security(kwargs)
+    kwargs['securityType'] = _deduce_security(kwargs)
 
     # If we have wpa2-personal, we need a psk
-    if kwargs['security_type'] == nmcli.SECURITY_TYPES.WPA_PSK:
+    if kwargs['securityType'] == nmcli.SECURITY_TYPES.WPA_PSK:
         if not kwargs.get('psk'):
             raise ConfigureArgsError(
-                'If security_type is wpa-psk, psk must be specified')
+                'If securityType is wpa-psk, psk must be specified')
         return kwargs
 
     # If we have wpa2-enterprise, we need eap config, and we need to check
     # it
-    if kwargs['security_type'] == nmcli.SECURITY_TYPES.WPA_EAP:
-        if not kwargs.get('eap_config'):
+    if kwargs['securityType'] == nmcli.SECURITY_TYPES.WPA_EAP:
+        if not kwargs.get('eapConfig'):
             raise ConfigureArgsError(
-                'If security_type is wpa-eap, eap_config must be specified')
-        kwargs['eap_config'] = _eap_check_config(kwargs['eap_config'])
+                'If securityType is wpa-eap, eapConfig must be specified')
+        kwargs['eapConfig'] = _eap_check_config(kwargs['eapConfig'])
         return kwargs
 
     # If we’re still here we have no security and we’re done
@@ -219,26 +201,26 @@ async def configure(request: web.Request) -> web.Response:
 
     Fields in the body are:
     ssid: str Required. The SSID to connect to.
-    security_type: str Optional. one of 'none', 'wpa-psk', 'wpa-eap.
-                       If not specified and
-                       - psk is also not specified: assumed to be 'none'
-                       - psk is specified: assumed to be 'wpa-psk'
+    securityType: str Optional. one of 'none', 'wpa-psk', 'wpa-eap.
+                      If not specified and
+                      - psk is also not specified: assumed to be 'none'
+                      - psk is specified: assumed to be 'wpa-psk'
     psk: str Optional. The password for the network, if there is one.
     hidden: bool Optional. True if the network is not broadcasting its
                            SSID. If not specified, assumed to be False.
-    eap_config: dict Optional. Configuration for WPA-EAP, required if
-                     security_type is wpa-eap. Should follow the format
-                     described by /wifi/eapoptions, e.g.
-                     {
-                         "method": <valid eap method>,
-                         "valid-eap-option1": arg,
-                         ...
-                         "valid-eap-optionN": arg
-                     }
-                     The types of the options should be as specified in
-                     /wifi/eapoptions. If the type is "file", the value
-                     should be a string containing the id of a previously
-                     uploaded key.
+    eapConfig: dict Optional. Configuration for WPA-EAP, required if
+                    securityType is wpa-eap. Should follow the format
+                    described by /wifi/eap-options, e.g.
+                    {
+                        "method": <valid eap method>,
+                        "valid-eap-option1": arg,
+                        ...
+                        "valid-eap-optionN": arg
+                    }
+                    The types of the options should be as specified in
+                    /wifi/eapoptions. If the type is "file", the value
+                    should be a string containing the id of a previously
+                    uploaded key.
     """
     try:
         body = await request.json()
@@ -446,26 +428,17 @@ async def eap_options(request: web.Request) -> web.Response:
 
     The object is shaped like this:
     {
-        options: [  // top-level options valid for any EAP configuration method
+        options: [ // Supported EAP methods and their options. One of these
+                   // method names must be passed in the eapConfig dict
             {
-                  name: str // i.e. "identity"
-                  friendlyName: str // something human readable like "Username"
-                  required: bool,
-                  type: str,
-                  choices: optional list[str]
-            },
-        ],
-        methods: [ // Supported EAP methods and their options. One of these
-                   // method names must be passed in the eap_config dict
-            {
-                name: str // i.e. TTLS-EAPMSCHAPv2
+                name: str // i.e. TTLS-EAPMSCHAPv2. Should be in the eapType
+                          // key of eapConfig when sent to /configure.
                 options: [
                     {
                      name: str // i.e. "username"
-                     friendlyName: str // i.e. "Username"
+                     displayName: str // i.e. "Username"
                      required: bool,
-                     type: str,
-                     choices: optional list[str]
+                     type: str
                    }
                 ]
             }
@@ -473,17 +446,13 @@ async def eap_options(request: web.Request) -> web.Response:
     }
 
 
-    The ``type`` keys denore the semantic kind of the argument. Valid types
+    The ``type`` keys denote the semantic kind of the argument. Valid types
     are:
 
     password: This is some kind of password. It may be a psk for the network,
               an Active Directory password, or the passphrase for a private key
-    str:      A generic string; perhaps a username, or a subject-matches
+    string:   A generic string; perhaps a username, or a subject-matches
               domain name for server validation
-    choice:   A string field with a limited number of options. If this is the
-              the type of an option, the option will also have a ``choices``
-              field presenting a list of valid options (as strings)
-    bool:     A boolean
     file:     A file that the user must provide. This should be the id of a
               file previously uploaded via POST /wifi/keys.
 
@@ -498,8 +467,8 @@ async def eap_options(request: web.Request) -> web.Response:
         ssid: "my-ssid",
         securityType: "wpa-eap",
         hidden: false,
-        eap_config : {
-            method: "TTLS/EAP-TLS",  // One of the method options
+        eapConfig : {
+            eapType: "TTLS/EAP-TLS",  // One of the method options
             identity: "alice@example.com", // And then its arguments
             anonymousIdentity: "anonymous@example.com",
             password: "testing123",
