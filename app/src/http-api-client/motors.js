@@ -1,11 +1,13 @@
 // @flow
 // http api client module for /motors/** endpoints
 import type {ThunkPromiseAction} from '../types'
+import type {ApiCall} from './types'
 import type {Mount, RobotService} from '../robot'
 
 import type {PipettesResponse} from './pipettes'
-import client, {type ApiRequestError} from './client'
-
+import client from './client'
+import {apiRequest, apiSuccess, apiFailure} from './actions'
+import type {ApiAction} from './actions'
 export type MotorAxis = 'a' | 'b' | 'c' | 'x' | 'y' | 'z'
 
 // not the actual request body because we combine multiple api calls
@@ -17,45 +19,16 @@ type DisengageResponse = {
   message: string,
 }
 
-type RequestPath = 'disengage'
-
-type MotorsRequest = DisengageRequest
-
-type MotorsResponse = DisengageResponse
-
-type MotorsRequestAction = {|
-  type: 'api:MOTORS_REQUEST',
-  payload: {|
-    robot: RobotService,
-    path: RequestPath,
-    request: MotorsRequest,
-  |},
-|}
-
-type MotorsSuccessAction = {|
-  type: 'api:MOTORS_SUCCESS',
-  payload: {|
-    robot: RobotService,
-    path: RequestPath,
-    response: MotorsResponse,
-  |},
-|}
-
-type MotorsFailureAction = {|
-  type: 'api:MOTORS_FAILURE',
-  payload: {|
-    robot: RobotService,
-    path: RequestPath,
-    error: ApiRequestError,
-  |},
-|}
+type MotorsCall = ApiCall<DisengageRequest, DisengageResponse>
 
 export type MotorsAction =
-  | MotorsRequestAction
-  | MotorsSuccessAction
-  | MotorsFailureAction
+  | ApiAction<'disengage', null, DisengageResponse>
 
-const DISENGAGE: RequestPath = 'disengage'
+export type MotorsState = {
+  motors?: MotorsCall,
+}
+
+const DISENGAGE: 'motors/disengage' = 'motors/disengage'
 
 export function disengagePipetteMotors (
   robot: RobotService,
@@ -64,7 +37,7 @@ export function disengagePipetteMotors (
   return (dispatch, getState) => {
     const pipettesState = getState().api.api[robot.name].pipettes
 
-    dispatch(motorsRequest(robot, DISENGAGE, {mounts}))
+    dispatch(apiRequest(robot, DISENGAGE, {mounts}))
 
     // pull motor axes from state if available, otherwise hit GET /pipettes
     const getPipettes = pipettesState && pipettesState.response
@@ -81,41 +54,9 @@ export function disengagePipetteMotors (
         return client(robot, 'POST', 'motors/disengage', {axes})
       })
       .then(
-        (response) => motorsSuccess(robot, DISENGAGE, response),
-        (error) => motorsFailure(robot, DISENGAGE, error)
+        (response) => apiSuccess(robot, DISENGAGE, response),
+        (error) => apiFailure(robot, DISENGAGE, error)
       )
       .then(dispatch)
   }
-}
-
-// TODO(mc, 2018-04-24): track motor request state
-export function motorsReducer () {
-  return {}
-}
-
-function motorsRequest (
-  robot: RobotService,
-  path: RequestPath,
-  request: MotorsRequest
-): MotorsRequestAction {
-  return {type: 'api:MOTORS_REQUEST', payload: {robot, path, request}}
-}
-
-function motorsSuccess (
-  robot: RobotService,
-  path: RequestPath,
-  response: MotorsResponse
-): MotorsSuccessAction {
-  return {
-    type: 'api:MOTORS_SUCCESS',
-    payload: {robot, path, response},
-  }
-}
-
-function motorsFailure (
-  robot: RobotService,
-  path: RequestPath,
-  error: ApiRequestError
-): MotorsFailureAction {
-  return {type: 'api:MOTORS_FAILURE', payload: {robot, path, error}}
 }
