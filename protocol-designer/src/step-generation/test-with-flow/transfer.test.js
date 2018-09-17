@@ -157,6 +157,7 @@ test('invalid pipette ID should throw error', () => {
 })
 
 describe('single transfer exceeding pipette max', () => {
+  let expectedFinalLiquidState
   beforeEach(() => {
     transferArgs = {
       ...transferArgs,
@@ -170,6 +171,28 @@ describe('single transfer exceeding pipette max', () => {
     // liquid setup
     robotInitialState.liquidState.labware.sourcePlateId.A1 = {'0': {volume: 400}}
     robotInitialState.liquidState.labware.sourcePlateId.B1 = {'1': {volume: 400}}
+
+    expectedFinalLiquidState = {
+      labware: {
+        sourcePlateId: {
+          A1: {'0': {volume: 400 - 350}},
+          B1: {'1': {volume: 400 - 350}},
+        },
+        destPlateId: {
+          A3: {'0': {volume: 350}},
+          B3: {'0': {volume: 0}, '1': {volume: 350}},
+        },
+      },
+      pipettes: {
+        p300SingleId: {
+          '0': {
+            // pipette's Tip 0 has 0uL of Ingred 0 and 1 (contamination)
+            '0': {volume: 0},
+            '1': {volume: 0},
+          },
+        },
+      },
+    }
   })
 
   test('changeTip="once"', () => {
@@ -194,30 +217,7 @@ describe('single transfer exceeding pipette max', () => {
     expect(result.robotState.liquidState).toEqual(merge(
       {},
       robotInitialState.liquidState,
-      {
-        labware: {
-          sourcePlateId: {
-            A1: {'0': {volume: 400 - 350}},
-            B1: {'1': {volume: 400 - 350}},
-          },
-          destPlateId: {
-            A3: {'0': {volume: 350}},
-            B3: {
-              '0': {volume: 0}, // contaminant volume
-              '1': {volume: 350},
-            },
-          },
-        },
-        pipettes: {
-          p300SingleId: {
-            // pipette's Tip 0 has 0uL of Ingred 0 & 1 (contamination)
-            '0': {
-              '0': {volume: 0},
-              '1': {volume: 0},
-            },
-          },
-        },
-      }
+      expectedFinalLiquidState
     ))
   })
 
@@ -256,31 +256,14 @@ describe('single transfer exceeding pipette max', () => {
       cmd.dispense('B3', 50, {labware: 'destPlateId'}),
     ])
 
+    // ignore trash contents because of "__air__" from dropped tips
+    // TODO: Ian 2018-09-17 fix "__air__" and remove this line $FlowFixMe
+    expectedFinalLiquidState.labware[FIXED_TRASH_ID] = result.robotState.liquidState.labware[FIXED_TRASH_ID]
+
     expect(result.robotState.liquidState).toEqual(merge(
       {},
       robotInitialState.liquidState,
-      {
-        labware: {
-          sourcePlateId: {
-            A1: {'0': {volume: 400 - 350}},
-            B1: {'1': {volume: 400 - 350}},
-          },
-          destPlateId: {
-            A3: {'0': {volume: 350}},
-            B3: {'0': {volume: 0}, '1': {volume: 350}},
-          },
-          [FIXED_TRASH_ID]: result.robotState.liquidState.labware[FIXED_TRASH_ID], // Ignore liquid contents of trash. TODO LATER make this more elegant
-        },
-        pipettes: {
-          p300SingleId: {
-            '0': {
-              // pipette's Tip 0 has 0uL of Ingred 0 and 1 (contamination)
-              '0': {volume: 0},
-              '1': {volume: 0},
-            },
-          },
-        },
-      }
+      expectedFinalLiquidState
     ))
   })
 
@@ -311,27 +294,7 @@ describe('single transfer exceeding pipette max', () => {
     expect(result.robotState.liquidState).toEqual(merge(
       {},
       robotInitialState.liquidState,
-      {
-        labware: {
-          sourcePlateId: {
-            A1: {'0': {volume: 400 - 350}},
-            B1: {'1': {volume: 400 - 350}},
-          },
-          destPlateId: {
-            A3: {'0': {volume: 350}},
-            B3: {'0': {volume: 0}, '1': {volume: 350}},
-          },
-        },
-        pipettes: {
-          p300SingleId: {
-            // pipette's Tip 0 has 0uL of Ingred 0 and 1 (contamination)
-            '0': {
-              '0': {volume: 0},
-              '1': {volume: 0},
-            },
-          },
-        },
-      }
+      expectedFinalLiquidState
     ))
   })
 })
