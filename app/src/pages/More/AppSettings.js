@@ -83,7 +83,7 @@ function mapDispatchToProps (dispatch: Dispatch): DP {
   return {
     checkUpdate: () => dispatch(checkShellUpdate()),
     downloadUpdate: () => dispatch(downloadShellUpdate()),
-    applyUpdate: () => applyShellUpdate(),
+    applyUpdate: () => dispatch(applyShellUpdate()),
     closeUpdateModal: () => {
       dispatch(setShellUpdateSeen())
       dispatch(push('/menu/app'))
