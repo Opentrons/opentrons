@@ -302,11 +302,14 @@ def delay(seconds, minutes):
     )
 
 
-def pause():
+def pause(msg):
+    text = 'Pausing robot operation'
+    if msg:
+        text = text + ': {}'.format(msg)
     return make_command(
         name=types.PAUSE,
         payload={
-            'text': 'Pausing robot operation'
+            'text': text
         }
     )
 

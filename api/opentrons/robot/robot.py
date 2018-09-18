@@ -741,7 +741,7 @@ class Robot(object):
             )
 
     @commands.publish.both(command=commands.pause)
-    def pause(self):
+    def pause(self, msg=None):
         """
         Pauses execution of the protocol. Use :meth:`resume` to resume
         """
@@ -817,7 +817,7 @@ class Robot(object):
             return False
         return self._driver.simulating
 
-    @commands.publish.before(command=commands.comment)
+    @commands.publish.both(command=commands.comment)
     def comment(self, msg):
         pass
 
