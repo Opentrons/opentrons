@@ -68,6 +68,7 @@ export default class JogControls extends React.Component<Props, State> {
 
   handleStepSelect = (event: SyntheticInputEvent<*>) => {
     this.setState({step: Number(event.target.value)})
+    event.target.blur()
   }
 
   getJogHandlers () {
