@@ -12,7 +12,7 @@ import {
   constants as robotConstants,
 } from '../../robot'
 import {getAnyRobotUpdateAvailable} from '../../http-api-client'
-import {getShellUpdate} from '../../shell'
+import {getAvailableShellUpdate} from '../../shell'
 
 import {NavButton} from '@opentrons/components'
 
@@ -38,7 +38,7 @@ function mapStateToProps (state: State, ownProps: OP): SP {
     robotSelectors.getConnectionStatus(state) === robotConstants.CONNECTED
   )
   const robotNotification = getAnyRobotUpdateAvailable(state)
-  const moreNotification = getShellUpdate(state).available != null
+  const moreNotification = getAvailableShellUpdate(state) != null
 
   const NAV_ITEM_BY_NAME: {[string]: React.ElementProps<typeof NavButton>} = {
     connect: {

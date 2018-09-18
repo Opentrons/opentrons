@@ -11,7 +11,7 @@ import type {State, Dispatch} from '../../types'
 import type {UpdateChannel} from '../../config'
 
 type OP = {
-  checkForUpdates: () => mixed,
+  checkUpdate: () => mixed,
 }
 
 type SP = {
@@ -23,6 +23,7 @@ type DP = {
   toggleDevTools: () => mixed,
   handleChannel: (event: SyntheticInputEvent<HTMLSelectElement>) => mixed,
 }
+
 type Props = SP & DP
 
 const TITLE = 'Advanced Settings'
@@ -83,7 +84,7 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP) {
 
       // TODO(mc, 2018-08-03): refactor app update interface to be more
       // reactive and teach it to re-check on release channel change
-      setTimeout(ownProps.checkForUpdates, 500)
+      setTimeout(ownProps.checkUpdate, 500)
     },
   }
 }
