@@ -39,7 +39,7 @@ export default function AppUpdateModal (props: Props) {
         contentsClassName={styles.update_modal_contents}
         alertOverlay
       >
-        {info && <ReleaseNotes source={info.releaseNotes} />}
+        <ReleaseNotes source={info && info.releaseNotes} />
         <BottomButtonBar
           buttons={[
             {onClick: closeModal, children: closeButtonChildren},

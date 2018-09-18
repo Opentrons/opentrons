@@ -10,13 +10,18 @@ const renderer = remark().use(reactRenderer, {
   remarkReactComponents: {div: React.Fragment},
 })
 
+const DEFAULT_RELEASE_NOTES = 'We recommend upgrading to the latest version.'
+
 export default function ReleaseNotes (props: Props) {
   const {source} = props
-  if (!source) return null
 
   return (
     <div className={styles.release_notes}>
-      {renderer.processSync(source).contents}
+      {source ? (
+        renderer.processSync(source).contents
+      ) : (
+        <p>{DEFAULT_RELEASE_NOTES}</p>
+      )}
     </div>
   )
 }
