@@ -66,9 +66,10 @@
 }
 
 .alert_modal_wrapper {
-  border-radius: 0;
   position: relative;
+  max-height: 100%;
   padding-top: 4rem;
+  border-radius: 0;
 }
 
 .no_alert_header {
@@ -109,6 +110,7 @@
 .alert_modal_contents {
   @apply --font-body-2-dark;
 
+  max-height: 100%;
   padding: 1rem;
 
   & > p {

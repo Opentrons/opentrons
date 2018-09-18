@@ -85,7 +85,7 @@ export function updateReducer (
       }
 
     case 'shell:SET_UPDATE_SEEN':
-      return {...state, seen: true}
+      return {...state, seen: true, error: null}
   }
 
   return state

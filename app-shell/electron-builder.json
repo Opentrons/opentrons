@@ -8,6 +8,7 @@
       "to": "./ui",
       "filter": ["**/*"]
     },
+    "build/release-notes.md",
     "!Makefile"
   ],
   "extraResources": [
@@ -49,20 +50,14 @@
     "fpm": ["--name=Opentrons"]
   },
   "mac": {
-    "target": [
-      "zip"
-    ],
+    "target": ["zip"],
     "category": "public.app-category.productivity"
   },
   "win": {
-    "target": [
-      "nsis"
-    ]
+    "target": ["nsis"]
   },
   "linux": {
-    "target": [
-      "deb"
-    ],
+    "target": ["deb"],
     "executableName": "opentrons",
     "category": "Science"
   },

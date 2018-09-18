@@ -8,10 +8,8 @@ import AppInfoCard from './AppInfoCard'
 import AppUpdateModal from './AppUpdateModal'
 import {CardContainer, CardRow} from '../layout'
 
-import type {ShellUpdateState} from '../../shell'
-
 type Props = {
-  update: ShellUpdateState,
+  availableVersion: ?string,
   checkUpdate: () => mixed,
 }
 
@@ -19,10 +17,13 @@ export default function AppSettings (props: Props) {
   return (
     <CardContainer>
       <CardRow>
-        <AppInfoCard {...props}/>
+        <AppInfoCard
+          availableVersion={props.availableVersion}
+          checkUpdate={props.checkUpdate}
+        />
       </CardRow>
       <CardRow>
-        <AnalyticsSettingsCard {...props} />
+        <AnalyticsSettingsCard />
       </CardRow>
       <CardRow>
         <AdvancedSettingsCard checkUpdate={props.checkUpdate} />
