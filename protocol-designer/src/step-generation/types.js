@@ -84,8 +84,9 @@ export type DistributeFormData = {
   sourceWell: string,
   destWells: Array<string>,
 
-  /** Disposal destination is final blowout destination of disposalVolume contents (e.g. trash, source well ...) */
-  disposalDestination: ?string,
+  /** Disposal labware and well for final blowout destination of disposalVolume contents (e.g. trash, source well, etc.) */
+  disposalLabware: ?string,
+  disposalWell: ?string,
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?MixArgs,
@@ -221,7 +222,7 @@ export type Command = {|
   params: {|
     ...PipetteLabwareFields,
     offsetFromBottomMm?: ?number,
-  |}
+  |},
 |} | {|
   command: 'delay',
   /** number of seconds to delay (fractional values OK),

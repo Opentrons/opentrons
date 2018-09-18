@@ -69,13 +69,6 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
     'dispense_mix_times'
   )
 
-  let disposalVolume = null
-  let disposalDestination = null
-  if (formData['aspirate_disposalVol_checkbox']) { // TODO: BC 09-17-2018 handle unparseable values?
-    disposalVolume = Number(formData['aspirate_disposalVol_volume'])
-    disposalDestination = formData['aspirate_disposalVol_destination']
-  }
-
   const changeTip = formData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION
 
   const commonFields = {
@@ -91,7 +84,6 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
     blowout, // TODO allow user to blowout
     changeTip,
     delayAfterDispense,
-    disposalVolume,
     mixInDestination,
     preWetTip: formData['aspirate_preWetTip'] || false,
     touchTipAfterAspirate: formData['aspirate_touchTip'] || false,
@@ -132,6 +124,24 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
     }
   }
 
+  const SOURCE_WELL_DISPOSAL_DESTINATION = 'source_well'
+  let disposalVolume = null
+  let disposalDestination = null
+  let disposalLabware = null
+  let disposalWell = null
+  if (formData['aspirate_disposalVol_checkbox']) { // TODO: BC 09-17-2018 handle unparseable values?
+    disposalVolume = Number(formData['aspirate_disposalVol_volume'])
+    disposalDestination = formData['aspirate_disposalVol_destination']
+    if (disposalDestination === SOURCE_WELL_DISPOSAL_DESTINATION) {
+      disposalLabware = sourceLabware
+      disposalWell = sourceWells[0]
+    } else {
+      // NOTE: if disposalDestination is not source well it is a labware type (e.g. fixed-trash)
+      disposalLabware = disposalDestination
+      disposalWell = 'A1'
+    }
+  }
+
   // TODO: BC 2018-08-21 remove this old validation logic once no longer preventing save
   const requiredFieldErrors = [
     'pipette',
@@ -166,6 +176,7 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
         errors,
         validatedForm: Object.values(errors).length === 0 ? {
           ...commonFields,
+          disposalVolume,
           stepType: 'transfer',
           sourceWells,
           destWells,
@@ -181,6 +192,7 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
         errors,
         validatedForm: Object.values(errors).length === 0 ? {
           ...commonFields,
+          disposalVolume,
           mixFirstAspirate,
           sourceWells,
           destWell: destWells[0],
@@ -196,7 +208,9 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
         errors,
         validatedForm: Object.values(errors).length === 0 ? {
           ...commonFields,
-          disposalDestination,
+          disposalVolume,
+          disposalLabware,
+          disposalWell,
           mixBeforeAspirate,
           sourceWell: sourceWells[0],
           destWells,

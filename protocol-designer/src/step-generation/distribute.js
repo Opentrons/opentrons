@@ -110,18 +110,11 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
       }
 
       let blowoutCommands = []
-      if (data.disposalVolume && data.disposalDestination === 'source_well') {
+      if (data.disposalVolume && data.disposalLabware && data.disposalWell) {
         blowoutCommands = [blowout({
           pipette: data.pipette,
-          labware: data.sourceLabware,
-          well: data.sourceWell,
-        })]
-      } else if (data.disposalVolume && data.disposalDestination) {
-        // if disposalDestination is not 'source_well' assume it is a labware (e.g. fixed-trash)
-        blowoutCommands = [blowout({
-          pipette: data.pipette,
-          labware: data.disposalDestination,
-          well: 'A1',
+          labware: data.disposalLabware,
+          well: data.disposalWell,
         })]
       }
 

@@ -34,7 +34,8 @@ beforeEach(() => {
     preWetTip: false,
     touchTipAfterAspirate: false,
     disposalVolume: 60,
-    disposalDestination: 'trashId',
+    disposalLabware: 'trashId',
+    disposalWell: 'A1',
     mixBeforeAspirate: null,
 
     touchTipAfterDispense: false,
@@ -181,7 +182,7 @@ describe('tip handling for multiple distribute chunks', () => {
   })
 })
 
-describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () => {
+describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
   test('mix before aspirate, then aspirate disposal volume', () => {
     // NOTE this also tests "uneven final chunk" eg A6 in [A2 A3 | A4 A5 | A6]
     // which is especially relevant to disposal volume
@@ -194,7 +195,8 @@ describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () =
 
       mixFirstAspirate: true,
       disposalVolume: 12,
-      disposalDestination: 'source_well',
+      disposalLabware: 'sourcePlateId',
+      disposalWell: 'A1',
     }
     const result = distribute(distributeArgs)(robotInitialState)
     const aspirateVol = (120 * 2) + 12
@@ -357,7 +359,8 @@ describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () =
   test('mix before aspirate w/ disposal vol', () => {
     const volume = 130
     const disposalVolume = 20
-    const disposalDestination = 'source_well'
+    const disposalLabware = 'sourcePlateId'
+    const disposalWell = 'A1'
     const aspirateVol = (volume * 2) + disposalVolume
     const distributeArgs: DistributeFormData = {
       ...mixinArgs,
@@ -370,7 +373,8 @@ describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () =
         times: 2,
       },
       disposalVolume,
-      disposalDestination,
+      disposalLabware,
+      disposalWell,
     }
 
     const result = distribute(distributeArgs)(robotInitialState)
@@ -430,7 +434,8 @@ describe('distribute volume exceeds pipette max volume', () => {
       changeTip,
       volume: 350,
       disposalVolume: null, // TODO additional test with blowout
-      disposalDestination: null,
+      disposalLabware: null,
+      disposalWell: null,
     }
     const result = distribute(distributeArgs)(robotInitialState)
 
@@ -471,7 +476,8 @@ describe('distribute volume exceeds pipette max volume', () => {
       changeTip,
       volume: 350,
       disposalVolume: null, // TODO additional test with blowout
-      disposalDestination: null,
+      disposalLabware: null,
+      disposalWell: null,
     }
     const result = distribute(distributeArgs)(robotInitialState)
 
@@ -504,7 +510,8 @@ describe('distribute volume exceeds pipette max volume', () => {
       changeTip,
       volume: 350,
       disposalVolume: null, // TODO additional test with blowout
-      disposalDestination: null,
+      disposalLabware: null,
+      disposalWell: null,
     }
     const result = distribute(distributeArgs)(robotInitialState)
 
