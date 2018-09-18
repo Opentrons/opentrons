@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import { Manager, Reference, Popper } from 'react-popper'
+import cx from 'classnames'
 import styles from './tooltips.css'
 
 const OPEN_DELAY_MS = 300
@@ -51,17 +52,27 @@ class HoverTooltip extends React.Component<Props, State> {
           {({ref}) => this.props.children({ref, onMouseEnter: this.delayedOpen, onMouseLeave: this.delayedClose})}
         </Reference>
         {
-          this.state.isOpen &&
+          true &&
           <Popper
             placement={this.props.placement}
-            modifiers={{offset: {offset: `0, ${DISTANCE_FROM_REFERENCE}`}, ...this.props.modifiers}}
+            modifiers={{
+              offset: {offset: `0, ${DISTANCE_FROM_REFERENCE}`},
+              ...this.props.modifiers,
+            }}
             positionFixed={this.props.positionFixed}
           >
-            {({ref, style, placement}) => (
-              <div ref={ref} className={styles.tooltip_box} style={style} data-placement={placement}>
-                {this.props.tooltipComponent}
-              </div>
-            )}
+            {({ref, style, placement, arrowProps}) => {
+              let {style: arrowStyle} = arrowProps
+              if (placement === 'left' || placement === 'right') {
+                arrowStyle = {top: '2px'}
+              }
+              return (
+                <div ref={ref} className={styles.tooltip_box} style={style} data-placement={placement}>
+                  {this.props.tooltipComponent}
+                  <div className={cx(styles.arrow, styles[placement])} ref={arrowProps.ref} style={arrowStyle} />
+                </div>
+              )
+            }}
           </Popper>
         }
       </Manager>

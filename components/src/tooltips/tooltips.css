@@ -10,3 +10,63 @@
   cursor: pointer;
   z-index: 9001;
 }
+
+.arrow {
+  position: absolute;
+  width: 2em;
+  height: 2em;
+  bottom: 0;
+  left: 0;
+  margin-bottom: -0.9em;
+  width: 2em;
+  height: 1em;
+  &::before {
+    border-width: 1em 1em 0 1em;
+    border-color: var(--c-bg-dark) transparent transparent transparent;
+  }
+}
+
+.arrow.bottom {
+  top: 0;
+  left: 0;
+  margin-top: -0.9em;
+  width: 2em;
+  height: 1em;
+  &::before {
+    border-width: 0 1em 1em 1em;
+    border-color: transparent transparent var(--c-bg-dark) transparent;
+  }
+}
+
+.arrow.right {
+  top: 0.2em;
+  left: 0;
+  margin-left: -0.9em;
+  height: 2em;
+  width: 1em;
+  &::before {
+    border-width: 1em 1em 1em 0;
+    border-color: transparent var(--c-bg-dark) transparent transparent;
+  }
+}
+
+.arrow.left {
+  top: 0.2em;
+  right: 0;
+  margin-right: -0.9em;
+  height: 2em;
+  width: 1em;
+  &::before {
+    border-width: 1em 0 1em 1em;
+    border-color: transparent transparent transparent var(--c-bg-dark);
+  }
+}
+
+.arrow::before {
+  content: '';
+  margin: auto;
+  display: block;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
