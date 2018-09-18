@@ -211,7 +211,8 @@ const stepCreationButtonExpandedSelector: Selector<boolean> = createSelector(
   (state: RootState) => state.stepCreationButtonExpanded
 )
 
-const selectedStepFormDataSelector: Selector<boolean | FormData | BlankForm> = createSelector(
+type MakeGetSelectedStepFormData = ({defaultNextPipette: string}) => Selector<boolean | FormData | BlankForm>
+const makeGetSelectedStepFormData: MakeGetSelectedStepFormData = ({defaultNextPipette}) => createSelector(
   getSavedForms,
   getSelectedStepId,
   getSteps,
@@ -230,7 +231,11 @@ const selectedStepFormDataSelector: Selector<boolean | FormData | BlankForm> = c
       // existing form
       savedStepForms[selectedStepId] ||
       // new blank form
-      generateNewForm(selectedStepId, steps[selectedStepId].stepType)
+      generateNewForm({
+        stepId: selectedStepId,
+        stepType: steps[selectedStepId].stepType,
+        defaultNextPipette,
+      })
     )
   }
 )
@@ -344,7 +349,7 @@ export default {
   getHoveredStepId,
   getActiveItem,
   getHoveredSubstep,
-  selectedStepFormData: selectedStepFormDataSelector,
+  makeGetSelectedStepFormData,
   getUnsavedForm,
   formData, // TODO: remove after sunset
   formModalData,

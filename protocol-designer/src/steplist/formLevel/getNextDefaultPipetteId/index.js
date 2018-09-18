@@ -1,6 +1,6 @@
 // @flow
 import last from 'lodash/last'
-import type {StepIdType, FormData} from '../../form-types'
+import type {StepIdType, FormData} from '../../../form-types'
 
 // TODO: Ian 2018-09-18 once we support switching pipettes mid-protocol,
 // this should use pipette state in RobotState, instead of pipettes/ selectors

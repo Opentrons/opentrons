@@ -9,6 +9,7 @@ import type {ChangeFormPayload} from './types'
 import type {TerminalItemId, SubstepIdentifier, FormSectionNames} from '../types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../../types'
 import handleFormChange from './handleFormChange'
+import {getNextDefaultPipetteId} from '../formLevel'
 
 export type ChangeFormInputAction = {
   type: 'CHANGE_FORM_INPUT',
@@ -131,9 +132,18 @@ export const selectStep = (stepId: StepIdType): ThunkAction<*> =>
 
     dispatch(selectStepAction)
 
+    const state = getState()
+
+    const defaultNextPipette = getNextDefaultPipetteId(
+      selectors.getSavedForms(state),
+      selectors.orderedSteps(state),
+      // $FlowFixMe TODO IMMEDIATELY use selector
+      state.pipettes.pipettes.byMount || {}) // TODO IMMEDIATELY use selector
+
     dispatch({
       type: 'POPULATE_FORM',
-      payload: selectors.selectedStepFormData(getState()),
+      // TODO IMMEDIATELY rethink this ahhh
+      payload: selectors.makeGetSelectedStepFormData({defaultNextPipette})(state),
     })
   }
 
