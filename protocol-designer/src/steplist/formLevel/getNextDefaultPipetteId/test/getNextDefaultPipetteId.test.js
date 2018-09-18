@@ -1,5 +1,5 @@
 // @flow
-import getNextDefaultPipetteId from '../index'
+import getNextDefaultPipetteId from '../'
 
 describe('getNextDefaultPipetteId', () => {
   describe('no previous forms', () => {
@@ -21,7 +21,7 @@ describe('getNextDefaultPipetteId', () => {
         const savedForms = {}
         const orderedSteps = []
 
-        const result = getNextDefaultPipetteId.resultFunc(
+        const result = getNextDefaultPipetteId(
           savedForms,
           orderedSteps,
           equippedPipettes)
@@ -48,6 +48,16 @@ describe('getNextDefaultPipetteId', () => {
         orderedSteps: ['x', 'a', 'x'],
         expected: 'pipetteId_A',
       },
+      {
+        testMsg: 'missing steps (no key in savedForms)',
+        orderedSteps: ['missingStep', 'a', 'missingStep', 'b', 'missingStep'],
+        expected: 'pipetteId_B',
+      },
+      {
+        testMsg: 'only missing steps',
+        orderedSteps: ['missingStep', 'missingStep'],
+        expected: 'default',
+      },
     ]
 
     testCases.forEach(({testMsg, orderedSteps, expected}) => {
@@ -60,7 +70,7 @@ describe('getNextDefaultPipetteId', () => {
 
         const equippedPipettes = {left: 'default'}
 
-        const result = getNextDefaultPipetteId.resultFunc(
+        const result = getNextDefaultPipetteId(
           savedForms,
           orderedSteps,
           equippedPipettes)

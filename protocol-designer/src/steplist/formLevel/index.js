@@ -19,6 +19,7 @@ import {
 import type {StepType} from '../../form-types'
 
 export {default as generateNewForm} from './generateNewForm'
+export {default as getDefaultsForStepType} from './getDefaultsForStepType'
 export {default as stepFormToArgs} from './stepFormToArgs'
 
 type FormHelpers = {getErrors?: (mixed) => Array<FormError>, getWarnings?: (mixed) => Array<FormWarning>}
