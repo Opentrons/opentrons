@@ -61,6 +61,7 @@ dev:
 .PHONY: wheel
 wheel: clean
 	$(python) setup.py bdist_wheel
+	$(python) remove_cr_in_zip.py -v dist/
 	shx rm -rf build
 	shx ls dist
 
