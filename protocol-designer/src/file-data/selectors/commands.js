@@ -30,7 +30,8 @@ export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> 
       acc: StepGeneration.LabwareLiquidState,
       labwareId
     ): StepGeneration.LabwareLiquidState => {
-      const allWells = getAllWellsForLabware(allLabware[labwareId].type)
+      const labwareType = allLabware[labwareId] && allLabware[labwareId].type
+      const allWells = labwareType ? getAllWellsForLabware(labwareType) : []
       const liquidStateForLabwareAllWells = allWells.reduce(
         (innerAcc: StepGeneration.SingleLabwareLiquidState, well) => ({
           ...innerAcc,
@@ -46,7 +47,7 @@ export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> 
   }
 )
 
-function labwareConverter (labwareAppState: {[labwareId: string]: Labware}): {[labwareId: string]: StepGeneration.LabwareData} {
+function labwareConverter (labwareAppState: {[labwareId: string]: ?Labware}): {[labwareId: string]: StepGeneration.LabwareData} {
   // Convert internal PD labware objects into JSON spec labware objects
   // (just removes keys & makes flow happy)
   return mapValues(labwareAppState, (l: Labware): StepGeneration.LabwareData => ({

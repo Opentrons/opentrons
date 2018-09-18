@@ -145,7 +145,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     containerId,
     wellContents,
     getTipProps: getTipProps || noop,
-    containerType: labware.type,
+    containerType: labware ? labware.type : 'missing labware',
     selectable,
   }
 }

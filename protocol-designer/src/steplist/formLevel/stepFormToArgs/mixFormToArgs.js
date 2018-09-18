@@ -32,8 +32,7 @@ const mixFormToArgs = (formData: FormData, context: StepFormContext): Validation
   const orderSecond = formData.aspirate_wellOrder_second
   if (context && context.labware && labware) {
     const labwareById = context.labware
-    const labwareType = labwareById[labware].type
-    const labwareDef = getLabware(labwareType)
+    const labwareDef = labwareById[labware] && getLabware(labwareById[labware].type)
     if (labwareDef) {
       const allWellsOrdered = orderWells(labwareDef.ordering, orderFirst, orderSecond)
       wells = intersection(allWellsOrdered, wells)

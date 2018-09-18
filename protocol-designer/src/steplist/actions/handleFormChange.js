@@ -138,7 +138,8 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       } else if (multiToSingle) {
         // multi-channel to single-channel: convert primary wells to all wells
         const labwareId = unsavedForm.labware
-        const labwareType = labwareId && labwareIngredSelectors.getLabware(baseState)[labwareId].type
+        const labware = labwareId && labwareIngredSelectors.getLabware(baseState)[labwareId]
+        const labwareType = labware && labware.type
 
         updateOverrides = {
           ...updateOverrides,
@@ -158,8 +159,10 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
         const sourceLabwareId = unsavedForm['aspirate_labware']
         const destLabwareId = unsavedForm['dispense_labware']
 
-        const sourceLabwareType = sourceLabwareId && labwareIngredSelectors.getLabware(baseState)[sourceLabwareId].type
-        const destLabwareType = destLabwareId && labwareIngredSelectors.getLabware(baseState)[destLabwareId].type
+        const sourceLabware = sourceLabwareId && labwareIngredSelectors.getLabware(baseState)[sourceLabwareId]
+        const sourceLabwareType = sourceLabware && sourceLabware.type
+        const destLabware = destLabwareId && labwareIngredSelectors.getLabware(baseState)[destLabwareId]
+        const destLabwareType = destLabware && destLabware.type
 
         updateOverrides = {
           ...updateOverrides,

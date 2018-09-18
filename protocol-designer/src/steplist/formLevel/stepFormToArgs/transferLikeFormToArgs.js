@@ -110,7 +110,7 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
   if (context && context.labware) {
     const labwareById = context.labware
     if (stepType !== 'distribute' && sourceLabware) {
-      const sourceLabwareDef = getLabware(labwareById[sourceLabware].type)
+      const sourceLabwareDef = labwareById[sourceLabware] && getLabware(labwareById[sourceLabware].type)
       if (sourceLabwareDef) {
         const allWellsOrdered = orderWells(sourceLabwareDef.ordering, aspirate_wellOrder_first, aspirate_wellOrder_second)
         sourceWells = intersection(allWellsOrdered, sourceWells)
@@ -119,7 +119,7 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
       }
     }
     if (stepType !== 'consolidate' && destLabware) {
-      const destLabwareDef = getLabware(labwareById[destLabware].type)
+      const destLabwareDef = labwareById[destLabware] && getLabware(labwareById[destLabware].type)
       if (destLabwareDef) {
         const allWellsOrdered = orderWells(destLabwareDef.ordering, dispense_wellOrder_first, dispense_wellOrder_second)
         destWells = intersection(allWellsOrdered, destWells)
