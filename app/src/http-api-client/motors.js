@@ -19,13 +19,13 @@ type DisengageResponse = {
   message: string,
 }
 
-type MotorsCall = ApiCall<DisengageRequest, DisengageResponse>
+type DisengageCall = ApiCall<DisengageRequest, DisengageResponse>
 
 export type MotorsAction =
-  | ApiAction<'disengage', null, DisengageResponse>
+  | ApiAction<'motors/disengage', DisengageRequest, DisengageResponse>
 
 export type MotorsState = {
-  motors?: MotorsCall,
+  'motors/disengage'?: DisengageCall,
 }
 
 const DISENGAGE: 'motors/disengage' = 'motors/disengage'
