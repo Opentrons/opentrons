@@ -11,7 +11,7 @@ import type {StepIdType, FormData} from '../../../form-types'
 export default function getNextDefaultPipetteId (
   savedForms: {[StepIdType]: FormData},
   orderedSteps: Array<StepIdType>,
-  pipetteIdsByMount: {left?: string, right?: string}
+  pipetteIdsByMount: {left?: ?string, right?: ?string}
 ): string {
   const prevPipetteSteps = orderedSteps
     .map(stepId => savedForms[stepId])

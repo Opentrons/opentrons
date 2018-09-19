@@ -2,14 +2,11 @@
 import type {Dispatch} from 'redux'
 
 import {selectors} from '../index'
-import {selectors as labwareIngredsSelectors} from '../../labware-ingred/reducers'
-import {actions as tutorialActions} from '../../tutorial'
 import type {StepType, StepIdType, FormModalFields, FormData} from '../../form-types'
 import type {ChangeFormPayload} from './types'
 import type {TerminalItemId, SubstepIdentifier, FormSectionNames} from '../types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../../types'
 import handleFormChange from './handleFormChange'
-import {getNextDefaultPipetteId} from '../formLevel'
 
 export type ChangeFormInputAction = {
   type: 'CHANGE_FORM_INPUT',
@@ -40,30 +37,6 @@ export type AddStepAction = {
     stepType: StepType,
   },
 }
-
-type NewStepPayload = {
-  stepType: StepType,
-}
-
-// addStep thunk adds an incremental integer ID for Step reducers.
-export const addStep = (payload: NewStepPayload) =>
-  (dispatch: ThunkDispatch<*>, getState: GetState) => {
-    const state = getState()
-    const stepId = selectors.nextStepId(state)
-    dispatch({
-      type: 'ADD_STEP',
-      payload: {
-        ...payload,
-        id: stepId,
-      },
-    })
-    const deckHasLiquid = labwareIngredsSelectors.hasLiquid(state)
-    const stepNeedsLiquid = ['transfer', 'distribute', 'consolidate', 'mix'].includes(payload.stepType)
-    if (stepNeedsLiquid && !deckHasLiquid) {
-      dispatch(tutorialActions.addHint('add_liquids_and_labware'))
-    }
-    dispatch(selectStep(stepId))
-  }
 
 export type DeleteStepAction = {
   type: 'DELETE_STEP',
@@ -97,11 +70,6 @@ export const toggleStepCollapsed = (stepId: StepIdType): ToggleStepCollapsedActi
   payload: stepId,
 })
 
-export type SelectStepAction = {
-  type: 'SELECT_STEP',
-  payload: StepIdType,
-}
-
 export const hoverOnSubstep = (payload: SubstepIdentifier): * => ({
   type: 'HOVER_ON_SUBSTEP',
   payload: payload,
@@ -121,30 +89,6 @@ export const selectTerminalItem = (terminalId: TerminalItemId): ThunkAction<*> =
 
     dispatch(cancelStepForm())
     dispatch(selectTerminalItemAction)
-  }
-
-export const selectStep = (stepId: StepIdType): ThunkAction<*> =>
-  (dispatch: ThunkDispatch<*>, getState: GetState) => {
-    const selectStepAction: SelectStepAction = {
-      type: 'SELECT_STEP',
-      payload: stepId,
-    }
-
-    dispatch(selectStepAction)
-
-    const state = getState()
-
-    const defaultNextPipette = getNextDefaultPipetteId(
-      selectors.getSavedForms(state),
-      selectors.orderedSteps(state),
-      // $FlowFixMe TODO IMMEDIATELY use selector
-      state.pipettes.pipettes.byMount || {}) // TODO IMMEDIATELY use selector
-
-    dispatch({
-      type: 'POPULATE_FORM',
-      // TODO IMMEDIATELY rethink this ahhh
-      payload: selectors.makeGetSelectedStepFormData({defaultNextPipette})(state),
-    })
   }
 
 // TODO: Ian 2018-07-31 types aren't being inferred by ActionType in hoveredItem reducer...
