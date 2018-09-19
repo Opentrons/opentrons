@@ -52,7 +52,7 @@ class HoverTooltip extends React.Component<Props, State> {
           {({ref}) => this.props.children({ref, onMouseEnter: this.delayedOpen, onMouseLeave: this.delayedClose})}
         </Reference>
         {
-          true &&
+          this.state.isOpen &&
           <Popper
             placement={this.props.placement}
             modifiers={{
