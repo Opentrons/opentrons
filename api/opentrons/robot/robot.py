@@ -134,6 +134,20 @@ class Robot(object):
         else:
             return True
 
+    def clear_tips(self):
+        """
+        If reset is called with a tip attached, the tip must be removed
+        before the poses and _instruments members are cleared. If the tip is
+        not removed, the effective length of the pipette remains increased by
+        the length of the tip, and subsequent `_add_tip` calls will increase
+        the length in addition to this. This should be fixed by changing pose
+        tracking to that it tracks the tip as a separate node rather than
+        adding and subtracting the tip length to the pipette length.
+        """
+        for instrument in self._instruments.values():
+            if instrument.tip_attached:
+                instrument._remove_tip(instrument._tip_length)
+
     def reset(self):
         """
         Resets the state of the robot and clears:
@@ -174,16 +188,7 @@ class Robot(object):
                     axis_mapping={'x': 'C'})
             }
         }
-        # If reset is called with a tip attached, the tip must be removed
-        # before the poses and _instruments members are cleared. If the tip is
-        # not removed, the effective length of the pipette remains increased by
-        # the length of the tip, and subsequent `_add_tip` calls will increase
-        # the length in addition to this. This should be fixed by changing pose
-        # tracking to that it tracks the tip as a separate node rather than
-        # adding and subtracting the tip length to the pipette length.
-        for instrument in self._instruments.values():
-            if instrument.tip_attached:
-                instrument._remove_tip(instrument._tip_length)
+        self.clear_tips()
 
         self.poses = pose_tracker.init()
 
