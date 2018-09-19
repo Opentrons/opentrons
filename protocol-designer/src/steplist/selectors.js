@@ -9,7 +9,6 @@ import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {
   getFormWarnings,
   getFormErrors,
-  generateNewForm,
   stepFormToArgs,
 } from './formLevel'
 import type {FormError, FormWarning} from './formLevel'
@@ -27,7 +26,6 @@ import type {
 
 import type {
   FormData,
-  BlankForm,
   StepIdType,
 } from '../form-types'
 
@@ -211,30 +209,6 @@ const stepCreationButtonExpandedSelector: Selector<boolean> = createSelector(
   (state: RootState) => state.stepCreationButtonExpanded
 )
 
-const selectedStepFormDataSelector: Selector<boolean | FormData | BlankForm> = createSelector(
-  getSavedForms,
-  getSelectedStepId,
-  getSteps,
-  (savedStepForms, selectedStepId, steps) => {
-    if (selectedStepId == null) {
-      // no step selected
-      return false
-    }
-
-    if (!steps[selectedStepId]) {
-      console.error(`Step id ${selectedStepId} not in 'steps', could not get form data`)
-      return false
-    }
-
-    return (
-      // existing form
-      savedStepForms[selectedStepId] ||
-      // new blank form
-      generateNewForm(selectedStepId, steps[selectedStepId].stepType)
-    )
-  }
-)
-
 const nextStepId: Selector<number> = createSelector( // generates the next step ID to use
   getSteps,
   (_steps): number => {
@@ -344,7 +318,6 @@ export default {
   getHoveredStepId,
   getActiveItem,
   getHoveredSubstep,
-  selectedStepFormData: selectedStepFormDataSelector,
   getUnsavedForm,
   formData, // TODO: remove after sunset
   formModalData,

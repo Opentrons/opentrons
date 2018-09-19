@@ -3,43 +3,7 @@ import zipWith from 'lodash/zipWith'
 import uniq from 'lodash/uniq'
 import compact from 'lodash/compact'
 import flatten from 'lodash/flatten'
-import type {WellOrderOption} from '../components/StepEditForm/WellOrderInput/types'
-
-/** Merge 2 adjacent elements of an array when predicate fn is true */
-export function mergeWhen<T> (
-  array: Array<T>,
-  predicate: (current: T, next: T) => mixed,
-  merge: (current: T, next: T) => T
-): Array<T> {
-  if (array.length <= 1) {
-    return array
-  }
-
-  const result = []
-  let canMerge = true
-
-  for (let i = 0; i + 1 < array.length; i++) {
-    let current = array[i]
-    let next = array[i + 1]
-
-    if (canMerge) {
-      if (predicate(current, next)) {
-        result.push(merge(current, next))
-        canMerge = false
-      } else {
-        result.push(current)
-      }
-    } else {
-      canMerge = true
-    }
-  }
-
-  if (canMerge) {
-    result.push(array[array.length - 1])
-  }
-
-  return result
-}
+import type {WellOrderOption} from '../../components/StepEditForm/WellOrderInput/types'
 
 // labware definitions in shared-data have an ordering
 // attribute which is an Array of Arrays of wells. Each inner
@@ -54,7 +18,7 @@ export function mergeWhen<T> (
 // ]                      /       ]
 //
 
-export const orderingColsToRows = (ordering: Array<Array<string>>): Array<Array<string>> => (
+export const _orderingColsToRows = (ordering: Array<Array<string>>): Array<Array<string>> => (
   // $FlowFixMe(BC, 2018-08-27): flow-typed for lodash zipWith only supports <4 inner arrays
   zipWith(...ordering, (...col) => (compact(uniq(col))))
 )
@@ -84,15 +48,15 @@ export const orderWells = (
     }
   } else if (first === 'l2r') {
     if (second === 't2b') {
-      orderedWells = orderingColsToRows(defaultOrdering)
+      orderedWells = _orderingColsToRows(defaultOrdering)
     } else if (second === 'b2t') {
-      orderedWells = orderingColsToRows(defaultOrdering).slice().reverse()
+      orderedWells = _orderingColsToRows(defaultOrdering).slice().reverse()
     }
   } else if (first === 'r2l') {
     if (second === 't2b') {
-      orderedWells = orderingColsToRows(defaultOrdering).map(col => col.slice().reverse())
+      orderedWells = _orderingColsToRows(defaultOrdering).map(col => col.slice().reverse())
     } else if (second === 'b2t') {
-      orderedWells = orderingColsToRows(defaultOrdering).slice().reverse().map(col => col.slice().reverse())
+      orderedWells = _orderingColsToRows(defaultOrdering).slice().reverse().map(col => col.slice().reverse())
     }
   }
   return flatten(orderedWells)
