@@ -22,6 +22,7 @@ export default function ResourceCard (props: Props) {
         Component="a"
         href={props.url}
         target="_blank"
+        rel="noopener noreferrer"
         className={styles.link_button}
       >
         View in Browser

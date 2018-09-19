@@ -1,5 +1,5 @@
 // sets up the main window ui
-import {app, BrowserWindow} from 'electron'
+import {app, shell, BrowserWindow} from 'electron'
 import path from 'path'
 import {getConfig} from './config'
 import createLogger from './log'
@@ -41,6 +41,13 @@ export default function createUi () {
 
   log.info(`Loading ${url}`)
   mainWindow.loadURL(url, {'extraHeaders': 'pragma: no-cache\n'})
+
+  // open new windows (<a target="_blank" ...) in browser windows
+  mainWindow.webContents.on('new-window', (event, url) => {
+    log.debug('Opening external link', {url})
+    event.preventDefault()
+    shell.openExternal(url)
+  })
 
   return mainWindow
 }
