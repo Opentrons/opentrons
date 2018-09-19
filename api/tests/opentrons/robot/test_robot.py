@@ -7,6 +7,26 @@ from unittest import mock
 import pytest
 
 
+def test_reset(virtual_smoothie_env):
+    """
+    This test may need to be expanded to include various other conditions that
+    should be reset.
+
+    :param virtual_smoothie_env: pytest fixture to simulate Smoothie connection
+    """
+    # Not testing this one--this is needed to clean the robot singleton from
+    # other tests. This is an inherent problem with the use of the singleton--
+    # it entangles both runtime code and tests in unpredictable ways.
+    robot.reset()
+
+    lw = labware.load('opentrons-tiprack-300ul', '1')
+    p = instruments.P300_Single(mount='right', tip_racks=[lw])
+    p.pick_up_tip()
+    assert p.tip_attached
+    robot.reset()
+    assert not p.tip_attached
+
+
 def test_configurable_mount_offsets():
     def _test_offset(x, y, z):
         robot.reset()

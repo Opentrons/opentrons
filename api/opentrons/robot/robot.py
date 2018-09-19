@@ -102,6 +102,7 @@ class Robot(object):
         self.fw_version = self._driver.get_fw_version()
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
+        self._instruments = {}
         self.model_by_mount = {'left': None, 'right': None}
 
         # TODO (artyom, 09182017): once protocol development experience
@@ -173,6 +174,16 @@ class Robot(object):
                     axis_mapping={'x': 'C'})
             }
         }
+        # If reset is called with a tip attached, the tip must be removed
+        # before the poses and _instruments members are cleared. If the tip is
+        # not removed, the effective length of the pipette remains increased by
+        # the length of the tip, and subsequent `_add_tip` calls will increase
+        # the length in addition to this. This should be fixed by changing pose
+        # tracking to that it tracks the tip as a separate node rather than
+        # adding and subtracting the tip length to the pipette length.
+        for instrument in self._instruments.values():
+            if instrument.tip_attached:
+                instrument._remove_tip(instrument._tip_length)
 
         self.poses = pose_tracker.init()
 
