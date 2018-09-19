@@ -5,6 +5,7 @@ export type StepFieldName =
   | 'aspirate_airGap_volume'
   | 'aspirate_changeTip'
   | 'aspirate_disposalVol_checkbox'
+  | 'aspirate_disposalVol_destination'
   | 'aspirate_disposalVol_volume'
   | 'aspirate_flowRate'
   | 'aspirate_labware'

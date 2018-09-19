@@ -344,6 +344,25 @@ const labwareOptions: Selector<Options> = createSelector(
   }, [])
 )
 
+const DISPOSAL_LABWARE_TYPES = ['trash-box', 'fixed-trash']
+/** Returns options for disposal (e.g. fixed trash and trash box) */
+const disposalLabwareOptions: Selector<Options> = createSelector(
+  getLabware,
+  getLabwareNames,
+  (_labware, names) => reduce(_labware, (acc: Options, labware: Labware, labwareId): Options => {
+    if (!labware.type || !DISPOSAL_LABWARE_TYPES.includes(labware.type)) {
+      return acc
+    }
+    return [
+      ...acc,
+      {
+        name: names[labwareId],
+        value: labwareId,
+      },
+    ]
+  }, [])
+)
+
 const canAdd = (state: BaseState) => rootSelector(state).modeLabwareSelection // false or selected slot to add labware to, eg 'A2'
 
 const getSavedLabware = (state: BaseState) => rootSelector(state).savedLabware
@@ -452,6 +471,7 @@ export const selectors = {
   loadedContainersBySlot,
   containersBySlot,
   canAdd,
+  disposalLabwareOptions,
   labwareOptions,
   hasLiquid,
 }

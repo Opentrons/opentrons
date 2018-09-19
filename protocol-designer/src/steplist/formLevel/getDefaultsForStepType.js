@@ -40,11 +40,10 @@ export default function getDefaultsForStepType (stepType: StepType) {
       return {
         'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
         'aspirate_disposalVol_checkbox': true,
+        'aspirate_disposalVol_destination': FIXED_TRASH_ID,
         'aspirate_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
         'dispense_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
         'dispense_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
-        'dispense_blowout_checkbox': true,
-        'dispense_blowout_labware': FIXED_TRASH_ID,
         'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
       }
     default:
