@@ -381,4 +381,24 @@ def smoothie(monkeypatch):
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
 
 
+@pytest.fixture
+def hardware_controller_lockfile():
+    old_lockfile = environment.settings['HARDWARE_CONTROLLER_LOCKFILE']
+    with tempfile.NamedTemporaryFile() as td:
+        environment.settings['HARDWARE_CONTROLLER_LOCKFILE'] = td
+        yield td
+        environment.settings['HARDWARE_CONTROLLER_LOCKFILE'] = old_lockfile
+
+
+@pytest.fixture
+def running_on_pi():
+    oldpi = os.environ.get('RUNNING_ON_PI')
+    os.environ['RUNNING_ON_PI'] = '1'
+    yield
+    if None is oldpi:
+        os.environ.pop('RUNNING_ON_PI')
+    else:
+        os.environ['RUNNING_ON_PI'] = oldpi
+
+
 setup_testing_env()
