@@ -16,6 +16,7 @@ import {actions} from '../../steplist'
 import {hydrateField} from '../../steplist/fieldLevel'
 import type {StepFieldName} from '../../steplist/fieldLevel'
 import {DISPOSAL_PERCENTAGE} from '../../steplist/formLevel/warnings'
+import {SOURCE_WELL_DISPOSAL_DESTINATION} from '../../steplist/formLevel/transferLikeFormToArgs'
 import type {ChangeTipOptions} from '../../step-generation/types'
 import type {BaseState, ThunkDispatch} from '../../types'
 import type {StepType} from '../../form-types'
@@ -168,7 +169,7 @@ export const DisposalDestinationDropdown = connect(DisposalDestinationDropdownST
       render={({value, updateValue}) => (
         <DropdownField
           className={className}
-          options={[...options, {name: 'Source Well', value: 'source_well'}]}
+          options={[...options, {name: 'Source Well', value: SOURCE_WELL_DISPOSAL_DESTINATION}]}
           onBlur={() => { onFieldBlur(name) }}
           onFocus={() => { onFieldFocus(name) }}
           value={value ? String(value) : null}

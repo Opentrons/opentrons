@@ -12,6 +12,8 @@ import { DEFAULT_CHANGE_TIP_OPTION } from '../../../constants'
 import type { StepFormContext } from './types'
 import { orderWells } from '../../utils'
 
+export const SOURCE_WELL_DISPOSAL_DESTINATION = 'source_well'
+
 type ValidationAndErrors<F> = {
   errors: {[string]: string},
   validatedForm: F | null,
@@ -124,7 +126,6 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
     }
   }
 
-  const SOURCE_WELL_DISPOSAL_DESTINATION = 'source_well'
   let disposalVolume = null
   let disposalDestination = null
   let disposalLabware = null
