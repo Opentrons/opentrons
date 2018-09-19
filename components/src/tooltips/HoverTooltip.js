@@ -52,7 +52,7 @@ class HoverTooltip extends React.Component<Props, State> {
           {({ref}) => this.props.children({ref, onMouseEnter: this.delayedOpen, onMouseLeave: this.delayedClose})}
         </Reference>
         {
-          this.state.isOpen &&
+          // this.state.isOpen &&
           <Popper
             placement={this.props.placement}
             modifiers={{
@@ -64,7 +64,7 @@ class HoverTooltip extends React.Component<Props, State> {
             {({ref, style, placement, arrowProps}) => {
               let {style: arrowStyle} = arrowProps
               if (placement === 'left' || placement === 'right') {
-                arrowStyle = {top: '2px'}
+                arrowStyle = {top: '0.6em'}
               }
               return (
                 <div ref={ref} className={styles.tooltip_box} style={style} data-placement={placement}>

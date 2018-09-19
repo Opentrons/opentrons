@@ -17,7 +17,8 @@ function StepCreationButton (props: Props) {
   const {expanded, onExpandClick, onStepClick, onClickAway} = props
   const supportedSteps = ['transfer', 'distribute', 'consolidate', 'mix', 'pause']
 
-  const buttons = expanded && supportedSteps.map(stepType =>
+  // expanded &&
+  const buttons = supportedSteps.map(stepType =>
     <HoverTooltip
       key={stepType}
       placement='right'
