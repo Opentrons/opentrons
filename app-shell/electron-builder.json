@@ -15,11 +15,6 @@
       "from": "../api/dist",
       "to": "./api/dist",
       "filter": ["**/*"]
-    },
-    {
-      "from": "../api-server-lib/dist",
-      "to": "./api-server-lib/dist",
-      "filter": ["**/*"]
     }
   ],
   "artifactName": "${productName}-v${version}-${os}-${env.BUILD_ID}.${ext}",
