@@ -7,7 +7,7 @@ import styles from './tooltips.css'
 
 const OPEN_DELAY_MS = 300
 const CLOSE_DELAY_MS = 150
-const DISTANCE_FROM_REFERENCE = 4
+const DISTANCE_FROM_REFERENCE = 8
 
 export type HoverTooltipHandlers = {
   ref: React.Ref<*>,
