@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
+import asyncio
 import sys
 import logging
 import os
 import traceback
+import re
 from aiohttp import web
-from opentrons import robot, __version__
+from opentrons import robot, __version__, HERE
 from opentrons.api import MainRouter
 from opentrons.server.rpc import Server
 from opentrons.server import endpoints as endp
@@ -14,7 +16,7 @@ from opentrons.config import feature_flags as ff
 from opentrons.util import environment
 from opentrons.deck_calibration import endpoints as dc_endp
 from logging.config import dictConfig
-from opentrons.server.endpoints import serverlib_fallback as endpoints
+from opentrons.server.endpoints import serverlib_fallback as endpoints, update
 
 from argparse import ArgumentParser
 
@@ -256,6 +258,57 @@ def setup_udev_rules_file():
         log.warning(res1.strip())
 
 
+def _find_smoothie_file():
+    resources = os.listdir(os.path.join(HERE, 'resources'))
+    for fi in resources:
+        matches = re.search('smoothie-(.*).hex', fi)
+        if matches:
+            branch_plus_ref = matches.group(1)
+            return os.path.join(HERE, 'resources', fi), branch_plus_ref
+    raise OSError("Could not find smoothie firmware file in {}"
+                  .format(os.path.join(HERE, 'resources')))
+
+
+def _sync_do_smoothie_install(explicit_modeset, filename):
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(update._update_firmware(filename,
+                                                    loop,
+                                                    explicit_modeset))
+
+
+def initialize_robot():
+    packed_smoothie_fw_file, packed_smoothie_fw_ver = _find_smoothie_file()
+    try:
+        robot.connect()
+    except Exception as e:
+        # The most common reason for this exception (aside from hardware
+        # failures such as a disconnected smoothie) is that the smoothie
+        # is in programming mode. If it is, then we still want to update
+        # it (so it can boot again), but we don’t have to do the GPIO
+        # manipulations that _put_ it in programming mode
+        log.exception("Error while connecting to motor driver: {}".format(e))
+        explicit_modeset = False
+        fw_version = None
+    else:
+        explicit_modeset = True
+        fw_version = robot.fw_version
+
+    if fw_version != packed_smoothie_fw_ver:
+        log.info("Executing smoothie update: current vers {}, packed vers {}"
+                 .format(fw_version, packed_smoothie_fw_ver))
+        _sync_do_smoothie_install(explicit_modeset, packed_smoothie_fw_file)
+
+        if robot.is_connected():
+            robot.fw_version = robot._driver.get_fw_version()
+            log.info("FW Update complete!")
+        else:
+            raise RuntimeError(
+                "Could not connect to motor driver after fw update")
+
+    else:
+        log.info("FW version OK: {}".format(packed_smoothie_fw_ver))
+
+
 def main():
     """
     This application creates and starts the server for both the RPC routes
@@ -294,20 +347,17 @@ def main():
             args.hostname, args.port))
         path, host, port = None, args.hostname, args.port
 
-    try:
-        robot.connect()
-    except Exception as e:
-        log.exception("Error while connecting to motor-driver: {}".format(e))
+    if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
+        initialize_robot()
+
+        if not ff.disable_home_on_boot():
+            log.info("Homing Z axes")
+            robot.home_z()
+        setup_udev_rules_file()
 
     log.info("API server version:  {}".format(__version__))
     log.info("Smoothie FW version: {}".format(robot.fw_version))
 
-    if not ff.disable_home_on_boot():
-        log.info("Homing Z axes")
-        robot.home_z()
-
-    if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
-        setup_udev_rules_file()
     # Explicitly unlock resin updates in case a prior server left them locked
     unlock_resin_updates()
     web.run_app(init(), host=host, port=port, path=path)

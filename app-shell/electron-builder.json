@@ -20,11 +20,6 @@
       "from": "../api-server-lib/dist",
       "to": "./api-server-lib/dist",
       "filter": ["**/*"]
-    },
-    {
-      "from": "../api/smoothie",
-      "to": "./api/smoothie",
-      "filter": ["**/*.hex"]
     }
   ],
   "artifactName": "${productName}-v${version}-${os}-${env.BUILD_ID}.${ext}",
