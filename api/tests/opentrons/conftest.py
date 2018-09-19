@@ -223,6 +223,20 @@ def protocol(request):
         return Protocol(text=text, filename=filename)
 
 
+@pytest.fixture(params=["no_clear_tips.py"])
+def tip_clear_protocol(request):
+    try:
+        root = request.getfuncargvalue('protocol_file')
+    except Exception:
+        root = request.param
+
+    filename = os.path.join(os.path.dirname(__file__), 'data', root)
+
+    with open(filename) as file:
+        text = ''.join(list(file))
+        return Protocol(text=text, filename=filename)
+
+
 @pytest.fixture
 def session_manager(main_router):
     return main_router.session_manager

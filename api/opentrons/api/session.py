@@ -177,6 +177,12 @@ class Session(object):
             self._modules.extend(_dedupe(modules))
             self._interactions.extend(_dedupe(interactions))
 
+            # Labware calibration happens after simulation and before run, so
+            # we have to clear the tips if they are left on after simulation
+            # to ensure that the instruments are in the expected state at the
+            # beginning of the labware calibration flow
+            robot.clear_tips()
+
         return res
 
     def refresh(self):
