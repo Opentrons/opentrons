@@ -96,8 +96,8 @@ describe('shell/update', () => {
       {
         name: 'handles shell:SET_UPDATE_SEEN',
         action: {type: 'shell:SET_UPDATE_SEEN'},
-        initialState: {seen: false},
-        expected: {seen: true},
+        initialState: {seen: false, error: {message: 'AH'}},
+        expected: {seen: true, error: null},
       },
     ]
 

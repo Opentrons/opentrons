@@ -1,5 +1,7 @@
 // @flow
 // app updater
+import path from 'path'
+import fs from 'fs'
 import {autoUpdater as updater} from 'electron-updater'
 
 import createLogger from './log'
@@ -15,6 +17,10 @@ updater.logger = createLogger(__filename)
 updater.autoDownload = false
 
 export const CURRENT_VERSION = updater.currentVersion
+export const CURRENT_RELEASE_NOTES = fs.readFileSync(
+  path.join(__dirname, '../build/release-notes.md'),
+  'utf8'
+)
 
 export function registerUpdate (dispatch: Dispatch) {
   return function handleAction (action: Action) {

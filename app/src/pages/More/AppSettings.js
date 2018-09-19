@@ -5,8 +5,6 @@ import {connect} from 'react-redux'
 import {Route, Switch, Redirect, type ContextRouter} from 'react-router'
 import {push} from 'react-router-redux'
 
-import type {State} from '../../types'
-import type {ShellUpdateState} from '../../shell'
 import {
   getShellUpdateState,
   getAvailableShellUpdate,
@@ -18,6 +16,10 @@ import {
 
 import Page from '../../components/Page'
 import AppSettings, {AppUpdateModal} from '../../components/AppSettings'
+import {ErrorModal} from '../../components/modals'
+
+import type {State} from '../../types'
+import type {ShellUpdateState} from '../../shell'
 
 type OP = ContextRouter
 
@@ -30,7 +32,7 @@ type DP = {
   checkUpdate: () => mixed,
   downloadUpdate: () => mixed,
   applyUpdate: () => mixed,
-  closeUpdateModal: () => mixed,
+  closeModal: () => mixed,
 }
 
 type Props = OP & SP & DP
@@ -42,30 +44,41 @@ export default connect(
 
 function AppSettingsPage (props: Props) {
   const {
-    update,
+    availableVersion,
+    checkUpdate,
+    closeModal,
+    update: {available, seen, error},
     match: {path},
   } = props
 
   return (
     <React.Fragment>
       <Page titleBarProps={{title: 'App'}}>
-        <AppSettings {...props} />
+        <AppSettings
+          availableVersion={availableVersion}
+          checkUpdate={checkUpdate}
+        />
       </Page>
       <Switch>
         <Route
           path={`${path}/update`}
-          render={() => (
-            <AppUpdateModal {...props} close={props.closeUpdateModal} />
-          )}
+          render={() =>
+            !error ? (
+              <AppUpdateModal {...props} />
+            ) : (
+              <ErrorModal
+                heading="Update Error"
+                description="Something went wrong while updating your app"
+                close={closeModal}
+                error={error}
+              />
+            )
+          }
         />
         <Route
-          render={() => {
-            if (update.available && !update.seen) {
-              return <Redirect to="/menu/app/update" />
-            }
-
-            return null
-          }}
+          render={() =>
+            available && !seen ? <Redirect to="/menu/app/update" /> : null
+          }
         />
       </Switch>
     </React.Fragment>
@@ -84,7 +97,7 @@ function mapDispatchToProps (dispatch: Dispatch): DP {
     checkUpdate: () => dispatch(checkShellUpdate()),
     downloadUpdate: () => dispatch(downloadShellUpdate()),
     applyUpdate: () => dispatch(applyShellUpdate()),
-    closeUpdateModal: () => {
+    closeModal: () => {
       dispatch(setShellUpdateSeen())
       dispatch(push('/menu/app'))
     },

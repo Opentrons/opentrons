@@ -18,6 +18,8 @@ type Props = {
   children: React.Node,
   /** optional classes to apply */
   className?: string,
+  /** optional classes to apply */
+  contentsClassName?: string,
   /** lightens overlay (alert modal over existing modal)**/
   alertOverlay?: boolean,
 }
@@ -27,9 +29,9 @@ type Props = {
  */
 export default function AlertModal (props: Props) {
   const {heading, buttons, className, onCloseClick, alertOverlay} = props
-  const wrapperStyle = heading
-    ? styles.alert_modal_wrapper
-    : cx(styles.alert_modal_wrapper, styles.no_alert_header)
+  const wrapperStyle = cx(styles.alert_modal_wrapper, {
+    [styles.no_alert_header]: !heading,
+  }, props.contentsClassName)
 
   return (
     <Modal

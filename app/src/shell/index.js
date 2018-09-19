@@ -15,7 +15,7 @@ import type {ShellUpdateAction} from './update'
 
 export type ShellAction = ShellUpdateAction
 
-const {CURRENT_VERSION} = remote.require('./update')
+const {CURRENT_VERSION, CURRENT_RELEASE_NOTES} = remote.require('./update')
 const {getConfig} = remote.require('./config')
 const {getRobots} = remote.require('./discovery')
 
@@ -23,7 +23,7 @@ const log = createLogger(__filename)
 
 export * from './update'
 
-export {CURRENT_VERSION}
+export {CURRENT_VERSION, CURRENT_RELEASE_NOTES}
 
 export const shellReducer = combineReducers({update: updateReducer})
 
