@@ -10,7 +10,7 @@ module.exports.__mockReset = () => {
     autoDownload: true,
     autoInstallOnAppQuit: true,
     allowDowngrade: false,
-    currentVersion: '0.0.0-mock',
+    currentVersion: {version: '0.0.0-mock'},
     channel: null,
 
     checkForUpdates: jest.fn(),
