@@ -7,7 +7,7 @@ import mdns from 'mdns-js'
 import escape from 'escape-string-regexp'
 import toRegex from 'to-regex'
 
-import { poll, stop, type PollRequest } from './poller'
+import {poll, stop, type PollRequest} from './poller'
 import {
   DEFAULT_PORT,
   fromMdnsBrowser,
@@ -21,7 +21,7 @@ import {
   rejectCandidate,
 } from './service'
 
-import type { Browser, BrowserService } from 'mdns-js'
+import type {Browser, BrowserService} from 'mdns-js'
 import type {
   Candidate,
   Service,
@@ -57,9 +57,9 @@ export default function DiscoveryClientFactory (options?: Options) {
 export const SERVICE_EVENT: 'service' = 'service'
 export const SERVICE_REMOVED_EVENT: 'serviceRemoved' = 'serviceRemoved'
 export const DEFAULT_POLL_INTERVAL = 5000
-export { DEFAULT_PORT }
+export {DEFAULT_PORT}
 
-const TO_REGEX_OPTS = { contains: true, nocase: true, safe: true }
+const TO_REGEX_OPTS = {contains: true, nocase: true, safe: true}
 
 export class DiscoveryClient extends EventEmitter {
   services: Array<Service>
@@ -116,7 +116,7 @@ export class DiscoveryClient extends EventEmitter {
   add (ip: string, port?: number): DiscoveryClient {
     if (!this.candidates.some(c => c.ip === ip)) {
       const candidate = makeCandidate(ip, port)
-      log(this._logger, 'debug', 'adding new unique candidate', { candidate })
+      log(this._logger, 'debug', 'adding new unique candidate', {candidate})
       this.candidates = this.candidates.concat(candidate)
       this._poll()
     }
@@ -132,7 +132,7 @@ export class DiscoveryClient extends EventEmitter {
       removals.every(s => s.ip !== c.ip)
     )
 
-    log(this._logger, 'debug', 'removed services from discovery', { removals })
+    log(this._logger, 'debug', 'removed services from discovery', {removals})
     this._poll()
     removals.forEach(s => this.emit(SERVICE_REMOVED_EVENT, s))
 
@@ -190,7 +190,7 @@ export class DiscoveryClient extends EventEmitter {
   }
 
   _handleUp (browserService: BrowserService): void {
-    log(this._logger, 'debug', 'mdns service detected', { browserService })
+    log(this._logger, 'debug', 'mdns service detected', {browserService})
     const service = fromMdnsBrowser(browserService)
 
     if (service) this._handleService(service)
@@ -206,11 +206,11 @@ export class DiscoveryClient extends EventEmitter {
     if (service) return this._handleService(service)
 
     // else, response was not ok, so unset ok flag in all matching ips
-    const { ip } = candidate
+    const {ip} = candidate
     const nextServices = this.services.map(
       s =>
         s.ip === ip && (s.ok !== false || s.serverOk !== false)
-          ? { ...s, ok: false, serverOk: false }
+          ? {...s, ok: false, serverOk: false}
           : s
     )
 
@@ -241,16 +241,17 @@ export class DiscoveryClient extends EventEmitter {
     nextServices = nextServices.map(s => {
       // if we have a service already, make sure not to reset oks to null
       if (s === prevService) {
-        const newOk = s.ok == null ? service.ok : s.ok
-        const newServerOk = s.serverOk == null ? service.serverOk : s.serverOk
+        const newOk = service.ok != null ? service.ok : s.ok
+        const newServerOk =
+          service.serverOk != null ? service.serverOk : s.serverOk
 
         return newOk !== s.ok || newServerOk !== s.serverOk
-          ? { ...service, ok: newOk, serverOk: newServerOk }
+          ? {...service, ok: newOk, serverOk: newServerOk}
           : s
       }
 
       return serviceConflicts.includes(s)
-        ? { ...s, ip: null, ok: null, serverOk: null }
+        ? {...s, ip: null, ok: null, serverOk: null}
         : s
     })
 
@@ -269,7 +270,7 @@ export class DiscoveryClient extends EventEmitter {
     if (poll) this._poll()
     if (updated.length) {
       updated.forEach(s => this.emit(SERVICE_EVENT, s))
-      log(this._logger, 'debug', 'updated services', { updated })
+      log(this._logger, 'debug', 'updated services', {updated})
     }
   }
 }

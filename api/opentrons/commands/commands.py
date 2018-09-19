@@ -302,11 +302,14 @@ def delay(seconds, minutes):
     )
 
 
-def pause():
+def pause(msg):
+    text = 'Pausing robot operation'
+    if msg:
+        text = text + ': {}'.format(msg)
     return make_command(
         name=types.PAUSE,
         payload={
-            'text': 'Pausing robot operation'
+            'text': text
         }
     )
 
@@ -331,15 +334,15 @@ def publish(before, after, command, meta=None):
             call_args = _get_args(f, args, kwargs)
             command_args = dict(
                 zip(
-                    reversed(inspect.getargspec(command).args),
-                    reversed(inspect.getargspec(command).defaults or [])))
+                    reversed(inspect.getfullargspec(command).args),
+                    reversed(inspect.getfullargspec(command).defaults or [])))
 
             # TODO (artyom, 20170927): we are doing this to be able to use
             # the decorator in Instrument class methods, in which case
             # self is effectively an instrument.
             # To narrow the scope of this hack, we are checking if the command
             # is expecting instrument first.
-            if 'instrument' in inspect.getargspec(command).args:
+            if 'instrument' in inspect.getfullargspec(command).args:
                 # We are also checking if call arguments have 'self' and
                 # don't have instruments specified, in which case instruments
                 # should take precedence.
@@ -349,7 +352,7 @@ def publish(before, after, command, meta=None):
             command_args.update({
                 key: call_args[key]
                 for key in
-                set(inspect.getargspec(command).args) & call_args.keys()
+                set(inspect.getfullargspec(command).args) & call_args.keys()
             })
 
             if meta:
@@ -377,14 +380,14 @@ def _get_args(f, args, kwargs):
     # Create the initial dictionary with args that have defaults
     res = {}
 
-    if inspect.getargspec(f).defaults:
+    if inspect.getfullargspec(f).defaults:
         res = dict(
             zip(
-                reversed(inspect.getargspec(f).args),
-                reversed(inspect.getargspec(f).defaults)))
+                reversed(inspect.getfullargspec(f).args),
+                reversed(inspect.getfullargspec(f).defaults)))
 
     # Update / insert values for positional args
-    res.update(dict(zip(inspect.getargspec(f).args, args)))
+    res.update(dict(zip(inspect.getfullargspec(f).args, args)))
 
     # Update it with values for named args
     res.update(kwargs)

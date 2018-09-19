@@ -22,3 +22,19 @@
   left: 0;
   right: 0;
 }
+
+.bottom_button_bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem 1.5rem 1rem;
+  text-align: right;
+  background-color: white;
+  box-shadow: 0 -8px 8px -4px white;
+}
+
+.bottom_button {
+  margin-left: 1rem;
+  width: 10rem;
+}

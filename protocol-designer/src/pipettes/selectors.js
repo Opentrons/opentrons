@@ -17,6 +17,11 @@ export const pipettesById = createSelector(
   pipettes => pipettes.byId
 )
 
+export const pipetteIdsByMount: Selector<*> = createSelector(
+  rootSelector,
+  pipettes => pipettes.byMount
+)
+
 function _getPipetteName (pipetteData): string {
   const result = getPipetteModels().find(pipetteModel => {
     const p = getPipette(pipetteModel)

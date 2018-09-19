@@ -14,7 +14,7 @@ import type {
   SessionStatus,
 } from '../types'
 
-import type {DisconnectResponseAction, SessionUpdateAction} from '../actions'
+import type {SessionUpdateAction} from '../actions'
 
 type Request = {
   inProgress: boolean,
@@ -88,12 +88,14 @@ export default function sessionReducer (
 ): State {
   switch (action.type) {
     case 'robot:DISCONNECT_RESPONSE':
-      return handleDisconnectResponse(state, action)
+      return INITIAL_STATE
 
     case 'robot:SESSION_UPDATE':
       return handleSessionUpdate(state, action)
 
     case 'protocol:UPLOAD':
+      return handleSessionInProgress(INITIAL_STATE)
+
     case 'robot:REFRESH_SESSION':
       return handleSessionInProgress(state)
 
@@ -101,32 +103,33 @@ export default function sessionReducer (
     case 'robot:SESSION_ERROR':
       return handleSessionResponse(state, action)
 
-    case RUN: return handleRun(state, action)
-    case RUN_RESPONSE: return handleRunResponse(state, action)
-    case PAUSE: return handlePause(state, action)
-    case PAUSE_RESPONSE: return handlePauseResponse(state, action)
-    case RESUME: return handleResume(state, action)
-    case RESUME_RESPONSE: return handleResumeResponse(state, action)
-    case CANCEL: return handleCancel(state, action)
-    case CANCEL_RESPONSE: return handleCancelResponse(state, action)
-    case TICK_RUN_TIME: return handleTickRunTime(state, action)
+    case RUN:
+      return handleRun(state, action)
+    case RUN_RESPONSE:
+      return handleRunResponse(state, action)
+    case PAUSE:
+      return handlePause(state, action)
+    case PAUSE_RESPONSE:
+      return handlePauseResponse(state, action)
+    case RESUME:
+      return handleResume(state, action)
+    case RESUME_RESPONSE:
+      return handleResumeResponse(state, action)
+    case CANCEL:
+      return handleCancel(state, action)
+    case CANCEL_RESPONSE:
+      return handleCancelResponse(state, action)
+    case TICK_RUN_TIME:
+      return handleTickRunTime(state, action)
   }
 
   return state
 }
 
-function handleDisconnectResponse (
-  state: State,
-  action: DisconnectResponseAction
-): State {
-  return INITIAL_STATE
-}
-
-function handleSessionUpdate (
-  state: State,
-  action: SessionUpdateAction
-): State {
-  const {payload: {state: sessionState, startTime, lastCommand}} = action
+function handleSessionUpdate (state: State, action: SessionUpdateAction): State {
+  const {
+    payload: {state: sessionState, startTime, lastCommand},
+  } = action
   let {protocolCommandsById} = state
 
   if (lastCommand) {

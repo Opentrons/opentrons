@@ -4,6 +4,7 @@ import cx from 'classnames'
 
 import {SpinnerModal} from '@opentrons/components'
 import SessionAlert from './SessionAlert'
+import {Portal} from '../portal'
 
 import styles from './styles.css'
 
@@ -64,7 +65,9 @@ export default class CommandList extends Component {
     return (
       <div className={styles.run_page}>
       {showSpinner && (
-        <SpinnerModal />
+        <Portal>
+          <SpinnerModal />
+        </Portal>
       )}
       {!showSpinner && (
         <SessionAlert {...this.props} className={styles.alert} />

@@ -10,6 +10,7 @@ import {
 } from '../../../steplist'
 
 import {PDTitledList} from '../../lists'
+export {default as TerminalItemLink} from './TerminalItemLink'
 
 type Props = React.ElementProps<typeof PDTitledList>
 

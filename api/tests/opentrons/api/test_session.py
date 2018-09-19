@@ -58,6 +58,15 @@ async def test_load_from_text(session_manager, protocol):
     assert len(acc) == 75
 
 
+async def test_clear_tips(session_manager, tip_clear_protocol):
+    session = session_manager.create(
+        name='<blank>', text=tip_clear_protocol.text)
+
+    assert len(session._instruments) == 1
+    for instrument in session._instruments:
+        assert not instrument.tip_attached
+
+
 async def test_async_notifications(main_router):
     publish('session', {'name': 'foo', 'payload': {'bar': 'baz'}})
     # Get async iterator

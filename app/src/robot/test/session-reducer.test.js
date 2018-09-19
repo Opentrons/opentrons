@@ -44,6 +44,7 @@ describe('robot reducer - session', () => {
   })
 
   test('handles protocol:UPLOAD action', () => {
+    const initialState = reducer(undefined, {}).session
     const state = {
       session: {
         sessionRequest: {inProgress: false, error: new Error('AH')},
@@ -57,9 +58,8 @@ describe('robot reducer - session', () => {
     }
 
     expect(reducer(state, action).session).toEqual({
+      ...initialState,
       sessionRequest: {inProgress: true, error: null},
-      startTime: null,
-      runTime: 0,
     })
   })
 

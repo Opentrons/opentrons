@@ -74,7 +74,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
         (subTransferVol: number, chunkIdx: number): Array<CommandCreator> => {
           // TODO IMMEDIATELY disposal vol ^^^
           const tipCommands: Array<CommandCreator> = (
-            (data.changeTip === 'once' && chunkIdx === 0) ||
+            (data.changeTip === 'once' && pairIdx === 0 && chunkIdx === 0) ||
             data.changeTip === 'always')
               ? [replaceTip(data.pipette)]
               : []

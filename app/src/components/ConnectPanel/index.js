@@ -30,15 +30,12 @@ export default connect(mapStateToProps, mapDispatchToProps)(ConnectPanel)
 function ConnectPanel (props: Props) {
   return (
     <SidePanel title='Robots'>
-      <div>
-        <ScanStatus {...props} />
-        <RobotList>
-          {props.robots.map((robot) => (
-            // $FlowFixMe: flow-typed withRouter def throwing bogus errors
-            <RobotItem key={robot.name} {...robot} />
-          ))}
-        </RobotList>
-      </div>
+      <ScanStatus {...props} />
+      <RobotList>
+        {props.robots.map((robot) => (
+          <RobotItem key={robot.name} {...robot} />
+        ))}
+      </RobotList>
     </SidePanel>
   )
 }

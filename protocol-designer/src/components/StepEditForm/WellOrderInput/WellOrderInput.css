@@ -4,6 +4,7 @@
   height: 30px;
   width: 30px;
   cursor: pointer;
+  margin: 0.25rem;
 }
 
 .well_order_icon:hover {
