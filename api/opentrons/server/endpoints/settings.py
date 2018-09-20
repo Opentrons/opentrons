@@ -10,11 +10,6 @@ log = logging.getLogger(__name__)
 
 _settings_reset_options = [
     {
-        'id': 'deckCalibration',
-        'name': 'Deck Calibration',
-        'description': 'Reset pipette-to-deck alignment calibration'
-    },
-    {
         'id': 'tipProbe',
         'name': 'Tip Length',
         'description': 'Clear tip probe data'
@@ -80,8 +75,6 @@ async def reset(request: web.Request) -> web.Response:
                  .format(requested_reset)},
                 status=400)
     log.info("Reset requested for {}".format(', '.join(data.keys())))
-    if data.get('deckCalibration'):
-        rc.clear(calibration=True, robot=False)
     if data.get('tipProbe'):
         config = rc.load()
         config.tip_length.clear()
