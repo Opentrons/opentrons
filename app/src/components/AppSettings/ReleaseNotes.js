@@ -7,7 +7,10 @@ import styles from './styles.css'
 type Props = {source: ?string}
 
 const renderer = remark().use(reactRenderer, {
-  remarkReactComponents: {div: React.Fragment},
+  remarkReactComponents: {
+    div: React.Fragment,
+    a: ExternalLink,
+  },
 })
 
 const DEFAULT_RELEASE_NOTES = 'We recommend upgrading to the latest version.'
@@ -24,4 +27,8 @@ export default function ReleaseNotes (props: Props) {
       )}
     </div>
   )
+}
+
+function ExternalLink (props) {
+  return <a {...props} target="_blank" rel="noopener noreferrer" />
 }
