@@ -9,7 +9,7 @@
   },
   "name": "protocol-designer",
   "private": true,
-  "version": "3.4.0-beta.0",
+  "version": "3.4.0",
   "description": "Protocol designer app",
   "main": "src/index.js",
   "bugs": {
@@ -18,7 +18,7 @@
   "homepage": "https://github.com/Opentrons/opentrons",
   "license": "Apache-2.0",
   "dependencies": {
-    "@opentrons/components": "3.4.0-beta.0",
+    "@opentrons/components": "3.4.0",
     "classnames": "^2.2.5",
     "i18next": "^11.5.0",
     "lodash": "^4.17.4",
