@@ -160,7 +160,7 @@ export default class NewFileModal extends React.Component<Props, State> {
           </div>
 
           <div className={styles.diagrams}>
-            <TiprackDiagram containerType={this.state.right.tiprackModel} />
+            <TiprackDiagram containerType={this.state.left.tiprackModel} />
             <PipetteDiagram
               leftPipette={this.state.left.pipetteModel}
               rightPipette={this.state.right.pipetteModel}
