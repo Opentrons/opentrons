@@ -46,6 +46,10 @@ const getChannels = (pipetteId: string, state: BaseState): PipetteChannels => {
   return pipette.channels
 }
 
+// TODO: Ian 2018-09-20 this is only usable by 'unsavedForm'.
+// Eventually we gotta allow arbitrary actions like DELETE_LABWARE
+// (or more speculatively, CHANGE_PIPETTE etc), which affect saved forms from
+// 'outside', to cause changes that run thru all the logic in this block
 function handleFormChange (payload: ChangeFormPayload, getState: GetState): ChangeFormPayload {
   // Use state to handle form changes
   const baseState = getState()

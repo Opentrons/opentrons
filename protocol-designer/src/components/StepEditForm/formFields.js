@@ -191,15 +191,24 @@ export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdo
       name={name}
       focusedField={focusedField}
       dirtyFields={dirtyFields}
-      render={({value, updateValue}) => (
-        <DropdownField
-          className={className}
-          options={labwareOptions}
-          onBlur={() => { onFieldBlur(name) }}
-          onFocus={() => { onFieldFocus(name) }}
-          value={value ? String(value) : null}
-          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
-      )} />
+      render={({value, updateValue}) => {
+        // blank out the dropdown if labware id does not exist
+        const availableLabwareIds = labwareOptions.map(opt => opt.value)
+        const fieldValue = availableLabwareIds.includes(value)
+          ? String(value)
+          : null
+        return (
+          <DropdownField
+            className={className}
+            options={labwareOptions}
+            onBlur={() => { onFieldBlur(name) }}
+            onFocus={() => { onFieldFocus(name) }}
+            value={fieldValue}
+            onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } }
+          />
+        )
+      }}
+    />
   )
 })
 
