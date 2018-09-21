@@ -64,8 +64,10 @@ export default function SourceDestSubstep (props: SourceDestSubstepProps) {
       volume={row.volume}
       sourceIngredients={row.sourceIngredients}
       sourceWells={row.sourceWell}
+      sourceVol={row.preSubstepSourceVol}
       destIngredients={row.destIngredients}
       destWells={row.destWell}
+      destVol={row.preSubstepDestVol}
     />
   )
 }

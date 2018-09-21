@@ -8,8 +8,7 @@ type Props = {
 }
 
 function IngredPill (props: Props) {
-  const {ingreds} = props
-
+  const {ingreds, hoverTooltipHandlers} = props
   if (!ingreds || ingreds.length === 0) {
     // Invisible Pill, but has correct height/margin/etc for spacing
     return <Pill />
@@ -19,9 +18,11 @@ function IngredPill (props: Props) {
     ? swatchColors(Number(ingreds[0].id))
     : MIXED_WELL_COLOR
 
-  return <Pill color={color}>{
-    ingreds.map(ingred => ingred.name).join(',')
-  }</Pill>
+  return (
+    <Pill color={color} hoverTooltipHandlers={hoverTooltipHandlers}>
+      { ingreds.map(ingred => ingred.name).join(',') }
+    </Pill>
+  )
 }
 
 export default IngredPill

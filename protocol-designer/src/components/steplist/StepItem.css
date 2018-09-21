@@ -72,3 +72,9 @@
 .error_icon {
   fill: var(--c-warning);
 }
+
+.liquid_circle {
+  height: 2em;
+  width: 2em;
+  border-radius: 50%;
+}

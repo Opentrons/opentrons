@@ -1,5 +1,6 @@
 // @flow
 import {createSelector} from 'reselect'
+import map from 'lodash/map'
 
 import {selectors as pipetteSelectors} from '../pipettes'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
@@ -25,9 +26,10 @@ const getIngredsFactory = (
     wellContentsByLabware[labware] &&
     wellContentsByLabware[labware][well])
 
-  return wellContents.groupIds.map(id => ({
-    id: id,
-    name: ingredNames[id],
+  return map(wellContents.volumeByGroupId, (groupVolume, groupId) => ({
+    id: groupId,
+    name: ingredNames[groupId],
+    volume: groupVolume,
   })) || []
 }
 
@@ -40,6 +42,7 @@ export const allSubsteps: Selector<AllSubsteps> = createSelector(
   allWellContentsForSteps,
   steplistSelectors.orderedSteps,
   fileDataSelectors.robotStateTimeline,
+  fileDataSelectors.getInitialRobotState,
   (
     validatedForms,
     allPipetteData,
@@ -47,12 +50,13 @@ export const allSubsteps: Selector<AllSubsteps> = createSelector(
     ingredNames,
     _allWellContentsForSteps,
     orderedSteps,
-    robotStateTimeline
+    robotStateTimeline,
+    _initialRobotState,
   ) => {
     return orderedSteps
     .reduce((acc: AllSubsteps, stepId, timelineIndex) => {
-      const robotState = robotStateTimeline.timeline[timelineIndex] &&
-        robotStateTimeline.timeline[timelineIndex].robotState
+      const timeline = [{robotState: _initialRobotState}, ...robotStateTimeline.timeline]
+      const robotState = timeline[timelineIndex] && timeline[timelineIndex].robotState
 
       const substeps = generateSubsteps(
         validatedForms[stepId],

@@ -24,13 +24,15 @@ function Pill (props: Props) {
     props.className,
     {[styles.invert_text]: props.invertTextColor}
   )
-
-  return <span
-    style={{backgroundColor: props.color}}
-    className={className}
-  >
-    {props.children}
-  </span>
+  const {color, children, hoverTooltipHandlers} = props
+  return (
+    <span
+      style={{backgroundColor: color}}
+      className={className}
+      {...hoverTooltipHandlers}>
+      {children}
+    </span>
+  )
 }
 
 export default Pill

@@ -2,7 +2,7 @@
 import * as React from 'react'
 import last from 'lodash/last'
 
-import {Icon} from '@opentrons/components'
+import {Icon, HoverTooltip, swatchColors, MIXED_WELL_COLOR} from '@opentrons/components'
 import IngredPill from '../IngredPill'
 import {PDListItem} from '../lists'
 import styles from './StepItem.css'
@@ -67,6 +67,21 @@ function wellRange (sourceWells: string | ?Array<?string>): ?string {
   return firstWell || lastWell
 }
 
+const PillTooltipContents = (props) => {
+  const color = (props.ingreds.length === 1)
+    ? swatchColors(Number(props.ingreds[0].id))
+    : MIXED_WELL_COLOR
+  return (
+    <div>
+      <div
+        className={styles.liquid_circle}
+        style={{backgroundColor: color}}
+        ingreds={props.ingreds} />
+      {props.volume}
+    </div>
+  )
+}
+
 export default function SubstepRow (props: SubstepRowProps) {
   const sourceWellRange = wellRange(props.sourceWells)
   const destWellRange = wellRange(props.destWells)
@@ -80,7 +95,18 @@ export default function SubstepRow (props: SubstepRowProps) {
       onMouseEnter={props.onMouseEnter}
       onMouseLeave={props.onMouseLeave}
     >
-      <IngredPill ingreds={props.sourceIngredients} />
+      <HoverTooltip
+        tooltipComponent={(
+          <PillTooltipContents
+            ingreds={props.sourceIngredients}
+            volume={props.sourceVol} />)
+        }>
+        {(hoverTooltipHandlers) => (
+          <IngredPill
+            hoverTooltipHandlers={hoverTooltipHandlers}
+            ingreds={props.sourceIngredients} />
+        )}
+      </HoverTooltip>
       <span className={styles.emphasized_cell}>{sourceWellRange}</span>
       <span className={styles.volume_cell}>{
         formattedVolume && (props.hideVolumeUnits
@@ -93,7 +119,15 @@ export default function SubstepRow (props: SubstepRowProps) {
         ? <span className={styles.inner_carat} onClick={props.toggleCollapsed}>
           <Icon name={props.collapsed ? 'chevron-down' : 'chevron-up'} />
         </span>
-        : <IngredPill ingreds={props.destIngredients} />
+        : (
+          <HoverTooltip tooltipComponent={props.destVol}>
+            {(hoverTooltipHandlers) => (
+              <IngredPill
+                hoverTooltipHandlers={hoverTooltipHandlers}
+                ingreds={props.destIngredients} />
+            )}
+          </HoverTooltip>
+        )
       }
     </PDListItem>
   )

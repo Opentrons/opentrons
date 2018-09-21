@@ -2,6 +2,7 @@
 import cloneDeep from 'lodash/cloneDeep'
 import range from 'lodash/range'
 import mapValues from 'lodash/mapValues'
+import reduce from 'lodash/reduce'
 
 import type {Channels} from '@opentrons/components'
 import {getWellsForTips} from '../step-generation/utils'
@@ -73,7 +74,6 @@ function transferLikeSubsteps (args: {
   // TODO: Ian 2018-07-31 develop more elegant way to bypass tip handling for simulation/test
   const robotState = cloneDeep(args.robotState)
   robotState.tipState.pipettes = mapValues(robotState.tipState.pipettes, () => true)
-
   const {
     pipette: pipetteId,
   } = validatedForm
@@ -178,10 +178,53 @@ function transferLikeSubsteps (args: {
     return acc
   }, [])
 
+  let intermediateVolumesByWell = {}
+  const rowsWithIntermediateVols = aspDispRows.map((row, index) => {
+    let cloneRow = row
+    if (row.sourceWell) {
+      if (!(row.sourceWell in intermediateVolumesByWell)) {
+        intermediateVolumesByWell = {
+          ...intermediateVolumesByWell,
+          [row.sourceWell]: reduce(row.sourceIngredients, (acc, ingredGroup) => (
+            ingredGroup.volume ? Number(ingredGroup.volume) + acc : acc
+          ), 0),
+        }
+      }
+      const preSubstepSourceVol = intermediateVolumesByWell[row.sourceWell] || 0
+      cloneRow = {
+        ...cloneRow,
+        preSubstepSourceVol,
+      }
+      intermediateVolumesByWell = {
+        ...intermediateVolumesByWell,
+        [row.sourceWell]: preSubstepSourceVol - row.volume,
+      }
+    } else if (row.destWell) {
+      if (!(row.destWell in intermediateVolumesByWell)) {
+        intermediateVolumesByWell = {
+          ...intermediateVolumesByWell,
+          [row.destWell]: reduce(row.destIngredients, (acc, ingredGroup) => (
+            ingredGroup.volume ? Number(ingredGroup.volume) + acc : acc
+          ), 0),
+        }
+      }
+      const preSubstepDestVol = intermediateVolumesByWell[row.destWell] || 0
+      cloneRow = {
+        ...cloneRow,
+        preSubstepDestVol,
+      }
+      intermediateVolumesByWell = {
+        ...intermediateVolumesByWell,
+        [row.destWell]: preSubstepDestVol + row.volume,
+      }
+    }
+    return cloneRow
+  })
+
   const mergedRows: SourceDestSubstepItemRows = steplistUtils.mergeWhen(
-    aspDispRows,
+    rowsWithIntermediateVols,
     (currentRow, nextRow) =>
-      // aspirate then dispense rows adjacent
+      // NOTE: if aspirate then dispense rows are adjacent, collapse them into one row
       currentRow.sourceWell && nextRow.destWell,
     (currentRow, nextRow) => ({
       ...nextRow,

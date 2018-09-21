@@ -31,10 +31,9 @@ function _wellContentsForWell (
   well: string
 ): WellContents {
   // TODO IMMEDIATELY Ian 2018-03-23 why is liquidVolState missing sometimes (eg first call with trashId)? Thus the liquidVolState || {}
-  const ingredGroupIdsWithContent = Object.keys(liquidVolState || {}).filter(groupId =>
-      liquidVolState[groupId] &&
-      liquidVolState[groupId].volume > 0
-    )
+  const ingredGroupIdsWithContent = Object.keys(liquidVolState || {}).filter(groupId => (
+    liquidVolState[groupId] && liquidVolState[groupId].volume > 0
+  ))
 
   return {
     highlighted: false,
@@ -42,7 +41,8 @@ function _wellContentsForWell (
     error: false,
     maxVolume: Infinity, // TODO Ian 2018-03-23 refactor so all these fields aren't needed
     wellName: well,
-    groupIds: ingredGroupIdsWithContent,
+    volumeByGroupId: mapValues(liquidVolState, volState => volState.volume),
+    groupIds: ingredGroupIdsWithContent, // TODO: BC 2018-09-21 remove in favor of volumeByGroupId
   }
 }
 
