@@ -4,7 +4,7 @@ import os
 import shutil
 import tempfile
 
-from opentrons.server.main import init
+from opentrons.server import init
 from opentrons.data_storage import database as db
 from opentrons.robot import robot_configs as rc
 

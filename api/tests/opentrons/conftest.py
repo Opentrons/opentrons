@@ -18,7 +18,7 @@ from opentrons.data_storage import database
 from opentrons.server import rpc
 from opentrons import config
 from opentrons.config import advanced_settings as advs
-from opentrons.server.main import init
+from opentrons.server import init
 from opentrons.deck_calibration import endpoints
 from opentrons.util import environment
 
@@ -249,6 +249,8 @@ def session(loop, test_client, request, main_router):
     to have @pytest.mark.parametrize('root', [value]) decorator set.
     If not set root will be defaulted to None
     """
+    from aiohttp import web
+    from opentrons.server import error_middleware
     root = None
     try:
         root = request.getfuncargvalue('root')
@@ -259,7 +261,8 @@ def session(loop, test_client, request, main_router):
     except Exception:
         pass
 
-    server = rpc.Server(loop=loop, root=root)
+    app = web.Application(loop=loop, middlewares=[error_middleware])
+    server = rpc.RPCServer(app, root)
     client = loop.run_until_complete(test_client(server.app))
     socket = loop.run_until_complete(client.ws_connect('/'))
     token = str(uuid())

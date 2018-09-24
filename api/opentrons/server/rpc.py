@@ -11,6 +11,7 @@ from asyncio import Queue
 from opentrons.server import serialize
 from concurrent.futures import ThreadPoolExecutor
 
+
 log = logging.getLogger(__name__)
 
 # Number of executor threads
@@ -25,10 +26,11 @@ CALL_NACK_MESSAGE = 4
 PONG_MESSAGE = 5
 
 
-class Server(object):
-    def __init__(self, root=None, loop=None, middlewares=()):
+class RPCServer(object):
+    def __init__(self, app, root=None):
         self.monitor_events_task = None
-        self.loop = loop or asyncio.get_event_loop()
+        self.app = app
+        self.loop = app.loop or asyncio.get_event_loop()
         self.objects = {}
         self.system = SystemCalls(self.objects)
 
@@ -40,7 +42,6 @@ class Server(object):
         self.clients = {}
         self.tasks = []
 
-        self.app = web.Application(loop=loop, middlewares=middlewares)
         self.app.router.add_get('/', self.handler)
         self.app.on_shutdown.append(self.on_shutdown)
 

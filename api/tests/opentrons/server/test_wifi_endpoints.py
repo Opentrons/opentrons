@@ -3,8 +3,8 @@ import os
 import random
 import tempfile
 import pytest
-from opentrons.server.main import init
 from opentrons.system import nmcli
+from opentrons.server import init
 from opentrons.server.endpoints import wifi
 
 """

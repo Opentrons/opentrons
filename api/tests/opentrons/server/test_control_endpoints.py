@@ -1,7 +1,7 @@
 import json
 from copy import deepcopy
 from opentrons import robot, modules
-from opentrons.server.main import init
+from opentrons.server import init
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 from opentrons import instruments
 from opentrons.instruments import pipette_config
