@@ -275,7 +275,8 @@ def magdeck_calibrate():
 
 
 def tempdeck_set_temp():
-    text = "Setting temperature deck module temperature"
+    text = "Setting temperature deck module temperature " \
+           "(rounded off to nearest integer)"
     return make_command(
         name=types.TEMPDECK_SET_TEMP,
         payload={'text': text}

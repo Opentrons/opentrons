@@ -42,7 +42,7 @@ TEMP_DECK_ACK = 'ok\r\nok\r\n'
 
 # Number of digits after the decimal point for temperatures being sent
 # to/from Temp-Deck
-GCODE_ROUNDING_PRECISION = 3
+GCODE_ROUNDING_PRECISION = 0
 
 
 class TempDeckError(Exception):
