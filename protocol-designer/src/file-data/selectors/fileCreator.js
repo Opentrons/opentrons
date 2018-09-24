@@ -19,6 +19,11 @@ import type {LabwareData, PipetteData} from '../../step-generation'
 const protocolSchemaVersion = '1.0.0'
 const applicationVersion = process.env.OT_PD_VERSION || 'unknown version'
 
+// Internal release date: this should never be read programatically,
+// it just helps us humans quickly identify what build a user was using
+// when we look at saved protocols (without requiring us to trace thru git logs)
+const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
+
 const executionDefaults = {
   'aspirate-flow-rate': getPropertyAllPipettes('aspirateFlowRate'),
   'dispense-flow-rate': getPropertyAllPipettes('dispenseFlowRate'),
@@ -90,6 +95,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
       'designer-application': {
         'application-name': 'opentrons/protocol-designer',
         'application-version': applicationVersion,
+        _internalAppBuildDate,
         data: {
           pipetteTiprackAssignments: mapValues(
             initialRobotState.instruments,
