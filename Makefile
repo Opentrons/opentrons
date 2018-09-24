@@ -124,12 +124,9 @@ lint-css:
 	stylelint '**/*.css'
 
 # upload coverage reports
-# uses codecov's bash upload script
-# TODO(mc, 2018-08-28): add test as a task dependency once travis is setup to
-# use this Makefile for tests
 .PHONY: coverage
 coverage:
-	$(SHELL) <(curl -s https://codecov.io/bash) -X coveragepy
+	codecov
 
 # TODO(mc, 2018-06-06): update publish call and echo note when lerna splits
 # version bump and publish: https://github.com/lerna/lerna/issues/961
