@@ -8,7 +8,7 @@ _lock = threading.Lock()
 
 
 class _Locker:
-    """ A class that combines a threading.Lock and an flock to ensure
+    """ A class that combines a threading.Lock and a file lock to ensure
     controllers are unique both between processes and within a process.
 
     There should be one instance of this per process.
@@ -18,13 +18,13 @@ class _Locker:
     def __init__(self):
         global _lock
 
-        self._tlock_acquired = _lock.acquire(blocking=False)
-        self._flock_acquired = self._try_acquire_flock()
-        if not (self._tlock_acquired and self._flock_acquired):
+        self._thread_lock_acquired = _lock.acquire(blocking=False)
+        self._file_lock_acquired = self._try_acquire_file_lock()
+        if not (self._thread_lock_acquired and self._file_lock_acquired):
             raise RuntimeError(
                 'Only one hardware controller may be instantiated')
 
-    def _try_acquire_flock(self):
+    def _try_acquire_file_lock(self):
         self._file = open(self.LOCK_FILE_PATH, 'w')
         try:
             fcntl.lockf(self._file, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -35,9 +35,9 @@ class _Locker:
 
     def __del__(self):
         global _lock
-        if self._flock_acquired:
+        if self._file_lock_acquired:
             fcntl.lockf(self._file, fcntl.LOCK_UN)
-        if self._tlock_acquired:
+        if self._thread_lock_acquired:
             _lock.release()
 
 
