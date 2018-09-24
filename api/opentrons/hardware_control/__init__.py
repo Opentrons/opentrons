@@ -11,6 +11,7 @@ functions are available elsewhere.
 """
 
 import asyncio
+import functools
 import logging
 
 from . import simulator
@@ -25,6 +26,7 @@ mod_log = logging.getLogger(__name__)
 
 
 def _log_call(func):
+    @functools.wraps(func)
     def _log_call_inner(*args, **kwargs):
         args[0]._log.debug(func.__name__)
         return func(*args, **kwargs)
