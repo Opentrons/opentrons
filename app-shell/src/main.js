@@ -3,9 +3,9 @@ import {app, dialog, ipcMain, Menu} from 'electron'
 
 import createUi from './ui'
 import initializeMenu from './menu'
-import {initialize as initializeApiUpdate} from './api-update'
 import createLogger from './log'
 import {getConfig, getStore, getOverrides, registerConfig} from './config'
+import {registerApiUpdate} from './api-update'
 import {registerDiscovery} from './discovery'
 import {registerRobotLogs} from './robot-logs'
 import {registerUpdate} from './update'
@@ -31,20 +31,20 @@ app.on('ready', startUp)
 
 function startUp () {
   log.info('Starting App')
-  process.on('uncaughtException', (error) => log.error('Uncaught: ', {error}))
+  process.on('uncaughtException', error => log.error('Uncaught: ', {error}))
 
   mainWindow = createUi()
   rendererLogger = createRendererLogger()
 
   initializeMenu()
-  initializeApiUpdate()
 
   // wire modules to UI dispatches
-  const dispatch = (action) => {
+  const dispatch = action => {
     log.debug('Sending action via IPC to renderer', {action})
     mainWindow.webContents.send('dispatch', action)
   }
 
+  const apiUpdateHandler = registerApiUpdate(dispatch)
   const configHandler = registerConfig(dispatch)
   const discoveryHandler = registerDiscovery(dispatch)
   const robotLogsHandler = registerRobotLogs(dispatch, mainWindow)
@@ -52,6 +52,7 @@ function startUp () {
 
   ipcMain.on('dispatch', (_, action) => {
     log.debug('Received action via IPC from renderer', {action})
+    apiUpdateHandler(action)
     configHandler(action)
     discoveryHandler(action)
     robotLogsHandler(action)
@@ -59,8 +60,9 @@ function startUp () {
   })
 
   if (config.devtools) {
-    installAndOpenExtensions()
-      .catch((error) => dialog.showErrorBox('Error opening dev tools', error))
+    installAndOpenExtensions().catch(error =>
+      dialog.showErrorBox('Error opening dev tools', error)
+    )
   }
 
   log.silly('Global references', {mainWindow, rendererLogger})
@@ -79,21 +81,20 @@ function installAndOpenExtensions () {
   const devtools = require('electron-devtools-installer')
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS
   const install = devtools.default
-  const extensions = [
-    'REACT_DEVELOPER_TOOLS',
-    'REDUX_DEVTOOLS',
-  ]
+  const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS']
 
-  return Promise
-    .all(extensions.map((name) => install(devtools[name], forceDownload)))
-    .then(() => mainWindow.webContents.on('context-menu', (_, props) => {
+  return Promise.all(
+    extensions.map(name => install(devtools[name], forceDownload))
+  ).then(() =>
+    mainWindow.webContents.on('context-menu', (_, props) => {
       const {x, y} = props
 
-      Menu
-        .buildFromTemplate([{
+      Menu.buildFromTemplate([
+        {
           label: 'Inspect element',
           click: () => mainWindow.inspectElement(x, y),
-        }])
-        .popup(mainWindow)
-    }))
+        },
+      ]).popup(mainWindow)
+    })
+  )
 }

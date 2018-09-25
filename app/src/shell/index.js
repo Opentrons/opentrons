@@ -6,6 +6,7 @@ import {combineReducers} from 'redux'
 import createLogger from '../logger'
 import {makeGetRobotHealth} from '../http-api-client'
 import {updateReducer} from './update'
+import {apiUpdateReducer} from './api-update'
 
 import type {Middleware, ThunkAction} from '../types'
 import type {RobotService} from '../robot'
@@ -22,10 +23,14 @@ const {getRobots} = remote.require('./discovery')
 const log = createLogger(__filename)
 
 export * from './update'
+export * from './api-update'
 
 export {CURRENT_VERSION, CURRENT_RELEASE_NOTES}
 
-export const shellReducer = combineReducers({update: updateReducer})
+export const shellReducer = combineReducers({
+  update: updateReducer,
+  apiUpdate: apiUpdateReducer,
+})
 
 export const shellMiddleware: Middleware = store => {
   const {dispatch} = store
