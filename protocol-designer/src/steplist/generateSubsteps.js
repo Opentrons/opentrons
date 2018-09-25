@@ -178,48 +178,61 @@ function transferLikeSubsteps (args: {
     return acc
   }, [])
 
-  let intermediateVolumesByWell = {}
+  let intermediateVolumesByWellByLabware = {}
   const rowsWithIntermediateVols = aspDispRows.map((row, index) => {
     let cloneRow = row
     if (row.sourceWell) {
-      if (!(row.sourceWell in intermediateVolumesByWell)) {
-        intermediateVolumesByWell = {
-          ...intermediateVolumesByWell,
-          [row.sourceWell]: reduce(row.sourceIngredients, (acc, ingredGroup) => (
-            ingredGroup.volume ? Number(ingredGroup.volume) + acc : acc
-          ), 0),
+      if (!intermediateVolumesByWellByLabware[row.labware] || !intermediateVolumesByWellByLabware[row.labware][row.sourceWell]) {
+        intermediateVolumesByWellByLabware = {
+          ...intermediateVolumesByWellByLabware,
+          [row.labware]: {
+            ...intermediateVolumesByWellByLabware[row.labware],
+            [row.sourceWell]: reduce(row.sourceIngredients, (acc, ingredGroup) => (
+              ingredGroup.volume ? Number(ingredGroup.volume) + acc : acc
+            ), 0),
+          }
         }
       }
-      const preSubstepSourceVol = intermediateVolumesByWell[row.sourceWell] || 0
+      const preSubstepSourceVol = intermediateVolumesByWellByLabware[row.labware][row.sourceWell] || 0
       cloneRow = {
         ...cloneRow,
         preSubstepSourceVol,
       }
-      intermediateVolumesByWell = {
-        ...intermediateVolumesByWell,
-        [row.sourceWell]: preSubstepSourceVol - row.volume,
+      intermediateVolumesByWellByLabware = {
+        ...intermediateVolumesByWellByLabware,
+        [row.labware]: {
+          ...intermediateVolumesByWellByLabware[row.labware],
+          [row.sourceWell]: preSubstepSourceVol - row.volume,
+        },
       }
     } else if (row.destWell) {
-      if (!(row.destWell in intermediateVolumesByWell)) {
-        intermediateVolumesByWell = {
-          ...intermediateVolumesByWell,
-          [row.destWell]: reduce(row.destIngredients, (acc, ingredGroup) => (
-            ingredGroup.volume ? Number(ingredGroup.volume) + acc : acc
-          ), 0),
+      if (!intermediateVolumesByWellByLabware[row.labware] || !intermediateVolumesByWellByLabware[row.labware][row.destWell]) {
+        intermediateVolumesByWellByLabware = {
+          ...intermediateVolumesByWellByLabware,
+          [row.labware]: {
+            ...intermediateVolumesByWellByLabware[row.labware],
+            [row.destWell]: reduce(row.destIngredients, (acc, ingredGroup) => (
+              ingredGroup.volume ? Number(ingredGroup.volume) + acc : acc
+            ), 0),
+          },
         }
       }
-      const preSubstepDestVol = intermediateVolumesByWell[row.destWell] || 0
+      const preSubstepDestVol = intermediateVolumesByWellByLabware[row.labware][row.destWell] || 0
       cloneRow = {
         ...cloneRow,
         preSubstepDestVol,
       }
-      intermediateVolumesByWell = {
-        ...intermediateVolumesByWell,
-        [row.destWell]: preSubstepDestVol + row.volume,
+      intermediateVolumesByWellByLabware = {
+        ...intermediateVolumesByWellByLabware,
+        [row.labware]: {
+          ...intermediateVolumesByWellByLabware[row.labware],
+          [row.destWell]: preSubstepDestVol + row.volume,
+        },
       }
     }
     return cloneRow
   })
+  console.log('here: ', rowsWithIntermediateVols)
 
   const mergedRows: SourceDestSubstepItemRows = steplistUtils.mergeWhen(
     rowsWithIntermediateVols,
@@ -253,6 +266,7 @@ function commandToRows (
       sourceIngredients: getIngreds(labware, well),
       sourceWell: well,
       volume,
+      labware,
     }
   }
 
@@ -262,6 +276,7 @@ function commandToRows (
       destIngredients: getIngreds(labware, well),
       destWell: well,
       volume,
+      labware,
     }
   }
 

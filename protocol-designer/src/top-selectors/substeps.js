@@ -26,10 +26,12 @@ const getIngredsFactory = (
     wellContentsByLabware[labware] &&
     wellContentsByLabware[labware][well])
 
+  const totalWellVolume = Object.values(wellContents.volumeByGroupId).reduce((acc, volume) => acc + volume, 0)
   return map(wellContents.volumeByGroupId, (groupVolume, groupId) => ({
     id: groupId,
     name: ingredNames[groupId],
     volume: groupVolume,
+    volumeRatio: groupVolume / totalWellVolume,
   })) || []
 }
 

@@ -56,10 +56,7 @@ export default function SourceDestSubstep (props: SourceDestSubstepProps) {
           substepIndex === hoveredSubstep.substepIndex,
         }
       )}
-      onMouseEnter={() => onSelectSubstep({
-        stepId: substeps.parentStepId,
-        substepIndex,
-      })}
+      onMouseEnter={() => onSelectSubstep({stepId: substeps.parentStepId, substepIndex})}
       onMouseLeave={() => onSelectSubstep(null)}
       volume={row.volume}
       sourceIngredients={row.sourceIngredients}

@@ -78,3 +78,10 @@
   width: 2em;
   border-radius: 50%;
 }
+
+.ingred_row {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  min-width: 180px;
+}

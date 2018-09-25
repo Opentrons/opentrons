@@ -67,20 +67,19 @@ function wellRange (sourceWells: string | ?Array<?string>): ?string {
   return firstWell || lastWell
 }
 
-const PillTooltipContents = (props) => {
-  const color = (props.ingreds.length === 1)
-    ? swatchColors(Number(props.ingreds[0].id))
-    : MIXED_WELL_COLOR
-  return (
-    <div>
-      <div
-        className={styles.liquid_circle}
-        style={{backgroundColor: color}}
-        ingreds={props.ingreds} />
-      {props.volume}
-    </div>
-  )
-}
+const PillTooltipContents = (props) => (
+  <div>
+    {props.ingreds.map((ingred) => (
+      <div key={ingred.id} className={styles.ingred_row}>
+        <div
+          className={styles.liquid_circle}
+          style={{backgroundColor: swatchColors(Number(ingred.id))}} />
+        <span>{ingred.name}</span>
+        {props.volume * ingred.volumeRatio}
+      </div>
+    ))}
+  </div>
+)
 
 export default function SubstepRow (props: SubstepRowProps) {
   const sourceWellRange = wellRange(props.sourceWells)
