@@ -153,8 +153,10 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
     const commandCreators = continuousValidForms.reduce(
       (acc: Array<StepGeneration.CommandCreator>, formData, formIndex) => {
         const {stepType} = formData
-        const stepCommandCreator = commandCreatorsFromFormData(formData)
-
+        let stepCommandCreator = commandCreatorsFromFormData(formData)
+        if (stepType === 'transfer') {
+          stepCommandCreator = StepGeneration.reduceCommandCreators(stepCommandCreator(initialRobotState))
+        }
         if (!stepCommandCreator) {
           // TODO Ian 2018-05-08 use assert
           console.warn(`StepType "${stepType}" not yet implemented`)

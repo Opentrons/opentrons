@@ -3,9 +3,10 @@ import cloneDeep from 'lodash/cloneDeep'
 import range from 'lodash/range'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
+import startCase from 'lodash/startCase'
 
 import type {Channels} from '@opentrons/components'
-import {getWellsForTips} from '../step-generation/utils'
+import {getWellsForTips, commandCreatorsTimeline} from '../step-generation/utils'
 import {
   utils as steplistUtils,
   type NamedIngred,
@@ -100,6 +101,7 @@ function transferLikeSubsteps (args: {
       preWetTip: false,
     }
 
+    // NOTE: result is a flat array of commandCreators
     result = transfer(commandCallArgs)(robotState)
   } else if (validatedForm.stepType === 'distribute') {
     const commandCallArgs = {
@@ -169,10 +171,24 @@ function transferLikeSubsteps (args: {
     }
   }
 
+  const timeline = commandCreatorsTimeline(result)(robotState)
+  const timelineWithInitial = [{robotState}, ...timeline.timeline]
+
+  const LIQUID_COMMANDS = ['aspirate', 'dispense']
   // Single-channel rows
-  const aspDispRows: SourceDestSubstepItemRows = result.commands.reduce((acc, c, commandIdx) => {
-    if (c.command === 'aspirate' || c.command === 'dispense') {
-      const row = commandToRows(c, getIngreds)
+  const aspDispRows: SourceDestSubstepItemRows = timeline.timeline.reduce((acc, frame, timelineIdx) => {
+    const {commands} = frame
+    // if (timelineIdx === 0) return [...acc, {preVolume: frame.robotState.liquidState.labware}]
+    if (commands && commands.some(command => LIQUID_COMMANDS.includes(command.command))) {
+      const command = commands[0]
+      console.log('commad', command)
+      console.log('timelint ', frame.robotState.liquidState.labware[command.params.labware][command.params.well])
+      // const preVolumeKey = `pre${startCase(command.command)}Volume`
+      const row = frameToRows(frame, getIngreds)
+      // const row = {
+      //   ...commandToRows(command, getIngreds),
+      //   [preVolumeKey]: frame.robotState.liquidState.labware[command.params.labware][command.params.well]
+      // }
       return row ? [...acc, row] : acc
     }
     return acc
@@ -232,7 +248,6 @@ function transferLikeSubsteps (args: {
     }
     return cloneRow
   })
-  console.log('here: ', rowsWithIntermediateVols)
 
   const mergedRows: SourceDestSubstepItemRows = steplistUtils.mergeWhen(
     rowsWithIntermediateVols,
@@ -256,17 +271,19 @@ function transferLikeSubsteps (args: {
   }
 }
 
-function commandToRows (
-  command: AspDispCommandType,
+function frameToRows (
+  frame,
   getIngreds: GetIngreds
 ): ?StepItemSourceDestRow {
+  const command = frame.commands[0]
   if (command.command === 'aspirate') {
     const {well, volume, labware} = command.params
     return {
       sourceIngredients: getIngreds(labware, well),
       sourceWell: well,
       volume,
-      labware,
+      sourceLabware: labware,
+      sourceIngreds: frame.robotState.liquidState.labware[command.params.labware][command.params.well],
     }
   }
 
@@ -276,7 +293,8 @@ function commandToRows (
       destIngredients: getIngreds(labware, well),
       destWell: well,
       volume,
-      labware,
+      destLabware: labware,
+      destIngreds: frame.robotState.liquidState.labware[command.params.labware][command.params.well],
     }
   }
 

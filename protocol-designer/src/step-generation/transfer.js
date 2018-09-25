@@ -158,7 +158,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
     }
   )
 
-  return reduceCommandCreators(commandCreators)(prevRobotState)
+  return commandCreators
 }
 
 export default transfer

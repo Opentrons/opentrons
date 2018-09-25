@@ -71,8 +71,7 @@ export function _wellContentsForLabware (
 export const allWellContentsForSteps: Selector<Array<WellContentsByLabware>> = createSelector(
   fileDataSelectors.getInitialRobotState,
   fileDataSelectors.robotStateTimeline,
-  steplistSelectors.validatedForms,
-  (_initialRobotState, _robotStateTimeline, _forms) => {
+  (_initialRobotState, _robotStateTimeline) => {
     const timeline = [{robotState: _initialRobotState}, ..._robotStateTimeline.timeline]
 
     return timeline.map((timelineStep, timelineIndex) => {
