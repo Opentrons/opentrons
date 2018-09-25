@@ -1,16 +1,14 @@
 // tests for the shell module
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
-import electron from 'electron'
 
 import {shellMiddleware, getShellConfig} from '..'
 
 jest.mock('../../logger')
-jest.mock('electron')
 
 const middlewares = [thunk, shellMiddleware]
 const mockStore = configureMockStore(middlewares)
-const {'./config': mockConfig} = electron.__mockRemotes
+const {ipcRenderer: mockIpc, config: mockConfig} = global.APP_SHELL
 
 describe('app shell module', () => {
   afterEach(() => {
@@ -23,17 +21,16 @@ describe('app shell module', () => {
       const action = {type: 'foo', meta: {shell: true}}
 
       store.dispatch(action)
-      expect(electron.ipcRenderer.send).toHaveBeenCalledWith('dispatch', action)
+      expect(mockIpc.send).toHaveBeenCalledWith('dispatch', action)
     })
 
     test('catches actions from main and dispatches them to redux', () => {
       const store = mockStore({})
       const action = {type: 'foo'}
 
-      expect(electron.ipcRenderer.on)
-        .toHaveBeenCalledWith('dispatch', expect.any(Function))
+      expect(mockIpc.on).toHaveBeenCalledWith('dispatch', expect.any(Function))
 
-      const dispatchHandler = electron.ipcRenderer.on.mock.calls.find(call => {
+      const dispatchHandler = mockIpc.on.mock.calls.find(call => {
         return call[0] === 'dispatch' && typeof call[1] === 'function'
       })[1]
 

@@ -1,6 +1,5 @@
 // @flow
 // desktop shell module
-import {remote, ipcRenderer} from 'electron'
 import {combineReducers} from 'redux'
 
 import createLogger from '../logger'
@@ -16,9 +15,12 @@ import type {ShellUpdateAction} from './update'
 
 export type ShellAction = ShellUpdateAction
 
-const {CURRENT_VERSION, CURRENT_RELEASE_NOTES} = remote.require('./update')
-const {getConfig} = remote.require('./config')
-const {getRobots} = remote.require('./discovery')
+const {
+  ipcRenderer,
+  update: {CURRENT_VERSION, CURRENT_RELEASE_NOTES},
+  config: {getConfig},
+  discovery: {getRobots},
+} = global.APP_SHELL
 
 const log = createLogger(__filename)
 
