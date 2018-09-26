@@ -1,9 +1,10 @@
 // @flow
 import * as React from 'react'
 import last from 'lodash/last'
+import map from 'lodash/map'
 
-import {Icon, HoverTooltip, swatchColors, MIXED_WELL_COLOR} from '@opentrons/components'
-import IngredPill from '../IngredPill'
+import {Icon, HoverTooltip, swatchColors} from '@opentrons/components'
+import IngredPill from './IngredPill'
 import {PDListItem} from '../lists'
 import styles from './StepItem.css'
 
@@ -68,22 +69,24 @@ function wellRange (sourceWells: string | ?Array<?string>): ?string {
 }
 
 const PillTooltipContents = (props) => (
-  <div>
-    {props.ingreds.map((ingred) => (
-      <div key={ingred.id} className={styles.ingred_row}>
-        <div
-          className={styles.liquid_circle}
-          style={{backgroundColor: swatchColors(Number(ingred.id))}} />
-        <span>{ingred.name}</span>
-        {props.volume * ingred.volumeRatio}
+  <div className={styles.liquid_tooltip_contents}>
+    {map(props.ingreds, (ingred, groupId) => (
+      <div key={groupId} className={styles.ingred_row}>
+        <div className={styles.ingred_row_left}>
+          <div
+            className={styles.liquid_circle}
+            style={{backgroundColor: swatchColors(Number(groupId))}} />
+          <span>{props.ingredNames[groupId]}</span>
+        </div>
+        {ingred.volume}µl
       </div>
     ))}
   </div>
 )
 
 export default function SubstepRow (props: SubstepRowProps) {
-  const sourceWellRange = wellRange(props.sourceWells)
-  const destWellRange = wellRange(props.destWells)
+  const sourceWellRange = wellRange(props.source.well)
+  const destWellRange = wellRange(props.dest.well)
 
   const formattedVolume = formatVolume(props.volume)
 
@@ -96,14 +99,13 @@ export default function SubstepRow (props: SubstepRowProps) {
     >
       <HoverTooltip
         tooltipComponent={(
-          <PillTooltipContents
-            ingreds={props.sourceIngredients}
-            volume={props.sourceVol} />)
-        }>
+          <PillTooltipContents ingredNames={props.ingredNames} ingreds={props.source.preIngreds} />
+        )}>
         {(hoverTooltipHandlers) => (
           <IngredPill
             hoverTooltipHandlers={hoverTooltipHandlers}
-            ingreds={props.sourceIngredients} />
+            ingredNames={props.ingredNames}
+            ingreds={props.source.preIngreds} />
         )}
       </HoverTooltip>
       <span className={styles.emphasized_cell}>{sourceWellRange}</span>
@@ -119,11 +121,15 @@ export default function SubstepRow (props: SubstepRowProps) {
           <Icon name={props.collapsed ? 'chevron-down' : 'chevron-up'} />
         </span>
         : (
-          <HoverTooltip tooltipComponent={props.destVol}>
+          <HoverTooltip
+            tooltipComponent={(
+              <PillTooltipContents ingredNames={props.ingredNames} ingreds={props.dest.preIngreds} />
+            )}>
             {(hoverTooltipHandlers) => (
               <IngredPill
                 hoverTooltipHandlers={hoverTooltipHandlers}
-                ingreds={props.destIngredients} />
+                ingredNames={props.ingredNames}
+                ingreds={props.dest.preIngreds} />
             )}
           </HoverTooltip>
         )

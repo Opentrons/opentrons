@@ -64,7 +64,7 @@ export const allSubsteps: Selector<AllSubsteps> = createSelector(
         validatedForms[stepId],
         allPipetteData,
         (labwareId: string) => allLabwareTypes[labwareId],
-        getIngredsFactory(_allWellContentsForSteps[timelineIndex], ingredNames),
+        ingredNames,
         robotState,
         stepId
       )

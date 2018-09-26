@@ -3,10 +3,9 @@ import cloneDeep from 'lodash/cloneDeep'
 import range from 'lodash/range'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import startCase from 'lodash/startCase'
 
 import type {Channels} from '@opentrons/components'
-import {getWellsForTips, commandCreatorsTimeline} from '../step-generation/utils'
+import {getWellsForTips, substepTimeline} from '../step-generation/utils'
 import {
   utils as steplistUtils,
   type NamedIngred,
@@ -58,7 +57,7 @@ type AspDispCommandType = {
 function transferLikeSubsteps (args: {
   validatedForm: ConsolidateFormData | DistributeFormData | TransferFormData | MixFormData,
   allPipetteData: AllPipetteData,
-  getIngreds: GetIngreds,
+  ingredNames: jjj,
   getLabwareType: GetLabwareType,
   robotState: RobotState,
   stepId: number,
@@ -66,7 +65,7 @@ function transferLikeSubsteps (args: {
   const {
     validatedForm,
     allPipetteData,
-    getIngreds,
+    ingredNames,
     getLabwareType,
     stepId,
   } = args
@@ -137,7 +136,7 @@ function transferLikeSubsteps (args: {
   if (pipette.channels > 1) {
     const aspDispMultiRows: SourceDestSubstepItemMultiRows = result.commands.reduce((acc, c, commandIdx) => {
       if (c.command === 'aspirate' || c.command === 'dispense') {
-        const rows = commandToMultiRows(c, getIngreds, getLabwareType, pipette.channels)
+        const rows = commandToMultiRows(c, ingredNames, getLabwareType, pipette.channels)
         return rows ? [...acc, rows] : acc
       }
       return acc
@@ -171,89 +170,81 @@ function transferLikeSubsteps (args: {
     }
   }
 
-  const timeline = commandCreatorsTimeline(result)(robotState)
-  const timelineWithInitial = [{robotState}, ...timeline.timeline]
+  const substepRows = substepTimeline(result)(robotState)
 
-  const LIQUID_COMMANDS = ['aspirate', 'dispense']
+  // console.log(timeline)
+  // const aspDispRows = timeline.timeline.map(frame => frameToRows(frame, getIngreds))
+  // console.log(aspDispRows)
   // Single-channel rows
-  const aspDispRows: SourceDestSubstepItemRows = timeline.timeline.reduce((acc, frame, timelineIdx) => {
-    const {commands} = frame
-    // if (timelineIdx === 0) return [...acc, {preVolume: frame.robotState.liquidState.labware}]
-    if (commands && commands.some(command => LIQUID_COMMANDS.includes(command.command))) {
-      const command = commands[0]
-      console.log('commad', command)
-      console.log('timelint ', frame.robotState.liquidState.labware[command.params.labware][command.params.well])
-      // const preVolumeKey = `pre${startCase(command.command)}Volume`
-      const row = frameToRows(frame, getIngreds)
-      // const row = {
-      //   ...commandToRows(command, getIngreds),
-      //   [preVolumeKey]: frame.robotState.liquidState.labware[command.params.labware][command.params.well]
-      // }
-      return row ? [...acc, row] : acc
-    }
-    return acc
-  }, [])
+  // const aspDispRows: SourceDestSubstepItemRows = timeline.timeline.reduce((acc, frame, timelineIdx) => {
+  //   const {commands} = frame
+  //   if (commands && commands.some(command => LIQUID_COMMANDS.includes(command.command))) {
+  //     const row = frameToRows(frame, getIngreds)
+  //     return row ? [...acc, row] : acc
+  //   }
+  //   return acc
+  // }, [])
 
-  let intermediateVolumesByWellByLabware = {}
-  const rowsWithIntermediateVols = aspDispRows.map((row, index) => {
-    let cloneRow = row
-    if (row.sourceWell) {
-      if (!intermediateVolumesByWellByLabware[row.labware] || !intermediateVolumesByWellByLabware[row.labware][row.sourceWell]) {
-        intermediateVolumesByWellByLabware = {
-          ...intermediateVolumesByWellByLabware,
-          [row.labware]: {
-            ...intermediateVolumesByWellByLabware[row.labware],
-            [row.sourceWell]: reduce(row.sourceIngredients, (acc, ingredGroup) => (
-              ingredGroup.volume ? Number(ingredGroup.volume) + acc : acc
-            ), 0),
-          }
-        }
-      }
-      const preSubstepSourceVol = intermediateVolumesByWellByLabware[row.labware][row.sourceWell] || 0
-      cloneRow = {
-        ...cloneRow,
-        preSubstepSourceVol,
-      }
-      intermediateVolumesByWellByLabware = {
-        ...intermediateVolumesByWellByLabware,
-        [row.labware]: {
-          ...intermediateVolumesByWellByLabware[row.labware],
-          [row.sourceWell]: preSubstepSourceVol - row.volume,
-        },
-      }
-    } else if (row.destWell) {
-      if (!intermediateVolumesByWellByLabware[row.labware] || !intermediateVolumesByWellByLabware[row.labware][row.destWell]) {
-        intermediateVolumesByWellByLabware = {
-          ...intermediateVolumesByWellByLabware,
-          [row.labware]: {
-            ...intermediateVolumesByWellByLabware[row.labware],
-            [row.destWell]: reduce(row.destIngredients, (acc, ingredGroup) => (
-              ingredGroup.volume ? Number(ingredGroup.volume) + acc : acc
-            ), 0),
-          },
-        }
-      }
-      const preSubstepDestVol = intermediateVolumesByWellByLabware[row.labware][row.destWell] || 0
-      cloneRow = {
-        ...cloneRow,
-        preSubstepDestVol,
-      }
-      intermediateVolumesByWellByLabware = {
-        ...intermediateVolumesByWellByLabware,
-        [row.labware]: {
-          ...intermediateVolumesByWellByLabware[row.labware],
-          [row.destWell]: preSubstepDestVol + row.volume,
-        },
-      }
-    }
-    return cloneRow
-  })
+  // let intermediateVolumesByWellByLabware = {}
+  // const rowsWithIntermediateVols = aspDispRows.map((row, index) => {
+  //   let cloneRow = row
+  //   if (row.sourceWell) {
+  //     if (!intermediateVolumesByWellByLabware[row.labware] || !intermediateVolumesByWellByLabware[row.labware][row.sourceWell]) {
+  //       intermediateVolumesByWellByLabware = {
+  //         ...intermediateVolumesByWellByLabware,
+  //         [row.labware]: {
+  //           ...intermediateVolumesByWellByLabware[row.labware],
+  //           [row.sourceWell]: reduce(row.sourceIngredients, (acc, ingredGroup) => (
+  //             ingredGroup.volume ? Number(ingredGroup.volume) + acc : acc
+  //           ), 0),
+  //         }
+  //       }
+  //     }
+  //     const preSubstepSourceVol = intermediateVolumesByWellByLabware[row.labware][row.sourceWell] || 0
+  //     cloneRow = {
+  //       ...cloneRow,
+  //       preSubstepSourceVol,
+  //     }
+  //     intermediateVolumesByWellByLabware = {
+  //       ...intermediateVolumesByWellByLabware,
+  //       [row.labware]: {
+  //         ...intermediateVolumesByWellByLabware[row.labware],
+  //         [row.sourceWell]: preSubstepSourceVol - row.volume,
+  //       },
+  //     }
+  //   } else if (row.destWell) {
+  //     if (!intermediateVolumesByWellByLabware[row.labware] || !intermediateVolumesByWellByLabware[row.labware][row.destWell]) {
+  //       intermediateVolumesByWellByLabware = {
+  //         ...intermediateVolumesByWellByLabware,
+  //         [row.labware]: {
+  //           ...intermediateVolumesByWellByLabware[row.labware],
+  //           [row.destWell]: reduce(row.destIngredients, (acc, ingredGroup) => (
+  //             ingredGroup.volume ? Number(ingredGroup.volume) + acc : acc
+  //           ), 0),
+  //         },
+  //       }
+  //     }
+  //     const preSubstepDestVol = intermediateVolumesByWellByLabware[row.labware][row.destWell] || 0
+  //     cloneRow = {
+  //       ...cloneRow,
+  //       preSubstepDestVol,
+  //     }
+  //     intermediateVolumesByWellByLabware = {
+  //       ...intermediateVolumesByWellByLabware,
+  //       [row.labware]: {
+  //         ...intermediateVolumesByWellByLabware[row.labware],
+  //         [row.destWell]: preSubstepDestVol + row.volume,
+  //       },
+  //     }
+  //   }
+  //   return cloneRow
+  // })
 
   const mergedRows: SourceDestSubstepItemRows = steplistUtils.mergeWhen(
-    rowsWithIntermediateVols,
+    substepRows,
     (currentRow, nextRow) =>
       // NOTE: if aspirate then dispense rows are adjacent, collapse them into one row
-      currentRow.sourceWell && nextRow.destWell,
+      currentRow.source && nextRow.dest,
     (currentRow, nextRow) => ({
       ...nextRow,
       ...currentRow,
@@ -271,35 +262,35 @@ function transferLikeSubsteps (args: {
   }
 }
 
-function frameToRows (
-  frame,
-  getIngreds: GetIngreds
-): ?StepItemSourceDestRow {
-  const command = frame.commands[0]
-  if (command.command === 'aspirate') {
-    const {well, volume, labware} = command.params
-    return {
-      sourceIngredients: getIngreds(labware, well),
-      sourceWell: well,
-      volume,
-      sourceLabware: labware,
-      sourceIngreds: frame.robotState.liquidState.labware[command.params.labware][command.params.well],
-    }
-  }
+// function frameToRows (
+//   frame,
+//   getIngreds: GetIngreds
+// ): ?StepItemSourceDestRow {
+//   const command = frame.commands[0]
+//   if (command.command === 'aspirate') {
+//     const {well, volume, labware} = command.params
+//     return {
+//       sourceIngredients: getIngreds(labware, well),
+//       sourceWell: well,
+//       volume,
+//       sourceLabware: labware,
+//       sourceIngreds: frame.robotState.liquidState.labware[command.params.labware][command.params.well],
+//     }
+//   }
 
-  if (command.command === 'dispense') {
-    const {well, volume, labware} = command.params
-    return {
-      destIngredients: getIngreds(labware, well),
-      destWell: well,
-      volume,
-      destLabware: labware,
-      destIngreds: frame.robotState.liquidState.labware[command.params.labware][command.params.well],
-    }
-  }
+//   if (command.command === 'dispense') {
+//     const {well, volume, labware} = command.params
+//     return {
+//       destIngredients: getIngreds(labware, well),
+//       destWell: well,
+//       volume,
+//       destLabware: labware,
+//       destIngreds: frame.robotState.liquidState.labware[command.params.labware][command.params.well],
+//     }
+//   }
 
-  return null
-}
+//   return null
+// }
 
 function commandToMultiRows (
   command: AspDispCommandType,
@@ -348,7 +339,7 @@ export function generateSubsteps (
   valForm: ?ValidFormAndErrors,
   allPipetteData: AllPipetteData,
   getLabwareType: GetLabwareType,
-  getIngreds: GetIngreds,
+  ingredNames: GetIngreds, //TODO: change type
   robotState: ?RobotState,
   stepId: number // stepId is used only for substeps to reference parent step
 ): ?SubstepItemData {
@@ -381,7 +372,7 @@ export function generateSubsteps (
     return transferLikeSubsteps({
       validatedForm,
       allPipetteData,
-      getIngreds,
+      ingredNames,
       getLabwareType,
       robotState,
       stepId,

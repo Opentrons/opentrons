@@ -77,6 +77,7 @@ function getStepItemContents (stepItemProps: StepItemProps) {
     getLabwareName,
     hoveredSubstep,
     handleSubstepHover,
+    ingredNames,
   } = stepItemProps
 
   const formData = step && step.formData
@@ -134,6 +135,7 @@ function getStepItemContents (stepItemProps: StepItemProps) {
     result.push(
       <SourceDestSubstep
         key='substeps'
+        ingredNames={ingredNames}
         substeps={substeps}
         hoveredSubstep={hoveredSubstep}
         onSelectSubstep={handleSubstepHover}
