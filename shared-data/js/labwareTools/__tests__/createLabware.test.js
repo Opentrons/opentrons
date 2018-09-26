@@ -18,11 +18,11 @@ const ajv = new Ajv({
 const validate = ajv.compile(labwareSchema)
 
 // Test a minimal labware definition
-const well = omit(exampleLabware["wells"]["A1"], ['x', 'y', 'z'])
-const labware = createRegularLabware(exampleLabware["metadata"], exampleLabware["parameters"], exampleLabware["dimensions"], [1, 2], [10, 10], well, exampleLabware["vendor"])
+const well = omit(exampleLabware['wells']['A1'], ['x', 'y', 'z'])
+const labware = createRegularLabware(exampleLabware['metadata'], exampleLabware['parameters'], exampleLabware['dimensions'], [1, 2], [10, 10], well, exampleLabware['vendor'])
 
-const well2 = omit(exampleLabware2["wells"]["A1"], ['x', 'y', 'z'])
-const labware2 = createRegularLabware(exampleLabware2["metadata"], exampleLabware2["parameters"], exampleLabware2["dimensions"], [3, 2], [9, 9], well2)
+const well2 = omit(exampleLabware2['wells']['A1'], ['x', 'y', 'z'])
+const labware2 = createRegularLabware(exampleLabware2['metadata'], exampleLabware2['parameters'], exampleLabware2['dimensions'], [3, 2], [9, 9], well2)
 
 describe('test the schema against a minimalist fixture', () => {
   test('...', () => {
@@ -31,7 +31,6 @@ describe('test the schema against a minimalist fixture', () => {
 
     expect(validationErrors).toBe(null)
     expect(valid).toBe(true)
-
   })
 })
 
@@ -50,9 +49,9 @@ describe('test fields generate correctly', () => {
     const spacing = [11.8, 12.1]
     const grid = [8, 12]
     const labware3 = createRegularLabware(
-      exampleLabware2["metadata"],
-      exampleLabware2["parameters"],
-      exampleLabware2["dimensions"],
+      exampleLabware2['metadata'],
+      exampleLabware2['parameters'],
+      exampleLabware2['dimensions'],
       grid,
       spacing,
       well2)
@@ -67,13 +66,12 @@ describe('test fields generate correctly', () => {
       for (r in columns) {
         var index = labware3.ordering[c][r]
         var well = labware3.wells[index]
-        expect(well.x).toEqual(roundTo(col*spacing[1], 2))
-        expect(well.y).toEqual(roundTo(row*spacing[0], 2))
+        expect(well.x).toEqual(roundTo(col * spacing[1], 2))
+        expect(well.y).toEqual(roundTo(row * spacing[0], 2))
         expect(well.z).toEqual(0)
         row = row - 1
       }
       col = col + 1
     }
-
   })
 })

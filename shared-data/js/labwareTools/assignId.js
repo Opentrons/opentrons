@@ -1,6 +1,6 @@
 import uuidv1 from 'uuid/v1'
 
-function assignId() {
+function assignId () {
   return uuidv1()
 }
 
