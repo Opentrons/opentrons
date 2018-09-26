@@ -13,6 +13,11 @@ from opentrons.containers.placeable import (
     Deck,
     Slot)
 from tests.opentrons import generate_plate
+# TODO: Modify all calls to get a Well to use the `wells` method
+# TODO: remove `unpack_location` calls
+# TODO: revise `share` logic
+# TODO: remove `generate_plate` and use JS generated data
+# TODO: Modify calls that expect Deck and Slot to be Placeables
 
 
 class ContainerTestCase(unittest.TestCase):

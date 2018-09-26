@@ -8,6 +8,7 @@ from opentrons.data_storage import old_container_loading
 from opentrons.containers.placeable import Container, Well
 from opentrons.util import environment
 from opentrons.config import feature_flags as ff
+# TODO: Remove
 
 
 if not ff.split_labware_definitions():

@@ -1,4 +1,7 @@
 # Test loading container onto a module
+# TODO: Change to 'magdeck' to 'Magnetic Module' or similar and 'tempdeck' to
+# TODO: 'Temperature Module' or similar
+
 import pytest
 import asyncio
 from opentrons import robot, labware, modules
