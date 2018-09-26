@@ -27,9 +27,10 @@ class TempDeck:
     def set_temperature(self, celsius):
         """
         Set temperature in degree Celsius
-        Range: -9 to 99 degree Celsius.
-        The range is limited by the 2-digit temperature display. Any input
-        outside of this range will be clipped to the nearest limit
+        Range: 4 to 95 degree Celsius (QA tested).
+        The internal temp range is -9 to 99 C, which is limited by the 2-digit
+        temperature display. Any input outside of this range will be clipped
+        to the nearest limit
         """
         if self._driver and self._driver.is_connected():
             self._driver.set_temperature(celsius)
