@@ -241,21 +241,6 @@ export function serverReducer (
   return state
 }
 
-export const makeGetAvailableRobotUpdate = () => {
-  const selector: Selector<State, RobotService, ?string> = createSelector(
-    makeGetRobotHealth(),
-    getApiUpdateVersion,
-    (health, updateVersion) => {
-      const currentVersion = health.response && health.response.api_version
-      return currentVersion && currentVersion !== updateVersion
-        ? updateVersion
-        : null
-    }
-  )
-
-  return selector
-}
-
 export type RobotUpdateType = 'upgrade' | 'downgrade' | null
 
 export type RobotUpdateInfo = {version: string, type: RobotUpdateType}

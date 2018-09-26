@@ -109,7 +109,7 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   const {dispatch} = dispatchProps
 
   const close = () => dispatch(push(`/robots/${ownProps.name}`))
-  let ignoreUpdate = updateInfo
+  let ignoreUpdate = updateInfo.type
     ? () => dispatch(setIgnoredUpdate(ownProps, updateInfo.version)).then(close)
     : close
 
