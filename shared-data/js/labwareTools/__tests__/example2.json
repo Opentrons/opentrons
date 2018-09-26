@@ -1,0 +1,78 @@
+{
+ "otId": 1,
+ "deprecated": false,
+ "metadata": {
+   "name": "fake labware 2",
+   "displayCategory": "wellPlate",
+   "displayVolumeUnits": "uL",
+   "displayLengthUnits": "mm"
+ },
+ "parameters": {
+   "format": "irregular",
+   "isTiprack": false
+ },
+ "dimensions": {
+   "overallLength": 50,
+   "overallWidth": 50,
+   "overallHeight": 50,
+   "offsetX":10,
+   "offsetY":10,
+   "offsetZ":5
+ },
+ "ordering": [["A1", "B1", "C1"], ["A2", "B2", "C2"]],
+ "wells": {
+   "A1":{
+     "depth": 40,
+     "totalLiquidVolume": 100,
+     "diameter": 30,
+     "x": 0,
+     "y": 18,
+     "z": 0
+
+   },
+   "B1":{
+     "depth": 40,
+     "totalLiquidVolume": 100,
+     "diameter": 30,
+     "x": 0,
+     "y": 9,
+     "z": 0
+
+   },
+   "C1":{
+     "depth": 40,
+     "totalLiquidVolume": 100,
+     "diameter": 30,
+     "x": 0,
+     "y": 0,
+     "z": 0
+
+   },
+   "A2":{
+     "depth": 40,
+     "totalLiquidVolume": 100,
+     "diameter": 30,
+     "x": 9,
+     "y": 18,
+     "z": 0
+     },
+     "B2":{
+       "depth": 40,
+       "totalLiquidVolume": 100,
+       "diameter": 30,
+       "x": 9,
+       "y": 9,
+       "z": 0
+     },
+     "C2":{
+       "depth": 40,
+       "totalLiquidVolume": 100,
+       "diameter": 30,
+       "x": 9,
+       "y": 0,
+       "z": 0
+       }
+   }
+
+
+}

@@ -1,0 +1,141 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "positiveNumber": {
+      "type": "number",
+      "minimum": 0
+    }
+  },
+
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["otId", "deprecated", "metadata","parameters", "ordering", "dimensions", "wells"],
+  "properties": {
+    "otId": {
+      "type": "number"
+    },
+    "deprecated": {
+      "type": "boolean"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "displayCategory"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "displayCategory": {
+          "type": "string"
+        },
+        "displayLengthUnits": {
+          "type": "string"
+        },
+        "displayVolumeUnits": {
+          "type": "string"
+        }
+      }
+    },
+    "vendor": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sku": {
+          "type": "string"
+        },
+        "vendor": {
+          "type": "string"
+        }
+      }
+
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format", "isTiprack"],
+      "properties": {
+        "format": {
+          "type": "string"
+        },
+        "isTiprack": {
+          "type": "boolean"
+        },
+        "tipLength": {
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "wellShape": {
+          "type": "string"
+        }
+      }
+
+    },
+    "ordering": {
+      "type": "array",
+      "description": "",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["overallWidth", "overallHeight", "overallLength", "offsetX", "offsetY", "offsetZ"],
+      "properties": {
+        "overallWidth": {
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "overallHeight": {
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "overallLength": {
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "offsetX": {
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "offsetY": {
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "offsetZ": {
+          "$ref": "#/definitions/positiveNumber"
+        }
+      }
+
+    },
+    "wells": {
+      "type": "object",
+      "patternProperties": {
+        ".*": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["depth", "x", "y", "z"],
+          "oneOf": [
+            {"required": ["width", "length"]},
+            {"required": ["diameter"]}
+          ],
+          "not": {"anyOf": [
+                    {"required": ["diameter", "width"]},
+                    {"required": ["diameter", "length"]}
+          ]},
+          "properties": {
+            "depth": {"$ref": "#/definitions/positiveNumber"},
+            "x": {"$ref": "#/definitions/positiveNumber"},
+            "y": {"$ref": "#/definitions/positiveNumber"},
+            "z": {"$ref": "#/definitions/positiveNumber"},
+            "totalLiquidVolume": {"$ref": "#/definitions/positiveNumber"},
+            "width": {"$ref": "#/definitions/positiveNumber"},
+            "length": {"$ref": "#/definitions/positiveNumber"},
+            "diameter": {"$ref": "#/definitions/positiveNumber"}
+
+          }
+        }
+      }
+
+    }
+
+  }
+
+}
