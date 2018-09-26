@@ -15,6 +15,8 @@ const LabwareFormats = [
   'irregular',
 ]
 
+// TODO (9/21/2018): This will be deprecated and
+// replaced with labware-json-schema
 const schema = {
   type: 'object',
   required: ['metadata', 'ordering', 'wells'],
