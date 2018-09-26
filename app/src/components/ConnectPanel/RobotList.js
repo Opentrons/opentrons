@@ -17,7 +17,7 @@ type ListProps = {
 }
 
 type ItemProps = Robot & {
-  availableUpdate: ?string,
+  upgradable: ?string,
   connect: () => mixed,
   disconnect: () => mixed,
 }
@@ -31,7 +31,7 @@ export default function RobotList (props: ListProps) {
 }
 
 export function RobotListItem (props: ItemProps) {
-  const {name, wired, isConnected, availableUpdate, connect, disconnect} = props
+  const {name, wired, isConnected, upgradable, connect, disconnect} = props
   const onClick = isConnected
     ? disconnect
     : connect
@@ -46,7 +46,7 @@ export function RobotListItem (props: ItemProps) {
         <NotificationIcon
           name={wired ? 'usb' : 'wifi'}
           className={styles.robot_item_icon}
-          childName={availableUpdate ? 'circle' : null}
+          childName={upgradable ? 'circle' : null}
           childClassName={styles.notification}
         />
 

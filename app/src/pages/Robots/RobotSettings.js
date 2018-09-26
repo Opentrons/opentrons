@@ -11,7 +11,7 @@ import {
   makeGetRobotHome,
   clearHomeResponse,
   makeGetRobotIgnoredUpdateRequest,
-  makeGetAvailableRobotUpdate,
+  makeGetRobotUpdateInfo,
 } from '../../http-api-client'
 
 import {SpinnerModalPage} from '@opentrons/components'
@@ -121,19 +121,19 @@ function RobotSettingsPage (props: Props) {
 function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   const getHomeRequest = makeGetRobotHome()
   const getUpdateIgnoredRequest = makeGetRobotIgnoredUpdateRequest()
-  const getAvailableRobotUpdate = makeGetAvailableRobotUpdate()
+  const getRobotUpdateInfo = makeGetRobotUpdateInfo()
 
   return (state, ownProps) => {
     const {robot} = ownProps
     const connectRequest = robotSelectors.getConnectRequest(state)
     const homeRequest = getHomeRequest(state, robot)
     const ignoredRequest = getUpdateIgnoredRequest(state, robot)
-    const availableUpdate = getAvailableRobotUpdate(state, robot)
+    const updateInfo = getRobotUpdateInfo(state, robot)
     const showUpdateModal = (
-      availableUpdate &&
+      updateInfo.type === 'upgrade' &&
       ignoredRequest &&
       ignoredRequest.response &&
-      ignoredRequest.response.version !== availableUpdate
+      ignoredRequest.response.version !== updateInfo.version
     )
 
     return {

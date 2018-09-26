@@ -2,10 +2,11 @@
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import electron from 'electron'
+import {setter} from '@thi.ng/paths'
 
 import client from '../client'
 import {
-  makeGetAvailableRobotUpdate,
+  makeGetRobotUpdateInfo,
   makeGetRobotIgnoredUpdateRequest,
   makeGetRobotUpdateRequest,
   makeGetRobotRestartRequest,
@@ -22,7 +23,7 @@ jest.mock('../client')
 const REQUESTS_TO_TEST = [
   {path: 'update', response: {message: 'foo', filename: 'bar'}},
   {path: 'restart', response: {message: 'restarting'}},
-  {path: 'update/ignore', response: {version: '42.0.0'}},
+  // {path: 'update/ignore', response: {version: '42.0.0'}},
 ]
 
 const middlewares = [thunk]
@@ -68,11 +69,24 @@ describe('server API client', () => {
       }
     })
 
-    test('makeGetRobotAvailableUpdate', () => {
-      const getAvailableUpdate = makeGetAvailableRobotUpdate()
+    test('makeGetRobotUpdateInfo', () => {
+      const version = state.shell.apiUpdate.version
+      const getRobotUpdateInfo = makeGetRobotUpdateInfo()
+      const setCurrent = setter(`api.api.${robot.name}.health.response.api_version`)
 
-      expect(getAvailableUpdate(state, robot)).toEqual('4.0.0')
-      expect(getAvailableUpdate(state, {name: 'foo'})).toEqual(null)
+      // test upgrade available
+      expect(getRobotUpdateInfo(state, robot)).toEqual({version, type: 'upgrade'})
+
+      // test downgrade
+      state = setCurrent(state, '5.0.0')
+      expect(getRobotUpdateInfo(state, robot)).toEqual({version, type: 'downgrade'})
+
+      // test no upgrade
+      state = setCurrent(state, '4.0.0')
+      expect(getRobotUpdateInfo(state, robot)).toEqual({version, type: null})
+
+      // test unknown robot
+      expect(getRobotUpdateInfo(state, {name: 'foo'})).toEqual({version, type: null})
     })
 
     test('makeGetRobotUpdateRequest', () => {
@@ -176,7 +190,7 @@ describe('server API client', () => {
   })
 
   describe('fetchIgnoredUpdate action creator', () => {
-    test('calls GET /server/update/ignore', () => {
+    test('calls GET /update/ignore', () => {
       client.__setMockResponse({
         inProgress: true,
         error: null,
@@ -187,7 +201,7 @@ describe('server API client', () => {
         expect(client).toHaveBeenCalledWith(
           robot,
           'GET',
-          'server/update/ignore'
+          'update/ignore'
         )
       )
     })
@@ -230,7 +244,7 @@ describe('server API client', () => {
   })
 
   describe('setIgnoredUpdate action creator', () => {
-    test('calls POST /server/update/ignore', () => {
+    test('calls POST update/ignore', () => {
       client.__setMockResponse({
         inProgress: true,
         error: null,
@@ -241,7 +255,7 @@ describe('server API client', () => {
         expect(client).toHaveBeenCalledWith(
           robot,
           'POST',
-          'server/update/ignore',
+          'update/ignore',
           {version: availableUpdate}
         )
       )

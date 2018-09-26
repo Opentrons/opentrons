@@ -47,12 +47,6 @@ export type {
 } from './robot'
 
 export type {
-  RobotServerUpdate,
-  RobotServerRestart,
-  RobotServerUpdateIgnore,
-} from './server'
-
-export type {
   WifiListResponse,
   WifiStatusResponse,
   WifiConfigureResponse,
@@ -94,6 +88,8 @@ export * from './pipettes'
 
 export * from './motors'
 
+export * from './server'
+
 export {
   home,
   clearHomeResponse,
@@ -105,20 +101,6 @@ export {
   makeGetRobotHome,
   makeGetRobotLights,
 } from './robot'
-
-export {
-  updateRobotServer,
-  restartRobotServer,
-  makeGetAvailableRobotUpdate,
-  makeGetRobotUpdateRequest,
-  makeGetRobotRestartRequest,
-  getAnyRobotUpdateAvailable,
-  fetchHealthAndIgnored,
-  fetchIgnoredUpdate,
-  setIgnoredUpdate,
-  makeGetRobotIgnoredUpdateRequest,
-  clearRestartResponse,
-} from './server'
 
 export {
   fetchWifiList,

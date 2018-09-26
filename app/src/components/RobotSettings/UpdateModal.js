@@ -5,11 +5,12 @@ import {push} from 'react-router-redux'
 
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
-import type {RobotServerUpdate, RobotServerRestart} from '../../http-api-client'
+import type {RobotServerUpdate, RobotServerRestart, RobotUpdateInfo} from '../../http-api-client'
 import {
   updateRobotServer,
   restartRobotServer,
-  makeGetAvailableRobotUpdate,
+  clearUpdateResponse,
+  makeGetRobotUpdateInfo,
   makeGetRobotUpdateRequest,
   makeGetRobotRestartRequest,
   setIgnoredUpdate,
@@ -20,7 +21,7 @@ import {AlertModal, Icon} from '@opentrons/components'
 type OP = Robot
 
 type SP = {
-  availableUpdate: ?string,
+  updateInfo: RobotUpdateInfo,
   updateRequest: RobotServerUpdate,
   restartRequest: RobotServerRestart,
 }
@@ -33,10 +34,10 @@ type Props = OP & SP & {
   ignoreUpdate: () => mixed,
 }
 
-const UPDATE_MSG = "We recommend updating your robot's software to the latest version"
+const DOWNGRADE_MSG = 'Your app is at an older version than your robot. You may want to downgrade your robot to ensure compatability.'
+const UPGRADE_MSG = 'Your robot is at an older version than your app. We recommend you upgrade your robot to ensure compatability.'
 const ALREADY_UPDATED_MSG = "It looks like your robot is already up to date, but if you're experiencing issues you can re-apply the latest update."
 const RESTART_MSG = 'Restart your robot to finish the update. It may take several minutes for your robot to restart.'
-const DONE_MSG = 'Your robot has been updated. Please wait for your robot to fully restart, which may take several minutes.'
 
 // TODO(mc, 2018-03-19): prop or component for text-height icons
 const Spinner = () => (<Icon name='ot-spinner' height='1em' spin />)
@@ -44,34 +45,38 @@ const Spinner = () => (<Icon name='ot-spinner' height='1em' spin />)
 export default connect(makeMapStateToProps, null, mergeProps)(UpdateModal)
 
 function UpdateModal (props: Props) {
-  const {ignoreUpdate, update, restart, updateRequest, restartRequest} = props
-  const availableUpdate = props.availableUpdate || ''
+  const {updateInfo, ignoreUpdate, update, restart, updateRequest, restartRequest} = props
   const inProgress = updateRequest.inProgress || restartRequest.inProgress
   let closeButtonText = 'not now'
   let message
   let button
 
-  const heading = availableUpdate
-    ? `Version ${availableUpdate || ''} available`
+  const heading = updateInfo.type
+    ? `Version ${updateInfo.version} available`
     : 'Robot is up to date'
 
+  let buttonAction
+  let buttonText
   if (!updateRequest.response) {
-    message = availableUpdate
-      ? UPDATE_MSG
-      : ALREADY_UPDATED_MSG
-    button = inProgress
-      ? {disabled: true, children: (<Spinner />)}
-      : {onClick: update, children: 'update'}
-  } else if (!restartRequest.response) {
-    message = RESTART_MSG
-    button = inProgress
-      ? {disabled: true, children: (<Spinner />)}
-      : {onClick: restart, children: 'restart'}
+    buttonAction = update
+    if (updateInfo.type) {
+      message = updateInfo.type === 'upgrade'
+        ? UPGRADE_MSG
+        : DOWNGRADE_MSG
+      buttonText = updateInfo.type
+    } else {
+      message = ALREADY_UPDATED_MSG
+      buttonText = 'reinstall'
+    }
   } else {
-    message = DONE_MSG
-    button = null
-    closeButtonText = 'close'
+    message = RESTART_MSG
+    buttonText = 'restart'
+    buttonAction = restart
   }
+
+  button = inProgress
+    ? {disabled: true, children: (<Spinner />)}
+    : {onClick: buttonAction, children: buttonText}
 
   return (
     <AlertModal
@@ -88,24 +93,24 @@ function UpdateModal (props: Props) {
 }
 
 function makeMapStateToProps (): (State, OP) => SP {
-  const getAvailableRobotUpdate = makeGetAvailableRobotUpdate()
+  const getRobotUpdateInfo = makeGetRobotUpdateInfo()
   const getRobotUpdateRequest = makeGetRobotUpdateRequest()
   const getRobotRestartRequest = makeGetRobotRestartRequest()
 
   return (state, ownProps) => ({
-    availableUpdate: getAvailableRobotUpdate(state, ownProps),
+    updateInfo: getRobotUpdateInfo(state, ownProps),
     updateRequest: getRobotUpdateRequest(state, ownProps),
     restartRequest: getRobotRestartRequest(state, ownProps),
   })
 }
 
 function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
-  const {availableUpdate} = stateProps
+  const {updateInfo} = stateProps
   const {dispatch} = dispatchProps
 
   const close = () => dispatch(push(`/robots/${ownProps.name}`))
-  let ignoreUpdate = availableUpdate
-    ? () => dispatch(setIgnoredUpdate(ownProps, availableUpdate)).then(close)
+  let ignoreUpdate = updateInfo
+    ? () => dispatch(setIgnoredUpdate(ownProps, updateInfo.version)).then(close)
     : close
 
   return {
@@ -113,6 +118,10 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
     ...ownProps,
     ignoreUpdate,
     update: () => dispatch(updateRobotServer(ownProps)),
-    restart: () => dispatch(restartRobotServer(ownProps)).then(close),
+    restart: () => {
+      dispatch(restartRobotServer(ownProps))
+        .then(() => dispatch(clearUpdateResponse(ownProps)))
+        .then(close)
+    },
   }
 }
