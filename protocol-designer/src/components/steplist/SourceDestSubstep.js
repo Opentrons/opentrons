@@ -34,6 +34,7 @@ export default function SourceDestSubstep (props: SourceDestSubstepProps) {
             stepId: substeps.parentStepId,
             substepIndex: groupKey,
           })}
+          ingredNames={props.ingredNames}
           onMouseLeave={() => onSelectSubstep(null)}
           highlighted={!!hoveredSubstep &&
             hoveredSubstep.stepId === substeps.parentStepId &&

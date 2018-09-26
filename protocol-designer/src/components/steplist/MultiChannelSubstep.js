@@ -51,7 +51,7 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
         className={cx({[styles.highlighted]: highlighted})}
       >
         {/* Header row */}
-        <SubstepRow
+        {/* <SubstepRow
           className={cx(styles.step_subitem, {[styles.clear_border]: highlighted})}
           sourceIngredients={uniqBy(
             rowGroup.reduce((acc, row) => (row.sourceIngredients)
@@ -66,19 +66,18 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
           collapsible
           collapsed={collapsed}
           toggleCollapsed={this.handleToggleCollapsed}
-        />
+        /> */}
 
-        {!collapsed && rowGroup.map((row, rowKey) =>
+        {collapsed && rowGroup.map((row, rowKey) =>
           // Channel rows (1 for each channel in multi-channel pipette
           <SubstepRow
             key={rowKey}
             className={styles.step_subitem_channel_row}
             volume={row.volume}
             hideVolumeUnits
-            sourceIngredients={row.sourceIngredients}
-            sourceWells={row.sourceWell}
-            destWells={row.destWell}
-            destIngredients={row.destIngredients}
+            ingredNames={this.props.ingredNames}
+            source={row.source}
+            dest={row.dest}
           />
       )}
       </ol>
