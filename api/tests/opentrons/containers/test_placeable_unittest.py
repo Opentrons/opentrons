@@ -25,7 +25,7 @@ class PlaceableTestCase(unittest.TestCase):
                     print(w2)
                     assert False
         else:
-            self.assertEquals(w1, w2)
+            self.assertEqual(w1, w2)
 
     def test_get_name(self):
         c = generate_plate(4, 2, (5, 5), (0, 0), 5)

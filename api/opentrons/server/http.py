@@ -41,9 +41,9 @@ class HTTPServer(object):
         self.app.router.add_post(
             '/modules/{serial}/update', update.update_module_firmware)
         self.app.router.add_get(
-            '/server/update/ignore', endpoints.get_ignore_version)
+            '/update/ignore', endpoints.get_ignore_version)
         self.app.router.add_post(
-            '/server/update/ignore', endpoints.set_ignore_version)
+            '/update/ignore', endpoints.set_ignore_version)
         self.app.router.add_static(
             '/logs', self.log_file_path, show_index=True)
         self.app.router.add_post(

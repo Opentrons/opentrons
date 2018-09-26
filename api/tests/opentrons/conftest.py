@@ -212,7 +212,7 @@ def robot(dummy_db):
 @pytest.fixture(params=["dinosaur.py"])
 def protocol(request):
     try:
-        root = request.getfuncargvalue('protocol_file')
+        root = request.getfixturevalue('protocol_file')
     except Exception:
         root = request.param
 
@@ -226,7 +226,7 @@ def protocol(request):
 @pytest.fixture(params=["no_clear_tips.py"])
 def tip_clear_protocol(request):
     try:
-        root = request.getfuncargvalue('protocol_file')
+        root = request.getfixturevalue('protocol_file')
     except Exception:
         root = request.param
 
@@ -253,7 +253,7 @@ def session(loop, test_client, request, main_router):
     from opentrons.server import error_middleware
     root = None
     try:
-        root = request.getfuncargvalue('root')
+        root = request.getfixturevalue('root')
         if not root:
             root = main_router
         # Assume test fixture has init to attach test loop

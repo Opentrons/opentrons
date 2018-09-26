@@ -74,23 +74,23 @@ async def test_ignore_updates(
     app = init(loop)
     cli = await loop.create_task(test_client(app))
     # Test no ignore file found
-    r0 = await cli.get('/server/update/ignore')
+    r0 = await cli.get('/update/ignore')
     r0body = await r0.text()
     assert json.loads(r0body) == {'version': None}
 
     # Test that values are set correctly
 
     ignore = {'version': '3.1.3'}
-    r1 = await cli.post('server/update/ignore', json=ignore)
+    r1 = await cli.post('/update/ignore', json=ignore)
     assert r1.status == 200
 
     # Test that you cannot pass an empty version
     ignore2 = {'version': ''}
-    r2 = await cli.post('server/update/ignore', json=ignore2)
+    r2 = await cli.post('/update/ignore', json=ignore2)
     assert r2.status == 400
 
     # Test that version in the temporary directory is still '3.1.3'
-    r3 = await cli.get('/server/update/ignore')
+    r3 = await cli.get('/update/ignore')
     r3body = await r3.text()
     assert json.loads(r3body) == {'version': '3.1.3'}
 

@@ -48,14 +48,14 @@ if not ff.split_labware_definitions():
             old_container_loading.get_persisted_container("container-2")
 
             # Skip container-3 is defined in .secret/containers-3.json.
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 ValueError,
                 'Container type "container-3" not found in files: .*'
             ):
                 old_container_loading.get_persisted_container("container-3")
 
             # Skip container-4 is defined in .containers-4.json.
-            with self.assertRaisesRegexp(
+            with self.assertRaisesRegex(
                 ValueError,
                 'Container type "container-4" not found in files: .*'
             ):
