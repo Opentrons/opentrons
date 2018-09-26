@@ -68,17 +68,26 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
           toggleCollapsed={this.handleToggleCollapsed}
         /> */}
 
-        {collapsed && rowGroup.map((row, rowKey) =>
+        {collapsed && rowGroup.map((row, rowKey) => {
           // Channel rows (1 for each channel in multi-channel pipette
-          <SubstepRow
-            key={rowKey}
-            className={styles.step_subitem_channel_row}
-            volume={row.volume}
-            hideVolumeUnits
-            ingredNames={this.props.ingredNames}
-            source={row.source}
-            dest={row.dest}
-          />
+          const singleSource = {
+            labware: row.source,
+            postIngreds: row.source.postIngreds[row.source.wells[rowKey]],
+            preIngreds: row.source.preIngreds[row.source.wells[rowKey]],
+          }
+          console.log(row)
+          return (
+            <SubstepRow
+              key={rowKey}
+              className={styles.step_subitem_channel_row}
+              volume={row.volume}
+              hideVolumeUnits
+              ingredNames={this.props.ingredNames}
+              source={singleSource}
+              dest={row.dest}
+            />
+          )
+        }
       )}
       </ol>
     )
