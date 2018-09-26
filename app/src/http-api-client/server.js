@@ -1,6 +1,5 @@
 // @flow
 // server endpoints http api module
-import {remote} from 'electron'
 import {createSelector, type Selector} from 'reselect'
 import {chainActions} from '../util'
 import type {State, ThunkPromiseAction, Action} from '../types'
@@ -8,10 +7,12 @@ import type {RobotService} from '../robot'
 
 import type {ApiCall} from './types'
 import client, {FetchError, type ApiRequestError} from './client'
-import {fetchHealth} from './health'
-
-// remote module paths relative to app-shell/lib/main.js
-const {AVAILABLE_UPDATE, getUpdateFiles} = remote.require('./api-update')
+import {fetchHealth, makeGetRobotHealth} from './health'
+import {
+  getApiUpdateVersion,
+  getApiUpdateFilename,
+  getApiUpdateContents,
+} from '../shell'
 
 type RequestPath = 'update' | 'restart' | 'update/ignore'
 
@@ -92,14 +93,12 @@ const UPDATE: RequestPath = 'update'
 const RESTART: RequestPath = 'restart'
 const IGNORE: RequestPath = 'update/ignore'
 
-export function updateRobotServer (
-  robot: RobotService
-): ThunkPromiseAction {
-  return (dispatch) => {
+export function updateRobotServer (robot: RobotService): ThunkPromiseAction {
+  return (dispatch, getState) => {
     dispatch(serverRequest(robot, UPDATE))
 
-    return getUpdateRequestBody()
-      .then((body) => client(robot, 'POST', 'server/update', body))
+    return getUpdateRequestBody(getState())
+      .then(body => client(robot, 'POST', 'server/update', body))
       .then(
         (response: ServerUpdateResponse) =>
           dispatch(serverSuccess(robot, UPDATE, response)),
@@ -109,19 +108,15 @@ export function updateRobotServer (
   }
 }
 
-export function restartRobotServer (
-  robot: RobotService
-): ThunkPromiseAction {
-  return (dispatch) => {
+export function restartRobotServer (robot: RobotService): ThunkPromiseAction {
+  return dispatch => {
     dispatch(serverRequest(robot, RESTART))
 
-    return client(robot, 'POST', 'server/restart')
-      .then(
-        (response: ServerRestartResponse) =>
-          dispatch(serverSuccess(robot, RESTART, response)),
-        (error: ApiRequestError) =>
-          dispatch(serverFailure(robot, RESTART, error))
-      )
+    return client(robot, 'POST', 'server/restart').then(
+      (response: ServerRestartResponse) =>
+        dispatch(serverSuccess(robot, RESTART, response)),
+      (error: ApiRequestError) => dispatch(serverFailure(robot, RESTART, error))
+    )
   }
 }
 
@@ -130,37 +125,33 @@ export function clearRestartResponse (robot: RobotService): * {
 }
 
 export function fetchHealthAndIgnored (robot: RobotService): * {
-  return chainActions(
-    fetchHealth(robot),
-    fetchIgnoredUpdate(robot)
-  )
+  return chainActions(fetchHealth(robot), fetchIgnoredUpdate(robot))
 }
 
 export function fetchIgnoredUpdate (robot: RobotService): ThunkPromiseAction {
-  return (dispatch) => {
+  return dispatch => {
     dispatch(serverRequest(robot, IGNORE))
 
-    return client(robot, 'GET', 'server/update/ignore')
-    .then(
+    return client(robot, 'GET', 'server/update/ignore').then(
       (response: ServerRestartResponse) =>
         dispatch(serverSuccess(robot, IGNORE, response)),
-      (error: ApiRequestError) =>
-        dispatch(serverFailure(robot, IGNORE, error))
+      (error: ApiRequestError) => dispatch(serverFailure(robot, IGNORE, error))
     )
   }
 }
 
-export function setIgnoredUpdate (robot: RobotService, version: ?string): ThunkPromiseAction {
-  return (dispatch) => {
+export function setIgnoredUpdate (
+  robot: RobotService,
+  version: ?string
+): ThunkPromiseAction {
+  return dispatch => {
     const body = {version}
     dispatch(serverRequest(robot, IGNORE))
 
-    return client(robot, 'POST', 'server/update/ignore', body)
-    .then(
+    return client(robot, 'POST', 'server/update/ignore', body).then(
       (response: ServerRestartResponse) =>
         dispatch(serverSuccess(robot, IGNORE, response)),
-      (error: ApiRequestError) =>
-        dispatch(serverFailure(robot, IGNORE, error))
+      (error: ApiRequestError) => dispatch(serverFailure(robot, IGNORE, error))
     )
   }
 }
@@ -175,7 +166,10 @@ export function serverReducer (
   let path
   switch (action.type) {
     case 'api:SERVER_REQUEST':
-      ({path, robot: {name}} = action.payload)
+      ;({
+        path,
+        robot: {name},
+      } = action.payload)
 
       return {
         ...state,
@@ -186,7 +180,10 @@ export function serverReducer (
       }
 
     case 'api:SERVER_SUCCESS':
-      ({path, robot: {name}} = action.payload)
+      ;({
+        path,
+        robot: {name},
+      } = action.payload)
 
       return {
         ...state,
@@ -201,7 +198,10 @@ export function serverReducer (
       }
 
     case 'api:SERVER_FAILURE':
-      ({path, robot: {name}} = action.payload)
+      ;({
+        path,
+        robot: {name},
+      } = action.payload)
 
       return {
         ...state,
@@ -216,7 +216,10 @@ export function serverReducer (
       }
 
     case 'api:CLEAR_SERVER_RESPONSE':
-      ({path, robot: {name}} = action.payload)
+      ;({
+        path,
+        robot: {name},
+      } = action.payload)
       return {
         ...state,
         [name]: {
@@ -228,24 +231,6 @@ export function serverReducer (
           },
         },
       }
-
-    // TODO(mc, 2018-07-05): this logic should live in a selector
-    case 'api:SUCCESS': {
-      if (action.payload.path !== 'health') return state
-      const name = action.payload.robot.name
-      let stateByName = state[name]
-      const previousUpdate = stateByName && stateByName.availableUpdate
-      const currentVersion = action.payload.response.api_version
-      const availableUpdate = currentVersion !== AVAILABLE_UPDATE
-        ? AVAILABLE_UPDATE
-        : null
-
-      if (availableUpdate !== previousUpdate) {
-        stateByName = {...stateByName, update: null, restart: null}
-      }
-
-      return {...state, [name]: {...stateByName, availableUpdate}}
-    }
   }
 
   return state
@@ -253,48 +238,59 @@ export function serverReducer (
 
 export const makeGetAvailableRobotUpdate = () => {
   const selector: Selector<State, RobotService, ?string> = createSelector(
-    selectRobotServerState,
-    (state) => (state && state.availableUpdate) || null
+    makeGetRobotHealth(),
+    getApiUpdateVersion,
+    (health, updateVersion) => {
+      const currentVersion = health.response && health.response.api_version
+      return currentVersion && currentVersion !== updateVersion
+        ? updateVersion
+        : null
+    }
   )
 
   return selector
 }
 
+// TODO(mc, 2018-09-25): this is broken until some planned discovery work is
+// done for https://github.com/Opentrons/opentrons/milestone/68
 export const makeGetRobotUpdateRequest = () => {
-  const selector: Selector<State, RobotService, RobotServerUpdate> =
-    createSelector(
-      selectRobotServerState,
-      (state) => (state && state.update) || {inProgress: false}
-    )
+  const selector: Selector<State,
+    RobotService,
+    RobotServerUpdate> = createSelector(
+    selectRobotServerState,
+    state => (state && state.update) || {inProgress: false}
+  )
 
   return selector
 }
 
 export const makeGetRobotRestartRequest = () => {
-  const selector: Selector<State, RobotService, RobotServerRestart> =
-    createSelector(
-      selectRobotServerState,
-      (state) => (state && state.restart) || {inProgress: false}
-    )
+  const selector: Selector<State,
+    RobotService,
+    RobotServerRestart> = createSelector(
+    selectRobotServerState,
+    state => (state && state.restart) || {inProgress: false}
+  )
 
   return selector
 }
 
 export const makeGetRobotIgnoredUpdateRequest = () => {
-  const selector: Selector<State, RobotService, RobotServerUpdateIgnore> =
-    createSelector(
-      selectRobotServerState,
-      (state) => (state && state['update/ignore']) || {inProgress: false}
-    )
+  const selector: Selector<State,
+    RobotService,
+    RobotServerUpdateIgnore> = createSelector(
+    selectRobotServerState,
+    state => (state && state['update/ignore']) || {inProgress: false}
+  )
 
   return selector
 }
 
-export const getAnyRobotUpdateAvailable: Selector<State, void, boolean> =
-  createSelector(
-    selectServerState,
-    (state) => Object.keys(state).some((name) => state[name].availableUpdate)
-  )
+export const getAnyRobotUpdateAvailable: Selector<State,
+  void,
+  boolean> = createSelector(selectServerState, state =>
+  Object.keys(state).some(name => state[name].availableUpdate)
+)
 
 function selectServerState (state: State) {
   return state.api.server
@@ -304,14 +300,16 @@ function selectRobotServerState (state: State, props: RobotService) {
   return selectServerState(state)[props.name]
 }
 
-function getUpdateRequestBody () {
-  return getUpdateFiles()
-    .then(files => {
+function getUpdateRequestBody (state: State) {
+  const filename = getApiUpdateFilename(state)
+
+  return getApiUpdateContents()
+    .then(contents => {
       const formData = new FormData()
-      files.forEach(f => formData.append(f.id, new Blob([f.contents]), f.name))
+      formData.append('whl', contents, filename)
       return formData
     })
-    .catch((error) => Promise.reject(FetchError(error)))
+    .catch(error => Promise.reject(FetchError(error)))
 }
 
 function serverRequest (
