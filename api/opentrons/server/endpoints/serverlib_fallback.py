@@ -9,8 +9,12 @@ from aiohttp import web
 from threading import Thread
 
 log = logging.getLogger(__name__)
-PATH = os.path.abspath(os.path.dirname(__file__))
-filepath = os.path.join(PATH, 'ignore.json')
+ignore_file = 'ignore.json'
+if os.environ.get('RUNNING_ON_PI'):
+    filedir = '/data/user_storage/opentrons_data'
+else:
+    filedir = os.path.abspath(os.path.dirname(__file__))
+filepath = os.path.join(filedir, ignore_file)
 
 
 async def _install(filename, loop):

@@ -21,8 +21,8 @@ class HelpersTest(unittest.TestCase):
         p2 = Vector(10, -12, 14)
         res = helpers.break_down_travel(
             p1, p2, increment=5, mode='absolute')
-        self.assertEquals(res[-1], p2)
-        self.assertEquals(len(res), 5)
+        self.assertEqual(res[-1], p2)
+        self.assertEqual(len(res), 5)
 
         p1 = Vector(10, -12, 14)
         res = helpers.break_down_travel(Vector(0, 0, 0), p1, mode='relative')
@@ -30,5 +30,5 @@ class HelpersTest(unittest.TestCase):
             0.46537410754407676,
             -0.5584489290528921,
             0.6515237505617075)
-        self.assertEquals(res[-1], expected)
-        self.assertEquals(len(res), 5)
+        self.assertEqual(res[-1], expected)
+        self.assertEqual(len(res), 5)

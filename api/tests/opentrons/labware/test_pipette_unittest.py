@@ -57,10 +57,10 @@ class PipetteTest(unittest.TestCase):
 
     def test_get_plunger_position(self):
 
-        self.assertEquals(self.p200._get_plunger_position('top'), 0)
-        self.assertEquals(self.p200._get_plunger_position('bottom'), 10)
-        self.assertEquals(self.p200._get_plunger_position('blow_out'), 12)
-        self.assertEquals(self.p200._get_plunger_position('drop_tip'), 13)
+        self.assertEqual(self.p200._get_plunger_position('top'), 0)
+        self.assertEqual(self.p200._get_plunger_position('bottom'), 10)
+        self.assertEqual(self.p200._get_plunger_position('blow_out'), 12)
+        self.assertEqual(self.p200._get_plunger_position('drop_tip'), 13)
 
         self.p200.plunger_positions['drop_tip'] = None
         self.assertRaises(
@@ -112,7 +112,7 @@ class PipetteTest(unittest.TestCase):
             self.plate[1]
         ]
 
-        self.assertEquals(self.p200.placeables, expected)
+        self.assertEqual(self.p200.placeables, expected)
 
     def test_unpack_location(self):
 
@@ -133,10 +133,10 @@ class PipetteTest(unittest.TestCase):
     def test_volume_percentage(self):
         self.assertRaises(RuntimeError, self.p200._volume_percentage, -1)
         self.assertRaises(RuntimeError, self.p200._volume_percentage, 300)
-        self.assertEquals(self.p200._volume_percentage(100), 0.5)
-        self.assertEquals(len(self.robot.get_warnings()), 0)
+        self.assertEqual(self.p200._volume_percentage(100), 0.5)
+        self.assertEqual(len(self.robot.get_warnings()), 0)
         self.p200._volume_percentage(self.p200.min_volume / 2)
-        self.assertEquals(len(self.robot.get_warnings()), 1)
+        self.assertEqual(len(self.robot.get_warnings()), 1)
 
     def test_add_tip(self):
         """
@@ -922,7 +922,7 @@ class PipetteTest(unittest.TestCase):
                 strategy='direct')
         ]
 
-        self.assertEquals(expected, self.p200.robot.move_to.mock_calls)
+        self.assertEqual(expected, self.p200.robot.move_to.mock_calls)
 
     def test_mix(self):
         # It is necessary to aspirate before it is mocked out
@@ -950,26 +950,26 @@ class PipetteTest(unittest.TestCase):
         self.p200.pick_up_tip()
         self.p200.aspirate(50, self.plate[0])
         self.p200.air_gap()
-        self.assertEquals(self.p200.current_volume, 200)
+        self.assertEqual(self.p200.current_volume, 200)
 
         self.p200.dispense()
         self.p200.aspirate(50, self.plate[1])
         self.p200.air_gap(10)
-        self.assertEquals(self.p200.current_volume, 60)
+        self.assertEqual(self.p200.current_volume, 60)
 
         self.p200.dispense()
         self.p200.aspirate(50, self.plate[2])
         self.p200.air_gap(10, 10)
-        self.assertEquals(self.p200.current_volume, 60)
+        self.assertEqual(self.p200.current_volume, 60)
 
         self.p200.dispense()
         self.p200.aspirate(50, self.plate[2])
         self.p200.air_gap(0)
-        self.assertEquals(self.p200.current_volume, 50)
+        self.assertEqual(self.p200.current_volume, 50)
 
     def test_pipette_home(self):
         self.p200.home()
-        self.assertEquals(len(self.robot.commands()), 1)
+        self.assertEqual(len(self.robot.commands()), 1)
 
     def test_mix_with_named_args(self):
         self.p200.current_volume = 100
@@ -1008,22 +1008,22 @@ class PipetteTest(unittest.TestCase):
     def test_simulate_plunger_while_enqueing(self):
 
         self.p200.pick_up_tip()
-        self.assertEquals(self.p200.current_volume, 0)
+        self.assertEqual(self.p200.current_volume, 0)
 
         self.p200.aspirate(200)
-        self.assertEquals(self.p200.current_volume, 200)
+        self.assertEqual(self.p200.current_volume, 200)
 
         self.p200.dispense(20)
-        self.assertEquals(self.p200.current_volume, 180)
+        self.assertEqual(self.p200.current_volume, 180)
 
         self.p200.dispense(20)
-        self.assertEquals(self.p200.current_volume, 160)
+        self.assertEqual(self.p200.current_volume, 160)
 
         self.p200.dispense(60)
-        self.assertEquals(self.p200.current_volume, 100)
+        self.assertEqual(self.p200.current_volume, 100)
 
         self.p200.dispense(100)
-        self.assertEquals(self.p200.current_volume, 0)
+        self.assertEqual(self.p200.current_volume, 0)
 
         self.p200.drop_tip()
 
@@ -1113,7 +1113,7 @@ class PipetteTest(unittest.TestCase):
     def test_tip_tracking_start_at_tip(self):
         self.p200.start_at_tip(self.tiprack1['B2'])
         self.p200.pick_up_tip()
-        self.assertEquals(self.tiprack1['B2'], self.p200.current_tip())
+        self.assertEqual(self.tiprack1['B2'], self.p200.current_tip())
 
     def test_tip_tracking_return(self):
         # Note: because this test mocks out `drop_tip`, as a side-effect

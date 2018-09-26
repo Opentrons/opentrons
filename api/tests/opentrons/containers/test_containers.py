@@ -27,7 +27,7 @@ class ContainerTestCase(unittest.TestCase):
         slot = '1'
         containers_load(self.robot, container_name, slot)
         # 2018-1-30 Incremented number of containers based on fixed trash
-        self.assertEquals(len(self.robot.get_containers()), 2)
+        self.assertEqual(len(self.robot.get_containers()), 2)
 
         self.assertRaises(
             RuntimeWarning, containers_load,
@@ -47,11 +47,11 @@ class ContainerTestCase(unittest.TestCase):
 
         containers_load(
             self.robot, container_name, slot, 'custom-name', share=True)
-        self.assertEquals(len(self.robot.get_containers()), 3)
+        self.assertEqual(len(self.robot.get_containers()), 3)
 
         containers_load(
             self.robot, 'trough-12row', slot, share=True)
-        self.assertEquals(len(self.robot.get_containers()), 4)
+        self.assertEqual(len(self.robot.get_containers()), 4)
 
     def test_load_legacy_slot_names(self):
         slots_old = [
