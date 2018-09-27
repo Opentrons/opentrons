@@ -4,6 +4,8 @@ from opentrons.robot.mover import Mover
 from opentrons.trackers.pose_tracker import (
     change_base, init, ROOT
 )
+# TODO: revamp test for readability and general test criteria when refactoring
+# TODO: the pose_tracker
 
 
 def test_functional(smoothie):

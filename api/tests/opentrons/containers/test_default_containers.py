@@ -3,6 +3,7 @@ from opentrons import instruments, robot
 from opentrons.trackers import pose_tracker
 from numpy import isclose
 import pytest
+# TODO: Remove in favor of a minimum membership test on `labware.list`
 
 
 def test_new_containers():

@@ -6,6 +6,8 @@ from opentrons.data_storage import database
 from opentrons.util.vector import Vector
 from opentrons import robot
 from opentrons.config import feature_flags as ff
+# TODO: Modify all calls to get a Well to use the `wells` method
+# TODO: Revise for new data (top-center) and add json-schema check
 
 
 @pytest.mark.xfail

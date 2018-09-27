@@ -1,4 +1,5 @@
 from opentrons import labware
+# TODO: Revise to match new schemas and use json-schema validation in test
 
 
 def test_labware_create(dummy_db):

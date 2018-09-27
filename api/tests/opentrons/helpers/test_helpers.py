@@ -4,6 +4,7 @@ from opentrons.helpers import helpers
 from opentrons.instruments import pipette
 from opentrons.util.vector import Vector
 from opentrons.containers import load as containers_load
+# TODO: Move `helpers` methods into either pipette or other non-generic place
 
 
 class HelpersTest(unittest.TestCase):

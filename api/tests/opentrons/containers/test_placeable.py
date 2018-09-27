@@ -3,6 +3,8 @@ from opentrons.containers.placeable import Deck, Slot
 from opentrons.config import feature_flags as ff
 
 from tests.opentrons import generate_plate
+# TODO: Revise to use new Labware and Well classes
+# TODO: Add tests on well accessor methods in Labware
 
 
 def test_well_from_center_new(split_labware_def):

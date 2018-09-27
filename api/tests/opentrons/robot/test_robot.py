@@ -5,6 +5,10 @@ from opentrons.util import vector
 from numpy import isclose
 from unittest import mock
 import pytest
+# TODO: Modify all calls to get a Well to use the `wells` method
+# TODO: Modify calls as needed to check absolute position with refactor of
+# TODO: pose_tracker
+# TODO: Get rid of Vector
 
 
 def test_reset(virtual_smoothie_env):

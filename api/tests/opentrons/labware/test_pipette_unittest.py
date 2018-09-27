@@ -1,4 +1,5 @@
 # pylama:ignore=E501
+# TODO: Modify all calls to get a Well to use the `wells` method
 
 import unittest
 from unittest import mock
@@ -115,7 +116,8 @@ class PipetteTest(unittest.TestCase):
         self.assertEqual(self.p200.placeables, expected)
 
     def test_unpack_location(self):
-
+        # TODO: remove when new labware system is promoted to production (it
+        # TODO: should not include the `unpack_location` magic
         location = (self.plate[0], (1, 0, -1))
         res = unpack_location(location)
         self.assertEqual(res, (self.plate[0], (1, 0, -1)))

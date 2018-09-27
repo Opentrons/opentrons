@@ -8,6 +8,9 @@ from opentrons.containers.placeable import (
     Slot)
 from opentrons.util.vector import Vector
 from tests.opentrons import generate_plate
+# TODO: Remove `generate_plate` and use JS generated data or redesign as
+# TODO: property tests
+# TODO: Modify all calls to get a Well to use the `wells`/`rows` methods
 
 
 class PlaceableTestCase(unittest.TestCase):

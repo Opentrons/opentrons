@@ -3,6 +3,7 @@ import unittest
 from opentrons.containers import load
 from opentrons.instruments import pipette
 from opentrons import Robot
+# TODO: Remove (ordering tested by new labware def test suite)
 
 
 class GridTestCase(unittest.TestCase):
