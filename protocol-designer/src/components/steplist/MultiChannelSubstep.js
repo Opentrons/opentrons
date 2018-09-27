@@ -51,29 +51,35 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
         className={cx({[styles.highlighted]: highlighted})}
       >
         {/* Header row */}
-        {/* <SubstepRow
+        <SubstepRow
           className={cx(styles.step_subitem, {[styles.clear_border]: highlighted})}
-          sourceIngredients={uniqBy(
-            rowGroup.reduce((acc, row) => (row.sourceIngredients)
-              ? [...acc, ...row.sourceIngredients]
-              : acc,
-            []),
-            ingred => ingred.id
-          )}
-          sourceWells={rowGroup.map(row => row.sourceWell)}
-          destWells={rowGroup.map(row => row.destWell)}
+          source={{
+            preIngreds: rowGroup[0].source.preIngreds[rowGroup[0].source.wells[0]],
+            well: rowGroup[0].source.wells,
+          }}
+          dest={{
+            preIngreds: rowGroup[0].dest.preIngreds[rowGroup[0].dest.wells[0]],
+            well: rowGroup[0].dest.wells,
+          }}
           volume={rowGroup[0] && rowGroup[0].volume}
+          ingredNames={this.props.ingredNames}
           collapsible
           collapsed={collapsed}
-          toggleCollapsed={this.handleToggleCollapsed}
-        /> */}
+          toggleCollapsed={this.handleToggleCollapsed} />
 
         {collapsed && rowGroup.map((row, rowKey) => {
           // Channel rows (1 for each channel in multi-channel pipette
-          const singleSource = {
+          const channelSource = {
             labware: row.source,
+            well: row.source.wells[rowKey],
             postIngreds: row.source.postIngreds[row.source.wells[rowKey]],
             preIngreds: row.source.preIngreds[row.source.wells[rowKey]],
+          }
+          const channelDest = {
+            labware: row.dest,
+            well: row.dest.wells[rowKey],
+            postIngreds: row.dest.postIngreds[row.dest.wells[rowKey]],
+            preIngreds: row.dest.preIngreds[row.dest.wells[rowKey]],
           }
           console.log(row)
           return (
@@ -81,10 +87,9 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
               key={rowKey}
               className={styles.step_subitem_channel_row}
               volume={row.volume}
-              hideVolumeUnits
               ingredNames={this.props.ingredNames}
-              source={singleSource}
-              dest={row.dest}
+              source={channelSource}
+              dest={channelDest}
             />
           )
         }

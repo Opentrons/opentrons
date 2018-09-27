@@ -109,12 +109,7 @@ export default function SubstepRow (props: SubstepRowProps) {
         )}
       </HoverTooltip>
       <span className={styles.emphasized_cell}>{sourceWellRange}</span>
-      <span className={styles.volume_cell}>{
-        formattedVolume && (props.hideVolumeUnits
-          ? formattedVolume
-          : `${formattedVolume} μL`
-        )
-      }</span>
+      <span className={styles.volume_cell}>{`${formattedVolume} μL`}</span>
       <span className={styles.emphasized_cell}>{destWellRange}</span>
       {props.collapsible
         ? <span className={styles.inner_carat} onClick={props.toggleCollapsed}>

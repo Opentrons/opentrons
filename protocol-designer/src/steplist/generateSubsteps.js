@@ -126,11 +126,6 @@ function transferLikeSubsteps (args: {
     return null
   }
 
-  // if (result.errors) {
-  //   console.warn('Could not get substep, had errors:', result)
-  //   return null
-  // }
-
   // Multichannel substeps
   if (pipette.channels > 1) {
     const substepRows = substepTimelineMulti(
@@ -154,7 +149,6 @@ function transferLikeSubsteps (args: {
         }))
       }
     )
-    console.log(mergedMultiRows)
     return {
       multichannel: true,
       stepType: validatedForm.stepType,
@@ -185,48 +179,6 @@ function transferLikeSubsteps (args: {
       rows: mergedRows,
     }
   }
-}
-
-function commandToMultiRows (
-  command: AspDispCommandType,
-  getIngreds: GetIngreds,
-  getLabwareType: GetLabwareType,
-  channels: Channels
-): ?Array<StepItemSourceDestRowMulti> {
-  const labwareId = command.params.labware
-  const labwareType = getLabwareType(labwareId)
-
-  if (!labwareType) {
-    console.warn(`No labwareType for labwareId ${labwareId}`)
-    return null
-  }
-  const wellsForTips = getWellsForTips(channels, labwareType, command.params.well).wellsForTips
-
-  return range(channels).map(channel => {
-    const well = wellsForTips[channel]
-    const ingreds = getIngreds(labwareId, well)
-    const volume = command.params.volume
-
-    if (command.command === 'aspirate') {
-      return {
-        channelId: channel,
-        sourceIngredients: ingreds,
-        sourceWell: well,
-        volume,
-      }
-    }
-    if (command.command !== 'dispense') {
-      // TODO Ian 2018-05-17 use assert
-      console.warn(`expected aspirate or dispense in commandToMultiRows, got ${command.command}`)
-    }
-    // dispense
-    return {
-      channelId: channel,
-      destIngredients: ingreds,
-      destWell: well,
-      volume,
-    }
-  })
 }
 
 // NOTE: This is the fn used by the `allSubsteps` selector

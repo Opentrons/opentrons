@@ -158,7 +158,7 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
     }
   )
 
-  return reduceCommandCreators(commandCreators)(prevRobotState)
+  return commandCreators
 }
 
 export default distribute
