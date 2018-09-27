@@ -10,7 +10,6 @@ from opentrons.config import feature_flags as ff
 # TODO: Revise for new data (top-center) and add json-schema check
 
 
-
 @pytest.mark.xfail
 def test_container_from_container_load():
     robot.reset()
