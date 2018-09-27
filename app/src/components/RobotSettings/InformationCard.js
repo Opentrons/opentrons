@@ -6,12 +6,12 @@ import {Link} from 'react-router-dom'
 
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
-import type {FetchHealthCall} from '../../http-api-client'
+import type {FetchHealthCall, RobotUpdateInfo} from '../../http-api-client'
 
 import {
   fetchHealthAndIgnored,
   makeGetRobotHealth,
-  makeGetAvailableRobotUpdate,
+  makeGetRobotUpdateInfo,
 } from '../../http-api-client'
 
 import {RefreshCard, LabeledValue, OutlineButton} from '@opentrons/components'
@@ -23,7 +23,7 @@ type OwnProps = Robot & {
 
 type StateProps = {
   healthRequest: FetchHealthCall,
-  availableUpdate: ?string,
+  updateInfo: RobotUpdateInfo,
 }
 
 type DispatchProps = {
@@ -42,7 +42,7 @@ export default connect(makeMapStateToProps, mapDispatchToProps)(InformationCard)
 function InformationCard (props: Props) {
   const {
     name,
-    availableUpdate,
+    updateInfo,
     fetchHealth,
     updateUrl,
     healthRequest: {inProgress, response: health},
@@ -51,9 +51,8 @@ function InformationCard (props: Props) {
   const realName = (health && health.name) || name
   const version = (health && health.api_version) || 'Unknown'
   const firmwareVersion = (health && health.fw_version) || 'Unknown'
-  const updateText = availableUpdate
-    ? 'Update'
-    : 'Updated'
+  const updateText = updateInfo.type || 'Reinstall'
+
   return (
     <RefreshCard
       watch={name}
@@ -93,11 +92,11 @@ function InformationCard (props: Props) {
 
 function makeMapStateToProps () {
   const getRobotHealth = makeGetRobotHealth()
-  const getAvailableRobotUpdate = makeGetAvailableRobotUpdate()
+  const getUpdateInfo = makeGetRobotUpdateInfo()
 
   return (state: State, ownProps: OwnProps): StateProps => ({
     healthRequest: getRobotHealth(state, ownProps),
-    availableUpdate: getAvailableRobotUpdate(state, ownProps),
+    updateInfo: getUpdateInfo(state, ownProps),
   })
 }
 

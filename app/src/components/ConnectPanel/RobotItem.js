@@ -6,14 +6,14 @@ import {withRouter} from 'react-router'
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
 import {actions as robotActions} from '../../robot'
-import {makeGetAvailableRobotUpdate} from '../../http-api-client'
+import {makeGetRobotUpdateInfo} from '../../http-api-client'
 
 import {RobotListItem} from './RobotList.js'
 
 type OP = Robot
 
 type SP = {
-  availableUpdate: ?string,
+  upgradable: boolean,
 }
 
 type DP = {
@@ -26,10 +26,10 @@ export default withRouter(
 )
 
 function makeMapStateToProps () {
-  const getAvailableRobotUpdate = makeGetAvailableRobotUpdate()
+  const getUpdateInfo = makeGetRobotUpdateInfo()
 
   return (state: State, ownProps: OP): SP => ({
-    availableUpdate: getAvailableRobotUpdate(state, ownProps),
+    upgradable: getUpdateInfo(state, ownProps).type === 'upgrade',
   })
 }
 

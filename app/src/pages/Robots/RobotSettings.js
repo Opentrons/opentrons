@@ -11,7 +11,8 @@ import {
   makeGetRobotHome,
   clearHomeResponse,
   makeGetRobotIgnoredUpdateRequest,
-  makeGetAvailableRobotUpdate,
+  makeGetRobotRestartRequest,
+  makeGetRobotUpdateInfo,
 } from '../../http-api-client'
 
 import {SpinnerModalPage} from '@opentrons/components'
@@ -121,19 +122,28 @@ function RobotSettingsPage (props: Props) {
 function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   const getHomeRequest = makeGetRobotHome()
   const getUpdateIgnoredRequest = makeGetRobotIgnoredUpdateRequest()
-  const getAvailableRobotUpdate = makeGetAvailableRobotUpdate()
+  const getRestartRequest = makeGetRobotRestartRequest()
+  const getRobotUpdateInfo = makeGetRobotUpdateInfo()
 
   return (state, ownProps) => {
     const {robot} = ownProps
     const connectRequest = robotSelectors.getConnectRequest(state)
     const homeRequest = getHomeRequest(state, robot)
     const ignoredRequest = getUpdateIgnoredRequest(state, robot)
-    const availableUpdate = getAvailableRobotUpdate(state, robot)
+    const restartRequest = getRestartRequest(state, robot)
+    const updateInfo = getRobotUpdateInfo(state, robot)
     const showUpdateModal = (
-      availableUpdate &&
-      ignoredRequest &&
+      // only show the alert modal if there's an upgrade available
+      updateInfo.type === 'upgrade' &&
+      // and we haven't already ignored the upgrade
       ignoredRequest.response &&
-      ignoredRequest.response.version !== availableUpdate
+      ignoredRequest.response.version !== updateInfo.version &&
+      // and we're not actively restarting
+      !restartRequest.inProgress &&
+      // TODO(mc, 2018-09-27): clear this state out on disconnect otherwise
+      // restartRequest.response latches this modal closed (which is fine,
+      // but only for this specific modal)
+      !restartRequest.response
     )
 
     return {

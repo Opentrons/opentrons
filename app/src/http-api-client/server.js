@@ -1,6 +1,7 @@
 // @flow
 // server endpoints http api module
 import {createSelector, type Selector} from 'reselect'
+import semver from 'semver'
 import {chainActions} from '../util'
 import type {State, ThunkPromiseAction, Action} from '../types'
 import type {RobotService} from '../robot'
@@ -108,6 +109,10 @@ export function updateRobotServer (robot: RobotService): ThunkPromiseAction {
   }
 }
 
+export function clearUpdateResponse (robot: RobotService): * {
+  return clearServerResponse(robot, UPDATE)
+}
+
 export function restartRobotServer (robot: RobotService): ThunkPromiseAction {
   return dispatch => {
     dispatch(serverRequest(robot, RESTART))
@@ -132,7 +137,7 @@ export function fetchIgnoredUpdate (robot: RobotService): ThunkPromiseAction {
   return dispatch => {
     dispatch(serverRequest(robot, IGNORE))
 
-    return client(robot, 'GET', 'server/update/ignore').then(
+    return client(robot, 'GET', 'update/ignore').then(
       (response: ServerRestartResponse) =>
         dispatch(serverSuccess(robot, IGNORE, response)),
       (error: ApiRequestError) => dispatch(serverFailure(robot, IGNORE, error))
@@ -148,7 +153,7 @@ export function setIgnoredUpdate (
     const body = {version}
     dispatch(serverRequest(robot, IGNORE))
 
-    return client(robot, 'POST', 'server/update/ignore', body).then(
+    return client(robot, 'POST', 'update/ignore', body).then(
       (response: ServerRestartResponse) =>
         dispatch(serverSuccess(robot, IGNORE, response)),
       (error: ApiRequestError) => dispatch(serverFailure(robot, IGNORE, error))
@@ -236,15 +241,27 @@ export function serverReducer (
   return state
 }
 
-export const makeGetAvailableRobotUpdate = () => {
-  const selector: Selector<State, RobotService, ?string> = createSelector(
+export type RobotUpdateType = 'upgrade' | 'downgrade' | null
+
+export type RobotUpdateInfo = {version: string, type: RobotUpdateType}
+
+export const makeGetRobotUpdateInfo = () => {
+  const selector: Selector<State, RobotService, RobotUpdateInfo> = createSelector(
     makeGetRobotHealth(),
     getApiUpdateVersion,
     (health, updateVersion) => {
-      const currentVersion = health.response && health.response.api_version
-      return currentVersion && currentVersion !== updateVersion
-        ? updateVersion
-        : null
+      const current = health.response && health.response.api_version
+      const upgrade = current && semver.gt(updateVersion, current)
+      const downgrade = current && semver.lt(updateVersion, current)
+      let type
+      if (!current || (!upgrade && !downgrade)) {
+        type = null
+      } else {
+        type = upgrade
+          ? 'upgrade'
+          : 'downgrade'
+      }
+      return {version: updateVersion, type: type}
     }
   )
 
