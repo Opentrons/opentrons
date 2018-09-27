@@ -17,7 +17,7 @@ type SP = {
 
 function mapStateToProps (state: BaseState): SP {
   return {
-    slot: labwareIngredSelectors.canAdd(state) || null,
+    slot: labwareIngredSelectors.selectedAddLabwareSlot(state) || null,
     permittedTipracks: pipetteSelectors.permittedTipracks(state),
   }
 }
