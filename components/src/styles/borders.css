@@ -4,7 +4,7 @@
   /* borders */
   --bd-radius-default: 2px;
   --bd-radius-pill: 12px;
-  --bd-width-default: 2px;
+  --bd-width-default: 1px;
   --bd-light: var(--bd-width-default) solid var(--c-light-gray);
 
   /* outlines */
