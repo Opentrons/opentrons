@@ -36,8 +36,12 @@ module.exports = {
       components: 'src/alerts/[A-Z]*.js',
     },
     {
-      name: 'Nav',
+      name: 'Nav (buttons)',
       components: 'src/nav/[A-Z]*.js',
+    },
+    {
+      name: 'Tabbed Nav',
+      components: 'src/tabbedNav/[A-Z]*.js',
     },
     {
       name: 'Buttons',
