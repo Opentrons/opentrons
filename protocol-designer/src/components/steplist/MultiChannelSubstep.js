@@ -1,8 +1,10 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import uniqBy from 'lodash/uniqBy'
+import last from 'lodash/last'
 
+import {Icon} from '@opentrons/components'
+import {PDListItem} from '../lists'
 import SubstepRow from './SubstepRow'
 import styles from './StepItem.css'
 
@@ -21,66 +23,56 @@ type MultiChannelSubstepState = {
   collapsed: boolean,
 }
 
-export default class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, MultiChannelSubstepState> {
-  constructor (props: MultiChannelSubstepProps) {
-    super(props)
-    this.state = {
-      collapsed: DEFAULT_COLLAPSED_STATE,
-    }
+const VOLUME_DIGITS = 1
+
+function formatVolume (inputVolume: ?string | ?number): ?string {
+  if (typeof inputVolume === 'number') {
+    // don't add digits to numbers with nothing to the right of the decimal
+    const digits = inputVolume.toString().split('.')[1]
+      ? VOLUME_DIGITS
+      : 0
+    return inputVolume.toFixed(digits)
   }
 
+  return inputVolume
+}
+
+export default class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, MultiChannelSubstepState> {
+  state = {collapsed: DEFAULT_COLLAPSED_STATE}
+
   handleToggleCollapsed = () => {
-    this.setState({
-      ...this.state,
-      collapsed: !this.state.collapsed,
-    })
+    this.setState({collapsed: !this.state.collapsed})
   }
 
   render () {
-    const {
-      rowGroup,
-      highlighted,
-    } = this.props
-
-    const collapsed = this.state.collapsed
+    const {rowGroup, highlighted} = this.props
+    const {collapsed} = this.state
 
     return (
       <ol
         onMouseEnter={this.props.onMouseEnter}
         onMouseLeave={this.props.onMouseLeave}
-        className={cx({[styles.highlighted]: highlighted})}
-      >
+        className={cx({[styles.highlighted]: highlighted})} >
+
         {/* Header row */}
-        <SubstepRow
-          className={cx(styles.step_subitem, {[styles.clear_border]: highlighted})}
-          source={{
-            preIngreds: rowGroup[0].source.preIngreds[rowGroup[0].source.wells[0]],
-            well: rowGroup[0].source.wells,
-          }}
-          dest={{
-            preIngreds: rowGroup[0].dest.preIngreds[rowGroup[0].dest.wells[0]],
-            well: rowGroup[0].dest.wells,
-          }}
-          volume={rowGroup[0] && rowGroup[0].volume}
-          ingredNames={this.props.ingredNames}
-          collapsible
-          collapsed={collapsed}
-          toggleCollapsed={this.handleToggleCollapsed} />
+        <PDListItem
+          border
+          className={cx(styles.step_subitem, {[styles.clear_border]: highlighted})}>
+          <span className={styles.multi_substep_header}>multi</span>
+          <span className={styles.emphasized_cell}>
+            {`${rowGroup[0].source.well || ''}:${last(rowGroup).source.well || ''}`}
+          </span>
+          <span className={styles.volume_cell}>{`${formatVolume(rowGroup[0].volume)} μL`}</span>
+          <span className={styles.emphasized_cell}>
+            {`${rowGroup[0].dest.well || ''}:${last(rowGroup).dest.well || ''}`}
+          </span>
+          <span className={styles.inner_carat} onClick={this.handleToggleCollapsed}>
+            <Icon name={collapsed ? 'chevron-down' : 'chevron-up'} />
+          </span>
+        </PDListItem>
 
         {collapsed && rowGroup.map((row, rowKey) => {
           // Channel rows (1 for each channel in multi-channel pipette
-          const channelSource = {
-            labware: row.source,
-            well: row.source.wells[rowKey],
-            postIngreds: row.source.postIngreds[row.source.wells[rowKey]],
-            preIngreds: row.source.preIngreds[row.source.wells[rowKey]],
-          }
-          const channelDest = {
-            labware: row.dest,
-            well: row.dest.wells[rowKey],
-            postIngreds: row.dest.postIngreds[row.dest.wells[rowKey]],
-            preIngreds: row.dest.preIngreds[row.dest.wells[rowKey]],
-          }
           console.log(row)
           return (
             <SubstepRow
@@ -88,8 +80,8 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
               className={styles.step_subitem_channel_row}
               volume={row.volume}
               ingredNames={this.props.ingredNames}
-              source={channelSource}
-              dest={channelDest}
+              source={row.source}
+              dest={row.dest}
             />
           )
         }

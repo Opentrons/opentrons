@@ -142,13 +142,26 @@ function transferLikeSubsteps (args: {
       },
       // Merge each channel row together when predicate true
       (currentMultiRow, nextMultiRow) => {
-        return range(pipette.channels).map(channel => ({
-          ...currentMultiRow,
-          ...nextMultiRow,
-          volume: showDispenseVol ? nextMultiRow.volume : currentMultiRow.volume,
-        }))
+        return range(pipette.channels).map(channelIndex => {
+          const sourceChannelWell = currentMultiRow.source.wells[channelIndex]
+          const destChannelWell = nextMultiRow.dest.wells[channelIndex]
+          return {
+            source: {
+              well: sourceChannelWell,
+              preIngreds: currentMultiRow.source.preIngreds[sourceChannelWell],
+              postIngreds: currentMultiRow.source.postIngreds[sourceChannelWell],
+            },
+            dest: {
+              well: destChannelWell,
+              preIngreds: nextMultiRow.dest.preIngreds[destChannelWell],
+              postIngreds: nextMultiRow.dest.postIngreds[destChannelWell],
+            },
+            volume: showDispenseVol ? nextMultiRow.volume : currentMultiRow.volume,
+          }
+        })
       }
     )
+    console.log('mergedMultiRows: ', mergedMultiRows)
     return {
       multichannel: true,
       stepType: validatedForm.stepType,

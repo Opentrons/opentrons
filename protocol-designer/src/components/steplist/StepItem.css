@@ -99,3 +99,7 @@
 .ingred_pill {
   cursor: default;
 }
+
+.multi_substep_header {
+  font-style: italic;
+}
