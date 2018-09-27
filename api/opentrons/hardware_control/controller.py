@@ -1,8 +1,10 @@
 import os
 import fcntl
 import threading
-
+from typing import Dict
 from opentrons.util import environment
+from opentrons.drivers.smoothie_drivers import driver_3_0
+from opentrons.robot import robot_configs
 
 _lock = threading.Lock()
 
@@ -60,3 +62,13 @@ class Controller:
             raise RuntimeError('{} may only be instantiated on a robot'
                                .format(self.__class__.__name__))
         self._lock = _Locker()
+        self.config = config or robot_configs.load()
+        self._smoothie_driver = driver_3_0.SmoothieDriver_3_0_0(
+            config=self.config)
+
+    def move(self, target_position: Dict[str, float], home_flagged_axes=True):
+        self._smoothie_driver.move(
+            target_position, home_flagged_axes=home_flagged_axes)
+
+    def home(self):
+        return self._smoothie_driver.home()
