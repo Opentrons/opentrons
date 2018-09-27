@@ -88,12 +88,26 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-width: 120px;
+  min-width: 180px;
+}
+
+.ingred_row:not(:last-child) {
+  margin-bottom: 0.5em;
 }
 
 .ingred_row_left {
   display: flex;
   align-items: center;
+}
+
+.ingred_row_right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.ingred_percentage {
+  margin-right: 1em;
 }
 
 .ingred_pill {

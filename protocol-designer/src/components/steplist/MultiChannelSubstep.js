@@ -73,7 +73,6 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
 
         {collapsed && rowGroup.map((row, rowKey) => {
           // Channel rows (1 for each channel in multi-channel pipette
-          console.log(row)
           return (
             <SubstepRow
               key={rowKey}

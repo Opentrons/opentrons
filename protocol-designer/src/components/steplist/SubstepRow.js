@@ -2,6 +2,8 @@
 import * as React from 'react'
 import last from 'lodash/last'
 import map from 'lodash/map'
+import reduce from 'lodash/reduce'
+import omitBy from 'lodash/omitBy'
 
 import {Icon, HoverTooltip, swatchColors} from '@opentrons/components'
 import IngredPill from './IngredPill'
@@ -68,21 +70,35 @@ function wellRange (sourceWells: string | ?Array<?string>): ?string {
   return firstWell || lastWell
 }
 
-const PillTooltipContents = (props) => (
-  <div className={styles.liquid_tooltip_contents}>
-    {map(props.ingreds, (ingred, groupId) => (
-      <div key={groupId} className={styles.ingred_row}>
-        <div className={styles.ingred_row_left}>
-          <div
-            className={styles.liquid_circle}
-            style={{backgroundColor: swatchColors(Number(groupId))}} />
-          <span>{props.ingredNames[groupId]}</span>
+const formatPercentage = (part: number, total: number): string => {
+  return `${Number((part / total) * 100).toFixed(1)}%`
+}
+
+const PillTooltipContents = (props) => {
+  const nonZeroIngreds = omitBy(props.ingreds, ingred => ingred.volume < 1)
+  const totalLiquidVolume = reduce(nonZeroIngreds, (acc, ingred) => acc + ingred.volume, 0)
+  return (
+    <div className={styles.liquid_tooltip_contents}>
+      {map(nonZeroIngreds, (ingred, groupId) => (
+        <div key={groupId} className={styles.ingred_row}>
+          <div className={styles.ingred_row_left}>
+            <div
+              className={styles.liquid_circle}
+              style={{backgroundColor: swatchColors(Number(groupId))}} />
+            <span>{props.ingredNames[groupId]}</span>
+          </div>
+          <div className={styles.ingred_row_right}>
+            {
+              Object.keys(nonZeroIngreds).length > 1 &&
+              <span className={styles.ingred_percentage}>{formatPercentage(ingred.volume, totalLiquidVolume)}</span>
+            }
+            <span>{ingred.volume}µl</span>
+          </div>
         </div>
-        {ingred.volume}µl
-      </div>
-    ))}
-  </div>
-)
+      ))}
+    </div>
+  )
+}
 
 export default function SubstepRow (props: SubstepRowProps) {
   const sourceWellRange = wellRange(props.source.well)
@@ -90,22 +106,23 @@ export default function SubstepRow (props: SubstepRowProps) {
 
   const formattedVolume = formatVolume(props.volume)
 
+  const filteredSourcePreIngreds = omitBy(props.source.preIngreds, ingred => ingred.volume < 1)
+  const filteredDestPreIngreds = omitBy(props.dest.preIngreds, ingred => ingred.volume < 1)
   return (
     <PDListItem
       border
       className={props.className}
       onMouseEnter={props.onMouseEnter}
-      onMouseLeave={props.onMouseLeave}
-    >
+      onMouseLeave={props.onMouseLeave}>
       <HoverTooltip
         tooltipComponent={(
-          <PillTooltipContents ingredNames={props.ingredNames} ingreds={props.source.preIngreds} />
+          <PillTooltipContents ingredNames={props.ingredNames} ingreds={filteredSourcePreIngreds} />
         )}>
         {(hoverTooltipHandlers) => (
           <IngredPill
             hoverTooltipHandlers={hoverTooltipHandlers}
             ingredNames={props.ingredNames}
-            ingreds={props.source.preIngreds} />
+            ingreds={filteredSourcePreIngreds} />
         )}
       </HoverTooltip>
       <span className={styles.emphasized_cell}>{sourceWellRange}</span>
@@ -118,13 +135,13 @@ export default function SubstepRow (props: SubstepRowProps) {
         : (
           <HoverTooltip
             tooltipComponent={(
-              <PillTooltipContents ingredNames={props.ingredNames} ingreds={props.dest.preIngreds} />
+              <PillTooltipContents ingredNames={props.ingredNames} ingreds={filteredDestPreIngreds} />
             )}>
             {(hoverTooltipHandlers) => (
               <IngredPill
                 hoverTooltipHandlers={hoverTooltipHandlers}
                 ingredNames={props.ingredNames}
-                ingreds={props.dest.preIngreds} />
+                ingreds={filteredDestPreIngreds} />
             )}
           </HoverTooltip>
         )

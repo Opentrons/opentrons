@@ -161,7 +161,6 @@ function transferLikeSubsteps (args: {
         })
       }
     )
-    console.log('mergedMultiRows: ', mergedMultiRows)
     return {
       multichannel: true,
       stepType: validatedForm.stepType,
