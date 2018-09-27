@@ -2,7 +2,7 @@
 import os
 import sys
 
-settings = {}
+settings: dict = {}
 
 IS_WIN = sys.platform.startswith('win')
 IS_OSX = sys.platform == 'darwin'

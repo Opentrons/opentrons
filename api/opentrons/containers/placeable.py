@@ -3,7 +3,7 @@ import math
 import numbers
 import re
 import functools
-
+from typing import List
 from collections import OrderedDict
 from itertools import chain
 
@@ -476,7 +476,7 @@ class Deck(Placeable):
         Returns all containers on a deck as a list
         """
 
-        all_containers = list()
+        all_containers: List = list()
         for slot in self:
             all_containers += slot.get_children_list()
 

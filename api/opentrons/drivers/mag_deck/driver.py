@@ -2,7 +2,7 @@ from os import environ
 import logging
 from threading import Event
 from time import sleep
-
+from typing import Optional
 from serial.serialutil import SerialException
 
 from opentrons.drivers import serial_communication
@@ -70,7 +70,7 @@ def _parse_string_value_from_substring(substring) -> str:
                 substring))
 
 
-def _parse_number_from_substring(substring) -> float:
+def _parse_number_from_substring(substring) -> Optional[float]:
     '''
     Returns the number in the expected string "N:12.3", where "N" is the
     key, and "12.3" is a floating point value

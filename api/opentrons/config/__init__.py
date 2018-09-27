@@ -136,7 +136,7 @@ def _flatten_dict(input_dict: dict) -> dict:
     return res
 
 
-def _generate_base_config(skip_usb=False) -> (str, dict):
+def _generate_base_config(skip_usb=False) -> Tuple[str, dict]:
     """
     Determines where existing info can be found in the system, and creates a
     corresponding data dict that can be written to index.json in the
@@ -240,7 +240,7 @@ def build(pairs: List[Tuple[tuple, object]]) -> dict:
     Builds a tree out of key-value pairs consisting of full
     path to the value and the value itself
     """
-    tree = {}
+    tree: dict = {}
 
     def append(tree, path, value):
         if not path:

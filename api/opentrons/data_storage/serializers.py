@@ -59,7 +59,7 @@ def labware_to_json(container: Container, container_name: str=None) -> dict:
     if container.ordering:
         ordering = container.ordering
     else:
-        groups = {}
+        groups: dict = {}
         for w in wells.keys():
             num = int(w[1:])
             if num in groups.keys():

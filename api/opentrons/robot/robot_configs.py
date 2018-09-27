@@ -124,7 +124,7 @@ def _default_probe_dimensions():
 def _build_fallback_instrument_offset(robot_settings: dict) -> dict:
     # because `instrument_offset` is a dict of dicts, we must loop through it
     # and replace empty values with the default offset
-    inst_offs = {'right': {}, 'left': {}}
+    inst_offs: dict = {'right': {}, 'left': {}}
     pip_types = ['single', 'multi']
     prev_instrument_offset = robot_settings.get('instrument_offset', {})
     for mount in inst_offs.keys():

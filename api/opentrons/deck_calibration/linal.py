@@ -115,7 +115,8 @@ def add_z(xy: np.ndarray, z: float) -> np.ndarray:
 
 
 def apply_transform(
-        t: List[List[float]], pos: (int, int, int)) -> (int, int, int, int):
+        t: List[List[float]],
+        pos: Tuple[float, float, float]) -> Tuple[float, ...]:
     """
     Change of base using a transform matrix. Primarily used to render a point
     in space in a way that is more readable for the user.

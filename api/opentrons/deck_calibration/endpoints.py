@@ -25,7 +25,7 @@ def expected_points():
         '3': slot_7_upper_left}
 
 
-def safe_points() -> Dict[str, Tuple[int, int, int]]:
+def safe_points() -> Dict[str, Tuple[float, float, float]]:
     # Safe points are defined as 5mm toward the center of the deck in x, y and
     # 10mm above the deck. User is expect to jog to the critical point from the
     # corresponding safe point, to avoid collision depending on direction of
