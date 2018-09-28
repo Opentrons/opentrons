@@ -169,7 +169,7 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
     }
   )
 
-  return reduceCommandCreators(commandCreators)(prevRobotState)
+  return commandCreators
 }
 
 export default consolidate

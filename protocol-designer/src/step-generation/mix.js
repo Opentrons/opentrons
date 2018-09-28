@@ -107,7 +107,7 @@ const mix = (data: MixFormData): CommandCreator => (prevRobotState: RobotState) 
     }
   )
 
-  return reduceCommandCreators(commandCreators)(prevRobotState)
+  return commandCreators
 }
 
 export default mix

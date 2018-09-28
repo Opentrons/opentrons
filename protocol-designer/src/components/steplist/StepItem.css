@@ -81,7 +81,7 @@
 }
 
 .liquid_tooltip_contents {
-  margin: 0.2em;
+  margin: 0.5em;
 }
 
 .ingred_row {
@@ -96,18 +96,38 @@
 }
 
 .ingred_row_left {
+  flex: 1;
   display: flex;
   align-items: center;
 }
 
 .ingred_row_right {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: flex-end;
 }
 
 .ingred_percentage {
-  margin-right: 1em;
+  flex: 1;
+  text-align: right;
+}
+
+.ingred_partial_volume {
+  flex: 1;
+  text-align: right;
+}
+
+.total_divider {
+  height: 1px;
+  width: 100%;
+  background-color: var(--c-light-gray);
+  margin: 1em 0;
+}
+
+.total_row {
+  display: flex;
+  justify-content: space-between;
 }
 
 .ingred_pill {

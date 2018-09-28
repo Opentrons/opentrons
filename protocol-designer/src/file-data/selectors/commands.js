@@ -154,7 +154,7 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
       (acc: Array<StepGeneration.CommandCreator>, formData, formIndex) => {
         const {stepType} = formData
         let stepCommandCreator = commandCreatorsFromFormData(formData)
-        if (stepType === 'transfer') {
+        if (['transfer', 'consolidate', 'mix', 'distribute'].includes(stepType)) {
           stepCommandCreator = StepGeneration.reduceCommandCreators(stepCommandCreator(initialRobotState))
         }
         if (!stepCommandCreator) {

@@ -30,7 +30,7 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
           // if there are errors, short-circuit the reduce
           return prev
         }
-
+        console.log('reduceCommands: ', prev, prev.commands)
         const next = reducerFn(prev.robotState)
 
         if (next.errors) {
