@@ -3,7 +3,7 @@ import json
 import os
 import sys
 import logging
-
+from typing import List
 from opentrons.util import environment
 from opentrons.util.vector import Vector, VectorEncoder
 
@@ -30,8 +30,8 @@ class Instrument(object):
     calibration_data_version = 1
 
     calibration_key = "unique_name"
-    persisted_attributes = []
-    persisted_defaults = {}
+    persisted_attributes: List = []
+    persisted_defaults: dict = {}
 
     def reset(self):
         """

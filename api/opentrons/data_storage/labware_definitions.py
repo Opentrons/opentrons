@@ -142,7 +142,7 @@ def _load_definition(path: str, labware_name: str) -> dict:
 def _load_offset(path: str, labware_name: str) -> dict:
     offset_file = os.path.join(
         path, "{}.json".format(labware_name))
-    offs = {}
+    offs: dict = {}
     try:
         if os.path.exists(offset_file):
             with open(offset_file) as offs_f:
@@ -201,13 +201,13 @@ def _list_labware(path: str) -> List[str]:
     try:
         lw = list(map(lambda x: os.path.splitext(x)[0], os.listdir(path)))
     except FileNotFoundError:
-        lw = []
+        lw = list()
     return lw
 
 
 def list_all_labware() -> List[str]:
-    user_list = [] + _list_labware(user_defn_dir())
-    default_list = [] + _list_labware(default_definition_dir())
+    user_list = _list_labware(user_defn_dir())
+    default_list = _list_labware(default_definition_dir())
     return sorted(list(set(user_list + default_list)))
 
 

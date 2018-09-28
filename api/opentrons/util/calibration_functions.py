@@ -1,5 +1,5 @@
 from numpy import array
-
+from typing import Tuple
 from opentrons.trackers.pose_tracker import (
     update, Point, change_base
 )
@@ -202,7 +202,8 @@ def _calculate_safeheight(robot, z_crossover_clearance):
     return center.z + z_crossover_clearance
 
 
-def update_instrument_config(instrument, measured_center) -> (Point, float):
+def update_instrument_config(
+        instrument, measured_center) -> Tuple[Point, float]:
     """
     Update config and pose tree with instrument's x and y offsets
     and tip length based on delta between probe center and measured_center,

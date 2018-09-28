@@ -4,7 +4,7 @@ from asyncio import Queue
 from concurrent import futures
 from contextlib import contextmanager
 
-subscriptions = {}
+subscriptions: dict = {}
 
 
 class Notifications(object):
