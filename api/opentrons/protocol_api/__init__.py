@@ -4,12 +4,11 @@ This package defines classes and functions for access through a protocol to
 control the OT2.
 """
 
-from collections import OrderedDict
 import enum
 import os
 from typing import Callable, List, Dict
 
-from opentrons.labware import Well, Labware, load
+from opentrons.protocol_api.labware import Well, Labware, load
 
 
 def run(protocol_callable: Callable[['ProtocolContext'], None] = None,
@@ -76,7 +75,7 @@ class ProtocolContext:
         return labware
 
     @property
-    def loaded_labwares(self) -> OrderedDict[str, Labware]:
+    def loaded_labwares(self) -> Dict[str, Labware]:
         """ Get the labwares that have been loaded into the protocol context.
 
         The return value is a dict mapping locations to labware, sorted
@@ -96,7 +95,7 @@ class ProtocolContext:
         pass
 
     @property
-    def loaded_instruments(self) -> OrderedDict[str, 'InstrumentContext']:
+    def loaded_instruments(self) -> Dict[str, 'InstrumentContext']:
         """ Get the instruments that have been loaded into the protocol context
 
         The return value is a dict mapping locations to instruments, sorted

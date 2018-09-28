@@ -1,12 +1,7 @@
-"""
-This module will replace Placeable, and should eventually be renamed to
-`labware` and moved to the protocol_api module.
-"""
+"""This module will replace Placeable"""
 from typing import List, Dict
 from enum import Enum, auto
-from collections import namedtuple
-
-Point = namedtuple('Point', ['x', 'y', 'z'])
+from opentrons.types import Point
 
 
 class WellShape(Enum):
