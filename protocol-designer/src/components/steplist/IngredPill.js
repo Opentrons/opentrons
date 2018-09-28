@@ -1,11 +1,12 @@
 // @flow
 import * as React from 'react'
-import {Pill, swatchColors, MIXED_WELL_COLOR} from '@opentrons/components'
-import type {NamedIngred} from '../../steplist/types'
+import {Pill, swatchColors, MIXED_WELL_COLOR, type HoverTooltipHandlers} from '@opentrons/components'
 import styles from './StepItem.css'
 
 type Props = {
-  ingreds: ?Array<NamedIngred>,
+  ingreds: {[mixed]: number},
+  ingredNames: {[mixed]: string},
+  hoverTooltipHandlers?: ?HoverTooltipHandlers,
 }
 
 function IngredPill (props: Props) {

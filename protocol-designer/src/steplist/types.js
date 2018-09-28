@@ -21,12 +21,16 @@ export type NamedIngred = {|
   name: string,
 |}
 
+export type SourceDestData = {|
+  well?: string,
+  preIngreds?: {[mixed]: number},
+  postIngreds?: {[mixed]: number},
+|}
+
 export type StepItemSourceDestRow = {|
   substepIndex?: number,
-  sourceIngredients?: Array<NamedIngred>,
-  destIngredients?: Array<NamedIngred>,
-  sourceWell?: ?string,
-  destWell?: ?string,
+  source?: SourceDestData,
+  dest?: SourceDestData,
   volume?: ?number,
 |}
 

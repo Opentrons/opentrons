@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
+import type {HoverTooltipHandlers} from '../tooltips'
 import styles from './Pill.css'
 
 type Props = {
@@ -12,7 +13,8 @@ type Props = {
   className?: string,
   /** contents of the pill */
   children?: React.Node,
-  // TODO LATER Ian 2018-04-11 mouse event handlers (eg for triggering tooltip)
+  /** handlers for HoverTooltipComponent */
+  hoverTooltipHandlers?: ?HoverTooltipHandlers,
 }
 
 /**

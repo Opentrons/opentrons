@@ -60,7 +60,7 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
           className={cx(styles.step_subitem, {[styles.clear_border]: highlighted})}>
           <span className={styles.multi_substep_header}>multi</span>
           <span className={styles.emphasized_cell}>
-            {rowGroup[0].source && `${rowGroup[0].source.well || ''}:${last(rowGroup).source.well || ''}`}
+            {`${(rowGroup[0].source && rowGroup[0].source.well) || ''}:${(last(rowGroup).source && last(rowGroup).source.well) || ''}`}
           </span>
           <span className={styles.volume_cell}>{`${formatVolume(rowGroup[0].volume)} μL`}</span>
           <span className={styles.emphasized_cell}>
