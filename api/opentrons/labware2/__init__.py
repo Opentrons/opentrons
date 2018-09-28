@@ -52,15 +52,17 @@ class Well:
 
     def top(self) -> Point:
         """
-        :return: a Point corresponding to the top-center of the well, relative
-        to the origin of the labware
+        :return: a Point corresponding to the absolute position of the
+        top-center of the well relative to the deck (with the lower-left corner
+        of slot 1 as (0,0,0))
         """
         return self._position
 
     def bottom(self) -> Point:
         """
-        :return: a Point corresponding to the bottom-center of the well,
-        relative to the origin of the labware
+        :return: a Point corresponding to the absolute position of the
+        bottom-center of the well (with the lower-left corner of slot 1 as
+        (0,0,0))
         """
         top = self.top()
         bottom_z = top.z - self._depth
@@ -68,8 +70,9 @@ class Well:
 
     def center(self) -> Point:
         """
-        :return: a Point corresponding to the center of the well, relative to
-        the origin of the labware
+        :return: a Point corresponding to the absolute position of the center
+        of the well relative to the deck (with the lower-left corner of slot 1
+        as (0,0,0))
         """
         top = self.top()
         center_z = top.z - (self._depth / 2.0)
@@ -81,14 +84,7 @@ class Well:
         Specifies an arbitrary point relative to the center of the well based
         on percentages of the radius in each axis. For example, to specify the
         back-right corner of a well at 1/4 of the well depth from the bottom,
-        the call would be `_from_center_cartesian(1, 1, -0.5)`. This point is
-        relative to origin of the labware containing the well, so if the well
-        defintion specifies its top-center as (100, 25, 20) and a depth of 18,
-        and a diameter of 8, then `_from_center_cartesian(0.5, -0.5, 0.1)`
-        would return (102, 23, 12.8).
-
-        Note that the behavior of the `z` parameter is identical to `h` for
-        `_from_center_polar`.
+        the call would be `_from_center_cartesian(1, 1, -0.5)`.
 
         No checks are performed to ensure that the resulting position will be
         inside of the well.
@@ -100,7 +96,8 @@ class Well:
         :param z: a float in the range [-1.0, 1.0] for a percentage of half of
             the height above/below the center
 
-        :return: a Point relative to the center of the well
+        :return: a Point representing the specified location in absolute deck
+        coordinates
         """
         center = self.center()
         if self._shape is WellShape.RECTANGULAR:
