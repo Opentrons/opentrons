@@ -16,11 +16,19 @@ import {
   setIgnoredUpdate,
 } from '../../http-api-client'
 
+import {
+  getShellUpdateState,
+} from '../../shell'
+
+import type {ShellUpdateState} from '../../shell'
+
 import {AlertModal, Icon} from '@opentrons/components'
+import UpdateAppMessage from './UpdateAppMessage'
 
 type OP = Robot
 
 type SP = {
+  appUpdate: ShellUpdateState,
   updateInfo: RobotUpdateInfo,
   updateRequest: RobotServerUpdate,
   restartRequest: RobotServerRestart,
@@ -45,7 +53,15 @@ const Spinner = () => (<Icon name='ot-spinner' height='1em' spin />)
 export default connect(makeMapStateToProps, null, mergeProps)(UpdateModal)
 
 function UpdateModal (props: Props) {
-  const {updateInfo, ignoreUpdate, update, restart, updateRequest, restartRequest} = props
+  const {
+    updateInfo,
+    ignoreUpdate,
+    update,
+    restart,
+    updateRequest,
+    restartRequest,
+    appUpdate: {available},
+  } = props
   const inProgress = updateRequest.inProgress || restartRequest.inProgress
   let closeButtonText = 'not now'
   let message
@@ -87,7 +103,8 @@ function UpdateModal (props: Props) {
       ]}
       alertOverlay
     >
-      {message}
+      {available && <UpdateAppMessage />}
+      <p>{message}</p>
     </AlertModal>
   )
 }
@@ -98,6 +115,7 @@ function makeMapStateToProps (): (State, OP) => SP {
   const getRobotRestartRequest = makeGetRobotRestartRequest()
 
   return (state, ownProps) => ({
+    appUpdate: getShellUpdateState(state),
     updateInfo: getRobotUpdateInfo(state, ownProps),
     updateRequest: getRobotUpdateRequest(state, ownProps),
     restartRequest: getRobotRestartRequest(state, ownProps),

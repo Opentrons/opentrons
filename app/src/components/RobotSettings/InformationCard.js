@@ -14,6 +14,10 @@ import {
   makeGetRobotUpdateInfo,
 } from '../../http-api-client'
 
+import {
+  checkShellUpdate,
+} from '../../shell'
+
 import {RefreshCard, LabeledValue, OutlineButton} from '@opentrons/components'
 import {CardContentQuarter} from '../layout'
 
@@ -28,6 +32,7 @@ type StateProps = {
 
 type DispatchProps = {
   fetchHealth: () => mixed,
+  checkAppUpdate: () => mixed,
 }
 
 type Props = OwnProps & StateProps & DispatchProps
@@ -45,6 +50,7 @@ function InformationCard (props: Props) {
     updateInfo,
     fetchHealth,
     updateUrl,
+    checkAppUpdate,
     healthRequest: {inProgress, response: health},
   } = props
 
@@ -82,6 +88,7 @@ function InformationCard (props: Props) {
         <OutlineButton
           Component={Link}
           to={updateUrl}
+          onClick={checkAppUpdate}
         >
           {updateText}
         </OutlineButton>
@@ -106,5 +113,6 @@ function mapDispatchToProps (
 ): DispatchProps {
   return {
     fetchHealth: () => dispatch(fetchHealthAndIgnored(ownProps)),
+    checkAppUpdate: () => dispatch(checkShellUpdate()),
   }
 }
