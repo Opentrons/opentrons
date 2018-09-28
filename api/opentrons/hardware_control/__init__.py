@@ -13,7 +13,9 @@ functions are available elsewhere.
 import asyncio
 import functools
 import logging
-
+import enum
+from typing import Dict
+from opentrons import types
 from . import simulator
 try:
     from . import controller
@@ -31,6 +33,22 @@ def _log_call(func):
         args[0]._log.debug(func.__name__)
         return func(*args, **kwargs)
     return _log_call_inner
+
+
+class _Axis(enum.Enum):
+    X = enum.auto()
+    Y = enum.auto()
+    Z = enum.auto()
+    A = enum.auto()
+
+    @classmethod
+    def by_mount(cls, mount):
+        bm = {types.Mount.LEFT: cls.Z, types.Mount.RIGHT: cls.A}
+        return bm[mount]
+
+
+class MustHomeError(RuntimeError):
+    pass
 
 
 class API:
@@ -62,6 +80,8 @@ class API:
             self._loop = asyncio.get_event_loop()
         else:
             self._loop = loop
+        # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
+        self._current_position: dict = None
 
     @classmethod
     def build_hardware_controller(
@@ -143,15 +163,49 @@ class API:
     # Gantry/frame (i.e. not pipette) action API
     @_log_call
     async def home(self, *args, **kwargs):
-        pass
+        # Initialize/update current_position
+        self._current_position = self._backend.home()
 
     @_log_call
     async def home_z(self):
         pass
 
     @_log_call
-    async def move_to(self, mount, position=None, position_rel=None):
-        pass
+    async def move_to(
+            self, mount: types.Mount, abs_position: types.Point = None):
+        if not self._current_position:
+            raise MustHomeError
+        z_axis = _Axis.by_mount(mount)
+        try:
+            target_position = {_Axis.X.name: abs_position.x,
+                               _Axis.Y.name: abs_position.y,
+                               z_axis.name: abs_position.z}
+        except KeyError:
+            raise MustHomeError
+        await self._move(target_position)
+
+    @_log_call
+    async def move_rel(self, mount: types.Mount, delta: types.Point = None):
+        if not self._current_position:
+            raise MustHomeError
+        z_axis = _Axis.by_mount(mount)
+        try:
+            target_position = \
+                {_Axis.X.name: self._current_position[_Axis.X.name] + delta.x,
+                 _Axis.Y.name: self._current_position[_Axis.Y.name] + delta.y,
+                 z_axis.name: self._current_position[z_axis.name] + delta.z}
+        except KeyError:
+            raise MustHomeError
+        await self._move(target_position)
+
+    async def _move(self, target_position: Dict[str, float]):
+        self._current_position.update(target_position)
+        try:
+            self._backend.move(target_position)
+        except Exception:
+            mod_log.exception('Move failed')
+            self._current_position.clear()
+            raise
 
     # Gantry/frame (i.e. not pipette) config API
     @_log_call
