@@ -2,8 +2,9 @@
 // TODO Ian 2018-05-03
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
+import flatten from 'lodash/flatten'
 // import {FIXED_TRASH_ID} from '../constants'
-import {aspirate, dispense, blowout, replaceTip, touchTip, reduceCommandCreators} from './'
+import {aspirate, dispense, blowout, replaceTip, touchTip} from './'
 import transfer from './transfer'
 import {mixUtil} from './mix'
 import * as errorCreators from './errorCreators'
@@ -68,7 +69,7 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
       return transfer(transferData)
     })
 
-    return reduceCommandCreators(transferCommands)(prevRobotState)
+    return flatten(transferCommands.map(tC => tC(prevRobotState)))
   }
 
   const commandCreators = flatMap(

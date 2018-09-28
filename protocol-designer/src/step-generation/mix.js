@@ -5,7 +5,7 @@ import blowout from './blowout'
 import dispense from './dispense'
 import replaceTip from './replaceTip'
 import touchTip from './touchTip'
-import {repeatArray, reduceCommandCreators} from './utils'
+import {repeatArray} from './utils'
 import * as errorCreators from './errorCreators'
 import type {MixFormData, RobotState, CommandCreator} from './'
 

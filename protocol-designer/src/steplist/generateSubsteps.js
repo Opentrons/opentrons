@@ -57,7 +57,6 @@ type AspDispCommandType = {
 function transferLikeSubsteps (args: {
   validatedForm: ConsolidateFormData | DistributeFormData | TransferFormData | MixFormData,
   allPipetteData: AllPipetteData,
-  ingredNames: jjj,
   getLabwareType: GetLabwareType,
   robotState: RobotState,
   stepId: number,
@@ -65,7 +64,6 @@ function transferLikeSubsteps (args: {
   const {
     validatedForm,
     allPipetteData,
-    ingredNames,
     getLabwareType,
     stepId,
   } = args
@@ -145,27 +143,45 @@ function transferLikeSubsteps (args: {
         return range(pipette.channels).map(channelIndex => {
           const sourceChannelWell = currentMultiRow.source.wells[channelIndex]
           const destChannelWell = nextMultiRow.dest.wells[channelIndex]
+          const source = {
+            well: sourceChannelWell,
+            preIngreds: currentMultiRow.source.preIngreds[sourceChannelWell],
+            postIngreds: currentMultiRow.source.postIngreds[sourceChannelWell],
+          }
+          const dest = {
+            well: destChannelWell,
+            preIngreds: nextMultiRow.dest.preIngreds[destChannelWell],
+            postIngreds: nextMultiRow.dest.postIngreds[destChannelWell],
+          }
           return {
-            source: {
-              well: sourceChannelWell,
-              preIngreds: currentMultiRow.source.preIngreds[sourceChannelWell],
-              postIngreds: currentMultiRow.source.postIngreds[sourceChannelWell],
-            },
-            dest: {
-              well: destChannelWell,
-              preIngreds: nextMultiRow.dest.preIngreds[destChannelWell],
-              postIngreds: nextMultiRow.dest.postIngreds[destChannelWell],
-            },
+            source,
+            dest: validatedForm.stepType === 'mix' ? source : dest,
             volume: showDispenseVol ? nextMultiRow.volume : currentMultiRow.volume,
           }
         })
       }
     )
+    const allMultiRows = mergedMultiRows.map((multiRow) => {
+      if (Array.isArray(multiRow)) return multiRow
+      return range(pipette.channels).map(channelIndex => {
+        const source = multiRow.source && {
+          well: multiRow.source.wells[channelIndex],
+          preIngreds: multiRow.source.preIngreds[multiRow.source.wells[channelIndex]],
+          postIngreds: multiRow.source.postIngreds[multiRow.source.wells[channelIndex]],
+        }
+        const dest = multiRow.dest && {
+          well: multiRow.dest.wells[channelIndex],
+          preIngreds: multiRow.dest.preIngreds[multiRow.dest.wells[channelIndex]],
+          postIngreds: multiRow.dest.postIngreds[multiRow.dest.wells[channelIndex]],
+        }
+        return { source, dest, volume: multiRow.volume }
+      })
+    })
     return {
       multichannel: true,
       stepType: validatedForm.stepType,
       parentStepId: stepId,
-      multiRows: mergedMultiRows,
+      multiRows: allMultiRows,
     }
   } else { // single channel
     const substepRows = substepTimeline(substepCommandCreators)(robotState)
@@ -198,7 +214,6 @@ export function generateSubsteps (
   valForm: ?ValidFormAndErrors,
   allPipetteData: AllPipetteData,
   getLabwareType: GetLabwareType,
-  ingredNames: GetIngreds, //TODO: change type
   robotState: ?RobotState,
   stepId: number // stepId is used only for substeps to reference parent step
 ): ?SubstepItemData {
@@ -231,7 +246,6 @@ export function generateSubsteps (
     return transferLikeSubsteps({
       validatedForm,
       allPipetteData,
-      ingredNames,
       getLabwareType,
       robotState,
       stepId,

@@ -2,7 +2,7 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import {FIXED_TRASH_ID} from '../constants'
-import {aspirate, dispense, blowout, replaceTip, touchTip, reduceCommandCreators} from './'
+import {aspirate, dispense, blowout, replaceTip, touchTip} from './'
 import {mixUtil} from './mix'
 import * as errorCreators from './errorCreators'
 import type {ConsolidateFormData, RobotState, CommandCreator} from './'

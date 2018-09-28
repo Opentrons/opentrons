@@ -47,29 +47,6 @@ function formatVolume (inputVolume: ?string | ?number): ?string {
   return inputVolume
 }
 
-function wellRange (sourceWells: string | ?Array<?string>): ?string {
-  if (typeof sourceWells === 'string') {
-    return sourceWells
-  }
-
-  if (!sourceWells || sourceWells.length === 0) {
-    return null
-  }
-
-  if (sourceWells.length === 1) {
-    return sourceWells[0]
-  }
-
-  const firstWell = sourceWells[0]
-  const lastWell = last(sourceWells)
-
-  if (firstWell && lastWell) {
-    return `${firstWell || ''}:${lastWell || ''}`
-  }
-
-  return firstWell || lastWell
-}
-
 const formatPercentage = (part: number, total: number): string => {
   return `${Number((part / total) * 100).toFixed(1)}%`
 }
@@ -111,8 +88,8 @@ const PillTooltipContents = (props) => {
 }
 
 export default function SubstepRow (props: SubstepRowProps) {
-  const compactedSourcePreIngreds = omitBy(props.source.preIngreds, ingred => ingred.volume < 1)
-  const compactedDestPreIngreds = omitBy(props.dest.preIngreds, ingred => ingred.volume < 1)
+  const compactedSourcePreIngreds = props.source && omitBy(props.source.preIngreds, ingred => ingred.volume < 1)
+  const compactedDestPreIngreds = props.dest && omitBy(props.dest.preIngreds, ingred => ingred.volume < 1)
   return (
     <PDListItem
       border
@@ -122,7 +99,7 @@ export default function SubstepRow (props: SubstepRowProps) {
       <HoverTooltip
         tooltipComponent={(
           <PillTooltipContents
-            well={props.source.well}
+            well={props.source && props.source.well}
             ingredNames={props.ingredNames}
             ingreds={compactedSourcePreIngreds} />
         )}>
@@ -133,13 +110,13 @@ export default function SubstepRow (props: SubstepRowProps) {
             ingreds={compactedSourcePreIngreds} />
         )}
       </HoverTooltip>
-      <span className={styles.emphasized_cell}>{props.source.well}</span>
+      <span className={styles.emphasized_cell}>{props.source && props.source.well}</span>
       <span className={styles.volume_cell}>{`${formatVolume(props.volume)} μL`}</span>
-      <span className={styles.emphasized_cell}>{props.dest.well}</span>
+      <span className={styles.emphasized_cell}>{props.dest && props.dest.well}</span>
       <HoverTooltip
         tooltipComponent={(
           <PillTooltipContents
-            well={props.dest.well}
+            well={props.dest && props.dest.well}
             ingredNames={props.ingredNames}
             ingreds={compactedDestPreIngreds} />
         )}>

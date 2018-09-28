@@ -155,7 +155,8 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
         const {stepType} = formData
         let stepCommandCreator = commandCreatorsFromFormData(formData)
         if (['transfer', 'consolidate', 'mix', 'distribute'].includes(stepType)) {
-          stepCommandCreator = StepGeneration.reduceCommandCreators(stepCommandCreator(initialRobotState))
+          const commandCreators = stepCommandCreator(initialRobotState)
+          stepCommandCreator = StepGeneration.reduceCommandCreators(commandCreators)
         }
         if (!stepCommandCreator) {
           // TODO Ian 2018-05-08 use assert

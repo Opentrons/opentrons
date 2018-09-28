@@ -156,7 +156,6 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
       )
     }
   )
-
   return commandCreators
 }
 
