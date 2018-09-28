@@ -1,6 +1,8 @@
 // @flow
+import range from 'lodash/range'
+
 import assignId from './assignId'
-import roundTo from 'round-to'
+import {toWellName} from '../helpers/index'
 
 type Metadata = {
   name: string,
@@ -13,9 +15,6 @@ type Dimensions = {
   overallLength: number,
   overallWidth: number,
   overallHeight: number,
-  offsetX: number,
-  offsetY: number,
-  offsetZ: number,
 }
 
 type Vendor = {
@@ -34,14 +33,37 @@ type Params = {
 
 type Well = {
   depth: number,
+  shape: string,
   diameter?: number,
   length?: number,
   width?: number,
   totalLiquidVolume?: number,
 }
 
+type Cell = {
+  row: number,
+  column: number,
+}
+
+type Offset = {
+  x: number,
+  y: number,
+  z: number,
+}
+
+export type RegularLabwareProps = {
+  metadata: Metadata,
+  parameters: Params,
+  offset: Offset,
+  dimensions: Dimensions,
+  grid: Cell,
+  spacing: Cell,
+  well: Well,
+  vendor?: Vendor,
+}
+
 type Schema = {
-  otId: number,
+  otId: string,
   deprecated: boolean,
   metadata: Metadata,
   dimensions: Dimensions,
@@ -51,64 +73,67 @@ type Schema = {
   wells: {[wellName: string]: Well},
 }
 
-function determineOrdering (grid: Array<number>): Array<Array<string>> {
-  var ordering = []
-  var rows = grid[0]
-  var cols = grid[1]
-  var A = 'A'
+function round (value, decimals) {
+  return Number(Math.round(Number(value + 'e' + decimals)) + 'e-' + decimals)
+}
 
-  var r
-  var c
-
-  for (c = 0; c < cols; c++) {
-    let colOrdering = []
-    for (r = 0; r < rows; r++) {
-      var char = String.fromCharCode(A.charCodeAt(0) + r)
-      var wellName = char + (1 + c).toString()
-      colOrdering.push(wellName)
-    }
-    ordering.push(colOrdering)
-  }
+function determineOrdering (grid: Cell): Array<Array<string>> {
+  const ordering = range(grid.column).map(colNum =>
+    range(grid.row).map(rowNum =>
+      toWellName({rowNum, colNum})))
 
   return ordering
 }
-// Private helper function to return individual well output
-function calculateCoordinates (well: Well, ordering: Array<Array<string>>, spacing: Array<number>): {[wellName: string]: Well} {
+// Private helper function to calculate the XYZ coordinates of a give well
+// Will return a nested object of all well objects for a labware
+function calculateCoordinates (
+  well: Well,
+  ordering: Array<Array<string>>,
+  spacing: Cell): {[wellName: string]: Well} {
   let wells = {}
-  var rowSpacing = spacing[0]
-  var colSpacing = spacing[1]
-  var col
-  var row
 
-  for (col = 0; col < ordering.length; col++) {
-    var rowLength = ordering[col].length
-    for (row = 0; row < rowLength; row++) {
-      var x = roundTo(col * colSpacing, 2)
-      var y = roundTo((rowLength - row - 1) * rowSpacing, 2)
-      var z = 0
-      wells[ordering[col][row]] = {...well, x, y, z}
-    }
-  }
+  // Note, reverse() on its own mutates ordering. Use slice() as a workaround
+  // to prevent mutation
+  ordering.forEach(function (subarray, cIndex) {
+    subarray.slice().reverse().forEach(function (element, rIndex) {
+      wells[element] = {
+        ...well,
+        x: round(cIndex * spacing.column, 2),
+        y: round(rIndex * spacing.row, 2),
+        z: 0}
+    })
+  })
 
   return wells
 }
 
-// Make function public via export function
-// Need slot offset
-// well spacing
-// use display category to do logic checks (tiprack has tip length etc)
-// rows/cols
-// customization can contain nothing OR ??
-export function createRegularLabware (metadata: Metadata, parameters: Params, dimensions: Dimensions, grid: Array<number>, spacing: Array<number>, well: Well, vendor?: Vendor): Schema {
-  const otId = assignId()
-  const ordering = determineOrdering(grid)
-  var definition = null
-
-  const wells = calculateCoordinates(well, ordering, spacing)
-  if (vendor) {
-    definition = {otId, deprecated: false, metadata, dimensions, parameters, ordering, wells, vendor}
-  } else {
-    definition = {otId, deprecated: false, metadata, dimensions, parameters, ordering, wells}
+// Generator function for labware definitions within a regular grid format
+// e.g. well plates, regular tuberacks (NOT 15_50ml) etc.
+// Required parameters are:
+//   metadata: Metadata,
+//  parameters: Params,
+//  dimensions: Dimensions,
+//  grid: Cell,
+//  spacing: Cell,
+//  well: Well,
+// Optional parameters are:
+// vendor: Vendor
+// For further info on these parameters look at labware examples in __tests__
+// or the labware definition schema in labware-json-schema
+export function createRegularLabware (props: RegularLabwareProps): Schema {
+  const ordering = determineOrdering(props.grid)
+  const definition: Schema = {
+    ordering,
+    otId: assignId(),
+    deprecated: false,
+    metadata: props.metadata,
+    cornerOffsetFromSlot: props.offset,
+    dimensions: props.dimensions,
+    parameters: props.parameters,
+    wells: calculateCoordinates(props.well, ordering, props.spacing),
   }
+
+  if (props.vendor) definition.vendor = props.vendor
+
   return definition
 }

@@ -14,7 +14,6 @@
     "flow-typed": "^2.5.1"
   },
   "dependencies": {
-    "round-to": "^3.0.0",
     "uuid": "3.3.2"
   }
 }

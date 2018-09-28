@@ -9,10 +9,10 @@
 
   "type": "object",
   "additionalProperties": false,
-  "required": ["otId", "deprecated", "metadata","parameters", "ordering", "dimensions", "wells"],
+  "required": ["otId","deprecated","metadata","parameters","cornerOffsetFromSlot","ordering","dimensions","wells"],
   "properties": {
     "otId": {
-      "type": "number"
+      "type": "string"
     },
     "deprecated": {
       "type": "boolean"
@@ -52,7 +52,7 @@
     "parameters": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["format", "isTiprack", "wellShape"],
+      "required": ["format", "isTiprack"],
       "properties": {
         "format": {
           "type": "string"
@@ -62,10 +62,6 @@
         },
         "tipLength": {
           "$ref": "#/definitions/positiveNumber"
-        },
-        "wellShape": {
-          "type": "string",
-          "enum": ["rectangular", "circular"]
         }
       }
 
@@ -80,10 +76,21 @@
         }
       }
     },
+    "cornerOffsetFromSlot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": {"type": "number"},
+        "y": {"type": "number"},
+        "z": {"type": "number"}
+      }
+
+    },
     "dimensions": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["overallWidth", "overallHeight", "overallLength", "offsetX", "offsetY", "offsetZ"],
+      "required": ["overallWidth", "overallHeight", "overallLength"],
       "properties": {
         "overallWidth": {
           "$ref": "#/definitions/positiveNumber"
@@ -93,15 +100,6 @@
         },
         "overallLength": {
           "$ref": "#/definitions/positiveNumber"
-        },
-        "offsetX": {
-          "$ref": "#/definitions/positiveNumber"
-        },
-        "offsetY": {
-          "$ref": "#/definitions/positiveNumber"
-        },
-        "offsetZ": {
-          "$ref": "#/definitions/positiveNumber"
         }
       }
 
@@ -109,10 +107,10 @@
     "wells": {
       "type": "object",
       "patternProperties": {
-        ".*": {
+        "['A' - 'Z'][*]": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["depth", "x", "y", "z"],
+          "required": ["depth", "x", "y", "z", "shape"],
           "oneOf": [
             {"required": ["width", "length"]},
             {"required": ["diameter"]}
@@ -129,7 +127,11 @@
             "totalLiquidVolume": {"$ref": "#/definitions/positiveNumber"},
             "width": {"$ref": "#/definitions/positiveNumber"},
             "length": {"$ref": "#/definitions/positiveNumber"},
-            "diameter": {"$ref": "#/definitions/positiveNumber"}
+            "diameter": {"$ref": "#/definitions/positiveNumber"},
+            "shape": {
+              "type": "string",
+              "enum": ["rectangular", "circular"]
+            }
 
           }
         }
