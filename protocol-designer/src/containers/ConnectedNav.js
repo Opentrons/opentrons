@@ -4,10 +4,9 @@ import type {ThunkDispatch, BaseState} from '../types'
 import {connect} from 'react-redux'
 
 import {KNOWLEDGEBASE_ROOT_URL} from '../components/KnowledgeBaseLink'
-import {NavButton, VerticalNavBar, OutsideLinkButton} from '@opentrons/components'
+import {NavTab, TabbedNavBar, OutsideLinkTab} from '@opentrons/components'
 import i18n from '../localization'
 import {type Page, actions, selectors} from '../navigation'
-import styles from './NavBar.css'
 
 type Props = {
   currentPage: Page,
@@ -16,32 +15,36 @@ type Props = {
 
 function Nav (props: Props) {
   return (
-    <VerticalNavBar className={styles.nav_bar}>
-      <div className={styles.top_buttons}>
-        <NavButton
-          iconName='ot-file'
-          title={i18n.t('nav.file')}
-          selected={props.currentPage === 'file-splash' || props.currentPage === 'file-detail'}
-          onClick={props.handleClick('file-detail')} />
-        <NavButton
-          iconName='ot-design'
-          title={i18n.t('nav.design')}
-          disabled={props.currentPage === 'file-splash'}
-          selected={props.currentPage === 'steplist' || props.currentPage === 'ingredient-detail'}
-          onClick={props.handleClick('steplist')} />
-      </div>
-      <div className={styles.bottom_buttons}>
-        <OutsideLinkButton
-          iconName='help-circle'
-          title={i18n.t('nav.help')}
-          to={KNOWLEDGEBASE_ROOT_URL} />
-        <NavButton
-          iconName='settings'
-          title={i18n.t('nav.settings')}
-          selected={props.currentPage === 'settings-privacy'}
-          onClick={props.handleClick('settings-privacy')} />
-      </div>
-    </VerticalNavBar>
+    <TabbedNavBar
+      topChildren={
+        <React.Fragment>
+          <NavTab
+            iconName='ot-file'
+            title={i18n.t('nav.file')}
+            selected={props.currentPage === 'file-splash' || props.currentPage === 'file-detail'}
+            onClick={props.handleClick('file-detail')} />
+          <NavTab
+            iconName='ot-design'
+            title={i18n.t('nav.design')}
+            disabled={props.currentPage === 'file-splash'}
+            selected={props.currentPage === 'steplist' || props.currentPage === 'ingredient-detail'}
+            onClick={props.handleClick('steplist')} />
+        </React.Fragment>
+      }
+      bottomChildren={
+        <React.Fragment>
+          <OutsideLinkTab
+            iconName='help-circle'
+            title={i18n.t('nav.help')}
+            to={KNOWLEDGEBASE_ROOT_URL} />
+          <NavTab
+            iconName='settings'
+            title={i18n.t('nav.settings')}
+            selected={props.currentPage === 'settings-privacy'}
+            onClick={props.handleClick('settings-privacy')} />
+        </React.Fragment>
+      }
+    />
   )
 }
 

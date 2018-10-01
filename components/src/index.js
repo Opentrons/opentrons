@@ -21,6 +21,7 @@ export * from './interaction-enhancers'
 export * from './lists'
 export * from './modals'
 export * from './nav'
+export * from './tabbedNav'
 export * from './structure'
 export * from './tooltips'
 
