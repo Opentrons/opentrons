@@ -10,7 +10,7 @@ import ConnectivityCard from './ConnectivityCard'
 import CalibrationCard from './CalibrationCard'
 import AdvancedSettingsCard from './AdvancedSettingsCard'
 import ConnectAlertModal from './ConnectAlertModal'
-import UpdateModal from './UpdateModal'
+import RobotUpdateModal from './RobotUpdateModal'
 import {CardContainer, CardRow, CardColumn} from '../layout'
 
 type Props = Robot
@@ -44,4 +44,4 @@ export default function RobotSettings (props: Props) {
   )
 }
 
-export {ConnectAlertModal, UpdateModal}
+export {ConnectAlertModal, RobotUpdateModal}

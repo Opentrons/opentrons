@@ -4,7 +4,9 @@ import remark from 'remark'
 import reactRenderer from 'remark-react'
 import styles from './styles.css'
 
-type Props = {source: ?string}
+type Props = {
+  source: ?string,
+}
 
 const renderer = remark().use(reactRenderer, {
   remarkReactComponents: {
