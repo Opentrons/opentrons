@@ -1,6 +1,5 @@
 // @flow
 import uuidv1 from 'uuid/v1'
-import {wellNameSplit} from '@opentrons/components'
 import type {BoundingRect, GenericRect} from '../collision-types'
 import type {Wells} from '../labware-ingred/types'
 
@@ -24,28 +23,6 @@ export const formConnectorFactory = (
 })
 
 export const uuid: () => string = uuidv1
-
-export const intToAlphabetLetter = (i: number, lowerCase: boolean = false) =>
-  String.fromCharCode((lowerCase ? 96 : 65) + i)
-
-// These utils are great candidates for unit tests
-export const toWellName = ({rowNum, colNum}: {rowNum: number, colNum: number}) => (
-  String.fromCharCode(colNum + 65) + (rowNum + 1)
-)
-
-export const wellKeyToXYList = (wellKey: string) => {
-  const [x, y] = wellKey.split(',').map(s => parseInt(s, 10))
-  return toWellName({rowNum: parseInt(y), colNum: x})
-}
-
-export const wellNameToXY = (wellName: string) => {
-  // Eg B9 => [1, 8]
-  const [letters, numbers] = wellNameSplit(wellName)
-
-  const letterNum = letters.toUpperCase().charCodeAt(0) - 65
-  const numberNum = parseInt(numbers, 10) - 1
-  return [letterNum, numberNum]
-}
 
 // Collision detection for SelectionRect / SelectablePlate
 

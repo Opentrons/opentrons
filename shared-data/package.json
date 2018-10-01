@@ -12,5 +12,8 @@
   "devDependencies": {
     "flow-bin": "^0.76.0",
     "flow-typed": "^2.5.1"
+  },
+  "dependencies": {
+    "uuid": "3.3.2"
   }
 }
