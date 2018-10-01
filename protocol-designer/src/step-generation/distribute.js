@@ -8,9 +8,9 @@ import {aspirate, dispense, blowout, replaceTip, touchTip} from './'
 import transfer from './transfer'
 import {mixUtil} from './mix'
 import * as errorCreators from './errorCreators'
-import type {DistributeFormData, RobotState, CommandCreator, TransferLikeFormDataFields, TransferFormData} from './'
+import type {DistributeFormData, RobotState, CommandCreator, CompoundCommandCreator, TransferLikeFormDataFields, TransferFormData} from './'
 
-const distribute = (data: DistributeFormData): Array<CommandCreator> => (prevRobotState: RobotState) => {
+const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRobotState: RobotState) => {
   /**
     Distribute will aspirate from a single source well into multiple destination wells.
 
@@ -33,9 +33,9 @@ const distribute = (data: DistributeFormData): Array<CommandCreator> => (prevRob
   const pipetteData = prevRobotState.instruments[data.pipette]
   if (!pipetteData) {
     // bail out before doing anything else
-    return {
+    return [(_robotState) => ({
       errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: data.pipette})],
-    }
+    })]
   }
 
   const {

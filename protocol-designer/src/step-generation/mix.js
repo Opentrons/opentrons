@@ -7,7 +7,7 @@ import replaceTip from './replaceTip'
 import touchTip from './touchTip'
 import {repeatArray} from './utils'
 import * as errorCreators from './errorCreators'
-import type {MixFormData, RobotState, CommandCreator} from './'
+import type {MixFormData, RobotState, CommandCreator, CompoundCommandCreator} from './'
 
 /** Helper fn to make mix command creators w/ minimal arguments */
 export function mixUtil (
@@ -25,7 +25,7 @@ export function mixUtil (
   ], times)
 }
 
-const mix = (data: MixFormData): Array<CommandCreator> => (prevRobotState: RobotState) => {
+const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: RobotState) => {
   /**
     Mix will aspirate and dispense a uniform volume some amount of times from a set of wells
     in a single labware.
@@ -52,15 +52,15 @@ const mix = (data: MixFormData): Array<CommandCreator> => (prevRobotState: Robot
   // Errors
   if (!prevRobotState.instruments[pipette]) {
     // bail out before doing anything else
-    return {
+    return [(_robotState) => ({
       errors: [errorCreators.pipetteDoesNotExist({actionName, pipette})],
-    }
+    })]
   }
 
   if (!prevRobotState.labware[labware]) {
-    return {
+    return [(_robotState) => ({
       errors: [errorCreators.labwareDoesNotExist({actionName, labware})],
-    }
+    })]
   }
 
   // Command generation

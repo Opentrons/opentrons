@@ -32,11 +32,7 @@ export type StepItemSourceDestRow = {
   source?: SourceDestData,
   dest?: SourceDestData,
   volume?: ?number,
-}
-
-export type StepItemSourceDestRowMulti = {
-  ...StepItemSourceDestRow,
-  channelId: number,
+  channelId?: number,
 }
 
 export type SourceDestSubstepItemSingleChannel = {|

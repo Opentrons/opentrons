@@ -2,10 +2,8 @@
 import cloneDeep from 'lodash/cloneDeep'
 import range from 'lodash/range'
 import mapValues from 'lodash/mapValues'
-import reduce from 'lodash/reduce'
 
-import type {Channels} from '@opentrons/components'
-import {getWellsForTips, substepTimeline, substepTimelineMulti} from '../step-generation/utils'
+import substepTimeline from './substepTimeline'
 import {
   utils as steplistUtils,
   type NamedIngred,
@@ -17,8 +15,6 @@ import type {
   SubstepItemData,
   SourceDestSubstepItem,
   StepItemSourceDestRow,
-  StepItemSourceDestRowMulti,
-  SourceDestSubstepItemSingleChannel,
 } from './types'
 
 import {
@@ -43,8 +39,6 @@ import type {
 } from '../step-generation/types'
 
 type AllPipetteData = {[pipetteId: string]: PipetteData}
-type SourceDestSubstepItemRows = $PropertyType<SourceDestSubstepItemSingleChannel, 'rows'>
-type SourceDestSubstepItemMultiRows = Array<Array<StepItemSourceDestRowMulti>>
 
 export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 type GetLabwareType = (labwareId: string) => ?string
@@ -126,13 +120,13 @@ function transferLikeSubsteps (args: {
 
   // Multichannel substeps
   if (pipette.channels > 1) {
-    const substepRows = substepTimelineMulti(
+    const substepRows: Array<StepItemSourceDestRow> = substepTimeline(
       substepCommandCreators,
       {channels: pipette.channels, getLabwareType},
     )(robotState)
-    const mergedMultiRows: SourceDestSubstepItemMultiRows = steplistUtils.mergeWhen(
+    const mergedMultiRows: Array<Array<StepItemSourceDestRow>> = steplistUtils.mergeWhen(
       substepRows,
-      (currentMultiRow, nextMultiRow) => {
+      (currentMultiRow: StepItemSourceDestRow, nextMultiRow: StepItemSourceDestRow) => {
         // aspirate then dispense multirows adjacent
         // (inferring from first channel row in each multirow)
         return currentMultiRow && currentMultiRow.source &&
@@ -186,7 +180,7 @@ function transferLikeSubsteps (args: {
   } else { // single channel
     const substepRows = substepTimeline(substepCommandCreators)(robotState)
 
-    const mergedRows: SourceDestSubstepItemRows = steplistUtils.mergeWhen(
+    const mergedRows: Array<StepItemSourceDestRow> = steplistUtils.mergeWhen(
       substepRows,
       (currentRow, nextRow) =>
         // NOTE: if aspirate then dispense rows are adjacent, collapse them into one row

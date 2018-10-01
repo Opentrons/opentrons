@@ -4,8 +4,8 @@
 export default function mergeWhen<T> (
   array: Array<T>,
   predicate: (current: T, next: T) => mixed,
-  merge: (current: T, next: T) => T
-): Array<T> {
+  merge: (current: T, next: T) => *
+): Array<*> {
   if (array.length <= 1) {
     return array
   }

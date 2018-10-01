@@ -7,12 +7,12 @@ import {PDListItem} from '../lists'
 import SubstepRow from './SubstepRow'
 import styles from './StepItem.css'
 
-import type {StepItemSourceDestRowMulti} from '../../steplist/types'
+import type {StepItemSourceDestRow} from '../../steplist/types'
 
 const DEFAULT_COLLAPSED_STATE = true
 
 type MultiChannelSubstepProps = {|
-  rowGroup: Array<StepItemSourceDestRowMulti>,
+  rowGroup: Array<StepItemSourceDestRow>,
   ingredNames: {[string]: string},
   highlighted?: boolean,
   onMouseEnter?: (e: SyntheticMouseEvent<*>) => mixed,
