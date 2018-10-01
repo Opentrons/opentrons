@@ -25,6 +25,7 @@ type StepItemProps = {
   selected?: boolean,
   hovered?: boolean,
   hoveredSubstep: ?SubstepIdentifier,
+  ingredNames: {[string]: string},
 
   getLabwareName: (labwareId: ?string) => ?string,
   handleSubstepHover: SubstepIdentifier => mixed,

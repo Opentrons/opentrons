@@ -17,6 +17,7 @@ export type StepSubItemProps = {|
 
 type SourceDestSubstepProps = {|
   ...StepSubItemProps,
+  ingredNames: {[string]: string},
   onSelectSubstep: SubstepIdentifier => mixed,
   hoveredSubstep: ?SubstepIdentifier,
 |}

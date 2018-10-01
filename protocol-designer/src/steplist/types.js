@@ -21,18 +21,18 @@ export type NamedIngred = {|
   name: string,
 |}
 
-export type SourceDestData = {|
-  well?: string,
-  preIngreds?: {[mixed]: number},
-  postIngreds?: {[mixed]: number},
-|}
+export type SourceDestData = {
+  well: string,
+  preIngreds: {[string]: {volume: number}},
+  postIngreds: {[string]: {volume: number}},
+}
 
-export type StepItemSourceDestRow = {|
+export type StepItemSourceDestRow = {
   substepIndex?: number,
   source?: SourceDestData,
   dest?: SourceDestData,
   volume?: ?number,
-|}
+}
 
 export type StepItemSourceDestRowMulti = {
   ...StepItemSourceDestRow,

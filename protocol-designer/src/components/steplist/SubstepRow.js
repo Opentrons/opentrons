@@ -1,41 +1,28 @@
 // @flow
 import * as React from 'react'
-import last from 'lodash/last'
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
 
-import {Icon, HoverTooltip, swatchColors} from '@opentrons/components'
+import {HoverTooltip, swatchColors} from '@opentrons/components'
+import type {SourceDestData} from '../../steplist/types'
 import IngredPill from './IngredPill'
 import {PDListItem} from '../lists'
 import styles from './StepItem.css'
 
-import type {NamedIngred} from '../../steplist/types'
-
 type SubstepRowProps = {|
   volume?: ?number | ?string,
-  /** if true, hide 'μL' on volume */
-  hideVolumeUnits?: boolean,
-
-  sourceWells?: ?string | ?Array<?string>,
-  destWells?: ?string | ?Array<?string>,
-
+  source?: SourceDestData,
+  dest?: SourceDestData,
+  ingredNames: {[string]: string},
   className?: string,
-
-  sourceIngredients?: Array<NamedIngred>,
-  destIngredients?: Array<NamedIngred>,
-
-  collapsible?: boolean,
-  collapsed?: boolean,
-  toggleCollapsed?: (e: SyntheticMouseEvent<*>) => mixed,
-
   onMouseEnter?: (e: SyntheticMouseEvent<*>) => mixed,
   onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed,
 |}
 
 const VOLUME_DIGITS = 1
 
-function formatVolume (inputVolume: ?string | ?number): ?string {
+function formatVolume (inputVolume: ?string | ?number): string {
   if (typeof inputVolume === 'number') {
     // don't add digits to numbers with nothing to the right of the decimal
     const digits = inputVolume.toString().split('.')[1]
@@ -44,14 +31,19 @@ function formatVolume (inputVolume: ?string | ?number): ?string {
     return inputVolume.toFixed(digits)
   }
 
-  return inputVolume
+  return inputVolume || ''
 }
 
 const formatPercentage = (part: number, total: number): string => {
   return `${Number((part / total) * 100).toFixed(1)}%`
 }
 
-const PillTooltipContents = (props) => {
+type PillTooltipContentsProps = {
+  ingreds: {[string]: {volume: number}},
+  ingredNames: {[string]: string},
+  well: string,
+}
+const PillTooltipContents = (props: PillTooltipContentsProps) => {
   const totalLiquidVolume = reduce(props.ingreds, (acc, ingred) => acc + ingred.volume, 0)
   const hasMultipleIngreds = Object.keys(props.ingreds).length > 1
   return (
@@ -88,8 +80,8 @@ const PillTooltipContents = (props) => {
 }
 
 export default function SubstepRow (props: SubstepRowProps) {
-  const compactedSourcePreIngreds = props.source && omitBy(props.source.preIngreds, ingred => ingred.volume < 1)
-  const compactedDestPreIngreds = props.dest && omitBy(props.dest.preIngreds, ingred => ingred.volume < 1)
+  const compactedSourcePreIngreds = props.source ? omitBy(props.source.preIngreds, ingred => ingred.volume < 1) : {}
+  const compactedDestPreIngreds = props.dest ? omitBy(props.dest.preIngreds, ingred => ingred.volume < 1) : {}
   return (
     <PDListItem
       border
@@ -99,7 +91,7 @@ export default function SubstepRow (props: SubstepRowProps) {
       <HoverTooltip
         tooltipComponent={(
           <PillTooltipContents
-            well={props.source && props.source.well}
+            well={props.source ? props.source.well : ''}
             ingredNames={props.ingredNames}
             ingreds={compactedSourcePreIngreds} />
         )}>
@@ -116,7 +108,7 @@ export default function SubstepRow (props: SubstepRowProps) {
       <HoverTooltip
         tooltipComponent={(
           <PillTooltipContents
-            well={props.dest && props.dest.well}
+            well={props.dest ? props.dest.well : ''}
             ingredNames={props.ingredNames}
             ingreds={compactedDestPreIngreds} />
         )}>

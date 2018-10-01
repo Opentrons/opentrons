@@ -27,6 +27,7 @@ type SP = {|
   hovered: $PropertyType<Props, 'hovered'>,
   hoveredSubstep: $PropertyType<Props, 'hoveredSubstep'>,
   getLabwareName: $PropertyType<Props, 'getLabwareName'>,
+  ingredNames: $PropertyType<Props, 'ingredNames'>,
 |}
 
 type DP = $Diff<$Diff<Props, SP>, OP>

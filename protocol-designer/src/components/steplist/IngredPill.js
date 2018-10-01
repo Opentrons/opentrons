@@ -4,8 +4,8 @@ import {Pill, swatchColors, MIXED_WELL_COLOR, type HoverTooltipHandlers} from '@
 import styles from './StepItem.css'
 
 type Props = {
-  ingreds: {[mixed]: number},
-  ingredNames: {[mixed]: string},
+  ingreds: {[string]: {volume: number}},
+  ingredNames: {[string]: string},
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
 }
 
