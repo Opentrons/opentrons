@@ -5,15 +5,15 @@ import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
 
 import {HoverTooltip, swatchColors} from '@opentrons/components'
-import type {SourceDestData} from '../../steplist/types'
+import type {SubstepWellData} from '../../steplist/types'
 import IngredPill from './IngredPill'
 import {PDListItem} from '../lists'
 import styles from './StepItem.css'
 
 type SubstepRowProps = {|
   volume?: ?number | ?string,
-  source?: SourceDestData,
-  dest?: SourceDestData,
+  source?: SubstepWellData,
+  dest?: SubstepWellData,
   ingredNames: {[string]: string},
   className?: string,
   onMouseEnter?: (e: SyntheticMouseEvent<*>) => mixed,

@@ -22,6 +22,20 @@ export type NamedIngred = {|
 |}
 
 export type SourceDestData = {
+  wells: Array<string>,
+  preIngreds: {[string]: {volume: number}},
+  postIngreds: {[string]: {volume: number}},
+}
+
+export type SubstepTimelineFrame = {
+  substepIndex?: number,
+  source?: SourceDestData,
+  dest?: SourceDestData,
+  volume?: ?number,
+  channelId?: number,
+}
+
+export type SubstepWellData = {
   well: string,
   preIngreds: {[string]: {volume: number}},
   postIngreds: {[string]: {volume: number}},
@@ -29,8 +43,8 @@ export type SourceDestData = {
 
 export type StepItemSourceDestRow = {
   substepIndex?: number,
-  source?: SourceDestData,
-  dest?: SourceDestData,
+  source?: SubstepWellData,
+  dest?: SubstepWellData,
   volume?: ?number,
   channelId?: number,
 }
@@ -39,10 +53,7 @@ export type SourceDestSubstepItemSingleChannel = {|
   multichannel: false,
   stepType: TransferLikeStepType | 'mix',
   parentStepId: StepIdType,
-  rows: Array<{|
-    ...StepItemSourceDestRow,
-    volume?: number,
-  |}>,
+  rows: Array<StepItemSourceDestRow>,
 |}
 
 export type SourceDestSubstepItemMultiChannel = {|
@@ -50,7 +61,7 @@ export type SourceDestSubstepItemMultiChannel = {|
   stepType: TransferLikeStepType | 'mix',
   parentStepId: StepIdType,
   volume?: ?number, // uniform volume for all steps
-  multiRows: Array<Array<StepItemSourceDestRowMulti>>, // Array of arrays.
+  multiRows: Array<Array<StepItemSourceDestRow>>, // Array of arrays.
   // NOTE: "Row" means a tabular row on the steplist, NOT a "row" of wells on the deck
 |}
 

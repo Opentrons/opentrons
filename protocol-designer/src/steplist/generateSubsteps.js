@@ -14,6 +14,7 @@ import { type ValidFormAndErrors } from './formLevel/stepFormToArgs'
 import type {
   SubstepItemData,
   SourceDestSubstepItem,
+  SubstepTimelineFrame,
   StepItemSourceDestRow,
 } from './types'
 
@@ -120,13 +121,13 @@ function transferLikeSubsteps (args: {
 
   // Multichannel substeps
   if (pipette.channels > 1) {
-    const substepRows: Array<StepItemSourceDestRow> = substepTimeline(
+    const substepRows: Array<SubstepTimelineFrame> = substepTimeline(
       substepCommandCreators,
       {channels: pipette.channels, getLabwareType},
     )(robotState)
     const mergedMultiRows: Array<Array<StepItemSourceDestRow>> = steplistUtils.mergeWhen(
       substepRows,
-      (currentMultiRow: StepItemSourceDestRow, nextMultiRow: StepItemSourceDestRow) => {
+      (currentMultiRow: SubstepTimelineFrame, nextMultiRow: SubstepTimelineFrame) => {
         // aspirate then dispense multirows adjacent
         // (inferring from first channel row in each multirow)
         return currentMultiRow && currentMultiRow.source &&
@@ -135,14 +136,14 @@ function transferLikeSubsteps (args: {
       // Merge each channel row together when predicate true
       (currentMultiRow, nextMultiRow) => {
         return range(pipette.channels).map(channelIndex => {
-          const sourceChannelWell = currentMultiRow.source.wells[channelIndex]
-          const destChannelWell = nextMultiRow.dest.wells[channelIndex]
-          const source = {
+          const sourceChannelWell = currentMultiRow.source && currentMultiRow.source.wells[channelIndex]
+          const destChannelWell = nextMultiRow.dest && nextMultiRow.dest.wells[channelIndex]
+          const source = currentMultiRow.source && sourceChannelWell && {
             well: sourceChannelWell,
             preIngreds: currentMultiRow.source.preIngreds[sourceChannelWell],
             postIngreds: currentMultiRow.source.postIngreds[sourceChannelWell],
           }
-          const dest = {
+          const dest = nextMultiRow.dest && destChannelWell && {
             well: destChannelWell,
             preIngreds: nextMultiRow.dest.preIngreds[destChannelWell],
             postIngreds: nextMultiRow.dest.postIngreds[destChannelWell],
@@ -153,29 +154,28 @@ function transferLikeSubsteps (args: {
             volume: showDispenseVol ? nextMultiRow.volume : currentMultiRow.volume,
           }
         })
-      }
+      },
+      (currentMultiRow) => (
+        range(pipette.channels).map(channelIndex => {
+          const source = currentMultiRow.source && {
+            well: currentMultiRow.source.wells[channelIndex],
+            preIngreds: currentMultiRow.source.preIngreds[currentMultiRow.source.wells[channelIndex]],
+            postIngreds: currentMultiRow.source.postIngreds[currentMultiRow.source.wells[channelIndex]],
+          }
+          const dest = currentMultiRow.dest && {
+            well: currentMultiRow.dest.wells[channelIndex],
+            preIngreds: currentMultiRow.dest.preIngreds[currentMultiRow.dest.wells[channelIndex]],
+            postIngreds: currentMultiRow.dest.postIngreds[currentMultiRow.dest.wells[channelIndex]],
+          }
+          return { source, dest, volume: currentMultiRow.volume }
+        })
+      )
     )
-    const allMultiRows = mergedMultiRows.map((multiRow) => {
-      if (Array.isArray(multiRow)) return multiRow
-      return range(pipette.channels).map(channelIndex => {
-        const source = multiRow.source && {
-          well: multiRow.source.wells[channelIndex],
-          preIngreds: multiRow.source.preIngreds[multiRow.source.wells[channelIndex]],
-          postIngreds: multiRow.source.postIngreds[multiRow.source.wells[channelIndex]],
-        }
-        const dest = multiRow.dest && {
-          well: multiRow.dest.wells[channelIndex],
-          preIngreds: multiRow.dest.preIngreds[multiRow.dest.wells[channelIndex]],
-          postIngreds: multiRow.dest.postIngreds[multiRow.dest.wells[channelIndex]],
-        }
-        return { source, dest, volume: multiRow.volume }
-      })
-    })
     return {
       multichannel: true,
       stepType: validatedForm.stepType,
       parentStepId: stepId,
-      multiRows: allMultiRows,
+      multiRows: mergedMultiRows,
     }
   } else { // single channel
     const substepRows = substepTimeline(substepCommandCreators)(robotState)
@@ -186,12 +186,35 @@ function transferLikeSubsteps (args: {
         // NOTE: if aspirate then dispense rows are adjacent, collapse them into one row
         currentRow.source && nextRow.dest,
       (currentRow, nextRow) => ({
-        ...nextRow,
         ...currentRow,
+        source: {
+          well: currentRow.source && currentRow.source.wells[0],
+          preIngreds: currentRow.source && currentRow.source.preIngreds,
+          postIngreds: currentRow.source && currentRow.source.postIngreds,
+        },
+        ...nextRow,
+        dest: {
+          well: nextRow.dest && nextRow.dest.wells[0],
+          preIngreds: nextRow.dest && nextRow.dest.preIngreds,
+          postIngreds: nextRow.dest && nextRow.dest.postIngreds,
+        },
         volume: showDispenseVol
           ? nextRow.volume
           : currentRow.volume,
-      })
+      }),
+      (currentRow) => {
+        const source = currentRow.source && {
+          well: currentRow.source.wells[0],
+          preIngreds: currentRow.source.preIngreds[currentRow.source.wells[0]],
+          postIngreds: currentRow.source.postIngreds[currentRow.source.wells[0]],
+        }
+        const dest = currentRow.dest && {
+          well: currentRow.dest.wells[0],
+          preIngreds: currentRow.dest.preIngreds[currentRow.dest.wells[0]],
+          postIngreds: currentRow.dest.postIngreds[currentRow.dest.wells[0]],
+        }
+        return {source, dest, volume: currentRow.volume}
+      }
     )
 
     return {
