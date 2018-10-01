@@ -25,7 +25,7 @@ export function mixUtil (
   ], times)
 }
 
-const mix = (data: MixFormData): CommandCreator => (prevRobotState: RobotState) => {
+const mix = (data: MixFormData): Array<CommandCreator> => (prevRobotState: RobotState) => {
   /**
     Mix will aspirate and dispense a uniform volume some amount of times from a set of wells
     in a single labware.

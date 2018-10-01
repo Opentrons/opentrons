@@ -7,7 +7,7 @@ import {mixUtil} from './mix'
 import * as errorCreators from './errorCreators'
 import type {ConsolidateFormData, RobotState, CommandCreator} from './'
 
-const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotState: RobotState) => {
+const consolidate = (data: ConsolidateFormData): Array<CommandCreator> => (prevRobotState: RobotState) => {
   /**
     Consolidate will aspirate several times in sequence from multiple source wells,
     then dispense into a single destination.

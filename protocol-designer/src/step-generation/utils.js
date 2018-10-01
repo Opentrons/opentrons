@@ -41,7 +41,6 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
             warnings: prev.warnings,
           }
         }
-        console.table({prev, next})
         return {
           robotState: next.robotState,
           commands: [...prev.commands, ...next.commands],

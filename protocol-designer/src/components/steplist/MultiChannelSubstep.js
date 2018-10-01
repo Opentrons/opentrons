@@ -64,9 +64,9 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
           border
           className={cx(styles.step_subitem, {[styles.clear_border]: highlighted})}>
           <span className={styles.multi_substep_header}>multi</span>
-          <span className={styles.emphasized_cell}>{sourceWellRange}</span>
+          <span className={styles.emphasized_cell}>{firstChannelSource ? sourceWellRange : ''}</span>
           <span className={styles.volume_cell}>{`${formatVolume(rowGroup[0].volume)} μL`}</span>
-          <span className={styles.emphasized_cell}>{destWellRange}</span>
+          <span className={styles.emphasized_cell}>{firstChannelDest ? destWellRange : ''}</span>
           <span className={styles.inner_carat} onClick={this.handleToggleCollapsed}>
             <Icon name={collapsed ? 'chevron-down' : 'chevron-up'} />
           </span>

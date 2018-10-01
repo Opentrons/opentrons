@@ -10,7 +10,7 @@ import {mixUtil} from './mix'
 import * as errorCreators from './errorCreators'
 import type {DistributeFormData, RobotState, CommandCreator, TransferLikeFormDataFields, TransferFormData} from './'
 
-const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState: RobotState) => {
+const distribute = (data: DistributeFormData): Array<CommandCreator> => (prevRobotState: RobotState) => {
   /**
     Distribute will aspirate from a single source well into multiple destination wells.
 

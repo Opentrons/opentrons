@@ -160,6 +160,7 @@ export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>
             _allSubsteps[_hoveredSubstep.stepId],
             _hoveredSubstep.substepIndex
           )
+          console.log('substep Selections ', selectedWells)
         } else {
           // wells for step overall
           selectedWells = _getSelectedWellsForStep(form, labwareId, robotState)

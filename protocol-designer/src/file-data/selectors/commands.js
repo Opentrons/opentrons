@@ -133,6 +133,8 @@ function commandCreatorsFromFormData (validatedForm: StepGeneration.CommandCreat
   return null
 }
 
+const SUBSTEP_STEP_TYPES = ['transfer', 'consolidate', 'mix', 'distribute']
+
 // exposes errors and last valid robotState
 export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelector(
   steplistSelectors.validatedForms,
@@ -153,9 +155,9 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
     const commandCreators = continuousValidForms.reduce(
       (acc: Array<StepGeneration.CommandCreator>, formData, formIndex) => {
         const {stepType} = formData
-        let stepCommandCreator = commandCreatorsFromFormData(formData)
-        if (['transfer', 'consolidate', 'mix', 'distribute'].includes(stepType)) {
-          const commandCreators = stepCommandCreator(initialRobotState)
+        let stepCommandCreator: StepGeneration.CommandCreator | Array<StepGeneration.CommandCreator> = commandCreatorsFromFormData(formData)
+        if (SUBSTEP_STEP_TYPES.includes(stepType)) {
+          const commandCreators = stepCommandCreator ? stepCommandCreator(initialRobotState) : []
           stepCommandCreator = StepGeneration.reduceCommandCreators(commandCreators)
         }
         if (!stepCommandCreator) {

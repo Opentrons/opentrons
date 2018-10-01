@@ -9,7 +9,7 @@ import touchTip from './touchTip'
 import * as errorCreators from './errorCreators'
 import type {TransferFormData, RobotState, CommandCreator} from './'
 
-const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: RobotState) => {
+const transfer = (data: TransferFormData): Array<CommandCreator> => (prevRobotState: RobotState) => {
   /**
     Transfer will iterate through a set of 1 or more source and destination wells.
     For each pair, it will aspirate from the source well, then dispense into the destination well.
