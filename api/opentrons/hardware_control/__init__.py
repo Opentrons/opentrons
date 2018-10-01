@@ -83,6 +83,9 @@ class API:
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: dict = None
 
+        self._attached_instruments = {types.Mount.LEFT: None,
+                                      types.Mount.RIGHT: None}
+
     @classmethod
     def build_hardware_controller(
             cls, config: dict = None,
@@ -101,14 +104,16 @@ class API:
 
     @classmethod
     def build_hardware_simulator(
-            cls, config: dict = None,
+            cls,
+            attached_instruments,
+            config: dict = None,
             loop: asyncio.AbstractEventLoop = None) -> 'API':
         """ Build a simulating hardware controller.
 
         This method may be used both on a real robot and on dev machines.
         Multiple simulating hardware controllers may be active at one time.
         """
-        return cls(simulator.Simulator(config, loop),
+        return cls(simulator.Simulator(attached_instruments, config, loop),
                    config=config, loop=loop)
 
     # Query API
@@ -141,7 +146,10 @@ class API:
 
     @_log_call
     async def cache_instrument_models(self):
-        pass
+        self._log.info("Updating instrument model cache")
+        for mount in types.Mount:
+            self._attached_instruments[mount] = \
+                self._backend.get_attached_instruments(mount)
 
     @_log_call
     async def update_smoothie_firmware(self, firmware_file):
@@ -203,7 +211,7 @@ class API:
         try:
             self._backend.move(target_position)
         except Exception:
-            mod_log.exception('Move failed')
+            self._log.exception('Move failed')
             self._current_position.clear()
             raise
 
