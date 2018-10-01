@@ -1,6 +1,6 @@
 from numpy import array, isclose
-from opentrons.instruments import Pipette
-from opentrons.robot.mover import Mover
+from opentrons.legacy_api.instruments import Pipette
+from opentrons.legacy_api.robot.mover import Mover
 from opentrons.trackers.pose_tracker import (
     change_base, init, ROOT
 )

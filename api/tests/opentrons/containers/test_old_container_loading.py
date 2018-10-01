@@ -5,7 +5,7 @@ import shutil
 import unittest
 
 from opentrons.data_storage import old_container_loading
-from opentrons.containers.placeable import Container, Well
+from opentrons.legacy_api.containers.placeable import Container, Well
 from opentrons.util import environment
 from opentrons.config import feature_flags as ff
 # TODO: Remove

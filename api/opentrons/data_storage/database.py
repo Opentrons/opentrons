@@ -2,7 +2,8 @@
 import sqlite3
 # import warnings
 from typing import List
-from opentrons.containers.placeable import Container, Well, Module
+from opentrons.legacy_api.containers.placeable\
+    import Container, Well, Module
 from opentrons.data_storage import database_queries as db_queries
 from opentrons.util import environment
 from opentrons.util.vector import Vector

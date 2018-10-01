@@ -1,7 +1,7 @@
 import pytest
 
-from opentrons.containers import load as containers_load
-from opentrons.containers.placeable import Well, Container
+from opentrons.legacy_api.containers import load as containers_load
+from opentrons.legacy_api.containers.placeable import Well, Container
 from opentrons.data_storage import database
 from opentrons.util.vector import Vector
 from opentrons import robot

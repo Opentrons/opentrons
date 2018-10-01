@@ -6,7 +6,7 @@ import tempfile
 
 from opentrons.server import init
 from opentrons.data_storage import database as db
-from opentrons.robot import robot_configs as rc
+from opentrons.legacy_api.robot import robot_configs as rc
 
 
 def validate_response_body(body):

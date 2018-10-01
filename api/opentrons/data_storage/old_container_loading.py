@@ -11,7 +11,7 @@ import numbers
 import os
 import pkg_resources
 from collections import OrderedDict
-from opentrons.containers.placeable import Container, Well
+from opentrons.legacy_api.containers.placeable import Container, Well
 from opentrons.util import environment
 from opentrons.util.vector import Vector
 

@@ -1,5 +1,5 @@
 from math import pi
-from opentrons.containers.placeable import Deck, Slot
+from opentrons.legacy_api.containers.placeable import Deck, Slot
 from opentrons.config import feature_flags as ff
 
 from tests.opentrons import generate_plate

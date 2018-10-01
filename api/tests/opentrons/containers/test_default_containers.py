@@ -1,4 +1,4 @@
-from opentrons.containers import load as containers_load
+from opentrons.legacy_api.containers import load as containers_load
 from opentrons import instruments, robot
 from opentrons.trackers import pose_tracker
 from numpy import isclose

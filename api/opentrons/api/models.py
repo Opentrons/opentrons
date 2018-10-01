@@ -1,4 +1,4 @@
-from opentrons.containers import Slot
+from opentrons.legacy_api.containers import Slot
 
 
 def _get_parent_slot(placeable):

@@ -1,8 +1,8 @@
-from opentrons.instruments.pipette import Pipette
+from .pipette import Pipette
 
 
 __all__ = [
-    Pipette
+    'Pipette'
 ]
 
 

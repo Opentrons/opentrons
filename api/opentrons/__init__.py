@@ -1,9 +1,6 @@
 import os
 import sys
 import json
-from opentrons.robot.robot import Robot
-from opentrons.instruments import pipette_config
-from opentrons import instruments as inst, containers as cnt
 from opentrons.data_storage import database_migration
 from opentrons.config import feature_flags as ff
 
@@ -26,9 +23,17 @@ if not ff.split_labware_definitions():
     database_migration.check_version_and_perform_necessary_migrations()
 
 if ff.use_protocol_api_v2():
-    from protocol_api.back_compat import *
+    import protocol_api
+    from protocol_api.back_compat\
+        import robot, reset as bcreset, instruments, containers, labware
+
+    def reset():
+        ctx = protocol_api.ProtocolContext()
+        bcreset(ctx)
+
 else:
-    from old_api import *
+    from .legacy_api.api import robot, reset, instruments, containers, labware
 
 
-__all__ = [containers, instruments, labware, robot, reset, __version__]
+__all__ = ['containers', 'instruments', 'labware', 'robot', 'reset',
+           '__version__']

@@ -2,14 +2,15 @@
 
 This package defines classes and functions for access through a protocol to
 control the OT2.
-"""
 
+"""
 import enum
 import os
-from typing import Callable, List, Dict
+from typing import List, Dict
 
 from opentrons.protocol_api.labware import Well, Labware, load
 from . import back_compat
+
 
 def run(protocol_bytes: bytes = None,
         protocol_json: str = None,
@@ -30,9 +31,14 @@ def run(protocol_bytes: bytes = None,
         if not os.environ.get('RUNNING_ON_PI'):
             simulate = True # noqa - will be used later
         if None is context and simulate:
-            context = ProtocolContext()
+            true_context = ProtocolContext()
+        elif context:
+            true_context = context
+        else:
+            raise RuntimeError(
+                'Will not automatically generate hardware controller')
         if protocol_bytes:
-            back_compat.run(protocol_bytes, context)
+            back_compat.run(protocol_bytes, true_context)
         elif protocol_json:
             pass
 
@@ -50,7 +56,7 @@ class ProtocolContext:
 
     def load_labware(
             self, labware_obj: Labware, location: str,
-            label: str=None, share: bool = False):
+            label: str = None, share: bool = False):
         """ Specify the presence of a piece of labware on the OT2 deck.
 
         This function loads the labware specified by ``labware``

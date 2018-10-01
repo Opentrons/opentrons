@@ -6,8 +6,8 @@ import logging
 import time
 
 from opentrons import commands
-from opentrons.containers import unpack_location
-from opentrons.containers.placeable import (
+from ..containers import unpack_location
+from ..containers.placeable import (
     Container, Placeable, WellSeries
 )
 from opentrons.helpers import helpers

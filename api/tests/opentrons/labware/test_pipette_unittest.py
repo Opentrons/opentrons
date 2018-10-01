@@ -3,10 +3,10 @@
 
 import unittest
 from unittest import mock
-from opentrons.robot.robot import Robot
-from opentrons.containers import load as containers_load
-from opentrons.instruments import Pipette
-from opentrons.containers.placeable import unpack_location
+from opentrons.legacy_api.robot import Robot
+from opentrons.legacy_api.containers import load as containers_load
+from opentrons.legacy_api.instruments import Pipette
+from opentrons.legacy_api.containers.placeable import unpack_location
 from opentrons.trackers import pose_tracker
 from tests.opentrons.conftest import fuzzy_assert
 from tests.opentrons import generate_plate

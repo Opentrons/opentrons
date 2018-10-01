@@ -1,3 +1,3 @@
-from opentrons.robot.robot import Robot
+from .robot import Robot
 
-__all__ = [Robot]
+__all__ = ['Robot']

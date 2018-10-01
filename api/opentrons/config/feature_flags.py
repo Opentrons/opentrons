@@ -22,5 +22,6 @@ def dots_deck_type():
 def disable_home_on_boot():
     return advs.get_adv_setting('disableHomeOnBoot')
 
+
 def use_protocol_api_v2():
     return advs.get_adv_setting('useProtocolApi2')

@@ -2,7 +2,7 @@
 """
 import argparse
 import opentrons.protocol_api as protocol_api
-import opentrons.hardware_control as hardware_control
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)

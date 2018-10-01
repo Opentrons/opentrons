@@ -1,8 +1,8 @@
 from aiohttp import web
 from uuid import uuid1
-from opentrons.instruments import pipette_config
+from opentrons.legacy_api.instruments import pipette_config
 from opentrons import instruments, robot
-from opentrons.robot import robot_configs
+from opentrons.legacy_api.robot import robot_configs
 from opentrons.deck_calibration import jog, position, dots_set, z_pos
 from opentrons.deck_calibration.linal import add_z, solve
 from typing import Dict, Tuple

@@ -1,4 +1,4 @@
-from ..trackers.pose_tracker import Point, change_base, update, ROOT
+from opentrons.trackers.pose_tracker import Point, change_base, update, ROOT
 
 
 class Mover:
