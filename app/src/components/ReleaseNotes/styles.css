@@ -42,10 +42,6 @@
 
   & code {
     font-family: monospace;
-    color: var(--c-font-light);
-  }
-
-  & li > code {
     color: var(--c-font-dark);
   }
 
@@ -53,6 +49,10 @@
     margin: 0.5rem 0;
     padding: 0.5rem 0.75rem;
     background-color: var(--c-font-dark);
+
+    & code {
+      color: var(--c-font-light);
+    }
   }
 
   & p {

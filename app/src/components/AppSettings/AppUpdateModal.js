@@ -3,7 +3,6 @@
 import * as React from 'react'
 
 import {Icon, type ButtonProps} from '@opentrons/components'
-// import {Portal} from '../portal'
 import {UpdateModal} from '../modals'
 import ReleaseNotes from '../ReleaseNotes'
 

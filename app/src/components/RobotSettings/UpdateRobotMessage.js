@@ -4,7 +4,7 @@ import styles from './styles.css'
 
 type Props = {message: React.Node}
 
-export default function UpdateAppMessage (props: Props) {
+export default function UpdateRobotMessage (props: Props) {
   return (
     <p className={styles.update_message}>
       {props.message}
