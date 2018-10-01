@@ -50,6 +50,11 @@ settings = [
         old_id='disable-home-on-boot',
         title='Disable home on boot',
         description='Prevent robot from homing motors on boot'
+    ),
+    Setting(
+        _id='useProtocolApi2',
+        title='Use Protocol API version 2',
+        description='Use new implementation of protocol API. This should not be activated except by developers.' # noqa
     )
 ]
 
