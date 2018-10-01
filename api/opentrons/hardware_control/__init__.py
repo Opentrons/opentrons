@@ -14,14 +14,14 @@ import asyncio
 import functools
 import logging
 import enum
-from typing import Dict
+from typing import Dict, Union
 from opentrons import types
-from . import simulator
+from .simulator import Simulator
 try:
-    from . import controller
+    from .controller import Controller
 except ModuleNotFoundError:
     # implies windows
-    controller = None  # type: ignore
+    Controller = None  # type: ignore
 
 
 mod_log = logging.getLogger(__name__)
@@ -51,6 +51,9 @@ class MustHomeError(RuntimeError):
     pass
 
 
+_Backend = Union[Controller, Simulator]
+
+
 class API:
     """ This API is the primary interface to the hardware controller.
 
@@ -65,7 +68,7 @@ class API:
     CLS_LOG = mod_log.getChild('API')
 
     def __init__(self,
-                 backend: object,
+                 backend: _Backend,
                  config: dict = None,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         """ Initialize an API instance.
@@ -81,7 +84,7 @@ class API:
         else:
             self._loop = loop
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
-        self._current_position: dict = None
+        self._current_position: Dict[str, float] = {}
 
         self._attached_instruments = {types.Mount.LEFT: None,
                                       types.Mount.RIGHT: None}
@@ -96,10 +99,10 @@ class API:
         real robot only one true hardware controller may be active at one
         time.
         """
-        if None is controller:
+        if None is Controller:
             raise RuntimeError(
                 'The hardware controller may only be instantiated on a robot')
-        return cls(controller.Controller(config, loop),
+        return cls(Controller(config, loop),
                    config=config, loop=loop)
 
     @classmethod
@@ -113,7 +116,7 @@ class API:
         This method may be used both on a real robot and on dev machines.
         Multiple simulating hardware controllers may be active at one time.
         """
-        return cls(simulator.Simulator(attached_instruments, config, loop),
+        return cls(Simulator(attached_instruments, config, loop),
                    config=config, loop=loop)
 
     # Query API
@@ -180,7 +183,7 @@ class API:
 
     @_log_call
     async def move_to(
-            self, mount: types.Mount, abs_position: types.Point = None):
+            self, mount: types.Mount, abs_position: types.Point):
         if not self._current_position:
             raise MustHomeError
         z_axis = _Axis.by_mount(mount)
@@ -193,7 +196,7 @@ class API:
         await self._move(target_position)
 
     @_log_call
-    async def move_rel(self, mount: types.Mount, delta: types.Point = None):
+    async def move_rel(self, mount: types.Mount, delta: types.Point):
         if not self._current_position:
             raise MustHomeError
         z_axis = _Axis.by_mount(mount)

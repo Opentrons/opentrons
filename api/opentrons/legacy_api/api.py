@@ -1,7 +1,8 @@
 from . import robot, instruments as inst, containers as cnt
 from .instruments import pipette_config
 
-robot = robot.Robot()  # typing: ignore This is why we’re moving away from it
+# Ignore the type here because well, this is exactly why this is the legacy_api
+robot = robot.Robot()  # type: ignore
 
 
 def reset():

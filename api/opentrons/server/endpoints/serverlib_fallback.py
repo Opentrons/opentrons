@@ -7,6 +7,7 @@ import logging
 from time import sleep
 from aiohttp import web
 from threading import Thread
+from typing import Dict, Any
 
 log = logging.getLogger(__name__)
 ignore_file = 'ignore.json'
@@ -162,7 +163,7 @@ async def update_api(request: web.Request) -> web.Response:
             res2 = await install_smoothie_firmware(
                 data['fw'], request.loop)
             reslist.append(res2)
-        res = {
+        res: Dict[str, Any] = {
             'message': [r['message'] for r in reslist],
             'filename': [r['filename'] for r in reslist]
         }

@@ -33,7 +33,7 @@ def json_to_labware(json_defn: dict) -> Container:
     container = Container()
     container._coordinates = Vector(0, 0, 0)
 
-    wells = container_data.get('wells')
+    wells = container_data['wells']
     for well_name, json_well in wells.items():
         well, coordinates = _json_to_well(json_well)
         container.add(well, well_name, coordinates)

@@ -76,7 +76,7 @@ class ProtocolContext:
         This function returns the created and initialized labware for use
         later in the protocol.
         """
-        labware = load(labware_name)
+        labware = load(labware_name, location)
         self.load_labware(labware, location)
         return labware
 

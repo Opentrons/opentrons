@@ -11,12 +11,13 @@ import numbers
 import os
 import pkg_resources
 from collections import OrderedDict
+from typing import Dict, Any, List
 from opentrons.legacy_api.containers.placeable import Container, Well
 from opentrons.util import environment
 from opentrons.util.vector import Vector
 
-persisted_containers_dict = {}
-containers_file_list = []
+persisted_containers_dict: Dict[str, Any] = {}
+containers_file_list: List[str] = []
 
 containers_dir_path = pkg_resources.resource_filename(
     'opentrons.config',
@@ -174,7 +175,7 @@ def create_container_obj_from_dict(container_data: dict) -> Container:
     origin_offset_z = container_data.get('origin-offset', {}).get('z') or 0
 
     container = Container()
-    locations = container_data.get('locations')
+    locations = container_data['locations']
     container._coordinates = Vector(
         origin_offset_x,
         origin_offset_y,

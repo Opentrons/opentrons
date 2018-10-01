@@ -12,7 +12,7 @@ async def test_cache_instruments(loop):
     assert hw_api._attached_instruments == dummy_instruments_attached
 
 
-@pytest.mark.skipif(not hc.controller,
+@pytest.mark.skipif(not hc.Controller,
                     reason='hardware controller not available '
                            '(probably windows)')
 async def test_cache_instruments_hc(monkeypatch, hardware_controller_lockfile,

@@ -142,7 +142,8 @@ def _parse_distance_response(distance_string) -> float:
         raise ParseError(err_msg)
     if 'Z' not in distance_string and 'height' not in distance_string:
         raise ParseError(err_msg)
-    return _parse_number_from_substring(distance_string.strip())
+    return _parse_number_from_substring(  # type: ignore
+        distance_string.strip())          # (preconditions checked above)
 
 
 class MagDeck:
