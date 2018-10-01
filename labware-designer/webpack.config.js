@@ -3,6 +3,7 @@
 const path = require('path')
 const webpack = require('webpack')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const {rules} = require('@opentrons/webpack-config')
 
@@ -22,6 +23,7 @@ module.exports = {
     rules: [
       rules.js,
       rules.localCss,
+      rules.handlebars,
     ],
   },
 
@@ -36,6 +38,10 @@ module.exports = {
       filename: 'bundle.css',
       disable: DEV,
       ignoreOrder: true,
+    }),
+    new HtmlWebpackPlugin({
+      title: 'Opentrons Labware Designer',
+      template: './src/index.hbs',
     }),
   ],
 }
