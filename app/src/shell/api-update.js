@@ -1,6 +1,4 @@
 // @flow
-import {remote} from 'electron'
-
 import type {State} from '../types'
 
 export type ApiUpdateInfo = {
@@ -8,7 +6,9 @@ export type ApiUpdateInfo = {
   version: string,
 }
 
-const {getUpdateInfo, getUpdateFileContents} = remote.require('./api-update')
+const {
+  apiUpdate: {getUpdateInfo, getUpdateFileContents},
+} = global.APP_SHELL
 
 export function apiUpdateReducer (state: ?ApiUpdateInfo) {
   if (!state) return getUpdateInfo()

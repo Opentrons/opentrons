@@ -1,6 +1,6 @@
 {
   "appId": "com.opentrons.app",
-  "electronVersion": "1.8.3",
+  "electronVersion": "3.0.2",
   "files": [
     "**/*",
     {

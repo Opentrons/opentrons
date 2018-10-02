@@ -23,9 +23,7 @@ const OUTPUT_PATH = path.join(__dirname, 'dist')
 const JS_OUTPUT_NAME = 'bundle.js'
 const CSS_OUTPUT_NAME = 'style.css'
 
-const entry = [
-  JS_BUNDLE_ENTRY,
-]
+const entry = [JS_BUNDLE_ENTRY]
 
 const output = {
   path: OUTPUT_PATH,
@@ -42,13 +40,13 @@ const rules = [
   namedRules.images,
 ]
 
-const target = 'electron-renderer'
+const target = 'web'
 
 const plugins = [
   new webpack.EnvironmentPlugin(
-    Object.keys(process.env).filter(v => v.startsWith('OT_APP')).concat([
-      'NODE_ENV',
-    ])
+    Object.keys(process.env)
+      .filter(v => v.startsWith('OT_APP'))
+      .concat(['NODE_ENV'])
   ),
 
   new ExtractTextPlugin({
@@ -108,5 +106,8 @@ module.exports = {
   devServer,
   node: {
     __filename: true,
+    // use userland events because webpack's is out of date
+    // https://github.com/webpack/node-libs-browser/issues/78
+    events: false,
   },
 }

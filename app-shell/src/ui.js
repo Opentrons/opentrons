@@ -20,13 +20,8 @@ const WINDOW_OPTS = {
   height: config.height,
   // allow webPreferences to be set at launchtime from config
   webPreferences: Object.assign({
-    // TODO(mc, 2018-05-15): turn off experimentalFeatures?
-    experimentalFeatures: true,
-
-    // TODO(mc, 2018-05-15): disable nodeIntegration in renderer thread
-    nodeIntegration: true,
-    // node integration needed for mdns robot discovery in webworker
-    nodeIntegrationInWorker: true,
+    preload: path.join(__dirname, './preload.js'),
+    nodeIntegration: false,
   }, config.webPreferences),
 }
 

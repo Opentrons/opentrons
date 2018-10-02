@@ -19,42 +19,6 @@
       "path": "cz-conventional-changelog"
     }
   },
-  "jest": {
-    "moduleNameMapper": {
-      "\\.(css)$": "identity-obj-proxy"
-    },
-    "transform": {
-      "^.+\\.js$": "babel-jest",
-      "\\.(jpg|png|gif|svg|woff|woff2)$": "@opentrons/components/src/__mocks__/file.js"
-    },
-    "transformIgnorePatterns": [
-      "/node_modules/(?!@opentrons/)"
-    ],
-    "collectCoverageFrom": [
-      "**/*.js",
-      "!.eslintrc.js",
-      "!.stylelintrc.js",
-      "!api/**",
-      "!webpack-config/**",
-      "!**/scripts/**",
-      "!components/interfaces/**",
-      "!components/styleguide.config.js",
-      "!**/node_modules/**",
-      "!**/__mocks__/**",
-      "!**/dist/**",
-      "!**/build/**",
-      "!**/webpack*",
-      "!**/webpack/**",
-      "!**/coverage/**",
-      "!**/test/**",
-      "!**/test-with-flow/**",
-      "!**/flow-typed/**"
-    ],
-    "coverageReporters": [
-      "lcov",
-      "text"
-    ]
-  },
   "devDependencies": {
     "ajv": "^6.2.1",
     "babel-cli": "^6.26.0",
@@ -73,7 +37,7 @@
     "cross-env": "^5.0.1",
     "css-loader": "^0.28.4",
     "cz-conventional-changelog": "2.1.0",
-    "electron": "1.8.3",
+    "electron": "3.0.2",
     "electron-builder": "^20.28.4",
     "electron-publisher-s3": "^20.17.2",
     "eslint": "3.19.0",

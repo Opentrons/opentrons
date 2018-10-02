@@ -1,10 +1,7 @@
-import electron from 'electron'
 import {mockResolvedValue} from '../../../__util__/mock-promise'
 import * as apiUpdate from '../api-update'
 
-jest.mock('electron')
-
-const {'./api-update': mockApiUpdate} = electron.__mockRemotes
+const {apiUpdate: mockApiUpdate} = global.APP_SHELL
 
 describe('shell/api-update', () => {
   let _Blob
@@ -16,6 +13,7 @@ describe('shell/api-update', () => {
 
   afterEach(() => {
     global.Blob = _Blob
+    jest.clearAllMocks()
   })
 
   test('reducer puts update info in state', () => {
