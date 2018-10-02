@@ -9,6 +9,7 @@ import styles from './StepItem.css'
 import type {
   SourceDestSubstepItem,
   SubstepIdentifier,
+  WellIngredientNames,
 } from '../../steplist/types'
 
 export type StepSubItemProps = {|
@@ -17,7 +18,7 @@ export type StepSubItemProps = {|
 
 type SourceDestSubstepProps = {|
   ...StepSubItemProps,
-  ingredNames: {[string]: string},
+  ingredNames: WellIngredientNames,
   onSelectSubstep: SubstepIdentifier => mixed,
   hoveredSubstep: ?SubstepIdentifier,
 |}

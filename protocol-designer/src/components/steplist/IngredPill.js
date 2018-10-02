@@ -2,10 +2,11 @@
 import * as React from 'react'
 import {Pill, swatchColors, MIXED_WELL_COLOR, type HoverTooltipHandlers} from '@opentrons/components'
 import styles from './StepItem.css'
+import type {WellIngredientVolumeData, WellIngredientNames} from '../../steplist'
 
 type Props = {
-  ingreds: {[string]: {volume: number}},
-  ingredNames: {[string]: string},
+  ingreds: WellIngredientVolumeData,
+  ingredNames: WellIngredientNames,
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
 }
 

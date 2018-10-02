@@ -142,7 +142,7 @@ function transferLikeSubsteps (args: {
           }
           return {
             source,
-            dest: validatedForm.stepType === 'mix' ? source : dest,
+            dest: validatedForm.stepType === 'mix' ? source : dest, // NOTE: since source and dest are same for mix, we're showing source on both sides. Otherwise dest would show the intermediate volume state
             volume: showDispenseVol ? nextMultiRow.volume : currentMultiRow.volume,
           }
         })

@@ -5,39 +5,25 @@ import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
 
 import {HoverTooltip, swatchColors} from '@opentrons/components'
-import type {SubstepWellData} from '../../steplist/types'
+import type {SubstepWellData, WellIngredientVolumeData, WellIngredientNames} from '../../steplist/types'
 import IngredPill from './IngredPill'
 import {PDListItem} from '../lists'
 import styles from './StepItem.css'
+import {formatVolume, formatPercentage} from './utils'
 
 type SubstepRowProps = {|
   volume?: ?number | ?string,
   source?: SubstepWellData,
   dest?: SubstepWellData,
-  ingredNames: {[string]: string},
+  ingredNames: WellIngredientNames,
   className?: string,
   onMouseEnter?: (e: SyntheticMouseEvent<*>) => mixed,
   onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed,
 |}
 
-const VOLUME_SIG_DIGITS_DEFAULT = 1
-
-function formatVolume (inputVolume: ?string | ?number, sigDigits?: number = VOLUME_SIG_DIGITS_DEFAULT): string {
-  if (typeof inputVolume === 'number') {
-    // don't add digits to numbers with nothing to the right of the decimal
-    const digits = inputVolume.toString().split('.')[1] ? sigDigits : 0
-    return Number(Math.round(`${inputVolume}e${digits}`) + `e-${digits}`)
-  }
-  return inputVolume || ''
-}
-
-const formatPercentage = (part: number, total: number): string => {
-  return `${Number((part / total) * 100).toFixed(1)}%`
-}
-
 type PillTooltipContentsProps = {
-  ingreds: {[string]: {volume: number}},
-  ingredNames: {[string]: string},
+  ingreds: WellIngredientVolumeData,
+  ingredNames: WellIngredientNames,
   well: string,
 }
 const PillTooltipContents = (props: PillTooltipContentsProps) => {
