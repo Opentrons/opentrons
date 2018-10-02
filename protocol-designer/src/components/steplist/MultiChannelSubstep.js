@@ -6,14 +6,15 @@ import {Icon} from '@opentrons/components'
 import {PDListItem} from '../lists'
 import SubstepRow from './SubstepRow'
 import styles from './StepItem.css'
+import {formatVolume} from './utils'
 
-import type {StepItemSourceDestRow} from '../../steplist/types'
+import type {StepItemSourceDestRow, WellIngredientNames} from '../../steplist/types'
 
 const DEFAULT_COLLAPSED_STATE = true
 
 type MultiChannelSubstepProps = {|
   rowGroup: Array<StepItemSourceDestRow>,
-  ingredNames: {[string]: string},
+  ingredNames: WellIngredientNames,
   highlighted?: boolean,
   onMouseEnter?: (e: SyntheticMouseEvent<*>) => mixed,
   onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed,
@@ -21,18 +22,6 @@ type MultiChannelSubstepProps = {|
 
 type MultiChannelSubstepState = {
   collapsed: boolean,
-}
-
-const VOLUME_DIGITS = 1
-
-function formatVolume (inputVolume: ?string | ?number): string {
-  if (typeof inputVolume === 'number') {
-    // don't add digits to numbers with nothing to the right of the decimal
-    const digits = inputVolume.toString().split('.')[1] ? VOLUME_DIGITS : 0
-    return inputVolume.toFixed(digits)
-  }
-
-  return inputVolume || ''
 }
 
 export default class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, MultiChannelSubstepState> {

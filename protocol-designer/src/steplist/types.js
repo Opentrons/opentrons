@@ -11,6 +11,10 @@ export const START_TERMINAL_ITEM_ID: '__initial_setup__' = '__initial_setup__'
 export const END_TERMINAL_ITEM_ID: '__end__' = '__end__'
 export type TerminalItemId = typeof START_TERMINAL_ITEM_ID | typeof END_TERMINAL_ITEM_ID
 
+export type WellIngredientNames = {[ingredId: string]: string}
+
+export type WellIngredientVolumeData = {[ingredId: string]: {volume: number}}
+
 export type SubstepIdentifier = {|
   stepId: StepIdType,
   substepIndex: number,
@@ -23,8 +27,8 @@ export type NamedIngred = {|
 
 export type SourceDestData = {
   wells: Array<string>,
-  preIngreds: {[string]: {volume: number}},
-  postIngreds: {[string]: {volume: number}},
+  preIngreds: WellIngredientVolumeData,
+  postIngreds: WellIngredientVolumeData,
 }
 
 export type SubstepTimelineFrame = {
@@ -37,8 +41,8 @@ export type SubstepTimelineFrame = {
 
 export type SubstepWellData = {
   well: string,
-  preIngreds: {[string]: {volume: number}},
-  postIngreds: {[string]: {volume: number}},
+  preIngreds: WellIngredientVolumeData,
+  postIngreds: WellIngredientVolumeData,
 }
 
 export type StepItemSourceDestRow = {
@@ -80,7 +84,3 @@ export type StepItemData = {
 }
 
 export type SubSteps = {[StepIdType]: ?SubstepItemData}
-
-export type ingredNames = {[ingredId: string]: string}
-
-export type ingredVolumeData = {[ingredId: string]: {volume: number}}
