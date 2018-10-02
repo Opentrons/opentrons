@@ -23,7 +23,7 @@ import {
 import type {ShellUpdateState} from '../../shell'
 
 import {Icon} from '@opentrons/components'
-import {UpdateModal} from '../modals'
+import {ScrollableAlertModal} from '../modals'
 import UpdateAppMessage from './UpdateAppMessage'
 import UpdateRobotMessage from './UpdateRobotMessage'
 import ReleaseNotes from '../ReleaseNotes'
@@ -102,7 +102,7 @@ function RobotUpdateModal (props: Props) {
     : null
 
   return (
-    <UpdateModal
+    <ScrollableAlertModal
       heading={heading}
       buttons={[
         {onClick: ignoreUpdate, children: closeButtonText},
@@ -113,7 +113,7 @@ function RobotUpdateModal (props: Props) {
       {available && <UpdateAppMessage />}
       <UpdateRobotMessage message={message} />
       <ReleaseNotes source={source} />
-    </UpdateModal>
+    </ScrollableAlertModal>
   )
 }
 

@@ -3,7 +3,7 @@
 import * as React from 'react'
 
 import {Icon, type ButtonProps} from '@opentrons/components'
-import {UpdateModal} from '../modals'
+import {ScrollableAlertModal} from '../modals'
 import ReleaseNotes from '../ReleaseNotes'
 
 import type {ShellUpdateState} from '../../shell'
@@ -29,7 +29,7 @@ export default function AppUpdateModal (props: Props) {
   const closeButtonChildren = downloading ? 'close' : 'not now'
 
   return (
-    <UpdateModal
+    <ScrollableAlertModal
       heading={`Version ${availableVersion || ''} Available`}
       buttons={[
         {onClick: closeModal, children: closeButtonChildren},
@@ -37,7 +37,7 @@ export default function AppUpdateModal (props: Props) {
       ]}
     >
       <ReleaseNotes source={info && info.releaseNotes} />
-    </UpdateModal>
+    </ScrollableAlertModal>
   )
 }
 

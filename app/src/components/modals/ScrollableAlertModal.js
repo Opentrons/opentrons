@@ -16,7 +16,7 @@ type Props = {
   buttons: Array<?ButtonProps>,
 }
 
-export default function AppUpdateModal (props: Props) {
+export default function ScrollableAlertModal (props: Props) {
   return (
     <Portal>
       <AlertModal

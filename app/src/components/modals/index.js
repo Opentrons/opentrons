@@ -3,6 +3,6 @@
 import Modal from './Modal'
 import ErrorModal from './ErrorModal'
 import BottomButtonBar from './BottomButtonBar'
-import UpdateModal from './UpdateModal'
+import ScrollableAlertModal from './ScrollableAlertModal'
 
-export {Modal, ErrorModal, BottomButtonBar, UpdateModal}
+export {Modal, ErrorModal, BottomButtonBar, ScrollableAlertModal}
