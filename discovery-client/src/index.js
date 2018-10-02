@@ -9,22 +9,24 @@ import toRegex from 'to-regex'
 
 import {poll, stop, type PollRequest} from './poller'
 import {
+  createServiceList,
+  upsertServiceList,
+  updateServiceListByIp,
+  diffServiceLists,
+} from './service-list'
+import {
   DEFAULT_PORT,
   fromMdnsBrowser,
   fromResponse,
   makeCandidate,
   toCandidate,
-  matchService,
-  matchUnassigned,
-  matchConflict,
-  matchCandidate,
-  rejectCandidate,
 } from './service'
 
 import type {Browser, BrowserService} from 'mdns-js'
 import type {
   Candidate,
   Service,
+  ServiceList,
   HealthResponse,
   LogLevel,
   Logger,
@@ -62,7 +64,7 @@ export {DEFAULT_PORT}
 const TO_REGEX_OPTS = {contains: true, nocase: true, safe: true}
 
 export class DiscoveryClient extends EventEmitter {
-  services: Array<Service>
+  services: ServiceList
   candidates: Array<Candidate>
   _browser: ?Browser
   _pollRequest: ?PollRequest
@@ -76,11 +78,7 @@ export class DiscoveryClient extends EventEmitter {
     super()
 
     // null out ok flag for pre-populated services
-    this.services = (options.services || []).map(s => ({
-      ...s,
-      ok: null,
-      serverOk: null,
-    }))
+    this.services = createServiceList(options.services || [])
 
     // allow strings instead of full {ip: string, port: ?number} object
     this.candidates = (options.candidates || [])
@@ -206,15 +204,12 @@ export class DiscoveryClient extends EventEmitter {
     if (service) return this._handleService(service)
 
     // else, response was not ok, so unset ok flag in all matching ips
-    const {ip} = candidate
-    const nextServices = this.services.map(
-      s =>
-        s.ip === ip && (s.ok !== false || s.serverOk !== false)
-          ? {...s, ok: false, serverOk: false}
-          : s
+    this._updateLists(
+      updateServiceListByIp(this.services, candidate.ip, {
+        ok: false,
+        serverOk: false,
+      })
     )
-
-    this._updateServiceList(nextServices)
   }
 
   _handleService (service: Service): mixed {
@@ -227,47 +222,23 @@ export class DiscoveryClient extends EventEmitter {
       return
     }
 
-    const candidateExists = this.candidates.some(matchCandidate(service))
-    const serviceConflicts = this.services.filter(matchConflict(service))
-    const prevService =
-      this.services.find(matchService(service)) ||
-      this.services.find(matchUnassigned(service))
-    let nextServices = this.services
-
-    // add service if necessary
-    if (!prevService) nextServices = nextServices.concat(service)
-
-    // update existing services and null out conflics
-    nextServices = nextServices.map(s => {
-      // if we have a service already, make sure not to reset oks to null
-      if (s === prevService) {
-        const newOk = service.ok != null ? service.ok : s.ok
-        const newServerOk =
-          service.serverOk != null ? service.serverOk : s.serverOk
-
-        return newOk !== s.ok || newServerOk !== s.serverOk
-          ? {...service, ok: newOk, serverOk: newServerOk}
-          : s
-      }
-
-      return serviceConflicts.includes(s)
-        ? {...s, ip: null, ok: null, serverOk: null}
-        : s
-    })
-
-    // promote candidates and update service list
-    // repoll if our IP addresses may have changed
-    const pollNeeed = candidateExists || !prevService || !prevService.ip
-    this.candidates = this.candidates.filter(rejectCandidate(service))
-    this._updateServiceList(nextServices, pollNeeed)
+    this._updateLists(upsertServiceList(this.services, service))
   }
 
-  // update this.services, emit if necessary, return number of services updated
-  _updateServiceList (nextServices: Array<Service>, poll?: boolean): void {
-    const updated = nextServices.filter((s, i) => s !== this.services[i])
-    this.services = nextServices
+  // update this.services, emit if necessary, re-poll if necessary
+  _updateLists (nextServices: ServiceList): void {
+    const updated = diffServiceLists(this.services, nextServices)
+    const nextCandidates = this.candidates.filter(candidate =>
+      nextServices.every(service => candidate.ip !== service.ip)
+    )
 
-    if (poll) this._poll()
+    const pollNeeded =
+      updated.length || nextCandidates.length !== this.candidates.length
+
+    this.services = nextServices
+    this.candidates = nextCandidates
+
+    if (pollNeeded) this._poll()
     if (updated.length) {
       updated.forEach(s => this.emit(SERVICE_EVENT, s))
       log(this._logger, 'debug', 'updated services', {updated})

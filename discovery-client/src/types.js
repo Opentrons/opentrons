@@ -15,6 +15,10 @@ export type Service = {
   serverOk: ?boolean,
 }
 
+export type ServiceUpdate = $Shape<Service>
+
+export type ServiceList = Array<Service>
+
 // TODO(mc, 2018-07-26): grab common logger type from app and app-shell
 export type LogLevel =
   | 'error'
