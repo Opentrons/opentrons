@@ -32,3 +32,7 @@
 .hidden_value {
   visibility: hidden;
 }
+
+.update_message {
+  margin-bottom: 1rem;
+}

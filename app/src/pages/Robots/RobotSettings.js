@@ -20,7 +20,7 @@ import {ErrorModal} from '../../components/modals'
 import Page from '../../components/Page'
 import RobotSettings, {
   ConnectAlertModal,
-  UpdateModal,
+  RobotUpdateModal,
 } from '../../components/RobotSettings'
 import CalibrateDeck from '../../components/CalibrateDeck'
 import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
@@ -72,7 +72,7 @@ function RobotSettingsPage (props: Props) {
       </Page>
       <Switch>
         <Route path={`${path}/update`} render={() => (
-          <UpdateModal {...robot} />
+          <RobotUpdateModal {...robot} />
         )} />
 
         <Route path={`${path}/calibrate-deck`} render={(props) => (

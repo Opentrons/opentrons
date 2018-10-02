@@ -2,11 +2,9 @@
 // AlertModal for updating to newest app version
 import * as React from 'react'
 
-import {Icon, AlertModal, type ButtonProps} from '@opentrons/components'
-import {Portal} from '../portal'
-import {BottomButtonBar} from '../modals'
-import ReleaseNotes from './ReleaseNotes'
-import styles from './styles.css'
+import {Icon, type ButtonProps} from '@opentrons/components'
+import {ScrollableAlertModal} from '../modals'
+import ReleaseNotes from '../ReleaseNotes'
 
 import type {ShellUpdateState} from '../../shell'
 
@@ -31,23 +29,15 @@ export default function AppUpdateModal (props: Props) {
   const closeButtonChildren = downloading ? 'close' : 'not now'
 
   return (
-    <Portal>
-      <AlertModal
-        heading={`Version ${availableVersion || ''} Available`}
-        onCloseClick={closeModal}
-        className={styles.update_modal}
-        contentsClassName={styles.update_modal_contents}
-        alertOverlay
-      >
-        <ReleaseNotes source={info && info.releaseNotes} />
-        <BottomButtonBar
-          buttons={[
-            {onClick: closeModal, children: closeButtonChildren},
-            buttonProps,
-          ]}
-        />
-      </AlertModal>
-    </Portal>
+    <ScrollableAlertModal
+      heading={`Version ${availableVersion || ''} Available`}
+      buttons={[
+        {onClick: closeModal, children: closeButtonChildren},
+        buttonProps,
+      ]}
+    >
+      <ReleaseNotes source={info && info.releaseNotes} />
+    </ScrollableAlertModal>
   )
 }
 

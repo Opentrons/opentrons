@@ -38,3 +38,16 @@
   margin-left: 1rem;
   width: 10rem;
 }
+
+.update_modal {
+  max-height: 100%;
+}
+
+.update_modal_contents {
+  display: flex;
+}
+
+.update_modal_scroll {
+  max-height: 100%;
+  overflow-y: auto;
+}

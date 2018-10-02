@@ -22,8 +22,11 @@ import {
 
 import type {ShellUpdateState} from '../../shell'
 
-import {AlertModal, Icon} from '@opentrons/components'
+import {Icon} from '@opentrons/components'
+import {ScrollableAlertModal} from '../modals'
 import UpdateAppMessage from './UpdateAppMessage'
+import UpdateRobotMessage from './UpdateRobotMessage'
+import ReleaseNotes from '../ReleaseNotes'
 
 type OP = Robot
 
@@ -50,9 +53,9 @@ const RESTART_MSG = 'Restart your robot to finish the update. It may take severa
 // TODO(mc, 2018-03-19): prop or component for text-height icons
 const Spinner = () => (<Icon name='ot-spinner' height='1em' spin />)
 
-export default connect(makeMapStateToProps, null, mergeProps)(UpdateModal)
+export default connect(makeMapStateToProps, null, mergeProps)(RobotUpdateModal)
 
-function UpdateModal (props: Props) {
+function RobotUpdateModal (props: Props) {
   const {
     updateInfo,
     ignoreUpdate,
@@ -60,7 +63,7 @@ function UpdateModal (props: Props) {
     restart,
     updateRequest,
     restartRequest,
-    appUpdate: {available},
+    appUpdate: {available, info},
   } = props
   const inProgress = updateRequest.inProgress || restartRequest.inProgress
   let closeButtonText = 'not now'
@@ -94,8 +97,12 @@ function UpdateModal (props: Props) {
     ? {disabled: true, children: (<Spinner />)}
     : {onClick: buttonAction, children: buttonText}
 
+  let source = info && info.releaseNotes
+    ? removeAppNotes(info.releaseNotes)
+    : null
+
   return (
-    <AlertModal
+    <ScrollableAlertModal
       heading={heading}
       buttons={[
         {onClick: ignoreUpdate, children: closeButtonText},
@@ -104,8 +111,9 @@ function UpdateModal (props: Props) {
       alertOverlay
     >
       {available && <UpdateAppMessage />}
-      <p>{message}</p>
-    </AlertModal>
+      <UpdateRobotMessage message={message} />
+      <ReleaseNotes source={source} />
+    </ScrollableAlertModal>
   )
 }
 
@@ -142,4 +150,13 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
         .then(close)
     },
   }
+}
+
+// TODO (ka, 2018-10-1):
+// Grabbing only the api notes removes changes since and technical change log
+
+const RE_APP_NOTES = /<!-- start:@opentrons\/app -->([\S\s]*?)<!-- end:@opentrons\/app -->/
+
+function removeAppNotes (notes: string) {
+  return notes.replace(RE_APP_NOTES, '')
 }
