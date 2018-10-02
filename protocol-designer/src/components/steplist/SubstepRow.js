@@ -46,23 +46,25 @@ const PillTooltipContents = (props: PillTooltipContentsProps) => {
   return (
     <div className={styles.liquid_tooltip_contents}>
       <table>
-        {map(props.ingreds, (ingred, groupId) => (
-          <tr key={groupId} className={styles.ingred_row}>
-            <td>
-              <div
-                className={styles.liquid_circle}
-                style={{backgroundColor: swatchColors(Number(groupId))}} />
-            </td>
-            <td className={styles.ingred_name}>
-              {props.ingredNames[groupId]}
-            </td>
-            {
-              hasMultipleIngreds &&
-              <td className={styles.ingred_percentage}>{formatPercentage(ingred.volume, totalLiquidVolume)}</td>
-            }
-            <td className={styles.ingred_partial_volume}>{formatVolume(ingred.volume, 2)}µl</td>
-          </tr>
-        ))}
+        <tbody>
+          {map(props.ingreds, (ingred, groupId) => (
+            <tr key={groupId} className={styles.ingred_row}>
+              <td>
+                <div
+                  className={styles.liquid_circle}
+                  style={{backgroundColor: swatchColors(Number(groupId))}} />
+              </td>
+              <td className={styles.ingred_name}>
+                {props.ingredNames[groupId]}
+              </td>
+              {
+                hasMultipleIngreds &&
+                <td className={styles.ingred_percentage}>{formatPercentage(ingred.volume, totalLiquidVolume)}</td>
+              }
+              <td className={styles.ingred_partial_volume}>{formatVolume(ingred.volume, 2)}µl</td>
+            </tr>
+          ))}
+        </tbody>
       </table>
       {
         hasMultipleIngreds &&

@@ -98,12 +98,12 @@
 
 .ingred_name {
   text-align: left;
-  padding-right: 0.5em;
+  padding-right: 1em;
 }
 
 .ingred_percentage {
   text-align: right;
-  padding-right: 0.5em;
+  padding-right: 1em;
 }
 
 .ingred_partial_volume {

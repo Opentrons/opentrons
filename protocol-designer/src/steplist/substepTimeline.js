@@ -25,22 +25,19 @@ const substepTimelineSingle = (commandCreators: Array<CommandCreator>) =>
 
       // NOTE: only aspirate and dispense commands will appear alone in atomic commands
       // from compound command creators (e.g. transfer, distribute, etc.)
-      if (nextFrame.commands.length === 1) {
-        const commandGroup = nextFrame.commands[0]
-        let nextSubstepFrame = {}
-        if (commandGroup.command === 'aspirate' || commandGroup.command === 'dispense') {
-          const {well, volume, labware} = commandGroup.params
-          const wellInfo = {
-            labware,
-            wells: [well],
-            preIngreds: prevRobotState.liquidState.labware[labware][well],
-            postIngreds: nextFrame.robotState.liquidState.labware[labware][well],
-          }
-          const ingredKey = commandGroup.command === 'aspirate' ? 'source' : 'dest'
-          nextSubstepFrame = {volume, [ingredKey]: wellInfo}
+      const isAtomic = nextFrame.commands.length === 1
+      const commandGroup = nextFrame.commands[0]
+      if (isAtomic && (commandGroup.command === 'aspirate' || commandGroup.command === 'dispense')) {
+        const {well, volume, labware} = commandGroup.params
+        const wellInfo = {
+          labware,
+          wells: [well],
+          preIngreds: prevRobotState.liquidState.labware[labware][well],
+          postIngreds: nextFrame.robotState.liquidState.labware[labware][well],
         }
         prevRobotState = nextFrame.robotState
-        return {timeline: [...acc.timeline, nextSubstepFrame], errors: null}
+        const ingredKey = commandGroup.command === 'aspirate' ? 'source' : 'dest'
+        return {timeline: [...acc.timeline, {volume, [ingredKey]: wellInfo}], errors: null}
       } else {
         return acc
       }
@@ -70,25 +67,21 @@ const substepTimeline = (
             return {timeline: acc.timeline, errors: nextFrame.errors}
           }
 
-          if (nextFrame.commands.length === 1) {
-            const commandGroup = nextFrame.commands[0]
-            let nextSubstepFrame = {}
-
-            if (commandGroup.command === 'aspirate' || commandGroup.command === 'dispense') {
-              const {well, volume, labware} = commandGroup.params
-              const labwareType = context.getLabwareType && context.getLabwareType(labware)
-              const wellsForTips = context.channels && labwareType && getWellsForTips(context.channels, labwareType, well).wellsForTips
-              const wellInfo = {
-                labware,
-                wells: wellsForTips || [],
-                preIngreds: wellsForTips ? pick(prevRobotState.liquidState.labware[labware], wellsForTips) : {},
-                postIngreds: wellsForTips ? pick(nextFrame.robotState.liquidState.labware[labware], wellsForTips) : {},
-              }
-              const ingredKey = commandGroup.command === 'aspirate' ? 'source' : 'dest'
-              nextSubstepFrame = {volume, [ingredKey]: wellInfo}
+          const isAtomic = nextFrame.commands.length === 1
+          const commandGroup = nextFrame.commands[0]
+          if (isAtomic && (commandGroup.command === 'aspirate' || commandGroup.command === 'dispense')) {
+            const {well, volume, labware} = commandGroup.params
+            const labwareType = context.getLabwareType && context.getLabwareType(labware)
+            const wellsForTips = context.channels && labwareType && getWellsForTips(context.channels, labwareType, well).wellsForTips
+            const wellInfo = {
+              labware,
+              wells: wellsForTips || [],
+              preIngreds: wellsForTips ? pick(prevRobotState.liquidState.labware[labware], wellsForTips) : {},
+              postIngreds: wellsForTips ? pick(nextFrame.robotState.liquidState.labware[labware], wellsForTips) : {},
             }
             prevRobotState = nextFrame.robotState
-            return {timeline: [...acc.timeline, nextSubstepFrame], errors: null}
+            const ingredKey = commandGroup.command === 'aspirate' ? 'source' : 'dest'
+            return {timeline: [...acc.timeline, {volume, [ingredKey]: wellInfo}], errors: null}
           } else {
             return acc
           }
