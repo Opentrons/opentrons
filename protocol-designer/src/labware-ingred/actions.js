@@ -13,7 +13,7 @@ import type {DeckSlot} from '@opentrons/components'
 // ===== Labware selector actions =====
 
 export const openAddLabwareModal = createAction(
-  'OPEN_LABWARE_SELECTOR',
+  'OPEN_ADD_LABWARE_MODAL',
   (args: {slot: DeckSlot}) => args
 )
 

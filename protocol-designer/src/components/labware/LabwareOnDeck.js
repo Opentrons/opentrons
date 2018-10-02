@@ -179,25 +179,23 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
             onClickOutside={cancelMove}
             cancelMove={cancelMove} />
         : <EmptyDestinationSlotOverlay {...{moveLabwareDestination}}/>
+    } else if (showNameOverlay) {
+      overlay = <EnhancedNameThisLabwareOverlay {...{
+        setLabwareName,
+        deleteLabware,
+      }}
+      onClickOutside={setDefaultLabwareName} />
     } else {
-      if (showNameOverlay) {
-        overlay = <EnhancedNameThisLabwareOverlay {...{
-          setLabwareName,
+      overlay = (slotHasLabware)
+        ? <LabwareDeckSlotOverlay {...{
+          canAddIngreds,
           deleteLabware,
-        }}
-        onClickOutside={setDefaultLabwareName} />
-      } else {
-        overlay = (slotHasLabware)
-          ? <LabwareDeckSlotOverlay {...{
-            canAddIngreds,
-            deleteLabware,
-            editLiquids,
-            moveLabwareSource,
-          }} />
-          : <EmptyDeckSlotOverlay {...{
-            addLabware,
-          }} />
-      }
+          editLiquids,
+          moveLabwareSource,
+        }} />
+        : <EmptyDeckSlotOverlay {...{
+          addLabware,
+        }} />
     }
   }
 

@@ -71,8 +71,8 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     modify: {name: null},
   })
 
-  // labware definition's metadata.isValueSource defaults to true,
-  // only use it when it's defined as false
+  // labware definition's metadata.isValidSource defaults to true,
+  // only use it when it is defined as false
   let canAddIngreds: boolean = !showNameOverlay
   const labwareInfo = getLabware(containerType)
   if (!labwareInfo || labwareInfo.metadata.isValidSource === false) {
