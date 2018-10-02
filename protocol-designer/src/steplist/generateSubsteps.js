@@ -172,6 +172,7 @@ function transferLikeSubsteps (args: {
   } else { // single channel
     const substepRows = substepTimeline(substepCommandCreators)(robotState)
 
+    console.log('sR', substepCommandCreators)
     const mergedRows: Array<StepItemSourceDestRow> = steplistUtils.mergeWhen(
       substepRows,
       (currentRow, nextRow) =>
@@ -197,13 +198,13 @@ function transferLikeSubsteps (args: {
       (currentRow) => {
         const source = currentRow.source && {
           well: currentRow.source.wells[0],
-          preIngreds: currentRow.source.preIngreds[currentRow.source.wells[0]],
-          postIngreds: currentRow.source.postIngreds[currentRow.source.wells[0]],
+          preIngreds: currentRow.source.preIngreds,
+          postIngreds: currentRow.source.postIngreds,
         }
         const dest = currentRow.dest && {
           well: currentRow.dest.wells[0],
-          preIngreds: currentRow.dest.preIngreds[currentRow.dest.wells[0]],
-          postIngreds: currentRow.dest.postIngreds[currentRow.dest.wells[0]],
+          preIngreds: currentRow.dest.preIngreds,
+          postIngreds: currentRow.dest.postIngreds,
         }
         return {source, dest, volume: currentRow.volume}
       }

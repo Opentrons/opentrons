@@ -31,7 +31,7 @@ export default function mergeWhen<T> (
   }
 
   if (canMerge) {
-    result.push(array[array.length - 1])
+    result.push(alternative(array[array.length - 1]))
   }
 
   return result
