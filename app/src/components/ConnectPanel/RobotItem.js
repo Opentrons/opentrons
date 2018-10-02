@@ -1,19 +1,22 @@
 // @flow
 // item in a RobotList
 import {connect} from 'react-redux'
-import {withRouter} from 'react-router'
+import {withRouter, type Match} from 'react-router'
 
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
 import {actions as robotActions} from '../../robot'
 import {makeGetRobotUpdateInfo} from '../../http-api-client'
 
-import {RobotListItem} from './RobotList.js'
+import {RobotListItem} from './RobotListItem.js'
 
-type OP = Robot
+type OP = Robot & {
+  match: Match,
+}
 
 type SP = {
   upgradable: boolean,
+  selected: boolean,
 }
 
 type DP = {
@@ -22,7 +25,10 @@ type DP = {
 }
 
 export default withRouter(
-  connect(makeMapStateToProps, mapDispatchToProps)(RobotListItem)
+  connect(
+    makeMapStateToProps,
+    mapDispatchToProps
+  )(RobotListItem)
 )
 
 function makeMapStateToProps () {
@@ -30,6 +36,7 @@ function makeMapStateToProps () {
 
   return (state: State, ownProps: OP): SP => ({
     upgradable: getUpdateInfo(state, ownProps).type === 'upgrade',
+    selected: ownProps.match.params.name === ownProps.name,
   })
 }
 
