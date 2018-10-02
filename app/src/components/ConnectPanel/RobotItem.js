@@ -1,14 +1,14 @@
 // @flow
 // item in a RobotList
-import { connect } from 'react-redux'
-import { withRouter, type Match } from 'react-router'
+import {connect} from 'react-redux'
+import {withRouter, type Match} from 'react-router'
 
-import type { State, Dispatch } from '../../types'
-import type { Robot } from '../../robot'
-import { actions as robotActions } from '../../robot'
-import { makeGetRobotUpdateInfo } from '../../http-api-client'
+import type {State, Dispatch} from '../../types'
+import type {Robot} from '../../robot'
+import {actions as robotActions} from '../../robot'
+import {makeGetRobotUpdateInfo} from '../../http-api-client'
 
-import { RobotListItem } from './RobotListItem.js'
+import {RobotListItem} from './RobotListItem.js'
 
 type OP = Robot & {
   match: Match,

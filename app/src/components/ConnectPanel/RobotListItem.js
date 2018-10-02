@@ -1,10 +1,10 @@
 // @flow
 // list of robots
 import * as React from 'react'
-import { NotificationIcon, Icon } from '@opentrons/components'
+import {NotificationIcon, Icon} from '@opentrons/components'
 
-import type { Robot } from '../../robot'
-import { ToggleButton } from '../controls'
+import type {Robot} from '../../robot'
+import {ToggleButton} from '../controls'
 import RobotLink from './RobotLink'
 import styles from './connect-panel.css'
 
