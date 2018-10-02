@@ -205,7 +205,7 @@ def dc_session(virtual_smoothie_env, monkeypatch):
 
 @pytest.fixture
 def robot(dummy_db):
-    from opentrons import Robot
+    from opentrons.legacy_api.robot import Robot
     return Robot()
 
 
@@ -350,8 +350,8 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
 
 @pytest.fixture
 def model(robot):
-    from opentrons.containers import load
-    from opentrons.instruments.pipette import Pipette
+    from opentrons.legacy_api.containers import load
+    from opentrons.legacy_api.instruments.pipette import Pipette
 
     pipette = Pipette(robot, ul_per_mm=18.5, mount='right')
     plate = load(robot, '96-flat', '1')
@@ -368,8 +368,8 @@ def model(robot):
 
 @pytest.fixture
 def model_with_trough(robot):
-    from opentrons.containers import load
-    from opentrons.instruments.pipette import Pipette
+    from opentrons.legacy_api.containers import load
+    from opentrons.legacy_api.instruments.pipette import Pipette
 
     pipette = Pipette(robot, mount='right')
     plate = load(robot, 'trough-12row', '1')
@@ -388,7 +388,7 @@ def model_with_trough(robot):
 def smoothie(monkeypatch):
     from opentrons.drivers.smoothie_drivers.driver_3_0 import \
          SmoothieDriver_3_0_0 as SmoothieDriver
-    from opentrons.robot import robot_configs
+    from opentrons.legacy_api.robot import robot_configs
 
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
     driver = SmoothieDriver(robot_configs.load())

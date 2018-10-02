@@ -1,17 +1,17 @@
 import math
 import unittest
 
-from opentrons.containers import (
+from opentrons.legacy_api.containers import (
     load as containers_load,
-    list as containers_list
+    list as containers_list,
 )
-from opentrons import Robot
-from opentrons.containers import placeable
-from opentrons.containers.placeable import (
+from opentrons.legacy_api.robot import Robot
+from opentrons.legacy_api.containers.placeable import (
     Container,
     Well,
     Deck,
-    Slot)
+    Slot,
+    unpack_location)
 from tests.opentrons import generate_plate
 # TODO: Modify all calls to get a Well to use the `wells` method
 # TODO: remove `unpack_location` calls
@@ -94,7 +94,7 @@ class ContainerTestCase(unittest.TestCase):
 
     def test_bad_unpack_containers(self):
         self.assertRaises(
-            ValueError, placeable.unpack_location, 1)
+            ValueError, unpack_location, 1)
 
     def test_iterate_without_parent(self):
         c = generate_plate(4, 2, (5, 5), (0, 0), 5)

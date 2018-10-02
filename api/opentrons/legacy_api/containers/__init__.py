@@ -4,7 +4,7 @@ import os
 import warnings
 
 from opentrons.data_storage import database
-from opentrons.containers.placeable import (
+from .placeable import (
     Deck,
     Slot,
     Container,
@@ -18,14 +18,14 @@ from opentrons.helpers import helpers
 from opentrons.util import environment
 
 __all__ = [
-    Deck,
-    Slot,
-    Container,
-    Well,
-    WellSeries,
-    unpack_location,
-    location_to_list,
-    get_container]
+    'Deck',
+    'Slot',
+    'Container',
+    'Well',
+    'WellSeries',
+    'unpack_location',
+    'location_to_list',
+    'get_container']
 
 
 def load(robot, container_name, slot, label=None, share=False):

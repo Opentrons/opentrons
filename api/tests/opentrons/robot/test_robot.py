@@ -1,4 +1,4 @@
-from opentrons.containers import load as containers_load
+from opentrons.legacy_api.containers import load as containers_load
 from opentrons import robot, instruments, labware
 from opentrons.trackers import pose_tracker
 from opentrons.util import vector
@@ -113,7 +113,8 @@ def test_comment(virtual_smoothie_env):
 
 
 def test_create_arc(virtual_smoothie_env):
-    from opentrons.robot.robot import TIP_CLEARANCE_DECK, TIP_CLEARANCE_LABWARE
+    from opentrons.legacy_api.robot.robot import (TIP_CLEARANCE_DECK,
+                                                  TIP_CLEARANCE_LABWARE)
     robot.reset()
 
     p300 = instruments.P300_Single(mount='left')

@@ -1,8 +1,8 @@
 import unittest
 
-from opentrons import Robot
-from opentrons.containers import load as containers_load
-from opentrons.instruments import pipette
+from opentrons.legacy_api.robot import Robot
+from opentrons.legacy_api.containers import load as containers_load
+from opentrons.legacy_api.instruments import pipette
 
 
 class PerformanceTest(unittest.TestCase):

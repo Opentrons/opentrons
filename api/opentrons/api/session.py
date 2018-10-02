@@ -6,8 +6,8 @@ from functools import reduce
 import json
 
 from opentrons.broker import publish, subscribe
-from opentrons.containers import get_container, location_to_list
-from opentrons.containers.placeable import Module as ModulePlaceable
+from opentrons.legacy_api.containers import get_container, location_to_list
+from opentrons.legacy_api.containers.placeable import Module as ModulePlaceable
 from opentrons.commands import tree, types
 from opentrons.protocols import execute_protocol
 from opentrons import robot, modules

@@ -11,7 +11,7 @@ import logging
 from typing import Tuple
 from numpy.linalg import inv
 from numpy import dot, array
-from opentrons.robot import robot_configs
+from opentrons.legacy_api.robot import robot_configs
 from opentrons import robot, instruments
 from opentrons.util.calibration_functions import probe_instrument
 from opentrons.deck_calibration.linal import solve, add_z, apply_transform

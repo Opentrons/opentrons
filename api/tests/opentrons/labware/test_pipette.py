@@ -2,15 +2,15 @@
 # TODO: Modify all calls to get a Well to use the `wells` method
 
 from opentrons import instruments, robot
-from opentrons.containers import load as containers_load
-from opentrons.instruments import Pipette
+from opentrons.legacy_api.containers import load as containers_load
+from opentrons.legacy_api.instruments import Pipette
 from opentrons.trackers import pose_tracker
 from numpy import isclose
 import pytest
 
 
 def test_pipette_version_1_0_and_1_3_extended_travel():
-    from opentrons.instruments import pipette_config
+    from opentrons.legacy_api.instruments import pipette_config
 
     models = [
         'p10_single', 'p10_multi', 'p50_single', 'p50_multi',
@@ -37,7 +37,7 @@ def test_pipette_version_1_0_and_1_3_extended_travel():
 
 
 def test_all_pipette_models_can_transfer():
-    from opentrons.instruments import pipette_config
+    from opentrons.legacy_api.instruments import pipette_config
 
     models = [
         'p10_single', 'p10_multi', 'p50_single', 'p50_multi',
@@ -60,7 +60,7 @@ def test_all_pipette_models_can_transfer():
 
 
 def test_pipette_models_reach_max_volume():
-    from opentrons.instruments import pipette_config
+    from opentrons.legacy_api.instruments import pipette_config
 
     for model in pipette_config.configs:
         config = pipette_config.load(model)
@@ -248,7 +248,7 @@ def test_trough_move_to():
 
 def test_delay_calls(monkeypatch):
     from opentrons import robot
-    from opentrons.instruments import pipette
+    from opentrons.legacy_api.instruments import pipette
     robot.reset()
     p300 = instruments.P300_Single(mount='right')
 
@@ -283,7 +283,7 @@ def test_delay_calls(monkeypatch):
 @pytest.mark.xfail
 def test_drop_tip_in_trash(virtual_smoothie_env, monkeypatch):
     from opentrons import robot, labware
-    from opentrons.instruments.pipette import Pipette
+    from opentrons.legacy_api.instruments.pipette import Pipette
     robot.reset()
     robot.home()
     tiprack = labware.load('tiprack-200ul', '1')

@@ -4,17 +4,21 @@ from functools import lru_cache
 
 import opentrons.util.calibration_functions as calib
 from numpy import add, subtract
-from opentrons import commands, containers, drivers
-from opentrons.instruments import pipette_config
+
+from opentrons import commands, drivers
 from opentrons.broker import subscribe
-from opentrons.containers import Container
+
 from opentrons.data_storage import database, old_container_loading,\
     database_migration
 from opentrons.drivers.smoothie_drivers import driver_3_0
-from opentrons.robot.mover import Mover
-from opentrons.robot.robot_configs import load
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as fflags
+
+from opentrons.legacy_api import containers
+from opentrons.legacy_api.robot.mover import Mover
+from opentrons.legacy_api.robot.robot_configs import load
+from opentrons.legacy_api.containers import Container
+from opentrons.legacy_api.instruments import pipette_config
 
 log = logging.getLogger(__name__)
 

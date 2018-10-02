@@ -1,9 +1,9 @@
 import unittest
-from opentrons import Robot
+from opentrons.legacy_api.robot import Robot
 from opentrons.helpers import helpers
-from opentrons.instruments import pipette
+from opentrons.legacy_api.instruments import pipette
 from opentrons.util.vector import Vector
-from opentrons.containers import load as containers_load
+from opentrons.legacy_api.containers import load as containers_load
 # TODO: Move `helpers` methods into either pipette or other non-generic place
 
 
