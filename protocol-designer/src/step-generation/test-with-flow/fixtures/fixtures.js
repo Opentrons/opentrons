@@ -21,6 +21,7 @@ export const commandCreatorNoErrors = (command: *) => (commandArgs: *) => (state
 
 export const commandCreatorHasErrors = (command: *) => (commandArgs: *) => (state: RobotState): CommandCreatorErrorResponse => {
   const result = command(commandArgs)(state)
+  console.log('LOGGGGG ', result)
   if (!result.errors) {
     throw new Error('expected errors')
   }

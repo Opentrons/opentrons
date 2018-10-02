@@ -6,6 +6,7 @@ import {
   commandCreatorHasErrors,
   commandFixtures as cmd,
 } from './fixtures'
+import {reduceCommandCreators} from '../utils'
 import type {MixFormData} from '../types'
 const mix = commandCreatorNoErrors(_mix)
 const mixWithErrors = commandCreatorHasErrors(_mix)
@@ -47,7 +48,7 @@ describe('mix: change tip', () => {
   })
   test('changeTip="always"', () => {
     const args = makeArgs('always')
-    const result = mix(args)(robotInitialState)
+    const result = reduceCommandCreators(mix(args)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       ...cmd.replaceTipCommands(0),
@@ -75,7 +76,7 @@ describe('mix: change tip', () => {
 
   test('changeTip="once"', () => {
     const args = makeArgs('once')
-    const result = mix(args)(robotInitialState)
+    const result = reduceCommandCreators(mix(args)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       ...cmd.replaceTipCommands(0),
@@ -101,7 +102,7 @@ describe('mix: change tip', () => {
 
   test('changeTip="never"', () => {
     const args = makeArgs('never')
-    const result = mix(args)(robotInitialState)
+    const result = reduceCommandCreators(mix(args)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.aspirate('A1', volume),
@@ -140,7 +141,7 @@ describe('mix: advanced options', () => {
       wells: ['A1', 'B1', 'C1'],
     }
 
-    const result = mix(args)(robotInitialState)
+    const result = reduceCommandCreators(mix(args)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       ...cmd.replaceTipCommands(0),
@@ -179,7 +180,7 @@ describe('mix: advanced options', () => {
       wells: ['A1', 'B1', 'C1'],
     }
 
-    const result = mix(args)(robotInitialState)
+    const result = reduceCommandCreators(mix(args)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       ...cmd.replaceTipCommands(0),
@@ -219,7 +220,7 @@ describe('mix: advanced options', () => {
       wells: ['A1', 'B1', 'C1'],
     }
 
-    const result = mix(args)(robotInitialState)
+    const result = reduceCommandCreators(mix(args)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       ...cmd.replaceTipCommands(0),
@@ -270,7 +271,7 @@ describe('mix: errors', () => {
       ...errorArgs,
       labware: 'invalidLabwareId',
     }
-    const result = mixWithErrors(args)(robotInitialState)
+    const result = reduceCommandCreators(mixWithErrors(args)(robotInitialState))
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
       type: 'LABWARE_DOES_NOT_EXIST',
@@ -282,7 +283,7 @@ describe('mix: errors', () => {
       ...errorArgs,
       pipette: 'invalidPipetteId',
     }
-    const result = mixWithErrors(args)(robotInitialState)
+    const result = reduceCommandCreators(mixWithErrors(args)(robotInitialState))
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
       type: 'PIPETTE_DOES_NOT_EXIST',

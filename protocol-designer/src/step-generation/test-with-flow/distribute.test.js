@@ -8,6 +8,8 @@ import {
   commandFixtures as cmd,
 } from './fixtures'
 import type {DistributeFormData} from '../types'
+import {reduceCommandCreators} from '../utils'
+
 const distribute = commandCreatorNoErrors(_distribute)
 const distributeWithErrors = commandCreatorHasErrors(_distribute)
 
@@ -73,7 +75,7 @@ describe('distribute: minimal example', () => {
       changeTip: 'never',
       volume: 60,
     }
-    const result = distribute(distributeArgs)(robotInitialState)
+    const result = reduceCommandCreators(distribute(distributeArgs)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.aspirate('A1', 180),
@@ -94,7 +96,7 @@ describe('tip handling for multiple distribute chunks', () => {
       volume: 90,
     }
 
-    const result = distribute(distributeArgs)(robotInitialState)
+    const result = reduceCommandCreators(distribute(distributeArgs)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.dropTip('A1'),
@@ -121,7 +123,7 @@ describe('tip handling for multiple distribute chunks', () => {
       volume: 90,
     }
 
-    const result = distribute(distributeArgs)(robotInitialState)
+    const result = reduceCommandCreators(distribute(distributeArgs)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.dropTip('A1'),
@@ -150,7 +152,7 @@ describe('tip handling for multiple distribute chunks', () => {
       changeTip: 'never',
       volume: 90,
     }
-    const result = distribute(distributeArgs)(robotInitialState)
+    const result = reduceCommandCreators(distribute(distributeArgs)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.aspirate('A1', 240),
@@ -173,7 +175,7 @@ describe('tip handling for multiple distribute chunks', () => {
       volume: 150,
     }
 
-    const result = distributeWithErrors(distributeArgs)(robotInitialStatePipettesLackTips)
+    const result = reduceCommandCreators(distributeWithErrors(distributeArgs)(robotInitialState))(robotInitialStatePipettesLackTips)
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
@@ -198,7 +200,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
       disposalLabware: 'sourcePlateId',
       disposalWell: 'A1',
     }
-    const result = distribute(distributeArgs)(robotInitialState)
+    const result = reduceCommandCreators(distribute(distributeArgs)(robotInitialState))(robotInitialState)
     const aspirateVol = (120 * 2) + 12
 
     expect(result.commands).toEqual([
@@ -228,7 +230,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
       volume: 150,
       preWetTip: true,
     }
-    const result = distribute(distributeArgs)(robotInitialState)
+    const result = reduceCommandCreators(distribute(distributeArgs)(robotInitialState))(robotInitialState)
 
     const preWetVolume = 42 // TODO what is pre-wet volume?
     const preWetTipCommands = [
@@ -307,7 +309,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
       volume: 90,
       touchTipAfterAspirate: true,
     }
-    const result = distribute(distributeArgs)(robotInitialState)
+    const result = reduceCommandCreators(distribute(distributeArgs)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.aspirate('A1', 240),
@@ -333,7 +335,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
       volume: 90,
       touchTipAfterDispense: true,
     }
-    const result = distribute(distributeArgs)(robotInitialState)
+    const result = reduceCommandCreators(distribute(distributeArgs)(robotInitialState))(robotInitialState)
 
     function touchTip (well: string) {
       return cmd.touchTip(well, {labware: 'destPlateId'})
@@ -377,7 +379,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
       disposalWell,
     }
 
-    const result = distribute(distributeArgs)(robotInitialState)
+    const result = reduceCommandCreators(distribute(distributeArgs)(robotInitialState))(robotInitialState)
 
     const mixCommands = [
       // mix 1
@@ -415,7 +417,7 @@ describe('invalid input + state errors', () => {
       pipette: 'no-such-pipette-id-here',
     }
 
-    const result = distributeWithErrors(distributeArgs)(robotInitialState)
+    const result = reduceCommandCreators(distributeWithErrors(distributeArgs)(robotInitialState))(robotInitialState)
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
@@ -437,7 +439,7 @@ describe('distribute volume exceeds pipette max volume', () => {
       disposalLabware: null,
       disposalWell: null,
     }
-    const result = distribute(distributeArgs)(robotInitialState)
+    const result = reduceCommandCreators(distribute(distributeArgs)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.dropTip('A1'),
@@ -479,7 +481,7 @@ describe('distribute volume exceeds pipette max volume', () => {
       disposalLabware: null,
       disposalWell: null,
     }
-    const result = distribute(distributeArgs)(robotInitialState)
+    const result = reduceCommandCreators(distribute(distributeArgs)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.dropTip('A1'),
@@ -513,7 +515,7 @@ describe('distribute volume exceeds pipette max volume', () => {
       disposalLabware: null,
       disposalWell: null,
     }
-    const result = distribute(distributeArgs)(robotInitialState)
+    const result = reduceCommandCreators(distribute(distributeArgs)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.aspirate('A1', 300),

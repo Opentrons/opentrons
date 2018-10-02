@@ -10,6 +10,7 @@ import {
   commandFixtures as cmd,
 } from './fixtures'
 import _consolidate from '../consolidate'
+import {reduceCommandCreators} from '../utils'
 
 const consolidate = commandCreatorNoErrors(_consolidate)
 const consolidateWithErrors = commandCreatorHasErrors(_consolidate)
@@ -111,7 +112,7 @@ describe('consolidate single-channel', () => {
       changeTip: 'once',
     }
 
-    const result = consolidate(data)(robotInitialState)
+    const result = reduceCommandCreators(consolidate(data)(robotInitialState))(robotInitialState)
 
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTip)
 
@@ -131,7 +132,7 @@ describe('consolidate single-channel', () => {
       changeTip: 'once',
     }
 
-    const result = consolidate(data)(robotInitialState)
+    const result = reduceCommandCreators(consolidate(data)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.pickUpTip('A1'),
@@ -154,7 +155,7 @@ describe('consolidate single-channel', () => {
       changeTip: 'always',
     }
 
-    const result = consolidate(data)(robotInitialState)
+    const result = reduceCommandCreators(consolidate(data)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.pickUpTip('A1'),
@@ -191,7 +192,7 @@ describe('consolidate single-channel', () => {
       changeTip: 'once',
     }
 
-    const result = consolidate(data)(robotInitialState)
+    const result = reduceCommandCreators(consolidate(data)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.pickUpTip('A1'),
@@ -214,7 +215,7 @@ describe('consolidate single-channel', () => {
       changeTip: 'never',
     }
 
-    const result = consolidate(data)(robotStatePickedUpOneTip)
+    const result = reduceCommandCreators(consolidate(data)(robotInitialState))(robotStatePickedUpOneTip)
 
     expect(result.commands).toEqual([
       cmd.aspirate('A1', 150),
@@ -237,7 +238,7 @@ describe('consolidate single-channel', () => {
       disposalVolume: 50,
     }
 
-    const result = consolidate(data)(robotInitialState)
+    const result = reduceCommandCreators(consolidate(data)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.pickUpTip('A1'),
@@ -262,7 +263,7 @@ describe('consolidate single-channel', () => {
       mixFirstAspirate: {times: 3, volume: 50},
     }
 
-    const result = consolidate(data)(robotInitialState)
+    const result = reduceCommandCreators(consolidate(data)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.pickUpTip('A1'),
@@ -291,7 +292,7 @@ describe('consolidate single-channel', () => {
       mixFirstAspirate: {times: 3, volume: 50},
     }
 
-    const result = consolidate(data)(robotInitialState)
+    const result = reduceCommandCreators(consolidate(data)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.pickUpTip('A1'),
@@ -336,7 +337,7 @@ describe('consolidate single-channel', () => {
       mixInDestination: {times: 3, volume: 53},
     }
 
-    const result = consolidate(data)(robotInitialState)
+    const result = reduceCommandCreators(consolidate(data)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.pickUpTip('A1'),
@@ -364,7 +365,7 @@ describe('consolidate single-channel', () => {
       blowout: 'trashId',
     }
 
-    const result = consolidate(data)(robotInitialState)
+    const result = reduceCommandCreators(consolidate(data)(robotInitialState))(robotInitialState)
     expect(result.commands).toEqual([
       cmd.pickUpTip('A1'),
       cmd.aspirate('A1', 100),
@@ -395,7 +396,7 @@ describe('consolidate single-channel', () => {
       mixInDestination: {times: 3, volume: 52},
     }
 
-    const result = consolidate(data)(robotInitialState)
+    const result = reduceCommandCreators(consolidate(data)(robotInitialState))(robotInitialState)
     expect(result.commands).toEqual([
       cmd.pickUpTip('A1'),
       cmd.aspirate('A1', 130), // includes disposal volume
@@ -431,7 +432,7 @@ describe('consolidate single-channel', () => {
 
     const preWetVol = data.volume // NOTE same as volume above... for now
 
-    const result = consolidate(data)(robotInitialState)
+    const result = reduceCommandCreators(consolidate(data)(robotInitialState))(robotInitialState)
     expect(result.commands).toEqual([
       cmd.pickUpTip('A1'),
 
@@ -464,7 +465,7 @@ describe('consolidate single-channel', () => {
       touchTipAfterAspirate: true,
     }
 
-    const result = consolidate(data)(robotInitialState)
+    const result = reduceCommandCreators(consolidate(data)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.pickUpTip('A1'),
@@ -496,7 +497,7 @@ describe('consolidate single-channel', () => {
       touchTipAfterDispense: true,
     }
 
-    const result = consolidate(data)(robotInitialState)
+    const result = reduceCommandCreators(consolidate(data)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.pickUpTip('A1'),
@@ -525,7 +526,7 @@ describe('consolidate single-channel', () => {
       pipette: 'no-such-pipette-id-here',
     }
 
-    const result = consolidateWithErrors(data)(robotInitialState)
+    const result = reduceCommandCreators(consolidateWithErrors(data)(robotInitialState))(robotInitialState)
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0].type).toEqual('PIPETTE_DOES_NOT_EXIST')
@@ -574,7 +575,7 @@ describe('consolidate multi-channel', () => {
       volume: 140,
       changeTip: 'once',
     }
-    const result = consolidate(data)(robotInitialState)
+    const result = reduceCommandCreators(consolidate(data)(robotInitialState))(robotInitialState)
 
     expect(result.commands).toEqual([
       cmd.pickUpTip('A1', multiParams),
