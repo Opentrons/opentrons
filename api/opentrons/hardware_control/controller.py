@@ -72,3 +72,6 @@ class Controller:
 
     def home(self):
         return self._smoothie_driver.home()
+
+    def get_attached_instruments(self, mount):
+        return self._smoothie_driver.read_pipette_model(mount.name.lower())
