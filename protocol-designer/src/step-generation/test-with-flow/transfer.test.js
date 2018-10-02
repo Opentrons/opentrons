@@ -2,16 +2,15 @@
 import merge from 'lodash/merge'
 import {
   createRobotState,
-  commandCreatorNoErrors,
-  commandCreatorHasErrors,
+  compoundCommandCreatorNoErrors,
+  compoundCommandCreatorHasErrors,
   commandFixtures as cmd,
 } from './fixtures'
 import _transfer from '../transfer'
-import {reduceCommandCreators} from '../utils'
 import {FIXED_TRASH_ID} from '../../constants'
 
-const transfer = commandCreatorNoErrors(_transfer)
-const transferWithErrors = commandCreatorHasErrors(_transfer)
+const transfer = compoundCommandCreatorNoErrors(_transfer)
+const transferWithErrors = compoundCommandCreatorHasErrors(_transfer)
 
 let transferArgs
 let robotInitialState
@@ -68,7 +67,7 @@ describe('pick up tip if no tip on pipette', () => {
         changeTip,
       }
 
-      const result = reduceCommandCreators(transfer(transferArgs)(robotInitialState))(robotInitialState)
+      const result = transfer(transferArgs)(robotInitialState)
 
       expect(result.commands[0]).toEqual(
         cmd.pickUpTip('A1')
@@ -82,7 +81,7 @@ describe('pick up tip if no tip on pipette', () => {
       changeTip: 'never',
     }
 
-    const result = reduceCommandCreators(transferWithErrors(transferArgs)(robotInitialState))(robotInitialState)
+    const result = transferWithErrors(transferArgs)(robotInitialState)
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
@@ -102,7 +101,7 @@ test('single transfer: 1 source & 1 dest', () => {
 
   robotInitialState.liquidState.labware.sourcePlateId.A1 = {'0': {volume: 200}}
 
-  const result = reduceCommandCreators(transfer(transferArgs)(robotInitialState))(robotInitialState)
+  const result = transfer(transferArgs)(robotInitialState)
   expect(result.commands).toEqual([
     cmd.aspirate('A1', 30),
     cmd.dispense('B2', 30, {labware: 'destPlateId'}),
@@ -131,7 +130,7 @@ test('transfer with multiple sets of wells', () => {
     changeTip: 'never',
     volume: 30,
   }
-  const result = reduceCommandCreators(transfer(transferArgs)(robotInitialState))(robotInitialState)
+  const result = transfer(transferArgs)(robotInitialState)
   expect(result.commands).toEqual([
     cmd.aspirate('A1', 30),
     cmd.dispense('B2', 30, {labware: 'destPlateId'}),
@@ -149,7 +148,7 @@ test('invalid pipette ID should throw error', () => {
     pipette: 'no-such-pipette-id-here',
   }
 
-  const result = reduceCommandCreators(transferWithErrors(transferArgs)(robotInitialState))(robotInitialState)
+  const result = transferWithErrors(transferArgs)(robotInitialState)
 
   expect(result.errors).toHaveLength(1)
   expect(result.errors[0]).toMatchObject({
@@ -202,7 +201,7 @@ describe('single transfer exceeding pipette max', () => {
       changeTip: 'once',
     }
 
-    const result = reduceCommandCreators(transfer(transferArgs)(robotInitialState))(robotInitialState)
+    const result = transfer(transferArgs)(robotInitialState)
     expect(result.commands).toEqual([
       cmd.pickUpTip('A1'),
       cmd.aspirate('A1', 300),
@@ -228,7 +227,7 @@ describe('single transfer exceeding pipette max', () => {
       changeTip: 'always',
     }
 
-    const result = reduceCommandCreators(transfer(transferArgs)(robotInitialState))(robotInitialState)
+    const result = transfer(transferArgs)(robotInitialState)
     expect(result.commands).toEqual([
       cmd.pickUpTip('A1'),
 
@@ -276,7 +275,7 @@ describe('single transfer exceeding pipette max', () => {
     // begin with tip on pipette
     robotInitialState.tipState.pipettes.p300SingleId = true
 
-    const result = reduceCommandCreators(transfer(transferArgs)(robotInitialState))(robotInitialState)
+    const result = transfer(transferArgs)(robotInitialState)
     expect(result.commands).toEqual([
       // no pick up tip
       cmd.aspirate('A1', 300),
@@ -317,7 +316,7 @@ describe('advanced options', () => {
         preWetTip: true,
       }
 
-      const result = reduceCommandCreators(transfer(transferArgs)(robotInitialState))(robotInitialState)
+      const result = transfer(transferArgs)(robotInitialState)
       expect(result.commands).toEqual([
         // pre-wet aspirate/dispense
         cmd.aspirate('A1', 300),
@@ -339,7 +338,7 @@ describe('advanced options', () => {
         touchTipAfterAspirate: true,
       }
 
-      const result = reduceCommandCreators(transfer(transferArgs)(robotInitialState))(robotInitialState)
+      const result = transfer(transferArgs)(robotInitialState)
       expect(result.commands).toEqual([
         cmd.aspirate('A1', 300),
         cmd.touchTip('A1'),
@@ -358,7 +357,7 @@ describe('advanced options', () => {
         touchTipAfterDispense: true,
       }
 
-      const result = reduceCommandCreators(transfer(transferArgs)(robotInitialState))(robotInitialState)
+      const result = transfer(transferArgs)(robotInitialState)
       expect(result.commands).toEqual([
         cmd.aspirate('A1', 300),
         cmd.dispense('B1', 300, {labware: 'destPlateId'}),
@@ -390,7 +389,7 @@ describe('advanced options', () => {
         cmd.dispense('A1', 250),
       ]
 
-      const result = reduceCommandCreators(transfer(transferArgs)(robotInitialState))(robotInitialState)
+      const result = transfer(transferArgs)(robotInitialState)
       expect(result.commands).toEqual([
         ...mixCommands,
         cmd.aspirate('A1', 300),
@@ -426,7 +425,7 @@ describe('advanced options', () => {
         cmd.dispense('B1', 250, {labware: 'destPlateId'}),
       ]
 
-      const result = reduceCommandCreators(transfer(transferArgs)(robotInitialState))(robotInitialState)
+      const result = transfer(transferArgs)(robotInitialState)
       expect(result.commands).toEqual([
         cmd.aspirate('A1', 300),
         cmd.dispense('B1', 300, {labware: 'destPlateId'}),
@@ -445,7 +444,7 @@ describe('advanced options', () => {
         delayAfterDispense: 100,
       }
 
-      const result = reduceCommandCreators(transfer(transferArgs)(robotInitialState))(robotInitialState)
+      const result = transfer(transferArgs)(robotInitialState)
 
       const delayCommand = {
         command: 'delay',

@@ -25,10 +25,7 @@ import {
   mix,
 } from '../step-generation'
 
-import type {
-  AspirateDispenseArgs,
-  RobotState,
-} from '../step-generation'
+import type {RobotState} from '../step-generation'
 
 import type {
   PipetteData,
@@ -43,11 +40,6 @@ type AllPipetteData = {[pipetteId: string]: PipetteData}
 
 export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 type GetLabwareType = (labwareId: string) => ?string
-
-type AspDispCommandType = {
-  command: 'aspirate' | 'dispense',
-  params: AspirateDispenseArgs,
-}
 
 function transferLikeSubsteps (args: {
   validatedForm: ConsolidateFormData | DistributeFormData | TransferFormData | MixFormData,
