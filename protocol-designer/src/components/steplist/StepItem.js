@@ -13,6 +13,7 @@ import type {
   SubstepIdentifier,
   StepItemData,
   SubstepItemData,
+  WellIngredientNames,
 } from '../../steplist/types'
 
 type StepItemProps = {
@@ -25,7 +26,7 @@ type StepItemProps = {
   selected?: boolean,
   hovered?: boolean,
   hoveredSubstep: ?SubstepIdentifier,
-  ingredNames: {[string]: string},
+  ingredNames: WellIngredientNames,
 
   getLabwareName: (labwareId: ?string) => ?string,
   handleSubstepHover: SubstepIdentifier => mixed,

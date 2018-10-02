@@ -20,17 +20,14 @@ type SubstepRowProps = {|
   onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed,
 |}
 
-const VOLUME_DIGITS = 1
+const VOLUME_SIG_DIGITS_DEFAULT = 1
 
-function formatVolume (inputVolume: ?string | ?number): string {
+function formatVolume (inputVolume: ?string | ?number, sigDigits?: number = VOLUME_SIG_DIGITS_DEFAULT): string {
   if (typeof inputVolume === 'number') {
     // don't add digits to numbers with nothing to the right of the decimal
-    const digits = inputVolume.toString().split('.')[1]
-      ? VOLUME_DIGITS
-      : 0
-    return inputVolume.toFixed(digits)
+    const digits = inputVolume.toString().split('.')[1] ? sigDigits : 0
+    return Number(Math.round(`${inputVolume}e${digits}`) + `e-${digits}`)
   }
-
   return inputVolume || ''
 }
 
@@ -48,23 +45,25 @@ const PillTooltipContents = (props: PillTooltipContentsProps) => {
   const hasMultipleIngreds = Object.keys(props.ingreds).length > 1
   return (
     <div className={styles.liquid_tooltip_contents}>
-      {map(props.ingreds, (ingred, groupId) => (
-        <div key={groupId} className={styles.ingred_row}>
-          <div className={styles.ingred_row_left}>
-            <div
-              className={styles.liquid_circle}
-              style={{backgroundColor: swatchColors(Number(groupId))}} />
-            <span>{props.ingredNames[groupId]}</span>
-          </div>
-          <div className={styles.ingred_row_right}>
+      <table>
+        {map(props.ingreds, (ingred, groupId) => (
+          <tr key={groupId} className={styles.ingred_row}>
+            <td>
+              <div
+                className={styles.liquid_circle}
+                style={{backgroundColor: swatchColors(Number(groupId))}} />
+            </td>
+            <td className={styles.ingred_name}>
+              {props.ingredNames[groupId]}
+            </td>
             {
               hasMultipleIngreds &&
-              <span className={styles.ingred_percentage}>{formatPercentage(ingred.volume, totalLiquidVolume)}</span>
+              <td className={styles.ingred_percentage}>{formatPercentage(ingred.volume, totalLiquidVolume)}</td>
             }
-            <span className={styles.ingred_partial_volume}>{ingred.volume}µl</span>
-          </div>
-        </div>
-      ))}
+            <td className={styles.ingred_partial_volume}>{formatVolume(ingred.volume, 2)}µl</td>
+          </tr>
+        ))}
+      </table>
       {
         hasMultipleIngreds &&
         <React.Fragment>
@@ -80,8 +79,8 @@ const PillTooltipContents = (props: PillTooltipContentsProps) => {
 }
 
 export default function SubstepRow (props: SubstepRowProps) {
-  const compactedSourcePreIngreds = props.source ? omitBy(props.source.preIngreds, ingred => ingred.volume < 1) : {}
-  const compactedDestPreIngreds = props.dest ? omitBy(props.dest.preIngreds, ingred => ingred.volume < 1) : {}
+  const compactedSourcePreIngreds = props.source ? omitBy(props.source.preIngreds, ingred => ingred.volume <= 0) : {}
+  const compactedDestPreIngreds = props.dest ? omitBy(props.dest.preIngreds, ingred => ingred.volume <= 0) : {}
   return (
     <PDListItem
       border

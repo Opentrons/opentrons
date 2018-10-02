@@ -85,36 +85,28 @@
 }
 
 .ingred_row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   min-width: 180px;
 }
 
-.ingred_row:not(:last-child) {
-  margin-bottom: 0.5em;
+.ingred_row > td {
+  flex: 1 1 40px;
 }
 
-.ingred_row_left {
-  flex: 1;
-  display: flex;
-  align-items: center;
+.ingred_row:not(:last-child) > td {
+  padding-bottom: 0.5em;
 }
 
-.ingred_row_right {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+.ingred_name {
+  text-align: left;
+  padding-right: 0.5em;
 }
 
 .ingred_percentage {
-  flex: 1;
   text-align: right;
+  padding-right: 0.5em;
 }
 
 .ingred_partial_volume {
-  flex: 1;
   text-align: right;
 }
 

@@ -80,3 +80,7 @@ export type StepItemData = {
 }
 
 export type SubSteps = {[StepIdType]: ?SubstepItemData}
+
+export type ingredNames = {[ingredId: string]: string}
+
+export type ingredVolumeData = {[ingredId: string]: {volume: number}}
