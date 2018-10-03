@@ -39,7 +39,7 @@ test:
 
 .PHONY: lint
 lint:
-	-$(python) -m mypy opentrons
+	$(python) -m mypy opentrons
 	$(python) -m pylama opentrons tests
 
 .PHONY: docs
