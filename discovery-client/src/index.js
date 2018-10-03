@@ -3,17 +3,19 @@
 // finds robots on the network via mdns
 
 import EventEmitter from 'events'
-import mdns from 'mdns-js'
 import escape from 'escape-string-regexp'
+import mdns from 'mdns-js'
 import toRegex from 'to-regex'
+import differenceBy from 'lodash/differenceBy'
+import xorBy from 'lodash/xorBy'
 
 import {poll, stop, type PollRequest} from './poller'
 import {
   createServiceList,
   upsertServiceList,
   updateServiceListByIp,
-  diffServiceLists,
 } from './service-list'
+
 import {
   DEFAULT_PORT,
   fromMdnsBrowser,
@@ -67,8 +69,9 @@ export class DiscoveryClient extends EventEmitter {
   services: ServiceList
   candidates: Array<Candidate>
   _browser: ?Browser
-  _pollRequest: ?PollRequest
+  _pollList: Array<Candidate>
   _pollInterval: number
+  _pollRequest: ?PollRequest
   _nameFilter: RegExp
   _ipFilter: RegExp
   _portFilter: Array<number>
@@ -85,12 +88,14 @@ export class DiscoveryClient extends EventEmitter {
       .map(c => (typeof c === 'string' ? makeCandidate(c) : c))
       .filter(c => this.services.every(s => s.ip !== c.ip))
 
+    this._browser = null
+    this._pollList = []
     this._pollInterval = options.pollInterval || DEFAULT_POLL_INTERVAL
+    this._pollRequest = null
     this._nameFilter = toRegex(santizeRe(options.nameFilter), TO_REGEX_OPTS)
     this._ipFilter = toRegex(santizeRe(options.ipFilter), TO_REGEX_OPTS)
     this._portFilter = [DEFAULT_PORT].concat(options.portFilter || [])
     this._logger = options.logger
-    this._browser = null
 
     log(this._logger, 'silly', 'Created', this)
   }
@@ -139,23 +144,30 @@ export class DiscoveryClient extends EventEmitter {
 
   setPollInterval (interval: number): DiscoveryClient {
     this._pollInterval = interval || DEFAULT_POLL_INTERVAL
-    this._poll()
+    this._poll(true)
 
     return this
   }
 
-  _poll (): void {
-    log(this._logger, 'debug', '(re)starting polling', {})
-    stop(this._pollRequest, this._logger)
-    this._pollRequest = poll(
-      this.services
-        .map(toCandidate)
-        .filter(Boolean)
-        .concat(this.candidates),
-      this._pollInterval,
-      this._handleHealth.bind(this),
-      this._logger
-    )
+  _poll (forceRestart?: boolean): void {
+    const nextPollList = this.services
+      .map(toCandidate)
+      .filter(Boolean)
+      .concat(this.candidates)
+
+    // only poll if needed
+    if (forceRestart || xorBy(this._pollList, nextPollList, 'ip').length) {
+      log(this._logger, 'debug', '(re)starting polling', {})
+
+      this._pollList = nextPollList
+      stop(this._pollRequest, this._logger)
+      this._pollRequest = poll(
+        nextPollList,
+        this._pollInterval,
+        this._handleHealth.bind(this),
+        this._logger
+      )
+    }
   }
 
   _stopPoll (): void {
@@ -227,19 +239,13 @@ export class DiscoveryClient extends EventEmitter {
 
   // update this.services, emit if necessary, re-poll if necessary
   _updateLists (nextServices: ServiceList): void {
-    const updated = diffServiceLists(this.services, nextServices)
-    const nextCandidates = this.candidates.filter(candidate =>
-      nextServices.every(service => candidate.ip !== service.ip)
-    )
-
-    const pollNeeded =
-      updated.length || nextCandidates.length !== this.candidates.length
-
-    this.services = nextServices
-    this.candidates = nextCandidates
-
-    if (pollNeeded) this._poll()
+    const updated = differenceBy(nextServices, this.services)
     if (updated.length) {
+      // $FlowFixMe: flow doesn't type differenceBy properly, but this works
+      this.candidates = differenceBy(this.candidates, nextServices, 'ip')
+      this.services = nextServices
+      this._poll()
+
       updated.forEach(s => this.emit(SERVICE_EVENT, s))
       log(this._logger, 'debug', 'updated services', {updated})
     }

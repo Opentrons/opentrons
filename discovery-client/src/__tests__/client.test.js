@@ -177,7 +177,7 @@ describe('discovery client', () => {
   })
 
   test('client.stop should stop polling', () => {
-    const client = DiscoveryClient()
+    const client = DiscoveryClient({services: [MOCK_SERVICE]})
 
     poller.poll.mockReturnValueOnce({id: 'foobar'})
     client.start()
@@ -360,13 +360,15 @@ describe('discovery client', () => {
   })
 
   test('if new service is added, poller is restarted', () => {
-    const client = DiscoveryClient()
+    const client = DiscoveryClient({
+      candidates: [{ip: '192.168.1.1', port: 31950}],
+    })
 
     poller.poll.mockReturnValueOnce({id: 1234})
 
     client.start()
     expect(poller.poll).toHaveBeenLastCalledWith(
-      [],
+      [{ip: '192.168.1.1', port: 31950}],
       expect.anything(),
       expect.anything(),
       client._logger
@@ -375,7 +377,7 @@ describe('discovery client', () => {
     client.once('service', robot => {
       expect(poller.stop).toHaveBeenLastCalledWith({id: 1234}, client._logger)
       expect(poller.poll).toHaveBeenLastCalledWith(
-        [{ip: '192.168.1.42', port: 31950}],
+        [{ip: '192.168.1.42', port: 31950}, {ip: '192.168.1.1', port: 31950}],
         expect.anything(),
         expect.anything(),
         client._logger

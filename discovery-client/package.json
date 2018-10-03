@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "escape-string-regexp": "^1.0.5",
+    "lodash": "^4.17.4",
     "mdns-js": "^1.0.1",
     "node-fetch": "^2.1.2",
     "to-regex": "^3.0.2",

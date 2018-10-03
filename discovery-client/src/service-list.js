@@ -47,15 +47,6 @@ export function updateServiceListByIp (
   return dedupeServices(nextList)
 }
 
-export function diffServiceLists (
-  prev: ServiceList,
-  next: ServiceList
-): ServiceList {
-  // TODO(mc, 2018-10-02): this could be _way_ more optimized but these lists
-  // will never really get bigger than order of magnitude 10
-  return next.filter(service => !prev.includes(service))
-}
-
 // ensure there aren't multiple entries with the same IP and there aren't
 // multiple entries with the same name and ip: null
 function dedupeServices (list: ServiceList) {

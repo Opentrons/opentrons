@@ -1,10 +1,11 @@
 // @flow
 // app shell discovery module
 import assert from 'assert'
+import Store from 'electron-store'
 import groupBy from 'lodash/groupBy'
 import map from 'lodash/map'
+import throttle from 'lodash/throttle'
 import uniqBy from 'lodash/uniqBy'
-import Store from 'electron-store'
 
 import DiscoveryClient, {
   SERVICE_EVENT,
@@ -23,27 +24,30 @@ import type {DiscoveredRobot, Connection} from '@opentrons/app/src/discovery/typ
 const log = createLogger(__filename)
 
 // TODO(mc, 2018-08-09): values picked arbitrarily and should be researched
-const FAST_POLL_INTERVAL = 3000
-const SLOW_POLL_INTERVAL = 15000
+const FAST_POLL_INTERVAL_MS = 3000
+const SLOW_POLL_INTERVAL_MS = 15000
+const UPDATE_THROTTLE_MS = 500
 
 let config
 let store
 let client
 
 export function registerDiscovery (dispatch: Action => void) {
+  const onServiceUpdate = throttle(handleServices, UPDATE_THROTTLE_MS)
+
   config = getConfig('discovery')
   store = new Store({name: 'discovery', defaults: {services: []}})
 
   client = DiscoveryClient({
-    pollInterval: SLOW_POLL_INTERVAL,
+    pollInterval: SLOW_POLL_INTERVAL_MS,
     logger: log,
     candidates: ['[fd00:0:cafe:fefe::1]'].concat(config.candidates),
     services: store.get('services'),
   })
 
   client
-    .on(SERVICE_EVENT, handleServices)
-    .on(SERVICE_REMOVED_EVENT, handleServices)
+    .on(SERVICE_EVENT, onServiceUpdate)
+    .on(SERVICE_REMOVED_EVENT, onServiceUpdate)
     .on('error', error => log.error('discovery error', {error}))
     .start()
 
@@ -53,9 +57,9 @@ export function registerDiscovery (dispatch: Action => void) {
     switch (action.type) {
       case 'discovery:START':
         handleServices()
-        return client.setPollInterval(FAST_POLL_INTERVAL).start()
+        return client.setPollInterval(FAST_POLL_INTERVAL_MS).start()
       case 'discovery:FINISH':
-        return client.setPollInterval(SLOW_POLL_INTERVAL)
+        return client.setPollInterval(SLOW_POLL_INTERVAL_MS)
     }
   }
 

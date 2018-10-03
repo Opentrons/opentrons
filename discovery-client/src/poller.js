@@ -15,6 +15,9 @@ export type PollRequest = {
   id: ?IntervalID,
 }
 
+const MIN_SUBINTERVAL_MS = 100
+const MAX_TIMEOUT_MS = 10000
+
 export function poll (
   candidates: Array<Candidate>,
   interval: number,
@@ -25,7 +28,9 @@ export function poll (
 
   log && log.debug('poller start', { interval, candidates: candidates.length })
 
-  const subInterval = interval / candidates.length
+  const subInterval = Math.max(interval / candidates.length, MIN_SUBINTERVAL_MS)
+  const timeout = Math.min(subInterval * candidates.length, MAX_TIMEOUT_MS)
+
   const id = setInterval(pollIp, subInterval)
   const request = { id }
   let current = -1
@@ -35,7 +40,7 @@ export function poll (
   function pollIp () {
     const next = getNextCandidate()
 
-    fetchHealth(next, interval, log).then(([apiRes, serverRes]) =>
+    fetchHealth(next, timeout, log).then(([apiRes, serverRes]) =>
       onHealth(next, apiRes, serverRes)
     )
   }

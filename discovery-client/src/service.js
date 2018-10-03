@@ -1,14 +1,13 @@
 // @flow
 // create Services from different sources
 import net from 'net'
-import type {BrowserService, ServiceType} from 'mdns-js'
+import defaultTo from 'lodash/defaultTo'
 
+import type {BrowserService, ServiceType} from 'mdns-js'
 import type {Service, ServiceUpdate, Candidate, HealthResponse} from './types'
 
 const nameExtractor = (st: ServiceType) =>
   new RegExp(`^(.+)\\._${st.name}\\._${st.protocol}`)
-
-const getOrElse = (value, orElse) => (value != null ? value : orElse)
 
 export const DEFAULT_PORT = 31950
 
@@ -38,7 +37,7 @@ export function updateService (
 
   return Object.keys(update).reduce((result, key) => {
     const prevVal = result[key]
-    const nextVal = getOrElse(next[key], prevVal)
+    const nextVal = defaultTo(next[key], prevVal)
     // $FlowFixMe: flow can't type [key]: nextVal but we know this is correct
     return nextVal !== prevVal ? {...result, [key]: nextVal} : result
   }, service)

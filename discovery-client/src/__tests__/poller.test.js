@@ -39,6 +39,12 @@ describe('discovery poller', () => {
     expect(setInterval).toHaveBeenCalledWith(expect.any(Function), 2000)
   })
 
+  test('will not set a subinterval smaller than 100ms', () => {
+    poll([{ip: 'foo', port: 31950}, {ip: 'bar', port: 31950}], 42, jest.fn())
+
+    expect(setInterval).toHaveBeenCalledWith(expect.any(Function), 100)
+  })
+
   test('returns interval ID in request object', () => {
     const intervalId = 1234
     setInterval.mockReturnValueOnce(intervalId)
