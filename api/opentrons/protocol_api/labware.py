@@ -116,25 +116,93 @@ class Labware:
     provides methods for accessing wells within the labware.
     """
     def __init__(self, definition: dict, parent: Point) -> None:
-        pass
+        self._ordering = definition['ordering']
+        self._wells = definition['wells']
+        offset = definition['cornerOffsetFromSlot']
+        self._offset = Point(x=offset['x'], y=offset['y'], z=offset['z'])
 
     def wells(self) -> List[Well]:
-        pass
+        """
+        Accessor function used to generate a list of wells in top -> down,
+        left -> right order. This is representative of moving down `rows` and
+        across `columns` (e.g. 'A1', 'B1', 'C1'...'A2', 'B2', 'C2')
+
+        With indexing one can treat it as a typical python
+        list. To access well A1, for example, simply write: labware.wells()[0]
+
+        :return: Ordered list of all wells in a labware
+        """
+        return [Well(self._wells[well], self._offset)
+                for col in self._ordering for well in col]
 
     def wells_by_index(self) -> Dict[str, Well]:
-        pass
+        """
+        Accessor function used to create a look-up table of Wells by name.
+
+        With indexing one can treat it as a typical python
+        dictionary whose keys are well names. To access well A1, for example,
+        simply write: labware.wells_by_index()['A1']
+
+        :return: Dictionary of well objects keyed by well name
+        """
+        return {well: Well(self._wells[well], self._offset)
+                for col in self._ordering for well in col}
 
     def rows(self) -> List[List[Well]]:
-        pass
+        """
+        Accessor function used to navigate through a labware by row.
+
+        With indexing one can treat it as a typical python nested list.
+        To access row A for example, simply write: labware.rows()[0]. This
+        will output ['A1', 'A2', 'A3', 'A4'...]
+
+        :return: A list of row lists
+        """
+        return [[Well(self._wells[well], self._offset) for well in row]
+                for row in zip(*self._ordering)]
 
     def rows_by_index(self) -> Dict[str, List[Well]]:
-        pass
+        """
+        Accessor function used to navigate through a labware by row name.
+
+        With indexing one can treat it as a typical python dictionary.
+        To access row A for example, simply write: labware.rows_by_index()['A']
+        This will output ['A1', 'A2', 'A3', 'A4'...].
+
+        :return: Dictionary of Well lists keyed by row name
+        """
+        return {chr(ord('A') + idx):
+                [Well(self._wells[well], self._offset) for well in row]
+                for idx, row in enumerate(zip(*self._ordering))}
 
     def columns(self) -> List[List[Well]]:
-        pass
+        """
+        Accessor function used to navigate through a labware by column.
+
+        With indexing one can treat it as a typical python nested list.
+        To access row A for example,
+        simply write: labware.columns()[0]
+        This will output ['A1', 'B1', 'C1', 'D1'...].
+
+        :return: A list of column lists
+        """
+        return [[Well(self._wells[well], self._offset) for well in col]
+                for col in self._ordering]
 
     def columns_by_index(self) -> Dict[str, List[Well]]:
-        pass
+        """
+        Accessor function used to navigate through a labware by column name.
+
+        With indexing one can treat it as a typical python dictionary.
+        To access row A for example,
+        simply write: labware.columns_by_index()['1']
+        This will output ['A1', 'B1', 'C1', 'D1'...].
+
+        :return: Dictionary of Well lists keyed by column name
+        """
+        return {str(idx + 1):
+                [Well(self._wells[well], self._offset) for well in col]
+                for idx, col in enumerate(self._ordering)}
 
 
 def _load_definition_by_name(name: str) -> dict:
