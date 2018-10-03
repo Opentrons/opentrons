@@ -3,7 +3,7 @@ import sqlite3
 # import warnings
 from typing import List
 from opentrons.legacy_api.containers.placeable\
-    import Container, Well, Module
+    import Container, Well, Module, Placeable
 from opentrons.data_storage import database_queries as db_queries
 from opentrons.util import environment
 from opentrons.util.vector import Vector
@@ -72,7 +72,7 @@ def _load_container_object_from_db(db, container_name: str):
         )
 
     if container_name in SUPPORTED_MODULES:
-        container = Module()
+        container: Placeable = Module()
     else:
         container = Container()
 
@@ -214,10 +214,12 @@ def overwrite_container(container: Container) -> bool:
 
 def save_labware_offset(labware: Container, labware_name: str=None) -> bool:
     if labware_name is None:
-        labware_name = labware.get_name()
+        name = labware.get_name()
+    else:
+        name = labware_name
     offset = _calculate_offset(labware)
-    log.debug("Saving offset {} for {}".format(offset, labware_name))
-    return ldef.save_labware_offset(labware_name, offset)
+    log.debug("Saving offset {} for {}".format(offset, name))
+    return ldef.save_labware_offset(name, offset)
 
 
 def delete_container(container_name) -> bool:

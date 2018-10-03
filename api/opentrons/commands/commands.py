@@ -325,7 +325,7 @@ def resume():
     )
 
 
-def publish(before, after, command, meta=None):
+def _do_publish(before, after, command, meta=None):
     publish_command = functools.partial(
         broker.publish,
         topic=types.COMMAND)
@@ -337,24 +337,26 @@ def publish(before, after, command, meta=None):
             command_args = dict(
                 zip(
                     reversed(inspect.getfullargspec(command).args),
-                    reversed(inspect.getfullargspec(command).defaults or [])))
+                    reversed(inspect.getfullargspec(command).defaults
+                             or [])))
 
             # TODO (artyom, 20170927): we are doing this to be able to use
             # the decorator in Instrument class methods, in which case
             # self is effectively an instrument.
-            # To narrow the scope of this hack, we are checking if the command
-            # is expecting instrument first.
+            # To narrow the scope of this hack, we are checking if the
+            # command is expecting instrument first.
             if 'instrument' in inspect.getfullargspec(command).args:
                 # We are also checking if call arguments have 'self' and
-                # don't have instruments specified, in which case instruments
-                # should take precedence.
+                # don't have instruments specified, in which case
+                # instruments should take precedence.
                 if 'self' in call_args and 'instrument' not in call_args:
                     call_args['instrument'] = call_args['self']
 
             command_args.update({
                 key: call_args[key]
                 for key in
-                set(inspect.getfullargspec(command).args) & call_args.keys()
+                (set(inspect.getfullargspec(command).args)
+                 & call_args.keys())
             })
 
             if meta:
@@ -378,6 +380,21 @@ def publish(before, after, command, meta=None):
     return decorator
 
 
+class publish:
+    """ Class that allows namespaced decorators with valid mypy types
+
+    These were previously defined by adding them as attributes to the
+    publish function, which is not currently supported by mypy:
+    https://github.com/python/mypy/issues/2087
+
+    Making a simple class with these as attributes does the same thing
+    but in a way that mypy can actually verify.
+    """
+    before = functools.partial(_do_publish, before=True, after=False)
+    after = functools.partial(_do_publish, before=False, after=True)
+    both = functools.partial(_do_publish, before=True, after=True)
+
+
 def _get_args(f, args, kwargs):
     # Create the initial dictionary with args that have defaults
     res = {}
@@ -394,8 +411,3 @@ def _get_args(f, args, kwargs):
     # Update it with values for named args
     res.update(kwargs)
     return res
-
-
-publish.before = functools.partial(publish, before=True, after=False)
-publish.after = functools.partial(publish, before=False, after=True)
-publish.both = functools.partial(publish, before=True, after=True)
