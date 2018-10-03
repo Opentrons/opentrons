@@ -2,7 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import SelectablePlate from '../containers/SelectablePlate'
+import {SelectableLabware} from '../components/labware'
 import SingleLabwareWrapper from '../components/SingleLabware'
 import WellSelectionInstructions from './WellSelectionInstructions'
 
@@ -21,7 +21,8 @@ type Props = {
 }
 
 export default function WellSelectionModal (props: Props) {
-  const pipetteConfig = props.pipette && getPipette(props.pipette.model)
+  const pipette = props
+  const pipetteConfig = pipette && getPipette(pipette.model)
 
   return (
     <Modal
@@ -41,10 +42,7 @@ export default function WellSelectionModal (props: Props) {
       </div>
 
       <SingleLabwareWrapper>
-        <SelectablePlate
-          selectable
-          pipetteChannels={props.pipette && props.pipette.channels}
-        />
+        <SelectableLabware pipetteChannels={pipette && pipette.channels} />
       </SingleLabwareWrapper>
 
       <WellSelectionInstructions />
