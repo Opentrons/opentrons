@@ -147,9 +147,9 @@ export const wellHighlightsByLabwareId: Selector<AllWellHighlightsAllLabware> = 
     const timelineIndex = orderedSteps.findIndex(i => i === stepId)
     const frame = timeline[timelineIndex]
     const robotState = frame && frame.robotState
-    const form = stepId && forms[stepId] && forms[stepId].validatedForm
+    const form = stepId != null && forms[stepId] && forms[stepId].validatedForm
 
-    if (!robotState || !stepId || !form) {
+    if (!robotState || stepId == null || !form) {
       // nothing hovered, or no form for step
       return {}
     }
@@ -159,7 +159,7 @@ export const wellHighlightsByLabwareId: Selector<AllWellHighlightsAllLabware> = 
       robotState.liquidState.labware,
       (labwareLiquids: StepGeneration.SingleLabwareLiquidState, labwareId: string): AllWellHighlights => {
         let selectedWells: Array<string> = []
-        if (hoveredSubstep) {
+        if (hoveredSubstep != null) {
           // wells for hovered substep
           selectedWells = _getSelectedWellsForSubstep(
             form,
