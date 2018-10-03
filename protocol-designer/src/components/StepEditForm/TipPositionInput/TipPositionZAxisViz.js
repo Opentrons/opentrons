@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import round from 'lodash/round'
 
 import PIPETTE_TIP_IMAGE from '../../../images/pipette_tip.svg'
 import WELL_CROSS_SECTION_IMAGE from '../../../images/well_cross_section.svg'
@@ -7,6 +8,7 @@ import WELL_CROSS_SECTION_IMAGE from '../../../images/well_cross_section.svg'
 import styles from './TipPositionInput.css'
 
 const WELL_HEIGHT_PIXELS = 48
+const PIXEL_DECIMALS = 2
 type Props = {
   mmFromBottom: string,
   wellHeightMM: number,
@@ -15,7 +17,7 @@ type Props = {
 const TipPositionZAxisViz = (props: Props) => {
   const fractionOfWellHeight = Number(props.mmFromBottom) / props.wellHeightMM
   const pixelsFromBottom = (Number(fractionOfWellHeight) * WELL_HEIGHT_PIXELS) - WELL_HEIGHT_PIXELS
-  const roundedPixelsFromBottom = String(pixelsFromBottom.toFixed(2))
+  const roundedPixelsFromBottom = String(round(pixelsFromBottom, PIXEL_DECIMALS))
   const bottomPx = props.wellHeightMM ? roundedPixelsFromBottom : (parseFloat(props.mmFromBottom) - WELL_HEIGHT_PIXELS)
   return (
     <div className={styles.viz_wrapper}>

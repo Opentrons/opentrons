@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import round from 'lodash/round'
 import {
   AlertModal,
   FormGroup,
@@ -121,7 +122,7 @@ export default class FlowRateField extends React.Component<Props, State> {
       minFlowRate > modalFlowRateNum ||
       modalFlowRateNum > maxFlowRate
     )
-    const correctDecimals = Number(modalFlowRateNum.toFixed(DECIMALS_ALLOWED)) === modalFlowRateNum
+    const correctDecimals = round(modalFlowRateNum, DECIMALS_ALLOWED) === modalFlowRateNum
     const allowSave = modalUseDefault || (!outOfBounds && correctDecimals)
 
     let errorMessage = null
