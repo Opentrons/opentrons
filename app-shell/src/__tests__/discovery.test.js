@@ -182,14 +182,20 @@ describe('app-shell/discovery', () => {
 
     mockClient.services = [{name: 'foo'}, {name: 'bar'}]
     mockClient.emit('service')
-    expect(Store.__store.set).toHaveBeenCalledWith('services', [
+    expect(Store.__store.set).toHaveBeenLastCalledWith('services', [
       {name: 'foo'},
       {name: 'bar'},
     ])
+  })
+
+  test('stores services to file on serviceRemoved events', () => {
+    registerDiscovery(dispatch)
 
     mockClient.services = [{name: 'foo'}]
     mockClient.emit('serviceRemoved')
-    expect(Store.__store.set).toHaveBeenCalledWith('services', [{name: 'foo'}])
+    expect(Store.__store.set).toHaveBeenLastCalledWith('services', [
+      {name: 'foo'},
+    ])
   })
 
   test('loads services from file on client initialization', () => {

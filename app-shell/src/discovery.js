@@ -19,7 +19,10 @@ import type {Service} from '@opentrons/discovery-client'
 
 // TODO(mc, 2018-08-08): figure out type exports from app
 import type {Action} from '@opentrons/app/src/types'
-import type {DiscoveredRobot, Connection} from '@opentrons/app/src/discovery/types'
+import type {
+  DiscoveredRobot,
+  Connection,
+} from '@opentrons/app/src/discovery/types'
 
 const log = createLogger(__filename)
 
