@@ -2,9 +2,8 @@ import os
 import logging
 import re
 import asyncio
-from opentrons.modules.magdeck import MagDeck
-from opentrons.modules.tempdeck import TempDeck
-from opentrons import robot, labware
+from .magdeck import MagDeck
+from .tempdeck import TempDeck
 
 log = logging.getLogger(__name__)
 
@@ -25,11 +24,25 @@ class AbsentModuleError(Exception):
     pass
 
 
+_mod_robot = None
+_mod_labware = None
+
+
+def provide_singleton(robot):
+    global _mod_robot
+    _mod_robot = robot
+
+
+def provide_labware(lw):
+    global _mod_labware
+    _mod_labware = lw
+
+
 def load(name, slot):
     module_instance = None
     if name in SUPPORTED_MODULES:
-        if robot.is_simulating():
-            labware_instance = labware.load(name, slot)
+        if _mod_robot.is_simulating():
+            labware_instance = _mod_labware.load(name, slot)
             module_class = SUPPORTED_MODULES.get(name)
             module_instance = module_class(lw=labware_instance)
         else:
@@ -39,13 +52,13 @@ def load(name, slot):
             # accessor would then load the correct disambiguated module
             # instance via the module's serial
             matching_modules = [
-                module for module in robot.modules if isinstance(
+                module for module in _mod_robot.modules if isinstance(
                     module, SUPPORTED_MODULES.get(name)
                 )
             ]
             if matching_modules:
                 module_instance = matching_modules[0]
-                labware_instance = labware.load(name, slot)
+                labware_instance = _mod_labware.load(name, slot)
                 module_instance.labware = labware_instance
             else:
                 raise AbsentModuleError(
