@@ -4,6 +4,7 @@ import re
 import asyncio
 from .magdeck import MagDeck
 from .tempdeck import TempDeck
+from opentrons import HERE as package_root
 
 log = logging.getLogger(__name__)
 
@@ -125,7 +126,7 @@ async def enter_bootloader(module):
     return new_port
 
 
-async def update_firmware(module, firmware_file_path, config_file_path, loop):
+async def update_firmware(module, firmware_file_path, loop):
     """
     Run avrdude firmware upload command. Switch back to normal module port
 
@@ -136,7 +137,8 @@ async def update_firmware(module, firmware_file_path, config_file_path, loop):
     # TODO: Make sure the module isn't in the middle of operation
 
     ports_before_update = await _discover_ports()
-
+    config_file_path = os.path.join(package_root,
+                                    'config', 'modules', 'avrdude.conf')
     proc = await asyncio.create_subprocess_exec(
         'avrdude', '-C{}'.format(config_file_path), '-v',
         '-p{}'.format(PART_NO),

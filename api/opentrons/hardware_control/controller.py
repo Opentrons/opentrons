@@ -1,10 +1,13 @@
+import asyncio
 import os
 import fcntl
 import threading
-from typing import Dict
+from typing import Dict, List, Optional, Tuple
 from opentrons.util import environment
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.legacy_api.robot import robot_configs
+from . import modules
+
 
 _lock = threading.Lock()
 
@@ -65,6 +68,7 @@ class Controller:
         self.config = config or robot_configs.load()
         self._smoothie_driver = driver_3_0.SmoothieDriver_3_0_0(
             config=self.config)
+        self._attached_modules = {}
 
     def move(self, target_position: Dict[str, float], home_flagged_axes=True):
         self._smoothie_driver.move(
@@ -75,3 +79,20 @@ class Controller:
 
     def get_attached_instruments(self, mount):
         return self._smoothie_driver.read_pipette_model(mount.name.lower())
+
+    def get_attached_modules(self) -> List[Tuple[str, str]]:
+        return modules.discover()
+
+        return list(self._attached_modules.values())
+
+    def build_module(self, port: str, model: str) -> modules.AbstractModule:
+        return modules.build(port, model, False)
+
+    async def update_module(
+            self,
+            module: modules.AbstractModule,
+            firmware_file: str,
+            loop: Optional[asyncio.AbstractEventLoop])\
+            -> modules.AbstractModule:
+        return await modules.update_firmware(
+            module, firmware_file, loop)

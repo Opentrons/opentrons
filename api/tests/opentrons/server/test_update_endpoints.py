@@ -132,7 +132,7 @@ async def test_update_module_firmware(
                'filename': fw_filename}
 
     async def mock_successful_upload_to_module(
-            module, fw_file, config_file, loop):
+            module, fw_file, loop):
         return res_msg
 
     expected_res = res_msg
@@ -175,7 +175,7 @@ async def test_fail_update_module_firmware(
                 'filename': fw_filename}
 
     async def mock_failed_upload_to_module1(
-            serialnum, fw_file, config_file, loop):
+            serialnum, fw_file, loop):
         return res_msg1
 
     expected_res1 = res_msg1
@@ -196,7 +196,7 @@ async def test_fail_update_module_firmware(
                 'filename': fw_filename}
 
     async def mock_failed_upload_to_module2(
-            serialnum, fw_file, config_file, loop):
+            serialnum, fw_file, loop):
         return res_msg2
 
     expected_res2 = res_msg2
@@ -216,7 +216,7 @@ async def test_fail_update_module_firmware(
                      'filename': fw_filename}
 
     async def mock_failed_upload_to_module3(
-            serialnum, fw_file, config_file, loop):
+            serialnum, fw_file, loop):
         await asyncio.sleep(2)
 
     monkeypatch.setattr(modules,
