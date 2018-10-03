@@ -45,30 +45,26 @@ def test_get_temp_deck_temperature():
 
 def test_fail_get_temp_deck_temperature():
     # Get the curent and target temperatures
-    # If no target temp has been previously set,
-    # then the response will set 'T' to 'none'
+    # If get fails, temp_deck temperature is not updated
     import types
     from opentrons.drivers.temp_deck import TempDeck
 
     temp_deck = TempDeck()
     temp_deck.simulating = False
-    return_string = 'T:none C:90'
 
-    def _mock_send_command(self, command, timeout=None):
-        return return_string
+    def _mock_send_command1(self, command, timeout=None):
+        return 'T:none C:90'
 
-    temp_deck._send_command = types.MethodType(_mock_send_command, temp_deck)
+    temp_deck._send_command = types.MethodType(_mock_send_command1, temp_deck)
 
     temp_deck.update_temperature()
 
     assert temp_deck._temperature == {'current': 90, 'target': None}
 
-    return_string = 'Tx:none C:1'
+    def _mock_send_command2(self, command, timeout=None):
+        return 'Tx:none C:1'    # Failure premise
 
-    def _mock_send_command(self, command, timeout=None):
-        return return_string
-
-    temp_deck._send_command = types.MethodType(_mock_send_command, temp_deck)
+    temp_deck._send_command = types.MethodType(_mock_send_command2, temp_deck)
 
     temp_deck.update_temperature()
     assert temp_deck._temperature == {'current': 90, 'target': None}
