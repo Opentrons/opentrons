@@ -1,13 +1,4 @@
 // @flow
-
-// On an empty slot:
-// * Renders a slot on the deck
-// * Renders Add Labware mouseover button
-//
-// On a slot with a container:
-// * Renders a SelectablePlate in the slot
-// * Renders Add Ingreds / Delete container mouseover buttons, and dispatches their actions
-
 import React from 'react'
 import cx from 'classnames'
 import {
@@ -20,7 +11,6 @@ import {
   clickOutside,
   type DeckSlot,
 } from '@opentrons/components'
-import {getLabware} from '@opentrons/shared-data'
 import styles from './labware.css'
 
 import ClickableText from './ClickableText'
@@ -30,32 +20,25 @@ import DisabledSelectSlotOverlay from './DisabledSelectSlotOverlay.js'
 
 const EnhancedNameThisLabwareOverlay = clickOutside(NameThisLabwareOverlay)
 
-function OccupiedDeckSlotOverlay ({
+function LabwareDeckSlotOverlay ({
   canAddIngreds,
-  containerId,
-  slot,
-  containerType,
-  containerName,
-  openIngredientSelector,
-  setMoveLabwareMode,
-  deleteContainer,
+  deleteLabware,
+  editLiquids,
+  moveLabwareSource,
 }) {
   return (
     <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
       <rect className={styles.overlay_panel} />
       {canAddIngreds &&
         <ClickableText
-          onClick={() => openIngredientSelector(containerId)}
+          onClick={editLiquids}
           iconName='pencil' y='15%' text='Name & Liquids' />
       }
       <ClickableText
-        onClick={() => setMoveLabwareMode(slot)}
+        onClick={moveLabwareSource}
         iconName='cursor-move' y='40%' text='Move' />
       <ClickableText
-        onClick={() => (
-          window.confirm(`Are you sure you want to permanently delete ${containerName || containerType} in slot ${slot}?`) &&
-          deleteContainer({containerId, slot, containerType})
-        )}
+        onClick={deleteLabware}
         iconName='close' y='65%' text='Delete' />
     </g>
   )
@@ -67,13 +50,13 @@ const labwareImages = {
   'trash-box': IMG_TRASH,
 }
 
-type SlotWithContainerProps = {
+type SlotWithLabwareProps = {
   containerType: string,
   displayName: string,
   containerId: string,
 }
 
-function SlotWithContainer (props: SlotWithContainerProps) {
+function SlotWithLabware (props: SlotWithLabwareProps) {
   const {containerType, displayName, containerId} = props
 
   return (
@@ -90,152 +73,143 @@ function SlotWithContainer (props: SlotWithContainerProps) {
   )
 }
 
-type LabwareOnDeckProps = {
-  slot: DeckSlot,
-
-  containerId: string,
-  containerType: string,
-  containerName: ?string,
-  showNameOverlay: ?boolean,
-
-  // canAdd: boolean,
-
-  activeModals: {
-    ingredientSelection: ?{
-      containerName: ?string,
-      slot: ?DeckSlot,
-    },
-    labwareSelection: boolean,
-  },
-  openIngredientSelector: (containerId: string) => void,
-
-  // createContainer: ({slot: string, containerType: string}) => mixed,
-  deleteContainer: ({containerId: string, slot: DeckSlot, containerType: string}) => void,
-  modifyContainer: ({containerId: string, modify: {[field: string]: mixed}}) => void, // eg modify = {name: 'newName'}
-
-  openLabwareSelector: ({slot: DeckSlot}) => void,
-  // closeLabwareSelector: ({slot: string}) => mixed,
-
-  setMoveLabwareMode: (slot: ?DeckSlot) => void,
-  slotToMoveFrom: ?DeckSlot,
-  moveLabware: (slot: DeckSlot) => void,
-
-  height?: number,
-  width?: number,
-  highlighted: boolean,
-
-  deckSetupMode: boolean,
+type EmptyDestinationSlotOverlayProps = {
+  moveLabwareDestination: (e?: SyntheticEvent<*>) => mixed,
 }
-
-export default function LabwareOnDeck (props: LabwareOnDeckProps) {
-  const {
-    slot,
-
-    containerId,
-    containerType,
-    containerName,
-    showNameOverlay,
-
-    // canAdd,
-
-    activeModals,
-    openIngredientSelector,
-
-    // createContainer,
-    deleteContainer,
-    modifyContainer,
-
-    openLabwareSelector,
-    // closeLabwareSelector,
-
-    setMoveLabwareMode,
-    slotToMoveFrom,
-    moveLabware,
-
-    height,
-    width,
-    highlighted,
-
-    deckSetupMode,
-  } = props
-
-  const slotIsOccupied = !!containerType
-
-  let canAddIngreds: boolean = !showNameOverlay
-
-  // labware definition's metadata.isValueSource defaults to true,
-  // only use it when it's defined as false
-  const labwareInfo = getLabware(containerType)
-  if (!labwareInfo || labwareInfo.metadata.isValidSource === false) {
-    canAddIngreds = false
-  }
-
-  const setDefaultLabwareName = () => modifyContainer({
-    containerId,
-    modify: {name: null},
-  })
+function EmptyDestinationSlotOverlay (props: EmptyDestinationSlotOverlayProps) {
+  const {moveLabwareDestination} = props
 
   const handleSelectMoveDestination = (e: SyntheticEvent<*>) => {
     e.preventDefault()
-    moveLabware(slot)
-  }
-  const cancelMove = () => {
-    setMoveLabwareMode()
+    moveLabwareDestination()
   }
 
   return (
-    <LabwareContainer {...{height, width, slot}} highlighted={highlighted}>
-      {/* The actual deck slot container: rendering of container, or rendering of empty slot */}
-      {slotIsOccupied
-        ? <SlotWithContainer displayName={containerName || containerType} {...{containerType, containerId}} />
-        : <EmptyDeckSlot {...{height, width, slot}} />
-      }
+    <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
+    <rect className={styles.overlay_panel} onClick={moveLabwareDestination} />
+    <ClickableText
+      onClick={handleSelectMoveDestination}
+      iconName='cursor-move'
+      y='40%'
+      text='Place Here'
+    />
+    </g>
+  )
+}
 
-      {(!deckSetupMode || activeModals.labwareSelection)
-        // "Add Labware" labware selection dropdown menu
-        ? null
-        : (slotToMoveFrom
-            // Mouseover empty slot -- Add (or Copy if in copy mode)
-            ? <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
-              <rect className={styles.overlay_panel} onClick={() => moveLabware(slot)} />
-              <ClickableText onClick={handleSelectMoveDestination} iconName='cursor-move' y='40%' text='Place Here' />
-            </g>
-            : <g className={cx(styles.slot_overlay, styles.appear_on_mouseover, styles.add_labware)}>
-              <rect className={styles.overlay_panel} />
-              <ClickableText onClick={e => openLabwareSelector({slot})}
-                iconName='plus' y='30%' text='Add Labware' />
-              <ClickableText onClick={e => window.alert('NOT YET IMPLEMENTED: Add Copy') /* TODO: New Copy feature */}
-                iconName='content-copy' y='55%' text='Add Copy' />
-            </g>
-        )
-      }
+type EmptyDeckSlotOverlayProps = {
+  addLabware: (e: SyntheticEvent<*>) => mixed,
+}
+function EmptyDeckSlotOverlay (props: EmptyDeckSlotOverlayProps) {
+  const {addLabware} = props
+  return (
+    <g className={cx(styles.slot_overlay, styles.appear_on_mouseover, styles.add_labware)}>
+      <rect className={styles.overlay_panel} />
+      <ClickableText onClick={addLabware}
+        iconName='plus' y='30%' text='Add Labware' />
+      <ClickableText
+        onClick={e => window.alert('NOT YET IMPLEMENTED: Add Copy') /* TODO: New Copy feature */}
+        iconName='content-copy' y='55%' text='Add Copy' />
+    </g>
+  )
+}
 
-      {slotToMoveFrom === slot &&
-        <DisabledSelectSlotOverlay onClickOutside={cancelMove} setMoveLabwareMode={setMoveLabwareMode} />}
+type LabwareOnDeckProps = {
+  slot: DeckSlot,
+  containerId: string,
+  containerName: ?string,
+  containerType: string,
 
-      {deckSetupMode && slotIsOccupied && !slotToMoveFrom && !showNameOverlay &&
-        <OccupiedDeckSlotOverlay {...{
+  showNameOverlay: ?boolean,
+  slotHasLabware: boolean,
+  highlighted: boolean,
+
+  addLabwareMode: boolean,
+  canAddIngreds: boolean,
+  deckSetupMode: boolean,
+  moveLabwareMode: boolean,
+
+  addLabware: () => mixed,
+  editLiquids: () => mixed,
+  deleteLabware: () => mixed,
+
+  cancelMove: () => mixed,
+  moveLabwareDestination: () => mixed,
+  moveLabwareSource: () => mixed,
+  slotToMoveFrom: ?DeckSlot,
+
+  setLabwareName: (name: ?string) => mixed,
+  setDefaultLabwareName: () => mixed,
+}
+export default function LabwareOnDeck (props: LabwareOnDeckProps) {
+  const {
+    slot,
+    containerId,
+    containerName,
+    containerType,
+
+    showNameOverlay,
+    slotHasLabware,
+    highlighted,
+
+    addLabwareMode,
+    canAddIngreds,
+    deckSetupMode,
+    moveLabwareMode,
+
+    addLabware,
+    editLiquids,
+    deleteLabware,
+
+    cancelMove,
+    moveLabwareDestination,
+    moveLabwareSource,
+    slotToMoveFrom,
+
+    setDefaultLabwareName,
+    setLabwareName,
+  } = props
+
+  // determine what overlay to show
+  let overlay = null
+  if (deckSetupMode && !addLabwareMode) {
+    if (moveLabwareMode) {
+      overlay = (slotToMoveFrom === slot)
+        ? <DisabledSelectSlotOverlay
+            onClickOutside={cancelMove}
+            cancelMove={cancelMove} />
+        : <EmptyDestinationSlotOverlay {...{moveLabwareDestination}}/>
+    } else if (showNameOverlay) {
+      overlay = <EnhancedNameThisLabwareOverlay {...{
+        setLabwareName,
+        deleteLabware,
+      }}
+      onClickOutside={setDefaultLabwareName} />
+    } else {
+      overlay = (slotHasLabware)
+        ? <LabwareDeckSlotOverlay {...{
           canAddIngreds,
-          containerId,
-          slot,
-          containerType,
-          containerName,
-          openIngredientSelector,
-          setMoveLabwareMode,
-          deleteContainer,
+          deleteLabware,
+          editLiquids,
+          moveLabwareSource,
         }} />
-      }
+        : <EmptyDeckSlotOverlay {...{
+          addLabware,
+        }} />
+    }
+  }
 
-      {deckSetupMode && showNameOverlay &&
-        <EnhancedNameThisLabwareOverlay {...{
-          containerType,
-          containerId,
-          slot,
-          modifyContainer,
-          deleteContainer,
-        }}
-        onClickOutside={setDefaultLabwareName} />
-      }
+  const labwareOrSlot = (slotHasLabware)
+    ? <SlotWithLabware
+        {...{containerType, containerId}}
+        displayName={containerName || containerType}
+      />
+    : <EmptyDeckSlot slot={slot} />
+
+  return (
+    <LabwareContainer {...{slot, highlighted}}>
+      {labwareOrSlot}
+      {overlay}
     </LabwareContainer>
   )
 }

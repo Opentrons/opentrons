@@ -48,7 +48,7 @@ const nextEmptySlot = loadedContainersSubstate => {
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
 // (this state just toggles a modal)
 const modeLabwareSelection = handleActions({
-  OPEN_LABWARE_SELECTOR: (state, action: ActionType<typeof actions.openLabwareSelector>) =>
+  OPEN_ADD_LABWARE_MODAL: (state, action: ActionType<typeof actions.openAddLabwareModal>) =>
       action.payload.slot,
   CLOSE_LABWARE_SELECTOR: () => false,
   CREATE_CONTAINER: () => false,
@@ -363,7 +363,8 @@ const disposalLabwareOptions: Selector<Options> = createSelector(
   }, [])
 )
 
-const canAdd = (state: BaseState) => rootSelector(state).modeLabwareSelection // false or selected slot to add labware to, eg 'A2'
+// false or selected slot to add labware to, eg 'A2'
+const selectedAddLabwareSlot = (state: BaseState) => rootSelector(state).modeLabwareSelection
 
 const getSavedLabware = (state: BaseState) => rootSelector(state).savedLabware
 
@@ -470,7 +471,7 @@ export const selectors = {
   allIngredientNamesIds,
   loadedContainersBySlot,
   containersBySlot,
-  canAdd,
+  selectedAddLabwareSlot,
   disposalLabwareOptions,
   labwareOptions,
   hasLiquid,

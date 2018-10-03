@@ -3,15 +3,12 @@ import * as React from 'react'
 import ForeignDiv from '../../components/ForeignDiv.js'
 import ClickableText from './ClickableText'
 import styles from './labware.css'
-import type {ClickOutsideInterface, DeckSlot} from '@opentrons/components'
+import type {ClickOutsideInterface} from '@opentrons/components'
 
 type Props = {
-  containerType: string,
-  containerId: string,
-  slot: DeckSlot,
+  setLabwareName: (name: ?string) => mixed,
   // TODO Ian 2018-02-16 type these fns elsewhere and import the type
-  modifyContainer: (args: {containerId: string, modify: {[field: string]: mixed}}) => void,
-  deleteContainer: (args: {containerId: string, slot: DeckSlot, containerType: string}) => void,
+  deleteLabware: () => mixed,
 } & ClickOutsideInterface
 
 type State = {
@@ -44,21 +41,13 @@ export default class NameThisLabwareOverlay extends React.Component<Props, State
   }
 
   onSubmit = () => {
-    const { containerId, modifyContainer } = this.props
     const containerName = this.state.inputValue || null
-
-    modifyContainer({
-      containerId,
-      modify: { name: containerName },
-    })
+    this.props.setLabwareName(containerName)
   }
 
   render () {
     const {
-      containerType,
-      containerId,
-      slot,
-      deleteContainer,
+      deleteLabware,
       passRef,
     } = this.props
 
@@ -79,7 +68,7 @@ export default class NameThisLabwareOverlay extends React.Component<Props, State
           <ClickableText onClick={this.onSubmit}
             iconName='check' y='60%' text='Save' />
 
-          <ClickableText onClick={() => deleteContainer({containerId, slot, containerType})}
+          <ClickableText onClick={deleteLabware}
             iconName='close' y='80%' text='Cancel' />
         </g>
       </g>
