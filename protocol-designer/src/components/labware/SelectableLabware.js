@@ -99,6 +99,7 @@ class SelectableLabware extends React.Component<Props, State> {
       const well = wellContents[wellName]
 
       return {
+        selectable: true,
         wellName,
         highlighted: Object.keys(this.state.highlightedWells).includes(wellName),
         selected: Object.keys(this.state.selectedWells).includes(wellName),
