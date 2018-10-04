@@ -28,7 +28,6 @@ type Params = {
   format: string,
   isTiprack: boolean,
   tipLength?: number,
-  wellShape?: string,
 }
 
 type Well = {
@@ -62,7 +61,7 @@ export type RegularLabwareProps = {
   vendor?: Vendor,
 }
 
-type Schema = {
+export type Schema = {
   otId: string,
   deprecated: boolean,
   metadata: Metadata,
@@ -90,21 +89,18 @@ function calculateCoordinates (
   well: Well,
   ordering: Array<Array<string>>,
   spacing: Cell): {[wellName: string]: Well} {
-  let wells = {}
-
   // Note, reverse() on its own mutates ordering. Use slice() as a workaround
   // to prevent mutation
-  ordering.forEach(function (subarray, cIndex) {
-    subarray.slice().reverse().forEach(function (element, rIndex) {
+  return ordering.reduce((wells, column, cIndex) => {
+    column.slice().reverse().forEach((element, rIndex) => {
       wells[element] = {
         ...well,
         x: round(cIndex * spacing.column, 2),
         y: round(rIndex * spacing.row, 2),
         z: 0}
     })
-  })
-
-  return wells
+    return wells
+  }, {})
 }
 
 // Generator function for labware definitions within a regular grid format
