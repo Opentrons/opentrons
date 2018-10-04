@@ -7,9 +7,13 @@ module.exports = {
     'standard',
     'plugin:react/recommended',
     'plugin:flowtype/recommended',
+    'plugin:prettier/recommended',
+    'prettier/flowtype',
+    'prettier/react',
+    'prettier/standard',
   ],
 
-  plugins: ['flowtype', 'react', 'json'],
+  plugins: ['flowtype', 'react', 'json', 'prettier'],
 
   rules: {
     camelcase: 'off',
