@@ -13,6 +13,7 @@ import type {
   SubstepIdentifier,
   StepItemData,
   SubstepItemData,
+  WellIngredientNames,
 } from '../../steplist/types'
 
 type StepItemProps = {
@@ -25,6 +26,7 @@ type StepItemProps = {
   selected?: boolean,
   hovered?: boolean,
   hoveredSubstep: ?SubstepIdentifier,
+  ingredNames: WellIngredientNames,
 
   getLabwareName: (labwareId: ?string) => ?string,
   handleSubstepHover: SubstepIdentifier => mixed,
@@ -77,6 +79,7 @@ function getStepItemContents (stepItemProps: StepItemProps) {
     getLabwareName,
     hoveredSubstep,
     handleSubstepHover,
+    ingredNames,
   } = stepItemProps
 
   const formData = step && step.formData
@@ -134,6 +137,7 @@ function getStepItemContents (stepItemProps: StepItemProps) {
     result.push(
       <SourceDestSubstep
         key='substeps'
+        ingredNames={ingredNames}
         substeps={substeps}
         hoveredSubstep={hoveredSubstep}
         onSelectSubstep={handleSubstepHover}

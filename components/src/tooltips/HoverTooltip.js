@@ -6,7 +6,7 @@ import cx from 'classnames'
 import styles from './tooltips.css'
 
 const OPEN_DELAY_MS = 300
-const CLOSE_DELAY_MS = 150
+const CLOSE_DELAY_MS = 0
 const DISTANCE_FROM_REFERENCE = 8
 
 export type HoverTooltipHandlers = {

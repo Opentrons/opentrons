@@ -9,6 +9,7 @@ import styles from './StepItem.css'
 import type {
   SourceDestSubstepItem,
   SubstepIdentifier,
+  WellIngredientNames,
 } from '../../steplist/types'
 
 export type StepSubItemProps = {|
@@ -17,6 +18,7 @@ export type StepSubItemProps = {|
 
 type SourceDestSubstepProps = {|
   ...StepSubItemProps,
+  ingredNames: WellIngredientNames,
   onSelectSubstep: SubstepIdentifier => mixed,
   hoveredSubstep: ?SubstepIdentifier,
 |}
@@ -34,6 +36,7 @@ export default function SourceDestSubstep (props: SourceDestSubstepProps) {
             stepId: substeps.parentStepId,
             substepIndex: groupKey,
           })}
+          ingredNames={props.ingredNames}
           onMouseLeave={() => onSelectSubstep(null)}
           highlighted={!!hoveredSubstep &&
             hoveredSubstep.stepId === substeps.parentStepId &&
@@ -56,16 +59,12 @@ export default function SourceDestSubstep (props: SourceDestSubstepProps) {
           substepIndex === hoveredSubstep.substepIndex,
         }
       )}
-      onMouseEnter={() => onSelectSubstep({
-        stepId: substeps.parentStepId,
-        substepIndex,
-      })}
+      onMouseEnter={() => onSelectSubstep({stepId: substeps.parentStepId, substepIndex})}
       onMouseLeave={() => onSelectSubstep(null)}
+      ingredNames={props.ingredNames}
       volume={row.volume}
-      sourceIngredients={row.sourceIngredients}
-      sourceWells={row.sourceWell}
-      destIngredients={row.destIngredients}
-      destWells={row.destWell}
+      source={row.source}
+      dest={row.dest}
     />
   )
 }

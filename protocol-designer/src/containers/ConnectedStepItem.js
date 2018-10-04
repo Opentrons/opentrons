@@ -27,6 +27,7 @@ type SP = {|
   hovered: $PropertyType<Props, 'hovered'>,
   hoveredSubstep: $PropertyType<Props, 'hoveredSubstep'>,
   getLabwareName: $PropertyType<Props, 'getLabwareName'>,
+  ingredNames: $PropertyType<Props, 'ingredNames'>,
 |}
 
 type DP = $Diff<$Diff<Props, SP>, OP>
@@ -61,6 +62,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     hovered: (hoveredStep === stepId) && !hoveredSubstep,
 
     getLabwareName: (labwareId: ?string) => labwareId && labwareIngredSelectors.getLabwareNames(state)[labwareId],
+    ingredNames: labwareIngredSelectors.getIngredientNames(state),
   }
 }
 

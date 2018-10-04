@@ -273,6 +273,7 @@ export type CommandCreatorErrorResponse = {
 }
 
 export type CommandCreator = (prevRobotState: RobotState) => CommandsAndRobotState | CommandCreatorErrorResponse
+export type CompoundCommandCreator = (prevRobotState: RobotState) => Array<CommandCreator>
 
 export type Timeline = {|
   timeline: Array<CommandsAndRobotState>, // TODO: Ian 2018-06-14 avoid timeline.timeline shape, better names
