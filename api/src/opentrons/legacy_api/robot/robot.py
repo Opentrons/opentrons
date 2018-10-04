@@ -16,8 +16,8 @@ from opentrons.config import feature_flags as fflags
 from opentrons.config.robot_configs import load
 from opentrons.legacy_api import containers
 from opentrons.legacy_api.containers import Container
-from opentrons.legacy_api.instruments import pipette_config
 from .mover import Mover
+from opentrons.config import pipette_config
 
 log = logging.getLogger(__name__)
 

@@ -2,6 +2,7 @@ import logging
 import os
 import json
 from collections import namedtuple
+from typing import List
 from opentrons import __file__ as root_file
 
 
@@ -114,3 +115,24 @@ def load(pipette_model: str) -> pipette_config:
         assert res.model_offset[2] == Z_OFFSET_P50
 
     return res
+
+
+def piecewise_volume_conversion(
+        ul: float, sequence: List[List[float]]) -> float:
+    """
+    Takes a volume in microliters and a sequence representing a piecewise
+    function for the slope and y-intercept of a ul/mm function, where each
+    sub-list in the sequence contains:
+
+      - the max volume for the piece of the function (minimum implied from the
+        max of the previous item or 0
+      - the slope of the segment
+      - the y-intercept of the segment
+
+    :return: the ul/mm value for the specified volume
+    """
+    # pick the first item from the seq for which the target is less than
+    # the bracketing element
+    i = list(filter(lambda x: ul <= x[0], sequence))[0]
+    # use that element to calculate the movement distance in mm
+    return i[1]*ul + i[2]

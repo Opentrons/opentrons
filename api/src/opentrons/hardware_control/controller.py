@@ -82,8 +82,14 @@ class Controller:
             args = tuple()
         return self._smoothie_driver.home(*args)
 
-    def get_attached_instruments(self, mount) -> Optional[str]:
+    def get_attached_instrument(self, mount) -> Optional[str]:
         return self._smoothie_driver.read_pipette_model(mount.name.lower())
+
+    def set_active_current(self, axis, amp):
+        self._smoothie_driver.set_active_current({axis.name: amp})
+
+    def set_pipette_speed(self, val: float):
+        self._smoothie_driver.set_speed(val)
 
     def get_attached_modules(self) -> List[Tuple[str, str]]:
         return modules.discover()
@@ -99,3 +105,6 @@ class Controller:
             -> modules.AbstractModule:
         return await modules.update_firmware(
             module, firmware_file, loop)
+
+    def _connect(self):
+        self._smoothie_driver.connect()

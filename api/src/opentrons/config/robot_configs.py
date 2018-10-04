@@ -217,6 +217,7 @@ def _clear_file(filename):
         os.remove(filename)
 
 
+# TODO: move to util (write a default load, save JSON function)
 def _load_json(filename) -> dict:
     try:
         with open(filename, 'r') as file:

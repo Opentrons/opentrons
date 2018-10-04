@@ -1,7 +1,7 @@
 import time
 from itertools import chain
 from opentrons import instruments, labware, robot
-from opentrons.legacy_api.instruments import pipette_config
+from opentrons.config import pipette_config
 
 
 def _sleep(seconds):

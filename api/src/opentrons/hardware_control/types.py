@@ -24,3 +24,9 @@ class Axis(enum.Enum):
         calibration transform
         """
         return (cls.X, cls.Y, cls.Z, cls.A)
+
+    @classmethod
+    def of_plunger(cls, mount: opentrons.types.Mount):
+        pm = {opentrons.types.Mount.LEFT: cls.B,
+              opentrons.types.Mount.RIGHT: cls.C}
+        return pm[mount]

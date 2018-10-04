@@ -1,6 +1,6 @@
 from aiohttp import web
 from uuid import uuid1
-from opentrons.legacy_api.instruments import pipette_config
+from opentrons.config import pipette_config
 from opentrons import instruments, robot
 from opentrons.config import robot_configs
 from . import jog, position, dots_set, z_pos

@@ -3,14 +3,14 @@
 
 from opentrons import instruments, robot
 from opentrons.legacy_api.containers import load as containers_load
-from opentrons.legacy_api.instruments import pipette_config
+from opentrons.config import pipette_config
 from opentrons.trackers import pose_tracker
 from numpy import isclose
 import pytest
 
 
 def test_pipette_version_1_0_and_1_3_extended_travel():
-    from opentrons.legacy_api.instruments import pipette_config
+    from opentrons.config import pipette_config
 
     models = [
         'p10_single', 'p10_multi', 'p50_single', 'p50_multi',
@@ -37,7 +37,7 @@ def test_pipette_version_1_0_and_1_3_extended_travel():
 
 
 def test_all_pipette_models_can_transfer():
-    from opentrons.legacy_api.instruments import pipette_config
+    from opentrons.config import pipette_config
 
     models = [
         'p10_single', 'p10_multi', 'p50_single', 'p50_multi',

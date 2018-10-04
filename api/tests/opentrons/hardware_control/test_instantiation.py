@@ -1,6 +1,5 @@
 import subprocess
 import threading
-
 import pytest
 from opentrons import hardware_control as hc
 
@@ -14,14 +13,15 @@ def test_controller_runs_only_on_pi():
         c = hc.API.build_hardware_controller() # noqa
 
 
-def test_controller_instantiates(
-        hardware_controller_lockfile, running_on_pi, loop):
+def test_controller_instantiates(hardware_controller_lockfile, running_on_pi,
+                                 cntrlr_mock_connect, loop):
     c = hc.API.build_hardware_controller(loop=loop)
     assert None is not c
 
 
-def test_controller_unique_per_thread(
-        hardware_controller_lockfile, running_on_pi, loop):
+def test_controller_unique_per_thread(hardware_controller_lockfile,
+                                      running_on_pi,
+                                      cntrlr_mock_connect, loop):
     c = hc.API.build_hardware_controller(loop=loop) # noqa
     with pytest.raises(RuntimeError):
         _ = hc.API.build_hardware_controller(loop=loop) # noqa
@@ -42,8 +42,8 @@ def test_controller_unique_per_thread(
         loop.run_until_complete(fut)
 
 
-def test_controller_unique_per_proc(
-        hardware_controller_lockfile, running_on_pi, loop):
+def test_controller_unique_per_proc(hardware_controller_lockfile,
+                                    running_on_pi, cntrlr_mock_connect, loop):
     c = hc.API.build_hardware_controller(loop=loop) # noqa
 
     script = '''import os

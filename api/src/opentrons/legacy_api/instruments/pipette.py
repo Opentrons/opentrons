@@ -4,8 +4,6 @@ import itertools
 import warnings
 import logging
 import time
-from typing import List
-
 from opentrons import commands
 from ..containers import unpack_location
 from ..containers.placeable import (
@@ -13,6 +11,7 @@ from ..containers.placeable import (
 )
 from opentrons.helpers import helpers
 from opentrons.trackers import pose_tracker
+from opentrons.config import pipette_config
 
 log = logging.getLogger(__name__)
 
@@ -1427,7 +1426,7 @@ class Pipette:
         :return: microliters/mm as a float
         """
         sequence = self.ul_per_mm[func]
-        return piecewise_volume_conversion(ul, sequence)
+        return pipette_config.piecewise_volume_conversion(ul, sequence)
 
     def _volume_percentage(self, volume):
         """Returns the plunger percentage for a given volume.
@@ -1774,24 +1773,3 @@ class Pipette:
     @property
     def type(self):
         return 'single' if self.channels == 1 else 'multi'
-
-
-def piecewise_volume_conversion(
-        ul: float, sequence: List[List[float]]) -> float:
-    """
-    Takes a volume in microliters and a sequence representing a piecewise
-    function for the slope and y-intercept of a ul/mm function, where each
-    sub-list in the sequence contains:
-
-      - the max volume for the piece of the function (minimum implied from the
-        max of the previous item or 0
-      - the slope of the segment
-      - the y-intercept of the segment
-
-    :return: the ul/mm value for the specified volume
-    """
-    # pick the first item from the seq for which the target is less than
-    # the bracketing element
-    i = list(filter(lambda x: ul <= x[0], sequence))[0]
-    # use that element to calculate the movement distance in mm
-    return i[1]*ul + i[2]
