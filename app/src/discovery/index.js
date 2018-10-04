@@ -5,7 +5,6 @@ import {getShellRobots} from '../shell'
 
 import type {Service} from '@opentrons/discovery-client'
 import type {State, Action, ThunkAction} from '../types'
-import type {DiscoveredRobot} from './types'
 
 type RobotsMap = {[name: string]: Array<Service>}
 
@@ -29,8 +28,6 @@ type UpdateListAction = {|
   payload: {|robots: Array<Service>|},
 |}
 
-export * from './types'
-
 export type DiscoveryAction = StartAction | FinishAction | UpdateListAction
 
 const DISCOVERY_TIMEOUT = 20000
@@ -48,7 +45,7 @@ export function startDiscovery (): ThunkAction {
 // TODO(mc, 2018-08-09): uncomment when we figure out how to get this
 // to the app shell
 // export function updateDiscoveryList (
-//   robots: Array<DiscoveredRobot>
+//   robots: Array<Service>
 // ): UpdateListAction {
 //   return {type: 'discovery:UPDATE_LIST', payload: {robots}}
 // }
