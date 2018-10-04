@@ -134,9 +134,10 @@
                     {"required": ["diameter", "length"]}
           ]},
           "properties": {
-            "description": "XYZ calculated from bottom-left corner of slot to top-center of the well",
             "depth": {"$ref": "#/definitions/positiveNumber"},
-            "x": {"$ref": "#/definitions/positiveNumber"},
+            "x": {
+              "description": "XYZ calculated from bottom-left corner of slot to top-center of the well",
+              "$ref": "#/definitions/positiveNumber"},
             "y": {"$ref": "#/definitions/positiveNumber"},
             "z": {"$ref": "#/definitions/positiveNumber"},
             "totalLiquidVolume": {"$ref": "#/definitions/positiveNumber"},
