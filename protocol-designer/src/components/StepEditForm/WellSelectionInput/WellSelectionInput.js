@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react'
 import {FormGroup, InputField} from '@opentrons/components'
+import WellSelectionModal from './WellSelectionModal'
+import {Portal} from '../../portals/MainPageModalPortal'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import styles from '../StepEditForm.css'
 
@@ -13,19 +15,39 @@ type Props = {
   isMulti: ?boolean,
 }
 
-export default function WellSelectionInput (props: Props) {
-  return (
-    <FormGroup
-      label={props.isMulti ? 'Columns:' : 'Wells:'}
-      disabled={props.disabled}
-      className={styles.well_selection_input}
-      >
+type State = {isModalOpen: boolean}
+
+class WellSelectionInput extends React.Component<Props, State> {
+  state = {isModalOpen: false}
+
+  toggleModal = () => {
+    this.setState({isModalOpen: !this.state.isModalOpen})
+  }
+
+  render () {
+    return (
+      <FormGroup
+        label={this.props.isMulti ? 'Columns:' : 'Wells:'}
+        disabled={this.props.disabled}
+        className={styles.well_selection_input}>
         <InputField
           readOnly
-          name={props.name}
-          value={props.primaryWellCount ? String(props.primaryWellCount) : null}
-          onClick={props.onClick}
-          error={props.errorToShow} />
-        </FormGroup>
-  )
+          name={this.props.name}
+          value={this.props.primaryWellCount ? String(this.props.primaryWellCount) : null}
+          onClick={this.toggleModal}
+          error={this.props.errorToShow} />
+        <Portal>
+          <WellSelectionModal
+            key={this.props.name}
+            pipetteId={this.props.pipetteId}
+            labwareId={this.props.labwareId}
+            isOpen={this.state.isModalOpen}
+            onCloseClick={this.toggleModal}
+            name={this.props.name} />
+        </Portal>
+      </FormGroup>
+    )
+  }
 }
+
+export default WellSelectionInput
