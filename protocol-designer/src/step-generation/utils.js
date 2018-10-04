@@ -22,14 +22,13 @@ export function repeatArray<T> (array: Array<T>, repeats: number): Array<T> {
  * and adding each CommandCreator's commands to a single commands array.
  */
 export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): CommandCreator =>
-  (prevRobotState: RobotState) => (
-    commandCreators.reduce(
+  (prevRobotState: RobotState) => {
+    return commandCreators.reduce(
       (prev: $Call<CommandCreator, *>, reducerFn: CommandCreator, stepIdx) => {
         if (prev.errors) {
           // if there are errors, short-circuit the reduce
           return prev
         }
-
         const next = reducerFn(prev.robotState)
 
         if (next.errors) {
@@ -41,7 +40,6 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
             warnings: prev.warnings,
           }
         }
-
         return {
           robotState: next.robotState,
           commands: [...prev.commands, ...next.commands],
@@ -52,7 +50,7 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
       // TODO: should I clone here (for safety) or is it safe enough?
       // Should I avoid cloning in the CommandCreators themselves and just do it pre-emptively in here?
     )
-  )
+  }
 
 export const commandCreatorsTimeline = (commandCreators: Array<CommandCreator>) =>
 (initialRobotState: RobotState): Timeline => {

@@ -12,7 +12,7 @@ import {selectors as fileDataSelectors} from '../file-data'
 import type {Selector} from '../types'
 import type {SubstepItemData} from '../steplist/types'
 
-type AllWellHighlights = {[wellName: string]: true} // NOTE: all keys are true
+type AllWellHighlights = {[wellName: string]: true} // NOTE: all keys are true. There's a TODO in SelectablePlate.js about making this a Set of well strings
 type AllWellHighlightsAllLabware = {[labwareId: string]: AllWellHighlights}
 
 function _wellsForPipette (pipetteChannels: 1 | 8, labwareType: string, wells: Array<string>): Array<string> {
@@ -47,7 +47,8 @@ function _getSelectedWellsForStep (
     return []
   }
 
-  const getWells = (wells: Array<string>) => _wellsForPipette(pipetteChannels, labwareType, wells)
+  const getWells = (wells: Array<string>) =>
+    _wellsForPipette(pipetteChannels, labwareType, wells)
 
   let wells = []
 
@@ -94,18 +95,19 @@ function _getSelectedWellsForSubstep (
     return []
   }
 
-  function getWells (wellField): Array<string> {
+  // TODO: Ian 2018-10-01 proper type for wellField enum
+  function getWells (wellField: 'source' | 'dest'): Array<string> {
     if (substeps && substeps.rows && substeps.rows[substepIndex]) {
       // single-channel
-      const well = substeps.rows[substepIndex][wellField]
-      return well ? [well] : []
+      const wellData = substeps.rows[substepIndex][wellField]
+      return (wellData && wellData.well) ? [wellData.well] : []
     }
 
     if (substeps && substeps.multiRows && substeps.multiRows[substepIndex]) {
       // multi-channel
       return substeps.multiRows[substepIndex].reduce((acc, multiRow) => {
-        const well = multiRow[wellField]
-        return well ? [...acc, well] : acc
+        const wellData = multiRow[wellField]
+        return (wellData && wellData.well) ? [...acc, wellData.well] : acc
       }, [])
     }
     return []
@@ -116,81 +118,64 @@ function _getSelectedWellsForSubstep (
   // TODO Ian 2018-05-09 re-evaluate the steptype handling here
   // single-labware steps
   if (form.stepType === 'mix' && form.labware && form.labware === labwareId) {
-    return getWells('sourceWell')
+    return getWells('source')
   }
 
   // source + dest steps
   // $FlowFixMe: property `sourceLabware` is missing in `MixFormData`
   if (form.sourceLabware && form.sourceLabware === labwareId) {
-    wells.push(...getWells('sourceWell'))
+    wells.push(...getWells('source'))
   }
   // $FlowFixMe: property `destLabware` is missing in `MixFormData`
   if (form.destLabware && form.destLabware === labwareId) {
-    wells.push(...getWells('destWell'))
+    wells.push(...getWells('dest'))
   }
 
   return wells
 }
 
-export const wellHighlightsForSteps: Selector<Array<AllWellHighlightsAllLabware>> = createSelector(
+export const wellHighlightsByLabwareId: Selector<AllWellHighlightsAllLabware> = createSelector(
   fileDataSelectors.robotStateTimeline,
   steplistSelectors.validatedForms,
   steplistSelectors.getHoveredStepId,
   steplistSelectors.getHoveredSubstep,
   allSubsteps,
   steplistSelectors.orderedSteps,
-  (_robotStateTimeline, _forms, _hoveredStepId, _hoveredSubstep, _allSubsteps, _orderedSteps) => {
-    const timeline = _robotStateTimeline.timeline
+  (robotStateTimeline, forms, hoveredStepId, hoveredSubstep, allSubsteps, orderedSteps) => {
+    const timeline = robotStateTimeline.timeline
+    const stepId = hoveredStepId
+    const timelineIndex = orderedSteps.findIndex(i => i === stepId)
+    const frame = timeline[timelineIndex]
+    const robotState = frame && frame.robotState
+    const form = stepId != null && forms[stepId] && forms[stepId].validatedForm
 
-    function highlightedWellsForLabwareAtStep (
-      labwareLiquids: StepGeneration.SingleLabwareLiquidState,
-      labwareId: string,
-      robotState: StepGeneration.RobotState,
-      form: StepGeneration.CommandCreatorData,
-      stepId: number
-    ): AllWellHighlights {
-      let selectedWells: Array<string> = []
-      if (form && _hoveredStepId === stepId) {
-        // only show selected wells when user is **hovering** over the step
-        if (_hoveredSubstep) {
+    if (!robotState || stepId == null || !form) {
+      // nothing hovered, or no form for step
+      return {}
+    }
+
+    // replace value of each labware with highlighted wells info
+    return mapValues(
+      robotState.liquidState.labware,
+      (labwareLiquids: StepGeneration.SingleLabwareLiquidState, labwareId: string): AllWellHighlights => {
+        let selectedWells: Array<string> = []
+        if (hoveredSubstep != null) {
           // wells for hovered substep
           selectedWells = _getSelectedWellsForSubstep(
             form,
             labwareId,
-            _allSubsteps[_hoveredSubstep.stepId],
-            _hoveredSubstep.substepIndex
+            allSubsteps[stepId],
+            hoveredSubstep.substepIndex
           )
         } else {
           // wells for step overall
           selectedWells = _getSelectedWellsForStep(form, labwareId, robotState)
         }
+
+        // return selected wells eg {A1: true, B4: true}
+        return selectedWells.reduce((acc: AllWellHighlights, well) =>
+          ({...acc, [well]: true}), {})
       }
-
-      // return selected wells eg {A1: true, B4: true}
-      return selectedWells.reduce((acc, well) => ({...acc, [well]: true}), {})
-    }
-
-    function highlightedWellsForTimelineFrame (liquidState, timelineIndex): AllWellHighlightsAllLabware {
-      const robotState = timeline[timelineIndex].robotState
-      const stepId = _orderedSteps[timelineIndex]
-      const form = _forms[stepId] && _forms[stepId].validatedForm
-
-      // replace value of each labware with highlighted wells info
-      return mapValues(
-        liquidState,
-        (labwareLiquids: StepGeneration.SingleLabwareLiquidState, labwareId: string) => (form)
-          ? highlightedWellsForLabwareAtStep(
-            labwareLiquids,
-            labwareId,
-            robotState,
-            form,
-            stepId
-          )
-        : {} // no form -> no highlighted wells
-      )
-    }
-
-    const liquidStateTimeline = timeline.map(t => t.robotState.liquidState.labware)
-    return liquidStateTimeline.map(highlightedWellsForTimelineFrame)
+    )
   }
 )

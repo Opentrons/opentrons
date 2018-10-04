@@ -7,7 +7,6 @@ import pick from 'lodash/pick'
 import reduce from 'lodash/reduce'
 
 import * as StepGeneration from '../../step-generation'
-import {selectors as steplistSelectors} from '../../steplist'
 import {selectors as fileDataSelectors} from '../../file-data'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import wellSelectionSelectors from '../../well-selection/selectors'
@@ -31,10 +30,9 @@ function _wellContentsForWell (
   well: string
 ): WellContents {
   // TODO IMMEDIATELY Ian 2018-03-23 why is liquidVolState missing sometimes (eg first call with trashId)? Thus the liquidVolState || {}
-  const ingredGroupIdsWithContent = Object.keys(liquidVolState || {}).filter(groupId =>
-      liquidVolState[groupId] &&
-      liquidVolState[groupId].volume > 0
-    )
+  const ingredGroupIdsWithContent = Object.keys(liquidVolState || {}).filter(groupId => (
+    liquidVolState[groupId] && liquidVolState[groupId].volume > 0
+  ))
 
   return {
     highlighted: false,
@@ -42,7 +40,7 @@ function _wellContentsForWell (
     error: false,
     maxVolume: Infinity, // TODO Ian 2018-03-23 refactor so all these fields aren't needed
     wellName: well,
-    groupIds: ingredGroupIdsWithContent,
+    groupIds: ingredGroupIdsWithContent, // TODO: BC 2018-09-21 remove in favor of volumeByGroupId
   }
 }
 
@@ -71,8 +69,7 @@ export function _wellContentsForLabware (
 export const allWellContentsForSteps: Selector<Array<WellContentsByLabware>> = createSelector(
   fileDataSelectors.getInitialRobotState,
   fileDataSelectors.robotStateTimeline,
-  steplistSelectors.validatedForms,
-  (_initialRobotState, _robotStateTimeline, _forms) => {
+  (_initialRobotState, _robotStateTimeline) => {
     const timeline = [{robotState: _initialRobotState}, ..._robotStateTimeline.timeline]
 
     return timeline.map((timelineStep, timelineIndex) => {

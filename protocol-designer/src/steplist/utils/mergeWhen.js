@@ -4,8 +4,9 @@
 export default function mergeWhen<T> (
   array: Array<T>,
   predicate: (current: T, next: T) => mixed,
-  merge: (current: T, next: T) => T
-): Array<T> {
+  merge: (current: T, next: T) => *,
+  alternative: (current: T) => * = (c) => c
+): Array<*> {
   if (array.length <= 1) {
     return array
   }
@@ -22,7 +23,7 @@ export default function mergeWhen<T> (
         result.push(merge(current, next))
         canMerge = false
       } else {
-        result.push(current)
+        result.push(alternative(current))
       }
     } else {
       canMerge = true
@@ -30,7 +31,7 @@ export default function mergeWhen<T> (
   }
 
   if (canMerge) {
-    result.push(array[array.length - 1])
+    result.push(alternative(array[array.length - 1]))
   }
 
   return result

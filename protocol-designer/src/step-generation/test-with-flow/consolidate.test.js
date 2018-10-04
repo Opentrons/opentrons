@@ -5,14 +5,14 @@ import {
   createEmptyLiquidState,
   getTipColumn,
   getTiprackTipstate,
-  commandCreatorNoErrors,
-  commandCreatorHasErrors,
+  compoundCommandCreatorNoErrors,
+  compoundCommandCreatorHasErrors,
   commandFixtures as cmd,
 } from './fixtures'
 import _consolidate from '../consolidate'
 
-const consolidate = commandCreatorNoErrors(_consolidate)
-const consolidateWithErrors = commandCreatorHasErrors(_consolidate)
+const consolidate = compoundCommandCreatorNoErrors(_consolidate)
+const consolidateWithErrors = compoundCommandCreatorHasErrors(_consolidate)
 
 // shorthand
 const dispense = (well, volume) =>

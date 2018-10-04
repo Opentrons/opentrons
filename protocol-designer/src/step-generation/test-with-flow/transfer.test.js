@@ -2,15 +2,15 @@
 import merge from 'lodash/merge'
 import {
   createRobotState,
-  commandCreatorNoErrors,
-  commandCreatorHasErrors,
+  compoundCommandCreatorNoErrors,
+  compoundCommandCreatorHasErrors,
   commandFixtures as cmd,
 } from './fixtures'
 import _transfer from '../transfer'
 import {FIXED_TRASH_ID} from '../../constants'
 
-const transfer = commandCreatorNoErrors(_transfer)
-const transferWithErrors = commandCreatorHasErrors(_transfer)
+const transfer = compoundCommandCreatorNoErrors(_transfer)
+const transferWithErrors = compoundCommandCreatorHasErrors(_transfer)
 
 let transferArgs
 let robotInitialState

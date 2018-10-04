@@ -15,6 +15,9 @@ export type PollRequest = {
   id: ?IntervalID,
 }
 
+const MIN_SUBINTERVAL_MS = 100
+const MAX_TIMEOUT_MS = 10000
+
 export function poll (
   candidates: Array<Candidate>,
   interval: number,
@@ -25,7 +28,9 @@ export function poll (
 
   log && log.debug('poller start', { interval, candidates: candidates.length })
 
-  const subInterval = interval / candidates.length
+  const subInterval = Math.max(interval / candidates.length, MIN_SUBINTERVAL_MS)
+  const timeout = Math.min(subInterval * candidates.length, MAX_TIMEOUT_MS)
+
   const id = setInterval(pollIp, subInterval)
   const request = { id }
   let current = -1
@@ -35,7 +40,7 @@ export function poll (
   function pollIp () {
     const next = getNextCandidate()
 
-    fetchHealth(next, log).then(([apiRes, serverRes]) =>
+    fetchHealth(next, timeout, log).then(([apiRes, serverRes]) =>
       onHealth(next, apiRes, serverRes)
     )
   }
@@ -60,18 +65,18 @@ export function stop (request: ?PollRequest, log: ?Logger) {
   }
 }
 
-function fetchHealth (cand: Candidate, log: ?Logger) {
+function fetchHealth (cand: Candidate, timeout: number, log: ?Logger) {
   const apiHealthUrl = `http://${cand.ip}:${cand.port}/health`
   const serverHealthUrl = `http://${cand.ip}:${cand.port}/server/update/health`
 
   return Promise.all([
-    fetchAndParseBody(apiHealthUrl, log),
-    fetchAndParseBody(serverHealthUrl, log),
+    fetchAndParseBody(apiHealthUrl, timeout, log),
+    fetchAndParseBody(serverHealthUrl, timeout, log),
   ])
 }
 
-function fetchAndParseBody (url, log: ?Logger) {
-  return fetch(url)
+function fetchAndParseBody (url, timeout, log: ?Logger) {
+  return fetch(url, {timeout})
     .then(response => (response.ok ? response.json() : null))
     .then(body => {
       log && log.silly('GET', { url, body })
@@ -79,7 +84,7 @@ function fetchAndParseBody (url, log: ?Logger) {
     })
     .catch(error => {
       const { message, type, code } = error
-      log && log.http('GET failed', { url, message, type, code })
+      log && log.silly('GET failed', { url, message, type, code })
       return null
     })
 }

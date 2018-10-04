@@ -3,13 +3,13 @@ import _distribute from '../distribute'
 // import merge from 'lodash/merge'
 import {
   createRobotState,
-  commandCreatorNoErrors,
-  commandCreatorHasErrors,
+  compoundCommandCreatorNoErrors,
+  compoundCommandCreatorHasErrors,
   commandFixtures as cmd,
 } from './fixtures'
 import type {DistributeFormData} from '../types'
-const distribute = commandCreatorNoErrors(_distribute)
-const distributeWithErrors = commandCreatorHasErrors(_distribute)
+const distribute = compoundCommandCreatorNoErrors(_distribute)
+const distributeWithErrors = compoundCommandCreatorHasErrors(_distribute)
 
 // shorthand
 const dispense = (well, volume) =>

@@ -2,13 +2,13 @@
 import _mix from '../mix'
 import {
   createRobotState,
-  commandCreatorNoErrors,
-  commandCreatorHasErrors,
+  compoundCommandCreatorNoErrors,
+  compoundCommandCreatorHasErrors,
   commandFixtures as cmd,
 } from './fixtures'
 import type {MixFormData} from '../types'
-const mix = commandCreatorNoErrors(_mix)
-const mixWithErrors = commandCreatorHasErrors(_mix)
+const mix = compoundCommandCreatorNoErrors(_mix)
+const mixWithErrors = compoundCommandCreatorHasErrors(_mix)
 
 let robotInitialState
 let mixinArgs

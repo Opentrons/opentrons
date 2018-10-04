@@ -116,8 +116,7 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
     }
   }
 )
-
-function commandCreatorsFromFormData (validatedForm: StepGeneration.CommandCreatorData) {
+function compoundCommandCreatorFromFormData (validatedForm: StepGeneration.CommandCreatorData): ?StepGeneration.CompoundCommandCreator {
   switch (validatedForm.stepType) {
     case 'consolidate':
       return StepGeneration.consolidate(validatedForm)
@@ -125,12 +124,11 @@ function commandCreatorsFromFormData (validatedForm: StepGeneration.CommandCreat
       return StepGeneration.transfer(validatedForm)
     case 'distribute':
       return StepGeneration.distribute(validatedForm)
-    case 'pause':
-      return StepGeneration.delay(validatedForm)
     case 'mix':
       return StepGeneration.mix(validatedForm)
+    default:
+      return null
   }
-  return null
 }
 
 // exposes errors and last valid robotState
@@ -153,9 +151,15 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
     const commandCreators = continuousValidForms.reduce(
       (acc: Array<StepGeneration.CommandCreator>, formData, formIndex) => {
         const {stepType} = formData
-        const stepCommandCreator = commandCreatorsFromFormData(formData)
+        let reducedCommandCreator = null
 
-        if (!stepCommandCreator) {
+        if (formData.stepType === 'pause') {
+          reducedCommandCreator = StepGeneration.delay(formData)
+        } else { // NOTE: compound return an array of command creators, atomic steps only return one command creator
+          const compoundCommandCreator: ?StepGeneration.CompoundCommandCreator = compoundCommandCreatorFromFormData(formData)
+          reducedCommandCreator = compoundCommandCreator && StepGeneration.reduceCommandCreators(compoundCommandCreator(initialRobotState))
+        }
+        if (!reducedCommandCreator) {
           // TODO Ian 2018-05-08 use assert
           console.warn(`StepType "${stepType}" not yet implemented`)
           return acc
@@ -175,14 +179,14 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
             return [
               ...acc,
               StepGeneration.reduceCommandCreators([
-                stepCommandCreator,
+                reducedCommandCreator,
                 StepGeneration.dropTip(pipetteId),
               ]),
             ]
           }
         }
 
-        return [...acc, stepCommandCreator]
+        return [...acc, reducedCommandCreator]
       }, [])
 
     const timeline = StepGeneration.commandCreatorsTimeline(commandCreators)(initialRobotState)

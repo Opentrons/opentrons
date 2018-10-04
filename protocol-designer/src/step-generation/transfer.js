@@ -5,12 +5,11 @@ import aspirate from './aspirate'
 import dispense from './dispense'
 import {mixUtil} from './mix'
 import replaceTip from './replaceTip'
-import {reduceCommandCreators} from './utils'
 import touchTip from './touchTip'
 import * as errorCreators from './errorCreators'
-import type {TransferFormData, RobotState, CommandCreator} from './'
+import type {TransferFormData, RobotState, CommandCreator, CompoundCommandCreator} from './'
 
-const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: RobotState) => {
+const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotState: RobotState) => {
   /**
     Transfer will iterate through a set of 1 or more source and destination wells.
     For each pair, it will aspirate from the source well, then dispense into the destination well.
@@ -36,9 +35,9 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
   const pipetteData = prevRobotState.instruments[data.pipette]
   if (!pipetteData) {
     // bail out before doing anything else
-    return {
+    return [(_robotState) => ({
       errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: data.pipette})],
-    }
+    })]
   }
 
   const {
@@ -157,8 +156,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
       )
     }
   )
-
-  return reduceCommandCreators(commandCreators)(prevRobotState)
+  return commandCreators
 }
 
 export default transfer
