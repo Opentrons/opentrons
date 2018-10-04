@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-// import mapValues from 'lodash/mapValues'
+import reduce from 'lodash/reduce'
 // import {connect} from 'react-redux'
 import {
   swatchColors,
@@ -58,9 +58,8 @@ class SelectableLabware extends React.Component<Props, State> {
         const wellSet = getWellSetForMultichannel(this.props.containerType, well)
         if (!wellSet) return acc
 
-        const primaryWell = wellSet[0]
-
-        return { ...acc, [primaryWell]: primaryWell }
+        const selectedWellsFromSet = reduce(wellSet, (acc, well) => ({...acc, [well]: well}), {})
+        return {...acc, ...selectedWellsFromSet}
       }, {})
 
       return primaryWells
@@ -84,6 +83,20 @@ class SelectableLabware extends React.Component<Props, State> {
     }
   }
 
+  makeHandleMouseOverWell = (wellName) => () => {
+    if (this.props.pipetteChannels === 8) {
+      const wellSet = getWellSetForMultichannel(this.props.containerType, wellName)
+      const nextHighlightedWells = reduce(wellSet, (acc, well) => ({...acc, [well]: well}), {})
+      this.props.updateHighlightedWells(nextHighlightedWells)
+    } else {
+      this.props.updateHighlightedWells({[wellName]: wellName})
+    }
+  }
+
+  handleMouseExitWell = () => {
+    this.props.updateHighlightedWells({})
+  }
+
   render () {
     const {
       wellContents,
@@ -99,6 +112,8 @@ class SelectableLabware extends React.Component<Props, State> {
       return {
         selectable: true,
         wellName,
+        onMouseOver: this.makeHandleMouseOverWell(wellName),
+        onMouseLeave: this.handleMouseExitWell,
         highlighted: Object.keys(highlightedWells).includes(wellName),
         selected: Object.keys(selectedWells).includes(wellName),
         error: well && well.error,

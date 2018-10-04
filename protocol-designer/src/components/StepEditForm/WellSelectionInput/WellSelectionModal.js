@@ -111,12 +111,6 @@ class WellSelectionModal extends React.Component<Props, State> {
   }
 }
 
-type DP = {
-  saveWellSelection: $PropertyType<Props, 'onSave'>,
-}
-
-type SP = $Diff<Props, DP>
-
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {pipetteId, labwareId} = ownProps
 
