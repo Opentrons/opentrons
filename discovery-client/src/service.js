@@ -1,9 +1,10 @@
 // @flow
 // create Services from different sources
 import net from 'net'
-import type { BrowserService, ServiceType } from 'mdns-js'
+import defaultTo from 'lodash/defaultTo'
 
-import type { Service, Candidate, HealthResponse } from './types'
+import type {BrowserService, ServiceType} from 'mdns-js'
+import type {Service, ServiceUpdate, Candidate, HealthResponse} from './types'
 
 const nameExtractor = (st: ServiceType) =>
   new RegExp(`^(.+)\\._${st.name}\\._${st.protocol}`)
@@ -26,19 +27,46 @@ export function makeService (
   }
 }
 
+// apply known value updates (not null or undefined) to a service, returning
+// original service reference if nothing to update
+export function updateService (
+  service: Service,
+  update: ServiceUpdate
+): Service {
+  const next: Service | ServiceUpdate = update
+
+  return Object.keys(update).reduce((result, key) => {
+    const prevVal = result[key]
+    const nextVal = defaultTo(next[key], prevVal)
+    // $FlowFixMe: flow can't type [key]: nextVal but we know this is correct
+    return nextVal !== prevVal ? {...result, [key]: nextVal} : result
+  }, service)
+}
+
+// null out conflicting fields
+export function clearServiceIfConflict (
+  service: Service,
+  update: ?Service
+): Service {
+  return update && service.ip === update.ip
+    ? {...service, ip: null, ok: null, serverOk: null}
+    : service
+}
+
 export function makeCandidate (ip: string, port: ?number): Candidate {
-  return { ip, port: port || DEFAULT_PORT }
+  return {ip, port: port || DEFAULT_PORT}
 }
 
 export function fromMdnsBrowser (browserService: BrowserService): ?Service {
-  const { addresses, type, port, fullname } = browserService
+  const {addresses, type, port, fullname} = browserService
 
   if (!type || !fullname) return null
 
   let ip = addresses.find(address => net.isIPv4(address))
   if (!ip) ip = addresses.find(address => net.isIP(address))
-  if (!ip) ip = browserService.host
-  if (ip && net.isIPv6(ip)) ip = `[${ip}]`
+  if (!ip) return null
+
+  if (net.isIPv6(ip)) ip = `[${ip}]`
 
   const nameMatch = type[0] && fullname.match(nameExtractor(type[0]))
   const name = (nameMatch && nameMatch[1]) || fullname
@@ -81,15 +109,3 @@ export function toCandidate (service: Service): ?Candidate {
 
 export const matchService = (source: Service) => (target: Service) =>
   source.name === target.name && source.ip === target.ip
-
-export const matchUnassigned = (source: Service) => (target: Service) =>
-  source.name === target.name && target.ip === null
-
-export const matchConflict = (source: Service) => (target: Service) =>
-  source.ok && source.name !== target.name && source.ip === target.ip
-
-export const matchCandidate = (source: Service) => (target: Candidate) =>
-  source.ok && source.ip === target.ip
-
-export const rejectCandidate = (source: Service) => (target: Candidate) =>
-  !source.ok || source.ip !== target.ip
