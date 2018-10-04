@@ -12,14 +12,52 @@ describe('serviceList', () => {
       {
         name: 'cleans up input list',
         input: [
-          {...MOCK_SERVICE, name: 'foo', ok: true, serverOk: false},
-          {...MOCK_SERVICE, name: 'bar', ok: false, serverOk: true},
-          {...MOCK_SERVICE, name: 'baz', ok: true, serverOk: true},
+          {
+            ...MOCK_SERVICE,
+            name: 'foo',
+            ok: true,
+            serverOk: false,
+            health: {api_version: '1.0.0'},
+            serverHealth: null,
+          },
+          {
+            ...MOCK_SERVICE,
+            name: 'bar',
+            ok: false,
+            serverOk: true,
+            health: null,
+            serverHealth: {apiServerVersion: '1.0.0'},
+          },
+          {
+            ...MOCK_SERVICE,
+            name: 'baz',
+            ok: true,
+            serverOk: true,
+            health: {api_version: '1.0.0'},
+            serverHealth: {apiServerVersion: '1.0.0'},
+          },
         ],
         expected: [
-          {...MOCK_SERVICE, name: 'foo'},
-          {...MOCK_SERVICE, name: 'bar', ip: null},
-          {...MOCK_SERVICE, name: 'baz', ip: null},
+          {
+            ...MOCK_SERVICE,
+            name: 'foo',
+            health: {api_version: '1.0.0'},
+            serverHealth: null,
+          },
+          {
+            ...MOCK_SERVICE,
+            name: 'bar',
+            ip: null,
+            health: null,
+            serverHealth: {apiServerVersion: '1.0.0'},
+          },
+          {
+            ...MOCK_SERVICE,
+            name: 'baz',
+            ip: null,
+            health: {api_version: '1.0.0'},
+            serverHealth: {apiServerVersion: '1.0.0'},
+          },
         ],
       },
       {

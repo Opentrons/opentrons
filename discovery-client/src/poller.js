@@ -3,12 +3,17 @@
 
 import fetch from 'node-fetch'
 
-import type { Candidate, Logger, HealthResponse } from './types'
+import type {
+  Candidate,
+  Logger,
+  HealthResponse,
+  ServerHealthResponse,
+} from './types'
 
 type HealthHandler = (
   candidate: Candidate,
   apiResponse: ?HealthResponse,
-  serverResponse: ?HealthResponse
+  serverResponse: ?ServerHealthResponse
 ) => mixed
 
 export type PollRequest = {

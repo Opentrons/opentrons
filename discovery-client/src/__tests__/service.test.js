@@ -1,87 +1,236 @@
 // tests for service and candidate creation utils
-import cloneDeep from 'lodash/cloneDeep'
+import {setIn} from '@thi.ng/paths'
 
 import * as service from '../service'
 import MOCK_BROWSER_SERVICE from '../__fixtures__/mdns-browser-service'
 
 describe('service utils', () => {
   describe('makeService', () => {
-    test('all info specified', () => {
-      expect(service.makeService('name', 'ip', 1234, false, false)).toEqual({
-        name: 'name',
-        ip: 'ip',
-        port: 1234,
-        ok: false,
-        serverOk: false,
-      })
-    })
-
-    test('defaults', () => {
-      expect(service.makeService('name')).toEqual(
-        expect.objectContaining({
+    const SPECS = [
+      {
+        name: 'all info specified',
+        args: [
+          'name',
+          'ip',
+          1234,
+          false,
+          false,
+          false,
+          {name: 'name'},
+          {name: 'name'},
+        ],
+        expected: {
+          name: 'name',
+          ip: 'ip',
+          port: 1234,
+          ok: false,
+          serverOk: false,
+          advertising: false,
+          health: {name: 'name'},
+          serverHealth: {name: 'name'},
+        },
+      },
+      {
+        name: 'defaults',
+        args: ['name'],
+        expected: {
+          name: 'name',
           ip: null,
           port: 31950,
           ok: null,
           serverOk: null,
-        })
+          advertising: null,
+          health: null,
+          serverHealth: null,
+        },
+      },
+    ]
+
+    SPECS.forEach(spec => {
+      const {name, args, expected} = spec
+      test(name, () =>
+        expect(service.makeService.apply(null, args)).toEqual(expected)
       )
     })
   })
 
   describe('makeCandidate', () => {
-    test('all info specified', () => {
-      expect(service.makeCandidate('ip', 1234)).toEqual({ip: 'ip', port: 1234})
-    })
+    const SPECS = [
+      {
+        name: 'all info specified',
+        args: ['ip', 1234],
+        expected: {ip: 'ip', port: 1234},
+      },
+      {
+        name: 'defaults',
+        args: ['ip'],
+        expected: {ip: 'ip', port: 31950},
+      },
+    ]
 
-    test('defaults', () => {
-      expect(service.makeCandidate('ip')).toEqual({ip: 'ip', port: 31950})
+    SPECS.forEach(spec => {
+      const {name, args, expected} = spec
+      test(name, () =>
+        expect(service.makeCandidate.apply(null, args)).toEqual(expected)
+      )
     })
   })
 
   describe('fromMdnsBrowser', () => {
-    let mdnsService
+    const SPECS = [
+      {
+        name: 'returns null if no IP',
+        args: [setIn(MOCK_BROWSER_SERVICE, 'addresses', [])],
+        expected: null,
+      },
+      {
+        name: 'gets name from fqdn and populates IP, port, and advertising',
+        args: [MOCK_BROWSER_SERVICE],
+        expected: {
+          name: 'opentrons-dev',
+          ip: MOCK_BROWSER_SERVICE.addresses[0],
+          port: MOCK_BROWSER_SERVICE.port,
+          ok: null,
+          serverOk: null,
+          advertising: true,
+          health: null,
+          serverHealth: null,
+        },
+      },
+      {
+        name: 'prefers IPv4',
+        args: [
+          setIn(MOCK_BROWSER_SERVICE, 'addresses', [
+            'fe80::caf4:6db4:4652:e975',
+            ...MOCK_BROWSER_SERVICE.addresses,
+          ]),
+        ],
+        expected: {
+          name: 'opentrons-dev',
+          ip: '192.168.1.42',
+          port: 31950,
+          ok: null,
+          serverOk: null,
+          advertising: true,
+          health: null,
+          serverHealth: null,
+        },
+      },
+      {
+        name: 'adds brackets to IPv6',
+        args: [
+          setIn(MOCK_BROWSER_SERVICE, 'addresses', [
+            'fe80::caf4:6db4:4652:e975',
+          ]),
+        ],
+        expected: {
+          name: 'opentrons-dev',
+          ip: '[fe80::caf4:6db4:4652:e975]',
+          port: 31950,
+          ok: null,
+          serverOk: null,
+          advertising: true,
+          health: null,
+          serverHealth: null,
+        },
+      },
+    ]
 
-    beforeEach(() => {
-      mdnsService = cloneDeep(MOCK_BROWSER_SERVICE)
-    })
-
-    test('gets name from fqdn', () => {
-      expect(service.fromMdnsBrowser(mdnsService)).toEqual(
-        service.makeService(
-          'opentrons-dev',
-          expect.anything(),
-          expect.anything()
-        )
+    SPECS.forEach(spec => {
+      const {name, args, expected} = spec
+      test(name, () =>
+        expect(service.fromMdnsBrowser.apply(null, args)).toEqual(expected)
       )
     })
+  })
 
-    test('with IPv4 service', () => {
-      mdnsService.addresses = [
-        'fe80::caf4:6db4:4652:e975',
-        ...mdnsService.addresses,
-      ]
+  describe('fromResponse', () => {
+    const MOCK_CANDIDATE = {ip: '192.168.1.42', port: 31950}
+    const SPECS = [
+      {
+        name: 'returns null if no responses',
+        args: [MOCK_CANDIDATE, null, null],
+        expected: null,
+      },
+      {
+        name: 'gets ip from candidate and name from responses',
+        args: [
+          MOCK_CANDIDATE,
+          {name: 'opentrons-dev', api_version: '1.0.0'},
+          {name: 'opentrons-dev', apiServerVersion: '1.0.0'},
+        ],
+        expected: {
+          name: 'opentrons-dev',
+          ip: '192.168.1.42',
+          port: 31950,
+          ok: true,
+          serverOk: true,
+          advertising: null,
+          health: {name: 'opentrons-dev', api_version: '1.0.0'},
+          serverHealth: {name: 'opentrons-dev', apiServerVersion: '1.0.0'},
+        },
+      },
+      {
+        name: 'flags ok false if no /health response',
+        args: [
+          MOCK_CANDIDATE,
+          null,
+          {name: 'opentrons-dev', apiServerVersion: '1.0.0'},
+        ],
+        expected: {
+          name: 'opentrons-dev',
+          ip: '192.168.1.42',
+          port: 31950,
+          ok: false,
+          serverOk: true,
+          advertising: null,
+          health: null,
+          serverHealth: {name: 'opentrons-dev', apiServerVersion: '1.0.0'},
+        },
+      },
+      {
+        name: 'flags serverOk false if no /server/update/health response',
+        args: [
+          MOCK_CANDIDATE,
+          {name: 'opentrons-dev', api_version: '1.0.0'},
+          null,
+        ],
+        expected: {
+          name: 'opentrons-dev',
+          ip: '192.168.1.42',
+          port: 31950,
+          ok: true,
+          serverOk: false,
+          advertising: null,
+          health: {name: 'opentrons-dev', api_version: '1.0.0'},
+          serverHealth: null,
+        },
+      },
+      {
+        name: 'flags ok false if name mismatch in responses',
+        args: [
+          MOCK_CANDIDATE,
+          {name: 'opentrons-wrong', api_version: '1.0.0'},
+          {name: 'opentrons-dev', apiServerVersion: '1.0.0'},
+        ],
+        expected: {
+          name: 'opentrons-dev',
+          ip: '192.168.1.42',
+          port: 31950,
+          ok: false,
+          serverOk: true,
+          advertising: null,
+          health: {name: 'opentrons-wrong', api_version: '1.0.0'},
+          serverHealth: {name: 'opentrons-dev', apiServerVersion: '1.0.0'},
+        },
+      },
+    ]
 
-      expect(service.fromMdnsBrowser(mdnsService)).toEqual(
-        service.makeService('opentrons-dev', '192.168.1.42', 31950)
+    SPECS.forEach(spec => {
+      const {name, args, expected} = spec
+      test(name, () =>
+        expect(service.fromResponse.apply(null, args)).toEqual(expected)
       )
-    })
-
-    test('with IPv6 service', () => {
-      mdnsService.addresses = ['fe80::caf4:6db4:4652:e975']
-
-      expect(service.fromMdnsBrowser(mdnsService)).toEqual(
-        service.makeService(
-          'opentrons-dev',
-          '[fe80::caf4:6db4:4652:e975]',
-          31950
-        )
-      )
-    })
-
-    test('return null if no IP found', () => {
-      mdnsService.addresses = []
-
-      expect(service.fromMdnsBrowser(mdnsService)).toEqual(null)
     })
   })
 })

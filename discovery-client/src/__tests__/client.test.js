@@ -66,11 +66,12 @@ describe('discovery client', () => {
       const client = DiscoveryClient()
 
       client.start()
-      client.once('service', robot => {
+      client.once('service', results => {
         expect(service.fromMdnsBrowser).toHaveBeenCalledWith(
           MOCK_BROWSER_SERVICE
         )
-        expect(robot).toEqual(MOCK_SERVICE)
+        expect(results).toHaveLength(1)
+        expect(results[0]).toEqual({...MOCK_SERVICE, advertising: true})
         done()
       })
 
@@ -79,22 +80,14 @@ describe('discovery client', () => {
     10
   )
 
-  test(
-    'adds robot to client.services if browser finds a service',
-    done => {
-      const client = DiscoveryClient()
+  test('adds robot to client.services if browser finds a service', () => {
+    const client = DiscoveryClient()
 
-      client.start()
-      client.once('service', service => {
-        expect(client.services).toEqual([service])
-        expect(client.candidates).toEqual([])
-        done()
-      })
-
-      mdns.__mockBrowser.emit('update', MOCK_BROWSER_SERVICE)
-    },
-    10
-  )
+    client.start()
+    mdns.__mockBrowser.emit('update', MOCK_BROWSER_SERVICE)
+    expect(client.services).toEqual([{...MOCK_SERVICE, advertising: true}])
+    expect(client.candidates).toEqual([])
+  })
 
   test('new mdns service does not null out ok of existing service', () => {
     const client = DiscoveryClient()
@@ -104,6 +97,7 @@ describe('discovery client', () => {
         ...MOCK_SERVICE,
         ok: true,
         serverOk: true,
+        advertising: true,
       },
     ]
 
@@ -115,6 +109,7 @@ describe('discovery client', () => {
         ...MOCK_SERVICE,
         ok: true,
         serverOk: true,
+        advertising: true,
       },
     ])
   })
@@ -326,6 +321,8 @@ describe('discovery client', () => {
         ...MOCK_SERVICE,
         ok: true,
         serverOk: true,
+        health: {name: 'opentrons-dev'},
+        serverHealth: {name: 'opentrons-dev'},
       },
     ])
   })
@@ -334,28 +331,28 @@ describe('discovery client', () => {
     const client = DiscoveryClient()
 
     client.services = [
-      {name: 'bar', ip: 'foo', port: 31950},
-      {name: 'baz', ip: 'foo', port: 31950},
+      {...MOCK_SERVICE, name: 'bar', ok: true, serverOk: true},
+      {...MOCK_SERVICE, name: 'baz', ok: true, serverOk: true},
     ]
 
     client.start()
     const onHealth = poller.poll.mock.calls[0][2]
     onHealth(
-      {ip: 'foo', port: 31950},
+      {ip: MOCK_SERVICE.ip, port: 31950},
       {name: 'opentrons-dev'},
       {name: 'opentrons-dev'}
     )
 
     expect(client.services).toEqual([
       {
-        name: 'opentrons-dev',
-        ip: 'foo',
-        port: 31950,
+        ...MOCK_SERVICE,
         ok: true,
         serverOk: true,
+        health: {name: 'opentrons-dev'},
+        serverHealth: {name: 'opentrons-dev'},
       },
-      {name: 'bar', ip: null, port: 31950, ok: null, serverOk: null},
-      {name: 'baz', ip: null, port: 31950, ok: null, serverOk: null},
+      {...MOCK_SERVICE, name: 'bar', ip: null},
+      {...MOCK_SERVICE, name: 'baz', ip: null},
     ])
   })
 
@@ -428,7 +425,7 @@ describe('discovery client', () => {
   test(
     'candidate removal emits removal events',
     done => {
-      let services = [
+      const services = [
         MOCK_SERVICE,
         {
           ...MOCK_SERVICE,
@@ -439,13 +436,9 @@ describe('discovery client', () => {
 
       const client = DiscoveryClient({services})
 
-      client.on('serviceRemoved', service => {
-        expect(services).toContainEqual(service)
-        services = services.filter(
-          s => s.name !== service.name || s.ip !== service.ip
-        )
-
-        if (services.length === 0) done()
+      client.on('serviceRemoved', results => {
+        expect(results).toEqual(services)
+        done()
       })
 
       client.start()

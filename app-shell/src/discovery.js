@@ -4,6 +4,7 @@ import assert from 'assert'
 import Store from 'electron-store'
 import groupBy from 'lodash/groupBy'
 import map from 'lodash/map'
+import omit from 'lodash/omit'
 import throttle from 'lodash/throttle'
 import uniqBy from 'lodash/uniqBy'
 
@@ -106,13 +107,12 @@ function servicesToConnections (services: Array<Service>): Array<Connection> {
 }
 
 function serviceToConnection (service: Service): ?Connection {
-  if (!service.ip) return null
+  const {ip} = service
+  if (!ip) return null
 
   return {
-    ip: service.ip,
-    ok: service.ok,
-    port: service.port,
-    local: isLocal(service.ip),
+    ...omit(service, ['name']),
+    local: isLocal(ip),
   }
 }
 
