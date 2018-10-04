@@ -17,7 +17,9 @@ If you are up-to-date on all other directories you can simply run `yarn` instead
 Next you have two options:
 1. From the top level folder type: `make -C labware-designer dev`
 2. Open your browser and type in: `localhost:8080`
+
 OR
+
 1. Type `make build` within the `opentrons/labware-designer` folder
 2. Open `labware-designer/dist/index.html` in your browser
 

@@ -21,7 +21,7 @@
     },
     "metadata": {
       "type": "object",
-      "description": "Properties used for searchability",
+      "description": "Properties used for search and display",
       "additionalProperties": false,
       "required": ["name", "displayCategory"],
       "properties": {
@@ -63,14 +63,15 @@
       "properties": {
         "format": {
           "description": "Property to determine compatibility with multichannel pipette",
-          "type": "string"
+          "type": "string",
+          "enum": ["96Standard", "384Standard", "trough", "irregular"]
         },
         "isTiprack": {
-          "description": "Flag marking whether a container is a tiprack or not",
+          "description": "Flag marking whether a labware is a tiprack or not",
           "type": "boolean"
         },
         "tipLength": {
-          "description": "Required if container is tiprack",
+          "description": "Required if labware is tiprack",
           "$ref": "#/definitions/positiveNumber"
         }
       }
@@ -78,7 +79,7 @@
     },
     "ordering": {
       "type": "array",
-      "description": "Generated array that keeps track of how wells should be ordered in a container",
+      "description": "Generated array that keeps track of how wells should be ordered in a labware",
       "items": {
         "type": "array",
         "items": {
@@ -89,7 +90,7 @@
     "cornerOffsetFromSlot": {
       "type": "object",
       "additionalProperties": false,
-      "description": "XYZ values from top left corner of container to well A1",
+      "description": "XYZ values from top left corner of slot to well A1",
       "required": ["x", "y", "z"],
       "properties": {
         "x": {"type": "number"},
@@ -101,7 +102,7 @@
     "dimensions": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Outer dimensions of a container",
+      "description": "Outer dimensions of a labware",
       "required": ["overallWidth", "overallHeight", "overallLength"],
       "properties": {
         "overallWidth": {
@@ -118,7 +119,7 @@
     },
     "wells": {
       "type": "object",
-      "description": "Unordered object of well objects with calculated XYZ",
+      "description": "Unordered object of well objects with position and dimensional information",
       "patternProperties": {
         "['A' - 'Z'][*]": {
           "type": "object",
@@ -133,6 +134,7 @@
                     {"required": ["diameter", "length"]}
           ]},
           "properties": {
+            "description": "XYZ calculated from bottom-left corner of slot to top-center of the well",
             "depth": {"$ref": "#/definitions/positiveNumber"},
             "x": {"$ref": "#/definitions/positiveNumber"},
             "y": {"$ref": "#/definitions/positiveNumber"},
@@ -142,6 +144,7 @@
             "length": {"$ref": "#/definitions/positiveNumber"},
             "diameter": {"$ref": "#/definitions/positiveNumber"},
             "shape": {
+              "description": "If rectangular, use length and width; otherwise use diameter",
               "type": "string",
               "enum": ["rectangular", "circular"]
             }
