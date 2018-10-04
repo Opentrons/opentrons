@@ -68,12 +68,15 @@ describe('serviceList', () => {
       {
         name: 'collapses multiple IP unknown duplicates into one',
         input: [
-          {...MOCK_SERVICE, ip: null},
+          {...MOCK_SERVICE, ip: null, local: null},
           MOCK_SERVICE,
-          {...MOCK_SERVICE, name: 'bar', ip: null},
-          {...MOCK_SERVICE, name: 'bar', ip: null},
+          {...MOCK_SERVICE, name: 'bar', ip: null, local: null},
+          {...MOCK_SERVICE, name: 'bar', ip: null, local: null},
         ],
-        expected: [MOCK_SERVICE, {...MOCK_SERVICE, name: 'bar', ip: null}],
+        expected: [
+          MOCK_SERVICE,
+          {...MOCK_SERVICE, name: 'bar', ip: null, local: null},
+        ],
       },
     ]
 

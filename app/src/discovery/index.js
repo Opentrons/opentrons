@@ -1,11 +1,13 @@
 // @flow
 // robot discovery state
+import groupBy from 'lodash/groupBy'
 import {getShellRobots} from '../shell'
 
+import type {Service} from '@opentrons/discovery-client'
 import type {State, Action, ThunkAction} from '../types'
 import type {DiscoveredRobot} from './types'
 
-type RobotsMap = {[name: string]: DiscoveredRobot}
+type RobotsMap = {[name: string]: Array<Service>}
 
 type DiscoveryState = {
   scanning: boolean,
@@ -24,7 +26,7 @@ type FinishAction = {|
 
 type UpdateListAction = {|
   type: 'discovery:UPDATE_LIST',
-  payload: {|robots: Array<DiscoveredRobot>|},
+  payload: {|robots: Array<Service>|},
 |}
 
 export * from './types'
@@ -91,12 +93,6 @@ export function discoveryReducer (
   return state
 }
 
-function normalizeRobots (robots: Array<DiscoveredRobot> = []): RobotsMap {
-  return robots.reduce(
-    (robotsMap: RobotsMap, robot: DiscoveredRobot) => ({
-      ...robotsMap,
-      [robot.name]: robot,
-    }),
-    {}
-  )
+function normalizeRobots (robots: Array<Service> = []): RobotsMap {
+  return groupBy(robots, 'name')
 }

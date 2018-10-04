@@ -16,6 +16,15 @@ import type {
 const nameExtractor = (st: ServiceType) =>
   new RegExp(`^(.+)\\._${st.name}\\._${st.protocol}`)
 
+const isLocal = (ip: ?string) => {
+  if (ip == null) return null
+  return (
+    ip.startsWith('169.254') ||
+    ip.startsWith('[fe80') ||
+    ip.startsWith('[fd00') ||
+    ip === 'localhost'
+  )
+}
 export const DEFAULT_PORT = 31950
 
 export function makeService (
@@ -32,6 +41,7 @@ export function makeService (
     name,
     ip: defaultTo(ip, null),
     port: defaultTo(port, DEFAULT_PORT),
+    local: isLocal(ip),
     ok: defaultTo(ok, null),
     serverOk: defaultTo(serverOk, null),
     advertising: defaultTo(advertising, null),

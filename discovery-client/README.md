@@ -91,8 +91,11 @@ type Service = {
   /** possible ip address (null if an IP conflict occurred) */
   ip: ?string,
 
-  /** possible service port (31950 if unspecified) */
-  port: ?number,
+  /** service port (deafult 31950) */
+  port: number,
+
+  /** IP address (if known) is a link-local address */
+  local: ?boolean,
 
   /** health status of the API server (null if not yet determined) */
   ok: ?boolean,

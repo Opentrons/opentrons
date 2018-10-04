@@ -431,6 +431,7 @@ describe('discovery client', () => {
           ...MOCK_SERVICE,
           ip: '[fd00:0:cafe:fefe::1]',
           port: 31950,
+          local: true,
         },
       ]
 

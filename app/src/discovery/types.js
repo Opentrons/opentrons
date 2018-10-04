@@ -1,10 +1,7 @@
 // @flow
-export type Connection = {
-  ip: string,
-  port: number,
-  local: boolean,
-  ok: ?boolean,
-}
+import type {Service} from '@opentrons/discovery-client'
+
+export type Connection = Service & {local: boolean}
 
 export type DiscoveredRobot = {
   name: string,

@@ -3,8 +3,8 @@ import {discoveryReducer} from '..'
 
 jest.mock('../../shell', () => ({
   getShellRobots: () => ([
-    {name: 'foo', connections: []},
-    {name: 'bar', connections: []},
+    {name: 'foo', ip: '192.168.1.1', port: 31950},
+    {name: 'bar', ip: '192.168.1.2', port: 31950},
   ]),
 }))
 
@@ -21,8 +21,8 @@ describe('discoveryReducer', () => {
       expectedState: {
         scanning: false,
         robotsByName: {
-          foo: {name: 'foo', connections: []},
-          bar: {name: 'bar', connections: []},
+          foo: [{name: 'foo', ip: '192.168.1.1', port: 31950}],
+          bar: [{name: 'bar', ip: '192.168.1.2', port: 31950}],
         },
       },
     },
@@ -44,16 +44,16 @@ describe('discoveryReducer', () => {
         type: 'discovery:UPDATE_LIST',
         payload: {
           robots: [
-            {name: 'foo', connections: []},
-            {name: 'bar', connections: []},
+            {name: 'foo', ip: '192.168.1.1', port: 31950},
+            {name: 'bar', ip: '192.168.1.2', port: 31950},
           ],
         },
       },
       initialState: {robotsByName: {}},
       expectedState: {
         robotsByName: {
-          foo: {name: 'foo', connections: []},
-          bar: {name: 'bar', connections: []},
+          foo: [{name: 'foo', ip: '192.168.1.1', port: 31950}],
+          bar: [{name: 'bar', ip: '192.168.1.2', port: 31950}],
         },
       },
     },

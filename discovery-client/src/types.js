@@ -26,6 +26,8 @@ export type Service = {
   name: string,
   ip: ?string,
   port: number,
+  // IP address (if known) is a link-local address
+  local: ?boolean,
   // GET /health response.ok === true
   ok: ?boolean,
   // GET /server/health response.ok === true

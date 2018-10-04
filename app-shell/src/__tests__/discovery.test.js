@@ -83,19 +83,11 @@ describe('app-shell/discovery', () => {
   })
 
   test('always sends "discovery:UPDATE_LIST" on "discovery:START"', () => {
-    mockClient.services = [
+    const expected = [
       {name: 'opentrons-dev', ip: '192.168.1.42', port: 31950, ok: true},
     ]
 
-    const expected = [
-      {
-        name: 'opentrons-dev',
-        connections: [
-          {ip: '192.168.1.42', port: 31950, ok: true, local: false},
-        ],
-      },
-    ]
-
+    mockClient.services = expected
     registerDiscovery(dispatch)({type: 'discovery:START'})
     expect(dispatch).toHaveBeenCalledWith({
       type: 'discovery:UPDATE_LIST',
@@ -112,51 +104,6 @@ describe('app-shell/discovery', () => {
         services: [
           {name: 'opentrons-dev', ip: '192.168.1.42', port: 31950, ok: true},
         ],
-        expected: [
-          {
-            name: 'opentrons-dev',
-            connections: [
-              {ip: '192.168.1.42', port: 31950, ok: true, local: false},
-            ],
-          },
-        ],
-      },
-      {
-        name: 'handles multiple services',
-        services: [
-          {name: 'opentrons-1', ip: '192.168.1.42', port: 31950, ok: false},
-          {name: 'opentrons-2', ip: '169.254.9.8', port: 31950, ok: true},
-        ],
-        expected: [
-          {
-            name: 'opentrons-1',
-            connections: [
-              {ip: '192.168.1.42', port: 31950, ok: false, local: false},
-            ],
-          },
-          {
-            name: 'opentrons-2',
-            connections: [
-              {ip: '169.254.9.8', port: 31950, ok: true, local: true},
-            ],
-          },
-        ],
-      },
-      {
-        name: 'combines multiple services into one robot',
-        services: [
-          {name: 'opentrons-dev', ip: '192.168.1.42', port: 31950, ok: true},
-          {name: 'opentrons-dev', ip: '169.254.9.8', port: 31950, ok: true},
-        ],
-        expected: [
-          {
-            name: 'opentrons-dev',
-            connections: [
-              {ip: '192.168.1.42', port: 31950, ok: true, local: false},
-              {ip: '169.254.9.8', port: 31950, ok: true, local: true},
-            ],
-          },
-        ],
       },
     ]
 
@@ -167,7 +114,7 @@ describe('app-shell/discovery', () => {
         mockClient.emit('service')
         expect(dispatch).toHaveBeenCalledWith({
           type: 'discovery:UPDATE_LIST',
-          payload: {robots: spec.expected},
+          payload: {robots: spec.services},
         })
       })
     )
