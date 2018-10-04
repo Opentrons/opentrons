@@ -12,12 +12,12 @@ import {formConnectorFactory, type FormConnector} from '../utils'
 type SP = {
   instruments: $PropertyType<FilePageProps, 'instruments'>,
   isFormAltered: $PropertyType<FilePageProps, 'isFormAltered'>,
-  _values: {[accessor: FileMetadataFieldAccessors]: string},
+  _values: {[accessor: FileMetadataFieldAccessors]: any},
 }
 
 type DP = {
   _updateFileMetadataFields: typeof actions.updateFileMetadataFields,
-  _saveFileMetadata: ({[accessor: FileMetadataFieldAccessors]: string}) => mixed,
+  _saveFileMetadata: ({[accessor: FileMetadataFieldAccessors]: mixed}) => mixed,
   goToDesignPage: $PropertyType<FilePageProps, 'goToDesignPage'>,
   swapPipettes: $PropertyType<FilePageProps, 'swapPipettes'>,
 }
@@ -46,7 +46,7 @@ const mergeProps = (
   {_updateFileMetadataFields, _saveFileMetadata, goToDesignPage, swapPipettes}: DP
 ): FilePageProps => {
   const onChange = (accessor) => (e: SyntheticInputEvent<*>) => {
-    if (accessor === 'name' || accessor === 'description' || accessor === 'author') {
+    if (accessor === 'protocol-name' || accessor === 'description' || accessor === 'author') {
       _updateFileMetadataFields({[accessor]: e.target.value})
     } else {
       console.warn('Invalid accessor in ConnectedFilePage:', accessor)

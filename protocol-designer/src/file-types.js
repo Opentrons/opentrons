@@ -48,12 +48,12 @@ export type ProtocolFile = {
     'protocol-name': string,
     author: string,
     description: string,
-    created: MsSinceEpoch,
-    'last-modified': MsSinceEpoch | null,
+    created?: MsSinceEpoch,
+    'last-modified'?: MsSinceEpoch | null,
     // TODO LATER string enums for category/subcategory? Or just strings?
-    category: string | null,
-    subcategory: string | null,
-    tags: Array<string>,
+    category?: string | null,
+    subcategory?: string | null,
+    tags?: Array<string>,
   },
 
   'default-values': {

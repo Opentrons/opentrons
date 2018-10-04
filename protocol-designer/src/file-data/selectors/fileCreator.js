@@ -2,7 +2,7 @@
 import {createSelector} from 'reselect'
 import mapValues from 'lodash/mapValues'
 import {getPropertyAllPipettes} from '@opentrons/shared-data'
-import {fileMetadata} from './fileFields'
+import {getFileMetadata} from './fileFields'
 import {getInitialRobotState, robotStateTimeline} from './commands'
 import {selectors as dismissSelectors} from '../../dismiss'
 import {selectors as ingredSelectors} from '../../labware-ingred/reducers'
@@ -32,7 +32,7 @@ const executionDefaults = {
 }
 
 export const createFile: BaseState => ProtocolFile = createSelector(
-  fileMetadata,
+  getFileMetadata,
   getInitialRobotState,
   robotStateTimeline,
   dismissSelectors.getAllDismissedWarnings,
@@ -50,8 +50,9 @@ export const createFile: BaseState => ProtocolFile = createSelector(
     savedStepForms,
     orderedSteps
   ) => {
-    const {author, description} = fileMetadata
-    const name = fileMetadata.name || 'untitled'
+    const {author, description, created} = fileMetadata
+    const name = fileMetadata['protocol-name'] || 'untitled'
+    const lastModified = fileMetadata['last-modified']
 
     const instruments = mapValues(
       initialRobotState.instruments,
@@ -83,8 +84,10 @@ export const createFile: BaseState => ProtocolFile = createSelector(
         'protocol-name': name,
         author,
         description,
-        created: Date.now(),
-        'last-modified': null,
+        created,
+        'last-modified': lastModified,
+
+        // TODO LATER
         category: null,
         subcategory: null,
         tags: [],
