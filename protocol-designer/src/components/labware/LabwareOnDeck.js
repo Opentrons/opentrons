@@ -8,7 +8,6 @@ import {
   SLOT_WIDTH_MM,
   SLOT_HEIGHT_MM,
   humanizeLabwareType,
-  clickOutside,
   type DeckSlot,
 } from '@opentrons/components'
 import styles from './labware.css'
@@ -17,8 +16,6 @@ import ClickableText from './ClickableText'
 import SelectablePlate from '../../containers/SelectablePlate.js'
 import NameThisLabwareOverlay from './NameThisLabwareOverlay.js'
 import DisabledSelectSlotOverlay from './DisabledSelectSlotOverlay.js'
-
-const EnhancedNameThisLabwareOverlay = clickOutside(NameThisLabwareOverlay)
 
 function LabwareDeckSlotOverlay ({
   canAddIngreds,
@@ -180,9 +177,9 @@ export default function LabwareOnDeck (props: LabwareOnDeckProps) {
             cancelMove={cancelMove} />
         : <EmptyDestinationSlotOverlay {...{moveLabwareDestination}}/>
     } else if (showNameOverlay) {
-      overlay = <EnhancedNameThisLabwareOverlay {...{
+      overlay = <NameThisLabwareOverlay {...{
         setLabwareName,
-        deleteLabware,
+        editLiquids,
       }}
       onClickOutside={setDefaultLabwareName} />
     } else {
