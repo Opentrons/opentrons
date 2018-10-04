@@ -116,4 +116,8 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
   }
 }
 
-export default connect(mapStateToProps, null, mergeProps)(TitleBar)
+const StickyTitleBar = (props) => (
+  <TitleBar {...props} className={styles.sticky_bar} />
+)
+
+export default connect(mapStateToProps, null, mergeProps)(StickyTitleBar)

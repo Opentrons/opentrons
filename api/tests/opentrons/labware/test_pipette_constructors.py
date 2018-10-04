@@ -1,6 +1,7 @@
+# TODO: Modify all calls to get a Well to use the `wells` method
 import pytest
 from opentrons import robot, instruments
-from opentrons.instruments import Pipette
+from opentrons.legacy_api.instruments import Pipette
 
 factories = [
     ('p10_single', instruments.P10_Single),

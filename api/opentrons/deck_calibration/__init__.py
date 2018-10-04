@@ -1,5 +1,4 @@
 from opentrons import robot
-from opentrons.robot.robot import Robot
 from opentrons.config import feature_flags as ff
 
 # Application constants
@@ -80,7 +79,7 @@ def jog(axis, direction, step):
     return position(axis)
 
 
-def set_calibration_value(rbt: Robot, axis: str, value: float):
+def set_calibration_value(rbt, axis: str, value: float):
     if axis == 'x':
         row = x_row
     elif axis == 'y':

@@ -88,11 +88,13 @@ exports[`DropdownField renders correctly with a falsey value 1`] = `
     className="dropdown_field"
   >
     <select
+      autoFocus={undefined}
       className="dropdown"
       disabled={undefined}
       onBlur={undefined}
       onChange={undefined}
       onFocus={undefined}
+      tabIndex={undefined}
       value=""
     >
       <option
@@ -158,11 +160,13 @@ exports[`DropdownField renders correctly with a value 1`] = `
     className="dropdown_field"
   >
     <select
+      autoFocus={undefined}
       className="dropdown"
       disabled={undefined}
       onBlur={undefined}
       onChange={undefined}
       onFocus={undefined}
+      tabIndex={undefined}
       value="rna"
     >
       <option
@@ -248,12 +252,14 @@ exports[`InputField renders correctly 1`] = `
       className="input_field"
     >
       <input
+        autoFocus={undefined}
         onBlur={undefined}
         onChange={undefined}
         onClick={undefined}
         onFocus={undefined}
         placeholder="Placeholder Text"
         readOnly={undefined}
+        tabIndex={undefined}
         type="text"
         value=""
       />

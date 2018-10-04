@@ -73,7 +73,7 @@ Temperature Module
 **********
 
 Our temperature module acts as both a cooling and heating device. The range
-of temperatures this module can reach goes from -9 to 99 degrees celsius with a resolution of 3 decimal places.
+of temperatures this module can reach goes from 4 to 95 degrees celsius with a resolution of 1 degree celcius.
 
 
 The temperature module has the following methods that can be accessed during a protocol.

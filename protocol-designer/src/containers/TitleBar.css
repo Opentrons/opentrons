@@ -8,3 +8,9 @@
   display: inline-block;
   vertical-align: middle;
 }
+
+.sticky_bar {
+  position: sticky;
+  top: 0;
+  z-index: 101;
+}

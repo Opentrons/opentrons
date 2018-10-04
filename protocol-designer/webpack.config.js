@@ -12,12 +12,13 @@ const PROTOCOL_DESIGNER_ENV_VAR_PREFIX = 'OT_PD_'
 
 const gitInfo = gitDescribeSync()
 const OT_PD_VERSION = gitInfo && gitInfo.raw
+const OT_PD_BUILD_DATE = (new Date()).toUTCString()
 
 const passThruEnvVars = Object.keys(process.env)
   .filter(v => v.startsWith(PROTOCOL_DESIGNER_ENV_VAR_PREFIX))
   .concat(['NODE_ENV'])
 
-const envVarsWithDefaults = {OT_PD_VERSION}
+const envVarsWithDefaults = {OT_PD_VERSION, OT_PD_BUILD_DATE}
 
 const envVars = passThruEnvVars.reduce((acc, envVar) =>
   ({[envVar]: '', ...acc}),

@@ -8,7 +8,7 @@ type Props = {
   height?: string | number,
   text?: string,
   iconName?: IconName,
-  onClick?: (e: SyntheticEvent<*>) => void,
+  onClick?: (e: SyntheticEvent<*>) => mixed,
 }
 
 const DEFAULT_HEIGHT = 15

@@ -4,9 +4,9 @@ import os
 import shutil
 import tempfile
 
-from opentrons.server.main import init
+from opentrons.server import init
 from opentrons.data_storage import database as db
-from opentrons.robot import robot_configs as rc
+from opentrons.legacy_api.robot import robot_configs as rc
 
 
 def validate_response_body(body):
@@ -52,8 +52,7 @@ async def test_available_resets(virtual_smoothie_env, loop, test_client):
     body = await resp.json()
     options_list = body.get('options')
     assert resp.status == 200
-    for key in ['deckCalibration', 'tipProbe',
-                'labwareCalibration', 'bootScripts']:
+    for key in ['tipProbe', 'labwareCalibration', 'bootScripts']:
         for opt in options_list:
             if opt['id'] == key:
                 assert 'name' in opt
@@ -88,21 +87,6 @@ async def execute_reset_tests(cli):
     with open(robot_settings, 'r') as f:
         data = json.load(f)
     assert data['tip_length'] == {}
-
-    # Check that we delete the entire deck calibration file
-    resp = await cli.post('/settings/reset', json={'deckCalibration': True})
-    body = await resp.json()
-    assert resp.status == 200
-    assert body == {}
-
-    deck_cal = index['deckCalibrationFile']
-    assert not os.path.exists(deck_cal)
-
-    # Check that this endpoint is idempotent
-    resp = await cli.post('/settings/reset', json={'deckCalibration': True})
-    body = await resp.json()
-    assert resp.status == 200
-    assert body == {}
 
     # Check the inpost validation
     resp = await cli.post('/settings/reset', json={'aksgjajhadjasl': False})

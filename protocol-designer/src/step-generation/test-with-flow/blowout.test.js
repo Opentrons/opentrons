@@ -71,6 +71,19 @@ describe('blowout', () => {
     })
   })
 
+  test('blowout with invalid labware ID should throw error', () => {
+    const result = blowoutWithErrors({
+      pipette: 'p300SingleId',
+      labware: 'badLabware',
+      well: 'A1',
+    })(robotStateWithTip)
+
+    expect(result.errors).toHaveLength(1)
+    expect(result.errors[0]).toMatchObject({
+      type: 'LABWARE_DOES_NOT_EXIST',
+    })
+  })
+
   test('blowout with no tip should throw error', () => {
     const result = blowoutWithErrors({
       pipette: 'p300SingleId',

@@ -66,6 +66,7 @@ exports[`alerts warning alert onCloseClick renders correctly 1`] = `
       className="button_flat button_icon close"
       disabled={undefined}
       onClick={[Function]}
+      tabIndex={undefined}
       title={undefined}
       type="button"
     >
@@ -157,6 +158,7 @@ exports[`alerts warning alert with message body renders correctly 1`] = `
       className="button_flat button_icon close"
       disabled={undefined}
       onClick={[Function]}
+      tabIndex={undefined}
       title={undefined}
       type="button"
     >

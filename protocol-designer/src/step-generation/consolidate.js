@@ -2,12 +2,12 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import {FIXED_TRASH_ID} from '../constants'
-import {aspirate, dispense, blowout, replaceTip, touchTip, reduceCommandCreators} from './'
+import {aspirate, dispense, blowout, replaceTip, touchTip} from './'
 import {mixUtil} from './mix'
 import * as errorCreators from './errorCreators'
-import type {ConsolidateFormData, RobotState, CommandCreator} from './'
+import type {ConsolidateFormData, RobotState, CommandCreator, CompoundCommandCreator} from './'
 
-const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotState: RobotState) => {
+const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prevRobotState: RobotState) => {
   /**
     Consolidate will aspirate several times in sequence from multiple source wells,
     then dispense into a single destination.
@@ -29,9 +29,9 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
   const pipetteData = prevRobotState.instruments[data.pipette]
   if (!pipetteData) {
     // bail out before doing anything else
-    return {
+    return [(_robotState) => ({
       errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: data.pipette})],
-    }
+    })]
   }
 
   const {
@@ -169,7 +169,7 @@ const consolidate = (data: ConsolidateFormData): CommandCreator => (prevRobotSta
     }
   )
 
-  return reduceCommandCreators(commandCreators)(prevRobotState)
+  return commandCreators
 }
 
 export default consolidate

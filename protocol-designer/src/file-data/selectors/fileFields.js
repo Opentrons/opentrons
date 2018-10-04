@@ -16,8 +16,8 @@ export const isUnsavedMetadatFormAltered = createSelector(
   state => !isEqual(state.unsavedMetadataForm, state.fileMetadata)
 )
 
-export const protocolName = createSelector(rootSelector, state => state.fileMetadata.name)
-export const fileMetadata = createSelector(
+export const protocolName = createSelector(rootSelector, state => state.fileMetadata['protocol-name'])
+export const getFileMetadata = createSelector(
   rootSelector,
   state => state.fileMetadata
 )

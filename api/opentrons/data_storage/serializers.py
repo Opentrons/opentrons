@@ -1,5 +1,5 @@
 # pylama:ignore=E252
-from opentrons.containers.placeable import Well, Container
+from opentrons.legacy_api.containers.placeable import Well, Container
 from opentrons.util.vector import Vector
 from numbers import Number
 from typing import Tuple
@@ -33,7 +33,7 @@ def json_to_labware(json_defn: dict) -> Container:
     container = Container()
     container._coordinates = Vector(0, 0, 0)
 
-    wells = container_data.get('wells')
+    wells = container_data['wells']
     for well_name, json_well in wells.items():
         well, coordinates = _json_to_well(json_well)
         container.add(well, well_name, coordinates)
@@ -59,7 +59,7 @@ def labware_to_json(container: Container, container_name: str=None) -> dict:
     if container.ordering:
         ordering = container.ordering
     else:
-        groups = {}
+        groups: dict = {}
         for w in wells.keys():
             num = int(w[1:])
             if num in groups.keys():

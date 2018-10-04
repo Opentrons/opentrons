@@ -1,6 +1,6 @@
 // @flow
 // logger
-import {ipcRenderer} from 'electron'
+const {ipcRenderer} = global.APP_SHELL
 
 // TODO(mc, 2018-05-17): put this type somewhere common to app and app-shell
 export type LogLevel =

@@ -36,7 +36,7 @@ describe('/motors/**', () => {
   })
 
   describe('disengagePipetteMotors action creator', () => {
-    const path = 'disengage'
+    const path = 'motors/disengage'
     const mockPipettesResponse = {
       left: {mount_axis: 'z', plunger_axis: 'b'},
       right: {mount_axis: 'a', plunger_axis: 'c'},
@@ -71,9 +71,10 @@ describe('/motors/**', () => {
 
     test('dispatches MOTORS_REQUEST and MOTORS_SUCCESS', () => {
       const request = {mounts: ['left', 'right']}
+
       const expectedActions = [
-        {type: 'api:MOTORS_REQUEST', payload: {robot, request, path}},
-        {type: 'api:MOTORS_SUCCESS', payload: {robot, response, path}},
+        {type: 'api:REQUEST', payload: {robot, request, path}},
+        {type: 'api:SUCCESS', payload: {robot, response, path}},
       ]
 
       client.__setMockResponse(mockPipettesResponse, response)
@@ -86,8 +87,8 @@ describe('/motors/**', () => {
       const request = {mounts: ['left', 'right']}
       const error = {name: 'ResponseError', status: '400'}
       const expectedActions = [
-        {type: 'api:MOTORS_REQUEST', payload: {robot, request, path}},
-        {type: 'api:MOTORS_FAILURE', payload: {robot, error, path}},
+        {type: 'api:REQUEST', payload: {robot, request, path}},
+        {type: 'api:FAILURE', payload: {robot, error, path}},
       ]
 
       client.__setMockError(error)

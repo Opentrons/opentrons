@@ -2,14 +2,15 @@
 // TODO Ian 2018-05-03
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
+import flatten from 'lodash/flatten'
 // import {FIXED_TRASH_ID} from '../constants'
-import {aspirate, dispense, blowout, replaceTip, touchTip, reduceCommandCreators} from './'
+import {aspirate, dispense, blowout, replaceTip, touchTip} from './'
 import transfer from './transfer'
 import {mixUtil} from './mix'
 import * as errorCreators from './errorCreators'
-import type {DistributeFormData, RobotState, CommandCreator, TransferLikeFormDataFields, TransferFormData} from './'
+import type {DistributeFormData, RobotState, CommandCreator, CompoundCommandCreator, TransferLikeFormDataFields, TransferFormData} from './'
 
-const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState: RobotState) => {
+const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRobotState: RobotState) => {
   /**
     Distribute will aspirate from a single source well into multiple destination wells.
 
@@ -32,9 +33,9 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
   const pipetteData = prevRobotState.instruments[data.pipette]
   if (!pipetteData) {
     // bail out before doing anything else
-    return {
+    return [(_robotState) => ({
       errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: data.pipette})],
-    }
+    })]
   }
 
   const {
@@ -63,11 +64,12 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
         destWells: [destWell],
         mixBeforeAspirate: data.mixBeforeAspirate,
         mixInDestination: null,
+        blowout: null,
       }
       return transfer(transferData)
     })
 
-    return reduceCommandCreators(transferCommands)(prevRobotState)
+    return flatten(transferCommands.map(tC => tC(prevRobotState)))
   }
 
   const commandCreators = flatMap(
@@ -108,11 +110,14 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
         tipCommands = [replaceTip(data.pipette)]
       }
 
-      const blowoutCommands = data.blowout ? [blowout({
-        pipette: data.pipette,
-        labware: data.blowout,
-        well: 'A1',
-      })] : []
+      let blowoutCommands = []
+      if (data.disposalVolume && data.disposalLabware && data.disposalWell) {
+        blowoutCommands = [blowout({
+          pipette: data.pipette,
+          labware: data.disposalLabware,
+          well: data.disposalWell,
+        })]
+      }
 
       const touchTipAfterAspirateCommand = data.touchTipAfterAspirate
         ? [
@@ -154,7 +159,7 @@ const distribute = (data: DistributeFormData): CommandCreator => (prevRobotState
     }
   )
 
-  return reduceCommandCreators(commandCreators)(prevRobotState)
+  return commandCreators
 }
 
 export default distribute

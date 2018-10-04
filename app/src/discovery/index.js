@@ -31,7 +31,7 @@ export * from './types'
 
 export type DiscoveryAction = StartAction | FinishAction | UpdateListAction
 
-const DISCOVERY_TIMEOUT = 15000
+const DISCOVERY_TIMEOUT = 20000
 
 export function startDiscovery (): ThunkAction {
   const start: StartAction = {type: 'discovery:START', meta: {shell: true}}

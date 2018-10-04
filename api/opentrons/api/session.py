@@ -6,8 +6,8 @@ from functools import reduce
 import json
 
 from opentrons.broker import publish, subscribe
-from opentrons.containers import get_container, location_to_list
-from opentrons.containers.placeable import Module as ModulePlaceable
+from opentrons.legacy_api.containers import get_container, location_to_list
+from opentrons.legacy_api.containers.placeable import Module as ModulePlaceable
 from opentrons.commands import tree, types
 from opentrons.protocols import execute_protocol
 from opentrons import robot, modules
@@ -176,6 +176,12 @@ class Session(object):
             self._instruments.extend(_dedupe(instruments))
             self._modules.extend(_dedupe(modules))
             self._interactions.extend(_dedupe(interactions))
+
+            # Labware calibration happens after simulation and before run, so
+            # we have to clear the tips if they are left on after simulation
+            # to ensure that the instruments are in the expected state at the
+            # beginning of the labware calibration flow
+            robot.clear_tips()
 
         return res
 

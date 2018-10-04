@@ -2,8 +2,9 @@
 import * as React from 'react'
 import cx from 'classnames'
 import {Icon} from '../icons'
-// import globalStyles from '../styles/index.css'
 import styles from './forms.css'
+
+// TODO: Ian 2018-09-14 remove 'label' prop when IngredientPropertiesForm gets updated
 
 type Props = {
   /** field is disabled if value is true */
@@ -12,7 +13,7 @@ type Props = {
   onChange?: (event: SyntheticInputEvent<*>) => mixed,
   /** classes to apply */
   className?: string,
-  /** inline label text */
+  /** inline label text. DEPRECATED */
   label?: string,
   /** placeholder text */
   placeholder?: string,
@@ -36,6 +37,10 @@ type Props = {
   onBlur?: (event: SyntheticFocusEvent<*>) => mixed,
   /** makes input field read-only */
   readOnly?: ?boolean,
+  /** html tabindex property */
+  tabIndex?: number,
+  /** automatically focus field on render */
+  autoFocus?: boolean,
 }
 
 export default function InputField (props: Props) {
@@ -84,6 +89,8 @@ function Input (props: Props) {
           onBlur={props.onBlur}
           onClick={props.disabled ? undefined : props.onClick}
           readOnly={props.readOnly}
+          tabIndex={props.tabIndex}
+          autoFocus={props.autoFocus}
         />
         {props.units && <div className={styles.suffix}>{props.units}</div>}
       </div>

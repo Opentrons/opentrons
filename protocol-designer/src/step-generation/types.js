@@ -46,8 +46,6 @@ export type TransferLikeFormDataFields = {
   touchTipAfterDispense: boolean,
   /** Number of seconds to delay at the very end of the step (TODO: or after each dispense ?) */
   delayAfterDispense: ?number,
-  /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
-  blowout: ?string, // TODO LATER LabwareId export type here instead of string?
   /** offset from bottom of well in mm */
   dispenseOffsetFromBottomMm?: ?number,
 }
@@ -58,6 +56,8 @@ export type ConsolidateFormData = {
   sourceWells: Array<string>,
   destWell: string,
 
+  /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
+  blowout: ?string, // TODO LATER LabwareId export type here instead of string?
   /** Mix in first well in chunk */
   mixFirstAspirate: ?MixArgs,
   /** Mix in destination well after dispense */
@@ -70,6 +70,8 @@ export type TransferFormData = {
   sourceWells: Array<string>,
   destWells: Array<string>,
 
+  /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
+  blowout: ?string, // TODO LATER LabwareId export type here instead of string?
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?MixArgs,
   /** Mix in destination well after dispense */
@@ -81,6 +83,10 @@ export type DistributeFormData = {
 
   sourceWell: string,
   destWells: Array<string>,
+
+  /** Disposal labware and well for final blowout destination of disposalVolume contents (e.g. trash, source well, etc.) */
+  disposalLabware: ?string,
+  disposalWell: ?string,
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?MixArgs,
@@ -209,8 +215,14 @@ export type Command = {|
   command: 'aspirate' | 'dispense',
   params: AspirateDispenseArgs,
 |} | {|
-  command: 'pick-up-tip' | 'drop-tip' | 'blowout' | 'touch-tip',
+  command: 'pick-up-tip' | 'drop-tip' | 'touch-tip',
   params: PipetteLabwareFields,
+|} | {|
+  command: 'blowout',
+  params: {|
+    ...PipetteLabwareFields,
+    offsetFromBottomMm?: ?number,
+  |},
 |} | {|
   command: 'delay',
   /** number of seconds to delay (fractional values OK),
@@ -261,6 +273,7 @@ export type CommandCreatorErrorResponse = {
 }
 
 export type CommandCreator = (prevRobotState: RobotState) => CommandsAndRobotState | CommandCreatorErrorResponse
+export type CompoundCommandCreator = (prevRobotState: RobotState) => Array<CommandCreator>
 
 export type Timeline = {|
   timeline: Array<CommandsAndRobotState>, // TODO: Ian 2018-06-14 avoid timeline.timeline shape, better names

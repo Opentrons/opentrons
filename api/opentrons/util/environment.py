@@ -2,7 +2,7 @@
 import os
 import sys
 
-settings = {}
+settings: dict = {}
 
 IS_WIN = sys.platform.startswith('win')
 IS_OSX = sys.platform == 'darwin'
@@ -62,7 +62,9 @@ def refresh():
         'DATABASE_FILE':
             os.path.join(APP_DATA_DIR, 'opentrons.db'),
         'APP_IS_ALIVE_URL': 'http://localhost:31950',
-        'WIFI_KEYS_DIR': os.path.join(APP_DATA_DIR, 'network_keys')
+        'WIFI_KEYS_DIR': os.path.join(APP_DATA_DIR, 'network_keys'),
+        'HARDWARE_CONTROLLER_LOCKFILE': os.path.join(APP_DATA_DIR,
+                                                     'hardware.lock')
     })
 
     return settings

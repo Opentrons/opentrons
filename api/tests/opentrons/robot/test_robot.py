@@ -1,10 +1,34 @@
-from opentrons.containers import load as containers_load
+from opentrons.legacy_api.containers import load as containers_load
 from opentrons import robot, instruments, labware
 from opentrons.trackers import pose_tracker
 from opentrons.util import vector
 from numpy import isclose
 from unittest import mock
 import pytest
+# TODO: Modify all calls to get a Well to use the `wells` method
+# TODO: Modify calls as needed to check absolute position with refactor of
+# TODO: pose_tracker
+# TODO: Get rid of Vector
+
+
+def test_reset(virtual_smoothie_env):
+    """
+    This test may need to be expanded to include various other conditions that
+    should be reset.
+
+    :param virtual_smoothie_env: pytest fixture to simulate Smoothie connection
+    """
+    # Not testing this one--this is needed to clean the robot singleton from
+    # other tests. This is an inherent problem with the use of the singleton--
+    # it entangles both runtime code and tests in unpredictable ways.
+    robot.reset()
+
+    lw = labware.load('opentrons-tiprack-300ul', '1')
+    p = instruments.P300_Single(mount='right', tip_racks=[lw])
+    p.pick_up_tip()
+    assert p.tip_attached
+    robot.reset()
+    assert not p.tip_attached
 
 
 def test_configurable_mount_offsets():
@@ -89,7 +113,8 @@ def test_comment(virtual_smoothie_env):
 
 
 def test_create_arc(virtual_smoothie_env):
-    from opentrons.robot.robot import TIP_CLEARANCE_DECK, TIP_CLEARANCE_LABWARE
+    from opentrons.legacy_api.robot.robot import (TIP_CLEARANCE_DECK,
+                                                  TIP_CLEARANCE_LABWARE)
     robot.reset()
 
     p300 = instruments.P300_Single(mount='left')

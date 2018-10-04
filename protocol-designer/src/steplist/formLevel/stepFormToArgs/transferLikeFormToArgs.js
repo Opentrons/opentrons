@@ -12,6 +12,8 @@ import { DEFAULT_CHANGE_TIP_OPTION } from '../../../constants'
 import type { StepFormContext } from './types'
 import { orderWells } from '../../utils'
 
+export const SOURCE_WELL_DISPOSAL_DESTINATION = 'source_well'
+
 type ValidationAndErrors<F> = {
   errors: {[string]: string},
   validatedForm: F | null,
@@ -69,10 +71,6 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
     'dispense_mix_times'
   )
 
-  const disposalVolume = formData['aspirate_disposalVol_checkbox']
-    ? Number('aspirate_disposal-vol_volume') // TODO handle unparseable
-    : null
-
   const changeTip = formData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION
 
   const commonFields = {
@@ -88,7 +86,6 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
     blowout, // TODO allow user to blowout
     changeTip,
     delayAfterDispense,
-    disposalVolume,
     mixInDestination,
     preWetTip: formData['aspirate_preWetTip'] || false,
     touchTipAfterAspirate: formData['aspirate_touchTip'] || false,
@@ -110,7 +107,7 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
   if (context && context.labware) {
     const labwareById = context.labware
     if (stepType !== 'distribute' && sourceLabware) {
-      const sourceLabwareDef = getLabware(labwareById[sourceLabware].type)
+      const sourceLabwareDef = labwareById[sourceLabware] && getLabware(labwareById[sourceLabware].type)
       if (sourceLabwareDef) {
         const allWellsOrdered = orderWells(sourceLabwareDef.ordering, aspirate_wellOrder_first, aspirate_wellOrder_second)
         sourceWells = intersection(allWellsOrdered, sourceWells)
@@ -119,13 +116,30 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
       }
     }
     if (stepType !== 'consolidate' && destLabware) {
-      const destLabwareDef = getLabware(labwareById[destLabware].type)
+      const destLabwareDef = labwareById[destLabware] && getLabware(labwareById[destLabware].type)
       if (destLabwareDef) {
         const allWellsOrdered = orderWells(destLabwareDef.ordering, dispense_wellOrder_first, dispense_wellOrder_second)
         destWells = intersection(allWellsOrdered, destWells)
       } else {
         console.warn('the specified destination labware definition could not be located')
       }
+    }
+  }
+
+  let disposalVolume = null
+  let disposalDestination = null
+  let disposalLabware = null
+  let disposalWell = null
+  if (formData['aspirate_disposalVol_checkbox']) { // TODO: BC 09-17-2018 handle unparseable values?
+    disposalVolume = Number(formData['aspirate_disposalVol_volume'])
+    disposalDestination = formData['aspirate_disposalVol_destination']
+    if (disposalDestination === SOURCE_WELL_DISPOSAL_DESTINATION) {
+      disposalLabware = sourceLabware
+      disposalWell = sourceWells[0]
+    } else {
+      // NOTE: if disposalDestination is not source well it is a labware type (e.g. fixed-trash)
+      disposalLabware = disposalDestination
+      disposalWell = 'A1'
     }
   }
 
@@ -163,6 +177,7 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
         errors,
         validatedForm: Object.values(errors).length === 0 ? {
           ...commonFields,
+          disposalVolume,
           stepType: 'transfer',
           sourceWells,
           destWells,
@@ -178,6 +193,7 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
         errors,
         validatedForm: Object.values(errors).length === 0 ? {
           ...commonFields,
+          disposalVolume,
           mixFirstAspirate,
           sourceWells,
           destWell: destWells[0],
@@ -193,6 +209,9 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
         errors,
         validatedForm: Object.values(errors).length === 0 ? {
           ...commonFields,
+          disposalVolume,
+          disposalLabware,
+          disposalWell,
           mixBeforeAspirate,
           sourceWell: sourceWells[0],
           destWells,

@@ -1,7 +1,7 @@
 import time
 from itertools import chain
 from opentrons import instruments, labware, robot
-from opentrons.instruments import pipette_config
+from opentrons.legacy_api.instruments import pipette_config
 
 
 def _sleep(seconds):
@@ -156,12 +156,8 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
             if wait is None:
                 raise ValueError('Delay cannot be null')
             elif wait is True:
-                # TODO: Ian 2018-09-11 this causes Run App command list to
-                # indent, un-comment when there's a path to fix:
-
-                # message = params.get('message', 'Pausing until user resumes')
-                # robot.comment(message)
-                robot.pause()
+                message = params.get('message', 'Pausing until user resumes')
+                robot.pause(msg=message)
             else:
                 _sleep(wait)
 

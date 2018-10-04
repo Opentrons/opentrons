@@ -84,7 +84,7 @@ export const dispense = (
 
 export const blowout = (
   labware?: string,
-  params?: {| pipette?: string |}
+  params?: {| pipette?: string, well?: string |}
 ): Command => ({
   command: 'blowout',
   params: {

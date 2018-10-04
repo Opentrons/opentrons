@@ -1,4 +1,4 @@
-from opentrons.containers.placeable import Container, Well
+from opentrons.legacy_api.containers.placeable import Container, Well
 
 
 def generate_plate(wells, cols, spacing, offset, radius, height=0):

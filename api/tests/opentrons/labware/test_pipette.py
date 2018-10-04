@@ -1,15 +1,16 @@
 # pylama:ignore=E501
+# TODO: Modify all calls to get a Well to use the `wells` method
 
 from opentrons import instruments, robot
-from opentrons.containers import load as containers_load
-from opentrons.instruments import Pipette
+from opentrons.legacy_api.containers import load as containers_load
+from opentrons.legacy_api.instruments import Pipette
 from opentrons.trackers import pose_tracker
 from numpy import isclose
 import pytest
 
 
 def test_pipette_version_1_0_and_1_3_extended_travel():
-    from opentrons.instruments import pipette_config
+    from opentrons.legacy_api.instruments import pipette_config
 
     models = [
         'p10_single', 'p10_multi', 'p50_single', 'p50_multi',
@@ -36,7 +37,7 @@ def test_pipette_version_1_0_and_1_3_extended_travel():
 
 
 def test_all_pipette_models_can_transfer():
-    from opentrons.instruments import pipette_config
+    from opentrons.legacy_api.instruments import pipette_config
 
     models = [
         'p10_single', 'p10_multi', 'p50_single', 'p50_multi',
@@ -59,7 +60,7 @@ def test_all_pipette_models_can_transfer():
 
 
 def test_pipette_models_reach_max_volume():
-    from opentrons.instruments import pipette_config
+    from opentrons.legacy_api.instruments import pipette_config
 
     for model in pipette_config.configs:
         config = pipette_config.load(model)
@@ -137,6 +138,7 @@ def test_pipette_max_deck_height():
     p = instruments.P300_Single(mount='left')
     assert p._max_deck_height() == tallest_point
 
+    # TODO: revise when tip length is on tipracks
     for tip_length in [10, 25, 55, 100]:
         p._add_tip(length=tip_length)
         assert p._max_deck_height() == tallest_point - tip_length
@@ -167,6 +169,11 @@ def test_retract():
 
 
 def test_aspirate_move_to():
+    # TODO: it seems like this test is checking that the aspirate point is
+    # TODO: *fully* at the bottom of the well, which isn't the expected
+    # TODO: behavior of aspirate when a location is not specified. This should
+    # TODO: be split into two tests--one for this behavior (specifying a place)
+    # TODO: and another one for the default
     robot.reset()
     tip_rack = containers_load(robot, 'tiprack-200ul', '3')
     p300 = instruments.P300_Single(
@@ -194,6 +201,7 @@ def test_aspirate_move_to():
 
 
 def test_dispense_move_to():
+    # TODO: same as for aspirate
     robot.reset()
     tip_rack = containers_load(robot, 'tiprack-200ul', '3')
     p300 = instruments.P300_Single(
@@ -222,6 +230,9 @@ def test_dispense_move_to():
 
 
 def test_trough_move_to():
+    # TODO: new labware system should center multichannel pipettes within wells
+    # TODO: (correct single-channel position currently corresponds to back-
+    # TODO: most tip of multi-channel), so calculate against that
     robot.reset()
     tip_rack = containers_load(robot, 'tiprack-200ul', '3')
     p300 = instruments.P300_Single(
@@ -237,7 +248,7 @@ def test_trough_move_to():
 
 def test_delay_calls(monkeypatch):
     from opentrons import robot
-    from opentrons.instruments import pipette
+    from opentrons.legacy_api.instruments import pipette
     robot.reset()
     p300 = instruments.P300_Single(mount='right')
 
@@ -272,7 +283,7 @@ def test_delay_calls(monkeypatch):
 @pytest.mark.xfail
 def test_drop_tip_in_trash(virtual_smoothie_env, monkeypatch):
     from opentrons import robot, labware
-    from opentrons.instruments.pipette import Pipette
+    from opentrons.legacy_api.instruments.pipette import Pipette
     robot.reset()
     robot.home()
     tiprack = labware.load('tiprack-200ul', '1')

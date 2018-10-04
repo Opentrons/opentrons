@@ -116,13 +116,8 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
       // TODO Ian 2018-05-02: Should wellHighlightsForSteps return well highlights
       // even when prev step isn't processed (due to encountering an upstream error
       // in the timeline reduce op)
-      const highlightedWellsForSteps = highlightSelectors.wellHighlightsForSteps(state)
-      highlightedWells = (
-        timelineIdx != null &&
-        highlightedWellsForSteps &&
-        highlightedWellsForSteps[timelineIdx] &&
-        highlightedWellsForSteps[timelineIdx][containerId]
-      ) || {}
+      const highlightedWellsByLabware = highlightSelectors.wellHighlightsByLabwareId(state)
+      highlightedWells = highlightedWellsByLabware[containerId] || {}
     }
 
     // TODO: Ian 2018-07-31 some sets of wells are {[wellName]: true},
@@ -145,7 +140,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     containerId,
     wellContents,
     getTipProps: getTipProps || noop,
-    containerType: labware.type,
+    containerType: labware ? labware.type : 'missing labware',
     selectable,
   }
 }

@@ -2,7 +2,7 @@ from os import environ
 import logging
 from threading import Event, Thread
 from time import sleep
-
+from typing import Optional
 from serial.serialutil import SerialException
 
 from opentrons.drivers import serial_communication
@@ -42,7 +42,7 @@ TEMP_DECK_ACK = 'ok\r\nok\r\n'
 
 # Number of digits after the decimal point for temperatures being sent
 # to/from Temp-Deck
-GCODE_ROUNDING_PRECISION = 3
+GCODE_ROUNDING_PRECISION = 0
 
 
 class TempDeckError(Exception):
@@ -68,7 +68,7 @@ def _parse_string_value_from_substring(substring) -> str:
                 substring))
 
 
-def _parse_number_from_substring(substring) -> float:
+def _parse_number_from_substring(substring) -> Optional[float]:
     '''
     Returns the number in the expected string "N:12.3", where "N" is the
     key, and "12.3" is a floating point value
@@ -165,9 +165,9 @@ class TempDeck:
         self._temperature = {'current': 25, 'target': None}
         self._update_thread = None
 
-    def connect(self, port=None) -> str:
+    def connect(self, port=None) -> Optional[str]:
         if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
-            return
+            return None
         try:
             self.disconnect()
             self._connect_to_port(port)
@@ -187,7 +187,7 @@ class TempDeck:
         return self._connection.is_open
 
     @property
-    def port(self) -> str:
+    def port(self) -> Optional[str]:
         if not self._connection:
             return None
         return self._connection.port
@@ -345,12 +345,12 @@ class TempDeck:
             return self._recursive_write_and_return(
                 cmd, timeout, retries)
 
-    def _recursive_update_temperature(self, retries) -> dict:
+    def _recursive_update_temperature(self, retries) -> Optional[dict]:
         try:
             res = self._send_command(GCODES['GET_TEMP'])
             res = _parse_temperature_response(res)
             self._temperature.update(res)
-            return
+            return None
         except ParseError as e:
             retries -= 1
             if retries <= 0:

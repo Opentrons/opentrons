@@ -48,7 +48,7 @@ const nextEmptySlot = loadedContainersSubstate => {
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
 // (this state just toggles a modal)
 const modeLabwareSelection = handleActions({
-  OPEN_LABWARE_SELECTOR: (state, action: ActionType<typeof actions.openLabwareSelector>) =>
+  OPEN_ADD_LABWARE_MODAL: (state, action: ActionType<typeof actions.openAddLabwareModal>) =>
       action.payload.slot,
   CLOSE_LABWARE_SELECTOR: () => false,
   CREATE_CONTAINER: () => false,
@@ -82,7 +82,7 @@ const renameLabwareFormMode = handleActions({
 }, false)
 
 type ContainersState = {
-  [id: string]: Labware,
+  [id: string]: ?Labware,
 }
 
 const initialLabwareState: ContainersState = {
@@ -95,10 +95,14 @@ const initialLabwareState: ContainersState = {
   },
 }
 
-function getNextDisambiguationNumber (allContainers: ContainersState, labwareType: string): number {
-  const allIds = Object.keys(allContainers)
-  const sameTypeLabware = allIds.filter(containerId => allContainers[containerId].type === labwareType)
-  const disambigNumbers = sameTypeLabware.map(containerId => allContainers[containerId].disambiguationNumber)
+function getNextDisambiguationNumber (allLabwareById: ContainersState, labwareType: string): number {
+  const allIds = Object.keys(allLabwareById)
+  const sameTypeLabware = allIds.filter(labwareId =>
+    allLabwareById[labwareId] &&
+    allLabwareById[labwareId].type === labwareType)
+  const disambigNumbers = sameTypeLabware.map(labwareId =>
+    (allLabwareById[labwareId] &&
+    allLabwareById[labwareId].disambiguationNumber) || 0)
 
   return disambigNumbers.length > 0
     ? Math.max(...disambigNumbers) + 1
@@ -282,7 +286,7 @@ const rootReducer = combineReducers({
 // SELECTORS
 const rootSelector = (state: BaseState): RootState => state.labwareIngred
 
-const getLabware: Selector<{[labwareId: string]: Labware}> = createSelector(
+const getLabware: Selector<{[labwareId: string]: ?Labware}> = createSelector(
   rootSelector,
   rootState => rootState.containers
 )
@@ -311,8 +315,8 @@ const getIngredientNames: Selector<{[ingredId: string]: string}> = createSelecto
 )
 
 const _loadedContainersBySlot = (containers: ContainersState) =>
-  reduce(containers, (acc, container: Labware, containerId) => (container.slot)
-    ? {...acc, [container.slot]: container.type}
+  reduce(containers, (acc, labware: ?Labware) => (labware && labware.slot)
+    ? {...acc, [labware.slot]: labware.type}
     : acc
   , {})
 
@@ -340,7 +344,27 @@ const labwareOptions: Selector<Options> = createSelector(
   }, [])
 )
 
-const canAdd = (state: BaseState) => rootSelector(state).modeLabwareSelection // false or selected slot to add labware to, eg 'A2'
+const DISPOSAL_LABWARE_TYPES = ['trash-box', 'fixed-trash']
+/** Returns options for disposal (e.g. fixed trash and trash box) */
+const disposalLabwareOptions: Selector<Options> = createSelector(
+  getLabware,
+  getLabwareNames,
+  (_labware, names) => reduce(_labware, (acc: Options, labware: Labware, labwareId): Options => {
+    if (!labware.type || !DISPOSAL_LABWARE_TYPES.includes(labware.type)) {
+      return acc
+    }
+    return [
+      ...acc,
+      {
+        name: names[labwareId],
+        value: labwareId,
+      },
+    ]
+  }, [])
+)
+
+// false or selected slot to add labware to, eg 'A2'
+const selectedAddLabwareSlot = (state: BaseState) => rootSelector(state).modeLabwareSelection
 
 const getSavedLabware = (state: BaseState) => rootSelector(state).savedLabware
 
@@ -447,7 +471,8 @@ export const selectors = {
   allIngredientNamesIds,
   loadedContainersBySlot,
   containersBySlot,
-  canAdd,
+  selectedAddLabwareSlot,
+  disposalLabwareOptions,
   labwareOptions,
   hasLiquid,
 }

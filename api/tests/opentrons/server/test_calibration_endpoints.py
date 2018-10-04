@@ -3,7 +3,7 @@ import numpy as np
 from opentrons import robot, instruments
 from opentrons import deck_calibration as dc
 from opentrons.deck_calibration import endpoints
-from opentrons.robot import robot_configs
+from opentrons.legacy_api.robot import robot_configs
 
 
 # Note that several tests in this file have target/expected values that do not
@@ -217,7 +217,7 @@ async def test_create_session_fail(async_client, monkeypatch):
     Tests that the GET request to initiate a session manager for factory
     calibration returns a good token.
     """
-    from opentrons.robot.robot import Robot
+    from opentrons.legacy_api.robot import Robot
     dummy_token = 'Test Token'
 
     def uuid_mock():

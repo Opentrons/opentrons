@@ -4,6 +4,7 @@ import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
+import {reduceCommandCreators} from '../../utils'
 import {tiprackWellNamesFlat} from '../../'
 import type {RobotState, PipetteData, LabwareData} from '../../'
 import type {CommandsAndRobotState, CommandCreatorErrorResponse} from '../../types'
@@ -21,6 +22,22 @@ export const commandCreatorNoErrors = (command: *) => (commandArgs: *) => (state
 
 export const commandCreatorHasErrors = (command: *) => (commandArgs: *) => (state: RobotState): CommandCreatorErrorResponse => {
   const result = command(commandArgs)(state)
+  if (!result.errors) {
+    throw new Error('expected errors')
+  }
+  return result
+}
+
+export const compoundCommandCreatorNoErrors = (command: *) => (commandArgs: *) => (state: RobotState): CommandsAndRobotState => {
+  const result = reduceCommandCreators(command(commandArgs)(state))(state)
+  if (result.errors) {
+    throw new Error('expected no errors, got ' + JSON.stringify(result.errors))
+  }
+  return result
+}
+
+export const compoundCommandCreatorHasErrors = (command: *) => (commandArgs: *) => (state: RobotState): CommandCreatorErrorResponse => {
+  const result = reduceCommandCreators(command(commandArgs)(state))(state)
   if (!result.errors) {
     throw new Error('expected errors')
   }

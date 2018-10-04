@@ -2,7 +2,7 @@
 import {createSelector} from 'reselect'
 import mapValues from 'lodash/mapValues'
 import {getPropertyAllPipettes} from '@opentrons/shared-data'
-import {fileMetadata} from './fileFields'
+import {getFileMetadata} from './fileFields'
 import {getInitialRobotState, robotStateTimeline} from './commands'
 import {selectors as dismissSelectors} from '../../dismiss'
 import {selectors as ingredSelectors} from '../../labware-ingred/reducers'
@@ -19,6 +19,11 @@ import type {LabwareData, PipetteData} from '../../step-generation'
 const protocolSchemaVersion = '1.0.0'
 const applicationVersion = process.env.OT_PD_VERSION || 'unknown version'
 
+// Internal release date: this should never be read programatically,
+// it just helps us humans quickly identify what build a user was using
+// when we look at saved protocols (without requiring us to trace thru git logs)
+const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
+
 const executionDefaults = {
   'aspirate-flow-rate': getPropertyAllPipettes('aspirateFlowRate'),
   'dispense-flow-rate': getPropertyAllPipettes('dispenseFlowRate'),
@@ -27,7 +32,7 @@ const executionDefaults = {
 }
 
 export const createFile: BaseState => ProtocolFile = createSelector(
-  fileMetadata,
+  getFileMetadata,
   getInitialRobotState,
   robotStateTimeline,
   dismissSelectors.getAllDismissedWarnings,
@@ -45,8 +50,9 @@ export const createFile: BaseState => ProtocolFile = createSelector(
     savedStepForms,
     orderedSteps
   ) => {
-    const {author, description} = fileMetadata
-    const name = fileMetadata.name || 'untitled'
+    const {author, description, created} = fileMetadata
+    const name = fileMetadata['protocol-name'] || 'untitled'
+    const lastModified = fileMetadata['last-modified']
 
     const instruments = mapValues(
       initialRobotState.instruments,
@@ -78,8 +84,10 @@ export const createFile: BaseState => ProtocolFile = createSelector(
         'protocol-name': name,
         author,
         description,
-        created: Date.now(),
-        'last-modified': null,
+        created,
+        'last-modified': lastModified,
+
+        // TODO LATER
         category: null,
         subcategory: null,
         tags: [],
@@ -90,6 +98,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
       'designer-application': {
         'application-name': 'opentrons/protocol-designer',
         'application-version': applicationVersion,
+        _internalAppBuildDate,
         data: {
           pipetteTiprackAssignments: mapValues(
             initialRobotState.instruments,

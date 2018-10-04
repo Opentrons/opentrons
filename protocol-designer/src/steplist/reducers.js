@@ -16,7 +16,7 @@ import type {
 } from './types'
 import type {LoadFileAction} from '../load-file'
 import type {FormData, StepIdType, FormModalFields} from '../form-types'
-import { getDefaultsForStepType } from './formLevel/generateNewForm'
+import {getDefaultsForStepType} from './formLevel'
 
 import type {
   AddStepAction,

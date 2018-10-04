@@ -37,6 +37,6 @@ fi
 
 export ENABLE_NETWORKING_ENDPOINTS=true
 echo "[ $0 ] Starting Opentrons API server"
-python -m opentrons.server.main -U $OT_SERVER_UNIX_SOCKET_PATH opentrons.server.main:init
+python -m opentrons.main -U $OT_SERVER_UNIX_SOCKET_PATH
 echo "[ $0 ] Server exited unexpectedly. Please power-cycle the machine, and contact Opentrons support."
 while true; do sleep 1; done

@@ -20,7 +20,7 @@ class VectorTestCase(unittest.TestCase):
 
     def test_repr(self):
         v1 = Vector(1, 2, 3)
-        self.assertEquals(str(v1), '(x=1.00, y=2.00, z=3.00)')
+        self.assertEqual(str(v1), '(x=1.00, y=2.00, z=3.00)')
 
     def test_add(self):
         v1 = Vector(1, 2, 3)
@@ -38,7 +38,7 @@ class VectorTestCase(unittest.TestCase):
     def test_zero_coordinates(self):
 
         zero_coords = Vector(1, 2, 3).zero_coordinates()
-        self.assertEquals(zero_coords, VectorValue(0, 0, 0))
+        self.assertEqual(zero_coords, VectorValue(0, 0, 0))
 
     def test_substract(self):
         v1 = Vector(1, 2, 3)

@@ -18,7 +18,7 @@ from opentrons.data_storage import database
 from opentrons.server import rpc
 from opentrons import config
 from opentrons.config import advanced_settings as advs
-from opentrons.server.main import init
+from opentrons.server import init
 from opentrons.deck_calibration import endpoints
 from opentrons.util import environment
 
@@ -205,14 +205,28 @@ def dc_session(virtual_smoothie_env, monkeypatch):
 
 @pytest.fixture
 def robot(dummy_db):
-    from opentrons import Robot
+    from opentrons.legacy_api.robot import Robot
     return Robot()
 
 
 @pytest.fixture(params=["dinosaur.py"])
 def protocol(request):
     try:
-        root = request.getfuncargvalue('protocol_file')
+        root = request.getfixturevalue('protocol_file')
+    except Exception:
+        root = request.param
+
+    filename = os.path.join(os.path.dirname(__file__), 'data', root)
+
+    with open(filename) as file:
+        text = ''.join(list(file))
+        return Protocol(text=text, filename=filename)
+
+
+@pytest.fixture(params=["no_clear_tips.py"])
+def tip_clear_protocol(request):
+    try:
+        root = request.getfixturevalue('protocol_file')
     except Exception:
         root = request.param
 
@@ -235,9 +249,11 @@ def session(loop, test_client, request, main_router):
     to have @pytest.mark.parametrize('root', [value]) decorator set.
     If not set root will be defaulted to None
     """
+    from aiohttp import web
+    from opentrons.server import error_middleware
     root = None
     try:
-        root = request.getfuncargvalue('root')
+        root = request.getfixturevalue('root')
         if not root:
             root = main_router
         # Assume test fixture has init to attach test loop
@@ -245,7 +261,8 @@ def session(loop, test_client, request, main_router):
     except Exception:
         pass
 
-    server = rpc.Server(loop=loop, root=root)
+    app = web.Application(loop=loop, middlewares=[error_middleware])
+    server = rpc.RPCServer(app, root)
     client = loop.run_until_complete(test_client(server.app))
     socket = loop.run_until_complete(client.ws_connect('/'))
     token = str(uuid())
@@ -333,8 +350,8 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
 
 @pytest.fixture
 def model(robot):
-    from opentrons.containers import load
-    from opentrons.instruments.pipette import Pipette
+    from opentrons.legacy_api.containers import load
+    from opentrons.legacy_api.instruments.pipette import Pipette
 
     pipette = Pipette(robot, ul_per_mm=18.5, mount='right')
     plate = load(robot, '96-flat', '1')
@@ -351,8 +368,8 @@ def model(robot):
 
 @pytest.fixture
 def model_with_trough(robot):
-    from opentrons.containers import load
-    from opentrons.instruments.pipette import Pipette
+    from opentrons.legacy_api.containers import load
+    from opentrons.legacy_api.instruments.pipette import Pipette
 
     pipette = Pipette(robot, mount='right')
     plate = load(robot, 'trough-12row', '1')
@@ -371,7 +388,7 @@ def model_with_trough(robot):
 def smoothie(monkeypatch):
     from opentrons.drivers.smoothie_drivers.driver_3_0 import \
          SmoothieDriver_3_0_0 as SmoothieDriver
-    from opentrons.robot import robot_configs
+    from opentrons.legacy_api.robot import robot_configs
 
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
     driver = SmoothieDriver(robot_configs.load())
@@ -379,6 +396,26 @@ def smoothie(monkeypatch):
     yield driver
     driver.disconnect()
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
+
+
+@pytest.fixture
+def hardware_controller_lockfile():
+    old_lockfile = environment.settings['HARDWARE_CONTROLLER_LOCKFILE']
+    with tempfile.NamedTemporaryFile() as td:
+        environment.settings['HARDWARE_CONTROLLER_LOCKFILE'] = td
+        yield td
+        environment.settings['HARDWARE_CONTROLLER_LOCKFILE'] = old_lockfile
+
+
+@pytest.fixture
+def running_on_pi():
+    oldpi = os.environ.get('RUNNING_ON_PI')
+    os.environ['RUNNING_ON_PI'] = '1'
+    yield
+    if None is oldpi:
+        os.environ.pop('RUNNING_ON_PI')
+    else:
+        os.environ['RUNNING_ON_PI'] = oldpi
 
 
 setup_testing_env()

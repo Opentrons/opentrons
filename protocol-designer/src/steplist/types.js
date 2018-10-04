@@ -11,6 +11,10 @@ export const START_TERMINAL_ITEM_ID: '__initial_setup__' = '__initial_setup__'
 export const END_TERMINAL_ITEM_ID: '__end__' = '__end__'
 export type TerminalItemId = typeof START_TERMINAL_ITEM_ID | typeof END_TERMINAL_ITEM_ID
 
+export type WellIngredientNames = {[ingredId: string]: string}
+
+export type WellIngredientVolumeData = {[ingredId: string]: {volume: number}}
+
 export type SubstepIdentifier = {|
   stepId: StepIdType,
   substepIndex: number,
@@ -21,28 +25,39 @@ export type NamedIngred = {|
   name: string,
 |}
 
-export type StepItemSourceDestRow = {|
-  substepIndex?: number,
-  sourceIngredients?: Array<NamedIngred>,
-  destIngredients?: Array<NamedIngred>,
-  sourceWell?: ?string,
-  destWell?: ?string,
-  volume?: ?number,
-|}
+export type SourceDestData = {
+  wells: Array<string>,
+  preIngreds: WellIngredientVolumeData,
+  postIngreds: WellIngredientVolumeData,
+}
 
-export type StepItemSourceDestRowMulti = {
-  ...StepItemSourceDestRow,
-  channelId: number,
+export type SubstepTimelineFrame = {
+  substepIndex?: number,
+  source?: SourceDestData,
+  dest?: SourceDestData,
+  volume?: ?number,
+  channelId?: number,
+}
+
+export type SubstepWellData = {
+  well: string,
+  preIngreds: WellIngredientVolumeData,
+  postIngreds: WellIngredientVolumeData,
+}
+
+export type StepItemSourceDestRow = {
+  substepIndex?: number,
+  source?: SubstepWellData,
+  dest?: SubstepWellData,
+  volume?: ?number,
+  channelId?: number,
 }
 
 export type SourceDestSubstepItemSingleChannel = {|
   multichannel: false,
   stepType: TransferLikeStepType | 'mix',
   parentStepId: StepIdType,
-  rows: Array<{|
-    ...StepItemSourceDestRow,
-    volume?: number,
-  |}>,
+  rows: Array<StepItemSourceDestRow>,
 |}
 
 export type SourceDestSubstepItemMultiChannel = {|
@@ -50,7 +65,7 @@ export type SourceDestSubstepItemMultiChannel = {|
   stepType: TransferLikeStepType | 'mix',
   parentStepId: StepIdType,
   volume?: ?number, // uniform volume for all steps
-  multiRows: Array<Array<StepItemSourceDestRowMulti>>, // Array of arrays.
+  multiRows: Array<Array<StepItemSourceDestRow>>, // Array of arrays.
   // NOTE: "Row" means a tabular row on the steplist, NOT a "row" of wells on the deck
 |}
 

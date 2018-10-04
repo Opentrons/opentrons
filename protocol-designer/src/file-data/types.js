@@ -1,8 +1,5 @@
 // @flow
-export type FileMetadataFields = {
-  name: string,
-  author: string,
-  description: string,
-}
+import type {ProtocolFile} from '../file-types'
+export type FileMetadataFields = $PropertyType<ProtocolFile, 'metadata'>
 
 export type FileMetadataFieldAccessors = $Keys<FileMetadataFields>

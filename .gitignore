@@ -80,6 +80,7 @@ target/
 api/tests/opentrons/data/configs/
 api/opentrons/config/*.json
 sample_protocol.py
+api/opentrons/server/endpoints/ignore.json
 
 # Local Calibration Data
 calibrations/

@@ -1,12 +1,12 @@
 import unittest
 
-from opentrons import Robot
-from opentrons.containers import load as containers_load
-from opentrons.containers.placeable import Container, Deck
-from opentrons.instruments import pipette
+from opentrons.legacy_api.robot import Robot
+from opentrons.legacy_api.containers import load as containers_load
+from opentrons.legacy_api.containers.placeable import Container, Deck
+from opentrons.legacy_api.instruments import pipette
+# TODO: Modify all calls to get a Well to use the `wells` method
 
 
-# TODO: Refactor this into a standalone protocol script thats invoked by test
 class ProtocolTestCase(unittest.TestCase):
     def setUp(self):
         self.robot = Robot()

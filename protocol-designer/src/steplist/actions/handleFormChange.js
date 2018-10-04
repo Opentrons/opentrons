@@ -46,6 +46,10 @@ const getChannels = (pipetteId: string, state: BaseState): PipetteChannels => {
   return pipette.channels
 }
 
+// TODO: Ian 2018-09-20 this is only usable by 'unsavedForm'.
+// Eventually we gotta allow arbitrary actions like DELETE_LABWARE
+// (or more speculatively, CHANGE_PIPETTE etc), which affect saved forms from
+// 'outside', to cause changes that run thru all the logic in this block
 function handleFormChange (payload: ChangeFormPayload, getState: GetState): ChangeFormPayload {
   // Use state to handle form changes
   const baseState = getState()
@@ -138,7 +142,8 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       } else if (multiToSingle) {
         // multi-channel to single-channel: convert primary wells to all wells
         const labwareId = unsavedForm.labware
-        const labwareType = labwareId && labwareIngredSelectors.getLabware(baseState)[labwareId].type
+        const labware = labwareId && labwareIngredSelectors.getLabware(baseState)[labwareId]
+        const labwareType = labware && labware.type
 
         updateOverrides = {
           ...updateOverrides,
@@ -158,8 +163,10 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
         const sourceLabwareId = unsavedForm['aspirate_labware']
         const destLabwareId = unsavedForm['dispense_labware']
 
-        const sourceLabwareType = sourceLabwareId && labwareIngredSelectors.getLabware(baseState)[sourceLabwareId].type
-        const destLabwareType = destLabwareId && labwareIngredSelectors.getLabware(baseState)[destLabwareId].type
+        const sourceLabware = sourceLabwareId && labwareIngredSelectors.getLabware(baseState)[sourceLabwareId]
+        const sourceLabwareType = sourceLabware && sourceLabware.type
+        const destLabware = destLabwareId && labwareIngredSelectors.getLabware(baseState)[destLabwareId]
+        const destLabwareType = destLabware && destLabware.type
 
         updateOverrides = {
           ...updateOverrides,

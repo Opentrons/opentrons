@@ -7,6 +7,7 @@
     "app-shell",
     "components",
     "discovery-client",
+    "labware-designer",
     "protocol-designer",
     "protocol-library-kludge",
     "shared-data",
@@ -17,42 +18,6 @@
     "commitizen": {
       "path": "cz-conventional-changelog"
     }
-  },
-  "jest": {
-    "moduleNameMapper": {
-      "\\.(css)$": "identity-obj-proxy"
-    },
-    "transform": {
-      "^.+\\.js$": "babel-jest",
-      "\\.(jpg|png|gif|svg|woff|woff2)$": "@opentrons/components/src/__mocks__/file.js"
-    },
-    "transformIgnorePatterns": [
-      "/node_modules/(?!@opentrons/)"
-    ],
-    "collectCoverageFrom": [
-      "**/*.js",
-      "!.eslintrc.js",
-      "!.stylelintrc.js",
-      "!api/**",
-      "!webpack-config/**",
-      "!**/scripts/**",
-      "!components/interfaces/**",
-      "!components/styleguide.config.js",
-      "!**/node_modules/**",
-      "!**/__mocks__/**",
-      "!**/dist/**",
-      "!**/build/**",
-      "!**/webpack*",
-      "!**/webpack/**",
-      "!**/coverage/**",
-      "!**/test/**",
-      "!**/test-with-flow/**",
-      "!**/flow-typed/**"
-    ],
-    "coverageReporters": [
-      "lcov",
-      "text"
-    ]
   },
   "devDependencies": {
     "ajv": "^6.2.1",
@@ -67,13 +32,14 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-flow": "^6.23.0",
     "babel-preset-react": "^6.24.1",
+    "codecov": "^3.1.0",
     "concurrently": "^3.5.0",
     "cross-env": "^5.0.1",
     "css-loader": "^0.28.4",
     "cz-conventional-changelog": "2.1.0",
-    "electron": "1.8.3",
-    "electron-builder": "20.6.2",
-    "electron-publisher-s3": "20.7.0",
+    "electron": "3.0.2",
+    "electron-builder": "^20.28.4",
+    "electron-publisher-s3": "^20.17.2",
     "eslint": "3.19.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-flowtype": "^2.41.0",

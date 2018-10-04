@@ -3,13 +3,13 @@ import _distribute from '../distribute'
 // import merge from 'lodash/merge'
 import {
   createRobotState,
-  commandCreatorNoErrors,
-  commandCreatorHasErrors,
+  compoundCommandCreatorNoErrors,
+  compoundCommandCreatorHasErrors,
   commandFixtures as cmd,
 } from './fixtures'
 import type {DistributeFormData} from '../types'
-const distribute = commandCreatorNoErrors(_distribute)
-const distributeWithErrors = commandCreatorHasErrors(_distribute)
+const distribute = compoundCommandCreatorNoErrors(_distribute)
+const distributeWithErrors = compoundCommandCreatorHasErrors(_distribute)
 
 // shorthand
 const dispense = (well, volume) =>
@@ -18,7 +18,8 @@ const dispense = (well, volume) =>
 let mixinArgs
 let robotInitialState
 let robotInitialStatePipettesLackTips
-let blowoutSingleToDestPlateA1
+let blowoutSingleToTrash
+let blowoutSingleToSourceA1
 
 beforeEach(() => {
   mixinArgs = {
@@ -32,14 +33,13 @@ beforeEach(() => {
 
     preWetTip: false,
     touchTipAfterAspirate: false,
-    disposalVolume: null,
+    disposalVolume: 60,
+    disposalLabware: 'trashId',
+    disposalWell: 'A1',
     mixBeforeAspirate: null,
 
     touchTipAfterDispense: false,
     delayAfterDispense: null,
-    // NOTE: setting "blowout to dest plate" in standard args for these tests to make sure
-    // we're not just blowing out to trashId and ignoring the given blowout labware
-    blowout: 'destPlateId',
   }
 
   robotInitialState = createRobotState({
@@ -58,7 +58,8 @@ beforeEach(() => {
     fillTiprackTips: false,
   })
 
-  blowoutSingleToDestPlateA1 = cmd.blowout(mixinArgs.blowout)
+  blowoutSingleToTrash = cmd.blowout('trashId')
+  blowoutSingleToSourceA1 = cmd.blowout('sourcePlateId', {well: 'A1'})
 })
 
 describe('distribute: minimal example', () => {
@@ -75,10 +76,10 @@ describe('distribute: minimal example', () => {
     const result = distribute(distributeArgs)(robotInitialState)
 
     expect(result.commands).toEqual([
-      cmd.aspirate('A1', 120),
+      cmd.aspirate('A1', 180),
       dispense('A2', 60),
       dispense('A3', 60),
-      blowoutSingleToDestPlateA1,
+      blowoutSingleToTrash,
     ])
   })
 })
@@ -90,7 +91,7 @@ describe('tip handling for multiple distribute chunks', () => {
       sourceWell: 'A1',
       destWells: ['A2', 'A3', 'A4', 'A5'],
       changeTip: 'once',
-      volume: 150,
+      volume: 90,
     }
 
     const result = distribute(distributeArgs)(robotInitialState)
@@ -98,16 +99,16 @@ describe('tip handling for multiple distribute chunks', () => {
     expect(result.commands).toEqual([
       cmd.dropTip('A1'),
       cmd.pickUpTip('A1'),
-      cmd.aspirate('A1', 300),
-      dispense('A2', 150),
-      dispense('A3', 150),
-      blowoutSingleToDestPlateA1,
+      cmd.aspirate('A1', 240),
+      dispense('A2', 90),
+      dispense('A3', 90),
+      blowoutSingleToTrash,
 
-      cmd.aspirate('A1', 300),
-      dispense('A4', 150),
-      dispense('A5', 150),
+      cmd.aspirate('A1', 240),
+      dispense('A4', 90),
+      dispense('A5', 90),
 
-      blowoutSingleToDestPlateA1,
+      blowoutSingleToTrash,
     ])
   })
 
@@ -117,7 +118,7 @@ describe('tip handling for multiple distribute chunks', () => {
       sourceWell: 'A1',
       destWells: ['A2', 'A3', 'A4', 'A5'],
       changeTip: 'always',
-      volume: 150,
+      volume: 90,
     }
 
     const result = distribute(distributeArgs)(robotInitialState)
@@ -125,18 +126,18 @@ describe('tip handling for multiple distribute chunks', () => {
     expect(result.commands).toEqual([
       cmd.dropTip('A1'),
       cmd.pickUpTip('A1'),
-      cmd.aspirate('A1', 300),
-      dispense('A2', 150),
-      dispense('A3', 150),
-      blowoutSingleToDestPlateA1,
+      cmd.aspirate('A1', 240),
+      dispense('A2', 90),
+      dispense('A3', 90),
+      blowoutSingleToTrash,
 
       // next chunk, change tip
       cmd.dropTip('A1'),
       cmd.pickUpTip('B1'),
-      cmd.aspirate('A1', 300),
-      dispense('A4', 150),
-      dispense('A5', 150),
-      blowoutSingleToDestPlateA1,
+      cmd.aspirate('A1', 240),
+      dispense('A4', 90),
+      dispense('A5', 90),
+      blowoutSingleToTrash,
     ])
   })
 
@@ -147,19 +148,19 @@ describe('tip handling for multiple distribute chunks', () => {
       sourceWell: 'A1',
       destWells: ['A2', 'A3', 'A4', 'A5'],
       changeTip: 'never',
-      volume: 150,
+      volume: 90,
     }
     const result = distribute(distributeArgs)(robotInitialState)
 
     expect(result.commands).toEqual([
-      cmd.aspirate('A1', 300),
-      dispense('A2', 150),
-      dispense('A3', 150),
-      blowoutSingleToDestPlateA1,
-      cmd.aspirate('A1', 300),
-      dispense('A4', 150),
-      dispense('A5', 150),
-      blowoutSingleToDestPlateA1,
+      cmd.aspirate('A1', 240),
+      dispense('A2', 90),
+      dispense('A3', 90),
+      blowoutSingleToTrash,
+      cmd.aspirate('A1', 240),
+      dispense('A4', 90),
+      dispense('A5', 90),
+      blowoutSingleToTrash,
     ])
   })
 
@@ -181,7 +182,7 @@ describe('tip handling for multiple distribute chunks', () => {
   })
 })
 
-describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () => {
+describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
   test('mix before aspirate, then aspirate disposal volume', () => {
     // NOTE this also tests "uneven final chunk" eg A6 in [A2 A3 | A4 A5 | A6]
     // which is especially relevant to disposal volume
@@ -194,6 +195,8 @@ describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () =
 
       mixFirstAspirate: true,
       disposalVolume: 12,
+      disposalLabware: 'sourcePlateId',
+      disposalWell: 'A1',
     }
     const result = distribute(distributeArgs)(robotInitialState)
     const aspirateVol = (120 * 2) + 12
@@ -202,16 +205,16 @@ describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () =
       cmd.aspirate('A1', aspirateVol),
       dispense('A2', 120),
       dispense('A3', 120),
-      blowoutSingleToDestPlateA1,
+      blowoutSingleToSourceA1,
 
       cmd.aspirate('A1', aspirateVol),
       dispense('A4', 120),
       dispense('A5', 120),
-      blowoutSingleToDestPlateA1,
+      blowoutSingleToSourceA1,
 
       cmd.aspirate('A1', 120 + 12),
       dispense('A6', 120),
-      blowoutSingleToDestPlateA1,
+      blowoutSingleToSourceA1,
     ])
   })
 
@@ -268,7 +271,7 @@ describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () =
         volume: 150,
         well: 'A3',
       },
-      blowoutSingleToDestPlateA1,
+      blowoutSingleToTrash,
       ...preWetTipCommands,
       {
         command: 'aspirate',
@@ -291,7 +294,7 @@ describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () =
         volume: 150,
         well: 'A5',
       },
-      blowoutSingleToDestPlateA1,
+      blowoutSingleToTrash,
     ])
   })
 
@@ -301,23 +304,23 @@ describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () =
       sourceWell: 'A1',
       destWells: ['A2', 'A3', 'A4', 'A5'],
       changeTip: 'never',
-      volume: 150,
+      volume: 90,
       touchTipAfterAspirate: true,
     }
     const result = distribute(distributeArgs)(robotInitialState)
 
     expect(result.commands).toEqual([
-      cmd.aspirate('A1', 300),
+      cmd.aspirate('A1', 240),
       cmd.touchTip('A1'),
-      dispense('A2', 150),
-      dispense('A3', 150),
-      blowoutSingleToDestPlateA1,
+      dispense('A2', 90),
+      dispense('A3', 90),
+      blowoutSingleToTrash,
 
-      cmd.aspirate('A1', 300),
+      cmd.aspirate('A1', 240),
       cmd.touchTip('A1'),
-      dispense('A4', 150),
-      dispense('A5', 150),
-      blowoutSingleToDestPlateA1,
+      dispense('A4', 90),
+      dispense('A5', 90),
+      blowoutSingleToTrash,
     ])
   })
 
@@ -327,7 +330,7 @@ describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () =
       sourceWell: 'A1',
       destWells: ['A2', 'A3', 'A4', 'A5'],
       changeTip: 'never',
-      volume: 150,
+      volume: 90,
       touchTipAfterDispense: true,
     }
     const result = distribute(distributeArgs)(robotInitialState)
@@ -337,25 +340,27 @@ describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () =
     }
 
     expect(result.commands).toEqual([
-      cmd.aspirate('A1', 300),
-      dispense('A2', 150),
+      cmd.aspirate('A1', 240),
+      dispense('A2', 90),
       touchTip('A2'),
-      dispense('A3', 150),
+      dispense('A3', 90),
       touchTip('A3'),
-      blowoutSingleToDestPlateA1,
+      blowoutSingleToTrash,
 
-      cmd.aspirate('A1', 300),
-      dispense('A4', 150),
+      cmd.aspirate('A1', 240),
+      dispense('A4', 90),
       touchTip('A4'),
-      dispense('A5', 150),
+      dispense('A5', 90),
       touchTip('A5'),
-      blowoutSingleToDestPlateA1,
+      blowoutSingleToTrash,
     ])
   })
 
   test('mix before aspirate w/ disposal vol', () => {
     const volume = 130
     const disposalVolume = 20
+    const disposalLabware = 'sourcePlateId'
+    const disposalWell = 'A1'
     const aspirateVol = (volume * 2) + disposalVolume
     const distributeArgs: DistributeFormData = {
       ...mixinArgs,
@@ -368,6 +373,8 @@ describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () =
         times: 2,
       },
       disposalVolume,
+      disposalLabware,
+      disposalWell,
     }
 
     const result = distribute(distributeArgs)(robotInitialState)
@@ -386,13 +393,13 @@ describe('advanced settings: disposal volume, mix, pre-wet tip, tip touch', () =
       cmd.aspirate('A1', aspirateVol),
       dispense('A2', volume),
       dispense('A3', volume),
-      blowoutSingleToDestPlateA1,
+      blowoutSingleToSourceA1,
 
       ...mixCommands,
       cmd.aspirate('A1', aspirateVol),
       dispense('A4', volume),
       dispense('A5', volume),
-      blowoutSingleToDestPlateA1,
+      blowoutSingleToSourceA1,
     ])
   })
 })
@@ -426,7 +433,9 @@ describe('distribute volume exceeds pipette max volume', () => {
       destWells: ['A2', 'A3'],
       changeTip,
       volume: 350,
-      blowout: null, // TODO additional test with blowout
+      disposalVolume: null, // TODO additional test with blowout
+      disposalLabware: null,
+      disposalWell: null,
     }
     const result = distribute(distributeArgs)(robotInitialState)
 
@@ -466,7 +475,9 @@ describe('distribute volume exceeds pipette max volume', () => {
       destWells: ['A2', 'A3'],
       changeTip,
       volume: 350,
-      blowout: null, // TODO additional test with blowout
+      disposalVolume: null, // TODO additional test with blowout
+      disposalLabware: null,
+      disposalWell: null,
     }
     const result = distribute(distributeArgs)(robotInitialState)
 
@@ -498,7 +509,9 @@ describe('distribute volume exceeds pipette max volume', () => {
       destWells: ['A2', 'A3'],
       changeTip,
       volume: 350,
-      blowout: null, // TODO additional test with blowout
+      disposalVolume: null, // TODO additional test with blowout
+      disposalLabware: null,
+      disposalWell: null,
     }
     const result = distribute(distributeArgs)(robotInitialState)
 

@@ -8,9 +8,10 @@ import atexit
 import os
 import sys
 import logging
+from typing import Tuple
 from numpy.linalg import inv
 from numpy import dot, array
-from opentrons.robot import robot_configs
+from opentrons.legacy_api.robot import robot_configs
 from opentrons import robot, instruments
 from opentrons.util.calibration_functions import probe_instrument
 from opentrons.deck_calibration.linal import solve, add_z, apply_transform
@@ -270,12 +271,13 @@ class CLITool:
 
     def validate(
             self,
-            point: (float, float, float),
+            point: Tuple[float, float, float],
             point_num: int,
             pipette: str) -> str:
         """
         :param point: Expected values from mechanical drawings
         :param point_num: The current position attempting to be validated
+        :param pipette: 'Z' for left mount or 'A' for right mount
 
         :return:
         """

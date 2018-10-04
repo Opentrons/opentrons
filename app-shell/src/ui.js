@@ -1,5 +1,5 @@
 // sets up the main window ui
-import {app, BrowserWindow} from 'electron'
+import {app, shell, BrowserWindow} from 'electron'
 import path from 'path'
 import {getConfig} from './config'
 import createLogger from './log'
@@ -20,13 +20,8 @@ const WINDOW_OPTS = {
   height: config.height,
   // allow webPreferences to be set at launchtime from config
   webPreferences: Object.assign({
-    // TODO(mc, 2018-05-15): turn off experimentalFeatures?
-    experimentalFeatures: true,
-
-    // TODO(mc, 2018-05-15): disable nodeIntegration in renderer thread
-    nodeIntegration: true,
-    // node integration needed for mdns robot discovery in webworker
-    nodeIntegrationInWorker: true,
+    preload: path.join(__dirname, './preload.js'),
+    nodeIntegration: false,
   }, config.webPreferences),
 }
 
@@ -41,6 +36,13 @@ export default function createUi () {
 
   log.info(`Loading ${url}`)
   mainWindow.loadURL(url, {'extraHeaders': 'pragma: no-cache\n'})
+
+  // open new windows (<a target="_blank" ...) in browser windows
+  mainWindow.webContents.on('new-window', (event, url) => {
+    log.debug('Opening external link', {url})
+    event.preventDefault()
+    shell.openExternal(url)
+  })
 
   return mainWindow
 }

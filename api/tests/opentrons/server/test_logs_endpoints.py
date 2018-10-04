@@ -1,7 +1,7 @@
 import os
 import json
-from opentrons.server import main
-from opentrons.server.main import init
+from opentrons import main
+from opentrons.server import init
 
 
 async def test_log_endpoints(

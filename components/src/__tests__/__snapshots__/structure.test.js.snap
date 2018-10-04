@@ -93,6 +93,7 @@ exports[`RefreshCard renders correctly 1`] = `
     className="button_flat button_icon refresh_card_icon"
     disabled={true}
     onClick={undefined}
+    tabIndex={undefined}
     title={undefined}
     type="button"
   >
@@ -174,6 +175,7 @@ exports[`TitleBar renders TitleBar with back button correctly 1`] = `
     className="button_flat inverted"
     disabled={undefined}
     onClick={[Function]}
+    tabIndex={undefined}
     title="Back"
     type="button"
   >
