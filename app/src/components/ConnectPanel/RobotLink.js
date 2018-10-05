@@ -12,14 +12,14 @@ type LinkProps = {
   url: string,
   className?: string,
   activeClassName?: string,
-  disabled: boolean,
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
+  disabled?: boolean,
 }
 
 export default function RobotLink (props: LinkProps) {
   const {url} = props
   const className = cx(styles.robot_link, props.className, {
-    [styles.disabled]: props.isabled,
+    [styles.disabled]: props.disabled,
   })
   return (
     <div className={styles.robot_link_wrapper} {...props.hoverTooltipHandlers}>
