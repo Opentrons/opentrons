@@ -1520,9 +1520,18 @@ class Pipette:
 
     def _p1000_piecewise(self, ul, func):
         if func == 'aspirate':
-            return 65
+            if (ul > 0) and (ul < 88.2951):
+                return 0.0647*ul + 53.153
+            elif (ul >= 88.2951) and (ul < 119.062):
+                return 0.0217*ul + 56.9474
+            elif (ul >= 119.062) and (ul < 211.8242):
+                return 0.0086*ul + 58.9607
+            elif (ul >= 211.8242) and (ul < 490.5573):
+                return 0.0029*ul + 59.9144
+            elif (ul >= 490.5573):
+                return 0.0008*ul + 60.9102
         else:
-            return 65
+            return 0*ul + 61.3275
 
     def _volume_percentage(self, volume):
         """Returns the plunger percentage for a given volume.
