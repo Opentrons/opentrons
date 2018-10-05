@@ -1,4 +1,5 @@
 // @flow
+import type {RootState as Analytics} from './analytics'
 import type {RootState as Dismiss} from './dismiss'
 import type {RootState as FileData} from './file-data'
 import type {RootState as LabwareIngred} from './labware-ingred/reducers'
@@ -9,6 +10,7 @@ import type {RootState as StepList} from './steplist'
 import type {RootState as Tutorial} from './tutorial'
 import type {RootState as WellSelection} from './well-selection/reducers'
 export type BaseState = {
+  analytics: Analytics,
   dismiss: Dismiss,
   fileData: FileData,
   labwareIngred: LabwareIngred,
