@@ -7,10 +7,10 @@ import {makeGetRobotHealth} from '../http-api-client'
 import {updateReducer} from './update'
 import {apiUpdateReducer} from './api-update'
 
+import type {Service} from '@opentrons/discovery-client'
 import type {Middleware, ThunkAction} from '../types'
 import type {RobotService} from '../robot'
 import type {Config} from '../config'
-import type {DiscoveredRobot} from '../discovery'
 import type {ShellUpdateAction} from './update'
 
 export type ShellAction = ShellUpdateAction
@@ -55,7 +55,7 @@ export function getShellConfig (): Config {
 }
 
 // getShellRobots makes a sync RPC call, so use sparingly
-export function getShellRobots (): Array<DiscoveredRobot> {
+export function getShellRobots (): Array<Service> {
   return getRobots()
 }
 

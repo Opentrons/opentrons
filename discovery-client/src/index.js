@@ -25,11 +25,13 @@ import {
 } from './service'
 
 import type {Browser, BrowserService} from 'mdns-js'
+
 import type {
   Candidate,
   Service,
   ServiceList,
   HealthResponse,
+  ServerHealthResponse,
   LogLevel,
   Logger,
 } from './types'
@@ -137,7 +139,7 @@ export class DiscoveryClient extends EventEmitter {
 
     log(this._logger, 'debug', 'removed services from discovery', {removals})
     this._poll()
-    removals.forEach(s => this.emit(SERVICE_REMOVED_EVENT, s))
+    this.emit(SERVICE_REMOVED_EVENT, removals)
 
     return this
   }
@@ -208,7 +210,7 @@ export class DiscoveryClient extends EventEmitter {
   _handleHealth (
     candidate: Candidate,
     apiResponse: ?HealthResponse,
-    serverResponse: ?HealthResponse
+    serverResponse: ?ServerHealthResponse
   ): mixed {
     const service = fromResponse(candidate, apiResponse, serverResponse)
 
@@ -239,14 +241,15 @@ export class DiscoveryClient extends EventEmitter {
   // update this.services, emit if necessary, re-poll if necessary
   _updateLists (nextServices: ServiceList): void {
     const updated = differenceBy(nextServices, this.services)
+
     if (updated.length) {
       // $FlowFixMe: flow doesn't type differenceBy properly, but this works
       this.candidates = differenceBy(this.candidates, nextServices, 'ip')
       this.services = nextServices
       this._poll()
 
-      updated.forEach(s => this.emit(SERVICE_EVENT, s))
       log(this._logger, 'debug', 'updated services', {updated})
+      this.emit(SERVICE_EVENT, updated)
     }
   }
 }

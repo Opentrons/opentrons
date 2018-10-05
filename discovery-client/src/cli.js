@@ -71,8 +71,8 @@ require('yargs')
 
 function browse (argv) {
   DiscoveryClient(argv)
-    .on('service', s => argv.logger.info('service added or updated:', s))
-    .on('serviceRemoved', s => argv.logger.info('service removed:', s))
+    .on('service', s => argv.logger.info('services added or updated:', s))
+    .on('serviceRemoved', s => argv.logger.info('services removed:', s))
     .once('error', argv.handleError)
     .start()
 

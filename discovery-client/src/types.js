@@ -1,5 +1,22 @@
 // @flow
 
+// TODO(mc, 2018-10-03): figure out what to do with duplicate type in app
+export type HealthResponse = {
+  name: string,
+  api_version: string,
+  fw_version: string,
+  system_version?: string,
+  logs?: Array<string>,
+}
+
+export type ServerHealthResponse = {
+  name: string,
+  apiServerVersion: string,
+  updateServerVersion: string,
+  smoothieVersion: string,
+  systemVersion: string,
+}
+
 export type Candidate = {
   ip: string,
   port: number,
@@ -9,10 +26,18 @@ export type Service = {
   name: string,
   ip: ?string,
   port: number,
+  // IP address (if known) is a link-local address
+  local: ?boolean,
   // GET /health response.ok === true
   ok: ?boolean,
   // GET /server/health response.ok === true
   serverOk: ?boolean,
+  // is advertising on MDNS
+  advertising: ?boolean,
+  // last good /health response
+  health: ?HealthResponse,
+  // last good /server/health response
+  serverHealth: ?ServerHealthResponse,
 }
 
 export type ServiceUpdate = $Shape<Service>
@@ -30,8 +55,3 @@ export type LogLevel =
   | 'silly'
 
 export type Logger = {[level: LogLevel]: (message: string, meta?: {}) => void}
-
-// note: the discovery module only cares about name
-export type HealthResponse = {
-  name: string,
-}

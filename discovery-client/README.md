@@ -24,7 +24,7 @@ const options = {
   nameFilter: ['opentrons'],
   portFilter: [31950],
   pollInterval: 5000,
-  candidates: [{ ip: '[fd00:0:cafe:fefe::1]', port: 31950 }, 'localhost']
+  candidates: [{ip: '[fd00:0:cafe:fefe::1]', port: 31950}, 'localhost'],
 }
 
 const client = DiscoveryClientFactory(options)
@@ -91,11 +91,38 @@ type Service = {
   /** possible ip address (null if an IP conflict occurred) */
   ip: ?string,
 
-  /** possible service port (31950 if unspecified) */
-  port: ?number,
+  /** service port (deafult 31950) */
+  port: number,
 
-  /** possible health status (null if not yet determined) */
-  ok: ?boolean
+  /** IP address (if known) is a link-local address */
+  local: ?boolean,
+
+  /** health status of the API server (null if not yet determined) */
+  ok: ?boolean,
+
+  /** health status of the update server (null if not yet determined) */
+  serverOk: ?boolean,
+
+  /** whether robot is advertising over MDNS (null if not yet determined) */
+  advertising: ?boolean,
+
+  /** last good health response */
+  health: ?{
+    name: string,
+    api_version: string,
+    fw_version: string,
+    system_version?: string,
+    logs?: Array<string>,
+  },
+
+  /** last good update server health response */
+  serverHealth: ?{
+    name: string,
+    apiServerVersion: string,
+    updateServerVersion: string,
+    smoothieVersion: string,
+    systemVersion: string,
+  },
 }
 ```
 
@@ -105,14 +132,14 @@ type Candidate = {
   ip: string,
 
   /** service port (31950 if unspecified) */
-  port: ?number
+  port: ?number,
 }
 ```
 
 `discovery.client` takes an optional `options` parameter:
 
 ```js
-type Option = {
+type Options = {
   /**
    * interval (ms) at which to poll an IP to find a robot
    * default: 5000
@@ -152,15 +179,15 @@ type Option = {
 
   /** optional logger */
   logger?: {
-    ['error' | 'warn' | 'info' | 'debug']: (message: string, meta: {}) => void
-  }
+    ['error' | 'warn' | 'info' | 'debug']: (message: string, meta: {}) => void,
+  },
 }
 ```
 
 If you need access to the `DiscoveryClient` class itself for some reason:
 
 ```js
-import { DiscoveryClient } from '@opentrons/discovery-client'
+import {DiscoveryClient} from '@opentrons/discovery-client'
 
 const client = new DiscoveryClient({})
 ```
@@ -177,11 +204,11 @@ client.on(SERVICE_REMOVED_EVENT, (data) => console.log('service removed', data))
 client.on('error', (error) => console.error(error)
 ```
 
-| event name       | data      | description                                   |
-| ---------------- | --------- | --------------------------------------------- |
-| `service`        | `Service` | Service added or updated in the services list |
-| `serviceRemoved` | `Service` | Service removed from the services list        |
-| `error`          | `Error`   | MDNS encountered an error                     |
+| event name       | data             | description                                    |
+| ---------------- | ---------------- | ---------------------------------------------- |
+| `service`        | `Array<Service>` | Services added or updated in the services list |
+| `serviceRemoved` | `Array<Service>` | Services removed from the services list        |
+| `error`          | `Error`          | MDNS encountered an error                      |
 
 ## cli
 
@@ -211,7 +238,7 @@ The CLI's global options are almost completely the same as the API's options, wi
 | `-c, --candidates`   | see `candidates` option   | `[]`     | `-c localhost`   |
 | `-n, --nameFilter`   | see `nameFilter` option   | `[]`     | `-n opentrons`   |
 | `-i, --ipFilter`     | see `ipFilter` option     | `[]`     | `-i 169.254`     |
-| `-a, --portFilter` | see `portFilter` option | `[]`     | `-a 31951 31952` |
+| `-a, --portFilter`   | see `portFilter` option   | `[]`     | `-a 31951 31952` |
 | `-l, --logLevel`     | log level for printout    | `'info'` | `-l debug`       |
 
 ### `discovery (browse) [options]`

@@ -33,7 +33,7 @@ describe('health check', () => {
       },
       discovery: {
         robotsByName: {
-          [name]: {name, connections: [{ip, port, ok: true}]},
+          [name]: [{ip, port, ok: true}],
         },
       },
       healthCheck: {

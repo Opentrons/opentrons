@@ -55,18 +55,18 @@ export const getDiscovered: OutputSelector<State, void, Array<Robot>> =
     (discoveredByName, connectedTo, unexpectedDisconnect) => {
       const robots = Object.keys(discoveredByName)
         .map(name => {
-          const robot = discoveredByName[name]
           const connection = orderBy(
-            robot.connections,
+            discoveredByName[name],
             ['ok', 'local'],
             ['desc', 'desc']
-          ).find(c => c.ok)
+          ).find(c => c.ip && c.ok)
 
           if (!connection) return null
 
           return {
-            name: robot.name,
-            ip: connection.ip,
+            name,
+            // $FlowFixMe: to be fixed by the removal of this selector
+            ip: (connection.ip: string),
             port: connection.port,
             wired: connection.local,
             isConnected: connectedTo === name,
