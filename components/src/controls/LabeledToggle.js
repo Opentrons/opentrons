@@ -8,7 +8,7 @@ import styles from './styles.css'
 type Props = {
   label: string,
   toggledOn: boolean,
-  children?: React.Node,
+  children: React.Node,
   onClick: () => mixed,
 }
 

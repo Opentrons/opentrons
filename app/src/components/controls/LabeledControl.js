@@ -7,7 +7,7 @@ import styles from './styles.css'
 type Props = {
   label: string,
   control: React.Node,
-  children?: React.Node,
+  children: React.Node,
 }
 
 export default function LabeledControl (props: Props) {

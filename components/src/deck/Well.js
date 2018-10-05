@@ -106,4 +106,5 @@ export default function Well (props: Props) {
   }
 
   console.warn('Invalid well: neither rectangle or circle: ' + JSON.stringify(wellDef))
+  return null
 }

@@ -11,7 +11,7 @@ import {
   filenameToType,
 } from './protocol-data'
 
-import type {Selector} from 'reselect'
+import type {OutputSelector} from 'reselect'
 import type {State, Action, ThunkAction} from '../types'
 import type {ProtocolState, ProtocolFile, ProtocolData} from './types'
 
@@ -92,8 +92,8 @@ export function protocolReducer (
 
 type StringGetter = (?ProtocolData) => ?string
 type NumberGetter = (?ProtocolData) => ?number
-type StringSelector = Selector<State, void, ?string>
-type NumberSelector = Selector<State, void, ?number>
+type StringSelector = OutputSelector<State, void, ?string>
+type NumberSelector = OutputSelector<State, void, ?number>
 
 const getName: StringGetter = getter('metadata.protocol-name')
 const getAuthor: StringGetter = getter('metadata.author')

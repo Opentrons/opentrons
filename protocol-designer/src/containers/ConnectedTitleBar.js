@@ -58,7 +58,7 @@ function mapStateToProps (state: BaseState): SP {
     case 'ingredient-detail': {
       return {
         _page,
-        title: labwareNickname,
+        title: labwareNickname || null,
         subtitle: labware && humanizeLabwareType(labware.type),
         backButtonLabel: 'Deck',
       }

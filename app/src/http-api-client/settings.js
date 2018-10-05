@@ -1,10 +1,11 @@
 // @flow
 // robot settings endpoints
-import {createSelector, type Selector} from 'reselect'
+import {createSelector} from 'reselect'
 
 import {buildRequestMaker} from './actions'
 import {getRobotApiState} from './reducer'
 
+import type {OutputSelector} from 'reselect'
 import type {State} from '../types'
 import type {BaseRobot} from '../robot'
 import type {ApiCall} from './types'
@@ -45,7 +46,7 @@ export const setSettings: SettingsRequestMaker =
   buildRequestMaker('POST', SETTINGS)
 
 export function makeGetRobotSettings () {
-  const selector: Selector<State, BaseRobot, RobotSettingsCall> =
+  const selector: OutputSelector<State, BaseRobot, RobotSettingsCall> =
     createSelector(getRobotApiState, getSettingsRequest)
 
   return selector

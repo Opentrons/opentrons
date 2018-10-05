@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "main": "js/index.js",
   "devDependencies": {
-    "flow-bin": "^0.76.0",
+    "flow-bin": "^0.82.0",
     "flow-typed": "^2.5.1"
   },
   "dependencies": {
