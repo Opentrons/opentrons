@@ -17,18 +17,19 @@ declare module 'mdns-js' {
   }
 
   declare module.exports: {
-    createBrowser: (serviceType: ServiceType) => Browser,
-    tcp: (type: string) => ServiceType
+    createBrowser: (serviceType: MdnsServiceType) => Browser,
+    tcp: (type: string) => MdnsServiceType,
+    ServiceType: any
   }
 
   declare type Browser = mdns$Browser
 
-  declare type ServiceType = mdns$ServiceType
+  declare type MdnsServiceType = mdns$ServiceType
 
   declare type BrowserService = {
     addresses: Array<string>,
     query: Array<string>,
-    type?: Array<ServiceType>,
+    type?: Array<MdnsServiceType>,
     txt?: Array<string>,
     port?: number,
     fullname?: string,

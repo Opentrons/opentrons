@@ -4,11 +4,11 @@
 
 import EventEmitter from 'events'
 import escape from 'escape-string-regexp'
-import mdns from 'mdns-js'
 import toRegex from 'to-regex'
 import differenceBy from 'lodash/differenceBy'
 import xorBy from 'lodash/xorBy'
 
+import MdnsBrowser from './mdns-browser'
 import {poll, stop, type PollRequest} from './poller'
 import {
   createServiceList,
@@ -178,8 +178,7 @@ export class DiscoveryClient extends EventEmitter {
   _startBrowser (): void {
     this._stopBrowser()
 
-    const browser = mdns
-      .createBrowser(mdns.tcp('http'))
+    const browser = MdnsBrowser()
       .once('ready', () => browser.discover())
       .on('update', service => this._handleUp(service))
       .on('error', error => this.emit('error', error))

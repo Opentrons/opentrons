@@ -20,4 +20,6 @@ const __mockReset = () => {
   createBrowser.mockReturnValue(__mockBrowser)
 }
 
-module.exports = {tcp, createBrowser, __mockBrowser, __mockReset}
+const ServiceType = function () {}
+
+module.exports = {tcp, createBrowser, ServiceType, __mockBrowser, __mockReset}
