@@ -1,7 +1,8 @@
 // @flow
 // API client for modules (the robot kind)
-import {createSelector, type Selector} from 'reselect'
+import {createSelector} from 'reselect'
 
+import type {OutputSelector} from 'reselect'
 import type {State, ThunkPromiseAction} from '../types'
 import type {BaseRobot, RobotService} from '../robot'
 import type {ApiCall, ApiRequestError} from './types'
@@ -95,7 +96,7 @@ export function fetchModuleData (robot: RobotService, serial: string): ThunkProm
 }
 
 export function makeGetRobotModules () {
-  const selector: Selector<State, BaseRobot, FetchModulesCall> = createSelector(
+  const selector: OutputSelector<State, BaseRobot, FetchModulesCall> = createSelector(
     getRobotApiState,
     (state) => state[MODULES] || {inProgress: false}
   )
@@ -104,7 +105,7 @@ export function makeGetRobotModules () {
 }
 
 export function makeGetRobotModuleData () {
-  const selector: Selector<State, BaseRobot, FetchModuleDataCall> = createSelector(
+  const selector: OutputSelector<State, BaseRobot, FetchModuleDataCall> = createSelector(
     (state, robot, _serial) => (getRobotApiState(state, robot)),
     (_state, _robot, serial) => serial,
     (state, serial) => {

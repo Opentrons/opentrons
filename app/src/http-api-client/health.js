@@ -1,7 +1,8 @@
 // @flow
 // health http api module
-import {createSelector, type Selector} from 'reselect'
+import {createSelector} from 'reselect'
 
+import type {OutputSelector} from 'reselect'
 import type {State} from '../types'
 import type {BaseRobot} from '../robot'
 import type {ApiCall} from './types'
@@ -30,7 +31,7 @@ const HEALTH: 'health' = 'health'
 export const fetchHealth = buildRequestMaker('GET', HEALTH)
 
 export const makeGetRobotHealth = () => {
-  const selector: Selector<State, BaseRobot, FetchHealthCall> = createSelector(
+  const selector: OutputSelector<State, BaseRobot, FetchHealthCall> = createSelector(
     getRobotApiState,
     state => state[HEALTH] || {inProgress: false}
   )

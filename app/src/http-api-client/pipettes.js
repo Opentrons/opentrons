@@ -1,17 +1,17 @@
 // @flow
 // pipette state from api
-import {createSelector, type Selector} from 'reselect'
-
-import type {State, ThunkPromiseAction} from '../types'
-import type {BaseRobot, RobotService} from '../robot'
+import {createSelector} from 'reselect'
 
 import {apiRequest, apiSuccess, apiFailure} from './actions'
-import type {ApiCall} from './types'
-import type {ApiAction} from './actions'
 import {getRobotApiState} from './reducer'
+import client from './client'
 
+import type {OutputSelector} from 'reselect'
+import type {State, ThunkPromiseAction} from '../types'
+import type {BaseRobot, RobotService} from '../robot'
+import type {ApiCall, ApiRequestError} from './types'
+import type {ApiAction} from './actions'
 import type {MotorAxis} from './motors'
-import client, {type ApiRequestError} from './client'
 
 // TODO(mc, 2018-03-30): mount, volume, and channels should come from the API
 export type Pipette = {
@@ -57,7 +57,7 @@ export function fetchPipettes (
 }
 
 export const makeGetRobotPipettes = () => {
-  const selector: Selector<State, BaseRobot, RobotPipettes> = createSelector(
+  const selector: OutputSelector<State, BaseRobot, RobotPipettes> = createSelector(
     getRobotApiState,
     (state) => state[PIPETTES] || {inProgress: false}
   )

@@ -1,19 +1,21 @@
 // @flow
 // server endpoints http api module
-import {createSelector, type Selector} from 'reselect'
+import {createSelector} from 'reselect'
 import semver from 'semver'
-import {chainActions} from '../util'
-import type {State, ThunkPromiseAction, Action} from '../types'
-import type {RobotService} from '../robot'
 
-import type {ApiCall} from './types'
-import client, {FetchError, type ApiRequestError} from './client'
+import {chainActions} from '../util'
+import client, {FetchError} from './client'
 import {fetchHealth, makeGetRobotHealth} from './health'
 import {
   getApiUpdateVersion,
   getApiUpdateFilename,
   getApiUpdateContents,
 } from '../shell'
+
+import type {OutputSelector} from 'reselect'
+import type {State, ThunkPromiseAction, Action} from '../types'
+import type {RobotService} from '../robot'
+import type {ApiCall, ApiRequestError} from './types'
 
 type RequestPath = 'update' | 'restart' | 'update/ignore'
 
@@ -246,7 +248,7 @@ export type RobotUpdateType = 'upgrade' | 'downgrade' | null
 export type RobotUpdateInfo = {version: string, type: RobotUpdateType}
 
 export const makeGetRobotUpdateInfo = () => {
-  const selector: Selector<State, RobotService, RobotUpdateInfo> = createSelector(
+  const selector: OutputSelector<State, RobotService, RobotUpdateInfo> = createSelector(
     makeGetRobotHealth(),
     getApiUpdateVersion,
     (health, updateVersion) => {
@@ -271,7 +273,7 @@ export const makeGetRobotUpdateInfo = () => {
 // TODO(mc, 2018-09-25): this is broken until some planned discovery work is
 // done for https://github.com/Opentrons/opentrons/milestone/68
 export const makeGetRobotUpdateRequest = () => {
-  const selector: Selector<State,
+  const selector: OutputSelector<State,
     RobotService,
     RobotServerUpdate> = createSelector(
     selectRobotServerState,
@@ -282,7 +284,7 @@ export const makeGetRobotUpdateRequest = () => {
 }
 
 export const makeGetRobotRestartRequest = () => {
-  const selector: Selector<State,
+  const selector: OutputSelector<State,
     RobotService,
     RobotServerRestart> = createSelector(
     selectRobotServerState,
@@ -293,7 +295,7 @@ export const makeGetRobotRestartRequest = () => {
 }
 
 export const makeGetRobotIgnoredUpdateRequest = () => {
-  const selector: Selector<State,
+  const selector: OutputSelector<State,
     RobotService,
     RobotServerUpdateIgnore> = createSelector(
     selectRobotServerState,
@@ -303,7 +305,7 @@ export const makeGetRobotIgnoredUpdateRequest = () => {
   return selector
 }
 
-export const getAnyRobotUpdateAvailable: Selector<State,
+export const getAnyRobotUpdateAvailable: OutputSelector<State,
   void,
   boolean> = createSelector(selectServerState, state =>
   Object.keys(state).some(name => state[name].availableUpdate)

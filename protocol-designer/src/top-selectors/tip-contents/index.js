@@ -1,5 +1,5 @@
 // @flow
-import {createSelector, type Selector} from 'reselect'
+import {createSelector} from 'reselect'
 import noop from 'lodash/noop'
 import * as StepGeneration from '../../step-generation'
 import {
@@ -10,12 +10,13 @@ import {
 import {selectors as fileDataSelectors} from '../../file-data'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
 
+import type {OutputSelector} from 'reselect'
 import type {BaseState} from '../../types'
 import type {ElementProps} from 'react'
 import {typeof Labware} from '@opentrons/components'
 
 type GetTipProps = $PropertyType<ElementProps<Labware>, 'getTipProps'>
-type GetTipSelector = Selector<BaseState, {labwareId: string}, GetTipProps>
+type GetTipSelector = OutputSelector<BaseState, {labwareId: string}, GetTipProps>
 
 function getLabwareIdProp (state, props: {labwareId: string}) {
   return props.labwareId

@@ -12,7 +12,8 @@ export function getPortalElem () {
   return document.getElementById(PORTAL_ROOT_ID)
 }
 
-type Props = {children?: React.Node}
+type Props = {children: React.Node}
+
 /** The children of Portal are rendered into the
   * PortalRoot, if the PortalRoot exists in the DOM */
 export function Portal (props: Props): React.Node {

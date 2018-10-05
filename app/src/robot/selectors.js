@@ -2,7 +2,7 @@
 // robot selectors
 import padStart from 'lodash/padStart'
 import orderBy from 'lodash/orderBy'
-import {createSelector, type Selector} from 'reselect'
+import {createSelector} from 'reselect'
 
 import {
   type ConnectionStatus,
@@ -11,6 +11,7 @@ import {
 } from './constants'
 
 import type {ContextRouter} from 'react-router'
+import type {OutputSelector} from 'reselect'
 import type {State} from '../types'
 import type {
   Mount,
@@ -45,7 +46,7 @@ export function labwareType (labware: Labware): LabwareType {
 }
 
 // TODO(mc, 2018-08-10): deprecate in favor of getRobots in discovery module
-export const getDiscovered: Selector<State, void, Array<Robot>> =
+export const getDiscovered: OutputSelector<State, void, Array<Robot>> =
   createSelector(
     // TODO(mc, 2018-08-15): not using the selector in discovery right now
     // because of dependency problem in WebWorker where this selector is used
@@ -85,15 +86,15 @@ export function getConnectRequest (state: State) {
   return connection(state).connectRequest
 }
 
-export const getConnectedRobot: Selector<State, void, ?Robot> = createSelector(
+export const getConnectedRobot: OutputSelector<State, void, ?Robot> = createSelector(
   getDiscovered,
   discovered => discovered.find(r => r.isConnected)
 )
 
-export const getConnectedRobotName: Selector<State, void, ?string> =
+export const getConnectedRobotName: OutputSelector<State, void, ?string> =
   createSelector(getConnectedRobot, r => r && r.name)
 
-export const getConnectionStatus: Selector<State, void, ConnectionStatus> =
+export const getConnectionStatus: OutputSelector<State, void, ConnectionStatus> =
   createSelector(
     getConnectedRobotName,
     state => getConnectRequest(state).inProgress,
@@ -325,7 +326,7 @@ export function getModulesBySlot (state: State): {[string]: ?SessionModule} {
   return session(state).modulesBySlot
 }
 
-export const getModules: Selector<State, void, Array<SessionModule>> =
+export const getModules: OutputSelector<State, void, Array<SessionModule>> =
   createSelector(
     getModulesBySlot,
     modulesBySlot => Object

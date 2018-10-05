@@ -1,5 +1,5 @@
-// flow-typed signature: a56215e90c2cb9a5f9e106edd857208f
-// flow-typed version: 057d3e81b5/moment_v2.3.x/flow_>=v0.34.x
+// flow-typed signature: 23b805356f90ad9384dd88489654e380
+// flow-typed version: e9374c5fe9/moment_v2.3.x/flow_>=v0.25.x
 
 type moment$MomentOptions = {
   y?: number | string,
@@ -104,6 +104,8 @@ declare class moment$MomentDuration {
   days(): number,
   asDays(): number,
   months(): number,
+  asWeeks(): number,
+  weeks(): number,
   asMonths(): number,
   years(): number,
   asYears(): number,
@@ -263,7 +265,9 @@ declare class moment$Moment {
   toDate(): Date,
   toArray(): Array<number>,
   toJSON(): string,
-  toISOString(): string,
+  toISOString(
+    keepOffset?: boolean
+  ): string,
   toObject(): moment$MomentObject,
   isBefore(
     date?: moment$Moment | string | number | Date | Array<number>,

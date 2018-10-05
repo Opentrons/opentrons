@@ -32,7 +32,7 @@ export default function WellSelectionModal (props: Props) {
       <div className={styles.top_row}>
         <LabeledValue
           label='Pipette'
-          value={pipetteConfig && pipetteConfig.displayName}
+          value={(pipetteConfig && pipetteConfig.displayName) || null}
           className={styles.inverted_text}
         />
         <OutlineButton onClick={props.onSave} inverted>
