@@ -351,8 +351,8 @@ describe('discovery client', () => {
         health: {name: 'opentrons-dev'},
         serverHealth: {name: 'opentrons-dev'},
       },
-      {...MOCK_SERVICE, name: 'bar', ip: null},
-      {...MOCK_SERVICE, name: 'baz', ip: null},
+      {...MOCK_SERVICE, name: 'bar', ip: null, local: null},
+      {...MOCK_SERVICE, name: 'baz', ip: null, local: null},
     ])
   })
 

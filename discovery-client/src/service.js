@@ -73,7 +73,7 @@ export function clearServiceIfConflict (
   update: ?ServiceUpdate
 ): Service {
   return update && service.ip === update.ip
-    ? {...service, ip: null, ok: null, serverOk: null}
+    ? {...service, ip: null, local: null, ok: null, serverOk: null}
     : service
 }
 
