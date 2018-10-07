@@ -1,7 +1,9 @@
 """This module will replace Placeable"""
+import re
 from typing import List, Dict
 from enum import Enum, auto
 from opentrons.types import Point
+from collections import defaultdict
 
 
 class WellShape(Enum):
@@ -116,10 +118,13 @@ class Labware:
     provides methods for accessing wells within the labware.
     """
     def __init__(self, definition: dict, parent: Point) -> None:
-        self._ordering = definition['ordering']
+        self._ordering = [well
+                          for col in definition['ordering']
+                          for well in col]
         self._wells = definition['wells']
         offset = definition['cornerOffsetFromSlot']
         self._offset = Point(x=offset['x'], y=offset['y'], z=offset['z'])
+        self._pattern = re.compile(r'^([A-Z]+)([1-9]+)$', re.X)
 
     def wells(self) -> List[Well]:
         """
@@ -133,7 +138,7 @@ class Labware:
         :return: Ordered list of all wells in a labware
         """
         return [Well(self._wells[well], self._offset)
-                for col in self._ordering for well in col]
+                for well in self._ordering]
 
     def wells_by_index(self) -> Dict[str, Well]:
         """
@@ -146,7 +151,7 @@ class Labware:
         :return: Dictionary of well objects keyed by well name
         """
         return {well: Well(self._wells[well], self._offset)
-                for col in self._ordering for well in col}
+                for well in self._ordering}
 
     def rows(self) -> List[List[Well]]:
         """
@@ -158,8 +163,9 @@ class Labware:
 
         :return: A list of row lists
         """
-        return [[Well(self._wells[well], self._offset) for well in row]
-                for row in zip(*self._ordering)]
+        rowDict = self._create_indexed_dictionary(group=1)
+        keys = sorted(rowDict)
+        return [rowDict[key] for key in keys]
 
     def rows_by_index(self) -> Dict[str, List[Well]]:
         """
@@ -171,9 +177,8 @@ class Labware:
 
         :return: Dictionary of Well lists keyed by row name
         """
-        return {chr(ord('A') + idx):
-                [Well(self._wells[well], self._offset) for well in row]
-                for idx, row in enumerate(zip(*self._ordering))}
+        rowDict = self._create_indexed_dictionary(group=1)
+        return rowDict
 
     def columns(self) -> List[List[Well]]:
         """
@@ -186,8 +191,9 @@ class Labware:
 
         :return: A list of column lists
         """
-        return [[Well(self._wells[well], self._offset) for well in col]
-                for col in self._ordering]
+        colDict = self._create_indexed_dictionary(group=2)
+        keys = sorted(colDict)
+        return [colDict[key] for key in keys]
 
     def columns_by_index(self) -> Dict[str, List[Well]]:
         """
@@ -200,9 +206,15 @@ class Labware:
 
         :return: Dictionary of Well lists keyed by column name
         """
-        return {str(idx + 1):
-                [Well(self._wells[well], self._offset) for well in col]
-                for idx, col in enumerate(self._ordering)}
+        colDict = self._create_indexed_dictionary(group=2)
+        return colDict
+
+    def _create_indexed_dictionary(self, group=0):
+        dictList = defaultdict(list)
+        for well in self._ordering:
+            wellObj = Well(self._wells[well], self._offset)
+            dictList[self._pattern.match(well).group(group)].append(wellObj)
+        return dictList
 
 
 def _load_definition_by_name(name: str) -> dict:

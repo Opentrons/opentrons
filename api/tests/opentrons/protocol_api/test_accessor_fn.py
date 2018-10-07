@@ -99,7 +99,8 @@ minimalLabwareDef2 = {
 def test_labware_init():
     deck = Point(0, 0, 0)
     fakeLabware = labware.Labware(minimalLabwareDef, deck)
-    assert fakeLabware._ordering == minimalLabwareDef['ordering']
+    ordering = [well for col in minimalLabwareDef['ordering'] for well in col]
+    assert fakeLabware._ordering == ordering
     assert fakeLabware._wells == minimalLabwareDef['wells']
     assert fakeLabware._offset == Point(x=10, y=10, z=5)
 
