@@ -14,6 +14,7 @@ function _addStoragePrefix (path: string): string {
 // paths from Redux root to all persisted reducers
 const PERSISTED_PATHS = [
   'analytics.hasOptedIn',
+  'tutorial.dismissedHints',
 ]
 
 /** Subscribe this fn to the Redux store to persist selected substates */

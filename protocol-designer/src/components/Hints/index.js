@@ -93,7 +93,7 @@ class Hints extends React.Component<Props, State> {
                 className={styles.ok_button}
                 onClick={this.makeHandleCloseClick(hint)}
               >
-                OK{/* TODO: internationalization string */}
+                {i18n.t('button.ok')}
               </OutlineButton>
             </div>
           </AlertModal>

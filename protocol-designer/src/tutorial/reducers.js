@@ -1,9 +1,10 @@
 // @flow
 import {combineReducers} from 'redux'
 import {handleActions} from 'redux-actions'
+import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
-import uniqBy from 'lodash/uniqBy'
 import without from 'lodash/without'
+import {rehydrate} from '../persist'
 import type {EditIngredient} from '../labware-ingred/actions'
 import type {HintKey} from './index'
 import type {AddHintAction, RemoveHintAction} from './actions'
@@ -18,12 +19,19 @@ const hints = handleActions({
   ),
 }, [])
 
-type DismissedHintReducerState = Array<{hintKey: HintKey, rememberDismissal: boolean}>
+type DismissedHintReducerState = {[HintKey]: {rememberDismissal: boolean}}
+const dismissedHintsInitialState = {}
 const dismissedHints = handleActions({
-  REMOVE_HINT: (state: DismissedHintReducerState, action: RemoveHintAction): DismissedHintReducerState => (
-    uniqBy([...state, action.payload], 'hintKey')
+  // only rehydrate "rememberDismissal" hints
+  REHYDRATE_PERSISTED: () => pickBy(
+    rehydrate('tutorial.dismissedHints', dismissedHintsInitialState),
+    (h: $Values<DismissedHintReducerState>) => h && h.rememberDismissal
   ),
-}, [])
+  REMOVE_HINT: (state: DismissedHintReducerState, action: RemoveHintAction): DismissedHintReducerState => {
+    const {hintKey, rememberDismissal} = action.payload
+    return {...state, [hintKey]: {rememberDismissal}}
+  },
+}, dismissedHintsInitialState)
 
 const _allReducers = {
   hints,
