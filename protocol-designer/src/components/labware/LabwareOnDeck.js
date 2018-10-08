@@ -143,7 +143,12 @@ type LabwareOnDeckProps = {
 }
 class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
   shouldComponentUpdate (nextProps: LabwareOnDeckProps) {
-    if (nextProps.addLabwareMode || nextProps.moveLabwareMode) {
+    const shouldAlwaysUpdate = this.props.addLabwareMode ||
+      nextProps.addLabwareMode ||
+      this.props.moveLabwareMode ||
+      nextProps.moveLabwareMode
+
+    if (shouldAlwaysUpdate) {
       return true
     } else {
       return this.props.highlighted !== nextProps.highlighted
