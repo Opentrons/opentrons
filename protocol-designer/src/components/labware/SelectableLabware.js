@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import reduce from 'lodash/reduce'
+import map from 'lodash/map'
 // import {connect} from 'react-redux'
 import {
   swatchColors,
@@ -8,7 +9,11 @@ import {
   LabwareLabels,
   MIXED_WELL_COLOR,
   type Channels,
+  LabwareOutline,
+  Well,
 } from '@opentrons/components'
+
+import {getWellDefsForSVG} from '@opentrons/shared-data'
 
 import {getCollidingWells} from '../../utils'
 import {SELECTABLE_WELL_CLASS} from '../../constants'
@@ -27,7 +32,6 @@ type LabwareProps = React.ElementProps<typeof Labware>
 
 export type Props = {
   wellContents: ContentsByWell,
-  getTipProps?: $PropertyType<LabwareProps, 'getTipProps'>,
   containerType: string,
   updateSelectedWells: (Wells) => mixed,
 
@@ -100,31 +104,31 @@ class SelectableLabware extends React.Component<Props, State> {
   render () {
     const {
       wellContents,
-      getTipProps,
       containerType,
       highlightedWells,
       selectedWells,
     } = this.props
 
-    const getWellProps = (wellName) => {
-      const well = wellContents[wellName]
-
-      return {
-        selectable: true,
-        wellName,
-        onMouseOver: this.makeHandleMouseOverWell(wellName),
-        onMouseLeave: this.handleMouseExitWell,
-        highlighted: Object.keys(highlightedWells).includes(wellName),
-        selected: Object.keys(selectedWells).includes(wellName),
-        error: well && well.error,
-        maxVolume: well && well.maxVolume,
-        fillColor: getFillColor(well.groupIds),
-      }
-    }
+    const allWellDefsByName = getWellDefsForSVG(containerType)
 
     return (
       <SelectionRect svg onSelectionMove={this.handleSelectionMove} onSelectionDone={this.handleSelectionDone}>
-        <Labware labwareType={containerType} getWellProps={getWellProps} getTipProps={getTipProps} />
+        <g>
+          <LabwareOutline />
+          {map(wellContents, (well, wellName) => (
+            <Well
+              selectable
+              key={wellName}
+              wellName={wellName}
+              onMouseOver={this.makeHandleMouseOverWell(wellName)}
+              onMouseLeave={this.handleMouseExitWell}
+              highlighted={Object.keys(highlightedWells).includes(wellName)}
+              selected={Object.keys(selectedWells).includes(wellName)}
+              fillColor={getFillColor(well.groupIds)}
+              svgOffset={{x: 1, y: -3}}
+              wellDef={allWellDefsByName[wellName]} />
+          ))}
+        </g>
         <LabwareLabels labwareType={containerType} />
       </SelectionRect>
     )
