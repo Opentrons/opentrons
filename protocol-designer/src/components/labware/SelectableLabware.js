@@ -2,10 +2,8 @@
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 import map from 'lodash/map'
-// import {connect} from 'react-redux'
 import {
   swatchColors,
-  Labware,
   LabwareLabels,
   MIXED_WELL_COLOR,
   type Channels,
@@ -20,23 +18,16 @@ import {SELECTABLE_WELL_CLASS} from '../../constants'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
 import SelectionRect from '../SelectionRect.js'
 import type {ContentsByWell, Wells} from '../../labware-ingred/types'
-
-// import * as wellContentsSelectors from '../../top-selectors/well-contents'
-// import wellSelectionSelectors from '../../well-selection/selectors'
-// import {selectors} from '../../labware-ingred/reducers'
-// import {selectors as steplistSelectors} from '../../steplist'
 import type {GenericRect} from '../../collision-types'
-// import type {BaseState} from '../../types'
-
-type LabwareProps = React.ElementProps<typeof Labware>
 
 export type Props = {
   wellContents: ContentsByWell,
   containerType: string,
-  updateSelectedWells: (Wells) => mixed,
-
-  // used by container
-  containerId: string,
+  selectedWells: Wells,
+  highlightedWells: Wells,
+  selectWells: (Wells) => mixed,
+  deselectWells: (Wells) => mixed,
+  updateHighlightedWells: (Wells) => mixed,
   pipetteChannels?: ?Channels,
 }
 
@@ -47,7 +38,7 @@ function getFillColor (groupIds: Array<string>): ?string {
   return MIXED_WELL_COLOR
 }
 
-class SelectableLabware extends React.Component<Props, State> {
+class SelectableLabware extends React.Component<Props> {
   _getWellsFromRect = (rect: GenericRect): * => {
     const selectedWells = getCollidingWells(rect, SELECTABLE_WELL_CLASS)
     return this._wellsFromSelected(selectedWells)
@@ -73,12 +64,12 @@ class SelectableLabware extends React.Component<Props, State> {
     return selectedWells
   }
 
-  handleSelectionMove = (e, rect) => {
+  handleSelectionMove = (e: MouseEvent, rect: GenericRect) => {
     if (!e.shiftKey) {
       this.props.updateHighlightedWells(this._getWellsFromRect(rect))
     }
   }
-  handleSelectionDone = (e, rect) => {
+  handleSelectionDone = (e: MouseEvent, rect: GenericRect) => {
     const wells = this._getWellsFromRect(rect)
     if (e.shiftKey) {
       this.props.deselectWells(wells)
@@ -87,11 +78,11 @@ class SelectableLabware extends React.Component<Props, State> {
     }
   }
 
-  makeHandleMouseOverWell = (wellName) => () => {
+  makeHandleMouseOverWell = (wellName: string) => () => {
     if (this.props.pipetteChannels === 8) {
       const wellSet = getWellSetForMultichannel(this.props.containerType, wellName)
       const nextHighlightedWells = reduce(wellSet, (acc, well) => ({...acc, [well]: well}), {})
-      this.props.updateHighlightedWells(nextHighlightedWells)
+      nextHighlightedWells && this.props.updateHighlightedWells(nextHighlightedWells)
     } else {
       this.props.updateHighlightedWells({[wellName]: wellName})
     }

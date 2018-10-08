@@ -13,6 +13,8 @@ type Props = {
   onClick?: (e: SyntheticMouseEvent<*>) => mixed,
   errorToShow: ?string,
   isMulti: ?boolean,
+  pipetteId: ?string,
+  labwareId: ?string,
 }
 
 type State = {isModalOpen: boolean}

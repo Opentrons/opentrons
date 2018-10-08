@@ -25,7 +25,7 @@ type Props = {
 }
 
 class Well extends React.Component<Props> {
-  shouldComponentUpdate (nextProps) {
+  shouldComponentUpdate (nextProps: Props) {
     return this.props.highlighted !== nextProps.highlighted ||
       this.props.selected !== nextProps.selected ||
       this.props.fillColor !== nextProps.fillColor

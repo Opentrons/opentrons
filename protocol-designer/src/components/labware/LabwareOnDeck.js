@@ -142,7 +142,7 @@ type LabwareOnDeckProps = {
   setDefaultLabwareName: () => mixed,
 }
 class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
-  shouldComponentUpdate (nextProps) {
+  shouldComponentUpdate (nextProps: LabwareOnDeckProps) {
     if (nextProps.addLabwareMode || nextProps.moveLabwareMode) {
       return true
     } else {

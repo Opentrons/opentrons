@@ -16,21 +16,21 @@ import {selectors} from '../../../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../../../steplist'
 import {changeFormInput} from '../../../steplist/actions'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
+import type {PipetteData} from '../../../step-generation/types'
+import type {Wells, ContentsByWell} from '../../../labware-ingred/types'
 
 import {SelectableLabware} from '../../labware'
 import SingleLabwareWrapper from '../../SingleLabware'
 import WellSelectionInstructions from '../../WellSelectionInstructions'
-import type {PipetteData} from '../step-generation/types'
-import type {Wells, ContentsByWell} from '../labware-ingred/types'
 
 import styles from './WellSelectionModal.css'
 import modalStyles from '../../modals/modal.css'
 
 type OP = {
-  pipetteId: string,
-  labwareId: string,
+  pipetteId: ?string,
+  labwareId: ?string,
   isOpen: boolean,
-  onCloseClick: (e: SyntheticEvent<*>) => mixed,
+  onCloseClick: (e: ?SyntheticEvent<*>) => mixed,
   name: StepFieldName,
 }
 type SP = {
@@ -39,7 +39,7 @@ type SP = {
   wellContents: ContentsByWell,
   containerType: string,
 }
-type DP = {saveWellSelection: () => mixed}
+type DP = {saveWellSelection: (Wells) => mixed}
 
 type Props = OP & SP & DP
 type State = {selectedWells: Wells, highlightedWells: Wells}
@@ -114,7 +114,7 @@ class WellSelectionModal extends React.Component<Props, State> {
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {pipetteId, labwareId} = ownProps
 
-  const labware = selectors.getLabware(state)[labwareId]
+  const labware = labwareId && selectors.getLabware(state)[labwareId]
   const allWellContentsForSteps = wellContentsSelectors.allWellContentsForSteps(state)
 
   const stepId = steplistSelectors.getActiveItem(state).id
@@ -124,8 +124,8 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const formData = steplistSelectors.getUnsavedForm(state)
 
   return {
-    initialSelectedWells: formData ? formData[ownProps.name] : null,
-    pipette: pipetteSelectors.equippedPipettes(state)[pipetteId],
+    initialSelectedWells: formData ? formData[ownProps.name] : [],
+    pipette: pipetteId ? pipetteSelectors.equippedPipettes(state)[pipetteId] : null,
     wellContents: labware ? allWellContentsForSteps[timelineIdx][labware.id] : {},
     containerType: labware ? labware.type : 'missing labware',
   }
