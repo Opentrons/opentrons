@@ -1,8 +1,11 @@
 // @flow
 // robot discovery state
 import groupBy from 'lodash/groupBy'
+import map from 'lodash/map'
+import {createSelector} from 'reselect'
 import {getShellRobots} from '../shell'
 
+import type {OutputSelector} from 'reselect'
 import type {Service} from '@opentrons/discovery-client'
 import type {State, Action, ThunkAction} from '../types'
 
@@ -27,6 +30,10 @@ type UpdateListAction = {|
   type: 'discovery:UPDATE_LIST',
   payload: {|robots: Array<Service>|},
 |}
+
+export type UnreachableRobot = {
+  name: string,
+}
 
 export type DiscoveryAction = StartAction | FinishAction | UpdateListAction
 
@@ -62,6 +69,23 @@ export function getDiscoveredRobotsByName (state: State) {
 // export function getRobots (state: State) {
 //
 // }
+
+type UnreachableSelector = OutputSelector<State, void, Array<UnreachableRobot>>
+
+const serviceUnreachable = (service: Service) => !service.ip || !service.ok
+// TODO(mc, 2018-10-08): check advertising and serverOk flags
+// !service.ip || (!service.advertising && !service.ok && !service.serverOk)
+
+const robotUnreachable = (robot: Array<Service>) =>
+  robot.every(serviceUnreachable)
+
+const makeUnreachableRobot = (robot: Array<Service>, name: string) =>
+  robotUnreachable(robot) ? {name} : null
+
+export const getUnreachableRobots: UnreachableSelector = createSelector(
+  state => state.discovery.robotsByName,
+  robotsByName => map(robotsByName, makeUnreachableRobot).filter(Boolean)
+)
 
 // getShellRobots makes a sync RPC call, so use sparingly
 const initialState: DiscoveryState = {
