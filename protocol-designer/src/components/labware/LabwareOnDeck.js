@@ -16,6 +16,8 @@ import ClickableText from './ClickableText'
 import SelectablePlate from '../../containers/SelectablePlate.js'
 import NameThisLabwareOverlay from './NameThisLabwareOverlay.js'
 import DisabledSelectSlotOverlay from './DisabledSelectSlotOverlay.js'
+import BrowseLabwareOverlay from './BrowseLabwareOverlay.js'
+import {type TerminalItemId, START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID} from '../../steplist'
 
 function LabwareDeckSlotOverlay ({
   canAddIngreds,
@@ -123,7 +125,7 @@ type LabwareOnDeckProps = {
 
   addLabwareMode: boolean,
   canAddIngreds: boolean,
-  deckSetupMode: boolean,
+  selectedTerminalItem: ?TerminalItemId,
   moveLabwareMode: boolean,
 
   addLabware: () => mixed,
@@ -165,7 +167,7 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
 
       addLabwareMode,
       canAddIngreds,
-      deckSetupMode,
+      selectedTerminalItem,
       moveLabwareMode,
 
       addLabware,
@@ -183,7 +185,7 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
 
     // determine what overlay to show
     let overlay = null
-    if (deckSetupMode && !addLabwareMode) {
+    if (selectedTerminalItem === START_TERMINAL_ITEM_ID && !addLabwareMode) {
       if (moveLabwareMode) {
         overlay = (slotToMoveFrom === slot)
           ? <DisabledSelectSlotOverlay
@@ -204,10 +206,10 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
             editLiquids,
             moveLabwareSource,
           }} />
-          : <EmptyDeckSlotOverlay {...{
-            addLabware,
-          }} />
+          : <EmptyDeckSlotOverlay {...{addLabware}} />
       }
+    } else if (selectedTerminalItem === END_TERMINAL_ITEM_ID) {
+      overlay = <BrowseLabwareOverlay />
     }
 
     const labwareOrSlot = (slotHasLabware)

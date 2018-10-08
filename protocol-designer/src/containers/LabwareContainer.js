@@ -11,6 +11,7 @@ import {
   modifyContainer,
 
   openAddLabwareModal,
+  drillDownLabware,
 
   setMoveLabwareMode,
   moveLabware,
@@ -54,7 +55,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const selectedContainer = selectors.getSelectedContainer(state)
   const isSelectedSlot = !!(selectedContainer && selectedContainer.slot === slot)
 
-  const deckSetupMode = steplistSelectors.getSelectedTerminalItemId(state) === START_TERMINAL_ITEM_ID
+  const selectedTerminalItem = steplistSelectors.getSelectedTerminalItemId(state)
   const labwareHasName = container && selectors.getSavedLabware(state)[containerId]
   const isTiprack = getIsTiprack(containerType)
   const showNameOverlay = container && !isTiprack && !labwareHasName
@@ -89,13 +90,13 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 
     showNameOverlay,
     slotToMoveFrom,
-    highlighted: (deckSetupMode)
+    highlighted: selectedTerminalItem === START_TERMINAL_ITEM_ID
     // in deckSetupMode, labware is highlighted when selected (currently editing ingredients)
     // or when targeted by an open "Add Labware" modal
     ? (isSelectedSlot || selectors.selectedAddLabwareSlot(state) === slot)
     // outside of deckSetupMode, labware is highlighted when step/substep is hovered
     : steplistSelectors.hoveredStepLabware(state).includes(containerId),
-    deckSetupMode,
+    selectedTerminalItem,
 
     slot,
     containerName,
@@ -116,7 +117,7 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}, own
       window.confirm(`Are you sure you want to permanently delete ${containerName || containerType} in slot ${slot}?`) &&
       dispatch(deleteContainer({containerId, slot, containerType}))
     ),
-
+    drillDownLabware: () => dispatch(drillDownLabware(containerId)),
     cancelMove: () => dispatch(setMoveLabwareMode()),
     moveLabwareDestination: () => dispatch(moveLabware(slot)),
     moveLabwareSource: () => dispatch(setMoveLabwareMode(slot)),

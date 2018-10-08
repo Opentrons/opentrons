@@ -81,6 +81,12 @@ const renameLabwareFormMode = handleActions({
   EDIT_MODE_INGREDIENT_GROUP: () => false,
 }, false)
 
+type DrillDownLabwareId = string | null
+const drillDownLabwareId = handleActions({
+  DRILL_DOWN_ON_LABWARE: (state, action: ActionType<typeof actions.drillDownOnLabware>): DrillDownLabwareId => action.payload,
+  DRILL_UP_FROM_LABWARE: (state, action: ActionType<typeof actions.drillUpFromLabware>): DrillDownLabwareId => null,
+}, null)
+
 type ContainersState = {
   [id: string]: ?Labware,
 }
@@ -264,6 +270,7 @@ export type RootState = {|
   modeLabwareSelection: ?DeckSlot,
   moveLabwareMode: ?DeckSlot,
   selectedContainerId: SelectedContainerId,
+  drillDownLabwareId: DrillDownLabwareId,
   containers: ContainersState,
   savedLabware: SavedLabwareState,
   ingredients: IngredientsState,
@@ -276,6 +283,7 @@ const rootReducer = combineReducers({
   modeLabwareSelection,
   moveLabwareMode,
   selectedContainerId,
+  drillDownLabwareId,
   containers,
   savedLabware,
   ingredients,
@@ -379,6 +387,11 @@ const getSelectedContainer: Selector<?Labware> = createSelector(
   (_selectedId, _labware) => (_selectedId && _labware[_selectedId]) || null
 )
 
+const getDrillDownLabwareId: Selector<DrillDownLabwareId> = createSelector(
+  rootSelector,
+  rootState => rootState.drillDownLabwareId
+)
+
 type ContainersBySlot = { [DeckSlot]: {...Labware, containerId: string} }
 
 const containersBySlot: Selector<ContainersBySlot> = createSelector(
@@ -461,6 +474,7 @@ export const selectors = {
   getSavedLabware,
   getSelectedContainer,
   getSelectedContainerId,
+  getDrillDownLabwareId,
 
   activeModals,
   getRenameLabwareFormMode,

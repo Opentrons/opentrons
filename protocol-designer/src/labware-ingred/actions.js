@@ -39,6 +39,13 @@ export const closeIngredientSelector = createAction(
   () => {}
 )
 
+// ===== Drill Down on Labware ====
+
+export const drillDownOnLabware = createAction(
+  'DRILL_DOWN_ON_LABWARE',
+  (labwareId: string) => labwareId
+)
+
 // =====
 
 export const editModeIngredientGroup = createAction(
