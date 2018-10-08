@@ -3,12 +3,11 @@ import * as React from 'react'
 import reduce from 'lodash/reduce'
 import map from 'lodash/map'
 import {
-  swatchColors,
   LabwareLabels,
-  MIXED_WELL_COLOR,
   type Channels,
   LabwareOutline,
   Well,
+  ingredIdsToColor,
 } from '@opentrons/components'
 
 import {getWellDefsForSVG} from '@opentrons/shared-data'
@@ -29,13 +28,6 @@ export type Props = {
   deselectWells: (Wells) => mixed,
   updateHighlightedWells: (Wells) => mixed,
   pipetteChannels?: ?Channels,
-}
-
-// TODO Ian 2018-07-20: make sure '__air__' or other pseudo-ingredients don't get in here
-function getFillColor (groupIds: Array<string>): ?string {
-  if (groupIds.length === 0) return null
-  if (groupIds.length === 1) return swatchColors(Number(groupIds[0]))
-  return MIXED_WELL_COLOR
 }
 
 class SelectableLabware extends React.Component<Props> {
@@ -122,7 +114,7 @@ class SelectableLabware extends React.Component<Props> {
               onMouseLeave={this.handleMouseExitWell}
               highlighted={Object.keys(highlightedWells).includes(wellName)}
               selected={selectedWellSets.includes(wellName)}
-              fillColor={getFillColor(well.groupIds)}
+              fillColor={ingredIdsToColor(well.groupIds)}
               svgOffset={{x: 1, y: -3}}
               wellDef={allWellDefsByName[wellName]} />
           ))}

@@ -46,6 +46,11 @@ export const drillDownOnLabware = createAction(
   (labwareId: string) => labwareId
 )
 
+export const drillUpFromLabware = createAction(
+  'DRILL_UP_FROM_LABWARE',
+  () => {}
+)
+
 // =====
 
 export const editModeIngredientGroup = createAction(

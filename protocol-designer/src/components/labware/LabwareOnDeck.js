@@ -130,6 +130,8 @@ type LabwareOnDeckProps = {
 
   addLabware: () => mixed,
   editLiquids: () => mixed,
+  drillDown: () => mixed,
+  drillUp: () => mixed,
   deleteLabware: () => mixed,
 
   cancelMove: () => mixed,
@@ -140,6 +142,8 @@ type LabwareOnDeckProps = {
   setLabwareName: (name: ?string) => mixed,
   setDefaultLabwareName: () => mixed,
 }
+
+// TODO: BC 2018-10-08 move these connections to lower lever components
 class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
   shouldComponentUpdate (nextProps: LabwareOnDeckProps) {
     const shouldAlwaysUpdate = this.props.addLabwareMode ||
@@ -169,6 +173,8 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
       canAddIngreds,
       selectedTerminalItem,
       moveLabwareMode,
+      drillDown,
+      drillUp,
 
       addLabware,
       editLiquids,
@@ -209,7 +215,7 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
           : <EmptyDeckSlotOverlay {...{addLabware}} />
       }
     } else if (selectedTerminalItem === END_TERMINAL_ITEM_ID) {
-      overlay = <BrowseLabwareOverlay />
+      overlay = <BrowseLabwareOverlay drillDown={drillDown} drillUp={drillUp} />
     }
 
     const labwareOrSlot = (slotHasLabware)

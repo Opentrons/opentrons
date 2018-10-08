@@ -11,7 +11,8 @@ import {
   modifyContainer,
 
   openAddLabwareModal,
-  drillDownLabware,
+  drillDownOnLabware,
+  drillUpFromLabware,
 
   setMoveLabwareMode,
   moveLabware,
@@ -117,7 +118,8 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}, own
       window.confirm(`Are you sure you want to permanently delete ${containerName || containerType} in slot ${slot}?`) &&
       dispatch(deleteContainer({containerId, slot, containerType}))
     ),
-    drillDownLabware: () => dispatch(drillDownLabware(containerId)),
+    drillDown: () => dispatch(drillDownOnLabware(containerId)),
+    drillUp: () => dispatch(drillUpFromLabware()),
     cancelMove: () => dispatch(setMoveLabwareMode()),
     moveLabwareDestination: () => dispatch(moveLabware(slot)),
     moveLabwareSource: () => dispatch(setMoveLabwareMode(slot)),

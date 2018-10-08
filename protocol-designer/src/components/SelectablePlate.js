@@ -8,13 +8,12 @@ import {
   getIsTiprack,
 } from '@opentrons/shared-data'
 import {
-  swatchColors,
   Labware,
   Well,
   Tip,
   LabwareOutline,
   LabwareLabels,
-  MIXED_WELL_COLOR,
+  ingredIdsToColor,
   type Channels,
 } from '@opentrons/components'
 
@@ -41,19 +40,6 @@ export type Props = {
   // used by container
   containerId: string,
   pipetteChannels?: ?Channels,
-}
-
-// TODO Ian 2018-07-20: make sure '__air__' or other pseudo-ingredients don't get in here
-function getFillColor (groupIds: Array<string>): ?string {
-  if (groupIds.length === 0) {
-    return null
-  }
-
-  if (groupIds.length === 1) {
-    return swatchColors(Number(groupIds[0]))
-  }
-
-  return MIXED_WELL_COLOR
 }
 
 // TODO: BC 2018-10-08 for disconnect hover and select in the IngredSelectionModal from
@@ -102,7 +88,7 @@ export default function SelectablePlate (props: Props) {
                 wellName={wellName}
                 highlighted={well.highlighted}
                 selected={well.selected}
-                fillColor={getFillColor(well.groupIds)}
+                fillColor={ingredIdsToColor(well.groupIds)}
                 svgOffset={{x: 1, y: -3}}
                 wellDef={allWellDefsByName[wellName]} />
             )
@@ -122,7 +108,7 @@ export default function SelectablePlate (props: Props) {
         selected: well.selected,
         error: well.error,
         maxVolume: well.maxVolume,
-        fillColor: getFillColor(well.groupIds),
+        fillColor: ingredIdsToColor(well.groupIds),
       }
     }
 

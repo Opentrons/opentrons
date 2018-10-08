@@ -8,10 +8,12 @@ import styles from './Deck.css'
 import IngredientSelectionModal from '../components/IngredientSelectionModal.js'
 import LabwareContainer from '../containers/LabwareContainer.js'
 import LabwareSelectionModal from '../components/LabwareSelectionModal'
+import BrowseLabwareModal from '../components/labware/BrowseLabwareModal'
 
 import {selectors} from '../labware-ingred/reducers'
 import * as actions from '../labware-ingred/actions'
 import {selectors as steplistSelectors, START_TERMINAL_ITEM_ID} from '../steplist'
+
 import type {BaseState, ThunkDispatch} from '../types'
 
 const ingredSelModIsVisible = activeModals => activeModals.ingredientSelection && activeModals.ingredientSelection.slot
@@ -34,18 +36,22 @@ const mapStateToProps = (state: BaseState): StateProps => ({
   ),
   // TODO SOON remove all uses of the `activeModals` selector
   ingredSelectionMode: !!ingredSelModIsVisible(selectors.activeModals(state)),
+  drilledDown: !!selectors.getDrillDownLabwareId(state),
   _moveLabwareMode: !!selectors.slotToMoveFrom(state),
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DispatchProps => ({
   cancelMoveLabwareMode: () => dispatch(actions.setMoveLabwareMode()),
+  drillUpFromLabware: () => dispatch(actions.drillUpFromLabware()),
 })
 
 const mergeProps = (stateProps: StateProps, dispatchProps: DispatchProps): Props => ({
   deckSetupMode: stateProps.deckSetupMode,
   ingredSelectionMode: stateProps.ingredSelectionMode,
-  cancelMoveLabwareMode: () => {
+  drilledDown: stateProps.drilledDown,
+  handleClickOutside: () => {
     if (stateProps._moveLabwareMode) dispatchProps.cancelMoveLabwareMode()
+    if (stateProps.drilledDown) dispatchProps.drillUpFromLabware()
   },
 })
 
@@ -53,7 +59,8 @@ const mergeProps = (stateProps: StateProps, dispatchProps: DispatchProps): Props
 class DeckSetup extends React.Component<Props> {
   renderDeck = () => (
     <div className={styles.deck_row}>
-      <ClickOutside onClickOutside={this.props.cancelMoveLabwareMode}>
+      {this.props.drilledDown && <BrowseLabwareModal />}
+      <ClickOutside onClickOutside={this.props.handleClickOutside}>
         {({ref}) => (
           <div ref={ref}>
             <Deck LabwareComponent={LabwareContainer} className={styles.deck} />
