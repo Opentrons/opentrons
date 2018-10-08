@@ -6,7 +6,7 @@ type Props = {children: React.Node}
 
 type State = {hasRoot: boolean}
 
-const PORTAL_ROOT_ID = '__main-modal-portal-root'
+const PORTAL_ROOT_ID = '__otAppModalPortalRoot'
 const getPortalRoot = () => global.document.getElementById(PORTAL_ROOT_ID)
 
 export function PortalRoot () {
