@@ -72,8 +72,9 @@ export function getDiscoveredRobotsByName (state: State) {
 
 type UnreachableSelector = OutputSelector<State, void, Array<UnreachableRobot>>
 
-const serviceUnreachable = (service: Service) =>
-  !service.ip || (!service.advertising && !service.ok && !service.serverOk)
+const serviceUnreachable = (service: Service) => !service.ip || !service.ok
+// TODO(mc, 2018-10-08): check advertising and serverOk flags
+// !service.ip || (!service.advertising && !service.ok && !service.serverOk)
 
 const robotUnreachable = (robot: Array<Service>) =>
   robot.every(serviceUnreachable)
