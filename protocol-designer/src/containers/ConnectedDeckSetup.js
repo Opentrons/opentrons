@@ -22,6 +22,11 @@ type StateProps = {
   ingredSelectionMode: boolean,
 }
 type DispatchProps = {cancelMoveLabwareMode: () => mixed}
+type Props = {
+  deckSetupMode: boolean,
+  ingredSelectionMode: boolean,
+  cancelMoveLabwareMode: () => void,
+}
 
 const mapStateToProps = (state: BaseState): StateProps => ({
   deckSetupMode: (
@@ -29,14 +34,23 @@ const mapStateToProps = (state: BaseState): StateProps => ({
   ),
   // TODO SOON remove all uses of the `activeModals` selector
   ingredSelectionMode: !!ingredSelModIsVisible(selectors.activeModals(state)),
+  _moveLabwareMode: !!selectors.slotToMoveFrom(state),
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DispatchProps => ({
   cancelMoveLabwareMode: () => dispatch(actions.setMoveLabwareMode()),
 })
 
+const mergeProps = (stateProps: StateProps, dispatchProps: DispatchProps): Props => ({
+  deckSetupMode: stateProps.deckSetupMode,
+  ingredSelectionMode: stateProps.ingredSelectionMode,
+  cancelMoveLabwareMode: () => {
+    if (stateProps._moveLabwareMode) dispatchProps.cancelMoveLabwareMode()
+  },
+})
+
 // TODO Ian 2018-02-16 this will be broken apart and incorporated into ProtocolEditor
-class DeckSetup extends React.Component<StateProps & DispatchProps> {
+class DeckSetup extends React.Component<Props> {
   renderDeck = () => (
     <div className={styles.deck_row}>
       <ClickOutside onClickOutside={this.props.cancelMoveLabwareMode}>
@@ -73,4 +87,4 @@ class DeckSetup extends React.Component<StateProps & DispatchProps> {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(DeckSetup)
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(DeckSetup)
