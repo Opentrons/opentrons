@@ -1,5 +1,7 @@
 // @flow
 import get from 'lodash/get'
+import assert from 'assert'
+import type {Store} from 'redux'
 
 export function rehydratePersistedAction (): {type: 'REHYDRATE_PERSISTED'} {
   return {type: 'REHYDRATE_PERSISTED'}
@@ -15,7 +17,7 @@ const PERSISTED_PATHS = [
 ]
 
 /** Subscribe this fn to the Redux store to persist selected substates */
-export const makePersistSubscriber = (store: *) => (): void => {
+export const makePersistSubscriber = (store: Store<*, *>) => (): void => {
   const currentPersistedStatesByPath = {}
   const state = store.getState()
   PERSISTED_PATHS.forEach(path => {
@@ -35,10 +37,11 @@ export const makePersistSubscriber = (store: *) => (): void => {
   * If there's no persisted state, defaults to the given `initialState`.
   * The `path` should match where the reducer lives in the Redux state tree
   */
-export function rehydrate (path: string, initialState: any) {
-  if (!PERSISTED_PATHS.includes(path)) {
-    console.error(`Path "${path}" is missing from PERSISTED_PATHS! The changes to this reducer will not be persisted.`)
-  }
+export function rehydrate<S> (path: string, initialState: S): S {
+  assert(
+    PERSISTED_PATHS.includes(path),
+    `Path "${path}" is missing from PERSISTED_PATHS! The changes to this reducer will not be persisted.`
+  )
   const persisted = global.localStorage.getItem(_addStoragePrefix(path))
   return persisted ? JSON.parse(persisted) : initialState
 }
