@@ -124,7 +124,7 @@ class Labware:
         self._wells = definition['wells']
         offset = definition['cornerOffsetFromSlot']
         self._offset = Point(x=offset['x'], y=offset['y'], z=offset['z'])
-        self._pattern = re.compile(r'^([A-Z]+)([1-9]+)$', re.X)
+        self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
 
     def wells(self) -> List[Well]:
         """

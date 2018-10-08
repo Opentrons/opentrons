@@ -105,6 +105,14 @@ def test_labware_init():
     assert fakeLabware._offset == Point(x=10, y=10, z=5)
 
 
+def test_well_pattern():
+    deck = Point(0, 0, 0)
+    fakeLabware = labware.Labware(minimalLabwareDef, deck)
+    assert fakeLabware._pattern.match('A1')
+    assert fakeLabware._pattern.match('A10')
+    assert not fakeLabware._pattern.match('A0')
+
+
 def test_wells_accessor():
     deck = Point(0, 0, 0)
     fakeLabware = labware.Labware(minimalLabwareDef, deck)
