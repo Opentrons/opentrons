@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 
-import TimelineAlerts from '../components/steplist/TimelineAlerts'
+import TimelineAlerts from '../components/alerts/TimelineAlerts'
 import Hints from '../components/Hints'
 import ConnectedMoreOptionsModal from '../containers/ConnectedMoreOptionsModal'
 import ConnectedNav from '../containers/ConnectedNav'
@@ -12,6 +12,7 @@ import ConnectedMainPanel from '../containers/ConnectedMainPanel'
 import ConnectedNewFileModal from '../containers/ConnectedNewFileModal'
 import ConnectedWellSelectionModal from '../containers/ConnectedWellSelectionModal'
 import FileUploadErrorModal from './modals/FileUploadErrorModal'
+import AnalyticsModal from './modals/AnalyticsModal'
 import {PortalRoot as MainPageModalPortalRoot} from '../components/portals/MainPageModalPortal'
 
 import styles from './ProtocolEditor.css'
@@ -34,6 +35,7 @@ export default function ProtocolEditor () {
           <Hints />
 
           <div className={styles.main_page_content}>
+            <AnalyticsModal />
             <ConnectedNewFileModal />
             <ConnectedMoreOptionsModal />
             <ConnectedWellSelectionModal />

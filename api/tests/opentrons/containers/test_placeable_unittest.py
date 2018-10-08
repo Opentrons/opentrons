@@ -1,13 +1,16 @@
 import unittest
 import math
 
-from opentrons.containers.placeable import (
+from opentrons.legacy_api.containers.placeable import (
     Container,
     Well,
     Deck,
     Slot)
 from opentrons.util.vector import Vector
 from tests.opentrons import generate_plate
+# TODO: Remove `generate_plate` and use JS generated data or redesign as
+# TODO: property tests
+# TODO: Modify all calls to get a Well to use the `wells`/`rows` methods
 
 
 class PlaceableTestCase(unittest.TestCase):
@@ -25,7 +28,7 @@ class PlaceableTestCase(unittest.TestCase):
                     print(w2)
                     assert False
         else:
-            self.assertEquals(w1, w2)
+            self.assertEqual(w1, w2)
 
     def test_get_name(self):
         c = generate_plate(4, 2, (5, 5), (0, 0), 5)

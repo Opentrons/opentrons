@@ -6,8 +6,7 @@ import type {
   Slot,
   Axis,
   Direction,
-  ProtocolFile,
-  SessionUpdate
+  SessionUpdate,
 } from './types'
 
 // TODO(mc, 2017-11-22): rename this function to actionType
@@ -19,10 +18,10 @@ type Error = {message: string}
 export type ConnectAction = {|
   type: 'robot:CONNECT',
   payload: {|
-    name: string
+    name: string,
   |},
   meta: {|
-    robotCommand: true
+    robotCommand: true,
   |},
 |}
 
@@ -37,8 +36,8 @@ export type ConnectResponseAction = {|
 export type ReturnTipResponseAction = {|
   type: 'robot:RETURN_TIP_RESPONSE',
   payload: {|
-    error: ?{message: string}
-  |}
+    error: ?{message: string},
+  |},
 |}
 
 export type ClearConnectResponseAction = {|
@@ -48,7 +47,7 @@ export type ClearConnectResponseAction = {|
 export type DisconnectAction = {|
   type: 'robot:DISCONNECT',
   meta: {|
-    robotCommand: true
+    robotCommand: true,
   |},
 |}
 
@@ -63,7 +62,7 @@ export type UnexpectedDisconnectAction = {|
 
 export type ConfirmProbedAction = {|
   type: 'robot:CONFIRM_PROBED',
-  payload: Mount
+  payload: Mount,
 |}
 
 export type PipetteCalibrationAction = {|
@@ -74,11 +73,11 @@ export type PipetteCalibrationAction = {|
     mount: Mount,
     axis?: Axis,
     direction?: Direction,
-    step?: number
+    step?: number,
   |},
   meta: {|
-    robotCommand: true
-  |}
+    robotCommand: true,
+  |},
 |}
 
 export type SetJogDistanceAction = {|
@@ -97,11 +96,11 @@ export type LabwareCalibrationAction = {|
   ),
   payload: {|
     mount: Mount,
-    slot: Slot
+    slot: Slot,
   |},
   meta: {|
-    robotCommand: true
-  |}
+    robotCommand: true,
+  |},
 |}
 
 export type CalibrationSuccessAction = {
@@ -116,8 +115,8 @@ export type CalibrationSuccessAction = {
   ),
   payload: {
     isTiprack?: boolean,
-    tipOn?: boolean
-  }
+    tipOn?: boolean,
+  },
 }
 
 export type CalibrationFailureAction = {|
@@ -131,7 +130,21 @@ export type CalibrationFailureAction = {|
     | 'robot:RETURN_TIP_FAILURE'
   ),
   error: true,
-  payload: Error
+  payload: Error,
+|}
+
+export type SessionResponseAction = {|
+  type: 'robot:SESSION_RESPONSE',
+  // TODO(mc, 2018-09-06): this payload is incomplete
+  payload: {|
+    name: string,
+    protocolText: string,
+  |},
+|}
+
+export type SessionErrorAction = {|
+  type: 'robot:SESSION_ERROR',
+  payload: {|error: Error|},
 |}
 
 export type SessionUpdateAction = {|
@@ -142,7 +155,7 @@ export type SessionUpdateAction = {|
 export type RefreshSessionAction = {|
   type: 'robot:REFRESH_SESSION',
   meta: {|
-    robotCommand: true
+    robotCommand: true,
   |},
 |}
 
@@ -152,16 +165,12 @@ export type CalibrationResponseAction =
 
 export type SetModulesReviewedAction = {
   type: 'robot:SET_MODULES_REVIEWED',
-  payload: boolean
+  payload: boolean,
 }
 
 // TODO(mc, 2018-01-23): refactor to use type above
 //   DO NOT ADD NEW ACTIONS HERE
 export const actionTypes = {
-  // protocol loading
-  SESSION: makeRobotActionName('SESSION'),
-  SESSION_RESPONSE: makeRobotActionName('SESSION_RESPONSE'),
-
   // calibration
   SET_DECK_POPULATED: makeRobotActionName('SET_DECK_POPULATED'),
   // TODO(mc, 2018-01-10): rename MOVE_TO_FRONT to PREPARE_TO_PROBE?
@@ -184,7 +193,7 @@ export const actionTypes = {
   CANCEL: makeRobotActionName('CANCEL'),
   CANCEL_RESPONSE: makeRobotActionName('CANCEL_RESPONSE'),
 
-  TICK_RUN_TIME: makeRobotActionName('TICK_RUN_TIME')
+  TICK_RUN_TIME: makeRobotActionName('TICK_RUN_TIME'),
 }
 
 // TODO(mc, 2018-01-23): NEW ACTION TYPES GO HERE
@@ -202,6 +211,8 @@ export type Action =
   | CalibrationFailureAction
   | ReturnTipResponseAction
   | SetJogDistanceAction
+  | SessionResponseAction
+  | SessionErrorAction
   | SessionUpdateAction
   | RefreshSessionAction
   | SetModulesReviewedAction
@@ -211,14 +222,14 @@ export const actions = {
     return {
       type: 'robot:CONNECT',
       payload: {name},
-      meta: {robotCommand: true}
+      meta: {robotCommand: true},
     }
   },
 
   connectResponse (error: ?Error, pollHealth: ?boolean): ConnectResponseAction {
     return {
       type: 'robot:CONNECT_RESPONSE',
-      payload: {error, pollHealth}
+      payload: {error, pollHealth},
     }
   },
 
@@ -233,7 +244,7 @@ export const actions = {
   disconnectResponse (): DisconnectResponseAction {
     return {
       type: 'robot:DISCONNECT_RESPONSE',
-      payload: {}
+      payload: {},
     }
   },
 
@@ -241,28 +252,20 @@ export const actions = {
     return {type: 'robot:UNEXPECTED_DISCONNECT'}
   },
 
-  // make new session with protocol file
-  session (file: ProtocolFile) {
-    return tagForRobotApi({type: actionTypes.SESSION, payload: {file}})
-  },
+  sessionResponse (
+    error: ?Error,
+    // TODO(mc, 2018-01-23): type Session (see reducers/session.js)
+    session: any
+  ): SessionResponseAction | SessionErrorAction {
+    if (error) return {type: 'robot:SESSION_ERROR', payload: {error}}
 
-  // TODO(mc, 2018-01-23): type Session (see reducers/session.js)
-  sessionResponse (error: ?Error, session: any) {
-    const didError = error != null
-
-    return {
-      type: actionTypes.SESSION_RESPONSE,
-      error: didError,
-      payload: !didError
-        ? session
-        : error
-    }
+    return {type: 'robot:SESSION_RESPONSE', payload: session}
   },
 
   sessionUpdate (update: SessionUpdate): SessionUpdateAction {
     return {
       type: 'robot:SESSION_UPDATE',
-      payload: update
+      payload: update,
     }
   },
 
@@ -279,7 +282,7 @@ export const actions = {
     return {
       type: 'robot:PICKUP_AND_HOME',
       payload: {mount, slot},
-      meta: {robotCommand: true}
+      meta: {robotCommand: true},
     }
   },
 
@@ -289,13 +292,13 @@ export const actions = {
       return {
         type: 'robot:PICKUP_AND_HOME_FAILURE',
         error: true,
-        payload: error
+        payload: error,
       }
     }
 
     return {
       type: 'robot:PICKUP_AND_HOME_SUCCESS',
-      payload: {}
+      payload: {},
     }
   },
 
@@ -304,7 +307,7 @@ export const actions = {
     return {
       type: 'robot:DROP_TIP_AND_HOME',
       payload: {mount, slot},
-      meta: {robotCommand: true}
+      meta: {robotCommand: true},
     }
   },
 
@@ -314,13 +317,13 @@ export const actions = {
       return {
         type: 'robot:DROP_TIP_AND_HOME_FAILURE',
         error: true,
-        payload: error
+        payload: error,
       }
     }
 
     return {
       type: 'robot:DROP_TIP_AND_HOME_SUCCESS',
-      payload: {}
+      payload: {},
     }
   },
 
@@ -329,7 +332,7 @@ export const actions = {
     return {
       type: 'robot:CONFIRM_TIPRACK',
       payload: {mount, slot},
-      meta: {robotCommand: true}
+      meta: {robotCommand: true},
     }
   },
 
@@ -343,27 +346,27 @@ export const actions = {
       return {
         type: 'robot:CONFIRM_TIPRACK_FAILURE',
         error: true,
-        payload: error
+        payload: error,
       }
     }
 
     return {
       type: 'robot:CONFIRM_TIPRACK_SUCCESS',
-      payload: {tipOn}
+      payload: {tipOn},
     }
   },
 
   moveToFront (mount: Mount) {
     return tagForRobotApi({
       type: actionTypes.MOVE_TO_FRONT,
-      payload: {mount}
+      payload: {mount},
     })
   },
 
   moveToFrontResponse (error: ?Error = null) {
     const action: {type: string, error: boolean, payload?: Error} = {
       type: actionTypes.MOVE_TO_FRONT_RESPONSE,
-      error: error != null
+      error: error != null,
     }
     if (error) action.payload = error
 
@@ -377,7 +380,7 @@ export const actions = {
   probeTipResponse (error: ?Error = null) {
     const action: {type: string, error: boolean, payload?: Error} = {
       type: actionTypes.PROBE_TIP_RESPONSE,
-      error: error != null
+      error: error != null,
     }
     if (error) action.payload = error
 
@@ -395,7 +398,7 @@ export const actions = {
   returnTipResponse (error: ?Error = null) {
     const action: {type: string, error: boolean, payload?: Error} = {
       type: actionTypes.RETURN_TIP_RESPONSE,
-      error: error != null
+      error: error != null,
     }
     if (error) action.payload = error
 
@@ -406,7 +409,7 @@ export const actions = {
     return {
       type: 'robot:MOVE_TO',
       payload: {mount, slot},
-      meta: {robotCommand: true}
+      meta: {robotCommand: true},
     }
   },
 
@@ -415,7 +418,7 @@ export const actions = {
       return {
         type: 'robot:MOVE_TO_FAILURE',
         error: true,
-        payload: error
+        payload: error,
       }
     }
 
@@ -435,7 +438,7 @@ export const actions = {
     return {
       type: 'robot:JOG',
       payload: {mount, axis, direction, step},
-      meta: {robotCommand: true}
+      meta: {robotCommand: true},
     }
   },
 
@@ -444,7 +447,7 @@ export const actions = {
       return {
         type: 'robot:JOG_FAILURE',
         error: true,
-        payload: error
+        payload: error,
       }
     }
 
@@ -456,7 +459,7 @@ export const actions = {
     return {
       type: 'robot:UPDATE_OFFSET',
       payload: {mount, slot},
-      meta: {robotCommand: true}
+      meta: {robotCommand: true},
     }
   },
 
@@ -466,13 +469,13 @@ export const actions = {
       return {
         type: 'robot:UPDATE_OFFSET_FAILURE',
         error: true,
-        payload: error
+        payload: error,
       }
     }
 
     return {
       type: 'robot:UPDATE_OFFSET_SUCCESS',
-      payload: {}
+      payload: {},
     }
   },
 
@@ -487,7 +490,7 @@ export const actions = {
   runResponse (error: ?Error = null) {
     const action: {type: string, error: boolean, payload?: Error} = {
       type: actionTypes.RUN_RESPONSE,
-      error: error != null
+      error: error != null,
     }
     if (error) action.payload = error
 
@@ -501,7 +504,7 @@ export const actions = {
   pauseResponse (error: ?Error = null) {
     const action: {type: string, error: boolean, payload?: Error} = {
       type: actionTypes.PAUSE_RESPONSE,
-      error: error != null
+      error: error != null,
     }
     if (error) action.payload = error
 
@@ -515,7 +518,7 @@ export const actions = {
   resumeResponse (error: ?Error = null) {
     const action: {type: string, error: boolean, payload?: Error} = {
       type: actionTypes.RESUME_RESPONSE,
-      error: error != null
+      error: error != null,
     }
     if (error) action.payload = error
 
@@ -529,7 +532,7 @@ export const actions = {
   cancelResponse (error: ?Error = null) {
     const action: {type: string, error: boolean, payload?: Error} = {
       type: actionTypes.CANCEL_RESPONSE,
-      error: error != null
+      error: error != null,
     }
     if (error) action.payload = error
 
@@ -542,5 +545,5 @@ export const actions = {
 
   tickRunTime () {
     return {type: actionTypes.TICK_RUN_TIME}
-  }
+  },
 }

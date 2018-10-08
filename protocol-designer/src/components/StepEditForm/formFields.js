@@ -7,7 +7,7 @@ import {
   InputField,
   DropdownField,
   RadioGroup,
-  type DropdownOption
+  type DropdownOption,
 } from '@opentrons/components'
 import i18n from '../../localization'
 import {selectors as pipetteSelectors} from '../../pipettes'
@@ -16,6 +16,7 @@ import {actions} from '../../steplist'
 import {hydrateField} from '../../steplist/fieldLevel'
 import type {StepFieldName} from '../../steplist/fieldLevel'
 import {DISPOSAL_PERCENTAGE} from '../../steplist/formLevel/warnings'
+import {SOURCE_WELL_DISPOSAL_DESTINATION} from '../../steplist/formLevel/stepFormToArgs/transferLikeFormToArgs'
 import type {ChangeTipOptions} from '../../step-generation/types'
 import type {BaseState, ThunkDispatch} from '../../types'
 import type {StepType} from '../../form-types'
@@ -73,7 +74,7 @@ export const StepInputField = (props: StepInputFieldProps & React.ElementProps<t
 
 type StepRadioGroupProps = {
   name: StepFieldName,
-  options: $PropertyType<React.ElementProps<typeof RadioGroup>, 'options'>
+  options: $PropertyType<React.ElementProps<typeof RadioGroup>, 'options'>,
 } & FocusHandlers
 export const StepRadioGroup = (props: StepRadioGroupProps) => {
   const {name, onFieldFocus, onFieldBlur, focusedField, dirtyFields, ...radioGroupProps} = props
@@ -121,12 +122,12 @@ type PipetteFieldDP = {updateDisposalVolume: (?mixed) => void}
 type PipetteFieldProps = PipetteFieldOP & PipetteFieldSP & PipetteFieldDP
 const PipetteFieldSTP = (state: BaseState, ownProps: PipetteFieldOP): PipetteFieldSP => ({
   pipetteOptions: pipetteSelectors.equippedPipetteOptions(state),
-  getHydratedPipette: (value) => hydrateField(state, ownProps.name, value)
+  getHydratedPipette: (value) => hydrateField(state, ownProps.name, value),
 })
 const PipetteFieldDTP = (dispatch: ThunkDispatch<*>): PipetteFieldDP => ({
   updateDisposalVolume: (disposalVolume: ?mixed) => {
     dispatch(actions.changeFormInput({update: {aspirate_disposalVol_volume: disposalVolume}}))
-  }
+  },
 })
 export const PipetteField = connect(PipetteFieldSTP, PipetteFieldDTP)((props: PipetteFieldProps) => (
   <StepField
@@ -153,10 +154,34 @@ export const PipetteField = connect(PipetteFieldSTP, PipetteFieldDTP)((props: Pi
     )} />
 ))
 
+type DisposalDestinationDropdownOP = {name: StepFieldName, className?: string} & FocusHandlers
+type DisposalDestinationDropdownSP = {options: Options}
+const DisposalDestinationDropdownSTP = (state: BaseState): DisposalDestinationDropdownSP => ({
+  options: labwareIngredSelectors.disposalLabwareOptions(state),
+})
+export const DisposalDestinationDropdown = connect(DisposalDestinationDropdownSTP)((props: DisposalDestinationDropdownOP & DisposalDestinationDropdownSP) => {
+  const {options, name, className, focusedField, dirtyFields, onFieldBlur, onFieldFocus} = props
+  return (
+    <StepField
+      name={name}
+      focusedField={focusedField}
+      dirtyFields={dirtyFields}
+      render={({value, updateValue}) => (
+        <DropdownField
+          className={className}
+          options={[...options, {name: 'Source Well', value: SOURCE_WELL_DISPOSAL_DESTINATION}]}
+          onBlur={() => { onFieldBlur(name) }}
+          onFocus={() => { onFieldFocus(name) }}
+          value={value ? String(value) : null}
+          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
+      )} />
+  )
+})
+
 type LabwareDropdownOP = {name: StepFieldName, className?: string} & FocusHandlers
 type LabwareDropdownSP = {labwareOptions: Options}
 const LabwareDropdownSTP = (state: BaseState): LabwareDropdownSP => ({
-  labwareOptions: labwareIngredSelectors.labwareOptions(state)
+  labwareOptions: labwareIngredSelectors.labwareOptions(state),
 })
 export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdownOP & LabwareDropdownSP) => {
   const {labwareOptions, name, className, focusedField, dirtyFields, onFieldBlur, onFieldFocus} = props
@@ -166,15 +191,24 @@ export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdo
       name={name}
       focusedField={focusedField}
       dirtyFields={dirtyFields}
-      render={({value, updateValue}) => (
-        <DropdownField
-          className={className}
-          options={labwareOptions}
-          onBlur={() => { onFieldBlur(name) }}
-          onFocus={() => { onFieldFocus(name) }}
-          value={value ? String(value) : null}
-          onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
-      )} />
+      render={({value, updateValue}) => {
+        // blank out the dropdown if labware id does not exist
+        const availableLabwareIds = labwareOptions.map(opt => opt.value)
+        const fieldValue = availableLabwareIds.includes(value)
+          ? String(value)
+          : null
+        return (
+          <DropdownField
+            className={className}
+            options={labwareOptions}
+            onBlur={() => { onFieldBlur(name) }}
+            onFocus={() => { onFieldFocus(name) }}
+            value={fieldValue}
+            onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } }
+          />
+        )
+      }}
+    />
   )
 })
 
@@ -186,7 +220,7 @@ export const ChangeTipField = (props: ChangeTipFieldProps) => {
   const {name, stepType} = props
   const options = CHANGE_TIP_VALUES.map((value) => ({
     value,
-    name: i18n.t(`step_edit_form.${stepType}.change_tip_option.${value}`)
+    name: i18n.t(`step_edit_form.${stepType}.change_tip_option.${value}`),
   }))
   return (
     <StepField

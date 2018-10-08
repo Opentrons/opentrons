@@ -73,7 +73,7 @@ Temperature Module
 **********
 
 Our temperature module acts as both a cooling and heating device. The range
-of temperatures this module can reach goes from -9 to 99 degrees celsius with a resolution of 3 decimal places.
+of temperatures this module can reach goes from 4 to 95 degrees celsius with a resolution of 1 degree celcius.
 
 
 The temperature module has the following methods that can be accessed during a protocol.
@@ -176,13 +176,14 @@ Magnetic Module
 
 The magnetic module has two actions:
 
-- engage: The magnetic stage rises to a default height unless otherwise specified
+- engage: The magnetic stage rises to a default height unless an *offset* or a custom *height* is specified
 - disengage: The magnetic stage moves down to its home position
 
-The magnetic module is currently compatible with normal PCR well plates. The magnets will default
-to an engaged height of about 4.3 mm from the bottom of the well. This is roughly 30% of the well depth.
-This engaged height has been tested for an elution volume of 40ul.
+The magnetic module api is currently fully compatible with the BioRad Hardshell 96-PCR (.2ml) well plates. The magnets will
+default to an engaged height of about 4.3 mm from the bottom of the well (or 18mm from magdeck home position). This is
+roughly 30% of the well depth. This engaged height has been tested for an elution volume of 40ul.
 
+You can also specify a custom engage height for the magnets so you can use a different labware with the magdeck.
 In the future, we will have adapters to support tuberacks as well as deep well plates.
 
 
@@ -193,20 +194,38 @@ Engage
     from opentrons import modules, labware
 
     module = modules.load('magdeck', slot)
-    plate = labware.load('96-flat', slot, share=True)
+    plate = labware.load('biorad-hardshell-96-PCR', slot, share=True)
 
     module.engage()
 
 If you deem that the default engage height is not ideal for your applications,
 you can include an offset in mm for the magnet to move to. The engage function
-will take in a value (positive or negative) to move the magnets from the **current**
-offset position.
+will take in a value (positive or negative) to offset the magnets from the **default** position.
 
-To move the magnets higher than the default position you would input a positive mm value such as:
-``module.engage(4)``
+To move the magnets higher than the default position you would specify a positive mm offset such as:
+``module.engage(offset=4)``
 
 To move the magnets lower than the default position you would input a negative mm value such as:
-``module.engage(-4)``
+``module.engage(offset=-4)``
+
+You can also use a custom height parameter with engage():
+
+.. code-block:: python
+
+    from opentrons import modules, labware
+
+    module = modules.load('magdeck', slot)
+    plate = labware.load('96-deep-well', slot, share=True)
+
+    module.engage(height=12)
+
+The height should be specified in mm from the magdeck home position (i.e. the position of magnets when power-cycled or
+disengaged)
+
+** Note **
+`engage()` and `engage(offset=y)` can only be used for labware that have default heights defined in the api. If your
+labware doesn't yet have a default height definition and your protocol uses either of those methods then you will get
+an error. Simply use the height parameter to provide a custom height for you labware in such a case.
 
 Disengage
 =========
@@ -215,7 +234,7 @@ Disengage
     from opentrons import modules, labware
 
     module = modules.load('magdeck', slot)
-    plate = labware.load('96-flat', slot, share=True)
+    plate = labware.load('biorad-hardshell-96-PCR', slot, share=True)
 
     module.engage()
     ## OTHER PROTOCOL ACTIONS

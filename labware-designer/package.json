@@ -1,0 +1,27 @@
+{
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Opentrons/opentrons.git"
+  },
+  "author": {
+    "name": "Opentrons Labworks",
+    "email": "engineering@opentrons.com"
+  },
+  "name": "labware-designer",
+  "private": true,
+  "version": "3.4.0",
+  "description": "Labware Designer",
+  "main": "src/index.js",
+  "bugs": {
+    "url": "https://github.com/Opentrons/opentrons/issues"
+  },
+  "homepage": "https://github.com/Opentrons/opentrons",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@opentrons/shared-data": "3.4.0"
+  },
+  "devDependencies": {
+    "flow-bin": "^0.82.0",
+    "flow-typed": "^2.5.1"
+  }
+}

@@ -5,6 +5,7 @@ import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import takeWhile from 'lodash/takeWhile'
 import uniqBy from 'lodash/uniqBy'
+import { getIsTiprack } from '@opentrons/shared-data'
 import type {BaseState, Selector} from '../../types'
 import {getAllWellsForLabware} from '../../constants'
 import * as StepGeneration from '../../step-generation'
@@ -29,29 +30,30 @@ export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> 
       acc: StepGeneration.LabwareLiquidState,
       labwareId
     ): StepGeneration.LabwareLiquidState => {
-      const allWells = getAllWellsForLabware(allLabware[labwareId].type)
+      const labwareType = allLabware[labwareId] && allLabware[labwareId].type
+      const allWells = labwareType ? getAllWellsForLabware(labwareType) : []
       const liquidStateForLabwareAllWells = allWells.reduce(
         (innerAcc: StepGeneration.SingleLabwareLiquidState, well) => ({
           ...innerAcc,
-          [well]: (ingredLocations[labwareId] && ingredLocations[labwareId][well]) || {}
+          [well]: (ingredLocations[labwareId] && ingredLocations[labwareId][well]) || {},
         }),
         {}
       )
       return {
         ...acc,
-        [labwareId]: liquidStateForLabwareAllWells
+        [labwareId]: liquidStateForLabwareAllWells,
       }
     }, {})
   }
 )
 
-function labwareConverter (labwareAppState: {[labwareId: string]: Labware}): {[labwareId: string]: StepGeneration.LabwareData} {
+function labwareConverter (labwareAppState: {[labwareId: string]: ?Labware}): {[labwareId: string]: StepGeneration.LabwareData} {
   // Convert internal PD labware objects into JSON spec labware objects
   // (just removes keys & makes flow happy)
   return mapValues(labwareAppState, (l: Labware): StepGeneration.LabwareData => ({
     name: l.name,
     type: l.type,
-    slot: l.slot
+    slot: l.slot,
   }))
 }
 
@@ -68,13 +70,12 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
     const tipracks: TiprackTipState = reduce(
       labware,
       (acc: TiprackTipState, labwareData: StepGeneration.LabwareData, labwareId: string) => {
-        // TODO Ian 2018-05-18 have a more robust way of designating labware types
-        // as tiprack or not
-        if (labwareData.type && labwareData.type.startsWith('tiprack')) {
+        const isTiprack = getIsTiprack(labwareData.type)
+        if (labwareData.type && isTiprack) {
           return {
             ...acc,
             // TODO LATER Ian 2018-05-18 use shared-data wells instead of assuming 96 tips?
-            [labwareId]: {...all96Tips}
+            [labwareId]: {...all96Tips},
           }
         }
         return acc
@@ -87,7 +88,7 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
       (acc: PipetteTipState, pipetteData: StepGeneration.PipetteData) =>
         ({
           ...acc,
-          [pipetteData.id]: false // start with no tips
+          [pipetteData.id]: false, // start with no tips
         }),
       {})
 
@@ -97,7 +98,7 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
         ...acc,
         [pipetteId]: (pipetteData.channels > 1)
           ? {'0': {}, '1': {}, '2': {}, '3': {}, '4': {}, '5': {}, '6': {}, '7': {}}
-          : {'0': {}}
+          : {'0': {}},
       }),
     {})
 
@@ -106,17 +107,16 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
       labware,
       tipState: {
         tipracks,
-        pipettes: pipetteTipState
+        pipettes: pipetteTipState,
       },
       liquidState: {
         pipettes: pipetteLiquidState,
-        labware: labwareLiquidState
-      }
+        labware: labwareLiquidState,
+      },
     }
   }
 )
-
-function commandCreatorsFromFormData (validatedForm: StepGeneration.CommandCreatorData) {
+function compoundCommandCreatorFromFormData (validatedForm: StepGeneration.CommandCreatorData): ?StepGeneration.CompoundCommandCreator {
   switch (validatedForm.stepType) {
     case 'consolidate':
       return StepGeneration.consolidate(validatedForm)
@@ -124,12 +124,11 @@ function commandCreatorsFromFormData (validatedForm: StepGeneration.CommandCreat
       return StepGeneration.transfer(validatedForm)
     case 'distribute':
       return StepGeneration.distribute(validatedForm)
-    case 'pause':
-      return StepGeneration.delay(validatedForm)
     case 'mix':
       return StepGeneration.mix(validatedForm)
+    default:
+      return null
   }
-  return null
 }
 
 // exposes errors and last valid robotState
@@ -152,9 +151,15 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
     const commandCreators = continuousValidForms.reduce(
       (acc: Array<StepGeneration.CommandCreator>, formData, formIndex) => {
         const {stepType} = formData
-        const stepCommandCreator = commandCreatorsFromFormData(formData)
+        let reducedCommandCreator = null
 
-        if (!stepCommandCreator) {
+        if (formData.stepType === 'pause') {
+          reducedCommandCreator = StepGeneration.delay(formData)
+        } else { // NOTE: compound return an array of command creators, atomic steps only return one command creator
+          const compoundCommandCreator: ?StepGeneration.CompoundCommandCreator = compoundCommandCreatorFromFormData(formData)
+          reducedCommandCreator = compoundCommandCreator && StepGeneration.reduceCommandCreators(compoundCommandCreator(initialRobotState))
+        }
+        if (!reducedCommandCreator) {
           // TODO Ian 2018-05-08 use assert
           console.warn(`StepType "${stepType}" not yet implemented`)
           return acc
@@ -174,14 +179,14 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
             return [
               ...acc,
               StepGeneration.reduceCommandCreators([
-                stepCommandCreator,
-                StepGeneration.dropTip(pipetteId)
-              ])
+                reducedCommandCreator,
+                StepGeneration.dropTip(pipetteId),
+              ]),
             ]
           }
         }
 
-        return [...acc, stepCommandCreator]
+        return [...acc, reducedCommandCreator]
       }, [])
 
     const timeline = StepGeneration.commandCreatorsTimeline(commandCreators)(initialRobotState)
@@ -200,7 +205,7 @@ export const timelineWarningsPerStep: Selector<WarningsPerStep> = createSelector
     // remove warnings of duplicate 'type'. chosen arbitrarily
     return {
       ...acc,
-      [stepId]: uniqBy(frame.warnings, w => w.type)
+      [stepId]: uniqBy(frame.warnings, w => w.type),
     }
   }, {})
 )

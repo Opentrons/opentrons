@@ -5,7 +5,7 @@ const EventEmitter = require('events')
 
 const __mockBrowser = Object.assign(new EventEmitter(), {
   discover: jest.fn(),
-  stop: jest.fn()
+  stop: jest.fn(),
 })
 
 const createBrowser = jest.fn()
@@ -20,4 +20,6 @@ const __mockReset = () => {
   createBrowser.mockReturnValue(__mockBrowser)
 }
 
-module.exports = {tcp, createBrowser, __mockBrowser, __mockReset}
+const ServiceType = function () {}
+
+module.exports = {tcp, createBrowser, ServiceType, __mockBrowser, __mockReset}

@@ -50,6 +50,11 @@ settings = [
         old_id='disable-home-on-boot',
         title='Disable home on boot',
         description='Prevent robot from homing motors on boot'
+    ),
+    Setting(
+        _id='useProtocolApi2',
+        title='Use Protocol API version 2',
+        description='Use new implementation of protocol API. This should not be activated except by developers.' # noqa
     )
 ]
 
@@ -60,7 +65,7 @@ settings_by_old_id = {s.old_id: s for s in settings}
 def get_adv_setting(_id: str) -> bool:
     _id = _clean_id(_id)
     s = get_all_adv_settings()
-    return s.get(_id).get('value')
+    return s[_id].get('value')
 
 
 def get_all_adv_settings() -> dict:
@@ -68,7 +73,7 @@ def get_all_adv_settings() -> dict:
     :return: a dict of settings keyed by setting ID, where each value is a
         dict with keys "id", "title", "description", and "value"
     """
-    settings_file = get_config_index().get('featureFlagFile')
+    settings_file = get_config_index()['featureFlagFile']
 
     values = _read_settings_file(settings_file)
     for key, value in values.items():
@@ -81,7 +86,7 @@ def get_all_adv_settings() -> dict:
 
 def set_adv_setting(_id: str, value):
     _id = _clean_id(_id)
-    settings_file = get_config_index().get('featureFlagFile')
+    settings_file = get_config_index()['featureFlagFile']
     s = _read_settings_file(settings_file)
     s[_id] = value
     _write_settings_file(s, settings_file)
@@ -123,7 +128,7 @@ def _read_settings_file(settings_file: str) -> dict:
     if any([k in old_keys for k in data.keys()]):
         for v in data.keys():
             if v in old_keys:
-                new_key = settings_by_old_id.get(v).id
+                new_key = settings_by_old_id[v].id
                 data[new_key] = data[v]
                 data.pop(v)
         _write_settings_file(data, settings_file)

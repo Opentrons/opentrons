@@ -6,20 +6,19 @@ import {
   InputField,
   InstrumentGroup,
   OutlineButton,
-  PrimaryButton
+  PrimaryButton,
 } from '@opentrons/components'
-import type {FileMetadataFields} from '../file-data'
 import type {FormConnector} from '../utils'
 import styles from './FilePage.css'
 import formStyles from '../components/forms.css'
 
 export type FilePageProps = {
-  formConnector: FormConnector<FileMetadataFields>,
+  formConnector: FormConnector<any>,
   isFormAltered: boolean,
   instruments: React.ElementProps<typeof InstrumentGroup>,
   goToDesignPage: () => mixed,
   saveFileMetadata: () => mixed,
-  swapPipettes: () => mixed
+  swapPipettes: () => mixed,
 }
 
 const FilePage = ({formConnector, isFormAltered, instruments, saveFileMetadata, goToDesignPage, swapPipettes}: FilePageProps) => {
@@ -35,7 +34,7 @@ const FilePage = ({formConnector, isFormAltered, instruments, saveFileMetadata, 
         <form onSubmit={handleSubmit} className={styles.card_content}>
           <div className={formStyles.row_wrapper}>
             <FormGroup label='Protocol Name:' className={formStyles.column_1_2}>
-              <InputField placeholder='Untitled' {...formConnector('name')} />
+              <InputField placeholder='Untitled' {...formConnector('protocol-name')} />
             </FormGroup>
 
             <FormGroup label='Organization/Author:' className={formStyles.column_1_2}>

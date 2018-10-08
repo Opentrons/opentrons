@@ -1,6 +1,6 @@
 import json
 from opentrons import __version__
-from opentrons.server.main import init
+from opentrons.server import init
 
 
 async def test_health(virtual_smoothie_env, loop, test_client):

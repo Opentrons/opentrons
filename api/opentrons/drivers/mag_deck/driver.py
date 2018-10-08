@@ -2,7 +2,7 @@ from os import environ
 import logging
 from threading import Event
 from time import sleep
-
+from typing import Optional
 from serial.serialutil import SerialException
 
 from opentrons.drivers import serial_communication
@@ -70,7 +70,7 @@ def _parse_string_value_from_substring(substring) -> str:
                 substring))
 
 
-def _parse_number_from_substring(substring) -> float:
+def _parse_number_from_substring(substring) -> Optional[float]:
     '''
     Returns the number in the expected string "N:12.3", where "N" is the
     key, and "12.3" is a floating point value
@@ -142,7 +142,8 @@ def _parse_distance_response(distance_string) -> float:
         raise ParseError(err_msg)
     if 'Z' not in distance_string and 'height' not in distance_string:
         raise ParseError(err_msg)
-    return _parse_number_from_substring(distance_string.strip())
+    return _parse_number_from_substring(  # type: ignore
+        distance_string.strip())          # (preconditions checked above)
 
 
 class MagDeck:
@@ -158,7 +159,7 @@ class MagDeck:
 
     def connect(self, port=None) -> str:
         '''
-        :param port: '/dev/ttyMagDeck'
+        :param port: '/dev/modules/ttyn_magdeck'
         NOTE: Using the symlink above to connect makes sure that the robot
         connects/reconnects to the module even after a device
         reset/reconnection

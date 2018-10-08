@@ -1,6 +1,8 @@
 // @flow
 // http api client module for /calibration/**
-import {createSelector, type Selector} from 'reselect'
+import {createSelector} from 'reselect'
+
+import type {OutputSelector} from 'reselect'
 import type {State, Action, ThunkPromiseAction} from '../types'
 import type {BaseRobot, RobotService, Mount} from '../robot'
 import type {ApiCall, ApiRequestError} from './types'
@@ -20,7 +22,7 @@ export type DeckCalPoint = '1' | '2' | '3'
 export type DeckCalMovePoint = 'attachTip' | 'safeZ' | DeckCalPoint
 
 type DeckStartRequest = {|
-  force?: boolean
+  force?: boolean,
 |}
 
 type DeckStartResponse = {
@@ -142,8 +144,8 @@ export function calibrationReducer (
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {request, inProgress: true, response: null, error: null}
-        }
+          [path]: {request, inProgress: true, response: null, error: null},
+        },
       }
     }
 
@@ -158,8 +160,8 @@ export function calibrationReducer (
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, response, inProgress: false, error: null}
-        }
+          [path]: {...stateByPath, response, inProgress: false, error: null},
+        },
       }
     }
 
@@ -174,8 +176,8 @@ export function calibrationReducer (
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, error, inProgress: false}
-        }
+          [path]: {...stateByPath, error, inProgress: false},
+        },
       }
     }
 
@@ -190,8 +192,8 @@ export function calibrationReducer (
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, error: null, response: null}
-        }
+          [path]: {...stateByPath, error: null, response: null},
+        },
       }
     }
   }
@@ -200,7 +202,7 @@ export function calibrationReducer (
 }
 
 export function makeGetDeckCalibrationStartState () {
-  const sel: Selector<State, BaseRobot, DeckCalStartState> = createSelector(
+  const sel: OutputSelector<State, BaseRobot, DeckCalStartState> = createSelector(
     getRobotCalState,
     getStartStateFromCalState
   )
@@ -209,7 +211,7 @@ export function makeGetDeckCalibrationStartState () {
 }
 
 export function makeGetDeckCalibrationCommandState () {
-  const sel: Selector<State, BaseRobot, DeckCalCommandState> = createSelector(
+  const sel: OutputSelector<State, BaseRobot, DeckCalCommandState> = createSelector(
     getRobotCalState,
     getDeckStateFromCalState
   )

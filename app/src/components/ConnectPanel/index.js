@@ -20,7 +20,7 @@ type StateProps = {
 }
 
 type DispatchProps = {
-  onScanClick: () => mixed
+  onScanClick: () => mixed,
 }
 
 type Props = StateProps & DispatchProps
@@ -30,15 +30,12 @@ export default connect(mapStateToProps, mapDispatchToProps)(ConnectPanel)
 function ConnectPanel (props: Props) {
   return (
     <SidePanel title='Robots'>
-      <div>
-        <ScanStatus {...props} />
-        <RobotList>
-          {props.robots.map((robot) => (
-            // $FlowFixMe: flow-typed withRouter def throwing bogus errors
-            <RobotItem key={robot.name} {...robot} />
-          ))}
-        </RobotList>
-      </div>
+      <ScanStatus {...props} />
+      <RobotList>
+        {props.robots.map((robot) => (
+          <RobotItem key={robot.name} {...robot} />
+        ))}
+      </RobotList>
     </SidePanel>
   )
 }
@@ -49,12 +46,12 @@ function mapStateToProps (state: State): StateProps {
   return {
     robots,
     found: robots.length > 0,
-    isScanning: getScanning(state)
+    isScanning: getScanning(state),
   }
 }
 
 function mapDispatchToProps (dispatch: Dispatch): DispatchProps {
   return {
-    onScanClick: () => dispatch(startDiscovery())
+    onScanClick: () => dispatch(startDiscovery()),
   }
 }

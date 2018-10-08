@@ -1,133 +1,40 @@
 // @flow
 // health http api module
-import {createSelector, type Selector} from 'reselect'
+import {createSelector} from 'reselect'
 
-import type {State, ThunkPromiseAction, Action} from '../types'
-import type {BaseRobot, RobotService} from '../robot'
-import type {ApiCall, ApiRequestError} from './types'
-import type {ApiRequestAction, ApiSuccessAction, ApiFailureAction} from './actions'
+import type {OutputSelector} from 'reselect'
+import type {State} from '../types'
+import type {BaseRobot} from '../robot'
+import type {ApiCall} from './types'
+import type {ApiAction} from './actions'
 
-import {apiRequest, apiSuccess, apiFailure} from './actions'
-import client from './client'
+import {buildRequestMaker} from './actions'
+import {getRobotApiState} from './reducer'
 
-type HealthPath = 'health'
-
-type HealthResponse = {
+type FetchHealthResponse = {
   name: string,
   api_version: string,
   fw_version: string,
   logs: ?Array<string>,
 }
 
-export type HealthAction =
-  | ApiRequestAction<HealthPath, void>
-  | ApiSuccessAction<HealthPath, HealthResponse>
-  | ApiFailureAction<HealthPath>
+export type HealthAction = ApiAction<'health', null, FetchHealthResponse>
 
-export type RobotHealth = ApiCall<void, HealthResponse>
+export type FetchHealthCall = ApiCall<void, FetchHealthResponse>
 
-type RobotHealthState = {
-  health?: RobotHealth,
-}
-
-type HealthState = {
-  [robotName: string]: ?RobotHealthState
+export type RobotHealthState = {
+  health?: FetchHealthCall,
 }
 
 const HEALTH: 'health' = 'health'
 
-// TODO(mc, 2018-07-03): flow helper until we have one reducer, since
-// p === 'constant' checks but p === CONSTANT does not, even if
-// CONSTANT is defined as `const CONSTANT: 'constant' = 'constant'`
-function getHealthPath (p: string): ?HealthPath {
-  if (p === 'health') return p
-  return null
-}
-
-export function fetchHealth (robot: RobotService): ThunkPromiseAction {
-  return (dispatch) => {
-    dispatch(apiRequest(robot, HEALTH, null))
-
-    return client(robot, 'GET', HEALTH)
-      .then(
-        (resp: HealthResponse) => apiSuccess(robot, HEALTH, resp),
-        (err: ApiRequestError) => apiFailure(robot, HEALTH, err)
-      )
-      .then(dispatch)
-  }
-}
-
-export function healthReducer (
-  state: ?HealthState,
-  action: Action
-): HealthState {
-  if (state == null) return {}
-
-  switch (action.type) {
-    case 'api:REQUEST': {
-      const path = getHealthPath(action.payload.path)
-      if (!path) return state
-      const {payload: {request, robot: {name}}} = action
-      const stateByName = state[name] || {}
-      const stateByPath = stateByName[path] || {}
-
-      return {
-        ...state,
-        [name]: {
-          ...stateByName,
-          [path]: {...stateByPath, request, inProgress: true, error: null}
-        }
-      }
-    }
-
-    case 'api:SUCCESS': {
-      const path = getHealthPath(action.payload.path)
-      if (!path) return state
-      const {payload: {response, robot: {name}}} = action
-      const stateByName = state[name] || {}
-      const stateByPath = stateByName[path] || {}
-
-      return {
-        ...state,
-        [name]: {
-          ...stateByName,
-          [path]: {...stateByPath, response, inProgress: false, error: null}
-        }
-      }
-    }
-
-    case 'api:FAILURE': {
-      const path = getHealthPath(action.payload.path)
-      if (!path) return state
-      const {payload: {error, robot: {name}}} = action
-      const stateByName = state[name] || {}
-      const stateByPath = stateByName[path] || {}
-
-      return {
-        ...state,
-        [name]: {
-          ...stateByName,
-          [path]: {...stateByPath, error, inProgress: false}
-        }
-      }
-    }
-  }
-
-  return state
-}
+export const fetchHealth = buildRequestMaker('GET', HEALTH)
 
 export const makeGetRobotHealth = () => {
-  const selector: Selector<State, BaseRobot, RobotHealth> = createSelector(
-    selectRobotHealthState,
+  const selector: OutputSelector<State, BaseRobot, FetchHealthCall> = createSelector(
+    getRobotApiState,
     state => state[HEALTH] || {inProgress: false}
   )
 
   return selector
-}
-
-function selectRobotHealthState (
-  state: State,
-  props: BaseRobot
-): RobotHealthState {
-  return state.api.health[props.name] || {}
 }

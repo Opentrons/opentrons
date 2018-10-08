@@ -8,12 +8,9 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # source and output directories for main process code
 src_dir := src
 lib_dir := lib
-src_ignore := "**/__@(tests|mocks)__/**"
+src_ignore := "**/__@(tests|mocks|fixtures)__/**"
 babel := babel $(src_dir) --ignore $(src_ignore) --out-dir $(lib_dir)
 flow_copy := flow-copy-source --ignore $(src_ignore) $(src_dir) $(lib_dir)
-
-# set NODE_ENV for a command with $(env)=environment
-env := cross-env NODE_ENV
 
 # standard targets
 #####################################################################
@@ -33,8 +30,9 @@ clean:
 #####################################################################
 
 .PHONY: lib
+lib: export NODE_ENV := production
 lib:
-	$(env)=production $(babel)
+	$(babel)
 	$(flow_copy)
 
 .PHONY: dist

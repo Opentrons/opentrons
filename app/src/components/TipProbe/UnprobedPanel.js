@@ -10,26 +10,26 @@ import {PrimaryButton} from '@opentrons/components'
 import {
   actions as robotActions,
   selectors as robotSelectors,
-  type Mount
+  type Mount,
 } from '../../robot'
 
 type OwnProps = {
   mount: Mount,
   probed: boolean,
-  confirmTipProbeUrl: string
+  confirmTipProbeUrl: string,
 }
 
 type StateProps = {
-  _showContinueModal: boolean
+  _showContinueModal: boolean,
 }
 
 type DispatchProps = {
-  dispatch: Dispatch<*>
+  dispatch: Dispatch<*>,
 }
 
 type Props = {
   probed: boolean,
-  onPrepareClick: () => void
+  onPrepareClick: () => void,
 }
 
 export default connect(mapStateToProps, null, mergeProps)(UnprobedPanel)
@@ -65,7 +65,7 @@ function mapStateToProps (state, ownProps: OwnProps): StateProps {
   const deckPopulated = robotSelectors.getDeckPopulated(state)
 
   return {
-    _showContinueModal: deckPopulated || deckPopulated == null
+    _showContinueModal: deckPopulated || deckPopulated == null,
   }
 }
 
@@ -84,6 +84,6 @@ function mergeProps (
 
   return {
     ...ownProps,
-    onPrepareClick
+    onPrepareClick,
   }
 }

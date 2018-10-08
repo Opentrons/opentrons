@@ -2,9 +2,7 @@ import React from 'react'
 import {connect} from 'react-redux'
 import {Link} from 'react-router-dom'
 
-import {
-  selectors as robotSelectors
-} from '../../robot'
+import {getProtocolFilename} from '../../protocol'
 
 export default connect(mapStateToProps)(SessionHeader)
 
@@ -18,6 +16,6 @@ function SessionHeader (props) {
 
 function mapStateToProps (state) {
   return {
-    sessionName: robotSelectors.getSessionName(state)
+    sessionName: getProtocolFilename(state),
   }
 }

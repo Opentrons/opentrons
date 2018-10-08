@@ -16,7 +16,7 @@ type ModalProps = {
   /** classes to apply to the contents box */
   contentsClassName?: string,
   /** lightens overlay (alert modal over existing modal)**/
-  alertOverlay?: boolean
+  alertOverlay?: boolean,
 }
 
 /**

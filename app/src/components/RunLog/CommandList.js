@@ -4,6 +4,7 @@ import cx from 'classnames'
 
 import {SpinnerModal} from '@opentrons/components'
 import SessionAlert from './SessionAlert'
+import {Portal} from '../portal'
 
 import styles from './styles.css'
 
@@ -33,8 +34,8 @@ export default class CommandList extends Component {
         className: cx(style, {
           [styles.executed]: handledAt,
           [styles.current]: isCurrent,
-          [styles.last_current]: isLast
-        })
+          [styles.last_current]: isLast,
+        }),
       }
 
       if (isLast) liProps.ref = 'ensureVisible'
@@ -58,13 +59,15 @@ export default class CommandList extends Component {
     )
 
     const wrapperStyle = cx(styles.run_log_wrapper, {
-      [styles.alert_visible]: showAlert
+      [styles.alert_visible]: showAlert,
     })
 
     return (
       <div className={styles.run_page}>
       {showSpinner && (
-        <SpinnerModal />
+        <Portal>
+          <SpinnerModal />
+        </Portal>
       )}
       {!showSpinner && (
         <SessionAlert {...this.props} className={styles.alert} />
@@ -81,5 +84,5 @@ export default class CommandList extends Component {
 
 CommandList.propTypes = {
   // TODO(mc, 2017-08-23): use PropTypes.shape instead of object
-  commands: PropTypes.arrayOf(PropTypes.object).isRequired
+  commands: PropTypes.arrayOf(PropTypes.object).isRequired,
 }

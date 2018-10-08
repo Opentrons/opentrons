@@ -6,18 +6,20 @@ import selectors from './selectors'
 import * as actions from './actions'
 import * as utils from './utils'
 import {getFieldErrors, processField} from './fieldLevel'
+import {getDefaultsForStepType} from './formLevel'
 import type {FormWarning, FormWarningType} from './formLevel'
 export * from './types'
 export type {
   RootState,
   FormWarning,
-  FormWarningType
+  FormWarningType,
 }
 export {
   actions,
   rootReducer,
   selectors,
   getFieldErrors,
+  getDefaultsForStepType,
   processField,
-  utils
+  utils,
 }

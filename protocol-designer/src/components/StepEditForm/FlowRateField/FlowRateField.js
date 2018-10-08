@@ -4,13 +4,13 @@ import {
   AlertModal,
   FormGroup,
   InputField,
-  RadioGroup
+  RadioGroup,
 } from '@opentrons/components'
 import {Portal} from '../../portals/MainPageModalPortal'
 import modalStyles from '../../modals/modal.css'
 import styles from './FlowRateField.css'
 
-const DEFAULT_LABEL = 'FLOW RATE'
+const DEFAULT_LABEL = 'Flow Rate'
 const DECIMALS_ALLOWED = 1
 
 type Props = {
@@ -23,14 +23,14 @@ type Props = {
   minFlowRate: number,
   maxFlowRate: number,
   updateValue: (flowRate: ?number) => mixed,
-  pipetteModelDisplayName: ?string
+  pipetteModelDisplayName: ?string,
 }
 
 type State = {
   showModal: boolean,
   modalFlowRate: ?string,
   modalUseDefault: boolean,
-  pristine: boolean
+  pristine: boolean,
 }
 
 export default class FlowRateField extends React.Component<Props, State> {
@@ -45,7 +45,7 @@ export default class FlowRateField extends React.Component<Props, State> {
       showModal: false,
       modalFlowRate: formFlowRate ? formFlowRate.toString() : null,
       modalUseDefault: !formFlowRate,
-      pristine: true
+      pristine: true,
     }
   }
 
@@ -75,7 +75,7 @@ export default class FlowRateField extends React.Component<Props, State> {
 
   handleChangeRadio = (e: SyntheticInputEvent<*>) => {
     this.setState({
-      modalUseDefault: e.target.value !== 'custom'
+      modalUseDefault: e.target.value !== 'custom',
     })
   }
 
@@ -88,7 +88,7 @@ export default class FlowRateField extends React.Component<Props, State> {
     ) {
       this.setState({
         modalFlowRate: value,
-        modalUseDefault: false
+        modalUseDefault: false,
       })
     }
   }
@@ -97,7 +97,7 @@ export default class FlowRateField extends React.Component<Props, State> {
     const {
       showModal,
       modalUseDefault,
-      pristine
+      pristine,
     } = this.state
 
     const {
@@ -108,7 +108,7 @@ export default class FlowRateField extends React.Component<Props, State> {
       label,
       minFlowRate,
       maxFlowRate,
-      pipetteModelDisplayName
+      pipetteModelDisplayName,
     } = this.props
 
     const modalFlowRateNum = Number(this.state.modalFlowRate)
@@ -153,13 +153,13 @@ export default class FlowRateField extends React.Component<Props, State> {
           buttons={[
             {
               children: 'Cancel',
-              onClick: this.cancelModal
+              onClick: this.cancelModal,
             },
             {
               children: 'Done',
               onClick: this.makeSaveModal(allowSave),
-              disabled: pristine ? false : !allowSave
-            }
+              disabled: pristine ? false : !allowSave,
+            },
           ]}
         >
           <h3 className={styles.header}>Flow Rate</h3>
@@ -182,7 +182,7 @@ export default class FlowRateField extends React.Component<Props, State> {
             onChange={this.handleChangeRadio}
             options={[
               {name: `${defaultFlowRate || '?'} μL/s (default)`, value: 'default'},
-              {name: 'Custom', value: 'custom', 'children': FlowRateInput}
+              {name: 'Custom', value: 'custom', 'children': FlowRateInput},
             ]}
           />
         </AlertModal>

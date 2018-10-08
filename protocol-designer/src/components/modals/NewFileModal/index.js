@@ -6,7 +6,7 @@ import {
   DropdownField,
   FormGroup,
   InputField,
-  type Mount
+  type Mount,
 } from '@opentrons/components'
 import startCase from 'lodash/startCase'
 import isEmpty from 'lodash/isEmpty'
@@ -22,7 +22,7 @@ type State = NewProtocolFields
 type Props = {
   hideModal: boolean,
   onCancel: () => mixed,
-  onSave: (NewProtocolFields) => mixed
+  onSave: (NewProtocolFields) => mixed,
 }
 
 // 'USER_HAS_NOT_SELECTED' state is just a concern of these dropdowns,
@@ -34,12 +34,12 @@ const USER_HAS_NOT_SELECTED = 'USER_HAS_NOT_SELECTED'
 
 const pipetteOptionsWithNone = [
   {name: 'None', value: ''},
-  ...pipetteOptions
+  ...pipetteOptions,
 ]
 
 const pipetteOptionsWithInvalid = [
   {name: '', value: USER_HAS_NOT_SELECTED},
-  ...pipetteOptionsWithNone
+  ...pipetteOptionsWithNone,
 ]
 
 // TODO: Ian 2018-06-22 get this programatically from shared-data labware defs
@@ -47,16 +47,16 @@ const pipetteOptionsWithInvalid = [
 // and also auto-select tiprack if there's only one compatible tiprack for a pipette
 const tiprackOptions = [
   {name: '10 μL', value: 'tiprack-10ul'},
-  {name: '200 μL', value: 'tiprack-200ul'},
+  {name: '300 μL', value: 'opentrons-tiprack-300ul'},
   {name: '1000 μL', value: 'tiprack-1000ul'},
-  {name: '1000 μL Chem', value: 'tiprack-1000ul-chem'}
+  {name: '1000 μL Chem', value: 'tiprack-1000ul-chem'},
   // {name: '300 μL', value: 'GEB-tiprack-300ul'} // NOTE this is not supported by Python API yet
 ]
 
 const initialState = {
   name: '',
   left: {pipetteModel: USER_HAS_NOT_SELECTED, tiprackModel: null},
-  right: {pipetteModel: USER_HAS_NOT_SELECTED, tiprackModel: null}
+  right: {pipetteModel: USER_HAS_NOT_SELECTED, tiprackModel: null},
 }
 
 export default class NewFileModal extends React.Component<Props, State> {
@@ -65,13 +65,12 @@ export default class NewFileModal extends React.Component<Props, State> {
     this.state = initialState
   }
 
-  // TODO(mc, 2018-07-24): use a different lifecycle hook
-  componentWillReceiveProps (nextProps: Props) {
+  componentDidUpdate (prevProps: Props) {
     // reset form state when modal is hidden
-    if (!this.props.hideModal && nextProps.hideModal) this.setState(initialState)
+    if (!prevProps.hideModal && this.props.hideModal) this.setState(initialState)
   }
 
-  makeHandleMountFieldChange = (mount: Mount, fieldName: $Keys<PipetteFields>) => (e: SyntheticInputEvent<*>) => {
+  makeHandleMountChange = (mount: Mount, fieldName: $Keys<PipetteFields>) => (e: SyntheticInputEvent<*>) => {
     const value: string = e.target.value
     let nextMountState = {[fieldName]: value}
     if (fieldName === 'pipetteModel') nextMountState = {...nextMountState, tiprackModel: null}
@@ -105,20 +104,59 @@ export default class NewFileModal extends React.Component<Props, State> {
       <AlertModal
         className={cx(modalStyles.modal, styles.new_file_modal)}
         buttons={[
-          {onClick: this.props.onCancel, children: 'Cancel'},
-          {onClick: this.handleSubmit, disabled: !canSubmit, children: 'Save'}
+          {onClick: this.props.onCancel, children: 'Cancel', tabIndex: 7},
+          {onClick: this.handleSubmit, disabled: !canSubmit, children: 'Save', tabIndex: 6},
         ]}>
-        <form className={modalStyles.modal_contents}>
+        <form
+          className={modalStyles.modal_contents}
+          onSubmit={() => { canSubmit && this.handleSubmit() }}>
           <h2>Create New Protocol</h2>
 
           <FormGroup label='Name:'>
-            <InputField placeholder='Untitled' value={name} onChange={this.handleNameChange} />
+            <InputField
+              autoFocus
+              tabIndex={1}
+              placeholder='Untitled'
+              value={name}
+              onChange={this.handleNameChange} />
           </FormGroup>
           <BetaRestrictions />
 
           <div className={styles.mount_fields_row}>
-            <MountFields mount="left" values={this.state.left} makeOnChange={this.makeHandleMountFieldChange} />
-            <MountFields mount="right" values={this.state.right} makeOnChange={this.makeHandleMountFieldChange} />
+            <div className={styles.mount_column}>
+              <FormGroup key="leftPipetteModel" label="Left Pipette">
+                <DropdownField
+                  tabIndex={2}
+                  options={this.state.left.pipetteModel === USER_HAS_NOT_SELECTED ? pipetteOptionsWithInvalid : pipetteOptionsWithNone}
+                  value={this.state.left.pipetteModel}
+                  onChange={this.makeHandleMountChange('left', 'pipetteModel')} />
+              </FormGroup>
+              <FormGroup disabled={isEmpty(this.state.left.pipetteModel)} key={'leftTiprackModel'} label={`${startCase('left')} Tiprack*`}>
+                <DropdownField
+                  tabIndex={3}
+                  disabled={isEmpty(this.state.left.pipetteModel)}
+                  options={tiprackOptions}
+                  value={this.state.left.tiprackModel}
+                  onChange={this.makeHandleMountChange('left', 'tiprackModel')} />
+              </FormGroup>
+            </div>
+            <div className={styles.mount_column}>
+              <FormGroup key="rightPipetteModel" label="Right Pipette">
+                <DropdownField
+                  tabIndex={4}
+                  options={this.state.right.pipetteModel === USER_HAS_NOT_SELECTED ? pipetteOptionsWithInvalid : pipetteOptionsWithNone}
+                  value={this.state.right.pipetteModel}
+                  onChange={this.makeHandleMountChange('right', 'pipetteModel')} />
+              </FormGroup>
+              <FormGroup disabled={isEmpty(this.state.right.pipetteModel)} key={'rightTiprackModel'} label={`${startCase('right')} Tiprack*`}>
+                <DropdownField
+                  tabIndex={5}
+                  disabled={isEmpty(this.state.right.pipetteModel)}
+                  options={tiprackOptions}
+                  value={this.state.right.tiprackModel}
+                  onChange={this.makeHandleMountChange('right', 'tiprackModel')} />
+              </FormGroup>
+            </div>
           </div>
 
           <div className={styles.diagrams}>
@@ -134,30 +172,6 @@ export default class NewFileModal extends React.Component<Props, State> {
     )
   }
 }
-
-type MountFieldsProps = {
-  mount: Mount,
-  values: {pipetteModel: string, tiprackModel: ?string},
-  makeOnChange: (mount: Mount, fieldName: $Keys<PipetteFields>) => (SyntheticInputEvent<*>) => void
-}
-const MountFields = (props: MountFieldsProps) => (
-  <div className={styles.mount_column}>
-    <FormGroup key={`${props.mount}PipetteModel`} label={`${startCase(props.mount)} Pipette*`}>
-      <DropdownField
-        options={props.values.pipetteModel === USER_HAS_NOT_SELECTED ? pipetteOptionsWithInvalid : pipetteOptionsWithNone}
-        value={props.values.pipetteModel}
-        onChange={props.makeOnChange(props.mount, 'pipetteModel')} />
-    </FormGroup>
-
-    <FormGroup disabled={isEmpty(props.values.pipetteModel)} key={`${props.mount}TiprackModel`} label={`${startCase(props.mount)} Tiprack*`}>
-      <DropdownField
-        disabled={isEmpty(props.values.pipetteModel)}
-        options={tiprackOptions}
-        value={props.values.tiprackModel}
-        onChange={props.makeOnChange(props.mount, 'tiprackModel')} />
-    </FormGroup>
-  </div>
-)
 
 const BetaRestrictions = () => (
   <React.Fragment>

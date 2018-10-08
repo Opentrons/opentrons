@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/components",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "React components library for Opentrons' projects",
   "main": "src/index.js",
   "style": "src/index.css",
@@ -15,7 +15,7 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
   "devDependencies": {
-    "flow-bin": "^0.76.0",
+    "flow-bin": "^0.82.0",
     "flow-typed": "^2.5.1"
   },
   "peerDependencies": {

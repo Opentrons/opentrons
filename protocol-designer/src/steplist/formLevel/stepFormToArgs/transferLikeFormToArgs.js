@@ -6,15 +6,17 @@ import type { FormData } from '../../../form-types'
 import type {
   ConsolidateFormData,
   DistributeFormData,
-  TransferFormData
+  TransferFormData,
 } from '../../../step-generation'
 import { DEFAULT_CHANGE_TIP_OPTION } from '../../../constants'
 import type { StepFormContext } from './types'
 import { orderWells } from '../../utils'
 
+export const SOURCE_WELL_DISPOSAL_DESTINATION = 'source_well'
+
 type ValidationAndErrors<F> = {
   errors: {[string]: string},
-  validatedForm: F | null
+  validatedForm: F | null,
 }
 
 function getMixData (formData, checkboxField, volumeField, timesField) {
@@ -38,7 +40,7 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
   const volume = Number(formData['volume'])
   const sourceLabware = formData['aspirate_labware']
   const destLabware = formData['dispense_labware']
-  const blowout = formData['dispense_blowout_labware']
+  const blowout = formData['dispense_blowout_checkbox'] ? formData['dispense_blowout_labware'] : null
 
   const aspirateOffsetFromBottomMm = Number(formData['aspirate_mmFromBottom'])
   const dispenseOffsetFromBottomMm = Number(formData['dispense_mmFromBottom'])
@@ -51,7 +53,7 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
   const mixFirstAspirate = formData['aspirate_mix_checkbox']
     ? {
       volume: Number(formData['aspirate_mix_volume']),
-      times: parseInt(formData['aspirate_mix_times']) // TODO handle unparseable
+      times: parseInt(formData['aspirate_mix_times']), // TODO handle unparseable
     }
     : null
 
@@ -69,10 +71,6 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
     'dispense_mix_times'
   )
 
-  const disposalVolume = formData['aspirate_disposalVol_checkbox']
-    ? Number('aspirate_disposal-vol_volume') // TODO handle unparseable
-    : null
-
   const changeTip = formData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION
 
   const commonFields = {
@@ -88,12 +86,11 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
     blowout, // TODO allow user to blowout
     changeTip,
     delayAfterDispense,
-    disposalVolume,
     mixInDestination,
     preWetTip: formData['aspirate_preWetTip'] || false,
     touchTipAfterAspirate: formData['aspirate_touchTip'] || false,
     touchTipAfterDispense: formData['dispense_touchTip'] || false,
-    description: 'description would be here 2018-03-01' // TODO get from form
+    description: 'description would be here 2018-03-01', // TODO get from form
   }
 
   let {
@@ -102,7 +99,7 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
     aspirate_wellOrder_first,
     aspirate_wellOrder_second,
     dispense_wellOrder_first,
-    dispense_wellOrder_second
+    dispense_wellOrder_second,
   } = formData
   sourceWells = sourceWells || []
   destWells = destWells || []
@@ -110,7 +107,7 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
   if (context && context.labware) {
     const labwareById = context.labware
     if (stepType !== 'distribute' && sourceLabware) {
-      const sourceLabwareDef = getLabware(labwareById[sourceLabware].type)
+      const sourceLabwareDef = labwareById[sourceLabware] && getLabware(labwareById[sourceLabware].type)
       if (sourceLabwareDef) {
         const allWellsOrdered = orderWells(sourceLabwareDef.ordering, aspirate_wellOrder_first, aspirate_wellOrder_second)
         sourceWells = intersection(allWellsOrdered, sourceWells)
@@ -119,7 +116,7 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
       }
     }
     if (stepType !== 'consolidate' && destLabware) {
-      const destLabwareDef = getLabware(labwareById[destLabware].type)
+      const destLabwareDef = labwareById[destLabware] && getLabware(labwareById[destLabware].type)
       if (destLabwareDef) {
         const allWellsOrdered = orderWells(destLabwareDef.ordering, dispense_wellOrder_first, dispense_wellOrder_second)
         destWells = intersection(allWellsOrdered, destWells)
@@ -129,11 +126,28 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
     }
   }
 
+  let disposalVolume = null
+  let disposalDestination = null
+  let disposalLabware = null
+  let disposalWell = null
+  if (formData['aspirate_disposalVol_checkbox']) { // TODO: BC 09-17-2018 handle unparseable values?
+    disposalVolume = Number(formData['aspirate_disposalVol_volume'])
+    disposalDestination = formData['aspirate_disposalVol_destination']
+    if (disposalDestination === SOURCE_WELL_DISPOSAL_DESTINATION) {
+      disposalLabware = sourceLabware
+      disposalWell = sourceWells[0]
+    } else {
+      // NOTE: if disposalDestination is not source well it is a labware type (e.g. fixed-trash)
+      disposalLabware = disposalDestination
+      disposalWell = 'A1'
+    }
+  }
+
   // TODO: BC 2018-08-21 remove this old validation logic once no longer preventing save
   const requiredFieldErrors = [
     'pipette',
     'aspirate_labware',
-    'dispense_labware'
+    'dispense_labware',
   ].reduce((acc, fieldName) => (!formData[fieldName])
     ? {...acc, [fieldName]: 'This field is required'}
     : acc,
@@ -163,12 +177,13 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
         errors,
         validatedForm: Object.values(errors).length === 0 ? {
           ...commonFields,
+          disposalVolume,
           stepType: 'transfer',
           sourceWells,
           destWells,
           mixBeforeAspirate,
-          name: `Transfer ${formData.id}` // TODO Ian 2018-04-03 real name for steps
-        } : null
+          name: `Transfer ${formData.id}`, // TODO Ian 2018-04-03 real name for steps
+        } : null,
       }
       stepArguments = transferStepArguments
       break
@@ -178,12 +193,13 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
         errors,
         validatedForm: Object.values(errors).length === 0 ? {
           ...commonFields,
+          disposalVolume,
           mixFirstAspirate,
           sourceWells,
           destWell: destWells[0],
           stepType: 'consolidate',
-          name: `Consolidate ${formData.id}` // TODO Ian 2018-04-03 real name for steps
-        } : null
+          name: `Consolidate ${formData.id}`, // TODO Ian 2018-04-03 real name for steps
+        } : null,
       }
       stepArguments = consolidateStepArguments
       break
@@ -193,12 +209,15 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
         errors,
         validatedForm: Object.values(errors).length === 0 ? {
           ...commonFields,
+          disposalVolume,
+          disposalLabware,
+          disposalWell,
           mixBeforeAspirate,
           sourceWell: sourceWells[0],
           destWells,
           stepType: 'distribute',
-          name: `Distribute ${formData.id}` // TODO Ian 2018-04-03 real name for steps
-        } : null
+          name: `Distribute ${formData.id}`, // TODO Ian 2018-04-03 real name for steps
+        } : null,
       }
       stepArguments = distributeStepArguments
       break

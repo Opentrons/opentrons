@@ -13,7 +13,7 @@ export default function NoPipetteModal (props: Props) {
     <AlertModal
       heading={HEADING}
       buttons={[
-        {children: 'close', Component: Link, to: props.parentUrl}
+        {children: 'close', Component: Link, to: props.parentUrl},
       ]}
       alertOverlay
     >

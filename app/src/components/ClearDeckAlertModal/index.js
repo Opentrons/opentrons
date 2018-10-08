@@ -12,7 +12,7 @@ type Props = {
   parentUrl: string,
   cancelText: string,
   continueText: string,
-  children?: React.Node
+  children?: React.Node,
 }
 const HEADING = 'Before continuing, remove from deck:'
 
@@ -28,8 +28,8 @@ export default function ClearDeckAlertModal (props: Props) {
           {
             children: `${continueText}`,
             className: styles.alert_button,
-            onClick: onContinueClick
-          }
+            onClick: onContinueClick,
+          },
         ]}
         alertOverlay
       >

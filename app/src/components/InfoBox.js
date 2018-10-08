@@ -6,7 +6,7 @@ import styles from './InfoBox.css'
 
 InfoBox.propTypes = {
   className: PropTypes.string,
-  onCancelClick: PropTypes.func
+  onCancelClick: PropTypes.func,
 }
 
 export default function InfoBox (props) {

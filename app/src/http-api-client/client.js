@@ -5,7 +5,7 @@ import type {Error} from '../types'
 import type {RobotService} from '../robot'
 import type {ApiRequestError} from './types'
 
-type Method = 'GET' | 'POST'
+export type Method = 'GET' | 'POST'
 
 // TODO(mc, 2018-04-30): deprecate importing this type from client
 export type {ApiRequestError}
@@ -23,7 +23,7 @@ function ResponseError (
     message,
     status,
     statusText,
-    url
+    url,
   }
 }
 
@@ -45,7 +45,7 @@ export default function client<T, U> (
     method,
     headers: {},
     // to make flow happy...
-    body: undefined
+    body: undefined,
   }
 
   if (body instanceof FormData) {

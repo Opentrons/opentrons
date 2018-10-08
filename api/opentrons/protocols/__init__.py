@@ -1,7 +1,7 @@
 import time
 from itertools import chain
 from opentrons import instruments, labware, robot
-from opentrons.instruments import pipette_config
+from opentrons.legacy_api.instruments import pipette_config
 
 
 def _sleep(seconds):
@@ -152,10 +152,12 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
                 pipette_model, pipette, command_type, params, default_values)
 
         if command_type == 'delay':
-            wait = params.get('wait', 0)
-            if wait is True:
-                # TODO Ian 2018-05-14 pass message
-                robot.pause()
+            wait = params.get('wait')
+            if wait is None:
+                raise ValueError('Delay cannot be null')
+            elif wait is True:
+                message = params.get('message', 'Pausing until user resumes')
+                robot.pause(msg=message)
             else:
                 _sleep(wait)
 

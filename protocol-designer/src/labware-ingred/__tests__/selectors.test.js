@@ -6,13 +6,13 @@ const baseIngredFields = {
   groupId: '0',
   name: 'Some Ingred',
   description: null,
-  individualize: false
+  individualize: false,
 }
 
 const allIngredientsXXSingleIngred = {
   '0': {
-    ...baseIngredFields
-  }
+    ...baseIngredFields,
+  },
 }
 
 // ==============================
@@ -23,7 +23,7 @@ describe('allIngredientNamesIds selector', () => {
       selectors.allIngredientNamesIds.resultFunc(allIngredientsXXSingleIngred)
     ).toEqual([{
       ingredientId: '0',
-      name: 'Some Ingred'
+      name: 'Some Ingred',
     }])
   })
 })
@@ -40,8 +40,8 @@ describe('allIngredientGroupFields', () => {
       selectors.allIngredientGroupFields.resultFunc(allIngredientsXXSingleIngred)
     ).toEqual({
       '0': {
-        ...baseIngredFields
-      }
+        ...baseIngredFields,
+      },
     })
   })
 })

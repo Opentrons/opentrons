@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import {FormGroup, HoverTooltip} from '@opentrons/components'
+import {FormGroup, HoverTooltip, CheckboxField} from '@opentrons/components'
 
 import i18n from '../../localization'
 import {
@@ -8,10 +8,12 @@ import {
   StepCheckboxRow,
   DispenseDelayFields,
   PipetteField,
+  DisposalDestinationDropdown,
   LabwareDropdown,
-  ChangeTipField
+  ChangeTipField,
 } from './formFields'
 
+import StepField from './StepFormField'
 import TipPositionInput from './TipPositionInput'
 import getTooltipForField from './getTooltipForField'
 import FlowRateField from './FlowRateField'
@@ -43,7 +45,8 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
           {stepType === 'consolidate' &&
             <FormGroup label='Volume:' className={styles.volume_field}>
               <StepInputField name="volume" units='μL' {...focusHandlers} />
-            </FormGroup>}
+            </FormGroup>
+          }
         </div>
 
         <div className={formStyles.row_wrapper}>
@@ -61,9 +64,30 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                 <StepInputField name="aspirate_mix_times" units='Times' {...focusHandlers} />
               </StepCheckboxRow>
               {stepType === 'distribute' &&
-                <StepCheckboxRow name="aspirate_disposalVol_checkbox" label="Disposal Volume" >
-                  <StepInputField name="aspirate_disposalVol_volume" units="μL" {...focusHandlers} />
-                </StepCheckboxRow>
+                <StepField
+                  name="aspirate_disposalVol_checkbox"
+                  render={({value, updateValue}) => (
+                    <React.Fragment>
+                      <div className={styles.field_row}>
+                        <CheckboxField
+                          label="Disposal Volume"
+                          value={!!value}
+                          onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)} />
+                        {value
+                          ? <div>
+                              <StepInputField name="aspirate_disposalVol_volume" units="μL" {...focusHandlers} />
+                            </div>
+                          : null}
+                      </div>
+                      {value
+                        ? <div className={styles.field_row}>
+                            <div className={styles.sub_select_label}>Blowout</div>
+                            <DisposalDestinationDropdown name="aspirate_disposalVol_destination" className={styles.full_width} {...focusHandlers} />
+                          </div>
+                        : null
+                      }
+                    </React.Fragment>
+                  )} />
               }
             </FormGroup>
           </div>
@@ -76,8 +100,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
             <FlowRateField
               name='aspirate_flowRate'
               pipetteFieldName='pipette'
-              flowRateType='aspirate'
-            />
+              flowRateType='aspirate' />
           </div>
         </div>
       </FormSection>
@@ -96,14 +119,12 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
             // TODO: Ian 2018-08-30 make volume field not be a one-off
             <HoverTooltip
               tooltipComponent={getTooltipForField(stepType, 'volume')}
-              placement='top-start'
-            >
+              placement='top-start'>
               {(hoverTooltipHandlers) =>
                 <FormGroup
                   label='Volume:'
                   className={styles.volume_field}
-                  hoverTooltipHandlers={hoverTooltipHandlers}
-                >
+                  hoverTooltipHandlers={hoverTooltipHandlers}>
                   <StepInputField name="volume" units="μL" {...focusHandlers} />
                 </FormGroup>
               }
@@ -123,9 +144,11 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                 disabled
                 tooltipComponent={i18n.t('tooltip.not_in_beta')}
                 focusHandlers={focusHandlers} />
-              <StepCheckboxRow name='dispense_blowout_checkbox' label='Blow out' >
-                <LabwareDropdown name="dispense_blowout_labware" className={styles.full_width} {...focusHandlers} />
-              </StepCheckboxRow>
+              {stepType !== 'distribute' &&
+                <StepCheckboxRow name='dispense_blowout_checkbox' label='Blow out' >
+                  <LabwareDropdown name="dispense_blowout_labware" className={styles.full_width} {...focusHandlers} />
+                </StepCheckboxRow>
+              }
             </FormGroup>
           </div>
           <div className={styles.middle_settings_column}>

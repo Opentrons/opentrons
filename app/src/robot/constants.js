@@ -55,7 +55,7 @@ export const LABWARE_CONFIRMATION_TYPE = PropTypes.oneOf([
   UPDATING,
   UPDATED,
   CONFIRMING,
-  CONFIRMED
+  CONFIRMED,
 ])
 
 // deck layout
@@ -71,7 +71,7 @@ export const DECK_SLOTS: Array<Slot> = [
   '8',
   '9',
   '10',
-  '11'
+  '11',
 ]
 
 // pipette channels

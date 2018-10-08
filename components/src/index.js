@@ -2,7 +2,7 @@
 // opentrons components library
 import LabwareContainerStyles from './deck/LabwareContainer.css'
 export const allStyles = {
-  LabwareContainer: LabwareContainerStyles
+  LabwareContainer: LabwareContainerStyles,
 }
 
 export * from './constants'
@@ -11,6 +11,7 @@ export * from './utils'
 // Components
 export * from './alerts'
 export * from './buttons'
+export * from './controls'
 export * from './CenteredTextSvg'
 export * from './deck'
 export * from './forms'
@@ -20,6 +21,7 @@ export * from './interaction-enhancers'
 export * from './lists'
 export * from './modals'
 export * from './nav'
+export * from './tabbedNav'
 export * from './structure'
 export * from './tooltips'
 

@@ -2,8 +2,10 @@
 import * as React from 'react'
 import UploadInput from './UploadInput'
 import ConfirmUploadModal from './ConfirmUploadModal'
+import UploadMenu from './UploadMenu'
 
 type Props = {
+  filename: ?string,
   sessionLoaded: ?boolean,
   createSession: (file: File) => mixed,
 }
@@ -39,7 +41,7 @@ export default class Upload extends React.Component<Props, State> {
   }
 
   confirmUpload = () => {
-    const { uploadedFile } = this.state
+    const {uploadedFile} = this.state
 
     if (uploadedFile) {
       this.props.createSession(uploadedFile)
@@ -52,12 +54,15 @@ export default class Upload extends React.Component<Props, State> {
   }
 
   render () {
-    const { uploadedFile } = this.state
+    const {uploadedFile} = this.state
+    const {filename} = this.props
 
     return (
       <React.Fragment>
+        {filename && <UploadMenu />}
         <UploadInput onUpload={this.onUpload} isButton />
         <UploadInput onUpload={this.onUpload} />
+
         {uploadedFile && (
           <ConfirmUploadModal
             confirm={this.confirmUpload}

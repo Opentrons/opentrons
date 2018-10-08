@@ -12,7 +12,7 @@ type Props = CalibrateDeckStartedProps & {
 
 type DiagramProps = {
   calibrationStep: CalibrationStep,
-  pipette: PipetteConfig
+  pipette: PipetteConfig,
 }
 
 type Channels = 'single' | 'multi'
@@ -20,12 +20,12 @@ type Channels = 'single' | 'multi'
 const DIAGRAMS: {[step: CalibrationStep]: {[Channels]: string}} = {
   '1': {
     single: require('./images/attach-tip-single@3x.png'),
-    multi: require('./images/attach-tip-multi@3x.png')
+    multi: require('./images/attach-tip-multi@3x.png'),
   },
   '6': {
     single: require('./images/detach-tip-single@3x.png'),
-    multi: require('./images/detach-tip-multi@3x.png')
-  }
+    multi: require('./images/detach-tip-multi@3x.png'),
+  },
 }
 
 export default function AttachTipModal (props: Props) {

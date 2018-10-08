@@ -7,7 +7,7 @@ import styles from './StepItem.css'
 
 type AspirateDispenseHeaderProps = {
   sourceLabwareName: ?string,
-  destLabwareName: ?string
+  destLabwareName: ?string,
 }
 
 function AspirateDispenseHeader (props: AspirateDispenseHeaderProps) {

@@ -10,7 +10,7 @@ import {
   resetHealthCheck,
   healthCheckReducer,
   healthCheckMiddleware,
-  makeGetHealthCheckOk
+  makeGetHealthCheckOk,
 } from '..'
 
 jest.mock('../../http-api-client/health')
@@ -28,19 +28,19 @@ describe('health check', () => {
       robot: {
         connection: {
           connectedTo: name,
-          connectRequest: {name}
-        }
+          connectRequest: {name},
+        },
       },
       discovery: {
         robotsByName: {
-          [name]: {name, connections: [{ip, port, ok: true}]}
-        }
+          [name]: [{ip, port, ok: true}],
+        },
       },
       healthCheck: {
         alreadyRunning: {id: 1, missed: 0},
         alreadyMissed: {id: 2, missed: 2},
-        [name]: {id: null, missed: 1}
-      }
+        [name]: {id: null, missed: 1},
+      },
     }
   })
 
@@ -48,35 +48,35 @@ describe('health check', () => {
     test('START_HEALTH_CHECK', () => {
       expect(startHealthCheck(robot)).toEqual({
         type: 'api:START_HEALTH_CHECK',
-        payload: {robot}
+        payload: {robot},
       })
     })
 
     test('STOP_HEALTH_CHECK', () => {
       expect(stopHealthCheck(robot)).toEqual({
         type: 'api:STOP_HEALTH_CHECK',
-        payload: {robot}
+        payload: {robot},
       })
     })
 
     test('SET_HEALTH_CHECK_ID', () => {
       expect(setHealthCheckId(robot, 1234)).toEqual({
         type: 'api:SET_HEALTH_CHECK_ID',
-        payload: {robot, id: 1234}
+        payload: {robot, id: 1234},
       })
     })
 
     test('CLEAR_HEALTH_CHECK_ID', () => {
       expect(clearHealthCheckId(robot)).toEqual({
         type: 'api:CLEAR_HEALTH_CHECK_ID',
-        payload: {robot}
+        payload: {robot},
       })
     })
 
     test('RESET_HEALTH_CHECK', () => {
       expect(resetHealthCheck(robot)).toEqual({
         type: 'api:RESET_HEALTH_CHECK',
-        payload: {robot}
+        payload: {robot},
       })
     })
   })
@@ -159,7 +159,7 @@ describe('health check', () => {
       expect(store.dispatch).toHaveBeenCalledWith(
         startHealthCheck(expect.objectContaining({
           ip: robot.ip,
-          port: robot.port
+          port: robot.port,
         }))
       )
     })
@@ -212,7 +212,7 @@ describe('health check', () => {
       expect(reduce(action)).toEqual({
         alreadyRunning: {id: 1, missed: 0},
         alreadyMissed: {id: null, missed: 0},
-        [name]: {id: null, missed: 1}
+        [name]: {id: null, missed: 1},
       })
     })
 
@@ -221,7 +221,7 @@ describe('health check', () => {
       expect(reduce(action)).toEqual({
         alreadyRunning: {id: 1, missed: 0},
         alreadyMissed: {id: 2, missed: 2},
-        [name]: {id: 1234, missed: 0}
+        [name]: {id: 1234, missed: 0},
       })
     })
 
@@ -230,7 +230,7 @@ describe('health check', () => {
       expect(reduce(action)).toEqual({
         alreadyRunning: {id: null, missed: 0},
         alreadyMissed: {id: 2, missed: 2},
-        [name]: {id: null, missed: 1}
+        [name]: {id: null, missed: 1},
       })
     })
 
@@ -240,7 +240,7 @@ describe('health check', () => {
       expect(reduce(action)).toEqual({
         alreadyRunning: {id: 1, missed: 0},
         alreadyMissed: {id: 2, missed: 0},
-        [name]: {id: null, missed: 1}
+        [name]: {id: null, missed: 1},
       })
     })
 
@@ -249,7 +249,7 @@ describe('health check', () => {
       expect(reduce(action)).toEqual({
         alreadyRunning: {id: 1, missed: 0},
         alreadyMissed: {id: 2, missed: 2},
-        [name]: {id: null, missed: 1}
+        [name]: {id: null, missed: 1},
       })
     })
 
@@ -259,7 +259,7 @@ describe('health check', () => {
       expect(reduce(action)).toEqual({
         alreadyRunning: {id: 1, missed: 1},
         alreadyMissed: {id: 2, missed: 2},
-        [name]: {id: null, missed: 1}
+        [name]: {id: null, missed: 1},
       })
     })
 
@@ -268,7 +268,7 @@ describe('health check', () => {
       expect(reduce(action)).toEqual({
         alreadyRunning: {id: 1, missed: 0},
         alreadyMissed: {id: 2, missed: 2},
-        [name]: {id: null, missed: 1}
+        [name]: {id: null, missed: 1},
       })
     })
   })

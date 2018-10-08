@@ -1,11 +1,18 @@
 {
   "field": {},
   "form": {},
+  "hint": {
+    "go_to": "Go to ",
+    "add_liquids_and_labware": {
+      "directions": " and hover over labware to specify where liquids start before the robot starts moving.",
+      "title": "Add Liquids to Deck"
+    }
+  },
   "timeline": {
     "error": {
       "INSUFFICIENT_TIPS": {
         "title": "Not enough tips to complete action",
-        "body": "Add another tip rack to an empty slot in Starting Deck State"
+        "body": "Add another tip rack to an empty slot in "
       },
       "NO_TIP_ON_PIPETTE": {
         "title": "No tip on pipette",
@@ -19,8 +26,13 @@
       },
       "ASPIRATE_FROM_PRISTINE_WELL": {
         "title": "Source well is empty",
-        "body": "The well(s) you're trying to aspirate from are empty. Hover over labware in Starting Deck State to add liquids."
+        "body": "The well(s) you're trying to aspirate from are empty. To add liquids, hover over labware in "
       }
     }
+  },
+  "window": {
+    "confirm_create_new": "Are you sure you want to create a new file? Any unsaved changes will be discarded.",
+    "confirm_import": "Are you sure you want to import this file? You will lose any current unsaved changes.",
+    "confirm_leave": "Are you sure you want to leave? You will lose any unsaved changes."
   }
 }

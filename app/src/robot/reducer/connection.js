@@ -7,7 +7,7 @@ import type {
   ConnectResponseAction,
   ClearConnectResponseAction,
   DisconnectAction,
-  DisconnectResponseAction
+  DisconnectResponseAction,
 } from '../actions'
 
 type State = {
@@ -15,11 +15,11 @@ type State = {
   connectRequest: {
     inProgress: boolean,
     error: ?{message: string},
-    name: string
+    name: string,
   },
   disconnectRequest: {
     inProgress: boolean,
-    error: ?{message: string}
+    error: ?{message: string},
   },
   unexpectedDisconnect: boolean,
 }
@@ -28,7 +28,7 @@ const INITIAL_STATE: State = {
   connectedTo: '',
   connectRequest: {inProgress: false, error: null, name: ''},
   disconnectRequest: {inProgress: false, error: null},
-  unexpectedDisconnect: false
+  unexpectedDisconnect: false,
 }
 
 export default function connectionReducer (
@@ -82,7 +82,7 @@ function handleConnectResponse (
   return {
     ...state,
     connectedTo,
-    connectRequest: {error, inProgress: false, name: requestName}
+    connectRequest: {error, inProgress: false, name: requestName},
   }
 }
 
@@ -98,7 +98,7 @@ function handleDisconnectResponse (
     ...state,
     connectedTo: '',
     disconnectRequest: {error: null, inProgress: false},
-    unexpectedDisconnect: false
+    unexpectedDisconnect: false,
   }
 }
 

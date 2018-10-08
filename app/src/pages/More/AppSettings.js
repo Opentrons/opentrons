@@ -5,76 +5,101 @@ import {connect} from 'react-redux'
 import {Route, Switch, Redirect, type ContextRouter} from 'react-router'
 import {push} from 'react-router-redux'
 
-import type {State} from '../../types'
-import type {ShellUpdate} from '../../shell'
 import {
-  getShellUpdate,
-  checkForShellUpdates,
+  getShellUpdateState,
+  getAvailableShellUpdate,
+  checkShellUpdate,
   downloadShellUpdate,
-  quitAndInstallShellUpdate,
-  setUpdateSeen
+  applyShellUpdate,
+  setShellUpdateSeen,
 } from '../../shell'
 
 import Page from '../../components/Page'
 import AppSettings, {AppUpdateModal} from '../../components/AppSettings'
+import {ErrorModal} from '../../components/modals'
+
+import type {State} from '../../types'
+import type {ShellUpdateState} from '../../shell'
 
 type OP = ContextRouter
 
 type SP = {
-  update: ShellUpdate,
+  update: ShellUpdateState,
+  availableVersion: ?string,
 }
 
 type DP = {
-  checkForUpdates: () => mixed,
+  checkUpdate: () => mixed,
   downloadUpdate: () => mixed,
-  quitAndInstall: () => mixed,
-  closeUpdateModal: () => mixed,
+  applyUpdate: () => mixed,
+  closeModal: () => mixed,
 }
 
 type Props = OP & SP & DP
 
-export default connect(mapStateToProps, mapDispatchToProps)(AppSettingsPage)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AppSettingsPage)
 
 function AppSettingsPage (props: Props) {
-  const {update, match: {path}} = props
+  const {
+    availableVersion,
+    checkUpdate,
+    closeModal,
+    update: {available, seen, error},
+    match: {path},
+  } = props
 
   return (
     <React.Fragment>
-      <Page
-        titleBarProps={{title: 'App'}}
-      >
-        <AppSettings {...props} />
+      <Page titleBarProps={{title: 'App'}}>
+        <AppSettings
+          availableVersion={availableVersion}
+          checkUpdate={checkUpdate}
+        />
       </Page>
       <Switch>
-        <Route path={`${path}/update`} render={() => (
-          <AppUpdateModal {...props} close={props.closeUpdateModal} />
-        )} />
-        <Route render={() => {
-          if (update.available && !update.seen) {
-            return (<Redirect to='/menu/app/update' />)
+        <Route
+          path={`${path}/update`}
+          render={() =>
+            !error ? (
+              <AppUpdateModal {...props} />
+            ) : (
+              <ErrorModal
+                heading="Update Error"
+                description="Something went wrong while updating your app"
+                close={closeModal}
+                error={error}
+              />
+            )
           }
-
-          return null
-        }} />
+        />
+        <Route
+          render={() =>
+            available && !seen ? <Redirect to="/menu/app/update" /> : null
+          }
+        />
       </Switch>
-     </React.Fragment>
+    </React.Fragment>
   )
 }
 
 function mapStateToProps (state: State): SP {
   return {
-    update: getShellUpdate(state)
+    update: getShellUpdateState(state),
+    availableVersion: getAvailableShellUpdate(state),
   }
 }
 
 function mapDispatchToProps (dispatch: Dispatch): DP {
   return {
-    checkForUpdates: () => dispatch(checkForShellUpdates()),
+    checkUpdate: () => dispatch(checkShellUpdate()),
     downloadUpdate: () => dispatch(downloadShellUpdate()),
-    quitAndInstall: () => quitAndInstallShellUpdate(),
-    closeUpdateModal: () => {
-      dispatch(setUpdateSeen())
+    applyUpdate: () => dispatch(applyShellUpdate()),
+    closeModal: () => {
+      dispatch(setShellUpdateSeen())
       dispatch(push('/menu/app'))
-    }
+    },
   }
 }

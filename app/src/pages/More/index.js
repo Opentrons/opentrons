@@ -7,7 +7,7 @@ import AppSettings from './AppSettings'
 import Resources from './Resources'
 
 type Props = {
-  match: Match
+  match: Match,
 }
 
 export default function More (props: Props) {

@@ -4,5 +4,5 @@ import NameThisLabwareOverlay from './NameThisLabwareOverlay'
 
 export {
   LabwareOnDeck,
-  NameThisLabwareOverlay
+  NameThisLabwareOverlay,
 }

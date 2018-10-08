@@ -1,3 +1,6 @@
+# TODO: Modify all calls to get a Well to use the `wells` method
+# TODO: Test `labware.create` against new schemas
+# TODO: Modify calibration file shape to fit new design
 import os
 import json
 import tempfile
@@ -73,7 +76,7 @@ def test_list_labware():
     # Minor spot-checks, function is simple. Values will need to be updated if
     # labware is added to library
     lw = ldef.list_all_labware()
-    assert len(lw) == 44
+    assert len(lw) == 54
     assert lw[0] == '12-well-plate'
     assert lw[-1] == 'wheaton_vial_rack'
 

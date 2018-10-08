@@ -6,7 +6,7 @@ import {connect} from 'react-redux'
 import {
   selectors as robotSelectors,
   type Pipette,
-  type Labware
+  type Labware,
 } from '../../robot'
 
 import ConfirmPositionContents from './ConfirmPositionContents'
@@ -16,7 +16,7 @@ import InProgressContents from './InProgressContents'
 type OwnProps = Labware
 
 type StateProps = {
-  calibrator: ?Pipette
+  calibrator: ?Pipette,
 }
 
 type Props = OwnProps & StateProps

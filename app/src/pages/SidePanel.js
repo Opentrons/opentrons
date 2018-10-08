@@ -12,7 +12,7 @@ import RunPanel from '../components/RunPanel'
 export default function NavPanel () {
   return (
     <Switch>
-      <Route path='/robots' component={ConnectPanel} />
+      <Route path='/robots/:name?' component={ConnectPanel} />
       <Route path='/menu' component={MenuPanel} />
       <Route path='/upload' component={UploadPanel} />
       <Route path='/calibrate' component={CalibratePanel} />

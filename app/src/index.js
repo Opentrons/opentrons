@@ -9,7 +9,7 @@ import createHistory from 'history/createHashHistory'
 import {ConnectedRouter, routerMiddleware} from 'react-router-redux'
 
 import createLogger from './logger'
-import {checkForShellUpdates, shellMiddleware} from './shell'
+import {checkShellUpdate, shellMiddleware} from './shell'
 
 import {healthCheckMiddleware} from './health-check'
 import {apiClientMiddleware as robotApiMiddleware} from './robot'
@@ -72,7 +72,7 @@ store.dispatch(initializeAnalytics())
 store.dispatch(initializeSupport())
 
 // kickoff an initial update check at launch
-store.dispatch(checkForShellUpdates())
+store.dispatch(checkShellUpdate())
 
 // kickoff a discovery run immediately
 store.dispatch(startDiscovery())

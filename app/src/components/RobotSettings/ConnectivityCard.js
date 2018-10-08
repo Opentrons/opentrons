@@ -11,7 +11,7 @@ import {
   makeGetRobotWifiList,
   makeGetRobotWifiConfigure,
   type RobotWifiList,
-  type RobotWifiConfigure
+  type RobotWifiConfigure,
 } from '../../http-api-client'
 
 import {RefreshCard, LabeledValue} from '@opentrons/components'
@@ -57,13 +57,13 @@ function ConnectivityCard (props: Props) {
     configure,
     listRequest: {
       inProgress: listInProgress,
-      response: listResponse
+      response: listResponse,
     },
     configureRequest: {
       inProgress: configInProgress,
       response: configResponse,
-      error: configError
-    }
+      error: configError,
+    },
   } = props
 
   const list = (listResponse && listResponse.list) || []
@@ -76,7 +76,7 @@ function ConnectivityCard (props: Props) {
 
   const listOptions = list.map(({active, ssid}) => ({
     name: active ? `${ssid} *` : ssid,
-    value: ssid
+    value: ssid,
   }))
 
   return (
@@ -122,7 +122,7 @@ function makeMapStateToProps () {
 
   return (state: State, ownProps: OwnProps): StateProps => ({
     listRequest: getWifiList(state, ownProps),
-    configureRequest: getWifiConfigure(state, ownProps)
+    configureRequest: getWifiConfigure(state, ownProps),
   })
 }
 
@@ -145,6 +145,6 @@ function mapDispatchToProps (
     fetchList,
     configure,
     clearSuccessfulConfigure,
-    clearFailedConfigure
+    clearFailedConfigure,
   }
 }

@@ -5,12 +5,11 @@ import aspirate from './aspirate'
 import dispense from './dispense'
 import {mixUtil} from './mix'
 import replaceTip from './replaceTip'
-import {reduceCommandCreators} from './utils'
 import touchTip from './touchTip'
 import * as errorCreators from './errorCreators'
-import type {TransferFormData, RobotState, CommandCreator} from './'
+import type {TransferFormData, RobotState, CommandCreator, CompoundCommandCreator} from './'
 
-const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: RobotState) => {
+const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotState: RobotState) => {
   /**
     Transfer will iterate through a set of 1 or more source and destination wells.
     For each pair, it will aspirate from the source well, then dispense into the destination well.
@@ -36,14 +35,14 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
   const pipetteData = prevRobotState.instruments[data.pipette]
   if (!pipetteData) {
     // bail out before doing anything else
-    return {
-      errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: data.pipette})]
-    }
+    return [(_robotState) => ({
+      errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: data.pipette})],
+    })]
   }
 
   const {
     aspirateOffsetFromBottomMm,
-    dispenseOffsetFromBottomMm
+    dispenseOffsetFromBottomMm,
   } = data
 
   // TODO error on negative data.disposalVolume?
@@ -74,7 +73,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
         (subTransferVol: number, chunkIdx: number): Array<CommandCreator> => {
           // TODO IMMEDIATELY disposal vol ^^^
           const tipCommands: Array<CommandCreator> = (
-            (data.changeTip === 'once' && chunkIdx === 0) ||
+            (data.changeTip === 'once' && pairIdx === 0 && chunkIdx === 0) ||
             data.changeTip === 'always')
               ? [replaceTip(data.pipette)]
               : []
@@ -107,7 +106,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
             ? [touchTip({
               pipette: data.pipette,
               labware: data.sourceLabware,
-              well: sourceWell
+              well: sourceWell,
             })]
             : []
 
@@ -115,7 +114,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
             ? [touchTip({
               pipette: data.pipette,
               labware: data.destLabware,
-              well: destWell
+              well: destWell,
             })]
             : []
 
@@ -140,7 +139,7 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
               volume: subTransferVol,
               labware: data.sourceLabware,
               well: sourceWell,
-              offsetFromBottomMm: aspirateOffsetFromBottomMm
+              offsetFromBottomMm: aspirateOffsetFromBottomMm,
             }),
             ...touchTipAfterAspirateCommands,
             dispense({
@@ -148,17 +147,16 @@ const transfer = (data: TransferFormData): CommandCreator => (prevRobotState: Ro
               volume: subTransferVol,
               labware: data.destLabware,
               well: destWell,
-              offsetFromBottomMm: dispenseOffsetFromBottomMm
+              offsetFromBottomMm: dispenseOffsetFromBottomMm,
             }),
             ...touchTipAfterDispenseCommands,
-            ...mixInDestinationCommands
+            ...mixInDestinationCommands,
           ]
         }
       )
     }
   )
-
-  return reduceCommandCreators(commandCreators)(prevRobotState)
+  return commandCreators
 }
 
 export default transfer

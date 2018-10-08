@@ -5,7 +5,7 @@ import {selectors} from '../index'
 import {selectors as pipetteSelectors} from '../../pipettes'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-  DEFAULT_MM_FROM_BOTTOM_DISPENSE
+  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
 } from '../../constants'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import type {PipetteChannels} from '@opentrons/shared-data'
@@ -46,6 +46,10 @@ const getChannels = (pipetteId: string, state: BaseState): PipetteChannels => {
   return pipette.channels
 }
 
+// TODO: Ian 2018-09-20 this is only usable by 'unsavedForm'.
+// Eventually we gotta allow arbitrary actions like DELETE_LABWARE
+// (or more speculatively, CHANGE_PIPETTE etc), which affect saved forms from
+// 'outside', to cause changes that run thru all the logic in this block
 function handleFormChange (payload: ChangeFormPayload, getState: GetState): ChangeFormPayload {
   // Use state to handle form changes
   const baseState = getState()
@@ -62,7 +66,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     updateOverrides = {
       ...updateOverrides,
       'aspirate_wells': null,
-      'aspirate_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_ASPIRATE
+      'aspirate_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
     }
   }
 
@@ -71,7 +75,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     updateOverrides = {
       ...updateOverrides,
       'dispense_wells': null,
-      'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE
+      'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
     }
   }
 
@@ -82,7 +86,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       'wells': null,
       // TODO: Ian 2018-09-03 should we have both asp/disp for Mix?
       // if not, is dispense the right choice vs aspirate?
-      'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE
+      'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
     }
   }
 
@@ -111,14 +115,14 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       if (unsavedForm.aspirate_flowRate) {
         updateOverrides = {
           ...updateOverrides,
-          aspirate_flowRate: null
+          aspirate_flowRate: null,
         }
       }
 
       if (unsavedForm.dispense_flowRate) {
         updateOverrides = {
           ...updateOverrides,
-          dispense_flowRate: null
+          dispense_flowRate: null,
         }
       }
     }
@@ -133,16 +137,17 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       if (singleToMulti) {
         updateOverrides = {
           ...updateOverrides,
-          wells: null
+          wells: null,
         }
       } else if (multiToSingle) {
         // multi-channel to single-channel: convert primary wells to all wells
         const labwareId = unsavedForm.labware
-        const labwareType = labwareId && labwareIngredSelectors.getLabware(baseState)[labwareId].type
+        const labware = labwareId && labwareIngredSelectors.getLabware(baseState)[labwareId]
+        const labwareType = labware && labware.type
 
         updateOverrides = {
           ...updateOverrides,
-          wells: _getAllWells(unsavedForm.wells, labwareType)
+          wells: _getAllWells(unsavedForm.wells, labwareType),
         }
       }
     } else {
@@ -151,20 +156,22 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
         updateOverrides = {
           ...updateOverrides,
           'aspirate_wells': null,
-          'dispense_wells': null
+          'dispense_wells': null,
         }
       } else if (multiToSingle) {
         // multi-channel to single-channel: convert primary wells to all wells
         const sourceLabwareId = unsavedForm['aspirate_labware']
         const destLabwareId = unsavedForm['dispense_labware']
 
-        const sourceLabwareType = sourceLabwareId && labwareIngredSelectors.getLabware(baseState)[sourceLabwareId].type
-        const destLabwareType = destLabwareId && labwareIngredSelectors.getLabware(baseState)[destLabwareId].type
+        const sourceLabware = sourceLabwareId && labwareIngredSelectors.getLabware(baseState)[sourceLabwareId]
+        const sourceLabwareType = sourceLabware && sourceLabware.type
+        const destLabware = destLabwareId && labwareIngredSelectors.getLabware(baseState)[destLabwareId]
+        const destLabwareType = destLabware && destLabware.type
 
         updateOverrides = {
           ...updateOverrides,
           'aspirate_wells': _getAllWells(unsavedForm['aspirate_wells'], sourceLabwareType),
-          'dispense_wells': _getAllWells(unsavedForm['dispense_wells'], destLabwareType)
+          'dispense_wells': _getAllWells(unsavedForm['dispense_wells'], destLabwareType),
         }
       }
     }
@@ -173,8 +180,8 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
   return {
     update: {
       ...payload.update,
-      ...updateOverrides
-    }
+      ...updateOverrides,
+    },
   }
 }
 

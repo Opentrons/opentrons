@@ -9,7 +9,7 @@ import type {CalibrateDeckStartedProps} from './types'
 
 import {
   restartRobotServer,
-  deckCalibrationCommand as dcCommand
+  deckCalibrationCommand as dcCommand,
 } from '../../http-api-client'
 
 import {chainActions} from '../../util'
@@ -20,7 +20,7 @@ import ConfirmPosition from './ConfirmPosition'
 type OP = CalibrateDeckStartedProps
 
 type DP = {
-  proceed: () => mixed
+  proceed: () => mixed,
 }
 
 type Props = OP & DP
@@ -44,7 +44,7 @@ function InstructionsModal (props: Props) {
       <SpinnerModalPage
         titleBar={{
           ...titleBarBase,
-          back: {...backButtonBase, disabled: true}
+          back: {...backButtonBase, disabled: true},
         }}
         message={getMovementDescription(props)}
       />
@@ -65,7 +65,7 @@ function InstructionsModal (props: Props) {
     <ModalPage
       titleBar={{
         ...titleBarBase,
-        back: {...backButtonBase, Component: Link, to: exitUrl}
+        back: {...backButtonBase, Component: Link, to: exitUrl},
       }}
       heading={getHeading(props)}
     >
@@ -115,37 +115,37 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
     actions = [
       dcCommand(robot, {command: 'attach tip', tipLength: pipette.tipLength}),
       dcCommand(robot, {command: 'move', point: 'safeZ'}),
-      goToNext
+      goToNext,
     ]
   } else if (step === '2') {
     actions = [
       dcCommand(robot, {command: 'save z'}),
       dcCommand(robot, {command: 'move', point: '1'}),
-      goToNext
+      goToNext,
     ]
   } else if (step === '3') {
     actions = [
       dcCommand(robot, {command: 'save xy', point: '1'}),
       dcCommand(robot, {command: 'move', point: '2'}),
-      goToNext
+      goToNext,
     ]
   } else if (step === '4') {
     actions = [
       dcCommand(robot, {command: 'save xy', point: '2'}),
       dcCommand(robot, {command: 'move', point: '3'}),
-      goToNext
+      goToNext,
     ]
   } else if (step === '5') {
     actions = [
       dcCommand(robot, {command: 'save xy', point: '3'}),
       dcCommand(robot, {command: 'move', point: 'attachTip'}),
-      goToNext
+      goToNext,
     ]
   } else {
     actions = [
       dcCommand(robot, {command: 'save transform'}),
       restartRobotServer(robot),
-      push(ownProps.parentUrl)
+      push(ownProps.parentUrl),
     ]
   }
 

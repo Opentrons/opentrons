@@ -6,7 +6,7 @@ import {OutlineButton} from '@opentrons/components'
 import styles from './styles.css'
 
 type Props = {
-  availableUpdate?: ?string
+  availableUpdate?: ?string,
 }
 
 export default function ModuleUpdate (props: Props) {

@@ -12,7 +12,8 @@ import {stepIconsByType, type StepIdType} from '../../form-types'
 import type {
   SubstepIdentifier,
   StepItemData,
-  SubstepItemData
+  SubstepItemData,
+  WellIngredientNames,
 } from '../../steplist/types'
 
 type StepItemProps = {
@@ -25,6 +26,7 @@ type StepItemProps = {
   selected?: boolean,
   hovered?: boolean,
   hoveredSubstep: ?SubstepIdentifier,
+  ingredNames: WellIngredientNames,
 
   getLabwareName: (labwareId: ?string) => ?string,
   handleSubstepHover: SubstepIdentifier => mixed,
@@ -46,7 +48,7 @@ export default function StepItem (props: StepItemProps) {
     onStepMouseLeave,
     onStepClick,
     onStepItemCollapseToggle,
-    onStepHover
+    onStepHover,
   } = props
 
   const iconName = step && stepIconsByType[step.stepType]
@@ -76,7 +78,8 @@ function getStepItemContents (stepItemProps: StepItemProps) {
     substeps,
     getLabwareName,
     hoveredSubstep,
-    handleSubstepHover
+    handleSubstepHover,
+    ingredNames,
   } = stepItemProps
 
   const formData = step && step.formData
@@ -134,6 +137,7 @@ function getStepItemContents (stepItemProps: StepItemProps) {
     result.push(
       <SourceDestSubstep
         key='substeps'
+        ingredNames={ingredNames}
         substeps={substeps}
         hoveredSubstep={hoveredSubstep}
         onSelectSubstep={handleSubstepHover}

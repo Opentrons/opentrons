@@ -72,3 +72,60 @@
 .error_icon {
   fill: var(--c-warning);
 }
+
+.liquid_circle {
+  height: 2em;
+  width: 2em;
+  border-radius: 50%;
+  margin-right: 1em;
+}
+
+.liquid_tooltip_contents {
+  margin: 0.5em;
+}
+
+.ingred_row {
+  min-width: 180px;
+}
+
+.ingred_row > td {
+  flex: 1 1 40px;
+}
+
+.ingred_row:not(:last-child) > td {
+  padding-bottom: 0.5em;
+}
+
+.ingred_name {
+  text-align: left;
+  padding-right: 1em;
+}
+
+.ingred_percentage {
+  text-align: right;
+  padding-right: 1em;
+}
+
+.ingred_partial_volume {
+  text-align: right;
+}
+
+.total_divider {
+  height: 1px;
+  width: 100%;
+  background-color: var(--c-light-gray);
+  margin: 1em 0;
+}
+
+.total_row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.ingred_pill {
+  cursor: default;
+}
+
+.multi_substep_header {
+  font-style: italic;
+}

@@ -1,0 +1,34 @@
+{
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Opentrons/opentrons.git"
+  },
+  "author": {
+    "name": "Opentrons Labworks",
+    "email": "engineering@opentrons.com"
+  },
+  "name": "protocol-library-kludge",
+  "private": true,
+  "version": "3.4.0",
+  "description": "Protocol library stuff (WIP)",
+  "main": "src/index.js",
+  "bugs": {
+    "url": "https://github.com/Opentrons/opentrons/issues"
+  },
+  "homepage": "https://github.com/Opentrons/opentrons",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@opentrons/components": "3.4.0",
+    "classnames": "^2.2.5",
+    "lodash": "^4.17.4",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-hot-loader": "^3.0.0-beta.7",
+    "react-redux": "^5.0.6",
+    "react-router-dom": "^4.1.1"
+  },
+  "devDependencies": {
+    "flow-bin": "^0.82.0",
+    "flow-typed": "^2.5.1"
+  }
+}

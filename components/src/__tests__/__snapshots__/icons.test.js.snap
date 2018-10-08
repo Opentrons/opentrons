@@ -617,6 +617,26 @@ exports[`icons ot-calibrate renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons ot-click-and-drag renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 48 48"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M44.1 37.9l-10.9-9.2H37v-4.2h-4.2v3.9l-.1-.1c-.2-.2-.5-.3-.7-.3-.6 0-1 .4-1 1v15c0 .6.4 1 1 1 .2 0 .5-.1.6-.2l2.5-2 2.2 4.7c.2.5.8.7 1.3.5l3.6-1.7c.5-.2.7-.8.5-1.3l-2.2-4.7 3.2-.6c.2 0 .4-.2.6-.3.3-.6.3-1.2-.2-1.5zM3 31.9h4.2v4.2H3zM3 8.5h4.2v4.2H3zM3 15.9h4.2v4.2H3zM3 24.4h4.2v4.2H3zM32.8 8.5H37v4.2h-4.2zM32.8 15.9H37v4.2h-4.2zM32.8 0H37v4.2h-4.2zM25.3 31.9h4.2v4.2h-4.2zM25.3 0h4.2v4.2h-4.2zM3 0h4.2v4.2H3zM17.9 0h4.2v4.2h-4.2zM10.4 31.9h4.2v4.2h-4.2zM17.9 31.9h4.2v4.2h-4.2zM10.4 0h4.2v4.2h-4.2z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons ot-connect renders correctly 1`] = `
 <svg
   aria-hidden="true"
@@ -857,6 +877,26 @@ exports[`icons ot-transfer renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons ot-water-outline renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="m 12,3.1972656 -0.650391,0.7304688 c 0,0 -1.33604,1.5032424 -2.6757809,3.4570312 -1.3397408,1.9537888 -2.7636718,4.2980244 -2.7636719,6.4726564 3e-7,3.352541 2.7373029,6.087891 6.0898438,6.08789 3.352541,0 6.089843,-2.735349 6.089844,-6.08789 0,-2.174632 -1.423931,-4.5188676 -2.763672,-6.4726564 C 13.986431,5.4309768 12.650391,3.9277344 12.650391,3.9277344 L 12,3.1972656 Z m 0,2.7265625 c 0.42229,0.4960538 0.947441,1.0669874 1.892578,2.4453125 1.269817,1.8518164 2.457031,4.1835024 2.457031,5.4882814 0,2.412334 -1.937275,4.349609 -4.349609,4.349609 -2.4123345,0 -4.3496092,-1.937275 -4.3496094,-4.349609 0,-1.304779 1.1872144,-3.636465 2.4570314,-5.4882814 C 11.052559,6.9908155 11.57771,6.4198819 12,5.9238281 Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons pause renders correctly 1`] = `
 <svg
   aria-hidden="true"
@@ -1092,6 +1132,26 @@ exports[`icons usb renders correctly 1`] = `
 >
   <path
     d="M15.677 11.32h1.132v2.265h-3.396V4.528h2.264L12.281 0 8.885 4.528h2.264v9.057H7.753v-2.343c.792-.42 1.358-1.223 1.358-2.185 0-1.37-1.12-2.491-2.49-2.491s-2.49 1.12-2.49 2.49c0 .963.565 1.767 1.358 2.186v2.343a2.256 2.256 0 0 0 2.264 2.264h3.396v3.453a2.492 2.492 0 0 0-1.358 2.207 2.49 2.49 0 0 0 4.98 0 2.49 2.49 0 0 0-1.358-2.207v-3.453h3.396a2.256 2.256 0 0 0 2.265-2.264V11.32h1.132V6.792h-4.529v4.529z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons water renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M12,20A6,6 0 0,1 6,14C6,10 12,3.25 12,3.25C12,3.25 18,10 18,14A6,6 0 0,1 12,20Z"
     fillRule="evenodd"
   />
 </svg>

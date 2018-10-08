@@ -25,8 +25,8 @@ export default function ConfirmPipette (props: ChangePipetteProps) {
         subtitle: props.subtitle,
         back: {
           onClick: props.back,
-          disabled: success || attachedWrong
-        }
+          disabled: success || attachedWrong,
+        },
       }}
     >
       <Status {...props} />
@@ -47,7 +47,7 @@ function Status (props: ChangePipetteProps) {
   const iconName = success ? 'check-circle' : 'close-circle'
   const iconClass = cx(styles.confirm_icon, {
     [styles.success]: success,
-    [styles.failure]: !success
+    [styles.failure]: !success,
   })
 
   let message
@@ -93,7 +93,7 @@ function StatusDetails (props: ChangePipetteProps) {
               ...props,
               channels: getPipetteChannelsByName(wantedPipetteName),
               diagram: 'tab',
-              direction: 'attach'
+              direction: 'attach',
             })}
           />
           <p className={styles.confirm_failure_instructions}>
@@ -133,7 +133,7 @@ function TryAgainButton (props: ChangePipetteProps) {
     checkPipette,
     attachedWrong,
     wantedPipetteName,
-    actualPipette
+    actualPipette,
   } = props
 
   let buttonProps
@@ -142,17 +142,17 @@ function TryAgainButton (props: ChangePipetteProps) {
     buttonProps = {
       Component: Link,
       to: baseUrl.replace(`/${wantedPipetteName}`, ''),
-      children: 'detach and try again'
+      children: 'detach and try again',
     }
   } else if (actualPipette) {
     buttonProps = {
       onClick: checkPipette,
-      children: 'confirm pipette is detached'
+      children: 'confirm pipette is detached',
     }
   } else {
     buttonProps = {
       onClick: checkPipette,
-      children: 'have robot check connection again'
+      children: 'have robot check connection again',
     }
   }
 

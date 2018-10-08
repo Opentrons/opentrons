@@ -3,7 +3,7 @@
 // application types
 import type {
   Store as ReduxStore,
-  Dispatch as ReduxDispatch
+  Dispatch as ReduxDispatch,
 } from 'redux'
 
 import type {RouterAction} from 'react-router-redux'
@@ -15,6 +15,7 @@ import type {Action as HttpApiAction} from './http-api-client'
 import type {ShellAction} from './shell'
 import type {ConfigAction} from './config'
 import type {DiscoveryAction} from './discovery'
+import type {ProtocolAction} from './protocol'
 
 export type State = $Call<reducer>
 
@@ -28,6 +29,7 @@ export type Action =
   | ConfigAction
   | RouterAction
   | DiscoveryAction
+  | ProtocolAction
 
 export type ActionType = $PropertyType<Action, 'type'>
 
@@ -46,7 +48,7 @@ export type Middleware = (s: MwStore) => (n: PlainDispatch) => PlainDispatch
 
 type MwStore = {
   getState: GetState,
-  dispatch: Dispatch
+  dispatch: Dispatch,
 }
 
 type PlainDispatch = ReduxDispatch<Action>

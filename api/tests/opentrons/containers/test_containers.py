@@ -1,18 +1,23 @@
 import math
 import unittest
 
-from opentrons.containers import (
+from opentrons.legacy_api.containers import (
     load as containers_load,
-    list as containers_list
+    list as containers_list,
 )
-from opentrons import Robot
-from opentrons.containers import placeable
-from opentrons.containers.placeable import (
+from opentrons.legacy_api.robot import Robot
+from opentrons.legacy_api.containers.placeable import (
     Container,
     Well,
     Deck,
-    Slot)
+    Slot,
+    unpack_location)
 from tests.opentrons import generate_plate
+# TODO: Modify all calls to get a Well to use the `wells` method
+# TODO: remove `unpack_location` calls
+# TODO: revise `share` logic
+# TODO: remove `generate_plate` and use JS generated data
+# TODO: Modify calls that expect Deck and Slot to be Placeables
 
 
 class ContainerTestCase(unittest.TestCase):
@@ -27,7 +32,7 @@ class ContainerTestCase(unittest.TestCase):
         slot = '1'
         containers_load(self.robot, container_name, slot)
         # 2018-1-30 Incremented number of containers based on fixed trash
-        self.assertEquals(len(self.robot.get_containers()), 2)
+        self.assertEqual(len(self.robot.get_containers()), 2)
 
         self.assertRaises(
             RuntimeWarning, containers_load,
@@ -47,11 +52,11 @@ class ContainerTestCase(unittest.TestCase):
 
         containers_load(
             self.robot, container_name, slot, 'custom-name', share=True)
-        self.assertEquals(len(self.robot.get_containers()), 3)
+        self.assertEqual(len(self.robot.get_containers()), 3)
 
         containers_load(
             self.robot, 'trough-12row', slot, share=True)
-        self.assertEquals(len(self.robot.get_containers()), 4)
+        self.assertEqual(len(self.robot.get_containers()), 4)
 
     def test_load_legacy_slot_names(self):
         slots_old = [
@@ -89,7 +94,7 @@ class ContainerTestCase(unittest.TestCase):
 
     def test_bad_unpack_containers(self):
         self.assertRaises(
-            ValueError, placeable.unpack_location, 1)
+            ValueError, unpack_location, 1)
 
     def test_iterate_without_parent(self):
         c = generate_plate(4, 2, (5, 5), (0, 0), 5)

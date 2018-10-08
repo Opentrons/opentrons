@@ -1,6 +1,6 @@
 // @flow
 // logger
-import {ipcRenderer} from 'electron'
+const {ipcRenderer} = global.APP_SHELL
 
 // TODO(mc, 2018-05-17): put this type somewhere common to app and app-shell
 export type LogLevel =
@@ -21,7 +21,7 @@ const LEVELS: Array<LogLevel> = [
   'http',
   'verbose',
   'debug',
-  'silly'
+  'silly',
 ]
 
 export default function createLogger (filename: string): Logger {
@@ -29,7 +29,7 @@ export default function createLogger (filename: string): Logger {
 
   return LEVELS.reduce((result, level) => ({
     ...result,
-    [level]: (message, meta) => log(level, message, label, meta)
+    [level]: (message, meta) => log(level, message, label, meta),
   }), {})
 }
 

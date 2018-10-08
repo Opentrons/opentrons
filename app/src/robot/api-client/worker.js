@@ -19,13 +19,13 @@ function dispatchFromWorker (action) {
   if (action.payload) {
     if (action.error === true) {
       action = Object.assign({}, action, {
-        payload: errorToPlainObject(action.payload)
+        payload: errorToPlainObject(action.payload),
       })
     } else if (action.payload.error) {
       action = Object.assign({}, action, {
         payload: Object.assign({}, action.payload, {
-          error: errorToPlainObject(action.payload.error)
-        })
+          error: errorToPlainObject(action.payload.error),
+        }),
       })
     }
   }
@@ -41,6 +41,6 @@ function dispatchFromWorker (action) {
 
 function errorToPlainObject (error) {
   return Object.assign({
-    name: error.name, message: error.message
+    name: error.name, message: error.message,
   }, error)
 }

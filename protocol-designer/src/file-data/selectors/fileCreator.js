@@ -2,14 +2,14 @@
 import {createSelector} from 'reselect'
 import mapValues from 'lodash/mapValues'
 import {getPropertyAllPipettes} from '@opentrons/shared-data'
-import {fileMetadata} from './fileFields'
+import {getFileMetadata} from './fileFields'
 import {getInitialRobotState, robotStateTimeline} from './commands'
 import {selectors as dismissSelectors} from '../../dismiss'
 import {selectors as ingredSelectors} from '../../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../../steplist'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-  DEFAULT_MM_FROM_BOTTOM_DISPENSE
+  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
 } from '../../constants'
 import type {BaseState} from '../../types'
 import type {ProtocolFile, FilePipette, FileLabware} from '../../file-types'
@@ -19,15 +19,20 @@ import type {LabwareData, PipetteData} from '../../step-generation'
 const protocolSchemaVersion = '1.0.0'
 const applicationVersion = process.env.OT_PD_VERSION || 'unknown version'
 
+// Internal release date: this should never be read programatically,
+// it just helps us humans quickly identify what build a user was using
+// when we look at saved protocols (without requiring us to trace thru git logs)
+const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
+
 const executionDefaults = {
   'aspirate-flow-rate': getPropertyAllPipettes('aspirateFlowRate'),
   'dispense-flow-rate': getPropertyAllPipettes('dispenseFlowRate'),
   'aspirate-mm-from-bottom': DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-  'dispense-mm-from-bottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE
+  'dispense-mm-from-bottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
 }
 
 export const createFile: BaseState => ProtocolFile = createSelector(
-  fileMetadata,
+  getFileMetadata,
   getInitialRobotState,
   robotStateTimeline,
   dismissSelectors.getAllDismissedWarnings,
@@ -45,15 +50,16 @@ export const createFile: BaseState => ProtocolFile = createSelector(
     savedStepForms,
     orderedSteps
   ) => {
-    const {author, description} = fileMetadata
-    const name = fileMetadata.name || 'untitled'
+    const {author, description, created} = fileMetadata
+    const name = fileMetadata['protocol-name'] || 'untitled'
+    const lastModified = fileMetadata['last-modified']
 
     const instruments = mapValues(
       initialRobotState.instruments,
       (pipette: PipetteData): FilePipette => ({
         mount: pipette.mount,
         // TODO HACK Ian 2018-05-11 use pipette definitions in labware-definitions
-        model: `p${pipette.maxVolume}_${pipette.channels === 1 ? 'single' : 'multi'}_v1` // eg p10_single_v1
+        model: `p${pipette.maxVolume}_${pipette.channels === 1 ? 'single' : 'multi'}_v1`, // eg p10_single_v1
       })
     )
 
@@ -62,7 +68,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
       (l: LabwareData): FileLabware => ({
         slot: l.slot,
         'display-name': l.name || l.type, // TODO Ian 2018-05-11 "humanize" type when no name?
-        model: l.type
+        model: l.type,
       })
     )
 
@@ -78,11 +84,13 @@ export const createFile: BaseState => ProtocolFile = createSelector(
         'protocol-name': name,
         author,
         description,
-        created: Date.now(),
-        'last-modified': null,
+        created,
+        'last-modified': lastModified,
+
+        // TODO LATER
         category: null,
         subcategory: null,
-        tags: []
+        tags: [],
       },
 
       'default-values': executionDefaults,
@@ -90,6 +98,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
       'designer-application': {
         'application-name': 'opentrons/protocol-designer',
         'application-version': applicationVersion,
+        _internalAppBuildDate,
         data: {
           pipetteTiprackAssignments: mapValues(
             initialRobotState.instruments,
@@ -99,12 +108,12 @@ export const createFile: BaseState => ProtocolFile = createSelector(
           ingredients,
           ingredLocations,
           savedStepForms,
-          orderedSteps: savedOrderedSteps
-        }
+          orderedSteps: savedOrderedSteps,
+        },
       },
 
       robot: {
-        model: 'OT-2 Standard'
+        model: 'OT-2 Standard',
       },
 
       pipettes: instruments,
@@ -113,10 +122,10 @@ export const createFile: BaseState => ProtocolFile = createSelector(
       procedure: _robotStateTimeline.timeline.map((timelineItem, i) => ({
         annotation: {
           name: `TODO Name ${i}`,
-          description: 'todo description'
+          description: 'todo description',
         },
-        subprocedure: timelineItem.commands.reduce((acc, c) => [...acc, c], [])
-      }))
+        subprocedure: timelineItem.commands.reduce((acc, c) => [...acc, c], []),
+      })),
     }
   }
 )

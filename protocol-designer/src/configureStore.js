@@ -11,7 +11,7 @@ function getRootReducer () {
     pipettes: require('./pipettes').rootReducer,
     steplist: require('./steplist').rootReducer,
     tutorial: require('./tutorial').rootReducer,
-    wellSelection: require('./well-selection/reducers').default
+    wellSelection: require('./well-selection/reducers').default,
   })
 
   return (state, action) => {
@@ -49,7 +49,7 @@ export default function configureStore () {
       './pipettes',
       './steplist/reducers',
       './tutorial/reducers',
-      './well-selection/reducers'
+      './well-selection/reducers',
     ], replaceReducers)
   }
 

@@ -1,5 +1,5 @@
 import pytest
-from opentrons.robot import robot_configs
+from opentrons.legacy_api.robot import robot_configs
 from opentrons.config import get_config_index
 from opentrons.util.calibration_functions import update_instrument_config
 
@@ -42,8 +42,8 @@ def config(monkeypatch):
 
 @pytest.fixture
 def fixture(config, monkeypatch):
-    from opentrons.robot.robot import Robot
-    from opentrons.instruments.pipette import Pipette
+    from opentrons.legacy_api.robot import Robot
+    from opentrons.legacy_api.instruments.pipette import Pipette
     from collections import namedtuple
     from opentrons.drivers.smoothie_drivers import driver_3_0
 

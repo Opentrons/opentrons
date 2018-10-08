@@ -8,11 +8,11 @@ type Props = {
   onSelectionMove?: (e: MouseEvent, GenericRect) => mixed,
   onSelectionDone?: (e: MouseEvent, GenericRect) => mixed,
   svg?: boolean, // set true if this is an embedded SVG
-  children?: React.Node
+  children?: React.Node,
 }
 
 type State = {
-  positions: DragRect | null
+  positions: DragRect | null,
 }
 
 class SelectionRect extends React.Component<Props, State> {
@@ -61,7 +61,7 @@ class SelectionRect extends React.Component<Props, State> {
         left: left + 'px',
         top: top + 'px',
         width: width + 'px',
-        height: height + 'px'
+        height: height + 'px',
       }}
     />
   }
@@ -74,7 +74,7 @@ class SelectionRect extends React.Component<Props, State> {
       x0: Math.min(xStart, xDynamic),
       x1: Math.max(xStart, xDynamic),
       y0: Math.min(yStart, yDynamic),
-      y1: Math.max(yStart, yDynamic)
+      y1: Math.max(yStart, yDynamic),
     }
   }
 

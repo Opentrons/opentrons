@@ -9,7 +9,7 @@ const dropTip = (pipetteId: string): CommandCreator => (prevRobotState: RobotSta
   if (prevRobotState.tipState.pipettes[pipetteId] === false) {
     return {
       robotState: prevRobotState,
-      commands: []
+      commands: [],
     }
   }
 
@@ -23,9 +23,9 @@ const dropTip = (pipetteId: string): CommandCreator => (prevRobotState: RobotSta
       params: {
         pipette: pipetteId,
         labware: FIXED_TRASH_ID,
-        well: 'A1' // TODO: Is 'A1' of the trash always the right place to drop tips?
-      }
-    }
+        well: 'A1', // TODO: Is 'A1' of the trash always the right place to drop tips?
+      },
+    },
   ]
 
   return {
@@ -38,9 +38,9 @@ const dropTip = (pipetteId: string): CommandCreator => (prevRobotState: RobotSta
         labwareId: FIXED_TRASH_ID,
         labwareType: 'fixed-trash',
         volume: prevRobotState.instruments[pipetteId].maxVolume, // update liquid state as if it was a dispense, but with max volume of pipette
-        well: 'A1'
-      }, prevRobotState.liquidState)
-    }
+        well: 'A1',
+      }, prevRobotState.liquidState),
+    },
   }
 }
 

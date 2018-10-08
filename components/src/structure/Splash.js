@@ -10,7 +10,7 @@ type Props = {
   /** optional alternative icon name. Defaults to 'logo'. */
   iconName?: IconName,
   /** additional className for Splash */
-  className?: string
+  className?: string,
 }
 
 export default function Splash (props: Props) {

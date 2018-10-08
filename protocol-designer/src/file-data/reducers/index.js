@@ -4,15 +4,15 @@ import {handleActions, type ActionType} from 'redux-actions'
 
 import {
   saveFileMetadata,
-  updateFileMetadataFields
+  updateFileMetadataFields,
 } from '../actions'
 import type {FileMetadataFields} from '../types'
 import type {LoadFileAction, NewProtocolFields} from '../../load-file'
 
 const defaultFields = {
-  name: '',
+  'protocol-name': '',
   author: '',
-  description: ''
+  description: '',
 }
 
 const updateMetadataFields = (
@@ -20,11 +20,7 @@ const updateMetadataFields = (
   action: LoadFileAction
 ): FileMetadataFields => {
   const {metadata} = action.payload
-  return {
-    author: metadata.author,
-    description: metadata.description,
-    name: metadata['protocol-name']
-  }
+  return metadata
 }
 
 function newProtocolMetadata (
@@ -33,7 +29,8 @@ function newProtocolMetadata (
 ): FileMetadataFields {
   return {
     ...defaultFields,
-    name: action.payload.name || ''
+    'protocol-name': action.payload.name || '',
+    created: Date.now(),
   }
 }
 
@@ -42,12 +39,12 @@ const unsavedMetadataForm = handleActions({
   CREATE_NEW_PROTOCOL: newProtocolMetadata,
   UPDATE_FILE_METADATA_FIELDS: (state: FileMetadataFields, action: ActionType<typeof updateFileMetadataFields>): FileMetadataFields => ({
     ...state,
-    ...action.payload
+    ...action.payload,
   }),
   SAVE_FILE_METADATA: (state: FileMetadataFields, action: ActionType<typeof saveFileMetadata>): FileMetadataFields => ({
     ...state,
-    ...action.payload
-  })
+    ...action.payload,
+  }),
 }, defaultFields)
 
 const fileMetadata = handleActions({
@@ -55,18 +52,22 @@ const fileMetadata = handleActions({
   CREATE_NEW_PROTOCOL: newProtocolMetadata,
   SAVE_FILE_METADATA: (state: FileMetadataFields, action: ActionType<typeof saveFileMetadata>): FileMetadataFields => ({
     ...state,
-    ...action.payload
-  })
+    ...action.payload,
+  }),
+  SAVE_PROTOCOL_FILE: (state: FileMetadataFields): FileMetadataFields => {
+    // NOTE: 'last-modified' is updated "on-demand", in response to user clicking "save/export"
+    return {...state, 'last-modified': Date.now()}
+  },
 }, defaultFields)
 
 export type RootState = {
   unsavedMetadataForm: FileMetadataFields,
-  fileMetadata: FileMetadataFields
+  fileMetadata: FileMetadataFields,
 }
 
 const _allReducers = {
   unsavedMetadataForm,
-  fileMetadata
+  fileMetadata,
 }
 
 export const rootReducer = combineReducers(_allReducers)

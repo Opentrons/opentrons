@@ -1,5 +1,9 @@
 // @flow
 // robot session (protocol) state and reducer
+import omit from 'lodash/omit'
+import {actionTypes} from '../actions'
+
+import type {Action} from '../../types'
 import type {
   Command,
   StatePipette,
@@ -7,30 +11,22 @@ import type {
   SessionModule,
   Mount,
   Slot,
-  SessionStatus
+  SessionStatus,
 } from '../types'
 
-import {actionTypes} from '../actions'
-
-import type {
-  Action,
-  DisconnectResponseAction,
-  SessionUpdateAction
-} from '../actions'
+import type {SessionUpdateAction} from '../actions'
 
 type Request = {
   inProgress: boolean,
-  error: ?{message: string}
+  error: ?{message: string},
 }
 
 export type State = {
   sessionRequest: Request,
-  name: string,
   state: SessionStatus,
-  errors: {}[],
-  protocolText: string,
+  errors: Array<{}>,
   // TODO(mc, 2018-01-11): command IDs should be strings
-  protocolCommands: number[],
+  protocolCommands: Array<number>,
   protocolCommandsById: {
     [number]: Command,
   },
@@ -53,8 +49,6 @@ export type State = {
 
 // TODO(mc, 2018-01-11): replace actionType constants with Flow types
 const {
-  SESSION,
-  SESSION_RESPONSE,
   RUN,
   RUN_RESPONSE,
   PAUSE,
@@ -63,16 +57,14 @@ const {
   RESUME_RESPONSE,
   CANCEL,
   CANCEL_RESPONSE,
-  TICK_RUN_TIME
+  TICK_RUN_TIME,
 } = actionTypes
 
 const INITIAL_STATE: State = {
   // loading a protocol
   sessionRequest: {inProgress: false, error: null},
-  name: '',
   state: '',
   errors: [],
-  protocolText: '',
   protocolCommands: [],
   protocolCommandsById: {},
 
@@ -87,7 +79,7 @@ const INITIAL_STATE: State = {
   resumeRequest: {inProgress: false, error: null},
   cancelRequest: {inProgress: false, error: null},
   startTime: null,
-  runTime: 0
+  runTime: 0,
 }
 
 export default function sessionReducer (
@@ -96,85 +88,90 @@ export default function sessionReducer (
 ): State {
   switch (action.type) {
     case 'robot:DISCONNECT_RESPONSE':
-      return handleDisconnectResponse(state, action)
+      return INITIAL_STATE
 
     case 'robot:SESSION_UPDATE':
       return handleSessionUpdate(state, action)
 
-    case SESSION:
-    case 'robot:REFRESH_SESSION':
-      return handleSession(state, action)
+    case 'protocol:UPLOAD':
+      return handleSessionInProgress(INITIAL_STATE)
 
-    case SESSION_RESPONSE: return handleSessionResponse(state, action)
-    case RUN: return handleRun(state, action)
-    case RUN_RESPONSE: return handleRunResponse(state, action)
-    case PAUSE: return handlePause(state, action)
-    case PAUSE_RESPONSE: return handlePauseResponse(state, action)
-    case RESUME: return handleResume(state, action)
-    case RESUME_RESPONSE: return handleResumeResponse(state, action)
-    case CANCEL: return handleCancel(state, action)
-    case CANCEL_RESPONSE: return handleCancelResponse(state, action)
-    case TICK_RUN_TIME: return handleTickRunTime(state, action)
+    case 'robot:REFRESH_SESSION':
+      return handleSessionInProgress(state)
+
+    case 'robot:SESSION_RESPONSE':
+    case 'robot:SESSION_ERROR':
+      return handleSessionResponse(state, action)
+
+    case RUN:
+      return handleRun(state, action)
+    case RUN_RESPONSE:
+      return handleRunResponse(state, action)
+    case PAUSE:
+      return handlePause(state, action)
+    case PAUSE_RESPONSE:
+      return handlePauseResponse(state, action)
+    case RESUME:
+      return handleResume(state, action)
+    case RESUME_RESPONSE:
+      return handleResumeResponse(state, action)
+    case CANCEL:
+      return handleCancel(state, action)
+    case CANCEL_RESPONSE:
+      return handleCancelResponse(state, action)
+    case TICK_RUN_TIME:
+      return handleTickRunTime(state, action)
   }
 
   return state
 }
 
-function handleDisconnectResponse (
-  state: State,
-  action: DisconnectResponseAction
-): State {
-  return INITIAL_STATE
-}
-
-function handleSessionUpdate (
-  state: State,
-  action: SessionUpdateAction
-): State {
-  const {payload: {state: sessionState, startTime, lastCommand}} = action
+function handleSessionUpdate (state: State, action: SessionUpdateAction): State {
+  const {
+    payload: {state: sessionState, startTime, lastCommand},
+  } = action
   let {protocolCommandsById} = state
 
   if (lastCommand) {
     const command = {
       ...protocolCommandsById[lastCommand.id],
-      ...lastCommand
+      ...lastCommand,
     }
 
     protocolCommandsById = {
       ...protocolCommandsById,
-      [lastCommand.id]: command
+      [lastCommand.id]: command,
     }
   }
 
   return {...state, state: sessionState, startTime, protocolCommandsById}
 }
 
-function handleSession (state: State, action: any): State {
-  let nextState = {
+function handleSessionInProgress (state: State): State {
+  return {
     ...state,
     runTime: 0,
     startTime: null,
-    sessionRequest: {inProgress: true, error: null}
+    sessionRequest: {inProgress: true, error: null},
   }
-
-  if (action.payload && action.payload.file && action.payload.file.name) {
-    return {...nextState, name: action.payload.file.name}
-  }
-
-  return nextState
 }
 
 function handleSessionResponse (state: State, action: any): State {
-  const {error, payload} = action
+  const {payload} = action
 
-  if (error) {
-    return {...state, sessionRequest: {inProgress: false, error: payload}}
+  if (payload.error) {
+    return {
+      ...state,
+      sessionRequest: {inProgress: false, error: payload.error},
+    }
   }
+
+  const session = omit(payload, ['name', 'protocolText'])
 
   return {
     ...state,
     sessionRequest: {inProgress: false, error: null},
-    ...payload
+    ...session,
   }
 }
 

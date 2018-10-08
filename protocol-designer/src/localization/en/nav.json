@@ -1,0 +1,18 @@
+{
+  "design": "DESIGN",
+  "file": "FILE",
+  "feature_flags": "Feature Flags",
+  "help": "HELP",
+  "settings": "SETTINGS",
+  "privacy": "PRIVACY",
+  "title": {
+    "settings": "Opentrons Beta"
+  },
+  "terminal_item": {
+    "__initial_setup__": "Starting Deck State",
+    "__end__": "Final Deck State"
+  },
+  "subtitle": {
+    "settings-privacy": "Privacy"
+  }
+}

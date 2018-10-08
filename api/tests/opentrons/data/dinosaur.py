@@ -27,7 +27,8 @@ p200.distribute(
         'C7', 'D7', 'E7', 'F7', 'G7', 'D8', 'E8', 'F8',
         'G8', 'H8', 'E9', 'F9', 'G9', 'H9', 'F10', 'G11',
         'H12'
-    )
+    ),
+    disposal_vol=0
 )
 
 p200.distribute(
@@ -36,5 +37,6 @@ p200.distribute(
     plate.wells(
         'C3', 'B4', 'A5', 'B5', 'B6', 'A7', 'B7',
         'C8', 'C9', 'D9', 'E10', 'E11', 'F11', 'G12'
-    )
+    ),
+    disposal_vol=0
 )

@@ -27,7 +27,7 @@ export default function client (dispatch) {
     switch (type) {
       case 'robot:CONNECT': return connect(state, action)
       case 'robot:DISCONNECT': return disconnect(state, action)
-      case actionTypes.SESSION: return createSession(state, action)
+      case 'protocol:UPLOAD': return uploadProtocol(state, action)
       case 'robot:PICKUP_AND_HOME': return pickupAndHome(state, action)
       case 'robot:DROP_TIP_AND_HOME': return dropTipAndHome(state, action)
       case 'robot:CONFIRM_TIPRACK': return confirmTiprack(state, action)
@@ -108,24 +108,16 @@ export default function client (dispatch) {
     dispatch(actions.unexpectedDisconnect())
   }
 
-  function createSession (state, action) {
-    const file = action.payload.file
-    const name = file.name
-    const reader = new FileReader()
+  function uploadProtocol (state, action) {
+    const {name} = state.protocol.file
+    const {contents} = action.payload
 
-    reader.onload = function handleProtocolRead (event) {
-      remote.session_manager.create(name, event.target.result)
-        .then((apiSession) => {
-          // TODO(mc, 2017-10-09): This seems like an API responsibility
-          remote.session_manager.session = apiSession
-          // TODO(mc, 2017-10-12) batch these updates and don't hardcode URL
-          handleApiSession(apiSession)
-        })
-        .catch((error) => dispatch(actions.sessionResponse(error)))
-    }
-
-    dispatch(push('/upload'))
-    return reader.readAsText(file)
+    remote.session_manager.create(name, contents)
+      .then((apiSession) => {
+        remote.session_manager.session = apiSession
+        handleApiSession(apiSession)
+      })
+      .catch((error) => dispatch(actions.sessionResponse(error)))
   }
 
   function moveToFront (state, action) {
@@ -325,7 +317,7 @@ export default function client (dispatch) {
     if ('lastCommand' in apiSession) {
       const lastCommand = apiSession.lastCommand && {
         id: apiSession.lastCommand.id,
-        handledAt: apiSession.lastCommand.handledAt
+        handledAt: apiSession.lastCommand.handledAt,
       }
 
       return dispatch(actions.sessionUpdate({...update, lastCommand}))
@@ -390,7 +382,7 @@ export default function client (dispatch) {
           id,
           description,
           handledAt,
-          children: children.map((c) => c.id)
+          children: children.map((c) => c.id),
         }
       }
     }

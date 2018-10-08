@@ -10,7 +10,7 @@ import {
   OutlineButton,
   PrimaryButton,
   FormGroup,
-  DropdownField
+  DropdownField,
 } from '@opentrons/components'
 import modalStyles from '../../modals/modal.css'
 import {actions, selectors} from '../../../steplist'
@@ -28,22 +28,22 @@ const WELL_ORDER_VALUES: Array<WellOrderOption> = [...VERTICAL_VALUES, ...HORIZO
 
 type SP = {
   initialFirstValue: ?WellOrderOption,
-  initialSecondValue: ?WellOrderOption
+  initialSecondValue: ?WellOrderOption,
 }
 type DP = {
-  updateValues: (firstValue: ?WellOrderOption, secondValue: ?WellOrderOption) => mixed
+  updateValues: (firstValue: ?WellOrderOption, secondValue: ?WellOrderOption) => mixed,
 }
 
 type OP = {
   isOpen: boolean,
   closeModal: () => mixed,
-  prefix: 'aspirate' | 'dispense'
+  prefix: 'aspirate' | 'dispense',
 }
 
 type Props = OP & SP & DP
 type State = {
   firstValue: ?WellOrderOption,
-  secondValue: ?WellOrderOption
+  secondValue: ?WellOrderOption,
 }
 
 class WellOrderModal extends React.Component<Props, State> {
@@ -51,7 +51,7 @@ class WellOrderModal extends React.Component<Props, State> {
     super(props)
     this.state = {
       firstValue: props.initialFirstValue,
-      secondValue: props.initialSecondValue
+      secondValue: props.initialSecondValue,
     }
   }
   applyChanges = () => {
@@ -112,7 +112,7 @@ class WellOrderModal extends React.Component<Props, State> {
                   options={
                     WELL_ORDER_VALUES.map((value) => ({
                       value,
-                      name: i18n.t(`step_edit_form.field.well_order.option.${value}`)
+                      name: i18n.t(`step_edit_form.field.well_order.option.${value}`),
                     }))
                   } />
                 <span className={styles.field_spacer}>{i18n.t('modal.well_order.then')}</span>
@@ -124,7 +124,7 @@ class WellOrderModal extends React.Component<Props, State> {
                     WELL_ORDER_VALUES.map((value) => ({
                       value,
                       name: i18n.t(`step_edit_form.field.well_order.option.${value}`),
-                      disabled: this.isSecondOptionDisabled(value)
+                      disabled: this.isSecondOptionDisabled(value),
                     }))
                   } />
               </div>
@@ -162,7 +162,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   const secondName = ownProps.prefix === 'aspirate' ? 'aspirate_wellOrder_second' : 'dispense_wellOrder_second'
   return {
     initialFirstValue: formData && formData[firstName],
-    initialSecondValue: formData && formData[secondName]
+    initialSecondValue: formData && formData[secondName],
   }
 }
 
@@ -174,9 +174,9 @@ const mapDTP = (dispatch: Dispatch, ownProps: OP): DP => {
     updateValues: (firstValue, secondValue) => {
       dispatch(actions.changeFormInput({update: {
         [firstName]: firstValue,
-        [secondName]: secondValue
+        [secondName]: secondValue,
       }}))
-    }
+    },
   }
 }
 

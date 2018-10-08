@@ -2,15 +2,16 @@
 // robot selectors
 import padStart from 'lodash/padStart'
 import orderBy from 'lodash/orderBy'
-import {createSelector, type Selector} from 'reselect'
+import {createSelector} from 'reselect'
 
 import {
   type ConnectionStatus,
   PIPETTE_MOUNTS,
-  DECK_SLOTS
+  DECK_SLOTS,
 } from './constants'
 
 import type {ContextRouter} from 'react-router'
+import type {OutputSelector} from 'reselect'
 import type {State} from '../types'
 import type {
   Mount,
@@ -21,7 +22,7 @@ import type {
   LabwareType,
   Robot,
   SessionStatus,
-  SessionModule
+  SessionModule,
 } from './types'
 
 const calibration = (state: State) => state.robot.calibration
@@ -45,7 +46,7 @@ export function labwareType (labware: Labware): LabwareType {
 }
 
 // TODO(mc, 2018-08-10): deprecate in favor of getRobots in discovery module
-export const getDiscovered: Selector<State, void, Array<Robot>> =
+export const getDiscovered: OutputSelector<State, void, Array<Robot>> =
   createSelector(
     // TODO(mc, 2018-08-15): not using the selector in discovery right now
     // because of dependency problem in WebWorker where this selector is used
@@ -54,21 +55,21 @@ export const getDiscovered: Selector<State, void, Array<Robot>> =
     (discoveredByName, connectedTo, unexpectedDisconnect) => {
       const robots = Object.keys(discoveredByName)
         .map(name => {
-          const robot = discoveredByName[name]
           const connection = orderBy(
-            robot.connections,
+            discoveredByName[name],
             ['ok', 'local'],
             ['desc', 'desc']
-          ).find(c => c.ok)
+          ).find(c => c.ip && c.ok)
 
           if (!connection) return null
 
           return {
-            name: robot.name,
-            ip: connection.ip,
+            name,
+            // $FlowFixMe: to be fixed by the removal of this selector
+            ip: (connection.ip: string),
             port: connection.port,
             wired: connection.local,
-            isConnected: connectedTo === name
+            isConnected: connectedTo === name,
           }
         })
         .filter(Boolean)
@@ -85,15 +86,15 @@ export function getConnectRequest (state: State) {
   return connection(state).connectRequest
 }
 
-export const getConnectedRobot: Selector<State, void, ?Robot> = createSelector(
+export const getConnectedRobot: OutputSelector<State, void, ?Robot> = createSelector(
   getDiscovered,
   discovered => discovered.find(r => r.isConnected)
 )
 
-export const getConnectedRobotName: Selector<State, void, ?string> =
+export const getConnectedRobotName: OutputSelector<State, void, ?string> =
   createSelector(getConnectedRobot, r => r && r.name)
 
-export const getConnectionStatus: Selector<State, void, ConnectionStatus> =
+export const getConnectionStatus: OutputSelector<State, void, ConnectionStatus> =
   createSelector(
     getConnectedRobotName,
     state => getConnectRequest(state).inProgress,
@@ -109,16 +110,12 @@ export const getConnectionStatus: Selector<State, void, ConnectionStatus> =
     }
   )
 
-export function getSessionLoadInProgress (state: State) {
+export function getSessionLoadInProgress (state: State): boolean {
   return sessionRequest(state).inProgress
 }
 
 export function getUploadError (state: State): ?{message: string} {
   return sessionRequest(state).error
-}
-
-export function getSessionName (state: State): string {
-  return session(state).name
 }
 
 export function getSessionStatus (state: State): SessionStatus {
@@ -178,7 +175,7 @@ function traverseCommands (commandsById, parentIsCurrent) {
       handledAt,
       isCurrent,
       isLast,
-      children: children.map(traverseCommands(commandsById, isCurrent))
+      children: children.map(traverseCommands(commandsById, isCurrent)),
     }
   }
 }
@@ -286,7 +283,7 @@ export const getPipettes = createSelector(
           ...pipette,
           calibration,
           probed,
-          tipOn
+          tipOn,
         }
       })
   }
@@ -329,7 +326,7 @@ export function getModulesBySlot (state: State): {[string]: ?SessionModule} {
   return session(state).modulesBySlot
 }
 
-export const getModules: Selector<State, void, Array<SessionModule>> =
+export const getModules: OutputSelector<State, void, Array<SessionModule>> =
   createSelector(
     getModulesBySlot,
     modulesBySlot => Object

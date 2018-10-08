@@ -6,14 +6,13 @@ import JogControls from '../JogControls'
 import Instructions from './Instructions'
 
 type Props = CalibrateDeckStartedProps & {
-  proceed: () => mixed
+  proceed: () => mixed,
 }
 
 export default function ConfirmPosition (props: Props) {
   return (
     <div>
-      {/* $FlowFixMe: `...props` type doesn't include necessary keys */}
-      <Instructions {...props} />
+      <Instructions calibrationStep={props.calibrationStep} />
       <JogControls jog={props.jog} />
       <PrimaryButton onClick={props.proceed}>
         Save Calibration and Continue

@@ -12,5 +12,5 @@ export {
   DropdownField,
   FormGroup,
   InputField,
-  RadioGroup
+  RadioGroup,
 }

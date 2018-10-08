@@ -39,6 +39,7 @@ test:
 
 .PHONY: lint
 lint:
+	$(python) -m mypy opentrons
 	$(python) -m pylama opentrons tests
 
 .PHONY: docs
@@ -55,7 +56,7 @@ publish:
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
-	$(python) opentrons/server/main.py -P 31950
+	$(python) opentrons/main.py -P 31950
 
 .PHONY: wheel
 wheel: clean

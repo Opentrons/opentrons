@@ -29,7 +29,9 @@ export type ButtonProps = {
   /** custom element or component to use instead of `<button>` */
   Component?: React.ElementType,
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: ?HoverTooltipHandlers
+  hoverTooltipHandlers?: ?HoverTooltipHandlers,
+  /** html tabindex property */
+  tabIndex?: number,
 }
 
 // props to strip if using a custom component
@@ -45,7 +47,7 @@ const STRIP_PROPS = ['inverted', 'iconName', 'children', 'Component']
  * ```
  */
 export default function Button (props: ButtonProps) {
-  const {title, disabled, hover} = props
+  const {title, disabled, hover, tabIndex} = props
   const className = cx(props.className, {[styles.hover]: hover})
   const onClick = !disabled ? props.onClick : undefined
   const Component = props.Component || 'button'
@@ -53,11 +55,11 @@ export default function Button (props: ButtonProps) {
 
   // pass all props if using a custom component
   const buttonProps = !props.Component
-    ? {type, title, disabled, onClick, className}
+    ? {type, title, disabled, onClick, className, tabIndex}
     : {
       ...omit(props, STRIP_PROPS),
       className: cx(className, {[styles.disabled]: disabled}),
-      onClick
+      onClick,
     }
 
   return (

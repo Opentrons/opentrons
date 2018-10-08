@@ -9,8 +9,7 @@ import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {
   getFormWarnings,
   getFormErrors,
-  generateNewForm,
-  stepFormToArgs
+  stepFormToArgs,
 } from './formLevel'
 import type {FormError, FormWarning} from './formLevel'
 import {hydrateField} from './fieldLevel'
@@ -22,13 +21,12 @@ import type {
   StepItemData,
   FormSectionState,
   SubstepIdentifier,
-  TerminalItemId
+  TerminalItemId,
 } from './types'
 
 import type {
   FormData,
-  BlankForm,
-  StepIdType
+  StepIdType,
 } from '../form-types'
 
 import { type ValidFormAndErrors } from './formLevel/stepFormToArgs'
@@ -146,12 +144,12 @@ const validatedForms: Selector<{[StepIdType]: ValidFormAndErrors}> = createSelec
         // NOTE: usually, stepFormData is undefined here b/c there's no saved step form for it:
         : {
           errors: {'form': ['no saved form for step ' + stepId]},
-          validatedForm: null
+          validatedForm: null,
         } // TODO Ian 2018-03-20 revisit "no saved form for step"
 
       return {
         ...acc,
-        [stepId]: nextStepData
+        [stepId]: nextStepData,
       }
     }, {})
   }
@@ -209,30 +207,6 @@ const hoveredStepLabware: Selector<Array<string>> = createSelector(
 const stepCreationButtonExpandedSelector: Selector<boolean> = createSelector(
   rootSelector,
   (state: RootState) => state.stepCreationButtonExpanded
-)
-
-const selectedStepFormDataSelector: Selector<boolean | FormData | BlankForm> = createSelector(
-  getSavedForms,
-  getSelectedStepId,
-  getSteps,
-  (savedStepForms, selectedStepId, steps) => {
-    if (selectedStepId == null) {
-      // no step selected
-      return false
-    }
-
-    if (!steps[selectedStepId]) {
-      console.error(`Step id ${selectedStepId} not in 'steps', could not get form data`)
-      return false
-    }
-
-    return (
-      // existing form
-      savedStepForms[selectedStepId] ||
-      // new blank form
-      generateNewForm(selectedStepId, steps[selectedStepId].stepType)
-    )
-  }
 )
 
 const nextStepId: Selector<number> = createSelector( // generates the next step ID to use
@@ -296,7 +270,7 @@ export const allSteps: Selector<{[stepId: StepIdType]: StepItemData}> = createSe
           ...steps[id],
           formData: savedForm,
           title,
-          description: savedForm ? savedForm['step-details'] : null
+          description: savedForm ? savedForm['step-details'] : null,
         }
       }
     )
@@ -344,7 +318,6 @@ export default {
   getHoveredStepId,
   getActiveItem,
   getHoveredSubstep,
-  selectedStepFormData: selectedStepFormDataSelector,
   getUnsavedForm,
   formData, // TODO: remove after sunset
   formModalData,
@@ -361,5 +334,5 @@ export default {
   getSteps,
   orderedStepsSelector,
   getCollapsedSteps,
-  getSavedForms
+  getSavedForms,
 }

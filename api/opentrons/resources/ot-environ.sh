@@ -27,6 +27,7 @@ if [ -z $OT_ENVIRON_SET_UP ]; then
     export USER_DEFN_ROOT=/data/user_storage/opentrons_data/labware
     export OT_SMOOTHIE_ID=AMA
     export OT_ENVIRON_SET_UP=1
+    chmod a+x /data/system/scripts/*
     echo "[ $0 ] Environment configuration done"
 else
     echo "[ $0 ] Environment already configured"

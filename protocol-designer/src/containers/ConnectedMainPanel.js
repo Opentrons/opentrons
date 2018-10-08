@@ -5,6 +5,7 @@ import {Splash} from '@opentrons/components'
 
 import ConnectedDeckSetup from '../containers/ConnectedDeckSetup'
 import ConnectedFilePage from '../containers/ConnectedFilePage'
+import SettingsPage from '../components/SettingsPage'
 
 import type {BaseState} from '../types'
 import {selectors, type Page} from '../navigation'
@@ -15,18 +16,20 @@ type Props = {page: Page}
 
 function MainPanel (props: Props) {
   const {page} = props
-  if (page === 'file-splash') {
-    return <Splash />
+  switch (page) {
+    case 'file-splash':
+      return <Splash />
+    case 'file-detail':
+      return <ConnectedFilePage />
+    case 'settings-privacy':
+      return <SettingsPage />
+    default:
+      return <ConnectedDeckSetup />
   }
-  if (page === 'file-detail') {
-    return <ConnectedFilePage />
-  }
-  // all other pages show the deck setup
-  return <ConnectedDeckSetup />
 }
 
 function mapStateToProps (state: BaseState): Props {
   return {
-    page: selectors.currentPage(state)
+    page: selectors.currentPage(state),
   }
 }

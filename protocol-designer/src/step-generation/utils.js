@@ -10,7 +10,7 @@ import type {
   CommandCreator,
   RobotState,
   Timeline,
-  LocationLiquidState
+  LocationLiquidState,
 } from './types'
 
 export function repeatArray<T> (array: Array<T>, repeats: number): Array<T> {
@@ -22,14 +22,13 @@ export function repeatArray<T> (array: Array<T>, repeats: number): Array<T> {
  * and adding each CommandCreator's commands to a single commands array.
  */
 export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): CommandCreator =>
-  (prevRobotState: RobotState) => (
-    commandCreators.reduce(
+  (prevRobotState: RobotState) => {
+    return commandCreators.reduce(
       (prev: $Call<CommandCreator, *>, reducerFn: CommandCreator, stepIdx) => {
         if (prev.errors) {
           // if there are errors, short-circuit the reduce
           return prev
         }
-
         const next = reducerFn(prev.robotState)
 
         if (next.errors) {
@@ -38,21 +37,20 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
             commands: prev.commands,
             errors: next.errors,
             errorStep: stepIdx,
-            warnings: prev.warnings
+            warnings: prev.warnings,
           }
         }
-
         return {
           robotState: next.robotState,
           commands: [...prev.commands, ...next.commands],
-          warnings: [...(prev.warnings || []), ...(next.warnings || [])]
+          warnings: [...(prev.warnings || []), ...(next.warnings || [])],
         }
       },
       {robotState: cloneDeep(prevRobotState), commands: []}
       // TODO: should I clone here (for safety) or is it safe enough?
       // Should I avoid cloning in the CommandCreators themselves and just do it pre-emptively in here?
     )
-  )
+  }
 
 export const commandCreatorsTimeline = (commandCreators: Array<CommandCreator>) =>
 (initialRobotState: RobotState): Timeline => {
@@ -72,19 +70,19 @@ export const commandCreatorsTimeline = (commandCreators: Array<CommandCreator>) 
       if (nextResult.errors) {
         return {
           timeline: acc.timeline,
-          errors: nextResult.errors
+          errors: nextResult.errors,
         }
       }
 
       return {
         timeline: [...acc.timeline, nextResult],
-        errors: null
+        errors: null,
       }
     }, {timeline: [], errors: null})
 
   return {
     timeline: timeline.timeline,
-    errors: timeline.errors
+    errors: timeline.errors,
   }
 }
 
@@ -95,7 +93,7 @@ export const AIR = '__air__'
 /** Breaks a liquid volume state into 2 parts. Assumes all liquids are evenly mixed. */
 export function splitLiquid (volume: number, sourceLiquidState: LocationLiquidState): {
   source: LocationLiquidState,
-  dest: LocationLiquidState
+  dest: LocationLiquidState,
 } {
   const totalSourceVolume = reduce(
     sourceLiquidState,
@@ -117,7 +115,7 @@ export function splitLiquid (volume: number, sourceLiquidState: LocationLiquidSt
     // Splitting from empty source
     return {
       source: sourceLiquidState,
-      dest: {[AIR]: {volume}}
+      dest: {[AIR]: {volume}},
     }
   }
 
@@ -127,8 +125,8 @@ export function splitLiquid (volume: number, sourceLiquidState: LocationLiquidSt
       source: mapValues(sourceLiquidState, () => ({volume: 0})),
       dest: {
         ...sourceLiquidState,
-        [AIR]: {volume: volume - totalSourceVolume}
-      }
+        [AIR]: {volume: volume - totalSourceVolume},
+      },
     }
   }
 
@@ -136,7 +134,7 @@ export function splitLiquid (volume: number, sourceLiquidState: LocationLiquidSt
     sourceLiquidState,
     (acc: {[ingredId: string]: number}, ingredState: Vol, ingredId: string) => ({
       ...acc,
-      [ingredId]: ingredState.volume / totalSourceVolume
+      [ingredId]: ingredState.volume / totalSourceVolume,
     })
   , {})
 
@@ -145,12 +143,12 @@ export function splitLiquid (volume: number, sourceLiquidState: LocationLiquidSt
     return {
       source: {
         ...acc.source,
-        [ingredId]: {volume: sourceLiquidState[ingredId].volume - destVol}
+        [ingredId]: {volume: sourceLiquidState[ingredId].volume - destVol},
       },
       dest: {
         ...acc.dest,
-        [ingredId]: {volume: destVol}
-      }
+        [ingredId]: {volume: destVol},
+      },
     }
   }, {source: {}, dest: {}})
 }
@@ -173,9 +171,9 @@ export function mergeLiquid (source: LocationLiquidState, dest: LocationLiquidSt
 
       return {
         ...acc,
-        [ingredId]: {volume: ingredVolume}
+        [ingredId]: {volume: ingredVolume},
       }
-    }, {})
+    }, {}),
   }
 }
 

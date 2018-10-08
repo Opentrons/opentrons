@@ -9,7 +9,7 @@ import type {LabwareData} from '../step-generation'
 export type Labware = {|
   ...LabwareData,
   id: string,
-  disambiguationNumber: number
+  disambiguationNumber: number,
 |}
 
 export type LabwareTypeById = {[labwareId: string]: ?string}
@@ -17,7 +17,7 @@ export type LabwareTypeById = {[labwareId: string]: ?string}
 // ==== WELLS ==========
 
 export type Wells = {
-  [wellName: string]: string // eg A1: 'A1'.
+  [wellName: string]: string, // eg A1: 'A1'.
 }
 
 export type WellContents = {| // non-ingredient well state, for SelectablePlate
@@ -26,15 +26,15 @@ export type WellContents = {| // non-ingredient well state, for SelectablePlate
   error: boolean,
   maxVolume: number,
   wellName: string, // eg 'A1', 'A2' etc
-  groupIds: Array<string>
+  groupIds: Array<string>,
 |}
 
 export type ContentsByWell = {
-  [wellName: string]: WellContents
+  [wellName: string]: WellContents,
 }
 
 export type WellContentsByLabware = {
-  [labwareId: string]: ContentsByWell
+  [labwareId: string]: ContentsByWell,
 }
 
 // ==== INGREDIENTS ====
@@ -43,7 +43,7 @@ export type IngredInputs = {
   name: string | null,
   volume: number | null,
   description: string | null,
-  individualize: boolean
+  individualize: boolean,
 }
 
 export type IngredInputFields = $Exact<IngredInputs>
@@ -53,9 +53,9 @@ export type IngredGroupAccessor = $Keys<IngredInputs>
 export type IngredientInstance = $Diff<IngredInputFields, {volume: *}>
 
 export type IngredientGroups = {
-  [groupId: string]: IngredientInstance
+  [groupId: string]: IngredientInstance,
 }
 
 export type AllIngredGroupFields = {
-  [ingredGroupId: string]: IngredInputs
+  [ingredGroupId: string]: IngredInputs,
 }

@@ -3,9 +3,9 @@ import {discoveryReducer} from '..'
 
 jest.mock('../../shell', () => ({
   getShellRobots: () => ([
-    {name: 'foo', connections: []},
-    {name: 'bar', connections: []}
-  ])
+    {name: 'foo', ip: '192.168.1.1', port: 31950},
+    {name: 'bar', ip: '192.168.1.2', port: 31950},
+  ]),
 }))
 
 describe('discoveryReducer', () => {
@@ -21,22 +21,22 @@ describe('discoveryReducer', () => {
       expectedState: {
         scanning: false,
         robotsByName: {
-          foo: {name: 'foo', connections: []},
-          bar: {name: 'bar', connections: []}
-        }
-      }
+          foo: [{name: 'foo', ip: '192.168.1.1', port: 31950}],
+          bar: [{name: 'bar', ip: '192.168.1.2', port: 31950}],
+        },
+      },
     },
     {
       name: 'discovery:START sets scanning: true',
       action: {type: 'discovery:START'},
       initialState: {scanning: false},
-      expectedState: {scanning: true}
+      expectedState: {scanning: true},
     },
     {
       name: 'discovery:FINISH sets scanning: false',
       action: {type: 'discovery:FINISH'},
       initialState: {scanning: true},
-      expectedState: {scanning: false}
+      expectedState: {scanning: false},
     },
     {
       name: 'discovery:UPDATE_LIST resets discovered list',
@@ -44,19 +44,19 @@ describe('discoveryReducer', () => {
         type: 'discovery:UPDATE_LIST',
         payload: {
           robots: [
-            {name: 'foo', connections: []},
-            {name: 'bar', connections: []}
-          ]
-        }
+            {name: 'foo', ip: '192.168.1.1', port: 31950},
+            {name: 'bar', ip: '192.168.1.2', port: 31950},
+          ],
+        },
       },
       initialState: {robotsByName: {}},
       expectedState: {
         robotsByName: {
-          foo: {name: 'foo', connections: []},
-          bar: {name: 'bar', connections: []}
-        }
-      }
-    }
+          foo: [{name: 'foo', ip: '192.168.1.1', port: 31950}],
+          bar: [{name: 'bar', ip: '192.168.1.2', port: 31950}],
+        },
+      },
+    },
   ]
 
   SPECS.forEach(spec => {

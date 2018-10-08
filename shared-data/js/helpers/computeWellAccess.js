@@ -24,8 +24,12 @@ function findWellAt (labwareName: string, x: number, y: number): ?string {
     // Not circular, must be a rectangular well
     // For rectangular wells, (x, y) is at the center.
     // Here we calculate 'wellOriginX/Y', at the bottom left point (lowest x y values)
-    const wellOriginX = well.x - (well.width / 2)
-    const wellOriginY = well.y - (well.length / 2)
+
+    // TODO: Ian 2018-09-17 un-comment the below when definitions update to center
+    // (right now defs are bottom-left bounding box)
+
+    const wellOriginX = well.x // - (well.width / 2)
+    const wellOriginY = well.y // - (well.length / 2)
 
     return Math.abs(x - wellOriginX) <= well.width &&
       Math.abs(y - wellOriginY) <= well.length
@@ -59,3 +63,5 @@ export default function computeWellAccess (labwareName: string, topWellName: str
 
   return wellsAccessed
 }
+
+window.computeWellAccess = computeWellAccess

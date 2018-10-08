@@ -17,6 +17,11 @@ export const pipettesById = createSelector(
   pipettes => pipettes.byId
 )
 
+export const pipetteIdsByMount: Selector<*> = createSelector(
+  rootSelector,
+  pipettes => pipettes.byMount
+)
+
 function _getPipetteName (pipetteData): string {
   const result = getPipetteModels().find(pipetteModel => {
     const p = getPipette(pipetteModel)
@@ -45,8 +50,8 @@ export const equippedPipetteOptions: Selector<Array<DropdownOption>> = createSel
           ...acc,
           {
             name: _getPipetteName(byId[pipetteId]),
-            value: pipetteId
-          }
+            value: pipetteId,
+          },
         ]
         : acc,
       [])
@@ -61,7 +66,7 @@ export const equippedPipettes: Selector<PipettesById> = createSelector(
     if (!pipetteData) return acc
     return {
       ...acc,
-      [pipetteId]: pipetteData
+      [pipetteId]: pipetteData,
     }
   }, {})
 )
@@ -83,7 +88,7 @@ export const pipettesForInstrumentGroup: Selector<*> = createSelector(
       channels: pipetteData.channels,
       description: _getPipetteName(pipetteData),
       isDisabled: false,
-      tiprackModel: tipVolume && `${tipVolume} µl`// TODO: BC 2018-07-23 tiprack displayName
+      tiprackModel: tipVolume && `${tipVolume} µl`, // TODO: BC 2018-07-23 tiprack displayName
     }
 
     return [...acc, pipetteForInstrumentGroup]

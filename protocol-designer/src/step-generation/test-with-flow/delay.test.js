@@ -18,7 +18,7 @@ describe('delay indefinitely', () => {
       message,
       description: 'description',
       name: 'name',
-      wait: true
+      wait: true,
     })(robotInitialState)
 
     expect(result.robotState).toEqual(getRobotInitialState())
@@ -29,9 +29,9 @@ describe('delay indefinitely', () => {
         command: 'delay',
         params: {
           wait: true,
-          message
-        }
-      }
+          message,
+        },
+      },
     ])
   })
 })
@@ -45,7 +45,7 @@ describe('delay for a given time', () => {
       message,
       description: 'description',
       name: 'name',
-      wait: 95.5
+      wait: 95.5,
     })(robotInitialState)
 
     expect(result.robotState).toEqual(getRobotInitialState())
@@ -56,9 +56,9 @@ describe('delay for a given time', () => {
         command: 'delay',
         params: {
           wait: 95.5,
-          message
-        }
-      }
+          message,
+        },
+      },
     ])
   })
 })

@@ -19,7 +19,7 @@ describe('dropTip', () => {
       destPlateType: '96-flat',
       fillTiprackTips: true,
       fillPipetteTips: false,
-      tipracks: [200, 200]
+      tipracks: [200, 200],
     })
 
     robotStateWithTip = {
@@ -28,9 +28,9 @@ describe('dropTip', () => {
         ...initialRobotState.tipState,
         pipettes: {
           ...initialRobotState.tipState.pipettes,
-          p300SingleId: true
-        }
-      }
+          p300SingleId: true,
+        },
+      },
     }
 
     // $FlowFixMe: mock methods
@@ -47,15 +47,15 @@ describe('dropTip', () => {
         destPlateType: '96-flat',
         tipracks: [200, 200],
         fillPipetteTips: false,
-        fillTiprackTips: true
+        fillTiprackTips: true,
       }),
       {
         tipState: {
           pipettes: {
             p300SingleId: args.singleHasTips,
-            p300MultiId: args.multiHasTips
-          }
-        }
+            p300MultiId: args.multiHasTips,
+          },
+        },
       }
     )
   }
@@ -70,8 +70,8 @@ describe('dropTip', () => {
         params: {
           pipette: 'p300SingleId',
           labware: 'trashId',
-          well: 'A1'
-        }
+          well: 'A1',
+        },
       }])
       expect(result.robotState).toEqual(
         makeRobotState({singleHasTips: false, multiHasTips: true})
@@ -94,8 +94,8 @@ describe('dropTip', () => {
         params: {
           pipette: 'p300MultiId',
           labware: 'trashId',
-          well: 'A1'
-        }
+          well: 'A1',
+        },
       }])
       expect(result.robotState).toEqual(
         makeRobotState({singleHasTips: true, multiHasTips: false})
@@ -129,7 +129,7 @@ describe('dropTip', () => {
           volume: 300, // pipette's max vol
           well: 'A1',
           labwareType: 'fixed-trash',
-          pipetteData: robotStateWithTip.instruments.p300MultiId
+          pipetteData: robotStateWithTip.instruments.p300MultiId,
         },
         robotStateWithTip.liquidState
       )

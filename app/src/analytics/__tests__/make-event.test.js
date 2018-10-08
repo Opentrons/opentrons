@@ -12,7 +12,7 @@ describe('analytics events map', () => {
 
     expect(makeEvent(state, action)).toEqual({
       name: 'url',
-      properties: {pathname: '/foo'}
+      properties: {pathname: '/foo'},
     })
   })
 
@@ -20,21 +20,15 @@ describe('analytics events map', () => {
     const state = (name) => ({
       robot: {
         connection: {
-          connectRequest: {name}
-        }
+          connectRequest: {name},
+        },
       },
       discovery: {
         robotsByName: {
-          wired: {
-            name: 'wired',
-            connections: [{ip: 'foo', port: 123, ok: true, local: true}]
-          },
-          wireless: {
-            name: 'wireless',
-            connections: [{ip: 'bar', port: 456, ok: true, local: false}]
-          }
-        }
-      }
+          wired: [{ip: 'foo', port: 123, ok: true, local: true}],
+          wireless: [{ip: 'bar', port: 456, ok: true, local: false}],
+        },
+      },
     })
 
     const success = robotActions.connectResponse()
@@ -42,38 +36,41 @@ describe('analytics events map', () => {
 
     expect(makeEvent(state('wired'), success)).toEqual({
       name: 'robotConnect',
-      properties: {method: 'usb', success: true, error: ''}
+      properties: {method: 'usb', success: true, error: ''},
     })
 
     expect(makeEvent(state('wired'), failure)).toEqual({
       name: 'robotConnect',
-      properties: {method: 'usb', success: false, error: 'AH'}
+      properties: {method: 'usb', success: false, error: 'AH'},
     })
 
     expect(makeEvent(state('wireless'), success)).toEqual({
       name: 'robotConnect',
-      properties: {method: 'wifi', success: true, error: ''}
+      properties: {method: 'wifi', success: true, error: ''},
     })
 
     expect(makeEvent(state('wireless'), failure)).toEqual({
       name: 'robotConnect',
-      properties: {method: 'wifi', success: false, error: 'AH'}
+      properties: {method: 'wifi', success: false, error: 'AH'},
     })
   })
 
-  test('robot:SESSION_RESPONSE error -> protocolUpload event', () => {
+  test('robot:SESSION_RESPONSE/ERROR -> protocolUpload event', () => {
     const state = {}
-    const success = {type: 'robot:SESSION_RESPONSE'}
-    const failure = {type: 'robot:SESSION_RESPONSE', error: new Error('AH')}
+    const success = {type: 'robot:SESSION_RESPONSE', payload: {}}
+    const failure = {
+      type: 'robot:SESSION_ERROR',
+      payload: {error: new Error('AH')},
+    }
 
     expect(makeEvent(state, success)).toEqual({
       name: 'protocolUpload',
-      properties: {success: true, error: ''}
+      properties: {success: true, error: ''},
     })
 
     expect(makeEvent(state, failure)).toEqual({
       name: 'protocolUpload',
-      properties: {success: false, error: 'AH'}
+      properties: {success: false, error: 'AH'},
     })
   })
 
@@ -83,7 +80,7 @@ describe('analytics events map', () => {
 
     expect(makeEvent(state, action)).toEqual({
       name: 'runStart',
-      properties: {}
+      properties: {},
     })
   })
 
@@ -96,16 +93,16 @@ describe('analytics events map', () => {
       name: 'runPause',
       properties: {
         success: true,
-        error: ''
-      }
+        error: '',
+      },
     })
 
     expect(makeEvent(state, failure)).toEqual({
       name: 'runPause',
       properties: {
         success: false,
-        error: 'AH'
-      }
+        error: 'AH',
+      },
     })
   })
 
@@ -114,9 +111,9 @@ describe('analytics events map', () => {
       robot: {
         session: {
           startTime: 1000,
-          runTime: 5000
-        }
-      }
+          runTime: 5000,
+        },
+      },
     }
     const success = {type: 'robot:CANCEL_RESPONSE'}
     const failure = {type: 'robot:CANCEL_RESPONSE', error: new Error('AH')}
@@ -126,8 +123,8 @@ describe('analytics events map', () => {
       properties: {
         runTime: 4,
         success: true,
-        error: ''
-      }
+        error: '',
+      },
     })
 
     expect(makeEvent(state, failure)).toEqual({
@@ -135,8 +132,8 @@ describe('analytics events map', () => {
       properties: {
         runTime: 4,
         success: false,
-        error: 'AH'
-      }
+        error: 'AH',
+      },
     })
   })
 
@@ -145,15 +142,15 @@ describe('analytics events map', () => {
       robot: {
         session: {
           startTime: 1000,
-          runTime: 5000
-        }
-      }
+          runTime: 5000,
+        },
+      },
     }
     const action = {type: 'robot:RUN_RESPONSE', error: false}
 
     expect(makeEvent(state, action)).toEqual({
       name: 'runFinish',
-      properties: {runTime: 4}
+      properties: {runTime: 4},
     })
   })
 
@@ -163,7 +160,7 @@ describe('analytics events map', () => {
 
     expect(makeEvent(state, action)).toEqual({
       name: 'runError',
-      properties: {error: 'AH'}
+      properties: {error: 'AH'},
     })
   })
 })

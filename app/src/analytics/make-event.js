@@ -32,19 +32,19 @@ export default function makeEvent (state: State, action: Action): ?Event {
         properties: {
           success: !action.payload.error,
           method: robot.wired ? 'usb' : 'wifi',
-          error: (action.payload.error && action.payload.error.message) || ''
-        }
+          error: (action.payload.error && action.payload.error.message) || '',
+        },
       }
 
-    // $FlowFixMe(ka, 2018-06-5): flow type robot:SESSION_RESPONSE
     case 'robot:SESSION_RESPONSE':
+    case 'robot:SESSION_ERROR':
       // TODO (ka, 2018-6-6): add file open type 'button' | 'drag-n-drop' (work required in action meta)
       return {
         name: 'protocolUpload',
         properties: {
-          success: !action.error,
-          error: (action.error && action.error.message) || ''
-        }
+          success: action.type === 'robot:SESSION_RESPONSE',
+          error: (action.payload.error && action.payload.error.message) || '',
+        },
       }
 
     // $FlowFixMe(mc, 2018-05-28): flow type robot:RUN
@@ -60,8 +60,8 @@ export default function makeEvent (state: State, action: Action): ?Event {
         return {
           name: 'runError',
           properties: {
-            error: action.error.message
-          }
+            error: action.error.message,
+          },
         }
       }
     // $FlowFixMe(ka, 2018-06-5): flow type robot:PAUSE_RESPONSE
@@ -70,8 +70,8 @@ export default function makeEvent (state: State, action: Action): ?Event {
         name: 'runPause',
         properties: {
           success: !action.error,
-          error: (action.error && action.error.message) || ''
-        }
+          error: (action.error && action.error.message) || '',
+        },
       }
 
     // $FlowFixMe(ka, 2018-06-5): flow type robot:CANCEL
@@ -82,8 +82,8 @@ export default function makeEvent (state: State, action: Action): ?Event {
         properties: {
           runTime,
           success: !action.error,
-          error: (action.error && action.error.message) || ''
-        }
+          error: (action.error && action.error.message) || '',
+        },
       }
   }
 

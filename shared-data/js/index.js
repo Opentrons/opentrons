@@ -11,10 +11,11 @@ export * from './constants'
 export * from './helpers'
 export * from './pipettes'
 export * from './types'
+export * from './labwareTools'
 
 export {
   getLabware,
   getWellDefsForSVG,
   getIsTiprack,
-  labwareList
+  labwareList,
 }

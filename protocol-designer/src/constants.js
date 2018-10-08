@@ -14,7 +14,7 @@ export const {
   // STYLE CONSTANTS
   swatchColors,
   // SPECIAL SELECTORS
-  SELECTABLE_WELL_CLASS
+  SELECTABLE_WELL_CLASS,
 } = componentLib
 
 export const getMaxVolumes = (labwareType: string): WellVolumes => {
@@ -24,7 +24,7 @@ export const getMaxVolumes = (labwareType: string): WellVolumes => {
       labware.wells,
       (acc, wellData: JsonWellData, wellName): WellVolumes => ({
         ...acc,
-        [wellName]: wellData['total-liquid-volume']
+        [wellName]: wellData['total-liquid-volume'],
       }),
       {}
     )

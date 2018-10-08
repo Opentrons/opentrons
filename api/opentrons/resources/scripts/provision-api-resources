@@ -3,7 +3,8 @@
 
 This should be run
 - On the first boot of a new container (handled by `container_setup.sh`)
-- When a new version of the API server is installed by runapp (handled by `setup.py`) in the API server wheel
+- When a new version of the API server is installed by runapp (handled by
+  `setup.py`) in the API server wheel
 """
 
 import os
@@ -13,8 +14,10 @@ import sys
 sys.path.append('/usr/local/bin')
 import find_python_module_path
 
+
 def provision():
-    """ Should be called the first time a given version of the server is run in a container.
+    """ Should be called the first time a given version of the server is run
+    in a container.
 
     Should not be called if the server is not running in a container.
     """
@@ -25,7 +28,23 @@ def provision():
     config_dir = os.environ.get('OT_CONFIG_PATH', '/data/system')
     if os.path.exists(config_dir):
         shutil.rmtree(config_dir)
-    shutil.copytree(provision_from_resources, config_dir)
+
+    def ensure_executable(src, dst, *args, follow_symlinks=True):
+        """ Use as a copy_function in shutil.copytree
+
+        Makes sure the files are executable.
+
+        Note this will only work in the case where it is used from
+        shutil.copytree; if used as a general replacement for copy2,
+        it will fail on the case where ``dst`` is a directory.
+        """
+        shutil.copy2(src, dst, *args, follow_symlinks=follow_symlinks)
+        if 'scripts' in src:
+            os.chmod(dst, 0o777)
+
+    shutil.copytree(provision_from_resources, config_dir,
+                    copy_function=ensure_executable)
+
 
 if __name__ == '__main__':
     provision()

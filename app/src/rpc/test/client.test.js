@@ -12,7 +12,7 @@ import {
   ACK,
   NACK,
   NOTIFICATION,
-  CONTROL_MESSAGE
+  CONTROL_MESSAGE,
 } from '../../rpc/message-types'
 
 jest.mock('../remote-object')
@@ -25,14 +25,14 @@ const REMOTE_TYPE = {i: 5, t: 3, v: {be_a_robot: {}, be_a_person: {}}}
 const CONTROL = {
   $: {type: CONTROL_MESSAGE},
   root: REMOTE,
-  type: REMOTE_TYPE
+  type: REMOTE_TYPE,
 }
 
 const makeAckResponse = (token) => ({$: {type: ACK, token}})
 const makeNackResponse = (token, reason) => ({$: {type: NACK, token}, reason})
 const makeCallResponse = (token, status, data) => ({
   $: {type: RESULT, token, status},
-  data
+  data,
 })
 
 const waitAndTry = (delay, handler) => util.promisify((done) => {
@@ -124,7 +124,7 @@ describe('rpc client', () => {
     expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 10000)
 
     return expect(result).rejects.toMatchObject({
-      message: expect.stringMatching(/timeout/i)
+      message: expect.stringMatching(/timeout/i),
     })
   })
 
@@ -183,7 +183,7 @@ describe('rpc client', () => {
         .then((client) => client.callRemote(id, name, args))
 
       return expect(call).rejects.toMatchObject({
-        message: expect.stringMatching(/NACK.+You done messed up/)
+        message: expect.stringMatching(/NACK.+You done messed up/),
       })
     })
 
@@ -202,7 +202,7 @@ describe('rpc client', () => {
         })
 
       return expect(call).rejects.toMatchObject({
-        message: expect.stringMatching(/OH NO/)
+        message: expect.stringMatching(/OH NO/),
       })
     })
 
@@ -219,7 +219,7 @@ describe('rpc client', () => {
         .then((client) => client.callRemote(id, name, args))
 
       return expect(call).rejects.toMatchObject({
-        message: expect.stringMatching(/ahhh/)
+        message: expect.stringMatching(/ahhh/),
       })
     })
 
@@ -236,7 +236,7 @@ describe('rpc client', () => {
         .then((client) => client.callRemote(id, name, args))
 
       return expect(call).rejects.toMatchObject({
-        message: expect.stringMatching(/ahhh/)
+        message: expect.stringMatching(/ahhh/),
       })
     })
   })
@@ -265,7 +265,7 @@ describe('rpc client', () => {
         $: {token: expect.anything()},
         id: null,
         name: 'get_object_by_id',
-        args: [type.i]
+        args: [type.i],
       }
 
       let client

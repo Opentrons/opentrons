@@ -1,0 +1,49 @@
+{
+  "otId": "mock-id",
+  "deprecated": false,
+  "metadata": {
+    "name": "fake labware",
+    "displayCategory": "wellPlate",
+    "displayVolumeUnits": "uL",
+    "displayLengthUnits": "mm"
+  },
+  "vendor": {
+    "sku": "t40u9sernisofsea",
+    "vendor": "opentrons"
+  },
+  "parameters": {
+    "format": "96Standard",
+    "isTiprack": false
+  },
+  "cornerOffsetFromSlot": {
+    "x": 10,
+    "y": 10,
+    "z": 5
+  },
+  "dimensions": {
+    "overallLength": 50,
+    "overallWidth": 50,
+    "overallHeight": 50
+  },
+  "ordering": [["A1"], ["A2"]],
+  "wells": {
+    "A1": {
+      "depth": 40,
+      "totalLiquidVolume": 100,
+      "diameter": 30,
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "shape": "circular"
+    },
+    "A2": {
+      "depth": 40,
+      "totalLiquidVolume": 100,
+      "diameter": 30,
+      "x": 10,
+      "y": 0,
+      "z": 0,
+      "shape": "circular"
+    }
+  }
+}

@@ -3,17 +3,12 @@ import shutil
 import os
 from aiohttp import web
 from opentrons.config import advanced_settings as advs
-from opentrons.robot import robot_configs as rc
+from opentrons.legacy_api.robot import robot_configs as rc
 from opentrons.data_storage import database as db
 
 log = logging.getLogger(__name__)
 
 _settings_reset_options = [
-    {
-        'id': 'deckCalibration',
-        'name': 'Deck Calibration',
-        'description': 'Reset pipette-to-deck alignment calibration'
-    },
     {
         'id': 'tipProbe',
         'name': 'Tip Length',
@@ -80,8 +75,6 @@ async def reset(request: web.Request) -> web.Response:
                  .format(requested_reset)},
                 status=400)
     log.info("Reset requested for {}".format(', '.join(data.keys())))
-    if data.get('deckCalibration'):
-        rc.clear(calibration=True, robot=False)
     if data.get('tipProbe'):
         config = rc.load()
         config.tip_length.clear()

@@ -5,14 +5,12 @@ SHELL := /bin/bash
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
-# desktop shell directory for dev
-shell_dir := ../app-shell
-
-# set NODE_ENV for a command with $(env)=environment
-env := cross-env NODE_ENV
-
 # dev server port
-port ?= 8090
+PORT ?= 8090
+
+# dependency directories for dev
+shell_dir := ../app-shell
+discovery_client_dir = ../discovery-client
 
 # standard targets
 #####################################################################
@@ -32,23 +30,31 @@ clean:
 #####################################################################
 
 .PHONY: dist
+dist: export NODE_ENV := production
 dist:
-	$(env)=production webpack --profile
+	webpack --profile
 
 # development
 #####################################################################
 
 .PHONY: dev
-dev:
+dev: export NODE_ENV := development
+dev: export PORT := $(PORT)
+dev: dev-deps
 	concurrently --no-color --kill-others --names "server,shell" \
 		"$(MAKE) dev-server" \
 		"$(MAKE) dev-shell"
 
 .PHONY: dev-server
 dev-server:
-	$(env)=development PORT=$(port) webpack-dev-server --hot
+	webpack-dev-server --hot
 
 .PHONY: dev-shell
 dev-shell:
-	wait-on http-get://localhost:$(port) && \
-	$(MAKE) -C $(shell_dir) lib dev port=$(port)
+	wait-on http-get://localhost:$(PORT)
+	$(MAKE) -C $(shell_dir) dev
+
+.PHONY: dev-deps
+dev-deps:
+	$(MAKE) -C $(discovery_client_dir)
+	$(MAKE) -C $(shell_dir) lib

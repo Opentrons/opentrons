@@ -13,51 +13,266 @@ from subprocess itself, only parsing nmcli output.
 
 import logging
 import re
+import copy
+from typing import Optional, List, Tuple, Dict, Callable, Any, NamedTuple
+import enum
+import os
+
 from shlex import quote
 from asyncio import subprocess as as_subprocess
 
 
 log = logging.getLogger(__name__)
 
-# These supported security types are passed directly to nmcli; they should
-# match the security types allowed in the network-manager settings for
-# 802-11-wireless-security.key-mgmt
-SUPPORTED_SECURITY_TYPES = ('none', 'wpa-psk')
 
-# These connection types are used to parse nmcli results and should be valid
-# results for the last element when splitting connection.type by ’-’
-CONNECTION_TYPES = ('wireless', 'ethernet')
-
-IFACE_NAMES = ('wlan0', 'eth0')
+class EAPType(NamedTuple):
+    name: str
+    args: List[Dict[str, Any]]
 
 
-async def available_ssids():
+class _EAP_OUTER_TYPES(enum.Enum):
+    """ The types of phase-1 EAP we support.
+    """
+
+    # The string values of these supported EAP types should match both what
+    # is expected by nmcli/wpa_supplicant (in 802-1x.eap) and the keys in
+    # the CONFIG_REQUIRES dict above
+    TLS = EAPType(
+        name='tls',
+        args=[{'name': 'identity',
+               'displayName': 'Username',
+               'nmName': 'identity',
+               'required': True,
+               'type': 'string'},
+              {'name': 'caCert',
+               'displayName': 'CA Certificate File',
+               'nmName': 'ca-cert',
+               'required': False,
+               'type': 'file'},
+              {'name': 'clientCert',
+               'displayName': 'Client Certificate File',
+               'nmName': 'client-cert',
+               'required': True,
+               'type': 'file'},
+              {'name': 'privateKey',
+               'displayName': 'Private Key File',
+               'nmName': 'private-key',
+               'required': True,
+               'type': 'file'},
+              {'name': 'privateKeyPassword',
+               'displayName': 'Private Key Password',
+               'nmName': 'private-key-password',
+               'required': False,
+               'type': 'password'}])
+    PEAP = EAPType(
+        name='peap',
+        args=[{'name': 'identity',
+               'displayName': 'Username',
+               'nmName': 'identity',
+               'required': True,
+               'type': 'string'},
+              {'name': 'anonymousIdentity',
+               'displayName': 'Anonymous Identity',
+               'nmName': 'anonymous-identity',
+               'required': False,
+               'type': 'string'},
+              {'name': 'caCert',
+               'displayName': 'CA Certificate File',
+               'nmName': 'ca-cert',
+               'required': False,
+               'type': 'file'}])
+    TTLS = EAPType(
+        name='ttls',
+        args=[{'name': 'identity',
+               'displayName': 'Username',
+               'nmName': 'identity',
+               'required': True,
+               'type': 'string'},
+              {'name': 'anonymousIdentity',
+               'displayName': 'Anonymous Identity',
+               'nmName': 'anonymous-identity',
+               'required': False,
+               'type': 'string'},
+              {'name': 'caCert',
+               'displayName': 'CA Certificate File',
+               'nmName': 'ca-cert',
+               'required': False,
+               'type': 'file'},
+              {'name': 'clientCert',
+               'displayName': 'Client Certificate File',
+               'nmName': 'client-cert',
+               'required': False,
+               'type': 'file'},
+              {'name': 'privateKey',
+               'displayName': 'Private Key File',
+               'nmName': 'private-key',
+               'required': False,
+               'type': 'file'},
+              {'name': 'privateKeyPassword',
+               'displayName': 'Private Key Password',
+               'nmName': 'private-key-password',
+               'required': False,
+               'type': 'password'}])
+
+    def qualified_name(self) -> str:
+        return self.value.name
+
+
+class _EAP_PHASE2_TYPES(enum.Enum):
+    """ The types of EAP phase 2 auth (for tunneled EAP) we support
+    """
+
+    # The string values of these supported EAP types should match both what
+    # is expected by nmcli/wpa_supplicant (in 802-1x.phase2-autheap) and the
+    # keys in the CONFIG_REQUIRES dict above
+    MSCHAP_V2 = EAPType(
+        name='mschapv2',
+        args=[{'name': 'password',
+               'displayName': 'Password',
+               'nmName': 'password',
+               'required': True,
+               'type': 'password'}])
+    MD5 = EAPType(
+        name='md5',
+        args=[{'name': 'password',
+               'displayName': 'Password',
+               'nmName': 'password',
+               'required': True,
+               'type': 'password'}])
+    TLS = EAPType(
+        name='tls',
+        args=[{'name': 'phase2CaCert',
+               'displayName': 'Inner CA Certificate File',
+               'nmName': 'phase2-ca-cert',
+               'required': False,
+               'type': 'file'},
+              {'name': 'phase2ClientCert',
+               'displayName': 'Inner Client Certificate File',
+               'nmName': 'phase2-client-cert',
+               'required': True,
+               'type': 'file'},
+              {'name': 'phase2PrivateKey',
+               'displayName': 'Inner Private Key File',
+               'nmName': 'phase2-private-key',
+               'required': True,
+               'type': 'file'},
+              {'name': 'phase2PrivateKeyPassword',
+               'displayName': 'Inner Private Key Password',
+               'nmName': 'phase2-private-key-password',
+               'required': False,
+               'type': 'password'}])
+
+    def qualified_name(self) -> str:
+        return 'eap-' + self.value.name
+
+
+class EAP_TYPES(enum.Enum):
+    """ The types of EAP we support, fusing inner and outer methods """
+    TTLS_EAPTLS = (_EAP_OUTER_TYPES.TTLS, _EAP_PHASE2_TYPES.TLS)
+    TTLS_EAPMSCHAPV2 = (_EAP_OUTER_TYPES.TTLS, _EAP_PHASE2_TYPES.MSCHAP_V2)
+    TTLS_MD5 = (_EAP_OUTER_TYPES.TTLS, _EAP_PHASE2_TYPES.MD5)
+    PEAP_EAPMSCHAPV2 = (_EAP_OUTER_TYPES.PEAP, _EAP_PHASE2_TYPES.MSCHAP_V2)
+    TLS = (_EAP_OUTER_TYPES.TLS, None)
+
+    def __init__(self, outer, inner):
+        self.outer = outer
+        self.inner = inner
+
+    def qualified_name(self) -> str:
+        name = self.outer.qualified_name()
+        if self.inner:
+            name += '/' + self.inner.qualified_name()
+        return name
+
+    @classmethod
+    def by_qualified_name(cls, qname: str) -> 'EAP_TYPES':
+        for val in cls.__members__.values():
+            if val.qualified_name() == qname:
+                return val
+        raise KeyError(qname)
+
+    def args(self) -> List[Dict[str, Any]]:
+        # Have to copy these or reference semantics modify the version stored
+        # in the enums
+        to_ret = copy.deepcopy(self.outer.value.args)
+        if self.inner:
+            to_ret += copy.deepcopy(self.inner.value.args)
+        return to_ret
+
+
+class SECURITY_TYPES(enum.Enum):
+    """ The types of security that this module supports.
+    """
+
+    # The string values of these supported security types are passed
+    # directly to nmcli; they should match the security types allowed
+    # in the network-manager settings for 802-11-wireless-security.key-mgmt
+    NONE = 'none'
+    WPA_PSK = 'wpa-psk'
+    WPA_EAP = 'wpa-eap'
+
+
+class CONNECTION_TYPES(enum.Enum):
+    """ Types of connection (used to parse nmcli results)
+    """
+
+    # These connection types are used to parse nmcli results and should be
+    # valid results for the last element when splitting connection.type by ’-’
+    WIRELESS = 'wireless'
+    ETHERNET = 'ethernet'
+
+
+class NETWORK_IFACES(enum.Enum):
+    """ Network interface names that we manage here.
+    """
+    WIFI = 'wlan0'
+    ETH_LL = 'eth0'
+
+
+def _add_security_type_to_scan(scan_out: Dict[str, Any]) -> Dict[str, Any]:
+    sec = scan_out['security']
+    if '802.1X' in sec:
+        scan_out['securityType'] = 'wpa-eap'
+    elif 'WPA2'in sec:
+        scan_out['securityType'] = 'wpa-psk'
+    elif '' is sec:
+        scan_out['securityType'] = 'none'
+    else:
+        scan_out['securityType'] = 'unsupported'
+    return scan_out
+
+
+async def available_ssids() -> List[Dict[str, Any]]:
     """ List the visible (broadcasting SSID) wireless networks.
 
     Returns a list of the SSIDs. They may contain spaces and should be escaped
     if later passed to a shell.
     """
-    fields = ['ssid', 'signal', 'active']
+    fields = ['ssid', 'signal', 'active', 'security']
     cmd = ['--terse',
            '--fields',
            ','.join(fields),
            'device',
            'wifi',
            'list']
-    out, _ = await _call(cmd)
-    return _dict_from_terse_tabular(
+    out, err = await _call(cmd)
+    if err:
+        raise RuntimeError(err)
+    output = _dict_from_terse_tabular(
         fields, out,
         transformers={'signal': lambda s: int(s) if s.isdigit() else None,
                       'active': lambda s: s.lower() == 'yes'})
+    return [_add_security_type_to_scan(ssid) for ssid in output]
 
 
-async def is_connected():
+async def is_connected() -> str:
     """ Return nmcli's connection measure: none/portal/limited/full/unknown"""
     res, _ = await _call(['networking', 'connectivity'])
     return res
 
 
-async def connections(for_type=None):
+async def connections(
+        for_type: Optional[CONNECTION_TYPES] = None) -> List[Dict[str, str]]:
     """ Return the list of configured connections.
 
     This is all connections that nmcli knows about and manages.
@@ -79,19 +294,16 @@ async def connections(for_type=None):
                       'active': lambda s: s.lower() == 'yes'}
     )
     if for_type is not None:
-        if for_type not in CONNECTION_TYPES:
-            raise ValueError('typename {} not in valid connections types {}'
-                             .format(for_type, CONNECTION_TYPES))
         should_return = []
         for c in found:
-            if c['type'] == for_type:
+            if c['type'] == for_type.value:
                 should_return.append(c)
         return should_return
     else:
         return found
 
 
-async def connection_exists(ssid):
+async def connection_exists(ssid: str) -> Optional[str]:
     """ If there is already a connection for this ssid, return the name of
     the connection; if there is not, return None.
     """
@@ -106,7 +318,8 @@ async def connection_exists(ssid):
     return None
 
 
-async def _trim_old_connections(new_name, con_type):
+async def _trim_old_connections(
+        new_name: str, con_type: CONNECTION_TYPES) -> Tuple[bool, str]:
     """ Delete all connections of con_type but the one specified.
     """
     existing_cons = await connections(for_type=con_type)
@@ -127,13 +340,76 @@ async def _trim_old_connections(new_name, con_type):
     return ok, ';'.join(res)
 
 
-async def configure(ssid, # noqa(C901) There is a lot of work that will be done
-                          # here for EAP configuration, let’s address
-                          # complexity then
-                    security_type=None,
-                    psk=None,
-                    hidden=False,
-                    up_retries=3):
+def _add_eap_args(eap_args: Dict[str, str]) -> List[str]:
+    """ Add configuration options suitable for an nmcli con add command
+    for WPA-EAP configuration. These options are mostly in the
+    802-1x group.
+
+    The eap_args dict should be a flat structure of arguments. They
+    must contain at least 'eapType', specifying the EAP type to use
+    (the qualified_name() of one of the members of EAP_TYPES) and the
+    required arguments for that EAP type.
+    """
+    args = ['wifi-sec.key-mgmt', 'wpa-eap']
+    eap_type = EAP_TYPES.by_qualified_name(eap_args['eapType'])
+    type_args = eap_type.args()
+    args += ['802-1x.eap', eap_type.outer.value.name]
+    if eap_type.inner:
+        args += ['802-1x.phase2-autheap', eap_type.inner.value.name]
+    for ta in type_args:
+        if ta['name'] in eap_args:
+            if ta['type'] == 'file':
+                # Keyfiles must be prepended with file:// so nm-cli
+                # knows that we’re not giving it DER-encoded blobs
+                _make_host_symlink_if_necessary()
+                path = _rewrite_key_path_to_host_path(eap_args[ta['name']])
+                val = 'file://' + path
+            else:
+                val = eap_args[ta['name']]
+            args += ['802-1x.' + ta['nmName'], val]
+    return args
+
+
+def _build_con_add_cmd(ssid: str, security_type: SECURITY_TYPES,
+                       psk: Optional[str], hidden: bool,
+                       eap_args: Optional[Dict[str, Any]]) -> List[str]:
+    """ Build the nmcli connection add command to configure the new network.
+
+    The parameters are the same as configure but without the defaults; this
+    should be called only by configure.
+    """
+    configure_cmd = ['connection', 'add',
+                     'save', 'yes',
+                     'autoconnect', 'yes',
+                     'ifname', 'wlan0',
+                     'type', 'wifi',
+                     'con-name', ssid,
+                     'wifi.ssid', ssid]
+    if hidden:
+        configure_cmd += ['wifi.hidden', 'true']
+    if security_type == SECURITY_TYPES.WPA_PSK:
+        configure_cmd += ['wifi-sec.key-mgmt', security_type.value]
+        if psk is None:
+            raise ValueError('wpa-psk security type requires psk')
+        configure_cmd += ['wifi-sec.psk', psk]
+    elif security_type == SECURITY_TYPES.WPA_EAP:
+        if eap_args is None:
+            raise ValueError('wpa-eap security type requires eap_args')
+        configure_cmd += _add_eap_args(eap_args)
+    elif security_type == SECURITY_TYPES.NONE:
+        pass
+    else:
+        raise ValueError("Bad security_type {}".format(security_type))
+
+    return configure_cmd
+
+
+async def configure(ssid: str,
+                    securityType: SECURITY_TYPES,
+                    psk: Optional[str] = None,
+                    hidden: bool = False,
+                    eapConfig: Optional[Dict[str, Any]] = None,
+                    upRetries: int = 2) -> Tuple[bool, str]:
     """ Configure a connection but do not bring it up (though it is configured
     for autoconnect).
 
@@ -144,41 +420,25 @@ async def configure(ssid, # noqa(C901) There is a lot of work that will be done
     that doesn't exist will get a False and a message; a system where nmcli
     is not found will raise a CalledProcessError.
 
-    The ssid is mandatory. If security_type is 'wpa-psk', the psk must be
-    specified; if security_type is 'none', the psk will be ignored.
+    Input checks should be conducted before calling this function; any issues
+    with arguments that make it to this function will probably surface
+    themselves as TypeErrors and ValueErrors rather than anything more
+    structured.
 
-    If security_type is not specified, it will be inferred from the specified
-    arguments.
+    The ssid and security_type arguments are mandatory; the others have
+    different requirements depending on the security type.
     """
-    if None is security_type and None is not psk:
-        security_type = 'wpa-psk'
-    if security_type and security_type not in SUPPORTED_SECURITY_TYPES:
-        message = 'Only security types {} are supported'\
-            .format(SUPPORTED_SECURITY_TYPES)
-        log.error("Specified security type <{}> is not supported"
-                  .format(security_type))
-        return False, message
-
     already = await connection_exists(ssid)
     if already:
         # TODO(seth, 8/29/2018): We may need to do connection modifies
         # here for EAP configuration if e.g. we’re passing a keyfile in a
         # different http request
         _1, _2 = await _call(['connection', 'delete', already])
-    configure_cmd = ['connection', 'add',
-                     'save', 'yes',
-                     'autoconnect', 'yes',
-                     'ifname', 'wlan0',
-                     'type', 'wifi',
-                     'con-name', ssid,
-                     'wifi.ssid', ssid]
-    if security_type:
-        configure_cmd += ['wifi-sec.key-mgmt', security_type]
-    if psk:
-        configure_cmd += ['wifi-sec.psk', psk]
-    if hidden:
-        configure_cmd += ['wifi.hidden', 'true']
+
+    configure_cmd = _build_con_add_cmd(
+        ssid, securityType, psk, hidden, eapConfig)
     res, err = await _call(configure_cmd)
+
     # nmcli connection add returns a string that looks like
     # "Connection ’connection-name’ (connection-uuid) successfully added."
     # This unfortunately doesn’t respect the --terse flag, so we need to
@@ -190,19 +450,20 @@ async def configure(ssid, # noqa(C901) There is a lot of work that will be done
         return False, err.split('\r')[-1]
     name = uuid_matches.group(1)
     uuid = uuid_matches.group(2)
-    for _ in range(up_retries):
+    for _ in range(upRetries):
         res, err = await _call(['connection', 'up', 'uuid', uuid])
         if 'Connection successfully activated' in res:
             # If we successfully added the connection, remove other wifi
             # connections so they don’t accumulate over time
 
-            _1, _2 = await _trim_old_connections(name, 'wireless')
+            _3, _4 = await _trim_old_connections(name,
+                                                 CONNECTION_TYPES.WIRELESS)
             return True, res
     else:
         return False, err.split('\r')[-1]
 
 
-async def remove(ssid=None, name=None) -> (bool, str):
+async def remove(ssid: str = None, name: str = None) -> Tuple[bool, str]:
     """ Remove a network. Depending on what is known, specify either ssid
     (in which case this function will call ``connection_exists`` to get the
     nmcli connection name) or the nmcli connection name directly.
@@ -221,7 +482,7 @@ async def remove(ssid=None, name=None) -> (bool, str):
         return False, 'No connection for ssid {}'.format(ssid)
 
 
-async def iface_info(which_iface):
+async def iface_info(which_iface: NETWORK_IFACES) -> Dict[str, Optional[str]]:
     """ Get the basic network configuration of an interface.
 
     Returns a dict containing the info:
@@ -233,12 +494,9 @@ async def iface_info(which_iface):
 
     which_iface should be a string in IFACE_NAMES.
     """
-    if which_iface not in IFACE_NAMES:
-        raise ValueError('Bad interface name {}, not in {}'
-                         .format(which_iface, IFACE_NAMES))
-    default_res = {'ipAddress': None,
-                   'macAddress': None,
-                   'gatewayAddress': None}
+    default_res: Dict[str, Optional[str]] = {'ipAddress': None,
+                                             'macAddress': None,
+                                             'gatewayAddress': None}
     fields = ['GENERAL.HWADDR', 'IP4.ADDRESS', 'IP4.GATEWAY', 'GENERAL.STATE']
     # Note on this specific command: Most nmcli commands default to a tabular
     # output mode, where if there are multiple things to pull a couple specific
@@ -250,7 +508,7 @@ async def iface_info(which_iface):
     res, err = await _call(['--mode', 'tabular',
                             '--escape', 'no',
                             '--terse', '--fields', ','.join(fields),
-                            'dev', 'show', which_iface])
+                            'dev', 'show', which_iface.value])
     values = res.split('\n')
     if len(fields) != len(values):
         # We failed
@@ -261,7 +519,7 @@ async def iface_info(which_iface):
     return default_res
 
 
-async def _call(cmd) -> (str, str):
+async def _call(cmd: List[str]) -> Tuple[str, str]:
     """
     Runs the command in a subprocess and returns the captured stdout output.
     :param cmd: a list of arguments to nmcli. Should not include nmcli itself.
@@ -286,19 +544,26 @@ async def _call(cmd) -> (str, str):
     return out_str, err_str
 
 
-def sanitize_args(cmd) -> (str, str):
+def sanitize_args(cmd: List[str]) -> List[str]:
     """ Filter the command so that it no longer contains passwords
     """
     sanitized = []
     for idx, fieldname in enumerate(cmd):
-        if idx > 0 and 'wifi-sec.psk' in cmd[idx-1]:
+        def _is_password(cmdstr):
+            return 'wifi-sec.psk' in cmdstr\
+                or 'password' in cmdstr.lower()
+        if idx > 0 and _is_password(cmd[idx-1]):
             sanitized.append('****')
         else:
             sanitized.append(fieldname)
     return sanitized
 
 
-def _dict_from_terse_tabular(names, inp, transformers={}):
+def _dict_from_terse_tabular(
+        names: List[str],
+        inp: str,
+        transformers: Dict[str, Callable[[str], Any]] = {})\
+        -> List[Dict[str, Any]]:
     """ Parse NMCLI terse tabular output into a list of Python dict.
 
     ``names`` is a list of strings of field names to apply to the input data,
@@ -325,3 +590,76 @@ def _dict_from_terse_tabular(names, inp, transformers={}):
             (elem[0], transformers[elem[0]](elem[1]))
             for elem in zip(names, fields)]))
     return res
+
+
+# The functions that follow are designed to configure the system so that the
+# paths to the keys specified in `nmcli con add`, from our perspective in
+# the container, are the same as the paths to the keys from the perspective
+# of the host.
+
+# When we run nmcli, it is talking via D-bus to the NetworkManager daemon
+# running in the host - not in our container. That means that all the config
+# lives in the host’s /etc/NetworkManager/system-connections (you can tell
+# because when we have connections up, the containers
+# /etc/NetworkManager/system-connections is empty - I think it only exists
+# because nmcli creates it on install). That means that file paths must be
+# correct from that perspective.
+
+# In addition, `nmcli con add` checks locally, _in the container_, that the
+# paths specified as key files do indeed contain keyfiles. That means
+# whatever paths we specify must be valid in the container at the time that
+# we call `nmcli con add`, and valid in the host when we call `nmcli con up`
+# (i.e., all the time, including when the container isn’t running). So, we
+# make the paths be what the host will see, and we create a symlink in the
+# container to make the path look the same here.
+
+# This path depends on the resin app ID, which cannot be hardcoded because
+# it changes based on which Resin application the robot running the code
+# is in. It is also specified by Resin, which means it is given to pid 1
+# and relies on pid 1 passing it to children made with execve. To make this
+# path specification work whenever we run this, including if somebody is
+# running it directly from a shell which _won’t_ correctly pass the data,
+# we need to parse the environment of pid1.
+
+def _get_host_data_prefix() -> str:
+    return os.path.join('mnt', 'data', 'resin-data', _get_resin_app_id())
+
+
+def _get_resin_app_id() -> str:
+    if not os.environ.get('RUNNING_ON_PI'):
+        raise RuntimeError('Resin app id is only available on the pi')
+    p1_env = open('/proc/1/environ').read()
+    # /proc/x/environ is pretty much just the raw memory segment of the
+    # process that represents its environment. It contains a
+    # NUL-separated list of strings.
+    app_id = re.search('RESIN_APP_ID=([^\x00]*)\x00',
+                       p1_env)
+    if not app_id:
+        raise RuntimeError(
+            'Cannot find resin app id! /proc/1/env={}'.format(p1_env))
+    return app_id.group(1)
+
+
+def _rewrite_key_path_to_host_path(key_path) -> str:
+    resin_id = _get_resin_app_id()
+    key_abspath = os.path.abspath(key_path)
+    if key_abspath.startswith('/data'):
+        key_relpath = os.path.relpath(key_abspath, '/data')
+        key_hostpath = os.path.join('/', 'mnt', 'data', 'resin-data',
+                                    resin_id, key_relpath)
+        log.debug("Rewrote key path {} to {} for host"
+                  .format(key_path, key_hostpath))
+        return key_hostpath
+    else:
+        log.warning('Wifi keys that are not in /data may not work unless'
+                    'they are specified in a path common to the host and'
+                    ' the container')
+        return key_path
+
+
+def _make_host_symlink_if_necessary():
+    host_data_prefix = _get_host_data_prefix()
+    if not os.path.islink(_get_host_data_prefix()):
+        parent = os.path.abspath(os.path.join(host_data_prefix, os.pardir))
+        os.makedirs(parent, exist_ok=True)
+        os.symlink('/data', host_data_prefix)

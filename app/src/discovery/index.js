@@ -1,37 +1,36 @@
 // @flow
 // robot discovery state
+import groupBy from 'lodash/groupBy'
 import {getShellRobots} from '../shell'
 
+import type {Service} from '@opentrons/discovery-client'
 import type {State, Action, ThunkAction} from '../types'
-import type {DiscoveredRobot} from './types'
 
-type RobotsMap = {[name: string]: DiscoveredRobot}
+type RobotsMap = {[name: string]: Array<Service>}
 
 type DiscoveryState = {
   scanning: boolean,
-  robotsByName: RobotsMap
+  robotsByName: RobotsMap,
 }
 
 type StartAction = {|
   type: 'discovery:START',
-  meta: {|shell: true|}
+  meta: {|shell: true|},
 |}
 
 type FinishAction = {|
   type: 'discovery:FINISH',
-  meta: {|shell: true|}
+  meta: {|shell: true|},
 |}
 
 type UpdateListAction = {|
   type: 'discovery:UPDATE_LIST',
-  payload: {|robots: Array<DiscoveredRobot>|}
+  payload: {|robots: Array<Service>|},
 |}
-
-export * from './types'
 
 export type DiscoveryAction = StartAction | FinishAction | UpdateListAction
 
-const DISCOVERY_TIMEOUT = 15000
+const DISCOVERY_TIMEOUT = 20000
 
 export function startDiscovery (): ThunkAction {
   const start: StartAction = {type: 'discovery:START', meta: {shell: true}}
@@ -46,7 +45,7 @@ export function startDiscovery (): ThunkAction {
 // TODO(mc, 2018-08-09): uncomment when we figure out how to get this
 // to the app shell
 // export function updateDiscoveryList (
-//   robots: Array<DiscoveredRobot>
+//   robots: Array<Service>
 // ): UpdateListAction {
 //   return {type: 'discovery:UPDATE_LIST', payload: {robots}}
 // }
@@ -67,7 +66,7 @@ export function getDiscoveredRobotsByName (state: State) {
 // getShellRobots makes a sync RPC call, so use sparingly
 const initialState: DiscoveryState = {
   scanning: false,
-  robotsByName: normalizeRobots(getShellRobots())
+  robotsByName: normalizeRobots(getShellRobots()),
 }
 
 export function discoveryReducer (
@@ -84,19 +83,13 @@ export function discoveryReducer (
     case 'discovery:UPDATE_LIST':
       return {
         ...state,
-        robotsByName: normalizeRobots(action.payload.robots)
+        robotsByName: normalizeRobots(action.payload.robots),
       }
   }
 
   return state
 }
 
-function normalizeRobots (robots: Array<DiscoveredRobot> = []): RobotsMap {
-  return robots.reduce(
-    (robotsMap: RobotsMap, robot: DiscoveredRobot) => ({
-      ...robotsMap,
-      [robot.name]: robot
-    }),
-    {}
-  )
+function normalizeRobots (robots: Array<Service> = []): RobotsMap {
+  return groupBy(robots, 'name')
 }

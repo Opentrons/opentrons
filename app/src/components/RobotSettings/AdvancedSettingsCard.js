@@ -6,7 +6,7 @@ import {Link} from 'react-router-dom'
 
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
-import type {Setting, RobotHealth} from '../../http-api-client'
+import type {Setting, FetchHealthCall} from '../../http-api-client'
 import {fetchSettings, setSettings, makeGetRobotSettings, makeGetRobotHealth} from '../../http-api-client'
 import {downloadLogs} from '../../shell'
 
@@ -16,7 +16,7 @@ import {LabeledButton, LabeledToggle} from '../controls'
 type OP = Robot
 
 type SP = {
-  health: ?RobotHealth,
+  health: ?FetchHealthCall,
   settings: Array<Setting>,
 }
 
@@ -70,7 +70,7 @@ function AdvancedSettingsCard (props: Props) {
         buttonProps={{
           disabled: !logsAvailable,
           onClick: download,
-          children: 'Download'
+          children: 'Download',
         }}
       >
         <p>Access logs from this robot.</p>
@@ -80,7 +80,7 @@ function AdvancedSettingsCard (props: Props) {
         buttonProps={{
           Component: Link,
           to: resetUrl,
-          children: 'Reset'
+          children: 'Reset',
         }}
       >
         <p>Restore robot to factory configuration</p>
@@ -103,7 +103,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
 
     return {
       health,
-      settings: settings || []
+      settings: settings || [],
     }
   }
 }
@@ -111,7 +111,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   return {
     fetch: () => dispatch(fetchSettings(ownProps)),
-    set: (id, value) => dispatch(setSettings(ownProps, id, value)),
-    download: () => dispatch(downloadLogs(ownProps))
+    set: (id, value) => dispatch(setSettings(ownProps, {id, value})),
+    download: () => dispatch(downloadLogs(ownProps)),
   }
 }

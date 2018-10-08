@@ -7,18 +7,20 @@ import {
   wellRatioTransfer,
   wellRatioConsolidate,
   wellRatioDistribute,
-  type FormError
+  type FormError,
 } from './errors'
 import {
   composeWarnings,
   maxDispenseWellVolume,
   minDisposalVolume,
   type FormWarning,
-  type FormWarningType
+  type FormWarningType,
 } from './warnings'
 import type {StepType} from '../../form-types'
 
 export {default as generateNewForm} from './generateNewForm'
+export {default as getDefaultsForStepType} from './getDefaultsForStepType'
+export {default as getNextDefaultPipetteId} from './getNextDefaultPipetteId'
 export {default as stepFormToArgs} from './stepFormToArgs'
 
 type FormHelpers = {getErrors?: (mixed) => Array<FormError>, getWarnings?: (mixed) => Array<FormWarning>}
@@ -27,16 +29,16 @@ const stepFormHelperMap: {[StepType]: FormHelpers} = {
   pause: {getErrors: composeErrors(incompatibleLabware)},
   transfer: {
     getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware, wellRatioTransfer),
-    getWarnings: composeWarnings(maxDispenseWellVolume)
+    getWarnings: composeWarnings(maxDispenseWellVolume),
   },
   consolidate: {
     getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware, wellRatioConsolidate),
-    getWarnings: composeWarnings(maxDispenseWellVolume)
+    getWarnings: composeWarnings(maxDispenseWellVolume),
   },
   distribute: {
     getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware, wellRatioDistribute),
-    getWarnings: composeWarnings(maxDispenseWellVolume, minDisposalVolume)
-  }
+    getWarnings: composeWarnings(maxDispenseWellVolume, minDisposalVolume),
+  },
 }
 
 export type {FormError, FormWarning, FormWarningType}

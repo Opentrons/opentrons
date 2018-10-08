@@ -13,7 +13,7 @@ import type {BaseState} from '../../../types'
 type OP = {prefix?: 'aspirate' | 'dispense'}
 type SP = {
   mmFromBottom: ?string,
-  wellHeightMM: ?number
+  wellHeightMM: ?number,
 }
 
 type TipPositionInputState = {isModalOpen: boolean}
@@ -69,8 +69,8 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   let wellHeightMM = null
   if (formData && formData[labwareFieldName]) {
     const labwareById = labwareIngredsSelectors.getLabware(state)
-    // TODO: BC 2018-08-29 protect for the case where selected labware gets deleted
-    const labwareDef = getLabware(labwareById[formData[labwareFieldName]].type)
+    const labware = labwareById[formData[labwareFieldName]]
+    const labwareDef = labware && labware.type && getLabware(labware.type)
     if (labwareDef) {
       // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
       const firstWell = labwareDef.wells['A1']
@@ -81,7 +81,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   }
   return {
     wellHeightMM,
-    mmFromBottom: formData && formData[fieldName]
+    mmFromBottom: formData && formData[fieldName],
   }
 }
 

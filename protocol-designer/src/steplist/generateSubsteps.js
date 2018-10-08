@@ -3,11 +3,10 @@ import cloneDeep from 'lodash/cloneDeep'
 import range from 'lodash/range'
 import mapValues from 'lodash/mapValues'
 
-import type {Channels} from '@opentrons/components'
-import {getWellsForTips} from '../step-generation/utils'
+import substepTimeline from './substepTimeline'
 import {
   utils as steplistUtils,
-  type NamedIngred
+  type NamedIngred,
 } from '../steplist'
 
 import { type ValidFormAndErrors } from './formLevel/stepFormToArgs'
@@ -15,22 +14,18 @@ import { type ValidFormAndErrors } from './formLevel/stepFormToArgs'
 import type {
   SubstepItemData,
   SourceDestSubstepItem,
+  SubstepTimelineFrame,
   StepItemSourceDestRow,
-  StepItemSourceDestRowMulti,
-  SourceDestSubstepItemSingleChannel
 } from './types'
 
 import {
   consolidate,
   distribute,
   transfer,
-  mix
+  mix,
 } from '../step-generation'
 
-import type {
-  AspirateDispenseArgs,
-  RobotState
-} from '../step-generation'
+import type {RobotState} from '../step-generation'
 
 import type {
   PipetteData,
@@ -38,44 +33,34 @@ import type {
   DistributeFormData,
   MixFormData,
   PauseFormData,
-  TransferFormData
+  TransferFormData,
 } from '../step-generation/types'
 
 type AllPipetteData = {[pipetteId: string]: PipetteData}
-type SourceDestSubstepItemRows = $PropertyType<SourceDestSubstepItemSingleChannel, 'rows'>
-type SourceDestSubstepItemMultiRows = Array<Array<StepItemSourceDestRowMulti>>
 
 export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 type GetLabwareType = (labwareId: string) => ?string
 
-type AspDispCommandType = {
-  command: 'aspirate' | 'dispense',
-  params: AspirateDispenseArgs
-}
-
 function transferLikeSubsteps (args: {
   validatedForm: ConsolidateFormData | DistributeFormData | TransferFormData | MixFormData,
   allPipetteData: AllPipetteData,
-  getIngreds: GetIngreds,
   getLabwareType: GetLabwareType,
   robotState: RobotState,
-  stepId: number
+  stepId: number,
 }): ?SourceDestSubstepItem {
   const {
     validatedForm,
     allPipetteData,
-    getIngreds,
     getLabwareType,
-    stepId
+    stepId,
   } = args
 
   // Add tips to pipettes, since this is just a "simulation"
   // TODO: Ian 2018-07-31 develop more elegant way to bypass tip handling for simulation/test
   const robotState = cloneDeep(args.robotState)
   robotState.tipState.pipettes = mapValues(robotState.tipState.pipettes, () => true)
-
   const {
-    pipette: pipetteId
+    pipette: pipetteId,
   } = validatedForm
 
   const pipette = allPipetteData[pipetteId]
@@ -88,7 +73,7 @@ function transferLikeSubsteps (args: {
   // if false, show aspirate vol instead
   const showDispenseVol = validatedForm.stepType === 'distribute'
 
-  let result
+  let substepCommandCreators
 
   // Call appropriate command creator with the validateForm fields.
   // Disable any mix args so those aspirate/dispenses don't show up in substeps
@@ -97,174 +82,140 @@ function transferLikeSubsteps (args: {
       ...validatedForm,
       mixBeforeAspirate: null,
       mixInDestination: null,
-      preWetTip: false
+      preWetTip: false,
     }
 
-    result = transfer(commandCallArgs)(robotState)
+    substepCommandCreators = transfer(commandCallArgs)(robotState)
   } else if (validatedForm.stepType === 'distribute') {
     const commandCallArgs = {
       ...validatedForm,
       mixBeforeAspirate: null,
-      preWetTip: false
+      preWetTip: false,
     }
 
-    result = distribute(commandCallArgs)(robotState)
+    substepCommandCreators = distribute(commandCallArgs)(robotState)
   } else if (validatedForm.stepType === 'consolidate') {
     const commandCallArgs = {
       ...validatedForm,
       mixFirstAspirate: null,
       mixInDestination: null,
-      preWetTip: false
+      preWetTip: false,
     }
 
-    result = consolidate(commandCallArgs)(robotState)
+    substepCommandCreators = consolidate(commandCallArgs)(robotState)
   } else if (validatedForm.stepType === 'mix') {
-    result = mix(validatedForm)(robotState)
+    substepCommandCreators = mix(validatedForm)(robotState)
   } else {
     // TODO Ian 2018-05-21 Use assert here. Should be unreachable
     console.warn(`transferLikeSubsteps got unsupported stepType "${validatedForm.stepType}"`)
     return null
   }
 
-  if (result.errors) {
-    console.warn('Could not get substep, had errors:', result)
-    return null
-  }
-
   // Multichannel substeps
   if (pipette.channels > 1) {
-    const aspDispMultiRows: SourceDestSubstepItemMultiRows = result.commands.reduce((acc, c, commandIdx) => {
-      if (c.command === 'aspirate' || c.command === 'dispense') {
-        const rows = commandToMultiRows(c, getIngreds, getLabwareType, pipette.channels)
-        return rows ? [...acc, rows] : acc
-      }
-      return acc
-    }, [])
-
-    const mergedMultiRows: SourceDestSubstepItemMultiRows = steplistUtils.mergeWhen(
-      aspDispMultiRows,
-      (currentMultiRow, nextMultiRow) => {
+    const substepRows: Array<SubstepTimelineFrame> = substepTimeline(
+      substepCommandCreators,
+      {channels: pipette.channels, getLabwareType},
+    )(robotState)
+    const mergedMultiRows: Array<Array<StepItemSourceDestRow>> = steplistUtils.mergeWhen(
+      substepRows,
+      (currentMultiRow: SubstepTimelineFrame, nextMultiRow: SubstepTimelineFrame) => {
         // aspirate then dispense multirows adjacent
         // (inferring from first channel row in each multirow)
-        return currentMultiRow[0] && currentMultiRow[0].sourceWell &&
-        nextMultiRow[0] && nextMultiRow[0].destWell
+        return currentMultiRow && currentMultiRow.source &&
+        nextMultiRow && nextMultiRow.dest
       },
       // Merge each channel row together when predicate true
       (currentMultiRow, nextMultiRow) => {
-        return range(pipette.channels).map(channel => ({
-          ...currentMultiRow[channel],
-          ...nextMultiRow[channel],
-          volume: showDispenseVol
-            ? nextMultiRow[channel].volume
-            : currentMultiRow[channel].volume
-        }))
-      }
+        return range(pipette.channels).map(channelIndex => {
+          const sourceChannelWell = currentMultiRow.source && currentMultiRow.source.wells[channelIndex]
+          const destChannelWell = nextMultiRow.dest && nextMultiRow.dest.wells[channelIndex]
+          const source = currentMultiRow.source && sourceChannelWell && {
+            well: sourceChannelWell,
+            preIngreds: currentMultiRow.source.preIngreds[sourceChannelWell],
+            postIngreds: currentMultiRow.source.postIngreds[sourceChannelWell],
+          }
+          const dest = nextMultiRow.dest && destChannelWell && {
+            well: destChannelWell,
+            preIngreds: nextMultiRow.dest.preIngreds[destChannelWell],
+            postIngreds: nextMultiRow.dest.postIngreds[destChannelWell],
+          }
+          return {
+            source,
+            dest: validatedForm.stepType === 'mix' ? source : dest, // NOTE: since source and dest are same for mix, we're showing source on both sides. Otherwise dest would show the intermediate volume state
+            volume: showDispenseVol ? nextMultiRow.volume : currentMultiRow.volume,
+          }
+        })
+      },
+      (currentMultiRow) => (
+        range(pipette.channels).map(channelIndex => {
+          const source = currentMultiRow.source && {
+            well: currentMultiRow.source.wells[channelIndex],
+            preIngreds: currentMultiRow.source.preIngreds[currentMultiRow.source.wells[channelIndex]],
+            postIngreds: currentMultiRow.source.postIngreds[currentMultiRow.source.wells[channelIndex]],
+          }
+          const dest = currentMultiRow.dest && {
+            well: currentMultiRow.dest.wells[channelIndex],
+            preIngreds: currentMultiRow.dest.preIngreds[currentMultiRow.dest.wells[channelIndex]],
+            postIngreds: currentMultiRow.dest.postIngreds[currentMultiRow.dest.wells[channelIndex]],
+          }
+          return { source, dest, volume: currentMultiRow.volume }
+        })
+      )
     )
-
     return {
       multichannel: true,
       stepType: validatedForm.stepType,
       parentStepId: stepId,
-      multiRows: mergedMultiRows
+      multiRows: mergedMultiRows,
     }
-  }
+  } else { // single channel
+    const substepRows = substepTimeline(substepCommandCreators)(robotState)
 
-  // Single-channel rows
-  const aspDispRows: SourceDestSubstepItemRows = result.commands.reduce((acc, c, commandIdx) => {
-    if (c.command === 'aspirate' || c.command === 'dispense') {
-      const row = commandToRows(c, getIngreds)
-      return row ? [...acc, row] : acc
-    }
-    return acc
-  }, [])
-
-  const mergedRows: SourceDestSubstepItemRows = steplistUtils.mergeWhen(
-    aspDispRows,
-    (currentRow, nextRow) =>
-      // aspirate then dispense rows adjacent
-      currentRow.sourceWell && nextRow.destWell,
-    (currentRow, nextRow) => ({
-      ...nextRow,
-      ...currentRow,
-      volume: showDispenseVol
-        ? nextRow.volume
-        : currentRow.volume
-    })
-  )
-
-  return {
-    multichannel: false,
-    stepType: validatedForm.stepType,
-    parentStepId: stepId,
-    rows: mergedRows
-  }
-}
-
-function commandToRows (
-  command: AspDispCommandType,
-  getIngreds: GetIngreds
-): ?StepItemSourceDestRow {
-  if (command.command === 'aspirate') {
-    const {well, volume, labware} = command.params
-    return {
-      sourceIngredients: getIngreds(labware, well),
-      sourceWell: well,
-      volume
-    }
-  }
-
-  if (command.command === 'dispense') {
-    const {well, volume, labware} = command.params
-    return {
-      destIngredients: getIngreds(labware, well),
-      destWell: well,
-      volume
-    }
-  }
-
-  return null
-}
-
-function commandToMultiRows (
-  command: AspDispCommandType,
-  getIngreds: GetIngreds,
-  getLabwareType: GetLabwareType,
-  channels: Channels
-): ?Array<StepItemSourceDestRowMulti> {
-  const labwareId = command.params.labware
-  const labwareType = getLabwareType(labwareId)
-
-  if (!labwareType) {
-    console.warn(`No labwareType for labwareId ${labwareId}`)
-    return null
-  }
-  const wellsForTips = getWellsForTips(channels, labwareType, command.params.well).wellsForTips
-
-  return range(channels).map(channel => {
-    const well = wellsForTips[channel]
-    const ingreds = getIngreds(labwareId, well)
-    const volume = command.params.volume
-
-    if (command.command === 'aspirate') {
-      return {
-        channelId: channel,
-        sourceIngredients: ingreds,
-        sourceWell: well,
-        volume
+    const mergedRows: Array<StepItemSourceDestRow> = steplistUtils.mergeWhen(
+      substepRows,
+      (currentRow, nextRow) =>
+        // NOTE: if aspirate then dispense rows are adjacent, collapse them into one row
+        currentRow.source && nextRow.dest,
+      (currentRow, nextRow) => ({
+        ...currentRow,
+        source: {
+          well: currentRow.source && currentRow.source.wells[0],
+          preIngreds: currentRow.source && currentRow.source.preIngreds,
+          postIngreds: currentRow.source && currentRow.source.postIngreds,
+        },
+        ...nextRow,
+        dest: {
+          well: nextRow.dest && nextRow.dest.wells[0],
+          preIngreds: nextRow.dest && nextRow.dest.preIngreds,
+          postIngreds: nextRow.dest && nextRow.dest.postIngreds,
+        },
+        volume: showDispenseVol
+          ? nextRow.volume
+          : currentRow.volume,
+      }),
+      (currentRow) => {
+        const source = currentRow.source && {
+          well: currentRow.source.wells[0],
+          preIngreds: currentRow.source.preIngreds,
+          postIngreds: currentRow.source.postIngreds,
+        }
+        const dest = currentRow.dest && {
+          well: currentRow.dest.wells[0],
+          preIngreds: currentRow.dest.preIngreds,
+          postIngreds: currentRow.dest.postIngreds,
+        }
+        return {source, dest, volume: currentRow.volume}
       }
-    }
-    if (command.command !== 'dispense') {
-      // TODO Ian 2018-05-17 use assert
-      console.warn(`expected aspirate or dispense in commandToMultiRows, got ${command.command}`)
-    }
-    // dispense
+    )
+
     return {
-      channelId: channel,
-      destIngredients: ingreds,
-      destWell: well,
-      volume
+      multichannel: false,
+      stepType: validatedForm.stepType,
+      parentStepId: stepId,
+      rows: mergedRows,
     }
-  })
+  }
 }
 
 // NOTE: This is the fn used by the `allSubsteps` selector
@@ -272,7 +223,6 @@ export function generateSubsteps (
   valForm: ?ValidFormAndErrors,
   allPipetteData: AllPipetteData,
   getLabwareType: GetLabwareType,
-  getIngreds: GetIngreds,
   robotState: ?RobotState,
   stepId: number // stepId is used only for substeps to reference parent step
 ): ?SubstepItemData {
@@ -305,10 +255,9 @@ export function generateSubsteps (
     return transferLikeSubsteps({
       validatedForm,
       allPipetteData,
-      getIngreds,
       getLabwareType,
       robotState,
-      stepId
+      stepId,
     })
   }
 

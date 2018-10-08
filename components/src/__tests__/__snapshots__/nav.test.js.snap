@@ -5,6 +5,7 @@ exports[`NavButton renders nav button with icon correctly 1`] = `
   className="button disabled"
   disabled="false"
   onClick={undefined}
+  tabIndex={undefined}
   title={undefined}
   type="button"
 >
@@ -46,6 +47,7 @@ exports[`SidePanel renders SidePanel correctly 1`] = `
       className="button_flat button_icon button_close"
       disabled={undefined}
       onClick={[Function]}
+      tabIndex={undefined}
       title="close panel"
       type="button"
     >

@@ -9,5 +9,5 @@ export {
   VerticalNavBar,
   NavButton,
   OutsideLinkButton,
-  SidePanel
+  SidePanel,
 }

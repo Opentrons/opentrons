@@ -16,7 +16,7 @@ export default function ConfirmUploadModal (props: Props) {
         heading={'Are you sure you want to open a new protocol?'}
         buttons={[
           {children: 'cancel', onClick: props.cancel},
-          {children: 'continue', onClick: props.confirm}
+          {children: 'continue', onClick: props.confirm},
         ]}
         alertOverlay
       >

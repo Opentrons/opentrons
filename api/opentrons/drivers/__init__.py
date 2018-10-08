@@ -9,9 +9,6 @@ import serial
 
 from opentrons.drivers import connection
 
-__all__ = [
-]
-
 VIRTUAL_SMOOTHIE_PORT = 'Virtual Smoothie'
 
 SMOOTHIE_DEFAULTS_DIR = pkg_resources.resource_filename(

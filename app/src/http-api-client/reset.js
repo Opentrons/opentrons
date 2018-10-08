@@ -1,7 +1,8 @@
 // @flow
 // API client for getting reset options and resetting robot config files
-import {createSelector, type Selector} from 'reselect'
+import {createSelector} from 'reselect'
 
+import type {OutputSelector} from 'reselect'
 import type {State, ThunkPromiseAction} from '../types'
 import type {BaseRobot, RobotService} from '../robot'
 import type {ApiCall, ApiRequestError} from './types'
@@ -20,7 +21,7 @@ export type ResetOption = {
 }
 
 type FetchResetOptionsResponse = {
-  options: Array<ResetOption>
+  options: Array<ResetOption>,
 }
 
 export type ResetRobotRequest = {
@@ -70,7 +71,7 @@ export function resetRobotData (robot: RobotService, options: ResetRobotRequest)
 }
 
 export function makeGetRobotResetOptions () {
-  const selector: Selector<State, BaseRobot, FetchResetOptionsCall> = createSelector(
+  const selector: OutputSelector<State, BaseRobot, FetchResetOptionsCall> = createSelector(
     getRobotApiState,
     (state) => state[OPTIONS_PATH] || {inProgress: false}
   )
@@ -79,7 +80,7 @@ export function makeGetRobotResetOptions () {
 }
 
 export function makeGetRobotResetRequest () {
-  const selector: Selector<State, BaseRobot, ResetRobotRequest> = createSelector(
+  const selector: OutputSelector<State, BaseRobot, ResetRobotRequest> = createSelector(
     getRobotApiState,
     (state) => state[RESET_PATH] || {inProgress: false}
   )

@@ -74,9 +74,14 @@
     flex: 1 1 auto;
     color: var(--c-dark-gray);
     width: 100%;
+    font-size: 1rem;
 
-    /* add 1px padding that is present in chrome but not ff */
-    padding: 1px;
+    /* TODO: Ian 2018-09-14 Firefox has 1px padding on input element,
+    * but I can't figure out how to fix it in Firefox without breaking it in Chrome.
+    * Better CSS reset for inputs needed?
+    */
+
+    /* padding: 1px; */
   }
 
   & input:focus {
@@ -97,6 +102,7 @@
     flex: 1 0;
     font-weight: var(--fw-semibold);
     text-align: right;
+    align-self: center;
     color: var(--c-dark-gray);
   }
 }
@@ -125,6 +131,16 @@
   flex: 1;
 }
 
+.error div,
+.error span {
+  color: var(--c-warning-dark);
+}
+
+.error select,
+.error .input_field {
+  background-color: var(--c-warning-light);
+}
+
 .dropdown_field {
   position: relative;
 
@@ -140,6 +156,11 @@
     width: 100%;
     appearance: none;
     overflow: hidden;
+
+    &:focus {
+      background-color: var(--c-white);
+      box-shadow: 0 0.125rem 0.25rem 0 color(var(--c-black) alpha(0.5));
+    }
   }
 
   & .dropdown_icon {
@@ -153,16 +174,6 @@
       color: var(--c-dark-gray);
     }
   }
-}
-
-.error div,
-.error span {
-  color: var(--c-warning-dark);
-}
-
-.error select,
-.error .input_field {
-  background-color: var(--c-warning-light);
 }
 
 .error_icon {

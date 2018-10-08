@@ -58,7 +58,7 @@ export default function RemoteObject (context, source, options, seen) {
     .reduce((accPromise, sourceChild) => accPromise.then((acc) => (
       RemoteObject(context, sourceChild.value, options, seen)
         .then((remoteValue) => Object.assign(acc, {
-          [sourceChild.key]: remoteValue
+          [sourceChild.key]: remoteValue,
         }))
     )), Promise.resolve({}))
 

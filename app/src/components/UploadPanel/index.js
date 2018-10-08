@@ -1,41 +1,50 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import {connect} from 'react-redux'
-import {push} from 'react-router-redux'
 
-import {
-  actions as robotActions,
-  selectors as robotSelectors
-} from '../../robot'
+import {selectors as robotSelectors} from '../../robot'
+import {openProtocol, getProtocolFilename} from '../../protocol'
 
 import {SidePanel} from '@opentrons/components'
 import Upload from './Upload'
 
-type Props = {
+import type {State, Dispatch} from '../../types'
+
+type SP = {
+  filename: ?string,
   sessionLoaded: ?boolean,
-  confirmUpload: () => mixed,
-  createSession: () => mixed,
+  uploadError: ?{message: string},
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UploadPanel)
+type DP = {
+  createSession: File => mixed,
+}
+
+type Props = SP & DP
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(UploadPanel)
 
 function UploadPanel (props: Props) {
   return (
-    <SidePanel title='Open Protocol'>
+    <SidePanel title="Protocol File">
       <Upload {...props} />
     </SidePanel>
   )
 }
 
-function mapStateToProps (state) {
+function mapStateToProps (state: State): SP {
   return {
-    sessionLoaded: robotSelectors.getSessionIsLoaded(state)
+    filename: getProtocolFilename(state),
+    sessionLoaded: robotSelectors.getSessionIsLoaded(state),
+    uploadError: robotSelectors.getUploadError(state),
   }
 }
 
-function mapDispatchToProps (dispatch) {
+function mapDispatchToProps (dispatch: Dispatch): DP {
   return {
-    confirmUpload: () => dispatch(push('/upload/confirm')),
-    createSession: (file) => dispatch(robotActions.session(file))
+    createSession: (file: File) => dispatch(openProtocol(file)),
   }
 }

@@ -1,7 +1,8 @@
 // @flow
 // HTTP API client module for /robot/**
-import {createSelector, type Selector} from 'reselect'
+import {createSelector} from 'reselect'
 
+import type {OutputSelector} from 'reselect'
 import type {PipetteConfig} from '@opentrons/shared-data'
 import type {State, ThunkPromiseAction, Action} from '../types'
 import type {Mount, BaseRobot, RobotService} from '../robot'
@@ -10,7 +11,7 @@ import type {
   ApiRequestAction,
   ApiSuccessAction,
   ApiFailureAction,
-  ClearApiResponseAction
+  ClearApiResponseAction,
 } from './actions'
 
 import {apiRequest, apiSuccess, apiFailure, clearApiResponse} from './actions'
@@ -58,11 +59,11 @@ type RobotHomeResponse = {
 }
 
 type RobotLightsRequest = ?{
-  on: boolean
+  on: boolean,
 }
 
 type RobotLightsResponse = {
-  on: boolean
+  on: boolean,
 }
 
 type RobotPath =
@@ -224,8 +225,8 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {request, inProgress: true, response: null, error: null}
-        }
+          [path]: {request, inProgress: true, response: null, error: null},
+        },
       }
     }
 
@@ -240,8 +241,8 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, response, inProgress: false, error: null}
-        }
+          [path]: {...stateByPath, response, inProgress: false, error: null},
+        },
       }
     }
 
@@ -256,8 +257,8 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, error, inProgress: false}
-        }
+          [path]: {...stateByPath, error, inProgress: false},
+        },
       }
     }
 
@@ -272,8 +273,8 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, response: null, error: null}
-        }
+          [path]: {...stateByPath, response: null, error: null},
+        },
       }
     }
   }
@@ -282,7 +283,7 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
 }
 
 export const makeGetRobotMove = () => {
-  const selector: Selector<State, BaseRobot, RobotMove> = createSelector(
+  const selector: OutputSelector<State, BaseRobot, RobotMove> = createSelector(
     selectRobotState,
     (state) => state[MOVE] || {inProgress: false}
   )
@@ -291,7 +292,7 @@ export const makeGetRobotMove = () => {
 }
 
 export const makeGetRobotHome = () => {
-  const selector: Selector<State, BaseRobot, RobotHome> = createSelector(
+  const selector: OutputSelector<State, BaseRobot, RobotHome> = createSelector(
     selectRobotState,
     (state) => state[HOME] || {inProgress: false}
   )
@@ -300,7 +301,7 @@ export const makeGetRobotHome = () => {
 }
 
 export const makeGetRobotLights = () => {
-  const selector: Selector<State, BaseRobot, RobotLights> = createSelector(
+  const selector: OutputSelector<State, BaseRobot, RobotLights> = createSelector(
     selectRobotState,
     (state) => state[LIGHTS] || {inProgress: false}
   )

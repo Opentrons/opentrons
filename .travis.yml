@@ -55,14 +55,12 @@ before_script:
 
 script:
   - make test
+  - make coverage
   - if [[ $LINT = true ]]; then make lint; fi
   - if [[ $BUILD_COMPONENTS = true ]]; then make -C components build; fi
   - if [[ $BUILD_PD = true ]]; then make -C protocol-designer build; fi
   - if [[ $BUILD_APP = true ]]; then make -C app-shell dist-$APP_OS_TARGET; fi
   - if [[ $BUILD_API_DOCS = true ]]; then (make -C api docs > /dev/null); fi
-
-after_success:
-  - make coverage
 
 deploy:
   - provider: pages
@@ -141,6 +139,9 @@ env:
 
     # OT_APP_INTERCOM_ID
     - secure: "B+OLp0ZNWX6T9BFFGdNYA6vmXYJH0KXFGdyrEKHh0bFC4BnbPbbhN1SFp50Au+uMY1lzIhnihrkLpabie89N8HfHVuvTf27KDGP2vUrs7Vnnf+goSb2PrtcFcRNDjOM5bKQAWNfrjDVUBYkDWWL+zkS9ms6+mF+E8keCDGeMacPSus6NNK1v8+i9yK1/lJHYHxA353BkU73iP2SdrZ3IFuysEG8DVj9wBl7fXYOHrP2Dzw/ZQYzQOiagPYGAPoyMDcbr0Pnq1wu9sPADbPAA+UFOq0LfNTLDd8iP6EZuahwVIhldKBFOuT15YmbHG2c00Hepjl9V72d2FwnkXWcbKf/tgOrgCO+mDgYXtwE7rVfBQdhCZGgfxY7w8MTmNNm/WRrFhLBVvLpRGmVprIrA0fTJVUUo5O+YUHXuSAWwE2OPM3MfXj4Qdy656mTg6A/FWRuE1IZffhr/YhfcHiW6VG/W5t5wF5dzR1so4QILcL+aU2wfoHaFQ+c25ejoo7aPaY4D1bbQl0AtpQMJLtMSUH8X7xJGkVgc3mbwFdpvHNAhh2rhtOJtftwhTXSZ0WLfcJLl4Hj2F/6IqZj/DvTO5xMjuqdTigFVJzUSFdG6C61Af5C49v+ag9hqTHyQ59kOIFoKeyW4SPmqQIm7ZSVs1h3wCkmtZVOHWSV+n41JJ/I="
+
+    # OT_PD_FULLSTORY_ORG
+    - secure: "N/WWTWYdEPF7UfWIefSnOIKYVj9/q8ti7kCiB9DNfeKIsjJwsmg6S5yrwn6N4B/9ZMSp0yswo442n09CvH4jMG99BodXdYxg3JhuJ5dxWReAUTWO0PTiyihWeFhd2sbQ3VZa+o85OoFWFHO8UCXqcG//iUZ4l05t9DY5CGUBsPnyJTptsjPCb+CFUc+xkckv9RBfhLeyGBDWodJVfjU4xb124f5MBVF67OlHJ20HmbuH/kRNLDXSiRW4BD9UIXyWrIaPZHW612dX6inETz0vhUOJbUftgn8kdpjjBqa1394TjnjW5fey1n73KH4KpaDPZeGJ5GnYRpk9Wvw7uQkWH7xjkXbFq6cqd0vIWWS5uYmdsMsNDjUtTyELqG01rj813jbmcItuzK2tAcuQ5kBPwikLsHYeQY/68GKlws9POd444YQXXiTYgCoHgYq8O3nxaLoMZBgabFq6Rtz0xJb3Hu99PkU6flI4hgT82RZGf32PgYSKznaGps9DGf2as8FU+wui/So89eQwkDyhirzGvC31OlRHdZitjWYvI27nGgiPWheuZR5zAtf6tJeZaZ1N/PZGBwJW6ykfjG+vyRep/IIW5r0ujnBcmgxT7USVpW0E45QolZBS75t29kkTxP0/EHLMavv7QqP3LNpDJpptPrMQ8mLINxlB7FCQ2AQLbDY="
 
 notifications:
   email:

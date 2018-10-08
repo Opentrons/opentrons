@@ -8,7 +8,7 @@ import styles from './connect-panel.css'
 type Props = {
   onScanClick: () => mixed,
   isScanning: boolean,
-  found: boolean
+  found: boolean,
 }
 
 export default function ScanStatus (props: Props) {

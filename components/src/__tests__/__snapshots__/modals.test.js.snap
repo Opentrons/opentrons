@@ -45,6 +45,7 @@ exports[`modals AlertModal renders correctly 1`] = `
         className="button_outline alert_button"
         disabled={undefined}
         onClick={[Function]}
+        tabIndex={undefined}
         title={undefined}
         type="button"
       >
@@ -54,6 +55,7 @@ exports[`modals AlertModal renders correctly 1`] = `
         className="button_outline alert_button"
         disabled={undefined}
         onClick={[Function]}
+        tabIndex={undefined}
         title={undefined}
         type="button"
       >
@@ -87,6 +89,7 @@ exports[`modals ContinueModal renders correctly 1`] = `
         className="button_outline alert_button"
         disabled={undefined}
         onClick={[Function]}
+        tabIndex={undefined}
         title="Cancel"
         type="button"
       >
@@ -96,6 +99,7 @@ exports[`modals ContinueModal renders correctly 1`] = `
         className="button_outline alert_button"
         disabled={undefined}
         onClick={[Function]}
+        tabIndex={undefined}
         title="Continue"
         type="button"
       >
@@ -158,6 +162,7 @@ exports[`modals ModalPage renders correctly 1`] = `
       className="button_flat inverted"
       disabled={undefined}
       onClick={[Function]}
+      tabIndex={undefined}
       title="Back"
       type="button"
     >
@@ -226,6 +231,7 @@ exports[`modals SpinnerModalPage renders correctly 1`] = `
       className="button_flat inverted"
       disabled={true}
       onClick={undefined}
+      tabIndex={undefined}
       title="Back"
       type="button"
     >

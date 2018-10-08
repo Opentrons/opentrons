@@ -1,41 +1,48 @@
 // @flow
 // item in a RobotList
 import {connect} from 'react-redux'
-import {withRouter} from 'react-router'
+import {withRouter, type Match} from 'react-router'
 
 import type {State, Dispatch} from '../../types'
 import type {Robot} from '../../robot'
 import {actions as robotActions} from '../../robot'
-import {makeGetAvailableRobotUpdate} from '../../http-api-client'
+import {makeGetRobotUpdateInfo} from '../../http-api-client'
 
-import {RobotListItem} from './RobotList.js'
+import {RobotListItem} from './RobotListItem.js'
 
-type OP = Robot
+type OP = Robot & {
+  match: Match,
+}
 
 type SP = {
-  availableUpdate: ?string
+  upgradable: boolean,
+  selected: boolean,
 }
 
 type DP = {
   connect: () => mixed,
-  disconnect: () => mixed
+  disconnect: () => mixed,
 }
 
 export default withRouter(
-  connect(makeMapStateToProps, mapDispatchToProps)(RobotListItem)
+  connect(
+    makeMapStateToProps,
+    mapDispatchToProps
+  )(RobotListItem)
 )
 
 function makeMapStateToProps () {
-  const getAvailableRobotUpdate = makeGetAvailableRobotUpdate()
+  const getUpdateInfo = makeGetRobotUpdateInfo()
 
   return (state: State, ownProps: OP): SP => ({
-    availableUpdate: getAvailableRobotUpdate(state, ownProps)
+    upgradable: getUpdateInfo(state, ownProps).type === 'upgrade',
+    selected: ownProps.match.params.name === ownProps.name,
   })
 }
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   return {
     connect: () => dispatch(robotActions.connect(ownProps.name)),
-    disconnect: () => dispatch(robotActions.disconnect())
+    disconnect: () => dispatch(robotActions.disconnect()),
   }
 }

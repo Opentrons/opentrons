@@ -16,6 +16,7 @@
     "modelOffset": [0.0, 0.0, -13],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
+    "minVolume": 1,
     "maxVolume": 10,
     "tipLength": 33
   },
@@ -36,6 +37,7 @@
     "modelOffset": [0.0, 0.0, -13],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
+    "minVolume": 1,
     "maxVolume": 10,
     "tipLength": 33
   },
@@ -56,6 +58,7 @@
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
+    "minVolume": 1,
     "maxVolume": 10,
     "tipLength": 33
   },
@@ -76,6 +79,7 @@
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
+    "minVolume": 1,
     "maxVolume": 10,
     "tipLength": 33
   },
@@ -96,6 +100,7 @@
     "modelOffset": [0.0, 0.0, 0.0],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
+    "minVolume": 5,
     "maxVolume": 50,
     "tipLength": 51.7
   },
@@ -116,6 +121,7 @@
     "modelOffset": [0.0, 0.0, 0.0],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
+    "minVolume": 5,
     "maxVolume": 50,
     "tipLength": 51.7
   },
@@ -136,6 +142,7 @@
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
+    "minVolume": 5,
     "maxVolume": 50,
     "tipLength": 51.7
   },
@@ -156,6 +163,7 @@
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
+    "minVolume": 5,
     "maxVolume": 50,
     "tipLength": 51.7
   },
@@ -176,6 +184,7 @@
     "modelOffset": [0.0, 0.0, 0.0],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
+    "minVolume": 30,
     "maxVolume": 300,
     "tipLength": 51.7
   },
@@ -196,6 +205,7 @@
     "modelOffset": [0.0, 0.0, 0.0],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
+    "minVolume": 30,
     "maxVolume": 300,
     "tipLength": 51.7
   },
@@ -216,6 +226,7 @@
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
+    "minVolume": 30,
     "maxVolume": 300,
     "tipLength": 51.7
   },
@@ -236,6 +247,7 @@
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
+    "minVolume": 30,
     "maxVolume": 300,
     "tipLength": 51.7
   },
@@ -255,7 +267,8 @@
     "channels": 1,
     "modelOffset": [0.0, 0.0, 20.0],
     "plungerCurrent": 0.5,
-    "dropTipCurrent": 0.7,
+    "dropTipCurrent": 0.5,
+    "minVolume": 100,
     "maxVolume": 1000,
     "tipLength": 76.7
   },
@@ -276,6 +289,7 @@
     "modelOffset": [0.0, 0.0, 20.0],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.7,
+    "minVolume": 100,
     "maxVolume": 1000,
     "tipLength": 76.7
   }

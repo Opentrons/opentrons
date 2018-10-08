@@ -11,8 +11,8 @@ type Props = {
     wellName: string,
 
     concentration?: string,
-    ingredientNum?: number
-  }
+    ingredientNum?: number,
+  },
 }
 
 // TODO: Ian 2018-07-02 use or lose this component!

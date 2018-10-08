@@ -8,7 +8,7 @@ import type {State, Dispatch} from '../../types'
 import {
   selectors as robotSelectors,
   actions as robotActions,
-  type Robot
+  type Robot,
 } from '../../robot'
 
 import {Card, LabeledValue, OutlineButton} from '@opentrons/components'
@@ -18,11 +18,11 @@ type OwnProps = Robot
 
 type StateProps = {
   status: string,
-  connectButtonText: string
+  connectButtonText: string,
 }
 
 type DispatchProps = {
-  onClick: () => *
+  onClick: () => *,
 }
 
 type Props = OwnProps & StateProps & DispatchProps
@@ -78,6 +78,6 @@ function mapDispatchToProps (
     : robotActions.connect(name)
 
   return {
-    onClick: () => dispatch(onClickAction)
+    onClick: () => dispatch(onClickAction),
   }
 }

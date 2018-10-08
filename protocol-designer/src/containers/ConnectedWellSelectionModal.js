@@ -7,12 +7,12 @@ import wellSelectionSelectors from '../well-selection/selectors'
 import {selectors as pipetteSelectors} from '../pipettes'
 import {
   closeWellSelectionModal,
-  saveWellSelectionModal
+  saveWellSelectionModal,
 } from '../well-selection/actions'
 
 type Props = {
   ...React.ElementProps<typeof WellSelectionModal>,
-  hideModal?: boolean
+  hideModal?: boolean,
 }
 
 function WellSelectionModalWrapper (props: Props) {
@@ -24,7 +24,7 @@ function WellSelectionModalWrapper (props: Props) {
 
 type DP = {
   onSave: $PropertyType<Props, 'onSave'>,
-  onCloseClick: $PropertyType<Props, 'onCloseClick'>
+  onCloseClick: $PropertyType<Props, 'onCloseClick'>,
 }
 
 type SP = $Diff<Props, DP>
@@ -34,21 +34,21 @@ function mapStateToProps (state: BaseState): SP {
 
   if (!wellSelectionModalData) {
     return {
-      hideModal: true
+      hideModal: true,
     }
   }
 
   const pipetteId = wellSelectionModalData.pipetteId
 
   return {
-    pipette: pipetteSelectors.equippedPipettes(state)[pipetteId]
+    pipette: pipetteSelectors.equippedPipettes(state)[pipetteId],
   }
 }
 
 function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
   return {
     onSave: () => dispatch(saveWellSelectionModal()),
-    onCloseClick: () => dispatch(closeWellSelectionModal())
+    onCloseClick: () => dispatch(closeWellSelectionModal()),
   }
 }
 

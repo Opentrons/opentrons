@@ -9,7 +9,7 @@
   },
   "name": "protocol-designer",
   "private": true,
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "Protocol designer app",
   "main": "src/index.js",
   "bugs": {
@@ -18,7 +18,7 @@
   "homepage": "https://github.com/Opentrons/opentrons",
   "license": "Apache-2.0",
   "dependencies": {
-    "@opentrons/components": "3.3.0",
+    "@opentrons/components": "3.4.0",
     "classnames": "^2.2.5",
     "i18next": "^11.5.0",
     "lodash": "^4.17.4",
@@ -35,7 +35,7 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "flow-bin": "^0.76.0",
+    "flow-bin": "^0.82.0",
     "flow-typed": "^2.5.1",
     "git-describe": "^4.0.3"
   }

@@ -5,9 +5,9 @@ import blowout from './blowout'
 import dispense from './dispense'
 import replaceTip from './replaceTip'
 import touchTip from './touchTip'
-import {repeatArray, reduceCommandCreators} from './utils'
+import {repeatArray} from './utils'
 import * as errorCreators from './errorCreators'
-import type {MixFormData, RobotState, CommandCreator} from './'
+import type {MixFormData, RobotState, CommandCreator, CompoundCommandCreator} from './'
 
 /** Helper fn to make mix command creators w/ minimal arguments */
 export function mixUtil (
@@ -21,11 +21,11 @@ export function mixUtil (
 ): Array<CommandCreator> {
   return repeatArray([
     aspirate({pipette, volume, labware, well, offsetFromBottomMm: aspirateOffsetFromBottomMm}),
-    dispense({pipette, volume, labware, well, offsetFromBottomMm: dispenseOffsetFromBottomMm})
+    dispense({pipette, volume, labware, well, offsetFromBottomMm: dispenseOffsetFromBottomMm}),
   ], times)
 }
 
-const mix = (data: MixFormData): CommandCreator => (prevRobotState: RobotState) => {
+const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: RobotState) => {
   /**
     Mix will aspirate and dispense a uniform volume some amount of times from a set of wells
     in a single labware.
@@ -46,21 +46,21 @@ const mix = (data: MixFormData): CommandCreator => (prevRobotState: RobotState) 
     times,
     changeTip,
     aspirateOffsetFromBottomMm,
-    dispenseOffsetFromBottomMm
+    dispenseOffsetFromBottomMm,
   } = data
 
   // Errors
   if (!prevRobotState.instruments[pipette]) {
     // bail out before doing anything else
-    return {
-      errors: [errorCreators.pipetteDoesNotExist({actionName, pipette})]
-    }
+    return [(_robotState) => ({
+      errors: [errorCreators.pipetteDoesNotExist({actionName, pipette})],
+    })]
   }
 
   if (!prevRobotState.labware[labware]) {
-    return {
-      errors: [errorCreators.labwareDoesNotExist({actionName, labware})]
-    }
+    return [(_robotState) => ({
+      errors: [errorCreators.labwareDoesNotExist({actionName, labware})],
+    })]
   }
 
   // Command generation
@@ -84,7 +84,7 @@ const mix = (data: MixFormData): CommandCreator => (prevRobotState: RobotState) 
       ? [blowout({
         pipette,
         labware: data.blowout,
-        well: 'A1'
+        well: 'A1',
       })]
       : []
 
@@ -102,12 +102,12 @@ const mix = (data: MixFormData): CommandCreator => (prevRobotState: RobotState) 
         ...tipCommands,
         ...mixCommands,
         ...blowoutCommands,
-        ...touchTipCommands
+        ...touchTipCommands,
       ]
     }
   )
 
-  return reduceCommandCreators(commandCreators)(prevRobotState)
+  return commandCreators
 }
 
 export default mix

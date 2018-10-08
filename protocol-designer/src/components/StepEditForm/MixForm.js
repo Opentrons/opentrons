@@ -10,7 +10,7 @@ import {
   DispenseDelayFields,
   PipetteField,
   LabwareDropdown,
-  ChangeTipField
+  ChangeTipField,
 } from './formFields'
 
 import FlowRateField from './FlowRateField'
@@ -23,7 +23,7 @@ import styles from './StepEditForm.css'
 
 type MixFormProps = {focusHandlers: FocusHandlers}
 
-const MixForm = (props: MixFormProps): React.Element<React.Fragment> => {
+const MixForm = (props: MixFormProps): React.Element<typeof React.Fragment> => {
   const {focusHandlers} = props
   return (
     <React.Fragment>

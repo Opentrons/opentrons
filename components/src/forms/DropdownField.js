@@ -8,7 +8,7 @@ import styles from './forms.css'
 export type DropdownOption = {
   name: string,
   value: string,
-  disabled?: boolean
+  disabled?: boolean,
 }
 
 // TODO(mc, 2018-02-22): disabled prop
@@ -31,6 +31,10 @@ type Props = {
   error?: ?string,
   /** dropdown is disabled if value is true */
   disabled?: boolean,
+  /** html tabindex property */
+  tabIndex?: number,
+  /** automatically focus field on render */
+  autoFocus?: boolean,
 }
 
 export default function DropdownField (props: Props) {
@@ -51,7 +55,9 @@ export default function DropdownField (props: Props) {
           onBlur={props.onBlur}
           onFocus={props.onFocus}
           disabled={props.disabled}
-          className={styles.dropdown}>
+          className={styles.dropdown}
+          tabIndex={props.tabIndex}
+          autoFocus={props.autoFocus}>
           {options.map(opt =>
             <option key={opt.value} value={opt.value} disabled={!!opt.disabled}>
               {opt.name}

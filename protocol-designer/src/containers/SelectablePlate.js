@@ -13,7 +13,7 @@ import {selectors} from '../labware-ingred/reducers'
 import {
   selectors as steplistSelectors,
   START_TERMINAL_ITEM_ID,
-  END_TERMINAL_ITEM_ID
+  END_TERMINAL_ITEM_ID,
 } from '../steplist'
 import * as highlightSelectors from '../top-selectors/substep-highlight'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
@@ -21,7 +21,7 @@ import * as tipContentsSelectors from '../top-selectors/tip-contents'
 import {
   highlightWells,
   selectWells,
-  deselectWells
+  deselectWells,
 } from '../well-selection/actions'
 import wellSelectionSelectors from '../well-selection/selectors'
 
@@ -37,18 +37,18 @@ type OP = {
   containerId?: string,
   pipetteChannels?: $PropertyType<Props, 'pipetteChannels'>,
   selectable?: $PropertyType<Props, 'selectable'>,
-  cssFillParent?: boolean
+  cssFillParent?: boolean,
 }
 
 type DP = {
-  dispatch: Dispatch<*>
+  dispatch: Dispatch<*>,
 }
 
 type MP = {
   onSelectionMove: $PropertyType<Props, 'onSelectionMove'>,
   onSelectionDone: $PropertyType<Props, 'onSelectionDone'>,
   makeOnMouseOverWell: $PropertyType<Props, 'makeOnMouseOverWell'>,
-  onMouseExitWell: $PropertyType<Props, 'onMouseExitWell'>
+  onMouseExitWell: $PropertyType<Props, 'onMouseExitWell'>,
 }
 
 type SP = $Diff<Props, MP>
@@ -64,7 +64,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
       containerId: '',
       wellContents: {},
       containerType: '',
-      selectable: selectable
+      selectable: selectable,
     }
   }
 
@@ -116,13 +116,8 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
       // TODO Ian 2018-05-02: Should wellHighlightsForSteps return well highlights
       // even when prev step isn't processed (due to encountering an upstream error
       // in the timeline reduce op)
-      const highlightedWellsForSteps = highlightSelectors.wellHighlightsForSteps(state)
-      highlightedWells = (
-        timelineIdx != null &&
-        highlightedWellsForSteps &&
-        highlightedWellsForSteps[timelineIdx] &&
-        highlightedWellsForSteps[timelineIdx][containerId]
-      ) || {}
+      const highlightedWellsByLabware = highlightSelectors.wellHighlightsByLabwareId(state)
+      highlightedWells = highlightedWellsByLabware[containerId] || {}
     }
 
     // TODO: Ian 2018-07-31 some sets of wells are {[wellName]: true},
@@ -134,7 +129,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
       (wellContentsForWell: WellContents, well: string): WellContents => ({
         ...wellContentsForWell,
         highlighted: Boolean(highlightedWells[well]),
-        selected: Boolean(selectedWells[well])
+        selected: Boolean(selectedWells[well]),
       })
     ): ContentsByWell)
   }
@@ -145,8 +140,8 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     containerId,
     wellContents,
     getTipProps: getTipProps || noop,
-    containerType: labware.type,
-    selectable
+    containerType: labware ? labware.type : 'missing labware',
+    selectable,
   }
 }
 
@@ -169,7 +164,7 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
 
         return {
           ...acc,
-          [primaryWell]: primaryWell
+          [primaryWell]: primaryWell,
         }
       },
       {})
@@ -214,7 +209,7 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
     },
     onMouseExitWell: () => dispatch(
       highlightWells(_wellsFromSelected({})) // TODO more convenient way to de-highlight
-    )
+    ),
   }
 }
 

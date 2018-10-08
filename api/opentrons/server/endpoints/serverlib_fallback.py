@@ -7,10 +7,15 @@ import logging
 from time import sleep
 from aiohttp import web
 from threading import Thread
+from typing import Dict, Any
 
 log = logging.getLogger(__name__)
-PATH = os.path.abspath(os.path.dirname(__file__))
-filepath = os.path.join(PATH, 'ignore.json')
+ignore_file = 'ignore.json'
+if os.environ.get('RUNNING_ON_PI'):
+    filedir = '/data/user_storage/opentrons_data'
+else:
+    filedir = os.path.abspath(os.path.dirname(__file__))
+filepath = os.path.join(filedir, ignore_file)
 
 
 async def _install(filename, loop):
@@ -158,7 +163,7 @@ async def update_api(request: web.Request) -> web.Response:
             res2 = await install_smoothie_firmware(
                 data['fw'], request.loop)
             reslist.append(res2)
-        res = {
+        res: Dict[str, Any] = {
             'message': [r['message'] for r in reslist],
             'filename': [r['filename'] for r in reslist]
         }

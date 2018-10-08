@@ -13,6 +13,9 @@ venv/
 env/
 .env/
 
+# MyPy caches
+.mypy_cache
+
 build/
 api/docs/build/
 develop-eggs/
@@ -77,6 +80,7 @@ target/
 api/tests/opentrons/data/configs/
 api/opentrons/config/*.json
 sample_protocol.py
+api/opentrons/server/endpoints/ignore.json
 
 # Local Calibration Data
 calibrations/

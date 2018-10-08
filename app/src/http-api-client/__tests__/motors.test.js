@@ -23,19 +23,23 @@ describe('/motors/**', () => {
     robot = {name: NAME, ip: '1.2.3.4', port: '1234'}
     state = {
       api: {
-        pipettes: {},
-        motors: {}
-      }
+        api: {
+          [NAME]: {
+            pipettes: {},
+            motors: {},
+          },
+        },
+      },
     }
 
     store = mockStore(state)
   })
 
   describe('disengagePipetteMotors action creator', () => {
-    const path = 'disengage'
+    const path = 'motors/disengage'
     const mockPipettesResponse = {
       left: {mount_axis: 'z', plunger_axis: 'b'},
-      right: {mount_axis: 'a', plunger_axis: 'c'}
+      right: {mount_axis: 'a', plunger_axis: 'c'},
     }
     const response = {message: 'we did it'}
 
@@ -48,28 +52,29 @@ describe('/motors/**', () => {
       return store.dispatch(disengagePipetteMotors(robot, 'right'))
         .then(() => expect(client.mock.calls).toEqual([
           [robot, 'GET', 'pipettes'],
-          [robot, 'POST', 'motors/disengage', expected]
+          [robot, 'POST', 'motors/disengage', expected],
         ]))
     })
 
     test('skips GET /pipettes call if axes are in state', () => {
       const expected = {axes: ['z', 'b']}
 
-      state.api.pipettes = {[NAME]: {response: mockPipettesResponse}}
+      state.api.api[NAME].pipettes = {response: mockPipettesResponse}
       client.__setMockResponse(response)
 
       // use mock.calls to verify call order
       return store.dispatch(disengagePipetteMotors(robot, 'left'))
         .then(() => expect(client.mock.calls).toEqual([
-          [robot, 'POST', 'motors/disengage', expected]
+          [robot, 'POST', 'motors/disengage', expected],
         ]))
     })
 
     test('dispatches MOTORS_REQUEST and MOTORS_SUCCESS', () => {
       const request = {mounts: ['left', 'right']}
+
       const expectedActions = [
-        {type: 'api:MOTORS_REQUEST', payload: {robot, request, path}},
-        {type: 'api:MOTORS_SUCCESS', payload: {robot, response, path}}
+        {type: 'api:REQUEST', payload: {robot, request, path}},
+        {type: 'api:SUCCESS', payload: {robot, response, path}},
       ]
 
       client.__setMockResponse(mockPipettesResponse, response)
@@ -82,8 +87,8 @@ describe('/motors/**', () => {
       const request = {mounts: ['left', 'right']}
       const error = {name: 'ResponseError', status: '400'}
       const expectedActions = [
-        {type: 'api:MOTORS_REQUEST', payload: {robot, request, path}},
-        {type: 'api:MOTORS_FAILURE', payload: {robot, error, path}}
+        {type: 'api:REQUEST', payload: {robot, request, path}},
+        {type: 'api:FAILURE', payload: {robot, error, path}},
       ]
 
       client.__setMockError(error)

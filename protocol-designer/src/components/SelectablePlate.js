@@ -6,7 +6,7 @@ import {
   Labware,
   LabwareLabels,
   MIXED_WELL_COLOR,
-  type Channels
+  type Channels,
 } from '@opentrons/components'
 
 import SelectionRect from '../components/SelectionRect.js'
@@ -29,7 +29,7 @@ export type Props = {
 
   // used by container
   containerId: string,
-  pipetteChannels?: ?Channels
+  pipetteChannels?: ?Channels,
 }
 
 // TODO Ian 2018-07-20: make sure '__air__' or other pseudo-ingredients don't get in here
@@ -54,7 +54,7 @@ export default function SelectablePlate (props: Props) {
     onSelectionDone,
     selectable,
     makeOnMouseOverWell,
-    onMouseExitWell
+    onMouseExitWell,
   } = props
 
   const getWellProps = (wellName) => {
@@ -71,7 +71,7 @@ export default function SelectablePlate (props: Props) {
       error: well.error,
       maxVolume: well.maxVolume,
 
-      fillColor: getFillColor(well.groupIds)
+      fillColor: getFillColor(well.groupIds),
     }
   }
 

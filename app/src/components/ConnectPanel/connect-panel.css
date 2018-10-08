@@ -6,24 +6,27 @@
 }
 
 .robot_group {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+}
 
-  & > li {
-    max-height: 3rem;
-  }
+.robot_link {
+  @apply --font-body-1-dark;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 0.75rem;
+  border-bottom: 1px solid var(--c-light-gray);
+  text-transform: uppercase;
 }
 
 .robot_item {
-  max-height: 3rem;
-  text-transform: uppercase;
-  border-bottom: 1px solid var(--c-light-gray);
+  height: 3rem;
 }
 
 .instrument_item {
-  max-height: 2.5rem;
-  text-transform: uppercase;
-  border-bottom: 1px solid var(--c-light-gray);
+  height: 2.5rem;
 }
 
 .robot_item_icon {
@@ -36,10 +39,10 @@
   color: var(--c-orange);
 }
 
-.robot_name {
+.link_text {
   flex: 1;
   margin: 0 0.5rem;
-  font-weight: bold;
+  font-weight: var(--fw-semibold);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

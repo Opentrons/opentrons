@@ -6,7 +6,7 @@ import styles from './SingleLabware.css'
 
 type Props = {
   className?: string,
-  children?: React.Node
+  children?: React.Node,
 }
 
 /** Simply wraps SVG components like Plate/SelectablePlate with correct dimensions */

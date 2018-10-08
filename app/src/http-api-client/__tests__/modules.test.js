@@ -18,8 +18,8 @@ const modules = [
     serial: 'serial',
     fwVersion: 'fwVersion',
     status: 'status',
-    displayName: 'displayName'
-  }
+    displayName: 'displayName',
+  },
 ]
 
 describe('/modules', () => {
@@ -51,7 +51,7 @@ describe('/modules', () => {
       const request = null
       const expectedActions = [
         {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:SUCCESS', payload: {robot, response, path}}
+        {type: 'api:SUCCESS', payload: {robot, response, path}},
       ]
 
       client.__setMockResponse(response)
@@ -65,7 +65,7 @@ describe('/modules', () => {
       const error = {name: 'ResponseError', status: 500, message: ''}
       const expectedActions = [
         {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:FAILURE', payload: {robot, error, path}}
+        {type: 'api:FAILURE', payload: {robot, error, path}},
       ]
 
       client.__setMockError(error)
@@ -78,7 +78,7 @@ describe('/modules', () => {
   describe('selectors', () => {
     beforeEach(() => {
       state.api.api[NAME] = {
-        modules: {inProgress: true}
+        modules: {inProgress: true},
       }
     })
 

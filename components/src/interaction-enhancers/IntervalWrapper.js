@@ -11,14 +11,14 @@ type Props = {
 }
 
 type State = {
-  intervalId: ?IntervalID
+  intervalId: ?IntervalID,
 }
 
 export default class IntervalWrapper extends React.Component<Props, State> {
   constructor (props: Props) {
     super(props)
     this.state = {
-      intervalId: null
+      intervalId: null,
     }
   }
 

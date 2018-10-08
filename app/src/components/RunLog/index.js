@@ -4,7 +4,7 @@ import type {State} from '../../types'
 import {
   actions as robotActions,
   selectors as robotSelectors,
-  type SessionStatus
+  type SessionStatus,
 } from '../../robot'
 
 import CommandList from './CommandList'
@@ -23,12 +23,12 @@ function mapStateToProps (state: State): SP {
     showSpinner: (
       robotSelectors.getCancelInProgress(state) ||
       robotSelectors.getSessionLoadInProgress(state)
-    )
+    ),
   }
 }
 
 const mapDispatchToProps = (dispatch) => ({
-  onResetClick: () => dispatch(robotActions.refreshSession())
+  onResetClick: () => dispatch(robotActions.refreshSession()),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(CommandList)

@@ -5,7 +5,7 @@ import Renderer from 'react-test-renderer'
 import {
   VerticalNavBar,
   NavButton,
-  SidePanel
+  SidePanel,
 } from '..'
 
 describe('VerticalNavBar', () => {

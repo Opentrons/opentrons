@@ -13,7 +13,7 @@ import ClearDeckAlertModal from '../ClearDeckAlertModal'
 
 type OP = CalibrateDeckProps & {
   pipette: PipetteConfig,
-  mount: Mount
+  mount: Mount,
 }
 
 type DP = {
@@ -45,6 +45,6 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
       dispatch(dcCommand(robot, {command: 'move', point: 'attachTip'}))
       dispatch(push(`${url}/step-1`))
     },
-    onCancel: () => dispatch(dcCommand(robot, {command: 'release'}))
+    onCancel: () => dispatch(dcCommand(robot, {command: 'release'})),
   }
 }

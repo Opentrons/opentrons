@@ -3,42 +3,39 @@
 import * as React from 'react'
 import {Link} from 'react-router-dom'
 
-import type {ShellUpdate} from '../../shell'
+import {CURRENT_VERSION} from '../../shell'
 import {RefreshCard, LabeledValue, OutlineButton} from '@opentrons/components'
 import {CardContentHalf} from '../layout'
 
+import styles from './styles.css'
+
 type Props = {
-  update: ShellUpdate,
-  checkForUpdates: () => mixed
+  availableVersion: ?string,
+  checkUpdate: () => mixed,
 }
+
 const TITLE = 'Information'
 const VERSION_LABEL = 'Software Version'
 
+const UPDATE_AVAILABLE = 'view available update'
+const UPDATE_NOT_AVAILABLE = 'up to date'
+
 export default function AppInfoCard (props: Props) {
-  const {
-    checkForUpdates,
-    update: {current, available, checkInProgress}
-  } = props
+  const {checkUpdate, availableVersion} = props
 
   return (
-    <RefreshCard
-      refreshing={checkInProgress}
-      refresh={checkForUpdates}
-      title={TITLE}
-    >
+    <RefreshCard refresh={checkUpdate} title={TITLE}>
       <CardContentHalf>
-        <LabeledValue
-          label={VERSION_LABEL}
-          value={current}
-        />
+        <LabeledValue label={VERSION_LABEL} value={CURRENT_VERSION} />
       </CardContentHalf>
       <CardContentHalf>
         <OutlineButton
           Component={Link}
-          to='/menu/app/update'
-          disabled={!available}
+          to="/menu/app/update"
+          disabled={!availableVersion}
+          className={styles.show_update_button}
         >
-          {available ? 'update' : 'updated'}
+          {availableVersion ? UPDATE_AVAILABLE : UPDATE_NOT_AVAILABLE}
         </OutlineButton>
       </CardContentHalf>
     </RefreshCard>

@@ -28,5 +28,5 @@ export {
   mix,
   replaceTip,
   touchTip,
-  transfer
+  transfer,
 }
