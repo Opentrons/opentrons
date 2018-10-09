@@ -17,6 +17,7 @@ export type Robot = {
   ok: true,
   health: $NonMaybeType<$PropertyType<Service, 'health'>>,
   status: 'connectable',
+  connected: boolean,
 }
 
 // robot with a known IP (i.e. advertising over mDNS) but unconnectable
