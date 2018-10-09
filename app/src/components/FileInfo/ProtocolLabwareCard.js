@@ -24,7 +24,7 @@ function ProtocolLabwareCard (props: Props) {
 
   if (labware.length === 0) return null
 
-  const labwareCount = countBy(labware, 'name')
+  const labwareCount = countBy(labware, 'type')
   const labwareList = Object.keys(labwareCount).map(type => (
     <tr key={type}>
       <td>{type}</td>
