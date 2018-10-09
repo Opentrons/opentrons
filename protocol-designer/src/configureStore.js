@@ -1,6 +1,7 @@
 import {createStore, combineReducers, applyMiddleware, compose} from 'redux'
 import thunk from 'redux-thunk'
 import {makePersistSubscriber, rehydratePersistedAction} from './persist'
+import {fileErrors} from './load-file/actions'
 
 function getRootReducer () {
   const rootReducer = combineReducers({
@@ -18,10 +19,27 @@ function getRootReducer () {
 
   return (state, action) => {
     if (action.type === 'LOAD_FILE' || action.type === 'CREATE_NEW_PROTOCOL') {
+      let hydratedState
+      try {
+        hydratedState = rootReducer(undefined, rehydratePersistedAction())
+      } catch (e) {
+        console.error('Could not rehydrate during load/create:', e)
+      }
       // reset entire state, rehydrate from localStorage, then pass the action
-      const hydratedState = rootReducer(undefined, rehydratePersistedAction())
+      if (action.type === 'LOAD_FILE') {
+        try {
+          return rootReducer(hydratedState, action)
+        } catch (e) {
+          // something in the reducers went wrong, show it to the user for bug report
+          return rootReducer(hydratedState, fileErrors({
+            errorType: 'INVALID_JSON_FILE',
+            message: e.message,
+          }))
+        }
+      }
       return rootReducer(hydratedState, action)
     }
+    // pass-thru
     return rootReducer(state, action)
   }
 }
@@ -37,7 +55,11 @@ export default function configureStore () {
   )
 
   // initial rehydration, and persistence subscriber
-  store.dispatch(rehydratePersistedAction())
+  try {
+    store.dispatch(rehydratePersistedAction())
+  } catch (e) {
+    console.error('Could not perform initial rehydrate:', e)
+  }
   store.subscribe(makePersistSubscriber(store))
 
   function replaceReducers () {
