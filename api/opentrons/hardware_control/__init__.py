@@ -14,7 +14,7 @@ import asyncio
 import functools
 import logging
 import enum
-from typing import Dict, Union
+from typing import Any, Dict, Union, List, Optional, Tuple
 from opentrons import types
 from .simulator import Simulator
 try:
@@ -22,6 +22,7 @@ try:
 except ModuleNotFoundError:
     # implies windows
     Controller = None  # type: ignore
+from . import modules
 
 
 mod_log = logging.getLogger(__name__)
@@ -88,6 +89,7 @@ class API:
 
         self._attached_instruments = {types.Mount.LEFT: None,
                                       types.Mount.RIGHT: None}
+        self._attached_modules: Dict[str, Any] = {}
 
     @classmethod
     def build_hardware_controller(
@@ -108,7 +110,8 @@ class API:
     @classmethod
     def build_hardware_simulator(
             cls,
-            attached_instruments,
+            attached_instruments: Dict[types.Mount, Optional[str]] = None,
+            attached_modules: List[str] = None,
             config: dict = None,
             loop: asyncio.AbstractEventLoop = None) -> 'API':
         """ Build a simulating hardware controller.
@@ -116,7 +119,14 @@ class API:
         This method may be used both on a real robot and on dev machines.
         Multiple simulating hardware controllers may be active at one time.
         """
-        return cls(Simulator(attached_instruments, config, loop),
+        if None is attached_instruments:
+            attached_instruments = {types.Mount.LEFT: None,
+                                    types.Mount.RIGHT: None}
+        if None is attached_modules:
+            attached_modules = []
+        return cls(Simulator(attached_instruments,
+                             attached_modules,
+                             config, loop),
                    config=config, loop=loop)
 
     # Query API
@@ -262,3 +272,41 @@ class API:
     @_log_call
     async def set_pick_up_current(self, mount, amperes):
         pass
+
+    @_log_call
+    async def discover_modules(self):
+        discovered = {port + model: (port, model)
+                      for port, model in self._backend.get_attached_modules()}
+        these = set(discovered.keys())
+        known = set(self._attached_modules.keys())
+        new = these - known
+        gone = known - these
+        for mod in gone:
+            self._attached_modules.pop(mod)
+        for mod in new:
+            self._attached_modules[mod]\
+                = self._backend.build_module(discovered[mod][0],
+                                             discovered[mod][1])
+        return list(self._attached_modules.values())
+
+    @_log_call
+    async def update_module(
+            self, module: modules.AbstractModule,
+            firmware_file: str,
+            loop: asyncio.AbstractEventLoop = None) -> Tuple[bool, str]:
+        """ Update a module's firmware.
+
+        Returns (ok, message) where ok is True if the update succeeded and
+        message is a human readable message.
+        """
+        details = (module.port, module.name())
+        mod = self._attached_modules.pop(details[0] + details[1])
+        try:
+            new_mod = await self._backend.update_module(
+                mod, firmware_file, loop)
+        except modules.UpdateError as e:
+            return False, e.msg
+        else:
+            new_details = new_mod.port + new_mod.device_info['model']
+            self._attached_modules[new_details] = new_mod
+            return True, 'firmware update successful'

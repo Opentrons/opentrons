@@ -7,17 +7,13 @@ from opentrons import hardware_control as hc
 def hardware_api(monkeypatch, loop):
     def mock_move(position):
         pass
-    attached_pipettes = {types.Mount.LEFT: None, types.Mount.RIGHT: None}
-    hw_api = hc.API.build_hardware_simulator(
-        attached_instruments=attached_pipettes, loop=loop)
+    hw_api = hc.API.build_hardware_simulator(loop=loop)
     monkeypatch.setattr(hw_api._backend, 'move', mock_move)
     return hw_api
 
 
 async def test_controller_home(loop):
-    attached_pipettes = {types.Mount.LEFT: None, types.Mount.RIGHT: None}
-    c = hc.API.build_hardware_simulator(
-        attached_instruments=attached_pipettes, loop=loop)
+    c = hc.API.build_hardware_simulator(loop=loop)
     await c.home()
     assert c._current_position == {'X': 418, 'Y': 353, 'Z': 218,
                                    'A': 218, 'B': 19, 'C': 19}

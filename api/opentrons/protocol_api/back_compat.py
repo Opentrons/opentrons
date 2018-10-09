@@ -42,6 +42,14 @@ class BCLabware:
         pass
 
 
+class BCModules:
+    def __init__(self, ctx: 'papi.ProtocolContext') -> None:
+        self._ctx = ctx
+
+    def load(self, *args, **wargs):
+        pass
+
+
 def reset(api: 'papi.ProtocolContext'):
     global robot
     global labware
