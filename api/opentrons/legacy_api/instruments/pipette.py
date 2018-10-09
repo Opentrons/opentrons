@@ -940,8 +940,12 @@ class Pipette:
             self._add_tip(
                 length=self._tip_length
             )
-            self._shake_off_tips(location)
-            self._shake_off_tips(location)
+            # neighboring tips tend to get stuck in the space between
+            # the volume chamber and the drop-tip sleeve on p1000.
+            # This extra shake ensures those tips are removed
+            if 'p1000_single_v1' in self.name:
+                self._shake_off_tips(location)
+                self._shake_off_tips(location)
             self.previous_placeable = None  # no longer inside a placeable
             self.robot.poses = self.instrument_mover.fast_home(
                 self.robot.poses, self._pick_up_distance)
