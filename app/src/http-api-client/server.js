@@ -14,7 +14,7 @@ import {
 
 import type {OutputSelector} from 'reselect'
 import type {State, ThunkPromiseAction, Action} from '../types'
-import type {RobotService} from '../robot'
+import type {BaseRobot, RobotService} from '../robot'
 import type {ApiCall, ApiRequestError} from './types'
 
 type RequestPath = 'update' | 'restart' | 'update/ignore'
@@ -248,7 +248,9 @@ export type RobotUpdateType = 'upgrade' | 'downgrade' | null
 export type RobotUpdateInfo = {version: string, type: RobotUpdateType}
 
 export const makeGetRobotUpdateInfo = () => {
-  const selector: OutputSelector<State, RobotService, RobotUpdateInfo> = createSelector(
+  const selector: OutputSelector<State,
+    BaseRobot,
+    RobotUpdateInfo> = createSelector(
     makeGetRobotHealth(),
     getApiUpdateVersion,
     (health, updateVersion) => {
@@ -259,9 +261,7 @@ export const makeGetRobotUpdateInfo = () => {
       if (!current || (!upgrade && !downgrade)) {
         type = null
       } else {
-        type = upgrade
-          ? 'upgrade'
-          : 'downgrade'
+        type = upgrade ? 'upgrade' : 'downgrade'
       }
       return {version: updateVersion, type: type}
     }
