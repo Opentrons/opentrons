@@ -125,6 +125,7 @@ type LabwareOnDeckProps = {
 
   addLabwareMode: boolean,
   canAddIngreds: boolean,
+  isTiprack: boolean,
   selectedTerminalItem: ?TerminalItemId,
   moveLabwareMode: boolean,
 
@@ -171,6 +172,7 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
 
       addLabwareMode,
       canAddIngreds,
+      isTiprack,
       selectedTerminalItem,
       moveLabwareMode,
       drillDown,
@@ -214,7 +216,7 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
           }} />
           : <EmptyDeckSlotOverlay {...{addLabware}} />
       }
-    } else if (selectedTerminalItem === END_TERMINAL_ITEM_ID) {
+    } else if (selectedTerminalItem === END_TERMINAL_ITEM_ID && slotHasLabware && !isTiprack) {
       overlay = <BrowseLabwareOverlay drillDown={drillDown} drillUp={drillUp} />
     }
 

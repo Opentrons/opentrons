@@ -1,4 +1,7 @@
 {
+  "browse_labware": {
+    "instructions": "Hover on a well to see contents"
+  },
   "tip_position": {
     "title": "Tip Positioning",
     "body": "Change from where in the well the robot aspirates",

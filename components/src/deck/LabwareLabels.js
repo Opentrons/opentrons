@@ -8,14 +8,17 @@ import styles from './LabwareLabels.css'
 
 type Props = {
   labwareType: string,
+  inner?: boolean,
 }
 
 // TODO: Ian 2018-08-14 change these offsets to negative numbers to place outside of Labware
-const ROW_OFFSET = 4
-const COLUMN_OFFSET = 4
+const INNER_ROW_OFFSET = 4
+const INNER_COLUMN_OFFSET = 4
+const OUTER_ROW_OFFSET = -4
+const OUTER_COLUMN_OFFSET = -4
 
 export default function LabwareLabels (props: Props) {
-  const {labwareType} = props
+  const {labwareType, inner = true} = props
   // TODO: Ian 2018-06-27 Labels are not aligned nicely, but in new designs they're
   // supposed to be moved outside of the Plate anyway
   const allWells = getWellDefsForSVG(labwareType)
@@ -39,10 +42,12 @@ export default function LabwareLabels (props: Props) {
       : 0
     return (
       <text key={letter}
-        x={ROW_OFFSET}
+        x={inner ? INNER_ROW_OFFSET : OUTER_ROW_OFFSET}
         y={relativeWell.y - rectOffset}
-        className={cx(styles.plate_label, {[styles.tiny_labels]: rowLetters.length > 8})}
-      >
+        className={cx(styles.plate_label, {
+          [styles.tiny_labels]: rowLetters.length > 8,
+          [styles.inverted]: !inner,
+        })}>
         {letter}
       </text>
     )
@@ -56,9 +61,11 @@ export default function LabwareLabels (props: Props) {
     return (
       <text key={number}
         x={relativeWell.x + rectOffset}
-        y={COLUMN_OFFSET}
-        className={cx(styles.plate_label, {[styles.tiny_labels]: colNumbers.length > 12})}
-      >
+        y={inner ? INNER_COLUMN_OFFSET : OUTER_COLUMN_OFFSET}
+        className={cx(styles.plate_label, {
+          [styles.tiny_labels]: colNumbers.length > 12,
+          [styles.inverted]: !inner,
+        })}>
         {number}
       </text>
     )

@@ -16,7 +16,7 @@ function BrowseLabwareOverlay (props: Props) {
       <rect className={styles.overlay_panel} />
       <ClickableText
         onClick={props.drillDown}
-        iconName='water' y='50%' text='View Liquids' />
+        iconName='water' y='40%' text='View Liquids' />
     </g>
   )
 }

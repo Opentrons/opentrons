@@ -22,12 +22,18 @@ const DECK_HEADER = 'Tell the robot where labware and liquids start on the deck'
 type StateProps = {
   deckSetupMode: boolean,
   ingredSelectionMode: boolean,
+  drilledDown: boolean,
+  _moveLabwareMode: boolean,
 }
-type DispatchProps = {cancelMoveLabwareMode: () => mixed}
+type DispatchProps = {
+  cancelMoveLabwareMode: () => mixed,
+  drillUpFromLabware: () => mixed,
+}
 type Props = {
   deckSetupMode: boolean,
+  drilledDown: boolean,
   ingredSelectionMode: boolean,
-  cancelMoveLabwareMode: () => void,
+  handleClickOutside: () => void,
 }
 
 const mapStateToProps = (state: BaseState): StateProps => ({

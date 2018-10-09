@@ -15,3 +15,7 @@
 .tiny_labels:nth-child(odd) {
   fill: gray;
 }
+
+.plate_label.inverted {
+  fill: var(--c-white);
+}

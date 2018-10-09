@@ -42,7 +42,12 @@ type DP = {
   setDefaultLabwareName: () => mixed,
 }
 
-type SP = $Diff<Props, DP>
+type MP = {
+  drillDown: () => mixed,
+  drillUp: () => mixed,
+}
+
+type SP = $Diff<Props, {...DP, ...MP}>
 
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {slot} = ownProps
@@ -87,6 +92,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     moveLabwareMode,
     setDefaultLabwareName,
     canAddIngreds,
+    isTiprack,
     labwareInfo,
 
     showNameOverlay,

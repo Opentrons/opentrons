@@ -73,3 +73,11 @@
   color: var(--c-font-dark);
   font-size: var(--fs-body-1);
 }
+
+.modal_instructions {
+  user-select: none;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: var(--fw-semibold);
+  color: var(--c-white);
+}
