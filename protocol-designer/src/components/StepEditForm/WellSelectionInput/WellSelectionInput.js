@@ -40,7 +40,7 @@ class WellSelectionInput extends React.Component<Props, State> {
           error={this.props.errorToShow} />
         <Portal>
           <WellSelectionModal
-            key={this.props.name}
+            key={`${this.props.name}${this.props.pipetteId || 'noPipette'}${this.props.labwareId || 'noLabware'}${String(this.state.isModalOpen)}`}
             pipetteId={this.props.pipetteId}
             labwareId={this.props.labwareId}
             isOpen={this.state.isModalOpen}

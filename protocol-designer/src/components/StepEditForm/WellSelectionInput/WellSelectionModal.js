@@ -80,8 +80,7 @@ class WellSelectionModal extends React.Component<Props, State> {
       <Modal
         className={modalStyles.modal}
         contentsClassName={cx(modalStyles.modal_contents, modalStyles.transparent_content)}
-        onCloseClick={this.props.onCloseClick}
-      >
+        onCloseClick={this.props.onCloseClick}>
         <div className={styles.top_row}>
           <LabeledValue
             label='Pipette'
@@ -114,7 +113,8 @@ class WellSelectionModal extends React.Component<Props, State> {
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {pipetteId, labwareId} = ownProps
 
-  const labware = labwareId && selectors.getLabware(state)[labwareId]
+  const allLabware = selectors.getLabware(state)
+  const labware = labwareId && allLabware && allLabware[labwareId]
   const allWellContentsForSteps = wellContentsSelectors.allWellContentsForSteps(state)
 
   const stepId = steplistSelectors.getActiveItem(state).id

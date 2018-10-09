@@ -53,8 +53,7 @@ class SelectableLabware extends React.Component<Props> {
         const wellSet = getWellSetForMultichannel(this.props.containerType, well)
         if (!wellSet) return acc
 
-        const selectedWellsFromSet = reduce(wellSet, (acc, well) => ({...acc, [well]: well}), {})
-        return {...acc, ...selectedWellsFromSet}
+        return {...acc, [wellSet[0]]: wellSet[0]}
       }, {})
 
       return primaryWells
@@ -98,10 +97,18 @@ class SelectableLabware extends React.Component<Props> {
       containerType,
       highlightedWells,
       selectedWells,
+      pipetteChannels,
     } = this.props
 
     const allWellDefsByName = getWellDefsForSVG(containerType)
 
+    const selectedWellSets = pipetteChannels === 8
+      ? reduce(selectedWells, (acc, wellName) => {
+        const wellSet = getWellSetForMultichannel(this.props.containerType, wellName)
+        if (!wellSet) return acc
+        return [...acc, ...wellSet]
+      }, [])
+      : Object.keys(selectedWells)
     return (
       <SelectionRect svg onSelectionMove={this.handleSelectionMove} onSelectionDone={this.handleSelectionDone}>
         <g>
@@ -114,7 +121,7 @@ class SelectableLabware extends React.Component<Props> {
               onMouseOver={this.makeHandleMouseOverWell(wellName)}
               onMouseLeave={this.handleMouseExitWell}
               highlighted={Object.keys(highlightedWells).includes(wellName)}
-              selected={Object.keys(selectedWells).includes(wellName)}
+              selected={selectedWellSets.includes(wellName)}
               fillColor={getFillColor(well.groupIds)}
               svgOffset={{x: 1, y: -3}}
               wellDef={allWellDefsByName[wellName]} />
