@@ -85,7 +85,7 @@ class WellSelectionModal extends React.Component<Props, State> {
         <div className={styles.top_row}>
           <LabeledValue
             label='Pipette'
-            value={pipetteConfig && pipetteConfig.displayName}
+            value={pipetteConfig ? pipetteConfig.displayName : ''}
             className={styles.inverted_text}
           />
           <OutlineButton onClick={this.handleSave} inverted>
