@@ -4,7 +4,7 @@ import * as React from 'react'
 import type {UnreachableRobot} from '../../discovery'
 import {Icon, HoverTooltip} from '@opentrons/components'
 import RobotLink from './RobotLink'
-import styles from './connect-panel.css'
+import styles from './styles.css'
 
 export default function UnreachableRobotItem (props: UnreachableRobot) {
   const {name} = props

@@ -29,11 +29,13 @@ export type Slot =
 export type Axis = 'x' | 'y' | 'z'
 export type Direction = -1 | 1
 
+// TODO(mc, 2018-10-09): deprecate this type?
 // minimum robot for actions/reducers/middleware to work
 export type BaseRobot = {
   name: string,
 }
 
+// TODO(mc, 2018-10-09): deprecate this type
 // robot MDNS service for connectivity
 export type RobotService = BaseRobot & {
   ip: string,
@@ -41,6 +43,7 @@ export type RobotService = BaseRobot & {
   wired: ?boolean,
 }
 
+// TODO(mc, 2018-10-09): deprecate this type
 // robot from getDiscovered selector
 export type Robot = RobotService & {
   isConnected: boolean,

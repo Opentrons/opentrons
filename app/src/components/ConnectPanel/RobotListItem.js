@@ -5,7 +5,7 @@ import {NotificationIcon, Icon} from '@opentrons/components'
 
 import {ToggleButton} from '../controls'
 import RobotLink from './RobotLink'
-import styles from './connect-panel.css'
+import styles from './styles.css'
 
 // circular type dependency, thanks flow
 import type {RobotItemProps} from './RobotItem'

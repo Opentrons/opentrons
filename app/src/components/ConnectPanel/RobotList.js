@@ -1,7 +1,7 @@
 // @flow
 // list of robots
 import * as React from 'react'
-import styles from './connect-panel.css'
+import styles from './styles.css'
 
 type ListProps = {
   children: React.Node,

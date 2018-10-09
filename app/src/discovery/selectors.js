@@ -7,11 +7,13 @@ import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
 import {createSelector} from 'reselect'
 
+import {selectors as robotSelectors} from '../robot'
+
 import type {OutputSelector as Selector} from 'reselect'
 import type {Service} from '@opentrons/discovery-client'
 import type {State} from '../types'
 import type {
-  ResolvedService,
+  ResolvedRobot,
   Robot,
   ReachableRobot,
   UnreachableRobot,
@@ -33,12 +35,12 @@ type GetUnreachableRobots = Selector<State, void, Array<UnreachableRobot>>
 const isResolved = (s: Service) =>
   s.ip != null && s.local != null && s.ok != null && s.serverOk != null
 
-const isConnectable = (s: ResolvedService) => s.ok === true && s.health != null
+const isConnectable = (s: ResolvedRobot) => s.ok === true && s.health != null
 
-const isReachable = (s: ResolvedService) =>
+const isReachable = (s: ResolvedRobot) =>
   s.advertising === true || s.serverOk === true
 
-const maybeGetResolved = (service: Service): ?ResolvedService =>
+const maybeGetResolved = (service: Service): ?ResolvedRobot =>
   isResolved(service) ? (service: any) : null
 
 // group services of each robot into connectable, reachable, and unconnectable
@@ -47,19 +49,27 @@ const maybeGetResolved = (service: Service): ?ResolvedService =>
 const getGroupedRobotsMap: GetGroupedRobotsMap = createSelector(
   state => state.discovery.robotsByName,
   robotsMap =>
-    mapValues(robotsMap, services =>
-      groupBy(services, s => {
+    mapValues(robotsMap, services => {
+      const servicesWithStatus = services.map(s => {
         const resolved = maybeGetResolved(s)
-        if (resolved && isConnectable(resolved)) return 'connectable'
-        if (resolved && isReachable(resolved)) return 'reachable'
-        return 'unreachable'
+        if (resolved) {
+          if (isConnectable(resolved)) return {...s, status: 'connectable'}
+          if (isReachable(resolved)) return {...s, status: 'reachable'}
+        }
+        return {...s, status: 'unreachable'}
       })
-    )
+
+      return groupBy(servicesWithStatus, 'status')
+    })
 )
 
 export const getConnectableRobots: GetConnectableRobots = createSelector(
   getGroupedRobotsMap,
-  robotsMap => map(robotsMap, g => head(g.connectable)).filter(Boolean)
+  robotSelectors.getConnectedRobotName,
+  (robotsMap, connectedName) =>
+    map(robotsMap, g => head(g.connectable))
+      .filter(Boolean)
+      .map(r => ({...r, connected: r.name === connectedName}))
 )
 
 export const getReachableRobots: GetReachableRobots = createSelector(

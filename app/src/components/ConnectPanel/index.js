@@ -48,17 +48,12 @@ function ConnectPanel (props: Props) {
       <ScanStatus {...props} />
       <RobotList>
         {props.robots.map(robot => <RobotItem key={robot.name} {...robot} />)}
-        {props.reachableRobots
-          .concat(props.unreachableRobots)
-          .map(robot => <UnreachableRobotItem key={robot.name} {...robot} />)}
-        {/*
-          {props.connectableRobots.map((robot) => (
-            <RobotItem key={robot.name} {...robot} />
-          ))}
-          {props.reachableRobots.map((robot) => (
-            <RobotItem key={robot.name} {...robot} />
-          ))}
-        */}
+        {props.reachableRobots.map(robot => (
+          <RobotItem key={robot.name} {...robot} />
+        ))}
+        {props.unreachableRobots.map(robot => (
+          <UnreachableRobotItem key={robot.name} {...robot} />
+        ))}
       </RobotList>
     </SidePanel>
   )

@@ -4,8 +4,6 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {withRouter, Route, Switch, Redirect, type Match} from 'react-router'
 
-import type {State, Dispatch, Error} from '../../types'
-import type {Robot} from '../../robot'
 import {selectors as robotSelectors, actions as robotActions} from '../../robot'
 import {
   makeGetRobotHome,
@@ -26,6 +24,9 @@ import CalibrateDeck from '../../components/CalibrateDeck'
 import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
 import ResetRobotModal from '../../components/RobotSettings/ResetRobotModal'
 
+import type {State, Dispatch, Error} from '../../types'
+import type {ViewableRobot} from '../../discovery'
+
 type SP = {
   showUpdateModal: boolean,
   showConnectAlert: boolean,
@@ -36,7 +37,7 @@ type SP = {
 type DP = {dispatch: Dispatch}
 
 type OP = {
-  robot: Robot,
+  robot: ViewableRobot,
   match: Match,
 }
 
