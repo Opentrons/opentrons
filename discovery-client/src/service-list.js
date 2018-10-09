@@ -91,7 +91,12 @@ function dedupeServices (list: ServiceList) {
   return sanitizedWithIp.concat(dedupedWithoutIp).sort(compareServices)
 }
 
-// sort service list by: ip exists, update server healthy, API healthy, advertising
+// sort service list by:
+//   1. ip exists,
+//   2. update server healthy
+//   3. API healthy
+//   4. link-local address
+//   5. advertising
 function compareServices (a: Service, b: Service) {
   if (a.ip && !b.ip) return -1
   if (!a.ip && b.ip) return 1
@@ -99,6 +104,8 @@ function compareServices (a: Service, b: Service) {
   if (!a.serverOk && b.serverOk) return 1
   if (a.ok && !b.ok) return -1
   if (!a.ok && b.ok) return 1
+  if (a.local && !b.local) return -1
+  if (!a.local && b.local) return 1
   if (a.advertising && !b.advertising) return -1
   if (!a.advertising && b.advertising) return 1
   return 0

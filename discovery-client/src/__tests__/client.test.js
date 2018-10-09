@@ -426,13 +426,13 @@ describe('discovery client', () => {
     'candidate removal emits removal events',
     done => {
       const services = [
-        MOCK_SERVICE,
         {
           ...MOCK_SERVICE,
           ip: '[fd00:0:cafe:fefe::1]',
           port: 31950,
           local: true,
         },
+        MOCK_SERVICE,
       ]
 
       const client = DiscoveryClient({services})
@@ -553,5 +553,9 @@ describe('discovery client', () => {
       expect.anything(),
       client._logger
     )
+  })
+
+  test.skip('periodically refreshes mDNS discovery', () => {
+    // TODO(mc, 2018-10-08): write this test
   })
 })

@@ -7,19 +7,35 @@ declare module 'mdns-js' {
   declare class mdns$Browser extends EventEmitter {
     discover(): void;
     stop(): void;
+    networking: {
+      connections: Array<{interfaceIndex: number, networkInterface: string}>,
+    };
+    connections: {
+      services?: {
+        [typeString: string]: {type: MdnsServiceType, addresses: Array<string>},
+      },
+      addresses?: {
+        [ip: string]: {
+          address: string,
+          port: number,
+          host: string,
+          txt: Array<string>,
+        },
+      },
+    };
   }
 
   declare class mdns$ServiceType {
     name: string;
     protocol: string;
     subtypes: Array<string>;
-    description: string;
+    description?: string;
   }
 
   declare module.exports: {
     createBrowser: (serviceType: MdnsServiceType) => Browser,
     tcp: (type: string) => MdnsServiceType,
-    ServiceType: any
+    ServiceType: any,
   }
 
   declare type Browser = mdns$Browser
@@ -35,6 +51,6 @@ declare module 'mdns-js' {
     fullname?: string,
     host?: string,
     interfaceIndex: number,
-    networkInterface: string
+    networkInterface: string,
   }
 }

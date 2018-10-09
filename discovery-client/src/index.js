@@ -8,7 +8,7 @@ import toRegex from 'to-regex'
 import differenceBy from 'lodash/differenceBy'
 import xorBy from 'lodash/xorBy'
 
-import MdnsBrowser from './mdns-browser'
+import MdnsBrowser, {getKnownIps} from './mdns-browser'
 import {poll, stop, type PollRequest} from './poller'
 import {
   createServiceList,
@@ -18,6 +18,7 @@ import {
 
 import {
   DEFAULT_PORT,
+  updateService,
   fromMdnsBrowser,
   fromResponse,
   makeCandidate,
@@ -63,6 +64,7 @@ export default function DiscoveryClientFactory (options?: Options) {
 export const SERVICE_EVENT: 'service' = 'service'
 export const SERVICE_REMOVED_EVENT: 'serviceRemoved' = 'serviceRemoved'
 export const DEFAULT_POLL_INTERVAL = 5000
+export const DEFAULT_DISCOVERY_INTERVAL = 60000
 export {DEFAULT_PORT}
 
 const TO_REGEX_OPTS = {contains: true, nocase: true, safe: true}
@@ -71,6 +73,7 @@ export class DiscoveryClient extends EventEmitter {
   services: ServiceList
   candidates: Array<Candidate>
   _browser: ?Browser
+  _discoveryInterval: IntervalID
   _pollList: Array<Candidate>
   _pollInterval: number
   _pollRequest: ?PollRequest
@@ -106,6 +109,10 @@ export class DiscoveryClient extends EventEmitter {
     log(this._logger, 'debug', 'starting discovery client', {})
     this._startBrowser()
     this._poll()
+    this._discoveryInterval = setInterval(
+      this._rediscover.bind(this),
+      DEFAULT_DISCOVERY_INTERVAL
+    )
 
     return this
   }
@@ -114,6 +121,7 @@ export class DiscoveryClient extends EventEmitter {
     log(this._logger, 'debug', 'stopping discovery client', {})
     this._stopBrowser()
     this._stopPoll()
+    clearInterval(this._discoveryInterval)
 
     return this
   }
@@ -198,6 +206,19 @@ export class DiscoveryClient extends EventEmitter {
 
       this._browser = null
     }
+  }
+
+  _rediscover (): void {
+    const knownIps = getKnownIps(this._browser)
+    const nextServices = this.services.map(s =>
+      updateService(s, {
+        advertising: knownIps.includes(s.ip),
+      })
+    )
+
+    this._updateLists(nextServices)
+    this._stopBrowser()
+    this._startBrowser()
   }
 
   _handleUp (browserService: BrowserService): void {
