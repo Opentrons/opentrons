@@ -98,7 +98,6 @@ export default function SelectablePlate (props: Props) {
           } else {
             return (
               <Well
-                selectable
                 key={wellName}
                 wellName={wellName}
                 highlighted={well.highlighted}
