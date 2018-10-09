@@ -22,6 +22,7 @@ import RobotSettings, {
 } from '../../components/RobotSettings'
 import CalibrateDeck from '../../components/CalibrateDeck'
 import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
+// import ReachableRobotBanner from '../../components/RobotSettings/ReachableRobotBanner'
 import ResetRobotModal from '../../components/RobotSettings/ResetRobotModal'
 
 import type {State, Dispatch, Error} from '../../types'
@@ -41,13 +42,18 @@ type OP = {
   match: Match,
 }
 
-type Props = SP & OP & {
-  closeHomeAlert?: () => mixed,
-  closeConnectAlert: () => mixed,
-}
+type Props = SP &
+  OP & {
+    closeHomeAlert?: () => mixed,
+    closeConnectAlert: () => mixed,
+  }
 
 export default withRouter(
-  connect(makeMapStateToProps, null, mergeProps)(RobotSettingsPage)
+  connect(
+    makeMapStateToProps,
+    null,
+    mergeProps
+  )(RobotSettingsPage)
 )
 
 function RobotSettingsPage (props: Props) {
@@ -68,55 +74,65 @@ function RobotSettingsPage (props: Props) {
   return (
     <React.Fragment>
       <Page titleBarProps={titleBarProps}>
-        <ConnectBanner {...robot} key={Number(robot.isConnected)}/>
+        {/* <ReachableRobotBanner key={robot.name} /> */}
+        <ConnectBanner {...robot} key={Number(robot.isConnected)} />
         <RobotSettings {...robot} />
       </Page>
       <Switch>
-        <Route path={`${path}/update`} render={() => (
-          <RobotUpdateModal {...robot} />
-        )} />
+        <Route
+          path={`${path}/update`}
+          render={() => <RobotUpdateModal {...robot} />}
+        />
 
-        <Route path={`${path}/calibrate-deck`} render={(props) => (
-          <CalibrateDeck match={props.match} robot={robot} parentUrl={url} />
-        )} />
+        <Route
+          path={`${path}/calibrate-deck`}
+          render={props => (
+            <CalibrateDeck match={props.match} robot={robot} parentUrl={url} />
+          )}
+        />
 
-        <Route path={`${path}/reset`} render={(props) => (
-          <ResetRobotModal robot={robot} />
-        )} />
+        <Route
+          path={`${path}/reset`}
+          render={props => <ResetRobotModal robot={robot} />}
+        />
 
-        <Route exact path={path} render={() => {
-          if (showUpdateModal) {
-            return (<Redirect to={`/robots/${robot.name}/update`} />)
-          }
+        <Route
+          exact
+          path={path}
+          render={() => {
+            if (showUpdateModal) {
+              return <Redirect to={`/robots/${robot.name}/update`} />
+            }
 
-          // only show homing spinner and error on main page
-          // otherwise, it will show up during homes in pipette swap
-          return (
-            <React.Fragment>
-              {homeInProgress && (
-                <SpinnerModalPage
-                  titleBar={titleBarProps}
-                  message='Robot is homing.'
-                />
-              )}
+            // only show homing spinner and error on main page
+            // otherwise, it will show up during homes in pipette swap
+            return (
+              <React.Fragment>
+                {homeInProgress && (
+                  <SpinnerModalPage
+                    titleBar={titleBarProps}
+                    message="Robot is homing."
+                  />
+                )}
 
-              {!!homeError && (
-                <ErrorModal
-                  heading='Robot unable to home'
-                  error={homeError}
-                  description='Robot was unable to home, please try again.'
-                  close={closeHomeAlert}
-                />
-              )}
-            </React.Fragment>
-          )
-        }} />
+                {!!homeError && (
+                  <ErrorModal
+                    heading="Robot unable to home"
+                    error={homeError}
+                    description="Robot was unable to home, please try again."
+                    close={closeHomeAlert}
+                  />
+                )}
+              </React.Fragment>
+            )
+          }}
+        />
       </Switch>
 
       {showConnectAlert && (
         <ConnectAlertModal onCloseClick={closeConnectAlert} />
       )}
-     </React.Fragment>
+    </React.Fragment>
   )
 }
 
@@ -133,7 +149,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     const ignoredRequest = getUpdateIgnoredRequest(state, robot)
     const restartRequest = getRestartRequest(state, robot)
     const updateInfo = getRobotUpdateInfo(state, robot)
-    const showUpdateModal = (
+    const showUpdateModal =
       // only show the alert modal if there's an upgrade available
       updateInfo.type === 'upgrade' &&
       // and we haven't already ignored the upgrade
@@ -145,7 +161,6 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
       // restartRequest.response latches this modal closed (which is fine,
       // but only for this specific modal)
       !restartRequest.response
-    )
 
     return {
       showUpdateModal: !!showUpdateModal,
