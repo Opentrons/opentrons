@@ -22,7 +22,7 @@ import RobotSettings, {
 } from '../../components/RobotSettings'
 import CalibrateDeck from '../../components/CalibrateDeck'
 import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
-// import ReachableRobotBanner from '../../components/RobotSettings/ReachableRobotBanner'
+import ReachableRobotBanner from '../../components/RobotSettings/ReachableRobotBanner'
 import ResetRobotModal from '../../components/RobotSettings/ResetRobotModal'
 
 import type {State, Dispatch, Error} from '../../types'
@@ -69,12 +69,12 @@ function RobotSettingsPage (props: Props) {
   } = props
 
   const titleBarProps = {title: robot.name}
-
+  const reachable = robot.status === 'reachable'
   // TODO(mc, 2018-05-08): pass parentUrl to RobotSettings
   return (
     <React.Fragment>
       <Page titleBarProps={titleBarProps}>
-        {/* <ReachableRobotBanner key={robot.name} /> */}
+        {reachable && <ReachableRobotBanner key={robot.name} {...robot} />}
         <ConnectBanner {...robot} key={Number(robot.isConnected)} />
         <RobotSettings {...robot} />
       </Page>

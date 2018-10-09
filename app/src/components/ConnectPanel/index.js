@@ -16,6 +16,7 @@ import {SidePanel} from '@opentrons/components'
 import RobotList from './RobotList'
 import RobotItem from './RobotItem'
 import ScanStatus from './ScanStatus'
+import ReachableRobotItem from './ReachableRobotItem'
 import UnreachableRobotItem from './UnreachableRobotItem'
 
 import type {Robot, ReachableRobot, UnreachableRobot} from '../../discovery'
@@ -49,7 +50,7 @@ function ConnectPanel (props: Props) {
       <RobotList>
         {props.robots.map(robot => <RobotItem key={robot.name} {...robot} />)}
         {props.reachableRobots.map(robot => (
-          <RobotItem key={robot.name} {...robot} />
+          <ReachableRobotItem key={robot.name} {...robot} />
         ))}
         {props.unreachableRobots.map(robot => (
           <UnreachableRobotItem key={robot.name} {...robot} />

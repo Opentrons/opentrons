@@ -32,7 +32,10 @@ const STATUS_LABEL = 'This robot is currently'
 const STATUS_VALUE_DISCONNECTED = 'Unknown - connect to view status'
 const STATUS_VALUE_DEFAULT = 'Idle'
 
-export default connect(mapStateToProps, mapDispatchToProps)(StatusCard)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(StatusCard)
 
 function StatusCard (props: Props) {
   const {status, connectButtonText, onClick} = props
@@ -40,15 +43,10 @@ function StatusCard (props: Props) {
   return (
     <Card title={TITLE}>
       <CardContentHalf>
-        <LabeledValue
-          label={STATUS_LABEL}
-          value={status}
-        />
+        <LabeledValue label={STATUS_LABEL} value={status} />
       </CardContentHalf>
       <CardContentHalf>
-        <OutlineButton onClick={onClick}>
-          {connectButtonText}
-        </OutlineButton>
+        <OutlineButton onClick={onClick}>{connectButtonText}</OutlineButton>
       </CardContentHalf>
     </Card>
   )
@@ -61,9 +59,7 @@ function mapStateToProps (state: State, ownProps: OwnProps): StateProps {
     ? (sessionStatus && capitalize(sessionStatus)) || STATUS_VALUE_DEFAULT
     : STATUS_VALUE_DISCONNECTED
 
-  const connectButtonText = isConnected
-    ? 'disconnect'
-    : 'connect'
+  const connectButtonText = isConnected ? 'disconnect' : 'connect'
 
   return {status, connectButtonText}
 }
