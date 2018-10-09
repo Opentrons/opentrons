@@ -6,6 +6,7 @@ import {Splash} from '@opentrons/components'
 import ConnectedDeckSetup from '../containers/ConnectedDeckSetup'
 import ConnectedFilePage from '../containers/ConnectedFilePage'
 import SettingsPage from '../components/SettingsPage'
+import LiquidsPage from '../components/LiquidsPage'
 
 import type {BaseState} from '../types'
 import {selectors, type Page} from '../navigation'
@@ -21,6 +22,8 @@ function MainPanel (props: Props) {
       return <Splash />
     case 'file-detail':
       return <ConnectedFilePage />
+    case 'liquids':
+      return <LiquidsPage />
     case 'settings-privacy':
       return <SettingsPage />
     default:

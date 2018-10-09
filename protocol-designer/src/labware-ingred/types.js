@@ -39,6 +39,11 @@ export type WellContentsByLabware = {
 
 // ==== INGREDIENTS ====
 
+export type OrderedLiquids = Array<{
+  ingredientId: string,
+  name: ?string,
+}>
+
 export type IngredInputs = {
   name: string | null,
   volume: number | null,

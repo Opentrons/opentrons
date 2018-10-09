@@ -1,5 +1,6 @@
 // @flow
 // TODO: Ian 2018-06-07 break out these components into their own files (make IngredientsList a directory)
+// TODO: Ian 2018-10-09 figure out what belongs in LiquidsSidebar vs IngredientsList after #2427
 import React from 'react'
 
 import {IconButton, SidePanel, swatchColors} from '@opentrons/components'

@@ -50,7 +50,10 @@ function mapStateToProps (state: BaseState): SP {
   const labwareNames = labwareIngredSelectors.getLabwareNames(state)
   const labwareNickname = labware && labware.id && labwareNames[labware.id]
 
+  // TODO IMMEDIATELY: use internationalization not strings
   switch (_page) {
+    case 'liquids':
+      return {_page, title: fileName, subtitle: 'liquids'}
     case 'file-splash':
       return { _page, title: 'Opentrons Protocol Designer' }
     case 'file-detail':

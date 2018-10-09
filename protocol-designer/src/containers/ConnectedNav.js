@@ -24,6 +24,12 @@ function Nav (props: Props) {
             selected={props.currentPage === 'file-splash' || props.currentPage === 'file-detail'}
             onClick={props.handleClick('file-detail')} />
           <NavTab
+            iconName='water'
+            title={i18n.t('nav.liquids')}
+            disabled={props.currentPage === 'file-splash'}
+            selected={props.currentPage === 'liquids'}
+            onClick={props.handleClick('liquids')} />
+          <NavTab
             iconName='ot-design'
             title={i18n.t('nav.design')}
             disabled={props.currentPage === 'file-splash'}
