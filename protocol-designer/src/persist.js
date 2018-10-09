@@ -2,6 +2,7 @@
 import get from 'lodash/get'
 import assert from 'assert'
 import type {Store} from 'redux'
+import {dismissedHintsPersist} from './tutorial/reducers'
 
 export function rehydratePersistedAction (): {type: 'REHYDRATE_PERSISTED'} {
   return {type: 'REHYDRATE_PERSISTED'}
@@ -17,6 +18,15 @@ const PERSISTED_PATHS = [
   'tutorial.dismissedHints',
 ]
 
+function transformBeforePersist (path: string, reducerState: any) {
+  switch (path) {
+    case 'tutorial.dismissedHints':
+      return dismissedHintsPersist(reducerState)
+    default:
+      return reducerState
+  }
+}
+
 /** Subscribe this fn to the Redux store to persist selected substates */
 export const makePersistSubscriber = (store: Store<*, *>) => (): void => {
   const currentPersistedStatesByPath = {}
@@ -26,7 +36,7 @@ export const makePersistSubscriber = (store: Store<*, *>) => (): void => {
     if (currentPersistedStatesByPath[path] !== nextValue) {
       global.localStorage.setItem(
         _addStoragePrefix(path),
-        JSON.stringify(nextValue)
+        JSON.stringify(transformBeforePersist(path, nextValue))
       )
       currentPersistedStatesByPath[path] = nextValue
     }

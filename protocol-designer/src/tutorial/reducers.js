@@ -23,15 +23,20 @@ type DismissedHintReducerState = {[HintKey]: {rememberDismissal: boolean}}
 const dismissedHintsInitialState = {}
 const dismissedHints = handleActions({
   // only rehydrate "rememberDismissal" hints
-  REHYDRATE_PERSISTED: () => pickBy(
-    rehydrate('tutorial.dismissedHints', dismissedHintsInitialState),
-    (h: $Values<DismissedHintReducerState>) => h && h.rememberDismissal
-  ),
+  REHYDRATE_PERSISTED: () => rehydrate('tutorial.dismissedHints', dismissedHintsInitialState),
   REMOVE_HINT: (state: DismissedHintReducerState, action: RemoveHintAction): DismissedHintReducerState => {
     const {hintKey, rememberDismissal} = action.payload
     return {...state, [hintKey]: {rememberDismissal}}
   },
 }, dismissedHintsInitialState)
+
+export function dismissedHintsPersist (state: DismissedHintReducerState) {
+  // persist only 'rememberDismissal' hints
+  return pickBy(
+    state,
+    (h: $Values<DismissedHintReducerState>) => h && h.rememberDismissal
+  )
+}
 
 const _allReducers = {
   hints,
