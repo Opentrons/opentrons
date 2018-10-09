@@ -83,8 +83,6 @@ class Controller:
     def get_attached_modules(self) -> List[Tuple[str, str]]:
         return modules.discover()
 
-        return list(self._attached_modules.values())
-
     def build_module(self, port: str, model: str) -> modules.AbstractModule:
         return modules.build(port, model, False)
 
