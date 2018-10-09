@@ -313,6 +313,7 @@ async def test_eap_config_options(virtual_smoothie_env, loop, test_client):
 
     for opt in body['options']:
         assert 'name' in opt
+        assert 'displayName' in opt
         assert 'options' in opt
         for method_opt in opt['options']:
             check_option(method_opt)
