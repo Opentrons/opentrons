@@ -28,19 +28,22 @@ function transformBeforePersist (path: string, reducerState: any) {
 }
 
 /** Subscribe this fn to the Redux store to persist selected substates */
-export const makePersistSubscriber = (store: Store<*, *>) => (): void => {
-  const currentPersistedStatesByPath = {}
-  const state = store.getState()
-  PERSISTED_PATHS.forEach(path => {
-    const nextValue = get(state, path)
-    if (currentPersistedStatesByPath[path] !== nextValue) {
-      global.localStorage.setItem(
-        _addStoragePrefix(path),
-        JSON.stringify(transformBeforePersist(path, nextValue))
-      )
-      currentPersistedStatesByPath[path] = nextValue
-    }
-  })
+type PersistSubscriber = () => void
+export const makePersistSubscriber = (store: Store<*, *>): PersistSubscriber => {
+  const prevReducerStates = {}
+  return () => {
+    const state = store.getState()
+    PERSISTED_PATHS.forEach(path => {
+      const nextReducerState = get(state, path)
+      if (prevReducerStates[path] !== nextReducerState) {
+        global.localStorage.setItem(
+          _addStoragePrefix(path),
+          JSON.stringify(transformBeforePersist(path, nextReducerState))
+        )
+        prevReducerStates[path] = nextReducerState
+      }
+    })
+  }
 }
 
 /** Use inside a reducer to pull out persisted state,
