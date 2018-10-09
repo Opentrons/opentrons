@@ -27,6 +27,7 @@ log = logging.getLogger(__name__)
 
 class EAPType(NamedTuple):
     name: str
+    displayName: str
     args: List[Dict[str, Any]]
 
 
@@ -39,6 +40,7 @@ class _EAP_OUTER_TYPES(enum.Enum):
     # the CONFIG_REQUIRES dict above
     TLS = EAPType(
         name='tls',
+        displayName='EAP-TLS',
         args=[{'name': 'identity',
                'displayName': 'Username',
                'nmName': 'identity',
@@ -66,6 +68,7 @@ class _EAP_OUTER_TYPES(enum.Enum):
                'type': 'password'}])
     PEAP = EAPType(
         name='peap',
+        displayName='EAP-PEAP',
         args=[{'name': 'identity',
                'displayName': 'Username',
                'nmName': 'identity',
@@ -83,6 +86,7 @@ class _EAP_OUTER_TYPES(enum.Enum):
                'type': 'file'}])
     TTLS = EAPType(
         name='ttls',
+        displayName='EAP-TTLS',
         args=[{'name': 'identity',
                'displayName': 'Username',
                'nmName': 'identity',
@@ -127,6 +131,7 @@ class _EAP_PHASE2_TYPES(enum.Enum):
     # keys in the CONFIG_REQUIRES dict above
     MSCHAP_V2 = EAPType(
         name='mschapv2',
+        displayName='MS-CHAP v2',
         args=[{'name': 'password',
                'displayName': 'Password',
                'nmName': 'password',
@@ -134,6 +139,7 @@ class _EAP_PHASE2_TYPES(enum.Enum):
                'type': 'password'}])
     MD5 = EAPType(
         name='md5',
+        displayName='MD5',
         args=[{'name': 'password',
                'displayName': 'Password',
                'nmName': 'password',
@@ -141,6 +147,7 @@ class _EAP_PHASE2_TYPES(enum.Enum):
                'type': 'password'}])
     TLS = EAPType(
         name='tls',
+        displayName='TLS',
         args=[{'name': 'phase2CaCert',
                'displayName': 'Inner CA Certificate File',
                'nmName': 'phase2-ca-cert',
@@ -198,6 +205,12 @@ class EAP_TYPES(enum.Enum):
         if self.inner:
             to_ret += copy.deepcopy(self.inner.value.args)
         return to_ret
+
+    def display_name(self) -> str:
+        name = self.outer.value.displayName
+        if self.inner:
+            name += ' with ' + self.inner.value.displayName
+        return name
 
 
 class SECURITY_TYPES(enum.Enum):

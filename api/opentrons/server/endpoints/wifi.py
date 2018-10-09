@@ -14,6 +14,7 @@ log = logging.getLogger(__name__)
 EAP_CONFIG_SHAPE = {
     'options': [
         {'name': method.qualified_name(),
+         'displayName': method.display_name(),
          'options': [{k: v for k, v in arg.items()
                       if k in ['name',
                                'displayName',
