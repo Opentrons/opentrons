@@ -29,7 +29,9 @@ export default function Instructions (props: Props) {
   const diagram = getDiagramSrc(calibrationStep)
   const instructions = getInstructionsByStep(calibrationStep)
 
-  return diagram && instructions && (
+  if (!diagram || !instructions) return null
+
+  return (
     <div className={styles.instructions}>
       <InstructionStep
         step={'one'}

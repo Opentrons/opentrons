@@ -29,8 +29,14 @@ type UrlData = {
 
 function getDataFromUrl (): ?UrlData {
   try {
-    const urlData = JSON.parse(new URLSearchParams(window.location.search).get('data'))
-    return urlData
+    const urlData = new URLSearchParams(window.location.search).get('data')
+
+    if (!urlData) {
+      console.error('No "data" param in URL')
+      return null
+    }
+
+    return JSON.parse(urlData)
   } catch (e) {
     console.error('Failed to parse "data" URL param.', e)
     return null

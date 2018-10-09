@@ -41,32 +41,20 @@ describe('robot selectors', () => {
         robot: {connection: {connectedTo: 'bar'}},
         discovery: {
           robotsByName: {
-            foo: {
-              name: 'foo',
-              connections: [
-                {ip: '10.10.1.2', port: 31950, ok: true, local: false},
-              ],
-            },
-            bar: {
-              name: 'bar',
-              connections: [
-                {ip: '10.10.3.4', port: 31950, ok: true, local: false},
-                {ip: '169.254.3.4', port: 31950, ok: true, local: true},
-              ],
-            },
-            baz: {
-              name: 'baz',
-              connections: [
-                {ip: '10.10.5.6', port: 31950, ok: true, local: false},
-                {ip: '169.254.5.6', port: 31950, ok: false, local: true},
-              ],
-            },
-            qux: {
-              name: 'qux',
-              connections: [
-                {ip: '169.254.7.8', port: 31950, ok: true, local: true},
-              ],
-            },
+            foo: [
+              {ip: '10.10.1.2', port: 31950, ok: true, local: false},
+            ],
+            bar: [
+              {ip: '10.10.3.4', port: 31950, ok: true, local: false},
+              {ip: '169.254.3.4', port: 31950, ok: true, local: true},
+            ],
+            baz: [
+              {ip: '10.10.5.6', port: 31950, ok: true, local: false},
+              {ip: '169.254.5.6', port: 31950, ok: false, local: true},
+            ],
+            qux: [
+              {ip: '169.254.7.8', port: 31950, ok: true, local: true},
+            ],
           },
         },
       }

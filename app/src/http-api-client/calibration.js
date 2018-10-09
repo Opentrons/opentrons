@@ -1,6 +1,8 @@
 // @flow
 // http api client module for /calibration/**
-import {createSelector, type Selector} from 'reselect'
+import {createSelector} from 'reselect'
+
+import type {OutputSelector} from 'reselect'
 import type {State, Action, ThunkPromiseAction} from '../types'
 import type {BaseRobot, RobotService, Mount} from '../robot'
 import type {ApiCall, ApiRequestError} from './types'
@@ -200,7 +202,7 @@ export function calibrationReducer (
 }
 
 export function makeGetDeckCalibrationStartState () {
-  const sel: Selector<State, BaseRobot, DeckCalStartState> = createSelector(
+  const sel: OutputSelector<State, BaseRobot, DeckCalStartState> = createSelector(
     getRobotCalState,
     getStartStateFromCalState
   )
@@ -209,7 +211,7 @@ export function makeGetDeckCalibrationStartState () {
 }
 
 export function makeGetDeckCalibrationCommandState () {
-  const sel: Selector<State, BaseRobot, DeckCalCommandState> = createSelector(
+  const sel: OutputSelector<State, BaseRobot, DeckCalCommandState> = createSelector(
     getRobotCalState,
     getDeckStateFromCalState
   )

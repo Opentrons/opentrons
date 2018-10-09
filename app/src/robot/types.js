@@ -38,7 +38,7 @@ export type BaseRobot = {
 export type RobotService = BaseRobot & {
   ip: string,
   port: number,
-  wired?: boolean,
+  wired: ?boolean,
 }
 
 // robot from getDiscovered selector

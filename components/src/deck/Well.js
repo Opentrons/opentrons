@@ -112,6 +112,7 @@ class Well extends React.Component<Props> {
     }
 
     console.warn('Invalid well: neither rectangle or circle: ' + JSON.stringify(wellDef))
+    return null
   }
 }
 

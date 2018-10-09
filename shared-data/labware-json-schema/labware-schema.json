@@ -12,20 +12,25 @@
   "required": ["otId","deprecated","metadata","parameters","cornerOffsetFromSlot","ordering","dimensions","wells"],
   "properties": {
     "otId": {
+      "description": "Unique internal ID generated using UUID",
       "type": "string"
     },
     "deprecated": {
+      "description": "Flag specifying whether a labware is deprecated or not",
       "type": "boolean"
     },
     "metadata": {
       "type": "object",
+      "description": "Properties used for search and display",
       "additionalProperties": false,
       "required": ["name", "displayCategory"],
       "properties": {
         "name": {
+          "description": "Easy to remember name of labware",
           "type": "string"
         },
         "displayCategory": {
+          "description": "Label used in UI to categorize labware",
           "type": "string"
         },
         "displayLengthUnits": {
@@ -38,6 +43,7 @@
     },
     "vendor": {
       "type": "object",
+      "description": "Also for searchability, so that users know exactly which labware this was modeled off",
       "additionalProperties": false,
       "properties": {
         "sku": {
@@ -51,16 +57,21 @@
     },
     "parameters": {
       "type": "object",
+      "description": "Internal describers used to determine pipette movement to labware",
       "additionalProperties": false,
       "required": ["format", "isTiprack"],
       "properties": {
         "format": {
-          "type": "string"
+          "description": "Property to determine compatibility with multichannel pipette",
+          "type": "string",
+          "enum": ["96Standard", "384Standard", "trough", "irregular"]
         },
         "isTiprack": {
+          "description": "Flag marking whether a labware is a tiprack or not",
           "type": "boolean"
         },
         "tipLength": {
+          "description": "Required if labware is tiprack",
           "$ref": "#/definitions/positiveNumber"
         }
       }
@@ -68,7 +79,7 @@
     },
     "ordering": {
       "type": "array",
-      "description": "",
+      "description": "Generated array that keeps track of how wells should be ordered in a labware",
       "items": {
         "type": "array",
         "items": {
@@ -79,6 +90,7 @@
     "cornerOffsetFromSlot": {
       "type": "object",
       "additionalProperties": false,
+      "description": "XYZ values from top left corner of slot to well A1",
       "required": ["x", "y", "z"],
       "properties": {
         "x": {"type": "number"},
@@ -90,6 +102,7 @@
     "dimensions": {
       "type": "object",
       "additionalProperties": false,
+      "description": "Outer dimensions of a labware",
       "required": ["overallWidth", "overallHeight", "overallLength"],
       "properties": {
         "overallWidth": {
@@ -106,6 +119,7 @@
     },
     "wells": {
       "type": "object",
+      "description": "Unordered object of well objects with position and dimensional information",
       "patternProperties": {
         "['A' - 'Z'][*]": {
           "type": "object",
@@ -121,7 +135,9 @@
           ]},
           "properties": {
             "depth": {"$ref": "#/definitions/positiveNumber"},
-            "x": {"$ref": "#/definitions/positiveNumber"},
+            "x": {
+              "description": "XYZ calculated from bottom-left corner of slot to top-center of the well",
+              "$ref": "#/definitions/positiveNumber"},
             "y": {"$ref": "#/definitions/positiveNumber"},
             "z": {"$ref": "#/definitions/positiveNumber"},
             "totalLiquidVolume": {"$ref": "#/definitions/positiveNumber"},
@@ -129,6 +145,7 @@
             "length": {"$ref": "#/definitions/positiveNumber"},
             "diameter": {"$ref": "#/definitions/positiveNumber"},
             "shape": {
+              "description": "If rectangular, use length and width; otherwise use diameter",
               "type": "string",
               "enum": ["rectangular", "circular"]
             }

@@ -9,7 +9,7 @@ import styles from './styles.css'
 type Props = {
   label: string,
   buttonProps: ButtonProps,
-  children?: React.Node,
+  children: React.Node,
 }
 
 export default function LabeledButton (props: Props) {

@@ -1,7 +1,8 @@
 // @flow
 // HTTP API client module for /robot/**
-import {createSelector, type Selector} from 'reselect'
+import {createSelector} from 'reselect'
 
+import type {OutputSelector} from 'reselect'
 import type {PipetteConfig} from '@opentrons/shared-data'
 import type {State, ThunkPromiseAction, Action} from '../types'
 import type {Mount, BaseRobot, RobotService} from '../robot'
@@ -282,7 +283,7 @@ export function robotReducer (state: ?RobotState, action: Action): RobotState {
 }
 
 export const makeGetRobotMove = () => {
-  const selector: Selector<State, BaseRobot, RobotMove> = createSelector(
+  const selector: OutputSelector<State, BaseRobot, RobotMove> = createSelector(
     selectRobotState,
     (state) => state[MOVE] || {inProgress: false}
   )
@@ -291,7 +292,7 @@ export const makeGetRobotMove = () => {
 }
 
 export const makeGetRobotHome = () => {
-  const selector: Selector<State, BaseRobot, RobotHome> = createSelector(
+  const selector: OutputSelector<State, BaseRobot, RobotHome> = createSelector(
     selectRobotState,
     (state) => state[HOME] || {inProgress: false}
   )
@@ -300,7 +301,7 @@ export const makeGetRobotHome = () => {
 }
 
 export const makeGetRobotLights = () => {
-  const selector: Selector<State, BaseRobot, RobotLights> = createSelector(
+  const selector: OutputSelector<State, BaseRobot, RobotLights> = createSelector(
     selectRobotState,
     (state) => state[LIGHTS] || {inProgress: false}
   )

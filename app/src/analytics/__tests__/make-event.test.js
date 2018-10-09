@@ -25,14 +25,8 @@ describe('analytics events map', () => {
       },
       discovery: {
         robotsByName: {
-          wired: {
-            name: 'wired',
-            connections: [{ip: 'foo', port: 123, ok: true, local: true}],
-          },
-          wireless: {
-            name: 'wireless',
-            connections: [{ip: 'bar', port: 456, ok: true, local: false}],
-          },
+          wired: [{ip: 'foo', port: 123, ok: true, local: true}],
+          wireless: [{ip: 'bar', port: 456, ok: true, local: false}],
         },
       },
     })

@@ -2,7 +2,7 @@
 // shell update substate
 import {createSelector} from 'reselect'
 
-import type {Selector} from 'reselect'
+import type {OutputSelector} from 'reselect'
 import type {State, Action, Error} from '../types'
 
 export type UpdateInfo = {
@@ -91,7 +91,7 @@ export function updateReducer (
   return state
 }
 
-type StringSelector = Selector<State, void, ?string>
+type StringSelector = OutputSelector<State, void, ?string>
 
 export function getShellUpdateState (state: State): ShellUpdateState {
   return state.shell.update

@@ -1,7 +1,7 @@
 // @flow
 import uuidv1 from 'uuid/v1'
 
-function assignId () {
+function assignId (): string {
   return uuidv1()
 }
 

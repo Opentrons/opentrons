@@ -2,7 +2,6 @@ import logging
 import asyncio
 import shutil
 import os
-import opentrons
 import tempfile
 from aiohttp import web
 from opentrons import robot
@@ -109,19 +108,17 @@ async def _update_module_firmware(module_serial, data, loop=None):
     fw_filename = data.filename
     content = data.file.read()
     log.info('Preparing to flash firmware image {}'.format(fw_filename))
-    config_file_path = os.path.join(opentrons.HERE,
-                                    'config', 'modules', 'avrdude.conf')
+
     with tempfile.NamedTemporaryFile(suffix=fw_filename) as fp:
         fp.write(content)
         # returns a dict of 'message' & 'avrdudeResponse'
-        res = await _upload_to_module(module_serial, fp.name,
-                                      config_file_path, loop=loop)
+        res = await _upload_to_module(module_serial, fp.name, loop=loop)
     log.info('Firmware update complete')
     res['filename'] = fw_filename
     return res
 
 
-async def _upload_to_module(serialnum, fw_filename, config_file_path, loop):
+async def _upload_to_module(serialnum, fw_filename, loop):
     """
     This method remains in the API currently because of its use of the robot
     singleton's copy of the api object & driver. This should move to the server
@@ -143,13 +140,13 @@ async def _upload_to_module(serialnum, fw_filename, config_file_path, loop):
             if bootloader_port:
                 module._port = bootloader_port
             # else assume old bootloader connection on existing module port
-            log.info("Uploading file to port:{} using config file {}".format(
-                module.port, config_file_path))
+            log.info("Uploading file to port: {}".format(
+                module.port))
             log.info("Flashing firmware. This will take a few seconds")
             try:
                 res = await asyncio.wait_for(
                     modules.update_firmware(
-                        module, fw_filename, config_file_path, loop),
+                        module, fw_filename, loop),
                     UPDATE_TIMEOUT)
             except asyncio.TimeoutError:
                 return {'message': 'AVRDUDE not responding'}

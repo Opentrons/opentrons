@@ -5,6 +5,9 @@ SHELL := /bin/bash
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
+# dev server port
+PORT ?= 8090
+
 # source and output directories for main process code
 src_dir := src
 lib_dir := lib
@@ -49,7 +52,7 @@ electron := electron . \
 	--log.level.console="debug" \
 	--disable_ui.webPreferences.webSecurity \
 	--ui.url.protocol="http:" \
-	--ui.url.path="localhost:$(port)" \
+	--ui.url.path="localhost:$(PORT)" \
 	--discovery.candidates=localhost
 
 # standard targets

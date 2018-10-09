@@ -1,5 +1,5 @@
-// flow-typed signature: adde207d8a99710b8ff48ff0cbe934b5
-// flow-typed version: 1ae5dd9673/redux-actions_v2.x.x/flow_>=v0.39.x
+// flow-typed signature: a162cca82c36beb11175755d31cad408
+// flow-typed version: fd5f73ad43/redux-actions_v2.x.x/flow_>=v0.39.x
 
 declare module "redux-actions" {
   /*
@@ -33,13 +33,13 @@ declare module "redux-actions" {
 
   declare function createAction<T, A, P>(
     type: T,
-    payloadCreator: (...rest: A) => P,
+    payloadCreator: (...rest: A) => Promise<P> | P,
     $?: empty
   ): {(...rest: A): { type: T, payload: P, error?: boolean }, +toString: () => T};
 
   declare function createAction<T, A, P, M>(
     type: T,
-    payloadCreator: (...rest: A) => P,
+    payloadCreator: (...rest: A) => Promise<P> | P,
     metaCreator: (...rest: A) => M
   ): {(...rest: A): { type: T, payload: P, error?: boolean, meta: M }, +toString: () => T};
 
@@ -60,7 +60,22 @@ declare module "redux-actions" {
   ): Object;
   declare function createActions(...identityActions: string[]): Object;
 
+  /*
+   * The semantics of the reducer (i.e. ReduxReducer<S, A>) returned by either
+   * `handleAction` or `handleActions` are actually different from the semantics
+   * of the reducer (i.e. Reducer<S, A>) that are consumed by either `handleAction`
+   * or `handleActions`.
+   *
+   * Reducers (i.e. Reducer<S, A>) consumed by either `handleAction` or `handleActions`
+   * are assumed to be given the actual `State` type, since internally,
+   * `redux-actions` will perform the action type matching for us, and will always
+   * provide the expected state type.
+   *
+   * The reducers returned by either `handleAction` or `handleActions` will be
+   * compatible with the `redux` library.
+  */
   declare type Reducer<S, A> = (state: S, action: A) => S;
+  declare type ReduxReducer<S, A> = (state: S | void, action: A) => S;
 
   declare type ReducerMap<S, A> =
     | { next: Reducer<S, A> }
@@ -73,7 +88,7 @@ declare module "redux-actions" {
    * `handleActions`. For example:
    *
    *     import { type Reducer } from 'redux'
-   *     import { createAction, handleAction, type Action } from 'redux-actions'
+   *     import { createAction, handleAction, type ActionType } from 'redux-actions'
    *
    *     const increment = createAction(INCREMENT, (count: number) => count)
    *
@@ -92,14 +107,14 @@ declare module "redux-actions" {
     type: Type,
     reducer: ReducerDefinition<State, Action>,
     defaultState: State
-  ): Reducer<State, Action>;
+  ): ReduxReducer<State, Action>;
 
   declare function handleActions<State, Action>(
     reducers: {
       [key: string]: Reducer<State, Action> | ReducerMap<State, Action>
     },
     defaultState?: State
-  ): Reducer<State, Action>;
+  ): ReduxReducer<State, Action>;
 
   declare function combineActions(
     ...types: (string | Symbol | Function)[]

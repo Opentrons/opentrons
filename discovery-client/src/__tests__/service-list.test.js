@@ -12,14 +12,54 @@ describe('serviceList', () => {
       {
         name: 'cleans up input list',
         input: [
-          {...MOCK_SERVICE, name: 'foo', ok: true, serverOk: false},
-          {...MOCK_SERVICE, name: 'bar', ok: false, serverOk: true},
-          {...MOCK_SERVICE, name: 'baz', ok: true, serverOk: true},
+          {
+            ...MOCK_SERVICE,
+            name: 'foo',
+            ok: true,
+            serverOk: false,
+            health: {api_version: '1.0.0'},
+            serverHealth: null,
+          },
+          {
+            ...MOCK_SERVICE,
+            name: 'bar',
+            ok: false,
+            serverOk: true,
+            health: null,
+            serverHealth: {apiServerVersion: '1.0.0'},
+          },
+          {
+            ...MOCK_SERVICE,
+            name: 'baz',
+            ok: true,
+            serverOk: true,
+            health: {api_version: '1.0.0'},
+            serverHealth: {apiServerVersion: '1.0.0'},
+          },
         ],
         expected: [
-          {...MOCK_SERVICE, name: 'foo'},
-          {...MOCK_SERVICE, name: 'bar', ip: null},
-          {...MOCK_SERVICE, name: 'baz', ip: null},
+          {
+            ...MOCK_SERVICE,
+            name: 'foo',
+            health: {api_version: '1.0.0'},
+            serverHealth: null,
+          },
+          {
+            ...MOCK_SERVICE,
+            name: 'bar',
+            ip: null,
+            local: null,
+            health: null,
+            serverHealth: {apiServerVersion: '1.0.0'},
+          },
+          {
+            ...MOCK_SERVICE,
+            name: 'baz',
+            ip: null,
+            local: null,
+            health: {api_version: '1.0.0'},
+            serverHealth: {apiServerVersion: '1.0.0'},
+          },
         ],
       },
       {
@@ -30,12 +70,15 @@ describe('serviceList', () => {
       {
         name: 'collapses multiple IP unknown duplicates into one',
         input: [
-          {...MOCK_SERVICE, ip: null},
+          {...MOCK_SERVICE, ip: null, local: null},
           MOCK_SERVICE,
-          {...MOCK_SERVICE, name: 'bar', ip: null},
-          {...MOCK_SERVICE, name: 'bar', ip: null},
+          {...MOCK_SERVICE, name: 'bar', ip: null, local: null},
+          {...MOCK_SERVICE, name: 'bar', ip: null, local: null},
         ],
-        expected: [MOCK_SERVICE, {...MOCK_SERVICE, name: 'bar', ip: null}],
+        expected: [
+          MOCK_SERVICE,
+          {...MOCK_SERVICE, name: 'bar', ip: null, local: null},
+        ],
       },
     ]
 
@@ -81,8 +124,22 @@ describe('serviceList', () => {
         upsert: MOCK_SERVICE,
         expected: [
           MOCK_SERVICE,
-          {...MOCK_SERVICE, name: 'bar', ip: null, ok: null, serverOk: null},
-          {...MOCK_SERVICE, name: 'baz', ip: null, ok: null, serverOk: null},
+          {
+            ...MOCK_SERVICE,
+            name: 'bar',
+            ip: null,
+            local: null,
+            ok: null,
+            serverOk: null,
+          },
+          {
+            ...MOCK_SERVICE,
+            name: 'baz',
+            ip: null,
+            local: null,
+            ok: null,
+            serverOk: null,
+          },
         ],
       },
     ]

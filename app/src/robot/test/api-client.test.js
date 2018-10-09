@@ -81,10 +81,7 @@ describe('api client', () => {
     },
     discovery: {
       robotsByName: {
-        [ROBOT_NAME]: {
-          name: ROBOT_NAME,
-          connections: [{ip: ROBOT_IP, port: 31950, ok: true}],
-        },
+        [ROBOT_NAME]: [{ip: ROBOT_IP, port: 31950, ok: true}],
       },
     },
   }

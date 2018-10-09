@@ -25,15 +25,17 @@ if not ff.split_labware_definitions():
 if ff.use_protocol_api_v2():
     import protocol_api
     from protocol_api.back_compat\
-        import robot, reset as bcreset, instruments, containers, labware
+        import robot, reset as bcreset, instruments, containers, labware,\
+        modules
 
     def reset():
         ctx = protocol_api.ProtocolContext()
         bcreset(ctx)
 
 else:
-    from .legacy_api.api import robot, reset, instruments, containers, labware
+    from .legacy_api.api\
+        import robot, reset, instruments, containers, labware, modules
 
 
 __all__ = ['containers', 'instruments', 'labware', 'robot', 'reset',
-           '__version__']
+           '__version__', 'modules']

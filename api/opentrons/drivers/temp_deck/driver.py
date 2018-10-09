@@ -220,7 +220,8 @@ class TempDeck:
             try:
                 self._update_thread = Thread(
                     target=self._recursive_update_temperature,
-                    args=[DEFAULT_COMMAND_RETRIES])
+                    args=[DEFAULT_COMMAND_RETRIES],
+                    name='Tempdeck recursive update temperature')
                 self._update_thread.start()
             except (TempDeckError, SerialException, SerialNoResponse) as e:
                 return str(e)

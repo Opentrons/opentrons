@@ -1,4 +1,8 @@
 // @flow
+import differenceBy from 'lodash/differenceBy'
+import partition from 'lodash/partition'
+import uniqBy from 'lodash/uniqBy'
+
 import {
   makeService,
   updateService,
@@ -10,7 +14,18 @@ import type {Service, ServiceList, ServiceUpdate} from './types'
 
 export function createServiceList (list: ServiceList = []): ServiceList {
   // strip health flags from input list
-  const nextList = list.map(s => makeService(s.name, s.ip, s.port))
+  const nextList = list.map(s =>
+    makeService(
+      s.name,
+      s.ip,
+      s.port,
+      null,
+      null,
+      null,
+      s.health,
+      s.serverHealth
+    )
+  )
 
   return dedupeServices(nextList)
 }
@@ -50,30 +65,41 @@ export function updateServiceListByIp (
 // ensure there aren't multiple entries with the same IP and there aren't
 // multiple entries with the same name and ip: null
 function dedupeServices (list: ServiceList) {
-  const dedupeResult = list
-    .slice()
-    .sort(compareByIpExists)
-    .reduce(
-      (result, service) => {
-        const {unique, seenIps, seenNames} = result
-        const {name} = service
-        const ip = service.ip && seenIps[service.ip] ? null : service.ip
-        const cleanedService = service.ip === ip ? service : {...service, ip}
+  const [listWithIp, listWithoutIp] = partition(list, 'ip')
+  const sanitizedWithIp = listWithIp.reduce(
+    (result, service) => {
+      // we know IP exists here thanks to our partition above
+      const ip: string = (service.ip: any)
+      const cleanedService = result.seenIps[ip]
+        ? clearServiceIfConflict(service, {ip})
+        : service
 
-        if (ip || !seenNames[name]) unique.push(cleanedService)
-        if (ip && !seenIps[ip]) seenIps[ip] = true
-        if (!seenNames[name]) seenNames[name] = true
+      result.seenIps[ip] = true
+      result.unique.push(cleanedService)
 
-        return {unique, seenIps, seenNames}
-      },
-      {unique: [], seenIps: {}, seenNames: {}}
-    )
+      return result
+    },
+    {unique: [], seenIps: {}}
+  ).unique
 
-  return dedupeResult.unique
+  const dedupedWithoutIp = differenceBy(
+    uniqBy(listWithoutIp, 'name'),
+    sanitizedWithIp,
+    'name'
+  )
+
+  return sanitizedWithIp.concat(dedupedWithoutIp).sort(compareServices)
 }
 
-function compareByIpExists (a: Service, b: Service) {
+// sort service list by: ip exists, update server healthy, API healthy, advertising
+function compareServices (a: Service, b: Service) {
   if (a.ip && !b.ip) return -1
   if (!a.ip && b.ip) return 1
+  if (a.serverOk && !b.serverOk) return -1
+  if (!a.serverOk && b.serverOk) return 1
+  if (a.ok && !b.ok) return -1
+  if (!a.ok && b.ok) return 1
+  if (a.advertising && !b.advertising) return -1
+  if (!a.advertising && b.advertising) return 1
   return 0
 }

@@ -25,6 +25,11 @@
   height: 3rem;
 }
 
+.disabled {
+  color: var(--c-font-disabled);
+  pointer-events: none;
+}
+
 .instrument_item {
   height: 2.5rem;
 }

@@ -18,7 +18,8 @@
   width: 100%;
   padding: 1rem;
 
-  &:not(:last-child) {
+  /* TODO(mc, 2018-10-08): update to :last-of-type in components lib */
+  &:not(:last-of-type) {
     border-bottom: 1px solid var(--c-light-gray);
   }
 }
