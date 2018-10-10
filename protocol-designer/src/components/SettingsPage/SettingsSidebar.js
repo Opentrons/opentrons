@@ -13,18 +13,18 @@ type SP = {currentPage: Page}
 type DP = {makeNavigateToPage: (Page) => () => mixed}
 
 const SettingsSidebar = (props: SP & DP) => (
-  <SidePanel title={i18n.t('nav.settings')}>
+  <SidePanel title={i18n.t('nav.tab_name.settings')}>
     <PDTitledList
       className={styles.sidebar_item}
       selected={props.currentPage === 'settings-privacy'}
       onClick={props.makeNavigateToPage('settings-privacy')}
-      title={i18n.t('nav.privacy')}/>
+      title={i18n.t('nav.settings.privacy')}/>
     {/* <PDTitledList
       disabled
       className={styles.sidebar_item}
       onClick={props.makeNavigateToPage('settings-features')}
       selected={props.currentPage === 'settings-features'}
-      title={i18n.t('nav.feature_flags')}/> */}
+      title={i18n.t('nav.settings.feature_flags')}/> */}
   </SidePanel>
 )
 

@@ -20,18 +20,18 @@ function Nav (props: Props) {
         <React.Fragment>
           <NavTab
             iconName='ot-file'
-            title={i18n.t('nav.file')}
+            title={i18n.t('nav.tab_name.file')}
             selected={props.currentPage === 'file-splash' || props.currentPage === 'file-detail'}
             onClick={props.handleClick('file-detail')} />
           <NavTab
             iconName='water'
-            title={i18n.t('nav.liquids')}
+            title={i18n.t('nav.tab_name.liquids')}
             disabled={props.currentPage === 'file-splash'}
             selected={props.currentPage === 'liquids'}
             onClick={props.handleClick('liquids')} />
           <NavTab
             iconName='ot-design'
-            title={i18n.t('nav.design')}
+            title={i18n.t('nav.tab_name.design')}
             disabled={props.currentPage === 'file-splash'}
             selected={props.currentPage === 'steplist' || props.currentPage === 'ingredient-detail'}
             onClick={props.handleClick('steplist')} />
@@ -41,11 +41,11 @@ function Nav (props: Props) {
         <React.Fragment>
           <OutsideLinkTab
             iconName='help-circle'
-            title={i18n.t('nav.help')}
+            title={i18n.t('nav.tab_name.help')}
             to={KNOWLEDGEBASE_ROOT_URL} />
           <NavTab
             iconName='settings'
-            title={i18n.t('nav.settings')}
+            title={i18n.t('nav.tab_name.settings')}
             selected={props.currentPage === 'settings-privacy'}
             onClick={props.handleClick('settings-privacy')} />
         </React.Fragment>
