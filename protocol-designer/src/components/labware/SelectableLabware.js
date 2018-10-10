@@ -39,10 +39,9 @@ function getFillColor (groupIds: Array<string>): ?string {
 }
 
 class SelectableLabware extends React.Component<Props> {
-  _getWellsFromRect = (rect: GenericRect): * => {
-    const selectedWells = getCollidingWells(rect, SELECTABLE_WELL_CLASS)
-    return this._wellsFromSelected(selectedWells)
-  }
+  _getWellsFromRect = (rect: GenericRect): * => (
+    getCollidingWells(rect, SELECTABLE_WELL_CLASS)
+  )
 
   _wellsFromSelected = (selectedWells: Wells): Wells => {
     // Returns PRIMARY WELLS from the selection.
@@ -65,11 +64,23 @@ class SelectableLabware extends React.Component<Props> {
 
   handleSelectionMove = (e: MouseEvent, rect: GenericRect) => {
     if (!e.shiftKey) {
-      this.props.updateHighlightedWells(this._getWellsFromRect(rect))
+      if (this.props.pipetteChannels === 8) {
+        const selectedWells = this._getWellsFromRect(rect)
+        const allWells: Wells = Object.keys(selectedWells).reduce((acc: Wells, well: string): Wells => {
+          const channelWells: Array<string> = reduce(getWellSetForMultichannel(this.props.containerType, well), (acc, wellName) => ({
+            ...acc,
+            [wellName]: wellName,
+          }), {})
+          return {...acc, ...channelWells}
+        }, {})
+        this.props.updateHighlightedWells(allWells)
+      } else {
+        this.props.updateHighlightedWells(this._getWellsFromRect(rect))
+      }
     }
   }
   handleSelectionDone = (e: MouseEvent, rect: GenericRect) => {
-    const wells = this._getWellsFromRect(rect)
+    const wells = this._wellsFromSelected(this._getWellsFromRect(rect))
     if (e.shiftKey) {
       this.props.deselectWells(wells)
     } else {
