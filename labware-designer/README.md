@@ -46,7 +46,7 @@ input = {
   brand,
 }
 
-The above inputs are all required except for `vendor`. Each individual input has the following shape(s).
+The above inputs are all required except for `brand`. Each individual input has the following shape(s).
 Variables in bold signify that they are required, those in italics are optional.
 
 metadata = {

@@ -138,7 +138,7 @@ export function createRegularLabware (props: RegularLabwareProps): Schema {
 
   definition.parameters.loadName = `${brand}_${numWells}_${
     props.metadata.displayCategory}_${props.well.totalLiquidVolume}_${
-      props.metadata.displayVolumeUnits}_${definition.otId}`
+      props.metadata.displayVolumeUnits}`
 
   return definition
 }

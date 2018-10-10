@@ -12,7 +12,7 @@
     "brand": "opentrons"
   },
   "parameters": {
-    "loadName": "opentrons_2_wellPlate_100_uL_mock-id",
+    "loadName": "opentrons_2_wellPlate_100_uL",
     "format": "96Standard",
     "isTiprack": false
   },
