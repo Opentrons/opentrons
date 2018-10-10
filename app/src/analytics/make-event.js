@@ -2,6 +2,7 @@
 // redux action types to analytics events map
 import createLogger from '../logger'
 import {selectors as robotSelectors} from '../robot'
+import {getConnectableRobots} from '../discovery'
 
 import type {State, Action} from '../types'
 
@@ -19,8 +20,7 @@ export default function makeEvent (state: State, action: Action): ?Event {
 
     case 'robot:CONNECT_RESPONSE':
       const name = state.robot.connection.connectRequest.name
-      const robot = robotSelectors.getDiscovered(state)
-        .find(r => r.name === name)
+      const robot = getConnectableRobots(state).find(r => r.name === name)
 
       if (!robot) {
         log.warn('No robot found for connect response')
@@ -31,7 +31,7 @@ export default function makeEvent (state: State, action: Action): ?Event {
         name: 'robotConnect',
         properties: {
           success: !action.payload.error,
-          method: robot.wired ? 'usb' : 'wifi',
+          method: robot.local ? 'usb' : 'wifi',
           error: (action.payload.error && action.payload.error.message) || '',
         },
       }

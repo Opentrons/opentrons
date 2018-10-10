@@ -4,29 +4,34 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {Link} from 'react-router-dom'
 
-import type {State, Dispatch} from '../../types'
-import type {Robot} from '../../robot'
-import type {Setting, FetchHealthCall} from '../../http-api-client'
-import {fetchSettings, setSettings, makeGetRobotSettings, makeGetRobotHealth} from '../../http-api-client'
+import {fetchSettings, setSettings, makeGetRobotSettings} from '../../http-api-client'
 import {downloadLogs} from '../../shell'
-
 import {RefreshCard} from '@opentrons/components'
 import {LabeledButton, LabeledToggle} from '../controls'
 
-type OP = Robot
+import type {State, Dispatch} from '../../types'
+import type {ViewableRobot} from '../../discovery'
+import type {Setting} from '../../http-api-client'
 
-type SP = {
-  health: ?FetchHealthCall,
-  settings: Array<Setting>,
+type OP = {
+  robot: ViewableRobot,
 }
 
-type DP = {
+type SP = {|
+  settings: Array<Setting>,
+|}
+
+type DP = {|
   fetch: () => mixed,
   set: (id: string, value: boolean) => mixed,
   download: () => mixed,
-}
+|}
 
-type Props = OP & SP & DP
+type Props = {
+  ...$Exact<OP>,
+  ...SP,
+  ...DP,
+}
 
 type BooleanSettingProps = {
   id: string,
@@ -60,9 +65,11 @@ class BooleanSettingToggle extends React.Component<BooleanSettingProps> {
 }
 
 function AdvancedSettingsCard (props: Props) {
-  const {name, settings, set, fetch, download, health} = props
-  const logsAvailable = health && health.response && health.response.logs
+  const {settings, set, fetch, download} = props
+  const {name, health} = props.robot
+  const logsAvailable = health && health.logs
   const resetUrl = `/robots/${name}/reset`
+
   return (
     <RefreshCard watch={name} refresh={fetch} title={TITLE} column>
       <LabeledButton
@@ -94,24 +101,21 @@ function AdvancedSettingsCard (props: Props) {
 
 function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   const getRobotSettings = makeGetRobotSettings()
-  const getRobotHealth = makeGetRobotHealth()
 
   return (state, ownProps) => {
-    const settingsRequest = getRobotSettings(state, ownProps)
+    const settingsRequest = getRobotSettings(state, ownProps.robot)
     const settings = settingsRequest && settingsRequest.response && settingsRequest.response.settings
-    const health = getRobotHealth(state, ownProps)
 
-    return {
-      health,
-      settings: settings || [],
-    }
+    return {settings: settings || []}
   }
 }
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
+  const {robot} = ownProps
+
   return {
-    fetch: () => dispatch(fetchSettings(ownProps)),
-    set: (id, value) => dispatch(setSettings(ownProps, {id, value})),
-    download: () => dispatch(downloadLogs(ownProps)),
+    fetch: () => dispatch(fetchSettings(robot)),
+    set: (id, value) => dispatch(setSettings(robot, {id, value})),
+    download: () => dispatch(downloadLogs(robot)),
   }
 }

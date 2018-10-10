@@ -3,14 +3,14 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 
-import type {State} from '../../types'
-import type {Robot} from '../../robot'
-import type {Pipette} from '../../http-api-client'
 import {makeGetRobotPipettes, fetchPipettes, clearMoveResponse} from '../../http-api-client'
-
 import InstrumentInfo from './InstrumentInfo'
 import {CardContentFlex} from '../layout'
 import {RefreshCard} from '@opentrons/components'
+
+import type {State} from '../../types'
+import type {Robot} from '../../discovery'
+import type {Pipette} from '../../http-api-client'
 
 type OP = Robot
 

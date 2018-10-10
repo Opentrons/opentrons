@@ -69,7 +69,8 @@ function Robots (props: Props) {
 
 function mapStateToProps (state: State, ownProps: OP): SP {
   const {match: {params: {name}}} = ownProps
-  const robots: Array<ViewableRobot> = getConnectableRobots(state).concat(getReachableRobots(state))
+  const robots: Array<ViewableRobot> = getConnectableRobots(state)
+    .concat(getReachableRobots(state))
   const connectedName = robotSelectors.getConnectedRobotName(state)
   const robot: ?ViewableRobot = robots.find(r => r.name === name)
 

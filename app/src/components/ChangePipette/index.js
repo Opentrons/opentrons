@@ -7,7 +7,8 @@ import {getPipette, getPipetteNames} from '@opentrons/shared-data'
 
 import type {PipetteConfig} from '@opentrons/shared-data'
 import type {State, Dispatch} from '../../types'
-import type {Robot, Mount} from '../../robot'
+import type {Mount} from '../../robot'
+import type {Robot} from '../../discovery'
 import type {Direction, ChangePipetteProps} from './types'
 
 import type {RobotHome, RobotMove} from '../../http-api-client'

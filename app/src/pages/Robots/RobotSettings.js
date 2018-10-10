@@ -69,19 +69,24 @@ function RobotSettingsPage (props: Props) {
   } = props
 
   const titleBarProps = {title: robot.name}
-  const reachable = robot.status === 'reachable'
+
   // TODO(mc, 2018-05-08): pass parentUrl to RobotSettings
   return (
     <React.Fragment>
       <Page titleBarProps={titleBarProps}>
-        {reachable && <ReachableRobotBanner key={robot.name} {...robot} />}
-        <ConnectBanner {...robot} key={Number(robot.isConnected)} />
-        <RobotSettings {...robot} />
+        {robot.status === 'reachable' && (
+          <ReachableRobotBanner key={robot.name} {...robot} />
+        )}
+        {robot.status === 'connectable' && (
+          <ConnectBanner {...robot} key={Number(robot.connected)} />
+        )}
+
+        <RobotSettings robot={robot} />
       </Page>
       <Switch>
         <Route
           path={`${path}/update`}
-          render={() => <RobotUpdateModal {...robot} />}
+          render={() => <RobotUpdateModal robot={robot} />}
         />
 
         <Route

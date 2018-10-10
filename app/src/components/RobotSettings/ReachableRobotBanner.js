@@ -1,22 +1,18 @@
 // @flow
 import * as React from 'react'
-import {type Robot} from '../../robot'
 import {AlertItem} from '@opentrons/components'
 
-type State = {
-  dismissed: boolean,
-}
+import type {ReachableRobot} from '../../discovery'
+
+type State = {dismissed: boolean}
 
 export default class ReachableRobotBanner extends React.Component<
-  Robot,
+  ReachableRobot,
   State
 > {
-  constructor (props: Robot) {
+  constructor (props: ReachableRobot) {
     super(props)
-
-    this.state = {
-      dismissed: false,
-    }
+    this.state = {dismissed: false}
   }
 
   render () {

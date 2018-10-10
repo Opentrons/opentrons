@@ -4,28 +4,26 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import capitalize from 'lodash/capitalize'
 
-import type {State, Dispatch} from '../../types'
-import {
-  selectors as robotSelectors,
-  actions as robotActions,
-  type Robot,
-} from '../../robot'
+import {selectors as robotSelectors, actions as robotActions} from '../../robot'
 
 import {Card, LabeledValue, OutlineButton} from '@opentrons/components'
 import {CardContentHalf} from '../layout'
 
-type OwnProps = Robot
+import type {State, Dispatch} from '../../types'
+import type {ViewableRobot} from '../../discovery'
 
-type StateProps = {
+type OwnProps = {robot: ViewableRobot}
+
+type StateProps = {|
   status: string,
   connectButtonText: string,
-}
+|}
 
-type DispatchProps = {
-  onClick: () => *,
-}
+type DispatchProps = {|
+  onClick: () => mixed,
+|}
 
-type Props = OwnProps & StateProps & DispatchProps
+type Props = {...$Exact<OwnProps>, ...StateProps, ...DispatchProps}
 
 const TITLE = 'Status'
 const STATUS_LABEL = 'This robot is currently'
@@ -53,13 +51,14 @@ function StatusCard (props: Props) {
 }
 
 function mapStateToProps (state: State, ownProps: OwnProps): StateProps {
-  const {isConnected} = ownProps
+  const {robot} = ownProps
+  const connected = robot.connected != null && robot.connected === true
   const sessionStatus = robotSelectors.getSessionStatus(state)
-  const status = isConnected
+  const status = connected
     ? (sessionStatus && capitalize(sessionStatus)) || STATUS_VALUE_DEFAULT
     : STATUS_VALUE_DISCONNECTED
 
-  const connectButtonText = isConnected ? 'disconnect' : 'connect'
+  const connectButtonText = connected ? 'disconnect' : 'connect'
 
   return {status, connectButtonText}
 }
@@ -68,10 +67,11 @@ function mapDispatchToProps (
   dispatch: Dispatch,
   ownProps: OwnProps
 ): DispatchProps {
-  const {name, isConnected} = ownProps
-  const onClickAction = isConnected
-    ? robotActions.disconnect()
-    : robotActions.connect(name)
+  const {robot} = ownProps
+  const onClickAction =
+    robot.connected === true
+      ? robotActions.disconnect()
+      : robotActions.connect(robot.name)
 
   return {
     onClick: () => dispatch(onClickAction),

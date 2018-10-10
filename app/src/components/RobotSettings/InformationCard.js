@@ -4,92 +4,75 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {Link} from 'react-router-dom'
 
-import type {State, Dispatch} from '../../types'
-import type {Robot} from '../../robot'
-import type {FetchHealthCall, RobotUpdateInfo} from '../../http-api-client'
-
 import {
   fetchHealthAndIgnored,
-  makeGetRobotHealth,
   makeGetRobotUpdateInfo,
 } from '../../http-api-client'
-
-import {
-  checkShellUpdate,
-} from '../../shell'
-
+import {checkShellUpdate} from '../../shell'
 import {RefreshCard, LabeledValue, OutlineButton} from '@opentrons/components'
 import {CardContentQuarter} from '../layout'
 
-type OwnProps = Robot & {
+import type {State, Dispatch} from '../../types'
+import type {RobotUpdateInfo} from '../../http-api-client'
+import type {ViewableRobot} from '../../discovery'
+
+type OwnProps = {
+  robot: ViewableRobot,
   updateUrl: string,
 }
 
-type StateProps = {
-  healthRequest: FetchHealthCall,
+type StateProps = {|
   updateInfo: RobotUpdateInfo,
-}
+|}
 
-type DispatchProps = {
+type DispatchProps = {|
   fetchHealth: () => mixed,
   checkAppUpdate: () => mixed,
-}
+|}
 
-type Props = OwnProps & StateProps & DispatchProps
+type Props = {...$Exact<OwnProps>, ...StateProps, ...DispatchProps}
 
 const TITLE = 'Information'
 const NAME_LABEL = 'Robot Name'
 const SERVER_VERSION_LABEL = 'Server version'
 const FIRMWARE_VERSION_LABEL = 'Firmware version'
 
-export default connect(makeMapStateToProps, mapDispatchToProps)(InformationCard)
+export default connect(
+  makeMapStateToProps,
+  mapDispatchToProps
+)(InformationCard)
+
+const getApiVersion = robot =>
+  (robot.serverHealth && robot.serverHealth.apiServerVersion) ||
+  (robot.health && robot.health.api_version) ||
+  'unknown'
+
+const getFirmwareVersion = robot =>
+  (robot.serverHealth && robot.serverHealth.smoothieVersion) ||
+  (robot.health && robot.health.fw_version) ||
+  'unknown'
 
 function InformationCard (props: Props) {
-  const {
-    name,
-    updateInfo,
-    fetchHealth,
-    updateUrl,
-    checkAppUpdate,
-    healthRequest: {inProgress, response: health},
-  } = props
+  const {robot, updateInfo, fetchHealth, updateUrl, checkAppUpdate} = props
 
-  const realName = (health && health.name) || name
-  const version = (health && health.api_version) || 'Unknown'
-  const firmwareVersion = (health && health.fw_version) || 'Unknown'
+  const {name} = robot
+  const version = getApiVersion(robot)
+  const firmwareVersion = getFirmwareVersion(robot)
   const updateText = updateInfo.type || 'Reinstall'
 
   return (
-    <RefreshCard
-      watch={name}
-      refresh={fetchHealth}
-      refreshing={inProgress}
-      title={TITLE}
-    >
+    <RefreshCard watch={name} refresh={fetchHealth} title={TITLE}>
       <CardContentQuarter>
-        <LabeledValue
-          label={NAME_LABEL}
-          value={realName}
-        />
+        <LabeledValue label={NAME_LABEL} value={name} />
       </CardContentQuarter>
       <CardContentQuarter>
-        <LabeledValue
-          label={SERVER_VERSION_LABEL}
-          value={version}
-        />
+        <LabeledValue label={SERVER_VERSION_LABEL} value={version} />
       </CardContentQuarter>
       <CardContentQuarter>
-        <LabeledValue
-          label={FIRMWARE_VERSION_LABEL}
-          value={firmwareVersion}
-        />
+        <LabeledValue label={FIRMWARE_VERSION_LABEL} value={firmwareVersion} />
       </CardContentQuarter>
       <CardContentQuarter>
-        <OutlineButton
-          Component={Link}
-          to={updateUrl}
-          onClick={checkAppUpdate}
-        >
+        <OutlineButton Component={Link} to={updateUrl} onClick={checkAppUpdate}>
           {updateText}
         </OutlineButton>
       </CardContentQuarter>
@@ -98,12 +81,10 @@ function InformationCard (props: Props) {
 }
 
 function makeMapStateToProps () {
-  const getRobotHealth = makeGetRobotHealth()
   const getUpdateInfo = makeGetRobotUpdateInfo()
 
   return (state: State, ownProps: OwnProps): StateProps => ({
-    healthRequest: getRobotHealth(state, ownProps),
-    updateInfo: getUpdateInfo(state, ownProps),
+    updateInfo: getUpdateInfo(state, ownProps.robot),
   })
 }
 
@@ -112,7 +93,8 @@ function mapDispatchToProps (
   ownProps: OwnProps
 ): DispatchProps {
   return {
-    fetchHealth: () => dispatch(fetchHealthAndIgnored(ownProps)),
+    // TODO(mc, 2018-10-10): only need to fetch ignored
+    fetchHealth: () => dispatch(fetchHealthAndIgnored(ownProps.robot)),
     checkAppUpdate: () => dispatch(checkShellUpdate()),
   }
 }

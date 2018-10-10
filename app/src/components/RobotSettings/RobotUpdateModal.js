@@ -28,18 +28,22 @@ import UpdateAppMessage from './UpdateAppMessage'
 import UpdateRobotMessage from './UpdateRobotMessage'
 import ReleaseNotes from '../ReleaseNotes'
 
-type OP = Robot
+import type {ViewableRobot} from '../../discovery'
 
-type SP = {
+type OP = {robot: ViewableRobot}
+
+type SP = {|
   appUpdate: ShellUpdateState,
   updateInfo: RobotUpdateInfo,
   updateRequest: RobotServerUpdate,
   restartRequest: RobotServerRestart,
-}
+|}
 
 type DP = {dispatch: Dispatch}
 
-type Props = OP & SP & {
+type Props = {
+  ...$Exact<OP>,
+  ...SP,
   update: () => mixed,
   restart: () => mixed,
   ignoreUpdate: () => mixed,
@@ -124,29 +128,30 @@ function makeMapStateToProps (): (State, OP) => SP {
 
   return (state, ownProps) => ({
     appUpdate: getShellUpdateState(state),
-    updateInfo: getRobotUpdateInfo(state, ownProps),
-    updateRequest: getRobotUpdateRequest(state, ownProps),
-    restartRequest: getRobotRestartRequest(state, ownProps),
+    updateInfo: getRobotUpdateInfo(state, ownProps.robot),
+    updateRequest: getRobotUpdateRequest(state, ownProps.robot),
+    restartRequest: getRobotRestartRequest(state, ownProps.robot),
   })
 }
 
 function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
+  const {robot} = ownProps
   const {updateInfo} = stateProps
   const {dispatch} = dispatchProps
 
-  const close = () => dispatch(push(`/robots/${ownProps.name}`))
+  const close = () => dispatch(push(`/robots/${robot.name}`))
   let ignoreUpdate = updateInfo.type
-    ? () => dispatch(setIgnoredUpdate(ownProps, updateInfo.version)).then(close)
+    ? () => dispatch(setIgnoredUpdate(robot, updateInfo.version)).then(close)
     : close
 
   return {
     ...stateProps,
     ...ownProps,
     ignoreUpdate,
-    update: () => dispatch(updateRobotServer(ownProps)),
+    update: () => dispatch(updateRobotServer(robot)),
     restart: () => {
-      dispatch(restartRobotServer(ownProps))
-        .then(() => dispatch(clearUpdateResponse(ownProps)))
+      dispatch(restartRobotServer(robot))
+        .then(() => dispatch(clearUpdateResponse(robot)))
         .then(close)
     },
   }
