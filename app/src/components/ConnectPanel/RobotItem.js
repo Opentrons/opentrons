@@ -4,14 +4,13 @@ import {connect} from 'react-redux'
 import {withRouter, type ContextRouter} from 'react-router'
 
 import type {State, Dispatch} from '../../types'
-import type {Robot} from '../../discovery'
+import type {ViewableRobot} from '../../discovery'
 import {actions as robotActions, selectors as robotSelectors} from '../../robot'
 import {makeGetRobotUpdateInfo} from '../../http-api-client'
-
 import {RobotListItem} from './RobotListItem.js'
 
 type OP = {|
-  ...$Exact<Robot>,
+  ...$Exact<ViewableRobot>,
   ...ContextRouter,
 |}
 

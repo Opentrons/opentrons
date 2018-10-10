@@ -5,6 +5,7 @@ import {connect} from 'react-redux'
 import {withRouter, Route, Switch, Redirect, type Match} from 'react-router'
 
 import {selectors as robotSelectors, actions as robotActions} from '../../robot'
+import {CONNECTABLE, REACHABLE} from '../../discovery'
 import {
   makeGetRobotHome,
   clearHomeResponse,
@@ -56,6 +57,9 @@ export default withRouter(
   )(RobotSettingsPage)
 )
 
+const UPDATE_FRAGMENT = 'update'
+const CALIBRATE_DECK_FRAGMENT = 'calibrate-deck'
+
 function RobotSettingsPage (props: Props) {
   const {
     robot,
@@ -74,23 +78,27 @@ function RobotSettingsPage (props: Props) {
   return (
     <React.Fragment>
       <Page titleBarProps={titleBarProps}>
-        {robot.status === 'reachable' && (
+        {robot.status === REACHABLE && (
           <ReachableRobotBanner key={robot.name} {...robot} />
         )}
-        {robot.status === 'connectable' && (
+        {robot.status === CONNECTABLE && (
           <ConnectBanner {...robot} key={Number(robot.connected)} />
         )}
 
-        <RobotSettings robot={robot} />
+        <RobotSettings
+          robot={robot}
+          updateUrl={`${url}/${UPDATE_FRAGMENT}`}
+          calibrateDeckUrl={`${url}/${CALIBRATE_DECK_FRAGMENT}`}
+        />
       </Page>
       <Switch>
         <Route
-          path={`${path}/update`}
+          path={`${path}/${UPDATE_FRAGMENT}`}
           render={() => <RobotUpdateModal robot={robot} />}
         />
 
         <Route
-          path={`${path}/calibrate-deck`}
+          path={`${path}/${CALIBRATE_DECK_FRAGMENT}`}
           render={props => (
             <CalibrateDeck match={props.match} robot={robot} parentUrl={url} />
           )}
@@ -106,7 +114,7 @@ function RobotSettingsPage (props: Props) {
           path={path}
           render={() => {
             if (showUpdateModal) {
-              return <Redirect to={`/robots/${robot.name}/update`} />
+              return <Redirect to={`${url}/${UPDATE_FRAGMENT}`} />
             }
 
             // only show homing spinner and error on main page

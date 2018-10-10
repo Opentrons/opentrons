@@ -6,7 +6,7 @@ import {withRouter, Route, Switch, Redirect, type Match} from 'react-router'
 
 import createLogger from '../../logger'
 import {selectors as robotSelectors} from '../../robot'
-import {getConnectableRobots, getReachableRobots} from '../../discovery'
+import {CONNECTABLE, getConnectableRobots, getReachableRobots} from '../../discovery'
 
 import {Splash} from '@opentrons/components'
 import Page from '../../components/Page'
@@ -53,7 +53,7 @@ function Robots (props: Props) {
 
   return (
     <Switch>
-      {robot.status === 'connectable' && (
+      {robot.status === CONNECTABLE && (
         <Route
           path={`${path}/instruments`}
           render={props => (<InstrumentSettings {...props} robot={robot} />)}

@@ -2,6 +2,10 @@
 
 import type {Service} from '@opentrons/discovery-client'
 
+export type ConnectableStatus = 'connectable'
+export type ReachableStatus = 'reachable'
+export type UnreachableStatus = 'unreachable'
+
 // service with a known IP address
 export type ResolvedRobot = {
   ...$Exact<Service>,
@@ -16,7 +20,7 @@ export type Robot = {
   ...$Exact<ResolvedRobot>,
   ok: true,
   health: $NonMaybeType<$PropertyType<Service, 'health'>>,
-  status: 'connectable',
+  status: ConnectableStatus,
   connected: boolean,
 }
 
@@ -24,13 +28,15 @@ export type Robot = {
 export type ReachableRobot = {
   ...$Exact<ResolvedRobot>,
   ok: false,
-  status: 'reachable',
+  status: ReachableStatus,
 }
-
-export type ViewableRobot = Robot | ReachableRobot
 
 // robot with an unknown IP
 export type UnreachableRobot = {
   ...$Exact<Service>,
-  status: 'unreachable',
+  status: UnreachableStatus,
 }
+
+export type ViewableRobot = Robot | ReachableRobot
+
+export type AnyRobot = Robot | ReachableRobot | UnreachableRobot

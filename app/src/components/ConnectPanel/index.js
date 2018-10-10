@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
+import orderBy from 'lodash/orderBy'
 
 import type {State, Dispatch} from '../../types'
 
@@ -16,7 +17,6 @@ import {SidePanel} from '@opentrons/components'
 import RobotList from './RobotList'
 import RobotItem from './RobotItem'
 import ScanStatus from './ScanStatus'
-import ReachableRobotItem from './ReachableRobotItem'
 import UnreachableRobotItem from './UnreachableRobotItem'
 
 import type {Robot, ReachableRobot, UnreachableRobot} from '../../discovery'
@@ -50,7 +50,7 @@ function ConnectPanel (props: Props) {
       <RobotList>
         {props.robots.map(robot => <RobotItem key={robot.name} {...robot} />)}
         {props.reachableRobots.map(robot => (
-          <ReachableRobotItem key={robot.name} {...robot} />
+          <RobotItem key={robot.name} {...robot} />
         ))}
         {props.unreachableRobots.map(robot => (
           <UnreachableRobotItem key={robot.name} {...robot} />
@@ -60,13 +60,19 @@ function ConnectPanel (props: Props) {
   )
 }
 
+const robotOrder = [['connected', 'local', 'name'], ['desc', 'desc', 'asc']]
+const reachableOrder = [['local', 'name'], ['desc', 'asc']]
+const unreachableOrder = [['name'], ['asc']]
+
 function mapStateToProps (state: State): StateProps {
   const robots = getConnectableRobots(state)
+  const reachableRobots = getReachableRobots(state)
+  const unreachableRobots = getUnreachableRobots(state)
 
   return {
-    robots,
-    reachableRobots: getReachableRobots(state),
-    unreachableRobots: getUnreachableRobots(state),
+    robots: orderBy(robots, ...robotOrder),
+    reachableRobots: orderBy(reachableRobots, ...reachableOrder),
+    unreachableRobots: orderBy(unreachableRobots, ...unreachableOrder),
     found: robots.length > 0,
     isScanning: getScanning(state),
   }

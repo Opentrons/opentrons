@@ -11,7 +11,7 @@ import {
 } from '../../http-api-client'
 
 import {selectors as robotSelectors} from '../../robot'
-
+import {CONNECTABLE} from '../../discovery'
 import {RefreshCard} from '@opentrons/components'
 import {LabeledToggle, LabeledButton} from '../controls'
 
@@ -39,26 +39,33 @@ type Props = {
 
 const TITLE = 'Robot Controls'
 
-export default connect(makeMakeStateToProps, null, mergeProps)(ControlsCard)
+export default connect(
+  makeMakeStateToProps,
+  null,
+  mergeProps
+)(ControlsCard)
 
 function ControlsCard (props: Props) {
   const {lightsOn, fetchLights, toggleLights, homeAll, homeEnabled} = props
-  const {name} = props.robot
+  const {name, status} = props.robot
+  const disabled = status !== CONNECTABLE
 
   return (
-    <RefreshCard title={TITLE} watch={name} refresh={fetchLights} column>
-      <LabeledToggle
-        label='Lights'
-        toggledOn={lightsOn}
-        onClick={toggleLights}
-      >
+    <RefreshCard
+      title={TITLE}
+      watch={name}
+      refresh={fetchLights}
+      disabled={disabled}
+      column
+    >
+      <LabeledToggle label="Lights" toggledOn={lightsOn} onClick={toggleLights}>
         <p>Control lights on deck.</p>
       </LabeledToggle>
       <LabeledButton
-        label='Home all axes'
+        label="Home all axes"
         buttonProps={{
           onClick: homeAll,
-          disabled: !homeEnabled,
+          disabled: disabled || !homeEnabled,
           children: 'Home',
         }}
       >

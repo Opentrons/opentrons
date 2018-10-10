@@ -17,6 +17,9 @@ import type {
   Robot,
   ReachableRobot,
   UnreachableRobot,
+  ConnectableStatus,
+  ReachableStatus,
+  UnreachableStatus,
 } from './types'
 
 type GroupedRobotsMap = {
@@ -31,6 +34,10 @@ type GetGroupedRobotsMap = Selector<State, void, GroupedRobotsMap>
 type GetConnectableRobots = Selector<State, void, Array<Robot>>
 type GetReachableRobots = Selector<State, void, Array<ReachableRobot>>
 type GetUnreachableRobots = Selector<State, void, Array<UnreachableRobot>>
+
+export const CONNECTABLE: ConnectableStatus = 'connectable'
+export const REACHABLE: ReachableStatus = 'reachable'
+export const UNREACHABLE: UnreachableStatus = 'unreachable'
 
 const isResolved = (s: Service) =>
   s.ip != null && s.local != null && s.ok != null && s.serverOk != null
@@ -53,10 +60,10 @@ const getGroupedRobotsMap: GetGroupedRobotsMap = createSelector(
       const servicesWithStatus = services.map(s => {
         const resolved = maybeGetResolved(s)
         if (resolved) {
-          if (isConnectable(resolved)) return {...s, status: 'connectable'}
-          if (isReachable(resolved)) return {...s, status: 'reachable'}
+          if (isConnectable(resolved)) return {...s, status: CONNECTABLE}
+          if (isReachable(resolved)) return {...s, status: REACHABLE}
         }
-        return {...s, status: 'unreachable'}
+        return {...s, status: UNREACHABLE}
       })
 
       return groupBy(servicesWithStatus, 'status')

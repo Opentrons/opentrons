@@ -53,7 +53,7 @@ export default class ConfigureWifiForm extends React.Component<Props, State> {
         className={styles.configure_form}
       >
         <label className={styles.configure_label}>
-          {'WiFi network:'}
+          <p>WiFi network:</p>
           <Select
             name='ssid'
             value={ssid}
@@ -64,7 +64,7 @@ export default class ConfigureWifiForm extends React.Component<Props, State> {
           />
         </label>
         <label className={styles.configure_label}>
-          {'Password:'}
+          <p>Password:</p>
           <TextInput
             type='password'
             name='psk'

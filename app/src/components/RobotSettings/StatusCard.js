@@ -7,6 +7,7 @@ import capitalize from 'lodash/capitalize'
 import {selectors as robotSelectors, actions as robotActions} from '../../robot'
 
 import {Card, LabeledValue, OutlineButton} from '@opentrons/components'
+import {CONNECTABLE} from '../../discovery'
 import {CardContentHalf} from '../layout'
 
 import type {State, Dispatch} from '../../types'
@@ -36,14 +37,18 @@ export default connect(
 )(StatusCard)
 
 function StatusCard (props: Props) {
-  const {status, connectButtonText, onClick} = props
+  const {robot, connectButtonText, onClick} = props
+  const disabled = robot.status !== CONNECTABLE
+
   return (
-    <Card title={TITLE}>
+    <Card title={TITLE} disabled={disabled}>
       <CardContentHalf>
         <LabeledValue label={STATUS_LABEL} value={status} />
       </CardContentHalf>
       <CardContentHalf>
-        <OutlineButton onClick={onClick}>{connectButtonText}</OutlineButton>
+        <OutlineButton onClick={onClick} disabled={disabled}>
+          {connectButtonText}
+        </OutlineButton>
       </CardContentHalf>
     </Card>
   )

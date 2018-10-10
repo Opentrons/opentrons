@@ -3,6 +3,7 @@
 import * as React from 'react'
 import {NotificationIcon, Icon} from '@opentrons/components'
 
+import {CONNECTABLE} from '../../discovery'
 import {ToggleButton} from '../controls'
 import RobotLink from './RobotLink'
 import styles from './styles.css'
@@ -14,12 +15,14 @@ export function RobotListItem (props: RobotItemProps) {
   const {
     name,
     local,
+    status,
     connected,
     selected,
     upgradable,
     connect,
     disconnect,
   } = props
+  const connectable = status === CONNECTABLE
   const onClick = connected ? disconnect : connect
 
   return (
@@ -34,21 +37,26 @@ export function RobotListItem (props: RobotItemProps) {
 
         <p className={styles.link_text}>{name}</p>
 
-        <ToggleButton
-          toggledOn={connected}
-          onClick={onClick}
-          className={styles.robot_item_icon}
-        />
-      </RobotLink>
-      {selected && (
-        <RobotLink
-          url={`/robots/${name}/instruments`}
-          className={styles.instrument_item}
-        >
-          <p className={styles.link_text}>Pipettes & Modules</p>
+        {connectable ? (
+          <ToggleButton
+            toggledOn={connected}
+            onClick={onClick}
+            className={styles.robot_item_icon}
+          />
+        ) : (
           <Icon name="chevron-right" className={styles.robot_item_icon} />
-        </RobotLink>
-      )}
+        )}
+      </RobotLink>
+      {connectable &&
+        selected && (
+          <RobotLink
+            url={`/robots/${name}/instruments`}
+            className={styles.instrument_item}
+          >
+            <p className={styles.link_text}>Pipettes & Modules</p>
+            <Icon name="chevron-right" className={styles.robot_item_icon} />
+          </RobotLink>
+        )}
     </li>
   )
 }

@@ -3,7 +3,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 
-import {startDiscovery} from '../../discovery'
+import {CONNECTABLE, startDiscovery} from '../../discovery'
 import {
   fetchWifiList,
   configureWifi,
@@ -56,25 +56,20 @@ function ConnectivityCard (props: Props) {
     clearSuccessfulConfigure,
     clearFailedConfigure,
     configure,
-    robot: {ip, local, name},
-    listRequest: {
-      inProgress: listInProgress,
-      response: listResponse,
-    },
+    robot: {ip, local, name, status},
+    listRequest: {inProgress: listInProgress, response: listResponse},
     configureRequest: {
       inProgress: configInProgress,
       response: configResponse,
       error: configError,
     },
   } = props
-
+  const disabled = status !== CONNECTABLE
   const list = (listResponse && listResponse.list) || []
 
-  const active = list.find((network) => network.active)
+  const active = list.find(network => network.active)
   const activeSsid = active && active.ssid
-  const connectedBy = local
-    ? 'USB'
-    : `${activeSsid || ''} (WiFi)`
+  const connectedBy = local ? 'USB' : `${activeSsid || ''} (WiFi)`
 
   const listOptions = list.map(({active, ssid}) => ({
     name: active ? `${ssid} *` : ssid,
@@ -88,6 +83,7 @@ function ConnectivityCard (props: Props) {
         refresh={fetchList}
         refreshing={listInProgress || configInProgress}
         title={TITLE}
+        disabled={disabled}
         column
       >
         <CardContentFull>
@@ -108,10 +104,7 @@ function ConnectivityCard (props: Props) {
         <WifiConnectModal
           error={configError}
           response={configResponse}
-          close={(configError
-            ? clearFailedConfigure
-            : clearSuccessfulConfigure
-          )}
+          close={configError ? clearFailedConfigure : clearSuccessfulConfigure}
         />
       )}
     </React.Fragment>
@@ -140,9 +133,10 @@ function mapDispatchToProps (
   //   more elegantly and closer to the configure response
   const clearConfigureAction = clearConfigureWifiResponse(robot)
   const clearFailedConfigure = () => dispatch(clearConfigureAction)
-  const clearSuccessfulConfigure = () => fetchList()
-    .then(() => dispatch(startDiscovery()))
-    .then(() => dispatch(clearConfigureAction))
+  const clearSuccessfulConfigure = () =>
+    fetchList()
+      .then(() => dispatch(startDiscovery()))
+      .then(() => dispatch(clearConfigureAction))
 
   return {
     fetchList,
