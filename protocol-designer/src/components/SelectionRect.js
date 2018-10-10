@@ -43,6 +43,7 @@ class SelectionRect extends React.Component<Props, State> {
       const clientRect: {width: number, height: number, left: number, top: number} = parentRef.getBoundingClientRect()
       const viewBox: {width: number, height: number} = parentRef.closest('svg').viewBox.baseVal // WARNING: elem.closest() is experiemental
 
+      console.log(viewBox)
       const xScale = viewBox.width / clientRect.width
       const yScale = viewBox.height / clientRect.height
 

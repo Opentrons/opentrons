@@ -5,7 +5,7 @@ import {SLOT_WIDTH_MM, SLOT_HEIGHT_MM} from '../constants.js'
 import styles from './SingleLabware.css'
 
 type Props = {className?: string, children?: React.Node}
-const LABEL_OFFSET = 8
+const LABEL_OFFSET = 4
 
 /** Simply wraps SVG components like Plate/SelectablePlate with correct dimensions */
 export default function SingleLabware (props: Props) {

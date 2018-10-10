@@ -1,6 +1,13 @@
-"name_labware": {
-    "nickname_placeholder": "Add a nickname?",
-    "add_liquids": "Add Liquids",
-    "leave_empty": "Leave Empty"
+{
+  "header": {
+    "start": "Tell the robot where labware and liquids start on the deck",
+    "end": "Click on labware to inspect the result of your protocol"
+  },
+  "overlay": {
+    "name_labware": {
+      "nickname_placeholder": "Add a nickname?",
+      "add_liquids": "Add Liquids",
+      "leave_empty": "Leave Empty"
+    }
   }
 }

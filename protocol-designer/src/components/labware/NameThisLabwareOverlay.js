@@ -61,16 +61,16 @@ export default class NameThisLabwareOverlay extends React.Component<Props, State
                   className={styles.name_input}
                   onChange={this.handleChange}
                   onKeyUp={this.handleKeyUp}
-                  placeholder={i18n.t('labware_overlays.name_labware.nickname_placeholder')}
+                  placeholder={i18n.t('deck.overlay.name_labware.nickname_placeholder')}
                   value={this.state.inputValue}
                 />
               </ForeignDiv>
 
               <ClickableText onClick={this.onAddLiquids}
-                iconName='water' y='50%' text={i18n.t('labware_overlays.name_labware.add_liquids')} />
+                iconName='water' y='50%' text={i18n.t('deck.overlay.name_labware.add_liquids')} />
 
               <ClickableText onClick={this.onSubmit}
-                iconName='ot-water-outline' y='75%' text={i18n.t('labware_overlays.name_labware.leave_empty')} />
+                iconName='ot-water-outline' y='75%' text={i18n.t('deck.overlay.name_labware.leave_empty')} />
             </g>
           </g>
         )}

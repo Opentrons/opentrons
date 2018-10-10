@@ -4,6 +4,7 @@ import {connect} from 'react-redux'
 
 import {Deck, ClickOutside} from '@opentrons/components'
 import styles from './Deck.css'
+import i18n from '../localization'
 
 import IngredientSelectionModal from '../components/IngredientSelectionModal.js'
 import LabwareContainer from '../containers/LabwareContainer.js'
@@ -19,7 +20,7 @@ import type {BaseState, ThunkDispatch} from '../types'
 const ingredSelModIsVisible = activeModals => activeModals.ingredientSelection && activeModals.ingredientSelection.slot
 
 type StateProps = {
-  deckSetupMode: boolean,
+  selectedTerminalItemId: boolean,
   ingredSelectionMode: boolean,
   drilledDown: boolean,
   _moveLabwareMode: boolean,
@@ -29,7 +30,7 @@ type DispatchProps = {
   drillUpFromLabware: () => mixed,
 }
 type Props = {
-  deckSetupMode: boolean,
+  selectedTerminalItemId: boolean,
   header: string,
   drilledDown: boolean,
   ingredSelectionMode: boolean,
@@ -37,9 +38,7 @@ type Props = {
 }
 
 const mapStateToProps = (state: BaseState): StateProps => ({
-  deckSetupMode: (
-    steplistSelectors.getSelectedTerminalItemId(state) === START_TERMINAL_ITEM_ID
-  ),
+  selectedTerminalItemId: steplistSelectors.getSelectedTerminalItemId(state),
   // TODO SOON remove all uses of the `activeModals` selector
   ingredSelectionMode: !!ingredSelModIsVisible(selectors.activeModals(state)),
   drilledDown: !!selectors.getDrillDownLabwareId(state),
@@ -52,7 +51,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DispatchProps => ({
 })
 
 const mergeProps = (stateProps: StateProps, dispatchProps: DispatchProps): Props => ({
-  deckSetupMode: stateProps.deckSetupMode,
+  selectedTerminalItemId: stateProps.selectedTerminalItemId,
   ingredSelectionMode: stateProps.ingredSelectionMode,
   drilledDown: stateProps.drilledDown,
   handleClickOutside: () => {
@@ -63,24 +62,33 @@ const mergeProps = (stateProps: StateProps, dispatchProps: DispatchProps): Props
 
 // TODO Ian 2018-02-16 this will be broken apart and incorporated into ProtocolEditor
 class DeckSetup extends React.Component<Props> {
-  renderDeck = () => (
-    <React.Fragment>
-      <div className={styles.deck_header}>{this.props.header}</div>
-      <div className={styles.deck_row}>
-        {this.props.drilledDown && <BrowseLabwareModal />}
-        <ClickOutside onClickOutside={this.props.handleClickOutside}>
-          {({ref}) => (
-            <div ref={ref}>
-              <Deck LabwareComponent={LabwareContainer} className={styles.deck} />
-            </div>
-          )}
-        </ClickOutside>
-      </div>
-    </React.Fragment>
-  )
+  renderDeck = () => {
+    const {selectedTerminalItemId} = this.props
+    return (
+      <React.Fragment>
+        <div className={styles.deck_header}>
+          {
+            selectedTerminalItemId
+              ? i18n.t(`deck.header.${selectedTerminalItemId === START_TERMINAL_ITEM_ID ? 'start' : 'end'}`)
+              : null
+          }
+        </div>
+        <div className={styles.deck_row}>
+          {this.props.drilledDown && <BrowseLabwareModal />}
+          <ClickOutside onClickOutside={this.props.handleClickOutside}>
+            {({ref}) => (
+              <div ref={ref}>
+                <Deck LabwareComponent={LabwareContainer} className={styles.deck} />
+              </div>
+            )}
+          </ClickOutside>
+        </div>
+      </React.Fragment>
+    )
+  }
 
   render () {
-    if (!this.props.deckSetupMode) {
+    if (this.props.selectedTerminalItemId !== START_TERMINAL_ITEM_ID) {
       // Temporary quickfix: if we're not in deck setup mode,
       // hide the labware dropdown and ingredient selection modal
       // and just show the deck.
