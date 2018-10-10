@@ -1,9 +1,8 @@
 [run]
-omit =
-    */python?.?/*
-    */lib-python/?.?/*.py
-    */lib_pypy/_*.py
-    */site-packages/ordereddict.py
-    */site-packages/nose/*
-    */tests/*
-    opentrons/_version.py
+include =
+    */site-packages/opentrons/*
+
+[paths]
+source =
+    src/opentrons
+    */site-packages/opentrons

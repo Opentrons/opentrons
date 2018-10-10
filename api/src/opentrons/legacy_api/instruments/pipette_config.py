@@ -6,7 +6,8 @@ from opentrons import __file__ as root_file
 
 
 root_dir = os.path.abspath(os.path.dirname(root_file))
-config_file = os.path.join(root_dir, 'config', 'pipette-config.json')
+config_file = os.path.join(root_dir,
+                           'shared_data', 'robot-data', 'pipette-config.json')
 log = logging.getLogger(__name__)
 
 pipette_config = namedtuple(

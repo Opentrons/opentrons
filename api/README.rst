@@ -102,3 +102,10 @@ Below is a short protocol that will pick up a tip and use it to move 100ul volum
       p300.dispense(plate[i + 1])
 
   p300.return_tip()
+
+Using This Repo Outside Of A Robot
+----------------------------------
+
+The code in this subdirectory can be used outside of a robot to check protocols; however, because the code requires extra shared data files and dependencies, you cannot simply run a python interpreter.
+
+To use the opentrons API locally, please run ``make install`` to set up your system. Then, running ``make local-shell`` will give you a shell with the opentrons module all set up and ready to be imported.
