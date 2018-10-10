@@ -37,7 +37,6 @@ export default connect(
 
 function StatusCard (props: Props) {
   const {status, connectButtonText, onClick} = props
-
   return (
     <Card title={TITLE}>
       <CardContentHalf>

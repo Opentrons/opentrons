@@ -55,7 +55,7 @@ const getFirmwareVersion = robot =>
 function InformationCard (props: Props) {
   const {robot, updateInfo, fetchHealth, updateUrl, checkAppUpdate} = props
 
-  const {name} = robot
+  const {name, serverOk} = robot
   const version = getApiVersion(robot)
   const firmwareVersion = getFirmwareVersion(robot)
   const updateText = updateInfo.type || 'Reinstall'
@@ -72,7 +72,12 @@ function InformationCard (props: Props) {
         <LabeledValue label={FIRMWARE_VERSION_LABEL} value={firmwareVersion} />
       </CardContentQuarter>
       <CardContentQuarter>
-        <OutlineButton Component={Link} to={updateUrl} onClick={checkAppUpdate}>
+        <OutlineButton
+          Component={Link}
+          to={updateUrl}
+          onClick={checkAppUpdate}
+          disabled={!serverOk}
+        >
           {updateText}
         </OutlineButton>
       </CardContentQuarter>
