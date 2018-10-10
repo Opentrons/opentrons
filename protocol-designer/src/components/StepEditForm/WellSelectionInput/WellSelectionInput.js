@@ -27,6 +27,7 @@ class WellSelectionInput extends React.Component<Props, State> {
   }
 
   render () {
+    const modalKey = `${this.props.name}${this.props.pipetteId || 'noPipette'}${this.props.labwareId || 'noLabware'}${String(this.state.isModalOpen)}`
     return (
       <FormGroup
         label={this.props.isMulti ? 'Columns:' : 'Wells:'}
@@ -40,7 +41,7 @@ class WellSelectionInput extends React.Component<Props, State> {
           error={this.props.errorToShow} />
         <Portal>
           <WellSelectionModal
-            key={`${this.props.name}${this.props.pipetteId || 'noPipette'}${this.props.labwareId || 'noLabware'}${String(this.state.isModalOpen)}`}
+            key={modalKey}
             pipetteId={this.props.pipetteId}
             labwareId={this.props.labwareId}
             isOpen={this.state.isModalOpen}

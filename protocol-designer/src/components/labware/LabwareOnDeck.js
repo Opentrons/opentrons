@@ -145,10 +145,9 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
       this.props.moveLabwareMode ||
       nextProps.moveLabwareMode
 
-    const labwarePresenceChange = (this.props.containerId && !nextProps.containerId) ||
-      (!this.props.containerId && nextProps.containerId)
-    const nameOverlayChange = (this.props.showNameOverlay && !nextProps.showNameOverlay) ||
-      (!this.props.showNameOverlay && nextProps.showNameOverlay)
+    const labwarePresenceChange = this.props.containerId !== nextProps.containerId
+    const nameOverlayChange = this.props.showNameOverlay !== nextProps.showNameOverlay
+
     if (shouldAlwaysUpdate || labwarePresenceChange || nameOverlayChange) return true
     return this.props.highlighted !== nextProps.highlighted
   }
