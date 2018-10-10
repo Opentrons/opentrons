@@ -13,14 +13,14 @@ import BrowseLabwareModal from '../components/labware/BrowseLabwareModal'
 
 import {selectors} from '../labware-ingred/reducers'
 import * as actions from '../labware-ingred/actions'
-import {selectors as steplistSelectors, START_TERMINAL_ITEM_ID} from '../steplist'
+import {selectors as steplistSelectors, START_TERMINAL_ITEM_ID, type TerminalItemId} from '../steplist'
 
 import type {BaseState, ThunkDispatch} from '../types'
 
 const ingredSelModIsVisible = activeModals => activeModals.ingredientSelection && activeModals.ingredientSelection.slot
 
 type StateProps = {
-  selectedTerminalItemId: boolean,
+  selectedTerminalItemId: ?TerminalItemId,
   ingredSelectionMode: boolean,
   drilledDown: boolean,
   _moveLabwareMode: boolean,
@@ -30,8 +30,7 @@ type DispatchProps = {
   drillUpFromLabware: () => mixed,
 }
 type Props = {
-  selectedTerminalItemId: boolean,
-  header: string,
+  selectedTerminalItemId: ?TerminalItemId,
   drilledDown: boolean,
   ingredSelectionMode: boolean,
   handleClickOutside: () => void,
