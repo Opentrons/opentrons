@@ -4,12 +4,17 @@ This package defines classes and functions for access through a protocol to
 control the OT2.
 
 """
+from collections import UserDict
 import enum
+import logging
 import os
 from typing import List, Dict
 
 from opentrons.protocol_api.labware import Well, Labware, load
+from opentrons import types
 from . import back_compat
+
+MODULE_LOG = logging.getLogger(__name__)
 
 
 def run(protocol_bytes: bytes = None,
@@ -52,21 +57,22 @@ class ProtocolContext:
     """
 
     def __init__(self):
-        pass
+        self._deck_layout = Deck()
 
     def load_labware(
-            self, labware_obj: Labware, location: str,
-            label: str = None, share: bool = False):
+            self, labware_obj: Labware, location: types.DeckLocation,
+            label: str = None, share: bool = False) -> Labware:
         """ Specify the presence of a piece of labware on the OT2 deck.
 
         This function loads the labware specified by ``labware``
         (previously loaded from a configuration file) to the location
         specified by ``location``.
         """
-        pass
+        self._deck_layout[location] = labware_obj
+        return labware_obj
 
     def load_labware_by_name(
-            self, labware_name: str, location: str) -> Labware:
+            self, labware_name: str, location: types.DeckLocation) -> Labware:
         """ A convenience function to specify a piece of labware by name.
 
         For labware already defined by Opentrons, this is a convient way
@@ -76,18 +82,18 @@ class ProtocolContext:
         This function returns the created and initialized labware for use
         later in the protocol.
         """
-        labware = load(labware_name, location)
-        self.load_labware(labware, location)
-        return labware
+        labware = load(labware_name,
+                       self._deck_layout.position_for(location))
+        return self.load_labware(labware, location)
 
     @property
-    def loaded_labwares(self) -> Dict[str, Labware]:
+    def loaded_labwares(self) -> Dict[int, Labware]:
         """ Get the labwares that have been loaded into the protocol context.
 
         The return value is a dict mapping locations to labware, sorted
         in order of the locations.
         """
-        pass
+        return dict(self._deck_layout)
 
     def load_instrument(
             self, instrument_name: str, mount: str) \
@@ -283,6 +289,7 @@ class InstrumentContext:
 
         :param amps: The current, in amperes. Acceptable values: (0.0, 2.0)
         """
+        pass
 
     @property
     def type(self) -> TYPE:
@@ -308,3 +315,62 @@ class InstrumentContext:
     @trash_container.setter
     def trash_container(self, trash: Labware):
         pass
+
+
+class Deck(UserDict):
+    def __init__(self):
+        super().__init__()
+        row_offset = 90.5
+        col_offset = 132.5
+        for idx in range(1, 13):
+            self.data[idx] = None
+        self._positions = {idx+1: types.Point((idx % 3) * col_offset,
+                                              idx//3 * row_offset,
+                                              0)
+                           for idx in range(12)}
+
+    @staticmethod
+    def _assure_int(key: object) -> int:
+        if isinstance(key, str):
+            return int(key)
+        elif isinstance(key, int):
+            return key
+        else:
+            raise TypeError(type(key))
+
+    def _check_name(self, key: object) -> int:
+        should_raise = False
+        try:
+            key_int = Deck._assure_int(key)
+        except Exception:
+            MODULE_LOG.exception("Bad slot name: {}".format(key))
+            should_raise = True
+        should_raise = should_raise or key_int not in self.data
+        if should_raise:
+            raise ValueError("Unknown slot: {}".format(key))
+        else:
+            return key_int
+
+    def __getitem__(self, key: types.DeckLocation) -> Labware:
+        return self.data[self._check_name(key)]
+
+    def __delitem__(self, key: types.DeckLocation) -> None:
+        self.data[self._check_name(key)] = None
+
+    def __setitem__(self, key: types.DeckLocation, val: Labware) -> None:
+        key_int = self._check_name(key)
+        if self.data.get(key_int) is not None:
+            raise ValueError('Deck location {} already has an item: {}'
+                             .format(key, self.data[key_int]))
+        self.data[key_int] = val
+
+    def __contains__(self, key: object) -> bool:
+        try:
+            key_int = self._check_name(key)
+        except ValueError:
+            return False
+        return key_int in self.data
+
+    def position_for(self, key: types.DeckLocation) -> types.Point:
+        key_int = self._check_name(key)
+        return self._positions[key_int]

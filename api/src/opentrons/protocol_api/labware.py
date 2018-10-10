@@ -123,7 +123,9 @@ class Labware:
                           for well in col]
         self._wells = definition['wells']
         offset = definition['cornerOffsetFromSlot']
-        self._offset = Point(x=offset['x'], y=offset['y'], z=offset['z'])
+        self._offset = Point(x=offset['x'] + parent.x,
+                             y=offset['y'] + parent.y,
+                             z=offset['z'] + parent.z)
         self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
 
     def wells(self) -> List[Well]:
@@ -226,28 +228,18 @@ def _load_definition_by_name(name: str) -> dict:
     raise NotImplementedError
 
 
-def _get_slot_position(slot: str) -> Point:
-    """
-    :param slot: a string corresponding to a slot on the deck
-    :return: a Point representing the position of the lower-left corner of the
-        slot
-    """
-    raise NotImplementedError
-
-
-def load(name: str, slot: str) -> Labware:
+def load(name: str, ll_at: Point) -> Labware:
     """
     Return a labware object constructed from a labware definition dict looked
     up by name (definition must have been previously stored locally on the
     robot)
     """
     definition = _load_definition_by_name(name)
-    return load_from_definition(definition, slot)
+    return load_from_definition(definition, ll_at)
 
 
-def load_from_definition(definition: dict, slot: str) -> Labware:
+def load_from_definition(definition: dict, ll_at: Point) -> Labware:
     """
     Return a labware object constructed from a provided labware definition dict
     """
-    point = _get_slot_position(slot)
-    return Labware(definition, point)
+    return Labware(definition, ll_at)

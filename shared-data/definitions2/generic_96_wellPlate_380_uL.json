@@ -136,6 +136,7 @@
             "generic"
         ]
     },
+    "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0},
     "dimensions": {
         "overallLength": 127.76,
         "overallWidth": 85.48,
