@@ -7,11 +7,7 @@ import {getProtocolFilename} from '../../protocol'
 export default connect(mapStateToProps)(SessionHeader)
 
 function SessionHeader (props) {
-  return (
-    <Link to='/upload'>
-      {props.sessionName}
-    </Link>
-  )
+  return <Link to="/upload">{props.sessionName}</Link>
 }
 
 function mapStateToProps (state) {

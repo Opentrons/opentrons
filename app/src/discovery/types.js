@@ -9,6 +9,7 @@ export type UnreachableStatus = 'unreachable'
 // service with a known IP address
 export type ResolvedRobot = {
   ...$Exact<Service>,
+  displayName: string,
   ip: $NonMaybeType<$PropertyType<Service, 'ip'>>,
   local: $NonMaybeType<$PropertyType<Service, 'local'>>,
   ok: $NonMaybeType<$PropertyType<Service, 'ok'>>,
@@ -34,6 +35,7 @@ export type ReachableRobot = {
 // robot with an unknown IP
 export type UnreachableRobot = {
   ...$Exact<Service>,
+  displayName: string,
   status: UnreachableStatus,
 }
 

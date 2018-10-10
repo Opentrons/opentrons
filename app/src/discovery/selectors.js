@@ -59,16 +59,27 @@ const getGroupedRobotsMap: GetGroupedRobotsMap = createSelector(
     mapValues(robotsMap, services => {
       const servicesWithStatus = services.map(s => {
         const resolved = maybeGetResolved(s)
+        const displayName = makeDisplayName(s)
         if (resolved) {
-          if (isConnectable(resolved)) return {...s, status: CONNECTABLE}
-          if (isReachable(resolved)) return {...s, status: REACHABLE}
+          if (isConnectable(resolved)) {
+            return {...s, status: CONNECTABLE, displayName}
+          }
+          if (isReachable(resolved)) {
+            return {...s, status: REACHABLE, displayName}
+          }
         }
-        return {...s, status: UNREACHABLE}
+        return {...s, status: UNREACHABLE, displayName}
       })
 
       return groupBy(servicesWithStatus, 'status')
     })
 )
+
+function makeDisplayName (robot: Service) {
+  const {name} = robot
+  const displayName = name.replace('opentrons-', '')
+  return displayName
+}
 
 export const getConnectableRobots: GetConnectableRobots = createSelector(
   getGroupedRobotsMap,

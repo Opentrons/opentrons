@@ -74,7 +74,7 @@ function RobotSettingsPage (props: Props) {
     match: {path, url},
   } = props
 
-  const titleBarProps = {title: robot.name}
+  const titleBarProps = {title: robot.displayName}
   const updateUrl = `${url}/${UPDATE_FRAGMENT}`
   const calibrateDeckUrl = `${url}/${CALIBRATE_DECK_FRAGMENT}`
   const resetUrl = `${url}/${RESET_FRAGMENT}`

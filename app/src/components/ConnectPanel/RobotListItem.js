@@ -14,6 +14,7 @@ import type {RobotItemProps} from './RobotItem'
 export function RobotListItem (props: RobotItemProps) {
   const {
     name,
+    displayName,
     local,
     status,
     connected,
@@ -35,7 +36,7 @@ export function RobotListItem (props: RobotItemProps) {
           childClassName={styles.notification}
         />
 
-        <p className={styles.link_text}>{name}</p>
+        <p className={styles.link_text}>{displayName}</p>
 
         {connectable ? (
           <ToggleButton
