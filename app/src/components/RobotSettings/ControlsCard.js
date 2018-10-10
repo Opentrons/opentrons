@@ -11,25 +11,27 @@ import {
 } from '../../http-api-client'
 
 import {selectors as robotSelectors} from '../../robot'
-
+import {CONNECTABLE} from '../../discovery'
 import {RefreshCard} from '@opentrons/components'
 import {LabeledToggle, LabeledButton} from '../controls'
 
 import type {State, Dispatch} from '../../types'
-import type {Robot} from '../../robot'
+import type {ViewableRobot} from '../../discovery'
 
-type OP = Robot
+type OP = {robot: ViewableRobot}
 
-type SP = {
+type SP = {|
   lightsOn: boolean,
   homeEnabled: boolean,
-}
+|}
 
-type DP = {
+type DP = {|
   dispatch: Dispatch,
-}
+|}
 
-type Props = OP & SP & {
+type Props = {
+  ...$Exact<OP>,
+  ...SP,
   homeAll: () => mixed,
   fetchLights: () => mixed,
   toggleLights: () => mixed,
@@ -37,25 +39,33 @@ type Props = OP & SP & {
 
 const TITLE = 'Robot Controls'
 
-export default connect(makeMakeStateToProps, null, mergeProps)(ControlsCard)
+export default connect(
+  makeMakeStateToProps,
+  null,
+  mergeProps
+)(ControlsCard)
 
 function ControlsCard (props: Props) {
-  const {name, lightsOn, fetchLights, toggleLights, homeAll, homeEnabled} = props
+  const {lightsOn, fetchLights, toggleLights, homeAll, homeEnabled} = props
+  const {name, status} = props.robot
+  const disabled = status !== CONNECTABLE
 
   return (
-    <RefreshCard title={TITLE} watch={name} refresh={fetchLights} column>
-      <LabeledToggle
-        label='Lights'
-        toggledOn={lightsOn}
-        onClick={toggleLights}
-      >
+    <RefreshCard
+      title={TITLE}
+      watch={name}
+      refresh={fetchLights}
+      disabled={disabled}
+      column
+    >
+      <LabeledToggle label="Lights" toggledOn={lightsOn} onClick={toggleLights}>
         <p>Control lights on deck.</p>
       </LabeledToggle>
       <LabeledButton
-        label='Home all axes'
+        label="Home all axes"
         buttonProps={{
           onClick: homeAll,
-          disabled: !homeEnabled,
+          disabled: disabled || !homeEnabled,
           children: 'Home',
         }}
       >
@@ -69,26 +79,27 @@ function makeMakeStateToProps (): (state: State, ownProps: OP) => SP {
   const getRobotLights = makeGetRobotLights()
 
   return (state, ownProps) => {
-    const lights = getRobotLights(state, ownProps)
-    const connectedName = robotSelectors.getConnectedRobotName(state)
+    const {robot} = ownProps
+    const lights = getRobotLights(state, robot)
     const isRunning = robotSelectors.getIsRunning(state)
 
     return {
       lightsOn: !!(lights && lights.response && lights.response.on),
-      homeEnabled: connectedName === ownProps.name && !isRunning,
+      homeEnabled: robot.connected === true && !isRunning,
     }
   }
 }
 
 function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
+  const {robot} = ownProps
   const {lightsOn} = stateProps
   const {dispatch} = dispatchProps
 
   return {
     ...ownProps,
     ...stateProps,
-    homeAll: () => dispatch(home(ownProps)),
-    fetchLights: () => dispatch(fetchRobotLights(ownProps)),
-    toggleLights: () => dispatch(setRobotLights(ownProps, !lightsOn)),
+    homeAll: () => dispatch(home(robot)),
+    fetchLights: () => dispatch(fetchRobotLights(robot)),
+    toggleLights: () => dispatch(setRobotLights(robot, !lightsOn)),
   }
 }

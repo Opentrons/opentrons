@@ -3,13 +3,13 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 
-import type {State, Dispatch} from '../../types'
-import type {Module} from '../../http-api-client'
-import type {Robot} from '../../robot'
-
 import {RefreshCard} from '@opentrons/components'
 import {fetchModules, makeGetRobotModules} from '../../http-api-client'
 import ModulesCardContents from './ModulesCardContents'
+
+import type {State, Dispatch} from '../../types'
+import type {Module} from '../../http-api-client'
+import type {Robot} from '../../discovery'
 
 type OP = Robot
 

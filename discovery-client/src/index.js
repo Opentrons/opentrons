@@ -64,7 +64,7 @@ export default function DiscoveryClientFactory (options?: Options) {
 export const SERVICE_EVENT: 'service' = 'service'
 export const SERVICE_REMOVED_EVENT: 'serviceRemoved' = 'serviceRemoved'
 export const DEFAULT_POLL_INTERVAL = 5000
-export const DEFAULT_DISCOVERY_INTERVAL = 60000
+export const DEFAULT_DISCOVERY_INTERVAL = 90000
 export {DEFAULT_PORT}
 
 const TO_REGEX_OPTS = {contains: true, nocase: true, safe: true}
@@ -210,6 +210,8 @@ export class DiscoveryClient extends EventEmitter {
 
   _rediscover (): void {
     const knownIps = getKnownIps(this._browser)
+    log(this._logger, 'debug', 'refreshing advertising flags', {knownIps})
+
     const nextServices = this.services.map(s =>
       updateService(s, {
         advertising: knownIps.includes(s.ip),

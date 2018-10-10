@@ -4,9 +4,8 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {withRouter, Route, Switch, Redirect, type Match} from 'react-router'
 
-import type {State, Dispatch, Error} from '../../types'
-import type {Robot} from '../../robot'
 import {selectors as robotSelectors, actions as robotActions} from '../../robot'
+import {CONNECTABLE, REACHABLE} from '../../discovery'
 import {
   makeGetRobotHome,
   clearHomeResponse,
@@ -24,30 +23,44 @@ import RobotSettings, {
 } from '../../components/RobotSettings'
 import CalibrateDeck from '../../components/CalibrateDeck'
 import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
+import ReachableRobotBanner from '../../components/RobotSettings/ReachableRobotBanner'
 import ResetRobotModal from '../../components/RobotSettings/ResetRobotModal'
 
-type SP = {
+import type {State, Dispatch, Error} from '../../types'
+import type {ViewableRobot} from '../../discovery'
+
+type OP = {
+  robot: ViewableRobot,
+  match: Match,
+}
+
+type SP = {|
   showUpdateModal: boolean,
   showConnectAlert: boolean,
   homeInProgress: ?boolean,
   homeError: ?Error,
-}
+|}
 
-type DP = {dispatch: Dispatch}
+type DP = {|dispatch: Dispatch|}
 
-type OP = {
-  robot: Robot,
-  match: Match,
-}
-
-type Props = SP & OP & {
+type Props = {
+  ...$Exact<OP>,
+  ...SP,
   closeHomeAlert?: () => mixed,
   closeConnectAlert: () => mixed,
 }
 
 export default withRouter(
-  connect(makeMapStateToProps, null, mergeProps)(RobotSettingsPage)
+  connect(
+    makeMapStateToProps,
+    null,
+    mergeProps
+  )(RobotSettingsPage)
 )
+
+const UPDATE_FRAGMENT = 'update'
+const CALIBRATE_DECK_FRAGMENT = 'calibrate-deck'
+const RESET_FRAGMENT = 'reset'
 
 function RobotSettingsPage (props: Props) {
   const {
@@ -62,60 +75,81 @@ function RobotSettingsPage (props: Props) {
   } = props
 
   const titleBarProps = {title: robot.name}
+  const updateUrl = `${url}/${UPDATE_FRAGMENT}`
+  const calibrateDeckUrl = `${url}/${CALIBRATE_DECK_FRAGMENT}`
+  const resetUrl = `${url}/${RESET_FRAGMENT}`
 
   // TODO(mc, 2018-05-08): pass parentUrl to RobotSettings
   return (
     <React.Fragment>
       <Page titleBarProps={titleBarProps}>
-        <ConnectBanner {...robot} key={Number(robot.isConnected)}/>
-        <RobotSettings {...robot} />
+        {robot.status === REACHABLE && (
+          <ReachableRobotBanner key={robot.name} {...robot} />
+        )}
+        {robot.status === CONNECTABLE && (
+          <ConnectBanner {...robot} key={Number(robot.connected)} />
+        )}
+
+        <RobotSettings
+          robot={robot}
+          updateUrl={updateUrl}
+          calibrateDeckUrl={calibrateDeckUrl}
+          resetUrl={resetUrl}
+        />
       </Page>
       <Switch>
-        <Route path={`${path}/update`} render={() => (
-          <RobotUpdateModal {...robot} />
-        )} />
+        <Route
+          path={`${path}/${UPDATE_FRAGMENT}`}
+          render={() => <RobotUpdateModal robot={robot} />}
+        />
 
-        <Route path={`${path}/calibrate-deck`} render={(props) => (
-          <CalibrateDeck match={props.match} robot={robot} parentUrl={url} />
-        )} />
+        <Route
+          path={`${path}/${CALIBRATE_DECK_FRAGMENT}`}
+          render={props => (
+            <CalibrateDeck match={props.match} robot={robot} parentUrl={url} />
+          )}
+        />
 
-        <Route path={`${path}/reset`} render={(props) => (
-          <ResetRobotModal robot={robot} />
-        )} />
+        <Route
+          path={`${path}/${RESET_FRAGMENT}`}
+          render={props => <ResetRobotModal robot={robot} />}
+        />
 
-        <Route exact path={path} render={() => {
-          if (showUpdateModal) {
-            return (<Redirect to={`/robots/${robot.name}/update`} />)
-          }
+        <Route
+          exact
+          path={path}
+          render={() => {
+            if (showUpdateModal) return <Redirect to={updateUrl} />
 
-          // only show homing spinner and error on main page
-          // otherwise, it will show up during homes in pipette swap
-          return (
-            <React.Fragment>
-              {homeInProgress && (
-                <SpinnerModalPage
-                  titleBar={titleBarProps}
-                  message='Robot is homing.'
-                />
-              )}
+            // only show homing spinner and error on main page
+            // otherwise, it will show up during homes in pipette swap
+            return (
+              <React.Fragment>
+                {homeInProgress && (
+                  <SpinnerModalPage
+                    titleBar={titleBarProps}
+                    message="Robot is homing."
+                  />
+                )}
 
-              {!!homeError && (
-                <ErrorModal
-                  heading='Robot unable to home'
-                  error={homeError}
-                  description='Robot was unable to home, please try again.'
-                  close={closeHomeAlert}
-                />
-              )}
-            </React.Fragment>
-          )
-        }} />
+                {!!homeError && (
+                  <ErrorModal
+                    heading="Robot unable to home"
+                    error={homeError}
+                    description="Robot was unable to home, please try again."
+                    close={closeHomeAlert}
+                  />
+                )}
+              </React.Fragment>
+            )
+          }}
+        />
       </Switch>
 
       {showConnectAlert && (
         <ConnectAlertModal onCloseClick={closeConnectAlert} />
       )}
-     </React.Fragment>
+    </React.Fragment>
   )
 }
 
@@ -132,7 +166,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     const ignoredRequest = getUpdateIgnoredRequest(state, robot)
     const restartRequest = getRestartRequest(state, robot)
     const updateInfo = getRobotUpdateInfo(state, robot)
-    const showUpdateModal = (
+    const showUpdateModal =
       // only show the alert modal if there's an upgrade available
       updateInfo.type === 'upgrade' &&
       // and we haven't already ignored the upgrade
@@ -144,7 +178,6 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
       // restartRequest.response latches this modal closed (which is fine,
       // but only for this specific modal)
       !restartRequest.response
-    )
 
     return {
       showUpdateModal: !!showUpdateModal,

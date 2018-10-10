@@ -36,3 +36,16 @@
 .update_message {
   margin-bottom: 1rem;
 }
+
+.banner {
+  @apply --font-body-1-dark;
+
+  & > p {
+    margin-bottom: 0.5rem;
+  }
+
+  & > ol {
+    padding-left: 1rem;
+    margin-bottom: 0.5rem;
+  }
+}

@@ -5,7 +5,7 @@ import {NavLink} from 'react-router-dom'
 
 import type {HoverTooltipHandlers} from '@opentrons/components'
 import cx from 'classnames'
-import styles from './connect-panel.css'
+import styles from './styles.css'
 
 type LinkProps = {
   children: React.Node,

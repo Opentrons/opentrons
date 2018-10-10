@@ -1,7 +1,7 @@
 // discovery selectors tests
 import * as discovery from '..'
 
-const makeFullyUp = (name, ip) => ({
+const makeFullyUp = (name, ip, status = null, connected = null) => ({
   name,
   ip,
   local: false,
@@ -10,27 +10,32 @@ const makeFullyUp = (name, ip) => ({
   advertising: true,
   health: {},
   serverHealth: {},
+  status,
+  connected,
 })
 
-const makeConnectable = (name, ip) => ({
+const makeConnectable = (name, ip, status = null, connected = null) => ({
   name,
   ip,
   local: false,
   ok: true,
   serverOk: false,
   health: {},
+  status,
+  connected,
 })
 
-const makeAdvertising = (name, ip) => ({
+const makeAdvertising = (name, ip, status = null) => ({
   name,
   ip,
   local: false,
   ok: false,
   serverOk: false,
   advertising: true,
+  status,
 })
 
-const makeServerUp = (name, ip, advertising) => ({
+const makeServerUp = (name, ip, advertising, status = null) => ({
   name,
   ip,
   advertising,
@@ -38,15 +43,17 @@ const makeServerUp = (name, ip, advertising) => ({
   ok: false,
   serverOk: true,
   serverHealth: {},
+  status,
 })
 
-const makeUnreachable = (name, ip) => ({
+const makeUnreachable = (name, ip, status = null) => ({
   name,
   ip,
   local: false,
   ok: false,
   serverOk: false,
   advertising: false,
+  status,
 })
 
 describe('discovery selectors', () => {
@@ -73,10 +80,11 @@ describe('discovery selectors', () => {
             bar: [makeFullyUp('bar', '10.0.0.2')],
           },
         },
+        robot: {connection: {connectedTo: 'bar'}},
       },
       expected: [
-        makeConnectable('foo', '10.0.0.1'),
-        makeFullyUp('bar', '10.0.0.2'),
+        makeConnectable('foo', '10.0.0.1', 'connectable', false),
+        makeFullyUp('bar', '10.0.0.2', 'connectable', true),
       ],
     },
     {
@@ -93,23 +101,24 @@ describe('discovery selectors', () => {
             ],
           },
         },
+        robot: {connection: {connectedTo: 'foo'}},
       },
-      expected: [makeConnectable('foo', '10.0.0.1')],
+      expected: [makeConnectable('foo', '10.0.0.1', 'connectable', true)],
     },
     {
-      name: 'getReachableRobots grabs robots with advertising: true',
+      name: 'getReachableRobots grabs robots with serverUp or advertising',
       selector: discovery.getReachableRobots,
       state: {
         discovery: {
           robotsByName: {
-            foo: [makeAdvertising('foo', '10.0.0.1', false)],
-            bar: [makeAdvertising('bar', '10.0.0.2', true)],
+            foo: [makeServerUp('foo', '10.0.0.1', false)],
+            bar: [makeAdvertising('bar', '10.0.0.2')],
           },
         },
       },
       expected: [
-        makeAdvertising('foo', '10.0.0.1', false),
-        makeAdvertising('bar', '10.0.0.2', true),
+        makeServerUp('foo', '10.0.0.1', false, 'reachable'),
+        makeAdvertising('bar', '10.0.0.2', 'reachable'),
       ],
     },
     {
@@ -121,12 +130,12 @@ describe('discovery selectors', () => {
             foo: [
               makeServerUp('foo', '10.0.0.1', true),
               makeServerUp('foo', '10.0.0.1', false),
-              makeAdvertising('foo', '10.0.0.2', false),
+              makeAdvertising('foo', '10.0.0.2'),
             ],
           },
         },
       },
-      expected: [makeServerUp('foo', '10.0.0.1', true)],
+      expected: [makeServerUp('foo', '10.0.0.1', true, 'reachable')],
     },
     {
       name: 'getReachableRobots does not grab connectable robots',
@@ -158,7 +167,7 @@ describe('discovery selectors', () => {
       state: {
         discovery: {robotsByName: {foo: [{name: 'foo', ip: null}]}},
       },
-      expected: [{name: 'foo', ip: null}],
+      expected: [{name: 'foo', ip: null, status: 'unreachable'}],
     },
     {
       name: 'getUnreachableRobots grabs robots with IP but no responses',
@@ -173,7 +182,7 @@ describe('discovery selectors', () => {
           },
         },
       },
-      expected: [makeUnreachable('foo', '10.0.0.1')],
+      expected: [makeUnreachable('foo', '10.0.0.1', 'unreachable')],
     },
     {
       name: "getUnreachableRobots won't grab connectable/reachable robots",
