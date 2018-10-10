@@ -357,6 +357,7 @@ If you are creating a custom tiprack, it must be `tiprack`-REST-OF-CONTAINER-NAM
 If you would like to delete a container you have already added to the database, you can do the following:
 
 .. code-block:: python
+
     from opentrons.data_storage import database
     database.delete_container('3x6_plate')
 
