@@ -89,7 +89,7 @@ function ConnectivityCard (props: Props) {
           />
           <WifiConnectForm
             key={name}
-            disabled={configInProgress}
+            disabled={disabled || configInProgress}
             activeSsid={activeSsid}
             networks={listOptions}
             onSubmit={configure}
