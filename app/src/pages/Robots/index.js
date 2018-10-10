@@ -14,7 +14,6 @@ import RobotSettings from './RobotSettings'
 import InstrumentSettings from './InstrumentSettings'
 
 import type {State} from '../../types'
-// import type {Robot} from '../../robot'
 import type {ViewableRobot} from '../../discovery'
 
 type SP = {

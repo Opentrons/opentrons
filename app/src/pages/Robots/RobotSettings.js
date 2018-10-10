@@ -29,25 +29,26 @@ import ResetRobotModal from '../../components/RobotSettings/ResetRobotModal'
 import type {State, Dispatch, Error} from '../../types'
 import type {ViewableRobot} from '../../discovery'
 
-type SP = {
-  showUpdateModal: boolean,
-  showConnectAlert: boolean,
-  homeInProgress: ?boolean,
-  homeError: ?Error,
-}
-
-type DP = {dispatch: Dispatch}
-
 type OP = {
   robot: ViewableRobot,
   match: Match,
 }
 
-type Props = SP &
-  OP & {
-    closeHomeAlert?: () => mixed,
-    closeConnectAlert: () => mixed,
-  }
+type SP = {|
+  showUpdateModal: boolean,
+  showConnectAlert: boolean,
+  homeInProgress: ?boolean,
+  homeError: ?Error,
+|}
+
+type DP = {|dispatch: Dispatch|}
+
+type Props = {
+  ...$Exact<OP>,
+  ...SP,
+  closeHomeAlert?: () => mixed,
+  closeConnectAlert: () => mixed,
+}
 
 export default withRouter(
   connect(
@@ -59,6 +60,7 @@ export default withRouter(
 
 const UPDATE_FRAGMENT = 'update'
 const CALIBRATE_DECK_FRAGMENT = 'calibrate-deck'
+const RESET_FRAGMENT = 'reset'
 
 function RobotSettingsPage (props: Props) {
   const {
@@ -73,6 +75,9 @@ function RobotSettingsPage (props: Props) {
   } = props
 
   const titleBarProps = {title: robot.name}
+  const updateUrl = `${url}/${UPDATE_FRAGMENT}`
+  const calibrateDeckUrl = `${url}/${CALIBRATE_DECK_FRAGMENT}`
+  const resetUrl = `${url}/${RESET_FRAGMENT}`
 
   // TODO(mc, 2018-05-08): pass parentUrl to RobotSettings
   return (
@@ -87,8 +92,9 @@ function RobotSettingsPage (props: Props) {
 
         <RobotSettings
           robot={robot}
-          updateUrl={`${url}/${UPDATE_FRAGMENT}`}
-          calibrateDeckUrl={`${url}/${CALIBRATE_DECK_FRAGMENT}`}
+          updateUrl={updateUrl}
+          calibrateDeckUrl={calibrateDeckUrl}
+          resetUrl={resetUrl}
         />
       </Page>
       <Switch>
@@ -105,7 +111,7 @@ function RobotSettingsPage (props: Props) {
         />
 
         <Route
-          path={`${path}/reset`}
+          path={`${path}/${RESET_FRAGMENT}`}
           render={props => <ResetRobotModal robot={robot} />}
         />
 
@@ -113,9 +119,7 @@ function RobotSettingsPage (props: Props) {
           exact
           path={path}
           render={() => {
-            if (showUpdateModal) {
-              return <Redirect to={`${url}/${UPDATE_FRAGMENT}`} />
-            }
+            if (showUpdateModal) return <Redirect to={updateUrl} />
 
             // only show homing spinner and error on main page
             // otherwise, it will show up during homes in pipette swap

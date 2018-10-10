@@ -40,7 +40,6 @@ export type BaseRobot = {
 export type RobotService = BaseRobot & {
   ip: string,
   port: number,
-  // wired: ?boolean,
 }
 
 // TODO(mc, 2018-10-09): deprecate this type

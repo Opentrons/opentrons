@@ -18,7 +18,10 @@ import type {State, Dispatch} from '../../types'
 import type {ViewableRobot} from '../../discovery'
 import type {Setting} from '../../http-api-client'
 
-type OP = {robot: ViewableRobot}
+type OP = {
+  robot: ViewableRobot,
+  resetUrl: string,
+}
 
 type SP = {|settings: Array<Setting>|}
 
@@ -28,11 +31,7 @@ type DP = {|
   download: () => mixed,
 |}
 
-type Props = {
-  ...$Exact<OP>,
-  ...SP,
-  ...DP,
-}
+type Props = {...$Exact<OP>, ...SP, ...DP}
 
 type BooleanSettingProps = {
   id: string,
@@ -66,11 +65,10 @@ class BooleanSettingToggle extends React.Component<BooleanSettingProps> {
 }
 
 function AdvancedSettingsCard (props: Props) {
-  const {settings, set, fetch, download} = props
+  const {settings, set, fetch, download, resetUrl} = props
   const {name, health, status} = props.robot
   const disabled = status !== CONNECTABLE
   const logsAvailable = health && health.logs
-  const resetUrl = `/robots/${name}/reset`
 
   return (
     <RefreshCard

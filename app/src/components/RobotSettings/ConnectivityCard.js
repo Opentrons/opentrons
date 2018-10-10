@@ -22,25 +22,21 @@ import WifiConnectModal from './WifiConnectModal'
 import type {State, Dispatch} from '../../types'
 import type {ViewableRobot} from '../../discovery'
 
-type OwnProps = {robot: ViewableRobot}
+type OP = {robot: ViewableRobot}
 
-type StateProps = {|
+type SP = {|
   listRequest: RobotWifiList,
   configureRequest: RobotWifiConfigure,
 |}
 
-type DispatchProps = {|
+type DP = {|
   fetchList: () => mixed,
   configure: (?string, ?string) => mixed,
   clearSuccessfulConfigure: () => mixed,
   clearFailedConfigure: () => mixed,
 |}
 
-type Props = {
-  ...$Exact<OwnProps>,
-  ...StateProps,
-  ...DispatchProps,
-}
+type Props = {...$Exact<OP>, ...SP, ...DP}
 
 const TITLE = 'Connectivity'
 const CONNECTED_BY_LABEL = 'Connected by'
@@ -115,16 +111,13 @@ function makeMapStateToProps () {
   const getWifiList = makeGetRobotWifiList()
   const getWifiConfigure = makeGetRobotWifiConfigure()
 
-  return (state: State, ownProps: OwnProps): StateProps => ({
+  return (state: State, ownProps: OP): SP => ({
     listRequest: getWifiList(state, ownProps.robot),
     configureRequest: getWifiConfigure(state, ownProps.robot),
   })
 }
 
-function mapDispatchToProps (
-  dispatch: Dispatch,
-  ownProps: OwnProps
-): DispatchProps {
+function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   const {robot} = ownProps
   const fetchList = () => dispatch(fetchWifiList(robot))
   const configure = (ssid, psk) => dispatch(configureWifi(robot, ssid, psk))
