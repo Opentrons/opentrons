@@ -17,7 +17,6 @@ import {selectors as steplistSelectors, START_TERMINAL_ITEM_ID} from '../steplis
 import type {BaseState, ThunkDispatch} from '../types'
 
 const ingredSelModIsVisible = activeModals => activeModals.ingredientSelection && activeModals.ingredientSelection.slot
-const DECK_HEADER = 'Tell the robot where labware and liquids start on the deck'
 
 type StateProps = {
   deckSetupMode: boolean,
@@ -31,6 +30,7 @@ type DispatchProps = {
 }
 type Props = {
   deckSetupMode: boolean,
+  header: string,
   drilledDown: boolean,
   ingredSelectionMode: boolean,
   handleClickOutside: () => void,
@@ -65,7 +65,7 @@ const mergeProps = (stateProps: StateProps, dispatchProps: DispatchProps): Props
 class DeckSetup extends React.Component<Props> {
   renderDeck = () => (
     <React.Fragment>
-      <div className={styles.deck_header}>{DECK_HEADER}</div>
+      <div className={styles.deck_header}>{this.props.header}</div>
       <div className={styles.deck_row}>
         {this.props.drilledDown && <BrowseLabwareModal />}
         <ClickOutside onClickOutside={this.props.handleClickOutside}>
