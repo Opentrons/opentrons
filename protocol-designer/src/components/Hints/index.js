@@ -30,7 +30,7 @@ class Hints extends React.Component<Props, State> {
     this.state = {rememberDismissal: false}
   }
 
-  toggleDismiss = () => {
+  toggleRememberDismissal = () => {
     this.setState({rememberDismissal: !this.state.rememberDismissal})
   }
 
@@ -86,7 +86,7 @@ class Hints extends React.Component<Props, State> {
               <CheckboxField
                 className={styles.dont_show_again}
                 label={i18n.t('alert.hint.dont_show_again')}
-                onChange={this.toggleDismiss}
+                onChange={this.toggleRememberDismissal}
                 value={this.state.rememberDismissal}
               />
               <OutlineButton
