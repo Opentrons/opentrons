@@ -51,10 +51,16 @@ function mapStateToProps (state: BaseState): SP {
   const labwareNickname = labware && labware.id && labwareNames[labware.id]
 
   switch (_page) {
+    case 'liquids':
     case 'file-splash':
-      return { _page, title: 'Opentrons Protocol Designer' }
     case 'file-detail':
-      return {_page, title: fileName, subtitle: 'FILE DETAILS'}
+    case 'settings-features':
+    case 'settings-privacy':
+      return {
+        _page,
+        title: i18n.t([`nav.title.${_page}`, fileName]),
+        subtitle: i18n.t([`nav.subtitle.${_page}`, '']),
+      }
     case 'ingredient-detail': {
       return {
         _page,
@@ -71,13 +77,6 @@ function mapStateToProps (state: BaseState): SP {
           text={selectedStep && selectedStep.title}
         />,
         subtitle: labwareNickname,
-      }
-    case 'settings-features':
-    case 'settings-privacy':
-      return {
-        _page,
-        title: i18n.t('nav.title.settings'),
-        subtitle: i18n.t(`nav.subtitle.${_page}`),
       }
     case 'steplist':
     default: {

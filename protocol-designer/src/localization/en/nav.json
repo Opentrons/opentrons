@@ -1,18 +1,27 @@
 {
-  "design": "DESIGN",
-  "file": "FILE",
-  "feature_flags": "Feature Flags",
-  "help": "HELP",
-  "settings": "SETTINGS",
-  "privacy": "PRIVACY",
-  "title": {
-    "settings": "Opentrons Beta"
+  "settings": {
+    "privacy": "PRIVACY",
+    "feature_flags": "Feature Flags"
+  },
+  "tab_name": {
+    "design": "DESIGN",
+    "file": "FILE",
+    "help": "HELP",
+    "liquids": "LIQUIDS",
+    "settings": "SETTINGS"
   },
   "terminal_item": {
     "__initial_setup__": "Starting Deck State",
     "__end__": "Final Deck State"
   },
+  "title": {
+    "settings-features": "Opentrons Beta",
+    "settings-privacy": "Opentrons Beta",
+    "file-splash": "Opentrons Beta"
+  },
   "subtitle": {
-    "settings-privacy": "Privacy"
+    "file-detail": "File Details",
+    "settings-privacy": "Privacy",
+    "liquids": "Liquids"
   }
 }

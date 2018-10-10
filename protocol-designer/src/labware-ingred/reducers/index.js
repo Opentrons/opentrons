@@ -23,6 +23,7 @@ import type {
   IngredientGroups,
   AllIngredGroupFields,
   IngredientInstance,
+  OrderedLiquids,
   Labware,
   LabwareTypeById,
 } from '../types'
@@ -410,7 +411,7 @@ const allIngredientGroupFields: Selector<AllIngredGroupFields> = createSelector(
     }), {})
 )
 
-const allIngredientNamesIds: BaseState => Array<{ingredientId: string, name: ?string}> = createSelector(
+const allIngredientNamesIds: BaseState => OrderedLiquids = createSelector(
   getIngredientGroups,
   ingreds => Object.keys(ingreds).map(ingredId =>
       ({ingredientId: ingredId, name: ingreds[ingredId].name}))
