@@ -64,16 +64,19 @@ const mergeProps = (stateProps: StateProps, dispatchProps: DispatchProps): Props
 // TODO Ian 2018-02-16 this will be broken apart and incorporated into ProtocolEditor
 class DeckSetup extends React.Component<Props> {
   renderDeck = () => (
-    <div className={styles.deck_row}>
-      {this.props.drilledDown && <BrowseLabwareModal />}
-      <ClickOutside onClickOutside={this.props.handleClickOutside}>
-        {({ref}) => (
-          <div ref={ref}>
-            <Deck LabwareComponent={LabwareContainer} className={styles.deck} />
-          </div>
-        )}
-      </ClickOutside>
-    </div>
+    <React.Fragment>
+      <div className={styles.deck_header}>{DECK_HEADER}</div>
+      <div className={styles.deck_row}>
+        {this.props.drilledDown && <BrowseLabwareModal />}
+        <ClickOutside onClickOutside={this.props.handleClickOutside}>
+          {({ref}) => (
+            <div ref={ref}>
+              <Deck LabwareComponent={LabwareContainer} className={styles.deck} />
+            </div>
+          )}
+        </ClickOutside>
+      </div>
+    </React.Fragment>
   )
 
   render () {
@@ -93,7 +96,6 @@ class DeckSetup extends React.Component<Props> {
       <React.Fragment>
         <LabwareSelectionModal />
         {this.props.ingredSelectionMode && <IngredientSelectionModal />}
-        <div className={styles.deck_header}>{DECK_HEADER}</div>
         {this.renderDeck()}
       </React.Fragment>
     )

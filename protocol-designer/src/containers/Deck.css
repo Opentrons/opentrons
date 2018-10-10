@@ -10,7 +10,7 @@
   @apply --font-header-dark;
 
   text-align: center;
-  padding-top: 1rem;
+  padding: 1rem 0;
 }
 
 .deck_row {
