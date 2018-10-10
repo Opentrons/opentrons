@@ -13,5 +13,5 @@ export function formatVolume (inputVolume: ?string | ?number, sigDigits?: number
 }
 
 export const formatPercentage = (part: number, total: number): string => {
-  return `${Number((part / total) * 100).toFixed(1)}%`
+  return `${round(Number((part / total) * 100), 1)}%`
 }
