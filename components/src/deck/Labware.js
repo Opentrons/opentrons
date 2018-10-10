@@ -87,6 +87,7 @@ function createWell (
   />
 }
 
+// TODO: BC 2018-10-10 this is a class component because it should probably have a sCU for performance reasons
 class Labware extends React.Component<Props> {
   render () {
     const {labwareType, getTipProps, getWellProps} = this.props
