@@ -17,7 +17,7 @@ describe('analytics events map', () => {
   })
 
   test('robot:CONNECT_RESPONSE -> robotConnected event', () => {
-    const state = (name) => ({
+    const state = name => ({
       robot: {
         connection: {
           connectRequest: {name},
@@ -25,8 +25,30 @@ describe('analytics events map', () => {
       },
       discovery: {
         robotsByName: {
-          wired: [{ip: 'foo', port: 123, ok: true, local: true}],
-          wireless: [{ip: 'bar', port: 456, ok: true, local: false}],
+          wired: [
+            {
+              name: 'wired',
+              ip: 'foo',
+              port: 123,
+              ok: true,
+              serverOk: true,
+              local: true,
+              health: {},
+              serverHealth: {},
+            },
+          ],
+          wireless: [
+            {
+              name: 'wireless',
+              ip: 'bar',
+              port: 456,
+              ok: true,
+              serverOk: true,
+              local: false,
+              health: {},
+              serverHealth: {},
+            },
+          ],
         },
       },
     })
