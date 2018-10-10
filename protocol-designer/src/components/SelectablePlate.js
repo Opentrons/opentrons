@@ -17,6 +17,8 @@ import {
   type Channels,
 } from '@opentrons/components'
 
+import {WELL_LABEL_OFFSET} from '../constants'
+import SingleLabware from '../components/SingleLabware'
 import SelectionRect from '../components/SelectionRect.js'
 import type {ContentsByWell} from '../labware-ingred/types'
 import type {RectEvent} from '../collision-types'
@@ -112,11 +114,18 @@ export default function SelectablePlate (props: Props) {
       }
     }
 
+    // FIXME: SelectionRect is somehow off by one in the x axis, hence the magic number
     return (
-      <SelectionRect svg {...{onSelectionMove, onSelectionDone}}>
-        <Labware labwareType={containerType} getWellProps={getWellProps} getTipProps={getTipProps} />
-        <LabwareLabels labwareType={containerType} />
-      </SelectionRect>
+      <SingleLabware showLabels>
+        <SelectionRect
+          svg
+          originXOffset={WELL_LABEL_OFFSET - 1}
+          originYOffset={WELL_LABEL_OFFSET}
+          {...{onSelectionMove, onSelectionDone}}>
+          <Labware labwareType={containerType} getWellProps={getWellProps} getTipProps={getTipProps} />
+          <LabwareLabels labwareType={containerType} />
+        </SelectionRect>
+      </SingleLabware>
     )
   }
 }

@@ -13,7 +13,10 @@ import {
 import {getWellDefsForSVG} from '@opentrons/shared-data'
 
 import {getCollidingWells} from '../../utils'
-import {SELECTABLE_WELL_CLASS} from '../../constants'
+import {
+  SELECTABLE_WELL_CLASS,
+  WELL_LABEL_OFFSET,
+} from '../../constants'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
 import SelectionRect from '../SelectionRect.js'
 import type {ContentsByWell, Wells} from '../../labware-ingred/types'
@@ -101,8 +104,15 @@ class SelectableLabware extends React.Component<Props> {
         return [...acc, ...wellSet]
       }, [])
       : Object.keys(selectedWells)
+
+    // FIXME: SelectionRect is somehow off by one in the x axis, hence the magic number
     return (
-      <SelectionRect svg onSelectionMove={this.handleSelectionMove} onSelectionDone={this.handleSelectionDone}>
+      <SelectionRect
+        svg
+        originXOffset={WELL_LABEL_OFFSET - 1}
+        originYOffset={WELL_LABEL_OFFSET}
+        onSelectionMove={this.handleSelectionMove}
+        onSelectionDone={this.handleSelectionDone}>
         <g>
           <LabwareOutline />
           {map(wellContents, (well, wellName) => (

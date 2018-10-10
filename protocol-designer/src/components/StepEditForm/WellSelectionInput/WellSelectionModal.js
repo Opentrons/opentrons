@@ -92,7 +92,7 @@ class WellSelectionModal extends React.Component<Props, State> {
           </OutlineButton>
         </div>
 
-        <SingleLabwareWrapper>
+        <SingleLabwareWrapper showLabels>
           <SelectableLabware
             highlightedWells={this.state.highlightedWells}
             selectedWells={this.state.selectedWells}
@@ -121,12 +121,13 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   // TODO: Ian 2018-07-31 replace with util function, "findIndexOrNull"?
   const orderedSteps = steplistSelectors.orderedSteps(state)
   const timelineIdx = orderedSteps.findIndex(id => id === stepId)
+  const allWellContentsForStep = allWellContentsForSteps[timelineIdx]
   const formData = steplistSelectors.getUnsavedForm(state)
 
   return {
     initialSelectedWells: formData ? formData[ownProps.name] : [],
     pipette: pipetteId ? pipetteSelectors.equippedPipettes(state)[pipetteId] : null,
-    wellContents: labware ? allWellContentsForSteps[timelineIdx][labware.id] : {},
+    wellContents: labware && allWellContentsForStep ? allWellContentsForStep[labware.id] : {},
     containerType: labware ? labware.type : 'missing labware',
   }
 }

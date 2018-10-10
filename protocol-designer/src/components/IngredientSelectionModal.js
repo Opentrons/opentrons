@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 
-import SingleLabware from './SingleLabware'
 import styles from './IngredientSelectionModal.css'
 
 import SelectablePlate from '../containers/SelectablePlate'
@@ -18,9 +17,7 @@ export default function IngredientSelectionModal (props: Props) {
       <IngredientPropertiesForm />
       <LabwareNameEditForm />
 
-      <SingleLabware>
-        <SelectablePlate showLabels selectable />
-      </SingleLabware>
+      <SelectablePlate selectable />
 
       <WellSelectionInstructions />
     </div>

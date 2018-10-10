@@ -49,7 +49,7 @@ class BrowseLabwareModal extends React.Component<Props> {
         className={modalStyles.modal}
         contentsClassName={cx(modalStyles.modal_contents, modalStyles.transparent_content)}
         onCloseClick={this.handleClose}>
-        <SingleLabwareWrapper>
+        <SingleLabwareWrapper showLabels>
           <g>
             <LabwareOutline />
             {map(this.props.wellContents, (well, wellName) => (

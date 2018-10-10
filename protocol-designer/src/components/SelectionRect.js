@@ -9,6 +9,8 @@ type Props = {
   onSelectionDone?: (e: MouseEvent, GenericRect) => mixed,
   svg?: boolean, // set true if this is an embedded SVG
   children?: React.Node,
+  originXOffset?: number,
+  originYOffset?: number,
 }
 
 type State = {
@@ -41,15 +43,14 @@ class SelectionRect extends React.Component<Props, State> {
       }
 
       const clientRect: {width: number, height: number, left: number, top: number} = parentRef.getBoundingClientRect()
-      const viewBox: {width: number, height: number} = parentRef.closest('svg').viewBox.baseVal // WARNING: elem.closest() is experiemental
+      let viewBox: {width: number, height: number} = parentRef.closest('svg').viewBox.baseVal // WARNING: elem.closest() is experiemental
 
-      console.log(viewBox)
       const xScale = viewBox.width / clientRect.width
       const yScale = viewBox.height / clientRect.height
 
       return <rect
-        x={(left - clientRect.left) * xScale}
-        y={(top - clientRect.top) * yScale}
+        x={((left - clientRect.left) * xScale) - this.props.originXOffset}
+        y={((top - clientRect.top) * yScale) - this.props.originYOffset}
         width={width * xScale}
         height={height * yScale}
         className={styles.selection_rect}
