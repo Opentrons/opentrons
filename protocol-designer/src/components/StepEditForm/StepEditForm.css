@@ -90,15 +90,6 @@
 
 /* form buttons */
 
-.button_row {
-  lost-utility: clearfix;
-  margin-top: 2rem;
-
-  & > * {
-    lost-column: 1/6;
-  }
-}
-
 .cancel_button {
   lost-offset: 2/6;
 }

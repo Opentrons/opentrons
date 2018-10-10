@@ -6,6 +6,7 @@ import {OutlineButton, PrimaryButton} from '@opentrons/components'
 import {actions, selectors} from '../../steplist'
 import type {BaseState, ThunkDispatch} from '../../types'
 import styles from './StepEditForm.css'
+import formStyles from '../Form.css'
 
 type OP = {onDelete?: (event: SyntheticEvent<>) => mixed}
 type SP = {canSave?: ?boolean}
@@ -19,7 +20,7 @@ type Props = OP & SP & DP
 const ButtonRow = (props: Props) => {
   const {canSave, onDelete, onSave, onCancel, onClickMoreOptions} = props
   return (
-    <div className={styles.button_row}>
+    <div className={formStyles.button_row}>
       <OutlineButton onClick={onDelete}>DELETE</OutlineButton>
       <OutlineButton onClick={onClickMoreOptions}>NOTES</OutlineButton>
       <PrimaryButton className={styles.cancel_button} onClick={onCancel}>CANCEL</PrimaryButton>
