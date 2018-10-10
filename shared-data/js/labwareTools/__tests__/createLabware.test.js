@@ -35,7 +35,7 @@ describe('createLabware', () => {
       grid: {row: 1, column: 2},
       spacing: {row: 10, column: 10},
       well: well1,
-      vendor: exampleLabware1.vendor,
+      brand: exampleLabware1.brand,
     })
 
     labware2 = createRegularLabware({
@@ -81,7 +81,7 @@ describe('createLabware', () => {
 
     const labware3 = createRegularLabware({
       metadata: exampleLabware2.metadata,
-      paramenters: exampleLabware2.parameters,
+      parameters: exampleLabware2.parameters,
       dimensions: exampleLabware2.dimensions,
       offset: exampleLabware2.cornerOffsetFromSlot,
       grid,

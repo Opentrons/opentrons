@@ -2,16 +2,17 @@
   "otId": "mock-id",
   "deprecated": false,
   "metadata": {
-    "name": "fake labware",
+    "displayName": "fake labware",
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "uL",
     "displayLengthUnits": "mm"
   },
-  "vendor": {
-    "sku": "t40u9sernisofsea",
-    "vendor": "opentrons"
+  "brand": {
+    "brandId": ["t40u9sernisofsea"],
+    "brand": "opentrons"
   },
   "parameters": {
+    "loadName": "opentrons_2_wellPlate_100_uL_mock-id",
     "format": "96Standard",
     "isTiprack": false
   },

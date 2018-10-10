@@ -5,10 +5,11 @@ import assignId from './assignId'
 import {toWellName} from '../helpers/index'
 
 type Metadata = {
-  name: string,
+  displayName: string,
   displayCategory: string,
-  displayVolumeUnits?: string,
+  displayVolumeUnits: string,
   displayLengthUnits?: string,
+  tags?: Array<string>,
 }
 
 type Dimensions = {
@@ -17,9 +18,9 @@ type Dimensions = {
   overallHeight: number,
 }
 
-type Vendor = {
-  sku?: string,
-  vendor?: string,
+type Brand = {
+  brandId?: Array<string>,
+  brand: string,
 }
 
 // 1. Valid pipette type for a container (i.e. is there multi channel access?)
@@ -28,6 +29,7 @@ type Params = {
   format: string,
   isTiprack: boolean,
   tipLength?: number,
+  loadName?: string,
 }
 
 type Well = {
@@ -36,7 +38,7 @@ type Well = {
   diameter?: number,
   length?: number,
   width?: number,
-  totalLiquidVolume?: number,
+  totalLiquidVolume: number,
 }
 
 type Cell = {
@@ -58,7 +60,7 @@ export type RegularLabwareProps = {
   grid: Cell,
   spacing: Cell,
   well: Well,
-  vendor?: Vendor,
+  brand: Brand,
 }
 
 export type Schema = {
@@ -66,8 +68,9 @@ export type Schema = {
   deprecated: boolean,
   metadata: Metadata,
   dimensions: Dimensions,
+  cornerOffsetFromSlot: Offset,
   parameters: Params,
-  vendor?: Vendor,
+  brand?: Brand,
   ordering: Array<Array<string>>,
   wells: {[wellName: string]: Well},
 }
@@ -129,7 +132,13 @@ export function createRegularLabware (props: RegularLabwareProps): Schema {
     wells: calculateCoordinates(props.well, ordering, props.spacing),
   }
 
-  if (props.vendor) definition.vendor = props.vendor
+  const numWells = props.grid.row * props.grid.column
+  const brand = (props.brand && props.brand.brand) || 'generic'
+  if (props.brand) definition.brand = props.brand
+
+  definition.parameters.loadName = `${brand}_${numWells}_${
+    props.metadata.displayCategory}_${props.well.totalLiquidVolume}_${
+      props.metadata.displayVolumeUnits}_${definition.otId}`
 
   return definition
 }
