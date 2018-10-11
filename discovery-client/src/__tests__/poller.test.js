@@ -79,25 +79,25 @@ describe('discovery poller', () => {
     jest.runTimersToTime(6000)
     expect(fetch).toHaveBeenCalledTimes(6)
     expect(fetch).toHaveBeenCalledWith(`http://foo:31950/health`, {
-      timeout: 6000,
+      timeout: 30000,
     })
     expect(fetch).toHaveBeenCalledWith(`http://bar:31950/health`, {
-      timeout: 6000,
+      timeout: 30000,
     })
     expect(fetch).toHaveBeenCalledWith(`http://baz:31950/health`, {
-      timeout: 6000,
+      timeout: 30000,
     })
     expect(fetch).toHaveBeenCalledWith(
       `http://foo:31950/server/update/health`,
-      {timeout: 6000}
+      {timeout: 30000}
     )
     expect(fetch).toHaveBeenCalledWith(
       `http://bar:31950/server/update/health`,
-      {timeout: 6000}
+      {timeout: 30000}
     )
     expect(fetch).toHaveBeenCalledWith(
       `http://baz:31950/server/update/health`,
-      {timeout: 6000}
+      {timeout: 30000}
     )
   })
 

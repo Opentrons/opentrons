@@ -1,14 +1,15 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
+import orderBy from 'lodash/orderBy'
 
 import type {State, Dispatch} from '../../types'
-import type {Robot} from '../../robot'
 
-import {selectors as robotSelectors} from '../../robot'
 import {
   startDiscovery,
   getScanning,
+  getConnectableRobots,
+  getReachableRobots,
   getUnreachableRobots,
 } from '../../discovery'
 
@@ -18,20 +19,24 @@ import RobotItem from './RobotItem'
 import ScanStatus from './ScanStatus'
 import UnreachableRobotItem from './UnreachableRobotItem'
 
-import type {UnreachableRobot} from '../../discovery'
+import type {Robot, ReachableRobot, UnreachableRobot} from '../../discovery'
 
-type StateProps = {
+type StateProps = {|
   robots: Array<Robot>,
+  reachableRobots: Array<ReachableRobot>,
   unreachableRobots: Array<UnreachableRobot>,
   found: boolean,
   isScanning: boolean,
-}
+|}
 
-type DispatchProps = {
+type DispatchProps = {|
   onScanClick: () => mixed,
-}
+|}
 
-type Props = StateProps & DispatchProps
+type Props = {
+  ...StateProps,
+  ...DispatchProps,
+}
 
 export default connect(
   mapStateToProps,
@@ -44,27 +49,30 @@ function ConnectPanel (props: Props) {
       <ScanStatus {...props} />
       <RobotList>
         {props.robots.map(robot => <RobotItem key={robot.name} {...robot} />)}
+        {props.reachableRobots.map(robot => (
+          <RobotItem key={robot.name} {...robot} />
+        ))}
         {props.unreachableRobots.map(robot => (
           <UnreachableRobotItem key={robot.name} {...robot} />
         ))}
-        {/*
-          {props.connectableRobots.map((robot) => (
-            <RobotItem key={robot.name} {...robot} />
-          ))}
-          {props.reachableRobots.map((robot) => (
-            <RobotItem key={robot.name} {...robot} />
-          ))}
-        */}
       </RobotList>
     </SidePanel>
   )
 }
 
+const robotOrder = [['connected', 'local', 'name'], ['desc', 'desc', 'asc']]
+const reachableOrder = [['local', 'name'], ['desc', 'asc']]
+const unreachableOrder = [['name'], ['asc']]
+
 function mapStateToProps (state: State): StateProps {
-  const robots = robotSelectors.getDiscovered(state)
+  const robots = getConnectableRobots(state)
+  const reachableRobots = getReachableRobots(state)
+  const unreachableRobots = getUnreachableRobots(state)
+
   return {
-    robots,
-    unreachableRobots: getUnreachableRobots(state),
+    robots: orderBy(robots, ...robotOrder),
+    reachableRobots: orderBy(reachableRobots, ...reachableOrder),
+    unreachableRobots: orderBy(unreachableRobots, ...unreachableOrder),
     found: robots.length > 0,
     isScanning: getScanning(state),
   }

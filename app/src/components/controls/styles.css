@@ -25,14 +25,14 @@
 }
 
 .labeled_control {
+  @apply --font-body-1-dark;
+
   display: block;
 }
 
 .labeled_control_label {
-  @apply --font-body-1-dark;
-
-  max-width: var(--mw-labeled-toggle);
   display: inline-block;
+  max-width: var(--mw-labeled-toggle);
   font-weight: var(--fw-semibold);
 }
 

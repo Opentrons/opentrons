@@ -144,7 +144,7 @@ type LabwareOnDeckProps = {
   setDefaultLabwareName: () => mixed,
 }
 
-// TODO: BC 2018-10-08 move these connections to lower lever components
+// TODO: BC 2018-10-08 move these connections to lower level components
 class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
   shouldComponentUpdate (nextProps: LabwareOnDeckProps) {
     const shouldAlwaysUpdate = this.props.addLabwareMode ||
@@ -152,10 +152,9 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
       this.props.moveLabwareMode ||
       nextProps.moveLabwareMode
 
-    const labwarePresenceChange = (this.props.containerId && !nextProps.containerId) ||
-      (!this.props.containerId && nextProps.containerId)
-    const nameOverlayChange = (this.props.showNameOverlay && !nextProps.showNameOverlay) ||
-      (!this.props.showNameOverlay && nextProps.showNameOverlay)
+    const labwarePresenceChange = this.props.containerId !== nextProps.containerId
+    const nameOverlayChange = this.props.showNameOverlay !== nextProps.showNameOverlay
+
     if (shouldAlwaysUpdate || labwarePresenceChange || nameOverlayChange) return true
     return this.props.highlighted !== nextProps.highlighted
   }

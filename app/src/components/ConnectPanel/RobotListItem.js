@@ -3,49 +3,53 @@
 import * as React from 'react'
 import {NotificationIcon, Icon} from '@opentrons/components'
 
-import type {Robot} from '../../robot'
+import {CONNECTABLE} from '../../discovery'
 import {ToggleButton} from '../controls'
 import RobotLink from './RobotLink'
-import styles from './connect-panel.css'
+import styles from './styles.css'
 
-type ItemProps = Robot & {
-  upgradable: ?string,
-  selected: boolean,
-  connect: () => mixed,
-  disconnect: () => mixed,
-}
+// circular type dependency, thanks flow
+import type {RobotItemProps} from './RobotItem'
 
-export function RobotListItem (props: ItemProps) {
+export function RobotListItem (props: RobotItemProps) {
   const {
     name,
-    wired,
+    displayName,
+    local,
+    status,
+    connected,
     selected,
-    isConnected,
     upgradable,
     connect,
     disconnect,
   } = props
-  const onClick = isConnected ? disconnect : connect
+  const connectable = status === CONNECTABLE
+  const onClick = connected ? disconnect : connect
+
   return (
     <li className={styles.robot_group}>
-      <React.Fragment>
-        <RobotLink url={`/robots/${name}`} className={styles.robot_item} exact>
-          <NotificationIcon
-            name={wired ? 'usb' : 'wifi'}
-            className={styles.robot_item_icon}
-            childName={upgradable ? 'circle' : null}
-            childClassName={styles.notification}
-          />
+      <RobotLink url={`/robots/${name}`} className={styles.robot_item} exact>
+        <NotificationIcon
+          name={local ? 'usb' : 'wifi'}
+          className={styles.robot_item_icon}
+          childName={upgradable ? 'circle' : null}
+          childClassName={styles.notification}
+        />
 
-          <p className={styles.link_text}>{name}</p>
+        <p className={styles.link_text}>{displayName}</p>
 
+        {connectable ? (
           <ToggleButton
-            toggledOn={isConnected}
+            toggledOn={connected}
             onClick={onClick}
             className={styles.robot_item_icon}
           />
-        </RobotLink>
-        {selected && (
+        ) : (
+          <Icon name="chevron-right" className={styles.robot_item_icon} />
+        )}
+      </RobotLink>
+      {connectable &&
+        selected && (
           <RobotLink
             url={`/robots/${name}/instruments`}
             className={styles.instrument_item}
@@ -54,68 +58,6 @@ export function RobotListItem (props: ItemProps) {
             <Icon name="chevron-right" className={styles.robot_item_icon} />
           </RobotLink>
         )}
-      </React.Fragment>
     </li>
   )
 }
-
-// TODO (ka 2018-10-5): Separate Connectable and Reachable Robots
-// export function ConnectableRobot (props: ItemProps) {
-// const {
-//   name,
-//   wired,
-//   selected,
-//   isConnected,
-//   upgradable,
-//   connect,
-//   disconnect,
-// } = props
-// const onClick = isConnected ? disconnect : connect
-//   return (
-//     <React.Fragment>
-//       <RobotLink url={`/robots/${name}`} className={styles.robot_item} exact>
-//         <NotificationIcon
-//           name={wired ? 'usb' : 'wifi'}
-//           className={styles.robot_item_icon}
-//           childName={upgradable ? 'circle' : null}
-//           childClassName={styles.notification}
-//         />
-//
-//         <p className={styles.link_text}>{name}</p>
-//
-//         <ToggleButton
-//           toggledOn={isConnected}
-//           onClick={onClick}
-//           className={styles.robot_item_icon}
-//         />
-//       </RobotLink>
-//       {selected && (
-//         <RobotLink
-//           url={`/robots/${name}/instruments`}
-//           className={styles.instrument_item}
-//         >
-//           <p className={styles.link_text}>Pipettes & Modules</p>
-//           <Icon name="chevron-right" className={styles.robot_item_icon} />
-//         </RobotLink>
-//       )}
-//     </React.Fragment>
-//   )
-// }
-
-// export function ReachableRobotItem (props: ReachableProps) {
-//   const {name, wired, upgradable} = props
-//   return (
-//     <RobotLink url={`/robots/${name}`} className={styles.robot_item} exact>
-//       <NotificationIcon
-//         name={wired ? 'usb' : 'wifi'}
-//         className={styles.robot_item_icon}
-//         childName={upgradable ? 'circle' : null}
-//         childClassName={styles.notification}
-//       />
-//
-//       <p className={styles.link_text}>{name}</p>
-//
-//       <Icon name="chevron-right" className={styles.robot_item_icon} />
-//     </RobotLink>
-//   )
-// }

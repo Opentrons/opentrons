@@ -3,7 +3,7 @@ import * as React from 'react'
 
 import ScanButton from './ScanButton'
 
-import styles from './connect-panel.css'
+import styles from './styles.css'
 
 type Props = {
   onScanClick: () => mixed,

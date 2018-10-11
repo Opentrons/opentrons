@@ -1,8 +1,8 @@
 // @flow
 // robot status panel with connect button
 import * as React from 'react'
-import type {Robot} from '../../robot'
 
+import {CardContainer, CardRow, CardColumn} from '../layout'
 import StatusCard from './StatusCard'
 import InformationCard from './InformationCard'
 import ControlsCard from './ControlsCard'
@@ -11,34 +11,40 @@ import CalibrationCard from './CalibrationCard'
 import AdvancedSettingsCard from './AdvancedSettingsCard'
 import ConnectAlertModal from './ConnectAlertModal'
 import RobotUpdateModal from './RobotUpdateModal'
-import {CardContainer, CardRow, CardColumn} from '../layout'
 
-type Props = Robot
+import type {ViewableRobot} from '../../discovery'
+
+type Props = {
+  robot: ViewableRobot,
+  updateUrl: string,
+  calibrateDeckUrl: string,
+  resetUrl: string,
+}
 
 export default function RobotSettings (props: Props) {
-  const updateUrl = `/robots/${props.name}/update`
+  const {robot, updateUrl, calibrateDeckUrl, resetUrl} = props
 
   return (
     <CardContainer>
       <CardRow>
-        <StatusCard {...props} />
+        <StatusCard robot={robot} />
       </CardRow>
       <CardRow>
-        <InformationCard {...props} updateUrl={updateUrl} />
+        <InformationCard robot={robot} updateUrl={updateUrl} />
       </CardRow>
       <CardRow>
-        <ControlsCard {...props} />
+        <ControlsCard robot={robot} />
       </CardRow>
       <CardRow>
         <CardColumn>
-          <ConnectivityCard {...props} />
+          <ConnectivityCard robot={robot} />
         </CardColumn>
         <CardColumn>
-          <CalibrationCard {...props} />
+          <CalibrationCard robot={robot} calibrateDeckUrl={calibrateDeckUrl} />
         </CardColumn>
       </CardRow>
       <CardRow>
-        <AdvancedSettingsCard {...props} />
+        <AdvancedSettingsCard robot={robot} resetUrl={resetUrl} />
       </CardRow>
     </CardContainer>
   )

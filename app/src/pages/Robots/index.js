@@ -4,19 +4,20 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {withRouter, Route, Switch, Redirect, type Match} from 'react-router'
 
-import type {State} from '../../types'
-import type {Robot} from '../../robot'
-import {selectors as robotSelectors} from '../../robot'
-
 import createLogger from '../../logger'
+import {selectors as robotSelectors} from '../../robot'
+import {CONNECTABLE, getConnectableRobots, getReachableRobots} from '../../discovery'
 
 import {Splash} from '@opentrons/components'
 import Page from '../../components/Page'
 import RobotSettings from './RobotSettings'
 import InstrumentSettings from './InstrumentSettings'
 
+import type {State} from '../../types'
+import type {ViewableRobot} from '../../discovery'
+
 type SP = {
-  robot: ?Robot,
+  robot: ?ViewableRobot,
   connectedName: ?string,
 }
 
@@ -51,10 +52,12 @@ function Robots (props: Props) {
 
   return (
     <Switch>
-      <Route
-        path={`${path}/instruments`}
-        render={props => (<InstrumentSettings {...props} robot={robot} />)}
-      />
+      {robot.status === CONNECTABLE && (
+        <Route
+          path={`${path}/instruments`}
+          render={props => (<InstrumentSettings {...props} robot={robot} />)}
+        />
+      )}
       <Route
         path={path}
         render={() => (<RobotSettings robot={robot} />)}
@@ -65,9 +68,10 @@ function Robots (props: Props) {
 
 function mapStateToProps (state: State, ownProps: OP): SP {
   const {match: {params: {name}}} = ownProps
-  const robots = robotSelectors.getDiscovered(state)
+  const robots: Array<ViewableRobot> = getConnectableRobots(state)
+    .concat(getReachableRobots(state))
   const connectedName = robotSelectors.getConnectedRobotName(state)
-  const robot = robots.find(r => r.name === name)
+  const robot: ?ViewableRobot = robots.find(r => r.name === name)
 
   return {
     robot,

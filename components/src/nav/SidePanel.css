@@ -9,7 +9,6 @@
   overflow: hidden;
   border-right: var(--bd-light);
   background-color: var(--c-bg-light);
-  transition: all 0.5s ease-in-out;
   position: relative;
   padding: 0 4px;
 }

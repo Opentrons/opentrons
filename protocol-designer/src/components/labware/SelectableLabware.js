@@ -44,8 +44,8 @@ class SelectableLabware extends React.Component<Props> {
     if (this.props.pipetteChannels === 8) {
       // for the wells that have been highlighted,
       // get all 8-well well sets and merge them
-      const primaryWells: Wells = Object.keys(selectedWells).reduce((acc: Wells, well: string): Wells => {
-        const wellSet = getWellSetForMultichannel(this.props.containerType, well)
+      const primaryWells: Wells = Object.keys(selectedWells).reduce((acc: Wells, wellName: string): Wells => {
+        const wellSet = getWellSetForMultichannel(this.props.containerType, wellName)
         if (!wellSet) return acc
 
         return {...acc, [wellSet[0]]: wellSet[0]}
@@ -60,11 +60,23 @@ class SelectableLabware extends React.Component<Props> {
 
   handleSelectionMove = (e: MouseEvent, rect: GenericRect) => {
     if (!e.shiftKey) {
-      this.props.updateHighlightedWells(this._getWellsFromRect(rect))
+      if (this.props.pipetteChannels === 8) {
+        const selectedWells: Wells = this._getWellsFromRect(rect)
+        const allWells: Wells = Object.keys(selectedWells).reduce((acc: Wells, wellName: string): Wells => {
+          const channelWells: ?Wells = reduce(getWellSetForMultichannel(this.props.containerType, wellName), (acc, channelWellName) => ({
+            ...acc,
+            [channelWellName]: channelWellName,
+          }), {})
+          return {...acc, ...channelWells}
+        }, {})
+        this.props.updateHighlightedWells(allWells)
+      } else {
+        this.props.updateHighlightedWells(this._getWellsFromRect(rect))
+      }
     }
   }
   handleSelectionDone = (e: MouseEvent, rect: GenericRect) => {
-    const wells = this._getWellsFromRect(rect)
+    const wells = this._wellsFromSelected(this._getWellsFromRect(rect))
     if (e.shiftKey) {
       this.props.deselectWells(wells)
     } else {

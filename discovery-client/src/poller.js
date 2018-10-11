@@ -21,7 +21,7 @@ export type PollRequest = {
 }
 
 const MIN_SUBINTERVAL_MS = 100
-const MAX_TIMEOUT_MS = 10000
+const MIN_TIMEOUT_MS = 30000
 
 export function poll (
   candidates: Array<Candidate>,
@@ -29,15 +29,15 @@ export function poll (
   onHealth: HealthHandler,
   log: ?Logger
 ): PollRequest {
-  if (!candidates.length) return { id: null }
+  if (!candidates.length) return {id: null}
 
-  log && log.debug('poller start', { interval, candidates: candidates.length })
+  log && log.debug('poller start', {interval, candidates: candidates.length})
 
   const subInterval = Math.max(interval / candidates.length, MIN_SUBINTERVAL_MS)
-  const timeout = Math.min(subInterval * candidates.length, MAX_TIMEOUT_MS)
+  const timeout = Math.max(subInterval * candidates.length, MIN_TIMEOUT_MS)
 
   const id = setInterval(pollIp, subInterval)
-  const request = { id }
+  const request = {id}
   let current = -1
 
   return request
@@ -66,7 +66,7 @@ export function stop (request: ?PollRequest, log: ?Logger) {
 
   if (id) {
     clearInterval(id)
-    log && log.debug('poller stop', { id })
+    log && log.debug('poller stop', {id})
   }
 }
 
@@ -84,12 +84,12 @@ function fetchAndParseBody (url, timeout, log: ?Logger) {
   return fetch(url, {timeout})
     .then(response => (response.ok ? response.json() : null))
     .then(body => {
-      log && log.silly('GET', { url, body })
+      log && log.silly('GET', {url, body})
       return body
     })
     .catch(error => {
-      const { message, type, code } = error
-      log && log.silly('GET failed', { url, message, type, code })
+      const {message, type, code} = error
+      log && log.silly('GET failed', {url, message, type, code})
       return null
     })
 }

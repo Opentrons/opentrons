@@ -6,6 +6,7 @@ import {selectors} from '../navigation'
 import ConnectedStepList from './ConnectedStepList'
 import IngredientsList from './IngredientsList'
 import FileSidebar from '../components/FileSidebar'
+import LiquidsSidebar from '../components/LiquidsSidebar'
 import { SettingsSidebar } from '../components/SettingsPage'
 
 import type {BaseState} from '../types'
@@ -17,6 +18,8 @@ type Props = {
 
 function Sidebar (props: Props) {
   switch (props.page) {
+    case 'liquids':
+      return <LiquidsSidebar />
     case 'steplist':
     case 'well-selection-modal':
       return <ConnectedStepList />

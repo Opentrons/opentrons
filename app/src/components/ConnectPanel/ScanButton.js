@@ -2,7 +2,7 @@
 import * as React from 'react'
 import {Icon, PrimaryButton} from '@opentrons/components'
 
-import styles from './connect-panel.css'
+import styles from './styles.css'
 
 type Props = {
   isScanning: boolean,

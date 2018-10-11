@@ -4,42 +4,54 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
 
-import type {Robot} from '../../robot'
+import {CONNECTABLE} from '../../discovery'
 import {startDeckCalibration} from '../../http-api-client'
 import {Card, OutlineButton} from '@opentrons/components'
 import {CardContentFlex, CardContentFull} from '../layout'
 
-type OP = Robot
+import type {ViewableRobot} from '../../discovery'
 
-type DP = {
-  start: () => mixed,
+type OP = {
+  robot: ViewableRobot,
+  calibrateDeckUrl: string,
+  disabled: boolean,
 }
 
-type Props = OP & DP
+type DP = {|
+  start: () => mixed,
+|}
+
+type Props = {...$Exact<OP>, ...DP}
 
 const TITLE = 'Deck Calibration'
 // const LAST_RUN_LABEL = 'Last Run'
-const CALIBRATION_MESSAGE = 'Calibrate your robot to initial factory settings to ensure accuracy.'
+const CALIBRATION_MESSAGE =
+  'Calibrate your robot to initial factory settings to ensure accuracy.'
 
-export default connect(null, mapDispatchToProps)(CalibrationCard)
+export default connect(
+  null,
+  mapDispatchToProps
+)(CalibrationCard)
 
 function CalibrationCard (props: Props) {
-  const {start} = props
+  const {start, robot} = props
+  const disabled = robot.status !== CONNECTABLE
+
   return (
-    <Card title={TITLE}>
+    <Card title={TITLE} disabled={disabled}>
       <CardContentFull>
         <p>{CALIBRATION_MESSAGE}</p>
       </CardContentFull>
       <CardContentFlex>
         <div>
-        {/*
+          {/*
           <LabeledValue
             label={LAST_RUN_LABEL}
             value='Never'
           />
         */}
         </div>
-        <OutlineButton onClick={start}>
+        <OutlineButton onClick={start} disabled={disabled}>
           Calibrate
         </OutlineButton>
       </CardContentFlex>
@@ -48,11 +60,12 @@ function CalibrationCard (props: Props) {
 }
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  // TODO(mc, 2018-05-08): pass this in as a prop
-  const deckCalUrl = `/robots/${ownProps.name}/calibrate-deck`
+  const {robot, calibrateDeckUrl} = ownProps
 
   return {
-    start: () => dispatch(startDeckCalibration(ownProps))
-      .then(() => dispatch(push(deckCalUrl))),
+    start: () =>
+      dispatch(startDeckCalibration(robot)).then(() =>
+        dispatch(push(calibrateDeckUrl))
+      ),
   }
 }

@@ -86,11 +86,13 @@ function find (argv) {
   )
 
   DiscoveryClient(argv)
-    .on('service', s => {
-      if (!argv.name || s.name === argv.name) {
-        process.stdout.write(`${normalizeIp(s.ip)}\n`)
-        process.exit(0)
-      }
+    .on('service', updatedServices => {
+      updatedServices
+        .filter(s => !argv.name || s.name === argv.name)
+        .forEach(s => {
+          process.stdout.write(`${normalizeIp(s.ip)}\n`)
+          process.exit(0)
+        })
     })
     .once('error', argv.handleError)
     .start()

@@ -3,7 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
 import type {State, Dispatch} from '../../types'
-import type {Robot} from '../../robot'
+import type {RobotService} from '../../robot'
 import type {ResetOption, ResetRobotRequest, RobotServerRestart} from '../../http-api-client'
 import {
   fetchResetOptions,
@@ -22,7 +22,7 @@ import {Portal} from '../portal'
 import {LabeledCheckbox} from '../controls'
 
 type OP = {
-  robot: Robot,
+  robot: RobotService,
 }
 
 type SP = {
