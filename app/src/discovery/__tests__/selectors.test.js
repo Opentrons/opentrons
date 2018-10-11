@@ -293,6 +293,99 @@ describe('discovery selectors', () => {
         },
       ],
     },
+    {
+      name: 'getAllRobots returns all robots',
+      selector: discovery.getAllRobots,
+      state: {
+        robot: {connection: {connectedTo: 'qux'}},
+        discovery: {
+          robotsByName: {
+            foo: [
+              makeConnectable('foo', '10.0.0.1'),
+              makeUnreachable('foo', '10.0.0.2'),
+            ],
+            bar: [
+              makeServerUp('bar', '10.0.0.3', false),
+              makeUnreachable('bar', '10.0.0.4'),
+            ],
+            baz: [
+              makeAdvertising('baz', '10.0.0.5'),
+              makeUnreachable('baz', '10.0.0.6'),
+            ],
+            qux: [makeFullyUp('qux', '10.0.0.7')],
+          },
+        },
+      },
+      expected: [
+        makeConnectable('foo', '10.0.0.1', 'connectable', false, 'foo'),
+        makeFullyUp('qux', '10.0.0.7', 'connectable', true, 'qux'),
+        makeServerUp('bar', '10.0.0.3', false, 'reachable', 'bar'),
+        makeAdvertising('baz', '10.0.0.5', 'reachable', 'baz'),
+      ],
+    },
+    {
+      name: 'getConnectedRobot returns connected robot',
+      selector: discovery.getConnectedRobot,
+      state: {
+        discovery: {
+          robotsByName: {
+            foo: [makeConnectable('foo', '10.0.0.1')],
+            bar: [makeFullyUp('bar', '10.0.0.2')],
+          },
+        },
+        robot: {connection: {connectedTo: 'bar'}},
+      },
+      expected: makeFullyUp('bar', '10.0.0.2', 'connectable', true, 'bar'),
+    },
+    {
+      name: 'getRobotApiVersion returns serverHealth.apiServerVersion',
+      // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
+      state: {
+        serverHealth: {apiServerVersion: '1.2.3'},
+        health: {api_version: '4.5.6'},
+      },
+      selector: discovery.getRobotApiVersion,
+      expected: '1.2.3',
+    },
+    {
+      name: 'getRobotApiVersion returns health.api_version if no serverHealth',
+      // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
+      state: {serverHealth: null, health: {api_version: '4.5.6'}},
+      selector: discovery.getRobotApiVersion,
+      expected: '4.5.6',
+    },
+    {
+      name: 'getRobotApiVersion returns null if no healths',
+      // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
+      state: {serverHealth: null, health: null},
+      selector: discovery.getRobotApiVersion,
+      expected: null,
+    },
+    {
+      name: 'getRobotFirmwareVersion returns serverHealth.smoothieVersion',
+      // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
+      state: {
+        serverHealth: {smoothieVersion: '1.2.3'},
+        health: {fw_version: '4.5.6'},
+      },
+      selector: discovery.getRobotFirmwareVersion,
+      expected: '1.2.3',
+    },
+    {
+      name:
+        'getRobotFirmwareVersion returns health.fw_version if no serverHealth',
+      // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
+      state: {serverHealth: null, health: {fw_version: '4.5.6'}},
+      selector: discovery.getRobotFirmwareVersion,
+      expected: '4.5.6',
+    },
+    {
+      name: 'getRobotFirmwareVersion returns null if no healths',
+      // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
+      state: {serverHealth: null, health: null},
+      selector: discovery.getRobotFirmwareVersion,
+      expected: null,
+    },
   ]
 
   SPECS.forEach(spec => {

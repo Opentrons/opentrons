@@ -2,34 +2,38 @@
 // setup pipettes component
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {Route, Redirect, type Match} from 'react-router'
-
-import type {State} from '../../types'
-import type {Pipette, Robot} from '../../robot'
-import type {PipettesResponse} from '../../http-api-client'
+import {Route, Redirect} from 'react-router'
 
 import {selectors as robotSelectors} from '../../robot'
 import {makeGetRobotPipettes, fetchPipettes} from '../../http-api-client'
+import {getConnectedRobot} from '../../discovery'
 
 import Page, {RefreshWrapper} from '../../components/Page'
 import TipProbe from '../../components/TipProbe'
 import ConfirmTipProbeModal from '../../components/ConfirmTipProbeModal'
 import {PipetteTabs, Pipettes} from '../../components/calibrate-pipettes'
-
 import SessionHeader from '../../components/SessionHeader'
 
-type SP = {
+import type {ContextRouter} from 'react-router'
+import type {State} from '../../types'
+import type {Pipette} from '../../robot'
+import type {PipettesResponse} from '../../http-api-client'
+import type {Robot} from '../../discovery'
+
+type OP = ContextRouter
+
+type SP = {|
   pipettes: Array<Pipette>,
   currentPipette: ?Pipette,
   actualPipettes: ?PipettesResponse,
   _robot: ?Robot,
-}
+|}
 
-type DP = {dispatch: Dispatch}
+type DP = {|dispatch: Dispatch|}
 
-type OP = {match: Match}
-
-type Props = SP & OP & {
+type Props = {
+  ...OP,
+  ...SP,
   fetchPipettes: () => mixed,
   changePipetteUrl: string,
 }
@@ -84,7 +88,7 @@ function makeMapStateToProps (): (State, OP) => SP {
   const getAttachedPipettes = makeGetRobotPipettes()
 
   return (state, props) => {
-    const _robot = robotSelectors.getConnectedRobot(state)
+    const _robot = getConnectedRobot(state)
     const pipettesCall = _robot && getAttachedPipettes(state, _robot)
 
     return {
@@ -102,8 +106,8 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   const changePipetteUrl = _robot ? `/robots/${_robot.name}/instruments` : '/robots'
 
   return {
-    ...stateProps,
     ...ownProps,
+    ...stateProps,
     changePipetteUrl,
     fetchPipettes: () => _robot && dispatch(fetchPipettes(_robot)),
   }

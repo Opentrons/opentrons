@@ -5,8 +5,6 @@ import {NAME, selectors, constants} from '../'
 const makeState = (state) => ({[NAME]: state})
 
 const {
-  getDiscovered,
-  getConnectedRobot,
   getConnectedRobotName,
   getConnectionStatus,
   getSessionLoadInProgress,
@@ -39,77 +37,13 @@ describe('robot selectors', () => {
     beforeEach(() => {
       state = {
         robot: {connection: {connectedTo: 'bar'}},
-        discovery: {
-          robotsByName: {
-            foo: [
-              {ip: '10.10.1.2', port: 31950, ok: true, local: false},
-            ],
-            bar: [
-              {ip: '10.10.3.4', port: 31950, ok: true, local: false},
-              {ip: '169.254.3.4', port: 31950, ok: true, local: true},
-            ],
-            baz: [
-              {ip: '10.10.5.6', port: 31950, ok: true, local: false},
-              {ip: '169.254.5.6', port: 31950, ok: false, local: true},
-            ],
-            qux: [
-              {ip: '169.254.7.8', port: 31950, ok: true, local: true},
-            ],
-          },
-        },
       }
-    })
-
-    test('getDiscovered', () => {
-      expect(getDiscovered(state)).toEqual([
-        {
-          name: 'bar',
-          ip: '169.254.3.4',
-          port: 31950,
-          wired: true,
-          isConnected: true,
-        },
-        {
-          name: 'qux',
-          ip: '169.254.7.8',
-          port: 31950,
-          isConnected: false,
-          wired: true,
-        },
-        {
-          name: 'baz',
-          ip: '10.10.5.6',
-          port: 31950,
-          wired: false,
-          isConnected: false,
-        },
-        {
-          name: 'foo',
-          ip: '10.10.1.2',
-          port: 31950,
-          wired: false,
-          isConnected: false,
-        },
-      ])
-    })
-
-    test('getConnectedRobot', () => {
-      expect(getConnectedRobot(state)).toEqual({
-        name: 'bar',
-        ip: '169.254.3.4',
-        port: 31950,
-        wired: true,
-        isConnected: true,
-      })
-
-      state = setIn(state, 'robot.connection.connectedTo', 'not-found')
-      expect(getConnectedRobot(state)).toBeUndefined()
     })
 
     test('getConnectedRobotName', () => {
       expect(getConnectedRobotName(state)).toEqual('bar')
-      state = setIn(state, 'robot.connection.connectedTo', 'not-found')
-      expect(getConnectedRobotName(state)).toBeUndefined()
+      state = setIn(state, 'robot.connection.connectedTo', 'foo')
+      expect(getConnectedRobotName(state)).toEqual('foo')
     })
 
     test('getConnectionStatus', () => {

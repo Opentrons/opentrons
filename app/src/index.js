@@ -11,7 +11,6 @@ import {ConnectedRouter, routerMiddleware} from 'react-router-redux'
 import createLogger from './logger'
 import {checkShellUpdate, shellMiddleware} from './shell'
 
-import {healthCheckMiddleware} from './health-check'
 import {apiClientMiddleware as robotApiMiddleware} from './robot'
 import {initializeAnalytics, analyticsMiddleware} from './analytics'
 import {initializeSupport, supportMiddleware} from './support'
@@ -30,7 +29,6 @@ const middleware = applyMiddleware(
   thunk,
   robotApiMiddleware(),
   shellMiddleware,
-  healthCheckMiddleware,
   analyticsMiddleware,
   supportMiddleware,
   routerMiddleware(history)

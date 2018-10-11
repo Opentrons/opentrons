@@ -1,5 +1,7 @@
 // @flow
+import concat from 'lodash/concat'
 import filter from 'lodash/filter'
+import find from 'lodash/find'
 import groupBy from 'lodash/groupBy'
 import head from 'lodash/head'
 import map from 'lodash/map'
@@ -7,7 +9,9 @@ import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
 import {createSelector} from 'reselect'
 
-import {selectors as robotSelectors} from '../robot'
+// TODO(mc, 2018-10-10): fix circular dependency with RPC API client
+// that requires us to bypass the robot entry point here
+import {getConnectedRobotName} from '../robot/selectors'
 
 import type {OutputSelector as Selector} from 'reselect'
 import type {Service} from '@opentrons/discovery-client'
@@ -17,6 +21,7 @@ import type {
   Robot,
   ReachableRobot,
   UnreachableRobot,
+  AnyRobot,
   ConnectableStatus,
   ReachableStatus,
   UnreachableStatus,
@@ -34,6 +39,8 @@ type GetGroupedRobotsMap = Selector<State, void, GroupedRobotsMap>
 type GetConnectableRobots = Selector<State, void, Array<Robot>>
 type GetReachableRobots = Selector<State, void, Array<ReachableRobot>>
 type GetUnreachableRobots = Selector<State, void, Array<UnreachableRobot>>
+type GetAllRobots = Selector<State, void, Array<AnyRobot>>
+type GetConnectedRobot = Selector<State, void, ?Robot>
 
 export const CONNECTABLE: ConnectableStatus = 'connectable'
 export const REACHABLE: ReachableStatus = 'reachable'
@@ -49,6 +56,9 @@ const isReachable = (s: ResolvedRobot) =>
 
 const maybeGetResolved = (service: Service): ?ResolvedRobot =>
   isResolved(service) ? (service: any) : null
+
+const makeDisplayName = (service: Service): string =>
+  service.name.replace('opentrons-', '')
 
 // group services of each robot into connectable, reachable, and unconnectable
 // sort order will be preserved from state (and therefore discovery-client),
@@ -75,15 +85,13 @@ const getGroupedRobotsMap: GetGroupedRobotsMap = createSelector(
     })
 )
 
-function makeDisplayName (robot: Service) {
-  const {name} = robot
-  const displayName = name.replace('opentrons-', '')
-  return displayName
+export function getScanning (state: State) {
+  return state.discovery.scanning
 }
 
 export const getConnectableRobots: GetConnectableRobots = createSelector(
   getGroupedRobotsMap,
-  robotSelectors.getConnectedRobotName,
+  getConnectedRobotName,
   (robotsMap, connectedName) =>
     map(robotsMap, g => head(g.connectable))
       .filter(Boolean)
@@ -108,3 +116,23 @@ export const getUnreachableRobots: GetUnreachableRobots = createSelector(
     return map(unreachableMap, g => head(g.unreachable)).filter(Boolean)
   }
 )
+
+export const getAllRobots: GetAllRobots = createSelector(
+  getConnectableRobots,
+  getReachableRobots,
+  getUnreachableRobots,
+  concat
+)
+
+export const getConnectedRobot: GetConnectedRobot = createSelector(
+  getConnectableRobots,
+  robots => find(robots, 'connected')
+)
+
+export const getRobotApiVersion = (robot: AnyRobot): ?string =>
+  (robot.serverHealth && robot.serverHealth.apiServerVersion) ||
+  (robot.health && robot.health.api_version)
+
+export const getRobotFirmwareVersion = (robot: AnyRobot): ?string =>
+  (robot.serverHealth && robot.serverHealth.smoothieVersion) ||
+  (robot.health && robot.health.fw_version)

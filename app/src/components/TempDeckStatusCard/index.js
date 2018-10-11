@@ -1,17 +1,23 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import type {State} from '../../types'
+
+import {getConnectedRobot} from '../../discovery'
 import {
-  selectors as robotSelectors,
-  type Robot,
-} from '../../robot'
-import type {TempDeckModule, FetchModuleDataResponse} from '../../http-api-client'
-import {fetchModules, fetchModuleData, makeGetRobotModules, makeGetRobotModuleData} from '../../http-api-client'
+  fetchModules,
+  fetchModuleData,
+  makeGetRobotModules,
+  makeGetRobotModuleData,
+} from '../../http-api-client'
+
 import {LabeledValue, IntervalWrapper} from '@opentrons/components'
 import StatusCard from './StatusCard'
 import CardContentRow from './CardContentRow'
 import StatusItem from './StatusItem'
+
+import type {State} from '../../types'
+import type {TempDeckModule, FetchModuleDataResponse} from '../../http-api-client'
+import type {Robot} from '../../discovery'
 
 const POLL_TEMPDECK_INTERVAL_MS = 1000
 
@@ -71,7 +77,7 @@ function makeSTP (): (state: State) => SP {
   const getRobotModules = makeGetRobotModules()
   const getRobotModuleData = makeGetRobotModuleData()
   return (state) => {
-    const _robot = robotSelectors.getConnectedRobot(state)
+    const _robot = getConnectedRobot(state)
     const modulesCall = _robot && getRobotModules(state, _robot)
     const modulesResponse = modulesCall && modulesCall.response
     const modules = modulesResponse && modulesResponse.modules

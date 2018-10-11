@@ -8,7 +8,7 @@ describe('robot reducer - connection', () => {
     const state = reducer(undefined, {})
 
     expect(getState(state)).toEqual({
-      connectedTo: '',
+      connectedTo: null,
       connectRequest: {inProgress: false, error: null, name: ''},
       disconnectRequest: {inProgress: false, error: null},
       unexpectedDisconnect: false,
@@ -18,7 +18,7 @@ describe('robot reducer - connection', () => {
   test('handles CONNECT action', () => {
     const state = {
       connection: {
-        connectedTo: '',
+        connectedTo: null,
         connectRequest: {
           inProgress: false,
           error: new Error('AH'),
@@ -32,7 +32,7 @@ describe('robot reducer - connection', () => {
     }
 
     expect(getState(reducer(state, action))).toEqual({
-      connectedTo: '',
+      connectedTo: null,
       connectRequest: {inProgress: true, error: null, name: 'ot'},
     })
   })
@@ -40,7 +40,7 @@ describe('robot reducer - connection', () => {
   test('handles CONNECT_RESPONSE success', () => {
     const state = {
       connection: {
-        connectedTo: '',
+        connectedTo: null,
         connectRequest: {
           inProgress: true,
           error: null,
@@ -59,7 +59,7 @@ describe('robot reducer - connection', () => {
   test('handles CONNECT_RESPONSE failure', () => {
     const state = {
       connection: {
-        connectedTo: '',
+        connectedTo: null,
         connectRequest: {
           inProgress: true,
           error: null,
@@ -73,7 +73,7 @@ describe('robot reducer - connection', () => {
     }
 
     expect(getState(reducer(state, action))).toEqual({
-      connectedTo: '',
+      connectedTo: null,
       connectRequest: {
         inProgress: false,
         error: new Error('AH'),
@@ -85,7 +85,7 @@ describe('robot reducer - connection', () => {
   test('handles CLEAR_CONNECT_RESPONSE action', () => {
     const state = {
       connection: {
-        connectedTo: '',
+        connectedTo: null,
         connectRequest: {
           inProgress: false,
           error: new Error('AH'),
@@ -97,7 +97,7 @@ describe('robot reducer - connection', () => {
     const action = {type: 'robot:CLEAR_CONNECT_RESPONSE', error: false}
 
     expect(getState(reducer(state, action))).toEqual({
-      connectedTo: '',
+      connectedTo: null,
       connectRequest: {inProgress: false, error: null, name: ''},
     })
   })
@@ -132,7 +132,7 @@ describe('robot reducer - connection', () => {
     const action = {type: 'robot:DISCONNECT_RESPONSE', payload: {}}
 
     expect(getState(reducer(state, action))).toEqual({
-      connectedTo: '',
+      connectedTo: null,
       disconnectRequest: {inProgress: false, error: null},
       unexpectedDisconnect: false,
     })
