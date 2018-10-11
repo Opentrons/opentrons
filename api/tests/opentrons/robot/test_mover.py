@@ -66,7 +66,7 @@ def test_functional(smoothie):
 
 
 def test_integration(robot):
-    left = Pipette(robot, mount='left')
+    left = Pipette(robot, mount='left', ul_per_mm=1000, max_volume=1000)
     robot.home()
     pose = left._move(robot.poses, 1, 1, 1)
     assert isclose(change_base(pose, src=left), (1, 1, 1)).all()

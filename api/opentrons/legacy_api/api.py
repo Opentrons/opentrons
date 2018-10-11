@@ -241,6 +241,7 @@ class InstrumentsWrapper(object):
             plunger_current=config.plunger_current,
             drop_tip_current=config.drop_tip_current,
             plunger_positions=config.plunger_positions.copy(),
+            ul_per_mm=config.ul_per_mm,
             pick_up_current=config.pick_up_current,
             pick_up_distance=config.pick_up_distance,
             quirks=config.quirks,

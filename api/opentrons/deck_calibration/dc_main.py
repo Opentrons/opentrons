@@ -341,7 +341,8 @@ class CLITool:
 def probe(tip_length: float) -> str:
     robot.reset()
 
-    pipette = instruments.Pipette(mount='right', channels=1)
+    pipette = instruments.Pipette(
+        mount='right', channels=1, max_volume=1000, ul_per_mm=1000)
     probe_center = tuple(probe_instrument(
         pipette, robot, tip_length=tip_length))
     log.debug("Setting probe center to {}".format(probe_center))

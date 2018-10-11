@@ -44,6 +44,7 @@ class PerformanceTest(unittest.TestCase):
             name="p200",
             trash_container=trash,
             tip_racks=[tiprack],
+            max_volume=200,
             min_volume=0.5,
             axis="b",
             channels=1
