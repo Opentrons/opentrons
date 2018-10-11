@@ -144,20 +144,22 @@ type LabwareOnDeckProps = {
   setDefaultLabwareName: () => mixed,
 }
 
-// TODO: BC 2018-10-08 move these connections to lower level components
 class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
-  shouldComponentUpdate (nextProps: LabwareOnDeckProps) {
-    const shouldAlwaysUpdate = this.props.addLabwareMode ||
-      nextProps.addLabwareMode ||
-      this.props.moveLabwareMode ||
-      nextProps.moveLabwareMode
+  // TODO: BC 2018-10-11 re-implement this re-render check at a lower level once this component
+  // and its connected props are broken out into lower level components.
 
-    const labwarePresenceChange = this.props.containerId !== nextProps.containerId
-    const nameOverlayChange = this.props.showNameOverlay !== nextProps.showNameOverlay
+  // shouldComponentUpdate (nextProps: LabwareOnDeckProps) {
+  //   const shouldAlwaysUpdate = this.props.addLabwareMode ||
+  //     nextProps.addLabwareMode ||
+  //     this.props.moveLabwareMode ||
+  //     nextProps.moveLabwareMode
 
-    if (shouldAlwaysUpdate || labwarePresenceChange || nameOverlayChange) return true
-    return this.props.highlighted !== nextProps.highlighted
-  }
+  //   const labwarePresenceChange = this.props.containerId !== nextProps.containerId
+  //   const nameOverlayChange = this.props.showNameOverlay !== nextProps.showNameOverlay
+
+  //   if (shouldAlwaysUpdate || labwarePresenceChange || nameOverlayChange) return true
+  //   return this.props.highlighted !== nextProps.highlighted
+  // }
   render () {
     const {
       slot,
