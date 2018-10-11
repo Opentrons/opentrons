@@ -3,7 +3,7 @@
 
 from opentrons import instruments, robot
 from opentrons.legacy_api.containers import load as containers_load
-from opentrons.legacy_api.instruments import Pipette, pipette_config
+from opentrons.legacy_api.instruments import pipette_config
 from opentrons.trackers import pose_tracker
 from numpy import isclose
 import pytest
