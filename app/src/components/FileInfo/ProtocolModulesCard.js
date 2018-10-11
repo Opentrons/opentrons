@@ -17,23 +17,20 @@ import InstrumentItem from './InstrumentItem'
 import InstrumentWarning from './InstrumentWarning'
 
 import type {State} from '../../types'
-import type {Robot, SessionModule} from '../../robot'
+import type {SessionModule} from '../../robot'
+import type {Robot} from '../../discovery'
 
-type OP = {
-  robot: Robot,
-}
+type OP = {robot: Robot}
 
-type SP = {
+type SP = {|
   modules: Array<SessionModule>,
   actualModules: ?FetchModulesResponse,
   attachModulesUrl: string,
-}
+|}
 
-type DP = {
-  fetchModules: () => mixed,
-}
+type DP = {|fetchModules: () => mixed|}
 
-type Props = OP & SP & DP
+type Props = {...$Exact<OP>, ...SP, ...DP}
 
 const TITLE = 'Required Modules'
 
@@ -93,6 +90,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     return {
       modules: robotSelectors.getModules(state),
       actualModules: modulesCall && modulesCall.response,
+      // TODO(mc, 2018-10-10): pass this prop down from page
       attachModulesUrl: `/robots/${robot.name}/instruments`,
     }
   }

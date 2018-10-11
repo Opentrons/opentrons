@@ -3,69 +3,58 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {withRouter} from 'react-router'
 import {push} from 'react-router-redux'
-import type {State, Dispatch} from '../../types'
-import type {Robot} from '../../robot'
+import find from 'lodash/find'
 
-import {
-  selectors as robotSelectors,
-  actions as robotActions,
-} from '../../robot'
-
-import {makeGetHealthCheckOk} from '../../health-check'
-
+import {actions as robotActions, selectors as robotSelectors} from '../../robot'
+import {getAllRobots} from '../../discovery'
 import {AlertModal} from '@opentrons/components'
 import {Portal} from '../portal'
 import ModalCopy from './ModalCopy'
 
-type StateProps = {
-  robot: ?Robot,
-  ok: ?boolean,
-}
+import type {State, Dispatch} from '../../types'
 
-type DispatchProps = {
-  disconnect: () => mixed,
-}
+type SP = {|ok: ?boolean|}
+type DP = {|disconnect: () => mixed|}
+type Props = {...SP, ...DP}
 
-type Props = StateProps & DispatchProps
-
-export default withRouter(connect(
-  makeMapStateToProps,
-  mapDispatchToProps
-)(LostConnectionAlert))
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(LostConnectionAlert)
+)
 
 function LostConnectionAlert (props: Props) {
   const {ok, disconnect} = props
 
-  return ok === false && (
-    <Portal>
-      <AlertModal
-        onCloseClick={disconnect}
-        heading={'Connection to robot lost'}
-        buttons={[
-          {onClick: disconnect, children: 'close'},
-        ]}
-        alertOverlay
-      >
-        <ModalCopy />
-      </AlertModal>
-    </Portal>
+  return (
+    ok === false && (
+      <Portal>
+        <AlertModal
+          onCloseClick={disconnect}
+          heading={'Connection to robot lost'}
+          buttons={[{onClick: disconnect, children: 'close'}]}
+          alertOverlay
+        >
+          <ModalCopy />
+        </AlertModal>
+      </Portal>
+    )
   )
 }
 
-function makeMapStateToProps () {
-  const getHealthOk = makeGetHealthCheckOk()
+function mapStateToProps (state: State): SP {
+  // search _all_ robots, not just connectable ones, in case we were connected
+  // and then robot became not connectable
+  const robot = find(getAllRobots(state), {
+    name: robotSelectors.getConnectedRobotName(state),
+  })
+  const unexpectedDisconnect = state.robot.connection.unexpectedDisconnect
 
-  return (state: State) => {
-    const robot = robotSelectors.getConnectedRobot(state)
-    const unexpectedDisconnect = state.robot.connection.unexpectedDisconnect
-
-    return {
-      ok: robot && !unexpectedDisconnect && getHealthOk(state, robot),
-    }
-  }
+  return {ok: robot && robot.ok && !unexpectedDisconnect}
 }
 
-function mapDispatchToProps (dispatch: Dispatch) {
+function mapDispatchToProps (dispatch: Dispatch): DP {
   return {
     disconnect: () => {
       dispatch(push('/robots'))

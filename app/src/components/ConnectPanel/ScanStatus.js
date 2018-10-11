@@ -17,7 +17,10 @@ export default function ScanStatus (props: Props) {
   const notFoundMessage = !isScanning && !found && (
     <div>
       <h3 className={styles.title}>No robots found!</h3>
-      <p className={styles.message}>If you haven’t set up wifi on your robot<br />please connect it with USB</p>
+      <p className={styles.message}>
+        If you haven&apos;t set up Wi-Fi on your robot please connect it with
+        USB
+      </p>
     </div>
   )
 

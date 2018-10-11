@@ -5,7 +5,7 @@ import {SpinnerModal} from '@opentrons/components'
 import Page from '../../components/Page'
 import FileInfo from '../../components/FileInfo'
 
-import type {Robot} from '../../robot'
+import type {Robot} from '../../discovery'
 
 type Props = {
   robot: Robot,

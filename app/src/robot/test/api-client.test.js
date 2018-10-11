@@ -72,7 +72,7 @@ describe('api client', () => {
   })
 
   const ROBOT_NAME = 'ot'
-  const ROBOT_IP = '127.0.0.01'
+  const ROBOT_IP = '127.0.0.1'
   const STATE = {
     [NAME]: {
       connection: {
@@ -81,7 +81,18 @@ describe('api client', () => {
     },
     discovery: {
       robotsByName: {
-        [ROBOT_NAME]: [{ip: ROBOT_IP, port: 31950, ok: true}],
+        [ROBOT_NAME]: [
+          {
+            name: ROBOT_NAME,
+            ip: ROBOT_IP,
+            local: true,
+            port: 31950,
+            ok: true,
+            serverOk: true,
+            health: {},
+            serverHealth: {},
+          },
+        ],
       },
     },
   }

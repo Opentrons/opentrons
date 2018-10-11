@@ -2,11 +2,15 @@
 // takes a dispatch (send) function and returns a receive handler
 // TODO(mc, 2018-01-26): typecheck with flow
 import {push} from 'react-router-redux'
+import find from 'lodash/find'
 
 import RpcClient from '../../rpc/client'
 import {actions, actionTypes} from '../actions'
 import * as constants from '../constants'
 import * as selectors from '../selectors'
+
+// bypass the robot entry point here to avoid shell module
+import {getConnectableRobots} from '../../discovery/selectors'
 
 const RUN_TIME_TICK_INTERVAL_MS = 1000
 const NO_INTERVAL = -1
@@ -49,8 +53,7 @@ export default function client (dispatch) {
     if (rpcClient) disconnect()
 
     const name = action.payload.name
-    const target = selectors.getDiscovered(state)
-      .find(r => r.name === name)
+    const target = find(getConnectableRobots(state), {name})
 
     if (!target) {
       return dispatch(

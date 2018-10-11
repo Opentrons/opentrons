@@ -11,7 +11,7 @@ import type {
 } from '../actions'
 
 type State = {
-  connectedTo: string,
+  connectedTo: ?string,
   connectRequest: {
     inProgress: boolean,
     error: ?{message: string},
@@ -25,7 +25,7 @@ type State = {
 }
 
 const INITIAL_STATE: State = {
-  connectedTo: '',
+  connectedTo: null,
   connectRequest: {inProgress: false, error: null, name: ''},
   disconnectRequest: {inProgress: false, error: null},
   unexpectedDisconnect: false,
@@ -76,7 +76,7 @@ function handleConnectResponse (
 
   if (error) {
     requestName = connectedTo
-    connectedTo = ''
+    connectedTo = null
   }
 
   return {
@@ -96,7 +96,7 @@ function handleDisconnectResponse (
 ): State {
   return {
     ...state,
-    connectedTo: '',
+    connectedTo: null,
     disconnectRequest: {error: null, inProgress: false},
     unexpectedDisconnect: false,
   }

@@ -5,7 +5,8 @@ import semver from 'semver'
 
 import {chainActions} from '../util'
 import client, {FetchError} from './client'
-import {fetchHealth, makeGetRobotHealth} from './health'
+import {fetchHealth} from './health'
+import {getRobotApiVersion} from '../discovery'
 import {
   getApiUpdateVersion,
   getApiUpdateFilename,
@@ -14,7 +15,8 @@ import {
 
 import type {OutputSelector} from 'reselect'
 import type {State, ThunkPromiseAction, Action} from '../types'
-import type {BaseRobot, RobotService} from '../robot'
+import type {AnyRobot} from '../discovery'
+import type {RobotService} from '../robot'
 import type {ApiCall, ApiRequestError} from './types'
 
 type RequestPath = 'update' | 'restart' | 'update/ignore'
@@ -249,12 +251,11 @@ export type RobotUpdateInfo = {version: string, type: RobotUpdateType}
 
 export const makeGetRobotUpdateInfo = () => {
   const selector: OutputSelector<State,
-    BaseRobot,
+    AnyRobot,
     RobotUpdateInfo> = createSelector(
-    makeGetRobotHealth(),
+    (_, robot) => getRobotApiVersion(robot),
     getApiUpdateVersion,
-    (health, updateVersion) => {
-      const current = health.response && health.response.api_version
+    (current, updateVersion) => {
       const upgrade = current && semver.gt(updateVersion, current)
       const downgrade = current && semver.lt(updateVersion, current)
       let type
@@ -305,6 +306,7 @@ export const makeGetRobotIgnoredUpdateRequest = () => {
   return selector
 }
 
+// TODO(mc, 2018-10-10): this selector is broken
 export const getAnyRobotUpdateAvailable: OutputSelector<State,
   void,
   boolean> = createSelector(selectServerState, state =>

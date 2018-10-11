@@ -2,13 +2,11 @@
 // setup labware page
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {Route, Redirect, withRouter, type Match} from 'react-router'
+import {Route, Redirect, withRouter} from 'react-router'
 import {push} from 'react-router-redux'
 
-import type {State, Dispatch} from '../../types'
-import type {Labware, Robot} from '../../robot'
-
 import {selectors as robotSelectors} from '../../robot'
+import {getConnectedRobot} from '../../discovery'
 import {makeGetRobotSettings} from '../../http-api-client'
 
 import Page from '../../components/Page'
@@ -18,22 +16,24 @@ import ReviewDeckModal from '../../components/ReviewDeckModal'
 import ConfirmModal from '../../components/CalibrateLabware/ConfirmModal'
 import ConnectModulesModal from '../../components/ConnectModulesModal'
 
-type OP = {
-  match: Match,
-}
+import type {ContextRouter} from 'react-router'
+import type {State, Dispatch} from '../../types'
+import type {Labware} from '../../robot'
+import type {Robot} from '../../discovery'
 
-// TODO(mc, 2018-07-19): rename mergeProps-only properties with _privateName
-type SP = {
+type OP = ContextRouter
+
+type SP = {|
   deckPopulated: boolean,
   labware: ?Labware,
   calibrateToBottom: boolean,
   robot: ?Robot,
   reviewModules: ?boolean,
-}
+|}
 
-type DP = {onBackClick: () => mixed}
+type DP = {|onBackClick: () => mixed|}
 
-type Props = OP & SP & DP
+type Props = {...OP, ...SP, ...DP}
 
 export default withRouter(
   connect(makeMapStateToProps, mapDispatchToProps)(SetupDeckPage)
@@ -80,10 +80,10 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   const getRobotSettings = makeGetRobotSettings()
 
   return (state, ownProps) => {
-    const {match: {url, params: {slot}}} = ownProps
+    const {match: {params: {slot}}} = ownProps
     const labware = robotSelectors.getLabware(state)
     const currentLabware = labware.find((lw) => lw.slot === slot)
-    const robot = robotSelectors.getConnectedRobot(state)
+    const robot = getConnectedRobot(state)
 
     // TODO(mc, 2018-07-19): API selector for getting the response directly
     const settingsResp = robot && getRobotSettings(state, robot).response
@@ -98,8 +98,6 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     const reviewModules = modulesRequired && !modulesReviewed
 
     return {
-      slot,
-      url,
       calibrateToBottom,
       reviewModules,
       robot,

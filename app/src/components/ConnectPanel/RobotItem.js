@@ -5,7 +5,7 @@ import {withRouter, type ContextRouter} from 'react-router'
 
 import type {State, Dispatch} from '../../types'
 import type {ViewableRobot} from '../../discovery'
-import {actions as robotActions, selectors as robotSelectors} from '../../robot'
+import {actions as robotActions} from '../../robot'
 import {makeGetRobotUpdateInfo} from '../../http-api-client'
 import {RobotListItem} from './RobotListItem.js'
 
@@ -15,7 +15,6 @@ type OP = {|
 |}
 
 type SP = {|
-  connected: boolean,
   upgradable: boolean,
   selected: boolean,
 |}
@@ -42,7 +41,6 @@ function makeMapStateToProps () {
   const getUpdateInfo = makeGetRobotUpdateInfo()
 
   return (state: State, ownProps: OP): SP => ({
-    connected: robotSelectors.getConnectedRobotName(state) === ownProps.name,
     upgradable: getUpdateInfo(state, ownProps).type === 'upgrade',
     selected: ownProps.match.params.name === ownProps.name,
   })

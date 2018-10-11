@@ -9,9 +9,6 @@ import {reducer as robotReducer} from './robot'
 // api state
 import {reducer as httpApiReducer} from './http-api-client'
 
-// health check state
-import {healthCheckReducer} from './health-check'
-
 // app shell state
 import {shellReducer} from './shell'
 
@@ -29,7 +26,6 @@ export default combineReducers({
   api: httpApiReducer,
   config: configReducer,
   discovery: discoveryReducer,
-  healthCheck: healthCheckReducer,
   protocol: protocolReducer,
   shell: shellReducer,
   router: routerReducer,

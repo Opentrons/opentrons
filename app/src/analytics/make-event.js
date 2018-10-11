@@ -1,5 +1,6 @@
 // @flow
 // redux action types to analytics events map
+import find from 'lodash/find'
 import createLogger from '../logger'
 import {selectors as robotSelectors} from '../robot'
 import {getConnectableRobots} from '../discovery'
@@ -20,7 +21,7 @@ export default function makeEvent (state: State, action: Action): ?Event {
 
     case 'robot:CONNECT_RESPONSE':
       const name = state.robot.connection.connectRequest.name
-      const robot = getConnectableRobots(state).find(r => r.name === name)
+      const robot = find(getConnectableRobots(state), {name})
 
       if (!robot) {
         log.warn('No robot found for connect response')

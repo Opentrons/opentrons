@@ -40,8 +40,10 @@ describe('server API client', () => {
 
   describe('selectors', () => {
     let state
+    let robot
 
     beforeEach(() => {
+      robot = {name: 'opentrons', ip: '1.2.3.4', port: '1234'}
       state = {
         api: {
           server: {
@@ -49,15 +51,6 @@ describe('server API client', () => {
               update: {inProgress: true, error: null, response: null},
               restart: {inProgress: true, error: null, response: null},
               'update/ignore': {inProgress: true, error: null, response: null},
-            },
-          },
-          api: {
-            [robot.name]: {
-              health: {
-                response: {
-                  api_version: '3.0.0',
-                },
-              },
             },
           },
         },
@@ -72,17 +65,18 @@ describe('server API client', () => {
     test('makeGetRobotUpdateInfo', () => {
       const version = state.shell.apiUpdate.version
       const getRobotUpdateInfo = makeGetRobotUpdateInfo()
-      const setCurrent = setter(`api.api.${robot.name}.health.response.api_version`)
+      const setCurrent = setter(`health.api_version`)
 
       // test upgrade available
+      robot = setCurrent(robot, '3.0.0')
       expect(getRobotUpdateInfo(state, robot)).toEqual({version, type: 'upgrade'})
 
       // test downgrade
-      state = setCurrent(state, '5.0.0')
+      robot = setCurrent(robot, '5.0.0')
       expect(getRobotUpdateInfo(state, robot)).toEqual({version, type: 'downgrade'})
 
       // test no upgrade
-      state = setCurrent(state, '4.0.0')
+      robot = setCurrent(robot, '4.0.0')
       expect(getRobotUpdateInfo(state, robot)).toEqual({version, type: null})
 
       // test unknown robot
