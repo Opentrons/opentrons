@@ -15,21 +15,21 @@ def labware_setup():
     from opentrons import containers, instruments
 
     tip_racks = \
-        [containers.load('tiprack-200ul', slot, slot) for slot in ['1', '4']]
+        [containers.load('opentrons-tiprack-300ul', slot, slot)
+         for slot in ['1', '4']]
     plates = \
-        [containers.load('96-PCR-flat', slot, slot) for slot in ['2', '5']]
+        [containers.load('96-flat', slot, slot) for slot in ['2', '5']]
 
-    # TODO(mc, 2018-06-13): use standard pipette factories
-    p100 = instruments.Pipette(
-        name='p100', mount='right', channels=8, tip_racks=tip_racks)
+    p50 = instruments.P50_Multi(
+        mount='right', tip_racks=tip_racks)
 
-    p1000 = instruments.Pipette(
-        name='p1000', mount='left', channels=8, tip_racks=tip_racks)
+    p1000 = instruments.P1000_Single(
+        mount='left', tip_racks=tip_racks)
 
     commands = [
         {
             'location': plates[0][0],
-            'instrument': p100
+            'instrument': p50
         },
         {
             'location': plates[1]
@@ -40,7 +40,7 @@ def labware_setup():
         }
     ]
 
-    return (p100, p1000), tip_racks, plates, commands
+    return (p50, p1000), tip_racks, plates, commands
 
 
 async def test_load_from_text(session_manager, protocol):
@@ -165,7 +165,7 @@ def test_error_append(run_session):
 
 def test_get_instruments_and_containers(labware_setup, virtual_smoothie_env):
     instruments, tip_racks, plates, commands = labware_setup
-    p100, p1000 = instruments
+    p50, p1000 = instruments
 
     instruments, containers, modules, interactions = \
         _accumulate([_get_labware(command) for command in commands])
@@ -182,9 +182,9 @@ def test_get_instruments_and_containers(labware_setup, virtual_smoothie_env):
     containers = session.get_containers()
     modules = session.get_modules()
 
-    assert [i.name for i in instruments] == ['p100', 'p1000']
+    assert [i.name for i in instruments] == ['p50_multi_v1', 'p1000_single_v1']
     assert [i.axis for i in instruments] == ['a', 'b']
-    assert [i.id for i in instruments] == [id(p100), id(p1000)]
+    assert [i.id for i in instruments] == [id(p50), id(p1000)]
     assert [[t.slot for t in i.tip_racks] for i in instruments] == \
         [['1', '4'], ['1', '4']]
     assert [[c.slot for c in i.containers] for i in instruments] == \
@@ -192,7 +192,7 @@ def test_get_instruments_and_containers(labware_setup, virtual_smoothie_env):
 
     assert [c.slot for c in containers] == ['2', '5']
     assert [[i.id for i in c.instruments] for c in containers] == \
-        [[id(p100), id(p1000)], [id(p1000)]]
+        [[id(p50), id(p1000)], [id(p1000)]]
     assert [c.id for c in containers] == [id(plates[0]), id(plates[1])]
 
     # TODO(ben 20180717): Add meaningful data and assertions for modules once

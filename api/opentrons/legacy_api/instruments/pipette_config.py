@@ -23,6 +23,7 @@ pipette_config = namedtuple(
         'drop_tip_current',
         'min_volume',
         'max_volume',
+        'ul_per_mm',
         'tip_length'  # TODO (andy): remove from pipette, move to tip-rack
     ]
 )
@@ -87,6 +88,7 @@ def load(pipette_model: str) -> pipette_config:
             drop_tip_current=cfg.get('dropTipCurrent'),
             min_volume=cfg.get('minVolume'),
             max_volume=cfg.get('maxVolume'),
+            ul_per_mm=cfg.get('ulPerMm'),
             tip_length=cfg.get('tipLength')
         )
 

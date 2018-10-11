@@ -4,6 +4,7 @@ import itertools
 import warnings
 import logging
 import time
+from typing import List
 
 from opentrons import commands
 from ..containers import unpack_location
@@ -142,7 +143,6 @@ class Pipette:
 
         self.mount = mount
         self.channels = channels
-        self.ul_per_mm = ul_per_mm
 
         self.model_offset = model_offset
 
@@ -176,6 +176,20 @@ class Pipette:
 
         self.max_volume = max_volume
         self.min_volume = min_volume
+
+        volume_fn_type = type(ul_per_mm)
+        if dict is volume_fn_type:
+            self.ul_per_mm = ul_per_mm
+        elif float is volume_fn_type or int is volume_fn_type:
+            # assume float or int is static ul/mm
+            self.ul_per_mm = {
+                "aspirate": [[max_volume, 0, ul_per_mm]],
+                "dispense": [[max_volume, 0, ul_per_mm]]
+            }
+        else:
+            raise TypeError(
+                'Invalid type {} for microlters/mm function'.format(
+                    volume_fn_type))
 
         self._pick_up_current = None
         self.set_pick_up_current(DEFAULT_PLUNGE_CURRENT)
@@ -1380,14 +1394,7 @@ class Pipette:
 
         Calibration of the pipette motor's ul-to-mm conversion is required
         """
-
-        model = self.name
-        # Set the ul_per_mm for the pipette
-        if self.ul_per_mm:
-            ul_per_mm = lambda: self.ul_per_mm
-        else:
-            ul_per_mm = self._key_map_pipette_functions(model, ul, 'aspirate')
-        millimeters = ul / ul_per_mm()
+        millimeters = ul / self._ul_per_mm(ul, 'aspirate')
         destination_mm = self._get_plunger_position('bottom') + millimeters
         return round(destination_mm, 6)
 
@@ -1399,139 +1406,18 @@ class Pipette:
 
         Calibration of the pipette motor's ul-to-mm conversion is required
         """
-
-        model = self.name
-        # Set the ul_per_mm for the pipette
-        if self.ul_per_mm:
-            ul_per_mm = lambda: self.ul_per_mm
-        else:
-            ul_per_mm = self._key_map_pipette_functions(model, ul, 'dispense')
-        # Change default of 1000 ul/mm if function returns a value
-        millimeters = ul / ul_per_mm()
+        millimeters = ul / self._ul_per_mm(ul, 'dispense')
         destination_mm = self._get_plunger_position('bottom') + millimeters
         return round(destination_mm, 6)
 
-    def _key_map_pipette_functions(self, model, ul, func):
-        function_map = {
-            'p10_single_v1': lambda: self._p10_single_piecewise(ul, func),
-            'p10_single_v1.3': lambda: self._p10_single_piecewise(ul, func),
-            'p10_multi_v1': lambda: self._p10_multi_piecewise(ul, func),
-            'p10_multi_v1.3': lambda: self._p10_multi_piecewise(ul, func),
-            'p50_single_v1': lambda: self._p50_single_piecewise(ul, func),
-            'p50_single_v1.3': lambda: self._p50_single_piecewise(ul, func),
-            'p50_multi_v1': lambda: self._p50_multi_piecewise(ul, func),
-            'p50_multi_v1.3': lambda: self._p50_multi_piecewise(ul, func),
-            'p300_single_v1': lambda: self._p300_single_piecewise(ul, func),
-            'p300_single_v1.3': lambda: self._p300_single_piecewise(ul, func),
-            'p300_multi_v1': lambda: self._p300_multi_piecewise(ul, func),
-            'p300_multi_v1.3': lambda: self._p300_multi_piecewise(ul, func),
-            'p1000_single_v1': lambda: self._p1000_piecewise(ul, func),
-            'p1000_single_v1.3': lambda: self._p1000_piecewise(ul, func)
-        }
-
-        return function_map[model]
-
-    def _p10_single_piecewise(self, ul, func):
-        # Piecewise function that calculates ul_per_mm for a p10 single
-        # pipette model given a particular ul value
-        if func == 'aspirate':
-            if (ul > 0) and (ul < 1.8263):
-                return -0.0958*ul + 1.088
-            elif (ul >= 1.8263) and (ul < 2.5222):
-                return -0.104*ul + 1.1031
-            elif (ul >= 2.5222) and (ul < 3.2354):
-                return -0.0447*ul + 0.9536
-            elif (ul >= 3.2354) and (ul < 3.9984):
-                return -0.012*ul + 0.8477
-            elif (ul >= 3.9984) and (ul <= 12.5135):
-                return -0.0021*ul + 0.8079
-        else:
-            # Constant function for dispense
-            return 0*ul + 0.7945
-
-    def _p10_multi_piecewise(self, ul, func):
-        # Piecewise function that calculates ul_per_mm for a p10 multi
-        # pipette model given a particular ul value
-        if func == 'aspirate':
-            if (ul > 0) and (ul < 1.893415617):
-                return -1.1069*ul + 3.042593193
-            elif (ul >= 1.893415617) and (ul < 2.497849452):
-                return -0.1888*ul + 1.30410391
-            elif (ul >= 2.497849452) and (ul < 5.649462387):
-                return -0.0081*ul + 0.8528667891
-            elif (ul >= 5.649462387) and (ul <= 12.74444519):
-                return -0.0018*ul + 0.8170558891
-        else:
-            # Constant function for dispense
-            return 0*ul + 0.8058688085
-
-    def _p50_single_piecewise(self, ul, func):
-        # Piecewise function that calculates ul_per_mm for a p50 single
-        # pipette model given a particular ul value
-        if func == 'aspirate':
-            if (ul > 0) and (ul < 11.79687499):
-                return -0.0098*ul + 3.064988953
-            elif (ul >= 11.79687499) and (ul <= 50):
-                return -0.0004*ul + 2.954068131
-        else:
-            return 0*ul + 2.931601299
-
-    def _p50_multi_piecewise(self, ul, func):
-        # Piecewise function that calculates ul_per_mm for a p50 multi
-        # pipette model given a particular ul value
-        if func == 'aspirate':
-            if (ul > 0) and (ul < 12.29687531):
-                return -0.0049*ul + 3.134703694
-            elif (ul >= 12.29687531) and (ul <= 50):
-                return -0.0002*ul + 3.077116024
-        else:
-            # Constant function for dispense
-            return 0*ul + 3.06368702
-
-    def _p300_single_piecewise(self, ul, func):
-        # Piecewise function that calculates ul_per_mm for a p300 single
-        # pipette model given a particular ul value
-        if func == 'aspirate':
-            if (ul > 0) and (ul < 36.19844973):
-                return 0.043*ul + 16.548
-            elif (ul >= 36.19844973) and (ul < 54.98518519):
-                return 0.012*ul + 17.658
-            elif (ul >= 54.98518519) and (ul < 73.90077516):
-                return 0.008*ul + 17.902
-            elif (ul >= 73.90077516) and (ul < 111.8437953):
-                return 0.004*ul + 18.153
-            elif (ul >= 111.8437953) and (ul <= 302.3895337):
-                return 0.001*ul + 18.23
-        else:
-            # Constant function for dispense
-            return 0*ul + 18.83156277
-
-    def _p300_multi_piecewise(self, ul, func):
-        # Piecewise function that calculates ul_per_mm for a p300 multi
-        # pipette model given a particular ul value
-        if func == 'aspirate':
-            if (ul > 0) and (ul < 57.25698968):
-                return 0.017*ul + 18.132
-            elif (ul >= 57.25698968) and (ul <= 309.2612689):
-                return 0.001*ul + 19.03
-        else:
-            # Constant function for dispense
-            return 0*ul + 19.29389273
-
-    def _p1000_piecewise(self, ul, func):
-        if func == 'aspirate':
-            if (ul > 0) and (ul < 88.2951):
-                return 0.0647*ul + 53.153
-            elif (ul >= 88.2951) and (ul < 119.062):
-                return 0.0217*ul + 56.9474
-            elif (ul >= 119.062) and (ul < 211.8242):
-                return 0.0086*ul + 58.9607
-            elif (ul >= 211.8242) and (ul < 490.5573):
-                return 0.0029*ul + 59.9144
-            elif (ul >= 490.5573):
-                return 0.0008*ul + 60.9102
-        else:
-            return 0*ul + 61.3275
+    def _ul_per_mm(self, ul: float, func: str) -> float:
+        """
+        :param ul: microliters as a float
+        :param func: must be one of 'aspirate' or 'dispense'
+        :return: microliters/mm as a float
+        """
+        sequence = self.ul_per_mm[func]
+        return piecewise_volume_conversion(ul, sequence)
 
     def _volume_percentage(self, volume):
         """Returns the plunger percentage for a given volume.
@@ -1767,26 +1653,16 @@ class Pipette:
             move while performing an dispense
         """
         ul = self.max_volume
-        # Get model name
-        model = self.name
         if aspirate:
             # Set the ul_per_mm for the pipette
-            if self.ul_per_mm:
-                ul_per_mm = lambda: self.ul_per_mm
-            else:
-                ul_per_mm = self._key_map_pipette_functions(
-                    model, ul, 'aspirate')
+            ul_per_mm = self._ul_per_mm(ul, 'aspirate')
             self.set_speed(
-                aspirate=round(aspirate / ul_per_mm(), 6))
+                aspirate=round(aspirate / ul_per_mm, 6))
         if dispense:
             # Set the ul_per_mm for the pipette
-            if self.ul_per_mm:
-                ul_per_mm = lambda: self.ul_per_mm
-            else:
-                ul_per_mm = self._key_map_pipette_functions(
-                    model, ul, 'dispense')
+            ul_per_mm = self._ul_per_mm(ul, 'dispense')
             self.set_speed(
-                dispense=round(dispense / ul_per_mm(), 6))
+                dispense=round(dispense / ul_per_mm, 6))
         return self
 
     def set_pick_up_current(self, amperes):
@@ -1888,3 +1764,24 @@ class Pipette:
     @property
     def type(self):
         return 'single' if self.channels == 1 else 'multi'
+
+
+def piecewise_volume_conversion(
+        ul: float, sequence: List[List[float]]) -> float:
+    """
+    Takes a volume in microliters and a sequence representing a piecewise
+    function for the slope and y-intercept of a ul/mm function, where each
+    sub-list in the sequence contains:
+
+      - the max volume for the piece of the function (minimum implied from the
+        max of the previous item or 0
+      - the slope of the segment
+      - the y-intercept of the segment
+
+    :return: the ul/mm value for the specified volume
+    """
+    # pick the first item from the seq for which the target is less than
+    # the bracketing element
+    i = list(filter(lambda x: ul <= x[0], sequence))[0]
+    # use that element to calculate the movement distance in mm
+    return i[1]*ul + i[2]

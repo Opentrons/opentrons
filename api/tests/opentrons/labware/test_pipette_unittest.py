@@ -27,12 +27,12 @@ class PipetteTest(unittest.TestCase):
             ul_per_mm=18.5,
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
+            max_volume=200,
             min_volume=10,  # These are variable
             mount='left',
             channels=1,
             name='other-pipette-for-transfer-tests'
         )
-        self.p200.max_volume = 200
 
         self.p200.reset()
 
@@ -47,8 +47,14 @@ class PipetteTest(unittest.TestCase):
 
     def test_add_instrument(self):
         self.robot.reset()
-        Pipette(self.robot, ul_per_mm=18.5, mount='left')
-        self.assertRaises(RuntimeError, Pipette, self.robot, mount='left')
+        Pipette(self.robot, ul_per_mm=18.5, max_volume=1000, mount='left')
+        self.assertRaises(
+            RuntimeError,
+            Pipette,
+            self.robot,
+            mount='left',
+            max_volume=100,
+            ul_per_mm=10)
 
     def test_aspirate_zero_volume(self):
         assert self.robot.commands() == []
@@ -90,6 +96,7 @@ class PipetteTest(unittest.TestCase):
             ul_per_mm=18.5,
             trash_container=self.trash,
             tip_racks=[self.tiprack1],
+            max_volume=1000,
             min_volume=10,  # These are variable
             mount='right',
             name='p1000',
@@ -1048,9 +1055,9 @@ class PipetteTest(unittest.TestCase):
             tip_racks=[self.tiprack1, self.tiprack2],
             trash_container=self.tiprack1,
             name='pipette-for-transfer-tests',
+            max_volume=200,
             ul_per_mm=18.5
         )
-        self.p200.max_volume = 200
 
         self.p200.move_to = mock.Mock()
 
@@ -1087,6 +1094,7 @@ class PipetteTest(unittest.TestCase):
             self.robot,
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
+            max_volume=200,
             min_volume=10,  # These are variable
             mount='right',
             channels=8,

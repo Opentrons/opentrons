@@ -46,10 +46,8 @@ def test_robot():
     p200rack = containers.load('tiprack-200ul', '2', 'tiprack')
 
     # create a p200 pipette on robot axis B
-    instruments.Pipette(
-        name="p200",
+    instruments.P300_Single(
         mount="left",
-        min_volume=20,
         tip_racks=[p200rack]
     )
 

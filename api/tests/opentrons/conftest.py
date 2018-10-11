@@ -353,7 +353,7 @@ def model(robot):
     from opentrons.legacy_api.containers import load
     from opentrons.legacy_api.instruments.pipette import Pipette
 
-    pipette = Pipette(robot, ul_per_mm=18.5, mount='right')
+    pipette = Pipette(robot, ul_per_mm=18.5, max_volume=300, mount='right')
     plate = load(robot, '96-flat', '1')
 
     instrument = models.Instrument(pipette)
@@ -371,7 +371,7 @@ def model_with_trough(robot):
     from opentrons.legacy_api.containers import load
     from opentrons.legacy_api.instruments.pipette import Pipette
 
-    pipette = Pipette(robot, mount='right')
+    pipette = Pipette(robot, ul_per_mm=18.5, max_volume=300, mount='right')
     plate = load(robot, 'trough-12row', '1')
 
     instrument = models.Instrument(pipette)

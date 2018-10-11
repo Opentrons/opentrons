@@ -241,6 +241,7 @@ class InstrumentsWrapper(object):
             plunger_current=config.plunger_current,
             drop_tip_current=config.drop_tip_current,
             plunger_positions=config.plunger_positions.copy(),
+            ul_per_mm=config.ul_per_mm,
             fallback_tip_length=config.tip_length)  # TODO move to labware
 
         p.set_pick_up_current(config.pick_up_current)

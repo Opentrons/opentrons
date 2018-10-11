@@ -33,7 +33,9 @@ class ProtocolTestCase(unittest.TestCase):
             name='myPipette',
             trash_container=trash,
             tip_racks=[tiprack],
+            max_volume=200,
             min_volume=10,  # These are variable
+            ul_per_mm=18.0,
             mount='left',
             channels=1
         )
@@ -47,7 +49,8 @@ class ProtocolTestCase(unittest.TestCase):
     def test_deck_setup(self):
         deck = self.robot.deck
 
-        pip = pipette.Pipette(self.robot, mount='left')
+        pip = pipette.Pipette(
+            self.robot, mount='left', max_volume=300, ul_per_mm=18.0)
 
         # Check that the fixed trash has loaded on to the pipette
         trash = pip.trash_container

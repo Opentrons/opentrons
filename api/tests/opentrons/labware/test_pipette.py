@@ -3,7 +3,7 @@
 
 from opentrons import instruments, robot
 from opentrons.legacy_api.containers import load as containers_load
-from opentrons.legacy_api.instruments import Pipette
+from opentrons.legacy_api.instruments import Pipette, pipette_config
 from opentrons.trackers import pose_tracker
 from numpy import isclose
 import pytest
@@ -60,7 +60,6 @@ def test_all_pipette_models_can_transfer():
 
 
 def test_pipette_models_reach_max_volume():
-    from opentrons.legacy_api.instruments import pipette_config
 
     for model in pipette_config.configs:
         config = pipette_config.load(model)
@@ -77,18 +76,43 @@ def test_pipette_models_reach_max_volume():
         assert pos[0] < pipette.plunger_positions['top']
 
 
-def test_set_flow_rate():
+# TODO: fix this test to work with the new piecewise functions, and add a test
+# TODO: to make some guarantees that the functions are continuous, and that the
+# TODO: mm of movement for max volume aspirate and max volume dispense agree
+def test_ul_per_mm_continuous():
+    """
+    For each model of pipette, for each boundary between pieces of the
+    piecewise function describing the ul/mm relationship, test that the
+    function is continuous by checking the boundary volume on the curves of
+    the pieces immediately above and below the boundary
+    """
+    for model in pipette_config.configs:
+        config = pipette_config.load(model)
+        sequence = config.ul_per_mm['aspirate']
+
+        for line in range(len(sequence) - 1):
+            volume = sequence[line][0]
+            ul_per_mm_top = sequence[line][1]*volume + sequence[line][2]
+            ul_per_mm_bottom = sequence[line+1][1]*volume + sequence[line+1][2]
+
+            diff_mm = abs(ul_per_mm_top - ul_per_mm_bottom) / volume
+
+            assert diff_mm < 1e-2, 'Continuity failed for {}, line {}'.format(
+                model, line)
+
+
+def test_flow_rate():
     # Test new flow-rate functionality on all pipettes with different max vols
     robot.reset()
     p10 = instruments.P10_Single(mount='right')
 
     p10.set_flow_rate(aspirate=10)
-    ul_per_mm = Pipette._p10_single_piecewise(p10, p10.max_volume, 'aspirate')
+    ul_per_mm = p10._ul_per_mm(p10.max_volume, 'aspirate')
     expected_mm_per_sec = round(10 / ul_per_mm, 6)
     assert p10.speeds['aspirate'] == expected_mm_per_sec
 
     p10.set_flow_rate(dispense=20)
-    ul_per_mm = Pipette._p10_single_piecewise(p10, p10.max_volume, 'dispense')
+    ul_per_mm = p10._ul_per_mm(p10.max_volume, 'dispense')
     expected_mm_per_sec = round(20 / ul_per_mm, 6)
     assert p10.speeds['dispense'] == expected_mm_per_sec
 
@@ -96,12 +120,12 @@ def test_set_flow_rate():
     p50 = instruments.P50_Single(mount='right')
 
     p50.set_flow_rate(aspirate=50)
-    ul_per_mm = Pipette._p50_single_piecewise(p50, p50.max_volume, 'aspirate')
+    ul_per_mm = p50._ul_per_mm(p50.max_volume, 'aspirate')
     expected_mm_per_sec = round(50 / ul_per_mm, 6)
     assert p50.speeds['aspirate'] == expected_mm_per_sec
 
     p50.set_flow_rate(dispense=60)
-    ul_per_mm = Pipette._p50_single_piecewise(p50, p50.max_volume, 'dispense')
+    ul_per_mm = p50._ul_per_mm(p50.max_volume, 'dispense')
     expected_mm_per_sec = round(60 / ul_per_mm, 6)
     assert p50.speeds['dispense'] == expected_mm_per_sec
 
@@ -109,12 +133,12 @@ def test_set_flow_rate():
     p300 = instruments.P300_Single(mount='right')
 
     p300.set_flow_rate(aspirate=300)
-    ul_per_mm = Pipette._p300_single_piecewise(p300, p300.max_volume, 'aspirate')
+    ul_per_mm = p300._ul_per_mm(p300.max_volume, 'aspirate')
     expected_mm_per_sec = round(300 / ul_per_mm, 6)
     assert p300.speeds['aspirate'] == expected_mm_per_sec
 
     p300.set_flow_rate(dispense=310)
-    ul_per_mm = Pipette._p300_single_piecewise(p300, p300.max_volume, 'dispense')
+    ul_per_mm = p300._ul_per_mm(p300.max_volume, 'dispense')
     expected_mm_per_sec = round(310 / ul_per_mm, 6)
     assert p300.speeds['dispense'] == expected_mm_per_sec
 
@@ -122,12 +146,12 @@ def test_set_flow_rate():
     p1000 = instruments.P1000_Single(mount='right')
 
     p1000.set_flow_rate(aspirate=1000)
-    ul_per_mm = Pipette._p1000_piecewise(p1000, p1000.max_volume, 'aspirate')
+    ul_per_mm = p1000._ul_per_mm(p1000.max_volume, 'aspirate')
     expected_mm_per_sec = round(1000 / ul_per_mm, 6)
     assert p1000.speeds['aspirate'] == expected_mm_per_sec
 
     p1000.set_flow_rate(dispense=1100)
-    ul_per_mm = Pipette._p1000_piecewise(p1000, p1000.max_volume, 'dispense')
+    ul_per_mm = p1000._ul_per_mm(p1000.max_volume, 'dispense')
     expected_mm_per_sec = round(1100 / ul_per_mm, 6)
     assert p1000.speeds['dispense'] == expected_mm_per_sec
 
