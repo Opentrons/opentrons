@@ -12,7 +12,3 @@
   /* For 384 plate */
   font-size: var(--fs-micro);
 }
-
-.tiny_labels:nth-child(odd) {
-  fill: var(--c-light-gray);
-}
