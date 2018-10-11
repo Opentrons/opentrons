@@ -2,36 +2,37 @@
 // upload progress container
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {withRouter, Route, Switch, Redirect, type Match} from 'react-router'
-import type {State} from '../../types'
-import type {Robot} from '../../robot'
+import {withRouter, Route, Switch, Redirect} from 'react-router'
 
 import {selectors as robotSelectors} from '../../robot'
 import {getProtocolFilename} from '../../protocol'
+import {getConnectedRobot} from '../../discovery'
 
 import {Splash} from '@opentrons/components'
 import Page from '../../components/Page'
 import FileInfo from './FileInfo'
 
-type SP = {
+import type {ContextRouter} from 'react-router'
+import type {State} from '../../types'
+import type {Robot} from '../../discovery'
+
+type OP = ContextRouter
+
+type SP = {|
   robot: ?Robot,
   filename: ?string,
   uploadInProgress: boolean,
   uploadError: ?{message: string},
   sessionLoaded: boolean,
-}
+|}
 
-type OP = {match: Match}
-
-type Props = SP & OP
+type Props = {...OP, ...SP}
 
 export default withRouter(connect(mapStateToProps)(UploadPage))
 
 function mapStateToProps (state: State, ownProps: OP): SP {
-  const connectedRobot = robotSelectors.getConnectedRobot(state)
-
   return {
-    robot: connectedRobot,
+    robot: getConnectedRobot(state),
     filename: getProtocolFilename(state),
     uploadInProgress: robotSelectors.getSessionLoadInProgress(state),
     uploadError: robotSelectors.getUploadError(state),

@@ -3,10 +3,6 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 
-import type {State} from '../../types'
-import type {Pipette, Robot} from '../../robot'
-import type {PipettesResponse} from '../../http-api-client'
-
 import {selectors as robotSelectors} from '../../robot'
 import {makeGetRobotPipettes, fetchPipettes} from '../../http-api-client'
 import {getPipette} from '@opentrons/shared-data'
@@ -16,21 +12,24 @@ import {SectionContentHalf} from '../layout'
 import InfoSection from './InfoSection'
 import InstrumentWarning from './InstrumentWarning'
 
-type OP = {
-  robot: Robot,
-}
+import type {State} from '../../types'
+import type {Pipette} from '../../robot'
+import type {PipettesResponse} from '../../http-api-client'
+import type {Robot} from '../../discovery'
 
-type SP = {
+type OP = {robot: Robot}
+
+type SP = {|
   pipettes: Array<Pipette>,
   actualPipettes: ?PipettesResponse,
-}
+|}
 
-type DP = {
+type DP = {|
   fetchPipettes: () => mixed,
   changePipetteUrl: string,
-}
+|}
 
-type Props = OP & SP & DP
+type Props = {...$Exact<OP>, ...SP, ...DP}
 
 const TITLE = 'Required Pipettes'
 
@@ -101,6 +100,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   const {robot} = ownProps
+  // TODO(mc, 2018-10-10): pass this prop down from page
   const changePipetteUrl = `/robots/${robot.name}/instruments`
 
   return {

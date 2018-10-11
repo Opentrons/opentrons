@@ -1,7 +1,6 @@
 // @flow
 // robot selectors
 import padStart from 'lodash/padStart'
-import orderBy from 'lodash/orderBy'
 import {createSelector} from 'reselect'
 
 import {
@@ -20,7 +19,6 @@ import type {
   Labware,
   LabwareCalibrationStatus,
   LabwareType,
-  Robot,
   SessionStatus,
   SessionModule,
 } from './types'
@@ -45,54 +43,13 @@ export function labwareType (labware: Labware): LabwareType {
     : 'labware'
 }
 
-// TODO(mc, 2018-08-10): deprecate in favor of getRobots in discovery module
-export const getDiscovered: OutputSelector<State, void, Array<Robot>> =
-  createSelector(
-    // TODO(mc, 2018-08-15): not using the selector in discovery right now
-    // because of dependency problem in WebWorker where this selector is used
-    state => state.discovery.robotsByName,
-    state => connection(state).connectedTo,
-    (discoveredByName, connectedTo, unexpectedDisconnect) => {
-      const robots = Object.keys(discoveredByName)
-        .map(name => {
-          const connection = orderBy(
-            discoveredByName[name],
-            ['ok', 'local'],
-            ['desc', 'desc']
-          ).find(c => c.ip && c.ok)
-
-          if (!connection) return null
-
-          return {
-            name,
-            // $FlowFixMe: to be fixed by the removal of this selector
-            ip: (connection.ip: string),
-            port: connection.port,
-            wired: connection.local,
-            isConnected: connectedTo === name,
-          }
-        })
-        .filter(Boolean)
-
-      return orderBy(
-        robots,
-        ['isConnected', 'wired', 'name'],
-        ['desc', 'desc', 'asc']
-      )
-    }
-  )
-
 export function getConnectRequest (state: State) {
   return connection(state).connectRequest
 }
 
-export const getConnectedRobot: OutputSelector<State, void, ?Robot> = createSelector(
-  getDiscovered,
-  discovered => discovered.find(r => r.isConnected)
-)
-
-export const getConnectedRobotName: OutputSelector<State, void, ?string> =
-  createSelector(getConnectedRobot, r => r && r.name)
+export function getConnectedRobotName (state: State): ?string {
+  return connection(state).connectedTo
+}
 
 export const getConnectionStatus: OutputSelector<State, void, ConnectionStatus> =
   createSelector(

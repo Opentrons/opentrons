@@ -8,6 +8,7 @@ import {
   fetchHealthAndIgnored,
   makeGetRobotUpdateInfo,
 } from '../../http-api-client'
+import {getRobotApiVersion, getRobotFirmwareVersion} from '../../discovery'
 import {checkShellUpdate} from '../../shell'
 import {RefreshCard, LabeledValue, OutlineButton} from '@opentrons/components'
 import {CardContentQuarter} from '../layout'
@@ -33,7 +34,7 @@ type DispatchProps = {|
 type Props = {...$Exact<OwnProps>, ...StateProps, ...DispatchProps}
 
 const TITLE = 'Information'
-const NAME_LABEL = 'Robot Name'
+const NAME_LABEL = 'Robot name'
 const SERVER_VERSION_LABEL = 'Server version'
 const FIRMWARE_VERSION_LABEL = 'Firmware version'
 
@@ -42,27 +43,17 @@ export default connect(
   mapDispatchToProps
 )(InformationCard)
 
-const getApiVersion = robot =>
-  (robot.serverHealth && robot.serverHealth.apiServerVersion) ||
-  (robot.health && robot.health.api_version) ||
-  'unknown'
-
-const getFirmwareVersion = robot =>
-  (robot.serverHealth && robot.serverHealth.smoothieVersion) ||
-  (robot.health && robot.health.fw_version) ||
-  'unknown'
-
 function InformationCard (props: Props) {
   const {robot, updateInfo, fetchHealth, updateUrl, checkAppUpdate} = props
-  const {name, serverOk} = robot
-  const version = getApiVersion(robot)
-  const firmwareVersion = getFirmwareVersion(robot)
+  const {name, displayName, serverOk} = robot
+  const version = getRobotApiVersion(robot) || 'Unknown'
+  const firmwareVersion = getRobotFirmwareVersion(robot) || 'Unknown'
   const updateText = updateInfo.type || 'Reinstall'
 
   return (
     <RefreshCard watch={name} refresh={fetchHealth} title={TITLE}>
       <CardContentQuarter>
-        <LabeledValue label={NAME_LABEL} value={name} />
+        <LabeledValue label={NAME_LABEL} value={displayName} />
       </CardContentQuarter>
       <CardContentQuarter>
         <LabeledValue label={SERVER_VERSION_LABEL} value={version} />

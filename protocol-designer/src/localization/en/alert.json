@@ -2,10 +2,12 @@
   "field": {},
   "form": {},
   "hint": {
-    "go_to": "Go to ",
+    "dont_show_again": "Don't show me again",
     "add_liquids_and_labware": {
-      "directions": " and hover over labware to specify where liquids start before the robot starts moving.",
-      "title": "Add Liquids to Deck"
+      "title": "Your labware has no liquids in it",
+      "summary": "In {{deck_setup_step}}, hover on labware to add liquids.",
+      "step1": "Add liquids",
+      "step2": "Watch liquids move as you build your protocol"
     }
   },
   "timeline": {

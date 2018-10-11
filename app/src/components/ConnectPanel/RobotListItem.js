@@ -17,12 +17,12 @@ export function RobotListItem (props: RobotItemProps) {
     displayName,
     local,
     status,
-    connected,
     selected,
     upgradable,
     connect,
     disconnect,
   } = props
+  const connected = props.connected != null && props.connected === true
   const connectable = status === CONNECTABLE
   const onClick = connected ? disconnect : connect
 

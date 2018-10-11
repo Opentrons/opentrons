@@ -29,12 +29,11 @@ DROP_TIP_RELEASE_DISTANCE = 20
 DEFAULT_ASPIRATE_SPEED = 5
 DEFAULT_DISPENSE_SPEED = 10
 
-DEFAULT_TIP_PRESS_MM = -10
-
+DEFAULT_TIP_PRESS_MM = 10
 DEFAULT_PLUNGE_CURRENT = 0.1
 
-SHAKE_OFF_TIPS_SPEED = 25
-SHAKE_OFF_TIPS_DISTANCE = 2
+SHAKE_OFF_TIPS_SPEED = 50
+SHAKE_OFF_TIPS_DISTANCE = 2.25
 
 
 def _sleep(seconds):
@@ -125,6 +124,9 @@ class Pipette:
             plunger_current=0.5,
             drop_tip_current=0.5,
             plunger_positions=PLUNGER_POSITIONS,
+            pick_up_current=DEFAULT_PLUNGE_CURRENT,
+            pick_up_distance=DEFAULT_TIP_PRESS_MM,
+            quirks=[],
             fallback_tip_length=51.7):  # TODO (andy): move to tip-rack
 
         self.robot = robot
@@ -193,6 +195,8 @@ class Pipette:
 
         self._pick_up_current = None
         self.set_pick_up_current(DEFAULT_PLUNGE_CURRENT)
+        self._pick_up_distance = pick_up_distance
+        self._pick_up_current = pick_up_current
 
         # TODO (andy) these values maybe should persist between sessions,
         # by saving within `robot_config`
@@ -208,6 +212,8 @@ class Pipette:
         # TODO (andy): remove from pipette, move to tip-rack
         self.robot.config.tip_length[self.name] = \
             self.robot.config.tip_length.get(self.name, fallback_tip_length)
+
+        self.quirks = quirks if isinstance(quirks, list) else []
 
     def reset(self):
         """
@@ -924,7 +930,7 @@ class Pipette:
 
         @commands.publish.both(command=commands.pick_up_tip)
         def _pick_up_tip(
-                self, location, presses, plunge_depth, increment):
+                self, location, presses, increment):
             self.instrument_actuator.set_active_current(self._plunger_current)
             self.robot.poses = self.instrument_actuator.move(
                 self.robot.poses,
@@ -940,7 +946,7 @@ class Pipette:
                 self.instrument_mover.push_active_current()
                 self.instrument_mover.set_active_current(self._pick_up_current)
                 self.instrument_mover.set_speed(30)
-                dist = plunge_depth + (-1 * increment * i)
+                dist = (-1 * self._pick_up_distance) + (-1 * increment * i)
                 self.move_to(
                     self.current_tip().top(dist),
                     strategy='direct')
@@ -953,9 +959,15 @@ class Pipette:
             self._add_tip(
                 length=self._tip_length
             )
+            # neighboring tips tend to get stuck in the space between
+            # the volume chamber and the drop-tip sleeve on p1000.
+            # This extra shake ensures those tips are removed
+            if 'needs-pickup-shake' in self.quirks:
+                self._shake_off_tips(location)
+                self._shake_off_tips(location)
             self.previous_placeable = None  # no longer inside a placeable
             self.robot.poses = self.instrument_mover.fast_home(
-                self.robot.poses, abs(plunge_depth))
+                self.robot.poses, self._pick_up_distance)
 
             return self
 
@@ -963,7 +975,6 @@ class Pipette:
             self,
             location=location,
             presses=presses,
-            plunge_depth=DEFAULT_TIP_PRESS_MM,
             increment=increment)
 
     def drop_tip(self, location=None, home_after=True):
@@ -1041,7 +1052,6 @@ class Pipette:
                 x=pos_drop_tip
             )
             self._shake_off_tips(location)
-
             if home_after:
                 self._home_after_drop_tip()
 

@@ -4,9 +4,14 @@ import type {BaseState} from '../types'
 
 const rootSelector = (state: BaseState) => state.tutorial
 
-export const getHints = createSelector(
+export const getHint = createSelector(
   rootSelector,
-  tutorial => (
-    tutorial.hints.filter(hint => !tutorial.dismissedHints.includes(hint))
-  )
+  tutorial => {
+    const dismissedKeys = Object.keys(tutorial.dismissedHints)
+    const hints = tutorial.hints.filter(hintKey => !dismissedKeys.includes(hintKey))
+
+    // TODO: Ian 2018-10-08 ordering of multiple hints is TBD.
+    // For now, show 1 non-dismissed hint at a time
+    return hints[0]
+  }
 )
