@@ -9,6 +9,7 @@
       "dropTip": -4.5
     },
     "pickUpCurrent": 0.1,
+    "pickUpDistance": 10,
     "aspirateFlowRate": 5,
     "dispenseFlowRate": 10,
     "channels": 1,
@@ -17,6 +18,7 @@
     "dropTipCurrent": 0.5,
     "minVolume": 1,
     "maxVolume": 10,
+    "quirks": [],
     "tipLength": 33
   },
   "p10_single_v1.3": {
@@ -29,6 +31,7 @@
       "dropTip": -6
     },
     "pickUpCurrent": 0.1,
+    "pickUpDistance": 10,
     "aspirateFlowRate": 5,
     "dispenseFlowRate": 10,
     "channels": 1,
@@ -37,6 +40,7 @@
     "dropTipCurrent": 0.5,
     "minVolume": 1,
     "maxVolume": 10,
+    "quirks": [],
     "tipLength": 33
   },
   "p10_multi_v1": {
@@ -49,6 +53,7 @@
       "dropTip": -4
     },
     "pickUpCurrent": 0.4,
+    "pickUpDistance": 10,
     "aspirateFlowRate": 5,
     "dispenseFlowRate": 10,
     "channels": 8,
@@ -57,6 +62,7 @@
     "dropTipCurrent": 0.5,
     "minVolume": 1,
     "maxVolume": 10,
+    "quirks": [],
     "tipLength": 33
   },
   "p10_multi_v1.3": {
@@ -69,6 +75,7 @@
       "dropTip": -5.5
     },
     "pickUpCurrent": 0.4,
+    "pickUpDistance": 10,
     "aspirateFlowRate": 5,
     "dispenseFlowRate": 10,
     "channels": 8,
@@ -77,6 +84,7 @@
     "dropTipCurrent": 0.5,
     "minVolume": 1,
     "maxVolume": 10,
+    "quirks": [],
     "tipLength": 33
   },
   "p50_single_v1": {
@@ -89,6 +97,7 @@
       "dropTip": -4.5
     },
     "pickUpCurrent": 0.1,
+    "pickUpDistance": 10,
     "aspirateFlowRate": 25,
     "dispenseFlowRate": 50,
     "channels": 1,
@@ -97,6 +106,7 @@
     "dropTipCurrent": 0.5,
     "minVolume": 5,
     "maxVolume": 50,
+    "quirks": [],
     "tipLength": 51.7
   },
   "p50_single_v1.3": {
@@ -109,6 +119,7 @@
       "dropTip": -6
     },
     "pickUpCurrent": 0.1,
+    "pickUpDistance": 10,
     "aspirateFlowRate": 25,
     "dispenseFlowRate": 50,
     "channels": 1,
@@ -117,6 +128,7 @@
     "dropTipCurrent": 0.5,
     "minVolume": 5,
     "maxVolume": 50,
+    "quirks": [],
     "tipLength": 51.7
   },
   "p50_multi_v1": {
@@ -129,6 +141,7 @@
       "dropTip": -3.5
     },
     "pickUpCurrent": 0.6,
+    "pickUpDistance": 10,
     "aspirateFlowRate": 25,
     "dispenseFlowRate": 50,
     "channels": 8,
@@ -137,6 +150,7 @@
     "dropTipCurrent": 0.5,
     "minVolume": 5,
     "maxVolume": 50,
+    "quirks": [],
     "tipLength": 51.7
   },
   "p50_multi_v1.3": {
@@ -149,6 +163,7 @@
       "dropTip": -5
     },
     "pickUpCurrent": 0.6,
+    "pickUpDistance": 10,
     "aspirateFlowRate": 25,
     "dispenseFlowRate": 50,
     "channels": 8,
@@ -157,6 +172,7 @@
     "dropTipCurrent": 0.5,
     "minVolume": 5,
     "maxVolume": 50,
+    "quirks": [],
     "tipLength": 51.7
   },
   "p300_single_v1": {
@@ -169,6 +185,7 @@
       "dropTip": -4
     },
     "pickUpCurrent": 0.1,
+    "pickUpDistance": 10,
     "aspirateFlowRate": 150,
     "dispenseFlowRate": 300,
     "channels": 1,
@@ -177,6 +194,7 @@
     "dropTipCurrent": 0.5,
     "minVolume": 30,
     "maxVolume": 300,
+    "quirks": [],
     "tipLength": 51.7
   },
   "p300_single_v1.3": {
@@ -189,6 +207,7 @@
       "dropTip": -5.5
     },
     "pickUpCurrent": 0.1,
+    "pickUpDistance": 10,
     "aspirateFlowRate": 150,
     "dispenseFlowRate": 300,
     "channels": 1,
@@ -197,6 +216,7 @@
     "dropTipCurrent": 0.5,
     "minVolume": 30,
     "maxVolume": 300,
+    "quirks": [],
     "tipLength": 51.7
   },
   "p300_multi_v1": {
@@ -209,6 +229,7 @@
       "dropTip": -2
     },
     "pickUpCurrent": 0.6,
+    "pickUpDistance": 10,
     "aspirateFlowRate": 150,
     "dispenseFlowRate": 300,
     "channels": 8,
@@ -217,6 +238,7 @@
     "dropTipCurrent": 0.5,
     "minVolume": 30,
     "maxVolume": 300,
+    "quirks": [],
     "tipLength": 51.7
   },
   "p300_multi_v1.3": {
@@ -229,6 +251,7 @@
       "dropTip": -3.5
     },
     "pickUpCurrent": 0.6,
+    "pickUpDistance": 10,
     "aspirateFlowRate": 150,
     "dispenseFlowRate": 300,
     "channels": 8,
@@ -237,6 +260,7 @@
     "dropTipCurrent": 0.5,
     "minVolume": 30,
     "maxVolume": 300,
+    "quirks": [],
     "tipLength": 51.7
   },
   "p1000_single_v1": {
@@ -246,9 +270,10 @@
       "top": 19.5,
       "bottom": 3,
       "blowOut": 1,
-      "dropTip": -5
+      "dropTip": -2.2
     },
     "pickUpCurrent": 0.1,
+    "pickUpDistance": 15,
     "aspirateFlowRate": 500,
     "dispenseFlowRate": 1000,
     "channels": 1,
@@ -257,6 +282,7 @@
     "dropTipCurrent": 0.5,
     "minVolume": 100,
     "maxVolume": 1000,
+    "quirks": ["needs-pickup-shake"],
     "tipLength": 76.7
   },
   "p1000_single_v1.3": {
@@ -266,17 +292,19 @@
       "top": 19.5,
       "bottom": 2.5,
       "blowOut": -0.5,
-      "dropTip": -4
+      "dropTip": -3.7
     },
     "pickUpCurrent": 0.1,
+    "pickUpDistance": 15,
     "aspirateFlowRate": 500,
     "dispenseFlowRate": 1000,
     "channels": 1,
     "modelOffset": [0.0, 0.0, 20.0],
     "plungerCurrent": 0.5,
-    "dropTipCurrent": 0.5,
+    "dropTipCurrent": 0.7,
     "minVolume": 100,
     "maxVolume": 1000,
+    "quirks": ["needs-pickup-shake"],
     "tipLength": 76.7
   }
 }
