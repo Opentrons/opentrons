@@ -19,18 +19,21 @@ export default function InstrumentSettingsPage (props: Props) {
     robot,
     match: {path, url},
   } = props
-  const titleBarProps = {title: robot.name}
+  const titleBarProps = {title: robot.displayName}
 
   return (
     <React.Fragment>
-    <Page titleBarProps={titleBarProps}>
-      <InstrumentSettings {...robot} />
-    </Page>
-    <Switch>
-      <Route path={`${path}/pipettes`} render={(props) => (
-        <ChangePipette {...props} robot={robot} parentUrl={url} />
-      )} />
-    </Switch>
+      <Page titleBarProps={titleBarProps}>
+        <InstrumentSettings {...robot} />
+      </Page>
+      <Switch>
+        <Route
+          path={`${path}/pipettes`}
+          render={props => (
+            <ChangePipette {...props} robot={robot} parentUrl={url} />
+          )}
+        />
+      </Switch>
     </React.Fragment>
   )
 }

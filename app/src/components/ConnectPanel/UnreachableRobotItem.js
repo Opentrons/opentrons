@@ -7,7 +7,7 @@ import RobotLink from './RobotLink'
 import styles from './styles.css'
 
 export default function UnreachableRobotItem (props: UnreachableRobot) {
-  const {name} = props
+  const {displayName} = props
   return (
     <li className={styles.robot_group}>
       <HoverTooltip
@@ -27,7 +27,7 @@ export default function UnreachableRobotItem (props: UnreachableRobot) {
               className={styles.robot_item_icon}
               disabled
             />
-            <p className={styles.link_text}>{name}</p>
+            <p className={styles.link_text}>{displayName}</p>
           </RobotLink>
         )}
       </HoverTooltip>

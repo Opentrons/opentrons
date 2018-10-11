@@ -1,7 +1,13 @@
 // discovery selectors tests
 import * as discovery from '..'
 
-const makeFullyUp = (name, ip, status = null, connected = null) => ({
+const makeFullyUp = (
+  name,
+  ip,
+  status = null,
+  connected = null,
+  displayName = null
+) => ({
   name,
   ip,
   local: false,
@@ -12,9 +18,16 @@ const makeFullyUp = (name, ip, status = null, connected = null) => ({
   serverHealth: {},
   status,
   connected,
+  displayName,
 })
 
-const makeConnectable = (name, ip, status = null, connected = null) => ({
+const makeConnectable = (
+  name,
+  ip,
+  status = null,
+  connected = null,
+  displayName = null
+) => ({
   name,
   ip,
   local: false,
@@ -23,9 +36,10 @@ const makeConnectable = (name, ip, status = null, connected = null) => ({
   health: {},
   status,
   connected,
+  displayName,
 })
 
-const makeAdvertising = (name, ip, status = null) => ({
+const makeAdvertising = (name, ip, status = null, displayName = null) => ({
   name,
   ip,
   local: false,
@@ -33,9 +47,16 @@ const makeAdvertising = (name, ip, status = null) => ({
   serverOk: false,
   advertising: true,
   status,
+  displayName,
 })
 
-const makeServerUp = (name, ip, advertising, status = null) => ({
+const makeServerUp = (
+  name,
+  ip,
+  advertising,
+  status = null,
+  displayName = null
+) => ({
   name,
   ip,
   advertising,
@@ -44,9 +65,10 @@ const makeServerUp = (name, ip, advertising, status = null) => ({
   serverOk: true,
   serverHealth: {},
   status,
+  displayName,
 })
 
-const makeUnreachable = (name, ip, status = null) => ({
+const makeUnreachable = (name, ip, status = null, displayName = null) => ({
   name,
   ip,
   local: false,
@@ -54,6 +76,7 @@ const makeUnreachable = (name, ip, status = null) => ({
   serverOk: false,
   advertising: false,
   status,
+  displayName,
 })
 
 describe('discovery selectors', () => {
@@ -83,8 +106,8 @@ describe('discovery selectors', () => {
         robot: {connection: {connectedTo: 'bar'}},
       },
       expected: [
-        makeConnectable('foo', '10.0.0.1', 'connectable', false),
-        makeFullyUp('bar', '10.0.0.2', 'connectable', true),
+        makeConnectable('foo', '10.0.0.1', 'connectable', false, 'foo'),
+        makeFullyUp('bar', '10.0.0.2', 'connectable', true, 'bar'),
       ],
     },
     {
@@ -103,7 +126,9 @@ describe('discovery selectors', () => {
         },
         robot: {connection: {connectedTo: 'foo'}},
       },
-      expected: [makeConnectable('foo', '10.0.0.1', 'connectable', true)],
+      expected: [
+        makeConnectable('foo', '10.0.0.1', 'connectable', true, 'foo'),
+      ],
     },
     {
       name: 'getReachableRobots grabs robots with serverUp or advertising',
@@ -117,8 +142,8 @@ describe('discovery selectors', () => {
         },
       },
       expected: [
-        makeServerUp('foo', '10.0.0.1', false, 'reachable'),
-        makeAdvertising('bar', '10.0.0.2', 'reachable'),
+        makeServerUp('foo', '10.0.0.1', false, 'reachable', 'foo'),
+        makeAdvertising('bar', '10.0.0.2', 'reachable', 'bar'),
       ],
     },
     {
@@ -135,7 +160,7 @@ describe('discovery selectors', () => {
           },
         },
       },
-      expected: [makeServerUp('foo', '10.0.0.1', true, 'reachable')],
+      expected: [makeServerUp('foo', '10.0.0.1', true, 'reachable', 'foo')],
     },
     {
       name: 'getReachableRobots does not grab connectable robots',
@@ -165,9 +190,13 @@ describe('discovery selectors', () => {
       name: 'getUnreachableRobots grabs robots with no ip',
       selector: discovery.getUnreachableRobots,
       state: {
-        discovery: {robotsByName: {foo: [{name: 'foo', ip: null}]}},
+        discovery: {
+          robotsByName: {foo: [{name: 'foo', ip: null}]},
+        },
       },
-      expected: [{name: 'foo', ip: null, status: 'unreachable'}],
+      expected: [
+        {name: 'foo', ip: null, status: 'unreachable', displayName: 'foo'},
+      ],
     },
     {
       name: 'getUnreachableRobots grabs robots with IP but no responses',
@@ -182,7 +211,7 @@ describe('discovery selectors', () => {
           },
         },
       },
-      expected: [makeUnreachable('foo', '10.0.0.1', 'unreachable')],
+      expected: [makeUnreachable('foo', '10.0.0.1', 'unreachable', 'foo')],
     },
     {
       name: "getUnreachableRobots won't grab connectable/reachable robots",
@@ -207,6 +236,62 @@ describe('discovery selectors', () => {
         },
       },
       expected: [],
+    },
+    {
+      name: 'display name removes opentrons- from connectable robot names',
+      selector: discovery.getConnectableRobots,
+      state: {
+        discovery: {
+          robotsByName: {
+            'opentrons-foo': [makeConnectable('opentrons-foo', '10.0.0.1')],
+            'opentrons-bar': [makeFullyUp('opentrons-bar', '10.0.0.2')],
+          },
+        },
+        robot: {connection: {connectedTo: 'opentrons-bar'}},
+      },
+      expected: [
+        makeConnectable(
+          'opentrons-foo',
+          '10.0.0.1',
+          'connectable',
+          false,
+          'foo'
+        ),
+        makeFullyUp('opentrons-bar', '10.0.0.2', 'connectable', true, 'bar'),
+      ],
+    },
+    {
+      name: 'display name removes opentrons- from reachable robot names',
+      selector: discovery.getReachableRobots,
+      state: {
+        discovery: {
+          robotsByName: {
+            'opentrons-foo': [makeServerUp('opentrons-foo', '10.0.0.1', false)],
+            'opentrons-bar': [makeAdvertising('opentrons-bar', '10.0.0.2')],
+          },
+        },
+      },
+      expected: [
+        makeServerUp('opentrons-foo', '10.0.0.1', false, 'reachable', 'foo'),
+        makeAdvertising('opentrons-bar', '10.0.0.2', 'reachable', 'bar'),
+      ],
+    },
+    {
+      name: 'display name removes opentrons- from unreachable robot names',
+      selector: discovery.getUnreachableRobots,
+      state: {
+        discovery: {
+          robotsByName: {'opentrons-foo': [{name: 'opentrons-foo', ip: null}]},
+        },
+      },
+      expected: [
+        {
+          name: 'opentrons-foo',
+          ip: null,
+          status: 'unreachable',
+          displayName: 'foo',
+        },
+      ],
     },
   ]
 
