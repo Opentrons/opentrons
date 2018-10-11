@@ -24,6 +24,7 @@ function getRootReducer () {
       // reset entire state, rehydrate from localStorage, then pass the action
       if (action.type === 'LOAD_FILE') {
         try {
+          // TODO: Ian 2018-10-11 validate the file with JSON schema and remove this try/catch (See #2465)
           return rootReducer(hydratedState, action)
         } catch (e) {
           // something in the reducers went wrong, show it to the user for bug report
