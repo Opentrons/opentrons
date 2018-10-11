@@ -19,12 +19,8 @@ function getRootReducer () {
 
   return (state, action) => {
     if (action.type === 'LOAD_FILE' || action.type === 'CREATE_NEW_PROTOCOL') {
-      let hydratedState
-      try {
-        hydratedState = rootReducer(undefined, rehydratePersistedAction())
-      } catch (e) {
-        console.error('Could not rehydrate during load/create:', e)
-      }
+      const hydratedState = rootReducer(undefined, rehydratePersistedAction())
+
       // reset entire state, rehydrate from localStorage, then pass the action
       if (action.type === 'LOAD_FILE') {
         try {
@@ -55,11 +51,7 @@ export default function configureStore () {
   )
 
   // initial rehydration, and persistence subscriber
-  try {
-    store.dispatch(rehydratePersistedAction())
-  } catch (e) {
-    console.error('Could not perform initial rehydrate:', e)
-  }
+  store.dispatch(rehydratePersistedAction())
   store.subscribe(makePersistSubscriber(store))
 
   function replaceReducers () {

@@ -36,10 +36,14 @@ export const makePersistSubscriber = (store: Store<*, *>): PersistSubscriber => 
     PERSISTED_PATHS.forEach(path => {
       const nextReducerState = get(state, path)
       if (prevReducerStates[path] !== nextReducerState) {
-        global.localStorage.setItem(
-          _addStoragePrefix(path),
-          JSON.stringify(transformBeforePersist(path, nextReducerState))
-        )
+        try {
+          global.localStorage.setItem(
+            _addStoragePrefix(path),
+            JSON.stringify(transformBeforePersist(path, nextReducerState))
+          )
+        } catch (e) {
+          console.error(`error attempting to persist ${path}:`, e)
+        }
         prevReducerStates[path] = nextReducerState
       }
     })
@@ -56,6 +60,11 @@ export function rehydrate<S> (path: string, initialState: S): S {
     PERSISTED_PATHS.includes(path),
     `Path "${path}" is missing from PERSISTED_PATHS! The changes to this reducer will not be persisted.`
   )
-  const persisted = global.localStorage.getItem(_addStoragePrefix(path))
-  return persisted ? JSON.parse(persisted) : initialState
+  try {
+    const persisted = global.localStorage.getItem(_addStoragePrefix(path))
+    return persisted ? JSON.parse(persisted) : initialState
+  } catch (e) {
+    console.error('Could not rehydrate:', e)
+  }
+  return initialState
 }
