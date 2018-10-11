@@ -49,7 +49,7 @@ class Pipette:
     DIRECT USE OF THIS CLASS IS DEPRECATED -- this class should not be used
     directly. Its parameters, defaults, methods, and behaviors are subject to
     change without a major version release. Use the model-specific constructors
-    available through `from opentrons import instruments`.
+    available through ``from opentrons import instruments``.
 
     All model-specific instrument constructors are inheritors of this class.
     With any of those instances you can can:

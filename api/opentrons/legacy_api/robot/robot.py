@@ -65,6 +65,9 @@ class Robot(object):
     """
     This class is the main interface to the robot.
 
+    It should never be instantiated directly; instead, the global instance may
+    be accessed at :py:attr:``opentrons.robot``.
+
     Through this class you can can:
         * define your :class:`opentrons.Deck`
         * :meth:`connect` to Opentrons physical robot
