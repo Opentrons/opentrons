@@ -125,6 +125,7 @@ class Pipette:
             plunger_positions=PLUNGER_POSITIONS,
             pick_up_current=DEFAULT_PLUNGE_CURRENT,
             pick_up_distance=DEFAULT_TIP_PRESS_MM,
+            quirks=[],
             fallback_tip_length=51.7):  # TODO (andy): move to tip-rack
 
         self.robot = robot
@@ -195,6 +196,8 @@ class Pipette:
         # TODO (andy): remove from pipette, move to tip-rack
         self.robot.config.tip_length[self.name] = \
             self.robot.config.tip_length.get(self.name, fallback_tip_length)
+
+        self.quirks = quirks if isinstance(quirks, list) else []
 
     def reset(self):
         """
@@ -943,7 +946,7 @@ class Pipette:
             # neighboring tips tend to get stuck in the space between
             # the volume chamber and the drop-tip sleeve on p1000.
             # This extra shake ensures those tips are removed
-            if 'p1000_single_v1' in self.name:
+            if 'needs-pickup-shake' in self.quirks:
                 self._shake_off_tips(location)
                 self._shake_off_tips(location)
             self.previous_placeable = None  # no longer inside a placeable
