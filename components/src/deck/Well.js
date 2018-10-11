@@ -24,87 +24,96 @@ type Props = {
   onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed,
 }
 
-export default function Well (props: Props) {
-  const {
-    wellName,
-    selectable,
-    highlighted,
-    selected,
-    error,
-    wellDef,
-    onMouseOver,
-    onMouseLeave,
-  } = props
-
-  const fillColor = props.fillColor || 'transparent'
-
-  const wellOverlayClassname = cx(
-    styles.well_border,
-    {
-      [SELECTABLE_WELL_CLASS]: selectable,
-      [styles.selected]: selected,
-      [styles.selected_overlay]: selected,
-      [styles.highlighted]: highlighted,
-      [styles.error]: error,
-    }
-  )
-
-  const selectionProps = {
-    'data-wellname': wellName,
-    onMouseOver,
-    onMouseLeave,
+class Well extends React.Component<Props> {
+  shouldComponentUpdate (nextProps: Props) {
+    return this.props.highlighted !== nextProps.highlighted ||
+      this.props.selected !== nextProps.selected ||
+      this.props.fillColor !== nextProps.fillColor
   }
+  render () {
+    const {
+      wellName,
+      selectable,
+      highlighted,
+      selected,
+      error,
+      wellDef,
+      onMouseOver,
+      onMouseLeave,
+    } = this.props
 
-  const isRect = wellIsRect(wellDef)
-  const isCircle = !isRect
+    const fillColor = this.props.fillColor || 'transparent'
 
-  if (isRect) {
-    const rectProps = {
-      x: wellDef.x,
-      y: wellDef.y - (wellDef.length || 0), // zero fallback for flow
-      width: wellDef.width,
-      height: wellDef.y,
+    const wellOverlayClassname = cx(
+      styles.well_border,
+      {
+        [SELECTABLE_WELL_CLASS]: selectable,
+        [styles.selected]: selected,
+        [styles.selected_overlay]: selected,
+        [styles.highlighted]: highlighted,
+        [styles.error]: error,
+      }
+    )
+
+    const selectionProps = {
+      'data-wellname': wellName,
+      onMouseOver,
+      onMouseLeave,
     }
 
-    return <g>
-      {/* Fill contents */}
-      <rect
-        {...rectProps}
-        className={styles.well_fill}
-        color={fillColor}
-      />
-      {/* Border + overlay */}
-      <rect
-        {...selectionProps}
-        {...rectProps}
-        className={wellOverlayClassname}
-      />
-    </g>
-  }
+    const isRect = wellIsRect(wellDef)
+    const isCircle = !isRect
 
-  if (isCircle) {
-    const circleProps = {
-      cx: wellDef.x,
-      cy: wellDef.y,
-      r: (wellDef.diameter || 0) / 2,
+    if (isRect) {
+      const rectProps = {
+        x: wellDef.x,
+        y: wellDef.y - (wellDef.length || 0), // zero fallback for flow
+        width: wellDef.width,
+        height: wellDef.y,
+      }
+
+      return <g>
+        {/* Fill contents */}
+        <rect
+          {...rectProps}
+          className={styles.well_fill}
+          color={fillColor}
+        />
+        {/* Border + overlay */}
+        <rect
+          {...selectionProps}
+          {...rectProps}
+          className={wellOverlayClassname}
+        />
+      </g>
     }
 
-    return <g>
-      {/* Fill contents */}
-      <circle
-        {...circleProps}
-        className={styles.well_fill}
-        color={fillColor}
-      />
-      {/* Border + overlay */}
-      <circle
-        {...selectionProps}
-        {...circleProps}
-        className={wellOverlayClassname}
-      />
-    </g>
-  }
+    if (isCircle) {
+      const circleProps = {
+        cx: wellDef.x,
+        cy: wellDef.y,
+        r: (wellDef.diameter || 0) / 2,
+      }
 
-  console.warn('Invalid well: neither rectangle or circle: ' + JSON.stringify(wellDef))
-  return null
+      return <g>
+        {/* Fill contents */}
+        <circle
+          {...circleProps}
+          className={styles.well_fill}
+          color={fillColor}
+        />
+        {/* Border + overlay */}
+        <circle
+          {...selectionProps}
+          {...circleProps}
+          className={wellOverlayClassname}
+        />
+      </g>
+    }
+
+    console.warn('Invalid well: neither rectangle or circle: ' + JSON.stringify(wellDef))
+    return null
+  }
 }
+
+export default Well

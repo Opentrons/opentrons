@@ -71,6 +71,8 @@ function mergeProps (
   return {
     name,
     disabled,
+    pipetteId: _pipetteId,
+    labwareId: _selectedLabwareId,
     isMulti: stateProps.isMulti,
     primaryWellCount: stateProps.primaryWellCount,
     errorToShow: showErrors ? _wellFieldErrors[0] : null,

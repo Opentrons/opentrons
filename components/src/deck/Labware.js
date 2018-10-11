@@ -87,21 +87,26 @@ function createWell (
   />
 }
 
-export default function Labware (props: Props) {
-  const {labwareType, getTipProps, getWellProps} = props
+// TODO: BC 2018-10-10 this is a class component because it should probably have a sCU for performance reasons
+class Labware extends React.Component<Props> {
+  render () {
+    const {labwareType, getTipProps, getWellProps} = this.props
 
-  if (!(getLabware(labwareType))) {
-    return <FallbackLabware />
+    if (!(getLabware(labwareType))) {
+      return <FallbackLabware />
+    }
+
+    const allWellNames = Object.keys(getWellDefsForSVG(labwareType))
+    const isTiprack = getIsTiprack(labwareType)
+    const wells = allWellNames.map(wellName => createWell(wellName, labwareType, getTipProps, getWellProps))
+
+    return (
+      <g>
+        <LabwareOutline className={isTiprack ? styles.tiprack_plate_outline : null}/>
+        {wells}
+      </g>
+    )
   }
-
-  const allWellNames = Object.keys(getWellDefsForSVG(labwareType))
-  const isTiprack = getIsTiprack(labwareType)
-  const wells = allWellNames.map(wellName => createWell(wellName, labwareType, getTipProps, getWellProps))
-
-  return (
-    <g>
-      <LabwareOutline className={isTiprack ? styles.tiprack_plate_outline : null}/>
-      {wells}
-    </g>
-  )
 }
+
+export default Labware
