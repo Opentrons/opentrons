@@ -3,19 +3,23 @@ import type {HintKey} from './index'
 
 export type AddHintAction = {
   type: 'ADD_HINT',
-  payload: {hint: HintKey},
+  payload: {hintKey: HintKey},
 }
 export type RemoveHintAction = {
   type: 'REMOVE_HINT',
-  payload: {hint: HintKey},
+  payload: {
+    hintKey: HintKey,
+    // persist hint removal across sessions
+    rememberDismissal: boolean,
+  },
 }
 
-export const addHint = (hint: HintKey): AddHintAction => ({
+export const addHint = (hintKey: HintKey): AddHintAction => ({
   type: 'ADD_HINT',
-  payload: {hint},
+  payload: {hintKey},
 })
 
-export const removeHint = (hint: HintKey): RemoveHintAction => ({
+export const removeHint = (hintKey: HintKey, rememberDismissal: boolean): RemoveHintAction => ({
   type: 'REMOVE_HINT',
-  payload: {hint},
+  payload: {hintKey, rememberDismissal},
 })

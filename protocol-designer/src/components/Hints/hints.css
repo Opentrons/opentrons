@@ -1,0 +1,40 @@
+@import '@opentrons/components';
+
+.dont_show_again {
+  float: left;
+}
+
+.ok_button {
+  float: right;
+}
+
+.summary {
+  padding-bottom: 2rem;
+}
+
+.step_description {
+  margin-bottom: 1rem;
+
+  & span:first-of-type {
+    font-weight: var(--fw-semibold);
+  }
+}
+
+.column_left {
+  width: 35%;
+}
+
+.column_right {
+  margin-left: 5%;
+  width: 60%;
+}
+
+.column_left,
+.column_right {
+  display: inline-block;
+  vertical-align: top;
+
+  & > * {
+    width: 100%;
+  }
+}

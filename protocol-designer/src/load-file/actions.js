@@ -17,11 +17,6 @@ const loadFileAction = (payload: ProtocolFile): LoadFileAction => ({
 // load file thunk, handles file loading errors
 export const loadProtocolFile = (event: SyntheticInputEvent<HTMLInputElement>): ThunkAction<*> =>
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
-    const parseAndLoadFile = fileBody => {
-      const parsedProtocol: ProtocolFile = JSON.parse(fileBody)
-      // TODO LATER Ian 2018-05-18 validate file with JSON Schema here
-      dispatch(loadFileAction(parsedProtocol))
-    }
     const fileError = error => dispatch(fileErrors(error))
 
     const file = event.currentTarget.files[0]
@@ -37,15 +32,19 @@ export const loadProtocolFile = (event: SyntheticInputEvent<HTMLInputElement>): 
     } else {
       reader.onload = readEvent => {
         const result = readEvent.currentTarget.result
+        let parsedProtocol: ?ProtocolFile
 
         try {
-          parseAndLoadFile(result)
+          parsedProtocol = JSON.parse(result)
+          // TODO LATER Ian 2018-05-18 validate file with JSON Schema here
         } catch (error) {
           fileError({
             errorType: 'INVALID_JSON_FILE',
             message: error.message,
           })
         }
+
+        if (parsedProtocol) dispatch(loadFileAction(parsedProtocol))
       }
       reader.readAsText(file)
     }
