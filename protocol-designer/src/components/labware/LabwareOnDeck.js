@@ -16,6 +16,8 @@ import ClickableText from './ClickableText'
 import SelectablePlate from '../../containers/SelectablePlate.js'
 import NameThisLabwareOverlay from './NameThisLabwareOverlay.js'
 import DisabledSelectSlotOverlay from './DisabledSelectSlotOverlay.js'
+import BrowseLabwareOverlay from './BrowseLabwareOverlay.js'
+import {type TerminalItemId, START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID} from '../../steplist'
 
 function LabwareDeckSlotOverlay ({
   canAddIngreds,
@@ -123,11 +125,14 @@ type LabwareOnDeckProps = {
 
   addLabwareMode: boolean,
   canAddIngreds: boolean,
-  deckSetupMode: boolean,
+  isTiprack: boolean,
+  selectedTerminalItem: ?TerminalItemId,
   moveLabwareMode: boolean,
 
   addLabware: () => mixed,
   editLiquids: () => mixed,
+  drillDown: () => mixed,
+  drillUp: () => mixed,
   deleteLabware: () => mixed,
 
   cancelMove: () => mixed,
@@ -138,19 +143,23 @@ type LabwareOnDeckProps = {
   setLabwareName: (name: ?string) => mixed,
   setDefaultLabwareName: () => mixed,
 }
+
 class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
-  shouldComponentUpdate (nextProps: LabwareOnDeckProps) {
-    const shouldAlwaysUpdate = this.props.addLabwareMode ||
-      nextProps.addLabwareMode ||
-      this.props.moveLabwareMode ||
-      nextProps.moveLabwareMode
+  // TODO: BC 2018-10-11 re-implement this re-render check at a lower level once this component
+  // and its connected props are broken out into lower level components.
 
-    const labwarePresenceChange = this.props.containerId !== nextProps.containerId
-    const nameOverlayChange = this.props.showNameOverlay !== nextProps.showNameOverlay
+  // shouldComponentUpdate (nextProps: LabwareOnDeckProps) {
+  //   const shouldAlwaysUpdate = this.props.addLabwareMode ||
+  //     nextProps.addLabwareMode ||
+  //     this.props.moveLabwareMode ||
+  //     nextProps.moveLabwareMode
 
-    if (shouldAlwaysUpdate || labwarePresenceChange || nameOverlayChange) return true
-    return this.props.highlighted !== nextProps.highlighted
-  }
+  //   const labwarePresenceChange = this.props.containerId !== nextProps.containerId
+  //   const nameOverlayChange = this.props.showNameOverlay !== nextProps.showNameOverlay
+
+  //   if (shouldAlwaysUpdate || labwarePresenceChange || nameOverlayChange) return true
+  //   return this.props.highlighted !== nextProps.highlighted
+  // }
   render () {
     const {
       slot,
@@ -164,8 +173,11 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
 
       addLabwareMode,
       canAddIngreds,
-      deckSetupMode,
+      isTiprack,
+      selectedTerminalItem,
       moveLabwareMode,
+      drillDown,
+      drillUp,
 
       addLabware,
       editLiquids,
@@ -182,7 +194,7 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
 
     // determine what overlay to show
     let overlay = null
-    if (deckSetupMode && !addLabwareMode) {
+    if (selectedTerminalItem === START_TERMINAL_ITEM_ID && !addLabwareMode) {
       if (moveLabwareMode) {
         overlay = (slotToMoveFrom === slot)
           ? <DisabledSelectSlotOverlay
@@ -203,10 +215,10 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
             editLiquids,
             moveLabwareSource,
           }} />
-          : <EmptyDeckSlotOverlay {...{
-            addLabware,
-          }} />
+          : <EmptyDeckSlotOverlay {...{addLabware}} />
       }
+    } else if (selectedTerminalItem === END_TERMINAL_ITEM_ID && slotHasLabware && !isTiprack) {
+      overlay = <BrowseLabwareOverlay drillDown={drillDown} drillUp={drillUp} />
     }
 
     const labwareOrSlot = (slotHasLabware)

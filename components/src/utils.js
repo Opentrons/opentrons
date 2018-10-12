@@ -1,5 +1,9 @@
 // @flow
 import startCase from 'lodash/startCase'
+import {
+  swatchColors,
+  MIXED_WELL_COLOR,
+} from '@opentrons/components'
 
 export const humanizeLabwareType = startCase
 
@@ -20,4 +24,11 @@ export const wellNameSplit = (wellName: string): [string, string] => {
   const numbers = raw[2]
 
   return [letters, numbers]
+}
+
+// TODO Ian 2018-07-20: make sure '__air__' or other pseudo-ingredients don't get in here
+export const ingredIdsToColor = (groupIds: Array<string>): ?string => {
+  if (groupIds.length === 0) return null
+  if (groupIds.length === 1) return swatchColors(Number(groupIds[0]))
+  return MIXED_WELL_COLOR
 }

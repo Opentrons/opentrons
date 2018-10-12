@@ -8,16 +8,17 @@ import {
   getIsTiprack,
 } from '@opentrons/shared-data'
 import {
-  swatchColors,
   Labware,
   Well,
   Tip,
   LabwareOutline,
   LabwareLabels,
-  MIXED_WELL_COLOR,
+  ingredIdsToColor,
   type Channels,
 } from '@opentrons/components'
 
+import {WELL_LABEL_OFFSET} from '../constants'
+import SingleLabware from '../components/SingleLabware'
 import SelectionRect from '../components/SelectionRect.js'
 import type {ContentsByWell} from '../labware-ingred/types'
 import type {RectEvent} from '../collision-types'
@@ -41,19 +42,6 @@ export type Props = {
   // used by container
   containerId: string,
   pipetteChannels?: ?Channels,
-}
-
-// TODO Ian 2018-07-20: make sure '__air__' or other pseudo-ingredients don't get in here
-function getFillColor (groupIds: Array<string>): ?string {
-  if (groupIds.length === 0) {
-    return null
-  }
-
-  if (groupIds.length === 1) {
-    return swatchColors(Number(groupIds[0]))
-  }
-
-  return MIXED_WELL_COLOR
 }
 
 // TODO: BC 2018-10-08 for disconnect hover and select in the IngredSelectionModal from
@@ -102,7 +90,7 @@ export default function SelectablePlate (props: Props) {
                 wellName={wellName}
                 highlighted={well.highlighted}
                 selected={well.selected}
-                fillColor={getFillColor(well.groupIds)}
+                fillColor={ingredIdsToColor(well.groupIds)}
                 svgOffset={{x: 1, y: -3}}
                 wellDef={allWellDefsByName[wellName]} />
             )
@@ -122,15 +110,22 @@ export default function SelectablePlate (props: Props) {
         selected: well.selected,
         error: well.error,
         maxVolume: well.maxVolume,
-        fillColor: getFillColor(well.groupIds),
+        fillColor: ingredIdsToColor(well.groupIds),
       }
     }
 
+    // FIXME: SelectionRect is somehow off by one in the x axis, hence the magic number
     return (
-      <SelectionRect svg {...{onSelectionMove, onSelectionDone}}>
-        <Labware labwareType={containerType} getWellProps={getWellProps} getTipProps={getTipProps} />
-        <LabwareLabels labwareType={containerType} />
-      </SelectionRect>
+      <SingleLabware showLabels>
+        <SelectionRect
+          svg
+          originXOffset={WELL_LABEL_OFFSET - 1}
+          originYOffset={WELL_LABEL_OFFSET}
+          {...{onSelectionMove, onSelectionDone}}>
+          <Labware labwareType={containerType} getWellProps={getWellProps} getTipProps={getTipProps} />
+          <LabwareLabels labwareType={containerType} />
+        </SelectionRect>
+      </SingleLabware>
     )
   }
 }

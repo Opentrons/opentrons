@@ -53,3 +53,5 @@ export const DEFAULT_MM_FROM_BOTTOM_ASPIRATE = 1
 export const DEFAULT_MM_FROM_BOTTOM_DISPENSE = 0.5
 export const DEFAULT_WELL_ORDER_FIRST_OPTION: 't2b' = 't2b'
 export const DEFAULT_WELL_ORDER_SECOND_OPTION: 'l2r' = 'l2r'
+
+export const WELL_LABEL_OFFSET: number = 8

@@ -3,18 +3,20 @@ import * as React from 'react'
 import reduce from 'lodash/reduce'
 import map from 'lodash/map'
 import {
-  swatchColors,
   LabwareLabels,
-  MIXED_WELL_COLOR,
   type Channels,
   LabwareOutline,
   Well,
+  ingredIdsToColor,
 } from '@opentrons/components'
 
 import {getWellDefsForSVG} from '@opentrons/shared-data'
 
 import {getCollidingWells} from '../../utils'
-import {SELECTABLE_WELL_CLASS} from '../../constants'
+import {
+  SELECTABLE_WELL_CLASS,
+  WELL_LABEL_OFFSET,
+} from '../../constants'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
 import SelectionRect from '../SelectionRect.js'
 import type {ContentsByWell, Wells} from '../../labware-ingred/types'
@@ -31,17 +33,11 @@ export type Props = {
   pipetteChannels?: ?Channels,
 }
 
-// TODO Ian 2018-07-20: make sure '__air__' or other pseudo-ingredients don't get in here
-function getFillColor (groupIds: Array<string>): ?string {
-  if (groupIds.length === 0) return null
-  if (groupIds.length === 1) return swatchColors(Number(groupIds[0]))
-  return MIXED_WELL_COLOR
-}
-
 class SelectableLabware extends React.Component<Props> {
-  _getWellsFromRect = (rect: GenericRect): * => (
-    getCollidingWells(rect, SELECTABLE_WELL_CLASS)
-  )
+  _getWellsFromRect = (rect: GenericRect): * => {
+    const selectedWells = getCollidingWells(rect, SELECTABLE_WELL_CLASS)
+    return this._wellsFromSelected(selectedWells)
+  }
 
   _wellsFromSelected = (selectedWells: Wells): Wells => {
     // Returns PRIMARY WELLS from the selection.
@@ -120,8 +116,15 @@ class SelectableLabware extends React.Component<Props> {
         return [...acc, ...wellSet]
       }, [])
       : Object.keys(selectedWells)
+
+    // FIXME: SelectionRect is somehow off by one in the x axis, hence the magic number
     return (
-      <SelectionRect svg onSelectionMove={this.handleSelectionMove} onSelectionDone={this.handleSelectionDone}>
+      <SelectionRect
+        svg
+        originXOffset={WELL_LABEL_OFFSET - 1}
+        originYOffset={WELL_LABEL_OFFSET}
+        onSelectionMove={this.handleSelectionMove}
+        onSelectionDone={this.handleSelectionDone}>
         <g>
           <LabwareOutline />
           {map(wellContents, (well, wellName) => (
@@ -133,7 +136,7 @@ class SelectableLabware extends React.Component<Props> {
               onMouseLeave={this.handleMouseExitWell}
               highlighted={Object.keys(highlightedWells).includes(wellName)}
               selected={selectedWellSets.includes(wellName)}
-              fillColor={getFillColor(well.groupIds)}
+              fillColor={ingredIdsToColor(well.groupIds)}
               svgOffset={{x: 1, y: -3}}
               wellDef={allWellDefsByName[wellName]} />
           ))}

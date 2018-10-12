@@ -5,13 +5,10 @@
   font-size: var(--fs-tiny);
   text-anchor: middle;
   dominant-baseline: middle;
+  fill: var(--c-white);
 }
 
 .tiny_labels {
   /* For 384 plate */
   font-size: var(--fs-micro);
-}
-
-.tiny_labels:nth-child(odd) {
-  fill: gray;
 }
