@@ -112,7 +112,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
         name: null,
         volume: null,
         description: null,
-        individualize: false,
+        serialize: false,
       },
       commonIngredGroupId: null,
     }
@@ -127,7 +127,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
             : this.state.commonIngredGroupId,
         })
       },
-      getSubstate: (inputKey) => this.state.input[inputKey],
+      getSubstate: (inputKey) => this.state.input[inputKey] || null,
     })
   }
 
@@ -143,7 +143,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
     const allIngredientGroupFields = (nextIngredGroupFields || this.props.allIngredientGroupFields || {})
 
     if (ingredGroupId && ingredGroupId in allIngredientGroupFields) {
-      const {name, volume, description, individualize} = this.state.input
+      const {name, volume, description, serialize} = this.state.input
       const newIngredFields = allIngredientGroupFields[ingredGroupId]
       this.setState({
         ...this.state,
@@ -151,7 +151,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
           name: newIngredFields.name || name,
           volume: newIngredFields.volume || volume,
           description: newIngredFields.description || description,
-          individualize: newIngredFields.individualize || individualize,
+          serialize: newIngredFields.serialize || serialize,
         },
       }, cb)
     } else {
@@ -166,7 +166,7 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
           name: null,
           volume: null,
           description: null,
-          individualize: false,
+          serialize: false,
         },
       }, cb)
     }
@@ -290,11 +290,11 @@ class IngredientPropertiesForm extends React.Component<Props, State> {
 
               <FormGroup
                 label={'\u00A0'} // non-breaking space
-                className={styles.individualize}
+                className={styles.serialize}
               >
                 <Field
                   label='Serialize'
-                  accessor='individualize'
+                  accessor='serialize'
                   type='checkbox'
                 />
               </FormGroup>

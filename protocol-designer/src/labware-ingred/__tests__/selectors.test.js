@@ -6,7 +6,7 @@ const baseIngredFields = {
   groupId: '0',
   name: 'Some Ingred',
   description: null,
-  individualize: false,
+  serialize: false,
 }
 
 const allIngredientsXXSingleIngred = {

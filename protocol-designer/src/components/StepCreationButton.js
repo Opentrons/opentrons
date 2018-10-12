@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import styles from './StepCreationButton.css'
+import styles from './listButtons.css'
 import i18n from '../localization'
 
 import {HoverTooltip, PrimaryButton} from '@opentrons/components'
@@ -38,7 +38,7 @@ function StepCreationButton (props: Props) {
   )
 
   return (
-    <div className={styles.step_creation_button} onMouseLeave={onClickAway}>
+    <div className={styles.list_item_button} onMouseLeave={onClickAway}>
       <PrimaryButton
         onClick={expanded ? onClickAway : onExpandClick}
       >

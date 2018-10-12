@@ -1,7 +1,6 @@
 // @flow
 import {createAction} from 'redux-actions'
 import type {Dispatch} from 'redux'
-import max from 'lodash/max'
 
 import {selectors} from './reducers'
 import wellSelectionSelectors from '../well-selection/selectors'
@@ -166,10 +165,10 @@ export type EditIngredientPayload = {
   groupId: string | null, // null indicates new ingredient is being created
 }
 
+// TODO: Ian 2018-10-12 this is deprecated, remove when "add liquids to deck" modal is redone
 export const editIngredient = (payload: EditIngredientPayload) => (dispatch: Dispatch<EditIngredient>, getState: GetState) => {
   const state = getState()
   const container = selectors.getSelectedContainer(state)
-  const allIngredients = selectors.getIngredientGroups(state)
 
   const {groupId, ...inputFields} = payload
 
@@ -190,17 +189,59 @@ export const editIngredient = (payload: EditIngredientPayload) => (dispatch: Dis
     })
   }
 
-  // TODO: Ian 2018-02-19 make selector
-  const nextGroupId: string = ((max(Object.keys(allIngredients).map(id => parseInt(id))) + 1) || 0).toString()
-
   return dispatch({
     type: 'EDIT_INGREDIENT',
     payload: {
       ...inputFields,
       // if it matches the name of the clone parent, append "copy" to that name
       containerId: container.id,
-      groupId: nextGroupId,
+      groupId: selectors.getNextLiquidGroupId(state),
       wells: wellSelectionSelectors.selectedWellNames(state),
+    },
+  })
+}
+
+export type SelectLiquidAction = {
+  type: 'SELECT_LIQUID_GROUP',
+  payload: string,
+}
+
+export function selectLiquidGroup (liquidGroupId: string): SelectLiquidAction {
+  return {
+    type: 'SELECT_LIQUID_GROUP',
+    payload: liquidGroupId,
+  }
+}
+
+export function deselectLiquidGroup () {
+  return {type: 'DESELECT_LIQUID_GROUP'}
+}
+
+export function createNewLiquidGroup () {
+  return {type: 'CREATE_NEW_LIQUID_GROUP_FORM'}
+}
+
+export type EditLiquidGroupAction = {
+  type: 'EDIT_LIQUID_GROUP',
+  payload: {
+    liquidGroupId: string,
+    ...IngredInputFields,
+  },
+}
+
+// NOTE: with no ID, a new one is assigned
+export const editLiquidGroup = (
+  args: {liquidGroupId: ?string, ...IngredInputFields}
+) => (dispatch: Dispatch<EditLiquidGroupAction>, getState: GetState
+) => {
+  // TODO: Ian 2018-10-12 flow doesn't understand unpacking in: {...args, liquidGroupId: args.id || 'blahId'}
+  dispatch({
+    type: 'EDIT_LIQUID_GROUP',
+    payload: {
+      name: args.name,
+      serialize: args.serialize,
+      description: args.description,
+      liquidGroupId: args.liquidGroupId || selectors.getNextLiquidGroupId(getState()),
     },
   })
 }

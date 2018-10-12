@@ -44,11 +44,11 @@ export type OrderedLiquids = Array<{
   name: ?string,
 }>
 
-export type IngredInputs = {
-  name: string | null,
-  volume: number | null,
-  description: string | null,
-  individualize: boolean,
+export type IngredInputs = { // TODO: Ian 2018-10-12 rename to 'LiquidFormFields'
+  name: ?string,
+  volume?: ?number,
+  description: ?string,
+  serialize: boolean,
 }
 
 export type IngredInputFields = $Exact<IngredInputs>

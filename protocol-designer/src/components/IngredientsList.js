@@ -50,7 +50,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
       groupId,
       labwareWellContents,
     } = this.props
-    const {individualize, description, name} = ingredGroup
+    const {serialize, description, name} = ingredGroup
     const {isExpanded} = this.state
 
     const wellsWithIngred = Object.keys(labwareWellContents)
@@ -91,7 +91,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
           }
 
           return <IngredIndividual key={well}
-            name={individualize
+            name={serialize
               ? `${ingredGroup.name || ''} ${i + 1}`
               : ''
             }
