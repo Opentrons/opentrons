@@ -39,13 +39,11 @@ type OP = {
 }
 
 type Props = OP & DP
-type State = { value: number }
+type State = { value: string }
 
-const formatValue = (value: number | string): number => {
-  let val = value || 0
-  if (typeof val === 'string') val = Number(val)
-  return round(val, DECIMALS_ALLOWED)
-}
+const formatValue = (value: number): string => (
+  String(round(value, DECIMALS_ALLOWED))
+)
 
 class TipPositionModal extends React.Component<Props, State> {
   constructor (props: Props) {
@@ -58,7 +56,7 @@ class TipPositionModal extends React.Component<Props, State> {
     }
   }
   applyChanges = () => {
-    this.props.updateValue(String(formatValue(this.state.value)))
+    this.props.updateValue(formatValue(Number(this.state.value) || 0))
   }
   handleReset = () => {
     // NOTE: when `prefix` isn't set (eg in the Mix form), we'll use
@@ -78,32 +76,34 @@ class TipPositionModal extends React.Component<Props, State> {
     this.props.closeModal()
   }
   handleChange = (e: SyntheticEvent<HTMLSelectElement>) => {
-    const rawValue = e.currentTarget.value
-    const value = formatValue(rawValue)
+    const {value} = e.currentTarget
+    const valueFloat = Number(formatValue(Number(value)))
     const maximumHeightMM = (this.props.wellHeightMM * 2)
 
-    if (value > maximumHeightMM) {
-      this.setState({value: formatValue(maximumHeightMM)})
-    } else if (value >= 0) {
+    if (!value) {
       this.setState({value})
+    } else if (valueFloat > maximumHeightMM) {
+      this.setState({value: formatValue(maximumHeightMM)})
+    } else if (valueFloat >= 0) {
+      const numericValue = value.replace(/[^.0-9]/, '')
+      this.setState({value: numericValue.replace(/(\d*[.]{1}\d{1})(\d*)/, (match, group1) => group1)})
     } else {
       this.setState({value: formatValue(0)})
     }
   }
   makeHandleIncrement = (step: number) => () => {
     const {value} = this.state
-    const incrementedValue = (value || 0) + step
+    const incrementedValue = parseFloat(value || 0) + step
     const maximumHeightMM = (this.props.wellHeightMM * 2)
     this.setState({value: formatValue(Math.min(incrementedValue, maximumHeightMM))})
   }
   makeHandleDecrement = (step: number) => () => {
-    const nextValueFloat = (this.state.value || 0) - step
+    const nextValueFloat = parseFloat(this.state.value || 0) - step
     this.setState({value: formatValue(nextValueFloat < 0 ? 0 : nextValueFloat)})
   }
   render () {
     if (!this.props.isOpen) return null
     const {value} = this.state
-    const valueString = String(value)
     const {wellHeightMM} = this.props
 
     return (
@@ -131,24 +131,24 @@ class TipPositionModal extends React.Component<Props, State> {
                     className={styles.position_from_bottom_input}
                     onChange={this.handleChange}
                     units="mm"
-                    value={valueString} />
+                    value={value } />
                 </FormGroup>
                 <div className={styles.viz_group}>
                   <div className={styles.adjustment_buttons}>
                     <OutlineButton
                       className={styles.adjustment_button}
-                      disabled={value >= (wellHeightMM * 2)}
+                      disabled={parseFloat(value) >= (wellHeightMM * 2)}
                       onClick={this.makeHandleIncrement(SMALL_STEP_MM)}>
                       <Icon name="plus" />
                     </OutlineButton>
                     <OutlineButton
                       className={styles.adjustment_button}
-                      disabled={value <= 0}
+                      disabled={parseFloat(value) <= 0}
                       onClick={this.makeHandleDecrement(SMALL_STEP_MM)}>
                       <Icon name="minus" />
                     </OutlineButton>
                   </div>
-                  <TipPositionZAxisViz mmFromBottom={valueString} wellHeightMM={wellHeightMM} />
+                  <TipPositionZAxisViz mmFromBottom={value} wellHeightMM={wellHeightMM} />
                 </div>
               </div>
               <div className={styles.rightHalf}>{/* TODO: xy tip positioning */}</div>
