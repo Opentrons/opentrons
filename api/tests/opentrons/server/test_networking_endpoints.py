@@ -5,14 +5,14 @@ import tempfile
 import pytest
 from opentrons.system import nmcli
 from opentrons.server import init
-from opentrons.server.endpoints import wifi
+from opentrons.server.endpoints import networking
 
 """
 All mocks in this test suite represent actual output from nmcli commands
 """
 
 
-async def test_wifi_status(
+async def test_networking_status(
         virtual_smoothie_env, loop, test_client, monkeypatch):
     app = init(loop)
     cli = await loop.create_task(test_client(app))
@@ -20,21 +20,49 @@ async def test_wifi_status(
     async def mock_call(cmd):
         # Command: `nmcli networking connectivity`
         if 'connectivity' in cmd:
-            return 'full', ''
+            res = 'full'
+        elif 'wlan0' in cmd:
+            res = '''GENERAL.HWADDR:B8:27:EB:5F:A6:89
+IP4.ADDRESS[1]:--
+IP4.GATEWAY:--
+GENERAL.TYPE:wifi
+GENERAL.STATE:30 (disconnected)'''
+        elif 'eth0' in cmd:
+            res = '''GENERAL.HWADDR:B8:27:EB:39:C0:9A
+IP4.ADDRESS[1]:169.254.229.173/16
+GENERAL.TYPE:ethernet
+GENERAL.STATE:100 (connected)'''
         else:
-            res = '''B8:27:EB:5F:A6:89
-192.168.1.137/24
-192.168.1.1
-100 (connected)'''
-            return res, ''
+            res = 'incorrect nmcli call'
+
+        return res, ''
 
     monkeypatch.setattr(nmcli, '_call', mock_call)
 
-    expected = json.dumps({'status': 'full',
-                           'ipAddress': '192.168.1.137/24',
-                           'macAddress': 'B8:27:EB:5F:A6:89',
-                           'gatewayAddress': '192.168.1.1'})
-    resp = await cli.get('/wifi/status')
+    expected = json.dumps({
+        'status': 'full',
+        'interfaces': {
+            'wlan0': {
+                # test "--" gets mapped to None
+                'ipAddress': None,
+                'macAddress': 'B8:27:EB:5F:A6:89',
+                # test "--" gets mapped to None
+                'gatewayAddress': None,
+                'state': 'disconnected',
+                'type': 'wifi'
+            },
+            'eth0': {
+                'ipAddress': '169.254.229.173/16',
+                'macAddress': 'B8:27:EB:39:C0:9A',
+                # test missing output gets mapped to None
+                'gatewayAddress': None,
+                'state': 'connected',
+                'type': 'ethernet'
+            }
+        }
+    })
+
+    resp = await cli.get('/networking/status')
     text = await resp.text()
     assert resp.status == 200
     assert text == expected
@@ -46,7 +74,7 @@ async def test_wifi_status(
             return '', 'this is a dummy error'
 
     monkeypatch.setattr(nmcli, '_call', mock_call)
-    resp = await cli.get('/wifi/status')
+    resp = await cli.get('/networking/status')
     assert resp.status == 500
 
 
@@ -105,15 +133,16 @@ async def test_wifi_configure(
 
 
 def test_deduce_security():
-    with pytest.raises(wifi.ConfigureArgsError):
-        wifi._deduce_security({'psk': 'hi', 'eapConfig': {'hi': 'nope'}})
-    assert wifi._deduce_security({'psk': 'test-psk'})\
+    with pytest.raises(networking.ConfigureArgsError):
+        networking._deduce_security({'psk': 'hi', 'eapConfig': {'hi': 'nope'}})
+    assert networking._deduce_security({'psk': 'test-psk'})\
         == nmcli.SECURITY_TYPES.WPA_PSK
-    assert wifi._deduce_security({'eapConfig': {'hi': 'this is bad'}})\
+    assert networking._deduce_security({'eapConfig': {'hi': 'this is bad'}})\
         == nmcli.SECURITY_TYPES.WPA_EAP
-    assert wifi._deduce_security({}) == nmcli.SECURITY_TYPES.NONE
-    with pytest.raises(wifi.ConfigureArgsError):
-        wifi._deduce_security({'securityType': 'this is invalid you fool'})
+    assert networking._deduce_security({}) == nmcli.SECURITY_TYPES.NONE
+    with pytest.raises(networking.ConfigureArgsError):
+        networking._deduce_security(
+            {'securityType': 'this is invalid you fool'})
 
 
 def test_check_eap_config(wifi_keys_tempdir):
@@ -124,24 +153,24 @@ def test_check_eap_config(wifi_keys_tempdir):
                            'test.pem'), 'w') as f:
         f.write('what a terrible key')
     # Bad eap types should fail
-    with pytest.raises(wifi.ConfigureArgsError):
-        wifi._eap_check_config({'eapType': 'afaosdasd'})
+    with pytest.raises(networking.ConfigureArgsError):
+        networking._eap_check_config({'eapType': 'afaosdasd'})
     # Valid (if short) arguments should work
-    wifi._eap_check_config({'eapType': 'peap/eap-mschapv2',
-                            'identity': 'test@hi.com',
-                            'password': 'passwd'})
+    networking._eap_check_config({'eapType': 'peap/eap-mschapv2',
+                                  'identity': 'test@hi.com',
+                                  'password': 'passwd'})
     # Extra args should fail
-    with pytest.raises(wifi.ConfigureArgsError):
-        wifi._eap_check_config({'eapType': 'tls',
-                                'identity': 'test@example.com',
-                                'privateKey': wifi_key_id,
-                                'clientCert': wifi_key_id,
-                                'phase2CaCertf': 'foo'})
+    with pytest.raises(networking.ConfigureArgsError):
+        networking._eap_check_config({'eapType': 'tls',
+                                      'identity': 'test@example.com',
+                                      'privateKey': wifi_key_id,
+                                      'clientCert': wifi_key_id,
+                                      'phase2CaCertf': 'foo'})
     # Filenames should be rewritten
-    rewritten = wifi._eap_check_config({'eapType': 'ttls/eap-md5',
-                                        'identity': 'hello@example.com',
-                                        'password': 'hi',
-                                        'caCert': wifi_key_id})
+    rewritten = networking._eap_check_config({'eapType': 'ttls/eap-md5',
+                                              'identity': 'hello@example.com',
+                                              'password': 'hi',
+                                              'caCert': wifi_key_id})
     assert rewritten['caCert'] == os.path.join(wifi_keys_tempdir,
                                                wifi_key_id,
                                                'test.pem')
@@ -150,64 +179,64 @@ def test_check_eap_config(wifi_keys_tempdir):
               'identity': "test@hello.com",
               'phase2ClientCert': wifi_key_id,
               'phase2PrivateKey': wifi_key_id}
-    out = wifi._eap_check_config(config)
+    out = networking._eap_check_config(config)
     for key in config.keys():
         assert key in out
 
 
 def test_eap_check_option():
     # Required arguments that are not specified should raise
-    with pytest.raises(wifi.ConfigureArgsError):
-        wifi._eap_check_option_ok({'name': 'test-opt', 'required': True,
-                                   'displayName': 'Test Option'},
-                                  {'eapType': 'test'})
+    with pytest.raises(networking.ConfigureArgsError):
+        networking._eap_check_option_ok({'name': 'test-opt', 'required': True,
+                                         'displayName': 'Test Option'},
+                                        {'eapType': 'test'})
     # Non-required arguments that are not specified should not raise
-    wifi._eap_check_option_ok({'name': 'test-1',
-                               'required': False,
-                               'type': 'string',
-                               'displayName': 'Test Option'},
-                              {'eapType': 'test'})
+    networking._eap_check_option_ok({'name': 'test-1',
+                                     'required': False,
+                                     'type': 'string',
+                                     'displayName': 'Test Option'},
+                                    {'eapType': 'test'})
 
     # Check type mismatch detection pos and neg
-    with pytest.raises(wifi.ConfigureArgsError):
-        wifi._eap_check_option_ok({'name': 'identity',
-                                   'displayName': 'Username',
-                                   'required': True,
-                                   'type': 'string'},
-                                  {'identity': 2,
-                                   'eapType': 'test'})
-    wifi._eap_check_option_ok({'name': 'identity',
-                               'required': True,
-                               'displayName': 'Username',
-                               'type': 'string'},
-                              {'identity': 'hi',
-                               'eapType': 'test'})
-    with pytest.raises(wifi.ConfigureArgsError):
-        wifi._eap_check_option_ok({'name': 'password',
-                                   'required': True,
-                                   'displayName': 'Password',
-                                   'type': 'password'},
-                                  {'password': [2, 3],
-                                   'eapType': 'test'})
-    wifi._eap_check_option_ok({'name': 'password',
-                               'required': True,
-                               'displayName': 'password',
-                               'type': 'password'},
-                              {'password': 'secret',
-                               'eapType': 'test'})
-    with pytest.raises(wifi.ConfigureArgsError):
-        wifi._eap_check_option_ok({'name': 'phase2CaCert',
-                                   'displayName': 'some file who cares',
-                                   'required': True,
-                                   'type': 'file'},
-                                  {'phase2CaCert': 2,
-                                   'eapType': 'test'})
-    wifi._eap_check_option_ok({'name': 'phase2CaCert',
-                               'required': True,
-                               'displayName': 'hello',
-                               'type': 'file'},
-                              {'phase2CaCert': '82141cceaf',
-                               'eapType': 'test'})
+    with pytest.raises(networking.ConfigureArgsError):
+        networking._eap_check_option_ok({'name': 'identity',
+                                         'displayName': 'Username',
+                                         'required': True,
+                                         'type': 'string'},
+                                        {'identity': 2,
+                                         'eapType': 'test'})
+    networking._eap_check_option_ok({'name': 'identity',
+                                     'required': True,
+                                     'displayName': 'Username',
+                                     'type': 'string'},
+                                    {'identity': 'hi',
+                                     'eapType': 'test'})
+    with pytest.raises(networking.ConfigureArgsError):
+        networking._eap_check_option_ok({'name': 'password',
+                                         'required': True,
+                                         'displayName': 'Password',
+                                         'type': 'password'},
+                                        {'password': [2, 3],
+                                         'eapType': 'test'})
+    networking._eap_check_option_ok({'name': 'password',
+                                     'required': True,
+                                     'displayName': 'password',
+                                     'type': 'password'},
+                                    {'password': 'secret',
+                                     'eapType': 'test'})
+    with pytest.raises(networking.ConfigureArgsError):
+        networking._eap_check_option_ok({'name': 'phase2CaCert',
+                                         'displayName': 'some file who cares',
+                                         'required': True,
+                                         'type': 'file'},
+                                        {'phase2CaCert': 2,
+                                         'eapType': 'test'})
+    networking._eap_check_option_ok({'name': 'phase2CaCert',
+                                     'required': True,
+                                     'displayName': 'hello',
+                                     'type': 'file'},
+                                    {'phase2CaCert': '82141cceaf',
+                                     'eapType': 'test'})
 
 
 async def test_list_keys(loop, test_client, wifi_keys_tempdir):
