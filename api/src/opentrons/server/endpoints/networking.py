@@ -276,32 +276,65 @@ async def configure(request: web.Request) -> web.Response:
 
 async def status(request: web.Request) -> web.Response:
     """
-    Get request will return the status of the wifi connection from the
-    RaspberryPi to the internet.
+    Get request will return the status of the machine's connection to the
+    internet as well as the status of its network interfaces.
 
     The body of the response is a json dict containing
 
-    'status': connectivity status, where the options are:
+    'status': internet connectivity status, where the options are:
       "none" - no connection to router or network
       "portal" - device behind a captive portal and cannot reach full internet
       "limited" - connection to router but not internet
       "full" - connection to router and internet
       "unknown" - an exception occured while trying to determine status
-    'ipAddress': the ip address, if it exists (null otherwise); this also
-                 contains the subnet mask in CIDR notation, e.g. 10.2.12.120/16
-    'macAddress': the mac address
-    'gatewayAddress': the address of the current gateway, if it exists (null
-                      otherwise)
+    'interfaces': JSON object of networking interfaces, keyed by device name,
+    where the value of each entry is another object with the keys:
+      - 'type': "ethernet" or "wifi"
+      - 'state': state string, e.g. "disconnected", "connecting", "connected"
+      - 'ipAddress': the ip address, if it exists (null otherwise); this also
+        contains the subnet mask in CIDR notation, e.g. 10.2.12.120/16
+      - 'macAddress': the MAC address of the interface device
+      - 'gatewayAddress': the address of the current gateway, if it exists
+        (null otherwise)
+
+
+    Example request:
+    ```
+    GET /networking/status
+    ```
+
+    Example response:
+    ```
+    200 OK
+    {
+        "status": "full",
+        "interfaces": {
+            "wlan0": {
+                "ipAddress": "192.168.43.97/24",
+                "macAddress": "B8:27:EB:6C:95:CF",
+                "gatewayAddress": "192.168.43.161",
+                "state": "connected",
+                "type": "wifi"
+            },
+            "eth0": {
+                "ipAddress": "169.254.229.173/16",
+                "macAddress": "B8:27:EB:39:C0:9A",
+                "gatewayAddress": null,
+                "state": "connected",
+                "type": "ethernet"
+            }
+        }
+    }
+    ```
     """
-    connectivity = {'status': 'none',
-                    'ipAddress': None,
-                    'macAddress': 'unknown',
-                    'gatewayAddress': None}
+    connectivity = {'status': 'none', 'interfaces': {}}
     try:
         connectivity['status'] = await nmcli.is_connected()
-        net_info = await nmcli.iface_info(nmcli.NETWORK_IFACES.WIFI)
-        connectivity.update(net_info)
+        connectivity['interfaces'] = {
+            i.value: await nmcli.iface_info(i) for i in nmcli.NETWORK_IFACES
+        }
         log.debug("Connectivity: {}".format(connectivity['status']))
+        log.debug("Interfaces: {}".format(connectivity['interfaces']))
         status = 200
     except subprocess.CalledProcessError as e:
         log.error("CalledProcessError: {}".format(e.stdout))

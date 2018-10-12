@@ -457,8 +457,8 @@ async def configure(ssid: str,
     # This unfortunately doesn’t respect the --terse flag, so we need to
     # regex out the name or the uuid to use later in connection up; the
     # uuid is slightly more regular, so that’s what we use.
-    uuid_matches = re.search( # noqa
-        "Connection '(.*)'[\s]+\(([\w\d-]+)\) successfully", res) # noqa
+    uuid_matches = re.search(  # noqa
+        "Connection '(.*)'[\s]+\(([\w\d-]+)\) successfully", res)  # noqa
     if not uuid_matches:
         return False, err.split('\r')[-1]
     name = uuid_matches.group(1)
@@ -507,10 +507,15 @@ async def iface_info(which_iface: NETWORK_IFACES) -> Dict[str, Optional[str]]:
 
     which_iface should be a string in IFACE_NAMES.
     """
-    default_res: Dict[str, Optional[str]] = {'ipAddress': None,
-                                             'macAddress': None,
-                                             'gatewayAddress': None}
-    fields = ['GENERAL.HWADDR', 'IP4.ADDRESS', 'IP4.GATEWAY', 'GENERAL.STATE']
+    _IFACE_STATE_RE = r'\d+ \((.+)\)'
+
+    info: Dict[str, Optional[str]] = {'ipAddress': None,
+                                      'macAddress': None,
+                                      'gatewayAddress': None,
+                                      'state': None,
+                                      'type': None}
+    fields = ['GENERAL.HWADDR', 'IP4.ADDRESS',
+              'IP4.GATEWAY', 'GENERAL.TYPE', 'GENERAL.STATE']
     # Note on this specific command: Most nmcli commands default to a tabular
     # output mode, where if there are multiple things to pull a couple specific
     # fields from it you’ll get a table where rows are, say, connections, and
@@ -522,14 +527,26 @@ async def iface_info(which_iface: NETWORK_IFACES) -> Dict[str, Optional[str]]:
                             '--escape', 'no',
                             '--terse', '--fields', ','.join(fields),
                             'dev', 'show', which_iface.value])
-    values = res.split('\n')
+
+    # nmcli uses -- for None, so replace
+    values = [None if v == '--' else v for v in res.split('\n')]
+
     if len(fields) != len(values):
         # We failed
         raise ValueError("Bad result from nmcli: {}".format(err))
-    default_res['macAddress'] = values[0]
-    default_res['ipAddress'] = values[1]
-    default_res['gatewayAddress'] = values[2]
-    return default_res
+
+    info['macAddress'] = values[0]
+    info['ipAddress'] = values[1]
+    info['gatewayAddress'] = values[2]
+    info['type'] = values[3]
+    state_val = values[4]
+
+    if state_val:
+        state_match = re.fullmatch(_IFACE_STATE_RE, state_val)
+        if state_match:
+            info['state'] = state_match.group(1)
+
+    return info
 
 
 async def _call(cmd: List[str]) -> Tuple[str, str]:
