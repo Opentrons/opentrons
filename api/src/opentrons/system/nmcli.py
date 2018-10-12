@@ -507,7 +507,15 @@ async def iface_info(which_iface: NETWORK_IFACES) -> Dict[str, Optional[str]]:
 
     which_iface should be a string in IFACE_NAMES.
     """
-    _IFACE_STATE_RE = r'\d+ \((.+)\)'
+    # example device info lines
+    #  GENERAL.HWADDR:B8:27:EB:24:D1:D0
+    #  IP4.ADDRESS[1]:10.10.2.221/22
+    # capture the field name (without the number in brackets) and the value
+    # using regex instead of split because there may be ":" in the value
+    _DEV_INFO_LINE_RE = re.compile(r'([\w.]+)(?:\[\d+])?:(.*)')
+    # example device info: 30 (disconnected)
+    # capture the string without the number
+    _IFACE_STATE_RE = re.compile(r'\d+ \((.+)\)')
 
     info: Dict[str, Optional[str]] = {'ipAddress': None,
                                       'macAddress': None,
@@ -523,26 +531,30 @@ async def iface_info(which_iface: NETWORK_IFACES) -> Dict[str, Optional[str]]:
     # ‘dev show <dev-name>’ default to a multiline representation, and even if
     # explicitly ask for it to be tabular, it’s not quite the same as the other
     # commands. So we have to special-case the parsing.
-    res, err = await _call(['--mode', 'tabular',
+    res, err = await _call(['--mode', 'multiline',
                             '--escape', 'no',
                             '--terse', '--fields', ','.join(fields),
                             'dev', 'show', which_iface.value])
 
-    # nmcli uses -- for None, so replace
-    values = [None if v == '--' else v for v in res.split('\n')]
+    field_map = {}
+    for line in res.split('\n'):
+        # pull the key (without brackets) and the value out of the line
+        match = _DEV_INFO_LINE_RE.fullmatch(line)
+        if match is None:
+            raise ValueError(
+                "Bad nmcli result; out: {}; err: {}".format(res, err))
+        key, val = match.groups()
+        # nmcli can put "--" instead of "" for None
+        field_map[key] = None if val == '--' else val
 
-    if len(fields) != len(values):
-        # We failed
-        raise ValueError("Bad result from nmcli: {}".format(err))
-
-    info['macAddress'] = values[0]
-    info['ipAddress'] = values[1]
-    info['gatewayAddress'] = values[2]
-    info['type'] = values[3]
-    state_val = values[4]
+    info['macAddress'] = field_map.get('GENERAL.HWADDR')
+    info['ipAddress'] = field_map.get('IP4.ADDRESS')
+    info['gatewayAddress'] = field_map.get('IP4.GATEWAY')
+    info['type'] = field_map.get('GENERAL.TYPE')
+    state_val = field_map.get('GENERAL.STATE')
 
     if state_val:
-        state_match = re.fullmatch(_IFACE_STATE_RE, state_val)
+        state_match = _IFACE_STATE_RE.fullmatch(state_val)
         if state_match:
             info['state'] = state_match.group(1)
 

@@ -22,17 +22,16 @@ async def test_networking_status(
         if 'connectivity' in cmd:
             res = 'full'
         elif 'wlan0' in cmd:
-            res = '''B8:27:EB:5F:A6:89
---
---
-wifi
-30 (disconnected)'''
+            res = '''GENERAL.HWADDR:B8:27:EB:5F:A6:89
+IP4.ADDRESS[1]:--
+IP4.GATEWAY:--
+GENERAL.TYPE:wifi
+GENERAL.STATE:30 (disconnected)'''
         elif 'eth0' in cmd:
-            res = '''B8:27:EB:39:C0:9A
-169.254.229.173/16
---
-ethernet
-100 (connected)'''
+            res = '''GENERAL.HWADDR:B8:27:EB:39:C0:9A
+IP4.ADDRESS[1]:169.254.229.173/16
+GENERAL.TYPE:ethernet
+GENERAL.STATE:100 (connected)'''
         else:
             res = 'incorrect nmcli call'
 
@@ -44,8 +43,10 @@ ethernet
         'status': 'full',
         'interfaces': {
             'wlan0': {
+                # test "--" gets mapped to None
                 'ipAddress': None,
                 'macAddress': 'B8:27:EB:5F:A6:89',
+                # test "--" gets mapped to None
                 'gatewayAddress': None,
                 'state': 'disconnected',
                 'type': 'wifi'
@@ -53,6 +54,7 @@ ethernet
             'eth0': {
                 'ipAddress': '169.254.229.173/16',
                 'macAddress': 'B8:27:EB:39:C0:9A',
+                # test missing output gets mapped to None
                 'gatewayAddress': None,
                 'state': 'connected',
                 'type': 'ethernet'
