@@ -11,12 +11,20 @@ firmware = $(wildcard smoothie/*.hex)
 
 # python and pipenv config
 python := pipenv run python
+pip := pipenv run pip
+pytest := pipenv run py.test
 pipenv_opts := --dev
 pipenv_opts += $(and $(CI),--ignore-pipfile)
+
+tests ?= tests
+test_opts ?=
 
 .PHONY: install
 install:
 	pipenv install $(pipenv_opts)
+
+.PHONY: all
+all: lint test
 
 .PHONY: clean
 clean:
@@ -30,17 +38,13 @@ clean:
 		'**/*.pyc'
 
 .PHONY: test
-test:
-	$(python) -m pytest \
-		--cov=opentrons \
-		--cov-report term-missing:skip-covered \
-		--cov-report xml:coverage.xml \
-		tests
+test: local-install
+	${pytest} ${tests} ${test_opts}
 
 .PHONY: lint
 lint:
-	$(python) -m mypy opentrons
-	$(python) -m pylama opentrons tests
+	$(python) -m mypy src/opentrons
+	$(python) -m pylama src/opentrons tests
 
 .PHONY: docs
 docs:
@@ -55,14 +59,22 @@ publish:
 
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true
-dev:
-	$(python) opentrons/main.py -P 31950
+dev: local-install
+	$(python) -m opentrons.main -P 31950
 
 .PHONY: wheel
 wheel: clean
 	$(python) setup.py bdist_wheel
 	shx rm -rf build
 	shx ls dist
+
+.PHONY: local-install
+local-install: wheel
+	$(pip) install --ignore-installed --no-deps dist/opentrons-*.whl
+
+.PHONY: local-shell
+local-shell: local-install
+	pipenv shell
 
 .PHONY: push
 push: wheel

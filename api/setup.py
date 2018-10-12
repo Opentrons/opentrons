@@ -2,15 +2,80 @@
 # https://hynek.me/articles/sharing-your-labor-of-love-pypi-quick-and-dirty/
 import codecs
 import os
-import shutil
+import os.path
 from setuptools import setup, find_packages
+from setuptools.command import build_py, sdist
+
 import json
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
+# Where we get our files from
+SHARED_DATA_PATH = os.path.join('..', 'shared-data')
+# The subdirectories of SHARED_DATA_PATH to scan for files
+SHARED_DATA_SUBDIRS = ['labware-json-schema',
+                       'protocol-json-schema',
+                       'definitions',
+                       'robot-data']
+# Where, relative to the package root, we put the files we copy
+DEST_BASE_PATH = 'shared_data'
+
+
+def get_shared_data_files():
+    to_include = []
+    for subdir in SHARED_DATA_SUBDIRS:
+        top = os.path.join(SHARED_DATA_PATH, subdir)
+        for dirpath, dirnames, filenames in os.walk(top):
+            from_source = os.path.relpath(dirpath, SHARED_DATA_PATH)
+            to_include.extend([os.path.join(from_source, fname)
+                               for fname in filenames])
+    return to_include
+
+
+class SDistWithSharedData(sdist.sdist):
+    description = sdist.sdist.description\
+        + " Also, include opentrons data files."
+
+    def make_release_tree(self, base_dir, files):
+        self.announce("adding opentrons data files to base dir {}".format(base_dir))
+        for data_file in get_shared_data_files():
+            sdist_dest = os.path.join(base_dir, DEST_BASE_PATH)
+            self.mkpath(os.path.join(sdist_dest, 'opentrons',
+                                     os.path.dirname(data_file)))
+            self.copy_file(os.path.join(SHARED_DATA_PATH, data_file),
+                           os.path.join(sdist_dest, data_file))
+        super().make_release_tree(base_dir, files)
+
+
+class BuildWithSharedData(build_py.build_py):
+    description = build_py.build_py.description\
+        + " Also, include opentrons data files"
+
+    def _get_data_files(self):
+        """
+        Override of build_py.get_data_files that includes out of tree configs.
+        These are currently hardcoded to include everything in
+         ../shared-data/robot-data, which will move to
+        opentrons/config/shared-data
+        """
+        files = super()._get_data_files()
+        # We don’t really want to duplicate logic used in the original
+        # implementation, but we can back out what it did with commonpath -
+        # should be something ending in opentrons
+        build_base = os.path.commonpath([f[2] for f in files])
+        # We want a list of paths to only files relative to ../shared-data
+        to_include = get_shared_data_files()
+        destination = os.path.join(build_base, DEST_BASE_PATH)
+        # And finally, tell the system about our files
+        print("FILES BEFORE {}".format(files))
+        files.append(('opentrons', SHARED_DATA_PATH,
+                      destination, to_include))
+        print("FILES AFTER {}".format(files))
+        return files
+
 
 def get_version():
-    with open(os.path.join(HERE, 'opentrons', 'package.json')) as pkg:
+    with open(os.path.join(HERE, 'src', 'opentrons', 'package.json')) as pkg:
         package_json = json.load(pkg)
         return package_json.get('version')
 
@@ -37,12 +102,13 @@ KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 DESCRIPTION = (
     "The Opentrons API is a simple framework designed to make "
     "writing automated biology lab protocols easy.")
-PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
+PACKAGES = find_packages(where='src')
 INSTALL_REQUIRES = [
     'pyserial==3.2.1',
     'aiohttp==2.3.8',
     'numpy==1.12.1',
     'urwid==1.3.1']
+
 
 def read(*parts):
     """
@@ -54,20 +120,6 @@ def read(*parts):
 
 
 if __name__ == "__main__":
-    pipette_config_filename = 'pipette-config.json'
-    config_src = os.path.join(
-        '..', 'shared-data', 'robot-data', pipette_config_filename)
-    config_dst = os.path.join('opentrons', 'config')
-    # If you add more copies like this in setup.py you must add them to the
-    # Dockerfile as well, since this doesn’t work during a docker build
-    try:
-        pipette_config_file = os.path.join(config_dst, pipette_config_filename)
-        if os.path.exists(pipette_config_file):
-            os.remove(pipette_config_file)
-        shutil.copy2(config_src, config_dst)
-    except OSError:
-        print('Unable to copy shared data directory due to exception:')
-
     setup(
         python_requires='>=3.6',
         name=DISTNAME,
@@ -87,17 +139,10 @@ if __name__ == "__main__":
         install_requires=INSTALL_REQUIRES,
         setup_requires=['pytest-runner'],
         tests_require=['pytest'],
-        include_package_data=True
+        include_package_data=True,
+        package_dir={'': 'src'},
+        cmdclass={
+            'build_py': BuildWithSharedData,
+            'sdist': SDistWithSharedData
+        }
     )
-    if os.environ.get('RUNNING_ON_PI'):
-        # This only applies to software updates: when `pip install` is invoked
-        # on a running robot - not when `pip install` is invoked in the
-        # Dockerfile and not when the server starts up on a robot.
-        resource_dir = os.path.join(HERE, 'opentrons', 'resources')
-        provision = os.path.join(resource_dir, 'provision.py')
-        # We use a subprocess that invokes another python here to avoid
-        # importing the opentrons module that we’re about to install, since this
-        # is side-effect-heavy.
-        import sys
-        import subprocess
-        subprocess.check_call([sys.executable, provision], stdout=sys.stdout)
