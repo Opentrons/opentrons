@@ -5,7 +5,6 @@ import {selectors as pipetteSelectors} from '../pipettes'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../steplist'
 import {selectors as fileDataSelectors} from '../file-data'
-import {allWellContentsForSteps} from './well-contents'
 
 import {
   generateSubsteps,

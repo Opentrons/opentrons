@@ -12,11 +12,11 @@ import {
   LabwareOutline,
   LabwareLabels,
   ingredIdsToColor,
-  HoverTooltip,
 } from '@opentrons/components'
 import type {BaseState, ThunkDispatch} from '../../types'
 import i18n from '../../localization'
 
+import type {LocationLiquidState} from '../../step-generation'
 import {PillTooltipContents} from '../steplist/SubstepRow'
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import {selectors} from '../../labware-ingred/reducers'
@@ -40,32 +40,39 @@ type DP = {
 
 type Props = SP & DP
 
-const initialState = {
+type State = {
+  tooltipX: ?number,
+  tooltipY: ?number,
+  tooltipWellName: ?string,
+  tooltipWellIngreds: ?LocationLiquidState,
+}
+const initialState: State = {
   tooltipX: null,
   tooltipY: null,
   tooltipWellName: null,
-  tooltipwellIngreds: null,
-  tooltipHeight: null,
-  tooltipWidth: null,
+  tooltipWellIngreds: null,
 }
 
 const MOUSE_TOOLTIP_OFFSET_PIXELS = 14
 
-class BrowseLabwareModal extends React.Component<Props> {
-  state = initialState
-  wrapperRef
+class BrowseLabwareModal extends React.Component<Props, State> {
+  state: State = initialState
+  wrapperRef: ?any
 
-  makeHandleWellMouseOver = (wellName, wellIngreds) => (e) => {
-    const {clientX, clientY} = e
-    if (Object.keys(wellIngreds).length > 0 && clientX && clientY && this.wrapperRef) {
-      this.setState({
-        tooltipX: clientX - this.wrapperRef.getBoundingClientRect().left + MOUSE_TOOLTIP_OFFSET_PIXELS,
-        tooltipY: clientY - this.wrapperRef.getBoundingClientRect().top + MOUSE_TOOLTIP_OFFSET_PIXELS,
-        tooltipWellName: wellName,
-        tooltipWellIngreds: wellIngreds,
-      })
+  makeHandleWellMouseOver = (wellName: string, wellIngreds: LocationLiquidState) =>
+    (e) => {
+      const {clientX, clientY} = e
+      if (Object.keys(wellIngreds).length > 0 && clientX && clientY && this.wrapperRef) {
+        const wrapperLeft = this.wrapperRef ? this.wrapperRef.getBoundingClientRect().left : 0
+        const wrapperTop = this.wrapperRef ? this.wrapperRef.getBoundingClientRect().top : 0
+        this.setState({
+          tooltipX: clientX - wrapperLeft + MOUSE_TOOLTIP_OFFSET_PIXELS,
+          tooltipY: clientY - wrapperTop + MOUSE_TOOLTIP_OFFSET_PIXELS,
+          tooltipWellName: wellName,
+          tooltipWellIngreds: wellIngreds,
+        })
+      }
     }
-  }
 
   handleWellMouseLeave = (e) => {
     this.setState(initialState)
@@ -122,7 +129,7 @@ class BrowseLabwareModal extends React.Component<Props> {
               <PillTooltipContents
                 well={this.state.tooltipWellName}
                 ingredNames={this.props.ingredNames}
-                ingreds={this.state.tooltipWellIngreds} />
+                ingreds={this.state.tooltipWellIngreds || {}} />
             </div>
           </div>
         }

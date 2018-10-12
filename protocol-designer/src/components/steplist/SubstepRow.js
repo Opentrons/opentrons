@@ -5,6 +5,7 @@ import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
 
 import {HoverTooltip, swatchColors} from '@opentrons/components'
+import type {LocationLiquidState} from '../../step-generation'
 import type {SubstepWellData, WellIngredientVolumeData, WellIngredientNames} from '../../steplist/types'
 import IngredPill from './IngredPill'
 import {PDListItem} from '../lists'
@@ -22,7 +23,7 @@ type SubstepRowProps = {|
 |}
 
 type PillTooltipContentsProps = {
-  ingreds: WellIngredientVolumeData,
+  ingreds: WellIngredientVolumeData | LocationLiquidState,
   ingredNames: WellIngredientNames,
   well: string,
 }
