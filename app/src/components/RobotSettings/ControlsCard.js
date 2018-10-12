@@ -2,12 +2,14 @@
 // "Robot Controls" card
 import * as React from 'react'
 import {connect} from 'react-redux'
+import {push} from 'react-router-redux'
 
 import {
   home,
   fetchRobotLights,
   setRobotLights,
   makeGetRobotLights,
+  startDeckCalibration,
 } from '../../http-api-client'
 
 import {selectors as robotSelectors} from '../../robot'
@@ -18,7 +20,10 @@ import {LabeledToggle, LabeledButton} from '../controls'
 import type {State, Dispatch} from '../../types'
 import type {ViewableRobot} from '../../discovery'
 
-type OP = {robot: ViewableRobot}
+type OP = {
+  robot: ViewableRobot,
+  calibrateDeckUrl: string,
+}
 
 type SP = {|
   lightsOn: boolean,
@@ -35,6 +40,7 @@ type Props = {
   homeAll: () => mixed,
   fetchLights: () => mixed,
   toggleLights: () => mixed,
+  start: () => mixed,
 }
 
 const TITLE = 'Robot Controls'
@@ -45,8 +51,18 @@ export default connect(
   mergeProps
 )(ControlsCard)
 
+const CALIBRATE_DECK_DESCRIPTION =
+  "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots."
+
 function ControlsCard (props: Props) {
-  const {lightsOn, fetchLights, toggleLights, homeAll, homeEnabled} = props
+  const {
+    lightsOn,
+    fetchLights,
+    toggleLights,
+    homeAll,
+    homeEnabled,
+    start,
+  } = props
   const {name, status} = props.robot
   const disabled = status !== CONNECTABLE
 
@@ -58,9 +74,16 @@ function ControlsCard (props: Props) {
       disabled={disabled}
       column
     >
-      <LabeledToggle label="Lights" toggledOn={lightsOn} onClick={toggleLights}>
-        <p>Control lights on deck.</p>
-      </LabeledToggle>
+      <LabeledButton
+        label="Calibrate deck"
+        buttonProps={{
+          onClick: start,
+          disabled: disabled,
+          children: 'Calibrate',
+        }}
+      >
+        <p>{CALIBRATE_DECK_DESCRIPTION}</p>
+      </LabeledButton>
       <LabeledButton
         label="Home all axes"
         buttonProps={{
@@ -71,6 +94,9 @@ function ControlsCard (props: Props) {
       >
         <p>Return robot to starting position.</p>
       </LabeledButton>
+      <LabeledToggle label="Lights" toggledOn={lightsOn} onClick={toggleLights}>
+        <p>Control lights on deck.</p>
+      </LabeledToggle>
     </RefreshCard>
   )
 }
@@ -91,7 +117,7 @@ function makeMakeStateToProps (): (state: State, ownProps: OP) => SP {
 }
 
 function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
-  const {robot} = ownProps
+  const {robot, calibrateDeckUrl} = ownProps
   const {lightsOn} = stateProps
   const {dispatch} = dispatchProps
 
@@ -101,5 +127,9 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
     homeAll: () => dispatch(home(robot)),
     fetchLights: () => dispatch(fetchRobotLights(robot)),
     toggleLights: () => dispatch(setRobotLights(robot, !lightsOn)),
+    start: () =>
+      dispatch(startDeckCalibration(robot)).then(() =>
+        dispatch(push(calibrateDeckUrl))
+      ),
   }
 }
