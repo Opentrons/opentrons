@@ -712,8 +712,8 @@ def test_speed_change(model, monkeypatch):
     pipette.tip_attached = True
     pipette.max_volume = 100
     pipette.set_speed(aspirate=20, dispense=40)
-    pipette.aspirate()
-    pipette.dispense()
+    pipette.aspirate(10)
+    pipette.dispense(10)
     expected = [
         ['G0F1200 M400'],  # pipette's default aspirate speed in mm/min
         ['G0F24000 M400'],

@@ -59,14 +59,14 @@
 }
 
 .scan_status {
-  padding: 2rem 1rem;
+  padding: 1rem 1rem 2rem 1rem;
   text-align: center;
 }
 
 .title {
   font-size: var(--fs-header);
   font-weight: var(--fw-semibold);
-  margin: 1.25rem;
+  margin-bottom: 1.25rem;
 }
 
 .message {

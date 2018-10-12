@@ -27,12 +27,12 @@ class PipetteTest(unittest.TestCase):
             ul_per_mm=18.5,
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
+            max_volume=200,
             min_volume=10,  # These are variable
             mount='left',
             channels=1,
             name='other-pipette-for-transfer-tests'
         )
-        self.p200.max_volume = 200
 
         self.p200.reset()
 
@@ -47,8 +47,14 @@ class PipetteTest(unittest.TestCase):
 
     def test_add_instrument(self):
         self.robot.reset()
-        Pipette(self.robot, ul_per_mm=18.5, mount='left')
-        self.assertRaises(RuntimeError, Pipette, self.robot, mount='left')
+        Pipette(self.robot, ul_per_mm=18.5, max_volume=1000, mount='left')
+        self.assertRaises(
+            RuntimeError,
+            Pipette,
+            self.robot,
+            mount='left',
+            max_volume=100,
+            ul_per_mm=10)
 
     def test_aspirate_zero_volume(self):
         assert self.robot.commands() == []
@@ -90,6 +96,7 @@ class PipetteTest(unittest.TestCase):
             ul_per_mm=18.5,
             trash_container=self.trash,
             tip_racks=[self.tiprack1],
+            max_volume=1000,
             min_volume=10,  # These are variable
             mount='right',
             name='p1000',
@@ -1004,8 +1011,8 @@ class PipetteTest(unittest.TestCase):
         self.p200.pick_up_tip()
 
         assert self.p200.move_to.mock_calls == \
-            self.build_pick_up_tip(self.tiprack1[0]) + \
-            self.build_pick_up_tip(self.tiprack1[1])
+            self.build_pick_up_tip(self.p200, self.tiprack1[0]) + \
+            self.build_pick_up_tip(self.p200, self.tiprack1[1])
 
     def test_simulate_plunger_while_enqueing(self):
 
@@ -1048,9 +1055,9 @@ class PipetteTest(unittest.TestCase):
             tip_racks=[self.tiprack1, self.tiprack2],
             trash_container=self.tiprack1,
             name='pipette-for-transfer-tests',
+            max_volume=200,
             ul_per_mm=18.5
         )
-        self.p200.max_volume = 200
 
         self.p200.move_to = mock.Mock()
 
@@ -1060,9 +1067,9 @@ class PipetteTest(unittest.TestCase):
 
         expected = []
         for i in range(0, total_tips_per_plate):
-            expected.extend(self.build_pick_up_tip(self.tiprack1[i]))
+            expected.extend(self.build_pick_up_tip(self.p200, self.tiprack1[i]))
         for i in range(0, total_tips_per_plate):
-            expected.extend(self.build_pick_up_tip(self.tiprack2[i]))
+            expected.extend(self.build_pick_up_tip(self.p200, self.tiprack2[i]))
 
         self.assertEqual(
             self.p200.move_to.mock_calls,
@@ -1087,6 +1094,7 @@ class PipetteTest(unittest.TestCase):
             self.robot,
             trash_container=self.trash,
             tip_racks=[self.tiprack1, self.tiprack2],
+            max_volume=200,
             min_volume=10,  # These are variable
             mount='right',
             channels=8,
@@ -1103,9 +1111,11 @@ class PipetteTest(unittest.TestCase):
 
         expected = []
         for i in range(0, 12):
-            expected.extend(self.build_pick_up_tip(self.tiprack1.cols[i]))
+            expected.extend(
+                self.build_pick_up_tip(p200_multi, self.tiprack1.cols[i]))
         for i in range(0, 12):
-            expected.extend(self.build_pick_up_tip(self.tiprack2.cols[i]))
+            expected.extend(
+                self.build_pick_up_tip(p200_multi, self.tiprack2.cols[i]))
 
         self.assertEqual(
             p200_multi.move_to.mock_calls,
@@ -1163,14 +1173,16 @@ class PipetteTest(unittest.TestCase):
         ]
         self.assertEqual(self.robot.move_to.mock_calls, expected)
 
-    def build_pick_up_tip(self, well):
-        plunge = -10
+    def build_pick_up_tip(self, pipette, well):
         return [
             mock.call(well.top()),
-            mock.call(well.top(plunge), strategy='direct'),
+            mock.call(
+                well.top(-pipette._pick_up_distance), strategy='direct'),
             mock.call(well.top(), strategy='direct'),
-            mock.call(well.top(plunge - 1), strategy='direct'),
+            mock.call(
+                well.top(-pipette._pick_up_distance - 1), strategy='direct'),
             mock.call(well.top(), strategy='direct'),
-            mock.call(well.top(plunge - 2), strategy='direct'),
+            mock.call(
+                well.top(-pipette._pick_up_distance - 2), strategy='direct'),
             mock.call(well.top(), strategy='direct')
         ]

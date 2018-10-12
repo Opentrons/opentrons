@@ -4,7 +4,7 @@ import groupBy from 'lodash/groupBy'
 import {getShellRobots} from '../shell'
 
 import type {Service} from '@opentrons/discovery-client'
-import type {State, Action, ThunkAction} from '../types'
+import type {Action, ThunkAction} from '../types'
 
 export * from './types'
 export * from './selectors'
@@ -52,14 +52,6 @@ export function startDiscovery (): ThunkAction {
 // ): UpdateListAction {
 //   return {type: 'discovery:UPDATE_LIST', payload: {robots}}
 // }
-
-export function getScanning (state: State) {
-  return state.discovery.scanning
-}
-
-export function getDiscoveredRobotsByName (state: State) {
-  return state.discovery.robotsByName
-}
 
 // getShellRobots makes a sync RPC call, so use sparingly
 const initialState: DiscoveryState = {

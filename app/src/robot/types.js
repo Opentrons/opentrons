@@ -37,15 +37,10 @@ export type BaseRobot = {
 
 // TODO(mc, 2018-10-09): deprecate this type
 // robot MDNS service for connectivity
-export type RobotService = BaseRobot & {
+export type RobotService = {
+  ...$Exact<BaseRobot>,
   ip: string,
   port: number,
-}
-
-// TODO(mc, 2018-10-09): deprecate this type
-// robot from getDiscovered selector
-export type Robot = RobotService & {
-  isConnected: boolean,
 }
 
 // TODO(mc, 2018-01-22): pay attention to this when deprecating status contants

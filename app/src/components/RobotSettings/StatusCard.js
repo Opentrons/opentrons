@@ -37,7 +37,7 @@ export default connect(
 )(StatusCard)
 
 function StatusCard (props: Props) {
-  const {robot, connectButtonText, onClick} = props
+  const {robot, status, connectButtonText, onClick} = props
   const disabled = robot.status !== CONNECTABLE
 
   return (

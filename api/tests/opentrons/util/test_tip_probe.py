@@ -77,7 +77,7 @@ def fixture(config, monkeypatch):
         probe_axis)
 
     robot = Robot(config=config)
-    pipette = Pipette(robot, mount='right')
+    pipette = Pipette(robot, mount='right', ul_per_mm=1000)
     robot.home()
 
     return namedtuple('fixture', 'robot instrument log X Y Z')(

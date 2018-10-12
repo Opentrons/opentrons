@@ -3,13 +3,12 @@
 import {combineReducers} from 'redux'
 
 import createLogger from '../logger'
-import {makeGetRobotHealth} from '../http-api-client'
 import {updateReducer} from './update'
 import {apiUpdateReducer} from './api-update'
 
 import type {Service} from '@opentrons/discovery-client'
 import type {Middleware, ThunkAction} from '../types'
-import type {RobotService} from '../robot'
+import type {ViewableRobot} from '../discovery'
 import type {Config} from '../config'
 import type {ShellUpdateAction} from './update'
 
@@ -59,10 +58,10 @@ export function getShellRobots (): Array<Service> {
   return getRobots()
 }
 
-export function downloadLogs (robot: RobotService): ThunkAction {
+export function downloadLogs (robot: ViewableRobot): ThunkAction {
   return (dispatch, getState) => {
-    const health = makeGetRobotHealth()(getState(), robot)
-    const logPaths = health && health.response && health.response.logs
+    const logPaths = robot.health && robot.health.logs
+
     if (logPaths) {
       const logUrls = logPaths.map(p => `http://${robot.ip}:${robot.port}${p}`)
 

@@ -25,7 +25,9 @@ matrix:
 
     - os: osx
       language: generic
-      if: type != pull_request AND (tag IS present OR branch IN (master, edge))
+      if: |
+        type != pull_request AND \
+        (tag IS present OR branch =~ ^(edge|release_.+)$)
       env:
         LINT=false
         BUILD_APP=true

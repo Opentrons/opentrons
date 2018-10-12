@@ -2,14 +2,15 @@
   "otId": "mock-id",
   "deprecated": false,
   "metadata": {
-    "name": "fake labware 2",
+    "displayName": "fake labware 2",
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "uL",
     "displayLengthUnits": "mm"
   },
   "parameters": {
     "format": "irregular",
-    "isTiprack": false
+    "isTiprack": false,
+    "loadName": "6_wellPlate_100_uL"
   },
   "cornerOffsetFromSlot": {
     "x": 10,

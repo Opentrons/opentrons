@@ -4,6 +4,7 @@ import {connect} from 'react-redux'
 import countBy from 'lodash/countBy'
 
 import {makeGetRobotModules} from '../../http-api-client'
+import {getConnectedRobot} from '../../discovery'
 import {selectors as robotSelectors} from '../../robot'
 import {Module as ModuleItem} from '@opentrons/components'
 
@@ -24,7 +25,10 @@ function ReviewModuleItem (props: Props) {
   if (!props.module) return null
 
   return (
-    <ModuleItem name={props.module.name} mode={props.present ? 'present' : 'missing'} />
+    <ModuleItem
+      name={props.module.name}
+      mode={props.present ? 'present' : 'missing'}
+    />
   )
 }
 
@@ -34,7 +38,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => Props {
   const getRobotModules = makeGetRobotModules()
 
   return (state, ownProps) => {
-    const robot = robotSelectors.getConnectedRobot(state)
+    const robot = getConnectedRobot(state)
     const module = robotSelectors.getModulesBySlot(state)[ownProps.slot]
     const sessionModules = robotSelectors.getModules(state)
     const actualModulesCall = robot && getRobotModules(state, robot)

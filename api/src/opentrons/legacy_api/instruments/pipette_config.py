@@ -6,7 +6,8 @@ from opentrons import __file__ as root_file
 
 
 root_dir = os.path.abspath(os.path.dirname(root_file))
-config_file = os.path.join(root_dir, 'config', 'pipette-config.json')
+config_file = os.path.join(root_dir,
+                           'shared_data', 'robot-data', 'pipette-config.json')
 log = logging.getLogger(__name__)
 
 pipette_config = namedtuple(
@@ -14,6 +15,7 @@ pipette_config = namedtuple(
     [
         'plunger_positions',
         'pick_up_current',
+        'pick_up_distance',
         'aspirate_flow_rate',
         'dispense_flow_rate',
         'channels',
@@ -23,10 +25,11 @@ pipette_config = namedtuple(
         'drop_tip_current',
         'min_volume',
         'max_volume',
+        'ul_per_mm',
+        'quirks',
         'tip_length'  # TODO (andy): remove from pipette, move to tip-rack
     ]
 )
-
 
 # Notes:
 # - multi-channel pipettes share the same dimensional offsets
@@ -78,6 +81,7 @@ def load(pipette_model: str) -> pipette_config:
                 'drop_tip': plunger_pos.get('dropTip'),
             },
             pick_up_current=cfg.get('pickUpCurrent'),
+            pick_up_distance=cfg.get('pickUpDistance'),
             aspirate_flow_rate=cfg.get('aspirateFlowRate'),
             dispense_flow_rate=cfg.get('dispenseFlowRate'),
             channels=cfg.get('channels'),
@@ -87,6 +91,8 @@ def load(pipette_model: str) -> pipette_config:
             drop_tip_current=cfg.get('dropTipCurrent'),
             min_volume=cfg.get('minVolume'),
             max_volume=cfg.get('maxVolume'),
+            ul_per_mm=cfg.get('ulPerMm'),
+            quirks=cfg.get('quirks'),
             tip_length=cfg.get('tipLength')
         )
 

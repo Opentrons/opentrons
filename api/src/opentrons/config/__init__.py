@@ -75,6 +75,7 @@ def get_config_index() -> dict:
     """
     rewrite_needed = False
     base_path = settings_dir()
+    log.info("Using settings dir {}".format(base_path))
     file_path = os.path.join(base_path, index_filename)
     with open(file_path) as base_config_file:
         res = json.load(base_config_file)

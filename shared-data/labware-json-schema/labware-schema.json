@@ -23,9 +23,9 @@
       "type": "object",
       "description": "Properties used for search and display",
       "additionalProperties": false,
-      "required": ["name", "displayCategory"],
+      "required": ["displayName", "displayCategory"],
       "properties": {
-        "name": {
+        "displayName": {
           "description": "Easy to remember name of labware",
           "type": "string"
         },
@@ -38,18 +38,29 @@
         },
         "displayVolumeUnits": {
           "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "description": "List of descriptions for a given labware",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
-    "vendor": {
+    "brand": {
       "type": "object",
       "description": "Also for searchability, so that users know exactly which labware this was modeled off",
       "additionalProperties": false,
       "properties": {
-        "sku": {
-          "type": "string"
+        "brandId": {
+          "type": "array",
+          "description": "An array of manufacture numbers pertaining to a given labware",
+          "items": {
+            "type": "string"
+          }
         },
-        "vendor": {
+        "brand": {
           "type": "string"
         }
       }
@@ -59,7 +70,7 @@
       "type": "object",
       "description": "Internal describers used to determine pipette movement to labware",
       "additionalProperties": false,
-      "required": ["format", "isTiprack"],
+      "required": ["format", "isTiprack", "loadName"],
       "properties": {
         "format": {
           "description": "Property to determine compatibility with multichannel pipette",
@@ -73,6 +84,10 @@
         "tipLength": {
           "description": "Required if labware is tiprack",
           "$ref": "#/definitions/positiveNumber"
+        },
+        "loadName": {
+          "description": "Generated unique name of container",
+          "type": "string"
         }
       }
 

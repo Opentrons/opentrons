@@ -112,7 +112,6 @@ class BrowseLabwareModal extends React.Component<Props, State> {
                   wellDef={allWellDefsByName[wellName]} />
               )
             })}
-
           </g>
           <LabwareLabels labwareType={this.props.labwareType} inner={false} />
         </SingleLabwareWrapper>
@@ -123,9 +122,7 @@ class BrowseLabwareModal extends React.Component<Props, State> {
               top: this.state.tooltipY,
               position: 'absolute',
             }}>
-            <div
-              className={styles.tooltip_box}
-              xmlns="http://www.w3.org/1999/xhtml">
+            <div className={styles.tooltip_box}>
               <PillTooltipContents
                 well={this.state.tooltipWellName}
                 ingredNames={this.props.ingredNames}
