@@ -41,8 +41,8 @@ type OP = {
 type Props = OP & DP
 type State = { value: string }
 
-const formatValue = (value: number): string => (
-  String(round(value, DECIMALS_ALLOWED))
+const formatValue = (value: number | string): string => (
+  String(round(Number(value), DECIMALS_ALLOWED))
 )
 
 class TipPositionModal extends React.Component<Props, State> {
@@ -56,7 +56,7 @@ class TipPositionModal extends React.Component<Props, State> {
     }
   }
   applyChanges = () => {
-    this.props.updateValue(formatValue(Number(this.state.value) || 0))
+    this.props.updateValue(formatValue(this.state.value || 0))
   }
   handleReset = () => {
     // NOTE: when `prefix` isn't set (eg in the Mix form), we'll use
@@ -77,7 +77,7 @@ class TipPositionModal extends React.Component<Props, State> {
   }
   handleChange = (e: SyntheticEvent<HTMLSelectElement>) => {
     const {value} = e.currentTarget
-    const valueFloat = Number(formatValue(Number(value)))
+    const valueFloat = Number(formatValue(value))
     const maximumHeightMM = (this.props.wellHeightMM * 2)
 
     if (!value) {
