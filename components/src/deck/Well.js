@@ -22,6 +22,8 @@ type Props = {
   wellDef: WellDefinition,
   onMouseOver?: (e: SyntheticMouseEvent<*>) => mixed,
   onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed,
+  /** handlers for HoverTooltipComponent */
+  hoverTooltipHandlers?: ?HoverTooltipHandlers,
 }
 
 class Well extends React.Component<Props> {
@@ -40,6 +42,8 @@ class Well extends React.Component<Props> {
       wellDef,
       onMouseOver,
       onMouseLeave,
+      onMouseMove,
+      hoverTooltipHandlers,
     } = this.props
 
     const fillColor = this.props.fillColor || 'transparent'
@@ -59,6 +63,7 @@ class Well extends React.Component<Props> {
       'data-wellname': wellName,
       onMouseOver,
       onMouseLeave,
+      onMouseMove,
     }
 
     const isRect = wellIsRect(wellDef)
@@ -82,6 +87,7 @@ class Well extends React.Component<Props> {
         {/* Border + overlay */}
         <rect
           {...selectionProps}
+          {...hoverTooltipHandlers}
           {...rectProps}
           className={wellOverlayClassname}
         />
@@ -105,6 +111,7 @@ class Well extends React.Component<Props> {
         {/* Border + overlay */}
         <circle
           {...selectionProps}
+          {...hoverTooltipHandlers}
           {...circleProps}
           className={wellOverlayClassname}
         />

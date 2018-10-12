@@ -5,6 +5,7 @@ import mapValues from 'lodash/mapValues'
 import min from 'lodash/min'
 import pick from 'lodash/pick'
 import reduce from 'lodash/reduce'
+import omitBy from 'lodash/omitBy'
 
 import * as StepGeneration from '../../step-generation'
 import {selectors as fileDataSelectors} from '../../file-data'
@@ -41,6 +42,7 @@ function _wellContentsForWell (
     maxVolume: Infinity, // TODO Ian 2018-03-23 refactor so all these fields aren't needed
     wellName: well,
     groupIds: ingredGroupIdsWithContent, // TODO: BC 2018-09-21 remove in favor of volumeByGroupId
+    ingreds: omitBy(liquidVolState, (ingredData) => !ingredData || ingredData.volume <= 0),
   }
 }
 

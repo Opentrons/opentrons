@@ -17,6 +17,7 @@ type ModalProps = {
   contentsClassName?: string,
   /** lightens overlay (alert modal over existing modal)**/
   alertOverlay?: boolean,
+  innerRef?: React.Ref<*>,
 }
 
 /**
@@ -24,11 +25,13 @@ type ModalProps = {
  * with a dark overlay and displays `children` as its contents in a white box
  */
 export default function Modal (props: ModalProps) {
-  const {contentsClassName, alertOverlay, onCloseClick, heading} = props
+  const {contentsClassName, alertOverlay, onCloseClick, heading, innerRef} = props
   return (
     <div className={cx(styles.modal, props.className, {[styles.alert_modal]: alertOverlay})} >
       <Overlay onClick={onCloseClick} alertOverlay={alertOverlay}/>
-       <div className={cx(styles.modal_contents, contentsClassName)}>
+       <div
+        ref={innerRef}
+        className={cx(styles.modal_contents, contentsClassName)}>
          {heading && (
            <h3 className={styles.modal_heading}>{heading}</h3>
          )}

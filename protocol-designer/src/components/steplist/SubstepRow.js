@@ -26,7 +26,7 @@ type PillTooltipContentsProps = {
   ingredNames: WellIngredientNames,
   well: string,
 }
-const PillTooltipContents = (props: PillTooltipContentsProps) => {
+export const PillTooltipContents = (props: PillTooltipContentsProps) => {
   const totalLiquidVolume = reduce(props.ingreds, (acc, ingred) => acc + ingred.volume, 0)
   const hasMultipleIngreds = Object.keys(props.ingreds).length > 1
   return (
@@ -58,7 +58,7 @@ const PillTooltipContents = (props: PillTooltipContentsProps) => {
           <div className={styles.total_divider}></div>
           <div className={styles.total_row}>
             <span>{`${props.well} Total Volume`}</span>
-            <span>{totalLiquidVolume}µl</span>
+            <span>{formatVolume(totalLiquidVolume, 2)}µl</span>
           </div>
         </React.Fragment>
       }
