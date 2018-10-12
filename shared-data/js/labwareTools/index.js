@@ -1,8 +1,10 @@
 // @flow
+import Ajv from 'ajv'
 import range from 'lodash/range'
 
 import assignId from './assignId'
 import {toWellName} from '../helpers/index'
+import labwareSchema from '../../labware-json-schema/labware-schema.json'
 
 type Metadata = {
   displayName: string,
@@ -75,6 +77,12 @@ export type Schema = {
   wells: {[wellName: string]: Well},
 }
 
+const ajv = new Ajv({
+  allErrors: true,
+  jsonPointers: true,
+})
+const validate = ajv.compile(labwareSchema)
+
 function round (value, decimals) {
   return Number(Math.round(Number(value + 'e' + decimals)) + 'e-' + decimals)
 }
@@ -140,5 +148,10 @@ export function createRegularLabware (props: RegularLabwareProps): Schema {
     props.metadata.displayCategory}_${props.well.totalLiquidVolume}_${
       props.metadata.displayVolumeUnits}`
 
+  const valid = validate(definition)
+
+  if (valid !== true) {
+    throw new Error('1 or more required arguments missing from input.')
+  }
   return definition
 }

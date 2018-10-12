@@ -101,4 +101,17 @@ describe('createLabware', () => {
       })
     })
   })
+  test('invalid schema throws error', () => {
+    const spacing = {row: 11.8, column: 12.1}
+    const grid = {row: 8, column: 12}
+    const input = {
+      metadata: exampleLabware2.metadata,
+      parameters: exampleLabware2.parameters,
+      dimensions: exampleLabware2.dimensions,
+      grid,
+      spacing,
+      well: well2,
+    }
+    expect(() => { createRegularLabware(input) }).toThrow('1 or more required arguments missing from input.')
+  })
 })
