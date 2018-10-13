@@ -34,12 +34,34 @@ describe('networking', () => {
         state: {
           api: {
             api: {
-              someName: {'wifi/list': {response: {list: []}}},
+              someName: {
+                'wifi/list': {
+                  inProgress: false,
+                  response: {
+                    list: [
+                      {ssid: 'foo', active: false, signal: 100},
+                      {ssid: 'foo', active: true, signal: 42},
+                      {ssid: 'baz', active: false, signal: 50},
+                      {ssid: 'baz', active: false, signal: 65},
+                      {ssid: 'bar', active: false, signal: 42},
+                    ],
+                  },
+                },
+              },
             },
           },
         },
         props: {name: 'someName'},
-        expected: {response: {list: []}},
+        expected: {
+          inProgress: false,
+          response: {
+            list: [
+              {ssid: 'foo', active: true, signal: 42},
+              {ssid: 'bar', active: false, signal: 42},
+              {ssid: 'baz', active: false, signal: 65},
+            ],
+          },
+        },
       },
       {
         name: 'makeGetRobotWifiConfigure',

@@ -1,6 +1,9 @@
 // @flow
 // networking http api module
 import {createSelector} from 'reselect'
+import orderBy from 'lodash/orderBy'
+import uniqBy from 'lodash/uniqBy'
+
 import {buildRequestMaker, clearApiResponse} from './actions'
 import {getRobotApiState} from './reducer'
 
@@ -108,22 +111,9 @@ export const makeGetRobotWifiConfigure = (): GetConfigureWifiCall =>
     state => state[CONFIGURE] || {inProgress: false}
   )
 
+const LIST_ORDER = [['active', 'ssid', 'signal'], ['desc', 'asc', 'desc']]
+
 function dedupeNetworkList (list: WifiNetworkList): WifiNetworkList {
-  const {ids, networksById} = list.reduce(
-    (result, network) => {
-      const {ssid, active} = network
-
-      if (!result.networksById[ssid]) {
-        result.ids.push(ssid)
-        result.networksById[ssid] = network
-      } else if (active) {
-        result.networksById[ssid].active = true
-      }
-
-      return result
-    },
-    {ids: [], networksById: {}}
-  )
-
-  return ids.map(ssid => networksById[ssid])
+  const sortedList = orderBy(list, ...LIST_ORDER)
+  return uniqBy(sortedList, 'ssid')
 }
