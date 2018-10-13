@@ -5,13 +5,12 @@ import {connect} from 'react-redux'
 
 import {CONNECTABLE, startDiscovery} from '../../discovery'
 import {
+  fetchNetworkingStatus,
   fetchWifiList,
   configureWifi,
   clearConfigureWifiResponse,
   makeGetRobotWifiList,
   makeGetRobotWifiConfigure,
-  type RobotWifiList,
-  type RobotWifiConfigure,
 } from '../../http-api-client'
 
 import {RefreshCard, LabeledValue} from '@opentrons/components'
@@ -21,16 +20,17 @@ import WifiConnectModal from './WifiConnectModal'
 
 import type {State, Dispatch} from '../../types'
 import type {ViewableRobot} from '../../discovery'
+import type {FetchWifiListCall, ConfigureWifiCall} from '../../http-api-client'
 
 type OP = {robot: ViewableRobot}
 
 type SP = {|
-  listRequest: RobotWifiList,
-  configureRequest: RobotWifiConfigure,
+  listRequest: FetchWifiListCall,
+  configureRequest: ConfigureWifiCall,
 |}
 
 type DP = {|
-  fetchList: () => mixed,
+  refresh: () => mixed,
   configure: (?string, ?string) => mixed,
   clearSuccessfulConfigure: () => mixed,
   clearFailedConfigure: () => mixed,
@@ -48,12 +48,12 @@ export default connect(
 
 function ConnectivityCard (props: Props) {
   const {
-    fetchList,
+    refresh,
     clearSuccessfulConfigure,
     clearFailedConfigure,
     configure,
     robot: {ip, local, name, status},
-    listRequest: {inProgress: listInProgress, response: listResponse},
+    listRequest: {response: listResponse},
     configureRequest: {
       inProgress: configInProgress,
       response: configResponse,
@@ -76,8 +76,8 @@ function ConnectivityCard (props: Props) {
     <React.Fragment>
       <RefreshCard
         watch={name}
-        refresh={fetchList}
-        refreshing={listInProgress || configInProgress}
+        refresh={refresh}
+        refreshing={configInProgress}
         title={TITLE}
         disabled={disabled}
         column
@@ -119,20 +119,25 @@ function makeMapStateToProps () {
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   const {robot} = ownProps
-  const fetchList = () => dispatch(fetchWifiList(robot))
-  const configure = (ssid, psk) => dispatch(configureWifi(robot, ssid, psk))
+  const configure = (ssid, psk) => dispatch(configureWifi(robot, {ssid, psk}))
+  const refresh = () => {
+    // send these requests simultaneously
+    dispatch(fetchNetworkingStatus(robot))
+    dispatch(fetchWifiList(robot))
+  }
 
   // TODO(mc, 2018-02-26): handle refreshing the list and kicking off dispatch
   //   more elegantly and closer to the configure response
   const clearConfigureAction = clearConfigureWifiResponse(robot)
   const clearFailedConfigure = () => dispatch(clearConfigureAction)
   const clearSuccessfulConfigure = () =>
-    fetchList()
+    Promise.resolve()
+      .then(refresh)
       .then(() => dispatch(startDiscovery()))
       .then(() => dispatch(clearConfigureAction))
 
   return {
-    fetchList,
+    refresh,
     configure,
     clearSuccessfulConfigure,
     clearFailedConfigure,

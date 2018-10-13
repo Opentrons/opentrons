@@ -11,13 +11,12 @@ import type {ResetAction} from './reset'
 import {robotReducer, type RobotAction} from './robot'
 import {serverReducer, type ServerAction} from './server'
 import type {SettingsAction} from './settings'
-import {wifiReducer, type WifiAction} from './wifi'
+import type {NetworkingAction} from './networking'
 
 export const reducer = combineReducers({
   calibration: calibrationReducer,
   robot: robotReducer,
   server: serverReducer,
-  wifi: wifiReducer,
   // TODO(mc, 2018-07-09): api subreducer will become the sole reducer
   api: apiReducer,
 })
@@ -40,20 +39,7 @@ export type {
   DeckCalPoint,
 } from './calibration'
 
-export type {
-  RobotMove,
-  RobotHome,
-  RobotLights,
-} from './robot'
-
-export type {
-  WifiListResponse,
-  WifiStatusResponse,
-  WifiConfigureResponse,
-  RobotWifiList,
-  RobotWifiStatus,
-  RobotWifiConfigure,
-} from './wifi'
+export type {RobotMove, RobotHome, RobotLights} from './robot'
 
 export type State = $Call<typeof reducer>
 
@@ -62,12 +48,12 @@ export type Action =
   | HealthAction
   | ModulesAction
   | MotorsAction
+  | NetworkingAction
   | PipettesAction
   | ResetAction
   | RobotAction
   | ServerAction
   | SettingsAction
-  | WifiAction
 
 export {
   startDeckCalibration,
@@ -88,6 +74,8 @@ export * from './pipettes'
 
 export * from './motors'
 
+export * from './networking'
+
 export * from './server'
 
 export {
@@ -101,13 +89,3 @@ export {
   makeGetRobotHome,
   makeGetRobotLights,
 } from './robot'
-
-export {
-  fetchWifiList,
-  fetchWifiStatus,
-  clearConfigureWifiResponse,
-  configureWifi,
-  makeGetRobotWifiStatus,
-  makeGetRobotWifiList,
-  makeGetRobotWifiConfigure,
-} from './wifi'
