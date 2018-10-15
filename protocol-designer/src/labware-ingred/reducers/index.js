@@ -21,9 +21,9 @@ import type {LabwareLiquidState} from '../../step-generation'
 
 import type {
   IngredInputs,
-  IngredientGroups,
+  LiquidGroupsById,
   AllIngredGroupFields,
-  IngredientInstance,
+  LiquidGroup,
   OrderedLiquids,
   Labware,
   LabwareTypeById,
@@ -211,7 +211,7 @@ export const savedLabware = handleActions({
   ),
 }, {})
 
-type IngredientsState = IngredientGroups
+type IngredientsState = LiquidGroupsById
 export const ingredients = handleActions({
   EDIT_LIQUID_GROUP: (state: IngredientsState, action: EditLiquidGroupAction): IngredientsState => {
     const {liquidGroupId} = action.payload
@@ -223,9 +223,9 @@ export const ingredients = handleActions({
   EDIT_INGREDIENT: (state, action: EditIngredient) => {
     // TODO: Ian 2018-10-12 this is deprecated, remove when "add liquids to deck" modal is redone
     const {groupId, description, serialize, name} = action.payload
-    const ingredFields: IngredientInstance = {
+    const ingredFields: LiquidGroup = {
       description,
-      serialize,
+      serialize: Boolean(serialize),
       name,
     }
 
@@ -346,17 +346,17 @@ const getLabwareTypes: Selector<LabwareTypeById> = createSelector(
   )
 )
 
-const getIngredientGroups = (state: BaseState) => rootSelector(state).ingredients
+const getLiquidGroupsById = (state: BaseState) => rootSelector(state).ingredients
 const getIngredientLocations = (state: BaseState) => rootSelector(state).ingredLocations
 
 const getNextLiquidGroupId: Selector<string> = createSelector(
-  getIngredientGroups,
+  getLiquidGroupsById,
   (_ingredGroups) => ((max(Object.keys(_ingredGroups).map(id => parseInt(id))) + 1) || 0).toString()
 )
 
 const getIngredientNames: Selector<{[ingredId: string]: string}> = createSelector(
-  getIngredientGroups,
-  ingredGroups => mapValues(ingredGroups, (ingred: IngredientInstance) => ingred.name)
+  getLiquidGroupsById,
+  ingredGroups => mapValues(ingredGroups, (ingred: LiquidGroup) => ingred.name)
 )
 
 const _loadedContainersBySlot = (containers: ContainersState) =>
@@ -456,7 +456,7 @@ type IngredGroupFields = {
   },
 }
 const allIngredientGroupFields: Selector<AllIngredGroupFields> = createSelector(
-  getIngredientGroups,
+  getLiquidGroupsById,
   (ingreds) => reduce(
     ingreds,
     (acc: IngredGroupFields, ingredGroup: IngredGroupFields, ingredGroupId: string) => ({
@@ -466,7 +466,7 @@ const allIngredientGroupFields: Selector<AllIngredGroupFields> = createSelector(
 )
 
 const allIngredientNamesIds: BaseState => OrderedLiquids = createSelector(
-  getIngredientGroups,
+  getLiquidGroupsById,
   ingreds => Object.keys(ingreds).map(ingredId =>
       ({ingredientId: ingredId, name: ingreds[ingredId].name}))
 )
@@ -501,13 +501,13 @@ const getRenameLabwareFormMode = (state: BaseState) => rootSelector(state).renam
 
 const slotToMoveFrom = (state: BaseState) => rootSelector(state).moveLabwareMode
 
-const hasLiquid = (state: BaseState) => !isEmpty(getIngredientGroups(state))
+const hasLiquid = (state: BaseState) => !isEmpty(getLiquidGroupsById(state))
 
 // TODO: prune selectors
 export const selectors = {
   rootSelector,
 
-  getIngredientGroups,
+  getLiquidGroupsById,
   getIngredientLocations,
   getIngredientNames,
   getLabware,

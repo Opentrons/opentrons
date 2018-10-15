@@ -33,7 +33,7 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
         tooltipComponent={i18n.t('tooltip.step_fields.defaults.tipPosition')}
       >{(hoverTooltipHandlers) => (
         <FormGroup
-          label={i18n.t('step_edit_form.field.tip_position.label')}
+          label={i18n.t('form.step_edit_form.field.tip_position.label')}
           disabled={!this.props.wellHeightMM}
           className={styles.well_order_input}
           hoverTooltipHandlers={hoverTooltipHandlers}

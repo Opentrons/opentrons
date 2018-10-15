@@ -1,0 +1,65 @@
+{
+"generic": {
+  "labware_type": "Type",
+  "nickname": "Nickname"
+  },
+  "labware": {
+    "type": "Labware Type"
+  },
+  "liquid": {
+    "details": "Details",
+    "description": "Description",
+    "name": "Liquid name",
+    "serialize": "Serialize",
+    "serialize_explanation": "Each placement of the liquid will get its own number. (\"Sample 1\", \"Sample 2\", \"Sample 3\")"
+  },
+  "step_edit_form": {
+    "step_edit_form": {
+      "consolidate": {
+        "change_tip_option": {
+          "always": "For each dispense",
+          "once": "Only the first aspirate",
+          "never": "Never"
+        }
+      },
+      "distribute": {
+        "change_tip_option": {
+          "always": "For each aspirate",
+          "once": "Only the first aspirate",
+          "never": "Never"
+        }
+      },
+      "mix": {
+        "change_tip_option": {
+          "always": "For each well",
+          "once": "Only the first aspirate",
+          "never": "Never"
+        }
+      },
+      "transfer": {
+        "change_tip_option": {
+          "always": "For each aspirate",
+          "once": "Only the first aspirate",
+          "never": "Never"
+        }
+      },
+      "field": {
+        "change_tip": {
+          "label": "Get new tip"
+        },
+        "tip_position": {
+          "label": "Tip Position"
+        },
+        "well_order": {
+          "label": "Well Order",
+          "option": {
+            "l2r": "Left to right",
+            "r2l": "Right to left",
+            "t2b": "Top to bottom",
+            "b2t": "Bottom to top"
+          }
+        }
+      }
+    }
+  }
+}

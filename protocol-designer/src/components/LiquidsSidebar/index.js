@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
+import i18n from '../../localization'
 import {
   PrimaryButton,
   SidePanel,
@@ -46,7 +47,7 @@ function LiquidsSidebar (props: Props) {
         <PrimaryButton
           iconName='water'
           onClick={createNewLiquid}>
-          New Liquid
+          {i18n.t('button.new_liquid')}
         </PrimaryButton>
       </div>
     </SidePanel>

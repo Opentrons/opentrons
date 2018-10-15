@@ -9,7 +9,7 @@ import {PDTitledList, PDListItem} from './lists'
 import stepItemStyles from './steplist/StepItem.css'
 import StepDescription from './StepDescription'
 import styles from './IngredientsList.css'
-import type {IngredientGroups, IngredientInstance} from '../labware-ingred/types'
+import type {LiquidGroupsById, LiquidGroup} from '../labware-ingred/types'
 import type {SingleLabwareLiquidState} from '../step-generation'
 
 type DeleteIngredient = (args: {|groupId: string, wellName?: string|}) => mixed
@@ -24,7 +24,7 @@ type CommonProps = {|
 
 type CardProps = {|
   groupId: string,
-  ingredGroup: IngredientInstance,
+  ingredGroup: LiquidGroup,
   labwareWellContents: SingleLabwareLiquidState,
   ...CommonProps,
 |}
@@ -148,7 +148,7 @@ function IngredIndividual (props: IndividProps) {
 
 type Props = {
   ...CommonProps,
-  ingredientGroups: IngredientGroups,
+  LiquidGroupsById: LiquidGroupsById,
   labwareWellContents: SingleLabwareLiquidState,
   selectedIngredientGroupId: ?string,
   renameLabwareFormMode: boolean,
@@ -158,7 +158,7 @@ type Props = {
 export default function IngredientsList (props: Props) {
   const {
     labwareWellContents,
-    ingredientGroups,
+    LiquidGroupsById,
     editModeIngredientGroup,
     deleteIngredient,
     selectedIngredientGroupId,
@@ -177,12 +177,12 @@ export default function IngredientsList (props: Props) {
           onClick={openRenameLabwareForm}
         />
 
-        {Object.keys(ingredientGroups).map((groupIdForCard) =>
+        {Object.keys(LiquidGroupsById).map((groupIdForCard) =>
           <IngredGroupCard key={groupIdForCard}
             editModeIngredientGroup={editModeIngredientGroup}
             deleteIngredient={deleteIngredient}
             labwareWellContents={labwareWellContents}
-            ingredGroup={ingredientGroups[groupIdForCard]}
+            ingredGroup={LiquidGroupsById[groupIdForCard]}
             groupId={groupIdForCard}
             selected={selectedIngredientGroupId === groupIdForCard}
           />)

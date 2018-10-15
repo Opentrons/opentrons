@@ -9,7 +9,7 @@ import type {GetState} from '../types'
 import type {IngredInputs} from './types'
 import type {DeckSlot} from '@opentrons/components'
 
-type IngredInputFields = $Exact<IngredInputs>
+type IngredInputsExact = $Exact<IngredInputs>
 
 // ===== Labware selector actions =====
 
@@ -155,7 +155,7 @@ export const deleteIngredient = (payload: DeleteIngredientPrepayload) => (dispat
 export type EditIngredient = {
   type: 'EDIT_INGREDIENT',
   payload: {
-    ...IngredInputFields,
+    ...IngredInputs,
     containerId: string,
     groupId: string,
     wells: Array<string>,
@@ -163,7 +163,7 @@ export type EditIngredient = {
 }
 
 export type EditIngredientPayload = {
-  ...IngredInputFields,
+  ...IngredInputsExact,
   groupId: string | null, // null indicates new ingredient is being created
 }
 
@@ -227,13 +227,13 @@ export type EditLiquidGroupAction = {|
   type: 'EDIT_LIQUID_GROUP',
   payload: {|
     liquidGroupId: string,
-    ...IngredInputFields,
+    ...IngredInputsExact,
   |},
 |}
 
 // NOTE: with no ID, a new one is assigned
 export const editLiquidGroup = (
-  args: {liquidGroupId: ?string, ...IngredInputFields}
+  args: {liquidGroupId: ?string, ...IngredInputsExact}
 ) => (dispatch: Dispatch<EditLiquidGroupAction>, getState: GetState
 ) => {
   const {liquidGroupId, ...payloadArgs} = args // NOTE: separate liquidGroupId for flow to understand unpacking :/

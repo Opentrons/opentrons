@@ -220,14 +220,14 @@ export const ChangeTipField = (props: ChangeTipFieldProps) => {
   const {name, stepType} = props
   const options = CHANGE_TIP_VALUES.map((value) => ({
     value,
-    name: i18n.t(`step_edit_form.${stepType}.change_tip_option.${value}`),
+    name: i18n.t(`form.step_edit_form.${stepType}.change_tip_option.${value}`),
   }))
   return (
     <StepField
       name={name}
       render={({value, updateValue, hoverTooltipHandlers}) => (
         <FormGroup
-          label={i18n.t('step_edit_form.field.change_tip.label')}
+          label={i18n.t('form.step_edit_form.field.change_tip.label')}
           hoverTooltipHandlers={hoverTooltipHandlers}
         >
           <DropdownField

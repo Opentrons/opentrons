@@ -112,7 +112,7 @@ class WellOrderModal extends React.Component<Props, State> {
                   options={
                     WELL_ORDER_VALUES.map((value) => ({
                       value,
-                      name: i18n.t(`step_edit_form.field.well_order.option.${value}`),
+                      name: i18n.t(`form.step_edit_form.field.well_order.option.${value}`),
                     }))
                   } />
                 <span className={styles.field_spacer}>{i18n.t('modal.well_order.then')}</span>
@@ -123,7 +123,7 @@ class WellOrderModal extends React.Component<Props, State> {
                   options={
                     WELL_ORDER_VALUES.map((value) => ({
                       value,
-                      name: i18n.t(`step_edit_form.field.well_order.option.${value}`),
+                      name: i18n.t(`form.step_edit_form.field.well_order.option.${value}`),
                       disabled: this.isSecondOptionDisabled(value),
                     }))
                   } />

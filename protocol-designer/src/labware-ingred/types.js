@@ -44,19 +44,21 @@ export type OrderedLiquids = Array<{
   name: ?string,
 }>
 
-export type IngredInputs = { // TODO: Ian 2018-10-12 rename to 'LiquidFormFields'
+// TODO: Ian 2018-10-15 audit & rename these confusing types
+export type LiquidGroup = {
   name: ?string,
-  volume?: ?number,
   description: ?string,
   serialize: boolean,
 }
 
+export type IngredInputs = LiquidGroup & {
+  volume: ?number,
+}
+
 export type IngredGroupAccessor = $Keys<IngredInputs>
 
-export type IngredientInstance = $Diff<$Exact<IngredInputs>, {volume: *}>
-
-export type IngredientGroups = {
-  [groupId: string]: IngredientInstance,
+export type LiquidGroupsById = {
+  [groupId: string]: LiquidGroup,
 }
 
 export type AllIngredGroupFields = {

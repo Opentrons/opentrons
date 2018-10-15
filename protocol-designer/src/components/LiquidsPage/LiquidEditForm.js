@@ -6,7 +6,7 @@ import i18n from '../../localization'
 
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
-import type {IngredInputs} from '../../labware-ingred/types'
+import type {LiquidGroup} from '../../labware-ingred/types'
 import type {BaseState, ThunkDispatch} from '../../types'
 
 import {
@@ -21,17 +21,17 @@ import styles from './LiquidEditForm.css'
 import formStyles from '../forms.css'
 
 type Props = {
-  ...$Exact<IngredInputs>,
+  ...$Exact<LiquidGroup>,
   deleteLiquidGroup: () => mixed,
   cancelForm: () => mixed,
-  saveForm: (IngredInputs) => mixed,
+  saveForm: (LiquidGroup) => mixed,
 }
-type State = IngredInputs
+type State = LiquidGroup
 
 type WrapperProps = {showForm: boolean, formKey: string, formProps: Props}
 
 type SP = {
-  ...IngredInputs,
+  ...LiquidGroup,
   _liquidGroupId: ?string,
   showForm: boolean,
 }
@@ -46,7 +46,7 @@ class LiquidEditForm extends React.Component<Props, State> {
     }
   }
 
-  updateForm = (fieldName: $Keys<IngredInputs>) => (e: SyntheticInputEvent<*>) => {
+  updateForm = (fieldName: $Keys<LiquidGroup>) => (e: SyntheticInputEvent<*>) => {
     // need to handle checkbox fields explicitly
     if (fieldName === 'serialize') {
       this.setState({[fieldName]: !this.state[fieldName]})
@@ -59,21 +59,28 @@ class LiquidEditForm extends React.Component<Props, State> {
     this.props.saveForm(this.state)
   }
 
+  disableSave = () => {
+    const hasChanges = Object.keys(this.state).some(field =>
+      (this.state[field] || null) !== (this.props[field]) || null)
+    console.log(this.props, this.state)
+    return !hasChanges
+  }
+
   render () {
     const {deleteLiquidGroup, cancelForm} = this.props
     const {name, description, serialize} = this.state
     return (
       <Card className={styles.form_card}>
         <section className={styles.section}>
-          <div className={formStyles.header}>{i18n.t('liquids.details')}</div>
+          <div className={formStyles.header}>{i18n.t('form.liquid.details')}</div>
           <div className={formStyles.row_wrapper}>
             <FormGroup
-              label={`${i18n.t('liquids.liquid_name')}:`}
+              label={`${i18n.t('form.liquid.name')}:`}
               className={formStyles.column_1_2}>
               <InputField value={name} onChange={this.updateForm('name')} />
             </FormGroup>
             <FormGroup
-              label={`${i18n.t('liquids.description')}:`}
+              label={`${i18n.t('form.liquid.description')}:`}
               className={formStyles.column_1_2}>
               <InputField value={description} onChange={this.updateForm('description')} />
             </FormGroup>
@@ -83,7 +90,7 @@ class LiquidEditForm extends React.Component<Props, State> {
         <section className={styles.section}>
           <div className={formStyles.header}>Serialization</div>
           <p className={styles.info_text}>
-            {i18n.t('liquids.serialize_explanation')}</p>
+            {i18n.t('form.liquid.serialize_explanation')}</p>
           <CheckboxField label='Serialize' value={serialize}
             onChange={this.updateForm('serialize')} />
         </section>
@@ -91,7 +98,11 @@ class LiquidEditForm extends React.Component<Props, State> {
         <div className={styles.button_row}>
           <OutlineButton onClick={deleteLiquidGroup}>{i18n.t('button.delete')}</OutlineButton>
           <PrimaryButton onClick={cancelForm}>{i18n.t('button.cancel')}</PrimaryButton>
-          <PrimaryButton onClick={this.handleSaveForm}>{i18n.t('button.save')}</PrimaryButton>
+          <PrimaryButton
+            disabled={this.disableSave()}
+            onClick={this.handleSaveForm}>
+            {i18n.t('button.save')}
+          </PrimaryButton>
         </div>
       </Card>
     )
@@ -132,7 +143,7 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>}
       ...passThruFormProps,
       deleteLiquidGroup: () => window.alert('Deleting liquids is not yet implemented'), // TODO: Ian 2018-10-12 later ticket
       cancelForm: () => dispatch(labwareIngredActions.deselectLiquidGroup()),
-      saveForm: (formData: IngredInputs) => dispatch(labwareIngredActions.editLiquidGroup({
+      saveForm: (formData: LiquidGroup) => dispatch(labwareIngredActions.editLiquidGroup({
         ...formData,
         liquidGroupId: _liquidGroupId,
       })),
