@@ -1,5 +1,5 @@
 // @flow
-import type {LabwareData} from '../step-generation'
+import type {LabwareData, LocationLiquidState} from '../step-generation'
 // TODO Ian 2018-02-19 make these shared in component library, standardize with Run App
 
 //  ===== LABWARE ===========
@@ -27,6 +27,7 @@ export type WellContents = {| // non-ingredient well state, for SelectablePlate
   maxVolume: number,
   wellName: string, // eg 'A1', 'A2' etc
   groupIds: Array<string>,
+  ingreds: LocationLiquidState,
 |}
 
 export type ContentsByWell = {

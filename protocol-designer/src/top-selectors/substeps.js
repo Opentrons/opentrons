@@ -5,7 +5,6 @@ import {selectors as pipetteSelectors} from '../pipettes'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../steplist'
 import {selectors as fileDataSelectors} from '../file-data'
-import {allWellContentsForSteps} from './well-contents'
 
 import {
   generateSubsteps,
@@ -20,7 +19,6 @@ export const allSubsteps: Selector<AllSubsteps> = createSelector(
   steplistSelectors.validatedForms,
   pipetteSelectors.equippedPipettes,
   labwareIngredSelectors.getLabwareTypes,
-  allWellContentsForSteps,
   steplistSelectors.orderedSteps,
   fileDataSelectors.robotStateTimeline,
   fileDataSelectors.getInitialRobotState,
@@ -28,7 +26,6 @@ export const allSubsteps: Selector<AllSubsteps> = createSelector(
     validatedForms,
     allPipetteData,
     allLabwareTypes,
-    _allWellContentsForSteps,
     orderedSteps,
     robotStateTimeline,
     _initialRobotState,

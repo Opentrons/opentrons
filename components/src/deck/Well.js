@@ -5,7 +5,6 @@ import cx from 'classnames'
 import {wellIsRect, type WellDefinition} from '@opentrons/shared-data'
 import styles from './Well.css'
 import {SELECTABLE_WELL_CLASS} from '../constants.js'
-// import WellToolTip from '../components/WellToolTip.js' // TODO bring back tooltip in SVG, somehow
 
 export type SingleWell = {|
   wellName: string,
@@ -22,6 +21,7 @@ type Props = {
   wellDef: WellDefinition,
   onMouseOver?: (e: SyntheticMouseEvent<*>) => mixed,
   onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed,
+  onMouseMove?: (e: SyntheticMouseEvent<*>) => mixed,
 }
 
 class Well extends React.Component<Props> {
@@ -40,6 +40,7 @@ class Well extends React.Component<Props> {
       wellDef,
       onMouseOver,
       onMouseLeave,
+      onMouseMove,
     } = this.props
 
     const fillColor = this.props.fillColor || 'transparent'
@@ -59,6 +60,7 @@ class Well extends React.Component<Props> {
       'data-wellname': wellName,
       onMouseOver,
       onMouseLeave,
+      onMouseMove,
     }
 
     const isRect = wellIsRect(wellDef)

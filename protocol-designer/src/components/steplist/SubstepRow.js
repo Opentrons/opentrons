@@ -5,6 +5,7 @@ import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
 
 import {HoverTooltip, swatchColors} from '@opentrons/components'
+import type {LocationLiquidState} from '../../step-generation'
 import type {SubstepWellData, WellIngredientVolumeData, WellIngredientNames} from '../../steplist/types'
 import IngredPill from './IngredPill'
 import {PDListItem} from '../lists'
@@ -22,11 +23,11 @@ type SubstepRowProps = {|
 |}
 
 type PillTooltipContentsProps = {
-  ingreds: WellIngredientVolumeData,
+  ingreds: WellIngredientVolumeData | LocationLiquidState,
   ingredNames: WellIngredientNames,
   well: string,
 }
-const PillTooltipContents = (props: PillTooltipContentsProps) => {
+export const PillTooltipContents = (props: PillTooltipContentsProps) => {
   const totalLiquidVolume = reduce(props.ingreds, (acc, ingred) => acc + ingred.volume, 0)
   const hasMultipleIngreds = Object.keys(props.ingreds).length > 1
   return (
@@ -58,7 +59,7 @@ const PillTooltipContents = (props: PillTooltipContentsProps) => {
           <div className={styles.total_divider}></div>
           <div className={styles.total_row}>
             <span>{`${props.well} Total Volume`}</span>
-            <span>{totalLiquidVolume}µl</span>
+            <span>{formatVolume(totalLiquidVolume, 2)}µl</span>
           </div>
         </React.Fragment>
       }
