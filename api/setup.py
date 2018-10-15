@@ -16,6 +16,7 @@ SHARED_DATA_PATH = os.path.join('..', 'shared-data')
 SHARED_DATA_SUBDIRS = ['labware-json-schema',
                        'protocol-json-schema',
                        'definitions',
+                       'definitions2',
                        'robot-data']
 # Where, relative to the package root, we put the files we copy
 DEST_BASE_PATH = 'shared_data'
