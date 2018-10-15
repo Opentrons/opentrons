@@ -1,5 +1,5 @@
 {
-  "details": "details",
+  "details": "Details",
   "description": "Description",
   "serialize": "Serialize",
   "serialize_explanation": "Each placement of the liquid will get its own number. (\"Sample 1\", \"Sample 2\", \"Sample 3\")",
