@@ -10,6 +10,9 @@ import type {State} from '../../types'
 // import type {State, Dispatch} from '../../types'
 import type {ViewableRobot} from '../../discovery'
 
+import {RefreshCard} from '@opentrons/components'
+import {ConnectionStatusMessage, WirelessInfo, WiredInfo} from './connection'
+
 type OP = {robot: ViewableRobot}
 
 type SP = {|__featureEnabled: boolean|}
@@ -26,12 +29,19 @@ export default connect(
   /* mapDispatchToProps */
 )(ConnectionCard)
 
+const TITLE = 'Connectivity'
 function ConnectionCard (props: Props) {
   // TODO(mc, 2018-10-15): remove feature flag
   if (!props.__featureEnabled) return null
 
   // TODO(mc, 2018-10-15): implement
-  return <p>TODO</p>
+  return (
+    <RefreshCard title={TITLE} refresh={() => console.log('placeholder')}>
+      <ConnectionStatusMessage />
+      <WirelessInfo />
+      <WiredInfo />
+    </RefreshCard>
+  )
 }
 
 function makeMapStateToProps (): (State, OP) => SP {

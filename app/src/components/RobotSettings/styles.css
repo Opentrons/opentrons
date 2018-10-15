@@ -49,3 +49,34 @@
     margin-bottom: 0.5rem;
   }
 }
+
+.connection_status {
+  @apply --font-body-1-dark;
+
+  padding: 1rem;
+  border-bottom: var(--bd-light);
+  line-height: 2;
+}
+
+.wifi_dropdown {
+  max-width: 75%;
+}
+
+.connection_label {
+  @apply --font-body-1-dark;
+
+  font-weight: var(--fw-semibold);
+  padding-bottom: 0.25rem;
+}
+
+.wireless_info,
+.wired_info {
+  @apply --font-body-1-dark;
+
+  text-align: left;
+  line-height: 2;
+}
+
+.wireless_info {
+  padding-top: 1rem;
+}
