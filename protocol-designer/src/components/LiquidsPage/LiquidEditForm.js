@@ -2,6 +2,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import assert from 'assert'
+import i18n from '../../localization'
 
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
@@ -35,7 +36,6 @@ type SP = {
   showForm: boolean,
 }
 
-// TODO IMMEDIATELY: internationalization of copy
 class LiquidEditForm extends React.Component<Props, State> {
   constructor (props: Props) {
     super(props)
@@ -47,7 +47,7 @@ class LiquidEditForm extends React.Component<Props, State> {
   }
 
   updateForm = (fieldName: $Keys<IngredInputs>) => (e: SyntheticInputEvent<*>) => {
-    // TODO how to handle checkbox cleanly???
+    // need to handle checkbox fields explicitly
     if (fieldName === 'serialize') {
       this.setState({[fieldName]: !this.state[fieldName]})
     } else {
@@ -65,12 +65,16 @@ class LiquidEditForm extends React.Component<Props, State> {
     return (
       <Card className={styles.form_card}>
         <section className={styles.section}>
-          <div className={formStyles.header}>Details</div>
+          <div className={formStyles.header}>{i18n.t('liquids.details')}</div>
           <div className={formStyles.row_wrapper}>
-            <FormGroup label='Liquid name:' className={formStyles.column_1_2}>
+            <FormGroup
+              label={`${i18n.t('liquids.liquid_name')}:`}
+              className={formStyles.column_1_2}>
               <InputField value={name} onChange={this.updateForm('name')} />
             </FormGroup>
-            <FormGroup label='Description:' className={formStyles.column_1_2}>
+            <FormGroup
+              label={`${i18n.t('liquids.description')}:`}
+              className={formStyles.column_1_2}>
               <InputField value={description} onChange={this.updateForm('description')} />
             </FormGroup>
           </div>
@@ -78,14 +82,16 @@ class LiquidEditForm extends React.Component<Props, State> {
 
         <section className={styles.section}>
           <div className={formStyles.header}>Serialization</div>
-          <p className={styles.info_text}>{'Each placement of the liquid will get its own number. ("Sample 1", "Sample 2", "Sample 3")'}</p>
-          <CheckboxField label='Serialize' value={serialize} onChange={this.updateForm('serialize')} />
+          <p className={styles.info_text}>
+            {i18n.t('liquids.serialize_explanation')}</p>
+          <CheckboxField label='Serialize' value={serialize}
+            onChange={this.updateForm('serialize')} />
         </section>
 
         <div className={styles.button_row}>
-          <OutlineButton onClick={deleteLiquidGroup}>DELETE</OutlineButton>
-          <PrimaryButton onClick={cancelForm}>CANCEL</PrimaryButton>
-          <PrimaryButton onClick={this.handleSaveForm}>SAVE</PrimaryButton>
+          <OutlineButton onClick={deleteLiquidGroup}>{i18n.t('button.delete')}</OutlineButton>
+          <PrimaryButton onClick={cancelForm}>{i18n.t('button.cancel')}</PrimaryButton>
+          <PrimaryButton onClick={this.handleSaveForm}>{i18n.t('button.save')}</PrimaryButton>
         </div>
       </Card>
     )
