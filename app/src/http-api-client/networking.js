@@ -22,9 +22,9 @@ export type InternetStatus = 'none' | 'portal' | 'limited' | 'full' | 'unknown'
 export type SecurityType = 'none' | 'wpa-psk' | 'wpa-eap'
 
 export type NetworkInterface = {
-  ipAddress: string,
+  ipAddress: ?string,
   macAddress: string,
-  gatewayAddress: string,
+  gatewayAddress: ?string,
   state: string,
   type: 'wifi' | 'ethernet',
 }
