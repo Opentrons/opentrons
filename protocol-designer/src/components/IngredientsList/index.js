@@ -1,16 +1,15 @@
 // @flow
-// TODO: Ian 2018-06-07 break out these components into their own files (make IngredientsList a directory)
 // TODO: Ian 2018-10-09 figure out what belongs in LiquidsSidebar vs IngredientsList after #2427
 import React from 'react'
 
 import {IconButton, SidePanel, swatchColors} from '@opentrons/components'
-import {sortWells} from '../utils'
-import {PDTitledList, PDListItem} from './lists'
-import stepItemStyles from './steplist/StepItem.css'
-import StepDescription from './StepDescription'
+import {sortWells} from '../../utils'
+import {PDTitledList, PDListItem} from '../lists'
+import StepDescription from '../StepDescription'
+import LabwareDetailsCard from './LabwareDetailsCard'
 import styles from './IngredientsList.css'
-import type {LiquidGroupsById, LiquidGroup} from '../labware-ingred/types'
-import type {SingleLabwareLiquidState} from '../step-generation'
+import type {LiquidGroupsById, LiquidGroup} from '../../labware-ingred/types'
+import type {SingleLabwareLiquidState} from '../../step-generation'
 
 type RemoveWellsContents = (args: {|liquidGroupId: string, wells: Array<string>|}) => mixed
 
@@ -146,8 +145,6 @@ type Props = {
   liquidGroupsById: LiquidGroupsById,
   labwareWellContents: SingleLabwareLiquidState,
   selectedIngredientGroupId: ?string,
-  renameLabwareFormMode: boolean,
-  openRenameLabwareForm: () => mixed,
 }
 
 export default function IngredientsList (props: Props) {
@@ -156,20 +153,11 @@ export default function IngredientsList (props: Props) {
     liquidGroupsById,
     removeWellsContents,
     selectedIngredientGroupId,
-    renameLabwareFormMode,
-    openRenameLabwareForm,
   } = props
 
   return (
     <SidePanel title='Name & Liquids'>
-        {/* Labware Name "button" to open LabwareNameEditForm */}
-        <PDTitledList
-          className={stepItemStyles.step_item}
-          title='labware name'
-          iconName='pencil'
-          selected={renameLabwareFormMode}
-          onClick={openRenameLabwareForm}
-        />
+        <LabwareDetailsCard />
 
         {Object.keys(liquidGroupsById).map((groupIdForCard) =>
           <IngredGroupCard key={groupIdForCard}

@@ -81,16 +81,6 @@ export const modifyContainer = createAction(
   |}) => args
 )
 
-export const openRenameLabwareForm = createAction(
-  'OPEN_RENAME_LABWARE_FORM',
-  () => {}
-)
-
-export const closeRenameLabwareForm = createAction(
-  'CLOSE_RENAME_LABWARE_FORM',
-  () => {}
-)
-
 // ===========
 
 export type MoveLabware = {
