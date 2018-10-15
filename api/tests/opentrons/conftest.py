@@ -388,7 +388,7 @@ def model_with_trough(robot):
 def smoothie(monkeypatch):
     from opentrons.drivers.smoothie_drivers.driver_3_0 import \
          SmoothieDriver_3_0_0 as SmoothieDriver
-    from opentrons.legacy_api.robot import robot_configs
+    from opentrons.config import robot_configs
 
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
     driver = SmoothieDriver(robot_configs.load())

@@ -5,7 +5,7 @@ import threading
 from typing import Dict, List, Optional, Tuple
 from opentrons.util import environment
 from opentrons.drivers.smoothie_drivers import driver_3_0
-from opentrons.legacy_api.robot import robot_configs
+from opentrons.config import robot_configs
 from . import modules
 
 

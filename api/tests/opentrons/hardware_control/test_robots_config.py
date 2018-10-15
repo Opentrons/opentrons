@@ -1,6 +1,7 @@
-def test_old_probe_height(short_trash_flag):
-    from opentrons.legacy_api.robot import robot_configs
+from opentrons.config import robot_configs
 
+
+def test_old_probe_height(short_trash_flag):
     cfg = robot_configs.load()
 
     assert cfg.probe_center[2] == 55.0
@@ -8,8 +9,6 @@ def test_old_probe_height(short_trash_flag):
 
 
 def test_default_probe_height():
-    from opentrons.legacy_api.robot import robot_configs
-
     cfg = robot_configs.load()
     assert cfg.probe_center[2] == 77.0
     assert cfg.probe_dimensions[2] == 82.0
@@ -17,7 +16,6 @@ def test_default_probe_height():
 
 def test_load_corrupt_json():
     import os
-    from opentrons.legacy_api.robot import robot_configs
     filename = os.path.join(os.path.dirname(__file__), 'bad_config.json')
     with open(filename, 'w') as file:
         file.write('')  # empty config file
@@ -27,8 +25,6 @@ def test_load_corrupt_json():
 
 
 def test_build_config():
-    from opentrons.legacy_api.robot import robot_configs
-
     deck_cal = [
         [1.23, 1.23, 1.23,  1.23],
         [1.23, 1.23, 1.23,  1.23],
