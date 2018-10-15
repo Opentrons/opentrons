@@ -25,7 +25,20 @@ export function WirelessInfo () {
         <AvailableNetworks />
       </CardContentHalf>
       <CardContentHalf>
-        <WirelessAddresses />
+        <NetworkAddresses />
+      </CardContentHalf>
+    </React.Fragment>
+  )
+}
+
+export function WiredInfo () {
+  return (
+    <React.Fragment>
+      <CardContentHalf>
+        <h4 className={styles.connection_label}>USB</h4>
+      </CardContentHalf>
+      <CardContentHalf>
+        <NetworkAddresses wired />
       </CardContentHalf>
     </React.Fragment>
   )
@@ -47,35 +60,20 @@ function AvailableNetworks () {
   )
 }
 
-function WirelessAddresses () {
+type NetworkAddressProps = {
+  wired?: boolean,
+}
+function NetworkAddresses (props: NetworkAddressProps) {
+  const type = props.wired ? 'Wired' : 'Wireless'
+
   return (
     <div className={styles.wireless_info}>
       <p>
-        <span className={styles.connection_label}>Wireless IP: </span>192.168.2.161
+        <span className={styles.connection_label}>{type} IP: </span>192.168.2.161
       </p>
       <p>
-        <span className={styles.connection_label}>Wireless MAC address: </span>192.168.2.161
+        <span className={styles.connection_label}>{type} MAC address: </span>192.168.2.161
       </p>
     </div>
-  )
-}
-
-export function WiredInfo () {
-  return (
-    <React.Fragment>
-      <CardContentHalf>
-        <h4 className={styles.connection_label}>USB</h4>
-      </CardContentHalf>
-      <CardContentHalf>
-        <div className={styles.wired_info}>
-          <p>
-            <span className={styles.connection_label}>Wired IP: </span>192.168.2.161
-          </p>
-          <p>
-            <span className={styles.connection_label}>Wired MAC address: </span>192.168.2.161
-          </p>
-        </div>
-      </CardContentHalf>
-    </React.Fragment>
   )
 }
