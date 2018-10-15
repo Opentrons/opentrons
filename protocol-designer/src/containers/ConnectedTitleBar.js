@@ -49,6 +49,7 @@ function mapStateToProps (state: BaseState): SP {
   const labware = labwareIngredSelectors.getSelectedContainer(state)
   const labwareNames = labwareIngredSelectors.getLabwareNames(state)
   const labwareNickname = labware && labware.id && labwareNames[labware.id]
+  const drilledDownLabwareId = labwareIngredSelectors.getDrillDownLabwareId(state)
 
   switch (_page) {
     case 'liquids':
@@ -83,14 +84,22 @@ function mapStateToProps (state: BaseState): SP {
       // NOTE: this default case error should never be reached, it's just a sanity check
       if (_page !== 'steplist') console.error('ConnectedTitleBar got an unsupported page, returning steplist instead')
       let subtitle
+      let backButtonLabel
+      let title
       if (selectedTerminalId === START_TERMINAL_ITEM_ID) {
         subtitle = START_TERMINAL_TITLE
       } else if (selectedTerminalId === END_TERMINAL_ITEM_ID) {
         subtitle = END_TERMINAL_TITLE
+        if (drilledDownLabwareId) {
+          backButtonLabel = 'Deck'
+          const drilledDownLabware = labwareIngredSelectors.getLabware(state)[drilledDownLabwareId]
+          title = drilledDownLabware && drilledDownLabware.name
+          subtitle = drilledDownLabware && humanizeLabwareType(drilledDownLabware.type)
+        }
       } else if (selectedStep) {
         subtitle = selectedStep.title
       }
-      return { _page: 'steplist', title: fileName, subtitle }
+      return { _page: 'steplist', title: title || fileName, subtitle, backButtonLabel }
     }
   }
 }
@@ -107,6 +116,10 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
 
   if (_page === 'well-selection-modal') {
     onBackClick = () => dispatch(closeWellSelectionModal())
+  }
+
+  if (_page === 'steplist' && props.backButtonLabel) {
+    onBackClick = () => {}
   }
 
   return {

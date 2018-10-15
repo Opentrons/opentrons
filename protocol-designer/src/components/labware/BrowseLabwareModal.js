@@ -107,6 +107,7 @@ class BrowseLabwareModal extends React.Component<Props, State> {
                   {...mouseHandlers}
                   key={wellName}
                   wellName={wellName}
+                  highlighted={this.state.tooltipWellName === wellName}
                   fillColor={color}
                   svgOffset={{x: 1, y: -3}}
                   wellDef={allWellDefsByName[wellName]} />
