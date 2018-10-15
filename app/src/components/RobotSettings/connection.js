@@ -1,13 +1,19 @@
 // @flow
 // UI components for displaying connection info
 import * as React from 'react'
-import {DropdownField} from '@opentrons/components'
+import Select from 'react-select'
+import {Icon} from '@opentrons/components'
 import {CardContentHalf} from '../layout'
 import styles from './styles.css'
 
-import type {InternetStatus, NetworkInterface} from '../../http-api-client'
+import type {IconName} from '@opentrons/components'
+import type {
+  InternetStatus,
+  NetworkInterface,
+  WifiNetworkList,
+  WifiNetwork,
+} from '../../http-api-client'
 
-// TODO(ka, 2018-10-15): break these out into separate files
 type ConnectionStatusProps = {type: string, status: ?InternetStatus}
 
 function shortStatusToDescription (status: ?InternetStatus) {
@@ -40,7 +46,6 @@ export function ConnectionStatusMessage (props: ConnectionStatusProps) {
 }
 
 type ConnectionInfoProps = {
-  // makes keys of NetworkInterface optional which is what we want
   connection: ?NetworkInterface,
   title: string,
   wired?: boolean,
@@ -63,17 +68,60 @@ export function ConnectionInfo (props: ConnectionInfoProps) {
   )
 }
 
-export function AvailableNetworks () {
+type AvailableNetworksProps = {list: ?WifiNetworkList}
+
+export function AvailableNetworks (props: AvailableNetworksProps) {
+  const list = props.list || []
+  const options = list.map(NetworkOption)
   return (
-    <DropdownField
+    <Select
+      value={options[0]}
       className={styles.wifi_dropdown}
-      onChange={e => console.log(e.target.value)}
-      options={[
-        {name: 'WIFI1', value: 'wifi1'},
-        {name: 'Wifi2', value: 'wifi2'},
-      ]}
+      onChange={e => console.log(e)}
+      options={options}
     />
   )
+}
+
+function NetworkOption (nw: WifiNetwork): {value: string, label: React.Node} {
+  const value = nw.ssid
+  const connectedIcon = nw.active ? (
+    <Icon name="check" className={styles.wifi_option_icon} />
+  ) : (
+    <span className={styles.wifi_option_icon} />
+  )
+
+  const securedIcon =
+    nw.securityType !== 'none' ? (
+      <Icon name="lock" className={styles.wifi_option_icon_right} />
+    ) : (
+      <span className={styles.wifi_option_icon_right} />
+    )
+
+  let signalIconName: IconName
+  if (nw.signal <= 25) {
+    signalIconName = 'ot-wifi-0'
+  } else if (nw.signal <= 50) {
+    signalIconName = 'ot-wifi-1'
+  } else if (nw.signal <= 75) {
+    signalIconName = 'ot-wifi-2'
+  } else {
+    signalIconName = 'ot-wifi-3'
+  }
+  const signalIcon = (
+    <Icon name={signalIconName} className={styles.wifi_option_icon_right} />
+  )
+
+  const label = (
+    <div className={styles.wifi_option}>
+      {connectedIcon}
+      {value}
+      {signalIcon}
+      {securedIcon}
+    </div>
+  )
+
+  return {value, label}
 }
 
 type NetworkAddressProps = {

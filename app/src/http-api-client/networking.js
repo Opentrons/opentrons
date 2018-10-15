@@ -31,7 +31,7 @@ export type NetworkInterface = {
 
 export type WifiNetwork = {
   ssid: string,
-  signal: ?number,
+  signal: number,
   active: boolean,
   security: string,
   securityType: SecurityType,

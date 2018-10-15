@@ -6,12 +6,10 @@ import {getIn} from '@thi.ng/paths'
 import find from 'lodash/find'
 
 import {getConfig} from '../../config'
-
-import type {State} from '../../types'
-// import type {State, Dispatch} from '../../types'
-import type {ViewableRobot} from '../../discovery'
-import {makeGetRobotNetworkingStatus} from '../../http-api-client'
-
+import {
+  makeGetRobotNetworkingStatus,
+  makeGetRobotWifiList,
+} from '../../http-api-client'
 import {RefreshCard} from '@opentrons/components'
 import {
   ConnectionStatusMessage,
@@ -19,21 +17,25 @@ import {
   AvailableNetworks,
 } from './connection'
 
-import type {InternetStatus, NetworkInterface} from '../../http-api-client'
+import type {State} from '../../types'
+import type {ViewableRobot} from '../../discovery'
+import type {
+  WifiNetworkList,
+  InternetStatus,
+  NetworkInterface,
+} from '../../http-api-client'
 
 type OP = {robot: ViewableRobot}
 
 type SP = {|
   __featureEnabled: boolean,
+  wifiList: ?WifiNetworkList,
   internetStatus: ?InternetStatus,
   wifiNetwork: ?NetworkInterface,
   ethernetNetwork: ?NetworkInterface,
 |}
 
-// type DP = {||}
-
 type Props = {...$Exact<OP>, ...SP}
-// type Props = {...$Exact<OP>, ...SP, ...DP}
 
 const __FEATURE_FLAG = 'devInternal.manageRobotConnection.newCard'
 
@@ -47,9 +49,8 @@ function ConnectionCard (props: Props) {
   // TODO(mc, 2018-10-15): remove feature flag
   if (!props.__featureEnabled) return null
 
-  const {robot, internetStatus, wifiNetwork, ethernetNetwork} = props
+  const {robot, wifiList, internetStatus, wifiNetwork, ethernetNetwork} = props
 
-  // TODO(mc, 2018-10-15): implement
   return (
     <RefreshCard title={TITLE} refresh={() => console.log('placeholder')}>
       <ConnectionStatusMessage
@@ -57,7 +58,7 @@ function ConnectionCard (props: Props) {
         status={internetStatus}
       />
       <ConnectionInfo connection={wifiNetwork} title="Wi-Fi">
-        <AvailableNetworks />
+        <AvailableNetworks list={wifiList} />
       </ConnectionInfo>
       <ConnectionInfo connection={ethernetNetwork} title="USB" wired />
     </RefreshCard>
@@ -66,21 +67,21 @@ function ConnectionCard (props: Props) {
 
 function makeMapStateToProps (): (State, OP) => SP {
   const getNetworkingStatusCall = makeGetRobotNetworkingStatus()
+  const getWifiListCall = makeGetRobotWifiList()
 
   return (state, ownProps) => {
-    const {response} = getNetworkingStatusCall(state, ownProps.robot)
-    const internetStatus = response && response.status
-    const interfaces = response && response.interfaces
+    const {robot} = ownProps
+    const {response: statusResponse} = getNetworkingStatusCall(state, robot)
+    const {response: listResponse} = getWifiListCall(state, robot)
+    const internetStatus = statusResponse && statusResponse.status
+    const interfaces = statusResponse && statusResponse.interfaces
 
     return {
       internetStatus,
+      wifiList: listResponse && listResponse.list,
       wifiNetwork: find(interfaces, {type: 'wifi'}),
       ethernetNetwork: find(interfaces, {type: 'ethernet'}),
       __featureEnabled: !!getIn(getConfig(state), __FEATURE_FLAG),
     }
   }
 }
-
-// function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-//   return {}
-// }
