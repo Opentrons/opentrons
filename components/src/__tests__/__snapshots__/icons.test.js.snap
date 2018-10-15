@@ -477,6 +477,26 @@ exports[`icons information renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons lock renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons menu-down renders correctly 1`] = `
 <svg
   aria-hidden="true"
@@ -897,6 +917,86 @@ exports[`icons ot-water-outline renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons ot-wifi-0 renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M12 22.3l-4.3-5.7.4-.3c2.3-1.7 5.5-1.7 7.8 0l.4.3-4.3 5.7zm-2.9-5.5l2.9 3.8 2.9-3.8c-1.7-1.1-4.1-1.1-5.8 0zm8.4-1.8l-.4-.3C15.6 13.6 13.9 13 12 13s-3.6.6-5.1 1.7l-.4.3-2.4-3.2.4-.3C6.7 9.9 9.3 9 12 9s5.3.9 7.5 2.5l.4.3-2.4 3.2zm-12-3l1.2 1.6c1.6-1 3.4-1.6 5.3-1.6s3.7.6 5.3 1.6l1.2-1.6c-1.9-1.3-4.2-2-6.5-2s-4.6.7-6.5 2zm15.6-1.8l-.4-.3C18.2 8 15.2 7 12 7S5.8 8 3.3 9.9l-.4.3L.5 7l.4-.3C4.1 4.3 8 3 12 3s7.9 1.3 11.1 3.7l.4.3-2.4 3.2zM12 6c3.2 0 6.3 1 8.9 2.8l1.2-1.6C19.1 5.1 15.7 4 12 4S4.9 5.1 1.9 7.2l1.2 1.6C5.7 7 8.8 6 12 6z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-wifi-1 renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M8.4 16.7l3.6 4.8 3.6-4.8c-1-.8-2.2-1.2-3.6-1.2s-2.6.4-3.6 1.2zM12 9c-2.7 0-5.3.9-7.5 2.5l-.4.3L6.5 15l.4-.3C8.4 13.6 10.2 13 12 13s3.6.6 5.1 1.7l.4.3 2.4-3.2-.4-.3C17.3 9.9 14.7 9 12 9zm5.3 4.6c-3.2-2.1-7.4-2.1-10.6 0L5.5 12c1.9-1.3 4.2-2 6.5-2s4.6.7 6.5 2l-1.2 1.6zm5.8-6.9C19.9 4.3 16.1 3 12 3S4.1 4.3.9 6.7L.5 7l2.4 3.2.4-.3C5.8 8 8.8 7 12 7s6.2 1 8.7 2.9l.4.3L23.5 7l-.4-.3zm-2.2 2.1C18.3 7 15.2 6 12 6S5.7 7 3.1 8.8L1.9 7.2C4.8 5.1 8.3 4 12 4s7.2 1.1 10.1 3.2l-1.2 1.6z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-wifi-2 renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M4.8 11.9l1.8 2.4c1.5-1.1 3.4-1.8 5.4-1.8s3.9.7 5.4 1.8l1.8-2.4c-2-1.5-4.5-2.4-7.2-2.4s-5.2.9-7.2 2.4zm3.6 4.8l3.6 4.8 3.6-4.8c-1-.8-2.2-1.2-3.6-1.2s-2.6.5-3.6 1.2zm14.7-10C19.9 4.3 16 3 12 3S4.1 4.3.9 6.7L.5 7l2.4 3.2.4-.3C5.8 8 8.8 7 12 7s6.2 1 8.7 2.9l.4.3L23.5 7l-.4-.3zm-2.2 2.1C18.3 7 15.2 6 12 6S5.7 7 3.1 8.8L1.9 7.2C4.9 5.1 8.3 4 12 4s7.1 1.1 10.1 3.2l-1.2 1.6z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-wifi-3 renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  height={undefined}
+  style={undefined}
+  version="1.1"
+  viewBox="0 0 24 24"
+  width={undefined}
+  x={undefined}
+  y={undefined}
+>
+  <path
+    d="M4.8 11.4l1.8 2.4C8.1 12.7 10 12 12 12s3.9.7 5.4 1.8l1.8-2.4C17.2 9.9 14.7 9 12 9s-5.2.9-7.2 2.4zM8.4 16.2L12 21l3.6-4.8c-1-.8-2.2-1.2-3.6-1.2s-2.6.5-3.6 1.2zM12 3C8 3 4.2 4.3 1.2 6.6L3 9c2.5-1.9 5.6-3 9-3s6.5 1.1 9 3l1.8-2.4C19.8 4.3 16 3 12 3z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons pause renders correctly 1`] = `
 <svg
   aria-hidden="true"
@@ -1171,7 +1271,7 @@ exports[`icons wifi renders correctly 1`] = `
   y={undefined}
 >
   <path
-    d="M0 9.414l2.182 2.182c5.422-5.422 14.214-5.422 19.636 0L24 9.414c-6.622-6.622-17.367-6.622-24 0zm8.727 8.727L12 21.414l3.273-3.273a4.622 4.622 0 0 0-6.546 0zm-4.363-4.363l2.181 2.181a7.717 7.717 0 0 1 10.91 0l2.181-2.181c-4.21-4.211-11.05-4.211-15.272 0z"
+    d="M4.8 11.4l1.8 2.4C8.1 12.7 10 12 12 12s3.9.7 5.4 1.8l1.8-2.4C17.2 9.9 14.7 9 12 9s-5.2.9-7.2 2.4zM8.4 16.2L12 21l3.6-4.8c-1-.8-2.2-1.2-3.6-1.2s-2.6.5-3.6 1.2zM12 3C8 3 4.2 4.3 1.2 6.6L3 9c2.5-1.9 5.6-3 9-3s6.5 1.1 9 3l1.8-2.4C19.8 4.3 16 3 12 3z"
     fillRule="evenodd"
   />
 </svg>
