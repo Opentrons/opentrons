@@ -51,11 +51,9 @@ export type IngredInputs = { // TODO: Ian 2018-10-12 rename to 'LiquidFormFields
   serialize: boolean,
 }
 
-export type IngredInputFields = $Exact<IngredInputs>
-
 export type IngredGroupAccessor = $Keys<IngredInputs>
 
-export type IngredientInstance = $Diff<IngredInputFields, {volume: *}>
+export type IngredientInstance = $Diff<$Exact<IngredInputs>, {volume: *}>
 
 export type IngredientGroups = {
   [groupId: string]: IngredientInstance,

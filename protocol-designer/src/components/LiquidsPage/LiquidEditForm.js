@@ -21,7 +21,7 @@ import styles from './LiquidEditForm.css'
 import formStyles from '../forms.css'
 
 type Props = {
-  ...IngredInputs,
+  ...$Exact<IngredInputs>,
   deleteLiquidGroup: () => mixed,
   cancelForm: () => mixed,
   saveForm: (IngredInputs) => mixed,

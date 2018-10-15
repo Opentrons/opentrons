@@ -20,7 +20,7 @@ import {getIsTiprack} from '@opentrons/shared-data'
 import type {LabwareLiquidState} from '../../step-generation'
 
 import type {
-  IngredInputFields,
+  IngredInputs,
   IngredientGroups,
   AllIngredGroupFields,
   IngredientInstance,
@@ -452,7 +452,7 @@ const containersBySlot: Selector<ContainersBySlot> = createSelector(
 type IngredGroupFields = {
   [ingredGroupId: string]: {
     groupId: string,
-    ...IngredInputFields,
+    ...$Exact<IngredInputs>,
   },
 }
 const allIngredientGroupFields: Selector<AllIngredGroupFields> = createSelector(

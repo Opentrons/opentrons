@@ -6,8 +6,10 @@ import {selectors} from './reducers'
 import wellSelectionSelectors from '../well-selection/selectors'
 
 import type {GetState} from '../types'
-import type {IngredInputFields} from './types'
+import type {IngredInputs} from './types'
 import type {DeckSlot} from '@opentrons/components'
+
+type IngredInputFields = $Exact<IngredInputs>
 
 // ===== Labware selector actions =====
 
@@ -221,26 +223,24 @@ export function createNewLiquidGroup () {
   return {type: 'CREATE_NEW_LIQUID_GROUP_FORM'}
 }
 
-export type EditLiquidGroupAction = {
+export type EditLiquidGroupAction = {|
   type: 'EDIT_LIQUID_GROUP',
-  payload: {
+  payload: {|
     liquidGroupId: string,
     ...IngredInputFields,
-  },
-}
+  |},
+|}
 
 // NOTE: with no ID, a new one is assigned
 export const editLiquidGroup = (
   args: {liquidGroupId: ?string, ...IngredInputFields}
 ) => (dispatch: Dispatch<EditLiquidGroupAction>, getState: GetState
 ) => {
-  // TODO: Ian 2018-10-12 flow doesn't understand unpacking in: {...args, liquidGroupId: args.id || 'blahId'}
+  const {liquidGroupId, ...payloadArgs} = args // NOTE: separate liquidGroupId for flow to understand unpacking :/
   dispatch({
     type: 'EDIT_LIQUID_GROUP',
     payload: {
-      name: args.name,
-      serialize: args.serialize,
-      description: args.description,
+      ...payloadArgs,
       liquidGroupId: args.liquidGroupId || selectors.getNextLiquidGroupId(getState()),
     },
   })
