@@ -56,6 +56,13 @@ export type Config = {
   discovery: {
     candidates: string | Array<string>,
   },
+
+  // internal development flags
+  devInternal?: {
+    manageRobotConnection?: {
+      newConnectivityCard?: boolean,
+    },
+  },
 }
 
 type UpdateConfigAction = {|
@@ -85,10 +92,7 @@ export function updateConfig (path: string, value: any): UpdateConfigAction {
 }
 
 // config reducer
-export function configReducer (
-  state: ?Config,
-  action: Action
-): Config {
+export function configReducer (state: ?Config, action: Action): Config {
   // initial state
   // getShellConfig makes a sync RPC call, so use sparingly
   if (!state) return getShellConfig()
