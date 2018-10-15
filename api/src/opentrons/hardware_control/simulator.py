@@ -3,6 +3,7 @@ from typing import Dict, Optional, List, Tuple
 
 from opentrons import types
 from . import modules
+from .types import Axis
 
 
 class Simulator:
@@ -24,11 +25,11 @@ class Simulator:
     def move(self, target_position: Dict[str, float]):
         pass
 
-    def home(self):
+    def home(self, axes: List[Axis] = None) -> Dict[str, float]:
         # driver_3_0-> HOMED_POSITION
         return {'X': 418, 'Y': 353, 'Z': 218, 'A': 218, 'B': 19, 'C': 19}
 
-    def get_attached_instruments(self, mount):
+    def get_attached_instruments(self, mount) -> Optional[str]:
         return self._attached_instruments[mount]
 
     def get_attached_modules(self) -> List[Tuple[str, str]]:

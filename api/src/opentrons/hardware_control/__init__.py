@@ -11,18 +11,23 @@ functions are available elsewhere.
 """
 
 import asyncio
+from collections import OrderedDict
 import functools
 import logging
-import enum
 from typing import Any, Dict, Union, List, Optional, Tuple
-from opentrons import types
+
+from opentrons import types as top_types
+from opentrons.util import linal
 from .simulator import Simulator
+from opentrons.config import robot_configs
+
 try:
     from .controller import Controller
 except ModuleNotFoundError:
     # implies windows
     Controller = None  # type: ignore
 from . import modules
+from .types import Axis
 
 
 mod_log = logging.getLogger(__name__)
@@ -34,18 +39,6 @@ def _log_call(func):
         args[0]._log.debug(func.__name__)
         return func(*args, **kwargs)
     return _log_call_inner
-
-
-class _Axis(enum.Enum):
-    X = enum.auto()
-    Y = enum.auto()
-    Z = enum.auto()
-    A = enum.auto()
-
-    @classmethod
-    def by_mount(cls, mount):
-        bm = {types.Mount.LEFT: cls.Z, types.Mount.RIGHT: cls.A}
-        return bm[mount]
 
 
 class MustHomeError(RuntimeError):
@@ -70,7 +63,7 @@ class API:
 
     def __init__(self,
                  backend: _Backend,
-                 config: dict = None,
+                 config: robot_configs.robot_config = None,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         """ Initialize an API instance.
 
@@ -79,21 +72,22 @@ class API:
         build_hardware_simulator should be used.
         """
         self._log = self.CLS_LOG.getChild(str(id(self)))
+        self._config = config or robot_configs.load()
         self._backend = backend
         if None is loop:
             self._loop = asyncio.get_event_loop()
         else:
             self._loop = loop
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
-        self._current_position: Dict[str, float] = {}
+        self._current_position: Dict[Axis, float] = {}
 
-        self._attached_instruments = {types.Mount.LEFT: None,
-                                      types.Mount.RIGHT: None}
+        self._attached_instruments = {top_types.Mount.LEFT: None,
+                                      top_types.Mount.RIGHT: None}
         self._attached_modules: Dict[str, Any] = {}
 
     @classmethod
     def build_hardware_controller(
-            cls, config: dict = None,
+            cls, config: robot_configs.robot_config = None,
             loop: asyncio.AbstractEventLoop = None) -> 'API':
         """ Build a hardware controller that will actually talk to hardware.
 
@@ -110,9 +104,9 @@ class API:
     @classmethod
     def build_hardware_simulator(
             cls,
-            attached_instruments: Dict[types.Mount, Optional[str]] = None,
+            attached_instruments: Dict[top_types.Mount, Optional[str]] = None,
             attached_modules: List[str] = None,
-            config: dict = None,
+            config: robot_configs.robot_config = None,
             loop: asyncio.AbstractEventLoop = None) -> 'API':
         """ Build a simulating hardware controller.
 
@@ -120,8 +114,8 @@ class API:
         Multiple simulating hardware controllers may be active at one time.
         """
         if None is attached_instruments:
-            attached_instruments = {types.Mount.LEFT: None,
-                                    types.Mount.RIGHT: None}
+            attached_instruments = {top_types.Mount.LEFT: None,
+                                    top_types.Mount.RIGHT: None}
         if None is attached_modules:
             attached_modules = []
         return cls(Simulator(attached_instruments,
@@ -160,7 +154,7 @@ class API:
     @_log_call
     async def cache_instrument_models(self):
         self._log.info("Updating instrument model cache")
-        for mount in types.Mount:
+        for mount in top_types.Mount:
             self._attached_instruments[mount] = \
                 self._backend.get_attached_instruments(mount)
 
@@ -183,52 +177,199 @@ class API:
 
     # Gantry/frame (i.e. not pipette) action API
     @_log_call
-    async def home(self, *args, **kwargs):
-        # Initialize/update current_position
-        self._current_position = self._backend.home()
+    async def home_z(self, mount: top_types.Mount):
+        """ Home one mount's Z-axis """
+        backend_pos = self._backend.home(Axis.by_mount(mount))
+        self._current_position = self._deck_from_smoothie(backend_pos)
 
     @_log_call
-    async def home_z(self):
-        pass
+    async def home(self):
+        """ Home the entire robot and initialize current position.
+        """
+        # Initialize/update current_position
+        smoothie_pos = self._backend.home()
+        self._current_position = self._deck_from_smoothie(smoothie_pos)
+
+    def _deck_from_smoothie(
+            self, smoothie_pos: Dict[str, float]) -> Dict[Axis, float]:
+        """ Build a deck-abs position store from the smoothie's position
+
+        This should take the smoothie style position {'X': float, etc}
+        and turn it into the position dict used here {Axis.X: float} in
+        deck-absolute coordinates. It runs the reverse deck transformation
+        for the axes that require it.
+
+        One piece of complexity is that if the gantry transformation includes
+        a transition between non parallel planes, the z position of the left
+        mount would depend on its actual position in deck frame, so we have
+        to apply the mount offset.
+
+        TODO: Figure out which frame the mount offset is measured in, because
+              if it's measured in the deck frame (e.g. by touching off points
+              on the deck) it has to go through the reverse transform to be
+              added to the smoothie coordinates here.
+        """
+        with_enum = {Axis[k]: v for k, v in smoothie_pos.items()}
+        other = {k: v for k, v in with_enum.items()
+                 if k not in Axis.gantry_axes()}
+        right = (with_enum[Axis.X], with_enum[Axis.Y],
+                 with_enum[Axis.by_mount(top_types.Mount.RIGHT)])
+        # Tell apply_transform to just do the change of base part of the
+        # transform rather than the full affine transform, because this is
+        # an offset
+        offset_in_smoothie = linal.apply_transform(
+            self.config.gantry_calibration,
+            self.config.mount_offset,
+            False)
+        left = (with_enum[Axis.X] + offset_in_smoothie[0],
+                with_enum[Axis.Y] + offset_in_smoothie[1],
+                with_enum[Axis.by_mount(top_types.Mount.LEFT)]
+                + offset_in_smoothie[2])
+        right_deck = linal.apply_reverse(self.config.gantry_calibration,
+                                         right)
+        left_deck = linal.apply_reverse(self.config.gantry_calibration,
+                                        left)
+        deck_pos = {Axis.X: right_deck[0],
+                    Axis.Y: right_deck[1],
+                    Axis.by_mount(top_types.Mount.RIGHT): right_deck[2],
+                    Axis.by_mount(top_types.Mount.LEFT): left_deck[2]}
+        deck_pos.update(other)
+        return deck_pos
+
+    def current_position(self, mount: top_types.Mount) -> Dict[Axis, float]:
+        """ Return the postion (in deck coords) of the critical point of the
+        specified mount.
+
+        This returns cached position to avoid hitting the smoothie driver
+        unless ``refresh`` is ``True``.
+        """
+        if mount == mount.RIGHT:
+            offset = top_types.Point(0, 0, 0)
+        else:
+            offset = top_types.Point(*self.config.mount_offset)
+        z_ax = Axis.by_mount(mount)
+        return {
+            Axis.X: self._current_position[Axis.X] + offset[0],
+            Axis.Y: self._current_position[Axis.Y] + offset[1],
+            z_ax: self._current_position[z_ax] + offset[2]
+        }
 
     @_log_call
     async def move_to(
-            self, mount: types.Mount, abs_position: types.Point):
+            self, mount: top_types.Mount, abs_position: top_types.Point):
+        """ Move the critical point of the specified mount to a location
+        relative to the deck.
+
+        The critical point of the mount depends on the current status of
+        the mount:
+        - If the mount does not have anything attached, its critical point is
+          the bottom of the mount attach bracket.
+        - If the mount has a pipette attached and it is not known to have a
+          pipette tip, the critical point is the end of the nozzle of a single
+          pipette or the end of the backmost nozzle of a multipipette
+        - If the mount has a pipette attached and it is known to have a
+          pipette tip, the critical point is the end of the pipette tip for
+          a single pipette or the end of the tip of the backmost nozzle of a
+          multipipette
+        """
         if not self._current_position:
             raise MustHomeError
-        z_axis = _Axis.by_mount(mount)
-        try:
-            target_position = {_Axis.X.name: abs_position.x,
-                               _Axis.Y.name: abs_position.y,
-                               z_axis.name: abs_position.z}
-        except KeyError:
-            raise MustHomeError
+        z_axis = Axis.by_mount(mount)
+        if mount == top_types.Mount.LEFT:
+            offset = top_types.Point(*self.config.mount_offset)
+        else:
+            offset = top_types.Point(0, 0, 0)
+        target_position = OrderedDict(
+            ((Axis.X, abs_position.x - offset.x),
+             (Axis.Y, abs_position.y - offset.y),
+             (z_axis, abs_position.z - offset.z))
+        )
         await self._move(target_position)
 
     @_log_call
-    async def move_rel(self, mount: types.Mount, delta: types.Point):
+    async def move_rel(self, mount: top_types.Mount, delta: top_types.Point):
+        """ Move the critical point of the specified mount by a specified
+        displacement in a specified direction.
+        """
         if not self._current_position:
             raise MustHomeError
-        z_axis = _Axis.by_mount(mount)
+        z_axis = Axis.by_mount(mount)
         try:
-            target_position = \
-                {_Axis.X.name: self._current_position[_Axis.X.name] + delta.x,
-                 _Axis.Y.name: self._current_position[_Axis.Y.name] + delta.y,
-                 z_axis.name: self._current_position[z_axis.name] + delta.z}
+            target_position = OrderedDict(
+                ((Axis.X,
+                  self._current_position[Axis.X] + delta.x),
+                 (Axis.Y,
+                  self._current_position[Axis.Y] + delta.y),
+                 (z_axis,
+                  self._current_position[z_axis] + delta.z))
+                )
         except KeyError:
             raise MustHomeError
         await self._move(target_position)
 
-    async def _move(self, target_position: Dict[str, float]):
-        self._current_position.update(target_position)
+    async def _move(self, target_position: 'OrderedDict[Axis, float]'):
+        """ Worker function to apply robot motion.
+
+        Robot motion means the kind of motions that are relevant to the robot,
+        i.e. only one pipette plunger and mount move at the same time, and an
+        XYZ move in the coordinate frame of one of the pipettes.
+
+        ``target_position`` should be an ordered dict (ordered by XYZABC)
+        containing any specified XY motion and at most one of a ZA or BC
+        components. The frame in which to move is identified by the presence of
+        (ZA) or (BC).
+        """
+        # Transform only the x, y, and (z or a) axes specified since this could
+        # get the b or c axes as well
+        to_transform = tuple((tp
+                              for ax, tp in target_position.items()
+                              if ax in Axis.gantry_axes()))
+
+        # Pre-fill the dict we’ll send to the backend with the axes we don’t
+        # need to transform
+        smoothie_pos = {ax.name: pos for ax, pos in target_position.items()
+                        if ax not in Axis.gantry_axes()}
+
+        # We’d better have all of (x, y, (z or a)) or none of them since the
+        # gantry transform requires them all
+        if len(to_transform) != 3:
+            self._log.error("Move derived {} axes to transform from {}"
+                            .format(len(to_transform), target_position))
+            raise ValueError("Moves must specify either exactly an x, y, and "
+                             "(z or a) or none of them")
+
+        # Type ignored below because linal.apply_transform (rightly) specifies
+        # Tuple[float, float, float] and the implied type from
+        # target_position.items() is (rightly) Tuple[float, ...] with unbounded
+        # size; unfortunately, mypy can’t quite figure out the length check
+        # above that makes this OK
+        transformed = linal.apply_transform(  # type: ignore
+            self.config.gantry_calibration, to_transform)
+
+        # Since target_position is an OrderedDict with the axes ordered by
+        # (x, y, z, a, b, c), and we’ll only have one of a or z (as checked
+        # by the len(to_transform) check above) we can use an enumerate to
+        # fuse the specified axes and the transformed values back together
+        for idx, ax in enumerate(target_position.keys()):
+            if ax in Axis.gantry_axes():
+                smoothie_pos[ax.name] = transformed[idx]
         try:
-            self._backend.move(target_position)
+            self._backend.move(smoothie_pos)
         except Exception:
             self._log.exception('Move failed')
             self._current_position.clear()
             raise
+        else:
+            self._current_position.update(target_position)
 
     # Gantry/frame (i.e. not pipette) config API
+    @property
+    def config(self) -> robot_configs.robot_config:
+        return self._config
+
+    async def update_deck_calibration(self, new_transform):
+        pass
+
     @_log_call
     async def head_speed(self, combined_speed=None,
                          x=None, y=None, z=None, a=None, b=None, c=None):

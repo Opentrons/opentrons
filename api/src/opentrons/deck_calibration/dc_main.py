@@ -14,7 +14,7 @@ from numpy import dot, array
 from opentrons import robot, instruments
 from opentrons.config import robot_configs
 from opentrons.util.calibration_functions import probe_instrument
-from opentrons.deck_calibration.linal import solve, add_z, apply_transform
+from opentrons.util.linal import solve, add_z, apply_transform
 from opentrons.deck_calibration import *
 
 # TODO: add tests for methods, split out current point behavior per comment
@@ -329,7 +329,7 @@ class CLITool:
             points,
             # 'Smoothie: {}'.format(self.current_position),
             'World: {}'.format(apply_transform(
-                self._calibration_matrix, self.current_position)),
+                inv(self._calibration_matrix), self.current_position)),
             'Step: {}'.format(self.current_step()),
             'Message: {}'.format(msg)
         ])

@@ -2,11 +2,12 @@ import asyncio
 import os
 import fcntl
 import threading
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from opentrons.util import environment
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.config import robot_configs
 from . import modules
+from .types import Axis
 
 
 _lock = threading.Lock()
@@ -74,10 +75,14 @@ class Controller:
         self._smoothie_driver.move(
             target_position, home_flagged_axes=home_flagged_axes)
 
-    def home(self):
-        return self._smoothie_driver.home()
+    def home(self, axes: List[Axis] = None) -> Dict[str, float]:
+        if axes:
+            args: Tuple[Any, ...] = (''.join([ax.name for ax in axes]),)
+        else:
+            args = tuple()
+        return self._smoothie_driver.home(*args)
 
-    def get_attached_instruments(self, mount):
+    def get_attached_instruments(self, mount) -> Optional[str]:
         return self._smoothie_driver.read_pipette_model(mount.name.lower())
 
     def get_attached_modules(self) -> List[Tuple[str, str]]:
