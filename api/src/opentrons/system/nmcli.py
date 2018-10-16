@@ -246,7 +246,7 @@ def _add_security_type_to_scan(scan_out: Dict[str, Any]) -> Dict[str, Any]:
     sec = scan_out['security']
     if '802.1X' in sec:
         scan_out['securityType'] = 'wpa-eap'
-    elif 'WPA2'in sec:
+    elif 'WPA2' in sec:
         scan_out['securityType'] = 'wpa-psk'
     elif '' is sec:
         scan_out['securityType'] = 'none'
@@ -274,8 +274,10 @@ async def available_ssids() -> List[Dict[str, Any]]:
     output = _dict_from_terse_tabular(
         fields, out,
         transformers={'signal': lambda s: int(s) if s.isdigit() else None,
-                      'active': lambda s: s.lower() == 'yes'})
-    return [_add_security_type_to_scan(ssid) for ssid in output]
+                      'active': lambda a: a.lower() == 'yes',
+                      'ssid': lambda s: s if s != '--' else None})
+
+    return [_add_security_type_to_scan(nw) for nw in output if nw['ssid']]
 
 
 async def is_connected() -> str:
