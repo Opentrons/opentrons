@@ -255,11 +255,12 @@ export const makeGetRobotUpdateInfo = () => {
     RobotUpdateInfo> = createSelector(
     (_, robot) => getRobotApiVersion(robot),
     getApiUpdateVersion,
-    (current, updateVersion) => {
+    (currentVersion, updateVersion) => {
+      const current = semver.valid(currentVersion)
       const upgrade = current && semver.gt(updateVersion, current)
       const downgrade = current && semver.lt(updateVersion, current)
       let type
-      if (!current || (!upgrade && !downgrade)) {
+      if (!upgrade && !downgrade) {
         type = null
       } else {
         type = upgrade ? 'upgrade' : 'downgrade'

@@ -3,6 +3,7 @@
 import assert from 'assert'
 import fse from 'fs-extra'
 import path from 'path'
+import semver from 'semver'
 
 import pkg from '../package.json'
 import createLogger from './log'
@@ -71,6 +72,9 @@ function getVersionFromFilename (filename: string): string {
     shortLabel && labelVersion
       ? `-${SHORT_LABEL_TO_LABEL[shortLabel]}.${labelVersion}`
       : ''
+  const version = `${baseVersion}${label}`
 
-  return `${baseVersion}${label}`
+  assert(semver.valid(version), `"${version}" is not valid semver`)
+
+  return version
 }

@@ -8,6 +8,7 @@ import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
 import {createSelector} from 'reselect'
+import semver from 'semver'
 
 // TODO(mc, 2018-10-10): fix circular dependency with RPC API client
 // that requires us to bypass the robot entry point here
@@ -130,8 +131,8 @@ export const getConnectedRobot: GetConnectedRobot = createSelector(
 )
 
 export const getRobotApiVersion = (robot: AnyRobot): ?string =>
-  (robot.serverHealth && robot.serverHealth.apiServerVersion) ||
-  (robot.health && robot.health.api_version)
+  (robot.serverHealth && semver.valid(robot.serverHealth.apiServerVersion)) ||
+  (robot.health && semver.valid(robot.health.api_version))
 
 export const getRobotFirmwareVersion = (robot: AnyRobot): ?string =>
   (robot.serverHealth && robot.serverHealth.smoothieVersion) ||
