@@ -8,7 +8,7 @@ import MixHeader from './MixHeader'
 import PauseStepItems from './PauseStepItems'
 import StepDescription from '../StepDescription'
 import {stepIconsByType, type StepIdType} from '../../form-types'
-import type {Labware} from '../../labware-ingred'
+import type {Labware} from '../../labware-ingred/types'
 import type {
   SubstepIdentifier,
   StepItemData,
@@ -28,7 +28,7 @@ type StepItemProps = {
   hoveredSubstep: ?SubstepIdentifier,
   ingredNames: WellIngredientNames,
 
-  getLabware: (labwareId: ?string) => Labware,
+  getLabware: (labwareId: ?string) => ?Labware,
   handleSubstepHover: SubstepIdentifier => mixed,
   onStepClick?: (event?: SyntheticEvent<>) => mixed,
   onStepItemCollapseToggle?: (event?: SyntheticEvent<>) => mixed,
@@ -103,8 +103,8 @@ function getStepItemContents (stepItemProps: StepItemProps) {
       formData.stepType === 'distribute'
     )
   ) {
-    const sourceLabware= getLabware(formData['aspirate_labware'])
-    const destLabware= getLabware(formData['dispense_labware'])
+    const sourceLabware = getLabware(formData['aspirate_labware'])
+    const destLabware = getLabware(formData['dispense_labware'])
 
     result.push(
       <AspirateDispenseHeader

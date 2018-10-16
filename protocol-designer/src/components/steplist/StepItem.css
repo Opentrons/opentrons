@@ -129,3 +129,16 @@
 .multi_substep_header {
   font-style: italic;
 }
+
+.labware_type {
+  color: var(--c-med-gray);
+  margin-left: 1rem;
+}
+
+.labware_tooltip_contents {
+  margin: 0.5rem;
+}
+
+.labware_display_name {
+  cursor: default;
+}

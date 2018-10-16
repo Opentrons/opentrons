@@ -61,7 +61,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     // user is not hovering on substep.
     hovered: (hoveredStep === stepId) && !hoveredSubstep,
 
-    getLabware: (labwareId: ?string) => labwareId && labwareIngredSelectors.getLabware(state)[labwareId],
+    getLabware: (labwareId: ?string) => labwareId ? labwareIngredSelectors.getLabware(state)[labwareId] : null,
     ingredNames: labwareIngredSelectors.getIngredientNames(state),
   }
 }
