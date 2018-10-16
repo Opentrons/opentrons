@@ -2,6 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import {connect} from 'react-redux'
+import round from 'lodash/round'
 import {
   Modal,
   OutlineButton,
@@ -25,6 +26,7 @@ import styles from './TipPositionInput.css'
 
 const SMALL_STEP_MM = 1
 const LARGE_STEP_MM = 10
+const DECIMALS_ALLOWED = 1
 
 type DP = { updateValue: (string) => mixed }
 
@@ -37,10 +39,10 @@ type OP = {
 }
 
 type Props = OP & DP
-type State = { value: string}
+type State = { value: string }
 
-const formatValue = (value: mixed) => (
-  parseFloat(value).toFixed(1)
+const formatValue = (value: number | string): string => (
+  String(round(Number(value), DECIMALS_ALLOWED))
 )
 
 class TipPositionModal extends React.Component<Props, State> {
@@ -75,14 +77,14 @@ class TipPositionModal extends React.Component<Props, State> {
   }
   handleChange = (e: SyntheticEvent<HTMLSelectElement>) => {
     const {value} = e.currentTarget
-    const valueFloat = formatValue(value)
+    const valueFloat = Number(formatValue(value))
     const maximumHeightMM = (this.props.wellHeightMM * 2)
 
     if (!value) {
       this.setState({value})
-    } else if (Number(valueFloat) > maximumHeightMM) {
+    } else if (valueFloat > maximumHeightMM) {
       this.setState({value: formatValue(maximumHeightMM)})
-    } else if (Number(valueFloat) >= 0) {
+    } else if (valueFloat >= 0) {
       const numericValue = value.replace(/[^.0-9]/, '')
       this.setState({value: numericValue.replace(/(\d*[.]{1}\d{1})(\d*)/, (match, group1) => group1)})
     } else {

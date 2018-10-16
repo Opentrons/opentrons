@@ -12,6 +12,7 @@ export function formatVolume (inputVolume: ?string | ?number, sigDigits?: number
   return inputVolume || ''
 }
 
+const PERCENTAGE_DECIMALS_ALLOWED = 1
 export const formatPercentage = (part: number, total: number): string => {
-  return `${Number((part / total) * 100).toFixed(1)}%`
+  return `${round((part / total) * 100, PERCENTAGE_DECIMALS_ALLOWED)}%`
 }
