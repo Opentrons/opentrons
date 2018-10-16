@@ -1,3 +1,5 @@
 # Set the default behavior, in case people don't have core.autocrlf set.
 * text=auto
-api/opentrons/resources/smoothie*.hex -text
+# These files are binary and line endings should be left untouched
+*.hex binary
+*.bat binary
