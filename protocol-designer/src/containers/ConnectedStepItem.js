@@ -26,7 +26,7 @@ type SP = {|
   selected: $PropertyType<Props, 'selected'>,
   hovered: $PropertyType<Props, 'hovered'>,
   hoveredSubstep: $PropertyType<Props, 'hoveredSubstep'>,
-  getLabwareName: $PropertyType<Props, 'getLabwareName'>,
+  getLabware: $PropertyType<Props, 'getLabware'>,
   ingredNames: $PropertyType<Props, 'ingredNames'>,
 |}
 
@@ -61,7 +61,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     // user is not hovering on substep.
     hovered: (hoveredStep === stepId) && !hoveredSubstep,
 
-    getLabwareName: (labwareId: ?string) => labwareId && labwareIngredSelectors.getLabwareNames(state)[labwareId],
+    getLabware: (labwareId: ?string) => labwareId && labwareIngredSelectors.getLabware(state)[labwareId],
     ingredNames: labwareIngredSelectors.getIngredientNames(state),
   }
 }
