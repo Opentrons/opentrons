@@ -69,18 +69,31 @@ describe('server API client', () => {
 
       // test upgrade available
       robot = setCurrent(robot, '3.0.0')
-      expect(getRobotUpdateInfo(state, robot)).toEqual({version, type: 'upgrade'})
+      expect(getRobotUpdateInfo(state, robot)).toEqual({
+        version,
+        type: 'upgrade',
+      })
 
       // test downgrade
       robot = setCurrent(robot, '5.0.0')
-      expect(getRobotUpdateInfo(state, robot)).toEqual({version, type: 'downgrade'})
+      expect(getRobotUpdateInfo(state, robot)).toEqual({
+        version,
+        type: 'downgrade',
+      })
 
       // test no upgrade
       robot = setCurrent(robot, '4.0.0')
       expect(getRobotUpdateInfo(state, robot)).toEqual({version, type: null})
 
+      // test bad version string
+      robot = setCurrent(robot, 'not available')
+      expect(getRobotUpdateInfo(state, robot)).toEqual({version, type: null})
+
       // test unknown robot
-      expect(getRobotUpdateInfo(state, {name: 'foo'})).toEqual({version, type: null})
+      expect(getRobotUpdateInfo(state, {name: 'foo'})).toEqual({
+        version,
+        type: null,
+      })
     })
 
     test('makeGetRobotUpdateRequest', () => {
@@ -192,11 +205,7 @@ describe('server API client', () => {
       })
 
       return fetchIgnoredUpdate(robot)(() => {}).then(() =>
-        expect(client).toHaveBeenCalledWith(
-          robot,
-          'GET',
-          'update/ignore'
-        )
+        expect(client).toHaveBeenCalledWith(robot, 'GET', 'update/ignore')
       )
     })
 
@@ -246,12 +255,9 @@ describe('server API client', () => {
       })
 
       return setIgnoredUpdate(robot, availableUpdate)(() => {}).then(() =>
-        expect(client).toHaveBeenCalledWith(
-          robot,
-          'POST',
-          'update/ignore',
-          {version: availableUpdate}
-        )
+        expect(client).toHaveBeenCalledWith(robot, 'POST', 'update/ignore', {
+          version: availableUpdate,
+        })
       )
     })
 

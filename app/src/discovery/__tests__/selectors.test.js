@@ -362,6 +362,26 @@ describe('discovery selectors', () => {
       expected: null,
     },
     {
+      name: 'getRobotApiVersion returns API health if serverHealth invalid',
+      // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
+      state: {
+        serverHealth: {apiServerVersion: 'not available'},
+        health: {api_version: '4.5.6'},
+      },
+      selector: discovery.getRobotApiVersion,
+      expected: '4.5.6',
+    },
+    {
+      name: 'getRobotApiVersion returns null if all healths invalid',
+      // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
+      state: {
+        serverHealth: {apiServerVersion: 'not available'},
+        health: {api_version: 'also not available'},
+      },
+      selector: discovery.getRobotApiVersion,
+      expected: null,
+    },
+    {
       name: 'getRobotFirmwareVersion returns serverHealth.smoothieVersion',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: {
