@@ -32,7 +32,7 @@ describe('DELETE_INGREDIENT action', () => {
         wellDetailsByLocation: null,
         concentration: '50 mol/ng',
         description: '',
-        individualize: false,
+        serialize: false,
       },
       '4': 'blah',
     }
@@ -108,14 +108,14 @@ describe.skip('COPY_LABWARE action', () => {
         wellDetailsByLocation: null,
         concentration: '50 mol/ng',
         description: '',
-        individualize: false,
+        serialize: false,
       },
       ingred4: {
         name: 'Other Ingred',
         wellDetailsByLocation: null,
         concentration: '100%',
         description: '',
-        individualize: false,
+        serialize: false,
       },
     }
 
@@ -168,7 +168,7 @@ describe('EDIT_INGREDIENT action', () => {
     name: 'Cool Ingredient',
     volume: 250,
     description: 'far out!',
-    individualize: false,
+    serialize: false,
   }
 
   const resultingIngred = omit(ingredFields, ['volume'])
@@ -212,7 +212,7 @@ describe('EDIT_INGREDIENT action', () => {
         name: 'Cool Ingredient',
         volume: 250,
         description: 'far out!',
-        individualize: false,
+        serialize: false,
 
         containerId: 'container1Id',
         groupId: 'newIngredId',

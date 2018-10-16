@@ -7,7 +7,7 @@ type Props = {
   wellContent: {
     name: string,
     volume: number,
-    individualize: boolean,
+    serialize: boolean,
     wellName: string,
 
     concentration?: string,
@@ -25,7 +25,7 @@ export default function WellToolTip (props: Props) {
         <div>
           {wellContent.wellName}
         </div>
-        {wellContent.individualize && <div className={styles.instance_name}>
+        {wellContent.serialize && <div className={styles.instance_name}>
           {wellContent.name || ''} {wellContent.ingredientNum}
         </div>}
         <div>

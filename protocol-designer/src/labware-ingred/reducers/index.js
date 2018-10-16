@@ -6,6 +6,7 @@ import {createSelector} from 'reselect'
 
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
+import max from 'lodash/max'
 import pickBy from 'lodash/pickBy'
 import reduce from 'lodash/reduce'
 import isEmpty from 'lodash/isEmpty'
@@ -19,10 +20,10 @@ import {getIsTiprack} from '@opentrons/shared-data'
 import type {LabwareLiquidState} from '../../step-generation'
 
 import type {
-  IngredInputFields,
-  IngredientGroups,
+  IngredInputs,
+  LiquidGroupsById,
   AllIngredGroupFields,
-  IngredientInstance,
+  LiquidGroup,
   OrderedLiquids,
   Labware,
   LabwareTypeById,
@@ -31,7 +32,13 @@ import * as actions from '../actions'
 import {getPDMetadata} from '../../file-types'
 import type {BaseState, Selector, Options} from '../../types'
 import type {LoadFileAction} from '../../load-file'
-import type {MoveLabware, DeleteIngredient, EditIngredient} from '../actions'
+import type {
+  DeleteIngredient,
+  EditIngredient,
+  EditLiquidGroupAction,
+  MoveLabware,
+  SelectLiquidAction,
+} from '../actions'
 
 // external actions (for types)
 import typeof {openWellSelectionModal} from '../../well-selection/actions'
@@ -91,6 +98,20 @@ const drillDownLabwareId = handleActions({
 type ContainersState = {
   [id: string]: ?Labware,
 }
+
+export type SelectedLiquidGroupState = {liquidGroupId: ?string, newLiquidGroup?: true}
+const unselectedLiquidGroupState = {liquidGroupId: null}
+// This is only a concern of the liquid page.
+// null = nothing selected, newLiquidGroup: true means user is creating new liquid
+const selectedLiquidGroup = handleActions({
+  SELECT_LIQUID_GROUP: (state: SelectedLiquidGroupState, action: SelectLiquidAction): SelectedLiquidGroupState =>
+    ({liquidGroupId: action.payload}),
+  DESELECT_LIQUID_GROUP: () => unselectedLiquidGroupState,
+  CREATE_NEW_LIQUID_GROUP_FORM: (): SelectedLiquidGroupState =>
+    ({liquidGroupId: null, newLiquidGroup: true}),
+  NAVIGATE_TO_PAGE: () => unselectedLiquidGroupState, // clear selection on navigate
+  EDIT_LIQUID_GROUP: () => unselectedLiquidGroupState, // clear on form save
+}, unselectedLiquidGroupState)
 
 const initialLabwareState: ContainersState = {
   [FIXED_TRASH_ID]: {
@@ -190,13 +211,21 @@ export const savedLabware = handleActions({
   ),
 }, {})
 
-type IngredientsState = IngredientGroups
+type IngredientsState = LiquidGroupsById
 export const ingredients = handleActions({
+  EDIT_LIQUID_GROUP: (state: IngredientsState, action: EditLiquidGroupAction): IngredientsState => {
+    const {liquidGroupId} = action.payload
+    return {
+      ...state,
+      [liquidGroupId]: {...state[liquidGroupId], ...action.payload},
+    }
+  },
   EDIT_INGREDIENT: (state, action: EditIngredient) => {
-    const {groupId, description, individualize, name} = action.payload
-    const ingredFields: IngredientInstance = {
+    // TODO: Ian 2018-10-12 this is deprecated, remove when "add liquids to deck" modal is redone
+    const {groupId, description, serialize, name} = action.payload
+    const ingredFields: LiquidGroup = {
       description,
-      individualize,
+      serialize: Boolean(serialize),
       name,
     }
 
@@ -274,6 +303,7 @@ export type RootState = {|
   drillDownLabwareId: DrillDownLabwareId,
   containers: ContainersState,
   savedLabware: SavedLabwareState,
+  selectedLiquidGroup: SelectedLiquidGroupState,
   ingredients: IngredientsState,
   ingredLocations: LocationsState,
   renameLabwareFormMode: RenameLabwareFormModeState,
@@ -284,6 +314,7 @@ const rootReducer = combineReducers({
   modeLabwareSelection,
   moveLabwareMode,
   selectedContainerId,
+  selectedLiquidGroup,
   drillDownLabwareId,
   containers,
   savedLabware,
@@ -315,12 +346,17 @@ const getLabwareTypes: Selector<LabwareTypeById> = createSelector(
   )
 )
 
-const getIngredientGroups = (state: BaseState) => rootSelector(state).ingredients
+const getLiquidGroupsById = (state: BaseState) => rootSelector(state).ingredients
 const getIngredientLocations = (state: BaseState) => rootSelector(state).ingredLocations
 
+const getNextLiquidGroupId: Selector<string> = createSelector(
+  getLiquidGroupsById,
+  (_ingredGroups) => ((max(Object.keys(_ingredGroups).map(id => parseInt(id))) + 1) || 0).toString()
+)
+
 const getIngredientNames: Selector<{[ingredId: string]: string}> = createSelector(
-  getIngredientGroups,
-  ingredGroups => mapValues(ingredGroups, (ingred: IngredientInstance) => ingred.name)
+  getLiquidGroupsById,
+  ingredGroups => mapValues(ingredGroups, (ingred: LiquidGroup) => ingred.name)
 )
 
 const _loadedContainersBySlot = (containers: ContainersState) =>
@@ -382,6 +418,11 @@ const getSelectedContainerId: Selector<SelectedContainerId> = createSelector(
   rootState => rootState.selectedContainerId
 )
 
+const getSelectedLiquidGroupState: Selector<SelectedLiquidGroupState> = createSelector(
+  rootSelector,
+  rootState => rootState.selectedLiquidGroup
+)
+
 const getSelectedContainer: Selector<?Labware> = createSelector(
   getSelectedContainerId,
   getLabware,
@@ -411,11 +452,11 @@ const containersBySlot: Selector<ContainersBySlot> = createSelector(
 type IngredGroupFields = {
   [ingredGroupId: string]: {
     groupId: string,
-    ...IngredInputFields,
+    ...$Exact<IngredInputs>,
   },
 }
 const allIngredientGroupFields: Selector<AllIngredGroupFields> = createSelector(
-  getIngredientGroups,
+  getLiquidGroupsById,
   (ingreds) => reduce(
     ingreds,
     (acc: IngredGroupFields, ingredGroup: IngredGroupFields, ingredGroupId: string) => ({
@@ -425,7 +466,7 @@ const allIngredientGroupFields: Selector<AllIngredGroupFields> = createSelector(
 )
 
 const allIngredientNamesIds: BaseState => OrderedLiquids = createSelector(
-  getIngredientGroups,
+  getLiquidGroupsById,
   ingreds => Object.keys(ingreds).map(ingredId =>
       ({ingredientId: ingredId, name: ingreds[ingredId].name}))
 )
@@ -460,21 +501,23 @@ const getRenameLabwareFormMode = (state: BaseState) => rootSelector(state).renam
 
 const slotToMoveFrom = (state: BaseState) => rootSelector(state).moveLabwareMode
 
-const hasLiquid = (state: BaseState) => !isEmpty(getIngredientGroups(state))
+const hasLiquid = (state: BaseState) => !isEmpty(getLiquidGroupsById(state))
 
 // TODO: prune selectors
 export const selectors = {
   rootSelector,
 
-  getIngredientGroups,
+  getLiquidGroupsById,
   getIngredientLocations,
   getIngredientNames,
   getLabware,
   getLabwareNames,
   getLabwareTypes,
+  getNextLiquidGroupId,
   getSavedLabware,
   getSelectedContainer,
   getSelectedContainerId,
+  getSelectedLiquidGroupState,
   getDrillDownLabwareId,
 
   activeModals,

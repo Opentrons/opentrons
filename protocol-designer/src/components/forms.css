@@ -9,6 +9,12 @@
   box-shadow: 0 0.25rem 1rem 0 rgba(0, 0, 0, 0.25);
 }
 
+.header {
+  @apply --font-header-dark;
+
+  padding-bottom: 1rem;
+}
+
 /* NOTE: explicit column classes should only be used for forms with a layout
  * that doesn't match the layout of transfer/distribute/consolidate/mix.
  * Eg the Pause form is an example of an exceptional layout.
