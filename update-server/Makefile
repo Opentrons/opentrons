@@ -5,7 +5,7 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 
 python := pipenv run python
 pipenv_opts := --dev
-pipenv_opts += $(and $(CI),--ignore-pipfile)
+pipenv_opts += $(and $(CI),--keep-outdated)
 port ?= 34000
 
 # make bootstrap wheel file (= rather than := to expand at every use)
@@ -13,7 +13,7 @@ wheel = $(wildcard dist/*.whl)
 
 .PHONY: install
 install:
-	pipenv install $(pipenv_opts)
+	pipenv sync $(pipenv_opts)
 
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true

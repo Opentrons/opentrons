@@ -34,7 +34,7 @@ install: install-py install-js
 
 .PHONY: install-py
 install-py:
-	$(OT_PYTHON) -m pip install pipenv==11.6.8
+	$(OT_PYTHON) -m pip install pipenv==2018.10.9
 	$(MAKE) -C $(API_DIR) install
 	$(MAKE) -C $(UPDATE_SERVER_DIR) install
 
