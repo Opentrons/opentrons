@@ -34,7 +34,6 @@ type SP = {|
   internetStatus: ?InternetStatus,
   wifiNetwork: ?NetworkInterface,
   ethernetNetwork: ?NetworkInterface,
-  configInProgress: boolean,
   connectingTo: ?string,
 |}
 
@@ -58,13 +57,9 @@ function ConnectionCard (props: Props) {
     internetStatus,
     wifiNetwork,
     ethernetNetwork,
-    configInProgress,
     connectingTo,
   } = props
 
-  const connectMessage = connectingTo
-    ? `Attempting to connect to network ${connectingTo}`
-    : ''
   return (
     <RefreshCard title={TITLE} refresh={() => console.log('placeholder')}>
       <ConnectionStatusMessage
@@ -75,7 +70,11 @@ function ConnectionCard (props: Props) {
         <AvailableNetworks list={wifiList} />
       </ConnectionInfo>
       <ConnectionInfo connection={ethernetNetwork} title="USB" wired />
-      {configInProgress && <SpinnerModal message={connectMessage} />}
+      {connectingTo && (
+        <SpinnerModal
+          message={`Attempting to connect to network ${connectingTo}`}
+        />
+      )}
     </RefreshCard>
   )
 }
@@ -102,7 +101,6 @@ function makeMapStateToProps (): (State, OP) => SP {
       wifiNetwork: find(interfaces, {type: 'wifi'}),
       ethernetNetwork: find(interfaces, {type: 'ethernet'}),
       __featureEnabled: !!getIn(getConfig(state), __FEATURE_FLAG),
-      configInProgress: configureCall.inProgress,
       connectingTo,
     }
   }
