@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {Icon} from '@opentrons/components'
+import {Icon, HoverTooltip} from '@opentrons/components'
 import {PDListItem} from '../lists'
 import styles from './StepItem.css'
 
@@ -22,13 +22,21 @@ function AspirateDispenseHeader (props: AspirateDispenseHeaderProps) {
       </li>
 
       <PDListItem className={cx(styles.step_subitem_column_header, styles.emphasized_cell)}>
-        <span>{sourceLabwareName}</span>
+        <HoverTooltip tooltipComponent={<LabwareTooltipContents name={sourceLabwareName} />}>
+          {(hoverTooltipHandlers) => <span {...hoverTooltipHandlers}>{sourceLabwareName}</span>}
+        </HoverTooltip>
         {/* This is always a "transfer icon" (arrow pointing right) for any step: */}
         <Icon name='ot-transfer' />
-        <span>{destLabwareName}</span>
+        <HoverTooltip tooltipComponent={<LabwareTooltipContents name={destLabwareName} />}>
+          {(hoverTooltipHandlers) => <span {...hoverTooltipHandlers}>{destLabwareName}</span>}
+        </HoverTooltip>
       </PDListItem>
     </React.Fragment>
   )
 }
+
+const LabwareTooltipContents = () => (
+
+)
 
 export default AspirateDispenseHeader
