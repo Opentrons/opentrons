@@ -9,8 +9,9 @@ import {getConfig} from '../../config'
 import {
   makeGetRobotNetworkingStatus,
   makeGetRobotWifiList,
+  makeGetRobotWifiConfigure,
 } from '../../http-api-client'
-import {RefreshCard} from '@opentrons/components'
+import {RefreshCard, SpinnerModal} from '@opentrons/components'
 import {
   ConnectionStatusMessage,
   ConnectionInfo,
@@ -23,6 +24,7 @@ import type {
   WifiNetworkList,
   InternetStatus,
   NetworkInterface,
+  ConfigureWifiCall,
 } from '../../http-api-client'
 
 type OP = {robot: ViewableRobot}
@@ -33,6 +35,7 @@ type SP = {|
   internetStatus: ?InternetStatus,
   wifiNetwork: ?NetworkInterface,
   ethernetNetwork: ?NetworkInterface,
+  configureRequest: ConfigureWifiCall,
 |}
 
 type Props = {...$Exact<OP>, ...SP}
@@ -49,10 +52,24 @@ function ConnectionCard (props: Props) {
   // TODO(mc, 2018-10-15): remove feature flag
   if (!props.__featureEnabled) return null
 
-  const {robot, wifiList, internetStatus, wifiNetwork, ethernetNetwork} = props
+  const {
+    robot,
+    wifiList,
+    internetStatus,
+    wifiNetwork,
+    ethernetNetwork,
+    configureRequest: {inProgress: configInProgress, request},
+  } = props
 
+  const connectMessage = request
+    ? `Attempting to connect to network ${request.ssid}`
+    : 'Attempting to connect to network'
   return (
-    <RefreshCard title={TITLE} refresh={() => console.log('placeholder')}>
+    <RefreshCard
+      title={TITLE}
+      refresh={() => console.log('placeholder')}
+      refreshing={configInProgress}
+    >
       <ConnectionStatusMessage
         type={robot.local ? 'USB' : 'Wi-Fi'}
         status={internetStatus}
@@ -61,6 +78,7 @@ function ConnectionCard (props: Props) {
         <AvailableNetworks list={wifiList} />
       </ConnectionInfo>
       <ConnectionInfo connection={ethernetNetwork} title="USB" wired />
+      {configInProgress && <SpinnerModal message={connectMessage} />}
     </RefreshCard>
   )
 }
@@ -75,13 +93,14 @@ function makeMapStateToProps (): (State, OP) => SP {
     const {response: listResponse} = getWifiListCall(state, robot)
     const internetStatus = statusResponse && statusResponse.status
     const interfaces = statusResponse && statusResponse.interfaces
-
+    const getWifiConfigure = makeGetRobotWifiConfigure()
     return {
       internetStatus,
       wifiList: listResponse && listResponse.list,
       wifiNetwork: find(interfaces, {type: 'wifi'}),
       ethernetNetwork: find(interfaces, {type: 'ethernet'}),
       __featureEnabled: !!getIn(getConfig(state), __FEATURE_FLAG),
+      configureRequest: getWifiConfigure(state, ownProps.robot),
     }
   }
 }
