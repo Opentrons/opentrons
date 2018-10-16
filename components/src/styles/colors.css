@@ -7,6 +7,8 @@
   /* grays */
   --c-dark-gray: #4a4a4a;
   --c-med-gray: #9b9b9b;
+
+  /* TODO(mc, 2018-10-25): light gray should be e6e6e6 */
   --c-light-gray: #e5e2e2;
   --c-charcoal: #979797;
   --c-near-black: #a4a4a4;

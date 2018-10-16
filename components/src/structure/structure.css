@@ -79,7 +79,7 @@
 /* Card and card content styles */
 .card {
   position: relative;
-  overflow: auto;
+  overflow: visible;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.33);
   font-size: var(--fs-body-2);
 }
@@ -87,7 +87,8 @@
 .card_title {
   @apply --font-header-dark;
 
-  margin: 1rem 1rem 0;
+  margin: 0;
+  padding: 1rem 1rem 0;
   font-weight: var(--fw-regular);
   text-transform: capitalize;
 }

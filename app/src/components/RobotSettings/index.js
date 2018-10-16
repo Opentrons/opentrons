@@ -6,6 +6,7 @@ import {CardContainer, CardRow, CardColumn} from '../layout'
 import StatusCard from './StatusCard'
 import InformationCard from './InformationCard'
 import ControlsCard from './ControlsCard'
+import ConnectionCard from './ConnectionCard'
 import ConnectivityCard from './ConnectivityCard'
 import AdvancedSettingsCard from './AdvancedSettingsCard'
 import ConnectAlertModal from './ConnectAlertModal'
@@ -33,6 +34,9 @@ export default function RobotSettings (props: Props) {
       </CardRow>
       <CardRow>
         <ControlsCard robot={robot} calibrateDeckUrl={calibrateDeckUrl} />
+      </CardRow>
+      <CardRow>
+        <ConnectionCard robot={robot} />
       </CardRow>
       <CardRow>
         <CardColumn>

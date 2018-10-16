@@ -49,3 +49,57 @@
     margin-bottom: 0.5rem;
   }
 }
+
+.connection_status {
+  @apply --font-body-1-dark;
+
+  padding: 1rem;
+  border-bottom: var(--bd-light);
+  line-height: 2;
+}
+
+/* TODO(mc, 2018-10-15): switch wifi select/options to flex ASAP */
+.wifi_dropdown {
+  max-width: 75%;
+}
+
+.wifi_option {
+  @apply --font-body-1-dark;
+}
+
+.wifi_option_icon,
+.wifi_option_icon_right {
+  display: inline-block;
+  height: 1rem;
+  width: 1rem;
+  line-height: 0;
+}
+
+.wifi_option_icon {
+  float: left;
+  padding-right: 0.25rem;
+}
+
+.wifi_option_icon_right {
+  float: right;
+  padding-left: 0.25rem;
+}
+
+.connection_label {
+  @apply --font-body-1-dark;
+
+  font-weight: var(--fw-semibold);
+  padding-bottom: 0.25rem;
+}
+
+.wireless_info,
+.wired_info {
+  @apply --font-body-1-dark;
+
+  text-align: left;
+  line-height: 2;
+}
+
+.wireless_info {
+  padding-top: 1rem;
+}
