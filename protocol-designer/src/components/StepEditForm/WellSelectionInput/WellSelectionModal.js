@@ -63,7 +63,7 @@ class WellSelectionModal extends React.Component<Props, State> {
   }
 
   deselectWells = (wells: Wells) => {
-    this.setState({selectedWells: omit(this.state.selectedWells, Object.keys(wells))})
+    this.setState({selectedWells: omit(this.state.selectedWells, Object.keys(wells)), highlightedWells: {}})
   }
 
   handleSave = () => {
