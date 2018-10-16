@@ -23,7 +23,7 @@ function mapStateToProps (state: BaseState): SP {
 
   return {
     renameLabwareFormMode: selectors.getRenameLabwareFormMode(state),
-    LiquidGroupsById: selectors.getLiquidGroupsById(state),
+    liquidGroupsById: selectors.getLiquidGroupsById(state),
     labwareWellContents: (container && selectors.getIngredientLocations(state)[container.id]) || {},
     selectedIngredientGroupId: wellSelectionSelectors.getSelectedWellsCommonIngredId(state),
     selected: false,

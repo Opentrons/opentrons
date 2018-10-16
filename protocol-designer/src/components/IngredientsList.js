@@ -148,7 +148,7 @@ function IngredIndividual (props: IndividProps) {
 
 type Props = {
   ...CommonProps,
-  LiquidGroupsById: LiquidGroupsById,
+  liquidGroupsById: LiquidGroupsById,
   labwareWellContents: SingleLabwareLiquidState,
   selectedIngredientGroupId: ?string,
   renameLabwareFormMode: boolean,
@@ -158,7 +158,7 @@ type Props = {
 export default function IngredientsList (props: Props) {
   const {
     labwareWellContents,
-    LiquidGroupsById,
+    liquidGroupsById,
     editModeIngredientGroup,
     deleteIngredient,
     selectedIngredientGroupId,
@@ -177,12 +177,12 @@ export default function IngredientsList (props: Props) {
           onClick={openRenameLabwareForm}
         />
 
-        {Object.keys(LiquidGroupsById).map((groupIdForCard) =>
+        {Object.keys(liquidGroupsById).map((groupIdForCard) =>
           <IngredGroupCard key={groupIdForCard}
             editModeIngredientGroup={editModeIngredientGroup}
             deleteIngredient={deleteIngredient}
             labwareWellContents={labwareWellContents}
-            ingredGroup={LiquidGroupsById[groupIdForCard]}
+            ingredGroup={liquidGroupsById[groupIdForCard]}
             groupId={groupIdForCard}
             selected={selectedIngredientGroupId === groupIdForCard}
           />)

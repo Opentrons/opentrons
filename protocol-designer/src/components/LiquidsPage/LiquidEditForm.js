@@ -61,8 +61,8 @@ class LiquidEditForm extends React.Component<Props, State> {
 
   disableSave = () => {
     const hasChanges = Object.keys(this.state).some(field =>
-      (this.state[field] || null) !== (this.props[field]) || null)
-    console.log(this.props, this.state)
+      (this.state[field] || null) !== (this.props[field] || null)
+    )
     return !hasChanges
   }
 
