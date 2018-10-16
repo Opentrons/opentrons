@@ -24,7 +24,6 @@ import type {
   WifiNetworkList,
   InternetStatus,
   NetworkInterface,
-  ConfigureWifiCall,
 } from '../../http-api-client'
 
 type OP = {robot: ViewableRobot}
@@ -35,7 +34,8 @@ type SP = {|
   internetStatus: ?InternetStatus,
   wifiNetwork: ?NetworkInterface,
   ethernetNetwork: ?NetworkInterface,
-  configureRequest: ConfigureWifiCall,
+  configInProgress: boolean,
+  connectingTo: ?string,
 |}
 
 type Props = {...$Exact<OP>, ...SP}
@@ -58,18 +58,15 @@ function ConnectionCard (props: Props) {
     internetStatus,
     wifiNetwork,
     ethernetNetwork,
-    configureRequest: {inProgress: configInProgress, request},
+    configInProgress,
+    connectingTo,
   } = props
 
-  const connectMessage = request
-    ? `Attempting to connect to network ${request.ssid}`
-    : 'Attempting to connect to network'
+  const connectMessage = connectingTo
+    ? `Attempting to connect to network ${connectingTo}`
+    : ''
   return (
-    <RefreshCard
-      title={TITLE}
-      refresh={() => console.log('placeholder')}
-      refreshing={configInProgress}
-    >
+    <RefreshCard title={TITLE} refresh={() => console.log('placeholder')}>
       <ConnectionStatusMessage
         type={robot.local ? 'USB' : 'Wi-Fi'}
         status={internetStatus}
@@ -86,21 +83,27 @@ function ConnectionCard (props: Props) {
 function makeMapStateToProps (): (State, OP) => SP {
   const getNetworkingStatusCall = makeGetRobotNetworkingStatus()
   const getWifiListCall = makeGetRobotWifiList()
-
+  const getWifiConfigure = makeGetRobotWifiConfigure()
   return (state, ownProps) => {
     const {robot} = ownProps
     const {response: statusResponse} = getNetworkingStatusCall(state, robot)
     const {response: listResponse} = getWifiListCall(state, robot)
     const internetStatus = statusResponse && statusResponse.status
     const interfaces = statusResponse && statusResponse.interfaces
-    const getWifiConfigure = makeGetRobotWifiConfigure()
+    const configureCall = getWifiConfigure(state, robot)
+    const connectingTo =
+      configureCall.inProgress && configureCall.request
+        ? configureCall.request.ssid
+        : null
+
     return {
       internetStatus,
       wifiList: listResponse && listResponse.list,
       wifiNetwork: find(interfaces, {type: 'wifi'}),
       ethernetNetwork: find(interfaces, {type: 'ethernet'}),
       __featureEnabled: !!getIn(getConfig(state), __FEATURE_FLAG),
-      configureRequest: getWifiConfigure(state, ownProps.robot),
+      configInProgress: configureCall.inProgress,
+      connectingTo,
     }
   }
 }
