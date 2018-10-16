@@ -22,6 +22,7 @@ For more details, please see the full [technical change log][changelog]
 - Fixed a bug that was causing the analytics opt-in modal to fail to pop up on first app launch
 - Switched the labware table of the protocol info page to organize by type instead of nickname
 - Patched up some problems with robot discovery that could cause robots to fail to appear in environments with many robots present
+- Fixed an app crash if a robot reported an invalid server version
 
 ### New features
 
@@ -49,6 +50,7 @@ For more details, please see the full [technical change log][changelog]
 - We fixed a launch configuration problem with the Jupyter Notebook server that could result in a boot failure
 - The "Not Now" button for a robot update will now be remembered by the robot, so other users of your robot won't get an update pop-up if you choose to keep your robot at an older software version
 - The temperature module now correctly rounds its input to the nearest degree Celsius to reflect what it is physically capable of
+- The API will no longer show hidden networks as "--" in its available Wi-Fi networks list
 
 ### New features
 
