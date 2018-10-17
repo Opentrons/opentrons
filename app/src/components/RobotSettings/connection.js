@@ -2,6 +2,7 @@
 // UI components for displaying connection info
 import * as React from 'react'
 import Select from 'react-select'
+import find from 'lodash/find'
 import {Icon} from '@opentrons/components'
 import {CardContentHalf} from '../layout'
 import styles from './styles.css'
@@ -68,22 +69,37 @@ export function ConnectionInfo (props: ConnectionInfoProps) {
   )
 }
 
-type AvailableNetworksProps = {list: ?WifiNetworkList}
+type SelectNetworkOption = {
+  ...$Exact<WifiNetwork>,
+  value: string,
+  label: React.Node,
+}
 
-export function AvailableNetworks (props: AvailableNetworksProps) {
+type NetworkDropdownProps = {
+  list: ?WifiNetworkList,
+  value: ?string,
+  disabled: boolean,
+  onChange: SelectNetworkOption => mixed,
+}
+
+export function NetworkDropdown (props: NetworkDropdownProps) {
+  const {value, disabled, onChange} = props
   const list = props.list || []
   const options = list.map(NetworkOption)
+  const selectedOption = find(options, {value})
+
   return (
     <Select
-      value={options[0]}
       className={styles.wifi_dropdown}
-      onChange={e => console.log(e)}
+      isDisabled={disabled}
+      value={selectedOption}
+      onChange={onChange}
       options={options}
     />
   )
 }
 
-function NetworkOption (nw: WifiNetwork): {value: string, label: React.Node} {
+function NetworkOption (nw: WifiNetwork): SelectNetworkOption {
   const value = nw.ssid
   const connectedIcon = nw.active ? (
     <Icon name="check" className={styles.wifi_option_icon} />
@@ -121,7 +137,7 @@ function NetworkOption (nw: WifiNetwork): {value: string, label: React.Node} {
     </div>
   )
 
-  return {value, label}
+  return {...nw, value, label}
 }
 
 type NetworkAddressProps = {
