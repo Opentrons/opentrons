@@ -92,11 +92,13 @@ function makeSTP (): (State, OP) => SP {
     const {
       request: cfgRequest,
       inProgress: cfgInProgress,
+      error: cfgError,
     } = getWifiConfigureCall(state, robot)
 
     return {
-      connectingTo: cfgInProgress && cfgRequest ? cfgRequest.ssid : null,
       list: listResponse && listResponse.list,
+      connectingTo:
+        !cfgError && cfgInProgress && cfgRequest ? cfgRequest.ssid : null,
     }
   }
 }
