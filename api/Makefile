@@ -14,14 +14,14 @@ python := pipenv run python
 pip := pipenv run pip
 pytest := pipenv run py.test
 pipenv_opts := --dev
-pipenv_opts += $(and $(CI),--ignore-pipfile)
+pipenv_opts += $(and $(CI),--keep-outdated)
 
 tests ?= tests
 test_opts ?=
 
 .PHONY: install
 install:
-	pipenv install $(pipenv_opts)
+	pipenv sync $(pipenv_opts)
 
 .PHONY: all
 all: lint test
