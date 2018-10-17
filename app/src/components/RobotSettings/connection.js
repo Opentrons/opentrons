@@ -75,22 +75,25 @@ type SelectNetworkOption = {
   label: React.Node,
 }
 
-type AvailableNetworksProps = {
+type NetworkDropdownProps = {
   list: ?WifiNetworkList,
-  selected: ?string,
+  value: ?string,
+  disabled: boolean,
   onChange: SelectNetworkOption => mixed,
 }
 
-export function AvailableNetworks (props: AvailableNetworksProps) {
+export function NetworkDropdown (props: NetworkDropdownProps) {
+  const {value, disabled, onChange} = props
   const list = props.list || []
   const options = list.map(NetworkOption)
-  const selected = find(options, {value: props.selected})
+  const selectedOption = find(options, {value})
 
   return (
     <Select
-      value={selected}
       className={styles.wifi_dropdown}
-      onChange={props.onChange}
+      isDisabled={disabled}
+      value={selectedOption}
+      onChange={onChange}
       options={options}
     />
   )

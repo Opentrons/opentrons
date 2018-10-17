@@ -7,7 +7,7 @@ import find from 'lodash/find'
 
 import {getConfig} from '../../config'
 import {makeGetRobotNetworkingStatus} from '../../http-api-client'
-import {RefreshCard} from '@opentrons/components'
+import {Card} from '@opentrons/components'
 import SelectNetwork from './SelectNetwork'
 import {ConnectionStatusMessage, ConnectionInfo} from './connection'
 
@@ -38,7 +38,7 @@ function ConnectionCard (props: Props) {
   const {robot, internetStatus, wifiNetwork, ethernetNetwork} = props
 
   return (
-    <RefreshCard title={TITLE} refresh={() => console.log('placeholder')}>
+    <Card title={TITLE}>
       <ConnectionStatusMessage
         type={robot.local ? 'USB' : 'Wi-Fi'}
         status={internetStatus}
@@ -47,7 +47,7 @@ function ConnectionCard (props: Props) {
         <SelectNetwork key={robot.name} robot={robot} />
       </ConnectionInfo>
       <ConnectionInfo connection={ethernetNetwork} title="USB" wired />
-    </RefreshCard>
+    </Card>
   )
 }
 
