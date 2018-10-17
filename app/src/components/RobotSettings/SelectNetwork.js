@@ -82,7 +82,7 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
   }
 }
 
-function makeSTP (): (State, OP) => SP {
+function makeMapStateToProps (): (State, OP) => SP {
   const getWifiListCall = makeGetRobotWifiList()
   const getWifiConfigureCall = makeGetRobotWifiConfigure()
 
@@ -103,7 +103,7 @@ function makeSTP (): (State, OP) => SP {
   }
 }
 
-function DTP (dispatch: Dispatch, ownProps: OP): DP {
+function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   const {robot} = ownProps
 
   return {
@@ -117,6 +117,6 @@ function DTP (dispatch: Dispatch, ownProps: OP): DP {
 }
 
 export default connect(
-  makeSTP,
-  DTP
+  makeMapStateToProps,
+  mapDispatchToProps
 )(SelectNetwork)

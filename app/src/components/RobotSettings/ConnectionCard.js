@@ -28,7 +28,7 @@ type Props = {...$Exact<OP>, ...SP}
 
 const __FEATURE_FLAG = 'devInternal.manageRobotConnection.newCard'
 
-export default connect(makeSTP)(ConnectionCard)
+export default connect(makeMapStateToProps)(ConnectionCard)
 
 const TITLE = 'Connectivity'
 function ConnectionCard (props: Props) {
@@ -51,7 +51,7 @@ function ConnectionCard (props: Props) {
   )
 }
 
-function makeSTP (): (State, OP) => SP {
+function makeMapStateToProps (): (State, OP) => SP {
   const getNetworkingStatusCall = makeGetRobotNetworkingStatus()
 
   return (state, ownProps) => {
