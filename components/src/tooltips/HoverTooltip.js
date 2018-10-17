@@ -17,10 +17,12 @@ export type HoverTooltipHandlers = {
 type PopperProps = React.ElementProps<typeof Popper>
 type Props = {
   tooltipComponent?: React.Node,
+  portal?: React.ComponentType<*>,
   placement?: $PropertyType<PopperProps, 'placement'>,
   positionFixed?: $PropertyType<PopperProps, 'positionFixed'>,
   modifiers?: $PropertyType<PopperProps, 'modifiers'>,
   children: (?HoverTooltipHandlers) => React.Node,
+  forceOpen?: boolean, // NOTE: mostly for debugging/positioning
 }
 type State = {isOpen: boolean}
 class HoverTooltip extends React.Component<Props, State> {
@@ -52,7 +54,7 @@ class HoverTooltip extends React.Component<Props, State> {
           {({ref}) => this.props.children({ref, onMouseEnter: this.delayedOpen, onMouseLeave: this.delayedClose})}
         </Reference>
         {
-          this.state.isOpen &&
+          (this.props.forceOpen || this.state.isOpen) &&
           <Popper
             placement={this.props.placement}
             modifiers={{
@@ -66,12 +68,17 @@ class HoverTooltip extends React.Component<Props, State> {
               if (placement === 'left' || placement === 'right') {
                 arrowStyle = {top: '0.6em'}
               }
-              return (
+              const tooltipContents = (
                 <div ref={ref} className={styles.tooltip_box} style={style} data-placement={placement}>
                   {this.props.tooltipComponent}
                   <div className={cx(styles.arrow, styles[placement])} ref={arrowProps.ref} style={arrowStyle} />
                 </div>
               )
+              if (this.props.portal) {
+                const PortalClass = this.props.portal
+                return <PortalClass>{tooltipContents}</PortalClass>
+              }
+              return tooltipContents
             }}
           </Popper>
         }

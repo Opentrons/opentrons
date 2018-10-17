@@ -9,9 +9,12 @@ const LabwareTooltipContents = ({labware}: LabwareTooltipContentsProps) => {
   const displayName = labware && labwareToDisplayName(labware)
   return (
     <div className={styles.labware_tooltip_contents}>
-      <span>{displayName}</span>
+      <p className={styles.labware_name}>{displayName}</p>
       {labware && labware.type !== displayName &&
-        <span className={styles.labware_type}>{labware && labware.type}</span>
+        <React.Fragment>
+          <div className={styles.labware_spacer} />
+          <p>{labware && labware.type}</p>
+        </React.Fragment>
       }
     </div>
   )

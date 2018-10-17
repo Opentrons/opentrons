@@ -11,6 +11,7 @@ import IngredPill from './IngredPill'
 import {PDListItem} from '../lists'
 import styles from './StepItem.css'
 import {formatVolume, formatPercentage} from './utils'
+import {TooltipPortal} from './TooltipPortal'
 
 type SubstepRowProps = {|
   volume?: ?number | ?string,
@@ -77,6 +78,7 @@ export default function SubstepRow (props: SubstepRowProps) {
       onMouseEnter={props.onMouseEnter}
       onMouseLeave={props.onMouseLeave}>
       <HoverTooltip
+        portal={TooltipPortal}
         tooltipComponent={(
           <PillTooltipContents
             well={props.source ? props.source.well : ''}
@@ -94,6 +96,7 @@ export default function SubstepRow (props: SubstepRowProps) {
       <span className={styles.volume_cell}>{`${formatVolume(props.volume)} μL`}</span>
       <span className={styles.emphasized_cell}>{props.dest && props.dest.well}</span>
       <HoverTooltip
+        portal={TooltipPortal}
         tooltipComponent={(
           <PillTooltipContents
             well={props.dest ? props.dest.well : ''}

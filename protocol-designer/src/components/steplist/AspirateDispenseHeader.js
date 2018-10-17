@@ -7,6 +7,7 @@ import styles from './StepItem.css'
 import LabwareTooltipContents from './LabwareTooltipContents'
 import type {Labware} from '../../labware-ingred/types'
 import {labwareToDisplayName} from '../../labware-ingred/utils'
+import {TooltipPortal} from './TooltipPortal'
 
 type AspirateDispenseHeaderProps = {
   sourceLabware: ?Labware,
@@ -25,7 +26,9 @@ function AspirateDispenseHeader (props: AspirateDispenseHeaderProps) {
       </li>
 
       <PDListItem className={cx(styles.step_subitem_column_header, styles.emphasized_cell)}>
-        <HoverTooltip tooltipComponent={<LabwareTooltipContents labware={sourceLabware} />}>
+        <HoverTooltip
+          portal={TooltipPortal}
+          tooltipComponent={<LabwareTooltipContents labware={sourceLabware} />}>
           {(hoverTooltipHandlers) => (
             <span {...hoverTooltipHandlers} className={styles.labware_display_name}>
               {sourceLabware && labwareToDisplayName(sourceLabware)}
@@ -34,7 +37,9 @@ function AspirateDispenseHeader (props: AspirateDispenseHeaderProps) {
         </HoverTooltip>
         {/* This is always a "transfer icon" (arrow pointing right) for any step: */}
         <Icon name='ot-transfer' />
-        <HoverTooltip tooltipComponent={<LabwareTooltipContents labware={destLabware} />}>
+        <HoverTooltip
+          portal={TooltipPortal}
+          tooltipComponent={<LabwareTooltipContents labware={destLabware} />}>
           {(hoverTooltipHandlers) => (
             <span {...hoverTooltipHandlers} className={styles.labware_display_name}>
               {destLabware && labwareToDisplayName(destLabware)}
