@@ -9,12 +9,12 @@ type State = {hasRoot: boolean}
 const PORTAL_ROOT_ID = 'steplist-tooltip-portal-root'
 const getPortalRoot = () => global.document.getElementById(PORTAL_ROOT_ID)
 
-export function TooltipPortalRoot () {
+export function PortalRoot () {
   return <div id={PORTAL_ROOT_ID} />
 }
 
 // the children of Portal are rendered into the PortalRoot if it exists in DOM
-export class TooltipPortal extends React.Component<Props, State> {
+export class Portal extends React.Component<Props, State> {
   $root: ?Element
 
   constructor (props: Props) {

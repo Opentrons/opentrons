@@ -36,6 +36,11 @@ class HoverTooltip extends React.Component<Props, State> {
     this.state = {isOpen: false}
   }
 
+  componentWillUnmount () {
+    if (this.closeTimeout) clearTimeout(this.closeTimeout)
+    if (this.openTimeout) clearTimeout(this.openTimeout)
+  }
+
   delayedOpen = () => {
     if (this.closeTimeout) clearTimeout(this.closeTimeout)
     this.openTimeout = setTimeout(() => this.setState({isOpen: true}), OPEN_DELAY_MS)

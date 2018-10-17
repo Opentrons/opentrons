@@ -6,7 +6,7 @@ import {PDListItem} from '../lists'
 import styles from './StepItem.css'
 import type {Labware} from '../../labware-ingred/types'
 import LabwareTooltipContents from './LabwareTooltipContents'
-import {TooltipPortal} from './TooltipPortal'
+import {Portal} from './TooltipPortal'
 
 type Props = {
   volume: ?string,
@@ -19,7 +19,7 @@ export default function MixHeader (props: Props) {
   return (
     <PDListItem className={styles.step_subitem}>
       <HoverTooltip
-        portal={TooltipPortal}
+        portal={Portal}
         tooltipComponent={<LabwareTooltipContents labware={labware} />}>
         {(hoverTooltipHandlers) => (
           <span {...hoverTooltipHandlers} className={cx(styles.emphasized_cell, styles.labware_display_name)}>

@@ -13,7 +13,8 @@ import type {
   LocationLiquidState,
 } from './types'
 
-export {AIR} from '@opentrons/components'
+import {AIR} from '@opentrons/components'
+export {AIR}
 
 export function repeatArray<T> (array: Array<T>, repeats: number): Array<T> {
   return flatMap(range(repeats), (i: number): Array<T> => array)

@@ -3,8 +3,9 @@ import startCase from 'lodash/startCase'
 import {
   swatchColors,
   MIXED_WELL_COLOR,
-  AIR,
 } from '@opentrons/components'
+
+import {AIR} from './constants'
 
 export const humanizeLabwareType = startCase
 

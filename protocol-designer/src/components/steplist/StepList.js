@@ -10,7 +10,7 @@ import {END_TERMINAL_TITLE} from '../../constants'
 import {END_TERMINAL_ITEM_ID} from '../../steplist'
 
 import type {StepIdType} from '../../form-types'
-import {TooltipPortalRoot} from './TooltipPortal'
+import {PortalRoot} from './TooltipPortal'
 
 type StepListProps = {
   orderedSteps: Array<StepIdType>,
@@ -30,7 +30,7 @@ export default function StepList (props: StepListProps) {
         <StepCreationButton />
         <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />
       </SidePanel>
-      <TooltipPortalRoot />
+      <PortalRoot />
     </React.Fragment>
   )
 }
