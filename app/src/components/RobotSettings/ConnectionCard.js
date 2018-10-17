@@ -9,8 +9,9 @@ import {getConfig} from '../../config'
 import {
   makeGetRobotNetworkingStatus,
   makeGetRobotWifiList,
+  makeGetRobotWifiConfigure,
 } from '../../http-api-client'
-import {RefreshCard} from '@opentrons/components'
+import {RefreshCard, SpinnerModal} from '@opentrons/components'
 import {
   ConnectionStatusMessage,
   ConnectionInfo,
@@ -33,6 +34,7 @@ type SP = {|
   internetStatus: ?InternetStatus,
   wifiNetwork: ?NetworkInterface,
   ethernetNetwork: ?NetworkInterface,
+  connectingTo: ?string,
 |}
 
 type Props = {...$Exact<OP>, ...SP}
@@ -49,7 +51,14 @@ function ConnectionCard (props: Props) {
   // TODO(mc, 2018-10-15): remove feature flag
   if (!props.__featureEnabled) return null
 
-  const {robot, wifiList, internetStatus, wifiNetwork, ethernetNetwork} = props
+  const {
+    robot,
+    wifiList,
+    internetStatus,
+    wifiNetwork,
+    ethernetNetwork,
+    connectingTo,
+  } = props
 
   return (
     <RefreshCard title={TITLE} refresh={() => console.log('placeholder')}>
@@ -61,6 +70,11 @@ function ConnectionCard (props: Props) {
         <AvailableNetworks list={wifiList} />
       </ConnectionInfo>
       <ConnectionInfo connection={ethernetNetwork} title="USB" wired />
+      {connectingTo && (
+        <SpinnerModal
+          message={`Attempting to connect to network ${connectingTo}`}
+        />
+      )}
     </RefreshCard>
   )
 }
@@ -68,13 +82,18 @@ function ConnectionCard (props: Props) {
 function makeMapStateToProps (): (State, OP) => SP {
   const getNetworkingStatusCall = makeGetRobotNetworkingStatus()
   const getWifiListCall = makeGetRobotWifiList()
-
+  const getWifiConfigure = makeGetRobotWifiConfigure()
   return (state, ownProps) => {
     const {robot} = ownProps
     const {response: statusResponse} = getNetworkingStatusCall(state, robot)
     const {response: listResponse} = getWifiListCall(state, robot)
     const internetStatus = statusResponse && statusResponse.status
     const interfaces = statusResponse && statusResponse.interfaces
+    const configureCall = getWifiConfigure(state, robot)
+    const connectingTo =
+      configureCall.inProgress && configureCall.request
+        ? configureCall.request.ssid
+        : null
 
     return {
       internetStatus,
@@ -82,6 +101,7 @@ function makeMapStateToProps (): (State, OP) => SP {
       wifiNetwork: find(interfaces, {type: 'wifi'}),
       ethernetNetwork: find(interfaces, {type: 'ethernet'}),
       __featureEnabled: !!getIn(getConfig(state), __FEATURE_FLAG),
+      connectingTo,
     }
   }
 }

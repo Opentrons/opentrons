@@ -87,7 +87,7 @@
   flex-direction: column;
   font-style: italic;
   text-align: center;
-  z-index: 4;
+  z-index: 2;
 }
 
 .spinner_modal_icon {
