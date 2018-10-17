@@ -5,11 +5,8 @@ SHELL := /bin/bash
 # add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
 # and also make an explicit version for shx for use in the shell function,
 # where PATH won’t be propagated
-yarn_path := $(shell cd .. && yarn bin)
-PATH := ${yarn_path}:${PATH}
-# Make an explicit version of this for shx so it can be used in the $(shell)
-# function, where the PATH won’t be propagated
-SHX := ${yarn_path}/shx
+PATH := $(shell cd .. && yarn bin):${PATH}
+SHX := npx shx
 
 # make push wheel file (= rather than := to expand at every use)
 firmware = $(wildcard smoothie/*.hex)
@@ -43,7 +40,7 @@ OT_SHARED_DATA_SOURCES := $(filter %.json,$(shell ${SHX} find ../shared-data/))
 OT_RESOURCES := $(filter %,$(shell ${SHX} find src/opentrons/resources))
 OT_SOURCES := ${OT_PY_SOURCES} ${OT_SHARED_DATA_SOURCES} ${OT_RESOURCES}
 # And the tests
-OT_TEST_SOURCES := $(filter-out data/configs% configs/%.json,$(shell %{SHX} find tests/))
+OT_TEST_SOURCES := $(filter-out data/configs% configs/%.json,$(shell ${SHX} find tests/))
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
@@ -95,8 +92,8 @@ dev: local-install
 	$(python) -m opentrons.main -P 31950
 
 .PHONY: local-install
-local-install: wheel
-	$(pip) install --ignore-installed --no-deps dist/opentrons-*.whl
+local-install: ${WHEEL_FILE}
+	$(pip) install --ignore-installed --no-deps ${WHEEL_FILE}
 
 .PHONY: local-shell
 local-shell: local-install
@@ -105,7 +102,7 @@ local-shell: local-install
 .PHONY: push
 push: wheel
 	curl -X POST \
-		-H "Conte<nt-Type: multipart/form-data" \
+		-H "Content-Type: multipart/form-data" \
 		-F "whl=@${WHEEL_FILE}" \
 		http://$(host):31950/server/update
 
