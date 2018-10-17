@@ -7,6 +7,10 @@ minimalLabwareDef = {
         "y": 10,
         "z": 5
     },
+    "otId": "minimalLabwareDef",
+    "parameters": {
+        "isTiprack": False,
+    },
     "ordering": [["A1"], ["A2"]],
     "wells": {
         "A1": {
@@ -35,6 +39,10 @@ minimalLabwareDef2 = {
             "x": 10,
             "y": 10,
             "z": 5
+    },
+    "otId": "minimalLabwareDef2",
+    "parameters": {
+        "isTiprack": False,
     },
     "ordering": [["A1", "B1", "C1"], ["A2", "B2", "C2"]],
     "wells": {
@@ -101,7 +109,7 @@ def test_labware_init():
     fakeLabware = labware.Labware(minimalLabwareDef, deck)
     ordering = [well for col in minimalLabwareDef['ordering'] for well in col]
     assert fakeLabware._ordering == ordering
-    assert fakeLabware._wells == minimalLabwareDef['wells']
+    assert fakeLabware._well_definition == minimalLabwareDef['wells']
     assert fakeLabware._offset == Point(x=10, y=10, z=5)
 
 
