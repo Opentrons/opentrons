@@ -29,7 +29,7 @@ export const wellNameSplit = (wellName: string): [string, string] => {
 // TODO Ian 2018-07-20: make sure '__air__' or other pseudo-ingredients don't get in here
 export const ingredIdsToColor = (groupIds: Array<string>): ?string => {
   if (groupIds.length === 0) return null
-  const firstGroupIdNumber: ?number = Number(groupIds[0])
+  const firstGroupIdNumber: number = Number(groupIds[0])
   if (groupIds.length === 1 && firstGroupIdNumber) return swatchColors(firstGroupIdNumber)
   return MIXED_WELL_COLOR
 }
