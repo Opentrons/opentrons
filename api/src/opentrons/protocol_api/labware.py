@@ -1,8 +1,12 @@
 """This module will replace Placeable"""
 import re
+import os
+import json
+import time
 from typing import List, Dict
 from enum import Enum, auto
 from opentrons.types import Point
+from opentrons.util import environment as env
 from collections import defaultdict
 
 
@@ -15,6 +19,8 @@ well_shapes = {
     'rectangular': WellShape.RECTANGULAR,
     'circular': WellShape.CIRCULAR
 }
+
+persistent_path = os.path.join(env.get_path('APP_DATA_DIR'), 'offsets')
 
 
 class Well:
@@ -118,15 +124,47 @@ class Labware:
     provides methods for accessing wells within the labware.
     """
     def __init__(self, definition: dict, parent: Point) -> None:
+        self._calibrated_offset: Point = Point(0, 0, 0)
+        self._wells: List[Well] = []
+        # Directly from definition
+        self._well_definition = definition['wells']
+        self._id = definition['otId']
+        self._parameters = definition['parameters']
+        offset = definition['cornerOffsetFromSlot']
+        # Inferred from definition
         self._ordering = [well
                           for col in definition['ordering']
                           for well in col]
-        self._wells = definition['wells']
-        offset = definition['cornerOffsetFromSlot']
         self._offset = Point(x=offset['x'] + parent.x,
                              y=offset['y'] + parent.y,
                              z=offset['z'] + parent.z)
+        # Applied properties
+        self.set_calibration(self._calibrated_offset)
         self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
+
+    def _build_wells(self) -> List[Well]:
+        """
+        This function is used to create one instance of wells to be used by all
+        accessor functions. It is only called again if a new offset needs
+        to be applied.
+        """
+        return [Well(self._well_definition[well], self._calibrated_offset)
+                for well in self._ordering]
+
+    def _create_indexed_dictionary(self, group=0):
+        dictList = defaultdict(list)
+        for index, wellObj in zip(self._ordering, self._wells):
+            dictList[self._pattern.match(index).group(group)].append(wellObj)
+        return dictList
+
+    def set_calibration(self, delta: Point):
+        """
+        Called by save calibration in order to update the offset on the object.
+        """
+        self._calibrated_offset = Point(x=self._offset.x + delta.x,
+                                        y=self._offset.y + delta.y,
+                                        z=self._offset.z + delta.z)
+        self._wells = self._build_wells()
 
     def wells(self) -> List[Well]:
         """
@@ -139,8 +177,7 @@ class Labware:
 
         :return: Ordered list of all wells in a labware
         """
-        return [Well(self._wells[well], self._offset)
-                for well in self._ordering]
+        return self._wells
 
     def wells_by_index(self) -> Dict[str, Well]:
         """
@@ -152,8 +189,8 @@ class Labware:
 
         :return: Dictionary of well objects keyed by well name
         """
-        return {well: Well(self._wells[well], self._offset)
-                for well in self._ordering}
+        return {well: wellObj
+                for well, wellObj in zip(self._ordering, self._wells)}
 
     def rows(self) -> List[List[Well]]:
         """
@@ -211,12 +248,58 @@ class Labware:
         colDict = self._create_indexed_dictionary(group=2)
         return colDict
 
-    def _create_indexed_dictionary(self, group=0):
-        dictList = defaultdict(list)
-        for well in self._ordering:
-            wellObj = Well(self._wells[well], self._offset)
-            dictList[self._pattern.match(well).group(group)].append(wellObj)
-        return dictList
+
+def save_calibration(labware: Labware, delta: Point):
+    """
+    Function to be used whenever an updated delta is found for the first well
+    of a given labware. If an offset file does not exist, create the file
+    using labware id as the filename. If the file does exist, load it and
+    modify the delta and the lastModified field.
+    """
+    if not os.path.exists(persistent_path):
+        os.mkdir(persistent_path)
+    labwareOffsetPath = os.path.join(
+        persistent_path, "{}.json".format(labware._id))
+    calibration_data = _helper_offset_data_format(labwareOffsetPath, delta)
+    with open(labwareOffsetPath, 'w') as f:
+        json.dump(calibration_data, f)
+    labware.set_calibration(delta)
+
+
+def load_calibration(labware: Labware):
+    """
+    Look up a calibration if it exists and apply it to the given labware.
+    """
+    offset = Point(0, 0, 0)
+    labwareOffsetPath = os.path.join(
+        persistent_path, "{}.json".format(labware._id))
+    if os.path.exists(labwareOffsetPath):
+        calibration_data = _read_file(labwareOffsetPath)
+        offsetArray = calibration_data['default']['offset']
+        offset = Point(x=offsetArray[0], y=offsetArray[1], z=offsetArray[2])
+    labware.set_calibration(offset)
+
+
+def _helper_offset_data_format(filepath: str, delta: Point) -> dict:
+    if not os.path.exists(filepath):
+        calibration_data = {
+            "default": {
+                "offset": [delta.x, delta.y, delta.z],
+                "lastModified": time.time()
+            }
+        }
+    else:
+        calibration_data = _read_file(filepath)
+        calibration_data['default']['offset'] = [delta.x, delta.y, delta.z]
+        calibration_data['default']['lastModified'] = time.time()
+    return calibration_data
+
+
+def _read_file(filepath: str) -> dict:
+    calibration_data: dict = {}
+    with open(filepath, 'r') as f:
+        calibration_data = json.load(f)
+    return calibration_data
 
 
 def _load_definition_by_name(name: str) -> dict:
@@ -228,18 +311,20 @@ def _load_definition_by_name(name: str) -> dict:
     raise NotImplementedError
 
 
-def load(name: str, ll_at: Point) -> Labware:
+def load(name: str, cornerOffset: Point) -> Labware:
     """
     Return a labware object constructed from a labware definition dict looked
     up by name (definition must have been previously stored locally on the
     robot)
     """
     definition = _load_definition_by_name(name)
-    return load_from_definition(definition, ll_at)
+    return load_from_definition(definition, cornerOffset)
 
 
-def load_from_definition(definition: dict, ll_at: Point) -> Labware:
+def load_from_definition(definition: dict, cornerOffset: Point) -> Labware:
     """
     Return a labware object constructed from a provided labware definition dict
     """
-    return Labware(definition, ll_at)
+    labware = Labware(definition, cornerOffset)
+    load_calibration(labware)
+    return labware
