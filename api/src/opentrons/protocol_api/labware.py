@@ -6,8 +6,7 @@ import time
 from typing import List, Dict
 from enum import Enum, auto
 from opentrons.types import Point
-from opentrons.util.environment import PI_DATA_PATH
-from opentrons.util import environment
+from opentrons.util import environment as env
 from collections import defaultdict
 
 
@@ -21,11 +20,7 @@ well_shapes = {
     'circular': WellShape.CIRCULAR
 }
 
-if os.environ.get('RUNNING_ON_PI'):
-    presistentPath = os.path.join(PI_DATA_PATH, 'offsets')
-else:
-    app_dir = environment.get_path('APP_DATA_DIR')
-    persistentPath = os.path.join(app_dir, 'offsets')
+persistent_path = os.path.join(env.get_path('APP_DATA_DIR'), 'offsets')
 
 
 class Well:
@@ -144,7 +139,7 @@ class Labware:
                              y=offset['y'] + parent.y,
                              z=offset['z'] + parent.z)
         # Applied properties
-        self.set_calibration(Point(0, 0, 0))
+        self.set_calibration(self._calibrated_offset)
         self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
 
     def _build_wells(self) -> List[Well]:
@@ -261,28 +256,13 @@ def save_calibration(labware: Labware, delta: Point):
     using labware id as the filename. If the file does exist, load it and
     modify the delta and the lastModified field.
     """
-    if not os.path.exists(persistentPath):
-        os.mkdir(persistentPath)
+    if not os.path.exists(persistent_path):
+        os.mkdir(persistent_path)
     labwareOffsetPath = os.path.join(
-        persistentPath, "{}.json".format(labware._id))
-    if not os.path.exists(labwareOffsetPath):
-        schema = {
-            "default": {
-                "offset": [delta.x, delta.y, delta.z],
-                "lastModified": time.time()
-            }
-        }
-
-        with open(labwareOffsetPath, 'w') as f:
-            json.dump(schema, f)
-    else:
-        with open(labwareOffsetPath, 'r') as f:
-            schema = json.load(f)
-        schema['default']['offset'] = [delta.x, delta.y, delta.z]
-        schema['default']['lastModified'] = time.time()
-        with open(labwareOffsetPath, 'w') as f:
-            json.dump(schema, f)
-
+        persistent_path, "{}.json".format(labware._id))
+    calibration_data = _helper_offset_data_format(labwareOffsetPath, delta)
+    with open(labwareOffsetPath, 'w') as f:
+        json.dump(calibration_data, f)
     labware.set_calibration(delta)
 
 
@@ -292,13 +272,34 @@ def load_calibration(labware: Labware):
     """
     offset = Point(0, 0, 0)
     labwareOffsetPath = os.path.join(
-        persistentPath, "{}.json".format(labware._id))
+        persistent_path, "{}.json".format(labware._id))
     if os.path.exists(labwareOffsetPath):
-        with open(labwareOffsetPath) as f:
-            schema = json.load(f)
-        offsetArray = schema['default']['offset']
+        calibration_data = _read_file(labwareOffsetPath)
+        offsetArray = calibration_data['default']['offset']
         offset = Point(x=offsetArray[0], y=offsetArray[1], z=offsetArray[2])
     labware.set_calibration(offset)
+
+
+def _helper_offset_data_format(filepath: str, delta: Point) -> dict:
+    if not os.path.exists(filepath):
+        calibration_data = {
+            "default": {
+                "offset": [delta.x, delta.y, delta.z],
+                "lastModified": time.time()
+            }
+        }
+    else:
+        calibration_data = _read_file(filepath)
+        calibration_data['default']['offset'] = [delta.x, delta.y, delta.z]
+        calibration_data['default']['lastModified'] = time.time()
+    return calibration_data
+
+
+def _read_file(filepath: str) -> dict:
+    calibration_data: dict = {}
+    with open(filepath, 'r') as f:
+        calibration_data = json.load(f)
+    return calibration_data
 
 
 def _load_definition_by_name(name: str) -> dict:
@@ -310,20 +311,20 @@ def _load_definition_by_name(name: str) -> dict:
     raise NotImplementedError
 
 
-def load(name: str, slot: Point) -> Labware:
+def load(name: str, cornerOffset: Point) -> Labware:
     """
     Return a labware object constructed from a labware definition dict looked
     up by name (definition must have been previously stored locally on the
     robot)
     """
     definition = _load_definition_by_name(name)
-    labware = load_from_definition(definition, slot)
-    load_calibration(labware)
-    return labware
+    return load_from_definition(definition, cornerOffset)
 
 
-def load_from_definition(definition: dict, slot: Point) -> Labware:
+def load_from_definition(definition: dict, cornerOffset: Point) -> Labware:
     """
     Return a labware object constructed from a provided labware definition dict
     """
-    return Labware(definition, slot)
+    labware = Labware(definition, cornerOffset)
+    load_calibration(labware)
+    return labware
