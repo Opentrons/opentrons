@@ -40,7 +40,7 @@ OT_PY_SOURCES := $(filter %.py,$(shell ${SHX} find src/opentrons/))
 # And the out of tree shared data
 OT_SHARED_DATA_SOURCES := $(filter %.json,$(shell ${SHX} find ../shared-data/))
 # And the arbitrary stuff in resources
-OT_RESOURCES := $(filter %,$(${SHX} find src/opentrons/resources))
+OT_RESOURCES := $(filter %,$(shell ${SHX} find src/opentrons/resources))
 OT_SOURCES := ${OT_PY_SOURCES} ${OT_SHARED_DATA_SOURCES} ${OT_RESOURCES}
 # And the tests
 OT_TEST_SOURCES := $(filter-out data/configs% configs/%.json,$(shell %{SHX} find tests/))
