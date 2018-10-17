@@ -13,6 +13,8 @@ type Props = {
   value?: boolean,
   /** classes to apply */
   className?: string,
+  /** name of field in form */
+  name?: string,
   /** label text for checkbox */
   label?: string,
   /** if is included, checkbox will use error style. The content of the string is ignored. */
@@ -45,6 +47,7 @@ export default function CheckboxField (props: Props) {
       <input
         className={cx(styles.input_field, styles.accessibly_hidden)}
         type='checkbox'
+        name={props.name}
         checked={props.value || false}
         disabled={props.disabled}
         onChange={props.onChange}

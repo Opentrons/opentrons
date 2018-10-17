@@ -15,6 +15,8 @@ type Props = {
   className?: string,
   /** inline label text. DEPRECATED */
   label?: string,
+  /** name of field in form */
+  name?: string,
   /** placeholder text */
   placeholder?: string,
   /** optional units string, appears to the right of input text */
@@ -83,6 +85,7 @@ function Input (props: Props) {
         <input
           type={props.type || 'text'}
           value={props.value || ''}
+          name={props.name}
           placeholder={props.placeholder}
           onChange={props.disabled ? undefined : props.onChange}
           onFocus={props.disabled ? undefined : props.onFocus}
