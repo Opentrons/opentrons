@@ -6,8 +6,6 @@ import {
   AIR,
 } from '@opentrons/components'
 
-import {AIR} from './constants'
-
 export const humanizeLabwareType = startCase
 
 export const wellNameSplit = (wellName: string): [string, string] => {

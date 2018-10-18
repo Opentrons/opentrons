@@ -1,13 +1,15 @@
 // @flow
 import * as React from 'react'
 
+import {Popper, Reference, Manager} from 'react-popper'
 import type {LocationLiquidState} from '../../step-generation'
 import {PillTooltipContents} from '../steplist/SubstepRow'
 import type {WellIngredientNames} from '../../steplist/types'
+import {Portal} from '../portals/TopPortal'
 
 import styles from './labware.css'
 
-type Props = {ingredNames: WellIngredientNames, wrapperRef: React.Element<*>}
+type Props = {ingredNames: WellIngredientNames}
 
 type State = {
   tooltipX: ?number,
@@ -24,18 +26,29 @@ const initialState: State = {
 
 const MOUSE_TOOLTIP_OFFSET_PIXELS = 14
 
+type MouseTargetProps = {top: number, left: number}
+class VirtualMouseTarget extends React.Component<MouseTargetProps> {
+  render () {
+    return (
+      <div style={{
+        width: 100,
+        height: 100,
+        top: this.props.top,
+        left: this.props.left,
+      }}></div>
+    )
+  }
+}
 class WellTooltip extends React.Component<Props, State> {
   state: State = initialState
+  mouseRef
 
   makeHandleMouseMove = (wellName: string, wellIngreds: LocationLiquidState) => (e) => {
     const {pageX, pageY} = e
     if (Object.keys(wellIngreds).length > 0 && pageX && pageY) {
-      const wrapperLeft = 0//this.props.wrapperRef ? this.props.wrapperRef.getBoundingpageRect().left : 0
-      const wrapperTop = 0//this.props.wrapperRef ? this.props.wrapperRef.getBoundingpageRect().top : 0
-      console.table({e, wellName, wellIngreds, pageX, pageY})
       this.setState({
-        tooltipX: pageX - wrapperLeft + MOUSE_TOOLTIP_OFFSET_PIXELS,
-        tooltipY: pageY - wrapperTop + MOUSE_TOOLTIP_OFFSET_PIXELS,
+        tooltipX: pageX + MOUSE_TOOLTIP_OFFSET_PIXELS,
+        tooltipY: pageY + MOUSE_TOOLTIP_OFFSET_PIXELS,
         tooltipWellName: wellName,
         tooltipWellIngreds: wellIngreds,
       })
@@ -47,28 +60,47 @@ class WellTooltip extends React.Component<Props, State> {
   }
 
   render () {
+    const {tooltipX, tooltipY} = this.state
+
     return (
       <React.Fragment>
-        {this.props.children({
-          makeHandleMouseMove: this.makeHandleMouseMove,
-          handleMouseLeaveWell: this.handleMouseLeaveWell,
-          tooltipWellName: this.state.tooltipWellName,
-        })}
-        {this.state.tooltipWellName &&
-          <div
-            style={{
-              left: this.state.tooltipX,
-              top: this.state.tooltipY,
-              position: 'absolute',
-            }}>
-            <div className={styles.tooltip_box}>
-              <PillTooltipContents
-                well={this.state.tooltipWellName}
-                ingredNames={this.props.ingredNames}
-                ingreds={this.state.tooltipWellIngreds || {}} />
-            </div>
-          </div>
-        }
+        <Manager>
+          <Reference>
+            {({ref}) => (
+                <Portal>
+                  <div ref={ref} style={{position: 'absolute', top: tooltipY, left: tooltipX, height: 1, width: 1}}></div>
+                </Portal>
+              )
+            }
+          </Reference>
+          {this.props.children({
+            makeHandleMouseMove: this.makeHandleMouseMove,
+            handleMouseLeaveWell: this.handleMouseLeaveWell,
+            tooltipWellName: this.state.tooltipWellName,
+          })}
+          {this.state.tooltipWellName &&
+            <Popper modifiers={{offset: {offset: `0, ${20}`}}} >
+              {({ref, style, placement}) => {
+                console.log('tried Render', style, placement)
+                return (
+                  <Portal>
+                    <div
+                      style={style}
+                      ref={ref}
+                      data-placement={placement}
+                      // style={{left: this.state.tooltipX, top: this.state.tooltipY}}
+                      className={styles.tooltip_box}>
+                      <PillTooltipContents
+                        well={this.state.tooltipWellName}
+                        ingredNames={this.props.ingredNames}
+                        ingreds={this.state.tooltipWellIngreds || {}} />
+                    </div>
+                  </Portal>
+                )
+              }}
+            </Popper>
+          }
+        </Manager>
       </React.Fragment>
     )
   }
