@@ -32,14 +32,20 @@ async def test_controller_home(loop):
                                            [0, 0, 1, 30],
                                            [0, 0, 0, 1]]
     await c.home()
-    # Check that we correctly apply the inverse gantry calibration and
-    # mount offset
+    # Check that we correctly apply the inverse gantry calibration
     assert c._current_position == {Axis.X: 408,
                                    Axis.Y: 333,
-                                   Axis.Z: 198,
+                                   Axis.Z: 188,
                                    Axis.A: 188,
                                    Axis.B: 19,
                                    Axis.C: 19}
+    # Check that we subsequently apply mount offset
+    assert c.current_position(types.Mount.RIGHT) == {Axis.X: 408,
+                                                     Axis.Y: 333,
+                                                     Axis.A: 188}
+    assert c.current_position(types.Mount.LEFT) == {Axis.X: 408,
+                                                    Axis.Y: 333,
+                                                    Axis.Z: 198}
 
 
 async def test_controller_musthome(hardware_api):

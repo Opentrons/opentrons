@@ -210,21 +210,16 @@ class API:
               added to the smoothie coordinates here.
         """
         with_enum = {Axis[k]: v for k, v in smoothie_pos.items()}
-        other = {k: v for k, v in with_enum.items()
-                 if k not in Axis.gantry_axes()}
+        plunger_axes = {k: v for k, v in with_enum.items()
+                        if k not in Axis.gantry_axes()}
         right = (with_enum[Axis.X], with_enum[Axis.Y],
                  with_enum[Axis.by_mount(top_types.Mount.RIGHT)])
         # Tell apply_transform to just do the change of base part of the
         # transform rather than the full affine transform, because this is
         # an offset
-        offset_in_smoothie = linal.apply_transform(
-            self.config.gantry_calibration,
-            self.config.mount_offset,
-            False)
-        left = (with_enum[Axis.X] + offset_in_smoothie[0],
-                with_enum[Axis.Y] + offset_in_smoothie[1],
-                with_enum[Axis.by_mount(top_types.Mount.LEFT)]
-                + offset_in_smoothie[2])
+        left = (with_enum[Axis.X],
+                with_enum[Axis.Y],
+                with_enum[Axis.by_mount(top_types.Mount.LEFT)])
         right_deck = linal.apply_reverse(self.config.gantry_calibration,
                                          right)
         left_deck = linal.apply_reverse(self.config.gantry_calibration,
@@ -233,7 +228,7 @@ class API:
                     Axis.Y: right_deck[1],
                     Axis.by_mount(top_types.Mount.RIGHT): right_deck[2],
                     Axis.by_mount(top_types.Mount.LEFT): left_deck[2]}
-        deck_pos.update(other)
+        deck_pos.update(plunger_axes)
         return deck_pos
 
     def current_position(self, mount: top_types.Mount) -> Dict[Axis, float]:
