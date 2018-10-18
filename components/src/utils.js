@@ -5,6 +5,8 @@ import {
   MIXED_WELL_COLOR,
 } from '@opentrons/components'
 
+import {AIR} from './constants'
+
 export const humanizeLabwareType = startCase
 
 export const wellNameSplit = (wellName: string): [string, string] => {
@@ -26,9 +28,9 @@ export const wellNameSplit = (wellName: string): [string, string] => {
   return [letters, numbers]
 }
 
-// TODO Ian 2018-07-20: make sure '__air__' or other pseudo-ingredients don't get in here
 export const ingredIdsToColor = (groupIds: Array<string>): ?string => {
-  if (groupIds.length === 0) return null
-  if (groupIds.length === 1) return swatchColors(Number(groupIds[0]))
+  const filteredIngredIds = groupIds.filter(id => id !== AIR)
+  if (filteredIngredIds.length === 0) return null
+  if (filteredIngredIds.length === 1) return swatchColors(Number(filteredIngredIds[0]))
   return MIXED_WELL_COLOR
 }

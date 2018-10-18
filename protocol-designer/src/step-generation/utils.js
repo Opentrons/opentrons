@@ -13,6 +13,9 @@ import type {
   LocationLiquidState,
 } from './types'
 
+import {AIR} from '@opentrons/components'
+export {AIR}
+
 export function repeatArray<T> (array: Array<T>, repeats: number): Array<T> {
   return flatMap(range(repeats), (i: number): Array<T> => array)
 }
@@ -87,8 +90,6 @@ export const commandCreatorsTimeline = (commandCreators: Array<CommandCreator>) 
 }
 
 type Vol = {volume: number}
-
-export const AIR = '__air__'
 
 /** Breaks a liquid volume state into 2 parts. Assumes all liquids are evenly mixed. */
 export function splitLiquid (volume: number, sourceLiquidState: LocationLiquidState): {

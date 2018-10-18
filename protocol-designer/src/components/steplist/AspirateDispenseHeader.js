@@ -1,31 +1,51 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {Icon} from '@opentrons/components'
+import {Icon, HoverTooltip} from '@opentrons/components'
 import {PDListItem} from '../lists'
 import styles from './StepItem.css'
+import LabwareTooltipContents from './LabwareTooltipContents'
+import type {Labware} from '../../labware-ingred/types'
+import {labwareToDisplayName} from '../../labware-ingred/utils'
+import {Portal} from './TooltipPortal'
 
 type AspirateDispenseHeaderProps = {
-  sourceLabwareName: ?string,
-  destLabwareName: ?string,
+  sourceLabware: ?Labware,
+  destLabware: ?Labware,
 }
 
 function AspirateDispenseHeader (props: AspirateDispenseHeaderProps) {
-  const {sourceLabwareName, destLabwareName} = props
+  const {sourceLabware, destLabware} = props
 
   return (
     <React.Fragment>
       <li className={styles.aspirate_dispense}>
-          <span>ASPIRATE</span>
-          <span className={styles.spacer}/>
-          <span>DISPENSE</span>
+        <span>ASPIRATE</span>
+        <span className={styles.spacer}/>
+        <span>DISPENSE</span>
       </li>
 
       <PDListItem className={cx(styles.step_subitem_column_header, styles.emphasized_cell)}>
-        <span>{sourceLabwareName}</span>
+        <HoverTooltip
+          portal={Portal}
+          tooltipComponent={<LabwareTooltipContents labware={sourceLabware} />}>
+          {(hoverTooltipHandlers) => (
+            <span {...hoverTooltipHandlers} className={styles.labware_display_name}>
+              {sourceLabware && labwareToDisplayName(sourceLabware)}
+            </span>
+          )}
+        </HoverTooltip>
         {/* This is always a "transfer icon" (arrow pointing right) for any step: */}
         <Icon name='ot-transfer' />
-        <span>{destLabwareName}</span>
+        <HoverTooltip
+          portal={Portal}
+          tooltipComponent={<LabwareTooltipContents labware={destLabware} />}>
+          {(hoverTooltipHandlers) => (
+            <span {...hoverTooltipHandlers} className={styles.labware_display_name}>
+              {destLabware && labwareToDisplayName(destLabware)}
+            </span>
+          )}
+        </HoverTooltip>
       </PDListItem>
     </React.Fragment>
   )

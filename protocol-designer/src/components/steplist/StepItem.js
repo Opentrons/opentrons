@@ -8,7 +8,7 @@ import MixHeader from './MixHeader'
 import PauseStepItems from './PauseStepItems'
 import StepDescription from '../StepDescription'
 import {stepIconsByType, type StepIdType} from '../../form-types'
-
+import type {Labware} from '../../labware-ingred/types'
 import type {
   SubstepIdentifier,
   StepItemData,
@@ -28,7 +28,7 @@ type StepItemProps = {
   hoveredSubstep: ?SubstepIdentifier,
   ingredNames: WellIngredientNames,
 
-  getLabwareName: (labwareId: ?string) => ?string,
+  getLabware: (labwareId: ?string) => ?Labware,
   handleSubstepHover: SubstepIdentifier => mixed,
   onStepClick?: (event?: SyntheticEvent<>) => mixed,
   onStepItemCollapseToggle?: (event?: SyntheticEvent<>) => mixed,
@@ -76,7 +76,7 @@ function getStepItemContents (stepItemProps: StepItemProps) {
   const {
     step,
     substeps,
-    getLabwareName,
+    getLabware,
     hoveredSubstep,
     handleSubstepHover,
     ingredNames,
@@ -103,13 +103,13 @@ function getStepItemContents (stepItemProps: StepItemProps) {
       formData.stepType === 'distribute'
     )
   ) {
-    const sourceLabwareName = getLabwareName(formData['aspirate_labware'])
-    const destLabwareName = getLabwareName(formData['dispense_labware'])
+    const sourceLabware = getLabware(formData['aspirate_labware'])
+    const destLabware = getLabware(formData['dispense_labware'])
 
     result.push(
       <AspirateDispenseHeader
         key='transferlike-header'
-        {...{sourceLabwareName, destLabwareName}}
+        {...{sourceLabware, destLabware}}
       />
     )
   }
@@ -119,7 +119,7 @@ function getStepItemContents (stepItemProps: StepItemProps) {
       <MixHeader key='mix-header'
         volume={formData.volume}
         times={formData.times}
-        labwareName={getLabwareName(formData.labware)}
+        labware={getLabware(formData.labware)}
       />
     )
   }

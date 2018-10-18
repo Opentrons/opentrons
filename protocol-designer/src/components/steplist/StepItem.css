@@ -82,6 +82,7 @@
 
 .liquid_tooltip_contents {
   margin: 0.5em;
+  max-width: 20rem;
 }
 
 .ingred_row {
@@ -128,4 +129,25 @@
 
 .multi_substep_header {
   font-style: italic;
+}
+
+.labware_name {
+  font-weight: var(--fw-semibold);
+}
+
+.labware_spacer {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+.labware_tooltip_contents {
+  margin: 0.5rem;
+  max-width: 20rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.labware_display_name {
+  cursor: default;
 }

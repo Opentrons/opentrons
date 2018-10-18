@@ -10,6 +10,7 @@ import {END_TERMINAL_TITLE} from '../../constants'
 import {END_TERMINAL_ITEM_ID} from '../../steplist'
 
 import type {StepIdType} from '../../form-types'
+import {PortalRoot} from './TooltipPortal'
 
 type StepListProps = {
   orderedSteps: Array<StepIdType>,
@@ -18,18 +19,18 @@ type StepListProps = {
 
 export default function StepList (props: StepListProps) {
   return (
-    <SidePanel
-      title='Protocol Timeline'
-      onMouseLeave={props.handleStepHoverById && props.handleStepHoverById(null)}
-    >
-      <StartingDeckStateTerminalItem />
+    <React.Fragment>
+      <SidePanel
+        title='Protocol Timeline'
+        onMouseLeave={props.handleStepHoverById && props.handleStepHoverById(null)}>
+        <StartingDeckStateTerminalItem />
 
-      {props.orderedSteps.map((stepId: StepIdType) => (
-        <StepItem key={stepId} stepId={stepId} />
-      ))}
+        {props.orderedSteps.map((stepId: StepIdType) => <StepItem key={stepId} stepId={stepId} />)}
 
-      <StepCreationButton />
-      <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />
-    </SidePanel>
+        <StepCreationButton />
+        <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />
+      </SidePanel>
+      <PortalRoot />
+    </React.Fragment>
   )
 }

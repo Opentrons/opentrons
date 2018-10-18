@@ -1,5 +1,4 @@
 // @flow
-import {humanizeLabwareType} from '@opentrons/components'
 import {combineReducers} from 'redux'
 import {handleActions, type ActionType} from 'redux-actions'
 import {createSelector} from 'reselect'
@@ -13,6 +12,7 @@ import isEmpty from 'lodash/isEmpty'
 
 import {sortedSlotnames, FIXED_TRASH_ID} from '../../constants.js'
 import {uuid} from '../../utils'
+import {labwareToDisplayName} from '../utils'
 
 import type {DeckSlot} from '@opentrons/components'
 import {getIsTiprack} from '@opentrons/shared-data'
@@ -335,7 +335,8 @@ const getLabwareNames: Selector<{[labwareId: string]: string}> = createSelector(
   getLabware,
   (_labware) => mapValues(
     _labware,
-    (l: Labware) => l.name || `${humanizeLabwareType(l.type)} (${l.disambiguationNumber})`)
+    labwareToDisplayName,
+  )
 )
 
 const getLabwareTypes: Selector<LabwareTypeById> = createSelector(
