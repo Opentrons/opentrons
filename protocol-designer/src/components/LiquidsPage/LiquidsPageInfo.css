@@ -4,7 +4,8 @@
   @apply --font-body-2-dark;
 
   text-align: center;
-  padding: 2rem 0;
+  max-width: 38rem;
+  margin: 2rem auto;
 }
 
 .header {
@@ -12,7 +13,7 @@
 }
 
 .instruction {
-  margin: 2rem 8rem;
+  margin: 2rem 0;
   line-height: 1.5;
 }
 
