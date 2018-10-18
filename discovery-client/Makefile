@@ -37,6 +37,6 @@ lib:
 
 .PHONY: dist
 dist: clean lib
-	@mkdir -p dist
+	@shx mkdir -p dist
 	npm pack
 	shx mv '*.tgz' dist

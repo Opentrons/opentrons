@@ -13,6 +13,10 @@ venv/
 env/
 .env/
 
+# Generated files for local API server config paths
+api/.env
+api/index.json
+
 # MyPy caches
 .mypy_cache
 
@@ -78,6 +82,7 @@ target/
 
 # Testing
 api/tests/opentrons/data/configs/
+api/tests/opentrons/data/labware-def/
 api/opentrons/config/*.json
 sample_protocol.py
 api/opentrons/server/endpoints/ignore.json

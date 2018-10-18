@@ -21,7 +21,7 @@ pipenv_opts += $(and $(CI),--keep-outdated)
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/opentrons-$(shell $(python) normalized_version.py)-py2.py3-none-any.whl
+wheel_file = dist/opentrons-$(shell $(python) build_tools.py normalize_version)-py2.py3-none-any.whl
 wheel_pattern := dist/opentrons-%-py2.py3-none-any.whl
 
 # These variables can be overriden when make is invoked to customize the
@@ -47,6 +47,7 @@ clean_cmd = shx rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pyca
 .PHONY: install
 install:
 	pipenv sync $(pipenv_opts)
+	@$(python) build_tools.py write_local_env
 
 .PHONY: all
 all: lint test
