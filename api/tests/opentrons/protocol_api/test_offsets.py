@@ -3,7 +3,6 @@ import tempfile
 import os
 import json
 import time
-from functools import partial
 from opentrons.protocol_api import labware
 from opentrons.types import Point
 
@@ -40,26 +39,29 @@ minimalLabwareDef = {
     }
 }
 
-tmpdir = tempfile.mkdtemp("offsets")
-labware.persistent_path = tmpdir
-testLabware = labware.Labware(minimalLabwareDef, Point(0, 0, 0))
-path = os.path.join(labware.persistent_path, "{}.json".format(testLabware._id))
-
-
-def mock_set_calibration(test_point, delta):
-    test_point = delta
+labware.persistent_path = tempfile.mkdtemp("offsets")
+path = os.path.join(
+    labware.persistent_path, "{}.json".format(minimalLabwareDef["otId"]))
 
 
 def test_save_calibration(monkeypatch):
     # Test the save calibration file
     assert not os.path.exists(path)
     calibration_point = None
+
+    def mock_set_calibration(self, delta):
+        nonlocal calibration_point
+        calibration_point = delta
+
     monkeypatch.setattr(
-        testLabware,
-        'set_calibration', partial(mock_set_calibration, calibration_point))
-    labware.save_calibration(testLabware, Point(1, 1, 1))
+        labware.Labware,
+        'set_calibration', mock_set_calibration)
+
+    test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0))
+
+    labware.save_calibration(test_labware, Point(1, 1, 1))
     assert os.path.exists(path)
-    calibration_point == Point(1, 1, 1)
+    assert calibration_point == Point(1, 1, 1)
 
 
 def test_schema_shape(monkeypatch):
@@ -68,11 +70,10 @@ def test_schema_shape(monkeypatch):
     def fake_time():
         return 1
     monkeypatch.setattr(time, 'time', fake_time)
-    calibration_point = None
-    monkeypatch.setattr(
-        testLabware,
-        'set_calibration', partial(mock_set_calibration, calibration_point))
-    labware.save_calibration(testLabware, Point(1, 1, 1))
+
+    test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0))
+
+    labware.save_calibration(test_labware, Point(1, 1, 1))
     expected = {"default": {"offset": [1, 1, 1], "lastModified": 1}}
     with open(path) as f:
         result = json.load(f)
@@ -80,22 +81,53 @@ def test_schema_shape(monkeypatch):
 
 
 def test_load_calibration(monkeypatch):
-    labware.load_calibration(testLabware)
+
     calibration_point = None
+
+    def mock_set_calibration(self, delta):
+        nonlocal calibration_point
+        calibration_point = delta
+
     monkeypatch.setattr(
-        testLabware,
-        'set_calibration', partial(mock_set_calibration, calibration_point))
-    labware.save_calibration(testLabware, Point(1, 1, 1))
-    calibration_point == Point(1, 1, 1)
+        labware.Labware,
+        'set_calibration', mock_set_calibration)
+
+    test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0))
+
+    labware.save_calibration(test_labware, Point(1, 1, 1))
+
+    # Set without saving to show that load will update with previously saved
+    # data
+    test_labware.set_calibration(Point(0, 0, 0))
+
+    labware.load_calibration(test_labware)
+    assert calibration_point == Point(1, 1, 1)
 
 
 def test_wells_rebuilt_with_offset():
-    testLabware2 = labware.Labware(minimalLabwareDef, Point(0, 0, 0))
-    old_wells = testLabware._wells
-    assert testLabware2._offset == Point(10, 10, 5)
-    assert testLabware2._calibrated_offset == Point(10, 10, 5)
-    labware.save_calibration(testLabware2, Point(2, 2, 2))
-    new_wells = testLabware2._wells
+    test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0))
+    old_wells = test_labware._wells
+    assert test_labware._offset == Point(10, 10, 5)
+    assert test_labware._calibrated_offset == Point(10, 10, 5)
+    labware.save_calibration(test_labware, Point(2, 2, 2))
+    new_wells = test_labware._wells
     assert old_wells[0] != new_wells[0]
-    assert testLabware2._offset == Point(10, 10, 5)
-    assert testLabware2._calibrated_offset == Point(12, 12, 7)
+    assert test_labware._offset == Point(10, 10, 5)
+    assert test_labware._calibrated_offset == Point(12, 12, 7)
+
+
+def test_clear_calibrations():
+    with open(os.path.join(
+            labware.persistent_path, '1.json'), 'w') as offset_file:
+        test_offset = {
+            "default": {
+                "offset": [1, 2, 3],
+                "lastModified": 1
+            },
+            "tipLength": 1.2
+        }
+        json.dump(test_offset, offset_file)
+
+    assert len(os.listdir(labware.persistent_path)) > 0
+    labware.clear_calibrations()
+    assert len(os.listdir(labware.persistent_path)) == 0
