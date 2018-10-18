@@ -1,5 +1,6 @@
 from math import pi, sin, cos
-from opentrons.deck_calibration.linal import solve, add_z, apply_transform
+from opentrons.util.linal import solve, add_z, apply_transform
+from numpy.linalg import inv
 import numpy as np
 
 
@@ -65,5 +66,5 @@ def test_apply_transform():
         round(y - y_delta, 2),
         round(z - z_delta, 2))
 
-    result = apply_transform(transform, (x, y, z))
+    result = apply_transform(inv(transform), (x, y, z))
     assert result == expected

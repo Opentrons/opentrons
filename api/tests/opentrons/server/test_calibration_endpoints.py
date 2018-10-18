@@ -3,7 +3,7 @@ import numpy as np
 from opentrons import robot, instruments
 from opentrons import deck_calibration as dc
 from opentrons.deck_calibration import endpoints
-from opentrons.legacy_api.robot import robot_configs
+from opentrons.config import robot_configs
 
 
 # Note that several tests in this file have target/expected values that do not

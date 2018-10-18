@@ -2,8 +2,7 @@ import logging
 import shutil
 import os
 from aiohttp import web
-from opentrons.config import advanced_settings as advs
-from opentrons.legacy_api.robot import robot_configs as rc
+from opentrons.config import advanced_settings as advs, robot_configs as rc
 from opentrons.data_storage import database as db
 
 log = logging.getLogger(__name__)

@@ -1,12 +1,10 @@
 import pytest
-from opentrons.config import get_config_index
+from opentrons.config import get_config_index, robot_configs
 from opentrons.config import advanced_settings as advs
 
 
 @pytest.fixture
 def mock_config():
-    from opentrons.legacy_api.robot import robot_configs
-
     test_config = robot_configs.load()
     test_config = test_config._replace(name='new-value1')
     robot_configs.save_robot_settings(test_config)
@@ -21,7 +19,6 @@ def test_clear_config(mock_config):
     dc_main.clear_configuration_and_reload()
 
     from opentrons import robot
-    from opentrons.legacy_api.robot import robot_configs
 
     assert robot.config == robot_configs._build_config({}, {})
 
@@ -42,7 +39,6 @@ def test_save_and_clear_config(mock_config):
     dc_main.backup_configuration_and_reload(tag=tag)
 
     from opentrons import robot
-    from opentrons.legacy_api.robot import robot_configs
 
     assert robot.config == robot_configs._build_config({}, {})
 

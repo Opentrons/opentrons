@@ -1,7 +1,7 @@
 import numpy as np
 from numpy import insert, dot
 from numpy.linalg import inv
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 
 def solve(expected: List[Tuple[float, float]],
@@ -115,14 +115,28 @@ def add_z(xy: np.ndarray, z: float) -> np.ndarray:
 
 
 def apply_transform(
-        t: List[List[float]],
-        pos: Tuple[float, float, float]) -> Tuple[float, ...]:
+        t: Union[List[List[float]], np.ndarray],
+        pos: Tuple[float, float, float],
+        with_offsets=True) -> Tuple[float, float, float]:
     """
     Change of base using a transform matrix. Primarily used to render a point
     in space in a way that is more readable for the user.
 
     :param t: A transformation matrix from one 3D space [A] to another [B]
     :param pos: XYZ point in space A
-    :return: corresponding XYZ1 point in space B
+    :param with_offsets: Whether to apply the transform as an affine transform
+                         or as a standard transform. You might use
+                         with_offsets=False
+    :return: corresponding XYZ point in space B
     """
-    return tuple(dot(inv(t), list(pos) + [1])[:-1])
+    extended = 1 if with_offsets else 0
+    return tuple(dot(t, list(pos) + [extended])[:3])  # type: ignore
+
+
+def apply_reverse(
+        t: Union[List[List[float]], np.ndarray],
+        pos: Tuple[float, float, float],
+        with_offsets=True) -> Tuple[float, float, float]:
+    """ Like apply_transform but inverts the transform first
+    """
+    return apply_transform(inv(t), pos)
