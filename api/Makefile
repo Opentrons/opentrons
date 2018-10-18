@@ -39,8 +39,6 @@ ot_shared_data_sources := $(filter %.json,$(shell $(SHX) find ../shared-data/))
 # And the arbitrary stuff in resources
 ot_resources := $(filter %,$(shell $(SHX) find src/opentrons/resources))
 ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources)
-# And the tests
-ot_test_sources := $(filter-out data/configs% configs/%.json,$(shell $(SHX) find tests/))
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
@@ -67,7 +65,7 @@ $(wheel_pattern): setup.py $(ot_sources)
 wheel: $(wheel_file)
 
 .PHONY: test
-test: local-install $(ot_test_sources)
+test: local-install
 	$(pytest) $(tests) $(test_opts)
 
 .PHONY: lint
