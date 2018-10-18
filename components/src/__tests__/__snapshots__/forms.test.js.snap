@@ -255,6 +255,7 @@ exports[`InputField renders correctly 1`] = `
     >
       <input
         autoFocus={undefined}
+        id={undefined}
         name={undefined}
         onBlur={undefined}
         onChange={undefined}

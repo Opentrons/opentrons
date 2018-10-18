@@ -45,6 +45,7 @@ export default function WifiConnectModal (props: Props) {
   return (
     <Portal>
       <AlertModal
+        iconName='wifi'
         heading={`${SUCCESS_TITLE} ${response.ssid}`}
         onCloseClick={close}
         buttons={[

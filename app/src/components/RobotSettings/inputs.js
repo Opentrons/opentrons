@@ -1,7 +1,6 @@
 // @flow
 // input component convenience wrappers
-// TODO(mc, 2018): hopefully merge some of this functionality into components
-//   library so this file isn't necessary
+// TODO(mc, 2018-10-18): delete this file in favor of Formik
 import * as React from 'react'
 
 import {
