@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import {Formik} from 'formik'
-import mapValues from 'lodash/mapValues'
 
 import {InputField, CheckboxField} from '@opentrons/components'
 import {BottomButtonBar} from '../../modals'
@@ -39,12 +38,8 @@ export class ConnectForm extends React.Component<Props, State> {
   }
 
   onSubmit = (values: {[name: AuthFieldName]: string}) => {
-    const {ssid} = this.props
-    const showPassword = mapValues(this.state.showPassword, () => false)
-    this.setState({showPassword}, () => {
-      this.props.configure({ssid, ...values})
-      this.props.close()
-    })
+    this.props.configure({ssid: this.props.ssid, ...values})
+    this.props.close()
   }
 
   toggleShowPassword = (name: AuthFieldName) => {
