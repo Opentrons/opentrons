@@ -48,7 +48,7 @@ export type NetworkingStatusResponse = {
 
 export type WifiConfigureRequest = {
   ssid: string,
-  psk: string,
+  psk?: string,
 }
 
 export type WifiConfigureResponse = {
@@ -76,9 +76,9 @@ const STATUS: NetworkingStatusPath = 'networking/status'
 const LIST: WifiListPath = 'wifi/list'
 const CONFIGURE: WifiConfigurePath = 'wifi/configure'
 
-export const NO_SECURITY: SecurityType = 'none'
-export const WPA_PSK_SECURITY: SecurityType = 'wpa-psk'
-export const WPA_EAP_SECURITY: SecurityType = 'wpa-eap'
+export const NO_SECURITY: 'none' = 'none'
+export const WPA_PSK_SECURITY: 'wpa-psk' = 'wpa-psk'
+export const WPA_EAP_SECURITY: 'wpa-eap' = 'wpa-eap'
 
 export const fetchNetworkingStatus = buildRequestMaker('GET', STATUS)
 export const fetchWifiList = buildRequestMaker('GET', LIST)

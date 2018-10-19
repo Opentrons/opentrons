@@ -12,6 +12,8 @@ type Props = {
   contentsClassName?: string,
   /** Optional message to display as italic text below spinner */
   message?: string,
+  /** lightens overlay (alert modal over existing modal) */
+  alertOverlay?: boolean,
 }
 
 /**
@@ -20,9 +22,11 @@ type Props = {
 export default function SpinnerModal (props: Props) {
   return (
     <div className={styles.modal}>
-      <Overlay />
-      <div className={cx(styles.spinner_modal_contents, props.contentsClassName)}>
-        <Icon name='ot-spinner' className={styles.spinner_modal_icon} spin/>
+      <Overlay alertOverlay={props.alertOverlay} />
+      <div
+        className={cx(styles.spinner_modal_contents, props.contentsClassName)}
+      >
+        <Icon name="ot-spinner" className={styles.spinner_modal_icon} spin />
         <p>{props.message}</p>
       </div>
     </div>
