@@ -98,7 +98,7 @@ export default function SelectablePlate (props: Props) {
         })}
       </g>
     )
-  } else { // NOTE: Currently only selectable and hoverable (bound to redux) in IngredientSelectionModal
+  } else { // NOTE: Currently only selectable and hoverable (bound to redux) in LiquidPlacementModal
     const getWellProps = (wellName) => {
       const well = wellContents[wellName]
       return {

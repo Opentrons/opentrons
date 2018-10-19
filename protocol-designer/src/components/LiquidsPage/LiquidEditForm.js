@@ -28,7 +28,8 @@ type LiquidEditFormValues = {
   serialize?: boolean,
 }
 export const liquidEditFormSchema = Yup.object().shape({
-  name: Yup.string().required('Name is required'),
+  name: Yup.string().required(
+    i18n.t('form.generic.error.required', {name: i18n.t('form.liquid_edit.name')})),
   description: Yup.string(),
   serialize: Yup.boolean(),
 })
@@ -55,10 +56,10 @@ export default function LiquidEditForm (props: Props) {
         <Card className={styles.form_card}>
           <form onSubmit={handleSubmit}>
             <section className={styles.section}>
-              <div className={formStyles.header}>{i18n.t('form.liquid.details')}</div>
+              <div className={formStyles.header}>{i18n.t('form.liquid_edit.details')}</div>
               <div className={formStyles.row_wrapper}>
                 <FormGroup
-                  label={`${i18n.t('form.liquid.name')}:`}
+                  label={`${i18n.t('form.liquid_edit.name')}:`}
                   className={formStyles.column_1_2}>
                   <InputField
                     name='name'
@@ -69,7 +70,7 @@ export default function LiquidEditForm (props: Props) {
                   />
                 </FormGroup>
                 <FormGroup
-                  label={`${i18n.t('form.liquid.description')}:`}
+                  label={`${i18n.t('form.liquid_edit.description')}:`}
                   className={formStyles.column_1_2}>
                   <InputField
                     name='description'
@@ -80,12 +81,12 @@ export default function LiquidEditForm (props: Props) {
             </section>
 
             <section className={styles.section}>
-              <div className={formStyles.header}>{i18n.t('form.liquid.serialize_title')}</div>
+              <div className={formStyles.header}>{i18n.t('form.liquid_edit.serialize_title')}</div>
               <p className={styles.info_text}>
-                {i18n.t('form.liquid.serialize_explanation')}</p>
+                {i18n.t('form.liquid_edit.serialize_explanation')}</p>
               <CheckboxField
                 name='serialize'
-                label={i18n.t('form.liquid.serialize')}
+                label={i18n.t('form.liquid_edit.serialize')}
                 value={values.serialize}
                 onChange={handleChange} />
             </section>

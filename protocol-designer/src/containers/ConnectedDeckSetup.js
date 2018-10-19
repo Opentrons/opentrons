@@ -6,7 +6,7 @@ import {Deck, ClickOutside} from '@opentrons/components'
 import styles from './Deck.css'
 import i18n from '../localization'
 
-import IngredientSelectionModal from '../components/IngredientSelectionModal.js'
+import LiquidPlacementModal from '../components/LiquidPlacementModal.js'
 import LabwareContainer from '../containers/LabwareContainer.js'
 import LabwareSelectionModal from '../components/LabwareSelectionModal'
 import BrowseLabwareModal from '../components/labware/BrowseLabwareModal'
@@ -102,7 +102,7 @@ class DeckSetup extends React.Component<Props> {
     return (
       <React.Fragment>
         <LabwareSelectionModal />
-        {this.props.ingredSelectionMode && <IngredientSelectionModal />}
+        {this.props.ingredSelectionMode && <LiquidPlacementModal />}
         {this.renderDeck()}
       </React.Fragment>
     )

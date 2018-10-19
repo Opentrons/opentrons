@@ -32,6 +32,10 @@ export const deselectWells = createAction(
   _wellSelectPayloadMapper
 )
 
+export const deselectAllWells = createAction(
+  'DESELECT_ALL_WELLS'
+)
+
 // Well selection modal
 export type OpenWellSelectionModalPayload = {
   labwareId: string,

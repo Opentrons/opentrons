@@ -22,9 +22,9 @@ const unsavedChanges = (state: boolean = false, action: {type: string}): boolean
     case 'DELETE_CONTAINER':
     case 'MODIFY_CONTAINER':
     case 'MOVE_LABWARE':
-    case 'EDIT_MODE_INGREDIENT_GROUP':
     case 'DELETE_INGREDIENT':
-    case 'EDIT_INGREDIENT':
+    case 'EDIT_LIQUID_GROUP':
+    case 'SET_WELL_CONTENTS':
     case 'ADD_STEP':
     case 'DELETE_STEP':
     case 'SAVE_STEP_FORM':
