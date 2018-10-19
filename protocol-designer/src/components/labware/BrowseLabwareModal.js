@@ -51,13 +51,12 @@ class BrowseLabwareModal extends React.Component<Props> {
 
     return (
       <Modal
-        innerRef={ref => { this.wrapperRef = ref }}
         className={modalStyles.modal}
         contentsClassName={cx(modalStyles.modal_contents, modalStyles.transparent_content)}
         onCloseClick={this.handleClose}>
-        <WellTooltip ingredNames={this.props.ingredNames} wrapperRef={this.wrapperRef}>
+        <WellTooltip ingredNames={this.props.ingredNames}>
           {
-            ({makeHandleMouseMove, handleMouseLeaveWell, tooltipWellName}) => (
+            ({makeHandleMouseOverWell, handleMouseLeaveWell, tooltipWellName}) => (
               <SingleLabwareWrapper showLabels>
                 <g>
                   <LabwareOutline />
@@ -65,7 +64,7 @@ class BrowseLabwareModal extends React.Component<Props> {
                     const color = ingredIdsToColor(well.groupIds)
                     const mouseHandlers = color
                       ? {
-                        onMouseMove: makeHandleMouseMove(wellName, well.ingreds),
+                        onMouseOver: makeHandleMouseOverWell(wellName, well.ingreds),
                         onMouseLeave: handleMouseLeaveWell,
                       }
                       : {}

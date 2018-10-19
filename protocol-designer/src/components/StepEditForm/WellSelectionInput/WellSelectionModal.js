@@ -13,11 +13,12 @@ import {selectors as pipetteSelectors} from '../../../pipettes'
 
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import {selectors} from '../../../labware-ingred/reducers'
+import type {Wells, ContentsByWell} from '../../../labware-ingred/types'
 import {selectors as steplistSelectors} from '../../../steplist'
+import type {WellIngredientNames} from '../../steplist/types'
 import {changeFormInput} from '../../../steplist/actions'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import type {PipetteData} from '../../../step-generation/types'
-import type {Wells, ContentsByWell} from '../../../labware-ingred/types'
 
 import {SelectableLabware} from '../../labware'
 import SingleLabwareWrapper from '../../SingleLabware'
@@ -38,6 +39,7 @@ type SP = {
   initialSelectedWells: Array<string>,
   wellContents: ContentsByWell,
   containerType: string,
+  ingredNames: WellIngredientNames,
 }
 type DP = {saveWellSelection: (Wells) => mixed}
 
@@ -101,7 +103,8 @@ class WellSelectionModal extends React.Component<Props, State> {
             updateHighlightedWells={this.updateHighlightedWells}
             wellContents={this.props.wellContents}
             containerType={this.props.containerType}
-            pipetteChannels={pipette && pipette.channels} />
+            pipetteChannels={pipette && pipette.channels}
+            ingredNames={this.props.ingredNames} />
         </SingleLabwareWrapper>
 
         <WellSelectionInstructions />
@@ -123,12 +126,14 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const timelineIdx = orderedSteps.findIndex(id => id === stepId)
   const allWellContentsForStep = allWellContentsForSteps[timelineIdx]
   const formData = steplistSelectors.getUnsavedForm(state)
+  const ingredNames = selectors.getIngredientNames(state)
 
   return {
     initialSelectedWells: formData ? formData[ownProps.name] : [],
     pipette: pipetteId ? pipetteSelectors.equippedPipettes(state)[pipetteId] : null,
     wellContents: labware && allWellContentsForStep ? allWellContentsForStep[labware.id] : {},
     containerType: labware ? labware.type : 'missing labware',
+    ingredNames,
   }
 }
 

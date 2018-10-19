@@ -92,3 +92,68 @@
   z-index: 10001;
   position: absolute;
 }
+
+.virtual_reference {
+  width: 1px;
+  height: 1px;
+  position: absolute;
+}
+
+.arrow {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin-bottom: -0.5em;
+  width: 1em;
+  height: 0.5em;
+
+  &::before {
+    border-width: 0.5em 0.5em 0 0.5em;
+    content: '';
+    margin: auto;
+    display: block;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-color: var(--c-bg-dark) transparent transparent transparent;
+  }
+}
+
+.arrow.bottom {
+  top: 0;
+  left: 0;
+  margin-top: -0.5em;
+  width: 1em;
+  height: 0.5em;
+
+  &::before {
+    border-width: 0 0.5em 0.5em 0.5em;
+    border-color: transparent transparent var(--c-bg-dark) transparent;
+  }
+}
+
+.arrow.right {
+  top: 0;
+  left: 0;
+  margin-left: -0.5em;
+  height: 1em;
+  width: 0.5em;
+
+  &::before {
+    border-width: 0.5em 0.5em 0.5em 0;
+    border-color: transparent var(--c-bg-dark) transparent transparent;
+  }
+}
+
+.arrow.left {
+  top: 0;
+  right: 0;
+  margin-right: -0.5em;
+  height: 1em;
+  width: 0.5em;
+
+  &::before {
+    border-width: 0.5em 0 0.5em 0.5em;
+    border-color: transparent transparent transparent var(--c-bg-dark);
+  }
+}
