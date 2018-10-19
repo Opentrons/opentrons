@@ -42,10 +42,12 @@ async def test_controller_home(loop):
     # Check that we subsequently apply mount offset
     assert c.current_position(types.Mount.RIGHT) == {Axis.X: 408,
                                                      Axis.Y: 333,
-                                                     Axis.A: 188}
+                                                     Axis.A: 188,
+                                                     Axis.C: 19}
     assert c.current_position(types.Mount.LEFT) == {Axis.X: 408,
                                                     Axis.Y: 333,
-                                                    Axis.Z: 198}
+                                                    Axis.Z: 198,
+                                                    Axis.B: 19}
 
 
 async def test_controller_musthome(hardware_api):

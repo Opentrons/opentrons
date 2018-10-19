@@ -21,6 +21,7 @@ from opentrons.config import advanced_settings as advs
 from opentrons.server import init
 from opentrons.deck_calibration import endpoints
 from opentrons.util import environment
+from opentrons import hardware_control as hc
 
 # Uncomment to enable logging during tests
 
@@ -416,6 +417,16 @@ def running_on_pi():
         os.environ.pop('RUNNING_ON_PI')
     else:
         os.environ['RUNNING_ON_PI'] = oldpi
+
+
+@pytest.mark.skipif(not hc.Controller,
+                    reason='hardware controller not available '
+                           '(probably windows)')
+@pytest.fixture
+def cntrlr_mock_connect(monkeypatch):
+    def mock_connect(s):
+        return
+    monkeypatch.setattr(hc.Controller, '_connect', mock_connect)
 
 
 setup_testing_env()

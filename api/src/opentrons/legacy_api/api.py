@@ -1,5 +1,5 @@
 from . import robot, instruments as inst, containers as cnt, modules
-from .instruments import pipette_config
+from opentrons.config import pipette_config
 
 # Ignore the type here because well, this is exactly why this is the legacy_api
 robot = robot.Robot()  # type: ignore

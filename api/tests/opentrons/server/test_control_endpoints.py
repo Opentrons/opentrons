@@ -4,7 +4,7 @@ from opentrons import robot, modules
 from opentrons.server import init
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 from opentrons import instruments
-from opentrons.legacy_api.instruments import pipette_config
+from opentrons.config import pipette_config
 
 
 async def test_get_pipettes_uncommissioned(
