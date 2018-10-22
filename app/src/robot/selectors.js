@@ -1,6 +1,7 @@
 // @flow
 // robot selectors
 import padStart from 'lodash/padStart'
+import some from 'lodash/some'
 import {createSelector} from 'reselect'
 
 import {
@@ -306,7 +307,16 @@ export const getLabware = createSelector(
       .filter(isSlot)
       .map((slot) => {
         const labware = lwBySlot[slot]
-        const confirmed = confirmedBySlot[slot] || false
+        const {type, isTiprack} = labware
+
+        // labware is confirmed if:
+        //   - tiprack: labware in slot is confirmed
+        //   - non-tiprack: labware in slot or any of same type is confirmed
+        const confirmed = some(confirmedBySlot, (value, key) => (
+          value === true &&
+          (key === slot || (!isTiprack && type === lwBySlot[key].type))
+        ))
+
         let calibration: LabwareCalibrationStatus = 'unconfirmed'
         let isMoving = false
 

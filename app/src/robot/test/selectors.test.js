@@ -532,6 +532,7 @@ describe('robot selectors', () => {
               calibratorMount: 'left',
             },
             5: {slot: '5', type: 'a', isTiprack: false},
+            7: {slot: '7', type: 'a', isTiprack: false},
             9: {slot: '9', type: 'b', isTiprack: false},
           },
           pipettesByMount: {
@@ -589,6 +590,16 @@ describe('robot selectors', () => {
           isTiprack: false,
           isMoving: false,
           calibration: 'unconfirmed',
+          confirmed: true,
+        },
+        // then other labware by slot
+        {
+          slot: '7',
+          type: 'a',
+          isTiprack: false,
+          isMoving: false,
+          calibration: 'unconfirmed',
+          // note: labware a in slot 7 is confirmed because confirmed in slot 5
           confirmed: true,
         },
         {
