@@ -101,6 +101,7 @@ function Input (props: Props) {
         />
         {props.units && <div className={styles.suffix}>{props.units}</div>}
       </div>
+      {/* TODO(mc, 2018-10-20): do not render if no caption */}
       <div className={styles.input_caption}>
         <span>{error ? props.error : props.caption}</span>
         <span className={styles.right}>{props.secondaryCaption}</span>

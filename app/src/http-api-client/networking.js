@@ -16,10 +16,11 @@ import type {ApiAction} from './actions'
 type NetworkingStatusPath = 'networking/status'
 type WifiListPath = 'wifi/list'
 type WifiConfigurePath = 'wifi/configure'
+type WifiEapOptionsPath = 'wifi/eap-options'
 
 export type InternetStatus = 'none' | 'portal' | 'limited' | 'full' | 'unknown'
 
-export type SecurityType = 'none' | 'wpa-psk' | 'wpa-eap'
+export type WifiSecurityType = 'none' | 'wpa-psk' | 'wpa-eap'
 
 export type NetworkInterface = {
   ipAddress: ?string,
@@ -34,7 +35,7 @@ export type WifiNetwork = {
   signal: number,
   active: boolean,
   security: string,
-  securityType: SecurityType,
+  securityType: WifiSecurityType,
 }
 
 export type WifiNetworkList = Array<WifiNetwork>
@@ -46,9 +47,32 @@ export type NetworkingStatusResponse = {
   interfaces: {[device: string]: NetworkInterface},
 }
 
+export type WifiAuthField = {
+  name: string,
+  displayName: string,
+  required: boolean,
+  type: 'string' | 'password' | 'file',
+}
+
+export type WifiEapOption = {
+  name: string,
+  displayName: string,
+  options: Array<WifiAuthField>,
+}
+
+export type WifiEapOptionsResponse = {
+  options: Array<WifiEapOption>,
+}
+
 export type WifiConfigureRequest = {
   ssid: string,
   psk?: string,
+  securityType?: WifiSecurityType,
+  hidden?: boolean,
+  eapConfig?: {
+    method: string,
+    [eapOption: string]: string,
+  },
 }
 
 export type WifiConfigureResponse = {
@@ -59,21 +83,25 @@ export type WifiConfigureResponse = {
 export type NetworkingAction =
   | ApiAction<NetworkingStatusPath, void, NetworkingStatusResponse>
   | ApiAction<WifiListPath, void, WifiListResponse>
+  | ApiAction<WifiEapOptionsPath, void, WifiEapOptionsResponse>
   | ApiAction<WifiConfigurePath, WifiConfigureRequest, WifiConfigureResponse>
 
 export type FetchNetworkingStatusCall = ApiCall<void, NetworkingStatusResponse>
 export type FetchWifiListCall = ApiCall<void, WifiListResponse>
+export type FetchWifiEapOptionsCall = ApiCall<void, WifiEapOptionsResponse>
 export type ConfigureWifiCall = ApiCall<WifiConfigureRequest,
   WifiConfigureResponse>
 
 export type RobotNetworkingState = {
   'networking/list'?: FetchNetworkingStatusCall,
   'wifi/list'?: FetchWifiListCall,
+  'wifi/eap-options'?: FetchWifiEapOptionsCall,
   'wifi/configure': ConfigureWifiCall,
 }
 
 const STATUS: NetworkingStatusPath = 'networking/status'
 const LIST: WifiListPath = 'wifi/list'
+const EAP_OPTIONS: WifiEapOptionsPath = 'wifi/eap-options'
 const CONFIGURE: WifiConfigurePath = 'wifi/configure'
 
 export const NO_SECURITY: 'none' = 'none'
@@ -82,12 +110,14 @@ export const WPA_EAP_SECURITY: 'wpa-eap' = 'wpa-eap'
 
 export const fetchNetworkingStatus = buildRequestMaker('GET', STATUS)
 export const fetchWifiList = buildRequestMaker('GET', LIST)
+export const fetchWifiEapOptions = buildRequestMaker('GET', EAP_OPTIONS)
 export const configureWifi = buildRequestMaker('POST', CONFIGURE)
 export const clearConfigureWifiResponse = (robot: BaseRobot) =>
   clearApiResponse(robot, CONFIGURE)
 
 type GetNetworkingStatusCall = Sel<State, BaseRobot, FetchNetworkingStatusCall>
 type GetWifiListCall = Sel<State, BaseRobot, FetchWifiListCall>
+type GetWifiEapOptionsCall = Sel<State, BaseRobot, FetchWifiEapOptionsCall>
 type GetConfigureWifiCall = Sel<State, BaseRobot, ConfigureWifiCall>
 
 export const makeGetRobotNetworkingStatus = (): GetNetworkingStatusCall =>
@@ -108,6 +138,12 @@ export const makeGetRobotWifiList = (): GetWifiListCall =>
       },
     }
   })
+
+export const makeGetRobotWifiEapOptions = (): GetWifiEapOptionsCall =>
+  createSelector(
+    getRobotApiState,
+    state => state[EAP_OPTIONS] || {inProgress: true}
+  )
 
 export const makeGetRobotWifiConfigure = (): GetConfigureWifiCall =>
   createSelector(

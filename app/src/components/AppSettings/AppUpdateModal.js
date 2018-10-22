@@ -3,6 +3,7 @@
 import * as React from 'react'
 
 import {Icon, type ButtonProps} from '@opentrons/components'
+import {Portal} from '../portal'
 import {ScrollableAlertModal} from '../modals'
 import ReleaseNotes from '../ReleaseNotes'
 
@@ -29,15 +30,17 @@ export default function AppUpdateModal (props: Props) {
   const closeButtonChildren = downloading ? 'close' : 'not now'
 
   return (
-    <ScrollableAlertModal
-      heading={`Version ${availableVersion || ''} Available`}
-      buttons={[
-        {onClick: closeModal, children: closeButtonChildren},
-        buttonProps,
-      ]}
-    >
-      <ReleaseNotes source={info && info.releaseNotes} />
-    </ScrollableAlertModal>
+    <Portal>
+      <ScrollableAlertModal
+        heading={`Version ${availableVersion || ''} Available`}
+        buttons={[
+          {onClick: closeModal, children: closeButtonChildren},
+          buttonProps,
+        ]}
+      >
+        <ReleaseNotes source={info && info.releaseNotes} />
+      </ScrollableAlertModal>
+    </Portal>
   )
 }
 

@@ -235,7 +235,7 @@ async def configure(request: web.Request) -> web.Response:
                     securityType is wpa-eap. Should follow the format
                     described by /wifi/eap-options, e.g.
                     {
-                        "method": <valid eap method>,
+                        "eapType": <valid eap method>,
                         "valid-eap-option1": arg,
                         ...
                         "valid-eap-optionN": arg

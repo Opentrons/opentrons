@@ -26,10 +26,14 @@ export function FormTableRow (props: FormRowProps) {
     <span className={styles.form_table_label} />
   )
 
+  const inputClassName = props.label
+    ? styles.form_table_input
+    : styles.form_table_input_no_label
+
   return (
     <div className={styles.form_table_row}>
       {label}
-      <div className={styles.form_table_input}>{props.children}</div>
+      <div className={inputClassName}>{props.children}</div>
     </div>
   )
 }
