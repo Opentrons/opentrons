@@ -3,22 +3,24 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {selectors} from '../labware-ingred/reducers'
 import * as wellSelectionSelectors from '../top-selectors/well-contents'
-import {deleteIngredient, openRenameLabwareForm} from '../labware-ingred/actions'
-import type {BaseState, ThunkDispatch} from '../types'
+import {deleteWellsContents, openRenameLabwareForm} from '../labware-ingred/actions'
+import type {Dispatch} from 'redux'
+import type {BaseState} from '../types'
 
 import IngredientsList from '../components/IngredientsList'
 
 type Props = React.ElementProps<typeof IngredientsList>
 
 type DP = {
-  deleteIngredient: $ElementType<Props, 'deleteIngredient'>,
+  deleteWellsContents: $ElementType<Props, 'deleteWellsContents'>,
   openRenameLabwareForm: $ElementType<Props, 'openRenameLabwareForm'>,
 }
 
-type SP = $Diff<Props, DP>
+type SP = $Diff<Props, DP> & {_labwareId: ?string}
 
 function mapStateToProps (state: BaseState): SP {
   const container = selectors.getSelectedContainer(state)
+  const _labwareId = container && container.id
 
   return {
     renameLabwareFormMode: selectors.getRenameLabwareFormMode(state),
@@ -26,14 +28,18 @@ function mapStateToProps (state: BaseState): SP {
     labwareWellContents: (container && selectors.getIngredientLocations(state)[container.id]) || {},
     selectedIngredientGroupId: wellSelectionSelectors.getSelectedWellsCommonIngredId(state),
     selected: false,
+    _labwareId,
   }
 }
 
-function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
+function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Props {
+  const {dispatch} = dispatchProps
+  const {_labwareId, ...passThruProps} = stateProps
   return {
-    deleteIngredient: (args) => dispatch(deleteIngredient(args)),
+    ...passThruProps,
+    deleteWellsContents: (args) => dispatch(deleteWellsContents({...args, labwareId: _labwareId})),
     openRenameLabwareForm: () => dispatch(openRenameLabwareForm()),
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(IngredientsList)
+export default connect(mapStateToProps, null, mergeProps)(IngredientsList)

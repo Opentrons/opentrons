@@ -112,35 +112,43 @@ export const moveLabware = (toSlot: DeckSlot) => (dispatch: Dispatch<MoveLabware
   }
 }
 
-type DeleteIngredientPrepayload = {
-  wellName?: string,
-  groupId: string,
-}
-
-export type DeleteIngredient = {|
-  type: 'DELETE_INGREDIENT',
+export type DeleteWellsContents = {
+  type: 'DELETE_WELLS_CONTENTS',
   payload: {
-    containerId: string,
-  } & DeleteIngredientPrepayload,
-|}
-
-export const deleteIngredient = (payload: DeleteIngredientPrepayload) => (dispatch: Dispatch<DeleteIngredient>, getState: GetState) => {
-  const container = selectors.getSelectedContainer(getState())
-  if (!container || !container.id) {
-    console.warn('Tried to delete ingredient with no selected container')
-    return null
-  }
-
-  return dispatch({
-    type: 'DELETE_INGREDIENT',
-    payload: {
-      ...payload,
-      containerId: container.id,
-    },
-  })
+    liquidGroupId: string,
+    labwareId: string,
+    wells: Array<string>,
+  },
 }
 
-// ==========
+export const deleteWellsContents = (
+  payload: $PropertyType<DeleteWellsContents, 'payload'>
+) => ({
+  type: 'DELETE_WELLS_CONTENTS',
+  payload,
+})
+
+export type DeleteLiquidGroup = {
+  type: 'DELETE_LIQUID_GROUP',
+  payload: string, // liquid group id
+}
+
+export const deleteLiquidGroup = (liquidGroupId: string) =>
+  (dispatch: Dispatch<DeleteLiquidGroup>, getState: GetState) => {
+    const allLiquidGroupsOnDeck = selectors.getLiquidGroupsOnDeck(getState())
+    const liquidIsOnDeck = allLiquidGroupsOnDeck.includes(liquidGroupId)
+    // TODO: Ian 2018-10-22 we will eventually want to replace
+    // this window.confirm with a modal
+    const okToDelete = liquidIsOnDeck
+      ? global.confirm('This liquid has been placed on the deck, are you sure you want to delete it?')
+      : true
+    if (okToDelete) {
+      return dispatch({
+        type: 'DELETE_LIQUID_GROUP',
+        payload: liquidGroupId,
+      })
+    }
+  }
 
 // NOTE: assumes you want to set a uniform volume of the same liquid in one labware
 export type SetWellContentsPayload = {
