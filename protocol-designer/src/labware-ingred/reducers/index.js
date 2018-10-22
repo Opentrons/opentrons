@@ -17,7 +17,7 @@ import {labwareToDisplayName} from '../utils'
 import type {DeckSlot} from '@opentrons/components'
 import {getIsTiprack} from '@opentrons/shared-data'
 
-import type {LabwareLiquidState} from '../../step-generation'
+import type {SingleLabwareLiquidState, LabwareLiquidState} from '../../step-generation'
 
 import type {
   IngredInputs,
@@ -34,10 +34,10 @@ import type {BaseState, Selector, Options} from '../../types'
 import type {LoadFileAction} from '../../load-file'
 import type {
   DeleteIngredient,
-  EditIngredient,
   EditLiquidGroupAction,
   MoveLabware,
   SelectLiquidAction,
+  SetWellContentsAction,
 } from '../actions'
 
 // external actions (for types)
@@ -83,10 +83,8 @@ const selectedContainerId = handleActions({
 type RenameLabwareFormModeState = boolean
 const renameLabwareFormMode = handleActions({
   OPEN_RENAME_LABWARE_FORM: () => true,
-
   CLOSE_RENAME_LABWARE_FORM: () => false,
   CLOSE_INGREDIENT_SELECTOR: () => false,
-  EDIT_MODE_INGREDIENT_GROUP: () => false,
 }, false)
 
 type DrillDownLabwareId = string | null
@@ -220,20 +218,6 @@ export const ingredients = handleActions({
       [liquidGroupId]: {...state[liquidGroupId], ...action.payload},
     }
   },
-  EDIT_INGREDIENT: (state, action: EditIngredient) => {
-    // TODO: Ian 2018-10-12 this is deprecated, remove when "add liquids to deck" modal is redone
-    const {groupId, description, serialize, name} = action.payload
-    const ingredFields: LiquidGroup = {
-      description,
-      serialize: Boolean(serialize),
-      name,
-    }
-
-    return {
-      ...state,
-      [groupId]: ingredFields,
-    }
-  },
   // Remove the deleted group (referenced by array index)
   DELETE_INGREDIENT: (state, action: DeleteIngredient) => {
     const {groupId, wellName} = action.payload
@@ -250,25 +234,19 @@ export const ingredients = handleActions({
 type LocationsState = LabwareLiquidState
 
 export const ingredLocations = handleActions({
-  EDIT_INGREDIENT: (state: LocationsState, action: EditIngredient) => {
-    const {groupId, containerId} = action.payload
-
-    function wellsWithVol (acc: {[well: string]: {volume: number}}, well: string) {
-      return {
-        ...acc,
-        [well]: {
-          [groupId]: {
-            volume: action.payload.volume,
-          },
-        },
-      }
-    }
+  SET_WELL_CONTENTS: (state: LocationsState, action: SetWellContentsAction): LocationsState => {
+    const {liquidGroupId, labwareId, wells, volume} = action.payload
+    const newWellContents = {[liquidGroupId]: {volume}}
+    const updatedWells = wells.reduce((acc, wellName): SingleLabwareLiquidState => ({
+      ...acc,
+      [wellName]: newWellContents,
+    }), {})
 
     return {
       ...state,
-      [containerId]: {
-        ...state[containerId],
-        ...action.payload.wells.reduce(wellsWithVol, {}),
+      [labwareId]: {
+        ...state[labwareId],
+        ...updatedWells,
       },
     }
   },
@@ -355,9 +333,22 @@ const getNextLiquidGroupId: Selector<string> = createSelector(
   (_ingredGroups) => ((max(Object.keys(_ingredGroups).map(id => parseInt(id))) + 1) || 0).toString()
 )
 
-const getIngredientNames: Selector<{[ingredId: string]: string}> = createSelector(
+const getLiquidNamesById: Selector<{[ingredId: string]: string}> = createSelector(
   getLiquidGroupsById,
   ingredGroups => mapValues(ingredGroups, (ingred: LiquidGroup) => ingred.name)
+)
+
+const getLiquidSelectionOptions: Selector<Options> = createSelector(
+  getLiquidGroupsById,
+  (liquidGroupsById) => {
+    return Object.keys(liquidGroupsById).map(id => ({
+      // NOTE: if these fallbacks are used, it's a bug
+      name: (liquidGroupsById[id])
+        ? liquidGroupsById[id].name || `(Unnamed Liquid: ${String(id)})`
+        : 'Missing Liquid',
+      value: id,
+    }))
+  }
 )
 
 const _loadedContainersBySlot = (containers: ContainersState) =>
@@ -510,10 +501,11 @@ export const selectors = {
 
   getLiquidGroupsById,
   getIngredientLocations,
-  getIngredientNames,
+  getLiquidNamesById,
   getLabware,
   getLabwareNames,
   getLabwareTypes,
+  getLiquidSelectionOptions,
   getNextLiquidGroupId,
   getSavedLabware,
   getSelectedContainer,

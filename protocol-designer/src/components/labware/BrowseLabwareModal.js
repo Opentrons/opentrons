@@ -143,7 +143,7 @@ function mapStateToProps (state: BaseState): SP {
   const labware = labwareId && allLabware ? allLabware[labwareId] : null
   const allWellContents = wellContentsSelectors.lastValidWellContents(state)
   const wellContents = labwareId && allWellContents ? allWellContents[labwareId] : {}
-  const ingredNames = selectors.getIngredientNames(state)
+  const ingredNames = selectors.getLiquidNamesById(state)
   return {
     wellContents,
     ingredNames,

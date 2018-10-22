@@ -3,7 +3,6 @@ import {createAction} from 'redux-actions'
 import type {Dispatch} from 'redux'
 
 import {selectors} from './reducers'
-import wellSelectionSelectors from '../well-selection/selectors'
 
 import type {GetState} from '../types'
 import type {IngredInputs} from './types'
@@ -50,16 +49,6 @@ export const drillDownOnLabware = createAction(
 export const drillUpFromLabware = createAction(
   'DRILL_UP_FROM_LABWARE',
   () => {}
-)
-
-// =====
-
-export const editModeIngredientGroup = createAction(
-  'EDIT_MODE_INGREDIENT_GROUP',
-  (args: (
-    | null // null here means "deselect ingredient group"
-    | {| wellName: ?string, groupId: string |}
-  )) => args
 )
 
 // ==== Create/delete/modify labware =====
@@ -151,57 +140,25 @@ export const deleteIngredient = (payload: DeleteIngredientPrepayload) => (dispat
   })
 }
 
-// TODO test this thunk
-export type EditIngredient = {
-  type: 'EDIT_INGREDIENT',
-  payload: {
-    ...IngredInputs,
-    containerId: string,
-    groupId: string,
-    wells: Array<string>,
-  },
+// ==========
+
+// NOTE: assumes you want to set a uniform volume of the same liquid in one labware
+export type SetWellContentsPayload = {
+  liquidGroupId: string,
+  labwareId: string,
+  wells: Array<string>, // NOTE: order should not be meaningful
+  volume: number,
 }
 
-export type EditIngredientPayload = {
-  ...IngredInputsExact,
-  groupId: string | null, // null indicates new ingredient is being created
+export type SetWellContentsAction = {
+  type: 'SET_WELL_CONTENTS',
+  payload: SetWellContentsPayload,
 }
 
-// TODO: Ian 2018-10-12 this is deprecated, remove when "add liquids to deck" modal is redone
-export const editIngredient = (payload: EditIngredientPayload) => (dispatch: Dispatch<EditIngredient>, getState: GetState) => {
-  const state = getState()
-  const container = selectors.getSelectedContainer(state)
-
-  const {groupId, ...inputFields} = payload
-
-  if (!container) {
-    throw new Error('No container selected, cannot edit ingredient')
-  }
-
-  if (groupId !== null) {
-    // Not a copy, just an edit
-    return dispatch({
-      type: 'EDIT_INGREDIENT',
-      payload: {
-        ...inputFields,
-        groupId: groupId,
-        containerId: container.id,
-        wells: wellSelectionSelectors.selectedWellNames(state),
-      },
-    })
-  }
-
-  return dispatch({
-    type: 'EDIT_INGREDIENT',
-    payload: {
-      ...inputFields,
-      // if it matches the name of the clone parent, append "copy" to that name
-      containerId: container.id,
-      groupId: selectors.getNextLiquidGroupId(state),
-      wells: wellSelectionSelectors.selectedWellNames(state),
-    },
-  })
-}
+export const setWellContents = (payload: SetWellContentsPayload): SetWellContentsAction => ({
+  type: 'SET_WELL_CONTENTS',
+  payload,
+})
 
 export type SelectLiquidAction = {
   type: 'SELECT_LIQUID_GROUP',

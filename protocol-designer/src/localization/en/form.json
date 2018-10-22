@@ -1,15 +1,24 @@
 {
   "generic": {
     "labware_type": "Type",
-    "nickname": "Nickname"
+    "nickname": "Nickname",
+    "error": {
+      "required": "{{name}} is required",
+      "more_than_zero": "Must be more than 0"
+    }
   },
-  "liquid": {
+  "liquid_edit": {
     "details": "Details",
     "description": "Description",
     "name": "Liquid name",
     "serialize": "Serialize",
     "serialize_title": "Serialization",
     "serialize_explanation": "Each placement of the liquid will get its own number. (\"Sample 1\", \"Sample 2\", \"Sample 3\")"
+  },
+  "liquid_placement": {
+    "liquid": "Liquid",
+    "volume": "Volume",
+    "volume_exceeded": "Warning: exceeded max volume per well: {{volume}}µL"
   },
   "step_edit_form": {
     "consolidate": {

@@ -1,6 +1,6 @@
 @import '@opentrons/components';
 
-.ingredient_modal {
+.liquid_placement_modal {
   @apply(--absolute-fill);
 
   background-color: rgba(100, 100, 100, 0.8);
