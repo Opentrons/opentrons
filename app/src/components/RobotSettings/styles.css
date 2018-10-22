@@ -61,10 +61,19 @@
 /* TODO(mc, 2018-10-15): switch wifi select/options to flex ASAP */
 .wifi_dropdown {
   max-width: 75%;
+
+  /* TODO(ka, 2018-10-19): This is needed to address an inaccessible positioning element from react-select */
+  & > div:not(:first-child) {
+    box-shadow: none;
+    background-color: transparent;
+  }
 }
 
 .wifi_option {
   @apply --font-body-1-dark;
+
+  width: 100%;
+  padding: 0.25rem 0.5rem;
 }
 
 .wifi_option_icon,
@@ -83,6 +92,26 @@
 .wifi_option_icon_right {
   float: right;
   padding-left: 0.25rem;
+}
+
+.dropdown_icon {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.25rem;
+  width: 1.25rem;
+  pointer-events: none;
+
+  & svg {
+    color: var(--c-dark-gray);
+  }
+}
+
+.options_menu {
+  background-color: var(--c-light-gray);
+  position: relative;
+  top: -2.5rem;
+  border-radius: 3px;
+  padding: 0.25rem 0 0.5rem;
 }
 
 .connection_label {

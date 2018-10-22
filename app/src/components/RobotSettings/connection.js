@@ -1,7 +1,7 @@
 // @flow
 // UI components for displaying connection info
 import * as React from 'react'
-import Select from 'react-select'
+import Select, {components} from 'react-select'
 import find from 'lodash/find'
 import {Icon} from '@opentrons/components'
 import {CardContentHalf} from '../layout'
@@ -88,6 +88,55 @@ export function NetworkDropdown (props: NetworkDropdownProps) {
   const options = list.map(NetworkOption)
   const selectedOption = find(options, {value})
 
+  const selectStyles = {
+    option: (base, state) => ({
+      ...base,
+      padding: '0.25rem 0',
+    }),
+    input: () => ({
+      marginTop: '-0.25rem',
+      marginLeft: 0,
+    }),
+    container: base => ({
+      ...base,
+      backgroundColor: 'transparent',
+      height: '2rem',
+      overflow: 'visible',
+    }),
+    control: () => ({
+      backgroundColor: '#e5e2e2',
+      border: 'none',
+      padding: '0.25rem 0rem',
+      outline: 'none',
+      borderRadius: '3px',
+      height: '1.75rem',
+      boxShadow: 'none',
+    }),
+    indicatorSeparator: () => ({
+      display: 'none',
+    }),
+  }
+  // Custom dropdown indicator icon component needed to match comp lib
+  const DropdownIndicator = props => {
+    return (
+      components.DropdownIndicator && (
+        <components.DropdownIndicator {...props}>
+          <div className={styles.dropdown_icon}>
+            <Icon name="menu-down" width="100%" />
+          </div>
+        </components.DropdownIndicator>
+      )
+    )
+  }
+  // custom Menu (options dropwdown) component
+  const Menu = props => {
+    return (
+      <components.Menu {...props}>
+        <div className={styles.options_menu}>{props.children}</div>
+      </components.Menu>
+    )
+  }
+
   return (
     <Select
       className={styles.wifi_dropdown}
@@ -95,6 +144,8 @@ export function NetworkDropdown (props: NetworkDropdownProps) {
       value={selectedOption}
       onChange={onChange}
       options={options}
+      styles={selectStyles}
+      components={{DropdownIndicator, Menu}}
     />
   )
 }
