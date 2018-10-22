@@ -1,17 +1,14 @@
 import pytest
 from opentrons import types
 from opentrons import hardware_control as hc
-from opentrons.config import pipette_config
 from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.pipette import Pipette
 
 
 @pytest.fixture
 def dummy_instruments():
-    configs = pipette_config.load('p10_single_v1')
-    dummy_instruments_attached = {types.Mount.LEFT: {},
-                                  types.Mount.RIGHT: {}}
-    for config, default_value in configs._asdict().items():
-        dummy_instruments_attached[types.Mount.LEFT][config] = default_value
+    dummy_instruments_attached = {types.Mount.LEFT: 'p10_single_v1',
+                                  types.Mount.RIGHT: None}
     return dummy_instruments_attached
 
 
@@ -21,19 +18,21 @@ def attached_instruments(inst):
     """
     configs = ['name', 'min_volume', 'max_volume',
                'aspirate_flow_rate', 'dispense_flow_rate']
-    instruments = {types.Mount.LEFT: {},
-                   types.Mount.RIGHT: {}}
+    instr_objects = {mount: Pipette(model) if model else None
+                     for mount, model in inst.items()}
+    instruments = {types.Mount.LEFT: {}, types.Mount.RIGHT: {}}
     for mount in types.Mount:
-        if not inst[mount].get('name'):
+        if not instr_objects[mount]:
             continue
         for key in configs:
-            instruments[mount][key] = inst[mount][key]
+            instruments[mount][key] = instr_objects[mount].as_dict()[key]
     return instruments
 
 
 async def test_cache_instruments(dummy_instruments, loop):
     hw_api = hc.API.build_hardware_simulator(
-        attached_instruments=dummy_instruments, loop=loop)
+        attached_instruments=dummy_instruments,
+        loop=loop)
     await hw_api.cache_instruments()
     assert hw_api.attached_instruments == attached_instruments(
         dummy_instruments)

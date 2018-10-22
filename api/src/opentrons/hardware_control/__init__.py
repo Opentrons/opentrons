@@ -14,13 +14,13 @@ import asyncio
 from collections import OrderedDict
 import functools
 import logging
-from typing import Any, Dict, Union, List, Tuple
+from typing import Any, Dict, Union, List, Optional, Tuple
 from opentrons import types as top_types
 from opentrons.util import linal
 from .simulator import Simulator
 from opentrons.config import robot_configs
 from contextlib import contextmanager
-from opentrons.config import pipette_config
+from .pipette import Pipette
 try:
     from .controller import Controller
 except ModuleNotFoundError:
@@ -50,6 +50,7 @@ class PipetteNotAttachedError(KeyError):
 
 
 _Backend = Union[Controller, Simulator]
+Instruments = Dict[top_types.Mount, Optional[Pipette]]
 
 
 class API:
@@ -85,12 +86,10 @@ class API:
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: Dict[Axis, float] = {}
 
-        self._attached_instruments: \
-            Dict[top_types.Mount, Dict[str, Any]] = {top_types.Mount.LEFT: {},
-                                                     top_types.Mount.RIGHT: {}}
-        self._current_volume: \
-            Dict[top_types.Mount, float] = {top_types.Mount.LEFT: 0,
-                                            top_types.Mount.RIGHT: 0}
+        self._attached_instruments: Instruments = {
+            top_types.Mount.LEFT: None,
+            top_types.Mount.RIGHT: None
+        }
         self._attached_modules: Dict[str, Any] = {}
 
     @classmethod
@@ -113,7 +112,7 @@ class API:
     @classmethod
     def build_hardware_simulator(
             cls,
-            attached_instruments: Dict[top_types.Mount, Dict[str, Any]] = None,
+            attached_instruments: Dict[top_types.Mount, str] = None,
             attached_modules: List[str] = None,
             config: robot_configs.robot_config = None,
             loop: asyncio.AbstractEventLoop = None) -> 'API':
@@ -123,8 +122,7 @@ class API:
         Multiple simulating hardware controllers may be active at one time.
         """
         if None is attached_instruments:
-            attached_instruments = {top_types.Mount.LEFT: {},
-                                    top_types.Mount.RIGHT: {}}
+            attached_instruments = {}
 
         if None is attached_modules:
             attached_modules = []
@@ -171,8 +169,7 @@ class API:
         for mount in top_types.Mount:
             instrument_model = self._backend.get_attached_instrument(mount)
             if instrument_model:
-                configs = pipette_config.load(instrument_model)
-                self._attached_instruments[mount].update(configs._asdict())
+                self._attached_instruments[mount] = Pipette(instrument_model)
         mod_log.info("Instruments found:{}".format(self._attached_instruments))
 
     @property
@@ -182,11 +179,12 @@ class API:
         instruments = {top_types.Mount.LEFT: {},
                        top_types.Mount.RIGHT: {}}
         for mount in top_types.Mount:
-            if not self._attached_instruments[mount].get('name'):
+            instr = self._attached_instruments[mount]
+            if not instr:
                 continue
+            instr_dict = instr.as_dict()
             for key in configs:
-                    instruments[mount][key] = \
-                        self._attached_instruments[mount][key]
+                instruments[mount][key] = instr_dict[key]
         return instruments
 
     @_log_call
@@ -423,42 +421,41 @@ class API:
             speed = rate * aspirate_speed
         """
         this_pipette = self._attached_instruments[mount]
-        if 'name' not in this_pipette.keys():
+        if not this_pipette:
             raise PipetteNotAttachedError("No pipette attached to {} mount"
                                           .format(mount.name))
-
         if volume is None:
-            asp_vol = this_pipette['max_volume'] - self._current_volume[mount]
+            asp_vol = this_pipette.available_volume
             mod_log.debug(
                 "No aspirate volume defined. Aspirating up to pipette "
-                "max_volume ({}uL)".format(this_pipette['max_volume']))
+                "max_volume ({}uL)".format(this_pipette.config.max_volume))
         else:
             asp_vol = volume
 
-        assert self._current_volume[mount] + asp_vol \
-            <= this_pipette['max_volume'], \
+        assert this_pipette.ok_to_add_volume(asp_vol), \
             "Cannot aspirate more than pipette max volume"
         if asp_vol == 0:
             return
         # using a context generator to temporarily change pipette speed to a
         # user specified rate, then switch back to default
-        with self._set_temp_pipette_speed(mount, 'aspirate', rate):
+        with self._set_temp_pipette_speed(this_pipette, 'aspirate', rate):
             self._backend.set_active_current(
-                 Axis.of_plunger(mount), this_pipette['plunger_current'])
-            target_position = {Axis.of_plunger(mount): self._plunger_position(
-                                        mount,
-                                        self._current_volume[mount] + asp_vol,
-                                        'aspirate')}
+                 Axis.of_plunger(mount), this_pipette.config.plunger_current)
+            target_position = {
+                Axis.of_plunger(mount): self._plunger_position(
+                    this_pipette,
+                    this_pipette.current_volume + asp_vol,
+                    'aspirate')}
             try:
                 self._backend.move({ax.name: pos
                                     for ax, pos in target_position.items()})
             except Exception:
                 self._log.exception('Aspirate failed')
-                self._current_volume.clear()
+                this_pipette.set_current_volume(0)
                 raise
             else:
                 self._current_position.update(target_position)
-                self._current_volume[mount] += asp_vol
+                this_pipette.add_current_volume(asp_vol)
 
     @_log_call
     async def dispense(self, mount: top_types.Mount, volume: float = None,
@@ -474,57 +471,55 @@ class API:
             speed = rate * dispense_speed
         """
         this_pipette = self._attached_instruments[mount]
-        if 'name' not in this_pipette.keys():
+        if not this_pipette:
             raise PipetteNotAttachedError("No pipette attached to {} mount"
                                           .format(mount.name))
         if volume is None:
-            disp_vol = self._current_volume[mount]
+            disp_vol = this_pipette.current_volume
             mod_log.debug("No dispense volume specified. Dispensing all "
                           "remaining liquid ({}uL) from pipette".format
                           (disp_vol))
         else:
             disp_vol = volume
         # Ensure we don't dispense more than the current volume
-        disp_vol = min(self._current_volume[mount], disp_vol)
+        disp_vol = min(this_pipette.current_volume, disp_vol)
 
         if disp_vol == 0:
             return
         # using a context generator to temporarily change pipette speed to a
         # user specified rate, then switch back to default
-        with self._set_temp_pipette_speed(mount, 'dispense', rate):
+        with self._set_temp_pipette_speed(this_pipette, 'dispense', rate):
             self._backend.set_active_current(
-                Axis.of_plunger(mount), this_pipette['plunger_current'])
-            target_position = {Axis.of_plunger(mount): self._plunger_position(
-                                        mount,
-                                        self._current_volume[mount] - disp_vol,
-                                        'dispense')}
+                Axis.of_plunger(mount), this_pipette.config.plunger_current)
+            target_position = {
+                Axis.of_plunger(mount): self._plunger_position(
+                    this_pipette,
+                    this_pipette.current_volume - disp_vol,
+                    'dispense')}
             try:
                 self._backend.move({ax.name: pos
                                     for ax, pos in target_position.items()})
             except Exception:
                 self._log.exception('Dispense failed')
-                self._current_volume.clear()
+                this_pipette.set_current_volume(0)
                 raise
             else:
                 self._current_position.update(target_position)
-                self._current_volume[mount] -= disp_vol
+                this_pipette.remove_current_volume(disp_vol)
 
-    def _plunger_position(self, mount: top_types.Mount, ul: float,
+    def _plunger_position(self, instr: Pipette, ul: float,
                           action: str) -> float:
-        mm = ul / self._ul_per_mm(mount, ul, action)
-        position = mm + self._attached_instruments[
-            mount]['plunger_positions']['bottom']
+        mm = ul / instr.ul_per_mm(ul, action)
+        position = mm + instr.config.plunger_positions['bottom']
         return round(position, 6)
 
-    def _ul_per_mm(self, mount: top_types.Mount,
-                   ul: float, action: str) -> float:
-        sequence = self._attached_instruments[mount]['ul_per_mm'][action]
-        return pipette_config.piecewise_volume_conversion(ul, sequence)
-
     @contextmanager
-    def _set_temp_pipette_speed(self, mount, action, rate):
+    def _set_temp_pipette_speed(self,
+                                instr: Pipette,
+                                action: str,
+                                rate: float):
         action_str = '{}_flow_rate'.format(action)
-        saved_speed = self._attached_instruments[mount][action_str]
+        saved_speed = getattr(instr.config, action_str)
         self._backend.set_pipette_speed(saved_speed * rate)
         try:
             yield
@@ -555,10 +550,14 @@ class API:
 
     @_log_call
     async def set_flow_rate(self, mount, aspirate=None, dispense=None):
+        this_pipette = self._attached_instruments[mount]
+        if not this_pipette:
+            raise PipetteNotAttachedError("No pipette attached to {} mount"
+                                          .format(mount))
         if aspirate:
-            self._attached_instruments[mount]['aspirate_flow_rate'] = aspirate
+            this_pipette.update_config_item('aspirate_flow_rate', aspirate)
         if dispense:
-            self._attached_instruments[mount]['dispense_flow_rate'] = dispense
+            this_pipette.update_config_item('dispense_float_rate', dispense)
 
     @_log_call
     # Used by pick_up_tip

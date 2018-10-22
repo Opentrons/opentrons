@@ -125,12 +125,12 @@ def set_current_mount(attached_pipettes):
     if left['model'] in pipette_config.configs:
         pip_config = pipette_config.load(left['model'])
         left_pipette = instruments._create_pipette_from_config(
-            mount='left', config=pip_config)
+            mount='left', config=pip_config, name=left['model'])
 
     if right['model'] in pipette_config.configs:
         pip_config = pipette_config.load(right['model'])
         right_pipette = instruments._create_pipette_from_config(
-            mount='right', config=pip_config)
+            mount='right', config=pip_config, name=right['model'])
 
     if right_pipette and right_pipette.channels == 1:
         session.current_mount = 'A'
