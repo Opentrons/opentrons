@@ -99,16 +99,17 @@ function determineOrdering (grid: Cell): Array<Array<string>> {
 function calculateCoordinates (
   well: Well,
   ordering: Array<Array<string>>,
-  spacing: Cell): {[wellName: string]: Well} {
+  spacing: Cell,
+  offset: Offset): {[wellName: string]: Well} {
   // Note, reverse() on its own mutates ordering. Use slice() as a workaround
   // to prevent mutation
   return ordering.reduce((wells, column, cIndex) => {
     column.slice().reverse().forEach((element, rIndex) => {
       wells[element] = {
         ...well,
-        x: round(cIndex * spacing.column, 2),
-        y: round(rIndex * spacing.row, 2),
-        z: 0}
+        x: round(cIndex * spacing.column + offset.x, 2),
+        y: round(rIndex * spacing.row + offset.y, 2),
+        z: round(offset.z - well.depth, 2)}
     })
     return wells
   }, {})
@@ -129,15 +130,17 @@ function calculateCoordinates (
 // or the labware definition schema in labware-json-schema
 export function createRegularLabware (props: RegularLabwareProps): Schema {
   const ordering = determineOrdering(props.grid)
+  const slotDims = {x: 127.76, y: 85.48, z: 0}
+  props.offset.z = props.dimensions.overallHeight
   const definition: Schema = {
     ordering,
     otId: assignId(),
     deprecated: false,
     metadata: props.metadata,
-    cornerOffsetFromSlot: props.offset,
+    cornerOffsetFromSlot: {x: round(props.dimensions.overallLength - slotDims.x, 2), y: round(props.dimensions.overallWidth - slotDims.y, 2), z: slotDims.z},
     dimensions: props.dimensions,
     parameters: props.parameters,
-    wells: calculateCoordinates(props.well, ordering, props.spacing),
+    wells: calculateCoordinates(props.well, ordering, props.spacing, props.offset),
   }
 
   const numWells = props.grid.row * props.grid.column

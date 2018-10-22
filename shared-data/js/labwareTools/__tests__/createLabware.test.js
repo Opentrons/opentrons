@@ -1,21 +1,12 @@
-import Ajv from 'ajv'
 import omit from 'lodash/omit'
 import range from 'lodash/range'
 
-import labwareSchema from '../../../labware-json-schema/labware-schema.json'
 import {createRegularLabware} from '../index.js'
 
-import exampleLabware1 from './example.json'
-import exampleLabware2 from './example2.json'
+import exampleLabware1 from '../../__tests__/fixtures/labwareExample.json'
+import exampleLabware2 from '../../__tests__/fixtures/labwareExample2.json'
 
 jest.mock('../assignId', () => jest.fn(() => 'mock-id'))
-
-const ajv = new Ajv({
-  allErrors: true,
-  jsonPointers: true,
-})
-
-const validate = ajv.compile(labwareSchema)
 
 describe('createLabware', () => {
   let labware1
@@ -26,12 +17,13 @@ describe('createLabware', () => {
   beforeEach(() => {
     well1 = omit(exampleLabware1.wells.A1, ['x', 'y', 'z'])
     well2 = omit(exampleLabware2.wells.A1, ['x', 'y', 'z'])
+    const offset = {x: 10, y: 10, z: 5}
 
     labware1 = createRegularLabware({
       metadata: exampleLabware1.metadata,
       parameters: exampleLabware1.parameters,
       dimensions: exampleLabware1.dimensions,
-      offset: exampleLabware2.cornerOffsetFromSlot,
+      offset,
       grid: {row: 1, column: 2},
       spacing: {row: 10, column: 10},
       well: well1,
@@ -42,7 +34,7 @@ describe('createLabware', () => {
       metadata: exampleLabware2.metadata,
       parameters: exampleLabware2.parameters,
       dimensions: exampleLabware2.dimensions,
-      offset: exampleLabware2.cornerOffsetFromSlot,
+      offset,
       grid: {row: 3, column: 2},
       spacing: {row: 9, column: 9},
       well: well2,
@@ -58,14 +50,6 @@ describe('createLabware', () => {
     expect(labware2).toEqual(exampleLabware2)
   })
 
-  test('generated labware passes schema', () => {
-    const valid = validate(exampleLabware1)
-    const validationErrors = validate.errors
-
-    expect(validationErrors).toBe(null)
-    expect(valid).toBe(true)
-  })
-
   test('id is from assignId', () => {
     expect(labware1.otId).toBe('mock-id')
     expect(labware2.otId).toBe('mock-id')
@@ -78,40 +62,26 @@ describe('createLabware', () => {
   test('well XYZ generates correctly', () => {
     const spacing = {row: 11.8, column: 12.1}
     const grid = {row: 8, column: 12}
-
+    const offset = {x: 10, y: 10, z: 5}
     const labware3 = createRegularLabware({
       metadata: exampleLabware2.metadata,
       parameters: exampleLabware2.parameters,
       dimensions: exampleLabware2.dimensions,
-      offset: exampleLabware2.cornerOffsetFromSlot,
+      offset,
       grid,
       spacing,
       well: well2,
     })
 
-    const expectedXByCol = range(0, grid.column * spacing.column, spacing.column)
-    const expectedYByRow = range(0, grid.row * spacing.row, spacing.row).reverse()
-
+    const expectedXByCol = range(offset.x, (grid.column * spacing.column) + offset.x, spacing.column)
+    const expectedYByRow = range(offset.y, (grid.row * spacing.row) + offset.y, spacing.row).reverse()
     labware3.ordering.forEach((column, cIndex) => {
       column.forEach((wellName, rIndex) => {
         const well = labware3.wells[wellName]
         expect(well.x).toBeCloseTo(expectedXByCol[cIndex], 2)
         expect(well.y).toBeCloseTo(expectedYByRow[rIndex], 2)
-        expect(well.z).toBeCloseTo(0, 2)
+        expect(well.z).toBeCloseTo(exampleLabware2.dimensions.overallHeight - well.depth, 2)
       })
     })
-  })
-  test('invalid schema throws error', () => {
-    const spacing = {row: 11.8, column: 12.1}
-    const grid = {row: 8, column: 12}
-    const input = {
-      metadata: exampleLabware2.metadata,
-      parameters: exampleLabware2.parameters,
-      dimensions: exampleLabware2.dimensions,
-      grid,
-      spacing,
-      well: well2,
-    }
-    expect(() => { createRegularLabware(input) }).toThrow('1 or more required arguments missing from input.')
   })
 })

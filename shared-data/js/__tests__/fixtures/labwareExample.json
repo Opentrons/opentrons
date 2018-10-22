@@ -17,13 +17,13 @@
     "isTiprack": false
   },
   "cornerOffsetFromSlot": {
-    "x": 10,
-    "y": 10,
-    "z": 5
+    "x": 0,
+    "y": 0,
+    "z": 0
   },
   "dimensions": {
-    "overallLength": 50,
-    "overallWidth": 50,
+    "overallLength": 127.76,
+    "overallWidth": 85.48,
     "overallHeight": 50
   },
   "ordering": [["A1"], ["A2"]],
@@ -32,18 +32,18 @@
       "depth": 40,
       "totalLiquidVolume": 100,
       "diameter": 30,
-      "x": 0,
-      "y": 0,
-      "z": 0,
+      "x": 10,
+      "y": 10,
+      "z": 10,
       "shape": "circular"
     },
     "A2": {
       "depth": 40,
       "totalLiquidVolume": 100,
       "diameter": 30,
-      "x": 10,
-      "y": 0,
-      "z": 0,
+      "x": 20,
+      "y": 10,
+      "z": 10,
       "shape": "circular"
     }
   }
