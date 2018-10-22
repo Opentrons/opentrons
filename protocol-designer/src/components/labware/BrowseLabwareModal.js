@@ -40,8 +40,6 @@ type DP = {
 type Props = SP & DP
 
 class BrowseLabwareModal extends React.Component<Props> {
-  wrapperRef: ?any
-
   handleClose = () => {
     this.props.drillUp()
   }
