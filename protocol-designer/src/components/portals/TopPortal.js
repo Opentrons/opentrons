@@ -20,7 +20,7 @@ export function Portal (props: Props): React.Node {
   const modalRootElem = getPortalElem()
 
   if (!modalRootElem) {
-    console.error('Confirm Modal root is not present, could not render modal')
+    console.error('TopPortal root is not present, could not render modal')
     return null
   }
 
