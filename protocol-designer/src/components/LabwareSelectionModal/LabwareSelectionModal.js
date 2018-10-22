@@ -19,6 +19,9 @@ type Props = {
   selectedSection: ?string,
 }
 
+const imageBasePath = process.env.OT_PD_IMAGE_PATH ||
+  'http://docs.opentrons.com/_images/'
+
 // TODO: Ian 2017-07-26 use shared-data labware, need displayName
 // [labware type, display name, and optional image url]
 const hardcodedLabware = {
@@ -33,7 +36,8 @@ const hardcodedLabware = {
     ['tube-rack-.75ml', '0.75mL Tube Rack', 'Tuberack-075ml'],
     ['tube-rack-2ml', '2mL Tube Rack', 'Tuberack-2ml'],
     ['24-vial-rack', '3.5mL Tube Rack'],
-    ['tube-rack-15_50ml', '15mL x 6 + 50mL x 4 Tube Rack', 'Tuberack-15-50ml'],
+    ['opentrons-tuberack-15_50ml', '15mL x 6 + 50mL x 4 Tube Rack (4-in-1 Rack)', 'Opentrons-4-in-1-tuberack-15-50'],
+    ['tube-rack-15_50ml', '15mL x 6 + 50mL x 4 Tube Rack (Clear Acrylic)', 'Tuberack-15-50ml'],
   ],
   'Well Plate': [
     ['96-deep-well', '96 Deep Well Plate', '96-Deep-Well'],
@@ -76,7 +80,7 @@ class LabwareDropdown extends React.Component <Props> {
         selectLabware={selectLabware}
         // TODO: Ian 2018-02-22 If these images stay, factor out this magic URL more obvious (or import them with webpack)
         labwareImgUrl={img
-          ? `http://docs.opentrons.com/_images/${img}.png`
+          ? `${imageBasePath}${img}.png`
           : null
         }
       />
