@@ -87,21 +87,23 @@ class SelectableLabware extends React.Component<Props> {
     }
   }
 
-  makeHandleMouseOverWell = (wellName: string, callback: () => void) => () => {
-    callback()
-    if (this.props.pipetteChannels === 8) {
-      const wellSet = getWellSetForMultichannel(this.props.containerType, wellName)
-      const nextHighlightedWells = reduce(wellSet, (acc, well) => ({...acc, [well]: well}), {})
-      nextHighlightedWells && this.props.updateHighlightedWells(nextHighlightedWells)
-    } else {
-      this.props.updateHighlightedWells({[wellName]: wellName})
+  makeHandleMouseOverWell = (wellName: string, callback: (e: SyntheticMouseEvent<*>) => void) =>
+    (e: SyntheticMouseEvent<*>) => {
+      callback(e)
+      if (this.props.pipetteChannels === 8) {
+        const wellSet = getWellSetForMultichannel(this.props.containerType, wellName)
+        const nextHighlightedWells = reduce(wellSet, (acc, well) => ({...acc, [well]: well}), {})
+        nextHighlightedWells && this.props.updateHighlightedWells(nextHighlightedWells)
+      } else {
+        this.props.updateHighlightedWells({[wellName]: wellName})
+      }
     }
-  }
 
-  makeHandleMouseExitWell = (callback: () => void) => () => {
-    callback()
-    this.props.updateHighlightedWells({})
-  }
+  makeHandleMouseExitWell = (callback: (e: SyntheticMouseEvent<*>) => void) =>
+    (e: SyntheticMouseEvent<*>) => {
+      callback(e)
+      this.props.updateHighlightedWells({})
+    }
 
   render () {
     const {

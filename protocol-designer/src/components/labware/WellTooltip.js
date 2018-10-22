@@ -12,7 +12,16 @@ import styles from './labware.css'
 
 const TOOLTIP_OFFSET = 22
 
-type Props = {ingredNames: WellIngredientNames}
+type WellTooltipParams = {
+  makeHandleMouseOverWell: (wellName: string, wellIngreds: LocationLiquidState) => (e: SyntheticMouseEvent<*>) => void,
+  handleMouseLeaveWell: (e: SyntheticMouseEvent<*>) => void,
+  tooltipWellName: ?string,
+}
+
+type Props = {
+  children: (WellTooltipParams) => React.Node,
+  ingredNames: WellIngredientNames,
+}
 
 type State = {
   tooltipX: ?number,
@@ -29,22 +38,24 @@ const initialState: State = {
 
 class WellTooltip extends React.Component<Props, State> {
   state: State = initialState
-  mouseRef
 
-  makeHandleMouseOverWell = (wellName: string, wellIngreds: LocationLiquidState) => (e) => {
-    const wellBoundingRect = e.target.getBoundingClientRect()
-    const {x, y, height, width} = wellBoundingRect
-    if (Object.keys(wellIngreds).length > 0 && x && y) {
-      this.setState({
-        tooltipX: x + (width / 2),
-        tooltipY: y + (height / 2),
-        tooltipWellName: wellName,
-        tooltipWellIngreds: wellIngreds,
-      })
+  makeHandleMouseOverWell = (wellName: string, wellIngreds: LocationLiquidState) => (e: SyntheticMouseEvent<*>) => {
+    const {target} = e
+    if (target instanceof Element) {
+      const wellBoundingRect = target.getBoundingClientRect()
+      const {left, top, height, width} = wellBoundingRect
+      if (Object.keys(wellIngreds).length > 0 && left && top) {
+        this.setState({
+          tooltipX: left + (width / 2),
+          tooltipY: top + (height / 2),
+          tooltipWellName: wellName,
+          tooltipWellIngreds: wellIngreds,
+        })
+      }
     }
   }
 
-  handleMouseLeaveWell = (e) => {
+  handleMouseLeaveWell = (e: SyntheticMouseEvent<*>) => {
     this.setState(initialState)
   }
 
@@ -80,7 +91,7 @@ class WellTooltip extends React.Component<Props, State> {
                       data-placement={placement}
                       className={styles.tooltip_box}>
                       <PillTooltipContents
-                        well={this.state.tooltipWellName}
+                        well={this.state.tooltipWellName || ''}
                         ingredNames={this.props.ingredNames}
                         ingreds={this.state.tooltipWellIngreds || {}} />
                       <div className={cx(styles.arrow, styles[placement])} ref={arrowProps.ref} style={arrowProps.style} />
