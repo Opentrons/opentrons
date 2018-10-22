@@ -29,7 +29,7 @@ type Props = {
   showForm: boolean,
 
   cancelForm: () => mixed,
-  clearWells: () => mixed,
+  clearWells: ?() => mixed,
   saveForm: (ValidFormValues) => mixed,
 }
 
@@ -66,7 +66,7 @@ export default class LiquidPlacementForm extends React.Component <Props> {
   }
 
   handleClearWells = () => {
-    this.props.clearWells()
+    this.props.clearWells && this.props.clearWells()
   }
 
   handleChangeVolume = (setFieldValue: *) => (e: SyntheticInputEvent<*>) => {
@@ -123,7 +123,9 @@ export default class LiquidPlacementForm extends React.Component <Props> {
             </div>
 
             <div className={styles.button_row}>
-              <OutlineButton onClick={this.handleClearWells}>
+              <OutlineButton
+                disabled={!this.props.clearWells}
+                onClick={this.handleClearWells}>
                 {i18n.t('button.clear_wells')}
               </OutlineButton>
               <OutlineButton onClick={this.handleCancelForm}>
