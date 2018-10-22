@@ -129,7 +129,7 @@ export default class LiquidPlacementForm extends React.Component <Props> {
               <OutlineButton onClick={this.handleCancelForm}>
                 {i18n.t('button.cancel')}
               </OutlineButton>
-              <PrimaryButton onClick={handleSubmit}>
+              <PrimaryButton type='submit'>
                 {i18n.t('button.save')}
               </PrimaryButton>
             </div>
