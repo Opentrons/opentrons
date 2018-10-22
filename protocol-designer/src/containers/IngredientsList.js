@@ -3,7 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {selectors} from '../labware-ingred/reducers'
 import * as wellSelectionSelectors from '../top-selectors/well-contents'
-import {deleteWellsContents, openRenameLabwareForm} from '../labware-ingred/actions'
+import {removeWellsContents, openRenameLabwareForm} from '../labware-ingred/actions'
 import type {Dispatch} from 'redux'
 import type {BaseState} from '../types'
 
@@ -12,7 +12,7 @@ import IngredientsList from '../components/IngredientsList'
 type Props = React.ElementProps<typeof IngredientsList>
 
 type DP = {
-  deleteWellsContents: $ElementType<Props, 'deleteWellsContents'>,
+  removeWellsContents: $ElementType<Props, 'removeWellsContents'>,
   openRenameLabwareForm: $ElementType<Props, 'openRenameLabwareForm'>,
 }
 
@@ -37,7 +37,7 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
   const {_labwareId, ...passThruProps} = stateProps
   return {
     ...passThruProps,
-    deleteWellsContents: (args) => dispatch(deleteWellsContents({...args, labwareId: _labwareId})),
+    removeWellsContents: (args) => dispatch(removeWellsContents({...args, labwareId: _labwareId})),
     openRenameLabwareForm: () => dispatch(openRenameLabwareForm()),
   }
 }

@@ -112,8 +112,8 @@ export const moveLabware = (toSlot: DeckSlot) => (dispatch: Dispatch<MoveLabware
   }
 }
 
-export type DeleteWellsContents = {
-  type: 'DELETE_WELLS_CONTENTS',
+export type RemoveWellsContents = {
+  type: 'REMOVE_WELLS_CONTENTS',
   payload: {
     liquidGroupId: string,
     labwareId: string,
@@ -121,10 +121,10 @@ export type DeleteWellsContents = {
   },
 }
 
-export const deleteWellsContents = (
-  payload: $PropertyType<DeleteWellsContents, 'payload'>
+export const removeWellsContents = (
+  payload: $PropertyType<RemoveWellsContents, 'payload'>
 ) => ({
-  type: 'DELETE_WELLS_CONTENTS',
+  type: 'REMOVE_WELLS_CONTENTS',
   payload,
 })
 

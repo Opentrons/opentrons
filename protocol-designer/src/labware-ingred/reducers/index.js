@@ -34,7 +34,7 @@ import {getPDMetadata} from '../../file-types'
 import type {BaseState, Selector, Options} from '../../types'
 import type {LoadFileAction} from '../../load-file'
 import type {
-  DeleteWellsContents,
+  RemoveWellsContents,
   DeleteLiquidGroup,
   EditLiquidGroupAction,
   MoveLabware,
@@ -248,7 +248,7 @@ export const ingredLocations = handleActions({
       },
     }
   },
-  DELETE_WELLS_CONTENTS: (state: LocationsState, action: DeleteWellsContents): LocationsState => {
+  REMOVE_WELLS_CONTENTS: (state: LocationsState, action: RemoveWellsContents): LocationsState => {
     const {wells, labwareId} = action.payload
     return {
       ...state,

@@ -24,7 +24,7 @@ const unsavedChanges = (state: boolean = false, action: {type: string}): boolean
     case 'MOVE_LABWARE':
     case 'DELETE_LIQUID_GROUP':
     case 'EDIT_LIQUID_GROUP':
-    case 'DELETE_WELLS_CONTENTS':
+    case 'REMOVE_WELLS_CONTENTS':
     case 'SET_WELL_CONTENTS':
     case 'ADD_STEP':
     case 'DELETE_STEP':
