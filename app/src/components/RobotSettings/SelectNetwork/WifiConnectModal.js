@@ -5,11 +5,10 @@ import * as React from 'react'
 import type {
   WifiConfigureResponse,
   ApiRequestError,
-} from '../../http-api-client'
+} from '../../../http-api-client'
 
 import {AlertModal} from '@opentrons/components'
-import {Portal} from '../portal'
-import {ErrorModal} from '../modals'
+import {ErrorModal} from '../../modals'
 
 type Props = {
   close: () => mixed,
@@ -55,16 +54,14 @@ export default function WifiConnectModal (props: Props) {
   }
 
   return (
-    <Portal>
-      <AlertModal
-        iconName="wifi"
-        heading={`${SUCCESS_TITLE} ${response.ssid}`}
-        onCloseClick={close}
-        buttons={[{onClick: close, children: 'close'}]}
-        alertOverlay
-      >
-        {SUCCESS_MESSAGE}
-      </AlertModal>
-    </Portal>
+    <AlertModal
+      iconName="wifi"
+      heading={`${SUCCESS_TITLE} ${response.ssid}`}
+      onCloseClick={close}
+      buttons={[{onClick: close, children: 'close'}]}
+      alertOverlay
+    >
+      {SUCCESS_MESSAGE}
+    </AlertModal>
   )
 }

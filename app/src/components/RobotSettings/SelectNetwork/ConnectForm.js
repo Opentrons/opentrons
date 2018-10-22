@@ -73,6 +73,7 @@ export class ConnectForm extends React.Component<Props, State> {
                 />
               ))}
             </FormTable>
+            {/* TODO (ka 2018-10-22): disable this button if no password entered */}
             <BottomButtonBar
               buttons={[
                 {children: 'Cancel', onClick: this.props.close},
