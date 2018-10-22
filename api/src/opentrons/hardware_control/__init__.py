@@ -277,10 +277,11 @@ class API:
             offset = top_types.Point(*self.config.mount_offset)
         z_ax = Axis.by_mount(mount)
         plunger_ax = Axis.of_plunger(mount)
+        cp = self._critical_point_for(mount)
         return {
-            Axis.X: self._current_position[Axis.X] + offset[0],
-            Axis.Y: self._current_position[Axis.Y] + offset[1],
-            z_ax: self._current_position[z_ax] + offset[2],
+            Axis.X: self._current_position[Axis.X] + offset[0] + cp.x,
+            Axis.Y: self._current_position[Axis.Y] + offset[1] + cp.y,
+            z_ax: self._current_position[z_ax] + offset[2] + cp.z,
             plunger_ax: self._current_position[plunger_ax]
         }
 
@@ -309,10 +310,11 @@ class API:
             offset = top_types.Point(*self.config.mount_offset)
         else:
             offset = top_types.Point(0, 0, 0)
+        cp = self._critical_point_for(mount)
         target_position = OrderedDict(
-            ((Axis.X, abs_position.x - offset.x),
-             (Axis.Y, abs_position.y - offset.y),
-             (z_axis, abs_position.z - offset.z))
+            ((Axis.X, abs_position.x - offset.x - cp.x),
+             (Axis.Y, abs_position.y - offset.y - cp.y),
+             (z_axis, abs_position.z - offset.z - cp.z))
         )
         await self._move(target_position)
 
@@ -391,6 +393,24 @@ class API:
             raise
         else:
             self._current_position.update(target_position)
+
+    def _critical_point_for(self, mount: top_types.Mount) -> top_types.Point:
+        """ Return the current critical point of the specified mount.
+
+        The mount's critical point is the position of the mount itself, if no
+        pipette is attached, or the pipette's critical point (which depends on
+        tip status).
+        """
+        pip = self._attached_instruments[mount]
+        if pip is not None:
+            return pip.critical_point
+        else:
+            # TODO: The smoothie’s z/a home position is calculated to provide
+            # the offset for a P300 single. Here we should decide whether we
+            # implicitly accept this as correct (by returning a null offset)
+            # or not (by returning an offset calculated to move back up the
+            # length of the P300 single).
+            return top_types.Point(0, 0, 0)
 
     # Gantry/frame (i.e. not pipette) config API
     @property
@@ -535,12 +555,18 @@ class API:
         pass
 
     @_log_call
-    async def pick_up_tip(self, mount, tip_length):
-        pass
+    async def pick_up_tip(self, mount):
+        instr = self._attached_instruments[mount]
+        assert instr
+        # TODO: Move commands to pick up tip(s)
+        instr.add_tip()
 
     @_log_call
     async def drop_tip(self, mount):
-        pass
+        instr = self._attached_instruments[mount]
+        assert instr
+        # TODO: Move commands to drop tip(s)
+        instr.remove_tip()
 
     # Pipette config api
     @_log_call
