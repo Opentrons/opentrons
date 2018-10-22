@@ -17,6 +17,7 @@ import type {LiquidGroup} from '../../labware-ingred/types'
 
 type Props = {
   ...$Exact<LiquidGroup>,
+  canDelete: boolean,
   deleteLiquidGroup: () => mixed,
   cancelForm: () => mixed,
   saveForm: (LiquidGroup) => mixed,
@@ -35,7 +36,7 @@ export const liquidEditFormSchema = Yup.object().shape({
 })
 
 export default function LiquidEditForm (props: Props) {
-  const {deleteLiquidGroup, cancelForm, saveForm} = props
+  const {deleteLiquidGroup, cancelForm, canDelete, saveForm} = props
 
   const initialValues = {
     name: props.name,
@@ -92,7 +93,11 @@ export default function LiquidEditForm (props: Props) {
             </section>
 
             <div className={styles.button_row}>
-              <OutlineButton onClick={deleteLiquidGroup}>{i18n.t('button.delete')}</OutlineButton>
+              <OutlineButton
+                onClick={deleteLiquidGroup}
+                disabled={!canDelete}>
+                {i18n.t('button.delete')}
+              </OutlineButton>
               <PrimaryButton onClick={cancelForm}>{i18n.t('button.cancel')}</PrimaryButton>
               <PrimaryButton
                 disabled={!dirty}

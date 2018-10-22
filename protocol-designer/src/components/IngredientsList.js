@@ -12,11 +12,11 @@ import styles from './IngredientsList.css'
 import type {LiquidGroupsById, LiquidGroup} from '../labware-ingred/types'
 import type {SingleLabwareLiquidState} from '../step-generation'
 
-type DeleteIngredient = (args: {|groupId: string, wellName?: string|}) => mixed
+type RemoveWellsContents = (args: {|liquidGroupId: string, wells: Array<string>|}) => mixed
 
 // Props used by both IngredientsList and IngredGroupCard
 type CommonProps = {|
-  deleteIngredient: DeleteIngredient,
+  removeWellsContents: RemoveWellsContents,
   selected?: boolean,
 |}
 
@@ -42,7 +42,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
   render () {
     const {
       ingredGroup,
-      deleteIngredient,
+      removeWellsContents,
       selected,
       groupId,
       labwareWellContents,
@@ -96,7 +96,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
             canDelete
             volume={volume}
             groupId={groupId}
-            deleteIngredient={deleteIngredient}
+            removeWellsContents={removeWellsContents}
           />
         })}
       </PDTitledList>
@@ -111,7 +111,7 @@ type IndividProps = {|
   // concentration?: string,
   canDelete: boolean,
   groupId: string,
-  deleteIngredient: DeleteIngredient,
+  removeWellsContents: RemoveWellsContents,
 |}
 
 function IngredIndividual (props: IndividProps) {
@@ -122,7 +122,7 @@ function IngredIndividual (props: IndividProps) {
     // concentration, // TODO LATER Ian 2018-02-22: concentration is removed from MVP. Remove all traces of it, or add it back in
     canDelete,
     groupId,
-    deleteIngredient,
+    removeWellsContents,
   } = props
 
   return (
@@ -135,7 +135,7 @@ function IngredIndividual (props: IndividProps) {
         name='close'
         onClick={
           () => window.confirm(`Are you sure you want to delete well ${wellName} ?`) &&
-          deleteIngredient({wellName, groupId})
+          removeWellsContents({liquidGroupId: groupId, wells: [wellName]})
         } />}
     </PDListItem>
   )
@@ -154,7 +154,7 @@ export default function IngredientsList (props: Props) {
   const {
     labwareWellContents,
     liquidGroupsById,
-    deleteIngredient,
+    removeWellsContents,
     selectedIngredientGroupId,
     renameLabwareFormMode,
     openRenameLabwareForm,
@@ -173,7 +173,7 @@ export default function IngredientsList (props: Props) {
 
         {Object.keys(liquidGroupsById).map((groupIdForCard) =>
           <IngredGroupCard key={groupIdForCard}
-            deleteIngredient={deleteIngredient}
+            removeWellsContents={removeWellsContents}
             labwareWellContents={labwareWellContents}
             ingredGroup={liquidGroupsById[groupIdForCard]}
             groupId={groupIdForCard}

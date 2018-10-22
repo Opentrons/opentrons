@@ -18,6 +18,7 @@ type SP = {
   ...LiquidGroup,
   _liquidGroupId: ?string,
   showForm: boolean,
+  canDelete: $ElementType<Props, 'canDelete'>,
 }
 
 function LiquidEditFormWrapper (props: WrapperProps) {
@@ -37,6 +38,7 @@ function mapStateToProps (state: BaseState): SP {
 
   return {
     _liquidGroupId,
+    canDelete: _liquidGroupId != null,
     showForm,
     name: selectedIngredFields.name,
     description: selectedIngredFields.description,
@@ -52,7 +54,8 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>}
     formKey: _liquidGroupId || '__new_form__',
     formProps: {
       ...passThruFormProps,
-      deleteLiquidGroup: () => window.alert('Deleting liquids is not yet implemented'), // TODO: Ian 2018-10-12 later ticket
+      deleteLiquidGroup: () => _liquidGroupId &&
+        dispatch(labwareIngredActions.deleteLiquidGroup(_liquidGroupId)),
       cancelForm: () => dispatch(labwareIngredActions.deselectLiquidGroup()),
       saveForm: (formData: LiquidGroup) => dispatch(labwareIngredActions.editLiquidGroup({
         ...formData,
