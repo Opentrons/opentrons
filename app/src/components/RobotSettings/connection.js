@@ -89,7 +89,7 @@ export function NetworkDropdown (props: NetworkDropdownProps) {
   const selectedOption = find(options, {value})
 
   const selectStyles = {
-    option: (base, state) => ({
+    option: base => ({
       ...base,
       padding: '0.25rem 0',
     }),
@@ -128,7 +128,7 @@ export function NetworkDropdown (props: NetworkDropdownProps) {
       )
     )
   }
-  // custom Menu (options dropwdown) component
+  // custom Menu (options dropdown) component
   const Menu = props => {
     return (
       <components.Menu {...props}>
@@ -182,7 +182,7 @@ function NetworkOption (nw: WifiNetwork): SelectNetworkOption {
   const label = (
     <div className={styles.wifi_option}>
       {connectedIcon}
-      {value}
+      <span className={styles.wifi_name}>{value}</span>
       {signalIcon}
       {securedIcon}
     </div>
