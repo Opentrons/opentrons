@@ -5,6 +5,10 @@ import range from 'lodash/range'
 import assignId from './assignId'
 import {toWellName} from '../helpers/index'
 import labwareSchema from '../../labware-json-schema/labware-schema.json'
+import {
+  SLOT_WIDTH_MM as SLOT_LENGTH_MM,
+  SLOT_HEIGHT_MM as SLOT_WIDTH_MM,
+} from '../constants'
 
 type Metadata = {
   displayName: string,
@@ -130,7 +134,6 @@ function calculateCoordinates (
 // or the labware definition schema in labware-json-schema
 export function createRegularLabware (props: RegularLabwareProps): Schema {
   const ordering = determineOrdering(props.grid)
-  const slotDims = {x: 127.76, y: 85.48, z: 0}
   const offset = {...props.offset, z: props.dimensions.overallHeight + props.offset.z}
   const definition: Schema = {
     ordering,
@@ -138,9 +141,9 @@ export function createRegularLabware (props: RegularLabwareProps): Schema {
     deprecated: false,
     metadata: props.metadata,
     cornerOffsetFromSlot: {
-      x: round(props.dimensions.overallLength - slotDims.x, 2),
-      y: round(props.dimensions.overallWidth - slotDims.y, 2),
-      z: slotDims.z},
+      x: round(props.dimensions.overallLength - SLOT_LENGTH_MM, 2),
+      y: round(props.dimensions.overallWidth - SLOT_WIDTH_MM, 2),
+      z: 0},
     dimensions: props.dimensions,
     parameters: props.parameters,
     wells: calculateCoordinates(props.well, ordering, props.spacing, offset),
