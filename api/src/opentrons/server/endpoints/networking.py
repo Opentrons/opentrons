@@ -434,20 +434,20 @@ async def list_keys(request: web.Request) -> web.Response:
     ```
     """
     keys_dir = environment.get_path('WIFI_KEYS_DIR')
-    response: List[Dict[str, str]] = []
+    keys: List[Dict[str, str]] = []
     for path in os.listdir(keys_dir):
         full_path = os.path.join(keys_dir, path)
         if os.path.isdir(full_path):
             in_path = os.listdir(full_path)
             if len(in_path) > 1:
                 log.warning("Garbage in key dir for key {}".format(path))
-            response.append(
+            keys.append(
                 {'uri': '/wifi/keys/{}'.format(path),
                  'id': path,
                  'name': os.path.basename(in_path[0])})
         else:
             log.warning("Garbage in wifi keys dir: {}".format(full_path))
-    return web.json_response(response, status=200)
+    return web.json_response({'keys': keys}, status=200)
 
 
 async def remove_key(request: web.Request) -> web.Response:
