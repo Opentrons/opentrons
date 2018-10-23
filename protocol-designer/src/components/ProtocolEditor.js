@@ -13,6 +13,7 @@ import ConnectedNewFileModal from '../containers/ConnectedNewFileModal'
 import FileUploadErrorModal from './modals/FileUploadErrorModal'
 import AnalyticsModal from './modals/AnalyticsModal'
 import {PortalRoot as MainPageModalPortalRoot} from '../components/portals/MainPageModalPortal'
+import {PortalRoot as TopPortalRoot} from './portals/TopPortal'
 
 import styles from './ProtocolEditor.css'
 
@@ -24,7 +25,7 @@ export default function ProtocolEditor () {
   return (
     <div>
       <SelectorDebugger />
-
+      <TopPortalRoot />
       <div className={styles.wrapper}>
         <ConnectedNav />
         <ConnectedSidebar />
