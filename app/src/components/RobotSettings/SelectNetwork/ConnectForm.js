@@ -64,7 +64,7 @@ export default class ConnectForm extends React.Component<Props, State> {
 
   render () {
     const {showPassword} = this.state
-    const {securityType, eapOptions} = this.props
+    const {securityType, eapOptions, close} = this.props
     const eapMethodField = eapOptions ? 'eapConfig.eapType' : ''
     const eapMethodId = eapOptions
       ? `${CONNECT_FIELD_ID_PREFIX}${eapMethodField}`
