@@ -19,12 +19,16 @@ def test_pipette_version_1_0_and_1_3_extended_travel():
 
     for m in models:
         robot.reset()
+        v1 = m + '_v1'
+        v13 = m + '_v1.3'
         left = instruments._create_pipette_from_config(
-            config=pipette_config.load(m + '_v1'),
-            mount='left')
+            config=pipette_config.load(v1),
+            mount='left',
+            name=v1)
         right = instruments._create_pipette_from_config(
-            config=pipette_config.load(m + '_v1.3'),
-            mount='right')
+            config=pipette_config.load(v13),
+            mount='right',
+            name=v13)
 
         # the difference between v1 and v1.3 is that the plunger's travel
         # distance extended, allowing greater ranges for aspirate/dispense
@@ -46,12 +50,16 @@ def test_all_pipette_models_can_transfer():
 
     for m in models:
         robot.reset()
+        v1 = m + '_v1'
+        v13 = m + '_v1.3'
         left = instruments._create_pipette_from_config(
-            config=pipette_config.load(m + '_v1'),
-            mount='left')
+            config=pipette_config.load(v1),
+            mount='left',
+            name=v1)
         right = instruments._create_pipette_from_config(
-            config=pipette_config.load(m + '_v1.3'),
-            mount='right')
+            config=pipette_config.load(v13),
+            mount='right',
+            name=v13)
 
         left.tip_attached = True
         right.tip_attached = True
@@ -66,7 +74,8 @@ def test_pipette_models_reach_max_volume():
         robot.reset()
         pipette = instruments._create_pipette_from_config(
             config=config,
-            mount='right')
+            mount='right',
+            name=model)
 
         pipette.tip_attached = True
         pipette.aspirate(pipette.max_volume)

@@ -55,6 +55,7 @@ class InstrumentsWrapper(object):
         return self._create_pipette_from_config(
             config=config,
             mount=mount,
+            name=pipette_model_version,
             trash_container=trash_container,
             tip_racks=tip_racks,
             aspirate_flow_rate=aspirate_flow_rate,
@@ -79,6 +80,7 @@ class InstrumentsWrapper(object):
         return self._create_pipette_from_config(
             config=config,
             mount=mount,
+            name=pipette_model_version,
             trash_container=trash_container,
             tip_racks=tip_racks,
             aspirate_flow_rate=aspirate_flow_rate,
@@ -103,6 +105,7 @@ class InstrumentsWrapper(object):
         return self._create_pipette_from_config(
             config=config,
             mount=mount,
+            name=pipette_model_version,
             trash_container=trash_container,
             tip_racks=tip_racks,
             aspirate_flow_rate=aspirate_flow_rate,
@@ -127,6 +130,7 @@ class InstrumentsWrapper(object):
         return self._create_pipette_from_config(
             config=config,
             mount=mount,
+            name=pipette_model_version,
             trash_container=trash_container,
             tip_racks=tip_racks,
             aspirate_flow_rate=aspirate_flow_rate,
@@ -151,6 +155,7 @@ class InstrumentsWrapper(object):
         return self._create_pipette_from_config(
             config=config,
             mount=mount,
+            name=pipette_model_version,
             trash_container=trash_container,
             tip_racks=tip_racks,
             aspirate_flow_rate=aspirate_flow_rate,
@@ -175,6 +180,7 @@ class InstrumentsWrapper(object):
         return self._create_pipette_from_config(
             config=config,
             mount=mount,
+            name=pipette_model_version,
             trash_container=trash_container,
             tip_racks=tip_racks,
             aspirate_flow_rate=aspirate_flow_rate,
@@ -199,6 +205,7 @@ class InstrumentsWrapper(object):
         return self._create_pipette_from_config(
             config=config,
             mount=mount,
+            name=pipette_model_version,
             trash_container=trash_container,
             tip_racks=tip_racks,
             aspirate_flow_rate=aspirate_flow_rate,
@@ -210,6 +217,7 @@ class InstrumentsWrapper(object):
             self,
             config,
             mount,
+            name,
             trash_container='',
             tip_racks=[],
             aspirate_flow_rate=None,
@@ -230,7 +238,7 @@ class InstrumentsWrapper(object):
         p = self.Pipette(
             model_offset=config.model_offset,
             mount=mount,
-            name=config.name,
+            name=name,
             trash_container=trash_container,
             tip_racks=tip_racks,
             channels=config.channels,

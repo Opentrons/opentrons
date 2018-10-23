@@ -23,34 +23,6 @@ from opentrons.deck_calibration import endpoints
 from opentrons.util import environment
 from opentrons import hardware_control as hc
 
-# Uncomment to enable logging during tests
-
-# logging_config = dict(
-#     version=1,
-#     formatters={
-#         'basic': {
-#             'format':
-#             '[Line %(lineno)s] %(message)s'
-#         }
-#     },
-#     handlers={
-#         'debug': {
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'basic',
-#         }
-#     },
-#     loggers={
-#         '__main__': {
-#             'handlers': ['debug'],
-#             'level': logging.DEBUG
-#         },
-#         'opentrons.server': {
-#             'handlers': ['debug'],
-#             'level': logging.DEBUG
-#         },
-#     }
-# )
-# dictConfig(logging_config)
 
 Session = namedtuple(
     'Session',

@@ -55,13 +55,13 @@ async def test_get_pipettes(
     model = pipette_config.load(test_model)
     expected = {
         'left': {
-            'model': model.name,
+            'model': test_model,
             'tip_length': model.tip_length,
             'mount_axis': 'z',
             'plunger_axis': 'b'
         },
         'right': {
-            'model': model.name,
+            'model': test_model,
             'tip_length': model.tip_length,
             'mount_axis': 'a',
             'plunger_axis': 'c'
@@ -114,13 +114,13 @@ async def test_get_cached_pipettes(
     model = pipette_config.load(test_model)
     expected = {
         'left': {
-            'model': model.name,
+            'model': test_model,
             'tip_length': model.tip_length,
             'mount_axis': 'z',
             'plunger_axis': 'b'
         },
         'right': {
-            'model': model.name,
+            'model': test_model,
             'tip_length': model.tip_length,
             'mount_axis': 'a',
             'plunger_axis': 'c'
@@ -132,10 +132,11 @@ async def test_get_cached_pipettes(
     assert resp.status == 200
     assert json.loads(text) == expected
 
-    model1 = pipette_config.load('p10_single_v1.3')
+    name1 = 'p10_single_v1.3'
+    model1 = pipette_config.load(name1)
 
     def dummy_model(mount):
-        return model1.name
+        return name1
 
     monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_model)
 
@@ -146,13 +147,13 @@ async def test_get_cached_pipettes(
 
     expected2 = {
         'left': {
-            'model': model1.name,
+            'model': name1,
             'tip_length': model1.tip_length,
             'mount_axis': 'z',
             'plunger_axis': 'b'
         },
         'right': {
-            'model': model1.name,
+            'model': name1,
             'tip_length': model1.tip_length,
             'mount_axis': 'a',
             'plunger_axis': 'c'

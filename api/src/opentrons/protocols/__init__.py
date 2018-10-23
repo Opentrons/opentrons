@@ -19,7 +19,8 @@ def load_pipettes(protocol_data):
         config = pipette_config.load(model)
         pipettes_by_id[pipette_id] = instruments._create_pipette_from_config(
             config=config,
-            mount=mount)
+            mount=mount,
+            name=model)
 
     return pipettes_by_id
 

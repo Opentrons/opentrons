@@ -250,7 +250,8 @@ def _fetch_or_create_pipette(mount, model=None):
             config = pipette_config.load(model)
             pipette = instruments._create_pipette_from_config(
                 config=config,
-                mount=mount)
+                mount=mount,
+                name=model)
     return pipette, should_remove
 
 

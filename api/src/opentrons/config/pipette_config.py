@@ -20,7 +20,6 @@ pipette_config = namedtuple(
         'aspirate_flow_rate',
         'dispense_flow_rate',
         'channels',
-        'name',
         'model_offset',
         'plunger_current',
         'drop_tip_current',
@@ -28,7 +27,8 @@ pipette_config = namedtuple(
         'max_volume',
         'ul_per_mm',
         'quirks',
-        'tip_length'  # TODO (andy): remove from pipette, move to tip-rack
+        'tip_length',  # TODO (andy): remove from pipette, move to tip-rack
+        'display_name'
     ]
 )
 
@@ -86,7 +86,6 @@ def load(pipette_model: str) -> pipette_config:
             aspirate_flow_rate=cfg.get('aspirateFlowRate'),
             dispense_flow_rate=cfg.get('dispenseFlowRate'),
             channels=cfg.get('channels'),
-            name=pipette_model,
             model_offset=cfg.get('modelOffset'),
             plunger_current=cfg.get('plungerCurrent'),
             drop_tip_current=cfg.get('dropTipCurrent'),
@@ -94,7 +93,8 @@ def load(pipette_model: str) -> pipette_config:
             max_volume=cfg.get('maxVolume'),
             ul_per_mm=cfg.get('ulPerMm'),
             quirks=cfg.get('quirks'),
-            tip_length=cfg.get('tipLength')
+            tip_length=cfg.get('tipLength'),
+            display_name=cfg.get('displayName')
         )
 
     # Verify that stored values agree with calculations
