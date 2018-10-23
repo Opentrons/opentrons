@@ -16,14 +16,13 @@ import {
 
 import {IntervalWrapper, SpinnerModal} from '@opentrons/components'
 import {Portal} from '../../portal'
-import {NetworkDropdown} from '../connection'
 import ConnectModal from './ConnectModal'
 import ConnectForm from './ConnectForm'
+import SelectSsid from './SelectSsid'
 
 import type {State, Dispatch} from '../../../types'
 import type {ViewableRobot} from '../../../discovery'
 import type {
-  WifiNetwork,
   WifiNetworkList,
   WifiSecurityType,
   WifiEapOption,
@@ -60,21 +59,24 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
     this.state = {ssid: this.getActiveSsid(), securityType: null}
   }
 
-  onChange = (network: WifiNetwork) => {
-    const nextState: $Shape<SelectNetworkState> = {
-      ssid: network.ssid,
-      securityType: network.securityType,
-    }
+  setCurrentSsid = (_: string, ssid: string) => {
+    const network = find(this.props.list, {ssid})
 
-    // TODO(mc, 2018-10-22): pass network security type direct
-    if (network.securityType === NO_SECURITY) {
-      this.props.configure({ssid: network.ssid})
-    } else if (network.securityType === WPA_EAP_SECURITY) {
-      this.props.fetchEapOptions()
-    }
-    // TODO(mc, 2018-10-18): handle hidden network
+    if (network) {
+      const nextState: $Shape<SelectNetworkState> = {
+        ssid,
+        securityType: network.securityType,
+      }
 
-    this.setState(nextState)
+      if (network.securityType === NO_SECURITY) {
+        this.props.configure({ssid})
+      } else if (network.securityType === WPA_EAP_SECURITY) {
+        this.props.fetchEapOptions()
+      }
+      // TODO(mc, 2018-10-18): handle hidden network
+
+      this.setState(nextState)
+    }
   }
 
   closeConnectForm = () => this.setState({securityType: null})
@@ -98,11 +100,11 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
 
     return (
       <IntervalWrapper refresh={fetchList} interval={LIST_REFRESH_MS}>
-        <NetworkDropdown
-          list={list}
+        <SelectSsid
           value={ssid}
+          list={list}
           disabled={connectingTo != null}
-          onChange={this.onChange}
+          onValueChange={this.setCurrentSsid}
         />
         <Portal>
           {connectingTo && (

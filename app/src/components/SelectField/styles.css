@@ -1,0 +1,38 @@
+@import '@opentrons/components';
+
+.dropdown_icon {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.25rem;
+  width: 1.25rem;
+  pointer-events: none;
+
+  & svg {
+    color: var(--c-dark-gray);
+  }
+}
+
+.select_control {
+  @apply --font-body-1-dark;
+
+  background-color: #e5e2e2;
+  border: none;
+  padding: 0.25rem 0;
+  outline: none;
+  border-radius: 3px;
+  max-height: 1.75rem;
+  box-shadow: none;
+}
+
+.select_menu {
+  @apply --font-body-1-dark;
+
+  background-color: var(--c-light-gray);
+  border-radius: 3px;
+  padding: 0.25rem 0;
+}
+
+.error div,
+.error span {
+  color: var(--c-warning-dark);
+}
