@@ -88,10 +88,12 @@ export const pipettesForInstrumentGroup: Selector<*> = createSelector(
 
     const pipetteForInstrumentGroup = {
       mount: pipetteData.mount,
+      model: pipetteData.model,
       channels: pipetteData.channels,
       description: _getPipetteName(pipetteData),
       isDisabled: false,
       tiprackModel: tipVolume && `${tipVolume} µl`, // TODO: BC 2018-07-23 tiprack displayName
+      tiprack: {model: pipetteData.tiprackModel}, // TODO: BC 2018-10-22-3 consolidate with tiprackModel above
     }
 
     return [...acc, pipetteForInstrumentGroup]

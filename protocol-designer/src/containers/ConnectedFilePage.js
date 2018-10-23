@@ -39,6 +39,7 @@ const mapDispatchToProps: DP = {
   _saveFileMetadata: actions.saveFileMetadata,
   goToNextPage: () => navActions.navigateToPage('liquids'),
   swapPipettes: pipetteActions.swapPipettes,
+  editPipette: pipetteActions.editPipettes,
 }
 
 const mergeProps = (
