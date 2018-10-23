@@ -3,10 +3,7 @@ import {combineReducers} from 'redux'
 import {handleActions} from 'redux-actions'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import {uuid} from '../utils'
-import {getPipette, getLabware} from '@opentrons/shared-data'
 
-import type {Mount} from '@opentrons/components'
 import type {LoadFileAction, NewProtocolFields} from '../load-file'
 import type {PipetteData} from '../step-generation'
 import type {FilePipette} from '../file-types'
@@ -90,6 +87,7 @@ const byId = handleActions({
       ...newPipettes,
     }
   },
+  UPDATE_PIPETTES: (state: PipetteReducerState, action: UpdatePipetteAction) => action.payload.byId,
   CREATE_NEW_PROTOCOL: (
     state: PipetteById,
     action: {payload: NewProtocolFields}
@@ -140,6 +138,7 @@ const byMount = handleActions({
       right: pipetteIds.find(id => pipettes[id].mount === 'right'),
     }
   },
+  UPDATE_PIPETTES: (state: PipetteReducerState, action: UpdatePipetteAction) => action.payload.byMount,
   CREATE_NEW_PROTOCOL: (
     state: PipetteIdByMount,
     action: {payload: NewProtocolFields}

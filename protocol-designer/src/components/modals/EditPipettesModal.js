@@ -11,7 +11,7 @@ import isEmpty from 'lodash/isEmpty'
 import i18n from '../../localization'
 import type {BaseState} from '../../types'
 import {pipetteOptions} from '../../pipettes/pipetteData'
-import {actions as pipetteActions, selectors as pipetteSelectors} from '../../pipettes'
+import {thunks as pipetteThunks, selectors as pipetteSelectors} from '../../pipettes'
 
 import PipetteDiagram from './NewFileModal/PipetteDiagram'
 import TiprackDiagram from './NewFileModal/TiprackDiagram'
@@ -180,8 +180,7 @@ const mapDTP = (dispatch: Dispatch): DP => ({
   onSave: (fields) => {
     // TODO: only launch if changes protocol
     if (window.confirm(i18n.t('alert.window.confirm_create_new'))) {
-      console.log('tried save', fields)
-      dispatch(pipetteActions.editPipettes(fields))
+      dispatch(pipetteThunks.editPipettes(fields))
     }
   },
   onCancel: () => console.log('tried to Cancel'),

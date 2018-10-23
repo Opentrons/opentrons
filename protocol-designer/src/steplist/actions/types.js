@@ -9,3 +9,10 @@ export type ChangeFormPayload = {
     [accessor: string]: ?mixed, // string | boolean | Array<string> | null,
   },
 }
+
+export type ChangeSavedFormPayload = {
+  stepId?: string,
+  update: {
+    [accessor: string]: ?mixed, // string | boolean | Array<string> | null,
+  },
+}

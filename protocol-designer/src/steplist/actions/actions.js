@@ -3,25 +3,20 @@ import type {Dispatch} from 'redux'
 
 import {selectors} from '../index'
 import type {StepType, StepIdType, FormModalFields, FormData} from '../../form-types'
-import type {ChangeFormPayload} from './types'
+import type {ChangeFormPayload, ChangeSavedFormPayload} from './types'
 import type {TerminalItemId, SubstepIdentifier, FormSectionNames} from '../types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../../types'
 import handleFormChange from './handleFormChange'
 
 export type ChangeSavedStepFormAction = {
   type: 'CHANGE_SAVED_STEP_FORM',
-  payload: ChangeFormPayload,
+  payload: ChangeSavedFormPayload,
 }
 
-export const changeSavedStepForm = (payload: ChangeFormPayload) =>
-  (dispatch: ThunkDispatch<ChangeSavedStepFormAction>, getState: GetState) => {
-    dispatch({
-      type: 'CHANGE_SAVED_STEP_FORM',
-      payload: {
-        ...handleFormChange(payload, getState),
-      },
-    })
-  }
+export const changeSavedStepForm = (payload: ChangeSavedFormPayload) => ({
+  type: 'CHANGE_SAVED_STEP_FORM',
+  payload,
+})
 
 export type ChangeFormInputAction = {
   type: 'CHANGE_FORM_INPUT',

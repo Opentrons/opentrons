@@ -96,9 +96,10 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       console.error('no next pipette, could not handleFormChange')
       return payload
     }
+    const nextChannels = getChannels(payload.update.pipette, baseState)
     updateOverrides = {
       ...updateOverrides,
-      ...reconcileFormPipette(unsavedForm, baseState, payload.update.pipette),
+      ...reconcileFormPipette(unsavedForm, baseState, payload.update.pipette, nextChannels),
     }
   }
 
@@ -110,9 +111,8 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
   }
 }
 
-const reconcileFormPipette = (formData, baseState, nextPipette: stringj) => {
+export const reconcileFormPipette = (formData, baseState, nextPipetteId: string, nextChannels) => {
   const prevChannels = getChannels(formData.pipette, baseState)
-  const nextChannels = getChannels(nextPipette, baseState)
 
   const singleToMulti = prevChannels === 1 && nextChannels === 8
   const multiToSingle = prevChannels === 8 && nextChannels === 1
@@ -122,7 +122,7 @@ const reconcileFormPipette = (formData, baseState, nextPipette: stringj) => {
   // *****
   // set any flow rates to null when pipette is changed
   // *****
-  if (formData.pipette !== nextPipette) {
+  if (formData.pipette !== nextPipetteId) {
     if (formData.aspirate_flowRate) {
       updateOverrides = {...updateOverrides, aspirate_flowRate: null}
     }
