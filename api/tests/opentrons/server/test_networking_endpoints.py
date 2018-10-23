@@ -246,7 +246,7 @@ async def test_list_keys(loop, test_client, wifi_keys_tempdir):
     empty_resp = await cli.get('/wifi/keys')
     assert empty_resp.status == 200
     empty_body = await empty_resp.json()
-    assert empty_body == []
+    assert empty_body == {'keys': []}
 
     for dn in dummy_names:
         os.mkdir(os.path.join(wifi_keys_tempdir, dn))
@@ -255,9 +255,10 @@ async def test_list_keys(loop, test_client, wifi_keys_tempdir):
     resp = await cli.get('/wifi/keys')
     assert resp.status == 200
     body = await resp.json()
-    assert len(body) == 3
+    keys = body['keys']
+    assert len(keys) == 3
     for dn in dummy_names:
-        for keyfile in body:
+        for keyfile in keys:
             if keyfile['id'] == dn:
                 assert keyfile['name'] == 'test.pem'
                 assert keyfile['uri'] == '/wifi/keys/{}'.format(dn)
@@ -273,7 +274,7 @@ async def test_key_lifecycle(loop, test_client, wifi_keys_tempdir):
         empty_resp = await cli.get('/wifi/keys')
         assert empty_resp.status == 200
         empty_body = await empty_resp.json()
-        assert empty_body == []
+        assert empty_body == {'keys': []}
 
         results = {}
         # We should be able to add multiple keys
@@ -305,8 +306,9 @@ async def test_key_lifecycle(loop, test_client, wifi_keys_tempdir):
         list_resp = await cli.get('/wifi/keys')
         assert list_resp.status == 200
         list_body = await list_resp.json()
-        assert len(list_body) == 3
-        for elem in list_body:
+        keys = list_body['keys']
+        assert len(keys) == 3
+        for elem in keys:
             assert elem['id'] in [r['id'] for r in results.values()]
 
         for fn, data in results.items():
@@ -316,7 +318,7 @@ async def test_key_lifecycle(loop, test_client, wifi_keys_tempdir):
             assert 'message' in del_body
             del_list_resp = await cli.get('/wifi/keys')
             del_list_body = await del_list_resp.json()
-            assert data['id'] not in [k['id'] for k in del_list_body]
+            assert data['id'] not in [k['id'] for k in del_list_body['keys']]
 
         dup_del_resp = await cli.delete(results['test1.pem']['uri'])
         assert dup_del_resp.status == 404
