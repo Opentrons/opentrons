@@ -18,7 +18,7 @@ type SP = {
 type DP = {
   _updateFileMetadataFields: typeof actions.updateFileMetadataFields,
   _saveFileMetadata: ({[accessor: FileMetadataFieldAccessors]: mixed}) => mixed,
-  goToDesignPage: $PropertyType<FilePageProps, 'goToDesignPage'>,
+  goToNextPage: $PropertyType<FilePageProps, 'goToNextPage'>,
   swapPipettes: $PropertyType<FilePageProps, 'swapPipettes'>,
 }
 
@@ -37,13 +37,13 @@ const mapStateToProps = (state: BaseState): SP => {
 const mapDispatchToProps: DP = {
   _updateFileMetadataFields: actions.updateFileMetadataFields,
   _saveFileMetadata: actions.saveFileMetadata,
-  goToDesignPage: () => navActions.navigateToPage('steplist'),
+  goToNextPage: () => navActions.navigateToPage('liquids'),
   swapPipettes: pipetteActions.swapPipettes,
 }
 
 const mergeProps = (
   {instruments, isFormAltered, _values}: SP,
-  {_updateFileMetadataFields, _saveFileMetadata, goToDesignPage, swapPipettes}: DP
+  {_updateFileMetadataFields, _saveFileMetadata, goToNextPage, swapPipettes}: DP
 ): FilePageProps => {
   const onChange = (accessor) => (e: SyntheticInputEvent<*>) => {
     if (accessor === 'protocol-name' || accessor === 'description' || accessor === 'author') {
@@ -59,7 +59,7 @@ const mergeProps = (
     formConnector,
     isFormAltered,
     instruments,
-    goToDesignPage,
+    goToNextPage,
     saveFileMetadata: () => _saveFileMetadata(_values),
     swapPipettes,
   }
