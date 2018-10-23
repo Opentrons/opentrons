@@ -31,10 +31,7 @@ export type ResetRobotRequest = {
 type ResetRobotResponse = {}
 
 type FetchResetOptionsCall = ApiCall<null, FetchResetOptionsResponse>
-
-export type OptionsState = {
-  [robotName: string]: ?FetchResetOptionsCall,
-}
+type ResetRobotCall = ApiCall<ResetRobotRequest, ResetRobotRequest>
 
 export const OPTIONS_PATH: 'settings/reset/options' = 'settings/reset/options'
 export const RESET_PATH: 'settings/reset' = 'settings/reset'
@@ -42,6 +39,11 @@ export const RESET_PATH: 'settings/reset' = 'settings/reset'
 export type ResetAction =
   | ApiAction<'settings/reset/options', null, FetchResetOptionsResponse>
   | ApiAction<'settings/reset', ResetRobotRequest, ResetRobotResponse>
+
+export type ResetState = {|
+  'settings/reset/options'?: FetchResetOptionsCall,
+  'settings/reset'?: ResetRobotCall,
+|}
 
 export function fetchResetOptions (robot: RobotService): ThunkPromiseAction {
   return (dispatch) => {

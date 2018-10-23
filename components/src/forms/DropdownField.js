@@ -21,6 +21,8 @@ type Props = {
   onBlur?: (event: SyntheticFocusEvent<*>) => mixed,
   /** value that is selected */
   value?: ?string,
+  /** optional id for the <select> element */
+  id?: string,
   /** name of field in form */
   name?: string,
   /** Array of {name, value} data */
@@ -52,6 +54,7 @@ export default function DropdownField (props: Props) {
     <div className={className}>
       <div className={styles.dropdown_field}>
         <select
+          id={props.id}
           value={props.value || ''}
           name={props.name}
           onChange={props.onChange}

@@ -60,9 +60,9 @@ type FetchModuleDataCall = ApiCall<null, FetchModuleDataResponse>
 export type ModulesAction =
   | ApiAction<'modules', null, FetchModulesResponse>
 
-export type ModulesState = {
+export type ModulesState = {|
   modules?: FetchModulesCall,
-}
+|}
 
 const MODULES: 'modules' = 'modules'
 

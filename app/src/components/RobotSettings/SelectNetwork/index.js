@@ -5,32 +5,42 @@ import find from 'lodash/find'
 
 import {
   NO_SECURITY,
-  WPA_PSK_SECURITY,
+  WPA_EAP_SECURITY,
   fetchWifiList,
+  fetchWifiEapOptions,
   configureWifi,
   makeGetRobotWifiList,
+  makeGetRobotWifiEapOptions,
   makeGetRobotWifiConfigure,
 } from '../../../http-api-client'
 
-import {IntervalWrapper, SpinnerModal, AlertModal} from '@opentrons/components'
+import {IntervalWrapper, SpinnerModal} from '@opentrons/components'
 import {Portal} from '../../portal'
 import {NetworkDropdown} from '../connection'
-import {ConnectForm} from './ConnectForm'
+import ConnectModal from './ConnectModal'
+import ConnectForm from './ConnectForm'
 
 import type {State, Dispatch} from '../../../types'
 import type {ViewableRobot} from '../../../discovery'
 import type {
   WifiNetwork,
   WifiNetworkList,
+  WifiSecurityType,
+  WifiEapOption,
   WifiConfigureRequest,
 } from '../../../http-api-client'
 
 type OP = {robot: ViewableRobot}
 
-type SP = {|list: ?WifiNetworkList, connectingTo: ?string|}
+type SP = {|
+  list: ?WifiNetworkList,
+  connectingTo: ?string,
+  eapOptions: ?Array<WifiEapOption>,
+|}
 
 type DP = {|
-  getList: () => mixed,
+  fetchList: () => mixed,
+  fetchEapOptions: () => mixed,
   configure: WifiConfigureRequest => mixed,
 |}
 
@@ -38,7 +48,7 @@ type Props = {...$Exact<OP>, ...SP, ...DP}
 
 type SelectNetworkState = {
   ssid: ?string,
-  connectFormType: ?typeof WPA_PSK_SECURITY,
+  securityType: ?WifiSecurityType,
 }
 
 const LIST_REFRESH_MS = 15000
@@ -47,24 +57,27 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
   constructor (props) {
     super(props)
     // prepopulate selected SSID with currently connected network, if any
-    this.state = {ssid: this.getActiveSsid(), connectFormType: null}
+    this.state = {ssid: this.getActiveSsid(), securityType: null}
   }
 
   onChange = (network: WifiNetwork) => {
-    const nextState: $Shape<SelectNetworkState> = {ssid: network.ssid}
+    const nextState: $Shape<SelectNetworkState> = {
+      ssid: network.ssid,
+      securityType: network.securityType,
+    }
 
+    // TODO(mc, 2018-10-22): pass network security type direct
     if (network.securityType === NO_SECURITY) {
       this.props.configure({ssid: network.ssid})
-    } else if (network.securityType === WPA_PSK_SECURITY) {
-      nextState.connectFormType = WPA_PSK_SECURITY
+    } else if (network.securityType === WPA_EAP_SECURITY) {
+      this.props.fetchEapOptions()
     }
-    // TODO(mc, 2018-10-18): handle WPA_EAP_SECURITY
     // TODO(mc, 2018-10-18): handle hidden network
 
     this.setState(nextState)
   }
 
-  closeConnectForm = () => this.setState({connectFormType: null})
+  closeConnectForm = () => this.setState({securityType: null})
 
   getActiveSsid (): ?string {
     const activeNetwork = find(this.props.list, 'active')
@@ -80,11 +93,11 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
   }
 
   render () {
-    const {list, connectingTo, getList, configure} = this.props
-    const {ssid, connectFormType} = this.state
+    const {list, connectingTo, eapOptions, fetchList, configure} = this.props
+    const {ssid, securityType} = this.state
 
     return (
-      <IntervalWrapper refresh={getList} interval={LIST_REFRESH_MS}>
+      <IntervalWrapper refresh={fetchList} interval={LIST_REFRESH_MS}>
         <NetworkDropdown
           list={list}
           value={ssid}
@@ -99,27 +112,21 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
             />
           )}
           {ssid &&
-            connectFormType === WPA_PSK_SECURITY && (
-              <AlertModal
-                heading={`WiFi network ${ssid} requires a WPA2 password`}
-                iconName="wifi"
-                onCloseClick={this.closeConnectForm}
-                alertOverlay
+            securityType &&
+            securityType !== NO_SECURITY && (
+              <ConnectModal
+                ssid={ssid}
+                securityType={securityType}
+                close={this.closeConnectForm}
               >
                 <ConnectForm
                   ssid={ssid}
                   configure={configure}
                   close={this.closeConnectForm}
-                  fields={[
-                    {
-                      name: 'psk',
-                      displayName: 'Password:',
-                      type: 'password',
-                      required: true,
-                    },
-                  ]}
+                  eapOptions={eapOptions}
+                  securityType={securityType}
                 />
-              </AlertModal>
+              </ConnectModal>
             )}
         </Portal>
       </IntervalWrapper>
@@ -128,20 +135,23 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
 }
 
 function makeMapStateToProps (): (State, OP) => SP {
-  const getWifiListCall = makeGetRobotWifiList()
-  const getWifiConfigureCall = makeGetRobotWifiConfigure()
+  const getListCall = makeGetRobotWifiList()
+  const getEapCall = makeGetRobotWifiEapOptions()
+  const getConfigureCall = makeGetRobotWifiConfigure()
 
   return (state, ownProps) => {
     const {robot} = ownProps
-    const {response: listResponse} = getWifiListCall(state, robot)
+    const {response: listResponse} = getListCall(state, robot)
+    const {response: eapResponse} = getEapCall(state, robot)
     const {
       request: cfgRequest,
       inProgress: cfgInProgress,
       error: cfgError,
-    } = getWifiConfigureCall(state, robot)
+    } = getConfigureCall(state, robot)
 
     return {
       list: listResponse && listResponse.list,
+      eapOptions: eapResponse && eapResponse.options,
       connectingTo:
         !cfgError && cfgInProgress && cfgRequest ? cfgRequest.ssid : null,
     }
@@ -152,7 +162,8 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   const {robot} = ownProps
 
   return {
-    getList: () => dispatch(fetchWifiList(robot)),
+    fetchList: () => dispatch(fetchWifiList(robot)),
+    fetchEapOptions: () => dispatch(fetchWifiEapOptions(robot)),
     configure: params => dispatch(configureWifi(robot, params)),
   }
 }

@@ -24,9 +24,9 @@ type DisengageCall = ApiCall<DisengageRequest, DisengageResponse>
 export type MotorsAction =
   | ApiAction<'motors/disengage', DisengageRequest, DisengageResponse>
 
-export type MotorsState = {
+export type MotorsState = {|
   'motors/disengage'?: DisengageCall,
-}
+|}
 
 const DISENGAGE: 'motors/disengage' = 'motors/disengage'
 

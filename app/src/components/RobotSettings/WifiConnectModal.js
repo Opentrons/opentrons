@@ -34,9 +34,9 @@ export default function WifiConnectModal (props: Props) {
     let errorMessage = 'An unknown error occurred'
 
     if (error && error.message) {
-      // TODO(mc, 2018-10-18): improve API message response
+      // TODO(mc, 2018-10-18): improve API message response from NMCLI
       const messageMatch = error.message.match(ERROR_MESSAGE_RE)
-      if (messageMatch) errorMessage = messageMatch[1]
+      errorMessage = messageMatch ? messageMatch[1] : error.message
     }
 
     const modalError = {

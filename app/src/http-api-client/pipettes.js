@@ -31,9 +31,9 @@ export type PipettesAction = ApiAction<'pipette', null, PipettesResponse>
 
 export type RobotPipettes = ApiCall<void, PipettesResponse>
 
-export type PipettesState = {
+export type PipettesState = {|
   pipettes?: FetchPipettesCall,
-}
+|}
 
 const PIPETTES: 'pipettes' = 'pipettes'
 
