@@ -31,9 +31,9 @@ export type SettingsAction = ApiAction<'settings', SettingsRequest, SettingsResp
 
 export type RobotSettingsCall = ApiCall<SettingsRequest, SettingsResponse>
 
-export type RobotSettingsState = {
+export type SettingsState = {|
   settings?: RobotSettingsCall,
-}
+|}
 
 const SETTINGS: 'settings' = 'settings'
 
@@ -52,7 +52,7 @@ export function makeGetRobotSettings () {
   return selector
 }
 
-function getSettingsRequest (state: RobotSettingsState): RobotSettingsCall {
+function getSettingsRequest (state: SettingsState): RobotSettingsCall {
   let requestState = state[SETTINGS] || {inProgress: false}
 
   // guard against an older version of GET /settings

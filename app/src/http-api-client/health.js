@@ -22,9 +22,9 @@ export type HealthAction = ApiAction<'health', null, FetchHealthResponse>
 
 export type FetchHealthCall = ApiCall<void, FetchHealthResponse>
 
-export type RobotHealthState = {
+export type HealthState = {|
   health?: FetchHealthCall,
-}
+|}
 
 const HEALTH: 'health' = 'health'
 

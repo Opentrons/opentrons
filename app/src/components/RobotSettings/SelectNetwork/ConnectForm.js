@@ -3,7 +3,7 @@ import * as React from 'react'
 import {Formik} from 'formik'
 import get from 'lodash/get'
 import find from 'lodash/find'
-import orderBy from 'lodash/orderBy'
+import set from 'lodash/set'
 
 import {WPA_PSK_SECURITY, WPA_EAP_SECURITY} from '../../../http-api-client'
 
@@ -75,7 +75,7 @@ export default class ConnectForm extends React.Component<Props, State> {
       <Formik
         onSubmit={this.onSubmit}
         render={formProps => {
-          const {handleReset, handleChange, handleSubmit, values} = formProps
+          const {handleChange, handleSubmit, values, setValues} = formProps
           const eapMethod = get(values, eapMethodField)
           let fields: Array<WifiAuthField> = []
 
@@ -107,13 +107,13 @@ export default class ConnectForm extends React.Component<Props, State> {
                           value: o.name,
                         }))}
                         onChange={e => {
-                          handleReset()
-                          handleChange(e)
+                          // reset all other fields on EAP type change
+                          setValues(set({}, eapMethodField, e.target.value))
                         }}
                       />
                     </FormTableRow>
                   )}
-                {orderBy(fields, ['required'], ['desc']).map(field => (
+                {fields.map(field => (
                   <ConnectFormField
                     key={field.name}
                     field={field}

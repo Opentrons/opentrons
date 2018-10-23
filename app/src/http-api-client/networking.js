@@ -2,6 +2,7 @@
 // networking http api module
 import {createSelector} from 'reselect'
 import orderBy from 'lodash/orderBy'
+import partition from 'lodash/partition'
 import uniqBy from 'lodash/uniqBy'
 
 import {buildRequestMaker, clearApiResponse} from './actions'
@@ -60,8 +61,10 @@ export type WifiEapOption = {
   options: Array<WifiAuthField>,
 }
 
+export type WifiEapOptionsList = Array<WifiEapOption>
+
 export type WifiEapOptionsResponse = {
-  options: Array<WifiEapOption>,
+  options: WifiEapOptionsList,
 }
 
 export type WifiConfigureRequest = {
@@ -92,12 +95,12 @@ export type FetchWifiEapOptionsCall = ApiCall<void, WifiEapOptionsResponse>
 export type ConfigureWifiCall = ApiCall<WifiConfigureRequest,
   WifiConfigureResponse>
 
-export type RobotNetworkingState = {
+export type NetworkingState = {|
   'networking/list'?: FetchNetworkingStatusCall,
   'wifi/list'?: FetchWifiListCall,
   'wifi/eap-options'?: FetchWifiEapOptionsCall,
   'wifi/configure': ConfigureWifiCall,
-}
+|}
 
 const STATUS: NetworkingStatusPath = 'networking/status'
 const LIST: WifiListPath = 'wifi/list'
@@ -140,10 +143,17 @@ export const makeGetRobotWifiList = (): GetWifiListCall =>
   })
 
 export const makeGetRobotWifiEapOptions = (): GetWifiEapOptionsCall =>
-  createSelector(
-    getRobotApiState,
-    state => state[EAP_OPTIONS] || {inProgress: true}
-  )
+  createSelector(getRobotApiState, state => {
+    const call = state[EAP_OPTIONS] || {inProgress: true}
+    if (!call.response) return call
+    return {
+      ...call,
+      response: {
+        ...call.response,
+        options: sortEapOptions(call.response.options),
+      },
+    }
+  })
 
 export const makeGetRobotWifiConfigure = (): GetConfigureWifiCall =>
   createSelector(
@@ -156,4 +166,20 @@ const LIST_ORDER = [['active', 'ssid', 'signal'], ['desc', 'asc', 'desc']]
 function dedupeNetworkList (list: WifiNetworkList): WifiNetworkList {
   const sortedList = orderBy(list, ...LIST_ORDER)
   return uniqBy(sortedList, 'ssid')
+}
+
+function sortEapOptions (list: WifiEapOptionsList): WifiEapOptionsList {
+  return list.map(eapOption => {
+    const [required, optional] = partition(eapOption.options, 'required')
+    // place any matching (starts with the same name) optional fields directly
+    // after their "parent" required field
+    const requiredWithMatching = required.reduce((result, field) => {
+      result.push(field)
+      result.push(...optional.filter(f => f.name.startsWith(field.name)))
+      return result
+    }, [])
+    const options = uniqBy(requiredWithMatching.concat(optional), 'name')
+
+    return {...eapOption, options}
+  })
 }

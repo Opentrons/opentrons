@@ -38,6 +38,8 @@ class _EAP_OUTER_TYPES(enum.Enum):
     # The string values of these supported EAP types should match both what
     # is expected by nmcli/wpa_supplicant (in 802-1x.eap) and the keys in
     # the CONFIG_REQUIRES dict above
+    # Note: if a file field has an optional password, the password field `name`
+    # must start with the `name` of the file field
     TLS = EAPType(
         name='tls',
         displayName='EAP-TLS',
