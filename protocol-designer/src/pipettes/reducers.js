@@ -62,6 +62,34 @@ const byId = handleActions({
         : acc
     }, {})
   },
+  EDIT_PIPETTES: (
+    state: PipetteById,
+    action: {payload: NewProtocolFields}
+  ): PipetteById => {
+    const {left, right} = action.payload
+
+    const leftPipette = (left.pipetteModel && left.tiprackModel)
+      ? createPipette('left', left.pipetteModel, left.tiprackModel)
+      : null
+
+    const rightPipette = (right.pipetteModel && right.tiprackModel)
+      ? createPipette('right', right.pipetteModel, right.tiprackModel)
+      : null
+
+    const newPipettes: PipetteById = ([leftPipette, rightPipette]).reduce(
+      (acc: {[string]: PipetteData}, pipette: ?PipetteData) => {
+        if (!pipette) return acc
+        return {
+          ...acc,
+          [pipette.id]: pipette,
+        }
+      }, {})
+
+    return {
+      ...state,
+      ...newPipettes,
+    }
+  },
   CREATE_NEW_PROTOCOL: (
     state: PipetteById,
     action: {payload: NewProtocolFields}

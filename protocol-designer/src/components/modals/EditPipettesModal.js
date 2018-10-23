@@ -180,7 +180,8 @@ const mapDTP = (dispatch: Dispatch): DP => ({
   onSave: (fields) => {
     // TODO: only launch if changes protocol
     if (window.confirm(i18n.t('alert.window.confirm_create_new'))) {
-      dispatch(pipetteActions.editPipette(fields))
+      console.log('tried save', fields)
+      dispatch(pipetteActions.editPipettes(fields))
     }
   },
   onCancel: () => console.log('tried to Cancel'),
