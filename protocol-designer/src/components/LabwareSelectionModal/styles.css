@@ -17,7 +17,7 @@
   left: 0;
   right: 0;
   top: 12%;
-  max-width: 30rem;
+  max-width: 25rem;
   margin: auto;
   padding: 1rem 2rem;
   user-select: none;
@@ -45,7 +45,7 @@
   content: var(--image-url);
   border: var(--bd-light);
   top: 4rem;
-  left: 20rem;
+  left: 10rem;
 
   /* Images too large, and need to be cropped from left */
   zoom: 0.5;

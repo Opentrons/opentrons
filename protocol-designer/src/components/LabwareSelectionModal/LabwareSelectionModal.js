@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import {getLabwareDiagramURL} from '../../images'
 import {
   ClickOutside,
   OutlineButton,
@@ -18,9 +19,6 @@ type Props = {
   select: (?string) => mixed,
   selectedSection: ?string,
 }
-
-const imageBasePath = process.env.OT_PD_IMAGE_PATH ||
-  'http://docs.opentrons.com/_images/'
 
 // TODO: Ian 2017-07-26 use shared-data labware, need displayName
 // [labware type, display name, and optional image url]
@@ -71,7 +69,7 @@ const labwareSectionOrder: Array<$Keys<typeof hardcodedLabware>> = [
 class LabwareDropdown extends React.Component <Props> {
   labwareItemMapper = (dataRow, key) => {
     const {selectLabware} = this.props
-    const [labwareType, displayName, img] = dataRow
+    const [labwareType, displayName, imgFileName] = dataRow
     return (
       <LabwareItem
         key={key}
@@ -79,10 +77,7 @@ class LabwareDropdown extends React.Component <Props> {
         displayName={displayName}
         selectLabware={selectLabware}
         // TODO: Ian 2018-02-22 If these images stay, factor out this magic URL more obvious (or import them with webpack)
-        labwareImgUrl={img
-          ? `${imageBasePath}${img}.png`
-          : null
-        }
+        labwareImgUrl={getLabwareDiagramURL(imgFileName)}
       />
     )
   }
