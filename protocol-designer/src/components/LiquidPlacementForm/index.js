@@ -3,6 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import assert from 'assert'
 import {
+  removeWellsContents,
   setWellContents,
 } from '../../labware-ingred/actions'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
@@ -25,10 +26,19 @@ type DP = {
 type SP = $Diff<Props, DP> & {
   _labwareId: ?string,
   _selectedWells: ?Array<string>,
+  _selectionHasLiquids: boolean,
 }
 
 function mapStateToProps (state: BaseState): SP {
   const selectedWells = Object.keys(wellSelectionSelectors.getSelectedWells(state))
+
+  const _labwareId = labwareIngredSelectors.getSelectedContainerId(state)
+  const liquidLocations = labwareIngredSelectors.getIngredientLocations(state)
+  const _selectionHasLiquids = Boolean(
+    _labwareId &&
+    liquidLocations[_labwareId] &&
+    selectedWells.some(well => liquidLocations[_labwareId][well])
+  )
 
   return {
     commonSelectedLiquidId: wellContentsSelectors.getSelectedWellsCommonIngredId(state),
@@ -37,18 +47,32 @@ function mapStateToProps (state: BaseState): SP {
     showForm: selectedWells.length > 0,
     selectedWellsMaxVolume: wellContentsSelectors.selectedWellsMaxVolume(state),
 
-    _labwareId: labwareIngredSelectors.getSelectedContainerId(state),
+    _labwareId,
     _selectedWells: selectedWells,
+    _selectionHasLiquids,
   }
 }
 
 function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Props {
-  const {_labwareId, _selectedWells, ...passThruProps} = stateProps
+  const {_labwareId, _selectedWells, _selectionHasLiquids, ...passThruProps} = stateProps
   const {dispatch} = dispatchProps
+
+  const clearWells = (_labwareId && _selectedWells && _selectionHasLiquids)
+    ? () => {
+      // TODO: Ian 2018-10-22 replace with modal later on if we like this UX
+      if (global.confirm('Are you sure you want to remove liquids from all selected wells?')) {
+        dispatch(removeWellsContents({
+          labwareId: _labwareId,
+          wells: _selectedWells,
+        }))
+      }
+    }
+    : null
+
   return {
     ...passThruProps,
     cancelForm: () => dispatch(deselectAllWells()),
-    clearWells: () => global.alert('"Clear Wells" is not yet implemented'), // TODO: Ian 2018-10-19
+    clearWells,
     saveForm: (values: ValidFormValues) => {
       const volume = Number(values.volume)
 

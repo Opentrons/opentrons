@@ -115,7 +115,6 @@ export const moveLabware = (toSlot: DeckSlot) => (dispatch: Dispatch<MoveLabware
 export type RemoveWellsContents = {
   type: 'REMOVE_WELLS_CONTENTS',
   payload: {
-    liquidGroupId: string,
     labwareId: string,
     wells: Array<string>,
   },
