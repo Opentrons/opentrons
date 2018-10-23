@@ -17,13 +17,13 @@ describe('createLabware', () => {
   beforeEach(() => {
     well1 = omit(exampleLabware1.wells.A1, ['x', 'y', 'z'])
     well2 = omit(exampleLabware2.wells.A1, ['x', 'y', 'z'])
-    const offset = {x: 10, y: 10, z: 5}
-
+    const offset1 = {x: 10, y: 10, z: 5}
+    const offset2 = {x: 10, y: 10, z: 0}
     labware1 = createRegularLabware({
       metadata: exampleLabware1.metadata,
       parameters: exampleLabware1.parameters,
       dimensions: exampleLabware1.dimensions,
-      offset,
+      offset: offset1,
       grid: {row: 1, column: 2},
       spacing: {row: 10, column: 10},
       well: well1,
@@ -34,7 +34,7 @@ describe('createLabware', () => {
       metadata: exampleLabware2.metadata,
       parameters: exampleLabware2.parameters,
       dimensions: exampleLabware2.dimensions,
-      offset,
+      offset: offset2,
       grid: {row: 3, column: 2},
       spacing: {row: 9, column: 9},
       well: well2,
@@ -80,7 +80,7 @@ describe('createLabware', () => {
         const well = labware3.wells[wellName]
         expect(well.x).toBeCloseTo(expectedXByCol[cIndex], 2)
         expect(well.y).toBeCloseTo(expectedYByRow[rIndex], 2)
-        expect(well.z).toBeCloseTo(exampleLabware2.dimensions.overallHeight - well.depth, 2)
+        expect(well.z).toBeCloseTo(exampleLabware2.dimensions.overallHeight + offset.z - well.depth, 2)
       })
     })
   })

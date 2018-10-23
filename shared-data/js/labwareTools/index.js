@@ -131,16 +131,19 @@ function calculateCoordinates (
 export function createRegularLabware (props: RegularLabwareProps): Schema {
   const ordering = determineOrdering(props.grid)
   const slotDims = {x: 127.76, y: 85.48, z: 0}
-  props.offset.z = props.dimensions.overallHeight
+  const offset = {...props.offset, z: props.dimensions.overallHeight + props.offset.z}
   const definition: Schema = {
     ordering,
     otId: assignId(),
     deprecated: false,
     metadata: props.metadata,
-    cornerOffsetFromSlot: {x: round(props.dimensions.overallLength - slotDims.x, 2), y: round(props.dimensions.overallWidth - slotDims.y, 2), z: slotDims.z},
+    cornerOffsetFromSlot: {
+      x: round(props.dimensions.overallLength - slotDims.x, 2),
+      y: round(props.dimensions.overallWidth - slotDims.y, 2),
+      z: slotDims.z},
     dimensions: props.dimensions,
     parameters: props.parameters,
-    wells: calculateCoordinates(props.well, ordering, props.spacing, props.offset),
+    wells: calculateCoordinates(props.well, ordering, props.spacing, offset),
   }
 
   const numWells = props.grid.row * props.grid.column

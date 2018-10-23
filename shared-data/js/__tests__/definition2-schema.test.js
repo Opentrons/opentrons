@@ -17,7 +17,7 @@ const ajv = new Ajv({
 const validate = ajv.compile(schema)
 
 describe('test the schema against a minimalist fixture', () => {
-  test('...', () => {
+  test('validate example definitions with schema', () => {
     const valid1 = validate(exampleLabware1)
     const validationErrors1 = validate.errors
     expect(validationErrors1).toBe(null)
@@ -48,8 +48,7 @@ describe('test the schema against a minimalist fixture', () => {
 
 describe('test schemas of all definitions', () => {
   const labwarePaths = glob.sync(definitionsGlobPath)
-
-  test('got at least 1 labware definition file', () => {
+  beforeAll(() => {
     // Make sure definitions path didn't break, which would give you false positives
     expect(labwarePaths.length).toBeGreaterThan(0)
   })

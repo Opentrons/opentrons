@@ -34,7 +34,7 @@
       "diameter": 30,
       "x": 10,
       "y": 10,
-      "z": 10,
+      "z": 15,
       "shape": "circular"
     },
     "A2": {
@@ -43,7 +43,7 @@
       "diameter": 30,
       "x": 20,
       "y": 10,
-      "z": 10,
+      "z": 15,
       "shape": "circular"
     }
   }
