@@ -1,9 +1,10 @@
+import asyncio
 import enum
 import logging
 from typing import List, Dict
 
 from opentrons.protocol_api.labware import Well, Labware, load
-from opentrons import types
+from opentrons import types, hardware_control as hc
 from . import geometry
 
 
@@ -18,8 +19,30 @@ class ProtocolContext:
     pause and resume.
     """
 
-    def __init__(self) -> None:
+    def __init__(self,
+                 hardware: hc.API = None,
+                 loop: asyncio.AbstractEventLoop = None) -> None:
+        self._loop = loop or asyncio.get_event_loop()
+        if hardware:
+            self._hardware = hardware
+        else:
+            self._hardware = hc.API.build_hardware_simulator(loop=self._loop)
         self._deck_layout = geometry.Deck()
+        self._instruments = {mount: None for mount in types.Mount}
+
+    def connect(self, hardware: hc.API):
+        """ Connect to a running hardware API.
+
+        This can be either a simulator or a full hardware controller.
+        """
+        self._hardware = hardware
+        self._loop.run_until_complete(
+            self._hardware.cache_instruments())
+
+    def disconnect(self):
+        """ Disconnect from currently-connected hardware and simulate instead
+        """
+        self.connect(hc.API.build_hardware_simulator())
 
     def load_labware(
             self, labware_obj: Labware, location: types.DeckLocation,
@@ -59,7 +82,7 @@ class ProtocolContext:
         return dict(self._deck_layout)
 
     def load_instrument(
-                    self, instrument_name: str, mount: types.Mount) \
+            self, instrument_name: str, mount: types.Mount) \
             -> 'InstrumentContext':
         """ Specify a specific instrument required by the protocol.
 
@@ -67,16 +90,16 @@ class ProtocolContext:
         ensure that the correct instrument is attached in the specified
         location.
         """
-        pass
-
-    @property
-    def loaded_instruments(self) -> Dict[str, 'InstrumentContext']:
-        """ Get the instruments that have been loaded into the protocol context
-
-        The return value is a dict mapping locations to instruments, sorted
-        in order of mounts (so 'left' (if any), then 'right' (if any))
-        """
-        pass
+        attached = {att_mount: instr.get('name', None)
+                    for att_mount, instr
+                    in self._hardware.attached_instruments.items()}
+        attached[mount] = instrument_name
+        self._loop.run_until_complete(
+            self._hardware.cache_instruments(attached))
+        # If the cache call didn’t raise, the instrument is attached
+        return InstrumentContext(self, mount,
+                                 [],
+                                 self._hardware.attached_instruments[mount])
 
     def pause(self):
         """ Pause execution of the protocol until resume is called.
@@ -98,7 +121,13 @@ class ProtocolContext:
     def move_to(self, mount: types.Mount,
                 location: geometry.Location,
                 strategy: types.MotionStrategy = None):
-        pass
+        where = geometry.point_from_location(location)
+        self._loop.run_until_complete(self._hardware.move_to(mount, where))
+
+    def home(self):
+        """ Homes the robot.
+        """
+        self._loop.run_until_complete(self._hardware.home())
 
 
 class InstrumentContext:
@@ -129,8 +158,11 @@ class InstrumentContext:
         MULTI = 'multi'
 
     def __init__(self, ctx, mount: types.Mount, tip_racks,
+                 info,
                  **config_kwargs) -> None:
-        pass
+        self._ctx = ctx
+        self._info = info
+        self._mount = mount
 
     def aspirate(self,
                  volume: float = None,
@@ -179,7 +211,12 @@ class InstrumentContext:
         pass
 
     def home(self):
-        pass
+        """ Home the robot.
+
+        :returns: This instance.
+        """
+        self._ctx.home()
+        return self
 
     def distribute(self,
                    volume: float,
@@ -205,7 +242,12 @@ class InstrumentContext:
     def move_to(self,
                 location: geometry.Location,
                 strategy: types.MotionStrategy = None):
-        pass
+        self._ctx.move_to(self._mount, location, strategy)
+        return self
+
+    @property
+    def mount(self) -> str:
+        return self._mount.name.lower()
 
     @property
     def speeds(self) -> Dict[MODE, float]:
@@ -288,3 +330,7 @@ class InstrumentContext:
     @trash_container.setter
     def trash_container(self, trash: Labware):
         pass
+
+    @property
+    def name(self):
+        return self._info['name']
