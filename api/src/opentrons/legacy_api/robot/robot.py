@@ -13,12 +13,11 @@ from opentrons.data_storage import database, old_container_loading,\
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as fflags
-
+from opentrons.config.robot_configs import load
 from opentrons.legacy_api import containers
-from opentrons.legacy_api.robot.mover import Mover
-from opentrons.legacy_api.robot.robot_configs import load
 from opentrons.legacy_api.containers import Container
-from opentrons.legacy_api.instruments import pipette_config
+from .mover import Mover
+from opentrons.config import pipette_config
 
 log = logging.getLogger(__name__)
 

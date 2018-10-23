@@ -5,7 +5,7 @@ import logging
 from aiohttp import web
 from threading import Thread
 from opentrons import robot, instruments, modules
-from opentrons.legacy_api.instruments import pipette_config
+from opentrons.config import pipette_config
 from opentrons.trackers import pose_tracker
 
 log = logging.getLogger(__name__)

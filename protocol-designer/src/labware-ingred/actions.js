@@ -3,7 +3,6 @@ import {createAction} from 'redux-actions'
 import type {Dispatch} from 'redux'
 
 import {selectors} from './reducers'
-import wellSelectionSelectors from '../well-selection/selectors'
 
 import type {GetState} from '../types'
 import type {IngredInputs} from './types'
@@ -50,16 +49,6 @@ export const drillDownOnLabware = createAction(
 export const drillUpFromLabware = createAction(
   'DRILL_UP_FROM_LABWARE',
   () => {}
-)
-
-// =====
-
-export const editModeIngredientGroup = createAction(
-  'EDIT_MODE_INGREDIENT_GROUP',
-  (args: (
-    | null // null here means "deselect ingredient group"
-    | {| wellName: ?string, groupId: string |}
-  )) => args
 )
 
 // ==== Create/delete/modify labware =====
@@ -123,85 +112,61 @@ export const moveLabware = (toSlot: DeckSlot) => (dispatch: Dispatch<MoveLabware
   }
 }
 
-type DeleteIngredientPrepayload = {
-  wellName?: string,
-  groupId: string,
-}
-
-export type DeleteIngredient = {|
-  type: 'DELETE_INGREDIENT',
+export type RemoveWellsContents = {
+  type: 'REMOVE_WELLS_CONTENTS',
   payload: {
-    containerId: string,
-  } & DeleteIngredientPrepayload,
-|}
-
-export const deleteIngredient = (payload: DeleteIngredientPrepayload) => (dispatch: Dispatch<DeleteIngredient>, getState: GetState) => {
-  const container = selectors.getSelectedContainer(getState())
-  if (!container || !container.id) {
-    console.warn('Tried to delete ingredient with no selected container')
-    return null
-  }
-
-  return dispatch({
-    type: 'DELETE_INGREDIENT',
-    payload: {
-      ...payload,
-      containerId: container.id,
-    },
-  })
-}
-
-// TODO test this thunk
-export type EditIngredient = {
-  type: 'EDIT_INGREDIENT',
-  payload: {
-    ...IngredInputs,
-    containerId: string,
-    groupId: string,
+    liquidGroupId: string,
+    labwareId: string,
     wells: Array<string>,
   },
 }
 
-export type EditIngredientPayload = {
-  ...IngredInputsExact,
-  groupId: string | null, // null indicates new ingredient is being created
+export const removeWellsContents = (
+  payload: $PropertyType<RemoveWellsContents, 'payload'>
+) => ({
+  type: 'REMOVE_WELLS_CONTENTS',
+  payload,
+})
+
+export type DeleteLiquidGroup = {
+  type: 'DELETE_LIQUID_GROUP',
+  payload: string, // liquid group id
 }
 
-// TODO: Ian 2018-10-12 this is deprecated, remove when "add liquids to deck" modal is redone
-export const editIngredient = (payload: EditIngredientPayload) => (dispatch: Dispatch<EditIngredient>, getState: GetState) => {
-  const state = getState()
-  const container = selectors.getSelectedContainer(state)
-
-  const {groupId, ...inputFields} = payload
-
-  if (!container) {
-    throw new Error('No container selected, cannot edit ingredient')
+export const deleteLiquidGroup = (liquidGroupId: string) =>
+  (dispatch: Dispatch<DeleteLiquidGroup>, getState: GetState) => {
+    const allLiquidGroupsOnDeck = selectors.getLiquidGroupsOnDeck(getState())
+    const liquidIsOnDeck = allLiquidGroupsOnDeck.includes(liquidGroupId)
+    // TODO: Ian 2018-10-22 we will eventually want to replace
+    // this window.confirm with a modal
+    const okToDelete = liquidIsOnDeck
+      ? global.confirm('This liquid has been placed on the deck, are you sure you want to delete it?')
+      : true
+    if (okToDelete) {
+      return dispatch({
+        type: 'DELETE_LIQUID_GROUP',
+        payload: liquidGroupId,
+      })
+    }
   }
 
-  if (groupId !== null) {
-    // Not a copy, just an edit
-    return dispatch({
-      type: 'EDIT_INGREDIENT',
-      payload: {
-        ...inputFields,
-        groupId: groupId,
-        containerId: container.id,
-        wells: wellSelectionSelectors.selectedWellNames(state),
-      },
-    })
-  }
-
-  return dispatch({
-    type: 'EDIT_INGREDIENT',
-    payload: {
-      ...inputFields,
-      // if it matches the name of the clone parent, append "copy" to that name
-      containerId: container.id,
-      groupId: selectors.getNextLiquidGroupId(state),
-      wells: wellSelectionSelectors.selectedWellNames(state),
-    },
-  })
+// NOTE: assumes you want to set a uniform volume of the same liquid in one labware
+export type SetWellContentsPayload = {
+  liquidGroupId: string,
+  labwareId: string,
+  wells: Array<string>, // NOTE: order should not be meaningful
+  volume: number,
 }
+
+export type SetWellContentsAction = {
+  type: 'SET_WELL_CONTENTS',
+  payload: SetWellContentsPayload,
+}
+
+export const setWellContents = (payload: SetWellContentsPayload): SetWellContentsAction => ({
+  type: 'SET_WELL_CONTENTS',
+  payload,
+})
 
 export type SelectLiquidAction = {
   type: 'SELECT_LIQUID_GROUP',

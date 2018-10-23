@@ -1,0 +1,24 @@
+@import '@opentrons/components';
+
+.info_wrapper {
+  @apply --font-body-2-dark;
+
+  text-align: center;
+  max-width: 38rem;
+  margin: 2rem auto;
+}
+
+.header {
+  @apply --font-header-dark;
+}
+
+.instruction {
+  margin: 2rem 0;
+  line-height: 1.5;
+}
+
+.inline_icon {
+  color: var(--c-font-dark);
+  height: 1.5em;
+  padding: 0 0.25em;
+}

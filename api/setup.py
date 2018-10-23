@@ -68,10 +68,8 @@ class BuildWithSharedData(build_py.build_py):
         to_include = get_shared_data_files()
         destination = os.path.join(build_base, DEST_BASE_PATH)
         # And finally, tell the system about our files
-        print("FILES BEFORE {}".format(files))
         files.append(('opentrons', SHARED_DATA_PATH,
                       destination, to_include))
-        print("FILES AFTER {}".format(files))
         return files
 
 

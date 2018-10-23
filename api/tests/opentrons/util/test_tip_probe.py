@@ -1,6 +1,5 @@
 import pytest
-from opentrons.legacy_api.robot import robot_configs
-from opentrons.config import get_config_index
+from opentrons.config import get_config_index, robot_configs
 from opentrons.util.calibration_functions import update_instrument_config
 
 

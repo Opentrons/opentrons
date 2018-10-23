@@ -29,6 +29,7 @@ exports[`CheckboxField renders correctly when checked 1`] = `
     checked={true}
     className="input_field accessibly_hidden"
     disabled={undefined}
+    name={undefined}
     onChange={undefined}
     type="checkbox"
   />
@@ -69,6 +70,7 @@ exports[`CheckboxField renders correctly when unchecked 1`] = `
     checked={false}
     className="input_field accessibly_hidden"
     disabled={undefined}
+    name={undefined}
     onChange={undefined}
     type="checkbox"
   />
@@ -91,6 +93,7 @@ exports[`DropdownField renders correctly with a falsey value 1`] = `
       autoFocus={undefined}
       className="dropdown"
       disabled={undefined}
+      name={undefined}
       onBlur={undefined}
       onChange={undefined}
       onFocus={undefined}
@@ -163,6 +166,7 @@ exports[`DropdownField renders correctly with a value 1`] = `
       autoFocus={undefined}
       className="dropdown"
       disabled={undefined}
+      name={undefined}
       onBlur={undefined}
       onChange={undefined}
       onFocus={undefined}
@@ -253,6 +257,8 @@ exports[`InputField renders correctly 1`] = `
     >
       <input
         autoFocus={undefined}
+        id={undefined}
+        name={undefined}
         onBlur={undefined}
         onChange={undefined}
         onClick={undefined}

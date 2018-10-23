@@ -15,6 +15,10 @@ type Props = {
   className?: string,
   /** inline label text. DEPRECATED */
   label?: string,
+  /** name of field in form */
+  name?: string,
+  /** optional ID of <input> element */
+  id?: string,
   /** placeholder text */
   placeholder?: string,
   /** optional units string, appears to the right of input text */
@@ -61,11 +65,12 @@ export default function InputField (props: Props) {
   return (
     <label className={labelClass}>
       <div className={styles.label_text}>
-        {props.label && error &&
-          <div className={styles.error_icon}>
-            <Icon name='alert' />
-          </div>
-        }
+        {props.label &&
+          error && (
+            <div className={styles.error_icon}>
+              <Icon name="alert" />
+            </div>
+          )}
         {props.label}
       </div>
       <Input {...props} />
@@ -81,8 +86,10 @@ function Input (props: Props) {
     <div className={styles.input_field_container}>
       <div className={styles.input_field}>
         <input
+          id={props.id}
           type={props.type || 'text'}
           value={props.value || ''}
+          name={props.name}
           placeholder={props.placeholder}
           onChange={props.disabled ? undefined : props.onChange}
           onFocus={props.disabled ? undefined : props.onFocus}

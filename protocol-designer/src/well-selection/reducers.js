@@ -38,11 +38,11 @@ const selectedWells = handleActions({
     selected: deleteWells(state.selected, action.payload),
   }),
   // Actions that cause "deselect everything" behavior:
-  EDIT_MODE_INGREDIENT_GROUP: () => selectedWellsInitialState,
   CLOSE_INGREDIENT_SELECTOR: () => selectedWellsInitialState,
-  EDIT_INGREDIENT: () => selectedWellsInitialState,
   CLOSE_WELL_SELECTION_MODAL: () => selectedWellsInitialState,
+  DESELECT_ALL_WELLS: () => selectedWellsInitialState,
   OPEN_RENAME_LABWARE_FORM: () => selectedWellsInitialState,
+  SET_WELL_CONTENTS: () => selectedWellsInitialState,
 }, selectedWellsInitialState)
 
 type WellSelectionModalState = OpenWellSelectionModalPayload | null

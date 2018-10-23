@@ -3,10 +3,9 @@ from typing import Tuple
 from opentrons.trackers.pose_tracker import (
     update, Point, change_base
 )
-from opentrons.legacy_api.robot import robot_configs
 from opentrons.data_storage import database
 from opentrons.trackers.pose_tracker import absolute
-from opentrons.config import feature_flags as ff
+from opentrons.config import feature_flags as ff, robot_configs
 
 import logging
 

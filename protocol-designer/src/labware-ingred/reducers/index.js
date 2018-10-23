@@ -3,6 +3,7 @@ import {combineReducers} from 'redux'
 import {handleActions, type ActionType} from 'redux-actions'
 import {createSelector} from 'reselect'
 
+import forEach from 'lodash/forEach'
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import max from 'lodash/max'
@@ -17,7 +18,7 @@ import {labwareToDisplayName} from '../utils'
 import type {DeckSlot} from '@opentrons/components'
 import {getIsTiprack} from '@opentrons/shared-data'
 
-import type {LabwareLiquidState} from '../../step-generation'
+import type {SingleLabwareLiquidState, LabwareLiquidState} from '../../step-generation'
 
 import type {
   IngredInputs,
@@ -33,11 +34,12 @@ import {getPDMetadata} from '../../file-types'
 import type {BaseState, Selector, Options} from '../../types'
 import type {LoadFileAction} from '../../load-file'
 import type {
-  DeleteIngredient,
-  EditIngredient,
+  RemoveWellsContents,
+  DeleteLiquidGroup,
   EditLiquidGroupAction,
   MoveLabware,
   SelectLiquidAction,
+  SetWellContentsAction,
 } from '../actions'
 
 // external actions (for types)
@@ -83,10 +85,8 @@ const selectedContainerId = handleActions({
 type RenameLabwareFormModeState = boolean
 const renameLabwareFormMode = handleActions({
   OPEN_RENAME_LABWARE_FORM: () => true,
-
   CLOSE_RENAME_LABWARE_FORM: () => false,
   CLOSE_INGREDIENT_SELECTOR: () => false,
-  EDIT_MODE_INGREDIENT_GROUP: () => false,
 }, false)
 
 type DrillDownLabwareId = string | null
@@ -106,6 +106,7 @@ const unselectedLiquidGroupState = {liquidGroupId: null}
 const selectedLiquidGroup = handleActions({
   SELECT_LIQUID_GROUP: (state: SelectedLiquidGroupState, action: SelectLiquidAction): SelectedLiquidGroupState =>
     ({liquidGroupId: action.payload}),
+  DELETE_LIQUID_GROUP: () => unselectedLiquidGroupState,
   DESELECT_LIQUID_GROUP: () => unselectedLiquidGroupState,
   CREATE_NEW_LIQUID_GROUP_FORM: (): SelectedLiquidGroupState =>
     ({liquidGroupId: null, newLiquidGroup: true}),
@@ -220,28 +221,9 @@ export const ingredients = handleActions({
       [liquidGroupId]: {...state[liquidGroupId], ...action.payload},
     }
   },
-  EDIT_INGREDIENT: (state, action: EditIngredient) => {
-    // TODO: Ian 2018-10-12 this is deprecated, remove when "add liquids to deck" modal is redone
-    const {groupId, description, serialize, name} = action.payload
-    const ingredFields: LiquidGroup = {
-      description,
-      serialize: Boolean(serialize),
-      name,
-    }
-
-    return {
-      ...state,
-      [groupId]: ingredFields,
-    }
-  },
-  // Remove the deleted group (referenced by array index)
-  DELETE_INGREDIENT: (state, action: DeleteIngredient) => {
-    const {groupId, wellName} = action.payload
-    return (wellName)
-      // if wellName included, only a single well is being delete. not the whole group. Only ingredLocations change.
-      ? state
-      // otherwise, the whole ingred group is deleted
-      : omit(state, [groupId])
+  DELETE_LIQUID_GROUP: (state: IngredientsState, action: DeleteLiquidGroup): IngredientsState => {
+    const liquidGroupId = action.payload
+    return omit(state, liquidGroupId)
   },
   LOAD_FILE: (state: IngredientsState, action: LoadFileAction): IngredientsState =>
     getPDMetadata(action.payload).ingredients,
@@ -250,47 +232,36 @@ export const ingredients = handleActions({
 type LocationsState = LabwareLiquidState
 
 export const ingredLocations = handleActions({
-  EDIT_INGREDIENT: (state: LocationsState, action: EditIngredient) => {
-    const {groupId, containerId} = action.payload
-
-    function wellsWithVol (acc: {[well: string]: {volume: number}}, well: string) {
-      return {
-        ...acc,
-        [well]: {
-          [groupId]: {
-            volume: action.payload.volume,
-          },
-        },
-      }
-    }
+  SET_WELL_CONTENTS: (state: LocationsState, action: SetWellContentsAction): LocationsState => {
+    const {liquidGroupId, labwareId, wells, volume} = action.payload
+    const newWellContents = {[liquidGroupId]: {volume}}
+    const updatedWells = wells.reduce((acc, wellName): SingleLabwareLiquidState => ({
+      ...acc,
+      [wellName]: newWellContents,
+    }), {})
 
     return {
       ...state,
-      [containerId]: {
-        ...state[containerId],
-        ...action.payload.wells.reduce(wellsWithVol, {}),
+      [labwareId]: {
+        ...state[labwareId],
+        ...updatedWells,
       },
     }
   },
-  // TODO: Ian 2018-06-07
-  //  - refactor to allow clearing multiple wells vs (probably) deleting all
-  //      instances of an ingredient group
-  //  - write tests for this reducer
-  DELETE_INGREDIENT: (state: LocationsState, action: DeleteIngredient) => {
-    const {wellName, groupId, containerId} = action.payload
-    if (wellName) {
-      // deleting single well location
-      return {
-        ...state,
-        [containerId]: {
-          ...omit(state[containerId], wellName),
-        },
-      }
+  REMOVE_WELLS_CONTENTS: (state: LocationsState, action: RemoveWellsContents): LocationsState => {
+    const {wells, labwareId} = action.payload
+    return {
+      ...state,
+      [labwareId]: {
+        ...omit(state[labwareId], wells),
+      },
     }
-    // deleting entire ingred group
-    // TODO: Ian 2018-06-07
-    console.warn(`TODO: User tried to delete ingred group: ${groupId}. Deleting entire ingred group not supported yet`)
-    return state
+  },
+  DELETE_LIQUID_GROUP: (state: LocationsState, action: DeleteLiquidGroup): LocationsState => {
+    const liquidGroupId = action.payload
+    return mapValues(state, labwareContents =>
+      mapValues(labwareContents, well =>
+        omit(well, liquidGroupId)))
   },
   LOAD_FILE: (state: LocationsState, action: LoadFileAction): LocationsState =>
     getPDMetadata(action.payload).ingredLocations,
@@ -355,9 +326,22 @@ const getNextLiquidGroupId: Selector<string> = createSelector(
   (_ingredGroups) => ((max(Object.keys(_ingredGroups).map(id => parseInt(id))) + 1) || 0).toString()
 )
 
-const getIngredientNames: Selector<{[ingredId: string]: string}> = createSelector(
+const getLiquidNamesById: Selector<{[ingredId: string]: string}> = createSelector(
   getLiquidGroupsById,
   ingredGroups => mapValues(ingredGroups, (ingred: LiquidGroup) => ingred.name)
+)
+
+const getLiquidSelectionOptions: Selector<Options> = createSelector(
+  getLiquidGroupsById,
+  (liquidGroupsById) => {
+    return Object.keys(liquidGroupsById).map(id => ({
+      // NOTE: if these fallbacks are used, it's a bug
+      name: (liquidGroupsById[id])
+        ? liquidGroupsById[id].name || `(Unnamed Liquid: ${String(id)})`
+        : 'Missing Liquid',
+      value: id,
+    }))
+  }
 )
 
 const _loadedContainersBySlot = (containers: ContainersState) =>
@@ -504,16 +488,35 @@ const slotToMoveFrom = (state: BaseState) => rootSelector(state).moveLabwareMode
 
 const hasLiquid = (state: BaseState) => !isEmpty(getLiquidGroupsById(state))
 
+const getLiquidGroupsOnDeck: Selector<Array<string>> = createSelector(
+  getIngredientLocations,
+  (ingredLocationsByLabware) => {
+    let liquidGroups: Set<string> = new Set()
+    forEach(ingredLocationsByLabware, (byWell: $Values<typeof ingredLocationsByLabware>) =>
+      forEach(byWell, (groupContents: $Values<typeof byWell>) => {
+        forEach(groupContents, (contents: $Values<typeof groupContents>, groupId: $Keys<typeof groupContents>) => {
+          if (contents.volume > 0) {
+            liquidGroups.add(groupId)
+          }
+        })
+      })
+    )
+    return [...liquidGroups]
+  }
+)
+
 // TODO: prune selectors
 export const selectors = {
   rootSelector,
 
   getLiquidGroupsById,
   getIngredientLocations,
-  getIngredientNames,
+  getLiquidNamesById,
   getLabware,
   getLabwareNames,
   getLabwareTypes,
+  getLiquidSelectionOptions,
+  getLiquidGroupsOnDeck,
   getNextLiquidGroupId,
   getSavedLabware,
   getSelectedContainer,

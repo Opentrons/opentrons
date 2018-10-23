@@ -62,7 +62,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     hovered: (hoveredStep === stepId) && !hoveredSubstep,
 
     getLabware: (labwareId: ?string) => labwareId ? labwareIngredSelectors.getLabware(state)[labwareId] : null,
-    ingredNames: labwareIngredSelectors.getIngredientNames(state),
+    ingredNames: labwareIngredSelectors.getLiquidNamesById(state),
   }
 }
 

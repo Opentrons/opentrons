@@ -152,10 +152,10 @@ class Labware:
                 for well in self._ordering]
 
     def _create_indexed_dictionary(self, group=0):
-        dictList = defaultdict(list)
-        for index, wellObj in zip(self._ordering, self._wells):
-            dictList[self._pattern.match(index).group(group)].append(wellObj)
-        return dictList
+        dict_list = defaultdict(list)
+        for index, well_obj in zip(self._ordering, self._wells):
+            dict_list[self._pattern.match(index).group(group)].append(well_obj)
+        return dict_list
 
     def set_calibration(self, delta: Point):
         """
@@ -202,9 +202,9 @@ class Labware:
 
         :return: A list of row lists
         """
-        rowDict = self._create_indexed_dictionary(group=1)
-        keys = sorted(rowDict)
-        return [rowDict[key] for key in keys]
+        row_dict = self._create_indexed_dictionary(group=1)
+        keys = sorted(row_dict)
+        return [row_dict[key] for key in keys]
 
     def rows_by_index(self) -> Dict[str, List[Well]]:
         """
@@ -216,8 +216,8 @@ class Labware:
 
         :return: Dictionary of Well lists keyed by row name
         """
-        rowDict = self._create_indexed_dictionary(group=1)
-        return rowDict
+        row_dict = self._create_indexed_dictionary(group=1)
+        return row_dict
 
     def columns(self) -> List[List[Well]]:
         """
@@ -230,9 +230,9 @@ class Labware:
 
         :return: A list of column lists
         """
-        colDict = self._create_indexed_dictionary(group=2)
-        keys = sorted(colDict)
-        return [colDict[key] for key in keys]
+        col_dict = self._create_indexed_dictionary(group=2)
+        keys = sorted(col_dict)
+        return [col_dict[key] for key in keys]
 
     def columns_by_index(self) -> Dict[str, List[Well]]:
         """
@@ -245,8 +245,8 @@ class Labware:
 
         :return: Dictionary of Well lists keyed by column name
         """
-        colDict = self._create_indexed_dictionary(group=2)
-        return colDict
+        col_dict = self._create_indexed_dictionary(group=2)
+        return col_dict
 
 
 def save_calibration(labware: Labware, delta: Point):
@@ -258,10 +258,10 @@ def save_calibration(labware: Labware, delta: Point):
     """
     if not os.path.exists(persistent_path):
         os.mkdir(persistent_path)
-    labwareOffsetPath = os.path.join(
+    labware_offset_path = os.path.join(
         persistent_path, "{}.json".format(labware._id))
-    calibration_data = _helper_offset_data_format(labwareOffsetPath, delta)
-    with open(labwareOffsetPath, 'w') as f:
+    calibration_data = _helper_offset_data_format(labware_offset_path, delta)
+    with open(labware_offset_path, 'w') as f:
         json.dump(calibration_data, f)
     labware.set_calibration(delta)
 
@@ -271,12 +271,12 @@ def load_calibration(labware: Labware):
     Look up a calibration if it exists and apply it to the given labware.
     """
     offset = Point(0, 0, 0)
-    labwareOffsetPath = os.path.join(
+    labware_offset_path = os.path.join(
         persistent_path, "{}.json".format(labware._id))
-    if os.path.exists(labwareOffsetPath):
-        calibration_data = _read_file(labwareOffsetPath)
-        offsetArray = calibration_data['default']['offset']
-        offset = Point(x=offsetArray[0], y=offsetArray[1], z=offsetArray[2])
+    if os.path.exists(labware_offset_path):
+        calibration_data = _read_file(labware_offset_path)
+        offset_array = calibration_data['default']['offset']
+        offset = Point(x=offset_array[0], y=offset_array[1], z=offset_array[2])
     labware.set_calibration(offset)
 
 
@@ -311,20 +311,34 @@ def _load_definition_by_name(name: str) -> dict:
     raise NotImplementedError
 
 
-def load(name: str, cornerOffset: Point) -> Labware:
+def load(name: str, corner_offset: Point) -> Labware:
     """
     Return a labware object constructed from a labware definition dict looked
     up by name (definition must have been previously stored locally on the
     robot)
     """
     definition = _load_definition_by_name(name)
-    return load_from_definition(definition, cornerOffset)
+    return load_from_definition(definition, corner_offset)
 
 
-def load_from_definition(definition: dict, cornerOffset: Point) -> Labware:
+def load_from_definition(definition: dict, corner_offset: Point) -> Labware:
     """
     Return a labware object constructed from a provided labware definition dict
     """
-    labware = Labware(definition, cornerOffset)
+    labware = Labware(definition, corner_offset)
     load_calibration(labware)
     return labware
+
+
+def clear_calibrations():
+    """
+    Delete all calibration files for labware. This includes deleting tip-length
+    data for tipracks.
+    """
+    try:
+        targets = [
+            f for f in os.listdir(persistent_path) if f.endswith('.json')]
+        for target in targets:
+            os.remove(os.path.join(persistent_path, target))
+    except FileNotFoundError:
+        pass

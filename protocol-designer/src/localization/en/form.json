@@ -1,63 +1,68 @@
 {
-"generic": {
-  "labware_type": "Type",
-  "nickname": "Nickname"
+  "generic": {
+    "labware_type": "Type",
+    "nickname": "Nickname",
+    "error": {
+      "required": "{{name}} is required",
+      "more_than_zero": "Must be more than 0"
+    }
   },
-  "labware": {
-    "type": "Labware Type"
-  },
-  "liquid": {
+  "liquid_edit": {
     "details": "Details",
     "description": "Description",
     "name": "Liquid name",
     "serialize": "Serialize",
+    "serialize_title": "Serialization",
     "serialize_explanation": "Each placement of the liquid will get its own number. (\"Sample 1\", \"Sample 2\", \"Sample 3\")"
   },
+  "liquid_placement": {
+    "liquid": "Liquid",
+    "volume": "Volume",
+    "volume_exceeded": "Warning: exceeded max volume per well: {{volume}}µL"
+  },
   "step_edit_form": {
-    "step_edit_form": {
-      "consolidate": {
-        "change_tip_option": {
-          "always": "For each dispense",
-          "once": "Only the first aspirate",
-          "never": "Never"
-        }
+    "consolidate": {
+      "change_tip_option": {
+        "always": "For each dispense",
+        "once": "Only the first aspirate",
+        "never": "Never"
+      }
+    },
+    "distribute": {
+      "change_tip_option": {
+        "always": "For each aspirate",
+        "once": "Only the first aspirate",
+        "never": "Never"
+      }
+    },
+    "mix": {
+      "change_tip_option": {
+        "always": "For each well",
+        "once": "Only the first aspirate",
+        "never": "Never"
+      }
+    },
+    "transfer": {
+      "change_tip_option": {
+        "always": "For each aspirate",
+        "once": "Only the first aspirate",
+        "never": "Never"
+      }
+    },
+    "field": {
+      "change_tip": {
+        "label": "Get new tip"
       },
-      "distribute": {
-        "change_tip_option": {
-          "always": "For each aspirate",
-          "once": "Only the first aspirate",
-          "never": "Never"
-        }
+      "tip_position": {
+        "label": "Tip Position"
       },
-      "mix": {
-        "change_tip_option": {
-          "always": "For each well",
-          "once": "Only the first aspirate",
-          "never": "Never"
-        }
-      },
-      "transfer": {
-        "change_tip_option": {
-          "always": "For each aspirate",
-          "once": "Only the first aspirate",
-          "never": "Never"
-        }
-      },
-      "field": {
-        "change_tip": {
-          "label": "Get new tip"
-        },
-        "tip_position": {
-          "label": "Tip Position"
-        },
-        "well_order": {
-          "label": "Well Order",
-          "option": {
-            "l2r": "Left to right",
-            "r2l": "Right to left",
-            "t2b": "Top to bottom",
-            "b2t": "Bottom to top"
-          }
+      "well_order": {
+        "label": "Well Order",
+        "option": {
+          "l2r": "Left to right",
+          "r2l": "Right to left",
+          "t2b": "Top to bottom",
+          "b2t": "Bottom to top"
         }
       }
     }

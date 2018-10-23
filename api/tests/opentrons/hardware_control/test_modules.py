@@ -57,7 +57,8 @@ async def test_module_update_logic(monkeypatch):
 
 @pytest.mark.skipif(not hardware_control.Controller,
                     reason='hardware controller not available')
-async def test_module_update_integration(monkeypatch, loop, running_on_pi):
+async def test_module_update_integration(monkeypatch, loop,
+                                         cntrlr_mock_connect, running_on_pi):
     api = hardware_control.API.build_hardware_controller(loop=loop)
 
     def mock_get_modules():

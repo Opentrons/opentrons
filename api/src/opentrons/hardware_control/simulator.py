@@ -1,8 +1,9 @@
 import asyncio
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, Optional, List, Tuple, Any
 
 from opentrons import types
 from . import modules
+from .types import Axis
 
 
 class Simulator:
@@ -11,7 +12,7 @@ class Simulator:
     a robot with no smoothie connected.
     """
     def __init__(self,
-                 attached_instruments: Dict[types.Mount, Optional[str]],
+                 attached_instruments: Dict[types.Mount, Dict[str, Any]],
                  attached_modules: List[str],
                  config, loop) -> None:
         self._config = config
@@ -24,12 +25,21 @@ class Simulator:
     def move(self, target_position: Dict[str, float]):
         pass
 
-    def home(self):
+    def home(self, axes: List[Axis] = None) -> Dict[str, float]:
         # driver_3_0-> HOMED_POSITION
         return {'X': 418, 'Y': 353, 'Z': 218, 'A': 218, 'B': 19, 'C': 19}
 
-    def get_attached_instruments(self, mount):
-        return self._attached_instruments[mount]
+    def get_attached_instrument(self, mount) -> Optional[str]:
+        try:
+            return self._attached_instruments[mount]['name']
+        except KeyError:
+            return None
+
+    def set_active_current(self, axis, amp):
+        pass
+
+    def set_pipette_speed(self, speed):
+        pass
 
     def get_attached_modules(self) -> List[Tuple[str, str]]:
         return self._attached_modules

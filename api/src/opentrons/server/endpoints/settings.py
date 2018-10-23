@@ -2,9 +2,9 @@ import logging
 import shutil
 import os
 from aiohttp import web
-from opentrons.config import advanced_settings as advs
-from opentrons.legacy_api.robot import robot_configs as rc
+from opentrons.config import advanced_settings as advs, robot_configs as rc
 from opentrons.data_storage import database as db
+from opentrons.protocol_api import labware
 
 log = logging.getLogger(__name__)
 
@@ -81,6 +81,7 @@ async def reset(request: web.Request) -> web.Response:
         rc.save_robot_settings(config)
     if data.get('labwareCalibration'):
         db.reset()
+        labware.clear_calibrations()
     if data.get('bootScripts'):
         if os.environ.get('RUNNING_ON_PI'):
             if os.path.exists('/data/boot.d'):
