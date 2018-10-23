@@ -1,6 +1,6 @@
 """ Test the functions and classes in the protocol context """
 
-from opentrons import protocol_api as papi
+from opentrons.protocol_api.geometry import Deck
 
 import pytest
 
@@ -9,7 +9,7 @@ def test_slot_names():
     slots_by_int = list(range(1, 13))
     slots_by_str = [str(idx) for idx in slots_by_int]
     for method in (slots_by_int, slots_by_str):
-        d = papi.Deck()
+        d = Deck()
         for idx, slot in enumerate(method):
             assert slot in d
             d[slot] = 'its real'
