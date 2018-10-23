@@ -90,90 +90,15 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     }
   }
 
-  if (
-    unsavedForm.pipette &&
-    payload.update.pipette
-  ) {
-    const prevPipette: string = unsavedForm.pipette
-    const prevChannels = getChannels(prevPipette, baseState)
-    const nextPipette = payload.update.pipette
-
-    if (typeof nextPipette !== 'string') {
+  if (unsavedForm.pipette && payload.update.pipette) {
+    if (typeof payload.update.pipette !== 'string') {
       // this should not happen!
       console.error('no next pipette, could not handleFormChange')
       return payload
     }
-    const nextChannels = getChannels(nextPipette, baseState)
-
-    const singleToMulti = prevChannels === 1 && nextChannels === 8
-    const multiToSingle = prevChannels === 8 && nextChannels === 1
-
-    // *****
-    // set any flow rates to null when pipette is changed
-    // *****
-    if (prevPipette !== nextPipette) {
-      if (unsavedForm.aspirate_flowRate) {
-        updateOverrides = {
-          ...updateOverrides,
-          aspirate_flowRate: null,
-        }
-      }
-
-      if (unsavedForm.dispense_flowRate) {
-        updateOverrides = {
-          ...updateOverrides,
-          dispense_flowRate: null,
-        }
-      }
-    }
-
-    // *****
-    // Changing pipette from multi-channel to single-channel (and visa versa)
-    // modifies well selection
-    // *****
-
-    // steptypes with single set of wells (not source + dest)
-    if (unsavedForm.stepType === 'mix') {
-      if (singleToMulti) {
-        updateOverrides = {
-          ...updateOverrides,
-          wells: null,
-        }
-      } else if (multiToSingle) {
-        // multi-channel to single-channel: convert primary wells to all wells
-        const labwareId = unsavedForm.labware
-        const labware = labwareId && labwareIngredSelectors.getLabware(baseState)[labwareId]
-        const labwareType = labware && labware.type
-
-        updateOverrides = {
-          ...updateOverrides,
-          wells: _getAllWells(unsavedForm.wells, labwareType),
-        }
-      }
-    } else {
-      if (singleToMulti) {
-        // source + dest well steptypes
-        updateOverrides = {
-          ...updateOverrides,
-          'aspirate_wells': null,
-          'dispense_wells': null,
-        }
-      } else if (multiToSingle) {
-        // multi-channel to single-channel: convert primary wells to all wells
-        const sourceLabwareId = unsavedForm['aspirate_labware']
-        const destLabwareId = unsavedForm['dispense_labware']
-
-        const sourceLabware = sourceLabwareId && labwareIngredSelectors.getLabware(baseState)[sourceLabwareId]
-        const sourceLabwareType = sourceLabware && sourceLabware.type
-        const destLabware = destLabwareId && labwareIngredSelectors.getLabware(baseState)[destLabwareId]
-        const destLabwareType = destLabware && destLabware.type
-
-        updateOverrides = {
-          ...updateOverrides,
-          'aspirate_wells': _getAllWells(unsavedForm['aspirate_wells'], sourceLabwareType),
-          'dispense_wells': _getAllWells(unsavedForm['dispense_wells'], destLabwareType),
-        }
-      }
+    updateOverrides = {
+      ...updateOverrides,
+      ...reconcileFormPipette(unsavedForm, baseState, payload.update.pipette),
     }
   }
 
@@ -183,6 +108,71 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       ...updateOverrides,
     },
   }
+}
+
+const reconcileFormPipette = (formData, baseState, nextPipette: stringj) => {
+  const prevChannels = getChannels(formData.pipette, baseState)
+  const nextChannels = getChannels(nextPipette, baseState)
+
+  const singleToMulti = prevChannels === 1 && nextChannels === 8
+  const multiToSingle = prevChannels === 8 && nextChannels === 1
+
+  let updateOverrides = {}
+
+  // *****
+  // set any flow rates to null when pipette is changed
+  // *****
+  if (formData.pipette !== nextPipette) {
+    if (formData.aspirate_flowRate) {
+      updateOverrides = {...updateOverrides, aspirate_flowRate: null}
+    }
+    if (formData.dispense_flowRate) {
+      updateOverrides = {...updateOverrides, dispense_flowRate: null}
+    }
+  }
+
+  // *****
+  // Changing pipette from multi-channel to single-channel (and vice versa)
+  // modifies well selection
+  // *****
+
+  // steptypes with single set of wells (not source + dest)
+  if (formData.stepType === 'mix') {
+    if (singleToMulti) {
+      updateOverrides = {...updateOverrides, wells: null}
+    } else if (multiToSingle) {
+      // multi-channel to single-channel: convert primary wells to all wells
+      const labwareId = formData.labware
+      const labware = labwareId && labwareIngredSelectors.getLabware(baseState)[labwareId]
+      const labwareType = labware && labware.type
+
+      updateOverrides = {
+        ...updateOverrides,
+        wells: _getAllWells(formData.wells, labwareType),
+      }
+    }
+  } else {
+    if (singleToMulti) {
+      // source + dest well steptypes
+      updateOverrides = {...updateOverrides, 'aspirate_wells': null, 'dispense_wells': null}
+    } else if (multiToSingle) {
+      // multi-channel to single-channel: convert primary wells to all wells
+      const sourceLabwareId = formData['aspirate_labware']
+      const destLabwareId = formData['dispense_labware']
+
+      const sourceLabware = sourceLabwareId && labwareIngredSelectors.getLabware(baseState)[sourceLabwareId]
+      const sourceLabwareType = sourceLabware && sourceLabware.type
+      const destLabware = destLabwareId && labwareIngredSelectors.getLabware(baseState)[destLabwareId]
+      const destLabwareType = destLabware && destLabware.type
+
+      updateOverrides = {
+        ...updateOverrides,
+        'aspirate_wells': _getAllWells(formData['aspirate_wells'], sourceLabwareType),
+        'dispense_wells': _getAllWells(formData['dispense_wells'], destLabwareType),
+      }
+    }
+  }
+  return updateOverrides
 }
 
 export default handleFormChange
