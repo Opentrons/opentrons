@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from opentrons.util import environment
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.config import robot_configs
+from opentrons.types import Mount
 from . import modules
 from .types import Axis
 
@@ -82,8 +83,32 @@ class Controller:
             args = tuple()
         return self._smoothie_driver.home(*args)
 
-    def get_attached_instrument(self, mount) -> Optional[str]:
-        return self._smoothie_driver.read_pipette_model(mount.name.lower())
+    def get_attached_instruments(
+            self, expected: Dict[Mount, str]) -> Dict[Mount, Optional[str]]:
+        """ Find the instruments attached to our mounts.
+
+        :param expected: A dict that may contain a mapping from mount to
+                         strings that should prefix instrument model names.
+                         When instruments are scanned, they are matched
+                         against the expectation (if present) and a
+                         :py:attr:`RuntimeError` is raised if there is no
+                         match.
+
+        :raises RuntimeError: If an instrument is expected but not found.
+        :returns: A dict of mount to either instrument model names or `None`.
+        """
+        to_return: Dict[Mount, Optional[str]] = {}
+        for mount in Mount:
+            found = self._smoothie_driver.read_pipette_model(
+                mount.name.lower())
+            expected_instr = expected.get(mount, None)
+            if expected_instr and\
+               (not found or not found.startswith(expected_instr)):
+                raise RuntimeError(
+                    'mount {}: expected instrument {} but got {}'
+                    .format(mount.name, expected_instr, found))
+            to_return[mount] = found
+        return to_return
 
     def set_active_current(self, axis, amp):
         self._smoothie_driver.set_active_current({axis.name: amp})

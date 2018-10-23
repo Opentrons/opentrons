@@ -160,17 +160,27 @@ class API:
         pass
 
     @_log_call
-    async def cache_instruments(self):
+    async def cache_instruments(self,
+                                require: Dict[top_types.Mount, str] = None):
         """
          - Get the attached instrument on each mount and
          - Cache their pipette configs from pipette-config.json
+
+        If specified, the require element should be a dict of mounts to
+        instrument models describing the instruments expected to be present.
+        This can save a subsequent of :py:attr:`attached_instruments` and also
+        serves as the hook for the hardware simulator to decide what is
+        attached.
         """
+        checked_require = require or {}
         self._log.info("Updating instrument model cache")
-        for mount in top_types.Mount:
-            instrument_model = self._backend.get_attached_instrument(mount)
-            if instrument_model:
-                self._attached_instruments[mount] = Pipette(instrument_model)
-        mod_log.info("Instruments found:{}".format(self._attached_instruments))
+        found = self._backend.get_attached_instruments(checked_require)
+        self._attached_instruments = {mount: Pipette(instrument_model)
+                                      if instrument_model else None
+                                      for mount, instrument_model
+                                      in found.items()}
+        mod_log.info("Instruments found: {}"
+                     .format(self._attached_instruments))
 
     @property
     def attached_instruments(self):
