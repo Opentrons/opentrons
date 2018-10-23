@@ -133,9 +133,9 @@ The output of your data should look something to the affect of this JSON below:
     "loadName": ???,
   },
   "cornerOffsetFromSlot": {
-    "x": 10,
-    "y": 10,
-    "z": 5
+    "x": -77.76,
+    "y": -35.48,
+    "z": 0
   },
   "dimensions": {
     "overallLength": 50,

@@ -13,9 +13,9 @@
     "loadName": "6_wellPlate_100_uL"
   },
   "cornerOffsetFromSlot": {
-    "x": 10,
-    "y": 10,
-    "z": 5
+    "x": -77.76,
+    "y": -35.48,
+    "z": 0
   },
   "dimensions": {
     "overallLength": 50,
@@ -28,54 +28,54 @@
       "depth": 40,
       "totalLiquidVolume": 100,
       "diameter": 30,
-      "x": 0,
-      "y": 18,
-      "z": 0,
+      "x": 10,
+      "y": 28,
+      "z": 10,
       "shape": "circular"
     },
     "B1": {
       "depth": 40,
       "totalLiquidVolume": 100,
       "diameter": 30,
-      "x": 0,
-      "y": 9,
-      "z": 0,
+      "x": 10,
+      "y": 19,
+      "z": 10,
       "shape": "circular"
     },
     "C1": {
       "depth": 40,
       "totalLiquidVolume": 100,
       "diameter": 30,
-      "x": 0,
-      "y": 0,
-      "z": 0,
+      "x": 10,
+      "y": 10,
+      "z": 10,
       "shape": "circular"
     },
     "A2": {
       "depth": 40,
       "totalLiquidVolume": 100,
       "diameter": 30,
-      "x": 9,
-      "y": 18,
-      "z": 0,
+      "x": 19,
+      "y": 28,
+      "z": 10,
       "shape": "circular"
     },
     "B2": {
       "depth": 40,
       "totalLiquidVolume": 100,
       "diameter": 30,
-      "x": 9,
-      "y": 9,
-      "z": 0,
+      "x": 19,
+      "y": 19,
+      "z": 10,
       "shape": "circular"
     },
     "C2": {
       "depth": 40,
       "totalLiquidVolume": 100,
       "diameter": 30,
-      "x": 9,
-      "y": 0,
-      "z": 0,
+      "x": 19,
+      "y": 10,
+      "z": 10,
       "shape": "circular"
     }
   }

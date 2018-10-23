@@ -5,6 +5,10 @@ import range from 'lodash/range'
 import assignId from './assignId'
 import {toWellName} from '../helpers/index'
 import labwareSchema from '../../labware-json-schema/labware-schema.json'
+import {
+  SLOT_WIDTH_MM as SLOT_LENGTH_MM,
+  SLOT_HEIGHT_MM as SLOT_WIDTH_MM,
+} from '../constants'
 
 type Metadata = {
   displayName: string,
@@ -99,16 +103,17 @@ function determineOrdering (grid: Cell): Array<Array<string>> {
 function calculateCoordinates (
   well: Well,
   ordering: Array<Array<string>>,
-  spacing: Cell): {[wellName: string]: Well} {
+  spacing: Cell,
+  offset: Offset): {[wellName: string]: Well} {
   // Note, reverse() on its own mutates ordering. Use slice() as a workaround
   // to prevent mutation
   return ordering.reduce((wells, column, cIndex) => {
     column.slice().reverse().forEach((element, rIndex) => {
       wells[element] = {
         ...well,
-        x: round(cIndex * spacing.column, 2),
-        y: round(rIndex * spacing.row, 2),
-        z: 0}
+        x: round(cIndex * spacing.column + offset.x, 2),
+        y: round(rIndex * spacing.row + offset.y, 2),
+        z: round(offset.z - well.depth, 2)}
     })
     return wells
   }, {})
@@ -129,15 +134,19 @@ function calculateCoordinates (
 // or the labware definition schema in labware-json-schema
 export function createRegularLabware (props: RegularLabwareProps): Schema {
   const ordering = determineOrdering(props.grid)
+  const offset = {...props.offset, z: round(props.dimensions.overallHeight + props.offset.z, 2)}
   const definition: Schema = {
     ordering,
     otId: assignId(),
     deprecated: false,
     metadata: props.metadata,
-    cornerOffsetFromSlot: props.offset,
+    cornerOffsetFromSlot: {
+      x: round(props.dimensions.overallLength - SLOT_LENGTH_MM, 2),
+      y: round(props.dimensions.overallWidth - SLOT_WIDTH_MM, 2),
+      z: 0},
     dimensions: props.dimensions,
     parameters: props.parameters,
-    wells: calculateCoordinates(props.well, ordering, props.spacing),
+    wells: calculateCoordinates(props.well, ordering, props.spacing, offset),
   }
 
   const numWells = props.grid.row * props.grid.column
