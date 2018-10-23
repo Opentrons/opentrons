@@ -142,6 +142,9 @@ const savedStepForms: Reducer<SavedStepFormState, *> = handleActions({
       ...stepForm,
     }))
   },
+  EDIT_PIPETTES: (state: SavedStepFormState, action: EditPipettesAction): SavedStepFormState => {
+    console.log('savedFormState', state)
+  },
 }, {})
 
 type CollapsedStepsState = {
