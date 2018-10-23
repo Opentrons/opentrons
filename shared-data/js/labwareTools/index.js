@@ -134,7 +134,7 @@ function calculateCoordinates (
 // or the labware definition schema in labware-json-schema
 export function createRegularLabware (props: RegularLabwareProps): Schema {
   const ordering = determineOrdering(props.grid)
-  const offset = {...props.offset, z: props.dimensions.overallHeight + props.offset.z}
+  const offset = {...props.offset, z: round(props.dimensions.overallHeight + props.offset.z, 2)}
   const definition: Schema = {
     ordering,
     otId: assignId(),
