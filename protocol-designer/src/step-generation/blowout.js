@@ -50,7 +50,7 @@ const blowout = (args: PipetteLabwareFields): CommandCreator => (prevRobotState:
         pipetteData,
         labwareId: labware,
         labwareType: prevRobotState.labware[labware].type,
-        volume: pipetteData.maxVolume, // update liquid state as if it was a dispense, but with max volume of pipette
+        useFullVolume: true,
         well,
       }, prevRobotState.liquidState),
     },

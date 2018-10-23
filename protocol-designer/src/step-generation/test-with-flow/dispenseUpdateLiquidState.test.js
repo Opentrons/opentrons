@@ -1,5 +1,6 @@
 // @flow
 import merge from 'lodash/merge'
+import omit from 'lodash/omit'
 import {
   createEmptyLiquidState,
   createTipLiquidState,
@@ -35,7 +36,7 @@ beforeEach(() => {
 })
 
 describe('...single-channel pipette', () => {
-  test('fully dispense single ingredient into empty well', () => {
+  test('fully dispense single ingredient into empty well, with explicit volume', () => {
     const initialLiquidState = merge(
       {},
       getBlankLiquidState(),
@@ -52,6 +53,47 @@ describe('...single-channel pipette', () => {
 
     const result = _updateLiquidState(
       dispenseSingleCh150ToA1Args,
+      initialLiquidState
+    )
+
+    expect(result).toMatchObject({
+      pipettes: {
+        p300SingleId: {
+          '0': {
+            ingred1: {volume: 0},
+          },
+        },
+      },
+      labware: {
+        sourcePlateId: {
+          A1: {ingred1: {volume: 150}},
+          A2: {},
+          B1: {},
+        },
+      },
+    })
+  })
+
+  test('fully dispense single ingredient into empty well, with useFullVolume', () => {
+    const initialLiquidState = merge(
+      {},
+      getBlankLiquidState(),
+      {
+        pipettes: {
+          p300SingleId: {
+            '0': {
+              ingred1: {volume: 150},
+            },
+          },
+        },
+      }
+    )
+
+    const result = _updateLiquidState(
+      {
+        ...omit(dispenseSingleCh150ToA1Args, 'volume'),
+        useFullVolume: true,
+      },
       initialLiquidState
     )
 

@@ -1,9 +1,10 @@
 // @flow
+import assert from 'assert'
 import cloneDeep from 'lodash/cloneDeep'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import {splitLiquid, mergeLiquid, getWellsForTips} from './utils'
-import type {RobotState, LocationLiquidState, PipetteData} from './'
+import {splitLiquid, mergeLiquid, getWellsForTips, getLocationTotalVolume} from './utils'
+import type {RobotState, LocationLiquidState, PipetteData, SourceAndDest} from './types'
 
 type LiquidState = $PropertyType<RobotState, 'liquidState'>
 
@@ -11,7 +12,8 @@ export default function updateLiquidState (
   args: {
     pipetteId: string,
     pipetteData: PipetteData,
-    volume: number,
+    volume?: number,
+    useFullVolume?: boolean,
     labwareId: string,
     labwareType: string,
     well: string,
@@ -19,22 +21,32 @@ export default function updateLiquidState (
   prevLiquidState: LiquidState
 ): LiquidState {
   // TODO: Ian 2018-06-14 return same shape as aspirateUpdateLiquidState fn: {liquidState, warnings}.
-  const {pipetteId, pipetteData, volume, labwareId, labwareType, well} = args
-  type SourceAndDest = {|source: LocationLiquidState, dest: LocationLiquidState|}
+  const {pipetteId, pipetteData, volume, useFullVolume, labwareId, labwareType, well} = args
+
+  assert(
+    !(useFullVolume && typeof volume === 'number'),
+    'dispenseUpdateLiquidState takes either `volume` or `useFullVolume`, but got both')
+  assert(typeof volume === 'number' || useFullVolume,
+    'in dispenseUpdateLiquidState, either volume or useFullVolume are required')
+
+  const {wellsForTips, allWellsShared} = getWellsForTips(
+    pipetteData.channels, labwareType, well)
 
   // remove liquid from pipette tips,
   // create intermediate object where sources are updated tip liquid states
   // and dests are "droplets" that need to be merged to dest well contents
   const splitLiquidStates: {[tipId: string]: SourceAndDest} = mapValues(
     prevLiquidState.pipettes[pipetteId],
-    (prevTipLiquidState: LocationLiquidState) =>
-      splitLiquid(
-        volume,
-        prevTipLiquidState
-      )
+    (prevTipLiquidState: LocationLiquidState): SourceAndDest => {
+      if (useFullVolume) {
+        const totalTipVolume = getLocationTotalVolume(prevTipLiquidState)
+        return totalTipVolume > 0
+          ? splitLiquid(totalTipVolume, prevTipLiquidState)
+          : {source: {}, dest: {}}
+      }
+      return splitLiquid(volume || 0, prevTipLiquidState)
+    }
   )
-
-  const {wellsForTips, allWellsShared} = getWellsForTips(pipetteData.channels, labwareType, well)
 
   // add liquid to well(s)
   const labwareLiquidState = allWellsShared

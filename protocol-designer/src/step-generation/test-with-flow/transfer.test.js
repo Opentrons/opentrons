@@ -7,7 +7,6 @@ import {
   commandFixtures as cmd,
 } from './fixtures'
 import _transfer from '../transfer'
-import {FIXED_TRASH_ID} from '../../constants'
 
 const transfer = compoundCommandCreatorNoErrors(_transfer)
 const transferWithErrors = compoundCommandCreatorHasErrors(_transfer)
@@ -256,9 +255,14 @@ describe('single transfer exceeding pipette max', () => {
       cmd.dispense('B3', 50, {labware: 'destPlateId'}),
     ])
 
-    // ignore trash contents because of "__air__" from dropped tips
-    // TODO: Ian 2018-09-17 fix "__air__" and remove this line $FlowFixMe
-    expectedFinalLiquidState.labware[FIXED_TRASH_ID] = result.robotState.liquidState.labware[FIXED_TRASH_ID]
+    // unlike the other test cases here, we have a new tip when aspirating from B1.
+    // so there's only ingred 1, and no ingred 0
+    // $FlowFixMe flow doesn't like assigning to these objects
+    expectedFinalLiquidState.pipettes.p300SingleId['0'] = {'1': {volume: 0}}
+
+    // likewise, there's no residue of ingred 0 in B3 from a dirty tip.
+    // $FlowFixMe flow doesn't like assigning to these objects
+    expectedFinalLiquidState.labware.destPlateId.B3 = {'1': {volume: 350}}
 
     expect(result.robotState.liquidState).toEqual(merge(
       {},

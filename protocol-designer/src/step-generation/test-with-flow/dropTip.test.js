@@ -117,7 +117,7 @@ describe('dropTip', () => {
       updateLiquidState.mockReturnValue(mockLiquidReturnValue)
     })
 
-    test('dropTip calls dispenseUpdateLiquidState with the max volume of the pipette', () => {
+    test('dropTip calls dispenseUpdateLiquidState with useFullVolume: true', () => {
       const initialRobotState = makeRobotState({singleHasTips: true, multiHasTips: true})
 
       const result = dropTip('p300MultiId')(initialRobotState)
@@ -126,7 +126,7 @@ describe('dropTip', () => {
         {
           pipetteId: 'p300MultiId',
           labwareId: 'trashId',
-          volume: 300, // pipette's max vol
+          useFullVolume: true,
           well: 'A1',
           labwareType: 'fixed-trash',
           pipetteData: robotStateWithTip.instruments.p300MultiId,
