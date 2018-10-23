@@ -59,6 +59,148 @@ Some containers might only take up half a slot. You must explicitly say `share=T
 
 **********************
 
+*********************
+Opentrons Containers
+*********************
+
+Tipracks
+========
+
+opentrons-300ul-tiprack
+-----------------------
+Tiprack for both a 50ul and 300ul pipette (single or 8-channel)
+
+.. code-block:: python
+
+  labware.load('opentrons-300ul-tiprack', slot)
+
+**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
+
+|tiprack_left| |tiprack_right|
+
+
+.. |tiprack_left| image:: img/labware_lib/OT2TipRackP50_P300_TOP.png
+
+.. |tiprack_right| image:: img/labware_lib/OT2TipRackP50_P300_ISO.png
+
+Aluminum Blocks
+===============
+
+Aluminum blocks are typically paired with a temperature module. Can also be used as a standalone container.
+
+opentrons-aluminum-block-2ml-eppendorf
+--------------------------------------
+A 2ml tube holder, specifically based off of eppendorf snapcap tubes.
+
+.. code-block:: python
+
+  labware.load('opentrons-aluminum-block-2ml-eppendorf', slot)
+
+**Accessing Wells:** *single channel* ``['A1']-['D6']``
+
+|2ml_alum_left| |2ml_alum_right|
+
+.. |2ml_alum_left| image:: img/labware_lib/24x1.5mL_TOP.png
+
+.. |2ml_alum_right| image:: img/labware_lib/24x1.5mL_ISO.png
+
+
+opentrons-aluminum-block-2ml-screwcap
+-------------------------------------
+A 2ml tube holder, specifically based off of screwcap tubes
+
+.. code-block:: python
+
+  labware.load('opentrons-aluminum-block-2ml-screwcap', slot)
+
+**Accessing Wells:** *single channel* ``['A1']-['D6']``
+
+|2ml_alum_left| |2ml_alum_right|
+
+.. |2ml_alum_left| image:: img/labware_lib/24x1.5mL_TOP.png
+
+.. |2ml_alum_right| image:: img/labware_lib/24x1.5mL_ISO.png
+
+opentrons-aluminum-block-96-PCR-plate
+-------------------------------------
+A flat plate which acts as an adaptor for a well plate. This particular definition is modeled after the
+96-well biorad hardshell plate.
+
+.. code-block:: python
+
+  labware.load('opentrons-aluminum-block-96-PCR-plate', slot)
+
+**Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
+
+opentrons-aluminum-block-PCR-strips-200ul
+-----------------------------------
+A 96 well adaptor meant to hold 96 PCR strips with 200ul max volume.
+
+.. code-block:: python
+
+  labware.load('opentrons-aluminum-block-PCR-strips-200ul', slot)
+
+**Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
+
+|96tube_left| |96tube_right|
+
+.. |96tube_left| image:: img/labware_lib/96well_aluminumblock_TOP.png
+
+.. |96tube_right| image:: img/labware_lib/96well_aluminumblock_ISO.png
+
+Modular Tuberack
+================
+
+opentrons-tuberack-2ml-eppendorf
+--------------------------------
+
+This tuberack insert definition is for snapcap tubes ranging from 2-5ml.
+
+|2ml_left| |2ml_right|
+
+.. |2ml_left| image:: img/labware_lib/24x2mL-5mL_TOP.png
+
+.. |2ml_right| image:: img/labware_lib/24x2mL-5mL_ISO.png
+
+opentrons-tuberack-2ml-screwcap
+-------------------------------
+
+This tuberack insert definition is for screwcap tubes ranging from 2-5ml.
+
+|2ml_left| |2ml_right|
+
+.. |2ml_left| image:: img/labware_lib/24x2mL-5mL_TOP.png
+
+.. |2ml_right| image:: img/labware_lib/24x2mL-5mL_ISO.png
+
+
+opentrons-tuberack-15ml
+-----------------------
+
+|15ml_left| |15ml_right|
+
+.. |15ml_left| image:: img/labware_lib/15x15mL_TOP.png
+
+.. |15ml_right| image:: img/labware_lib/15x15mL_ISO.png
+
+opentrons-tuberack-50ml
+-----------------------
+
+|50ml_left| |50ml_right|
+
+.. |50ml_left| image:: img/labware_lib/6x50mL_TOP.png
+
+.. |50ml_right| image:: img/labware_lib/6x50mL_ISO.png
+
+opentrons-tuberack-15_50ml
+--------------------------
+
+|15_50ml_left| |15_50ml_right|
+
+.. |15_50ml_left| image:: img/labware_lib/6x15mL_4x50mL_TOP.png
+
+.. |15_50ml_right| image:: img/labware_lib/6x15mL_4x50mL_ISO.png
+
 Point
 =====
 
@@ -533,7 +675,7 @@ will print out...
 
 Wells To
 --------
- 
+
 Instead of having to list the name of every well, we can also create a range of wells with a start and end point. The first argument is the starting well, and the ``to=`` argument is the last well.
 
 .. code-block:: python
