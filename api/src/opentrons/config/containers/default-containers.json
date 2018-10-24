@@ -9052,1726 +9052,675 @@
                          "y": 0,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "B1": {
                          "x": 9,
                          "y": 0,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "C1": {
                          "x": 18,
                          "y": 0,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "D1": {
                          "x": 27,
                          "y": 0,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "E1": {
                          "x": 36,
                          "y": 0,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "F1": {
                          "x": 45,
                          "y": 0,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "G1": {
                          "x": 54,
                          "y": 0,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "H1": {
                          "x": 63,
                          "y": 0,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "A2": {
                          "x": 0,
                          "y": 9,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "B2": {
                          "x": 9,
                          "y": 9,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "C2": {
                          "x": 18,
                          "y": 9,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "D2": {
                          "x": 27,
                          "y": 9,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "E2": {
                          "x": 36,
                          "y": 9,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "F2": {
                          "x": 45,
                          "y": 9,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "G2": {
                          "x": 54,
                          "y": 9,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "H2": {
                          "x": 63,
                          "y": 9,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "A3": {
                          "x": 0,
                          "y": 18,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "B3": {
                          "x": 9,
                          "y": 18,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "C3": {
                          "x": 18,
                          "y": 18,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "D3": {
                          "x": 27,
                          "y": 18,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "E3": {
                          "x": 36,
                          "y": 18,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "F3": {
                          "x": 45,
                          "y": 18,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "G3": {
                          "x": 54,
                          "y": 18,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "H3": {
                          "x": 63,
                          "y": 18,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "A4": {
                          "x": 0,
                          "y": 27,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "B4": {
                          "x": 9,
                          "y": 27,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "C4": {
                          "x": 18,
                          "y": 27,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "D4": {
                          "x": 27,
                          "y": 27,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "E4": {
                          "x": 36,
                          "y": 27,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "F4": {
                          "x": 45,
                          "y": 27,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "G4": {
                          "x": 54,
                          "y": 27,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "H4": {
                          "x": 63,
                          "y": 27,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "A5": {
                          "x": 0,
                          "y": 36,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "B5": {
                          "x": 9,
                          "y": 36,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "C5": {
                          "x": 18,
                          "y": 36,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "D5": {
                          "x": 27,
                          "y": 36,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "E5": {
                          "x": 36,
                          "y": 36,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "F5": {
                          "x": 45,
                          "y": 36,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "G5": {
                          "x": 54,
                          "y": 36,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "H5": {
                          "x": 63,
                          "y": 36,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "A6": {
                          "x": 0,
                          "y": 45,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "B6": {
                          "x": 9,
                          "y": 45,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "C6": {
                          "x": 18,
                          "y": 45,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "D6": {
                          "x": 27,
                          "y": 45,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "E6": {
                          "x": 36,
                          "y": 45,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "F6": {
                          "x": 45,
                          "y": 45,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "G6": {
                          "x": 54,
                          "y": 45,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "H6": {
                          "x": 63,
                          "y": 45,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "A7": {
                          "x": 0,
                          "y": 54,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "B7": {
                          "x": 9,
                          "y": 54,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "C7": {
                          "x": 18,
                          "y": 54,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "D7": {
                          "x": 27,
                          "y": 54,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "E7": {
                          "x": 36,
                          "y": 54,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "F7": {
                          "x": 45,
                          "y": 54,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "G7": {
                          "x": 54,
                          "y": 54,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "H7": {
                          "x": 63,
                          "y": 54,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "A8": {
                          "x": 0,
                          "y": 63,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "B8": {
                          "x": 9,
                          "y": 63,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "C8": {
                          "x": 18,
                          "y": 63,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "D8": {
                          "x": 27,
                          "y": 63,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "E8": {
                          "x": 36,
                          "y": 63,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "F8": {
                          "x": 45,
                          "y": 63,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "G8": {
                          "x": 54,
                          "y": 63,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "H8": {
                          "x": 63,
                          "y": 63,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "A9": {
                          "x": 0,
                          "y": 72,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "B9": {
                          "x": 9,
                          "y": 72,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "C9": {
                          "x": 18,
                          "y": 72,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "D9": {
                          "x": 27,
                          "y": 72,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "E9": {
                          "x": 36,
                          "y": 72,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "F9": {
                          "x": 45,
                          "y": 72,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "G9": {
                          "x": 54,
                          "y": 72,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "H9": {
                          "x": 63,
                          "y": 72,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "A10": {
                          "x": 0,
                          "y": 81,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "B10": {
                          "x": 9,
                          "y": 81,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "C10": {
                          "x": 18,
                          "y": 81,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "D10": {
                          "x": 27,
                          "y": 81,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "E10": {
                          "x": 36,
                          "y": 81,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "F10": {
                          "x": 45,
                          "y": 81,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "G10": {
                          "x": 54,
                          "y": 81,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "H10": {
                          "x": 63,
                          "y": 81,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "A11": {
                          "x": 0,
                          "y": 90,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "B11": {
                          "x": 9,
                          "y": 90,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "C11": {
                          "x": 18,
                          "y": 90,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "D11": {
                          "x": 27,
                          "y": 90,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "E11": {
                          "x": 36,
                          "y": 90,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "F11": {
                          "x": 45,
                          "y": 90,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "G11": {
                          "x": 54,
                          "y": 90,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "H11": {
                          "x": 63,
                          "y": 90,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "A12": {
                          "x": 0,
                          "y": 99,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "B12": {
                          "x": 9,
                          "y": 99,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "C12": {
                          "x": 18,
                          "y": 99,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "D12": {
                          "x": 27,
                          "y": 99,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "E12": {
                          "x": 36,
                          "y": 99,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "F12": {
                          "x": 45,
                          "y": 99,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "G12": {
                          "x": 54,
                          "y": 99,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     },
                     "H12": {
                          "x": 63,
                          "y": 99,
                          "z": 0,
                          "diameter": 6.4,
-                         "depth": 85.0
+                         "depth": 101.0
                     }
                }
           },
-
-          "tiprack-1000ul-H": {
-               "origin-offset": {
-                    "x": 11.24,
-                    "y": 14.34
-               },
-               "locations": {
-                    "A1": {
-                         "x": 0,
-                         "y": 0,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "B1": {
-                         "x": 9,
-                         "y": 0,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "C1": {
-                         "x": 18,
-                         "y": 0,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "D1": {
-                         "x": 27,
-                         "y": 0,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "A2": {
-                         "x": 0,
-                         "y": 9,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "B2": {
-                         "x": 9,
-                         "y": 9,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "C2": {
-                         "x": 18,
-                         "y": 9,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "D2": {
-                         "x": 27,
-                         "y": 9,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "A3": {
-                         "x": 0,
-                         "y": 18,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "B3": {
-                         "x": 9,
-                         "y": 18,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "C3": {
-                         "x": 18,
-                         "y": 18,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "D3": {
-                         "x": 27,
-                         "y": 18,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "A4": {
-                         "x": 0,
-                         "y": 27,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "B4": {
-                         "x": 9,
-                         "y": 27,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "C4": {
-                         "x": 18,
-                         "y": 27,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "D4": {
-                         "x": 27,
-                         "y": 27,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "A5": {
-                         "x": 0,
-                         "y": 36,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "B5": {
-                         "x": 9,
-                         "y": 36,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "C5": {
-                         "x": 18,
-                         "y": 36,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "D5": {
-                         "x": 27,
-                         "y": 36,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "A6": {
-                         "x": 0,
-                         "y": 45,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "B6": {
-                         "x": 9,
-                         "y": 45,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "C6": {
-                         "x": 18,
-                         "y": 45,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "D6": {
-                         "x": 27,
-                         "y": 45,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "A7": {
-                         "x": 0,
-                         "y": 54,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "B7": {
-                         "x": 9,
-                         "y": 54,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "C7": {
-                         "x": 18,
-                         "y": 54,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "D7": {
-                         "x": 27,
-                         "y": 54,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "A8": {
-                         "x": 0,
-                         "y": 63,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "B8": {
-                         "x": 9,
-                         "y": 63,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "C8": {
-                         "x": 18,
-                         "y": 63,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "D8": {
-                         "x": 27,
-                         "y": 63,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "A9": {
-                         "x": 0,
-                         "y": 72,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "B9": {
-                         "x": 9,
-                         "y": 72,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "C9": {
-                         "x": 18,
-                         "y": 72,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "D9": {
-                         "x": 27,
-                         "y": 72,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "A10": {
-                         "x": 0,
-                         "y": 81,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "B10": {
-                         "x": 9,
-                         "y": 81,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "C10": {
-                         "x": 18,
-                         "y": 81,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "D10": {
-                         "x": 27,
-                         "y": 81,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "A11": {
-                         "x": 0,
-                         "y": 90,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "B11": {
-                         "x": 9,
-                         "y": 90,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "C11": {
-                         "x": 18,
-                         "y": 90,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "D11": {
-                         "x": 27,
-                         "y": 90,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "A12": {
-                         "x": 0,
-                         "y": 99,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "B12": {
-                         "x": 9,
-                         "y": 99,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "C12": {
-                         "x": 18,
-                         "y": 99,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    },
-                    "D12": {
-                         "x": 27,
-                         "y": 99,
-                         "z": 0,
-                         "diameter": 6.4,
-                         "depth": 85.0
-                    }
-               }
-          },
-
-          "tiprack-1000ul-chem": {
-               "locations": {
-                    "A1": {
-                         "x": 0,
-                         "y": 0,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B1": {
-                         "x": 18.8,
-                         "y": 0,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C1": {
-                         "x": 37.6,
-                         "y": 0,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D1": {
-                         "x": 56.4,
-                         "y": 0,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E1": {
-                         "x": 75.2,
-                         "y": 0,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A2": {
-                         "x": 9.4,
-                         "y": 5.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B2": {
-                         "x": 28.2,
-                         "y": 5.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C2": {
-                         "x": 47,
-                         "y": 5.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D2": {
-                         "x": 65.8,
-                         "y": 5.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E2": {
-                         "x": 84.6,
-                         "y": 5.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A3": {
-                         "x": 0,
-                         "y": 11.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B3": {
-                         "x": 18.8,
-                         "y": 11.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C3": {
-                         "x": 37.6,
-                         "y": 11.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D3": {
-                         "x": 56.4,
-                         "y": 11.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E3": {
-                         "x": 75.2,
-                         "y": 11.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A4": {
-                         "x": 9.4,
-                         "y": 17.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B4": {
-                         "x": 28.2,
-                         "y": 17.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C4": {
-                         "x": 47,
-                         "y": 17.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D4": {
-                         "x": 65.8,
-                         "y": 17.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E4": {
-                         "x": 84.6,
-                         "y": 17.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A5": {
-                         "x": 0,
-                         "y": 23,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B5": {
-                         "x": 18.8,
-                         "y": 23,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C5": {
-                         "x": 37.6,
-                         "y": 23,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D5": {
-                         "x": 56.4,
-                         "y": 23,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E5": {
-                         "x": 75.2,
-                         "y": 23,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A6": {
-                         "x": 9.4,
-                         "y": 28.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B6": {
-                         "x": 28.2,
-                         "y": 28.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C6": {
-                         "x": 47,
-                         "y": 28.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D6": {
-                         "x": 65.8,
-                         "y": 28.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E6": {
-                         "x": 84.6,
-                         "y": 28.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A7": {
-                         "x": 0,
-                         "y": 34.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B7": {
-                         "x": 18.8,
-                         "y": 34.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C7": {
-                         "x": 37.6,
-                         "y": 34.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D7": {
-                         "x": 56.4,
-                         "y": 34.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E7": {
-                         "x": 75.2,
-                         "y": 34.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A8": {
-                         "x": 9.4,
-                         "y": 40.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B8": {
-                         "x": 28.2,
-                         "y": 40.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C8": {
-                         "x": 47,
-                         "y": 40.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D8": {
-                         "x": 65.8,
-                         "y": 40.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E8": {
-                         "x": 84.6,
-                         "y": 40.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A9": {
-                         "x": 0,
-                         "y": 46,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B9": {
-                         "x": 18.8,
-                         "y": 46,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C9": {
-                         "x": 37.6,
-                         "y": 46,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D9": {
-                         "x": 56.4,
-                         "y": 46,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E9": {
-                         "x": 75.2,
-                         "y": 46,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A10": {
-                         "x": 9.4,
-                         "y": 51.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B10": {
-                         "x": 28.2,
-                         "y": 51.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C10": {
-                         "x": 47,
-                         "y": 51.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D10": {
-                         "x": 65.8,
-                         "y": 51.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E10": {
-                         "x": 84.6,
-                         "y": 51.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A11": {
-                         "x": 0,
-                         "y": 57.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B11": {
-                         "x": 18.8,
-                         "y": 57.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C11": {
-                         "x": 37.6,
-                         "y": 57.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D11": {
-                         "x": 56.4,
-                         "y": 57.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E11": {
-                         "x": 75.2,
-                         "y": 57.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A12": {
-                         "x": 9.4,
-                         "y": 63.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B12": {
-                         "x": 28.2,
-                         "y": 63.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C12": {
-                         "x": 47,
-                         "y": 63.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D12": {
-                         "x": 65.8,
-                         "y": 63.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E12": {
-                         "x": 84.6,
-                         "y": 63.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A13": {
-                         "x": 0,
-                         "y": 69,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B13": {
-                         "x": 18.8,
-                         "y": 69,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C13": {
-                         "x": 37.6,
-                         "y": 69,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D13": {
-                         "x": 56.4,
-                         "y": 69,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E13": {
-                         "x": 75.2,
-                         "y": 69,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A14": {
-                         "x": 9.4,
-                         "y": 74.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B14": {
-                         "x": 28.2,
-                         "y": 74.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C14": {
-                         "x": 47,
-                         "y": 74.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D14": {
-                         "x": 65.8,
-                         "y": 74.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E14": {
-                         "x": 84.6,
-                         "y": 74.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A15": {
-                         "x": 0,
-                         "y": 80.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B15": {
-                         "x": 18.8,
-                         "y": 80.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C15": {
-                         "x": 37.6,
-                         "y": 80.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D15": {
-                         "x": 56.4,
-                         "y": 80.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E15": {
-                         "x": 75.2,
-                         "y": 80.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A16": {
-                         "x": 9.4,
-                         "y": 86.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B16": {
-                         "x": 28.2,
-                         "y": 86.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C16": {
-                         "x": 47,
-                         "y": 86.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D16": {
-                         "x": 65.8,
-                         "y": 86.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E16": {
-                         "x": 84.6,
-                         "y": 86.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A17": {
-                         "x": 0,
-                         "y": 92,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B17": {
-                         "x": 18.8,
-                         "y": 92,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C17": {
-                         "x": 37.6,
-                         "y": 92,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D17": {
-                         "x": 56.4,
-                         "y": 92,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E17": {
-                         "x": 75.2,
-                         "y": 92,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A18": {
-                         "x": 9.4,
-                         "y": 97.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B18": {
-                         "x": 28.2,
-                         "y": 97.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C18": {
-                         "x": 47,
-                         "y": 97.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D18": {
-                         "x": 65.8,
-                         "y": 97.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E18": {
-                         "x": 84.6,
-                         "y": 97.75,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A19": {
-                         "x": 0,
-                         "y": 103.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B19": {
-                         "x": 18.8,
-                         "y": 103.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C19": {
-                         "x": 37.6,
-                         "y": 103.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D19": {
-                         "x": 56.4,
-                         "y": 103.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E19": {
-                         "x": 75.2,
-                         "y": 103.5,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "A20": {
-                         "x": 9.4,
-                         "y": 109.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "B20": {
-                         "x": 28.2,
-                         "y": 109.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "C20": {
-                         "x": 47,
-                         "y": 109.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "D20": {
-                         "x": 65.8,
-                         "y": 109.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    },
-                    "E20": {
-                         "x": 84.6,
-                         "y": 109.25,
-                         "z": 0,
-                         "diameter": 10,
-                         "depth": 85.0
-                    }
-               }
-          },
-
           "tube-rack-.75ml": {
                "origin-offset": {
                     "x": 13.5,
