@@ -8,7 +8,6 @@ from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.config import robot_configs
 from opentrons.types import Mount
 from . import modules
-from .types import Axis
 
 
 _lock = threading.Lock()
@@ -76,12 +75,15 @@ class Controller:
         self._smoothie_driver.move(
             target_position, home_flagged_axes=home_flagged_axes)
 
-    def home(self, axes: List[Axis] = None) -> Dict[str, float]:
+    def home(self, axes: List[str] = None) -> Dict[str, float]:
         if axes:
-            args: Tuple[Any, ...] = (''.join([ax.name for ax in axes]),)
+            args: Tuple[Any, ...] = (''.join(axes),)
         else:
             args = tuple()
         return self._smoothie_driver.home(*args)
+
+    def fast_home(self, axis: str, margin: float) -> Dict[str, float]:
+        return self._smoothie_driver.fast_home(axis, margin)
 
     def get_attached_instruments(
             self, expected: Dict[Mount, str]) -> Dict[Mount, Optional[str]]:

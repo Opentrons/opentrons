@@ -1,10 +1,10 @@
 import asyncio
+import copy
 from typing import Dict, Optional, List, Tuple
 
 from opentrons import types
 from opentrons.config.pipette_config import configs
 from . import modules
-from .types import Axis
 
 
 def find_config(prefix: str) -> str:
@@ -14,6 +14,10 @@ def find_config(prefix: str) -> str:
         return prefix
     else:
         return sorted(matches)[0]
+
+
+_HOME_POSITION = {'X': 418.0, 'Y': 353.0, 'Z': 218.0,
+                  'A': 218.0, 'B': 19.0, 'C': 19.0}
 
 
 class Simulator:
@@ -31,13 +35,21 @@ class Simulator:
         self._attached_modules = [('mod' + str(idx), mod)
                                   for idx, mod
                                   in enumerate(attached_modules)]
+        self._position = copy.copy(_HOME_POSITION)
 
     def move(self, target_position: Dict[str, float]):
-        pass
+        self._position.update(target_position)
 
-    def home(self, axes: List[Axis] = None) -> Dict[str, float]:
+    def home(self, axes: List[str] = None) -> Dict[str, float]:
         # driver_3_0-> HOMED_POSITION
-        return {'X': 418, 'Y': 353, 'Z': 218, 'A': 218, 'B': 19, 'C': 19}
+        checked_axes = axes or 'XYZABC'
+        self._position.update({ax: _HOME_POSITION[ax]
+                               for ax in checked_axes})
+        return self._position
+
+    def fast_home(self, axis: str, margin: float) -> Dict[str, float]:
+        self._position[axis] = _HOME_POSITION[axis]
+        return self._position
 
     def get_attached_instruments(
             self, expected: Dict[types.Mount, str])\
