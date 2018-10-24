@@ -8,6 +8,7 @@ import {
   OutlineButton,
   PrimaryButton,
 } from '@opentrons/components'
+import i18n from '../localization'
 import type {FormConnector} from '../utils'
 import styles from './FilePage.css'
 import formStyles from '../components/forms.css'
@@ -16,12 +17,12 @@ export type FilePageProps = {
   formConnector: FormConnector<any>,
   isFormAltered: boolean,
   instruments: React.ElementProps<typeof InstrumentGroup>,
-  goToDesignPage: () => mixed,
+  goToNextPage: () => mixed,
   saveFileMetadata: () => mixed,
   swapPipettes: () => mixed,
 }
 
-const FilePage = ({formConnector, isFormAltered, instruments, saveFileMetadata, goToDesignPage, swapPipettes}: FilePageProps) => {
+const FilePage = ({formConnector, isFormAltered, instruments, saveFileMetadata, goToNextPage, swapPipettes}: FilePageProps) => {
   const handleSubmit = (e: SyntheticEvent<*>) => {
     // blur focused field on submit
     if (document && document.activeElement) document.activeElement.blur()
@@ -68,11 +69,11 @@ const FilePage = ({formConnector, isFormAltered, instruments, saveFileMetadata, 
 
       <div className={styles.button_row}>
         <PrimaryButton
-          onClick={goToDesignPage}
+          onClick={goToNextPage}
           className={styles.continue_button}
           iconName="arrow-right"
         >
-          Continue to Design
+          {i18n.t('button.continue_to_liquids')}
         </PrimaryButton>
       </div>
     </div>
