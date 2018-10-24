@@ -48,6 +48,7 @@ const _getWellContents = (
         selected: selectedWells ? wellName in selectedWells : false,
         maxVolume: well['total-liquid-volume'] || Infinity,
         groupIds,
+        ingreds: __ingredientsForContainer && __ingredientsForContainer[wellName],
       },
     }
   }, {})
