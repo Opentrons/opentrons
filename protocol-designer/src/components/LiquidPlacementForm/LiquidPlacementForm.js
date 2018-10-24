@@ -104,7 +104,7 @@ export default class LiquidPlacementForm extends React.Component <Props> {
                   error={touched.selectedLiquidId && errors.selectedLiquidId}
                   value={values.selectedLiquidId}
                   onChange={handleChange}
-                  onBlue={handleBlur}
+                  onBlur={handleBlur}
                 />
               </FormGroup>
               <FormGroup
@@ -117,7 +117,7 @@ export default class LiquidPlacementForm extends React.Component <Props> {
                   error={touched.volume && errors.volume}
                   value={values.volume}
                   onChange={this.handleChangeVolume(setFieldValue)}
-                  onBlue={handleBlur}
+                  onBlur={handleBlur}
                 />
               </FormGroup>
             </div>
