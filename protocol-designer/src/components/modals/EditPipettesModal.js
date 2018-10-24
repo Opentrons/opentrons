@@ -27,13 +27,6 @@ type Props = {
   closeModal: () => void,
 }
 
-// 'USER_HAS_NOT_SELECTED' state is just a concern of these dropdowns,
-// not selected pipette state in general
-// It's needed b/c user must select 'None' explicitly,
-// they cannot just leave the dropdown blank.
-const USER_HAS_NOT_SELECTED = 'USER_HAS_NOT_SELECTED'
-// TODO: Ian 2018-06-22 use pristinity instead of this?
-
 const pipetteOptionsWithNone = [
   {name: 'None', value: ''},
   ...pipetteOptions,
@@ -50,7 +43,7 @@ const tiprackOptions = [
   // {name: '300 μL', value: 'GEB-tiprack-300ul'} // NOTE this is not supported by Python API yet
 ]
 
-const DEFAULT_SELECTION = {pipetteModel: USER_HAS_NOT_SELECTED, tiprackModel: null}
+const DEFAULT_SELECTION = {pipetteModel: '', tiprackModel: null}
 
 const pipetteDataToFormState = (pipetteData) => ({
   pipetteModel: pipetteData.model,
@@ -89,8 +82,6 @@ class EditPipettesModal extends React.Component<Props, State> {
     const {left, right} = this.state
 
     const pipetteSelectionIsValid = (
-      // neither can be invalid
-      (left.pipetteModel !== USER_HAS_NOT_SELECTED && right.pipetteModel !== USER_HAS_NOT_SELECTED) &&
       // at least one must not be none (empty string)
       (left.pipetteModel || right.pipetteModel)
     )

@@ -39,25 +39,31 @@ export function createPipette (
 
 // TODO: BC type left and right here with form mount values
 export const createNewPipettesSlice = (state: PipetteReducerState, left: any, right: any): PipetteReducerState => {
-  const leftPipette = (left.pipetteModel && left.tiprackModel)
+  const prevLeftPipette = state.byId[state.byMount.left]
+  const prevRightPipette = state.byId[state.byMount.right]
+
+  const leftChanged = left.pipetteModel !== (prevLeftPipette && prevLeftPipette.model) ||
+    left.tiprackModel !== (prevLeftPipette && prevLeftPipette.tiprackModel)
+
+  const rightChanged = right.pipetteModel !== (prevRightPipette && prevRightPipette.model) ||
+    right.tiprackModel !== (prevRightPipette && prevRightPipette.tiprackModel)
+
+  const newLeftPipette = (leftChanged && left.pipetteModel && left.tiprackModel)
     ? createPipette('left', left.pipetteModel, left.tiprackModel)
     : null
 
-  const rightPipette = (right.pipetteModel && right.tiprackModel)
+  const newRightPipette = (rightChanged && right.pipetteModel && right.tiprackModel)
     ? createPipette('right', right.pipetteModel, right.tiprackModel)
     : null
 
   return {
     byMount: {
-      left: leftPipette ? leftPipette.id : state.byMount.left,
-      right: rightPipette ? rightPipette.id : state.byMount.right,
+      left: newLeftPipette ? newLeftPipette.id : state.byMount.left,
+      right: newRightPipette ? newRightPipette.id : state.byMount.right,
     },
-    byId: {
-      ...state.byId,
-      ...([leftPipette, rightPipette]).reduce((acc: {[string]: PipetteData}, pipette: ?PipetteData) => {
-        if (!pipette) return acc
-        return {...acc, [pipette.id]: pipette}
-      }, {}),
-    },
+    byId: ([newLeftPipette, newRightPipette]).reduce((acc: {[string]: PipetteData}, pipette: ?PipetteData) => {
+      if (!pipette) return acc
+      return {...acc, [pipette.id]: pipette}
+    }, {}),
   }
 }
