@@ -62,6 +62,34 @@ export default class ConnectForm extends React.Component<Props, State> {
     })
   }
 
+  getEapFields = (eapMethod: any): Array<WifiAuthField> => {
+    return get(eapMethod, 'options', []).map(field => ({
+      ...field,
+      name: `eapConfig.${field.name}`,
+    }))
+  }
+
+  getValidationSchema = (values: any) => {
+    let fields = []
+    let errors = {}
+    if (this.props.securityType === WPA_PSK_SECURITY) {
+      fields = WIFI_PSK_FIELDS
+    } else {
+      const selectedEapMethod = find(this.props.eapOptions, {
+        name: values.eapConfig.eapType,
+      })
+      fields = this.getEapFields(selectedEapMethod)
+    }
+    fields.forEach(f => {
+      if (f.required && !get(values, f.name)) {
+        set(errors, `${f.name}`, `${f.displayName} is required`)
+      } else if (f.type === 'password' && get(values, f.name).length < 8) {
+        set(errors, `${f.name}`, 'Password must be at least 8 characters')
+      }
+    })
+    return errors
+  }
+
   render () {
     const {showPassword} = this.state
     const {securityType, eapOptions, close} = this.props
@@ -74,8 +102,17 @@ export default class ConnectForm extends React.Component<Props, State> {
     return (
       <Formik
         onSubmit={this.onSubmit}
+        validate={this.getValidationSchema}
         render={formProps => {
-          const {handleChange, handleSubmit, values, setValues} = formProps
+          const {
+            handleChange,
+            handleSubmit,
+            values,
+            setValues,
+            handleBlur,
+            errors,
+            touched,
+          } = formProps
           const eapMethod = get(values, eapMethodField)
           let fields: Array<WifiAuthField> = []
 
@@ -83,12 +120,8 @@ export default class ConnectForm extends React.Component<Props, State> {
             fields = WIFI_PSK_FIELDS
           } else if (securityType === WPA_EAP_SECURITY) {
             const selectedEapMethod = find(eapOptions, {name: eapMethod})
-            fields = get(selectedEapMethod, 'options', []).map(field => ({
-              ...field,
-              name: `eapConfig.${field.name}`,
-            }))
+            fields = this.getEapFields(selectedEapMethod)
           }
-
           return (
             <form onSubmit={handleSubmit}>
               <FormTable>
@@ -121,6 +154,9 @@ export default class ConnectForm extends React.Component<Props, State> {
                     showPassword={!!showPassword[field.name]}
                     onChange={handleChange}
                     toggleShowPassword={this.toggleShowPassword}
+                    onBlur={handleBlur}
+                    errors={errors}
+                    touched={touched}
                   />
                 ))}
               </FormTable>
