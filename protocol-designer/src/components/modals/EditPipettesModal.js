@@ -2,30 +2,42 @@
 import * as React from 'react'
 import cx from 'classnames'
 import {connect} from 'react-redux'
-import type {Dispatch} from 'redux'
 
 import {AlertModal, DropdownField, FormGroup, type Mount} from '@opentrons/components'
 import startCase from 'lodash/startCase'
 import isEmpty from 'lodash/isEmpty'
 
+import type {PipetteData} from '../../step-generation'
 import i18n from '../../localization'
-import type {BaseState} from '../../types'
+import type {BaseState, ThunkDispatch} from '../../types'
 import {pipetteOptions} from '../../pipettes/pipetteData'
-import {thunks as pipetteThunks, selectors as pipetteSelectors} from '../../pipettes'
+import {
+  thunks as pipetteThunks,
+  selectors as pipetteSelectors,
+  type EditPipettesFields,
+} from '../../pipettes'
 
 import PipetteDiagram from './NewFileModal/PipetteDiagram'
 import TiprackDiagram from './NewFileModal/TiprackDiagram'
 import styles from './NewFileModal/NewFileModal.css'
 import modalStyles from './modal.css'
-import type {NewProtocolFields, PipetteFields} from '../../load-file'
+import type {PipetteFields} from '../../load-file'
 
-type State = NewProtocolFields
+type State = EditPipettesFields
 
-type Props = {
-  onCancel: () => mixed,
-  onSave: (NewProtocolFields) => mixed,
-  closeModal: () => void,
+type SP = {
+  instruments: {
+    left: ?PipetteData,
+    right: ?PipetteData,
+  },
 }
+
+type DP = {
+  onCancel: () => mixed,
+  onSave: (State) => mixed,
+}
+
+type Props = {closeModal: () => void} & SP & DP
 
 const pipetteOptionsWithNone = [
   {name: 'None', value: ''},
@@ -66,7 +78,6 @@ class EditPipettesModal extends React.Component<Props, State> {
     if (fieldName === 'pipetteModel') nextMountState = {...nextMountState, tiprackModel: null}
     this.setState({[mount]: {...this.state[mount], ...nextMountState}})
   }
-  handleNameChange = (e: SyntheticInputEvent<*>) => this.setState({name: e.target.value})
 
   handleSubmit = () => {
     this.props.onSave(this.state)
@@ -167,8 +178,8 @@ const mapSTP = (state: BaseState): SP => {
   }
 }
 
-const mapDTP = (dispatch: Dispatch): DP => ({
-  onSave: (fields) => {
+const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
+  onSave: (fields: EditPipettesFields) => {
     // TODO: only launch if changes protocol
     if (window.confirm(i18n.t('alert.window.confirm_create_new'))) {
       dispatch(pipetteThunks.editPipettes(fields))

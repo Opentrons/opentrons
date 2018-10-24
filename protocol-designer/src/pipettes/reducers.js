@@ -7,6 +7,8 @@ import reduce from 'lodash/reduce'
 import type {LoadFileAction, NewProtocolFields} from '../load-file'
 import type {PipetteData} from '../step-generation'
 import type {FilePipette} from '../file-types'
+import {createPipette, createNewPipettesSlice} from './utils'
+import type {PipetteReducerState, UpdatePipettesAction} from './types'
 
 function createPipette (
   mount: Mount,

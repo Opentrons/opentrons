@@ -4,7 +4,7 @@ import {getPipette, getLabware} from '@opentrons/shared-data'
 
 import type {Mount} from '@opentrons/components'
 import type {PipetteData} from '../step-generation'
-import type {PipetteReducerState} from './type'
+import type {PipetteReducerState} from './types'
 
 export function createPipette (
   mount: Mount,
@@ -39,8 +39,8 @@ export function createPipette (
 
 // TODO: BC type left and right here with form mount values
 export const createNewPipettesSlice = (state: PipetteReducerState, left: any, right: any): PipetteReducerState => {
-  const prevLeftPipette = state.byId[state.byMount.left]
-  const prevRightPipette = state.byId[state.byMount.right]
+  const prevLeftPipette = state.byMount.left && state.byId[state.byMount.left]
+  const prevRightPipette = state.byMount.right && state.byId[state.byMount.right]
 
   const leftChanged = left.pipetteModel !== (prevLeftPipette && prevLeftPipette.model) ||
     left.tiprackModel !== (prevLeftPipette && prevLeftPipette.tiprackModel)
@@ -59,12 +59,12 @@ export const createNewPipettesSlice = (state: PipetteReducerState, left: any, ri
   const leftId = newLeftPipette ? newLeftPipette.id : state.byMount.left
   const rightId = newRightPipette ? newRightPipette.id : state.byMount.right
 
-  const leftPipette = newLeftPipette || state.byId[leftId]
-  const rightPipette = newRightPipette || state.byId[rightId]
+  const leftPipette = newLeftPipette || (leftId ? state.byId[leftId] : null)
+  const rightPipette = newRightPipette || (rightId ? state.byId[rightId] : null)
 
   return {
-    byMount: {left: leftId, right: rightId},
-    byId: ([leftPipette, rightPipette]).reduce((acc: {[string]: PipetteData}, pipette: ?PipetteData) => {
+    byMount: {left: leftId || null, right: rightId || null},
+    byId: ([leftPipette, rightPipette]).reduce((acc: {[pipetteId: string]: PipetteData}, pipette: ?PipetteData) => {
       return pipette ? {...acc, [pipette.id]: pipette} : acc
     }, {}),
   }

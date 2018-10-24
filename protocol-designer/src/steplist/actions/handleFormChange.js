@@ -10,6 +10,7 @@ import {
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import type {PipetteChannels} from '@opentrons/shared-data'
 import type {BaseState, GetState} from '../../types'
+import type {FormData} from '../../form-types'
 
 import type {ChangeFormPayload} from './types'
 
@@ -111,7 +112,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
   }
 }
 
-export const reconcileFormPipette = (formData, baseState, nextPipetteId: string, nextChannels) => {
+export const reconcileFormPipette = (formData: FormData, baseState: BaseState, nextPipetteId: ?mixed, nextChannels: ?number) => {
   const prevChannels = getChannels(formData.pipette, baseState)
 
   const singleToMulti = prevChannels === 1 && nextChannels === 8

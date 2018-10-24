@@ -42,7 +42,7 @@ import {
   hoverOnStep,
   hoverOnTerminalItem,
   toggleStepCollapsed,
-  ChangeSavedStepFormAction,
+  type ChangeSavedStepFormAction,
 } from './actions'
 
 type FormState = FormData | null
@@ -146,7 +146,7 @@ const savedStepForms: Reducer<SavedStepFormState, *> = handleActions({
   CHANGE_SAVED_STEP_FORM: (state: SavedStepFormState, action: ChangeSavedStepFormAction): SavedStepFormState => ({
     ...state,
     [action.payload.stepId]: {
-      ...state[action.payload.stepId],
+      ...(action.payload.stepId ? state[action.payload.stepId] : {}),
       ...action.payload.update,
     },
   }),

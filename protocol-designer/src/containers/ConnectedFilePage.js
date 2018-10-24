@@ -2,7 +2,7 @@
 import {connect} from 'react-redux'
 import type {BaseState} from '../types'
 import FilePage from '../components/FilePage'
-import type {FilePageProps} from '../components/FilePage'
+import type {Props as FilePageProps} from '../components/FilePage'
 import {actions, selectors as fileSelectors} from '../file-data'
 import {actions as pipetteActions, selectors as pipetteSelectors} from '../pipettes'
 import type {FileMetadataFields, FileMetadataFieldAccessors} from '../file-data'
@@ -39,7 +39,6 @@ const mapDispatchToProps: DP = {
   _saveFileMetadata: actions.saveFileMetadata,
   goToNextPage: () => navActions.navigateToPage('liquids'),
   swapPipettes: pipetteActions.swapPipettes,
-  editPipette: pipetteActions.editPipettes,
 }
 
 const mergeProps = (
