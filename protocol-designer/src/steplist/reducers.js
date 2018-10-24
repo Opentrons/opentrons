@@ -159,6 +159,12 @@ const collapsedSteps: Reducer<CollapsedStepsState, *> = handleActions({
     ...state,
     [payload]: !state[payload],
   }),
+  LOAD_FILE: (state: CollapsedStepsState, action: LoadFileAction) =>
+    // default all steps to collapsed
+    getPDMetadata(action.payload).orderedSteps.reduce(
+      (acc: CollapsedStepsState, stepId) => ({...acc, [stepId]: true}),
+      {}
+    ),
 }, {})
 
 export type OrderedStepsState = Array<StepIdType>
