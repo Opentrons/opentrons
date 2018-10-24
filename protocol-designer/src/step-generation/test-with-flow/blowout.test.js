@@ -114,7 +114,7 @@ describe('blowout', () => {
       expect(updateLiquidState).toHaveBeenCalledWith({
         pipetteId: 'p300SingleId',
         labwareId: 'sourcePlateId',
-        volume: 300, // pipette's max vol
+        useFullVolume: true,
         well: 'A1',
         labwareType: 'trough-12row',
         pipetteData: robotStateWithTip.instruments.p300SingleId,

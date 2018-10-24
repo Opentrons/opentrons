@@ -8,9 +8,10 @@ import last from 'lodash/last'
 import {computeWellAccess} from '@opentrons/shared-data'
 import type {
   CommandCreator,
-  RobotState,
-  Timeline,
   LocationLiquidState,
+  RobotState,
+  SourceAndDest,
+  Timeline,
 } from './types'
 
 import {AIR} from '@opentrons/components'
@@ -91,13 +92,9 @@ export const commandCreatorsTimeline = (commandCreators: Array<CommandCreator>) 
 
 type Vol = {volume: number}
 
-/** Breaks a liquid volume state into 2 parts. Assumes all liquids are evenly mixed. */
-export function splitLiquid (volume: number, sourceLiquidState: LocationLiquidState): {
-  source: LocationLiquidState,
-  dest: LocationLiquidState,
-} {
-  const totalSourceVolume = reduce(
-    sourceLiquidState,
+export function getLocationTotalVolume (loc: LocationLiquidState): number {
+  return reduce(
+    loc,
     (acc: number, ingredState: Vol, ingredId: string) => {
       // air is not included in the total volume
       return (ingredId === AIR)
@@ -106,13 +103,18 @@ export function splitLiquid (volume: number, sourceLiquidState: LocationLiquidSt
     },
     0
   )
+}
 
-  // TODO Ian 2018-03-19 figure out what to do with air warning reporting
-  // if (AIR in sourceLiquidState) {
-  //   console.warn('Splitting liquid with air present', sourceLiquidState)
-  // }
+/** Breaks a liquid volume state into 2 parts. Assumes all liquids are evenly mixed. */
+export function splitLiquid (volume: number, sourceLiquidState: LocationLiquidState): SourceAndDest {
+  const totalSourceVolume = getLocationTotalVolume(sourceLiquidState)
+
+  if (AIR in sourceLiquidState) {
+    console.warn('Splitting liquid with air present', sourceLiquidState)
+  }
 
   if (totalSourceVolume === 0) {
+    console.warn('splitting with zero source volume')
     // Splitting from empty source
     return {
       source: sourceLiquidState,
@@ -121,6 +123,7 @@ export function splitLiquid (volume: number, sourceLiquidState: LocationLiquidSt
   }
 
   if (volume > totalSourceVolume) {
+    console.warn('volume to split exceeds total source volume, adding air', sourceLiquidState, volume, totalSourceVolume)
     // Take all of source, plus air
     return {
       source: mapValues(sourceLiquidState, () => ({volume: 0})),
