@@ -435,6 +435,7 @@ async def list_keys(request: web.Request) -> web.Response:
     """
     keys_dir = environment.get_path('WIFI_KEYS_DIR')
     keys: List[Dict[str, str]] = []
+    # TODO(mc, 2018-10-24): add last modified info to keys for sort purposes
     for path in os.listdir(keys_dir):
         full_path = os.path.join(keys_dir, path)
         if os.path.isdir(full_path):

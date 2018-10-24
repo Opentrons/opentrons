@@ -1,15 +1,27 @@
 @import '@opentrons/components';
 
-.dropdown_icon {
+.dropdown_icon_wrapper {
   position: absolute;
-  top: 0.2rem;
+  top: 0.25rem;
   right: 0.25rem;
   width: 1.25rem;
   pointer-events: none;
 
-  & svg {
+  & > svg {
     color: var(--c-dark-gray);
   }
+
+  &.flipped > svg {
+    transform: rotate(180deg);
+  }
+}
+
+.select_wrapper {
+  /* TODO(mc, 2018-10-29): this value comes from existing fields in components
+   * library that always render a caption div with a height, even when empty.
+   * Figure out what we should be doing here moving forward
+   */
+  padding-bottom: 0.625rem;
 }
 
 .select_control {
@@ -20,19 +32,38 @@
   padding: 0.25rem 0;
   outline: none;
   border-radius: 3px;
-  max-height: 1.75rem;
+  height: 1.75rem;
   box-shadow: none;
+
+  &.focus {
+    background-color: var(--c-white);
+    box-shadow: var(--shadow-lvl-1);
+  }
 }
 
 .select_menu {
   @apply --font-body-1-dark;
 
-  background-color: var(--c-light-gray);
-  border-radius: 3px;
-  padding: 0.25rem 0;
+  background-color: var(--c-white);
+  border-radius: 2px;
+  padding: 2px 0 0 0;
 }
 
-.error div,
-.error span {
+.select_group {
+  &:not(:first-child) {
+    border-top: 1px solid var(--c-med-gray);
+  }
+}
+
+.select_caption {
+  font-size: var(--fs-caption);
+}
+
+.error_bg {
+  background-color: var(--c-warning-light);
+}
+
+.error_color {
   color: var(--c-warning-dark);
+  font-weight: var(--fw-semibold);
 }
