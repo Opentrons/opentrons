@@ -42,6 +42,7 @@ const selectedWells = handleActions({
   CLOSE_WELL_SELECTION_MODAL: () => selectedWellsInitialState,
   DESELECT_ALL_WELLS: () => selectedWellsInitialState,
   OPEN_RENAME_LABWARE_FORM: () => selectedWellsInitialState,
+  REMOVE_WELLS_CONTENTS: () => selectedWellsInitialState,
   SET_WELL_CONTENTS: () => selectedWellsInitialState,
 }, selectedWellsInitialState)
 
