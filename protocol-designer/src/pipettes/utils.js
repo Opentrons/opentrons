@@ -56,14 +56,16 @@ export const createNewPipettesSlice = (state: PipetteReducerState, left: any, ri
     ? createPipette('right', right.pipetteModel, right.tiprackModel)
     : null
 
+  const leftId = newLeftPipette ? newLeftPipette.id : state.byMount.left
+  const rightId = newRightPipette ? newRightPipette.id : state.byMount.right
+
+  const leftPipette = newLeftPipette || state.byId[leftId]
+  const rightPipette = newRightPipette || state.byId[rightId]
+
   return {
-    byMount: {
-      left: newLeftPipette ? newLeftPipette.id : state.byMount.left,
-      right: newRightPipette ? newRightPipette.id : state.byMount.right,
-    },
-    byId: ([newLeftPipette, newRightPipette]).reduce((acc: {[string]: PipetteData}, pipette: ?PipetteData) => {
-      if (!pipette) return acc
-      return {...acc, [pipette.id]: pipette}
+    byMount: {left: leftId, right: rightId},
+    byId: ([leftPipette, rightPipette]).reduce((acc: {[string]: PipetteData}, pipette: ?PipetteData) => {
+      return pipette ? {...acc, [pipette.id]: pipette} : acc
     }, {}),
   }
 }

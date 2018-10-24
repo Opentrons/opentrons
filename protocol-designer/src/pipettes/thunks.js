@@ -23,16 +23,15 @@ export const editPipettes = (payload: EditPipetteFields) =>
     const prevPipettesByMount = pipetteSelectors.pipettesByMount(state)
     const savedForms = steplistSelectors.getSavedForms(state)
 
-    const effectedForms = pickBy(savedForms, (formData, stepId) => (
-      formData.pipette && some(prevPipettesByMount, pipetteData => pipetteData.id === formData.pipette)
-    ))
     const nextPipettesSlice = createNewPipettesSlice(state.pipettes.pipettes, payload.left, payload.right)
 
-    if (!isEmpty(effectedForms)) {
-      each(effectedForms, formData => {
-        const changedMount = findKey(prevPipettesByMount, (pipetteData) => pipetteData.id === formData.pipette)
-        const nextPipetteId = nextPipettesSlice.byMount[changedMount]
-        const nextChannels = nextPipettesSlice.byId[nextPipetteId].channels
+    each(savedForms, formData => {
+      const formPipetteMount = findKey(prevPipettesByMount, (pipetteData) => (
+        (pipetteData && pipetteData.id) === formData.pipette
+      ))
+      if (formData.pipette && formPipetteMount) {
+        const nextPipetteId = nextPipettesSlice.byMount[formPipetteMount]
+        const nextChannels = nextPipettesSlice.byId[nextPipetteId] && nextPipettesSlice.byId[nextPipetteId].channels
         dispatch(steplistActions.changeSavedStepForm({
           stepId: formData.id,
           update: {
@@ -40,8 +39,8 @@ export const editPipettes = (payload: EditPipetteFields) =>
             pipette: nextPipetteId,
           },
         }))
-      })
-    }
+      }
+    })
 
     dispatch({type: 'UPDATE_PIPETTES', payload: nextPipettesSlice})
   }
