@@ -25,7 +25,7 @@ export const editPipettes = (payload: EditPipettesFields) =>
 
     const nextPipettesSlice = createNewPipettesSlice(state.pipettes.pipettes, payload.left, payload.right)
 
-    each(savedForms, formData => {
+    each(savedForms, (formData, stepId) => {
       const formPipetteMount = findKey(prevPipettesByMount, (pipetteData) => (
         (pipetteData && pipetteData.id) === formData.pipette
       ))
@@ -33,10 +33,10 @@ export const editPipettes = (payload: EditPipettesFields) =>
         const nextPipetteId = nextPipettesSlice.byMount[formPipetteMount]
         const nextChannels = nextPipettesSlice.byId[nextPipetteId] && nextPipettesSlice.byId[nextPipetteId].channels
         dispatch(steplistActions.changeSavedStepForm({
-          stepId: formData.id,
+          stepId,
           update: {
             ...reconcileFormPipette(formData, state, nextPipetteId, nextChannels),
-            pipette: nextPipetteId,
+            pipette: nextPipetteId || null,
           },
         }))
       }
