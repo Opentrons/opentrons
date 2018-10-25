@@ -7,6 +7,9 @@ from opentrons.protocol_api import labware
 from opentrons.types import Point
 
 minimalLabwareDef = {
+    "metadata": {
+        "displayName": "minimal labware"
+    },
     "cornerOffsetFromSlot": {
         "x": 10,
         "y": 10,
@@ -57,7 +60,7 @@ def test_save_calibration(monkeypatch):
         labware.Labware,
         'set_calibration', mock_set_calibration)
 
-    test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0))
+    test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0), 'deck')
 
     labware.save_calibration(test_labware, Point(1, 1, 1))
     assert os.path.exists(path)
@@ -71,7 +74,7 @@ def test_schema_shape(monkeypatch):
         return 1
     monkeypatch.setattr(time, 'time', fake_time)
 
-    test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0))
+    test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0), 'deck')
 
     labware.save_calibration(test_labware, Point(1, 1, 1))
     expected = {"default": {"offset": [1, 1, 1], "lastModified": 1}}
@@ -92,7 +95,7 @@ def test_load_calibration(monkeypatch):
         labware.Labware,
         'set_calibration', mock_set_calibration)
 
-    test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0))
+    test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0), 'deck')
 
     labware.save_calibration(test_labware, Point(1, 1, 1))
 
@@ -105,7 +108,7 @@ def test_load_calibration(monkeypatch):
 
 
 def test_wells_rebuilt_with_offset():
-    test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0))
+    test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0), 'deck')
     old_wells = test_labware._wells
     assert test_labware._offset == Point(10, 10, 5)
     assert test_labware._calibrated_offset == Point(10, 10, 5)

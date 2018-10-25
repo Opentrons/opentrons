@@ -128,7 +128,7 @@ class Well:
     def __str__(self):
         return self._display_name
 
-    def __eq__(self, other: 'Well') -> bool:
+    def __eq__(self, other: object) -> bool:
         """
         Assuming that equality of wells in this system is having the same
         absolute coordinates for the top.
@@ -148,6 +148,21 @@ class Labware:
     """
     def __init__(
             self, definition: dict, parent: Point, parent_name: str) -> None:
+        """
+        :param definition: A dict representing all required data for a labware,
+            including metadata such as the display name of the labware, a
+            definition of the order to iterate over wells, the shape of wells
+            (shape, physical dimensions, etc), and so on. The correct shape of
+            this definition is governed by the "labware-designer" project in
+            the Opentrons/opentrons repo.
+        :param parent: A Point representing the critical point for the object
+            upon which the labware is mounted (often the lower-left corner of
+            a slot on the deck)
+        :param parent_name: A string with the debug name of the parent, usually
+            either the name of the slot or another device that can have a
+            labware mounted on it (e.g.: "Slot 5" or "Temperature Module in
+            Slot 4")
+        """
         self._display_name = "{} on {}".format(
             definition['metadata']['displayName'], parent_name)
         self._calibrated_offset: Point = Point(0, 0, 0)
@@ -224,7 +239,10 @@ class Labware:
         list. To access well A1, for example, simply write: labware.wells()[0]
 
         Note that this method takes args for backward-compatibility, but use
-        of args is deprecated and will be removed in future versions.
+        of args is deprecated and will be removed in future versions. Args
+        can be either strings or integers, but must all be the same type (e.g.:
+        `self.wells(1, 4, 8)` or `self.wells('A1', 'B2')`, but
+        `self.wells('A1', 4)` is invalid.
 
         :return: Ordered list of all wells in a labware
         """
@@ -235,7 +253,7 @@ class Labware:
         elif isinstance(args[0], str):
             res = [self.wells_by_index()[idx] for idx in args]
         else:
-            res = NotImplemented
+            raise TypeError
         return res
 
     def wells_by_index(self) -> Dict[str, Well]:
@@ -260,7 +278,10 @@ class Labware:
         will output ['A1', 'A2', 'A3', 'A4'...]
 
         Note that this method takes args for backward-compatibility, but use
-        of args is deprecated and will be removed in future versions.
+        of args is deprecated and will be removed in future versions. Args
+        can be either strings or integers, but must all be the same type (e.g.:
+        `self.rows(1, 4, 8)` or `self.rows('A', 'B')`, but  `self.rows('A', 4)`
+        is invalid.
 
         :return: A list of row lists
         """
@@ -274,7 +295,7 @@ class Labware:
         elif isinstance(args[0], str):
             res = [row_dict[idx] for idx in args]
         else:
-            res = NotImplemented
+            raise TypeError
         return res
 
     def rows_by_index(self) -> Dict[str, List[Well]]:
@@ -300,7 +321,10 @@ class Labware:
         This will output ['A1', 'B1', 'C1', 'D1'...].
 
         Note that this method takes args for backward-compatibility, but use
-        of args is deprecated and will be removed in future versions.
+        of args is deprecated and will be removed in future versions. Args
+        can be either strings or integers, but must all be the same type (e.g.:
+        `self.columns(1, 4, 8)` or `self.columns('1', '2')`, but
+        `self.columns('1', 4)` is invalid.
 
         :return: A list of column lists
         """
@@ -314,7 +338,7 @@ class Labware:
         elif isinstance(args[0], str):
             res = [col_dict[idx] for idx in args]
         else:
-            res = NotImplemented
+            raise TypeError
         return res
 
     def columns_by_index(self) -> Dict[str, List[Well]]:
@@ -345,7 +369,7 @@ class Labware:
         elif isinstance(item, int):
             return self.wells()[item]
         else:
-            return NotImplemented
+            raise KeyError
 
 
 def save_calibration(labware: Labware, delta: Point):
@@ -405,26 +429,55 @@ def _load_definition_by_name(name: str) -> dict:
     Look up and return a definition by name (name is expected to correspond to
     the filename of the definition, with the .json extension) and return it or
     raise an exception
+
+    :param name: A string to use for looking up a labware defintion previously
+        saved to disc. The definition file must have been saved in a known
+        location with the filename '${name}.json'
     """
     raise NotImplementedError
 
 
-def load(name: str, corner_offset: Point, parent_name: str) -> Labware:
+def load(name: str, parent: Point, parent_name: str) -> Labware:
     """
     Return a labware object constructed from a labware definition dict looked
     up by name (definition must have been previously stored locally on the
     robot)
+
+    :param name: A string to use for looking up a labware defintion previously
+        saved to disc. The definition file must have been saved in a known
+        location with the filename '${name}.json'
+    :param parent: A Point representing the critical point for the object
+        upon which the labware is mounted (often the lower-left corner of
+        a slot on the deck)
+    :param parent_name: A string with the debug name of the parent, usually
+        either the name of the slot or another device that can have a
+        labware mounted on it (e.g.: "Slot 5" or "Temperature Module in
+        Slot 4")
     """
     definition = _load_definition_by_name(name)
-    return load_from_definition(definition, corner_offset, parent_name)
+    return load_from_definition(definition, parent, parent_name)
 
 
 def load_from_definition(
-        definition: dict, corner_offset: Point, parent_name: str) -> Labware:
+        definition: dict, parent: Point, parent_name: str) -> Labware:
     """
     Return a labware object constructed from a provided labware definition dict
+
+    :param definition: A dict representing all required data for a labware,
+        including metadata such as the display name of the labware, a
+        definition of the order to iterate over wells, the shape of wells
+        (shape, physical dimensions, etc), and so on. The correct shape of
+        this definition is governed by the "labware-designer" project in
+        the Opentrons/opentrons repo.
+    :param parent: A Point representing the critical point for the object
+        upon which the labware is mounted (often the lower-left corner of
+        a slot on the deck)
+    :param parent_name: A string with the debug name of the parent, usually
+        either the name of the slot or another device that can have a
+        labware mounted on it (e.g.: "Slot 5" or "Temperature Module in
+        Slot 4")
     """
-    labware = Labware(definition, corner_offset, parent_name)
+    labware = Labware(definition, parent, parent_name)
     load_calibration(labware)
     return labware
 

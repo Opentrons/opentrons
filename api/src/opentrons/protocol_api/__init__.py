@@ -83,7 +83,7 @@ class ProtocolContext:
         later in the protocol.
         """
         labware = load(labware_name,
-                       self._deck_layout.position_for(location))
+                       self._deck_layout.position_for(location), str(location))
         return self.load_labware(labware, location)
 
     @property
