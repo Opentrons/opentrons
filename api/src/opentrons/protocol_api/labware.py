@@ -132,8 +132,6 @@ class Well:
         """
         Assuming that equality of wells in this system is having the same
         absolute coordinates for the top.
-        :param other:
-        :return:
         """
         if not isinstance(other, Well):
             return NotImplemented
