@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.5.0"></a>
+# [3.5.0](https://github.com/Opentrons/opentrons/compare/v3.5.0-beta.1...v3.5.0) (2018-10-25)
+
+
+### Bug Fixes
+
+* **shared-data:** Fix corner offset from slot logic; add in container offset to well coordinates ([#2519](https://github.com/Opentrons/opentrons/issues/2519)) ([c79684b](https://github.com/Opentrons/opentrons/commit/c79684b))
+
+
+
+
+
 <a name="3.5.0-beta.1"></a>
 # [3.5.0-beta.1](https://github.com/Opentrons/opentrons/compare/v3.5.0-beta.0...v3.5.0-beta.1) (2018-10-16)
 
