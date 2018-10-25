@@ -33,8 +33,8 @@ const FORM_ERRORS: {[FormErrorKey]: FormError} = {
     dependentFields: ['labware', 'pipette'],
   },
   WELL_RATIO_TRANSFER: {
-    title: 'In transfer actions the number of source and destination wells must match',
-    body: 'You may want to use a Distribute or Consolidate instead of Transfer',
+    title: 'In transfer actions the ratio between number of source and destination wells must be one to one, one to many, or many to one ',
+    // body: 'You may want to use a Distribute or Consolidate instead of Transfer',
     dependentFields: ['aspirate_wells', 'dispense_wells'],
   },
   WELL_RATIO_CONSOLIDATE: {
@@ -77,7 +77,11 @@ export const incompatibleAspirateLabware = (fields: HydratedFormData): ?FormErro
 export const wellRatioTransfer = (fields: HydratedFormData): ?FormError => {
   const {aspirate_wells, dispense_wells} = fields
   if (!aspirate_wells || !dispense_wells) return null
-  return aspirate_wells.length !== dispense_wells.length ? FORM_ERRORS.WELL_RATIO_TRANSFER : null
+  const isEqual = aspirate_wells.length === dispense_wells.length
+  const oneToMany = aspirate_wells.length === 1 && dispense_wells.length > 1
+  const manyToOne = aspirate_wells.length > 1 && dispense_wells.length === 1
+  console.table({isEqual, oneToMany, manyToOne})
+  return !(isEqual || oneToMany || manyToOne) ? FORM_ERRORS.WELL_RATIO_TRANSFER : null
 }
 
 export const wellRatioDistribute = (fields: HydratedFormData): ?FormError => {

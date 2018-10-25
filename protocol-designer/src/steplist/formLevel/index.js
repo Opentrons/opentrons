@@ -28,7 +28,7 @@ const stepFormHelperMap: {[StepType]: FormHelpers} = {
   mix: {getErrors: composeErrors(incompatibleLabware)},
   pause: {getErrors: composeErrors(incompatibleLabware)},
   transfer: {
-    getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware),
+    getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware, wellRatioTransfer),
     getWarnings: composeWarnings(maxDispenseWellVolume),
   },
   consolidate: {
