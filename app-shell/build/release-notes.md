@@ -9,10 +9,10 @@ For more details, please see the full [technical change log][changelog]
 
 ### Known issues
 
-- Downgrading back to `3.4.0` from later releases _may_ cause the app to crash unless you delete the configuration folder (which will reset your app's configuration):
-    - macOS: `~/Library/Application Support/Opentrons`
-    - Linux: `~/.config/Opentrons`
-    - Windows: `%APPDATA%\Opentrons`
+- Downgrading back to "3.4.0" from later releases _may_ cause the app to crash unless you delete the configuration folder (which will reset your app's configuration):
+    - macOS: "~/Library/Application Support/Opentrons"
+    - Linux: "~/.config/Opentrons"
+    - Windows: "%APPDATA%\Opentrons"
 - The app's run log is still having problems displaying the current run step, especially if pauses and resumes are involved ([#2047][2047])
 
 [2047]: https://github.com/Opentrons/opentrons/issues/2047
@@ -23,12 +23,14 @@ For more details, please see the full [technical change log][changelog]
 - Switched the labware table of the protocol info page to organize by type instead of nickname
 - Patched up some problems with robot discovery that could cause robots to fail to appear in environments with many robots present
 - Fixed an app crash if a robot reported an invalid server version
+- When calibrating labware, the app will now show all labware of the same type as calibrated once you've calibrated one of them
+    - This is _not_ a change in how the robot saves calibration; the API software has always saved calibration data by labware type
 
 ### New features
 
 - We put a lot of work into the discovered robots list for this release:
     - The app now displays robots you've connected to in the past as well as robots that it can hear from but are not responding properly to requests
-    - We've stripped off that annoying `opentrons-` that would appear in front of every robot's name
+    - We've stripped off that annoying "opentrons-" that would appear in front of every robot's name
     - The "Pipettes and Modules" submenu will now only appear for the robot you've currently selected, so the robot list should be a little less noisy
 - We improved the copy of the robot update popup to (hopefully) make it more clear whether you're upgrading, downgrading, or re-installing your robot's software
 - We've upgraded our underlying [Electron framework][electron] to version 3, which closes up a few potential security holes and should result in a faster, smoother app experience for you!
@@ -43,7 +45,12 @@ For more details, please see the full [technical change log][changelog]
 
 ### Known issues
 
-- While the underlying definition is correct, there is a known API bug that is causing the robot to think a `50ml` tube in a `15/50ml` tuberack is the same height as the `15ml` tube
+- While the underlying definition is correct, there is a known API bug that is causing the robot to think a "50ml" tube in a "15/50ml" tuberack is the same height as the "15ml" tube
+- The definition of "96-well-plate" has an incorrect height. When calibrating for the first time after a factory reset:
+    1. Begin labware calibration with the "96-well-plate" **off the deck**
+    2. Jog the pipette up until there is enough room to insert the plate
+    3. Insert plate and calibrate normally
+        - After the plate has been calibrated once, the issue will not reoccur
 
 ### Bug fixes
 
@@ -51,6 +58,7 @@ For more details, please see the full [technical change log][changelog]
 - The "Not Now" button for a robot update will now be remembered by the robot, so other users of your robot won't get an update pop-up if you choose to keep your robot at an older software version
 - The temperature module now correctly rounds its input to the nearest degree Celsius to reflect what it is physically capable of
 - The API will no longer show hidden networks as "--" in its available Wi-Fi networks list
+- The height of the P1000 tiprack was incorrect and has been corrected
 
 ### New features
 

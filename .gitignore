@@ -21,6 +21,7 @@ api/index.json
 .mypy_cache
 
 build/
+!app-shell/build
 api/docs/build/
 develop-eggs/
 dist/
