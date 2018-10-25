@@ -17,7 +17,7 @@
   left: 0;
   right: 0;
   top: 12%;
-  max-width: 20rem;
+  max-width: 25rem;
   margin: auto;
   padding: 1rem 2rem;
   user-select: none;
@@ -39,10 +39,13 @@
  */
 .labware_list_item:hover::after {
   position: absolute;
+  width: 32rem;
+  height: 15rem;
+  background-color: var(--c-white);
   content: var(--image-url);
   border: var(--bd-light);
   top: 4rem;
-  left: 8rem;
+  left: 10rem;
 
   /* Images too large, and need to be cropped from left */
   zoom: 0.5;

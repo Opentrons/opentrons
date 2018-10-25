@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import {getLabwareDiagramURL} from '../../images'
 import {
   ClickOutside,
   OutlineButton,
@@ -33,7 +34,8 @@ const hardcodedLabware = {
     ['tube-rack-.75ml', '0.75mL Tube Rack', 'Tuberack-075ml'],
     ['tube-rack-2ml', '2mL Tube Rack', 'Tuberack-2ml'],
     ['24-vial-rack', '3.5mL Tube Rack'],
-    ['tube-rack-15_50ml', '15mL x 6 + 50mL x 4 Tube Rack', 'Tuberack-15-50ml'],
+    ['opentrons-tuberack-15_50ml', '15mL x 6 + 50mL x 4 Tube Rack (4-in-1 Rack)', 'Opentrons-4-in-1-tuberack-15-50'],
+    ['tube-rack-15_50ml', '15mL x 6 + 50mL x 4 Tube Rack (Clear Acrylic)', 'Tuberack-15-50ml'],
   ],
   'Well Plate': [
     ['96-deep-well', '96 Deep Well Plate', '96-Deep-Well'],
@@ -67,7 +69,7 @@ const labwareSectionOrder: Array<$Keys<typeof hardcodedLabware>> = [
 class LabwareDropdown extends React.Component <Props> {
   labwareItemMapper = (dataRow, key) => {
     const {selectLabware} = this.props
-    const [labwareType, displayName, img] = dataRow
+    const [labwareType, displayName, imgFileName] = dataRow
     return (
       <LabwareItem
         key={key}
@@ -75,10 +77,7 @@ class LabwareDropdown extends React.Component <Props> {
         displayName={displayName}
         selectLabware={selectLabware}
         // TODO: Ian 2018-02-22 If these images stay, factor out this magic URL more obvious (or import them with webpack)
-        labwareImgUrl={img
-          ? `http://docs.opentrons.com/_images/${img}.png`
-          : null
-        }
+        labwareImgUrl={getLabwareDiagramURL(imgFileName)}
       />
     )
   }
