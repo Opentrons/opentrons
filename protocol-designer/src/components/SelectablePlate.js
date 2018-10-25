@@ -121,7 +121,9 @@ export default function SelectablePlate (props: Props) {
                     return {
                       onMouseOver: (e: SyntheticMouseEvent<*>) => {
                         makeOnMouseOverWell && makeOnMouseOverWell(wellName)(e)
-                        makeHandleMouseOverWell(wellName, well.ingreds)(e)
+                        if (well.ingreds) {
+                          makeHandleMouseOverWell(wellName, well.ingreds)(e)
+                        }
                       },
                       onMouseLeave: (e: SyntheticMouseEvent<*>) => {
                         onMouseExitWell && onMouseExitWell(e)
