@@ -443,7 +443,7 @@ def load(name: str, parent: Point, parent_name: str) -> Labware:
     up by name (definition must have been previously stored locally on the
     robot)
 
-    :param name: A string to use for looking up a labware defintion previously
+    :param name: A string to use for looking up a labware definition previously
         saved to disc. The definition file must have been saved in a known
         location with the filename '${name}.json'
     :param parent: A Point representing the critical point for the object
