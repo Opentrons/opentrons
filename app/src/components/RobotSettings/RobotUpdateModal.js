@@ -13,7 +13,7 @@ import {
   setIgnoredUpdate,
 } from '../../http-api-client'
 
-import {getShellUpdateState} from '../../shell'
+import {CURRENT_RELEASE_NOTES, getShellUpdateState} from '../../shell'
 
 import type {ShellUpdateState} from '../../shell'
 
@@ -50,6 +50,11 @@ type Props = {
   ignoreUpdate: () => mixed,
 }
 
+const API_RELEASE_NOTES = CURRENT_RELEASE_NOTES.replace(
+  /<!-- start:@opentrons\/app -->([\S\s]*?)<!-- end:@opentrons\/app -->/,
+  ''
+)
+
 const DOWNGRADE_MSG =
   'Your app is at an older version than your robot. You may want to downgrade your robot to ensure compatability.'
 const UPGRADE_MSG =
@@ -76,7 +81,7 @@ function RobotUpdateModal (props: Props) {
     restart,
     updateRequest,
     restartRequest,
-    appUpdate: {available, info},
+    appUpdate: {available},
   } = props
   const inProgress = updateRequest.inProgress || restartRequest.inProgress
   let closeButtonText = 'not now'
@@ -108,9 +113,6 @@ function RobotUpdateModal (props: Props) {
     ? {disabled: true, children: <Spinner />}
     : {onClick: buttonAction, children: buttonText}
 
-  let source =
-    info && info.releaseNotes ? removeAppNotes(info.releaseNotes) : null
-
   return (
     <ScrollableAlertModal
       heading={heading}
@@ -119,7 +121,7 @@ function RobotUpdateModal (props: Props) {
     >
       {available && <UpdateAppMessage />}
       <UpdateRobotMessage message={message} />
-      <ReleaseNotes source={source} />
+      <ReleaseNotes source={API_RELEASE_NOTES} />
     </ScrollableAlertModal>
   )
 }
@@ -158,13 +160,4 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
         .then(close)
     },
   }
-}
-
-// TODO (ka, 2018-10-1):
-// Grabbing only the api notes removes changes since and technical change log
-
-const RE_APP_NOTES = /<!-- start:@opentrons\/app -->([\S\s]*?)<!-- end:@opentrons\/app -->/
-
-function removeAppNotes (notes: string) {
-  return notes.replace(RE_APP_NOTES, '')
 }
