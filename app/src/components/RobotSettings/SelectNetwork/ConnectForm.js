@@ -62,7 +62,7 @@ export default class ConnectForm extends React.Component<Props, State> {
     })
   }
 
-  getEapFields = (eapMethod: any): Array<WifiAuthField> => {
+  getEapFields = (eapMethod: ?WifiEapOption): Array<WifiAuthField> => {
     return get(eapMethod, 'options', []).map(field => ({
       ...field,
       name: `eapConfig.${field.name}`,
@@ -71,7 +71,7 @@ export default class ConnectForm extends React.Component<Props, State> {
 
   getValidationSchema = (values: any) => {
     let fields = []
-    let errors = {}
+    const errors = {}
     if (this.props.securityType === WPA_PSK_SECURITY) {
       fields = WIFI_PSK_FIELDS
     } else {
@@ -82,8 +82,8 @@ export default class ConnectForm extends React.Component<Props, State> {
     }
     fields.forEach(f => {
       if (f.required && !get(values, f.name)) {
-        set(errors, `${f.name}`, `${f.displayName} is required`)
-      } else if (f.type === 'password' && get(values, f.name).length < 8) {
+        set(errors, f.name, `${f.displayName} is required`)
+      } else if (f.name === 'psk' && get(values, f.name).length < 8) {
         set(errors, `${f.name}`, 'Password must be at least 8 characters')
       }
     })
@@ -98,7 +98,6 @@ export default class ConnectForm extends React.Component<Props, State> {
       ? `${CONNECT_FIELD_ID_PREFIX}${eapMethodField}`
       : ''
 
-    // TODO(mc, 2018-10-18): form validation
     return (
       <Formik
         onSubmit={this.onSubmit}
@@ -113,6 +112,10 @@ export default class ConnectForm extends React.Component<Props, State> {
             errors,
             touched,
           } = formProps
+
+          // disable submit if form is pristine or errors present
+          const disabled = isEmpty(touched) || !isEmpty(errors)
+
           const eapMethod = get(values, eapMethodField)
           let fields: Array<WifiAuthField> = []
 
@@ -163,7 +166,7 @@ export default class ConnectForm extends React.Component<Props, State> {
               <BottomButtonBar
                 buttons={[
                   {children: 'Cancel', onClick: close},
-                  {children: 'Join', type: 'submit'},
+                  {children: 'Join', type: 'submit', disabled},
                 ]}
               />
             </form>
@@ -172,4 +175,12 @@ export default class ConnectForm extends React.Component<Props, State> {
       />
     )
   }
+}
+
+// Helper function to check for empty objects
+function isEmpty (obj) {
+  for (var key in obj) {
+    if (obj.hasOwnProperty(key)) return false
+  }
+  return true
 }

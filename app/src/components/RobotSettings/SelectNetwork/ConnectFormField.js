@@ -76,7 +76,6 @@ export default function ConnectFormField (props: Props) {
         {inputRow}
         <FormTableRow>
           <CheckboxField
-            name="Show password"
             label="Show password"
             value={showPassword}
             onChange={() => toggleShowPassword(name)}
