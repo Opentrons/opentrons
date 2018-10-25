@@ -5,9 +5,6 @@ SHELL := /bin/bash
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
-# set NODE_ENV for a command with $(env)=environment
-env := cross-env NODE_ENV
-
 # dev server port
 port ?= 8081
 
@@ -15,7 +12,7 @@ port ?= 8081
 #####################################################################
 
 .PHONY: all
-all: clean build
+all: clean dist
 
 .PHONY: install
 install:
@@ -28,13 +25,15 @@ clean:
 # artifacts
 #####################################################################
 
-.PHONY: build
-build:
-	$(env)=development styleguidist build
+.PHONY: dist
+dist: export NODE_ENV := development
+dist:
+	styleguidist build
 
 # development
 #####################################################################
 
 .PHONY: dev
+build: export NODE_ENV := development
 dev:
-	$(env)=development styleguidist server
+	styleguidist server

@@ -8,18 +8,23 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # set NODE_ENV for a command with $(env)=environment
 env := cross-env NODE_ENV
 
+# TODO(mc, 2018-10-25): use dist to match other projects
 BUILD_DIR := build
 
 #######################################
 
+.PHONY: all
+all: clean dist
+
 .PHONY: install
 install:
 	yarn
-	$(MAKE) build
+	$(MAKE) dist
 
-.PHONY: build
-build:
-	shx mkdir -p $(BUILD_DIR) && node js/scripts/build.js $(BUILD_DIR)
+.PHONY: dist
+dist:
+	@shx mkdir -p $(BUILD_DIR)
+	node js/scripts/build.js $(BUILD_DIR)
 
 .PHONY: clean
 clean:

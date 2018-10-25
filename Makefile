@@ -42,7 +42,7 @@ install-py:
 .PHONY: install-js
 install-js:
 	yarn
-	$(MAKE) -C $(SHARED_DATA_DIR) build
+	$(MAKE) -C $(SHARED_DATA_DIR)
 	$(MAKE) -C $(DISCOVERY_CLIENT_DIR)
 
 # uninstall all project dependencies

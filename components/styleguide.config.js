@@ -1,34 +1,15 @@
 'use strict'
 
 const path = require('path')
-
-// TODO(mc, 2017-12-22): Create common webpack config
-const {rules} = require('@opentrons/webpack-config')
-
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
-const DEV = process.env.NODE_ENV !== 'production'
-const CSS_OUTPUT_NAME = 'style.css'
+const {baseConfig} = require('@opentrons/webpack-config')
 
 module.exports = {
   styleguideDir: 'dist',
   webpackConfig: {
-    module: {
-      rules: [
-        rules.js,
-        rules.localCss,
-        rules.images,
-      ],
-    },
-    plugins: [
-      new ExtractTextPlugin({
-        filename: CSS_OUTPUT_NAME,
-        disable: DEV,
-        ignoreOrder: true,
-      }),
-    ],
+    module: baseConfig.module,
   },
-  showUsage: true,
-  showCode: true,
+  usageMode: 'expand',
+  exampleMode: 'expand',
   // TODO(mc, 2017-12-22): generate these sections automatically by walking src
   sections: [
     {

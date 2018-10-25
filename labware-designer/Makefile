@@ -9,7 +9,7 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 #####################################################################
 
 .PHONY: all
-all: clean build
+all: clean dist
 
 .PHONY: install
 install:
@@ -22,10 +22,10 @@ clean:
 # artifacts
 #####################################################################
 
-.PHONY: build
-build: export NODE_ENV := production
-build:
-	webpack -p
+.PHONY: dist
+dist: export NODE_ENV := production
+dist:
+	webpack --profile
 
 # development
 #####################################################################

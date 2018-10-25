@@ -5,11 +5,8 @@ SHELL := /bin/bash
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
-# set NODE_ENV for a command with $(env)=environment
-env := cross-env NODE_ENV
-
 # dev server port
-port ?= 8080
+PORT ?= 8080
 
 # standard targets
 #####################################################################
@@ -29,13 +26,14 @@ clean:
 #####################################################################
 
 .PHONY: build
+build: export NODE_ENV := production
 build:
-	$(env)=production webpack -p
-	shx cp index.html dist/
+	webpack --profile
 
 # development
 #####################################################################
 
 .PHONY: dev
+dev: export NODE_ENV := development
 dev:
-	$(env)=development webpack-dev-server --hot
+	webpack-dev-server --hot
