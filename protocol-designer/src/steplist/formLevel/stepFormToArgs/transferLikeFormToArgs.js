@@ -2,6 +2,7 @@
 
 import { getLabware } from '@opentrons/shared-data'
 import intersection from 'lodash/intersection'
+import fill from 'lodash/fill'
 import type { FormData } from '../../../form-types'
 import type {
   ConsolidateFormData,
@@ -158,8 +159,14 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
     errors = {...errors, 'volume': 'Volume must be a positive number'}
   }
   if (stepType === 'transfer' && (sourceWells.length !== destWells.length || sourceWells.length === 0)) {
-    // $FlowFixMe: Cannot assign `'Numbers of...'` to `errors._mismatchedWells` because property `_mismatchedWells` is missing in object literal
-    errors = {...errors, '_mismatchedWells': 'Numbers of wells must match'}
+    if (sourceWells.length === 1 && destWells.length > 1) {
+      sourceWells = fill(Array(destWells.length), sourceWells[0])
+    } else if (sourceWells.length > 1 && destWells.length === 1) {
+      destWells = fill(Array(sourceWells.length), destWells[0])
+    } else {
+      // $FlowFixMe: Cannot assign `'Numbers of...'` to `errors._mismatchedWells` because property `_mismatchedWells` is missing in object literal
+      errors = {...errors, '_mismatchedWells': 'Numbers of wells must match'}
+    }
   }
   if (stepType === 'consolidate' && (sourceWells.length <= 1 || destWells.length !== 1)) {
     // $FlowFixMe: Cannot assign `'Multiple s...'` to `errors._mismatchedWells` because property `_mismatchedWells` is missing in object literal
