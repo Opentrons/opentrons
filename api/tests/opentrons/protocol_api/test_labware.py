@@ -1,3 +1,5 @@
+import json
+import pkgutil
 from opentrons.protocol_api import labware
 from opentrons.types import Point
 
@@ -26,40 +28,45 @@ test_data = {
 
 def test_well_init():
     slot = Point(1, 2, 3)
-    well1 = labware.Well(test_data['circular_well_json'], slot)
-    assert well1._diameter == test_data['circular_well_json']['diameter']
+    well_name = 'circular_well_json'
+    well1 = labware.Well(test_data[well_name], slot, well_name)
+    assert well1._diameter == test_data[well_name]['diameter']
     assert well1._length is None
     assert well1._width is None
 
-    well2 = labware.Well(test_data['rectangular_well_json'], slot)
+    well2_name = 'rectangular_well_json'
+    well2 = labware.Well(test_data[well2_name], slot, well2_name)
     assert well2._diameter is None
-    assert well2._length == test_data['rectangular_well_json']['length']
-    assert well2._width == test_data['rectangular_well_json']['width']
+    assert well2._length == test_data[well2_name]['length']
+    assert well2._width == test_data[well2_name]['width']
 
 
 def test_top():
     slot = Point(4, 5, 6)
-    well = labware.Well(test_data['circular_well_json'], slot)
-    well_data = test_data['circular_well_json']
+    well_name = 'circular_well_json'
+    well = labware.Well(test_data[well_name], slot, well_name)
+    well_data = test_data[well_name]
     expected_x = well_data['x'] + slot.x
     expected_y = well_data['y'] + slot.y
     expected_z = well_data['z'] + well_data['depth'] + slot.z
-    assert well.top() == (expected_x, expected_y, expected_z)
+    assert well.top() == Point(expected_x, expected_y, expected_z)
 
 
 def test_bottom():
     slot = Point(7, 8, 9)
-    well = labware.Well(test_data['rectangular_well_json'], slot)
-    well_data = test_data['rectangular_well_json']
+    well_name = 'rectangular_well_json'
+    well = labware.Well(test_data[well_name], slot, well_name)
+    well_data = test_data[well_name]
     expected_x = well_data['x'] + slot.x
     expected_y = well_data['y'] + slot.y
     expected_z = well_data['z'] + slot.z
-    assert well.bottom() == (expected_x, expected_y, expected_z)
+    assert well.bottom() == Point(expected_x, expected_y, expected_z)
 
 
 def test_from_center_cartesian():
     slot1 = Point(10, 11, 12)
-    well1 = labware.Well(test_data['circular_well_json'], slot1)
+    well_name = 'circular_well_json'
+    well1 = labware.Well(test_data[well_name], slot1, well_name)
 
     percent1_x = 1
     percent1_y = 1
@@ -78,7 +85,8 @@ def test_from_center_cartesian():
     assert point1.z == expected_z
 
     slot2 = Point(13, 14, 15)
-    well2 = labware.Well(test_data['rectangular_well_json'], slot2)
+    well2_name = 'rectangular_well_json'
+    well2 = labware.Well(test_data[well2_name], slot2, well2_name)
     percent2_x = -0.25
     percent2_y = 0.1
     percent2_z = 0.9
@@ -94,3 +102,66 @@ def test_from_center_cartesian():
     assert point2.x == expected_x
     assert point2.y == expected_y
     assert point2.z == expected_z
+
+
+def test_backcompat():
+    labware_name = 'generic_96_wellPlate_380_uL'
+    labware_def = json.loads(
+        pkgutil.get_data('opentrons',
+                         'shared_data/definitions2/{}.json'.format(
+                             labware_name)))
+    lw = labware.Labware(labware_def, Point(0, 0, 0), 'Test Slot')
+
+    # Note that this test uses the display name of wells to test for equality,
+    # because dimensional parameters could be subject to modification through
+    # calibration, whereas here we are testing for "identity" in a way that is
+    # related to the combination of well name, labware name, and slot name
+    well_a1_name = repr(lw.wells_by_index()['A1'])
+    well_b2_name = repr(lw.wells_by_index()['B2'])
+    well_c3_name = repr(lw.wells_by_index()['C3'])
+
+    w0 = lw[0]
+    assert repr(w0) == well_a1_name
+
+    w1 = lw['A1']
+    assert repr(w1) == well_a1_name
+
+    w2 = lw.well(0)
+    assert repr(w2) == well_a1_name
+
+    w3 = lw.well('A1')
+    assert repr(w3) == well_a1_name
+
+    w4 = lw.wells('B2')
+    assert repr(w4[0]) == well_b2_name
+
+    w5 = lw.wells(9, 21, 25, 27)
+    assert len(w5) == 4
+    assert repr(w5[0]) == well_b2_name
+
+    w6 = lw.wells('A1', 'B2', 'C3')
+    assert all([
+        repr(well[0]) == well[1]
+        for well in zip(w6, [well_a1_name, well_b2_name, well_c3_name])])
+
+    w7 = lw.rows('A')
+    assert len(w7) == 1
+    assert repr(w7[0][0]) == well_a1_name
+
+    w8 = lw.rows('A', 'C')
+    assert len(w8) == 2
+    assert repr(w8[0][0]) == well_a1_name
+    assert repr(w8[1][2]) == well_c3_name
+
+    w9 = lw.cols('2')
+    assert len(w9) == 1
+    assert len(w9[0]) == len(labware_def['ordering'][1])
+    assert repr(w9[0][1]) == well_b2_name
+
+    w10 = lw.cols('2', '5')
+    assert len(w10) == 2
+    assert repr(w10[0][1]) == well_b2_name
+
+    w11 = lw.columns('2', '3', '6')
+    assert len(w11) == 3
+    assert repr(w11[1][2]) == well_c3_name

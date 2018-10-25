@@ -24,14 +24,23 @@ persistent_path = os.path.join(env.get_path('APP_DATA_DIR'), 'offsets')
 
 
 class Well:
-    def __init__(self, well_props: dict, parent: Point) -> None:
+    def __init__(
+            self, well_props: dict, parent: Point, display_name: str) -> None:
         """
         Create a well, and track the Point corresponding to the top-center of
         the well (this Point is in absolute deck coordinates)
+
+        :param name: a string that identifies a well. Used primarily for debug
+            and test purposes. Should be unique and human-readable--something
+            like "Tip C3 of Opentrons 300ul Tiprack on Slot 5" or
+            "Well D1 of Biorad 96 PCR Plate on Magnetic Module in Slot 1".
+            This is created by the caller and passed in, so here it is just
+            saved and made available.
         :param well_props: a dict that conforms to the json-schema for a Well
         :param parent: a Point representing the absolute position of the parent
             of the Well (usually the lower-left corner of a labware)
         """
+        self._display_name = display_name
         self._position = Point(
             x=well_props['x'] + parent.x,
             y=well_props['y'] + parent.y,
@@ -116,6 +125,20 @@ class Well:
             y=center.y + (y * (y_size / 2.0)),
             z=center.z + (z * (z_size / 2.0)))
 
+    def __str__(self):
+        return self._display_name
+
+    def __eq__(self, other: 'Well') -> bool:
+        """
+        Assuming that equality of wells in this system is having the same
+        absolute coordinates for the top.
+        :param other:
+        :return:
+        """
+        if not isinstance(other, Well):
+            return NotImplemented
+        return self.top() == other.top()
+
 
 class Labware:
     """
@@ -123,7 +146,10 @@ class Labware:
     tip rack, etc. It defines the physical geometry of the labware, and
     provides methods for accessing wells within the labware.
     """
-    def __init__(self, definition: dict, parent: Point) -> None:
+    def __init__(
+            self, definition: dict, parent: Point, parent_name: str) -> None:
+        self._display_name = "{} on {}".format(
+            definition['metadata']['displayName'], parent_name)
         self._calibrated_offset: Point = Point(0, 0, 0)
         self._wells: List[Well] = []
         # Directly from definition
@@ -148,10 +174,22 @@ class Labware:
         accessor functions. It is only called again if a new offset needs
         to be applied.
         """
-        return [Well(self._well_definition[well], self._calibrated_offset)
-                for well in self._ordering]
+        return [
+            Well(
+                self._well_definition[well],
+                self._calibrated_offset,
+                "{} of {}".format(well, self._display_name))
+            for well in self._ordering]
 
     def _create_indexed_dictionary(self, group=0):
+        """
+        Creates a dict of lists of Wells. Which way the labware is segmented
+        determines whether this is a dict of rows or dict of columns. If group
+        is 1, then it will collect wells that have the same alphabetic prefix
+        and therefore are considered to be in the same row. If group is 2, it
+        will collect wells that have the same numeric postfix and therefore
+        are considered to be in the same column.
+        """
         dict_list = defaultdict(list)
         for index, well_obj in zip(self._ordering, self._wells):
             dict_list[self._pattern.match(index).group(group)].append(well_obj)
@@ -166,7 +204,17 @@ class Labware:
                                         z=self._offset.z + delta.z)
         self._wells = self._build_wells()
 
-    def wells(self) -> List[Well]:
+    def well(self, idx) -> Well:
+        """Deprecated---use result of `wells` or `wells_by_index`"""
+        if isinstance(idx, int):
+            res = self._wells[idx]
+        elif isinstance(idx, str):
+            res = self.wells_by_index()[idx]
+        else:
+            res = NotImplemented
+        return res
+
+    def wells(self, *args) -> List[Well]:
         """
         Accessor function used to generate a list of wells in top -> down,
         left -> right order. This is representative of moving down `rows` and
@@ -175,9 +223,20 @@ class Labware:
         With indexing one can treat it as a typical python
         list. To access well A1, for example, simply write: labware.wells()[0]
 
+        Note that this method takes args for backward-compatibility, but use
+        of args is deprecated and will be removed in future versions.
+
         :return: Ordered list of all wells in a labware
         """
-        return self._wells
+        if not args:
+            res = self._wells
+        elif isinstance(args[0], int):
+            res = [self._wells[idx] for idx in args]
+        elif isinstance(args[0], str):
+            res = [self.wells_by_index()[idx] for idx in args]
+        else:
+            res = NotImplemented
+        return res
 
     def wells_by_index(self) -> Dict[str, Well]:
         """
@@ -192,7 +251,7 @@ class Labware:
         return {well: wellObj
                 for well, wellObj in zip(self._ordering, self._wells)}
 
-    def rows(self) -> List[List[Well]]:
+    def rows(self, *args) -> List[List[Well]]:
         """
         Accessor function used to navigate through a labware by row.
 
@@ -200,11 +259,23 @@ class Labware:
         To access row A for example, simply write: labware.rows()[0]. This
         will output ['A1', 'A2', 'A3', 'A4'...]
 
+        Note that this method takes args for backward-compatibility, but use
+        of args is deprecated and will be removed in future versions.
+
         :return: A list of row lists
         """
         row_dict = self._create_indexed_dictionary(group=1)
         keys = sorted(row_dict)
-        return [row_dict[key] for key in keys]
+
+        if not args:
+            res = [row_dict[key] for key in keys]
+        elif isinstance(args[0], int):
+            res = [row_dict[keys[idx]] for idx in args]
+        elif isinstance(args[0], str):
+            res = [row_dict[idx] for idx in args]
+        else:
+            res = NotImplemented
+        return res
 
     def rows_by_index(self) -> Dict[str, List[Well]]:
         """
@@ -219,7 +290,7 @@ class Labware:
         row_dict = self._create_indexed_dictionary(group=1)
         return row_dict
 
-    def columns(self) -> List[List[Well]]:
+    def columns(self, *args) -> List[List[Well]]:
         """
         Accessor function used to navigate through a labware by column.
 
@@ -228,11 +299,23 @@ class Labware:
         simply write: labware.columns()[0]
         This will output ['A1', 'B1', 'C1', 'D1'...].
 
+        Note that this method takes args for backward-compatibility, but use
+        of args is deprecated and will be removed in future versions.
+
         :return: A list of column lists
         """
         col_dict = self._create_indexed_dictionary(group=2)
         keys = sorted(col_dict)
-        return [col_dict[key] for key in keys]
+
+        if not args:
+            res = [col_dict[key] for key in keys]
+        elif isinstance(args[0], int):
+            res = [col_dict[keys[idx]] for idx in args]
+        elif isinstance(args[0], str):
+            res = [col_dict[idx] for idx in args]
+        else:
+            res = NotImplemented
+        return res
 
     def columns_by_index(self) -> Dict[str, List[Well]]:
         """
@@ -247,6 +330,22 @@ class Labware:
         """
         col_dict = self._create_indexed_dictionary(group=2)
         return col_dict
+
+    def cols(self, *args):
+        """Deprecated--use `columns`"""
+        return self.columns(*args)
+
+    def __repr__(self):
+        return self._display_name
+
+    def __getitem__(self, item):
+        """Deprecated--use `wells` or `wells_by_index`"""
+        if isinstance(item, str):
+            return self.wells_by_index()[item]
+        elif isinstance(item, int):
+            return self.wells()[item]
+        else:
+            return NotImplemented
 
 
 def save_calibration(labware: Labware, delta: Point):
@@ -296,7 +395,6 @@ def _helper_offset_data_format(filepath: str, delta: Point) -> dict:
 
 
 def _read_file(filepath: str) -> dict:
-    calibration_data: dict = {}
     with open(filepath, 'r') as f:
         calibration_data = json.load(f)
     return calibration_data
@@ -311,21 +409,22 @@ def _load_definition_by_name(name: str) -> dict:
     raise NotImplementedError
 
 
-def load(name: str, corner_offset: Point) -> Labware:
+def load(name: str, corner_offset: Point, parent_name: str) -> Labware:
     """
     Return a labware object constructed from a labware definition dict looked
     up by name (definition must have been previously stored locally on the
     robot)
     """
     definition = _load_definition_by_name(name)
-    return load_from_definition(definition, corner_offset)
+    return load_from_definition(definition, corner_offset, parent_name)
 
 
-def load_from_definition(definition: dict, corner_offset: Point) -> Labware:
+def load_from_definition(
+        definition: dict, corner_offset: Point, parent_name: str) -> Labware:
     """
     Return a labware object constructed from a provided labware definition dict
     """
-    labware = Labware(definition, corner_offset)
+    labware = Labware(definition, corner_offset, parent_name)
     load_calibration(labware)
     return labware
 
