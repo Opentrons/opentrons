@@ -141,6 +141,8 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
       return (forms[stepId] && forms[stepId].validatedForm) || null
     })
 
+    console.log({forms, orderedSteps, allFormData})
+
     // TODO: Ian 2018-06-14 `takeWhile` isn't inferring the right type
     // $FlowFixMe
     const continuousValidForms: Array<StepGeneration.CommandCreatorData> = takeWhile(

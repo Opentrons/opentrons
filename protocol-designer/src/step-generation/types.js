@@ -207,6 +207,11 @@ export type PipetteLabwareFields = {|
   /* TODO optional uL/sec (or uL/minute???) speed here */
 |}
 
+export type TouchTipArgs = {|
+  ...PipetteLabwareFields,
+  offsetFromBottomMm?: ?number,
+|}
+
 export type AspirateDispenseArgs = {|
   ...PipetteLabwareFields,
   volume: number,
@@ -217,10 +222,10 @@ export type Command = {|
   command: 'aspirate' | 'dispense',
   params: AspirateDispenseArgs,
 |} | {|
-  command: 'pick-up-tip' | 'drop-tip' | 'touch-tip',
+  command: 'pick-up-tip' | 'drop-tip' | 'blowout',
   params: PipetteLabwareFields,
 |} | {|
-  command: 'blowout',
+  command: 'touch-tip',
   params: {|
     ...PipetteLabwareFields,
     offsetFromBottomMm?: ?number,

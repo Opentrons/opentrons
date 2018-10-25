@@ -178,7 +178,12 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
             pipette.dispense(volume, location)
 
         elif command_type == 'touch-tip':
-            pipette.touch_tip(location)
+            offset_from_top = -1
+            if ('offsetFromBottomMm' in params):
+                offset_from_bottom = params['offsetFromBottomMm']
+                offset_from_top = (
+                    location.properties['depth'] - offset_from_bottom)
+            pipette.touch_tip(location, v_offset=offset_from_top)
 
 
 def execute_protocol(protocol):

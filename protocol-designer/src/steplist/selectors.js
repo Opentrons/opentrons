@@ -297,10 +297,10 @@ export const currentFormCanBeSaved: Selector<boolean | null> = createSelector(
   getSelectedStepId,
   allSteps,
   labwareIngredSelectors.getLabware,
-  (formData, selectedStepId, allSteps, labware) =>
-    ((typeof selectedStepId === 'number') && allSteps[selectedStepId] && formData)
-      ? Object.values(stepFormToArgs(formData, {labware}).errors).length === 0
-      : null
+  (formData, selectedStepId, allSteps, labware) => true
+    // ((typeof selectedStepId === 'number') && allSteps[selectedStepId] && formData)
+    //   ? Object.values(stepFormToArgs(formData, {labware}).errors).length === 0
+    //   : null
 )
 
 export default {

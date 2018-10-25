@@ -1,12 +1,12 @@
 // @flow
 // import cloneDeep from 'lodash/cloneDeep'
 import {noTipOnPipette, pipetteDoesNotExist} from './errorCreators'
-import type {RobotState, CommandCreator, CommandCreatorError, PipetteLabwareFields} from './'
+import type {RobotState, CommandCreator, CommandCreatorError, TouchTipArgs} from './'
 
-const touchTip = (args: PipetteLabwareFields): CommandCreator => (prevRobotState: RobotState) => {
+const touchTip = (args: TouchTipArgs): CommandCreator => (prevRobotState: RobotState) => {
   /** touchTip with given args. Requires tip. */
   const actionName = 'touchTip'
-  const {pipette, labware, well} = args
+  const {pipette, labware, well, offsetFromBottomMm} = args
 
   const pipetteData = prevRobotState.instruments[pipette]
 
@@ -30,6 +30,9 @@ const touchTip = (args: PipetteLabwareFields): CommandCreator => (prevRobotState
       pipette,
       labware,
       well,
+      offsetFromBottomMm: offsetFromBottomMm == null
+        ? undefined
+        : offsetFromBottomMm,
     },
   }]
 
