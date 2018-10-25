@@ -109,7 +109,8 @@ class Robot(object):
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
         self._instruments = {}
-        self.model_by_mount = {'left': None, 'right': None}
+        self.model_by_mount = {'left': {'model': None, 'uuid': None},
+                               'right': {'model': None, 'uuid': None}}
 
         # TODO (artyom, 09182017): once protocol development experience
         # in the light of Session concept is fully fleshed out, we need
@@ -229,8 +230,19 @@ class Robot(object):
     def cache_instrument_models(self):
         log.debug("Updating instrument model cache")
         for mount in self.model_by_mount.keys():
-            self.model_by_mount[mount] = self._driver.read_pipette_model(mount)
-            log.debug("{}: {}".format(mount, self.model_by_mount[mount]))
+            model_value = self._driver.read_pipette_model(mount)
+            if model_value:
+                uuid = self._driver.read_pipette_id(mount)
+            else:
+                uuid = None
+            self.model_by_mount[mount] = {
+                'model': model_value,
+                'uuid': uuid
+            }
+            log.debug("{}: {} [{}]".format(
+                mount,
+                self.model_by_mount[mount]['model'],
+                self.model_by_mount[mount]['uuid']))
 
     def turn_on_button_light(self):
         self._driver.turn_on_blue_button_light()
@@ -800,7 +812,8 @@ class Robot(object):
         left_data = {
                 'mount_axis': 'z',
                 'plunger_axis': 'b',
-                'model': self.model_by_mount['left'],
+                'model': self.model_by_mount['left']['model'],
+                'uuid': self.model_by_mount['left']['uuid']
             }
         left_model = left_data.get('model')
         if left_model:
@@ -810,7 +823,8 @@ class Robot(object):
         right_data = {
                 'mount_axis': 'a',
                 'plunger_axis': 'c',
-                'model': self.model_by_mount['right']
+                'model': self.model_by_mount['right']['model'],
+                'uuid': self.model_by_mount['right']['uuid']
             }
         right_model = right_data.get('model')
         if right_model:

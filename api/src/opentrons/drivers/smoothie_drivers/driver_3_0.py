@@ -364,6 +364,9 @@ class SmoothieDriver_3_0_0:
         if res:
             ret = {'pipette_id': res}
         else:
+            # TODO (ben 20181024): http design leaked way too far down (my
+            # TODO: fault). This should be revised to return a plain value
+            # TODO: and let the caller decide what to do with it.
             ret = {'message': 'Error: Pipette ID read failed'}
         return ret
 

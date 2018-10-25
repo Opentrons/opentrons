@@ -18,16 +18,19 @@ async def test_get_pipettes_uncommissioned(
     monkeypatch.setattr(
         SmoothieDriver_3_0_0, '_read_from_pipette', mock_parse_fail)
 
+
     expected = {
         "left": {
             "mount_axis": "z",
             "plunger_axis": "b",
-            "model": None
+            "model": None,
+            "uuid": None
         },
         "right": {
             "mount_axis": "a",
             "plunger_axis": "c",
-            "model": None
+            "model": None,
+            "uuid": None
         }
     }
 
@@ -42,11 +45,16 @@ async def test_get_pipettes_uncommissioned(
 async def test_get_pipettes(
         virtual_smoothie_env, loop, test_client, monkeypatch):
     test_model = 'p300_multi_v1'
+    test_id = '123abc'
 
     def dummy_read_model(mount):
         return test_model
 
+    def dummy_read_id(mount):
+        return test_id
+
     monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_read_model)
+    monkeypatch.setattr(robot._driver, 'read_pipette_id', dummy_read_id)
     robot.reset()
 
     app = init(loop)
@@ -58,13 +66,15 @@ async def test_get_pipettes(
             'model': test_model,
             'tip_length': model.tip_length,
             'mount_axis': 'z',
-            'plunger_axis': 'b'
+            'plunger_axis': 'b',
+            'uuid': test_id
         },
         'right': {
             'model': test_model,
             'tip_length': model.tip_length,
             'mount_axis': 'a',
-            'plunger_axis': 'c'
+            'plunger_axis': 'c',
+            'uuid': test_id
         }
     }
 
@@ -101,11 +111,16 @@ async def test_get_modules(
 async def test_get_cached_pipettes(
         virtual_smoothie_env, loop, test_client, monkeypatch):
     test_model = 'p300_multi_v1'
+    test_id = '123abc'
 
     def dummy_read_model(mount):
         return test_model
 
+    def dummy_read_id(mount):
+        return test_id
+
     monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_read_model)
+    monkeypatch.setattr(robot._driver, 'read_pipette_id', dummy_read_id)
     robot.reset()
 
     app = init(loop)
@@ -117,13 +132,15 @@ async def test_get_cached_pipettes(
             'model': test_model,
             'tip_length': model.tip_length,
             'mount_axis': 'z',
-            'plunger_axis': 'b'
+            'plunger_axis': 'b',
+            'uuid': test_id
         },
         'right': {
             'model': test_model,
             'tip_length': model.tip_length,
             'mount_axis': 'a',
-            'plunger_axis': 'c'
+            'plunger_axis': 'c',
+            'uuid': test_id
         }
     }
 
@@ -134,11 +151,16 @@ async def test_get_cached_pipettes(
 
     name1 = 'p10_single_v1.3'
     model1 = pipette_config.load(name1)
+    uuid1 = 'fgh876'
 
     def dummy_model(mount):
         return name1
 
+    def dummy_id(mount):
+        return uuid1
+
     monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_model)
+    monkeypatch.setattr(robot._driver, 'read_pipette_id', dummy_id)
 
     resp1 = await cli.get('/pipettes')
     text1 = await resp1.text()
@@ -150,13 +172,15 @@ async def test_get_cached_pipettes(
             'model': name1,
             'tip_length': model1.tip_length,
             'mount_axis': 'z',
-            'plunger_axis': 'b'
+            'plunger_axis': 'b',
+            'uuid': uuid1
         },
         'right': {
             'model': name1,
             'tip_length': model1.tip_length,
             'mount_axis': 'a',
-            'plunger_axis': 'c'
+            'plunger_axis': 'c',
+            'uuid': uuid1
         }
     }
 
