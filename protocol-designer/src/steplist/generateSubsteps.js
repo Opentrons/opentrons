@@ -59,11 +59,10 @@ function transferLikeSubsteps (args: {
   // TODO: Ian 2018-07-31 develop more elegant way to bypass tip handling for simulation/test
   const robotState = cloneDeep(args.robotState)
   robotState.tipState.pipettes = mapValues(robotState.tipState.pipettes, () => true)
-  const {
-    pipette: pipetteId,
-  } = validatedForm
+  const {pipette} = validatedForm
+  const {id: pipetteId} = pipette
 
-  const pipette = allPipetteData[pipetteId]
+  // const pipette = allPipetteData[pipetteId]
 
   // TODO Ian 2018-04-06 use assert here
   if (!pipette) {

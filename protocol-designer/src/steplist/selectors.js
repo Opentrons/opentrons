@@ -4,6 +4,8 @@ import last from 'lodash/last'
 import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
 import max from 'lodash/max'
+import isEmpty from 'lodash/isEmpty'
+import each from 'lodash/each'
 
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {
@@ -12,7 +14,10 @@ import {
   stepFormToArgs,
 } from './formLevel'
 import type {FormError, FormWarning} from './formLevel'
-import {hydrateField} from './fieldLevel'
+import {
+  hydrateField,
+  getFieldErrors,
+} from './fieldLevel'
 import {initialSelectedItemState} from './reducers'
 import type {RootState, OrderedStepsState, SelectableItem} from './reducers'
 import type {BaseState, Selector} from '../types'
@@ -130,22 +135,58 @@ const getSavedForms: Selector<{[StepIdType]: FormData}> = createSelector(
   }
 )
 
+const getHydratedSavedForms: Selector<{[StepIdType]: FormData}> = createSelector(
+  getSavedForms,
+  (baseState: BaseState) => baseState,
+  (_savedForms, _baseState) => {
+    return mapValues(_savedForms, (savedForm) => (
+      mapValues(savedForm, (value, name) => hydrateField(_baseState, name, value))
+    ))
+  }
+)
+
 // TODO Brian 2018-08-21 rename validatedForms -> stepArguments since it should only include
 // the results of translating form data into step generation arguments
 const validatedForms: Selector<{[StepIdType]: ValidFormAndErrors}> = createSelector(
   getSteps,
-  getSavedForms,
+  getHydratedSavedForms,
   orderedStepsSelector,
   labwareIngredSelectors.getLabware,
   (_steps, _savedStepForms, _orderedSteps, _labware) => {
     return reduce(_orderedSteps, (acc, stepId) => {
-      const nextStepData = (_steps[stepId] && _savedStepForms[stepId])
-        ? stepFormToArgs(_savedStepForms[stepId], {labware: _labware})
+      let nextStepData
+      let errors = {}
+      if (_steps[stepId] && _savedStepForms[stepId]) {
+        const savedForm = _savedStepForms[stepId]
+
+        each(savedForm, (value, fieldName) => {
+          const fieldErrors = getFieldErrors(fieldName, value)
+          if (fieldErrors && fieldErrors.length > 0) {
+            errors = {
+              ...errors,
+              field: [
+                ...(errors && errors.fields),
+                ...fieldErrors,
+              ],
+            }
+          }
+        })
+        const formErrors = getFormErrors(savedForm.stepType, savedForm)
+        if (formErrors && formErrors.length > 0) {
+          errors = {...errors, form: formErrors}
+        }
+        if (isEmpty(errors)) {
+          nextStepData = stepFormToArgs(savedForm, {labware: _labware})
+        } else {
+          nextStepData = {errors, validatedForm: null}
+        }
+      } else {
         // NOTE: usually, stepFormData is undefined here b/c there's no saved step form for it:
-        : {
+        nextStepData = {
           errors: {'form': ['no saved form for step ' + stepId]},
           validatedForm: null,
-        } // TODO Ian 2018-03-20 revisit "no saved form for step"
+        }
+      } // TODO Ian 2018-03-20 revisit "no saved form for step"
 
       return {
         ...acc,
