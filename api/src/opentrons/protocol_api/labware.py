@@ -30,9 +30,9 @@ class Well:
         Create a well, and track the Point corresponding to the top-center of
         the well (this Point is in absolute deck coordinates)
 
-        :param name: a string that identifies a well. Used primarily for debug
-            and test purposes. Should be unique and human-readable--something
-            like "Tip C3 of Opentrons 300ul Tiprack on Slot 5" or
+        :param display_name: a string that identifies a well. Used primarily
+            for debug and test purposes. Should be unique and human-readable--
+            something like "Tip C3 of Opentrons 300ul Tiprack on Slot 5" or
             "Well D1 of Biorad 96 PCR Plate on Magnetic Module in Slot 1".
             This is created by the caller and passed in, so here it is just
             saved and made available.
