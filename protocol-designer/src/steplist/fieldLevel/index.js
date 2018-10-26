@@ -22,7 +22,9 @@ export type {
   StepFieldName,
 }
 
-const hydrateLabware = (state, id) => (labwareIngredSelectors.getLabware(state)[id])
+// TODO: BC 2018-10-26 type these with StepFormContextualState
+const hydrateLabware = (state, id) => labwareIngredSelectors.getLabware(state)[id]
+const hydratePipette = (state, id) => pipetteSelectors.pipettesById(state)[id]
 
 type StepFieldHelpers = {
   getErrors?: (mixed) => Array<string>,
@@ -69,7 +71,7 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
   },
   'pipette': {
     getErrors: composeErrors(requiredField),
-    hydrate: (state, id) => pipetteSelectors.pipettesById(state)[id],
+    hydrate: hydratePipette,
   },
   'times': {
     getErrors: composeErrors(requiredField),

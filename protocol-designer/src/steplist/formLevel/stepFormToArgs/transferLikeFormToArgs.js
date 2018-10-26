@@ -9,15 +9,9 @@ import type {
   TransferFormData,
 } from '../../../step-generation'
 import { DEFAULT_CHANGE_TIP_OPTION } from '../../../constants'
-import type { StepFormContext } from './types'
 import { orderWells } from '../../utils'
 
 export const SOURCE_WELL_DISPOSAL_DESTINATION = 'source_well'
-
-type ValidationAndErrors<F> = {
-  errors: {[string]: string},
-  validatedForm: F | null,
-}
 
 function getMixData (formData, checkboxField, volumeField, timesField) {
   // TODO Ian 2018-04-03 is error reporting necessary? Or are only valid inputs allowed in these fields?
@@ -29,12 +23,9 @@ function getMixData (formData, checkboxField, volumeField, timesField) {
     : null
 }
 
-type TransferLikeValidationAndErrors =
-  | ValidationAndErrors<ConsolidateFormData>
-  | ValidationAndErrors<DistributeFormData>
-  | ValidationAndErrors<TransferFormData>
+type TransferLikeStepArgs = ConsolidateFormData | DistributeFormData | TransferFormData
 
-const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): TransferLikeValidationAndErrors => {
+const transferLikeFormToArgs = (formData: FormData): TransferLikeStepArgs => {
   const stepType = formData.stepType
   const pipette = formData['pipette']
   const volume = Number(formData['volume'])
@@ -74,11 +65,11 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
   const changeTip = formData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION
 
   const commonFields = {
-    pipette,
+    pipette: pipette.id,
     volume,
 
-    sourceLabware,
-    destLabware,
+    sourceLabware: sourceLabware.id,
+    destLabware: destLabware.id,
 
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
@@ -104,25 +95,22 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
   sourceWells = sourceWells || []
   destWells = destWells || []
 
-  if (context && context.labware) {
-    const labwareById = context.labware
-    if (stepType !== 'distribute' && sourceLabware) {
-      const sourceLabwareDef = labwareById[sourceLabware] && getLabware(labwareById[sourceLabware].type)
-      if (sourceLabwareDef) {
-        const allWellsOrdered = orderWells(sourceLabwareDef.ordering, aspirate_wellOrder_first, aspirate_wellOrder_second)
-        sourceWells = intersection(allWellsOrdered, sourceWells)
-      } else {
-        console.warn('the specified source labware definition could not be located')
-      }
+  if (stepType !== 'distribute' && sourceLabware) {
+    const sourceLabwareDef = sourceLabware && getLabware(sourceLabware.type)
+    if (sourceLabwareDef) {
+      const allWellsOrdered = orderWells(sourceLabwareDef.ordering, aspirate_wellOrder_first, aspirate_wellOrder_second)
+      sourceWells = intersection(allWellsOrdered, sourceWells)
+    } else {
+      console.warn('the specified source labware definition could not be located')
     }
-    if (stepType !== 'consolidate' && destLabware) {
-      const destLabwareDef = labwareById[destLabware] && getLabware(labwareById[destLabware].type)
-      if (destLabwareDef) {
-        const allWellsOrdered = orderWells(destLabwareDef.ordering, dispense_wellOrder_first, dispense_wellOrder_second)
-        destWells = intersection(allWellsOrdered, destWells)
-      } else {
-        console.warn('the specified destination labware definition could not be located')
-      }
+  }
+  if (stepType !== 'consolidate' && destLabware) {
+    const destLabwareDef = destLabware && getLabware(destLabware.type)
+    if (destLabwareDef) {
+      const allWellsOrdered = orderWells(destLabwareDef.ordering, dispense_wellOrder_first, dispense_wellOrder_second)
+      destWells = intersection(allWellsOrdered, destWells)
+    } else {
+      console.warn('the specified destination labware definition could not be located')
     }
   }
 
@@ -144,86 +132,77 @@ const transferLikeFormToArgs = (formData: FormData, context: StepFormContext): T
   }
 
   // TODO: BC 2018-08-21 remove this old validation logic once no longer preventing save
-  const requiredFieldErrors = [
-    'pipette',
-    'aspirate_labware',
-    'dispense_labware',
-  ].reduce((acc, fieldName) => (!formData[fieldName])
-    ? {...acc, [fieldName]: 'This field is required'}
-    : acc,
-  {})
-  let errors = {...requiredFieldErrors}
-  if (isNaN(volume) || !(volume > 0)) {
-    // $FlowFixMe: Cannot assign `'Volume mus...'` to `errors['volume']` because property `volume` is missing in object literal
-    errors = {...errors, 'volume': 'Volume must be a positive number'}
-  }
-  if (stepType === 'transfer' && (sourceWells.length !== destWells.length || sourceWells.length === 0)) {
-    // $FlowFixMe: Cannot assign `'Numbers of...'` to `errors._mismatchedWells` because property `_mismatchedWells` is missing in object literal
-    errors = {...errors, '_mismatchedWells': 'Numbers of wells must match'}
-  }
-  if (stepType === 'consolidate' && (sourceWells.length <= 1 || destWells.length !== 1)) {
-    // $FlowFixMe: Cannot assign `'Multiple s...'` to `errors._mismatchedWells` because property `_mismatchedWells` is missing in object literal
-    errors = {...errors, '_mismatchedWells': 'Multiple source wells and exactly one destination well is required.'}
-  }
-  if (stepType === 'distribute' && (sourceWells.length !== 1 || destWells.length <= 1)) {
-    // $FlowFixMe: Cannot assign `'Single sou...'` to `errors._mismatchedWells` because property `_mismatchedWells` is missing in object literal
-    errors = {...errors, '_mismatchedWells': 'Single source well and multiple destination wells is required.'}
-  }
+  // const requiredFieldErrors = [
+  //   'pipette',
+  //   'aspirate_labware',
+  //   'dispense_labware',
+  // ].reduce((acc, fieldName) => (!formData[fieldName])
+  //   ? {...acc, [fieldName]: 'This field is required'}
+  //   : acc,
+  // {})
+  // let errors = {...requiredFieldErrors}
+  // if (isNaN(volume) || !(volume > 0)) {
+  //   // $FlowFixMe: Cannot assign `'Volume mus...'` to `errors['volume']` because property `volume` is missing in object literal
+  //   errors = {...errors, 'volume': 'Volume must be a positive number'}
+  // }
+  // if (stepType === 'transfer' && (sourceWells.length !== destWells.length || sourceWells.length === 0)) {
+  //   // $FlowFixMe: Cannot assign `'Numbers of...'` to `errors._mismatchedWells` because property `_mismatchedWells` is missing in object literal
+  //   errors = {...errors, '_mismatchedWells': 'Numbers of wells must match'}
+  // }
+  // if (stepType === 'consolidate' && (sourceWells.length <= 1 || destWells.length !== 1)) {
+  //   // $FlowFixMe: Cannot assign `'Multiple s...'` to `errors._mismatchedWells` because property `_mismatchedWells` is missing in object literal
+  //   errors = {...errors, '_mismatchedWells': 'Multiple source wells and exactly one destination well is required.'}
+  // }
+  // if (stepType === 'distribute' && (sourceWells.length !== 1 || destWells.length <= 1)) {
+  //   // $FlowFixMe: Cannot assign `'Single sou...'` to `errors._mismatchedWells` because property `_mismatchedWells` is missing in object literal
+  //   errors = {...errors, '_mismatchedWells': 'Single source well and multiple destination wells is required.'}
+  // }
 
-  let stepArguments: TransferLikeValidationAndErrors = {errors, validatedForm: null}
   switch (stepType) {
     case 'transfer': {
-      const transferStepArguments: ValidationAndErrors<TransferFormData> = {
-        errors,
-        validatedForm: Object.values(errors).length === 0 ? {
-          ...commonFields,
-          disposalVolume,
-          stepType: 'transfer',
-          sourceWells,
-          destWells,
-          mixBeforeAspirate,
-          name: `Transfer ${formData.id}`, // TODO Ian 2018-04-03 real name for steps
-        } : null,
+      const transferStepArguments: TransferFormData = {
+        ...commonFields,
+        disposalVolume,
+        stepType: 'transfer',
+        sourceWells,
+        destWells,
+        mixBeforeAspirate,
+        name: `Transfer ${formData.id}`, // TODO Ian 2018-04-03 real name for steps
       }
-      stepArguments = transferStepArguments
-      break
+      return transferStepArguments
     }
     case 'consolidate': {
-      const consolidateStepArguments: ValidationAndErrors<ConsolidateFormData> = {
-        errors,
-        validatedForm: Object.values(errors).length === 0 ? {
-          ...commonFields,
-          disposalVolume,
-          mixFirstAspirate,
-          sourceWells,
-          destWell: destWells[0],
-          stepType: 'consolidate',
-          name: `Consolidate ${formData.id}`, // TODO Ian 2018-04-03 real name for steps
-        } : null,
+      const consolidateStepArguments: ConsolidateFormData = {
+        ...commonFields,
+        disposalVolume,
+        mixFirstAspirate,
+        sourceWells,
+        destWell: destWells[0],
+        stepType: 'consolidate',
+        name: `Consolidate ${formData.id}`, // TODO Ian 2018-04-03 real name for steps
       }
-      stepArguments = consolidateStepArguments
-      break
+      return consolidateStepArguments
     }
     case 'distribute': {
-      const distributeStepArguments: ValidationAndErrors<DistributeFormData> = {
-        errors,
-        validatedForm: Object.values(errors).length === 0 ? {
-          ...commonFields,
-          disposalVolume,
-          disposalLabware,
-          disposalWell,
-          mixBeforeAspirate,
-          sourceWell: sourceWells[0],
-          destWells,
-          stepType: 'distribute',
-          name: `Distribute ${formData.id}`, // TODO Ian 2018-04-03 real name for steps
-        } : null,
+      const distributeStepArguments: DistributeFormData = {
+        ...commonFields,
+        disposalVolume,
+        disposalLabware,
+        disposalWell,
+        mixBeforeAspirate,
+        sourceWell: sourceWells[0],
+        destWells,
+        stepType: 'distribute',
+        name: `Distribute ${formData.id}`, // TODO Ian 2018-04-03 real name for steps
       }
-      stepArguments = distributeStepArguments
-      break
+      return distributeStepArguments
+    }
+    default: {
+      // should never hit default, just a sanity check
+      console.error('Called TransferLikeFormToArgs with non Transfer-Like step type')
+      return null
     }
   }
-  return stepArguments
 }
 
 export default transferLikeFormToArgs

@@ -2,6 +2,7 @@
 import cloneDeep from 'lodash/cloneDeep'
 import range from 'lodash/range'
 import mapValues from 'lodash/mapValues'
+import isEmpty from 'lodash/isEmpty'
 
 import substepTimeline from './substepTimeline'
 import {
@@ -59,10 +60,9 @@ function transferLikeSubsteps (args: {
   // TODO: Ian 2018-07-31 develop more elegant way to bypass tip handling for simulation/test
   const robotState = cloneDeep(args.robotState)
   robotState.tipState.pipettes = mapValues(robotState.tipState.pipettes, () => true)
-  const {pipette} = validatedForm
-  const {id: pipetteId} = pipette
+  const {pipette: pipetteId} = validatedForm
 
-  // const pipette = allPipetteData[pipetteId]
+  const pipette = allPipetteData[pipetteId]
 
   // TODO Ian 2018-04-06 use assert here
   if (!pipette) {
@@ -233,7 +233,8 @@ export function generateSubsteps (
 
   // TODO: BC: 2018-08-21 replace old error check with new logic in field, form, and timeline level
   // Don't try to render with form errors. TODO LATER: presentational error state of substeps?
-  if (!valForm || !valForm.validatedForm || Object.values(valForm.errors).length > 0) {
+  if (!valForm || !valForm.validatedForm || !isEmpty(valForm.errors)) {
+    console.log('caught', stepId)
     return null
   }
 

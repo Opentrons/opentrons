@@ -5,40 +5,24 @@ import intersection from 'lodash/intersection'
 import type { FormData } from '../../../form-types'
 import type { MixFormData } from '../../../step-generation'
 import { DEFAULT_CHANGE_TIP_OPTION } from '../../../constants'
-import type { StepFormContext } from './types'
 import { orderWells } from '../../utils'
 
-type ValidationAndErrors<F> = {
-  errors: {[string]: string},
-  validatedForm: F | null,
-}
+type MixStepArgs = MixFormData
 
-const mixFormToArgs = (formData: FormData, context: StepFormContext): ValidationAndErrors<MixFormData> => {
-  const requiredFields = ['pipette', 'labware', 'volume', 'times']
-
-  let errors = {}
-
-  requiredFields.forEach(field => {
-    if (formData[field] == null) {
-      errors[field] = 'This field is required'
-    }
-  })
-
+const mixFormToArgs = (formData: FormData): MixStepArgs => {
   const {labware, pipette} = formData
   const touchTip = !!formData['touchTip']
 
   let wells = formData.wells || []
   const orderFirst = formData.aspirate_wellOrder_first
   const orderSecond = formData.aspirate_wellOrder_second
-  if (context && context.labware && labware) {
-    const labwareById = context.labware
-    const labwareDef = labwareById[labware] && getLabware(labwareById[labware].type)
-    if (labwareDef) {
-      const allWellsOrdered = orderWells(labwareDef.ordering, orderFirst, orderSecond)
-      wells = intersection(allWellsOrdered, wells)
-    } else {
-      console.warn('the specified labware definition could not be located')
-    }
+
+  const labwareDef = labware && getLabware(labware.type)
+  if (labwareDef) {
+    const allWellsOrdered = orderWells(labwareDef.ordering, orderFirst, orderSecond)
+    wells = intersection(allWellsOrdered, wells)
+  } else {
+    console.warn('the specified labware definition could not be located')
   }
 
   const volume = Number(formData.volume) || 0
@@ -59,41 +43,21 @@ const mixFormToArgs = (formData: FormData, context: StepFormContext): Validation
     : null
   // TODO Ian 2018-05-08 delay number parsing errors
 
-  if (wells.length <= 0) {
-    errors.wells = '1 or more wells is required'
-  }
-
-  if (volume <= 0) {
-    errors.volume = 'Volume must be a number greater than 0'
-  }
-
-  if (times <= 0 || !Number.isInteger(times)) {
-    errors.times = 'Number of repetitions must be an integer greater than 0'
-  }
-
-  // TODO: BC 2018-08-21 remove this old validation logic, currently unused
-  const isErrorFree = !(Object.values(errors).length > 0)
-
   return {
-    errors,
-    validatedForm: isErrorFree && labware && pipette
-      ? {
-        stepType: 'mix',
-        name: `Mix ${formData.id}`, // TODO real name for steps
-        description: 'description would be here 2018-03-01', // TODO get from form
-        labware,
-        wells,
-        volume,
-        times,
-        touchTip,
-        delay,
-        changeTip,
-        blowout,
-        pipette,
-        aspirateOffsetFromBottomMm,
-        dispenseOffsetFromBottomMm,
-      }
-      : null,
+    stepType: 'mix',
+    name: `Mix ${formData.id}`, // TODO real name for steps
+    description: 'description would be here 2018-03-01', // TODO get from form
+    labware,
+    wells,
+    volume,
+    times,
+    touchTip,
+    delay,
+    changeTip,
+    blowout,
+    pipette,
+    aspirateOffsetFromBottomMm,
+    dispenseOffsetFromBottomMm,
   }
 }
 

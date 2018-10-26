@@ -5,7 +5,6 @@ import type { CommandCreatorData } from '../../../step-generation'
 import mixFormToArgs from './mixFormToArgs'
 import pauseFormToArgs from './pauseFormToArgs'
 import transferLikeFormToArgs from './transferLikeFormToArgs'
-import type { StepFormContext } from './types'
 
 export type ValidFormAndErrors = {
   errors: {[string]: string},
@@ -16,16 +15,16 @@ export type ValidFormAndErrors = {
 // to create arguments that the step generation service is expecting
 // in order to generate command creators
 
-const stepFormToArgs = (formData: FormData, context?: StepFormContext = {}): * => { // really returns ValidFormAndErrors
+const stepFormToArgs = (formData: FormData): StepArgs => { // really returns ValidFormAndErrors
   switch (formData.stepType) {
     case 'transfer':
     case 'consolidate':
     case 'distribute':
-      return transferLikeFormToArgs(formData, context)
+      return transferLikeFormToArgs(formData)
     case 'pause':
       return pauseFormToArgs(formData)
     case 'mix':
-      return mixFormToArgs(formData, context)
+      return mixFormToArgs(formData)
     default:
       return {
         errors: {_form: `Unsupported step type: ${formData.stepType}`},

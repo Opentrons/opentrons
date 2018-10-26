@@ -10,7 +10,7 @@ import type {PipetteData} from '../step-generation'
 
 type PipettesById = {[pipetteId: string]: PipetteData}
 
-const rootSelector = (state: BaseState) => state.pipettes.pipettes
+export const rootSelector = (state: BaseState) => state.pipettes
 
 export const pipettesById = createSelector(
   rootSelector,
@@ -54,7 +54,7 @@ export const equippedPipetteOptions: Selector<Array<DropdownOption>> = createSel
           },
         ]
         : acc,
-      [])
+    [])
   }
 )
 
