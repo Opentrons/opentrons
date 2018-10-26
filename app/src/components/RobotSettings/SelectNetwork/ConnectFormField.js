@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-
+import get from 'lodash/get'
 import {InputField, CheckboxField, DropdownField} from '@opentrons/components'
 import {FormTableRow} from './FormTable'
 
@@ -12,12 +12,27 @@ type Props = {
   showPassword: boolean,
   onChange: (*) => mixed,
   toggleShowPassword: (name: string) => mixed,
+  errors: {
+    [string]: string,
+  },
+  touched: {
+    [string]: boolean,
+  },
+  onBlur: (SyntheticFocusEvent<*>) => mixed,
 }
 
 export const CONNECT_FIELD_ID_PREFIX = '__ConnectForm__'
 
 export default function ConnectFormField (props: Props) {
-  const {value, showPassword, onChange, toggleShowPassword} = props
+  const {
+    value,
+    showPassword,
+    onChange,
+    toggleShowPassword,
+    onBlur,
+    touched,
+    errors,
+  } = props
   const {name, displayName, type, required} = props.field
   const id = `${CONNECT_FIELD_ID_PREFIX}${name}`
   const label = required ? `* ${displayName}:` : `${displayName}:`
@@ -25,7 +40,6 @@ export default function ConnectFormField (props: Props) {
 
   if (type === 'string' || type === 'password') {
     const inputType = type === 'string' || showPassword ? 'text' : 'password'
-
     input = (
       <InputField
         id={id}
@@ -33,6 +47,8 @@ export default function ConnectFormField (props: Props) {
         type={inputType}
         value={value}
         onChange={onChange}
+        error={get(touched, name) && get(errors, name)}
+        onBlur={onBlur}
       />
     )
   } else if (type === 'file') {
