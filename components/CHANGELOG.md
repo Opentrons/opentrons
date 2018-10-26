@@ -4,17 +4,9 @@ All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
 <a name="3.5.1"></a>
-## [3.5.1](https://github.com/Opentrons/opentrons/compare/v3.5.0-beta.1...v3.5.1) (2018-10-26)
+## [3.5.1](https://github.com/Opentrons/opentrons/compare/v3.5.0...v3.5.1) (2018-10-26)
 
-
-### Features
-
-* **protocol-designer:** add tooltip for labware name/type on steplist ([#2497](https://github.com/Opentrons/opentrons/issues/2497)) ([4890374](https://github.com/Opentrons/opentrons/commit/4890374)), closes [#2421](https://github.com/Opentrons/opentrons/issues/2421)
-* **protocol-designer:** liquid tooltips on well selection, popper and portal ([#2521](https://github.com/Opentrons/opentrons/issues/2521)) ([12d8adb](https://github.com/Opentrons/opentrons/commit/12d8adb)), closes [#2487](https://github.com/Opentrons/opentrons/issues/2487)
-* **protocol-designer:** replace liquid placement form ([#2518](https://github.com/Opentrons/opentrons/issues/2518)) ([3a6b06f](https://github.com/Opentrons/opentrons/commit/3a6b06f)), closes [#2429](https://github.com/Opentrons/opentrons/issues/2429)
-* **protocol-designer:** use formik for liquid edit form ([#2512](https://github.com/Opentrons/opentrons/issues/2512)) ([3e7456f](https://github.com/Opentrons/opentrons/commit/3e7456f)), closes [#2460](https://github.com/Opentrons/opentrons/issues/2460)
-
-
+**Note:** Version bump only for package @opentrons/components
 
 
 

@@ -4,18 +4,10 @@ All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
 <a name="3.5.1"></a>
-## [3.5.1](https://github.com/Opentrons/opentrons/compare/v3.5.0-beta.1...v3.5.1) (2018-10-26)
+## [3.5.1](https://github.com/Opentrons/opentrons/compare/v3.5.0...v3.5.1) (2018-10-26)
 
 
-### Bug Fixes
-
-* **shared-data:** Fix corner offset from slot logic; add in container offset to well coordinates ([#2519](https://github.com/Opentrons/opentrons/issues/2519)) ([c79684b](https://github.com/Opentrons/opentrons/commit/c79684b))
-
-
-### Features
-
-* **api:** Add error checking on generated labware def ([#2476](https://github.com/Opentrons/opentrons/issues/2476)) ([242ffe4](https://github.com/Opentrons/opentrons/commit/242ffe4))
-
+**Note:** Version bump only for package @opentrons/shared-data
 
 
 

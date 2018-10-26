@@ -4,15 +4,10 @@ All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
 <a name="3.5.1"></a>
-## [3.5.1](https://github.com/Opentrons/opentrons/compare/v3.5.0-beta.1...v3.5.1) (2018-10-26)
+## [3.5.1](https://github.com/Opentrons/opentrons/compare/v3.5.0...v3.5.1) (2018-10-26)
 
 
-### Bug Fixes
-
-* **api:** Write .env with absolute path for conf on make install ([#2500](https://github.com/Opentrons/opentrons/issues/2500)) ([ec469ed](https://github.com/Opentrons/opentrons/commit/ec469ed)), closes [#2495](https://github.com/Opentrons/opentrons/issues/2495)
-
-
-
+**Note:** Version bump only for package @opentrons/discovery-client
 
 
 <a name="3.5.0"></a>
