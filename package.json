@@ -2,7 +2,7 @@
   "name": "opentrons",
   "private": true,
   "workspaces": [
-    "api/opentrons",
+    "api/src/opentrons",
     "app",
     "app-shell",
     "components",
