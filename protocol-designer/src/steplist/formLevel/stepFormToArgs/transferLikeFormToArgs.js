@@ -23,7 +23,7 @@ function getMixData (formData, checkboxField, volumeField, timesField) {
     : null
 }
 
-type TransferLikeStepArgs = ConsolidateFormData | DistributeFormData | TransferFormData
+type TransferLikeStepArgs = ConsolidateFormData | DistributeFormData | TransferFormData | null
 
 const transferLikeFormToArgs = (formData: FormData): TransferLikeStepArgs => {
   const stepType = formData.stepType
@@ -130,33 +130,6 @@ const transferLikeFormToArgs = (formData: FormData): TransferLikeStepArgs => {
       disposalWell = 'A1'
     }
   }
-
-  // TODO: BC 2018-08-21 remove this old validation logic once no longer preventing save
-  // const requiredFieldErrors = [
-  //   'pipette',
-  //   'aspirate_labware',
-  //   'dispense_labware',
-  // ].reduce((acc, fieldName) => (!formData[fieldName])
-  //   ? {...acc, [fieldName]: 'This field is required'}
-  //   : acc,
-  // {})
-  // let errors = {...requiredFieldErrors}
-  // if (isNaN(volume) || !(volume > 0)) {
-  //   // $FlowFixMe: Cannot assign `'Volume mus...'` to `errors['volume']` because property `volume` is missing in object literal
-  //   errors = {...errors, 'volume': 'Volume must be a positive number'}
-  // }
-  // if (stepType === 'transfer' && (sourceWells.length !== destWells.length || sourceWells.length === 0)) {
-  //   // $FlowFixMe: Cannot assign `'Numbers of...'` to `errors._mismatchedWells` because property `_mismatchedWells` is missing in object literal
-  //   errors = {...errors, '_mismatchedWells': 'Numbers of wells must match'}
-  // }
-  // if (stepType === 'consolidate' && (sourceWells.length <= 1 || destWells.length !== 1)) {
-  //   // $FlowFixMe: Cannot assign `'Multiple s...'` to `errors._mismatchedWells` because property `_mismatchedWells` is missing in object literal
-  //   errors = {...errors, '_mismatchedWells': 'Multiple source wells and exactly one destination well is required.'}
-  // }
-  // if (stepType === 'distribute' && (sourceWells.length !== 1 || destWells.length <= 1)) {
-  //   // $FlowFixMe: Cannot assign `'Single sou...'` to `errors._mismatchedWells` because property `_mismatchedWells` is missing in object literal
-  //   errors = {...errors, '_mismatchedWells': 'Single source well and multiple destination wells is required.'}
-  // }
 
   switch (stepType) {
     case 'transfer': {

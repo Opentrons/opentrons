@@ -42,18 +42,15 @@ function createPipette (
   }
 }
 
-export type PipetteReducerState = {
-  byMount: {|
-    left: ?string,
-    right: ?string,
-  |},
-  byId: {
-    [pipetteId: string]: PipetteData,
-  },
-}
+export type PipetteIdByMount = {|
+  left: ?string,
+  right: ?string,
+|}
+
+export type PipetteById = {[pipetteId: string]: PipetteData}
 
 const byId = handleActions({
-  LOAD_FILE: (state: PipetteReducerState, action: LoadFileAction): PipetteReducerState => {
+  LOAD_FILE: (state: PipetteById, action: LoadFileAction): PipetteById => {
     const file = action.payload
     const {pipettes} = file
     // TODO: Ian 2018-06-29 create fns to access ProtocolFile data
@@ -66,9 +63,9 @@ const byId = handleActions({
     }, {})
   },
   CREATE_NEW_PROTOCOL: (
-    state: PipetteReducerState,
+    state: PipetteById,
     action: {payload: NewProtocolFields}
-  ): PipetteReducerState => {
+  ): PipetteById => {
     const {left, right} = action.payload
 
     const leftPipette = (left.pipetteModel && left.tiprackModel)
@@ -79,7 +76,7 @@ const byId = handleActions({
       ? createPipette('right', right.pipetteModel, right.tiprackModel)
       : null
 
-    const newPipettes = ([leftPipette, rightPipette]).reduce(
+    const newPipettes: PipetteById = ([leftPipette, rightPipette]).reduce(
       (acc: {[string]: PipetteData}, pipette: ?PipetteData) => {
         if (!pipette) return acc
         return {
@@ -89,15 +86,15 @@ const byId = handleActions({
       }, {})
 
     return {
-      ...state.byId,
+      ...state,
       ...newPipettes,
     }
   },
   SWAP_PIPETTES: (
-    state: PipetteReducerState,
+    state: PipetteById,
     action: {payload: NewProtocolFields}
-  ): PipetteReducerState => {
-    return mapValues(state.byId, (pipette: PipetteData): PipetteData => ({
+  ): PipetteById => {
+    return mapValues(state, (pipette: PipetteData): PipetteData => ({
       ...pipette,
       mount: (pipette.mount === 'left') ? 'right' : 'left',
     }))
@@ -105,7 +102,7 @@ const byId = handleActions({
 }, {})
 
 const byMount = handleActions({
-  LOAD_FILE: (state: PipetteReducerState, action: LoadFileAction): PipetteReducerState => {
+  LOAD_FILE: (state: PipetteIdByMount, action: LoadFileAction): PipetteIdByMount => {
     const file = action.payload
     const {pipettes} = file
     // TODO: Ian 2018-06-29 create fns to access ProtocolFile data
@@ -116,9 +113,9 @@ const byMount = handleActions({
     }
   },
   CREATE_NEW_PROTOCOL: (
-    state: PipetteReducerState,
+    state: PipetteIdByMount,
     action: {payload: NewProtocolFields}
-  ): PipetteReducerState => {
+  ): PipetteIdByMount => {
     const {left, right} = action.payload
 
     const leftPipette = (left.pipetteModel && left.tiprackModel)
@@ -130,13 +127,13 @@ const byMount = handleActions({
       : null
 
     return {
-      left: leftPipette ? leftPipette.id : state.byMount.left,
-      right: rightPipette ? rightPipette.id : state.byMount.right,
+      left: leftPipette ? leftPipette.id : state.left,
+      right: rightPipette ? rightPipette.id : state.right,
     }
   },
-  SWAP_PIPETTES: (state: PipetteReducerState, action: {payload: NewProtocolFields}): PipetteReducerState => ({
-    left: state.byMount.right,
-    right: state.byMount.left,
+  SWAP_PIPETTES: (state: PipetteIdByMount, action: {payload: NewProtocolFields}): PipetteIdByMount => ({
+    left: state.right,
+    right: state.left,
   }),
 }, {left: null, right: null})
 
@@ -145,6 +142,9 @@ const _allReducers = {
   byId,
 }
 
-export type RootState = PipetteReducerState
+export type RootState = {
+  byId: PipetteById,
+  byMount: PipetteIdByMount,
+}
 
 export const rootReducer = combineReducers(_allReducers)
