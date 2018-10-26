@@ -351,8 +351,8 @@ class SmoothieDriver_3_0_0:
 
     def read_pipette_id(self, mount):
         '''
-        Reads in an attached pipette's UUID
-        The UUID is unique to this pipette, and is a string of unknown length
+        Reads in an attached pipette's ID
+        The ID is unique to this pipette, and is a string of unknown length
 
         mount:
             String (str) with value 'left' or 'right'
@@ -396,8 +396,8 @@ class SmoothieDriver_3_0_0:
 
     def write_pipette_id(self, mount, data_string):
         '''
-        Writes to an attached pipette's UUID memory location
-        The UUID is unique to this pipette, and is a string of unknown length
+        Writes to an attached pipette's ID memory location
+        The ID is unique to this pipette, and is a string of unknown length
 
         NOTE: To enable write-access to the pipette, it's button must be held
 

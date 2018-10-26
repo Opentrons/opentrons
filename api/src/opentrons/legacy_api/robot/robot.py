@@ -228,21 +228,43 @@ class Robot(object):
         return self
 
     def cache_instrument_models(self):
+        """
+        Queries Smoothie for the model and ID strings of attached pipettes, and
+        saves them so they can be reported without querying Smoothie again (as
+        this could interrupt a command if done during a run or other movement).
+
+        Shape of return dict should be:
+
+        ```
+        {
+          "left": {
+            "model": "<model_string>" or None,
+            "id": "<pipette_id_string>" or None
+          },
+          "right": {
+            "model": "<model_string>" or None,
+            "id": "<pipette_id_string>" or None
+          }
+        }
+        ```
+
+        :return: a dict with pipette data (shape described above)
+        """
         log.debug("Updating instrument model cache")
         for mount in self.model_by_mount.keys():
             model_value = self._driver.read_pipette_model(mount)
             if model_value:
-                uuid = self._driver.read_pipette_id(mount)
+                id_response = self._driver.read_pipette_id(mount)
             else:
-                uuid = None
+                id_response = None
             self.model_by_mount[mount] = {
                 'model': model_value,
-                'uuid': uuid
+                'id': id_response
             }
             log.debug("{}: {} [{}]".format(
                 mount,
                 self.model_by_mount[mount]['model'],
-                self.model_by_mount[mount]['uuid']))
+                self.model_by_mount[mount]['id']))
 
     def turn_on_button_light(self):
         self._driver.turn_on_blue_button_light()
@@ -813,7 +835,7 @@ class Robot(object):
                 'mount_axis': 'z',
                 'plunger_axis': 'b',
                 'model': self.model_by_mount['left']['model'],
-                'uuid': self.model_by_mount['left']['uuid']
+                'id': self.model_by_mount['left']['id']
             }
         left_model = left_data.get('model')
         if left_model:
@@ -824,7 +846,7 @@ class Robot(object):
                 'mount_axis': 'a',
                 'plunger_axis': 'c',
                 'model': self.model_by_mount['right']['model'],
-                'uuid': self.model_by_mount['right']['uuid']
+                'id': self.model_by_mount['right']['id']
             }
         right_model = right_data.get('model')
         if right_model:

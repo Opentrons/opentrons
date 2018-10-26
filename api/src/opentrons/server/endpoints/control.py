@@ -29,14 +29,14 @@ async def get_attached_pipettes(request):
         'tip_length': 51.7,
         'mount_axis': 'z',
         'plunger_axis': 'b',
-        'uuid': '<pipette id string>'
+        'id': '<pipette id string>'
       },
       'right': {
         'model': 'p10_multi_v1',
         'tip_length': 40,
         'mount_axis': 'a',
         'plunger_axis': 'c',
-        'uuid': '<pipette id string>'
+        'id': '<pipette id string>'
       }
     }
     ```

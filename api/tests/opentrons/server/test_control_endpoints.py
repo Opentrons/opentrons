@@ -18,19 +18,18 @@ async def test_get_pipettes_uncommissioned(
     monkeypatch.setattr(
         SmoothieDriver_3_0_0, '_read_from_pipette', mock_parse_fail)
 
-
     expected = {
         "left": {
             "mount_axis": "z",
             "plunger_axis": "b",
             "model": None,
-            "uuid": None
+            "id": None
         },
         "right": {
             "mount_axis": "a",
             "plunger_axis": "c",
             "model": None,
-            "uuid": None
+            "id": None
         }
     }
 
@@ -67,14 +66,14 @@ async def test_get_pipettes(
             'tip_length': model.tip_length,
             'mount_axis': 'z',
             'plunger_axis': 'b',
-            'uuid': test_id
+            'id': test_id
         },
         'right': {
             'model': test_model,
             'tip_length': model.tip_length,
             'mount_axis': 'a',
             'plunger_axis': 'c',
-            'uuid': test_id
+            'id': test_id
         }
     }
 
@@ -133,14 +132,14 @@ async def test_get_cached_pipettes(
             'tip_length': model.tip_length,
             'mount_axis': 'z',
             'plunger_axis': 'b',
-            'uuid': test_id
+            'id': test_id
         },
         'right': {
             'model': test_model,
             'tip_length': model.tip_length,
             'mount_axis': 'a',
             'plunger_axis': 'c',
-            'uuid': test_id
+            'id': test_id
         }
     }
 
@@ -151,13 +150,13 @@ async def test_get_cached_pipettes(
 
     name1 = 'p10_single_v1.3'
     model1 = pipette_config.load(name1)
-    uuid1 = 'fgh876'
+    id1 = 'fgh876'
 
     def dummy_model(mount):
         return name1
 
     def dummy_id(mount):
-        return uuid1
+        return id1
 
     monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_model)
     monkeypatch.setattr(robot._driver, 'read_pipette_id', dummy_id)
@@ -173,14 +172,14 @@ async def test_get_cached_pipettes(
             'tip_length': model1.tip_length,
             'mount_axis': 'z',
             'plunger_axis': 'b',
-            'uuid': uuid1
+            'id': id1
         },
         'right': {
             'model': name1,
             'tip_length': model1.tip_length,
             'mount_axis': 'a',
             'plunger_axis': 'c',
-            'uuid': uuid1
+            'id': id1
         }
     }
 
