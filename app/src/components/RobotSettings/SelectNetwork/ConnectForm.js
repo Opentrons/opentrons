@@ -4,6 +4,7 @@ import {Formik} from 'formik'
 import get from 'lodash/get'
 import find from 'lodash/find'
 import set from 'lodash/set'
+import isEmpty from 'lodash/isEmpty'
 
 import {WPA_PSK_SECURITY, WPA_EAP_SECURITY} from '../../../http-api-client'
 
@@ -84,7 +85,7 @@ export default class ConnectForm extends React.Component<Props, State> {
       if (f.required && !get(values, f.name)) {
         set(errors, f.name, `${f.displayName} is required`)
       } else if (f.name === 'psk' && get(values, f.name).length < 8) {
-        set(errors, `${f.name}`, 'Password must be at least 8 characters')
+        set(errors, f.name, 'Password must be at least 8 characters')
       }
     })
     return errors
@@ -175,12 +176,4 @@ export default class ConnectForm extends React.Component<Props, State> {
       />
     )
   }
-}
-
-// Helper function to check for empty objects
-function isEmpty (obj) {
-  for (var key in obj) {
-    if (obj.hasOwnProperty(key)) return false
-  }
-  return true
 }
