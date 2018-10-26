@@ -65,7 +65,7 @@ class Robot(object):
     This class is the main interface to the robot.
 
     It should never be instantiated directly; instead, the global instance may
-    be accessed at :py:attr:``opentrons.robot``.
+    be accessed at :py:attr:`opentrons.robot`.
 
     Through this class you can can:
         * define your :class:`opentrons.Deck`
@@ -958,3 +958,12 @@ class Robot(object):
         )
         placeable_tallest_point = pose_tracker.max_z(self.poses, placeable)
         return placeable_coordinate[2] + placeable_tallest_point
+
+    def update_config(self, **kwargs):
+        """ Replace configuration values.
+
+        kwargs should contain configuration keys. For instance:
+        `robot.update_config(name='Grace Hopper')` will update the `name` key
+        of the configuration.
+        """
+        self.config._replace(**kwargs)

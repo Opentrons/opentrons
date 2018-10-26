@@ -23,18 +23,26 @@ if not ff.split_labware_definitions():
     database_migration.check_version_and_perform_necessary_migrations()
 
 if ff.use_protocol_api_v2():
-    import protocol_api
-    from protocol_api.back_compat\
-        import robot, reset as bcreset, instruments, containers, labware,\
-        modules
+    import opentrons.hardware_control as hardware_control
+    try:
+        hardware = hardware_control.API.build_hardware_controller()
+        """ The global singleton of :py:class:`.hardware_control.API`.
 
-    def reset():
-        ctx = protocol_api.ProtocolContext()
-        bcreset(ctx)
-
-else:
-    from .legacy_api.api\
+        If this is running on a real robot (and no other Python process
+        is running on the robot) it will be connected to the actual
+        hardware. Otherwise, it will be a simulator.
+        """
+    except RuntimeError:
+        hardware = hardware_control.API.build_hardware_simulator()
+    from opentrons.protocol_api.back_compat\
         import robot, reset, instruments, containers, labware, modules
+else:
+    from .legacy_api.api import (robot,  # type: ignore
+                                 reset,  # type: ignore
+                                 instruments,  # type: ignore
+                                 containers,  # type: ignore
+                                 labware,  # type: ignore
+                                 modules)  # type: ignore
 
 
 __all__ = ['containers', 'instruments', 'labware', 'robot', 'reset',

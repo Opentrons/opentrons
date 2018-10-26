@@ -41,6 +41,7 @@ class Deck(UserDict):
                                               idx//3 * row_offset,
                                               0)
                            for idx in range(12)}
+        self._highest_z = 0.0
 
     @staticmethod
     def _assure_int(key: object) -> int:
@@ -68,7 +69,13 @@ class Deck(UserDict):
         return self.data[self._check_name(key)]
 
     def __delitem__(self, key: types.DeckLocation) -> None:
-        self.data[self._check_name(key)] = None
+        checked_key = self._check_name(key)
+        old = self.data[checked_key]
+        self.data[checked_key] = None
+        if old:
+            self._highest_z = 0.0
+            for item in [lw for lw in self.data.values() if lw]:
+                self._highest_z = max(item.wells()[0].top().z, self._highest_z)
 
     def __setitem__(self, key: types.DeckLocation, val: Labware) -> None:
         key_int = self._check_name(key)
@@ -76,6 +83,7 @@ class Deck(UserDict):
             raise ValueError('Deck location {} already has an item: {}'
                              .format(key, self.data[key_int]))
         self.data[key_int] = val
+        self._highest_z = max(val.wells()[0].top().z, self._highest_z)
 
     def __contains__(self, key: object) -> bool:
         try:
@@ -87,3 +95,8 @@ class Deck(UserDict):
     def position_for(self, key: types.DeckLocation) -> types.Point:
         key_int = self._check_name(key)
         return self._positions[key_int]
+
+    @property
+    def highest_z(self) -> float:
+        """ Return the tallest known point on the deck. """
+        return self._highest_z

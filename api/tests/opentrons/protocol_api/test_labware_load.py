@@ -33,7 +33,5 @@ def test_from_backcompat(monkeypatch, loop):
     def dummy_load(labware):
         return labware_def
     monkeypatch.setattr(papi.labware, '_load_definition_by_name', dummy_load)
-    ctx = papi.ProtocolContext(loop=loop)
-    papi.back_compat.reset(ctx)
     lw = papi.back_compat.labware.load(labware_name, 3)
-    assert lw == ctx.loaded_labwares[3]
+    assert lw == papi.back_compat.robot.loaded_labwares[3]

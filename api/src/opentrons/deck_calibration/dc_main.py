@@ -215,8 +215,7 @@ class CLITool:
         log.debug("save_mount_offset mxyz: {}".format((mx, my, mz)))
         offset = (mx - dx, my - dy, mz - dz)
         log.debug("save_mount_offset mount offset: {}".format(offset))
-        robot.config = robot.config._replace(
-            mount_offset=offset)
+        robot.update_config(mount_offset=offset)
         msg = 'saved mount-offset: {}'.format(
             robot.config.mount_offset)
         return msg
@@ -244,8 +243,7 @@ class CLITool:
         log.debug("save_transform calibration_matrix: {}".format(
             gantry_calibration))
 
-        robot.config = robot.config._replace(
-            gantry_calibration=gantry_calibration)
+        robot.update_config(gantry_calibration=gantry_calibration)
         res = str(robot.config)
 
         return '{}\n{}'.format(res, save_config())
@@ -341,14 +339,14 @@ class CLITool:
 def probe(tip_length: float) -> str:
     robot.reset()
 
-    pipette = instruments.Pipette(
-        mount='right', channels=1, max_volume=1000, ul_per_mm=1000)
+    # TODO seth, 10/29/2018: Change this to not use a deprecated ctor
+    pipette = instruments.Pipette(  # type: ignore
+        mount='right', channels=1,
+        max_volume=1000, ul_per_mm=1000)
     probe_center = tuple(probe_instrument(
         pipette, robot, tip_length=tip_length))
     log.debug("Setting probe center to {}".format(probe_center))
-    robot.config = robot.config._replace(
-        probe_center=probe_center
-    )
+    robot.update_config(probe_center=probe_center)
     return 'Tip probe'
 
 

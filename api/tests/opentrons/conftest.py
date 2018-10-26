@@ -396,9 +396,9 @@ def running_on_pi():
                            '(probably windows)')
 @pytest.fixture
 def cntrlr_mock_connect(monkeypatch):
-    def mock_connect(s):
+    def mock_connect(obj, port=None):
         return
-    monkeypatch.setattr(hc.Controller, '_connect', mock_connect)
+    monkeypatch.setattr(hc.Controller, 'connect', mock_connect)
 
 
 setup_testing_env()

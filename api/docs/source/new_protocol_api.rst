@@ -1,6 +1,24 @@
 New Protocol API
 ================
 
+Backwards Compatibility
+-----------------------
+
+.. automodule:: opentrons.protocol_api.back_compat
+
+.. autoclass:: opentrons.protocol_api.back_compat.BCRobot
+   :members:
+
+.. autoclass:: opentrons.protocol_api.back_compat.BCInstruments
+   :members:
+
+.. autoclass:: opentrons.protocol_api.back_compat.BCLabware
+   :members:
+
+.. autoclass:: opentrons.protocol_api.back_compat.BCModules
+   :members:
+
+
 Robot and Pipette
 -----------------
 .. module:: opentrons.protocol_api.contexts
