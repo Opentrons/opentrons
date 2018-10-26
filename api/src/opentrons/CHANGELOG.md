@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.5.1"></a>
+## [3.5.1](https://github.com/Opentrons/opentrons/compare/v3.5.0-beta.1...v3.5.1) (2018-10-26)
+
+
+### Bug Fixes
+
+* **api:** Correct GET /wifi/keys response to match documentation ([#2532](https://github.com/Opentrons/opentrons/issues/2532)) ([9e577b2](https://github.com/Opentrons/opentrons/commit/9e577b2))
+* **api:** Fix height of p1000 tip rack definition ([#2547](https://github.com/Opentrons/opentrons/issues/2547)) ([8a92e82](https://github.com/Opentrons/opentrons/commit/8a92e82))
+
+
+### Features
+
+* **api:** Add ability to save new delta from calibrating labware ([#2503](https://github.com/Opentrons/opentrons/issues/2503)) ([a6e3a24](https://github.com/Opentrons/opentrons/commit/a6e3a24))
+* **api:** Clear labware calibrations in new labware system ([#2513](https://github.com/Opentrons/opentrons/issues/2513)) ([cb3d12e](https://github.com/Opentrons/opentrons/commit/cb3d12e)), closes [#2276](https://github.com/Opentrons/opentrons/issues/2276)
+* **api:** Use deck-absolute coords in hardware_control ([#2502](https://github.com/Opentrons/opentrons/issues/2502)) ([36c9f73](https://github.com/Opentrons/opentrons/commit/36c9f73)), closes [#2238](https://github.com/Opentrons/opentrons/issues/2238)
+
+
+
+
+
 <a name="3.5.0-beta.0"></a>
 # [3.5.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.4.0...v3.5.0-beta.0) (2018-10-11)
 

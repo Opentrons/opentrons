@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.5.1"></a>
+## [3.5.1](https://github.com/Opentrons/opentrons/compare/v3.5.0-beta.1...v3.5.1) (2018-10-26)
+
+
+### Bug Fixes
+
+* **protocol-designer:** close liquid placement form when clear wells is clicked ([#2533](https://github.com/Opentrons/opentrons/issues/2533)) ([e0727e6](https://github.com/Opentrons/opentrons/commit/e0727e6)), closes [#2528](https://github.com/Opentrons/opentrons/issues/2528)
+* **protocol-designer:** do not add __air__ on blowout ([#2545](https://github.com/Opentrons/opentrons/issues/2545)) ([b35cfa9](https://github.com/Opentrons/opentrons/commit/b35cfa9)), closes [#2498](https://github.com/Opentrons/opentrons/issues/2498)
+* **protocol-designer:** fix LiquidPlacementForm onBlur typo ([#2546](https://github.com/Opentrons/opentrons/issues/2546)) ([c6a9f38](https://github.com/Opentrons/opentrons/commit/c6a9f38))
+* **protocol-designer:** fix localization refactor mistakes ([#2499](https://github.com/Opentrons/opentrons/issues/2499)) ([4ef34f2](https://github.com/Opentrons/opentrons/commit/4ef34f2))
+
+
+### Features
+
+* **protocol-designer:** add 4-in-1 15-50 tuberack to PD ([#2530](https://github.com/Opentrons/opentrons/issues/2530)) ([48cc9c0](https://github.com/Opentrons/opentrons/commit/48cc9c0)), closes [#2453](https://github.com/Opentrons/opentrons/issues/2453)
+* **protocol-designer:** add tooltip for labware name/type on steplist ([#2497](https://github.com/Opentrons/opentrons/issues/2497)) ([4890374](https://github.com/Opentrons/opentrons/commit/4890374)), closes [#2421](https://github.com/Opentrons/opentrons/issues/2421)
+* **protocol-designer:** allow user to delete entire liquid groups ([#2524](https://github.com/Opentrons/opentrons/issues/2524)) ([dce806b](https://github.com/Opentrons/opentrons/commit/dce806b)), closes [#2437](https://github.com/Opentrons/opentrons/issues/2437)
+* **protocol-designer:** continue to liquids not design page ([#2539](https://github.com/Opentrons/opentrons/issues/2539)) ([49da7b1](https://github.com/Opentrons/opentrons/commit/49da7b1)), closes [#2534](https://github.com/Opentrons/opentrons/issues/2534)
+* **protocol-designer:** implement "clear wells" button ([#2528](https://github.com/Opentrons/opentrons/issues/2528)) ([145977f](https://github.com/Opentrons/opentrons/commit/145977f)), closes [#2430](https://github.com/Opentrons/opentrons/issues/2430)
+* **protocol-designer:** liquid tooltips on well selection, popper and portal ([#2521](https://github.com/Opentrons/opentrons/issues/2521)) ([12d8adb](https://github.com/Opentrons/opentrons/commit/12d8adb)), closes [#2487](https://github.com/Opentrons/opentrons/issues/2487)
+* **protocol-designer:** replace liquid placement form ([#2518](https://github.com/Opentrons/opentrons/issues/2518)) ([3a6b06f](https://github.com/Opentrons/opentrons/commit/3a6b06f)), closes [#2429](https://github.com/Opentrons/opentrons/issues/2429)
+* **protocol-designer:** use formik for liquid edit form ([#2512](https://github.com/Opentrons/opentrons/issues/2512)) ([3e7456f](https://github.com/Opentrons/opentrons/commit/3e7456f)), closes [#2460](https://github.com/Opentrons/opentrons/issues/2460)
+
+
+
+
+
 <a name="3.5.0"></a>
 # [3.5.0](https://github.com/Opentrons/opentrons/compare/v3.5.0-beta.1...v3.5.0) (2018-10-25)
 
