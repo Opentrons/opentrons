@@ -5,9 +5,6 @@ SHELL := /bin/bash
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
-# dev server port
-PORT ?= 8080
-
 # standard targets
 #####################################################################
 
