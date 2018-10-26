@@ -1,5 +1,9 @@
 @import '@opentrons/components';
 
+:root {
+  --mw-labeled-toggle: 25rem;
+}
+
 .sidebar_item {
   background-color: white;
   margin: 0.4rem 0.125rem;
