@@ -42,7 +42,7 @@ ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources)
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
-clean_cmd = shx rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc'
+clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc'
 
 .PHONY: install
 install:
@@ -59,8 +59,8 @@ clean:
 $(wheel_pattern): setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py bdist_wheel
-	shx rm -rf build
-	shx ls dist
+	$(SHX) rm -rf build
+	$(SHX) ls dist
 
 .PHONY: wheel
 wheel: $(wheel_file)
@@ -78,8 +78,8 @@ lint: $(ot_py_sources)
 docs:
 	pipenv run sphinx-build -b html -d docs/build/doctrees docs/source docs/build/html
 	pipenv run sphinx-build -b doctest -d docs/build/doctrees docs/source docs/build/doctest
-	shx mkdir -p docs/dist
-	shx cp -R docs/build/html/. docs/public/. docs/dist
+	$(SHX) mkdir -p docs/dist
+	$(SHX) cp -R docs/build/html/. docs/public/. docs/dist
 
 .PHONY: publish
 publish:
