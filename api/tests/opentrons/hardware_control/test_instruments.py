@@ -154,3 +154,23 @@ async def test_no_pipette(dummy_instruments, loop):
     with pytest.raises(hc.PipetteNotAttachedError):
         await hw_api.aspirate(types.Mount.RIGHT, aspirate_ul, aspirate_rate)
         assert not hw_api._current_volume[types.Mount.RIGHT]
+
+
+async def test_pick_up_tip(dummy_instruments, loop):
+    hw_api = hc.API.build_hardware_simulator(
+        attached_instruments=dummy_instruments, loop=loop)
+    mount = types.Mount.LEFT
+    await hw_api.home()
+    await hw_api.cache_instruments()
+    tip_position = types.Point(12.13, 9, 150)
+    target_position = {Axis.X: 46.13,   # Left mount offset
+                       Axis.Y: 9,
+                       Axis.Z: 218,     # Z retracts after pick_up
+                       Axis.A: 218,
+                       Axis.B: 2,
+                       Axis.C: 19}
+    await hw_api.move_to(mount, tip_position)
+    await hw_api.pick_up_tip(mount)
+    assert hw_api._attached_instruments[mount].has_tip
+    assert hw_api._attached_instruments[mount].current_volume == 0
+    assert hw_api._current_position == target_position

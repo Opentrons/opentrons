@@ -7,6 +7,7 @@ from opentrons.util import environment
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.config import robot_configs
 from opentrons.types import Mount
+from contextlib import contextmanager
 from . import modules
 
 
@@ -71,9 +72,11 @@ class Controller:
             config=self.config)
         self._attached_modules = {}
 
-    def move(self, target_position: Dict[str, float], home_flagged_axes=True):
-        self._smoothie_driver.move(
-            target_position, home_flagged_axes=home_flagged_axes)
+    def move(self, target_position: Dict[str, float],
+             home_flagged_axes: bool = True, speed: float = None):
+        with self._set_temp_speed(speed):
+            self._smoothie_driver.move(
+                target_position, home_flagged_axes=home_flagged_axes)
 
     def home(self, axes: List[str] = None) -> Dict[str, float]:
         if axes:
@@ -121,7 +124,20 @@ class Controller:
         return to_return
 
     def set_active_current(self, axis, amp):
+        """
+        This method sets only the 'active' current, i.e., the current for an
+        axis' movement. Smoothie driver automatically resets the current for
+        pipette axis to a low current (dwelling current) after each move
+        """
         self._smoothie_driver.set_active_current({axis.name: amp})
+
+    @contextmanager
+    def save_current(self):
+        self._smoothie_driver.push_active_current()
+        try:
+            yield
+        finally:
+            self._smoothie_driver.pop_active_current()
 
     def set_pipette_speed(self, val: float):
         self._smoothie_driver.set_speed(val)
@@ -143,3 +159,15 @@ class Controller:
 
     def _connect(self):
         self._smoothie_driver.connect()
+
+    @contextmanager
+    def _set_temp_speed(self, speed):
+        if not speed:
+            yield
+        else:
+            self._smoothie_driver.push_speed()
+            self._smoothie_driver.set_speed(speed)
+            try:
+                yield
+            finally:
+                self._smoothie_driver.pop_speed()

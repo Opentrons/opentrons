@@ -143,7 +143,9 @@ async def test_critical_point_applied(hardware_api, monkeypatch):
     assert hardware_api.current_position(types.Mount.RIGHT) == target
     await hardware_api.pick_up_tip(types.Mount.RIGHT)
     # Now the current position (with offset applied) should change
-    target[Axis.A] = -33
+    # pos_after_pickup + model_offset + critical point
+    target[Axis.A] = 218 + (-13) + (-33)
+    target_no_offset[Axis.C] = target[Axis.C] = 2
     assert hardware_api.current_position(types.Mount.RIGHT) == target
     # This move should take the new critical point into account
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
@@ -154,7 +156,7 @@ async def test_critical_point_applied(hardware_api, monkeypatch):
     assert hardware_api.current_position(types.Mount.RIGHT) == target
     # And removing the tip should move us back to the original
     await hardware_api.drop_tip(types.Mount.RIGHT)
-    target[Axis.A] = 33
+    target[Axis.A] = 33 + hc.DROP_TIP_RELEASE_DISTANCE
     assert hardware_api.current_position(types.Mount.RIGHT) == target
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
     target_no_offset[Axis.A] = 13
@@ -170,7 +172,7 @@ async def test_deck_cal_applied(monkeypatch, loop):
                       [0, 0, 0, 1]]
     called_with = None
 
-    def mock_move(position):
+    def mock_move(position, speed=None):
         nonlocal called_with
         called_with = position
 
