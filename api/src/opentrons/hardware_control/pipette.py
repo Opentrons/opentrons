@@ -13,11 +13,12 @@ class Pipette:
     control API. Its only purpose is to gather state.
     """
 
-    def __init__(self, model: str) -> None:
+    def __init__(self, model: str, pipette_id: str) -> None:
         self._config = pipette_config.load(model)
         self._name = model
         self._current_volume = 0.0
         self._has_tip = False
+        self._pipette_id = pipette_id
 
     @property
     def config(self) -> pipette_config.pipette_config:
@@ -29,6 +30,10 @@ class Pipette:
     @property
     def name(self) -> str:
         return self._name
+
+    @property
+    def pipette_id(self) -> str:
+        return self._pipette_id
 
     @property
     def critical_point(self) -> Point:
@@ -98,5 +103,6 @@ class Pipette:
         config_dict = self.config._asdict()
         config_dict.update({'current_volume': self.current_volume,
                             'name': self.name,
+                            'pipette_id': self.pipette_id,
                             'has_tip': self.has_tip})
         return config_dict

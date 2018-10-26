@@ -109,8 +109,8 @@ class Robot(object):
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
         self._instruments = {}
-        self.model_by_mount = {'left': {'model': None, 'uuid': None},
-                               'right': {'model': None, 'uuid': None}}
+        self.model_by_mount = {'left': {'model': None, 'id': None},
+                               'right': {'model': None, 'id': None}}
 
         # TODO (artyom, 09182017): once protocol development experience
         # in the light of Session concept is fully fleshed out, we need

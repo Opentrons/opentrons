@@ -472,7 +472,7 @@ def test_read_and_write_pipettes(model):
     driver.simulating = False
     read_id = driver.read_pipette_id('left')
     driver.simulating = True
-    assert read_id == {'pipette_id': test_id}
+    assert read_id == test_id
 
     driver.write_pipette_model('left', test_model)
     driver.simulating = False

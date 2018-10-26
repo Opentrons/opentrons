@@ -2,40 +2,38 @@ import pytest
 from opentrons import types
 from opentrons import hardware_control as hc
 from opentrons.hardware_control.types import Axis
-from opentrons.hardware_control.pipette import Pipette
+
+
+LEFT_PIPETTE_MODEL = 'p10_single_v1'
+LEFT_PIPETTE_ID = 'testy'
 
 
 @pytest.fixture
 def dummy_instruments():
-    dummy_instruments_attached = {types.Mount.LEFT: 'p10_single_v1',
-                                  types.Mount.RIGHT: None}
+    dummy_instruments_attached = {
+        types.Mount.LEFT: {
+            'model': LEFT_PIPETTE_MODEL,
+            'id': LEFT_PIPETTE_ID
+        },
+        types.Mount.RIGHT: {
+            'model': None,
+            'id': None
+        }
+    }
     return dummy_instruments_attached
 
 
-def attached_instruments(inst):
-    """
-    Format inst dict like the public 'attached_instruments' property
-    """
-    configs = ['name', 'min_volume', 'max_volume',
-               'aspirate_flow_rate', 'dispense_flow_rate']
-    instr_objects = {mount: Pipette(model) if model else None
-                     for mount, model in inst.items()}
-    instruments = {types.Mount.LEFT: {}, types.Mount.RIGHT: {}}
-    for mount in types.Mount:
-        if not instr_objects[mount]:
-            continue
-        for key in configs:
-            instruments[mount][key] = instr_objects[mount].as_dict()[key]
-    return instruments
-
-
 async def test_cache_instruments(dummy_instruments, loop):
+    expected_keys = [
+        'name', 'min_volume', 'max_volume', 'aspirate_flow_rate',
+        'dispense_flow_rate', 'pipette_id']
+
     hw_api = hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments,
         loop=loop)
     await hw_api.cache_instruments()
-    assert hw_api.attached_instruments == attached_instruments(
-        dummy_instruments)
+    assert sorted(hw_api.attached_instruments[types.Mount.LEFT].keys()) == \
+        sorted(expected_keys)
 
 
 @pytest.mark.skipif(not hc.Controller,
@@ -44,17 +42,29 @@ async def test_cache_instruments(dummy_instruments, loop):
 async def test_cache_instruments_hc(monkeypatch, dummy_instruments,
                                     hardware_controller_lockfile,
                                     running_on_pi, cntrlr_mock_connect, loop):
+    expected_keys = [
+        'name', 'min_volume', 'max_volume', 'aspirate_flow_rate',
+        'dispense_flow_rate', 'pipette_id']
 
     hw_api_cntrlr = hc.API.build_hardware_controller(loop=loop)
 
-    def mock_driver_method(mount):
-        attached_pipette = {'left': 'p10_single_v1', 'right': None}
+    def mock_driver_model(mount):
+        attached_pipette = {'left': LEFT_PIPETTE_MODEL, 'right': None}
         return attached_pipette[mount]
+
+    def mock_driver_id(mount):
+        attached_pipette = {'left': LEFT_PIPETTE_ID, 'right': None}
+        return attached_pipette[mount]
+
     monkeypatch.setattr(hw_api_cntrlr._backend._smoothie_driver,
-                        'read_pipette_model', mock_driver_method)
+                        'read_pipette_model', mock_driver_model)
+    monkeypatch.setattr(hw_api_cntrlr._backend._smoothie_driver,
+                        'read_pipette_id', mock_driver_id)
+
     await hw_api_cntrlr.cache_instruments()
-    assert hw_api_cntrlr.attached_instruments == attached_instruments(
-        dummy_instruments)
+    assert sorted(
+        hw_api_cntrlr.attached_instruments[types.Mount.LEFT].keys()) == \
+        sorted(expected_keys)
 
 
 async def test_aspirate(dummy_instruments, loop):

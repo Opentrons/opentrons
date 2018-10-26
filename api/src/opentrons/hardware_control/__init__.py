@@ -112,7 +112,7 @@ class API:
     @classmethod
     def build_hardware_simulator(
             cls,
-            attached_instruments: Dict[top_types.Mount, str] = None,
+            attached_instruments: Dict[top_types.Mount, Dict[str, Optional[str]]] = None,  # noqa E501
             attached_modules: List[str] = None,
             config: robot_configs.robot_config = None,
             loop: asyncio.AbstractEventLoop = None) -> 'API':
@@ -167,15 +167,17 @@ class API:
         """
         self._log.info("Updating instrument model cache")
         for mount in top_types.Mount:
-            instrument_model = self._backend.get_attached_instrument(mount)
-            if instrument_model:
-                self._attached_instruments[mount] = Pipette(instrument_model)
+            instrument_data = self._backend.get_attached_instrument(mount)
+            if instrument_data['model']:
+                self._attached_instruments[mount] = Pipette(
+                    instrument_data['model'], instrument_data['id'])
         mod_log.info("Instruments found:{}".format(self._attached_instruments))
 
     @property
     def attached_instruments(self):
         configs = ['name', 'min_volume', 'max_volume',
-                   'aspirate_flow_rate', 'dispense_flow_rate']
+                   'aspirate_flow_rate', 'dispense_flow_rate',
+                   'pipette_id']
         instruments = {top_types.Mount.LEFT: {},
                        top_types.Mount.RIGHT: {}}
         for mount in top_types.Mount:

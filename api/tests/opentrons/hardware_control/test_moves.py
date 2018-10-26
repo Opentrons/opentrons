@@ -102,8 +102,8 @@ async def test_mount_offset_applied(hardware_api):
 async def test_critical_point_applied(hardware_api, monkeypatch):
     await hardware_api.home()
     hardware_api._backend._attached_instruments\
-        = {types.Mount.LEFT: None,
-           types.Mount.RIGHT: 'p10_single_v1'}
+        = {types.Mount.LEFT: {'model': None, 'id': None},
+           types.Mount.RIGHT: {'model': 'p10_single_v1', 'id': 'testyness'}}
     await hardware_api.cache_instruments()
     # Our critical point is now the tip of the nozzle
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))

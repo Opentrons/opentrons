@@ -82,8 +82,10 @@ class Controller:
             args = tuple()
         return self._smoothie_driver.home(*args)
 
-    def get_attached_instrument(self, mount) -> Optional[str]:
-        return self._smoothie_driver.read_pipette_model(mount.name.lower())
+    def get_attached_instrument(self, mount) -> Dict[str, Optional[str]]:
+        model = self._smoothie_driver.read_pipette_model(mount.name.lower())
+        _id = self._smoothie_driver.read_pipette_id(mount.name.lower())
+        return {'model': model, 'id': _id}
 
     def set_active_current(self, axis, amp):
         self._smoothie_driver.set_active_current({axis.name: amp})

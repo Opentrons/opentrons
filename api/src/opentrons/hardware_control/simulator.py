@@ -11,10 +11,11 @@ class Simulator:
     hardware actions. It is suitable for use on a dev machine or on
     a robot with no smoothie connected.
     """
-    def __init__(self,
-                 attached_instruments: Dict[types.Mount, str],
-                 attached_modules: List[str],
-                 config, loop) -> None:
+    def __init__(
+            self,
+            attached_instruments: Dict[types.Mount, Dict[str, Optional[str]]],
+            attached_modules: List[str],
+            config, loop) -> None:
         self._config = config
         self._loop = loop
         self._attached_instruments = attached_instruments
@@ -29,8 +30,9 @@ class Simulator:
         # driver_3_0-> HOMED_POSITION
         return {'X': 418, 'Y': 353, 'Z': 218, 'A': 218, 'B': 19, 'C': 19}
 
-    def get_attached_instrument(self, mount) -> Optional[str]:
-        return self._attached_instruments.get(mount, None)
+    def get_attached_instrument(self, mount) -> Dict[str, Optional[str]]:
+        return self._attached_instruments.get(
+            mount, {'mount': None, 'id': None})
 
     def set_active_current(self, axis, amp):
         pass
