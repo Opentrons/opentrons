@@ -5,11 +5,8 @@ from opentrons.hardware_control.types import Axis
 
 
 @pytest.fixture
-def hardware_api(monkeypatch, loop):
-    def mock_move(position):
-        pass
+def hardware_api(loop):
     hw_api = hc.API.build_hardware_simulator(loop=loop)
-    monkeypatch.setattr(hw_api._backend, 'move', mock_move)
     return hw_api
 
 
@@ -55,6 +52,31 @@ async def test_controller_musthome(hardware_api):
     mount = types.Mount.RIGHT
     with pytest.raises(hc.MustHomeError):
         await hardware_api.move_to(mount, abs_position)
+
+
+async def test_home_specific_sim(hardware_api, monkeypatch):
+    await hardware_api.home()
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(-10, 10, 20))
+    await hardware_api.move_rel(types.Mount.LEFT, types.Point(0, 0, -20))
+    await hardware_api.home([Axis.Z, Axis.C])
+    assert hardware_api._current_position == {Axis.X: -10,
+                                              Axis.Y: 10,
+                                              Axis.Z: 218,
+                                              Axis.A: 20,
+                                              Axis.B: 19,
+                                              Axis.C: 19}
+
+
+async def test_retract(hardware_api):
+    await hardware_api.home()
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(-10, 10, 20))
+    await hardware_api.retract(types.Mount.RIGHT, 10)
+    assert hardware_api._current_position == {Axis.X: -10,
+                                              Axis.Y: 10,
+                                              Axis.Z: 218,
+                                              Axis.A: 218,
+                                              Axis.B: 19,
+                                              Axis.C: 19}
 
 
 async def test_move(hardware_api):

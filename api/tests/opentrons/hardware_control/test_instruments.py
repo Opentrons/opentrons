@@ -55,6 +55,40 @@ async def test_cache_instruments_hc(monkeypatch, dummy_instruments,
     await hw_api_cntrlr.cache_instruments()
     assert hw_api_cntrlr.attached_instruments == attached_instruments(
         dummy_instruments)
+    # If we pass a conflicting expectation we should get an error
+    with pytest.raises(RuntimeError):
+        await hw_api_cntrlr.cache_instruments({types.Mount.LEFT: 'p300_multi'})
+    # If we pass a matching expects it should work
+    await hw_api_cntrlr.cache_instruments({types.Mount.LEFT: 'p10_single'})
+    assert hw_api_cntrlr.attached_instruments\
+        == attached_instruments(dummy_instruments)
+
+
+async def test_cache_instruments_sim(loop, dummy_instruments):
+    sim = hc.API.build_hardware_simulator(loop=loop)
+    # With nothing specified at init or expected, we should have nothing
+    await sim.cache_instruments()
+    assert sim.attached_instruments == {types.Mount.LEFT: {},
+                                        types.Mount.RIGHT: {}}
+    # When we expect instruments, we should get what we expect since nothing
+    # was specified at init time
+    await sim.cache_instruments({types.Mount.LEFT: 'p10_single_v1.3'})
+    assert sim.attached_instruments[types.Mount.LEFT]['name']\
+        == 'p10_single_v1.3'
+    # If we use prefixes, that should work too
+    await sim.cache_instruments({types.Mount.RIGHT: 'p300_single'})
+    assert sim.attached_instruments[types.Mount.RIGHT]['name']\
+        == 'p300_single_v1'
+    # If we specify instruments at init time, we should get them without
+    # passing an expectation
+    sim = hc.API.build_hardware_simulator(
+        attached_instruments=dummy_instruments)
+    await sim.cache_instruments()
+    assert sim.attached_instruments == attached_instruments(dummy_instruments)
+    # If we specify conflicting expectations and init arguments we should
+    # get a RuntimeError
+    with pytest.raises(RuntimeError):
+        await sim.cache_instruments({types.Mount.LEFT: 'p300_multi'})
 
 
 async def test_aspirate(dummy_instruments, loop):
