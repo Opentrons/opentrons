@@ -51,6 +51,10 @@ export const END_TERMINAL_TITLE = 'FINAL DECK STATE'
 export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
 export const DEFAULT_MM_FROM_BOTTOM_ASPIRATE = 1
 export const DEFAULT_MM_FROM_BOTTOM_DISPENSE = 0.5
+
+// NOTE: in the negative Z direction, to go down from top
+export const DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP = -1
+
 export const DEFAULT_WELL_ORDER_FIRST_OPTION: 't2b' = 't2b'
 export const DEFAULT_WELL_ORDER_SECOND_OPTION: 'l2r' = 'l2r'
 

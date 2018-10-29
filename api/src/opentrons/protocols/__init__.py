@@ -77,6 +77,15 @@ def _get_location(loaded_labware, command_type, params, default_values):
 
     if offset_from_bottom is None:
         # not all commands use offsets
+
+        # touch-tip uses offset from top, not bottom, as default
+        # when offsetFromBottomMm command-specific value is unset
+        if command_type == 'touch-tip':
+            # TODO: Ian 2018-10-29 remove this `-1` when
+            # touch-tip-mm-from-top is a required field
+            return labware.wells(well).top(
+                z=default_values.get('touch-tip-mm-from-top', -1))
+
         return labware.wells(well)
 
     return labware.wells(well).bottom(offset_from_bottom)
@@ -178,12 +187,18 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
             pipette.dispense(volume, location)
 
         elif command_type == 'touch-tip':
-            offset_from_top = -1
-            if ('offsetFromBottomMm' in params):
-                offset_from_bottom = params['offsetFromBottomMm']
-                offset_from_top = (
-                    location.properties['depth'] - offset_from_bottom)
-            pipette.touch_tip(location, v_offset=offset_from_top)
+            # NOTE: if touch_tip can take a location tuple,
+            # this can be much simpler
+            (wellObject, locTuple) = location
+
+            # Use the offset baked into the wellObject.
+            # Do not allow API to apply its v_offset kwarg default value,
+            # and do not apply the JSON protocol's default offset.
+            z_from_bottom = locTuple[2]
+            offset_from_top = (
+                wellObject.properties['depth'] - z_from_bottom) * -1
+
+            pipette.touch_tip(wellObject, v_offset=offset_from_top)
 
 
 def execute_protocol(protocol):
