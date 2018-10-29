@@ -98,7 +98,7 @@ export type StepArgsAndErrors = {
   stepArgs: CommandCreatorData | null, // TODO: incompleteData field when this is null?
 }
 
-export type StepFormContextualState = {|
+export type StepFormContextualState = {
   labwareIngred: $PropertyType<BaseState, 'labwareIngred'>,
   pipettes: $PropertyType<BaseState, 'pipettes'>,
-|}
+}

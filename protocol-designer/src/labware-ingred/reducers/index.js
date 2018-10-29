@@ -31,7 +31,7 @@ import type {
 } from '../types'
 import * as actions from '../actions'
 import {getPDMetadata} from '../../file-types'
-import type {BaseState, Selector, Options} from '../../types'
+import type {BaseState, Options} from '../../types'
 import type {LoadFileAction} from '../../load-file'
 import type {
   RemoveWellsContents,
@@ -294,8 +294,10 @@ const rootReducer = combineReducers({
   renameLabwareFormMode,
 })
 
+type RootSlice = {labwareIngred: RootState}
+type Selector<T> = (RootSlice) => T
 // SELECTORS
-const rootSelector = (state: BaseState): RootState => state.labwareIngred
+const rootSelector = (state: RootSlice): RootState => state.labwareIngred
 
 const getLabware: Selector<{[labwareId: string]: ?Labware}> = createSelector(
   rootSelector,
@@ -318,8 +320,8 @@ const getLabwareTypes: Selector<LabwareTypeById> = createSelector(
   )
 )
 
-const getLiquidGroupsById = (state: BaseState) => rootSelector(state).ingredients
-const getIngredientLocations = (state: BaseState) => rootSelector(state).ingredLocations
+const getLiquidGroupsById = (state: RootSlice) => rootSelector(state).ingredients
+const getIngredientLocations = (state: RootSlice) => rootSelector(state).ingredLocations
 
 const getNextLiquidGroupId: Selector<string> = createSelector(
   getLiquidGroupsById,

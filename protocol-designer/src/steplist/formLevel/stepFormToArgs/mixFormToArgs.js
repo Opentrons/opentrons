@@ -47,7 +47,7 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
     stepType: 'mix',
     name: `Mix ${hydratedFormData.id}`, // TODO real name for steps
     description: 'description would be here 2018-03-01', // TODO get from form
-    labware,
+    labware: labware.id,
     wells,
     volume,
     times,

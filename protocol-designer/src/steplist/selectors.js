@@ -48,19 +48,23 @@ const getUnsavedForm: Selector<?FormData> = createSelector(
   (state: RootState) => state.unsavedForm
 )
 
-const getHydratedUnsavedForm: Selector<?FormData> = createSelector(
-  getUnsavedForm,
+const getStepFormContextualState: Selector<StepFormContextualState> = createSelector(
   labwareIngredSelectors.rootSelector,
   pipetteSelectors.rootSelector,
-  (_unsavedForm, _labwareIngred, _pipettes) => {
-    const contextualState: StepFormContextualState = {
-      labwareIngred: _labwareIngred,
-      pipettes: _pipettes,
-    }
-    return _unsavedForm && mapValues(_unsavedForm, (value, name) => (
-      hydrateField(contextualState, name, value)
+  (_labwareIngred, _pipettes) => ({
+    labwareIngred: _labwareIngred,
+    pipettes: _pipettes,
+  })
+)
+
+const getHydratedUnsavedForm: Selector<?FormData> = createSelector(
+  getUnsavedForm,
+  getStepFormContextualState,
+  (_unsavedForm, _contextualState) => (
+    _unsavedForm && mapValues(_unsavedForm, (value, name) => (
+      hydrateField(_contextualState, name, value)
     ))
-  }
+  )
 )
 
 // TODO Ian 2018-02-08 rename formData to something like getUnsavedForm or unsavedFormFields
@@ -155,19 +159,14 @@ const getSavedForms: Selector<{[StepIdType]: FormData}> = createSelector(
 
 const getHydratedSavedForms: Selector<{[StepIdType]: FormData}> = createSelector(
   getSavedForms,
-  labwareIngredSelectors.rootSelector,
-  pipetteSelectors.rootSelector,
-  (_savedForms, _labwareIngred, _pipettes) => {
-    const contextualState: StepFormContextualState = {
-      labwareIngred: _labwareIngred,
-      pipettes: _pipettes,
-    }
-    return mapValues(_savedForms, (savedForm) => (
+  getStepFormContextualState,
+  (_savedForms, _contextualState) => (
+    mapValues(_savedForms, (savedForm) => (
       mapValues(savedForm, (value, name) => (
-        hydrateField(contextualState, name, value)
+        hydrateField(_contextualState, name, value)
       ))
     ))
-  }
+  )
 )
 
 // TODO type with hydrated form type
@@ -296,21 +295,27 @@ const nextStepId: Selector<number> = createSelector( // generates the next step 
   }
 )
 
-const formLevelWarnings: Selector<Array<FormWarning>> = (state) => {
-  const formData = getUnsavedForm(state)
-  if (!formData) return []
-  const {id, stepType, ...fields} = formData
-  const hydratedFields = mapValues(fields, (value, name) => hydrateField(state, name, value))
-  return getFormWarnings(stepType, hydratedFields)
-}
+const formLevelWarnings: Selector<Array<FormWarning>> = createSelector(
+  getUnsavedForm,
+  getStepFormContextualState,
+  (_unsavedFormData, _contextualState) => {
+    if (!_unsavedFormData) return []
+    const {id, stepType, ...fields} = _unsavedFormData
+    const hydratedFields = mapValues(fields, (value, name) => hydrateField(_contextualState, name, value))
+    return getFormWarnings(stepType, hydratedFields)
+  }
+)
 
-const formLevelErrors: Selector<Array<FormError>> = (state) => {
-  const formData = getUnsavedForm(state)
-  if (!formData) return []
-  const {id, stepType, ...fields} = formData
-  const hydratedFields = mapValues(fields, (value, name) => hydrateField(state, name, value))
-  return getFormErrors(stepType, hydratedFields)
-}
+const formLevelErrors: Selector<Array<FormError>> = createSelector(
+  getUnsavedForm,
+  getStepFormContextualState,
+  (_unsavedFormData, _contextualState) => {
+    if (!_unsavedFormData) return []
+    const {id, stepType, ...fields} = _unsavedFormData
+    const hydratedFields = mapValues(fields, (value, name) => hydrateField(_contextualState, name, value))
+    return getFormErrors(stepType, hydratedFields)
+  }
+)
 
 const formSectionCollapseSelector: Selector<FormSectionState> = createSelector(
   rootSelector,
@@ -368,7 +373,7 @@ export const currentFormCanBeSaved: Selector<boolean | null> = createSelector(
   getSelectedStepId,
   allSteps,
   (hydratedForm, selectedStepId, allSteps) => {
-    if (!selectedStepId || typeof selectedStepId !== 'number' || !allSteps[selectedStepId] || !hydratedForm) return null
+    if (selectedStepId == null || !allSteps[selectedStepId] || !hydratedForm) return null
     return isEmpty(getAllErrorsFromHydratedForm(hydratedForm))
   }
 )
