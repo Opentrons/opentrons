@@ -3,111 +3,65 @@
 
 const path = require('path')
 const webpack = require('webpack')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const webpackMerge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
-const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer')
 
-const {rules: namedRules} = require('@opentrons/webpack-config')
-const devServerConfig = require('./webpack/dev-server')
-
-const {productName} = require('@opentrons/app-shell/package.json')
+const {DEV_MODE, baseConfig} = require('@opentrons/webpack-config')
+const {productName: title} = require('@opentrons/app-shell/package.json')
 const {description, author} = require('./package.json')
 
-const DEV = process.env.NODE_ENV !== 'production'
-const ANALYZER = process.env.ANALYZER === 'true'
-const PORT = process.env.PORT
-
-const JS_BUNDLE_ENTRY = path.join(__dirname, 'src/index.js')
+const JS_ENTRY = path.join(__dirname, 'src/index.js')
+const HTML_ENTRY = path.join(__dirname, 'src/index.hbs')
 const OUTPUT_PATH = path.join(__dirname, 'dist')
 const JS_OUTPUT_NAME = 'bundle.js'
-const CSS_OUTPUT_NAME = 'style.css'
 
-const entry = [JS_BUNDLE_ENTRY]
+const PORT = process.env.PORT || 8080
+const CONTENT_BASE = path.join(__dirname, './src')
+const PUBLIC_PATH = DEV_MODE ? `http://localhost:${PORT}/` : ''
 
-const output = {
-  path: OUTPUT_PATH,
-  filename: JS_OUTPUT_NAME,
-}
+module.exports = webpackMerge(baseConfig, {
+  entry: [JS_ENTRY],
 
-const rules = [
-  namedRules.js,
-  namedRules.worker,
-  namedRules.globalCss,
-  namedRules.localCss,
-  namedRules.handlebars,
-  namedRules.fonts,
-  namedRules.images,
-]
-
-const target = 'web'
-
-const plugins = [
-  new webpack.EnvironmentPlugin(
-    Object.keys(process.env)
-      .filter(v => v.startsWith('OT_APP'))
-      .concat(['NODE_ENV'])
+  output: Object.assign(
+    {
+      path: OUTPUT_PATH,
+      filename: JS_OUTPUT_NAME,
+      publicPath: PUBLIC_PATH,
+    },
+    // workaround for worker-loader HMR
+    // see https://github.com/webpack/webpack/issues/6642
+    DEV_MODE ? {globalObject: 'this'} : {}
   ),
 
-  new ExtractTextPlugin({
-    filename: CSS_OUTPUT_NAME,
-    disable: DEV,
-    ignoreOrder: true,
-  }),
+  plugins: [
+    new webpack.EnvironmentPlugin(
+      Object.keys(process.env)
+        .filter(v => v.startsWith('OT_APP'))
+        .concat(['NODE_ENV'])
+    ),
 
-  new HtmlWebpackPlugin({
-    title: productName,
-    template: './src/index.hbs',
-    description,
-    author,
-    intercomId: process.env.OT_APP_INTERCOM_ID,
-  }),
+    new HtmlWebpackPlugin({
+      title,
+      description,
+      author,
+      template: HTML_ENTRY,
+      intercomId: process.env.OT_APP_INTERCOM_ID,
+    }),
 
-  new ScriptExtHtmlWebpackPlugin({
-    defaultAttribute: 'defer',
-  }),
-]
+    new ScriptExtHtmlWebpackPlugin({defaultAttribute: 'defer'}),
+  ],
 
-let devtool = 'source-map'
-
-let devServer = {}
-
-if (DEV) {
-  const publicPath = `http://localhost:${PORT}/`
-  const contentBase = [path.join(__dirname, './src')]
-
-  entry.unshift('react-hot-loader/patch')
-
-  output.publicPath = publicPath
-
-  plugins.push(
-    new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.NamedModulesPlugin()
-  )
-
-  devtool = 'eval-source-map'
-
-  devServer = devServerConfig(PORT, publicPath, contentBase)
-}
-
-if (ANALYZER) {
-  plugins.push(
-    new BundleAnalyzerPlugin({analyzerMode: 'server', openAnalyzer: true})
-  )
-}
-
-module.exports = {
-  entry,
-  module: {rules},
-  output,
-  target,
-  plugins,
-  devtool,
-  devServer,
   node: {
     __filename: true,
     // use userland events because webpack's is out of date
     // https://github.com/webpack/node-libs-browser/issues/78
     events: false,
   },
-}
+
+  devServer: {
+    port: PORT,
+    publicPath: PUBLIC_PATH,
+    contentBase: [CONTENT_BASE],
+  },
+})

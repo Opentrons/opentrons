@@ -12,6 +12,7 @@ for _irregular_ labware.
 * The overall height remains consistent throughout the labware
 
 ## Launching the Tool
+
 First you should make sure that you run `make install` within the `/opentrons` top level folder.
 If you are up-to-date on all other directories you can simply run `yarn` instead.
 Next you have two options:
@@ -20,7 +21,7 @@ Next you have two options:
 
 OR
 
-1. Type `make build` within the `opentrons/labware-designer` folder
+1. Type `make` within the `opentrons/labware-designer` folder
 2. Open `labware-designer/dist/index.html` in your browser
 
 Once you have the browser page open, you should be able to go to the browser console.

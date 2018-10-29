@@ -5,14 +5,11 @@ SHELL := /bin/bash
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
-# set NODE_ENV for a command with $(env)=environment
-env := cross-env NODE_ENV
-
 # standard targets
 #####################################################################
 
 .PHONY: all
-all: clean build
+all: clean dist
 
 .PHONY: install
 install:
@@ -25,10 +22,10 @@ clean:
 # artifacts
 #####################################################################
 
-.PHONY: build
-build:
-	$(env)=production webpack -p
-	shx cp index.html dist/
+.PHONY: dist
+dist: export NODE_ENV := production
+dist:
+	webpack --profile
 
 # NOTE: Ian 2018-09-07 while this is a one-off OT2 deckmap iframe dealie,
 # it should be deployed MANUALLY to protocol-library-kludge/production/ on S3
@@ -37,5 +34,6 @@ build:
 #####################################################################
 
 .PHONY: dev
+dev: export NODE_ENV := development
 dev:
-	$(env)=development webpack-dev-server --hot
+	webpack-dev-server --hot

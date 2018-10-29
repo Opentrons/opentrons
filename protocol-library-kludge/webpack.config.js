@@ -1,53 +1,29 @@
 'use strict'
 
 const path = require('path')
-const webpack = require('webpack')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const webpackMerge = require('webpack-merge')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
 
-const {rules} = require('@opentrons/webpack-config')
+const {DEV_MODE, baseConfig} = require('@opentrons/webpack-config')
+const {productName: title, description, author} = require('./package.json')
 
-const DEV = process.env.NODE_ENV !== 'production'
+const JS_BUNDLE_ENTRY = path.join(__dirname, 'src/index.js')
+const HTML_ENTRY = path.join(__dirname, 'src/index.hbs')
+const OUTPUT_PATH = path.join(__dirname, 'dist')
+const JS_OUTPUT_NAME = 'bundle.js'
 
-module.exports = {
-  entry: [
-    './src/index.js',
-  ],
+module.exports = webpackMerge(baseConfig, {
+  entry: [JS_BUNDLE_ENTRY],
 
   output: {
-    filename: 'bundle.js',
-    path: path.join(__dirname, 'dist'),
+    filename: JS_OUTPUT_NAME,
+    path: OUTPUT_PATH,
+    publicPath: DEV_MODE ? '' : './',
   },
-
-  module: {
-    rules: [
-      rules.js,
-      rules.localCss,
-      rules.images,
-    ],
-  },
-
-  devServer: {
-    historyApiFallback: true,
-  },
-
-  devtool: DEV ? 'eval-source-map' : 'source-map',
 
   plugins: [
-    new ExtractTextPlugin({
-      filename: 'bundle.css',
-      disable: DEV,
-      ignoreOrder: true,
-    }),
+    new HtmlWebpackPlugin({title, description, author, template: HTML_ENTRY}),
+    new ScriptExtHtmlWebpackPlugin({defaultAttribute: 'defer'}),
   ],
-}
-
-if (DEV) {
-  module.exports.entry.unshift(
-    'react-hot-loader/patch'
-  )
-
-  module.exports.plugins.push(
-    new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.NamedModulesPlugin()
-  )
-}
+})

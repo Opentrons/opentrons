@@ -1,9 +1,8 @@
 // webpack rules by name
 'use strict'
 
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
-
-const DEV = process.env.NODE_ENV !== 'production'
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const DEV_MODE = require('./dev-mode')
 
 const CSS_LOADER = {
   loader: 'css-loader',
@@ -24,7 +23,7 @@ const POSTCSS_LOADER = {
   loader: 'postcss-loader',
   options: {
     ident: 'postcss',
-    plugins: (loader) => [
+    plugins: loader => [
       require('postcss-import')({root: loader.resourcePath}),
       require('postcss-cssnext')(),
       require('lost'),
@@ -61,27 +60,21 @@ module.exports = {
   // global CSS files
   globalCss: {
     test: /\.global\.css$/,
-    use: DEV
-      ? ['style-loader', CSS_LOADER, POSTCSS_LOADER]
-      : ExtractTextPlugin.extract({
-        use: [
-          CSS_LOADER,
-          POSTCSS_LOADER,
-        ],
-      }),
+    use: [
+      DEV_MODE ? 'style-loader' : MiniCssExtractPlugin.loader,
+      CSS_LOADER,
+      POSTCSS_LOADER,
+    ],
   },
 
   // local CSS (CSS module) files
   localCss: {
     test: /^((?!\.global).)*\.css$/,
-    use: DEV
-      ? ['style-loader', CSS_MODULE_LOADER, POSTCSS_LOADER]
-      : ExtractTextPlugin.extract({
-        use: [
-          CSS_MODULE_LOADER,
-          POSTCSS_LOADER,
-        ],
-      }),
+    use: [
+      DEV_MODE ? 'style-loader' : MiniCssExtractPlugin.loader,
+      CSS_MODULE_LOADER,
+      POSTCSS_LOADER,
+    ],
   },
 
   // handlebars HTML templates

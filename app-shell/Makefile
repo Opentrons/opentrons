@@ -22,9 +22,6 @@ discovery_client_dir := ../discovery-client
 # directories for robot API update bundled in production build
 api_dir := ../api
 
-# set NODE_ENV for a command with $(env)=environment
-env := cross-env NODE_ENV
-
 # cross-platform noop command
 noop := cd .
 
@@ -45,7 +42,7 @@ build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
 # only copy update files publish directory on tagged builds
 publish_update := $(OT_TAG)
 
-builder := $(env)=production BUILD_ID=$(build_id) electron-builder -p never
+builder := electron-builder -p never
 
 electron := electron . \
 	--devtools \
@@ -88,12 +85,13 @@ api-deps:
 .PHONY: package-deps
 package-deps: clean lib deps api-deps
 
+package dist-posix dist-osx dist-linux dist-win: export NODE_ENV := production
+package dist-posix dist-osx dist-linux dist-win: export BUILD_ID := $(build_id)
+
 .PHONY: package
 package: package-deps
 	$(builder) --dir
 
-# TODO(mc, 2018-03-27): remove posix target in favor of individual
-#   build_$(OS) variables
 .PHONY: dist-posix
 dist-posix: package-deps
 	$(builder) --linux --mac
@@ -126,5 +124,6 @@ _dist-collect-artifacts:
 #####################################################################
 
 .PHONY: dev
+dev: export NODE_ENV := development
 dev: lib
-	$(env)=development $(electron)
+	$(electron)

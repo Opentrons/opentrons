@@ -8,6 +8,7 @@
     "email": "engineering@opentrons.com"
   },
   "name": "labware-designer",
+  "productName": "Opentrons Labware Designer",
   "private": true,
   "version": "3.5.1",
   "description": "Labware Designer",

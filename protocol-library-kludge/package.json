@@ -10,6 +10,7 @@
   "name": "protocol-library-kludge",
   "private": true,
   "version": "3.5.1",
+  "productName": "Opentrons Protocol Library",
   "description": "Protocol library stuff (WIP)",
   "main": "src/index.js",
   "bugs": {
