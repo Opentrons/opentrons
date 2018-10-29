@@ -115,7 +115,6 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
     return (
       <IntervalWrapper refresh={fetchList} interval={LIST_REFRESH_MS}>
         <SelectSsid
-          value={ssid}
           list={list}
           disabled={connectingTo != null}
           onValueChange={this.setCurrentSsid}

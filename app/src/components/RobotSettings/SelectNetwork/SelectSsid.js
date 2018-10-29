@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import find from 'lodash/find'
 import map from 'lodash/map'
 
 import {Icon} from '@opentrons/components'
@@ -12,13 +13,14 @@ import type {OptionType} from '../../SelectField'
 
 type Props = {
   list: ?WifiNetworkList,
-  value: ?string,
   disabled?: boolean,
   onValueChange: (name: string, ssid: string) => mixed,
 }
 
 export default function SelectSsid (props: Props) {
-  const {value, list, disabled, onValueChange} = props
+  const {list, disabled, onValueChange} = props
+  const connected = find(list, 'active')
+  const value = connected && connected.ssid
 
   return (
     <SelectField
