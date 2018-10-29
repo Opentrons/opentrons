@@ -5,9 +5,6 @@ SHELL := /bin/bash
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
-# set NODE_ENV for a command with $(env)=environment
-env := cross-env NODE_ENV
-
 # TODO(mc, 2018-10-25): use dist to match other projects
 BUILD_DIR := build
 
