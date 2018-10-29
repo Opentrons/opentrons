@@ -55,7 +55,7 @@ Z_OFFSET_P1000 = 20  # shortest single-channel pipette
 
 
 with open(config_file) as cfg_file:
-    configs = json.load(cfg_file).keys()
+    configs = list(json.load(cfg_file).keys())
 
 
 def load(pipette_model: str) -> pipette_config:
@@ -72,7 +72,7 @@ def load(pipette_model: str) -> pipette_config:
     with open(config_file) as cfg_file:
         cfg = json.load(cfg_file).get(pipette_model, {})
 
-        plunger_pos = cfg.get('plungerPositions')
+        plunger_pos = cfg.get('plungerPositions', {})
 
         res = pipette_config(
             plunger_positions={

@@ -4,6 +4,7 @@ import {Formik} from 'formik'
 import get from 'lodash/get'
 import find from 'lodash/find'
 import set from 'lodash/set'
+import isEmpty from 'lodash/isEmpty'
 
 import {WPA_PSK_SECURITY, WPA_EAP_SECURITY} from '../../../http-api-client'
 
@@ -62,6 +63,34 @@ export default class ConnectForm extends React.Component<Props, State> {
     })
   }
 
+  getEapFields = (eapMethod: ?WifiEapOption): Array<WifiAuthField> => {
+    return get(eapMethod, 'options', []).map(field => ({
+      ...field,
+      name: `eapConfig.${field.name}`,
+    }))
+  }
+
+  getValidationSchema = (values: any) => {
+    let fields = []
+    const errors = {}
+    if (this.props.securityType === WPA_PSK_SECURITY) {
+      fields = WIFI_PSK_FIELDS
+    } else {
+      const selectedEapMethod = find(this.props.eapOptions, {
+        name: values.eapConfig.eapType,
+      })
+      fields = this.getEapFields(selectedEapMethod)
+    }
+    fields.forEach(f => {
+      if (f.required && !get(values, f.name)) {
+        set(errors, f.name, `${f.displayName} is required`)
+      } else if (f.name === 'psk' && get(values, f.name).length < 8) {
+        set(errors, f.name, 'Password must be at least 8 characters')
+      }
+    })
+    return errors
+  }
+
   render () {
     const {showPassword} = this.state
     const {securityType, eapOptions, close} = this.props
@@ -70,12 +99,24 @@ export default class ConnectForm extends React.Component<Props, State> {
       ? `${CONNECT_FIELD_ID_PREFIX}${eapMethodField}`
       : ''
 
-    // TODO(mc, 2018-10-18): form validation
     return (
       <Formik
         onSubmit={this.onSubmit}
+        validate={this.getValidationSchema}
         render={formProps => {
-          const {handleChange, handleSubmit, values, setValues} = formProps
+          const {
+            handleChange,
+            handleSubmit,
+            values,
+            setValues,
+            handleBlur,
+            errors,
+            touched,
+          } = formProps
+
+          // disable submit if form is pristine or errors present
+          const disabled = isEmpty(touched) || !isEmpty(errors)
+
           const eapMethod = get(values, eapMethodField)
           let fields: Array<WifiAuthField> = []
 
@@ -83,12 +124,8 @@ export default class ConnectForm extends React.Component<Props, State> {
             fields = WIFI_PSK_FIELDS
           } else if (securityType === WPA_EAP_SECURITY) {
             const selectedEapMethod = find(eapOptions, {name: eapMethod})
-            fields = get(selectedEapMethod, 'options', []).map(field => ({
-              ...field,
-              name: `eapConfig.${field.name}`,
-            }))
+            fields = this.getEapFields(selectedEapMethod)
           }
-
           return (
             <form onSubmit={handleSubmit}>
               <FormTable>
@@ -121,13 +158,16 @@ export default class ConnectForm extends React.Component<Props, State> {
                     showPassword={!!showPassword[field.name]}
                     onChange={handleChange}
                     toggleShowPassword={this.toggleShowPassword}
+                    onBlur={handleBlur}
+                    errors={errors}
+                    touched={touched}
                   />
                 ))}
               </FormTable>
               <BottomButtonBar
                 buttons={[
                   {children: 'Cancel', onClick: close},
-                  {children: 'Join', type: 'submit'},
+                  {children: 'Join', type: 'submit', disabled},
                 ]}
               />
             </form>

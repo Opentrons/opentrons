@@ -160,18 +160,30 @@ class API:
         pass
 
     @_log_call
-    async def cache_instruments(self):
+    async def cache_instruments(self,
+                                require: Dict[top_types.Mount, str] = None):
         """
          - Get the attached instrument on each mount and
          - Cache their pipette configs from pipette-config.json
+
+        If specified, the require element should be a dict of mounts to
+        instrument models describing the instruments expected to be present.
+        This can save a subsequent of :py:attr:`attached_instruments` and also
+        serves as the hook for the hardware simulator to decide what is
+        attached.
         """
+        checked_require = require or {}
         self._log.info("Updating instrument model cache")
-        for mount in top_types.Mount:
-            instrument_data = self._backend.get_attached_instrument(mount)
-            if instrument_data['model']:
-                self._attached_instruments[mount] = Pipette(
-                    instrument_data['model'], instrument_data['id'])
-        mod_log.info("Instruments found:{}".format(self._attached_instruments))
+        found = self._backend.get_attached_instruments(checked_require)
+        for mount, instrument_data in found.items():
+            model = instrument_data.get('model')
+            if model is not None:
+                p = Pipette(model, instrument_data['id'])
+                self._attached_instruments[mount] = p
+            else:
+                self._attached_instruments[mount] = None
+        mod_log.info("Instruments found: {}".format(
+            self._attached_instruments))
 
     @property
     def attached_instruments(self):
@@ -212,17 +224,20 @@ class API:
 
     # Gantry/frame (i.e. not pipette) action API
     @_log_call
-    async def home_z(self, mount: top_types.Mount):
-        """ Home one mount's Z-axis """
-        backend_pos = self._backend.home(Axis.by_mount(mount))
-        self._current_position = self._deck_from_smoothie(backend_pos)
+    async def home_z(self):
+        """ Home the two z-axes """
+        await self.home([Axis.Z, Axis.A])
 
     @_log_call
-    async def home(self):
+    async def home(self, axes: List[Axis] = None):
         """ Home the entire robot and initialize current position.
+        :param axes: A list of axes to home. Default is `None`, which will
+                     home everything.
         """
         # Initialize/update current_position
-        smoothie_pos = self._backend.home()
+        checked_axes = axes or [ax for ax in Axis]
+        smoothie_axes = [ax.name.upper() for ax in checked_axes]
+        smoothie_pos = self._backend.home(smoothie_axes)
         self._current_position = self._deck_from_smoothie(smoothie_pos)
 
     def _deck_from_smoothie(
@@ -395,6 +410,16 @@ class API:
             raise
         else:
             self._current_position.update(target_position)
+
+    @_log_call
+    async def retract(self, mount: top_types.Mount, margin: float):
+        """ Pull the specified mount up to its home position.
+
+        Works regardless of critical point or home status.
+        """
+        smoothie_ax = Axis.by_mount(mount).name.upper()
+        smoothie_pos = self._backend.fast_home(smoothie_ax, margin)
+        self._current_position = self._deck_from_smoothie(smoothie_pos)
 
     def _critical_point_for(self, mount: top_types.Mount) -> top_types.Point:
         """ Return the current critical point of the specified mount.

@@ -29,3 +29,8 @@ class Mount(enum.Enum):
 
 
 DeckLocation = Union[int, str]
+
+
+class MotionStrategy(enum.Enum):
+    DIRECT = enum.auto()
+    ARC = enum.auto()

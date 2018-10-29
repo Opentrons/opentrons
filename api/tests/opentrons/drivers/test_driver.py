@@ -414,9 +414,9 @@ def test_drop_tip_current(model):
     # Instrument in `model` is configured to right mount, which is the A axis
     # on the Smoothie (see `Robot._actuators`)
     expected = [
-        {'C': 0.456},   # make to 'drop_tip' position
-        {'C': 0.05},    # dwell
         {'C': 0.123},   # move to 'bottom' position
+        {'C': 0.05},    # dwell
+        {'C': 0.456},   # move to 'drop_tip' position
         {'C': 0.05},    # dwell
         {'C': 0.123},   # fast-home move upwards
         {'C': 0.05},    # dwell

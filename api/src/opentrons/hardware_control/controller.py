@@ -6,8 +6,8 @@ from typing import Any, Dict, List, Optional, Tuple
 from opentrons.util import environment
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.config import robot_configs
+from opentrons.types import Mount
 from . import modules
-from .types import Axis
 
 
 _lock = threading.Lock()
@@ -75,17 +75,50 @@ class Controller:
         self._smoothie_driver.move(
             target_position, home_flagged_axes=home_flagged_axes)
 
-    def home(self, axes: List[Axis] = None) -> Dict[str, float]:
+    def home(self, axes: List[str] = None) -> Dict[str, float]:
         if axes:
-            args: Tuple[Any, ...] = (''.join([ax.name for ax in axes]),)
+            args: Tuple[Any, ...] = (''.join(axes),)
         else:
             args = tuple()
         return self._smoothie_driver.home(*args)
 
-    def get_attached_instrument(self, mount) -> Dict[str, Optional[str]]:
-        model = self._smoothie_driver.read_pipette_model(mount.name.lower())
-        _id = self._smoothie_driver.read_pipette_id(mount.name.lower())
-        return {'model': model, 'id': _id}
+    def fast_home(self, axis: str, margin: float) -> Dict[str, float]:
+        return self._smoothie_driver.fast_home(axis, margin)
+
+    def get_attached_instruments(
+            self, expected: Dict[Mount, str])\
+            -> Dict[Mount, Dict[str, Optional[str]]]:
+        """ Find the instruments attached to our mounts.
+
+        :param expected: A dict that may contain a mapping from mount to
+                         strings that should prefix instrument model names.
+                         When instruments are scanned, they are matched
+                         against the expectation (if present) and a
+                         :py:attr:`RuntimeError` is raised if there is no
+                         match.
+
+        :raises RuntimeError: If an instrument is expected but not found.
+        :returns: A dict with mounts as the top-level keys. Each mount value is
+            a dict with keys 'mount' (containing an instrument model name or
+            `None`) and 'id' (containing the serial number of the pipette
+            attached to that mount, or `None`).
+        """
+        to_return: Dict[Mount, Dict[str, Optional[str]]] = {}
+        for mount in Mount:
+            found_model = self._smoothie_driver.read_pipette_model(
+                mount.name.lower())
+            found_id = self._smoothie_driver.read_pipette_id(
+                mount.name.lower())
+            expected_instr = expected.get(mount, None)
+            if expected_instr and\
+               (not found_model or not found_model.startswith(expected_instr)):
+                raise RuntimeError(
+                    'mount {}: expected instrument {} but got {}'
+                    .format(mount.name, expected_instr, found_model))
+            to_return[mount] = {
+                'model': found_model,
+                'id': found_id}
+        return to_return
 
     def set_active_current(self, axis, amp):
         self._smoothie_driver.set_active_current({axis.name: amp})

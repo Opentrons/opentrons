@@ -1,6 +1,6 @@
 """ Classes and functions for pipette state tracking
 """
-from typing import Any, Dict, Union
+from typing import Any, Dict, Union, Optional
 
 from opentrons.types import Point
 from opentrons.config import pipette_config
@@ -13,7 +13,7 @@ class Pipette:
     control API. Its only purpose is to gather state.
     """
 
-    def __init__(self, model: str, pipette_id: str) -> None:
+    def __init__(self, model: str, pipette_id: str = None) -> None:
         self._config = pipette_config.load(model)
         self._name = model
         self._current_volume = 0.0
@@ -32,7 +32,7 @@ class Pipette:
         return self._name
 
     @property
-    def pipette_id(self) -> str:
+    def pipette_id(self) -> Optional[str]:
         return self._pipette_id
 
     @property

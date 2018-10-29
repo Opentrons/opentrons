@@ -1040,12 +1040,12 @@ class Pipette:
             pos_bottom = self._get_plunger_position('bottom')
             pos_drop_tip = self._get_plunger_position('drop_tip')
 
-            self.instrument_actuator.set_active_current(self._drop_tip_current)
+            self.instrument_actuator.set_active_current(self._plunger_current)
             self.robot.poses = self.instrument_actuator.move(
                 self.robot.poses,
                 x=pos_bottom
             )
-            self.instrument_actuator.set_active_current(self._plunger_current)
+            self.instrument_actuator.set_active_current(self._drop_tip_current)
             self.robot.poses = self.instrument_actuator.move(
                 self.robot.poses,
                 x=pos_drop_tip
