@@ -361,7 +361,12 @@ class SmoothieDriver_3_0_0:
         if self.simulating:
             res = '1234567890'
         else:
-            res = self._read_from_pipette(GCODES['READ_INSTRUMENT_ID'], mount)
+            try:
+                res = self._read_from_pipette(
+                    GCODES['READ_INSTRUMENT_ID'], mount)
+            except UnicodeDecodeError:
+                log.exception("Failed to decode pipette ID string:")
+                res = None
         return res
 
     def read_pipette_model(self, mount) -> Optional[str]:
