@@ -42,8 +42,8 @@ install-py:
 .PHONY: install-js
 install-js:
 	yarn
-	$(MAKE) -C $(SHARED_DATA_DIR)
-	$(MAKE) -C $(DISCOVERY_CLIENT_DIR)
+	$(MAKE) -j 1 -C $(SHARED_DATA_DIR)
+	$(MAKE) -j 1 -C $(DISCOVERY_CLIENT_DIR)
 
 # uninstall all project dependencies
 # TODO(mc, 2018-03-22): API uninstall via pipenv --rm in api/Makefile
