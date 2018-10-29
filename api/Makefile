@@ -75,7 +75,7 @@ lint: $(ot_py_sources)
 	$(python) -m pylama src/opentrons tests
 
 .PHONY: docs
-docs:
+docs: local-install
 	pipenv run sphinx-build -b html -d docs/build/doctrees docs/source docs/build/html
 	pipenv run sphinx-build -b doctest -d docs/build/doctrees docs/source docs/build/doctest
 	shx mkdir -p docs/dist
