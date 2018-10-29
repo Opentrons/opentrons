@@ -2,7 +2,6 @@
 import * as React from 'react'
 import {Formik} from 'formik'
 import get from 'lodash/get'
-import isEmpty from 'lodash/isEmpty'
 import find from 'lodash/find'
 import map from 'lodash/map'
 import set from 'lodash/set'
@@ -144,19 +143,16 @@ export default class ConnectForm extends React.Component<Props, State> {
         render={formProps => {
           const {
             values,
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            setFieldValue,
-            setFieldTouched,
-            resetForm,
             errors,
             touched,
+            isValid,
+            handleChange,
+            setFieldValue,
+            handleBlur,
+            setFieldTouched,
+            resetForm,
+            handleSubmit,
           } = formProps
-
-          // disable submit if form is pristine or errors present
-          const disabled = isEmpty(touched) || !isEmpty(errors)
-          const fields = this.getFields(values)
 
           return (
             <form onSubmit={handleSubmit}>
@@ -183,7 +179,7 @@ export default class ConnectForm extends React.Component<Props, State> {
                     />
                   </FormTableRow>
                 )}
-                {fields.map(field => (
+                {this.getFields(values).map(field => (
                   <ConnectFormField
                     key={field.name}
                     field={field}
@@ -204,7 +200,7 @@ export default class ConnectForm extends React.Component<Props, State> {
               <BottomButtonBar
                 buttons={[
                   {children: 'Cancel', onClick: close},
-                  {children: 'Join', type: 'submit', disabled},
+                  {children: 'Join', type: 'submit', disabled: !isValid},
                 ]}
               />
             </form>
