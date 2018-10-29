@@ -28,6 +28,9 @@ import type {
   FormSectionState,
   SubstepIdentifier,
   TerminalItemId,
+  StepFormAndFieldErrors,
+  StepArgsAndErrors,
+  StepFormContextualState,
 } from './types'
 
 import type {
@@ -35,19 +38,17 @@ import type {
   StepIdType,
 } from '../form-types'
 
-import { type ValidFormAndErrors } from './formLevel/stepFormToArgs'
-
 // TODO Ian 2018-01-19 Rethink the hard-coded 'steplist' key in Redux root
 const rootSelector = (state: BaseState): RootState => state.steplist
 
 // ======= Selectors ===============================================
 
-const getUnsavedForm = createSelector(
+const getUnsavedForm: Selector<?FormData> = createSelector(
   rootSelector,
   (state: RootState) => state.unsavedForm
 )
 
-const getHydratedUnsavedForm: Selector<FormData> = createSelector(
+const getHydratedUnsavedForm: Selector<?FormData> = createSelector(
   getUnsavedForm,
   labwareIngredSelectors.rootSelector,
   pipetteSelectors.rootSelector,
@@ -56,7 +57,7 @@ const getHydratedUnsavedForm: Selector<FormData> = createSelector(
       labwareIngred: _labwareIngred,
       pipettes: _pipettes,
     }
-    return mapValues(_unsavedForm, (value, name) => (
+    return _unsavedForm && mapValues(_unsavedForm, (value, name) => (
       hydrateField(contextualState, name, value)
     ))
   }
@@ -152,11 +153,6 @@ const getSavedForms: Selector<{[StepIdType]: FormData}> = createSelector(
   }
 )
 
-type StepFormContextualState = {
-  labwareIngred: $PropertyType<BaseState, 'labwareIngred'>,
-  pipettes: $PropertyType<BaseState, 'pipettes'>,
-}
-
 const getHydratedSavedForms: Selector<{[StepIdType]: FormData}> = createSelector(
   getSavedForms,
   labwareIngredSelectors.rootSelector,
@@ -175,18 +171,18 @@ const getHydratedSavedForms: Selector<{[StepIdType]: FormData}> = createSelector
 )
 
 // TODO type with hydrated form type
-const getAllErrorsFromHydratedForm = (hydratedForm) => {
-  let errors = {}
+const getAllErrorsFromHydratedForm = (hydratedForm: FormData): StepFormAndFieldErrors => {
+  let errors: StepFormAndFieldErrors = {}
 
   each(hydratedForm, (value, fieldName) => {
     const fieldErrors = getFieldErrors(fieldName, value)
     if (fieldErrors && fieldErrors.length > 0) {
       errors = {
         ...errors,
-        field: [
-          ...(errors && errors.fields),
-          ...fieldErrors,
-        ],
+        field: {
+          ...errors.field,
+          [fieldName]: fieldErrors,
+        },
       }
     }
   })
@@ -198,9 +194,8 @@ const getAllErrorsFromHydratedForm = (hydratedForm) => {
   return errors
 }
 
-// TODO Brian 2018-08-21 rename validatedForms -> stepArguments since it should only include
-// the results of translating form data into step generation arguments
-const validatedForms: Selector<{[StepIdType]: ValidFormAndErrors}> = createSelector(
+// TODO Brian 2018-10-29 separate out getErrors and getStepArgs
+const getAllStepArgsAndErrors: Selector<{[StepIdType]: StepArgsAndErrors}> = createSelector(
   getSteps,
   getHydratedSavedForms,
   orderedStepsSelector,
@@ -213,13 +208,13 @@ const validatedForms: Selector<{[StepIdType]: ValidFormAndErrors}> = createSelec
         const errors = getAllErrorsFromHydratedForm(savedForm)
 
         nextStepData = isEmpty(errors)
-          ? {validatedForm: stepFormToArgs(savedForm)}
-          : {errors, validatedForm: null}
+          ? {stepArgs: stepFormToArgs(savedForm)}
+          : {errors, stepArgs: null}
       } else {
         // NOTE: usually, stepFormData is undefined here b/c there's no saved step form for it:
         nextStepData = {
           errors: {'form': ['no saved form for step ' + stepId]},
-          validatedForm: null,
+          stepArgs: null,
         }
       } // TODO Ian 2018-03-20 revisit "no saved form for step"
       return {
@@ -230,9 +225,8 @@ const validatedForms: Selector<{[StepIdType]: ValidFormAndErrors}> = createSelec
   }
 )
 
-// TODO: type actual validation error
-const allStepsFormAndFieldErrors: Selector<{[StepIdType]: ValidationError}> = createSelector(
-  validatedForms,
+const allStepsFormAndFieldErrors: Selector<{[StepIdType]: StepFormAndFieldErrors}> = createSelector(
+  getAllStepArgsAndErrors,
   (_stepsArgsAndErrors) => (
     mapValues(_stepsArgsAndErrors, (argsAndErrors) => argsAndErrors.errors)
   )
@@ -246,15 +240,15 @@ const isNewStepForm = createSelector(
 
 /** Array of labware (labwareId's) involved in hovered Step, or [] */
 const hoveredStepLabware: Selector<Array<string>> = createSelector(
-  validatedForms,
+  getAllStepArgsAndErrors,
   getHoveredStepId,
-  (_forms, _hoveredStep) => {
+  (_allStepArgsAndErrors, _hoveredStep) => {
     const blank = []
-    if (typeof _hoveredStep !== 'number' || !_forms[_hoveredStep]) {
+    if (typeof _hoveredStep !== 'number' || !_allStepArgsAndErrors[_hoveredStep]) {
       return blank
     }
 
-    const stepForm = _forms[_hoveredStep].validatedForm
+    const stepForm = _allStepArgsAndErrors[_hoveredStep].stepArgs
 
     if (!stepForm) {
       return blank
@@ -374,7 +368,7 @@ export const currentFormCanBeSaved: Selector<boolean | null> = createSelector(
   getSelectedStepId,
   allSteps,
   (hydratedForm, selectedStepId, allSteps) => {
-    if (!(typeof selectedStepId === 'number' || allSteps[selectedStepId] || hydratedForm)) return null
+    if (!selectedStepId || typeof selectedStepId !== 'number' || !allSteps[selectedStepId] || !hydratedForm) return null
     return isEmpty(getAllErrorsFromHydratedForm(hydratedForm))
   }
 )
@@ -400,7 +394,7 @@ export default {
   formData, // TODO: remove after sunset
   formModalData,
   nextStepId,
-  validatedForms,
+  getAllStepArgsAndErrors,
   isNewStepForm,
   formLevelWarnings,
   formLevelErrors,

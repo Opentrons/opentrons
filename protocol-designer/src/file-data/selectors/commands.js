@@ -116,16 +116,16 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
     }
   }
 )
-function compoundCommandCreatorFromFormData (validatedForm: StepGeneration.CommandCreatorData): ?StepGeneration.CompoundCommandCreator {
-  switch (validatedForm.stepType) {
+function compoundCommandCreatorFromStepArgs (stepArgs: StepGeneration.CommandCreatorData): ?StepGeneration.CompoundCommandCreator {
+  switch (stepArgs.stepType) {
     case 'consolidate':
-      return StepGeneration.consolidate(validatedForm)
+      return StepGeneration.consolidate(stepArgs)
     case 'transfer':
-      return StepGeneration.transfer(validatedForm)
+      return StepGeneration.transfer(stepArgs)
     case 'distribute':
-      return StepGeneration.distribute(validatedForm)
+      return StepGeneration.distribute(stepArgs)
     case 'mix':
-      return StepGeneration.mix(validatedForm)
+      return StepGeneration.mix(stepArgs)
     default:
       return null
   }
@@ -133,30 +133,30 @@ function compoundCommandCreatorFromFormData (validatedForm: StepGeneration.Comma
 
 // exposes errors and last valid robotState
 export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelector(
-  steplistSelectors.validatedForms,
+  steplistSelectors.getAllStepArgsAndErrors,
   steplistSelectors.orderedSteps,
   getInitialRobotState,
-  (forms, orderedSteps, initialRobotState) => {
-    const allFormData: Array<StepGeneration.CommandCreatorData | null> = orderedSteps.map(stepId => {
-      return (forms[stepId] && forms[stepId].validatedForm) || null
+  (allStepArgsAndErrors, orderedSteps, initialRobotState) => {
+    const allStepArgs: Array<StepGeneration.CommandCreatorData | null> = orderedSteps.map(stepId => {
+      return (allStepArgsAndErrors[stepId] && allStepArgsAndErrors[stepId].stepArgs) || null
     })
 
     // TODO: Ian 2018-06-14 `takeWhile` isn't inferring the right type
     // $FlowFixMe
-    const continuousValidForms: Array<StepGeneration.CommandCreatorData> = takeWhile(
-      allFormData,
-      f => f
+    const continuousStepArgs: Array<StepGeneration.CommandCreatorData> = takeWhile(
+      allStepArgs,
+      stepArgs => stepArgs
     )
 
-    const commandCreators = continuousValidForms.reduce(
-      (acc: Array<StepGeneration.CommandCreator>, formData, formIndex) => {
-        const {stepType} = formData
+    const commandCreators = continuousStepArgs.reduce(
+      (acc: Array<StepGeneration.CommandCreator>, stepArgs, stepIndex) => {
+        const {stepType} = stepArgs
         let reducedCommandCreator = null
 
-        if (formData.stepType === 'pause') {
-          reducedCommandCreator = StepGeneration.delay(formData)
+        if (stepArgs.stepType === 'pause') {
+          reducedCommandCreator = StepGeneration.delay(stepArgs)
         } else { // NOTE: compound return an array of command creators, atomic steps only return one command creator
-          const compoundCommandCreator: ?StepGeneration.CompoundCommandCreator = compoundCommandCreatorFromFormData(formData)
+          const compoundCommandCreator: ?StepGeneration.CompoundCommandCreator = compoundCommandCreatorFromStepArgs(stepArgs)
           reducedCommandCreator = compoundCommandCreator && StepGeneration.reduceCommandCreators(compoundCommandCreator(initialRobotState))
         }
         if (!reducedCommandCreator) {
@@ -168,13 +168,13 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
         // Drop tips eagerly, per pipette
         // NOTE: this assumes all step forms that use a pipette have both
         // 'pipette' and 'changeTip' fields (and they're not named something else).
-        const pipetteId = formData.pipette
+        const pipetteId = stepArgs.pipette
         if (pipetteId) {
-          const nextFormForPipette = continuousValidForms
-            .slice(formIndex + 1)
-            .find(form => form.pipette === pipetteId)
+          const nextStepArgsForPipette = continuousStepArgs
+            .slice(stepIndex + 1)
+            .find(stepArgs => stepArgs.pipette === pipetteId)
 
-          const willReuseTip = nextFormForPipette && nextFormForPipette.changeTip === 'never'
+          const willReuseTip = nextStepArgsForPipette && nextStepArgsForPipette.changeTip === 'never'
           if (!willReuseTip) {
             return [
               ...acc,

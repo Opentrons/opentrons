@@ -9,13 +9,13 @@ import { orderWells } from '../../utils'
 
 type MixStepArgs = MixFormData
 
-const mixFormToArgs = (formData: FormData): MixStepArgs => {
-  const {labware, pipette} = formData
-  const touchTip = !!formData['touchTip']
+const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
+  const {labware, pipette} = hydratedFormData
+  const touchTip = !!hydratedFormData['touchTip']
 
-  let wells = formData.wells || []
-  const orderFirst = formData.aspirate_wellOrder_first
-  const orderSecond = formData.aspirate_wellOrder_second
+  let wells = hydratedFormData.wells || []
+  const orderFirst = hydratedFormData.aspirate_wellOrder_first
+  const orderSecond = hydratedFormData.aspirate_wellOrder_second
 
   const labwareDef = labware && getLabware(labware.type)
   if (labwareDef) {
@@ -25,27 +25,27 @@ const mixFormToArgs = (formData: FormData): MixStepArgs => {
     console.warn('the specified labware definition could not be located')
   }
 
-  const volume = Number(formData.volume) || 0
-  const times = Number(formData.times) || 0
+  const volume = Number(hydratedFormData.volume) || 0
+  const times = Number(hydratedFormData.times) || 0
   // NOTE: for mix, there is only one tip offset field,
   // and it applies to both aspirate and dispense
-  const aspirateOffsetFromBottomMm = Number(formData['mmFromBottom'])
-  const dispenseOffsetFromBottomMm = Number(formData['mmFromBottom'])
+  const aspirateOffsetFromBottomMm = Number(hydratedFormData['mmFromBottom'])
+  const dispenseOffsetFromBottomMm = Number(hydratedFormData['mmFromBottom'])
 
   // It's radiobutton, so one should always be selected.
-  const changeTip = formData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION
+  const changeTip = hydratedFormData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION
 
-  const blowout = formData['dispense_blowout_labware']
+  const blowout = hydratedFormData['dispense_blowout_labware']
 
-  const delay = formData['dispense_delay_checkbox']
-    ? ((Number(formData['dispense_delayMinutes']) || 0) * 60) +
-      (Number(formData['dispense_delaySeconds'] || 0))
+  const delay = hydratedFormData['dispense_delay_checkbox']
+    ? ((Number(hydratedFormData['dispense_delayMinutes']) || 0) * 60) +
+      (Number(hydratedFormData['dispense_delaySeconds'] || 0))
     : null
   // TODO Ian 2018-05-08 delay number parsing errors
 
   return {
     stepType: 'mix',
-    name: `Mix ${formData.id}`, // TODO real name for steps
+    name: `Mix ${hydratedFormData.id}`, // TODO real name for steps
     description: 'description would be here 2018-03-01', // TODO get from form
     labware,
     wells,
@@ -55,7 +55,7 @@ const mixFormToArgs = (formData: FormData): MixStepArgs => {
     delay,
     changeTip,
     blowout,
-    pipette,
+    pipette: pipette.id,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
   }

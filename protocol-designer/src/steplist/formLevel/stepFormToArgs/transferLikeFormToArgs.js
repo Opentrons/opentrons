@@ -13,11 +13,11 @@ import { orderWells } from '../../utils'
 
 export const SOURCE_WELL_DISPOSAL_DESTINATION = 'source_well'
 
-function getMixData (formData, checkboxField, volumeField, timesField) {
+function getMixData (hydratedFormData, checkboxField, volumeField, timesField) {
   // TODO Ian 2018-04-03 is error reporting necessary? Or are only valid inputs allowed in these fields?
-  const checkbox = formData[checkboxField]
-  const volume = parseFloat(formData[volumeField])
-  const times = parseInt(formData[timesField])
+  const checkbox = hydratedFormData[checkboxField]
+  const volume = parseFloat(hydratedFormData[volumeField])
+  const times = parseInt(hydratedFormData[timesField])
   return (checkbox && volume > 0 && times > 0)
     ? {volume, times}
     : null
@@ -25,44 +25,44 @@ function getMixData (formData, checkboxField, volumeField, timesField) {
 
 type TransferLikeStepArgs = ConsolidateFormData | DistributeFormData | TransferFormData | null
 
-const transferLikeFormToArgs = (formData: FormData): TransferLikeStepArgs => {
-  const stepType = formData.stepType
-  const pipette = formData['pipette']
-  const volume = Number(formData['volume'])
-  const sourceLabware = formData['aspirate_labware']
-  const destLabware = formData['dispense_labware']
-  const blowout = formData['dispense_blowout_checkbox'] ? formData['dispense_blowout_labware'] : null
+const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArgs => {
+  const stepType = hydratedFormData.stepType
+  const pipette = hydratedFormData['pipette']
+  const volume = Number(hydratedFormData['volume'])
+  const sourceLabware = hydratedFormData['aspirate_labware']
+  const destLabware = hydratedFormData['dispense_labware']
+  const blowout = hydratedFormData['dispense_blowout_checkbox'] ? hydratedFormData['dispense_blowout_labware'] : null
 
-  const aspirateOffsetFromBottomMm = Number(formData['aspirate_mmFromBottom'])
-  const dispenseOffsetFromBottomMm = Number(formData['dispense_mmFromBottom'])
+  const aspirateOffsetFromBottomMm = Number(hydratedFormData['aspirate_mmFromBottom'])
+  const dispenseOffsetFromBottomMm = Number(hydratedFormData['dispense_mmFromBottom'])
 
-  const delayAfterDispense = formData['dispense_delay_checkbox']
-    ? ((Number(formData['dispense_delayMinutes']) || 0) * 60) +
-      (Number(formData['dispense_delaySeconds'] || 0))
+  const delayAfterDispense = hydratedFormData['dispense_delay_checkbox']
+    ? ((Number(hydratedFormData['dispense_delayMinutes']) || 0) * 60) +
+      (Number(hydratedFormData['dispense_delaySeconds'] || 0))
     : null
 
-  const mixFirstAspirate = formData['aspirate_mix_checkbox']
+  const mixFirstAspirate = hydratedFormData['aspirate_mix_checkbox']
     ? {
-      volume: Number(formData['aspirate_mix_volume']),
-      times: parseInt(formData['aspirate_mix_times']), // TODO handle unparseable
+      volume: Number(hydratedFormData['aspirate_mix_volume']),
+      times: parseInt(hydratedFormData['aspirate_mix_times']), // TODO handle unparseable
     }
     : null
 
   const mixBeforeAspirate = getMixData(
-    formData,
+    hydratedFormData,
     'aspirate_mix_checkbox',
     'aspirate_mix_volume',
     'aspirate_mix_times'
   )
 
   const mixInDestination = getMixData(
-    formData,
+    hydratedFormData,
     'dispense_mix_checkbox',
     'dispense_mix_volume',
     'dispense_mix_times'
   )
 
-  const changeTip = formData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION
+  const changeTip = hydratedFormData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION
 
   const commonFields = {
     pipette: pipette.id,
@@ -78,9 +78,9 @@ const transferLikeFormToArgs = (formData: FormData): TransferLikeStepArgs => {
     changeTip,
     delayAfterDispense,
     mixInDestination,
-    preWetTip: formData['aspirate_preWetTip'] || false,
-    touchTipAfterAspirate: formData['aspirate_touchTip'] || false,
-    touchTipAfterDispense: formData['dispense_touchTip'] || false,
+    preWetTip: hydratedFormData['aspirate_preWetTip'] || false,
+    touchTipAfterAspirate: hydratedFormData['aspirate_touchTip'] || false,
+    touchTipAfterDispense: hydratedFormData['dispense_touchTip'] || false,
     description: 'description would be here 2018-03-01', // TODO get from form
   }
 
@@ -91,7 +91,7 @@ const transferLikeFormToArgs = (formData: FormData): TransferLikeStepArgs => {
     aspirate_wellOrder_second,
     dispense_wellOrder_first,
     dispense_wellOrder_second,
-  } = formData
+  } = hydratedFormData
   sourceWells = sourceWells || []
   destWells = destWells || []
 
@@ -118,9 +118,9 @@ const transferLikeFormToArgs = (formData: FormData): TransferLikeStepArgs => {
   let disposalDestination = null
   let disposalLabware = null
   let disposalWell = null
-  if (formData['aspirate_disposalVol_checkbox']) { // TODO: BC 09-17-2018 handle unparseable values?
-    disposalVolume = Number(formData['aspirate_disposalVol_volume'])
-    disposalDestination = formData['aspirate_disposalVol_destination']
+  if (hydratedFormData['aspirate_disposalVol_checkbox']) { // TODO: BC 09-17-2018 handle unparseable values?
+    disposalVolume = Number(hydratedFormData['aspirate_disposalVol_volume'])
+    disposalDestination = hydratedFormData['aspirate_disposalVol_destination']
     if (disposalDestination === SOURCE_WELL_DISPOSAL_DESTINATION) {
       disposalLabware = sourceLabware
       disposalWell = sourceWells[0]
@@ -140,7 +140,7 @@ const transferLikeFormToArgs = (formData: FormData): TransferLikeStepArgs => {
         sourceWells,
         destWells,
         mixBeforeAspirate,
-        name: `Transfer ${formData.id}`, // TODO Ian 2018-04-03 real name for steps
+        name: `Transfer ${hydratedFormData.id}`, // TODO Ian 2018-04-03 real name for steps
       }
       return transferStepArguments
     }
@@ -152,7 +152,7 @@ const transferLikeFormToArgs = (formData: FormData): TransferLikeStepArgs => {
         sourceWells,
         destWell: destWells[0],
         stepType: 'consolidate',
-        name: `Consolidate ${formData.id}`, // TODO Ian 2018-04-03 real name for steps
+        name: `Consolidate ${hydratedFormData.id}`, // TODO Ian 2018-04-03 real name for steps
       }
       return consolidateStepArguments
     }
@@ -166,7 +166,7 @@ const transferLikeFormToArgs = (formData: FormData): TransferLikeStepArgs => {
         sourceWell: sourceWells[0],
         destWells,
         stepType: 'distribute',
-        name: `Distribute ${formData.id}`, // TODO Ian 2018-04-03 real name for steps
+        name: `Distribute ${hydratedFormData.id}`, // TODO Ian 2018-04-03 real name for steps
       }
       return distributeStepArguments
     }

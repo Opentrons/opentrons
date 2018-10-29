@@ -1,6 +1,9 @@
 // @flow
-import type {PauseFormData} from '../step-generation'
+import type {PauseFormData, CommandCreatorData} from '../step-generation'
 import type {FormData, StepIdType, StepType, TransferLikeStepType} from '../form-types'
+import type {BaseState} from '../types'
+import type {FormError} from './formLevel/errors'
+import type {StepFieldName} from './fieldLevel'
 
 // sections of the form that are expandable/collapsible
 export type FormSectionState = {aspirate: boolean, dispense: boolean}
@@ -84,3 +87,18 @@ export type StepItemData = {
 }
 
 export type SubSteps = {[StepIdType]: ?SubstepItemData}
+
+export type StepFormAndFieldErrors = {
+  field?: {[StepFieldName]: Array<string>},
+  form?: Array<FormError>,
+}
+
+export type StepArgsAndErrors = {
+  errors: StepFormAndFieldErrors,
+  stepArgs: CommandCreatorData | null, // TODO: incompleteData field when this is null?
+}
+
+export type StepFormContextualState = {|
+  labwareIngred: $PropertyType<BaseState, 'labwareIngred'>,
+  pipettes: $PropertyType<BaseState, 'pipettes'>,
+|}

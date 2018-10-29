@@ -8,9 +8,8 @@ import substepTimeline from './substepTimeline'
 import {
   utils as steplistUtils,
   type NamedIngred,
+  type StepArgsAndErrors,
 } from '../steplist'
-
-import { type ValidFormAndErrors } from './formLevel/stepFormToArgs'
 
 import type {
   SubstepItemData,
@@ -43,14 +42,14 @@ export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 type GetLabwareType = (labwareId: string) => ?string
 
 function transferLikeSubsteps (args: {
-  validatedForm: ConsolidateFormData | DistributeFormData | TransferFormData | MixFormData,
+  stepArgs: ConsolidateFormData | DistributeFormData | TransferFormData | MixFormData,
   allPipetteData: AllPipetteData,
   getLabwareType: GetLabwareType,
   robotState: RobotState,
   stepId: number,
 }): ?SourceDestSubstepItem {
   const {
-    validatedForm,
+    stepArgs,
     allPipetteData,
     getLabwareType,
     stepId,
@@ -60,7 +59,7 @@ function transferLikeSubsteps (args: {
   // TODO: Ian 2018-07-31 develop more elegant way to bypass tip handling for simulation/test
   const robotState = cloneDeep(args.robotState)
   robotState.tipState.pipettes = mapValues(robotState.tipState.pipettes, () => true)
-  const {pipette: pipetteId} = validatedForm
+  const {pipette: pipetteId} = stepArgs
 
   const pipette = allPipetteData[pipetteId]
 
@@ -70,43 +69,43 @@ function transferLikeSubsteps (args: {
   }
 
   // if false, show aspirate vol instead
-  const showDispenseVol = validatedForm.stepType === 'distribute'
+  const showDispenseVol = stepArgs.stepType === 'distribute'
 
   let substepCommandCreators
 
   // Call appropriate command creator with the validateForm fields.
   // Disable any mix args so those aspirate/dispenses don't show up in substeps
-  if (validatedForm.stepType === 'transfer') {
+  if (stepArgs.stepType === 'transfer') {
     const commandCallArgs = {
-      ...validatedForm,
+      ...stepArgs,
       mixBeforeAspirate: null,
       mixInDestination: null,
       preWetTip: false,
     }
 
     substepCommandCreators = transfer(commandCallArgs)(robotState)
-  } else if (validatedForm.stepType === 'distribute') {
+  } else if (stepArgs.stepType === 'distribute') {
     const commandCallArgs = {
-      ...validatedForm,
+      ...stepArgs,
       mixBeforeAspirate: null,
       preWetTip: false,
     }
 
     substepCommandCreators = distribute(commandCallArgs)(robotState)
-  } else if (validatedForm.stepType === 'consolidate') {
+  } else if (stepArgs.stepType === 'consolidate') {
     const commandCallArgs = {
-      ...validatedForm,
+      ...stepArgs,
       mixFirstAspirate: null,
       mixInDestination: null,
       preWetTip: false,
     }
 
     substepCommandCreators = consolidate(commandCallArgs)(robotState)
-  } else if (validatedForm.stepType === 'mix') {
-    substepCommandCreators = mix(validatedForm)(robotState)
+  } else if (stepArgs.stepType === 'mix') {
+    substepCommandCreators = mix(stepArgs)(robotState)
   } else {
     // TODO Ian 2018-05-21 Use assert here. Should be unreachable
-    console.warn(`transferLikeSubsteps got unsupported stepType "${validatedForm.stepType}"`)
+    console.warn(`transferLikeSubsteps got unsupported stepType "${stepArgs.stepType}"`)
     return null
   }
 
@@ -141,7 +140,7 @@ function transferLikeSubsteps (args: {
           }
           return {
             source,
-            dest: validatedForm.stepType === 'mix' ? source : dest, // NOTE: since source and dest are same for mix, we're showing source on both sides. Otherwise dest would show the intermediate volume state
+            dest: stepArgs.stepType === 'mix' ? source : dest, // NOTE: since source and dest are same for mix, we're showing source on both sides. Otherwise dest would show the intermediate volume state
             volume: showDispenseVol ? nextMultiRow.volume : currentMultiRow.volume,
           }
         })
@@ -164,7 +163,7 @@ function transferLikeSubsteps (args: {
     )
     return {
       multichannel: true,
-      stepType: validatedForm.stepType,
+      stepType: stepArgs.stepType,
       parentStepId: stepId,
       multiRows: mergedMultiRows,
     }
@@ -210,7 +209,7 @@ function transferLikeSubsteps (args: {
 
     return {
       multichannel: false,
-      stepType: validatedForm.stepType,
+      stepType: stepArgs.stepType,
       parentStepId: stepId,
       rows: mergedRows,
     }
@@ -219,7 +218,7 @@ function transferLikeSubsteps (args: {
 
 // NOTE: This is the fn used by the `allSubsteps` selector
 export function generateSubsteps (
-  valForm: ?ValidFormAndErrors,
+  stepArgsAndErrors: ?StepArgsAndErrors,
   allPipetteData: AllPipetteData,
   getLabwareType: GetLabwareType,
   robotState: ?RobotState,
@@ -233,27 +232,27 @@ export function generateSubsteps (
 
   // TODO: BC: 2018-08-21 replace old error check with new logic in field, form, and timeline level
   // Don't try to render with form errors. TODO LATER: presentational error state of substeps?
-  if (!valForm || !valForm.validatedForm || !isEmpty(valForm.errors)) {
+  if (!stepArgsAndErrors || !stepArgsAndErrors.stepArgs || !isEmpty(stepArgsAndErrors.errors)) {
     console.log('caught', stepId)
     return null
   }
 
-  const validatedForm = valForm.validatedForm
+  const {stepArgs} = stepArgsAndErrors
 
-  if (validatedForm.stepType === 'pause') {
+  if (stepArgs.stepType === 'pause') {
     // just returns formData
-    const formData: PauseFormData = validatedForm
+    const formData: PauseFormData = stepArgs
     return formData
   }
 
   if (
-    validatedForm.stepType === 'consolidate' ||
-    validatedForm.stepType === 'distribute' ||
-    validatedForm.stepType === 'transfer' ||
-    validatedForm.stepType === 'mix'
+    stepArgs.stepType === 'consolidate' ||
+    stepArgs.stepType === 'distribute' ||
+    stepArgs.stepType === 'transfer' ||
+    stepArgs.stepType === 'mix'
   ) {
     return transferLikeSubsteps({
-      validatedForm,
+      stepArgs,
       allPipetteData,
       getLabwareType,
       robotState,
@@ -261,6 +260,6 @@ export function generateSubsteps (
     })
   }
 
-  console.warn('allSubsteps doesn\'t support step type: ', validatedForm.stepType, stepId)
+  console.warn('allSubsteps doesn\'t support step type: ', stepArgs.stepType, stepId)
   return null
 }

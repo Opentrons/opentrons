@@ -16,14 +16,14 @@ import type {SubstepItemData} from '../steplist/types'
 
 type AllSubsteps = {[StepIdType]: ?SubstepItemData}
 export const allSubsteps: Selector<AllSubsteps> = createSelector(
-  steplistSelectors.validatedForms,
+  steplistSelectors.getAllStepArgsAndErrors,
   pipetteSelectors.equippedPipettes,
   labwareIngredSelectors.getLabwareTypes,
   steplistSelectors.orderedSteps,
   fileDataSelectors.robotStateTimeline,
   fileDataSelectors.getInitialRobotState,
   (
-    validatedForms,
+    allStepArgsAndErrors,
     allPipetteData,
     allLabwareTypes,
     orderedSteps,
@@ -35,7 +35,7 @@ export const allSubsteps: Selector<AllSubsteps> = createSelector(
       const robotState = timeline[timelineIndex] && timeline[timelineIndex].robotState
 
       const substeps = generateSubsteps(
-        validatedForms[stepId],
+        allStepArgsAndErrors[stepId],
         allPipetteData,
         (labwareId: string) => allLabwareTypes[labwareId],
         robotState,

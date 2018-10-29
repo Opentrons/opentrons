@@ -136,18 +136,18 @@ function _getSelectedWellsForSubstep (
 
 export const wellHighlightsByLabwareId: Selector<AllWellHighlightsAllLabware> = createSelector(
   fileDataSelectors.robotStateTimeline,
-  steplistSelectors.validatedForms,
+  steplistSelectors.getAllStepArgsAndErrors,
   steplistSelectors.getHoveredStepId,
   steplistSelectors.getHoveredSubstep,
   allSubsteps,
   steplistSelectors.orderedSteps,
-  (robotStateTimeline, forms, hoveredStepId, hoveredSubstep, allSubsteps, orderedSteps) => {
+  (robotStateTimeline, allStepArgsAndErrors, hoveredStepId, hoveredSubstep, allSubsteps, orderedSteps) => {
     const timeline = robotStateTimeline.timeline
     const stepId = hoveredStepId
     const timelineIndex = orderedSteps.findIndex(i => i === stepId)
     const frame = timeline[timelineIndex]
     const robotState = frame && frame.robotState
-    const form = stepId != null && forms[stepId] && forms[stepId].validatedForm
+    const form = stepId != null && allStepArgsAndErrors[stepId] && allStepArgsAndErrors[stepId].stepArgs
 
     if (!robotState || stepId == null || !form) {
       // nothing hovered, or no form for step
