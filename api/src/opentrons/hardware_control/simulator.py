@@ -8,8 +8,10 @@ from . import modules
 
 
 def find_config(prefix: str) -> str:
-    """ Find the most recent config matching `prefix` or None """
+    """ Find the most recent config matching `prefix` """
     matches = [conf for conf in configs if conf.startswith(prefix)]
+    if not matches:
+        raise KeyError('No match found for prefix {}'.format(prefix))
     if prefix in matches:
         return prefix
     else:
@@ -25,10 +27,11 @@ class Simulator:
     hardware actions. It is suitable for use on a dev machine or on
     a robot with no smoothie connected.
     """
-    def __init__(self,
-                 attached_instruments: Dict[types.Mount, str],
-                 attached_modules: List[str],
-                 config, loop) -> None:
+    def __init__(
+            self,
+            attached_instruments: Dict[types.Mount, Dict[str, Optional[str]]],
+            attached_modules: List[str],
+            config, loop) -> None:
         self._config = config
         self._loop = loop
         self._attached_instruments = attached_instruments
@@ -53,7 +56,7 @@ class Simulator:
 
     def get_attached_instruments(
             self, expected: Dict[types.Mount, str])\
-            -> Dict[types.Mount, Optional[str]]:
+            -> Dict[types.Mount, Dict[str, Optional[str]]]:
         """ Update the internal cache of attached instruments.
 
         This method allows after-init-time specification of attached simulated
@@ -72,23 +75,34 @@ class Simulator:
         :raises RuntimeError: If an instrument is expected but not found.
         :returns: A dict of mount to either instrument model names or `None`.
         """
-        to_return: Dict[types.Mount, Optional[str]] = {}
+        to_return: Dict[types.Mount, Dict[str, Optional[str]]] = {}
         for mount in types.Mount:
             expected_instr = expected.get(mount, None)
-            init_instr = self._attached_instruments.get(mount, None)
-            if expected_instr and init_instr\
-               and not init_instr.startswith(expected_instr):
+            init_instr = self._attached_instruments.get(mount, {})
+            found_model = init_instr.get('model', '')
+            if expected_instr and found_model\
+                    and not found_model.startswith(expected_instr):
                 raise RuntimeError(
                     'mount {}: expected instrument {} but got {}'
                     .format(mount.name, expected_instr, init_instr))
-            elif init_instr and expected_instr:
+            elif found_model and expected_instr:
+                # Instrument detected matches instrument expected (note:
+                # "instrument detected" means passed as an argument to the
+                # constructor of this class)
                 to_return[mount] = init_instr
-            elif init_instr:
+            elif found_model:
+                # Instrument detected and no expected instrument specified
                 to_return[mount] = init_instr
             elif expected_instr:
-                to_return[mount] = find_config(expected_instr)
+                # Expected instrument specified and no instrument detected
+                to_return[mount] = {
+                    'model': find_config(expected_instr),
+                    'id': None}
             else:
-                to_return[mount] = None
+                # No instrument detected or expected
+                to_return[mount] = {
+                    'model': None,
+                    'id': None}
         return to_return
 
     def set_active_current(self, axis, amp):

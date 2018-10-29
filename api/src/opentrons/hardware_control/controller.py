@@ -86,7 +86,8 @@ class Controller:
         return self._smoothie_driver.fast_home(axis, margin)
 
     def get_attached_instruments(
-            self, expected: Dict[Mount, str]) -> Dict[Mount, Optional[str]]:
+            self, expected: Dict[Mount, str])\
+            -> Dict[Mount, Dict[str, Optional[str]]]:
         """ Find the instruments attached to our mounts.
 
         :param expected: A dict that may contain a mapping from mount to
@@ -97,19 +98,26 @@ class Controller:
                          match.
 
         :raises RuntimeError: If an instrument is expected but not found.
-        :returns: A dict of mount to either instrument model names or `None`.
+        :returns: A dict with mounts as the top-level keys. Each mount value is
+            a dict with keys 'mount' (containing an instrument model name or
+            `None`) and 'id' (containing the serial number of the pipette
+            attached to that mount, or `None`).
         """
-        to_return: Dict[Mount, Optional[str]] = {}
+        to_return: Dict[Mount, Dict[str, Optional[str]]] = {}
         for mount in Mount:
-            found = self._smoothie_driver.read_pipette_model(
+            found_model = self._smoothie_driver.read_pipette_model(
+                mount.name.lower())
+            found_id = self._smoothie_driver.read_pipette_id(
                 mount.name.lower())
             expected_instr = expected.get(mount, None)
             if expected_instr and\
-               (not found or not found.startswith(expected_instr)):
+               (not found_model or not found_model.startswith(expected_instr)):
                 raise RuntimeError(
                     'mount {}: expected instrument {} but got {}'
-                    .format(mount.name, expected_instr, found))
-            to_return[mount] = found
+                    .format(mount.name, expected_instr, found_model))
+            to_return[mount] = {
+                'model': found_model,
+                'id': found_id}
         return to_return
 
     def set_active_current(self, axis, amp):

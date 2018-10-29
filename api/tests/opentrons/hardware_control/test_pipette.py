@@ -5,7 +5,7 @@ from opentrons.config import pipette_config
 
 
 def test_tip_tracking():
-    pip = pipette.Pipette('p10_single_v1')
+    pip = pipette.Pipette('p10_single_v1', 'testID')
     with pytest.raises(AssertionError):
         pip.remove_tip()
     assert not pip.has_tip
@@ -22,7 +22,7 @@ def test_tip_tracking():
 def test_critical_points():
     for config in pipette_config.configs:
         loaded = pipette_config.load(config)
-        pip = pipette.Pipette(config)
+        pip = pipette.Pipette(config, 'testID')
         mod_offset = Point(*loaded.model_offset)
         assert pip.critical_point == mod_offset
         pip.add_tip()
@@ -35,7 +35,7 @@ def test_critical_points():
 def test_volume_tracking():
     for config in pipette_config.configs:
         loaded = pipette_config.load(config)
-        pip = pipette.Pipette(config)
+        pip = pipette.Pipette(config, 'testID')
         assert pip.current_volume == 0.0
         assert pip.available_volume == loaded.max_volume
         assert pip.ok_to_add_volume(loaded.max_volume - 0.1)

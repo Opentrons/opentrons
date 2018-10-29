@@ -2,7 +2,7 @@ from os import environ
 import logging
 from time import sleep
 from threading import Event
-from typing import Dict
+from typing import Dict, Optional
 
 from serial.serialutil import SerialException
 
@@ -349,29 +349,32 @@ class SmoothieDriver_3_0_0:
 
         self._update_position(updated_position)
 
-    def read_pipette_id(self, mount):
+    def read_pipette_id(self, mount) -> Optional[str]:
         '''
-        Reads in an attached pipette's UUID
-        The UUID is unique to this pipette, and is a string of unknown length
+        Reads in an attached pipette's ID
+        The ID is unique to this pipette, and is a string of unknown length
 
-        mount:
-            String (str) with value 'left' or 'right'
+        :param mount: string with value 'left' or 'right'
+        :return id string, or None
         '''
+        res: Optional[str] = None
         if self.simulating:
             res = '1234567890'
         else:
-            res = self._read_from_pipette(GCODES['READ_INSTRUMENT_ID'], mount)
-        if res:
-            ret = {'pipette_id': res}
-        else:
-            ret = {'message': 'Error: Pipette ID read failed'}
-        return ret
+            try:
+                res = self._read_from_pipette(
+                    GCODES['READ_INSTRUMENT_ID'], mount)
+            except UnicodeDecodeError:
+                log.exception("Failed to decode pipette ID string:")
+                res = None
+        return res
 
-    def read_pipette_model(self, mount):
+    def read_pipette_model(self, mount) -> Optional[str]:
         '''
         Reads an attached pipette's MODEL
         The MODEL is a unique string for this model of pipette
 
+        :param mount: string with value 'left' or 'right'
         :return model string, or None
         '''
         if self.simulating:
@@ -393,8 +396,8 @@ class SmoothieDriver_3_0_0:
 
     def write_pipette_id(self, mount, data_string):
         '''
-        Writes to an attached pipette's UUID memory location
-        The UUID is unique to this pipette, and is a string of unknown length
+        Writes to an attached pipette's ID memory location
+        The ID is unique to this pipette, and is a string of unknown length
 
         NOTE: To enable write-access to the pipette, it's button must be held
 
@@ -959,7 +962,7 @@ class SmoothieDriver_3_0_0:
         self.pop_axis_max_speed()
         self.pop_speed()
 
-    def _read_from_pipette(self, gcode, mount):
+    def _read_from_pipette(self, gcode, mount) -> Optional[str]:
         '''
         Read from an attached pipette's internal memory. The gcode used
         determines which portion of memory is read and returned.
@@ -992,6 +995,7 @@ class SmoothieDriver_3_0_0:
                 return _byte_array_to_ascii_string(res[mount])
         except (ParseError, AssertionError, SmoothieError):
             pass
+        return None
 
     def _write_to_pipette(self, gcode, mount, data_string):
         '''

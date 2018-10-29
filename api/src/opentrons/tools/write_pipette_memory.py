@@ -41,7 +41,7 @@ def write_identifiers(robot, mount, new_id, new_model):
     '''
     robot._driver.write_pipette_id(mount, new_id)
     read_id = robot._driver.read_pipette_id(mount)
-    _assert_the_same(new_id, read_id['pipette_id'])
+    _assert_the_same(new_id, read_id)
     robot._driver.write_pipette_model(mount, new_model)
     read_model = robot._driver.read_pipette_model(mount)
     _assert_the_same(new_model, read_model)
@@ -49,7 +49,6 @@ def write_identifiers(robot, mount, new_id, new_model):
 
 def check_previous_data(robot, mount):
     old_id = robot._driver.read_pipette_id(mount)
-    old_id = old_id.get('pipette_id')
     old_model = robot._driver.read_pipette_model(mount)
     if old_id and old_model:
         print(
