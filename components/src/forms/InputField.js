@@ -21,8 +21,8 @@ type Props = {
   id?: string,
   /** placeholder text */
   placeholder?: string,
-  /** optional units string, appears to the right of input text */
-  units?: string,
+  /** optional suffix component, appears to the right of input text */
+  units?: React.Node, // TODO: Ian 2018-10-30 rename to 'suffix'
   /** current value of text in box, defaults to '' */
   value?: ?string,
   /** if included, InputField will use error style and display error instead of caption */
