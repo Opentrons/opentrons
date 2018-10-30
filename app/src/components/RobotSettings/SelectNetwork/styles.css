@@ -68,3 +68,23 @@
   font-weight: var(--fw-semibold);
   text-align: right;
 }
+
+/**
+ * TODO(mc, 2018-10-23): move this padding to form_table_row once CL text
+ * fields stop having empty caption divs that take up height
+ */
+.wifi_key_select {
+  /* padding-bottom: 0.5rem; */
+}
+
+.wifi_add_key_input {
+  /* copied from components/src/forms/forms.css > .accessibly_hidden */
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}

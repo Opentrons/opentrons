@@ -8,9 +8,12 @@ import {
   WPA_EAP_SECURITY,
   fetchWifiList,
   fetchWifiEapOptions,
+  fetchWifiKeys,
+  addWifiKey,
   configureWifi,
   makeGetRobotWifiList,
   makeGetRobotWifiEapOptions,
+  makeGetRobotWifiKeys,
   makeGetRobotWifiConfigure,
 } from '../../../http-api-client'
 
@@ -25,7 +28,8 @@ import type {ViewableRobot} from '../../../discovery'
 import type {
   WifiNetworkList,
   WifiSecurityType,
-  WifiEapOption,
+  WifiEapOptionsList,
+  WifiKeysList,
   WifiConfigureRequest,
 } from '../../../http-api-client'
 
@@ -34,12 +38,15 @@ type OP = {robot: ViewableRobot}
 type SP = {|
   list: ?WifiNetworkList,
   connectingTo: ?string,
-  eapOptions: ?Array<WifiEapOption>,
+  eapOptions: ?WifiEapOptionsList,
+  keys: ?WifiKeysList,
 |}
 
 type DP = {|
   fetchList: () => mixed,
   fetchEapOptions: () => mixed,
+  fetchKeys: () => mixed,
+  addKey: (file: File) => mixed,
   configure: WifiConfigureRequest => mixed,
 |}
 
@@ -63,15 +70,14 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
     const network = find(this.props.list, {ssid})
 
     if (network) {
-      const nextState: $Shape<SelectNetworkState> = {
-        ssid,
-        securityType: network.securityType,
-      }
+      const securityType = network.securityType
+      const nextState: $Shape<SelectNetworkState> = {ssid, securityType}
 
-      if (network.securityType === NO_SECURITY) {
+      if (securityType === NO_SECURITY) {
         this.props.configure({ssid})
-      } else if (network.securityType === WPA_EAP_SECURITY) {
+      } else if (securityType === WPA_EAP_SECURITY) {
         this.props.fetchEapOptions()
+        this.props.fetchKeys()
       }
       // TODO(mc, 2018-10-18): handle hidden network
 
@@ -95,13 +101,20 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
   }
 
   render () {
-    const {list, connectingTo, eapOptions, fetchList, configure} = this.props
+    const {
+      list,
+      connectingTo,
+      eapOptions,
+      keys,
+      fetchList,
+      configure,
+      addKey,
+    } = this.props
     const {ssid, securityType} = this.state
 
     return (
       <IntervalWrapper refresh={fetchList} interval={LIST_REFRESH_MS}>
         <SelectSsid
-          value={ssid}
           list={list}
           disabled={connectingTo != null}
           onValueChange={this.setCurrentSsid}
@@ -123,10 +136,12 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
               >
                 <ConnectForm
                   ssid={ssid}
+                  securityType={securityType}
+                  eapOptions={eapOptions}
+                  keys={keys}
                   configure={configure}
                   close={this.closeConnectForm}
-                  eapOptions={eapOptions}
-                  securityType={securityType}
+                  addKey={addKey}
                 />
               </ConnectModal>
             )}
@@ -139,12 +154,14 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
 function makeMapStateToProps (): (State, OP) => SP {
   const getListCall = makeGetRobotWifiList()
   const getEapCall = makeGetRobotWifiEapOptions()
+  const getKeysCall = makeGetRobotWifiKeys()
   const getConfigureCall = makeGetRobotWifiConfigure()
 
   return (state, ownProps) => {
     const {robot} = ownProps
     const {response: listResponse} = getListCall(state, robot)
     const {response: eapResponse} = getEapCall(state, robot)
+    const {response: keysResponse} = getKeysCall(state, robot)
     const {
       request: cfgRequest,
       inProgress: cfgInProgress,
@@ -154,6 +171,7 @@ function makeMapStateToProps (): (State, OP) => SP {
     return {
       list: listResponse && listResponse.list,
       eapOptions: eapResponse && eapResponse.options,
+      keys: keysResponse && keysResponse.keys,
       connectingTo:
         !cfgError && cfgInProgress && cfgRequest ? cfgRequest.ssid : null,
     }
@@ -166,6 +184,8 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   return {
     fetchList: () => dispatch(fetchWifiList(robot)),
     fetchEapOptions: () => dispatch(fetchWifiEapOptions(robot)),
+    fetchKeys: () => dispatch(fetchWifiKeys(robot)),
+    addKey: file => dispatch(addWifiKey(robot, file)),
     configure: params => dispatch(configureWifi(robot, params)),
   }
 }

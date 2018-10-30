@@ -1,24 +1,24 @@
 // @flow
 import * as React from 'react'
-import get from 'lodash/get'
-import {InputField, CheckboxField, DropdownField} from '@opentrons/components'
+import {InputField, CheckboxField} from '@opentrons/components'
+import SelectKey from './SelectKey'
 import {FormTableRow} from './FormTable'
 
-import type {WifiAuthField} from '../../../http-api-client'
+import type {WifiAuthField, WifiKeysList} from '../../../http-api-client'
 
 type Props = {
   field: WifiAuthField,
   value: string,
-  showPassword: boolean,
+  touched: ?boolean,
+  error: ?string,
   onChange: (*) => mixed,
-  toggleShowPassword: (name: string) => mixed,
-  errors: {
-    [string]: string,
-  },
-  touched: {
-    [string]: boolean,
-  },
   onBlur: (SyntheticFocusEvent<*>) => mixed,
+  onValueChange: (name: string, value: *) => mixed,
+  onLoseFocus: (name: string) => mixed,
+  showPassword: boolean,
+  toggleShowPassword: (name: string) => mixed,
+  keys: ?WifiKeysList,
+  addKey: File => mixed,
 }
 
 export const CONNECT_FIELD_ID_PREFIX = '__ConnectForm__'
@@ -26,14 +26,17 @@ export const CONNECT_FIELD_ID_PREFIX = '__ConnectForm__'
 export default function ConnectFormField (props: Props) {
   const {
     value,
-    showPassword,
     onChange,
-    toggleShowPassword,
+    onValueChange,
     onBlur,
-    touched,
-    errors,
+    onLoseFocus,
+    showPassword,
+    toggleShowPassword,
+    keys,
+    addKey,
   } = props
   const {name, displayName, type, required} = props.field
+  const error = props.touched ? props.error : null
   const id = `${CONNECT_FIELD_ID_PREFIX}${name}`
   const label = required ? `* ${displayName}:` : `${displayName}:`
   let input = null
@@ -47,18 +50,21 @@ export default function ConnectFormField (props: Props) {
         type={inputType}
         value={value}
         onChange={onChange}
-        error={get(touched, name) && get(errors, name)}
+        error={error}
         onBlur={onBlur}
       />
     )
   } else if (type === 'file') {
     input = (
-      <DropdownField
-        disabled
+      <SelectKey
         id={id}
         name={name}
-        onChange={onChange}
-        options={[{name: 'Certificates not yet supported', value: ''}]}
+        value={value}
+        error={error}
+        keys={keys}
+        addKey={addKey}
+        onValueChange={onValueChange}
+        onLoseFocus={onLoseFocus}
       />
     )
   }
@@ -76,6 +82,7 @@ export default function ConnectFormField (props: Props) {
         {inputRow}
         <FormTableRow>
           <CheckboxField
+            name="Show password"
             label="Show password"
             value={showPassword}
             onChange={() => toggleShowPassword(name)}

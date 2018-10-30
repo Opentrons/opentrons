@@ -191,7 +191,8 @@
     color: var(--c-light-gray);
   }
 
-  & input { /* stylelint-disable no-descending-specificity */
+  /* stylelint-disable no-descending-specificity */
+  & input {
     color: var(--c-med-gray);
   }
 }

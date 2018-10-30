@@ -3,8 +3,8 @@ import * as React from 'react'
 import {Formik} from 'formik'
 import get from 'lodash/get'
 import find from 'lodash/find'
+import map from 'lodash/map'
 import set from 'lodash/set'
-import isEmpty from 'lodash/isEmpty'
 
 import {WPA_PSK_SECURITY, WPA_EAP_SECURITY} from '../../../http-api-client'
 
@@ -15,7 +15,8 @@ import FormTable, {FormTableRow} from './FormTable'
 
 import type {
   WifiSecurityType,
-  WifiEapOption,
+  WifiEapOptionsList,
+  WifiKeysList,
   WifiAuthField,
   WifiConfigureRequest,
 } from '../../../http-api-client'
@@ -24,8 +25,10 @@ type Props = {
   // TODO(mc, 2018-10-22): optional SSID
   ssid: string,
   securityType: WifiSecurityType,
-  eapOptions: ?Array<WifiEapOption>,
+  eapOptions: ?WifiEapOptionsList,
+  keys: ?WifiKeysList,
   configure: WifiConfigureRequest => mixed,
+  addKey: File => mixed,
   close: () => mixed,
 }
 
@@ -33,9 +36,27 @@ type State = {|
   showPassword: {[name: string]: boolean},
 |}
 
-const WIFI_PSK_FIELDS = [
-  {name: 'psk', displayName: 'Password', type: 'password', required: true},
+type FormValues = {[string]: ?(string | {[string]: string})}
+
+const PSK_FIELD_NAME = 'psk'
+const PSK_MIN_LENGTH = 8
+
+const WPA_PSK_FIELDS = [
+  {
+    name: PSK_FIELD_NAME,
+    displayName: 'Password',
+    type: 'password',
+    required: true,
+  },
 ]
+
+// all eap options go in a sub-object `eapConfig`
+// eap method is stored under eapConfig.eapType
+const EAP_FIELD_PREFIX = 'eapConfig.'
+const EAP_METHOD_DISPLAY_NAME = 'Authentication'
+const EAP_METHOD_FIELD = `${EAP_FIELD_PREFIX}eapType`
+const EAP_METHOD_FIELD_ID = `${CONNECT_FIELD_ID_PREFIX}${EAP_METHOD_FIELD}`
+const getEapMethod = (v: FormValues): ?string => get(v, EAP_METHOD_FIELD)
 
 export default class ConnectForm extends React.Component<Props, State> {
   constructor (props: Props) {
@@ -63,41 +84,57 @@ export default class ConnectForm extends React.Component<Props, State> {
     })
   }
 
-  getEapFields = (eapMethod: ?WifiEapOption): Array<WifiAuthField> => {
-    return get(eapMethod, 'options', []).map(field => ({
-      ...field,
-      name: `eapConfig.${field.name}`,
-    }))
+  getValidationSchema = (values: FormValues) => {
+    const errors = this.getFields(values).reduce((errors, field) => {
+      const {name, displayName, required} = field
+      const value = get(values, name, '')
+
+      if (required && !value) {
+        set(errors, name, `${displayName} is required`)
+      } else if (name === PSK_FIELD_NAME && value.length < PSK_MIN_LENGTH) {
+        set(errors, name, `${displayName} must be at least 8 characters`)
+      }
+
+      return errors
+    }, {})
+
+    if (this.getSecurityType(values) === WPA_EAP_SECURITY) {
+      if (!getEapMethod(values)) {
+        set(errors, EAP_METHOD_FIELD, `${EAP_METHOD_DISPLAY_NAME} is required`)
+      }
+    }
+
+    return errors
   }
 
-  getValidationSchema = (values: any) => {
-    let fields = []
-    const errors = {}
-    if (this.props.securityType === WPA_PSK_SECURITY) {
-      fields = WIFI_PSK_FIELDS
-    } else {
-      const selectedEapMethod = find(this.props.eapOptions, {
-        name: values.eapConfig.eapType,
-      })
-      fields = this.getEapFields(selectedEapMethod)
+  // TODO(mc, 2018-10-26): allow security type to be pulled from values
+  // if not in props
+  getSecurityType (values: FormValues): WifiSecurityType {
+    return this.props.securityType
+  }
+
+  getFields (values: FormValues): Array<WifiAuthField> {
+    const securityType = this.getSecurityType(values)
+
+    if (securityType === WPA_PSK_SECURITY) return WPA_PSK_FIELDS
+    if (securityType === WPA_EAP_SECURITY) {
+      const method = find(this.props.eapOptions, {name: getEapMethod(values)})
+      return get(method, 'options', []).map(field => ({
+        ...field,
+        name: `${EAP_FIELD_PREFIX}${field.name}`,
+      }))
     }
-    fields.forEach(f => {
-      if (f.required && !get(values, f.name)) {
-        set(errors, f.name, `${f.displayName} is required`)
-      } else if (f.name === 'psk' && get(values, f.name).length < 8) {
-        set(errors, f.name, 'Password must be at least 8 characters')
-      }
-    })
-    return errors
+
+    return []
   }
 
   render () {
     const {showPassword} = this.state
-    const {securityType, eapOptions, close} = this.props
-    const eapMethodField = eapOptions ? 'eapConfig.eapType' : ''
-    const eapMethodId = eapOptions
-      ? `${CONNECT_FIELD_ID_PREFIX}${eapMethodField}`
-      : ''
+    const {securityType, keys, addKey, close} = this.props
+    const eapOptions = map(this.props.eapOptions, o => ({
+      name: o.displayName || o.name,
+      value: o.name,
+    }))
 
     return (
       <Formik
@@ -105,69 +142,65 @@ export default class ConnectForm extends React.Component<Props, State> {
         validate={this.getValidationSchema}
         render={formProps => {
           const {
-            handleChange,
-            handleSubmit,
             values,
-            setValues,
-            handleBlur,
             errors,
             touched,
+            isValid,
+            handleChange,
+            setFieldValue,
+            handleBlur,
+            setFieldTouched,
+            resetForm,
+            handleSubmit,
           } = formProps
 
-          // disable submit if form is pristine or errors present
-          const disabled = isEmpty(touched) || !isEmpty(errors)
-
-          const eapMethod = get(values, eapMethodField)
-          let fields: Array<WifiAuthField> = []
-
-          if (securityType === WPA_PSK_SECURITY) {
-            fields = WIFI_PSK_FIELDS
-          } else if (securityType === WPA_EAP_SECURITY) {
-            const selectedEapMethod = find(eapOptions, {name: eapMethod})
-            fields = this.getEapFields(selectedEapMethod)
-          }
           return (
             <form onSubmit={handleSubmit}>
               <FormTable>
-                {securityType === WPA_EAP_SECURITY &&
-                  eapOptions && (
-                    <FormTableRow
-                      label="* Authentication:"
-                      labelFor={eapMethodId}
-                    >
-                      <DropdownField
-                        id={eapMethodId}
-                        name={eapMethodField}
-                        value={eapMethod}
-                        options={eapOptions.map(o => ({
-                          name: o.displayName || o.name,
-                          value: o.name,
-                        }))}
-                        onChange={e => {
-                          // reset all other fields on EAP type change
-                          setValues(set({}, eapMethodField, e.target.value))
-                        }}
-                      />
-                    </FormTableRow>
-                  )}
-                {fields.map(field => (
+                {securityType === WPA_EAP_SECURITY && (
+                  <FormTableRow
+                    label={`* ${EAP_METHOD_DISPLAY_NAME}:`}
+                    labelFor={EAP_METHOD_FIELD_ID}
+                  >
+                    <DropdownField
+                      id={EAP_METHOD_FIELD_ID}
+                      name={EAP_METHOD_FIELD}
+                      value={getEapMethod(values)}
+                      options={eapOptions}
+                      onChange={e => {
+                        // reset all other fields on EAP type change
+                        resetForm(set({}, EAP_METHOD_FIELD, e.target.value))
+                      }}
+                      onBlur={handleBlur}
+                      error={
+                        get(touched, EAP_METHOD_FIELD) &&
+                        get(errors, EAP_METHOD_FIELD)
+                      }
+                    />
+                  </FormTableRow>
+                )}
+                {this.getFields(values).map(field => (
                   <ConnectFormField
                     key={field.name}
                     field={field}
                     value={get(values, field.name, '')}
+                    keys={keys}
                     showPassword={!!showPassword[field.name]}
                     onChange={handleChange}
-                    toggleShowPassword={this.toggleShowPassword}
+                    onValueChange={setFieldValue}
                     onBlur={handleBlur}
-                    errors={errors}
-                    touched={touched}
+                    onLoseFocus={setFieldTouched}
+                    addKey={addKey}
+                    toggleShowPassword={this.toggleShowPassword}
+                    error={get(errors, field.name)}
+                    touched={get(touched, field.name)}
                   />
                 ))}
               </FormTable>
               <BottomButtonBar
                 buttons={[
                   {children: 'Cancel', onClick: close},
-                  {children: 'Join', type: 'submit', disabled},
+                  {children: 'Join', type: 'submit', disabled: !isValid},
                 ]}
               />
             </form>
