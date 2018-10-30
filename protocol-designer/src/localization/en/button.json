@@ -5,10 +5,12 @@
   "continue_to_liquids": "Continue to Liquids",
   "delete": "delete",
   "done": "done",
+  "edit": "edit",
   "new_liquid": "New Liquid",
   "no": "no",
   "ok": "ok",
   "reset": "reset",
   "save": "save",
+  "swap": "swap",
   "yes": "yes"
 }

@@ -6,6 +6,7 @@ import {connect} from 'react-redux'
 import {AlertModal, DropdownField, FormGroup, type Mount} from '@opentrons/components'
 import startCase from 'lodash/startCase'
 import isEmpty from 'lodash/isEmpty'
+import isEqual from 'lodash/isEqual'
 
 import type {PipetteData} from '../../step-generation'
 import i18n from '../../localization'
@@ -23,7 +24,7 @@ import styles from './NewFileModal/NewFileModal.css'
 import modalStyles from './modal.css'
 import type {PipetteFields} from '../../load-file'
 
-type State = EditPipettesFields
+type State = EditPipettesFields & {isWarningModalOpen: boolean}
 
 type SP = {
   instruments: {
@@ -69,6 +70,7 @@ class EditPipettesModal extends React.Component<Props, State> {
     this.state = {
       left: instruments.left ? pipetteDataToFormState(instruments.left) : DEFAULT_SELECTION,
       right: instruments.right ? pipetteDataToFormState(instruments.right) : DEFAULT_SELECTION,
+      isWarningModalOpen: false,
     }
   }
 
@@ -80,7 +82,20 @@ class EditPipettesModal extends React.Component<Props, State> {
   }
 
   handleSubmit = () => {
-    this.props.onSave(this.state)
+    const {instruments} = this.props
+    const {left, right} = this.state
+    const leftChanged = !isEqual(pipetteDataToFormState(instruments.left), left)
+    const rightChanged = !isEqual(pipetteDataToFormState(instruments.right), right)
+    if ((instruments.left && leftChanged) || (instruments.right && rightChanged)) {
+      this.setState({isWarningModalOpen: true})
+    } else {
+      this.savePipettes()
+    }
+  }
+
+  savePipettes = () => {
+    const {left, right} = this.state
+    this.props.onSave({left, right})
     this.props.closeModal()
   }
 
@@ -106,64 +121,86 @@ class EditPipettesModal extends React.Component<Props, State> {
     const canSubmit = pipetteSelectionIsValid && tiprackSelectionIsValid
 
     return (
-      <AlertModal
-        className={cx(modalStyles.modal, styles.new_file_modal)}
-        buttons={[
-          {onClick: this.handleCancel, children: 'Cancel', tabIndex: 7},
-          {onClick: this.handleSubmit, disabled: !canSubmit, children: 'Save', tabIndex: 6},
-        ]}>
-        <form
-          className={modalStyles.modal_contents}
-          onSubmit={() => { canSubmit && this.handleSubmit() }}>
-          <h2>Edit Pipettes</h2>
+      <React.Fragment>
+        <AlertModal
+          className={cx(modalStyles.modal, styles.new_file_modal)}
+          buttons={[
+            {onClick: this.handleCancel, children: 'Cancel', tabIndex: 7},
+            {onClick: this.handleSubmit, disabled: !canSubmit, children: 'Save', tabIndex: 6},
+          ]}>
+          <form
+            className={modalStyles.modal_contents}
+            onSubmit={() => { canSubmit && this.handleSubmit() }}>
+            <h2>Edit Pipettes</h2>
 
-          <div className={styles.mount_fields_row}>
-            <div className={styles.mount_column}>
-              <FormGroup key="leftPipetteModel" label="Left Pipette">
-                <DropdownField
-                  tabIndex={2}
-                  options={pipetteOptionsWithNone}
-                  value={this.state.left.pipetteModel}
-                  onChange={this.makeHandleMountChange('left', 'pipetteModel')} />
-              </FormGroup>
-              <FormGroup disabled={isEmpty(this.state.left.pipetteModel)} key={'leftTiprackModel'} label={`${startCase('left')} Tiprack*`}>
-                <DropdownField
-                  tabIndex={3}
-                  disabled={isEmpty(this.state.left.pipetteModel)}
-                  options={tiprackOptions}
-                  value={this.state.left.tiprackModel}
-                  onChange={this.makeHandleMountChange('left', 'tiprackModel')} />
-              </FormGroup>
+            <div className={styles.mount_fields_row}>
+              <div className={styles.mount_column}>
+                <FormGroup key="leftPipetteModel" label="Left Pipette">
+                  <DropdownField
+                    tabIndex={2}
+                    options={pipetteOptionsWithNone}
+                    value={this.state.left.pipetteModel}
+                    onChange={this.makeHandleMountChange('left', 'pipetteModel')} />
+                </FormGroup>
+                <FormGroup disabled={isEmpty(this.state.left.pipetteModel)} key={'leftTiprackModel'} label={`${startCase('left')} Tiprack*`}>
+                  <DropdownField
+                    tabIndex={3}
+                    disabled={isEmpty(this.state.left.pipetteModel)}
+                    options={tiprackOptions}
+                    value={this.state.left.tiprackModel}
+                    onChange={this.makeHandleMountChange('left', 'tiprackModel')} />
+                </FormGroup>
+              </div>
+              <div className={styles.mount_column}>
+                <FormGroup key="rightPipetteModel" label="Right Pipette">
+                  <DropdownField
+                    tabIndex={4}
+                    options={pipetteOptionsWithNone}
+                    value={this.state.right.pipetteModel}
+                    onChange={this.makeHandleMountChange('right', 'pipetteModel')} />
+                </FormGroup>
+                <FormGroup disabled={isEmpty(this.state.right.pipetteModel)} key={'rightTiprackModel'} label={`${startCase('right')} Tiprack*`}>
+                  <DropdownField
+                    tabIndex={5}
+                    disabled={isEmpty(this.state.right.pipetteModel)}
+                    options={tiprackOptions}
+                    value={this.state.right.tiprackModel}
+                    onChange={this.makeHandleMountChange('right', 'tiprackModel')} />
+                </FormGroup>
+              </div>
             </div>
-            <div className={styles.mount_column}>
-              <FormGroup key="rightPipetteModel" label="Right Pipette">
-                <DropdownField
-                  tabIndex={4}
-                  options={pipetteOptionsWithNone}
-                  value={this.state.right.pipetteModel}
-                  onChange={this.makeHandleMountChange('right', 'pipetteModel')} />
-              </FormGroup>
-              <FormGroup disabled={isEmpty(this.state.right.pipetteModel)} key={'rightTiprackModel'} label={`${startCase('right')} Tiprack*`}>
-                <DropdownField
-                  tabIndex={5}
-                  disabled={isEmpty(this.state.right.pipetteModel)}
-                  options={tiprackOptions}
-                  value={this.state.right.tiprackModel}
-                  onChange={this.makeHandleMountChange('right', 'tiprackModel')} />
-              </FormGroup>
-            </div>
-          </div>
 
-          <div className={styles.diagrams}>
-            <TiprackDiagram containerType={this.state.left.tiprackModel} />
-            <PipetteDiagram
-              leftPipette={this.state.left.pipetteModel}
-              rightPipette={this.state.right.pipetteModel}
-            />
-            <TiprackDiagram containerType={this.state.right.tiprackModel} />
-          </div>
-        </form>
-      </AlertModal>
+            <div className={styles.diagrams}>
+              <TiprackDiagram containerType={this.state.left.tiprackModel} />
+              <PipetteDiagram
+                leftPipette={this.state.left.pipetteModel}
+                rightPipette={this.state.right.pipetteModel}
+              />
+              <TiprackDiagram containerType={this.state.right.tiprackModel} />
+            </div>
+          </form>
+        </AlertModal>
+        {
+          this.state.isWarningModalOpen &&
+          <AlertModal
+            type='warning'
+            alertOverlay
+            heading={i18n.t(`alert.hint.${hint}.title`)}>
+            <div className={styles.button_row}>
+              <OutlineButton
+                className={styles.ok_button}
+                onClick={this.handleCancel()}>
+                {i18n.t('button.cancel')}
+              </OutlineButton>
+              <OutlineButton
+                className={styles.ok_button}
+                onClick={this.savePipettes()}>
+                {i18n.t('button.ok')}
+              </OutlineButton>
+            </div>
+          </AlertModal>
+        }
+      </React.Fragment>
     )
   }
 }

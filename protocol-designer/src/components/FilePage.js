@@ -70,15 +70,17 @@ class FilePage extends React.Component<Props, State> {
         <Card title='Pipettes'>
           <div className={styles.card_content}>
             <InstrumentGroup {...instruments} showMountLabel />
-            <OutlineButton
-              onClick={swapPipettes}
-              className={styles.swap_button}
-              iconName='swap-horizontal'>
-              Swap
-            </OutlineButton>
-            <OutlineButton onClick={this.openEditPipetteModal} className={styles.swap_button} >
-              Edit
-            </OutlineButton>
+            <div className={styles.pipette_button_row}>
+              <PrimaryButton onClick={this.openEditPipetteModal} className={styles.edit_button} >
+                {i18n.t('button.edit')}
+              </PrimaryButton>
+              <OutlineButton
+                onClick={swapPipettes}
+                className={styles.swap_button}
+                iconName='swap-horizontal'>
+                {i18n.t('button.swap')}
+              </OutlineButton>
+            </div>
           </div>
         </Card>
 
