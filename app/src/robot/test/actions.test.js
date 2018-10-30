@@ -234,6 +234,16 @@ describe('robot actions', () => {
     expect(actions.confirmProbed('left')).toEqual(expected)
   })
 
+  test('CONFIRM_PROBED_AND_HOME action', () => {
+    const action = {
+      type: 'robot:CONFIRM_PROBED_AND_HOME',
+      payload: {mount: 'right'},
+      meta: {robotCommand: true},
+    }
+
+    expect(actions.confirmProbedAndHome('right')).toEqual(action)
+  })
+
   test('MOVE_TO action', () => {
     const expected = {
       type: 'robot:MOVE_TO',

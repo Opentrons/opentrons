@@ -29,23 +29,45 @@ export default function client (dispatch) {
     const {type} = action
 
     switch (type) {
-      case 'robot:CONNECT': return connect(state, action)
-      case 'robot:DISCONNECT': return disconnect(state, action)
-      case 'protocol:UPLOAD': return uploadProtocol(state, action)
-      case 'robot:PICKUP_AND_HOME': return pickupAndHome(state, action)
-      case 'robot:DROP_TIP_AND_HOME': return dropTipAndHome(state, action)
-      case 'robot:CONFIRM_TIPRACK': return confirmTiprack(state, action)
-      case actionTypes.MOVE_TO_FRONT: return moveToFront(state, action)
-      case actionTypes.PROBE_TIP: return probeTip(state, action)
-      case 'robot:MOVE_TO': return moveTo(state, action)
-      case 'robot:JOG': return jog(state, action)
-      case 'robot:UPDATE_OFFSET': return updateOffset(state, action)
-      case actionTypes.RETURN_TIP: return returnTip(state, action)
-      case actionTypes.RUN: return run(state, action)
-      case actionTypes.PAUSE: return pause(state, action)
-      case actionTypes.RESUME: return resume(state, action)
-      case actionTypes.CANCEL: return cancel(state, action)
-      case 'robot:REFRESH_SESSION': return refreshSession(state, action)
+      case 'robot:CONNECT':
+        return connect(
+          state,
+          action
+        )
+      case 'robot:DISCONNECT':
+        return disconnect(state, action)
+      case 'protocol:UPLOAD':
+        return uploadProtocol(state, action)
+      case 'robot:PICKUP_AND_HOME':
+        return pickupAndHome(state, action)
+      case 'robot:DROP_TIP_AND_HOME':
+        return dropTipAndHome(state, action)
+      case 'robot:CONFIRM_PROBED_AND_HOME':
+        return confirmProbedAndHome(state, action)
+      case 'robot:CONFIRM_TIPRACK':
+        return confirmTiprack(state, action)
+      case actionTypes.MOVE_TO_FRONT:
+        return moveToFront(state, action)
+      case actionTypes.PROBE_TIP:
+        return probeTip(state, action)
+      case 'robot:MOVE_TO':
+        return moveTo(state, action)
+      case 'robot:JOG':
+        return jog(state, action)
+      case 'robot:UPDATE_OFFSET':
+        return updateOffset(state, action)
+      case actionTypes.RETURN_TIP:
+        return returnTip(state, action)
+      case actionTypes.RUN:
+        return run(state, action)
+      case actionTypes.PAUSE:
+        return pause(state, action)
+      case actionTypes.RESUME:
+        return resume(state, action)
+      case actionTypes.CANCEL:
+        return cancel(state, action)
+      case 'robot:REFRESH_SESSION':
+        return refreshSession(state, action)
     }
   }
 
@@ -64,7 +86,7 @@ export default function client (dispatch) {
     const {ip, port} = target
 
     RpcClient(`ws://${ip}:${port}`)
-      .then((c) => {
+      .then(c => {
         rpcClient = c
         rpcClient
           .on('notification', handleRobotNotification)
@@ -90,7 +112,7 @@ export default function client (dispatch) {
         // only poll health if RPC is not monitoring itself with ping/pong
         dispatch(actions.connectResponse(null, !rpcClient.monitoring))
       })
-      .catch((e) => dispatch(actions.connectResponse(e)))
+      .catch(e => dispatch(actions.connectResponse(e)))
   }
 
   function disconnect () {
@@ -115,29 +137,45 @@ export default function client (dispatch) {
     const {name} = state.protocol.file
     const {contents} = action.payload
 
-    remote.session_manager.create(name, contents)
-      .then((apiSession) => {
+    remote.session_manager
+      .create(name, contents)
+      .then(apiSession => {
         remote.session_manager.session = apiSession
         handleApiSession(apiSession)
       })
-      .catch((error) => dispatch(actions.sessionResponse(error)))
+      .catch(error => dispatch(actions.sessionResponse(error)))
   }
 
   function moveToFront (state, action) {
-    const {payload: {mount}} = action
+    const {
+      payload: {mount},
+    } = action
     const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.moveToFrontResponse()), 1000)
 
-    remote.calibration_manager.move_to_front(pipette)
+    remote.calibration_manager
+      .move_to_front(pipette)
       .then(() => dispatch(actions.moveToFrontResponse()))
-      .catch((error) => dispatch(actions.moveToFrontResponse(error)))
+      .catch(error => dispatch(actions.moveToFrontResponse(error)))
+  }
+  // Confirm tip probed, tip removed, then home
+  function confirmProbedAndHome (state, action) {
+    const {
+      payload: {mount},
+    } = action
+    const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
+
+    dispatch(actions.confirmProbed(mount))
+    remote.calibration_manager.home(pipette)
   }
 
   // saves container offset and then attempts a tip pickup
   function pickupAndHome (state, action) {
-    const {payload: {mount, slot}} = action
+    const {
+      payload: {mount, slot},
+    } = action
     const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
@@ -148,27 +186,32 @@ export default function client (dispatch) {
       .update_container_offset(labware, pipette)
       .then(() => remote.calibration_manager.pick_up_tip(pipette, labware))
       .then(() => dispatch(actions.pickupAndHomeResponse()))
-      .catch((error) => dispatch(actions.pickupAndHomeResponse(error)))
+      .catch(error => dispatch(actions.pickupAndHomeResponse(error)))
   }
 
   function dropTipAndHome (state, action) {
-    const {payload: {mount, slot}} = action
+    const {
+      payload: {mount, slot},
+    } = action
     const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.dropTipAndHomeResponse()), 1000)
 
-    remote.calibration_manager.drop_tip(pipette, labware)
+    remote.calibration_manager
+      .drop_tip(pipette, labware)
       .then(() => remote.calibration_manager.home(pipette))
       .then(() => remote.calibration_manager.move_to(pipette, labware))
       .then(() => dispatch(actions.dropTipAndHomeResponse()))
-      .catch((error) => dispatch(actions.dropTipAndHomeResponse(error)))
+      .catch(error => dispatch(actions.dropTipAndHomeResponse(error)))
   }
 
   // drop the tip unless the tiprack is the last one to be confirmed
   function confirmTiprack (state, action) {
-    const {payload: {mount, slot}} = action
+    const {
+      payload: {mount, slot},
+    } = action
     const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
@@ -179,37 +222,46 @@ export default function client (dispatch) {
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.confirmTiprackResponse()), 1000)
 
-    remote.calibration_manager.drop_tip(pipette, labware)
+    remote.calibration_manager
+      .drop_tip(pipette, labware)
       .then(() => dispatch(actions.confirmTiprackResponse()))
-      .catch((error) => dispatch(actions.confirmTiprackResponse(error)))
+      .catch(error => dispatch(actions.confirmTiprackResponse(error)))
   }
 
   function probeTip (state, action) {
-    const {payload: {mount}} = action
+    const {
+      payload: {mount},
+    } = action
     const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.probeTipResponse()), 1000)
 
-    remote.calibration_manager.tip_probe(pipette)
+    remote.calibration_manager
+      .tip_probe(pipette)
       .then(() => dispatch(actions.probeTipResponse()))
-      .catch((error) => dispatch(actions.probeTipResponse(error)))
+      .catch(error => dispatch(actions.probeTipResponse(error)))
   }
 
   function returnTip (state, action) {
-    const {payload: {mount}} = action
+    const {
+      payload: {mount},
+    } = action
     const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
 
     // FIXME(mc, 2017-10-05): DEBUG CODE
     // return setTimeout(() => dispatch(actions.return_tipResponse()), 1000)
 
-    remote.calibration_manager.return_tip(pipette)
+    remote.calibration_manager
+      .return_tip(pipette)
       .then(() => dispatch(actions.returnTipResponse()))
-      .catch((error) => dispatch(actions.returnTipResponse(error)))
+      .catch(error => dispatch(actions.returnTipResponse(error)))
   }
 
   function moveTo (state, action) {
-    const {payload: {mount, slot}} = action
+    const {
+      payload: {mount, slot},
+    } = action
     const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
     const labware = {_id: selectors.getLabwareBySlot(state)[slot]._id}
 
@@ -219,31 +271,37 @@ export default function client (dispatch) {
     //   dispatch(push(`/setup-deck/${slot}/confirm`))
     // }, 1000)
 
-    remote.calibration_manager.move_to(pipette, labware)
+    remote.calibration_manager
+      .move_to(pipette, labware)
       .then(() => {
         dispatch(actions.moveToResponse())
         dispatch(push(`/calibrate/labware/${slot}/confirm`))
       })
-      .catch((error) => dispatch(actions.moveToResponse(error)))
+      .catch(error => dispatch(actions.moveToResponse(error)))
   }
 
   function jog (state, action) {
-    const {payload: {mount, axis, direction, step}} = action
+    const {
+      payload: {mount, axis, direction, step},
+    } = action
     const pipette = selectors.getPipettesByMount(state)[mount]
     const distance = step * direction
 
     // FIXME(mc, 2017-10-06): DEBUG CODE
     // return setTimeout(() => dispatch(actions.jogResponse()), 1000)
 
-    remote.calibration_manager.jog(pipette, distance, axis)
+    remote.calibration_manager
+      .jog(pipette, distance, axis)
       .then(() => dispatch(actions.jogResponse()))
-      .catch((error) => dispatch(actions.jogResponse(error)))
+      .catch(error => dispatch(actions.jogResponse(error)))
   }
 
   // saves container offset
   // TODO(mc, 2018-02-07): rename to confirmNonTiprack
   function updateOffset (state, action) {
-    const {payload: {mount, slot}} = action
+    const {
+      payload: {mount, slot},
+    } = action
     const labwareObject = selectors.getLabwareBySlot(state)[slot]
 
     const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
@@ -255,41 +313,46 @@ export default function client (dispatch) {
     remote.calibration_manager
       .update_container_offset(labware, pipette)
       .then(() => dispatch(actions.updateOffsetResponse()))
-      .catch((error) => dispatch(actions.updateOffsetResponse(error)))
+      .catch(error => dispatch(actions.updateOffsetResponse(error)))
   }
 
   function run (state, action) {
     setRunTimerInterval()
-    remote.session_manager.session.run()
+    remote.session_manager.session
+      .run()
       .then(() => dispatch(actions.runResponse()))
-      .catch((error) => dispatch(actions.runResponse(error)))
+      .catch(error => dispatch(actions.runResponse(error)))
       .then(() => clearRunTimerInterval())
   }
 
   function pause (state, action) {
-    remote.session_manager.session.pause()
+    remote.session_manager.session
+      .pause()
       .then(() => dispatch(actions.pauseResponse()))
-      .catch((error) => dispatch(actions.pauseResponse(error)))
+      .catch(error => dispatch(actions.pauseResponse(error)))
   }
 
   function resume (state, action) {
-    remote.session_manager.session.resume()
+    remote.session_manager.session
+      .resume()
       .then(() => dispatch(actions.resumeResponse()))
-      .catch((error) => dispatch(actions.resumeResponse(error)))
+      .catch(error => dispatch(actions.resumeResponse(error)))
   }
 
   function cancel (state, action) {
     // ensure session is unpaused before canceling to work around RPC API's
     // inablity to cancel a paused protocol
-    remote.session_manager.session.resume()
+    remote.session_manager.session
+      .resume()
       .then(() => remote.session_manager.session.stop())
       .then(() => dispatch(actions.cancelResponse()))
-      .catch((error) => dispatch(actions.cancelResponse(error)))
+      .catch(error => dispatch(actions.cancelResponse(error)))
   }
 
   function refreshSession (state, action) {
-    remote.session_manager.session.refresh()
-      .catch((error) => dispatch(actions.sessionResponse(error)))
+    remote.session_manager.session
+      .refresh()
+      .catch(error => dispatch(actions.sessionResponse(error)))
   }
 
   function setRunTimerInterval () {
@@ -385,7 +448,7 @@ export default function client (dispatch) {
           id,
           description,
           handledAt,
-          children: children.map((c) => c.id),
+          children: children.map(c => c.id),
         }
       }
     }
@@ -422,7 +485,8 @@ export default function client (dispatch) {
     console.log(`"${topic}" message:`, payload)
 
     switch (topic) {
-      case 'session': return handleApiSession(payload)
+      case 'session':
+        return handleApiSession(payload)
     }
 
     console.warn(`"${topic}" message was unhandled`)

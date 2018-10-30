@@ -62,6 +62,6 @@ function mapDispatchToProps (
   const {mount} = ownProps
 
   return {
-    onConfirmClick: () => { dispatch(robotActions.confirmProbed(mount)) },
+    onConfirmClick: () => { dispatch(robotActions.confirmProbedAndHome(mount)) },
   }
 }
