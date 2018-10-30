@@ -68,6 +68,7 @@ export default class EditableTextField extends React.Component<Props, State> {
               ref={ref}
             >
               <InputField
+                autoFocus
                 value={this.state.transientValue}
                 onChange={this.updateValue}
                 units={<Icon name='pencil' className={styles.edit_icon} />}
