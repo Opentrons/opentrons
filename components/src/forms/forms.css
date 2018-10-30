@@ -108,10 +108,9 @@
 }
 
 .input_caption {
-  padding-top: 0.25rem;
   font-size: var(--fs-caption);
   font-weight: var(--fw-semibold);
-  min-height: var(--fs-caption);
+  line-height: 1.2;
   color: var(--c-med-gray);
 
   & .right {
