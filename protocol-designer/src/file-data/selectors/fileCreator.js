@@ -10,6 +10,7 @@ import {selectors as steplistSelectors} from '../../steplist'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+  DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../constants'
 import type {BaseState} from '../../types'
 import type {ProtocolFile, FilePipette, FileLabware} from '../../file-types'
@@ -29,6 +30,7 @@ const executionDefaults = {
   'dispense-flow-rate': getPropertyAllPipettes('dispenseFlowRate'),
   'aspirate-mm-from-bottom': DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   'dispense-mm-from-bottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+  'touch-tip-mm-from-top': DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 }
 
 export const createFile: BaseState => ProtocolFile = createSelector(

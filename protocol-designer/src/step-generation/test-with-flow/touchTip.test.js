@@ -39,6 +39,27 @@ describe('touchTip', () => {
     expect(result.robotState).toEqual(robotStateWithTip)
   })
 
+  test('touchTip with tip, specifying offsetFromBottomMm', () => {
+    const result = touchTip({
+      pipette: 'p300SingleId',
+      labware: 'sourcePlateId',
+      well: 'A1',
+      offsetFromBottomMm: 10,
+    })(robotStateWithTip)
+
+    expect(result.commands).toEqual([{
+      command: 'touch-tip',
+      params: {
+        pipette: 'p300SingleId',
+        labware: 'sourcePlateId',
+        well: 'A1',
+        offsetFromBottomMm: 10,
+      },
+    }])
+
+    expect(result.robotState).toEqual(robotStateWithTip)
+  })
+
   test('touchTip with invalid pipette ID should throw error', () => {
     const result = touchTipWithErrors({
       pipette: 'badPipette',

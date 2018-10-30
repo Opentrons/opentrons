@@ -143,6 +143,7 @@
     "default-values": {
       "description": "Default values required for protocol execution",
       "type": "object",
+      "$note": "TODO: Ian 2018-10-29 make touch-tip-mm-from-top required (breaking change)",
       "required": [
         "aspirate-flow-rate",
         "dispense-flow-rate",
@@ -153,7 +154,8 @@
         "aspirate-flow-rate": {"$ref": "#/definitions/flow-rate-for-pipettes"},
         "dispense-flow-rate": {"$ref": "#/definitions/flow-rate-for-pipettes"},
         "aspirate-mm-from-bottom": {"$ref": "#/definitions/mm-offset"},
-        "dispense-mm-from-bottom": {"$ref": "#/definitions/mm-offset"}
+        "dispense-mm-from-bottom": {"$ref": "#/definitions/mm-offset"},
+        "touch-tip-mm-from-top": {"$ref": "#/definitions/mm-offset"}
       }
     },
 
@@ -282,13 +284,32 @@
                 },
 
                 {
-                  "description": "Pick up tip / drop tip / touch tip / blowout commands",
+                  "description": "Touch tip commands",
                   "type": "object",
                   "required": ["command", "params"],
                   "additionalProperties": false,
                   "properties": {
                     "command": {
-                      "enum": ["pick-up-tip", "drop-tip", "touch-tip", "blowout"]
+                      "enum": ["touch-tip"]
+                    },
+                    "params": {
+                      "allOf": [
+                        {"$ref": "#/definitions/pipette-access-params"},
+                        {"$ref": "#/definitions/offsetFromBottomMm"}
+                      ]
+                    }
+                  }
+                },
+
+
+                {
+                  "description": "Pick up tip / drop tip / blowout commands",
+                  "type": "object",
+                  "required": ["command", "params"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "command": {
+                      "enum": ["pick-up-tip", "drop-tip", "blowout"]
                     },
                     "params": {
                       "allOf": [
