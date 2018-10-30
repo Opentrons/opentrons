@@ -8,7 +8,7 @@ import {
   openIngredientSelector,
 
   deleteContainer,
-  modifyContainer,
+  renameLabware,
 
   openAddLabwareModal,
   drillDownOnLabware,
@@ -73,9 +73,9 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const addLabwareMode = activeModals.labwareSelection
   const moveLabwareMode = Boolean(slotToMoveFrom)
 
-  const setDefaultLabwareName = () => modifyContainer({
-    containerId,
-    modify: {name: null},
+  const setDefaultLabwareName = () => renameLabware({
+    labwareId: containerId,
+    name: null,
   })
 
   // labware definition's metadata.isValidSource defaults to true,
@@ -130,13 +130,13 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}, own
     moveLabwareDestination: () => dispatch(moveLabware(slot)),
     moveLabwareSource: () => dispatch(setMoveLabwareMode(slot)),
 
-    setLabwareName: (name: ?string) => dispatch(modifyContainer({
-      containerId,
-      modify: {name},
+    setLabwareName: (name: ?string) => dispatch(renameLabware({
+      labwareId: containerId,
+      name,
     })),
-    setDefaultLabwareName: () => dispatch(modifyContainer({
-      containerId,
-      modify: {name: null},
+    setDefaultLabwareName: () => dispatch(renameLabware({
+      labwareId: containerId,
+      name: null,
     })),
   }
 

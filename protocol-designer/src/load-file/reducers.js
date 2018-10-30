@@ -20,8 +20,8 @@ const unsavedChanges = (state: boolean = false, action: {type: string}): boolean
     case 'DISMISS_TIMELINE_WARNING':
     case 'CREATE_CONTAINER':
     case 'DELETE_CONTAINER':
-    case 'MODIFY_CONTAINER':
     case 'MOVE_LABWARE':
+    case 'RENAME_LABWARE':
     case 'DELETE_LIQUID_GROUP':
     case 'EDIT_LIQUID_GROUP':
     case 'REMOVE_WELLS_CONTENTS':

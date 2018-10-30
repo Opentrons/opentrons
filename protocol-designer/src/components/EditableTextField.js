@@ -34,6 +34,17 @@ export default class EditableTextField extends React.Component<Props, State> {
     })
   }
 
+  handleKeyUp = (e: SyntheticKeyboardEvent<*>) => {
+    if (e.key === 'Escape') {
+      this.handleCancel()
+    }
+  }
+
+  handleFormSubmit = (e: SyntheticEvent<*>) => {
+    e.preventDefault() // avoid 'form is not connected' warning
+    this.handleSubmit()
+  }
+
   handleSubmit = () => {
     this.setState({editing: false}, () =>
       this.props.saveEdit(this.state.transientValue || '')
@@ -48,15 +59,19 @@ export default class EditableTextField extends React.Component<Props, State> {
     const {className, value} = this.props
     if (this.state.editing) {
       return (
-        <ClickOutside onClickOutside={this.handleCancel}>{
+        <ClickOutside onClickOutside={this.handleSubmit}>{
           ({ref}) =>
-            <form ref={ref} className={className} onSubmit={this.handleSubmit}>
+            <form
+              className={className}
+              onKeyUp={this.handleKeyUp}
+              onSubmit={this.handleSubmit}
+              ref={ref}
+            >
               <InputField
                 value={this.state.transientValue}
                 onChange={this.updateValue}
                 units={<Icon name='pencil' className={styles.edit_icon} />}
               />
-              <button type='submit' style={{visibility: 'hidden'}} />
             </form>
           }</ClickOutside>
       )

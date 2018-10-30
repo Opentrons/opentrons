@@ -149,9 +149,15 @@ export const containers = handleActions({
     state,
     (value: Labware, key: string) => key !== action.payload.containerId
   ),
-  MODIFY_CONTAINER: (state: ContainersState, action: ActionType<typeof actions.modifyContainer>) => {
-    const { containerId, modify } = action.payload
-    return {...state, [containerId]: {...state[containerId], ...modify}}
+  RENAME_LABWARE: (state: ContainersState, action: ActionType<typeof actions.renameLabware>) => {
+    const {labwareId, name} = action.payload
+    return {
+      ...state,
+      [labwareId]: {
+        ...state[labwareId],
+        name,
+      },
+    }
   },
   MOVE_LABWARE: (state: ContainersState, action: MoveLabware): ContainersState => {
     const { toSlot, fromSlot } = action.payload
@@ -196,9 +202,9 @@ export const savedLabware = handleActions({
     ...state,
     [action.payload.containerId]: false,
   }),
-  MODIFY_CONTAINER: (state: SavedLabwareState, action: ActionType<typeof actions.modifyContainer>) => ({
+  RENAME_LABWARE: (state: SavedLabwareState, action: ActionType<typeof actions.renameLabware>) => ({
     ...state,
-    [action.payload.containerId]: true,
+    [action.payload.labwareId]: true,
   }),
   LOAD_FILE: (state: SavedLabwareState, action: LoadFileAction): SavedLabwareState => (
     mapValues(action.payload.labware, () => true)
