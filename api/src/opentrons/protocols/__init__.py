@@ -189,16 +189,16 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
         elif command_type == 'touch-tip':
             # NOTE: if touch_tip can take a location tuple,
             # this can be much simpler
-            (wellObject, locTuple) = location
+            (well_object, loc_tuple) = location
 
-            # Use the offset baked into the wellObject.
+            # Use the offset baked into the well_object.
             # Do not allow API to apply its v_offset kwarg default value,
             # and do not apply the JSON protocol's default offset.
-            z_from_bottom = locTuple[2]
+            z_from_bottom = loc_tuple[2]
             offset_from_top = (
-                wellObject.properties['depth'] - z_from_bottom) * -1
+                well_object.properties['depth'] - z_from_bottom) * -1
 
-            pipette.touch_tip(wellObject, v_offset=offset_from_top)
+            pipette.touch_tip(well_object, v_offset=offset_from_top)
 
 
 def execute_protocol(protocol):
