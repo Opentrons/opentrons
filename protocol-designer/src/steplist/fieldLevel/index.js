@@ -4,6 +4,7 @@ import {selectors as pipetteSelectors} from '../../pipettes'
 import {
   requiredField,
   minimumWellCount,
+  nonZero,
   composeErrors,
 } from './errors'
 import {
@@ -41,6 +42,10 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
     hydrate: hydrateLabware,
   },
   'aspirate_mix_volume': { processValue: composeProcessors(castToFloat, onlyPositiveNumbers) },
+  'aspirate_wells': {
+    getErrors: composeErrors(minimumWellCount(1)),
+    processValue: defaultTo([]),
+  },
   'dispense_delayMinutes': {
     processValue: composeProcessors(castToNumber, defaultTo(0)),
   },
@@ -81,7 +86,7 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
     processValue: composeProcessors(castToNumber, onlyPositiveNumbers, onlyIntegers, defaultTo(0)),
   },
   'volume': {
-    getErrors: composeErrors(requiredField),
+    getErrors: composeErrors(requiredField, nonZero),
     processValue: composeProcessors(castToFloat, onlyPositiveNumbers, defaultTo(0)),
   },
   'wells': {

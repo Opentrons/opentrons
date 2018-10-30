@@ -1,13 +1,7 @@
 // @flow
 
-import type { FormData } from '../../../form-types'
-import type {
-  ConsolidateFormData,
-  DistributeFormData,
-  TransferFormData,
-  MixFormData,
-  PauseFormData,
-} from '../../../step-generation'
+import type {FormData} from '../../../form-types'
+import type {CommandCreatorData} from '../../../step-generation'
 import mixFormToArgs from './mixFormToArgs'
 import pauseFormToArgs from './pauseFormToArgs'
 import transferLikeFormToArgs from './transferLikeFormToArgs'
@@ -16,7 +10,7 @@ import transferLikeFormToArgs from './transferLikeFormToArgs'
 // to create arguments that the step generation service is expecting
 // in order to generate command creators
 
-type StepArgs = ConsolidateFormData | DistributeFormData | TransferFormData | MixFormData | PauseFormData | null
+type StepArgs = CommandCreatorData | null
 
 const stepFormToArgs = (formData: FormData): StepArgs => {
   switch (formData.stepType) {

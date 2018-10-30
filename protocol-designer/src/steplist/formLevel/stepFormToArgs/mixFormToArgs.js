@@ -9,6 +9,7 @@ import { orderWells } from '../../utils'
 
 type MixStepArgs = MixFormData
 
+// TODO: BC 2018-10-30 move getting labwareDef into hydration layer upstream
 const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
   const {labware, pipette} = hydratedFormData
   const touchTip = !!hydratedFormData['touchTip']

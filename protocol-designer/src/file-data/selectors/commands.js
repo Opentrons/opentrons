@@ -133,7 +133,7 @@ function compoundCommandCreatorFromStepArgs (stepArgs: StepGeneration.CommandCre
 
 // exposes errors and last valid robotState
 export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelector(
-  steplistSelectors.getAllStepArgsAndErrors,
+  steplistSelectors.getArgsAndErrorsByStepId,
   steplistSelectors.orderedSteps,
   getInitialRobotState,
   (allStepArgsAndErrors, orderedSteps, initialRobotState) => {

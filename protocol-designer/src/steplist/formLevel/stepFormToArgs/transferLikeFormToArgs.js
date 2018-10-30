@@ -14,7 +14,6 @@ import { orderWells } from '../../utils'
 export const SOURCE_WELL_DISPOSAL_DESTINATION = 'source_well'
 
 function getMixData (hydratedFormData, checkboxField, volumeField, timesField) {
-  // TODO Ian 2018-04-03 is error reporting necessary? Or are only valid inputs allowed in these fields?
   const checkbox = hydratedFormData[checkboxField]
   const volume = parseFloat(hydratedFormData[volumeField])
   const times = parseInt(hydratedFormData[timesField])
@@ -25,6 +24,7 @@ function getMixData (hydratedFormData, checkboxField, volumeField, timesField) {
 
 type TransferLikeStepArgs = ConsolidateFormData | DistributeFormData | TransferFormData | null
 
+// TODO: BC 2018-10-30 move getting labwareDef into hydration layer upstream
 const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArgs => {
   const stepType = hydratedFormData.stepType
   const pipette = hydratedFormData['pipette']
@@ -44,7 +44,7 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
   const mixFirstAspirate = hydratedFormData['aspirate_mix_checkbox']
     ? {
       volume: Number(hydratedFormData['aspirate_mix_volume']),
-      times: parseInt(hydratedFormData['aspirate_mix_times']), // TODO handle unparseable
+      times: parseInt(hydratedFormData['aspirate_mix_times']),
     }
     : null
 
@@ -118,7 +118,7 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
   let disposalDestination = null
   let disposalLabware = null
   let disposalWell = null
-  if (hydratedFormData['aspirate_disposalVol_checkbox']) { // TODO: BC 09-17-2018 handle unparseable values?
+  if (hydratedFormData['aspirate_disposalVol_checkbox']) {
     disposalVolume = Number(hydratedFormData['aspirate_disposalVol_volume'])
     disposalDestination = hydratedFormData['aspirate_disposalVol_destination']
     if (disposalDestination === SOURCE_WELL_DISPOSAL_DESTINATION) {

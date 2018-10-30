@@ -233,7 +233,6 @@ export function generateSubsteps (
   // TODO: BC: 2018-08-21 replace old error check with new logic in field, form, and timeline level
   // Don't try to render with form errors. TODO LATER: presentational error state of substeps?
   if (!stepArgsAndErrors || !stepArgsAndErrors.stepArgs || !isEmpty(stepArgsAndErrors.errors)) {
-    console.log('caught', stepId)
     return null
   }
 
