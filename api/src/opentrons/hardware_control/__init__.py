@@ -19,7 +19,6 @@ from opentrons import types as top_types
 from opentrons.util import linal
 from .simulator import Simulator
 from opentrons.config import robot_configs
-from contextlib import contextmanager
 from .pipette import Pipette
 try:
     from .controller import Controller
@@ -31,6 +30,7 @@ from .types import Axis
 
 
 mod_log = logging.getLogger(__name__)
+PICK_UP_SPEED = 30
 
 
 def _log_call(func):
@@ -51,6 +51,9 @@ class PipetteNotAttachedError(KeyError):
 
 _Backend = Union[Controller, Simulator]
 Instruments = Dict[top_types.Mount, Optional[Pipette]]
+SHAKE_OFF_TIPS_SPEED = 50
+SHAKE_OFF_TIPS_DISTANCE = 2.25
+DROP_TIP_RELEASE_DISTANCE = 20
 
 
 class API:
@@ -304,9 +307,12 @@ class API:
 
     @_log_call
     async def move_to(
-            self, mount: top_types.Mount, abs_position: top_types.Point):
+            self, mount: top_types.Mount, abs_position: top_types.Point,
+            speed: float = None):
         """ Move the critical point of the specified mount to a location
-        relative to the deck.
+        relative to the deck, at the specified speed. 'speed' sets the speed
+        of all robot axes to the given value. So, if multiple axes are to be
+        moved, they will do so at the same speed
 
         The critical point of the mount depends on the current status of
         the mount:
@@ -333,12 +339,15 @@ class API:
              (Axis.Y, abs_position.y - offset.y - cp.y),
              (z_axis, abs_position.z - offset.z - cp.z))
         )
-        await self._move(target_position)
+        await self._move(target_position, speed=speed)
 
     @_log_call
-    async def move_rel(self, mount: top_types.Mount, delta: top_types.Point):
+    async def move_rel(self, mount: top_types.Mount, delta: top_types.Point,
+                       speed: float = None):
         """ Move the critical point of the specified mount by a specified
-        displacement in a specified direction.
+        displacement in a specified direction, at the specified speed.
+        'speed' sets the speed of all axes to the given value. So, if multiple
+        axes are to be moved, they will do so at the same speed
         """
         if not self._current_position:
             raise MustHomeError
@@ -354,9 +363,28 @@ class API:
                 )
         except KeyError:
             raise MustHomeError
-        await self._move(target_position)
+        await self._move(target_position, speed=speed)
 
-    async def _move(self, target_position: 'OrderedDict[Axis, float]'):
+    async def _move_plunger(self, mount: top_types.Mount, dist: float,
+                            speed: float = None):
+        z_axis = Axis.by_mount(mount)
+        pl_axis = Axis.of_plunger(mount)
+        all_axes_pos = OrderedDict(
+            ((Axis.X,
+              self._current_position[Axis.X]),
+             (Axis.Y,
+              self._current_position[Axis.Y]),
+             (z_axis,
+              self._current_position[z_axis]),
+             (pl_axis, dist))
+        )
+        try:
+            await self._move(all_axes_pos, speed)
+        except KeyError:
+            raise MustHomeError
+
+    async def _move(self, target_position: 'OrderedDict[Axis, float]',
+                    speed: float = None):
         """ Worker function to apply robot motion.
 
         Robot motion means the kind of motions that are relevant to the robot,
@@ -364,9 +392,9 @@ class API:
         XYZ move in the coordinate frame of one of the pipettes.
 
         ``target_position`` should be an ordered dict (ordered by XYZABC)
-        containing any specified XY motion and at most one of a ZA or BC
-        components. The frame in which to move is identified by the presence of
-        (ZA) or (BC).
+        of deck calibrated values, containing any specified XY motion and
+        at most one of a ZA or BC components. The frame in which to move
+        is identified by the presence of (ZA) or (BC).
         """
         # Transform only the x, y, and (z or a) axes specified since this could
         # get the b or c axes as well
@@ -403,7 +431,7 @@ class API:
             if ax in Axis.gantry_axes():
                 smoothie_pos[ax.name] = transformed[idx]
         try:
-            self._backend.move(smoothie_pos)
+            self._backend.move(smoothie_pos, speed=speed)
         except Exception:
             self._log.exception('Move failed')
             self._current_position.clear()
@@ -483,32 +511,28 @@ class API:
             "Cannot aspirate more than pipette max volume"
         if asp_vol == 0:
             return
-        # using a context generator to temporarily change pipette speed to a
-        # user specified rate, then switch back to default
-        with self._set_temp_pipette_speed(this_pipette, 'aspirate', rate):
-            self._backend.set_active_current(
-                 Axis.of_plunger(mount), this_pipette.config.plunger_current)
-            target_position = {
-                Axis.of_plunger(mount): self._plunger_position(
-                    this_pipette,
-                    this_pipette.current_volume + asp_vol,
-                    'aspirate')}
-            try:
-                self._backend.move({ax.name: pos
-                                    for ax, pos in target_position.items()})
-            except Exception:
-                self._log.exception('Aspirate failed')
-                this_pipette.set_current_volume(0)
-                raise
-            else:
-                self._current_position.update(target_position)
-                this_pipette.add_current_volume(asp_vol)
+
+        self._backend.set_active_current(
+             Axis.of_plunger(mount), this_pipette.config.plunger_current)
+        dist = self._plunger_position(
+                this_pipette,
+                this_pipette.current_volume + asp_vol,
+                'aspirate')
+        speed = this_pipette.config.aspirate_flow_rate * rate
+        try:
+            await self._move_plunger(mount, dist, speed=speed)
+        except Exception:
+            self._log.exception('Aspirate failed')
+            this_pipette.set_current_volume(0)
+            raise
+        else:
+            this_pipette.add_current_volume(asp_vol)
 
     @_log_call
     async def dispense(self, mount: top_types.Mount, volume: float = None,
                        rate: float = 1.0):
         """
-        Dispense a volume of liquid (in microliters/uL) using this pipette
+        Dispense a volume of liquid in microliters(uL) using this pipette
         at the current location. If no volume is specified, `dispense` will
         dispense all volume currently present in pipette
 
@@ -533,26 +557,22 @@ class API:
 
         if disp_vol == 0:
             return
-        # using a context generator to temporarily change pipette speed to a
-        # user specified rate, then switch back to default
-        with self._set_temp_pipette_speed(this_pipette, 'dispense', rate):
-            self._backend.set_active_current(
-                Axis.of_plunger(mount), this_pipette.config.plunger_current)
-            target_position = {
-                Axis.of_plunger(mount): self._plunger_position(
-                    this_pipette,
-                    this_pipette.current_volume - disp_vol,
-                    'dispense')}
-            try:
-                self._backend.move({ax.name: pos
-                                    for ax, pos in target_position.items()})
-            except Exception:
-                self._log.exception('Dispense failed')
-                this_pipette.set_current_volume(0)
-                raise
-            else:
-                self._current_position.update(target_position)
-                this_pipette.remove_current_volume(disp_vol)
+
+        self._backend.set_active_current(
+            Axis.of_plunger(mount), this_pipette.config.plunger_current)
+        dist = self._plunger_position(
+                this_pipette,
+                this_pipette.current_volume - disp_vol,
+                'dispense')
+        speed = this_pipette.config.dispense_flow_rate * rate
+        try:
+            await self._move_plunger(mount, dist, speed)
+        except Exception:
+            self._log.exception('Dispense failed')
+            this_pipette.set_current_volume(0)
+            raise
+        else:
+            this_pipette.remove_current_volume(disp_vol)
 
     def _plunger_position(self, instr: Pipette, ul: float,
                           action: str) -> float:
@@ -560,40 +580,123 @@ class API:
         position = mm + instr.config.plunger_positions['bottom']
         return round(position, 6)
 
-    @contextmanager
-    def _set_temp_pipette_speed(self,
-                                instr: Pipette,
-                                action: str,
-                                rate: float):
-        action_str = '{}_flow_rate'.format(action)
-        saved_speed = getattr(instr.config, action_str)
-        self._backend.set_pipette_speed(saved_speed * rate)
-        try:
-            yield
-        finally:
-            self._backend.set_pipette_speed(saved_speed)
-
     @_log_call
     async def blow_out(self, mount):
-        pass
+        """
+        Force any remaining liquid to dispense. The liquid will be dispensed at
+        the current location of pipette
+        """
+        this_pipette = self._attached_instruments[mount]
+        if not this_pipette:
+            raise PipetteNotAttachedError("No pipette attached to {} mount"
+                                          .format(mount.name))
+
+        self._backend.set_active_current(Axis.of_plunger(mount),
+                                         this_pipette.config.plunger_current)
+        try:
+            await self._move_plunger(
+                mount, this_pipette.config.plunger_positions['blow_out'])
+        except Exception:
+            self._log.exception('Blow out failed')
+            raise
+        finally:
+            this_pipette.set_current_volume(0)
 
     @_log_call
-    async def air_gap(self, mount, volume=None):
-        pass
-
-    @_log_call
-    async def pick_up_tip(self, mount):
+    async def pick_up_tip(self, mount, presses: int = 3, increment: float = 1):
+        """
+        Pick up tip from current location
+        """
         instr = self._attached_instruments[mount]
         assert instr
-        # TODO: Move commands to pick up tip(s)
+        assert not instr.has_tip, 'Tip already attached'
+        instr_ax = Axis.by_mount(mount)
+        plunger_ax = Axis.of_plunger(mount)
+        self._log.info('Picking up tip on {}'.format(instr.name))
+        # Initialize plunger to bottom position
+        self._backend.set_active_current(plunger_ax,
+                                         instr.config.plunger_current)
+        await self._move_plunger(
+            mount, instr.config.plunger_positions['bottom'])
+
+        # Press the nozzle into the tip <presses> number of times,
+        # moving further by <increment> mm after each press
+        for i in range(presses):
+            # move nozzle down into the tip
+            with self._backend.save_current():
+                self._backend.set_active_current(instr_ax,
+                                                 instr.config.pick_up_current)
+                dist = -1 * instr.config.pick_up_distance + -1 * increment * i
+                target_pos = top_types.Point(0, 0, dist)
+                await self.move_rel(mount, target_pos, PICK_UP_SPEED)
+            # move nozzle back up
+            backup_pos = top_types.Point(0, 0, -dist)
+            await self.move_rel(mount, backup_pos)
         instr.add_tip()
+        instr.set_current_volume(0)
+
+        # neighboring tips tend to get stuck in the space between
+        # the volume chamber and the drop-tip sleeve on p1000.
+        # This extra shake ensures those tips are removed
+        if 'needs-pickup-shake' in instr.config.quirks:
+            await self._shake_off_tips(mount)
+            await self._shake_off_tips(mount)
+
+        await self.retract(mount, instr.config.pick_up_distance)
 
     @_log_call
     async def drop_tip(self, mount):
+        """
+        Drop tip at the current location
+        """
         instr = self._attached_instruments[mount]
         assert instr
-        # TODO: Move commands to drop tip(s)
+        assert instr.has_tip, 'Cannot drop tip without a tip attached'
+        self._log.info("Dropping tip off from {}".format(instr.name))
+        plunger_ax = Axis.of_plunger(mount)
+        self._backend.set_active_current(plunger_ax,
+                                         instr.config.plunger_current)
+        await self._move_plunger(mount,
+                                 instr.config.plunger_positions['bottom'])
+        self._backend.set_active_current(plunger_ax,
+                                         instr.config.drop_tip_current)
+        await self._move_plunger(mount,
+                                 instr.config.plunger_positions['drop_tip'])
+        await self._shake_off_tips(mount)
+        await self._home_plunger_after_drop_tip(mount)
+        instr.set_current_volume(0)
         instr.remove_tip()
+
+    async def _shake_off_tips(self, mount):
+        # tips don't always fall off, especially if resting against
+        # tiprack or other tips below it. To ensure the tip has fallen
+        # first, shake the pipette to dislodge partially-sealed tips,
+        # then second, raise the pipette so loosened tips have room to fall
+        shake_off_dist = SHAKE_OFF_TIPS_DISTANCE
+        # TODO: ensure the distance is not >25% the diameter of placeable
+        shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # move left
+        await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
+        shake_pos = top_types.Point(2*shake_off_dist, 0, 0)    # move right
+        await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
+        shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # original position
+        await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
+        # raise the pipette upwards so we are sure tip has fallen off
+        up_pos = top_types.Point(0, 0, DROP_TIP_RELEASE_DISTANCE)
+        await self.move_rel(mount, up_pos)
+
+    async def _home_plunger_after_drop_tip(self, mount):
+        # incase plunger motor stalled while dropping a tip, add a
+        # safety margin of the distance between `bottom` and `drop_tip`
+        instr = self._attached_instruments[mount]
+        b = instr.config.plunger_positions['bottom']
+        d = instr.config.plunger_positions['drop_tip']
+        safety_margin = abs(b-d)
+        self._backend.set_active_current(Axis.of_plunger(mount),
+                                         instr.config.plunger_current)
+        await self._move_plunger(mount, safety_margin)
+        await self.home([Axis.of_plunger(mount)])
+        await self._move_plunger(mount,
+                                 instr.config.plunger_positions['bottom'])
 
     # Pipette config api
     @_log_call

@@ -1,7 +1,7 @@
 import asyncio
 import copy
 from typing import Dict, Optional, List, Tuple
-
+from contextlib import contextmanager
 from opentrons import types
 from opentrons.config.pipette_config import configs
 from . import modules
@@ -40,7 +40,8 @@ class Simulator:
                                   in enumerate(attached_modules)]
         self._position = copy.copy(_HOME_POSITION)
 
-    def move(self, target_position: Dict[str, float]):
+    def move(self, target_position: Dict[str, float],
+             home_flagged_axes: bool = True, speed: float = None):
         self._position.update(target_position)
 
     def home(self, axes: List[str] = None) -> Dict[str, float]:
@@ -108,11 +109,12 @@ class Simulator:
     def set_active_current(self, axis, amp):
         pass
 
-    def set_pipette_speed(self, speed):
-        pass
-
     def get_attached_modules(self) -> List[Tuple[str, str]]:
         return self._attached_modules
+
+    @contextmanager
+    def save_current(self):
+        yield
 
     def build_module(self, port: str, model: str) -> modules.AbstractModule:
         return modules.build(port, model, True)
