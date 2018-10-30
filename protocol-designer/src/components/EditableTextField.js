@@ -64,7 +64,7 @@ export default class EditableTextField extends React.Component<Props, State> {
             <form
               className={className}
               onKeyUp={this.handleKeyUp}
-              onSubmit={this.handleSubmit}
+              onSubmit={this.handleFormSubmit}
               ref={ref}
             >
               <InputField

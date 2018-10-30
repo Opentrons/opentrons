@@ -151,13 +151,16 @@ export const containers = handleActions({
   ),
   RENAME_LABWARE: (state: ContainersState, action: ActionType<typeof actions.renameLabware>) => {
     const {labwareId, name} = action.payload
-    return {
-      ...state,
-      [labwareId]: {
-        ...state[labwareId],
-        name,
-      },
-    }
+    // ignore renaming to whitespace
+    return (name && name.trim())
+      ? {
+        ...state,
+        [labwareId]: {
+          ...state[labwareId],
+          name,
+        },
+      }
+      : state
   },
   MOVE_LABWARE: (state: ContainersState, action: MoveLabware): ContainersState => {
     const { toSlot, fromSlot } = action.payload
