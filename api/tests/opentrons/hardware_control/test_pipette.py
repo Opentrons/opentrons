@@ -54,3 +54,14 @@ def test_volume_tracking():
         with pytest.raises(AssertionError):
             pip.add_current_volume(0.1)
         assert pip.current_volume == loaded.max_volume
+
+
+def test_config_update():
+    for config in pipette_config.configs:
+        pip = pipette.Pipette(config, 'testID')
+        sample_plunger_pos = {'top': 19.5,
+                              'bottom': 2,
+                              'blowOut': -1,
+                              'dropTip': -4.5}
+        pip.update_config_item('plunger_positions', sample_plunger_pos)
+        assert pip.config.plunger_positions == sample_plunger_pos
