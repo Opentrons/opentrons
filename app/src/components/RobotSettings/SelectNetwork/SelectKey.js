@@ -75,6 +75,7 @@ export default class SelectKey extends React.Component<Props, State> {
     const {id, name, value, error, keys, onLoseFocus} = this.props
     const keyOptions = map(keys, k => ({value: k.id, label: k.name}))
     const addNewGroup = {
+      label: null,
       options: [
         {
           value: UPLOAD_KEY_VALUE,

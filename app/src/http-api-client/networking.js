@@ -135,6 +135,10 @@ export const NO_SECURITY: 'none' = 'none'
 export const WPA_PSK_SECURITY: 'wpa-psk' = 'wpa-psk'
 export const WPA_EAP_SECURITY: 'wpa-eap' = 'wpa-eap'
 
+export const SECURITY_TYPE_FIELD = 'securityType'
+export const EAP_CONFIG_FIELD = 'eapConfig'
+export const EAP_TYPE_FIELD = `${EAP_CONFIG_FIELD}.eapType`
+
 export const fetchNetworkingStatus = buildRequestMaker('GET', STATUS)
 export const fetchWifiList = buildRequestMaker('GET', LIST)
 export const fetchWifiEapOptions = buildRequestMaker('GET', EAP_OPTIONS)

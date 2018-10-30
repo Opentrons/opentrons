@@ -45,8 +45,7 @@
   @apply --font-body-1-dark;
 
   background-color: var(--c-white);
-  border-radius: 2px;
-  padding: 2px 0 0 0;
+  border-radius: 3px;
 }
 
 .select_group {

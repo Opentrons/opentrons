@@ -88,3 +88,7 @@
   padding: 0;
   border: 0;
 }
+
+.select_security {
+  min-width: 12rem;
+}

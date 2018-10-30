@@ -9,7 +9,7 @@ import type {WifiSecurityType} from '../../../http-api-client'
 
 type Props = {
   ssid: ?string,
-  securityType: WifiSecurityType,
+  securityType: ?WifiSecurityType,
   close: () => mixed,
   children: React.Node,
 }
@@ -24,6 +24,8 @@ export default function ConnectModal (props: Props) {
       body = `Wi-Fi network ${ssid} requires a WPA2 password.`
     } else if (securityType === WPA_EAP_SECURITY) {
       body = `Wi-Fi network ${ssid} requires 802.1X authentication.`
+    } else {
+      body = `Please select the security type for Wi-Fi network ${ssid}.`
     }
   }
 
