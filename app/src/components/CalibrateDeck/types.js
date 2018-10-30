@@ -13,23 +13,23 @@ export type OP = {
   match: Match,
 }
 
-export type SP = {
+export type SP = {|
   startRequest: DeckCalStartState,
   commandRequest: DeckCalCommandState,
   pipetteProps: ?{
     mount: Mount,
     pipette: ?PipetteModelSpecs,
   },
-}
+|}
 
-export type DP = {
+export type DP = {|
   forceStart: () => mixed,
   jog: Jog,
   exit: () => mixed,
   back: () => mixed,
-}
+|}
 
-export type CalibrateDeckProps = OP & SP & DP
+export type CalibrateDeckProps = {...$Exact<OP>, ...SP, ...DP}
 
 export type CalibrateDeckStartedProps = CalibrateDeckProps & {
   exitUrl: string,

@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import cx from 'classnames'
 import {
   LabwareContainer,
@@ -24,6 +24,11 @@ function LabwareDeckSlotOverlay ({
   deleteLabware,
   editLiquids,
   moveLabwareSource,
+}: {
+  canAddIngreds: boolean,
+  deleteLabware: () => mixed,
+  editLiquids: () => mixed,
+  moveLabwareSource: () => mixed,
 }) {
   return (
     <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>

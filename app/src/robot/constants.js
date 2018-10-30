@@ -1,7 +1,5 @@
 // @flow
 // robot redux module constants
-import PropTypes from 'prop-types'
-
 import type {Mount, Slot} from './types'
 
 export const _NAME = 'robot'
@@ -45,18 +43,6 @@ export const UPDATING = 'updating'
 export const UPDATED = 'updated'
 export const CONFIRMING = 'confirming'
 export const CONFIRMED = 'confirmed'
-export const LABWARE_CONFIRMATION_TYPE = PropTypes.oneOf([
-  UNCONFIRMED,
-  MOVING_TO_SLOT,
-  OVER_SLOT,
-  PICKING_UP,
-  HOMING,
-  HOMED,
-  UPDATING,
-  UPDATED,
-  CONFIRMING,
-  CONFIRMED,
-])
 
 // deck layout
 export const PIPETTE_MOUNTS: Array<Mount> = ['left', 'right']

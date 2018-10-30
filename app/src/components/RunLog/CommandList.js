@@ -1,22 +1,30 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
+// @flow
+import * as React from 'react'
 import cx from 'classnames'
 
 import {SpinnerModal} from '@opentrons/components'
 import SessionAlert from './SessionAlert'
 import {Portal} from '../portal'
-
 import styles from './styles.css'
 
-export default class CommandList extends Component {
+import type {SessionStatus} from '../../robot'
+
+type Props = {
+  commands: Array<any>,
+  sessionStatus: SessionStatus,
+  showSpinner: boolean,
+  onResetClick: () => mixed,
+}
+
+export default class CommandList extends React.Component<Props> {
   componentDidUpdate () {
     // TODO(mc, 2018-07-24): use new refs
     if (this.refs.ensureVisible) this.refs.ensureVisible.scrollIntoView(true) // eslint-disable-line react/no-string-refs
   }
 
   render () {
-    const {commands, sessionStatus, showSpinner} = this.props
-    const makeCommandToTemplateMapper = (depth) => (command) => {
+    const {commands, sessionStatus, showSpinner, onResetClick} = this.props
+    const makeCommandToTemplateMapper = depth => command => {
       const {id, isCurrent, isLast, description, children, handledAt} = command
       const style = [styles[`indent-${depth}`]]
       let nestedList = null
@@ -29,7 +37,7 @@ export default class CommandList extends Component {
         )
       }
 
-      const liProps = {
+      const liProps: {key: string, className: string, ref?: string} = {
         key: id,
         className: cx(style, {
           [styles.executed]: handledAt,
@@ -42,7 +50,9 @@ export default class CommandList extends Component {
 
       return (
         <li {...liProps}>
-          <p className={style}>[{id}] : {description}</p>
+          <p className={style}>
+            [{id}] : {description}
+          </p>
           {nestedList}
         </li>
       )
@@ -52,11 +62,10 @@ export default class CommandList extends Component {
 
     // TODO (ka 2018-5-21): Temporarily hiding error to avoid showing smoothie
     //  error on halt, error AlertItem would be useful for future errors
-    const showAlert = (
+    const showAlert =
       sessionStatus !== 'running' &&
       sessionStatus !== 'loaded' &&
       sessionStatus !== 'error'
-    )
 
     const wrapperStyle = cx(styles.run_log_wrapper, {
       [styles.alert_visible]: showAlert,
@@ -70,19 +79,16 @@ export default class CommandList extends Component {
           </Portal>
         )}
         {!showSpinner && (
-          <SessionAlert {...this.props} className={styles.alert} />
+          <SessionAlert
+            sessionStatus={sessionStatus}
+            onResetClick={onResetClick}
+            className={styles.alert}
+          />
         )}
         <section className={wrapperStyle}>
-          <ol className={styles.list}>
-            {commandItems}
-          </ol>
+          <ol className={styles.list}>{commandItems}</ol>
         </section>
       </div>
     )
   }
-}
-
-CommandList.propTypes = {
-  // TODO(mc, 2017-08-23): use PropTypes.shape instead of object
-  commands: PropTypes.arrayOf(PropTypes.object).isRequired,
 }

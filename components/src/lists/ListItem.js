@@ -9,7 +9,7 @@ import {type IconName, Icon} from '../icons'
 
 type ListItemProps = {
   /** click handler */
-  onClick?: (event: SyntheticEvent<>) => void,
+  onClick?: (event: SyntheticEvent<>) => mixed,
   /** if URL is specified, ListItem is wrapped in a React Router NavLink */
   url?: string,
   /** if URL is specified NavLink can receive an active class name */

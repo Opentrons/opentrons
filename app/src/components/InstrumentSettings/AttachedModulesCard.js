@@ -13,18 +13,21 @@ import type {Robot} from '../../discovery'
 
 type OP = Robot
 
-type SP = {
+type SP = {|
   modules: ?Array<Module>,
   refreshing: boolean,
-}
+|}
 
-type DP = {refresh: () => mixed}
+type DP = {|refresh: () => mixed|}
 
-type Props = OP & SP & DP
+type Props = {...$Exact<OP>, ...SP, ...DP}
 
 const TITLE = 'Modules'
 
-export default connect(makeSTP, DTP)(AttachedModulesCard)
+export default connect(
+  makeSTP,
+  DTP
+)(AttachedModulesCard)
 
 function AttachedModulesCard (props: Props) {
   return (

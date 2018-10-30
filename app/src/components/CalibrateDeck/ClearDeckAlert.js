@@ -9,12 +9,12 @@ import type {CalibrateDeckProps} from './types'
 
 type OP = CalibrateDeckProps
 
-type DP = {
+type DP = {|
   onContinue: () => mixed,
   onCancel: () => mixed,
-}
+|}
 
-type Props = OP & DP
+type Props = {...$Exact<OP>, ...DP}
 
 export default connect(null, mapDispatchToProps)(ClearDeckAlert)
 
