@@ -157,17 +157,17 @@ export default function IngredientsList (props: Props) {
 
   return (
     <SidePanel title='Name & Liquids'>
-        <LabwareDetailsCard />
+      <LabwareDetailsCard />
 
-        {Object.keys(liquidGroupsById).map((groupIdForCard) =>
-          <IngredGroupCard key={groupIdForCard}
-            removeWellsContents={removeWellsContents}
-            labwareWellContents={labwareWellContents}
-            ingredGroup={liquidGroupsById[groupIdForCard]}
-            groupId={groupIdForCard}
-            selected={selectedIngredientGroupId === groupIdForCard}
-          />)
-        }
+      {Object.keys(liquidGroupsById).map((groupIdForCard) =>
+        <IngredGroupCard key={groupIdForCard}
+          removeWellsContents={removeWellsContents}
+          labwareWellContents={labwareWellContents}
+          ingredGroup={liquidGroupsById[groupIdForCard]}
+          groupId={groupIdForCard}
+          selected={selectedIngredientGroupId === groupIdForCard}
+        />)
+      }
     </SidePanel>
   )
 }

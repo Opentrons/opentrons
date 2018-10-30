@@ -64,19 +64,19 @@ export default class CommandList extends Component {
 
     return (
       <div className={styles.run_page}>
-      {showSpinner && (
-        <Portal>
-          <SpinnerModal />
-        </Portal>
-      )}
-      {!showSpinner && (
-        <SessionAlert {...this.props} className={styles.alert} />
-      )}
-      <section className={wrapperStyle}>
-        <ol className={styles.list}>
-          {commandItems}
-        </ol>
-      </section>
+        {showSpinner && (
+          <Portal>
+            <SpinnerModal />
+          </Portal>
+        )}
+        {!showSpinner && (
+          <SessionAlert {...this.props} className={styles.alert} />
+        )}
+        <section className={wrapperStyle}>
+          <ol className={styles.list}>
+            {commandItems}
+          </ol>
+        </section>
       </div>
     )
   }

@@ -117,11 +117,11 @@ function ChangePipetteRouter (props: ChangePipetteProps) {
   if (!moveRequest.inProgress && !moveRequest.response) {
     return (
       <ClearDeckAlertModal {...clearDeckProps} >
-      {props.actualPipette && (
-        <p>
+        {props.actualPipette && (
+          <p>
           Detaching a pipette will also clear its related calibration data
-        </p>
-      )}
+          </p>
+        )}
       </ClearDeckAlertModal>
     )
   }

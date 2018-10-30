@@ -16,17 +16,17 @@ export default function ResourceCard (props: Props) {
     <Card
       title={props.title}
     >
-    <div className={styles.card_content}>
-      <p className={styles.link_label}>{props.description}</p>
-      <OutlineButton
-        Component="a"
-        href={props.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={styles.link_button}
-      >
+      <div className={styles.card_content}>
+        <p className={styles.link_label}>{props.description}</p>
+        <OutlineButton
+          Component="a"
+          href={props.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.link_button}
+        >
         View in Browser
-      </OutlineButton>
+        </OutlineButton>
       </div>
     </Card>
   )

@@ -59,7 +59,7 @@ export default function RadioGroup (props: Props) {
           <div className={styles.label_text}>{radio.name}</div>
           {radio.children}
         </label>
-    )}
+      )}
     </div>
   )
 }

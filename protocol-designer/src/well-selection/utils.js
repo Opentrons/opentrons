@@ -23,8 +23,8 @@ function _getAllWellSetsForLabware (labwareName: string): ?WellSetByWell {
     const wellSet = computeWellAccess(labwareName, well)
 
     return (wellSet === null)
-    ? acc
-    : [...acc, wellSet]
+      ? acc
+      : [...acc, wellSet]
   }, [])
 
   return allWellSets

@@ -112,7 +112,7 @@ class LabwareDropdown extends React.Component <Props> {
           onCollapseToggle={selectSection}
           onClick={selectSection}
           className={styles.labware_selection_modal}
-          >
+        >
           {labwareInSection.map(this.labwareItemMapper)}
         </PDTitledList>
       )

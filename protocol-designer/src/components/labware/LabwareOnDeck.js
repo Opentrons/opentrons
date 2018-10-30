@@ -85,13 +85,13 @@ function EmptyDestinationSlotOverlay (props: EmptyDestinationSlotOverlayProps) {
 
   return (
     <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
-    <rect className={styles.overlay_panel} onClick={moveLabwareDestination} />
-    <ClickableText
-      onClick={handleSelectMoveDestination}
-      iconName='cursor-move'
-      y='40%'
-      text='Place Here'
-    />
+      <rect className={styles.overlay_panel} onClick={moveLabwareDestination} />
+      <ClickableText
+        onClick={handleSelectMoveDestination}
+        iconName='cursor-move'
+        y='40%'
+        text='Place Here'
+      />
     </g>
   )
 }
@@ -198,8 +198,8 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
       if (moveLabwareMode) {
         overlay = (slotToMoveFrom === slot)
           ? <DisabledSelectSlotOverlay
-              onClickOutside={cancelMove}
-              cancelMove={cancelMove} />
+            onClickOutside={cancelMove}
+            cancelMove={cancelMove} />
           : <EmptyDestinationSlotOverlay {...{moveLabwareDestination}}/>
       } else if (showNameOverlay) {
         overlay = <NameThisLabwareOverlay {...{
@@ -223,9 +223,9 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
 
     const labwareOrSlot = (slotHasLabware)
       ? <SlotWithLabware
-          {...{containerType, containerId}}
-          displayName={containerName || containerType}
-        />
+        {...{containerType, containerId}}
+        displayName={containerName || containerType}
+      />
       : <EmptyDeckSlot slot={slot} />
 
     return (

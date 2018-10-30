@@ -57,38 +57,38 @@ export const reduceCommandCreators = (commandCreators: Array<CommandCreator>): C
   }
 
 export const commandCreatorsTimeline = (commandCreators: Array<CommandCreator>) =>
-(initialRobotState: RobotState): Timeline => {
-  const timeline = commandCreators.reduce(
-    (acc: Timeline, commandCreator: CommandCreator, index: number) => {
-      const prevRobotState = (acc.timeline.length === 0)
-        ? initialRobotState
-        : last(acc.timeline).robotState
+  (initialRobotState: RobotState): Timeline => {
+    const timeline = commandCreators.reduce(
+      (acc: Timeline, commandCreator: CommandCreator, index: number) => {
+        const prevRobotState = (acc.timeline.length === 0)
+          ? initialRobotState
+          : last(acc.timeline).robotState
 
-      if (acc.errors) {
+        if (acc.errors) {
         // error short-circuit
-        return acc
-      }
-
-      const nextResult = commandCreator(prevRobotState)
-
-      if (nextResult.errors) {
-        return {
-          timeline: acc.timeline,
-          errors: nextResult.errors,
+          return acc
         }
-      }
 
-      return {
-        timeline: [...acc.timeline, nextResult],
-        errors: null,
-      }
-    }, {timeline: [], errors: null})
+        const nextResult = commandCreator(prevRobotState)
 
-  return {
-    timeline: timeline.timeline,
-    errors: timeline.errors,
+        if (nextResult.errors) {
+          return {
+            timeline: acc.timeline,
+            errors: nextResult.errors,
+          }
+        }
+
+        return {
+          timeline: [...acc.timeline, nextResult],
+          errors: null,
+        }
+      }, {timeline: [], errors: null})
+
+    return {
+      timeline: timeline.timeline,
+      errors: timeline.errors,
+    }
   }
-}
 
 type Vol = {volume: number}
 
@@ -140,7 +140,7 @@ export function splitLiquid (volume: number, sourceLiquidState: LocationLiquidSt
       ...acc,
       [ingredId]: ingredState.volume / totalSourceVolume,
     })
-  , {})
+    , {})
 
   return Object.keys(sourceLiquidState).reduce((acc, ingredId) => {
     const destVol = ratios[ingredId] * volume

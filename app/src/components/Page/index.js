@@ -16,8 +16,8 @@ export default function Page (props: Props) {
   return (
     <main className={styles.task}>
       {titleBarProps && (
-         <TitleBar {...titleBarProps} className={styles.fixed_title_bar}/>
-       )}
+        <TitleBar {...titleBarProps} className={styles.fixed_title_bar}/>
+      )}
       {children}
     </main>
   )

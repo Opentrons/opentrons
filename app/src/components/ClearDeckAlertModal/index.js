@@ -44,7 +44,7 @@ export default function ClearDeckAlertModal (props: Props) {
             </p>
             {props.children}
           </div>
-          )
+        )
         }
       </AlertModal>
     </Portal>

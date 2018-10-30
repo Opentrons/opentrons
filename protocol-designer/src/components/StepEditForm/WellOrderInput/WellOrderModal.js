@@ -99,8 +99,8 @@ class WellOrderModal extends React.Component<Props, State> {
           contentsClassName={cx(modalStyles.modal_contents)}
           onCloseClick={this.handleCancel}>
           <div className={styles.modal_header}>
-              <h4>{i18n.t('modal.well_order.title')}</h4>
-              <p>{i18n.t('modal.well_order.body')}</p>
+            <h4>{i18n.t('modal.well_order.title')}</h4>
+            <p>{i18n.t('modal.well_order.body')}</p>
           </div>
           <div className={styles.main_row}>
             <FormGroup label={i18n.t('modal.well_order.field_label')}>

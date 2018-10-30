@@ -22,7 +22,7 @@ export const loadProtocolFile = (event: SyntheticInputEvent<HTMLInputElement>): 
     const file = event.currentTarget.files[0]
     const reader = new FileReader()
 
-   // reset the state of the input to allow file re-uploads
+    // reset the state of the input to allow file re-uploads
     event.currentTarget.value = ''
 
     if (!file.name.endsWith('.json')) {

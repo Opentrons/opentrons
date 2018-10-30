@@ -67,10 +67,10 @@ export default function InputField (props: Props) {
       <div className={styles.label_text}>
         {props.label &&
           error && (
-            <div className={styles.error_icon}>
-              <Icon name="alert" />
-            </div>
-          )}
+          <div className={styles.error_icon}>
+            <Icon name="alert" />
+          </div>
+        )}
         {props.label}
       </div>
       <Input {...props} />

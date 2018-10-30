@@ -109,20 +109,20 @@ class TipPositionModal extends React.Component<Props, State> {
     return (
       <Portal>
         <HandleKeypress
-            preventDefault
-            handlers={[
-              {key: 'ArrowUp', shiftKey: false, onPress: this.makeHandleIncrement(SMALL_STEP_MM)},
-              {key: 'ArrowUp', shiftKey: true, onPress: this.makeHandleIncrement(LARGE_STEP_MM)},
-              {key: 'ArrowDown', shiftKey: false, onPress: this.makeHandleDecrement(SMALL_STEP_MM)},
-              {key: 'ArrowDown', shiftKey: true, onPress: this.makeHandleDecrement(LARGE_STEP_MM)},
-            ]}>
+          preventDefault
+          handlers={[
+            {key: 'ArrowUp', shiftKey: false, onPress: this.makeHandleIncrement(SMALL_STEP_MM)},
+            {key: 'ArrowUp', shiftKey: true, onPress: this.makeHandleIncrement(LARGE_STEP_MM)},
+            {key: 'ArrowDown', shiftKey: false, onPress: this.makeHandleDecrement(SMALL_STEP_MM)},
+            {key: 'ArrowDown', shiftKey: true, onPress: this.makeHandleDecrement(LARGE_STEP_MM)},
+          ]}>
           <Modal
             className={modalStyles.modal}
             contentsClassName={cx(modalStyles.modal_contents)}
             onCloseClick={this.handleCancel}>
             <div className={styles.modal_header}>
-                <h4>{i18n.t('modal.tip_position.title')}</h4>
-                <p>{i18n.t('modal.tip_position.body')}</p>
+              <h4>{i18n.t('modal.tip_position.title')}</h4>
+              <p>{i18n.t('modal.tip_position.body')}</p>
             </div>
             <div className={styles.main_row}>
               <div className={styles.leftHalf}>

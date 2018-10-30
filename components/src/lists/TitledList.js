@@ -90,8 +90,8 @@ export default function TitledList (props: ListProps) {
             <Icon
               className={styles.title_bar_icon}
               name={props.selected
-                  ? 'chevron-right'
-                  : (props.collapsed ? 'chevron-down' : 'chevron-up')}
+                ? 'chevron-right'
+                : (props.collapsed ? 'chevron-down' : 'chevron-up')}
             />
           </div>
         )}

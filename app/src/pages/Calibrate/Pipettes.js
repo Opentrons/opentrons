@@ -59,26 +59,26 @@ function CalibratePipettesPage (props: Props) {
     <RefreshWrapper
       refresh={fetchPipettes}
     >
-    <Page
-      titleBarProps={{title: (<SessionHeader />)}}
-    >
-      <PipetteTabs {...{pipettes, currentPipette}} />
-      <Pipettes {...props} changePipetteUrl={changePipetteUrl} />
-      {!!currentPipette && (
-        <TipProbe
-          {...currentPipette}
-          confirmTipProbeUrl={confirmTipProbeUrl}
-        />
-      )}
-      {!!currentPipette && (
-        <Route path={confirmTipProbeUrl} render={() => (
-          <ConfirmTipProbeModal
-            mount={currentPipette.mount}
-            backUrl={url}
+      <Page
+        titleBarProps={{title: (<SessionHeader />)}}
+      >
+        <PipetteTabs {...{pipettes, currentPipette}} />
+        <Pipettes {...props} changePipetteUrl={changePipetteUrl} />
+        {!!currentPipette && (
+          <TipProbe
+            {...currentPipette}
+            confirmTipProbeUrl={confirmTipProbeUrl}
           />
-        )} />
-      )}
-    </Page>
+        )}
+        {!!currentPipette && (
+          <Route path={confirmTipProbeUrl} render={() => (
+            <ConfirmTipProbeModal
+              mount={currentPipette.mount}
+              backUrl={url}
+            />
+          )} />
+        )}
+      </Page>
     </RefreshWrapper>
   )
 }

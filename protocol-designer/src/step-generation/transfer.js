@@ -75,8 +75,8 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
           const tipCommands: Array<CommandCreator> = (
             (data.changeTip === 'once' && pairIdx === 0 && chunkIdx === 0) ||
             data.changeTip === 'always')
-              ? [replaceTip(data.pipette)]
-              : []
+            ? [replaceTip(data.pipette)]
+            : []
 
           const preWetTipCommands = (data.preWetTip && chunkIdx === 0)
             ? mixUtil(
