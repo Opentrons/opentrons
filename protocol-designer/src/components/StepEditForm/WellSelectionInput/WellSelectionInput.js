@@ -5,25 +5,31 @@ import WellSelectionModal from './WellSelectionModal'
 import {Portal} from '../../portals/MainPageModalPortal'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import styles from '../StepEditForm.css'
+import { FocusHandlers } from '../index'
 
 type Props = {
   name: StepFieldName,
   primaryWellCount?: number,
   disabled: boolean,
-  onClick?: (e: SyntheticMouseEvent<*>) => mixed,
   errorToShow: ?string,
   isMulti: ?boolean,
   pipetteId: ?string,
   labwareId: ?string,
-}
+} & FocusHandlers
 
 type State = {isModalOpen: boolean}
 
 class WellSelectionInput extends React.Component<Props, State> {
   state = {isModalOpen: false}
 
-  toggleModal = () => {
-    this.setState({isModalOpen: !this.state.isModalOpen})
+  handleOpen = () => {
+    this.props.onFieldFocus(this.props.name)
+    this.setState({isModalOpen: true})
+  }
+
+  handleClose= () => {
+    this.props.onFieldBlur(this.props.name)
+    this.setState({isModalOpen: false})
   }
 
   render () {
@@ -37,7 +43,7 @@ class WellSelectionInput extends React.Component<Props, State> {
           readOnly
           name={this.props.name}
           value={this.props.primaryWellCount ? String(this.props.primaryWellCount) : null}
-          onClick={this.toggleModal}
+          onClick={this.handleOpen}
           error={this.props.errorToShow} />
         <Portal>
           <WellSelectionModal
@@ -45,7 +51,7 @@ class WellSelectionInput extends React.Component<Props, State> {
             pipetteId={this.props.pipetteId}
             labwareId={this.props.labwareId}
             isOpen={this.state.isModalOpen}
-            onCloseClick={this.toggleModal}
+            onCloseClick={this.handleClose}
             name={this.props.name} />
         </Portal>
       </FormGroup>

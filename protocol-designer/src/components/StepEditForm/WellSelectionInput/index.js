@@ -47,26 +47,26 @@ function mergeProps (
   dispatchProps: {dispatch: ThunkDispatch<*>},
   ownProps: OP
 ): Props {
-  const {dispatch} = dispatchProps
+  // const {dispatch} = dispatchProps
   const {_pipetteId, _selectedLabwareId, _wellFieldErrors} = stateProps
   const disabled = !(_pipetteId && _selectedLabwareId)
-  const {name, focusedField, dirtyFields} = ownProps
+  const {name, focusedField, dirtyFields, onFieldBlur, onFieldFocus} = ownProps
   const showErrors = showFieldErrors({name, focusedField, dirtyFields})
 
-  const onClick = () => {
-    if (ownProps.onFieldBlur) {
-      ownProps.onFieldBlur(ownProps.name)
-    }
-    if (_pipetteId && _selectedLabwareId) {
-      dispatch(
-        openWellSelectionModal({
-          pipetteId: _pipetteId,
-          labwareId: _selectedLabwareId,
-          formFieldAccessor: ownProps.name,
-        })
-      )
-    }
-  }
+  // const onClick = () => {
+  //   if (onFieldBlur) {
+  //     onFieldBlur(name)
+  //   }
+  //   if (_pipetteId && _selectedLabwareId) {
+  //     dispatch(
+  //       openWellSelectionModal({
+  //         pipetteId: _pipetteId,
+  //         labwareId: _selectedLabwareId,
+  //         formFieldAccessor: ownProps.name,
+  //       })
+  //     )
+  //   }
+  // }
 
   return {
     name,
@@ -76,7 +76,8 @@ function mergeProps (
     isMulti: stateProps.isMulti,
     primaryWellCount: stateProps.primaryWellCount,
     errorToShow: showErrors ? _wellFieldErrors[0] : null,
-    onClick,
+    onFieldBlur,
+    onFieldFocus,
   }
 }
 
