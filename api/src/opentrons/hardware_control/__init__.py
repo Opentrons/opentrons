@@ -481,7 +481,8 @@ class API:
         """ Update values of the robot's configuration.
 
         `kwargs` should contain keys of the robot's configuration. For instace,
-        `update_config(name='Grace Hopper')` would change the name of the robot
+        `update_config(log_level='debug)` would change the API server log level
+        to :py:attr:`logging.DEBUG`.
 
         Documentation on keys can be found in the documentation for
         :py:class:`.robot_config`.

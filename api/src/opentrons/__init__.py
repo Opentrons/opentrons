@@ -28,9 +28,9 @@ if ff.use_protocol_api_v2():
         hardware = hardware_control.API.build_hardware_controller()
         """ The global singleton of :py:class:`.hardware_control.API`.
 
-        If this is running on a real robot (and no other Python process
-        is running on the robot) it will be connected to the actual
-        hardware. Otherwise, it will be a simulator.
+        If this is running on a real robot (and no other Opentrons API server
+        is running and connected to the robot's hardware) it will be connected
+        to the actual hardware. Otherwise, it will be a simulator.
         """
     except RuntimeError:
         hardware = hardware_control.API.build_hardware_simulator()

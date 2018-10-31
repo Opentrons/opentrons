@@ -25,7 +25,7 @@ def run(protocol_bytes: bytes = None,
     file contents here.
     :param protocol_json: If the protocol is a json file, pass the contents
     here.
-    :param simulate: True to simulate; False to execute. If thsi is not an
+    :param simulate: True to simulate; False to execute. If this is not an
     OT2, ``simulate`` will be forced ``True``.
     :param context: The context to use. If ``None``, create a new
     ProtocolContext.

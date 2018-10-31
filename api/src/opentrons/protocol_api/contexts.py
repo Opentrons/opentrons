@@ -287,7 +287,7 @@ class InstrumentContext:
                          unspecified, the current position. For advanced usage,
                          an (x, y, z) tuple or instance of
                          :py:class:`types.Point` may be passed. This is a
-                         location in `Deck Coordinates`_.
+                         location in :ref:`protocol-api-deck-coords`.
         :type location: Well or tuple[float, float, float] or types.Point
         :param rate: The relative plunger speed for this aspirate. During
                      this aspirate, the speed of the plunger will be
@@ -348,7 +348,7 @@ class InstrumentContext:
                          unspecified, the bottom of the current well. For
                          advanced usage, an `(x, y, z)` tuple or instance of
                          :py:class:`types.Point` may be passed containing a
-                         location in `Deck Coordinates`_.
+                         location in :ref:`protocol-api-deck-coords`.
         :type location: .Well or tuple[float, float, float] or types.Point
         :param rate: The relative plunger speed for this aspirate. During
                      this aspirate, the speed of the plunger will be
@@ -458,7 +458,8 @@ class InstrumentContext:
                          well; or a position, whether specified by the result
                          of a call to something like :py:class:`.Well.top` or
                          directly specified as a `tuple` or
-                         :py:attr:`types.Point` in `Deck Coordinates`_.
+                         :py:attr:`types.Point` in
+                         :ref:`protocol-api-deck-coords`.
         :type location: Well or tuple[float, float, float] or types.Point
         :param strategy: How to move. This can be a member of
                          :py:class:`types.MotionStrategy` or one of the strings
