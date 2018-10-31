@@ -13,10 +13,11 @@ import startCase from 'lodash/startCase'
 import isEmpty from 'lodash/isEmpty'
 import isEqual from 'lodash/isEqual'
 
-import type {PipetteData} from '../../step-generation'
+import type {PipetteData} from '../../../step-generation'
 import i18n from '../../../localization'
-import type {BaseState, ThunkDispatch} from '../../types'
+import type {BaseState, ThunkDispatch} from '../../../types'
 import {pipetteOptions} from '../../../pipettes/pipetteData'
+import type {PipetteFields} from '../../../load-file'
 import {
   thunks as pipetteThunks,
   selectors as pipetteSelectors,
@@ -27,7 +28,6 @@ import PipetteDiagram from '../NewFileModal/PipetteDiagram'
 import TiprackDiagram from '../NewFileModal/TiprackDiagram'
 import styles from './EditPipettesModal.css'
 import modalStyles from '../modal.css'
-import type {PipetteFields} from '../../load-file'
 import StepChangesWarningModal from './StepChangesWarningModal'
 
 type State = EditPipettesFields & {isWarningModalOpen: boolean}
@@ -64,8 +64,8 @@ const tiprackOptions = [
 const DEFAULT_SELECTION = {pipetteModel: '', tiprackModel: null}
 
 const pipetteDataToFormState = (pipetteData) => ({
-  pipetteModel: pipetteData ? pipetteData.model : '',
-  tiprackModel: (pipetteData && pipetteData.tiprack) ? pipetteData.tiprack.model : null,
+  pipetteModel: (pipetteData && pipetteData.model) ? pipetteData.model : '',
+  tiprackModel: (pipetteData && pipetteData.tiprackModel) ? pipetteData.tiprackModel : null,
 })
 
 class EditPipettesModal extends React.Component<Props, State> {
