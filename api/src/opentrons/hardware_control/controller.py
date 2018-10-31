@@ -157,8 +157,8 @@ class Controller:
         return await modules.update_firmware(
             module, firmware_file, loop)
 
-    def _connect(self):
-        self._smoothie_driver.connect()
+    def connect(self, port: str = None):
+        self._smoothie_driver.connect(port)
 
     @contextmanager
     def _set_temp_speed(self, speed):

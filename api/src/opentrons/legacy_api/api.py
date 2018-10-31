@@ -1,15 +1,16 @@
-from . import robot, instruments as inst, containers as cnt, modules
+from . import (robot as _robot_module,
+               instruments as inst,
+               containers as cnt,
+               modules)
 from opentrons.config import pipette_config
 
 # Ignore the type here because well, this is exactly why this is the legacy_api
-robot = robot.Robot()  # type: ignore
+robot = _robot_module.Robot()  # type: ignore
 modules.provide_singleton(robot)
 
 
 def reset():
-    global robot
-    robot = robot.Robot()
-    modules.provide_singleton(robot)
+    robot.reset()
     return robot
 
 

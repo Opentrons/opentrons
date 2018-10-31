@@ -27,7 +27,7 @@ def dummy_instruments():
 async def test_cache_instruments(dummy_instruments, loop):
     expected_keys = [
         'name', 'min_volume', 'max_volume', 'aspirate_flow_rate',
-        'dispense_flow_rate', 'pipette_id']
+        'dispense_flow_rate', 'pipette_id', 'current_volume', 'display_name']
 
     hw_api = hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments,
@@ -45,7 +45,7 @@ async def test_cache_instruments_hc(monkeypatch, dummy_instruments,
                                     running_on_pi, cntrlr_mock_connect, loop):
     expected_keys = [
         'name', 'min_volume', 'max_volume', 'aspirate_flow_rate',
-        'dispense_flow_rate', 'pipette_id']
+        'dispense_flow_rate', 'pipette_id', 'current_volume', 'display_name']
 
     hw_api_cntrlr = hc.API.build_hardware_controller(loop=loop)
 
@@ -83,7 +83,7 @@ async def test_cache_instruments_hc(monkeypatch, dummy_instruments,
 async def test_cache_instruments_sim(loop, dummy_instruments):
     expected_keys = [
         'name', 'min_volume', 'max_volume', 'aspirate_flow_rate',
-        'dispense_flow_rate', 'pipette_id']
+        'dispense_flow_rate', 'pipette_id', 'current_volume', 'display_name']
 
     sim = hc.API.build_hardware_simulator(loop=loop)
     # With nothing specified at init or expected, we should have nothing

@@ -98,6 +98,7 @@ class API:
     @classmethod
     def build_hardware_controller(
             cls, config: robot_configs.robot_config = None,
+            port: str = None,
             loop: asyncio.AbstractEventLoop = None) -> 'API':
         """ Build a hardware controller that will actually talk to hardware.
 
@@ -109,7 +110,7 @@ class API:
             raise RuntimeError(
                 'The hardware controller may only be instantiated on a robot')
         backend = Controller(config, loop)
-        backend._connect()
+        backend.connect(port)
         return cls(backend, config=config, loop=loop)
 
     @classmethod
@@ -192,7 +193,7 @@ class API:
     def attached_instruments(self):
         configs = ['name', 'min_volume', 'max_volume',
                    'aspirate_flow_rate', 'dispense_flow_rate',
-                   'pipette_id']
+                   'pipette_id', 'current_volume', 'display_name']
         instruments = {top_types.Mount.LEFT: {},
                        top_types.Mount.RIGHT: {}}
         for mount in top_types.Mount:
@@ -470,7 +471,23 @@ class API:
     # Gantry/frame (i.e. not pipette) config API
     @property
     def config(self) -> robot_configs.robot_config:
+        """ Get the robot's configuration object.
+
+        :returns .robot_config: The object.
+        """
         return self._config
+
+    def update_config(self, **kwargs):
+        """ Update values of the robot's configuration.
+
+        `kwargs` should contain keys of the robot's configuration. For instace,
+        `update_config(log_level='debug)` would change the API server log level
+        to :py:attr:`logging.DEBUG`.
+
+        Documentation on keys can be found in the documentation for
+        :py:class:`.robot_config`.
+        """
+        self._config = self._config._replace(**kwargs)
 
     async def update_deck_calibration(self, new_transform):
         pass
