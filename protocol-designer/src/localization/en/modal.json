@@ -13,5 +13,17 @@
     "field_label": "Order",
     "then": "then",
     "viz_label": "Pattern"
+  },
+  "global_step_changes": {
+    "heading": "Changes to steps in protocol",
+    "all_steps_header": "All steps using a changed pipette will clear the following advanced settings:",
+    "all_steps_cleared_settings": "Flow rate, Mix, Air Gap, and Disposal Volume",
+    "other_potential_changes_header": "Other Potential Changes",
+    "multi_to_single": "Multi channel -> Single Channel",
+    "single_to_multi": "Single channel -> Multi Channel",
+    "next_pipette_smaller": "Switching to a smaller pipette",
+    "next_tip_size_smaller": "Switching to a smaller tip size",
+    "selected_wells_cleared": "Selected wells will be cleared",
+    "tip_use_may_increase": "Number of tips used may increase"
   }
 }

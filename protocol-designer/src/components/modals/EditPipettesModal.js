@@ -3,7 +3,13 @@ import * as React from 'react'
 import cx from 'classnames'
 import {connect} from 'react-redux'
 
-import {AlertModal, DropdownField, FormGroup, type Mount} from '@opentrons/components'
+import {
+  AlertModal,
+  DropdownField,
+  FormGroup,
+  OutlineButton,
+  type Mount,
+} from '@opentrons/components'
 import startCase from 'lodash/startCase'
 import isEmpty from 'lodash/isEmpty'
 import isEqual from 'lodash/isEqual'
@@ -59,8 +65,8 @@ const tiprackOptions = [
 const DEFAULT_SELECTION = {pipetteModel: '', tiprackModel: null}
 
 const pipetteDataToFormState = (pipetteData) => ({
-  pipetteModel: pipetteData.model,
-  tiprackModel: pipetteData.tiprack.model,
+  pipetteModel: pipetteData ? pipetteData.model : '',
+  tiprackModel: (pipetteData && pipetteData.tiprack) ? pipetteData.tiprack.model : null,
 })
 
 class EditPipettesModal extends React.Component<Props, State> {
@@ -86,7 +92,7 @@ class EditPipettesModal extends React.Component<Props, State> {
     const {left, right} = this.state
     const leftChanged = !isEqual(pipetteDataToFormState(instruments.left), left)
     const rightChanged = !isEqual(pipetteDataToFormState(instruments.right), right)
-    if ((instruments.left && leftChanged) || (instruments.right && rightChanged)) {
+    if (leftChanged || rightChanged) {
       this.setState({isWarningModalOpen: true})
     } else {
       this.savePipettes()
@@ -185,16 +191,35 @@ class EditPipettesModal extends React.Component<Props, State> {
           <AlertModal
             type='warning'
             alertOverlay
-            heading={i18n.t(`alert.hint.${hint}.title`)}>
+            heading={i18n.t('modal.global_step_changes.heading')}>
             <div className={styles.button_row}>
+              <span className={styles.modal_section_header}>{i18n.t('modal.global_step_changes.all_steps_header')}</span>
+              {i18n.t('modal.global_step_changes.all_steps_cleared_settings')}
+              <span className={styles.modal_section_header}>{i18n.t('modal.global_step_changes.other_potential_changes_header')}</span>
+              <div className={styles.effect_row}>
+                {i18n.t('modal.global_step_changes.multi_to_single')}
+                {i18n.t('modal.global_step_changes.selected_wells_cleared')}
+              </div>
+              <div className={styles.effect_row}>
+                {i18n.t('modal.global_step_changes.single_to_multi')}
+                {i18n.t('modal.global_step_changes.tip_use_may_increase')}
+              </div>
+              <div className={styles.effect_row}>
+                {i18n.t('modal.global_step_changes.next_pipette_smaller')}
+                {i18n.t('modal.global_step_changes.tip_use_may_increase')}
+              </div>
+              <div className={styles.effect_row}>
+                {i18n.t('modal.global_step_changes.next_tip_size_smaller')}
+                {i18n.t('modal.global_step_changes.tip_use_may_increase')}
+              </div>
               <OutlineButton
                 className={styles.ok_button}
-                onClick={this.handleCancel()}>
+                onClick={this.handleCancel}>
                 {i18n.t('button.cancel')}
               </OutlineButton>
               <OutlineButton
                 className={styles.ok_button}
-                onClick={this.savePipettes()}>
+                onClick={this.savePipettes}>
                 {i18n.t('button.ok')}
               </OutlineButton>
             </div>
