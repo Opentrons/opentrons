@@ -15,7 +15,8 @@
   display: flex;
 }
 
-.wifi_name {
+.wifi_name,
+.wifi_join_other {
   flex-basis: 100%;
   white-space: nowrap;
   overflow: hidden;
@@ -35,6 +36,10 @@
 
 .wifi_option_icon_right {
   padding-left: 0.25rem;
+}
+
+.wifi_join_other {
+  padding-left: 1rem;
 }
 
 .form_table {
@@ -59,7 +64,12 @@
   display: table-cell;
 }
 
+.form_table_input {
+  padding-bottom: 0.75rem;
+}
+
 .form_table_input_no_label {
+  margin-top: -0.325rem;
   padding-bottom: 0.5rem;
 }
 
@@ -67,14 +77,6 @@
   padding-right: 1rem;
   font-weight: var(--fw-semibold);
   text-align: right;
-}
-
-/**
- * TODO(mc, 2018-10-23): move this padding to form_table_row once CL text
- * fields stop having empty caption divs that take up height
- */
-.wifi_key_select {
-  /* padding-bottom: 0.5rem; */
 }
 
 .wifi_add_key_input {
@@ -89,6 +91,6 @@
   border: 0;
 }
 
-.select_security {
+.form_field_select {
   min-width: 12rem;
 }

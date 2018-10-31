@@ -27,6 +27,8 @@ export default function ConnectModal (props: Props) {
     } else {
       body = `Please select the security type for Wi-Fi network ${ssid}.`
     }
+  } else {
+    body = 'Enter the name and security type of the network you want to join.'
   }
 
   return (

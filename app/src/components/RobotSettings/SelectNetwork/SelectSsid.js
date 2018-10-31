@@ -9,12 +9,22 @@ import styles from './styles.css'
 
 import type {IconName} from '@opentrons/components'
 import type {WifiNetwork, WifiNetworkList} from '../../../http-api-client'
-import type {OptionType} from '../../SelectField'
+import type {OptionType, GroupType} from '../../SelectField'
 
 type Props = {
   list: ?WifiNetworkList,
   disabled?: boolean,
-  onValueChange: (name: string, ssid: string) => mixed,
+  onValueChange: (name: string, ssid: ?string) => mixed,
+}
+
+const JOIN_OTHER_GROUP: GroupType = {
+  label: null,
+  options: [
+    {
+      value: null,
+      label: <p className={styles.wifi_join_other}>Join other network...</p>,
+    },
+  ],
 }
 
 export default function SelectSsid (props: Props) {
@@ -26,7 +36,7 @@ export default function SelectSsid (props: Props) {
     <SelectField
       name="ssid"
       value={value}
-      options={map(list, makeNetworkOption)}
+      options={map(list, makeNetworkOption).concat(JOIN_OTHER_GROUP)}
       onValueChange={onValueChange}
       placeholder="Select network"
       className={styles.wifi_dropdown}
