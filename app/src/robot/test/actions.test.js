@@ -229,6 +229,7 @@ describe('robot actions', () => {
     const expected = {
       type: 'robot:CONFIRM_PROBED',
       payload: 'left',
+      meta: {robotCommand: true},
     }
 
     expect(actions.confirmProbed('left')).toEqual(expected)

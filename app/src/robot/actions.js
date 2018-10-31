@@ -1,17 +1,11 @@
 // @flow
 // robot actions and action types
 import {_NAME as NAME} from './constants'
-import type {
-  Mount,
-  Slot,
-  Axis,
-  Direction,
-  SessionUpdate,
-} from './types'
+import type {Mount, Slot, Axis, Direction, SessionUpdate} from './types'
 
 // TODO(mc, 2017-11-22): rename this function to actionType
-const makeRobotActionName = (action) => `${NAME}:${action}`
-const tagForRobotApi = (action) => ({...action, meta: {robotCommand: true}})
+const makeRobotActionName = action => `${NAME}:${action}`
+const tagForRobotApi = action => ({...action, meta: {robotCommand: true}})
 
 type Error = {message: string}
 
@@ -63,12 +57,13 @@ export type UnexpectedDisconnectAction = {|
 export type ConfirmProbedAction = {|
   type: 'robot:CONFIRM_PROBED',
   payload: Mount,
+  meta: {|
+    robotCommand: true,
+  |},
 |}
 
 export type PipetteCalibrationAction = {|
-  type: (
-    | 'robot:JOG'
-  ),
+  type: 'robot:JOG',
   payload: {|
     mount: Mount,
     axis?: Axis,
@@ -86,14 +81,12 @@ export type SetJogDistanceAction = {|
 |}
 
 export type LabwareCalibrationAction = {|
-  type: (
-    | 'robot:MOVE_TO'
+  type: | 'robot:MOVE_TO'
     | 'robot:PICKUP_AND_HOME'
     | 'robot:DROP_TIP_AND_HOME'
     | 'robot:CONFIRM_TIPRACK'
     | 'robot:UPDATE_OFFSET'
-    | 'robot:SET_JOG_DISTANCE'
-  ),
+    | 'robot:SET_JOG_DISTANCE',
   payload: {|
     mount: Mount,
     slot: Slot,
@@ -104,15 +97,13 @@ export type LabwareCalibrationAction = {|
 |}
 
 export type CalibrationSuccessAction = {
-  type: (
-    | 'robot:MOVE_TO_SUCCESS'
+  type: | 'robot:MOVE_TO_SUCCESS'
     | 'robot:JOG_SUCCESS'
     | 'robot:PICKUP_AND_HOME_SUCCESS'
     | 'robot:DROP_TIP_AND_HOME_SUCCESS'
     | 'robot:CONFIRM_TIPRACK_SUCCESS'
     | 'robot:UPDATE_OFFSET_SUCCESS'
-    | 'robot:RETURN_TIP_SUCCESS'
-  ),
+    | 'robot:RETURN_TIP_SUCCESS',
   payload: {
     isTiprack?: boolean,
     tipOn?: boolean,
@@ -120,15 +111,13 @@ export type CalibrationSuccessAction = {
 }
 
 export type CalibrationFailureAction = {|
-  type: (
-    | 'robot:MOVE_TO_FAILURE'
+  type: | 'robot:MOVE_TO_FAILURE'
     | 'robot:JOG_FAILURE'
     | 'robot:PICKUP_AND_HOME_FAILURE'
     | 'robot:DROP_TIP_AND_HOME_FAILURE'
     | 'robot:CONFIRM_TIPRACK_FAILURE'
     | 'robot:UPDATE_OFFSET_FAILURE'
-    | 'robot:RETURN_TIP_FAILURE'
-  ),
+    | 'robot:RETURN_TIP_FAILURE',
   error: true,
   payload: Error,
 |}
@@ -387,8 +376,13 @@ export const actions = {
     return action
   },
 
+  // confirm tip removed + tip probed then home pipette on `mount`
   confirmProbed (mount: Mount): ConfirmProbedAction {
-    return {type: 'robot:CONFIRM_PROBED', payload: mount}
+    return {
+      type: 'robot:CONFIRM_PROBED',
+      payload: mount,
+      meta: {robotCommand: true},
+    }
   },
 
   returnTip (mount: Mount) {
