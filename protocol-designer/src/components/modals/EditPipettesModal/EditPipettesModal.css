@@ -1,0 +1,76 @@
+@import '@opentrons/components';
+
+.diagrams {
+  display: flex;
+  align-items: baseline;
+}
+
+.tiprack_labware {
+  flex: 3;
+}
+
+.left_pipette,
+.right_pipette {
+  flex: 1;
+}
+
+.left_pipette {
+  text-align: right;
+  padding-right: 1rem;
+}
+
+.edit_pipettes_modal {
+  line-height: 1.5;
+  min-height: 100%;
+
+  /* override default modal top/bottom to allow scroll */
+  bottom: auto;
+
+  & form > * {
+    margin-bottom: 1rem;
+  }
+
+  & ol > li {
+    counter-increment: step-counter;
+    list-style: none;
+    margin: 1rem 0;
+  }
+
+  & ol > li::before {
+    content: counter(step-counter) ") ";
+  }
+}
+
+.mount_fields_row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.mount_column {
+  flex-grow: 1;
+}
+
+.mount_column:first-child {
+  margin-right: 0.5rem;
+}
+
+.button_row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+.effect_row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.modal_section_header {
+  font-weight: var(--fw-semibold);
+  padding-bottom: 0;
+}
+
+.modal_section_header:not(:first-child) {
+  margin-top: 1rem;
+}

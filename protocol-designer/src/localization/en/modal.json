@@ -14,11 +14,15 @@
     "then": "then",
     "viz_label": "Pattern"
   },
+  "edit_pipettes": {
+    "title": "Change Pipette Selection",
+    "body": "Update you pipette and tiprack selection. Please note, this may affect your existing protocol steps."
+  },
   "global_step_changes": {
     "heading": "Changes to steps in protocol",
     "all_steps_header": "All steps using a changed pipette will clear the following advanced settings:",
     "all_steps_cleared_settings": "Flow rate, Mix, Air Gap, and Disposal Volume",
-    "other_potential_changes_header": "Other Potential Changes",
+    "other_potential_changes_header": "Other potential changes to affected steps:",
     "multi_to_single": "Multi channel -> Single Channel",
     "single_to_multi": "Single channel -> Multi Channel",
     "next_pipette_smaller": "Switching to a smaller pipette",

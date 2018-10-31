@@ -12,7 +12,7 @@ import i18n from '../localization'
 import type {FormConnector} from '../utils'
 import {Portal} from './portals/MainPageModalPortal'
 import styles from './FilePage.css'
-import EditPipettesModal from '../components/modals/EditPipettesModal'
+import EditPipettesModal from './modals/EditPipettesModal'
 import formStyles from '../components/forms.css'
 
 export type Props = {

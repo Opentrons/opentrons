@@ -7,7 +7,6 @@ import {
   AlertModal,
   DropdownField,
   FormGroup,
-  OutlineButton,
   type Mount,
 } from '@opentrons/components'
 import startCase from 'lodash/startCase'
@@ -15,20 +14,21 @@ import isEmpty from 'lodash/isEmpty'
 import isEqual from 'lodash/isEqual'
 
 import type {PipetteData} from '../../step-generation'
-import i18n from '../../localization'
+import i18n from '../../../localization'
 import type {BaseState, ThunkDispatch} from '../../types'
-import {pipetteOptions} from '../../pipettes/pipetteData'
+import {pipetteOptions} from '../../../pipettes/pipetteData'
 import {
   thunks as pipetteThunks,
   selectors as pipetteSelectors,
   type EditPipettesFields,
-} from '../../pipettes'
+} from '../../../pipettes'
 
-import PipetteDiagram from './NewFileModal/PipetteDiagram'
-import TiprackDiagram from './NewFileModal/TiprackDiagram'
-import styles from './NewFileModal/NewFileModal.css'
-import modalStyles from './modal.css'
+import PipetteDiagram from '../NewFileModal/PipetteDiagram'
+import TiprackDiagram from '../NewFileModal/TiprackDiagram'
+import styles from './EditPipettesModal.css'
+import modalStyles from '../modal.css'
 import type {PipetteFields} from '../../load-file'
+import StepChangesWarningModal from './StepChangesWarningModal'
 
 type State = EditPipettesFields & {isWarningModalOpen: boolean}
 
@@ -40,8 +40,7 @@ type SP = {
 }
 
 type DP = {
-  onCancel: () => mixed,
-  onSave: (State) => mixed,
+  onSave: (EditPipettesFields) => mixed,
 }
 
 type Props = {closeModal: () => void} & SP & DP
@@ -90,9 +89,11 @@ class EditPipettesModal extends React.Component<Props, State> {
   handleSubmit = () => {
     const {instruments} = this.props
     const {left, right} = this.state
-    const leftChanged = !isEqual(pipetteDataToFormState(instruments.left), left)
-    const rightChanged = !isEqual(pipetteDataToFormState(instruments.right), right)
-    if (leftChanged || rightChanged) {
+    const initialLeft = pipetteDataToFormState(instruments.left)
+    const initialRight = pipetteDataToFormState(instruments.right)
+    const leftChanged = !isEqual(initialLeft, left)
+    const rightChanged = !isEqual(initialRight, right)
+    if ((leftChanged && !isEmpty(initialLeft.pipetteModel)) || (rightChanged && !isEmpty(initialRight.pipetteModel))) {
       this.setState({isWarningModalOpen: true})
     } else {
       this.savePipettes()
@@ -106,7 +107,6 @@ class EditPipettesModal extends React.Component<Props, State> {
   }
 
   handleCancel = () => {
-    this.props.onCancel()
     this.props.closeModal()
   }
 
@@ -137,7 +137,8 @@ class EditPipettesModal extends React.Component<Props, State> {
           <form
             className={modalStyles.modal_contents}
             onSubmit={() => { canSubmit && this.handleSubmit() }}>
-            <h2>Edit Pipettes</h2>
+            <h2>{i18n.t('modal.edit_pipettes.title')}</h2>
+            <p>{i18n.t('modal.edit_pipettes.body')}</p>
 
             <div className={styles.mount_fields_row}>
               <div className={styles.mount_column}>
@@ -188,42 +189,7 @@ class EditPipettesModal extends React.Component<Props, State> {
         </AlertModal>
         {
           this.state.isWarningModalOpen &&
-          <AlertModal
-            type='warning'
-            alertOverlay
-            heading={i18n.t('modal.global_step_changes.heading')}>
-            <div className={styles.button_row}>
-              <span className={styles.modal_section_header}>{i18n.t('modal.global_step_changes.all_steps_header')}</span>
-              {i18n.t('modal.global_step_changes.all_steps_cleared_settings')}
-              <span className={styles.modal_section_header}>{i18n.t('modal.global_step_changes.other_potential_changes_header')}</span>
-              <div className={styles.effect_row}>
-                {i18n.t('modal.global_step_changes.multi_to_single')}
-                {i18n.t('modal.global_step_changes.selected_wells_cleared')}
-              </div>
-              <div className={styles.effect_row}>
-                {i18n.t('modal.global_step_changes.single_to_multi')}
-                {i18n.t('modal.global_step_changes.tip_use_may_increase')}
-              </div>
-              <div className={styles.effect_row}>
-                {i18n.t('modal.global_step_changes.next_pipette_smaller')}
-                {i18n.t('modal.global_step_changes.tip_use_may_increase')}
-              </div>
-              <div className={styles.effect_row}>
-                {i18n.t('modal.global_step_changes.next_tip_size_smaller')}
-                {i18n.t('modal.global_step_changes.tip_use_may_increase')}
-              </div>
-              <OutlineButton
-                className={styles.ok_button}
-                onClick={this.handleCancel}>
-                {i18n.t('button.cancel')}
-              </OutlineButton>
-              <OutlineButton
-                className={styles.ok_button}
-                onClick={this.savePipettes}>
-                {i18n.t('button.ok')}
-              </OutlineButton>
-            </div>
-          </AlertModal>
+          <StepChangesWarningModal onCancel={this.handleCancel} onConfirm={this.savePipettes} />
         }
       </React.Fragment>
     )
@@ -242,12 +208,8 @@ const mapSTP = (state: BaseState): SP => {
 
 const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
   onSave: (fields: EditPipettesFields) => {
-    // TODO: only launch if changes protocol
-    if (window.confirm(i18n.t('alert.window.confirm_create_new'))) {
-      dispatch(pipetteThunks.editPipettes(fields))
-    }
+    dispatch(pipetteThunks.editPipettes(fields))
   },
-  onCancel: () => console.log('tried to Cancel'),
 })
 
 export default connect(mapSTP, mapDTP)(EditPipettesModal)
