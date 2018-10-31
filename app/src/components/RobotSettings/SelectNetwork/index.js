@@ -9,19 +9,24 @@ import {
   fetchWifiList,
   fetchWifiEapOptions,
   fetchWifiKeys,
+  fetchNetworkingStatus,
   addWifiKey,
   configureWifi,
   makeGetRobotWifiList,
   makeGetRobotWifiEapOptions,
   makeGetRobotWifiKeys,
   makeGetRobotWifiConfigure,
+  clearConfigureWifiResponse,
 } from '../../../http-api-client'
+
+import {startDiscovery} from '../../../discovery'
 
 import {IntervalWrapper, SpinnerModal} from '@opentrons/components'
 import {Portal} from '../../portal'
 import ConnectModal from './ConnectModal'
 import ConnectForm from './ConnectForm'
 import SelectSsid from './SelectSsid'
+import WifiConnectModal from './WifiConnectModal'
 
 import type {State, Dispatch} from '../../../types'
 import type {ViewableRobot} from '../../../discovery'
@@ -31,6 +36,8 @@ import type {
   WifiEapOptionsList,
   WifiKeysList,
   WifiConfigureRequest,
+  WifiConfigureResponse,
+  ApiRequestError,
 } from '../../../http-api-client'
 
 type OP = {robot: ViewableRobot}
@@ -40,6 +47,8 @@ type SP = {|
   connectingTo: ?string,
   eapOptions: ?WifiEapOptionsList,
   keys: ?WifiKeysList,
+  configError: ?ApiRequestError,
+  configResponse: ?WifiConfigureResponse,
 |}
 
 type DP = {|
@@ -48,6 +57,9 @@ type DP = {|
   fetchKeys: () => mixed,
   addKey: (file: File) => mixed,
   configure: WifiConfigureRequest => mixed,
+  refresh: () => mixed,
+  clearSuccessfulConfigure: () => mixed,
+  clearFailedConfigure: () => mixed,
 |}
 
 type Props = {...$Exact<OP>, ...SP, ...DP}
@@ -104,8 +116,12 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
       eapOptions,
       keys,
       fetchList,
-      configure,
       addKey,
+      configure,
+      configError,
+      configResponse,
+      clearSuccessfulConfigure,
+      clearFailedConfigure,
     } = this.props
     const {ssid, securityType, modalOpen} = this.state
 
@@ -140,6 +156,15 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
               />
             </ConnectModal>
           )}
+          {(!!configError || !!configResponse) && (
+            <WifiConnectModal
+              error={configError}
+              response={configResponse}
+              close={
+                configError ? clearFailedConfigure : clearSuccessfulConfigure
+              }
+            />
+          )}
         </Portal>
       </IntervalWrapper>
     )
@@ -160,6 +185,7 @@ function makeMapStateToProps (): (State, OP) => SP {
     const {
       request: cfgRequest,
       inProgress: cfgInProgress,
+      response: cfgResponse,
       error: cfgError,
     } = getConfigureCall(state, robot)
 
@@ -169,12 +195,25 @@ function makeMapStateToProps (): (State, OP) => SP {
       keys: keysResponse && keysResponse.keys,
       connectingTo:
         !cfgError && cfgInProgress && cfgRequest ? cfgRequest.ssid : null,
+      configResponse: cfgResponse,
+      configError: cfgError,
     }
   }
 }
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   const {robot} = ownProps
+  const refresh = () => {
+    dispatch(fetchNetworkingStatus(robot))
+    dispatch(fetchWifiList(robot))
+  }
+  const clearConfigureAction = clearConfigureWifiResponse(robot)
+  const clearFailedConfigure = () => dispatch(clearConfigureAction)
+  const clearSuccessfulConfigure = () =>
+    Promise.resolve()
+      .then(refresh)
+      .then(() => dispatch(startDiscovery()))
+      .then(() => dispatch(clearConfigureAction))
 
   return {
     fetchList: () => dispatch(fetchWifiList(robot)),
@@ -182,6 +221,9 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
     fetchKeys: () => dispatch(fetchWifiKeys(robot)),
     addKey: file => dispatch(addWifiKey(robot, file)),
     configure: params => dispatch(configureWifi(robot, params)),
+    refresh,
+    clearSuccessfulConfigure,
+    clearFailedConfigure,
   }
 }
 
