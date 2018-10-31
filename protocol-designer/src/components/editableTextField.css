@@ -1,0 +1,11 @@
+@import '@opentrons/components';
+
+.edit_icon,
+.edit_icon_right {
+  color: var(--c-med-gray);
+  height: 1.5em;
+}
+
+.edit_icon_right {
+  float: right;
+}

@@ -3,11 +3,13 @@ import React from 'react'
 import cx from 'classnames'
 import i18n from '../../../localization'
 import {PDTitledList, PDListItem} from '../../lists'
+import EditableTextField from '../../EditableTextField'
 import styles from './labwareDetailsCard.css'
 
 type Props = {
   labwareType: string,
   nickname: string,
+  renameLabware: (name: string) => mixed,
 }
 
 export default function LabwareDetailsCard (props: Props) {
@@ -19,7 +21,7 @@ export default function LabwareDetailsCard (props: Props) {
       <PDListItem>
         <div className={styles.row}>
           <span className={cx(styles.label, styles.column_1_3)}>
-            {i18n.t('form.labware.type')}
+            {i18n.t('form.generic.labware_type')}
           </span>
           <span className={styles.column_2_3}>{props.labwareType}</span>
         </div>
@@ -27,12 +29,12 @@ export default function LabwareDetailsCard (props: Props) {
       <PDListItem border>
         <div className={styles.row}>
           <span className={cx(styles.label, styles.column_1_3)}>
-            {i18n.t('form.liquid.nickname')}
+            {i18n.t('form.generic.nickname')}
           </span>
-          <span className={styles.column_1_3}>
-            {props.nickname}
-          </span>
-          {/* TODO: Ian 2018-10-15 TBD in future ticket: pencil icon goes here? See #2428 */}
+          <EditableTextField
+            value={props.nickname}
+            saveEdit={props.renameLabware}
+          />
         </div>
       </PDListItem>
     </PDTitledList>

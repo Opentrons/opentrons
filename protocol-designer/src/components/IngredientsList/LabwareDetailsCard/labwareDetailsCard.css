@@ -1,0 +1,11 @@
+@import '@opentrons/components';
+@import '../../../css/grid.css';
+
+.row {
+  lost-utility: clearfix;
+  text-align: left;
+}
+
+.label {
+  font-weight: var(--fw-bold);
+}

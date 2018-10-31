@@ -70,26 +70,20 @@ export const deleteContainer = createAction(
   |}) => args
 )
 
-export const modifyContainer = createAction(
-  'MODIFY_CONTAINER',
-  (args: {|
-    containerId: string,
-    modify: {
-      // TODO Ian 2018-02-20: `field` is some 'LabwareField' type
-      [field: string]: mixed, // eg modify = {name: 'newName'}
-    },
-  |}) => args
-)
+export type RenameLabwareAction = {
+  type: 'RENAME_LABWARE',
+  payload: {
+    labwareId: string,
+    name: ?string,
+  },
+}
 
-export const openRenameLabwareForm = createAction(
-  'OPEN_RENAME_LABWARE_FORM',
-  () => {}
-)
-
-export const closeRenameLabwareForm = createAction(
-  'CLOSE_RENAME_LABWARE_FORM',
-  () => {}
-)
+export const renameLabware = (
+  payload: $PropertyType<RenameLabwareAction, 'payload'>
+): RenameLabwareAction => ({
+  type: 'RENAME_LABWARE',
+  payload,
+})
 
 // ===========
 
