@@ -43,7 +43,7 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
   },
   'aspirate_mix_volume': { processValue: composeProcessors(castToFloat, onlyPositiveNumbers) },
   'aspirate_wells': {
-    getErrors: composeErrors(minimumWellCount(1)),
+    getErrors: composeErrors(requiredField, minimumWellCount(1)),
     processValue: defaultTo([]),
   },
   'dispense_delayMinutes': {
@@ -58,7 +58,7 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
   },
   'dispense_mix_volume': { processValue: composeProcessors(castToFloat, onlyPositiveNumbers) },
   'dispense_wells': {
-    getErrors: composeErrors(minimumWellCount(1)),
+    getErrors: composeErrors(requiredField, minimumWellCount(1)),
     processValue: defaultTo([]),
   },
   'aspirate_disposalVol_volume': {
@@ -90,7 +90,7 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
     processValue: composeProcessors(castToFloat, onlyPositiveNumbers, defaultTo(0)),
   },
   'wells': {
-    getErrors: composeErrors(minimumWellCount(1)),
+    getErrors: composeErrors(requiredField, minimumWellCount(1)),
     processValue: defaultTo([]),
   },
 }
