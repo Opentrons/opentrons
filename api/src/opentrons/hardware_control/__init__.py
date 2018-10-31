@@ -717,12 +717,39 @@ class API:
 
     # Pipette config api
     @_log_call
-    async def calibrate_plunger(
-            self, mount, top=None, bottom=None, blow_out=None, drop_tip=None):
-        pass
+    def calibrate_plunger(self,
+                          mount: top_types.Mount,
+                          top: float = None, bottom: float = None,
+                          blow_out: float = None, drop_tip: float = None):
+        """
+        Set calibration values for the pipette plunger.
+        This can be called multiple times as the user sets each value,
+        or you can set them all at once.
+        :param top: Touching but not engaging the plunger.
+        :param bottom: Must be above the pipette's physical hard-stop, while
+        still leaving enough room for 'blow_out'
+        :param blow_out: Plunger is pushed down enough to expel all liquids.
+        :param drop_tip: Position that causes the tip to be released from the
+        pipette
+        """
+        instr = self._attached_instruments[mount]
+        if not instr:
+            raise PipetteNotAttachedError("No pipette attached to {} mount"
+                                          .format(mount.name))
+
+        pos_dict: Dict = instr.config.plunger_positions
+        if top is not None:
+            pos_dict['top'] = top
+        if bottom is not None:
+            pos_dict['bottom'] = bottom
+        if blow_out is not None:
+            pos_dict['blow_out'] = blow_out
+        if bottom is not None:
+            pos_dict['drop_tip'] = drop_tip
+        instr.update_config_item('plunger_positions', pos_dict)
 
     @_log_call
-    async def set_flow_rate(self, mount, aspirate=None, dispense=None):
+    def set_flow_rate(self, mount, aspirate=None, dispense=None):
         this_pipette = self._attached_instruments[mount]
         if not this_pipette:
             raise PipetteNotAttachedError("No pipette attached to {} mount"
@@ -731,11 +758,6 @@ class API:
             this_pipette.update_config_item('aspirate_flow_rate', aspirate)
         if dispense:
             this_pipette.update_config_item('dispense_float_rate', dispense)
-
-    @_log_call
-    # Used by pick_up_tip
-    async def set_pick_up_current(self, mount, amperes):
-        pass
 
     @_log_call
     async def discover_modules(self):
