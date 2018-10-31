@@ -55,6 +55,7 @@ type Props = {...$Exact<OP>, ...SP, ...DP}
 type SelectNetworkState = {
   ssid: ?string,
   securityType: ?WifiSecurityType,
+  modalOpen: boolean,
 }
 
 const LIST_REFRESH_MS = 15000
@@ -63,7 +64,11 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
   constructor (props) {
     super(props)
     // prepopulate selected SSID with currently connected network, if any
-    this.state = {ssid: this.getActiveSsid(), securityType: null}
+    this.state = {
+      ssid: this.getActiveSsid(),
+      securityType: null,
+      modalOpen: false,
+    }
   }
 
   setCurrentSsid = (_: string, ssid: string) => {
@@ -71,21 +76,24 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
 
     if (network) {
       const securityType = network.securityType
-      const nextState: $Shape<SelectNetworkState> = {ssid, securityType}
+      const nextState: $Shape<SelectNetworkState> = {
+        ssid,
+        securityType,
+        modalOpen: securityType !== NO_SECURITY,
+      }
 
-      if (securityType === NO_SECURITY) {
+      if (!nextState.modalOpen) {
         this.props.configure({ssid})
-      } else if (securityType === WPA_EAP_SECURITY) {
+      } else if (securityType === WPA_EAP_SECURITY || !securityType) {
         this.props.fetchEapOptions()
         this.props.fetchKeys()
       }
-      // TODO(mc, 2018-10-18): handle hidden network
 
       this.setState(nextState)
     }
   }
 
-  closeConnectForm = () => this.setState({securityType: null})
+  closeConnectForm = () => this.setState({securityType: null, modalOpen: false})
 
   getActiveSsid (): ?string {
     const activeNetwork = find(this.props.list, 'active')
@@ -110,7 +118,7 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
       configure,
       addKey,
     } = this.props
-    const {ssid, securityType} = this.state
+    const {ssid, securityType, modalOpen} = this.state
 
     return (
       <IntervalWrapper refresh={fetchList} interval={LIST_REFRESH_MS}>
@@ -127,8 +135,7 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
             />
           )}
           {ssid &&
-            securityType &&
-            securityType !== NO_SECURITY && (
+            modalOpen && (
               <ConnectModal
                 ssid={ssid}
                 securityType={securityType}

@@ -11,7 +11,8 @@ import styles from './styles.css'
 
 // TODO(mc, 2018-10-23): we use "name", react-select uses "label"; align usage
 export type OptionType = {|value: string, label: React.Node|}
-export type GroupType = {|options: Array<OptionType>, label?: React.Node|}
+export type GroupType = {|options: Array<OptionType>, label: React.Node|}
+export type SelectOption = OptionType | GroupType
 
 type OptionList = Array<OptionType>
 
@@ -21,7 +22,7 @@ type SelectProps = {
   /** field name */
   name: string,
   /** React-Select option, usually label, value */
-  options: Array<OptionType | GroupType>,
+  options: Array<SelectOption>,
   /** currently selected value */
   value: ?string,
   /** change handler called with (name, value) */
@@ -38,6 +39,8 @@ type SelectProps = {
   caption?: string,
   /** if included, use error style and display error instead of caption */
   error?: ?string,
+  /** menuPosition prop to send to react-select */
+  menuPosition?: 'absolute' | 'fixed',
 }
 
 const SELECT_STYLES = {
@@ -72,6 +75,7 @@ export default class SelectField extends React.Component<SelectProps> {
       placeholder,
       className,
       error,
+      menuPosition,
     } = this.props
     const allOptions = flatMap(options, getOpts)
     const value = find(allOptions, {value: this.props.value}) || null
@@ -99,6 +103,7 @@ export default class SelectField extends React.Component<SelectProps> {
             IndicatorSeparator: null,
           }}
           className={className}
+          menuPosition={menuPosition}
         />
         {caption && <p className={captionCx}>{caption}</p>}
       </div>

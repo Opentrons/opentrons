@@ -44,7 +44,7 @@ function makeNetworkOption (nw: WifiNetwork): OptionType {
   )
 
   const securedIcon =
-    nw.securityType !== 'none' ? (
+    nw.securityType && nw.securityType !== 'none' ? (
       <Icon name="lock" className={styles.wifi_option_icon_right} />
     ) : (
       <span className={styles.wifi_option_icon_right} />

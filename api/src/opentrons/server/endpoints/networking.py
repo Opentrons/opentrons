@@ -44,7 +44,7 @@ async def list_networks(request: web.Request) -> web.Response:
            signal: int // e.g. 100; arbitrary signal strength, more is better
            active: boolean // e.g. true; whether there is a connection active
            security: str // e.g. "WPA2 802.1X" raw nmcli security type output
-           securityType: str // e.g. "wpa-eap"; see blow
+           securityType: str // e.g. "wpa-eap"; see below
         }
       ]
     }
