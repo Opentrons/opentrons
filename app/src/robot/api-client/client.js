@@ -42,8 +42,8 @@ export default function client (dispatch) {
         return pickupAndHome(state, action)
       case 'robot:DROP_TIP_AND_HOME':
         return dropTipAndHome(state, action)
-      case 'robot:CONFIRM_PROBED_AND_HOME':
-        return confirmProbedAndHome(state, action)
+      case 'robot:CONFIRM_PROBED':
+        return homePipette(state, action)
       case 'robot:CONFIRM_TIPRACK':
         return confirmTiprack(state, action)
       case actionTypes.MOVE_TO_FRONT:
@@ -160,14 +160,11 @@ export default function client (dispatch) {
       .then(() => dispatch(actions.moveToFrontResponse()))
       .catch(error => dispatch(actions.moveToFrontResponse(error)))
   }
-  // Confirm tip probed, tip removed, then home
-  function confirmProbedAndHome (state, action) {
-    const {
-      payload: {mount},
-    } = action
+  // Home pipette up
+  function homePipette (state, action) {
+    const {payload: mount} = action
     const pipette = {_id: selectors.getPipettesByMount(state)[mount]._id}
 
-    dispatch(actions.confirmProbed(mount))
     remote.calibration_manager.home(pipette)
   }
 

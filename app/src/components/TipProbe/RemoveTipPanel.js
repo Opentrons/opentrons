@@ -9,11 +9,7 @@ import CalibrationInfoContent from '../CalibrationInfoContent'
 import removeSingle from '../../img/remove_tip_single.png'
 import removeMulti from '../../img/remove_tip_multi.png'
 
-import {
-  actions as robotActions,
-  type Channels,
-  type Mount,
-} from '../../robot'
+import {actions as robotActions, type Channels, type Mount} from '../../robot'
 
 type OwnProps = {
   mount: Mount,
@@ -29,28 +25,27 @@ type RemoveTipProps = {
   onConfirmClick: () => void,
 }
 
-export default connect(null, mapDispatchToProps)(RemoveTipPanel)
+export default connect(
+  null,
+  mapDispatchToProps
+)(RemoveTipPanel)
 
 function RemoveTipPanel (props: RemoveTipProps) {
   const {channels, onConfirmClick} = props
 
-  const imgSrc = channels === 1
-    ? removeSingle
-    : removeMulti
+  const imgSrc = channels === 1 ? removeSingle : removeMulti
 
   return (
     <CalibrationInfoContent
-      leftChildren={(
+      leftChildren={
         <div>
           <p>Remove tip from pipette.</p>
           <PrimaryButton onClick={onConfirmClick}>
             Confirm Tip Removed
           </PrimaryButton>
         </div>
-      )}
-      rightChildren={(
-        <img src={imgSrc} alt='remove tip' />
-      )}
+      }
+      rightChildren={<img src={imgSrc} alt="remove tip" />}
     />
   )
 }
@@ -62,6 +57,8 @@ function mapDispatchToProps (
   const {mount} = ownProps
 
   return {
-    onConfirmClick: () => { dispatch(robotActions.confirmProbedAndHome(mount)) },
+    onConfirmClick: () => {
+      dispatch(robotActions.confirmProbed(mount))
+    },
   }
 }

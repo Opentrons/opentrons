@@ -57,11 +57,6 @@ export type UnexpectedDisconnectAction = {|
 export type ConfirmProbedAction = {|
   type: 'robot:CONFIRM_PROBED',
   payload: Mount,
-|}
-
-export type ConfirmProbedAndHomeAction = {|
-  type: 'robot:CONFIRM_PROBED_AND_HOME',
-  payload: {mount: Mount},
   meta: {|
     robotCommand: true,
   |},
@@ -199,7 +194,6 @@ export type Action =
   | ClearConnectResponseAction
   | UnexpectedDisconnectAction
   | ConfirmProbedAction
-  | ConfirmProbedAndHomeAction
   | PipetteCalibrationAction
   | LabwareCalibrationAction
   | CalibrationResponseAction
@@ -382,15 +376,11 @@ export const actions = {
     return action
   },
 
-  confirmProbed (mount: Mount): ConfirmProbedAction {
-    return {type: 'robot:CONFIRM_PROBED', payload: mount}
-  },
-
   // confirm tip removed + tip probed then home pipette on `mount`
-  confirmProbedAndHome (mount: Mount): ConfirmProbedAndHomeAction {
+  confirmProbed (mount: Mount): ConfirmProbedAction {
     return {
-      type: 'robot:CONFIRM_PROBED_AND_HOME',
-      payload: {mount},
+      type: 'robot:CONFIRM_PROBED',
+      payload: mount,
       meta: {robotCommand: true},
     }
   },
