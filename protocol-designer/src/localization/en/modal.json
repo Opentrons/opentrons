@@ -16,18 +16,24 @@
   },
   "edit_pipettes": {
     "title": "Change Pipette Selection",
-    "body": "Update you pipette and tiprack selection. Please note, this may affect your existing protocol steps."
+    "body": "Update your pipette and tiprack selection. Please note, this may affect your existing protocol steps."
   },
   "global_step_changes": {
-    "heading": "Changes to steps in protocol",
-    "all_steps_header": "All steps using a changed pipette will clear the following advanced settings:",
-    "all_steps_cleared_settings": "Flow rate, Mix, Air Gap, and Disposal Volume",
-    "other_potential_changes_header": "Other potential changes to affected steps:",
-    "multi_to_single": "Multi channel -> Single Channel",
-    "single_to_multi": "Single channel -> Multi Channel",
-    "next_pipette_smaller": "Switching to a smaller pipette",
-    "next_tip_size_smaller": "Switching to a smaller tip size",
-    "selected_wells_cleared": "Selected wells will be cleared",
-    "tip_use_may_increase": "Number of tips used may increase"
+    "heading": "Are you sure you want to make this change?",
+    "switch_pipettes": {
+      "body": "Switching pipette or tip type may affect how steps appear in your protocol:",
+      "cause": {
+        "any": "Switching pipettes or tips of any type",
+        "multi_to_single": "Switching a Multi-channel pipette to a Single-channel pipette",
+        "single_to_multi": "Switching a Single-channel pipette to a Multi-channel pipette",
+        "next_pipette_smaller": "Switching to a pipette or tip of smaller volume"
+      },
+      "effect": {
+        "any": "Clears flow rate, mix, air gap, & disposal volume",
+        "multi_to_single": "Clears selected wells",
+        "single_to_multi": "Number of tips used may increase",
+        "next_pipette_smaller": "Number of tips used may increase"
+      }
+    }
   }
 }

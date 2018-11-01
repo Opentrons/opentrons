@@ -66,11 +66,28 @@
   margin-bottom: 1.5rem;
 }
 
-.modal_section_header {
-  font-weight: var(--fw-semibold);
-  padding-bottom: 0;
+.continue_button {
+  margin-left: 1rem;
 }
 
-.modal_section_header:not(:first-child) {
-  margin-top: 1rem;
+.cause {
+  font-weight: var(--fw-semibold);
+  padding-bottom: 0;
+  margin-bottom: 0.5rem;
+}
+
+.cause_effect_item {
+  margin: 1rem 0;
+}
+
+.cause_effect_list {
+  margin-left: 2rem;
+}
+
+.edit_pipettes_description {
+  margin: 0.5rem 0 1rem 0;
+}
+
+.modal_contents {
+  padding: 0.8rem;
 }

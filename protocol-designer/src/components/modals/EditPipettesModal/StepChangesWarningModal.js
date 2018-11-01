@@ -18,37 +18,40 @@ const StepChangesWarningModal = (props: Props) => {
       alertOverlay
       className={modalStyles.modal}
       heading={i18n.t('modal.global_step_changes.heading')}>
-      <p className={styles.modal_section_header}>{i18n.t('modal.global_step_changes.all_steps_header')}</p>
-      <p>{i18n.t('modal.global_step_changes.all_steps_cleared_settings')}</p>
-      <p className={styles.modal_section_header}>{i18n.t('modal.global_step_changes.other_potential_changes_header')}</p>
-      <div className={styles.effect_row}>
-        <p>{i18n.t('modal.global_step_changes.multi_to_single')}</p>
-        <p>{i18n.t('modal.global_step_changes.selected_wells_cleared')}</p>
-      </div>
-      <div className={styles.effect_row}>
-        <p>{i18n.t('modal.global_step_changes.single_to_multi')}</p>
-        <p>{i18n.t('modal.global_step_changes.tip_use_may_increase')}</p>
-      </div>
-      <div className={styles.effect_row}>
-        <p>{i18n.t('modal.global_step_changes.next_pipette_smaller')}</p>
-        <p>{i18n.t('modal.global_step_changes.tip_use_may_increase')}</p>
-      </div>
-      <div className={styles.effect_row}>
-        <p>{i18n.t('modal.global_step_changes.next_tip_size_smaller')}</p>
-        <p>{i18n.t('modal.global_step_changes.tip_use_may_increase')}</p>
-      </div>
+      <p>{i18n.t('modal.global_step_changes.switch_pipettes.body')}</p>
+      <ul className={styles.cause_effect_list}>
+        <li className={styles.cause_effect_item}>
+          <p className={styles.cause}>
+            {i18n.t('modal.global_step_changes.switch_pipettes.cause.any')}
+          </p>
+          <p>{i18n.t('modal.global_step_changes.switch_pipettes.effect.any')}</p>
+        </li>
+        <li className={styles.cause_effect_item}>
+          <p className={styles.cause}>
+            {i18n.t('modal.global_step_changes.switch_pipettes.cause.multi_to_single')}
+          </p>
+          <p>{i18n.t('modal.global_step_changes.switch_pipettes.effect.multi_to_single')}</p>
+        </li>
+        <li className={styles.cause_effect_item}>
+          <p className={styles.cause}>
+            {i18n.t('modal.global_step_changes.switch_pipettes.cause.single_to_multi')}
+          </p>
+          <p>{i18n.t('modal.global_step_changes.switch_pipettes.effect.single_to_multi')}</p>
+        </li>
+        <li className={styles.cause_effect_item}>
+          <p className={styles.cause}>
+            {i18n.t('modal.global_step_changes.switch_pipettes.cause.next_pipette_smaller')}
+          </p>
+          <p>{i18n.t('modal.global_step_changes.switch_pipettes.effect.next_pipette_smaller')}</p>
+        </li>
+      </ul>
 
       <div className={styles.button_row}>
-
-        <OutlineButton
-          className={styles.ok_button}
-          onClick={onCancel}>
+        <OutlineButton onClick={onCancel}>
           {i18n.t('button.cancel')}
         </OutlineButton>
-        <OutlineButton
-          className={styles.ok_button}
-          onClick={onConfirm}>
-          {i18n.t('button.ok')}
+        <OutlineButton className={styles.continue_button} onClick={onConfirm}>
+          {i18n.t('button.continue')}
         </OutlineButton>
       </div>
     </AlertModal>

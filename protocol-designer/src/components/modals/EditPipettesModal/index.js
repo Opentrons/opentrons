@@ -65,7 +65,7 @@ const DEFAULT_SELECTION = {pipetteModel: '', tiprackModel: null}
 
 const pipetteDataToFormState = (pipetteData) => ({
   pipetteModel: (pipetteData && pipetteData.model) ? pipetteData.model : '',
-  tiprackModel: (pipetteData && pipetteData.tiprackModel) ? pipetteData.tiprackModel : null,
+  tiprackModel: (pipetteData && pipetteData.tiprack && pipetteData.tiprack.model) ? pipetteData.tiprack.model : null,
 })
 
 class EditPipettesModal extends React.Component<Props, State> {
@@ -130,15 +130,14 @@ class EditPipettesModal extends React.Component<Props, State> {
       <React.Fragment>
         <AlertModal
           className={cx(modalStyles.modal, styles.new_file_modal)}
+          contentsClassName={styles.modal_contents}
           buttons={[
             {onClick: this.handleCancel, children: 'Cancel', tabIndex: 7},
             {onClick: this.handleSubmit, disabled: !canSubmit, children: 'Save', tabIndex: 6},
           ]}>
-          <form
-            className={modalStyles.modal_contents}
-            onSubmit={() => { canSubmit && this.handleSubmit() }}>
+          <form onSubmit={() => { canSubmit && this.handleSubmit() }}>
             <h2>{i18n.t('modal.edit_pipettes.title')}</h2>
-            <p>{i18n.t('modal.edit_pipettes.body')}</p>
+            <p className={styles.edit_pipettes_description}>{i18n.t('modal.edit_pipettes.body')}</p>
 
             <div className={styles.mount_fields_row}>
               <div className={styles.mount_column}>
