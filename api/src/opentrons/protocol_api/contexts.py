@@ -209,8 +209,7 @@ class ProtocolContext:
         It encapsulates location caching and ensures that all moves are safe.
         It does this by taking a :py:class:`.types.Location` that can have
         a position attached to it, and its behavior depends on the state of
-        that location cache and the passed location. For more information
-        see :ref:`protocol-api-move-safety`.
+        that location cache and the passed location.
         """
         switching_instr = self._last_moved_instrument\
             and self._last_moved_instrument != mount
@@ -423,8 +422,7 @@ class InstrumentContext:
     def move_to(self, location: types.Location):
         """ Move this pipette to a specific location on the deck.
 
-        :param location: Where to dispense into. If unspecified, the
-                         current position.
+        :param location: Where to move to.
         :raises ValueError: if an argument is incorrect.
         """
         self._log.debug("move to {}".format(location))
