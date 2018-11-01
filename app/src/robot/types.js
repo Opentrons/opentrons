@@ -86,6 +86,7 @@ export type StatePipette = {
   // number of liquid channels
   channels: Channels,
   // user-given name of the intrument
+  // TODO: Ian 2018-11-01 is this really "model" aka versionless model?
   name: string,
   // volume of the instrument
   // TODO(mc, 2018-01-17): this is used to drive tip propbe setup

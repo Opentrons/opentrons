@@ -1,7 +1,6 @@
 {
   "p10_single_v1": {
-    "displayName": "P10 Single-Channel",
-    "nominalMaxVolumeUl": 10,
+    "model": "p10_single",
     "plungerPositions": {
       "top": 19.5,
       "bottom": 2,
@@ -10,14 +9,9 @@
     },
     "pickUpCurrent": 0.1,
     "pickUpDistance": 10,
-    "aspirateFlowRate": 5,
-    "dispenseFlowRate": 10,
-    "channels": 1,
     "modelOffset": [0.0, 0.0, -13],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
-    "minVolume": 1,
-    "maxVolume": 10,
     "ulPerMm": {
       "aspirate": [
         [1.8263, -0.0958, 1.088],
@@ -34,8 +28,7 @@
     "tipLength": 33
   },
   "p10_single_v1.3": {
-    "displayName": "P10 Single-Channel",
-    "nominalMaxVolumeUl": 10,
+    "model": "p10_single",
     "plungerPositions": {
       "top": 19.5,
       "bottom": 0.5,
@@ -44,14 +37,9 @@
     },
     "pickUpCurrent": 0.1,
     "pickUpDistance": 10,
-    "aspirateFlowRate": 5,
-    "dispenseFlowRate": 10,
-    "channels": 1,
     "modelOffset": [0.0, 0.0, -13],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
-    "minVolume": 1,
-    "maxVolume": 10,
     "ulPerMm": {
       "aspirate": [
         [1.8263, -0.0958, 1.088],
@@ -68,8 +56,7 @@
     "tipLength": 33
   },
   "p10_multi_v1": {
-    "displayName": "P10 8-Channel",
-    "nominalMaxVolumeUl": 10,
+    "model": "p10_multi",
     "plungerPositions": {
       "top": 19.5,
       "bottom": 2,
@@ -78,14 +65,9 @@
     },
     "pickUpCurrent": 0.4,
     "pickUpDistance": 10,
-    "aspirateFlowRate": 5,
-    "dispenseFlowRate": 10,
-    "channels": 8,
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
-    "minVolume": 1,
-    "maxVolume": 10,
     "ulPerMm": {
       "aspirate": [
         [1.893415617, -1.1069, 3.042593193],
@@ -101,8 +83,7 @@
     "tipLength": 33
   },
   "p10_multi_v1.3": {
-    "displayName": "P10 8-Channel",
-    "nominalMaxVolumeUl": 10,
+    "model": "p10_multi",
     "plungerPositions": {
       "top": 19.5,
       "bottom": 0.5,
@@ -111,14 +92,9 @@
     },
     "pickUpCurrent": 0.4,
     "pickUpDistance": 10,
-    "aspirateFlowRate": 5,
-    "dispenseFlowRate": 10,
-    "channels": 8,
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
-    "minVolume": 1,
-    "maxVolume": 10,
     "ulPerMm": {
       "aspirate": [
         [1.893415617, -1.1069, 3.042593193],
@@ -134,8 +110,7 @@
     "tipLength": 33
   },
   "p50_single_v1": {
-    "displayName": "P50 Single-Channel",
-    "nominalMaxVolumeUl": 50,
+    "model": "p50_single",
     "plungerPositions": {
       "top": 19.5,
       "bottom": 2.01,
@@ -144,14 +119,9 @@
     },
     "pickUpCurrent": 0.1,
     "pickUpDistance": 10,
-    "aspirateFlowRate": 25,
-    "dispenseFlowRate": 50,
-    "channels": 1,
     "modelOffset": [0.0, 0.0, 0.0],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
-    "minVolume": 5,
-    "maxVolume": 50,
     "ulPerMm": {
       "aspirate": [
         [11.79687499, -0.0098, 3.064988953],
@@ -165,8 +135,7 @@
     "tipLength": 51.7
   },
   "p50_single_v1.3": {
-    "displayName": "P50 Single-Channel",
-    "nominalMaxVolumeUl": 50,
+    "model": "p50_single",
     "plungerPositions": {
       "top": 19.5,
       "bottom": 2,
@@ -175,14 +144,9 @@
     },
     "pickUpCurrent": 0.1,
     "pickUpDistance": 10,
-    "aspirateFlowRate": 25,
-    "dispenseFlowRate": 50,
-    "channels": 1,
     "modelOffset": [0.0, 0.0, 0.0],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
-    "minVolume": 5,
-    "maxVolume": 50,
     "ulPerMm": {
       "aspirate": [
         [11.79687499, -0.0098, 3.064988953],
@@ -196,8 +160,7 @@
     "tipLength": 51.7
   },
   "p50_multi_v1": {
-    "displayName": "P50 8-Channel",
-    "nominalMaxVolumeUl": 50,
+    "model": "p50_multi",
     "plungerPositions": {
       "top": 19.5,
       "bottom": 2.5,
@@ -206,14 +169,9 @@
     },
     "pickUpCurrent": 0.6,
     "pickUpDistance": 10,
-    "aspirateFlowRate": 25,
-    "dispenseFlowRate": 50,
-    "channels": 8,
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
-    "minVolume": 5,
-    "maxVolume": 50,
     "ulPerMm": {
       "aspirate": [
         [12.29687531, -0.0049, 3.134703694],
@@ -227,8 +185,7 @@
     "tipLength": 51.7
   },
   "p50_multi_v1.3": {
-    "displayName": "P50 8-Channel",
-    "nominalMaxVolumeUl": 50,
+    "model": "p50_multi",
     "plungerPositions": {
       "top": 19.5,
       "bottom": 2,
@@ -237,14 +194,9 @@
     },
     "pickUpCurrent": 0.6,
     "pickUpDistance": 10,
-    "aspirateFlowRate": 25,
-    "dispenseFlowRate": 50,
-    "channels": 8,
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
-    "minVolume": 5,
-    "maxVolume": 50,
     "ulPerMm": {
       "aspirate": [
         [12.29687531, -0.0049, 3.134703694],
@@ -258,8 +210,7 @@
     "tipLength": 51.7
   },
   "p300_single_v1": {
-    "displayName": "P300 Single-Channel",
-    "nominalMaxVolumeUl": 300,
+    "model": "p300_single",
     "plungerPositions": {
       "top": 19.5,
       "bottom": 1.5,
@@ -268,14 +219,9 @@
     },
     "pickUpCurrent": 0.1,
     "pickUpDistance": 10,
-    "aspirateFlowRate": 150,
-    "dispenseFlowRate": 300,
-    "channels": 1,
     "modelOffset": [0.0, 0.0, 0.0],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
-    "minVolume": 30,
-    "maxVolume": 300,
     "ulPerMm": {
       "aspirate": [
         [36.19844973, 0.043, 16.548],
@@ -292,8 +238,7 @@
     "tipLength": 51.7
   },
   "p300_single_v1.3": {
-    "displayName": "P300 Single-Channel",
-    "nominalMaxVolumeUl": 300,
+    "model": "p300_single",
     "plungerPositions": {
       "top": 19.5,
       "bottom": 1.5,
@@ -302,14 +247,9 @@
     },
     "pickUpCurrent": 0.1,
     "pickUpDistance": 10,
-    "aspirateFlowRate": 150,
-    "dispenseFlowRate": 300,
-    "channels": 1,
     "modelOffset": [0.0, 0.0, 0.0],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
-    "minVolume": 30,
-    "maxVolume": 300,
     "ulPerMm": {
       "aspirate": [
         [36.19844973, 0.043, 16.548],
@@ -326,8 +266,7 @@
     "tipLength": 51.7
   },
   "p300_multi_v1": {
-    "displayName": "P300 8-Channel",
-    "nominalMaxVolumeUl": 300,
+    "model": "p300_multi",
     "plungerPositions": {
       "top": 19.5,
       "bottom": 3.5,
@@ -336,14 +275,9 @@
     },
     "pickUpCurrent": 0.6,
     "pickUpDistance": 10,
-    "aspirateFlowRate": 150,
-    "dispenseFlowRate": 300,
-    "channels": 8,
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
-    "minVolume": 30,
-    "maxVolume": 300,
     "ulPerMm": {
       "aspirate": [
         [57.25698968, 0.017, 18.132],
@@ -357,8 +291,7 @@
     "tipLength": 51.7
   },
   "p300_multi_v1.3": {
-    "displayName": "P300 8-Channel",
-    "nominalMaxVolumeUl": 300,
+    "model": "p300_multi",
     "plungerPositions": {
       "top": 19.5,
       "bottom": 3.5,
@@ -367,14 +300,9 @@
     },
     "pickUpCurrent": 0.6,
     "pickUpDistance": 10,
-    "aspirateFlowRate": 150,
-    "dispenseFlowRate": 300,
-    "channels": 8,
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
-    "minVolume": 30,
-    "maxVolume": 300,
     "ulPerMm": {
       "aspirate": [
         [57.25698968, 0.017, 18.132],
@@ -388,8 +316,7 @@
     "tipLength": 51.7
   },
   "p1000_single_v1": {
-    "displayName": "P1000 Single-channel",
-    "nominalMaxVolumeUl": 1000,
+    "model": "p1000_single",
     "plungerPositions": {
       "top": 19.5,
       "bottom": 3,
@@ -398,14 +325,9 @@
     },
     "pickUpCurrent": 0.1,
     "pickUpDistance": 15,
-    "aspirateFlowRate": 500,
-    "dispenseFlowRate": 1000,
-    "channels": 1,
     "modelOffset": [0.0, 0.0, 20.0],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
-    "minVolume": 100,
-    "maxVolume": 1000,
     "ulPerMm": {
       "aspirate": [
         [88.2951, 0.0647, 53.153],
@@ -422,8 +344,7 @@
     "tipLength": 76.7
   },
   "p1000_single_v1.3": {
-    "displayName": "P1000 Single-channel",
-    "nominalMaxVolumeUl": 1000,
+    "model": "p1000_single",
     "plungerPositions": {
       "top": 19.5,
       "bottom": 2.5,
@@ -432,14 +353,9 @@
     },
     "pickUpCurrent": 0.1,
     "pickUpDistance": 15,
-    "aspirateFlowRate": 500,
-    "dispenseFlowRate": 1000,
-    "channels": 1,
     "modelOffset": [0.0, 0.0, 20.0],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.7,
-    "minVolume": 100,
-    "maxVolume": 1000,
     "ulPerMm": {
       "aspirate": [
         [88.2951, 0.0647, 53.153],

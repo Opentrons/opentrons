@@ -3,8 +3,9 @@
 
   "definitions": {
     "pipette-model": {
-      "description": "Special keyword specifying the model of the pipette. TODO finalize these model names they are still TBD",
+      "description": "Special keyword specifying the (unversioned) model of the pipette. (Note: the major version number always matches the model name, and the minor version number is not specified in a protocol.)",
       "type": "string",
+      "$comment": "TODO: Ian 2018-11-01 DEPRECATE the _v1* suffixes (breaking change)",
       "enum": [
         "p10_single_v1",
         "p10_multi_v1",
@@ -22,7 +23,16 @@
         "p300_single_v1.3",
         "p300_multi_v1.3",
         "p1000_single_v1.3",
-        "p1000_multi_v1.3"
+        "p1000_multi_v1.3",
+
+        "p10_single",
+        "p10_multi",
+        "p50_single",
+        "p50_multi",
+        "p300_single",
+        "p300_multi",
+        "p1000_single",
+        "p1000_multi"
       ]
     },
 

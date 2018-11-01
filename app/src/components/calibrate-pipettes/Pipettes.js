@@ -7,7 +7,7 @@ import type {PipettesResponse} from '../../http-api-client'
 import type {Pipette} from '../../robot'
 import {constants as robotConstants} from '../../robot'
 
-import {getPipette} from '@opentrons/shared-data'
+import {getVersionedPipetteSpecs} from '@opentrons/shared-data'
 import {InstrumentGroup, AlertItem} from '@opentrons/components'
 import styles from './styles.css'
 
@@ -30,7 +30,7 @@ export default function Pipettes (props: Props) {
     const pipette = pipettes.find((p) => p.mount === mount)
     // TODO(mc, 2018-04-25)
     const pipetteConfig = pipette
-      ? getPipette(pipette.name)
+      ? getVersionedPipetteSpecs(pipette.name)
       : null
 
     const isDisabled = !pipette || mount !== currentMount
@@ -38,7 +38,7 @@ export default function Pipettes (props: Props) {
       ? {description: 'N/A', tipType: 'N/A'}
       : {
         description: pipetteConfig.displayName,
-        tipType: `${pipetteConfig.nominalMaxVolumeUl} ul`,
+        tipType: `${pipetteConfig.maxVolume} ul`,
         channels: pipetteConfig.channels,
       }
 
@@ -51,7 +51,7 @@ export default function Pipettes (props: Props) {
       if (actualModel == null) {
         showAlert = true
         alertType = 'attach'
-      } else if (actualModel !== pipetteConfig.model) {
+      } else if (pipette && (pipette.name !== actualModel)) {
         showAlert = true
         alertType = 'change'
       }

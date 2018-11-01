@@ -16,11 +16,17 @@ def load_pipettes(protocol_data):
     for pipette_id, props in pipettes.items():
         model = props.get('model')
         mount = props.get('mount')
-        config = pipette_config.load(model)
-        pipettes_by_id[pipette_id] = instruments._create_pipette_from_config(
+
+        pipette_model_version = instruments._retrieve_version_number(
+            mount, model)
+        config = pipette_config.load(pipette_model_version)
+
+        pipette = instruments._create_pipette_from_config(
             config=config,
             mount=mount,
-            name=model)
+            name=pipette_model_version)
+
+        pipettes_by_id[pipette_id] = pipette
 
     return pipettes_by_id
 

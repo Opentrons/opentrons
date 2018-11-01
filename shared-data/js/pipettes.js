@@ -1,45 +1,62 @@
 // @flow
 import mapValues from 'lodash/mapValues'
-import pipetteConfigByModel from '../robot-data/pipette-config.json'
+import pipetteModelSpecs from '../robot-data/pipetteModelSpecs.json'
+import pipetteVersionSpecs from '../robot-data/pipetteVersionSpecs.json'
 
 export type PipetteChannels = 1 | 8
 
-export type PipetteConfig = {
+export type PipetteModelSpecs = {
   model: string,
   displayName: string,
-  nominalMaxVolumeUl: number,
-  plungerPositions: {
-    top: number,
-    bottom: number,
-    blowOut: number,
-    dropTip: number,
-  },
-  pickUpCurrent: number,
-  aspirateFlowRate: number,
-  dispenseFlowRate: number,
-  ulPerMm: number,
+  minVolume: number,
+  maxVolume: number,
+  defaultAspirateFlowRate: number,
+  defaultDispenseFlowRate: number,
   channels: PipetteChannels,
-  modelOffset: [number, number, number],
-  tipLength: number,
 }
 
+export type VersionedPipetteSpecs = {
+  tipLength: number,
+} & PipetteModelSpecs
+
+export type PipetteModel =
+  | 'p10_single'
+  | 'p50_single'
+  | 'p300_single'
+  | 'p1000_single'
+  | 'p10_multi'
+  | 'p50_multi'
+  | 'p300_multi'
+
 type SortableProps =
-  | 'nominalMaxVolumeUl'
+  | 'maxVolume'
   | 'channels'
 
 // models sorted by channels and then volume by default
 const ALL_MODELS: Array<string> = Object
-  .keys(pipetteConfigByModel)
-  .sort(comparePipettes(['channels', 'nominalMaxVolumeUl']))
+  .keys(pipetteModelSpecs)
+  .sort(comparePipettes(['channels', 'maxVolume']))
 
-const ALL_PIPETTES: Array<PipetteConfig> = ALL_MODELS
-  .map(getPipette)
+const ALL_PIPETTES: Array<PipetteModelSpecs> = ALL_MODELS
+  .map(getPipetteModelSpecs)
   .filter(Boolean)
 
-export function getPipette (model: string): ?PipetteConfig {
-  const config = pipetteConfigByModel[model]
+// use a versionless model like 'p10_single' to get
+// specs true for all versions of that model
+export function getPipetteModelSpecs (model: string): ?PipetteModelSpecs {
+  const config = pipetteModelSpecs[model]
 
   return config && {...config, model: model}
+}
+
+// specify a versioned model, eg 'p10_single_v1.3' to get
+// both the model specs + version-specific specs
+// NOTE: this should NEVER be used in PD, which is pipette-version agnostic
+export function getVersionedPipetteSpecs (versionedModel: string): ?VersionedPipetteSpecs {
+  const versionSpecificFields = pipetteVersionSpecs[versionedModel]
+  const modelFields = versionSpecificFields &&
+    getPipetteModelSpecs(versionSpecificFields.model)
+  return modelFields && {...modelFields, ...versionSpecificFields}
 }
 
 export function getPipetteModels (
@@ -58,7 +75,7 @@ export function getPipetteNames (
   return getPipetteModels(...sortBy)
     .reduce((result, model) => {
       const {seen, names} = result
-      const {displayName} = getPipette(model) || {displayName: ''}
+      const {displayName} = getPipetteModelSpecs(model) || {displayName: ''}
 
       if (displayName && !seen[displayName]) {
         seen[displayName] = true
@@ -82,8 +99,8 @@ export function getPipetteChannelsByName (name: ?string): PipetteChannels {
 function comparePipettes (sortBy: Array<SortableProps>) {
   return (modelA, modelB) => {
     // any cast is because we know these pipettes exist
-    const a: PipetteConfig = (getPipette(modelA): any)
-    const b: PipetteConfig = (getPipette(modelB): any)
+    const a: PipetteModelSpecs = (getPipetteModelSpecs(modelA): any)
+    const b: PipetteModelSpecs = (getPipetteModelSpecs(modelB): any)
 
     let i
     for (i = 0; i < sortBy.length; i++) {
@@ -96,6 +113,6 @@ function comparePipettes (sortBy: Array<SortableProps>) {
   }
 }
 
-export function getPropertyAllPipettes (propertyName: $Keys<PipetteConfig>) {
-  return mapValues(pipetteConfigByModel, config => config[propertyName])
+export function getPropertyAllPipettes (propertyName: $Keys<PipetteModelSpecs>) {
+  return mapValues(pipetteModelSpecs, config => config[propertyName])
 }

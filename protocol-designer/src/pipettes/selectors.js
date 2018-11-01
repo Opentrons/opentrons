@@ -2,7 +2,7 @@
 import {createSelector} from 'reselect'
 import reduce from 'lodash/reduce'
 import get from 'lodash/get'
-import {getPipetteModels, getPipette, getLabware} from '@opentrons/shared-data'
+import {getPipetteModels, getPipetteModelSpecs, getLabware} from '@opentrons/shared-data'
 
 import type {BaseState, Selector} from '../types'
 import type {DropdownOption} from '@opentrons/components'
@@ -24,17 +24,17 @@ export const pipetteIdsByMount: Selector<*> = createSelector(
 
 function _getPipetteName (pipetteData): string {
   const result = getPipetteModels().find(pipetteModel => {
-    const p = getPipette(pipetteModel)
+    const p = getPipetteModelSpecs(pipetteModel)
     return p && (
       p.channels === pipetteData.channels &&
-      p.nominalMaxVolumeUl === pipetteData.maxVolume
+      p.maxVolume === pipetteData.maxVolume
     )
   })
   if (!result) {
     console.error('_getPipetteName: No name found for given pipette')
     return '???'
   }
-  const pipette = getPipette(result)
+  const pipette = getPipetteModelSpecs(result)
   return pipette ? pipette.displayName : '???'
 }
 

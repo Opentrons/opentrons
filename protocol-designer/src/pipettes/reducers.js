@@ -4,7 +4,7 @@ import {handleActions} from 'redux-actions'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import {uuid} from '../utils'
-import {getPipette, getLabware} from '@opentrons/shared-data'
+import {getPipetteModelSpecs, getLabware} from '@opentrons/shared-data'
 
 import type {Mount} from '@opentrons/components'
 import type {LoadFileAction, NewProtocolFields} from '../load-file'
@@ -13,12 +13,18 @@ import type {FilePipette} from '../file-types'
 
 function createPipette (
   mount: Mount,
-  model: string,
+  _model: string,
   tiprackModel: ?string,
   overrideId?: string
 ): ?PipetteData {
+  // for backwards compatibility, strip version suffix (_v1, _v1.3 etc)
+  // from model string, if it exists
+  const model = _model.replace(/_v\d(\.|\d+)*$/, '')
+  // TODO: Ian 2018-11-01 once the schema is updated to always exclude versions
+  // (breaking change to schema), this version removal would be handled in schema migration.
+
   const id = overrideId || `pipette:${model}:${uuid()}`
-  const pipetteData = getPipette(model)
+  const pipetteData = getPipetteModelSpecs(model)
 
   if (!pipetteData) {
     console.error(`Pipette ${id} - model '${model}' does not exist in shared-data`)
@@ -36,7 +42,7 @@ function createPipette (
     id,
     model,
     mount,
-    maxVolume: pipetteData.nominalMaxVolumeUl,
+    maxVolume: pipetteData.maxVolume,
     channels: pipetteData.channels,
     tiprackModel,
   }
