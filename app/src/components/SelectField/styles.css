@@ -16,14 +16,6 @@
   }
 }
 
-.select_wrapper {
-  /* TODO(mc, 2018-10-29): this value comes from existing fields in components
-   * library that always render a caption div with a height, even when empty.
-   * Figure out what we should be doing here moving forward
-   */
-  padding-bottom: 0.625rem;
-}
-
 .select_control {
   @apply --font-body-1-dark;
 
@@ -50,7 +42,7 @@
 
 .select_group {
   &:not(:first-child) {
-    border-top: 1px solid var(--c-med-gray);
+    border-top: 1px solid color(var(--c-med-gray) alpha(0.4));
   }
 }
 

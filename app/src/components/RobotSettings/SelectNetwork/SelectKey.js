@@ -3,19 +3,20 @@ import * as React from 'react'
 import find from 'lodash/find'
 import map from 'lodash/map'
 
-import SelectField from '../../SelectField'
+import {SelectOptionField} from './fields'
 import styles from './styles.css'
 
 import type {WifiKeysList} from '../../../http-api-client'
 
 type Props = {
-  id: string,
   name: string,
-  value: string,
+  label: string,
+  value: ?string,
   error: ?string,
+  required: boolean,
   keys: ?WifiKeysList,
   addKey: File => mixed,
-  onValueChange: (name: string, value: *) => mixed,
+  onValueChange: (name: string, value: ?string) => mixed,
   onLoseFocus: (name: string) => mixed,
 }
 
@@ -49,7 +50,7 @@ export default class SelectKey extends React.Component<Props, State> {
     }
   }
 
-  handleValueChange = (name: string, value: string) => {
+  handleValueChange = (name: string, value: ?string) => {
     if (value !== UPLOAD_KEY_VALUE) {
       this.props.onValueChange(name, value)
     }
@@ -72,7 +73,7 @@ export default class SelectKey extends React.Component<Props, State> {
   }
 
   render () {
-    const {id, name, value, error, keys, onLoseFocus} = this.props
+    const {name, label, value, error, required, keys, onLoseFocus} = this.props
     const keyOptions = map(keys, k => ({value: k.id, label: k.name}))
     const addNewGroup = {
       label: null,
@@ -89,15 +90,11 @@ export default class SelectKey extends React.Component<Props, State> {
     }
 
     return (
-      <div className={styles.wifi_key_select}>
-        <SelectField
-          id={id}
-          name={name}
-          value={value}
-          error={error}
-          onValueChange={this.handleValueChange}
-          onLoseFocus={onLoseFocus}
+      <React.Fragment>
+        <SelectOptionField
+          {...{name, label, value, error, required, onLoseFocus}}
           options={keyOptions.concat(addNewGroup)}
+          onValueChange={this.handleValueChange}
         />
         <input
           type="file"
@@ -106,7 +103,7 @@ export default class SelectKey extends React.Component<Props, State> {
           className={styles.wifi_add_key_input}
           aria-label={UPLOAD_KEY_LABEL}
         />
-      </div>
+      </React.Fragment>
     )
   }
 }

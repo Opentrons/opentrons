@@ -9,27 +9,31 @@ import {
   NO_SECURITY,
   WPA_PSK_SECURITY,
   WPA_EAP_SECURITY,
+  SSID_FIELD,
+  PSK_FIELD,
   SECURITY_TYPE_FIELD,
   EAP_CONFIG_FIELD,
   EAP_TYPE_FIELD,
 } from '../../../http-api-client'
 
 import {BottomButtonBar} from '../../modals'
-import ConnectFormField, {CONNECT_FIELD_ID_PREFIX} from './ConnectFormField'
-import SelectSecurity from './SelectSecurity'
+import {StringField, PasswordField, SelectOptionField} from './fields'
+import SelectKey from './SelectKey'
 import FormTable from './FormTable'
 
 import type {
   WifiSecurityType,
   WifiEapOptionsList,
-  WifiKeysList,
+  WifiEapOption,
   WifiAuthField,
+  WifiKeysList,
   WifiConfigureRequest,
 } from '../../../http-api-client'
 
+import type {SelectOption} from '../../SelectField'
+
 type Props = {
-  // TODO(mc, 2018-10-22): optional SSID
-  ssid: string,
+  ssid: ?string,
   securityType: ?WifiSecurityType,
   eapOptions: ?WifiEapOptionsList,
   keys: ?WifiKeysList,
@@ -42,25 +46,74 @@ type State = {|
   showPassword: {[name: string]: boolean},
 |}
 
+type FieldProps = {
+  type: 'string' | 'password' | 'security' | 'file',
+  name: string,
+  label: string,
+  required: boolean,
+}
+
 export type FormValues = {[string]: ?(string | {[string]: string})}
 
-const PSK_FIELD_NAME = 'psk'
 const PSK_MIN_LENGTH = 8
 
-const WPA_PSK_FIELDS = [
+// TODO(mc, 2018-10-31): i18n
+const SSID_LABEL = 'Network Name (SSID)'
+const PSK_LABEL = 'Password'
+const SECURITY_TYPE_LABEL = 'Authentication'
+const SECURITY_TYPE_PLACEHOLDER = 'Select authentication method'
+const NO_SECURITY_LABEL = 'None'
+const PSK_SECURITY_LABEL = 'WPA2 Personal'
+
+const UNKNOWN_SSID_FIELD_PROPS: FieldProps = {
+  type: 'string',
+  name: SSID_FIELD,
+  label: SSID_LABEL,
+  required: true,
+}
+
+const PSK_FIELD_PROPS: FieldProps = {
+  type: 'password',
+  name: PSK_FIELD,
+  label: PSK_LABEL,
+  required: true,
+}
+
+const SECURITY_TYPE_FIELD_PROPS: FieldProps = {
+  type: 'security',
+  name: SECURITY_TYPE_FIELD,
+  label: SECURITY_TYPE_LABEL,
+  required: true,
+}
+
+const UNKNOWN_SECURITY_OPTIONS: Array<SelectOption> = [
   {
-    name: PSK_FIELD_NAME,
-    displayName: 'Password',
-    type: 'password',
-    required: true,
+    label: null,
+    options: [{value: NO_SECURITY, label: NO_SECURITY_LABEL}],
+  },
+  {
+    label: null,
+    options: [{value: WPA_PSK_SECURITY, label: PSK_SECURITY_LABEL}],
   },
 ]
 
-// all eap options go in a sub-object `eapConfig`
-// eap method is stored under eapConfig.eapType
-const SECURITY_TYPE_LABEL = 'Authentication'
-const SECURITY_TYPE_ID = `${CONNECT_FIELD_ID_PREFIX}${SECURITY_TYPE_FIELD}`
 const getEapType = (v: FormValues): ?string => get(v, EAP_TYPE_FIELD)
+const makeEapOpt = (o: WifiEapOption) => ({label: o.displayName, value: o.name})
+const makeEapField = (o: WifiAuthField) => ({
+  type: o.type,
+  name: `${EAP_CONFIG_FIELD}.${o.name}`,
+  label: o.displayName,
+  required: o.required,
+})
+
+const getEapFields = (
+  eapOptions: ?WifiEapOptionsList,
+  name: ?string
+): Array<FieldProps> => {
+  const method = find(eapOptions, {name})
+  const options = method ? method.options : []
+  return options.map(makeEapField)
+}
 
 export default class ConnectForm extends React.Component<Props, State> {
   constructor (props: Props) {
@@ -68,19 +121,19 @@ export default class ConnectForm extends React.Component<Props, State> {
     this.state = {showPassword: {}}
   }
 
-  onSubmit = (values: FormValues) => {
-    this.props.configure({
-      ssid: this.props.ssid,
-      securityType: this.props.securityType,
-      hidden: !this.props.ssid,
-      ...values,
-    })
+  handleSubmit = (values: FormValues) => {
+    const {ssid: knownSsid, configure, close} = this.props
+    const ssid = this.getSsid(values)
+    const securityType = this.getSecurityType(values)
+    const hidden = !knownSsid
 
-    this.props.close()
+    configure({...values, ssid, securityType, hidden})
+    close()
   }
 
   toggleShowPassword = (name: string) => {
     this.setState({
+      // note: this will store paths as a flat object (e.g. {'foo.bar': true})
       showPassword: {
         ...this.state.showPassword,
         [name]: !this.state.showPassword[name],
@@ -88,62 +141,103 @@ export default class ConnectForm extends React.Component<Props, State> {
     })
   }
 
-  getValidationSchema = (values: FormValues) => {
-    const securityType = this.getSecurityType(values)
+  validate = (values: FormValues) => {
+    const {securityType: knownSecurityType} = this.props
 
-    if (securityType === NO_SECURITY) return {}
+    return this.getFields(values).reduce((errors, field) => {
+      const {name, label, required} = field
+      let missingEap = false
+      let value: string
 
-    const errors = this.getFields(values).reduce((errors, field) => {
-      const {name, displayName, required} = field
-      const value = get(values, name, '')
+      if (name === SSID_FIELD) {
+        value = this.getSsid(values) || ''
+      } else if (name === SECURITY_TYPE_FIELD) {
+        value = this.getSecurityType(values) || ''
+        missingEap =
+          knownSecurityType === WPA_EAP_SECURITY && !get(values, EAP_TYPE_FIELD)
+      } else {
+        value = get(values, name, '')
+      }
 
-      if (required && !value) {
-        set(errors, name, `${displayName} is required`)
-      } else if (name === PSK_FIELD_NAME && value.length < PSK_MIN_LENGTH) {
-        set(errors, name, `${displayName} must be at least 8 characters`)
+      if ((required && !value) || missingEap) {
+        set(errors, name, `${label} is required`)
+      } else if (name === PSK_FIELD && value.length < PSK_MIN_LENGTH) {
+        set(errors, name, `${label} must be at least 8 characters`)
       }
 
       return errors
     }, {})
+  }
 
-    if (
-      !securityType ||
-      (securityType === WPA_EAP_SECURITY && !getEapType(values))
-    ) {
-      set(errors, SECURITY_TYPE_FIELD, `${SECURITY_TYPE_LABEL} is required`)
-    }
-
-    return errors
+  getSsid (values: FormValues): ?string {
+    return this.props.ssid || get(values, SSID_FIELD)
   }
 
   getSecurityType (values: FormValues): ?WifiSecurityType {
-    const formSecurityType: ?WifiSecurityType = (values.securityType: any)
-    return this.props.securityType || formSecurityType
+    return this.props.securityType || get(values, SECURITY_TYPE_FIELD)
   }
 
-  getFields (values: FormValues): Array<WifiAuthField> {
-    const securityType = this.getSecurityType(values)
+  getSecurityOptions (): Array<SelectOption> {
+    const {eapOptions, securityType: knownSecurityType} = this.props
+    const opts = !knownSecurityType ? UNKNOWN_SECURITY_OPTIONS : []
 
-    if (securityType === WPA_PSK_SECURITY) return WPA_PSK_FIELDS
-    if (securityType === WPA_EAP_SECURITY) {
-      const method = find(this.props.eapOptions, {name: getEapType(values)})
-      return get(method, 'options', []).map(field => ({
-        ...field,
-        name: `${EAP_CONFIG_FIELD}.${field.name}`,
-      }))
+    return eapOptions && eapOptions.length
+      ? opts.concat({label: null, options: eapOptions.map(makeEapOpt)})
+      : opts
+  }
+
+  getFields (values: FormValues): Array<FieldProps> {
+    const {ssid: knownSsid, securityType: knownSecurityType} = this.props
+    const securityType = this.getSecurityType(values)
+    const fields = []
+
+    if (!knownSsid) fields.push(UNKNOWN_SSID_FIELD_PROPS)
+
+    if (!knownSecurityType || knownSecurityType === WPA_EAP_SECURITY) {
+      fields.push(SECURITY_TYPE_FIELD_PROPS)
     }
 
-    return []
+    if (securityType === WPA_PSK_SECURITY) {
+      fields.push(PSK_FIELD_PROPS)
+    } else if (securityType === WPA_EAP_SECURITY) {
+      fields.push(...getEapFields(this.props.eapOptions, getEapType(values)))
+    }
+
+    return fields
+  }
+
+  getFieldValue (name: string, values: FormValues): ?string {
+    if (name === SECURITY_TYPE_FIELD) {
+      return getEapType(values) || this.getSecurityType(values)
+    }
+
+    return get(values, name)
+  }
+
+  handleSecurityChange (
+    name: string,
+    value: ?string,
+    ssid: ?string,
+    setValues: FormValues => mixed
+  ): mixed {
+    const {eapOptions, securityType: knownSecurityType} = this.props
+    const nextValues = ssid ? {ssid} : {}
+    const eapType = find(eapOptions, {name: value})
+    const securityValue = eapType ? WPA_EAP_SECURITY : value
+
+    if (!knownSecurityType) set(nextValues, name, securityValue)
+    if (eapType) set(nextValues, EAP_TYPE_FIELD, value)
+    setValues(nextValues)
   }
 
   render () {
     const {showPassword} = this.state
-    const {keys, addKey, close, securityType: knownSecurityType} = this.props
+    const {keys, addKey, close} = this.props
 
     return (
       <Formik
-        onSubmit={this.onSubmit}
-        validate={this.getValidationSchema}
+        onSubmit={this.handleSubmit}
+        validate={this.validate}
         render={formProps => {
           const {
             values,
@@ -162,41 +256,68 @@ export default class ConnectForm extends React.Component<Props, State> {
           return (
             <form onSubmit={handleSubmit}>
               <FormTable>
-                <SelectSecurity
-                  id={SECURITY_TYPE_ID}
-                  name={SECURITY_TYPE_FIELD}
-                  label={`* ${SECURITY_TYPE_LABEL}:`}
-                  value={getEapType(values) || this.getSecurityType(values)}
-                  knownSecurityType={knownSecurityType}
-                  touched={get(touched, SECURITY_TYPE_FIELD)}
-                  error={get(errors, SECURITY_TYPE_FIELD)}
-                  eapOptions={this.props.eapOptions}
-                  setValues={nextValues => {
-                    if (nextValues.securityType === NO_SECURITY) {
-                      setValues(nextValues)
-                    } else {
-                      resetForm(nextValues)
-                    }
-                  }}
-                  onLoseFocus={setFieldTouched}
-                />
-                {this.getFields(values).map(field => (
-                  <ConnectFormField
-                    key={field.name}
-                    field={field}
-                    value={get(values, field.name, '')}
-                    keys={keys}
-                    showPassword={!!showPassword[field.name]}
-                    onChange={handleChange}
-                    onValueChange={setFieldValue}
-                    onBlur={handleBlur}
-                    onLoseFocus={setFieldTouched}
-                    addKey={addKey}
-                    toggleShowPassword={this.toggleShowPassword}
-                    error={get(errors, field.name)}
-                    touched={get(touched, field.name)}
-                  />
-                ))}
+                {this.getFields(values).map(field => {
+                  const {type, name, label, required} = field
+                  const value = this.getFieldValue(field.name, values)
+                  const error = get(touched, name) ? get(errors, name) : null
+
+                  if (type === 'string') {
+                    return (
+                      <StringField
+                        key={name}
+                        {...{name, label, value, error, required}}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                      />
+                    )
+                  }
+                  if (type === 'password') {
+                    return (
+                      <PasswordField
+                        key={name}
+                        {...{name, label, value, error, required}}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        showPassword={showPassword[name]}
+                        toggleShowPassword={this.toggleShowPassword}
+                      />
+                    )
+                  }
+                  if (type === 'security') {
+                    return (
+                      <SelectOptionField
+                        key={name}
+                        {...{name, label, value, error, required}}
+                        options={this.getSecurityOptions()}
+                        placeholder={SECURITY_TYPE_PLACEHOLDER}
+                        onLoseFocus={setFieldTouched}
+                        onValueChange={(name, value) => {
+                          this.handleSecurityChange(
+                            name,
+                            value,
+                            // needed to ensure SSID is not wiped out
+                            this.getSsid(values),
+                            // resetting the form on NO_SECURITY clears
+                            // validation, disabling submit, so use setValues
+                            value === NO_SECURITY ? setValues : resetForm
+                          )
+                        }}
+                      />
+                    )
+                  }
+                  if (type === 'file') {
+                    return (
+                      <SelectKey
+                        key={name}
+                        {...{name, label, value, error, required, keys, addKey}}
+                        onValueChange={setFieldValue}
+                        onLoseFocus={setFieldTouched}
+                      />
+                    )
+                  }
+
+                  return null
+                })}
               </FormTable>
               <BottomButtonBar
                 buttons={[

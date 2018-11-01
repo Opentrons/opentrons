@@ -71,26 +71,23 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
     }
   }
 
-  setCurrentSsid = (_: string, ssid: string) => {
+  setCurrentSsid = (_: string, ssid: ?string) => {
     const network = find(this.props.list, {ssid})
-
-    if (network) {
-      const securityType = network.securityType
-      const nextState: $Shape<SelectNetworkState> = {
-        ssid,
-        securityType,
-        modalOpen: securityType !== NO_SECURITY,
-      }
-
-      if (!nextState.modalOpen) {
-        this.props.configure({ssid})
-      } else if (securityType === WPA_EAP_SECURITY || !securityType) {
-        this.props.fetchEapOptions()
-        this.props.fetchKeys()
-      }
-
-      this.setState(nextState)
+    const securityType = network && network.securityType
+    const nextState = {
+      ssid,
+      securityType,
+      modalOpen: securityType !== NO_SECURITY,
     }
+
+    if (ssid && !nextState.modalOpen) {
+      this.props.configure({ssid})
+    } else if (securityType === WPA_EAP_SECURITY || !securityType) {
+      this.props.fetchEapOptions()
+      this.props.fetchKeys()
+    }
+
+    this.setState(nextState)
   }
 
   closeConnectForm = () => this.setState({securityType: null, modalOpen: false})
@@ -98,14 +95,6 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
   getActiveSsid (): ?string {
     const activeNetwork = find(this.props.list, 'active')
     return activeNetwork && activeNetwork.ssid
-  }
-
-  componentDidUpdate (prevProps) {
-    // if we don't have a selected network in component state and the list has
-    // updated, seed component state with active ssid from props
-    if (!this.state.ssid && this.props.list !== prevProps.list) {
-      this.setState({ssid: this.getActiveSsid()})
-    }
   }
 
   render () {
@@ -134,24 +123,23 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
               alertOverlay
             />
           )}
-          {ssid &&
-            modalOpen && (
-              <ConnectModal
+          {modalOpen && (
+            <ConnectModal
+              ssid={ssid}
+              securityType={securityType}
+              close={this.closeConnectForm}
+            >
+              <ConnectForm
                 ssid={ssid}
                 securityType={securityType}
+                eapOptions={eapOptions}
+                keys={keys}
+                configure={configure}
                 close={this.closeConnectForm}
-              >
-                <ConnectForm
-                  ssid={ssid}
-                  securityType={securityType}
-                  eapOptions={eapOptions}
-                  keys={keys}
-                  configure={configure}
-                  close={this.closeConnectForm}
-                  addKey={addKey}
-                />
-              </ConnectModal>
-            )}
+                addKey={addKey}
+              />
+            </ConnectModal>
+          )}
         </Portal>
       </IntervalWrapper>
     )

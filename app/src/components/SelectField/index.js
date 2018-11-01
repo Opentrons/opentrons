@@ -10,9 +10,12 @@ import {Icon} from '@opentrons/components'
 import styles from './styles.css'
 
 // TODO(mc, 2018-10-23): we use "name", react-select uses "label"; align usage
-export type OptionType = {|value: string, label: React.Node|}
+export type ValueType = ?string
+export type OptionType = {|value: ValueType, label: React.Node|}
 export type GroupType = {|options: Array<OptionType>, label: React.Node|}
 export type SelectOption = OptionType | GroupType
+
+export type MenuPosition = 'absolute' | 'fixed'
 
 type OptionList = Array<OptionType>
 
@@ -24,15 +27,15 @@ type SelectProps = {
   /** React-Select option, usually label, value */
   options: Array<SelectOption>,
   /** currently selected value */
-  value: ?string,
+  value: ValueType,
   /** change handler called with (name, value) */
-  onValueChange: (name: string, value: string) => mixed,
+  onValueChange: (name: string, value: ValueType) => mixed,
   /** blur handler called with (name) */
   onLoseFocus?: (name: string) => mixed,
   /** disable the select */
   disabled?: boolean,
   /** optional placeholder  */
-  placeholder?: string,
+  placeholder?: ?string,
   /** optional className */
   className?: string,
   /** optional caption. hidden when `error` is given */
@@ -40,15 +43,12 @@ type SelectProps = {
   /** if included, use error style and display error instead of caption */
   error?: ?string,
   /** menuPosition prop to send to react-select */
-  menuPosition?: 'absolute' | 'fixed',
+  menuPosition?: ?MenuPosition,
 }
 
 const SELECT_STYLES = {
   input: () => ({padding: 0}),
-  groupHeading: () => ({
-    margin: 0,
-    borderBottom: '1px solid #9b9b9b',
-  }),
+  groupHeading: () => ({margin: 0}),
 }
 
 const clearStyles = () => null
@@ -83,7 +83,7 @@ export default class SelectField extends React.Component<SelectProps> {
     const captionCx = cx(styles.select_caption, {[styles.error_color]: error})
 
     return (
-      <div className={styles.select_wrapper}>
+      <div>
         <Select
           id={id}
           name={name}

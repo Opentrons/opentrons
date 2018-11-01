@@ -135,6 +135,8 @@ export const NO_SECURITY: 'none' = 'none'
 export const WPA_PSK_SECURITY: 'wpa-psk' = 'wpa-psk'
 export const WPA_EAP_SECURITY: 'wpa-eap' = 'wpa-eap'
 
+export const SSID_FIELD = 'ssid'
+export const PSK_FIELD = 'psk'
 export const SECURITY_TYPE_FIELD = 'securityType'
 export const EAP_CONFIG_FIELD = 'eapConfig'
 export const EAP_TYPE_FIELD = `${EAP_CONFIG_FIELD}.eapType`
