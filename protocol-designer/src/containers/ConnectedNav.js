@@ -46,6 +46,7 @@ function Nav (props: Props) {
           <NavTab
             iconName='settings'
             title={i18n.t('nav.tab_name.settings')}
+            disabled={props.currentPage === 'file-splash'}
             selected={props.currentPage === 'settings-privacy'}
             onClick={props.handleClick('settings-privacy')} />
         </React.Fragment>
