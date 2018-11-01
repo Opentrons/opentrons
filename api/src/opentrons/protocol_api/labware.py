@@ -44,10 +44,10 @@ class Well:
                        lower-left corner of a labware)
         """
         self._display_name = display_name
-        self._position = Point(
-            x=well_props['x'] + parent.point.x,
-            y=well_props['y'] + parent.point.y,
-            z=well_props['z'] + well_props['depth'] + parent.point.z)
+        self._position\
+            = Point(well_props['x'],
+                    well_props['y'],
+                    well_props['z'] + well_props['depth']) + parent.point
 
         if not parent.labware:
             raise ValueError("Wells must have a parent")
