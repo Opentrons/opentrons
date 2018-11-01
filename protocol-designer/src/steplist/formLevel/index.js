@@ -4,6 +4,7 @@ import {
   incompatibleAspirateLabware,
   incompatibleDispenseLabware,
   incompatibleLabware,
+  pauseForTimeOrUntilTold,
   wellRatioTransfer,
   wellRatioConsolidate,
   wellRatioDistribute,
@@ -26,7 +27,7 @@ export {default as stepFormToArgs} from './stepFormToArgs'
 type FormHelpers = {getErrors?: (mixed) => Array<FormError>, getWarnings?: (mixed) => Array<FormWarning>}
 const stepFormHelperMap: {[StepType]: FormHelpers} = {
   mix: {getErrors: composeErrors(incompatibleLabware)},
-  pause: {getErrors: composeErrors(incompatibleLabware)},
+  pause: {getErrors: composeErrors(pauseForTimeOrUntilTold)},
   transfer: {
     getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware, wellRatioTransfer),
     getWarnings: composeWarnings(maxDispenseWellVolume),

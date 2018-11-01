@@ -46,6 +46,7 @@ const selectedWells = handleActions({
   SET_WELL_CONTENTS: () => selectedWellsInitialState,
 }, selectedWellsInitialState)
 
+// TODO: BC 2018-11-01 unused, remove and all references to the actions
 type WellSelectionModalState = OpenWellSelectionModalPayload | null
 const wellSelectionModal = handleActions({
   OPEN_WELL_SELECTION_MODAL: (state, action: {payload: OpenWellSelectionModalPayload}) => action.payload,

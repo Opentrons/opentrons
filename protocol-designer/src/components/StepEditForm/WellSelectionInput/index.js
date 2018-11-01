@@ -5,7 +5,6 @@ import {connect} from 'react-redux'
 import {selectors as pipetteSelectors} from '../../../pipettes'
 import {selectors as steplistSelectors} from '../../../steplist'
 import {getFieldErrors, type StepFieldName} from '../../../steplist/fieldLevel'
-import {openWellSelectionModal} from '../../../well-selection/actions'
 import type {BaseState, ThunkDispatch} from '../../../types'
 import {showFieldErrors} from '../StepFormField'
 import type {FocusHandlers} from '../index'
@@ -47,26 +46,10 @@ function mergeProps (
   dispatchProps: {dispatch: ThunkDispatch<*>},
   ownProps: OP
 ): Props {
-  // const {dispatch} = dispatchProps
   const {_pipetteId, _selectedLabwareId, _wellFieldErrors} = stateProps
   const disabled = !(_pipetteId && _selectedLabwareId)
   const {name, focusedField, dirtyFields, onFieldBlur, onFieldFocus} = ownProps
   const showErrors = showFieldErrors({name, focusedField, dirtyFields})
-
-  // const onClick = () => {
-  //   if (onFieldBlur) {
-  //     onFieldBlur(name)
-  //   }
-  //   if (_pipetteId && _selectedLabwareId) {
-  //     dispatch(
-  //       openWellSelectionModal({
-  //         pipetteId: _pipetteId,
-  //         labwareId: _selectedLabwareId,
-  //         formFieldAccessor: ownProps.name,
-  //       })
-  //     )
-  //   }
-  // }
 
   return {
     name,
