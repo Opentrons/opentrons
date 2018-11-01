@@ -211,21 +211,12 @@ class ProtocolContext:
         a position attached to it, and its behavior depends on the state of
         that location cache and the passed location.
         """
-        switching_instr = self._last_moved_instrument\
-            and self._last_moved_instrument != mount
-        if switching_instr:
-            # TODO: Is 10 the right number here? This is what’s used in
-            # robot since it’s a default to an argument that is never
-            # changed
-            self._log.debug("retract {}".format(self._last_moved_instrument))
-            self._hardware.retract(self._last_moved_instrument, 10)
-
-        if self._location_cache and not switching_instr:
-            from_loc = self._location_cache
+        if self._location_cache:
+            from_lw = self._location_cache.labware
         else:
-            from_loc = types.Location(
-                point=self._hardware.gantry_position(mount),
-                labware=None)
+            from_lw = None
+        from_loc = types.Location(self._hardware.gantry_position(mount),
+                                  from_lw)
         moves = geometry.plan_moves(from_loc, location, self._deck_layout)
         self._log.debug("planned moves for {}->{}: {}"
                         .format(from_loc, location, moves))

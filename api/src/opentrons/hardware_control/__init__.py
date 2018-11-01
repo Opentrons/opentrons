@@ -94,6 +94,7 @@ class API:
             top_types.Mount.RIGHT: None
         }
         self._attached_modules: Dict[str, Any] = {}
+        self._last_moved_mount: Optional[top_types.Mount] = None
 
     @classmethod
     def build_hardware_controller(
@@ -340,6 +341,11 @@ class API:
         """
         if not self._current_position:
             raise MustHomeError
+
+        if mount != self._last_moved_mount and self._last_moved_mount:
+            await self.retract(self._last_moved_mount, 10)
+        self._last_moved_mount = mount
+
         z_axis = Axis.by_mount(mount)
         if mount == top_types.Mount.LEFT:
             offset = top_types.Point(*self.config.mount_offset)
@@ -363,6 +369,11 @@ class API:
         """
         if not self._current_position:
             raise MustHomeError
+
+        if mount != self._last_moved_mount and self._last_moved_mount:
+            await self.retract(self._last_moved_mount, 10)
+        self._last_moved_mount = mount
+
         z_axis = Axis.by_mount(mount)
         try:
             target_position = OrderedDict(
@@ -379,6 +390,7 @@ class API:
 
     async def _move_plunger(self, mount: top_types.Mount, dist: float,
                             speed: float = None):
+
         z_axis = Axis.by_mount(mount)
         pl_axis = Axis.of_plunger(mount)
         all_axes_pos = OrderedDict(
