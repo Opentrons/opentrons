@@ -107,8 +107,8 @@ const makeEapField = (o: WifiAuthField) => ({
 })
 
 const getEapFields = (
-  eapOptions: WifiEapOptionsList,
-  name: string
+  eapOptions: ?WifiEapOptionsList,
+  name: ?string
 ): Array<FieldProps> => {
   const method = find(eapOptions, {name})
   const options = method ? method.options : []
