@@ -145,6 +145,17 @@ def test_aspirate(loop, load_my_labware, monkeypatch):
     assert asp_called_with == (Mount.RIGHT, 2.0, 1.0)
     assert move_called_with == (Mount.RIGHT, lw.wells()[0].bottom())
 
+    instr.well_bottom_clearance = 1.0
+    instr.aspirate(2.0, lw.wells()[0])
+    dest_point, dest_lw = lw.wells()[0].bottom()
+    dest_point = dest_point._replace(z=dest_point.z + 1.0)
+    assert move_called_with == (Mount.RIGHT,
+                                Location(dest_point, dest_lw))
+
+    move_called_with = None
+    instr.aspirate(2.0)
+    assert move_called_with is None
+
 
 def test_dispense(loop, load_my_labware, monkeypatch):
     ctx = papi.ProtocolContext(loop)
@@ -170,3 +181,14 @@ def test_dispense(loop, load_my_labware, monkeypatch):
 
     assert disp_called_with == (Mount.RIGHT, 2.0, 1.0)
     assert move_called_with == (Mount.RIGHT, lw.wells()[0].bottom())
+
+    instr.well_bottom_clearance = 1.0
+    instr.dispense(2.0, lw.wells()[0])
+    dest_point, dest_lw = lw.wells()[0].bottom()
+    dest_point = dest_point._replace(z=dest_point.z + 1.0)
+    assert move_called_with == (Mount.RIGHT,
+                                Location(dest_point, dest_lw))
+
+    move_called_with = None
+    instr.dispense(2.0)
+    assert move_called_with is None
