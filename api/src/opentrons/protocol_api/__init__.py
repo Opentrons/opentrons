@@ -7,7 +7,7 @@ control the OT2.
 import logging
 import os
 
-from . import back_compat
+from . import back_compat, labware
 from .contexts import ProtocolContext, InstrumentContext
 
 
@@ -45,4 +45,8 @@ def run(protocol_bytes: bytes = None,
         pass
 
 
-__all__ = ['run', 'ProtocolContext', 'InstrumentContext', 'back_compat']
+__all__ = ['run',
+           'ProtocolContext',
+           'InstrumentContext',
+           'back_compat',
+           'labware']

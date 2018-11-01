@@ -1,13 +1,14 @@
 """This module will replace Placeable"""
-import re
-import os
+from collections import defaultdict
+from enum import Enum, auto
 import json
+import os
+import re
 import time
 from typing import List, Dict
-from enum import Enum, auto
-from opentrons.types import Point
+
+from opentrons.types import Point, Location
 from opentrons.util import environment as env
-from collections import defaultdict
 
 
 class WellShape(Enum):
@@ -25,7 +26,8 @@ persistent_path = os.path.join(env.get_path('APP_DATA_DIR'), 'offsets')
 
 class Well:
     def __init__(
-            self, well_props: dict, parent: Point, display_name: str) -> None:
+            self, well_props: dict, parent: Location, display_name: str)\
+            -> None:
         """
         Create a well, and track the Point corresponding to the top-center of
         the well (this Point is in absolute deck coordinates)
@@ -37,15 +39,19 @@ class Well:
             This is created by the caller and passed in, so here it is just
             saved and made available.
         :param well_props: a dict that conforms to the json-schema for a Well
-        :param parent: a Point representing the absolute position of the parent
-            of the Well (usually the lower-left corner of a labware)
+        :param parent: a :py:class:`.Location` Point representing the absolute
+                       position of the parent of the Well (usually the
+                       lower-left corner of a labware)
         """
         self._display_name = display_name
-        self._position = Point(
-            x=well_props['x'] + parent.x,
-            y=well_props['y'] + parent.y,
-            z=well_props['z'] + well_props['depth'] + parent.z)
+        self._position\
+            = Point(well_props['x'],
+                    well_props['y'],
+                    well_props['z'] + well_props['depth']) + parent.point
 
+        if not parent.labware:
+            raise ValueError("Wells must have a parent")
+        self._parent = parent.labware
         self._shape = well_shapes.get(well_props['shape'])
         if self._shape is WellShape.RECTANGULAR:
             self._length = well_props['length']
@@ -62,33 +68,37 @@ class Well:
 
         self._depth = well_props['depth']
 
-    def top(self) -> Point:
+    @property
+    def parent(self) -> 'Labware':
+        return self._parent
+
+    def top(self) -> Location:
         """
         :return: a Point corresponding to the absolute position of the
         top-center of the well relative to the deck (with the lower-left corner
         of slot 1 as (0,0,0))
         """
-        return self._position
+        return Location(self._position, self)
 
-    def bottom(self) -> Point:
+    def bottom(self) -> Location:
         """
         :return: a Point corresponding to the absolute position of the
         bottom-center of the well (with the lower-left corner of slot 1 as
         (0,0,0))
         """
         top = self.top()
-        bottom_z = top.z - self._depth
-        return Point(x=top.x, y=top.y, z=bottom_z)
+        bottom_z = top.point.z - self._depth
+        return Location(Point(x=top.point.x, y=top.point.y, z=bottom_z), self)
 
-    def center(self) -> Point:
+    def center(self) -> Location:
         """
         :return: a Point corresponding to the absolute position of the center
         of the well relative to the deck (with the lower-left corner of slot 1
         as (0,0,0))
         """
         top = self.top()
-        center_z = top.z - (self._depth / 2.0)
-        return Point(x=top.x, y=top.y, z=center_z)
+        center_z = top.point.z - (self._depth / 2.0)
+        return Location(Point(x=top.point.x, y=top.point.y, z=center_z), self)
 
     def _from_center_cartesian(
             self, x: float, y: float, z: float) -> Point:
@@ -121,9 +131,9 @@ class Well:
         z_size = self._depth
 
         return Point(
-            x=center.x + (x * (x_size / 2.0)),
-            y=center.y + (y * (y_size / 2.0)),
-            z=center.z + (z * (z_size / 2.0)))
+            x=center.point.x + (x * (x_size / 2.0)),
+            y=center.point.y + (y * (y_size / 2.0)),
+            z=center.point.z + (z * (z_size / 2.0)))
 
     def __str__(self):
         return self._display_name
@@ -135,7 +145,7 @@ class Well:
         """
         if not isinstance(other, Well):
             return NotImplemented
-        return self.top() == other.top()
+        return self.top().point == other.top().point
 
 
 class Labware:
@@ -170,6 +180,7 @@ class Labware:
         self._id = definition['otId']
         self._parameters = definition['parameters']
         offset = definition['cornerOffsetFromSlot']
+        self._dimensions = definition['dimensions']
         # Inferred from definition
         self._ordering = [well
                           for col in definition['ordering']
@@ -179,6 +190,7 @@ class Labware:
                              z=offset['z'] + parent.z)
         # Applied properties
         self.set_calibration(self._calibrated_offset)
+
         self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
 
     def _build_wells(self) -> List[Well]:
@@ -190,7 +202,7 @@ class Labware:
         return [
             Well(
                 self._well_definition[well],
-                self._calibrated_offset,
+                Location(self._calibrated_offset, self),
                 "{} of {}".format(well, self._display_name))
             for well in self._ordering]
 
@@ -216,6 +228,10 @@ class Labware:
                                         y=self._offset.y + delta.y,
                                         z=self._offset.z + delta.z)
         self._wells = self._build_wells()
+
+    @property
+    def calibrated_offset(self) -> Point:
+        return self._calibrated_offset
 
     def well(self, idx) -> Well:
         """Deprecated---use result of `wells` or `wells_by_index`"""
@@ -356,6 +372,16 @@ class Labware:
     def cols(self, *args):
         """Deprecated--use `columns`"""
         return self.columns(*args)
+
+    @property
+    def highest_z(self) -> float:
+        """
+        The z-coordinate of the tallest single point anywhere on the labware.
+
+        This is drawn from the 'dimensions'/'overallHeight' elements of the
+        labware definition and takes into account the calibration offset.
+        """
+        return self._dimensions['overallHeight'] + self._calibrated_offset.z
 
     def __repr__(self):
         return self._display_name

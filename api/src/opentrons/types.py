@@ -1,12 +1,17 @@
 import enum
-from typing import Union
-from collections import namedtuple
-from typing import Any
+from typing import Any, NamedTuple, TYPE_CHECKING, Union
 
-_PointTuple = namedtuple('Point', ['x', 'y', 'z'])
+if TYPE_CHECKING:
+    from typing import (Optional,       # noqa(F401) Used for typechecking
+                        Tuple)
+    from .labware import Labware, Well  # noqa(F401) Used for typechecking
 
 
-class Point(_PointTuple):
+class Point(NamedTuple):
+    x: float
+    y: float
+    z: float
+
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Point):
             return False
@@ -23,14 +28,39 @@ class Point(_PointTuple):
         return Point(self.x - other.x, self.y - other.y, self.z - other.z)
 
 
+class Location(NamedTuple):
+    """ A location to target as a motion in the :ref:`protocol-api`.
+
+    The location contains a :py:class:`.Point` (in
+    :ref:`protocol-api-deck-coordinates`) and possibly an associated
+    :py:class:`.Labware` or :py:class:`.Well` instance.
+
+    It should rarely be constructed directly by the user; rather, it is the
+    return type of most :py:class:`.Well` accessors like :py:meth:`.Well.top`
+    and is passed directly into a method like
+    :py:meth:`InstrumentContext.aspirate`.
+
+    .. warning::
+       The :py:attr:`labware` attribute of this class is used by the protocol
+       API internals to, among other things, determine safe heights to retract
+       the instruments to when moving between locations. If constructing an
+       instance of this class manually, be sure to either specify `None` as the
+       labware (so the robot does its worst case retraction) or specify the
+       correct labware for the :py:attr:`point` attribute.
+
+
+    .. warning::
+       The `==` operation compares both the position and associated labware.
+       If you only need to compare locations, compare the :py:attr:`point`
+       of each item.
+    """
+    point: Point
+    labware: 'Union[Labware, Well, None]'
+
+
 class Mount(enum.Enum):
     LEFT = enum.auto()
     RIGHT = enum.auto()
 
 
 DeckLocation = Union[int, str]
-
-
-class MotionStrategy(enum.Enum):
-    DIRECT = enum.auto()
-    ARC = enum.auto()

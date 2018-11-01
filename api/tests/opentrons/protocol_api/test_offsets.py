@@ -39,6 +39,11 @@ minimalLabwareDef = {
           "z": 0,
           "shape": "circular"
         }
+    },
+    "dimensions": {
+        "overallLength": 1.0,
+        "overallWidth": 2.0,
+        "overallHeight": 3.0
     }
 }
 

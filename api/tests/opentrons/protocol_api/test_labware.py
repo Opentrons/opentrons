@@ -1,7 +1,7 @@
 import json
 import pkgutil
 from opentrons.protocol_api import labware
-from opentrons.types import Point
+from opentrons.types import Point, Location
 
 test_data = {
     'circular_well_json': {
@@ -27,7 +27,7 @@ test_data = {
 
 
 def test_well_init():
-    slot = Point(1, 2, 3)
+    slot = Location(Point(1, 2, 3), 1)
     well_name = 'circular_well_json'
     well1 = labware.Well(test_data[well_name], slot, well_name)
     assert well1._diameter == test_data[well_name]['diameter']
@@ -42,29 +42,31 @@ def test_well_init():
 
 
 def test_top():
-    slot = Point(4, 5, 6)
+    slot = Location(Point(4, 5, 6), 1)
     well_name = 'circular_well_json'
     well = labware.Well(test_data[well_name], slot, well_name)
     well_data = test_data[well_name]
-    expected_x = well_data['x'] + slot.x
-    expected_y = well_data['y'] + slot.y
-    expected_z = well_data['z'] + well_data['depth'] + slot.z
-    assert well.top() == Point(expected_x, expected_y, expected_z)
+    expected_x = well_data['x'] + slot.point.x
+    expected_y = well_data['y'] + slot.point.y
+    expected_z = well_data['z'] + well_data['depth'] + slot.point.z
+    assert well.top() == Location(Point(expected_x, expected_y, expected_z),
+                                  well)
 
 
 def test_bottom():
-    slot = Point(7, 8, 9)
+    slot = Location(Point(7, 8, 9), 1)
     well_name = 'rectangular_well_json'
     well = labware.Well(test_data[well_name], slot, well_name)
     well_data = test_data[well_name]
-    expected_x = well_data['x'] + slot.x
-    expected_y = well_data['y'] + slot.y
-    expected_z = well_data['z'] + slot.z
-    assert well.bottom() == Point(expected_x, expected_y, expected_z)
+    expected_x = well_data['x'] + slot.point.x
+    expected_y = well_data['y'] + slot.point.y
+    expected_z = well_data['z'] + slot.point.z
+    assert well.bottom() == Location(Point(expected_x, expected_y, expected_z),
+                                     well)
 
 
 def test_from_center_cartesian():
-    slot1 = Point(10, 11, 12)
+    slot1 = Location(Point(10, 11, 12), 1)
     well_name = 'circular_well_json'
     well1 = labware.Well(test_data[well_name], slot1, well_name)
 
@@ -84,7 +86,7 @@ def test_from_center_cartesian():
     assert point1.y == expected_y
     assert point1.z == expected_z
 
-    slot2 = Point(13, 14, 15)
+    slot2 = Location(Point(13, 14, 15), 1)
     well2_name = 'rectangular_well_json'
     well2 = labware.Well(test_data[well2_name], slot2, well2_name)
     percent2_x = -0.25
@@ -165,3 +167,24 @@ def test_backcompat():
     w11 = lw.columns('2', '3', '6')
     assert len(w11) == 3
     assert repr(w11[1][2]) == well_c3_name
+
+
+def test_well_parent():
+    labware_name = 'generic_96_wellPlate_380_uL'
+    labware_def = json.loads(
+        pkgutil.get_data('opentrons',
+                         'shared_data/definitions2/{}.json'.format(
+                             labware_name)))
+    lw = labware.Labware(labware_def, Point(0, 0, 0), 'Test Slot')
+    parent = Location(Point(7, 8, 9), lw)
+    well_name = 'circular_well_json'
+    well = labware.Well(test_data[well_name],
+                        parent,
+                        well_name)
+    assert well.parent is lw
+    assert well.top().labware is well
+    assert well.top().labware.parent is lw
+    assert well.bottom().labware is well
+    assert well.bottom().labware.parent is lw
+    assert well.center().labware is well
+    assert well.center().labware.parent is lw
