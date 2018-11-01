@@ -38,6 +38,7 @@ class ProtocolContext:
         self._instruments: Dict[types.Mount, Optional[InstrumentContext]]\
             = {mount: None for mount in types.Mount}
         self._last_moved_instrument: Optional[types.Mount] = None
+        self._location_cache: Optional[types.Location] = None
         self._hardware = self._build_hardware_adapter(self._loop)
         self._log = MODULE_LOG.getChild(self.__class__.__name__)
 
@@ -197,24 +198,42 @@ class ProtocolContext:
         self._hardware.update_config(**kwargs)
 
     def move_to(self, mount: types.Mount,
-                location: geometry.Location,
-                strategy: types.MotionStrategy):
-        where = geometry.point_from_location(location)
-        if self._last_moved_instrument\
-           and self._last_moved_instrument != mount:
+                location: types.Location):
+        """ Implement motions of the robot.
+
+        This should not need to be called by the user; it is called by
+        :py:meth:`InstrumentContext.move_to` (and thus all other
+        :py:class:`InstrumentContext` methods that involve moving, such as
+        :py:meth:`InstrumentContext.aspirate`) to move the pipettes around.
+
+        It encapsulates location caching and ensures that all moves are safe.
+        It does this by taking a :py:class:`.types.Location` that can have
+        a position attached to it, and its behavior depends on the state of
+        that location cache and the passed location. For more information
+        see :ref:`protocol-api-move-safety`.
+        """
+        switching_instr = self._last_moved_instrument\
+            and self._last_moved_instrument != mount
+        if switching_instr:
             # TODO: Is 10 the right number here? This is what’s used in
             # robot since it’s a default to an argument that is never
             # changed
             self._log.debug("retract {}".format(self._last_moved_instrument))
             self._hardware.retract(self._last_moved_instrument, 10)
-        if strategy == types.MotionStrategy.DIRECT:
-            self._hardware.move_to(mount, where)
-            self._log.debug("move {} direct {}".format(mount.name, where))
+
+        if self._location_cache and not switching_instr:
+            from_loc = self._location_cache
         else:
-            self._log.debug("move {} arc {}".format(mount.name, where))
-            self._log.warn(
-                "Arc moves are not implemented, following back to direct")
-            self._hardware.move_to(mount, where)
+            from_loc = types.Location(
+                point=self._hardware.gantry_position(mount),
+                labware=None)
+        moves = geometry.plan_moves(from_loc, location, self._deck_layout)
+        self._log.debug("planned moves for {}->{}: {}"
+                        .format(from_loc, location, moves))
+        self._location_cache = location
+        self._last_moved_instrument = mount
+        for move in moves:
+            self._hardware.move_to(mount, move)
 
     def home(self):
         """ Homes the robot.
@@ -261,7 +280,7 @@ class InstrumentContext:
 
     def aspirate(self,
                  volume: float = None,
-                 location: geometry.Location = None,
+                 location: types.Location = None,
                  rate: float = 1.0):
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
@@ -271,58 +290,36 @@ class InstrumentContext:
         from its current position. If only a location is passed,
         :py:meth:`aspirate` will default to its :py:attr:`max_volume`.
 
-        The location may be a :py:class:`.Well`, or a specific position in
-        relation to a :py:class:`.Well`, such as the return value of
-        :py:meth:`.Well.top`. If a :py:class:`.Well` is specified without
-        calling a position method (such as :py:meth:`.Well.top` or
-        :py:meth:`.Well.bottom`), this method will aspirate from the bottom
-        of the well.
+        If the :py:class:`.types.Location` passed in `location` has an
+        associated labware, that labware will be saved until another motion
+        is commanded. This is used to optimize motions - for instance, moving
+        between two wells requires much less Z-distance to avoid collisions
+        than moving between two pieces of labware.
 
         :param volume: The volume to aspirate, in microliters. If not
                        specified, :py:attr:`max_volume`.
         :type volume: int or float
-        :param location: Where to aspirate from. A :py:class:`.Well` or
-                         position (e.g. the return value from
-                         :py:meth:`.Well.top` or :py:meth:`.Well.bottom`). If
-                         unspecified, the current position. For advanced usage,
-                         an (x, y, z) tuple or instance of
-                         :py:class:`types.Point` may be passed. This is a
-                         location in :ref:`protocol-api-deck-coords`.
-        :type location: Well or tuple[float, float, float] or types.Point
+        :param location: Where to aspirate from. If unspecified, the
+                         current position.
         :param rate: The relative plunger speed for this aspirate. During
                      this aspirate, the speed of the plunger will be
                      `rate` * :py:attr:`aspirate_speed`. If not specified,
                      defaults to 1.0 (speed will not be modified).
         :type rate: float
         :returns: This instance.
-
-        Examples
-        --------
-        ..
-        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
-        >>> robot.reset() # doctest: +SKIP
-        >>> plate = labware.load('96-flat', '2') # doctest: +SKIP
-        >>> p300 = instruments.P300_Single(mount='right') # doctest: +SKIP
-        >>> p300.pick_up_tip() # doctest: +SKIP
-        # aspirate 50uL from a Well
-        >>> p300.aspirate(50, plate[0]) # doctest: +SKIP
-        # aspirate 50uL from the center of a well
-        >>> p300.aspirate(50, plate[1].bottom()) # doctest: +SKIP
-        >>> # aspirate 20uL in place, twice as fast
-        >>> p300.aspirate(20, rate=2.0) # doctest: +SKIP
-        >>> # aspirate the pipette's remaining volume (80uL) from a Well
-        >>> p300.aspirate(plate[2]) # doctest: +SKIP
         """
-        where = self._get_point_and_cache(location, 'bottom')
         self._log.debug("aspirate {} from {} at {}"
-                        .format(volume, where, rate))
-        self._ctx.move_to(self._mount, where, types.MotionStrategy.ARC)
+                        .format(volume,
+                                location if location else 'current position',
+                                rate))
+        if location:
+            self.move_to(location)
         self._hardware.aspirate(self._mount, volume, rate)
         return self
 
     def dispense(self,
                  volume: float = None,
-                 location: geometry.Location = None,
+                 location: types.Location = None,
                  rate: float = 1.0):
         """
         Dispense a volume of liquid (in microliters/uL) using this pipette
@@ -342,44 +339,21 @@ class InstrumentContext:
         :param volume: The volume of liquid to dispense, in microliters. If not
                        specified, defaults to :py:attr:`current_volume`.
         :type volume: int or float
-        :param location: Where to dispense into. A :py:class:`.Well` or
-                         position (e.g. the return value from
-                         :py:meth:`.Well.top` or :py:meth:`.Well.bottom`). If
-                         unspecified, the bottom of the current well. For
-                         advanced usage, an `(x, y, z)` tuple or instance of
-                         :py:class:`types.Point` may be passed containing a
-                         location in :ref:`protocol-api-deck-coords`.
-        :type location: .Well or tuple[float, float, float] or types.Point
+        :param location: Where to dispense into. If unspecified, the
+                         current position.
         :param rate: The relative plunger speed for this aspirate. During
                      this aspirate, the speed of the plunger will be
                      `rate` * :py:attr:`aspirate_speed`. If not specified,
                      defaults to 1.0 (speed will not be modified).
         :type rate: float
         :returns: This instance.
-
-        Examples
-        --------
-        ..
-        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
-        >>> robot.reset() # doctest: +SKIP
-        >>> plate = labware.load('96-flat', '3') # doctest: +SKIP
-        >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
-        # fill the pipette with liquid (200uL)
-        >>> p300.aspirate(plate[0]) # doctest: +SKIP
-        # dispense 50uL to a Well
-        >>> p300.dispense(50, plate[0]) # doctest: +SKIP
-        # dispense 50uL to the center of a well
-        >>> relative_vector = plate[1].center() # doctest: +SKIP
-        >>> p300.dispense(50, (plate[1], relative_vector)) # doctest: +SKIP
-        # dispense 20uL in place, at half the speed
-        >>> p300.dispense(20, rate=0.5) # doctest: +SKIP
-        # dispense the pipette's remaining volume (80uL) to a Well
-        >>> p300.dispense(plate[2]) # doctest: +SKIP
         """
-        where = self._get_point_and_cache(location, 'bottom')
         self._log.debug("dispense {} from {} at {}"
-                        .format(volume, where, rate))
-        self._ctx.move_to(self._mount, where, types.MotionStrategy.ARC)
+                        .format(volume,
+                                location if location else 'current position',
+                                rate))
+        if location:
+            self.move_to(location)
         self._hardware.dispense(self._mount, volume, rate)
         return self
 
@@ -446,55 +420,15 @@ class InstrumentContext:
                  **kwargs):
         raise NotImplementedError
 
-    def move_to(self,
-                location: geometry.Location,
-                strategy: Union[types.MotionStrategy, str] = None):
+    def move_to(self, location: types.Location):
         """ Move this pipette to a specific location on the deck.
 
-        :param location: Where to move to. This can be a :py:class:`.Well`, in
-                         which case the pipette will move to its
-                         :py:meth:`.Well.top`; a :py:class:`Labware`, in which
-                         case the pipette will move to the top of its first
-                         well; or a position, whether specified by the result
-                         of a call to something like :py:class:`.Well.top` or
-                         directly specified as a `tuple` or
-                         :py:attr:`types.Point` in
-                         :ref:`protocol-api-deck-coords`.
-        :type location: Well or tuple[float, float, float] or types.Point
-        :param strategy: How to move. This can be a member of
-                         :py:class:`types.MotionStrategy` or one of the strings
-                         `'arc'` and `'direct'` (with any capitalization).
-                         The `'arc'` strategy (default) will pick the head up
-                         on Z axis, then move over to the XY destination, then
-                         finally down to the Z destination. This avoids any
-                         obstacles, like labware, and is suitable for moving
-                         around between different areas on the deck. The
-                         `'direct'` strategy will simply move in a straight
-                         line from the current position to the destination,
-                         and is suitable for smaller motions, for instance
-                         plate streaking or custom touch tip implementations.
+        :param location: Where to dispense into. If unspecified, the
+                         current position.
         :raises ValueError: if an argument is incorrect.
         """
-        if None is strategy:
-            strategy = types.MotionStrategy.DIRECT
-        if strategy not in types.MotionStrategy:
-            # ignore the type here because mypy isn’t quite good enough
-            # to catch that if strategy is not in types.MotionStrategy
-            # it definitely isn’t an instance of types.MotionStrategy
-            name = strategy.upper()  # type: ignore
-            try:
-                checked_strategy = types.MotionStrategy[name]
-            except KeyError:
-                raise ValueError(
-                    "invalid motion strategy {}. Please use 'arc', 'direct'"
-                    "opentrons.types.MotionStrategy.ARC or "
-                    "opentrons.types.MotionStrategy.DIRECT"
-                    .format(strategy))
-        else:
-            # Same reason for the type: ignore as above
-            checked_strategy = strategy  # type: ignore
-        where = self._get_point_and_cache(location, 'top')
-        self._ctx.move_to(self._mount, where, checked_strategy)
+        self._log.debug("move to {}".format(location))
+        self._ctx.move_to(self._mount, location)
         return self
 
     @property
@@ -612,62 +546,6 @@ class InstrumentContext:
         """ View the information returned by the hardware API directly.
         """
         return self._hardware.attached_instruments[self._mount]
-
-    def _get_point_and_cache(self,
-                             location: Optional[geometry.Location],
-                             accessor: str) -> types.Point:
-        """ Take a location and turn it into a point, caching the labware.
-
-        This method resolves a :py:class:`.Point` in absolute coordinates.
-        If given a :py:class:`.Point` (or a 3-tuple of coordinates) it will
-        use the input directly; otherwise it will attempt to resolve a
-        :py:class:`.Well` (by taking the first well of a passed
-        :py:class:`.Labware` if necessary) and use the specified `accessor`
-        on it.
-
-        If `location` is `None` and there is a cached location, the cache
-        will be used.
-
-        If a :py:class:`.Well` could be resolved (i.e. `location` was a
-        :py:class:`.Labware` or :py:class:`.Well` or it was `None` and there
-        was a cached location) the resolved :py:class:`.Well` will be cached.
-        If `location` did not resolve to a :py:class:`.Well` the location
-        cache will be invalidated.
-
-        If `location` is `None` and nothing is cached, raises.
-
-        :param location: The location to resolve (see above).
-        :param accessor: The name of the position accessor on
-                         :py:class:`.Well` (e.g. 'top' or 'bottom') to use
-                         on the eventually-resolved :py:class:`.Well`.
-        :raises RuntimeError: If `location` was `None` and no location is
-                              cached.
-        """
-        if None is location:
-            if self._last_location:
-                location = self._last_location
-            else:
-                raise RuntimeError(
-                    'Locationless move specified but no location cached')
-        if isinstance(location, Labware):
-            well: Optional[Well] = location.wells()[0]
-            point: types.Point = getattr(well, accessor)()
-        elif isinstance(location, Well):
-            well = location
-            point = getattr(well, accessor)()
-        elif isinstance(location, types.Point):
-            point = location
-            well = None
-        elif isinstance(location, tuple):
-            point = types.Point(location[0], location[1], location[2])
-            well = None
-        else:
-            raise TypeError(
-                'Bad location {}, must be None, Labware, Well, Point or tuple'
-                .format(location))
-
-        self._last_location = well
-        return point
 
     def __repr__(self):
         return '<{}: {} in {}>'.format(self.__class__.__name__,

@@ -306,6 +306,17 @@ class API:
             plunger_ax: self._current_position[plunger_ax]
         }
 
+    def gantry_position(self, mount: top_types.Mount) -> top_types.Point:
+        """ Return the position of the critical point as pertains to the gantry
+
+        This ignores the plunger position and gives the Z-axis a predictable
+        name (as :py:attr:`.Point.z`).
+        """
+        cur_pos = self.current_position(mount)
+        return top_types.Point(x=cur_pos[Axis.X],
+                               y=cur_pos[Axis.Y],
+                               z=cur_pos[Axis.by_mount(mount)])
+
     @_log_call
     async def move_to(
             self, mount: top_types.Mount, abs_position: top_types.Point,
