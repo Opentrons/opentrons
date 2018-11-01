@@ -106,13 +106,22 @@ const makeEapField = (o: WifiAuthField) => ({
   required: o.required,
 })
 
+const getEapFields = (
+  eapOptions: WifiEapOptionsList,
+  name: string
+): Array<FieldProps> => {
+  const method = find(eapOptions, {name})
+  const options = method ? method.options : []
+  return options.map(makeEapField)
+}
+
 export default class ConnectForm extends React.Component<Props, State> {
   constructor (props: Props) {
     super(props)
     this.state = {showPassword: {}}
   }
 
-  onSubmit = (values: FormValues) => {
+  handleSubmit = (values: FormValues) => {
     const {ssid: knownSsid, configure, close} = this.props
     const ssid = this.getSsid(values)
     const securityType = this.getSecurityType(values)
@@ -132,7 +141,7 @@ export default class ConnectForm extends React.Component<Props, State> {
     })
   }
 
-  getValidationSchema = (values: FormValues) => {
+  validate = (values: FormValues) => {
     const {securityType: knownSecurityType} = this.props
 
     return this.getFields(values).reduce((errors, field) => {
@@ -191,8 +200,7 @@ export default class ConnectForm extends React.Component<Props, State> {
     if (securityType === WPA_PSK_SECURITY) {
       fields.push(PSK_FIELD_PROPS)
     } else if (securityType === WPA_EAP_SECURITY) {
-      const method = find(this.props.eapOptions, {name: getEapType(values)})
-      if (method) fields.push(...method.options.map(makeEapField))
+      fields.push(...getEapFields(this.props.eapOptions, getEapType(values)))
     }
 
     return fields
@@ -228,8 +236,8 @@ export default class ConnectForm extends React.Component<Props, State> {
 
     return (
       <Formik
-        onSubmit={this.onSubmit}
-        validate={this.getValidationSchema}
+        onSubmit={this.handleSubmit}
+        validate={this.validate}
         render={formProps => {
           const {
             values,
