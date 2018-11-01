@@ -15,7 +15,11 @@ type OP = {
   name: StepFieldName,
   pipetteFieldName: StepFieldName,
   labwareFieldName: StepFieldName,
-} & FocusHandlers
+  onFieldBlur: $PropertyType<FocusHandlers, 'onFieldBlur'>,
+  onFieldFocus: $PropertyType<FocusHandlers, 'onFieldFocus'>,
+  focusedField: $PropertyType<FocusHandlers, 'focusedField'>,
+  dirtyFields: $PropertyType<FocusHandlers, 'dirtyFields'>,
+}
 
 type SP = {
   isMulti: $PropertyType<Props, 'isMulti'>,

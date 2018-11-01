@@ -41,7 +41,7 @@ const FORM_ERRORS: {[FormErrorKey]: FormError} = {
   },
   TIME_PARAM_REQUIRED: {
     title: 'Must include hours, minutes, or seconds',
-    dependentFields: ['pauseFormAmountOfTime'],
+    dependentFields: ['pauseForAmountOfTime'],
   },
   WELL_RATIO_TRANSFER: {
     title: 'In transfer actions the number of source and destination wells must match',

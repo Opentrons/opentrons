@@ -5,7 +5,7 @@ import WellSelectionModal from './WellSelectionModal'
 import {Portal} from '../../portals/MainPageModalPortal'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import styles from '../StepEditForm.css'
-import { FocusHandlers } from '../index'
+import type { FocusHandlers } from '../index'
 
 type Props = {
   name: StepFieldName,
@@ -15,7 +15,9 @@ type Props = {
   isMulti: ?boolean,
   pipetteId: ?string,
   labwareId: ?string,
-} & FocusHandlers
+  onFieldBlur: $PropertyType<FocusHandlers, 'onFieldBlur'>,
+  onFieldFocus: $PropertyType<FocusHandlers, 'onFieldFocus'>,
+}
 
 type State = {isModalOpen: boolean}
 
