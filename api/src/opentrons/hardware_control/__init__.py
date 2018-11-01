@@ -293,6 +293,8 @@ class API:
         This returns cached position to avoid hitting the smoothie driver
         unless ``refresh`` is ``True``.
         """
+        if not self._current_position:
+            raise MustHomeError
         if mount == mount.RIGHT:
             offset = top_types.Point(0, 0, 0)
         else:

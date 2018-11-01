@@ -197,39 +197,27 @@ class ProtocolContext:
         """
         self._hardware.update_config(**kwargs)
 
-    def move_to(self, mount: types.Mount,
-                location: types.Location):
-        """ Implement motions of the robot.
-
-        This should not need to be called by the user; it is called by
-        :py:meth:`InstrumentContext.move_to` (and thus all other
-        :py:class:`InstrumentContext` methods that involve moving, such as
-        :py:meth:`InstrumentContext.aspirate`) to move the pipettes around.
-
-        It encapsulates location caching and ensures that all moves are safe.
-        It does this by taking a :py:class:`.types.Location` that can have
-        a position attached to it, and its behavior depends on the state of
-        that location cache and the passed location.
-        """
-        if self._location_cache:
-            from_lw = self._location_cache.labware
-        else:
-            from_lw = None
-        from_loc = types.Location(self._hardware.gantry_position(mount),
-                                  from_lw)
-        moves = geometry.plan_moves(from_loc, location, self._deck_layout)
-        self._log.debug("planned moves for {}->{}: {}"
-                        .format(from_loc, location, moves))
-        self._location_cache = location
-        self._last_moved_instrument = mount
-        for move in moves:
-            self._hardware.move_to(mount, move)
-
     def home(self):
         """ Homes the robot.
         """
         self._log.debug("home")
         self._hardware.home()
+
+    @property
+    def location_cache(self) -> Optional[types.Location]:
+        """ The cache used by the robot to determine where it last was.
+        """
+        return self._location_cache
+
+    @location_cache.setter
+    def location_cache(self, loc: Optional[types.Location]):
+        self._location_cache = loc
+
+    @property
+    def deck(self) -> geometry.Deck:
+        """ The object holding the deck layout of the robot.
+        """
+        return self._deck_layout
 
     @staticmethod
     def _build_hardware_adapter(
@@ -434,13 +422,22 @@ class InstrumentContext:
         raise NotImplementedError
 
     def move_to(self, location: types.Location):
-        """ Move this pipette to a specific location on the deck.
+        """ Move the instrument.
 
-        :param location: Where to move to.
-        :raises ValueError: if an argument is incorrect.
+        :param location: The location to move to.
         """
-        self._log.debug("move to {}".format(location))
-        self._ctx.move_to(self._mount, location)
+        if self._ctx.location_cache:
+            from_lw = self._ctx.location_cache.labware
+        else:
+            from_lw = None
+        from_loc = types.Location(self._hardware.gantry_position(self._mount),
+                                  from_lw)
+        moves = geometry.plan_moves(from_loc, location, self._ctx.deck)
+        self._log.debug("move {}->{}: {}"
+                        .format(from_loc, location, moves))
+        self._ctx.location_cache = location
+        for move in moves:
+            self._hardware.move_to(self._mount, move)
         return self
 
     @property
