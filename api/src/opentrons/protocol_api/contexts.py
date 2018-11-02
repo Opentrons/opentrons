@@ -435,9 +435,14 @@ class InstrumentContext:
         moves = geometry.plan_moves(from_loc, location, self._ctx.deck)
         self._log.debug("move {}->{}: {}"
                         .format(from_loc, location, moves))
-        self._ctx.location_cache = location
-        for move in moves:
-            self._hardware.move_to(self._mount, move)
+        try:
+            for move in moves:
+                self._hardware.move_to(self._mount, move)
+        except Exception:
+            self._ctx.location_cache = None
+            raise
+        else:
+            self._ctx.location_cache = location
         return self
 
     @property

@@ -76,7 +76,7 @@ def test_location_cache(loop, monkeypatch, load_my_labware):
     assert test_args[0].point == Point(418, 353, 205)
     assert test_args[0].labware is None
 
-    # kOnce we have a location cache, that should be our from_loc
+    # Once we have a location cache, that should be our from_loc
     right.move_to(lw.wells()[1].top())
     assert test_args[0].labware == lw.wells()[0]
 

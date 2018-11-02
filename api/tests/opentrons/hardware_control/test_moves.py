@@ -195,7 +195,7 @@ async def test_deck_cal_applied(monkeypatch, loop):
     assert called_with['Z'] == 30
 
 
-async def test_other_mount_retracted(hardware_api, monkeypatch):
+async def test_other_mount_retracted(hardware_api):
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
     assert hardware_api.gantry_position(types.Mount.RIGHT)\
