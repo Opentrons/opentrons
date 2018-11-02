@@ -16,27 +16,26 @@ import type {SubstepItemData} from '../steplist/types'
 
 type AllSubsteps = {[StepIdType]: ?SubstepItemData}
 export const allSubsteps: Selector<AllSubsteps> = createSelector(
-  steplistSelectors.validatedForms,
+  steplistSelectors.getArgsAndErrorsByStepId,
   pipetteSelectors.equippedPipettes,
   labwareIngredSelectors.getLabwareTypes,
   steplistSelectors.orderedSteps,
   fileDataSelectors.robotStateTimeline,
   fileDataSelectors.getInitialRobotState,
   (
-    validatedForms,
+    allStepArgsAndErrors,
     allPipetteData,
     allLabwareTypes,
     orderedSteps,
     robotStateTimeline,
     _initialRobotState,
   ) => {
-    return orderedSteps
-    .reduce((acc: AllSubsteps, stepId, timelineIndex) => {
+    return orderedSteps.reduce((acc: AllSubsteps, stepId, timelineIndex) => {
       const timeline = [{robotState: _initialRobotState}, ...robotStateTimeline.timeline]
       const robotState = timeline[timelineIndex] && timeline[timelineIndex].robotState
 
       const substeps = generateSubsteps(
-        validatedForms[stepId],
+        allStepArgsAndErrors[stepId],
         allPipetteData,
         (labwareId: string) => allLabwareTypes[labwareId],
         robotState,

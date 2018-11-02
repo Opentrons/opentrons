@@ -4,15 +4,18 @@ import reduce from 'lodash/reduce'
 import get from 'lodash/get'
 import {getPipetteModels, getPipette, getLabware} from '@opentrons/shared-data'
 
-import type {BaseState, Selector} from '../types'
 import type {DropdownOption} from '@opentrons/components'
 import type {PipetteData} from '../step-generation'
+import type {RootState} from './reducers'
 
 type PipettesById = {[pipetteId: string]: PipetteData}
+type RootSlice = {pipettes: RootState}
 
-const rootSelector = (state: BaseState) => state.pipettes.pipettes
+type Selector<T> = (RootSlice) => T
 
-export const pipettesById = createSelector(
+export const rootSelector = (state: {pipettes: RootState}) => state.pipettes
+
+export const pipettesById: Selector<PipettesById> = createSelector(
   rootSelector,
   pipettes => pipettes.byId
 )
@@ -54,7 +57,7 @@ export const equippedPipetteOptions: Selector<Array<DropdownOption>> = createSel
           },
         ]
         : acc,
-      [])
+    [])
   }
 )
 

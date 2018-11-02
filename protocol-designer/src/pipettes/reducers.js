@@ -42,42 +42,30 @@ function createPipette (
   }
 }
 
-export type PipetteReducerState = {
-  byMount: {|
-    left: ?string,
-    right: ?string,
-  |},
-  byId: {
-    [pipetteId: string]: PipetteData,
-  },
-}
+export type PipetteIdByMount = {|
+  left: ?string,
+  right: ?string,
+|}
 
-const pipettes = handleActions({
-  LOAD_FILE: (state: PipetteReducerState, action: LoadFileAction): PipetteReducerState => {
+export type PipetteById = {[pipetteId: string]: PipetteData}
+
+const byId = handleActions({
+  LOAD_FILE: (state: PipetteById, action: LoadFileAction): PipetteById => {
     const file = action.payload
     const {pipettes} = file
     // TODO: Ian 2018-06-29 create fns to access ProtocolFile data
     const {pipetteTiprackAssignments} = file['designer-application'].data
-    const pipetteIds = Object.keys(pipettes)
-    return {
-      byMount: {
-        left: pipetteIds.find(id => pipettes[id].mount === 'left'),
-        right: pipetteIds.find(id => pipettes[id].mount === 'right'),
-      },
-      byId: reduce(
-        pipettes,
-        (acc: {[pipetteId: string]: PipetteData}, p: FilePipette, id: string) => {
-          const newPipette = createPipette(p.mount, p.model, pipetteTiprackAssignments[id], id)
-          return newPipette
-            ? {...acc, [id]: newPipette}
-            : acc
-        }, {}),
-    }
+    return reduce(pipettes, (acc: {[pipetteId: string]: PipetteData}, p: FilePipette, id: string) => {
+      const newPipette = createPipette(p.mount, p.model, pipetteTiprackAssignments[id], id)
+      return newPipette
+        ? {...acc, [id]: newPipette}
+        : acc
+    }, {})
   },
   CREATE_NEW_PROTOCOL: (
-    state: PipetteReducerState,
+    state: PipetteById,
     action: {payload: NewProtocolFields}
-  ): PipetteReducerState => {
+  ): PipetteById => {
     const {left, right} = action.payload
 
     const leftPipette = (left.pipetteModel && left.tiprackModel)
@@ -88,7 +76,7 @@ const pipettes = handleActions({
       ? createPipette('right', right.pipetteModel, right.tiprackModel)
       : null
 
-    const newPipettes = ([leftPipette, rightPipette]).reduce(
+    const newPipettes: PipetteById = ([leftPipette, rightPipette]).reduce(
       (acc: {[string]: PipetteData}, pipette: ?PipetteData) => {
         if (!pipette) return acc
         return {
@@ -98,41 +86,65 @@ const pipettes = handleActions({
       }, {})
 
     return {
-      byMount: {
-        left: leftPipette ? leftPipette.id : state.byMount.left,
-        right: rightPipette ? rightPipette.id : state.byMount.right,
-      },
-      byId: {
-        ...state.byId,
-        ...newPipettes,
-      },
+      ...state,
+      ...newPipettes,
     }
   },
   SWAP_PIPETTES: (
-    state: PipetteReducerState,
+    state: PipetteById,
     action: {payload: NewProtocolFields}
-  ): PipetteReducerState => {
-    const byId = mapValues(state.byId, (pipette: PipetteData): PipetteData => ({
+  ): PipetteById => {
+    return mapValues(state, (pipette: PipetteData): PipetteData => ({
       ...pipette,
       mount: (pipette.mount === 'left') ? 'right' : 'left',
     }))
-
-    return ({
-      byMount: {
-        left: state.byMount.right,
-        right: state.byMount.left,
-      },
-      byId,
-    })
   },
-}, {byMount: {left: null, right: null}, byId: {}})
+}, {})
+
+const byMount = handleActions({
+  LOAD_FILE: (state: PipetteIdByMount, action: LoadFileAction): PipetteIdByMount => {
+    const file = action.payload
+    const {pipettes} = file
+    // TODO: Ian 2018-06-29 create fns to access ProtocolFile data
+    const pipetteIds = Object.keys(pipettes)
+    return {
+      left: pipetteIds.find(id => pipettes[id].mount === 'left'),
+      right: pipetteIds.find(id => pipettes[id].mount === 'right'),
+    }
+  },
+  CREATE_NEW_PROTOCOL: (
+    state: PipetteIdByMount,
+    action: {payload: NewProtocolFields}
+  ): PipetteIdByMount => {
+    const {left, right} = action.payload
+
+    const leftPipette = (left.pipetteModel && left.tiprackModel)
+      ? createPipette('left', left.pipetteModel, left.tiprackModel)
+      : null
+
+    const rightPipette = (right.pipetteModel && right.tiprackModel)
+      ? createPipette('right', right.pipetteModel, right.tiprackModel)
+      : null
+
+    return {
+      left: leftPipette ? leftPipette.id : state.left,
+      right: rightPipette ? rightPipette.id : state.right,
+    }
+  },
+  SWAP_PIPETTES: (state: PipetteIdByMount, action: {payload: NewProtocolFields}): PipetteIdByMount => ({
+    left: state.right,
+    right: state.left,
+  }),
+}, {left: null, right: null})
 
 const _allReducers = {
-  pipettes,
+  byMount,
+  byId,
 }
 
 export type RootState = {
-  pipettes: PipetteReducerState,
+  byId: PipetteById,
+  byMount: PipetteIdByMount,
 }
 
 export const rootReducer = combineReducers(_allReducers)

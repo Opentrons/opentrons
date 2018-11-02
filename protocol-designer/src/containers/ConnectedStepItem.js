@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
+import isEmpty from 'lodash/isEmpty'
 import type {BaseState, ThunkDispatch} from '../types'
 
 import type {SubstepIdentifier} from '../steplist/types'
@@ -40,8 +41,8 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const hoveredStep = steplistSelectors.getHoveredStepId(state)
   const selected = steplistSelectors.getSelectedStepId(state) === stepId
   const collapsed = steplistSelectors.getCollapsedSteps(state)[stepId]
-
-  const hasError = fileDataSelectors.getErrorStepId(state) === stepId
+  const formAndFieldErrors = steplistSelectors.getFormAndFieldErrorsByStepId(state)[stepId]
+  const hasError = fileDataSelectors.getErrorStepId(state) === stepId || !isEmpty(formAndFieldErrors)
   const warnings = (typeof stepId === 'number') // TODO: Ian 2018-07-13 remove when stepId always number
     ? dismissSelectors.getTimelineWarningsPerStep(state)[stepId]
     : []

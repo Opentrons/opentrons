@@ -191,7 +191,7 @@ export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdo
       name={name}
       focusedField={focusedField}
       dirtyFields={dirtyFields}
-      render={({value, updateValue}) => {
+      render={({value, updateValue, errorToShow}) => {
         // blank out the dropdown if labware id does not exist
         const availableLabwareIds = labwareOptions.map(opt => opt.value)
         const fieldValue = availableLabwareIds.includes(value)
@@ -199,6 +199,7 @@ export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdo
           : null
         return (
           <DropdownField
+            error={errorToShow}
             className={className}
             options={labwareOptions}
             onBlur={() => { onFieldBlur(name) }}

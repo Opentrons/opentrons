@@ -6,12 +6,15 @@ import type {StepFieldName} from '../fieldLevel'
 /*******************
 ** Error Messages **
 ********************/
-export type FormErrorKey = 'INCOMPATIBLE_ASPIRATE_LABWARE'
+export type FormErrorKey =
+  | 'INCOMPATIBLE_ASPIRATE_LABWARE'
   | 'INCOMPATIBLE_DISPENSE_LABWARE'
   | 'INCOMPATIBLE_LABWARE'
   | 'WELL_RATIO_TRANSFER'
   | 'WELL_RATIO_CONSOLIDATE'
   | 'WELL_RATIO_DISTRIBUTE'
+  | 'PAUSE_TYPE_REQUIRED'
+  | 'TIME_PARAM_REQUIRED'
 
 export type FormError = {
   title: string,
@@ -31,6 +34,14 @@ const FORM_ERRORS: {[FormErrorKey]: FormError} = {
   INCOMPATIBLE_LABWARE: {
     title: 'Selected labware may be incompatible with selected pipette',
     dependentFields: ['labware', 'pipette'],
+  },
+  PAUSE_TYPE_REQUIRED: {
+    title: 'Must either pause for amount of time, or until told to resume',
+    dependentFields: ['pauseForAmountOfTime'],
+  },
+  TIME_PARAM_REQUIRED: {
+    title: 'Must include hours, minutes, or seconds',
+    dependentFields: ['pauseForAmountOfTime'],
   },
   WELL_RATIO_TRANSFER: {
     title: 'In transfer actions the number of source and destination wells must match',
@@ -72,6 +83,24 @@ export const incompatibleAspirateLabware = (fields: HydratedFormData): ?FormErro
   const {aspirate_labware, pipette} = fields
   if (!aspirate_labware || !pipette) return null
   return (!canPipetteUseLabware(pipette.model, aspirate_labware.type)) ? FORM_ERRORS.INCOMPATIBLE_ASPIRATE_LABWARE : null
+}
+
+export const pauseForTimeOrUntilTold = (fields: HydratedFormData): ?FormError => {
+  const {pauseForAmountOfTime, pauseHour, pauseMinute, pauseSecond} = fields
+  if (pauseForAmountOfTime === 'true') {
+    // user selected pause for amount of time
+    const hours = parseFloat(pauseHour) || 0
+    const minutes = parseFloat(pauseMinute) || 0
+    const seconds = parseFloat(pauseSecond) || 0
+    const totalSeconds = hours * 3600 + minutes * 60 + seconds
+    return totalSeconds <= 0 ? FORM_ERRORS.TIME_PARAM_REQUIRED : null
+  } else if (pauseForAmountOfTime === 'false') {
+    // user selected pause until resume
+    return null
+  } else {
+    // user selected neither pause until resume nor pause for amount of time
+    return FORM_ERRORS.PAUSE_TYPE_REQUIRED
+  }
 }
 
 export const wellRatioTransfer = (fields: HydratedFormData): ?FormError => {

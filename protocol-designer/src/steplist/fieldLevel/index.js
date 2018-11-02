@@ -4,6 +4,7 @@ import {selectors as pipetteSelectors} from '../../pipettes'
 import {
   requiredField,
   minimumWellCount,
+  nonZero,
   composeErrors,
 } from './errors'
 import {
@@ -16,18 +17,23 @@ import {
   type ValueProcessor,
 } from './processing'
 import type {StepFieldName} from './types'
-import type {BaseState} from '../../types'
+import type {StepFormContextualState} from '../types'
 
 export type {
   StepFieldName,
 }
 
-const hydrateLabware = (state, id) => (labwareIngredSelectors.getLabware(state)[id])
+const hydrateLabware = (state: StepFormContextualState, id: string) => (
+  labwareIngredSelectors.getLabware(state)[id]
+)
+const hydratePipette = (state: StepFormContextualState, id: string) => (
+  pipetteSelectors.pipettesById(state)[id]
+)
 
 type StepFieldHelpers = {
   getErrors?: (mixed) => Array<string>,
   processValue?: ValueProcessor,
-  hydrate?: (state: BaseState, id: string) => mixed,
+  hydrate?: (state: StepFormContextualState, id: string) => mixed,
 }
 const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
   'aspirate_airGap_volume': { processValue: composeProcessors(castToFloat, onlyPositiveNumbers) },
@@ -36,6 +42,10 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
     hydrate: hydrateLabware,
   },
   'aspirate_mix_volume': { processValue: composeProcessors(castToFloat, onlyPositiveNumbers) },
+  'aspirate_wells': {
+    getErrors: composeErrors(requiredField, minimumWellCount(1)),
+    processValue: defaultTo([]),
+  },
   'dispense_delayMinutes': {
     processValue: composeProcessors(castToNumber, defaultTo(0)),
   },
@@ -48,7 +58,7 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
   },
   'dispense_mix_volume': { processValue: composeProcessors(castToFloat, onlyPositiveNumbers) },
   'dispense_wells': {
-    getErrors: composeErrors(minimumWellCount(1)),
+    getErrors: composeErrors(requiredField, minimumWellCount(1)),
     processValue: defaultTo([]),
   },
   'aspirate_disposalVol_volume': {
@@ -69,18 +79,18 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
   },
   'pipette': {
     getErrors: composeErrors(requiredField),
-    hydrate: (state, id) => pipetteSelectors.pipettesById(state)[id],
+    hydrate: hydratePipette,
   },
   'times': {
     getErrors: composeErrors(requiredField),
     processValue: composeProcessors(castToNumber, onlyPositiveNumbers, onlyIntegers, defaultTo(0)),
   },
   'volume': {
-    getErrors: composeErrors(requiredField),
+    getErrors: composeErrors(requiredField, nonZero),
     processValue: composeProcessors(castToFloat, onlyPositiveNumbers, defaultTo(0)),
   },
   'wells': {
-    getErrors: composeErrors(minimumWellCount(1)),
+    getErrors: composeErrors(requiredField, minimumWellCount(1)),
     processValue: defaultTo([]),
   },
 }
@@ -96,7 +106,7 @@ export const processField = (name: StepFieldName, value: mixed): ?mixed => {
   return fieldProcessor ? fieldProcessor(value) : value
 }
 
-export const hydrateField = (state: BaseState, name: StepFieldName, value: string): ?mixed => {
+export const hydrateField = (state: StepFormContextualState, name: StepFieldName, value: string): ?mixed => {
   const hydrator = stepFieldHelperMap[name] && stepFieldHelperMap[name].hydrate
   return hydrator ? hydrator(state, value) : value
 }
