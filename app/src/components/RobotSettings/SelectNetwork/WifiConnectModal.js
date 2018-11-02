@@ -3,6 +3,7 @@
 import * as React from 'react'
 
 import type {
+  WifiConfigureRequest,
   WifiConfigureResponse,
   ApiRequestError,
 } from '../../../http-api-client'
@@ -12,22 +13,25 @@ import {ErrorModal} from '../../modals'
 
 type Props = {
   close: () => mixed,
-  error: ?ApiRequestError,
+  request: WifiConfigureRequest,
   response: ?WifiConfigureResponse,
+  error: ?ApiRequestError,
 }
 
-const SUCCESS_TITLE = 'Successfully connected to '
-const FAILURE_TITLE = 'Could not join network'
+const SUCCESS_TITLE = 'Successfully connected to Wi-Fi'
+const FAILURE_TITLE = 'Unable to connect to Wi-Fi'
 
-const SUCCESS_MESSAGE =
-  'Your robot has successfully connected to WiFi and should appear in the robot list shortly. If not, try refreshing the list manually or rebooting the robot.'
-const FAILURE_MESSAGE =
-  'The robot was unable to connect to the selected WiFi network. Please double check your network credentials.'
+const success = ssid =>
+  `Your robot has successfully connected to Wi-Fi network ${ssid}.`
+
+const failure = ssid =>
+  `Your robot was unable to connect to ${ssid}. Please double-check your network credentials.`
 
 const ERROR_MESSAGE_RE = /Error: (.*)$/
 
 export default function WifiConnectModal (props: Props) {
-  const {response, error, close} = props
+  const {request, response, error, close} = props
+  const {ssid} = request
 
   if (error || !response) {
     let errorMessage = 'An unknown error occurred'
@@ -46,7 +50,7 @@ export default function WifiConnectModal (props: Props) {
     return (
       <ErrorModal
         heading={FAILURE_TITLE}
-        description={FAILURE_MESSAGE}
+        description={failure(ssid)}
         close={close}
         error={modalError}
       />
@@ -56,12 +60,12 @@ export default function WifiConnectModal (props: Props) {
   return (
     <AlertModal
       iconName="wifi"
-      heading={`${SUCCESS_TITLE} ${response.ssid}`}
+      heading={SUCCESS_TITLE}
       onCloseClick={close}
       buttons={[{onClick: close, children: 'close'}]}
       alertOverlay
     >
-      {SUCCESS_MESSAGE}
+      {success(ssid)}
     </AlertModal>
   )
 }

@@ -20,6 +20,7 @@ import {
 } from '../../../http-api-client'
 
 import {startDiscovery} from '../../../discovery'
+import {chainActions} from '../../../util'
 
 import {IntervalWrapper, SpinnerModal} from '@opentrons/components'
 import {Portal} from '../../portal'
@@ -47,19 +48,18 @@ type SP = {|
   connectingTo: ?string,
   eapOptions: ?WifiEapOptionsList,
   keys: ?WifiKeysList,
-  configError: ?ApiRequestError,
+  configRequest: ?WifiConfigureRequest,
   configResponse: ?WifiConfigureResponse,
+  configError: ?ApiRequestError,
 |}
 
 type DP = {|
-  fetchList: () => mixed,
   fetchEapOptions: () => mixed,
   fetchKeys: () => mixed,
   addKey: (file: File) => mixed,
   configure: WifiConfigureRequest => mixed,
   refresh: () => mixed,
-  clearSuccessfulConfigure: () => mixed,
-  clearFailedConfigure: () => mixed,
+  clearConfigure: () => mixed,
 |}
 
 type Props = {...$Exact<OP>, ...SP, ...DP}
@@ -115,18 +115,18 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
       connectingTo,
       eapOptions,
       keys,
-      fetchList,
+      refresh,
       addKey,
       configure,
-      configError,
+      configRequest,
       configResponse,
-      clearSuccessfulConfigure,
-      clearFailedConfigure,
+      configError,
+      clearConfigure,
     } = this.props
     const {ssid, securityType, modalOpen} = this.state
 
     return (
-      <IntervalWrapper refresh={fetchList} interval={LIST_REFRESH_MS}>
+      <IntervalWrapper refresh={refresh} interval={LIST_REFRESH_MS}>
         <SelectSsid
           list={list}
           disabled={connectingTo != null}
@@ -156,13 +156,13 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
               />
             </ConnectModal>
           )}
-          {(!!configError || !!configResponse) && (
+          {configRequest &&
+            !!(configError || configResponse) && (
             <WifiConnectModal
               error={configError}
+              request={configRequest}
               response={configResponse}
-              close={
-                configError ? clearFailedConfigure : clearSuccessfulConfigure
-              }
+              close={clearConfigure}
             />
           )}
         </Portal>
@@ -195,6 +195,7 @@ function makeMapStateToProps (): (State, OP) => SP {
       keys: keysResponse && keysResponse.keys,
       connectingTo:
         !cfgError && cfgInProgress && cfgRequest ? cfgRequest.ssid : null,
+      configRequest: cfgRequest,
       configResponse: cfgResponse,
       configError: cfgError,
     }
@@ -203,27 +204,23 @@ function makeMapStateToProps (): (State, OP) => SP {
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   const {robot} = ownProps
-  const refresh = () => {
-    dispatch(fetchNetworkingStatus(robot))
-    dispatch(fetchWifiList(robot))
-  }
-  const clearConfigureAction = clearConfigureWifiResponse(robot)
-  const clearFailedConfigure = () => dispatch(clearConfigureAction)
-  const clearSuccessfulConfigure = () =>
-    Promise.resolve()
-      .then(refresh)
-      .then(() => dispatch(startDiscovery()))
-      .then(() => dispatch(clearConfigureAction))
+  const refreshActions = [fetchWifiList(robot), fetchNetworkingStatus(robot)]
+  const configure = params =>
+    dispatch(
+      chainActions(
+        configureWifi(robot, params),
+        startDiscovery(),
+        ...refreshActions
+      )
+    )
 
   return {
-    fetchList: () => dispatch(fetchWifiList(robot)),
+    configure,
+    clearConfigure: () => dispatch(clearConfigureWifiResponse(robot)),
     fetchEapOptions: () => dispatch(fetchWifiEapOptions(robot)),
     fetchKeys: () => dispatch(fetchWifiKeys(robot)),
     addKey: file => dispatch(addWifiKey(robot, file)),
-    configure: params => dispatch(configureWifi(robot, params)),
-    refresh,
-    clearSuccessfulConfigure,
-    clearFailedConfigure,
+    refresh: () => refreshActions.forEach(dispatch),
   }
 }
 
