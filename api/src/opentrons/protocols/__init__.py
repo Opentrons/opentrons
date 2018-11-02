@@ -17,8 +17,13 @@ def load_pipettes(protocol_data):
         model = props.get('model')
         mount = props.get('mount')
 
+        # TODO: Ian 2018-11-02 remove this HACK when backwards-compatability
+        # for JSON protocols with versioned pipettes is dropped
+        # (next JSON protocol schema major bump)
+        versionless_model = model.split('_v')[0]
+
         pipette_model_version = instruments.retrieve_version_number(
-            mount, model)
+            mount, versionless_model)
         config = pipette_config.load(pipette_model_version)
 
         pipette = instruments._create_pipette_from_config(
