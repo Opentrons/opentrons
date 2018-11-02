@@ -125,3 +125,9 @@ class Simulator:
             loop: Optional[asyncio.AbstractEventLoop])\
             -> modules.AbstractModule:
         return module
+
+    @property
+    def axis_bounds(self) -> Dict[str, Tuple[float, float]]:
+        """ The (minimum, maximum) bounds for each axis. """
+        return {ax: (0, pos) for ax, pos in _HOME_POSITION.items()
+                if ax not in 'BC'}
