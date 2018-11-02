@@ -17,7 +17,7 @@ def load_pipettes(protocol_data):
         model = props.get('model')
         mount = props.get('mount')
 
-        pipette_model_version = instruments._retrieve_version_number(
+        pipette_model_version = instruments.retrieve_version_number(
             mount, model)
         config = pipette_config.load(pipette_model_version)
 
