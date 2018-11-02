@@ -1,5 +1,5 @@
 // @flow
-import {sortWells} from '..'
+import {sortWells} from '../helpers'
 
 describe('sortWells', () => {
   test('single letters', () => {

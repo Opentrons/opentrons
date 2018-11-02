@@ -6,8 +6,7 @@ import reduce from 'lodash/reduce'
 import {connect} from 'react-redux'
 
 import {Modal, OutlineButton, LabeledValue} from '@opentrons/components'
-import {getPipetteNameSpecs} from '@opentrons/shared-data'
-import {sortWells} from '../../../utils'
+import {getPipetteNameSpecs, sortWells} from '@opentrons/shared-data'
 import type {BaseState, ThunkDispatch} from '../../../types'
 import {selectors as pipetteSelectors} from '../../../pipettes'
 
