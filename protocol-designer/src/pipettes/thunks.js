@@ -1,6 +1,5 @@
 // @flow
 import each from 'lodash/each'
-import findKey from 'lodash/findKey'
 
 import {selectors as steplistSelectors, actions as steplistActions} from '../steplist'
 import {reconcileFormPipette} from '../steplist/actions/handleFormChange'

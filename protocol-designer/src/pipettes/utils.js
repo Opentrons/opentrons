@@ -3,8 +3,6 @@ import {getPipette, getLabware} from '@opentrons/shared-data'
 
 import type {Mount} from '@opentrons/components'
 import type {PipetteData} from '../step-generation'
-import type {PipetteFields} from '../load-file'
-import type {PipetteReducerState} from './types'
 
 export function createPipette (
   mount: Mount,
