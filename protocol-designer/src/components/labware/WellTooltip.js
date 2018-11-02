@@ -10,7 +10,8 @@ import {Portal} from '../portals/TopPortal'
 
 import styles from './labware.css'
 
-const TOOLTIP_OFFSET = 22
+const DEFAULT_TOOLTIP_OFFSET = 22
+const WELL_BORDER_WIDTH = 4
 
 type WellTooltipParams = {
   makeHandleMouseOverWell: (wellName: string, wellIngreds: LocationLiquidState) => (e: SyntheticMouseEvent<*>) => void,
@@ -28,12 +29,14 @@ type State = {
   tooltipY: ?number,
   tooltipWellName: ?string,
   tooltipWellIngreds: ?LocationLiquidState,
+  tooltipOffset: ?number,
 }
 const initialState: State = {
   tooltipX: null,
   tooltipY: null,
   tooltipWellName: null,
   tooltipWellIngreds: null,
+  tooltipOffset: DEFAULT_TOOLTIP_OFFSET,
 }
 
 class WellTooltip extends React.Component<Props, State> {
@@ -50,6 +53,7 @@ class WellTooltip extends React.Component<Props, State> {
           tooltipY: top + (height / 2),
           tooltipWellName: wellName,
           tooltipWellIngreds: wellIngreds,
+          tooltipOffset: height / 2,
         })
       }
     }
@@ -60,7 +64,7 @@ class WellTooltip extends React.Component<Props, State> {
   }
 
   render () {
-    const {tooltipX, tooltipY} = this.state
+    const {tooltipX, tooltipY, tooltipOffset} = this.state
 
     return (
       <React.Fragment>
@@ -81,7 +85,7 @@ class WellTooltip extends React.Component<Props, State> {
             tooltipWellName: this.state.tooltipWellName,
           })}
           {this.state.tooltipWellName &&
-            <Popper modifiers={{offset: {offset: `0, ${TOOLTIP_OFFSET}`}}} >
+            <Popper modifiers={{offset: {offset: `0, ${tooltipOffset + (WELL_BORDER_WIDTH * 2)}`}}} >
               {({ref, style, placement, arrowProps}) => {
                 return (
                   <Portal>
