@@ -344,9 +344,7 @@ class API:
         if not self._current_position:
             raise MustHomeError
 
-        if mount != self._last_moved_mount and self._last_moved_mount:
-            await self.retract(self._last_moved_mount, 10)
-        self._last_moved_mount = mount
+        await self._cache_and_maybe_retract_mount(mount)
 
         z_axis = Axis.by_mount(mount)
         if mount == top_types.Mount.LEFT:
@@ -372,9 +370,7 @@ class API:
         if not self._current_position:
             raise MustHomeError
 
-        if mount != self._last_moved_mount and self._last_moved_mount:
-            await self.retract(self._last_moved_mount, 10)
-        self._last_moved_mount = mount
+        await self._cache_and_maybe_retract_mount(mount)
 
         z_axis = Axis.by_mount(mount)
         try:
@@ -389,6 +385,18 @@ class API:
         except KeyError:
             raise MustHomeError
         await self._move(target_position, speed=speed)
+
+    async def _cache_and_maybe_retract_mount(self, mount: top_types.Mount):
+        """ Retract the 'other' mount if necessary
+
+        If `mount` does not match the value in :py:attr:`_last_moved_mount`
+        (and :py:attr:`_last_moved_mount` exists) then retract the mount
+        in :py:attr:`_last_moved_mount`. Also unconditionally update
+        :py:attr:`_last_moved_mount` to contain `mount`.
+        """
+        if mount != self._last_moved_mount and self._last_moved_mount:
+            await self.retract(self._last_moved_mount, 10)
+        self._last_moved_mount = mount
 
     async def _move_plunger(self, mount: top_types.Mount, dist: float,
                             speed: float = None):
