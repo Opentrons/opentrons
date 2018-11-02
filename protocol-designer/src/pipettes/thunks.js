@@ -7,7 +7,7 @@ import {reconcileFormPipette} from '../steplist/actions/handleFormChange'
 import {selectors as pipetteSelectors} from '../pipettes'
 import type {ThunkDispatch, GetState} from '../types'
 import {updatePipettes} from './actions'
-import {createNewPipettesSlice} from './utils'
+import {createPipette} from './utils'
 import type {EditPipettesFields} from './types'
 
 // TODO: BC 2018-10-24 this thunk exists because of the extra work our pipette
@@ -23,24 +23,28 @@ export const editPipettes = (payload: EditPipettesFields) =>
     const prevPipettesByMount = pipetteSelectors.pipettesByMount(state)
     const savedForms = steplistSelectors.getSavedForms(state)
 
-    const nextPipettesSlice = createNewPipettesSlice(state.pipettes.pipettes, payload.left, payload.right)
+    const {left: nextLeft, right: nextRight} = payload
+    const nextPipettesByMount = {
+      left: nextLeft.pipetteModel ? createPipette('left', nextLeft.pipetteModel, nextLeft.tiprackModel) : {},
+      right: nextRight.pipetteModel ? createPipette('right', nextRight.pipetteModel, nextRight.tiprackModel) : {},
+    }
 
-    each(savedForms, (formData, stepId) => {
-      const formPipetteMount = findKey(prevPipettesByMount, (pipetteData) => (
-        (pipetteData && pipetteData.id) === formData.pipette
-      ))
-      if (formData.pipette && formPipetteMount) {
-        const nextPipetteId = nextPipettesSlice.byMount[formPipetteMount]
-        const nextChannels = nextPipettesSlice.byId[nextPipetteId] && nextPipettesSlice.byId[nextPipetteId].channels
-        dispatch(steplistActions.changeSavedStepForm({
-          stepId,
-          update: {
-            ...reconcileFormPipette(formData, state, nextPipetteId, nextChannels),
-            pipette: nextPipetteId || null,
-          },
-        }))
+    each(nextPipettesByMount, (nextPipette, mount) => {
+      const prevPipette = prevPipettesByMount[mount]
+      if (prevPipette && prevPipette.id !== nextPipette.id) {
+        each(savedForms, (formData, stepId) => {
+          if (formData.pipette === prevPipette.id) {
+            dispatch(steplistActions.changeSavedStepForm({
+              stepId,
+              update: {
+                ...reconcileFormPipette(formData, state, nextPipette.id, nextPipette.nextChannels),
+                pipette: nextPipette.id || null,
+              },
+            }))
+          }
+        })
       }
     })
 
-    dispatch(updatePipettes(nextPipettesSlice))
+    dispatch(updatePipettes(nextPipettesByMount))
   }

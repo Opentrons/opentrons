@@ -7,39 +7,8 @@ import reduce from 'lodash/reduce'
 import type {LoadFileAction, NewProtocolFields} from '../load-file'
 import type {PipetteData} from '../step-generation'
 import type {FilePipette} from '../file-types'
-import {createPipette, createNewPipettesSlice} from './utils'
+import {createPipette} from './utils'
 import type {PipetteReducerState, UpdatePipettesAction} from './types'
-
-function createPipette (
-  mount: Mount,
-  model: string,
-  tiprackModel: ?string,
-  overrideId?: string
-): ?PipetteData {
-  const id = overrideId || `pipette:${model}:${uuid()}`
-  const pipetteData = getPipette(model)
-
-  if (!pipetteData) {
-    console.error(`Pipette ${id} - model '${model}' does not exist in shared-data`)
-    return null
-  }
-  if (!tiprackModel) {
-    console.error(`Pipette ${id} - no tiprackModel assigned. Skipping pipette creation.`)
-    return null
-  }
-  if (!getLabware(tiprackModel)) {
-    console.error(`Pipette ${id} - tiprackModel '${tiprackModel}' does not exist in shared-data`)
-    return null
-  }
-  return {
-    id,
-    model,
-    mount,
-    maxVolume: pipetteData.nominalMaxVolumeUl,
-    channels: pipetteData.channels,
-    tiprackModel,
-  }
-}
 
 export type PipetteIdByMount = {|
   left: ?string,
@@ -61,35 +30,9 @@ const byId = handleActions({
         : acc
     }, {})
   },
-  EDIT_PIPETTES: (
-    state: PipetteById,
-    action: {payload: NewProtocolFields}
-  ): PipetteById => {
-    const {left, right} = action.payload
-
-    const leftPipette = (left.pipetteModel && left.tiprackModel)
-      ? createPipette('left', left.pipetteModel, left.tiprackModel)
-      : null
-
-    const rightPipette = (right.pipetteModel && right.tiprackModel)
-      ? createPipette('right', right.pipetteModel, right.tiprackModel)
-      : null
-
-    const newPipettes: PipetteById = ([leftPipette, rightPipette]).reduce(
-      (acc: {[string]: PipetteData}, pipette: ?PipetteData) => {
-        if (!pipette) return acc
-        return {
-          ...acc,
-          [pipette.id]: pipette,
-        }
-      }, {})
-
-    return {
-      ...state,
-      ...newPipettes,
-    }
-  },
-  UPDATE_PIPETTES: (state: PipetteReducerState, action: UpdatePipetteAction) => action.payload.byId,
+  UPDATE_PIPETTES: (state: PipetteById, action: UpdatePipettesAction) => (
+    reduce(action.payload, (acc, pipette) => ({...acc, [pipette.id]: pipette}), {})
+  ),
   CREATE_NEW_PROTOCOL: (
     state: PipetteById,
     action: {payload: NewProtocolFields}
@@ -140,7 +83,9 @@ const byMount = handleActions({
       right: pipetteIds.find(id => pipettes[id].mount === 'right'),
     }
   },
-  UPDATE_PIPETTES: (state: PipetteReducerState, action: UpdatePipetteAction) => action.payload.byMount,
+  UPDATE_PIPETTES: (state: PipetteReducerState, action: UpdatePipettesAction) => (
+    mapValues(action.payload, (pipette) => pipette.id)
+  ),
   CREATE_NEW_PROTOCOL: (
     state: PipetteIdByMount,
     action: {payload: NewProtocolFields}
@@ -172,8 +117,8 @@ const _allReducers = {
 }
 
 export type RootState = {
-  byId: PipetteById,
   byMount: PipetteIdByMount,
+  byId: PipetteById,
 }
 
 export const rootReducer = combineReducers(_allReducers)
