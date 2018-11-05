@@ -1,3 +1,4 @@
+import asyncio
 import os
 import logging
 from functools import lru_cache
@@ -967,3 +968,18 @@ class Robot(object):
         of the configuration.
         """
         self.config._replace(**kwargs)
+
+    async def update_firmware(self,
+                              filename,
+                              loop=None,
+                              explicit_modeset=True):
+        if self.is_simulating():
+            return
+        if loop is None:
+            checked_loop = asyncio.get_event_loop()
+        else:
+            checked_loop = loop
+        msg = await self._driver.update_firmware(
+            filename, checked_loop, explicit_modeset)
+        self.fw_version = self._driver.get_fw_version()
+        return msg

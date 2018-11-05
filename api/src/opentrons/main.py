@@ -5,7 +5,6 @@ import re
 from opentrons import HERE
 from opentrons import server
 from opentrons.server.main import build_arg_parser
-from opentrons.server.endpoints import update
 from argparse import ArgumentParser
 from opentrons import robot, __version__
 from opentrons.config import feature_flags as ff
@@ -113,9 +112,9 @@ def _find_smoothie_file():
 
 def _sync_do_smoothie_install(explicit_modeset, filename):
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(update._update_firmware(filename,
-                                                    loop,
-                                                    explicit_modeset))
+    loop.run_until_complete(robot.update_firmware(filename,
+                                                  loop,
+                                                  explicit_modeset))
 
 
 def initialize_robot():

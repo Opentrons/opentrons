@@ -1,3 +1,4 @@
+import asyncio
 from os import environ
 import logging
 from time import sleep
@@ -8,6 +9,7 @@ from serial.serialutil import SerialException
 
 from opentrons.drivers import serial_communication
 from opentrons.drivers.rpi_drivers import gpio
+from opentrons.system import smoothie_update
 '''
 - Driver is responsible for providing an interface for motion control
 - Driver is the only system component that knows about GCODES or how smoothie
@@ -1409,5 +1411,56 @@ class SmoothieDriver_3_0_0:
             sleep(0.25)
             gpio.set_high(gpio.OUTPUT_PINS['HALT'])
             sleep(0.25)
+
+    async def update_firmware(self,
+                              filename: str,
+                              loop: asyncio.AbstractEventLoop,
+                              explicit_modeset: bool = True) -> str:
+        """
+        Program the smoothie board with a given hex file.
+
+        If explicit_modeset is True (default), explicitly place the smoothie in
+        programming mode.
+
+        If explicit_modeset is False, assume the smoothie is already in
+        programming mode.
+        """
+        # ensure there is a reference to the port
+        if self.simulating:
+            return 'Did nothing (simulating)'
+
+        smoothie_update._ensure_programmer_executable()
+
+        if not self.is_connected():
+            self._connect_to_port()
+
+        # get port name
+        port = self._connection.port
+
+        if explicit_modeset:
+            # set smoothieware into programming mode
+            self._smoothie_programming_mode()
+            # close the port so other application can access it
+            self._connection.close()
+
+        # run lpc21isp, THIS WILL TAKE AROUND 1 MINUTE TO COMPLETE
+        update_cmd = 'lpc21isp -wipe -donotstart {0} {1} {2} 12000'.format(
+            filename, port, self._config.serial_speed)
+        proc = await asyncio.create_subprocess_shell(
+            update_cmd,
+            stdout=asyncio.subprocess.PIPE,
+            loop=loop)
+        rd: bytes = await proc.stdout.read()  # type: ignore
+        res = rd.decode().strip()
+        await proc.communicate()
+
+        # re-open the port
+        self._connection.open()
+        # reset smoothieware
+        self._smoothie_reset()
+        # run setup gcodes
+        self._setup()
+
+        return res
 
     # ----------- END Public interface ------------ #
