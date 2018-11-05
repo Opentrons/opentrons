@@ -460,10 +460,28 @@ class API:
         # Since target_position is an OrderedDict with the axes ordered by
         # (x, y, z, a, b, c), and we’ll only have one of a or z (as checked
         # by the len(to_transform) check above) we can use an enumerate to
-        # fuse the specified axes and the transformed values back together
+        # fuse the specified axes and the transformed values back together.
+        # While we do this iteration, we’ll also check axis bounds.
+        bounds = self._backend.axis_bounds
         for idx, ax in enumerate(target_position.keys()):
             if ax in Axis.gantry_axes():
                 smoothie_pos[ax.name] = transformed[idx]
+                if smoothie_pos[ax.name] < bounds[ax.name][0]\
+                   or smoothie_pos[ax.name] > bounds[ax.name][1]:
+                    deck_mins = self._deck_from_smoothie({ax: bound[0]
+                                                          for ax, bound
+                                                          in bounds.items()})
+                    deck_max = self._deck_from_smoothie({ax: bound[1]
+                                                         for ax, bound
+                                                         in bounds.items()})
+                    raise RuntimeError(
+                        "Out of bounds move: {}={} (transformed: {}) not in"
+                        "limits ({}, {}) (transformed: ({}, {})"
+                        .format(ax.name,
+                                target_position[ax],
+                                smoothie_pos[ax.name],
+                                deck_mins[ax], deck_max[ax],
+                                bounds[ax.name][0], bounds[ax.name][1]))
         try:
             self._backend.move(smoothie_pos, speed=speed)
         except Exception:
