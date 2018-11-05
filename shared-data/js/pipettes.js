@@ -1,7 +1,7 @@
 // @flow
 import mapValues from 'lodash/mapValues'
 import pipetteNameSpecs from '../robot-data/pipetteNameSpecs.json'
-import pipetteVersionSpecs from '../robot-data/pipetteModelSpecs.json'
+import pipetteModelSpecs from '../robot-data/pipetteModelSpecs.json'
 
 export type PipetteChannels = 1 | 8
 
@@ -53,10 +53,10 @@ export function getPipetteNameSpecs (model: string): ?PipetteNameSpecs {
 // both the name specs + model-specific specs
 // NOTE: this should NEVER be used in PD, which is model-agnostic
 export function getPipetteModelSpecs (versionedModel: string): ?PipetteModelSpecs {
-  const versionSpecificFields = pipetteVersionSpecs[versionedModel]
-  const modelFields = versionSpecificFields &&
-    getPipetteNameSpecs(versionSpecificFields.model)
-  return modelFields && {...modelFields, ...versionSpecificFields}
+  const modelSpecificFields = pipetteModelSpecs[versionedModel]
+  const modelFields = modelSpecificFields &&
+    getPipetteNameSpecs(modelSpecificFields.name)
+  return modelFields && {...modelFields, ...modelSpecificFields}
 }
 
 export function getAllPipetteNames (
