@@ -2,17 +2,19 @@
 
 Information about our pipettes is split into 2 different files.
 
+## Name Level: `pipetteNameSpecs.json`
+
+A pipette name is what is communicated with customers, what is listed in the store, etc. Name-level information does not vary across pipettes with the same "name", it includes: min and max volume, display name, number of channels, and default aspirate/dispense flow rates.
+
+The "name" is all that is communicated to the average user about a pipette. Both JSON and Python protocols specify pipettes by name; they never specify the pipette model/version.
+
+`"p10_single"` is an example of a name.
+
 ## Model Level: `pipetteModelSpecs.json`
 
-Model-level information does not vary across pipette models: min and max volume, display name, number of channels, and default aspirate/dispense flow rates.
+A "model" is synonymous with a part number. Our models / part numbers look like `"p10_single_v1.3"`. Although the name is a substring of the model string, it isn't a good idea to infer name by parsing it out of the model.
 
-The "model" is all that is communicated to the average user about a pipette. Both JSON and Python protocols specify pipettes by model; they never specify the pipette version.
-
-`"p10_single"` is an example of a model.
-
-## Version Level: `pipetteVersionSpecs.json`
-
-The version level contains information specific to particular pipette versions. A "versioned model" like `p10_single_v1.3` corresponds to a part number. The "versioned model" can be read off of a pipette's SD card at runtime. This information is required for protocol execution on the robot, but is not used in JSON or Python protocols.
+The model level contains information specific to particular pipette models. The model can be read off of a pipette's EEPROM at runtime. This information is required for protocol execution on the robot, but is not used directly in the code of JSON or Python protocols.
 
 # JSON Schemas
 

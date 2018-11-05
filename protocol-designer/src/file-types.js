@@ -11,6 +11,7 @@ type PipetteModel = string // TODO Ian 2018-05-11 use pipette-definitions model 
 
 export type FilePipette = {
   mount: Mount,
+  // TODO: Ian 2018-11-05 use 'name' not 'model'. Breaking change for JSON protocol files, see JSON schema TODO.
   model: PipetteModel,
 }
 

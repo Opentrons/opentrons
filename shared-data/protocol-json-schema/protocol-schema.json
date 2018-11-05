@@ -3,9 +3,9 @@
 
   "definitions": {
     "pipette-model": {
-      "description": "Special keyword specifying the (unversioned) model of the pipette. (Note: the major version number always matches the model name, and the minor version number is not specified in a protocol.)",
+      "description": "Special keyword specifying the name (not model) of the pipette. Should match a key in pipetteNameSpecsSchema.json",
       "type": "string",
-      "$comment": "TODO: Ian 2018-11-01 DEPRECATE the _v1* suffixes (breaking change)",
+      "$comment": "TODO: Ian 2018-11-01 DEPRECATE the _v1* suffixes (breaking change), and call this 'pipetteName' not 'model'",
       "enum": [
         "p10_single_v1",
         "p10_multi_v1",

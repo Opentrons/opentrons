@@ -1,8 +1,8 @@
 // @flow
 import compact from 'lodash/compact'
-import {getPipetteModelSpecs} from '@opentrons/shared-data'
+import {getPipetteNameSpecs} from '@opentrons/shared-data'
 
-const supportedPipetteModels = [
+const supportedPipetteNames = [
   'p10_single',
   'p10_multi',
   'p50_single',
@@ -14,7 +14,7 @@ const supportedPipetteModels = [
 
 // TODO: should a version of pipetteOptions be moved to shared-data,
 // and used for both PD and Run App?
-export const pipetteOptions = compact(supportedPipetteModels.map((model: string) => {
-  const pipette = getPipetteModelSpecs(model)
-  return pipette ? {name: pipette.displayName, value: pipette.model} : null
+export const pipetteOptions = compact(supportedPipetteNames.map((name: string) => {
+  const pipette = getPipetteNameSpecs(name)
+  return pipette ? {name: pipette.displayName, value: pipette.name} : null
 }))

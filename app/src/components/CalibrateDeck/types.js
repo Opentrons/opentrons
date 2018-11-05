@@ -1,6 +1,6 @@
 // @flow
 import type {Match} from 'react-router'
-import type {VersionedPipetteSpecs} from '@opentrons/shared-data'
+import type {PipetteModelSpecs} from '@opentrons/shared-data'
 import type {RobotService, Mount} from '../../robot'
 import type {DeckCalCommandState, DeckCalStartState} from '../../http-api-client'
 import type {Jog} from '../JogControls'
@@ -18,7 +18,7 @@ export type SP = {
   commandRequest: DeckCalCommandState,
   pipetteProps: ?{
     mount: Mount,
-    pipette: ?VersionedPipetteSpecs,
+    pipette: ?PipetteModelSpecs,
   },
 }
 
@@ -34,6 +34,6 @@ export type CalibrateDeckProps = OP & SP & DP
 export type CalibrateDeckStartedProps = CalibrateDeckProps & {
   exitUrl: string,
   mount: Mount,
-  pipette: VersionedPipetteSpecs,
+  pipette: PipetteModelSpecs,
   calibrationStep: CalibrationStep,
 }

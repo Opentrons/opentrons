@@ -1,18 +1,30 @@
 import Ajv from 'ajv'
+import nameSpecsSchema from '../../robot-data/schemas/pipetteNameSpecsSchema.json'
 import modelSpecsSchema from '../../robot-data/schemas/pipetteModelSpecsSchema.json'
-import versionSpecsSchema from '../../robot-data/schemas/pipetteVersionSpecsSchema.json'
+import pipetteNameSpecs from '../../robot-data/pipetteNameSpecs.json'
 import pipetteModelSpecs from '../../robot-data/pipetteModelSpecs.json'
-import pipetteVersionSpecs from '../../robot-data/pipetteVersionSpecs.json'
 
 const ajv = new Ajv({
   allErrors: true,
   jsonPointers: true,
 })
 
+const validateNameSpecs = ajv.compile(nameSpecsSchema)
 const validateModelSpecs = ajv.compile(modelSpecsSchema)
-const validateVersionSpecs = ajv.compile(versionSpecsSchema)
 
 describe('validate pipette specs with JSON schemas', () => {
+  test('ensure all pipette *NAME* specs match name JSON schema', () => {
+    const valid = validateNameSpecs(pipetteNameSpecs)
+    const validationErrors = validateNameSpecs.errors
+
+    if (validationErrors) {
+      console.log(JSON.stringify(validationErrors, null, 4))
+    }
+
+    expect(validationErrors).toBe(null)
+    expect(valid).toBe(true)
+  })
+
   test('ensure all pipette *MODEL* specs match model JSON schema', () => {
     const valid = validateModelSpecs(pipetteModelSpecs)
     const validationErrors = validateModelSpecs.errors
@@ -24,28 +36,16 @@ describe('validate pipette specs with JSON schemas', () => {
     expect(validationErrors).toBe(null)
     expect(valid).toBe(true)
   })
-
-  test('ensure all pipette *VERSION* specs match version JSON schema', () => {
-    const valid = validateVersionSpecs(pipetteVersionSpecs)
-    const validationErrors = validateVersionSpecs.errors
-
-    if (validationErrors) {
-      console.log(JSON.stringify(validationErrors, null, 4))
-    }
-
-    expect(validationErrors).toBe(null)
-    expect(valid).toBe(true)
-  })
 })
 
-describe('version -> model referencing', () => {
-  test('ensure all pipette version specs reference a valid pipette model', () => {
-    const versionKeys = Object.keys(pipetteVersionSpecs)
+describe('model -> name referencing', () => {
+  test('ensure all pipette model specs reference a valid pipette name', () => {
     const modelKeys = Object.keys(pipetteModelSpecs)
+    const nameKeys = Object.keys(pipetteNameSpecs)
 
-    versionKeys.forEach(version => {
-      const modelForVersion = pipetteVersionSpecs[version].model
-      expect(modelKeys).toContain(modelForVersion)
+    modelKeys.forEach(model => {
+      const nameForVersion = pipetteModelSpecs[model].name
+      expect(nameKeys).toContain(nameForVersion)
     })
   })
 })

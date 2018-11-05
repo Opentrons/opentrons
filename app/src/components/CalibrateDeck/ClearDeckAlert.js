@@ -3,7 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
 
-import type {PipetteModelSpecs} from '@opentrons/shared-data'
+import type {PipetteNameSpecs} from '@opentrons/shared-data'
 import type {Mount} from '../../robot'
 import type {CalibrateDeckProps} from './types'
 
@@ -12,7 +12,7 @@ import {deckCalibrationCommand as dcCommand} from '../../http-api-client'
 import ClearDeckAlertModal from '../ClearDeckAlertModal'
 
 type OP = CalibrateDeckProps & {
-  pipette: PipetteModelSpecs,
+  pipette: PipetteNameSpecs,
   mount: Mount,
 }
 

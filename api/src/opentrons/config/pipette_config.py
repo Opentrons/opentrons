@@ -7,8 +7,8 @@ from opentrons import __file__ as root_file
 
 
 root_dir = os.path.abspath(os.path.dirname(root_file))
-config_version_file = os.path.join(
-  root_dir, 'shared_data', 'robot-data', 'pipetteVersionSpecs.json')
+config_name_file = os.path.join(
+    root_dir, 'shared_data', 'robot-data', 'pipetteNameSpecs.json')
 config_model_file = os.path.join(
     root_dir, 'shared_data', 'robot-data', 'pipetteModelSpecs.json')
 log = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ Z_OFFSET_P300 = 0
 Z_OFFSET_P1000 = 20  # shortest single-channel pipette
 
 
-with open(config_version_file) as cfg_file:
+with open(config_model_file) as cfg_file:
     configs = list(json.load(cfg_file).keys())
 
 
@@ -65,21 +65,21 @@ def load(pipette_model: str) -> pipette_config:
     Lazily loads pipette config data from disk. This means that changes to the
     configuration data should be picked up on newly instantiated objects
     without requiring a restart. If :param pipette_model is not in the top-
-    level keys of the "pipetteVersionSpecs.json" file, this function will raise
+    level keys of the "pipetteModelSpecs.json" file, this function will raise
     a KeyError
-    :param pipette_model: a versioned pipette model string corresponding to a
-        top-level key in the "pipetteVersionSpecs.json" file
+    :param pipette_model: a pipette model string corresponding to a top-level
+        key in the "pipetteModelSpecs.json" file
     :return: a `pipette_config` instance
     """
-    with open(config_version_file) as version_cfg_file:
-        cfg = json.load(version_cfg_file)[pipette_model]
-
-    model_key = cfg.get('model')
-
-    # spread model keys into version-specific dict
     with open(config_model_file) as model_cfg_file:
-        model_data = json.load(model_cfg_file)[model_key]
-        cfg.update(model_data)
+        cfg = json.load(model_cfg_file)[pipette_model]
+
+    name_key = cfg.get('name')
+
+    # spread name keys into model-specific dict
+    with open(config_name_file) as name_cfg_file:
+        name_data = json.load(name_cfg_file)[name_key]
+        cfg.update(name_data)
 
     plunger_pos = cfg.get('plungerPositions', {})
 

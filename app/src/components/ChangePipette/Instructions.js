@@ -5,7 +5,7 @@ import capitalize from 'lodash/capitalize'
 
 import type {ChangePipetteProps} from './types'
 
-import {getPipetteChannelsByName} from '@opentrons/shared-data'
+import {getPipetteChannelsByDisplayName} from '@opentrons/shared-data'
 import {ModalPage, PrimaryButton, type ButtonProps} from '@opentrons/components'
 import PipetteSelection from './PipetteSelection'
 import InstructionStep from './InstructionStep'
@@ -53,7 +53,7 @@ function Steps (props: ChangePipetteProps) {
   const {direction} = props
   const channels = props.actualPipette
     ? props.actualPipette.channels
-    : getPipetteChannelsByName(props.wantedPipetteName)
+    : getPipetteChannelsByDisplayName(props.wantedPipetteName)
 
   let stepOne
   let stepTwo

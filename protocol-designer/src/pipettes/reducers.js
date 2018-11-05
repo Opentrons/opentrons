@@ -4,7 +4,7 @@ import {handleActions} from 'redux-actions'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import {uuid} from '../utils'
-import {getPipetteModelSpecs, getLabware} from '@opentrons/shared-data'
+import {getPipetteNameSpecs, getLabware} from '@opentrons/shared-data'
 
 import type {Mount} from '@opentrons/components'
 import type {LoadFileAction, NewProtocolFields} from '../load-file'
@@ -24,7 +24,7 @@ function createPipette (
   // (breaking change to schema), this version removal would be handled in schema migration.
 
   const id = overrideId || `pipette:${model}:${uuid()}`
-  const pipetteData = getPipetteModelSpecs(model)
+  const pipetteData = getPipetteNameSpecs(model)
 
   if (!pipetteData) {
     console.error(`Pipette ${id} - model '${model}' does not exist in shared-data`)

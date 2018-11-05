@@ -7,7 +7,7 @@ import type {PipettesResponse} from '../../http-api-client'
 import type {Pipette} from '../../robot'
 import {constants as robotConstants} from '../../robot'
 
-import {getVersionedPipetteSpecs} from '@opentrons/shared-data'
+import {getPipetteModelSpecs} from '@opentrons/shared-data'
 import {InstrumentGroup, AlertItem} from '@opentrons/components'
 import styles from './styles.css'
 
@@ -30,7 +30,7 @@ export default function Pipettes (props: Props) {
     const pipette = pipettes.find((p) => p.mount === mount)
     // TODO(mc, 2018-04-25)
     const pipetteConfig = pipette
-      ? getVersionedPipetteSpecs(pipette.name)
+      ? getPipetteModelSpecs(pipette.name)
       : null
 
     const isDisabled = !pipette || mount !== currentMount
