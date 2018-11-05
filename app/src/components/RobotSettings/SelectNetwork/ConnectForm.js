@@ -98,12 +98,17 @@ const UNKNOWN_SECURITY_OPTIONS: Array<SelectOption> = [
 ]
 
 const getEapType = (v: FormValues): ?string => get(v, EAP_TYPE_FIELD)
-const makeEapOpt = (o: WifiEapOption) => ({label: o.displayName, value: o.name})
-const makeEapField = (o: WifiAuthField) => ({
-  type: o.type,
-  name: `${EAP_CONFIG_FIELD}.${o.name}`,
-  label: o.displayName,
-  required: o.required,
+
+const makeEapOpt = (opt: WifiEapOption) => ({
+  label: opt.displayName || opt.name,
+  value: opt.name,
+})
+
+const makeEapField = (opt: WifiAuthField) => ({
+  type: opt.type,
+  name: `${EAP_CONFIG_FIELD}.${opt.name}`,
+  label: opt.displayName,
+  required: opt.required,
 })
 
 const getEapFields = (
