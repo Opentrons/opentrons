@@ -8,7 +8,7 @@ import type {LoadFileAction, NewProtocolFields} from '../load-file'
 import type {PipetteData} from '../step-generation'
 import type {FilePipette} from '../file-types'
 import {createPipette} from './utils'
-import type {PipetteReducerState, UpdatePipettesAction} from './types'
+import type {UpdatePipettesAction} from './types'
 
 export type PipetteIdByMount = {|
   left: ?string,
@@ -31,7 +31,7 @@ const byId = handleActions({
     }, {})
   },
   UPDATE_PIPETTES: (state: PipetteById, action: UpdatePipettesAction) => (
-    reduce(action.payload, (acc, pipette) => ({...acc, [pipette.id]: pipette}), {})
+    reduce(action.payload, (acc, pipette) => ({...acc, [pipette && pipette.id]: pipette}), {})
   ),
   CREATE_NEW_PROTOCOL: (
     state: PipetteById,
@@ -65,10 +65,13 @@ const byId = handleActions({
     state: PipetteById,
     action: {payload: NewProtocolFields}
   ): PipetteById => {
-    return mapValues(state, (pipette: PipetteData): PipetteData => ({
-      ...pipette,
-      mount: (pipette.mount === 'left') ? 'right' : 'left',
-    }))
+    return mapValues(state, (pipette: PipetteData): PipetteData => {
+      if (!pipette) return pipette
+      return {
+        ...pipette,
+        mount: (pipette.mount === 'left') ? 'right' : 'left',
+      }
+    })
   },
 }, {})
 
@@ -83,8 +86,8 @@ const byMount = handleActions({
       right: pipetteIds.find(id => pipettes[id].mount === 'right'),
     }
   },
-  UPDATE_PIPETTES: (state: PipetteReducerState, action: UpdatePipettesAction) => (
-    mapValues(action.payload, (pipette) => pipette.id)
+  UPDATE_PIPETTES: (state: PipetteIdByMount, action: UpdatePipettesAction) => (
+    mapValues(action.payload, (pipette) => pipette && pipette.id)
   ),
   CREATE_NEW_PROTOCOL: (
     state: PipetteIdByMount,

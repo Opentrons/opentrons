@@ -1,11 +1,11 @@
 // @flow
-import type {UpdatePipettesAction, PipetteReducerState} from './types'
+import type {UpdatePipettesAction, PipettesByMount} from './types'
 
 export const swapPipettes = () => ({
   type: 'SWAP_PIPETTES',
 })
 
-export const updatePipettes = (nextPipettesSlice: PipetteReducerState): UpdatePipettesAction => ({
+export const updatePipettes = (pipettesByMount: PipettesByMount): UpdatePipettesAction => ({
   type: 'UPDATE_PIPETTES',
-  payload: nextPipettesSlice,
+  payload: pipettesByMount,
 })

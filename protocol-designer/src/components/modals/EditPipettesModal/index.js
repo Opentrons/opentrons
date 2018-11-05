@@ -22,6 +22,9 @@ import {
   thunks as pipetteThunks,
   selectors as pipetteSelectors,
   type EditPipettesFields,
+  type FormattedPipette,
+  createPipette,
+  type PipettesByMount,
 } from '../../../pipettes'
 
 import PipetteDiagram from '../NewFileModal/PipetteDiagram'
@@ -32,18 +35,22 @@ import StepChangesWarningModal from './StepChangesWarningModal'
 
 type State = EditPipettesFields & {isWarningModalOpen: boolean}
 
+type OP = {closeModal: () => void}
 type SP = {
-  instruments: {
-    left: ?PipetteData,
-    right: ?PipetteData,
-  },
+  initialLeft: ?FormattedPipette,
+  initialRight: ?FormattedPipette,
 }
 
 type DP = {
-  onSave: (EditPipettesFields) => mixed,
+  _changePipettes: (PipettesByMount) => mixed,
 }
 
-type Props = {closeModal: () => void} & SP & DP
+type Props = {
+  initialLeft: ?FormattedPipette,
+  initialRight: ?FormattedPipette,
+  updatePipettes: (EditPipettesFields) => mixed,
+  closeModal: () => void,
+}
 
 const pipetteOptionsWithNone = [
   {name: 'None', value: ''},
@@ -71,10 +78,10 @@ const pipetteDataToFormState = (pipetteData) => ({
 class EditPipettesModal extends React.Component<Props, State> {
   constructor (props) {
     super(props)
-    const {instruments} = props
+    const {initialLeft, initialRight} = props
     this.state = {
-      left: instruments.left ? pipetteDataToFormState(instruments.left) : DEFAULT_SELECTION,
-      right: instruments.right ? pipetteDataToFormState(instruments.right) : DEFAULT_SELECTION,
+      left: initialLeft ? pipetteDataToFormState(initialLeft) : DEFAULT_SELECTION,
+      right: initialRight ? pipetteDataToFormState(initialRight) : DEFAULT_SELECTION,
       isWarningModalOpen: false,
     }
   }
@@ -87,13 +94,13 @@ class EditPipettesModal extends React.Component<Props, State> {
   }
 
   handleSubmit = () => {
-    const {instruments} = this.props
+    const {initialLeft, initialRight} = this.props
     const {left, right} = this.state
-    const initialLeft = pipetteDataToFormState(instruments.left)
-    const initialRight = pipetteDataToFormState(instruments.right)
+    const initialLeftFormData = pipetteDataToFormState(initialLeft)
+    const initialRightFormData = pipetteDataToFormState(initialRight)
     const leftChanged = !isEqual(initialLeft, left)
     const rightChanged = !isEqual(initialRight, right)
-    if ((leftChanged && !isEmpty(initialLeft.pipetteModel)) || (rightChanged && !isEmpty(initialRight.pipetteModel))) {
+    if ((leftChanged && !isEmpty(initialLeftFormData.pipetteModel)) || (rightChanged && !isEmpty(initialRightFormData.pipetteModel))) {
       this.setState({isWarningModalOpen: true})
     } else {
       this.savePipettes()
@@ -102,7 +109,7 @@ class EditPipettesModal extends React.Component<Props, State> {
 
   savePipettes = () => {
     const {left, right} = this.state
-    this.props.onSave({left, right})
+    this.props.updatePipettes({left, right})
     this.props.closeModal()
   }
 
@@ -196,19 +203,64 @@ class EditPipettesModal extends React.Component<Props, State> {
 }
 
 const mapSTP = (state: BaseState): SP => {
-  const pipetteData = pipetteSelectors.pipettesForInstrumentGroup(state)
+  const pipetteData = pipetteSelectors.pipettesForEditPipettes(state)
   return {
-    instruments: {
-      left: pipetteData.find(i => i.mount === 'left'),
-      right: pipetteData.find(i => i.mount === 'right'),
-    },
+    initialLeft: pipetteData.find(i => i.mount === 'left'),
+    initialRight: pipetteData.find(i => i.mount === 'right'),
   }
 }
 
 const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
-  onSave: (fields: EditPipettesFields) => {
+  _changePipettes: (fields: PipettesByMount) => {
     dispatch(pipetteThunks.editPipettes(fields))
   },
 })
 
-export default connect(mapSTP, mapDTP)(EditPipettesModal)
+const getNextPipetteForMount = (
+  prevPipette: ?FormattedPipette,
+  nextPipetteData: PipetteFields,
+  mount: Mount,
+): ?PipetteData => {
+  const {id, model, maxVolume, channels, tiprack} = prevPipette || {}
+  let nextPipette = {id, mount, model, maxVolume, channels, tiprackModel: tiprack && tiprack.model}
+
+  const nextPipetteModel = nextPipetteData.pipetteModel
+  const nextTiprackModel = isEmpty(nextPipetteData.tiprackModel) ? null : nextPipetteData.tiprackModel
+
+  if (prevPipette) {
+    const hasPipetteModelChanged = prevPipette.model !== nextPipetteModel
+    if (hasPipetteModelChanged) {
+      // old pipette -> new pipette model and tiprack
+      nextPipette = nextPipetteModel ? createPipette(mount, nextPipetteModel, nextTiprackModel) : null
+    } else if (nextPipetteModel && (prevPipette.tiprack.model !== nextTiprackModel)) {
+      // old pipette -> same pipette model and new tiprack
+      nextPipette = nextTiprackModel ? {...nextPipette, tiprackModel: nextTiprackModel} : nextPipette
+    }
+  } else if (nextPipetteModel) {
+    // no old pipette -> new pipette model and new tiprack
+    nextPipette = createPipette(mount, nextPipetteModel, nextTiprackModel)
+  } else {
+    // no old pipette -> no new pipette
+    nextPipette = null
+  }
+  return nextPipette
+}
+
+const mergeProps = (stateProps: SP, dispatchProps: DP, ownProps: OP): Props => {
+  const {initialLeft, initialRight} = stateProps
+  const {closeModal} = ownProps
+  const updatePipettes = (fields) => {
+    dispatchProps._changePipettes({
+      left: getNextPipetteForMount(initialLeft, fields.left, 'left'),
+      right: getNextPipetteForMount(initialRight, fields.right, 'right'),
+    })
+  }
+  return {
+    initialLeft,
+    initialRight,
+    updatePipettes,
+    closeModal,
+  }
+}
+
+export default connect(mapSTP, mapDTP, mergeProps)(EditPipettesModal)
