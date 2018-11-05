@@ -1,14 +1,15 @@
 """This module will replace Placeable"""
-from collections import defaultdict
-from enum import Enum, auto
 import json
 import os
 import re
 import time
 from typing import List, Dict
 
-from opentrons.types import Point, Location
+from opentrons.types import Location
+from enum import Enum, auto
+from opentrons.types import Point
 from opentrons.util import environment as env
+from collections import defaultdict
 
 
 class WellShape(Enum):
@@ -383,6 +384,18 @@ class Labware:
         """
         return self._dimensions['overallHeight'] + self._calibrated_offset.z
 
+    @property
+    def is_tiprack(self) -> bool:
+        return self._parameters['isTiprack']
+
+    @property
+    def tip_length(self) -> float:
+        return self._parameters['tipLength']
+
+    @tip_length.setter
+    def tip_length(self, length: float):
+        self._parameters['tipLength'] = length
+
     def __repr__(self):
         return self._display_name
 
@@ -401,7 +414,7 @@ def save_calibration(labware: Labware, delta: Point):
     Function to be used whenever an updated delta is found for the first well
     of a given labware. If an offset file does not exist, create the file
     using labware id as the filename. If the file does exist, load it and
-    modify the delta and the lastModified field.
+    modify the delta and the lastModified fields under the "default" key.
     """
     if not os.path.exists(persistent_path):
         os.mkdir(persistent_path)
@@ -411,6 +424,24 @@ def save_calibration(labware: Labware, delta: Point):
     with open(labware_offset_path, 'w') as f:
         json.dump(calibration_data, f)
     labware.set_calibration(delta)
+
+
+def save_tip_length(labware: Labware, length: float):
+    """
+    Function to be used whenever an updated tip length is found for
+    of a given tip rack. If an offset file does not exist, create the file
+    using labware id as the filename. If the file does exist, load it and
+    modify the length and the lastModified fields under the "tipLength" key.
+    """
+    if not os.path.exists(persistent_path):
+        os.mkdir(persistent_path)
+    labware_offset_path = os.path.join(
+        persistent_path, "{}.json".format(labware._id))
+    calibration_data = _helper_tip_length_data_format(
+        labware_offset_path, length)
+    with open(labware_offset_path, 'w') as f:
+        json.dump(calibration_data, f)
+    labware.tip_length = length
 
 
 def load_calibration(labware: Labware):
@@ -439,6 +470,21 @@ def _helper_offset_data_format(filepath: str, delta: Point) -> dict:
         calibration_data = _read_file(filepath)
         calibration_data['default']['offset'] = [delta.x, delta.y, delta.z]
         calibration_data['default']['lastModified'] = time.time()
+    return calibration_data
+
+
+def _helper_tip_length_data_format(filepath: str, length: float) -> dict:
+    if not os.path.exists(filepath):
+        calibration_data = {
+            "tipLength": {
+                "length": length,
+                "lastModified": time.time()
+            }
+        }
+    else:
+        calibration_data = _read_file(filepath)
+        calibration_data['tipLength']['length'] = length
+        calibration_data['tipLength']['lastModified'] = time.time()
     return calibration_data
 
 

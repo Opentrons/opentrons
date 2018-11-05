@@ -170,7 +170,12 @@ async def test_pick_up_tip(dummy_instruments, loop):
                        Axis.B: 2,
                        Axis.C: 19}
     await hw_api.move_to(mount, tip_position)
-    await hw_api.pick_up_tip(mount)
+
+    # Note: pick_up_tip without a tip_length argument requires the pipette on
+    # the associated mount to have an associated tip rack from which to infer
+    # the tip length. That behavior is not tested here.
+    tip_length = 25.0
+    await hw_api.pick_up_tip(mount, tip_length)
     assert hw_api._attached_instruments[mount].has_tip
     assert hw_api._attached_instruments[mount].current_volume == 0
     assert hw_api._current_position == target_position

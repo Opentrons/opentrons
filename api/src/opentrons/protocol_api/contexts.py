@@ -246,12 +246,13 @@ class InstrumentContext:
     def __init__(self,
                  ctx: ProtocolContext,
                  hardware: adapters.SynchronousAdapter,
-                 mount: types.Mount, tip_racks,
+                 mount: types.Mount, tip_racks: List[Labware],
                  log_parent: logging.Logger,
                  **config_kwargs) -> None:
         self._hardware = hardware
         self._ctx = ctx
         self._mount = mount
+        self._tip_racks = tip_racks
         self._last_location: Union[Labware, Well, None] = None
         self._log = log_parent.getChild(repr(self))
         self._log.info("attached")
@@ -386,7 +387,40 @@ class InstrumentContext:
     def pick_up_tip(self, location: Well = None,
                     presses: int = 3,
                     increment: int = 1):
-        raise NotImplementedError
+        """
+        Pick up a tip for the Pipette to run liquid-handling commands with
+
+        Notes
+        -----
+        A tip can be manually set by passing a `location`. If no location
+        is passed, the Pipette will pick up the next available tip in
+        it's `tip_racks` list (see :any:`Pipette`)
+
+        Parameters
+        ----------
+        :param location: The `Well` to perform the pick_up_tip.
+        :type location: `Labware`, `Well`, or None
+
+        :param presses: The number of times to lower and then raise the pipette
+                        when picking up a tip, to ensure a good seal (0 [zero]
+                        will result in the pipette hovering over the tip but
+                        not picking it up--generally not desireable, but could
+                        be used for dry-run)
+        :type presses: int
+
+        :param increment: The additional distance to travel on each successive
+                          press (e.g.: if presses=3 and increment=1, then the
+                          first press will travel down into the tip by 3.5mm,
+                          the second by 4.5mm, and the third by 5.5mm
+        :type increment: int or float
+
+        :returns: This instance
+        """
+
+        assert tiprack.is_tiprack
+
+        self.move_to(tiprack.wells_by_index()[well_name].top())
+        self._hardware.pick_up_tip(tiprack.tip_length)
 
     def drop_tip(self, location: Well = None,
                  home_after: bool = True):

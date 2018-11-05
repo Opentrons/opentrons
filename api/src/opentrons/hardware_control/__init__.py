@@ -671,7 +671,11 @@ class API:
             this_pipette.set_current_volume(0)
 
     @_log_call
-    async def pick_up_tip(self, mount, presses: int = 3, increment: float = 1):
+    async def pick_up_tip(self,
+                          mount,
+                          tip_length: float,
+                          presses: int = 3,
+                          increment: float = 1):
         """
         Pick up tip from current location
         """
@@ -700,7 +704,7 @@ class API:
             # move nozzle back up
             backup_pos = top_types.Point(0, 0, -dist)
             await self.move_rel(mount, backup_pos)
-        instr.add_tip()
+        instr.add_tip(tip_length=tip_length)
         instr.set_current_volume(0)
 
         # neighboring tips tend to get stuck in the space between
