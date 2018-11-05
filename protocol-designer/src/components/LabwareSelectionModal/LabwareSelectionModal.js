@@ -30,29 +30,36 @@ const hardcodedLabware = {
     ['tiprack-1000ul', '1000µL Tip Rack', 'Tiprack-200ul'],
     ['tiprack-1000ul-chem', '10x10 1000µL Chem-Tip Rack', 'Tiprack-1000ul-chem'],
   ],
+  'Aluminum Block': [
+    ['opentrons-aluminum-block-2ml-eppendorf', 'Aluminum Block - 2mL Eppendorf Tubes'],
+    ['opentrons-aluminum-block-2ml-screwcap', 'Aluminum Block - 2mL Screw Cap Tubes'],
+    ['opentrons-aluminum-block-96-PCR-plate', 'Aluminum Block - 96 PCR Plate'],
+    ['opentrons-aluminum-block-PCR-strips-200ul', 'Aluminum Block - PCR Strips'],
+  ],
   'Tube Rack': [
+    ['opentrons-tuberack-2ml-eppendorf', '2mL Eppendorf Tube Rack (4-in-1 Rack)'],
+    ['opentrons-tuberack-2ml-screwcap', '2mL Screw Cap Tube Rack (4-in-1 Rack)'],
+    ['opentrons-tuberack-15ml', '15mL Tube Rack (4-in-1 Rack)'],
+    ['opentrons-tuberack-50ml', '50mL Tube Rack (4-in-1 Rack)'],
+    ['opentrons-tuberack-15_50ml', '15mL x 6 + 50mL x 4 Tube Rack (4-in-1 Rack)', 'Opentrons-4-in-1-tuberack-15-50'],
     ['tube-rack-.75ml', '0.75mL Tube Rack', 'Tuberack-075ml'],
     ['tube-rack-2ml', '2mL Tube Rack', 'Tuberack-2ml'],
-    ['24-vial-rack', '3.5mL Tube Rack'],
-    ['opentrons-tuberack-15_50ml', '15mL x 6 + 50mL x 4 Tube Rack (4-in-1 Rack)', 'Opentrons-4-in-1-tuberack-15-50'],
     ['tube-rack-15_50ml', '15mL x 6 + 50mL x 4 Tube Rack (Clear Acrylic)', 'Tuberack-15-50ml'],
+    ['24-vial-rack', '3.5mL Tube Rack'],
   ],
   'Well Plate': [
     ['96-deep-well', '96 Deep Well Plate', '96-Deep-Well'],
     ['96-flat', '96 Flat', '96-PCR-Flatt'],
     ['96-PCR-flat', '96 Well PCR Plate (Flat)', '96-PCR-Flatt'],
     ['96-PCR-tall', '96 Well PCR Plate (Tall)', '96-PCR-Tall'],
+    ['PCR-strip-tall', 'PCR Strip (Tall)'],
     ['384-plate', '384 Well Plate', '384-plate'],
     ['12-well-plate', '12 Well Plate'],
     ['24-well-plate', '24 Well Plate'],
-    // ['rigaku-compact-crystallization-plate', 'Rigaku Compact Crystallization Plate']
   ],
   'Trough': [
     ['trough-12row', '12-row Trough', 'Trough-12row'],
   ],
-  // 'PCR Strip': [
-  //   ['PCR-strip-tall', 'PCR Strip Tall', '96-PCR-Strip']
-  // ],
   'Trash': [
     ['trash-box', 'Trash Box'], // no container img
   ],
@@ -60,6 +67,7 @@ const hardcodedLabware = {
 
 const labwareSectionOrder: Array<$Keys<typeof hardcodedLabware>> = [
   'Tip Rack',
+  'Aluminum Block',
   'Tube Rack',
   'Well Plate',
   'Trough',
