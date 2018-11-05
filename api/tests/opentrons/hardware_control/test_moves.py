@@ -57,6 +57,8 @@ async def test_controller_musthome(hardware_api):
 async def test_home_specific_sim(hardware_api, monkeypatch):
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(-10, 10, 20))
+    # Avoid the autoretract when moving two difference instruments
+    hardware_api._last_moved_mount = None
     await hardware_api.move_rel(types.Mount.LEFT, types.Point(0, 0, -20))
     await hardware_api.home([Axis.Z, Axis.C])
     assert hardware_api._current_position == {Axis.X: -10,
@@ -100,7 +102,7 @@ async def test_move(hardware_api):
     target_position2 = {Axis.X: 60,
                         Axis.Y: 40,
                         Axis.Z: 228,
-                        Axis.A: 10,
+                        Axis.A: 218,  # The other instrument is retracted
                         Axis.B: 19,
                         Axis.C: 19}
     await hardware_api.move_rel(mount2, rel_position)
@@ -191,3 +193,13 @@ async def test_deck_cal_applied(monkeypatch, loop):
     assert called_with['X'] == 44
     assert called_with['Y'] == 20
     assert called_with['Z'] == 30
+
+
+async def test_other_mount_retracted(hardware_api):
+    await hardware_api.home()
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
+    assert hardware_api.gantry_position(types.Mount.RIGHT)\
+        == types.Point(0, 0, 0)
+    await hardware_api.move_to(types.Mount.LEFT, types.Point(20, 20, 0))
+    assert hardware_api.gantry_position(types.Mount.RIGHT) \
+        == types.Point(54, 20, 218)

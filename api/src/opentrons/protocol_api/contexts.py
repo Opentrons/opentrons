@@ -197,48 +197,27 @@ class ProtocolContext:
         """
         self._hardware.update_config(**kwargs)
 
-    def move_to(self, mount: types.Mount,
-                location: types.Location):
-        """ Implement motions of the robot.
-
-        This should not need to be called by the user; it is called by
-        :py:meth:`InstrumentContext.move_to` (and thus all other
-        :py:class:`InstrumentContext` methods that involve moving, such as
-        :py:meth:`InstrumentContext.aspirate`) to move the pipettes around.
-
-        It encapsulates location caching and ensures that all moves are safe.
-        It does this by taking a :py:class:`.types.Location` that can have
-        a position attached to it, and its behavior depends on the state of
-        that location cache and the passed location.
-        """
-        switching_instr = self._last_moved_instrument\
-            and self._last_moved_instrument != mount
-        if switching_instr:
-            # TODO: Is 10 the right number here? This is what’s used in
-            # robot since it’s a default to an argument that is never
-            # changed
-            self._log.debug("retract {}".format(self._last_moved_instrument))
-            self._hardware.retract(self._last_moved_instrument, 10)
-
-        if self._location_cache and not switching_instr:
-            from_loc = self._location_cache
-        else:
-            from_loc = types.Location(
-                point=self._hardware.gantry_position(mount),
-                labware=None)
-        moves = geometry.plan_moves(from_loc, location, self._deck_layout)
-        self._log.debug("planned moves for {}->{}: {}"
-                        .format(from_loc, location, moves))
-        self._location_cache = location
-        self._last_moved_instrument = mount
-        for move in moves:
-            self._hardware.move_to(mount, move)
-
     def home(self):
         """ Homes the robot.
         """
         self._log.debug("home")
         self._hardware.home()
+
+    @property
+    def location_cache(self) -> Optional[types.Location]:
+        """ The cache used by the robot to determine where it last was.
+        """
+        return self._location_cache
+
+    @location_cache.setter
+    def location_cache(self, loc: Optional[types.Location]):
+        self._location_cache = loc
+
+    @property
+    def deck(self) -> geometry.Deck:
+        """ The object holding the deck layout of the robot.
+        """
+        return self._deck_layout
 
     @staticmethod
     def _build_hardware_adapter(
@@ -276,10 +255,11 @@ class InstrumentContext:
         self._last_location: Union[Labware, Well, None] = None
         self._log = log_parent.getChild(repr(self))
         self._log.info("attached")
+        self._well_bottom_clearance = 0.5
 
     def aspirate(self,
                  volume: float = None,
-                 location: types.Location = None,
+                 location: Union[types.Location, Well] = None,
                  rate: float = 1.0):
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
@@ -289,16 +269,17 @@ class InstrumentContext:
         from its current position. If only a location is passed,
         :py:meth:`aspirate` will default to its :py:attr:`max_volume`.
 
-        If the :py:class:`.types.Location` passed in `location` has an
-        associated labware, that labware will be saved until another motion
-        is commanded. This is used to optimize motions - for instance, moving
-        between two wells requires much less Z-distance to avoid collisions
-        than moving between two pieces of labware.
-
         :param volume: The volume to aspirate, in microliters. If not
                        specified, :py:attr:`max_volume`.
         :type volume: int or float
-        :param location: Where to aspirate from. If unspecified, the
+        :param location: Where to aspirate from. If `location` is a
+                         :py:class:`.Well`, the robot will aspirate from
+                         :py:attr:`well_bottom_clearance` mm
+                         above the bottom of the well. If `location` is a
+                         :py:class:`.Location` (i.e. the result of
+                         :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the
+                         robot will aspirate from the exact specified location.
+                         If unspecified, the robot will aspirate from the
                          current position.
         :param rate: The relative plunger speed for this aspirate. During
                      this aspirate, the speed of the plunger will be
@@ -311,14 +292,24 @@ class InstrumentContext:
                         .format(volume,
                                 location if location else 'current position',
                                 rate))
-        if location:
+        if isinstance(location, Well):
+            point, well = location.bottom()
+            self.move_to(
+                types.Location(point + types.Point(0, 0,
+                                                   self.well_bottom_clearance),
+                               well))
+        elif isinstance(location, types.Location):
             self.move_to(location)
+        elif location is not None:
+            raise TypeError(
+                'location should be a Well or Location, but it is {}'
+                .format(location))
         self._hardware.aspirate(self._mount, volume, rate)
         return self
 
     def dispense(self,
                  volume: float = None,
-                 location: types.Location = None,
+                 location: Union[types.Location, Well] = None,
                  rate: float = 1.0):
         """
         Dispense a volume of liquid (in microliters/uL) using this pipette
@@ -329,20 +320,21 @@ class InstrumentContext:
         into the pipette will be dispensed (this volume is accessible through
         :py:attr:`current_volume`).
 
-        The location may be a :py:class:`.Well`, or a specific position in
-        relation to a :py:class:`.Well`, such as :py:meth:`.Well.top`. If a
-        :py:class:`.Well` is specified without calling a position method
-        (such as :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the liquid
-        will be dispensed at the bottom of the well.
-
         :param volume: The volume of liquid to dispense, in microliters. If not
                        specified, defaults to :py:attr:`current_volume`.
         :type volume: int or float
-        :param location: Where to dispense into. If unspecified, the
+        :param location: Where to dispense into. If `location` is a
+                         :py:class:`.Well`, the robot will dispense into
+                         :py:attr:`well_bottom_clearance` mm
+                         above the bottom of the well. If `location` is a
+                         :py:class:`.Location` (i.e. the result of
+                         :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the
+                         robot will dispense into the exact specified location.
+                         If unspecified, the robot will dispense into the
                          current position.
-        :param rate: The relative plunger speed for this aspirate. During
-                     this aspirate, the speed of the plunger will be
-                     `rate` * :py:attr:`aspirate_speed`. If not specified,
+        :param rate: The relative plunger speed for this dispense. During
+                     this dispense, the speed of the plunger will be
+                     `rate` * :py:attr:`dispense_speed`. If not specified,
                      defaults to 1.0 (speed will not be modified).
         :type rate: float
         :returns: This instance.
@@ -351,8 +343,18 @@ class InstrumentContext:
                         .format(volume,
                                 location if location else 'current position',
                                 rate))
-        if location:
+        if isinstance(location, Well):
+            point, well = location.bottom()
+            self.move_to(
+                types.Location(point + types.Point(0, 0,
+                                                   self.well_bottom_clearance),
+                               well))
+        elif isinstance(location, types.Location):
             self.move_to(location)
+        elif location is not None:
+            raise TypeError(
+                'location should be a Well or Location, but it is {}'
+                .format(location))
         self._hardware.dispense(self._mount, volume, rate)
         return self
 
@@ -420,13 +422,27 @@ class InstrumentContext:
         raise NotImplementedError
 
     def move_to(self, location: types.Location):
-        """ Move this pipette to a specific location on the deck.
+        """ Move the instrument.
 
-        :param location: Where to move to.
-        :raises ValueError: if an argument is incorrect.
+        :param location: The location to move to.
         """
-        self._log.debug("move to {}".format(location))
-        self._ctx.move_to(self._mount, location)
+        if self._ctx.location_cache:
+            from_lw = self._ctx.location_cache.labware
+        else:
+            from_lw = None
+        from_loc = types.Location(self._hardware.gantry_position(self._mount),
+                                  from_lw)
+        moves = geometry.plan_moves(from_loc, location, self._ctx.deck)
+        self._log.debug("move {}->{}: {}"
+                        .format(from_loc, location, moves))
+        try:
+            for move in moves:
+                self._hardware.move_to(self._mount, move)
+        except Exception:
+            self._ctx.location_cache = None
+            raise
+        else:
+            self._ctx.location_cache = location
         return self
 
     @property
@@ -544,6 +560,22 @@ class InstrumentContext:
         """ View the information returned by the hardware API directly.
         """
         return self._hardware.attached_instruments[self._mount]
+
+    @property
+    def well_bottom_clearance(self) -> float:
+        """ The distance above the bottom of a well to aspirate or dispense.
+
+        When :py:meth:`aspirate` or :py:meth:`dispense` is given a
+        :py:class:`.Well` rather than a full :py:class:`.Location`, the robot
+        will move this distance above the bottom of the well to aspirate or
+        dispense.
+        """
+        return self._well_bottom_clearance
+
+    @well_bottom_clearance.setter
+    def well_bottom_clearance(self, clearance: float):
+        assert clearance >= 0
+        self._well_bottom_clearance = clearance
 
     def __repr__(self):
         return '<{}: {} in {}>'.format(self.__class__.__name__,
