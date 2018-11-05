@@ -5,6 +5,7 @@ import json
 import os
 import re
 import time
+import pkgutil
 from typing import List, Dict
 
 from opentrons.types import Point, Location
@@ -458,7 +459,13 @@ def _load_definition_by_name(name: str) -> dict:
         saved to disc. The definition file must have been saved in a known
         location with the filename '${name}.json'
     """
-    raise NotImplementedError
+    labware_def: dict = {}
+    def_path = 'shared_data/definitions2/{}.json'.format(name)
+    try:
+        labware_def = json.loads(pkgutil.get_data('opentrons', def_path))  # type: ignore # NOQA
+    except FileNotFoundError:
+        print("{} definition not found".format(name))
+    return labware_def
 
 
 def load(name: str, parent: Point, parent_name: str) -> Labware:
