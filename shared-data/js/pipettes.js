@@ -43,17 +43,17 @@ const ALL_PIPETTES: Array<PipetteNameSpecs> = ALL_PIPETTE_NAMES
   .filter(Boolean)
 
 // use a name like 'p10_single' to get specs true for all models under that name
-export function getPipetteNameSpecs (model: string): ?PipetteNameSpecs {
-  const config = pipetteNameSpecs[model]
+export function getPipetteNameSpecs (name: string): ?PipetteNameSpecs {
+  const config = pipetteNameSpecs[name]
 
-  return config && {...config, model: model}
+  return config && {...config, name}
 }
 
 // specify a model, eg 'p10_single_v1.3' to get
 // both the name specs + model-specific specs
 // NOTE: this should NEVER be used in PD, which is model-agnostic
-export function getPipetteModelSpecs (versionedModel: string): ?PipetteModelSpecs {
-  const modelSpecificFields = pipetteModelSpecs[versionedModel]
+export function getPipetteModelSpecs (model: string): ?PipetteModelSpecs {
+  const modelSpecificFields = pipetteModelSpecs[model]
   const modelFields = modelSpecificFields &&
     getPipetteNameSpecs(modelSpecificFields.name)
   return modelFields && {...modelFields, ...modelSpecificFields}
