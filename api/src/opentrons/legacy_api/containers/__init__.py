@@ -105,8 +105,8 @@ def create(name, grid, spacing, diameter, depth, volume=0):
         'total-liquid-volume': volume
     }
 
-    for r in range(rows):
-        for c in range(columns):
+    for c in range(columns):
+        for r in range(rows):
             well = Well(properties=properties)
             well_name = chr(r + ord('A')) + str(1 + c)
             coordinates = (c * col_spacing, (rows - r - 1) * row_spacing, 0)
