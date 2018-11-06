@@ -1,6 +1,11 @@
 // @flow
 // generic api reducer
+import isEmpty from 'lodash/isEmpty'
+import reduce from 'lodash/reduce'
+import some from 'lodash/some'
+import {normalizeRobots} from '../discovery'
 
+import type {Service} from '@opentrons/discovery-client'
 import type {State, Action} from '../types'
 import type {BaseRobot} from '../robot'
 import type {HealthState} from './health'
@@ -81,10 +86,15 @@ export default function apiReducer (
     }
 
     case 'discovery:UPDATE_LIST':
-      return action.payload.robots.reduce((apiState, robot) => {
-        if (!robot.ok) return {...state, [robot.name]: {}}
-        return apiState
-      }, state)
+      return reduce(
+        normalizeRobots(action.payload.robots),
+        (apiState: ApiState, robots: Array<Service>, name: string) => {
+          const ok = some(robots, 'ok')
+          if (!ok && !isEmpty(apiState[name])) return {...apiState, [name]: {}}
+          return apiState
+        },
+        state
+      )
   }
 
   return state
