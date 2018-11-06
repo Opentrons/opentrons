@@ -56,6 +56,7 @@ const hardcodedLabware = {
     ['384-plate', '384 Well Plate', '384-plate'],
     ['12-well-plate', '12 Well Plate'],
     ['24-well-plate', '24 Well Plate'],
+    ['48-well-plate', '48 Well Plate'],
   ],
   'Trough': [
     ['trough-12row', '12-row Trough', 'Trough-12row'],
