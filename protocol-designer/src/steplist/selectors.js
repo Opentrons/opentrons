@@ -245,7 +245,7 @@ const getFormAndFieldErrorsByStepId: Selector<{[StepIdType]: StepFormAndFieldErr
 const isNewStepForm = createSelector(
   getUnsavedForm,
   getSavedForms,
-  (formData, savedForms) => !!(formData && formData.id !== null && !savedForms[formData.id])
+  (formData, savedForms) => !!(formData && formData.id != null && !savedForms[formData.id])
 )
 
 /** Array of labware (labwareId's) involved in hovered Step, or [] */

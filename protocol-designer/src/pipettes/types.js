@@ -4,8 +4,8 @@ import type {PipetteData} from '../step-generation'
 import type {PipetteFields} from '../load-file'
 
 export type PipettesByMount = {
-  left: ?PipetteData,
-  right: ?PipetteData,
+  left?: ?PipetteData,
+  right?: ?PipetteData,
 }
 
 export type UpdatePipettesAction = {

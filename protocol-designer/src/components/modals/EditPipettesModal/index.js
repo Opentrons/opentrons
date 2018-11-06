@@ -13,7 +13,6 @@ import startCase from 'lodash/startCase'
 import isEmpty from 'lodash/isEmpty'
 import isEqual from 'lodash/isEqual'
 
-import type {PipetteData} from '../../../step-generation'
 import i18n from '../../../localization'
 import type {BaseState, ThunkDispatch} from '../../../types'
 import {pipetteOptions} from '../../../pipettes/pipetteData'
@@ -23,8 +22,6 @@ import {
   selectors as pipetteSelectors,
   type EditPipettesFields,
   type FormattedPipette,
-  createPipette,
-  type PipettesByMount,
 } from '../../../pipettes'
 
 import PipetteDiagram from '../NewFileModal/PipetteDiagram'
@@ -40,17 +37,11 @@ type SP = {
   initialLeft: ?FormattedPipette,
   initialRight: ?FormattedPipette,
 }
-
 type DP = {
-  _changePipettes: (PipettesByMount) => mixed,
+  updatePipettes: (EditPipettesFields) => mixed,
 }
 
-type Props = {
-  initialLeft: ?FormattedPipette,
-  initialRight: ?FormattedPipette,
-  updatePipettes: (EditPipettesFields) => mixed,
-  closeModal: () => void,
-}
+type Props = SP & DP & OP
 
 const pipetteOptionsWithNone = [
   {name: 'None', value: ''},
@@ -211,56 +202,9 @@ const mapSTP = (state: BaseState): SP => {
 }
 
 const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
-  _changePipettes: (fields: PipettesByMount) => {
+  updatePipettes: (fields: EditPipettesFields) => {
     dispatch(pipetteThunks.editPipettes(fields))
   },
 })
 
-const getNextPipetteForMount = (
-  prevPipette: ?FormattedPipette,
-  nextPipetteData: PipetteFields,
-  mount: Mount,
-): ?PipetteData => {
-  const {id, model, maxVolume, channels, tiprack} = prevPipette || {}
-  let nextPipette = {id, mount, model, maxVolume, channels, tiprackModel: tiprack && tiprack.model}
-
-  const nextPipetteModel = nextPipetteData.pipetteModel
-  const nextTiprackModel = isEmpty(nextPipetteData.tiprackModel) ? null : nextPipetteData.tiprackModel
-
-  if (prevPipette) {
-    const hasPipetteModelChanged = prevPipette.model !== nextPipetteModel
-    if (hasPipetteModelChanged) {
-      // old pipette -> new pipette model and tiprack
-      nextPipette = nextPipetteModel ? createPipette(mount, nextPipetteModel, nextTiprackModel) : null
-    } else if (nextPipetteModel && (prevPipette.tiprack.model !== nextTiprackModel)) {
-      // old pipette -> same pipette model and new tiprack
-      nextPipette = nextTiprackModel ? {...nextPipette, tiprackModel: nextTiprackModel} : nextPipette
-    }
-  } else if (nextPipetteModel) {
-    // no old pipette -> new pipette model and new tiprack
-    nextPipette = createPipette(mount, nextPipetteModel, nextTiprackModel)
-  } else {
-    // no old pipette -> no new pipette
-    nextPipette = null
-  }
-  return nextPipette
-}
-
-const mergeProps = (stateProps: SP, dispatchProps: DP, ownProps: OP): Props => {
-  const {initialLeft, initialRight} = stateProps
-  const {closeModal} = ownProps
-  const updatePipettes = (fields) => {
-    dispatchProps._changePipettes({
-      left: getNextPipetteForMount(initialLeft, fields.left, 'left'),
-      right: getNextPipetteForMount(initialRight, fields.right, 'right'),
-    })
-  }
-  return {
-    initialLeft,
-    initialRight,
-    updatePipettes,
-    closeModal,
-  }
-}
-
-export default connect(mapSTP, mapDTP, mergeProps)(EditPipettesModal)
+export default connect(mapSTP, mapDTP)(EditPipettesModal)

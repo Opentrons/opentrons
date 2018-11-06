@@ -31,7 +31,11 @@ const byId = handleActions({
     }, {})
   },
   UPDATE_PIPETTES: (state: PipetteById, action: UpdatePipettesAction) => (
-    reduce(action.payload, (acc, pipette) => ({...acc, [pipette && pipette.id]: pipette}), {})
+    reduce(action.payload, (acc, pipette) => (
+      pipette && pipette.id
+        ? {...acc, [pipette && pipette.id]: pipette}
+        : acc
+    ), {})
   ),
   CREATE_NEW_PROTOCOL: (
     state: PipetteById,
