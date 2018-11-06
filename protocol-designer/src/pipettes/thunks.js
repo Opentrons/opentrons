@@ -27,7 +27,7 @@ export const editPipettes = (payload: PipettesByMount) =>
       const prevPipette = prevPipettesByMount[mount]
       if ((prevPipette && prevPipette.id) !== (nextPipette && nextPipette.id)) {
         each(savedForms, (formData, stepId) => {
-          if (formData.pipette === prevPipette && prevPipette.id) {
+          if (formData.pipette === (prevPipette && prevPipette.id)) {
             dispatch(steplistActions.changeSavedStepForm({
               stepId,
               update: {
