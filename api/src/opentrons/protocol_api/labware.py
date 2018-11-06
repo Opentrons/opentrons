@@ -3,7 +3,8 @@ import json
 import os
 import re
 import time
-from typing import List, Dict
+from itertools import takewhile, dropwhile
+from typing import List, Dict, Optional
 
 from opentrons.types import Location
 from enum import Enum, auto
@@ -26,9 +27,10 @@ persistent_path = os.path.join(env.get_path('APP_DATA_DIR'), 'offsets')
 
 
 class Well:
-    def __init__(
-            self, well_props: dict, parent: Location, display_name: str)\
-            -> None:
+    def __init__(self, well_props: dict,
+                 parent: Location,
+                 display_name: str,
+                 has_tip: bool) -> None:
         """
         Create a well, and track the Point corresponding to the top-center of
         the well (this Point is in absolute deck coordinates)
@@ -53,6 +55,7 @@ class Well:
         if not parent.labware:
             raise ValueError("Wells must have a parent")
         self._parent = parent.labware
+        self._has_tip = has_tip
         self._shape = well_shapes.get(well_props['shape'])
         if self._shape is WellShape.RECTANGULAR:
             self._length = well_props['length']
@@ -72,6 +75,14 @@ class Well:
     @property
     def parent(self) -> 'Labware':
         return self._parent
+
+    @property
+    def has_tip(self) -> bool:
+        return self._has_tip
+
+    @has_tip.setter
+    def has_tip(self, value: bool):
+        self._has_tip = value
 
     def top(self) -> Location:
         """
@@ -204,7 +215,8 @@ class Labware:
             Well(
                 self._well_definition[well],
                 Location(self._calibrated_offset, self),
-                "{} of {}".format(well, self._display_name))
+                "{} of {}".format(well, self._display_name),
+                self.is_tiprack)
             for well in self._ordering]
 
     def _create_indexed_dictionary(self, group=0):
@@ -344,7 +356,7 @@ class Labware:
         :return: A list of column lists
         """
         col_dict = self._create_indexed_dictionary(group=2)
-        keys = sorted(col_dict)
+        keys = sorted(col_dict, key=lambda x: int(x))
 
         if not args:
             res = [col_dict[key] for key in keys]
@@ -395,6 +407,75 @@ class Labware:
     @tip_length.setter
     def tip_length(self, length: float):
         self._parameters['tipLength'] = length
+
+    def next_tip(self, num_tips: int = 1) -> Optional[Well]:
+        """
+        Determines the next valid start tip from which to retrieve the
+        specified number of tips. There must be at least `num_tips` sequential
+        wells for which all wells have tips, in the same column
+
+        :param num_tips: the number of sequential tips in the same column
+        :type num_tips: int
+        :return:
+        """
+        assert num_tips > 0
+
+        columns: List[List[Well]] = self.columns()
+        drop_leading_empties = [
+            list(dropwhile(lambda x: not x.has_tip, column))
+            for column in columns]
+        drop_at_first_gap = [
+            list(takewhile(lambda x: x.has_tip, column))
+            for column in drop_leading_empties]
+        long_enough = [
+            column for column in drop_at_first_gap if len(column) >= num_tips]
+
+        try:
+            first_long_enough = long_enough[0]
+            result: Optional[Well] = first_long_enough[0]
+        except IndexError:
+            result = None
+
+        return result
+
+    def use_tips(self, start_well: Well, num_channels: int = 1):
+        """
+        Removes tips from the tip tracker. This method should be called when a
+        tip is picked up. Generally, it will be called with `num_wells=1` or
+        `num_wells=8` for single- and multi-channel respectively. If picking up
+        with more than one channel, this method will automatically determine
+        which tips are used based on the start well, the number of channels,
+        and the geometry of the tiprack.
+
+        For example, targeting the
+
+        :param start_well: The Well from which to pick up a tip. For a single-
+            channel pipette, this is the well to send the pipette to. For a
+            multi-channel pipette, this is the well to send the back-most
+            nozzle of the pipette to.
+        :type start_well: Well
+        :param num_channels: The number of channels for the current pipette
+        :type num_channels: int
+        """
+        assert num_channels > 0
+        # Select the column of the labware that contains the target well
+        target_column: List[Well] = [
+            col for col in self.columns() if start_well in col][0]
+
+        well_idx = target_column.index(start_well)
+        # Number of tips to pick up is the lesser of (1) the number of tips
+        # from the starting well to the end of the column, and (2) the number
+        # of channels of the pipette (so a 4-channel pipette would pick up a
+        # max of 4 tips, and picking up from the 2nd-to-bottom well in a
+        # column would get a maximum of 2 tips)
+        num_tips = min(len(target_column) - well_idx, num_channels)
+        target_wells = target_column[well_idx: well_idx + num_tips]
+
+        assert all([well.has_tip for well in target_wells])
+
+        for well in target_wells:
+            print("Using tip in {}".format(well))
+            well.has_tip = False
 
     def __repr__(self):
         return self._display_name

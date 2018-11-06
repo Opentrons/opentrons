@@ -6,22 +6,20 @@ import pkgutil
 import opentrons.protocol_api as papi
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import API
+from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.config.pipette_config import configs
 
 import pytest
 
 
-# TODO: Remove once load_labware_by_name is implemented
-labware_name = 'generic_96_wellPlate_380_uL'
-labware_def = json.loads(
-    pkgutil.get_data('opentrons',
-                     'shared_data/definitions2/{}.json'.format(labware_name)))
-
-
 @pytest.fixture
 def load_my_labware(monkeypatch):
-    def dummy_load(labware):
+    def dummy_load(labware_name):
+        labware_def = json.loads(
+            pkgutil.get_data('opentrons',
+                             'shared_data/definitions2/{}.json'.format(
+                                 labware_name)))
         return labware_def
     monkeypatch.setattr(papi.labware, '_load_definition_by_name', dummy_load)
 
@@ -112,6 +110,52 @@ def test_pipette_info(loop):
         == ctx._hardware.attached_instruments[Mount.RIGHT]['name']
     assert left.type == 'single'
     assert left.name == ctx._hardware.attached_instruments[Mount.LEFT]['name']
+
+
+def test_pick_up_and_drop_tip(loop, load_my_labware):
+    ctx = papi.ProtocolContext(loop)
+    ctx.home()
+    tiprack = ctx.load_labware_by_name('Opentrons_96_tiprack_300_uL', 1)
+    tip_lenth = tiprack.tip_length
+    mount = Mount.LEFT
+
+    instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
+
+    pipette: Pipette = ctx._hardware._attached_instruments[mount]
+    model_offset = Point(*pipette.config.model_offset)
+    assert pipette.critical_point == model_offset
+
+    instr.pick_up_tip(tiprack.wells_by_index()['A1'])
+
+    new_offset = model_offset - Point(0, 0, tip_lenth)
+    assert pipette.critical_point == new_offset
+
+    # TODO: uncomment and verify once trash container is added
+    # instr.drop_tip()
+    # assert pipette.critical_point == model_offset
+
+
+def test_pick_up_tip_no_location(loop, load_my_labware):
+    ctx = papi.ProtocolContext(loop)
+    ctx.home()
+    tiprack = ctx.load_labware_by_name('Opentrons_96_tiprack_300_uL', 1)
+    tip_lenth = tiprack.tip_length
+    mount = Mount.LEFT
+
+    instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
+
+    pipette: Pipette = ctx._hardware._attached_instruments[mount]
+    model_offset = Point(*pipette.config.model_offset)
+    assert pipette.critical_point == model_offset
+
+    instr.pick_up_tip()
+
+    new_offset = model_offset - Point(0, 0, tip_lenth)
+    assert pipette.critical_point == new_offset
+
+    # TODO: uncomment and verify once trash container is added
+    # instr.drop_tip()
+    # assert pipette.critical_point == model_offset
 
 
 def test_aspirate(loop, load_my_labware, monkeypatch):

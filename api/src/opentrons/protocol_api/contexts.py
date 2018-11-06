@@ -12,6 +12,10 @@ from . import geometry
 MODULE_LOG = logging.getLogger(__name__)
 
 
+class OutOfTipsError(Exception):
+    pass
+
+
 class ProtocolContext:
     """ The Context class is a container for the state of a protocol.
 
@@ -100,6 +104,7 @@ class ProtocolContext:
             self,
             instrument_name: str,
             mount: types.Mount,
+            tip_racks: List[Labware] = None,
             replace: bool = False) -> 'InstrumentContext':
         """ Load a specific instrument required by the protocol.
 
@@ -133,7 +138,11 @@ class ProtocolContext:
         self._hardware.cache_instruments(attached)
         # If the cache call didn’t raise, the instrument is attached
         new_instr = InstrumentContext(
-            self, self._hardware, mount, [], self._log)
+            ctx=self,
+            hardware=self._hardware,
+            mount=mount,
+            tip_racks=tip_racks,
+            log_parent=self._log)
         self._instruments[mount] = new_instr
         self._log.info("Instrument {} loaded".format(new_instr))
         return new_instr
@@ -246,13 +255,18 @@ class InstrumentContext:
     def __init__(self,
                  ctx: ProtocolContext,
                  hardware: adapters.SynchronousAdapter,
-                 mount: types.Mount, tip_racks: List[Labware],
+                 mount: types.Mount,
+                 tip_racks: Optional[List[Labware]],
                  log_parent: logging.Logger,
                  **config_kwargs) -> None:
         self._hardware = hardware
         self._ctx = ctx
         self._mount = mount
-        self._tip_racks = tip_racks
+
+        self._tip_racks = tip_racks or list()
+        for tip_rack in self.tip_racks:
+            assert tip_rack.is_tiprack
+
         self._last_location: Union[Labware, Well, None] = None
         self._log = log_parent.getChild(repr(self))
         self._log.info("attached")
@@ -261,7 +275,7 @@ class InstrumentContext:
     def aspirate(self,
                  volume: float = None,
                  location: Union[types.Location, Well] = None,
-                 rate: float = 1.0):
+                 rate: float = 1.0) -> 'InstrumentContext':
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
         from the specified location
@@ -311,7 +325,7 @@ class InstrumentContext:
     def dispense(self,
                  volume: float = None,
                  location: Union[types.Location, Well] = None,
-                 rate: float = 1.0):
+                 rate: float = 1.0) -> 'InstrumentContext':
         """
         Dispense a volume of liquid (in microliters/uL) using this pipette
         into the specified location.
@@ -363,30 +377,30 @@ class InstrumentContext:
             repetitions: int = 1,
             volume: float = None,
             location: Well = None,
-            rate: float = 1.0):
+            rate: float = 1.0) -> 'InstrumentContext':
         raise NotImplementedError
 
-    def blow_out(self, location: Well = None):
+    def blow_out(self, location: Well = None) -> 'InstrumentContext':
         raise NotImplementedError
 
     def touch_tip(self,
                   location: Well = None,
                   radius: float = 1.0,
                   v_offset: float = -1.0,
-                  speed: float = 60.0):
+                  speed: float = 60.0) -> 'InstrumentContext':
         raise NotImplementedError
 
     def air_gap(self,
                 volume: float = None,
-                height: float = None):
+                height: float = None) -> 'InstrumentContext':
         raise NotImplementedError
 
-    def return_tip(self, home_after: bool = True):
+    def return_tip(self, home_after: bool = True) -> 'InstrumentContext':
         raise NotImplementedError
 
     def pick_up_tip(self, location: Well = None,
                     presses: int = 3,
-                    increment: int = 1):
+                    increment: int = 1) -> 'InstrumentContext':
         """
         Pick up a tip for the Pipette to run liquid-handling commands with
 
@@ -416,17 +430,70 @@ class InstrumentContext:
 
         :returns: This instance
         """
+        num_channels = \
+            self._hardware.attached_instruments[self._mount]['channels']
+
+        def _select_tiprack_from_list(tip_racks) -> Labware:
+            try:
+                tr = tip_racks[0]
+            except IndexError:
+                raise OutOfTipsError
+            next_tip = tr.next_tip(num_channels)
+            if next_tip:
+                return tr
+            else:
+                return _select_tiprack_from_list(tip_racks[1:])
+
+        if isinstance(location, Labware):
+            tiprack = location
+            target: Optional[Well] = tiprack.next_tip(num_channels)
+        elif isinstance(location, Well):
+            tiprack = location.parent
+            target = location
+        else:
+            tiprack = _select_tiprack_from_list(self.tip_racks)
+            target = tiprack.next_tip(num_channels)
+        if target is None:
+            # This is primarily for type checking--should raise earlier
+            raise OutOfTipsError
 
         assert tiprack.is_tiprack
 
-        self.move_to(tiprack.wells_by_index()[well_name].top())
-        self._hardware.pick_up_tip(tiprack.tip_length)
+        self.move_to(target.top())
+
+        self._hardware.pick_up_tip(
+            self._mount, tiprack.tip_length, presses, increment)
+        # Note that the hardware API pick_up_tip action includes homing z after
+
+        tiprack.use_tips(target, num_channels)
+
+        return self
 
     def drop_tip(self, location: Well = None,
-                 home_after: bool = True):
-        raise NotImplementedError
+                 home_after: bool = True) -> 'InstrumentContext':
+        """
+        Drop the current tip. If a location is specified, drop the tip there,
+        otherwise drop it into the fixed trash.
 
-    def home(self):
+        :param location: The location to drop the tip
+        :type location: `Well` or None
+
+        :param home_after: if True, home the robot after dropping tip
+        :param home_after: bool
+
+        :returns: This instance
+        """
+        if location:
+            self.move_to(location.top())
+        else:
+            self.move_to(self.trash_container.wells()[0].top())
+        self._hardware.drop_tip(self.mount)
+        if home_after:
+            self.home()
+
+        return self
+
+    def home(self) -> 'InstrumentContext':
         """ Home the robot.
 
         :returns: This instance.
@@ -438,24 +505,24 @@ class InstrumentContext:
                    volume: float,
                    source: Well,
                    dest: Well,
-                   *args, **kwargs):
+                   *args, **kwargs) -> 'InstrumentContext':
         raise NotImplementedError
 
     def consolidate(self,
                     volume: float,
                     source: Well,
                     dest: Well,
-                    *args, **kwargs):
+                    *args, **kwargs) -> 'InstrumentContext':
         raise NotImplementedError
 
     def transfer(self,
                  volume: float,
                  source: Well,
                  dest: Well,
-                 **kwargs):
+                 **kwargs) -> 'InstrumentContext':
         raise NotImplementedError
 
-    def move_to(self, location: types.Location):
+    def move_to(self, location: types.Location) -> 'InstrumentContext':
         """ Move the instrument.
 
         :param location: The location to move to.
@@ -555,11 +622,11 @@ class InstrumentContext:
     @property
     def tip_racks(self) -> List[Labware]:
         """ Query which tipracks have been linked to this PipetteContext"""
-        raise NotImplementedError
+        return self._tip_racks
 
     @tip_racks.setter
     def tip_racks(self, racks: List[Labware]):
-        raise NotImplementedError
+        self._tip_racks = racks
 
     @property
     def trash_container(self) -> Labware:
@@ -610,6 +677,26 @@ class InstrumentContext:
     def well_bottom_clearance(self, clearance: float):
         assert clearance >= 0
         self._well_bottom_clearance = clearance
+
+    # def _find_next_tip(self) -> Well:
+    #     """
+    #     Recursively iterate through the associated tipracks and get the next
+    #     Well that has a tip in it. If no tips are available in any associated
+    #     tipracks, raise an `OutOfTipsError`
+    #     :return: a `Well` that has a tip available
+    #     """
+    #     def _find_tip_all_racks(tiprack_list: List[Labware]) -> Well:
+    #         try:
+    #             tr = tiprack_list.pop(0)
+    #         except IndexError:
+    #             raise OutOfTipsError
+    #         tip_from_tiprack: Optional[Well] = tr.next_tip()
+    #         if tip_from_tiprack:
+    #             return tip_from_tiprack
+    #         else:
+    #             return _find_tip_all_racks(tiprack_list)
+    #
+    #     return _find_tip_all_racks(self.tip_racks)
 
     def __repr__(self):
         return '<{}: {} in {}>'.format(self.__class__.__name__,

@@ -192,7 +192,7 @@ class API:
 
     @property
     def attached_instruments(self):
-        configs = ['name', 'min_volume', 'max_volume',
+        configs = ['name', 'min_volume', 'max_volume', 'channels',
                    'aspirate_flow_rate', 'dispense_flow_rate',
                    'pipette_id', 'current_volume', 'display_name']
         instruments = {top_types.Mount.LEFT: {},
