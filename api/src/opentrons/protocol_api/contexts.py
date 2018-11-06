@@ -678,26 +678,6 @@ class InstrumentContext:
         assert clearance >= 0
         self._well_bottom_clearance = clearance
 
-    # def _find_next_tip(self) -> Well:
-    #     """
-    #     Recursively iterate through the associated tipracks and get the next
-    #     Well that has a tip in it. If no tips are available in any associated
-    #     tipracks, raise an `OutOfTipsError`
-    #     :return: a `Well` that has a tip available
-    #     """
-    #     def _find_tip_all_racks(tiprack_list: List[Labware]) -> Well:
-    #         try:
-    #             tr = tiprack_list.pop(0)
-    #         except IndexError:
-    #             raise OutOfTipsError
-    #         tip_from_tiprack: Optional[Well] = tr.next_tip()
-    #         if tip_from_tiprack:
-    #             return tip_from_tiprack
-    #         else:
-    #             return _find_tip_all_racks(tiprack_list)
-    #
-    #     return _find_tip_all_racks(self.tip_racks)
-
     def __repr__(self):
         return '<{}: {} in {}>'.format(self.__class__.__name__,
                                        self.hw_pipette['name'],

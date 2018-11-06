@@ -529,14 +529,16 @@ def load_calibration(labware: Labware):
     """
     Look up a calibration if it exists and apply it to the given labware.
     """
-    offset = Point(0, 0, 0)
     labware_offset_path = os.path.join(
         persistent_path, "{}.json".format(labware._id))
     if os.path.exists(labware_offset_path):
         calibration_data = _read_file(labware_offset_path)
         offset_array = calibration_data['default']['offset']
         offset = Point(x=offset_array[0], y=offset_array[1], z=offset_array[2])
-    labware.set_calibration(offset)
+        labware.set_calibration(offset)
+        if 'tipLength' in calibration_data.keys():
+            tip_length = calibration_data['tipLength']['length']
+            labware.tip_length = tip_length
 
 
 def _helper_offset_data_format(filepath: str, delta: Point) -> dict:
@@ -555,17 +557,17 @@ def _helper_offset_data_format(filepath: str, delta: Point) -> dict:
 
 
 def _helper_tip_length_data_format(filepath: str, length: float) -> dict:
-    if not os.path.exists(filepath):
-        calibration_data = {
-            "tipLength": {
-                "length": length,
-                "lastModified": time.time()
-            }
-        }
-    else:
+    try:
         calibration_data = _read_file(filepath)
-        calibration_data['tipLength']['length'] = length
-        calibration_data['tipLength']['lastModified'] = time.time()
+    except FileNotFoundError:
+        # This should generally not occur, as labware calibration has to happen
+        # prior to tip length calibration
+        calibration_data = {}
+
+    calibration_data['tipLength'] = {
+        'length': length,
+        'lastModified': time.time()}
+
     return calibration_data
 
 
