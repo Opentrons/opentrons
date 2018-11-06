@@ -52,7 +52,6 @@ export function ConnectionInfo (props: ConnectionInfoProps) {
     [styles.disabled]: disabled,
   })
 
-  console.log(props.disabled)
   return (
     <React.Fragment>
       <CardContentHalf>

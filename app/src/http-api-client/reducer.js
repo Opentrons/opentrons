@@ -57,6 +57,7 @@ export default function apiReducer (
     case 'api:FAILURE': {
       const {error} = action.payload
       const {name, path, stateByName, stateByPath} = getUpdateInfo(state, action)
+      if (!stateByPath || !stateByPath.inProgress) return state
 
       return {
         ...state,
@@ -78,6 +79,12 @@ export default function apiReducer (
         },
       }
     }
+
+    case 'discovery:UPDATE_LIST':
+      return action.payload.robots.reduce((apiState, robot) => {
+        if (!robot.ok) return {...state, [robot.name]: {}}
+        return apiState
+      }, state)
   }
 
   return state

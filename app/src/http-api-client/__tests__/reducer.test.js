@@ -79,8 +79,7 @@ describe('apiReducer', () => {
   })
 
   test('handles api:FAILURE', () => {
-    const emptyState = {}
-    const oldRequestState = {
+    const state = {
       name: {
         otherPath: {inProgress: false},
         path: {
@@ -97,13 +96,7 @@ describe('apiReducer', () => {
       payload: {robot: {name: 'name'}, path: 'path', error: new Error('AH')},
     }
 
-    expect(apiReducer(emptyState, action)).toEqual({
-      name: {
-        path: {inProgress: false, error: new Error('AH')},
-      },
-    })
-
-    expect(apiReducer(oldRequestState, action)).toEqual({
+    expect(apiReducer(state, action)).toEqual({
       name: {
         otherPath: {inProgress: false},
         path: {
@@ -114,5 +107,24 @@ describe('apiReducer', () => {
         },
       },
     })
+  })
+
+  test('api:FAILURE noops if no inProgress state', () => {
+    const state = {name: {path: {inProgress: false}}}
+
+    const action = {
+      type: 'api:FAILURE',
+      payload: {robot: {name: 'name'}, path: 'path', error: new Error('AH')},
+    }
+
+    expect(apiReducer(state, action)).toEqual(state)
+  })
+
+  test('clears state for unhealthy robots on discovery:UPDATE_LIST', () => {
+    const robot = {name: 'name', ok: false}
+    const state = {name: {path: {inProgress: false, error: new Error('AH')}}}
+    const action = {type: 'discovery:UPDATE_LIST', payload: {robots: [robot]}}
+
+    expect(apiReducer(state, action)).toEqual({name: {}})
   })
 })
