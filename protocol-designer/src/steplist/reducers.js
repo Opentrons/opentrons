@@ -22,10 +22,10 @@ import type {
   AddStepAction,
   ChangeFormInputAction,
   DeleteStepAction,
+  ReorderSelectedStepAction,
   SaveStepFormAction,
   SelectStepAction,
   SelectTerminalItemAction,
-
   PopulateFormAction,
   CollapseFormSectionAction, // <- TODO this isn't a thunk
 
@@ -177,7 +177,7 @@ const orderedSteps: Reducer<OrderedStepsState, *> = handleActions({
     state.filter(stepId => !(stepId === action.payload || `${stepId}` === action.payload)),
   LOAD_FILE: (state: OrderedStepsState, action: LoadFileAction): OrderedStepsState =>
     getPDMetadata(action.payload).orderedSteps,
-  REORDER_STEP_CHEATCODE: (state: OrderedStepsState, action: {payload: {nextIndex: number, stepId: number}}): any => {
+  REORDER_SELECTED_STEP: (state: OrderedStepsState, action: ReorderSelectedStepAction): OrderedStepsState => {
     const {nextIndex, stepId} = action.payload
     const filteredStepIds = state.filter(s => s !== stepId)
 

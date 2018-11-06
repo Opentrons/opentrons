@@ -85,3 +85,31 @@ export const addStep = (payload: {stepType: StepType}) =>
     }
     dispatch(selectStep(stepId, stepType))
   }
+
+export type ReorderSelectedStepAction = {
+  type: 'REORDER_SELECTED_STEP',
+  payload: {
+    nextIndex: number,
+    stepId: StepIdType,
+  },
+}
+
+export const reorderSelectedStep = (delta: number) =>
+  (dispatch: ThunkDispatch<ReorderSelectedStepAction>, getState: GetState) => {
+    // TODO IMMEDIATELY: use selectors
+    const orderedSteps = getState().steplist.orderedSteps
+    const selectedItem = getState().steplist.selectedItem
+
+    if (selectedItem && selectedItem.isStep && selectedItem.id) {
+      const stepId = selectedItem.id
+      const selectedIndex = orderedSteps.findIndex(s => s === stepId)
+
+      dispatch({
+        type: 'REORDER_SELECTED_STEP',
+        payload: {
+          nextIndex: selectedIndex + delta,
+          stepId,
+        },
+      })
+    }
+  }

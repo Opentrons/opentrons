@@ -23,39 +23,6 @@ if (process.env.NODE_ENV === 'production') {
   }
 }
 
-function handleCheatCodes (e) {
-  const key = e.key
-
-  if (key === 'w') {
-    moveSelectedStep(-1)
-  } else if (key === 's') {
-    moveSelectedStep(1)
-  }
-}
-
-function moveSelectedStep (delta) {
-  const orderedSteps = store.getState().steplist.orderedSteps
-  const selectedItem = store.getState().steplist.selectedItem
-
-  if (selectedItem.isStep) {
-    const stepId = selectedItem.id
-    const selectedIndex = orderedSteps.findIndex(s => s === stepId)
-
-    store.dispatch({
-      type: 'REORDER_STEP_CHEATCODE',
-      payload: {
-        nextIndex: selectedIndex + delta,
-        stepId,
-      },
-    })
-  } else {
-    console.log('cannot do cheat code, no step selected')
-  }
-}
-
-global.document.addEventListener('keydown', handleCheatCodes)
-console.log('CHEAT CODES ENABLED! Use Ctrl + Up or Ctrl + Down with step selected')
-
 const render = (Component) => {
   ReactDOM.render(
     <Provider store={store}>
