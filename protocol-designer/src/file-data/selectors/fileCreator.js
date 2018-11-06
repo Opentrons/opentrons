@@ -60,7 +60,11 @@ export const createFile: BaseState => ProtocolFile = createSelector(
       initialRobotState.instruments,
       (pipette: PipetteData): FilePipette => ({
         mount: pipette.mount,
-        model: pipette.model,
+        // TODO: Ian 2018-11-06 'model' is for backwards compatibility with old API version
+        // (JSON executor used to expect versioned model).
+        // Drop this "model" when we do breaking change (see TODO in protocol-schema.json)
+        model: pipette.model + '_v1.3',
+        name: pipette.model,
       })
     )
 

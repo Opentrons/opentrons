@@ -87,8 +87,9 @@ export function getPipetteDisplayNames (
     .names
 }
 
-// note: this function assumes all pipettes with the same display name have
-// the same number of channels. This feels like a sane assumption
+// TODO: Ian + Mike 2018-11-06 - DEPRECATED! This function can and should go
+// away once we can switch the app to checking `name` rather than `displayName`
+// or `model` for pipette correctness
 export function getPipetteChannelsByDisplayName (name: ?string): PipetteChannels {
   const match = ALL_PIPETTES.find(p => p.displayName === name)
 

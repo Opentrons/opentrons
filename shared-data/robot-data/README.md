@@ -18,4 +18,4 @@ The model level contains information specific to particular pipette models. The 
 
 # JSON Schemas
 
-In `shared-data/pipetteSpecSchemas` there are JSON schemas for these 2 JSON files, which ensure data integrity. Further descriptions about the individual fields are written into the schemas.
+In `shared-data/robot-data/schemas/` there are JSON schemas for these 2 JSON files, which ensure data integrity. Further descriptions about the individual fields are written into the schemas.

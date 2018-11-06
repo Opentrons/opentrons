@@ -17,19 +17,19 @@ def load_pipettes(protocol_data):
         model = props.get('model')
         mount = props.get('mount')
 
-        # TODO: Ian 2018-11-02 remove this HACK when backwards-compatability
-        # for JSON protocols with versioned pipettes is dropped
-        # (next JSON protocol schema major bump)
-        versionless_model = model.split('_v')[0]
+        # TODO: Ian 2018-11-06 remove this fallback to 'model' when
+        # backwards-compatability for JSON protocols with versioned
+        # pipettes is dropped (next JSON protocol schema major bump)
+        name = props.get('name', model.split('_v')[0])
 
-        pipette_model_version = instruments.retrieve_version_number(
-            mount, versionless_model)
-        config = pipette_config.load(pipette_model_version)
+        pipette_name_version = instruments.retrieve_version_number(
+            mount, name)
+        config = pipette_config.load(pipette_name_version)
 
         pipette = instruments._create_pipette_from_config(
             config=config,
             mount=mount,
-            name=pipette_model_version)
+            name=pipette_name_version)
 
         pipettes_by_id[pipette_id] = pipette
 
@@ -110,16 +110,16 @@ def _get_pipette(command_params, loaded_pipettes):
 # TODO (Ian 2018-08-22) once Pipette has more sensible way of managing
 # flow rate value (eg as an argument in aspirate/dispense fns), remove this
 def _set_flow_rate(
-        pipette_model, pipette, command_type, params, default_values):
+        pipette_name, pipette, command_type, params, default_values):
     """
     Set flow rate in uL/mm, to value obtained from command's params,
     or if unspecified in command params, then from protocol's "default-values".
     """
     default_aspirate = default_values.get(
-        'aspirate-flow-rate', {}).get(pipette_model)
+        'aspirate-flow-rate', {}).get(pipette_name)
 
     default_dispense = default_values.get(
-        'dispense-flow-rate', {}).get(pipette_model)
+        'dispense-flow-rate', {}).get(pipette_name)
 
     flow_rate_param = params.get('flow-rate')
 
@@ -155,10 +155,18 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
         params = command_item.get('params', {})
 
         pipette = _get_pipette(params, loaded_pipettes)
-        pipette_model = protocol_data\
+        protocol_pipette_data = protocol_data\
             .get('pipettes', {})\
-            .get(params.get('pipette'), {})\
-            .get('model')
+            .get(params.get('pipette'), {})
+        pipette_name = protocol_pipette_data.get('name')
+
+        if (not pipette_name):
+            # TODO: Ian 2018-11-06 remove this fallback to 'model' when
+            # backwards-compatability for JSON protocols with versioned
+            # pipettes is dropped (next JSON protocol schema major bump)
+            pipette_name = protocol_pipette_data.get('model')
+
+        print('p pn', pipette, pipette_name)
 
         location = _get_location(
             loaded_labware, command_type, params, default_values)
@@ -170,7 +178,7 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
             # Flow rate is persisted inside the Pipette object
             # and is settable but not easily gettable
             _set_flow_rate(
-                pipette_model, pipette, command_type, params, default_values)
+                pipette_name, pipette, command_type, params, default_values)
 
         if command_type == 'delay':
             wait = params.get('wait')

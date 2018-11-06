@@ -85,8 +85,11 @@ export type StatePipette = {
   mount: Mount,
   // number of liquid channels
   channels: Channels,
-  // user-given name of the intrument
-  // TODO: Ian 2018-11-01 is this really "model" aka versionless model?
+  // user-given name of the instrument
+  // TODO: Ian + Mike 2018-11-06 This `name` is not what we now call the `name`,
+  // rather it is the full versioned `model` of the pipette, as placed in the
+  // Python Pipette's `name` field by the pipette factory functions.
+  // TLDR: this `name` needs to be renamed in a future PR to `model`
   name: string,
   // volume of the instrument
   // TODO(mc, 2018-01-17): this is used to drive tip propbe setup
