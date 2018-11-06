@@ -42,10 +42,10 @@ const hardcodedLabware = {
     ['opentrons-tuberack-15ml', '15mL Tube Rack (4-in-1 Rack)'],
     ['opentrons-tuberack-50ml', '50mL Tube Rack (4-in-1 Rack)'],
     ['opentrons-tuberack-15_50ml', '15mL x 6 + 50mL x 4 Tube Rack (4-in-1 Rack)', 'Opentrons-4-in-1-tuberack-15-50'],
-    ['tube-rack-.75ml', '0.75mL Tube Rack', 'Tuberack-075ml'],
-    ['tube-rack-2ml', '2mL Tube Rack', 'Tuberack-2ml'],
+    ['tube-rack-.75ml', '0.75mL Tube Rack (Clear Acrylic)', 'Tuberack-075ml'],
+    ['tube-rack-2ml', '2mL Tube Rack (Clear Acrylic)', 'Tuberack-2ml'],
     ['tube-rack-15_50ml', '15mL x 6 + 50mL x 4 Tube Rack (Clear Acrylic)', 'Tuberack-15-50ml'],
-    ['24-vial-rack', '3.5mL Tube Rack'],
+    ['24-vial-rack', '3.5mL Tube Rack (Clear Acrylic)'],
   ],
   'Well Plate': [
     ['96-deep-well', '96 Deep Well Plate', '96-Deep-Well'],
