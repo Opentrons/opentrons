@@ -145,6 +145,8 @@ def test_labware_create(dummy_db):
     assert lw.well("C3").coordinates() == (
         2 * col_space, 0, 0)
 
+    assert lw.well(2).get_name() == 'C1'
+
 
 def test_new_labware_create(split_labware_def):
     from opentrons import labware

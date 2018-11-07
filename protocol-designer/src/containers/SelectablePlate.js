@@ -65,6 +65,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
       wellContents: {},
       containerType: '',
       selectable: selectable,
+      liquidNamesById: {},
     }
   }
 
@@ -142,6 +143,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     getTipProps: getTipProps || noop,
     containerType: labware ? labware.type : 'missing labware',
     selectable,
+    liquidNamesById: selectors.getLiquidNamesById(state),
   }
 }
 

@@ -54,7 +54,6 @@ def test_location_cache(loop, monkeypatch, load_my_labware):
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
     right = ctx.load_instrument('p10_single', Mount.RIGHT)
-    left = ctx.load_instrument('p300_multi', Mount.LEFT)
     lw = ctx.load_labware_by_name('generic_96_wellPlate_380_uL', 1)
     ctx.home()
 
@@ -79,19 +78,14 @@ def test_location_cache(loop, monkeypatch, load_my_labware):
 
     # Once we have a location cache, that should be our from_loc
     right.move_to(lw.wells()[1].top())
-    assert test_args[0] == lw.wells()[0].top()
-
-    # If we switch instruments, we should ignore the cache
-    here = hardware.gantry_position(Mount.LEFT)
-    left.move_to(lw.wells()[1].top())
-    assert test_args[0].point == here
-    assert test_args[0].labware is None
+    assert test_args[0].labware == lw.wells()[0]
 
 
 def test_move_uses_arc(loop, monkeypatch, load_my_labware):
     hardware = API.build_hardware_simulator(loop=loop)
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
+    ctx.home()
     right = ctx.load_instrument('p10_single', Mount.RIGHT)
     lw = ctx.load_labware_by_name('generic_96_wellPlate_380_uL', 1)
     ctx.home()
@@ -122,6 +116,7 @@ def test_pipette_info(loop):
 
 def test_aspirate(loop, load_my_labware, monkeypatch):
     ctx = papi.ProtocolContext(loop)
+    ctx.home()
     lw = ctx.load_labware_by_name('generic_96_wellPlate_380_uL', 1)
     instr = ctx.load_instrument('p10_single', Mount.RIGHT)
 
@@ -138,16 +133,27 @@ def test_aspirate(loop, load_my_labware, monkeypatch):
         move_called_with = (mount, loc)
 
     monkeypatch.setattr(ctx._hardware._api, 'aspirate', fake_hw_aspirate)
-    monkeypatch.setattr(ctx, 'move_to', fake_move)
+    monkeypatch.setattr(ctx._hardware._api, 'move_to', fake_move)
 
     instr.aspirate(2.0, lw.wells()[0].bottom())
 
     assert asp_called_with == (Mount.RIGHT, 2.0, 1.0)
-    assert move_called_with == (Mount.RIGHT, lw.wells()[0].bottom())
+    assert move_called_with == (Mount.RIGHT, lw.wells()[0].bottom().point)
+
+    instr.well_bottom_clearance = 1.0
+    instr.aspirate(2.0, lw.wells()[0])
+    dest_point, dest_lw = lw.wells()[0].bottom()
+    dest_point = dest_point._replace(z=dest_point.z + 1.0)
+    assert move_called_with == (Mount.RIGHT, dest_point)
+
+    move_called_with = None
+    instr.aspirate(2.0)
+    assert move_called_with is None
 
 
 def test_dispense(loop, load_my_labware, monkeypatch):
     ctx = papi.ProtocolContext(loop)
+    ctx.home()
     lw = ctx.load_labware_by_name('generic_96_wellPlate_380_uL', 1)
     instr = ctx.load_instrument('p10_single', Mount.RIGHT)
 
@@ -164,9 +170,19 @@ def test_dispense(loop, load_my_labware, monkeypatch):
         move_called_with = (mount, loc)
 
     monkeypatch.setattr(ctx._hardware._api, 'dispense', fake_hw_dispense)
-    monkeypatch.setattr(ctx, 'move_to', fake_move)
+    monkeypatch.setattr(ctx._hardware._api, 'move_to', fake_move)
 
     instr.dispense(2.0, lw.wells()[0].bottom())
 
     assert disp_called_with == (Mount.RIGHT, 2.0, 1.0)
-    assert move_called_with == (Mount.RIGHT, lw.wells()[0].bottom())
+    assert move_called_with == (Mount.RIGHT, lw.wells()[0].bottom().point)
+
+    instr.well_bottom_clearance = 1.0
+    instr.dispense(2.0, lw.wells()[0])
+    dest_point, dest_lw = lw.wells()[0].bottom()
+    dest_point = dest_point._replace(z=dest_point.z + 1.0)
+    assert move_called_with == (Mount.RIGHT, dest_point)
+
+    move_called_with = None
+    instr.dispense(2.0)
+    assert move_called_with is None

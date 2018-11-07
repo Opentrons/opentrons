@@ -7,8 +7,10 @@ from opentrons import __file__ as root_file
 
 
 root_dir = os.path.abspath(os.path.dirname(root_file))
-config_file = os.path.join(root_dir,
-                           'shared_data', 'robot-data', 'pipette-config.json')
+config_name_file = os.path.join(
+    root_dir, 'shared_data', 'robot-data', 'pipetteNameSpecs.json')
+config_model_file = os.path.join(
+    root_dir, 'shared_data', 'robot-data', 'pipetteModelSpecs.json')
 log = logging.getLogger(__name__)
 
 pipette_config = namedtuple(
@@ -54,7 +56,7 @@ Z_OFFSET_P300 = 0
 Z_OFFSET_P1000 = 20  # shortest single-channel pipette
 
 
-with open(config_file) as cfg_file:
+with open(config_model_file) as cfg_file:
     configs = list(json.load(cfg_file).keys())
 
 
@@ -63,39 +65,46 @@ def load(pipette_model: str) -> pipette_config:
     Lazily loads pipette config data from disk. This means that changes to the
     configuration data should be picked up on newly instantiated objects
     without requiring a restart. If :param pipette_model is not in the top-
-    level keys of the "pipette-config.json" file, this function will raise a
-    KeyError
+    level keys of the "pipetteModelSpecs.json" file, this function will raise
+    a KeyError
     :param pipette_model: a pipette model string corresponding to a top-level
-        key in the "pipette-config.json" file
+        key in the "pipetteModelSpecs.json" file
     :return: a `pipette_config` instance
     """
-    with open(config_file) as cfg_file:
-        cfg = json.load(cfg_file).get(pipette_model, {})
+    with open(config_model_file) as model_cfg_file:
+        cfg = json.load(model_cfg_file)[pipette_model]
 
-        plunger_pos = cfg.get('plungerPositions', {})
+    name_key = cfg.get('name')
 
-        res = pipette_config(
-            plunger_positions={
-                'top': plunger_pos.get('top'),
-                'bottom': plunger_pos.get('bottom'),
-                'blow_out': plunger_pos.get('blowOut'),
-                'drop_tip': plunger_pos.get('dropTip'),
-            },
-            pick_up_current=cfg.get('pickUpCurrent'),
-            pick_up_distance=cfg.get('pickUpDistance'),
-            aspirate_flow_rate=cfg.get('aspirateFlowRate'),
-            dispense_flow_rate=cfg.get('dispenseFlowRate'),
-            channels=cfg.get('channels'),
-            model_offset=cfg.get('modelOffset'),
-            plunger_current=cfg.get('plungerCurrent'),
-            drop_tip_current=cfg.get('dropTipCurrent'),
-            min_volume=cfg.get('minVolume'),
-            max_volume=cfg.get('maxVolume'),
-            ul_per_mm=cfg.get('ulPerMm'),
-            quirks=cfg.get('quirks'),
-            tip_length=cfg.get('tipLength'),
-            display_name=cfg.get('displayName')
-        )
+    # spread name keys into model-specific dict
+    with open(config_name_file) as name_cfg_file:
+        name_data = json.load(name_cfg_file)[name_key]
+        cfg.update(name_data)
+
+    plunger_pos = cfg.get('plungerPositions', {})
+
+    res = pipette_config(
+        plunger_positions={
+            'top': plunger_pos.get('top'),
+            'bottom': plunger_pos.get('bottom'),
+            'blow_out': plunger_pos.get('blowOut'),
+            'drop_tip': plunger_pos.get('dropTip'),
+        },
+        pick_up_current=cfg.get('pickUpCurrent'),
+        pick_up_distance=cfg.get('pickUpDistance'),
+        aspirate_flow_rate=cfg.get('defaultAspirateFlowRate'),
+        dispense_flow_rate=cfg.get('defaultDispenseFlowRate'),
+        channels=cfg.get('channels'),
+        model_offset=cfg.get('modelOffset'),
+        plunger_current=cfg.get('plungerCurrent'),
+        drop_tip_current=cfg.get('dropTipCurrent'),
+        min_volume=cfg.get('minVolume'),
+        max_volume=cfg.get('maxVolume'),
+        ul_per_mm=cfg.get('ulPerMm'),
+        quirks=cfg.get('quirks'),
+        tip_length=cfg.get('tipLength'),
+        display_name=cfg.get('displayName')
+    )
 
     # Verify that stored values agree with calculations
     if 'multi' in pipette_model:

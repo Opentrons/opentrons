@@ -76,3 +76,7 @@
 .wireless_info {
   padding-top: 1rem;
 }
+
+.disabled {
+  color: var(--c-font-disabled);
+}

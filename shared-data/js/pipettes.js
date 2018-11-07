@@ -1,64 +1,81 @@
 // @flow
 import mapValues from 'lodash/mapValues'
-import pipetteConfigByModel from '../robot-data/pipette-config.json'
+import pipetteNameSpecs from '../robot-data/pipetteNameSpecs.json'
+import pipetteModelSpecs from '../robot-data/pipetteModelSpecs.json'
 
 export type PipetteChannels = 1 | 8
 
-export type PipetteConfig = {
-  model: string,
+export type PipetteNameSpecs = {
+  name: string,
   displayName: string,
-  nominalMaxVolumeUl: number,
-  plungerPositions: {
-    top: number,
-    bottom: number,
-    blowOut: number,
-    dropTip: number,
-  },
-  pickUpCurrent: number,
-  aspirateFlowRate: number,
-  dispenseFlowRate: number,
-  ulPerMm: number,
+  minVolume: number,
+  maxVolume: number,
+  defaultAspirateFlowRate: number,
+  defaultDispenseFlowRate: number,
   channels: PipetteChannels,
-  modelOffset: [number, number, number],
-  tipLength: number,
 }
 
+export type PipetteModelSpecs = {
+  model: string,
+  tipLength: number,
+} & PipetteNameSpecs
+
+export type PipetteModel =
+  | 'p10_single'
+  | 'p50_single'
+  | 'p300_single'
+  | 'p1000_single'
+  | 'p10_multi'
+  | 'p50_multi'
+  | 'p300_multi'
+
 type SortableProps =
-  | 'nominalMaxVolumeUl'
+  | 'maxVolume'
   | 'channels'
 
 // models sorted by channels and then volume by default
-const ALL_MODELS: Array<string> = Object
-  .keys(pipetteConfigByModel)
-  .sort(comparePipettes(['channels', 'nominalMaxVolumeUl']))
+const ALL_PIPETTE_NAMES: Array<string> = Object
+  .keys(pipetteNameSpecs)
+  .sort(comparePipettes(['channels', 'maxVolume']))
 
-const ALL_PIPETTES: Array<PipetteConfig> = ALL_MODELS
-  .map(getPipette)
+const ALL_PIPETTES: Array<PipetteNameSpecs> = ALL_PIPETTE_NAMES
+  .map(getPipetteNameSpecs)
   .filter(Boolean)
 
-export function getPipette (model: string): ?PipetteConfig {
-  const config = pipetteConfigByModel[model]
+// use a name like 'p10_single' to get specs true for all models under that name
+export function getPipetteNameSpecs (name: string): ?PipetteNameSpecs {
+  const config = pipetteNameSpecs[name]
 
-  return config && {...config, model: model}
+  return config && {...config, name}
 }
 
-export function getPipetteModels (
+// specify a model, eg 'p10_single_v1.3' to get
+// both the name specs + model-specific specs
+// NOTE: this should NEVER be used in PD, which is model-agnostic
+export function getPipetteModelSpecs (model: string): ?PipetteModelSpecs {
+  const modelSpecificFields = pipetteModelSpecs[model]
+  const modelFields = modelSpecificFields &&
+    getPipetteNameSpecs(modelSpecificFields.name)
+  return modelFields && {...modelFields, ...modelSpecificFields}
+}
+
+export function getAllPipetteNames (
   ...sortBy: Array<SortableProps>
 ): Array<string> {
-  const models = [...ALL_MODELS]
+  const models = [...ALL_PIPETTE_NAMES]
 
   if (sortBy.length) models.sort(comparePipettes(sortBy))
 
   return models
 }
 
-export function getPipetteNames (
+export function getPipetteDisplayNames (
   ...sortBy: Array<SortableProps>
 ): Array<string> {
-  return getPipetteModels(...sortBy)
+  return getAllPipetteNames(...sortBy)
     .reduce((result, model) => {
       const {seen, names} = result
-      const {displayName} = getPipette(model) || {displayName: ''}
+      const {displayName} = getPipetteNameSpecs(model) || {displayName: ''}
 
       if (displayName && !seen[displayName]) {
         seen[displayName] = true
@@ -70,9 +87,10 @@ export function getPipetteNames (
     .names
 }
 
-// note: this function assumes all pipettes with the same display name have
-// the same number of channels. This feels like a sane assumption
-export function getPipetteChannelsByName (name: ?string): PipetteChannels {
+// TODO: Ian + Mike 2018-11-06 - DEPRECATED! This function can and should go
+// away once we can switch the app to checking `name` rather than `displayName`
+// or `model` for pipette correctness
+export function getPipetteChannelsByDisplayName (name: ?string): PipetteChannels {
   const match = ALL_PIPETTES.find(p => p.displayName === name)
 
   // default to single-channel if name doesn't match
@@ -82,8 +100,8 @@ export function getPipetteChannelsByName (name: ?string): PipetteChannels {
 function comparePipettes (sortBy: Array<SortableProps>) {
   return (modelA, modelB) => {
     // any cast is because we know these pipettes exist
-    const a: PipetteConfig = (getPipette(modelA): any)
-    const b: PipetteConfig = (getPipette(modelB): any)
+    const a: PipetteNameSpecs = (getPipetteNameSpecs(modelA): any)
+    const b: PipetteNameSpecs = (getPipetteNameSpecs(modelB): any)
 
     let i
     for (i = 0; i < sortBy.length; i++) {
@@ -96,6 +114,6 @@ function comparePipettes (sortBy: Array<SortableProps>) {
   }
 }
 
-export function getPropertyAllPipettes (propertyName: $Keys<PipetteConfig>) {
-  return mapValues(pipetteConfigByModel, config => config[propertyName])
+export function getPropertyAllPipettes (propertyName: $Keys<PipetteNameSpecs>) {
+  return mapValues(pipetteNameSpecs, config => config[propertyName])
 }

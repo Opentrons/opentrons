@@ -2,11 +2,10 @@
 // RobotSettings card for wifi status
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {getIn} from '@thi.ng/paths'
 import find from 'lodash/find'
 
-import {getConfig} from '../../config'
 import {makeGetRobotNetworkingStatus} from '../../http-api-client'
+import {CONNECTABLE} from '../../discovery'
 import {Card} from '@opentrons/components'
 import SelectNetwork from './SelectNetwork'
 import {ConnectionStatusMessage, ConnectionInfo} from './connection'
@@ -18,7 +17,6 @@ import type {InternetStatus, NetworkInterface} from '../../http-api-client'
 type OP = {robot: ViewableRobot}
 
 type SP = {|
-  __featureEnabled: boolean,
   internetStatus: ?InternetStatus,
   wifiNetwork: ?NetworkInterface,
   ethernetNetwork: ?NetworkInterface,
@@ -26,27 +24,32 @@ type SP = {|
 
 type Props = {...$Exact<OP>, ...SP}
 
-const __FEATURE_FLAG = 'devInternal.manageRobotConnection.newCard'
-
 export default connect(makeMapStateToProps)(ConnectionCard)
 
 const TITLE = 'Connectivity'
 function ConnectionCard (props: Props) {
-  // TODO(mc, 2018-10-15): remove feature flag
-  if (!props.__featureEnabled) return null
-
   const {robot, internetStatus, wifiNetwork, ethernetNetwork} = props
+  const disabled = robot.status !== CONNECTABLE
 
   return (
-    <Card title={TITLE}>
+    <Card title={TITLE} disabled={disabled}>
       <ConnectionStatusMessage
         type={robot.local ? 'USB' : 'Wi-Fi'}
         status={internetStatus}
       />
-      <ConnectionInfo connection={wifiNetwork} title="Wi-Fi">
+      <ConnectionInfo
+        connection={wifiNetwork}
+        title="Wi-Fi"
+        disabled={disabled}
+      >
         <SelectNetwork key={robot.name} robot={robot} />
       </ConnectionInfo>
-      <ConnectionInfo connection={ethernetNetwork} title="USB" wired />
+      <ConnectionInfo
+        connection={ethernetNetwork}
+        title="USB"
+        wired
+        disabled={disabled}
+      />
     </Card>
   )
 }
@@ -64,7 +67,6 @@ function makeMapStateToProps (): (State, OP) => SP {
       internetStatus,
       wifiNetwork: find(interfaces, {type: 'wifi'}),
       ethernetNetwork: find(interfaces, {type: 'ethernet'}),
-      __featureEnabled: !!getIn(getConfig(state), __FEATURE_FLAG),
     }
   }
 }

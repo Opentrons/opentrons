@@ -94,6 +94,7 @@ class API:
             top_types.Mount.RIGHT: None
         }
         self._attached_modules: Dict[str, Any] = {}
+        self._last_moved_mount: Optional[top_types.Mount] = None
 
     @classmethod
     def build_hardware_controller(
@@ -292,6 +293,8 @@ class API:
         This returns cached position to avoid hitting the smoothie driver
         unless ``refresh`` is ``True``.
         """
+        if not self._current_position:
+            raise MustHomeError
         if mount == mount.RIGHT:
             offset = top_types.Point(0, 0, 0)
         else:
@@ -340,6 +343,9 @@ class API:
         """
         if not self._current_position:
             raise MustHomeError
+
+        await self._cache_and_maybe_retract_mount(mount)
+
         z_axis = Axis.by_mount(mount)
         if mount == top_types.Mount.LEFT:
             offset = top_types.Point(*self.config.mount_offset)
@@ -363,6 +369,9 @@ class API:
         """
         if not self._current_position:
             raise MustHomeError
+
+        await self._cache_and_maybe_retract_mount(mount)
+
         z_axis = Axis.by_mount(mount)
         try:
             target_position = OrderedDict(
@@ -377,8 +386,21 @@ class API:
             raise MustHomeError
         await self._move(target_position, speed=speed)
 
+    async def _cache_and_maybe_retract_mount(self, mount: top_types.Mount):
+        """ Retract the 'other' mount if necessary
+
+        If `mount` does not match the value in :py:attr:`_last_moved_mount`
+        (and :py:attr:`_last_moved_mount` exists) then retract the mount
+        in :py:attr:`_last_moved_mount`. Also unconditionally update
+        :py:attr:`_last_moved_mount` to contain `mount`.
+        """
+        if mount != self._last_moved_mount and self._last_moved_mount:
+            await self.retract(self._last_moved_mount, 10)
+        self._last_moved_mount = mount
+
     async def _move_plunger(self, mount: top_types.Mount, dist: float,
                             speed: float = None):
+
         z_axis = Axis.by_mount(mount)
         pl_axis = Axis.of_plunger(mount)
         all_axes_pos = OrderedDict(
@@ -438,10 +460,28 @@ class API:
         # Since target_position is an OrderedDict with the axes ordered by
         # (x, y, z, a, b, c), and we’ll only have one of a or z (as checked
         # by the len(to_transform) check above) we can use an enumerate to
-        # fuse the specified axes and the transformed values back together
+        # fuse the specified axes and the transformed values back together.
+        # While we do this iteration, we’ll also check axis bounds.
+        bounds = self._backend.axis_bounds
         for idx, ax in enumerate(target_position.keys()):
             if ax in Axis.gantry_axes():
                 smoothie_pos[ax.name] = transformed[idx]
+                if smoothie_pos[ax.name] < bounds[ax.name][0]\
+                   or smoothie_pos[ax.name] > bounds[ax.name][1]:
+                    deck_mins = self._deck_from_smoothie({ax: bound[0]
+                                                          for ax, bound
+                                                          in bounds.items()})
+                    deck_max = self._deck_from_smoothie({ax: bound[1]
+                                                         for ax, bound
+                                                         in bounds.items()})
+                    raise RuntimeError(
+                        "Out of bounds move: {}={} (transformed: {}) not in"
+                        "limits ({}, {}) (transformed: ({}, {})"
+                        .format(ax.name,
+                                target_position[ax],
+                                smoothie_pos[ax.name],
+                                deck_mins[ax], deck_max[ax],
+                                bounds[ax.name][0], bounds[ax.name][1]))
         try:
             self._backend.move(smoothie_pos, speed=speed)
         except Exception:

@@ -17,6 +17,8 @@ export type PipetteIdByMount = {|
 
 export type PipetteById = {[pipetteId: string]: PipetteData}
 
+// TODO: BC 2018-11-07 implement SWAP_PIPETTES using UPDATE_PIPETTES so id (which)
+// has baked in mount string, makes sense after swap
 const byId = handleActions({
   LOAD_FILE: (state: PipetteById, action: LoadFileAction): PipetteById => {
     const file = action.payload

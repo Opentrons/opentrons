@@ -56,10 +56,12 @@ async def test_controller_musthome(hardware_api):
 
 async def test_home_specific_sim(hardware_api, monkeypatch):
     await hardware_api.home()
-    await hardware_api.move_to(types.Mount.RIGHT, types.Point(-10, 10, 20))
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 10, 20))
+    # Avoid the autoretract when moving two difference instruments
+    hardware_api._last_moved_mount = None
     await hardware_api.move_rel(types.Mount.LEFT, types.Point(0, 0, -20))
     await hardware_api.home([Axis.Z, Axis.C])
-    assert hardware_api._current_position == {Axis.X: -10,
+    assert hardware_api._current_position == {Axis.X: 0,
                                               Axis.Y: 10,
                                               Axis.Z: 218,
                                               Axis.A: 20,
@@ -69,9 +71,9 @@ async def test_home_specific_sim(hardware_api, monkeypatch):
 
 async def test_retract(hardware_api):
     await hardware_api.home()
-    await hardware_api.move_to(types.Mount.RIGHT, types.Point(-10, 10, 20))
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 10, 20))
     await hardware_api.retract(types.Mount.RIGHT, 10)
-    assert hardware_api._current_position == {Axis.X: -10,
+    assert hardware_api._current_position == {Axis.X: 0,
                                               Axis.Y: 10,
                                               Axis.Z: 218,
                                               Axis.A: 218,
@@ -95,12 +97,12 @@ async def test_move(hardware_api):
     # This assert implicitly checks that the mount offset is not applied to
     # relative moves; if you change this to move_to, the offset will be
     # applied again
-    rel_position = types.Point(30, 20, 10)
+    rel_position = types.Point(30, 20, -10)
     mount2 = types.Mount.LEFT
     target_position2 = {Axis.X: 60,
                         Axis.Y: 40,
-                        Axis.Z: 228,
-                        Axis.A: 10,
+                        Axis.Z: 208,
+                        Axis.A: 218,  # The other instrument is retracted
                         Axis.B: 19,
                         Axis.C: 19}
     await hardware_api.move_rel(mount2, rel_position)
@@ -155,10 +157,15 @@ async def test_critical_point_applied(hardware_api, monkeypatch):
     target[Axis.A] = 0
     assert hardware_api.current_position(types.Mount.RIGHT) == target
     # And removing the tip should move us back to the original
+    await hardware_api.move_rel(types.Mount.RIGHT, types.Point(2.5, 0, 0))
     await hardware_api.drop_tip(types.Mount.RIGHT)
     target[Axis.A] = 33 + hc.DROP_TIP_RELEASE_DISTANCE
+    target_no_offset[Axis.X] = 2.5
+    target[Axis.X] = 2.5
     assert hardware_api.current_position(types.Mount.RIGHT) == target
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
+    target[Axis.X] = 0
+    target_no_offset[Axis.X] = 0
     target_no_offset[Axis.A] = 13
     target[Axis.A] = 0
     assert hardware_api._current_position == target_no_offset
@@ -191,3 +198,69 @@ async def test_deck_cal_applied(monkeypatch, loop):
     assert called_with['X'] == 44
     assert called_with['Y'] == 20
     assert called_with['Z'] == 30
+
+
+async def test_other_mount_retracted(hardware_api):
+    await hardware_api.home()
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
+    assert hardware_api.gantry_position(types.Mount.RIGHT)\
+        == types.Point(0, 0, 0)
+    await hardware_api.move_to(types.Mount.LEFT, types.Point(20, 20, 0))
+    assert hardware_api.gantry_position(types.Mount.RIGHT) \
+        == types.Point(54, 20, 218)
+
+
+async def catch_oob_moves(hardware_api):
+    await hardware_api.home()
+    # Check axis max checking for move and move rel
+    with pytest.raises(RuntimeError):
+        await hardware_api.move_rel(types.Mount.RIGHT, types.Point(1, 0, 0))
+    assert hardware_api.gantry_position(types.Mount.RIGHT)\
+        == types.Point(418, 353, 218)
+    with pytest.raises(RuntimeError):
+        await hardware_api.move_rel(types.Mount.RIGHT, types.Point(0, 1, 0))
+    with pytest.raises(RuntimeError):
+        await hardware_api.move_rel(types.Mount.RIGHT, types.Point(0, 0, 1))
+    with pytest.raises(RuntimeError):
+        await hardware_api.move_to(types.Mount.RIGHT,
+                                   types.Point(419, 353, 218))
+    with pytest.raises(RuntimeError):
+        await hardware_api.move_to(types.Mount.RIGHT,
+                                   types.Point(418, 354, 218))
+    with pytest.raises(RuntimeError):
+        await hardware_api.move_to(types.Mount.RIGHT,
+                                   types.Point(418, 353, 219))
+    assert hardware_api.gantry_position(types.Mount.RIGHT)\
+        == types.Point(418, 353, 218)
+    # Axis min checking for move and move rel
+    with pytest.raises(RuntimeError):
+        await hardware_api.move_to(types.Mount.RIGHT,
+                                   types.Point(-1, 353, 218))
+    assert hardware_api.gantry_position(types.Mount.RIGHT)\
+        == types.Point(418, 353, 218)
+    with pytest.raises(RuntimeError):
+        await hardware_api.move_to(types.Mount.RIGHT,
+                                   types.Point(418, -1, 218))
+    with pytest.raises(RuntimeError):
+        await hardware_api.move_to(types.Mount.RIGHT,
+                                   types.Point(418, 353, -1))
+    with pytest.raises(RuntimeError):
+        await hardware_api.move_rel(types.Mount.RIGHT, types.Point(-419, 0, 0))
+    with pytest.raises(RuntimeError):
+        await hardware_api.move_rel(types.Mount.RIGHT, types.Point(0, -354, 0))
+    with pytest.raises(RuntimeError):
+        await hardware_api.move_rel(types.Mount.RIGHT, types.Point(0, 0, -219))
+    assert hardware_api.gantry_position(types.Mount.RIGHT)\
+        == types.Point(418, 353, 218)
+    # Make sure we are checking after mount offset and critical points
+    # are applied
+    with pytest.raises(RuntimeError):
+        await hardware_api.move_to(types.Mount.LEFT, types.Point(33, 0, 0))
+    with pytest.raises(RuntimeError):
+        await hardware_api.move_to(types.Mount.LEFT, types.Point(385, 0, 0))
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(50, 50, 100))
+    await hardware_api.cache_instruments({types.Mount.LEFT: 'p10_single'})
+    with pytest.raises(RuntimeError):
+        await hardware_api.move_rel(types.Mount.LEFT, types.Point(0, 0, 12))
+    await hardware_api.pick_up_tip(types.Mount.LEFT)
+    await hardware_api.move_rel(types.Mount.LEFT, types.Point(0, 0, 0))

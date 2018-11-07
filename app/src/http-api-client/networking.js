@@ -65,7 +65,8 @@ export type WifiAuthField = {
 
 export type WifiEapOption = {
   name: string,
-  displayName: string,
+  // API <= 3.4.0 does not include displayName in response
+  displayName?: string,
   options: Array<WifiAuthField>,
 }
 

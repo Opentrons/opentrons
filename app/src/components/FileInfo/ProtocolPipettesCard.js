@@ -5,7 +5,7 @@ import {connect} from 'react-redux'
 
 import {selectors as robotSelectors} from '../../robot'
 import {makeGetRobotPipettes, fetchPipettes} from '../../http-api-client'
-import {getPipette} from '@opentrons/shared-data'
+import {getPipetteModelSpecs} from '@opentrons/shared-data'
 import InstrumentItem from './InstrumentItem'
 import {RefreshWrapper} from '../Page'
 import {SectionContentHalf} from '../layout'
@@ -44,13 +44,13 @@ function ProtocolPipettes (props: Props) {
   if (pipettes.length === 0) return null
 
   const pipetteInfo = pipettes.map(p => {
-    const pipetteConfig = getPipette(p.name)
+    const pipetteConfig = getPipetteModelSpecs(p.name)
     const displayName = !pipetteConfig ? 'N/A' : pipetteConfig.displayName
 
     const actualModel = actualPipettes && actualPipettes[p.mount].model
     let pipettesMatch = true
 
-    if (pipetteConfig && actualModel !== pipetteConfig.model) {
+    if (pipetteConfig && actualModel !== p.name) {
       pipettesMatch = false
     }
 

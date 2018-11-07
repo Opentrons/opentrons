@@ -18,8 +18,10 @@ import {
 } from '@opentrons/components'
 
 import {WELL_LABEL_OFFSET} from '../constants'
-import SingleLabware from '../components/SingleLabware'
-import SelectionRect from '../components/SelectionRect.js'
+import SingleLabware from './SingleLabware'
+import SelectionRect from './SelectionRect.js'
+import WellTooltip from './labware/WellTooltip'
+import type {WellIngredientNames} from '../steplist/types'
 import type {ContentsByWell} from '../labware-ingred/types'
 import type {RectEvent} from '../collision-types'
 import styles from './SelectablePlate.css'
@@ -35,6 +37,7 @@ export type Props = {
   hoverable?: boolean,
   makeOnMouseOverWell?: (well: string) => (e: SyntheticMouseEvent<*>) => mixed,
   onMouseExitWell?: (e: SyntheticMouseEvent<*>) => mixed,
+  liquidNamesById: WellIngredientNames,
 
   onSelectionMove: RectEvent,
   onSelectionDone: RectEvent,
@@ -59,6 +62,7 @@ export default function SelectablePlate (props: Props) {
     hoverable = true,
     makeOnMouseOverWell,
     onMouseExitWell,
+    liquidNamesById,
   } = props
 
   // NOTE: LabwareOnDeck is not selectable or hoverable
@@ -99,21 +103,6 @@ export default function SelectablePlate (props: Props) {
       </g>
     )
   } else { // NOTE: Currently only selectable and hoverable (bound to redux) in LiquidPlacementModal
-    const getWellProps = (wellName) => {
-      const well = wellContents[wellName]
-      return {
-        onMouseOver: makeOnMouseOverWell && makeOnMouseOverWell(wellName),
-        onMouseLeave: onMouseExitWell,
-        selectable,
-        wellName,
-        highlighted: well.highlighted,
-        selected: well.selected,
-        error: well.error,
-        maxVolume: well.maxVolume,
-        fillColor: ingredIdsToColor(well.groupIds),
-      }
-    }
-
     // FIXME: SelectionRect is somehow off by one in the x axis, hence the magic number
     return (
       <SingleLabware showLabels>
@@ -122,8 +111,38 @@ export default function SelectablePlate (props: Props) {
           originXOffset={WELL_LABEL_OFFSET - 1}
           originYOffset={WELL_LABEL_OFFSET}
           {...{onSelectionMove, onSelectionDone}}>
-          <Labware labwareType={containerType} getWellProps={getWellProps} getTipProps={getTipProps} />
-          <LabwareLabels labwareType={containerType} />
+          <WellTooltip ingredNames={liquidNamesById}>
+            {({makeHandleMouseOverWell, handleMouseLeaveWell}) => (
+              <React.Fragment>
+                <Labware
+                  labwareType={containerType}
+                  getWellProps={(wellName) => {
+                    const well = wellContents[wellName]
+                    return {
+                      onMouseOver: (e: SyntheticMouseEvent<*>) => {
+                        makeOnMouseOverWell && makeOnMouseOverWell(wellName)(e)
+                        if (well.ingreds) {
+                          makeHandleMouseOverWell(wellName, well.ingreds)(e)
+                        }
+                      },
+                      onMouseLeave: (e: SyntheticMouseEvent<*>) => {
+                        onMouseExitWell && onMouseExitWell(e)
+                        handleMouseLeaveWell(e)
+                      },
+                      selectable,
+                      wellName,
+                      highlighted: well.highlighted,
+                      selected: well.selected,
+                      error: well.error,
+                      maxVolume: well.maxVolume,
+                      fillColor: ingredIdsToColor(well.groupIds),
+                    }
+                  }}
+                  getTipProps={getTipProps} />
+                <LabwareLabels labwareType={containerType} />
+              </React.Fragment>
+            )}
+          </WellTooltip>
         </SelectionRect>
       </SingleLabware>
     )
