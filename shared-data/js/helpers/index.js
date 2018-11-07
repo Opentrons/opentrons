@@ -52,7 +52,8 @@ export function splitWellsOnColumn (sortedArray: Array<string>): Array<Array<str
     if (lastColumn === undefined || lastColumn.length === 0) {
       return [[curr]]
     }
-    if (curr.slice(1) > lastColumn[0].slice(-1)[0].slice(1)) {
+    const lastEle = lastColumn[0].slice(-1)[0].slice(1)
+    if (Number(curr.slice(1)) > Number(lastEle)) {
       return [...acc, [curr]]
     } else {
       return [...acc.slice(0, -1), [...lastColumn[0], curr]]

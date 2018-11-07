@@ -113,28 +113,45 @@ function round (value, decimals) {
   return Number(Math.round(Number(value + 'e' + decimals)) + 'e-' + decimals)
 }
 
-export function determineLayout (
+export function _irregularWellName (rowIdx: Number, colIdx: Number, gridStart: Array<GridStart>) {
+  const rowNum = rowIdx * gridStart.rowStride + gridStart.rowStart.charCodeAt(0) - 65
+  const colNum = colIdx * gridStart.colStride + parseInt(gridStart.colStart) - 1
+  return toWellName({rowNum, colNum})
+}
+
+export function _calculateWellCoord (rowIdx: Number, colIdx: Number, spacing: Cell, offset: Offset, wells: Well) {
+  return {
+    ...wells,
+    x: round(colIdx * spacing.column + offset.x, 2),
+    y: round(rowIdx * spacing.row + offset.y, 2),
+    z: round(offset.z - wells.depth, 2)}
+}
+
+function determineLayout (
   grids: Array<Cell>,
   spacing: Array<Cell>,
   offset: Array<Offset>,
   gridStart: Array<GridStart>,
   wells: Array<Well>): {[wellName: string]: Well} {
-  let wellList = {}
+  const wellList = {}
   grids.forEach((gridObj, gridIdx) => {
-    range(gridObj.column).map(colIdx => {
-      range(gridObj.row).map(rowIdx => {
-        const rowNum = rowIdx * gridStart[gridIdx].rowStride + gridStart[gridIdx].rowStart.charCodeAt(0) - 65
-        const colNum = colIdx * gridStart[gridIdx].colStride + parseInt(gridStart[gridIdx].colStart) - 1
-        const wellName = toWellName({rowNum, colNum})
-        wellList[wellName] = {
-          ...wells[gridIdx],
-          x: round(colIdx * spacing[gridIdx].column + offset[gridIdx].x, 2),
-          y: round(rowIdx * spacing[gridIdx].row + offset[gridIdx].y, 2),
-          z: round(offset[gridIdx].z - wells[gridIdx].depth, 2)}
-      })
+    range(gridObj.column).forEach(colIdx => {
+      range(gridObj.row).forEach(rowIdx => {
+        const wellName = _irregularWellName(rowIdx, colIdx, gridStart[gridIdx])
+        wellList[wellName] = _calculateWellCoord(rowIdx, colIdx, spacing[gridIdx], offset[gridIdx], wells[gridIdx])
     })
   })
+})
   return wellList
+}
+
+function generateLoadName (grid: Array<Cell>, well: Array<Well>, units: string): string {
+  let loadName = ''
+  grid.forEach((gridObj, gridIdx) => {
+    const numWells = gridObj.row * gridObj.column
+    loadName += `${numWells}x${well[gridIdx].totalLiquidVolume}_${units}`
+  })
+  return loadName
 }
 // Decide order of wells for single grid containers
 function determineOrdering (grid: Cell): Array<Array<string>> {
@@ -175,40 +192,31 @@ function calculateCoordinates (
 
 // Generator function for labware definitions within a regular grid format
 // e.g. well plates, regular tuberacks (NOT 15_50ml) etc.
-// Required parameters are:
-//   metadata: Metadata,
-//  parameters: Params,
-//  dimensions: Dimensions,
-//  grid: Cell,
-//  spacing: Cell,
-//  well: Well,
-// Optional parameters are:
-// brand: Brand
 // For further info on these parameters look at labware examples in __tests__
 // or the labware definition schema in labware-json-schema
-export function createRegularLabware (props: RegularLabwareProps): Schema {
-  const ordering = determineOrdering(props.grid)
-  const offset = {...props.offset, z: round(props.dimensions.overallHeight + props.offset.z, 2)}
+export function createRegularLabware (args: RegularLabwareProps): Schema {
+  const ordering = determineOrdering(args.grid)
+  const offset = {...args.offset, z: round(args.dimensions.overallHeight + args.offset.z, 2)}
   const definition: Schema = {
     ordering,
     otId: assignId(),
     deprecated: false,
-    metadata: props.metadata,
+    metadata: args.metadata,
     cornerOffsetFromSlot: {
-      x: round(props.dimensions.overallLength - SLOT_LENGTH_MM, 2),
-      y: round(props.dimensions.overallWidth - SLOT_WIDTH_MM, 2),
+      x: round(args.dimensions.overallLength - SLOT_LENGTH_MM, 2),
+      y: round(args.dimensions.overallWidth - SLOT_WIDTH_MM, 2),
       z: 0},
-    dimensions: props.dimensions,
-    parameters: props.parameters,
-    wells: calculateCoordinates(props.well, ordering, props.spacing, offset),
+    dimensions: args.dimensions,
+    parameters: args.parameters,
+    wells: calculateCoordinates(args.well, ordering, args.spacing, offset),
   }
-  const numWells = props.grid.row * props.grid.column
-  const brand = (props.brand && props.brand.brand) || 'generic'
-  if (props.brand) definition.brand = props.brand
+  const numWells = args.grid.row * args.grid.column
+  const brand = (args.brand && args.brand.brand) || 'generic'
+  if (args.brand) definition.brand = args.brand
 
   definition.parameters.loadName = `${brand}_${numWells}_${
-    props.metadata.displayCategory}_${props.well.totalLiquidVolume}_${
-    props.metadata.displayVolumeUnits}`
+    args.metadata.displayCategory}_${args.well.totalLiquidVolume}_${
+    args.metadata.displayVolumeUnits}`
 
   const valid = validate(definition)
   if (valid !== true) {
@@ -219,53 +227,39 @@ export function createRegularLabware (props: RegularLabwareProps): Schema {
 
 // Generator function for labware definitions within an irregular grid format
 // e.g. crystalization plates, 15_50ml tuberacks and anything with multiple "grids"
-// Required parameters are:
-//  metadata: Metadata,
-//  parameters: Params,
-//  dimensions: Dimensions,
-//  grid: Array<Cell>,
-//  spacing: Array<Cell>,
-//  well: Array<Well>,
-//  gridStart: Array<gridStart>
-// Optional parameters are:
-// brand: Brand
-// For further info on these parameters look at labware examples in __tests__
-// or the labware definition schema in labware-json-schema
-export function createIrregularLabware (props: IrregularLabwareProps): Schema {
-  let offset = []
-  props.offset.forEach(offsetObj => {
+export function createIrregularLabware (args: IrregularLabwareProps): Schema {
+  const offset = []
+  args.offset.forEach(offsetObj => {
     offset.push({
       ...offsetObj,
-      z: round(props.dimensions.overallHeight + offsetObj.z, 2),
+      z: round(args.dimensions.overallHeight + offsetObj.z, 2),
     })
   })
-  const wellsArray = determineLayout(props.grid, props.spacing, offset, props.gridStart, props.well)
+  const wellsArray = determineLayout(args.grid, args.spacing, offset, args.gridStart, args.well)
   const ordering = determineIrregularOrdering(Object.keys(wellsArray))
   const definition: Schema = {
     ordering,
     otId: assignId(),
     deprecated: false,
-    metadata: props.metadata,
+    metadata: args.metadata,
     cornerOffsetFromSlot: {
-      x: round(props.dimensions.overallLength - SLOT_LENGTH_MM, 2),
-      y: round(props.dimensions.overallWidth - SLOT_WIDTH_MM, 2),
+      x: round(args.dimensions.overallLength - SLOT_LENGTH_MM, 2),
+      y: round(args.dimensions.overallWidth - SLOT_WIDTH_MM, 2),
       z: 0},
-    dimensions: props.dimensions,
-    parameters: {...props.parameters, format: 'irregular'},
+    dimensions: args.dimensions,
+    parameters: {
+      ...args.parameters,
+      format: 'irregular'},
     wells: wellsArray,
     }
 
-    const brand = (props.brand && props.brand.brand) || 'generic'
-    if (props.brand) definition.brand = props.brand
+    const brand = (args.brand && args.brand.brand) || 'generic'
+    if (args.brand) definition.brand = args.brand
 
     // generate loadName based on numwells per grid type
-    let loadName = ''
-    props.grid.forEach((gridObj, gridIdx) => {
-      const numWells = gridObj.row * gridObj.column
-      loadName += `${numWells}x${props.well[gridIdx].totalLiquidVolume}_${
-        props.metadata.displayVolumeUnits}`
-    })
-    definition.parameters.loadName = `${brand}_${loadName}_${props.metadata.displayCategory}`
+    const wellCombo = generateLoadName(args.grid, args.well, args.metadata.displayVolumeUnits)
+
+    definition.parameters.loadName = `${brand}_${wellCombo}_${args.metadata.displayCategory}`
 
     const valid = validate(definition)
     if (valid !== true) {
