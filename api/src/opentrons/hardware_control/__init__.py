@@ -45,10 +45,6 @@ class MustHomeError(RuntimeError):
     pass
 
 
-class PipetteNotAttachedError(KeyError):
-    pass
-
-
 _Backend = Union[Controller, Simulator]
 Instruments = Dict[top_types.Mount, Optional[Pipette]]
 SHAKE_OFF_TIPS_SPEED = 50
@@ -240,7 +236,7 @@ class API:
         position.
 
         :param mount: the mount associated with the target plunger
-        :type mount: :py:class`.top_types.Mount`
+        :type mount: :py:class:`.top_types.Mount`
         """
         # incase plunger motor stalled while dropping a tip, add a
         # safety margin of the distance between `bottom` and `drop_tip`
@@ -588,8 +584,8 @@ class API:
         """
         this_pipette = self._attached_instruments[mount]
         if not this_pipette:
-            raise PipetteNotAttachedError("No pipette attached to {} mount"
-                                          .format(mount.name))
+            raise top_types.PipetteNotAttachedError(
+                "No pipette attached to {} mount".format(mount.name))
         if volume is None:
             asp_vol = this_pipette.available_volume
             mod_log.debug(
@@ -634,8 +630,8 @@ class API:
         """
         this_pipette = self._attached_instruments[mount]
         if not this_pipette:
-            raise PipetteNotAttachedError("No pipette attached to {} mount"
-                                          .format(mount.name))
+            raise top_types.PipetteNotAttachedError(
+                "No pipette attached to {} mount".format(mount.name))
         if volume is None:
             disp_vol = this_pipette.current_volume
             mod_log.debug("No dispense volume specified. Dispensing all "
@@ -679,8 +675,8 @@ class API:
         """
         this_pipette = self._attached_instruments[mount]
         if not this_pipette:
-            raise PipetteNotAttachedError("No pipette attached to {} mount"
-                                          .format(mount.name))
+            raise top_types.PipetteNotAttachedError(
+                "No pipette attached to {} mount".format(mount.name))
 
         self._backend.set_active_current(Axis.of_plunger(mount),
                                          this_pipette.config.plunger_current)
@@ -797,8 +793,8 @@ class API:
         """
         instr = self._attached_instruments[mount]
         if not instr:
-            raise PipetteNotAttachedError("No pipette attached to {} mount"
-                                          .format(mount.name))
+            raise top_types.PipetteNotAttachedError(
+                "No pipette attached to {} mount".format(mount.name))
 
         pos_dict: Dict = instr.config.plunger_positions
         if top is not None:
@@ -815,8 +811,8 @@ class API:
     def set_flow_rate(self, mount, aspirate=None, dispense=None):
         this_pipette = self._attached_instruments[mount]
         if not this_pipette:
-            raise PipetteNotAttachedError("No pipette attached to {} mount"
-                                          .format(mount))
+            raise top_types.PipetteNotAttachedError(
+                "No pipette attached to {} mount".format(mount))
         if aspirate:
             this_pipette.update_config_item('aspirate_flow_rate', aspirate)
         if dispense:

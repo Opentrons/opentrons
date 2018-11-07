@@ -418,7 +418,7 @@ class Labware:
 
         :param num_tips: target number of sequential tips in the same column
         :type num_tips: int
-        :return: the :py:class`.Well` meeting the target criteria, or None
+        :return: the :py:class:`.Well` meeting the target criteria, or None
         """
         assert num_tips > 0
 
@@ -451,12 +451,12 @@ class Labware:
         based on the start well, the number of channels, and the geometry of
         the tiprack.
 
-        :param start_well: The :py:class`.Well` from which to pick up a tip.
+        :param start_well: The :py:class:`.Well` from which to pick up a tip.
                            For a single-channel pipette, this is the well to
                            send the pipette to. For a multi-channel pipette,
                            this is the well to send the back-most nozzle of the
                            pipette to.
-        :type start_well: :py:class`.Well`
+        :type start_well: :py:class:`.Well`
         :param num_channels: The number of channels for the current pipette
         :type num_channels: int
         """
