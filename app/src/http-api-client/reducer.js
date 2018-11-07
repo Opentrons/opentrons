@@ -2,7 +2,6 @@
 // generic api reducer
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
-import some from 'lodash/some'
 import {normalizeRobots} from '../discovery'
 
 import type {Service} from '@opentrons/discovery-client'
@@ -89,9 +88,15 @@ export default function apiReducer (
       return reduce(
         normalizeRobots(action.payload.robots),
         (apiState: ApiState, robots: Array<Service>, name: string) => {
-          const ok = some(robots, 'ok')
-          if (!ok && !isEmpty(apiState[name])) return {...apiState, [name]: {}}
-          return apiState
+          const up =
+            robots.some(r => r.ok) ||
+            robots.some(r => r.serverOk) ||
+            robots.some(r => r.advertising)
+
+          // clear api request/response state if robot is fully offline
+          return !up && !isEmpty(apiState[name])
+            ? {...apiState, [name]: {}}
+            : apiState
         },
         state
       )

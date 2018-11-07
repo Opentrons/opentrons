@@ -121,10 +121,25 @@ describe('apiReducer', () => {
   })
 
   test('clears state for unhealthy robots on discovery:UPDATE_LIST', () => {
-    const robot = {name: 'name', ok: false}
-    const state = {name: {path: {inProgress: false, error: new Error('AH')}}}
-    const action = {type: 'discovery:UPDATE_LIST', payload: {robots: [robot]}}
+    const robots = [
+      {name: 'offline', ok: false, serverOk: false, advertising: false},
+      {name: 'advertising', ok: false, serverOk: false, advertising: true},
+      {name: 'reachable', ok: false, serverOk: true, advertising: false},
+      {name: 'connectable', ok: true, serverOk: false, advertising: false},
+    ]
+    const state = {
+      offline: {path: {inProgress: false, error: new Error('AH')}},
+      advertising: {path: {inProgress: false, error: new Error('AH')}},
+      reachable: {path: {inProgress: false, error: new Error('AH')}},
+      connectable: {path: {inProgress: false, error: new Error('AH')}},
+    }
+    const action = {type: 'discovery:UPDATE_LIST', payload: {robots}}
 
-    expect(apiReducer(state, action)).toEqual({name: {}})
+    expect(apiReducer(state, action)).toEqual({
+      offline: {},
+      advertising: {path: {inProgress: false, error: new Error('AH')}},
+      reachable: {path: {inProgress: false, error: new Error('AH')}},
+      connectable: {path: {inProgress: false, error: new Error('AH')}},
+    })
   })
 })
