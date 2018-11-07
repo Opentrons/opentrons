@@ -113,13 +113,13 @@ function round (value, decimals) {
   return Number(Math.round(Number(value + 'e' + decimals)) + 'e-' + decimals)
 }
 
-export function _irregularWellName (rowIdx: Number, colIdx: Number, gridStart: Array<GridStart>) {
+export function _irregularWellName (rowIdx: number, colIdx: number, gridStart: GridStart) {
   const rowNum = rowIdx * gridStart.rowStride + gridStart.rowStart.charCodeAt(0) - 65
   const colNum = colIdx * gridStart.colStride + parseInt(gridStart.colStart) - 1
   return toWellName({rowNum, colNum})
 }
 
-export function _calculateWellCoord (rowIdx: Number, colIdx: Number, spacing: Cell, offset: Offset, wells: Well) {
+export function _calculateWellCoord (rowIdx: number, colIdx: number, spacing: Cell, offset: Offset, wells: Well) {
   return {
     ...wells,
     x: round(colIdx * spacing.column + offset.x, 2),
