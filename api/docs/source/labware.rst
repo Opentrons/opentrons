@@ -66,13 +66,13 @@ Opentrons Containers
 Tipracks
 ========
 
-opentrons-300ul-tiprack
+opentrons-tiprack-300ul
 -----------------------
 Tiprack for both a 50ul and 300ul pipette (single or 8-channel)
 
 .. code-block:: python
 
-  labware.load('opentrons-300ul-tiprack', slot)
+  labware.load('opentrons-tiprack-300ul', slot)
 
 **Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
 
