@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Tuple
 
 from .labware import Well, Labware, load
 from opentrons import types, hardware_control as hc
@@ -118,6 +118,9 @@ class ProtocolContext:
                                     the version.
         :param types.Mount mount: The mount in which this instrument should be
                                   attached.
+        :param List[Labware] tip_racks: A list of tip racks from which to pick
+                                        tips if `pick_up_tip` is called without
+                                        arguments.
         :param bool replace: Indicate that the currently-loaded instrument in
                              `mount` (if such an instrument exists) should be
                              replaced by `instrument_name`.
@@ -256,8 +259,8 @@ class InstrumentContext:
                  ctx: ProtocolContext,
                  hardware: adapters.SynchronousAdapter,
                  mount: types.Mount,
-                 tip_racks: Optional[List[Labware]],
                  log_parent: logging.Logger,
+                 tip_racks: List[Labware] = None,
                  **config_kwargs) -> None:
         self._hardware = hardware
         self._ctx = ctx
@@ -395,64 +398,56 @@ class InstrumentContext:
                 height: float = None) -> 'InstrumentContext':
         raise NotImplementedError
 
-    def return_tip(self, home_after: bool = True) -> 'InstrumentContext':
+    def return_tip(self) -> 'InstrumentContext':
         raise NotImplementedError
 
-    def pick_up_tip(self, location: Well = None,
+    def pick_up_tip(self, location: types.Location = None,
                     presses: int = 3,
-                    increment: int = 1) -> 'InstrumentContext':
-        """
+                    increment: float = 1.0) -> 'InstrumentContext':
+        """`
         Pick up a tip for the Pipette to run liquid-handling commands with
 
-        Notes
-        -----
         A tip can be manually set by passing a `location`. If no location
         is passed, the Pipette will pick up the next available tip in
-        it's `tip_racks` list (see :any:`Pipette`)
+        its `tip_racks` list (see :any:`Pipette`)
 
-        Parameters
-        ----------
-        :param location: The `Well` to perform the pick_up_tip.
-        :type location: `Labware`, `Well`, or None
-
+        :param location: The labware or well from which to pick up a tip.
+        :type location: :py:class`.types.Location`
         :param presses: The number of times to lower and then raise the pipette
                         when picking up a tip, to ensure a good seal (0 [zero]
                         will result in the pipette hovering over the tip but
                         not picking it up--generally not desireable, but could
-                        be used for dry-run)
+                        be used for dry-run).
         :type presses: int
-
         :param increment: The additional distance to travel on each successive
-                          press (e.g.: if presses=3 and increment=1, then the
+                          press (e.g.: if presses=3 and increment=1.0, then the
                           first press will travel down into the tip by 3.5mm,
-                          the second by 4.5mm, and the third by 5.5mm
-        :type increment: int or float
-
+                          the second by 4.5mm, and the third by 5.5mm.
+        :type increment: float
         :returns: This instance
         """
         num_channels = \
             self._hardware.attached_instruments[self._mount]['channels']
 
-        def _select_tiprack_from_list(tip_racks) -> Labware:
+        def _select_tiprack_from_list(tip_racks) -> Tuple[Labware, Well]:
             try:
                 tr = tip_racks[0]
             except IndexError:
                 raise OutOfTipsError
             next_tip = tr.next_tip(num_channels)
             if next_tip:
-                return tr
+                return tr, next_tip
             else:
                 return _select_tiprack_from_list(tip_racks[1:])
 
-        if isinstance(location, Labware):
-            tiprack = location
+        if location and isinstance(location.labware, Labware):
+            tiprack = location.labware
             target: Optional[Well] = tiprack.next_tip(num_channels)
-        elif isinstance(location, Well):
-            tiprack = location.parent
-            target = location
+        elif location and isinstance(location.labware, Well):
+            tiprack = location.labware.parent
+            target = location.labware
         else:
-            tiprack = _select_tiprack_from_list(self.tip_racks)
-            target = tiprack.next_tip(num_channels)
+            tiprack, target = _select_tiprack_from_list(self.tip_racks)
         if target is None:
             # This is primarily for type checking--should raise earlier
             raise OutOfTipsError
@@ -469,28 +464,25 @@ class InstrumentContext:
 
         return self
 
-    def drop_tip(self, location: Well = None,
-                 home_after: bool = True) -> 'InstrumentContext':
+    def drop_tip(self, location: types.Location = None) -> 'InstrumentContext':
         """
         Drop the current tip. If a location is specified, drop the tip there,
         otherwise drop it into the fixed trash.
 
         :param location: The location to drop the tip
-        :type location: `Well` or None
-
-        :param home_after: if True, home the robot after dropping tip
-        :param home_after: bool
+        :type location: :py:class`.types.Location` or None
 
         :returns: This instance
         """
-        if location:
-            self.move_to(location.top())
+        if location and isinstance(location.labware, Labware):
+            target: Well = location.labware.wells()[0]
+        elif location and isinstance(location.labware, Well):
+            target = location.labware
         else:
-            self.move_to(self.trash_container.wells()[0].top())
-        self._hardware.drop_tip(self.mount)
-        if home_after:
-            self.home()
+            target = self.trash_container.wells()[0]
 
+        self.move_to(target.top())
+        self._hardware.drop_tip(self._mount)
         return self
 
     def home(self) -> 'InstrumentContext':
@@ -499,6 +491,14 @@ class InstrumentContext:
         :returns: This instance.
         """
         self._ctx.home()
+        return self
+
+    def home_plunger(self) -> 'InstrumentContext':
+        """ Home the plunger associated with this mount
+
+        :returns: This instance.
+        """
+        self._hardware.home_plunger(self.mount)
         return self
 
     def distribute(self,

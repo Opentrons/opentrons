@@ -160,6 +160,7 @@ async def test_critical_point_applied(hardware_api, monkeypatch):
     # And removing the tip should move us back to the original
     await hardware_api.move_rel(types.Mount.RIGHT, types.Point(2.5, 0, 0))
     await hardware_api.drop_tip(types.Mount.RIGHT)
+    await hardware_api.home_plunger(types.Mount.RIGHT)
     target[Axis.A] = 33 + hc.DROP_TIP_RELEASE_DISTANCE
     target_no_offset[Axis.X] = 2.5
     target[Axis.X] = 2.5

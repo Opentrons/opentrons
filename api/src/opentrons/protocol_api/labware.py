@@ -3,14 +3,14 @@ import json
 import os
 import re
 import time
+from collections import defaultdict
+from enum import Enum, auto
 from itertools import takewhile, dropwhile
 from typing import List, Dict, Optional
 
 from opentrons.types import Location
-from enum import Enum, auto
 from opentrons.types import Point
 from opentrons.util import environment as env
-from collections import defaultdict
 
 
 class WellShape(Enum):
@@ -410,13 +410,15 @@ class Labware:
 
     def next_tip(self, num_tips: int = 1) -> Optional[Well]:
         """
+        Find the next valid well for pick-up.
+
         Determines the next valid start tip from which to retrieve the
         specified number of tips. There must be at least `num_tips` sequential
-        wells for which all wells have tips, in the same column
+        wells for which all wells have tips, in the same column.
 
-        :param num_tips: the number of sequential tips in the same column
+        :param num_tips: target number of sequential tips in the same column
         :type num_tips: int
-        :return:
+        :return: the :py:class`.Well` meeting the target criteria, or None
         """
         assert num_tips > 0
 
@@ -440,20 +442,21 @@ class Labware:
 
     def use_tips(self, start_well: Well, num_channels: int = 1):
         """
-        Removes tips from the tip tracker. This method should be called when a
-        tip is picked up. Generally, it will be called with `num_wells=1` or
-        `num_wells=8` for single- and multi-channel respectively. If picking up
-        with more than one channel, this method will automatically determine
-        which tips are used based on the start well, the number of channels,
-        and the geometry of the tiprack.
+        Removes tips from the tip tracker.
 
-        For example, targeting the
+        This method should be called when a tip is picked up. Generally, it
+        will be called with `num_channels=1` or `num_channels=8` for single-
+        and multi-channel respectively. If picking up with more than one
+        channel, this method will automatically determine which tips are used
+        based on the start well, the number of channels, and the geometry of
+        the tiprack.
 
-        :param start_well: The Well from which to pick up a tip. For a single-
-            channel pipette, this is the well to send the pipette to. For a
-            multi-channel pipette, this is the well to send the back-most
-            nozzle of the pipette to.
-        :type start_well: Well
+        :param start_well: The :py:class`.Well` from which to pick up a tip.
+                           For a single-channel pipette, this is the well to
+                           send the pipette to. For a multi-channel pipette,
+                           this is the well to send the back-most nozzle of the
+                           pipette to.
+        :type start_well: :py:class`.Well`
         :param num_channels: The number of channels for the current pipette
         :type num_channels: int
         """
@@ -474,7 +477,6 @@ class Labware:
         assert all([well.has_tip for well in target_wells])
 
         for well in target_wells:
-            print("Using tip in {}".format(well))
             well.has_tip = False
 
     def __repr__(self):

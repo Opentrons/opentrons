@@ -234,6 +234,29 @@ class API:
         await self.home([Axis.Z, Axis.A])
 
     @_log_call
+    async def home_plunger(self, mount: top_types.Mount):
+        """
+        Home the plunger motor for a mount, and then return it to the 'bottom'
+        position.
+
+        :param mount: the mount associated with the target plunger
+        :type mount: :py:class`.top_types.Mount`
+        """
+        # incase plunger motor stalled while dropping a tip, add a
+        # safety margin of the distance between `bottom` and `drop_tip`
+        instr = self._attached_instruments[mount]
+        if instr:
+            b = instr.config.plunger_positions['bottom']
+            d = instr.config.plunger_positions['drop_tip']
+            safety_margin = abs(b-d)
+            self._backend.set_active_current(Axis.of_plunger(mount),
+                                             instr.config.plunger_current)
+            await self._move_plunger(mount, safety_margin)
+            await self.home([Axis.of_plunger(mount)])
+            await self._move_plunger(mount,
+                                     instr.config.plunger_positions['bottom'])
+
+    @_log_call
     async def home(self, axes: List[Axis] = None):
         """ Home the entire robot and initialize current position.
         :param axes: A list of axes to home. Default is `None`, which will
@@ -735,7 +758,6 @@ class API:
         await self._move_plunger(mount,
                                  instr.config.plunger_positions['drop_tip'])
         await self._shake_off_tips(mount)
-        await self._home_plunger_after_drop_tip(mount)
         instr.set_current_volume(0)
         instr.remove_tip()
 
@@ -755,20 +777,6 @@ class API:
         # raise the pipette upwards so we are sure tip has fallen off
         up_pos = top_types.Point(0, 0, DROP_TIP_RELEASE_DISTANCE)
         await self.move_rel(mount, up_pos)
-
-    async def _home_plunger_after_drop_tip(self, mount):
-        # incase plunger motor stalled while dropping a tip, add a
-        # safety margin of the distance between `bottom` and `drop_tip`
-        instr = self._attached_instruments[mount]
-        b = instr.config.plunger_positions['bottom']
-        d = instr.config.plunger_positions['drop_tip']
-        safety_margin = abs(b-d)
-        self._backend.set_active_current(Axis.of_plunger(mount),
-                                         instr.config.plunger_current)
-        await self._move_plunger(mount, safety_margin)
-        await self.home([Axis.of_plunger(mount)])
-        await self._move_plunger(mount,
-                                 instr.config.plunger_positions['bottom'])
 
     # Pipette config api
     @_log_call
