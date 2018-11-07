@@ -4,7 +4,7 @@ import cx from 'classnames'
 import {Link} from 'react-router-dom'
 
 import {Icon, PrimaryButton, ModalPage} from '@opentrons/components'
-import {getPipetteChannelsByName} from '@opentrons/shared-data'
+import {getPipetteChannelsByDisplayName} from '@opentrons/shared-data'
 
 import type {ChangePipetteProps} from './types'
 import {getDiagramSrc} from './InstructionStep'
@@ -91,7 +91,7 @@ function StatusDetails (props: ChangePipetteProps) {
             className={styles.confirm_diagram}
             src={getDiagramSrc({
               ...props,
-              channels: getPipetteChannelsByName(wantedPipetteName),
+              channels: getPipetteChannelsByDisplayName(wantedPipetteName),
               diagram: 'tab',
               direction: 'attach',
             })}

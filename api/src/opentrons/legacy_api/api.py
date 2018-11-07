@@ -49,7 +49,7 @@ class InstrumentsWrapper(object):
             min_volume=None,
             max_volume=None):
 
-        pipette_model_version = self._retrieve_version_number(
+        pipette_model_version = self.retrieve_version_number(
             mount, 'p10_single')
         config = pipette_config.load(pipette_model_version)
 
@@ -74,7 +74,7 @@ class InstrumentsWrapper(object):
             min_volume=None,
             max_volume=None):
 
-        pipette_model_version = self._retrieve_version_number(
+        pipette_model_version = self.retrieve_version_number(
             mount, 'p10_multi')
         config = pipette_config.load(pipette_model_version)
 
@@ -99,7 +99,7 @@ class InstrumentsWrapper(object):
             min_volume=None,
             max_volume=None):
 
-        pipette_model_version = self._retrieve_version_number(
+        pipette_model_version = self.retrieve_version_number(
             mount, 'p50_single')
         config = pipette_config.load(pipette_model_version)
 
@@ -124,7 +124,7 @@ class InstrumentsWrapper(object):
             min_volume=None,
             max_volume=None):
 
-        pipette_model_version = self._retrieve_version_number(
+        pipette_model_version = self.retrieve_version_number(
             mount, 'p50_multi')
         config = pipette_config.load(pipette_model_version)
 
@@ -149,7 +149,7 @@ class InstrumentsWrapper(object):
             min_volume=None,
             max_volume=None):
 
-        pipette_model_version = self._retrieve_version_number(
+        pipette_model_version = self.retrieve_version_number(
             mount, 'p300_single')
         config = pipette_config.load(pipette_model_version)
 
@@ -174,7 +174,7 @@ class InstrumentsWrapper(object):
             min_volume=None,
             max_volume=None):
 
-        pipette_model_version = self._retrieve_version_number(
+        pipette_model_version = self.retrieve_version_number(
             mount, 'p300_multi')
         config = pipette_config.load(pipette_model_version)
 
@@ -199,7 +199,7 @@ class InstrumentsWrapper(object):
             min_volume=None,
             max_volume=None):
 
-        pipette_model_version = self._retrieve_version_number(
+        pipette_model_version = self.retrieve_version_number(
             mount, 'p1000_single')
         config = pipette_config.load(pipette_model_version)
 
@@ -258,7 +258,7 @@ class InstrumentsWrapper(object):
 
         return p
 
-    def _retrieve_version_number(self, mount, expected_model_substring):
+    def retrieve_version_number(self, mount, expected_model_substring):
         attached_model = robot.get_attached_pipettes()[mount]['model']
 
         if attached_model and expected_model_substring in attached_model:

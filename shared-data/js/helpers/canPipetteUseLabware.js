@@ -2,7 +2,7 @@
 
 import get from 'lodash/get'
 import getLabware from '../getLabware'
-import {getPipette} from '../pipettes'
+import {getPipetteNameSpecs} from '../pipettes'
 
 const FORMAT_METADATA = {
   '96-standard': {multichannelAccess: true},
@@ -10,9 +10,9 @@ const FORMAT_METADATA = {
   'trough': {multichannelAccess: true},
   'irregular': {multichannelAccess: false},
 }
-const canPipetteUseLabware = (pipetteModel: string, labwareModel: string): ?boolean => {
+const canPipetteUseLabware = (pipetteName: string, labwareModel: string): ?boolean => {
   const labware = getLabware(labwareModel)
-  const pipette = getPipette(pipetteModel)
+  const pipette = getPipetteNameSpecs(pipetteName)
   if (!labware) {
     console.warn(`No labware definition found for labware ${labwareModel}`)
     return null
@@ -23,7 +23,7 @@ const canPipetteUseLabware = (pipetteModel: string, labwareModel: string): ?bool
     return null
   }
   if (!pipette) {
-    console.warn(`No pipette definition found for pipette ${pipetteModel}`)
+    console.warn(`No pipette definition found for pipette ${pipetteName}`)
     return null
   }
   if (pipette.channels > 1) {

@@ -6,7 +6,7 @@ import reduce from 'lodash/reduce'
 import {connect} from 'react-redux'
 
 import {Modal, OutlineButton, LabeledValue} from '@opentrons/components'
-import {getPipette} from '@opentrons/shared-data'
+import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import {sortWells} from '../../../utils'
 import type {BaseState, ThunkDispatch} from '../../../types'
 import {selectors as pipetteSelectors} from '../../../pipettes'
@@ -76,7 +76,7 @@ class WellSelectionModal extends React.Component<Props, State> {
   render () {
     if (!this.props.isOpen) return null
     const {pipette} = this.props
-    const pipetteConfig = pipette && getPipette(pipette.model)
+    const pipetteConfig = pipette && getPipetteNameSpecs(pipette.model)
 
     return (
       <Modal

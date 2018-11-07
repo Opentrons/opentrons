@@ -3,7 +3,7 @@
 import {createSelector} from 'reselect'
 
 import type {OutputSelector} from 'reselect'
-import type {PipetteConfig} from '@opentrons/shared-data'
+import type {PipetteModelSpecs} from '@opentrons/shared-data'
 import type {State, ThunkPromiseAction, Action} from '../types'
 import type {Mount, BaseRobot, RobotService} from '../robot'
 import type {ApiCall, ApiRequestError} from './types'
@@ -44,7 +44,7 @@ type RobotPositionsResponse = {
 // note: not the actual request body because moveTo is two requests
 type RobotMoveRequest =
   | {| position: 'change_pipette', mount: Mount |}
-  | {| position: 'attach_tip', mount: Mount, pipette: PipetteConfig |}
+  | {| position: 'attach_tip', mount: Mount, pipette: PipetteModelSpecs |}
 
 type RobotMoveResponse = {
   message: string,
