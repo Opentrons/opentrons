@@ -34,7 +34,7 @@ const hardcodedLabware = {
     ['opentrons-aluminum-block-2ml-eppendorf', 'Aluminum Block - 2mL Eppendorf Tubes'],
     ['opentrons-aluminum-block-2ml-screwcap', 'Aluminum Block - 2mL Screw Cap Tubes'],
     ['opentrons-aluminum-block-96-PCR-plate', 'Aluminum Block - 96 PCR Plate'],
-    ['opentrons-aluminum-block-PCR-strips-200ul', 'Aluminum Block - PCR Strips'],
+    ['opentrons-aluminum-block-PCR-strips-200ul', 'Aluminum Block - 0.2mL PCR Strips'],
   ],
   'Tube Rack': [
     ['opentrons-tuberack-2ml-eppendorf', '2mL Eppendorf Tube Rack (4-in-1 Rack)'],
@@ -45,7 +45,6 @@ const hardcodedLabware = {
     ['tube-rack-.75ml', '0.75mL Tube Rack (Clear Acrylic)', 'Tuberack-075ml'],
     ['tube-rack-2ml', '2mL Tube Rack (Clear Acrylic)', 'Tuberack-2ml'],
     ['tube-rack-15_50ml', '15mL x 6 + 50mL x 4 Tube Rack (Clear Acrylic)', 'Tuberack-15-50ml'],
-    ['24-vial-rack', '3.5mL Tube Rack (Clear Acrylic)'],
   ],
   'Well Plate': [
     ['96-deep-well', '96 Deep Well Plate', '96-Deep-Well'],
