@@ -151,7 +151,7 @@ async def test_no_pipette(dummy_instruments, loop):
     await hw_api.cache_instruments()
     aspirate_ul = 3.0
     aspirate_rate = 2
-    with pytest.raises(hc.PipetteNotAttachedError):
+    with pytest.raises(types.PipetteNotAttachedError):
         await hw_api.aspirate(types.Mount.RIGHT, aspirate_ul, aspirate_rate)
         assert not hw_api._current_volume[types.Mount.RIGHT]
 
