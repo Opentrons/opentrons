@@ -20,7 +20,9 @@ def load_pipettes(protocol_data):
         # TODO: Ian 2018-11-06 remove this fallback to 'model' when
         # backwards-compatability for JSON protocols with versioned
         # pipettes is dropped (next JSON protocol schema major bump)
-        name = props.get('name', model.split('_v')[0])
+        name = props.get('name')
+        if not name:
+            name = model.split('_v')[0]
 
         pipette_name_version = instruments.retrieve_version_number(
             mount, name)
@@ -165,8 +167,6 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
             # backwards-compatability for JSON protocols with versioned
             # pipettes is dropped (next JSON protocol schema major bump)
             pipette_name = protocol_pipette_data.get('model')
-
-        print('p pn', pipette, pipette_name)
 
         location = _get_location(
             loaded_labware, command_type, params, default_values)
