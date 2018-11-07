@@ -80,6 +80,6 @@ export function discoveryReducer (
   return state
 }
 
-function normalizeRobots (robots: Array<Service> = []): RobotsMap {
+export function normalizeRobots (robots: Array<Service> = []): RobotsMap {
   return groupBy(robots, 'name')
 }

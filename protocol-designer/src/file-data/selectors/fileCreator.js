@@ -26,8 +26,8 @@ const applicationVersion = process.env.OT_PD_VERSION || 'unknown version'
 const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
 
 const executionDefaults = {
-  'aspirate-flow-rate': getPropertyAllPipettes('aspirateFlowRate'),
-  'dispense-flow-rate': getPropertyAllPipettes('dispenseFlowRate'),
+  'aspirate-flow-rate': getPropertyAllPipettes('defaultAspirateFlowRate'),
+  'dispense-flow-rate': getPropertyAllPipettes('defaultDispenseFlowRate'),
   'aspirate-mm-from-bottom': DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   'dispense-mm-from-bottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   'touch-tip-mm-from-top': DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
@@ -60,8 +60,11 @@ export const createFile: BaseState => ProtocolFile = createSelector(
       initialRobotState.instruments,
       (pipette: PipetteData): FilePipette => ({
         mount: pipette.mount,
-        // TODO HACK Ian 2018-05-11 use pipette definitions in labware-definitions
-        model: `p${pipette.maxVolume}_${pipette.channels === 1 ? 'single' : 'multi'}_v1`, // eg p10_single_v1
+        // TODO: Ian 2018-11-06 'model' is for backwards compatibility with old API version
+        // (JSON executor used to expect versioned model).
+        // Drop this "model" when we do breaking change (see TODO in protocol-schema.json)
+        model: pipette.model + '_v1.3',
+        name: pipette.model,
       })
     )
 

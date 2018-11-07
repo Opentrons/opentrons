@@ -1,6 +1,7 @@
 // @flow
 // UI components for displaying connection info
 import * as React from 'react'
+import cx from 'classnames'
 import {CardContentHalf} from '../layout'
 import styles from './styles.css'
 
@@ -42,19 +43,27 @@ type ConnectionInfoProps = {
   title: string,
   wired?: boolean,
   children?: React.Node,
+  disabled: ?boolean,
 }
 
 export function ConnectionInfo (props: ConnectionInfoProps) {
-  const {connection, title, wired, children} = props
+  const {connection, title, wired, children, disabled} = props
+  const labelStyles = cx(styles.connection_label, {
+    [styles.disabled]: disabled,
+  })
 
   return (
     <React.Fragment>
       <CardContentHalf>
-        <h4 className={styles.connection_label}>{title}</h4>
+        <h4 className={labelStyles}>{title}</h4>
         {children}
       </CardContentHalf>
       <CardContentHalf>
-        <NetworkAddresses connection={connection} wired={wired} />
+        <NetworkAddresses
+          connection={connection}
+          wired={wired}
+          disabled={disabled}
+        />
       </CardContentHalf>
     </React.Fragment>
   )
@@ -63,21 +72,25 @@ export function ConnectionInfo (props: ConnectionInfoProps) {
 type NetworkAddressProps = {
   connection: ?NetworkInterface,
   wired: ?boolean,
+  disabled: ?boolean,
 }
 
 function NetworkAddresses (props: NetworkAddressProps) {
   const type = props.wired ? 'Wired' : 'Wireless'
   const ip = (props.connection && props.connection.ipAddress) || 'Unknown'
   const mac = (props.connection && props.connection.macAddress) || 'Unknown'
+  const labelStyles = cx(styles.connection_label, {
+    [styles.disabled]: props.disabled,
+  })
 
   return (
     <div className={styles.wireless_info}>
       <p>
-        <span className={styles.connection_label}>{type} IP: </span>
+        <span className={labelStyles}>{type} IP: </span>
         {ip}
       </p>
       <p>
-        <span className={styles.connection_label}>{type} MAC address: </span>
+        <span className={labelStyles}>{type} MAC address: </span>
         {mac}
       </p>
     </div>

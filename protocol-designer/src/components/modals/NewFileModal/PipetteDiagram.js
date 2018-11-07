@@ -1,16 +1,14 @@
 // @flow
 
-import {getPipette} from '@opentrons/shared-data'
+import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import * as React from 'react'
 import styles from './NewFileModal.css'
 import {InstrumentDiagram} from '@opentrons/components'
 
-function getChannels (pipetteModel: ?string): ?number {
-  if (!pipetteModel) return null
+function getChannels (pipetteName: ?string): ?number {
+  if (!pipetteName) return null
 
-  // TODO: Ian 2018-06-27 use getPipette fn from shared-data
-  // once PD's pipetteData.js is replaced with shared-data stuff
-  const pipetteData = getPipette(pipetteModel)
+  const pipetteData = getPipetteNameSpecs(pipetteName)
   return (pipetteData && pipetteData.channels) || null
 }
 

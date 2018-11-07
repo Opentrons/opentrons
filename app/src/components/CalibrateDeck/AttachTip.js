@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import type {PipetteConfig} from '@opentrons/shared-data'
+import type {PipetteModelSpecs} from '@opentrons/shared-data'
 import type {CalibrateDeckStartedProps, CalibrationStep} from './types'
 import {PrimaryButton} from '@opentrons/components'
 
@@ -12,7 +12,7 @@ type Props = CalibrateDeckStartedProps & {
 
 type DiagramProps = {
   calibrationStep: CalibrationStep,
-  pipette: PipetteConfig,
+  pipette: PipetteModelSpecs,
 }
 
 type Channels = 'single' | 'multi'

@@ -3,23 +3,39 @@ from opentrons import robot, protocols, labware, instruments
 
 
 def test_load_pipettes():
-    robot.reset()
-    data = {
-        "pipettes": {
-            "leftPipetteHere": {
-                "mount": "left",
-                "model": "p10_single_v1"
+    # TODO Ian 2018-11-07 when `model` is dropped, delete its test case
+    test_cases = [
+        # deprecated case
+        {
+            "pipettes": {
+                "leftPipetteHere": {
+                    "mount": "left",
+                    "model": "p10_single_v1.3"
+                }
+            }
+        },
+        # future case
+        {
+            "pipettes": {
+                "leftPipetteHere": {
+                    "mount": "left",
+                    "name": "p10_single"
+                }
             }
         }
-    }
-    loaded_pipettes = protocols.load_pipettes(data)
-    robot_instruments = robot.get_instruments()
+    ]
 
-    assert len(robot_instruments) == 1
-    mount, pipette = robot_instruments[0]
-    assert mount == 'left'
-    # loaded pipette in result dict should match that in robot_instruments
-    assert pipette == loaded_pipettes['leftPipetteHere']
+    for data in test_cases:
+        robot.reset()
+
+        loaded_pipettes = protocols.load_pipettes(data)
+        robot_instruments = robot.get_instruments()
+
+        assert len(robot_instruments) == 1
+        mount, pipette = robot_instruments[0]
+        assert mount == 'left'
+        # loaded pipette in result dict should match that in robot_instruments
+        assert pipette == loaded_pipettes['leftPipetteHere']
 
 
 def test_get_location():

@@ -5,6 +5,7 @@ import json
 import time
 from opentrons.protocol_api import labware
 from opentrons.types import Point
+import pytest
 
 minimalLabwareDef = {
     "metadata": {
@@ -17,7 +18,8 @@ minimalLabwareDef = {
     },
     "otId": "minimalLabwareDef",
     "parameters": {
-        "isTiprack": False,
+        "isTiprack": True,
+        "tipLength": 55.3
     },
     "ordering": [["A1"], ["A2"]],
     "wells": {
@@ -52,7 +54,20 @@ path = os.path.join(
     labware.persistent_path, "{}.json".format(minimalLabwareDef["otId"]))
 
 
-def test_save_calibration(monkeypatch):
+@pytest.fixture
+def clear_calibration(monkeypatch):
+    try:
+        os.remove(path)
+    except FileNotFoundError:
+        pass
+    yield
+    try:
+        os.remove(path)
+    except FileNotFoundError:
+        pass
+
+
+def test_save_calibration(monkeypatch, clear_calibration):
     # Test the save calibration file
     assert not os.path.exists(path)
     calibration_point = None
@@ -72,9 +87,19 @@ def test_save_calibration(monkeypatch):
     assert calibration_point == Point(1, 1, 1)
 
 
-def test_schema_shape(monkeypatch):
-    assert os.path.exists(path)
+def test_save_tip_length(monkeypatch, clear_calibration):
+    assert not os.path.exists(path)
 
+    test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0), 'deck')
+    calibrated_length = 22.0
+    labware.save_tip_length(test_labware, calibrated_length)
+    assert os.path.exists(path)
+    with open(path) as calibration_file:
+        data = json.load(calibration_file)
+        assert data['tipLength']['length'] == calibrated_length
+
+
+def test_schema_shape(monkeypatch, clear_calibration):
     def fake_time():
         return 1
     monkeypatch.setattr(time, 'time', fake_time)
@@ -88,7 +113,7 @@ def test_schema_shape(monkeypatch):
     assert result == expected
 
 
-def test_load_calibration(monkeypatch):
+def test_load_calibration(monkeypatch, clear_calibration):
 
     calibration_point = None
 
@@ -102,14 +127,20 @@ def test_load_calibration(monkeypatch):
 
     test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0), 'deck')
 
-    labware.save_calibration(test_labware, Point(1, 1, 1))
+    test_offset = Point(1, 1, 1)
+    test_tip_length = 34.5
+
+    labware.save_calibration(test_labware, test_offset)
+    labware.save_tip_length(test_labware, test_tip_length)
 
     # Set without saving to show that load will update with previously saved
     # data
     test_labware.set_calibration(Point(0, 0, 0))
+    test_labware.tip_length = 46.8
 
     labware.load_calibration(test_labware)
-    assert calibration_point == Point(1, 1, 1)
+    assert calibration_point == test_offset
+    assert test_labware.tip_length == test_tip_length
 
 
 def test_wells_rebuilt_with_offset():

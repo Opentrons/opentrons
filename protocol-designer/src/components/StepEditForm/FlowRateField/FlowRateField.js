@@ -24,7 +24,7 @@ type Props = {
   minFlowRate: number,
   maxFlowRate: number,
   updateValue: (flowRate: ?number) => mixed,
-  pipetteModelDisplayName: ?string,
+  pipetteDisplayName: ?string,
 }
 
 type State = {
@@ -109,7 +109,7 @@ export default class FlowRateField extends React.Component<Props, State> {
       label,
       minFlowRate,
       maxFlowRate,
-      pipetteModelDisplayName,
+      pipetteDisplayName,
     } = this.props
 
     const modalFlowRateNum = Number(this.state.modalFlowRate)
@@ -147,7 +147,7 @@ export default class FlowRateField extends React.Component<Props, State> {
       />
     )
 
-    const FlowRateModal = pipetteModelDisplayName && (
+    const FlowRateModal = pipetteDisplayName && (
       <Portal>
         <AlertModal
           className={modalStyles.modal}
@@ -166,7 +166,7 @@ export default class FlowRateField extends React.Component<Props, State> {
           <h3 className={styles.header}>Flow Rate</h3>
 
           <div className={styles.description}>
-            {`Our default aspirate speed is optimal for a ${pipetteModelDisplayName}
+            {`Our default aspirate speed is optimal for a ${pipetteDisplayName}
             aspirating liquids with a viscosity similar to water`}
           </div>
 

@@ -1,13 +1,15 @@
 """This module will replace Placeable"""
-from collections import defaultdict
-from enum import Enum, auto
 import json
 import os
 import re
 import time
-from typing import List, Dict
+from collections import defaultdict
+from enum import Enum, auto
+from itertools import takewhile, dropwhile
+from typing import List, Dict, Optional
 
-from opentrons.types import Point, Location
+from opentrons.types import Location
+from opentrons.types import Point
 from opentrons.util import environment as env
 
 
@@ -25,9 +27,10 @@ persistent_path = os.path.join(env.get_path('APP_DATA_DIR'), 'offsets')
 
 
 class Well:
-    def __init__(
-            self, well_props: dict, parent: Location, display_name: str)\
-            -> None:
+    def __init__(self, well_props: dict,
+                 parent: Location,
+                 display_name: str,
+                 has_tip: bool) -> None:
         """
         Create a well, and track the Point corresponding to the top-center of
         the well (this Point is in absolute deck coordinates)
@@ -52,6 +55,7 @@ class Well:
         if not parent.labware:
             raise ValueError("Wells must have a parent")
         self._parent = parent.labware
+        self._has_tip = has_tip
         self._shape = well_shapes.get(well_props['shape'])
         if self._shape is WellShape.RECTANGULAR:
             self._length = well_props['length']
@@ -71,6 +75,14 @@ class Well:
     @property
     def parent(self) -> 'Labware':
         return self._parent
+
+    @property
+    def has_tip(self) -> bool:
+        return self._has_tip
+
+    @has_tip.setter
+    def has_tip(self, value: bool):
+        self._has_tip = value
 
     def top(self) -> Location:
         """
@@ -203,7 +215,8 @@ class Labware:
             Well(
                 self._well_definition[well],
                 Location(self._calibrated_offset, self),
-                "{} of {}".format(well, self._display_name))
+                "{} of {}".format(well, self._display_name),
+                self.is_tiprack)
             for well in self._ordering]
 
     def _create_indexed_dictionary(self, group=0):
@@ -343,7 +356,7 @@ class Labware:
         :return: A list of column lists
         """
         col_dict = self._create_indexed_dictionary(group=2)
-        keys = sorted(col_dict)
+        keys = sorted(col_dict, key=lambda x: int(x))
 
         if not args:
             res = [col_dict[key] for key in keys]
@@ -383,6 +396,89 @@ class Labware:
         """
         return self._dimensions['overallHeight'] + self._calibrated_offset.z
 
+    @property
+    def is_tiprack(self) -> bool:
+        return self._parameters['isTiprack']
+
+    @property
+    def tip_length(self) -> float:
+        return self._parameters['tipLength']
+
+    @tip_length.setter
+    def tip_length(self, length: float):
+        self._parameters['tipLength'] = length
+
+    def next_tip(self, num_tips: int = 1) -> Optional[Well]:
+        """
+        Find the next valid well for pick-up.
+
+        Determines the next valid start tip from which to retrieve the
+        specified number of tips. There must be at least `num_tips` sequential
+        wells for which all wells have tips, in the same column.
+
+        :param num_tips: target number of sequential tips in the same column
+        :type num_tips: int
+        :return: the :py:class:`.Well` meeting the target criteria, or None
+        """
+        assert num_tips > 0
+
+        columns: List[List[Well]] = self.columns()
+        drop_leading_empties = [
+            list(dropwhile(lambda x: not x.has_tip, column))
+            for column in columns]
+        drop_at_first_gap = [
+            list(takewhile(lambda x: x.has_tip, column))
+            for column in drop_leading_empties]
+        long_enough = [
+            column for column in drop_at_first_gap if len(column) >= num_tips]
+
+        try:
+            first_long_enough = long_enough[0]
+            result: Optional[Well] = first_long_enough[0]
+        except IndexError:
+            result = None
+
+        return result
+
+    def use_tips(self, start_well: Well, num_channels: int = 1):
+        """
+        Removes tips from the tip tracker.
+
+        This method should be called when a tip is picked up. Generally, it
+        will be called with `num_channels=1` or `num_channels=8` for single-
+        and multi-channel respectively. If picking up with more than one
+        channel, this method will automatically determine which tips are used
+        based on the start well, the number of channels, and the geometry of
+        the tiprack.
+
+        :param start_well: The :py:class:`.Well` from which to pick up a tip.
+                           For a single-channel pipette, this is the well to
+                           send the pipette to. For a multi-channel pipette,
+                           this is the well to send the back-most nozzle of the
+                           pipette to.
+        :type start_well: :py:class:`.Well`
+        :param num_channels: The number of channels for the current pipette
+        :type num_channels: int
+        """
+        assert num_channels > 0
+        # Select the column of the labware that contains the target well
+        target_column: List[Well] = [
+            col for col in self.columns() if start_well in col][0]
+
+        well_idx = target_column.index(start_well)
+        # Number of tips to pick up is the lesser of (1) the number of tips
+        # from the starting well to the end of the column, and (2) the number
+        # of channels of the pipette (so a 4-channel pipette would pick up a
+        # max of 4 tips, and picking up from the 2nd-to-bottom well in a
+        # column would get a maximum of 2 tips)
+        num_tips = min(len(target_column) - well_idx, num_channels)
+        target_wells = target_column[well_idx: well_idx + num_tips]
+
+        assert all([well.has_tip for well in target_wells])
+
+        for well in target_wells:
+            well.has_tip = False
+
     def __repr__(self):
         return self._display_name
 
@@ -401,7 +497,7 @@ def save_calibration(labware: Labware, delta: Point):
     Function to be used whenever an updated delta is found for the first well
     of a given labware. If an offset file does not exist, create the file
     using labware id as the filename. If the file does exist, load it and
-    modify the delta and the lastModified field.
+    modify the delta and the lastModified fields under the "default" key.
     """
     if not os.path.exists(persistent_path):
         os.mkdir(persistent_path)
@@ -413,18 +509,38 @@ def save_calibration(labware: Labware, delta: Point):
     labware.set_calibration(delta)
 
 
+def save_tip_length(labware: Labware, length: float):
+    """
+    Function to be used whenever an updated tip length is found for
+    of a given tip rack. If an offset file does not exist, create the file
+    using labware id as the filename. If the file does exist, load it and
+    modify the length and the lastModified fields under the "tipLength" key.
+    """
+    if not os.path.exists(persistent_path):
+        os.mkdir(persistent_path)
+    labware_offset_path = os.path.join(
+        persistent_path, "{}.json".format(labware._id))
+    calibration_data = _helper_tip_length_data_format(
+        labware_offset_path, length)
+    with open(labware_offset_path, 'w') as f:
+        json.dump(calibration_data, f)
+    labware.tip_length = length
+
+
 def load_calibration(labware: Labware):
     """
     Look up a calibration if it exists and apply it to the given labware.
     """
-    offset = Point(0, 0, 0)
     labware_offset_path = os.path.join(
         persistent_path, "{}.json".format(labware._id))
     if os.path.exists(labware_offset_path):
         calibration_data = _read_file(labware_offset_path)
         offset_array = calibration_data['default']['offset']
         offset = Point(x=offset_array[0], y=offset_array[1], z=offset_array[2])
-    labware.set_calibration(offset)
+        labware.set_calibration(offset)
+        if 'tipLength' in calibration_data.keys():
+            tip_length = calibration_data['tipLength']['length']
+            labware.tip_length = tip_length
 
 
 def _helper_offset_data_format(filepath: str, delta: Point) -> dict:
@@ -439,6 +555,21 @@ def _helper_offset_data_format(filepath: str, delta: Point) -> dict:
         calibration_data = _read_file(filepath)
         calibration_data['default']['offset'] = [delta.x, delta.y, delta.z]
         calibration_data['default']['lastModified'] = time.time()
+    return calibration_data
+
+
+def _helper_tip_length_data_format(filepath: str, length: float) -> dict:
+    try:
+        calibration_data = _read_file(filepath)
+    except FileNotFoundError:
+        # This should generally not occur, as labware calibration has to happen
+        # prior to tip length calibration
+        calibration_data = {}
+
+    calibration_data['tipLength'] = {
+        'length': length,
+        'lastModified': time.time()}
+
     return calibration_data
 
 

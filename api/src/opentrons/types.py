@@ -7,6 +7,11 @@ if TYPE_CHECKING:
     from .labware import Labware, Well  # noqa(F401) Used for typechecking
 
 
+class PipetteNotAttachedError(KeyError):
+    """ An error raised if a pipette is accessed that is not attached """
+    pass
+
+
 class Point(NamedTuple):
     x: float
     y: float

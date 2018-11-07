@@ -137,7 +137,7 @@ export type CommandCreatorData =
 export type PipetteData = {| // TODO refactor all 'pipette fields', split PipetteData into its own export type
   id: string, // TODO PipetteId export type here instead of string?
   mount: Mount,
-  model: string,
+  model: string, // TODO Ian 2018-11-05 rename 'model' to 'name' when breaking change is made in JSON protocols
   maxVolume: number,
   channels: Channels,
   tiprackModel?: string, // NOTE: this will go away when tiprack sharing is implemented

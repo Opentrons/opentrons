@@ -143,10 +143,11 @@ async def test_critical_point_applied(hardware_api, monkeypatch):
               Axis.A: 0,
               Axis.C: 19}
     assert hardware_api.current_position(types.Mount.RIGHT) == target
-    await hardware_api.pick_up_tip(types.Mount.RIGHT)
+    p10_tip_length = 33
+    await hardware_api.pick_up_tip(types.Mount.RIGHT, p10_tip_length)
     # Now the current position (with offset applied) should change
     # pos_after_pickup + model_offset + critical point
-    target[Axis.A] = 218 + (-13) + (-33)
+    target[Axis.A] = 218 + (-13) + (-1 * p10_tip_length)
     target_no_offset[Axis.C] = target[Axis.C] = 2
     assert hardware_api.current_position(types.Mount.RIGHT) == target
     # This move should take the new critical point into account
@@ -159,6 +160,7 @@ async def test_critical_point_applied(hardware_api, monkeypatch):
     # And removing the tip should move us back to the original
     await hardware_api.move_rel(types.Mount.RIGHT, types.Point(2.5, 0, 0))
     await hardware_api.drop_tip(types.Mount.RIGHT)
+    await hardware_api.home_plunger(types.Mount.RIGHT)
     target[Axis.A] = 33 + hc.DROP_TIP_RELEASE_DISTANCE
     target_no_offset[Axis.X] = 2.5
     target[Axis.X] = 2.5

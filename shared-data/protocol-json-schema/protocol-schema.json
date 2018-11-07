@@ -2,9 +2,24 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
 
   "definitions": {
-    "pipette-model": {
-      "description": "Special keyword specifying the model of the pipette. TODO finalize these model names they are still TBD",
+    "pipetteName": {
+      "description": "Name of a pipette. Does not contain info about specific model/version. Should match keys in pipetteNameSpecs.json",
       "type": "string",
+      "enum": [
+        "p10_single",
+        "p10_multi",
+        "p50_single",
+        "p50_multi",
+        "p300_single",
+        "p300_multi",
+        "p1000_single",
+        "p1000_multi"
+      ]
+    },
+    "pipette-model": {
+      "description": "DEPRECATED. Exists to support backwards compatibility",
+      "type": "string",
+      "$comment": "TODO: Ian 2018-11-06 remove this def and every usage of it",
       "enum": [
         "p10_single_v1",
         "p10_multi_v1",
@@ -34,7 +49,7 @@
     "flow-rate-for-pipettes": {
       "description": "Flow rate in mm/sec for each pipette model used in the protocol",
       "type": "object",
-      "propertyNames": {"$ref": "#/definitions/pipette-model"},
+      "propertyNames": {"$ref": "#/definitions/pipetteName"},
       "patternProperties": {".*": {"type": "number"}},
       "additionalProperties": false
     },
@@ -192,6 +207,7 @@
     "pipettes": {
       "description": "The pipettes used in this protocol, keyed by an arbitrary unique ID",
       "additionalProperties": false,
+      "$comment": "TODO: Ian 2018-11-06 next breaking change, drop 'model' and require 'name' field",
       "patternProperties": {
         ".+": {
           "description": "Fields describing an individual pipette",
@@ -202,6 +218,9 @@
               "description": "Where the pipette is mounted",
               "type": "string",
               "enum": ["left", "right"]
+            },
+            "name": {
+              "$ref": "#/definitions/pipetteName"
             },
             "model": {
               "$ref": "#/definitions/pipette-model"
