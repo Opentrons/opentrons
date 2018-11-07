@@ -121,7 +121,7 @@ export const reconcileFormPipette = (formData: FormData, baseState: BaseState, n
   let updateOverrides = {}
 
   // *****
-  // set any flow rates to null when pipette is changed
+  // set any flow rates, mix volumes, air gaps, or disposal volumes to null when pipette is changed
   // *****
   if (formData.pipette !== nextPipetteId) {
     if (formData.aspirate_flowRate) {
@@ -129,6 +129,18 @@ export const reconcileFormPipette = (formData: FormData, baseState: BaseState, n
     }
     if (formData.dispense_flowRate) {
       updateOverrides = {...updateOverrides, dispense_flowRate: null}
+    }
+    if (formData.aspirate_mix_volume) {
+      updateOverrides = {...updateOverrides, aspirate_mix_volume: null}
+    }
+    if (formData.dispense_mix_volume) {
+      updateOverrides = {...updateOverrides, dispense_mix_volume: null}
+    }
+    if (formData.aspirate_airGap_volume) {
+      updateOverrides = {...updateOverrides, aspirate_airGap_volume: null}
+    }
+    if (formData.aspirate_disposalVol_volume) {
+      updateOverrides = {...updateOverrides, aspirate_disposalVol_volume: null}
     }
   }
 
