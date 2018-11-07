@@ -1,17 +1,33 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import type {BaseState} from '../types'
+import type {BaseState, ThunkDispatch} from '../types'
 
-import {selectors} from '../steplist'
+import {
+  actions as steplistActions,
+  selectors as steplistSelectors,
+} from '../steplist'
 import {StepList} from '../components/steplist'
 
 type Props = React.ElementProps<typeof StepList>
 
-function mapStateToProps (state: BaseState): Props {
+type SP = {
+  orderedSteps: $PropertyType<Props, 'orderedSteps'>,
+}
+
+type DP = $Diff<Props, SP>
+
+function mapStateToProps (state: BaseState): SP {
   return {
-    orderedSteps: selectors.orderedSteps(state),
+    orderedSteps: steplistSelectors.orderedSteps(state),
   }
 }
 
-export default connect(mapStateToProps)(StepList)
+function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
+  return {
+    reorderSelectedStep: (delta: number) =>
+      dispatch(steplistActions.reorderSelectedStep(delta)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(StepList)
