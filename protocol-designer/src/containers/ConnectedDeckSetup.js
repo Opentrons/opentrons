@@ -10,6 +10,8 @@ import LiquidPlacementModal from '../components/LiquidPlacementModal.js'
 import LabwareContainer from '../containers/LabwareContainer.js'
 import LabwareSelectionModal from '../components/LabwareSelectionModal'
 import BrowseLabwareModal from '../components/labware/BrowseLabwareModal'
+import StepEditForm from '../components/StepEditForm'
+import {Portal} from '../components/portals/MainPageModalPortal'
 
 import {selectors} from '../labware-ingred/reducers'
 import * as actions from '../labware-ingred/actions'
@@ -87,13 +89,7 @@ class DeckSetup extends React.Component<Props> {
   }
 
   render () {
-    if (this.props.selectedTerminalItemId !== START_TERMINAL_ITEM_ID) {
-      // Temporary quickfix: if we're not in deck setup mode,
-      // hide the labware dropdown and ingredient selection modal
-      // and just show the deck.
-      // TODO Ian 2018-05-30 this shouldn't be a responsibility of DeckSetup
-      return this.renderDeck()
-    }
+    const startTerminalItemSelected = this.props.selectedTerminalItemId === START_TERMINAL_ITEM_ID
 
     // NOTE: besides `Deck`, these are all modal-like components that show up
     // only when user is on deck setup / ingred selection "page".
@@ -101,8 +97,11 @@ class DeckSetup extends React.Component<Props> {
     // this will go away
     return (
       <React.Fragment>
-        <LabwareSelectionModal />
-        {this.props.ingredSelectionMode && <LiquidPlacementModal />}
+        <Portal>
+          {startTerminalItemSelected && <LabwareSelectionModal />}
+          {!startTerminalItemSelected && <StepEditForm />}
+          {startTerminalItemSelected && this.props.ingredSelectionMode && <LiquidPlacementModal />}
+        </Portal>
         {this.renderDeck()}
       </React.Fragment>
     )

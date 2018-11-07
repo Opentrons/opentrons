@@ -5,7 +5,6 @@ import TimelineAlerts from '../components/alerts/TimelineAlerts'
 import Hints from '../components/Hints'
 import ConnectedMoreOptionsModal from '../containers/ConnectedMoreOptionsModal'
 import ConnectedNav from '../containers/ConnectedNav'
-import StepEditForm from '../components/StepEditForm'
 import ConnectedSidebar from '../containers/ConnectedSidebar'
 import ConnectedTitleBar from '../containers/ConnectedTitleBar'
 import ConnectedMainPanel from '../containers/ConnectedMainPanel'
@@ -41,8 +40,6 @@ export default function ProtocolEditor () {
             <FileUploadErrorModal />
             {/* TODO: Ian 2018-06-28 All main page modals will go here */}
             <MainPageModalPortalRoot />
-
-            <StepEditForm />
 
             <ConnectedMainPanel />
           </div>

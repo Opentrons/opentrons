@@ -48,26 +48,27 @@ type StepEditFormState = {
 
 type Props = SP & DP
 
+// TODO: type fieldNames, don't use `any`
+const getDirtyFields = (isNewStep: ?boolean, formData: ?FormData): Array<any> => (
+  isNewStep ? [] : without(Object.keys(formData || {}), 'stepType', 'id')
+)
+
 class StepEditForm extends React.Component<Props, StepEditFormState> {
   constructor (props: Props) {
     super(props)
+    const {isNewStep, formData} = props
     this.state = {
       showConfirmDeleteModal: false,
       focusedField: null,
-      dirtyFields: [], // TODO: initialize to dirty if not new form
+      dirtyFields: getDirtyFields(isNewStep, formData),
     }
   }
 
   componentDidUpdate (prevProps) {
     // NOTE: formData is sometimes undefined between steps
     if (get(this.props, 'formData.id') !== get(prevProps, 'formData.id')) {
-      if (this.props.isNewStep) {
-        this.setState({ focusedField: null, dirtyFields: [] })
-      } else {
-        // TODO: type fieldNames, don't use `any`
-        const fieldNames: Array<any> = without(Object.keys(this.props.formData || {}), 'stepType', 'id')
-        this.setState({focusedField: null, dirtyFields: fieldNames})
-      }
+      const {isNewStep, formData} = this.props
+      this.setState({ focusedField: null, dirtyFields: getDirtyFields(isNewStep, formData) })
     }
   }
 

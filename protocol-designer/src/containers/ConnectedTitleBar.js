@@ -23,7 +23,7 @@ import type {BaseState} from '../types'
 
 type Props = React.ElementProps<typeof TitleBar>
 type DP = { onBackClick: $PropertyType<Props, 'onBackClick'> }
-type SP = $Diff<Props, DP> & {_page: Page}
+type SP = $Diff<Props, DP> & {_page: Page, _liquidPlacementMode?: boolean}
 
 type TitleWithIconProps = {
   iconName?: ?IconName,
@@ -112,16 +112,16 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
 
   let onBackClick
 
-  if (_page === 'steplist' && _liquidPlacementMode) {
-    onBackClick = () => dispatch(closeIngredientSelector())
+  if (_page === 'steplist') {
+    if (_liquidPlacementMode) {
+      onBackClick = () => dispatch(closeIngredientSelector())
+    } else if (props.backButtonLabel) {
+      onBackClick = () => {}
+    }
   }
 
   if (_page === 'well-selection-modal') {
     onBackClick = () => dispatch(closeWellSelectionModal())
-  }
-
-  if (_page === 'steplist' && props.backButtonLabel) {
-    onBackClick = () => {}
   }
 
   return {
