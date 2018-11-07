@@ -29,13 +29,14 @@ test_data = {
 def test_well_init():
     slot = Location(Point(1, 2, 3), 1)
     well_name = 'circular_well_json'
-    well1 = labware.Well(test_data[well_name], slot, well_name)
+    has_tip = False
+    well1 = labware.Well(test_data[well_name], slot, well_name, has_tip)
     assert well1._diameter == test_data[well_name]['diameter']
     assert well1._length is None
     assert well1._width is None
 
     well2_name = 'rectangular_well_json'
-    well2 = labware.Well(test_data[well2_name], slot, well2_name)
+    well2 = labware.Well(test_data[well2_name], slot, well2_name, has_tip)
     assert well2._diameter is None
     assert well2._length == test_data[well2_name]['length']
     assert well2._width == test_data[well2_name]['width']
@@ -44,7 +45,8 @@ def test_well_init():
 def test_top():
     slot = Location(Point(4, 5, 6), 1)
     well_name = 'circular_well_json'
-    well = labware.Well(test_data[well_name], slot, well_name)
+    has_tip = False
+    well = labware.Well(test_data[well_name], slot, well_name, has_tip)
     well_data = test_data[well_name]
     expected_x = well_data['x'] + slot.point.x
     expected_y = well_data['y'] + slot.point.y
@@ -56,7 +58,8 @@ def test_top():
 def test_bottom():
     slot = Location(Point(7, 8, 9), 1)
     well_name = 'rectangular_well_json'
-    well = labware.Well(test_data[well_name], slot, well_name)
+    has_tip = False
+    well = labware.Well(test_data[well_name], slot, well_name, has_tip)
     well_data = test_data[well_name]
     expected_x = well_data['x'] + slot.point.x
     expected_y = well_data['y'] + slot.point.y
@@ -68,7 +71,8 @@ def test_bottom():
 def test_from_center_cartesian():
     slot1 = Location(Point(10, 11, 12), 1)
     well_name = 'circular_well_json'
-    well1 = labware.Well(test_data[well_name], slot1, well_name)
+    has_tip = False
+    well1 = labware.Well(test_data[well_name], slot1, well_name, has_tip)
 
     percent1_x = 1
     percent1_y = 1
@@ -88,7 +92,8 @@ def test_from_center_cartesian():
 
     slot2 = Location(Point(13, 14, 15), 1)
     well2_name = 'rectangular_well_json'
-    well2 = labware.Well(test_data[well2_name], slot2, well2_name)
+    has_tip = False
+    well2 = labware.Well(test_data[well2_name], slot2, well2_name, has_tip)
     percent2_x = -0.25
     percent2_y = 0.1
     percent2_z = 0.9
@@ -178,9 +183,11 @@ def test_well_parent():
     lw = labware.Labware(labware_def, Point(0, 0, 0), 'Test Slot')
     parent = Location(Point(7, 8, 9), lw)
     well_name = 'circular_well_json'
+    has_tip = True
     well = labware.Well(test_data[well_name],
                         parent,
-                        well_name)
+                        well_name,
+                        has_tip)
     assert well.parent is lw
     assert well.top().labware is well
     assert well.top().labware.parent is lw
@@ -188,3 +195,117 @@ def test_well_parent():
     assert well.bottom().labware.parent is lw
     assert well.center().labware is well
     assert well.center().labware.parent is lw
+
+
+def test_tip_tracking_init():
+    labware_name = 'Opentrons_96_tiprack_300_uL'
+    labware_def = json.loads(
+        pkgutil.get_data('opentrons',
+                         'shared_data/definitions2/{}.json'.format(
+                             labware_name)))
+    tiprack = labware.Labware(labware_def, Point(0, 0, 0), 'Test Slot')
+    assert tiprack.is_tiprack
+    for well in tiprack.wells():
+        assert well.has_tip
+
+    labware_name = 'generic_96_wellPlate_380_uL'
+    labware_def = json.loads(
+        pkgutil.get_data('opentrons',
+                         'shared_data/definitions2/{}.json'.format(
+                             labware_name)))
+    lw = labware.Labware(labware_def, Point(0, 0, 0), 'Test Slot')
+    assert not lw.is_tiprack
+    for well in lw.wells():
+        assert not well.has_tip
+
+
+def test_use_tips():
+    labware_name = 'Opentrons_96_tiprack_300_uL'
+    labware_def = json.loads(
+        pkgutil.get_data('opentrons',
+                         'shared_data/definitions2/{}.json'.format(
+                             labware_name)))
+    tiprack = labware.Labware(labware_def, Point(0, 0, 0), 'Test Slot')
+    well_list = tiprack.wells()
+
+    # Test only using one tip
+    tiprack.use_tips(well_list[0])
+    assert not well_list[0].has_tip
+    for well in well_list[1:]:
+        assert well.has_tip
+
+    # Test using a whole column
+    tiprack.use_tips(well_list[8], num_channels=8)
+    for well in well_list[8:16]:
+        assert not well.has_tip
+    assert well_list[7].has_tip
+    assert well_list[16].has_tip
+
+    # Test using a partial column from the top
+    tiprack.use_tips(well_list[16], num_channels=4)
+    for well in well_list[16:20]:
+        assert not well.has_tip
+    for well in well_list[20:24]:
+        assert well.has_tip
+
+    # Test using a partial column where the number of tips that get picked up
+    # is less than the number of channels (e.g.: an 8-channel pipette picking
+    # up 4 tips from the bottom half of a column)
+    tiprack.use_tips(well_list[28], num_channels=4)
+    for well in well_list[24:28]:
+        assert well.has_tip
+    for well in well_list[28:32]:
+        assert not well.has_tip
+    for well in well_list[32:]:
+        assert well.has_tip
+
+
+def test_select_next_tip():
+    labware_name = 'Opentrons_96_tiprack_300_uL'
+    labware_def = json.loads(
+        pkgutil.get_data('opentrons',
+                         'shared_data/definitions2/{}.json'.format(
+                             labware_name)))
+    tiprack = labware.Labware(labware_def, Point(0, 0, 0), 'Test Slot')
+    well_list = tiprack.wells()
+
+    next_one = tiprack.next_tip()
+    assert next_one == well_list[0]
+    next_five = tiprack.next_tip(5)
+    assert next_five == well_list[0]
+    next_eight = tiprack.next_tip(8)
+    assert next_eight == well_list[0]
+    next_nine = tiprack.next_tip(9)
+    assert next_nine is None
+
+    # A1 tip only has been used
+    tiprack.use_tips(well_list[0])
+
+    next_one = tiprack.next_tip()
+    assert next_one == well_list[1]
+    next_five = tiprack.next_tip(5)
+    assert next_five == well_list[1]
+    next_eight = tiprack.next_tip(8)
+    assert next_eight == well_list[8]
+
+    # 2nd column has also been used
+    tiprack.use_tips(well_list[8], num_channels=8)
+
+    next_one = tiprack.next_tip()
+    assert next_one == well_list[1]
+    next_five = tiprack.next_tip(5)
+    assert next_five == well_list[1]
+    next_eight = tiprack.next_tip(8)
+    assert next_eight == well_list[16]
+
+    # Bottom 4 tips of 1rd column are also used
+    tiprack.use_tips(well_list[4], num_channels=4)
+
+    next_one = tiprack.next_tip()
+    assert next_one == well_list[1]
+    next_three = tiprack.next_tip(3)
+    assert next_three == well_list[1]
+    next_five = tiprack.next_tip(5)
+    assert next_five == well_list[16]
+    next_eight = tiprack.next_tip(8)
+    assert next_eight == well_list[16]

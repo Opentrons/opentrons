@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Tuple
 
 from .labware import Well, Labware, load
 from opentrons import types, hardware_control as hc
@@ -10,6 +10,10 @@ from . import geometry
 
 
 MODULE_LOG = logging.getLogger(__name__)
+
+
+class OutOfTipsError(Exception):
+    pass
 
 
 class ProtocolContext:
@@ -100,6 +104,7 @@ class ProtocolContext:
             self,
             instrument_name: str,
             mount: types.Mount,
+            tip_racks: List[Labware] = None,
             replace: bool = False) -> 'InstrumentContext':
         """ Load a specific instrument required by the protocol.
 
@@ -113,6 +118,10 @@ class ProtocolContext:
                                     the version.
         :param types.Mount mount: The mount in which this instrument should be
                                   attached.
+        :param tip_racks: A list of tip racks from which to pick tips if
+                          :py:meth:`.InstrumentContext.pick_up_tip` is called
+                          without arguments.
+        :type tip_racks: List[:py:class:`.Labware`]
         :param bool replace: Indicate that the currently-loaded instrument in
                              `mount` (if such an instrument exists) should be
                              replaced by `instrument_name`.
@@ -133,7 +142,11 @@ class ProtocolContext:
         self._hardware.cache_instruments(attached)
         # If the cache call didn’t raise, the instrument is attached
         new_instr = InstrumentContext(
-            self, self._hardware, mount, [], self._log)
+            ctx=self,
+            hardware=self._hardware,
+            mount=mount,
+            tip_racks=tip_racks,
+            log_parent=self._log)
         self._instruments[mount] = new_instr
         self._log.info("Instrument {} loaded".format(new_instr))
         return new_instr
@@ -246,12 +259,18 @@ class InstrumentContext:
     def __init__(self,
                  ctx: ProtocolContext,
                  hardware: adapters.SynchronousAdapter,
-                 mount: types.Mount, tip_racks,
+                 mount: types.Mount,
                  log_parent: logging.Logger,
+                 tip_racks: List[Labware] = None,
                  **config_kwargs) -> None:
         self._hardware = hardware
         self._ctx = ctx
         self._mount = mount
+
+        self._tip_racks = tip_racks or list()
+        for tip_rack in self.tip_racks:
+            assert tip_rack.is_tiprack
+
         self._last_location: Union[Labware, Well, None] = None
         self._log = log_parent.getChild(repr(self))
         self._log.info("attached")
@@ -260,7 +279,7 @@ class InstrumentContext:
     def aspirate(self,
                  volume: float = None,
                  location: Union[types.Location, Well] = None,
-                 rate: float = 1.0):
+                 rate: float = 1.0) -> 'InstrumentContext':
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
         from the specified location
@@ -310,7 +329,7 @@ class InstrumentContext:
     def dispense(self,
                  volume: float = None,
                  location: Union[types.Location, Well] = None,
-                 rate: float = 1.0):
+                 rate: float = 1.0) -> 'InstrumentContext':
         """
         Dispense a volume of liquid (in microliters/uL) using this pipette
         into the specified location.
@@ -362,37 +381,126 @@ class InstrumentContext:
             repetitions: int = 1,
             volume: float = None,
             location: Well = None,
-            rate: float = 1.0):
+            rate: float = 1.0) -> 'InstrumentContext':
         raise NotImplementedError
 
-    def blow_out(self, location: Well = None):
+    def blow_out(self, location: Well = None) -> 'InstrumentContext':
+        """
+        Blow liquid out of the tip.
+
+        If called without arguments, blow out into the
+        :py:attr:`trash_container`.
+        """
         raise NotImplementedError
 
     def touch_tip(self,
                   location: Well = None,
                   radius: float = 1.0,
                   v_offset: float = -1.0,
-                  speed: float = 60.0):
+                  speed: float = 60.0) -> 'InstrumentContext':
         raise NotImplementedError
 
     def air_gap(self,
                 volume: float = None,
-                height: float = None):
+                height: float = None) -> 'InstrumentContext':
         raise NotImplementedError
 
-    def return_tip(self, home_after: bool = True):
+    def return_tip(self) -> 'InstrumentContext':
         raise NotImplementedError
 
-    def pick_up_tip(self, location: Well = None,
+    def pick_up_tip(self, location: types.Location = None,
                     presses: int = 3,
-                    increment: int = 1):
-        raise NotImplementedError
+                    increment: float = 1.0) -> 'InstrumentContext':
+        """
+        Pick up a tip for the pipette to run liquid-handling commands with
 
-    def drop_tip(self, location: Well = None,
-                 home_after: bool = True):
-        raise NotImplementedError
+        A tip can be manually set by passing a :py:class:`.types.Location`.
+        If no location is passed, the Pipette will pick up the next available
+        tip in its :py:attr:`InstrumentContext.tip_racks` list
 
-    def home(self):
+        :param location: The location from which to pick up a tip.
+        :type location: :py:class:`.types.Location`
+        :param presses: The number of times to lower and then raise the pipette
+                        when picking up a tip, to ensure a good seal (0 [zero]
+                        will result in the pipette hovering over the tip but
+                        not picking it up--generally not desireable, but could
+                        be used for dry-run).
+        :type presses: int
+        :param increment: The additional distance to travel on each successive
+                          press (e.g.: if `presses=3` and `increment=1.0`, then
+                          the first press will travel down into the tip by
+                          3.5mm, the second by 4.5mm, and the third by 5.5mm).
+        :type increment: float
+        :returns: This instance
+        """
+        num_channels = \
+            self._hardware.attached_instruments[self._mount]['channels']
+
+        def _select_tiprack_from_list(tip_racks) -> Tuple[Labware, Well]:
+            try:
+                tr = tip_racks[0]
+            except IndexError:
+                raise OutOfTipsError
+            next_tip = tr.next_tip(num_channels)
+            if next_tip:
+                return tr, next_tip
+            else:
+                return _select_tiprack_from_list(tip_racks[1:])
+
+        if location and isinstance(location.labware, Labware):
+            tiprack = location.labware
+            target: Optional[Well] = tiprack.next_tip(num_channels)
+        elif location and isinstance(location.labware, Well):
+            tiprack = location.labware.parent
+            target = location.labware
+        else:
+            tiprack, target = _select_tiprack_from_list(self.tip_racks)
+        if target is None:
+            # This is primarily for type checking--should raise earlier
+            raise OutOfTipsError
+
+        assert tiprack.is_tiprack
+
+        self.move_to(target.top())
+
+        self._hardware.pick_up_tip(
+            self._mount, tiprack.tip_length, presses, increment)
+        # Note that the hardware API pick_up_tip action includes homing z after
+
+        tiprack.use_tips(target, num_channels)
+
+        return self
+
+    def drop_tip(self, location: types.Location = None) -> 'InstrumentContext':
+        """
+        Drop the current tip.
+
+        If a location is specified, drop the tip there, otherwise drop it into
+        the fixed trash.
+
+        .. note::
+            OT1 required homing the plunger after dropping tips, so the prior
+            version of `drop_tip` automatically homed the plunger. This is no
+            longer needed in OT2. If you need to home the plunger, use
+            :py:meth:`home_plunger`.
+
+        :param location: The location to drop the tip
+        :type location: :py:class:`.types.Location` or None
+
+        :returns: This instance
+        """
+        if location and isinstance(location.labware, Labware):
+            target: Well = location.labware.wells()[0]
+        elif location and isinstance(location.labware, Well):
+            target = location.labware
+        else:
+            target = self.trash_container.wells()[0]
+
+        self.move_to(target.top())
+        self._hardware.drop_tip(self._mount)
+        return self
+
+    def home(self) -> 'InstrumentContext':
         """ Home the robot.
 
         :returns: This instance.
@@ -400,31 +508,40 @@ class InstrumentContext:
         self._ctx.home()
         return self
 
+    def home_plunger(self) -> 'InstrumentContext':
+        """ Home the plunger associated with this mount
+
+        :returns: This instance.
+        """
+        self._hardware.home_plunger(self.mount)
+        return self
+
     def distribute(self,
                    volume: float,
                    source: Well,
                    dest: Well,
-                   *args, **kwargs):
+                   *args, **kwargs) -> 'InstrumentContext':
         raise NotImplementedError
 
     def consolidate(self,
                     volume: float,
                     source: Well,
                     dest: Well,
-                    *args, **kwargs):
+                    *args, **kwargs) -> 'InstrumentContext':
         raise NotImplementedError
 
     def transfer(self,
                  volume: float,
                  source: Well,
                  dest: Well,
-                 **kwargs):
+                 **kwargs) -> 'InstrumentContext':
         raise NotImplementedError
 
-    def move_to(self, location: types.Location):
+    def move_to(self, location: types.Location) -> 'InstrumentContext':
         """ Move the instrument.
 
         :param location: The location to move to.
+        :type location: :py:class:`.types.Location`
         """
         if self._ctx.location_cache:
             from_lw = self._ctx.location_cache.labware
@@ -520,16 +637,25 @@ class InstrumentContext:
 
     @property
     def tip_racks(self) -> List[Labware]:
-        """ Query which tipracks have been linked to this PipetteContext"""
-        raise NotImplementedError
+        """
+        The tip racks that have been linked to this pipette.
+
+        This is the property used to determine which tips to pick up next when
+        calling :py:meth:`pick_up_tip` without arguments.
+        """
+        return self._tip_racks
 
     @tip_racks.setter
     def tip_racks(self, racks: List[Labware]):
-        raise NotImplementedError
+        self._tip_racks = racks
 
     @property
     def trash_container(self) -> Labware:
-        """ The location the pipette will dispense trash to.
+        """ The trash container associated with this pipette.
+
+        This is the property used to determine where to drop tips and blow out
+        liquids when calling :py:meth:`drop_tip` or :py:meth:`blow_out` without
+        arguments.
         """
         raise NotImplementedError
 
@@ -538,28 +664,37 @@ class InstrumentContext:
         raise NotImplementedError
 
     @property
-    def name(self):
+    def name(self) -> str:
+        """
+        The model string for the pipette.
+        """
         return self.hw_pipette['name']
 
     @property
-    def max_volume(self):
+    def max_volume(self) -> float:
         """
         The maximum volume, in microliters, this pipette can hold.
         """
         return self.hw_pipette['max_volume']
 
     @property
-    def current_volume(self):
+    def current_volume(self) -> float:
         """
         The current amount of liquid, in microliters, held in the pipette.
         """
         return self.hw_pipette['current_volume']
 
     @property
-    def hw_pipette(self) -> Optional[Dict[str, Any]]:
+    def hw_pipette(self) -> Dict[str, Any]:
         """ View the information returned by the hardware API directly.
+
+        :raises: a :py:class:`.types.PipetteNotAttachedError` if the pipette is
+                 no longer attached (should not happen).
         """
-        return self._hardware.attached_instruments[self._mount]
+        pipette = self._hardware.attached_instruments[self._mount]
+        if pipette is None:
+            raise types.PipetteNotAttachedError
+        return pipette
 
     @property
     def well_bottom_clearance(self) -> float:
