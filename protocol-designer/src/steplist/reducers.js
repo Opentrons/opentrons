@@ -178,13 +178,17 @@ const orderedSteps: Reducer<OrderedStepsState, *> = handleActions({
   LOAD_FILE: (state: OrderedStepsState, action: LoadFileAction): OrderedStepsState =>
     getPDMetadata(action.payload).orderedSteps,
   REORDER_SELECTED_STEP: (state: OrderedStepsState, action: ReorderSelectedStepAction): OrderedStepsState => {
-    const {nextIndex, stepId} = action.payload
-    const filteredStepIds = state.filter(s => s !== stepId)
+    const {delta, stepId} = action.payload
+    const stepsWithoutSelectedStep = state.filter(s => s !== stepId)
+    const selectedIndex = state.findIndex(s => s === stepId)
+    const nextIndex = selectedIndex + delta
+
+    if (delta <= 0 && selectedIndex === 0) return state
 
     return [
-      ...filteredStepIds.slice(0, nextIndex),
+      ...stepsWithoutSelectedStep.slice(0, nextIndex),
       stepId,
-      ...filteredStepIds.slice(nextIndex),
+      ...stepsWithoutSelectedStep.slice(nextIndex),
     ]
   },
 }, [])
