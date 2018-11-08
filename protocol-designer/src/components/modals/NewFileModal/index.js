@@ -14,6 +14,7 @@ import {pipetteOptions} from '../../../pipettes/pipetteData'
 import PipetteDiagram from './PipetteDiagram'
 import TiprackDiagram from './TiprackDiagram'
 import styles from './NewFileModal.css'
+import formStyles from '../../forms.css'
 import modalStyles from '../modal.css'
 import type {NewProtocolFields, PipetteFields} from '../../../load-file'
 
@@ -125,7 +126,7 @@ export default class NewFileModal extends React.Component<Props, State> {
 
           <div className={styles.mount_fields_row}>
             <div className={styles.mount_column}>
-              <FormGroup key="leftPipetteModel" label="Left Pipette">
+              <FormGroup key="leftPipetteModel" label="Left Pipette" className={formStyles.stacked_row}>
                 <DropdownField
                   tabIndex={2}
                   options={this.state.left.pipetteModel === USER_HAS_NOT_SELECTED ? pipetteOptionsWithInvalid : pipetteOptionsWithNone}
@@ -142,7 +143,7 @@ export default class NewFileModal extends React.Component<Props, State> {
               </FormGroup>
             </div>
             <div className={styles.mount_column}>
-              <FormGroup key="rightPipetteModel" label="Right Pipette">
+              <FormGroup key="rightPipetteModel" label="Right Pipette" className={formStyles.stacked_row}>
                 <DropdownField
                   tabIndex={4}
                   options={this.state.right.pipetteModel === USER_HAS_NOT_SELECTED ? pipetteOptionsWithInvalid : pipetteOptionsWithNone}
