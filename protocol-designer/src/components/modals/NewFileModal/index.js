@@ -59,6 +59,7 @@ const initialState = {
   right: {pipetteModel: USER_HAS_NOT_SELECTED, tiprackModel: null},
 }
 
+// TODO: BC 2018-11-06 there is a lot of copy pasta between this component and the edit pipettes modal, lets consolidate
 export default class NewFileModal extends React.Component<Props, State> {
   constructor (props: Props) {
     super(props)
@@ -177,11 +178,6 @@ const BetaRestrictions = () => (
   <React.Fragment>
     <h3>Beta Pipette Restrictions:</h3>
     <ol>
-      <li>
-        You can&apos;t change your pipette selection later. If in doubt go for
-        smaller pipettes. The Protocol Designer automatically breaks up transfer
-        volumes that exceed pipette capacity into multiple transfers.
-      </li>
       <li>
         Pipettes can&apos;t share tip racks. There needs to be at least 1 tip rack per
         pipette on the deck.

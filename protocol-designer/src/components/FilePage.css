@@ -17,9 +17,16 @@
   justify-content: flex-end;
 }
 
+.pipette_button_row {
+  display: flex;
+  justify-content: center;
+}
+
+.edit_button,
 .swap_button {
   display: block;
-  margin: auto;
+  margin: 0 0.5rem;
+  width: 8rem;
 }
 
 .update_button {

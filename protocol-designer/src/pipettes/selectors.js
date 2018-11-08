@@ -2,11 +2,13 @@
 import {createSelector} from 'reselect'
 import reduce from 'lodash/reduce'
 import get from 'lodash/get'
+import mapValues from 'lodash/mapValues'
 import {getAllPipetteNames, getPipetteNameSpecs, getLabware} from '@opentrons/shared-data'
 
 import type {DropdownOption} from '@opentrons/components'
 import type {PipetteData} from '../step-generation'
 import type {RootState} from './reducers'
+import type {FormattedPipette} from './types'
 
 type PipettesById = {[pipetteId: string]: PipetteData}
 type RootSlice = {pipettes: RootState}
@@ -23,6 +25,11 @@ export const pipettesById: Selector<PipettesById> = createSelector(
 export const pipetteIdsByMount: Selector<*> = createSelector(
   rootSelector,
   pipettes => pipettes.byMount
+)
+
+export const pipettesByMount: Selector<*> = createSelector(
+  rootSelector,
+  pipettes => mapValues(pipettes.byMount, id => pipettes.byId[id])
 )
 
 function _getPipetteName (pipetteData): string {
@@ -74,7 +81,7 @@ export const equippedPipettes: Selector<PipettesById> = createSelector(
   }, {})
 )
 
-// Formats pipette data specifically for instrumentgroup
+// Formats pipette data specifically for edit pipette
 export const pipettesForInstrumentGroup: Selector<*> = createSelector(
   rootSelector,
   pipettes => [pipettes.byMount.left, pipettes.byMount.right].reduce((acc, pipetteId) => {
@@ -87,11 +94,35 @@ export const pipettesForInstrumentGroup: Selector<*> = createSelector(
     const tipVolume = pipetteData.tiprackModel && get(getLabware(pipetteData.tiprackModel), 'metadata.tipVolume')
 
     const pipetteForInstrumentGroup = {
-      mount: pipetteData.mount,
-      channels: pipetteData.channels,
+      ...pipetteData,
       description: _getPipetteName(pipetteData),
       isDisabled: false,
       tiprackModel: tipVolume && `${tipVolume} µl`, // TODO: BC 2018-07-23 tiprack displayName
+      tiprack: {model: pipetteData.tiprackModel}, // TODO: BC 2018-10-22-3 consolidate with tiprackModel above
+    }
+
+    return [...acc, pipetteForInstrumentGroup]
+  }, [])
+)
+
+// Formats pipette data specifically for edit pipette
+export const pipettesForEditPipettes: Selector<Array<FormattedPipette>> = createSelector(
+  rootSelector,
+  pipettes => [pipettes.byMount.left, pipettes.byMount.right].reduce((acc, pipetteId) => {
+    if (!pipetteId) return acc
+
+    const pipetteData = pipettes.byId[pipetteId]
+
+    if (!pipetteData) return acc
+
+    const tipVolume = pipetteData.tiprackModel && get(getLabware(pipetteData.tiprackModel), 'metadata.tipVolume')
+
+    const pipetteForInstrumentGroup = {
+      ...pipetteData,
+      description: _getPipetteName(pipetteData),
+      isDisabled: false,
+      tiprackModel: tipVolume && `${tipVolume} µl`, // TODO: BC 2018-07-23 tiprack displayName
+      tiprack: {model: pipetteData.tiprackModel}, // TODO: BC 2018-10-22-3 consolidate with tiprackModel above
     }
 
     return [...acc, pipetteForInstrumentGroup]

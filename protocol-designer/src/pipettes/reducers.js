@@ -3,50 +3,12 @@ import {combineReducers} from 'redux'
 import {handleActions} from 'redux-actions'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import {uuid} from '../utils'
-import {getPipetteNameSpecs, getLabware} from '@opentrons/shared-data'
 
-import type {Mount} from '@opentrons/components'
 import type {LoadFileAction, NewProtocolFields} from '../load-file'
 import type {PipetteData} from '../step-generation'
 import type {FilePipette} from '../file-types'
-
-function createPipette (
-  mount: Mount,
-  _model: string,
-  tiprackModel: ?string,
-  overrideId?: string
-): ?PipetteData {
-  // for backwards compatibility, strip version suffix (_v1, _v1.3 etc)
-  // from model string, if it exists
-  const model = _model.replace(/_v\d(\.|\d+)*$/, '')
-  // TODO: Ian 2018-11-01 once the schema is updated to always exclude versions
-  // (breaking change to schema), this version removal would be handled in schema migration.
-
-  const id = overrideId || `pipette:${model}:${uuid()}`
-  const pipetteData = getPipetteNameSpecs(model)
-
-  if (!pipetteData) {
-    console.error(`Pipette ${id} - model '${model}' does not exist in shared-data`)
-    return null
-  }
-  if (!tiprackModel) {
-    console.error(`Pipette ${id} - no tiprackModel assigned. Skipping pipette creation.`)
-    return null
-  }
-  if (!getLabware(tiprackModel)) {
-    console.error(`Pipette ${id} - tiprackModel '${tiprackModel}' does not exist in shared-data`)
-    return null
-  }
-  return {
-    id,
-    model,
-    mount,
-    maxVolume: pipetteData.maxVolume,
-    channels: pipetteData.channels,
-    tiprackModel,
-  }
-}
+import {createPipette} from './utils'
+import type {UpdatePipettesAction} from './types'
 
 export type PipetteIdByMount = {|
   left: ?string,
@@ -55,6 +17,8 @@ export type PipetteIdByMount = {|
 
 export type PipetteById = {[pipetteId: string]: PipetteData}
 
+// TODO: BC 2018-11-07 implement SWAP_PIPETTES using UPDATE_PIPETTES so id (which)
+// has baked in mount string, makes sense after swap
 const byId = handleActions({
   LOAD_FILE: (state: PipetteById, action: LoadFileAction): PipetteById => {
     const file = action.payload
@@ -68,6 +32,13 @@ const byId = handleActions({
         : acc
     }, {})
   },
+  UPDATE_PIPETTES: (state: PipetteById, action: UpdatePipettesAction) => (
+    reduce(action.payload, (acc, pipette) => (
+      pipette && pipette.id
+        ? {...acc, [pipette && pipette.id]: pipette}
+        : acc
+    ), {})
+  ),
   CREATE_NEW_PROTOCOL: (
     state: PipetteById,
     action: {payload: NewProtocolFields}
@@ -100,10 +71,13 @@ const byId = handleActions({
     state: PipetteById,
     action: {payload: NewProtocolFields}
   ): PipetteById => {
-    return mapValues(state, (pipette: PipetteData): PipetteData => ({
-      ...pipette,
-      mount: (pipette.mount === 'left') ? 'right' : 'left',
-    }))
+    return mapValues(state, (pipette: PipetteData): PipetteData => {
+      if (!pipette) return pipette
+      return {
+        ...pipette,
+        mount: (pipette.mount === 'left') ? 'right' : 'left',
+      }
+    })
   },
 }, {})
 
@@ -118,6 +92,9 @@ const byMount = handleActions({
       right: pipetteIds.find(id => pipettes[id].mount === 'right'),
     }
   },
+  UPDATE_PIPETTES: (state: PipetteIdByMount, action: UpdatePipettesAction) => (
+    mapValues(action.payload, (pipette) => pipette && pipette.id)
+  ),
   CREATE_NEW_PROTOCOL: (
     state: PipetteIdByMount,
     action: {payload: NewProtocolFields}
@@ -149,8 +126,8 @@ const _allReducers = {
 }
 
 export type RootState = {
-  byId: PipetteById,
   byMount: PipetteIdByMount,
+  byId: PipetteById,
 }
 
 export const rootReducer = combineReducers(_allReducers)

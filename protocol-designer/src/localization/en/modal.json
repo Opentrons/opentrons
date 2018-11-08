@@ -13,5 +13,27 @@
     "field_label": "Order",
     "then": "then",
     "viz_label": "Pattern"
+  },
+  "edit_pipettes": {
+    "title": "Change Pipette Selection",
+    "body": "Update your pipette and tiprack selection. Please note, this may affect your existing protocol steps."
+  },
+  "global_step_changes": {
+    "heading": "Are you sure you want to make this change?",
+    "switch_pipettes": {
+      "body": "Switching pipette or tip type may affect how steps appear in your protocol:",
+      "cause": {
+        "any": "Switching pipettes or tips of any type",
+        "multi_to_single": "Switching a Multi-channel pipette to a Single-channel pipette",
+        "single_to_multi": "Switching a Single-channel pipette to a Multi-channel pipette",
+        "next_pipette_smaller": "Switching to a pipette or tip of smaller volume"
+      },
+      "effect": {
+        "any": "Clears flow rate, mix, air gap, & disposal volume",
+        "multi_to_single": "Clears selected wells",
+        "single_to_multi": "Number of tips used may increase",
+        "next_pipette_smaller": "Number of tips used may increase"
+      }
+    }
   }
 }
