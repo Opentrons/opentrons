@@ -38,7 +38,6 @@ module.exports = webpackMerge(baseConfig, {
   entry: [JS_ENTRY],
 
   output: {
-    filename: 'bundle.js',
     path: path.join(__dirname, 'dist'),
     publicPath: DEV_MODE ? '' : './',
   },

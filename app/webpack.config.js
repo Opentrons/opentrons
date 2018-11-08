@@ -14,7 +14,6 @@ const {description, author} = require('./package.json')
 const JS_ENTRY = path.join(__dirname, 'src/index.js')
 const HTML_ENTRY = path.join(__dirname, 'src/index.hbs')
 const OUTPUT_PATH = path.join(__dirname, 'dist')
-const JS_OUTPUT_NAME = 'bundle.js'
 
 const PORT = process.env.PORT || 8080
 const CONTENT_BASE = path.join(__dirname, './src')
@@ -26,7 +25,6 @@ module.exports = webpackMerge(baseConfig, {
   output: Object.assign(
     {
       path: OUTPUT_PATH,
-      filename: JS_OUTPUT_NAME,
       publicPath: PUBLIC_PATH,
     },
     // workaround for worker-loader HMR
