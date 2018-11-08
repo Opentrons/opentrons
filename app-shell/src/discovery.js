@@ -52,12 +52,10 @@ export function registerDiscovery (dispatch: Action => void) {
     switch (action.type) {
       case 'discovery:START':
         handleServices()
-        client.setPollInterval(FAST_POLL_INTERVAL_MS).start()
-        break
+        return client.setPollInterval(FAST_POLL_INTERVAL_MS).start()
 
       case 'discovery:FINISH':
-        client.setPollInterval(SLOW_POLL_INTERVAL_MS)
-        break
+        return client.setPollInterval(SLOW_POLL_INTERVAL_MS)
     }
   }
 

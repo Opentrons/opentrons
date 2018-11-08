@@ -24,12 +24,12 @@ type DiscoveryState = {
 
 type StartAction = {|
   type: 'discovery:START',
-  meta?: {|shell: true|},
+  meta: {|shell: true|},
 |}
 
 type FinishAction = {|
   type: 'discovery:FINISH',
-  meta?: {|shell: true|},
+  meta: {|shell: true|},
 |}
 
 type UpdateListAction = {|
