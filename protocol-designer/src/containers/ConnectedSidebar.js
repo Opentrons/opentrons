@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
+import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {selectors} from '../navigation'
 
 import ConnectedStepList from './ConnectedStepList'
@@ -14,6 +15,7 @@ import type {Page} from '../navigation'
 
 type Props = {
   page: Page,
+  liquidPlacementMode: boolean,
 }
 
 function Sidebar (props: Props) {
@@ -21,10 +23,7 @@ function Sidebar (props: Props) {
     case 'liquids':
       return <LiquidsSidebar />
     case 'steplist':
-    case 'well-selection-modal':
-      return <ConnectedStepList />
-    case 'ingredient-detail':
-      return <IngredientsList />
+      return props.liquidPlacementMode ? <IngredientsList /> : <ConnectedStepList />
     case 'file-splash':
     case 'file-detail':
       return <FileSidebar />
@@ -37,9 +36,11 @@ function Sidebar (props: Props) {
 
 function mapStateToProps (state: BaseState): Props {
   const page = selectors.currentPage(state)
+  const liquidPlacementMode = !!labwareIngredSelectors.getSelectedContainer(state)
 
   return {
     page,
+    liquidPlacementMode,
   }
 }
 
