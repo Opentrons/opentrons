@@ -25,11 +25,6 @@ const getHighlightedPrimaryWells: Selector<Wells> = createSelector(
   state => state.selectedWells.highlighted
 )
 
-export const getWellSelectionLabwareId: Selector<?string> = createSelector(
-  rootSelector,
-  state => state.wellSelectionLabwareId
-)
-
 function _primaryToAllWells (
   wells: Wells,
   _wellSelectionModalData: ?OpenWellSelectionModalPayload
