@@ -3,10 +3,6 @@ import {createAction} from 'redux-actions'
 import selectors from './selectors'
 import {changeFormInput} from '../steplist/actions'
 
-import {selectors as steplistSelectors} from '../steplist'
-import {selectors as pipetteSelectors} from '../pipettes'
-import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
-
 import type {StepFieldName} from '../steplist/fieldLevel'
 import type {ThunkDispatch, GetState} from '../types'
 import type {Wells} from '../labware-ingred/types'
@@ -45,44 +41,13 @@ export type OpenWellSelectionModalPayload = {
   labwareName?: string,
 }
 
-function _wellArrayToObj (wells: ?Array<string>): Wells {
-  if (!wells) {
-    return {}
-  }
-  return wells.reduce((acc: Wells, well: string) => ({
-    ...acc,
-    [well]: well,
-  }), {})
-}
+export const setWellSelectionLabwareName = (labwareName: ?string): * => ({
+  type: 'SET_WELL_SELECTION_LABWARE_NAME',
+  payload: labwareName,
+})
 
-export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload) =>
-  (dispatch: ThunkDispatch<*>, getState: GetState) => {
-    const state = getState()
-    const accessor = payload.formFieldAccessor
-    const formData = steplistSelectors.formData(state)
-
-    const wells: Wells = (accessor && formData && formData[accessor] &&
-      _wellArrayToObj(formData[accessor])) || {}
-
-    // initially selected wells in form get selected in state before modal opens
-    dispatch(selectWells(wells))
-
-    const pipettes = pipetteSelectors.equippedPipettes(state)
-    const labware = labwareIngredSelectors.getLabware(state)
-    // TODO type this action, make an underline fn action creator
-
-    dispatch({
-      type: 'OPEN_WELL_SELECTION_MODAL',
-      payload: {
-        ...payload,
-        pipetteChannels: pipettes && pipettes[payload.pipetteId] && pipettes[payload.pipetteId].channels,
-        labwareName: labware && labware[payload.labwareId] && labware[payload.labwareId].type,
-      },
-    })
-  }
-
-export const closeWellSelectionModal = (): * => ({
-  type: 'CLOSE_WELL_SELECTION_MODAL',
+export const clearWellSelectionLabwareName = (): * => ({
+  type: 'CLEAR_WELL_SELECTION_LABWARE_NAME',
   payload: null,
 })
 
@@ -101,6 +66,4 @@ export const saveWellSelectionModal = () =>
     } else {
       console.warn('No well selection modal data in state')
     }
-
-    dispatch(closeWellSelectionModal())
   }

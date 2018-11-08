@@ -1,13 +1,22 @@
 // @flow
 import * as React from 'react'
+import {connect} from 'react-redux'
 import {FormGroup, InputField} from '@opentrons/components'
 import WellSelectionModal from './WellSelectionModal'
 import {Portal} from '../../portals/MainPageModalPortal'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
+import {selectors as labwareIngredSelectors} from '../../../labware-ingred/reducers'
+import * as wellSelectionActions from '../../../well-selection/actions'
 import styles from '../StepEditForm.css'
 import type { FocusHandlers } from '../index'
 
-type Props = {
+type SP = {_labwareNames: {[labwareId: string]: string}}
+type DP = {
+  _setWellSelectionLabwareName: (string) => mixed,
+  _clearWellSelectionLabwareName: () => mixed,
+}
+
+type OP = {
   name: StepFieldName,
   primaryWellCount?: number,
   disabled: boolean,
@@ -19,6 +28,8 @@ type Props = {
   onFieldFocus: $PropertyType<FocusHandlers, 'onFieldFocus'>,
 }
 
+type Props = OP & {onOpen: () => void, onClose: () => void}
+
 type State = {isModalOpen: boolean}
 
 class WellSelectionInput extends React.Component<Props, State> {
@@ -27,11 +38,13 @@ class WellSelectionInput extends React.Component<Props, State> {
   handleOpen = () => {
     this.props.onFieldFocus(this.props.name)
     this.setState({isModalOpen: true})
+    this.props.onOpen()
   }
 
   handleClose= () => {
     this.props.onFieldBlur(this.props.name)
     this.setState({isModalOpen: false})
+    this.props.onClose()
   }
 
   render () {
@@ -61,4 +74,19 @@ class WellSelectionInput extends React.Component<Props, State> {
   }
 }
 
-export default WellSelectionInput
+const mapStateToProps = (state: BaseState): SP => ({
+  _labwareNames: labwareIngredSelectors.getLabwareNames(state),
+})
+const mapDispatchToProps = (dispatch: Dispatch): DP => ({
+  _setWellSelectionLabwareName: name => dispatch(wellSelectionActions.setWellSelectionLabwareName(name)),
+  _clearWellSelectionLabwareName: () => dispatch(wellSelectionActions.clearWellSelectionLabwareName()),
+})
+const mergeProps = (stateProps: SP, dispatchProps: DP, ownProps: OP): Props => ({
+  ...ownProps,
+  onOpen: () => {
+    dispatchProps._setWellSelectionLabwareName(stateProps._labwareNames[ownProps.labwareId])
+  },
+  onClose: dispatchProps._clearWellSelectionLabwareName,
+})
+
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(WellSelectionInput)

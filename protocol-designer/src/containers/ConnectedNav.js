@@ -33,7 +33,7 @@ function Nav (props: Props) {
             iconName='ot-design'
             title={i18n.t('nav.tab_name.design')}
             disabled={props.currentPage === 'file-splash'}
-            selected={props.currentPage === 'steplist' || props.currentPage === 'ingredient-detail'}
+            selected={props.currentPage === 'steplist'}
             onClick={props.handleClick('steplist')} />
         </React.Fragment>
       }

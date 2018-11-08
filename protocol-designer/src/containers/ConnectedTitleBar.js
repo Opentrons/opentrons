@@ -8,6 +8,7 @@ import styles from './TitleBar.css'
 import i18n from '../localization'
 import {START_TERMINAL_TITLE, END_TERMINAL_TITLE} from '../constants'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
+import * as wellSelectionSelectors from '../well-selection/selectors'
 import {
   selectors as steplistSelectors,
   END_TERMINAL_ITEM_ID,
@@ -17,7 +18,6 @@ import {selectors as fileDataSelectors} from '../file-data'
 import {closeIngredientSelector} from '../labware-ingred/actions'
 import {stepIconsByType} from '../form-types'
 import {selectors, type Page} from '../navigation'
-import {closeWellSelectionModal} from '../well-selection/actions'
 
 import type {BaseState} from '../types'
 
@@ -51,6 +51,7 @@ function mapStateToProps (state: BaseState): SP {
   const labwareNickname = labware && labware.id && labwareNames[labware.id]
   const drilledDownLabwareId = labwareIngredSelectors.getDrillDownLabwareId(state)
   const liquidPlacementMode = !!labwareIngredSelectors.getSelectedContainer(state)
+  const wellSelectionLabwareName = wellSelectionSelectors.getWellSelectionLabwareName(state)
 
   switch (_page) {
     case 'liquids':
@@ -62,15 +63,6 @@ function mapStateToProps (state: BaseState): SP {
         _page,
         title: i18n.t([`nav.title.${_page}`, fileName]),
         subtitle: i18n.t([`nav.subtitle.${_page}`, '']),
-      }
-    case 'well-selection-modal':
-      return {
-        _page,
-        title: <TitleWithIcon
-          iconName={selectedStep && stepIconsByType[selectedStep.stepType]}
-          text={selectedStep && selectedStep.title}
-        />,
-        subtitle: labwareNickname,
       }
     case 'steplist':
     default: {
@@ -99,7 +91,19 @@ function mapStateToProps (state: BaseState): SP {
           subtitle = drilledDownLabware && humanizeLabwareType(drilledDownLabware.type)
         }
       } else if (selectedStep) {
-        subtitle = selectedStep.title
+        if (wellSelectionLabwareName) { // well selection modal
+          return {
+            _page,
+            title: <TitleWithIcon
+              iconName={selectedStep && stepIconsByType[selectedStep.stepType]}
+              text={selectedStep && selectedStep.title}
+            />,
+            subtitle: wellSelectionLabwareName,
+            backButtonLabel: 'Back',
+          }
+        } else {
+          subtitle = selectedStep.title
+        }
       }
       return { _page: 'steplist', title: title || fileName, subtitle, backButtonLabel }
     }
@@ -118,10 +122,6 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
     } else if (props.backButtonLabel) {
       onBackClick = () => {}
     }
-  }
-
-  if (_page === 'well-selection-modal') {
-    onBackClick = () => dispatch(closeWellSelectionModal())
   }
 
   return {
