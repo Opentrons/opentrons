@@ -8,6 +8,7 @@ import {
   OutlineButton,
   PrimaryButton,
 } from '@opentrons/components'
+import cx from 'classnames'
 import i18n from '../localization'
 import type {FormConnector} from '../utils'
 import {Portal} from './portals/MainPageModalPortal'
@@ -46,7 +47,7 @@ class FilePage extends React.Component<Props, State> {
       <div className={styles.file_page}>
         <Card title='Information'>
           <form onSubmit={this.handleSubmit} className={styles.card_content}>
-            <div className={formStyles.row_wrapper}>
+            <div className={cx(formStyles.row_wrapper, formStyles.stacked_row)}>
               <FormGroup label='Protocol Name:' className={formStyles.column_1_2}>
                 <InputField placeholder='Untitled' {...formConnector('protocol-name')} />
               </FormGroup>
@@ -56,7 +57,7 @@ class FilePage extends React.Component<Props, State> {
               </FormGroup>
             </div>
 
-            <FormGroup label='Description:'>
+            <FormGroup label='Description:' className={formStyles.stacked_row}>
               <InputField {...formConnector('description')}/>
             </FormGroup>
             <div className={styles.button_row}>

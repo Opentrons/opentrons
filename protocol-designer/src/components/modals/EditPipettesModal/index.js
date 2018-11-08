@@ -26,6 +26,7 @@ import {
 
 import PipetteDiagram from '../NewFileModal/PipetteDiagram'
 import TiprackDiagram from '../NewFileModal/TiprackDiagram'
+import formStyles from '../../forms.css'
 import styles from './EditPipettesModal.css'
 import modalStyles from '../modal.css'
 import StepChangesWarningModal from './StepChangesWarningModal'
@@ -139,14 +140,18 @@ class EditPipettesModal extends React.Component<Props, State> {
 
             <div className={styles.mount_fields_row}>
               <div className={styles.mount_column}>
-                <FormGroup key="leftPipetteModel" label="Left Pipette">
+                <FormGroup key="leftPipetteModel" label="Left Pipette" className={formStyles.stacked_row}>
                   <DropdownField
                     tabIndex={2}
                     options={pipetteOptionsWithNone}
                     value={this.state.left.pipetteModel}
                     onChange={this.makeHandleMountChange('left', 'pipetteModel')} />
                 </FormGroup>
-                <FormGroup disabled={isEmpty(this.state.left.pipetteModel)} key={'leftTiprackModel'} label={`${startCase('left')} Tiprack*`}>
+                <FormGroup
+                  disabled={isEmpty(this.state.left.pipetteModel)}
+                  key={'leftTiprackModel'}
+                  label={`${startCase('left')} Tiprack*`}
+                  className={formStyles.stacked_row}>
                   <DropdownField
                     tabIndex={3}
                     disabled={isEmpty(this.state.left.pipetteModel)}
@@ -156,14 +161,18 @@ class EditPipettesModal extends React.Component<Props, State> {
                 </FormGroup>
               </div>
               <div className={styles.mount_column}>
-                <FormGroup key="rightPipetteModel" label="Right Pipette">
+                <FormGroup key="rightPipetteModel" label="Right Pipette" className={formStyles.stacked_row}>
                   <DropdownField
                     tabIndex={4}
                     options={pipetteOptionsWithNone}
                     value={this.state.right.pipetteModel}
                     onChange={this.makeHandleMountChange('right', 'pipetteModel')} />
                 </FormGroup>
-                <FormGroup disabled={isEmpty(this.state.right.pipetteModel)} key={'rightTiprackModel'} label={`${startCase('right')} Tiprack*`}>
+                <FormGroup
+                  disabled={isEmpty(this.state.right.pipetteModel)}
+                  key={'rightTiprackModel'}
+                  label={`${startCase('right')} Tiprack*`}
+                  className={formStyles.stacked_row}>
                   <DropdownField
                     tabIndex={5}
                     disabled={isEmpty(this.state.right.pipetteModel)}
