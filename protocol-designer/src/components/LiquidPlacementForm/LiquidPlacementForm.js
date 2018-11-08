@@ -49,7 +49,7 @@ export default class LiquidPlacementForm extends React.Component <Props> {
         .string()
         .required(
           i18n.t('form.generic.error.required',
-          {name: i18n.t('form.liquid_placement.liquid')})),
+            {name: i18n.t('form.liquid_placement.liquid')})),
       volume: Yup.number()
         .nullable()
         .required(i18n.t('form.generic.error.required',
@@ -93,50 +93,50 @@ export default class LiquidPlacementForm extends React.Component <Props> {
           onSubmit={this.handleSubmit}
           validationSchema={this.getValidationSchema}
           render={({handleBlur, handleChange, handleSubmit, errors, setFieldValue, touched, values}) => (
-          <form onSubmit={handleSubmit}>
-            <div className={styles.field_row}>
-              <FormGroup
-                label={i18n.t('form.liquid_placement.liquid')}
-                className={styles.liquid_field}>
-                <DropdownField
-                  name='selectedLiquidId'
-                  options={liquidSelectionOptions}
-                  error={touched.selectedLiquidId && errors.selectedLiquidId}
-                  value={values.selectedLiquidId}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                />
-              </FormGroup>
-              <FormGroup
-                label={i18n.t('form.liquid_placement.volume')}
-                className={styles.volume_field}
+            <form onSubmit={handleSubmit}>
+              <div className={styles.field_row}>
+                <FormGroup
+                  label={i18n.t('form.liquid_placement.liquid')}
+                  className={styles.liquid_field}>
+                  <DropdownField
+                    name='selectedLiquidId'
+                    options={liquidSelectionOptions}
+                    error={touched.selectedLiquidId && errors.selectedLiquidId}
+                    value={values.selectedLiquidId}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                </FormGroup>
+                <FormGroup
+                  label={i18n.t('form.liquid_placement.volume')}
+                  className={styles.volume_field}
                 >
-                <InputField
-                  name='volume'
-                  units='μL'
-                  error={touched.volume && errors.volume}
-                  value={values.volume}
-                  onChange={this.handleChangeVolume(setFieldValue)}
-                  onBlur={handleBlur}
-                />
-              </FormGroup>
-            </div>
+                  <InputField
+                    name='volume'
+                    units='μL'
+                    error={touched.volume && errors.volume}
+                    value={values.volume}
+                    onChange={this.handleChangeVolume(setFieldValue)}
+                    onBlur={handleBlur}
+                  />
+                </FormGroup>
+              </div>
 
-            <div className={styles.button_row}>
-              <OutlineButton
-                disabled={!this.props.clearWells}
-                onClick={this.handleClearWells}>
-                {i18n.t('button.clear_wells')}
-              </OutlineButton>
-              <OutlineButton onClick={this.handleCancelForm}>
-                {i18n.t('button.cancel')}
-              </OutlineButton>
-              <PrimaryButton type='submit'>
-                {i18n.t('button.save')}
-              </PrimaryButton>
-            </div>
-          </form>
-        )} />
+              <div className={styles.button_row}>
+                <OutlineButton
+                  disabled={!this.props.clearWells}
+                  onClick={this.handleClearWells}>
+                  {i18n.t('button.clear_wells')}
+                </OutlineButton>
+                <OutlineButton onClick={this.handleCancelForm}>
+                  {i18n.t('button.cancel')}
+                </OutlineButton>
+                <PrimaryButton type='submit'>
+                  {i18n.t('button.save')}
+                </PrimaryButton>
+              </div>
+            </form>
+          )} />
       </div>
     )
   }

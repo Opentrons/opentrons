@@ -74,7 +74,7 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
             />
           )
         }
-      )}
+        )}
       </ol>
     )
   }

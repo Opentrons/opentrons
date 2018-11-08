@@ -8,7 +8,7 @@ import styles from './styles.css'
 
 type LabwareItemProps = {
   isDisabled: boolean,
-  onClick?: () => void,
+  onClick: () => mixed,
 }
 
 type Props = Labware & LabwareItemProps

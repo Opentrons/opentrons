@@ -43,8 +43,8 @@ function AttachedPipettesCard (props: Props) {
       refreshing={props.inProgress}
     >
       <CardContentFlex>
-      <InstrumentInfo mount='left' name={props.name} {...props.left} onClick={props.clearMove} />
-      <InstrumentInfo mount='right' name={props.name} {...props.right} onClick={props.clearMove} />
+        <InstrumentInfo mount='left' name={props.name} {...props.left} onClick={props.clearMove} />
+        <InstrumentInfo mount='right' name={props.name} {...props.right} onClick={props.clearMove} />
       </CardContentFlex>
     </RefreshCard>
   )

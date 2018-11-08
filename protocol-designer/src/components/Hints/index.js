@@ -98,8 +98,8 @@ class Hints extends React.Component<Props, State> {
             </div>
           </AlertModal>
         </Portal>
-    )
-    : null
+      )
+      : null
   }
 }
 

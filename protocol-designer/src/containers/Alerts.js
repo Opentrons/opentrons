@@ -39,10 +39,10 @@ function Alerts (props: Props) {
       key={`error:${key}`}
       title={error.message}
       onCloseClick={undefined}
-      >
-        {captions[error.type]}
-      </AlertItem>
-    ))
+    >
+      {captions[error.type]}
+    </AlertItem>
+  ))
 
   const warnings = props.warnings.map((warning, key) => (
     <AlertItem
@@ -50,10 +50,10 @@ function Alerts (props: Props) {
       key={`warning:${key}`}
       title={warning.message}
       onCloseClick={props.onDismiss(warning)}
-      >
-        {captions[warning.type]}
-      </AlertItem>
-    ))
+    >
+      {captions[warning.type]}
+    </AlertItem>
+  ))
 
   return (
     <div>

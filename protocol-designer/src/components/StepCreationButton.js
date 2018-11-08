@@ -26,15 +26,15 @@ function StepCreationButton (props: Props) {
       tooltipComponent={i18n.t(`tooltip.step_description.${stepType}`)}
     >
       {(hoverTooltipHandlers) => (
-      <PrimaryButton
-        hoverTooltipHandlers={hoverTooltipHandlers}
-        onClick={onStepClick && onStepClick(stepType)}
-        iconName={stepIconsByType[stepType]}
-      >
-        {stepType}
-      </PrimaryButton>
-    )}
-  </HoverTooltip>
+        <PrimaryButton
+          hoverTooltipHandlers={hoverTooltipHandlers}
+          onClick={onStepClick && onStepClick(stepType)}
+          iconName={stepIconsByType[stepType]}
+        >
+          {stepType}
+        </PrimaryButton>
+      )}
+    </HoverTooltip>
   )
 
   return (

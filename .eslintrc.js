@@ -18,10 +18,6 @@ module.exports = {
     'camelcase': 'off',
     'comma-dangle': ['error', 'always-multiline'],
     'flowtype/delimiter-dangle': ['error', 'always-multiline'],
-    // TODO(mc, 2018-09-04): enable this rule and fix lint failures
-    'react/prop-types': 'off',
-    // TODO(mc, 2018-10-25): enable this rule and fix lint failures
-    'indent': 'off',
   },
 
   globals: {},
@@ -29,7 +25,6 @@ module.exports = {
   env: {
     node: true,
     browser: true,
-    jest: true,
   },
 
   settings: {
@@ -37,4 +32,18 @@ module.exports = {
       version: '16.2',
     },
   },
+
+  overrides: [
+    {
+      files: [
+        '**/test/**.js',
+        '**/test-with-flow/**.js',
+        '**/__tests__/**.js',
+        '**/__mocks__/**.js',
+      ],
+      env: {
+        jest: true,
+      },
+    },
+  ],
 }

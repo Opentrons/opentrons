@@ -29,12 +29,12 @@ export default function Modal (props: ModalProps) {
   return (
     <div className={cx(styles.modal, props.className, {[styles.alert_modal]: alertOverlay})} >
       <Overlay onClick={onCloseClick} alertOverlay={alertOverlay}/>
-       <div
+      <div
         ref={innerRef}
         className={cx(styles.modal_contents, contentsClassName)}>
-         {heading && (
-           <h3 className={styles.modal_heading}>{heading}</h3>
-         )}
+        {heading && (
+          <h3 className={styles.modal_heading}>{heading}</h3>
+        )}
         {props.children}
       </div>
     </div>

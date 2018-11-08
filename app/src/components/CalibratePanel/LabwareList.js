@@ -1,3 +1,4 @@
+// @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {withRouter} from 'react-router'
@@ -5,60 +6,73 @@ import {withRouter} from 'react-router'
 import {TitledList} from '@opentrons/components'
 import LabwareListItem from './LabwareListItem'
 
-import {
-  selectors as robotSelectors,
-  actions as robotActions,
-} from '../../robot'
+import {selectors as robotSelectors, actions as robotActions} from '../../robot'
+
+import type {State, Dispatch} from '../../types'
+import type {Labware, Mount} from '../../robot'
+
+type SP = {|
+  disabled: boolean,
+  labware: Array<Labware>,
+  _calibrator: ?Mount,
+  _deckPopulated: boolean,
+|}
+
+type DP = {|dispatch: Dispatch|}
+
+type Props = {
+  labware: Array<Labware>,
+  disabled: boolean,
+  setLabware: (labware: Labware) => mixed,
+}
 
 export default withRouter(
-  connect(mapStateToProps, null, mergeProps)(LabwareList)
+  connect(
+    mapStateToProps,
+    null,
+    mergeProps
+  )(LabwareList)
 )
 
-function LabwareList (props) {
-  const {labware, disabled} = props
+function LabwareList (props: Props) {
+  const {labware, disabled, setLabware} = props
+
   return (
-    <TitledList title='labware' disabled={disabled}>
+    <TitledList title="labware" disabled={disabled}>
       {labware.map(lw => (
         <LabwareListItem
           {...lw}
+          key={lw.slot}
           isDisabled={disabled}
           confirmed={lw.confirmed}
-          key={lw.slot}
-          onClick={lw.setLabware}
+          onClick={() => setLabware(lw)}
         />
       ))}
     </TitledList>
   )
 }
 
-function mapStateToProps (state) {
-  const tipracksConfirmed = robotSelectors.getTipracksConfirmed(state)
+function mapStateToProps (state: State): SP {
   return {
-    _labware: robotSelectors.getNotTipracks(state),
-    disabled: !tipracksConfirmed,
+    labware: robotSelectors.getNotTipracks(state),
+    disabled: !robotSelectors.getTipracksConfirmed(state),
     _calibrator: robotSelectors.getCalibratorMount(state),
     _deckPopulated: robotSelectors.getDeckPopulated(state),
   }
 }
 
-function mergeProps (stateProps, dispatchProps) {
-  const {_calibrator, _deckPopulated, disabled} = stateProps
+function mergeProps (stateProps: SP, dispatchProps: DP): Props {
+  const {labware, disabled, _calibrator, _deckPopulated} = stateProps
   const {dispatch} = dispatchProps
-
-  const labware = stateProps._labware.map(lw => {
-    return {
-      ...lw,
-      setLabware: () => {
-        const calibrator = lw.calibratorMount || _calibrator
-        if (_deckPopulated && calibrator) {
-          dispatch(robotActions.moveTo(calibrator, lw.slot))
-        }
-      },
-    }
-  })
 
   return {
     labware,
     disabled,
+    setLabware: lw => {
+      const calibrator = lw.calibratorMount || _calibrator
+      if (_deckPopulated && calibrator) {
+        dispatch(robotActions.moveTo(calibrator, lw.slot))
+      }
+    },
   }
 }

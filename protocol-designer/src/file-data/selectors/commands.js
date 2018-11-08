@@ -100,7 +100,7 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
           ? {'0': {}, '1': {}, '2': {}, '3': {}, '4': {}, '5': {}, '6': {}, '7': {}}
           : {'0': {}},
       }),
-    {})
+      {})
 
     return {
       instruments: pipettes,

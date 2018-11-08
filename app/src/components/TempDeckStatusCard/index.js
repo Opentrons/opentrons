@@ -55,19 +55,19 @@ class TempDeckStatusCard extends React.Component<Props> {
     const targetTemp = (tempdeckData && tempdeckData.data.targetTemp) || tempdeck.data.targetTemp
     return (
       <IntervalWrapper refresh={fetchModuleData} interval={POLL_TEMPDECK_INTERVAL_MS}>
-          <StatusCard title={tempdeck.displayName}>
-            <CardContentRow>
-              <StatusItem status={(tempdeckData && tempdeckData.status) || tempdeck.status } />
-            </CardContentRow>
-            <CardContentRow>
-              <LabeledValue
-                label='Current Temp'
-                value={`${currentTemp} °C`} />
-              <LabeledValue
-                label='Target Temp'
-                value={targetTemp ? `${targetTemp} °C` : 'None'} />
-            </CardContentRow>
-          </StatusCard>
+        <StatusCard title={tempdeck.displayName}>
+          <CardContentRow>
+            <StatusItem status={(tempdeckData && tempdeckData.status) || tempdeck.status } />
+          </CardContentRow>
+          <CardContentRow>
+            <LabeledValue
+              label='Current Temp'
+              value={`${currentTemp} °C`} />
+            <LabeledValue
+              label='Target Temp'
+              value={targetTemp ? `${targetTemp} °C` : 'None'} />
+          </CardContentRow>
+        </StatusCard>
       </IntervalWrapper>
     )
   }

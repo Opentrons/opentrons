@@ -60,10 +60,10 @@ describe('robot/*', () => {
       client.__setMockResponse(mockPositionsResponse, response)
 
       return store.dispatch(moveRobotTo(robot, request))
-      .then(() => expect(client.mock.calls).toEqual([
-        [robot, 'GET', 'robot/positions'],
-        [robot, 'POST', 'robot/move', expected],
-      ]))
+        .then(() => expect(client.mock.calls).toEqual([
+          [robot, 'GET', 'robot/positions'],
+          [robot, 'POST', 'robot/move', expected],
+        ]))
     })
 
     test('dispatches api:REQUEST and api:SUCCESS', () => {

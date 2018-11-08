@@ -51,25 +51,25 @@ export default function updateLiquidState (
   // add liquid to well(s)
   const labwareLiquidState = allWellsShared
   // merge all liquid into the single well
-  ? {[well]: reduce(
-    splitLiquidStates,
-    (wellLiquidStateAcc, splitLiquidStateForTip: SourceAndDest) =>
-    mergeLiquid(
-      wellLiquidStateAcc,
-      splitLiquidStateForTip.dest
-    ),
-    cloneDeep(prevLiquidState.labware[labwareId][well])
-  )}
+    ? {[well]: reduce(
+      splitLiquidStates,
+      (wellLiquidStateAcc, splitLiquidStateForTip: SourceAndDest) =>
+        mergeLiquid(
+          wellLiquidStateAcc,
+          splitLiquidStateForTip.dest
+        ),
+      cloneDeep(prevLiquidState.labware[labwareId][well])
+    )}
   // merge each tip's liquid into that tip's respective well
-  : wellsForTips.reduce((acc, wellForTip, tipIdx) => {
-    return {
-      ...acc,
-      [wellForTip]: mergeLiquid(
-        splitLiquidStates[`${tipIdx}`].dest,
-        prevLiquidState.labware[labwareId][wellForTip] || {} // TODO Ian 2018-04-02 use robotState selector. (Liquid state falls back to {} for empty well)
-      ),
-    }
-  }, {})
+    : wellsForTips.reduce((acc, wellForTip, tipIdx) => {
+      return {
+        ...acc,
+        [wellForTip]: mergeLiquid(
+          splitLiquidStates[`${tipIdx}`].dest,
+          prevLiquidState.labware[labwareId][wellForTip] || {} // TODO Ian 2018-04-02 use robotState selector. (Liquid state falls back to {} for empty well)
+        ),
+      }
+    }, {})
 
   return {
     pipettes: {

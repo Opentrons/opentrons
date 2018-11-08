@@ -58,14 +58,14 @@ export default function AttachTipModal (props: Props) {
 
   return (
     <div className={styles.attach_tip_contents}>
-        <div className={styles.attach_tip_instructions}>
-          {instructions}
-          <PrimaryButton
-            title={buttonText}
-            onClick={props.proceed}
-          >
+      <div className={styles.attach_tip_instructions}>
+        {instructions}
+        <PrimaryButton
+          title={buttonText}
+          onClick={props.proceed}
+        >
           {buttonText}
-          </PrimaryButton>
+        </PrimaryButton>
       </div>
       <div className={styles.attach_tip_diagram}>
         <img src={diagramSrc} />

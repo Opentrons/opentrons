@@ -59,7 +59,7 @@ const nextEmptySlot = loadedContainersSubstate => {
 // (this state just toggles a modal)
 const modeLabwareSelection = handleActions({
   OPEN_ADD_LABWARE_MODAL: (state, action: ActionType<typeof actions.openAddLabwareModal>) =>
-      action.payload.slot,
+    action.payload.slot,
   CLOSE_LABWARE_SELECTOR: () => false,
   CREATE_CONTAINER: () => false,
 }, false)
@@ -78,7 +78,7 @@ const selectedContainerId = handleActions({
 
   // $FlowFixMe: Cannot get `action.payload` because property `payload` is missing in function
   OPEN_WELL_SELECTION_MODAL: (state, action: ActionType<openWellSelectionModal>): SelectedContainerId =>
-   action.payload.labwareId,
+    action.payload.labwareId,
   CLOSE_WELL_SELECTION_MODAL: (): SelectedContainerId => null,
 }, null)
 
@@ -349,7 +349,7 @@ const _loadedContainersBySlot = (containers: ContainersState) =>
   reduce(containers, (acc, labware: ?Labware) => (labware && labware.slot)
     ? {...acc, [labware.slot]: labware.type}
     : acc
-  , {})
+    , {})
 
 const loadedContainersBySlot = createSelector(
   getLabware,
@@ -454,7 +454,7 @@ const allIngredientGroupFields: Selector<AllIngredGroupFields> = createSelector(
 const allIngredientNamesIds: BaseState => OrderedLiquids = createSelector(
   getLiquidGroupsById,
   ingreds => Object.keys(ingreds).map(ingredId =>
-      ({ingredientId: ingredId, name: ingreds[ingredId].name}))
+    ({ingredientId: ingredId, name: ingreds[ingredId].name}))
 )
 
 // TODO: just use the individual selectors separately, no need to combine it into 'activeModals'

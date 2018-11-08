@@ -37,10 +37,10 @@ export default function SessionAlert (props: Props) {
     case 'stopped':
       return (
         <AlertItem
-        type='warning'
-        title={cancelMessage}
-        className={className}
-      />)
+          type='warning'
+          title={cancelMessage}
+          className={className}
+        />)
     default:
       return null
   }

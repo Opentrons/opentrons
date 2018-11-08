@@ -32,26 +32,26 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
       <HoverTooltip
         tooltipComponent={i18n.t('tooltip.step_fields.defaults.tipPosition')}
       >{(hoverTooltipHandlers) => (
-        <FormGroup
-          label={i18n.t('form.step_edit_form.field.tip_position.label')}
-          disabled={!this.props.wellHeightMM}
-          className={styles.well_order_input}
-          hoverTooltipHandlers={hoverTooltipHandlers}
-        >
-          <TipPositionModal
-            prefix={this.props.prefix}
-            closeModal={this.handleClose}
-            wellHeightMM={this.props.wellHeightMM}
-            mmFromBottom={this.props.mmFromBottom}
-            isOpen={this.state.isModalOpen} />
+          <FormGroup
+            label={i18n.t('form.step_edit_form.field.tip_position.label')}
+            disabled={!this.props.wellHeightMM}
+            className={styles.well_order_input}
+            hoverTooltipHandlers={hoverTooltipHandlers}
+          >
+            <TipPositionModal
+              prefix={this.props.prefix}
+              closeModal={this.handleClose}
+              wellHeightMM={this.props.wellHeightMM}
+              mmFromBottom={this.props.mmFromBottom}
+              isOpen={this.state.isModalOpen} />
             <InputField
               readOnly
               onClick={this.handleOpen}
               value={this.props.wellHeightMM ? this.props.mmFromBottom : null}
               units="mm" />
-        </FormGroup>
-      )}
-    </HoverTooltip>
+          </FormGroup>
+        )}
+      </HoverTooltip>
     )
   }
 }

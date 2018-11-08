@@ -74,7 +74,7 @@ export default class EditableTextField extends React.Component<Props, State> {
                 units={<Icon name='pencil' className={styles.edit_icon} />}
               />
             </form>
-          }</ClickOutside>
+        }</ClickOutside>
       )
     }
 

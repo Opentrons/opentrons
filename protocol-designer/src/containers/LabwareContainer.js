@@ -100,9 +100,9 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     highlighted: selectedTerminalItem === START_TERMINAL_ITEM_ID
     // in deckSetupMode, labware is highlighted when selected (currently editing ingredients)
     // or when targeted by an open "Add Labware" modal
-    ? (isSelectedSlot || selectors.selectedAddLabwareSlot(state) === slot)
+      ? (isSelectedSlot || selectors.selectedAddLabwareSlot(state) === slot)
     // outside of deckSetupMode, labware is highlighted when step/substep is hovered
-    : steplistSelectors.hoveredStepLabware(state).includes(containerId),
+      : steplistSelectors.hoveredStepLabware(state).includes(containerId),
     selectedTerminalItem,
 
     slot,

@@ -1,36 +1,41 @@
 // @flow
 import {connect} from 'react-redux'
 import type {State} from '../../types'
-import {
-  actions as robotActions,
-  selectors as robotSelectors,
-  type SessionStatus,
-} from '../../robot'
+import {actions as robotActions, selectors as robotSelectors} from '../../robot'
 
 import CommandList from './CommandList'
 import ConfirmCancelModal from './ConfirmCancelModal'
 
-type SP = {
+import type {SessionStatus} from '../../robot'
+
+type SP = {|
   commands: Array<any>,
   sessionStatus: SessionStatus,
   showSpinner: boolean,
-}
+|}
+
+type DP = {|
+  onResetClick: () => mixed,
+|}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CommandList)
+export {ConfirmCancelModal}
 
 function mapStateToProps (state: State): SP {
   return {
     commands: robotSelectors.getCommands(state),
     sessionStatus: robotSelectors.getSessionStatus(state),
-    showSpinner: (
+    showSpinner:
       robotSelectors.getCancelInProgress(state) ||
-      robotSelectors.getSessionLoadInProgress(state)
-    ),
+      robotSelectors.getSessionLoadInProgress(state),
   }
 }
 
-const mapDispatchToProps = (dispatch) => ({
-  onResetClick: () => dispatch(robotActions.refreshSession()),
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(CommandList)
-
-export {ConfirmCancelModal}
+function mapDispatchToProps (dispatch: Dispatch): DP {
+  return {
+    onResetClick: () => dispatch(robotActions.refreshSession()),
+  }
+}

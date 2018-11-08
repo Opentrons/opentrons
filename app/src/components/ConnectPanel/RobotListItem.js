@@ -50,14 +50,14 @@ export function RobotListItem (props: RobotItemProps) {
       </RobotLink>
       {connectable &&
         selected && (
-          <RobotLink
-            url={`/robots/${name}/instruments`}
-            className={styles.instrument_item}
-          >
-            <p className={styles.link_text}>Pipettes & Modules</p>
-            <Icon name="chevron-right" className={styles.robot_item_icon} />
-          </RobotLink>
-        )}
+        <RobotLink
+          url={`/robots/${name}/instruments`}
+          className={styles.instrument_item}
+        >
+          <p className={styles.link_text}>Pipettes & Modules</p>
+          <Icon name="chevron-right" className={styles.robot_item_icon} />
+        </RobotLink>
+      )}
     </li>
   )
 }

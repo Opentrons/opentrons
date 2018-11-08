@@ -77,16 +77,16 @@ const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: Robo
       }
 
       const touchTipCommands = data.touchTip
-      ? [touchTip({pipette, labware, well})]
-      : []
+        ? [touchTip({pipette, labware, well})]
+        : []
 
       const blowoutCommands = data.blowout
-      ? [blowout({
-        pipette,
-        labware: data.blowout,
-        well: 'A1',
-      })]
-      : []
+        ? [blowout({
+          pipette,
+          labware: data.blowout,
+          well: 'A1',
+        })]
+        : []
 
       const mixCommands = mixUtil(
         pipette,

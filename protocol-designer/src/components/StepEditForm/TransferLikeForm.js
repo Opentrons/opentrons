@@ -75,15 +75,15 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                           onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)} />
                         {value
                           ? <div>
-                              <StepInputField name="aspirate_disposalVol_volume" units="μL" {...focusHandlers} />
-                            </div>
+                            <StepInputField name="aspirate_disposalVol_volume" units="μL" {...focusHandlers} />
+                          </div>
                           : null}
                       </div>
                       {value
                         ? <div className={styles.field_row}>
-                            <div className={styles.sub_select_label}>Blowout</div>
-                            <DisposalDestinationDropdown name="aspirate_disposalVol_destination" className={styles.full_width} {...focusHandlers} />
-                          </div>
+                          <div className={styles.sub_select_label}>Blowout</div>
+                          <DisposalDestinationDropdown name="aspirate_disposalVol_destination" className={styles.full_width} {...focusHandlers} />
+                        </div>
                         : null
                       }
                     </React.Fragment>

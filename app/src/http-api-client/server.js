@@ -253,21 +253,21 @@ export const makeGetRobotUpdateInfo = () => {
   const selector: OutputSelector<State,
     AnyRobot,
     RobotUpdateInfo> = createSelector(
-    (_, robot) => getRobotApiVersion(robot),
-    getApiUpdateVersion,
-    (currentVersion, updateVersion) => {
-      const current = semver.valid(currentVersion)
-      const upgrade = current && semver.gt(updateVersion, current)
-      const downgrade = current && semver.lt(updateVersion, current)
-      let type
-      if (!upgrade && !downgrade) {
-        type = null
-      } else {
-        type = upgrade ? 'upgrade' : 'downgrade'
+      (_, robot) => getRobotApiVersion(robot),
+      getApiUpdateVersion,
+      (currentVersion, updateVersion) => {
+        const current = semver.valid(currentVersion)
+        const upgrade = current && semver.gt(updateVersion, current)
+        const downgrade = current && semver.lt(updateVersion, current)
+        let type
+        if (!upgrade && !downgrade) {
+          type = null
+        } else {
+          type = upgrade ? 'upgrade' : 'downgrade'
+        }
+        return {version: updateVersion, type: type}
       }
-      return {version: updateVersion, type: type}
-    }
-  )
+    )
 
   return selector
 }
@@ -278,9 +278,9 @@ export const makeGetRobotUpdateRequest = () => {
   const selector: OutputSelector<State,
     RobotService,
     RobotServerUpdate> = createSelector(
-    selectRobotServerState,
-    state => (state && state.update) || {inProgress: false}
-  )
+      selectRobotServerState,
+      state => (state && state.update) || {inProgress: false}
+    )
 
   return selector
 }
@@ -289,9 +289,9 @@ export const makeGetRobotRestartRequest = () => {
   const selector: OutputSelector<State,
     RobotService,
     RobotServerRestart> = createSelector(
-    selectRobotServerState,
-    state => (state && state.restart) || {inProgress: false}
-  )
+      selectRobotServerState,
+      state => (state && state.restart) || {inProgress: false}
+    )
 
   return selector
 }
@@ -300,9 +300,9 @@ export const makeGetRobotIgnoredUpdateRequest = () => {
   const selector: OutputSelector<State,
     RobotService,
     RobotServerUpdateIgnore> = createSelector(
-    selectRobotServerState,
-    state => (state && state['update/ignore']) || {inProgress: false}
-  )
+      selectRobotServerState,
+      state => (state && state['update/ignore']) || {inProgress: false}
+    )
 
   return selector
 }
@@ -311,8 +311,8 @@ export const makeGetRobotIgnoredUpdateRequest = () => {
 export const getAnyRobotUpdateAvailable: OutputSelector<State,
   void,
   boolean> = createSelector(selectServerState, state =>
-  Object.keys(state).some(name => state[name].availableUpdate)
-)
+    Object.keys(state).some(name => state[name].availableUpdate)
+  )
 
 function selectServerState (state: State) {
   return state.api.server

@@ -24,16 +24,16 @@ export default function PipetteDiagram (props: Props) {
   return (
     <React.Fragment>
       {(leftPipette && leftChannels)
-          ? <InstrumentDiagram
+        ? <InstrumentDiagram
           channels={leftChannels}
           className={styles.left_pipette} />
-          : <div className={styles.left_pipette} />
+        : <div className={styles.left_pipette} />
       }
       {(rightPipette && rightChannels)
-          ? <InstrumentDiagram
-            channels={rightChannels}
-            className={styles.right_pipette} />
-          : <div className={styles.right_pipette} />
+        ? <InstrumentDiagram
+          channels={rightChannels}
+          className={styles.right_pipette} />
+        : <div className={styles.right_pipette} />
       }
     </React.Fragment>
   )

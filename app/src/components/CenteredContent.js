@@ -1,14 +1,15 @@
+// @flow
 // vertically and horizontally CenteredContent component
-import React from 'react'
+import * as React from 'react'
 
 import styles from './CenteredContent.css'
 
-export default function CenteredContent (props) {
+type Props = {children: React.Node}
+
+export default function CenteredContent (props: Props) {
   return (
     <div className={styles.container}>
-      <div>
-        {props.children}
-      </div>
+      <div>{props.children}</div>
     </div>
   )
 }

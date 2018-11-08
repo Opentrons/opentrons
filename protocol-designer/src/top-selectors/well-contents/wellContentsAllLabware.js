@@ -11,8 +11,8 @@ import type {Selector} from '../../types'
 import type {
   Wells,
   ContentsByWell,
-WellContentsByLabware,
-  } from '../../labware-ingred/types'
+  WellContentsByLabware,
+} from '../../labware-ingred/types'
 import type {SingleLabwareLiquidState} from '../../step-generation'
 
 const _getWellContents = (
@@ -71,7 +71,7 @@ const wellContentsAllLabware: Selector<WellContentsByLabware> = createSelector(
       return {
         ...acc,
         [labwareId]: _getWellContents(
-           _labware[labwareId] && _labware[labwareId].type,
+          _labware[labwareId] && _labware[labwareId].type,
           ingredsForLabware,
           // Only give _getWellContents the selection data if it's a selected container
           isSelectedLabware ? _selectedWells : null,
