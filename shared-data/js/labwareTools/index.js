@@ -133,16 +133,16 @@ function determineLayout (
   offset: Array<Offset>,
   gridStart: Array<GridStart>,
   wells: Array<Well>): {[wellName: string]: Well} {
-  const wellList = {}
+  const wellMap = {}
   grids.forEach((gridObj, gridIdx) => {
     range(gridObj.column).forEach(colIdx => {
       range(gridObj.row).forEach(rowIdx => {
         const wellName = _irregularWellName(rowIdx, colIdx, gridStart[gridIdx])
-        wellList[wellName] = _calculateWellCoord(rowIdx, colIdx, spacing[gridIdx], offset[gridIdx], wells[gridIdx])
+        wellMap[wellName] = _calculateWellCoord(rowIdx, colIdx, spacing[gridIdx], offset[gridIdx], wells[gridIdx])
     })
   })
 })
-  return wellList
+  return wellMap
 }
 
 export function _generateIrregularLoadName (args: {
@@ -153,11 +153,10 @@ export function _generateIrregularLoadName (args: {
   displayCategory: string,
 }): string {
   const {grid, well, units, brand, displayCategory} = args
-  let wellComboArray = []
-  grid.forEach((gridObj, gridIdx) => {
+  const wellComboArray = grid.map((gridObj, gridIdx) => {
     const numWells = gridObj.row * gridObj.column
     // TODO Ian 2018-11-08: use units to convert volume
-    wellComboArray.push(`${numWells}x${well[gridIdx].totalLiquidVolume}_${units}`)
+    return `${numWells}x${well[gridIdx].totalLiquidVolume}_${units}`
   })
 
   const wellCombo = wellComboArray.join('_')
@@ -230,6 +229,7 @@ export function createRegularLabware (args: RegularLabwareProps): Schema {
 
   const valid = validate(definition)
   if (valid !== true) {
+    console.error(validate.errors)
     throw new Error('1 or more required arguments missing from input.')
   }
   return definition
@@ -238,15 +238,20 @@ export function createRegularLabware (args: RegularLabwareProps): Schema {
 // Generator function for labware definitions within an irregular grid format
 // e.g. crystalization plates, 15_50ml tuberacks and anything with multiple "grids"
 export function createIrregularLabware (args: IrregularLabwareProps): Schema {
-  const offset = []
-  args.offset.forEach(offsetObj => {
-    offset.push({
+  const offset = args.offset.map(offsetObj => ({
       ...offsetObj,
       z: round(args.dimensions.overallHeight + offsetObj.z, 2),
-    })
-  })
-  const wellsArray = determineLayout(args.grid, args.spacing, offset, args.gridStart, args.well)
+    }))
+
+  const wellsArray = determineLayout(
+    args.grid,
+    args.spacing,
+    offset,
+    args.gridStart,
+    args.well)
+
   const ordering = determineIrregularOrdering(Object.keys(wellsArray))
+
   const definition: Schema = {
     ordering,
     otId: assignId(),
@@ -277,7 +282,7 @@ export function createIrregularLabware (args: IrregularLabwareProps): Schema {
 
     const valid = validate(definition)
     if (valid !== true) {
-      console.log(validate.errors)
+      console.error(validate.errors)
       throw new Error('1 or more required arguments missing from input.')
     }
     return definition
