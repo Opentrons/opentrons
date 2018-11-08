@@ -6,12 +6,14 @@ import {Deck, ClickOutside} from '@opentrons/components'
 import styles from './Deck.css'
 import i18n from '../localization'
 
+import {Portal} from '../components/portals/MainPageModalPortal'
+import BrowseLabwareModal from '../components/labware/BrowseLabwareModal'
+import Hints from '../components/Hints'
 import LiquidPlacementModal from '../components/LiquidPlacementModal.js'
 import LabwareContainer from '../containers/LabwareContainer.js'
 import LabwareSelectionModal from '../components/LabwareSelectionModal'
-import BrowseLabwareModal from '../components/labware/BrowseLabwareModal'
 import StepEditForm from '../components/StepEditForm'
-import {Portal} from '../components/portals/MainPageModalPortal'
+import TimelineAlerts from '../components/alerts/TimelineAlerts'
 
 import {selectors} from '../labware-ingred/reducers'
 import * as actions from '../labware-ingred/actions'
@@ -98,6 +100,8 @@ class DeckSetup extends React.Component<Props> {
     return (
       <React.Fragment>
         <Portal>
+          <TimelineAlerts />
+          <Hints />
           {startTerminalItemSelected && <LabwareSelectionModal />}
           {!startTerminalItemSelected && <StepEditForm />}
           {startTerminalItemSelected && this.props.ingredSelectionMode && <LiquidPlacementModal />}
