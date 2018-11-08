@@ -18,6 +18,10 @@ module.exports = {
 
   entry: DEV_MODE ? ['react-hot-loader/patch'] : [],
 
+  output: {
+    filename: DEV_MODE ? 'bundle.js' : 'bundle.[contenthash].js',
+  },
+
   mode: DEV_MODE ? 'development' : 'production',
 
   devtool: DEV_MODE ? 'eval-source-map' : 'source-map',
@@ -36,8 +40,8 @@ module.exports = {
 
   plugins: [
     new MiniCssExtractPlugin({
-      filename: DEV_MODE ? '[name].css' : '[name].[hash].css',
-      chunkFilename: DEV_MODE ? '[id].css' : '[id].[hash].css',
+      filename: DEV_MODE ? '[name].css' : '[name].[contenthash].css',
+      chunkFilename: DEV_MODE ? '[id].css' : '[id].[contenthash].css',
     }),
     ANALYZER,
   ].filter(Boolean),
