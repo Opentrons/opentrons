@@ -54,6 +54,7 @@ export type ServerSuccessAction = {|
     path: RequestPath,
     response: ServerResponse,
   |},
+  meta: {|robot: true|},
 |}
 
 export type ServerFailureAction = {|
@@ -349,6 +350,7 @@ function serverSuccess (
   return {
     type: 'api:SERVER_SUCCESS',
     payload: {robot, path, response},
+    meta: {robot: true},
   }
 }
 

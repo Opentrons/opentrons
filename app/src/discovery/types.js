@@ -6,14 +6,17 @@ export type ConnectableStatus = 'connectable'
 export type ReachableStatus = 'reachable'
 export type UnreachableStatus = 'unreachable'
 
+export type RestartStatus = 'pending' | 'down'
+
 // service with a known IP address
 export type ResolvedRobot = {
   ...$Exact<Service>,
-  displayName: string,
   ip: $NonMaybeType<$PropertyType<Service, 'ip'>>,
   local: $NonMaybeType<$PropertyType<Service, 'local'>>,
   ok: $NonMaybeType<$PropertyType<Service, 'ok'>>,
   serverOk: $NonMaybeType<$PropertyType<Service, 'serverOk'>>,
+  displayName: string,
+  restartStatus: ?RestartStatus,
 }
 
 // fully connectable robot

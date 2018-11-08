@@ -13,16 +13,15 @@ export default class ConnectBanner extends React.Component<Robot, State> {
   }
 
   render () {
-    const {name, connected} = this.props
+    const {displayName, connected} = this.props
     const isVisible = connected && !this.state.dismissed
-    const TITLE = `${name} successfully connected`
-
     if (!isVisible) return null
+
     return (
       <AlertItem
         type="success"
         onCloseClick={() => this.setState({dismissed: true})}
-        title={TITLE}
+        title={`${displayName} successfully connected`}
       />
     )
   }

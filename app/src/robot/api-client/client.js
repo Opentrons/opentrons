@@ -68,6 +68,15 @@ export default function client (dispatch) {
         return cancel(state, action)
       case 'robot:REFRESH_SESSION':
         return refreshSession(state, action)
+
+      // disconnect RPC prior to robot restart
+      // TODO(mc, 2018-11-06): switch to api:RESPONSE when server.js switches
+      case 'api:SERVER_SUCCESS': {
+        const connectedName = selectors.getConnectedRobotName(state)
+        const {path, robot} = action.payload
+        if (path === 'restart' && connectedName === robot.name) disconnect()
+        break
+      }
     }
   }
 

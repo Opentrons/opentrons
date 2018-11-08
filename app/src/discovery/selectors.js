@@ -2,6 +2,7 @@
 import concat from 'lodash/concat'
 import filter from 'lodash/filter'
 import find from 'lodash/find'
+import get from 'lodash/get'
 import groupBy from 'lodash/groupBy'
 import head from 'lodash/head'
 import map from 'lodash/map'
@@ -66,20 +67,22 @@ const makeDisplayName = (service: Service): string =>
 // so the head of each group will be the most "desirable" option for that group
 const getGroupedRobotsMap: GetGroupedRobotsMap = createSelector(
   state => state.discovery.robotsByName,
-  robotsMap =>
+  state => state.discovery.restartsByName,
+  (robotsMap, restartsMap) =>
     mapValues(robotsMap, services => {
       const servicesWithStatus = services.map(s => {
         const resolved = maybeGetResolved(s)
-        const displayName = makeDisplayName(s)
-        if (resolved) {
-          if (isConnectable(resolved)) {
-            return {...s, status: CONNECTABLE, displayName}
-          }
-          if (isReachable(resolved)) {
-            return {...s, status: REACHABLE, displayName}
-          }
+        const service = {
+          ...s,
+          displayName: makeDisplayName(s),
+          restartStatus: get(restartsMap, s.name, null),
         }
-        return {...s, status: UNREACHABLE, displayName}
+
+        if (resolved) {
+          if (isConnectable(resolved)) return {...service, status: CONNECTABLE}
+          if (isReachable(resolved)) return {...service, status: REACHABLE}
+        }
+        return {...service, status: UNREACHABLE}
       })
 
       return groupBy(servicesWithStatus, 'status')
