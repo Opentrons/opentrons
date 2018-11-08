@@ -43,14 +43,14 @@ describe('test helper functions', () => {
 
     range(grid.column).forEach(colIdx => {
       range(grid.row).forEach(rowIdx => {
-          const well1 = _calculateWellCoord(rowIdx, colIdx, spacing[0], offset, well[0])
-          expect(well1.x).toBeCloseTo(expectedX1[colIdx], 2)
-          expect(well1.y).toBeCloseTo(expectedY1[rowIdx], 2)
-          expect(well1.z).toBeCloseTo(offset.z - well[0].depth, 2)
-          const well2 = _calculateWellCoord(rowIdx, colIdx, spacing[1], offset, well[1])
-          expect(well2.x).toBeCloseTo(expectedX2[colIdx], 2)
-          expect(well2.y).toBeCloseTo(expectedY2[rowIdx], 2)
-          expect(well2.z).toBeCloseTo(offset.z - well[1].depth, 2)
+        const well1 = _calculateWellCoord(rowIdx, colIdx, spacing[0], offset, well[0])
+        expect(well1.x).toBeCloseTo(expectedX1[colIdx], 2)
+        expect(well1.y).toBeCloseTo(expectedY1[rowIdx], 2)
+        expect(well1.z).toBeCloseTo(offset.z - well[0].depth, 2)
+        const well2 = _calculateWellCoord(rowIdx, colIdx, spacing[1], offset, well[1])
+        expect(well2.x).toBeCloseTo(expectedX2[colIdx], 2)
+        expect(well2.y).toBeCloseTo(expectedY2[rowIdx], 2)
+        expect(well2.z).toBeCloseTo(offset.z - well[1].depth, 2)
       })
     })
   })
@@ -67,8 +67,8 @@ describe('test createIrregularLabware function', () => {
         displayVolumeUnits: 'mL',
         displayLengthUnits: 'mm',
         tags: [
-            'fake',
-            'opentrons',
+          'fake',
+          'opentrons',
         ],
       },
       parameters: {
@@ -76,9 +76,9 @@ describe('test createIrregularLabware function', () => {
         isTiprack: false,
       },
       dimensions: {
-          overallLength: 127.76,
-          overallWidth: 85.48,
-          overallHeight: 64.48,
+        overallLength: 127.76,
+        overallWidth: 85.48,
+        overallHeight: 64.48,
       },
       well: [
         {

@@ -139,9 +139,9 @@ function determineLayout (
       range(gridObj.row).forEach(rowIdx => {
         const wellName = _irregularWellName(rowIdx, colIdx, gridStart[gridIdx])
         wellMap[wellName] = _calculateWellCoord(rowIdx, colIdx, spacing[gridIdx], offset[gridIdx], wells[gridIdx])
+      })
     })
   })
-})
   return wellMap
 }
 
@@ -239,9 +239,9 @@ export function createRegularLabware (args: RegularLabwareProps): Schema {
 // e.g. crystalization plates, 15_50ml tuberacks and anything with multiple "grids"
 export function createIrregularLabware (args: IrregularLabwareProps): Schema {
   const offset = args.offset.map(offsetObj => ({
-      ...offsetObj,
-      z: round(args.dimensions.overallHeight + offsetObj.z, 2),
-    }))
+    ...offsetObj,
+    z: round(args.dimensions.overallHeight + offsetObj.z, 2),
+  }))
 
   const wellsArray = determineLayout(
     args.grid,
@@ -266,24 +266,24 @@ export function createIrregularLabware (args: IrregularLabwareProps): Schema {
       ...args.parameters,
       format: 'irregular'},
     wells: wellsArray,
-    }
+  }
 
-    const brand = (args.brand && args.brand.brand) || 'generic'
-    if (args.brand) definition.brand = args.brand
+  const brand = (args.brand && args.brand.brand) || 'generic'
+  if (args.brand) definition.brand = args.brand
 
-    // generate loadName based on numwells per grid type
-    definition.parameters.loadName = _generateIrregularLoadName({
-      grid: args.grid,
-      well: args.well,
-      units: args.metadata.displayVolumeUnits,
-      displayCategory: args.metadata.displayCategory,
-      brand,
-    })
+  // generate loadName based on numwells per grid type
+  definition.parameters.loadName = _generateIrregularLoadName({
+    grid: args.grid,
+    well: args.well,
+    units: args.metadata.displayVolumeUnits,
+    displayCategory: args.metadata.displayCategory,
+    brand,
+  })
 
-    const valid = validate(definition)
-    if (valid !== true) {
-      console.error(validate.errors)
-      throw new Error('1 or more required arguments missing from input.')
-    }
-    return definition
+  const valid = validate(definition)
+  if (valid !== true) {
+    console.error(validate.errors)
+    throw new Error('1 or more required arguments missing from input.')
+  }
+  return definition
 }
