@@ -31,7 +31,7 @@ type OP = {
 
 type Props = OP & SP & DP
 
-class WellSelectionInput extends React.Component<Props, State> {
+class WellSelectionInput extends React.Component<Props> {
   handleOpen = () => {
     this.props.onFieldFocus(this.props.name)
     this.props.onOpen(this.props.labwareId)
