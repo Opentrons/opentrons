@@ -6,7 +6,7 @@ import some from 'lodash/some'
 import {getShellRobots} from '../shell'
 
 import type {Service} from '@opentrons/discovery-client'
-import type {Action, ThunkAction} from '../types'
+import type {Action, ThunkAction, Middleware} from '../types'
 import type {RestartStatus} from './types'
 
 export * from './types'
@@ -39,17 +39,18 @@ type UpdateListAction = {|
 
 export type DiscoveryAction = StartAction | FinishAction | UpdateListAction
 
-const DISCOVERY_TIMEOUT = 20000
+const DISCOVERY_TIMEOUT_MS = 30000
+const RESTART_DISCOVERY_TIMEOUT_MS = 60000
 
 export const RESTART_PENDING: RestartStatus = 'pending'
 export const RESTART_DOWN: RestartStatus = 'down'
 
-export function startDiscovery (): ThunkAction {
+export function startDiscovery (timeout = DISCOVERY_TIMEOUT_MS): ThunkAction {
   const start: StartAction = {type: 'discovery:START', meta: {shell: true}}
   const finish: FinishAction = {type: 'discovery:FINISH', meta: {shell: true}}
 
   return dispatch => {
-    setTimeout(() => dispatch(finish), DISCOVERY_TIMEOUT)
+    setTimeout(() => dispatch(finish), timeout)
     return dispatch(start)
   }
 }
@@ -111,6 +112,17 @@ export function discoveryReducer (
   }
 
   return state
+}
+
+export const discoveryMiddleware: Middleware = store => next => action => {
+  switch (action.type) {
+    case 'api:SERVER_SUCCESS':
+      if (action.payload.path === 'restart') {
+        store.dispatch(startDiscovery(RESTART_DISCOVERY_TIMEOUT_MS))
+      }
+  }
+
+  return next(action)
 }
 
 export function normalizeRobots (robots: Array<Service> = []): RobotsMap {

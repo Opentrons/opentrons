@@ -22,7 +22,6 @@ const log = createLogger(__filename)
 const FAST_POLL_INTERVAL_MS = 3000
 const SLOW_POLL_INTERVAL_MS = 15000
 const UPDATE_THROTTLE_MS = 500
-const RESTART_DISCOVERY_TIMEOUT_MS = 60000
 
 let config
 let store
@@ -53,34 +52,13 @@ export function registerDiscovery (dispatch: Action => void) {
     switch (action.type) {
       case 'discovery:START':
         handleServices()
-        fastPollClient()
+        client.setPollInterval(FAST_POLL_INTERVAL_MS).start()
         break
 
       case 'discovery:FINISH':
-        slowPollClient()
-        break
-
-      // TODO(mc, 2018-11-06): switch to api:SUCCESS when server.js switches
-      case 'api:SERVER_SUCCESS':
-        // on robot restart, go into fast polling to get the robot back asap
-        if (action.payload.path === 'restart') {
-          dispatch({type: 'discovery:START'})
-          fastPollClient()
-          setTimeout(() => {
-            slowPollClient()
-            dispatch({type: 'discovery:FINISH'})
-          }, RESTART_DISCOVERY_TIMEOUT_MS)
-        }
+        client.setPollInterval(SLOW_POLL_INTERVAL_MS)
         break
     }
-  }
-
-  function fastPollClient () {
-    client.setPollInterval(FAST_POLL_INTERVAL_MS).start()
-  }
-
-  function slowPollClient () {
-    client.setPollInterval(SLOW_POLL_INTERVAL_MS)
   }
 
   function handleServices () {
