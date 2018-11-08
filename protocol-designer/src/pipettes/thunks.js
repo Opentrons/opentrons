@@ -49,7 +49,7 @@ export const editPipettes = (payload: EditPipettesFields) =>
                   formData,
                   state,
                   (nextPipette && nextPipette.id),
-                  (nextPipette && nextPipette.nextChannels)
+                  (nextPipette && nextPipette.channels)
                 ),
                 pipette: nextPipette ? nextPipette.id : null,
               },
