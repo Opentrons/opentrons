@@ -1,10 +1,23 @@
 import os
 import sys
 import json
-from opentrons.data_storage import database_migration
-from opentrons.config import feature_flags as ff
-
 HERE = os.path.abspath(os.path.dirname(__file__))
+from opentrons.data_storage import database_migration  # noqa(E402)
+from opentrons.config import feature_flags as ff  # noqa(E402)
+import opentrons.hardware_control.adapters as adapters  # noqa(E402)
+from .protocol_api.back_compat import (robot as robotv2,  # noqa(E402)
+                                       reset as resetv2,
+                                       instruments as instrumentsv2,
+                                       containers as containersv2,
+                                       labware as labwarev2,
+                                       modules as modulesv2)
+from .legacy_api.api import (robot as robotv1,   # noqa(E402)
+                             reset as resetv1,
+                             instruments as instrumentsv1,
+                             containers as containersv1,
+                             labware as labwarev1,
+                             modules as modulesv1)
+
 
 try:
     with open(os.path.join(HERE, 'package.json')) as pkg:
@@ -22,28 +35,43 @@ if version < (3, 5):
 if not ff.split_labware_definitions():
     database_migration.check_version_and_perform_necessary_migrations()
 
-if ff.use_protocol_api_v2():
-    import opentrons.hardware_control as hardware_control
-    try:
-        hardware = hardware_control.API.build_hardware_controller()
-        """ The global singleton of :py:class:`.hardware_control.API`.
+def build_globals(version=None):
+    if version is None:
+        checked_version = 2 if ff.use_protocol_api_v2() else 1
+    else:
+        checked_version = version
+    if checked_version == 1:
+        return robotv1, resetv1, instrumentsv1, containersv1,\
+            labwarev1, modulesv1, robotv1
+    elif checked_version == 2:
+        return robotv2, resetv2, instrumentsv2, containersv2,\
+            labwarev2, modulesv2, adapters.SingletonAdapter()
+    else:
+        raise RuntimeError("Bad API version {}; only 1 and 2 are valid"
+                           .format(version))
 
-        If this is running on a real robot (and no other Opentrons API server
-        is running and connected to the robot's hardware) it will be connected
-        to the actual hardware. Otherwise, it will be a simulator.
-        """
-    except RuntimeError:
-        hardware = hardware_control.API.build_hardware_simulator()
-    from opentrons.protocol_api.back_compat\
-        import robot, reset, instruments, containers, labware, modules
-else:
-    from .legacy_api.api import (robot,  # type: ignore
-                                 reset,  # type: ignore
-                                 instruments,  # type: ignore
-                                 containers,  # type: ignore
-                                 labware,  # type: ignore
-                                 modules)  # type: ignore
+
+def reset_globals(version=None):
+    """ Reinitialize the global singletons with a given API version.
+
+    :param version: 1 or 2. If `None`, pulled from the `useProtocolApiV2`
+                    advanced setting.
+    """
+    global containers
+    global instruments
+    global labware
+    global robot
+    global reset
+    global modules
+    global hardware
+
+    robot, reset, instruments, containers, labware, modules, hardware\
+        = build_globals(version)
+
+
+robot, reset, instruments, containers, labware, modules, hardware\
+        = build_globals()
 
 
 __all__ = ['containers', 'instruments', 'labware', 'robot', 'reset',
-           '__version__', 'modules']
+           '__version__', 'modules', 'hardware', 'HERE']

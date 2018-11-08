@@ -13,6 +13,7 @@ from functools import partial
 from uuid import uuid4 as uuid
 
 import pytest
+import opentrons
 from opentrons.api import models
 from opentrons.data_storage import database
 from opentrons.server import rpc
@@ -164,6 +165,46 @@ async def async_client(virtual_smoothie_env, loop, test_client):
     cli = await loop.create_task(test_client(app))
     endpoints.session = None
     return cli
+
+
+@pytest.fixture
+def using_api2():
+    oldenv = os.environ.get('OT_FF_useProtocolApi2')
+    os.environ['OT_FF_useProtocolApi2'] = '1'
+    opentrons.reset_globals(2)
+    yield
+    if None is oldenv:
+        os.environ.pop('OT_FF_useProtocolApi2')
+    else:
+        os.environ['OT_FF_useProtocolApi2'] = oldenv
+    opentrons.reset_globals()
+
+
+@pytest.fixture
+def using_api1():
+    oldenv = os.environ.get('OT_FF_useProtocolApi2')
+    os.environ['OT_FF_useProtocolApi2'] = '2'
+    opentrons.reset_globals(1)
+    yield
+    if None is oldenv:
+        os.environ.pop('OT_FF_useProtocolApi2')
+    else:
+        os.environ['OT_FF_useProtocolApi2'] = oldenv
+    opentrons.reset_globals()
+
+
+@pytest.fixture(params=[using_api1, using_api2])
+async def old_and_new_client(request, virtual_smoothie_env, loop, test_client):
+    version_setter = request.param()
+    next(version_setter)
+    app = init(loop)
+    cli = await loop.create_task(test_client(app))
+    endpoints.session = None
+    yield cli
+    try:
+        next(version_setter)
+    except StopIteration:
+        pass
 
 
 @pytest.fixture
