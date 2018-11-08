@@ -145,13 +145,23 @@ function determineLayout (
   return wellList
 }
 
-function generateLoadName (grid: Array<Cell>, well: Array<Well>, units: string): string {
-  let loadName = ''
+export function _generateIrregularLoadName (args: {
+  grid: Array<Cell>,
+  well: Array<Well>,
+  units: string,
+  brand: string,
+  displayCategory: string,
+}): string {
+  const {grid, well, units, brand, displayCategory} = args
+  let wellComboArray = []
   grid.forEach((gridObj, gridIdx) => {
     const numWells = gridObj.row * gridObj.column
-    loadName += `${numWells}x${well[gridIdx].totalLiquidVolume}_${units}`
+    // TODO Ian 2018-11-08: use units to convert volume
+    wellComboArray.push(`${numWells}x${well[gridIdx].totalLiquidVolume}_${units}`)
   })
-  return loadName
+
+  const wellCombo = wellComboArray.join('_')
+  return `${brand}_${wellCombo}_${displayCategory}`.replace(' ', '_')
 }
 // Decide order of wells for single grid containers
 function determineOrdering (grid: Cell): Array<Array<string>> {
@@ -257,12 +267,17 @@ export function createIrregularLabware (args: IrregularLabwareProps): Schema {
     if (args.brand) definition.brand = args.brand
 
     // generate loadName based on numwells per grid type
-    const wellCombo = generateLoadName(args.grid, args.well, args.metadata.displayVolumeUnits)
-
-    definition.parameters.loadName = `${brand}_${wellCombo}_${args.metadata.displayCategory}`
+    definition.parameters.loadName = _generateIrregularLoadName({
+      grid: args.grid,
+      well: args.well,
+      units: args.metadata.displayVolumeUnits,
+      displayCategory: args.metadata.displayCategory,
+      brand,
+    })
 
     const valid = validate(definition)
     if (valid !== true) {
+      console.log(validate.errors)
       throw new Error('1 or more required arguments missing from input.')
     }
     return definition

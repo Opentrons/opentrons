@@ -1,7 +1,12 @@
 import omit from 'lodash/omit'
 import range from 'lodash/range'
 
-import {createIrregularLabware, _irregularWellName, _calculateWellCoord} from '../index.js'
+import {
+  createIrregularLabware,
+  _irregularWellName,
+  _generateIrregularLoadName,
+  _calculateWellCoord,
+} from '../index.js'
 import {splitWellsOnColumn, sortWells} from '../../helpers/index.js'
 
 import exampleLabware1 from '../../__tests__/fixtures/irregularLabwareExample1.json'
@@ -53,23 +58,58 @@ describe('test helper functions', () => {
 
 describe('test createIrregularLabware function', () => {
   let labware1
-  const well = [omit(exampleLabware1.wells.A1, ['x', 'y', 'z']), omit(exampleLabware1.wells.B1, ['x', 'y', 'z'])]
-  const offset = [{x: 10, y: 10, z: 5}, {x: 15, y: 15, z: 5}]
-  const grid = [{row: 5, column: 10}, {row: 1, column: 5}]
-  const spacing = [{row: 5, column: 10}, {row: 5, column: 10}]
-  const gridStart = [{rowStart: 'A', colStart: '1', rowStride: 2, colStride: 1}, {rowStart: 'B', colStart: '1', rowStride: 1, colStride: 1}]
 
   beforeEach(() => {
     labware1 = createIrregularLabware({
-      metadata: exampleLabware1.metadata,
-      parameters: exampleLabware1.parameters,
-      dimensions: exampleLabware1.dimensions,
-      offset,
-      grid,
-      spacing,
-      well,
-      brand: exampleLabware1.brand,
-      gridStart,
+      metadata: {
+        displayName: 'Fake Irregular Container',
+        displayCategory: 'irregular',
+        displayVolumeUnits: 'mL',
+        displayLengthUnits: 'mm',
+        tags: [
+            'fake',
+            'opentrons',
+        ],
+      },
+      parameters: {
+        format: 'irregular',
+        isTiprack: false,
+      },
+      dimensions: {
+          overallLength: 127.76,
+          overallWidth: 85.48,
+          overallHeight: 64.48,
+      },
+      well: [
+        {
+          depth: 10.54,
+          shape: 'circular',
+          diameter: 10,
+          totalLiquidVolume: 3,
+        },
+        {
+          depth: 20.54,
+          shape: 'circular',
+          diameter: 15,
+          totalLiquidVolume: 10,
+        },
+      ],
+      offset: [
+        {x: 10, y: 10, z: 5},
+        {x: 15, y: 15, z: 5},
+      ],
+      grid: [
+        {row: 5, column: 10},
+        {row: 1, column: 5},
+      ],
+      spacing: [
+        {row: 5, column: 10},
+        {row: 5, column: 10},
+      ],
+      gridStart: [
+        {rowStart: 'A', colStart: '1', rowStride: 2, colStride: 1},
+        {rowStart: 'B', colStart: '1', rowStride: 1, colStride: 1},
+      ],
     })
   })
 
@@ -81,5 +121,33 @@ describe('test createIrregularLabware function', () => {
 
   test('check labware matches fixture', () => {
     expect(labware1).toEqual(exampleLabware1)
+  })
+
+  test('labware loadName generated correctly for multi-grid labware', () => {
+    const loadName = _generateIrregularLoadName({
+      grid: [
+        {row: 3, column: 2},
+        {row: 1, column: 4},
+      ],
+      well: [
+        {
+          depth: 20,
+          shape: 'circular',
+          totalLiquidVolume: 400,
+        },
+        {
+          depth: 110,
+          shape: 'circular',
+          totalLiquidVolume: 2000,
+        },
+      ],
+      // TODO Ian 2018-11-08: add test with mL, expect displayVol = vol/1000 (would fail right now)
+      units: 'uL',
+      displayCategory: 'exampleDisplayCat',
+      brand: 'some brand',
+    })
+
+    expect(loadName).toEqual(
+      'some_brand_6x400_uL_4x2000_uL_exampleDisplayCat')
   })
 })
