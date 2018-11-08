@@ -8,6 +8,49 @@ import exampleLabware1 from '../../__tests__/fixtures/irregularLabwareExample1.j
 
 jest.mock('../assignId', () => jest.fn(() => 'mock-id'))
 
+describe('test helper functions', () => {
+  test('Well name generated correctly', () => {
+    const grid = {row: 2, column: 2}
+    const gridStart = [{rowStart: 'A', colStart: '1', rowStride: 1, colStride: 2}, {rowStart: 'B', colStart: '1', rowStride: 3, colStride: 1}]
+    const expected1 = ['A1', 'B1', 'A3', 'B3']
+    const expected2 = ['B1', 'E1', 'B2', 'E2']
+    let idx = 0
+    range(grid.column).forEach(colIdx => {
+      range(grid.row).forEach(rowIdx => {
+        const wellName1 = _irregularWellName(rowIdx, colIdx, gridStart[0])
+        expect(expected1[idx]).toEqual(wellName1)
+        const wellName2 = _irregularWellName(rowIdx, colIdx, gridStart[1])
+        expect(expected2[idx]).toEqual(wellName2)
+        idx += 1
+      })
+    })
+  })
+
+  test('XYZ generates correctly for each grid', () => {
+    const grid = {row: 1, column: 5}
+    const offset = {x: 1, y: 0.5, z: 55.5}
+    const spacing = [{row: 10, column: 10}, {row: 5, column: 14}]
+    const well = [omit(exampleLabware1.wells.A1, ['x', 'y', 'z']), omit(exampleLabware1.wells.B1, ['x', 'y', 'z'])]
+    const expectedX1 = [1, 11, 21, 31, 41]
+    const expectedY1 = [0.5]
+    const expectedX2 = [ 1, 15, 29, 43, 57 ]
+    const expectedY2 = [0.5]
+
+    range(grid.column).forEach(colIdx => {
+      range(grid.row).forEach(rowIdx => {
+          const well1 = _calculateWellCoord(rowIdx, colIdx, spacing[0], offset, well[0])
+          expect(well1.x).toBeCloseTo(expectedX1[colIdx], 2)
+          expect(well1.y).toBeCloseTo(expectedY1[rowIdx], 2)
+          expect(well1.z).toBeCloseTo(offset.z - well[0].depth, 2)
+          const well2 = _calculateWellCoord(rowIdx, colIdx, spacing[1], offset, well[1])
+          expect(well2.x).toBeCloseTo(expectedX2[colIdx], 2)
+          expect(well2.y).toBeCloseTo(expectedY2[rowIdx], 2)
+          expect(well2.z).toBeCloseTo(offset.z - well[1].depth, 2)
+      })
+    })
+  })
+})
+
 describe('test createIrregularLabware function', () => {
   let labware1
   const well = [omit(exampleLabware1.wells.A1, ['x', 'y', 'z']), omit(exampleLabware1.wells.B1, ['x', 'y', 'z'])]
@@ -36,53 +79,7 @@ describe('test createIrregularLabware function', () => {
     expect(labware1.ordering).toEqual(generatedOrdering)
   })
 
-  test('check labware matches schema', () => {
+  test('check labware matches fixture', () => {
     expect(labware1).toEqual(exampleLabware1)
-  })
-  test('check labware name generates as expected', () => {
-    expect(labware1.parameters.loadName).toEqual('generic_50x3_mL5x10_mL_irregular')
-  })
-  test('Well name generated correctly', () => {
-    const grid = {row: 2, column: 2}
-    const gridStart = [{rowStart: 'A', colStart: '1', rowStride: 1, colStride: 2}, {rowStart: 'B', colStart: '1', rowStride: 3, colStride: 1}]
-    const expected1 = ['A1', 'B1', 'A3', 'B3']
-    const expected2 = ['B1', 'E1', 'B2', 'E2']
-    let idx = 0
-    range(grid.column).forEach(colIdx => {
-      range(grid.row).forEach(rowIdx => {
-        const wellName1 = _irregularWellName(rowIdx, colIdx, gridStart[0])
-        expect(expected1[idx]).toEqual(wellName1)
-        const wellName2 = _irregularWellName(rowIdx, colIdx, gridStart[1])
-        expect(expected2[idx]).toEqual(wellName2)
-        idx += 1
-      })
-    })
-  })
-
-  test('XYZ generates correctly for each grid', () => {
-    const grid = {row: 1, column: 5}
-    const offset = {x: 1, y: 0.5, z: 55.5}
-    const spacing = [{row: 10, column: 10}, {row: 5, column: 14}]
-    const expectedX1 = range(offset.x,
-      (grid.column * spacing[0].column) + offset.x, spacing[0].column)
-    const expectedY1 = range(offset.y,
-      (grid.row * spacing[0].row) + offset.y, spacing[0].row)
-    const expectedX2 = range(offset.x,
-      (grid.column * spacing[1].column) + offset.x, spacing[1].column)
-    const expectedY2 = range(offset.y,
-      (grid.row * spacing[1].row) + offset.y, spacing[1].row)
-
-    range(grid.column).forEach(colIdx => {
-      range(grid.row).forEach(rowIdx => {
-          const well1 = _calculateWellCoord(rowIdx, colIdx, spacing[0], offset, well[0])
-          expect(well1.x).toBeCloseTo(expectedX1[colIdx], 2)
-          expect(well1.y).toBeCloseTo(expectedY1[rowIdx], 2)
-          expect(well1.z).toBeCloseTo(offset.z - well[0].depth, 2)
-          const well2 = _calculateWellCoord(rowIdx, colIdx, spacing[1], offset, well[1])
-          expect(well2.x).toBeCloseTo(expectedX2[colIdx], 2)
-          expect(well2.y).toBeCloseTo(expectedY2[rowIdx], 2)
-          expect(well2.z).toBeCloseTo(offset.z - well[1].depth, 2)
-      })
-    })
   })
 })
