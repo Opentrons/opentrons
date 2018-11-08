@@ -78,12 +78,8 @@ deps:
 	$(MAKE) -C $(ui_dir)
 	$(MAKE) -C $(discovery_client_dir)
 
-.PHONY: api-deps
-api-deps:
-	$(MAKE) -C $(api_dir) wheel
-
 .PHONY: package-deps
-package-deps: clean lib deps api-deps
+package-deps: clean lib deps
 
 package dist-posix dist-osx dist-linux dist-win: export NODE_ENV := production
 package dist-posix dist-osx dist-linux dist-win: export BUILD_ID := $(build_id)

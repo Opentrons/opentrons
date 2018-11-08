@@ -1,137 +1,138 @@
-# opentrons travis configuration
-
-matrix:
-  fast_finish: false
-  include:
-    - os: linux
-      sudo: false
-      language: python
-      python: '3.6'
-      env:
-        LINT=true
-        BUILD_APP=true
-        BUILD_PD=true
-        BUILD_COMPONENTS=true
-        BUILD_API_DOCS=true
-      addons:
-        apt:
-          sources: &common_sources
-          packages: &common_packages
-            - g++
-            - gcc
-            - icnsutils # electron-builder dependency
-            - graphicsmagick # electron-builder dependency
-            - xvfb
-
-    - os: osx
-      language: generic
-      if: |
-        type != pull_request AND \
-        (tag IS present OR branch =~ ^(edge|release_.+)$)
-      env:
-        LINT=false
-        BUILD_APP=true
-        BUILD_PD=false
-        BUILD_COMPONENTS=false
-        BUILD_API_DOCS=false
+# opentrons platform travis config
+sudo: false
 
 cache:
   pip: true
   yarn: true
-  directories:
-    - $HOME/.pyenv
-    - $HOME/Library/Caches/Homebrew
 
-before_install:
-  # source these scripts because they modify $PATH
-  - source scripts/travis-env.sh
-  - source scripts/travis-install.sh
+stages:
+  - test
+  - name: app
+    # don't build the app on pull requests
+    if: type != pull_request
 
-install:
-  - make -j 2 install
+# base configs
+_deploy_s3: &deploy_s3
+  provider: s3
+  skip_cleanup: true
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
+  acl: public_read
+  on:
+    repo: Opentrons/opentrons
+    all_branches: true
 
-before_script:
-  # Get all branches to allow comparison for mono-repo management tools
-  - git config --replace-all remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
-  - git fetch
+_app_stage_build: &app_stage_build
+  stage: app
+  language: node_js
+  install:
+    - pip install --user awscli
+    - make install-js
+  before_script:
+    # pull API wheel from S3
+    - mkdir -p ./api/dist
+    - aws s3 sync $OT_CI_TEMP_S3_PATH/api/dist ./api/dist
+  deploy:
+    - # deploy Opentrons App to S3
+      <<: *deploy_s3
+      local-dir: app-shell/dist/publish
+      bucket: $OT_APP_DEPLOY_BUCKET
+      upload-dir: $OT_APP_DEPLOY_FOLDER
 
-script:
-  - make test
-  - make coverage
-  - if [[ $LINT = true ]]; then make lint; fi
-  - if [[ $BUILD_COMPONENTS = true ]]; then make -C components; fi
-  - if [[ $BUILD_PD = true ]]; then make -C protocol-designer; fi
-  - if [[ $BUILD_APP = true ]]; then make -C app-shell dist-$APP_OS_TARGET; fi
-  - if [[ $BUILD_API_DOCS = true ]]; then (make -C api docs > /dev/null); fi
+jobs:
+  include:
+    # test, build, and upload wheels for Python projects
+    - stage: test
+      name: 'Python API unit tests, build/deploy API docs'
+      language: python
+      python: 3.6
+      install:
+        - pip install awscli
+        - nvm install
+        - make -j 2 install
+      script:
+        - make test-py
+        - make lint-py
+        - make -C api docs
+      after_success:
+        - make coverage
+        - aws s3 sync ./api/dist $OT_CI_TEMP_S3_PATH/api/dist
+      deploy:
+        # api docs deploy
+        - provider: pages
+          skip_cleanup: true
+          keep-history: false
+          local-dir: api/docs/dist
+          github-token: $GITHUB_TOKEN
+          on:
+            repo: Opentrons/opentrons
+            branch: edge
 
-deploy:
-  - provider: pages
-    skip_cleanup: true
-    github-token: $GITHUB_TOKEN
-    keep-history: false
-    local-dir: api/docs/dist
-    on:
-        condition: $BUILD_API_DOCS = true
-        repo: Opentrons/opentrons
-        branch: edge
+    # test, build, and upload for JavaScript projects
+    - stage: test
+      name: 'JS unit tests; build/deploy Protocol Designer, Components Library'
+      # node version pulled from .nvmrc
+      language: node_js
+      install:
+        - make install-js
+      script:
+        - make test-js
+        - make lint-js lint-css
+        - make -C components
+        - make -C protocol-designer
+      after_success:
+        - make coverage
+      deploy:
+        - # deploy protocol designer to S3
+          <<: *deploy_s3
+          # TODO(mc, 2018-03-26): why is this region not default?
+          region: us-west-2
+          local-dir: protocol-designer/dist
+          bucket: opentrons-protocol-designer
+          upload-dir: $TRAVIS_BRANCH
+        - # deploy components library to S3
+          <<: *deploy_s3
+          # TODO(mc, 2018-03-26): why is this region not default?
+          region: us-west-2
+          local-dir: components/dist
+          bucket: opentrons-components
+          upload-dir: $TRAVIS_BRANCH
 
-  # app deploy
-  - provider: s3
-    skip_cleanup: true
-    # TODO(mc, 2018-03-26): use AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
-    access_key_id: $AWS_ACCESS_KEY
-    secret_access_key: $AWS_SECRET_KEY
-    bucket: $OT_BUCKET_APP
-    upload-dir: $OT_FOLDER_APP
-    local-dir: $(pwd)/app-shell/dist/publish
-    acl: public_read
-    on:
-      condition: $BUILD_APP = true
-      repo: Opentrons/opentrons
-      all_branches: true
+    - # build the Opentrons App for POSIX (dev branch builds)
+      <<: *app_stage_build
+      name: 'Build/deploy Opentrons App for POSIX (unsigned dev builds)'
+      os: linux
+      script: make -C app-shell dist-posix
+      if: tag IS blank AND NOT branch =~ ^(edge|release_.+)$
 
-  # protocol designer deploy
-  - provider: s3
-    # TODO(mc, 2018-03-26): use AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
-    access_key_id: $AWS_ACCESS_KEY
-    secret_access_key: $AWS_SECRET_KEY
-    bucket: opentrons-protocol-designer
-    skip_cleanup: true
-    local-dir: $(pwd)/protocol-designer/dist/
-    upload-dir: $TRAVIS_BRANCH
-    acl: public_read
-    # TODO(mc, 2018-03-26): why is this region not default?
-    region: us-west-2
-    on:
-      condition: $BUILD_PD = true
-      repo: Opentrons/opentrons
-      all_branches: true
+    - # build the Opentrons App for Linux (tagged / edge / RC builds)
+      <<: *app_stage_build
+      name: 'Build/deploy Opentrons App for Linux'
+      os: linux
+      script: make -C app-shell dist-linux
+      if: tag IS present OR branch =~ ^(edge|release_.+)$
 
-  # components library deploy
-  - provider: s3
-    # TODO(mc, 2018-03-26): use AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
-    access_key_id: $AWS_ACCESS_KEY
-    secret_access_key: $AWS_SECRET_KEY
-    bucket: opentrons-components
-    skip_cleanup: true
-    local-dir: $(pwd)/components/dist/
-    upload-dir: $TRAVIS_BRANCH
-    acl: public_read
-    # TODO(mc, 2018-03-26): why is this region not default?
-    region: us-west-2
-    on:
-      condition: $BUILD_COMPONENTS = true
-      repo: Opentrons/opentrons
-      all_branches: true
+    - # build the Opentrons App for macOS (tagged / edge / RC builds)
+      <<: *app_stage_build
+      name: 'Build/deploy Opentrons App for macOS'
+      os: osx
+      script: make -C app-shell dist-osx
+      if: tag IS present OR branch =~ ^(edge|release_.+)$
 
 env:
   global:
+    # include $HOME/.local/bin for `aws`
+    - PYTHONUSERBASE: $HOME/.local
+    - PATH: $PYTHONUSERBASE/bin:$PATH
+
     - OT_BUILD: $TRAVIS_BUILD_NUMBER
     - OT_BRANCH: $TRAVIS_BRANCH
     - OT_TAG: $TRAVIS_TAG
 
-    - OT_BUCKET_APP: opentrons-app
-    - OT_FOLDER_APP: builds
+    - OT_CI_TEMP_S3_PATH: s3://opentrons-ci/temp/$OT_BUILD
+
+    - OT_APP_DEPLOY_BUCKET: opentrons-app
+    - OT_APP_DEPLOY_FOLDER: builds
 
     # GITHUB_TOKEN
     - secure: f/W7kN4gOvVpIanTQh9QtCwiXOk5UrRnUPo2ZU1Qk8zaFVbNj2za2A1xGKMqSyfZKw7guqIwTjWgc/aF9lxRtfU+5fkedJQdxDi5r7jZFxpqmpZOlhyXVY8WAWNqavEkefQInPlpHVAL8M2eV+Pi1cO9FsMhdyy/Wk7qA2nOiA8//9pFRB+0jgSbe1yqIF5DPyL0kbibd3EwmQvuQtnn25qqJXjneenhL6spflLCrnUjq1N/iOlcGd94eBUtk8RaBtMEjOb2D0Mb0DWKMsppoXg4/mZDus6s/PlmBwUJKNCuRtDiEUn5brE14q3OQh/FkDoXMRl69VND2mYp1LOeh5fgLSu6P+YToyHrh4lhXaRAul6l3JmXuoDC3k8hOAr8rPbtiwH7wGY2eRNv59vUejdXof4KHbAN6FTIH934tTe4uvBH79hRMoFY51pHRe6UiC39e/3hwl0pVKLjkV/40wfdEeYA7xhTZQVux+FAfk2krmggokxGEhbAQhWoyRX/wlH2XfEgassGskJ9SbuumNPNOLmEV9OOISFaXoYqVn+SPXy8mN1Pl2sLfaPFtnmmiY20t6yWsHsmfwi+41lv8n0vwCOGq521suDeNyiFhOH2AqG7xm6nHbIv+CiWt2ntKXgV233J17usvfr1zSK07PMDMlV2lvJx3CXj3hA4Yb4=
@@ -144,8 +145,3 @@ env:
 
     # OT_PD_FULLSTORY_ORG
     - secure: "N/WWTWYdEPF7UfWIefSnOIKYVj9/q8ti7kCiB9DNfeKIsjJwsmg6S5yrwn6N4B/9ZMSp0yswo442n09CvH4jMG99BodXdYxg3JhuJ5dxWReAUTWO0PTiyihWeFhd2sbQ3VZa+o85OoFWFHO8UCXqcG//iUZ4l05t9DY5CGUBsPnyJTptsjPCb+CFUc+xkckv9RBfhLeyGBDWodJVfjU4xb124f5MBVF67OlHJ20HmbuH/kRNLDXSiRW4BD9UIXyWrIaPZHW612dX6inETz0vhUOJbUftgn8kdpjjBqa1394TjnjW5fey1n73KH4KpaDPZeGJ5GnYRpk9Wvw7uQkWH7xjkXbFq6cqd0vIWWS5uYmdsMsNDjUtTyELqG01rj813jbmcItuzK2tAcuQ5kBPwikLsHYeQY/68GKlws9POd444YQXXiTYgCoHgYq8O3nxaLoMZBgabFq6Rtz0xJb3Hu99PkU6flI4hgT82RZGf32PgYSKznaGps9DGf2as8FU+wui/So89eQwkDyhirzGvC31OlRHdZitjWYvI27nGgiPWheuZR5zAtf6tJeZaZ1N/PZGBwJW6ykfjG+vyRep/IIW5r0ujnBcmgxT7USVpW0E45QolZBS75t29kkTxP0/EHLMavv7QqP3LNpDJpptPrMQ8mLINxlB7FCQ2AQLbDY="
-
-notifications:
-  email:
-    on_success: change
-    on_failure: change

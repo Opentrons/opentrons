@@ -34,8 +34,8 @@
   },
   "publish": {
     "provider": "s3",
-    "bucket": "${env.OT_BUCKET_APP}",
-    "path": "${env.OT_FOLDER_APP}"
+    "bucket": "${env.OT_APP_DEPLOY_BUCKET}",
+    "path": "${env.OT_APP_DEPLOY_FOLDER}"
   },
   "generateUpdatesFilesForAllChannels": true
 }
