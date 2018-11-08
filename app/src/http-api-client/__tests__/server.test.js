@@ -167,7 +167,7 @@ describe('server API client', () => {
         {
           type: 'api:SERVER_SUCCESS',
           payload: {robot, response, path: 'restart'},
-          meta: {robot: true, shell: true},
+          meta: {robot: true},
         },
       ]
 
@@ -218,7 +218,7 @@ describe('server API client', () => {
         {
           type: 'api:SERVER_SUCCESS',
           payload: {robot, response, path: 'update/ignore'},
-          meta: {robot: true, shell: true},
+          meta: {robot: true},
         },
       ]
 
@@ -271,7 +271,7 @@ describe('server API client', () => {
         {
           type: 'api:SERVER_SUCCESS',
           payload: {robot, response, path: 'update/ignore'},
-          meta: {robot: true, shell: true},
+          meta: {robot: true},
         },
       ]
 
