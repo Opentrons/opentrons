@@ -147,7 +147,11 @@ class EditPipettesModal extends React.Component<Props, State> {
                     value={this.state.left.pipetteModel}
                     onChange={this.makeHandleMountChange('left', 'pipetteModel')} />
                 </FormGroup>
-                <FormGroup disabled={isEmpty(this.state.left.pipetteModel)} key={'leftTiprackModel'} label={`${startCase('left')} Tiprack*`}>
+                <FormGroup
+                  disabled={isEmpty(this.state.left.pipetteModel)}
+                  key={'leftTiprackModel'}
+                  label={`${startCase('left')} Tiprack*`}
+                  className={formStyles.stacked_row}>
                   <DropdownField
                     tabIndex={3}
                     disabled={isEmpty(this.state.left.pipetteModel)}
@@ -164,7 +168,11 @@ class EditPipettesModal extends React.Component<Props, State> {
                     value={this.state.right.pipetteModel}
                     onChange={this.makeHandleMountChange('right', 'pipetteModel')} />
                 </FormGroup>
-                <FormGroup disabled={isEmpty(this.state.right.pipetteModel)} key={'rightTiprackModel'} label={`${startCase('right')} Tiprack*`}>
+                <FormGroup
+                  disabled={isEmpty(this.state.right.pipetteModel)}
+                  key={'rightTiprackModel'}
+                  label={`${startCase('right')} Tiprack*`}
+                  className={formStyles.stacked_row}>
                   <DropdownField
                     tabIndex={5}
                     disabled={isEmpty(this.state.right.pipetteModel)}
