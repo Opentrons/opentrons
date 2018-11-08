@@ -26,7 +26,7 @@ def dummy_instruments():
 
 async def test_cache_instruments(dummy_instruments, loop):
     expected_keys = [
-        'name', 'min_volume', 'max_volume', 'aspirate_flow_rate',
+        'name', 'min_volume', 'max_volume', 'aspirate_flow_rate', 'channels',
         'dispense_flow_rate', 'pipette_id', 'current_volume', 'display_name']
 
     hw_api = hc.API.build_hardware_simulator(
@@ -44,7 +44,7 @@ async def test_cache_instruments_hc(monkeypatch, dummy_instruments,
                                     hardware_controller_lockfile,
                                     running_on_pi, cntrlr_mock_connect, loop):
     expected_keys = [
-        'name', 'min_volume', 'max_volume', 'aspirate_flow_rate',
+        'name', 'min_volume', 'max_volume', 'aspirate_flow_rate', 'channels',
         'dispense_flow_rate', 'pipette_id', 'current_volume', 'display_name']
 
     hw_api_cntrlr = hc.API.build_hardware_controller(loop=loop)
@@ -82,7 +82,7 @@ async def test_cache_instruments_hc(monkeypatch, dummy_instruments,
 
 async def test_cache_instruments_sim(loop, dummy_instruments):
     expected_keys = [
-        'name', 'min_volume', 'max_volume', 'aspirate_flow_rate',
+        'name', 'min_volume', 'max_volume', 'aspirate_flow_rate', 'channels',
         'dispense_flow_rate', 'pipette_id', 'current_volume', 'display_name']
 
     sim = hc.API.build_hardware_simulator(loop=loop)
@@ -151,7 +151,7 @@ async def test_no_pipette(dummy_instruments, loop):
     await hw_api.cache_instruments()
     aspirate_ul = 3.0
     aspirate_rate = 2
-    with pytest.raises(hc.PipetteNotAttachedError):
+    with pytest.raises(types.PipetteNotAttachedError):
         await hw_api.aspirate(types.Mount.RIGHT, aspirate_ul, aspirate_rate)
         assert not hw_api._current_volume[types.Mount.RIGHT]
 
@@ -170,7 +170,12 @@ async def test_pick_up_tip(dummy_instruments, loop):
                        Axis.B: 2,
                        Axis.C: 19}
     await hw_api.move_to(mount, tip_position)
-    await hw_api.pick_up_tip(mount)
+
+    # Note: pick_up_tip without a tip_length argument requires the pipette on
+    # the associated mount to have an associated tip rack from which to infer
+    # the tip length. That behavior is not tested here.
+    tip_length = 25.0
+    await hw_api.pick_up_tip(mount, tip_length)
     assert hw_api._attached_instruments[mount].has_tip
     assert hw_api._attached_instruments[mount].current_volume == 0
     assert hw_api._current_position == target_position

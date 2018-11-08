@@ -17,7 +17,7 @@ class Pipette:
         self._config = pipette_config.load(model)
         self._name = model
         self._current_volume = 0.0
-        self._has_tip = False
+        self._current_tip_length = 0.0
         self._pipette_id = pipette_id
 
     @property
@@ -37,18 +37,24 @@ class Pipette:
 
     @property
     def critical_point(self) -> Point:
-        """ The vector from the pipette's origin to its critical point """
-        if not self.has_tip:
-            return Point(*self.config.model_offset)
-        else:
-            return Point(self.config.model_offset[0],
-                         self.config.model_offset[1],
-                         self.config.model_offset[2] - self.config.tip_length)
+        """
+        The vector from the pipette's origin to its critical point. The
+        critical point for a pipette is the end of the nozzle if no tip is
+        attached, or the end of the tip if a tip is attached.
+        """
+        return Point(self.config.model_offset[0],
+                     self.config.model_offset[1],
+                     self.config.model_offset[2] - self.current_tip_length)
 
     @property
     def current_volume(self) -> float:
         """ The amount of liquid currently aspirated """
         return self._current_volume
+
+    @property
+    def current_tip_length(self) -> float:
+        """ The length of the current tip attached (0.0 if no tip) """
+        return self._current_tip_length
 
     @property
     def available_volume(self) -> float:
@@ -71,17 +77,30 @@ class Pipette:
     def ok_to_add_volume(self, volume_incr: float) -> bool:
         return self.current_volume + volume_incr <= self.config.max_volume
 
-    def add_tip(self):
-        assert not self.has_tip
-        self._has_tip = True
+    def add_tip(self, tip_length) -> None:
+        """
+        Add a tip to the pipette for position tracking and validation
+        (effectively updates the pipette's critical point)
 
-    def remove_tip(self):
+        :param tip_length: a positive, non-zero float representing the distance
+            in Z from the end of the pipette nozzle to the end of the tip
+        :return:
+        """
+        assert tip_length > 0.0, "tip_length must be greater than 0"
+        assert not self.has_tip
+        self._current_tip_length = tip_length
+
+    def remove_tip(self) -> None:
+        """
+        Remove the tip from the pipette (effectively updates the pipette's
+        critical point)
+        """
         assert self.has_tip
-        self._has_tip = False
+        self._current_tip_length = 0.0
 
     @property
     def has_tip(self) -> bool:
-        return self._has_tip
+        return self.current_tip_length != 0.0
 
     def ul_per_mm(self, ul: float, action: str) -> float:
         sequence = self._config.ul_per_mm[action]

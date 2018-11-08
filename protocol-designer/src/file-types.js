@@ -7,11 +7,14 @@ import type {RootState as DismissRoot} from './dismiss'
 
 type MsSinceEpoch = number
 type VersionString = string // eg '1.0.0'
-type PipetteModel = string // TODO Ian 2018-05-11 use pipette-definitions model types enum
+type PipetteModel = string // TODO Ian 2018-05-11 use shared-data model types enum. Eg 'p10_single_v1.3'
+type PipetteName = string// TODO Ian 2018-11-06 use shared-data pipette names types enum. Eg 'p10_single'.
 
 export type FilePipette = {
   mount: Mount,
+  // TODO: Ian 2018-11-05 drop 'model' and just use 'name'. Breaking change for JSON protocol files, see JSON schema TODO.
   model: PipetteModel,
+  name: ?PipetteName,
 }
 
 export type FileLabware = {

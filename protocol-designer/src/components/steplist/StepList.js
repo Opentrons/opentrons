@@ -12,25 +12,51 @@ import {END_TERMINAL_ITEM_ID} from '../../steplist'
 import type {StepIdType} from '../../form-types'
 import {PortalRoot} from './TooltipPortal'
 
-type StepListProps = {
+type Props = {
   orderedSteps: Array<StepIdType>,
-  handleStepHoverById?: (?StepIdType) => (event?: SyntheticEvent<>) => mixed,
+  reorderSelectedStep: (delta: number) => mixed,
 }
 
-export default function StepList (props: StepListProps) {
-  return (
-    <React.Fragment>
-      <SidePanel
-        title='Protocol Timeline'
-        onMouseLeave={props.handleStepHoverById && props.handleStepHoverById(null)}>
-        <StartingDeckStateTerminalItem />
+export default class StepList extends React.Component<Props> {
+  handleKeyDown = (e: SyntheticKeyboardEvent<*>) => {
+    const {reorderSelectedStep} = this.props
+    const key = e.key
+    const altIsPressed = e.getModifierState('Alt')
 
-        {props.orderedSteps.map((stepId: StepIdType) => <StepItem key={stepId} stepId={stepId} />)}
+    if (altIsPressed) {
+      if (key === 'ArrowUp') {
+        reorderSelectedStep(-1)
+      } else if (key === 'ArrowDown') {
+        reorderSelectedStep(1)
+      }
+    }
+  }
 
-        <StepCreationButton />
-        <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />
-      </SidePanel>
-      <PortalRoot />
-    </React.Fragment>
-  )
+  componentDidMount () {
+    global.addEventListener('keydown', this.handleKeyDown, false)
+  }
+
+  componentWillUnmount () {
+    global.removeEventListener('keydown', this.handleKeyDown, false)
+  }
+
+  render () {
+    const {orderedSteps} = this.props
+
+    const stepItems = orderedSteps.map((stepId: StepIdType) =>
+      <StepItem key={stepId} stepId={stepId} />)
+
+    return (
+      <React.Fragment>
+        <SidePanel
+          title='Protocol Timeline'>
+          <StartingDeckStateTerminalItem />
+          {stepItems}
+          <StepCreationButton />
+          <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />
+        </SidePanel>
+        <PortalRoot />
+      </React.Fragment>
+    )
+  }
 }

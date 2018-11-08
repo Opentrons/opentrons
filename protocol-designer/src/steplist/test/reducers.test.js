@@ -123,6 +123,88 @@ describe('orderedSteps reducer', () => {
     }
     expect(orderedSteps(state, action)).toEqual([123, 22])
   })
+
+  describe('reorder steps', () => {
+    const state = ['1', '2', '3', '4']
+    const testCases = [
+      {
+        label: '+1 to first',
+        payload: {
+          delta: 1,
+          stepId: '1',
+        },
+        expected: ['2', '1', '3', '4'],
+      },
+      {
+        label: '+0 to first: no change',
+        payload: {
+          delta: 0,
+          stepId: '1',
+        },
+        expected: state,
+      },
+      {
+        label: '-1 to first: no change',
+        payload: {
+          delta: -1,
+          stepId: '1',
+        },
+        expected: state,
+      },
+      {
+        label: '-10 to first: no change',
+        payload: {
+          delta: -10,
+          stepId: '1',
+        },
+        expected: state,
+      },
+
+      {
+        label: '-1 to second',
+        payload: {
+          delta: -1,
+          stepId: '2',
+        },
+        expected: ['2', '1', '3', '4'],
+      },
+      {
+        label: '-10 to second',
+        payload: {
+          delta: -10,
+          stepId: '2',
+        },
+        expected: ['2', '1', '3', '4'],
+      },
+
+      {
+        label: '+1 to last: no change',
+        payload: {
+          delta: 1,
+          stepId: '4',
+        },
+        expected: state,
+      },
+      {
+        label: '+10 to last: no change',
+        payload: {
+          delta: 10,
+          stepId: '4',
+        },
+        expected: state,
+      },
+    ]
+
+    testCases.forEach(({label, payload, expected}) => {
+      test(label, () => {
+        const action = {
+          type: 'REORDER_SELECTED_STEP',
+          payload,
+        }
+        expect(orderedSteps(state, action)).toEqual(expected)
+      })
+    })
+  })
 })
 
 describe('selectedItem reducer', () => {

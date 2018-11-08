@@ -9,10 +9,11 @@ def test_tip_tracking():
     with pytest.raises(AssertionError):
         pip.remove_tip()
     assert not pip.has_tip
-    pip.add_tip()
+    tip_length = 25.0
+    pip.add_tip(tip_length)
     assert pip.has_tip
     with pytest.raises(AssertionError):
-        pip.add_tip()
+        pip.add_tip(tip_length)
     pip.remove_tip()
     assert not pip.has_tip
     with pytest.raises(AssertionError):
@@ -25,8 +26,9 @@ def test_critical_points():
         pip = pipette.Pipette(config, 'testID')
         mod_offset = Point(*loaded.model_offset)
         assert pip.critical_point == mod_offset
-        pip.add_tip()
-        new = mod_offset._replace(z=mod_offset.z - loaded.tip_length)
+        tip_length = 25.0
+        pip.add_tip(tip_length)
+        new = mod_offset._replace(z=mod_offset.z - tip_length)
         assert pip.critical_point == new
         pip.remove_tip()
         assert pip.critical_point == mod_offset

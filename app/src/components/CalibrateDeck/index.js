@@ -7,7 +7,7 @@ import {Switch, Route, withRouter} from 'react-router'
 import type {State, Dispatch} from '../../types'
 import type {OP, SP, DP, CalibrateDeckProps, CalibrationStep} from './types'
 
-import {getPipette} from '@opentrons/shared-data'
+import {getPipetteModelSpecs} from '@opentrons/shared-data'
 import {chainActions} from '../../util'
 import createLogger from '../../logger'
 
@@ -134,7 +134,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     const startRequest = getDeckCalStartState(state, robot)
     const pipetteInfo = startRequest.response && startRequest.response.pipette
     const pipetteProps = pipetteInfo
-      ? {mount: pipetteInfo.mount, pipette: getPipette(pipetteInfo.model)}
+      ? {mount: pipetteInfo.mount, pipette: getPipetteModelSpecs(pipetteInfo.model)}
       : null
 
     if (pipetteProps && !pipetteProps.pipette) {

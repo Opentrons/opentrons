@@ -2,19 +2,12 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
-
-import type {PipetteConfig} from '@opentrons/shared-data'
-import type {Mount} from '../../robot'
-import type {CalibrateDeckProps} from './types'
-
 import {deckCalibrationCommand as dcCommand} from '../../http-api-client'
-
 import ClearDeckAlertModal from '../ClearDeckAlertModal'
 
-type OP = CalibrateDeckProps & {
-  pipette: PipetteConfig,
-  mount: Mount,
-}
+import type {CalibrateDeckProps} from './types'
+
+type OP = CalibrateDeckProps
 
 type DP = {
   onContinue: () => mixed,
