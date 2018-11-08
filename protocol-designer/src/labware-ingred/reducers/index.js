@@ -103,7 +103,6 @@ const selectedLiquidGroup = handleActions({
   DESELECT_LIQUID_GROUP: () => unselectedLiquidGroupState,
   CREATE_NEW_LIQUID_GROUP_FORM: (): SelectedLiquidGroupState =>
     ({liquidGroupId: null, newLiquidGroup: true}),
-  NAVIGATE_TO_PAGE: () => unselectedLiquidGroupState, // clear selection on navigate
   EDIT_LIQUID_GROUP: () => unselectedLiquidGroupState, // clear on form save
 }, unselectedLiquidGroupState)
 

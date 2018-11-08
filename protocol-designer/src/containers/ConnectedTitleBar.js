@@ -23,7 +23,7 @@ import type {BaseState} from '../types'
 
 type Props = React.ElementProps<typeof TitleBar>
 type DP = { onBackClick: $PropertyType<Props, 'onBackClick'> }
-type SP = $Diff<Props, DP> & {_page: Page}
+type SP = $Diff<Props, DP> & {_page: Page, _liquidPlacementMode?: boolean}
 
 type TitleWithIconProps = {
   iconName?: ?IconName,
@@ -50,6 +50,7 @@ function mapStateToProps (state: BaseState): SP {
   const labwareNames = labwareIngredSelectors.getLabwareNames(state)
   const labwareNickname = labware && labware.id && labwareNames[labware.id]
   const drilledDownLabwareId = labwareIngredSelectors.getDrillDownLabwareId(state)
+  const liquidPlacementMode = !!labwareIngredSelectors.getSelectedContainer(state)
 
   switch (_page) {
     case 'liquids':
@@ -62,14 +63,6 @@ function mapStateToProps (state: BaseState): SP {
         title: i18n.t([`nav.title.${_page}`, fileName]),
         subtitle: i18n.t([`nav.subtitle.${_page}`, '']),
       }
-    case 'ingredient-detail': {
-      return {
-        _page,
-        title: labwareNickname || null,
-        subtitle: labware && humanizeLabwareType(labware.type),
-        backButtonLabel: 'Deck',
-      }
-    }
     case 'well-selection-modal':
       return {
         _page,
@@ -83,6 +76,15 @@ function mapStateToProps (state: BaseState): SP {
     default: {
       // NOTE: this default case error should never be reached, it's just a sanity check
       if (_page !== 'steplist') console.error('ConnectedTitleBar got an unsupported page, returning steplist instead')
+      if (liquidPlacementMode) {
+        return {
+          _page,
+          _liquidPlacementMode: liquidPlacementMode,
+          title: labwareNickname || null,
+          subtitle: labware && humanizeLabwareType(labware.type),
+          backButtonLabel: 'Deck',
+        }
+      }
       let subtitle
       let backButtonLabel
       let title
@@ -105,21 +107,21 @@ function mapStateToProps (state: BaseState): SP {
 }
 
 function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Props {
-  const {_page, ...props} = stateProps
+  const {_page, _liquidPlacementMode, ...props} = stateProps
   const {dispatch} = dispatchProps
 
   let onBackClick
 
-  if (_page === 'ingredient-detail') {
-    onBackClick = () => dispatch(closeIngredientSelector())
+  if (_page === 'steplist') {
+    if (_liquidPlacementMode) {
+      onBackClick = () => dispatch(closeIngredientSelector())
+    } else if (props.backButtonLabel) {
+      onBackClick = () => {}
+    }
   }
 
   if (_page === 'well-selection-modal') {
     onBackClick = () => dispatch(closeWellSelectionModal())
-  }
-
-  if (_page === 'steplist' && props.backButtonLabel) {
-    onBackClick = () => {}
   }
 
   return {
