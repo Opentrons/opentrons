@@ -187,3 +187,13 @@ export const saveMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetS
     payload: selectors.formModalData(getState()),
   })
 }
+
+export const setWellSelectionLabwareId = (labwareName: ?string): * => ({
+  type: 'SET_WELL_SELECTION_LABWARE_ID',
+  payload: labwareName,
+})
+
+export const clearWellSelectionLabwareId = (): * => ({
+  type: 'CLEAR_WELL_SELECTION_LABWARE_ID',
+  payload: null,
+})

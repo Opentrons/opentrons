@@ -43,19 +43,12 @@ const selectedWells = handleActions({
   SET_WELL_CONTENTS: () => selectedWellsInitialState,
 }, selectedWellsInitialState)
 
-const wellSelectionLabwareName = handleActions({
-  SET_WELL_SELECTION_LABWARE_NAME: (state, action: {payload: string}) => action.payload,
-  CLEAR_WELL_SELECTION_LABWARE_NAME: () => null,
-}, null)
-
 export type RootState = {|
   selectedWells: SelectedWellsState,
-  wellSelectionLabwareName: ?string,
 |}
 
 const rootReducer = combineReducers({
   selectedWells,
-  wellSelectionLabwareName,
 })
 
 export default rootReducer

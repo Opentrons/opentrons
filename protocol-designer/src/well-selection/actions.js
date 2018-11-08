@@ -41,16 +41,6 @@ export type OpenWellSelectionModalPayload = {
   labwareName?: string,
 }
 
-export const setWellSelectionLabwareName = (labwareName: ?string): * => ({
-  type: 'SET_WELL_SELECTION_LABWARE_NAME',
-  payload: labwareName,
-})
-
-export const clearWellSelectionLabwareName = (): * => ({
-  type: 'CLEAR_WELL_SELECTION_LABWARE_NAME',
-  payload: null,
-})
-
 export const saveWellSelectionModal = () =>
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
     const state = getState()

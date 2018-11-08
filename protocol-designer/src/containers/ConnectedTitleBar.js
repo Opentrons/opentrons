@@ -8,9 +8,9 @@ import styles from './TitleBar.css'
 import i18n from '../localization'
 import {START_TERMINAL_TITLE, END_TERMINAL_TITLE} from '../constants'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
-import * as wellSelectionSelectors from '../well-selection/selectors'
 import {
   selectors as steplistSelectors,
+  actions as steplistActions,
   END_TERMINAL_ITEM_ID,
   START_TERMINAL_ITEM_ID,
 } from '../steplist'
@@ -51,7 +51,7 @@ function mapStateToProps (state: BaseState): SP {
   const labwareNickname = labware && labware.id && labwareNames[labware.id]
   const drilledDownLabwareId = labwareIngredSelectors.getDrillDownLabwareId(state)
   const liquidPlacementMode = !!labwareIngredSelectors.getSelectedContainer(state)
-  const wellSelectionLabwareName = wellSelectionSelectors.getWellSelectionLabwareName(state)
+  const wellSelectionLabwareId = steplistSelectors.getWellSelectionLabwareId(state)
 
   switch (_page) {
     case 'liquids':
@@ -91,14 +91,15 @@ function mapStateToProps (state: BaseState): SP {
           subtitle = drilledDownLabware && humanizeLabwareType(drilledDownLabware.type)
         }
       } else if (selectedStep) {
-        if (wellSelectionLabwareName) { // well selection modal
+        if (wellSelectionLabwareId) { // well selection modal
           return {
             _page,
+            _wellSelectionMode: true,
             title: <TitleWithIcon
               iconName={selectedStep && stepIconsByType[selectedStep.stepType]}
               text={selectedStep && selectedStep.title}
             />,
-            subtitle: wellSelectionLabwareName,
+            subtitle: labwareNames[wellSelectionLabwareId],
             backButtonLabel: 'Back',
           }
         } else {
@@ -111,7 +112,7 @@ function mapStateToProps (state: BaseState): SP {
 }
 
 function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Props {
-  const {_page, _liquidPlacementMode, ...props} = stateProps
+  const {_page, _liquidPlacementMode, _wellSelectionMode, ...props} = stateProps
   const {dispatch} = dispatchProps
 
   let onBackClick
@@ -119,6 +120,8 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
   if (_page === 'steplist') {
     if (_liquidPlacementMode) {
       onBackClick = () => dispatch(closeIngredientSelector())
+    } else if (_wellSelectionMode) {
+      onBackClick = () => dispatch(steplistActions.clearWellSelectionLabwareId())
     } else if (props.backButtonLabel) {
       onBackClick = () => {}
     }
