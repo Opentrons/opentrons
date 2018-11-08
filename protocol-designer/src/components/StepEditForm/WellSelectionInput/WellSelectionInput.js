@@ -4,9 +4,12 @@ import {connect} from 'react-redux'
 import {FormGroup, InputField} from '@opentrons/components'
 import WellSelectionModal from './WellSelectionModal'
 import {Portal} from '../../portals/MainPageModalPortal'
-import type {StepFieldName} from '../../../steplist/fieldLevel'
 import {selectors as steplistSelectors, actions as steplistActions} from '../../../steplist'
 import styles from '../StepEditForm.css'
+
+import type {Dispatch} from 'redux'
+import type {StepFieldName} from '../../../steplist/fieldLevel'
+import type {BaseState} from '../../../types'
 import type { FocusHandlers } from '../index'
 
 type SP = {
@@ -33,8 +36,11 @@ type Props = OP & SP & DP
 
 class WellSelectionInput extends React.Component<Props> {
   handleOpen = () => {
-    this.props.onFieldFocus(this.props.name)
-    this.props.onOpen(this.props.labwareId)
+    const {labwareId, name} = this.props
+    this.props.onFieldFocus(name)
+    if (labwareId) {
+      this.props.onOpen(labwareId)
+    }
   }
 
   handleClose= () => {
@@ -43,7 +49,10 @@ class WellSelectionInput extends React.Component<Props> {
   }
 
   render () {
-    const modalKey = `${this.props.name}${this.props.pipetteId || 'noPipette'}${this.props.labwareId || 'noLabware'}${this.props.wellSelectionLabwareId}`
+    const modalKey = `${this.props.name}${
+      this.props.pipetteId ||
+      'noPipette'}${this.props.labwareId ||
+      'noLabware'}${String(this.props.wellSelectionLabwareId)}`
     return (
       <FormGroup
         label={this.props.isMulti ? 'Columns:' : 'Wells:'}
@@ -72,7 +81,7 @@ class WellSelectionInput extends React.Component<Props> {
 const mapStateToProps = (state: BaseState): SP => ({
   wellSelectionLabwareId: steplistSelectors.getWellSelectionLabwareId(state),
 })
-const mapDispatchToProps = (dispatch: Dispatch): DP => ({
+const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
   onOpen: id => dispatch(steplistActions.setWellSelectionLabwareId(id)),
   onClose: () => dispatch(steplistActions.clearWellSelectionLabwareId()),
 })

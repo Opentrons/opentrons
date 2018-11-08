@@ -23,7 +23,11 @@ import type {BaseState} from '../types'
 
 type Props = React.ElementProps<typeof TitleBar>
 type DP = { onBackClick: $PropertyType<Props, 'onBackClick'> }
-type SP = $Diff<Props, DP> & {_page: Page, _liquidPlacementMode?: boolean}
+type SP = $Diff<Props, DP> & {
+  _page: Page,
+  _liquidPlacementMode?: boolean,
+  _wellSelectionMode?: boolean,
+}
 
 type TitleWithIconProps = {
   iconName?: ?IconName,
