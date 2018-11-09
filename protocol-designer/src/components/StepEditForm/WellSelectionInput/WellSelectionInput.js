@@ -13,7 +13,7 @@ import type {BaseState} from '../../../types'
 import type { FocusHandlers } from '../index'
 
 type SP = {
-  wellSelectionLabwareId: ?string,
+  wellSelectionLabwareKey: ?string,
 }
 type DP = {
   onOpen: (string) => mixed,
@@ -36,10 +36,10 @@ type Props = OP & SP & DP
 
 class WellSelectionInput extends React.Component<Props> {
   handleOpen = () => {
-    const {labwareId, name} = this.props
+    const {labwareId, pipetteId, name} = this.props
     this.props.onFieldFocus(name)
-    if (labwareId) {
-      this.props.onOpen(labwareId)
+    if (labwareId && pipetteId) {
+      this.props.onOpen(this.getModalKey())
     }
   }
 
@@ -48,11 +48,12 @@ class WellSelectionInput extends React.Component<Props> {
     this.props.onClose()
   }
 
+  getModalKey = () => {
+    const {name, pipetteId, labwareId} = this.props
+    return `${name}${pipetteId || 'noPipette'}${labwareId || 'noLabware'}`
+  }
   render () {
-    const modalKey = `${this.props.name}${
-      this.props.pipetteId ||
-      'noPipette'}${this.props.labwareId ||
-      'noLabware'}${String(this.props.wellSelectionLabwareId)}`
+    const modalKey = this.getModalKey()
     return (
       <FormGroup
         label={this.props.isMulti ? 'Columns:' : 'Wells:'}
@@ -69,7 +70,7 @@ class WellSelectionInput extends React.Component<Props> {
             key={modalKey}
             pipetteId={this.props.pipetteId}
             labwareId={this.props.labwareId}
-            isOpen={this.props.wellSelectionLabwareId === this.props.labwareId}
+            isOpen={this.props.wellSelectionLabwareKey && this.props.wellSelectionLabwareKey === modalKey}
             onCloseClick={this.handleClose}
             name={this.props.name} />
         </Portal>
@@ -79,11 +80,11 @@ class WellSelectionInput extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: BaseState): SP => ({
-  wellSelectionLabwareId: steplistSelectors.getWellSelectionLabwareId(state),
+  wellSelectionLabwareKey: steplistSelectors.getWellSelectionLabwareKey(state),
 })
 const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
-  onOpen: id => dispatch(steplistActions.setWellSelectionLabwareId(id)),
-  onClose: () => dispatch(steplistActions.clearWellSelectionLabwareId()),
+  onOpen: key => dispatch(steplistActions.setWellSelectionLabwareKey(key)),
+  onClose: () => dispatch(steplistActions.clearWellSelectionLabwareKey()),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(WellSelectionInput)

@@ -188,12 +188,12 @@ export const saveMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetS
   })
 }
 
-export const setWellSelectionLabwareId = (labwareName: ?string): * => ({
-  type: 'SET_WELL_SELECTION_LABWARE_ID',
+export const setWellSelectionLabwareKey = (labwareName: ?string): * => ({
+  type: 'SET_WELL_SELECTION_LABWARE_KEY',
   payload: labwareName,
 })
 
-export const clearWellSelectionLabwareId = (): * => ({
-  type: 'CLEAR_WELL_SELECTION_LABWARE_ID',
+export const clearWellSelectionLabwareKey = (): * => ({
+  type: 'CLEAR_WELL_SELECTION_LABWARE_KEY',
   payload: null,
 })
