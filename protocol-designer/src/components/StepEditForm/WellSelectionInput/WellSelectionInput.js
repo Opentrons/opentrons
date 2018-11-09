@@ -70,7 +70,7 @@ class WellSelectionInput extends React.Component<Props> {
             key={modalKey}
             pipetteId={this.props.pipetteId}
             labwareId={this.props.labwareId}
-            isOpen={Boolean(this.props.wellSelectionLabwareKey && this.props.wellSelectionLabwareKey === modalKey)}
+            isOpen={this.props.wellSelectionLabwareKey === modalKey}
             onCloseClick={this.handleClose}
             name={this.props.name} />
         </Portal>
