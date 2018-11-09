@@ -389,6 +389,11 @@ export const currentFormCanBeSaved: Selector<boolean | null> = createSelector(
   }
 )
 
+export const getWellSelectionLabwareId: Selector<?string> = createSelector(
+  rootSelector,
+  (state: RootState) => state.wellSelectionLabwareId
+)
+
 export default {
   rootSelector,
 
@@ -416,6 +421,7 @@ export default {
   formLevelErrors,
   formSectionCollapse: formSectionCollapseSelector,
   hoveredStepLabware,
+  getWellSelectionLabwareId,
 
   // NOTE: these are exposed only for substeps/selectors.js
   getSteps,

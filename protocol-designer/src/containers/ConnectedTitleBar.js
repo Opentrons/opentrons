@@ -10,6 +10,7 @@ import {START_TERMINAL_TITLE, END_TERMINAL_TITLE} from '../constants'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {
   selectors as steplistSelectors,
+  actions as steplistActions,
   END_TERMINAL_ITEM_ID,
   START_TERMINAL_ITEM_ID,
 } from '../steplist'
@@ -17,13 +18,16 @@ import {selectors as fileDataSelectors} from '../file-data'
 import {closeIngredientSelector} from '../labware-ingred/actions'
 import {stepIconsByType} from '../form-types'
 import {selectors, type Page} from '../navigation'
-import {closeWellSelectionModal} from '../well-selection/actions'
 
 import type {BaseState} from '../types'
 
 type Props = React.ElementProps<typeof TitleBar>
 type DP = { onBackClick: $PropertyType<Props, 'onBackClick'> }
-type SP = $Diff<Props, DP> & {_page: Page, _liquidPlacementMode?: boolean}
+type SP = $Diff<Props, DP> & {
+  _page: Page,
+  _liquidPlacementMode?: boolean,
+  _wellSelectionMode?: boolean,
+}
 
 type TitleWithIconProps = {
   iconName?: ?IconName,
@@ -51,6 +55,7 @@ function mapStateToProps (state: BaseState): SP {
   const labwareNickname = labware && labware.id && labwareNames[labware.id]
   const drilledDownLabwareId = labwareIngredSelectors.getDrillDownLabwareId(state)
   const liquidPlacementMode = !!labwareIngredSelectors.getSelectedContainer(state)
+  const wellSelectionLabwareId = steplistSelectors.getWellSelectionLabwareId(state)
 
   switch (_page) {
     case 'liquids':
@@ -62,15 +67,6 @@ function mapStateToProps (state: BaseState): SP {
         _page,
         title: i18n.t([`nav.title.${_page}`, fileName]),
         subtitle: i18n.t([`nav.subtitle.${_page}`, '']),
-      }
-    case 'well-selection-modal':
-      return {
-        _page,
-        title: <TitleWithIcon
-          iconName={selectedStep && stepIconsByType[selectedStep.stepType]}
-          text={selectedStep && selectedStep.title}
-        />,
-        subtitle: labwareNickname,
       }
     case 'steplist':
     default: {
@@ -99,7 +95,20 @@ function mapStateToProps (state: BaseState): SP {
           subtitle = drilledDownLabware && humanizeLabwareType(drilledDownLabware.type)
         }
       } else if (selectedStep) {
-        subtitle = selectedStep.title
+        if (wellSelectionLabwareId) { // well selection modal
+          return {
+            _page,
+            _wellSelectionMode: true,
+            title: <TitleWithIcon
+              iconName={selectedStep && stepIconsByType[selectedStep.stepType]}
+              text={selectedStep && selectedStep.title}
+            />,
+            subtitle: labwareNames[wellSelectionLabwareId],
+            backButtonLabel: 'Back',
+          }
+        } else {
+          subtitle = selectedStep.title
+        }
       }
       return { _page: 'steplist', title: title || fileName, subtitle, backButtonLabel }
     }
@@ -107,7 +116,7 @@ function mapStateToProps (state: BaseState): SP {
 }
 
 function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Props {
-  const {_page, _liquidPlacementMode, ...props} = stateProps
+  const {_page, _liquidPlacementMode, _wellSelectionMode, ...props} = stateProps
   const {dispatch} = dispatchProps
 
   let onBackClick
@@ -115,13 +124,11 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
   if (_page === 'steplist') {
     if (_liquidPlacementMode) {
       onBackClick = () => dispatch(closeIngredientSelector())
+    } else if (_wellSelectionMode) {
+      onBackClick = () => dispatch(steplistActions.clearWellSelectionLabwareId())
     } else if (props.backButtonLabel) {
       onBackClick = () => {}
     }
-  }
-
-  if (_page === 'well-selection-modal') {
-    onBackClick = () => dispatch(closeWellSelectionModal())
   }
 
   return {

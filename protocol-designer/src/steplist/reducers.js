@@ -264,6 +264,11 @@ const stepCreationButtonExpanded = handleActions({
     payload,
 }, false)
 
+const wellSelectionLabwareId = handleActions({
+  SET_WELL_SELECTION_LABWARE_ID: (state, action: {payload: string}) => action.payload,
+  CLEAR_WELL_SELECTION_LABWARE_ID: () => null,
+}, null)
+
 export type RootState = {|
   unsavedForm: FormState,
   unsavedFormModal: FormModalFields,
@@ -276,6 +281,7 @@ export type RootState = {|
   hoveredItem: HoveredItemState,
   hoveredSubstep: SubstepIdentifier,
   stepCreationButtonExpanded: StepCreationButtonExpandedState,
+  wellSelectionLabwareId: ?string,
 |}
 
 export const _allReducers = {
@@ -290,6 +296,7 @@ export const _allReducers = {
   hoveredItem,
   hoveredSubstep,
   stepCreationButtonExpanded,
+  wellSelectionLabwareId,
 }
 
 const rootReducer = combineReducers(_allReducers)

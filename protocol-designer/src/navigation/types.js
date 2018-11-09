@@ -4,7 +4,5 @@ export type Page =
   'file-detail' |
   'liquids' |
   'steplist' |
-  'ingredient-detail' |
-  'well-selection-modal' |
   'settings-privacy' |
   'settings-features'
