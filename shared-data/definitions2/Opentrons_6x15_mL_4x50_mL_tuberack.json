@@ -1,0 +1,148 @@
+{
+    "ordering": [
+        [
+            "A1",
+            "B1",
+            "C1"
+        ],
+        [
+            "A2",
+            "B2",
+            "C2"
+        ],
+        [
+            "A3",
+            "B3"
+        ],
+        [
+            "A4",
+            "B4"
+        ]
+    ],
+    "otId": "e6488590-e388-11e8-b14b-2f570f23ab54",
+    "deprecated": false,
+    "metadata": {
+        "displayName": "Opentrons 15x50mL tuberack",
+        "displayCategory": "tuberack",
+        "displayVolumeUnits": "mL",
+        "displayLengthUnits": "mm",
+        "tags": [
+            "opentrons",
+            "modular",
+            "tuberack",
+            "15",
+            "mL",
+            "50"
+        ]
+    },
+    "cornerOffsetFromSlot": {
+        "x": -0.01,
+        "y": 0.02,
+        "z": 0
+    },
+    "dimensions": {
+        "overallLength": 127.75,
+        "overallWidth": 85.5,
+        "overallHeight": 123.76
+    },
+    "parameters": {
+        "isTiprack": false,
+        "format": "irregular",
+        "loadName": "Opentrons_6x15_mL_4x50_mL_tuberack"
+    },
+    "wells": {
+        "A1": {
+            "totalLiquidVolume": 15,
+            "diameter": 14.5,
+            "shape": "circular",
+            "depth": 117.98,
+            "x": 13.88,
+            "y": 17.75,
+            "z": 5.78
+        },
+        "B1": {
+            "totalLiquidVolume": 15,
+            "diameter": 14.5,
+            "shape": "circular",
+            "depth": 117.98,
+            "x": 13.88,
+            "y": 42.75,
+            "z": 5.78
+        },
+        "C1": {
+            "totalLiquidVolume": 15,
+            "diameter": 14.5,
+            "shape": "circular",
+            "depth": 117.98,
+            "x": 13.88,
+            "y": 67.75,
+            "z": 5.78
+        },
+        "A2": {
+            "totalLiquidVolume": 15,
+            "diameter": 14.5,
+            "shape": "circular",
+            "depth": 117.98,
+            "x": 38.88,
+            "y": 17.75,
+            "z": 5.78
+        },
+        "B2": {
+            "totalLiquidVolume": 15,
+            "diameter": 14.5,
+            "shape": "circular",
+            "depth": 117.98,
+            "x": 38.88,
+            "y": 42.75,
+            "z": 5.78
+        },
+        "C2": {
+            "totalLiquidVolume": 15,
+            "diameter": 14.5,
+            "shape": "circular",
+            "depth": 117.98,
+            "x": 38.88,
+            "y": 67.75,
+            "z": 5.78
+        },
+        "A3": {
+            "totalLiquidVolume": 50,
+            "diameter": 26.45,
+            "shape": "circular",
+            "depth": 113.85,
+            "x": 71.38,
+            "y": 25.25,
+            "z": 5.95
+        },
+        "B3": {
+            "totalLiquidVolume": 50,
+            "diameter": 26.45,
+            "shape": "circular",
+            "depth": 113.85,
+            "x": 71.38,
+            "y": 60.25,
+            "z": 5.95
+        },
+        "A4": {
+            "totalLiquidVolume": 50,
+            "diameter": 26.45,
+            "shape": "circular",
+            "depth": 113.85,
+            "x": 106.38,
+            "y": 25.25,
+            "z": 5.95
+        },
+        "B4": {
+            "totalLiquidVolume": 50,
+            "diameter": 26.45,
+            "shape": "circular",
+            "depth": 113.85,
+            "x": 106.38,
+            "y": 60.25,
+            "z": 5.95
+        }
+    },
+    "brand": {
+        "brand": "Opentrons"
+    }
+}

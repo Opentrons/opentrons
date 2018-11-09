@@ -3,7 +3,7 @@
 import React from 'react'
 
 import {IconButton, SidePanel, swatchColors} from '@opentrons/components'
-import {sortWells} from '../../utils'
+import {sortWells} from '@opentrons/shared-data'
 import {PDTitledList, PDListItem} from '../lists'
 import StepDescription from '../StepDescription'
 import LabwareDetailsCard from './LabwareDetailsCard'
