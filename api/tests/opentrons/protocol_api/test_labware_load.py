@@ -1,3 +1,4 @@
+import pytest
 from opentrons import protocol_api as papi, types
 
 
@@ -18,13 +19,6 @@ def test_loaded(loop):
     assert ctx.loaded_labwares[1] == labware
 
 
-def test_from_backcompat(loop):
-    ctx = papi.ProtocolContext(loop=loop)
-    papi.back_compat.reset()
-    lw = papi.back_compat.labware.load(labware_name, 3)
-    assert lw == ctx.loaded_labwares[3]
-
-
 def test_load_incorrect_definition_by_name():
-    definition = papi.labware._load_definition_by_name('fake_labware')
-    assert definition == {}
+    with pytest.raises(FileNotFoundError):
+        papi.labware._load_definition_by_name('fake_labware')
