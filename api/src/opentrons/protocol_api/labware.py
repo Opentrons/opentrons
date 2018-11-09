@@ -3,6 +3,7 @@ import json
 import os
 import re
 import time
+import pkgutil
 from collections import defaultdict
 from enum import Enum, auto
 from itertools import takewhile, dropwhile
@@ -589,7 +590,9 @@ def _load_definition_by_name(name: str) -> dict:
         saved to disc. The definition file must have been saved in a known
         location with the filename '${name}.json'
     """
-    raise NotImplementedError
+    def_path = 'shared_data/definitions2/{}.json'.format(name)
+    labware_def = json.loads(pkgutil.get_data('opentrons', def_path))  # type: ignore # NOQA
+    return labware_def
 
 
 def load(name: str, parent: Point, parent_name: str) -> Labware:
