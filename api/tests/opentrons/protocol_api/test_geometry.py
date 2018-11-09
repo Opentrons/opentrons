@@ -1,33 +1,19 @@
-import json
-import pkgutil
-
 import pytest
 
-import opentrons.protocol_api as papi
 from opentrons.protocol_api.geometry import Deck, plan_moves
-from opentrons.protocol_api.labware import load
+from opentrons.protocol_api import labware
 
 # TODO: Remove once load_labware_by_name is implemented
 labware_name = 'generic_96_wellPlate_380_uL'
-labware_def = json.loads(
-    pkgutil.get_data('opentrons',
-                     'shared_data/definitions2/{}.json'.format(labware_name)))
 
 
-@pytest.fixture
-def load_my_labware(monkeypatch):
-    def dummy_load(labware):
-        return labware_def
-    monkeypatch.setattr(papi.labware, '_load_definition_by_name', dummy_load)
-
-
-def test_slot_names(load_my_labware):
+def test_slot_names():
     slots_by_int = list(range(1, 13))
     slots_by_str = [str(idx) for idx in slots_by_int]
     for method in (slots_by_int, slots_by_str):
         d = Deck()
         for idx, slot in enumerate(method):
-            lw = load(labware_name, d.position_for(slot), str(slot))
+            lw = labware.load(labware_name, d.position_for(slot), str(slot))
             assert slot in d
             d[slot] = lw
             with pytest.raises(ValueError):
@@ -41,10 +27,10 @@ def test_slot_names(load_my_labware):
         d['ahgoasia'] = 'nope'
 
 
-def test_highest_z(load_my_labware):
+def test_highest_z():
     deck = Deck()
     assert deck.highest_z == 0
-    lw = load(labware_name, deck.position_for(1), '1')
+    lw = labware.load(labware_name, deck.position_for(1), '1')
     deck[1] = lw
     assert deck.highest_z == lw.wells()[0].top().point.z
     del deck[1]
@@ -65,9 +51,9 @@ def check_arc_basic(arc, from_loc, to_loc):
     assert arc[2] == to_loc.point
 
 
-def test_direct_movs(load_my_labware):
+def test_direct_movs():
     deck = Deck()
-    lw1 = load(labware_name, deck.position_for(1), 'lw1')
+    lw1 = labware.load(labware_name, deck.position_for(1), 'lw1')
 
     same_place = plan_moves(lw1.wells()[0].top(), lw1.wells()[0].top(), deck)
     assert same_place == [lw1.wells()[0].top().point]
@@ -76,10 +62,10 @@ def test_direct_movs(load_my_labware):
     assert same_well == [lw1.wells()[0].bottom().point]
 
 
-def test_basic_arc(load_my_labware):
+def test_basic_arc():
     deck = Deck()
-    lw1 = load(labware_name, deck.position_for(1), 'lw1')
-    lw2 = load(labware_name, deck.position_for(2), 'lw2')
+    lw1 = labware.load(labware_name, deck.position_for(1), 'lw1')
+    lw2 = labware.load(labware_name, deck.position_for(2), 'lw2')
     # same-labware moves should use the smaller safe z
     same_lw = plan_moves(lw1.wells()[0].top(),
                          lw1.wells()[8].bottom(),
@@ -99,10 +85,12 @@ def test_basic_arc(load_my_labware):
     assert different_lw[0].z == deck.highest_z + 15.0
 
 
-def test_no_labware_loc(load_my_labware):
+def test_no_labware_loc():
+    labware_def = labware._load_definition_by_name(labware_name)
+
     deck = Deck()
-    lw1 = load(labware_name, deck.position_for(1), 'lw1')
-    lw2 = load(labware_name, deck.position_for(2), 'lw2')
+    lw1 = labware.load(labware_name, deck.position_for(1), 'lw1')
+    lw2 = labware.load(labware_name, deck.position_for(2), 'lw2')
     # Various flavors of locations without labware should work
     no_lw = lw1.wells()[0].top()._replace(labware=None)
 
@@ -126,9 +114,9 @@ def test_no_labware_loc(load_my_labware):
     assert no_to_well[0].z == labware_def['dimensions']['overallHeight'] + 7.0
 
 
-def test_arc_tall_point(load_my_labware):
+def test_arc_tall_point():
     deck = Deck()
-    lw1 = load(labware_name, deck.position_for(1), 'lw1')
+    lw1 = labware.load(labware_name, deck.position_for(1), 'lw1')
     tall_z = 100
     old_top = lw1.wells()[0].top()
     tall_point = old_top.point._replace(z=tall_z)
