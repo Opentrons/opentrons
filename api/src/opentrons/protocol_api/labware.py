@@ -28,6 +28,12 @@ persistent_path = os.path.join(env.get_path('APP_DATA_DIR'), 'offsets')
 
 
 class Well:
+    """
+    The Well class represents a  single well in a :py:class:`Labware`
+
+    It provides functions to return positions used in operations on the well
+    such as :py:meth:`top`, :py:meth:`bottom`
+    """
     def __init__(self, well_props: dict,
                  parent: Location,
                  display_name: str,
@@ -85,22 +91,22 @@ class Well:
     def has_tip(self, value: bool):
         self._has_tip = value
 
-    def top(self) -> Location:
+    def top(self, z: float = 0.0) -> Location:
         """
         :return: a Point corresponding to the absolute position of the
         top-center of the well relative to the deck (with the front-left corner
         of slot 1 as (0,0,0))
         """
-        return Location(self._position, self)
+        return Location(self._position + Point(0, 0, z), self)
 
-    def bottom(self) -> Location:
+    def bottom(self, z: float = 0.0) -> Location:
         """
         :return: a Point corresponding to the absolute position of the
         bottom-center of the well (with the front-left corner of slot 1 as
         (0,0,0))
         """
         top = self.top()
-        bottom_z = top.point.z - self._depth
+        bottom_z = top.point.z - self._depth + z
         return Location(Point(x=top.point.x, y=top.point.y, z=bottom_z), self)
 
     def center(self) -> Location:

@@ -444,3 +444,97 @@ def test_hw_manager(loop):
     del mgr
     # but not its new one, even if deleted
     assert passed.is_alive()
+
+
+def test_mix(loop, monkeypatch):
+    ctx = papi.ProtocolContext(loop)
+    ctx.home()
+    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_mL_eppendorf', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 3)
+    instr = ctx.load_instrument('p300_single', Mount.RIGHT,
+                                tip_racks=[tiprack])
+
+    instr.pick_up_tip()
+    mix_steps = []
+    aspirate_called_with = None
+    dispense_called_with = None
+
+    def fake_aspirate(vol=None, loc=None, rate=None):
+        nonlocal aspirate_called_with
+        nonlocal mix_steps
+        aspirate_called_with = ('aspirate', vol, loc, rate)
+        mix_steps.append(aspirate_called_with)
+
+    def fake_dispense(vol=None, loc=None, rate=None):
+        nonlocal dispense_called_with
+        nonlocal mix_steps
+        dispense_called_with = ('dispense', vol, loc, rate)
+        mix_steps.append(dispense_called_with)
+
+    monkeypatch.setattr(instr, 'aspirate', fake_aspirate)
+    monkeypatch.setattr(instr, 'dispense', fake_dispense)
+
+    repetitions = 2
+    volume = 5
+    location = lw.wells()[0]
+    rate = 2
+    instr.mix(repetitions, volume, location, rate)
+    expected_mix_steps = [('aspirate', volume, location, 2),
+                          ('dispense', volume, None, 2),
+                          ('aspirate', volume, None, 2),
+                          ('dispense', volume, None, 2)]
+
+    assert mix_steps == expected_mix_steps
+
+
+def test_touch_tip_default_args(loop, monkeypatch):
+    ctx = papi.ProtocolContext(loop)
+    ctx.home()
+    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_mL_eppendorf', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 3)
+    instr = ctx.load_instrument('p300_single', Mount.RIGHT,
+                                tip_racks=[tiprack])
+
+    instr.pick_up_tip()
+    total_hw_moves = []
+
+    async def fake_hw_move(mount, abs_position, speed=None,
+                           critical_point=None):
+        nonlocal total_hw_moves
+        print("new_move_pos:{}".format(abs_position))
+        total_hw_moves.append((abs_position, speed))
+
+    instr.aspirate(10, lw.wells()[0])
+    monkeypatch.setattr(ctx._hw_manager.hardware._api, 'move_to', fake_hw_move)
+    instr.touch_tip()
+    z_offset = Point(0, 0, 1)   # default z offset of 1mm
+    speed = 60                  # default speed
+    edges = [lw.wells()[0]._from_center_cartesian(1, 0, 1) - z_offset,
+             lw.wells()[0]._from_center_cartesian(-1, 0, 1) - z_offset,
+             lw.wells()[0]._from_center_cartesian(0, 1, 1) - z_offset,
+             lw.wells()[0]._from_center_cartesian(0, -1, 1) - z_offset]
+    print("Well bottom clearance: {}".format(instr.well_bottom_clearance))
+
+    for i in range(1, 5):
+        assert total_hw_moves[i] == (edges[i-1], speed)
+
+
+def test_blow_out(loop, monkeypatch):
+    ctx = papi.ProtocolContext(loop)
+    ctx.home()
+    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_mL_eppendorf', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 3)
+    instr = ctx.load_instrument('p300_single', Mount.RIGHT,
+                                tip_racks=[tiprack])
+
+    move_location = None
+    instr.pick_up_tip()
+    instr.aspirate(10, lw.wells()[0])
+
+    def fake_move(loc):
+        nonlocal move_location
+        move_location = loc
+
+    monkeypatch.setattr(instr, 'move_to', fake_move)
+    instr.blow_out()
+    assert move_location == lw.wells()[0].top()

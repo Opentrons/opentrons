@@ -91,4 +91,10 @@ class Mount(enum.Enum):
         return self.name
 
 
+class TransferTipPolicy(enum.Enum):
+    ONCE = enum.auto()
+    NEVER = enum.auto()
+    ALWAYS = enum.auto()
+
+
 DeckLocation = Union[int, str]
