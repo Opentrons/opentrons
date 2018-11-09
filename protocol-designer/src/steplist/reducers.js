@@ -15,6 +15,7 @@ import type {
   TerminalItemId,
 } from './types'
 import type {LoadFileAction} from '../load-file'
+import type {DeleteContainerAction} from '../labware-ingred/actions'
 import type {FormData, StepIdType, FormModalFields} from '../form-types'
 import {getDefaultsForStepType} from './formLevel'
 
