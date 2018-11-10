@@ -38,8 +38,8 @@ beforeEach(() => {
   robotInitialState = createRobotState({
     sourcePlateType: '96-flat',
     destPlateType: '96-flat',
-    tipracks: [200],
-    fillPipetteTips: true,
+    tipracks: [300],
+    fillPipetteTips: 300,
     fillTiprackTips: true,
   })
 })
@@ -277,7 +277,7 @@ describe('single transfer exceeding pipette max', () => {
       changeTip: 'never',
     }
     // begin with tip on pipette
-    robotInitialState.tipState.pipettes.p300SingleId = true
+    robotInitialState.tipState.pipettes.p300SingleId = {tipMaxVolume: 300}
 
     const result = transfer(transferArgs)(robotInitialState)
     expect(result.commands).toEqual([

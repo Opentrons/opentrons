@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import {tiprackWellNamesByCol, tiprackWellNamesFlat} from './'
 import type {Channels} from '@opentrons/components'
 import type {RobotState, PipetteData, LabwareData} from './'
@@ -16,8 +17,7 @@ export function getPipetteChannels (pipetteId: string, robotState: RobotState): 
   const pipette = robotState.instruments[pipetteId]
 
   if (!pipette) {
-    // TODO Ian 2018-06-04 use assert
-    console.warn(`no pipette id: "${pipetteId}"`)
+    assert(pipette, `no pipette with ID {pipetteId} found in robot state`)
     return null
   }
 
@@ -113,4 +113,9 @@ export function getNextTiprack (pipette: PipetteData, robotState: RobotState): N
   }
   // No available tipracks (for given pipette channels)
   return null
+}
+
+export function getMaxTipVolumeForPipette (pipetteId: string, robotState: RobotState): number {
+  const pipetteTipstate = robotState.tipState.pipettes[pipetteId]
+  return (pipetteTipstate && pipetteTipstate.tipMaxVolume) || 0
 }

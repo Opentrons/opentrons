@@ -39,14 +39,14 @@ export function labwareDoesNotExist (args: {actionName: string, labware: string}
   }
 }
 
-export function pipetteVolumeExceeded (args: {
+export function tipVolumeExceeded (args: {
   actionName: string,
   volume: string | number,
   maxVolume: string | number,
 }): CommandCreatorError {
   const {actionName, volume, maxVolume} = args
   return {
-    message: `Attempted to ${actionName} volume greater than pipette max volume (${volume} > ${maxVolume})`,
-    type: 'PIPETTE_VOLUME_EXCEEDED',
+    message: `Attempted to ${actionName} volume greater than tip max volume (${volume} > ${maxVolume})`,
+    type: 'TIP_VOLUME_EXCEEDED',
   }
 }

@@ -1,6 +1,7 @@
 // @flow
 import updateLiquidState from './aspirateUpdateLiquidState'
 import * as errorCreators from './errorCreators'
+import {getMaxTipVolumeForPipette} from './robotStateSelectors'
 import type {RobotState, CommandCreator, CommandCreatorError, AspirateDispenseArgs} from './'
 
 /** Aspirate with given args. Requires tip. */
@@ -20,8 +21,10 @@ const aspirate = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState
     errors.push(errorCreators.noTipOnPipette({actionName, pipette, volume, labware, well}))
   }
 
-  if (pipetteData && pipetteData.maxVolume < volume) {
-    errors.push(errorCreators.pipetteVolumeExceeded({actionName, volume, maxVolume: pipetteData.maxVolume}))
+  // TODO IMMEDIATELY write/check test
+  const tipMaxVolume = getMaxTipVolumeForPipette(pipette, prevRobotState)
+  if (tipMaxVolume < volume && errors.length === 0) {
+    errors.push(errorCreators.tipVolumeExceeded({actionName, volume, maxVolume: tipMaxVolume}))
   }
 
   if (!labware || !prevRobotState.labware[labware]) {

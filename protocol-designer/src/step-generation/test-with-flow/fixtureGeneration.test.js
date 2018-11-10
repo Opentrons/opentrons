@@ -65,10 +65,11 @@ describe('createRobotState fixture generator', () => {
 
     tipFillingOptions.forEach(fillPipetteTips => {
       test('tiprack tips ' + (fillPipetteTips ? 'full' : 'empty'), () => {
+        const pipetteTipMaxVol = 200
         const result = createRobotState({
           sourcePlateType: 'trough-12row',
           destPlateType: '96-flat',
-          fillPipetteTips,
+          fillPipetteTips: fillPipetteTips ? pipetteTipMaxVol : false,
           fillTiprackTips: true,
           tipracks: [200, 200],
         })
@@ -76,7 +77,8 @@ describe('createRobotState fixture generator', () => {
         const pipetteIds = ['p300SingleId', 'p300MultiId']
         pipetteIds.forEach(pipetteId => {
           expect(result).toHaveProperty(`tipState.pipettes.${pipetteId}`)
-          expect(result.tipState.pipettes[pipetteId]).toEqual(fillPipetteTips)
+          expect(result.tipState.pipettes[pipetteId]).toEqual(
+            fillPipetteTips ? {tipMaxVolume: pipetteTipMaxVol} : false)
         })
       })
     })

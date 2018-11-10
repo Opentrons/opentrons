@@ -162,6 +162,8 @@ export type LabwareLiquidState = {[labwareId: string]: SingleLabwareLiquidState}
 
 export type SourceAndDest = {|source: LocationLiquidState, dest: LocationLiquidState|}
 
+export type PipetteTip = {tipMaxVolume: number} | false // false if no tip in rack
+
 // TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": RobotSimulationState?
 export type RobotState = {|
   instruments: { // TODO Ian 2018-05-23 rename this 'pipettes' to match tipState (& to disambiguate from future 'modules')
@@ -183,7 +185,7 @@ export type RobotState = {|
       },
     },
     pipettes: {
-      [pipetteId: string]: boolean, // true if tip is on pipette
+      [pipetteId: string]: PipetteTip,
     },
   },
   liquidState: {
@@ -252,7 +254,7 @@ export type ErrorType =
   | 'LABWARE_DOES_NOT_EXIST'
   | 'PIPETTE_DOES_NOT_EXIST'
   | 'NO_TIP_ON_PIPETTE'
-  | 'PIPETTE_VOLUME_EXCEEDED'
+  | 'TIP_VOLUME_EXCEEDED'
 
 export type CommandCreatorError = {|
   message: string,

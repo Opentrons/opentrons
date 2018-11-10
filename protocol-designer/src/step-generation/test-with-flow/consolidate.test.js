@@ -30,12 +30,14 @@ function tripleMix (well: string, volume: number, labware: string) {
   ]
 }
 
+const pipetteTip300uL = {tipMaxVolume: 300}
+
 const robotInitialStateNoLiquidState = createRobotStateFixture({
   sourcePlateType: 'trough-12row',
   destPlateType: '96-flat',
   fillTiprackTips: true,
   fillPipetteTips: false,
-  tipracks: [200, 200],
+  tipracks: [300, 300],
 })
 
 const emptyLiquidState = createEmptyLiquidState({
@@ -53,7 +55,7 @@ const robotStatePickedUpOneTipNoLiquidState = merge(
         tiprack1Id: {A1: false},
       },
       pipettes: {
-        p300SingleId: true,
+        p300SingleId: pipetteTip300uL,
       },
     },
   }
@@ -68,7 +70,7 @@ const robotStatePickedUpMultiTipsNoLiquidState = merge(
         tiprack1Id: getTipColumn(1, false),
       },
       pipettes: {
-        p300MultiId: true,
+        p300MultiId: pipetteTip300uL,
       },
     },
   }
@@ -178,7 +180,7 @@ describe('consolidate single-channel', () => {
         },
         pipettes: {
           ...robotInitialState.tipState.pipettes,
-          p300SingleId: true,
+          p300SingleId: pipetteTip300uL,
         },
       },
     })

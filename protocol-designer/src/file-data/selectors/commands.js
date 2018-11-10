@@ -82,7 +82,7 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
       },
       {})
 
-    type PipetteTipState = {[pipetteId: string]: boolean}
+    type PipetteTipState = {[pipetteId: string]: StepGeneration.PipetteTip}
     const pipetteTipState: PipetteTipState = reduce(
       pipettes,
       (acc: PipetteTipState, pipetteData: StepGeneration.PipetteData) =>

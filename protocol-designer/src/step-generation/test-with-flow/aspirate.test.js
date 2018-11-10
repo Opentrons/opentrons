@@ -34,14 +34,14 @@ describe('aspirate', () => {
       destPlateType: '96-flat',
       fillPipetteTips: false,
       fillTiprackTips: true,
-      tipracks: [200, 200],
+      tipracks: [300, 300],
     })
     robotStateWithTip = createRobotState({
       sourcePlateType: 'trough-12row',
       destPlateType: '96-flat',
-      fillPipetteTips: true,
+      fillPipetteTips: 300,
       fillTiprackTips: true,
-      tipracks: [200, 200],
+      tipracks: [300, 300],
     })
   })
 
@@ -49,9 +49,9 @@ describe('aspirate', () => {
   const robotStateWithTipNoLiquidState = createRobotStateFixture({
     sourcePlateType: 'trough-12row',
     destPlateType: '96-flat',
-    fillPipetteTips: true,
-    fillTiprackTips: true,
-    tipracks: [200, 200],
+    fillPipetteTips: 300,
+    fillTiprackTips: 300,
+    tipracks: [300, 300],
   })
 
   test('aspirate with tip', () => {
@@ -75,17 +75,17 @@ describe('aspirate', () => {
     expect(result.robotState).toMatchObject(robotStateWithTipNoLiquidState)
   })
 
-  test('aspirate with volume > pipette max vol should throw error', () => {
+  test('aspirate with volume > pipette tip vol should throw error', () => {
     const result = aspirateWithErrors({
       pipette: 'p300SingleId',
-      volume: 10000,
+      volume: 301,
       labware: 'sourcePlateId',
       well: 'A1',
     })(robotStateWithTip)
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
-      type: 'PIPETTE_VOLUME_EXCEEDED',
+      type: 'TIP_VOLUME_EXCEEDED',
     })
   })
 

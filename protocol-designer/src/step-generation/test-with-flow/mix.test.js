@@ -18,7 +18,7 @@ beforeEach(() => {
     sourcePlateType: '96-flat',
     destPlateType: '96-flat',
     tipracks: [200],
-    fillPipetteTips: true,
+    fillPipetteTips: 200,
     fillTiprackTips: true,
   })
 
