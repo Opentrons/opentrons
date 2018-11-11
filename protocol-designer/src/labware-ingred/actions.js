@@ -61,13 +61,17 @@ export const createContainer = createAction(
   |}) => args
 )
 
-export const deleteContainer = createAction(
-  'DELETE_CONTAINER',
-  (args: {|
+export type DeleteContainerAction = {
+  type: 'DELETE_CONTAINER',
+  payload: {
     containerId: string,
     slot: DeckSlot,
     containerType: string,
-  |}) => args
+  },
+}
+export const deleteContainer = createAction(
+  'DELETE_CONTAINER',
+  (args: $PropertyType<DeleteContainerAction, 'payload'>) => args
 )
 
 export type RenameLabwareAction = {

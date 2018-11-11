@@ -15,6 +15,7 @@ import type {
   TerminalItemId,
 } from './types'
 import type {LoadFileAction} from '../load-file'
+import type {DeleteContainerAction} from '../labware-ingred/actions'
 import type {FormData, StepIdType, FormModalFields} from '../form-types'
 import {getDefaultsForStepType} from './formLevel'
 
@@ -130,6 +131,13 @@ type SavedStepFormState = {
   [StepIdType]: FormData,
 }
 
+const LABWARE_FIELD_NAMES = [
+  'aspirate_labware',
+  'dispense_blowout_labware',
+  'dispense_labware',
+  'labware',
+]
+
 const savedStepForms: Reducer<SavedStepFormState, *> = handleActions({
   SAVE_STEP_FORM: (state, action: SaveStepFormAction) => ({
     ...state,
@@ -142,6 +150,39 @@ const savedStepForms: Reducer<SavedStepFormState, *> = handleActions({
       ...getDefaultsForStepType(stepForm.stepType),
       ...stepForm,
     }))
+  },
+  DELETE_CONTAINER: (state: SavedStepFormState, action: DeleteContainerAction): SavedStepFormState => {
+    const {payload} = action
+    return mapValues(state, savedForm => {
+      let dependentFields = []
+      const withoutDeletedLabware = mapValues(savedForm, (value, fieldName) => {
+        const isLabware = LABWARE_FIELD_NAMES.includes(fieldName)
+        if (isLabware && value === payload.containerId) {
+          switch (fieldName) {
+            case 'aspirate_labware': {
+              dependentFields = [...dependentFields, 'aspirate_wells']
+              break
+            }
+            case 'dispense_labware': {
+              dependentFields = [...dependentFields, 'dispense_wells']
+              break
+            }
+            case 'labware': {
+              dependentFields = [...dependentFields, 'wells']
+              break
+            }
+          }
+          return null
+        } else {
+          return value
+        }
+      })
+      const withoutDependentFields = mapValues(withoutDeletedLabware, (value, fieldName) => {
+        if (dependentFields.includes(fieldName)) return null
+        return value
+      })
+      return withoutDependentFields
+    })
   },
   CHANGE_SAVED_STEP_FORM: (state: SavedStepFormState, action: ChangeSavedStepFormAction): SavedStepFormState => ({
     ...state,
@@ -264,9 +305,9 @@ const stepCreationButtonExpanded = handleActions({
     payload,
 }, false)
 
-const wellSelectionLabwareId = handleActions({
-  SET_WELL_SELECTION_LABWARE_ID: (state, action: {payload: string}) => action.payload,
-  CLEAR_WELL_SELECTION_LABWARE_ID: () => null,
+const wellSelectionLabwareKey = handleActions({
+  SET_WELL_SELECTION_LABWARE_KEY: (state, action: {payload: string}) => action.payload,
+  CLEAR_WELL_SELECTION_LABWARE_KEY: () => null,
 }, null)
 
 export type RootState = {|
@@ -281,7 +322,7 @@ export type RootState = {|
   hoveredItem: HoveredItemState,
   hoveredSubstep: SubstepIdentifier,
   stepCreationButtonExpanded: StepCreationButtonExpandedState,
-  wellSelectionLabwareId: ?string,
+  wellSelectionLabwareKey: ?string,
 |}
 
 export const _allReducers = {
@@ -296,7 +337,7 @@ export const _allReducers = {
   hoveredItem,
   hoveredSubstep,
   stepCreationButtonExpanded,
-  wellSelectionLabwareId,
+  wellSelectionLabwareKey,
 }
 
 const rootReducer = combineReducers(_allReducers)
