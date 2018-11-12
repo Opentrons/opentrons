@@ -118,7 +118,6 @@ export function splitLiquid (volume: number, sourceLiquidState: LocationLiquidSt
   }
 
   if (volume > totalSourceVolume) {
-    // console.warn('volume to split exceeds total source volume, adding air', sourceLiquidState, volume, totalSourceVolume)
     // Take all of source, plus air
     return {
       source: mapValues(sourceLiquidState, () => ({volume: 0})),

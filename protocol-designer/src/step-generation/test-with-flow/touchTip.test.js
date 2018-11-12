@@ -19,7 +19,7 @@ describe('touchTip', () => {
     tipracks: [300, 300],
   }
   const initialRobotState = createRobotState(_robotFixtureArgs)
-  const robotStateWithTip = createRobotState({..._robotFixtureArgs, fillPipetteTips: 200})
+  const robotStateWithTip = createRobotState({..._robotFixtureArgs, fillPipetteTips: true})
 
   test('touchTip with tip', () => {
     const result = touchTip({

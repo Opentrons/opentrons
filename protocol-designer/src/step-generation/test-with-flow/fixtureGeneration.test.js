@@ -68,7 +68,7 @@ describe('createRobotState fixture generator', () => {
         const result = createRobotState({
           sourcePlateType: 'trough-12row',
           destPlateType: '96-flat',
-          fillPipetteTips: fillPipetteTips,
+          fillPipetteTips,
           fillTiprackTips: true,
           tipracks: [300, 300],
         })

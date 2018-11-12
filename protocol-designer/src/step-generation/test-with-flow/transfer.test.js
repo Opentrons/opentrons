@@ -277,7 +277,7 @@ describe('single transfer exceeding pipette max', () => {
       changeTip: 'never',
     }
     // begin with tip on pipette
-    robotInitialState.tipState.pipettes.p300SingleId = {tipMaxVolume: 300}
+    robotInitialState.tipState.pipettes.p300SingleId = true
 
     const result = transfer(transferArgs)(robotInitialState)
     expect(result.commands).toEqual([
