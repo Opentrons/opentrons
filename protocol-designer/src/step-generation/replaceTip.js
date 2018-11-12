@@ -1,7 +1,6 @@
 // @flow
-import assert from 'assert'
 import cloneDeep from 'lodash/cloneDeep'
-import {getLabware} from '@opentrons/shared-data'
+import {getTiprackVolumeByLabwareId} from './robotStateSelectors'
 import {dropTip, getNextTiprack, tiprackWellNamesByCol} from './'
 import {insufficientTips} from './errorCreators'
 import type {RobotState, CommandCreator} from './types'
@@ -47,12 +46,7 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
   ]
 
   // pipette now has tip
-  // TODO IMMEDIATELY: make this into selector in shared-data / robotStateSelector
-  const tiprackType = robotState.labware[nextTiprack.tiprackId].type
-  const tiprackData = getLabware(tiprackType)
-  assert(tiprackData, `could not get labware data for tiprack: id=${nextTiprack.tiprackId}, type=${tiprackType}. ${JSON.stringify(tiprackData)}`)
-  const tipMaxVolume = (tiprackData && tiprackData.metadata.tipVolume) || 0 // TODO IMMEDIATELY better bug reporting than 'max vol is 0 I guess'
-  assert(tipMaxVolume > 0, `expected tipMaxVolume > 0, got ${tipMaxVolume}. tiprack id: ${nextTiprack.tiprackId}`)
+  const tipMaxVolume = getTiprackVolumeByLabwareId(nextTiprack.tiprackId, robotState) || 0
   robotState.tipState.pipettes[pipetteId] = {tipMaxVolume}
 
   // update tiprack-to-pipette assignment

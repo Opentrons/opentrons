@@ -21,7 +21,6 @@ const aspirate = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState
     errors.push(errorCreators.noTipOnPipette({actionName, pipette, volume, labware, well}))
   }
 
-  // TODO IMMEDIATELY write/check test
   const tipMaxVolume = getMaxTipVolumeForPipette(pipette, prevRobotState)
   if (tipMaxVolume < volume && errors.length === 0) {
     errors.push(errorCreators.tipVolumeExceeded({actionName, volume, maxVolume: tipMaxVolume}))

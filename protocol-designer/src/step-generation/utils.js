@@ -109,13 +109,7 @@ export function getLocationTotalVolume (loc: LocationLiquidState): number {
 export function splitLiquid (volume: number, sourceLiquidState: LocationLiquidState): SourceAndDest {
   const totalSourceVolume = getLocationTotalVolume(sourceLiquidState)
 
-  // TODO IMMEDIATELY: re-enable console.warn's under feature flag???
-  // if (AIR in sourceLiquidState) {
-  //   console.warn('Splitting liquid with air present', sourceLiquidState)
-  // }
-
   if (totalSourceVolume === 0) {
-    // console.warn('splitting with zero source volume')
     // Splitting from empty source
     return {
       source: sourceLiquidState,

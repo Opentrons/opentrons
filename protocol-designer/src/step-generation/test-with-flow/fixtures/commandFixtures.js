@@ -8,14 +8,14 @@ export const replaceTipCommands = (tip: number | string): Array<Command> => [
 ]
 
 export const dropTip = (
-  tip: number | string, // TODO IMMEDIATELY should this be well?: string & default to A1?
+  well: string,
   params?: {| pipette?: string, labware?: string |}
 ): Command => ({
   command: 'drop-tip',
   params: {
     pipette: 'p300SingleId',
     labware: 'trashId',
-    well: (typeof tip === 'string') ? tip : tiprackWellNamesFlat[tip],
+    well: (typeof well === 'string') ? well : tiprackWellNamesFlat[well],
     ...params,
   },
 })
