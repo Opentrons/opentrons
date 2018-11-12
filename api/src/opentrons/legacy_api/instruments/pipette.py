@@ -485,7 +485,6 @@ class Pipette:
         """
         assert self.tip_attached, "Cannot dispense without a tip attached"
 
-
         # Note: volume positional argument may not be passed. if it isn't then
         # assume the first positional argument is the location
         if not helpers.is_number(volume):
@@ -631,7 +630,6 @@ class Pipette:
         """
         assert self.tip_attached, "Cannot mix without a tip attached"
 
-
         if volume is None:
             volume = self.max_volume
 
@@ -678,7 +676,6 @@ class Pipette:
         >>> p300.aspirate(50).dispense().blow_out() # doctest: +SKIP
         """
         assert self.tip_attached, "Cannot blow out without a tip attached"
-
 
         self.move_to(location)
         self.instrument_actuator.set_active_current(self._plunger_current)
