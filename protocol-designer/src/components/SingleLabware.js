@@ -11,7 +11,7 @@ type Props = {
 }
 export const LABEL_OFFSET = 8
 
-/** Simply wraps SVG components like Plate/SelectablePlate with correct dimensions */
+/** Simply wraps SVG components like Plate/SelectableLabware with correct dimensions */
 export default function SingleLabware (props: Props) {
   const {children, className, showLabels = false} = props
   const minX = showLabels ? -LABEL_OFFSET : 0

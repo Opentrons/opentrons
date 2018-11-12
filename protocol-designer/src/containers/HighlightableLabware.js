@@ -1,14 +1,11 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import type {Dispatch} from 'redux'
 import mapValues from 'lodash/mapValues'
 import noop from 'lodash/noop'
 
-import SelectablePlate from '../components/SelectablePlate.js'
+import HighlightableLabware from '../components/HighlightableLabware'
 
-import {getCollidingWells} from '../utils'
-import {getWellSetForMultichannel} from '../well-selection/utils'
 import {selectors} from '../labware-ingred/reducers'
 import {
   selectors as steplistSelectors,
@@ -18,54 +15,29 @@ import {
 import * as highlightSelectors from '../top-selectors/substep-highlight'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
 import * as tipContentsSelectors from '../top-selectors/tip-contents'
-import {
-  highlightWells,
-  selectWells,
-  deselectWells,
-} from '../well-selection/actions'
 import wellSelectionSelectors from '../well-selection/selectors'
 
-import {SELECTABLE_WELL_CLASS} from '../constants'
-import type {GenericRect} from '../collision-types'
-
-import type {WellContents, Wells, ContentsByWell} from '../labware-ingred/types'
+import type {WellContents, ContentsByWell} from '../labware-ingred/types'
 import type {BaseState} from '../types'
 
-type Props = React.ElementProps<typeof SelectablePlate>
+type Props = React.ElementProps<typeof HighlightableLabware>
 
 type OP = {
   containerId?: string,
-  pipetteChannels?: $PropertyType<Props, 'pipetteChannels'>,
-  selectable?: $PropertyType<Props, 'selectable'>,
-  cssFillParent?: boolean,
 }
 
-type DP = {
-  dispatch: Dispatch<*>,
-}
-
-type MP = {
-  onSelectionMove: $PropertyType<Props, 'onSelectionMove'>,
-  onSelectionDone: $PropertyType<Props, 'onSelectionDone'>,
-  makeOnMouseOverWell: $PropertyType<Props, 'makeOnMouseOverWell'>,
-  onMouseExitWell: $PropertyType<Props, 'onMouseExitWell'>,
-}
-
-type SP = $Diff<Props, MP>
+type SP = $Diff<Props, OP>
 
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
-  const {selectable} = ownProps
   const selectedContainerId = selectors.getSelectedContainerId(state)
   const containerId = ownProps.containerId || selectedContainerId
 
   if (containerId === null) {
-    console.error('SelectablePlate: No container is selected, and no containerId was given to Connected SelectablePlate')
+    console.error('HighlightableLabware: No container is selected, and no containerId was given to Connected HighlightableLabware')
     return {
       containerId: '',
       wellContents: {},
       containerType: '',
-      selectable: selectable,
-      liquidNamesById: {},
     }
   }
 
@@ -86,7 +58,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     // "end" terminal
     wellContents = wellContentsSelectors.lastValidWellContents(state)[containerId]
   } else if (!activeItem.isStep) {
-    console.warn(`SelectablePlate got unhandled terminal id: "${activeItem.id}"`)
+    console.warn(`HighlightableLabware got unhandled terminal id: "${activeItem.id}"`)
   } else {
     const stepId = activeItem.id
     // TODO: Ian 2018-07-31 replace with util function, "findIndexOrNull"?
@@ -138,81 +110,10 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const getTipProps = tipContentsSelectors.getTipsForCurrentStep(state, {labwareId: containerId})
 
   return {
-    containerId,
     wellContents,
     getTipProps: getTipProps || noop,
     containerType: labware ? labware.type : 'missing labware',
-    selectable,
-    liquidNamesById: selectors.getLiquidNamesById(state),
   }
 }
 
-function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
-  const {dispatch} = dispatchProps
-  const {pipetteChannels} = ownProps
-
-  const _wellsFromSelected = (selectedWells: Wells): Wells => {
-    // Returns PRIMARY WELLS from the selection.
-    if (pipetteChannels === 8) {
-      // for the wells that have been highlighted,
-      // get all 8-well well sets and merge them
-      const primaryWells: Wells = Object.keys(selectedWells).reduce((acc: Wells, well: string): Wells => {
-        const wellSet = getWellSetForMultichannel(stateProps.containerType, well)
-        if (!wellSet) {
-          return acc
-        }
-
-        const primaryWell = wellSet[0]
-
-        return {
-          ...acc,
-          [primaryWell]: primaryWell,
-        }
-      },
-      {})
-
-      return primaryWells
-    }
-
-    // single-channel or ingred selection mode
-    return selectedWells
-  }
-
-  const _getWellsFromRect = (rect: GenericRect): * => {
-    const selectedWells = getCollidingWells(rect, SELECTABLE_WELL_CLASS)
-    return _wellsFromSelected(selectedWells)
-  }
-
-  return {
-    ...stateProps,
-    ...ownProps,
-
-    onSelectionMove: (e, rect) => {
-      const wells = _getWellsFromRect(rect)
-      if (!e.shiftKey) {
-        dispatch(highlightWells(wells))
-      }
-    },
-
-    onSelectionDone: (e, rect) => {
-      const wells = _getWellsFromRect(rect)
-      if (e.shiftKey) {
-        dispatch(deselectWells(wells))
-      } else {
-        dispatch(selectWells(wells))
-      }
-    },
-
-    makeOnMouseOverWell: (well: string) => (e: SyntheticMouseEvent<*>) => {
-      if (!e.shiftKey) {
-        const hoveredWell = {[well]: well}
-        dispatch(highlightWells(_wellsFromSelected(hoveredWell)))
-      }
-    },
-    onMouseExitWell: () => dispatch(
-      highlightWells(_wellsFromSelected({})) // TODO more convenient way to de-highlight
-    ),
-  }
-}
-
-export default connect(mapStateToProps, null, mergeProps)(SelectablePlate)
+export default connect(mapStateToProps)(HighlightableLabware)
