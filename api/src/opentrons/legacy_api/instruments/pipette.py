@@ -389,8 +389,7 @@ class Pipette:
         >>> # aspirate the pipette's remaining volume (80uL) from a Well
         >>> p300.aspirate(plate[2]) # doctest: +SKIP
         """
-        if not self.tip_attached:
-            log.warning("Cannot aspirate without a tip attached.")
+        assert self.tip_attached, "Cannot aspirate without a tip attached"
 
         # Note: volume positional argument may not be passed. if it isn't then
         # assume the first positional argument is the location
@@ -484,8 +483,8 @@ class Pipette:
         # dispense the pipette's remaining volume (80uL) to a Well
         >>> p300.dispense(plate[2]) # doctest: +SKIP
         """
-        if not self.tip_attached:
-            log.warning("Cannot dispense without a tip attached.")
+        assert self.tip_attached, "Cannot dispense without a tip attached"
+
 
         # Note: volume positional argument may not be passed. if it isn't then
         # assume the first positional argument is the location
@@ -630,8 +629,8 @@ class Pipette:
         # mix 3x with the pipette's max volume, from current position
         >>> p300.mix(3) # doctest: +SKIP
         """
-        if not self.tip_attached:
-            log.warning("Cannot mix without a tip attached.")
+        assert self.tip_attached, "Cannot mix without a tip attached"
+
 
         if volume is None:
             volume = self.max_volume
@@ -678,8 +677,8 @@ class Pipette:
         >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
         >>> p300.aspirate(50).dispense().blow_out() # doctest: +SKIP
         """
-        if not self.tip_attached:
-            log.warning("Cannot 'blow out' without a tip attached.")
+        assert self.tip_attached, "Cannot blow out without a tip attached"
+
 
         self.move_to(location)
         self.instrument_actuator.set_active_current(self._plunger_current)
@@ -739,8 +738,8 @@ class Pipette:
         >>> p300.aspirate(50, plate[0]) # doctest: +SKIP
         >>> p300.dispense(plate[1]).touch_tip() # doctest: +SKIP
         """
-        if not self.tip_attached:
-            log.warning("Cannot touch tip without a tip attached.")
+        assert self.tip_attached, "Cannot touch tip without a tip attached"
+
         if speed > 80.0:
             log.warning("Touch tip speeds greater than 80mm/s not allowed")
             speed = 80.0
@@ -815,8 +814,7 @@ class Pipette:
         >>> p300.aspirate(50, plate[0]) # doctest: +SKIP
         >>> p300.air_gap(50) # doctest: +SKIP
         """
-        if not self.tip_attached:
-            log.warning("Cannot perform air_gap without a tip attached.")
+        assert self.tip_attached, "Cannot air gap without a tip attached"
 
         # if volumes is specified as 0uL, do nothing
         if volume is 0:
@@ -860,8 +858,7 @@ class Pipette:
         >>> p300.dispense(plate[1]) # doctest: +SKIP
         >>> p300.return_tip() # doctest: +SKIP
         """
-        if not self.tip_attached:
-            log.warning("Cannot return tip without tip attached.")
+        assert self.tip_attached, "Cannot return tip without a tip attached"
 
         if not self.current_tip():
             self.robot.add_warning(
@@ -915,8 +912,8 @@ class Pipette:
         >>> p300.pick_up_tip() # doctest: +SKIP
         >>> p300.return_tip() # doctest: +SKIP
         """
-        if self.tip_attached:
-            log.warning("There is already a tip attached to this pipette.")
+        assert not self.tip_attached, \
+            "Cannot pick up tip with a tip already attached"
 
         if not location:
             location = self.get_next_tip()
@@ -1012,8 +1009,7 @@ class Pipette:
         # drops the tip back at its tip rack
         >>> p300.drop_tip(tiprack[1]) # doctest: +SKIP
         """
-        if not self.tip_attached:
-            log.warning("Cannot drop tip without a tip attached.")
+        assert self.tip_attached, "Cannot drop tip without a tip attached"
 
         if not location and self.trash_container:
             location = self.trash_container

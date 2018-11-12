@@ -409,6 +409,7 @@ def test_drop_tip_current(model):
     pipette = model.instrument._instrument
     pipette._plunger_current = 0.123
     pipette._drop_tip_current = 0.456
+    pipette.tip_attached = True  # bypassing pick_up_tip for isolation
     pipette.drop_tip(rack[0])
 
     # Instrument in `model` is configured to right mount, which is the A axis
