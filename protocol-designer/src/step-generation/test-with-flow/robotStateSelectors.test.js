@@ -8,8 +8,6 @@ const basicLiquidState = {
   labware: {},
 }
 
-const pipetteTip300uL = {tipMaxVolume: 300}
-
 describe('sortLabwareBySlot', () => {
   test('sorts all labware by slot', () => {
     // TODO use a fixture, standardize
@@ -28,12 +26,12 @@ describe('sortLabwareBySlot', () => {
         },
         one: {
           slot: '1',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack',
         },
         eleven: {
           slot: '11',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack',
         },
         two: {
@@ -44,7 +42,7 @@ describe('sortLabwareBySlot', () => {
       },
       tipState: {
         tipracks: {
-          tiprack1Id: getTiprackTipstate(pipetteTip300uL),
+          tiprack1Id: getTiprackTipstate(true),
         },
         pipettes: {
           p300SingleId: false,
@@ -67,7 +65,7 @@ describe('sortLabwareBySlot', () => {
       labware: {},
       tipState: {
         tipracks: {
-          tiprack1Id: getTiprackTipstate(pipetteTip300uL),
+          tiprack1Id: getTiprackTipstate(true),
         },
         pipettes: {
           p300SingleId: false,
@@ -86,23 +84,23 @@ describe('sortLabwareBySlot', () => {
 
 describe('_getNextTip', () => {
   test('full tiprack should start at A1', () => {
-    const result = _getNextTip(1, {...getTiprackTipstate(pipetteTip300uL)})
+    const result = _getNextTip(1, {...getTiprackTipstate(true)})
     expect(result).toEqual('A1')
   })
 
   test('missing A1, go to B1', () => {
-    const result = _getNextTip(1, {...getTiprackTipstate(pipetteTip300uL), A1: false})
+    const result = _getNextTip(1, {...getTiprackTipstate(true), A1: false})
     expect(result).toEqual('B1')
   })
 
   test('missing A1 and B1, go to C1', () => {
-    const result = _getNextTip(1, {...getTiprackTipstate(pipetteTip300uL), A1: false, B1: false})
+    const result = _getNextTip(1, {...getTiprackTipstate(true), A1: false, B1: false})
     expect(result).toEqual('C1')
   })
 
   test('missing first column, go to A2', () => {
     const result = _getNextTip(1, {
-      ...getTiprackTipstate(pipetteTip300uL),
+      ...getTiprackTipstate(true),
       ...getTipColumn(1, false),
     })
     expect(result).toEqual('A2')
@@ -110,7 +108,7 @@ describe('_getNextTip', () => {
 
   test('missing a few random tips, go to lowest col, then lowest row', () => {
     const result = _getNextTip(1, {
-      ...getTiprackTipstate(pipetteTip300uL),
+      ...getTiprackTipstate(true),
       ...getTipColumn(1, false),
       ...getTipColumn(2, false),
       D2: true,
@@ -129,7 +127,7 @@ describe('getNextTiprack - single-channel', () => {
       labware: {
         tiprack2Id: {
           slot: '2',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 2',
         },
         sourcePlateId: {
@@ -151,7 +149,7 @@ describe('getNextTiprack - single-channel', () => {
       tipState: {
         tipracks: {
           tiprack2Id: {
-            ...getTiprackTipstate(pipetteTip300uL),
+            ...getTiprackTipstate(true),
             A1: false,
           },
         },
@@ -214,12 +212,12 @@ describe('getNextTiprack - single-channel', () => {
       labware: {
         tiprack2Id: {
           slot: '2',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 2',
         },
         tiprack11Id: {
           slot: '11',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 11',
         },
         sourcePlateId: {
@@ -241,10 +239,10 @@ describe('getNextTiprack - single-channel', () => {
       tipState: {
         tipracks: {
           tiprack2Id: {
-            ...getTiprackTipstate(pipetteTip300uL),
+            ...getTiprackTipstate(true),
           },
           tiprack11Id: {
-            ...getTiprackTipstate(pipetteTip300uL),
+            ...getTiprackTipstate(true),
           },
         },
         pipettes: {
@@ -269,12 +267,12 @@ describe('getNextTiprack - single-channel', () => {
       labware: {
         tiprack2Id: {
           slot: '2',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 2',
         },
         tiprack11Id: {
           slot: '11',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 11',
         },
         sourcePlateId: {
@@ -296,11 +294,11 @@ describe('getNextTiprack - single-channel', () => {
       tipState: {
         tipracks: {
           tiprack2Id: {
-            ...getTiprackTipstate(pipetteTip300uL),
+            ...getTiprackTipstate(true),
             A1: false,
           },
           tiprack11Id: {
-            ...getTiprackTipstate(pipetteTip300uL),
+            ...getTiprackTipstate(true),
             A1: false,
           },
         },
@@ -326,12 +324,12 @@ describe('getNextTiprack - single-channel', () => {
       labware: {
         tiprack2Id: {
           slot: '2',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 2',
         },
         tiprack11Id: {
           slot: '11',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 11',
         },
         sourcePlateId: {
@@ -382,7 +380,7 @@ describe('getNextTiprack - 8-channel', () => {
       labware: {
         tiprack2Id: {
           slot: '2',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 2',
         },
         sourcePlateId: {
@@ -403,7 +401,7 @@ describe('getNextTiprack - 8-channel', () => {
       },
       tipState: {
         tipracks: {
-          tiprack2Id: {...getTiprackTipstate(pipetteTip300uL)},
+          tiprack2Id: {...getTiprackTipstate(true)},
         },
         pipettes: {
           p300SingleId: false,
@@ -427,7 +425,7 @@ describe('getNextTiprack - 8-channel', () => {
       labware: {
         tiprack2Id: {
           slot: '2',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 2',
         },
         sourcePlateId: {
@@ -449,7 +447,7 @@ describe('getNextTiprack - 8-channel', () => {
       tipState: {
         tipracks: {
           tiprack2Id: {
-            ...getTiprackTipstate(pipetteTip300uL),
+            ...getTiprackTipstate(true),
             A1: false,
             A2: false,
             A5: false,
@@ -513,7 +511,7 @@ describe('getNextTiprack - 8-channel', () => {
       labware: {
         tiprack2Id: {
           slot: '2',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 2',
         },
         sourcePlateId: {
@@ -535,7 +533,7 @@ describe('getNextTiprack - 8-channel', () => {
       tipState: {
         tipracks: {
           tiprack2Id: {
-            ...getTiprackTipstate(pipetteTip300uL),
+            ...getTiprackTipstate(true),
             F1: false,
             B2: false,
             C3: false,
@@ -571,17 +569,17 @@ describe('getNextTiprack - 8-channel', () => {
       labware: {
         tiprack2Id: {
           slot: '2',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 2',
         },
         tiprack3Id: {
           slot: '3',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 3',
         },
         tiprack10Id: {
           slot: '10',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 10',
         },
         sourcePlateId: {
@@ -603,13 +601,13 @@ describe('getNextTiprack - 8-channel', () => {
       tipState: {
         tipracks: {
           tiprack2Id: {
-            ...getTiprackTipstate(pipetteTip300uL),
+            ...getTiprackTipstate(true),
           },
           tiprack3Id: {
-            ...getTiprackTipstate(pipetteTip300uL),
+            ...getTiprackTipstate(true),
           },
           tiprack10Id: {
-            ...getTiprackTipstate(pipetteTip300uL),
+            ...getTiprackTipstate(true),
           },
         },
         pipettes: {
@@ -634,17 +632,17 @@ describe('getNextTiprack - 8-channel', () => {
       labware: {
         tiprack2Id: {
           slot: '2',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 2',
         },
         tiprack3Id: {
           slot: '3',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 3',
         },
         tiprack10Id: {
           slot: '10',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 10',
         },
         sourcePlateId: {
@@ -666,7 +664,7 @@ describe('getNextTiprack - 8-channel', () => {
       tipState: {
         tipracks: {
           tiprack2Id: {
-            ...getTiprackTipstate(pipetteTip300uL),
+            ...getTiprackTipstate(true),
             // empty diagonal, 8-channel cannot use
             F1: false,
             B2: false,
@@ -682,7 +680,7 @@ describe('getNextTiprack - 8-channel', () => {
             F12: false,
           },
           tiprack3Id: {
-            ...getTiprackTipstate(pipetteTip300uL),
+            ...getTiprackTipstate(true),
             // empty row, 8-channel cannot use
             A1: false,
             A2: false,
@@ -698,7 +696,7 @@ describe('getNextTiprack - 8-channel', () => {
             A12: false,
           },
           tiprack10Id: {
-            ...getTiprackTipstate(pipetteTip300uL),
+            ...getTiprackTipstate(true),
             A1: false,
           },
         },
@@ -724,17 +722,17 @@ describe('getNextTiprack - 8-channel', () => {
       labware: {
         tiprack2Id: {
           slot: '2',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 2',
         },
         tiprack3Id: {
           slot: '3',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 3',
         },
         tiprack10Id: {
           slot: '10',
-          type: 'opentrons-tiprack-300uL',
+          type: 'opentrons-tiprack-300ul',
           name: 'Tip rack 10',
         },
         sourcePlateId: {
@@ -756,7 +754,7 @@ describe('getNextTiprack - 8-channel', () => {
       tipState: {
         tipracks: {
           tiprack2Id: {
-            ...getTiprackTipstate(pipetteTip300uL),
+            ...getTiprackTipstate(true),
             F1: false,
             B2: false,
             C3: false,
@@ -771,7 +769,7 @@ describe('getNextTiprack - 8-channel', () => {
             F12: false,
           },
           tiprack3Id: {
-            ...getTiprackTipstate(pipetteTip300uL),
+            ...getTiprackTipstate(true),
             A1: false,
             A2: false,
             A3: false,
@@ -786,7 +784,7 @@ describe('getNextTiprack - 8-channel', () => {
             A12: false,
           },
           tiprack10Id: {
-            ...getTiprackTipstate(pipetteTip300uL),
+            ...getTiprackTipstate(true),
             A1: false,
             A2: false,
             A3: false,
@@ -817,7 +815,7 @@ describe('getNextTiprack - 8-channel', () => {
 describe('tiprackIsAvailableToPipette', () => {
   let pipette
   let tiprack
-  const tiprackModel = 'opentrons-tiprack-300uL'
+  const tiprackModel = 'opentrons-tiprack-300ul'
   const pipetteId = 'pipetteId'
 
   beforeEach(() => {

@@ -1,6 +1,5 @@
 // @flow
 import cloneDeep from 'lodash/cloneDeep'
-import {getTiprackVolumeByLabwareId} from './robotStateSelectors'
 import {dropTip, getNextTiprack, tiprackWellNamesByCol} from './'
 import {insufficientTips} from './errorCreators'
 import type {RobotState, CommandCreator} from './types'
@@ -45,9 +44,8 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
     },
   ]
 
-  // pipette now has tip. Remember tip max volume in tipState.pipettes.
-  const tipMaxVolume = getTiprackVolumeByLabwareId(nextTiprack.tiprackId, robotState) || 0
-  robotState.tipState.pipettes[pipetteId] = {tipMaxVolume}
+  // pipette now has tip
+  robotState.tipState.pipettes[pipetteId] = true
 
   // update tiprack-to-pipette assignment
   robotState.tiprackAssignment = {

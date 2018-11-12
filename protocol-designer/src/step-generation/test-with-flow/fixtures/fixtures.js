@@ -1,5 +1,4 @@
 // @flow
-import assert from 'assert'
 import {getLabware} from '@opentrons/shared-data'
 import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
@@ -84,6 +83,7 @@ export const p300Single = {
   id: 'p300SingleId',
   mount: 'right',
   model: 'p300_single_v1',
+  tiprackModel: 'opentrons-tiprack-300ul',
   maxVolume: 300,
   channels: 1,
 }
@@ -92,6 +92,7 @@ export const p300Multi = {
   id: 'p300MultiId',
   mount: 'left',
   model: 'p300_multi_v1',
+  tiprackModel: 'opentrons-tiprack-300ul',
   maxVolume: 300,
   channels: 8,
 }
@@ -146,7 +147,7 @@ type CreateRobotArgs = {
   sourcePlateType: string,
   destPlateType?: string,
   tipracks: Array<10 | 200 | 300 | 1000>,
-  fillPipetteTips?: number,
+  fillPipetteTips: boolean,
   fillTiprackTips?: boolean,
 }
 /** RobotState with empty liquid state */
@@ -180,8 +181,6 @@ function getTiprackType (volume: number): string {
 
 /** RobotState without liquidState key, for use with jest's `toMatchObject` */
 export function createRobotStateFixture (args: CreateRobotArgs): RobotStateNoLiquidState {
-  assert(args.fillPipetteTips === false || typeof args.fillPipetteTips === 'number',
-    `fillPipetteTips should be false, or a number. Got ${String(args.fillTiprackTips)}`)
   function _getTiprackSlot (tiprackIndex: number, occupiedSlots: Array<string>): string {
     const slot = (tiprackIndex + 1).toString()
     if (occupiedSlots.includes(slot)) {
@@ -246,12 +245,8 @@ export function createRobotStateFixture (args: CreateRobotArgs): RobotStateNoLiq
         [tiprackId]: getTiprackTipstate(args.fillTiprackTips),
       }), {}),
       pipettes: {
-        p300SingleId: args.fillPipetteTips
-          ? {tipMaxVolume: args.fillPipetteTips}
-          : false,
-        p300MultiId: args.fillPipetteTips
-          ? {tipMaxVolume: args.fillPipetteTips}
-          : false,
+        p300SingleId: args.fillPipetteTips,
+        p300MultiId: args.fillPipetteTips,
       },
     },
   }

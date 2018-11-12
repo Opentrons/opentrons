@@ -10,7 +10,7 @@ const dispense = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState
   const actionName = 'dispense'
   let errors: Array<CommandCreatorError> = []
 
-  if (prevRobotState.tipState.pipettes[pipette] === false) {
+  if (!prevRobotState.tipState.pipettes[pipette]) {
     errors.push(errorCreators.noTipOnPipette({actionName, pipette, labware, well}))
   }
 

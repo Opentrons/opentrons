@@ -46,12 +46,7 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
     dispenseOffsetFromBottomMm,
   } = data
 
-  // TODO error on negative data.disposalVolume?
-  const disposalVolume = (data.disposalVolume && data.disposalVolume > 0)
-    ? data.disposalVolume
-    : 0
-
-  const effectiveTransferVol = getPipetteWithTipMaxVol(data.pipette, prevRobotState) - disposalVolume
+  const effectiveTransferVol = getPipetteWithTipMaxVol(data.pipette, prevRobotState)
 
   const chunksPerSubTransfer = Math.ceil(
     data.volume / effectiveTransferVol
@@ -72,7 +67,6 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
       return flatMap(
         subTransferVolumes,
         (subTransferVol: number, chunkIdx: number): Array<CommandCreator> => {
-          // TODO IMMEDIATELY disposal vol ^^^
           const tipCommands: Array<CommandCreator> = (
             (data.changeTip === 'once' && pairIdx === 0 && chunkIdx === 0) ||
             data.changeTip === 'always')

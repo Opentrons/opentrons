@@ -140,7 +140,7 @@ export type PipetteData = {| // TODO refactor all 'pipette fields', split Pipett
   model: string, // TODO Ian 2018-11-05 rename 'model' to 'name' when breaking change is made in JSON protocols
   maxVolume: number,
   channels: Channels,
-  tiprackModel?: string, // NOTE: this will go away when tiprack sharing is implemented
+  tiprackModel: string, // NOTE: this will go away when tiprack choice-per-step and/or tiprack sharing is implemented
 |}
 
 export type LabwareData = {|
@@ -161,8 +161,6 @@ export type SingleLabwareLiquidState = {[well: string]: LocationLiquidState}
 export type LabwareLiquidState = {[labwareId: string]: SingleLabwareLiquidState}
 
 export type SourceAndDest = {|source: LocationLiquidState, dest: LocationLiquidState|}
-
-export type PipetteTip = {tipMaxVolume: number} | false // false if no tip in rack
 
 // TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": RobotSimulationState?
 export type RobotState = {|
@@ -185,7 +183,7 @@ export type RobotState = {|
       },
     },
     pipettes: {
-      [pipetteId: string]: PipetteTip,
+      [pipetteId: string]: boolean, // true if pipette has tip(s)
     },
   },
   liquidState: {

@@ -1,4 +1,5 @@
 // @flow
+import {expectTimelineError} from './testMatchers'
 import _aspirate from '../aspirate'
 import {
   createRobotStateFixture,
@@ -39,7 +40,7 @@ describe('aspirate', () => {
     robotStateWithTip = createRobotState({
       sourcePlateType: 'trough-12row',
       destPlateType: '96-flat',
-      fillPipetteTips: 300,
+      fillPipetteTips: true,
       fillTiprackTips: true,
       tipracks: [300, 300],
     })
@@ -49,7 +50,7 @@ describe('aspirate', () => {
   const robotStateWithTipNoLiquidState = createRobotStateFixture({
     sourcePlateType: 'trough-12row',
     destPlateType: '96-flat',
-    fillPipetteTips: 300,
+    fillPipetteTips: true,
     fillTiprackTips: 300,
     tipracks: [300, 300],
   })
@@ -76,7 +77,7 @@ describe('aspirate', () => {
   })
 
   test('aspirate with volume > tip max volume should throw error', () => {
-    robotStateWithTip.tipState.pipettes['p300SingleId'].tipMaxVolume = 200
+    robotStateWithTip.instruments['p300SingleId'].tiprackModel = 'tiprack-200ul'
     const result = aspirateWithErrors({
       pipette: 'p300SingleId',
       volume: 201,
@@ -91,7 +92,8 @@ describe('aspirate', () => {
   })
 
   test('aspirate with volume > pipette max volume should throw error', () => {
-    robotStateWithTip.tipState.pipettes['p300SingleId'].tipMaxVolume = 9999
+    // NOTE: assigning p300 to a 1000uL tiprack is nonsense, just for this test
+    robotStateWithTip.instruments['p300SingleId'].tiprackModel = 'tiprack-1000ul'
     const result = aspirateWithErrors({
       pipette: 'p300SingleId',
       volume: 301,
@@ -105,7 +107,7 @@ describe('aspirate', () => {
     })
   })
 
-  test('aspirate with invalid pipette ID should throw error', () => {
+  test('aspirate with invalid pipette ID should return error', () => {
     const result = aspirateWithErrors({
       pipette: 'badPipette',
       volume: 50,
@@ -113,10 +115,7 @@ describe('aspirate', () => {
       well: 'A1',
     })(robotStateWithTip)
 
-    expect(result.errors).toHaveLength(1)
-    expect(result.errors[0]).toMatchObject({
-      type: 'PIPETTE_DOES_NOT_EXIST',
-    })
+    expectTimelineError(result.errors, 'PIPETTE_DOES_NOT_EXIST')
   })
 
   test('aspirate with no tip should return error', () => {

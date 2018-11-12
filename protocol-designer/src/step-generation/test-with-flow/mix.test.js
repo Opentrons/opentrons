@@ -17,8 +17,8 @@ beforeEach(() => {
   robotInitialState = createRobotState({
     sourcePlateType: '96-flat',
     destPlateType: '96-flat',
-    tipracks: [200],
-    fillPipetteTips: 200,
+    tipracks: [300],
+    fillPipetteTips: true,
     fillTiprackTips: true,
   })
 

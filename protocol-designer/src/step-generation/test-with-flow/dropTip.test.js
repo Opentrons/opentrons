@@ -19,7 +19,7 @@ describe('dropTip', () => {
       destPlateType: '96-flat',
       fillTiprackTips: true,
       fillPipetteTips: false,
-      tipracks: [200, 200],
+      tipracks: [300, 300],
     })
 
     robotStateWithTip = {
@@ -45,7 +45,7 @@ describe('dropTip', () => {
       createRobotState({
         sourcePlateType: 'trough-12row',
         destPlateType: '96-flat',
-        tipracks: [200, 200],
+        tipracks: [300, 300],
         fillPipetteTips: false,
         fillTiprackTips: true,
       }),

@@ -23,9 +23,7 @@ const p300MultiId = 'p300MultiId'
 describe('replaceTip', () => {
   let labwareTypes1
   let robotInitialState
-  let tip200uL
   beforeEach(() => {
-    tip200uL = {tipMaxVolume: 200}
     labwareTypes1 = {
       sourcePlateType: 'trough-12row',
       destPlateType: '96-flat',
@@ -35,7 +33,7 @@ describe('replaceTip', () => {
       ...labwareTypes1,
       fillTiprackTips: true,
       fillPipetteTips: false,
-      tipracks: [200, 200],
+      tipracks: [300, 300],
     })
 
     // $FlowFixMe: mock methods
@@ -63,7 +61,7 @@ describe('replaceTip', () => {
               },
             },
             pipettes: {
-              p300SingleId: tip200uL,
+              p300SingleId: true,
             },
           },
         }
@@ -104,7 +102,7 @@ describe('replaceTip', () => {
               },
             },
             pipettes: {
-              p300SingleId: tip200uL,
+              p300SingleId: true,
             },
           },
         }
@@ -144,7 +142,7 @@ describe('replaceTip', () => {
               },
             },
             pipettes: {
-              p300SingleId: tip200uL,
+              p300SingleId: true,
             },
           },
         }
@@ -163,7 +161,7 @@ describe('replaceTip', () => {
               },
             },
             pipettes: {
-              p300SingleId: tip200uL,
+              p300SingleId: true,
             },
           },
         }
@@ -224,7 +222,7 @@ describe('replaceTip', () => {
               },
             },
             pipettes: {
-              p300SingleId: tip200uL,
+              p300SingleId: true,
             },
           },
         }
@@ -249,7 +247,7 @@ describe('replaceTip', () => {
               [tiprack1Id]: getTipColumn(1, false),
             },
             pipettes: {
-              p300MultiId: tip200uL,
+              p300MultiId: true,
             },
           },
         }
@@ -294,7 +292,7 @@ describe('replaceTip', () => {
               },
             },
             pipettes: {
-              p300MultiId: tip200uL,
+              p300MultiId: true,
             },
           },
         }
@@ -307,7 +305,7 @@ describe('replaceTip', () => {
         tipState: {
           ...robotInitialState.tipState,
           pipettes: {
-            p300MultiId: tip200uL,
+            p300MultiId: true,
           },
         },
       }
@@ -330,7 +328,7 @@ describe('replaceTip', () => {
               [tiprack2Id]: getTiprackTipstate(true),
             },
             pipettes: {
-              p300MultiId: tip200uL,
+              p300MultiId: true,
             },
           },
         }
