@@ -50,3 +50,15 @@ export function tipVolumeExceeded (args: {
     type: 'TIP_VOLUME_EXCEEDED',
   }
 }
+
+export function pipetteVolumeExceeded (args: {
+  actionName: string,
+  volume: string | number,
+  maxVolume: string | number,
+}): CommandCreatorError {
+  const {actionName, volume, maxVolume} = args
+  return {
+    message: `Attempted to ${actionName} volume greater than pipette max volume (${volume} > ${maxVolume})`,
+    type: 'PIPETTE_VOLUME_EXCEEDED',
+  }
+}

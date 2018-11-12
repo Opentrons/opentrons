@@ -75,7 +75,23 @@ describe('aspirate', () => {
     expect(result.robotState).toMatchObject(robotStateWithTipNoLiquidState)
   })
 
-  test('aspirate with volume > pipette tip vol should throw error', () => {
+  test('aspirate with volume > tip max volume should throw error', () => {
+    robotStateWithTip.tipState.pipettes['p300SingleId'].tipMaxVolume = 200
+    const result = aspirateWithErrors({
+      pipette: 'p300SingleId',
+      volume: 201,
+      labware: 'sourcePlateId',
+      well: 'A1',
+    })(robotStateWithTip)
+
+    expect(result.errors).toHaveLength(1)
+    expect(result.errors[0]).toMatchObject({
+      type: 'TIP_VOLUME_EXCEEDED',
+    })
+  })
+
+  test('aspirate with volume > pipette max volume should throw error', () => {
+    robotStateWithTip.tipState.pipettes['p300SingleId'].tipMaxVolume = 9999
     const result = aspirateWithErrors({
       pipette: 'p300SingleId',
       volume: 301,
@@ -85,7 +101,7 @@ describe('aspirate', () => {
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
-      type: 'TIP_VOLUME_EXCEEDED',
+      type: 'PIPETTE_VOLUME_EXCEEDED',
     })
   })
 

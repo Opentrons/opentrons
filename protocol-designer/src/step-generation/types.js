@@ -254,6 +254,7 @@ export type ErrorType =
   | 'LABWARE_DOES_NOT_EXIST'
   | 'PIPETTE_DOES_NOT_EXIST'
   | 'NO_TIP_ON_PIPETTE'
+  | 'PIPETTE_VOLUME_EXCEEDED'
   | 'TIP_VOLUME_EXCEEDED'
 
 export type CommandCreatorError = {|

@@ -5,6 +5,7 @@ import {FIXED_TRASH_ID} from '../constants'
 import {aspirate, dispense, blowout, replaceTip, touchTip} from './'
 import {mixUtil} from './mix'
 import * as errorCreators from './errorCreators'
+import {getPipetteWithTipMaxVol} from './robotStateSelectors'
 import type {ConsolidateFormData, RobotState, CommandCreator, CompoundCommandCreator} from './'
 
 const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prevRobotState: RobotState) => {
@@ -45,7 +46,7 @@ const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prev
     : 0
 
   const maxWellsPerChunk = Math.floor(
-    (pipetteData.maxVolume - disposalVolume) / data.volume
+    (getPipetteWithTipMaxVol(data.pipette, prevRobotState) - disposalVolume) / data.volume
   )
 
   const commandCreators = flatMap(

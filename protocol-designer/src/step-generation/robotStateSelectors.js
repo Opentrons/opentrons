@@ -41,6 +41,17 @@ export function getTiprackVolumeByLabwareId (labwareId: string, robotState: Robo
   return tipMaxVolume
 }
 
+export function getPipetteWithTipMaxVol (pipetteId: string, robotState: RobotState): number {
+  const pipetteTipstate = robotState.tipState.pipettes[pipetteId]
+  assert(pipetteTipstate, `expected pipette ${pipetteId} to be in tipState.pipettes`)
+
+  const tipMaxVolume = (pipetteTipstate && pipetteTipstate.tipMaxVolume) || 0
+  assert(tipMaxVolume > 0, `expected tipMaxVolume of pipette ${pipetteId} to be > 0`)
+
+  const pipetteData = robotState.instruments[pipetteId]
+  return Math.min(tipMaxVolume, pipetteData.maxVolume)
+}
+
 export function getLabwareType (labwareId: string, robotState: RobotState): ?string {
   const labware = robotState.labware[labwareId]
 

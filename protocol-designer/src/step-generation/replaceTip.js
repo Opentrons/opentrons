@@ -45,7 +45,7 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
     },
   ]
 
-  // pipette now has tip
+  // pipette now has tip. Remember tip max volume in tipState.pipettes.
   const tipMaxVolume = getTiprackVolumeByLabwareId(nextTiprack.tiprackId, robotState) || 0
   robotState.tipState.pipettes[pipetteId] = {tipMaxVolume}
 
