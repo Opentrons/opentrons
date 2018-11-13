@@ -37,6 +37,9 @@ export const editPipettes = (payload: EditPipettesFields) =>
       {}
     )
 
+    // NOTE: this clears out currently selected step form so that we're only updating savedForms
+    dispatch(steplistActions.cancelStepForm())
+
     each(nextPipettesByMount, (nextPipette, mount) => {
       const prevPipette = prevPipettesByMount[mount]
       if ((prevPipette && prevPipette.id) !== (nextPipette && nextPipette.id)) {
