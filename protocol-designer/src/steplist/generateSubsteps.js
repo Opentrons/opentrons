@@ -25,6 +25,7 @@ import {
   mix,
 } from '../step-generation'
 
+import type {StepIdType} from '../form-types'
 import type {RobotState} from '../step-generation'
 
 import type {
@@ -46,7 +47,7 @@ function transferLikeSubsteps (args: {
   allPipetteData: AllPipetteData,
   getLabwareType: GetLabwareType,
   robotState: RobotState,
-  stepId: number,
+  stepId: StepIdType,
 }): ?SourceDestSubstepItem {
   const {
     stepArgs,
@@ -222,7 +223,7 @@ export function generateSubsteps (
   allPipetteData: AllPipetteData,
   getLabwareType: GetLabwareType,
   robotState: ?RobotState,
-  stepId: number // stepId is used only for substeps to reference parent step
+  stepId: string
 ): ?SubstepItemData {
   if (!robotState) {
     console.info(`No robot state, could not generate substeps for step ${stepId}.` +

@@ -12,8 +12,9 @@ import type {LoadFileAction} from '../load-file'
 import type {CommandCreatorWarning} from '../step-generation'
 import type {FormWarning} from '../steplist'
 import type {DeleteStepAction} from '../steplist/actions'
+import type {StepIdType} from '../form-types'
 
-export type DismissedWarningsAllSteps<WarningType> = {[stepId: number]: ?Array<WarningType>}
+export type DismissedWarningsAllSteps<WarningType> = {[stepId: StepIdType]: ?Array<WarningType>}
 export type DismissedWarningState = {
   form: DismissedWarningsAllSteps<FormWarning>,
   timeline: DismissedWarningsAllSteps<CommandCreatorWarning>,
@@ -62,7 +63,7 @@ const dismissedWarnings = handleActions({
   },
   DELETE_STEP: (state: DismissedWarningState, action: DeleteStepAction): DismissedWarningState => {
     // remove key for deleted step
-    const stepId = action.payload.toString(10)
+    const stepId = action.payload
     return {
       form: omit(state.form, stepId),
       timeline: omit(state.timeline, stepId),

@@ -8,6 +8,7 @@ import {
 import {selectors as steplistSelectors} from '../../steplist'
 import {selectors as fileDataSelectors} from '../../file-data'
 import type {BaseState} from '../../types'
+import type {StepIdType} from '../../form-types'
 import type {
   CommandCreatorError,
   CommandCreatorWarning,
@@ -18,7 +19,7 @@ import type {AlertLevel} from './types'
 type SP = {
   errors: Array<CommandCreatorError>,
   warnings: Array<CommandCreatorWarning>,
-  _stepId: ?number,
+  _stepId: ?StepIdType,
 }
 
 type MP = {

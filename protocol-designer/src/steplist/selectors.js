@@ -3,7 +3,6 @@ import {createSelector} from 'reselect'
 import last from 'lodash/last'
 import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
-import max from 'lodash/max'
 import isEmpty from 'lodash/isEmpty'
 import each from 'lodash/each'
 import some from 'lodash/some'
@@ -254,7 +253,7 @@ const hoveredStepLabware: Selector<Array<string>> = createSelector(
   getHoveredStepId,
   (allStepArgsAndErrors, hoveredStep) => {
     const blank = []
-    if (typeof hoveredStep !== 'number' || !allStepArgsAndErrors[hoveredStep]) {
+    if (!hoveredStep || !allStepArgsAndErrors[hoveredStep]) {
       return blank
     }
 
@@ -294,16 +293,6 @@ const hoveredStepLabware: Selector<Array<string>> = createSelector(
 const stepCreationButtonExpandedSelector: Selector<boolean> = createSelector(
   rootSelector,
   (state: RootState) => state.stepCreationButtonExpanded
-)
-
-const nextStepId: Selector<number> = createSelector( // generates the next step ID to use
-  getSteps,
-  (steps): number => {
-    const allStepIds = Object.keys(steps).map(stepId => parseInt(stepId))
-    return allStepIds.length === 0
-      ? 0
-      : max(allStepIds) + 1
-  }
 )
 
 const formLevelWarnings: Selector<Array<FormWarning>> = createSelector(
@@ -414,7 +403,6 @@ export default {
   getHydratedUnsavedForm,
   formData, // TODO: remove after sunset
   formModalData,
-  nextStepId,
   getArgsAndErrorsByStepId,
   isNewStepForm,
   formLevelWarnings,
