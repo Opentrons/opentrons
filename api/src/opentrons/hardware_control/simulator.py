@@ -39,6 +39,7 @@ class Simulator:
                                   for idx, mod
                                   in enumerate(attached_modules)]
         self._position = copy.copy(_HOME_POSITION)
+        self._lights = {'button': False, 'rails': False}
 
     def move(self, target_position: Dict[str, float],
              home_flagged_axes: bool = True, speed: float = None):
@@ -131,3 +132,16 @@ class Simulator:
         """ The (minimum, maximum) bounds for each axis. """
         return {ax: (0, pos) for ax, pos in _HOME_POSITION.items()
                 if ax not in 'BC'}
+
+    def set_lights(self, button: Optional[bool], rails: Optional[bool]):
+        if button is not None:
+            self._lights['button'] = button
+        if rails is not None:
+            self._lights['rails'] = rails
+
+    def get_lights(self) -> Dict[str, bool]:
+        return self._lights
+
+    async def identify(self):
+        pass
+

@@ -5,6 +5,7 @@ import threading
 from typing import Any, Dict, List, Optional, Tuple
 from opentrons.util import environment
 from opentrons.drivers.smoothie_drivers import driver_3_0
+from opentrons.drivers.rpi_drivers import gpio
 from opentrons.config import robot_configs
 from opentrons.types import Mount
 from contextlib import contextmanager
@@ -178,3 +179,14 @@ class Controller:
         return {ax: (0, pos) for ax, pos
                 in self._smoothie_driver.homed_position.items()
                 if ax not in 'BC'}
+
+    def set_lights(self, button: Optional[bool], rails: Optional[bool]):
+        if button is not None:
+            gpio.set_button_light(blue=button)
+        if rails is not None:
+            gpio.set_rail_lights(rails)
+
+    def get_lights(self) -> Dict[str, bool]:
+        return {'button': gpio.get_button_light()[2],
+                'rails': gpio.get_rail_lights()}
+

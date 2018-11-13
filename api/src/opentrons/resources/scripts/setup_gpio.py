@@ -2,7 +2,6 @@
 from time import sleep
 
 from opentrons.drivers.rpi_drivers import gpio
-from opentrons import robot
 
 # set the direction of each gpio (in or out)
 gpio.initialize()
@@ -20,4 +19,4 @@ gpio.set_high(gpio.OUTPUT_PINS['RESET'])
 sleep(0.25)
 
 # turn light to blue
-robot.turn_on_button_light()
+gpio.turn_on_blue_button_light()

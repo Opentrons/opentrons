@@ -282,6 +282,12 @@ class Robot(object):
     def get_rail_lights_on(self):
         return self._driver.get_rail_lights_on()
 
+    def get_lights(self):
+        return self._driver.get_lights()
+
+    def set_lights(self, button=None, rails=None):
+        self._driver.set_lights(button=button, rails=rails)
+
     def identify(self, seconds):
         """
         Identify a robot by flashing the light around the frame button for 10s

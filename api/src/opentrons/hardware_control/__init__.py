@@ -141,24 +141,40 @@ class API:
 
     # Incidentals (i.e. not motion) API
     @_log_call
-    async def turn_on_button_light(self):
-        pass
+    def set_lights(self, button: bool = None, rails: bool = None):
+        """ Control the robot lights.
+
+        :param button: If specified, turn the button light on (`True`) or
+                       off (`False`). If not specified, do not change the
+                       button light.
+        :param rails: If specified, turn the rail lights on (`True`) or
+                      off (`False`). If not specified, do not change the
+                      rail lights.
+        """
+        self._backend.set_lights(button, rails)
 
     @_log_call
-    async def turn_off_button_light(self):
-        pass
+    def get_lights(self) -> Dict[str, bool]:
+        """ Return the current status of the robot lights.
+
+        :returns: A dict of the lights: `{'button': bool, 'rails': bool}`
+        """
+        return self._backend.get_lights()
 
     @_log_call
-    async def turn_on_rail_lights(self):
-        pass
+    async def identify(self, duration_s: int):
+        """ Blink the button light to identify the robot.
 
-    @_log_call
-    async def turn_off_rail_lights(self):
-        pass
-
-    @_log_call
-    async def identify(self, seconds):
-        pass
+        :param int duration_s: The duration to blink for, in seconds.
+        """
+        count = duration_s * 4
+        on = True
+        for sec in range(count):
+            then = self._loop.time()
+            self.set_lights(button=on)
+            on = on ^ on
+            now = self._loop.time()
+            await asyncio.sleep(max(0, 0.25-(now-then)))
 
     @_log_call
     async def cache_instruments(self,
