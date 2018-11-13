@@ -57,7 +57,7 @@ deploy:
     # TODO(mc, 2018-03-26): use AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
     access_key_id: $(AWS_ACCESS_KEY)
     secret_access_key: $(AWS_SECRET_KEY)
-    bucket: $(OT_BUCKET_APP)
-    folder: $(OT_FOLDER_APP)
+    bucket: $(OT_APP_DEPLOY_BUCKET)
+    folder: $(OT_APP_DEPLOY_FOLDER)
     set_public: true
     artifact: App
