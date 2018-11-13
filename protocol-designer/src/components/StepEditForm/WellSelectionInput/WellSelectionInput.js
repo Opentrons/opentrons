@@ -52,7 +52,7 @@ class WellSelectionInput extends React.Component<Props> {
 
   getModalKey = () => {
     const {name, pipetteId, labwareId, stepId} = this.props
-    return `${stepId || 'noStepId'}${name}${pipetteId || 'noPipette'}${labwareId || 'noLabware'}`
+    return `${String(stepId)}${name}${pipetteId || 'noPipette'}${labwareId || 'noLabware'}`
   }
   render () {
     const modalKey = this.getModalKey()
