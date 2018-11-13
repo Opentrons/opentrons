@@ -98,7 +98,7 @@ test-js:
 
 # lints and typechecks
 .PHONY: lint
-lint: lint-py lint-js lint-css
+lint: lint-py lint-js lint-css check-js
 
 .PHONY: lint-py
 lint-py:
@@ -108,11 +108,14 @@ lint-py:
 .PHONY: lint-js
 lint-js:
 	eslint '.*.js' '**/*.js'
-	flow $(if $(CI),check,status)
 
 .PHONY: lint-css
 lint-css:
 	stylelint '**/*.css'
+
+.PHONY: check-js
+check-js:
+	flow $(if $(CI),check,status)
 
 # upload coverage reports
 .PHONY: coverage
