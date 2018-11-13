@@ -16,6 +16,7 @@ import i18n from '../../../localization'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+  DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
 import {Portal} from '../../portals/MainPageModalPortal'
 import modalStyles from '../../modals/modal.css'
@@ -23,6 +24,8 @@ import {actions} from '../../../steplist'
 import TipPositionZAxisViz from './TipPositionZAxisViz'
 
 import styles from './TipPositionInput.css'
+
+import type {TipOffsetFields} from '../../../form-types'
 
 const SMALL_STEP_MM = 1
 const LARGE_STEP_MM = 10
@@ -35,7 +38,8 @@ type OP = {
   wellHeightMM: number,
   isOpen: boolean,
   closeModal: () => mixed,
-  prefix: 'aspirate' | 'dispense',
+  defaultMm: number,
+  fieldName: TipOffsetFields,
 }
 
 type Props = OP & DP
@@ -58,13 +62,25 @@ class TipPositionModal extends React.Component<Props, State> {
   applyChanges = () => {
     this.props.updateValue(formatValue(this.state.value || 0))
   }
+  getDefaultMmFromBottom = (): number => {
+    const {fieldName, wellHeightMM} = this.props
+    switch (fieldName) {
+      case 'aspirate_mmFromBottom':
+        return DEFAULT_MM_FROM_BOTTOM_ASPIRATE
+      case 'dispense_mmFromBottom':
+        return DEFAULT_MM_FROM_BOTTOM_DISPENSE
+      case 'mix_mmFromBottom':
+        // TODO: Ian 2018-11-131 figure out what offset makes most sense for mix
+        return DEFAULT_MM_FROM_BOTTOM_DISPENSE
+      default:
+        // touch tip fields
+        return DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP + wellHeightMM
+    }
+  }
+
   handleReset = () => {
-    // NOTE: when `prefix` isn't set (eg in the Mix form), we'll use
-    // the value `DEFAULT_MM_FROM_BOTTOM_DISPENSE` (since we gotta pick something :/)
-    const defaultMm = this.props.prefix === 'aspirate'
-      ? DEFAULT_MM_FROM_BOTTOM_ASPIRATE
-      : DEFAULT_MM_FROM_BOTTOM_DISPENSE
-    this.setState({value: formatValue(defaultMm)}, this.applyChanges)
+    const defaultValue = this.getDefaultMmFromBottom()
+    this.setState({value: formatValue(defaultValue)}, this.applyChanges)
     this.props.closeModal()
   }
   handleCancel = () => {
@@ -174,14 +190,9 @@ class TipPositionModal extends React.Component<Props, State> {
 }
 
 const mapDTP = (dispatch: Dispatch, ownProps: OP): DP => {
-  // NOTE: not interpolating prefix because breaks flow string enum
-
-  let fieldName = 'mmFromBottom'
-  if (ownProps.prefix === 'aspirate') fieldName = 'aspirate_mmFromBottom'
-  else if (ownProps.prefix === 'dispense') fieldName = 'dispense_mmFromBottom'
   return {
     updateValue: (value) => {
-      dispatch(actions.changeFormInput({update: {[fieldName]: value}}))
+      dispatch(actions.changeFormInput({update: {[ownProps.fieldName]: value}}))
     },
   }
 }

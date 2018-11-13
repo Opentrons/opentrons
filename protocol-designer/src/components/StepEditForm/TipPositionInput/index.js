@@ -9,8 +9,21 @@ import {selectors} from '../../../steplist'
 import styles from './TipPositionInput.css'
 import TipPositionModal from './TipPositionModal'
 import type {BaseState} from '../../../types'
+import type {StepFieldName, TipOffsetFields} from '../../../form-types'
 
-type OP = {prefix?: 'aspirate' | 'dispense'}
+function getLabwareFieldForPositioningField (fieldName: TipOffsetFields): StepFieldName {
+  const fieldMap: {[TipOffsetFields]: StepFieldName} = {
+    aspirate_mmFromBottom: 'aspirate_labware',
+    dispense_mmFromBottom: 'dispense_labware',
+    mix_mmFromBottom: 'labware',
+    aspirate_touchTipMmFromBottom: 'aspirate_labware',
+    dispense_touchTipMmFromBottom: 'dispense_labware',
+    mix_touchTipMmFromBottom: 'labware',
+  }
+  return fieldMap[fieldName]
+}
+
+type OP = {fieldName: TipOffsetFields}
 type SP = {
   mmFromBottom: ?string,
   wellHeightMM: ?number,
@@ -39,7 +52,7 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
             hoverTooltipHandlers={hoverTooltipHandlers}
           >
             <TipPositionModal
-              prefix={this.props.prefix}
+              fieldName={this.props.fieldName}
               closeModal={this.handleClose}
               wellHeightMM={this.props.wellHeightMM}
               mmFromBottom={this.props.mmFromBottom}
@@ -55,16 +68,11 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
     )
   }
 }
+
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
   const formData = selectors.getUnsavedForm(state)
-  // NOTE: not interpolating prefix because breaks flow string enum
-  let fieldName = 'mmFromBottom'
-  if (ownProps.prefix === 'aspirate') fieldName = 'aspirate_mmFromBottom'
-  else if (ownProps.prefix === 'dispense') fieldName = 'dispense_mmFromBottom'
-
-  let labwareFieldName = 'labware'
-  if (ownProps.prefix === 'aspirate') labwareFieldName = 'aspirate_labware'
-  else if (ownProps.prefix === 'dispense') labwareFieldName = 'dispense_labware'
+  const {fieldName} = ownProps
+  const labwareFieldName = getLabwareFieldForPositioningField(ownProps.fieldName)
 
   let wellHeightMM = null
   if (formData && formData[labwareFieldName]) {

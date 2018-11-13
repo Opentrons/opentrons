@@ -8,7 +8,7 @@ import {selectors as steplistSelectors, actions as steplistActions} from '../../
 import styles from '../StepEditForm.css'
 
 import type {Dispatch} from 'redux'
-import type {StepFieldName} from '../../../steplist/fieldLevel'
+import type {StepFieldName} from '../../../form-types'
 import type {BaseState} from '../../../types'
 import type {StepIdType} from '../../../form-types'
 import type { FocusHandlers } from '../index'
