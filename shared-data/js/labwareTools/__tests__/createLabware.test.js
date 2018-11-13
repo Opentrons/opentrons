@@ -17,8 +17,8 @@ describe('createLabware', () => {
   beforeEach(() => {
     well1 = omit(exampleLabware1.wells.A1, ['x', 'y', 'z'])
     well2 = omit(exampleLabware2.wells.A1, ['x', 'y', 'z'])
-    const offset1 = {x: 10, y: 10, z: 5}
-    const offset2 = {x: 10, y: 10, z: 0}
+    const offset1 = {x: 10, y: 10, z: 55}
+    const offset2 = {x: 10, y: 10, z: 50}
     labware1 = createRegularLabware({
       metadata: exampleLabware1.metadata,
       parameters: exampleLabware1.parameters,
@@ -62,7 +62,7 @@ describe('createLabware', () => {
   test('well XYZ generates correctly', () => {
     const spacing = {row: 11.8, column: 12.1}
     const grid = {row: 8, column: 12}
-    const offset = {x: 10, y: 10, z: 5}
+    const offset = {x: 10, y: 10, z: 55}
     const labware3 = createRegularLabware({
       metadata: exampleLabware2.metadata,
       parameters: exampleLabware2.parameters,
@@ -80,7 +80,7 @@ describe('createLabware', () => {
         const well = labware3.wells[wellName]
         expect(well.x).toBeCloseTo(expectedXByCol[cIndex], 2)
         expect(well.y).toBeCloseTo(expectedYByRow[rIndex], 2)
-        expect(well.z).toBeCloseTo(exampleLabware2.dimensions.overallHeight + offset.z - well.depth, 2)
+        expect(well.z).toBeCloseTo(offset.z - well.depth, 2)
       })
     })
   })
