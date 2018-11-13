@@ -31,7 +31,7 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
   const volume = Number(hydratedFormData['volume'])
   const sourceLabware = hydratedFormData['aspirate_labware']
   const destLabware = hydratedFormData['dispense_labware']
-  const blowout = hydratedFormData['dispense_blowout_checkbox'] ? hydratedFormData['dispense_blowout_labware'] : null
+  const blowoutLabware = hydratedFormData['dispense_blowout_checkbox'] ? hydratedFormData['dispense_blowout_labware'] : null
 
   const aspirateOffsetFromBottomMm = Number(hydratedFormData['aspirate_mmFromBottom'])
   const dispenseOffsetFromBottomMm = Number(hydratedFormData['dispense_mmFromBottom'])
@@ -74,7 +74,7 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
 
-    blowout, // TODO allow user to blowout
+    blowout: blowoutLabware && blowoutLabware.id,
     changeTip,
     delayAfterDispense,
     mixInDestination,
@@ -160,7 +160,7 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
       const distributeStepArguments: DistributeFormData = {
         ...commonFields,
         disposalVolume,
-        disposalLabware,
+        disposalLabware: disposalLabware && disposalLabware.id,
         disposalWell,
         mixBeforeAspirate,
         sourceWell: sourceWells[0],
