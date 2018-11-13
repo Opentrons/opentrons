@@ -20,7 +20,7 @@ ui_dir := ../app
 discovery_client_dir := ../discovery-client
 
 # directories for robot API update bundled in production build
-api_dir := ../api
+api_dist_dir := ../api/dist
 
 # cross-platform noop command
 noop := cd .
@@ -74,7 +74,9 @@ lib:
 	$(babel)
 
 .PHONY: deps
+deps: wheel = $(wildcard $(api_dist_dir)/*.whl)
 deps:
+	$(if $(wheel),@echo "Packaging $(wheel)",$(error API wheel required))
 	$(MAKE) -C $(ui_dir)
 	$(MAKE) -C $(discovery_client_dir)
 
