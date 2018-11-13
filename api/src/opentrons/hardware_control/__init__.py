@@ -26,7 +26,7 @@ except ModuleNotFoundError:
     # implies windows
     Controller = None  # type: ignore
 from . import modules
-from .types import Axis
+from .types import Axis, HardwareAPILike
 
 
 mod_log = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ SHAKE_OFF_TIPS_DISTANCE = 2.25
 DROP_TIP_RELEASE_DISTANCE = 20
 
 
-class API:
+class API(HardwareAPILike):
     """ This API is the primary interface to the hardware controller.
 
     Because the hardware manager controls access to the system's hardware
@@ -93,22 +93,32 @@ class API:
         self._last_moved_mount: Optional[top_types.Mount] = None
 
     @classmethod
-    def build_hardware_controller(
+    async def build_hardware_controller(
             cls, config: robot_configs.robot_config = None,
             port: str = None,
-            loop: asyncio.AbstractEventLoop = None) -> 'API':
+            loop: asyncio.AbstractEventLoop = None,
+            force: bool = False) -> 'API':
         """ Build a hardware controller that will actually talk to hardware.
 
         This method should not be used outside of a real robot, and on a
         real robot only one true hardware controller may be active at one
         time.
+
+        :param config: A config to preload. If not specified, load the default.
+        :param port: A port to connect to. If not specified, the default port
+                     (found by scanning for connected FT232Rs).
+        :param loop: An event loop to use. If not specified, use the result of
+                     :py:meth:`asyncio.get_event_loop`.
+        :param force: If `True`, connect even if a lockfile is present. See
+                      :py:meth:`Controller.__init__`.
         """
         if None is Controller:
             raise RuntimeError(
                 'The hardware controller may only be instantiated on a robot')
-        backend = Controller(config, loop)
-        backend.connect(port)
-        return cls(backend, config=config, loop=loop)
+        checked_loop = loop or asyncio.get_event_loop()
+        backend = Controller(config, checked_loop, force=force)
+        await backend.connect(port)
+        return cls(backend, config=config, loop=checked_loop)
 
     @classmethod
     def build_hardware_simulator(
@@ -132,12 +142,29 @@ class API:
                              config, loop),
                    config=config, loop=loop)
 
+    @property
+    def loop(self) -> asyncio.AbstractEventLoop:
+        """ The event loop used by this instance. """
+        return self._loop
+
+    @property
+    def is_simulator(self) -> bool:
+        """ `True` if this is a simulator; `False` otherwise. """
+        return isinstance(self._backend, Simulator)
+
     # Query API
-    @_log_call
-    def get_connected_hardware(self):
-        """ Get the cached hardware connected to the robot.
+    @property
+    def fw_version(self) -> str:
+        """ Return the firmware version of the connected hardware.
+
+        The version is a string retrieved directly from the attached hardware
+        (or possibly simulator).
         """
-        pass
+        from_backend = self._backend.fw_version
+        if from_backend is None:
+            return 'unknown'
+        else:
+            return from_backend
 
     # Incidentals (i.e. not motion) API
     @_log_call
@@ -206,7 +233,8 @@ class API:
     def attached_instruments(self):
         configs = ['name', 'min_volume', 'max_volume', 'channels',
                    'aspirate_flow_rate', 'dispense_flow_rate',
-                   'pipette_id', 'current_volume', 'display_name']
+                   'pipette_id', 'current_volume', 'display_name',
+                   'tip_length']
         instruments = {top_types.Mount.LEFT: {},
                        top_types.Mount.RIGHT: {}}
         for mount in top_types.Mount:
@@ -219,25 +247,73 @@ class API:
         return instruments
 
     @_log_call
-    async def update_smoothie_firmware(self, firmware_file):
-        pass
+    async def update_firmware(
+            self,
+            firmware_file: str,
+            loop: asyncio.AbstractEventLoop = None,
+            explicit_modeset: bool = True) -> str:
+        """ Update the firmware on the Smoothie board.
+
+        :param firmware_file: The path to the firmware file.
+        :param explicit_modeset: `True` to force the smoothie into programming
+                                 mode; `False` to assume it is already in
+                                 programming mode.
+        :param loop: An asyncio event loop to use; if not specified, the one
+                     associated with this instance will be used.
+        :returns: The stdout of the tool used to update the smoothie
+        """
+        if None is loop:
+            checked_loop = self._loop
+        else:
+            checked_loop = loop
+        return await self._backend.update_firmware(firmware_file,
+                                                   checked_loop,
+                                                   explicit_modeset)
 
     # Global actions API
     @_log_call
-    async def pause(self):
-        pass
+    def pause(self):
+        """
+        Pause motion of the robot after a current motion concludes.
+
+        Individual calls to :py:meth:`move`
+        (which :py:meth:`aspirate` and :py:meth:`dispense` and other
+        calls may depend on) are considered atomic and will always complete if
+        they have been called prior to a call to this method. However,
+        subsequent calls to :py:meth:`move` that occur when the system
+        is paused will not proceed until the system is resumed with
+        :py:meth:`resume`.
+        """
+        self._backend.pause()
 
     @_log_call
-    async def resume(self):
-        pass
+    def resume(self):
+        """
+        Resume motion after a call to :py:meth:`pause`.
+        """
+        self._backend.resume()
 
     @_log_call
     async def halt(self):
-        pass
+        """ Immediately stop motion, reset, and home.
+
+        This will cancel motion (after the current call to :py:meth:`move`;
+        see :py:meth:`pause` for more detail), then home and reset the
+        robot.
+        """
+        self._backend.halt()
+        await self.reset()
+        await self.home()
 
     @_log_call
     async def reset(self):
-        pass
+        """ Reset the stored state of the system.
+
+        This will re-scan instruments and models, clearing any cached
+        information about their presence or state.
+        """
+        await self.cache_instruments()
+        await self.discover_modules()
 
     # Gantry/frame (i.e. not pipette) action API
     @_log_call
@@ -525,6 +601,15 @@ class API:
             raise
         else:
             self._current_position.update(target_position)
+
+    @property
+    def engaged_axes(self) -> Dict[Axis, bool]:
+        """ Which axes are engaged and holding. """
+        return {Axis[ax]: eng
+                for ax, eng in self._backend.engaged_axes().items()}
+
+    async def disengage_axes(self, which: List[Axis]):
+        self._backend.disengage_axes([ax.name for ax in which])
 
     @_log_call
     async def retract(self, mount: top_types.Mount, margin: float):

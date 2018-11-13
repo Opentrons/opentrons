@@ -1,6 +1,7 @@
 import asyncio
 import aiohttp
 import functools
+import inspect
 import json
 import logging
 import traceback
@@ -82,10 +83,13 @@ class RPCServer(object):
         _id = id(socket)
 
         def task_done(future):
-            exception = future.result()
-            if exception:
-                log.debug('Send task for socket {} result: {}'.format(
-                    _id, exception))
+            try:
+                result = future.result()
+            except Exception:
+                log.exception("send_task for socket {} threw:".format(_id))
+            else:
+                log.info('send_task for socket {} result: {}'.format(
+                    _id, result))
             log.debug('Send task for {} finished'.format(_id))
 
         async def send_task(socket, queue):
@@ -259,7 +263,18 @@ class RPCServer(object):
             log.exception('Error while processing request')
 
     def call_and_serialize(self, func, max_depth=0):
-        call_result = func()
+        try:
+            check = func.func
+        except AttributeError:
+            check = func
+        check_unwrapped = inspect.unwrap(check)
+        if asyncio.iscoroutinefunction(check_unwrapped):
+            # XXXX: This should really only be called in a new thread (as in
+            #       the normal case where it is called in a threadpool)
+            loop = asyncio.new_event_loop()
+            call_result = loop.run_until_complete(func())
+        else:
+            call_result = func()
         serialized, refs = serialize.get_object_tree(
             call_result, max_depth=max_depth)
         self.objects.update(refs)
@@ -273,14 +288,12 @@ class RPCServer(object):
             response['$']['status'] = 'success'
         except Exception as e:
             trace = traceback.format_exc()
-            log.exception('Exception while dispatching a method call:')
             try:
                 line_no = [
                     l.split(',')[0].strip()
                     for l in trace.split('line')
                     if '<module>' in l][0]
             except Exception:
-                log.exception("Exception while getting line number:")
                 line_no = 'unknown'
             finally:
                 response['$']['status'] = 'error'

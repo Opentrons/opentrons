@@ -15,7 +15,7 @@ from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as fflags
 from opentrons.config.robot_configs import load
-from opentrons.legacy_api import containers
+from opentrons.legacy_api import containers, modules
 from opentrons.legacy_api.containers import Container
 from .mover import Mover
 from opentrons.config import pipette_config
@@ -61,7 +61,7 @@ def _setup_container(container_name):
     return container
 
 
-class Robot(object):
+class Robot():
     """
     This class is the main interface to the robot.
 
@@ -989,3 +989,16 @@ class Robot(object):
             filename, checked_loop, explicit_modeset)
         self.fw_version = self._driver.get_fw_version()
         return msg
+
+    @property
+    def engaged_axes(self):
+        """ Which axes are engaged and holding. """
+        return self._driver.engaged_axes
+
+    async def disengage_axes(self, axes):
+        self._driver.disengage_axis(''.join(axes))
+
+    def discover_modules(self):
+        for module in self.modules:
+            module.disconnect()
+        self.modules = modules.discover_and_connect()

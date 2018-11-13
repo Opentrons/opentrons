@@ -3,6 +3,7 @@
 # from logging.config import dictConfig
 
 import asyncio
+import contextlib
 import os
 import re
 import shutil
@@ -159,62 +160,63 @@ def split_labware_def():
 # -----end feature flag fixtures-----------
 
 
-@pytest.fixture
-async def async_client(virtual_smoothie_env, loop, test_client):
-    app = init(loop)
-    cli = await loop.create_task(test_client(app))
-    endpoints.session = None
-    return cli
-
-
-@pytest.fixture
-def using_api2():
+@contextlib.contextmanager
+def using_api2(loop):
     oldenv = os.environ.get('OT_FF_useProtocolApi2')
     os.environ['OT_FF_useProtocolApi2'] = '1'
-    opentrons.reset_globals(2)
-    yield
-    if None is oldenv:
-        os.environ.pop('OT_FF_useProtocolApi2')
-    else:
-        os.environ['OT_FF_useProtocolApi2'] = oldenv
-    opentrons.reset_globals()
+    opentrons.reset_globals(version=2, loop=loop)
+    try:
+        yield opentrons.hardware
+    finally:
+        try:
+            loop.run_until_complete(opentrons.hardware.reset())
+        except RuntimeError:
+            loop.create_task(opentrons.hardware.reset())
+        if None is oldenv:
+            os.environ.pop('OT_FF_useProtocolApi2')
+        else:
+            os.environ['OT_FF_useProtocolApi2'] = oldenv
+        opentrons.reset_globals()
 
 
-@pytest.fixture
-def using_api1():
+@contextlib.contextmanager
+def using_api1(loop):
     oldenv = os.environ.get('OT_FF_useProtocolApi2')
-    os.environ['OT_FF_useProtocolApi2'] = '2'
-    opentrons.reset_globals(1)
-    yield
-    if None is oldenv:
+    if oldenv:
         os.environ.pop('OT_FF_useProtocolApi2')
-    else:
-        os.environ['OT_FF_useProtocolApi2'] = oldenv
-    opentrons.reset_globals()
+    opentrons.reset_globals(1)
+    try:
+        yield opentrons.hardware
+    finally:
+        opentrons.hardware.reset()
+        if None is not oldenv:
+            os.environ['OT_FF_useProtocolApi2'] = oldenv
+        opentrons.reset_globals()
 
 
 @pytest.fixture(params=[using_api1, using_api2])
-async def old_and_new_client(request, virtual_smoothie_env, loop, test_client):
-    version_setter = request.param()
-    next(version_setter)
-    app = init(loop)
-    cli = await loop.create_task(test_client(app))
-    endpoints.session = None
-    yield cli
-    try:
-        next(version_setter)
-    except StopIteration:
-        pass
+async def async_client(request, virtual_smoothie_env, loop, test_client):
+    for marker in request.node.iter_markers():
+        if marker.name == 'api1_only' and request.param != using_api1:
+            pytest.skip('requires api1 only')
+        elif marker.name == 'api2_only' and request.param != using_api2:
+            pytest.skip('requires api2 only')
+    with request.param(loop):
+        app = init(loop)
+        cli = await loop.create_task(test_client(app))
+        endpoints.session = None
+        yield cli
 
 
 @pytest.fixture
-def dc_session(virtual_smoothie_env, monkeypatch):
+def dc_session(virtual_smoothie_env, monkeypatch, loop):
     """
     Mock session manager for deck calibation
     """
-    ses = endpoints.SessionManager()
-    monkeypatch.setattr(endpoints, 'session', ses)
-    return ses
+    with using_api1(loop):
+        ses = endpoints.SessionManager()
+        monkeypatch.setattr(endpoints, 'session', ses)
+        yield ses
 
 
 @pytest.fixture
@@ -328,23 +330,26 @@ def virtual_smoothie_env(monkeypatch):
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
 
 
-@pytest.fixture
-def main_router(
-            loop,
-            virtual_smoothie_env,
-            monkeypatch
-        ):
-    from opentrons.api.routers import MainRouter
-    from opentrons import robot
+@pytest.fixture(params=[using_api1, using_api2])
+def hardware(request, loop, virtual_smoothie_env):
+    for marker in request.node.iter_markers():
+        if marker.name == 'api1_only' and request.param != using_api1:
+            pytest.skip('requires api1 only')
+        elif marker.name == 'api2_only' and request.param != using_api2:
+            pytest.skip('requires api2 only')
+    with request.param(loop) as hw:
+        yield hw
 
-    with MainRouter(loop=loop) as router:
+
+@pytest.fixture
+def main_router(loop, virtual_smoothie_env, hardware):
+    from opentrons.api.routers import MainRouter
+    with MainRouter(hardware, loop) as router:
         router.wait_until = partial(
             wait_until,
             notifications=router.notifications,
             loop=loop)
         yield router
-
-    robot.reset()
 
 
 async def wait_until(matcher, notifications, timeout=1, loop=None):
@@ -437,7 +442,7 @@ def running_on_pi():
                            '(probably windows)')
 @pytest.fixture
 def cntrlr_mock_connect(monkeypatch):
-    def mock_connect(obj, port=None):
+    async def mock_connect(obj, port=None):
         return
     monkeypatch.setattr(hc.Controller, 'connect', mock_connect)
 

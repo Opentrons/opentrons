@@ -5,12 +5,10 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 from opentrons.data_storage import database_migration  # noqa(E402)
 from opentrons.config import feature_flags as ff  # noqa(E402)
 import opentrons.hardware_control.adapters as adapters  # noqa(E402)
-from .protocol_api.back_compat import (robot as robotv2,  # noqa(E402)
-                                       reset as resetv2,
-                                       instruments as instrumentsv2,
-                                       containers as containersv2,
-                                       labware as labwarev2,
-                                       modules as modulesv2)
+from .protocol_api.back_compat import (build_globals as bcbuild,  # noqa(E402)
+                                       set_globals,
+                                       reset as resetv2)
+from .protocol_api.contexts import ProtocolContext  # noqa(E402)
 from .legacy_api.api import (robot as robotv1,   # noqa(E402)
                              reset as resetv1,
                              instruments as instrumentsv1,
@@ -35,7 +33,8 @@ if version < (3, 5):
 if not ff.split_labware_definitions():
     database_migration.check_version_and_perform_necessary_migrations()
 
-def build_globals(version=None):
+
+def build_globals(version=None, loop=None):
     if version is None:
         checked_version = 2 if ff.use_protocol_api_v2() else 1
     else:
@@ -44,14 +43,16 @@ def build_globals(version=None):
         return robotv1, resetv1, instrumentsv1, containersv1,\
             labwarev1, modulesv1, robotv1
     elif checked_version == 2:
-        return robotv2, resetv2, instrumentsv2, containersv2,\
-            labwarev2, modulesv2, adapters.SingletonAdapter()
+        hw = adapters.SingletonAdapter(loop)
+        rob, instr, con, lw, mod = bcbuild(hw, loop)
+        set_globals(rob, instr, lw, mod)
+        return rob, resetv2, instr, lw, lw, mod, hw
     else:
         raise RuntimeError("Bad API version {}; only 1 and 2 are valid"
                            .format(version))
 
 
-def reset_globals(version=None):
+def reset_globals(version=None, loop=None):
     """ Reinitialize the global singletons with a given API version.
 
     :param version: 1 or 2. If `None`, pulled from the `useProtocolApiV2`
@@ -66,7 +67,7 @@ def reset_globals(version=None):
     global hardware
 
     robot, reset, instruments, containers, labware, modules, hardware\
-        = build_globals(version)
+        = build_globals(version, loop)
 
 
 robot, reset, instruments, containers, labware, modules, hardware\

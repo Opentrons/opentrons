@@ -4,11 +4,20 @@ import json
 import logging
 from aiohttp import web
 from threading import Thread
-from opentrons import robot, instruments, modules
+
+from opentrons import instruments, modules
 from opentrons.config import pipette_config
 from opentrons.trackers import pose_tracker
+from opentrons.config import feature_flags as ff
+from opentrons.types import Mount, Point
+
 
 log = logging.getLogger(__name__)
+
+
+def hw_from_req(req):
+    """ Utility function to get the hardware resource from requests """
+    return req.app['com.opentrons.hardware']
 
 
 async def get_attached_pipettes(request):
@@ -45,9 +54,23 @@ async def get_attached_pipettes(request):
     written to on-board memory), or if no pipette is present, the corresponding
     mount will report `'model': null`
     """
+    hw = hw_from_req(request)
     if request.url.query.get('refresh') == 'true':
-        robot.cache_instrument_models()
-    return web.json_response(robot.get_attached_pipettes())
+        if ff.use_protocol_api_v2():
+            await hw.cache_instruments()
+        else:
+            hw.cache_instrument_models()
+    response = {}
+    for mount, data in hw.get_attached_pipettes().items():
+        response[mount] = {
+            'model': data['model'],
+            'mount_axis': str(data['mount_axis']).lower(),
+            'plunger_axis': str(data['plunger_axis']).lower(),
+            'id': data['id']
+        }
+        if 'tip_length' in data:
+            response[mount]['tip_length'] = data.get('tip_length', 0)
+    return web.json_response(response, status=200)
 
 
 async def get_attached_modules(request):
@@ -80,11 +103,12 @@ async def get_attached_modules(request):
         "message": "..."
     }
     """
-    for module in robot.modules:
+    hw = hw_from_req(request)
+    for module in hw.modules:
         module.disconnect()
-    robot.modules = modules.discover_and_connect()
+    hw.modules = modules.discover_and_connect()
 
-    data = {"modules": list(map(lambda md: md.to_dict(), robot.modules))}
+    data = {"modules": list(map(lambda md: md.to_dict(), hw.modules))}
     return web.json_response(data, status=200)
 
 
@@ -92,10 +116,11 @@ async def get_module_data(request):
     """
     Query a module (by its serial number) for its live data
     """
+    hw = hw_from_req(request)
     requested_serial = request.match_info['serial']
     res = None
 
-    for module in robot.modules:
+    for module in hw.modules:
         is_serial_match = module.device_info.get('serial') == requested_serial
         if is_serial_match and hasattr(module, 'live_data'):
             res = module.live_data()
@@ -116,9 +141,10 @@ async def get_engaged_axes(request):
     Response shape example:
         {"x": {"enabled": true}, "y": {"enabled": false}, ...}
     """
+    hw = hw_from_req(request)
     return web.json_response(
-        {k.lower(): {'enabled': v}
-         for k, v in robot._driver.engaged_axes.items()})
+        {str(k).lower(): {'enabled': v}
+         for k, v in hw.engaged_axes.items()})
 
 
 async def disengage_axes(request):
@@ -129,15 +155,16 @@ async def disengage_axes(request):
         to disengage (["x", "y", "z", "a", "b", "c"])
     :return: message and status code
     """
+    hw = hw_from_req(request)
     data = await request.text()
     axes = json.loads(data).get('axes')
     invalid_axes = [ax for ax in axes if ax.lower() not in 'xyzabc']
     if invalid_axes:
-        message = "Invalid axes: {}".format(invalid_axes)
+        message = "Invalid axes: {}".format(', '.join(invalid_axes))
         status = 400
     else:
-        robot._driver.disengage_axis("".join(axes))
-        message = "Disengaged axes: {}".format(axes)
+        await hw.disengage_axes([ax.upper() for ax in axes])
+        message = "Disengaged axes: {}".format(', '.join(axes))
         status = 200
     return web.json_response({"message": message}, status=status)
 
@@ -216,6 +243,7 @@ async def move(request):
     If 'target' is 'pipette', body must also contain:
     - 'model': must be a valid pipette model (as defined in `pipette_config`)
     """
+    hw = hw_from_req(request)
     req = await request.text()
     data = json.loads(req)
 
@@ -224,19 +252,29 @@ async def move(request):
         status = 400
     else:
         status = 200
-        if target == 'mount':
-            message = _move_mount(mount, point)
-        elif target == 'pipette':
-            pipette, _ = _fetch_or_create_pipette(mount, model)
-            pipette.move_to((robot.deck, point), strategy='arc')
-            new_position = tuple(
-                pose_tracker.absolute(pipette.robot.poses, pipette))
-            message = "Move complete. New position: {}".format(new_position)
+        if ff.use_protocol_api_v2():
+            await hw.cache_instruments()
+            await hw.move_to(Mount[mount.upper()], Point(*point))
+            message = 'Move complete. New position: {}'\
+                .format(hw.gantry_position(Mount[mount.upper()]))
+        else:
+            if target == 'mount':
+                message = _move_mount(hw, mount, point)
+            elif target == 'pipette':
+                message = _move_pipette(hw, mount, model, point)
 
     return web.json_response({"message": message}, status=status)
 
 
-def _fetch_or_create_pipette(mount, model=None):
+def _move_pipette(robot, mount, model, point):
+    pipette, _ = _fetch_or_create_pipette(robot, mount, model)
+    pipette.move_to((robot.deck, point), strategy='arc')
+    new_position = tuple(
+        pose_tracker.absolute(pipette.robot.poses, pipette))
+    return "Move complete. New position: {}".format(new_position)
+
+
+def _fetch_or_create_pipette(robot, mount, model=None):
     existing_pipettes = robot.get_instruments()
     pipette = None
     should_remove = True
@@ -257,7 +295,7 @@ def _fetch_or_create_pipette(mount, model=None):
     return pipette, should_remove
 
 
-def _move_mount(mount, point):
+def _move_mount(robot, mount, point):
     """
     The carriage moves the mount in the Z axis, and the gantry moves in X and Y
 
@@ -306,33 +344,36 @@ async def home(request):
         }
     :return: A success or non-success message.
     """
+    hw = hw_from_req(request)
     req = await request.text()
     data = json.loads(req)
-
     target = data.get('target')
-
-    if target in ['robot', 'pipette']:
-
-        if target == 'robot':
-            robot.home()
-
-            status = 200
-            message = "Homing robot."
+    if target == 'robot':
+        if ff.use_protocol_api_v2():
+            await hw.home()
         else:
-            mount = data.get('mount')
-            if mount in ['left', 'right']:
-                pipette, should_remove = _fetch_or_create_pipette(mount)
+            hw.home()
+        status = 200
+        message = "Homing robot."
+    elif target == 'pipette':
+        mount = data.get('mount')
+        if mount in ['left', 'right']:
+            if ff.use_protocol_api_v2():
+                await hw.home_plunger(Mount[mount.upper()])
+                status = 200
+                message = 'Pipette on {} homed successfuly'.format(mount)
+            else:
+                pipette, should_remove = _fetch_or_create_pipette(hw,
+                                                                  mount)
                 pipette.home()
                 if should_remove:
-                    robot.remove_instrument(mount)
-
+                    hw.remove_instrument(mount)
                 status = 200
                 message = "Pipette on {} homed successfully.".format(mount)
-            else:
-                status = 400
-                message = "Expected 'left' or 'right' as values for mount" \
-                          "got {} instead.".format(mount)
-
+        else:
+            status = 400
+            message = "Expected 'left' or 'right' as values for mount" \
+                      "got {} instead.".format(mount)
     else:
         status = 400
         message = "Expected 'robot' or 'pipette' got {}.".format(target)
@@ -341,16 +382,22 @@ async def home(request):
 
 
 async def identify(request):
-    Thread(target=lambda: robot.identify(
-        int(request.query.get('seconds', '10')))).start()
+    hw = hw_from_req(request)
+    blink_time = int(request.query.get('seconds', '10'))
+    if ff.use_protocol_api_v2():
+        asyncio.create_task(hw.identify(blink_time))
+    else:
+        Thread(target=lambda: hw.identify(blink_time)).start()
     return web.json_response({"message": "identifying"})
 
 
 async def get_rail_lights(request):
-    return web.json_response({'on': robot.get_rail_lights_on()})
+    hw = hw_from_req(request)
+    return web.json_response({'on': hw.get_lights()['rails']})
 
 
 async def set_rail_lights(request):
+    hw = hw_from_req(request)
     data = await request.json()
     on = data.get('on')
 
@@ -359,7 +406,7 @@ async def set_rail_lights(request):
             {'message': '"on" must be true or false, got {}'.format(on)},
             status=400)
 
-    robot.turn_on_rail_lights() if on else robot.turn_off_rail_lights()
+    hw.set_lights(rails=on)
     return web.json_response({'on': on})
 
 

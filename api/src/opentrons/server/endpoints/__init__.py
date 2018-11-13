@@ -2,7 +2,7 @@ import os
 import json
 import logging
 from aiohttp import web
-from opentrons import robot, __version__
+from opentrons import __version__
 
 log = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ async def health(request: web.Request) -> web.Response:
     res = {
         'name': NAME,
         'api_version': __version__,
-        'fw_version': robot.fw_version,
+        'fw_version': request.app['com.opentrons.hardware'].fw_version,
         'logs': static_paths,
         'system_version': os.environ.get('OT_SYSTEM_VERSION', 'unknown')
     }

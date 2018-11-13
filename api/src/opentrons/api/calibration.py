@@ -19,7 +19,8 @@ class CalibrationManager:
     """
     TOPIC = 'calibration'
 
-    def __init__(self, loop=None):
+    def __init__(self, hardware, loop=None):
+        self._hardware = hardware
         self._loop = loop
         self.state = None
 
