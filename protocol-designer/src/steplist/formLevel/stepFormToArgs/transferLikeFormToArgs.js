@@ -31,7 +31,7 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
   const volume = Number(hydratedFormData['volume'])
   const sourceLabware = hydratedFormData['aspirate_labware']
   const destLabware = hydratedFormData['dispense_labware']
-  const blowout = hydratedFormData['dispense_blowout_checkbox'] ? hydratedFormData['dispense_blowout_labware'] : null
+  const blowoutLabwareId = hydratedFormData['dispense_blowout_checkbox'] ? hydratedFormData['dispense_blowout_labware'] : null
 
   const aspirateOffsetFromBottomMm = Number(hydratedFormData['aspirate_mmFromBottom'])
   const dispenseOffsetFromBottomMm = Number(hydratedFormData['dispense_mmFromBottom'])
@@ -74,7 +74,7 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
 
-    blowout, // TODO allow user to blowout
+    blowout: blowoutLabwareId,
     changeTip,
     delayAfterDispense,
     mixInDestination,
@@ -122,7 +122,7 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
     disposalVolume = Number(hydratedFormData['aspirate_disposalVol_volume'])
     disposalDestination = hydratedFormData['aspirate_disposalVol_destination']
     if (disposalDestination === SOURCE_WELL_DISPOSAL_DESTINATION) {
-      disposalLabware = sourceLabware
+      disposalLabware = sourceLabware.id
       disposalWell = sourceWells[0]
     } else {
       // NOTE: if disposalDestination is not source well it is a labware type (e.g. fixed-trash)
