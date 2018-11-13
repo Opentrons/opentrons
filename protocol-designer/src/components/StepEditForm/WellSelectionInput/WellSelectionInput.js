@@ -10,9 +10,11 @@ import styles from '../StepEditForm.css'
 import type {Dispatch} from 'redux'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import type {BaseState} from '../../../types'
+import type {StepIdType} from '../../../form-types'
 import type { FocusHandlers } from '../index'
 
 type SP = {
+  stepId: ?StepIdType,
   wellSelectionLabwareKey: ?string,
 }
 type DP = {
@@ -49,8 +51,8 @@ class WellSelectionInput extends React.Component<Props> {
   }
 
   getModalKey = () => {
-    const {name, pipetteId, labwareId} = this.props
-    return `${name}${pipetteId || 'noPipette'}${labwareId || 'noLabware'}`
+    const {name, pipetteId, labwareId, stepId} = this.props
+    return `${stepId || 'noStepId'}${name}${pipetteId || 'noPipette'}${labwareId || 'noLabware'}`
   }
   render () {
     const modalKey = this.getModalKey()
@@ -80,6 +82,7 @@ class WellSelectionInput extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: BaseState): SP => ({
+  stepId: steplistSelectors.getSelectedStepId(state),
   wellSelectionLabwareKey: steplistSelectors.getWellSelectionLabwareKey(state),
 })
 const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
