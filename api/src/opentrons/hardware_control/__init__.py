@@ -246,6 +246,10 @@ class API(HardwareAPILike):
                 instruments[mount][key] = instr_dict[key]
         return instruments
 
+    @property
+    def attached_modules(self):
+        return self._attached_modules
+
     @_log_call
     async def update_firmware(
             self,

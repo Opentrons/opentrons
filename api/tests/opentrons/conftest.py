@@ -201,9 +201,10 @@ async def async_client(request, virtual_smoothie_env, loop, test_client):
             pytest.skip('requires api1 only')
         elif marker.name == 'api2_only' and request.param != using_api2:
             pytest.skip('requires api2 only')
-    with request.param(loop):
+    with request.param(loop) as hw:
         app = init(loop)
         cli = await loop.create_task(test_client(app))
+        setattr(cli, 'hw', hw)
         endpoints.session = None
         yield cli
 

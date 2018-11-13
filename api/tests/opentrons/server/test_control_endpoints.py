@@ -3,8 +3,10 @@ from copy import deepcopy
 
 import pytest
 
-from opentrons import robot, modules
-from opentrons.server import init
+from opentrons import robot
+from opentrons.legacy_api import modules as legacy_modules
+
+# from opentrons.server import init
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 from opentrons import instruments
 from opentrons.config import pipette_config
@@ -81,28 +83,38 @@ async def test_get_pipettes(async_client, monkeypatch):
     assert json.loads(text) == expected
 
 
-async def test_get_modules(
-        virtual_smoothie_env, loop, test_client, monkeypatch):
-    test_module = modules.MagDeck(port="/dev/modules/tty1_magdeck")
+@pytest.mark.api2_only
+async def test_get_modules_v2(
+        virtual_smoothie_env, loop, async_client, monkeypatch):
+    monkeypatch.setattr(async_client.hw._backend,
+                        '_attached_modules',
+                        [('/dev/modules/tty1_magdeck', 'magdeck')])
+    await check_modules_response(async_client)
+
+
+@pytest.mark.api1_only
+async def test_get_modules_v1(
+        virtual_smoothie_env, loop, async_client, monkeypatch):
+    test_module = legacy_modules.MagDeck(port="/dev/modules/tty1_magdeck")
 
     def stub_discover_modules():
         return [test_module]
 
-    monkeypatch.setattr(modules, "discover_and_connect", stub_discover_modules)
+    monkeypatch.setattr(legacy_modules,
+                        "discover_and_connect", stub_discover_modules)
+    await check_modules_response(async_client)
 
-    app = init(loop)
-    cli = await loop.create_task(test_client(app))
 
-    expected = {
-        "modules": [
-            test_module.to_dict()
-        ]
-    }
-
-    resp = await cli.get('/modules')
+async def check_modules_response(async_client):
+    keys = sorted(['name', 'port', 'serial', 'model', 'fwVersion',
+                   'displayName', 'status', 'data'])
+    resp = await async_client.get('/modules')
     body = await resp.json()
     assert resp.status == 200
-    assert body == expected
+    assert 'modules' in body
+    assert len(body['modules']) == 1
+    assert sorted(body['modules'][0].keys()) == keys
+    assert 'engaged' in body['modules'][0]['data']
 
 
 @pytest.mark.api1_only

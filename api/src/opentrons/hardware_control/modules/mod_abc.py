@@ -68,3 +68,9 @@ class AbstractModule(abc.ABC):
     def name(cls) -> str:
         """ A name for this kind of module. """
         pass
+
+    @classmethod
+    @abc.abstractmethod
+    def display_name(cls) -> str:
+        """ A user-facing name for this kind of module. """
+        pass

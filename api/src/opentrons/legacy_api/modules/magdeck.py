@@ -72,18 +72,33 @@ class MagDeck:
             self._driver.home()
             self._engaged = False
 
+    @classmethod
+    def name(cls):
+        return 'magdeck'
+
+    @classmethod
+    def display_name(cls):
+        return 'Magnetic Deck'
+
     # TODO: there should be a separate decoupled set of classes that
     # construct the http api response entity given the model instance.
     def to_dict(self):
         return {
-            'name': 'magdeck',
+            'name': self.name(),
             'port': self.port,
             'serial': self.device_info and self.device_info.get('serial'),
             'model': self.device_info and self.device_info.get('model'),
             'fwVersion': self.device_info and self.device_info.get('version'),
-            'displayName': 'Magnetic Deck',
+            'displayName': self.display_name(),
+            **self.live_data()
+        }
+
+    def live_data(self):
+        return {
             'status': self.status,
-            'data': {'engaged': self._engaged}
+            'data': {
+                'engaged': self._engaged
+            }
         }
 
     @property

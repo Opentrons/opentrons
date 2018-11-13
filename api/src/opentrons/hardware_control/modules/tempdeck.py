@@ -86,6 +86,10 @@ class TempDeck(mod_abc.AbstractModule):
     def name(cls) -> str:
         return 'tempdeck'
 
+    @classmethod
+    def display_name(cls) -> str:
+        return 'Temperature Deck'
+
     def __init__(self, port, simulating):
         if simulating:
             self._driver = SimulatingDriver()

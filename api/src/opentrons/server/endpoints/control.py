@@ -5,7 +5,7 @@ import logging
 from aiohttp import web
 from threading import Thread
 
-from opentrons import instruments, modules
+from opentrons import instruments
 from opentrons.config import pipette_config
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as ff
@@ -104,12 +104,38 @@ async def get_attached_modules(request):
     }
     """
     hw = hw_from_req(request)
-    for module in hw.modules:
-        module.disconnect()
-    hw.modules = modules.discover_and_connect()
-
-    data = {"modules": list(map(lambda md: md.to_dict(), hw.modules))}
-    return web.json_response(data, status=200)
+    if ff.use_protocol_api_v2():
+        hw_mods = await hw.discover_modules()
+        module_data = [
+            {
+                'name': mod.name(),
+                'displayName': mod.display_name(),
+                'port': mod.port,
+                'serial': mod.device_info.get('serial'),
+                'model': mod.device_info.get('model'),
+                'fwVersion': mod.device_info.get('version'),
+                **mod.live_data
+            }
+            for mod in hw_mods
+        ]
+    else:
+        hw.discover_modules()
+        hw_mods = hw.modules
+        module_data = [
+            {
+                'name': mod.name(),
+                'displayName': mod.display_name(),
+                'port': mod.port,
+                'serial': mod.device_info and mod.device_info.get('serial'),
+                'model': mod.device_info and mod.device_info.get('model'),
+                'fwVersion': mod.device_info
+                and mod.device_info.get('version'),
+                **mod.live_data()
+            }
+            for mod in hw_mods
+        ]
+    return web.json_response(data={"modules": module_data},
+                             status=200)
 
 
 async def get_module_data(request):
@@ -120,7 +146,12 @@ async def get_module_data(request):
     requested_serial = request.match_info['serial']
     res = None
 
-    for module in hw.modules:
+    if ff.use_protocol_api_v2():
+        hw_mods = await hw.discover_modules()
+    else:
+        hw_mods = hw.modules
+
+    for module in hw_mods:
         is_serial_match = module.device_info.get('serial') == requested_serial
         if is_serial_match and hasattr(module, 'live_data'):
             res = module.live_data()
