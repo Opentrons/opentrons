@@ -1,4 +1,4 @@
-# Changes since 3.4.0
+# Changes from 3.5.1 to 3.6.0
 
 For more details, please see the full [technical change log][changelog]
 
@@ -9,36 +9,30 @@ For more details, please see the full [technical change log][changelog]
 
 ### Known issues
 
-- Downgrading back to "3.4.0" from later releases _may_ cause the app to crash unless you delete the configuration folder (which will reset your app's configuration):
-    - macOS: "~/Library/Application Support/Opentrons"
-    - Linux: "~/.config/Opentrons"
-    - Windows: "%APPDATA%\Opentrons"
 - The app's run log is still having problems displaying the current run step, especially if pauses and resumes are involved ([#2047][2047])
+- The app should prevent you from starting a pipette swap while a protocol is
+executing, but it does not ([#2020][2020])
+- If a protocol run encounters an error, the app will suppress the error message instead of displaying it ([#1828][1828])
 
 [2047]: https://github.com/Opentrons/opentrons/issues/2047
+[2020]: https://github.com/Opentrons/opentrons/issues/2020
+[1828]: https://github.com/Opentrons/opentrons/issues/1828
 
 ### Bug fixes
 
-- Fixed a bug that was causing the analytics opt-in modal to fail to pop up on first app launch
-- Switched the labware table of the protocol info page to organize by type instead of nickname
-- Patched up some problems with robot discovery that could cause robots to fail to appear in environments with many robots present
-- Fixed an app crash if a robot reported an invalid server version
-- When calibrating labware, the app will now show all labware of the same type as calibrated once you've calibrated one of them
-    - This is _not_ a change in how the robot saves calibration; the API software has always saved calibration data by labware type
+- Lost connection alert messages will no longer trigger when your robot is restarting for normal reasons (e.g. software update or deck calibration). Sorry for the confusion this caused!
 
 ### New features
 
-- We put a lot of work into the discovered robots list for this release:
-    - The app now displays robots you've connected to in the past as well as robots that it can hear from but are not responding properly to requests
-    - We've stripped off that annoying "opentrons-" that would appear in front of every robot's name
-    - The "Pipettes and Modules" submenu will now only appear for the robot you've currently selected, so the robot list should be a little less noisy
-- We improved the copy of the robot update popup to (hopefully) make it more clear whether you're upgrading, downgrading, or re-installing your robot's software
-- We've upgraded our underlying [Electron framework][electron] to version 3, which closes up a few potential security holes and should result in a faster, smoother app experience for you!
-
-[electron]: https://electronjs.org/
+- We've put a lot of work into improving the Wi-Fi setup experience of your robot:
+    - Most 802.1X enterprise networks (e.g. eduroam) are now supported!
+    - Hidden SSID networks are also supported
+    - Generally, it should be easier to tell what Wi-Fi network your robot is currently connected to, along with signal strength and whether or not the network is secured
+    - The robot settings page now displays the IP and MAC addresses of the Wi-Fi and Ethernet-to-USB interfaces
+    - Please see our support documentation for more details
+- After tip-probe is completed, the app will now move the pipette out of the way so you have better access to the deck
 
 <!-- end:@opentrons/app -->
-
 
 <!-- start:@opentrons/api -->
 ## OT2 and Protocol API
@@ -54,14 +48,11 @@ For more details, please see the full [technical change log][changelog]
 
 ### Bug fixes
 
-- We fixed a launch configuration problem with the Jupyter Notebook server that could result in a boot failure
-- The "Not Now" button for a robot update will now be remembered by the robot, so other users of your robot won't get an update pop-up if you choose to keep your robot at an older software version
-- The temperature module now correctly rounds its input to the nearest degree Celsius to reflect what it is physically capable of
-- The API will no longer show hidden networks as "--" in its available Wi-Fi networks list
-- The height of the P1000 tiprack was incorrect and has been corrected
+- Fixed the iteration order of labware created with `labware.create` to match documentation
+- Fixed a misconfiguration with the motor current settings for drop-tip
 
 ### New features
 
-This release doesn't have any new user facing features, but rest assured that our API team is hard at work laying groundwork for lots of exciting new stuff!
+There aren't any new user facing features in this release, but the API team is hard at work putting exciting new stuff in place behind the scenes!
 
 <!-- end:@opentrons/api -->
