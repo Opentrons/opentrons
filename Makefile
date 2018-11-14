@@ -84,17 +84,8 @@ term:
 .PHONY: test
 test: test-py test-js
 
-# Use lerna to run test only if anything in update-server has changed
-# `--scope @opentrons/update-server` tells lerna to use the package.json that
-#   uses this name (e.g.: the one in update-server/otupdate)
-# `--since` gives the name of the upstream branch to check against
-# `-- ` (with the space after) tells lerna to execute everything after this
-# `-C ..` is here because the scope causes the working directory to change to
-#   where it finds the package.json specified by --scope, and the Makefile is
-#   in the parent of that directory
 .PHONY: test-py
 test-py:
-#	lerna exec --scope @opentrons/update-server --since origin/edge -- $(MAKE) -C .. test
 	$(MAKE) -C api test
 
 .PHONY: test-js
@@ -107,7 +98,7 @@ test-js:
 
 # lints and typechecks
 .PHONY: lint
-lint: lint-py lint-js lint-css
+lint: lint-py lint-js lint-css check-js
 
 .PHONY: lint-py
 lint-py:
@@ -117,11 +108,14 @@ lint-py:
 .PHONY: lint-js
 lint-js:
 	eslint '.*.js' '**/*.js'
-	flow $(if $(CI),check,status)
 
 .PHONY: lint-css
 lint-css:
 	stylelint '**/*.css'
+
+.PHONY: check-js
+check-js:
+	flow $(if $(CI),check,status)
 
 # upload coverage reports
 .PHONY: coverage

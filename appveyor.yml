@@ -11,8 +11,8 @@ environment:
   MAKE: C:\MinGW\bin\mingw32-make.exe
 
   # publish configuration
-  OT_BUCKET_APP: opentrons-app
-  OT_FOLDER_APP: builds
+  OT_APP_DEPLOY_BUCKET: opentrons-app
+  OT_APP_DEPLOY_FOLDER: builds
 
   OT_APP_MIXPANEL_ID:
     secure: W9ZdkT5jR5zZwQm1PMRzDNSZ1qFizfqGMIYv5hyGXPhpbzOPtyAlbJYfQMJ1Y+H+
@@ -57,7 +57,7 @@ deploy:
     # TODO(mc, 2018-03-26): use AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
     access_key_id: $(AWS_ACCESS_KEY)
     secret_access_key: $(AWS_SECRET_KEY)
-    bucket: $(OT_BUCKET_APP)
-    folder: $(OT_FOLDER_APP)
+    bucket: $(OT_APP_DEPLOY_BUCKET)
+    folder: $(OT_APP_DEPLOY_FOLDER)
     set_public: true
     artifact: App

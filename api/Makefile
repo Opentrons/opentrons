@@ -44,13 +44,13 @@ ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources)
 # depend on a PHONY target
 clean_cmd = shx rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc'
 
+.PHONY: all
+all: lint test
+
 .PHONY: install
 install:
 	pipenv sync $(pipenv_opts)
 	@$(python) build_tools.py write_local_env
-
-.PHONY: all
-all: lint test
 
 .PHONY: clean
 clean:

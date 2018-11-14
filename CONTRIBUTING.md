@@ -181,10 +181,11 @@ And you can run code linting / typechecking with:
 # lint all code
 make lint
 
-# lint specific languages
+# lint + typecheck specific languages
 make lint-py
 make lint-js
 make lint-css
+make check-js
 ```
 
 ### Opentrons API
