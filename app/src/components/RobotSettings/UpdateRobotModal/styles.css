@@ -1,0 +1,17 @@
+@import '@opentrons/components';
+
+.version_list {
+  @apply --font-body-1-dark;
+
+  margin: 0 0 1.5rem 2rem;
+}
+
+.sync_link {
+  color: var(--c-blue);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.sync_message {
+  margin-bottom: 1.5rem;
+}
