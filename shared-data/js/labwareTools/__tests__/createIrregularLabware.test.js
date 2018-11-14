@@ -95,8 +95,8 @@ describe('test createIrregularLabware function', () => {
         },
       ],
       offset: [
-        {x: 10, y: 10, z: 5},
-        {x: 15, y: 15, z: 5},
+        {x: 10, y: 10, z: 69.48},
+        {x: 15, y: 15, z: 69.48},
       ],
       grid: [
         {row: 5, column: 10},

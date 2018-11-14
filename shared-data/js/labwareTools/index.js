@@ -205,7 +205,6 @@ function calculateCoordinates (
 // or the labware definition schema in labware-json-schema
 export function createRegularLabware (args: RegularLabwareProps): Schema {
   const ordering = determineOrdering(args.grid)
-  const offset = {...args.offset, z: round(args.dimensions.overallHeight + args.offset.z, 2)}
   const definition: Schema = {
     ordering,
     otId: assignId(),
@@ -217,7 +216,7 @@ export function createRegularLabware (args: RegularLabwareProps): Schema {
       z: 0},
     dimensions: args.dimensions,
     parameters: args.parameters,
-    wells: calculateCoordinates(args.well, ordering, args.spacing, offset),
+    wells: calculateCoordinates(args.well, ordering, args.spacing, args.offset),
   }
   const numWells = args.grid.row * args.grid.column
   const brand = (args.brand && args.brand.brand) || 'generic'
@@ -238,15 +237,10 @@ export function createRegularLabware (args: RegularLabwareProps): Schema {
 // Generator function for labware definitions within an irregular grid format
 // e.g. crystalization plates, 15_50ml tuberacks and anything with multiple "grids"
 export function createIrregularLabware (args: IrregularLabwareProps): Schema {
-  const offset = args.offset.map(offsetObj => ({
-    ...offsetObj,
-    z: round(args.dimensions.overallHeight + offsetObj.z, 2),
-  }))
-
   const wellsArray = determineLayout(
     args.grid,
     args.spacing,
-    offset,
+    args.offset,
     args.gridStart,
     args.well)
 
