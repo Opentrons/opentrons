@@ -119,7 +119,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const labware = labwareId && allLabware && allLabware[labwareId]
   const allWellContentsForSteps = wellContentsSelectors.allWellContentsForSteps(state)
 
-  const stepId = steplistSelectors.getActiveItem(state).id
+  const stepId = steplistSelectors.getSelectedStepId(state)
   // TODO: Ian 2018-07-31 replace with util function, "findIndexOrNull"?
   const orderedSteps = steplistSelectors.orderedSteps(state)
   const timelineIdx = orderedSteps.findIndex(id => id === stepId)
