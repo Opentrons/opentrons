@@ -11,7 +11,7 @@ import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers
 import type {PipetteChannels} from '@opentrons/shared-data'
 import type {BaseState, GetState} from '../../types'
 import type {FormData} from '../../form-types'
-
+import type {StepFieldName} from '../fieldLevel'
 import type {ChangeFormPayload} from './types'
 
 function _getAllWells (
@@ -59,7 +59,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
   // pass thru, unchanged
   if (unsavedForm == null) { return payload }
 
-  let updateOverrides = reconcileFormLabware(payload.update)
+  let updateOverrides = getChangeLabwareEffects(payload.update)
 
   if (unsavedForm.pipette && payload.update.pipette) {
     if (typeof payload.update.pipette !== 'string') {
@@ -82,7 +82,7 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
   }
 }
 
-export const reconcileFormLabware = (updateFormData: ?mixed, nextChannels: ?number) => {
+export const getChangeLabwareEffects = (updateFormData: {[StepFieldName]: ?mixed}) => {
   let updateOverrides = {}
   // Changing labware clears wells selection: source labware
   if ('aspirate_labware' in updateFormData) {
