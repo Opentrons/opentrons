@@ -46,14 +46,14 @@ To build a *regular* labware, the `input` object should have the following shape
 
 ```
 input = {
-  metadata,
-  parameters,
-  offset,
-  dimensions,
-  grid,
-  spacing,
-  well,
-  brand,
+  "metadata": metadata,
+  "parameters": parameters,
+  "offset": offset,
+  "dimensinos": dimensions,
+  "grid": grid,
+  "spacing": spacing,
+  "well": well,
+  "brand": brand,
 }
 ```
 
@@ -123,6 +123,8 @@ well = {
 
 - "circular" (if of this shape, diameter is required)
 - "rectangular" (if of this shape, width and length is required)
+
+"width" corresponds to the Y axis on the deck of the OT2, and "length" corresponds to the X axis
 
 "totalLiquidVolume" is the actual working volume of the well, in the units specified in "displayLiquidVolume" (default
 is uL)
@@ -195,21 +197,35 @@ brand = {
 Given this sequence of commands in the console:
 
 ```
-metadata = {"displayName": "Opentrons 1.5mL tuberack", "displayCategory": "tuberack", "displayVolumeUnits": "mL"}
-parameters = {"format": "irregular", "isTiprack": false}
-offset = {"x": 18.213, "y": 10.075, "z": 79.85}
-dimensions = {"overallLength": 127.76, "overallWidth": 85.48, "overallHeight": 79.85}
-grid = {"row": 4, "column": 6}
-spacing = {"row": 19.278, "column": 19.892}
-well = {"depth": 38.58, "shape": "circular", "diameter": 9.9, "totalLiquidVolume": 1.5}
-brand = {"brand": "Opentrons"}
+const arguments = {
+  metadata: {
+    displayName: "Opentrons 1.5mL tuberack",
+    displayCategory: "tuberack",
+    displayVolumeUnits: "mL"
+  },
+  parameters: {format: "irregular", isTiprack: false},
+  offset: {x: 18.213, y: 10.075, z: 79.85},
+  dimensions: {
+    overallLength: 127.76,
+    overallWidth: 85.48,
+    overallHeight: 79.85
+  },
+  grid: {row: 4, column: 6},
+  spacing: {row: 19.278, column: 19.892},
+  well: {
+    depth: 38.58,
+    shape: "circular",
+    diameter: 9.9,
+    totalLiquidVolume: 1.5
+  },
+  brand: {brand: "Opentrons"},
+}
 
-input = {"metadata": metadata, "parameters": parameters, "offset": offset, "dimensions": dimensions, "grid": grid, "spacing": spacing, "well": well, "brand": brand}
-data = sharedData.createRegularLabware(input)
+const data = sharedData.createRegularLabware(arguments)
 JSON.stringify(data, null, 4)
 ```
 
-The input should look like this:
+The output should look like this:
 
 ```
 {
