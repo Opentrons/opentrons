@@ -13,6 +13,7 @@ import {selectors as steplistSelectors} from '../../steplist'
 import {selectors as pipetteSelectors} from '../../pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import type {Labware} from '../../labware-ingred/types'
+import type {StepIdType} from '../../form-types'
 
 const all96Tips = reduce(
   StepGeneration.tiprackWellNamesFlat,
@@ -210,7 +211,7 @@ export const timelineWarningsPerStep: Selector<WarningsPerStep> = createSelector
   }, {})
 )
 
-export const getErrorStepId: Selector<?number> = createSelector(
+export const getErrorStepId: Selector<?StepIdType> = createSelector(
   steplistSelectors.orderedSteps,
   robotStateTimeline,
   (orderedSteps, timeline) => {

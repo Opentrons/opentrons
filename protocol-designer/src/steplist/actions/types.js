@@ -11,7 +11,7 @@ export type ChangeFormPayload = {
 }
 
 export type ChangeSavedFormPayload = {
-  stepId?: number,
+  stepId?: string,
   update: {
     [accessor: string]: ?mixed, // string | boolean | Array<string> | null,
   },

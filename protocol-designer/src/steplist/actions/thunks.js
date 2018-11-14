@@ -1,6 +1,6 @@
 // @flow
 import {selectors} from '../index'
-
+import {uuid} from '../../utils'
 import {selectors as labwareIngredsSelectors} from '../../labware-ingred/reducers'
 import * as pipetteSelectors from '../../pipettes/selectors'
 import {actions as tutorialActions} from '../../tutorial'
@@ -69,7 +69,7 @@ export const selectStep = (stepId: StepIdType, newStepType?: StepType): ThunkAct
 export const addStep = (payload: {stepType: StepType}) =>
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
     const state = getState()
-    const stepId = selectors.nextStepId(state)
+    const stepId = uuid()
     const {stepType} = payload
     dispatch({
       type: 'ADD_STEP',

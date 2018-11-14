@@ -3,7 +3,7 @@ import type {IconName} from '@opentrons/components'
 import type {ChangeTipOptions} from './step-generation'
 import type {StepFieldName} from './steplist/fieldLevel'
 
-export type StepIdType = number // TODO Ian 2018-05-10 change to string
+export type StepIdType = string
 
 // TODO Ian 2018-01-16 factor out to some constants.js ?
 export const stepIconsByType: {[string]: IconName} = {

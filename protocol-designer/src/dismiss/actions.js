@@ -1,12 +1,13 @@
 // @flow
 import type {CommandCreatorWarning} from '../step-generation'
 import type {FormWarning} from '../steplist'
+import type {StepIdType} from '../form-types'
 
 export type DismissAction<ActionType, WarningType> = {
   type: ActionType,
   payload: {
     warning: WarningType,
-    stepId: ?number,
+    stepId: ?StepIdType,
   },
 }
 

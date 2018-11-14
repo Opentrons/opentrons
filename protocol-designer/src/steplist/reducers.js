@@ -222,8 +222,7 @@ const orderedSteps: Reducer<OrderedStepsState, *> = handleActions({
   ADD_STEP: (state: OrderedStepsState, action: AddStepAction) =>
     [...state, action.payload.id],
   DELETE_STEP: (state: OrderedStepsState, action: DeleteStepAction) =>
-    // TODO Ian 2018-05-10 standardize StepIdType to string, number is implicitly cast to string somewhere
-    state.filter(stepId => !(stepId === action.payload || `${stepId}` === action.payload)),
+    state.filter(stepId => stepId !== action.payload),
   LOAD_FILE: (state: OrderedStepsState, action: LoadFileAction): OrderedStepsState =>
     getPDMetadata(action.payload).orderedSteps,
   REORDER_SELECTED_STEP: (state: OrderedStepsState, action: ReorderSelectedStepAction): OrderedStepsState => {
@@ -252,7 +251,7 @@ export type SelectableItem = {
 
 type SelectedItemState = ?SelectableItem
 
-function stepIdHelper (id: StepIdType): SelectedItemState {
+function stepIdHelper (id: ?StepIdType): SelectedItemState {
   if (id == null) return null
   return {
     isStep: true,
@@ -260,7 +259,7 @@ function stepIdHelper (id: StepIdType): SelectedItemState {
   }
 }
 
-function terminalItemIdHelper (id: TerminalItemId): SelectedItemState {
+function terminalItemIdHelper (id: ?TerminalItemId): SelectedItemState {
   if (id == null) return null
   return {
     isStep: false,
