@@ -24,7 +24,7 @@ export const formConnectorFactory = (
 
 export const uuid: () => string = uuidv1
 
-// Collision detection for SelectionRect / SelectablePlate
+// Collision detection for SelectionRect / SelectableLabware
 
 export const rectCollision = (rect1: BoundingRect, rect2: BoundingRect) => (
   rect1.x < rect2.x + rect2.width &&

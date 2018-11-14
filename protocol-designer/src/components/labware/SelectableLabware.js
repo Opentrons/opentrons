@@ -144,7 +144,12 @@ class SelectableLabware extends React.Component<Props> {
                       selectable
                       key={wellName}
                       wellName={wellName}
-                      onMouseOver={this.makeHandleMouseOverWell(wellName, makeHandleMouseOverWell(wellName, well.ingreds))}
+                      onMouseOver={
+                        this.makeHandleMouseOverWell(
+                          wellName,
+                          well.ingreds ? makeHandleMouseOverWell(wellName, well.ingreds) : () => {}
+                        )
+                      }
                       onMouseLeave={ this.makeHandleMouseExitWell(handleMouseLeaveWell)}
                       highlighted={Object.keys(highlightedWells).includes(wellName)}
                       selected={selectedWellSets.includes(wellName)}

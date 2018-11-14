@@ -13,10 +13,10 @@ import {
 import styles from './labware.css'
 
 import ClickableText from './ClickableText'
-import SelectablePlate from '../../containers/SelectablePlate.js'
-import NameThisLabwareOverlay from './NameThisLabwareOverlay.js'
-import DisabledSelectSlotOverlay from './DisabledSelectSlotOverlay.js'
-import BrowseLabwareOverlay from './BrowseLabwareOverlay.js'
+import HighlightableLabware from '../../containers/HighlightableLabware'
+import NameThisLabwareOverlay from './NameThisLabwareOverlay'
+import DisabledSelectSlotOverlay from './DisabledSelectSlotOverlay'
+import BrowseLabwareOverlay from './BrowseLabwareOverlay'
 import {type TerminalItemId, START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID} from '../../steplist'
 
 function LabwareDeckSlotOverlay ({
@@ -70,7 +70,7 @@ function SlotWithLabware (props: SlotWithLabwareProps) {
           href={labwareImages[containerType]}
           width={SLOT_WIDTH_MM} height={SLOT_HEIGHT_MM}
         />
-        : <SelectablePlate hoverable={false} containerId={containerId} cssFillParent />
+        : <HighlightableLabware containerId={containerId} />
       }
       <ContainerNameOverlay title={displayName || humanizeLabwareType(containerType)} />
     </g>

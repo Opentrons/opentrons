@@ -12,7 +12,7 @@ import {selectors as fileDataSelectors} from '../file-data'
 import type {Selector} from '../types'
 import type {SubstepItemData} from '../steplist/types'
 
-type AllWellHighlights = {[wellName: string]: true} // NOTE: all keys are true. There's a TODO in SelectablePlate.js about making this a Set of well strings
+type AllWellHighlights = {[wellName: string]: true} // NOTE: all keys are true. There's a TODO in HighlightableLabware.js about making this a Set of well strings
 type AllWellHighlightsAllLabware = {[labwareId: string]: AllWellHighlights}
 
 function _wellsForPipette (pipetteChannels: 1 | 8, labwareType: string, wells: Array<string>): Array<string> {

@@ -20,7 +20,7 @@ export type Wells = {
   [wellName: string]: string, // eg A1: 'A1'.
 }
 
-export type WellContents = {| // non-ingredient well state, for SelectablePlate
+export type WellContents = {| // non-ingredient well state, for SelectableLabware
   highlighted: boolean,
   selected: boolean,
   error: boolean,
