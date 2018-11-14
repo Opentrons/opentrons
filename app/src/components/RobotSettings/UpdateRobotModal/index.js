@@ -12,13 +12,18 @@ import {
 
 import {getRobotApiVersion} from '../../../discovery'
 
-import {CURRENT_VERSION, getShellUpdateState} from '../../../shell'
+import {
+  CURRENT_VERSION,
+  CURRENT_RELEASE_NOTES,
+  getShellUpdateState,
+} from '../../../shell'
 
 import {ScrollableAlertModal} from '../../modals'
 import VersionList from './VersionList'
 import UpdateAppMessage from './UpdateAppMessage'
 import SkipAppUpdateMessage from './SkipAppUpdateMessage'
 import SyncRobotMessage from './SyncRobotMessage'
+import ReleaseNotes from '../../ReleaseNotes'
 
 import type {State, Dispatch} from '../../../types'
 import type {ShellUpdateState} from '../../../shell'
@@ -49,79 +54,117 @@ type Props = {
   update: () => mixed,
 }
 
-export default connect(
-  makeMapStateToProps,
-  null,
-  mergeProps
-)(UpdateRobotModal)
+type UpdateRobotState = {
+  showReleaseNotes: boolean,
+}
 
-function UpdateRobotModal (props: Props) {
-  const {
-    ignoreUpdate,
-    appVersion,
-    robotVersion,
-    updateInfo,
-    appUpdate: {available, info},
-  } = props
-  const appUpdateVersion = info ? info.version : appVersion
-  const robotUpdateVersion = updateInfo.version
-  const versionProps = {
-    appVersion,
-    robotVersion,
-    availableUpdate: appUpdateVersion || appVersion,
-  }
+const API_RELEASE_NOTES = CURRENT_RELEASE_NOTES.replace(
+  /<!-- start:@opentrons\/app -->([\S\s]*?)<!-- end:@opentrons\/app -->/,
+  ''
+)
 
-  let heading
-  let button
-  let buttonAction
-  let buttonText
-  let message
-  let skipMessage = null
-
-  if (available) {
-    heading = `Version ${appUpdateVersion} available`
-    buttonText = 'View App Update'
-    message = <UpdateAppMessage {...versionProps} />
-    skipMessage = (
-      <SkipAppUpdateMessage
-        onClick={() => console.log('update')}
-        {...versionProps}
-      />
-    )
-  } else if (updateInfo.type) {
-    heading = `Version ${robotUpdateVersion} available`
-    buttonText =
-      updateInfo.type === 'upgrade'
-        ? 'View Robot Server Update'
-        : 'Downgrade Robot'
-    message = <SyncRobotMessage updateInfo={updateInfo} {...versionProps} />
-  } else {
-    heading = 'Robot is up to date'
-    message = null
-    buttonText = 'Reinstall'
-  }
-
-  button = available
-    ? {
-      children: buttonText,
-      Component: Link,
-      to: '/menu/app/update',
+class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
+  constructor (props) {
+    super(props)
+    this.state = {
+      showReleaseNotes: this.getShowReleaseNotes(),
     }
-    : {onClick: buttonAction, children: buttonText}
+  }
+  getShowReleaseNotes (): boolean {
+    return (
+      (!this.props.appUpdate.available && !this.props.updateInfo.type) ||
+      !this.props.updateInfo.type
+    )
+  }
 
-  // TODO: (ka 2018-11-14): Change to stateful component,
-  // Render release notes and hide VersionList based on showReleaseNotes boolean
-  return (
-    <ScrollableAlertModal
-      heading={heading}
-      alertOverlay
-      buttons={[{onClick: ignoreUpdate, children: 'not now'}, button]}
-    >
-      {message}
+  setShowReleaseNotes = () => {
+    this.setState({showReleaseNotes: true})
+  }
+
+  render () {
+    const {
+      ignoreUpdate,
+      appVersion,
+      robotVersion,
+      updateInfo,
+      appUpdate: {available, info},
+    } = this.props
+    const {showReleaseNotes} = this.state
+    const appUpdateVersion = info ? info.version : appVersion
+    const robotUpdateVersion = updateInfo.version
+    const versionProps = {
+      appVersion,
+      robotVersion,
+      availableUpdate: appUpdateVersion || appVersion,
+    }
+
+    let heading
+    let button
+    let buttonAction
+    let buttonText
+    let message
+    let skipMessage
+
+    if (available) {
+      heading = `Version ${appUpdateVersion} available`
+      buttonText = 'View App Update'
+      message = <UpdateAppMessage {...versionProps} />
+      skipMessage = (
+        <SkipAppUpdateMessage
+          onClick={() => console.log('update')}
+          {...versionProps}
+        />
+      )
+    } else if (updateInfo.type) {
+      heading = `Version ${robotUpdateVersion} available`
+      if (updateInfo.type === 'upgrade') {
+        buttonText = 'View Robot Server Update'
+        buttonAction = this.setShowReleaseNotes
+      } else {
+        buttonText = 'Downgrade Robot'
+        buttonAction = () => console.log('install')
+      }
+      if (showReleaseNotes) {
+        buttonAction = () => console.log('install')
+        buttonText = 'Upgrade Robot'
+      }
+      message = <SyncRobotMessage updateInfo={updateInfo} {...versionProps} />
+    } else {
+      heading = 'Robot is up to date'
+      message =
+        "It looks like your robot is already up to date, but if you're experiencing issues you can re-apply the latest update."
+      buttonText = 'Reinstall'
+      buttonAction = () => console.log('reinstall')
+    }
+
+    button = available
+      ? {
+        children: buttonText,
+        Component: Link,
+        to: '/menu/app/update',
+      }
+      : {onClick: buttonAction, children: buttonText}
+
+    const children = showReleaseNotes ? (
+      <ReleaseNotes source={API_RELEASE_NOTES} />
+    ) : (
       <VersionList {...versionProps} />
-      {skipMessage}
-    </ScrollableAlertModal>
-  )
+    )
+
+    // TODO: (ka 2018-11-14): Change to stateful component,
+    // Render release notes and hide VersionList based on showReleaseNotes boolean
+    return (
+      <ScrollableAlertModal
+        heading={heading}
+        alertOverlay
+        buttons={[{onClick: ignoreUpdate, children: 'not now'}, button]}
+      >
+        {message}
+        {children}
+        {skipMessage}
+      </ScrollableAlertModal>
+    )
+  }
 }
 
 function makeMapStateToProps (): (State, OP) => SP {
@@ -152,3 +195,9 @@ function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
     update: () => dispatch(updateRobotServer(robot)),
   }
 }
+
+export default connect(
+  makeMapStateToProps,
+  null,
+  mergeProps
+)(UpdateRobotModal)
