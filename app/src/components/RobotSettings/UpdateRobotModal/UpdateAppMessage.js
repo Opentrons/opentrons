@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import styles from './styles.css'
-import type {VersionProps} from './VersionList'
+import type {VersionProps} from './types.js'
 
 export default function UpdateAppMessage (props: VersionProps) {
   const {appVersion, robotVersion} = props

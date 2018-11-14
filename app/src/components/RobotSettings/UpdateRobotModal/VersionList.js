@@ -1,12 +1,7 @@
 // @flow
 import * as React from 'react'
 import styles from './styles.css'
-
-export type VersionProps = {
-  appVersion: string,
-  robotVersion: string,
-  availableUpdate: string,
-}
+import type {VersionProps} from './types.js'
 
 export default function VersionList (props: VersionProps) {
   return (

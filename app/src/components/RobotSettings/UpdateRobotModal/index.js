@@ -64,7 +64,7 @@ function UpdateRobotModal (props: Props) {
     appUpdate: {available, info},
   } = props
   const appUpdateVersion = info ? info.version : appVersion
-  const robotUpdateVersion = updateInfo.version ? updateInfo.version : null
+  const robotUpdateVersion = updateInfo.version
   const versionProps = {
     appVersion,
     robotVersion,
@@ -88,16 +88,17 @@ function UpdateRobotModal (props: Props) {
         {...versionProps}
       />
     )
-  } else if (robotUpdateVersion) {
+  } else if (updateInfo.type) {
     heading = `Version ${robotUpdateVersion} available`
     buttonText =
       updateInfo.type === 'upgrade'
         ? 'View Robot Server Update'
         : 'Downgrade Robot'
-    message = <SyncRobotMessage updateInfo={updateInfo} />
+    message = <SyncRobotMessage updateInfo={updateInfo} {...versionProps} />
   } else {
     heading = 'Robot is up to date'
     message = null
+    buttonText = 'Reinstall'
   }
 
   button = available
@@ -108,6 +109,8 @@ function UpdateRobotModal (props: Props) {
     }
     : {onClick: buttonAction, children: buttonText}
 
+  // TODO: (ka 2018-11-14): Change to stateful component,
+  // Render release notes and hide VersionList based on showReleaseNotes boolean
   return (
     <ScrollableAlertModal
       heading={heading}

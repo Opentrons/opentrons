@@ -4,17 +4,21 @@ import styles from './styles.css'
 import type {RobotUpdateInfo} from '../../../http-api-client'
 type Props = {
   updateInfo: RobotUpdateInfo,
+  appVersion: string,
 }
+
+const notSyncedMessage = (
+  <strong>
+    Your robot server version and app version are out of sync. <br />
+  </strong>
+)
 
 export default function SyncRobotMessage (props: Props) {
   const {
+    appVersion,
     updateInfo: {type},
   } = props
-  const notSyncedMessage = (
-    <strong>
-      Your robot server version and app version are out of sync. <br />
-    </strong>
-  )
+
   if (type === 'upgrade') {
     return (
       <p className={styles.sync_message}>
@@ -23,11 +27,12 @@ export default function SyncRobotMessage (props: Props) {
         version to match the app version.
       </p>
     )
-  } else if (type === 'downgrade') {
+  }
+  if (type === 'downgrade') {
     return (
       <p className={styles.sync_message}>
         {notSyncedMessage}
-        You may wish to downgrade to robot server version 3.0.0 to ensure
+        You may wish to downgrade to robot server version {appVersion} to ensure
         compatibility.
       </p>
     )
