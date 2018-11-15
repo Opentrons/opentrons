@@ -11,7 +11,7 @@ import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers
 import type {PipetteChannels} from '@opentrons/shared-data'
 import type {BaseState, GetState} from '../../types'
 import type {FormData} from '../../form-types'
-
+import type {StepFieldName} from '../fieldLevel'
 import type {ChangeFormPayload} from './types'
 
 function _getAllWells (
@@ -54,42 +54,12 @@ const getChannels = (pipetteId: string, state: BaseState): PipetteChannels => {
 function handleFormChange (payload: ChangeFormPayload, getState: GetState): ChangeFormPayload {
   // Use state to handle form changes
   const baseState = getState()
-  const unsavedForm = selectors.formData(baseState)
-  let updateOverrides = {}
+  const unsavedForm = selectors.getUnsavedForm(baseState)
 
-  if (unsavedForm == null) {
-    // pass thru, unchanged
-    return payload
-  }
+  // pass thru, unchanged
+  if (unsavedForm == null) { return payload }
 
-  // Changing labware clears wells selection: source labware
-  if ('aspirate_labware' in payload.update) {
-    updateOverrides = {
-      ...updateOverrides,
-      'aspirate_wells': null,
-      'aspirate_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-    }
-  }
-
-  // Changing labware clears wells selection: dest labware
-  if ('dispense_labware' in payload.update) {
-    updateOverrides = {
-      ...updateOverrides,
-      'dispense_wells': null,
-      'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
-    }
-  }
-
-  // Changing labware clears wells selection: labware (eg, mix)
-  if ('labware' in payload.update) {
-    updateOverrides = {
-      ...updateOverrides,
-      'wells': null,
-      // TODO: Ian 2018-09-03 should we have both asp/disp for Mix?
-      // if not, is dispense the right choice vs aspirate?
-      'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
-    }
-  }
+  let updateOverrides = getChangeLabwareEffects(payload.update)
 
   if (unsavedForm.pipette && payload.update.pipette) {
     if (typeof payload.update.pipette !== 'string') {
@@ -110,6 +80,37 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
       ...updateOverrides,
     },
   }
+}
+
+export const getChangeLabwareEffects = (updateFormData: {[StepFieldName]: ?mixed}) => {
+  let updateOverrides = {}
+  // Changing labware clears wells selection: source labware
+  if ('aspirate_labware' in updateFormData) {
+    updateOverrides = {
+      ...updateOverrides,
+      'aspirate_wells': null,
+      'aspirate_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+    }
+  }
+  // Changing labware clears wells selection: dest labware
+  if ('dispense_labware' in updateFormData) {
+    updateOverrides = {
+      ...updateOverrides,
+      'dispense_wells': null,
+      'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+    }
+  }
+  // Changing labware clears wells selection: labware (eg, mix)
+  if ('labware' in updateFormData) {
+    updateOverrides = {
+      ...updateOverrides,
+      'wells': null,
+      // TODO: Ian 2018-09-03 should we have both asp/disp for Mix?
+      // if not, is dispense the right choice vs aspirate?
+      'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+    }
+  }
+  return updateOverrides
 }
 
 export const reconcileFormPipette = (formData: FormData, baseState: BaseState, nextPipetteId: ?mixed, nextChannels: ?number) => {
