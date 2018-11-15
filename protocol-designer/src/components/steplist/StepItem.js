@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react'
+import {DragSource, DropTarget} from 'react-dnd'
+
 import {PDTitledList} from '../lists'
 import SourceDestSubstep from './SourceDestSubstep'
 import styles from './StepItem.css'
@@ -36,7 +38,7 @@ type StepItemProps = {
   onStepMouseLeave?: (event?: SyntheticEvent<>) => mixed,
 }
 
-export default function StepItem (props: StepItemProps) {
+function StepItem (props: StepItemProps) {
   const {
     step,
 
@@ -147,3 +149,30 @@ function getStepItemContents (stepItemProps: StepItemProps) {
 
   return result
 }
+
+const StepItemWrapper = (props) => (
+  <div>
+    {props.connectDragSource(
+      <div style={{opacity: props.isDragging ? 0.5 : 1}}>
+        <StepItem {...props} />
+      </div>
+    )}
+  </div>
+)
+
+const DND_TYPES: {STEP_ITEM: "STEP_ITEM"} = {STEP_ITEM: 'STEP_ITEM'}
+
+const cardSource = {
+  beginDrag (props) {
+    return {stepId: props.stepId}
+  },
+}
+
+function collectSource (connect, monitor) {
+  return {
+    connectDragSource: connect.dragSource(),
+    isDragging: monitor.isDragging(),
+  }
+}
+
+export default DragSource(DND_TYPES.STEP_ITEM, cardSource, collectSource)(StepItemWrapper)

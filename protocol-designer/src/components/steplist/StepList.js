@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import {SidePanel} from '@opentrons/components'
-import { DragSource } from 'react-dnd';
 
 import StartingDeckStateTerminalItem from './StartingDeckStateTerminalItem'
 import StepItem from '../../containers/ConnectedStepItem'
@@ -12,36 +11,39 @@ import {END_TERMINAL_ITEM_ID} from '../../steplist'
 
 import type {StepIdType} from '../../form-types'
 import {PortalRoot} from './TooltipPortal'
+import { DropTarget } from 'react-dnd'
+
+type StepItemsProps = {orderedSteps: Array<StepIdType>}
+function StepItems (props: StepItemsProps) {
+  const {orderedSteps, connectDropTarget} = props
+  return connectDropTarget(
+    <div>
+      {orderedSteps.map((stepId: StepIdType) => <StepItem key={stepId} stepId={stepId} />)}
+    </div>
+  )
+}
+
+const cardTarget = {
+  drop (props, monitor, component) {
+    console.log('began drop', props, monitor, component)
+  },
+  hover (props, monitor, component) {
+    console.log('began hover', props, monitor, component)
+  },
+}
+
+function collectTarget (connect, monitor) {
+  return {
+    connectDropTarget: connect.dropTarget(),
+  }
+}
+
+const StepItemsDropTarget = DropTarget('STEP_ITEM', cardTarget, collectTarget)(StepItems)
 
 type Props = {
   orderedSteps: Array<StepIdType>,
   reorderSelectedStep: (delta: number) => mixed,
 }
-
-const DragSourceStepItem = (props) => (
-  props.connectDragSource(
-    <div style={{opacity: props.isDragging ? 0.5 : 1}}>
-      <StepItem {...props} />
-    </div>
-  )
-)
-
-const DND_TYPES: {STEP_ITEM: "STEP_ITEM"} = {
-  STEP_ITEM: 'STEP_ITEM',
-}
-const specImplementation = {
-  beginDrag (props) {
-    console.log('began')
-    return {stepId: props.stepId}
-  },
-}
-function collect (connect, monitor) {
-  return {
-    connectDragSource: connect.dragSource(),
-    isDragging: monitor.isDragging(),
-  }
-}
-const DraggableStepItem = DragSource(DND_TYPES.STEP_ITEM, specImplementation, collect)(DragSourceStepItem)
 
 export default class StepList extends React.Component<Props> {
   handleKeyDown = (e: SyntheticKeyboardEvent<*>) => {
@@ -67,17 +69,12 @@ export default class StepList extends React.Component<Props> {
   }
 
   render () {
-    const {orderedSteps} = this.props
-
-    const stepItems = orderedSteps.map((stepId: StepIdType) =>
-      <DraggableStepItem key={stepId} stepId={stepId} />)
-
     return (
       <React.Fragment>
         <SidePanel
           title='Protocol Timeline'>
           <StartingDeckStateTerminalItem />
-          {stepItems}
+          <StepItemsDropTarget orderedSteps={this.props.orderedSteps} />
           <StepCreationButton />
           <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />
         </SidePanel>
@@ -86,3 +83,4 @@ export default class StepList extends React.Component<Props> {
     )
   }
 }
+
