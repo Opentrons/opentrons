@@ -204,6 +204,12 @@ async def async_client(request, virtual_smoothie_env, loop, test_client):
         app = init(loop)
         cli = await loop.create_task(test_client(app))
         setattr(cli, 'hw', hw)
+        if request.param == using_api1:
+            setattr(cli, 'version', 1)
+        elif request.param == using_api2:
+            setattr(cli, 'version', 2)
+        else:
+            raise RuntimeError("Bad version? Bad param? Somethings broken")
         endpoints.session = None
         yield cli
 

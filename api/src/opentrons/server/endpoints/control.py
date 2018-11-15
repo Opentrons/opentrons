@@ -10,6 +10,7 @@ from opentrons.config import pipette_config
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as ff
 from opentrons.types import Mount, Point
+from opentrons.hardware_control.types import Axis
 
 
 log = logging.getLogger(__name__)
@@ -390,6 +391,7 @@ async def home(request):
         mount = data.get('mount')
         if mount in ['left', 'right']:
             if ff.use_protocol_api_v2():
+                await hw.home([Axis.by_mount(Mount[mount.upper()])])
                 await hw.home_plunger(Mount[mount.upper()])
                 status = 200
                 message = 'Pipette on {} homed successfuly'.format(mount)

@@ -123,15 +123,18 @@ class SingletonAdapter(HardwareAPILike):
     def get_attached_pipettes(self):
         """ Mimic the behavior of robot.get_attached_pipettes"""
         api = object.__getattribute__(self, '_api')
-        instrs = {
-            mount.name.lower(): {
+        instrs = {}
+        for mount, data in api.attached_instruments.items():
+            instrs[mount.name.lower()] = {
                 'model': data.get('name', None),
-                'tip_length': data.get('tip_length', None),
                 'id': data.get('pipette_id', None),
                 'mount_axis': Axis.by_mount(mount),
                 'plunger_axis': Axis.of_plunger(mount)
             }
-            for mount, data in api.attached_instruments.items()}
+            if data.get('name'):
+                instrs[mount.name.lower()]['tip_length'] \
+                    = data.get('tip_length', None)
+
         return instrs
 
     def stop(self):
