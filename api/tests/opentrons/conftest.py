@@ -196,10 +196,9 @@ def using_api1(loop):
 
 @pytest.fixture(params=[using_api1, using_api2])
 async def async_client(request, virtual_smoothie_env, loop, test_client):
-    for marker in request.node.iter_markers():
-        if marker.name == 'api1_only' and request.param != using_api1:
+    if request.node.get_marker('api1_only') and request.param != using_api1:
             pytest.skip('requires api1 only')
-        elif marker.name == 'api2_only' and request.param != using_api2:
+    elif request.node.get_marker('api2_only') and request.param != using_api2:
             pytest.skip('requires api2 only')
     with request.param(loop) as hw:
         app = init(loop)
@@ -333,11 +332,10 @@ def virtual_smoothie_env(monkeypatch):
 
 @pytest.fixture(params=[using_api1, using_api2])
 def hardware(request, loop, virtual_smoothie_env):
-    for marker in request.node.iter_markers():
-        if marker.name == 'api1_only' and request.param != using_api1:
-            pytest.skip('requires api1 only')
-        elif marker.name == 'api2_only' and request.param != using_api2:
-            pytest.skip('requires api2 only')
+    if request.node.get_marker('api1_only') and request.param != using_api1:
+        pytest.skip('requires api1 only')
+    elif request.node.get_marker('api2_only') and request.param != using_api2:
+        pytest.skip('requires api2 only')
     with request.param(loop) as hw:
         yield hw
 

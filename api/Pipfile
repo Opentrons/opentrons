@@ -1,19 +1,14 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [requires]
-
 python_version = "3.6"
 
-
 [dev-packages]
-
 pylama = "==7.4.3"
-pytest = "==3.8.0"
+pytest = "==3.4.2"
 pytest-cov = "==2.5.1"
 pytest-aiohttp = "==0.2.0"
 dill = "==0.2.7.1"
@@ -24,7 +19,7 @@ wheel = "==0.30.0"
 coverage = "==4.4.2"
 mypy = "*"
 
-
 [packages]
-
-pytest = "*"
+numpy = "*"
+pyserial = "==3.2.1"
+urwid = "*"
