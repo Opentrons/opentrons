@@ -1,4 +1,5 @@
 // @flow
+import type {StepFieldName} from '../fieldLevel'
 
 // Update Form input (onChange on inputs)
 export type ChangeFormPayload = {
@@ -6,13 +7,13 @@ export type ChangeFormPayload = {
   // Accessor strings and values depend on StepType
   stepType?: string,
   update: {
-    [accessor: string]: ?mixed, // string | boolean | Array<string> | null,
+    [StepFieldName]: ?mixed, // string | boolean | Array<string> | null,
   },
 }
 
 export type ChangeSavedFormPayload = {
   stepId?: string,
   update: {
-    [accessor: string]: ?mixed, // string | boolean | Array<string> | null,
+    [StepFieldName]: ?mixed, // string | boolean | Array<string> | null,
   },
 }

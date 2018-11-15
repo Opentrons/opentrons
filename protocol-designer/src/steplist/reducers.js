@@ -4,6 +4,7 @@ import {handleActions} from 'redux-actions'
 import type {ActionType, Reducer} from 'redux-actions'
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
+import reduce from 'lodash/reduce'
 
 import {getPDMetadata} from '../file-types'
 
@@ -45,6 +46,7 @@ import {
   toggleStepCollapsed,
   type ChangeSavedStepFormAction,
 } from './actions'
+import {getChangeLabwareEffects} from './actions/handleFormChange'
 
 type FormState = FormData | null
 
@@ -131,13 +133,6 @@ type SavedStepFormState = {
   [StepIdType]: FormData,
 }
 
-const LABWARE_FIELD_NAMES = [
-  'aspirate_labware',
-  'dispense_blowout_labware',
-  'dispense_labware',
-  'labware',
-]
-
 const savedStepForms: Reducer<SavedStepFormState, *> = handleActions({
   SAVE_STEP_FORM: (state, action: SaveStepFormAction) => ({
     ...state,
@@ -151,39 +146,26 @@ const savedStepForms: Reducer<SavedStepFormState, *> = handleActions({
       ...stepForm,
     }))
   },
-  DELETE_CONTAINER: (state: SavedStepFormState, action: DeleteContainerAction): SavedStepFormState => {
-    const {payload} = action
-    return mapValues(state, savedForm => {
-      let dependentFields = []
-      const withoutDeletedLabware = mapValues(savedForm, (value, fieldName) => {
-        const isLabware = LABWARE_FIELD_NAMES.includes(fieldName)
-        if (isLabware && value === payload.containerId) {
-          switch (fieldName) {
-            case 'aspirate_labware': {
-              dependentFields = [...dependentFields, 'aspirate_wells']
-              break
-            }
-            case 'dispense_labware': {
-              dependentFields = [...dependentFields, 'dispense_wells']
-              break
-            }
-            case 'labware': {
-              dependentFields = [...dependentFields, 'wells']
-              break
-            }
+  DELETE_CONTAINER: (state: SavedStepFormState, action: DeleteContainerAction): SavedStepFormState => (
+    mapValues(state, savedForm => {
+      const deleteLabwareUpdate = reduce(savedForm, (acc, value, fieldName) => {
+        if (value === action.payload.containerId) {
+          const formLabwareFieldUpdate = {[fieldName]: null}
+          return {
+            ...acc,
+            ...formLabwareFieldUpdate,
+            ...getChangeLabwareEffects(formLabwareFieldUpdate),
           }
-          return null
         } else {
-          return value
+          return acc
         }
-      })
-      const withoutDependentFields = mapValues(withoutDeletedLabware, (value, fieldName) => {
-        if (dependentFields.includes(fieldName)) return null
-        return value
-      })
-      return withoutDependentFields
+      }, {})
+      return {
+        ...savedForm,
+        ...deleteLabwareUpdate,
+      }
     })
-  },
+  ),
   CHANGE_SAVED_STEP_FORM: (state: SavedStepFormState, action: ChangeSavedStepFormAction): SavedStepFormState => ({
     ...state,
     [action.payload.stepId]: {
