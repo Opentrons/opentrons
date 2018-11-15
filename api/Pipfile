@@ -18,10 +18,10 @@ twine = "==1.8.1"
 wheel = "==0.30.0"
 coverage = "==4.4.2"
 mypy = "*"
+colorama = "*"
 
 [packages]
 numpy = "*"
 pyserial = "==3.2.1"
 urwid = "*"
 aiohttp = "==2.3.8"
-colorama = "*"
