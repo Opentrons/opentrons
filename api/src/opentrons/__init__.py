@@ -4,6 +4,9 @@ import json
 HERE = os.path.abspath(os.path.dirname(__file__))
 from opentrons.data_storage import database_migration  # noqa(E402)
 from opentrons.config import feature_flags as ff  # noqa(E402)
+if not ff.split_labware_definitions():
+    database_migration.check_version_and_perform_necessary_migrations()
+
 import opentrons.hardware_control.adapters as adapters  # noqa(E402)
 from .protocol_api.back_compat import (build_globals as bcbuild,  # noqa(E402)
                                        set_globals,
@@ -29,9 +32,6 @@ if version < (3, 5):
     raise RuntimeError(
         'opentrons requires Python 3.5 or above, this is {0}.{1}'.format(
             version[0], version[1]))
-
-if not ff.split_labware_definitions():
-    database_migration.check_version_and_perform_necessary_migrations()
 
 
 def build_globals(version=None, loop=None):
