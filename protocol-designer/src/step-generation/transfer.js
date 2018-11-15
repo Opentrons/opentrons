@@ -102,6 +102,7 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
               pipette: data.pipette,
               labware: data.sourceLabware,
               well: sourceWell,
+              offsetFromBottomMm: data.touchTipAfterAspirateOffsetMmFromBottom,
             })]
             : []
 
@@ -110,6 +111,7 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
               pipette: data.pipette,
               labware: data.destLabware,
               well: destWell,
+              offsetFromBottomMm: data.touchTipAfterDispenseOffsetMmFromBottom,
             })]
             : []
 

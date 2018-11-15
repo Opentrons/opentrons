@@ -80,7 +80,9 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
     mixInDestination,
     preWetTip: hydratedFormData['aspirate_preWetTip'] || false,
     touchTipAfterAspirate: hydratedFormData['aspirate_touchTip'] || false,
+    touchTipAfterAspirateOffsetMmFromBottom: Number(hydratedFormData['aspirate_touchTipMmFromBottom']),
     touchTipAfterDispense: hydratedFormData['dispense_touchTip'] || false,
+    touchTipAfterDispenseOffsetMmFromBottom: Number(hydratedFormData['dispense_touchTipMmFromBottom']),
     description: 'description would be here 2018-03-01', // TODO get from form
   }
 

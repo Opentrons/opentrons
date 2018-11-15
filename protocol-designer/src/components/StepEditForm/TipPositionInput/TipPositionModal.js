@@ -25,13 +25,13 @@ import TipPositionZAxisViz from './TipPositionZAxisViz'
 
 import styles from './TipPositionInput.css'
 
-import type {TipOffsetFields} from '../../../form-types'
+import {getIsTouchTipField, type TipOffsetFields} from '../../../form-types'
 
 const SMALL_STEP_MM = 1
 const LARGE_STEP_MM = 10
 const DECIMALS_ALLOWED = 1
 
-type DP = { updateValue: (string) => mixed }
+type DP = { updateValue: (?string) => mixed }
 
 type OP = {
   mmFromBottom: number,
@@ -43,7 +43,7 @@ type OP = {
 }
 
 type Props = OP & DP
-type State = { value: string }
+type State = { value: ?string }
 
 const formatValue = (value: number | string): string => (
   String(round(Number(value), DECIMALS_ALLOWED))
@@ -52,7 +52,10 @@ const formatValue = (value: number | string): string => (
 class TipPositionModal extends React.Component<Props, State> {
   constructor (props: Props) {
     super(props)
-    this.state = { value: formatValue(props.mmFromBottom) }
+    const initialValue = props.mmFromBottom
+      ? formatValue(props.mmFromBottom)
+      : formatValue(this.getDefaultMmFromBottom())
+    this.state = { value: initialValue }
   }
   componentDidUpdate (prevProps) {
     if (prevProps.wellHeightMM !== this.props.wellHeightMM) {
@@ -60,7 +63,8 @@ class TipPositionModal extends React.Component<Props, State> {
     }
   }
   applyChanges = () => {
-    this.props.updateValue(formatValue(this.state.value || 0))
+    const {value} = this.state
+    this.props.updateValue(value && formatValue(value))
   }
   getDefaultMmFromBottom = (): number => {
     const {fieldName, wellHeightMM} = this.props
@@ -79,8 +83,7 @@ class TipPositionModal extends React.Component<Props, State> {
   }
 
   handleReset = () => {
-    const defaultValue = this.getDefaultMmFromBottom()
-    this.setState({value: formatValue(defaultValue)}, this.applyChanges)
+    this.setState({value: null}, this.applyChanges)
     this.props.closeModal()
   }
   handleCancel = () => {
@@ -94,17 +97,21 @@ class TipPositionModal extends React.Component<Props, State> {
   handleChange = (e: SyntheticEvent<HTMLSelectElement>) => {
     const {value} = e.currentTarget
     const valueFloat = Number(formatValue(value))
+
+    const isTouchTip = getIsTouchTipField(this.props.fieldName)
+
     const maximumHeightMM = (this.props.wellHeightMM * 2)
+    const minimumHeightMM = isTouchTip ? this.props.wellHeightMM - 10 : 0
 
     if (!value) {
       this.setState({value})
     } else if (valueFloat > maximumHeightMM) {
       this.setState({value: formatValue(maximumHeightMM)})
-    } else if (valueFloat >= 0) {
+    } else if (valueFloat >= minimumHeightMM) {
       const numericValue = value.replace(/[^.0-9]/, '')
       this.setState({value: numericValue.replace(/(\d*[.]{1}\d{1})(\d*)/, (match, group1) => group1)})
     } else {
-      this.setState({value: formatValue(0)})
+      this.setState({value: null})
     }
   }
   makeHandleIncrement = (step: number) => () => {
@@ -164,7 +171,9 @@ class TipPositionModal extends React.Component<Props, State> {
                       <Icon name="minus" />
                     </OutlineButton>
                   </div>
-                  <TipPositionZAxisViz mmFromBottom={value} wellHeightMM={wellHeightMM} />
+                  <TipPositionZAxisViz
+                    mmFromBottom={value || String(this.getDefaultMmFromBottom())}
+                    wellHeightMM={wellHeightMM} />
                 </div>
               </div>
               <div className={styles.rightHalf}>{/* TODO: xy tip positioning */}</div>

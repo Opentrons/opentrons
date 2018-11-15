@@ -89,10 +89,6 @@ export type ChangeTipFields = {|
   'aspirate_changeTip'?: ChangeTipOptions,
 |}
 
-export type TouchTipFields = {|
-  'aspirate_touchTip'?: boolean,
-|}
-
 export type TransferLikeStepType = 'transfer' | 'consolidate' | 'distribute'
 
 export type TransferLikeForm = {|
@@ -100,7 +96,6 @@ export type TransferLikeForm = {|
   ...BlowoutFields,
   ...ChangeTipFields,
   ...DelayFields,
-  ...TouchTipFields,
 
   stepType: TransferLikeStepType,
   id: StepIdType,
@@ -131,7 +126,6 @@ export type MixForm = {|
   ...BlowoutFields,
   ...ChangeTipFields,
   ...DelayFields,
-  ...TouchTipFields,
   stepType: 'mix',
   id: StepIdType,
 
@@ -180,3 +174,12 @@ export type TipOffsetFields = 'aspirate_mmFromBottom'
   | 'aspirate_touchTipMmFromBottom'
   | 'dispense_touchTipMmFromBottom'
   | 'mix_touchTipMmFromBottom'
+
+export function getIsTouchTipField (field: string): boolean {
+  const touchTipFields = [
+    'aspirate_touchTipMmFromBottom',
+    'dispense_touchTipMmFromBottom',
+    'mix_touchTipMmFromBottom',
+  ]
+  return touchTipFields.includes(this.props.fieldName)
+}

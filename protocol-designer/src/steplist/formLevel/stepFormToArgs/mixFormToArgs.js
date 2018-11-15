@@ -13,6 +13,7 @@ type MixStepArgs = MixFormData
 const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
   const {labware, pipette} = hydratedFormData
   const touchTip = !!hydratedFormData['touchTip']
+  const touchTipMmFromBottom = hydratedFormData['mix_touchTipMmFromBottom']
 
   let wells = hydratedFormData.wells || []
   const orderFirst = hydratedFormData.aspirate_wellOrder_first
@@ -53,6 +54,7 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
     volume,
     times,
     touchTip,
+    touchTipMmFromBottom,
     delay,
     changeTip,
     blowout: blowoutLabwareId,

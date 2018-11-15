@@ -87,6 +87,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
       console.warn('the specified source labware definition could not be located')
     }
   }
+
   return {
     wellHeightMM,
     mmFromBottom: formData && formData[fieldName],

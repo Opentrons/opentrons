@@ -34,6 +34,8 @@ export type TransferLikeFormDataFields = {
   preWetTip: boolean,
   /** Touch tip after every aspirate */
   touchTipAfterAspirate: boolean,
+  /** Optional offset for touch tip after aspirate (if null, use PD default) */
+  touchTipAfterAspirateOffsetMmFromBottom?: ?number,
   /** changeTip is interpreted differently by different Step types */
   changeTip: ChangeTipOptions,
   /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
@@ -44,6 +46,8 @@ export type TransferLikeFormDataFields = {
   // ===== DISPENSE SETTINGS =====
   /** Touch tip in destination well after dispense */
   touchTipAfterDispense: boolean,
+  /** Optional offset for touch tip after dispense (if null, use PD default) */
+  touchTipAfterDispenseOffsetMmFromBottom?: ?number,
   /** Number of seconds to delay at the very end of the step (TODO: or after each dispense ?) */
   delayAfterDispense: ?number,
   /** offset from bottom of well in mm */
@@ -104,6 +108,7 @@ export type MixFormData = {
   times: number,
   /** Touch tip after mixing */
   touchTip: boolean,
+  touchTipMmFromBottom?: ?number,
   /** Delay in seconds */
   delay: ?number,
   /** change tip: see comments in step-generation/mix.js */
