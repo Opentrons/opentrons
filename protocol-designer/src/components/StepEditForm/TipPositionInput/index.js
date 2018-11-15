@@ -8,16 +8,17 @@ import i18n from '../../../localization'
 import {selectors} from '../../../steplist'
 import styles from './TipPositionInput.css'
 import TipPositionModal from './TipPositionModal'
+import {getIsTouchTipField} from '../../../form-types'
 import type {BaseState} from '../../../types'
 import type {StepFieldName, TipOffsetFields} from '../../../form-types'
 
 function getLabwareFieldForPositioningField (fieldName: TipOffsetFields): StepFieldName {
   const fieldMap: {[TipOffsetFields]: StepFieldName} = {
     aspirate_mmFromBottom: 'aspirate_labware',
-    dispense_mmFromBottom: 'dispense_labware',
-    mix_mmFromBottom: 'labware',
     aspirate_touchTipMmFromBottom: 'aspirate_labware',
+    dispense_mmFromBottom: 'dispense_labware',
     dispense_touchTipMmFromBottom: 'dispense_labware',
+    mix_mmFromBottom: 'labware',
     mix_touchTipMmFromBottom: 'labware',
   }
   return fieldMap[fieldName]
@@ -41,16 +42,22 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
   handleClose = () => { this.setState({isModalOpen: false}) }
 
   render () {
+    const Wrapper = ({children, hoverTooltipHandlers}) =>
+      getIsTouchTipField(this.props.fieldName)
+        ? <div>{children}</div>
+        : <FormGroup
+          label={i18n.t('form.step_edit_form.field.tip_position.label')}
+          disabled={!this.props.wellHeightMM}
+          className={styles.well_order_input}
+          hoverTooltipHandlers={hoverTooltipHandlers}>
+          {children}
+        </FormGroup>
+
     return (
       <HoverTooltip
         tooltipComponent={i18n.t('tooltip.step_fields.defaults.tipPosition')}
       >{(hoverTooltipHandlers) => (
-          <FormGroup
-            label={i18n.t('form.step_edit_form.field.tip_position.label')}
-            disabled={!this.props.wellHeightMM}
-            className={styles.well_order_input}
-            hoverTooltipHandlers={hoverTooltipHandlers}
-          >
+          <Wrapper hoverTooltipHandlers={hoverTooltipHandlers}>
             <TipPositionModal
               fieldName={this.props.fieldName}
               closeModal={this.handleClose}
@@ -62,7 +69,7 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
               onClick={this.handleOpen}
               value={this.props.wellHeightMM ? this.props.mmFromBottom : null}
               units="mm" />
-          </FormGroup>
+          </Wrapper>
         )}
       </HoverTooltip>
     )

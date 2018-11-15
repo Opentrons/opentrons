@@ -175,11 +175,11 @@ export type TipOffsetFields = 'aspirate_mmFromBottom'
   | 'dispense_touchTipMmFromBottom'
   | 'mix_touchTipMmFromBottom'
 
-export function getIsTouchTipField (field: string): boolean {
+export function getIsTouchTipField (fieldName: string): boolean {
   const touchTipFields = [
     'aspirate_touchTipMmFromBottom',
     'dispense_touchTipMmFromBottom',
     'mix_touchTipMmFromBottom',
   ]
-  return touchTipFields.includes(this.props.fieldName)
+  return touchTipFields.includes(fieldName)
 }
