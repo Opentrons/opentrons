@@ -150,29 +150,31 @@ function getStepItemContents (stepItemProps: StepItemProps) {
   return result
 }
 
-const StepItemWrapper = (props) => (
-  <div>
-    {props.connectDragSource(
-      <div style={{opacity: props.isDragging ? 0.5 : 1}}>
-        <StepItem {...props} />
-      </div>
-    )}
-  </div>
-)
+export default StepItem
 
-const DND_TYPES: {STEP_ITEM: "STEP_ITEM"} = {STEP_ITEM: 'STEP_ITEM'}
+// const StepItemWrapper = (props) => (
+//   <div>
+//     {props.connectDragSource(
+//       <div style={{opacity: props.isDragging ? 0.5 : 1}}>
+//         <StepItem {...props} />
+//       </div>
+//     )}
+//   </div>
+// )
 
-const cardSource = {
-  beginDrag (props) {
-    return {stepId: props.stepId}
-  },
-}
+// const DND_TYPES: {STEP_ITEM: "STEP_ITEM"} = {STEP_ITEM: 'STEP_ITEM'}
 
-function collectSource (connect, monitor) {
-  return {
-    connectDragSource: connect.dragSource(),
-    isDragging: monitor.isDragging(),
-  }
-}
+// const cardSource = {
+//   beginDrag (props) {
+//     return {stepId: props.stepId}
+//   },
+// }
 
-export default DragSource(DND_TYPES.STEP_ITEM, cardSource, collectSource)(StepItemWrapper)
+// function collectSource (connect, monitor) {
+//   return {
+//     connectDragSource: connect.dragSource(),
+//     isDragging: monitor.isDragging(),
+//   }
+// }
+
+// export default DragSource(DND_TYPES.STEP_ITEM, cardSource, collectSource)(StepItemWrapper)
