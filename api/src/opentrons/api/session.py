@@ -1,4 +1,5 @@
 import ast
+import asyncio
 import logging
 from copy import copy
 from time import time
@@ -275,7 +276,7 @@ class Session(object):
 
     async def identify(self):
         if ff.use_protocol_api_v2():
-            self._hardware.identify()
+            asyncio.ensure_future(self._hardware.identify())
         else:
             self._hardware.identify()
 

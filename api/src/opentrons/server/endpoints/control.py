@@ -418,7 +418,7 @@ async def identify(request):
     hw = hw_from_req(request)
     blink_time = int(request.query.get('seconds', '10'))
     if ff.use_protocol_api_v2():
-        asyncio.create_task(hw.identify(blink_time))
+        asyncio.ensure_future(hw.identify(blink_time))
     else:
         Thread(target=lambda: hw.identify(blink_time)).start()
     return web.json_response({"message": "identifying"})

@@ -189,19 +189,20 @@ class API(HardwareAPILike):
         return self._backend.get_lights()
 
     @_log_call
-    async def identify(self, duration_s: int):
+    async def identify(self, duration_s: int = 5):
         """ Blink the button light to identify the robot.
 
         :param int duration_s: The duration to blink for, in seconds.
         """
         count = duration_s * 4
-        on = True
+        on = False
         for sec in range(count):
             then = self._loop.time()
             self.set_lights(button=on)
-            on = on ^ on
+            on = not on
             now = self._loop.time()
             await asyncio.sleep(max(0, 0.25-(now-then)))
+        self.set_lights(button=True)
 
     @_log_call
     async def cache_instruments(self,

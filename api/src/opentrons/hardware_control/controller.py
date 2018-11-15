@@ -89,7 +89,7 @@ class Controller:
         self._cached_fw_version: Optional[str] = None
 
     def move(self, target_position: Dict[str, float],
-             home_flagged_axes: bool = True, speed: float = None):
+             home_flagged_axes: bool = False, speed: float = None):
         with self._set_temp_speed(speed):
             self._smoothie_driver.move(
                 target_position, home_flagged_axes=home_flagged_axes)
