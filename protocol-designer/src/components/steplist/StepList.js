@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import {SidePanel} from '@opentrons/components'
+import { DragSource } from 'react-dnd';
 
 import StartingDeckStateTerminalItem from './StartingDeckStateTerminalItem'
 import StepItem from '../../containers/ConnectedStepItem'
@@ -16,6 +17,31 @@ type Props = {
   orderedSteps: Array<StepIdType>,
   reorderSelectedStep: (delta: number) => mixed,
 }
+
+const DragSourceStepItem = (props) => (
+  props.connectDragSource(
+    <div style={{opacity: props.isDragging ? 0.5 : 1}}>
+      <StepItem {...props} />
+    </div>
+  )
+)
+
+const DND_TYPES: {STEP_ITEM: "STEP_ITEM"} = {
+  STEP_ITEM: 'STEP_ITEM',
+}
+const specImplementation = {
+  beginDrag (props) {
+    console.log('began')
+    return {stepId: props.stepId}
+  },
+}
+function collect (connect, monitor) {
+  return {
+    connectDragSource: connect.dragSource(),
+    isDragging: monitor.isDragging(),
+  }
+}
+const DraggableStepItem = DragSource(DND_TYPES.STEP_ITEM, specImplementation, collect)(DragSourceStepItem)
 
 export default class StepList extends React.Component<Props> {
   handleKeyDown = (e: SyntheticKeyboardEvent<*>) => {
@@ -44,7 +70,7 @@ export default class StepList extends React.Component<Props> {
     const {orderedSteps} = this.props
 
     const stepItems = orderedSteps.map((stepId: StepIdType) =>
-      <StepItem key={stepId} stepId={stepId} />)
+      <DraggableStepItem key={stepId} stepId={stepId} />)
 
     return (
       <React.Fragment>
