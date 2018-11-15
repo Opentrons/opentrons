@@ -9,6 +9,7 @@ import {selectors} from '../../../steplist'
 import styles from './TipPositionInput.css'
 import TipPositionModal from './TipPositionModal'
 import {getIsTouchTipField} from '../../../form-types'
+import {getDefaultMmFromBottom} from './utils'
 import type {BaseState} from '../../../types'
 import type {StepFieldName, TipOffsetFields} from '../../../form-types'
 
@@ -42,16 +43,28 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
   handleClose = () => { this.setState({isModalOpen: false}) }
 
   render () {
-    const Wrapper = ({children, hoverTooltipHandlers}) =>
+    const {fieldName, mmFromBottom, wellHeightMM} = this.props
+    const disabled = !this.props.wellHeightMM
+
+    const Wrapper = ({children, hoverTooltipHandlers}) => (
       getIsTouchTipField(this.props.fieldName)
         ? <div>{children}</div>
         : <FormGroup
           label={i18n.t('form.step_edit_form.field.tip_position.label')}
-          disabled={!this.props.wellHeightMM}
+          disabled={disabled}
           className={styles.well_order_input}
           hoverTooltipHandlers={hoverTooltipHandlers}>
           {children}
         </FormGroup>
+    )
+
+    let value = ''
+    if (wellHeightMM != null) {
+      // show default value for field in parens if no mmFromBottom value is selected
+      value = (mmFromBottom != null)
+        ? mmFromBottom
+        : `Default (${getDefaultMmFromBottom({fieldName, wellHeightMM})})`
+    }
 
     return (
       <HoverTooltip
@@ -59,15 +72,15 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
       >{(hoverTooltipHandlers) => (
           <Wrapper hoverTooltipHandlers={hoverTooltipHandlers}>
             <TipPositionModal
-              fieldName={this.props.fieldName}
+              fieldName={fieldName}
               closeModal={this.handleClose}
-              wellHeightMM={this.props.wellHeightMM}
-              mmFromBottom={this.props.mmFromBottom}
+              wellHeightMM={wellHeightMM}
+              mmFromBottom={mmFromBottom}
               isOpen={this.state.isModalOpen} />
             <InputField
               readOnly
               onClick={this.handleOpen}
-              value={this.props.wellHeightMM ? this.props.mmFromBottom : null}
+              value={value}
               units="mm" />
           </Wrapper>
         )}

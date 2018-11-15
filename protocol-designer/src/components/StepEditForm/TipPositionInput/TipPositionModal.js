@@ -14,18 +14,13 @@ import {
   HandleKeypress,
 } from '@opentrons/components'
 import i18n from '../../../localization'
-import {
-  DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
-  DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
-} from '../../../constants'
 import {Portal} from '../../portals/MainPageModalPortal'
 import modalStyles from '../../modals/modal.css'
 import {actions} from '../../../steplist'
 import TipPositionZAxisViz from './TipPositionZAxisViz'
 
 import styles from './TipPositionInput.css'
-
+import * as utils from './utils'
 import {getIsTouchTipField, type TipOffsetFields} from '../../../form-types'
 
 const SMALL_STEP_MM = 1
@@ -71,20 +66,8 @@ class TipPositionModal extends React.Component<Props, State> {
   }
   getDefaultMmFromBottom = (): number => {
     const {fieldName, wellHeightMM} = this.props
-    switch (fieldName) {
-      case 'aspirate_mmFromBottom':
-        return DEFAULT_MM_FROM_BOTTOM_ASPIRATE
-      case 'dispense_mmFromBottom':
-        return DEFAULT_MM_FROM_BOTTOM_DISPENSE
-      case 'mix_mmFromBottom':
-        // TODO: Ian 2018-11-131 figure out what offset makes most sense for mix
-        return DEFAULT_MM_FROM_BOTTOM_DISPENSE
-      default:
-        // touch tip fields
-        return DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP + wellHeightMM
-    }
+    return utils.getDefaultMmFromBottom({fieldName, wellHeightMM})
   }
-
   getMinMaxMmFromBottom = (): {maxMmFromBottom: number, minMmFromBottom: number} => {
     if (getIsTouchTipField(this.props.fieldName)) {
       return {
