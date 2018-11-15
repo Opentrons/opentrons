@@ -319,9 +319,9 @@
     "name": "p1000_single",
     "plungerPositions": {
       "top": 19.5,
-      "bottom": 3,
-      "blowOut": 1,
-      "dropTip": -2.2
+      "bottom": 4,
+      "blowOut": 2,
+      "dropTip": -2.5
     },
     "pickUpCurrent": 0.1,
     "pickUpDistance": 15,
@@ -348,8 +348,8 @@
     "plungerPositions": {
       "top": 19.5,
       "bottom": 2.5,
-      "blowOut": -0.5,
-      "dropTip": -3.7
+      "blowOut": 0.5,
+      "dropTip": -4
     },
     "pickUpCurrent": 0.1,
     "pickUpDistance": 15,
