@@ -77,7 +77,8 @@ jobs:
       install:
         - make install-js
       script:
-        - make -j 2 test-js check-js lint-js lint-css
+        - make test-js
+        - make lint-js lint-css
         - make -C components
         - make -C protocol-designer
       after_success:
@@ -97,6 +98,15 @@ jobs:
           local-dir: components/dist
           bucket: opentrons-components
           upload-dir: $TRAVIS_BRANCH
+
+    # typecheck JavaScript projects
+    - stage: test
+      name: 'JS type checks'
+      language: node_js
+      install:
+        - make install-js
+      script:
+        - make check-js
 
     - # build the Opentrons App for POSIX (dev branch builds)
       <<: *app_stage_build
