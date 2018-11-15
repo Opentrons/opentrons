@@ -4,7 +4,7 @@ import {handleActions} from 'redux-actions'
 import type {ActionType, Reducer} from 'redux-actions'
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
-import each from 'lodash/each'
+import reduce from 'lodash/reduce'
 
 import {getPDMetadata} from '../file-types'
 
@@ -133,13 +133,6 @@ type SavedStepFormState = {
   [StepIdType]: FormData,
 }
 
-const LABWARE_FIELD_NAMES = [
-  'aspirate_labware',
-  'dispense_blowout_labware',
-  'dispense_labware',
-  'labware',
-]
-
 const savedStepForms: Reducer<SavedStepFormState, *> = handleActions({
   SAVE_STEP_FORM: (state, action: SaveStepFormAction) => ({
     ...state,
@@ -155,17 +148,18 @@ const savedStepForms: Reducer<SavedStepFormState, *> = handleActions({
   },
   DELETE_CONTAINER: (state: SavedStepFormState, action: DeleteContainerAction): SavedStepFormState => (
     mapValues(state, savedForm => {
-      let deleteLabwareUpdate = {}
-      each(savedForm, (value, fieldName) => {
-        if (LABWARE_FIELD_NAMES.includes(fieldName) && value === action.payload.containerId) {
+      const deleteLabwareUpdate = reduce(savedForm, (acc, value, fieldName) => {
+        if (value === action.payload.containerId) {
           const formLabwareFieldUpdate = {[fieldName]: null}
-          deleteLabwareUpdate = {
-            ...deleteLabwareUpdate,
+          return {
+            ...acc,
             ...formLabwareFieldUpdate,
             ...getChangeLabwareEffects(formLabwareFieldUpdate),
           }
+        } else {
+          return acc
         }
-      })
+      }, {})
       return {
         ...savedForm,
         ...deleteLabwareUpdate,
