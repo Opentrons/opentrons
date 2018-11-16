@@ -37,13 +37,13 @@ const stepItemTarget = {
     return false
   },
   hover: (props: CardProps, monitor: DropTargetMonitor) => {
-    const { id: draggedId } = monitor.getItem()
-    const { id: overId } = props
+    const { stepId: draggedId } = monitor.getItem()
+    const { stepId: overId } = props
 
-    console.log('step item target', draggedId, overId)
+    console.log('step item ', monitor.getItem(), props)
     if (draggedId !== overId) {
-      const { index: overIndex } = props.findCard(overId)
-      props.moveCard(draggedId, overIndex)
+      const overIndex = props.findStepIndex(overId)
+      props.moveStep(draggedId, overIndex)
     }
   },
 }
@@ -92,11 +92,15 @@ class StepItems extends React.Component<StepItemsProps, StepItemsState> {
 
   moveStep = (stepId: StepIdType, targetIndex: number) => {
     const {stepIds} = this.state
-    const currentIndex = stepIds.findIndex(id => stepId === id)
-    const withoutTarget = stepIds.splice(currentIndex, 1)
-    const withTargetSplicedIn = withoutTarget.splice(targetIndex, 0, stepId)
-    this.setState({stepIds: withTargetSplicedIn})
+    const currentIndex = this.findStepIndex(stepId)
+    stepIds.splice(currentIndex, 1)
+    stepIds.splice(targetIndex, 0, stepId)
+    this.setState({stepIds})
   }
+
+  findStepIndex = stepId => (
+    this.state.stepIds.findIndex(id => stepId === id)
+  )
 
   render () {
     return this.props.connectDropTarget(
@@ -105,6 +109,7 @@ class StepItems extends React.Component<StepItemsProps, StepItemsState> {
           <DragDropStepItem
             key={stepId}
             stepId={stepId}
+            findStepIndex={this.findStepIndex}
             moveStep={this.moveStep} />
         ))}
       </div>
