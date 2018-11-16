@@ -108,3 +108,24 @@ export const reorderSelectedStep = (delta: number) =>
       })
     }
   }
+
+export type CopySelectedStepAction = {
+  type: 'COPY_SELECTED_STEP',
+  payload: {
+    selectedStepId: StepIdType,
+    nextStepId: StepIdType,
+  },
+}
+
+export const copySelectedStep = (delta: number) =>
+  (dispatch: ThunkDispatch<ReorderSelectedStepAction>, getState: GetState) => {
+    const selectedStepId = selectors.getSelectedStepId(getState())
+    const nextStepId = uuid()
+
+    if (selectedStepId != null) {
+      dispatch({
+        type: 'COPY_SELECTED_STEP',
+        payload: { selectedStepId, nextStepId },
+      })
+    }
+  }

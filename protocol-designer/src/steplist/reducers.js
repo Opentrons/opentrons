@@ -127,6 +127,13 @@ const steps: Reducer<StepsState, *> = handleActions({
       }
     }, {...initialStepState})
   },
+  COPY_SELECTED_STEP: (state: SavedStepFormState, action: CopySelectedStepAction): SavedStepFormState => ({
+    ...state,
+    [action.payload.nextStepId]: {
+      ...(action.payload.selectedStepId ? state[action.payload.selectedStepId] : {}),
+      id: action.payload.nextStepId,
+    },
+  }),
 }, initialStepState)
 
 type SavedStepFormState = {
@@ -171,6 +178,13 @@ const savedStepForms: Reducer<SavedStepFormState, *> = handleActions({
     [action.payload.stepId]: {
       ...(action.payload.stepId ? state[action.payload.stepId] : {}),
       ...action.payload.update,
+    },
+  }),
+  COPY_SELECTED_STEP: (state: SavedStepFormState, action: CopySelectedStepAction): SavedStepFormState => ({
+    ...state,
+    [action.payload.nextStepId]: {
+      ...(action.payload.selectedStepId ? state[action.payload.selectedStepId] : {}),
+      id: action.payload.nextStepId,
     },
   }),
 }, {})
@@ -219,6 +233,16 @@ const orderedSteps: Reducer<OrderedStepsState, *> = handleActions({
       ...stepsWithoutSelectedStep.slice(0, nextIndex),
       stepId,
       ...stepsWithoutSelectedStep.slice(nextIndex),
+    ]
+  },
+  COPY_SELECTED_STEP: (state: OrderedStepsState, action: CopySelectedStepAction): OrderedStepsState => {
+    const {selectedStepId, nextStepId} = action.payload
+    const selectedIndex = state.findIndex(s => s === selectedStepId)
+
+    return [
+      ...state.slice(0, selectedIndex + 1),
+      nextStepId,
+      ...state.slice(selectedIndex + 1, state.length),
     ]
   },
 }, [])
