@@ -1,4 +1,5 @@
 import ast
+import asyncio
 import logging
 from copy import copy
 from time import time
@@ -10,7 +11,7 @@ from opentrons.legacy_api.containers import get_container, location_to_list
 from opentrons.legacy_api.containers.placeable import Module as ModulePlaceable
 from opentrons.commands import tree, types
 from opentrons.protocols import execute_protocol
-from opentrons import robot, modules
+from opentrons.config import feature_flags as ff
 
 from .models import Container, Instrument, Module
 
@@ -20,33 +21,32 @@ VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused', 'error'}
 
 
 class SessionManager(object):
-    def __init__(self, loop=None):
+    def __init__(self, hardware):
         self.session = None
         self._session_lock = False
-        for module in robot.modules:
-            module.disconnect()
-        robot.modules = modules.discover_and_connect()
+        self._hardware = hardware
 
-    def create(self, name, text):
+    async def create(self, name, text):
         if self._session_lock:
             raise Exception(
                 'Cannot create session while simulation in progress')
 
         self._session_lock = True
         try:
-            self.session = Session(name=name, text=text)
+            self.session = await Session.build_and_prep(
+                name=name, text=text, hardware=self._hardware)
         finally:
             self._session_lock = False
 
         return self.session
 
-    def clear(self):
+    async def clear(self):
         if self._session_lock:
             raise Exception(
                 'Cannot clear session while simulation in progress')
 
         if self.session:
-            robot.reset()
+            self._hardware.reset()
         self.session = None
 
     def get_session(self):
@@ -56,10 +56,17 @@ class SessionManager(object):
 class Session(object):
     TOPIC = 'session'
 
-    def __init__(self, name, text):
+    @classmethod
+    async def build_and_prep(cls, name, text, hardware):
+        sess = cls(name, text, hardware)
+        await sess.prepare()
+        return sess
+
+    def __init__(self, name, text, hardware):
         self.name = name
         self.protocol_text = text
         self._protocol = None
+        self._hardware = hardware
         self.state = None
         self.commands = []
         self.command_log = {}
@@ -76,10 +83,12 @@ class Session(object):
 
         self.startTime = None
 
-        for module in robot.modules:
-            module.disconnect()
-        robot.modules = modules.discover_and_connect()
-        self.refresh()
+    async def prepare(self):
+        if ff.use_protocol_api_v2():
+            await self._hardware.discover_modules()
+        else:
+            self._hardware.discover_modules()
+        await self.refresh()
 
     def get_instruments(self):
         return [
@@ -117,8 +126,11 @@ class Session(object):
         self.command_log.clear()
         self.errors.clear()
 
-    def _simulate(self):
-        self._reset()
+    async def _simulate(self):
+        if ff.use_protocol_api_v2():
+            raise NotImplementedError(
+                    "Need to implement new api in protocols")
+        await self._reset()
 
         stack = []
         res = []
@@ -153,11 +165,13 @@ class Session(object):
 
         try:
             # ensure actual pipettes are cached before driver is disconnected
-            robot.cache_instrument_models()
 
-            # TODO (artyom, 20171005): this will go away
-            # once robot / driver simulation flow is fixed
-            robot.disconnect()
+            self._hardware.cache_instrument_models()
+
+            if not ff.use_protocol_api_v2():
+                # TODO (artyom, 20171005): this will go away
+                # once robot / driver simulation flow is fixed
+                self._hardware.disconnect()
             if self._is_json_protocol:
                 execute_protocol(self._protocol)
             else:
@@ -166,7 +180,8 @@ class Session(object):
             # physically attached pipettes are re-cached during robot.connect()
             # which is important, because during a simulation, the robot could
             # think that it holds a pipette model that it actually does not
-            robot.connect()
+            if not ff.use_protocol_api_v2():
+                self._hardware.connect()
             unsubscribe()
 
             instruments, containers, modules, interactions = _accumulate(
@@ -181,12 +196,13 @@ class Session(object):
             # we have to clear the tips if they are left on after simulation
             # to ensure that the instruments are in the expected state at the
             # beginning of the labware calibration flow
-            robot.clear_tips()
+            if not ff.use_protocol_api_v2():
+                self._hardware.clear_tips()
 
         return res
 
-    def refresh(self):
-        self._reset()
+    async def refresh(self):
+        await self._reset()
         self._is_json_protocol = self.name.endswith('.json')
 
         if self._is_json_protocol:
@@ -196,35 +212,32 @@ class Session(object):
         else:
             parsed = ast.parse(self.protocol_text)
             self._protocol = compile(parsed, filename=self.name, mode='exec')
-        commands = self._simulate()
+        commands = await self._simulate()
         self.commands = tree.from_list(commands)
 
         self.containers = self.get_containers()
         self.instruments = self.get_instruments()
         self.modules = self.get_modules()
         self.startTime = None
-
         self.set_state('loaded')
-
         return self
 
     def stop(self):
-        robot.stop()
+        self._hardware.stop()
         self.set_state('stopped')
         return self
 
     def pause(self):
-        robot.pause()
+        self._hardware.pause()
         self.set_state('paused')
         return self
 
     def resume(self):
-
-        robot.resume()
+        self._hardware.resume()
         self.set_state('running')
         return self
 
-    def run(self):
+    async def run(self):
         def on_command(message):
             if message['$'] == 'before':
                 self.log_append()
@@ -233,7 +246,10 @@ class Session(object):
             if message['name'] == types.RESUME:
                 self.set_state('running')
 
-        self._reset()
+        if ff.use_protocol_api_v2():
+            raise NotImplementedError("Need to implement new API in protocols")
+
+        await self._reset()
 
         _unsubscribe = subscribe(types.COMMAND, on_command)
         self.startTime = now()
@@ -241,13 +257,13 @@ class Session(object):
 
         try:
             self.resume()
-            self._pre_run_hooks()
+            await self._pre_run_hooks()
             if self._is_json_protocol:
                 execute_protocol(self._protocol)
             else:
                 exec(self._protocol, {})
             self.set_state('finished')
-            robot.home()
+            self._hardware.home()
         except Exception as e:
             log.exception("Exception during run:")
             self.error_append(e)
@@ -258,14 +274,17 @@ class Session(object):
 
         return self
 
-    def identify(self):
-        robot.identify()
+    async def identify(self):
+        if ff.use_protocol_api_v2():
+            asyncio.ensure_future(self._hardware.identify())
+        else:
+            self._hardware.identify()
 
     def turn_on_rail_lights(self):
-        robot.turn_on_rail_lights()
+        self._hardware.set_lights(rails=True)
 
     def turn_off_rail_lights(self):
-        robot.turn_off_rail_lights()
+        self._hardware.set_lights(rails=False)
 
     def set_state(self, state):
         log.debug("State set to {}".format(state))
@@ -290,8 +309,11 @@ class Session(object):
         )
         # self._on_state_changed()
 
-    def _reset(self):
-        robot.reset()
+    async def _reset(self):
+        if ff.use_protocol_api_v2():
+            await self._hardware.reset()
+        else:
+            self._hardware.reset()
         self.clear_logs()
 
     def _snapshot(self):
@@ -318,8 +340,11 @@ class Session(object):
     def _on_state_changed(self):
         publish(Session.TOPIC, self._snapshot())
 
-    def _pre_run_hooks(self):
-        robot.home_z()
+    async def _pre_run_hooks(self):
+        if ff.use_protocol_api_v2():
+            await self._hardware.home_z()
+        else:
+            self._hardware.home_z()
 
 
 def _accumulate(iterable):

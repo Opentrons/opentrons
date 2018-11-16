@@ -123,16 +123,16 @@ def test_pick_up_and_drop_tip(loop, load_my_labware):
 
     pipette: Pipette = ctx._hardware._attached_instruments[mount]
     model_offset = Point(*pipette.config.model_offset)
-    assert pipette.critical_point == model_offset
+    assert pipette.critical_point() == model_offset
     target_location = tiprack.wells_by_index()['A1'].top()
 
     instr.pick_up_tip(target_location)
 
     new_offset = model_offset - Point(0, 0, tip_lenth)
-    assert pipette.critical_point == new_offset
+    assert pipette.critical_point() == new_offset
 
     instr.drop_tip(target_location)
-    assert pipette.critical_point == model_offset
+    assert pipette.critical_point() == model_offset
 
 
 def test_pick_up_tip_no_location(loop, load_my_labware):
@@ -153,16 +153,16 @@ def test_pick_up_tip_no_location(loop, load_my_labware):
 
     pipette: Pipette = ctx._hardware._attached_instruments[mount]
     model_offset = Point(*pipette.config.model_offset)
-    assert pipette.critical_point == model_offset
+    assert pipette.critical_point() == model_offset
 
     instr.pick_up_tip()
 
     new_offset = model_offset - Point(0, 0, tip_lenth1)
-    assert pipette.critical_point == new_offset
+    assert pipette.critical_point() == new_offset
 
     # TODO: remove argument and verify once trash container is added
     instr.drop_tip(tiprack1.wells()[0].top())
-    assert pipette.critical_point == model_offset
+    assert pipette.critical_point() == model_offset
 
     for well in tiprack1.wells():
         if well.has_tip:

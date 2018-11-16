@@ -51,6 +51,10 @@ class MagDeck(mod_abc.AbstractModule):
     def name(cls) -> str:
         return 'magdeck'
 
+    @classmethod
+    def display_name(cls) -> str:
+        return 'Magnetic Deck'
+
     def __init__(self, port, simulating):
         self._engaged = False
         self._port = port
@@ -101,7 +105,9 @@ class MagDeck(mod_abc.AbstractModule):
     def live_data(self):
         return {
             'status': self.status,
-            'data': {}
+            'data': {
+                'engaged': self._engaged
+            }
         }
 
     @property
