@@ -14,7 +14,7 @@ import {getRobotApiVersion} from '../../../discovery'
 
 import {
   CURRENT_VERSION,
-  CURRENT_RELEASE_NOTES,
+  API_RELEASE_NOTES,
   getShellUpdateState,
 } from '../../../shell'
 
@@ -58,11 +58,6 @@ type UpdateRobotState = {
   showReleaseNotes: boolean,
 }
 
-const API_RELEASE_NOTES = CURRENT_RELEASE_NOTES.replace(
-  /<!-- start:@opentrons\/app -->([\S\s]*?)<!-- end:@opentrons\/app -->/,
-  ''
-)
-
 class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
   constructor (props) {
     super(props)
@@ -87,10 +82,10 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
       appVersion,
       robotVersion,
       updateInfo,
-      appUpdate: {available, info},
+      appUpdate: {available: appUpdateAvailable, info: appUpdateInfo},
     } = this.props
     const {showReleaseNotes} = this.state
-    const appUpdateVersion = info ? info.version : appVersion
+    const appUpdateVersion = appUpdateInfo ? appUpdateInfo.version : appVersion
     const robotUpdateVersion = updateInfo.version
     const versionProps = {
       appVersion,
@@ -105,7 +100,7 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
     let message
     let skipMessage
 
-    if (available) {
+    if (appUpdateAvailable) {
       heading = `Version ${appUpdateVersion} available`
       buttonText = 'View App Update'
       message = <UpdateAppMessage {...versionProps} />
@@ -137,7 +132,7 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
       buttonAction = () => console.log('reinstall')
     }
 
-    button = available
+    button = appUpdateAvailable
       ? {
         children: buttonText,
         Component: Link,
@@ -151,13 +146,12 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
       <VersionList {...versionProps} />
     )
 
-    // TODO: (ka 2018-11-14): Change to stateful component,
-    // Render release notes and hide VersionList based on showReleaseNotes boolean
     return (
       <ScrollableAlertModal
         heading={heading}
         alertOverlay
         buttons={[{onClick: ignoreUpdate, children: 'not now'}, button]}
+        key={String(showReleaseNotes)}
       >
         {message}
         {children}
