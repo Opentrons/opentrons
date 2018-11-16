@@ -6,6 +6,7 @@ import { getLabware } from '@opentrons/shared-data'
 import {selectors as labwareIngredsSelectors} from '../../../labware-ingred/reducers'
 import i18n from '../../../localization'
 import {selectors} from '../../../steplist'
+import stepFormStyles from '../StepEditForm.css'
 import styles from './TipPositionInput.css'
 import TipPositionModal from './TipPositionModal'
 import {getIsTouchTipField} from '../../../form-types'
@@ -45,18 +46,17 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
   render () {
     const {fieldName, mmFromBottom, wellHeightMM} = this.props
     const disabled = !this.props.wellHeightMM
+    const isTouchTipField = getIsTouchTipField(this.props.fieldName)
 
-    const Wrapper = ({children, hoverTooltipHandlers}) => (
-      getIsTouchTipField(this.props.fieldName)
-        ? <div>{children}</div>
-        : <FormGroup
-          label={i18n.t('form.step_edit_form.field.tip_position.label')}
-          disabled={disabled}
-          className={styles.well_order_input}
-          hoverTooltipHandlers={hoverTooltipHandlers}>
-          {children}
-        </FormGroup>
-    )
+    const Wrapper = ({children, hoverTooltipHandlers}) => isTouchTipField
+      ? <React.Fragment>{children}</React.Fragment>
+      : <FormGroup
+        label={i18n.t('form.step_edit_form.field.tip_position.label')}
+        disabled={disabled}
+        className={styles.well_order_input}
+        hoverTooltipHandlers={hoverTooltipHandlers}>
+        {children}
+      </FormGroup>
 
     let value = ''
     if (wellHeightMM != null) {
@@ -78,6 +78,9 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
               mmFromBottom={mmFromBottom}
               isOpen={this.state.isModalOpen} />
             <InputField
+              className={isTouchTipField
+                ? stepFormStyles.full_width
+                : undefined} // TODO Ian 2018-11-16 change InputField props.className to be `?string` so this can be `null` not `undefined`?
               readOnly
               onClick={this.handleOpen}
               value={value}
