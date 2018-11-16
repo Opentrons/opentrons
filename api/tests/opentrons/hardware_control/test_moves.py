@@ -151,6 +151,9 @@ async def test_critical_point_applied(hardware_api, monkeypatch):
                                               Axis.Z: 218,
                                               Axis.A: 0,
                                               Axis.B: 19, Axis.C: 19}
+    assert hardware_api.current_position(types.Mount.RIGHT,
+                                         critical_point=CriticalPoint.MOUNT)\
+        == {Axis.X: 0.0, Axis.Y: 0.0, Axis.A: 0, Axis.C: 19}
     # Specifying the critical point as nozzle should have the same behavior
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0),
                                critical_point=CriticalPoint.NOZZLE)

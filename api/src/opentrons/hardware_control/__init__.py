@@ -409,12 +409,23 @@ class API(HardwareAPILike):
         deck_pos.update(plunger_axes)
         return deck_pos
 
-    def current_position(self, mount: top_types.Mount) -> Dict[Axis, float]:
+    def current_position(
+            self,
+            mount: top_types.Mount,
+            critical_point: CriticalPoint = None) -> Dict[Axis, float]:
         """ Return the postion (in deck coords) of the critical point of the
         specified mount.
 
         This returns cached position to avoid hitting the smoothie driver
         unless ``refresh`` is ``True``.
+
+        If `critical_point` is specified, that critical point will be applied
+        instead of the default one. For instance, if
+        `critical_point=CriticalPoints.MOUNT` then the position of the mount
+        will be returned. If the critical point specified does not exist, then
+        the next one down is returned - for instance, if there is no tip on the
+        specified mount but `CriticalPoint.TIP` was specified, the position of
+        the nozzle will be returned.
         """
         if not self._current_position:
             raise MustHomeError
@@ -424,7 +435,7 @@ class API(HardwareAPILike):
             offset = top_types.Point(*self.config.mount_offset)
         z_ax = Axis.by_mount(mount)
         plunger_ax = Axis.of_plunger(mount)
-        cp = self._critical_point_for(mount)
+        cp = self._critical_point_for(mount, critical_point)
         return {
             Axis.X: self._current_position[Axis.X] + offset[0] + cp.x,
             Axis.Y: self._current_position[Axis.Y] + offset[1] + cp.y,
@@ -432,13 +443,19 @@ class API(HardwareAPILike):
             plunger_ax: self._current_position[plunger_ax]
         }
 
-    def gantry_position(self, mount: top_types.Mount) -> top_types.Point:
+    def gantry_position(
+            self,
+            mount: top_types.Mount,
+            critical_point: CriticalPoint = None) -> top_types.Point:
         """ Return the position of the critical point as pertains to the gantry
 
         This ignores the plunger position and gives the Z-axis a predictable
         name (as :py:attr:`.Point.z`).
+
+        `critical_point` specifies an override to the current critical point to
+        use (see :py:meth:`current_position`).
         """
-        cur_pos = self.current_position(mount)
+        cur_pos = self.current_position(mount, critical_point)
         return top_types.Point(x=cur_pos[Axis.X],
                                y=cur_pos[Axis.Y],
                                z=cur_pos[Axis.by_mount(mount)])
