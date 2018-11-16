@@ -141,8 +141,8 @@
     "name": "p10_multi",
     "plungerPositions": {
       "top": 19.5,
-      "bottom": 0.5,
-      "blowOut": -2.5,
+      "bottom": 2,
+      "blowOut": -1,
       "dropTip": -4.5
     },
     "pickUpCurrent": 0.4,
@@ -535,7 +535,7 @@
       "top": 19.5,
       "bottom": 2.5,
       "blowOut": -0.5,
-      "dropTip": -3.7
+      "dropTip": -4
     },
     "pickUpCurrent": 0.1,
     "pickUpDistance": 15,
