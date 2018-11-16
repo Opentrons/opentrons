@@ -1,6 +1,10 @@
 BAD_BARCODE_MESSAGE = 'Unexpected Serial -> {}'
 WRITE_FAIL_MESSAGE = 'Data not saved, HOLD BUTTON'
 
+# must iterate through v1.4 and v1.3 first, because v1 barcodes did not
+# have characters to specify the version number
+VERSIONS = ['v1.4', 'v1.3', 'v1']
+
 MODELS = {
     'v1': {
         'P10S': 'p10_single_v1',
@@ -19,6 +23,15 @@ MODELS = {
         'P3HSV13': 'p300_single_v1.3',
         'P3HMV13': 'p300_multi_v1.3',
         'P1KSV13': 'p1000_single_v1.3'
+    },
+    'v1.4': {
+        'P10SV14': 'p10_single_v1.4',
+        'P10MV14': 'p10_multi_v1.4',
+        'P50SV14': 'p50_single_v1.4',
+        'P50MV14': 'p50_multi_v1.4',
+        'P3HSV14': 'p300_single_v1.4',
+        'P3HMV14': 'p300_multi_v1.4',
+        'P1KSV14': 'p1000_single_v1.4'
     }
 }
 
@@ -79,9 +92,7 @@ def _user_submitted_barcode(max_length):
 
 
 def _parse_model_from_barcode(barcode):
-    # MUST iterate through v1.3 first, because v1 barcodes did not have
-    # characters to specify the version number
-    for version in ['v1.3', 'v1']:
+    for version in VERSIONS:
         for barcode_substring in MODELS[version].keys():
             if barcode.startswith(barcode_substring):
                 return MODELS[version][barcode_substring]
