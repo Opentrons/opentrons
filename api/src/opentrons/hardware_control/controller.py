@@ -216,7 +216,7 @@ class Controller:
         return self._smoothie_driver.engaged_axes
 
     def disengage_axes(self, axes: List[str]):
-        self._smoothie_driver.disengage_axes(''.join(axes))
+        self._smoothie_driver.disengage_axis(''.join(axes))
 
     def set_lights(self, button: Optional[bool], rails: Optional[bool]):
         if button is not None:

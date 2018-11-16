@@ -118,7 +118,7 @@ class SingletonAdapter(HardwareAPILike):
 
     async def disengage_axes(self, which: List[str]):
         api = object.__getattribute__(self, '_api')
-        await api.disengage_axes([Axis[ax] for ax in which])
+        await api.disengage_axes([Axis[ax.upper()] for ax in which])
 
     def get_attached_pipettes(self):
         """ Mimic the behavior of robot.get_attached_pipettes"""

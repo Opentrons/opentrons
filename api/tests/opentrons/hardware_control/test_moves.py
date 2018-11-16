@@ -192,7 +192,7 @@ async def test_deck_cal_applied(monkeypatch, loop):
                       [0, 0, 0, 1]]
     called_with = None
 
-    def mock_move(position, speed=None):
+    def mock_move(position, speed=None, home_flagged_axes=True):
         nonlocal called_with
         called_with = position
 

@@ -287,12 +287,19 @@ async def move(request):
         if ff.use_protocol_api_v2():
             await hw.cache_instruments()
             if target == 'mount':
-                await hw.move_to(Mount[mount.upper()], Point(*point),
-                                 critical_point=CriticalPoint.MOUNT)
+                critical_point = CriticalPoint.MOUNT
             else:
-                await hw.move_to(Mount[mount.upper()], Point(*point))
+                critical_point = None
+            mount = Mount[mount.upper()]
+            target = Point(*point)
+            await hw.home_z()
+            pos = hw.gantry_position(mount)
+            await hw.move_to(mount, target._replace(z=pos.z),
+                             critical_point=critical_point)
+            await hw.move_to(mount, target,
+                             critical_point=critical_point)
             message = 'Move complete. New position: {}'\
-                .format(hw.gantry_position(Mount[mount.upper()]))
+                .format(hw.gantry_position(mount))
         else:
             if target == 'mount':
                 message = _move_mount(hw, mount, point)

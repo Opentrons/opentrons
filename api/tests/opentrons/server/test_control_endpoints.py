@@ -245,7 +245,7 @@ async def test_disengage_axes(async_client, monkeypatch):
     assert json.loads(result0) == alltrue
 
     postres = await async_client.post(
-        '/motors/disengage', json={'axes': ['X', 'B']})
+        '/motors/disengage', json={'axes': ['X', 'b']})
     assert postres.status == 200
 
     xbfalse = deepcopy(alltrue)

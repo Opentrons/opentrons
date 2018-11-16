@@ -357,8 +357,15 @@ class API(HardwareAPILike):
         """
         # Initialize/update current_position
         checked_axes = axes or [ax for ax in Axis]
-        smoothie_axes = [ax.name.upper() for ax in checked_axes]
-        smoothie_pos = self._backend.home(smoothie_axes)
+        gantry = [ax for ax in checked_axes if ax in Axis.gantry_axes()]
+        smoothie_gantry = [ax.name.upper() for ax in gantry]
+        smoothie_pos = {}
+        if smoothie_gantry:
+            smoothie_pos.update(self._backend.home(smoothie_gantry))
+        plungers = [ax for ax in checked_axes if ax not in Axis.gantry_axes()]
+        smoothie_plungers = [ax.name.upper() for ax in plungers]
+        if smoothie_plungers:
+            smoothie_pos.update(self._backend.home(smoothie_plungers))
         self._current_position = self._deck_from_smoothie(smoothie_pos)
 
     def _deck_from_smoothie(
@@ -544,12 +551,12 @@ class API(HardwareAPILike):
              (pl_axis, dist))
         )
         try:
-            await self._move(all_axes_pos, speed)
+            await self._move(all_axes_pos, speed, False)
         except KeyError:
             raise MustHomeError
 
     async def _move(self, target_position: 'OrderedDict[Axis, float]',
-                    speed: float = None):
+                    speed: float = None, home_flagged_axes: bool = True):
         """ Worker function to apply robot motion.
 
         Robot motion means the kind of motions that are relevant to the robot,
@@ -614,7 +621,8 @@ class API(HardwareAPILike):
                                 deck_mins[ax], deck_max[ax],
                                 bounds[ax.name][0], bounds[ax.name][1]))
         try:
-            self._backend.move(smoothie_pos, speed=speed)
+            self._backend.move(smoothie_pos, speed=speed,
+                               home_flagged_axes=home_flagged_axes)
         except Exception:
             self._log.exception('Move failed')
             self._current_position.clear()
