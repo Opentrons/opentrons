@@ -27,8 +27,12 @@ function mapStateToProps (state: BaseState): SP {
 
 function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
   return {
-    reorderSelectedStep: (delta: number) =>
-      dispatch(steplistActions.reorderSelectedStep(delta)),
+    reorderSelectedStep: (delta: number) => {
+      dispatch(steplistActions.reorderSelectedStep(delta))
+    },
+    reorderSteps: (stepIds: Array<StepIdType>) => {
+      dispatch(steplistActions.reorderSteps(stepIds))
+    },
   }
 }
 

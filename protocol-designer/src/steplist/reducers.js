@@ -221,6 +221,9 @@ const orderedSteps: Reducer<OrderedStepsState, *> = handleActions({
       ...stepsWithoutSelectedStep.slice(nextIndex),
     ]
   },
+  REORDER_STEPS: (state: OrderedStepsState, action: ReorderStepsAction): OrderedStepsState => (
+    action.payload.stepIds
+  ),
 }, [])
 
 export type SelectableItem = {

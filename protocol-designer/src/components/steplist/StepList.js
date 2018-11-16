@@ -40,7 +40,6 @@ const stepItemTarget = {
     const { stepId: draggedId } = monitor.getItem()
     const { stepId: overId } = props
 
-    console.log('step item ', monitor.getItem(), props)
     if (draggedId !== overId) {
       const overIndex = props.findStepIndex(overId)
       props.moveStep(draggedId, overIndex)
@@ -51,6 +50,9 @@ const stepItemTarget = {
 const specImplementation = {
   beginDrag (props) {
     return {stepId: props.stepId}
+  },
+  endDrag (props) {
+    props.onEndDrag()
   },
 }
 function collect (connect, monitor) {
@@ -78,6 +80,7 @@ const stepListTarget = {
 }
 function collectTarget (connect, monitor) {
   return {
+    isOver: monitor.isOver(),
     connectDropTarget: connect.dropTarget(),
   }
 }
@@ -90,26 +93,48 @@ class StepItems extends React.Component<StepItemsProps, StepItemsState> {
     this.state = {stepIds: this.props.orderedSteps}
   }
 
+  componentDidUpdate (prevProps) {
+    if (!prevProps.isOver && this.props.isOver) {
+      this.setState({stepIds: this.props.orderedSteps})
+    } else if (prevProps.isOver && !this.props.isOver) {
+      if (confirm('Are you sure you want to reorder these steps, it may cause errors?')) {
+        this.props.reorderSteps(this.state.stepIds)
+      }
+    }
+  }
+
   moveStep = (stepId: StepIdType, targetIndex: number) => {
     const {stepIds} = this.state
     const currentIndex = this.findStepIndex(stepId)
-    stepIds.splice(currentIndex, 1)
-    stepIds.splice(targetIndex, 0, stepId)
-    this.setState({stepIds})
+    const currentRemoved = [
+      ...stepIds.slice(0, currentIndex),
+      ...stepIds.slice(currentIndex + 1, stepIds.length),
+    ]
+    const currentReinserted = [
+      ...currentRemoved.slice(0, targetIndex),
+      stepId,
+      ...currentRemoved.slice(targetIndex, currentRemoved.length),
+    ]
+    this.setState({stepIds: currentReinserted})
   }
 
   findStepIndex = stepId => (
     this.state.stepIds.findIndex(id => stepId === id)
   )
 
+  onEndDrag = () => {
+  }
+
   render () {
+    const currentIds = this.props.isOver ? this.state.stepIds : this.props.orderedSteps
     return this.props.connectDropTarget(
       <div>
-        {this.state.stepIds.map((stepId: StepIdType) => (
+        {currentIds.map((stepId: StepIdType) => (
           <DragDropStepItem
             key={stepId}
             stepId={stepId}
             findStepIndex={this.findStepIndex}
+            onEndDrag={this.onEndDrag}
             moveStep={this.moveStep} />
         ))}
       </div>
@@ -148,7 +173,9 @@ export default class StepList extends React.Component<Props> {
         <SidePanel
           title='Protocol Timeline'>
           <StartingDeckStateTerminalItem />
-          <DroppableStepItems orderedSteps={this.props.orderedSteps} />
+          <DroppableStepItems
+            orderedSteps={this.props.orderedSteps.slice()}
+            reorderSteps={this.props.reorderSteps} />
           <StepCreationButton />
           <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />
         </SidePanel>
