@@ -10,7 +10,7 @@ from opentrons.config import pipette_config
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as ff
 from opentrons.types import Mount, Point
-from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.types import Axis, CriticalPoint
 
 
 log = logging.getLogger(__name__)
@@ -286,7 +286,11 @@ async def move(request):
         status = 200
         if ff.use_protocol_api_v2():
             await hw.cache_instruments()
-            await hw.move_to(Mount[mount.upper()], Point(*point))
+            if target == 'mount':
+                await hw.move_to(Mount[mount.upper()], Point(*point),
+                                 critical_point=CriticalPoint.MOUNT)
+            else:
+                await hw.move_to(Mount[mount.upper()], Point(*point))
             message = 'Move complete. New position: {}'\
                 .format(hw.gantry_position(Mount[mount.upper()]))
         else:

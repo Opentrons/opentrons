@@ -26,7 +26,7 @@ except ModuleNotFoundError:
     # implies windows
     Controller = None  # type: ignore
 from . import modules
-from .types import Axis, HardwareAPILike
+from .types import Axis, HardwareAPILike, CriticalPoint
 
 
 mod_log = logging.getLogger(__name__)
@@ -439,7 +439,8 @@ class API(HardwareAPILike):
     @_log_call
     async def move_to(
             self, mount: top_types.Mount, abs_position: top_types.Point,
-            speed: float = None):
+            speed: float = None,
+            critical_point: CriticalPoint = None):
         """ Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed. 'speed' sets the speed
         of all robot axes to the given value. So, if multiple axes are to be
@@ -456,6 +457,20 @@ class API(HardwareAPILike):
           pipette tip, the critical point is the end of the pipette tip for
           a single pipette or the end of the tip of the backmost nozzle of a
           multipipette
+
+        :param mount: The mount to move
+        :param abs_position: The target absolute position in
+                             :ref:`protocol-api-deck-coords` to move the
+                             critical point to
+        :param speed: An overall head speed to use during the move
+        :param critical_point: The critical point to move. In most situations
+                               this is not needed. If not specified, the
+                               current critical point will be moved. If
+                               specified, the critical point must be one that
+                               actually exists - that is, specifying
+                               :py:attr:`.CriticalPoint.NOZZLE` when no pipette
+                               is attached or :py:attr:`.CriticalPoint.TIP`
+                               when no tip is applied will result in an error.
         """
         if not self._current_position:
             raise MustHomeError
@@ -467,7 +482,7 @@ class API(HardwareAPILike):
             offset = top_types.Point(*self.config.mount_offset)
         else:
             offset = top_types.Point(0, 0, 0)
-        cp = self._critical_point_for(mount)
+        cp = self._critical_point_for(mount, critical_point)
         target_position = OrderedDict(
             ((Axis.X, abs_position.x - offset.x - cp.x),
              (Axis.Y, abs_position.y - offset.y - cp.y),
@@ -626,16 +641,21 @@ class API(HardwareAPILike):
         smoothie_pos = self._backend.fast_home(smoothie_ax, margin)
         self._current_position = self._deck_from_smoothie(smoothie_pos)
 
-    def _critical_point_for(self, mount: top_types.Mount) -> top_types.Point:
+    def _critical_point_for(
+            self, mount: top_types.Mount,
+            cp_override: CriticalPoint = None) -> top_types.Point:
         """ Return the current critical point of the specified mount.
 
         The mount's critical point is the position of the mount itself, if no
         pipette is attached, or the pipette's critical point (which depends on
         tip status).
+
+        If `cp_override` is specified, and that critical point actually exists,
+        it will be used instead. Invalid `cp_override`s are ignored.
         """
         pip = self._attached_instruments[mount]
-        if pip is not None:
-            return pip.critical_point
+        if pip is not None and cp_override != CriticalPoint.MOUNT:
+            return pip.critical_point(cp_override)
         else:
             # TODO: The smoothie’s z/a home position is calculated to provide
             # the offset for a P300 single. Here we should decide whether we

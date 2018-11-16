@@ -39,3 +39,9 @@ class HardwareAPILike:
     """ A dummy class useful in isinstance checks to accept an API or adapter
     """
     pass
+
+
+class CriticalPoint(enum.Enum):
+    MOUNT = enum.auto()
+    NOZZLE = enum.auto()
+    TIP = enum.auto()
