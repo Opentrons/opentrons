@@ -13,7 +13,7 @@ const DND_TYPES: {STEP_ITEM: "STEP_ITEM"} = {
 const DragSourceStepItem = (props) => (
   props.connectDragSource(
     props.connectDropTarget(
-      <div style={{opacity: props.isDragging ? 0.5 : 1}}>
+      <div style={{opacity: props.isDragging ? 0.3 : 1}}>
         <StepItem {...props} />
       </div>
     )
