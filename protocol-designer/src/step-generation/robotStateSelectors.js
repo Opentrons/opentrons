@@ -19,27 +19,12 @@ export function getPipetteChannels (pipetteId: string, robotState: RobotState): 
   const pipette = robotState.instruments[pipetteId]
 
   if (!pipette) {
-    assert(pipette, `no pipette with ID {pipetteId} found in robot state`)
+    assert(false, `no pipette with ID {pipetteId} found in robot state`)
     return null
   }
 
   const pipetteChannels = pipette.channels
   return pipetteChannels
-}
-
-export function getTiprackVolumeByLabwareId (labwareId: string, robotState: RobotState): ?number {
-  const tiprackType = robotState.labware[labwareId].type
-  const tiprackData = getLabware(tiprackType)
-  assert(
-    tiprackData,
-    `could not get labware data for tiprack: id=${labwareId}, type=${tiprackType}.`)
-
-  const tipMaxVolume = (tiprackData && tiprackData.metadata.tipVolume) || null
-
-  assert(
-    tipMaxVolume && tipMaxVolume > 0,
-    `expected tipMaxVolume > 0, got ${String(tipMaxVolume)}. tiprack id: ${labwareId}`)
-  return tipMaxVolume
 }
 
 export function getLabwareType (labwareId: string, robotState: RobotState): ?string {
@@ -139,7 +124,7 @@ export function getPipetteWithTipMaxVol (pipetteId: string, robotState: RobotSta
   const tiprackTipVol = tiprackData && tiprackData.metadata.tipVolume
 
   if (!pipetteMaxVol || !tiprackTipVol) {
-    console.error('getPipetteEffectiveMaxVol expected tiprackMaxVol and pipette maxVolume to be > 0, got', {pipetteMaxVol, tiprackTipVol})
+    console.warn('getPipetteEffectiveMaxVol expected tiprackMaxVol and pipette maxVolume to be > 0, got', {pipetteMaxVol, tiprackTipVol})
     return NaN
   }
   return min([tiprackTipVol, pipetteMaxVol])
