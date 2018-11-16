@@ -10,7 +10,7 @@ from .types import Axis, HardwareAPILike
 
 
 def sync_call(loop, to_call, *args, **kwargs):
-    loop.run_until_complete(to_call(*args, **kwargs))
+    return loop.run_until_complete(to_call(*args, **kwargs))
 
 
 class SynchronousAdapter(HardwareAPILike):

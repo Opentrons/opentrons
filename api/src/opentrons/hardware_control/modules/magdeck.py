@@ -12,6 +12,7 @@ class MissingDevicePortError(Exception):
 class SimulatingDriver:
     def __init__(self):
         self._port = None
+        self._height = 0
 
     def probe_plate(self):
         pass
@@ -20,7 +21,7 @@ class SimulatingDriver:
         pass
 
     def move(self, location):
-        pass
+        self._height = location
 
     def get_device_info(self):
         return {'serial': 'dummySerial',
@@ -35,6 +36,10 @@ class SimulatingDriver:
 
     def enter_programming_mode(self):
         pass
+
+    @property
+    def plate_height(self):
+        return self._height
 
 
 class MagDeck(mod_abc.AbstractModule):

@@ -1,5 +1,5 @@
 from opentrons.protocol_api import labware
-from opentrons.types import Point
+from opentrons.types import Point, Location
 
 minimalLabwareDef = {
     "metadata": {
@@ -121,8 +121,8 @@ minimalLabwareDef2 = {
 
 
 def test_labware_init():
-    deck = Point(0, 0, 0)
-    fake_labware = labware.Labware(minimalLabwareDef, deck, 'deck')
+    deck = Location(Point(0, 0, 0), 'deck')
+    fake_labware = labware.Labware(minimalLabwareDef, deck)
     ordering = [well for col in minimalLabwareDef['ordering'] for well in col]
     assert fake_labware._ordering == ordering
     assert fake_labware._well_definition == minimalLabwareDef['wells']
@@ -130,16 +130,16 @@ def test_labware_init():
 
 
 def test_well_pattern():
-    deck = Point(0, 0, 0)
-    fake_labware = labware.Labware(minimalLabwareDef, deck, 'deck')
+    deck = Location(Point(0, 0, 0), 'deck')
+    fake_labware = labware.Labware(minimalLabwareDef, deck)
     assert fake_labware._pattern.match('A1')
     assert fake_labware._pattern.match('A10')
     assert not fake_labware._pattern.match('A0')
 
 
 def test_wells_accessor():
-    deck = Point(0, 0, 0)
-    fake_labware = labware.Labware(minimalLabwareDef, deck, 'deck')
+    deck = Location(Point(0, 0, 0), 'deck')
+    fake_labware = labware.Labware(minimalLabwareDef, deck)
     depth1 = minimalLabwareDef['wells']['A1']['depth']
     depth2 = minimalLabwareDef['wells']['A2']['depth']
     x = minimalLabwareDef['wells']['A2']['x']
@@ -152,8 +152,8 @@ def test_wells_accessor():
 
 
 def test_wells_index_accessor():
-    deck = Point(0, 0, 0)
-    fake_labware = labware.Labware(minimalLabwareDef, deck, 'deck')
+    deck = Location(Point(0, 0, 0), 'deck')
+    fake_labware = labware.Labware(minimalLabwareDef, deck)
     depth1 = minimalLabwareDef['wells']['A1']['depth']
     depth2 = minimalLabwareDef['wells']['A2']['depth']
     x = minimalLabwareDef['wells']['A2']['x']
@@ -166,8 +166,8 @@ def test_wells_index_accessor():
 
 
 def test_rows_accessor():
-    deck = Point(0, 0, 0)
-    fake_labware = labware.Labware(minimalLabwareDef2, deck, 'deck')
+    deck = Location(Point(0, 0, 0), 'deck')
+    fake_labware = labware.Labware(minimalLabwareDef2, deck)
     depth1 = minimalLabwareDef2['wells']['A1']['depth']
     x1 = minimalLabwareDef2['wells']['A1']['x']
     y1 = minimalLabwareDef2['wells']['A1']['y']
@@ -182,8 +182,8 @@ def test_rows_accessor():
 
 
 def test_row_index_accessor():
-    deck = Point(0, 0, 0)
-    fake_labware = labware.Labware(minimalLabwareDef2, deck, 'deck')
+    deck = Location(Point(0, 0, 0), 'deck')
+    fake_labware = labware.Labware(minimalLabwareDef2, deck)
     depth1 = minimalLabwareDef2['wells']['A1']['depth']
     x1 = minimalLabwareDef2['wells']['A1']['x']
     y1 = minimalLabwareDef2['wells']['A1']['y']
@@ -198,8 +198,8 @@ def test_row_index_accessor():
 
 
 def test_cols_accessor():
-    deck = Point(0, 0, 0)
-    fake_labware = labware.Labware(minimalLabwareDef, deck, 'deck')
+    deck = Location(Point(0, 0, 0), 'deck')
+    fake_labware = labware.Labware(minimalLabwareDef, deck)
     depth1 = minimalLabwareDef['wells']['A1']['depth']
     depth2 = minimalLabwareDef['wells']['A2']['depth']
     x = minimalLabwareDef['wells']['A2']['x']
@@ -212,8 +212,8 @@ def test_cols_accessor():
 
 
 def test_col_index_accessor():
-    deck = Point(0, 0, 0)
-    fake_labware = labware.Labware(minimalLabwareDef, deck, 'deck')
+    deck = Location(Point(0, 0, 0), 'deck')
+    fake_labware = labware.Labware(minimalLabwareDef, deck)
     depth1 = minimalLabwareDef['wells']['A1']['depth']
     depth2 = minimalLabwareDef['wells']['A2']['depth']
     x = minimalLabwareDef['wells']['A2']['x']

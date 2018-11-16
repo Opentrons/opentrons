@@ -42,7 +42,7 @@ class SimulatingDriver:
 
     @property
     def target(self):
-        return self._target_temp
+        return self._target_temp if self._active else None
 
     @property
     def status(self):
