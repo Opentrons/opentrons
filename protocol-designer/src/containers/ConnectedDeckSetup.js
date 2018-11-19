@@ -21,8 +21,6 @@ import {selectors as steplistSelectors, START_TERMINAL_ITEM_ID, type TerminalIte
 
 import type {BaseState, ThunkDispatch} from '../types'
 
-const ingredSelModIsVisible = activeModals => activeModals.ingredientSelection && activeModals.ingredientSelection.slot
-
 type StateProps = {
   selectedTerminalItemId: ?TerminalItemId,
   ingredSelectionMode: boolean,
@@ -42,8 +40,7 @@ type Props = {
 
 const mapStateToProps = (state: BaseState): StateProps => ({
   selectedTerminalItemId: steplistSelectors.getSelectedTerminalItemId(state),
-  // TODO SOON remove all uses of the `activeModals` selector
-  ingredSelectionMode: !!ingredSelModIsVisible(selectors.activeModals(state)),
+  ingredSelectionMode: Boolean(selectors.getSelectedContainer(state)),
   drilledDown: !!selectors.getDrillDownLabwareId(state),
   _moveLabwareMode: !!selectors.slotToMoveFrom(state),
 })
