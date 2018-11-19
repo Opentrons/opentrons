@@ -1,8 +1,10 @@
 // @flow
 import {createSelector} from 'reselect'
+import startCase from 'lodash/startCase'
 import reduce from 'lodash/reduce'
 import get from 'lodash/get'
 import mapValues from 'lodash/mapValues'
+import uniq from 'lodash/uniq'
 import {getAllPipetteNames, getPipetteNameSpecs, getLabware} from '@opentrons/shared-data'
 
 import type {DropdownOption} from '@opentrons/components'
@@ -48,26 +50,6 @@ function _getPipetteName (pipetteData): string {
   return pipette ? pipette.displayName : '???'
 }
 
-export const equippedPipetteOptions: Selector<Array<DropdownOption>> = createSelector(
-  rootSelector,
-  pipettes => {
-    const byId = pipettes.byId
-
-    const pipetteIds: Array<?string> = [pipettes.byMount.left, pipettes.byMount.right]
-    return pipetteIds.reduce((acc: Array<DropdownOption>, pipetteId: ?string): Array<DropdownOption> =>
-      (pipetteId && byId[pipetteId])
-        ? [
-          ...acc,
-          {
-            name: _getPipetteName(byId[pipetteId]),
-            value: pipetteId,
-          },
-        ]
-        : acc,
-    [])
-  }
-)
-
 // Shows equipped (left & right) pipettes by ID, not mount
 export const equippedPipettes: Selector<PipettesById> = createSelector(
   rootSelector,
@@ -79,6 +61,41 @@ export const equippedPipettes: Selector<PipettesById> = createSelector(
       [pipetteId]: pipetteData,
     }
   }, {})
+)
+
+export const equippedPipetteOptions: Selector<Array<DropdownOption>> = createSelector(
+  equippedPipettes,
+  (pipettesById: PipettesById) => {
+    const pipetteIds = Object.keys(pipettesById)
+    const pipetteNamesById = pipetteIds.reduce((acc: {[string]: string}, pipetteId: string) => {
+      const pipetteData = pipettesById[pipetteId]
+      if (!pipetteData) return acc
+      return {
+        ...acc,
+        [pipetteId]: _getPipetteName(pipetteData),
+      }
+    }, {})
+
+    const namesAreAmbiguous = (
+      uniq(Object.values(pipetteNamesById)).length !==
+      Object.values(pipetteNamesById).length)
+
+    return pipetteIds.reduce((acc: Array<DropdownOption>, pipetteId: string): Array<DropdownOption> => {
+      const pipetteData = pipettesById[pipetteId]
+      if (!pipetteData) return acc
+      const pipetteName = pipetteNamesById[pipetteId]
+
+      return [
+        ...acc,
+        {
+          name: (namesAreAmbiguous)
+            ? `${pipetteName} (${startCase(pipetteData.mount)})`
+            : pipetteName,
+          value: pipetteId,
+        },
+      ]
+    }, [])
+  }
 )
 
 // Formats pipette data specifically for edit pipette
