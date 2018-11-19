@@ -5,9 +5,7 @@ import styles from './styles.css'
 import type {VersionProps} from './types.js'
 
 const NEWER_VERSION = (
-  <strong>
-    A newer version of the robot server is available.<br />
-  </strong>
+  <strong>A newer version of the robot server is available.</strong>
 )
 const RECOMMEND_UPDATE_APP_FIRST = (
   <React.Fragment>
@@ -29,6 +27,7 @@ export default function UpdateAppMessage (props: VersionProps) {
   return (
     <p className={styles.sync_message}>
       {NEWER_VERSION}
+      <br />
       {!versionsMatch ? RECOMMEND_UPDATE_APP_FIRST : UPDATE_APP}
     </p>
   )
