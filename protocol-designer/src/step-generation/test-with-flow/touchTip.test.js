@@ -1,4 +1,5 @@
 // @flow
+import {expectTimelineError} from './testMatchers'
 import _touchTip from '../touchTip'
 import {
   createRobotState,
@@ -15,7 +16,7 @@ describe('touchTip', () => {
     destPlateType: '96-flat',
     fillTiprackTips: true,
     fillPipetteTips: false,
-    tipracks: [200, 200],
+    tipracks: [300, 300],
   }
   const initialRobotState = createRobotState(_robotFixtureArgs)
   const robotStateWithTip = createRobotState({..._robotFixtureArgs, fillPipetteTips: true})
@@ -67,10 +68,7 @@ describe('touchTip', () => {
       well: 'A1',
     })(robotStateWithTip)
 
-    expect(result.errors).toEqual([{
-      message: 'Attempted to touchTip with pipette id "badPipette", this pipette was not found under "instruments"',
-      type: 'PIPETTE_DOES_NOT_EXIST',
-    }])
+    expectTimelineError(result.errors, 'PIPETTE_DOES_NOT_EXIST')
   })
 
   test('touchTip with no tip should throw error', () => {

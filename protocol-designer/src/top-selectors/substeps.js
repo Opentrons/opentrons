@@ -41,6 +41,7 @@ export const allSubsteps: Selector<AllSubsteps> = createSelector(
         robotState,
         stepId
       )
+
       return {
         ...acc,
         [stepId]: substeps,

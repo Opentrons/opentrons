@@ -8,6 +8,7 @@ import {aspirate, dispense, blowout, replaceTip, touchTip} from './'
 import transfer from './transfer'
 import {mixUtil} from './mix'
 import * as errorCreators from './errorCreators'
+import {getPipetteWithTipMaxVol} from './robotStateSelectors'
 import type {DistributeFormData, RobotState, CommandCreator, CompoundCommandCreator, TransferLikeFormDataFields, TransferFormData} from './'
 
 const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRobotState: RobotState) => {
@@ -49,7 +50,7 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
     : 0
 
   const maxWellsPerChunk = Math.floor(
-    (pipetteData.maxVolume - disposalVolume) / data.volume
+    (getPipetteWithTipMaxVol(data.pipette, prevRobotState) - disposalVolume) / data.volume
   )
 
   const {pipette} = data

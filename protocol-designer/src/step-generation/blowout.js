@@ -20,7 +20,7 @@ const blowout = (args: PipetteLabwareFields): CommandCreator => (prevRobotState:
     errors.push(errorCreators.pipetteDoesNotExist({actionName, pipette}))
   }
 
-  if (prevRobotState.tipState.pipettes[pipette] === false) {
+  if (!prevRobotState.tipState.pipettes[pipette]) {
     errors.push(errorCreators.noTipOnPipette({actionName, pipette, labware, well}))
   }
 
