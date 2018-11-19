@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import {getWellTotalVolume} from '@opentrons/shared-data'
-import type {StepFieldName} from '../fieldLevel'
+import type {StepFieldName} from '../../form-types'
 import KnowledgeBaseLink from '../../components/KnowledgeBaseLink'
 
 export const DISPOSAL_PERCENTAGE = 0.2 // 20% percent of pipette capacity

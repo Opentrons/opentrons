@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import {canPipetteUseLabware} from '@opentrons/shared-data'
-import type {StepFieldName} from '../fieldLevel'
+import type {StepFieldName} from '../../form-types'
 
 /*******************
 ** Error Messages **

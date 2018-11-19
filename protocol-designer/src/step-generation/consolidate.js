@@ -61,6 +61,7 @@ const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prev
             pipette: data.pipette,
             labware: data.sourceLabware,
             well: sourceWell,
+            offsetFromBottomMm: data.touchTipAfterAspirateOffsetMmFromBottom,
           })]
           : []
 
@@ -90,6 +91,7 @@ const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prev
           pipette: data.pipette,
           labware: data.destLabware,
           well: data.destWell,
+          offsetFromBottomMm: data.touchTipAfterDispenseOffsetMmFromBottom,
         })]
         : []
 

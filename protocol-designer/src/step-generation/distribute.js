@@ -85,6 +85,7 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
                 pipette,
                 labware: data.destLabware,
                 well: destWell,
+                offsetFromBottomMm: data.touchTipAfterDispenseOffsetMmFromBottom,
               }),
             ]
             : []
@@ -126,6 +127,7 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
             pipette: data.pipette,
             labware: data.sourceLabware,
             well: data.sourceWell,
+            offsetFromBottomMm: data.touchTipAfterDispenseOffsetMmFromBottom,
           }),
         ]
         : []

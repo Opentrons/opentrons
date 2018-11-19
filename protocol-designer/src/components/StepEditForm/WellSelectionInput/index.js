@@ -4,9 +4,10 @@ import WellSelectionInput from './WellSelectionInput'
 import {connect} from 'react-redux'
 import {selectors as pipetteSelectors} from '../../../pipettes'
 import {selectors as steplistSelectors} from '../../../steplist'
-import {getFieldErrors, type StepFieldName} from '../../../steplist/fieldLevel'
-import type {BaseState, ThunkDispatch} from '../../../types'
+import {getFieldErrors} from '../../../steplist/fieldLevel'
 import {showFieldErrors} from '../StepFormField'
+import type {BaseState, ThunkDispatch} from '../../../types'
+import type {StepFieldName} from '../../../form-types'
 import type {FocusHandlers} from '../index'
 
 type Props = React.ElementProps<typeof WellSelectionInput>

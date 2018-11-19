@@ -53,7 +53,9 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
           <div className={styles.left_settings_column}>
             <FormGroup label='TECHNIQUE'>
               <StepCheckboxRow name="aspirate_preWetTip" label="Pre-wet tip" />
-              <StepCheckboxRow name="aspirate_touchTip" label="Touch tip" />
+              <StepCheckboxRow name="aspirate_touchTip" label="Touch tip">
+                <TipPositionInput fieldName="aspirate_touchTipMmFromBottom" />
+              </StepCheckboxRow>
 
               <StepCheckboxRow disabled tooltipComponent={i18n.t('tooltip.not_in_beta')} name="aspirate_airGap_checkbox" label="Air Gap">
                 <StepInputField disabled name="aspirate_airGap_volume" units="μL" {...focusHandlers} />
@@ -93,7 +95,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
           </div>
           <div className={styles.middle_settings_column}>
             <ChangeTipField stepType={stepType} name="aspirate_changeTip" />
-            <TipPositionInput prefix="aspirate" />
+            <TipPositionInput fieldName="aspirate_mmFromBottom" />
           </div>
           <div className={styles.right_settings_column}>
             {stepType !== 'distribute' && <WellOrderInput prefix="aspirate" />}
@@ -135,7 +137,9 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
         <div className={formStyles.row_wrapper}>
           <div className={styles.left_settings_column}>
             <FormGroup label='TECHNIQUE'>
-              <StepCheckboxRow name="dispense_touchTip" label="Touch tip" />
+              <StepCheckboxRow name="dispense_touchTip" label="Touch tip">
+                <TipPositionInput fieldName="dispense_touchTipMmFromBottom" />
+              </StepCheckboxRow>
               <StepCheckboxRow name="dispense_mix_checkbox" label='Mix'>
                 <StepInputField name="dispense_mix_volume" units="μL" {...focusHandlers} />
                 <StepInputField name="dispense_mix_times" units="Times" {...focusHandlers} />
@@ -152,7 +156,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
             </FormGroup>
           </div>
           <div className={styles.middle_settings_column}>
-            <TipPositionInput prefix="dispense" />
+            <TipPositionInput fieldName="dispense_mmFromBottom" />
           </div>
           <div className={styles.right_settings_column}>
             {stepType !== 'consolidate' && <WellOrderInput prefix="dispense" />}
