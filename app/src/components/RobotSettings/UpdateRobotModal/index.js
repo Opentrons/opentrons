@@ -103,7 +103,7 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
     if (appUpdateAvailable) {
       heading = `Version ${appUpdateVersion} available`
       buttonText = 'View App Update'
-      message = <UpdateAppMessage {...versionProps} />
+      message = showReleaseNotes ? null : <UpdateAppMessage {...versionProps} />
       skipMessage = (
         <SkipAppUpdateMessage
           onClick={() => console.log('update')}
