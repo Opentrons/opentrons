@@ -26,7 +26,11 @@ const log = createLogger(__filename)
 export * from './update'
 export * from './api-update'
 
-export {CURRENT_VERSION, CURRENT_RELEASE_NOTES}
+const API_RELEASE_NOTES = CURRENT_RELEASE_NOTES.replace(
+  /<!-- start:@opentrons\/app -->([\S\s]*?)<!-- end:@opentrons\/app -->/,
+  ''
+)
+export {CURRENT_VERSION, CURRENT_RELEASE_NOTES, API_RELEASE_NOTES}
 
 export const shellReducer = combineReducers({
   update: updateReducer,

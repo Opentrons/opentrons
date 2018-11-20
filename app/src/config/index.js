@@ -56,6 +56,11 @@ export type Config = {
   discovery: {
     candidates: string | Array<string>,
   },
+
+  // internal development flags
+  devInternal?: {
+    newUpdateModal?: boolean,
+  },
 }
 
 type UpdateConfigAction = {|
