@@ -1,0 +1,50 @@
+{
+    "ordering": [
+        [
+            "A1"
+        ]
+    ],
+    "otId": "629d3b80-ecfe-11e8-b073-3da0bb8daec9",
+    "deprecated": false,
+    "metadata": {
+        "displayCategory": "trash",
+        "displayVolumeUnits": "L",
+        "displayLengthUnits": "mm",
+        "displayName": "Tall Fixed Trash",
+        "tags": [
+            "trash",
+            "opentrons",
+            "tall"
+        ]
+    },
+    "cornerOffsetFromSlot": {
+        "x": 45.1,
+        "y": 80.38,
+        "z": 0
+    },
+    "dimensions": {
+        "overallLength": 172.86,
+        "overallWidth": 165.86,
+        "overallHeight": 82
+    },
+    "parameters": {
+        "format": "trash",
+        "isTiprack": false,
+        "loadName": "Opentrons_1_trash_1.1_L"
+    },
+    "wells": {
+        "A1": {
+            "shape": "rectangular",
+            "length": 172.86,
+            "width": 165.86,
+            "totalLiquidVolume": 1.1,
+            "depth": 82,
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    },
+    "brand": {
+        "brand": "Opentrons"
+    }
+}

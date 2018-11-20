@@ -144,6 +144,7 @@
         }
     },
     "brand": {
-        "brand": "Opentrons"
+        "brand": "Opentrons",
+        "brandId": ["352096", "352070"]
     }
 }
