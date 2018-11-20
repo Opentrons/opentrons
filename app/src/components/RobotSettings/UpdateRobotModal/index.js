@@ -3,6 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {Link} from 'react-router-dom'
 import {push} from 'react-router-redux'
+import semver from 'semver'
 
 import {
   updateRobotServer,
@@ -29,6 +30,7 @@ import type {State, Dispatch} from '../../../types'
 import type {ShellUpdateState} from '../../../shell'
 import type {ViewableRobot} from '../../../discovery'
 import type {RobotUpdateInfo} from '../../../http-api-client'
+import type {ButtonProps} from '@opentrons/components'
 
 export type VersionProps = {
   appVersion: string,
@@ -42,7 +44,7 @@ type SP = {|
   appVersion: string,
   robotVersion: string,
   appUpdate: ShellUpdateState,
-  updateInfo: RobotUpdateInfo,
+  robotUpdateInfo: RobotUpdateInfo,
 |}
 
 type DP = {dispatch: Dispatch}
@@ -61,15 +63,7 @@ type UpdateRobotState = {
 class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
   constructor (props) {
     super(props)
-    this.state = {
-      showReleaseNotes: this.getShowReleaseNotes(),
-    }
-  }
-  getShowReleaseNotes (): boolean {
-    return (
-      (!this.props.appUpdate.available && !this.props.updateInfo.type) ||
-      !this.props.updateInfo.type
-    )
+    this.state = {showReleaseNotes: false}
   }
 
   setShowReleaseNotes = () => {
@@ -81,70 +75,63 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
       ignoreUpdate,
       appVersion,
       robotVersion,
-      updateInfo,
+      robotUpdateInfo,
       appUpdate: {available: appUpdateAvailable, info: appUpdateInfo},
     } = this.props
     const {showReleaseNotes} = this.state
-    const appUpdateVersion = appUpdateInfo ? appUpdateInfo.version : appVersion
-    const robotUpdateVersion = updateInfo.version
-    const versionProps = {
-      appVersion,
-      robotVersion,
-      availableUpdate: appUpdateVersion || appVersion,
-    }
+    const appUpdateVersion = appUpdateInfo && appUpdateInfo.version
+    const robotUpdateVersion = robotUpdateInfo.version
+    const availableUpdate = appUpdateVersion || robotUpdateVersion
+    const versionProps = {appVersion, robotVersion, availableUpdate}
 
-    let heading
-    let button
-    let buttonAction
-    let buttonText
-    let message
-    let skipMessage
+    const heading = !semver.eq(robotVersion, availableUpdate)
+      ? `Version ${availableUpdate} available`
+      : 'Robot is up to date'
 
-    if (appUpdateAvailable) {
-      heading = `Version ${appUpdateVersion} available`
-      buttonText = 'View App Update'
-      message = showReleaseNotes ? null : <UpdateAppMessage {...versionProps} />
+    let message: ?React.Node
+    let skipMessage: ?React.Node
+    let button: ?ButtonProps
+
+    if (showReleaseNotes) {
+      button = {
+        children: 'Upgrade Robot',
+        onClick: () => console.log('install'),
+      }
+    } else if (appUpdateAvailable) {
+      message = <UpdateAppMessage {...versionProps} />
       skipMessage = (
         <SkipAppUpdateMessage
-          onClick={() => console.log('update')}
+          onClick={() => console.log('skip and sync')}
           {...versionProps}
         />
       )
-    } else if (updateInfo.type) {
-      heading = `Version ${robotUpdateVersion} available`
-      if (updateInfo.type === 'upgrade') {
-        buttonText = 'View Robot Server Update'
-        buttonAction = this.setShowReleaseNotes
-      } else {
-        buttonText = 'Downgrade Robot'
-        buttonAction = () => console.log('install')
-      }
-      if (showReleaseNotes) {
-        buttonAction = () => console.log('install')
-        buttonText = 'Upgrade Robot'
-      }
-      message = showReleaseNotes ? null : (
-        <SyncRobotMessage updateInfo={updateInfo} {...versionProps} />
-      )
-    } else {
-      heading = 'Robot is up to date'
-      message = <ReinstallMessage />
-      buttonText = 'Reinstall'
-    }
-
-    button = appUpdateAvailable
-      ? {
-        children: buttonText,
+      button = {
         Component: Link,
         to: '/menu/app/update',
+        children: 'View App Update',
       }
-      : {onClick: buttonAction, children: buttonText}
-
-    const children = showReleaseNotes ? (
-      <ReleaseNotes source={API_RELEASE_NOTES} />
-    ) : (
-      <VersionList {...versionProps} />
-    )
+    } else if (robotUpdateInfo.type) {
+      message = (
+        <SyncRobotMessage updateInfo={robotUpdateInfo} {...versionProps} />
+      )
+      if (robotUpdateInfo.type === 'upgrade') {
+        button = {
+          children: 'View Robot Server Update',
+          onClick: this.setShowReleaseNotes,
+        }
+      } else if (robotUpdateInfo.type === 'downgrade') {
+        button = {
+          children: 'Downgrade Robot',
+          onClick: () => console.log('install'),
+        }
+      }
+    } else {
+      message = <ReinstallMessage />
+      button = {
+        children: 'Reinstall',
+        onClick: () => console.log('install'),
+      }
+    }
 
     return (
       <ScrollableAlertModal
@@ -153,9 +140,15 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
         buttons={[{onClick: ignoreUpdate, children: 'not now'}, button]}
         key={String(showReleaseNotes)}
       >
-        {message}
-        {children}
-        {skipMessage}
+        {showReleaseNotes ? (
+          <ReleaseNotes source={API_RELEASE_NOTES} />
+        ) : (
+          <React.Fragment>
+            {message}
+            <VersionList {...versionProps} />
+            {skipMessage}
+          </React.Fragment>
+        )}
       </ScrollableAlertModal>
     )
   }
@@ -168,18 +161,19 @@ function makeMapStateToProps (): (State, OP) => SP {
     appVersion: CURRENT_VERSION,
     robotVersion: getRobotApiVersion(ownProps.robot) || 'Unknown',
     appUpdate: getShellUpdateState(state),
-    updateInfo: getRobotUpdateInfo(state, ownProps.robot),
+    robotUpdateInfo: getRobotUpdateInfo(state, ownProps.robot),
   })
 }
 
 function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   const {robot} = ownProps
-  const {updateInfo} = stateProps
+  const {robotUpdateInfo} = stateProps
   const {dispatch} = dispatchProps
 
   const close = () => dispatch(push(`/robots/${robot.name}`))
-  let ignoreUpdate = updateInfo.type
-    ? () => dispatch(setIgnoredUpdate(robot, updateInfo.version)).then(close)
+  let ignoreUpdate = robotUpdateInfo.type
+    ? () =>
+      dispatch(setIgnoredUpdate(robot, robotUpdateInfo.version)).then(close)
     : close
 
   return {
