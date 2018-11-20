@@ -16,7 +16,7 @@ import {
   composeProcessors,
   type ValueProcessor,
 } from './processing'
-import type {StepFieldName} from './types'
+import type {StepFieldName} from '../../form-types'
 import type {StepFormContextualState} from '../types'
 
 export type {

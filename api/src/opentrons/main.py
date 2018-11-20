@@ -5,9 +5,8 @@ import re
 from opentrons import HERE
 from opentrons import server
 from opentrons.server.main import build_arg_parser
-from opentrons.server.endpoints import update
 from argparse import ArgumentParser
-from opentrons import robot, __version__
+from opentrons import hardware, __version__
 from opentrons.config import feature_flags as ff
 from logging.config import dictConfig
 from opentrons.util import environment
@@ -23,7 +22,7 @@ def log_init():
     OT_LOG_LEVEL environment variable otherwise defaults to DEBUG.
     """
     fallback_log_level = 'INFO'
-    ot_log_level = robot.config.log_level
+    ot_log_level = hardware.config.log_level
     if ot_log_level not in logging._nameToLevel:
         log.info("OT Log Level {} not found. Defaulting to {}".format(
             ot_log_level, fallback_log_level))
@@ -83,7 +82,7 @@ def log_init():
                 'handlers': ['debug', 'api'],
                 'level': level_value
             },
-            'opentrons.robot.robot_configs': {
+            'opentrons.config.robot_configs': {
                 'handlers': ['debug', 'api'],
                 'level': level_value
             },
@@ -94,6 +93,14 @@ def log_init():
             'opentrons.drivers.serial_communication': {
                 'handlers': ['serial'],
                 'level': logging.DEBUG
+            },
+            'opentrons.protocol_api.contexts': {
+                'handlers': ['api'],
+                'level': level_value
+            },
+            'opentrons.hardware_control': {
+                'handlers': ['api', 'debug'],
+                'level': level_value
             }
         }
     )
@@ -111,17 +118,19 @@ def _find_smoothie_file():
                   .format(os.path.join(HERE, 'resources')))
 
 
-def _sync_do_smoothie_install(explicit_modeset, filename):
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(update._update_firmware(filename,
-                                                    loop,
-                                                    explicit_modeset))
+def _sync_do_smoothie_install(explicit_modeset, filename, loop):
+    loop.run_until_complete(hardware.update_firmware(filename,
+                                                     loop,
+                                                     explicit_modeset))
 
 
-def initialize_robot():
+def initialize_robot(loop):
     packed_smoothie_fw_file, packed_smoothie_fw_ver = _find_smoothie_file()
     try:
-        robot.connect()
+        if ff.use_protocol_api_v2():
+            hardware.connect(force=True)
+        else:
+            hardware.connect()
     except Exception as e:
         # The most common reason for this exception (aside from hardware
         # failures such as a disconnected smoothie) is that the smoothie
@@ -133,20 +142,19 @@ def initialize_robot():
         fw_version = None
     else:
         explicit_modeset = True
-        fw_version = robot.fw_version
-
+        fw_version = hardware.fw_version
+    log.info("Smoothie FW version: {}".format(fw_version))
     if fw_version != packed_smoothie_fw_ver:
         log.info("Executing smoothie update: current vers {}, packed vers {}"
                  .format(fw_version, packed_smoothie_fw_ver))
-        _sync_do_smoothie_install(explicit_modeset, packed_smoothie_fw_file)
-
-        if robot.is_connected():
-            robot.fw_version = robot._driver.get_fw_version()
+        loop.run_until_complete(
+            hardware.update_firmware(packed_smoothie_fw_file,
+                                     explicit_modeset=explicit_modeset))
+        if hardware.is_connected():
             log.info("FW Update complete!")
         else:
             raise RuntimeError(
                 "Could not connect to motor driver after fw update")
-
     else:
         log.info("FW version OK: {}".format(packed_smoothie_fw_ver))
 
@@ -160,30 +168,36 @@ def run(**kwargs):
     the use of different length args
     """
     log_init()
-    try:
-        robot.connect()
-    except Exception as e:
-        log.exception("Error while connecting to motor-driver: {}".format(e))
-
+    loop = asyncio.get_event_loop()
     log.info("API server version:  {}".format(__version__))
-    log.info("Smoothie FW version: {}".format(robot.fw_version))
-
     if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
-        initialize_robot()
+        initialize_robot(loop)
 
         if not ff.disable_home_on_boot():
             log.info("Homing Z axes")
-            robot.home_z()
+            if ff.use_protocol_api_v2():
+                loop.run_until_complete(hardware.home_z())
+            else:
+                hardware.home_z()
         udev.setup_rules_file()
     # Explicitly unlock resin updates in case a prior server left them locked
     resin.unlock_updates()
 
-    server.run(kwargs.get('hostname'), kwargs.get('port'), kwargs.get('path'))
+    server.run(kwargs.get('hostname'), kwargs.get('port'), kwargs.get('path'),
+               loop)
 
 
 def main():
-    """This application creates and starts the server for both the RPC routes
-    handled by opentrons.server.rpc and HTTP endpoints defined here
+    """ The main entrypoint for the Opentrons robot API server stack.
+
+    This function
+    - creates and starts the server for both the RPC routes
+      handled by :py:mod:`opentrons.server.rpc` and the HTTP routes handled
+      by :py:mod:`opentrons.server.http`
+    - initializes the hardware interaction handled by either
+      :py:mod:`opentrons.legacy_api` or :py:mod:`opentrons.hardware_control`
+
+    This function does not return until the server is brought down.
     """
 
     arg_parser = ArgumentParser(

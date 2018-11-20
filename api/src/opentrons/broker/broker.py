@@ -1,7 +1,6 @@
 import asyncio
 
 from asyncio import Queue
-from concurrent import futures
 from contextlib import contextmanager
 
 subscriptions: dict = {}
@@ -22,22 +21,9 @@ class Notifications(object):
             self.snoozed = False
 
     def on_notify(self, message):
-        def thread_has_event_loop():
-            try:
-                asyncio.get_event_loop()
-            except RuntimeError:
-                return False
-            else:
-                return True
-
         if self.snoozed:
             return
-
-        future = asyncio.run_coroutine_threadsafe(
-            self.queue.put(message), self.loop)
-
-        if not thread_has_event_loop():
-            futures.wait([future])
+        self.queue.put_nowait(message)
 
     async def __anext__(self):
         return await self.queue.get()

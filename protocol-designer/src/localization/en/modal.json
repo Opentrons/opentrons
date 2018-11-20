@@ -4,7 +4,14 @@
   },
   "tip_position": {
     "title": "Tip Positioning",
-    "body": "Change from where in the well the robot aspirates",
+    "body": {
+      "aspirate_mmFromBottom": "Change from where in the well the robot aspirates",
+      "dispense_mmFromBottom": "Change from where in the well the robot dispenses",
+      "mix_mmFromBottom": "Change from where in the well the robot aspirates and dispenses during the mix",
+      "aspirate_touchTipMmFromBottom": "Change from where in the well the robot performs touch tip",
+      "dispense_touchTipMmFromBottom": "Change from where in the well the robot performs touch tip",
+      "mix_touchTipMmFromBottom": "Change from where in the well the robot performs touch tip"
+    },
     "field_label": "Distance from bottom of well"
   },
   "well_order": {

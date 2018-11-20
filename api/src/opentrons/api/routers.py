@@ -4,7 +4,7 @@ from .calibration import CalibrationManager
 
 
 class MainRouter:
-    def __init__(self, loop=None):
+    def __init__(self, hardware=None, loop=None):
         self._notifications = Notifications(loop=loop)
         self._unsubscribe = []
         self._unsubscribe += [subscribe(
@@ -14,8 +14,9 @@ class MainRouter:
             CalibrationManager.TOPIC,
             self._notifications.on_notify)]
 
-        self.session_manager = SessionManager(loop=loop)
-        self.calibration_manager = CalibrationManager(loop=loop)
+        self.session_manager = SessionManager(hardware)
+        self.calibration_manager = CalibrationManager(hardware=hardware,
+                                                      loop=loop)
 
     @property
     def notifications(self):

@@ -7,7 +7,7 @@ from aiohttp import web
 from opentrons.server import init
 from opentrons.server.endpoints import update
 from opentrons.server.endpoints import serverlib_fallback
-from opentrons import modules
+from opentrons import modules, robot
 
 
 async def test_restart(virtual_smoothie_env, monkeypatch, loop, test_client):
@@ -37,10 +37,10 @@ async def test_update(virtual_smoothie_env, monkeypatch, loop, test_client):
         with open(os.path.join(tmpdir, filename), 'w') as fd:
             fd.write("test")
 
-    async def mock_install(filename, loop):
+    async def mock_install(filename, loop=None, modeset=True):
         return msg
     monkeypatch.setattr(serverlib_fallback, '_install', mock_install)
-    monkeypatch.setattr(update, '_update_firmware', mock_install)
+    monkeypatch.setattr(robot, 'update_firmware', mock_install)
 
     app = init(loop)
     cli = await loop.create_task(test_client(app))

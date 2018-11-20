@@ -83,6 +83,7 @@ export const p300Single = {
   id: 'p300SingleId',
   mount: 'right',
   model: 'p300_single_v1',
+  tiprackModel: 'opentrons-tiprack-300ul',
   maxVolume: 300,
   channels: 1,
 }
@@ -91,6 +92,7 @@ export const p300Multi = {
   id: 'p300MultiId',
   mount: 'left',
   model: 'p300_multi_v1',
+  tiprackModel: 'opentrons-tiprack-300ul',
   maxVolume: 300,
   channels: 8,
 }
@@ -144,8 +146,8 @@ type RobotStateNoLiquidState = $Diff<RobotState, SubtractLiquidState>
 type CreateRobotArgs = {
   sourcePlateType: string,
   destPlateType?: string,
-  tipracks: Array<10 | 200 | 1000>,
-  fillPipetteTips?: boolean,
+  tipracks: Array<10 | 200 | 300 | 1000>,
+  fillPipetteTips: boolean,
   fillTiprackTips?: boolean,
 }
 /** RobotState with empty liquid state */
@@ -161,6 +163,20 @@ export function createRobotState (args: CreateRobotArgs): RobotState {
       pipettes: {p300SingleId: p300Single, p300MultiId: p300Multi},
     }),
   }
+}
+
+function getTiprackType (volume: number): string {
+  const tiprackMap = {
+    '1000': 'tiprack-1000ul',
+    '300': 'opentrons-tiprack-300ul',
+    '200': 'tiprack-200ul',
+    '10': 'tiprack-10ul',
+  }
+  const result = tiprackMap[volume]
+  if (!result) {
+    throw new Error(`No tiprack in getTiprackType for tiprack volume: ${volume}`)
+  }
+  return result
 }
 
 /** RobotState without liquidState key, for use with jest's `toMatchObject` */
@@ -204,14 +220,16 @@ export function createRobotStateFixture (args: CreateRobotArgs): RobotStateNoLiq
 
   const occupiedSlots = map(baseLabware, (labwareData: LabwareData, labwareId) => labwareData.slot)
 
-  const tiprackLabware = args.tipracks.reduce((acc, tiprackVolume, tiprackIndex) => ({
-    ...acc,
-    [`tiprack${tiprackIndex + 1}Id`]: {
-      slot: _getTiprackSlot(tiprackIndex, occupiedSlots),
-      type: `tiprack-${tiprackVolume}ul`,
-      name: `Tip rack ${tiprackIndex + 1}`,
-    },
-  }), {})
+  const tiprackLabware = args.tipracks.reduce((acc, tiprackVolume, tiprackIndex) => {
+    return {
+      ...acc,
+      [`tiprack${tiprackIndex + 1}Id`]: {
+        slot: _getTiprackSlot(tiprackIndex, occupiedSlots),
+        type: getTiprackType(tiprackVolume),
+        name: `Tip rack ${tiprackIndex + 1}`,
+      },
+    }
+  }, {})
 
   return {
     instruments,
@@ -227,8 +245,8 @@ export function createRobotStateFixture (args: CreateRobotArgs): RobotStateNoLiq
         [tiprackId]: getTiprackTipstate(args.fillTiprackTips),
       }), {}),
       pipettes: {
-        p300SingleId: !!args.fillPipetteTips,
-        p300MultiId: !!args.fillPipetteTips,
+        p300SingleId: args.fillPipetteTips,
+        p300MultiId: args.fillPipetteTips,
       },
     },
   }

@@ -6,7 +6,7 @@ import updateLiquidState from './dispenseUpdateLiquidState'
 
 const dropTip = (pipetteId: string): CommandCreator => (prevRobotState: RobotState) => {
   // No-op if there is no tip
-  if (prevRobotState.tipState.pipettes[pipetteId] === false) {
+  if (!prevRobotState.tipState.pipettes[pipetteId]) {
     return {
       robotState: prevRobotState,
       commands: [],

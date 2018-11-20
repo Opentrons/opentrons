@@ -67,5 +67,8 @@ class Mount(enum.Enum):
     LEFT = enum.auto()
     RIGHT = enum.auto()
 
+    def __str__(self):
+        return self.name
+
 
 DeckLocation = Union[int, str]

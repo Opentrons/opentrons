@@ -49,7 +49,7 @@ describe('createRobotState fixture generator', () => {
           destPlateType: '96-flat',
           fillPipetteTips: false,
           fillTiprackTips,
-          tipracks: [200, 200],
+          tipracks: [300, 300],
         })
 
         const tiprackIds = ['tiprack1Id', 'tiprack2Id']
@@ -70,7 +70,7 @@ describe('createRobotState fixture generator', () => {
           destPlateType: '96-flat',
           fillPipetteTips,
           fillTiprackTips: true,
-          tipracks: [200, 200],
+          tipracks: [300, 300],
         })
 
         const pipetteIds = ['p300SingleId', 'p300MultiId']

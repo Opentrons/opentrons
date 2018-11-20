@@ -77,7 +77,14 @@ const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: Robo
       }
 
       const touchTipCommands = data.touchTip
-        ? [touchTip({pipette, labware, well})]
+        ? [
+          touchTip({
+            pipette,
+            labware,
+            well,
+            offsetFromBottomMm: data.touchTipMmFromBottom,
+          }),
+        ]
         : []
 
       const blowoutCommands = data.blowout

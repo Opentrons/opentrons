@@ -30,3 +30,18 @@ class Axis(enum.Enum):
         pm = {opentrons.types.Mount.LEFT: cls.B,
               opentrons.types.Mount.RIGHT: cls.C}
         return pm[mount]
+
+    def __str__(self):
+        return self.name
+
+
+class HardwareAPILike:
+    """ A dummy class useful in isinstance checks to accept an API or adapter
+    """
+    pass
+
+
+class CriticalPoint(enum.Enum):
+    MOUNT = enum.auto()
+    NOZZLE = enum.auto()
+    TIP = enum.auto()

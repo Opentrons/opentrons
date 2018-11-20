@@ -1,11 +1,14 @@
 import pytest
+import logging
 from opentrons.server import rpc
 # TODO: Modify test protocols to get a Well to use the `wells` method
 
 
 # Setting root to None tells session to use session_manager as root
+@pytest.mark.api1_only
 @pytest.mark.parametrize('root', [None])
-async def test_notifications(session, session_manager, protocol, root, connect):  # noqa
+async def test_notifications(session, session_manager, protocol, root, connect, caplog):  # noqa
+    caplog.set_level(logging.INFO)
     root = session_manager
 
     await session.socket.receive_json()  # Skip init
@@ -15,9 +18,10 @@ async def test_notifications(session, session_manager, protocol, root, connect):
         args=[protocol.filename, protocol.text]
     )
 
-    await session.socket.receive_json()  # Skip ack
+    res = await session.socket.receive_json()  # Skip ack
 
     res = await session.socket.receive_json()  # Get notification
+    assert res['$']['type'] == rpc.NOTIFICATION_MESSAGE
     assert res['data']['v']['payload']['v']['state'] == 'loaded'
 
     res = await session.socket.receive_json()  # Get call result

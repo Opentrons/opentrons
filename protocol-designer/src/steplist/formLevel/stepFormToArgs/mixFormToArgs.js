@@ -13,6 +13,7 @@ type MixStepArgs = MixFormData
 const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
   const {labware, pipette} = hydratedFormData
   const touchTip = !!hydratedFormData['touchTip']
+  const touchTipMmFromBottom = hydratedFormData['mix_touchTipMmFromBottom']
 
   let wells = hydratedFormData.wells || []
   const orderFirst = hydratedFormData.aspirate_wellOrder_first
@@ -30,8 +31,8 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
   const times = Number(hydratedFormData.times) || 0
   // NOTE: for mix, there is only one tip offset field,
   // and it applies to both aspirate and dispense
-  const aspirateOffsetFromBottomMm = Number(hydratedFormData['mmFromBottom'])
-  const dispenseOffsetFromBottomMm = Number(hydratedFormData['mmFromBottom'])
+  const aspirateOffsetFromBottomMm = Number(hydratedFormData['mix_mmFromBottom'])
+  const dispenseOffsetFromBottomMm = Number(hydratedFormData['mix_mmFromBottom'])
 
   // It's radiobutton, so one should always be selected.
   const changeTip = hydratedFormData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION
@@ -53,6 +54,7 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
     volume,
     times,
     touchTip,
+    touchTipMmFromBottom,
     delay,
     changeTip,
     blowout: blowoutLabwareId,

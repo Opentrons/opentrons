@@ -1,3 +1,4 @@
+import asyncio
 import os
 import logging
 from functools import lru_cache
@@ -14,7 +15,7 @@ from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as fflags
 from opentrons.config.robot_configs import load
-from opentrons.legacy_api import containers
+from opentrons.legacy_api import containers, modules
 from opentrons.legacy_api.containers import Container
 from .mover import Mover
 from opentrons.config import pipette_config
@@ -60,7 +61,7 @@ def _setup_container(container_name):
     return container
 
 
-class Robot(object):
+class Robot():
     """
     This class is the main interface to the robot.
 
@@ -280,6 +281,12 @@ class Robot(object):
 
     def get_rail_lights_on(self):
         return self._driver.get_rail_lights_on()
+
+    def get_lights(self):
+        return self._driver.get_lights()
+
+    def set_lights(self, button=None, rails=None):
+        self._driver.set_lights(button=button, rails=rails)
 
     def identify(self, seconds):
         """
@@ -967,3 +974,31 @@ class Robot(object):
         of the configuration.
         """
         self.config._replace(**kwargs)
+
+    async def update_firmware(self,
+                              filename,
+                              loop=None,
+                              explicit_modeset=True):
+        if self.is_simulating():
+            return
+        if loop is None:
+            checked_loop = asyncio.get_event_loop()
+        else:
+            checked_loop = loop
+        msg = await self._driver.update_firmware(
+            filename, checked_loop, explicit_modeset)
+        self.fw_version = self._driver.get_fw_version()
+        return msg
+
+    @property
+    def engaged_axes(self):
+        """ Which axes are engaged and holding. """
+        return self._driver.engaged_axes
+
+    async def disengage_axes(self, axes):
+        self._driver.disengage_axis(''.join(axes))
+
+    def discover_modules(self):
+        for module in self.modules:
+            module.disconnect()
+        self.modules = modules.discover_and_connect()

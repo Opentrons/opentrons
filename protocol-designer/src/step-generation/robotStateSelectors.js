@@ -1,8 +1,11 @@
 // @flow
-import {tiprackWellNamesByCol, tiprackWellNamesFlat} from './'
-import type {Channels} from '@opentrons/components'
-import type {RobotState, PipetteData, LabwareData} from './'
+import assert from 'assert'
+import min from 'lodash/min'
 import sortBy from 'lodash/sortBy'
+import type {Channels} from '@opentrons/components'
+import {getLabware} from '@opentrons/shared-data'
+import {tiprackWellNamesByCol, tiprackWellNamesFlat} from './'
+import type {RobotState, PipetteData, LabwareData} from './'
 
 // SELECTOR UTILITIES
 
@@ -16,8 +19,7 @@ export function getPipetteChannels (pipetteId: string, robotState: RobotState): 
   const pipette = robotState.instruments[pipetteId]
 
   if (!pipette) {
-    // TODO Ian 2018-06-04 use assert
-    console.warn(`no pipette id: "${pipetteId}"`)
+    assert(false, `no pipette with ID {pipetteId} found in robot state`)
     return null
   }
 
@@ -29,8 +31,7 @@ export function getLabwareType (labwareId: string, robotState: RobotState): ?str
   const labware = robotState.labware[labwareId]
 
   if (!labware) {
-    // TODO Ian 2018-06-04 use assert
-    console.warn(`no labware id: "${labwareId}"`)
+    assert(false, `no labware id: "${labwareId}"`)
     return null
   }
 
@@ -65,9 +66,7 @@ export function tiprackIsAvailableToPipette (
   tiprackData: LabwareData,
   assignedPipetteId: ?string
 ): boolean {
-  const matchingTiprackModel = (pipette.tiprackModel)
-    ? pipette.tiprackModel === tiprackData.type
-    : true // with no tiprack assigned, pipette can use anything
+  const matchingTiprackModel = pipette.tiprackModel === tiprackData.type
 
   // robotState.tiprackAssignment key may not exist,
   // or tiprack id may not be in tiprackAssignment
@@ -113,4 +112,20 @@ export function getNextTiprack (pipette: PipetteData, robotState: RobotState): N
   }
   // No available tipracks (for given pipette channels)
   return null
+}
+
+export function getPipetteWithTipMaxVol (pipetteId: string, robotState: RobotState): number {
+  // NOTE: this fn assumes each pipette is assigned to exactly one tiprack type,
+  // across the entire timeline
+  const pipetteData = robotState.instruments[pipetteId]
+  const pipetteMaxVol = pipetteData && pipetteData.maxVolume
+
+  const tiprackData = pipetteData && pipetteData.tiprackModel && getLabware(pipetteData.tiprackModel)
+  const tiprackTipVol = tiprackData && tiprackData.metadata.tipVolume
+
+  if (!pipetteMaxVol || !tiprackTipVol) {
+    console.warn('getPipetteEffectiveMaxVol expected tiprackMaxVol and pipette maxVolume to be > 0, got', {pipetteMaxVol, tiprackTipVol})
+    return NaN
+  }
+  return min([tiprackTipVol, pipetteMaxVol])
 }

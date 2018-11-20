@@ -109,12 +109,7 @@ export function getLocationTotalVolume (loc: LocationLiquidState): number {
 export function splitLiquid (volume: number, sourceLiquidState: LocationLiquidState): SourceAndDest {
   const totalSourceVolume = getLocationTotalVolume(sourceLiquidState)
 
-  if (AIR in sourceLiquidState) {
-    console.warn('Splitting liquid with air present', sourceLiquidState)
-  }
-
   if (totalSourceVolume === 0) {
-    console.warn('splitting with zero source volume')
     // Splitting from empty source
     return {
       source: sourceLiquidState,
@@ -123,7 +118,6 @@ export function splitLiquid (volume: number, sourceLiquidState: LocationLiquidSt
   }
 
   if (volume > totalSourceVolume) {
-    console.warn('volume to split exceeds total source volume, adding air', sourceLiquidState, volume, totalSourceVolume)
     // Take all of source, plus air
     return {
       source: mapValues(sourceLiquidState, () => ({volume: 0})),
