@@ -7,13 +7,16 @@ import {KNOWLEDGEBASE_ROOT_URL} from '../components/KnowledgeBaseLink'
 import {NavTab, TabbedNavBar, OutsideLinkTab} from '@opentrons/components'
 import i18n from '../localization'
 import {type Page, actions, selectors} from '../navigation'
+import {selectors as fileSelectors} from '../file-data'
 
 type Props = {
   currentPage: Page,
+  currentProtocolExists: boolean,
   handleClick: Page => (e: ?SyntheticEvent<>) => void,
 }
 
 function Nav (props: Props) {
+  const noCurrentProtocol = !props.currentProtocolExists
   return (
     <TabbedNavBar
       topChildren={
@@ -26,13 +29,13 @@ function Nav (props: Props) {
           <NavTab
             iconName='water'
             title={i18n.t('nav.tab_name.liquids')}
-            disabled={props.currentPage === 'file-splash'}
+            disabled={noCurrentProtocol}
             selected={props.currentPage === 'liquids'}
             onClick={props.handleClick('liquids')} />
           <NavTab
             iconName='ot-design'
             title={i18n.t('nav.tab_name.design')}
-            disabled={props.currentPage === 'file-splash'}
+            disabled={noCurrentProtocol}
             selected={props.currentPage === 'steplist'}
             onClick={props.handleClick('steplist')} />
         </React.Fragment>
@@ -46,7 +49,6 @@ function Nav (props: Props) {
           <NavTab
             iconName='settings'
             title={i18n.t('nav.tab_name.settings')}
-            disabled={props.currentPage === 'file-splash'}
             selected={props.currentPage === 'settings-privacy'}
             onClick={props.handleClick('settings-privacy')} />
         </React.Fragment>
@@ -58,6 +60,7 @@ function Nav (props: Props) {
 function mapStateToProps (state: BaseState) {
   return {
     currentPage: selectors.currentPage(state),
+    currentProtocolExists: fileSelectors.getCurrentProtocolExists(state),
   }
 }
 
