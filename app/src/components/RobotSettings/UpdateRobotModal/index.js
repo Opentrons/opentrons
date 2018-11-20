@@ -22,7 +22,7 @@ import {ScrollableAlertModal} from '../../modals'
 import VersionList from './VersionList'
 import UpdateAppMessage from './UpdateAppMessage'
 import SkipAppUpdateMessage from './SkipAppUpdateMessage'
-import SyncRobotMessage from './SyncRobotMessage'
+import SyncRobotMessage, {ReinstallMessage} from './SyncRobotMessage'
 import ReleaseNotes from '../../ReleaseNotes'
 
 import type {State, Dispatch} from '../../../types'
@@ -123,13 +123,13 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
         buttonAction = () => console.log('install')
         buttonText = 'Upgrade Robot'
       }
-      message = <SyncRobotMessage updateInfo={updateInfo} {...versionProps} />
+      message = showReleaseNotes ? null : (
+        <SyncRobotMessage updateInfo={updateInfo} {...versionProps} />
+      )
     } else {
       heading = 'Robot is up to date'
-      message =
-        "It looks like your robot is already up to date, but if you're experiencing issues you can re-apply the latest update."
+      message = <ReinstallMessage />
       buttonText = 'Reinstall'
-      buttonAction = () => console.log('reinstall')
     }
 
     button = appUpdateAvailable
