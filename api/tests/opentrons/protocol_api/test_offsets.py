@@ -4,7 +4,7 @@ import os
 import json
 import time
 from opentrons.protocol_api import labware
-from opentrons.types import Point
+from opentrons.types import Point, Location
 import pytest
 
 minimalLabwareDef = {
@@ -80,7 +80,8 @@ def test_save_calibration(monkeypatch, clear_calibration):
         labware.Labware,
         'set_calibration', mock_set_calibration)
 
-    test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0), 'deck')
+    test_labware = labware.Labware(minimalLabwareDef,
+                                   Location(Point(0, 0, 0), 'deck'))
 
     labware.save_calibration(test_labware, Point(1, 1, 1))
     assert os.path.exists(path)
@@ -90,7 +91,8 @@ def test_save_calibration(monkeypatch, clear_calibration):
 def test_save_tip_length(monkeypatch, clear_calibration):
     assert not os.path.exists(path)
 
-    test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0), 'deck')
+    test_labware = labware.Labware(minimalLabwareDef,
+                                   Location(Point(0, 0, 0), 'deck'))
     calibrated_length = 22.0
     labware.save_tip_length(test_labware, calibrated_length)
     assert os.path.exists(path)
@@ -104,7 +106,8 @@ def test_schema_shape(monkeypatch, clear_calibration):
         return 1
     monkeypatch.setattr(time, 'time', fake_time)
 
-    test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0), 'deck')
+    test_labware = labware.Labware(minimalLabwareDef,
+                                   Location(Point(0, 0, 0), 'deck'))
 
     labware.save_calibration(test_labware, Point(1, 1, 1))
     expected = {"default": {"offset": [1, 1, 1], "lastModified": 1}}
@@ -125,7 +128,8 @@ def test_load_calibration(monkeypatch, clear_calibration):
         labware.Labware,
         'set_calibration', mock_set_calibration)
 
-    test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0), 'deck')
+    test_labware = labware.Labware(minimalLabwareDef,
+                                   Location(Point(0, 0, 0), 'deck'))
 
     test_offset = Point(1, 1, 1)
     test_tip_length = 34.5
@@ -144,7 +148,8 @@ def test_load_calibration(monkeypatch, clear_calibration):
 
 
 def test_wells_rebuilt_with_offset():
-    test_labware = labware.Labware(minimalLabwareDef, Point(0, 0, 0), 'deck')
+    test_labware = labware.Labware(minimalLabwareDef,
+                                   Location(Point(0, 0, 0), 'deck'))
     old_wells = test_labware._wells
     assert test_labware._offset == Point(10, 10, 5)
     assert test_labware._calibrated_offset == Point(10, 10, 5)

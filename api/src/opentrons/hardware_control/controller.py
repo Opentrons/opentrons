@@ -192,7 +192,7 @@ class Controller:
     @property
     def axis_bounds(self) -> Dict[str, Tuple[float, float]]:
         """ The (minimum, maximum) bounds for each axis. """
-        return {ax: (0, pos) for ax, pos
+        return {ax: (0, pos+.05) for ax, pos
                 in self._smoothie_driver.homed_position.items()
                 if ax not in 'BC'}
 

@@ -1,10 +1,10 @@
 from collections import UserDict
 import functools
 import logging
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 
 from opentrons import types
-from .labware import Labware, Well
+from .labware import Labware, Well, ModuleGeometry
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -81,6 +81,9 @@ def plan_moves(from_loc: types.Location,
             to_point]
 
 
+DeckItem = Union[Labware, ModuleGeometry]
+
+
 class Deck(UserDict):
     def __init__(self):
         super().__init__()
@@ -116,7 +119,7 @@ class Deck(UserDict):
         else:
             return key_int
 
-    def __getitem__(self, key: types.DeckLocation) -> 'Labware':
+    def __getitem__(self, key: types.DeckLocation) -> DeckItem:
         return self.data[self._check_name(key)]
 
     def __delitem__(self, key: types.DeckLocation) -> None:
@@ -124,17 +127,15 @@ class Deck(UserDict):
         old = self.data[checked_key]
         self.data[checked_key] = None
         if old:
-            self._highest_z = 0.0
-            for item in [lw for lw in self.data.values() if lw]:
-                self._highest_z = max(item.wells()[0].top().z, self._highest_z)
+            self.recalculate_high_z()
 
-    def __setitem__(self, key: types.DeckLocation, val: 'Labware') -> None:
+    def __setitem__(self, key: types.DeckLocation, val: DeckItem) -> None:
         key_int = self._check_name(key)
         if self.data.get(key_int) is not None:
             raise ValueError('Deck location {} already has an item: {}'
                              .format(key, self.data[key_int]))
         self.data[key_int] = val
-        self._highest_z = max(val.wells()[0].top().point.z, self._highest_z)
+        self._highest_z = max(val.highest_z, self._highest_z)
 
     def __contains__(self, key: object) -> bool:
         try:
@@ -143,9 +144,14 @@ class Deck(UserDict):
             return False
         return key_int in self.data
 
-    def position_for(self, key: types.DeckLocation) -> types.Point:
+    def position_for(self, key: types.DeckLocation) -> types.Location:
         key_int = self._check_name(key)
-        return self._positions[key_int]
+        return types.Location(self._positions[key_int], "Slot " + str(key))
+
+    def recalculate_high_z(self):
+        self._highest_z = 0.0
+        for item in [lw for lw in self.data.values() if lw]:
+            self._highest_z = max(item.highest_z, self._highest_z)
 
     @property
     def highest_z(self) -> float:

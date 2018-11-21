@@ -11,7 +11,7 @@ def test_sim_initialization():
 def test_sim_state():
     temp = modules.build('', 'tempdeck', True)
     assert temp.temperature == 0
-    assert temp.target == 0
+    assert temp.target is None
     assert temp.status == 'idle'
     assert temp.live_data['status'] == temp.status
     assert temp.live_data['data']['currentTemp'] == temp.temperature
@@ -31,7 +31,7 @@ async def test_sim_update():
     await asyncio.wait_for(temp.wait_for_temp(), timeout=0.2)
     temp.disengage()
     assert temp.temperature == 0
-    assert temp.target == 0
+    assert temp.target is None
     assert temp.status == 'idle'
 
 

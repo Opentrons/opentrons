@@ -101,7 +101,8 @@
     "parameters": {
         "isTiprack": false,
         "format": "irregular",
-        "loadName": "generic_50x3_mL_5x10_mL_irregular"
+        "loadName": "generic_50x3_mL_5x10_mL_irregular",
+        "isMagneticModuleCompatible": false
     },
     "wells": {
         "A1": {

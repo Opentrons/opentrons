@@ -1,5 +1,8 @@
 import json
 import pkgutil
+
+import pytest
+
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Location
 
@@ -114,7 +117,7 @@ def test_from_center_cartesian():
 def test_backcompat():
     labware_name = 'generic_96_wellPlate_380_uL'
     labware_def = labware._load_definition_by_name(labware_name)
-    lw = labware.Labware(labware_def, Point(0, 0, 0), 'Test Slot')
+    lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
 
     # Note that this test uses the display name of wells to test for equality,
     # because dimensional parameters could be subject to modification through
@@ -174,7 +177,7 @@ def test_backcompat():
 def test_well_parent():
     labware_name = 'generic_96_wellPlate_380_uL'
     labware_def = labware._load_definition_by_name(labware_name)
-    lw = labware.Labware(labware_def, Point(0, 0, 0), 'Test Slot')
+    lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
     parent = Location(Point(7, 8, 9), lw)
     well_name = 'circular_well_json'
     has_tip = True
@@ -194,7 +197,8 @@ def test_well_parent():
 def test_tip_tracking_init():
     labware_name = 'Opentrons_96_tiprack_300_uL'
     labware_def = labware._load_definition_by_name(labware_name)
-    tiprack = labware.Labware(labware_def, Point(0, 0, 0), 'Test Slot')
+    tiprack = labware.Labware(labware_def,
+                              Location(Point(0, 0, 0), 'Test Slot'))
     assert tiprack.is_tiprack
     for well in tiprack.wells():
         assert well.has_tip
@@ -204,7 +208,7 @@ def test_tip_tracking_init():
         pkgutil.get_data('opentrons',
                          'shared_data/definitions2/{}.json'.format(
                              labware_name)))
-    lw = labware.Labware(labware_def, Point(0, 0, 0), 'Test Slot')
+    lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
     assert not lw.is_tiprack
     for well in lw.wells():
         assert not well.has_tip
@@ -213,7 +217,8 @@ def test_tip_tracking_init():
 def test_use_tips():
     labware_name = 'Opentrons_96_tiprack_300_uL'
     labware_def = labware._load_definition_by_name(labware_name)
-    tiprack = labware.Labware(labware_def, Point(0, 0, 0), 'Test Slot')
+    tiprack = labware.Labware(labware_def,
+                              Location(Point(0, 0, 0), 'Test Slot'))
     well_list = tiprack.wells()
 
     # Test only using one tip
@@ -251,7 +256,8 @@ def test_use_tips():
 def test_select_next_tip():
     labware_name = 'Opentrons_96_tiprack_300_uL'
     labware_def = labware._load_definition_by_name(labware_name)
-    tiprack = labware.Labware(labware_def, Point(0, 0, 0), 'Test Slot')
+    tiprack = labware.Labware(labware_def,
+                              Location(Point(0, 0, 0), 'Test Slot'))
     well_list = tiprack.wells()
 
     next_one = tiprack.next_tip()
@@ -294,3 +300,48 @@ def test_select_next_tip():
     assert next_five == well_list[16]
     next_eight = tiprack.next_tip(8)
     assert next_eight == well_list[16]
+
+
+def test_module_load():
+    module_names = ['tempdeck', 'magdeck']
+    module_defs = json.loads(
+        pkgutil.get_data('opentrons',
+                         'shared_data/robot-data/moduleSpecs.json'))
+    for name in module_names:
+        mod = labware.load_module(name, Location(Point(0, 0, 0), 'test'))
+        mod_def = module_defs[name]
+        offset = Point(mod_def['labwareOffset']['x'],
+                       mod_def['labwareOffset']['y'],
+                       mod_def['labwareOffset']['z'])
+        high_z = mod_def['dimensions']['bareOverallHeight']
+        assert mod.highest_z == high_z
+        assert mod.location.point == offset
+        mod = labware.load_module(name, Location(Point(1, 2, 3), 'test'))
+        assert mod.highest_z == high_z + 3
+        assert mod.location.point == (offset + Point(1, 2, 3))
+        mod2 = labware.load_module_from_definition(mod_def,
+                                                   Location(Point(3, 2, 1),
+                                                            'test2'))
+        assert mod2.highest_z == high_z + 1
+        assert mod2.location.point == (offset + Point(3, 2, 1))
+
+
+def test_module_load_labware():
+    module_names = ['tempdeck', 'magdeck']
+    labware_name = 'generic_96_wellPlate_380_uL'
+    labware_def = labware._load_definition_by_name(labware_name)
+    for name in module_names:
+        mod = labware.load_module(name, Location(Point(0, 0, 0), 'test'))
+        old_z = mod.highest_z
+        lw = labware.load_from_definition(labware_def, mod.location)
+        mod.add_labware(lw)
+        assert mod.labware == lw
+        assert mod.highest_z ==\
+            (mod.location.point.z
+             + labware_def['dimensions']['overallHeight']
+             + mod._over_labware)
+        with pytest.raises(AssertionError):
+            mod.add_labware(lw)
+        mod.reset_labware()
+        assert mod.labware is None
+        assert mod.highest_z == old_z
