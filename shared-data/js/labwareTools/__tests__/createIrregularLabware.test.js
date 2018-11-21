@@ -74,6 +74,7 @@ describe('test createIrregularLabware function', () => {
       parameters: {
         format: 'irregular',
         isTiprack: false,
+        isMagneticModuleCompatible: false,
       },
       dimensions: {
         overallLength: 127.76,
