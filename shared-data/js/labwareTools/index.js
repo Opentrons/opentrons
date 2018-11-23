@@ -254,8 +254,8 @@ export function createIrregularLabware (args: IrregularLabwareProps): Schema {
     deprecated: false,
     metadata: args.metadata,
     cornerOffsetFromSlot: {
-      x: round(args.dimensions.overallLength - SLOT_LENGTH_MM, 2),
-      y: round(args.dimensions.overallWidth - SLOT_WIDTH_MM, 2),
+      x: round(SLOT_LENGTH_MM - args.dimensions.overallLength, 2),
+      y: round(SLOT_WIDTH_MM - args.dimensions.overallWidth, 2),
       z: 0},
     dimensions: args.dimensions,
     parameters: {

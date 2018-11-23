@@ -18,8 +18,8 @@
         ]
     },
     "cornerOffsetFromSlot": {
-        "x": 45.1,
-        "y": 80.38,
+        "x": 0,
+        "y": 0,
         "z": 0
     },
     "dimensions": {
@@ -30,7 +30,8 @@
     "parameters": {
         "format": "trash",
         "isTiprack": false,
-        "loadName": "Opentrons_1_trash_0.85_L"
+        "loadName": "Opentrons_1_trash_0.85_L",
+        "isMagneticModuleCompatible": false
     },
     "wells": {
         "A1": {

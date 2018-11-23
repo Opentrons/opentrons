@@ -65,7 +65,8 @@
     "parameters": {
         "format": "irregular",
         "isTiprack": false,
-        "loadName": "Opentrons_24_tuberack_2_mL_screwcap"
+        "loadName": "Opentrons_24_tuberack_2_mL_screwcap",
+        "isMagneticModuleCompatible": false
     },
     "wells": {
         "D1": {
