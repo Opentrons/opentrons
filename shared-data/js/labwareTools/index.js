@@ -36,6 +36,8 @@ type Params = {
   isTiprack: boolean,
   tipLength?: number,
   loadName?: string,
+  isMagneticModuleCompatible: boolean,
+  magneticModuleEngageHeight?: number,
 }
 
 type Well = {

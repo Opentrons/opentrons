@@ -22,7 +22,7 @@ describe('dispense', () => {
       destPlateType: '96-flat',
       fillTiprackTips: true,
       fillPipetteTips: false,
-      tipracks: [200, 200],
+      tipracks: [300, 300],
     })
 
     robotStateWithTip = {

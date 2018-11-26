@@ -2,6 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import {connect} from 'react-redux'
+import clamp from 'lodash/clamp'
 import round from 'lodash/round'
 import {
   Modal,
@@ -13,98 +14,121 @@ import {
   HandleKeypress,
 } from '@opentrons/components'
 import i18n from '../../../localization'
-import {
-  DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
-} from '../../../constants'
 import {Portal} from '../../portals/MainPageModalPortal'
 import modalStyles from '../../modals/modal.css'
 import {actions} from '../../../steplist'
 import TipPositionZAxisViz from './TipPositionZAxisViz'
 
 import styles from './TipPositionInput.css'
+import * as utils from './utils'
+import {getIsTouchTipField, type TipOffsetFields} from '../../../form-types'
 
 const SMALL_STEP_MM = 1
 const LARGE_STEP_MM = 10
 const DECIMALS_ALLOWED = 1
 
-type DP = { updateValue: (string) => mixed }
+type DP = { updateValue: (?number) => mixed }
 
 type OP = {
   mmFromBottom: number,
   wellHeightMM: number,
   isOpen: boolean,
   closeModal: () => mixed,
-  prefix: 'aspirate' | 'dispense',
+  defaultMm: number,
+  fieldName: TipOffsetFields,
 }
 
 type Props = OP & DP
-type State = { value: string }
+type State = { value: ?number }
 
-const formatValue = (value: number | string): string => (
-  String(round(Number(value), DECIMALS_ALLOWED))
+const roundValue = (value: number | string): number => (
+  round(Number(value), DECIMALS_ALLOWED)
 )
 
 class TipPositionModal extends React.Component<Props, State> {
   constructor (props: Props) {
     super(props)
-    this.state = { value: formatValue(props.mmFromBottom) }
+    const initialValue = props.mmFromBottom
+      ? roundValue(props.mmFromBottom)
+      : roundValue(this.getDefaultMmFromBottom())
+    this.state = { value: initialValue }
   }
   componentDidUpdate (prevProps) {
     if (prevProps.wellHeightMM !== this.props.wellHeightMM) {
-      this.setState({value: formatValue(this.props.mmFromBottom)})
+      this.setState({value: roundValue(this.props.mmFromBottom)})
     }
   }
   applyChanges = () => {
-    this.props.updateValue(formatValue(this.state.value || 0))
-  }
-  handleReset = () => {
-    // NOTE: when `prefix` isn't set (eg in the Mix form), we'll use
-    // the value `DEFAULT_MM_FROM_BOTTOM_DISPENSE` (since we gotta pick something :/)
-    const defaultMm = this.props.prefix === 'aspirate'
-      ? DEFAULT_MM_FROM_BOTTOM_ASPIRATE
-      : DEFAULT_MM_FROM_BOTTOM_DISPENSE
-    this.setState({value: formatValue(defaultMm)}, this.applyChanges)
+    const {value} = this.state
+    console.log('applying changes', value)
+    this.props.updateValue(value == null ? null : roundValue(value))
     this.props.closeModal()
+  }
+  getDefaultMmFromBottom = (): number => {
+    const {fieldName, wellHeightMM} = this.props
+    return utils.getDefaultMmFromBottom({fieldName, wellHeightMM})
+  }
+  getMinMaxMmFromBottom = (): {maxMmFromBottom: number, minMmFromBottom: number} => {
+    if (getIsTouchTipField(this.props.fieldName)) {
+      return {
+        maxMmFromBottom: roundValue(this.props.wellHeightMM),
+        minMmFromBottom: roundValue(this.props.wellHeightMM / 2),
+      }
+    }
+    return {
+      maxMmFromBottom: roundValue(this.props.wellHeightMM * 2),
+      minMmFromBottom: 0,
+    }
+  }
+
+  handleReset = () => {
+    this.setState({value: null}, this.applyChanges)
   }
   handleCancel = () => {
-    this.setState({value: formatValue(this.props.mmFromBottom)}, this.applyChanges)
-    this.props.closeModal()
+    this.setState({value: roundValue(this.props.mmFromBottom)}, this.props.closeModal)
   }
   handleDone = () => {
     this.applyChanges()
-    this.props.closeModal()
   }
-  handleChange = (e: SyntheticEvent<HTMLSelectElement>) => {
-    const {value} = e.currentTarget
-    const valueFloat = Number(formatValue(value))
-    const maximumHeightMM = (this.props.wellHeightMM * 2)
 
-    if (!value) {
-      this.setState({value})
-    } else if (valueFloat > maximumHeightMM) {
-      this.setState({value: formatValue(maximumHeightMM)})
-    } else if (valueFloat >= 0) {
-      const numericValue = value.replace(/[^.0-9]/, '')
-      this.setState({value: numericValue.replace(/(\d*[.]{1}\d{1})(\d*)/, (match, group1) => group1)})
-    } else {
-      this.setState({value: formatValue(0)})
+  handleChange = (newValueRaw: string | number) => {
+    const {maxMmFromBottom, minMmFromBottom} = this.getMinMaxMmFromBottom()
+    // if string, strip non-number characters from string and cast to number
+    const valueFloatUnrounded = (typeof newValueRaw === 'string')
+      ? Number(newValueRaw
+        .replace(/[^.0-9]/, '')
+        .replace(/(\d*[.]{1}\d{1})(\d*)/, (match, group1) => group1))
+      : newValueRaw
+    const valueFloat = roundValue(valueFloatUnrounded)
+
+    if (!Number.isFinite(valueFloat)) {
+      return
     }
+
+    this.setState({value: clamp(valueFloat, minMmFromBottom, maxMmFromBottom)})
+  }
+  handleInputFieldChange = (e: SyntheticEvent<HTMLSelectElement>) => {
+    this.handleChange(e.currentTarget.value)
+  }
+  handleIncrementDecrement = (delta: number) => {
+    const {value} = this.state
+    const prevValue = this.state.value == null
+      ? this.getDefaultMmFromBottom()
+      : value
+
+    this.handleChange(prevValue + delta)
   }
   makeHandleIncrement = (step: number) => () => {
-    const {value} = this.state
-    const incrementedValue = parseFloat(value || 0) + step
-    const maximumHeightMM = (this.props.wellHeightMM * 2)
-    this.setState({value: formatValue(Math.min(incrementedValue, maximumHeightMM))})
+    this.handleIncrementDecrement(step)
   }
   makeHandleDecrement = (step: number) => () => {
-    const nextValueFloat = parseFloat(this.state.value || 0) - step
-    this.setState({value: formatValue(nextValueFloat < 0 ? 0 : nextValueFloat)})
+    this.handleIncrementDecrement(step * -1)
   }
   render () {
     if (!this.props.isOpen) return null
     const {value} = this.state
-    const {wellHeightMM} = this.props
+    const {fieldName, wellHeightMM} = this.props
+    const {maxMmFromBottom, minMmFromBottom} = this.getMinMaxMmFromBottom()
 
     return (
       <Portal>
@@ -122,33 +146,37 @@ class TipPositionModal extends React.Component<Props, State> {
             onCloseClick={this.handleCancel}>
             <div className={styles.modal_header}>
               <h4>{i18n.t('modal.tip_position.title')}</h4>
-              <p>{i18n.t('modal.tip_position.body')}</p>
+              <p>{i18n.t(`modal.tip_position.body.${fieldName}`)}</p>
             </div>
             <div className={styles.main_row}>
               <div className={styles.leftHalf}>
                 <FormGroup label={i18n.t('modal.tip_position.field_label')}>
                   <InputField
                     className={styles.position_from_bottom_input}
-                    onChange={this.handleChange}
+                    onChange={this.handleInputFieldChange}
                     units="mm"
-                    value={value } />
+                    value={(value != null) ? String(value) : ''} />
                 </FormGroup>
                 <div className={styles.viz_group}>
                   <div className={styles.adjustment_buttons}>
                     <OutlineButton
                       className={styles.adjustment_button}
-                      disabled={parseFloat(value) >= (wellHeightMM * 2)}
+                      disabled={value != null && value >= maxMmFromBottom}
                       onClick={this.makeHandleIncrement(SMALL_STEP_MM)}>
                       <Icon name="plus" />
                     </OutlineButton>
                     <OutlineButton
                       className={styles.adjustment_button}
-                      disabled={parseFloat(value) <= 0}
+                      disabled={value != null && value <= minMmFromBottom}
                       onClick={this.makeHandleDecrement(SMALL_STEP_MM)}>
                       <Icon name="minus" />
                     </OutlineButton>
                   </div>
-                  <TipPositionZAxisViz mmFromBottom={value} wellHeightMM={wellHeightMM} />
+                  <TipPositionZAxisViz
+                    mmFromBottom={(value != null)
+                      ? value
+                      : this.getDefaultMmFromBottom()}
+                    wellHeightMM={wellHeightMM} />
                 </div>
               </div>
               <div className={styles.rightHalf}>{/* TODO: xy tip positioning */}</div>
@@ -174,14 +202,9 @@ class TipPositionModal extends React.Component<Props, State> {
 }
 
 const mapDTP = (dispatch: Dispatch, ownProps: OP): DP => {
-  // NOTE: not interpolating prefix because breaks flow string enum
-
-  let fieldName = 'mmFromBottom'
-  if (ownProps.prefix === 'aspirate') fieldName = 'aspirate_mmFromBottom'
-  else if (ownProps.prefix === 'dispense') fieldName = 'dispense_mmFromBottom'
   return {
     updateValue: (value) => {
-      dispatch(actions.changeFormInput({update: {[fieldName]: value}}))
+      dispatch(actions.changeFormInput({update: {[ownProps.fieldName]: value}}))
     },
   }
 }

@@ -7,8 +7,8 @@ import {selectors as steplistSelectors} from '../steplist'
 import {selectors as pipetteSelectors} from '../pipettes'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 
-import type {StepFieldName} from '../steplist/fieldLevel'
 import type {ThunkDispatch, GetState} from '../types'
+import type {StepFieldName} from '../form-types'
 import type {Wells} from '../labware-ingred/types'
 import type {Channels} from '@opentrons/components'
 

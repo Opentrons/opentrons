@@ -49,16 +49,24 @@ class TempDeck:
             while self.status != 'holding at target':
                 pass
 
+    @classmethod
+    def name(cls):
+        return 'tempdeck'
+
+    @classmethod
+    def display_name(cls):
+        return 'Temperature Deck'
+
     # TODO: there should be a separate decoupled set of classes that construct
     # the http api response entity given the model instance.
     def to_dict(self):
         return {
-            'name': 'tempdeck',
+            'name': self.name(),
             'port': self.port,
             'serial': self.device_info and self.device_info.get('serial'),
             'model': self.device_info and self.device_info.get('model'),
             'fwVersion': self.device_info and self.device_info.get('version'),
-            'displayName': 'Temperature Deck',
+            'displayName': self.display_name(),
             **self.live_data()
         }
 

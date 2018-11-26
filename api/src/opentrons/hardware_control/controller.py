@@ -1,15 +1,17 @@
 import asyncio
-import os
+from contextlib import contextmanager
 import fcntl
+import os
 import threading
 from typing import Any, Dict, List, Optional, Tuple
+
 from opentrons.util import environment
 from opentrons.drivers.smoothie_drivers import driver_3_0
+from opentrons.drivers.rpi_drivers import gpio
 from opentrons.config import robot_configs
 from opentrons.types import Mount
-from contextlib import contextmanager
-from . import modules
 
+from . import modules
 
 _lock = threading.Lock()
 
@@ -22,7 +24,7 @@ class _Locker:
     """
     LOCK_FILE_PATH = environment.settings['HARDWARE_CONTROLLER_LOCKFILE']
 
-    def __init__(self):
+    def __init__(self, force=False):
         global _lock
 
         self._thread_lock_acquired = _lock.acquire(blocking=False)
@@ -56,21 +58,35 @@ class Controller:
     may be active at any time.
     """
 
-    def __init__(self, config, loop):
+    def __init__(self, config, loop, force=False):
         """ Build a Controller instance.
 
         If another controller is already instantiated on the system (or if
         this is instantiated somewhere other than a robot) then this method
         will raise a RuntimeError.
+
+        If `force` is specified as `True`, delete the lockfile and connect
+        anyway. This is intended specifically for the purpose of fixing an
+        issue where the update server connects to get the smoothie firmware
+        version but does not disconnect. It should only be specified true
+        by the opentrons main server process.
         """
         if not os.environ.get('RUNNING_ON_PI'):
             raise RuntimeError('{} may only be instantiated on a robot'
                                .format(self.__class__.__name__))
-        self._lock = _Locker()
+        try:
+            self._lock = _Locker()
+        except RuntimeError:
+            if force:
+                self._lock = None
+            else:
+                raise
+
         self.config = config or robot_configs.load()
         self._smoothie_driver = driver_3_0.SmoothieDriver_3_0_0(
             config=self.config)
         self._attached_modules = {}
+        self._cached_fw_version: Optional[str] = None
 
     def move(self, target_position: Dict[str, float],
              home_flagged_axes: bool = True, speed: float = None):
@@ -157,8 +173,9 @@ class Controller:
         return await modules.update_firmware(
             module, firmware_file, loop)
 
-    def connect(self, port: str = None):
+    async def connect(self, port: str = None):
         self._smoothie_driver.connect(port)
+        await self.update_fw_version()
 
     @contextmanager
     def _set_temp_speed(self, speed):
@@ -175,6 +192,48 @@ class Controller:
     @property
     def axis_bounds(self) -> Dict[str, Tuple[float, float]]:
         """ The (minimum, maximum) bounds for each axis. """
-        return {ax: (0, pos) for ax, pos
+        return {ax: (0, pos+.05) for ax, pos
                 in self._smoothie_driver.homed_position.items()
                 if ax not in 'BC'}
+
+    @property
+    def fw_version(self) -> Optional[str]:
+        return self._cached_fw_version
+
+    async def update_fw_version(self):
+        self._cached_fw_version = self._smoothie_driver.get_fw_version()
+
+    async def update_firmware(self,
+                              filename: str,
+                              loop: asyncio.AbstractEventLoop,
+                              modeset: bool) -> str:
+        msg = await self._smoothie_driver.update_firmware(
+            filename, loop, modeset)
+        self.update_fw_version()
+        return msg
+
+    def engaged_axes(self) -> Dict[str, bool]:
+        return self._smoothie_driver.engaged_axes
+
+    def disengage_axes(self, axes: List[str]):
+        self._smoothie_driver.disengage_axis(''.join(axes))
+
+    def set_lights(self, button: Optional[bool], rails: Optional[bool]):
+        if button is not None:
+            gpio.set_button_light(blue=button)
+        if rails is not None:
+            gpio.set_rail_lights(rails)
+
+    def get_lights(self) -> Dict[str, bool]:
+        return {'button': gpio.get_button_light()[2],
+                'rails': gpio.get_rail_lights()}
+
+    def pause(self):
+        self._smoothie_driver.pause()
+
+    def resume(self):
+        self._smoothie_driver.resume()
+
+    def halt(self):
+        self._smoothie_driver.kill()
+        self._smoothie_driver.resume()

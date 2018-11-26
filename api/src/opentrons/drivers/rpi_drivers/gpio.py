@@ -1,5 +1,6 @@
 from os import system
 from sys import platform
+from typing import Tuple
 """
 Raspberry Pi GPIO control module
 
@@ -150,3 +151,47 @@ def initialize():
 
     for pin in sorted(INPUT_PINS.values()):
         _enable_pin(pin, IN)
+
+
+def turn_on_blue_button_light():
+    set_button_light(blue=True)
+
+
+def set_button_light(red=False, green=False, blue=False):
+    color_pins = {
+        OUTPUT_PINS['RED_BUTTON']: red,
+        OUTPUT_PINS['GREEN_BUTTON']: green,
+        OUTPUT_PINS['BLUE_BUTTON']: blue
+    }
+    for pin, state in color_pins.items():
+        if state:
+            set_high(pin)
+        else:
+            set_low(pin)
+
+
+def get_button_light() -> Tuple[bool, bool, bool]:
+    return (read(OUTPUT_PINS['RED_BUTTON']) == 1,
+            read(OUTPUT_PINS['GREEN_BUTTON']) == 1,
+            read(OUTPUT_PINS['BLUE_BUTTON']) == 1)
+
+
+def set_rail_lights(on=True):
+    if on:
+        set_high(OUTPUT_PINS['FRAME_LEDS'])
+    else:
+        set_low(OUTPUT_PINS['FRAME_LEDS'])
+
+
+def get_rail_lights() -> bool:
+    value = read(OUTPUT_PINS['FRAME_LEDS'])
+    return True if value == 1 else False
+
+
+def read_button():
+    # button is normal-HIGH, so invert
+    return not bool(read(INPUT_PINS['BUTTON_INPUT']))
+
+
+def read_window_switches():
+    return bool(read(INPUT_PINS['WINDOW_INPUT']))

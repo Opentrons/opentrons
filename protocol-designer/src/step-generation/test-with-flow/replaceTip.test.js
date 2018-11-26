@@ -33,7 +33,7 @@ describe('replaceTip', () => {
       ...labwareTypes1,
       fillTiprackTips: true,
       fillPipetteTips: false,
-      tipracks: [200, 200],
+      tipracks: [300, 300],
     })
 
     // $FlowFixMe: mock methods

@@ -23,6 +23,12 @@ const updateMetadataFields = (
   return metadata
 }
 
+// track if a protocol has been created or loaded
+const currentProtocolExists = handleActions({
+  LOAD_FILE: () => true,
+  CREATE_NEW_PROTOCOL: () => true,
+}, false)
+
 function newProtocolMetadata (
   state: FileMetadataFields,
   action: {payload: NewProtocolFields}
@@ -61,11 +67,13 @@ const fileMetadata = handleActions({
 }, defaultFields)
 
 export type RootState = {
+  currentProtocolExists: boolean,
   unsavedMetadataForm: FileMetadataFields,
   fileMetadata: FileMetadataFields,
 }
 
 const _allReducers = {
+  currentProtocolExists,
   unsavedMetadataForm,
   fileMetadata,
 }

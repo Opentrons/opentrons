@@ -23580,6 +23580,208 @@
                     }
                }
           },
+
+          "opentrons-tuberack-1.5ml-eppendorf": {
+                  "origin-offset": {
+                       "x": 21.07,
+                       "y": 18.21
+                  },
+                  "locations": {
+                       "A1": {
+                            "x": 0,
+                            "y": 0,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "B1": {
+                            "x": 19.28,
+                            "y": 0,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "C1": {
+                            "x": 38.56,
+                            "y": 0,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "D1": {
+                            "x": 57.84,
+                            "y": 0,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "A2": {
+                            "x": 0,
+                            "y": 19.89,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "B2": {
+                            "x": 19.28,
+                            "y": 19.89,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "C2": {
+                            "x": 38.56,
+                            "y": 19.89,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "D2": {
+                            "x": 57.84,
+                            "y": 19.89,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "A3": {
+                            "x": 0,
+                            "y": 39.78,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "B3": {
+                            "x": 19.28,
+                            "y": 39.78,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "C3": {
+                            "x": 38.56,
+                            "y": 39.78,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "D3": {
+                            "x": 57.84,
+                            "y": 39.78,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "A4": {
+                            "x": 0,
+                            "y": 59.67,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "B4": {
+                            "x": 19.28,
+                            "y": 59.67,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "C4": {
+                            "x": 38.56,
+                            "y": 59.67,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "D4": {
+                            "x": 57.84,
+                            "y": 59.67,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "A5": {
+                            "x": 0,
+                            "y": 79.56,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "B5": {
+                            "x": 19.28,
+                            "y": 79.56,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "C5": {
+                            "x": 38.56,
+                            "y": 79.56,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "D5": {
+                            "x": 57.84,
+                            "y": 79.56,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "A6": {
+                            "x": 0,
+                            "y": 99.45,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "B6": {
+                            "x": 19.28,
+                            "y": 99.45,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "C6": {
+                            "x": 38.56,
+                            "y": 99.45,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       },
+                       "D6": {
+                            "x": 57.84,
+                            "y": 99.45,
+                            "z": 43.3,
+                            "depth": 37.0,
+                            "diameter": 9,
+                            "total-liquid-volume": 1500
+                       }
+                  }
+             },
+
           "opentrons-aluminum-block-2ml-eppendorf": {
                "origin-offset": {
                     "x": 25.88,

@@ -42,7 +42,7 @@ class SimulatingDriver:
 
     @property
     def target(self):
-        return self._target_temp
+        return self._target_temp if self._active else None
 
     @property
     def status(self):
@@ -85,6 +85,10 @@ class TempDeck(mod_abc.AbstractModule):
     @classmethod
     def name(cls) -> str:
         return 'tempdeck'
+
+    @classmethod
+    def display_name(cls) -> str:
+        return 'Temperature Deck'
 
     def __init__(self, port, simulating):
         if simulating:

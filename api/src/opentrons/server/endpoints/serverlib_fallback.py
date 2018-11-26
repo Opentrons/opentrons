@@ -9,6 +9,8 @@ from aiohttp import web
 from threading import Thread
 from typing import Dict, Any
 
+from opentrons import robot
+
 log = logging.getLogger(__name__)
 ignore_file = 'ignore.json'
 if os.environ.get('RUNNING_ON_PI'):
@@ -51,8 +53,6 @@ async def install_py(data, loop):
 
 
 async def install_smoothie_firmware(data, loop):
-    from opentrons.server.endpoints.update import _update_firmware
-
     filename = data.filename
     log.info('Flashing image "{}", this will take about 1 minute'.format(
         filename))
@@ -61,13 +61,12 @@ async def install_smoothie_firmware(data, loop):
     with open(filename, 'wb') as wf:
         wf.write(content)
 
-    msg = await _update_firmware(filename, loop)
-    log.debug('Firmware Update complete')
+    msg = await robot.update_firmware(filename, loop)
+    log.info('Firmware Update complete: {}'.format(msg))
     try:
         os.remove(filename)
     except OSError:
         pass
-    log.debug("Result: {}".format(msg))
     return {'message': msg, 'filename': filename}
 
 

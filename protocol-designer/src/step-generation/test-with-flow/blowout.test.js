@@ -1,4 +1,5 @@
 // @flow
+import {expectTimelineError} from './testMatchers'
 import _blowout from '../blowout'
 import {createRobotState, commandCreatorNoErrors, commandCreatorHasErrors} from './fixtures'
 
@@ -19,7 +20,7 @@ describe('blowout', () => {
       destPlateType: '96-flat',
       fillTiprackTips: true,
       fillPipetteTips: false,
-      tipracks: [200, 200],
+      tipracks: [300, 300],
     })
 
     robotStateWithTip = {
@@ -65,10 +66,7 @@ describe('blowout', () => {
       well: 'A1',
     })(robotStateWithTip)
 
-    expect(result.errors).toHaveLength(1)
-    expect(result.errors[0]).toMatchObject({
-      type: 'PIPETTE_DOES_NOT_EXIST',
-    })
+    expectTimelineError(result.errors, 'PIPETTE_DOES_NOT_EXIST')
   })
 
   test('blowout with invalid labware ID should throw error', () => {

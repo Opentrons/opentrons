@@ -6,6 +6,11 @@ import type {RootState} from '../reducers'
 
 export const rootSelector = (state: BaseState): RootState => state.fileData
 
+export const getCurrentProtocolExists = createSelector(
+  rootSelector,
+  (rootState) => rootState.currentProtocolExists
+)
+
 export const fileFormValues = createSelector(
   rootSelector,
   state => state.unsavedMetadataForm

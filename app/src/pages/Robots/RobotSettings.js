@@ -2,8 +2,10 @@
 // connect and configure robots page
 import * as React from 'react'
 import {connect} from 'react-redux'
+import {getIn} from '@thi.ng/paths'
 import {withRouter, Route, Switch, Redirect, type Match} from 'react-router'
 
+import {getConfig} from '../../config'
 import {selectors as robotSelectors, actions as robotActions} from '../../robot'
 import {CONNECTABLE, REACHABLE} from '../../discovery'
 import {
@@ -21,6 +23,7 @@ import RobotSettings, {
   ConnectAlertModal,
   RobotUpdateModal,
 } from '../../components/RobotSettings'
+import UpdateRobotModal from '../../components/RobotSettings/UpdateRobotModal'
 import CalibrateDeck from '../../components/CalibrateDeck'
 import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
 import ReachableRobotBanner from '../../components/RobotSettings/ReachableRobotBanner'
@@ -39,6 +42,7 @@ type SP = {|
   showConnectAlert: boolean,
   homeInProgress: ?boolean,
   homeError: ?Error,
+  __featureEnabled: boolean,
 |}
 
 type DP = {|dispatch: Dispatch|}
@@ -49,6 +53,8 @@ type Props = {
   closeHomeAlert?: () => mixed,
   closeConnectAlert: () => mixed,
 }
+
+const __FEATURE_FLAG = 'devInternal.newUpdateModal'
 
 export default withRouter(
   connect(
@@ -100,7 +106,13 @@ function RobotSettingsPage (props: Props) {
       <Switch>
         <Route
           path={`${path}/${UPDATE_FRAGMENT}`}
-          render={() => <RobotUpdateModal robot={robot} />}
+          render={() => {
+            if (props.__featureEnabled) {
+              return <UpdateRobotModal robot={robot} />
+            } else {
+              return <RobotUpdateModal robot={robot} />
+            }
+          }}
         />
 
         <Route
@@ -184,6 +196,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
       homeInProgress: homeRequest && homeRequest.inProgress,
       homeError: homeRequest && homeRequest.error,
       showConnectAlert: !connectRequest.inProgress && !!connectRequest.error,
+      __featureEnabled: !!getIn(getConfig(state), __FEATURE_FLAG),
     }
   }
 }

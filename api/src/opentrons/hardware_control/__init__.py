@@ -26,7 +26,7 @@ except ModuleNotFoundError:
     # implies windows
     Controller = None  # type: ignore
 from . import modules
-from .types import Axis
+from .types import Axis, HardwareAPILike, CriticalPoint
 
 
 mod_log = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ SHAKE_OFF_TIPS_DISTANCE = 2.25
 DROP_TIP_RELEASE_DISTANCE = 20
 
 
-class API:
+class API(HardwareAPILike):
     """ This API is the primary interface to the hardware controller.
 
     Because the hardware manager controls access to the system's hardware
@@ -93,22 +93,32 @@ class API:
         self._last_moved_mount: Optional[top_types.Mount] = None
 
     @classmethod
-    def build_hardware_controller(
+    async def build_hardware_controller(
             cls, config: robot_configs.robot_config = None,
             port: str = None,
-            loop: asyncio.AbstractEventLoop = None) -> 'API':
+            loop: asyncio.AbstractEventLoop = None,
+            force: bool = False) -> 'API':
         """ Build a hardware controller that will actually talk to hardware.
 
         This method should not be used outside of a real robot, and on a
         real robot only one true hardware controller may be active at one
         time.
+
+        :param config: A config to preload. If not specified, load the default.
+        :param port: A port to connect to. If not specified, the default port
+                     (found by scanning for connected FT232Rs).
+        :param loop: An event loop to use. If not specified, use the result of
+                     :py:meth:`asyncio.get_event_loop`.
+        :param force: If `True`, connect even if a lockfile is present. See
+                      :py:meth:`Controller.__init__`.
         """
         if None is Controller:
             raise RuntimeError(
                 'The hardware controller may only be instantiated on a robot')
-        backend = Controller(config, loop)
-        backend.connect(port)
-        return cls(backend, config=config, loop=loop)
+        checked_loop = loop or asyncio.get_event_loop()
+        backend = Controller(config, checked_loop, force=force)
+        await backend.connect(port)
+        return cls(backend, config=config, loop=checked_loop)
 
     @classmethod
     def build_hardware_simulator(
@@ -132,33 +142,67 @@ class API:
                              config, loop),
                    config=config, loop=loop)
 
+    @property
+    def loop(self) -> asyncio.AbstractEventLoop:
+        """ The event loop used by this instance. """
+        return self._loop
+
+    @property
+    def is_simulator(self) -> bool:
+        """ `True` if this is a simulator; `False` otherwise. """
+        return isinstance(self._backend, Simulator)
+
     # Query API
-    @_log_call
-    def get_connected_hardware(self):
-        """ Get the cached hardware connected to the robot.
+    @property
+    def fw_version(self) -> str:
+        """ Return the firmware version of the connected hardware.
+
+        The version is a string retrieved directly from the attached hardware
+        (or possibly simulator).
         """
-        pass
+        from_backend = self._backend.fw_version
+        if from_backend is None:
+            return 'unknown'
+        else:
+            return from_backend
 
     # Incidentals (i.e. not motion) API
     @_log_call
-    async def turn_on_button_light(self):
-        pass
+    def set_lights(self, button: bool = None, rails: bool = None):
+        """ Control the robot lights.
+
+        :param button: If specified, turn the button light on (`True`) or
+                       off (`False`). If not specified, do not change the
+                       button light.
+        :param rails: If specified, turn the rail lights on (`True`) or
+                      off (`False`). If not specified, do not change the
+                      rail lights.
+        """
+        self._backend.set_lights(button, rails)
 
     @_log_call
-    async def turn_off_button_light(self):
-        pass
+    def get_lights(self) -> Dict[str, bool]:
+        """ Return the current status of the robot lights.
+
+        :returns: A dict of the lights: `{'button': bool, 'rails': bool}`
+        """
+        return self._backend.get_lights()
 
     @_log_call
-    async def turn_on_rail_lights(self):
-        pass
+    async def identify(self, duration_s: int = 5):
+        """ Blink the button light to identify the robot.
 
-    @_log_call
-    async def turn_off_rail_lights(self):
-        pass
-
-    @_log_call
-    async def identify(self, seconds):
-        pass
+        :param int duration_s: The duration to blink for, in seconds.
+        """
+        count = duration_s * 4
+        on = False
+        for sec in range(count):
+            then = self._loop.time()
+            self.set_lights(button=on)
+            on = not on
+            now = self._loop.time()
+            await asyncio.sleep(max(0, 0.25-(now-then)))
+        self.set_lights(button=True)
 
     @_log_call
     async def cache_instruments(self,
@@ -190,7 +234,8 @@ class API:
     def attached_instruments(self):
         configs = ['name', 'min_volume', 'max_volume', 'channels',
                    'aspirate_flow_rate', 'dispense_flow_rate',
-                   'pipette_id', 'current_volume', 'display_name']
+                   'pipette_id', 'current_volume', 'display_name',
+                   'tip_length']
         instruments = {top_types.Mount.LEFT: {},
                        top_types.Mount.RIGHT: {}}
         for mount in top_types.Mount:
@@ -202,26 +247,78 @@ class API:
                 instruments[mount][key] = instr_dict[key]
         return instruments
 
+    @property
+    def attached_modules(self):
+        return self._attached_modules
+
     @_log_call
-    async def update_smoothie_firmware(self, firmware_file):
-        pass
+    async def update_firmware(
+            self,
+            firmware_file: str,
+            loop: asyncio.AbstractEventLoop = None,
+            explicit_modeset: bool = True) -> str:
+        """ Update the firmware on the Smoothie board.
+
+        :param firmware_file: The path to the firmware file.
+        :param explicit_modeset: `True` to force the smoothie into programming
+                                 mode; `False` to assume it is already in
+                                 programming mode.
+        :param loop: An asyncio event loop to use; if not specified, the one
+                     associated with this instance will be used.
+        :returns: The stdout of the tool used to update the smoothie
+        """
+        if None is loop:
+            checked_loop = self._loop
+        else:
+            checked_loop = loop
+        return await self._backend.update_firmware(firmware_file,
+                                                   checked_loop,
+                                                   explicit_modeset)
 
     # Global actions API
     @_log_call
-    async def pause(self):
-        pass
+    def pause(self):
+        """
+        Pause motion of the robot after a current motion concludes.
+
+        Individual calls to :py:meth:`move`
+        (which :py:meth:`aspirate` and :py:meth:`dispense` and other
+        calls may depend on) are considered atomic and will always complete if
+        they have been called prior to a call to this method. However,
+        subsequent calls to :py:meth:`move` that occur when the system
+        is paused will not proceed until the system is resumed with
+        :py:meth:`resume`.
+        """
+        self._backend.pause()
 
     @_log_call
-    async def resume(self):
-        pass
+    def resume(self):
+        """
+        Resume motion after a call to :py:meth:`pause`.
+        """
+        self._backend.resume()
 
     @_log_call
     async def halt(self):
-        pass
+        """ Immediately stop motion, reset, and home.
+
+        This will cancel motion (after the current call to :py:meth:`move`;
+        see :py:meth:`pause` for more detail), then home and reset the
+        robot.
+        """
+        self._backend.halt()
+        await self.reset()
+        await self.home()
 
     @_log_call
     async def reset(self):
-        pass
+        """ Reset the stored state of the system.
+
+        This will re-scan instruments and models, clearing any cached
+        information about their presence or state.
+        """
+        await self.cache_instruments()
+        await self.discover_modules()
 
     # Gantry/frame (i.e. not pipette) action API
     @_log_call
@@ -260,8 +357,15 @@ class API:
         """
         # Initialize/update current_position
         checked_axes = axes or [ax for ax in Axis]
-        smoothie_axes = [ax.name.upper() for ax in checked_axes]
-        smoothie_pos = self._backend.home(smoothie_axes)
+        gantry = [ax for ax in checked_axes if ax in Axis.gantry_axes()]
+        smoothie_gantry = [ax.name.upper() for ax in gantry]
+        smoothie_pos = {}
+        if smoothie_gantry:
+            smoothie_pos.update(self._backend.home(smoothie_gantry))
+        plungers = [ax for ax in checked_axes if ax not in Axis.gantry_axes()]
+        smoothie_plungers = [ax.name.upper() for ax in plungers]
+        if smoothie_plungers:
+            smoothie_pos.update(self._backend.home(smoothie_plungers))
         self._current_position = self._deck_from_smoothie(smoothie_pos)
 
     def _deck_from_smoothie(
@@ -305,12 +409,23 @@ class API:
         deck_pos.update(plunger_axes)
         return deck_pos
 
-    def current_position(self, mount: top_types.Mount) -> Dict[Axis, float]:
+    def current_position(
+            self,
+            mount: top_types.Mount,
+            critical_point: CriticalPoint = None) -> Dict[Axis, float]:
         """ Return the postion (in deck coords) of the critical point of the
         specified mount.
 
         This returns cached position to avoid hitting the smoothie driver
         unless ``refresh`` is ``True``.
+
+        If `critical_point` is specified, that critical point will be applied
+        instead of the default one. For instance, if
+        `critical_point=CriticalPoints.MOUNT` then the position of the mount
+        will be returned. If the critical point specified does not exist, then
+        the next one down is returned - for instance, if there is no tip on the
+        specified mount but `CriticalPoint.TIP` was specified, the position of
+        the nozzle will be returned.
         """
         if not self._current_position:
             raise MustHomeError
@@ -320,7 +435,7 @@ class API:
             offset = top_types.Point(*self.config.mount_offset)
         z_ax = Axis.by_mount(mount)
         plunger_ax = Axis.of_plunger(mount)
-        cp = self._critical_point_for(mount)
+        cp = self._critical_point_for(mount, critical_point)
         return {
             Axis.X: self._current_position[Axis.X] + offset[0] + cp.x,
             Axis.Y: self._current_position[Axis.Y] + offset[1] + cp.y,
@@ -328,13 +443,19 @@ class API:
             plunger_ax: self._current_position[plunger_ax]
         }
 
-    def gantry_position(self, mount: top_types.Mount) -> top_types.Point:
+    def gantry_position(
+            self,
+            mount: top_types.Mount,
+            critical_point: CriticalPoint = None) -> top_types.Point:
         """ Return the position of the critical point as pertains to the gantry
 
         This ignores the plunger position and gives the Z-axis a predictable
         name (as :py:attr:`.Point.z`).
+
+        `critical_point` specifies an override to the current critical point to
+        use (see :py:meth:`current_position`).
         """
-        cur_pos = self.current_position(mount)
+        cur_pos = self.current_position(mount, critical_point)
         return top_types.Point(x=cur_pos[Axis.X],
                                y=cur_pos[Axis.Y],
                                z=cur_pos[Axis.by_mount(mount)])
@@ -342,7 +463,8 @@ class API:
     @_log_call
     async def move_to(
             self, mount: top_types.Mount, abs_position: top_types.Point,
-            speed: float = None):
+            speed: float = None,
+            critical_point: CriticalPoint = None):
         """ Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed. 'speed' sets the speed
         of all robot axes to the given value. So, if multiple axes are to be
@@ -359,6 +481,20 @@ class API:
           pipette tip, the critical point is the end of the pipette tip for
           a single pipette or the end of the tip of the backmost nozzle of a
           multipipette
+
+        :param mount: The mount to move
+        :param abs_position: The target absolute position in
+                             :ref:`protocol-api-deck-coords` to move the
+                             critical point to
+        :param speed: An overall head speed to use during the move
+        :param critical_point: The critical point to move. In most situations
+                               this is not needed. If not specified, the
+                               current critical point will be moved. If
+                               specified, the critical point must be one that
+                               actually exists - that is, specifying
+                               :py:attr:`.CriticalPoint.NOZZLE` when no pipette
+                               is attached or :py:attr:`.CriticalPoint.TIP`
+                               when no tip is applied will result in an error.
         """
         if not self._current_position:
             raise MustHomeError
@@ -370,7 +506,7 @@ class API:
             offset = top_types.Point(*self.config.mount_offset)
         else:
             offset = top_types.Point(0, 0, 0)
-        cp = self._critical_point_for(mount)
+        cp = self._critical_point_for(mount, critical_point)
         target_position = OrderedDict(
             ((Axis.X, abs_position.x - offset.x - cp.x),
              (Axis.Y, abs_position.y - offset.y - cp.y),
@@ -432,12 +568,12 @@ class API:
              (pl_axis, dist))
         )
         try:
-            await self._move(all_axes_pos, speed)
+            await self._move(all_axes_pos, speed, False)
         except KeyError:
             raise MustHomeError
 
     async def _move(self, target_position: 'OrderedDict[Axis, float]',
-                    speed: float = None):
+                    speed: float = None, home_flagged_axes: bool = True):
         """ Worker function to apply robot motion.
 
         Robot motion means the kind of motions that are relevant to the robot,
@@ -502,13 +638,23 @@ class API:
                                 deck_mins[ax], deck_max[ax],
                                 bounds[ax.name][0], bounds[ax.name][1]))
         try:
-            self._backend.move(smoothie_pos, speed=speed)
+            self._backend.move(smoothie_pos, speed=speed,
+                               home_flagged_axes=home_flagged_axes)
         except Exception:
             self._log.exception('Move failed')
             self._current_position.clear()
             raise
         else:
             self._current_position.update(target_position)
+
+    @property
+    def engaged_axes(self) -> Dict[Axis, bool]:
+        """ Which axes are engaged and holding. """
+        return {Axis[ax]: eng
+                for ax, eng in self._backend.engaged_axes().items()}
+
+    async def disengage_axes(self, which: List[Axis]):
+        self._backend.disengage_axes([ax.name for ax in which])
 
     @_log_call
     async def retract(self, mount: top_types.Mount, margin: float):
@@ -520,16 +666,21 @@ class API:
         smoothie_pos = self._backend.fast_home(smoothie_ax, margin)
         self._current_position = self._deck_from_smoothie(smoothie_pos)
 
-    def _critical_point_for(self, mount: top_types.Mount) -> top_types.Point:
+    def _critical_point_for(
+            self, mount: top_types.Mount,
+            cp_override: CriticalPoint = None) -> top_types.Point:
         """ Return the current critical point of the specified mount.
 
         The mount's critical point is the position of the mount itself, if no
         pipette is attached, or the pipette's critical point (which depends on
         tip status).
+
+        If `cp_override` is specified, and that critical point actually exists,
+        it will be used instead. Invalid `cp_override`s are ignored.
         """
         pip = self._attached_instruments[mount]
-        if pip is not None:
-            return pip.critical_point
+        if pip is not None and cp_override != CriticalPoint.MOUNT:
+            return pip.critical_point(cp_override)
         else:
             # TODO: The smoothie’s z/a home position is calculated to provide
             # the offset for a P300 single. Here we should decide whether we

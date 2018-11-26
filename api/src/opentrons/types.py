@@ -4,7 +4,9 @@ from typing import Any, NamedTuple, TYPE_CHECKING, Union
 if TYPE_CHECKING:
     from typing import (Optional,       # noqa(F401) Used for typechecking
                         Tuple)
-    from .labware import Labware, Well  # noqa(F401) Used for typechecking
+    from .labware import (Labware,      # noqa(F401) Used for typechecking
+                          Well,
+                          ModuleGeometry)
 
 
 class PipetteNotAttachedError(KeyError):
@@ -60,12 +62,15 @@ class Location(NamedTuple):
        of each item.
     """
     point: Point
-    labware: 'Union[Labware, Well, None]'
+    labware: 'Union[Labware, Well, str, ModuleGeometry, None]'
 
 
 class Mount(enum.Enum):
     LEFT = enum.auto()
     RIGHT = enum.auto()
+
+    def __str__(self):
+        return self.name
 
 
 DeckLocation = Union[int, str]

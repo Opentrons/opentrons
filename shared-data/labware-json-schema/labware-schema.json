@@ -70,7 +70,7 @@
       "type": "object",
       "description": "Internal describers used to determine pipette movement to labware",
       "additionalProperties": false,
-      "required": ["format", "isTiprack", "loadName"],
+      "required": ["format", "isTiprack", "loadName", "isMagneticModuleCompatible"],
       "properties": {
         "format": {
           "description": "Property to determine compatibility with multichannel pipette",
@@ -88,6 +88,14 @@
         "loadName": {
           "description": "Generated unique name of container",
           "type": "string"
+        },
+        "isMagneticModuleCompatible": {
+          "description": "Flag marking whether a labware is compatible by default with the Magnetic Module",
+          "type": "boolean"
+        },
+        "magneticModuleEngageHeight": {
+          "description": "Distance to move magnetic module magnets to engage",
+          "$ref": "#/definitions/positiveNumber"
         }
       }
 
@@ -130,8 +138,8 @@
           "$ref": "#/definitions/positiveNumber"
         }
       }
-
     },
+
     "wells": {
       "type": "object",
       "description": "Unordered object of well objects with position and dimensional information",

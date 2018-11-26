@@ -1,4 +1,6 @@
 import numpy as np
+import pytest
+
 from opentrons import robot
 from opentrons import deck_calibration as dc
 from opentrons.deck_calibration import endpoints
@@ -16,6 +18,7 @@ from opentrons.config.pipette_config import Y_OFFSET_MULTI
 # should be replaced with something that accurately reflects actual robot
 # operation, and then these tests should be revised to match expected reality.
 
+@pytest.mark.api1_only
 async def test_transform_from_moves(async_client, monkeypatch):
     test_mount, test_model = ('left', 'p300_multi_v1')
     # test_mount, test_model = ('right', 'p300_single_v1')

@@ -216,7 +216,7 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.8 Z0.1 G4P0.005 G91 G0Y-28 G0Y10 G90 M400'],  # NOQA
         ['M203.1 X80 M400'],
         ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G28.2X M400'],
-        ['M203.1 A125 B50 C50 X600 Y400 Z125 M400'],
+        ['M203.1 A125 B40 C40 X600 Y400 Z125 M400'],
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
         ['M203.1 Y80 M400'],
         ['M907 A0.1 B0.05 C0.05 X0.3 Y1.25 Z0.1 G4P0.005 G28.2Y M400'],
@@ -224,7 +224,7 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['G91 G0Y-3 G90 M400'],
         ['G28.2Y M400'],
         ['G91 G0Y-3 G90 M400'],
-        ['M203.1 A125 B50 C50 X600 Y400 Z125 M400'],
+        ['M203.1 A125 B40 C40 X600 Y400 Z125 M400'],
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
         ['M114.2 M400']
     ]
@@ -833,7 +833,7 @@ def test_unstick_axes(model):
         'M119',  # get the switch status
         'M907 A0.1 B0.5 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G0B-1C-1',  # move
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # set plunger current
-        'M203.1 A125 B50 C50 X600 Y400 Z125'  # return to normal speed
+        'M203.1 A125 B40 C40 X600 Y400 Z125'  # return to normal speed
     ]
     # from pprint import pprint
     # pprint(current_log)
@@ -846,7 +846,7 @@ def test_unstick_axes(model):
         'M203.1 A1 X1 Y1 Z1',  # slow them down
         'M119',  # get the switch status
         'M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0A-1X-1Y-1Z-1',
-        'M203.1 A125 B50 C50 X600 Y400 Z125'  # return to normal speed
+        'M203.1 A125 B40 C40 X600 Y400 Z125'  # return to normal speed
     ]
     # from pprint import pprint
     # pprint(current_log)
@@ -874,7 +874,7 @@ def test_unstick_axes(model):
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # low current B
         'M907 A0.1 B0.05 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G28.2C',  # HOME C
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # low current C
-        'M203.1 A125 B50 C50 X600 Y400 Z125'  # reset max-speeds
+        'M203.1 A125 B40 C40 X600 Y400 Z125'  # reset max-speeds
     ]
     # from pprint import pprint
     # pprint(current_log)
@@ -900,7 +900,7 @@ def test_unstick_axes(model):
         'M119',  # get switch status
         'M907 A0.1 B0.5 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G28.2BC',  # HOME BC
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # low current BC
-        'M203.1 A125 B50 C50 X600 Y400 Z125'  # reset max-speeds
+        'M203.1 A125 B40 C40 X600 Y400 Z125'  # reset max-speeds
     ]
     # from pprint import pprint
     # pprint(current_log)

@@ -2,14 +2,16 @@ import asyncio
 import logging
 from typing import Any, Dict, List, Optional, Union, Tuple
 
-from .labware import Well, Labware, load
+from .labware import Well, Labware, load, load_module, ModuleGeometry
 from opentrons import types, hardware_control as hc
 import opentrons.config.robot_configs as rc
-from opentrons.hardware_control import adapters
+from opentrons.hardware_control import adapters, modules
 from . import geometry
 
 
 MODULE_LOG = logging.getLogger(__name__)
+
+ModuleTypes = Union['TemperatureModuleContext', 'MagneticModuleContext']
 
 
 class OutOfTipsError(Exception):
@@ -87,9 +89,27 @@ class ProtocolContext:
         later in the protocol.
         """
         labware = load(labware_name,
-                       self._deck_layout.position_for(location),
-                       str(location))
+                       self._deck_layout.position_for(location))
         return self.load_labware(labware, location)
+
+    def load_module(
+            self, module_name: str,
+            location: types.DeckLocation) -> ModuleTypes:
+        for mod in self._hardware.discover_modules():
+            if mod.name() == module_name:
+                mod_class = {'magdeck': MagneticModuleContext,
+                             'tempdeck': TemperatureModuleContext}[module_name]
+                break
+        else:
+            raise KeyError(module_name)
+        geometry = load_module(
+            module_name, self._deck_layout.position_for(location))
+        mod_ctx = mod_class(self,
+                            mod,
+                            geometry,
+                            self._loop)
+        self._deck_layout[location] = geometry
+        return mod_ctx
 
     @property
     def loaded_labwares(self) -> Dict[int, Labware]:
@@ -214,6 +234,7 @@ class ProtocolContext:
         """ Homes the robot.
         """
         self._log.debug("home")
+        self._location_cache = None
         self._hardware.home()
 
     @property
@@ -720,3 +741,178 @@ class InstrumentContext:
     def __str__(self):
         return '{} on {} mount'.format(self.hw_pipette['display_name'],
                                        self._mount.name.lower())
+
+
+class ModuleContext:
+    """ An object representing a connected module. """
+
+    def __init__(self, ctx: ProtocolContext, geometry: ModuleGeometry) -> None:
+        """ Build the ModuleContext.
+
+        This usually should not be instantiated directly; instead, modules
+        should be loaded using :py:meth:`ProtocolContext.load_module`.
+
+        :param ctx: The parent context for the module
+        :param geometry: The :py:class:`.ModuleGeometry` for the module
+        """
+        self._geometry = geometry
+        self._ctx = ctx
+
+    def load_labware(self, labware: Labware) -> Labware:
+        """ Specify the presence of a piece of labware on the module.
+
+        :param labware: The labware object. This object should be already
+                        initialized and its parent should be set to this
+                        module's geometry. To initialize and load a labware
+                        onto the module in one step, see
+                        :py:meth:`load_labware_by_name`.
+        :returns: The properly-linked labware object
+        """
+        self._geometry.add_labware(labware)
+        self._ctx.deck.recalculate_high_z()
+        return labware
+
+    def load_labware_by_name(self, name: str) -> Labware:
+        """ Specify the presence of a piece of labware on the module.
+
+        :param name: The name of the labware object.
+        :returns: The initialized and loaded labware object.
+        """
+        lw = load(name, self._geometry.location)
+        return self.load_labware(lw)
+
+    @property
+    def labware(self) -> Optional[Labware]:
+        """ The labware (if any) present on this module. """
+        return self._geometry.labware
+
+    def __repr__(self):
+        return "{} at {} lw {}".format(self.__class__.__name__,
+                                       self._geometry,
+                                       self.labware)
+
+
+class TemperatureModuleContext(ModuleContext):
+    """ An object representing a connected Temperature Module.
+
+    It should not be instantiated directly; instead, it should be
+    created through :py:meth:`.ProtocolContext.load_module`.
+    """
+    def __init__(self, ctx: ProtocolContext,
+                 hw_module: modules.tempdeck.TempDeck,
+                 geometry: ModuleGeometry,
+                 loop: asyncio.AbstractEventLoop):
+        self._module = hw_module
+        self._loop = loop
+        super().__init__(ctx, geometry)
+
+    def set_temperature(self, celsius: float):
+        """ Set the target temperature, in C.
+
+        Must be between 4 and 95C based on Opentrons QA.
+
+        :param celsius: The target temperature, in C
+        """
+        return self._module.set_temperature(celsius)
+
+    def deactivate(self):
+        """ Stop heating (or cooling) and turn off the fan.
+        """
+        return self._module.disengage()
+
+    def wait_for_temp(self):
+        """ Block until the module reaches its setpoint.
+        """
+        self._loop.run_until_complete(self._module.wait_for_temp())
+
+    @property
+    def temperature(self):
+        """ Current temperature in C"""
+        return self._module.temperature
+
+    @property
+    def target(self):
+        """ Current target temperature in C"""
+        return self._module.target
+
+
+class MagneticModuleContext(ModuleContext):
+    """ An object representing a connected Temperature Module.
+
+    It should not be instantiated directly; instead, it should be
+    created through :py:meth:`.ProtocolContext.load_module`.
+    """
+    def __init__(self,
+                 ctx: ProtocolContext,
+                 hw_module: modules.magdeck.MagDeck,
+                 geometry: ModuleGeometry,
+                 loop: asyncio.AbstractEventLoop) -> None:
+        self._module = hw_module
+        self._loop = loop
+        super().__init__(ctx, geometry)
+
+    def calibrate(self):
+        """ Calibrate the Magnetic Module.
+
+        The calibration is used to establish the position of the lawbare on
+        top of the magnetic module.
+        """
+        self._module.calibrate()
+
+    def load_labware(self, labware: Labware) -> Labware:
+        """
+        Load labware onto a Magnetic Module, checking if it is compatible
+        """
+        if labware.magdeck_engage_height is None:
+            MODULE_LOG.warning(
+                "This labware ({}) is not explicitly compatible with the"
+                " Magnetic Module. You will have to specify a height when"
+                " calling engage().")
+        return super().load_labware(labware)
+
+    def engage(self, height: float = None, offset: float = None):
+        """ Raise the Magnetic Module's magnets.
+
+        The destination of the magnets can be specified in several different
+        ways, based on internally stored default heights for labware:
+
+           - If neither `height` nor `offset` is specified, the magnets will
+             raise to a reasonable default height based on the specified
+             labware.
+           - If `height` is specified, it should be a distance in mm from the
+             home position of the magnets.
+           - If `offset` is specified, it should be an offset in mm from the
+             default position. A positive number moves the magnets higher and
+             a negative number moves the magnets lower.
+
+        Only certain labwares have defined engage heights for the Magnetic
+        Module. If a labware that does not have a defined engage height is
+        loaded on the Magnetic Module (or if no labware is loaded), then
+        `height` must be specified.
+
+        :param height: The height to raise the magnets to, in mm from home.
+        :param offset: An offset relative to the default height for the labware
+                       in mm
+        """
+        if height:
+            dist = height
+        elif self.labware and self.labware.magdeck_engage_height is not None:
+            dist = self.labware.magdeck_engage_height
+            if offset:
+                dist += offset
+        else:
+            raise ValueError(
+                "Currently loaded labware {} does not have a known engage "
+                "height; please specify explicitly with the height param"
+                .format(self.labware))
+        self._module.engage(dist)
+
+    def disengage(self):
+        """ Lower the magnets back into the Magnetic Module.
+        """
+        self._module.disengage()
+
+    @property
+    def status(self):
+        """ The status of the module. either 'engaged' or 'disengaged' """
+        return self._module.status
