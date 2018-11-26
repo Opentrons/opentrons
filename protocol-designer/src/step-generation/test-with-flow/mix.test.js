@@ -175,7 +175,8 @@ describe('mix: advanced options', () => {
       volume,
       times,
       changeTip: 'always',
-      blowout: blowoutLabwareId,
+      blowoutLabware: blowoutLabwareId,
+      blowoutWell: 'A1',
       wells: ['A1', 'B1', 'C1'],
     }
 

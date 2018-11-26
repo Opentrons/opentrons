@@ -87,12 +87,14 @@ const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: Robo
         ]
         : []
 
-      const blowoutCommands = data.blowout
-        ? [blowout({
-          pipette,
-          labware: data.blowout,
-          well: 'A1',
-        })]
+      const blowoutCommand = (data.blowoutLabware && data.blowoutWell)
+        ? [
+          blowout({
+            pipette: data.pipette,
+            labware: data.blowoutLabware, // TODO Ian 2018-05-04 more explicit test for non-trash blowout destination
+            well: data.blowoutWell, // TODO LATER: should user be able to specify the blowout well?
+          }),
+        ]
         : []
 
       const mixCommands = mixUtil(
@@ -108,7 +110,7 @@ const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: Robo
       return [
         ...tipCommands,
         ...mixCommands,
-        ...blowoutCommands,
+        ...blowoutCommand,
         ...touchTipCommands,
       ]
     }

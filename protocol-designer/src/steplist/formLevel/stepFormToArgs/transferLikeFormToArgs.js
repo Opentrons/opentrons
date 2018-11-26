@@ -12,6 +12,7 @@ import { DEFAULT_CHANGE_TIP_OPTION } from '../../../constants'
 import { orderWells } from '../../utils'
 
 export const SOURCE_WELL_DISPOSAL_DESTINATION = 'source_well'
+export const DEST_WELL_DISPOSAL_DESTINATION = 'dest_well'
 
 function getMixData (hydratedFormData, checkboxField, volumeField, timesField) {
   const checkbox = hydratedFormData[checkboxField]
@@ -32,7 +33,6 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
   const volume = Number(hydratedFormData['volume'])
   const sourceLabware = hydratedFormData['aspirate_labware']
   const destLabware = hydratedFormData['dispense_labware']
-  const blowoutLabwareId = hydratedFormData['dispense_blowout_checkbox'] ? hydratedFormData['dispense_blowout_labware'] : null
 
   const aspirateOffsetFromBottomMm = hydratedFormData['aspirate_mmFromBottom']
   const dispenseOffsetFromBottomMm = hydratedFormData['dispense_mmFromBottom']
@@ -84,7 +84,6 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
 
-    blowout: blowoutLabwareId,
     changeTip,
     delayAfterDispense,
     mixInDestination,
@@ -143,11 +142,30 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
     }
   }
 
+  let blowoutDestination = null
+  let blowoutLabware = null
+  let blowoutWell = null
+  if (hydratedFormData['dispense_blowout_checkbox']) {
+    blowoutDestination = hydratedFormData['dispense_blowout_labware']
+    if (blowoutDestination === SOURCE_WELL_DISPOSAL_DESTINATION) {
+      blowoutLabware = sourceLabware.id
+      blowoutWell = sourceWells[0]
+    } else if (blowoutDestination === DEST_WELL_DISPOSAL_DESTINATION) {
+      blowoutLabware = destLabware.id
+      blowoutWell = destWells[0]
+    } else {
+      // NOTE: if blowoutDestination is not source or dest well it is a labware type (e.g. fixed-trash)
+      blowoutLabware = blowoutDestination
+      blowoutWell = 'A1'
+    }
+  }
+
   switch (stepType) {
     case 'transfer': {
       const transferStepArguments: TransferFormData = {
         ...commonFields,
-        disposalVolume,
+        blowoutLabware,
+        blowoutWell,
         stepType: 'transfer',
         sourceWells,
         destWells,
@@ -159,7 +177,8 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
     case 'consolidate': {
       const consolidateStepArguments: ConsolidateFormData = {
         ...commonFields,
-        disposalVolume,
+        blowoutLabware,
+        blowoutWell,
         mixFirstAspirate,
         sourceWells,
         destWell: destWells[0],

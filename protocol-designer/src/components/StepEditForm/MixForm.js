@@ -8,6 +8,7 @@ import {
   StepInputField,
   StepCheckboxRow,
   DispenseDelayFields,
+  DisposalDestinationDropdown,
   PipetteField,
   LabwareDropdown,
   ChangeTipField,
@@ -51,7 +52,11 @@ const MixForm = (props: MixFormProps): React.Element<typeof React.Fragment> => {
               focusHandlers={focusHandlers}
             />
             <StepCheckboxRow name="dispense_blowout_checkbox" label='Blow out'>
-              <LabwareDropdown name="dispense_blowout_labware" className={styles.full_width} {...focusHandlers} />
+              <DisposalDestinationDropdown
+                name="dispense_blowout_labware"
+                className={styles.full_width}
+                includeDestWell
+                {...focusHandlers} />
             </StepCheckboxRow>
             <StepCheckboxRow name="touchTip" label='Touch tip'>
               <TipPositionInput fieldName="mix_touchTipMmFromBottom" />

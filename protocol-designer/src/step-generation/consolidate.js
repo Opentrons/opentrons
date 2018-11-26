@@ -142,12 +142,12 @@ const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prev
         )
         : []
 
-      const blowoutCommand = (data.blowout)
+      const blowoutCommand = (data.blowoutLabware && data.blowoutWell)
         ? [
           blowout({
             pipette: data.pipette,
-            labware: data.blowout, // TODO Ian 2018-05-04 more explicit test for non-trash blowout destination
-            well: 'A1', // TODO LATER: should user be able to specify the blowout well?
+            labware: data.blowoutLabware, // TODO Ian 2018-05-04 more explicit test for non-trash blowout destination
+            well: data.blowoutWell, // TODO LATER: should user be able to specify the blowout well?
           }),
         ]
         : []

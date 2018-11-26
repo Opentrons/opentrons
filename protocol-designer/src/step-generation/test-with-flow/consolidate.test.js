@@ -361,7 +361,8 @@ describe('consolidate single-channel', () => {
       volume: 100,
       changeTip: 'once',
       mixInDestination: {times: 3, volume: 54},
-      blowout: 'trashId',
+      blowoutLabware: 'trashId',
+      blowoutWell: 'A1',
     }
 
     const result = consolidate(data)(robotInitialState)

@@ -32,7 +32,8 @@ beforeEach(() => {
     touchTipAfterDispense: false,
     mixInDestination: null,
     delayAfterDispense: null,
-    blowout: null,
+    blowoutLabware: null,
+    blowoutWell: null,
   }
 
   robotInitialState = createRobotState({

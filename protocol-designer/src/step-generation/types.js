@@ -29,6 +29,7 @@ export type TransferLikeFormDataFields = {
   /** volume is interpreted differently by different Step types */
   volume: number,
 
+
   // ===== ASPIRATE SETTINGS =====
   /** Pre-wet tip with ??? uL liquid from the first source well. */
   preWetTip: boolean,
@@ -38,8 +39,6 @@ export type TransferLikeFormDataFields = {
   touchTipAfterAspirateOffsetMmFromBottom?: ?number,
   /** changeTip is interpreted differently by different Step types */
   changeTip: ChangeTipOptions,
-  /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
-  disposalVolume: ?number,
   /** offset from bottom of well in mm */
   aspirateOffsetFromBottomMm?: ?number,
 
@@ -61,7 +60,9 @@ export type ConsolidateFormData = {
   destWell: string,
 
   /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
-  blowout: ?string, // TODO LATER LabwareId export type here instead of string?
+  blowoutLabware: ?string, // TODO LATER LabwareId export type here instead of string?
+  blowoutWell: ?string,
+
   /** Mix in first well in chunk */
   mixFirstAspirate: ?MixArgs,
   /** Mix in destination well after dispense */
@@ -74,8 +75,10 @@ export type TransferFormData = {
   sourceWells: Array<string>,
   destWells: Array<string>,
 
-  /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
-  blowout: ?string, // TODO LATER LabwareId export type here instead of string?
+  /** If given, blow out in the specified labware after dispense at the end of each asp-dispense cycle */
+  blowoutLabware: ?string, // TODO LATER LabwareId export type here instead of string?
+  blowoutWell: ?string,
+
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?MixArgs,
   /** Mix in destination well after dispense */
@@ -113,8 +116,11 @@ export type MixFormData = {
   delay: ?number,
   /** change tip: see comments in step-generation/mix.js */
   changeTip: ChangeTipOptions,
+
   /** If given, blow out in the specified labware after mixing each well */
-  blowout?: string,
+  blowoutLabware: ?string, // TODO LATER LabwareId export type here instead of string?
+  blowoutWell: ?string,
+
   /** offset from bottom of well in mm */
   aspirateOffsetFromBottomMm?: ?number,
   dispenseOffsetFromBottomMm?: ?number,

@@ -149,8 +149,12 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                 tooltipComponent={i18n.t('tooltip.not_in_beta')}
                 focusHandlers={focusHandlers} />
               {stepType !== 'distribute' &&
-                <StepCheckboxRow name='dispense_blowout_checkbox' label='Blow out' >
-                  <LabwareDropdown name="dispense_blowout_labware" className={styles.full_width} {...focusHandlers} />
+                <StepCheckboxRow name='dispense_blowout_checkbox' label='Blow out'>
+                  <DisposalDestinationDropdown
+                    name="dispense_blowout_labware"
+                    className={styles.full_width}
+                    includeDestWell
+                    {...focusHandlers} />
                 </StepCheckboxRow>
               }
             </FormGroup>
