@@ -8,14 +8,14 @@ export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
 
 export const blowoutUtil = (
-  pipette,
-  sourceLabware,
-  sourceWell,
-  destLabware,
-  destWell,
-  blowoutDestination,
+  pipette: $PropertyType<PipetteLabwareFields, 'pipette'>,
+  sourceLabware: $PropertyType<PipetteLabwareFields, 'labware'>,
+  sourceWell: $PropertyType<PipetteLabwareFields, 'well'>,
+  destLabware: $PropertyType<PipetteLabwareFields, 'labware'>,
+  destWell: $PropertyType<PipetteLabwareFields, 'well'>,
+  blowoutDestination: ?string,
 ) => {
-  if (blowoutDestination) return []
+  if (!blowoutDestination) return []
   let labware = blowoutDestination
   let well = 'A1'
 

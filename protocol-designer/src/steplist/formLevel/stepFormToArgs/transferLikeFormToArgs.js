@@ -7,8 +7,8 @@ import type {
   ConsolidateFormData,
   DistributeFormData,
   TransferFormData,
-  SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../../../step-generation'
+import {SOURCE_WELL_BLOWOUT_DESTINATION} from '../../../step-generation/blowout'
 import { DEFAULT_CHANGE_TIP_OPTION } from '../../../constants'
 import { orderWells } from '../../utils'
 

@@ -65,8 +65,7 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
         destWells: [destWell],
         mixBeforeAspirate: data.mixBeforeAspirate,
         mixInDestination: null,
-        blowoutLabware: null,
-        blowoutWell: null,
+        blowoutDestination: null,
       }
       return transfer(transferData)
     })

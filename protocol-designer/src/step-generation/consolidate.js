@@ -129,7 +129,7 @@ const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prev
       const blowoutCommand = blowoutUtil(
         data.pipette,
         data.sourceLabware,
-        data.sourceWell,
+        sourceWellChunk[0],
         data.destLabware,
         data.destWell,
         data.blowoutDestination,
