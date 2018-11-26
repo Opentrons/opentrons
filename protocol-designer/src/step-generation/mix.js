@@ -1,7 +1,7 @@
 // @flow
 import flatMap from 'lodash/flatMap'
 import aspirate from './aspirate'
-import blowout from './blowout'
+import {blowoutUtil} from './blowout'
 import dispense from './dispense'
 import replaceTip from './replaceTip'
 import touchTip from './touchTip'
@@ -87,15 +87,14 @@ const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: Robo
         ]
         : []
 
-      const blowoutCommand = (data.blowoutLabware && data.blowoutWell)
-        ? [
-          blowout({
-            pipette: data.pipette,
-            labware: data.blowoutLabware, // TODO Ian 2018-05-04 more explicit test for non-trash blowout destination
-            well: data.blowoutWell, // TODO LATER: should user be able to specify the blowout well?
-          }),
-        ]
-        : []
+      const blowoutCommand = blowoutUtil(
+        data.pipette,
+        data.labware,
+        well,
+        data.labware,
+        well,
+        data.blowoutDestination,
+      )
 
       const mixCommands = mixUtil(
         pipette,

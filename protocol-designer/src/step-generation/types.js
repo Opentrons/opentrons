@@ -29,7 +29,6 @@ export type TransferLikeFormDataFields = {
   /** volume is interpreted differently by different Step types */
   volume: number,
 
-
   // ===== ASPIRATE SETTINGS =====
   /** Pre-wet tip with ??? uL liquid from the first source well. */
   preWetTip: boolean,
@@ -59,9 +58,8 @@ export type ConsolidateFormData = {
   sourceWells: Array<string>,
   destWell: string,
 
-  /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
-  blowoutLabware: ?string, // TODO LATER LabwareId export type here instead of string?
-  blowoutWell: ?string,
+  /** If given, blow out in the specified destination after dispense at the end of each asp-asp-dispense cycle */
+  blowoutDestination: ?string,
 
   /** Mix in first well in chunk */
   mixFirstAspirate: ?MixArgs,
@@ -75,9 +73,8 @@ export type TransferFormData = {
   sourceWells: Array<string>,
   destWells: Array<string>,
 
-  /** If given, blow out in the specified labware after dispense at the end of each asp-dispense cycle */
-  blowoutLabware: ?string, // TODO LATER LabwareId export type here instead of string?
-  blowoutWell: ?string,
+  /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
+  blowoutDestination: ?string,
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?MixArgs,
@@ -91,6 +88,8 @@ export type DistributeFormData = {
   sourceWell: string,
   destWells: Array<string>,
 
+  /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
+  disposalVolume: ?number,
   /** Disposal labware and well for final blowout destination of disposalVolume contents (e.g. trash, source well, etc.) */
   disposalLabware: ?string,
   disposalWell: ?string,
@@ -117,9 +116,8 @@ export type MixFormData = {
   /** change tip: see comments in step-generation/mix.js */
   changeTip: ChangeTipOptions,
 
-  /** If given, blow out in the specified labware after mixing each well */
-  blowoutLabware: ?string, // TODO LATER LabwareId export type here instead of string?
-  blowoutWell: ?string,
+  /** If given, blow out in the specified destination after mixing each well */
+  blowoutDestination: ?string,
 
   /** offset from bottom of well in mm */
   aspirateOffsetFromBottomMm?: ?number,

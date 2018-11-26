@@ -3,7 +3,7 @@ import flatMap from 'lodash/flatMap'
 import zip from 'lodash/zip'
 import aspirate from './aspirate'
 import dispense from './dispense'
-import blowout from './blowout'
+import {blowoutUtil} from './blowout'
 import {mixUtil} from './mix'
 import replaceTip from './replaceTip'
 import touchTip from './touchTip'
@@ -128,15 +128,15 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
             )
             : []
 
-          const blowoutCommand = (data.blowoutLabware && data.blowoutWell)
-            ? [
-              blowout({
-                pipette: data.pipette,
-                labware: data.blowoutLabware, // TODO Ian 2018-05-04 more explicit test for non-trash blowout destination
-                well: data.blowoutWell, // TODO LATER: should user be able to specify the blowout well?
-              }),
-            ]
-            : []
+
+          const blowoutCommand = blowoutUtil(
+            data.pipette,
+            data.sourceLabware,
+            sourceWell,
+            data.destLabware,
+            destWell,
+            data.blowoutDestination,
+          )
 
           return [
             ...tipCommands,

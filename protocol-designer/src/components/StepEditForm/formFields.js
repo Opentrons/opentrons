@@ -17,9 +17,9 @@ import {hydrateField} from '../../steplist/fieldLevel'
 import type {StepFieldName} from '../../steplist/fieldLevel'
 import {DISPOSAL_PERCENTAGE} from '../../steplist/formLevel/warnings'
 import {
-  SOURCE_WELL_DISPOSAL_DESTINATION,
-  DEST_WELL_DISPOSAL_DESTINATION,
-} from '../../steplist/formLevel/stepFormToArgs/transferLikeFormToArgs'
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+  DEST_WELL_BLOWOUT_DESTINATION,
+} from '../../step-generation/blowout'
 import type {ChangeTipOptions} from '../../step-generation/types'
 import type {BaseState, ThunkDispatch} from '../../types'
 import type {StepType} from '../../form-types'
@@ -160,7 +160,8 @@ export const PipetteField = connect(PipetteFieldSTP, PipetteFieldDTP)((props: Pi
 type DisposalDestinationDropdownOP = {
   name: StepFieldName,
   className?: string,
-  includeDestWell: ?boolean,
+  includeSourceWell?: ?boolean,
+  includeDestWell?: ?boolean,
 } & FocusHandlers
 type DisposalDestinationDropdownSP = {options: Options}
 const DisposalDestinationDropdownSTP = (state: BaseState, ownProps: DisposalDestinationDropdownOP): DisposalDestinationDropdownSP => {
@@ -168,13 +169,13 @@ const DisposalDestinationDropdownSTP = (state: BaseState, ownProps: DisposalDest
   if (ownProps.includeDestWell) {
     options = [
       ...options,
-      {name: 'Source Well', value: SOURCE_WELL_DISPOSAL_DESTINATION},
-      {name: 'Destination Well', value: DEST_WELL_DISPOSAL_DESTINATION},
+      {name: 'Destination Well', value: DEST_WELL_BLOWOUT_DESTINATION},
     ]
-  } else {
+  }
+  if (ownProps.includeSourceWell) {
     options = [
       ...options,
-      {name: 'Source Well', value: SOURCE_WELL_DISPOSAL_DESTINATION},
+      {name: 'Source Well', value: SOURCE_WELL_BLOWOUT_DESTINATION},
     ]
   }
   return {options}

@@ -84,7 +84,12 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                       {value
                         ? <div className={styles.field_row}>
                           <div className={styles.sub_select_label}>Blowout</div>
-                          <DisposalDestinationDropdown name="aspirate_disposalVol_destination" className={styles.full_width} {...focusHandlers} />
+                          <DisposalDestinationDropdown
+                            name="aspirate_disposalVol_destination"
+                            className={styles.full_width}
+                            includeSourceWell={stepType === 'transfer'}
+                            includeDestWell
+                            {...focusHandlers} />
                         </div>
                         : null
                       }
