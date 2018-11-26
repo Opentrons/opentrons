@@ -15,7 +15,7 @@ import {PortalRoot} from './TooltipPortal'
 type Props = {
   orderedSteps: Array<StepIdType>,
   reorderSelectedStep: (delta: number) => mixed,
-  copySelectedStep: () => mixed,
+  copySelectedStep: (delta: number) => mixed,
 }
 
 export default class StepList extends React.Component<Props> {
@@ -23,15 +23,17 @@ export default class StepList extends React.Component<Props> {
     const {reorderSelectedStep, copySelectedStep} = this.props
     const key = e.key
     const altIsPressed = e.getModifierState('Alt')
+    const ctlIsPressed = e.getModifierState('Control')
 
     if (altIsPressed) {
+      let delta = 0
       if (key === 'ArrowUp') {
-        reorderSelectedStep(-1)
+        delta = -1
       } else if (key === 'ArrowDown') {
-        reorderSelectedStep(1)
-      } else if (key === 'ArrowRight') {
-        copySelectedStep()
+        delta = 1
       }
+      if (!delta) return
+      ctlIsPressed ? copySelectedStep(delta) : reorderSelectedStep(delta)
     }
   }
 

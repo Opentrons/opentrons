@@ -25,7 +25,7 @@ function mapStateToProps (state: BaseState): SP {
 
 function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
   return {
-    copySelectedStep: () => dispatch(steplistActions.copySelectedStep()),
+    copySelectedStep: (delta: number) => dispatch(steplistActions.copySelectedStep(delta)),
     reorderSelectedStep: (delta: number) =>
       dispatch(steplistActions.reorderSelectedStep(delta)),
   }

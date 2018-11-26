@@ -25,6 +25,7 @@ import type {
   ChangeFormInputAction,
   DeleteStepAction,
   ReorderSelectedStepAction,
+  CopySelectedStepAction,
   SaveStepFormAction,
   SelectStepAction,
   SelectTerminalItemAction,
@@ -127,7 +128,7 @@ const steps: Reducer<StepsState, *> = handleActions({
       }
     }, {...initialStepState})
   },
-  COPY_SELECTED_STEP: (state: SavedStepFormState, action: CopySelectedStepAction): SavedStepFormState => ({
+  COPY_SELECTED_STEP: (state: StepsState, action: CopySelectedStepAction): StepsState => ({
     ...state,
     [action.payload.nextStepId]: {
       ...(action.payload.selectedStepId ? state[action.payload.selectedStepId] : {}),
@@ -236,13 +237,15 @@ const orderedSteps: Reducer<OrderedStepsState, *> = handleActions({
     ]
   },
   COPY_SELECTED_STEP: (state: OrderedStepsState, action: CopySelectedStepAction): OrderedStepsState => {
-    const {selectedStepId, nextStepId} = action.payload
+    const {selectedStepId, nextStepId, delta} = action.payload
     const selectedIndex = state.findIndex(s => s === selectedStepId)
 
+    if (delta <= 0 && selectedIndex === 0) return [nextStepId, ...state]
+    const boundary = delta <= 0 ? selectedIndex + 1 + delta : selectedIndex + delta
     return [
-      ...state.slice(0, selectedIndex + 1),
+      ...state.slice(0, boundary),
       nextStepId,
-      ...state.slice(selectedIndex + 1, state.length),
+      ...state.slice(boundary, state.length),
     ]
   },
 }, [])
