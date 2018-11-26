@@ -139,7 +139,9 @@ function transferLikeSubsteps (args: {
             preIngreds: nextMultiRow.dest.preIngreds[destChannelWell],
             postIngreds: nextMultiRow.dest.postIngreds[destChannelWell],
           }
+          const activeTips = currentMultiRow.activeTips
           return {
+            activeTips,
             source,
             dest: stepArgs.stepType === 'mix' ? source : dest, // NOTE: since source and dest are same for mix, we're showing source on both sides. Otherwise dest would show the intermediate volume state
             volume: showDispenseVol ? nextMultiRow.volume : currentMultiRow.volume,
@@ -158,7 +160,8 @@ function transferLikeSubsteps (args: {
             preIngreds: currentMultiRow.dest.preIngreds[currentMultiRow.dest.wells[channelIndex]],
             postIngreds: currentMultiRow.dest.postIngreds[currentMultiRow.dest.wells[channelIndex]],
           }
-          return { source, dest, volume: currentMultiRow.volume }
+          const activeTips = currentMultiRow.activeTips
+          return {activeTips, source, dest, volume: currentMultiRow.volume}
         })
       )
     )
@@ -204,7 +207,12 @@ function transferLikeSubsteps (args: {
           preIngreds: currentRow.dest.preIngreds,
           postIngreds: currentRow.dest.postIngreds,
         }
-        return {source, dest, volume: currentRow.volume}
+        return {
+          activeTips: currentRow.activeTips,
+          source,
+          dest,
+          volume: currentRow.volume,
+        }
       }
     )
 
