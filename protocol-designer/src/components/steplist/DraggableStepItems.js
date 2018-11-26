@@ -10,7 +10,15 @@ const DND_TYPES: {STEP_ITEM: "STEP_ITEM"} = {
   STEP_ITEM: 'STEP_ITEM',
 }
 
-const DragSourceStepItem = (props) => (
+type DragDropStepItemProps = React.ElementProps<typeof StepItem> & {
+  connectDragSource: mixed => React.Element<any>,
+  connectDropTarget: mixed => React.Element<any>,
+  stepId: StepIdType,
+  findStepIndex: (StepIdType) => number,
+  onDrag: () => void,
+  moveStep: (StepIdType, number) => void,
+}
+const DragSourceStepItem = (props: DragDropStepItemProps) => (
   props.connectDragSource(
     props.connectDropTarget(
       <div style={{opacity: props.isDragging ? 0.3 : 1}}>
@@ -19,22 +27,6 @@ const DragSourceStepItem = (props) => (
     )
   )
 )
-
-const stepItemTarget = {
-  canDrop: () => { return false },
-  hover: (props: CardProps, monitor: DropTargetMonitor) => {
-    const { stepId: draggedId } = monitor.getItem()
-    const { stepId: overId } = props
-
-    if (draggedId !== overId) {
-      const overIndex = props.findStepIndex(overId)
-      props.moveStep(draggedId, overIndex)
-    }
-  },
-}
-const collectStepTarget = (connect) => ({
-  connectDropTarget: connect.dropTarget(),
-})
 
 const stepItemSource = {
   beginDrag: (props) => {
@@ -47,13 +39,29 @@ const collectStepSource = (connect, monitor) => ({
   isDragging: monitor.isDragging(),
 })
 const DraggableStepItem = DragSource(DND_TYPES.STEP_ITEM, stepItemSource, collectStepSource)(DragSourceStepItem)
+
+const stepItemTarget = {
+  canDrop: () => { return false },
+  hover: (props: DragDropStepItemProps, monitor) => {
+    const { stepId: draggedId } = monitor.getItem()
+    const { stepId: overId } = props
+
+    if (draggedId !== overId) {
+      const overIndex = props.findStepIndex(overId)
+      props.moveStep(draggedId, overIndex)
+    }
+  },
+}
+const collectStepTarget = (connect) => ({
+  connectDropTarget: connect.dropTarget(),
+})
 const DragDropStepItem = DropTarget(DND_TYPES.STEP_ITEM, stepItemTarget, collectStepTarget)(DraggableStepItem)
 
 type StepItemsProps = {
   orderedSteps: Array<StepIdType>,
   reorderSteps: (Array<StepIdType>) => mixed,
   isOver: boolean,
-  connectDropTarget: mixed => mixed,
+  connectDropTarget: mixed => React.Element<any>,
 }
 type StepItemsState = {stepIds: Array<StepIdType>}
 class StepItems extends React.Component<StepItemsProps, StepItemsState> {
@@ -115,7 +123,7 @@ const listTarget = {
     }
   },
 }
-const collectListTarget = (connect, monitor): ListTargetProps => ({
+const collectListTarget = (connect, monitor) => ({
   isOver: monitor.isOver(),
   connectDropTarget: connect.dropTarget(),
 })

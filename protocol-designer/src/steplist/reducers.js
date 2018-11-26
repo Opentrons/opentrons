@@ -24,6 +24,7 @@ import type {
   AddStepAction,
   ChangeFormInputAction,
   DeleteStepAction,
+  ReorderStepsAction,
   ReorderSelectedStepAction,
   SaveStepFormAction,
   SelectStepAction,

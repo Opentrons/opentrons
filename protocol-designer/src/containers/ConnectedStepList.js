@@ -4,6 +4,7 @@ import HTML5Backend from 'react-dnd-html5-backend'
 import {connect} from 'react-redux'
 import { DragDropContext } from 'react-dnd'
 import type {BaseState, ThunkDispatch} from '../types'
+import type {StepIdType} from '../form-types'
 
 import {
   actions as steplistActions,
