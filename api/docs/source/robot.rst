@@ -46,7 +46,7 @@ The speed of the robot's motors can be set using ``robot.head_speed()``. The uni
 
 The ``combined_speed`` parameter sets the speed across all axes to either the specified value or the axis max, whichever is lower. Defaults are specified by ``DEFAULT_MAX_SPEEDS`` in `robot_configs.py`__.
 
-__ https://github.com/Opentrons/opentrons/blob/edge/api/opentrons/robot/robot_configs.py
+__ https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/config/robot_configs.py
 
 .. code-block:: python
 
