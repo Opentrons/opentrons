@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import {DragSource, DropTarget} from 'react-dnd'
 
 import {PDTitledList} from '../lists'
 import SourceDestSubstep from './SourceDestSubstep'

@@ -2,7 +2,7 @@
 import * as React from 'react'
 import HTML5Backend from 'react-dnd-html5-backend'
 import {connect} from 'react-redux'
-import { DragDropContext } from 'react-dnd';
+import { DragDropContext } from 'react-dnd'
 import type {BaseState, ThunkDispatch} from '../types'
 
 import {
