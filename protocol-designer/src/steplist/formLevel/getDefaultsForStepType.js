@@ -46,7 +46,7 @@ export default function getDefaultsForStepType (stepType: StepType) {
         'aspirate_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
         'aspirate_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
         'wells': [],
-        'mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE, // NOTE: mix uses dispense for both asp + disp, for now
+        'mix_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE, // NOTE: mix uses dispense for both asp + disp, for now
         'volume': undefined,
       }
     case 'distribute':

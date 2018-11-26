@@ -45,7 +45,7 @@ class Well:
         :param well_props: a dict that conforms to the json-schema for a Well
         :param parent: a :py:class:`.Location` Point representing the absolute
                        position of the parent of the Well (usually the
-                       lower-left corner of a labware)
+                       front-left corner of a labware)
         """
         self._display_name = display_name
         self._position\
@@ -75,7 +75,7 @@ class Well:
 
     @property
     def parent(self) -> 'Labware':
-        return self._parent
+        return self._parent  # type: ignore
 
     @property
     def has_tip(self) -> bool:
@@ -88,7 +88,7 @@ class Well:
     def top(self) -> Location:
         """
         :return: a Point corresponding to the absolute position of the
-        top-center of the well relative to the deck (with the lower-left corner
+        top-center of the well relative to the deck (with the front-left corner
         of slot 1 as (0,0,0))
         """
         return Location(self._position, self)
@@ -96,7 +96,7 @@ class Well:
     def bottom(self) -> Location:
         """
         :return: a Point corresponding to the absolute position of the
-        bottom-center of the well (with the lower-left corner of slot 1 as
+        bottom-center of the well (with the front-left corner of slot 1 as
         (0,0,0))
         """
         top = self.top()
@@ -106,7 +106,7 @@ class Well:
     def center(self) -> Location:
         """
         :return: a Point corresponding to the absolute position of the center
-        of the well relative to the deck (with the lower-left corner of slot 1
+        of the well relative to the deck (with the front-left corner of slot 1
         as (0,0,0))
         """
         top = self.top()
@@ -148,7 +148,7 @@ class Well:
             y=center.point.y + (y * (y_size / 2.0)),
             z=center.point.z + (z * (z_size / 2.0)))
 
-    def __str__(self):
+    def __repr__(self):
         return self._display_name
 
     def __eq__(self, other: object) -> bool:
@@ -167,25 +167,22 @@ class Labware:
     tip rack, etc. It defines the physical geometry of the labware, and
     provides methods for accessing wells within the labware.
     """
-    def __init__(
-            self, definition: dict, parent: Point, parent_name: str) -> None:
+    def __init__(self, definition: dict, parent: Location) -> None:
         """
         :param definition: A dict representing all required data for a labware,
-            including metadata such as the display name of the labware, a
-            definition of the order to iterate over wells, the shape of wells
-            (shape, physical dimensions, etc), and so on. The correct shape of
-            this definition is governed by the "labware-designer" project in
-            the Opentrons/opentrons repo.
-        :param parent: A Point representing the critical point for the object
-            upon which the labware is mounted (often the lower-left corner of
-            a slot on the deck)
-        :param parent_name: A string with the debug name of the parent, usually
-            either the name of the slot or another device that can have a
-            labware mounted on it (e.g.: "Slot 5" or "Temperature Module in
-            Slot 4")
+                           including metadata such as the display name of the
+                           labware, a definition of the order to iterate over
+                           wells, the shape of wells (shape, physical
+                           dimensions, etc), and so on. The correct shape of
+                           this definition is handled by the "labware-designer"
+                           project in the Opentrons/opentrons repo.
+        :param parent: A :py:class:`.Location` representing the location where
+                       the front and left most point of the outside of the
+                       labware is (often the front-left corner of a slot on the
+                       deck).
         """
         self._display_name = "{} on {}".format(
-            definition['metadata']['displayName'], parent_name)
+            definition['metadata']['displayName'], str(parent.labware))
         self._calibrated_offset: Point = Point(0, 0, 0)
         self._wells: List[Well] = []
         # Directly from definition
@@ -198,13 +195,25 @@ class Labware:
         self._ordering = [well
                           for col in definition['ordering']
                           for well in col]
-        self._offset = Point(x=offset['x'] + parent.x,
-                             y=offset['y'] + parent.y,
-                             z=offset['z'] + parent.z)
+        self._offset\
+            = Point(offset['x'], offset['y'], offset['z']) + parent.point
         # Applied properties
         self.set_calibration(self._calibrated_offset)
 
         self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
+        self._definition = definition
+
+    @property
+    def name(self) -> str:
+        """ The canonical name of the labware, which is used to load it """
+        return self._definition['parameters']['loadName']
+
+    @property
+    def magdeck_engage_height(self) -> Optional[float]:
+        if not self._parameters['isMagneticModuleCompatible']:
+            return None
+        else:
+            return self._parameters['magneticModuleEngageHeight']
 
     def _build_wells(self) -> List[Well]:
         """
@@ -493,6 +502,79 @@ class Labware:
             raise KeyError
 
 
+class ModuleGeometry:
+    """
+    This class represents an active peripheral, such as an Opentrons MagBead
+    Module or Temperature Module. It defines the physical geometry of the
+    device (primarily the offset that modifies the position of the labware
+    mounted on top of it).
+    """
+    def __init__(self,
+                 definition: dict,
+                 parent: Location) -> None:
+        """
+        Create a Module for tracking the position of a module.
+
+        Note that modules do not currently have a concept of calibration apart
+        from calibration of labware on top of the module. The practical result
+        of this is that if the module parent :py:class:`.Location` is
+        incorrect, then acorrect calibration of one labware on the deck would
+        be incorrect on the module, and vice-versa. Currently, the way around
+        this would be to correct the :py:class:`.Location` so that the
+        calibrated labware is targeted accurately in both positions.
+
+        :param definition: A dict containing all the data required to define
+                           the geometry of the module.
+        :type definition: dict
+        :param parent: A location representing location of the front left of
+                       the outside of the module (usually the front-left corner
+                       of a slot on the deck).
+        :type parent: :py:class:`.Location`
+        """
+        self._parent = parent
+        self._display_name = "{} on {}".format(definition["displayName"],
+                                               str(parent.labware))
+        self._offset = Point(definition["labwareOffset"]["x"],
+                             definition["labwareOffset"]["y"],
+                             definition["labwareOffset"]["z"])
+        self._height = definition["dimensions"]["bareOverallHeight"]\
+            + self._parent.point.z
+        self._over_labware = definition["dimensions"]["overLabwareHeight"]
+        self._labware: Optional[Labware] = None
+        self._location = Location(
+            point=self._offset + self._parent.point,
+            labware=self)
+
+    def add_labware(self, labware: Labware):
+        assert not self._labware,\
+            '{} is already on this module'.format(self._labware)
+        self._labware = labware
+
+    def reset_labware(self):
+        self._labware = None
+
+    @property
+    def labware(self) -> Optional[Labware]:
+        return self._labware
+
+    @property
+    def location(self) -> Location:
+        """
+        :return: a :py:class:`.Location` representing the top of the module
+        """
+        return self._location
+
+    @property
+    def highest_z(self) -> float:
+        if self.labware:
+            return self.labware.highest_z + self._over_labware
+        else:
+            return self._height
+
+    def __repr__(self):
+        return self._display_name
+
+
 def save_calibration(labware: Labware, delta: Point):
     """
     Function to be used whenever an updated delta is found for the first well
@@ -595,7 +677,7 @@ def _load_definition_by_name(name: str) -> dict:
     return labware_def
 
 
-def load(name: str, parent: Point, parent_name: str) -> Labware:
+def load(name: str, parent: Location) -> Labware:
     """
     Return a labware object constructed from a labware definition dict looked
     up by name (definition must have been previously stored locally on the
@@ -604,20 +686,15 @@ def load(name: str, parent: Point, parent_name: str) -> Labware:
     :param name: A string to use for looking up a labware definition previously
         saved to disc. The definition file must have been saved in a known
         location with the filename '${name}.json'
-    :param parent: A Point representing the critical point for the object
-        upon which the labware is mounted (often the lower-left corner of
-        a slot on the deck)
-    :param parent_name: A string with the debug name of the parent, usually
-        either the name of the slot or another device that can have a
-        labware mounted on it (e.g.: "Slot 5" or "Temperature Module in
-        Slot 4")
+    :param parent: A :py:class:`.Location` representing the location where
+                   the front and left most point of the outside of labware is
+                   (often the front-left corner of a slot on the deck).
     """
     definition = _load_definition_by_name(name)
-    return load_from_definition(definition, parent, parent_name)
+    return load_from_definition(definition, parent)
 
 
-def load_from_definition(
-        definition: dict, parent: Point, parent_name: str) -> Labware:
+def load_from_definition(definition: dict, parent: Location) -> Labware:
     """
     Return a labware object constructed from a provided labware definition dict
 
@@ -627,15 +704,11 @@ def load_from_definition(
         (shape, physical dimensions, etc), and so on. The correct shape of
         this definition is governed by the "labware-designer" project in
         the Opentrons/opentrons repo.
-    :param parent: A Point representing the critical point for the object
-        upon which the labware is mounted (often the lower-left corner of
-        a slot on the deck)
-    :param parent_name: A string with the debug name of the parent, usually
-        either the name of the slot or another device that can have a
-        labware mounted on it (e.g.: "Slot 5" or "Temperature Module in
-        Slot 4")
+    :param parent: A :py:class:`.Location` representing the location where
+                   the front and left most point of the outside of labware is
+                   (often the front-left corner of a slot on the deck).
     """
-    labware = Labware(definition, parent, parent_name)
+    labware = Labware(definition, parent)
     load_calibration(labware)
     return labware
 
@@ -652,3 +725,36 @@ def clear_calibrations():
             os.remove(os.path.join(persistent_path, target))
     except FileNotFoundError:
         pass
+
+
+def load_module_from_definition(
+        definition: dict, parent: Location) -> ModuleGeometry:
+    """
+    Return a :py:class:`ModuleGeometry` object from a specified definition
+
+    :param definition: A dict representing all required data for a module's
+                       geometry.
+    :param parent: A :py:class:`.Location` representing the location where
+                   the front and left most point of the outside of the module
+                   is (often the front-left corner of a slot on the deck).
+    """
+    mod = ModuleGeometry(definition, parent)
+    # TODO: calibration
+    return mod
+
+
+def load_module(name: str, parent: Location) -> ModuleGeometry:
+    """
+    Return a :py:class:`ModuleGeometry` object from a definition looked up
+    by name.
+
+    :param name: A string to use for looking up the definition. The string
+                 must be present as a top-level key in moduleSpecs.json.
+    :param parent: A :py:class:`.Location` representing the location where
+                   the front and left most point of the outside of the module
+                   is (often the front-left corner of a slot on the deck).
+    """
+    def_path = 'shared_data/robot-data/moduleSpecs.json'
+    module_def = json.loads(  # type: ignore
+        pkgutil.get_data('opentrons', def_path))
+    return load_module_from_definition(module_def[name], parent)

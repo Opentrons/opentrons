@@ -35,7 +35,7 @@ const robotInitialStateNoLiquidState = createRobotStateFixture({
   destPlateType: '96-flat',
   fillTiprackTips: true,
   fillPipetteTips: false,
-  tipracks: [200, 200],
+  tipracks: [300, 300],
 })
 
 const emptyLiquidState = createEmptyLiquidState({

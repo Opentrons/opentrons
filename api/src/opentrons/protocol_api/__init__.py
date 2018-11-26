@@ -8,7 +8,10 @@ import logging
 import os
 
 from . import back_compat, labware
-from .contexts import ProtocolContext, InstrumentContext
+from .contexts import (ProtocolContext,
+                       InstrumentContext,
+                       TemperatureModuleContext,
+                       MagneticModuleContext)
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -48,5 +51,7 @@ def run(protocol_bytes: bytes = None,
 __all__ = ['run',
            'ProtocolContext',
            'InstrumentContext',
+           'TemperatureModuleContext',
+           'MagneticModuleContext',
            'back_compat',
            'labware']

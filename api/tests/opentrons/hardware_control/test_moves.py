@@ -1,7 +1,7 @@
 import pytest
 from opentrons import types
 from opentrons import hardware_control as hc
-from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.types import Axis, CriticalPoint
 
 
 @pytest.fixture
@@ -144,6 +144,20 @@ async def test_critical_point_applied(hardware_api, monkeypatch):
               Axis.C: 19}
     assert hardware_api.current_position(types.Mount.RIGHT) == target
     p10_tip_length = 33
+    # Specifiying critical point overrides as mount should not use model offset
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0),
+                               critical_point=CriticalPoint.MOUNT)
+    assert hardware_api._current_position == {Axis.X: 0.0, Axis.Y: 0.0,
+                                              Axis.Z: 218,
+                                              Axis.A: 0,
+                                              Axis.B: 19, Axis.C: 19}
+    assert hardware_api.current_position(types.Mount.RIGHT,
+                                         critical_point=CriticalPoint.MOUNT)\
+        == {Axis.X: 0.0, Axis.Y: 0.0, Axis.A: 0, Axis.C: 19}
+    # Specifying the critical point as nozzle should have the same behavior
+    await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0),
+                               critical_point=CriticalPoint.NOZZLE)
+    assert hardware_api._current_position == target_no_offset
     await hardware_api.pick_up_tip(types.Mount.RIGHT, p10_tip_length)
     # Now the current position (with offset applied) should change
     # pos_after_pickup + model_offset + critical point
@@ -181,7 +195,7 @@ async def test_deck_cal_applied(monkeypatch, loop):
                       [0, 0, 0, 1]]
     called_with = None
 
-    def mock_move(position, speed=None):
+    def mock_move(position, speed=None, home_flagged_axes=True):
         nonlocal called_with
         called_with = position
 

@@ -123,16 +123,16 @@ def test_pick_up_and_drop_tip(loop, load_my_labware):
 
     pipette: Pipette = ctx._hardware._attached_instruments[mount]
     model_offset = Point(*pipette.config.model_offset)
-    assert pipette.critical_point == model_offset
+    assert pipette.critical_point() == model_offset
     target_location = tiprack.wells_by_index()['A1'].top()
 
     instr.pick_up_tip(target_location)
 
     new_offset = model_offset - Point(0, 0, tip_lenth)
-    assert pipette.critical_point == new_offset
+    assert pipette.critical_point() == new_offset
 
     instr.drop_tip(target_location)
-    assert pipette.critical_point == model_offset
+    assert pipette.critical_point() == model_offset
 
 
 def test_pick_up_tip_no_location(loop, load_my_labware):
@@ -153,16 +153,16 @@ def test_pick_up_tip_no_location(loop, load_my_labware):
 
     pipette: Pipette = ctx._hardware._attached_instruments[mount]
     model_offset = Point(*pipette.config.model_offset)
-    assert pipette.critical_point == model_offset
+    assert pipette.critical_point() == model_offset
 
     instr.pick_up_tip()
 
     new_offset = model_offset - Point(0, 0, tip_lenth1)
-    assert pipette.critical_point == new_offset
+    assert pipette.critical_point() == new_offset
 
     # TODO: remove argument and verify once trash container is added
     instr.drop_tip(tiprack1.wells()[0].top())
-    assert pipette.critical_point == model_offset
+    assert pipette.critical_point() == model_offset
 
     for well in tiprack1.wells():
         if well.has_tip:
@@ -247,3 +247,95 @@ def test_dispense(loop, load_my_labware, monkeypatch):
     move_called_with = None
     instr.dispense(2.0)
     assert move_called_with is None
+
+
+def test_load_module(loop, monkeypatch):
+    ctx = papi.ProtocolContext(loop)
+    ctx._hardware._backend._attached_modules = [('mod0', 'tempdeck')]
+    ctx.home()
+    mod = ctx.load_module('tempdeck', 1)
+    assert isinstance(mod, papi.TemperatureModuleContext)
+
+
+def test_tempdeck(loop, monkeypatch):
+    ctx = papi.ProtocolContext(loop)
+    ctx._hardware._backend._attached_modules = [('mod0', 'tempdeck')]
+    mod = ctx.load_module('tempdeck', 1)
+    assert ctx.deck[1] == mod._geometry
+    assert mod.target is None
+    mod.set_temperature(20)
+    assert mod.target == 20
+    mod.wait_for_temp()
+    assert mod.temperature == 20
+    mod.deactivate()
+    assert mod.target is None
+    mod.set_temperature(0)
+    assert mod.target == 0
+
+
+def test_magdeck(loop, monkeypatch):
+    ctx = papi.ProtocolContext(loop)
+    ctx._hardware._backend._attached_modules = [('mod0', 'magdeck')]
+    mod = ctx.load_module('magdeck', 1)
+    assert ctx.deck[1] == mod._geometry
+    assert mod.status == 'disengaged'
+    with pytest.raises(ValueError):
+        mod.engage()
+    mod.engage(2)
+    assert mod.status == 'engaged'
+    mod.disengage()
+    assert mod.status == 'disengaged'
+    mod.calibrate()
+
+
+def test_module_load_labware(loop, monkeypatch):
+    ctx = papi.ProtocolContext(loop)
+    labware_name = 'generic_96_wellPlate_380_uL'
+    labware_def = json.loads(
+        pkgutil.get_data('opentrons',
+                         'shared_data/definitions2/{}.json'.format(
+                             labware_name)))
+    ctx._hardware._backend._attached_modules = [('mod0', 'tempdeck')]
+    mod = ctx.load_module('tempdeck', 1)
+    assert mod.labware is None
+    lw = mod.load_labware_by_name(labware_name)
+    lw_offset = Point(labware_def['cornerOffsetFromSlot']['x'],
+                      labware_def['cornerOffsetFromSlot']['y'],
+                      labware_def['cornerOffsetFromSlot']['z'])
+    assert lw._offset == lw_offset + mod._geometry.location.point
+    assert lw.name == labware_name
+    mod2 = ctx.load_module('tempdeck', 2)
+    lw2 = mod2.load_labware_by_name(labware_name)
+    assert lw2._offset == lw_offset + mod2._geometry.location.point
+    assert lw2.name == labware_name
+
+
+def test_magdeck_labware_props(loop):
+    ctx = papi.ProtocolContext(loop)
+    labware_name = 'biorad_96_wellPlate_pcr_200_uL'
+    labware_def = json.loads(
+        pkgutil.get_data('opentrons',
+                         'shared_data/definitions2/{}.json'.format(
+                             labware_name)))
+    ctx._hardware._backend._attached_modules = [('mod0', 'magdeck')]
+    mod = ctx.load_module('magdeck', 1)
+    assert mod.labware is None
+    mod.load_labware_by_name(labware_name)
+    mod.engage()
+    lw_offset = labware_def['parameters']['magneticModuleEngageHeight']
+    assert mod._module._driver.plate_height == lw_offset
+    mod.disengage()
+    mod.engage(offset=2)
+    assert mod._module._driver.plate_height == lw_offset + 2
+    mod.disengage()
+    mod.engage(height=3)
+    assert mod._module._driver.plate_height == 3
+    mod._geometry.reset_labware()
+    labware_name = 'generic_96_wellPlate_380_uL'
+    mod.load_labware_by_name(labware_name)
+    with pytest.raises(ValueError):
+        mod.engage()
+    with pytest.raises(ValueError):
+        mod.engage(offset=1)
+    mod.engage(height=2)
+    assert mod._module._driver.plate_height == 2

@@ -55,6 +55,7 @@ install:
 .PHONY: clean
 clean:
 	$(clean_cmd)
+	pipenv --rm
 
 $(wheel_pattern): setup.py $(ot_sources)
 	$(clean_cmd)

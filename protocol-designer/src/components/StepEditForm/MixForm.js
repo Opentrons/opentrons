@@ -53,13 +53,15 @@ const MixForm = (props: MixFormProps): React.Element<typeof React.Fragment> => {
             <StepCheckboxRow name="dispense_blowout_checkbox" label='Blow out'>
               <LabwareDropdown name="dispense_blowout_labware" className={styles.full_width} {...focusHandlers} />
             </StepCheckboxRow>
-            <StepCheckboxRow name="touchTip" label='Touch tip' />
+            <StepCheckboxRow name="touchTip" label='Touch tip'>
+              <TipPositionInput fieldName="mix_touchTipMmFromBottom" />
+            </StepCheckboxRow>
           </FormGroup>
         </div>
 
         <div className={styles.middle_settings_column}>
           <ChangeTipField stepType="mix" name="aspirate_changeTip" />
-          <TipPositionInput />
+          <TipPositionInput fieldName="mix_mmFromBottom" />
         </div>
         <div className={styles.right_settings_column}>
           <FlowRateField

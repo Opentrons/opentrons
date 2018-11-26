@@ -1,5 +1,8 @@
 import json
+
 import numpy as np
+import pytest
+
 from opentrons import robot, instruments
 from opentrons import deck_calibration as dc
 from opentrons.deck_calibration import endpoints
@@ -169,6 +172,7 @@ async def test_transform_calculation(dc_session):
 
 
 # ------------ Session and token tests ----------------------
+@pytest.mark.api1_only
 async def test_create_session(async_client, monkeypatch):
     """
     Tests that the POST request to initiate a session manager for factory
@@ -212,6 +216,7 @@ async def test_create_session(async_client, monkeypatch):
         assert resp.status == 201
 
 
+@pytest.mark.api1_only
 async def test_create_session_fail(async_client, monkeypatch):
     """
     Tests that the GET request to initiate a session manager for factory
@@ -248,6 +253,7 @@ async def test_create_session_fail(async_client, monkeypatch):
     assert endpoints.session is None
 
 
+@pytest.mark.api1_only
 async def test_release(async_client, monkeypatch):
     """
     Tests that the GET request to initiate a session manager for factory
@@ -284,6 +290,7 @@ async def test_release(async_client, monkeypatch):
     assert resp3.status == 201
 
 
+@pytest.mark.api1_only
 async def test_forcing_new_session(async_client, monkeypatch):
     """
     Tests that the GET request to initiate a session manager for factory
@@ -327,6 +334,7 @@ async def test_forcing_new_session(async_client, monkeypatch):
     assert text2 == expected2
 
 
+@pytest.mark.api1_only
 async def test_incorrect_token(async_client, monkeypatch):
     """
     Test that putting in an incorrect token for a POST request does not work
@@ -362,6 +370,7 @@ async def test_incorrect_token(async_client, monkeypatch):
 
 # ------------ Router tests (integration) ----------------------
 # TODO(mc, 2018-05-02): this does not adequately test z to smoothie axis logic
+@pytest.mark.api1_only
 async def test_set_and_jog_integration(async_client, monkeypatch):
     """
     Test that the jog function works.

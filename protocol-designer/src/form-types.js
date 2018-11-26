@@ -1,9 +1,60 @@
 // @flow
 import type {IconName} from '@opentrons/components'
 import type {ChangeTipOptions} from './step-generation'
-import type {StepFieldName} from './steplist/fieldLevel'
 
 export type StepIdType = string
+
+export type StepFieldName =
+  | 'aspirate_airGap_checkbox'
+  | 'aspirate_airGap_volume'
+  | 'aspirate_changeTip'
+  | 'aspirate_disposalVol_checkbox'
+  | 'aspirate_disposalVol_destination'
+  | 'aspirate_disposalVol_volume'
+  | 'aspirate_flowRate'
+  | 'aspirate_labware'
+  | 'aspirate_mix_checkbox'
+  | 'aspirate_mix_times'
+  | 'aspirate_mix_volume'
+  | 'aspirate_preWetTip'
+  | 'aspirate_touchTip'
+  | 'aspirate_touchTipMmFromBottom'
+  | 'aspirate_mmFromBottom'
+  | 'aspirate_wellOrder_first'
+  | 'aspirate_wellOrder_second'
+  | 'aspirate_wells'
+  | 'changeTip'
+  | 'dispense_blowout_checkbox'
+  | 'dispense_blowout_labware'
+  | 'dispense_delay_checkbox'
+  | 'dispense_delayMinutes'
+  | 'dispense_delaySeconds'
+  | 'dispense_flowRate'
+  | 'dispense_labware'
+  | 'dispense_touchTip'
+  | 'dispense_mix_checkbox'
+  | 'dispense_mix_times'
+  | 'dispense_mix_volume'
+  | 'dispense_touchTipMmFromBottom'
+  | 'dispense_mmFromBottom'
+  | 'dispense_wellOrder_first'
+  | 'dispense_wellOrder_second'
+  | 'dispense_wells'
+  | 'labware'
+  | 'pauseForAmountOfTime'
+  | 'pauseHour'
+  | 'pauseMessage'
+  | 'pauseMinute'
+  | 'pauseSecond'
+  | 'pipette'
+  | 'stepDetails'
+  | 'stepName'
+  | 'times'
+  | 'mix_mmFromBottom'
+  | 'mix_touchTipMmFromBottom'
+  | 'touchTip'
+  | 'volume'
+  | 'wells'
 
 // TODO Ian 2018-01-16 factor out to some constants.js ?
 export const stepIconsByType: {[string]: IconName} = {
@@ -38,10 +89,6 @@ export type ChangeTipFields = {|
   'aspirate_changeTip'?: ChangeTipOptions,
 |}
 
-export type TouchTipFields = {|
-  'aspirate_touchTip'?: boolean,
-|}
-
 export type TransferLikeStepType = 'transfer' | 'consolidate' | 'distribute'
 
 export type TransferLikeForm = {|
@@ -49,7 +96,6 @@ export type TransferLikeForm = {|
   ...BlowoutFields,
   ...ChangeTipFields,
   ...DelayFields,
-  ...TouchTipFields,
 
   stepType: TransferLikeStepType,
   id: StepIdType,
@@ -80,7 +126,6 @@ export type MixForm = {|
   ...BlowoutFields,
   ...ChangeTipFields,
   ...DelayFields,
-  ...TouchTipFields,
   stepType: 'mix',
   id: StepIdType,
 
@@ -120,4 +165,21 @@ export type BlankForm = {
   ...FormModalFields,
   stepType: StepType,
   id: StepIdType,
+}
+
+// fields used in TipPositionInput
+export type TipOffsetFields = 'aspirate_mmFromBottom'
+  | 'dispense_mmFromBottom'
+  | 'mix_mmFromBottom'
+  | 'aspirate_touchTipMmFromBottom'
+  | 'dispense_touchTipMmFromBottom'
+  | 'mix_touchTipMmFromBottom'
+
+export function getIsTouchTipField (fieldName: string): boolean {
+  const touchTipFields = [
+    'aspirate_touchTipMmFromBottom',
+    'dispense_touchTipMmFromBottom',
+    'mix_touchTipMmFromBottom',
+  ]
+  return touchTipFields.includes(fieldName)
 }

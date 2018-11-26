@@ -16,7 +16,7 @@ import type {Wells, ContentsByWell} from '../../../labware-ingred/types'
 import {selectors as steplistSelectors} from '../../../steplist'
 import type {WellIngredientNames} from '../../../steplist/types'
 import {changeFormInput} from '../../../steplist/actions'
-import type {StepFieldName} from '../../../steplist/fieldLevel'
+import type {StepFieldName} from '../../../form-types'
 import type {PipetteData} from '../../../step-generation/types'
 
 import {SelectableLabware} from '../../labware'

@@ -4,6 +4,7 @@ from typing import Any, Dict, Union, Optional
 
 from opentrons.types import Point
 from opentrons.config import pipette_config
+from .types import CriticalPoint
 
 
 class Pipette:
@@ -35,16 +36,23 @@ class Pipette:
     def pipette_id(self) -> Optional[str]:
         return self._pipette_id
 
-    @property
-    def critical_point(self) -> Point:
+    def critical_point(self, cp_override: CriticalPoint = None) -> Point:
         """
         The vector from the pipette's origin to its critical point. The
         critical point for a pipette is the end of the nozzle if no tip is
         attached, or the end of the tip if a tip is attached.
+
+        If `cp_override` is specified and valid - so is either
+        :py:attr:`CriticalPoint.NOZZLE` or :py:attr:`CriticalPoint.TIP` when
+        we have a tip - the specified critical point will be used.
         """
+        if cp_override == CriticalPoint.NOZZLE:
+            tip_length = 0.0
+        else:
+            tip_length = self.current_tip_length
         return Point(self.config.model_offset[0],
                      self.config.model_offset[1],
-                     self.config.model_offset[2] - self.current_tip_length)
+                     self.config.model_offset[2] - tip_length)
 
     @property
     def current_volume(self) -> float:

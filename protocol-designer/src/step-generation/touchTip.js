@@ -16,7 +16,7 @@ const touchTip = (args: TouchTipArgs): CommandCreator => (prevRobotState: RobotS
     errors.push(pipetteDoesNotExist({actionName, pipette}))
   }
 
-  if (prevRobotState.tipState.pipettes[pipette] === false) {
+  if (!prevRobotState.tipState.pipettes[pipette]) {
     errors.push(noTipOnPipette({actionName, pipette, labware, well}))
   }
 

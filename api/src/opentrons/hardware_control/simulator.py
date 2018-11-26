@@ -1,10 +1,15 @@
 import asyncio
 import copy
+import logging
+from threading import Event
 from typing import Dict, Optional, List, Tuple
 from contextlib import contextmanager
 from opentrons import types
 from opentrons.config.pipette_config import configs
 from . import modules
+
+
+MODULE_LOG = logging.getLogger(__name__)
 
 
 def find_config(prefix: str) -> str:
@@ -39,20 +44,36 @@ class Simulator:
                                   for idx, mod
                                   in enumerate(attached_modules)]
         self._position = copy.copy(_HOME_POSITION)
+        # Engaged axes start all true in smoothie for some reason so we
+        # imitate that here
+        self._engaged_axes = {ax: True for ax in _HOME_POSITION}
+        self._lights = {'button': False, 'rails': False}
+        self._run_flag = Event()
+        self._log = MODULE_LOG.getChild(repr(self))
 
     def move(self, target_position: Dict[str, float],
              home_flagged_axes: bool = True, speed: float = None):
+        if self._run_flag.is_set():
+            self._log.warning("Move to {} would be blocked by pause"
+                              .format(target_position))
         self._position.update(target_position)
+        self._engaged_axes.update({ax: True
+                                   for ax in target_position})
 
     def home(self, axes: List[str] = None) -> Dict[str, float]:
+        if self._run_flag.is_set():
+            self._log.warning("Home would be blocked by pause")
         # driver_3_0-> HOMED_POSITION
         checked_axes = axes or 'XYZABC'
         self._position.update({ax: _HOME_POSITION[ax]
                                for ax in checked_axes})
+        self._engaged_axes.update({ax: True
+                                   for ax in checked_axes})
         return self._position
 
     def fast_home(self, axis: str, margin: float) -> Dict[str, float]:
         self._position[axis] = _HOME_POSITION[axis]
+        self._engaged_axes[axis] = True
         return self._position
 
     def get_attached_instruments(
@@ -129,5 +150,42 @@ class Simulator:
     @property
     def axis_bounds(self) -> Dict[str, Tuple[float, float]]:
         """ The (minimum, maximum) bounds for each axis. """
-        return {ax: (0, pos) for ax, pos in _HOME_POSITION.items()
+        return {ax: (0, pos+0.5) for ax, pos in _HOME_POSITION.items()
                 if ax not in 'BC'}
+
+    @property
+    def fw_version(self) -> Optional[str]:
+        return 'Virtual Smoothie'
+
+    async def update_fw_version(self):
+        pass
+
+    async def update_firmware(self, filename, loop, modeset) -> str:
+        return 'Did nothing (simulating)'
+
+    def engaged_axes(self):
+        return self._engaged_axes
+
+    def disengage_axes(self, axes: List[str]):
+        self._engaged_axes.update({ax: False for ax in axes})
+
+    def set_lights(self, button: Optional[bool], rails: Optional[bool]):
+        if button is not None:
+            self._lights['button'] = button
+        if rails is not None:
+            self._lights['rails'] = rails
+
+    def get_lights(self) -> Dict[str, bool]:
+        return self._lights
+
+    async def identify(self):
+        pass
+
+    def pause(self):
+        self._run_flag.clear()
+
+    def resume(self):
+        self._run_flag.set()
+
+    def halt(self):
+        self._run_flag.set()

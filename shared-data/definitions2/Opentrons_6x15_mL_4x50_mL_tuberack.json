@@ -48,7 +48,8 @@
     "parameters": {
         "isTiprack": false,
         "format": "irregular",
-        "loadName": "Opentrons_6x15_mL_4x50_mL_tuberack"
+        "loadName": "Opentrons_6x15_mL_4x50_mL_tuberack",
+        "isMagneticModuleCompatible": false
     },
     "wells": {
         "A1": {

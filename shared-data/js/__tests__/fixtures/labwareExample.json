@@ -14,7 +14,8 @@
   "parameters": {
     "loadName": "opentrons_2_wellPlate_100_uL",
     "format": "96Standard",
-    "isTiprack": false
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false
   },
   "cornerOffsetFromSlot": {
     "x": 0,

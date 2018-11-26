@@ -26,6 +26,7 @@ type TransferLikeStepArgs = ConsolidateFormData | DistributeFormData | TransferF
 
 // TODO: BC 2018-10-30 move getting labwareDef into hydration layer upstream
 const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArgs => {
+  console.log([hydratedFormData])
   const stepType = hydratedFormData.stepType
   const pipette = hydratedFormData['pipette']
   const volume = Number(hydratedFormData['volume'])
@@ -33,8 +34,17 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
   const destLabware = hydratedFormData['dispense_labware']
   const blowoutLabwareId = hydratedFormData['dispense_blowout_checkbox'] ? hydratedFormData['dispense_blowout_labware'] : null
 
-  const aspirateOffsetFromBottomMm = Number(hydratedFormData['aspirate_mmFromBottom'])
-  const dispenseOffsetFromBottomMm = Number(hydratedFormData['dispense_mmFromBottom'])
+  const aspirateOffsetFromBottomMm = hydratedFormData['aspirate_mmFromBottom']
+  const dispenseOffsetFromBottomMm = hydratedFormData['dispense_mmFromBottom']
+
+  const touchTipAfterAspirate = hydratedFormData['aspirate_touchTip'] || false
+  const touchTipAfterAspirateOffsetMmFromBottom = touchTipAfterAspirate
+    ? hydratedFormData['aspirate_touchTipMmFromBottom']
+    : null
+  const touchTipAfterDispense = hydratedFormData['dispense_touchTip'] || false
+  const touchTipAfterDispenseOffsetMmFromBottom = touchTipAfterDispense
+    ? hydratedFormData['dispense_touchTipMmFromBottom']
+    : null
 
   const delayAfterDispense = hydratedFormData['dispense_delay_checkbox']
     ? ((Number(hydratedFormData['dispense_delayMinutes']) || 0) * 60) +
@@ -79,8 +89,10 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
     delayAfterDispense,
     mixInDestination,
     preWetTip: hydratedFormData['aspirate_preWetTip'] || false,
-    touchTipAfterAspirate: hydratedFormData['aspirate_touchTip'] || false,
-    touchTipAfterDispense: hydratedFormData['dispense_touchTip'] || false,
+    touchTipAfterAspirate,
+    touchTipAfterAspirateOffsetMmFromBottom,
+    touchTipAfterDispense,
+    touchTipAfterDispenseOffsetMmFromBottom,
     description: 'description would be here 2018-03-01', // TODO get from form
   }
 

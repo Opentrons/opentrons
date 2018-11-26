@@ -1,9 +1,14 @@
 // @flow
 import type {PauseFormData, CommandCreatorData} from '../step-generation'
-import type {FormData, StepIdType, StepType, TransferLikeStepType} from '../form-types'
+import type {
+  FormData,
+  StepIdType,
+  StepFieldName,
+  StepType,
+  TransferLikeStepType,
+} from '../form-types'
 import type {BaseState} from '../types'
 import type {FormError} from './formLevel/errors'
-import type {StepFieldName} from './fieldLevel'
 
 // sections of the form that are expandable/collapsible
 export type FormSectionState = {aspirate: boolean, dispense: boolean}

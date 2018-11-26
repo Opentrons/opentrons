@@ -457,29 +457,10 @@ const allIngredientNamesIds: BaseState => OrderedLiquids = createSelector(
     ({ingredientId: ingredId, name: ingreds[ingredId].name}))
 )
 
-// TODO: just use the individual selectors separately, no need to combine it into 'activeModals'
-// -- so you'd have to refactor the props of the containers that use this selector too
-type ActiveModals = {
-  labwareSelection: boolean,
-  ingredientSelection: ?{
-    slot: ?DeckSlot,
-    containerName: ?string,
-  },
-}
-
-const activeModals: Selector<ActiveModals> = createSelector(
+const getLabwareSelectionMode: Selector<boolean> = createSelector(
   rootSelector,
-  getLabware,
-  getSelectedContainerId,
-  (state, _allLabware, _selectedContainerId) => {
-    const selectedContainer = _selectedContainerId && _allLabware[_selectedContainerId]
-    return ({
-      labwareSelection: state.modeLabwareSelection !== false,
-      ingredientSelection: {
-        slot: selectedContainer ? selectedContainer.slot : null,
-        containerName: selectedContainer && selectedContainer.type,
-      },
-    })
+  (rootState) => {
+    return rootState.modeLabwareSelection !== false
   }
 )
 
@@ -513,6 +494,7 @@ export const selectors = {
   getLiquidNamesById,
   getLabware,
   getLabwareNames,
+  getLabwareSelectionMode,
   getLabwareTypes,
   getLiquidSelectionOptions,
   getLiquidGroupsOnDeck,
@@ -522,8 +504,6 @@ export const selectors = {
   getSelectedContainerId,
   getSelectedLiquidGroupState,
   getDrillDownLabwareId,
-
-  activeModals,
 
   slotToMoveFrom,
 

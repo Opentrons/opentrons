@@ -1,9 +1,11 @@
-""" A backwards-compatibility shim for the new protocol API
+""" A backwards-compatibility shim for the new protocol API.
 
+This should not be imported directly; it is used to provide backwards
+compatible singletons in opentrons/__init__.py.
 """
 
 import importlib.util
-from typing import Union, Any, List
+from typing import Any, List
 
 import opentrons.hardware_control as hc
 from opentrons.config.pipette_config import configs
@@ -13,7 +15,6 @@ from .contexts import ProtocolContext, InstrumentContext
 
 
 def run(protocol_bytes: bytes, context: ProtocolContext):
-    reset()
     source = importlib.util.decode_source(protocol_bytes)
     exec(source)
 
@@ -33,10 +34,13 @@ class BCRobot:
 
     For more information see :py:class:`.ProtocolContext`.
     """
-    def __init__(self, protocol_ctx: ProtocolContext) -> None:
+    def __init__(self,
+                 hardware: hc.adapters.SingletonAdapter,
+                 protocol_ctx: ProtocolContext) -> None:
+        self._hardware = hardware
         self._ctx = protocol_ctx
 
-    def connect(self, port: Union[str, hc.API] = None,
+    def connect(self, port: str = None,
                 options: Any = None):
         """ Connect to the robot hardware.
 
@@ -50,21 +54,16 @@ class BCRobot:
         a simulator (depending on whether the protocol is being simulated or
         run) this should be unnecessary.
 
-        :param port: The port to connect to the smoothie board; the magic
+        :param port: The port to connect to the smoothie board or the magic
                      string ``"Virtual Smoothie"``, which will initialize and
-                     connect to a simulator; or an initialized hardware control
-                     API.
+                     connect to a simulator
         :param options: Ignored.
         """
-        if isinstance(port, str) and port == 'Virtual Smoothie':
-            self._ctx.connect(hc.API.build_hardware_simulator())
-        elif isinstance(port, hc.API):
-            self._ctx.connect(port)
-        else:
-            try:
-                self._ctx.connect(hc.API.build_hardware_controller(port=port))
-            except RuntimeError:
-                self._ctx.connect(hc.API.build_hardware_simulator())
+        self._hardware.connect(port)
+
+    @property
+    def fw_version(self):
+        return self._hardware.fw_version
 
     def __getattr__(self, name):
         """ Provide transparent access to the protocol context """
@@ -216,15 +215,41 @@ class BCModules:
         pass
 
 
-robot = BCRobot(ProtocolContext())
-labware = BCLabware(robot._ctx)
-containers = labware
-instruments = BCInstruments(robot._ctx)
-modules = BCModules(robot._ctx)
+def build_globals(hardware=None, loop=None):
+    hw = hardware or hc.adapters.SingletonAdapter(loop)
+    ctx = ProtocolContext(loop)
+    rob = BCRobot(hw, ctx)
+    instr = BCInstruments(ctx)
+    lw = BCLabware(ctx)
+    mod = BCModules(ctx)
+
+    return rob, instr, lw, lw, mod
+
+
+def set_globals(rob, instr, lw, mod):
+    global robot
+    global instruments
+    global labware
+    global containers
+    global modules
+    robot = rob
+    instruments = instr
+    labware = lw
+    containers = lw
+    modules = mod
+
+
+def reset_globals(hardware=None, loop=None):
+    robot, instruments, containers, labware, modules = build_globals(hardware,
+                                                                     loop)
+    set_globals(robot, instruments, containers, modules)
 
 
 def reset():
-    return robot
+    global robot
+    robot.reset()
 
 
-__all__ = ['containers', 'instruments', 'labware', 'robot', 'reset', 'modules']
+robot, instruments, containers, labware, modules = build_globals()
+
+__all__ = ['robot', 'reset', 'instruments', 'containers', 'labware', 'modules']

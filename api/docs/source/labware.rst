@@ -596,15 +596,15 @@ You can access a specific row or column by using the ``rows()`` and ``cols()`` m
     row = plate.rows('A')
     column = plate.cols('1')
 
-    print('Column "A" has', len(column), 'wells')
-    print('Row "1" has', len(row), 'wells')
+    print('Column "1" has', len(column), 'wells')
+    print('Row "A" has', len(row), 'wells')
 
 will print out...
 
 .. code-block:: python
 
-    Column "A" has 8 wells
-    Row "1" has 12 wells
+    Column "1" has 8 wells
+    Row "A" has 12 wells
 
 The ``rows()`` or ``cols()`` methods can be used in combination with the ``wells()`` method to access wells within that row or column. In the example below, both lines refer to well ``'A1'``.
 

@@ -34,6 +34,8 @@ export type TransferLikeFormDataFields = {
   preWetTip: boolean,
   /** Touch tip after every aspirate */
   touchTipAfterAspirate: boolean,
+  /** Optional offset for touch tip after aspirate (if null, use PD default) */
+  touchTipAfterAspirateOffsetMmFromBottom?: ?number,
   /** changeTip is interpreted differently by different Step types */
   changeTip: ChangeTipOptions,
   /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
@@ -44,6 +46,8 @@ export type TransferLikeFormDataFields = {
   // ===== DISPENSE SETTINGS =====
   /** Touch tip in destination well after dispense */
   touchTipAfterDispense: boolean,
+  /** Optional offset for touch tip after dispense (if null, use PD default) */
+  touchTipAfterDispenseOffsetMmFromBottom?: ?number,
   /** Number of seconds to delay at the very end of the step (TODO: or after each dispense ?) */
   delayAfterDispense: ?number,
   /** offset from bottom of well in mm */
@@ -104,6 +108,7 @@ export type MixFormData = {
   times: number,
   /** Touch tip after mixing */
   touchTip: boolean,
+  touchTipMmFromBottom?: ?number,
   /** Delay in seconds */
   delay: ?number,
   /** change tip: see comments in step-generation/mix.js */
@@ -140,7 +145,7 @@ export type PipetteData = {| // TODO refactor all 'pipette fields', split Pipett
   model: string, // TODO Ian 2018-11-05 rename 'model' to 'name' when breaking change is made in JSON protocols
   maxVolume: number,
   channels: Channels,
-  tiprackModel?: string, // NOTE: this will go away when tiprack sharing is implemented
+  tiprackModel: string, // NOTE: this will go away when tiprack choice-per-step and/or tiprack sharing is implemented
 |}
 
 export type LabwareData = {|
@@ -183,7 +188,7 @@ export type RobotState = {|
       },
     },
     pipettes: {
-      [pipetteId: string]: boolean, // true if tip is on pipette
+      [pipetteId: string]: boolean, // true if pipette has tip(s)
     },
   },
   liquidState: {
@@ -253,6 +258,7 @@ export type ErrorType =
   | 'PIPETTE_DOES_NOT_EXIST'
   | 'NO_TIP_ON_PIPETTE'
   | 'PIPETTE_VOLUME_EXCEEDED'
+  | 'TIP_VOLUME_EXCEEDED'
 
 export type CommandCreatorError = {|
   message: string,

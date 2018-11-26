@@ -67,10 +67,9 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const showNameOverlay = container && !isTiprack && !labwareHasName
 
   const slotToMoveFrom = selectors.slotToMoveFrom(state)
-  const activeModals = selectors.activeModals(state)
 
   const slotHasLabware = !!containerType
-  const addLabwareMode = activeModals.labwareSelection
+  const addLabwareMode = selectors.getLabwareSelectionMode(state)
   const moveLabwareMode = Boolean(slotToMoveFrom)
 
   const setDefaultLabwareName = () => renameLabware({

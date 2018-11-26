@@ -2,11 +2,17 @@
 
 import logging
 import traceback
-from opentrons.util import environment
+from typing import TYPE_CHECKING
 from aiohttp import web
+
+from opentrons.util import environment
 from .rpc import RPCServer
 from .http import HTTPServer
 from opentrons.api.routers import MainRouter
+import opentrons
+
+if TYPE_CHECKING:
+    from opentons.hardware_control.types import HardwareAPILike  # noqa(F501)
 
 log = logging.getLogger(__name__)
 log_file_path = environment.get_path('LOG_DIR')
@@ -34,20 +40,31 @@ async def error_middleware(request, handler):
 
 
 # Support for running using aiohttp CLI.
-# See: https://docs.aiohttp.org/en/stable/web.html#command-line-interface-cli  # NOQA
-def init(loop=None):
+# See: https://docs.aiohttp.org/en/stable/web.html#command-line-interface-cli
+def init(loop=None, hardware: 'HardwareAPILike' = None):
     """
-    Builds an application and sets up RPC and HTTP servers with it
+    Builds an application and sets up RPC and HTTP servers with it.
+
+    :param loop: A specific aiohttp event loop to use. If not specified, the
+                 server will use the default event loop.
+    :param hardware: The hardware manager or hardware adapter to connect to.
+                     If not specified, the server will use
+                     :py:attr:`opentrons.hardware`
     """
 
     app = web.Application(loop=loop, middlewares=[error_middleware])
-    app['opentronsRpc'] = RPCServer(app, MainRouter())
-    app['opentronsHttp'] = HTTPServer(app, log_file_path)
+    if hardware:
+        checked_hardware = hardware
+    else:
+        checked_hardware = opentrons.hardware
+    app['com.opentrons.hardware'] = checked_hardware
+    app['com.opentrons.rpc'] = RPCServer(app, MainRouter(checked_hardware))
+    app['com.opentrons.http'] = HTTPServer(app, log_file_path)
 
     return app
 
 
-def run(hostname=None, port=None, path=None):
+def run(hostname=None, port=None, path=None, loop=None):
     """
     The arguments are not all optional. Either a path or hostname+port should
     be specified; you have to specify one.
@@ -61,4 +78,4 @@ def run(hostname=None, port=None, path=None):
             hostname, port))
         path = None
 
-    web.run_app(init(), host=hostname, port=port, path=path)
+    web.run_app(init(loop), host=hostname, port=port, path=path)

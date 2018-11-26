@@ -1,6 +1,6 @@
 import pytest
 from opentrons.types import Point
-from opentrons.hardware_control import pipette
+from opentrons.hardware_control import pipette, types
 from opentrons.config import pipette_config
 
 
@@ -25,13 +25,19 @@ def test_critical_points():
         loaded = pipette_config.load(config)
         pip = pipette.Pipette(config, 'testID')
         mod_offset = Point(*loaded.model_offset)
-        assert pip.critical_point == mod_offset
+        assert pip.critical_point() == mod_offset
+        assert pip.critical_point(types.CriticalPoint.NOZZLE) == mod_offset
+        assert pip.critical_point(types.CriticalPoint.TIP) == mod_offset
         tip_length = 25.0
         pip.add_tip(tip_length)
         new = mod_offset._replace(z=mod_offset.z - tip_length)
-        assert pip.critical_point == new
+        assert pip.critical_point() == new
+        assert pip.critical_point(types.CriticalPoint.NOZZLE) == mod_offset
+        assert pip.critical_point(types.CriticalPoint.TIP) == new
         pip.remove_tip()
-        assert pip.critical_point == mod_offset
+        assert pip.critical_point() == mod_offset
+        assert pip.critical_point(types.CriticalPoint.NOZZLE) == mod_offset
+        assert pip.critical_point(types.CriticalPoint.TIP) == mod_offset
 
 
 def test_volume_tracking():
