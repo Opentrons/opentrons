@@ -123,7 +123,7 @@ export const saveStepForm = () =>
   (dispatch: Dispatch<*>, getState: GetState) => {
     const state = getState()
 
-    if (selectors.currentFormCanBeSaved(state)) {
+    if (selectors.getCurrentFormCanBeSaved(state)) {
       dispatch({
         type: 'SAVE_STEP_FORM',
         payload: selectors.formData(state),
@@ -184,7 +184,7 @@ export type SaveMoreOptionsModal = {
 export const saveMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
   dispatch({
     type: 'SAVE_MORE_OPTIONS_MODAL',
-    payload: selectors.formModalData(getState()),
+    payload: selectors.getFormModalData(getState()),
   })
 }
 

@@ -121,7 +121,7 @@ type PipetteFieldSP = {pipetteOptions: Options, getHydratedPipette: (string) => 
 type PipetteFieldDP = {updateDisposalVolume: (?mixed) => void}
 type PipetteFieldProps = PipetteFieldOP & PipetteFieldSP & PipetteFieldDP
 const PipetteFieldSTP = (state: BaseState, ownProps: PipetteFieldOP): PipetteFieldSP => ({
-  pipetteOptions: pipetteSelectors.equippedPipetteOptions(state),
+  pipetteOptions: pipetteSelectors.getEquippedPipetteOptions(state),
   getHydratedPipette: (value) => hydrateField(state, ownProps.name, value),
 })
 const PipetteFieldDTP = (dispatch: ThunkDispatch<*>): PipetteFieldDP => ({

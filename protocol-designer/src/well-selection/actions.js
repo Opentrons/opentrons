@@ -67,8 +67,8 @@ export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload) =
     // initially selected wells in form get selected in state before modal opens
     dispatch(selectWells(wells))
 
-    const pipettes = pipetteSelectors.equippedPipettes(state)
-    const labware = labwareIngredSelectors.getLabware(state)
+    const pipettes = pipetteSelectors.getEquippedPipettes(state)
+    const labware = labwareIngredSelectors.getLabwareById(state)
     // TODO type this action, make an underline fn action creator
 
     dispatch({
@@ -89,13 +89,13 @@ export const closeWellSelectionModal = (): * => ({
 export const saveWellSelectionModal = () =>
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
     const state = getState()
-    const wellSelectionModalData = selectors.wellSelectionModalData(state)
+    const wellSelectionModalData = selectors.getWellSelectionModalData(state)
 
     // this if-else is mostly for Flow
     if (wellSelectionModalData) {
       dispatch(changeFormInput({
         update: {
-          [wellSelectionModalData.formFieldAccessor]: selectors.selectedWellNames(state),
+          [wellSelectionModalData.formFieldAccessor]: selectors.getSelectedWellNames(state),
         },
       }))
     } else {

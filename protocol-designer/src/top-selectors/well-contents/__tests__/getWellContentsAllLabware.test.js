@@ -1,4 +1,4 @@
-import wellContentsAllLabware from '../wellContentsAllLabware'
+import getWellContentsAllLabware from '../getWellContentsAllLabware'
 
 // FIXTURES
 const baseIngredFields = {
@@ -53,8 +53,8 @@ const defaultWellContents = {
 
 const container1MaxVolume = 400
 
-describe('wellContentsAllLabware', () => {
-  const singleIngredResult = wellContentsAllLabware.resultFunc(
+describe('getWellContentsAllLabware', () => {
+  const singleIngredResult = getWellContentsAllLabware.resultFunc(
     containerState, // all labware
     ingredsByLabwareXXSingleIngred,
     {id: 'container1Id'}, // selected labware
@@ -63,7 +63,7 @@ describe('wellContentsAllLabware', () => {
   )
 
   // TODO: 2nd test case
-  // const twoIngredResult = selectors.wellContentsAllLabware.resultFunc(
+  // const twoIngredResult = selectors.getWellContentsAllLabware.resultFunc(
   //   containerState, // all labware
   //   ingredsByLabwareXXTwoIngred,
   //   containerState.container2Id, // selected labware

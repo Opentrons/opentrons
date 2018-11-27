@@ -23,7 +23,7 @@ import {createPipette} from './utils'
 export const editPipettes = (payload: EditPipettesFields) =>
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
     const state = getState()
-    const prevPipettesByMount = pipetteSelectors.pipettesByMount(state)
+    const prevPipettesByMount = pipetteSelectors.getPipettesByMount(state)
     const savedForms = steplistSelectors.getSavedForms(state)
 
     const nextPipettesByMount: PipettesByMount = Object.keys(payload).reduce(

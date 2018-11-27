@@ -10,7 +10,7 @@ export const getFileLoadErrors: Selector<$PropertyType<RootState, 'fileErrors'>>
   s => s.fileErrors
 )
 
-export const hasUnsavedChanges: Selector<$PropertyType<RootState, 'unsavedChanges'>> = createSelector(
+export const getHasUnsavedChanges: Selector<$PropertyType<RootState, 'unsavedChanges'>> = createSelector(
   rootSelector,
   s => s.unsavedChanges
 )

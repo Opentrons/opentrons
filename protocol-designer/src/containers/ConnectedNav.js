@@ -59,7 +59,7 @@ function Nav (props: Props) {
 
 function mapStateToProps (state: BaseState) {
   return {
-    currentPage: selectors.currentPage(state),
+    currentPage: selectors.getCurrentPage(state),
     currentProtocolExists: fileSelectors.getCurrentProtocolExists(state),
   }
 }

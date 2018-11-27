@@ -123,7 +123,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
 
 const mapStateToProps = (state: BaseState): SP => ({
   formData: selectors.formData(state),
-  isNewStep: selectors.isNewStepForm(state),
+  isNewStep: selectors.getIsNewStepForm(state),
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({

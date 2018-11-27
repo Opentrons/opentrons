@@ -298,33 +298,33 @@ type Selector<T> = (RootSlice) => T
 // SELECTORS
 const rootSelector = (state: RootSlice): RootState => state.labwareIngred
 
-const getLabware: Selector<{[labwareId: string]: ?Labware}> = createSelector(
+const getLabwareById: Selector<{[labwareId: string]: ?Labware}> = createSelector(
   rootSelector,
   rootState => rootState.containers
 )
 
 const getLabwareNames: Selector<{[labwareId: string]: string}> = createSelector(
-  getLabware,
-  (_labware) => mapValues(
-    _labware,
+  getLabwareById,
+  (labwareById) => mapValues(
+    labwareById,
     labwareToDisplayName,
   )
 )
 
 const getLabwareTypes: Selector<LabwareTypeById> = createSelector(
-  getLabware,
-  (_labware) => mapValues(
-    _labware,
-    (l: Labware) => l.type
+  getLabwareById,
+  (labwareById) => mapValues(
+    labwareById,
+    (labware: Labware) => labware.type
   )
 )
 
 const getLiquidGroupsById = (state: RootSlice) => rootSelector(state).ingredients
-const getIngredientLocations = (state: RootSlice) => rootSelector(state).ingredLocations
+const getLiquidsByLabwareId = (state: RootSlice) => rootSelector(state).ingredLocations
 
 const getNextLiquidGroupId: Selector<string> = createSelector(
   getLiquidGroupsById,
-  (_ingredGroups) => ((max(Object.keys(_ingredGroups).map(id => parseInt(id))) + 1) || 0).toString()
+  (ingredGroups) => ((max(Object.keys(ingredGroups).map(id => parseInt(id))) + 1) || 0).toString()
 )
 
 const getLiquidNamesById: Selector<{[ingredId: string]: string}> = createSelector(
@@ -352,15 +352,15 @@ const _loadedContainersBySlot = (containers: ContainersState) =>
     , {})
 
 const loadedContainersBySlot = createSelector(
-  getLabware,
+  getLabwareById,
   containers => _loadedContainersBySlot(containers)
 )
 
 /** Returns options for dropdowns, excluding tiprack labware */
 const labwareOptions: Selector<Options> = createSelector(
-  getLabware,
+  getLabwareById,
   getLabwareNames,
-  (_labware, names) => reduce(_labware, (acc: Options, labware: Labware, labwareId): Options => {
+  (labwareById, names) => reduce(labwareById, (acc: Options, labware: Labware, labwareId): Options => {
     const isTiprack = getIsTiprack(labware.type)
     if (!labware.type || isTiprack) {
       return acc
@@ -378,9 +378,9 @@ const labwareOptions: Selector<Options> = createSelector(
 const DISPOSAL_LABWARE_TYPES = ['trash-box', 'fixed-trash']
 /** Returns options for disposal (e.g. fixed trash and trash box) */
 const disposalLabwareOptions: Selector<Options> = createSelector(
-  getLabware,
+  getLabwareById,
   getLabwareNames,
-  (_labware, names) => reduce(_labware, (acc: Options, labware: Labware, labwareId): Options => {
+  (labwareById, names) => reduce(labwareById, (acc: Options, labware: Labware, labwareId): Options => {
     if (!labware.type || !DISPOSAL_LABWARE_TYPES.includes(labware.type)) {
       return acc
     }
@@ -399,7 +399,7 @@ const selectedAddLabwareSlot = (state: BaseState) => rootSelector(state).modeLab
 
 const getSavedLabware = (state: BaseState) => rootSelector(state).savedLabware
 
-const getSelectedContainerId: Selector<SelectedContainerId> = createSelector(
+const getSelectedLabwareId: Selector<SelectedContainerId> = createSelector(
   rootSelector,
   rootState => rootState.selectedContainerId
 )
@@ -409,10 +409,11 @@ const getSelectedLiquidGroupState: Selector<SelectedLiquidGroupState> = createSe
   rootState => rootState.selectedLiquidGroup
 )
 
-const getSelectedContainer: Selector<?Labware> = createSelector(
-  getSelectedContainerId,
-  getLabware,
-  (_selectedId, _labware) => (_selectedId && _labware[_selectedId]) || null
+const getSelectedLabware: Selector<?Labware> = createSelector(
+  getSelectedLabwareId,
+  getLabwareById,
+  (selectedLabwareId, labware) =>
+    (selectedLabwareId && labware[selectedLabwareId]) || null
 )
 
 const getDrillDownLabwareId: Selector<DrillDownLabwareId> = createSelector(
@@ -423,7 +424,7 @@ const getDrillDownLabwareId: Selector<DrillDownLabwareId> = createSelector(
 type ContainersBySlot = { [DeckSlot]: {...Labware, containerId: string} }
 
 const containersBySlot: Selector<ContainersBySlot> = createSelector(
-  getLabware,
+  getLabwareById,
   containers => reduce(
     containers,
     (acc: ContainersBySlot, containerObj: Labware, containerId: string) => ({
@@ -464,12 +465,12 @@ const getLabwareSelectionMode: Selector<boolean> = createSelector(
   }
 )
 
-const slotToMoveFrom = (state: BaseState) => rootSelector(state).moveLabwareMode
+const getSlotToMoveFrom = (state: BaseState) => rootSelector(state).moveLabwareMode
 
-const hasLiquid = (state: BaseState) => !isEmpty(getLiquidGroupsById(state))
+const getDeckHasLiquid = (state: BaseState) => !isEmpty(getLiquidGroupsById(state))
 
 const getLiquidGroupsOnDeck: Selector<Array<string>> = createSelector(
-  getIngredientLocations,
+  getLiquidsByLabwareId,
   (ingredLocationsByLabware) => {
     let liquidGroups: Set<string> = new Set()
     forEach(ingredLocationsByLabware, (byWell: $Values<typeof ingredLocationsByLabware>) =>
@@ -490,9 +491,9 @@ export const selectors = {
   rootSelector,
 
   getLiquidGroupsById,
-  getIngredientLocations,
+  getLiquidsByLabwareId,
   getLiquidNamesById,
-  getLabware,
+  getLabwareById,
   getLabwareNames,
   getLabwareSelectionMode,
   getLabwareTypes,
@@ -500,12 +501,12 @@ export const selectors = {
   getLiquidGroupsOnDeck,
   getNextLiquidGroupId,
   getSavedLabware,
-  getSelectedContainer,
-  getSelectedContainerId,
+  getSelectedLabware,
+  getSelectedLabwareId,
   getSelectedLiquidGroupState,
   getDrillDownLabwareId,
 
-  slotToMoveFrom,
+  getSlotToMoveFrom,
 
   allIngredientGroupFields,
   allIngredientNamesIds,
@@ -514,7 +515,7 @@ export const selectors = {
   selectedAddLabwareSlot,
   disposalLabwareOptions,
   labwareOptions,
-  hasLiquid,
+  getDeckHasLiquid,
 }
 
 export default rootReducer

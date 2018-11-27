@@ -39,7 +39,7 @@ type MP = {
   */
 
 function mapStateToProps (state: BaseState): SP {
-  const timeline = fileDataSelectors.robotStateTimeline(state)
+  const timeline = fileDataSelectors.getRobotStateTimeline(state)
   const errors = timeline.errors || []
   const warnings = dismissSelectors.getTimelineWarningsForSelectedStep(state)
   const _stepId = steplistSelectors.getSelectedStepId(state)

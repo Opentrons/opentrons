@@ -53,18 +53,18 @@ const getUnsavedForm: Selector<?FormData> = createSelector(
 const getStepFormContextualState: Selector<StepFormContextualState> = createSelector(
   labwareIngredSelectors.rootSelector,
   pipetteSelectors.rootSelector,
-  (labwareIngred, _pipettes) => ({
-    labwareIngred: labwareIngred,
-    pipettes: _pipettes,
+  (labwareIngred, pipettes) => ({
+    labwareIngred,
+    pipettes,
   })
 )
 
 const getHydratedUnsavedForm: Selector<?FormData> = createSelector(
   getUnsavedForm,
   getStepFormContextualState,
-  (_unsavedForm, _contextualState) => (
-    _unsavedForm && mapValues(_unsavedForm, (value, name) => (
-      hydrateField(_contextualState, name, value)
+  (unsavedForm, contextualState) => (
+    unsavedForm && mapValues(unsavedForm, (value, name) => (
+      hydrateField(contextualState, name, value)
     ))
   )
 )
@@ -73,7 +73,7 @@ const getHydratedUnsavedForm: Selector<?FormData> = createSelector(
 // NOTE: DEPRECATED use getUnsavedForm instead
 const formData = getUnsavedForm
 
-const formModalData = createSelector(
+const getFormModalData = createSelector(
   rootSelector,
   (state: RootState) => state.unsavedFormModal
 )
@@ -138,7 +138,7 @@ const getCollapsedSteps = createSelector(
   (state: RootState) => state.collapsedSteps
 )
 
-const orderedStepsSelector: Selector<OrderedStepsState> = createSelector(
+const getOrderedSteps: Selector<OrderedStepsState> = createSelector(
   rootSelector,
   (state: RootState) => state.orderedSteps
 )
@@ -146,7 +146,7 @@ const orderedStepsSelector: Selector<OrderedStepsState> = createSelector(
 /** This is just a simple selector, but has some debugging logic. TODO Ian 2018-03-20: use assert here */
 const getSavedForms: Selector<{[StepIdType]: FormData}> = createSelector(
   getSteps,
-  orderedStepsSelector,
+  getOrderedSteps,
   (state: BaseState) => rootSelector(state).savedStepForms,
   (steps, orderedSteps, savedStepForms) => {
     orderedSteps.forEach(stepId => {
@@ -199,7 +199,7 @@ const getAllErrorsFromHydratedForm = (hydratedForm: FormData): StepFormAndFieldE
 const getArgsAndErrorsByStepId: Selector<{[StepIdType]: StepArgsAndErrors}> = createSelector(
   getSteps,
   getHydratedSavedForms,
-  orderedStepsSelector,
+  getOrderedSteps,
   (steps, savedStepForms, orderedSteps) => {
     return reduce(orderedSteps, (acc, stepId) => {
       let nextStepData
@@ -241,14 +241,14 @@ const getFormAndFieldErrorsByStepId: Selector<{[StepIdType]: StepFormAndFieldErr
   )
 )
 
-const isNewStepForm = createSelector(
+const getIsNewStepForm = createSelector(
   getUnsavedForm,
   getSavedForms,
   (formData, savedForms) => !!(formData && formData.id != null && !savedForms[formData.id])
 )
 
 /** Array of labware (labwareId's) involved in hovered Step, or [] */
-const hoveredStepLabware: Selector<Array<string>> = createSelector(
+const getHoveredStepLabware: Selector<Array<string>> = createSelector(
   getArgsAndErrorsByStepId,
   getHoveredStepId,
   (allStepArgsAndErrors, hoveredStep) => {
@@ -283,19 +283,19 @@ const hoveredStepLabware: Selector<Array<string>> = createSelector(
     // step types that have no labware that gets highlighted
     if (!(stepForm.stepType === 'pause')) {
       // TODO Ian 2018-05-08 use assert here
-      console.warn(`hoveredStepLabware does not support step type "${stepForm.stepType}"`)
+      console.warn(`getHoveredStepLabware does not support step type "${stepForm.stepType}"`)
     }
 
     return blank
   }
 )
 
-const stepCreationButtonExpandedSelector: Selector<boolean> = createSelector(
+const getStepCreationButtonExpanded: Selector<boolean> = createSelector(
   rootSelector,
   (state: RootState) => state.stepCreationButtonExpanded
 )
 
-const formLevelWarnings: Selector<Array<FormWarning>> = createSelector(
+const getFormLevelWarnings: Selector<Array<FormWarning>> = createSelector(
   getUnsavedForm,
   getStepFormContextualState,
   (unsavedFormData, contextualState) => {
@@ -306,7 +306,7 @@ const formLevelWarnings: Selector<Array<FormWarning>> = createSelector(
   }
 )
 
-const formLevelErrors: Selector<Array<FormError>> = createSelector(
+const getFormLevelErrors: Selector<Array<FormError>> = createSelector(
   getUnsavedForm,
   getStepFormContextualState,
   (unsavedFormData, contextualState) => {
@@ -317,16 +317,16 @@ const formLevelErrors: Selector<Array<FormError>> = createSelector(
   }
 )
 
-const formSectionCollapseSelector: Selector<FormSectionState> = createSelector(
+const getFormSectionCollapsed: Selector<FormSectionState> = createSelector(
   rootSelector,
   s => s.formSectionCollapse
 )
 
-export const allSteps: Selector<{[stepId: StepIdType]: StepItemData}> = createSelector(
+export const getAllSteps: Selector<{[stepId: StepIdType]: StepItemData}> = createSelector(
   getSteps,
   getCollapsedSteps,
   getSavedForms,
-  labwareIngredSelectors.getLabware,
+  labwareIngredSelectors.getLabwareById,
   (steps, collapsedSteps, savedForms, labware) => {
     return mapValues(
       steps,
@@ -354,26 +354,26 @@ export const allSteps: Selector<{[stepId: StepIdType]: StepItemData}> = createSe
 )
 
 const getSelectedStep = createSelector(
-  allSteps,
+  getAllSteps,
   getSelectedStepId,
-  (_allSteps, selectedStepId) => {
+  (allSteps, selectedStepId) => {
     const stepId = selectedStepId
 
-    if (!_allSteps || stepId == null) {
+    if (!allSteps || stepId == null) {
       return null
     }
 
-    return _allSteps[stepId]
+    return allSteps[stepId]
   }
 )
 
 // TODO: BC: 2018-10-26 remove this when we decide to not block save
-export const currentFormCanBeSaved: Selector<boolean | null> = createSelector(
+export const getCurrentFormCanBeSaved: Selector<boolean | null> = createSelector(
   getHydratedUnsavedForm,
   getSelectedStepId,
-  allSteps,
-  (hydratedForm, selectedStepId, _allSteps) => {
-    if (selectedStepId == null || !_allSteps[selectedStepId] || !hydratedForm) return null
+  getAllSteps,
+  (hydratedForm, selectedStepId, allSteps) => {
+    if (selectedStepId == null || !allSteps[selectedStepId] || !hydratedForm) return null
     return isEmpty(getAllErrorsFromHydratedForm(hydratedForm))
   }
 )
@@ -386,13 +386,13 @@ export const getWellSelectionLabwareKey: Selector<?string> = createSelector(
 export default {
   rootSelector,
 
-  allSteps,
+  getAllSteps,
   getFormAndFieldErrorsByStepId,
-  currentFormCanBeSaved,
+  getCurrentFormCanBeSaved,
   getSelectedStep,
 
-  stepCreationButtonExpanded: stepCreationButtonExpandedSelector,
-  orderedSteps: orderedStepsSelector,
+  getStepCreationButtonExpanded,
+  getOrderedSteps,
   getSelectedStepId,
   getSelectedTerminalItemId,
   getHoveredTerminalItemId,
@@ -402,18 +402,17 @@ export default {
   getUnsavedForm,
   getHydratedUnsavedForm,
   formData, // TODO: remove after sunset
-  formModalData,
+  getFormModalData,
   getArgsAndErrorsByStepId,
-  isNewStepForm,
-  formLevelWarnings,
-  formLevelErrors,
-  formSectionCollapse: formSectionCollapseSelector,
-  hoveredStepLabware,
+  getIsNewStepForm,
+  getFormLevelWarnings,
+  getFormLevelErrors,
+  getFormSectionCollapsed,
+  getHoveredStepLabware,
   getWellSelectionLabwareKey,
 
   // NOTE: these are exposed only for substeps/selectors.js
   getSteps,
-  orderedStepsSelector,
   getCollapsedSteps,
   getSavedForms,
 }

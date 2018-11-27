@@ -17,10 +17,10 @@ import type {SubstepItemData} from '../steplist/types'
 type AllSubsteps = {[StepIdType]: ?SubstepItemData}
 export const allSubsteps: Selector<AllSubsteps> = createSelector(
   steplistSelectors.getArgsAndErrorsByStepId,
-  pipetteSelectors.equippedPipettes,
+  pipetteSelectors.getEquippedPipettes,
   labwareIngredSelectors.getLabwareTypes,
-  steplistSelectors.orderedSteps,
-  fileDataSelectors.robotStateTimeline,
+  steplistSelectors.getOrderedSteps,
+  fileDataSelectors.getRobotStateTimeline,
   fileDataSelectors.getInitialRobotState,
   (
     allStepArgsAndErrors,
