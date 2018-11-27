@@ -57,11 +57,11 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
           <span className={styles.volume_cell}>{`${formatVolume(rowGroup[0].volume)} μL`}</span>
           <span className={styles.emphasized_cell}>{firstChannelDest ? destWellRange : ''}</span>
           <span className={styles.inner_carat} onClick={this.handleToggleCollapsed}>
-            <Icon name={collapsed ? 'chevron-down' : 'chevron-up'} />
+            <Icon name={collapsed ? 'chevron-up' : 'chevron-down'} />
           </span>
         </PDListItem>
 
-        {collapsed && rowGroup.map((row, rowKey) => {
+        {!collapsed && rowGroup.map((row, rowKey) => {
           // Channel rows (1 for each channel in multi-channel pipette
           return (
             <SubstepRow
