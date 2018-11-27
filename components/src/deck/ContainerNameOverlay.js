@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import {SLOT_RENDER_HEIGHT} from './constants'
+import {SLOT_RENDER_HEIGHT} from '@opentrons/shared-data'
 import styles from './LabwareContainer.css'
 
 type Props = {

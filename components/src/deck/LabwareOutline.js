@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT} from './constants.js'
+import {SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT} from '@opentrons/shared-data'
 import styles from './Labware.css'
 
 type Props = {className?: ?string}

@@ -5,11 +5,13 @@ import {
   LabwareContainer,
   ContainerNameOverlay,
   EmptyDeckSlot,
-  SLOT_RENDER_WIDTH,
-  SLOT_RENDER_HEIGHT,
   humanizeLabwareType,
   type DeckSlot,
 } from '@opentrons/components'
+import {
+  SLOT_RENDER_WIDTH,
+  SLOT_RENDER_HEIGHT,
+} from '@opentrons/shared-data'
 import styles from './labware.css'
 
 import ClickableText from './ClickableText'

@@ -3,11 +3,12 @@ import * as React from 'react'
 import cx from 'classnames'
 import flatMap from 'lodash/flatMap'
 import type {DeckSlot} from '../robot-types'
-
 import {
-  SLOTNAME_MATRIX,
   SLOT_RENDER_WIDTH,
   SLOT_RENDER_HEIGHT,
+} from '@opentrons/shared-data'
+import {
+  SLOTNAME_MATRIX,
   SLOT_SPACING_MM,
   SLOT_OFFSET_MM,
   TRASH_SLOTNAME,
