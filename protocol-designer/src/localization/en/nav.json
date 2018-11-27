@@ -9,7 +9,7 @@
     "file": "FILE",
     "help": "HELP",
     "liquids": "LIQUIDS",
-    "settings": "SETTINGS"
+    "settings": "Settings"
   },
   "terminal_item": {
     "__initial_setup__": "Starting Deck State",
@@ -22,7 +22,7 @@
   },
   "subtitle": {
     "file-detail": "File Details",
-    "settings-app": "App",
+    "settings-app": "App Settings",
     "liquids": "Liquids"
   }
 }
