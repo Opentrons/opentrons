@@ -42,5 +42,8 @@
         "next_pipette_smaller": "Number of tips used may increase"
       }
     }
+  },
+  "delete_step": {
+    "confirm": "Are you sure you want to delete this step?"
   }
 }

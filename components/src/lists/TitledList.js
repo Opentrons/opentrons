@@ -22,6 +22,8 @@ type ListProps = {
   description?: React.Node,
   /** optional click action (on title div, not children) */
   onClick?: (event: SyntheticMouseEvent<>) => mixed,
+  /** optional right click action (on wrapping div) */
+  onContextMenu?: (event: SyntheticMouseEvent<>) => mixed,
   /** optional mouseEnter action */
   onMouseEnter?: (event: SyntheticMouseEvent<>) => mixed,
   /** optional mouseLeave action */
@@ -42,7 +44,7 @@ type ListProps = {
  * An ordered list with optional title, icon, and description.
  */
 export default function TitledList (props: ListProps) {
-  const {iconName, disabled, onCollapseToggle, iconProps, onMouseEnter, onMouseLeave} = props
+  const {iconName, disabled, onCollapseToggle, iconProps, onMouseEnter, onMouseLeave, onContextMenu} = props
   const collapsible = onCollapseToggle != null
 
   const onClick = !disabled
@@ -74,7 +76,7 @@ export default function TitledList (props: ListProps) {
   const iconClass = cx(styles.title_bar_icon, styles.icon_left_of_title, iconProps && iconProps.className)
 
   return (
-    <div className={className} {...{onMouseEnter, onMouseLeave}}>
+    <div className={className} {...{onMouseEnter, onMouseLeave, onContextMenu}}>
       <div onClick={onClick} className={titleBarClass}>
         {iconName && (
           <Icon {...iconProps} className={iconClass} name={iconName} />

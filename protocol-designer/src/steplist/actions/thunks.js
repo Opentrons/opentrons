@@ -109,24 +109,22 @@ export const reorderSelectedStep = (delta: number) =>
     }
   }
 
-export type CopySelectedStepAction = {
-  type: 'COPY_SELECTED_STEP',
+export type DuplicateStepAction = {
+  type: 'DUPLICATE_STEP',
   payload: {
-    selectedStepId: StepIdType,
-    nextStepId: StepIdType,
-    delta: number,
+    stepId: StepIdType,
+    duplicateStepId: StepIdType,
   },
 }
 
-export const copySelectedStep = (delta: number) =>
-  (dispatch: ThunkDispatch<CopySelectedStepAction>, getState: GetState) => {
-    const selectedStepId = selectors.getSelectedStepId(getState())
-    const nextStepId = uuid()
+export const duplicateStep = (stepId: StepIdType) =>
+  (dispatch: ThunkDispatch<DuplicateStepAction>, getState: GetState) => {
+    const duplicateStepId = uuid()
 
-    if (selectedStepId != null) {
+    if (stepId != null) {
       dispatch({
-        type: 'COPY_SELECTED_STEP',
-        payload: { selectedStepId, nextStepId, delta },
+        type: 'DUPLICATE_STEP',
+        payload: {stepId, duplicateStepId},
       })
     }
   }

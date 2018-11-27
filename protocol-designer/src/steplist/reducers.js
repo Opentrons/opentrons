@@ -25,7 +25,7 @@ import type {
   ChangeFormInputAction,
   DeleteStepAction,
   ReorderSelectedStepAction,
-  CopySelectedStepAction,
+  DuplicateStepAction,
   SaveStepFormAction,
   SelectStepAction,
   SelectTerminalItemAction,
@@ -128,11 +128,11 @@ const steps: Reducer<StepsState, *> = handleActions({
       }
     }, {...initialStepState})
   },
-  COPY_SELECTED_STEP: (state: StepsState, action: CopySelectedStepAction): StepsState => ({
+  DUPLICATE_STEP: (state: StepsState, action: DuplicateStepAction): StepsState => ({
     ...state,
-    [action.payload.nextStepId]: {
-      ...(action.payload.selectedStepId ? state[action.payload.selectedStepId] : {}),
-      id: action.payload.nextStepId,
+    [action.payload.duplicateStepId]: {
+      ...(action.payload.stepId !== null ? state[action.payload.stepId] : {}),
+      id: action.payload.duplicateStepId,
     },
   }),
 }, initialStepState)
@@ -177,15 +177,15 @@ const savedStepForms: Reducer<SavedStepFormState, *> = handleActions({
   CHANGE_SAVED_STEP_FORM: (state: SavedStepFormState, action: ChangeSavedStepFormAction): SavedStepFormState => ({
     ...state,
     [action.payload.stepId]: {
-      ...(action.payload.stepId ? state[action.payload.stepId] : {}),
+      ...(action.payload.stepId !== null ? state[action.payload.stepId] : {}),
       ...action.payload.update,
     },
   }),
-  COPY_SELECTED_STEP: (state: SavedStepFormState, action: CopySelectedStepAction): SavedStepFormState => ({
+  DUPLICATE_STEP: (state: SavedStepFormState, action: DuplicateStepAction): SavedStepFormState => ({
     ...state,
-    [action.payload.nextStepId]: {
-      ...(action.payload.selectedStepId ? state[action.payload.selectedStepId] : {}),
-      id: action.payload.nextStepId,
+    [action.payload.duplicateStepId]: {
+      ...(action.payload.stepId !== null ? state[action.payload.stepId] : {}),
+      id: action.payload.duplicateStepId,
     },
   }),
 }, {})
@@ -236,16 +236,14 @@ const orderedSteps: Reducer<OrderedStepsState, *> = handleActions({
       ...stepsWithoutSelectedStep.slice(nextIndex),
     ]
   },
-  COPY_SELECTED_STEP: (state: OrderedStepsState, action: CopySelectedStepAction): OrderedStepsState => {
-    const {selectedStepId, nextStepId, delta} = action.payload
-    const selectedIndex = state.findIndex(s => s === selectedStepId)
+  DUPLICATE_STEP: (state: OrderedStepsState, action: DuplicateStepAction): OrderedStepsState => {
+    const {stepId, duplicateStepId} = action.payload
+    const selectedIndex = state.findIndex(s => s === stepId)
 
-    if (delta <= 0 && selectedIndex === 0) return [nextStepId, ...state]
-    const boundary = delta <= 0 ? selectedIndex + 1 + delta : selectedIndex + delta
     return [
-      ...state.slice(0, boundary),
-      nextStepId,
-      ...state.slice(boundary, state.length),
+      ...state.slice(0, selectedIndex + 1),
+      duplicateStepId,
+      ...state.slice(selectedIndex + 1, state.length),
     ]
   },
 }, [])

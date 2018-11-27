@@ -11,6 +11,7 @@ import {END_TERMINAL_ITEM_ID} from '../../steplist'
 
 import type {StepIdType} from '../../form-types'
 import {PortalRoot} from './TooltipPortal'
+import ContextMenu from './ContextMenu'
 
 type Props = {
   orderedSteps: Array<StepIdType>,
@@ -48,8 +49,16 @@ export default class StepList extends React.Component<Props> {
   render () {
     const {orderedSteps} = this.props
 
-    const stepItems = orderedSteps.map((stepId: StepIdType) =>
-      <StepItem key={stepId} stepId={stepId} />)
+    const stepItems = (
+      <ContextMenu>
+        {({makeStepOnContextMenu}) => orderedSteps.map((stepId: StepIdType) => (
+          <StepItem
+            key={stepId}
+            onStepContextMenu={makeStepOnContextMenu(stepId)}
+            stepId={stepId} />
+        ))}
+      </ContextMenu>
+    )
 
     return (
       <React.Fragment>

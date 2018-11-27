@@ -31,6 +31,7 @@ type StepItemProps = {
   getLabware: (labwareId: ?string) => ?Labware,
   handleSubstepHover: SubstepIdentifier => mixed,
   onStepClick?: (event?: SyntheticEvent<>) => mixed,
+  onStepContextMenu?: (event?: SyntheticEvent<>) => mixed,
   onStepItemCollapseToggle?: (event?: SyntheticEvent<>) => mixed,
   onStepHover?: (event?: SyntheticEvent<>) => mixed,
   onStepMouseLeave?: (event?: SyntheticEvent<>) => mixed,
@@ -47,6 +48,7 @@ export default function StepItem (props: StepItemProps) {
 
     onStepMouseLeave,
     onStepClick,
+    onStepContextMenu,
     onStepItemCollapseToggle,
     onStepHover,
   } = props
@@ -62,6 +64,7 @@ export default function StepItem (props: StepItemProps) {
       iconProps={{className: error ? styles.error_icon : ''}}
       title={title || ''}
       onClick={onStepClick}
+      onContextMenu={onStepContextMenu}
       onMouseEnter={onStepHover}
       onMouseLeave={onStepMouseLeave}
       onCollapseToggle={onStepItemCollapseToggle}
