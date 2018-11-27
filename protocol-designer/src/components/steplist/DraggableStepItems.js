@@ -80,6 +80,7 @@ class StepItems extends React.Component<StepItemsProps, StepItemsState> {
     }
   }
 
+  // TODO: BC 2018-11-27 make util function for reordering and use it in hotkey implementation too
   moveStep = (stepId: StepIdType, targetIndex: number) => {
     const {stepIds} = this.state
     const currentIndex = this.findStepIndex(stepId)
