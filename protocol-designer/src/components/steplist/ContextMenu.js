@@ -2,14 +2,11 @@
 import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
-import {ContinueModal} from '@opentrons/components'
 import i18n from '../../localization'
 import {actions as steplistActions} from '../../steplist'
-import modalStyles from '../modals/modal.css'
 import {Portal} from '../portals/TopPortal'
 import type {StepIdType} from '../../form-types'
 import styles from './StepItem.css'
-import ConfirmDeleteModal from '../StepEditForm/ConfirmDeleteModal'
 
 const MENU_OFFSET_PX = 5
 
@@ -23,7 +20,6 @@ type State = {
   left: ?number,
   top: ?number,
   stepId: ?StepIdType,
-  showConfirmDeleteModal: boolean,
 }
 
 class ContextMenu extends React.Component<Props, State> {
@@ -32,7 +28,6 @@ class ContextMenu extends React.Component<Props, State> {
     left: null,
     top: null,
     stepId: null,
-    showConfirmDeleteModal: false,
   }
   menuRoot: HTMLElement
 
@@ -66,20 +61,18 @@ class ContextMenu extends React.Component<Props, State> {
     const { visible } = this.state
     const wasOutside = !(event.target.contains === this.root)
 
-    if (wasOutside && visible) this.setState({visible: false, stepId: null, left: null, top: null})
+    if (wasOutside && visible) this.setState({visible: false, left: null, top: null})
   }
 
   handleDuplicate = () => {
     this.props.duplicateStep(this.state.stepId)
   }
 
-  toggleConfirmDeleteModal = () => {
-    this.setState({showConfirmDeleteModal: !this.state.showConfirmDeleteModal})
-  }
-
   handleDelete = () => {
-    this.toggleConfirmDeleteModal()
-    this.props.deleteStep(this.state.stepId)
+    if (confirm(i18n.t('alert.confirm_delete_step'))) {
+      this.props.deleteStep(this.state.stepId)
+      this.setState({stepId: null})
+    }
   }
 
   render () {
@@ -99,22 +92,12 @@ class ContextMenu extends React.Component<Props, State> {
                   {i18n.t('context_menu.step.duplicate')}
                 </div>
                 <div
-                  onClick={this.toggleConfirmDeleteModal}
+                  onClick={this.handleDelete}
                   className={styles.context_menu_item}>
                   {i18n.t('context_menu.step.delete')}
                 </div>
               </div>
             </React.Fragment>
-          </Portal>
-        }
-        {this.state.showConfirmDeleteModal &&
-          <Portal>
-            <ContinueModal
-              className={modalStyles.modal}
-              onCancelClick={this.toggleConfirmDeleteModal}
-              onContinueClick={this.handleDelete}>
-              {i18n.t('modal.delete_step.confirm')}
-            </ContinueModal>
           </Portal>
         }
       </div>

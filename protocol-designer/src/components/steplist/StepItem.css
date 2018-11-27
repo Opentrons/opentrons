@@ -154,8 +154,9 @@
 
 .context_menu {
   position: absolute;
-  background: white;
-  box-shadow: 0 2px 10px #999;
+  color: var(--c-font-light);
+  background-color: var(--c-bg-dark);
+  box-shadow: 0 2px 6px #999;
   z-index: 100000;
 }
 
@@ -163,15 +164,19 @@
   padding: 6px 50px 5px 10px;
   min-width: 160px;
   cursor: default;
-  font-size: 12px;
+  font-size: var(--fs-body-1);
 }
 
 .context_menu_item:hover {
-  background: linear-gradient(to top, #555, #333);
-  color: white;
+  background-color: color(var(--c-bg-dark) shade(30%));
+  color: var(--c-font-light);
 }
 
 .context_menu_item:active {
-  color: #e9e9e9;
-  background: linear-gradient(to top, #555, #444);
+  color: white;
+  background-color: color(var(--c-bg-dark) shade(30%));
+}
+
+.confirm_delete_modal {
+  z-index: 1100;
 }
