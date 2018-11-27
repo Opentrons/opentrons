@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
-import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
+import type {ThunkDispatch} from '../../types'
 import i18n from '../../localization'
 import {actions as steplistActions} from '../../steplist'
 import {Portal} from '../portals/TopPortal'
@@ -14,7 +14,9 @@ type DP = {
   deleteStep: (StepIdType) => {},
   duplicateStep: (StepIdType) => {},
 }
-type Props = {children: ({onContextMenu: (event: SyntheticMouseEvent<>) => mixed}) => React.Node} & DP
+type Props = {
+  children: ({makeStepOnContextMenu: (StepIdType) => (event: SyntheticMouseEvent<>) => mixed}) => React.Node,
+} & DP
 type State = {
   visible: boolean,
   left: ?number,
@@ -29,14 +31,14 @@ class ContextMenu extends React.Component<Props, State> {
     top: null,
     stepId: null,
   }
-  menuRoot: HTMLElement
+  menuRoot: ?HTMLElement
 
   componentDidMount () {
-    document.addEventListener('click', this.handleClick)
+    global.addEventListener('click', this.handleClick)
   }
 
   componentWillUnmount () {
-    document.removeEventListener('click', this.handleClick)
+    global.removeEventListener('click', this.handleClick)
   }
 
   makeHandleContextMenu = (stepId: StepIdType) => (event) => {
@@ -48,8 +50,8 @@ class ContextMenu extends React.Component<Props, State> {
     this.setState({visible: true, stepId}, () => {
       const screenW = window.innerWidth
       const screenH = window.innerHeight
-      const rootW = this.menuRoot.offsetWidth
-      const rootH = this.menuRoot.offsetHeight
+      const rootW = this.menuRoot ? this.menuRoot.offsetWidth : 0
+      const rootH = this.menuRoot ? this.menuRoot.offsetHeight : 0
 
       const left = (screenW - clickX) > rootW ? clickX + MENU_OFFSET_PX : clickX - rootW - MENU_OFFSET_PX
       const top = (screenH - clickY) > rootH ? clickY + MENU_OFFSET_PX : clickY - rootH - MENU_OFFSET_PX
@@ -57,19 +59,21 @@ class ContextMenu extends React.Component<Props, State> {
     })
   }
 
-  handleClick = (event) => {
+  handleClick = (event: SyntheticMouseEvent<*>) => {
     const { visible } = this.state
-    const wasOutside = !(event.target.contains === this.root)
+    const wasOutside = !(this.menuRoot && this.menuRoot.contains(event.currentTarget))
 
     if (wasOutside && visible) this.setState({visible: false, left: null, top: null})
   }
 
   handleDuplicate = () => {
-    this.props.duplicateStep(this.state.stepId)
+    if (this.state.stepId != null) {
+      this.props.duplicateStep(this.state.stepId)
+    }
   }
 
   handleDelete = () => {
-    if (confirm(i18n.t('alert.confirm_delete_step'))) {
+    if (this.state.stepId != null && confirm(i18n.t('alert.window.confirm_delete_step'))) {
       this.props.deleteStep(this.state.stepId)
       this.setState({stepId: null})
     }
@@ -105,7 +109,7 @@ class ContextMenu extends React.Component<Props, State> {
   }
 }
 
-const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
+const mapDispatchToProps = (dispatch: ThunkDispatch<*>) => ({
   deleteStep: (stepId: StepIdType) => dispatch(steplistActions.deleteStep(stepId)),
   duplicateStep: (stepId: StepIdType) => dispatch(steplistActions.duplicateStep(stepId)),
 })

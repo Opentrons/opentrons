@@ -131,7 +131,7 @@ const steps: Reducer<StepsState, *> = handleActions({
   DUPLICATE_STEP: (state: StepsState, action: DuplicateStepAction): StepsState => ({
     ...state,
     [action.payload.duplicateStepId]: {
-      ...(action.payload.stepId !== null ? state[action.payload.stepId] : {}),
+      ...(action.payload.stepId != null ? state[action.payload.stepId] : {}),
       id: action.payload.duplicateStepId,
     },
   }),
@@ -177,14 +177,14 @@ const savedStepForms: Reducer<SavedStepFormState, *> = handleActions({
   CHANGE_SAVED_STEP_FORM: (state: SavedStepFormState, action: ChangeSavedStepFormAction): SavedStepFormState => ({
     ...state,
     [action.payload.stepId]: {
-      ...(action.payload.stepId !== null ? state[action.payload.stepId] : {}),
+      ...(action.payload.stepId != null ? state[action.payload.stepId] : {}),
       ...action.payload.update,
     },
   }),
   DUPLICATE_STEP: (state: SavedStepFormState, action: DuplicateStepAction): SavedStepFormState => ({
     ...state,
     [action.payload.duplicateStepId]: {
-      ...(action.payload.stepId !== null ? state[action.payload.stepId] : {}),
+      ...(action.payload.stepId != null ? state[action.payload.stepId] : {}),
       id: action.payload.duplicateStepId,
     },
   }),

@@ -16,15 +16,13 @@ import ContextMenu from './ContextMenu'
 type Props = {
   orderedSteps: Array<StepIdType>,
   reorderSelectedStep: (delta: number) => mixed,
-  copySelectedStep: (delta: number) => mixed,
 }
 
 export default class StepList extends React.Component<Props> {
   handleKeyDown = (e: SyntheticKeyboardEvent<*>) => {
-    const {reorderSelectedStep, copySelectedStep} = this.props
+    const {reorderSelectedStep} = this.props
     const key = e.key
     const altIsPressed = e.getModifierState('Alt')
-    const ctlIsPressed = e.getModifierState('Control')
 
     if (altIsPressed) {
       let delta = 0
@@ -34,7 +32,7 @@ export default class StepList extends React.Component<Props> {
         delta = 1
       }
       if (!delta) return
-      ctlIsPressed ? copySelectedStep(delta) : reorderSelectedStep(delta)
+      reorderSelectedStep(delta)
     }
   }
 
