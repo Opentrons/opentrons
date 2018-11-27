@@ -55,6 +55,7 @@ def test_fail_get_temp_deck_temperature():
     temp_deck.simulating = False
 
     done = False
+
     def _mock_send_command1(self, command, timeout=None):
         nonlocal done
         done = True
