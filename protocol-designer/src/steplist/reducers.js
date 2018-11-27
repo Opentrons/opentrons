@@ -209,6 +209,7 @@ const orderedSteps: Reducer<OrderedStepsState, *> = handleActions({
   LOAD_FILE: (state: OrderedStepsState, action: LoadFileAction): OrderedStepsState =>
     getPDMetadata(action.payload).orderedSteps,
   REORDER_SELECTED_STEP: (state: OrderedStepsState, action: ReorderSelectedStepAction): OrderedStepsState => {
+    // TODO: BC 2018-11-27 make util function for reordering and use it everywhere
     const {delta, stepId} = action.payload
     const stepsWithoutSelectedStep = state.filter(s => s !== stepId)
     const selectedIndex = state.findIndex(s => s === stepId)
