@@ -122,7 +122,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
 }
 
 const mapStateToProps = (state: BaseState): SP => ({
-  formData: selectors.formData(state),
+  formData: selectors.getUnsavedForm(state),
   isNewStep: selectors.getIsNewStepForm(state),
 })
 

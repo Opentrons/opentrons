@@ -59,7 +59,7 @@ export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload) =
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
     const state = getState()
     const accessor = payload.formFieldAccessor
-    const formData = steplistSelectors.formData(state)
+    const formData = steplistSelectors.getUnsavedForm(state)
 
     const wells: Wells = (accessor && formData && formData[accessor] &&
       _wellArrayToObj(formData[accessor])) || {}

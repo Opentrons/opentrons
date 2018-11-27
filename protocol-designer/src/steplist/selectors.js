@@ -69,10 +69,6 @@ const getHydratedUnsavedForm: Selector<?FormData> = createSelector(
   )
 )
 
-// TODO Ian 2018-02-08 rename formData to something like getUnsavedForm or unsavedFormFields
-// NOTE: DEPRECATED use getUnsavedForm instead
-const formData = getUnsavedForm
-
 const getFormModalData = createSelector(
   rootSelector,
   (state: RootState) => state.unsavedFormModal
@@ -401,7 +397,6 @@ export default {
   getHoveredSubstep,
   getUnsavedForm,
   getHydratedUnsavedForm,
-  formData, // TODO: remove after sunset
   getFormModalData,
   getArgsAndErrorsByStepId,
   getIsNewStepForm,

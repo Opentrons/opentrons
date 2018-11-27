@@ -126,7 +126,7 @@ export const saveStepForm = () =>
     if (selectors.getCurrentFormCanBeSaved(state)) {
       dispatch({
         type: 'SAVE_STEP_FORM',
-        payload: selectors.formData(state),
+        payload: selectors.getUnsavedForm(state),
       })
     }
   }
@@ -157,7 +157,7 @@ export type OpenMoreOptionsModal = {
 export const openMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
   dispatch({
     type: 'OPEN_MORE_OPTIONS_MODAL',
-    payload: selectors.formData(getState()), // TODO only pull in relevant fields?
+    payload: selectors.getUnsavedForm(getState()), // TODO only pull in relevant fields?
   })
 }
 
