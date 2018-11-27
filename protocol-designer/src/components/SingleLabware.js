@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {SLOT_WIDTH_MM, SLOT_HEIGHT_MM} from '../constants.js'
+import {SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT} from '../constants.js'
 import styles from './SingleLabware.css'
 
 type Props = {
@@ -16,8 +16,8 @@ export default function SingleLabware (props: Props) {
   const {children, className, showLabels = false} = props
   const minX = showLabels ? -LABEL_OFFSET : 0
   const minY = showLabels ? -LABEL_OFFSET : 0
-  const width = showLabels ? SLOT_WIDTH_MM + LABEL_OFFSET : SLOT_WIDTH_MM
-  const height = showLabels ? SLOT_HEIGHT_MM + LABEL_OFFSET : SLOT_HEIGHT_MM
+  const width = showLabels ? SLOT_RENDER_WIDTH + LABEL_OFFSET : SLOT_RENDER_WIDTH
+  const height = showLabels ? SLOT_RENDER_HEIGHT + LABEL_OFFSET : SLOT_RENDER_HEIGHT
   return (
     <div className={cx(styles.single_labware, className)}>
       <svg viewBox={`${minX} ${minY} ${width} ${height}`}>

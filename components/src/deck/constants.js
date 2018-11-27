@@ -1,6 +1,6 @@
 // @flow
 // ========= OT2 DECK ===============
-import {SLOT_WIDTH_MM, SLOT_HEIGHT_MM} from '@opentrons/shared-data'
+import {SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT} from '@opentrons/shared-data'
 
 export const SLOTNAME_MATRIX = [ // used for deckmap
   ['10', '11', '12'],
@@ -17,6 +17,6 @@ export const TRASH_SLOTNAME = '12'
 export const SLOT_SPACING_MM = 5
 export const SLOT_OFFSET_MM = 10
 export {
-  SLOT_WIDTH_MM,
-  SLOT_HEIGHT_MM,
+  SLOT_RENDER_WIDTH,
+  SLOT_RENDER_HEIGHT,
 }
