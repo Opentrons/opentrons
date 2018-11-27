@@ -62,7 +62,7 @@ function mapStateToProps (state: BaseState): SP {
     case 'file-splash':
     case 'file-detail':
     case 'settings-features':
-    case 'settings-privacy':
+    case 'settings-app':
       return {
         _page,
         title: i18n.t([`nav.title.${_page}`, fileName]),

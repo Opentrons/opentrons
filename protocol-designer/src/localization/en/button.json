@@ -11,6 +11,7 @@
   "no": "no",
   "ok": "ok",
   "reset": "reset",
+  "restore": "restore",
   "save": "save",
   "swap": "swap",
   "yes": "yes"

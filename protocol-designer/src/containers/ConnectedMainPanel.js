@@ -24,7 +24,7 @@ function MainPanel (props: Props) {
       return <ConnectedFilePage />
     case 'liquids':
       return <LiquidsPage />
-    case 'settings-privacy':
+    case 'settings-app':
       return <SettingsPage />
     default:
       return <ConnectedDeckSetup />

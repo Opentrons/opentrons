@@ -2,27 +2,39 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import i18n from '../../localization'
-import {Card, ToggleButton} from '@opentrons/components'
+import {Card, OutlineButton, ToggleButton} from '@opentrons/components'
 import styles from './SettingsPage.css'
 import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
 } from '../../analytics'
+import {actions as tutorialActions} from '../../tutorial'
 import type {BaseState} from '../../types'
 
 type Props = {
   hasOptedIn: boolean | null,
   toggleOptedIn: () => mixed,
+  restoreHints: () => mixed,
 }
 
 type SP = {
   hasOptedIn: $PropertyType<Props, 'hasOptedIn'>,
 }
 
-function Privacy (props: Props) {
-  const {hasOptedIn, toggleOptedIn} = props
+function SettingsApp (props: Props) {
+  const {hasOptedIn, toggleOptedIn, restoreHints} = props
   return (
     <div className={styles.card_wrapper}>
+      <Card title={i18n.t('card.title.hints')}>
+        <div className={styles.body_wrapper}>
+          <div className={styles.card_body}>
+            {i18n.t('card.body.restore_hints')}
+            <OutlineButton
+              className={styles.button}
+              onClick={restoreHints}>{i18n.t('button.restore')}</OutlineButton>
+          </div>
+        </div>
+      </Card>
       <Card title={i18n.t('card.title.privacy')}>
         <div className={styles.toggle_row}>
           <p className={styles.toggle_label}>{i18n.t('card.toggle.share_session')}</p>
@@ -60,7 +72,8 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
   return {
     ...stateProps,
     toggleOptedIn: () => dispatch(_toggleOptedIn()),
+    restoreHints: () => dispatch(tutorialActions.clearAllHintDismissals()),
   }
 }
 
-export default connect(mapStateToProps, null, mergeProps)(Privacy)
+export default connect(mapStateToProps, null, mergeProps)(SettingsApp)

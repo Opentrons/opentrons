@@ -4,5 +4,5 @@ export type Page =
   'file-detail' |
   'liquids' |
   'steplist' |
-  'settings-privacy' |
+  'settings-app' |
   'settings-features'
