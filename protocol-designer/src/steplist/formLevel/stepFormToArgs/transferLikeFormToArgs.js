@@ -46,11 +46,6 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
     ? hydratedFormData['dispense_touchTipMmFromBottom']
     : null
 
-  const delayAfterDispense = hydratedFormData['dispense_delay_checkbox']
-    ? ((Number(hydratedFormData['dispense_delayMinutes']) || 0) * 60) +
-      (Number(hydratedFormData['dispense_delaySeconds'] || 0))
-    : null
-
   const mixFirstAspirate = hydratedFormData['aspirate_mix_checkbox']
     ? {
       volume: Number(hydratedFormData['aspirate_mix_volume']),
@@ -86,7 +81,6 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
 
     blowout: blowoutLabwareId,
     changeTip,
-    delayAfterDispense,
     mixInDestination,
     preWetTip: hydratedFormData['aspirate_preWetTip'] || false,
     touchTipAfterAspirate,

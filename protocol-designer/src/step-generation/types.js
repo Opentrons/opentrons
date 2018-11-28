@@ -48,8 +48,6 @@ export type TransferLikeFormDataFields = {
   touchTipAfterDispense: boolean,
   /** Optional offset for touch tip after dispense (if null, use PD default) */
   touchTipAfterDispenseOffsetMmFromBottom?: ?number,
-  /** Number of seconds to delay at the very end of the step (TODO: or after each dispense ?) */
-  delayAfterDispense: ?number,
   /** offset from bottom of well in mm */
   dispenseOffsetFromBottomMm?: ?number,
 }
@@ -109,8 +107,6 @@ export type MixFormData = {
   /** Touch tip after mixing */
   touchTip: boolean,
   touchTipMmFromBottom?: ?number,
-  /** Delay in seconds */
-  delay: ?number,
   /** change tip: see comments in step-generation/mix.js */
   changeTip: ChangeTipOptions,
   /** If given, blow out in the specified labware after mixing each well */
