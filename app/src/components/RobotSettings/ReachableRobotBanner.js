@@ -18,7 +18,7 @@ const LAST_RESORT = (
 
 const RESTARTING_MESSAGE = (
   <div className={styles.banner}>
-    <p>Your robot is restarting, and should be back online shortly.</p>
+    <p>Your robot is restarting and should be back online shortly.</p>
     {LAST_RESORT}
   </div>
 )
