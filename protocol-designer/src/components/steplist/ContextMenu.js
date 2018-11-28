@@ -61,7 +61,8 @@ class ContextMenu extends React.Component<Props, State> {
 
   handleClick = (event: SyntheticMouseEvent<*>) => {
     const { visible } = this.state
-    const wasOutside = !(this.menuRoot && this.menuRoot.contains(event.currentTarget))
+
+    const wasOutside = !(this.menuRoot && event.target instanceof Node && this.menuRoot.contains(event.target))
 
     if (wasOutside && visible) this.setState({visible: false, left: null, top: null})
   }
