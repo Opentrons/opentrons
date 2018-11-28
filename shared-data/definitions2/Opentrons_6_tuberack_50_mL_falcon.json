@@ -19,7 +19,7 @@
         "displayLengthUnits": "mm",
         "displayVolumeUnits": "mL",
         "displayCategory": "tuberack",
-        "displayName": "Opentrons-tuberack-50mL-falcon",
+        "displayName": "Opentrons 50 mL tuberack",
         "tags": [
             "50",
             "mL",
@@ -29,8 +29,8 @@
         ]
     },
     "cornerOffsetFromSlot": {
-        "x": -6.76,
-        "y": -6.73,
+        "x": 6.76,
+        "y": 6.73,
         "z": 0
     },
     "dimensions": {

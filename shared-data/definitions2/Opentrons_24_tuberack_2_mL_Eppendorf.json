@@ -43,7 +43,7 @@
         "displayLengthUnits": "mm",
         "displayVolumeUnits": "mL",
         "displayCategory": "tuberack",
-        "displayName": "Opentrons-tuberack-2mL-snapcap",
+        "displayName": "Opentrons snapcap 2mL tuberack",
         "tags": [
             "2",
             "mL",
@@ -54,8 +54,8 @@
         ]
     },
     "cornerOffsetFromSlot": {
-        "x": -0.01,
-        "y": 0.02,
+        "x": 0.01,
+        "y": -0.02,
         "z": 0
     },
     "dimensions": {
@@ -289,6 +289,6 @@
     },
     "brand": {
         "brand": "Opentrons",
-        "brandId": []
+        "brandId": ["022363344", "022363352", "022363379", "022363476"]
     }
 }

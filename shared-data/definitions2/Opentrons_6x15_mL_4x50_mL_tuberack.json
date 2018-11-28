@@ -36,8 +36,8 @@
         ]
     },
     "cornerOffsetFromSlot": {
-        "x": -0.01,
-        "y": 0.02,
+        "x": 0.01,
+        "y": -0.02,
         "z": 0
     },
     "dimensions": {

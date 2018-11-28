@@ -36,13 +36,13 @@
     "wells": {
         "A1": {
             "shape": "rectangular",
-            "length": 172.86,
-            "width": 165.86,
+            "length": 165.67,
+            "width": 107.11,
             "totalLiquidVolume": 1.1,
-            "depth": 82,
-            "x": 0,
-            "y": 0,
-            "z": 0
+            "depth": 77,
+            "x": 82.84,
+            "y": 53.56,
+            "z": 5
         }
     },
     "brand": {

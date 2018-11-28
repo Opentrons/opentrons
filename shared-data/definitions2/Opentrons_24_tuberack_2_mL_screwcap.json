@@ -43,7 +43,7 @@
         "displayLengthUnits": "mm",
         "displayVolumeUnits": "mL",
         "displayCategory": "tuberack",
-        "displayName": "Opentrons-tuberack-2mL-screwcap",
+        "displayName": "Opentrons screwcap 2mL tuberack",
         "tags": [
             "2",
             "mL",
@@ -53,8 +53,8 @@
         ]
     },
     "cornerOffsetFromSlot": {
-        "x": -0.01,
-        "y": 0.02,
+        "x": 0.01,
+        "y": -0.02,
         "z": 0
     },
     "dimensions": {
