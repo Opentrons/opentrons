@@ -12,13 +12,11 @@ import {
 import i18n from '../../localization'
 import {selectors as pipetteSelectors} from '../../pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
-import {actions} from '../../steplist'
 import {hydrateField} from '../../steplist/fieldLevel'
 import type {StepFieldName} from '../../steplist/fieldLevel'
-import {DISPOSAL_PERCENTAGE} from '../../steplist/formLevel/warnings'
 import {SOURCE_WELL_DISPOSAL_DESTINATION} from '../../steplist/formLevel/stepFormToArgs/transferLikeFormToArgs'
 import type {ChangeTipOptions} from '../../step-generation/types'
-import type {BaseState, ThunkDispatch} from '../../types'
+import type {BaseState} from '../../types'
 import type {StepType} from '../../form-types'
 import styles from './StepEditForm.css'
 import StepField from './StepFormField'
@@ -118,18 +116,12 @@ export function DispenseDelayFields (props: DispenseDelayFieldsProps) {
 
 type PipetteFieldOP = {name: StepFieldName, stepType?: StepType} & FocusHandlers
 type PipetteFieldSP = {pipetteOptions: Options, getHydratedPipette: (string) => any} // TODO: real hydrated pipette type
-type PipetteFieldDP = {updateDisposalVolume: (?mixed) => void}
-type PipetteFieldProps = PipetteFieldOP & PipetteFieldSP & PipetteFieldDP
+type PipetteFieldProps = PipetteFieldOP & PipetteFieldSP
 const PipetteFieldSTP = (state: BaseState, ownProps: PipetteFieldOP): PipetteFieldSP => ({
   pipetteOptions: pipetteSelectors.getEquippedPipetteOptions(state),
   getHydratedPipette: (value) => hydrateField(state, ownProps.name, value),
 })
-const PipetteFieldDTP = (dispatch: ThunkDispatch<*>): PipetteFieldDP => ({
-  updateDisposalVolume: (disposalVolume: ?mixed) => {
-    dispatch(actions.changeFormInput({update: {aspirate_disposalVol_volume: disposalVolume}}))
-  },
-})
-export const PipetteField = connect(PipetteFieldSTP, PipetteFieldDTP)((props: PipetteFieldProps) => (
+export const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldProps) => (
   <StepField
     name={props.name}
     focusedField={props.focusedField}
@@ -143,12 +135,6 @@ export const PipetteField = connect(PipetteFieldSTP, PipetteFieldDTP)((props: Pi
           onFocus={() => { props.onFieldFocus(props.name) }}
           onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
             updateValue(e.currentTarget.value)
-            if (props.stepType === 'distribute') {
-              const hydratedPipette = props.getHydratedPipette(e.currentTarget.value)
-              if (hydratedPipette) {
-                props.updateDisposalVolume(hydratedPipette.maxVolume * DISPOSAL_PERCENTAGE)
-              }
-            }
           }} />
       </FormGroup>
     )} />

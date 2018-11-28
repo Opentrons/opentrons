@@ -26,7 +26,6 @@ type TransferLikeStepArgs = ConsolidateFormData | DistributeFormData | TransferF
 
 // TODO: BC 2018-10-30 move getting labwareDef into hydration layer upstream
 const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArgs => {
-  console.log([hydratedFormData])
   const stepType = hydratedFormData.stepType
   const pipette = hydratedFormData['pipette']
   const volume = Number(hydratedFormData['volume'])

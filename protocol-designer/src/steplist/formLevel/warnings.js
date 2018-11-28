@@ -1,10 +1,10 @@
 // @flow
 import * as React from 'react'
 import {getWellTotalVolume} from '@opentrons/shared-data'
+import {DISPOSAL_VOLUME_PERCENTAGE} from '../../constants'
 import type {StepFieldName} from '../../form-types'
 import KnowledgeBaseLink from '../../components/KnowledgeBaseLink'
 
-export const DISPOSAL_PERCENTAGE = 0.2 // 20% percent of pipette capacity
 /*******************
 ** Warning Messages **
 ********************/
@@ -62,7 +62,7 @@ export const minDisposalVolume = (fields: HydratedFormData): ?FormWarning => {
   if (!pipette) return null
   const isUnselected = !aspirate_disposalVol_checkbox || !aspirate_disposalVol_volume
   if (isUnselected) return FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME
-  const isBelowMin = aspirate_disposalVol_volume < (DISPOSAL_PERCENTAGE * pipette.maxVolume)
+  const isBelowMin = aspirate_disposalVol_volume < (DISPOSAL_VOLUME_PERCENTAGE * pipette.maxVolume)
   return isBelowMin ? FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME : null
 }
 

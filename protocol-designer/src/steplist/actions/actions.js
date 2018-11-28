@@ -25,9 +25,10 @@ export type ChangeFormInputAction = {
 
 export const changeFormInput = (payload: ChangeFormPayload) =>
   (dispatch: ThunkDispatch<ChangeFormInputAction>, getState: GetState) => {
+    const unsavedForm = selectors.getUnsavedForm(getState())
     dispatch({
       type: 'CHANGE_FORM_INPUT',
-      payload: handleFormChange(payload, getState),
+      payload: handleFormChange(payload, unsavedForm, getState),
     })
   }
 

@@ -60,7 +60,6 @@ class TipPositionModal extends React.Component<Props, State> {
   }
   applyChanges = () => {
     const {value} = this.state
-    console.log('applying changes', value)
     this.props.updateValue(value == null ? null : roundValue(value))
     this.props.closeModal()
   }
