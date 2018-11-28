@@ -1,12 +1,13 @@
 // @flow
 import {createSelector} from 'reselect'
-import type {BaseState} from '../types'
+import isEmpty from 'lodash/isEmpty'
+import type {BaseState, Selector} from '../types'
 
 const rootSelector = (state: BaseState) => state.tutorial
 
 export const getHint = createSelector(
   rootSelector,
-  tutorial => {
+  (tutorial) => {
     const dismissedKeys = Object.keys(tutorial.dismissedHints)
     const hints = tutorial.hints.filter(hintKey => !dismissedKeys.includes(hintKey))
 
@@ -14,4 +15,9 @@ export const getHint = createSelector(
     // For now, show 1 non-dismissed hint at a time
     return hints[0]
   }
+)
+
+export const getCanClearHintDismissals: Selector<boolean> = createSelector(
+  rootSelector,
+  (tutorial) => !isEmpty(tutorial.dismissedHints)
 )

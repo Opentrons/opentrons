@@ -8,21 +8,26 @@ import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
 } from '../../analytics'
-import {actions as tutorialActions} from '../../tutorial'
+import {
+  actions as tutorialActions,
+  selectors as tutorialSelectors,
+} from '../../tutorial'
 import type {BaseState} from '../../types'
 
 type Props = {
+  canClearHintDismissals: boolean,
   hasOptedIn: boolean | null,
-  toggleOptedIn: () => mixed,
   restoreHints: () => mixed,
+  toggleOptedIn: () => mixed,
 }
 
 type SP = {
+  canClearHintDismissals: $PropertyType<Props, 'canClearHintDismissals'>,
   hasOptedIn: $PropertyType<Props, 'hasOptedIn'>,
 }
 
 function SettingsApp (props: Props) {
-  const {hasOptedIn, toggleOptedIn, restoreHints} = props
+  const {canClearHintDismissals, hasOptedIn, restoreHints, toggleOptedIn} = props
   return (
     <div className={styles.card_wrapper}>
       <Card title={i18n.t('card.title.hints')}>
@@ -31,6 +36,7 @@ function SettingsApp (props: Props) {
             {i18n.t('card.body.restore_hints')}
             <OutlineButton
               className={styles.button}
+              disabled={!canClearHintDismissals}
               onClick={restoreHints}>{i18n.t('button.restore')}</OutlineButton>
           </div>
         </div>
@@ -59,6 +65,7 @@ function SettingsApp (props: Props) {
 function mapStateToProps (state: BaseState): SP {
   return {
     hasOptedIn: analyticsSelectors.getHasOptedIn(state),
+    canClearHintDismissals: tutorialSelectors.getCanClearHintDismissals(state),
   }
 }
 
