@@ -24,6 +24,7 @@ export default function getDefaultsForStepType (stepType: StepType) {
         'dispense_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
         'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
         'dispense_wells': [],
+        'pipette': null,
         'volume': undefined,
       }
     case 'consolidate':
@@ -37,6 +38,7 @@ export default function getDefaultsForStepType (stepType: StepType) {
         'dispense_labware': null,
         'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
         'dispense_wells': [],
+        'pipette': null,
         'volume': undefined,
       }
     case 'mix':
@@ -45,9 +47,10 @@ export default function getDefaultsForStepType (stepType: StepType) {
         'labware': null,
         'aspirate_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
         'aspirate_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
-        'wells': [],
         'mix_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE, // NOTE: mix uses dispense for both asp + disp, for now
+        'pipette': null,
         'volume': undefined,
+        'wells': [],
       }
     case 'distribute':
       return {
@@ -62,6 +65,7 @@ export default function getDefaultsForStepType (stepType: StepType) {
         'dispense_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
         'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
         'dispense_wells': [],
+        'pipette': null,
         'volume': undefined,
       }
     default:

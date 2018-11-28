@@ -15,15 +15,6 @@ export type SelectStepAction = {
   payload: StepIdType,
 }
 
-function isStepWithPipette (stepType: StepType) {
-  const pipetteStepTypes: Array<StepType> = [
-    'consolidate',
-    'distribute',
-    'transfer',
-  ]
-  return pipetteStepTypes.includes(stepType)
-}
-
 // get new or existing step for given stepId
 function getStepFormData (state: BaseState, stepId: StepIdType, newStepType?: StepType): ?FormData {
   const existingStep = steplistSelectors.getSavedForms(state)[stepId]
@@ -62,7 +53,7 @@ export const selectStep = (stepId: StepIdType, newStepType?: StepType): ThunkAct
     dispatch(selectStepAction)
 
     const state = getState()
-    let formData = getStepFormData(getState(), stepId, newStepType)
+    let formData = getStepFormData(state, stepId, newStepType)
 
     const defaultPipetteId = getNextDefaultPipetteId(
       steplistSelectors.getSavedForms(state),
@@ -70,10 +61,14 @@ export const selectStep = (stepId: StepIdType, newStepType?: StepType): ThunkAct
       pipetteSelectors.getEquippedPipettes(state),
     )
 
-    // Set `pipette` field of new steps to the next default pipette id.
-    // In order to trigger dependent field changes (eg default disposal volume)
+    // For a pristine step, if there is a `pipette` field in the form
+    // (added by upstream `getDefaultsForStepType` fn),
+    // then set `pipette` field of new steps to the next default pipette id.
+    //
+    // In order to trigger dependent field changes (eg default disposal volume),
     // update the form thru handleFormChange.
-    if (newStepType && isStepWithPipette(newStepType) && defaultPipetteId) {
+    const formHasPipetteField = formData && 'pipette' in formData
+    if (newStepType && formHasPipetteField && defaultPipetteId) {
       const updatePayload = {update: {pipette: defaultPipetteId}}
       const updatedFields = handleFormChange(
         updatePayload,
