@@ -23,7 +23,7 @@ import RobotSettings, {
   ConnectAlertModal,
   RobotUpdateModal,
 } from '../../components/RobotSettings'
-import UpdateRobotModal from '../../components/RobotSettings/UpdateRobotModal'
+import UpdateRobot from '../../components/RobotSettings/UpdateRobot'
 import CalibrateDeck from '../../components/CalibrateDeck'
 import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
 import ReachableRobotBanner from '../../components/RobotSettings/ReachableRobotBanner'
@@ -108,7 +108,7 @@ function RobotSettingsPage (props: Props) {
           path={`${path}/${UPDATE_FRAGMENT}`}
           render={() => {
             if (props.__featureEnabled) {
-              return <UpdateRobotModal robot={robot} />
+              return <UpdateRobot robot={robot} />
             } else {
               return <RobotUpdateModal robot={robot} />
             }

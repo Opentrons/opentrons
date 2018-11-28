@@ -72,6 +72,7 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
 
   render () {
     const {
+      update,
       ignoreUpdate,
       appVersion,
       robotVersion,
@@ -95,7 +96,7 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
     if (showReleaseNotes) {
       button = {
         children: 'Upgrade Robot',
-        onClick: () => console.log('install'),
+        onClick: update,
       }
     } else if (appUpdateAvailable) {
       message = <UpdateAppMessage {...versionProps} />
@@ -122,14 +123,14 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
       } else if (robotUpdateInfo.type === 'downgrade') {
         button = {
           children: 'Downgrade Robot',
-          onClick: () => console.log('install'),
+          onClick: update,
         }
       }
     } else {
       message = <ReinstallMessage />
       button = {
         children: 'Reinstall',
-        onClick: () => console.log('install'),
+        onClick: update,
       }
     }
 
