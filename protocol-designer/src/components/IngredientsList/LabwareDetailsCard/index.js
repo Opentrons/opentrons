@@ -17,7 +17,7 @@ type DP = {
 type SP = $Diff<Props, DP> & {_labwareId: ?string}
 
 function mapStateToProps (state: BaseState): SP {
-  const labwareData = labwareIngredSelectors.getSelectedContainer(state)
+  const labwareData = labwareIngredSelectors.getSelectedLabware(state)
   assert(labwareData, 'Expected labware data to exist in connected labware details card')
 
   const props = (labwareData)

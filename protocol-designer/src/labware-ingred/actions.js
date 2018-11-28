@@ -101,7 +101,7 @@ export type MoveLabware = {
 
 export const moveLabware = (toSlot: DeckSlot) => (dispatch: Dispatch<MoveLabware>, getState: GetState) => {
   const state = getState()
-  const fromSlot = selectors.slotToMoveFrom(state)
+  const fromSlot = selectors.getSlotToMoveFrom(state)
   if (fromSlot) {
     return dispatch({
       type: 'MOVE_LABWARE',

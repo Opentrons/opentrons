@@ -24,8 +24,8 @@ function getStepFormData (state: BaseState, stepId: StepIdType, newStepType?: St
 
   const defaultNextPipette = getNextDefaultPipetteId(
     selectors.getSavedForms(state),
-    selectors.orderedSteps(state),
-    pipetteSelectors.pipetteIdsByMount(state)
+    selectors.getOrderedSteps(state),
+    pipetteSelectors.getPipetteIdsByMount(state)
   )
 
   // TODO: Ian 2018-09-19 sunset 'steps' reducer. Right now, it's needed here to get stepType
@@ -78,7 +78,7 @@ export const addStep = (payload: {stepType: StepType}) =>
         id: stepId,
       },
     })
-    const deckHasLiquid = labwareIngredsSelectors.hasLiquid(state)
+    const deckHasLiquid = labwareIngredsSelectors.getDeckHasLiquid(state)
     const stepNeedsLiquid = ['transfer', 'distribute', 'consolidate', 'mix'].includes(payload.stepType)
     if (stepNeedsLiquid && !deckHasLiquid) {
       dispatch(tutorialActions.addHint('add_liquids_and_labware'))

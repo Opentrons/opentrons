@@ -46,7 +46,7 @@ const FormSection = (props: FormSectionProps) => {
 }
 
 const FormSectionSTP = (state: BaseState, ownProps: OP) => ({
-  collapsed: steplistSelectors.formSectionCollapse(state)[ownProps.sectionName],
+  collapsed: steplistSelectors.getFormSectionCollapsed(state)[ownProps.sectionName],
 })
 const FormSectionDTP = (dispatch: ThunkDispatch<*>, ownProps: OP) => ({
   onCollapseToggle: () => dispatch(collapseFormSection(ownProps.sectionName)),

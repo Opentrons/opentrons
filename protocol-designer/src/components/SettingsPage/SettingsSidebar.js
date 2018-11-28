@@ -29,7 +29,7 @@ const SettingsSidebar = (props: SP & DP) => (
 )
 
 const STP = (state: BaseState): SP => ({
-  currentPage: selectors.currentPage(state),
+  currentPage: selectors.getCurrentPage(state),
 })
 
 const DTP = (dispatch: ThunkDispatch<*>): DP => ({

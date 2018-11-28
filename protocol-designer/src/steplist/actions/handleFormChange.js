@@ -34,7 +34,7 @@ function _getAllWells (
 // maybe remove channels from pipette state and use shared-data?
 // or if not, make this its own selector in pipettes/ atom
 const getChannels = (pipetteId: string, state: BaseState): PipetteChannels => {
-  const pipettes = pipetteSelectors.pipettesById(state)
+  const pipettes = pipetteSelectors.getPipettesById(state)
   const pipette = pipettes[pipetteId]
   if (!pipette) {
     console.error(`${pipetteId} not found in pipettes, cannot handleFormChange properly`)
@@ -154,7 +154,7 @@ export const reconcileFormPipette = (formData: FormData, baseState: BaseState, n
     } else if (multiToSingle) {
       // multi-channel to single-channel: convert primary wells to all wells
       const labwareId = formData.labware
-      const labware = labwareId && labwareIngredSelectors.getLabware(baseState)[labwareId]
+      const labware = labwareId && labwareIngredSelectors.getLabwareById(baseState)[labwareId]
       const labwareType = labware && labware.type
 
       updateOverrides = {
@@ -171,9 +171,9 @@ export const reconcileFormPipette = (formData: FormData, baseState: BaseState, n
       const sourceLabwareId = formData['aspirate_labware']
       const destLabwareId = formData['dispense_labware']
 
-      const sourceLabware = sourceLabwareId && labwareIngredSelectors.getLabware(baseState)[sourceLabwareId]
+      const sourceLabware = sourceLabwareId && labwareIngredSelectors.getLabwareById(baseState)[sourceLabwareId]
       const sourceLabwareType = sourceLabware && sourceLabware.type
-      const destLabware = destLabwareId && labwareIngredSelectors.getLabware(baseState)[destLabwareId]
+      const destLabware = destLabwareId && labwareIngredSelectors.getLabwareById(baseState)[destLabwareId]
       const destLabwareType = destLabware && destLabware.type
 
       updateOverrides = {

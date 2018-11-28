@@ -23,7 +23,7 @@ const SettingsPage = (props: SP) => {
 }
 
 const STP = (state: BaseState): SP => ({
-  currentPage: selectors.currentPage(state),
+  currentPage: selectors.getCurrentPage(state),
 })
 
 export default connect(STP)(SettingsPage)

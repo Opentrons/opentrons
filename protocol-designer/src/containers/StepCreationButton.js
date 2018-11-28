@@ -18,7 +18,7 @@ type DispatchProps = $Diff<Props, StateProps>
 
 function mapStateToProps (state: BaseState): StateProps {
   return ({
-    expanded: selectors.stepCreationButtonExpanded(state),
+    expanded: selectors.getStepCreationButtonExpanded(state),
   })
 }
 

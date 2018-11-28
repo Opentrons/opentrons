@@ -23,7 +23,7 @@ type DP = {
 }
 
 const mapStateToProps = (state: BaseState): SP => {
-  const pipetteData = pipetteSelectors.pipettesForInstrumentGroup(state)
+  const pipetteData = pipetteSelectors.getPipettesForInstrumentGroup(state)
   return {
     _values: fileSelectors.fileFormValues(state),
     isFormAltered: fileSelectors.isUnsavedMetadatFormAltered(state),

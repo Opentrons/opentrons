@@ -71,7 +71,7 @@ class LiquidPlacementModal extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: BaseState): SP => {
-  const containerId = selectors.getSelectedContainerId(state)
+  const containerId = selectors.getSelectedLabwareId(state)
   const selectedWells = wellSelectionSelectors.getSelectedWells(state)
   if (containerId === null) {
     console.error('LiquidPlacementModal: No labware is selected, and no labwareId was given to LiquidPlacementModal')
@@ -83,11 +83,11 @@ const mapStateToProps = (state: BaseState): SP => {
     }
   }
 
-  const labware = selectors.getLabware(state)[containerId]
+  const labware = selectors.getLabwareById(state)[containerId]
   let wellContents: ContentsByWell = {}
 
   // selection for deck setup: shows initial state of liquids
-  wellContents = wellContentsSelectors.wellContentsAllLabware(state)[containerId]
+  wellContents = wellContentsSelectors.getWellContentsAllLabware(state)[containerId]
 
   return {
     selectedWells,

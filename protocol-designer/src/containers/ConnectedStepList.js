@@ -19,7 +19,7 @@ type DP = $Diff<Props, SP>
 
 function mapStateToProps (state: BaseState): SP {
   return {
-    orderedSteps: steplistSelectors.orderedSteps(state),
+    orderedSteps: steplistSelectors.getOrderedSteps(state),
   }
 }
 

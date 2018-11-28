@@ -24,7 +24,7 @@ export default connect(mapStateToProps, null, mergeProps)(FileSidebar)
 function mapStateToProps (state: BaseState): SP & MP {
   const protocolName = fileDataSelectors.getFileMetadata(state)['protocol-name'] || 'untitled'
   const fileData = fileDataSelectors.createFile(state)
-  const canDownload = selectors.currentPage(state) !== 'file-splash'
+  const canDownload = selectors.getCurrentPage(state) !== 'file-splash'
 
   return {
     downloadData: (canDownload)
@@ -34,8 +34,8 @@ function mapStateToProps (state: BaseState): SP & MP {
       }
       : null,
     // Ignore clicking 'CREATE NEW' button in these cases
-    _canCreateNew: !selectors.newProtocolModal(state),
-    _hasUnsavedChanges: loadFileSelectors.hasUnsavedChanges(state),
+    _canCreateNew: !selectors.getNewProtocolModal(state),
+    _hasUnsavedChanges: loadFileSelectors.getHasUnsavedChanges(state),
   }
 }
 

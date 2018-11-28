@@ -24,10 +24,10 @@ export type {
 }
 
 const hydrateLabware = (state: StepFormContextualState, id: string) => (
-  labwareIngredSelectors.getLabware(state)[id]
+  labwareIngredSelectors.getLabwareById(state)[id]
 )
 const hydratePipette = (state: StepFormContextualState, id: string) => (
-  pipetteSelectors.pipettesById(state)[id]
+  pipetteSelectors.getPipettesById(state)[id]
 )
 
 type StepFieldHelpers = {
