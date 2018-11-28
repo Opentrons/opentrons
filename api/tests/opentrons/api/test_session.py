@@ -203,7 +203,6 @@ async def test_get_instruments_and_containers(labware_setup,
     modules = session.get_modules()
 
     assert [i.name for i in instruments] == ['p50_multi_v1', 'p1000_single_v1']
-    assert [i.axis for i in instruments] == ['a', 'b']
     assert [i.id for i in instruments] == [id(p50), id(p1000)]
     assert [[t.slot for t in i.tip_racks] for i in instruments] == \
         [['1', '4'], ['1', '4']]

@@ -32,10 +32,6 @@ class Instrument:
         self.name = instrument.name
         self.channels = instrument.channels
         self.mount = instrument.mount
-        # Although axis has been deprecated from the instrument
-        # we still need to pass it to the UI for now
-        # Warning: this does not correspond to the Smoothie axis!
-        self.axis = 'a' if self.mount == 'right' else 'b'
         self.tip_racks = [
             Container(container)
             for container in instrument.tip_racks]
