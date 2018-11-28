@@ -125,7 +125,6 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
     }
   }
 
-
   // TODO: BC 2018-11-26 move this check into step generation like blowoutDestination
   let disposalVolume = null
   let disposalDestination = null
@@ -143,7 +142,6 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
       disposalWell = 'A1'
     }
   }
-
 
   switch (stepType) {
     case 'transfer': {

@@ -215,6 +215,7 @@ describe('mix: advanced options', () => {
       volume,
       times,
       changeTip: 'always',
+      blowoutDestination: blowoutLabwareId,
       touchTip: true,
       wells: ['A1', 'B1', 'C1'],
     }

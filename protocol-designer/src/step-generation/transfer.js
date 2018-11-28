@@ -128,7 +128,6 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
             )
             : []
 
-
           const blowoutCommand = blowoutUtil(
             data.pipette,
             data.sourceLabware,
