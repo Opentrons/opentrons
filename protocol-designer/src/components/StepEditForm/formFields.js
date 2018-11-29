@@ -19,7 +19,7 @@ import {DISPOSAL_PERCENTAGE} from '../../steplist/formLevel/warnings'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
-} from '../../step-generation/blowout'
+} from '../../step-generation/utils'
 import type {ChangeTipOptions} from '../../step-generation/types'
 import type {BaseState, ThunkDispatch} from '../../types'
 import type {StepType} from '../../form-types'
@@ -157,14 +157,14 @@ export const PipetteField = connect(PipetteFieldSTP, PipetteFieldDTP)((props: Pi
     )} />
 ))
 
-type DisposalDestinationDropdownOP = {
+type BlowoutLocationDropdownOP = {
   name: StepFieldName,
   className?: string,
   includeSourceWell?: ?boolean,
   includeDestWell?: ?boolean,
 } & FocusHandlers
-type DisposalDestinationDropdownSP = {options: Options}
-const DisposalDestinationDropdownSTP = (state: BaseState, ownProps: DisposalDestinationDropdownOP): DisposalDestinationDropdownSP => {
+type BlowoutLocationDropdownSP = {options: Options}
+const BlowoutLocationDropdownSTP = (state: BaseState, ownProps: BlowoutLocationDropdownOP): BlowoutLocationDropdownSP => {
   let options = labwareIngredSelectors.disposalLabwareOptions(state)
   if (ownProps.includeDestWell) {
     options = [
@@ -180,7 +180,7 @@ const DisposalDestinationDropdownSTP = (state: BaseState, ownProps: DisposalDest
   }
   return {options}
 }
-export const DisposalDestinationDropdown = connect(DisposalDestinationDropdownSTP)((props: DisposalDestinationDropdownOP & DisposalDestinationDropdownSP) => {
+export const BlowoutLocationDropdown = connect(BlowoutLocationDropdownSTP)((props: BlowoutLocationDropdownOP & BlowoutLocationDropdownSP) => {
   const {options, name, className, focusedField, dirtyFields, onFieldBlur, onFieldFocus} = props
   return (
     <StepField

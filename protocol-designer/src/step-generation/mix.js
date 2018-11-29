@@ -1,11 +1,10 @@
 // @flow
 import flatMap from 'lodash/flatMap'
 import aspirate from './aspirate'
-import {blowoutUtil} from './blowout'
 import dispense from './dispense'
 import replaceTip from './replaceTip'
 import touchTip from './touchTip'
-import {repeatArray} from './utils'
+import {repeatArray, blowoutUtil} from './utils'
 import * as errorCreators from './errorCreators'
 import type {MixFormData, RobotState, CommandCreator, CompoundCommandCreator} from './'
 
@@ -93,7 +92,7 @@ const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: Robo
         well,
         data.labware,
         well,
-        data.blowoutDestination,
+        data.blowoutLocation,
       )
 
       const mixCommands = mixUtil(

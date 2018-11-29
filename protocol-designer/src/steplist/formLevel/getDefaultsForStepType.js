@@ -24,7 +24,7 @@ export default function getDefaultsForStepType (stepType: StepType) {
         'dispense_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
         'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
         'dispense_blowout_checkbox': false,
-        'dispense_blowout_labware': FIXED_TRASH_ID,
+        'dispense_blowout_location': FIXED_TRASH_ID,
         'dispense_wells': [],
         'volume': undefined,
       }
@@ -39,7 +39,7 @@ export default function getDefaultsForStepType (stepType: StepType) {
         'dispense_labware': null,
         'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
         'dispense_blowout_checkbox': false,
-        'dispense_blowout_labware': FIXED_TRASH_ID,
+        'dispense_blowout_location': FIXED_TRASH_ID,
         'dispense_wells': [],
         'volume': undefined,
       }
@@ -50,7 +50,7 @@ export default function getDefaultsForStepType (stepType: StepType) {
         'aspirate_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
         'aspirate_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
         'dispense_blowout_checkbox': false,
-        'dispense_blowout_labware': FIXED_TRASH_ID,
+        'dispense_blowout_location': FIXED_TRASH_ID,
         'wells': [],
         'mix_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE, // NOTE: mix uses dispense for both asp + disp, for now
         'volume': undefined,
@@ -59,7 +59,7 @@ export default function getDefaultsForStepType (stepType: StepType) {
       return {
         'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
         'aspirate_disposalVol_checkbox': true,
-        'aspirate_disposalVol_destination': FIXED_TRASH_ID,
+        'dispense_blowout_location': FIXED_TRASH_ID, // only blowout location for disposalVol
         'aspirate_labware': null,
         'aspirate_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
         'aspirate_wells': [],

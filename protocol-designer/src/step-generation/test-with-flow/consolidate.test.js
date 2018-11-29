@@ -99,7 +99,7 @@ describe('consolidate single-channel', () => {
     touchTipAfterDispense: false,
     mixInDestination: null,
     delayAfterDispense: null,
-    blowoutDestination: null,
+    blowoutLocation: null,
   }
 
   test('Minimal single-channel: A1 A2 to B1, 50uL with p300', () => {
@@ -329,7 +329,7 @@ describe('consolidate single-channel', () => {
       volume: 100,
       changeTip: 'once',
       mixInDestination: {times: 3, volume: 54},
-      blowoutDestination: 'trashId',
+      blowoutLocation: 'trashId',
     }
 
     const result = consolidate(data)(robotInitialState)
@@ -498,7 +498,7 @@ describe('consolidate multi-channel', () => {
     touchTipAfterDispense: false,
     mixInDestination: null,
     delayAfterDispense: null,
-    blowoutDestination: null,
+    blowoutLocation: null,
   }
 
   test('simple multi-channel: cols A1 A2 A3 A4 to col A12', () => {

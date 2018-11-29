@@ -3,7 +3,7 @@ import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import {aspirate, dispense, replaceTip, touchTip} from './'
 import {mixUtil} from './mix'
-import {blowoutUtil} from './blowout'
+import {blowoutUtil} from './utils'
 import * as errorCreators from './errorCreators'
 import {getPipetteWithTipMaxVol} from './robotStateSelectors'
 import type {ConsolidateFormData, RobotState, CommandCreator, CompoundCommandCreator} from './'
@@ -131,7 +131,7 @@ const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prev
         sourceWellChunk[0],
         data.destLabware,
         data.destWell,
-        data.blowoutDestination,
+        data.blowoutLocation,
       )
 
       return [

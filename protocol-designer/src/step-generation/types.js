@@ -59,7 +59,7 @@ export type ConsolidateFormData = {
   destWell: string,
 
   /** If given, blow out in the specified destination after dispense at the end of each asp-asp-dispense cycle */
-  blowoutDestination: ?string,
+  blowoutLocation: ?string,
 
   /** Mix in first well in chunk */
   mixFirstAspirate: ?MixArgs,
@@ -74,7 +74,7 @@ export type TransferFormData = {
   destWells: Array<string>,
 
   /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
-  blowoutDestination: ?string,
+  blowoutLocation: ?string,
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?MixArgs,
@@ -117,7 +117,7 @@ export type MixFormData = {
   changeTip: ChangeTipOptions,
 
   /** If given, blow out in the specified destination after mixing each well */
-  blowoutDestination: ?string,
+  blowoutLocation: ?string,
 
   /** offset from bottom of well in mm */
   aspirateOffsetFromBottomMm?: ?number,

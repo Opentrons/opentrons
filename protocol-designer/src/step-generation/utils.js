@@ -12,6 +12,7 @@ import type {
   RobotState,
   SourceAndDest,
   Timeline,
+  PipetteLabwareFields,
 } from './types'
 import blowout from './blowout'
 
@@ -217,17 +218,17 @@ export const blowoutUtil = (
   sourceWell: $PropertyType<PipetteLabwareFields, 'well'>,
   destLabware: $PropertyType<PipetteLabwareFields, 'labware'>,
   destWell: $PropertyType<PipetteLabwareFields, 'well'>,
-  blowoutDestination: ?string,
+  blowoutLocation: ?string,
 ): Array<CommandCreator> => {
-  if (!blowoutDestination) return []
-  let labware = blowoutDestination
+  if (!blowoutLocation) return []
+  let labware = blowoutLocation
   let well = 'A1'
 
   // TODO Ian 2018-05-04 more explicit test for non-trash blowout destination
-  if (blowoutDestination === SOURCE_WELL_BLOWOUT_DESTINATION) {
+  if (blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
     labware = sourceLabware
     well = sourceWell
-  } else if (blowoutDestination === DEST_WELL_BLOWOUT_DESTINATION) {
+  } else if (blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION) {
     labware = destLabware
     well = destWell
   }

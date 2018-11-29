@@ -8,7 +8,7 @@ import {
   StepCheckboxRow,
   DispenseDelayFields,
   PipetteField,
-  DisposalDestinationDropdown,
+  BlowoutLocationDropdown,
   LabwareDropdown,
   ChangeTipField,
 } from './formFields'
@@ -84,11 +84,10 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                       {value
                         ? <div className={styles.field_row}>
                           <div className={styles.sub_select_label}>Blowout</div>
-                          <DisposalDestinationDropdown
-                            name="aspirate_disposalVol_destination"
+                          <BlowoutLocationDropdown
+                            name="dispense_blowout_location"
                             className={styles.full_width}
-                            includeSourceWell={stepType === 'transfer'}
-                            includeDestWell
+                            includeSourceWell
                             {...focusHandlers} />
                         </div>
                         : null
@@ -155,9 +154,10 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                 focusHandlers={focusHandlers} />
               {stepType !== 'distribute' &&
                 <StepCheckboxRow name='dispense_blowout_checkbox' label='Blow out'>
-                  <DisposalDestinationDropdown
-                    name="dispense_blowout_labware"
+                  <BlowoutLocationDropdown
+                    name="dispense_blowout_location"
                     className={styles.full_width}
+                    includeSourceWell={stepType === 'transfer'}
                     includeDestWell
                     {...focusHandlers} />
                 </StepCheckboxRow>

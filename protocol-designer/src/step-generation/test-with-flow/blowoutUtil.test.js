@@ -26,6 +26,7 @@ describe('blowoutUtil', () => {
   beforeEach(() => {
     // $FlowFixMe
     _blowout.mockClear()
+    // $FlowFixMe
     _blowout.mockReturnValue('return value from blowout')
   })
 
@@ -56,7 +57,7 @@ describe('blowoutUtil', () => {
     })
   })
 
-  test('blowoutUtil returns an empty array if not given a blowoutDestination', () => {
+  test('blowoutUtil returns an empty array if not given a blowoutLocation', () => {
     const result = blowoutUtil(...blowoutArgs, null)
     expect(_blowout).not.toHaveBeenCalled()
     expect(result).toEqual([])

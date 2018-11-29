@@ -9,7 +9,6 @@ export type StepFieldName =
   | 'aspirate_airGap_volume'
   | 'aspirate_changeTip'
   | 'aspirate_disposalVol_checkbox'
-  | 'aspirate_disposalVol_destination'
   | 'aspirate_disposalVol_volume'
   | 'aspirate_flowRate'
   | 'aspirate_labware'
@@ -25,7 +24,7 @@ export type StepFieldName =
   | 'aspirate_wells'
   | 'changeTip'
   | 'dispense_blowout_checkbox'
-  | 'dispense_blowout_labware'
+  | 'dispense_blowout_location'
   | 'dispense_delay_checkbox'
   | 'dispense_delayMinutes'
   | 'dispense_delaySeconds'
@@ -82,7 +81,7 @@ export type DelayFields = {|
 
 export type BlowoutFields = {|
   'dispense_blowout_checkbox'?: boolean,
-  'dispense_blowout_labware'?: string,
+  'dispense_blowout_location'?: string,
 |}
 
 export type ChangeTipFields = {|
