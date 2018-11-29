@@ -37,7 +37,10 @@ function SettingsApp (props: Props) {
             <OutlineButton
               className={styles.button}
               disabled={!canClearHintDismissals}
-              onClick={restoreHints}>{i18n.t('button.restore')}</OutlineButton>
+              onClick={restoreHints}
+            >
+              {canClearHintDismissals ? i18n.t('button.restore') : i18n.t('button.restored') }
+            </OutlineButton>
           </div>
         </div>
       </Card>
