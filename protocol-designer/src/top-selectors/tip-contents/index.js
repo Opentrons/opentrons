@@ -37,7 +37,7 @@ function getTipHighlighted (
       const channels = StepGeneration.getPipetteChannels(pipetteId, robotState)
 
       if (!labwareType) {
-        console.error(`Labware ${labwareId} missing labwareName. Could not get tip highlight state`)
+        console.error(`Labware ${labwareId} missing labwareType. Could not get tip highlight state`)
         return false
       } else if (channels === 1) {
         return commandWellName === wellName
