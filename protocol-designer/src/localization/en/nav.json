@@ -1,5 +1,6 @@
 {
   "settings": {
+    "app": "APP",
     "privacy": "PRIVACY",
     "feature_flags": "Feature Flags"
   },
@@ -8,7 +9,7 @@
     "file": "FILE",
     "help": "HELP",
     "liquids": "LIQUIDS",
-    "settings": "SETTINGS"
+    "settings": "Settings"
   },
   "terminal_item": {
     "__initial_setup__": "Starting Deck State",
@@ -16,12 +17,12 @@
   },
   "title": {
     "settings-features": "Opentrons Beta",
-    "settings-privacy": "Opentrons Beta",
+    "settings-app": "Opentrons Beta",
     "file-splash": "Opentrons Beta"
   },
   "subtitle": {
     "file-detail": "File Details",
-    "settings-privacy": "Privacy",
+    "settings-app": "App Settings",
     "liquids": "Liquids"
   }
 }

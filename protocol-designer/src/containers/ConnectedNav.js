@@ -49,8 +49,8 @@ function Nav (props: Props) {
           <NavTab
             iconName='settings'
             title={i18n.t('nav.tab_name.settings')}
-            selected={props.currentPage === 'settings-privacy'}
-            onClick={props.handleClick('settings-privacy')} />
+            selected={props.currentPage === 'settings-app'}
+            onClick={props.handleClick('settings-app')} />
         </React.Fragment>
       }
     />

@@ -23,3 +23,7 @@ export const removeHint = (hintKey: HintKey, rememberDismissal: boolean): Remove
   type: 'REMOVE_HINT',
   payload: {hintKey, rememberDismissal},
 })
+
+export const clearAllHintDismissals = () => ({
+  type: 'CLEAR_ALL_HINT_DISMISSALS',
+})
