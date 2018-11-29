@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import moment from 'moment'
 import {
   Card,
   FormGroup,
@@ -27,6 +28,11 @@ export type Props = {
 
 type State = { isEditPipetteModalOpen: boolean }
 
+// TODO IMMEDIATELY don't use placeholder, really pass in the timestamp
+const todo_placeholder = 92345678
+const DATE_ONLY_FORMAT = 'MMM DD, YYYY'
+const DATETIME_FORMAT = 'MMM DD, YYYY | h:mm A'
+
 class FilePage extends React.Component<Props, State> {
   state = {isEditPipetteModalOpen: false}
 
@@ -47,6 +53,16 @@ class FilePage extends React.Component<Props, State> {
       <div className={styles.file_page}>
         <Card title='Information'>
           <form onSubmit={this.handleSubmit} className={styles.card_content}>
+            <div className={cx(formStyles.row_wrapper, formStyles.stacked_row)}>
+              <FormGroup label='Date Created:' className={formStyles.column_1_2}>
+                {moment(todo_placeholder).format(DATE_ONLY_FORMAT)}
+              </FormGroup>
+
+              <FormGroup label='Last Exported:' className={formStyles.column_1_2}>
+                {moment(todo_placeholder).format(DATETIME_FORMAT)}
+              </FormGroup>
+            </div>
+
             <div className={cx(formStyles.row_wrapper, formStyles.stacked_row)}>
               <FormGroup label='Protocol Name:' className={formStyles.column_1_2}>
                 <InputField placeholder='Untitled' {...formConnector('protocol-name')} />
