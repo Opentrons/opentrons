@@ -29,21 +29,20 @@ type SubstepTimelineAcc = {
   timeline: Array<SubstepTimelineFrame>,
   errors: ?Array<CommandCreatorError>,
   prevActiveTips: ?TipLocation,
+  prevRobotState: RobotState,
 }
 
 const substepTimelineSingle = (commandCreators: Array<CommandCreator>) =>
   (initialRobotState: RobotState): Array<SubstepTimelineFrame> => {
-    let prevRobotState = initialRobotState
     const timeline = commandCreators.reduce((acc: SubstepTimelineAcc, commandCreator: CommandCreator, index: number) => {
       // error short-circuit
       if (acc.errors) return acc
 
-      const nextFrame = commandCreator(prevRobotState)
+      const nextFrame = commandCreator(acc.prevRobotState)
 
       if (nextFrame.errors) {
         return {...acc, errors: nextFrame.errors}
       }
-      prevRobotState = nextFrame.robotState
 
       // NOTE: only aspirate and dispense commands will appear alone in atomic commands
       // from compound command creators (e.g. transfer, distribute, etc.)
@@ -59,7 +58,7 @@ const substepTimelineSingle = (commandCreators: Array<CommandCreator>) =>
         const wellInfo = {
           labware,
           wells: [well],
-          preIngreds: prevRobotState.liquidState.labware[labware][well],
+          preIngreds: acc.prevRobotState.liquidState.labware[labware][well],
           postIngreds: nextFrame.robotState.liquidState.labware[labware][well],
         }
         const ingredKey = commandGroup.command === 'aspirate' ? 'source' : 'dest'
@@ -73,11 +72,15 @@ const substepTimelineSingle = (commandCreators: Array<CommandCreator>) =>
               activeTips: acc.prevActiveTips,
             },
           ],
+          prevRobotState: nextFrame.robotState,
         }
       } else {
-        return _conditionallyUpdateActiveTips(acc, nextFrame)
+        return {
+          ..._conditionallyUpdateActiveTips(acc, nextFrame),
+          prevRobotState: nextFrame.robotState,
+        }
       }
-    }, {timeline: [], errors: null, prevActiveTips: null})
+    }, {timeline: [], errors: null, prevActiveTips: null, prevRobotState: initialRobotState})
 
     return timeline.timeline
   }
@@ -90,14 +93,14 @@ const substepTimeline = (
   if (context.channels === 1) {
     return substepTimelineSingle(commandCreators)
   } else {
+    // timeline for multi-channel substep context
     return (
       (initialRobotState: RobotState): Array<SubstepTimelineFrame> => {
-        let prevRobotState = initialRobotState
         const timeline = commandCreators.reduce((acc: SubstepTimelineAcc, commandCreator: CommandCreator, index: number) => {
           // error short-circuit
           if (acc.errors) return acc
 
-          const nextFrame = commandCreator(prevRobotState)
+          const nextFrame = commandCreator(acc.prevRobotState)
 
           if (nextFrame.errors) {
             return {...acc, errors: nextFrame.errors}
@@ -117,10 +120,10 @@ const substepTimeline = (
             const wellInfo = {
               labware,
               wells: wellsForTips || [],
-              preIngreds: wellsForTips ? pick(prevRobotState.liquidState.labware[labware], wellsForTips) : {},
+              preIngreds: wellsForTips ? pick(acc.prevRobotState.liquidState.labware[labware], wellsForTips) : {},
               postIngreds: wellsForTips ? pick(nextFrame.robotState.liquidState.labware[labware], wellsForTips) : {},
             }
-            prevRobotState = nextFrame.robotState
+
             const ingredKey = firstCommand.command === 'aspirate' ? 'source' : 'dest'
             return {
               ...acc,
@@ -132,11 +135,15 @@ const substepTimeline = (
                   activeTips: acc.prevActiveTips,
                 },
               ],
+              prevRobotState: nextFrame.robotState,
             }
           } else {
-            return _conditionallyUpdateActiveTips(acc, nextFrame)
+            return {
+              ..._conditionallyUpdateActiveTips(acc, nextFrame),
+              prevRobotState: nextFrame.robotState,
+            }
           }
-        }, {timeline: [], errors: null, prevActiveTips: null})
+        }, {timeline: [], errors: null, prevActiveTips: null, prevRobotState: initialRobotState})
 
         return timeline.timeline
       }
