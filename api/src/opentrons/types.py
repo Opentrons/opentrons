@@ -34,6 +34,9 @@ class Point(NamedTuple):
             return NotImplemented
         return Point(self.x - other.x, self.y - other.y, self.z - other.z)
 
+    def __str__(self):
+        return '({}, {}, {})'.format(self.x, self.y, self.z)
+
 
 class Location(NamedTuple):
     """ A location to target as a motion in the :ref:`protocol-api`.

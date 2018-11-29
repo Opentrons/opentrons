@@ -182,6 +182,9 @@ def test_pick_up_tip_no_location(loop, load_my_labware):
 
     instr.pick_up_tip()
 
+    assert 'picking up tip' in ','.join([cmd.lower()
+                                         for cmd in ctx.commands()])
+
     new_offset = model_offset - Point(0, 0, tip_lenth1)
     assert pipette.critical_point() == new_offset
 
@@ -237,6 +240,7 @@ def test_aspirate(loop, load_my_labware, monkeypatch):
     monkeypatch.setattr(ctx._hardware._api, 'move_to', fake_move)
 
     instr.aspirate(2.0, lw.wells()[0].bottom())
+    assert 'aspirating' in ','.join([cmd.lower() for cmd in ctx.commands()])
 
     assert asp_called_with == (Mount.RIGHT, 2.0, 1.0)
     assert move_called_with == (Mount.RIGHT, lw.wells()[0].bottom().point)
@@ -274,7 +278,7 @@ def test_dispense(loop, load_my_labware, monkeypatch):
     monkeypatch.setattr(ctx._hardware._api, 'move_to', fake_move)
 
     instr.dispense(2.0, lw.wells()[0].bottom())
-
+    assert 'dispensing' in ','.join([cmd.lower() for cmd in ctx.commands()])
     assert disp_called_with == (Mount.RIGHT, 2.0, 1.0)
     assert move_called_with == (Mount.RIGHT, lw.wells()[0].bottom().point)
 
@@ -304,10 +308,14 @@ def test_tempdeck(loop, monkeypatch):
     assert ctx.deck[1] == mod._geometry
     assert mod.target is None
     mod.set_temperature(20)
-    assert mod.target == 20
+    assert 'setting temperature' in ','.join([cmd.lower()
+                                              for cmd in ctx.commands()])
     mod.wait_for_temp()
+    assert mod.target == 20
     assert mod.temperature == 20
     mod.deactivate()
+    assert 'deactivating temperature' in ','.join([cmd.lower()
+                                                   for cmd in ctx.commands()])
     assert mod.target is None
     mod.set_temperature(0)
     assert mod.target == 0
@@ -322,10 +330,16 @@ def test_magdeck(loop, monkeypatch):
     with pytest.raises(ValueError):
         mod.engage()
     mod.engage(2)
+    assert 'engaging magnetic' in ','.join([cmd.lower()
+                                            for cmd in ctx.commands()])
     assert mod.status == 'engaged'
     mod.disengage()
+    assert 'disengaging magnetic' in ','.join([cmd.lower()
+                                               for cmd in ctx.commands()])
     assert mod.status == 'disengaged'
     mod.calibrate()
+    assert 'calibrating magnetic' in ','.join([cmd.lower()
+                                               for cmd in ctx.commands()])
 
 
 def test_module_load_labware(loop, monkeypatch):
