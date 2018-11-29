@@ -1,8 +1,8 @@
 // @flow
-import updateLiquidState from './aspirateUpdateLiquidState'
-import * as errorCreators from './errorCreators'
-import {getPipetteWithTipMaxVol} from './robotStateSelectors'
-import type {RobotState, CommandCreator, CommandCreatorError, AspirateDispenseArgs} from './'
+import updateLiquidState from '../../aspirateUpdateLiquidState'
+import * as errorCreators from '../../errorCreators'
+import {getPipetteWithTipMaxVol} from '../../robotStateSelectors'
+import type {RobotState, CommandCreator, CommandCreatorError, AspirateDispenseArgs} from '../../types'
 
 /** Aspirate with given args. Requires tip. */
 const aspirate = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState: RobotState) => {

@@ -1,8 +1,8 @@
 // @flow
-import * as errorCreators from './errorCreators'
-import type {RobotState, CommandCreator, CommandCreatorError, PipetteLabwareFields} from './'
+import * as errorCreators from '../../errorCreators'
+import type {RobotState, CommandCreator, CommandCreatorError, PipetteLabwareFields} from '../../types'
 
-import updateLiquidState from './dispenseUpdateLiquidState'
+import updateLiquidState from '../../dispenseUpdateLiquidState'
 
 const blowout = (args: PipetteLabwareFields): CommandCreator => (prevRobotState: RobotState) => {
   /** Blowout with given args. Requires tip. */

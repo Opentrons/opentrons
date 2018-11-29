@@ -1,7 +1,7 @@
 // @flow
-import * as errorCreators from './errorCreators'
-import updateLiquidState from './dispenseUpdateLiquidState'
-import type {RobotState, CommandCreator, CommandCreatorError, AspirateDispenseArgs} from './'
+import * as errorCreators from '../../errorCreators'
+import updateLiquidState from '../../dispenseUpdateLiquidState'
+import type {RobotState, CommandCreator, CommandCreatorError, AspirateDispenseArgs} from '../../types'
 
 /** Dispense with given args. Requires tip. */
 const dispense = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState: RobotState) => {

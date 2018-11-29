@@ -1,6 +1,6 @@
 // @flow
-import type {CommandCreator, RobotState} from './'
-import {reduceCommandCreators} from './utils'
+import type {CommandCreator, RobotState} from '../../types'
+import {reduceCommandCreators} from '../../utils'
 import dropTip from './dropTip'
 
 /** Drop all tips from equipped pipettes.

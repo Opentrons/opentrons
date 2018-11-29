@@ -1,12 +1,12 @@
 // @flow
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
-import {FIXED_TRASH_ID} from '../constants'
-import {aspirate, dispense, blowout, replaceTip, touchTip} from './'
+import {FIXED_TRASH_ID} from '../../../constants'
+import * as errorCreators from '../../errorCreators'
+import {getPipetteWithTipMaxVol} from '../../robotStateSelectors'
+import type {ConsolidateFormData, RobotState, CommandCreator, CompoundCommandCreator} from '../../types'
+import {aspirate, dispense, blowout, replaceTip, touchTip} from '../atomic'
 import {mixUtil} from './mix'
-import * as errorCreators from './errorCreators'
-import {getPipetteWithTipMaxVol} from './robotStateSelectors'
-import type {ConsolidateFormData, RobotState, CommandCreator, CompoundCommandCreator} from './'
 
 const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prevRobotState: RobotState) => {
   /**

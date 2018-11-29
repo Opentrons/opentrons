@@ -1,14 +1,11 @@
 // @flow
 import flatMap from 'lodash/flatMap'
 import zip from 'lodash/zip'
-import aspirate from './aspirate'
-import dispense from './dispense'
+import * as errorCreators from '../../errorCreators'
+import {getPipetteWithTipMaxVol} from '../../robotStateSelectors'
+import type {TransferFormData, RobotState, CommandCreator, CompoundCommandCreator} from '../../types'
+import {aspirate, dispense, replaceTip, touchTip} from '../atomic'
 import {mixUtil} from './mix'
-import replaceTip from './replaceTip'
-import touchTip from './touchTip'
-import * as errorCreators from './errorCreators'
-import {getPipetteWithTipMaxVol} from './robotStateSelectors'
-import type {TransferFormData, RobotState, CommandCreator, CompoundCommandCreator} from './'
 
 const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotState: RobotState) => {
   /**

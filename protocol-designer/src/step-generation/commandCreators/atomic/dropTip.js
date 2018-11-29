@@ -1,8 +1,8 @@
 // @flow
-import type {CommandCreator, RobotState} from './'
-import {FIXED_TRASH_ID} from '../constants'
+import type {CommandCreator, RobotState} from '../../types'
+import {FIXED_TRASH_ID} from '../../../constants'
 import cloneDeep from 'lodash/cloneDeep'
-import updateLiquidState from './dispenseUpdateLiquidState'
+import updateLiquidState from '../../dispenseUpdateLiquidState'
 
 const dropTip = (pipetteId: string): CommandCreator => (prevRobotState: RobotState) => {
   // No-op if there is no tip
