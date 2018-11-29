@@ -40,9 +40,14 @@
   justify-content: space-between;
 }
 
+.new_file_modal_title {
+  @apply --font-header-dark;
+}
+
 .beta_restrictions {
+  @apply --font-body-2-dark;
+
   margin: 1rem 0;
-  font-size: var(--fs-body-2);
 }
 
 .button_row {
