@@ -13,9 +13,13 @@ import type {
   SourceAndDest,
   Timeline,
 } from './types'
+import blowout from './blowout'
 
 import {AIR} from '@opentrons/components'
 export {AIR}
+
+export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
+export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
 
 export function repeatArray<T> (array: Array<T>, repeats: number): Array<T> {
   return flatMap(range(repeats), (i: number): Array<T> => array)
@@ -205,4 +209,27 @@ export function totalVolume (location: LocationLiquidState): number {
       ? acc + (location[ingredId].volume || 0)
       : acc
   }, 0)
+}
+
+export const blowoutUtil = (
+  pipette: $PropertyType<PipetteLabwareFields, 'pipette'>,
+  sourceLabware: $PropertyType<PipetteLabwareFields, 'labware'>,
+  sourceWell: $PropertyType<PipetteLabwareFields, 'well'>,
+  destLabware: $PropertyType<PipetteLabwareFields, 'labware'>,
+  destWell: $PropertyType<PipetteLabwareFields, 'well'>,
+  blowoutDestination: ?string,
+): Array<CommandCreator> => {
+  if (!blowoutDestination) return []
+  let labware = blowoutDestination
+  let well = 'A1'
+
+  // TODO Ian 2018-05-04 more explicit test for non-trash blowout destination
+  if (blowoutDestination === SOURCE_WELL_BLOWOUT_DESTINATION) {
+    labware = sourceLabware
+    well = sourceWell
+  } else if (blowoutDestination === DEST_WELL_BLOWOUT_DESTINATION) {
+    labware = destLabware
+    well = destWell
+  }
+  return [blowout({pipette: pipette, labware, well})]
 }
