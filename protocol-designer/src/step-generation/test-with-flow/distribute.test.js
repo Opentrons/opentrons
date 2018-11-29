@@ -1,5 +1,5 @@
 // @flow
-import _distribute from '../distribute'
+import _distribute from '../commandCreators/compound/distribute'
 // import merge from 'lodash/merge'
 import {
   createRobotState,

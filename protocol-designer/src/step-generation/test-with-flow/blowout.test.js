@@ -1,6 +1,6 @@
 // @flow
 import {expectTimelineError} from './testMatchers'
-import _blowout from '../blowout'
+import _blowout from '../commandCreators/atomic/blowout'
 import {createRobotState, commandCreatorNoErrors, commandCreatorHasErrors} from './fixtures'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'

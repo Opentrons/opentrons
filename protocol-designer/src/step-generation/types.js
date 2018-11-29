@@ -292,3 +292,8 @@ export type Timeline = {|
   timeline: Array<CommandsAndRobotState>, // TODO: Ian 2018-06-14 avoid timeline.timeline shape, better names
   errors?: ?Array<CommandCreatorError>,
 |}
+
+export type RobotStateAndWarnings = {
+  robotState: RobotState,
+  warnings: Array<CommandCreatorWarning>,
+}

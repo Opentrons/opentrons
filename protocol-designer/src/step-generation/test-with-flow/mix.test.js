@@ -1,5 +1,5 @@
 // @flow
-import _mix from '../mix'
+import _mix from '../commandCreators/compound/mix'
 import {
   createRobotState,
   compoundCommandCreatorNoErrors,

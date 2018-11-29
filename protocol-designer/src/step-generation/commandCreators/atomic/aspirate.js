@@ -1,5 +1,5 @@
 // @flow
-import updateLiquidState from '../../aspirateUpdateLiquidState'
+import getNextRobotStateAndWarnings from '../../getNextRobotStateAndWarnings'
 import * as errorCreators from '../../errorCreators'
 import {getPipetteWithTipMaxVol} from '../../robotStateSelectors'
 import type {RobotState, CommandCreator, CommandCreatorError, AspirateDispenseArgs} from '../../types'
@@ -51,26 +51,9 @@ const aspirate = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState
     },
   }]
 
-  const liquidStateAndWarnings = updateLiquidState({
-    pipetteId: pipette,
-    pipetteData: prevRobotState.instruments[pipette],
-    labwareId: labware,
-    labwareType: prevRobotState.labware[labware].type,
-    volume,
-    well,
-  }, prevRobotState.liquidState)
-
-  const {liquidState, warnings: liquidUpdateWarnings} = liquidStateAndWarnings
-
-  const robotState = {
-    ...prevRobotState,
-    liquidState,
-  }
-
   return {
     commands,
-    robotState,
-    warnings: liquidUpdateWarnings,
+    ...getNextRobotStateAndWarnings(commands[0], prevRobotState),
   }
 }
 

@@ -7,7 +7,7 @@ import {
   commandCreatorNoErrors,
   commandFixtures as cmd,
 } from './fixtures'
-import _replaceTip from '../replaceTip'
+import _replaceTip from '../commandCreators/atomic/replaceTip'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
 

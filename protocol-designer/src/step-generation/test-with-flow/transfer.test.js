@@ -6,7 +6,7 @@ import {
   compoundCommandCreatorHasErrors,
   commandFixtures as cmd,
 } from './fixtures'
-import _transfer from '../transfer'
+import _transfer from '../commandCreators/compound/transfer'
 
 const transfer = compoundCommandCreatorNoErrors(_transfer)
 const transferWithErrors = compoundCommandCreatorHasErrors(_transfer)

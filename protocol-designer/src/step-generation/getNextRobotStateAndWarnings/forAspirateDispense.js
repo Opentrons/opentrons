@@ -1,31 +1,26 @@
 // @flow
 import range from 'lodash/range'
 import isEmpty from 'lodash/isEmpty'
-import {mergeLiquid, splitLiquid, getWellsForTips, totalVolume} from './utils'
-import * as warningCreators from './warningCreators'
+import {mergeLiquid, splitLiquid, getWellsForTips, totalVolume} from '../utils'
+import * as warningCreators from '../warningCreators'
 import type {
   RobotState,
-  PipetteData,
   SingleLabwareLiquidState,
   CommandCreatorWarning,
-} from './'
+  AspirateDispenseArgs,
+  RobotStateAndWarnings,
+} from '../types'
 
-type LiquidState = $PropertyType<RobotState, 'liquidState'>
+export default function getNextRobotStateAndWarningsForAspDisp (
+  args: AspirateDispenseArgs,
+  prevRobotState: RobotState
+): RobotStateAndWarnings {
+  const {pipette: pipetteId, volume, labware: labwareId, well} = args
 
-type LiquidStateAndWarnings = {liquidState: LiquidState, warnings: Array<CommandCreatorWarning>}
+  const {liquidState: prevLiquidState} = prevRobotState
+  const pipetteData = prevRobotState.instruments[pipetteId]
+  const labwareType = prevRobotState.labware[labwareId].type
 
-export default function updateLiquidState (
-  args: {
-    pipetteId: string,
-    pipetteData: PipetteData,
-    volume: number,
-    labwareId: string,
-    labwareType: string,
-    well: string,
-  },
-  prevLiquidState: LiquidState
-): LiquidStateAndWarnings {
-  const {pipetteId, pipetteData, volume, labwareId, labwareType, well} = args
   const {wellsForTips} = getWellsForTips(pipetteData.channels, labwareType, well)
 
   // Blend tip's liquid contents (if any) with liquid of the source
@@ -89,7 +84,10 @@ export default function updateLiquidState (
   }
 
   return {
-    liquidState: nextLiquidState,
+    robotState: {
+      ...prevRobotState,
+      liquidState: nextLiquidState,
+    },
     warnings: pipetteWarnings,
   }
 }
