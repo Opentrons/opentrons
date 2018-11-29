@@ -5,11 +5,13 @@ import {
   LabwareContainer,
   ContainerNameOverlay,
   EmptyDeckSlot,
-  SLOT_WIDTH_MM,
-  SLOT_HEIGHT_MM,
   humanizeLabwareType,
   type DeckSlot,
 } from '@opentrons/components'
+import {
+  SLOT_RENDER_WIDTH,
+  SLOT_RENDER_HEIGHT,
+} from '@opentrons/shared-data'
 import styles from './labware.css'
 
 import ClickableText from './ClickableText'
@@ -68,7 +70,7 @@ function SlotWithLabware (props: SlotWithLabwareProps) {
       {labwareImages[containerType]
         ? <image
           href={labwareImages[containerType]}
-          width={SLOT_WIDTH_MM} height={SLOT_HEIGHT_MM}
+          width={SLOT_RENDER_WIDTH} height={SLOT_RENDER_HEIGHT}
         />
         : <HighlightableLabware containerId={containerId} />
       }

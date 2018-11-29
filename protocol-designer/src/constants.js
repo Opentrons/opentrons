@@ -3,13 +3,12 @@ import reduce from 'lodash/reduce'
 import * as componentLib from '@opentrons/components'
 import {getLabware} from '@opentrons/shared-data'
 import type {JsonWellData, WellVolumes} from './types'
+// TODO Ian 2018-11-27: import these from components lib, not from this contants file
 export const {
   // OT2 DECK CONSTANTS
   SLOTNAME_MATRIX,
   sortedSlotnames,
   TRASH_SLOTNAME,
-  SLOT_WIDTH_MM,
-  SLOT_HEIGHT_MM,
   SLOT_SPACING_MM,
   // STYLE CONSTANTS
   swatchColors,
