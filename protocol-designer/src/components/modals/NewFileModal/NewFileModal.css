@@ -42,6 +42,8 @@
 
 .new_file_modal_title {
   @apply --font-header-dark;
+
+  margin-bottom: 1rem;
 }
 
 .beta_restrictions {

@@ -96,7 +96,6 @@ export default class NewFileModal extends React.Component<Props, State> {
         className={cx(modalStyles.modal, styles.new_file_modal)}>
         <form onSubmit={() => { canSubmit && this.handleSubmit() }}>
           <h2 className={styles.new_file_modal_title}>Create New Protocol</h2>
-
           <FormGroup className={formStyles.stacked_row} label='Name:'>
             <InputField
               autoFocus
