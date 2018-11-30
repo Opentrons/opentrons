@@ -412,7 +412,10 @@ describe('api client', () => {
           slot: '1',
           name: 'a',
           type: 'tiprack',
-          instruments: [{mount: 'right'}],
+          instruments: [
+            {mount: 'left', channels: 8},
+            {mount: 'right', channels: 1},
+          ],
         },
         {_id: 2, slot: '5', name: 'b', type: 'B'},
         {_id: 3, slot: '9', name: 'c', type: 'C'},
