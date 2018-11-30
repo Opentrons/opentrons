@@ -32,7 +32,7 @@ import type {
 import * as actions from '../actions'
 import {getPDMetadata} from '../../file-types'
 import type {BaseState, Options} from '../../types'
-import type {LoadFileAction} from '../../load-file'
+import type {LoadFileAction, NewProtocolFields} from '../../load-file'
 import type {
   RemoveWellsContents,
   DeleteLiquidGroup,
@@ -194,6 +194,30 @@ export const containers = handleActions({
         },
       }
     }, {})
+  },
+  CREATE_NEW_PROTOCOL: (
+    state: ContainersState,
+    action: {payload: NewProtocolFields}
+  ): ContainersState => {
+    const initialTipracks = [action.payload.left, action.payload.right].reduce((acc, mount) => {
+      if (mount.tiprackModel) {
+        const id = `${uuid()}:${String(mount.tiprackModel)}`
+        return {
+          ...acc,
+          [id]: {
+            slot: nextEmptySlot(_loadedContainersBySlot({...state, ...acc})),
+            type: mount.tiprackModel,
+            disambiguationNumber: getNextDisambiguationNumber({...state, ...acc}, String(mount.tiprackModel)),
+            id,
+            name: null, // create with null name, so we force explicit naming.
+          },
+        }
+      }
+    }, {})
+    return {
+      ...state,
+      ...initialTipracks,
+    }
   },
 }, initialLabwareState)
 
