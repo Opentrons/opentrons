@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
+import { DragSource, DropTarget } from 'react-dnd'
 import {
   LabwareContainer,
   ContainerNameOverlay,
@@ -20,6 +21,59 @@ import NameThisLabwareOverlay from './NameThisLabwareOverlay'
 import DisabledSelectSlotOverlay from './DisabledSelectSlotOverlay'
 import BrowseLabwareOverlay from './BrowseLabwareOverlay'
 import {type TerminalItemId, START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID} from '../../steplist'
+
+// TODO: consolidate with DraggableStepItems DND_TYPES
+const DND_TYPES: {LABWARE: "LABWARE"} = {
+  LABWARE: 'LABWARE',
+}
+
+type DragDropLabwareProps = React.ElementProps<typeof LabwareContainer> & {
+  connectDragSource: mixed => React.Element<any>,
+  connectDropTarget: mixed => React.Element<any>,
+  slot: DeckSlot,
+  onDrag: () => void,
+  moveLabware: (DeckSlot, DeckSlot) => void,
+}
+const DragSourceLabware = (props: DragDropLabwareProps) => (
+  props.connectDragSource(
+    props.connectDropTarget(
+      <g style={{opacity: props.isDragging ? 0.3 : 1}}>
+        <LabwareContainer slot={props.slot} highlighted={props.highlighted}>
+          {props.labwareOrSlot}
+          {props.overlay}
+        </LabwareContainer>
+      </g >
+    )
+  )
+)
+
+const labwareSource = {
+  beginDrag: (props) => {
+    props.onDrag()
+    return {slot: props.slot}
+  },
+}
+const collectLabwareSource = (connect, monitor) => ({
+  connectDragSource: connect.dragSource(),
+  isDragging: monitor.isDragging(),
+})
+const DraggableLabware = DragSource(DND_TYPES.LABWARE, labwareSource, collectLabwareSource)(DragSourceLabware)
+
+const labwareTarget = {
+  canDrop: () => { return false },
+  hover: (props: DragDropLabwareProps, monitor) => {
+    const { slot: draggedSlot } = monitor.getItem()
+    const { slot: overSlot } = props
+
+    if (draggedSlot !== overSlot) {
+      props.moveLabware(draggedSlot, overSlot)
+    }
+  },
+}
+const collectLabwareTarget = (connect) => ({
+  connectDropTarget: connect.dropTarget(),
+})
+const DragDropLabware = DropTarget(DND_TYPES.LABWARE, labwareTarget, collectLabwareTarget)(DraggableLabware)
 
 function LabwareDeckSlotOverlay ({
   canAddIngreds,
@@ -236,10 +290,10 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
       : <EmptyDeckSlot slot={slot} />
 
     return (
-      <LabwareContainer {...{slot, highlighted}}>
-        {labwareOrSlot}
-        {overlay}
-      </LabwareContainer>
+      <DragDropLabware
+        onDrag={() => { console.log('DRUGged') }}
+        moveLabware={() => { console.log('moveHandled') }}
+        {...{slot, highlighted, labwareOrSlot, overlay}} />
     )
   }
 }

@@ -10049,6 +10049,10 @@ react-dnd-html5-backend@^6.0.0:
     dnd-core "^6.0.0"
     lodash "^4.17.11"
 
+react-dnd-mouse-backend@^1.0.0-rc.1:
+  version "1.0.0-rc.1"
+  resolved "https://registry.yarnpkg.com/react-dnd-mouse-backend/-/react-dnd-mouse-backend-1.0.0-rc.1.tgz#dcbc0bd51a62a9681f42a43246e2a242ede9035b"
+
 react-dnd@^6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/react-dnd/-/react-dnd-6.0.0.tgz#0780eafaa47293bf12dc8f79cf1e48ede8ba72f1"

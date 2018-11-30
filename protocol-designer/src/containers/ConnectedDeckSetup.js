@@ -1,6 +1,8 @@
 // @flow
 import React from 'react'
 import {connect} from 'react-redux'
+import MouseBackEnd from 'react-dnd-mouse-backend'
+import { DragDropContext } from 'react-dnd'
 
 import {Deck, ClickOutside} from '@opentrons/components'
 import styles from './Deck.css'
@@ -109,4 +111,4 @@ class DeckSetup extends React.Component<Props> {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(DeckSetup)
+export default DragDropContext(MouseBackEnd)(connect(mapStateToProps, mapDispatchToProps, mergeProps)(DeckSetup))
