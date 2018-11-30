@@ -16,8 +16,10 @@ import {Portal} from './portals/MainPageModalPortal'
 import styles from './FilePage.css'
 import EditPipettesModal from './modals/EditPipettesModal'
 import formStyles from '../components/forms.css'
+import type {FileMetadataFields} from '../file-data'
 
 export type Props = {
+  formValues: FileMetadataFields,
   formConnector: FormConnector<any>,
   isFormAltered: boolean,
   instruments: React.ElementProps<typeof InstrumentGroup>,
@@ -28,11 +30,10 @@ export type Props = {
 
 type State = { isEditPipetteModalOpen: boolean }
 
-// TODO IMMEDIATELY don't use placeholder, really pass in the timestamp
-const todo_placeholder = 92345678
 const DATE_ONLY_FORMAT = 'MMM DD, YYYY'
 const DATETIME_FORMAT = 'MMM DD, YYYY | h:mm A'
 
+// TODO rewrite as Formik form
 class FilePage extends React.Component<Props, State> {
   state = {isEditPipetteModalOpen: false}
 
@@ -48,6 +49,7 @@ class FilePage extends React.Component<Props, State> {
 
   render () {
     const {formConnector, isFormAltered, instruments, goToNextPage, swapPipettes} = this.props
+    const {created, 'last-modified': lastModified} = this.props.formValues
 
     return (
       <div className={styles.file_page}>
@@ -55,11 +57,11 @@ class FilePage extends React.Component<Props, State> {
           <form onSubmit={this.handleSubmit} className={styles.card_content}>
             <div className={cx(formStyles.row_wrapper, formStyles.stacked_row)}>
               <FormGroup label='Date Created:' className={formStyles.column_1_2}>
-                {moment(todo_placeholder).format(DATE_ONLY_FORMAT)}
+                {created && moment(created).format(DATE_ONLY_FORMAT)}
               </FormGroup>
 
               <FormGroup label='Last Exported:' className={formStyles.column_1_2}>
-                {moment(todo_placeholder).format(DATETIME_FORMAT)}
+                {lastModified && moment(lastModified).format(DATETIME_FORMAT)}
               </FormGroup>
             </div>
 

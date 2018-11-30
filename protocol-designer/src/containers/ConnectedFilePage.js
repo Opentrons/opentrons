@@ -12,7 +12,7 @@ import {formConnectorFactory, type FormConnector} from '../utils'
 type SP = {
   instruments: $PropertyType<FilePageProps, 'instruments'>,
   isFormAltered: $PropertyType<FilePageProps, 'isFormAltered'>,
-  _values: {[accessor: FileMetadataFieldAccessors]: any},
+  formValues: {[accessor: FileMetadataFieldAccessors]: any},
 }
 
 type DP = {
@@ -25,7 +25,7 @@ type DP = {
 const mapStateToProps = (state: BaseState): SP => {
   const pipetteData = pipetteSelectors.getPipettesForInstrumentGroup(state)
   return {
-    _values: fileSelectors.fileFormValues(state),
+    formValues: fileSelectors.fileFormValues(state),
     isFormAltered: fileSelectors.isUnsavedMetadatFormAltered(state),
     instruments: {
       left: pipetteData.find(i => i.mount === 'left'),
@@ -42,7 +42,7 @@ const mapDispatchToProps: DP = {
 }
 
 const mergeProps = (
-  {instruments, isFormAltered, _values}: SP,
+  {instruments, isFormAltered, formValues}: SP,
   {_updateFileMetadataFields, _saveFileMetadata, goToNextPage, swapPipettes}: DP
 ): FilePageProps => {
   const onChange = (accessor) => (e: SyntheticInputEvent<*>) => {
@@ -53,14 +53,15 @@ const mergeProps = (
     }
   }
 
-  const formConnector: FormConnector<FileMetadataFields> = formConnectorFactory(onChange, _values)
+  const formConnector: FormConnector<FileMetadataFields> = formConnectorFactory(onChange, formValues)
 
   return {
+    formValues,
     formConnector,
     isFormAltered,
     instruments,
     goToNextPage,
-    saveFileMetadata: () => _saveFileMetadata(_values),
+    saveFileMetadata: () => _saveFileMetadata(formValues),
     swapPipettes,
   }
 }
