@@ -29,19 +29,37 @@ type Props = {
   LabwareComponent?: React.ComponentType<LabwareComponentProps>,
 }
 
-export default function Deck (props: Props) {
-  const {className, LabwareComponent} = props
+const VIEW_BOX_WIDTH = 427
+const VIEW_BOX_HEIGHT = 390
 
-  return (
-    // TODO(mc, 2018-07-16): is this viewBox in mm?
-    <svg viewBox={'0 0 427 390'} className={cx(styles.deck, className)}>
-      <DeckOutline />
-      {/* All containers */}
-      <g transform={`translate(${SLOT_OFFSET_MM} ${SLOT_OFFSET_MM})`}>
-        {renderLabware(LabwareComponent)}
-      </g>
-    </svg>
-  )
+export default class Deck extends React.Component<Props> {
+  parentRef: ?SVGElement
+
+  getXY = (rawX: number, rawY: number) => {
+    if (!this.parentRef) return {}
+    const clientRect: {width: number, height: number, left: number, top: number} = this.parentRef.getBoundingClientRect()
+
+    const scaledX = (rawX - clientRect.left) * (VIEW_BOX_WIDTH / clientRect.width)
+    const scaledY = (rawY - clientRect.top) * (VIEW_BOX_HEIGHT / clientRect.height)
+    return {scaledX, scaledY}
+  }
+  render () {
+    const {className, LabwareComponent, DragPreviewLayer} = this.props
+
+    return (
+      // TODO(mc, 2018-07-16): is this viewBox in mm?
+      <svg viewBox={'0 0 427 390'} className={cx(styles.deck, className)}>
+        <DeckOutline />
+        {/* All containers */}
+        <g
+          ref={ref => { this.parentRef = ref }}
+          transform={`translate(${SLOT_OFFSET_MM} ${SLOT_OFFSET_MM})`}>
+          {renderLabware(LabwareComponent)}
+          <DragPreviewLayer getXY={this.getXY} />
+        </g>
+      </svg>
+    )
+  }
 }
 
 function renderLabware (LabwareComponent): React.Node[] {

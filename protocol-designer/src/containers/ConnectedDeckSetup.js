@@ -10,6 +10,7 @@ import i18n from '../localization'
 
 import {Portal} from '../components/portals/MainPageModalPortal'
 import BrowseLabwareModal from '../components/labware/BrowseLabwareModal'
+import {DragPreviewLayer} from '../components/labware/LabwareOnDeck'
 import Hints from '../components/Hints'
 import LiquidPlacementModal from '../components/LiquidPlacementModal.js'
 import LabwareContainer from '../containers/LabwareContainer.js'
@@ -80,7 +81,10 @@ class DeckSetup extends React.Component<Props> {
           <ClickOutside onClickOutside={this.props.handleClickOutside}>
             {({ref}) => (
               <div ref={ref}>
-                <Deck LabwareComponent={LabwareContainer} className={styles.deck} />
+                <Deck
+                  DragPreviewLayer={DragPreviewLayer}
+                  LabwareComponent={LabwareContainer}
+                  className={styles.deck} />
               </div>
             )}
           </ClickOutside>

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { DragSource, DropTarget } from 'react-dnd'
+import { DragSource, DropTarget, DragLayer } from 'react-dnd'
 import {
   LabwareContainer,
   ContainerNameOverlay,
@@ -27,6 +27,31 @@ const DND_TYPES: {LABWARE: "LABWARE"} = {
   LABWARE: 'LABWARE',
 }
 
+type DragPreviewProps = {
+  getXY: (rawX: number, rawY: number) => {scaledX?: number, scaledY?: number},
+  isDragging: boolean, currentOffset: ?number, itemType: string}
+const DragPreview = (props: DragPreviewProps) => {
+  const {itemType, isDragging, currentOffset, getXY} = props
+  const {scaledX, scaledY} = getXY(currentOffset && currentOffset.x, currentOffset && currentOffset.y)
+  if (itemType !== DND_TYPES.LABWARE || !isDragging || !currentOffset) return null
+  return (
+    <circle
+      transform={`translate(${10} ${10})`}
+      cx={scaledX}
+      cy={scaledY}
+      r={22}
+      fill="red"
+      stroke="black"
+      strokeWidth={2}/>
+  )
+}
+
+export const DragPreviewLayer = DragLayer(monitor => ({
+  currentOffset: monitor.getSourceClientOffset(),
+  isDragging: monitor.isDragging(),
+  itemType: monitor.getItemType(),
+}))(DragPreview)
+
 type DragDropLabwareProps = React.ElementProps<typeof LabwareContainer> & {
   connectDragSource: mixed => React.Element<any>,
   connectDropTarget: mixed => React.Element<any>,
@@ -34,18 +59,27 @@ type DragDropLabwareProps = React.ElementProps<typeof LabwareContainer> & {
   onDrag: () => void,
   moveLabware: (DeckSlot, DeckSlot) => void,
 }
-const DragSourceLabware = (props: DragDropLabwareProps) => (
-  props.connectDragSource(
-    props.connectDropTarget(
-      <g style={{opacity: props.isDragging ? 0.3 : 1}}>
-        <LabwareContainer slot={props.slot} highlighted={props.highlighted}>
-          {props.labwareOrSlot}
-          {props.overlay}
-        </LabwareContainer>
-      </g >
+class DragSourceLabware extends React.Component<DragDropLabwareProps> {
+  componentDidUpdate (prevProps, nextProps) {
+    if (!prevProps.isOver && nextProps.isOver) {
+      nextProps.moveLabware(nextProps.draggedSlot, nextProps.slot)
+    }
+  }
+  render () {
+    return (
+      this.props.connectDragSource(
+        this.props.connectDropTarget(
+          <g>
+            <LabwareContainer slot={this.props.slot} highlighted={this.props.highlighted}>
+              {this.props.labwareOrSlot}
+              {this.props.overlay}
+            </LabwareContainer>
+          </g>
+        )
+      )
     )
-  )
-)
+  }
+}
 
 const labwareSource = {
   beginDrag: (props) => {
@@ -61,17 +95,11 @@ const DraggableLabware = DragSource(DND_TYPES.LABWARE, labwareSource, collectLab
 
 const labwareTarget = {
   canDrop: () => { return false },
-  hover: (props: DragDropLabwareProps, monitor) => {
-    const { slot: draggedSlot } = monitor.getItem()
-    const { slot: overSlot } = props
-
-    if (draggedSlot !== overSlot) {
-      props.moveLabware(draggedSlot, overSlot)
-    }
-  },
 }
-const collectLabwareTarget = (connect) => ({
+const collectLabwareTarget = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
+  isOver: monitor.isOver(),
+  draggedSlot: monitor.getItem(),
 })
 const DragDropLabware = DropTarget(DND_TYPES.LABWARE, labwareTarget, collectLabwareTarget)(DraggableLabware)
 
@@ -248,6 +276,7 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
       moveLabwareDestination,
       moveLabwareSource,
       slotToMoveFrom,
+      swapSlotContents,
 
       setDefaultLabwareName,
       setLabwareName,
@@ -292,7 +321,7 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
     return (
       <DragDropLabware
         onDrag={() => { console.log('DRUGged') }}
-        moveLabware={() => { console.log('moveHandled') }}
+        moveLabware={swapSlotContents}
         {...{slot, highlighted, labwareOrSlot, overlay}} />
     )
   }

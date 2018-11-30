@@ -16,6 +16,7 @@ import {
 
   setMoveLabwareMode,
   moveLabware,
+  swapSlotContents,
 } from '../labware-ingred/actions'
 import {selectors as steplistSelectors, START_TERMINAL_ITEM_ID} from '../steplist'
 
@@ -128,6 +129,7 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}, own
     cancelMove: () => dispatch(setMoveLabwareMode()),
     moveLabwareDestination: () => dispatch(moveLabware(slot)),
     moveLabwareSource: () => dispatch(setMoveLabwareMode(slot)),
+    swapSlotContents: (sourceSlot, destSlot) => dispatch(swapSlotContents(sourceSlot, destSlot)),
 
     setLabwareName: (name: ?string) => dispatch(renameLabware({
       labwareId: containerId,

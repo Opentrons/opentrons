@@ -110,6 +110,19 @@ export const moveLabware = (toSlot: DeckSlot) => (dispatch: Dispatch<MoveLabware
   }
 }
 
+export type SwapSlotContents = {
+  type: 'SWAP_SLOT_CONTENTS',
+  payload: {
+    sourceSlot: DeckSlot,
+    destSlot: DeckSlot,
+  },
+}
+
+export const swapSlotContents = (sourceSlot: DeckSlot, destSlot: DeckSlot): SwapSlotContents => ({
+  type: 'SWAP_SLOT_CONTENTS',
+  payload: {sourceSlot, destSlot},
+})
+
 export type RemoveWellsContents = {
   type: 'REMOVE_WELLS_CONTENTS',
   payload: {

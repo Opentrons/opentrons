@@ -175,6 +175,20 @@ export const containers = handleActions({
       ...toContainers,
     }
   },
+  SWAP_SLOT_CONTENTS: (state: ContainersState, action: SwapSlotContents): ContainersState => {
+    const { sourceSlot, destSlot } = action.payload
+    const fromLabware = reduce(state, (acc, container, id) => (
+      container.slot === destSlot ? {...acc, [id]: {...container, slot: sourceSlot}} : acc
+    ), {})
+    const toLabware = reduce(state, (acc, container, id) => (
+      container.slot === sourceSlot ? {...acc, [id]: {...container, slot: destSlot}} : acc
+    ), {})
+    return {
+      ...state,
+      ...fromLabware,
+      ...toLabware,
+    }
+  },
   LOAD_FILE: (state: ContainersState, action: LoadFileAction): ContainersState => {
     const file = action.payload
     const allFileLabware = file.labware
