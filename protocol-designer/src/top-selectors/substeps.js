@@ -30,8 +30,9 @@ export const allSubsteps: Selector<AllSubsteps> = createSelector(
     robotStateTimeline,
     _initialRobotState,
   ) => {
+    const timeline = [{robotState: _initialRobotState}, ...robotStateTimeline.timeline]
+
     return orderedSteps.reduce((acc: AllSubsteps, stepId, timelineIndex) => {
-      const timeline = [{robotState: _initialRobotState}, ...robotStateTimeline.timeline]
       const robotState = timeline[timelineIndex] && timeline[timelineIndex].robotState
 
       const substeps = generateSubsteps(
