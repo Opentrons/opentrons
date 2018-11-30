@@ -197,3 +197,15 @@ export const clearWellSelectionLabwareKey = (): * => ({
   type: 'CLEAR_WELL_SELECTION_LABWARE_KEY',
   payload: null,
 })
+
+export type ReorderStepsAction = {
+  type: 'REORDER_STEPS',
+  payload: {
+    stepIds: Array<StepIdType>,
+  },
+}
+
+export const reorderSteps = (stepIds: Array<StepIdType>): ReorderStepsAction => ({
+  type: 'REORDER_STEPS',
+  payload: {stepIds},
+})
