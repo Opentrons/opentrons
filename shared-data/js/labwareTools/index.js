@@ -201,10 +201,10 @@ function calculateCoordinates (
   }, {})
 }
 
-function calculateCornerOffset (dimensions: Dimensions): {string: number} {
+export function _calculateCornerOffset (dimensions: Dimensions): Offset {
   return {
-    x: round(dimensions.overallLength - SLOT_LENGTH_MM, 2),
-    y: round(dimensions.overallWidth - SLOT_WIDTH_MM, 2),
+    x: round(SLOT_LENGTH_MM - dimensions.overallLength, 2),
+    y: round(SLOT_WIDTH_MM - dimensions.overallWidth, 2),
     z: 0}
 }
 // Generator function for labware definitions within a regular grid format
@@ -218,7 +218,7 @@ export function createRegularLabware (args: RegularLabwareProps): Schema {
     otId: assignId(),
     deprecated: false,
     metadata: args.metadata,
-    cornerOffsetFromSlot: calculateCornerOffset(args.dimensions),
+    cornerOffsetFromSlot: _calculateCornerOffset(args.dimensions),
     dimensions: args.dimensions,
     parameters: args.parameters,
     wells: calculateCoordinates(args.well, ordering, args.spacing, args.offset),
@@ -256,7 +256,7 @@ export function createIrregularLabware (args: IrregularLabwareProps): Schema {
     otId: assignId(),
     deprecated: false,
     metadata: args.metadata,
-    cornerOffsetFromSlot: calculateCornerOffset(args.dimensions),
+    cornerOffsetFromSlot: _calculateCornerOffset(args.dimensions),
     dimensions: args.dimensions,
     parameters: {
       ...args.parameters,
