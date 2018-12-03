@@ -51,7 +51,6 @@ const tiprackOptions = [
   {name: '200 μL', value: 'tiprack-200ul'},
   {name: '300 μL', value: 'opentrons-tiprack-300ul'},
   {name: '1000 μL', value: 'tiprack-1000ul'},
-  {name: '1000 μL Chem', value: 'tiprack-1000ul-chem'},
 ]
 
 const initialState = {
