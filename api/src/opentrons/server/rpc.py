@@ -263,15 +263,16 @@ class RPCServer(object):
             log.exception('Error while processing request')
 
     def call_and_serialize(self, func, max_depth=0):
+        # XXXX: This should really only be called in a new thread (as in
+        #       the normal case where it is called in a threadpool)
         try:
             check = func.func
         except AttributeError:
             check = func
         check_unwrapped = inspect.unwrap(check)
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         if asyncio.iscoroutinefunction(check_unwrapped):
-            # XXXX: This should really only be called in a new thread (as in
-            #       the normal case where it is called in a threadpool)
-            loop = asyncio.new_event_loop()
             call_result = loop.run_until_complete(func())
         else:
             call_result = func()

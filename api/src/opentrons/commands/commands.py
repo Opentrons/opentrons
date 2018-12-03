@@ -12,13 +12,18 @@ from opentrons.protocol_api.labware import Well, Labware, ModuleGeometry
 from opentrons.types import Location
 
 
-def _stringify_new_loc(loc: Location) -> str:
-    if isinstance(loc.labware, str):
-        return loc.parent
-    elif isinstance(loc.labware, (Labware, Well, ModuleGeometry)):
-        return repr(loc.labware)
+def _stringify_new_loc(loc: Union[Location, Well]) -> str:
+    if isinstance(loc, Location):
+        if isinstance(loc.labware, str):
+            return loc.parent
+        elif isinstance(loc.labware, (Labware, Well, ModuleGeometry)):
+            return repr(loc.labware)
+        else:
+            return str(loc.point)
+    elif isinstance(loc, Well):
+        return str(loc)
     else:
-        return str(loc.point)
+        raise TypeError(loc)
 
 
 def _stringify_legacy_loc(loc: Union[OldWell, OldContainer,
@@ -53,7 +58,7 @@ def _stringify_legacy_loc(loc: Union[OldWell, OldContainer,
 
 def stringify_location(location: Union[Location, None,
                                        OldWell, OldContainer, OldSlot]) -> str:
-    if isinstance(location, Location):
+    if isinstance(location, (Location, Well)):
         return _stringify_new_loc(location)
     else:
         return _stringify_legacy_loc(location)

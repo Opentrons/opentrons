@@ -1,5 +1,4 @@
 import ast
-import asyncio
 import logging
 from copy import copy
 from time import time
@@ -12,6 +11,8 @@ from opentrons.legacy_api.containers.placeable import Module as ModulePlaceable
 from opentrons.commands import tree, types
 from opentrons.protocols import execute_protocol
 from opentrons.config import feature_flags as ff
+from opentrons.protocol_api import ProtocolContext, run_protocol
+from opentrons.hardware_control import API, adapters
 
 from .models import Container, Instrument, Module
 
@@ -24,23 +25,26 @@ class SessionManager(object):
     def __init__(self, hardware):
         self.session = None
         self._session_lock = False
-        self._hardware = hardware
+        if ff.use_protocol_api_v2():
+            self._hardware = adapters.SynchronousAdapter(hardware)
+        else:
+            self._hardware = hardware
 
-    async def create(self, name, text):
+    def create(self, name, text):
         if self._session_lock:
             raise Exception(
                 'Cannot create session while simulation in progress')
 
         self._session_lock = True
         try:
-            self.session = await Session.build_and_prep(
+            self.session = Session.build_and_prep(
                 name=name, text=text, hardware=self._hardware)
         finally:
             self._session_lock = False
 
         return self.session
 
-    async def clear(self):
+    def clear(self):
         if self._session_lock:
             raise Exception(
                 'Cannot clear session while simulation in progress')
@@ -57,9 +61,9 @@ class Session(object):
     TOPIC = 'session'
 
     @classmethod
-    async def build_and_prep(cls, name, text, hardware):
+    def build_and_prep(cls, name, text, hardware):
         sess = cls(name, text, hardware)
-        await sess.prepare()
+        sess.prepare()
         return sess
 
     def __init__(self, name, text, hardware):
@@ -84,12 +88,9 @@ class Session(object):
 
         self.startTime = None
 
-    async def prepare(self):
-        if ff.use_protocol_api_v2():
-            await self._hardware.discover_modules()
-        else:
-            self._hardware.discover_modules()
-        await self.refresh()
+    def prepare(self):
+        self._hardware.discover_modules()
+        self.refresh()
 
     def get_instruments(self):
         return [
@@ -127,11 +128,8 @@ class Session(object):
         self.command_log.clear()
         self.errors.clear()
 
-    async def _simulate(self):
-        if ff.use_protocol_api_v2():
-            raise NotImplementedError(
-                    "Need to implement new api in protocols")
-        await self._reset()
+    def _simulate(self):
+        self._reset()
 
         stack = []
         res = []
@@ -166,17 +164,24 @@ class Session(object):
 
         try:
             # ensure actual pipettes are cached before driver is disconnected
-
-            self._hardware.cache_instrument_models()
-
-            if not ff.use_protocol_api_v2():
+            if ff.use_protocol_api_v2():
+                self._hardware.cache_instruments()
+                sim = API.build_hardware_simulator(
+                    {m: pip.get('name')
+                     for m, pip
+                     in self._hardware.attached_instruments.items()},
+                    [mod.name() for mod in self._hardware.attached_modules])
+                context = ProtocolContext(hardware=sim)
+                run_protocol(self._protocol, simulate=True, context=context)
+            else:
                 # TODO (artyom, 20171005): this will go away
                 # once robot / driver simulation flow is fixed
+                self._hardware.cache_instrument_models()
                 self._hardware.disconnect()
-            if self._is_json_protocol:
-                execute_protocol(self._protocol)
-            else:
-                exec(self._protocol, {})
+                if self._is_json_protocol:
+                    execute_protocol(self._protocol)
+                else:
+                    exec(self._protocol, {})
         finally:
             # physically attached pipettes are re-cached during robot.connect()
             # which is important, because during a simulation, the robot could
@@ -202,8 +207,8 @@ class Session(object):
 
         return res
 
-    async def refresh(self):
-        await self._reset()
+    def refresh(self):
+        self._reset()
         self._is_json_protocol = self.name.endswith('.json')
 
         if self._is_json_protocol:
@@ -214,7 +219,7 @@ class Session(object):
             parsed = ast.parse(self.protocol_text, filename=self.name)
             self.metadata = extract_metadata(parsed)
             self._protocol = compile(parsed, filename=self.name, mode='exec')
-        commands = await self._simulate()
+        commands = self._simulate()
         self.commands = tree.from_list(commands)
 
         self.containers = self.get_containers()
@@ -239,7 +244,7 @@ class Session(object):
         self.set_state('running')
         return self
 
-    async def run(self):
+    def run(self):
         def on_command(message):
             if message['$'] == 'before':
                 self.log_append()
@@ -248,10 +253,7 @@ class Session(object):
             if message['name'] == types.RESUME:
                 self.set_state('running')
 
-        if ff.use_protocol_api_v2():
-            raise NotImplementedError("Need to implement new API in protocols")
-
-        await self._reset()
+        self._reset()
 
         _unsubscribe = subscribe(types.COMMAND, on_command)
         self.startTime = now()
@@ -259,11 +261,17 @@ class Session(object):
 
         try:
             self.resume()
-            await self._pre_run_hooks()
-            if self._is_json_protocol:
-                execute_protocol(self._protocol)
+            self._pre_run_hooks()
+            if ff.use_protocol_api_v2():
+                self._hardware.cache_instruments()
+                ctx = ProtocolContext()
+                ctx.connect(self._hardware)
+                run_protocol(self._protocol, context=ctx)
             else:
-                exec(self._protocol, {})
+                if self._is_json_protocol:
+                    execute_protocol(self._protocol)
+                else:
+                    exec(self._protocol, {})
             self.set_state('finished')
             self._hardware.home()
         except Exception as e:
@@ -276,11 +284,8 @@ class Session(object):
 
         return self
 
-    async def identify(self):
-        if ff.use_protocol_api_v2():
-            asyncio.ensure_future(self._hardware.identify())
-        else:
-            self._hardware.identify()
+    def identify(self):
+        self._hardware.identify()
 
     def turn_on_rail_lights(self):
         self._hardware.set_lights(rails=True)
@@ -311,11 +316,8 @@ class Session(object):
         )
         # self._on_state_changed()
 
-    async def _reset(self):
-        if ff.use_protocol_api_v2():
-            await self._hardware.reset()
-        else:
-            self._hardware.reset()
+    def _reset(self):
+        self._hardware.reset()
         self.clear_logs()
 
     def _snapshot(self):
@@ -342,11 +344,8 @@ class Session(object):
     def _on_state_changed(self):
         publish(Session.TOPIC, self._snapshot())
 
-    async def _pre_run_hooks(self):
-        if ff.use_protocol_api_v2():
-            await self._hardware.home_z()
-        else:
-            self._hardware.home_z()
+    def _pre_run_hooks(self):
+        self._hardware.home_z()
 
 
 def extract_metadata(parsed):

@@ -35,7 +35,8 @@ class ProtocolContext:
     """
 
     def __init__(self,
-                 loop: asyncio.AbstractEventLoop = None) -> None:
+                 loop: asyncio.AbstractEventLoop = None,
+                 hardware: hc.API = None) -> None:
         """ Build a :py:class:`.ProtocolContext`.
 
         :param loop: An event loop to use. If not specified, this ctor will
@@ -47,7 +48,7 @@ class ProtocolContext:
             = {mount: None for mount in types.Mount}
         self._last_moved_instrument: Optional[types.Mount] = None
         self._location_cache: Optional[types.Location] = None
-        self._hardware = self._build_hardware_adapter(self._loop)
+        self._hardware = self._build_hardware_adapter(self._loop, hardware)
         self._log = MODULE_LOG.getChild(self.__class__.__name__)
         self._commands = []
         self._unsubscribe_commands = None
