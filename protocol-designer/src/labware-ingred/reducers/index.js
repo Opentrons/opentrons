@@ -205,19 +205,16 @@ export const containers = handleActions({
         return {
           ...acc,
           [id]: {
-            slot: nextEmptySlot(_loadedContainersBySlot({...state, ...acc})),
+            slot: nextEmptySlot(_loadedContainersBySlot(acc || {})),
             type: mount.tiprackModel,
-            disambiguationNumber: getNextDisambiguationNumber({...state, ...acc}, String(mount.tiprackModel)),
+            disambiguationNumber: getNextDisambiguationNumber(acc || {}, String(mount.tiprackModel)),
             id,
             name: null, // create with null name, so we force explicit naming.
           },
         }
       }
-    }, {})
-    return {
-      ...state,
-      ...initialTipracks,
-    }
+    }, state)
+    return initialTipracks || {}
   },
 }, initialLabwareState)
 
