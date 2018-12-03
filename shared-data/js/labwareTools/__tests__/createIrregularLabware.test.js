@@ -27,7 +27,6 @@ describe('test helper functions', () => {
     expect(offset.y).toBeGreaterThan(0)
     expect(offset2.x).toBeLessThan(0)
     expect(offset2.y).toBeLessThan(0)
-
   })
   test('Well name generated correctly', () => {
     const grid = {row: 2, column: 2}
