@@ -26,9 +26,6 @@ export type StepFieldName =
   | 'changeTip'
   | 'dispense_blowout_checkbox'
   | 'dispense_blowout_labware'
-  | 'dispense_delay_checkbox'
-  | 'dispense_delayMinutes'
-  | 'dispense_delaySeconds'
   | 'dispense_flowRate'
   | 'dispense_labware'
   | 'dispense_touchTip'
@@ -74,12 +71,6 @@ export type FormModalFields = {|
   'step-details': string,
 |}
 
-export type DelayFields = {|
-  'dispense_delay_checkbox'?: boolean,
-  'dispense_delayMinutes'?: string,
-  'dispense_delaySeconds'?: string,
-|}
-
 export type BlowoutFields = {|
   'dispense_blowout_checkbox'?: boolean,
   'dispense_blowout_labware'?: string,
@@ -95,7 +86,6 @@ export type TransferLikeForm = {|
   ...FormModalFields,
   ...BlowoutFields,
   ...ChangeTipFields,
-  ...DelayFields,
 
   stepType: TransferLikeStepType,
   id: StepIdType,
@@ -125,7 +115,6 @@ export type MixForm = {|
   ...FormModalFields,
   ...BlowoutFields,
   ...ChangeTipFields,
-  ...DelayFields,
   stepType: 'mix',
   id: StepIdType,
 

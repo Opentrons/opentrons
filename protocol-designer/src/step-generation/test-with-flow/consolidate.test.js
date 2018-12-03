@@ -99,7 +99,6 @@ describe('consolidate single-channel', () => {
 
     touchTipAfterDispense: false,
     mixInDestination: null,
-    delayAfterDispense: null,
     blowout: null,
   }
 
@@ -531,7 +530,6 @@ describe('consolidate single-channel', () => {
     expect(result.errors[0].type).toEqual('PIPETTE_DOES_NOT_EXIST')
   })
 
-  test('delay after dispense') // TODO Ian 2018-04-05 support delay in consolidate
   test('air gap') // TODO Ian 2018-04-05 determine air gap behavior
 })
 
@@ -564,7 +562,6 @@ describe('consolidate multi-channel', () => {
 
     touchTipAfterDispense: false,
     mixInDestination: null,
-    delayAfterDispense: null,
     blowout: null,
   }
 

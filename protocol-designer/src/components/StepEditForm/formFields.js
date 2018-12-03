@@ -94,26 +94,6 @@ export const StepRadioGroup = (props: StepRadioGroupProps) => {
   )
 }
 
-type DispenseDelayFieldsProps = {
-  focusHandlers: FocusHandlers,
-  label?: string,
-  disabled?: boolean,
-  tooltipComponent?: React.Node,
-}
-export function DispenseDelayFields (props: DispenseDelayFieldsProps) {
-  const {label = 'Delay', focusHandlers, tooltipComponent, disabled} = props
-  return (
-    <StepCheckboxRow
-      disabled={disabled}
-      tooltipComponent={tooltipComponent}
-      name="dispense_delay_checkbox"
-      label={label}>
-      <StepInputField {...focusHandlers} disabled={disabled} name="dispense_delayMinutes" units='m' />
-      <StepInputField {...focusHandlers} disabled={disabled} name="dispense_delaySeconds" units='s' />
-    </StepCheckboxRow>
-  )
-}
-
 type PipetteFieldOP = {name: StepFieldName, stepType?: StepType} & FocusHandlers
 type PipetteFieldSP = {pipetteOptions: Options, getHydratedPipette: (string) => any} // TODO: real hydrated pipette type
 type PipetteFieldProps = PipetteFieldOP & PipetteFieldSP
