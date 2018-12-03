@@ -1,9 +1,11 @@
 // @flow
 import uniq from 'lodash/uniq'
+import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
-import {selectors} from '../index'
 import {selectors as pipetteSelectors} from '../../pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
+import {DISPOSAL_VOLUME_PERCENTAGE} from '../../constants'
+
 import type {PipetteChannels} from '@opentrons/shared-data'
 import type {BaseState, GetState} from '../../types'
 import type {FormData} from '../../form-types'
@@ -47,17 +49,20 @@ const getChannels = (pipetteId: string, state: BaseState): PipetteChannels => {
 // Eventually we gotta allow arbitrary actions like DELETE_LABWARE
 // (or more speculatively, CHANGE_PIPETTE etc), which affect saved forms from
 // 'outside', to cause changes that run thru all the logic in this block
-function handleFormChange (payload: ChangeFormPayload, getState: GetState): ChangeFormPayload {
+function handleFormChange (
+  payload: ChangeFormPayload,
+  baseForm: ?FormData,
+  getState: GetState,
+): ChangeFormPayload {
   // Use state to handle form changes
   const baseState = getState()
-  const unsavedForm = selectors.getUnsavedForm(baseState)
 
   // pass thru, unchanged
-  if (unsavedForm == null) { return payload }
+  if (baseForm == null) { return payload }
 
   let updateOverrides = getChangeLabwareEffects(payload.update)
 
-  if (unsavedForm.pipette && payload.update.pipette) {
+  if (baseForm.pipette && payload.update.pipette) {
     if (typeof payload.update.pipette !== 'string') {
       // this should not happen!
       console.error('no next pipette, could not handleFormChange')
@@ -66,7 +71,23 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     const nextChannels = getChannels(payload.update.pipette, baseState)
     updateOverrides = {
       ...updateOverrides,
-      ...reconcileFormPipette(unsavedForm, baseState, payload.update.pipette, nextChannels),
+      ...reconcileFormPipette(baseForm, baseState, payload.update.pipette, nextChannels),
+    }
+  }
+
+  if (baseForm.stepType === 'distribute') {
+    if (typeof payload.update.pipette === 'string') {
+      const pipetteData = pipetteSelectors.getPipettesById(baseState)[payload.update.pipette]
+      const pipetteSpecs = getPipetteNameSpecs(pipetteData.model)
+      const disposalVol = pipetteSpecs
+        ? pipetteSpecs.maxVolume * DISPOSAL_VOLUME_PERCENTAGE
+        : null
+
+      updateOverrides = {
+        ...updateOverrides,
+        'aspirate_disposalVol_checkbox': true,
+        'aspirate_disposalVol_volume': disposalVol,
+      }
     }
   }
 
@@ -183,6 +204,7 @@ export const reconcileFormPipette = (formData: FormData, baseState: BaseState, n
       }
     }
   }
+
   return updateOverrides
 }
 

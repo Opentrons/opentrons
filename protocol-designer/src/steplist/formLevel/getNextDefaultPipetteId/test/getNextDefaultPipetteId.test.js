@@ -6,17 +6,20 @@ describe('getNextDefaultPipetteId', () => {
     const testCases = [
       {
         testMsg: 'both pipettes present: use left pipette',
-        equippedPipettes: {'left': 'leftId', 'right': 'rightId'},
+        equippedPipettesById: {
+          'leftId': {id: 'leftId', mount: 'left'},
+          'rightId': {id: 'rightId', mount: 'right'},
+        },
         expected: 'leftId',
       },
       {
         testMsg: 'right only: use right',
-        equippedPipettes: {'right': 'rightId'},
+        equippedPipettesById: {'rightId': {id: 'rightId', mount: 'right'}},
         expected: 'rightId',
       },
     ]
 
-    testCases.forEach(({testMsg, equippedPipettes, expected}) => {
+    testCases.forEach(({testMsg, equippedPipettesById, expected}) => {
       test(testMsg, () => {
         const savedForms = {}
         const orderedSteps = []
@@ -24,7 +27,7 @@ describe('getNextDefaultPipetteId', () => {
         const result = getNextDefaultPipetteId(
           savedForms,
           orderedSteps,
-          equippedPipettes)
+          equippedPipettesById)
 
         expect(result).toBe(expected)
       })
@@ -41,7 +44,7 @@ describe('getNextDefaultPipetteId', () => {
       {
         testMsg: 'no previous forms use pipettes',
         orderedSteps: ['x', 'x', 'x'],
-        expected: 'default',
+        expected: 'defaultId',
       },
       {
         testMsg: 'mix of steps with and without pipettes',
@@ -56,7 +59,7 @@ describe('getNextDefaultPipetteId', () => {
       {
         testMsg: 'only missing steps',
         orderedSteps: ['missingStep', 'missingStep'],
-        expected: 'default',
+        expected: 'defaultId',
       },
     ]
 
@@ -68,12 +71,12 @@ describe('getNextDefaultPipetteId', () => {
           x: {}, // no 'pipette' key, eg a Pause step
         }
 
-        const equippedPipettes = {left: 'default'}
+        const equippedPipettesById = {'defaultId': {id: 'defaultId', mount: 'left'}}
 
         const result = getNextDefaultPipetteId(
           savedForms,
           orderedSteps,
-          equippedPipettes)
+          equippedPipettesById)
 
         expect(result).toBe(expected)
       })
