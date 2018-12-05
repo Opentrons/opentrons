@@ -10,14 +10,6 @@ import {
 
 import forAspirateDispense from '../getNextRobotStateAndWarnings/forAspirateDispense'
 
-let initialRobotState = createRobotState({
-  sourcePlateType: 'trough-12row',
-  destPlateType: '96-flat',
-  fillPipetteTips: false,
-  fillTiprackTips: true,
-  tipracks: [300, 300],
-})
-
 function getBlankLiquidState (sourcePlateType: ?string) {
   return createEmptyLiquidState({
     // leave sourcePlateType undefined for tests that don't care
@@ -34,6 +26,7 @@ function getBlankLiquidState (sourcePlateType: ?string) {
 
 describe('...single-channel pipette', () => {
   let aspirateSingleCh50FromA1Args
+  let initialRobotState
 
   beforeEach(() => {
     initialRobotState = createRobotState({
@@ -212,13 +205,11 @@ describe('...single-channel pipette', () => {
 
 describe('...8-channel pipette', () => {
   let aspirate8Ch50FromA1Args
+  let initialRobotState
 
   beforeEach(() => {
     initialRobotState = createRobotState({
-      sourcePlateType: 'trough-12row',
-      destPlateType: '96-flat',
-      fillPipetteTips: false,
-      fillTiprackTips: true,
+      sourcePlateType: '96-flat',
       tipracks: [300, 300],
     })
     aspirate8Ch50FromA1Args = {
@@ -305,6 +296,10 @@ describe('...8-channel pipette', () => {
   test('aspirate from single-ingredient common well (trough-12row)', () => {
     let initialLiquidState = getBlankLiquidState('trough-12row')
 
+    const initialTroughRobotState = createRobotState({
+      sourcePlateType: 'trough-12row',
+      tipracks: [300, 300],
+    })
     const initialSourceVolume = 300
     const aspirateVolume = 20
 
@@ -320,7 +315,7 @@ describe('...8-channel pipette', () => {
 
     const result = forAspirateDispense(
       args,
-      {...initialRobotState, liquidState: initialLiquidState},
+      {...initialTroughRobotState, liquidState: initialLiquidState},
     )
     expect(result.robotState.liquidState).toMatchObject({
       pipettes: {
