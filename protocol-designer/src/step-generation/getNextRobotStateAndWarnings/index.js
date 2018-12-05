@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import type {
   RobotState,
   Command,
@@ -7,10 +8,7 @@ import type {
 import forAspirateDispense from './forAspirateDispense'
 
 export default function getNextRobotStateAndWarnings (command: Command, prevRobotState: RobotState): RobotStateAndWarnings {
-  if (!command) {
-    console.info(`missing command was passed to getNextRobotStateAndWarning`)
-    return {robotState: prevRobotState, warnings: []}
-  }
+  assert(command, 'undefined command passed to getNextRobotStateAndWarning')
   switch (command.command) {
     case 'dispense':
     case 'aspirate':
@@ -31,7 +29,7 @@ export default function getNextRobotStateAndWarnings (command: Command, prevRobo
       // TODO: BC 2018-11-29 handle air-gap
       return {robotState: prevRobotState, warnings: []}
     default:
-      console.info(`unknown command ${command.command} passed to getNextRobotStateAndWarning`)
+      assert(true, `unknown command: ${command.command} passed to getNextRobotStateAndWarning`)
       return {robotState: prevRobotState, warnings: []}
   }
 }

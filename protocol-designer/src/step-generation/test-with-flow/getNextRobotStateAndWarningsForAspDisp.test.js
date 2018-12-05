@@ -10,7 +10,7 @@ import {
 
 import forAspirateDispense from '../getNextRobotStateAndWarnings/forAspirateDispense'
 
-const initialRobotState = createRobotState({
+let initialRobotState = createRobotState({
   sourcePlateType: 'trough-12row',
   destPlateType: '96-flat',
   fillPipetteTips: false,
@@ -36,6 +36,14 @@ describe('...single-channel pipette', () => {
   let aspirateSingleCh50FromA1Args
 
   beforeEach(() => {
+    initialRobotState = createRobotState({
+      sourcePlateType: 'trough-12row',
+      destPlateType: '96-flat',
+      fillPipetteTips: false,
+      fillTiprackTips: true,
+      tipracks: [300, 300],
+    })
+
     aspirateSingleCh50FromA1Args = {
       labware: 'sourcePlateId',
       pipette: 'p300SingleId',
@@ -206,6 +214,13 @@ describe('...8-channel pipette', () => {
   let aspirate8Ch50FromA1Args
 
   beforeEach(() => {
+    initialRobotState = createRobotState({
+      sourcePlateType: 'trough-12row',
+      destPlateType: '96-flat',
+      fillPipetteTips: false,
+      fillTiprackTips: true,
+      tipracks: [300, 300],
+    })
     aspirate8Ch50FromA1Args = {
       labware: 'sourcePlateId',
       pipette: 'p300MultiId',
