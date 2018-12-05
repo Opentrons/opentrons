@@ -1,13 +1,12 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import i18n from '../../localization'
 import {FormGroup} from '@opentrons/components'
 
 import {
   StepInputField,
   StepCheckboxRow,
-  DispenseDelayFields,
+  BlowoutLocationDropdown,
   PipetteField,
   LabwareDropdown,
   ChangeTipField,
@@ -45,13 +44,12 @@ const MixForm = (props: MixFormProps): React.Element<typeof React.Fragment> => {
       <div className={formStyles.row_wrapper}>
         <div className={styles.left_settings_column}>
           <FormGroup label='TECHNIQUE'>
-            <DispenseDelayFields
-              disabled
-              tooltipComponent={i18n.t('tooltip.not_in_beta')}
-              focusHandlers={focusHandlers}
-            />
             <StepCheckboxRow name="dispense_blowout_checkbox" label='Blow out'>
-              <LabwareDropdown name="dispense_blowout_labware" className={styles.full_width} {...focusHandlers} />
+              <BlowoutLocationDropdown
+                name="dispense_blowout_location"
+                className={styles.full_width}
+                includeDestWell
+                {...focusHandlers} />
             </StepCheckboxRow>
             <StepCheckboxRow name="touchTip" label='Touch tip'>
               <TipPositionInput fieldName="mix_touchTipMmFromBottom" />

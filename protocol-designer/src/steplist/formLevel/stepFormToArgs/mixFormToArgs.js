@@ -37,13 +37,7 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
   // It's radiobutton, so one should always be selected.
   const changeTip = hydratedFormData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION
 
-  const blowoutLabwareId = hydratedFormData['dispense_blowout_labware']
-
-  const delay = hydratedFormData['dispense_delay_checkbox']
-    ? ((Number(hydratedFormData['dispense_delayMinutes']) || 0) * 60) +
-      (Number(hydratedFormData['dispense_delaySeconds'] || 0))
-    : null
-  // TODO Ian 2018-05-08 delay number parsing errors
+  const blowoutLocation = hydratedFormData['dispense_blowout_checkbox'] ? hydratedFormData['dispense_blowout_location'] : null
 
   return {
     stepType: 'mix',
@@ -55,9 +49,8 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
     times,
     touchTip,
     touchTipMmFromBottom,
-    delay,
     changeTip,
-    blowout: blowoutLabwareId,
+    blowoutLocation,
     pipette: pipette.id,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,

@@ -25,9 +25,10 @@ export type ChangeFormInputAction = {
 
 export const changeFormInput = (payload: ChangeFormPayload) =>
   (dispatch: ThunkDispatch<ChangeFormInputAction>, getState: GetState) => {
+    const unsavedForm = selectors.getUnsavedForm(getState())
     dispatch({
       type: 'CHANGE_FORM_INPUT',
-      payload: handleFormChange(payload, getState),
+      payload: handleFormChange(payload, unsavedForm, getState),
     })
   }
 
@@ -53,12 +54,10 @@ export type DeleteStepAction = {
   payload: StepIdType,
 }
 
-export const deleteStep = () => (dispatch: Dispatch<*>, getState: GetState) => {
-  dispatch({
-    type: 'DELETE_STEP',
-    payload: selectors.getSelectedStepId(getState()),
-  })
-}
+export const deleteStep = (stepId: StepIdType) => ({
+  type: 'DELETE_STEP',
+  payload: stepId,
+})
 
 type ExpandAddStepButtonAction = {
   type: 'EXPAND_ADD_STEP_BUTTON',
@@ -196,4 +195,16 @@ export const setWellSelectionLabwareKey = (labwareName: ?string): * => ({
 export const clearWellSelectionLabwareKey = (): * => ({
   type: 'CLEAR_WELL_SELECTION_LABWARE_KEY',
   payload: null,
+})
+
+export type ReorderStepsAction = {
+  type: 'REORDER_STEPS',
+  payload: {
+    stepIds: Array<StepIdType>,
+  },
+}
+
+export const reorderSteps = (stepIds: Array<StepIdType>): ReorderStepsAction => ({
+  type: 'REORDER_STEPS',
+  payload: {stepIds},
 })

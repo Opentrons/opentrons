@@ -30,7 +30,7 @@ beforeEach(() => {
     pipette: 'p300SingleId',
     labware: 'sourcePlateId',
 
-    delay: null,
+    blowoutLocation: null,
     touchTip: false,
   }
 })
@@ -175,7 +175,7 @@ describe('mix: advanced options', () => {
       volume,
       times,
       changeTip: 'always',
-      blowout: blowoutLabwareId,
+      blowoutLocation: blowoutLabwareId,
       wells: ['A1', 'B1', 'C1'],
     }
 
@@ -214,8 +214,8 @@ describe('mix: advanced options', () => {
       volume,
       times,
       changeTip: 'always',
+      blowoutLocation: blowoutLabwareId,
       touchTip: true,
-      blowout: blowoutLabwareId,
       wells: ['A1', 'B1', 'C1'],
     }
 
@@ -250,8 +250,6 @@ describe('mix: advanced options', () => {
       cmd.touchTip('C1'),
     ])
   })
-
-  test.skip('delay') // TODO Ian 2018-05-08 implement when behavior is decided
 })
 
 describe('mix: errors', () => {

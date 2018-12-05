@@ -26,13 +26,11 @@ beforeEach(() => {
 
     preWetTip: false,
     touchTipAfterAspirate: false,
-    disposalVolume: null,
     mixBeforeAspirate: null,
 
     touchTipAfterDispense: false,
     mixInDestination: null,
-    delayAfterDispense: null,
-    blowout: null,
+    blowoutLocation: null,
   }
 
   robotInitialState = createRobotState({
@@ -405,7 +403,6 @@ describe('advanced options', () => {
       ])
     })
     test('air gap => ???') // TODO determine behavior
-    test('disposal volume => ???') // TODO determine behavior
   })
 
   describe('...dispense options', () => {
@@ -441,57 +438,6 @@ describe('advanced options', () => {
       ])
     })
 
-    test.skip('delay after dispense', () => { // TODO Ian 2018-04-05 support delay in transfer. REMOVE SKIP
-      transferArgs = {
-        ...transferArgs,
-        volume: 350,
-        delayAfterDispense: 100,
-      }
-
-      const result = transfer(transferArgs)(robotInitialState)
-
-      const delayCommand = {
-        command: 'delay',
-        params: {
-          wait: 100,
-          message: null,
-        },
-      }
-
-      expect(result.commands).toEqual([
-        {
-          command: 'aspirate',
-          labware: 'sourcePlateId',
-          pipette: 'p300SingleId',
-          volume: 300,
-          well: 'A1',
-        },
-        {
-          command: 'dispense',
-          labware: 'destPlateId',
-          pipette: 'p300SingleId',
-          volume: 300,
-          well: 'B1',
-        },
-        delayCommand,
-
-        {
-          command: 'aspirate',
-          labware: 'sourcePlateId',
-          pipette: 'p300SingleId',
-          volume: 50,
-          well: 'A1',
-        },
-        {
-          command: 'dispense',
-          labware: 'destPlateId',
-          pipette: 'p300SingleId',
-          volume: 50,
-          well: 'B1',
-        },
-        delayCommand,
-      ])
-    })
     test('blowout should blowout in specified labware after each dispense') // TODO
   })
 })

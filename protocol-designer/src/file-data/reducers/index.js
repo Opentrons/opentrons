@@ -2,10 +2,7 @@
 import {combineReducers} from 'redux'
 import {handleActions, type ActionType} from 'redux-actions'
 
-import {
-  saveFileMetadata,
-  updateFileMetadataFields,
-} from '../actions'
+import {saveFileMetadata} from '../actions'
 import type {FileMetadataFields} from '../types'
 import type {LoadFileAction, NewProtocolFields} from '../../load-file'
 
@@ -40,19 +37,6 @@ function newProtocolMetadata (
   }
 }
 
-const unsavedMetadataForm = handleActions({
-  LOAD_FILE: updateMetadataFields,
-  CREATE_NEW_PROTOCOL: newProtocolMetadata,
-  UPDATE_FILE_METADATA_FIELDS: (state: FileMetadataFields, action: ActionType<typeof updateFileMetadataFields>): FileMetadataFields => ({
-    ...state,
-    ...action.payload,
-  }),
-  SAVE_FILE_METADATA: (state: FileMetadataFields, action: ActionType<typeof saveFileMetadata>): FileMetadataFields => ({
-    ...state,
-    ...action.payload,
-  }),
-}, defaultFields)
-
 const fileMetadata = handleActions({
   LOAD_FILE: updateMetadataFields,
   CREATE_NEW_PROTOCOL: newProtocolMetadata,
@@ -68,13 +52,11 @@ const fileMetadata = handleActions({
 
 export type RootState = {
   currentProtocolExists: boolean,
-  unsavedMetadataForm: FileMetadataFields,
   fileMetadata: FileMetadataFields,
 }
 
 const _allReducers = {
   currentProtocolExists,
-  unsavedMetadataForm,
   fileMetadata,
 }
 

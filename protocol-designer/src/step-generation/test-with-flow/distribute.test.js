@@ -39,7 +39,6 @@ beforeEach(() => {
     mixBeforeAspirate: null,
 
     touchTipAfterDispense: false,
-    delayAfterDispense: null,
   }
 
   robotInitialState = createRobotState({

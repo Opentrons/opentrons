@@ -4,6 +4,7 @@ import zip from 'lodash/zip'
 import * as errorCreators from '../../errorCreators'
 import {getPipetteWithTipMaxVol} from '../../robotStateSelectors'
 import type {TransferFormData, RobotState, CommandCreator, CompoundCommandCreator} from '../../types'
+import {blowoutUtil} from '../../utils'
 import {aspirate, dispense, replaceTip, touchTip} from '../atomic'
 import {mixUtil} from './mix'
 
@@ -124,6 +125,15 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
             )
             : []
 
+          const blowoutCommand = blowoutUtil(
+            data.pipette,
+            data.sourceLabware,
+            sourceWell,
+            data.destLabware,
+            destWell,
+            data.blowoutLocation,
+          )
+
           return [
             ...tipCommands,
             ...preWetTipCommands,
@@ -145,6 +155,7 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
             }),
             ...touchTipAfterDispenseCommands,
             ...mixInDestinationCommands,
+            ...blowoutCommand,
           ]
         }
       )

@@ -1,8 +1,9 @@
 // @flow
-import {selectors} from '../index'
+import handleFormChange from './handleFormChange'
 import {uuid} from '../../utils'
 import {selectors as labwareIngredsSelectors} from '../../labware-ingred/reducers'
 import * as pipetteSelectors from '../../pipettes/selectors'
+import {selectors as steplistSelectors} from '../../steplist'
 import {actions as tutorialActions} from '../../tutorial'
 import {getNextDefaultPipetteId, generateNewForm} from '../formLevel'
 
@@ -16,23 +17,17 @@ export type SelectStepAction = {
 
 // get new or existing step for given stepId
 function getStepFormData (state: BaseState, stepId: StepIdType, newStepType?: StepType): ?FormData {
-  const existingStep = selectors.getSavedForms(state)[stepId]
+  const existingStep = steplistSelectors.getSavedForms(state)[stepId]
 
   if (existingStep) {
     return existingStep
   }
 
-  const defaultNextPipette = getNextDefaultPipetteId(
-    selectors.getSavedForms(state),
-    selectors.getOrderedSteps(state),
-    pipetteSelectors.getPipetteIdsByMount(state)
-  )
-
   // TODO: Ian 2018-09-19 sunset 'steps' reducer. Right now, it's needed here to get stepType
   // for any step that was created but never saved (never clicked Save button).
   // Instead, new steps should have their stepType immediately added
   // to 'savedStepForms' upon creation.
-  const steps = selectors.getSteps(state)
+  const steps = steplistSelectors.getSteps(state)
   const stepTypeFromStepReducer = steps[stepId] && steps[stepId].stepType
   const stepType = newStepType || stepTypeFromStepReducer
 
@@ -44,7 +39,6 @@ function getStepFormData (state: BaseState, stepId: StepIdType, newStepType?: St
   return generateNewForm({
     stepId,
     stepType: stepType,
-    defaultNextPipette,
   })
 }
 
@@ -58,7 +52,35 @@ export const selectStep = (stepId: StepIdType, newStepType?: StepType): ThunkAct
 
     dispatch(selectStepAction)
 
-    const formData = getStepFormData(getState(), stepId, newStepType)
+    const state = getState()
+    let formData = getStepFormData(state, stepId, newStepType)
+
+    const defaultPipetteId = getNextDefaultPipetteId(
+      steplistSelectors.getSavedForms(state),
+      steplistSelectors.getOrderedSteps(state),
+      pipetteSelectors.getEquippedPipettes(state),
+    )
+
+    // For a pristine step, if there is a `pipette` field in the form
+    // (added by upstream `getDefaultsForStepType` fn),
+    // then set `pipette` field of new steps to the next default pipette id.
+    //
+    // In order to trigger dependent field changes (eg default disposal volume),
+    // update the form thru handleFormChange.
+    const formHasPipetteField = formData && 'pipette' in formData
+    if (newStepType && formHasPipetteField && defaultPipetteId) {
+      const updatePayload = {update: {pipette: defaultPipetteId}}
+      const updatedFields = handleFormChange(
+        updatePayload,
+        formData,
+        getState).update
+
+      formData = {
+        ...formData,
+        ...updatedFields,
+      }
+    }
+
     dispatch({
       type: 'POPULATE_FORM',
       payload: formData,
@@ -96,7 +118,7 @@ export type ReorderSelectedStepAction = {
 
 export const reorderSelectedStep = (delta: number) =>
   (dispatch: ThunkDispatch<ReorderSelectedStepAction>, getState: GetState) => {
-    const stepId = selectors.getSelectedStepId(getState())
+    const stepId = steplistSelectors.getSelectedStepId(getState())
 
     if (stepId != null) {
       dispatch({
@@ -105,6 +127,26 @@ export const reorderSelectedStep = (delta: number) =>
           delta,
           stepId,
         },
+      })
+    }
+  }
+
+export type DuplicateStepAction = {
+  type: 'DUPLICATE_STEP',
+  payload: {
+    stepId: StepIdType,
+    duplicateStepId: StepIdType,
+  },
+}
+
+export const duplicateStep = (stepId: StepIdType) =>
+  (dispatch: ThunkDispatch<DuplicateStepAction>, getState: GetState) => {
+    const duplicateStepId = uuid()
+
+    if (stepId != null) {
+      dispatch({
+        type: 'DUPLICATE_STEP',
+        payload: {stepId, duplicateStepId},
       })
     }
   }

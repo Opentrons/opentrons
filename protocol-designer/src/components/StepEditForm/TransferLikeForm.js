@@ -6,9 +6,8 @@ import i18n from '../../localization'
 import {
   StepInputField,
   StepCheckboxRow,
-  DispenseDelayFields,
   PipetteField,
-  DisposalDestinationDropdown,
+  BlowoutLocationDropdown,
   LabwareDropdown,
   ChangeTipField,
 } from './formFields'
@@ -84,7 +83,11 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                       {value
                         ? <div className={styles.field_row}>
                           <div className={styles.sub_select_label}>Blowout</div>
-                          <DisposalDestinationDropdown name="aspirate_disposalVol_destination" className={styles.full_width} {...focusHandlers} />
+                          <BlowoutLocationDropdown
+                            name="dispense_blowout_location"
+                            className={styles.full_width}
+                            includeSourceWell
+                            {...focusHandlers} />
                         </div>
                         : null
                       }
@@ -144,13 +147,14 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                 <StepInputField name="dispense_mix_volume" units="μL" {...focusHandlers} />
                 <StepInputField name="dispense_mix_times" units="Times" {...focusHandlers} />
               </StepCheckboxRow>
-              <DispenseDelayFields
-                disabled
-                tooltipComponent={i18n.t('tooltip.not_in_beta')}
-                focusHandlers={focusHandlers} />
               {stepType !== 'distribute' &&
-                <StepCheckboxRow name='dispense_blowout_checkbox' label='Blow out' >
-                  <LabwareDropdown name="dispense_blowout_labware" className={styles.full_width} {...focusHandlers} />
+                <StepCheckboxRow name='dispense_blowout_checkbox' label='Blow out'>
+                  <BlowoutLocationDropdown
+                    name="dispense_blowout_location"
+                    className={styles.full_width}
+                    includeSourceWell={stepType === 'transfer'}
+                    includeDestWell
+                    {...focusHandlers} />
                 </StepCheckboxRow>
               }
             </FormGroup>

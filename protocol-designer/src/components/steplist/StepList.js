@@ -3,7 +3,6 @@ import * as React from 'react'
 import {SidePanel} from '@opentrons/components'
 
 import StartingDeckStateTerminalItem from './StartingDeckStateTerminalItem'
-import StepItem from '../../containers/ConnectedStepItem'
 import StepCreationButton from '../../containers/StepCreationButton'
 import TerminalItem from './TerminalItem'
 import {END_TERMINAL_TITLE} from '../../constants'
@@ -11,10 +10,12 @@ import {END_TERMINAL_ITEM_ID} from '../../steplist'
 
 import type {StepIdType} from '../../form-types'
 import {PortalRoot} from './TooltipPortal'
+import DraggableStepItems from './DraggableStepItems'
 
 type Props = {
   orderedSteps: Array<StepIdType>,
   reorderSelectedStep: (delta: number) => mixed,
+  reorderSteps: (Array<StepIdType>) => mixed,
 }
 
 export default class StepList extends React.Component<Props> {
@@ -24,11 +25,14 @@ export default class StepList extends React.Component<Props> {
     const altIsPressed = e.getModifierState('Alt')
 
     if (altIsPressed) {
+      let delta = 0
       if (key === 'ArrowUp') {
-        reorderSelectedStep(-1)
+        delta = -1
       } else if (key === 'ArrowDown') {
-        reorderSelectedStep(1)
+        delta = 1
       }
+      if (!delta) return
+      reorderSelectedStep(delta)
     }
   }
 
@@ -41,17 +45,14 @@ export default class StepList extends React.Component<Props> {
   }
 
   render () {
-    const {orderedSteps} = this.props
-
-    const stepItems = orderedSteps.map((stepId: StepIdType) =>
-      <StepItem key={stepId} stepId={stepId} />)
-
     return (
       <React.Fragment>
         <SidePanel
           title='Protocol Timeline'>
           <StartingDeckStateTerminalItem />
-          {stepItems}
+          <DraggableStepItems
+            orderedSteps={this.props.orderedSteps.slice()}
+            reorderSteps={this.props.reorderSteps} />
           <StepCreationButton />
           <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />
         </SidePanel>

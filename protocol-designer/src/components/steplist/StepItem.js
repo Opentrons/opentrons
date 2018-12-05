@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+
 import {PDTitledList} from '../lists'
 import SourceDestSubstep from './SourceDestSubstep'
 import styles from './StepItem.css'
@@ -31,12 +32,13 @@ type StepItemProps = {
   getLabware: (labwareId: ?string) => ?Labware,
   handleSubstepHover: SubstepIdentifier => mixed,
   onStepClick?: (event?: SyntheticEvent<>) => mixed,
+  onStepContextMenu?: (event?: SyntheticEvent<>) => mixed,
   onStepItemCollapseToggle?: (event?: SyntheticEvent<>) => mixed,
   onStepHover?: (event?: SyntheticEvent<>) => mixed,
   onStepMouseLeave?: (event?: SyntheticEvent<>) => mixed,
 }
 
-export default function StepItem (props: StepItemProps) {
+function StepItem (props: StepItemProps) {
   const {
     step,
 
@@ -47,6 +49,7 @@ export default function StepItem (props: StepItemProps) {
 
     onStepMouseLeave,
     onStepClick,
+    onStepContextMenu,
     onStepItemCollapseToggle,
     onStepHover,
   } = props
@@ -62,6 +65,7 @@ export default function StepItem (props: StepItemProps) {
       iconProps={{className: error ? styles.error_icon : ''}}
       title={title || ''}
       onClick={onStepClick}
+      onContextMenu={onStepContextMenu}
       onMouseEnter={onStepHover}
       onMouseLeave={onStepMouseLeave}
       onCollapseToggle={onStepItemCollapseToggle}
@@ -147,3 +151,5 @@ function getStepItemContents (stepItemProps: StepItemProps) {
 
   return result
 }
+
+export default StepItem

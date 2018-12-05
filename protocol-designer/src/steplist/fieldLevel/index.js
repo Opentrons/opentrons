@@ -46,12 +46,6 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
     getErrors: composeErrors(requiredField, minimumWellCount(1)),
     processValue: defaultTo([]),
   },
-  'dispense_delayMinutes': {
-    processValue: composeProcessors(castToNumber, defaultTo(0)),
-  },
-  'dispense_delaySeconds': {
-    processValue: composeProcessors(castToNumber, defaultTo(0)),
-  },
   'dispense_labware': {
     getErrors: composeErrors(requiredField),
     hydrate: hydrateLabware,

@@ -24,7 +24,9 @@ import type {
   AddStepAction,
   ChangeFormInputAction,
   DeleteStepAction,
+  ReorderStepsAction,
   ReorderSelectedStepAction,
+  DuplicateStepAction,
   SaveStepFormAction,
   SelectStepAction,
   SelectTerminalItemAction,
@@ -127,6 +129,13 @@ const steps: Reducer<StepsState, *> = handleActions({
       }
     }, {...initialStepState})
   },
+  DUPLICATE_STEP: (state: StepsState, action: DuplicateStepAction): StepsState => ({
+    ...state,
+    [action.payload.duplicateStepId]: {
+      ...(action.payload.stepId != null ? state[action.payload.stepId] : {}),
+      id: action.payload.duplicateStepId,
+    },
+  }),
 }, initialStepState)
 
 type SavedStepFormState = {
@@ -169,8 +178,15 @@ const savedStepForms: Reducer<SavedStepFormState, *> = handleActions({
   CHANGE_SAVED_STEP_FORM: (state: SavedStepFormState, action: ChangeSavedStepFormAction): SavedStepFormState => ({
     ...state,
     [action.payload.stepId]: {
-      ...(action.payload.stepId ? state[action.payload.stepId] : {}),
+      ...(action.payload.stepId != null ? state[action.payload.stepId] : {}),
       ...action.payload.update,
+    },
+  }),
+  DUPLICATE_STEP: (state: SavedStepFormState, action: DuplicateStepAction): SavedStepFormState => ({
+    ...state,
+    [action.payload.duplicateStepId]: {
+      ...(action.payload.stepId != null ? state[action.payload.stepId] : {}),
+      id: action.payload.duplicateStepId,
     },
   }),
 }, {})
@@ -208,6 +224,7 @@ const orderedSteps: Reducer<OrderedStepsState, *> = handleActions({
   LOAD_FILE: (state: OrderedStepsState, action: LoadFileAction): OrderedStepsState =>
     getPDMetadata(action.payload).orderedSteps,
   REORDER_SELECTED_STEP: (state: OrderedStepsState, action: ReorderSelectedStepAction): OrderedStepsState => {
+    // TODO: BC 2018-11-27 make util function for reordering and use it everywhere
     const {delta, stepId} = action.payload
     const stepsWithoutSelectedStep = state.filter(s => s !== stepId)
     const selectedIndex = state.findIndex(s => s === stepId)
@@ -221,6 +238,19 @@ const orderedSteps: Reducer<OrderedStepsState, *> = handleActions({
       ...stepsWithoutSelectedStep.slice(nextIndex),
     ]
   },
+  DUPLICATE_STEP: (state: OrderedStepsState, action: DuplicateStepAction): OrderedStepsState => {
+    const {stepId, duplicateStepId} = action.payload
+    const selectedIndex = state.findIndex(s => s === stepId)
+
+    return [
+      ...state.slice(0, selectedIndex + 1),
+      duplicateStepId,
+      ...state.slice(selectedIndex + 1, state.length),
+    ]
+  },
+  REORDER_STEPS: (state: OrderedStepsState, action: ReorderStepsAction): OrderedStepsState => (
+    action.payload.stepIds
+  ),
 }, [])
 
 export type SelectableItem = {

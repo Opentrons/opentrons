@@ -7,6 +7,7 @@
 
 .tiprack_labware {
   flex: 3;
+  margin: 0;
 }
 
 .left_pipette,
@@ -21,24 +22,43 @@
 
 .new_file_modal {
   line-height: 1.5;
-  min-height: 100%;
+  height: 100%;
+  padding: 2rem;
+  min-height: 38rem;
 
   /* override default modal top/bottom to allow scroll */
   bottom: auto;
+}
 
-  & form > * {
-    margin-bottom: 1rem;
-  }
+.new_file_modal_contents {
+  position: relative;
+  border-radius: 0;
+  margin: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 
-  & ol > li {
-    counter-increment: step-counter;
-    list-style: none;
-    margin: 1rem 0;
-  }
+.new_file_modal_title {
+  @apply --font-header-dark;
 
-  & ol > li::before {
-    content: counter(step-counter) ") ";
-  }
+  margin-bottom: 1rem;
+}
+
+.beta_restrictions {
+  @apply --font-body-2-dark;
+
+  margin: 1rem 0;
+}
+
+.button_row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.button {
+  margin: 0 0 0 1rem;
 }
 
 .mount_fields_row {

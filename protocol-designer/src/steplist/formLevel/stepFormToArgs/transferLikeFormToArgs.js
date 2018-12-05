@@ -8,10 +8,9 @@ import type {
   DistributeFormData,
   TransferFormData,
 } from '../../../step-generation'
+import {SOURCE_WELL_BLOWOUT_DESTINATION} from '../../../step-generation/utils'
 import { DEFAULT_CHANGE_TIP_OPTION } from '../../../constants'
 import { orderWells } from '../../utils'
-
-export const SOURCE_WELL_DISPOSAL_DESTINATION = 'source_well'
 
 function getMixData (hydratedFormData, checkboxField, volumeField, timesField) {
   const checkbox = hydratedFormData[checkboxField]
@@ -26,13 +25,11 @@ type TransferLikeStepArgs = ConsolidateFormData | DistributeFormData | TransferF
 
 // TODO: BC 2018-10-30 move getting labwareDef into hydration layer upstream
 const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArgs => {
-  console.log([hydratedFormData])
   const stepType = hydratedFormData.stepType
   const pipette = hydratedFormData['pipette']
   const volume = Number(hydratedFormData['volume'])
   const sourceLabware = hydratedFormData['aspirate_labware']
   const destLabware = hydratedFormData['dispense_labware']
-  const blowoutLabwareId = hydratedFormData['dispense_blowout_checkbox'] ? hydratedFormData['dispense_blowout_labware'] : null
 
   const aspirateOffsetFromBottomMm = hydratedFormData['aspirate_mmFromBottom']
   const dispenseOffsetFromBottomMm = hydratedFormData['dispense_mmFromBottom']
@@ -44,11 +41,6 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
   const touchTipAfterDispense = hydratedFormData['dispense_touchTip'] || false
   const touchTipAfterDispenseOffsetMmFromBottom = touchTipAfterDispense
     ? hydratedFormData['dispense_touchTipMmFromBottom']
-    : null
-
-  const delayAfterDispense = hydratedFormData['dispense_delay_checkbox']
-    ? ((Number(hydratedFormData['dispense_delayMinutes']) || 0) * 60) +
-      (Number(hydratedFormData['dispense_delaySeconds'] || 0))
     : null
 
   const mixFirstAspirate = hydratedFormData['aspirate_mix_checkbox']
@@ -74,6 +66,8 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
 
   const changeTip = hydratedFormData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION
 
+  const blowoutLocation = hydratedFormData['dispense_blowout_checkbox'] ? hydratedFormData['dispense_blowout_location'] : null
+
   const commonFields = {
     pipette: pipette.id,
     volume,
@@ -84,9 +78,7 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
 
-    blowout: blowoutLabwareId,
     changeTip,
-    delayAfterDispense,
     mixInDestination,
     preWetTip: hydratedFormData['aspirate_preWetTip'] || false,
     touchTipAfterAspirate,
@@ -126,14 +118,15 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
     }
   }
 
+  // TODO: BC 2018-11-26 move this check into step generation like blowoutLocation
   let disposalVolume = null
   let disposalDestination = null
   let disposalLabware = null
   let disposalWell = null
   if (hydratedFormData['aspirate_disposalVol_checkbox']) {
     disposalVolume = Number(hydratedFormData['aspirate_disposalVol_volume'])
-    disposalDestination = hydratedFormData['aspirate_disposalVol_destination']
-    if (disposalDestination === SOURCE_WELL_DISPOSAL_DESTINATION) {
+    disposalDestination = hydratedFormData['dispense_blowout_location']
+    if (disposalDestination === SOURCE_WELL_BLOWOUT_DESTINATION) {
       disposalLabware = sourceLabware.id
       disposalWell = sourceWells[0]
     } else {
@@ -147,7 +140,7 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
     case 'transfer': {
       const transferStepArguments: TransferFormData = {
         ...commonFields,
-        disposalVolume,
+        blowoutLocation,
         stepType: 'transfer',
         sourceWells,
         destWells,
@@ -159,7 +152,7 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
     case 'consolidate': {
       const consolidateStepArguments: ConsolidateFormData = {
         ...commonFields,
-        disposalVolume,
+        blowoutLocation,
         mixFirstAspirate,
         sourceWells,
         destWell: destWells[0],

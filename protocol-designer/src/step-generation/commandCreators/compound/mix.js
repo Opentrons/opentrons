@@ -1,9 +1,9 @@
 // @flow
 import flatMap from 'lodash/flatMap'
-import {repeatArray} from '../../utils'
+import {repeatArray, blowoutUtil} from '../../utils'
 import * as errorCreators from '../../errorCreators'
 import type {MixFormData, RobotState, CommandCreator, CompoundCommandCreator} from '../../types'
-import {aspirate, blowout, dispense, replaceTip, touchTip} from '../atomic'
+import {aspirate, dispense, replaceTip, touchTip} from '../atomic'
 
 /** Helper fn to make mix command creators w/ minimal arguments */
 export function mixUtil (
@@ -83,13 +83,14 @@ const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: Robo
         ]
         : []
 
-      const blowoutCommands = data.blowout
-        ? [blowout({
-          pipette,
-          labware: data.blowout,
-          well: 'A1',
-        })]
-        : []
+      const blowoutCommand = blowoutUtil(
+        data.pipette,
+        data.labware,
+        well,
+        data.labware,
+        well,
+        data.blowoutLocation,
+      )
 
       const mixCommands = mixUtil(
         pipette,
@@ -104,7 +105,7 @@ const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: Robo
       return [
         ...tipCommands,
         ...mixCommands,
-        ...blowoutCommands,
+        ...blowoutCommand,
         ...touchTipCommands,
       ]
     }
