@@ -1,4 +1,4 @@
-# Changes from 3.5.1 to 3.6.0
+# Changes from 3.5.1 to 3.6.1
 
 For more details, please see the full [technical change log][changelog]
 
@@ -37,8 +37,11 @@ executing, but it does not ([#2020][2020])
 <!-- start:@opentrons/api -->
 ## OT2 and Protocol API
 
+**Important**: This release changes the aspirate function of the P10 single pipette. This change was made because the old function was found to be inaccurate. The new function is based on extensive testing by our hardware team.
+
 ### Bug fixes
 
+- **Fixed the aspirate configuration of the P10 single pipette to avoid under-aspirating**
 - Fixed the iteration order of labware created with `labware.create` to match documentation
 - Fixed various misconfigurations with pipette motor current/position settings
 
