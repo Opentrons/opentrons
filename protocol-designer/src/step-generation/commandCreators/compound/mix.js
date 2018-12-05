@@ -6,6 +6,7 @@ import type {MixFormData, RobotState, CommandCreator, CompoundCommandCreator} fr
 import {aspirate, dispense, replaceTip, touchTip} from '../atomic'
 
 /** Helper fn to make mix command creators w/ minimal arguments */
+// TODO IMMEDIATELY: use named params not ordered args
 export function mixUtil (
   pipette: string,
   labware: string,
@@ -13,11 +14,13 @@ export function mixUtil (
   volume: number,
   times: number,
   aspirateOffsetFromBottomMm?: ?number,
-  dispenseOffsetFromBottomMm?: ?number
+  dispenseOffsetFromBottomMm?: ?number,
+  aspirateFlowRateUlSec?: ?number,
+  dispenseFlowRateUlSec?: ?number,
 ): Array<CommandCreator> {
   return repeatArray([
-    aspirate({pipette, volume, labware, well, offsetFromBottomMm: aspirateOffsetFromBottomMm}),
-    dispense({pipette, volume, labware, well, offsetFromBottomMm: dispenseOffsetFromBottomMm}),
+    aspirate({pipette, volume, labware, well, offsetFromBottomMm: aspirateOffsetFromBottomMm, 'flow-rate': aspirateFlowRateUlSec}),
+    dispense({pipette, volume, labware, well, offsetFromBottomMm: dispenseOffsetFromBottomMm, 'flow-rate': dispenseFlowRateUlSec}),
   ], times)
 }
 
@@ -43,6 +46,8 @@ const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: Robo
     changeTip,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
+    aspirateFlowRateUlSec,
+    dispenseFlowRateUlSec,
   } = data
 
   // Errors
@@ -99,7 +104,9 @@ const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: Robo
         volume,
         times,
         aspirateOffsetFromBottomMm,
-        dispenseOffsetFromBottomMm
+        dispenseOffsetFromBottomMm,
+        aspirateFlowRateUlSec,
+        dispenseFlowRateUlSec
       )
 
       return [

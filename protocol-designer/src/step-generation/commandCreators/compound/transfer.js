@@ -40,6 +40,8 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
   }
 
   const {
+    aspirateFlowRateUlSec,
+    dispenseFlowRateUlSec,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
   } = data
@@ -79,7 +81,9 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
               Math.max(subTransferVol),
               1,
               aspirateOffsetFromBottomMm,
-              dispenseOffsetFromBottomMm
+              dispenseOffsetFromBottomMm,
+              aspirateFlowRateUlSec,
+              dispenseFlowRateUlSec
             )
             : []
 
@@ -91,7 +95,9 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
               data.mixBeforeAspirate.volume,
               data.mixBeforeAspirate.times,
               aspirateOffsetFromBottomMm,
-              dispenseOffsetFromBottomMm
+              dispenseOffsetFromBottomMm,
+              aspirateFlowRateUlSec,
+              dispenseFlowRateUlSec
             )
             : []
 
@@ -121,7 +127,9 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
               data.mixInDestination.volume,
               data.mixInDestination.times,
               aspirateOffsetFromBottomMm,
-              dispenseOffsetFromBottomMm
+              dispenseOffsetFromBottomMm,
+              aspirateFlowRateUlSec,
+              dispenseFlowRateUlSec
             )
             : []
 
@@ -143,6 +151,7 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
               volume: subTransferVol,
               labware: data.sourceLabware,
               well: sourceWell,
+              'flow-rate': aspirateFlowRateUlSec,
               offsetFromBottomMm: aspirateOffsetFromBottomMm,
             }),
             ...touchTipAfterAspirateCommands,
@@ -151,6 +160,7 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
               volume: subTransferVol,
               labware: data.destLabware,
               well: destWell,
+              'flow-rate': dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
             }),
             ...touchTipAfterDispenseCommands,

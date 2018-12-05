@@ -36,6 +36,8 @@ const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prev
   }
 
   const {
+    aspirateFlowRateUlSec,
+    dispenseFlowRateUlSec,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
   } = data
@@ -64,6 +66,7 @@ const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prev
             volume: data.volume,
             labware: data.sourceLabware,
             well: sourceWell,
+            'flow-rate': aspirateFlowRateUlSec,
             offsetFromBottomMm: aspirateOffsetFromBottomMm,
           }),
           ...touchTipAfterAspirateCommand,
@@ -96,7 +99,9 @@ const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prev
           data.mixFirstAspirate.volume,
           data.mixFirstAspirate.times,
           aspirateOffsetFromBottomMm,
-          dispenseOffsetFromBottomMm
+          dispenseOffsetFromBottomMm,
+          aspirateFlowRateUlSec,
+          dispenseFlowRateUlSec,
         )
         : []
 
@@ -109,7 +114,9 @@ const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prev
           data.volume,
           1,
           aspirateOffsetFromBottomMm,
-          dispenseOffsetFromBottomMm
+          dispenseOffsetFromBottomMm,
+          aspirateFlowRateUlSec,
+          dispenseFlowRateUlSec,
         )
         : []
 
@@ -144,6 +151,7 @@ const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prev
           volume: data.volume * sourceWellChunk.length,
           labware: data.destLabware,
           well: data.destWell,
+          'flow-rate': dispenseFlowRateUlSec,
           offsetFromBottomMm: dispenseOffsetFromBottomMm,
         }),
         ...touchTipAfterDispenseCommands,
