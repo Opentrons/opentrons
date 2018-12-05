@@ -5,6 +5,7 @@ import isEqual from 'lodash/isEqual'
 
 import StepItem from '../../containers/ConnectedStepItem'
 import type {StepIdType} from '../../form-types'
+import ContextMenu from './ContextMenu'
 
 const DND_TYPES: {STEP_ITEM: "STEP_ITEM"} = {
   STEP_ITEM: 'STEP_ITEM',
@@ -104,14 +105,19 @@ class StepItems extends React.Component<StepItemsProps, StepItemsState> {
     const currentIds = this.props.isOver ? this.state.stepIds : this.props.orderedSteps
     return this.props.connectDropTarget(
       <div>
-        {currentIds.map((stepId: StepIdType) => (
-          <DragDropStepItem
-            key={stepId}
-            stepId={stepId}
-            findStepIndex={this.findStepIndex}
-            onDrag={this.onDrag}
-            moveStep={this.moveStep} />
-        ))}
+        <ContextMenu>
+          {({makeStepOnContextMenu}) => (
+            currentIds.map((stepId: StepIdType) => (
+              <DragDropStepItem
+                key={stepId}
+                stepId={stepId}
+                onStepContextMenu={makeStepOnContextMenu(stepId)}
+                findStepIndex={this.findStepIndex}
+                onDrag={this.onDrag}
+                moveStep={this.moveStep} />
+            ))
+          )}
+        </ContextMenu>
       </div>
     )
   }

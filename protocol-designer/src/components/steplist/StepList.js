@@ -25,11 +25,14 @@ export default class StepList extends React.Component<Props> {
     const altIsPressed = e.getModifierState('Alt')
 
     if (altIsPressed) {
+      let delta = 0
       if (key === 'ArrowUp') {
-        reorderSelectedStep(-1)
+        delta = -1
       } else if (key === 'ArrowDown') {
-        reorderSelectedStep(1)
+        delta = 1
       }
+      if (!delta) return
+      reorderSelectedStep(delta)
     }
   }
 

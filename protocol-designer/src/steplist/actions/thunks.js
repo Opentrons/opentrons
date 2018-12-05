@@ -130,3 +130,23 @@ export const reorderSelectedStep = (delta: number) =>
       })
     }
   }
+
+export type DuplicateStepAction = {
+  type: 'DUPLICATE_STEP',
+  payload: {
+    stepId: StepIdType,
+    duplicateStepId: StepIdType,
+  },
+}
+
+export const duplicateStep = (stepId: StepIdType) =>
+  (dispatch: ThunkDispatch<DuplicateStepAction>, getState: GetState) => {
+    const duplicateStepId = uuid()
+
+    if (stepId != null) {
+      dispatch({
+        type: 'DUPLICATE_STEP',
+        payload: {stepId, duplicateStepId},
+      })
+    }
+  }

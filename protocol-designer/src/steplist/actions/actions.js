@@ -54,12 +54,10 @@ export type DeleteStepAction = {
   payload: StepIdType,
 }
 
-export const deleteStep = () => (dispatch: Dispatch<*>, getState: GetState) => {
-  dispatch({
-    type: 'DELETE_STEP',
-    payload: selectors.getSelectedStepId(getState()),
-  })
-}
+export const deleteStep = (stepId: StepIdType) => ({
+  type: 'DELETE_STEP',
+  payload: stepId,
+})
 
 type ExpandAddStepButtonAction = {
   type: 'EXPAND_ADD_STEP_BUTTON',
