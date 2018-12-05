@@ -54,32 +54,32 @@ const _getWellContents = (
   }, {})
 }
 
-const wellContentsAllLabware: Selector<WellContentsByLabware> = createSelector(
-  labwareIngredSelectors.getLabware,
-  labwareIngredSelectors.getIngredientLocations,
-  labwareIngredSelectors.getSelectedContainer,
+const getWellContentsAllLabware: Selector<WellContentsByLabware> = createSelector(
+  labwareIngredSelectors.getLabwareById,
+  labwareIngredSelectors.getLiquidsByLabwareId,
+  labwareIngredSelectors.getSelectedLabware,
   wellSelectionSelectors.getSelectedWells,
   wellSelectionSelectors.getHighlightedWells,
-  (_labware, _ingredsByLabware, _selectedLabware, _selectedWells, _highlightedWells) => {
-    const allLabwareIds: Array<string> = Object.keys(_labware) // TODO Ian 2018-05-29 weird flow error w/o annotation
+  (labwareById, liquidsByLabware, selectedLabware, selectedWells, highlightedWells) => {
+    const allLabwareIds: Array<string> = Object.keys(labwareById) // TODO Ian 2018-05-29 weird flow error w/o annotation
 
     return allLabwareIds.reduce((acc: {[labwareId: string]: ContentsByWell | null}, labwareId: string) => {
-      const ingredsForLabware = _ingredsByLabware[labwareId]
-      const isSelectedLabware = _selectedLabware && (_selectedLabware.id === labwareId)
+      const liquidsForLabware = liquidsByLabware[labwareId]
+      const isSelectedLabware = selectedLabware && (selectedLabware.id === labwareId)
 
-      // Skip labware ids with no ingreds
+      // Skip labware ids with no liquids
       return {
         ...acc,
         [labwareId]: _getWellContents(
-          _labware[labwareId] && _labware[labwareId].type,
-          ingredsForLabware,
+          labwareById[labwareId] && labwareById[labwareId].type,
+          liquidsForLabware,
           // Only give _getWellContents the selection data if it's a selected container
-          isSelectedLabware ? _selectedWells : null,
-          isSelectedLabware ? _highlightedWells : null
+          isSelectedLabware ? selectedWells : null,
+          isSelectedLabware ? highlightedWells : null
         ),
       }
     }, {})
   }
 )
 
-export default wellContentsAllLabware
+export default getWellContentsAllLabware

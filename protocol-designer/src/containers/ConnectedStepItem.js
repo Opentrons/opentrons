@@ -35,7 +35,7 @@ type DP = $Diff<$Diff<Props, SP>, OP>
 
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {stepId} = ownProps
-  const allSteps = steplistSelectors.allSteps(state)
+  const allSteps = steplistSelectors.getAllSteps(state)
 
   const hoveredSubstep = steplistSelectors.getHoveredSubstep(state)
   const hoveredStep = steplistSelectors.getHoveredStepId(state)
@@ -62,7 +62,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     // user is not hovering on substep.
     hovered: (hoveredStep === stepId) && !hoveredSubstep,
 
-    getLabware: (labwareId: ?string) => labwareId ? labwareIngredSelectors.getLabware(state)[labwareId] : null,
+    getLabware: (labwareId: ?string) => labwareId ? labwareIngredSelectors.getLabwareById(state)[labwareId] : null,
     ingredNames: labwareIngredSelectors.getLiquidNamesById(state),
   }
 }

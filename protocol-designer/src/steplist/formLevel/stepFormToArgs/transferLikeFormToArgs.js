@@ -25,7 +25,6 @@ type TransferLikeStepArgs = ConsolidateFormData | DistributeFormData | TransferF
 
 // TODO: BC 2018-10-30 move getting labwareDef into hydration layer upstream
 const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArgs => {
-  console.log([hydratedFormData])
   const stepType = hydratedFormData.stepType
   const pipette = hydratedFormData['pipette']
   const volume = Number(hydratedFormData['volume'])
@@ -42,11 +41,6 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
   const touchTipAfterDispense = hydratedFormData['dispense_touchTip'] || false
   const touchTipAfterDispenseOffsetMmFromBottom = touchTipAfterDispense
     ? hydratedFormData['dispense_touchTipMmFromBottom']
-    : null
-
-  const delayAfterDispense = hydratedFormData['dispense_delay_checkbox']
-    ? ((Number(hydratedFormData['dispense_delayMinutes']) || 0) * 60) +
-      (Number(hydratedFormData['dispense_delaySeconds'] || 0))
     : null
 
   const mixFirstAspirate = hydratedFormData['aspirate_mix_checkbox']
@@ -85,7 +79,6 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
     dispenseOffsetFromBottomMm,
 
     changeTip,
-    delayAfterDispense,
     mixInDestination,
     preWetTip: hydratedFormData['aspirate_preWetTip'] || false,
     touchTipAfterAspirate,

@@ -1,5 +1,7 @@
 // @flow
+import findKey from 'lodash/findKey'
 import last from 'lodash/last'
+import type {PipetteData} from '../../../step-generation'
 import type {StepIdType, FormData} from '../../../form-types'
 
 // TODO: Ian 2018-09-18 once we support switching pipettes mid-protocol,
@@ -11,7 +13,7 @@ import type {StepIdType, FormData} from '../../../form-types'
 export default function getNextDefaultPipetteId (
   savedForms: {[StepIdType]: FormData},
   orderedSteps: Array<StepIdType>,
-  pipetteIdsByMount: {left?: ?string, right?: ?string}
+  equippedPipettesById: {[string]: PipetteData}
 ): string {
   const prevPipetteSteps = orderedSteps
     .map(stepId => savedForms[stepId])
@@ -19,10 +21,11 @@ export default function getNextDefaultPipetteId (
 
   const lastPipetteStep = last(prevPipetteSteps)
 
-  const nextDefaultPipette = (
+  // NOTE: order of findKey not guaranteed, expecting at most one pipette on each mount
+  const nextDefaultPipette: ?string = (
     (lastPipetteStep && lastPipetteStep.pipette) ||
-    pipetteIdsByMount['left'] ||
-    pipetteIdsByMount['right']
+    findKey(equippedPipettesById, p => p.mount === 'left') ||
+    findKey(equippedPipettesById, p => p.mount === 'right')
   )
 
   if (!nextDefaultPipette) {

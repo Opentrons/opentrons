@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 
 import type {BaseState} from '../../types'
 import {selectors, type Page} from '../../navigation'
-import Privacy from './Privacy'
+import SettingsApp from './SettingsApp'
 
 export {default as SettingsSidebar} from './SettingsSidebar'
 
@@ -16,14 +16,14 @@ const SettingsPage = (props: SP) => {
       // TODO: BC 2018-09-01 when we have feature flags put them here
       return <div>Feature Flags Coming Soon...</div>
     }
-    case 'settings-privacy':
+    case 'settings-app':
     default:
-      return <Privacy />
+      return <SettingsApp />
   }
 }
 
 const STP = (state: BaseState): SP => ({
-  currentPage: selectors.currentPage(state),
+  currentPage: selectors.getCurrentPage(state),
 })
 
 export default connect(STP)(SettingsPage)

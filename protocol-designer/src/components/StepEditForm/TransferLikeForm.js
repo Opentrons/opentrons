@@ -6,7 +6,6 @@ import i18n from '../../localization'
 import {
   StepInputField,
   StepCheckboxRow,
-  DispenseDelayFields,
   PipetteField,
   BlowoutLocationDropdown,
   LabwareDropdown,
@@ -148,10 +147,6 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                 <StepInputField name="dispense_mix_volume" units="μL" {...focusHandlers} />
                 <StepInputField name="dispense_mix_times" units="Times" {...focusHandlers} />
               </StepCheckboxRow>
-              <DispenseDelayFields
-                disabled
-                tooltipComponent={i18n.t('tooltip.not_in_beta')}
-                focusHandlers={focusHandlers} />
               {stepType !== 'distribute' &&
                 <StepCheckboxRow name='dispense_blowout_checkbox' label='Blow out'>
                   <BlowoutLocationDropdown

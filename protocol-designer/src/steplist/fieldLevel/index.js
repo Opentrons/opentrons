@@ -24,10 +24,10 @@ export type {
 }
 
 const hydrateLabware = (state: StepFormContextualState, id: string) => (
-  labwareIngredSelectors.getLabware(state)[id]
+  labwareIngredSelectors.getLabwareById(state)[id]
 )
 const hydratePipette = (state: StepFormContextualState, id: string) => (
-  pipetteSelectors.pipettesById(state)[id]
+  pipetteSelectors.getPipettesById(state)[id]
 )
 
 type StepFieldHelpers = {
@@ -45,12 +45,6 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
   'aspirate_wells': {
     getErrors: composeErrors(requiredField, minimumWellCount(1)),
     processValue: defaultTo([]),
-  },
-  'dispense_delayMinutes': {
-    processValue: composeProcessors(castToNumber, defaultTo(0)),
-  },
-  'dispense_delaySeconds': {
-    processValue: composeProcessors(castToNumber, defaultTo(0)),
   },
   'dispense_labware': {
     getErrors: composeErrors(requiredField),

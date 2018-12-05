@@ -39,12 +39,6 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
 
   const blowoutLocation = hydratedFormData['dispense_blowout_checkbox'] ? hydratedFormData['dispense_blowout_location'] : null
 
-  const delay = hydratedFormData['dispense_delay_checkbox']
-    ? ((Number(hydratedFormData['dispense_delayMinutes']) || 0) * 60) +
-      (Number(hydratedFormData['dispense_delaySeconds'] || 0))
-    : null
-  // TODO Ian 2018-05-08 delay number parsing errors
-
   return {
     stepType: 'mix',
     name: `Mix ${hydratedFormData.id}`, // TODO real name for steps
@@ -55,7 +49,6 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
     times,
     touchTip,
     touchTipMmFromBottom,
-    delay,
     changeTip,
     blowoutLocation,
     pipette: pipette.id,

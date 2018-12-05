@@ -23,6 +23,7 @@ const dismissedHints = handleActions({
     const {hintKey, rememberDismissal} = action.payload
     return {...state, [hintKey]: {rememberDismissal}}
   },
+  CLEAR_ALL_HINT_DISMISSALS: () => dismissedHintsInitialState,
 }, dismissedHintsInitialState)
 
 export function dismissedHintsPersist (state: DismissedHintReducerState) {

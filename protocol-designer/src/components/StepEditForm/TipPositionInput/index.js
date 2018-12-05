@@ -99,7 +99,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
 
   let wellHeightMM = null
   if (formData && formData[labwareFieldName]) {
-    const labwareById = labwareIngredsSelectors.getLabware(state)
+    const labwareById = labwareIngredsSelectors.getLabwareById(state)
     const labware = labwareById[formData[labwareFieldName]]
     const labwareDef = labware && labware.type && getLabware(labware.type)
     if (labwareDef) {

@@ -1,7 +1,10 @@
 // @flow
 import * as React from 'react'
+import HTML5Backend from 'react-dnd-html5-backend'
 import {connect} from 'react-redux'
+import { DragDropContext } from 'react-dnd'
 import type {BaseState, ThunkDispatch} from '../types'
+import type {StepIdType} from '../form-types'
 
 import {
   actions as steplistActions,
@@ -19,15 +22,19 @@ type DP = $Diff<Props, SP>
 
 function mapStateToProps (state: BaseState): SP {
   return {
-    orderedSteps: steplistSelectors.orderedSteps(state),
+    orderedSteps: steplistSelectors.getOrderedSteps(state),
   }
 }
 
 function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
   return {
-    reorderSelectedStep: (delta: number) =>
-      dispatch(steplistActions.reorderSelectedStep(delta)),
+    reorderSelectedStep: (delta: number) => {
+      dispatch(steplistActions.reorderSelectedStep(delta))
+    },
+    reorderSteps: (stepIds: Array<StepIdType>) => {
+      dispatch(steplistActions.reorderSteps(stepIds))
+    },
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(StepList)
+export default DragDropContext(HTML5Backend)(connect(mapStateToProps, mapDispatchToProps)(StepList))

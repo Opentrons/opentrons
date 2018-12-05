@@ -3,7 +3,7 @@ import {createSelector} from 'reselect'
 import mapValues from 'lodash/mapValues'
 import {getPropertyAllPipettes} from '@opentrons/shared-data'
 import {getFileMetadata} from './fileFields'
-import {getInitialRobotState, robotStateTimeline} from './commands'
+import {getInitialRobotState, getRobotStateTimeline} from './commands'
 import {selectors as dismissSelectors} from '../../dismiss'
 import {selectors as ingredSelectors} from '../../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../../steplist'
@@ -36,16 +36,16 @@ const executionDefaults = {
 export const createFile: BaseState => ProtocolFile = createSelector(
   getFileMetadata,
   getInitialRobotState,
-  robotStateTimeline,
+  getRobotStateTimeline,
   dismissSelectors.getAllDismissedWarnings,
   ingredSelectors.getLiquidGroupsById,
-  ingredSelectors.getIngredientLocations,
+  ingredSelectors.getLiquidsByLabwareId,
   steplistSelectors.getSavedForms,
-  steplistSelectors.orderedSteps,
+  steplistSelectors.getOrderedSteps,
   (
     fileMetadata,
     initialRobotState,
-    _robotStateTimeline,
+    robotStateTimeline,
     dismissedWarnings,
     ingredients,
     ingredLocations,
@@ -124,7 +124,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
       pipettes: instruments,
       labware,
 
-      procedure: _robotStateTimeline.timeline.map((timelineItem, i) => ({
+      procedure: robotStateTimeline.timeline.map((timelineItem, i) => ({
         annotation: {
           name: `TODO Name ${i}`,
           description: 'todo description',

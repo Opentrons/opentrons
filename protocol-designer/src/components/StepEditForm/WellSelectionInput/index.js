@@ -34,7 +34,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const formData = steplistSelectors.getUnsavedForm(state)
   const pipetteId = formData && formData[ownProps.pipetteFieldName]
   const selectedWells = formData ? formData[ownProps.name] : []
-  const pipetteData = pipetteId && pipetteSelectors.pipettesById(state)[pipetteId]
+  const pipetteData = pipetteId && pipetteSelectors.getPipettesById(state)[pipetteId]
   const isMulti = pipetteData && (pipetteData.channels > 1)
 
   return {

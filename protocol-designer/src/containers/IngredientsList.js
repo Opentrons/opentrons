@@ -18,12 +18,12 @@ type DP = {
 type SP = $Diff<Props, DP> & {_labwareId: ?string}
 
 function mapStateToProps (state: BaseState): SP {
-  const container = selectors.getSelectedContainer(state)
+  const container = selectors.getSelectedLabware(state)
   const _labwareId = container && container.id
 
   return {
     liquidGroupsById: selectors.getLiquidGroupsById(state),
-    labwareWellContents: (container && selectors.getIngredientLocations(state)[container.id]) || {},
+    labwareWellContents: (container && selectors.getLiquidsByLabwareId(state)[container.id]) || {},
     selectedIngredientGroupId: wellSelectionSelectors.getSelectedWellsCommonIngredId(state),
     selected: false,
     _labwareId,

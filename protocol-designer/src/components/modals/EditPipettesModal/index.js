@@ -57,7 +57,6 @@ const tiprackOptions = [
   {name: '200 μL', value: 'tiprack-200ul'},
   {name: '300 μL', value: 'opentrons-tiprack-300ul'},
   {name: '1000 μL', value: 'tiprack-1000ul'},
-  {name: '1000 μL Chem', value: 'tiprack-1000ul-chem'},
 ]
 
 const DEFAULT_SELECTION = {pipetteModel: '', tiprackModel: null}
@@ -203,7 +202,7 @@ class EditPipettesModal extends React.Component<Props, State> {
 }
 
 const mapSTP = (state: BaseState): SP => {
-  const pipetteData = pipetteSelectors.pipettesForEditPipettes(state)
+  const pipetteData = pipetteSelectors.getPipettesForEditPipettes(state)
   return {
     initialLeft: pipetteData.find(i => i.mount === 'left'),
     initialRight: pipetteData.find(i => i.mount === 'right'),

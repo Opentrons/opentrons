@@ -40,7 +40,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const formData = steplistSelectors.getUnsavedForm(state)
 
   const pipetteId = formData ? formData[pipetteFieldName] : null
-  const pipette = pipetteId && pipetteSelectors.pipettesById(state)[pipetteId]
+  const pipette = pipetteId && pipetteSelectors.getPipettesById(state)[pipetteId]
   const pipetteConfig = pipette && getPipetteNameSpecs(pipette.model)
   const pipetteDisplayName = pipetteConfig ? pipetteConfig.displayName : 'pipette'
 

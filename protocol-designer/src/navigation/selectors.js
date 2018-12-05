@@ -4,10 +4,10 @@ import {rootSelector as navigationRootSelector} from './reducers'
 
 import type {Page} from './types'
 
-export const newProtocolModal = (state: BaseState) =>
+export const getNewProtocolModal = (state: BaseState) =>
   navigationRootSelector(state).newProtocolModal
 
-export const currentPage: Selector<Page> = (state: BaseState) => {
+export const getCurrentPage: Selector<Page> = (state: BaseState) => {
   let page = navigationRootSelector(state).page
 
   return page

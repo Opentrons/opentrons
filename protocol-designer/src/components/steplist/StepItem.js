@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+
 import {PDTitledList} from '../lists'
 import SourceDestSubstep from './SourceDestSubstep'
 import styles from './StepItem.css'
@@ -36,7 +37,7 @@ type StepItemProps = {
   onStepMouseLeave?: (event?: SyntheticEvent<>) => mixed,
 }
 
-export default function StepItem (props: StepItemProps) {
+function StepItem (props: StepItemProps) {
   const {
     step,
 
@@ -147,3 +148,5 @@ function getStepItemContents (stepItemProps: StepItemProps) {
 
   return result
 }
+
+export default StepItem

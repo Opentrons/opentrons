@@ -28,15 +28,15 @@ function Sidebar (props: Props) {
     case 'file-detail':
       return <FileSidebar />
     case 'settings-features':
-    case 'settings-privacy':
+    case 'settings-app':
       return <SettingsSidebar />
   }
   return null
 }
 
 function mapStateToProps (state: BaseState): Props {
-  const page = selectors.currentPage(state)
-  const liquidPlacementMode = !!labwareIngredSelectors.getSelectedContainer(state)
+  const page = selectors.getCurrentPage(state)
+  const liquidPlacementMode = !!labwareIngredSelectors.getSelectedLabware(state)
 
   return {
     page,

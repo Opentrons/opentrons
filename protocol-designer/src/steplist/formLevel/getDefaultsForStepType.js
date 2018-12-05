@@ -26,6 +26,7 @@ export default function getDefaultsForStepType (stepType: StepType) {
         'dispense_blowout_checkbox': false,
         'dispense_blowout_location': FIXED_TRASH_ID,
         'dispense_wells': [],
+        'pipette': null,
         'volume': undefined,
       }
     case 'consolidate':
@@ -41,6 +42,7 @@ export default function getDefaultsForStepType (stepType: StepType) {
         'dispense_blowout_checkbox': false,
         'dispense_blowout_location': FIXED_TRASH_ID,
         'dispense_wells': [],
+        'pipette': null,
         'volume': undefined,
       }
     case 'mix':
@@ -51,9 +53,10 @@ export default function getDefaultsForStepType (stepType: StepType) {
         'aspirate_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
         'dispense_blowout_checkbox': false,
         'dispense_blowout_location': FIXED_TRASH_ID,
-        'wells': [],
         'mix_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE, // NOTE: mix uses dispense for both asp + disp, for now
+        'pipette': null,
         'volume': undefined,
+        'wells': [],
       }
     case 'distribute':
       return {
@@ -68,6 +71,7 @@ export default function getDefaultsForStepType (stepType: StepType) {
         'dispense_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
         'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
         'dispense_wells': [],
+        'pipette': null,
         'volume': undefined,
       }
     default:

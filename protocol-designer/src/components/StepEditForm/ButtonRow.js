@@ -29,7 +29,9 @@ const ButtonRow = (props: Props) => {
   )
 }
 
-const STP = (state: BaseState): SP => ({ canSave: selectors.currentFormCanBeSaved(state) })
+const STP = (state: BaseState): SP => ({
+  canSave: selectors.getCurrentFormCanBeSaved(state),
+})
 
 const DTP = (dispatch: ThunkDispatch<*>): DP => ({
   onCancel: () => dispatch(actions.cancelStepForm()),

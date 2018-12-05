@@ -7,17 +7,6 @@ For more details, please see the full [technical change log][changelog]
 <!-- start:@opentrons/app -->
 ## Opentrons App
 
-### Known issues
-
-- The app's run log is still having problems displaying the current run step, especially if pauses and resumes are involved ([#2047][2047])
-- The app should prevent you from starting a pipette swap while a protocol is
-executing, but it does not ([#2020][2020])
-- If a protocol run encounters an error, the app will suppress the error message instead of displaying it ([#1828][1828])
-
-[2047]: https://github.com/Opentrons/opentrons/issues/2047
-[2020]: https://github.com/Opentrons/opentrons/issues/2020
-[1828]: https://github.com/Opentrons/opentrons/issues/1828
-
 ### Bug fixes
 
 - Lost connection alert messages will no longer trigger when your robot is restarting for normal reasons (e.g. software update or deck calibration). Sorry for the confusion this caused!
@@ -32,10 +21,30 @@ executing, but it does not ([#2020][2020])
     - Please see our support documentation for more details
 - After tip-probe is completed, the app will now move the pipette out of the way so you have better access to the deck
 
+### Known issues
+
+- The app's run log is still having problems displaying the current run step, especially if pauses and resumes are involved ([#2047][2047])
+- The app should prevent you from starting a pipette swap while a protocol is
+executing, but it does not ([#2020][2020])
+- If a protocol run encounters an error, the app will suppress the error message instead of displaying it ([#1828][1828])
+
+[2047]: https://github.com/Opentrons/opentrons/issues/2047
+[2020]: https://github.com/Opentrons/opentrons/issues/2020
+[1828]: https://github.com/Opentrons/opentrons/issues/1828
+
 <!-- end:@opentrons/app -->
 
 <!-- start:@opentrons/api -->
 ## OT2 and Protocol API
+
+### Bug fixes
+
+- Fixed the iteration order of labware created with `labware.create` to match documentation
+- Fixed various misconfigurations with pipette motor current/position settings
+
+### New features
+
+- Added support for `v1.4` pipette models
 
 ### Known issues
 
@@ -46,13 +55,5 @@ executing, but it does not ([#2020][2020])
     3. Insert plate and calibrate normally
         - After the plate has been calibrated once, the issue will not reoccur
 
-### Bug fixes
-
-- Fixed the iteration order of labware created with `labware.create` to match documentation
-- Fixed a misconfiguration with the motor current settings for drop-tip
-
-### New features
-
-There aren't any new user facing features in this release, but the API team is hard at work putting exciting new stuff in place behind the scenes!
 
 <!-- end:@opentrons/api -->
