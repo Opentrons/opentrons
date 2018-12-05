@@ -3,6 +3,7 @@ import flatMap from 'lodash/flatMap'
 import zip from 'lodash/zip'
 import aspirate from './aspirate'
 import dispense from './dispense'
+import {blowoutUtil} from './utils'
 import {mixUtil} from './mix'
 import replaceTip from './replaceTip'
 import touchTip from './touchTip'
@@ -127,6 +128,15 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
             )
             : []
 
+          const blowoutCommand = blowoutUtil(
+            data.pipette,
+            data.sourceLabware,
+            sourceWell,
+            data.destLabware,
+            destWell,
+            data.blowoutLocation,
+          )
+
           return [
             ...tipCommands,
             ...preWetTipCommands,
@@ -148,6 +158,7 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
             }),
             ...touchTipAfterDispenseCommands,
             ...mixInDestinationCommands,
+            ...blowoutCommand,
           ]
         }
       )

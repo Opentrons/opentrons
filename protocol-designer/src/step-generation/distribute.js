@@ -65,7 +65,7 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
         destWells: [destWell],
         mixBeforeAspirate: data.mixBeforeAspirate,
         mixInDestination: null,
-        blowout: null,
+        blowoutLocation: null,
       }
       return transfer(transferData)
     })
@@ -112,6 +112,7 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
         tipCommands = [replaceTip(data.pipette)]
       }
 
+      // TODO: BC 2018-11-29 instead of disposalLabware and disposalWell use blowoutLocation
       let blowoutCommands = []
       if (data.disposalVolume && data.disposalLabware && data.disposalWell) {
         blowoutCommands = [blowout({

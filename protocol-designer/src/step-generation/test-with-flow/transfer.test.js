@@ -26,12 +26,11 @@ beforeEach(() => {
 
     preWetTip: false,
     touchTipAfterAspirate: false,
-    disposalVolume: null,
     mixBeforeAspirate: null,
 
     touchTipAfterDispense: false,
     mixInDestination: null,
-    blowout: null,
+    blowoutLocation: null,
   }
 
   robotInitialState = createRobotState({
@@ -404,7 +403,6 @@ describe('advanced options', () => {
       ])
     })
     test('air gap => ???') // TODO determine behavior
-    test('disposal volume => ???') // TODO determine behavior
   })
 
   describe('...dispense options', () => {

@@ -30,6 +30,7 @@ beforeEach(() => {
     pipette: 'p300SingleId',
     labware: 'sourcePlateId',
 
+    blowoutLocation: null,
     touchTip: false,
   }
 })
@@ -174,7 +175,7 @@ describe('mix: advanced options', () => {
       volume,
       times,
       changeTip: 'always',
-      blowout: blowoutLabwareId,
+      blowoutLocation: blowoutLabwareId,
       wells: ['A1', 'B1', 'C1'],
     }
 
@@ -213,8 +214,8 @@ describe('mix: advanced options', () => {
       volume,
       times,
       changeTip: 'always',
+      blowoutLocation: blowoutLabwareId,
       touchTip: true,
-      blowout: blowoutLabwareId,
       wells: ['A1', 'B1', 'C1'],
     }
 

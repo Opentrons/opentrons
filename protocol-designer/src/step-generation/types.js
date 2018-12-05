@@ -38,8 +38,6 @@ export type TransferLikeFormDataFields = {
   touchTipAfterAspirateOffsetMmFromBottom?: ?number,
   /** changeTip is interpreted differently by different Step types */
   changeTip: ChangeTipOptions,
-  /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
-  disposalVolume: ?number,
   /** offset from bottom of well in mm */
   aspirateOffsetFromBottomMm?: ?number,
 
@@ -58,8 +56,9 @@ export type ConsolidateFormData = {
   sourceWells: Array<string>,
   destWell: string,
 
-  /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
-  blowout: ?string, // TODO LATER LabwareId export type here instead of string?
+  /** If given, blow out in the specified destination after dispense at the end of each asp-asp-dispense cycle */
+  blowoutLocation: ?string,
+
   /** Mix in first well in chunk */
   mixFirstAspirate: ?MixArgs,
   /** Mix in destination well after dispense */
@@ -72,8 +71,9 @@ export type TransferFormData = {
   sourceWells: Array<string>,
   destWells: Array<string>,
 
-  /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
-  blowout: ?string, // TODO LATER LabwareId export type here instead of string?
+  /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
+  blowoutLocation: ?string,
+
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?MixArgs,
   /** Mix in destination well after dispense */
@@ -86,6 +86,8 @@ export type DistributeFormData = {
   sourceWell: string,
   destWells: Array<string>,
 
+  /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
+  disposalVolume: ?number,
   /** Disposal labware and well for final blowout destination of disposalVolume contents (e.g. trash, source well, etc.) */
   disposalLabware: ?string,
   disposalWell: ?string,
@@ -109,8 +111,10 @@ export type MixFormData = {
   touchTipMmFromBottom?: ?number,
   /** change tip: see comments in step-generation/mix.js */
   changeTip: ChangeTipOptions,
-  /** If given, blow out in the specified labware after mixing each well */
-  blowout?: string,
+
+  /** If given, blow out in the specified destination after mixing each well */
+  blowoutLocation: ?string,
+
   /** offset from bottom of well in mm */
   aspirateOffsetFromBottomMm?: ?number,
   dispenseOffsetFromBottomMm?: ?number,

@@ -94,12 +94,11 @@ describe('consolidate single-channel', () => {
 
     preWetTip: false,
     touchTipAfterAspirate: false,
-    disposalVolume: null,
     mixFirstAspirate: null,
 
     touchTipAfterDispense: false,
     mixInDestination: null,
-    blowout: null,
+    blowoutLocation: null,
   }
 
   test('Minimal single-channel: A1 A2 to B1, 50uL with p300', () => {
@@ -228,31 +227,6 @@ describe('consolidate single-channel', () => {
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
-  test('disposal vol should be taken from first well', () => {
-    const data = {
-      ...baseData,
-      volume: 100,
-      changeTip: 'once',
-      disposalVolume: 50,
-    }
-
-    const result = consolidate(data)(robotInitialState)
-
-    expect(result.commands).toEqual([
-      cmd.pickUpTip('A1'),
-      cmd.aspirate('A1', 150), // disposalVolume included
-      cmd.aspirate('A2', 100),
-      dispense('B1', 200),
-      cmd.blowout(), // Trash the disposal volume
-
-      cmd.aspirate('A3', 150), // disposalVolume included
-      cmd.aspirate('A4', 100),
-      dispense('B1', 200),
-      cmd.blowout(), // Trash the disposal volume
-    ])
-    expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
-  })
-
   test('mix on aspirate should mix before aspirate in first well of chunk only', () => {
     const data = {
       ...baseData,
@@ -281,11 +255,10 @@ describe('consolidate single-channel', () => {
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
-  test('mix on aspirate with disposal vol', () => {
+  test('mix on aspirate', () => {
     const data = {
       ...baseData,
       volume: 125,
-      disposalVolume: 30,
       changeTip: 'once',
       mixFirstAspirate: {times: 3, volume: 50},
     }
@@ -302,12 +275,9 @@ describe('consolidate single-channel', () => {
       cmd.aspirate('A1', 50),
       cmd.dispense('A1', 50), // sourceLabwareId
       // done mix
-      cmd.aspirate('A1', 155), // with disposal vol
+      cmd.aspirate('A1', 125),
       cmd.aspirate('A2', 125),
       dispense('B1', 250),
-
-      // Trash the disposal volume
-      cmd.blowout(),
 
       // Start mix
       cmd.aspirate('A3', 50),
@@ -318,11 +288,9 @@ describe('consolidate single-channel', () => {
       cmd.dispense('A3', 50), // sourceLabwareId
       // done mix
 
-      cmd.aspirate('A3', 155), // with disposal volume
+      cmd.aspirate('A3', 125),
       cmd.aspirate('A4', 125),
       dispense('B1', 250),
-      // Trash the disposal volume
-      cmd.blowout(),
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -360,7 +328,7 @@ describe('consolidate single-channel', () => {
       volume: 100,
       changeTip: 'once',
       mixInDestination: {times: 3, volume: 54},
-      blowout: 'trashId',
+      blowoutLocation: 'trashId',
     }
 
     const result = consolidate(data)(robotInitialState)
@@ -380,40 +348,6 @@ describe('consolidate single-channel', () => {
       ...tripleMix('B1', 54, 'destPlateId'),
 
       cmd.blowout(),
-    ])
-    expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
-  })
-
-  test('mix after dispense with disposal volume: dispose, then mix (?)', () => {
-    // TODO Ian 2018-02-13 should the mixing happen after disposing? Or should this behavior be different?
-    const data = {
-      ...baseData,
-      volume: 100,
-      changeTip: 'once',
-      disposalVolume: 30,
-      mixInDestination: {times: 3, volume: 52},
-    }
-
-    const result = consolidate(data)(robotInitialState)
-    expect(result.commands).toEqual([
-      cmd.pickUpTip('A1'),
-      cmd.aspirate('A1', 130), // includes disposal volume
-      cmd.aspirate('A2', 100),
-      dispense('B1', 200),
-      // Trash the disposal volume
-      cmd.blowout(),
-
-      // Mix in the dest well
-      ...tripleMix('B1', 52, 'destPlateId'),
-
-      cmd.aspirate('A3', 130), // includes disposal volume
-      cmd.aspirate('A4', 100),
-      dispense('B1', 200),
-      // Trash the disposal volume
-      cmd.blowout(),
-
-      // Mix in the dest well
-      ...tripleMix('B1', 52, 'destPlateId'),
     ])
     expect(result.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -557,12 +491,11 @@ describe('consolidate multi-channel', () => {
 
     preWetTip: false,
     touchTipAfterAspirate: false,
-    disposalVolume: null,
     mixFirstAspirate: null,
 
     touchTipAfterDispense: false,
     mixInDestination: null,
-    blowout: null,
+    blowoutLocation: null,
   }
 
   test('simple multi-channel: cols A1 A2 A3 A4 to col A12', () => {
