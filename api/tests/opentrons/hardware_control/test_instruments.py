@@ -115,7 +115,7 @@ async def test_aspirate(dummy_instruments, loop):
     aspirate_ul = 3.0
     aspirate_rate = 2
     await hw_api.aspirate(types.Mount.LEFT, aspirate_ul, aspirate_rate)
-    new_plunger_pos = 6.05285 
+    new_plunger_pos = 6.05285
     assert hw_api.current_position(types.Mount.LEFT)[Axis.B] == new_plunger_pos
 
 
