@@ -104,8 +104,6 @@ export default class NewFileModal extends React.Component<Props, State> {
               onChange={this.handleNameChange} />
           </FormGroup>
 
-          <BetaRestrictions />
-
           <div className={styles.mount_fields_row}>
             <div className={styles.mount_column}>
               <FormGroup key="leftPipetteModel" label="Left Pipette" className={formStyles.stacked_row}>
@@ -179,14 +177,3 @@ export default class NewFileModal extends React.Component<Props, State> {
     )
   }
 }
-
-const BetaRestrictions = () => (
-  <React.Fragment>
-    <p className={styles.beta_restrictions}>
-      <strong>NOTE:</strong>
-      &nbsp;
-      Pipettes can&apos;t share tip racks. There must be at least 1 tip rack per
-      pipette.
-    </p>
-  </React.Fragment>
-)
