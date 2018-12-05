@@ -9,13 +9,13 @@ import ReleaseNotes from '../../ReleaseNotes'
 
 import {API_RELEASE_NOTES} from '../../../shell'
 
-import type {VersionProps} from './types'
 import type {RobotUpdateInfo} from '../../../http-api-client'
+import type {VersionProps} from './types'
 import type {ButtonProps} from '@opentrons/components'
 type Props = {
-  versionProps: VersionProps,
   updateInfo: RobotUpdateInfo,
   parentUrl: string,
+  versionProps: VersionProps,
   ignoreUpdate: () => mixed,
   update: () => mixed,
 }
@@ -45,10 +45,11 @@ export default class SyncRobotModal extends React.Component<
       ignoreUpdate,
       parentUrl,
     } = this.props
-    const {availableUpdate} = versionProps
+    // should this always be the app version for sync purposes?
+    const {version} = updateInfo
     const {showReleaseNotes} = this.state
 
-    const heading = `Version ${availableUpdate} available`
+    const heading = `Version ${version} available`
     let buttons: Array<?ButtonProps>
 
     if (showReleaseNotes) {
@@ -88,11 +89,7 @@ export default class SyncRobotModal extends React.Component<
           <ReleaseNotes source={API_RELEASE_NOTES} />
         ) : (
           <React.Fragment>
-            <SyncRobotMessage
-              updateInfo={updateInfo}
-              // TODO fix this to only be available robot version
-              appVersion={availableUpdate}
-            />
+            <SyncRobotMessage updateInfo={updateInfo} />
             <VersionList {...versionProps} ignoreAppUpdate />
           </React.Fragment>
         )}

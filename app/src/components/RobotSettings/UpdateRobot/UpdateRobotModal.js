@@ -81,9 +81,11 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
     } else if (robotUpdateInfo.type) {
       return (
         <SyncRobotModal
-          {...this.props}
-          versionProps={versionProps}
           updateInfo={robotUpdateInfo}
+          parentUrl={parentUrl}
+          versionProps={versionProps}
+          update={this.props.update}
+          ignoreUpdate={this.props.ignoreUpdate}
         />
       )
     } else {
