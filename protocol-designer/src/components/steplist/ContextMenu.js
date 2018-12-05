@@ -70,13 +70,14 @@ class ContextMenu extends React.Component<Props, State> {
   handleDuplicate = () => {
     if (this.state.stepId != null) {
       this.props.duplicateStep(this.state.stepId)
+      this.setState({stepId: null, visible: false})
     }
   }
 
   handleDelete = () => {
     if (this.state.stepId != null && confirm(i18n.t('alert.window.confirm_delete_step'))) {
       this.props.deleteStep(this.state.stepId)
-      this.setState({stepId: null})
+      this.setState({stepId: null, visible: false})
     }
   }
 
