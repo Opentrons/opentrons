@@ -176,7 +176,3 @@
   color: white;
   background-color: color(var(--c-bg-dark) shade(30%));
 }
-
-.confirm_delete_modal {
-  z-index: 1100;
-}
