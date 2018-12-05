@@ -29,7 +29,7 @@ export default function getNextRobotStateAndWarnings (command: Command, prevRobo
       // TODO: BC 2018-11-29 handle air-gap
       return {robotState: prevRobotState, warnings: []}
     default:
-      assert(true, `unknown command: ${command.command} passed to getNextRobotStateAndWarning`)
+      assert(false, `unknown command: ${command.command} passed to getNextRobotStateAndWarning`)
       return {robotState: prevRobotState, warnings: []}
   }
 }
