@@ -6,8 +6,8 @@ import assignId from './assignId'
 import {toWellName, sortWells, splitWellsOnColumn} from '../helpers/index'
 import labwareSchema from '../../labware-json-schema/labware-schema.json'
 import {
-  SLOT_WIDTH_MM as SLOT_LENGTH_MM,
-  SLOT_HEIGHT_MM as SLOT_WIDTH_MM,
+  SLOT_WIDTH_MM,
+  SLOT_LENGTH_MM,
 } from '../constants'
 
 type Metadata = {

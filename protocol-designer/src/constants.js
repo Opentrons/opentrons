@@ -3,13 +3,12 @@ import reduce from 'lodash/reduce'
 import * as componentLib from '@opentrons/components'
 import {getLabware} from '@opentrons/shared-data'
 import type {JsonWellData, WellVolumes} from './types'
+// TODO Ian 2018-11-27: import these from components lib, not from this contants file
 export const {
   // OT2 DECK CONSTANTS
   SLOTNAME_MATRIX,
   sortedSlotnames,
   TRASH_SLOTNAME,
-  SLOT_WIDTH_MM,
-  SLOT_HEIGHT_MM,
   SLOT_SPACING_MM,
   // STYLE CONSTANTS
   swatchColors,
@@ -57,5 +56,7 @@ export const DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP = -1
 
 export const DEFAULT_WELL_ORDER_FIRST_OPTION: 't2b' = 't2b'
 export const DEFAULT_WELL_ORDER_SECOND_OPTION: 'l2r' = 'l2r'
+
+export const DISPOSAL_VOLUME_PERCENTAGE = 0.2 // 20% percent of pipette capacity
 
 export const WELL_LABEL_OFFSET: number = 8

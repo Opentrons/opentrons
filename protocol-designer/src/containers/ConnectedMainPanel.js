@@ -24,7 +24,7 @@ function MainPanel (props: Props) {
       return <ConnectedFilePage />
     case 'liquids':
       return <LiquidsPage />
-    case 'settings-privacy':
+    case 'settings-app':
       return <SettingsPage />
     default:
       return <ConnectedDeckSetup />
@@ -33,6 +33,6 @@ function MainPanel (props: Props) {
 
 function mapStateToProps (state: BaseState): Props {
   return {
-    page: selectors.currentPage(state),
+    page: selectors.getCurrentPage(state),
   }
 }

@@ -24,6 +24,7 @@ import type {
   AddStepAction,
   ChangeFormInputAction,
   DeleteStepAction,
+  ReorderStepsAction,
   ReorderSelectedStepAction,
   DuplicateStepAction,
   SaveStepFormAction,
@@ -223,6 +224,7 @@ const orderedSteps: Reducer<OrderedStepsState, *> = handleActions({
   LOAD_FILE: (state: OrderedStepsState, action: LoadFileAction): OrderedStepsState =>
     getPDMetadata(action.payload).orderedSteps,
   REORDER_SELECTED_STEP: (state: OrderedStepsState, action: ReorderSelectedStepAction): OrderedStepsState => {
+    // TODO: BC 2018-11-27 make util function for reordering and use it everywhere
     const {delta, stepId} = action.payload
     const stepsWithoutSelectedStep = state.filter(s => s !== stepId)
     const selectedIndex = state.findIndex(s => s === stepId)
@@ -246,6 +248,9 @@ const orderedSteps: Reducer<OrderedStepsState, *> = handleActions({
       ...state.slice(selectedIndex + 1, state.length),
     ]
   },
+  REORDER_STEPS: (state: OrderedStepsState, action: ReorderStepsAction): OrderedStepsState => (
+    action.payload.stepIds
+  ),
 }, [])
 
 export type SelectableItem = {

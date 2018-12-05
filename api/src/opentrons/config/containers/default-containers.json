@@ -23045,7 +23045,7 @@
                          "z": 6.95,
                          "depth": 112.85,
                          "diameter": 17,
-                         "total-liquid-volume": 15000
+                         "total-liquid-volume": 50000
                     },
                     "B1": {
                          "x": 35,
@@ -23053,7 +23053,7 @@
                          "z": 6.95,
                          "depth": 112.85,
                          "diameter": 17,
-                         "total-liquid-volume": 15000
+                         "total-liquid-volume": 50000
                     },
                     "A2": {
                          "x": 0,
@@ -23061,7 +23061,7 @@
                          "z": 6.95,
                          "depth": 112.85,
                          "diameter": 17,
-                         "total-liquid-volume": 15000
+                         "total-liquid-volume": 50000
                     },
                     "B2": {
                          "x": 35,
@@ -23069,7 +23069,7 @@
                          "z": 6.95,
                          "depth": 112.85,
                          "diameter": 17,
-                         "total-liquid-volume": 15000
+                         "total-liquid-volume": 50000
                     },
                     "A3": {
                          "x": 0,
@@ -23077,7 +23077,7 @@
                          "z": 6.95,
                          "depth": 112.85,
                          "diameter": 17,
-                         "total-liquid-volume": 15000
+                         "total-liquid-volume": 50000
                     },
                     "B3": {
                          "x": 35,
@@ -23085,7 +23085,7 @@
                          "z": 6.95,
                          "depth": 112.85,
                          "diameter": 17,
-                         "total-liquid-volume": 15000
+                         "total-liquid-volume": 50000
                     }
                }
           },

@@ -2,6 +2,7 @@
 import {createSelector} from 'reselect'
 import noop from 'lodash/noop'
 import * as StepGeneration from '../../step-generation'
+import {allSubsteps as getAllSubsteps} from '../substeps'
 import {
   selectors as steplistSelectors,
   START_TERMINAL_ITEM_ID,
@@ -32,16 +33,16 @@ function getTipHighlighted (
     if (c.command === 'pick-up-tip' && c.params.labware === labwareId) {
       const commandWellName = c.params.well
       const pipetteId = c.params.pipette
-      const labwareName = StepGeneration.getLabwareType(labwareId, robotState)
+      const labwareType = StepGeneration.getLabwareType(labwareId, robotState)
       const channels = StepGeneration.getPipetteChannels(pipetteId, robotState)
 
-      if (!labwareName) {
-        console.error(`Labware ${labwareId} missing labwareName. Could not get tip highlight state`)
+      if (!labwareType) {
+        console.error(`Labware ${labwareId} missing labwareType. Could not get tip highlight state`)
         return false
       } else if (channels === 1) {
         return commandWellName === wellName
       } else if (channels === 8) {
-        const wellSet = getWellSetForMultichannel(labwareName, commandWellName)
+        const wellSet = getWellSetForMultichannel(labwareType, commandWellName)
         return Boolean(wellSet && wellSet.includes(wellName))
       } else {
         console.error(`Unexpected number of channels: ${channels || '?'}. Could not get tip highlight state`)
@@ -86,14 +87,16 @@ const getLastValidTips: GetTipSelector = createSelector(
 )
 
 export const getTipsForCurrentStep: GetTipSelector = createSelector(
-  steplistSelectors.orderedSteps,
-  fileDataSelectors.robotStateTimeline,
+  steplistSelectors.getOrderedSteps,
+  fileDataSelectors.getRobotStateTimeline,
   steplistSelectors.getHoveredStepId,
   steplistSelectors.getActiveItem,
   getInitialTips,
   getLastValidTips,
   getLabwareIdProp,
-  (orderedSteps, robotStateTimeline, hoveredStepId, activeItem, initialTips, lastValidTips, labwareId) => {
+  steplistSelectors.getHoveredSubstep,
+  getAllSubsteps,
+  (orderedSteps, robotStateTimeline, hoveredStepId, activeItem, initialTips, lastValidTips, labwareId, hoveredSubstepIdentifier, allSubsteps) => {
     if (!activeItem.isStep) {
       const terminalId = activeItem.id
       if (terminalId === START_TERMINAL_ITEM_ID) {
@@ -128,9 +131,39 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
         : false
 
       // show highlights of tips used by current frame, if user is hovering
-      const highlighted = (hovered && currentFrame)
-        ? getTipHighlighted(labwareId, wellName, currentFrame)
-        : false
+      let highlighted = false
+      if (hoveredSubstepIdentifier && currentFrame) {
+        const {substepIndex} = hoveredSubstepIdentifier
+        const substepsForStep = allSubsteps[hoveredSubstepIdentifier.stepId]
+
+        if (substepsForStep && substepsForStep.stepType !== 'pause') {
+          if (substepsForStep.multichannel) {
+            const hoveredSubstepData = substepsForStep.multiRows[substepIndex][0] // just use first multi row
+
+            const labwareType = StepGeneration.getLabwareType(labwareId, currentFrame.robotState)
+            const wellSet = (labwareType && hoveredSubstepData.activeTips)
+              ? getWellSetForMultichannel(labwareType, hoveredSubstepData.activeTips.well)
+              : []
+
+            highlighted = (hoveredSubstepData &&
+              hoveredSubstepData.activeTips &&
+              hoveredSubstepData.activeTips.labware === labwareId &&
+              Boolean(wellSet && wellSet.includes(wellName))
+            ) || false
+          } else {
+            // single-channel
+            const hoveredSubstepData = substepsForStep.rows[substepIndex]
+
+            highlighted = (hoveredSubstepData &&
+              hoveredSubstepData.activeTips &&
+              hoveredSubstepData.activeTips.labware === labwareId &&
+              hoveredSubstepData.activeTips.well === wellName
+            ) || false
+          }
+        }
+      } else if (hovered && currentFrame) {
+        highlighted = getTipHighlighted(labwareId, wellName, currentFrame)
+      }
 
       return {
         empty,

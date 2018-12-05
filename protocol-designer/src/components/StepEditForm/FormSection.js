@@ -3,8 +3,9 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import startCase from 'lodash/startCase'
 import cx from 'classnames'
-import {IconButton} from '@opentrons/components'
+import {IconButton, HoverTooltip} from '@opentrons/components'
 
+import i18n from '../../localization'
 import {selectors as steplistSelectors} from '../../steplist'
 import {collapseFormSection} from '../../steplist/actions'
 import type {BaseState, ThunkDispatch} from '../../types'
@@ -34,19 +35,26 @@ const FormSection = (props: FormSectionProps) => {
       </div>
 
       {props.collapsed !== undefined && // if doesn't exist in redux
-        <div onClick={props.onCollapseToggle} className={styles.carat}>
-          <IconButton
-            name='settings'
-            hover={!props.collapsed}
-          />
-        </div>
+        <HoverTooltip tooltipComponent={i18n.t('tooltip.advanced_settings')}>
+          {(hoverTooltipHandlers) => (
+            <div {...hoverTooltipHandlers}
+              onClick={props.onCollapseToggle}
+              className={styles.carat}
+            >
+              <IconButton
+                name='settings'
+                hover={!props.collapsed}
+              />
+            </div>
+          )}
+        </HoverTooltip>
       }
     </div>
   )
 }
 
 const FormSectionSTP = (state: BaseState, ownProps: OP) => ({
-  collapsed: steplistSelectors.formSectionCollapse(state)[ownProps.sectionName],
+  collapsed: steplistSelectors.getFormSectionCollapsed(state)[ownProps.sectionName],
 })
 const FormSectionDTP = (dispatch: ThunkDispatch<*>, ownProps: OP) => ({
   onCollapseToggle: () => dispatch(collapseFormSection(ownProps.sectionName)),

@@ -14,7 +14,7 @@ import {
 import type {BaseState, ThunkDispatch} from '../types'
 
 function mapStateToProps (state: BaseState) {
-  const formModalData = selectors.formModalData(state)
+  const formModalData = selectors.getFormModalData(state)
   return {
     hideModal: formModalData === null,
     formData: formModalData,

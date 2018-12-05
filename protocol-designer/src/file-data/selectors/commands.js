@@ -23,8 +23,8 @@ const all96Tips = reduce(
 
 // NOTE this just adds missing well keys to the labware-ingred 'deck setup' liquid state
 export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> = createSelector(
-  labwareIngredSelectors.getIngredientLocations,
-  labwareIngredSelectors.getLabware,
+  labwareIngredSelectors.getLiquidsByLabwareId,
+  labwareIngredSelectors.getLabwareById,
   (ingredLocations, allLabware) => {
     const allLabwareIds: Array<string> = Object.keys(allLabware)
     return allLabwareIds.reduce((
@@ -59,8 +59,8 @@ function labwareConverter (labwareAppState: {[labwareId: string]: ?Labware}): {[
 }
 
 export const getInitialRobotState: BaseState => StepGeneration.RobotState = createSelector(
-  pipetteSelectors.equippedPipettes,
-  labwareIngredSelectors.getLabware,
+  pipetteSelectors.getEquippedPipettes,
+  labwareIngredSelectors.getLabwareById,
   getLabwareLiquidState,
   (pipettes, labwareAppState, labwareLiquidState) => {
     type TipState = $PropertyType<StepGeneration.RobotState, 'tipState'>
@@ -133,9 +133,9 @@ function compoundCommandCreatorFromStepArgs (stepArgs: StepGeneration.CommandCre
 }
 
 // exposes errors and last valid robotState
-export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelector(
+export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSelector(
   steplistSelectors.getArgsAndErrorsByStepId,
-  steplistSelectors.orderedSteps,
+  steplistSelectors.getOrderedSteps,
   getInitialRobotState,
   (allStepArgsAndErrors, orderedSteps, initialRobotState) => {
     const allStepArgs: Array<StepGeneration.CommandCreatorData | null> = orderedSteps.map(stepId => {
@@ -198,8 +198,8 @@ export const robotStateTimeline: Selector<StepGeneration.Timeline> = createSelec
 
 type WarningsPerStep = {[stepId: number | string]: ?Array<StepGeneration.CommandCreatorWarning>}
 export const timelineWarningsPerStep: Selector<WarningsPerStep> = createSelector(
-  steplistSelectors.orderedSteps,
-  robotStateTimeline,
+  steplistSelectors.getOrderedSteps,
+  getRobotStateTimeline,
   (orderedSteps, timeline) => timeline.timeline.reduce((acc: WarningsPerStep, frame, timelineIndex) => {
     const stepId = orderedSteps[timelineIndex]
 
@@ -212,8 +212,8 @@ export const timelineWarningsPerStep: Selector<WarningsPerStep> = createSelector
 )
 
 export const getErrorStepId: Selector<?StepIdType> = createSelector(
-  steplistSelectors.orderedSteps,
-  robotStateTimeline,
+  steplistSelectors.getOrderedSteps,
+  getRobotStateTimeline,
   (orderedSteps, timeline) => {
     const hasErrors = timeline.errors && timeline.errors.length > 0
     if (hasErrors) {
@@ -227,7 +227,7 @@ export const getErrorStepId: Selector<?StepIdType> = createSelector(
 )
 
 export const lastValidRobotState: Selector<StepGeneration.RobotState> = createSelector(
-  robotStateTimeline,
+  getRobotStateTimeline,
   getInitialRobotState,
   (timeline, initialRobotState) => {
     const lastTimelineFrame = last(timeline.timeline)

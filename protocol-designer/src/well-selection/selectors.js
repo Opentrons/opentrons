@@ -9,7 +9,7 @@ import type {OpenWellSelectionModalPayload} from './actions'
 
 const rootSelector = (state: BaseState) => state.wellSelection
 
-const wellSelectionModalData: Selector<?OpenWellSelectionModalPayload> = createSelector(
+const getWellSelectionModalData: Selector<?OpenWellSelectionModalPayload> = createSelector(
   rootSelector,
   s => s.wellSelectionModal
 )
@@ -47,24 +47,24 @@ function _primaryToAllWells (
 
 const getSelectedWells: Selector<Wells> = createSelector(
   getSelectedPrimaryWells,
-  wellSelectionModalData,
+  getWellSelectionModalData,
   _primaryToAllWells
 )
 
 const getHighlightedWells: Selector<Wells> = createSelector(
   getHighlightedPrimaryWells,
-  wellSelectionModalData,
+  getWellSelectionModalData,
   _primaryToAllWells
 )
 
-const selectedWellNames: Selector<Array<string>> = createSelector(
+const getSelectedWellNames: Selector<Array<string>> = createSelector(
   (state: BaseState) => rootSelector(state).selectedWells.selected,
   selectedWells => Object.keys(selectedWells).sort(sortWells)
 )
 
 export default {
-  selectedWellNames,
+  getSelectedWellNames,
   getSelectedWells,
   getHighlightedWells,
-  wellSelectionModalData,
+  getWellSelectionModalData,
 }

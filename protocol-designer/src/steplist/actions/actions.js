@@ -25,9 +25,10 @@ export type ChangeFormInputAction = {
 
 export const changeFormInput = (payload: ChangeFormPayload) =>
   (dispatch: ThunkDispatch<ChangeFormInputAction>, getState: GetState) => {
+    const unsavedForm = selectors.getUnsavedForm(getState())
     dispatch({
       type: 'CHANGE_FORM_INPUT',
-      payload: handleFormChange(payload, getState),
+      payload: handleFormChange(payload, unsavedForm, getState),
     })
   }
 
@@ -121,10 +122,10 @@ export const saveStepForm = () =>
   (dispatch: Dispatch<*>, getState: GetState) => {
     const state = getState()
 
-    if (selectors.currentFormCanBeSaved(state)) {
+    if (selectors.getCurrentFormCanBeSaved(state)) {
       dispatch({
         type: 'SAVE_STEP_FORM',
-        payload: selectors.formData(state),
+        payload: selectors.getUnsavedForm(state),
       })
     }
   }
@@ -155,7 +156,7 @@ export type OpenMoreOptionsModal = {
 export const openMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
   dispatch({
     type: 'OPEN_MORE_OPTIONS_MODAL',
-    payload: selectors.formData(getState()), // TODO only pull in relevant fields?
+    payload: selectors.getUnsavedForm(getState()), // TODO only pull in relevant fields?
   })
 }
 
@@ -182,7 +183,7 @@ export type SaveMoreOptionsModal = {
 export const saveMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
   dispatch({
     type: 'SAVE_MORE_OPTIONS_MODAL',
-    payload: selectors.formModalData(getState()),
+    payload: selectors.getFormModalData(getState()),
   })
 }
 
@@ -194,4 +195,16 @@ export const setWellSelectionLabwareKey = (labwareName: ?string): * => ({
 export const clearWellSelectionLabwareKey = (): * => ({
   type: 'CLEAR_WELL_SELECTION_LABWARE_KEY',
   payload: null,
+})
+
+export type ReorderStepsAction = {
+  type: 'REORDER_STEPS',
+  payload: {
+    stepIds: Array<StepIdType>,
+  },
+}
+
+export const reorderSteps = (stepIds: Array<StepIdType>): ReorderStepsAction => ({
+  type: 'REORDER_STEPS',
+  payload: {stepIds},
 })

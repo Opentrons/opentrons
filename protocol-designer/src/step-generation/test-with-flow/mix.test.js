@@ -30,7 +30,6 @@ beforeEach(() => {
     pipette: 'p300SingleId',
     labware: 'sourcePlateId',
 
-    delay: null,
     touchTip: false,
   }
 })
@@ -250,8 +249,6 @@ describe('mix: advanced options', () => {
       cmd.touchTip('C1'),
     ])
   })
-
-  test.skip('delay') // TODO Ian 2018-05-08 implement when behavior is decided
 })
 
 describe('mix: errors', () => {

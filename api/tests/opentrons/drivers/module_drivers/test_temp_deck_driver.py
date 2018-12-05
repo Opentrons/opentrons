@@ -8,6 +8,8 @@
 # If you send a commmand to the serial comm module and it never sees the
 # expected ACK, then it'll eventually time out and return an error
 
+import time
+
 
 def test_get_temp_deck_temperature():
     # Get the curent and target temperatures
@@ -52,21 +54,33 @@ def test_fail_get_temp_deck_temperature():
     temp_deck = TempDeck()
     temp_deck.simulating = False
 
+    done = False
+
     def _mock_send_command1(self, command, timeout=None):
+        nonlocal done
+        done = True
         return 'T:none C:90'
 
     temp_deck._send_command = types.MethodType(_mock_send_command1, temp_deck)
 
     temp_deck.update_temperature()
+    time.sleep(0.25)
+    while not done:
+        time.sleep(0.25)
 
     assert temp_deck._temperature == {'current': 90, 'target': None}
 
     def _mock_send_command2(self, command, timeout=None):
+        nonlocal done
+        done = True
         return 'Tx:none C:1'    # Failure premise
 
     temp_deck._send_command = types.MethodType(_mock_send_command2, temp_deck)
-
+    done = False
     temp_deck.update_temperature()
+    time.sleep(0.25)
+    while not done:
+        time.sleep(0.25)
     assert temp_deck._temperature == {'current': 90, 'target': None}
 
 

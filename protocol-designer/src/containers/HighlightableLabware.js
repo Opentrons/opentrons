@@ -29,7 +29,7 @@ type OP = {
 type SP = $Diff<Props, OP>
 
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
-  const selectedContainerId = selectors.getSelectedContainerId(state)
+  const selectedContainerId = selectors.getSelectedLabwareId(state)
   const containerId = ownProps.containerId || selectedContainerId
 
   if (containerId === null) {
@@ -41,8 +41,8 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     }
   }
 
-  const labware = selectors.getLabware(state)[containerId]
-  const allWellContentsForSteps = wellContentsSelectors.allWellContentsForSteps(state)
+  const labware = selectors.getLabwareById(state)[containerId]
+  const allWellContentsForSteps = wellContentsSelectors.getAllWellContentsForSteps(state)
   const wellSelectionModeForLabware = selectedContainerId === containerId
   let wellContents: ContentsByWell = {}
 
@@ -51,18 +51,18 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     !activeItem.isStep && activeItem.id === START_TERMINAL_ITEM_ID
   ) {
     // selection for deck setup: shows initial state of liquids
-    wellContents = wellContentsSelectors.wellContentsAllLabware(state)[containerId]
+    wellContents = wellContentsSelectors.getWellContentsAllLabware(state)[containerId]
   } else if (
     !activeItem.isStep && activeItem.id === END_TERMINAL_ITEM_ID
   ) {
     // "end" terminal
-    wellContents = wellContentsSelectors.lastValidWellContents(state)[containerId]
+    wellContents = wellContentsSelectors.getLastValidWellContents(state)[containerId]
   } else if (!activeItem.isStep) {
     console.warn(`HighlightableLabware got unhandled terminal id: "${activeItem.id}"`)
   } else {
     const stepId = activeItem.id
     // TODO: Ian 2018-07-31 replace with util function, "findIndexOrNull"?
-    const orderedSteps = steplistSelectors.orderedSteps(state)
+    const orderedSteps = steplistSelectors.getOrderedSteps(state)
     const timelineIdx = orderedSteps.includes(stepId)
       ? orderedSteps.findIndex(id => id === stepId)
       : null
@@ -77,7 +77,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
         // Valid non-end step
         ? allWellContentsForSteps[timelineIdx][containerId]
         // Erroring step: show last valid well contents in timeline
-        : wellContentsSelectors.lastValidWellContents(state)[containerId]
+        : wellContentsSelectors.getLastValidWellContents(state)[containerId]
     }
 
     if (wellSelectionModeForLabware) {

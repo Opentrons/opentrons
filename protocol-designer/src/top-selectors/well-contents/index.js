@@ -22,8 +22,8 @@ import type {
 
 // TODO Ian 2018-04-19: factor out all these selectors to their own files,
 // and make this index.js just imports and exports.
-import wellContentsAllLabwareExport from './wellContentsAllLabware'
-export const wellContentsAllLabware = wellContentsAllLabwareExport
+import getWellContentsAllLabware from './getWellContentsAllLabware'
+export {getWellContentsAllLabware}
 export type {WellContentsByLabware}
 
 function _wellContentsForWell (
@@ -68,11 +68,11 @@ export function _wellContentsForLabware (
   )
 }
 
-export const allWellContentsForSteps: Selector<Array<WellContentsByLabware>> = createSelector(
+export const getAllWellContentsForSteps: Selector<Array<WellContentsByLabware>> = createSelector(
   fileDataSelectors.getInitialRobotState,
-  fileDataSelectors.robotStateTimeline,
-  (_initialRobotState, _robotStateTimeline) => {
-    const timeline = [{robotState: _initialRobotState}, ..._robotStateTimeline.timeline]
+  fileDataSelectors.getRobotStateTimeline,
+  (initialRobotState, robotStateTimeline) => {
+    const timeline = [{robotState: initialRobotState}, ...robotStateTimeline.timeline]
 
     return timeline.map((timelineStep, timelineIndex) => {
       const liquidState = timelineStep.robotState.liquidState.labware
@@ -93,7 +93,7 @@ export const allWellContentsForSteps: Selector<Array<WellContentsByLabware>> = c
   }
 )
 
-export const lastValidWellContents: Selector<WellContentsByLabware> = createSelector(
+export const getLastValidWellContents: Selector<WellContentsByLabware> = createSelector(
   fileDataSelectors.lastValidRobotState,
   (robotState) => {
     return mapValues(
@@ -109,9 +109,9 @@ export const lastValidWellContents: Selector<WellContentsByLabware> = createSele
   }
 )
 
-export const selectedWellsMaxVolume: Selector<number> = createSelector(
+export const getSelectedWellsMaxVolume: Selector<number> = createSelector(
   wellSelectionSelectors.getSelectedWells,
-  labwareIngredSelectors.getSelectedContainer,
+  labwareIngredSelectors.getSelectedLabware,
   (selectedWells, selectedContainer) => {
     const selectedWellNames = Object.keys(selectedWells)
     const selectedContainerType = selectedContainer && selectedContainer.type
@@ -135,8 +135,8 @@ type CommonWellValues = {ingredientId: ?string, volume: ?number}
  * or null if there is not a single common ingredient group */
 export const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSelector(
   wellSelectionSelectors.getSelectedWells,
-  labwareIngredSelectors.getSelectedContainerId,
-  labwareIngredSelectors.getIngredientLocations,
+  labwareIngredSelectors.getSelectedLabwareId,
+  labwareIngredSelectors.getLiquidsByLabwareId,
   (selectedWellsObj, labwareId, allIngreds) => {
     if (!labwareId) return {ingredientId: null, volume: null}
     const ingredsInLabware = allIngreds[labwareId]

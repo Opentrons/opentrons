@@ -135,12 +135,12 @@ function _getSelectedWellsForSubstep (
 }
 
 export const wellHighlightsByLabwareId: Selector<AllWellHighlightsAllLabware> = createSelector(
-  fileDataSelectors.robotStateTimeline,
+  fileDataSelectors.getRobotStateTimeline,
   steplistSelectors.getArgsAndErrorsByStepId,
   steplistSelectors.getHoveredStepId,
   steplistSelectors.getHoveredSubstep,
   allSubsteps,
-  steplistSelectors.orderedSteps,
+  steplistSelectors.getOrderedSteps,
   (robotStateTimeline, allStepArgsAndErrors, hoveredStepId, hoveredSubstep, allSubsteps, orderedSteps) => {
     const timeline = robotStateTimeline.timeline
     const stepId = hoveredStepId

@@ -17,10 +17,10 @@ import type {SubstepItemData} from '../steplist/types'
 type AllSubsteps = {[StepIdType]: ?SubstepItemData}
 export const allSubsteps: Selector<AllSubsteps> = createSelector(
   steplistSelectors.getArgsAndErrorsByStepId,
-  pipetteSelectors.equippedPipettes,
+  pipetteSelectors.getEquippedPipettes,
   labwareIngredSelectors.getLabwareTypes,
-  steplistSelectors.orderedSteps,
-  fileDataSelectors.robotStateTimeline,
+  steplistSelectors.getOrderedSteps,
+  fileDataSelectors.getRobotStateTimeline,
   fileDataSelectors.getInitialRobotState,
   (
     allStepArgsAndErrors,
@@ -30,8 +30,9 @@ export const allSubsteps: Selector<AllSubsteps> = createSelector(
     robotStateTimeline,
     _initialRobotState,
   ) => {
+    const timeline = [{robotState: _initialRobotState}, ...robotStateTimeline.timeline]
+
     return orderedSteps.reduce((acc: AllSubsteps, stepId, timelineIndex) => {
-      const timeline = [{robotState: _initialRobotState}, ...robotStateTimeline.timeline]
       const robotState = timeline[timelineIndex] && timeline[timelineIndex].robotState
 
       const substeps = generateSubsteps(

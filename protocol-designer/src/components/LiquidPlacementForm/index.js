@@ -32,8 +32,8 @@ type SP = $Diff<Props, DP> & {
 function mapStateToProps (state: BaseState): SP {
   const selectedWells = Object.keys(wellSelectionSelectors.getSelectedWells(state))
 
-  const _labwareId = labwareIngredSelectors.getSelectedContainerId(state)
-  const liquidLocations = labwareIngredSelectors.getIngredientLocations(state)
+  const _labwareId = labwareIngredSelectors.getSelectedLabwareId(state)
+  const liquidLocations = labwareIngredSelectors.getLiquidsByLabwareId(state)
   const _selectionHasLiquids = Boolean(
     _labwareId &&
     liquidLocations[_labwareId] &&
@@ -45,7 +45,7 @@ function mapStateToProps (state: BaseState): SP {
     commonSelectedVolume: wellContentsSelectors.getSelectedWellsCommonVolume(state),
     liquidSelectionOptions: labwareIngredSelectors.getLiquidSelectionOptions(state),
     showForm: selectedWells.length > 0,
-    selectedWellsMaxVolume: wellContentsSelectors.selectedWellsMaxVolume(state),
+    selectedWellsMaxVolume: wellContentsSelectors.getSelectedWellsMaxVolume(state),
 
     _labwareId,
     _selectedWells: selectedWells,

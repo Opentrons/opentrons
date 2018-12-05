@@ -25,8 +25,8 @@ type DP = {
 
 function mapStateToProps (state: BaseState): SP {
   return {
-    hideModal: !selectors.newProtocolModal(state),
-    _hasUnsavedChanges: loadFileSelectors.hasUnsavedChanges(state),
+    hideModal: !selectors.getNewProtocolModal(state),
+    _hasUnsavedChanges: loadFileSelectors.getHasUnsavedChanges(state),
   }
 }
 

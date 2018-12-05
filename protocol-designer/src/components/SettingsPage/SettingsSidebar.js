@@ -16,9 +16,9 @@ const SettingsSidebar = (props: SP & DP) => (
   <SidePanel title={i18n.t('nav.tab_name.settings')}>
     <PDTitledList
       className={styles.sidebar_item}
-      selected={props.currentPage === 'settings-privacy'}
-      onClick={props.makeNavigateToPage('settings-privacy')}
-      title={i18n.t('nav.settings.privacy')}/>
+      selected={props.currentPage === 'settings-app'}
+      onClick={props.makeNavigateToPage('settings-app')}
+      title={i18n.t('nav.settings.app')}/>
     {/* <PDTitledList
       disabled
       className={styles.sidebar_item}
@@ -29,7 +29,7 @@ const SettingsSidebar = (props: SP & DP) => (
 )
 
 const STP = (state: BaseState): SP => ({
-  currentPage: selectors.currentPage(state),
+  currentPage: selectors.getCurrentPage(state),
 })
 
 const DTP = (dispatch: ThunkDispatch<*>): DP => ({
