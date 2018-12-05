@@ -60,9 +60,9 @@ type DragDropLabwareProps = React.ElementProps<typeof LabwareContainer> & {
   moveLabware: (DeckSlot, DeckSlot) => void,
 }
 class DragSourceLabware extends React.Component<DragDropLabwareProps> {
-  componentDidUpdate (prevProps, nextProps) {
-    if (!prevProps.isOver && nextProps.isOver) {
-      nextProps.moveLabware(nextProps.draggedSlot, nextProps.slot)
+  componentDidUpdate (prevProps) {
+    if (!prevProps.isOver && this.props.isOver) {
+      this.props.moveLabware(this.props.draggedSlo, this.props.slot)
     }
   }
   render () {
