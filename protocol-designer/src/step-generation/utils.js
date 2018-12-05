@@ -14,7 +14,7 @@ import type {
   Timeline,
   PipetteLabwareFields,
 } from './types'
-import blowout from './blowout'
+import blowout from './commandCreators/atomic/blowout'
 
 import {AIR} from '@opentrons/components'
 export {AIR}
