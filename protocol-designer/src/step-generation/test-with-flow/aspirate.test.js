@@ -45,6 +45,55 @@ describe('aspirate', () => {
     })
   })
 
+  describe('aspirate normally (with tip)', () => {
+    const optionalArgsCases = [
+      {
+        description: 'no optional args',
+        expectInParams: false,
+        args: {},
+      },
+      {
+        description: 'null optional args',
+        expectInParams: false,
+        args: {
+          offsetFromBottomMm: null,
+          'flow-rate': null,
+        },
+      },
+      {
+        description: 'all optional args',
+        expectInParams: true,
+        args: {
+          offsetFromBottomMm: 5,
+          'flow-rate': 6,
+        },
+      },
+    ]
+
+    optionalArgsCases.forEach(testCase => {
+      test(testCase.description, () => {
+        const result = aspirate({
+          pipette: 'p300SingleId',
+          volume: 50,
+          labware: 'sourcePlateId',
+          well: 'A1',
+          ...testCase.args,
+        })(robotStateWithTip)
+
+        expect(result.commands).toEqual([{
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 50,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            ...(testCase.expectInParams ? testCase.args : {}),
+          },
+        }])
+      })
+    })
+  })
+
   test('aspirate with volume > tip max volume should throw error', () => {
     robotStateWithTip.instruments['p300SingleId'].tiprackModel = 'tiprack-200ul'
     const result = aspirateWithErrors({

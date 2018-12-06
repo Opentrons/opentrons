@@ -40,6 +40,8 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
   }
 
   const {
+    aspirateFlowRateUlSec,
+    dispenseFlowRateUlSec,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
   } = data
@@ -103,6 +105,7 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
               volume: data.volume,
               labware: data.destLabware,
               well: destWell,
+              'flow-rate': dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
             }),
             ...touchTipAfterDispenseCommand,
@@ -141,15 +144,17 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
         : []
 
       const mixBeforeAspirateCommands = (data.mixBeforeAspirate)
-        ? mixUtil(
-          data.pipette,
-          data.sourceLabware,
-          data.sourceWell,
-          data.mixBeforeAspirate.volume,
-          data.mixBeforeAspirate.times,
+        ? mixUtil({
+          pipette: data.pipette,
+          labware: data.sourceLabware,
+          well: data.sourceWell,
+          volume: data.mixBeforeAspirate.volume,
+          times: data.mixBeforeAspirate.times,
           aspirateOffsetFromBottomMm,
-          dispenseOffsetFromBottomMm
-        )
+          dispenseOffsetFromBottomMm,
+          aspirateFlowRateUlSec,
+          dispenseFlowRateUlSec,
+        })
         : []
 
       return [
@@ -160,6 +165,7 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
           volume: data.volume * destWellChunk.length + disposalVolume,
           labware: data.sourceLabware,
           well: data.sourceWell,
+          'flow-rate': aspirateFlowRateUlSec,
           offsetFromBottomMm: aspirateOffsetFromBottomMm,
         }),
         ...touchTipAfterAspirateCommand,
