@@ -17,7 +17,9 @@ type Props = {
 
 export default function UpdateAppModal (props: Props) {
   const {parentUrl, versionProps, onClick} = props
-  const HEADING = `Version ${versionProps.availableUpdate} available`
+  const HEADING = `Robot Server Version ${
+    versionProps.availableUpdate
+  } Available`
   return (
     <AlertModal
       heading={HEADING}

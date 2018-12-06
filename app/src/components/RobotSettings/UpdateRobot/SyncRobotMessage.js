@@ -37,10 +37,3 @@ export default function SyncRobotMessage (props: Props) {
   }
   return null
 }
-
-const REINSTALL_MESSAGE =
-  "It looks like your robot is already up to date, but if you're experiencing issues you can re-apply the latest update."
-
-export function ReinstallMessage () {
-  return <p className={styles.sync_message}>{REINSTALL_MESSAGE}</p>
-}

@@ -12,7 +12,7 @@ type Props = {
   update: () => mixed,
 }
 
-const HEADING = 'Robot is up to date'
+const HEADING = 'Robot Server is up to date'
 const REINSTALL_MESSAGE =
   "It looks like your robot is already up to date, but if you're experiencing issues you can re-apply the latest update."
 
@@ -27,7 +27,7 @@ export default function ReinstallModal (props: Props) {
       ]}
       alertOverlay
     >
-      <p className={styles.sync_message}>{REINSTALL_MESSAGE}</p>
+      <p className={styles.reinstall_message}>{REINSTALL_MESSAGE}</p>
       <VersionList {...versionProps} ignoreAppUpdate />
     </AlertModal>
   )

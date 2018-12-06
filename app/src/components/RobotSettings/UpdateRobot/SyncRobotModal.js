@@ -45,11 +45,11 @@ export default class SyncRobotModal extends React.Component<
       ignoreUpdate,
       parentUrl,
     } = this.props
-    // should this always be the app version for sync purposes?
+
     const {version} = updateInfo
     const {showReleaseNotes} = this.state
 
-    const heading = `Version ${version} available`
+    const heading = `Robot Server Version ${version} Available`
     let buttons: Array<?ButtonProps>
 
     if (showReleaseNotes) {
