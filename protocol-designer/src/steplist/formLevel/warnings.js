@@ -18,6 +18,7 @@ export type FormWarning = {
   body?: React.Node,
   dependentFields: Array<StepFieldName>,
 }
+// TODO: Ian 2018-12-06 use i18n for title/body text
 const FORM_WARNINGS: {[FormWarningType]: FormWarning} = {
   OVER_MAX_WELL_VOLUME: {
     type: 'OVER_MAX_WELL_VOLUME',
@@ -29,8 +30,7 @@ const FORM_WARNINGS: {[FormWarningType]: FormWarning} = {
     title: 'Below Recommended disposal volume',
     body: (
       <React.Fragment>
-        For accuracy in distribute actions we recommend you use a disposal volume
-        of at least 20% of the tip&apos;s capacity.
+        For accuracy in distribute actions we recommend you use a disposal volume of at least the pipette&apos;s minimum.
         Read more <KnowledgeBaseLink to='distribute'>here</KnowledgeBaseLink>.
       </React.Fragment>
     ),
