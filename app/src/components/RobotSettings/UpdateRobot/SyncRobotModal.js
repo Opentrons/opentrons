@@ -19,6 +19,7 @@ type Props = {
   versionProps: VersionProps,
   ignoreUpdate: () => mixed,
   update: () => mixed,
+  showReleaseNotes: boolean,
 }
 
 type SyncRobotState = {
@@ -31,7 +32,7 @@ export default class SyncRobotModal extends React.Component<
 > {
   constructor (props: Props) {
     super(props)
-    this.state = {showReleaseNotes: false}
+    this.state = {showReleaseNotes: this.props.showReleaseNotes}
   }
 
   setShowReleaseNotes = () => {
