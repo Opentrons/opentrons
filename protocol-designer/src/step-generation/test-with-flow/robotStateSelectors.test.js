@@ -1,6 +1,6 @@
 // @flow
 import {p300Single, p300Multi, createEmptyLiquidState, getTiprackTipstate, getTipColumn} from './fixtures'
-import {sortLabwareBySlot, getNextTiprack, tiprackIsAvailableToPipette, _getNextTip} from '../'
+import {sortLabwareBySlot, getNextTiprack, _getNextTip} from '../'
 
 // just a blank liquidState to appease flow
 const basicLiquidState = {
@@ -809,57 +809,5 @@ describe('getNextTiprack - 8-channel', () => {
     const result = getNextTiprack(p300Multi, robotState)
 
     expect(result).toEqual(null)
-  })
-})
-
-describe('tiprackIsAvailableToPipette', () => {
-  let pipette
-  let tiprack
-  const tiprackModel = 'opentrons-tiprack-300ul'
-  const pipetteId = 'pipetteId'
-
-  beforeEach(() => {
-    pipette = {
-      channels: 1,
-      id: pipetteId,
-      maxVolume: 300,
-      model: 'some-model',
-      mount: 'left',
-      tiprackModel,
-    }
-
-    tiprack = {
-      name: 'Tiprack',
-      type: tiprackModel,
-      slot: '1',
-    }
-  })
-  test('tiprack unassigned, can use', () => {
-    const unassignedValues = [undefined, null]
-
-    unassignedValues.forEach(tiprackAssignment => {
-      expect(
-        tiprackIsAvailableToPipette(pipette, tiprack, tiprackAssignment)
-      ).toBe(true)
-    })
-  })
-
-  test('tiprack already assigned to current pipette, can use', () => {
-    expect(
-      tiprackIsAvailableToPipette(pipette, tiprack, pipetteId)
-    ).toBe(true)
-  })
-
-  test('tiprack assigned to different pipette, cannot use', () => {
-    expect(
-      tiprackIsAvailableToPipette(pipette, tiprack, 'differentPipetteId')
-    ).toBe(false)
-  })
-
-  test('tiprack unassigned but of wrong type, cannot use', () => {
-    pipette.tiprackModel = 'tiprack-wrong-type'
-    expect(
-      tiprackIsAvailableToPipette(pipette, tiprack, pipetteId)
-    ).toBe(false)
   })
 })

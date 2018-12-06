@@ -49,12 +49,6 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
   // pipette now has tip
   robotState.tipState.pipettes[pipetteId] = true
 
-  // update tiprack-to-pipette assignment
-  robotState.tiprackAssignment = {
-    ...robotState.tiprackAssignment,
-    [nextTiprack.tiprackId]: pipetteId,
-  }
-
   // remove tips from tiprack
   if (pipetteData.channels === 1 && nextTiprack.well) {
     robotState.tipState.tipracks[nextTiprack.tiprackId][nextTiprack.well] = false
