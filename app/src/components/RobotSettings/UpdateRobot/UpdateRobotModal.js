@@ -12,7 +12,7 @@ import {
 
 import {getRobotApiVersion} from '../../../discovery'
 
-import {CURRENT_VERSION, getShellUpdateState} from '../../../shell'
+import {CURRENT_VERSION} from '../../../shell'
 
 import UpdateAppModal from './UpdateAppModal'
 import SyncRobotModal from './SyncRobotModal'
@@ -23,12 +23,11 @@ import type {ShellUpdateState} from '../../../shell'
 import type {ViewableRobot} from '../../../discovery'
 import type {RobotUpdateInfo} from '../../../http-api-client'
 
-type OP = {robot: ViewableRobot}
+type OP = {robot: ViewableRobot, appUpdate: ShellUpdateState}
 
 type SP = {|
   appVersion: string,
   robotVersion: string,
-  appUpdate: ShellUpdateState,
   robotUpdateInfo: RobotUpdateInfo,
 |}
 
@@ -69,15 +68,13 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
     const robotUpdateVersion = robotUpdateInfo.version
     const availableUpdate = appUpdateVersion || robotUpdateVersion
     const versionProps = {appVersion, robotVersion, availableUpdate}
-    const isUpgrade = robotUpdateInfo.type === 'upgrade'
-    const onClick = isUpgrade ? this.setIgnoreAppUpdate : this.props.update
 
     if (appUpdateAvailable && !ignoreAppUpdate) {
       return (
         <UpdateAppModal
-          onClick={onClick}
+          onClick={this.props.update}
           versionProps={versionProps}
-          parentUrl={parentUrl}
+          ignoreUpdate={this.props.ignoreUpdate}
         />
       )
     } else if (robotUpdateInfo.type) {
@@ -88,7 +85,6 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
           versionProps={versionProps}
           update={this.props.update}
           ignoreUpdate={this.props.ignoreUpdate}
-          showReleaseNotes={isUpgrade && ignoreAppUpdate}
         />
       )
     } else {
@@ -103,7 +99,6 @@ function makeMapStateToProps (): (State, OP) => SP {
   return (state, ownProps) => ({
     appVersion: CURRENT_VERSION,
     robotVersion: getRobotApiVersion(ownProps.robot) || 'Unknown',
-    appUpdate: getShellUpdateState(state),
     robotUpdateInfo: getRobotUpdateInfo(state, ownProps.robot),
   })
 }

@@ -12,13 +12,13 @@ import {API_RELEASE_NOTES} from '../../../shell'
 import type {RobotUpdateInfo} from '../../../http-api-client'
 import type {VersionProps} from './types'
 import type {ButtonProps} from '@opentrons/components'
+
 type Props = {
   updateInfo: RobotUpdateInfo,
   parentUrl: string,
   versionProps: VersionProps,
   ignoreUpdate: () => mixed,
   update: () => mixed,
-  showReleaseNotes: boolean,
 }
 
 type SyncRobotState = {
@@ -31,7 +31,7 @@ export default class SyncRobotModal extends React.Component<
 > {
   constructor (props: Props) {
     super(props)
-    this.state = {showReleaseNotes: this.props.showReleaseNotes}
+    this.state = {showReleaseNotes: false}
   }
 
   setShowReleaseNotes = () => {

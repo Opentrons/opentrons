@@ -11,22 +11,23 @@ import type {VersionProps} from './types'
 
 type Props = {
   versionProps: VersionProps,
-  parentUrl: string,
+  ignoreUpdate: () => mixed,
   onClick: () => mixed,
 }
 
 export default function UpdateAppModal (props: Props) {
-  const {parentUrl, versionProps, onClick} = props
+  const {versionProps, onClick, ignoreUpdate} = props
   const HEADING = `Robot Server Version ${
     versionProps.availableUpdate
   } Available`
   return (
     <AlertModal
       heading={HEADING}
+      // Ignore available robot update on robot, set app update to seen in state
+      // TODO: set app update to seen
       buttons={[
         {
-          Component: Link,
-          to: parentUrl,
+          onClick: ignoreUpdate,
           children: 'not now',
         },
         {
