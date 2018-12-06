@@ -4,12 +4,12 @@ import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import flatten from 'lodash/flatten'
 // import {FIXED_TRASH_ID} from '../constants'
-import {aspirate, dispense, blowout, replaceTip, touchTip} from './'
+import * as errorCreators from '../../errorCreators'
+import {getPipetteWithTipMaxVol} from '../../robotStateSelectors'
+import type {DistributeFormData, RobotState, CommandCreator, CompoundCommandCreator, TransferLikeFormDataFields, TransferFormData} from '../../types'
+import {aspirate, dispense, blowout, replaceTip, touchTip} from '../atomic'
 import transfer from './transfer'
 import {mixUtil} from './mix'
-import * as errorCreators from './errorCreators'
-import {getPipetteWithTipMaxVol} from './robotStateSelectors'
-import type {DistributeFormData, RobotState, CommandCreator, CompoundCommandCreator, TransferLikeFormDataFields, TransferFormData} from './'
 
 const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRobotState: RobotState) => {
   /**

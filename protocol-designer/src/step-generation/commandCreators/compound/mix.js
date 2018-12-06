@@ -1,12 +1,9 @@
 // @flow
 import flatMap from 'lodash/flatMap'
-import aspirate from './aspirate'
-import dispense from './dispense'
-import replaceTip from './replaceTip'
-import touchTip from './touchTip'
-import {repeatArray, blowoutUtil} from './utils'
-import * as errorCreators from './errorCreators'
-import type {MixFormData, RobotState, CommandCreator, CompoundCommandCreator} from './'
+import {repeatArray, blowoutUtil} from '../../utils'
+import * as errorCreators from '../../errorCreators'
+import type {MixFormData, RobotState, CommandCreator, CompoundCommandCreator} from '../../types'
+import {aspirate, dispense, replaceTip, touchTip} from '../atomic'
 
 /** Helper fn to make mix command creators w/ minimal arguments */
 export function mixUtil (

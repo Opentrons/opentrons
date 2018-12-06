@@ -1,12 +1,12 @@
 // @flow
-import _blowout from '../blowout'
+import _blowout from '../commandCreators/atomic/blowout'
 import {
   blowoutUtil,
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../utils'
 
-jest.mock('../blowout')
+jest.mock('../commandCreators/atomic/blowout')
 
 const pipetteId = 'p300SingleId'
 const sourceLabwareId = 'sourcePlateId'

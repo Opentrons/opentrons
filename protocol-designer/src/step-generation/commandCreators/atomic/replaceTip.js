@@ -1,8 +1,10 @@
 // @flow
 import cloneDeep from 'lodash/cloneDeep'
-import {dropTip, getNextTiprack, tiprackWellNamesByCol} from './'
-import {insufficientTips} from './errorCreators'
-import type {RobotState, CommandCreator} from './types'
+import {getNextTiprack} from '../../robotStateSelectors'
+import {tiprackWellNamesByCol} from '../../data'
+import {insufficientTips} from '../../errorCreators'
+import type {RobotState, CommandCreator} from '../../types'
+import dropTip from './dropTip'
 
 const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: RobotState) => {
   /**

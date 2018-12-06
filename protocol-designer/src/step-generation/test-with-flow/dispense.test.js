@@ -4,7 +4,7 @@ import {
   commandCreatorNoErrors,
   commandCreatorHasErrors,
 } from './fixtures'
-import _dispense from '../dispense'
+import _dispense from '../commandCreators/atomic/dispense'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
 

@@ -9,7 +9,7 @@ import {
   compoundCommandCreatorHasErrors,
   commandFixtures as cmd,
 } from './fixtures'
-import _consolidate from '../consolidate'
+import _consolidate from '../commandCreators/compound/consolidate'
 
 const consolidate = compoundCommandCreatorNoErrors(_consolidate)
 const consolidateWithErrors = compoundCommandCreatorHasErrors(_consolidate)
