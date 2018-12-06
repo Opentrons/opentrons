@@ -1,4 +1,5 @@
 // @flow
+import forEach from 'lodash/forEach'
 import handleFormChange from './handleFormChange'
 import {uuid} from '../../utils'
 import {selectors as labwareIngredsSelectors} from '../../labware-ingred/reducers'
@@ -6,9 +7,10 @@ import * as pipetteSelectors from '../../pipettes/selectors'
 import {selectors as steplistSelectors} from '../../steplist'
 import {actions as tutorialActions} from '../../tutorial'
 import {getNextDefaultPipetteId, generateNewForm} from '../formLevel'
-
 import type {StepType, StepIdType, FormData} from '../../form-types'
 import type {BaseState, GetState, ThunkAction, ThunkDispatch} from '../../types'
+
+export const SCROLL_ON_SELECT_STEP_CLASSNAME = 'scroll_on_select_step'
 
 export type SelectStepAction = {
   type: 'SELECT_STEP',
@@ -85,6 +87,12 @@ export const selectStep = (stepId: StepIdType, newStepType?: StepType): ThunkAct
       type: 'POPULATE_FORM',
       payload: formData,
     })
+
+    // scroll to top of all elements with the special class
+    forEach(
+      global.document.getElementsByClassName(SCROLL_ON_SELECT_STEP_CLASSNAME),
+      elem => { elem.scrollTop = 0 }
+    )
   }
 
 // addStep thunk adds an incremental integer ID for Step reducers.
