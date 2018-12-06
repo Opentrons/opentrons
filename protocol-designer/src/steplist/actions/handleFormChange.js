@@ -4,7 +4,6 @@ import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
 import {selectors as pipetteSelectors} from '../../pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
-import {DISPOSAL_VOLUME_PERCENTAGE} from '../../constants'
 
 import type {PipetteChannels} from '@opentrons/shared-data'
 import type {BaseState, GetState} from '../../types'
@@ -80,7 +79,7 @@ function handleFormChange (
       const pipetteData = pipetteSelectors.getPipettesById(baseState)[payload.update.pipette]
       const pipetteSpecs = getPipetteNameSpecs(pipetteData.model)
       const disposalVol = pipetteSpecs
-        ? pipetteSpecs.maxVolume * DISPOSAL_VOLUME_PERCENTAGE
+        ? pipetteSpecs.minVolume
         : null
 
       updateOverrides = {
