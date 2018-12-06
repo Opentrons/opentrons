@@ -57,9 +57,16 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
 
   if (maxWellsPerChunk === 0) {
     // distribute vol exceeds pipette vol, break up into 1 transfer per dest well
-    const transferCommands = data.destWells.map((destWell) => {
+    const transferCommands = data.destWells.map((destWell, wellIndex) => {
+      let changeTip = data.changeTip
+      // 'once' means 'once per all inner transfers'
+      // so it should only apply to the first inner transfer
+      if (data.changeTip === 'once') {
+        changeTip = (wellIndex === 0) ? 'once' : 'never'
+      }
       const transferData: TransferFormData = {
         ...(data: TransferLikeFormDataFields),
+        changeTip,
         stepType: 'transfer',
         sourceWells: [data.sourceWell],
         destWells: [destWell],
