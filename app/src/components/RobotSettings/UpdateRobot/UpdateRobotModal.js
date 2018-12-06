@@ -69,11 +69,13 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
     const robotUpdateVersion = robotUpdateInfo.version
     const availableUpdate = appUpdateVersion || robotUpdateVersion
     const versionProps = {appVersion, robotVersion, availableUpdate}
+    const isUpgrade = robotUpdateInfo.type === 'upgrade'
+    const onClick = isUpgrade ? this.setIgnoreAppUpdate : this.props.update
 
     if (appUpdateAvailable && !ignoreAppUpdate) {
       return (
         <UpdateAppModal
-          onClick={this.setIgnoreAppUpdate}
+          onClick={onClick}
           versionProps={versionProps}
           parentUrl={parentUrl}
         />
@@ -86,6 +88,7 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
           versionProps={versionProps}
           update={this.props.update}
           ignoreUpdate={this.props.ignoreUpdate}
+          showReleaseNotes={isUpgrade && ignoreAppUpdate}
         />
       )
     } else {
