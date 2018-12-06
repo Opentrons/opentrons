@@ -116,14 +116,10 @@ async def test_load_and_run_v2(
     # main_router.calibration_manager.tip_probe(session.instruments[0])
 
     def run():
-        loop = asyncio.new_event_loop()
-        loop.run_until_complete(session.run())
+        session.run()
 
-    task = loop.run_in_executor(executor=None,
-                                func=run)
-
-    await task
-    assert len(session.command_log) == 7
+    await loop.run_in_executor(executor=None, func=run)
+    assert len(session.command_log) == 4
 
     res = []
     index = 0
@@ -139,11 +135,11 @@ async def test_load_and_run_v2(
             break
 
     assert [key for key, _ in itertools.groupby(res)] == \
-        ['loaded', 'probing', 'ready', 'running', 'finished']
+        ['loaded', 'running', 'finished']
     assert main_router.notifications.queue.qsize() == 0,\
         'Notification should be empty after receiving "finished" event'
     session.run()
-    assert len(session.command_log) == 7, \
+    assert len(session.command_log) == 4, \
         "Clears command log on the next run"
 
 
@@ -164,13 +160,10 @@ async def test_load_and_run(
     main_router.calibration_manager.tip_probe(session.instruments[0])
 
     def run():
-        loop = asyncio.new_event_loop()
-        loop.run_until_complete(session.run())
+        session.run()
 
-    task = loop.run_in_executor(executor=None,
-                                func=run)
-
-    await task
+    await loop.run_in_executor(executor=None,
+                               func=run)
     assert len(session.command_log) == 7
 
     res = []
@@ -188,7 +181,8 @@ async def test_load_and_run(
 
     assert [key for key, _ in itertools.groupby(res)] == \
         ['loaded', 'probing', 'ready', 'running', 'finished']
-    assert main_router.notifications.queue.qsize() == 0, 'Notification should be empty after receiving "finished" state change event'  # noqa
+    assert main_router.notifications.queue.qsize() == 0,\
+        'Notification should be empty after receiving "finished" state change'
     session.run()
     assert len(session.command_log) == 7, \
         "Clears command log on the next run"
@@ -237,7 +231,8 @@ async def test_get_instruments_and_containers(labware_setup,
     instruments, containers, modules, interactions = \
         _accumulate([_get_labware(command) for command in commands])
 
-    session = Session.build_and_prep(name='', text='', hardware=hardware)
+    session = Session.build_and_prep(name='', text='',
+                                     hardware=hardware, loop=loop)
     # We are calling dedupe directly for testing purposes.
     # Normally it is called from within a session
     session._instruments.extend(_dedupe(instruments))

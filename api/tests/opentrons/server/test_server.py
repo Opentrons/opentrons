@@ -284,6 +284,7 @@ async def test_notifications(session, root):
         'data': 'Done!'}
 
 
+@pytest.mark.api1_only
 @pytest.mark.parametrize('root', [TickTock()])
 async def test_concurrent_calls(session, root):
     await session.socket.receive_json()  # Skip init
@@ -401,6 +402,7 @@ def message_key(message):
     return str(meta.get('type')) + meta.get('token', '') + str(data)
 
 
+@pytest.mark.api1_only
 @pytest.mark.parametrize('root', [TickTock()])
 async def test_concurrent_and_disconnect(loop, root, session, connect):  # noqa C901
     n_sockets = 20

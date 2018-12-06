@@ -1,3 +1,4 @@
+import pytest
 from unittest import mock
 from functools import partial
 from tests.opentrons.conftest import state
@@ -6,6 +7,7 @@ from opentrons.util import calibration_functions
 state = partial(state, 'calibration')
 
 
+@pytest.mark.api1_only
 async def test_tip_probe(main_router, model):
     with mock.patch(
             'opentrons.util.calibration_functions.probe_instrument'
@@ -30,6 +32,7 @@ async def test_tip_probe(main_router, model):
     await main_router.wait_until(state('ready'))
 
 
+@pytest.mark.api1_only
 async def test_correct_hotspots(main_router, model):
 
     robot = model.robot
@@ -91,6 +94,7 @@ async def test_correct_hotspots(main_router, model):
     assert expected == actual
 
 
+@pytest.mark.api1_only
 async def test_move_to_front(main_router, model):
     robot = model.robot
 
@@ -107,6 +111,7 @@ async def test_move_to_front(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
+@pytest.mark.api1_only
 async def test_pick_up_tip(main_router, model):
     with mock.patch.object(model.instrument._instrument, 'pick_up_tip') as pick_up_tip:  # NOQA
         main_router.calibration_manager.pick_up_tip(
@@ -120,6 +125,7 @@ async def test_pick_up_tip(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
+@pytest.mark.api1_only
 async def test_drop_tip(main_router, model):
     with mock.patch.object(model.instrument._instrument, 'drop_tip') as drop_tip:  # NOQA
         main_router.calibration_manager.drop_tip(
@@ -133,6 +139,7 @@ async def test_drop_tip(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
+@pytest.mark.api1_only
 async def test_return_tip(main_router, model):
     with mock.patch.object(model.instrument._instrument, 'return_tip') as return_tip:  # NOQA
         main_router.calibration_manager.return_tip(model.instrument)
@@ -143,6 +150,7 @@ async def test_return_tip(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
+@pytest.mark.api1_only
 async def test_home(main_router, model):
     with mock.patch.object(model.instrument._instrument, 'home') as home:
         main_router.calibration_manager.home(
@@ -154,6 +162,7 @@ async def test_home(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
+@pytest.mark.api1_only
 async def test_move_to_top(main_router, model):
     with mock.patch.object(model.instrument._instrument, 'move_to') as move_to:
         main_router.calibration_manager.move_to(
@@ -166,6 +175,7 @@ async def test_move_to_top(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
+@pytest.mark.api1_only
 async def test_jog(main_router, model):
     with mock.patch('opentrons.util.calibration_functions.jog_instrument') as jog:  # NOQA
         for distance, axis in zip((1, 2, 3), 'xyz'):
@@ -189,6 +199,7 @@ async def test_jog(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
+@pytest.mark.api1_only
 async def test_update_container_offset(main_router, model):
     with mock.patch.object(
             model.robot,
@@ -204,6 +215,7 @@ async def test_update_container_offset(main_router, model):
         )
 
 
+@pytest.mark.api1_only
 async def test_jog_calibrate_bottom(
         dummy_db,
         main_router,
@@ -256,6 +268,7 @@ async def test_jog_calibrate_bottom(
     ).all()
 
 
+@pytest.mark.api1_only
 async def test_jog_calibrate_top(
         dummy_db,
         main_router,
@@ -310,6 +323,7 @@ async def test_jog_calibrate_top(
     ).all()
 
 
+@pytest.mark.api1_only
 async def test_jog_calibrate_top_new(
         split_labware_def,
         main_router,

@@ -1,4 +1,4 @@
-from opentrons.legacy_api.containers import Slot
+from opentrons.legacy_api.containers import Slot, placeable
 
 
 def _get_parent_slot(placeable):
@@ -13,11 +13,15 @@ class Container:
     def __init__(self, container, instruments=None):
         instruments = instruments or []
         self._container = container
-
         self.id = id(container)
-        self.name = container.get_name()
-        self.type = container.get_type()
-        self.slot = _get_parent_slot(container).get_name()
+
+        if isinstance(container, placeable.Placeable):
+            self.name = container.get_name()
+            self.type = container.get_type()
+            self.slot = _get_parent_slot(container).get_name()
+        else:
+            self.name = str(container)
+            self.type = container.name
         self.instruments = [
             Instrument(instrument)
             for instrument in instruments]

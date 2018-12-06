@@ -1,18 +1,21 @@
 import ast
-import logging
+import asyncio
 from copy import copy
-from time import time
 from functools import reduce
 import json
+import logging
+from time import time
 
 from opentrons.broker import publish, subscribe
 from opentrons.legacy_api.containers import get_container, location_to_list
-from opentrons.legacy_api.containers.placeable import Module as ModulePlaceable
+from opentrons.legacy_api.containers.placeable import (
+    Module as ModulePlaceable, Placeable)
 from opentrons.commands import tree, types
 from opentrons.protocols import execute_protocol
 from opentrons.config import feature_flags as ff
-from opentrons.protocol_api import ProtocolContext, run_protocol
-from opentrons.hardware_control import API, adapters
+from opentrons.protocol_api import ProtocolContext, run_protocol, labware
+from opentrons.hardware_control import adapters, API
+from opentrons.types import Location, Point
 
 from .models import Container, Instrument, Module
 
@@ -22,13 +25,19 @@ VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused', 'error'}
 
 
 class SessionManager(object):
-    def __init__(self, hardware):
+    def __init__(self, hardware, loop=None):
+        self._loop = loop or asyncio.get_event_loop()
         self.session = None
         self._session_lock = False
         if ff.use_protocol_api_v2():
             self._hardware = adapters.SynchronousAdapter(hardware)
         else:
             self._hardware = hardware
+
+    def __del__(self):
+        if isinstance(getattr(self, '_hardware', None),
+                      adapters.SynchronousAdapter):
+            self._hardware.join()
 
     def create(self, name, text):
         if self._session_lock:
@@ -38,7 +47,7 @@ class SessionManager(object):
         self._session_lock = True
         try:
             self.session = Session.build_and_prep(
-                name=name, text=text, hardware=self._hardware)
+                name=name, text=text, hardware=self._hardware, loop=self._loop)
         finally:
             self._session_lock = False
 
@@ -61,12 +70,13 @@ class Session(object):
     TOPIC = 'session'
 
     @classmethod
-    def build_and_prep(cls, name, text, hardware):
-        sess = cls(name, text, hardware)
+    def build_and_prep(cls, name, text, hardware, loop):
+        sess = cls(name, text, hardware, loop)
         sess.prepare()
         return sess
 
-    def __init__(self, name, text, hardware):
+    def __init__(self, name, text, hardware, loop):
+        self._loop = loop
         self.name = name
         self.protocol_text = text
         self._protocol = None
@@ -166,13 +176,18 @@ class Session(object):
             # ensure actual pipettes are cached before driver is disconnected
             if ff.use_protocol_api_v2():
                 self._hardware.cache_instruments()
-                sim = API.build_hardware_simulator(
-                    {m: pip.get('name')
-                     for m, pip
-                     in self._hardware.attached_instruments.items()},
+                instrs = {}
+                for mount, pip in self._hardware.attached_instruments.items():
+                    if pip:
+                        instrs[mount] = {'model': pip['name'],
+                                         'id': pip.get('pipette_id', '')}
+                sim = adapters.SynchronousAdapter.build(
+                    API.build_hardware_simulator,
+                    instrs,
                     [mod.name() for mod in self._hardware.attached_modules])
-                context = ProtocolContext(hardware=sim)
+                context = ProtocolContext(hardware=sim, loop=self._loop)
                 run_protocol(self._protocol, simulate=True, context=context)
+                sim.join()
             else:
                 # TODO (artyom, 20171005): this will go away
                 # once robot / driver simulation flow is fixed
@@ -264,7 +279,7 @@ class Session(object):
             self._pre_run_hooks()
             if ff.use_protocol_api_v2():
                 self._hardware.cache_instruments()
-                ctx = ProtocolContext()
+                ctx = ProtocolContext(loop=self._loop)
                 ctx.connect(self._hardware)
                 run_protocol(self._protocol, context=ctx)
             else:
@@ -381,11 +396,25 @@ def now():
 
 
 def _get_parent_module(placeable):
-    if isinstance(placeable, ModulePlaceable) or not placeable:
+    if not placeable or isinstance(placeable, (Point, str)):
+        res = None
+    elif isinstance(placeable,
+                    (ModulePlaceable, labware.ModuleGeometry)):
         res = placeable
     else:
         res = _get_parent_module(placeable.parent)
     return res
+
+
+def _get_new_labware(loc):
+    if isinstance(loc, Location):
+        return _get_new_labware(loc.labware)
+    elif isinstance(loc, labware.Well):
+        return loc.parent
+    elif isinstance(loc, labware.Labware):
+        return loc
+    else:
+        raise TypeError(loc)
 
 
 def _get_labware(command):
@@ -398,8 +427,10 @@ def _get_labware(command):
     instrument = command.get('instrument')
 
     placeable = location
-    if (type(location) == tuple):
+    if isinstance(location, tuple):
         placeable = location[0]
+    elif isinstance(location, Location):
+        placeable = location.labware
 
     maybe_module = _get_parent_module(placeable)
     modules.append(maybe_module)
@@ -407,7 +438,13 @@ def _get_labware(command):
     locations = command.get('locations')
 
     if location:
-        containers.append(get_container(location))
+        if isinstance(location, (Placeable)) or type(location) == tuple:
+            # tyoe()== used here instead of isinstance because a specific
+            # named tuple like location descends from tuple and therefore
+            # passes the check
+            containers.append(get_container(location))
+        elif isinstance(location, Location):
+            containers.append(_get_new_labware(location))
 
     if locations:
         list_of_locations = location_to_list(locations)

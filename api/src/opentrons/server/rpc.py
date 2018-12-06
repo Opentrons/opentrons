@@ -1,7 +1,6 @@
 import asyncio
 import aiohttp
 import functools
-import inspect
 import json
 import logging
 import traceback
@@ -265,17 +264,7 @@ class RPCServer(object):
     def call_and_serialize(self, func, max_depth=0):
         # XXXX: This should really only be called in a new thread (as in
         #       the normal case where it is called in a threadpool)
-        try:
-            check = func.func
-        except AttributeError:
-            check = func
-        check_unwrapped = inspect.unwrap(check)
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        if asyncio.iscoroutinefunction(check_unwrapped):
-            call_result = loop.run_until_complete(func())
-        else:
-            call_result = func()
+        call_result = func()
         serialized, refs = serialize.get_object_tree(
             call_result, max_depth=max_depth)
         self.objects.update(refs)

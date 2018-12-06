@@ -32,7 +32,7 @@ async def test_multi_single(main_router, protocol, protocol_file, dummy_db):
     robot.connect()
     robot.home()
 
-    session = await main_router.session_manager.create(
+    session = main_router.session_manager.create(
         name='<blank>', text=protocol.text)
     await main_router.wait_until(state('session', 'loaded'))
 
@@ -59,7 +59,7 @@ async def test_load_jog_save_run(
     temp = tempfile.gettempdir()
     monkeypatch.setenv('USER_DEFN_ROOT', temp)
 
-    session = await main_router.session_manager.create(
+    session = main_router.session_manager.create(
         name='<blank>', text=protocol.text)
     await main_router.wait_until(state('session', 'loaded'))
 

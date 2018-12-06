@@ -160,6 +160,9 @@ class Well:
             return NotImplemented
         return self.top().point == other.top().point
 
+    def __hash__(self):
+        return hash(self.top().point)
+
 
 class Labware:
     """
