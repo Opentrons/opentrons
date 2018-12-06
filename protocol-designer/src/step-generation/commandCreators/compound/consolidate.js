@@ -92,44 +92,44 @@ const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prev
         : []
 
       const mixBeforeCommands = (data.mixFirstAspirate)
-        ? mixUtil(
-          data.pipette,
-          data.sourceLabware,
-          sourceWellChunk[0],
-          data.mixFirstAspirate.volume,
-          data.mixFirstAspirate.times,
+        ? mixUtil({
+          pipette: data.pipette,
+          labware: data.sourceLabware,
+          well: sourceWellChunk[0],
+          volume: data.mixFirstAspirate.volume,
+          times: data.mixFirstAspirate.times,
           aspirateOffsetFromBottomMm,
           dispenseOffsetFromBottomMm,
           aspirateFlowRateUlSec,
           dispenseFlowRateUlSec,
-        )
+        })
         : []
 
       const preWetTipCommands = (data.preWetTip)
         // Pre-wet tip is equivalent to a single mix, with volume equal to the consolidate volume.
-        ? mixUtil(
-          data.pipette,
-          data.sourceLabware,
-          sourceWellChunk[0],
-          data.volume,
-          1,
+        ? mixUtil({
+          pipette: data.pipette,
+          labware: data.sourceLabware,
+          well: sourceWellChunk[0],
+          volume: data.volume,
+          times: 1,
           aspirateOffsetFromBottomMm,
           dispenseOffsetFromBottomMm,
           aspirateFlowRateUlSec,
           dispenseFlowRateUlSec,
-        )
+        })
         : []
 
       const mixAfterCommands = (data.mixInDestination)
-        ? mixUtil(
-          data.pipette,
-          data.destLabware,
-          data.destWell,
-          data.mixInDestination.volume,
-          data.mixInDestination.times,
+        ? mixUtil({
+          pipette: data.pipette,
+          labware: data.destLabware,
+          well: data.destWell,
+          volume: data.mixInDestination.volume,
+          times: data.mixInDestination.times,
           aspirateOffsetFromBottomMm,
-          dispenseOffsetFromBottomMm
-        )
+          dispenseOffsetFromBottomMm,
+        })
         : []
 
       const blowoutCommand = blowoutUtil(

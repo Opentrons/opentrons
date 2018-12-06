@@ -6,8 +6,7 @@ import type {MixFormData, RobotState, CommandCreator, CompoundCommandCreator} fr
 import {aspirate, dispense, replaceTip, touchTip} from '../atomic'
 
 /** Helper fn to make mix command creators w/ minimal arguments */
-// TODO IMMEDIATELY: use named params not ordered args
-export function mixUtil (
+export function mixUtil (args: {
   pipette: string,
   labware: string,
   well: string,
@@ -17,7 +16,18 @@ export function mixUtil (
   dispenseOffsetFromBottomMm?: ?number,
   aspirateFlowRateUlSec?: ?number,
   dispenseFlowRateUlSec?: ?number,
-): Array<CommandCreator> {
+}): Array<CommandCreator> {
+  const {
+    pipette,
+    labware,
+    well,
+    volume,
+    times,
+    aspirateOffsetFromBottomMm,
+    dispenseOffsetFromBottomMm,
+    aspirateFlowRateUlSec,
+    dispenseFlowRateUlSec,
+  } = args
   return repeatArray([
     aspirate({pipette, volume, labware, well, offsetFromBottomMm: aspirateOffsetFromBottomMm, 'flow-rate': aspirateFlowRateUlSec}),
     dispense({pipette, volume, labware, well, offsetFromBottomMm: dispenseOffsetFromBottomMm, 'flow-rate': dispenseFlowRateUlSec}),
@@ -97,7 +107,7 @@ const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: Robo
         data.blowoutLocation,
       )
 
-      const mixCommands = mixUtil(
+      const mixCommands = mixUtil({
         pipette,
         labware,
         well,
@@ -106,8 +116,8 @@ const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: Robo
         aspirateOffsetFromBottomMm,
         dispenseOffsetFromBottomMm,
         aspirateFlowRateUlSec,
-        dispenseFlowRateUlSec
-      )
+        dispenseFlowRateUlSec,
+      })
 
       return [
         ...tipCommands,

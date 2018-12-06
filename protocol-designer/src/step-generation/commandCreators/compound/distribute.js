@@ -137,17 +137,17 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
         : []
 
       const mixBeforeAspirateCommands = (data.mixBeforeAspirate)
-        ? mixUtil(
-          data.pipette,
-          data.sourceLabware,
-          data.sourceWell,
-          data.mixBeforeAspirate.volume,
-          data.mixBeforeAspirate.times,
+        ? mixUtil({
+          pipette: data.pipette,
+          labware: data.sourceLabware,
+          well: data.sourceWell,
+          volume: data.mixBeforeAspirate.volume,
+          times: data.mixBeforeAspirate.times,
           aspirateOffsetFromBottomMm,
           dispenseOffsetFromBottomMm,
           aspirateFlowRateUlSec,
-          dispenseFlowRateUlSec
-        )
+          dispenseFlowRateUlSec,
+        })
         : []
 
       return [
