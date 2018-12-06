@@ -9,7 +9,6 @@ import mapValues from 'lodash/mapValues'
 import max from 'lodash/max'
 import pickBy from 'lodash/pickBy'
 import reduce from 'lodash/reduce'
-import isEmpty from 'lodash/isEmpty'
 
 import {sortedSlotnames, FIXED_TRASH_ID} from '../../constants.js'
 import {uuid} from '../../utils'
@@ -285,6 +284,11 @@ export const ingredLocations = handleActions({
       mapValues(labwareContents, well =>
         omit(well, liquidGroupId)))
   },
+  DELETE_CONTAINER: (
+    state: LocationsState,
+    action: ActionType<typeof actions.deleteContainer>
+  ): LocationsState =>
+    omit(state, action.payload.containerId),
   LOAD_FILE: (state: LocationsState, action: LoadFileAction): LocationsState =>
     getPDMetadata(action.payload).ingredLocations,
 }, {})
@@ -488,8 +492,6 @@ const getLabwareSelectionMode: Selector<boolean> = createSelector(
 
 const getSlotToMoveFrom = (state: BaseState) => rootSelector(state).moveLabwareMode
 
-const getDeckHasLiquid = (state: BaseState) => !isEmpty(getLiquidGroupsById(state))
-
 const getLiquidGroupsOnDeck: Selector<Array<string>> = createSelector(
   getLiquidsByLabwareId,
   (ingredLocationsByLabware) => {
@@ -505,6 +507,11 @@ const getLiquidGroupsOnDeck: Selector<Array<string>> = createSelector(
     )
     return [...liquidGroups]
   }
+)
+
+const getDeckHasLiquid: Selector<boolean> = createSelector(
+  getLiquidGroupsOnDeck,
+  (liquidGroups) => liquidGroups.length > 0
 )
 
 // TODO: prune selectors
