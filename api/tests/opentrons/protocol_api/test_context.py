@@ -5,7 +5,7 @@ import pkgutil
 
 import opentrons.protocol_api as papi
 from opentrons.types import Mount, Point, Location
-from opentrons.hardware_control import API
+from opentrons.hardware_control import API, adapters
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.config.pipette_config import configs
@@ -106,10 +106,11 @@ def test_pipette_info(loop):
     right = ctx.load_instrument('p300_multi', Mount.RIGHT)
     left = ctx.load_instrument('p1000_single', Mount.LEFT)
     assert right.type == 'multi'
-    assert right.name\
-        == ctx._hardware.attached_instruments[Mount.RIGHT]['name']
+    name = ctx._hw_manager.hardware.attached_instruments[Mount.RIGHT]['name']
+    assert right.name == name
     assert left.type == 'single'
-    assert left.name == ctx._hardware.attached_instruments[Mount.LEFT]['name']
+    name = ctx._hw_manager.hardware.attached_instruments[Mount.LEFT]['name']
+    assert left.name == name
 
 
 def test_pick_up_and_drop_tip(loop, load_my_labware):
@@ -121,7 +122,7 @@ def test_pick_up_and_drop_tip(loop, load_my_labware):
 
     instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
 
-    pipette: Pipette = ctx._hardware._attached_instruments[mount]
+    pipette: Pipette = ctx._hw_manager.hardware._attached_instruments[mount]
     model_offset = Point(*pipette.config.model_offset)
     assert pipette.critical_point() == model_offset
     target_location = tiprack.wells_by_index()['A1'].top()
@@ -176,7 +177,7 @@ def test_pick_up_tip_no_location(loop, load_my_labware):
     instr = ctx.load_instrument(
         'p300_single', mount, tip_racks=[tiprack1, tiprack2])
 
-    pipette: Pipette = ctx._hardware._attached_instruments[mount]
+    pipette: Pipette = ctx._hw_manager.hardware._attached_instruments[mount]
     model_offset = Point(*pipette.config.model_offset)
     assert pipette.critical_point() == model_offset
 
@@ -236,8 +237,9 @@ def test_aspirate(loop, load_my_labware, monkeypatch):
         nonlocal move_called_with
         move_called_with = (mount, loc)
 
-    monkeypatch.setattr(ctx._hardware._api, 'aspirate', fake_hw_aspirate)
-    monkeypatch.setattr(ctx._hardware._api, 'move_to', fake_move)
+    monkeypatch.setattr(ctx._hw_manager.hardware._api,
+                        'aspirate', fake_hw_aspirate)
+    monkeypatch.setattr(ctx._hw_manager.hardware._api, 'move_to', fake_move)
 
     instr.aspirate(2.0, lw.wells()[0].bottom())
     assert 'aspirating' in ','.join([cmd.lower() for cmd in ctx.commands()])
@@ -274,8 +276,9 @@ def test_dispense(loop, load_my_labware, monkeypatch):
         nonlocal move_called_with
         move_called_with = (mount, loc)
 
-    monkeypatch.setattr(ctx._hardware._api, 'dispense', fake_hw_dispense)
-    monkeypatch.setattr(ctx._hardware._api, 'move_to', fake_move)
+    monkeypatch.setattr(ctx._hw_manager.hardware._api,
+                        'dispense', fake_hw_dispense)
+    monkeypatch.setattr(ctx._hw_manager.hardware._api, 'move_to', fake_move)
 
     instr.dispense(2.0, lw.wells()[0].bottom())
     assert 'dispensing' in ','.join([cmd.lower() for cmd in ctx.commands()])
@@ -295,7 +298,8 @@ def test_dispense(loop, load_my_labware, monkeypatch):
 
 def test_load_module(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
-    ctx._hardware._backend._attached_modules = [('mod0', 'tempdeck')]
+    ctx._hw_manager.hardware._backend._attached_modules = [
+        ('mod0', 'tempdeck')]
     ctx.home()
     mod = ctx.load_module('tempdeck', 1)
     assert isinstance(mod, papi.TemperatureModuleContext)
@@ -303,7 +307,8 @@ def test_load_module(loop, monkeypatch):
 
 def test_tempdeck(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
-    ctx._hardware._backend._attached_modules = [('mod0', 'tempdeck')]
+    ctx._hw_manager.hardware._backend._attached_modules = [
+        ('mod0', 'tempdeck')]
     mod = ctx.load_module('tempdeck', 1)
     assert ctx.deck[1] == mod._geometry
     assert mod.target is None
@@ -323,7 +328,7 @@ def test_tempdeck(loop, monkeypatch):
 
 def test_magdeck(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
-    ctx._hardware._backend._attached_modules = [('mod0', 'magdeck')]
+    ctx._hw_manager.hardware._backend._attached_modules = [('mod0', 'magdeck')]
     mod = ctx.load_module('magdeck', 1)
     assert ctx.deck[1] == mod._geometry
     assert mod.status == 'disengaged'
@@ -349,7 +354,8 @@ def test_module_load_labware(loop, monkeypatch):
         pkgutil.get_data('opentrons',
                          'shared_data/definitions2/{}.json'.format(
                              labware_name)))
-    ctx._hardware._backend._attached_modules = [('mod0', 'tempdeck')]
+    ctx._hw_manager.hardware._backend._attached_modules = [
+        ('mod0', 'tempdeck')]
     mod = ctx.load_module('tempdeck', 1)
     assert mod.labware is None
     lw = mod.load_labware_by_name(labware_name)
@@ -371,7 +377,7 @@ def test_magdeck_labware_props(loop):
         pkgutil.get_data('opentrons',
                          'shared_data/definitions2/{}.json'.format(
                              labware_name)))
-    ctx._hardware._backend._attached_modules = [('mod0', 'magdeck')]
+    ctx._hw_manager.hardware._backend._attached_modules = [('mod0', 'magdeck')]
     mod = ctx.load_module('magdeck', 1)
     assert mod.labware is None
     mod.load_labware_by_name(labware_name)
@@ -393,3 +399,39 @@ def test_magdeck_labware_props(loop):
         mod.engage(offset=1)
     mod.engage(height=2)
     assert mod._module._driver.plate_height == 2
+
+
+def test_hw_manager(loop):
+    # When built without an input it should build its own adapter
+    mgr = papi.ProtocolContext.HardwareManager(None)
+    assert mgr._is_orig
+    adapter = mgr.hardware
+    # When "disconnecting" from its own simulator, the adapter should
+    # be stopped and a new one created
+    assert adapter.is_alive()
+    new = mgr.reset_hw()
+    assert new is not adapter
+    assert not adapter.is_alive()
+    # When deleted, the self-created adapter should be stopped
+    del mgr
+    assert not new.is_alive()
+    # When built with a hardware API input it should wrap it but not
+    # build its own
+    mgr = papi.ProtocolContext.HardwareManager(
+        API.build_hardware_simulator(loop=loop))
+    assert isinstance(mgr.hardware, adapters.SynchronousAdapter)
+    assert not mgr._is_orig
+    passed = mgr.hardware
+    # When disconnecting from a real external adapter, it should create
+    # its own simulator and should _not_ stop the old hardware thread
+    new = mgr.reset_hw()
+    assert new is not passed
+    assert mgr._is_orig
+    assert passed.is_alive()
+    # When connecting to an adapter it shouldn’t rewrap it
+    assert mgr.set_hw(passed) is passed
+    # And should kill its old one
+    assert not new.is_alive()
+    del mgr
+    # but not its new one, even if deleted
+    assert passed.is_alive()

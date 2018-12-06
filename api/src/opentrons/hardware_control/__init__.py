@@ -142,6 +142,10 @@ class API(HardwareAPILike):
                              config, loop),
                    config=config, loop=loop)
 
+    def __repr__(self):
+        return '<{} using backend {}>'.format(type(self),
+                                              type(self._backend))
+
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
         """ The event loop used by this instance. """

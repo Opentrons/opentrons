@@ -3,6 +3,7 @@
 import asyncio
 import copy
 import functools
+import threading
 from typing import List
 
 from . import API
@@ -10,10 +11,11 @@ from .types import Axis, HardwareAPILike
 
 
 def sync_call(loop, to_call, *args, **kwargs):
-    return loop.run_until_complete(to_call(*args, **kwargs))
+    fut = asyncio.run_coroutine_threadsafe(to_call(*args, **kwargs), loop)
+    return fut.result()
 
 
-class SynchronousAdapter(HardwareAPILike):
+class SynchronousAdapter(HardwareAPILike, threading.Thread):
     """ A wrapper to make every call into :py:class:`.hardware_control.API`
     synchronous.
 
@@ -27,13 +29,64 @@ class SynchronousAdapter(HardwareAPILike):
     >>> synch.home()
     """
 
-    def __init__(self, api: API) -> None:
+    @classmethod
+    def build(cls, builder, *args, **kwargs):
+        """ Build a hardware control API and initialize the adapter in one call
+
+        :param builder: the builder method to use (e.g.
+                        :py:meth:`hardware_control.API.build_hardware_simulator`)
+        :param args: Args to forward to the builder method
+        :param kwargs: Kwargs to forward to the builder method
+        """
+        loop = asyncio.new_event_loop()
+        kwargs['loop'] = loop
+        args = [arg for arg in args
+                if not isinstance(arg, asyncio.AbstractEventLoop)]
+        api = builder(*args, **kwargs)
+        return cls(api, loop)
+
+    def __init__(self,
+                 api: API,
+                 loop: asyncio.AbstractEventLoop = None) -> None:
         """ Build the SynchronousAdapter.
 
         :param api: The API instance to wrap
+        :param loop: A specific event loop to use. This is for the use of
+                     :py:meth:`build` and should normally not be used; since
+                     this loop will be run in a worker thread it should not
+                     be run elsewhere. If not specified (which should be the
+                     normal use case) the adapter will start a new event loop
+                     for the worker thread.
         """
+        checked_loop = loop or asyncio.new_event_loop()
+        api._loop = checked_loop
+        self._loop = checked_loop
         self._api = api
-        self._loop = self._api._loop
+        super().__init__(
+            target=self._event_loop_in_thread,
+            name='SynchAdapter thread for {}'.format(repr(api)))
+        super().start()
+
+    def _event_loop_in_thread(self):
+        # asyncio.set_event_loop(self._loop)
+        loop = object.__getattribute__(self, '_loop')
+        loop.run_forever()
+        loop.close()
+
+    def join(self):
+        thread_loop = object.__getattribute__(self, '_loop')
+        if thread_loop.is_running():
+            thread_loop.call_soon_threadsafe(lambda: thread_loop.stop())
+        super().join()
+
+    def __del__(self):
+        try:
+            thread_loop = object.__getattribute__(self, '_loop')
+        except AttributeError:
+            pass
+        else:
+            if thread_loop.is_running():
+                thread_loop.call_soon_threadsafe(lambda: thread_loop.stop())
 
     def __getattribute__(self, attr_name):
         """ Retrieve attributes from our API and wrap coroutines """

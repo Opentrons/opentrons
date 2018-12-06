@@ -34,6 +34,51 @@ class ProtocolContext:
     compatibility and should be used less and less as time goes by.
     """
 
+    class HardwareManager:
+        def __init__(self, hardware):
+            if None is hardware:
+                self._is_orig = True
+                self._current = adapters.SynchronousAdapter.build(
+                    hc.API.build_hardware_simulator)
+            elif isinstance(hardware, adapters.SynchronousAdapter):
+                self._is_orig = False
+                self._current = hardware
+            else:
+                self._is_orig = False
+                self._current = adapters.SynchronousAdapter(hardware)
+
+        @property
+        def hardware(self):
+            return self._current
+
+        def set_hw(self, hardware):
+            if self._is_orig:
+                self._is_orig = False
+                self._current.join()
+            if isinstance(hardware, adapters.SynchronousAdapter):
+                self._current = hardware
+            elif isinstance(hardware, hc.API):
+                self._current = adapters.SynchronousAdapter(hardware)
+            else:
+                raise TypeError(
+                    "hardware should be API or synch adapter but is {}"
+                    .format(hardware))
+            return self._current
+
+        def reset_hw(self):
+            if self._is_orig:
+                self._current.join()
+            self._current = adapters.SynchronousAdapter.build(
+                    hc.API.build_hardware_simulator)
+            self._is_orig = True
+            return self._current
+
+        def __del__(self):
+            orig = getattr(self, '_is_orig', False)
+            cur = getattr(self, '_current', None)
+            if orig and cur:
+                cur.join()
+
     def __init__(self,
                  loop: asyncio.AbstractEventLoop = None,
                  hardware: hc.API = None) -> None:
@@ -48,7 +93,8 @@ class ProtocolContext:
             = {mount: None for mount in types.Mount}
         self._last_moved_instrument: Optional[types.Mount] = None
         self._location_cache: Optional[types.Location] = None
-        self._hardware = self._build_hardware_adapter(self._loop, hardware)
+
+        self._hw_manager = ProtocolContext.HardwareManager(hardware)
         self._log = MODULE_LOG.getChild(self.__class__.__name__)
         self._commands = []
         self._unsubscribe_commands = None
@@ -83,13 +129,13 @@ class ProtocolContext:
         :py:class:`.ProtocolContext`; :py:meth:`disconnect` simply creates
         a new simulator and replaces the current hardware with it.
         """
-        self._hardware = self._build_hardware_adapter(self._loop, hardware)
-        self._hardware.cache_instruments()
+        self._hw_manager.set_hw(hardware)
+        self._hw_manager.hardware.cache_instruments()
 
     def disconnect(self):
         """ Disconnect from currently-connected hardware and simulate instead
         """
-        self._hardware = self._build_hardware_adapter(self._loop)
+        self._hw_manager.reset_hw()
 
     def load_labware(
             self, labware_obj: Labware, location: types.DeckLocation,
@@ -121,7 +167,7 @@ class ProtocolContext:
     def load_module(
             self, module_name: str,
             location: types.DeckLocation) -> ModuleTypes:
-        for mod in self._hardware.discover_modules():
+        for mod in self._hw_manager.hardware.discover_modules():
             if mod.name() == module_name:
                 mod_class = {'magdeck': MagneticModuleContext,
                              'tempdeck': TemperatureModuleContext}[module_name]
@@ -181,15 +227,15 @@ class ProtocolContext:
                                        instr.name))
         attached = {att_mount: instr.get('name', None)
                     for att_mount, instr
-                    in self._hardware.attached_instruments.items()}
+                    in self._hw_manager.hardware.attached_instruments.items()}
         attached[mount] = instrument_name
         self._log.debug("cache instruments expectation: {}"
                         .format(attached))
-        self._hardware.cache_instruments(attached)
+        self._hw_manager.hardware.cache_instruments(attached)
         # If the cache call didn’t raise, the instrument is attached
         new_instr = InstrumentContext(
             ctx=self,
-            hardware=self._hardware,
+            hardware_mgr=self._hw_manager,
             mount=mount,
             tip_racks=tip_racks,
             log_parent=self._log)
@@ -263,7 +309,7 @@ class ProtocolContext:
 
         :returns .robot_config: The loaded configuration.
         """
-        return self._hardware.config
+        return self._hw_manager.hardware.config
 
     def update_config(self, **kwargs):
         """ Update values of the robot's configuration.
@@ -274,14 +320,14 @@ class ProtocolContext:
         Documentation on keys can be found in the documentation for
         :py:class:`.robot_config`.
         """
-        self._hardware.update_config(**kwargs)
+        self._hw_manager.hardware.update_config(**kwargs)
 
     def home(self):
         """ Homes the robot.
         """
         self._log.debug("home")
         self._location_cache = None
-        self._hardware.home()
+        self._hw_manager.hardware.home()
 
     @property
     def location_cache(self) -> Optional[types.Location]:
@@ -299,13 +345,7 @@ class ProtocolContext:
         """
         return self._deck_layout
 
-    @staticmethod
-    def _build_hardware_adapter(
-            loop: asyncio.AbstractEventLoop,
-            hardware: hc.API = None) -> adapters.SynchronousAdapter:
-        if not hardware:
-            hardware = hc.API.build_hardware_simulator(loop=loop)
-        return adapters.SynchronousAdapter(hardware)
+
 
 
 class InstrumentContext:
@@ -325,13 +365,13 @@ class InstrumentContext:
 
     def __init__(self,
                  ctx: ProtocolContext,
-                 hardware: adapters.SynchronousAdapter,
+                 hardware_mgr: ProtocolContext.HardwareManager,
                  mount: types.Mount,
                  log_parent: logging.Logger,
                  tip_racks: List[Labware] = None,
                  trash: Labware = None,
                  **config_kwargs) -> None:
-        self._hardware = hardware
+        self._hw_manager = hardware_mgr
         self._ctx = ctx
         self._mount = mount
 
@@ -407,7 +447,7 @@ class InstrumentContext:
             loc = self._ctx.location_cache
         cmds.do_publish(cmds.aspirate, self.aspirate, 'before', None, None,
                         self, volume, loc, rate)
-        self._hardware.aspirate(self._mount, volume, rate)
+        self._hw_manager.hardware.aspirate(self._mount, volume, rate)
         cmds.do_publish(cmds.aspirate, self.aspirate, 'after', self, None,
                         self, volume, loc, rate)
         return self
@@ -465,7 +505,7 @@ class InstrumentContext:
             loc = self._ctx.location_cache
         cmds.do_publish(cmds.dispense, self.dispense, 'before', None, None,
                         self, volume, loc, rate)
-        self._hardware.dispense(self._mount, volume, rate)
+        self._hw_manager.hardware.dispense(self._mount, volume, rate)
         cmds.do_publish(cmds.dispense, self.dispense, 'after', self, None,
                         self, volume, loc, rate)
         return self
@@ -547,8 +587,7 @@ class InstrumentContext:
         :type increment: float
         :returns: This instance
         """
-        num_channels = \
-            self._hardware.attached_instruments[self._mount]['channels']
+        num_channels = self.channels
 
         def _select_tiprack_from_list(tip_racks) -> Tuple[Labware, Well]:
             try:
@@ -577,7 +616,7 @@ class InstrumentContext:
 
         self.move_to(target.top())
 
-        self._hardware.pick_up_tip(
+        self._hw_manager.hardware.pick_up_tip(
             self._mount, tiprack.tip_length, presses, increment)
         # Note that the hardware API pick_up_tip action includes homing z after
 
@@ -612,7 +651,7 @@ class InstrumentContext:
             target = self.trash_container.wells()[0]
 
         self.move_to(target.top())
-        self._hardware.drop_tip(self._mount)
+        self._hw_manager.hardware.drop_tip(self._mount)
         return self
 
     def home(self) -> 'InstrumentContext':
@@ -633,7 +672,7 @@ class InstrumentContext:
 
         :returns: This instance.
         """
-        self._hardware.home_plunger(self.mount)
+        self._hw_manager.hardware.home_plunger(self.mount)
         return self
 
     @cmds.publish.both(command=cmds.distribute)
@@ -673,14 +712,15 @@ class InstrumentContext:
             from_lw = self._ctx.location_cache.labware
         else:
             from_lw = None
-        from_loc = types.Location(self._hardware.gantry_position(self._mount),
-                                  from_lw)
+        from_loc = types.Location(
+            self._hw_manager.hardware.gantry_position(self._mount),
+            from_lw)
         moves = geometry.plan_moves(from_loc, location, self._ctx.deck)
         self._log.debug("move {}->{}: {}"
                         .format(from_loc, location, moves))
         try:
             for move in moves:
-                self._hardware.move_to(self._mount, move)
+                self._hw_manager.hardware.move_to(self._mount, move)
         except Exception:
             self._ctx.location_cache = None
             raise
@@ -817,10 +857,15 @@ class InstrumentContext:
         :raises: a :py:class:`.types.PipetteNotAttachedError` if the pipette is
                  no longer attached (should not happen).
         """
-        pipette = self._hardware.attached_instruments[self._mount]
+        pipette = self._hw_manager.hardware.attached_instruments[self._mount]
         if pipette is None:
             raise types.PipetteNotAttachedError
         return pipette
+
+    @property
+    def channels(self) -> int:
+        """ The number of channels on the pipette. """
+        return self.hw_pipette['channels']
 
     @property
     def well_bottom_clearance(self) -> float:
