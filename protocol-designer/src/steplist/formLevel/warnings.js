@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
-import {getWellTotalVolume} from '@opentrons/shared-data'
-import {DISPOSAL_VOLUME_PERCENTAGE} from '../../constants'
+import {getWellTotalVolume, getPipetteNameSpecs} from '@opentrons/shared-data'
 import type {StepFieldName} from '../../form-types'
 import KnowledgeBaseLink from '../../components/KnowledgeBaseLink'
 
@@ -59,10 +58,11 @@ export const maxDispenseWellVolume = (fields: HydratedFormData): ?FormWarning =>
 
 export const minDisposalVolume = (fields: HydratedFormData): ?FormWarning => {
   const {aspirate_disposalVol_checkbox, aspirate_disposalVol_volume, pipette} = fields
-  if (!pipette) return null
+  const pipetteSpecs = getPipetteNameSpecs(pipette.model)
+  if (!pipette || !pipetteSpecs) return null
   const isUnselected = !aspirate_disposalVol_checkbox || !aspirate_disposalVol_volume
   if (isUnselected) return FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME
-  const isBelowMin = aspirate_disposalVol_volume < (DISPOSAL_VOLUME_PERCENTAGE * pipette.maxVolume)
+  const isBelowMin = aspirate_disposalVol_volume < (pipetteSpecs.minVolume)
   return isBelowMin ? FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME : null
 }
 
