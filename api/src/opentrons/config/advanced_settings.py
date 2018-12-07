@@ -55,6 +55,15 @@ settings = [
         _id='useProtocolApi2',
         title='Use Protocol API version 2',
         description='Use new implementation of protocol API. This should not be activated except by developers.' # noqa
+    ),
+    Setting(
+        _id='useNewP10Aspiration',
+        title='Use New P10 Single Calibration',
+        description="""This calibration includes a refinement to the aspiration
+        function based on an expanded data set. This is a small but material
+        change to the P10's pipetting performance, in particular decreasing the
+        low-volume µl-to-mm conversion factor to address under-aspiration
+        issues"""
     )
 ]
 

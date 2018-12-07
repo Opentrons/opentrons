@@ -4,6 +4,7 @@ import json
 from collections import namedtuple
 from typing import List
 from opentrons import __file__ as root_file
+from opentrons.config import feature_flags as ff
 
 
 root_dir = os.path.abspath(os.path.dirname(root_file))
@@ -116,6 +117,21 @@ def load(pipette_model: str) -> pipette_config:
     elif 'p10' in pipette_model:
         assert res.model_offset[1] == 0.0
         assert res.model_offset[2] == Z_OFFSET_P10
+        new_aspirate = ff.use_new_p10_aspiration()
+        if 'single' in pipette_model and new_aspirate:
+            log.info("Using new P10 single aspiration")
+            res.ul_per_mm['aspirate'] = [
+                [1.438649211,	0.01931415115,	0.691538317],
+                [2.5222, -0.104, 1.1031],
+                [1.836824579,	0.03868955123,	0.6636639129],
+                [3.2354, -0.0447, 0.9536],
+                [2.960052684,	0.00470371018,	0.7260899411],
+                [3.9984, -0.012, 0.8477],
+                [4.487508789,	0.005175245625,	0.7246941713],
+                [12.5135, -0.0021, 0.8079],
+                [10.59661421,	0.001470408978,	0.7413196584]]
+        elif not new_aspirate:
+            log.info("Using old P10 single aspiration")
     elif 'p300' in pipette_model:
         assert res.model_offset[1] == 0.0
         assert res.model_offset[2] == Z_OFFSET_P300
