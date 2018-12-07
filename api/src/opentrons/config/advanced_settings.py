@@ -59,11 +59,11 @@ settings = [
     Setting(
         _id='useNewP10Aspiration',
         title='Use New P10 Single Calibration',
-        description="""Use updated P10S pipette calibration. This calibration
-        includes a refinement to the aspiration function based on an expanded
-        data set. Note this is a small but material change to the P10's
-        pipetting performance, in particular decreasing the low-volume
-        µl-to-mm conversion factor to address under-aspiration issues"""
+        description="""This calibration includes a refinement to the aspiration
+        function based on an expanded data set. This is a small but material
+        change to the P10's pipetting performance, in particular decreasing the
+        low-volume µl-to-mm conversion factor to address under-aspiration
+        issues"""
     )
 ]
 
