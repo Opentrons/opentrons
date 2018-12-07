@@ -25,7 +25,7 @@ function Nav (props: Props) {
             iconName='ot-file'
             title={i18n.t('nav.tab_name.file')}
             selected={props.currentPage === 'file-splash' || props.currentPage === 'file-detail'}
-            onClick={props.handleClick('file-detail')} />
+            onClick={props.handleClick(noCurrentProtocol ? 'file-splash' : 'file-detail')} />
           <NavTab
             iconName='water'
             title={i18n.t('nav.tab_name.liquids')}
