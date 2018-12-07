@@ -99,6 +99,18 @@ class Mover:
     def pop_active_current(self):
         self._driver.pop_active_current()
 
+    def set_acceleration(self, acceleration):
+        self._driver.set_acceleration({
+                axis.upper(): acceleration
+                for axis in self._axis_mapping.values()
+            })
+
+    def push_acceleration(self):
+        self._driver.push_acceleration()
+
+    def pop_acceleration(self):
+        self._driver.pop_acceleration()
+
     def probe(self, pose_tree, axis, movement):
         assert axis in self._axis_mapping, "mapping is not set for " + axis
 

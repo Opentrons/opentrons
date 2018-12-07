@@ -313,6 +313,45 @@ def test_set_active_current(smoothie, monkeypatch):
     fuzzy_assert(result=command_log, expected=expected)
 
 
+def test_set_acceleration(smoothie, monkeypatch):
+    from opentrons.drivers import serial_communication
+    from opentrons.drivers.smoothie_drivers import driver_3_0
+    command_log = []
+    smoothie._setup()
+    smoothie.home()
+    smoothie.simulating = False
+
+    def write_with_log(command, ack, connection, timeout):
+        command_log.append(command.strip())
+        return driver_3_0.SMOOTHIE_ACK
+
+    def _parse_position_response(arg):
+        return smoothie.position
+
+    monkeypatch.setattr(serial_communication, 'write_and_return',
+                        write_with_log)
+    monkeypatch.setattr(
+        driver_3_0, '_parse_position_response', _parse_position_response)
+
+    smoothie.set_acceleration(
+        {'X': 1, 'Y': 2, 'Z': 3, 'A': 4, 'B': 5, 'C': 6})
+    smoothie.push_acceleration()
+    smoothie.pop_acceleration()
+    smoothie.set_acceleration(
+        {'X': 10, 'Y': 20, 'Z': 30, 'A': 40, 'B': 50, 'C': 60})
+    smoothie.pop_acceleration()
+
+    expected = [
+        ['M204 S10000 A4 B5 C6 X1 Y2 Z3 M400'],
+        ['M204 S10000 A4 B5 C6 X1 Y2 Z3 M400'],
+        ['M204 S10000 A40 B50 C60 X10 Y20 Z30 M400'],
+        ['M204 S10000 A4 B5 C6 X1 Y2 Z3 M400']
+    ]
+    from pprint import pprint
+    pprint(command_log)
+    fuzzy_assert(result=command_log, expected=expected)
+
+
 def test_active_dwelling_current_push_pop(smoothie):
     assert smoothie._active_current_settings != \
         smoothie._dwelling_current_settings

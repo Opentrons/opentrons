@@ -25,6 +25,8 @@ PLUNGER_POSITIONS = {
 
 DROP_TIP_RELEASE_DISTANCE = 20
 
+BLOW_OUT_ACCELERATION = 1500
+
 DEFAULT_ASPIRATE_SPEED = 5
 DEFAULT_DISPENSE_SPEED = 10
 
@@ -685,8 +687,15 @@ class Pipette:
         self.instrument_actuator.set_active_current(self._plunger_current)
         self.robot.poses = self.instrument_actuator.move(
             self.robot.poses,
+            x=self._get_plunger_position('bottom')
+        )
+        self.instrument_actuator.push_acceleration()
+        self.instrument_actuator.set_acceleration(BLOW_OUT_ACCELERATION)
+        self.robot.poses = self.instrument_actuator.move(
+            self.robot.poses,
             x=self._get_plunger_position('blow_out')
         )
+        self.instrument_actuator.pop_acceleration()
         self.current_volume = 0
 
         return self
