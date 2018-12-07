@@ -1,28 +1,27 @@
 // @flow
 import {expectTimelineError} from './testMatchers'
-import _aspirate from '../aspirate'
+import _aspirate from '../commandCreators/atomic/aspirate'
 import {
-  createRobotStateFixture,
   createRobotState,
   commandCreatorHasErrors,
   commandCreatorNoErrors,
 } from './fixtures'
-import updateLiquidState from '../aspirateUpdateLiquidState'
+import getNextRobotStateAndWarnings from '../getNextRobotStateAndWarnings'
 
-jest.mock('../aspirateUpdateLiquidState')
+jest.mock('../getNextRobotStateAndWarnings')
 
 const aspirate = commandCreatorNoErrors(_aspirate)
 const aspirateWithErrors = commandCreatorHasErrors(_aspirate)
 
-const mockLiquidReturnValue = {
+const mockRobotStateAndWarningsReturnValue = {
   // using strings instead of properly-shaped objects for easier assertions
-  liquidState: 'expected liquid state',
+  robotState: 'expected robot state',
   warnings: 'expected warnings',
 }
 
 beforeEach(() => {
   // $FlowFixMe
-  updateLiquidState.mockReturnValue(mockLiquidReturnValue)
+  getNextRobotStateAndWarnings.mockReturnValue(mockRobotStateAndWarningsReturnValue)
 })
 
 describe('aspirate', () => {
@@ -46,34 +45,53 @@ describe('aspirate', () => {
     })
   })
 
-  // Fixtures without liquidState key, for use with `toMatchObject`
-  const robotStateWithTipNoLiquidState = createRobotStateFixture({
-    sourcePlateType: 'trough-12row',
-    destPlateType: '96-flat',
-    fillPipetteTips: true,
-    fillTiprackTips: 300,
-    tipracks: [300, 300],
-  })
-
-  test('aspirate with tip', () => {
-    const result = aspirate({
-      pipette: 'p300SingleId',
-      volume: 50,
-      labware: 'sourcePlateId',
-      well: 'A1',
-    })(robotStateWithTip)
-
-    expect(result.commands).toEqual([{
-      command: 'aspirate',
-      params: {
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A1',
+  describe('aspirate normally (with tip)', () => {
+    const optionalArgsCases = [
+      {
+        description: 'no optional args',
+        expectInParams: false,
+        args: {},
       },
-    }])
+      {
+        description: 'null optional args',
+        expectInParams: false,
+        args: {
+          offsetFromBottomMm: null,
+          'flow-rate': null,
+        },
+      },
+      {
+        description: 'all optional args',
+        expectInParams: true,
+        args: {
+          offsetFromBottomMm: 5,
+          'flow-rate': 6,
+        },
+      },
+    ]
 
-    expect(result.robotState).toMatchObject(robotStateWithTipNoLiquidState)
+    optionalArgsCases.forEach(testCase => {
+      test(testCase.description, () => {
+        const result = aspirate({
+          pipette: 'p300SingleId',
+          volume: 50,
+          labware: 'sourcePlateId',
+          well: 'A1',
+          ...testCase.args,
+        })(robotStateWithTip)
+
+        expect(result.commands).toEqual([{
+          command: 'aspirate',
+          params: {
+            pipette: 'p300SingleId',
+            volume: 50,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            ...(testCase.expectInParams ? testCase.args : {}),
+          },
+        }])
+      })
+    })
   })
 
   test('aspirate with volume > tip max volume should throw error', () => {
@@ -147,28 +165,18 @@ describe('aspirate', () => {
   })
 
   describe('liquid tracking', () => {
-    test('aspirate calls aspirateUpdateLiquidState with correct args and puts result into robotState.liquidState', () => {
-      const result = aspirate({
+    test('aspirate calls getNextRobotStateAndWarnings with correct args and puts result into robotState', () => {
+      const args = {
         pipette: 'p300SingleId',
         labware: 'sourcePlateId',
         well: 'A1',
         volume: 152,
-      })(robotStateWithTip)
+      }
+      const result = aspirate(args)(robotStateWithTip)
 
-      expect(updateLiquidState).toHaveBeenCalledWith(
-        {
-          pipetteId: 'p300SingleId',
-          labwareId: 'sourcePlateId',
-          volume: 152,
-          well: 'A1',
-          labwareType: 'trough-12row',
-          pipetteData: robotStateWithTip.instruments.p300SingleId,
-        },
-        robotStateWithTip.liquidState
-      )
-
-      expect(result.robotState.liquidState).toBe(mockLiquidReturnValue.liquidState)
-      expect(result.warnings).toBe(mockLiquidReturnValue.warnings)
+      expect(getNextRobotStateAndWarnings).toHaveBeenCalledWith(result.commands[0], robotStateWithTip)
+      expect(result.robotState).toBe(mockRobotStateAndWarningsReturnValue.robotState)
+      expect(result.warnings).toBe(mockRobotStateAndWarningsReturnValue.warnings)
     })
   })
 })

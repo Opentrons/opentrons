@@ -1,27 +1,36 @@
 // @flow
 import flatMap from 'lodash/flatMap'
-import aspirate from './aspirate'
-import blowout from './blowout'
-import dispense from './dispense'
-import replaceTip from './replaceTip'
-import touchTip from './touchTip'
-import {repeatArray} from './utils'
-import * as errorCreators from './errorCreators'
-import type {MixFormData, RobotState, CommandCreator, CompoundCommandCreator} from './'
+import {repeatArray, blowoutUtil} from '../../utils'
+import * as errorCreators from '../../errorCreators'
+import type {MixFormData, RobotState, CommandCreator, CompoundCommandCreator} from '../../types'
+import {aspirate, dispense, replaceTip, touchTip} from '../atomic'
 
 /** Helper fn to make mix command creators w/ minimal arguments */
-export function mixUtil (
+export function mixUtil (args: {
   pipette: string,
   labware: string,
   well: string,
   volume: number,
   times: number,
   aspirateOffsetFromBottomMm?: ?number,
-  dispenseOffsetFromBottomMm?: ?number
-): Array<CommandCreator> {
+  dispenseOffsetFromBottomMm?: ?number,
+  aspirateFlowRateUlSec?: ?number,
+  dispenseFlowRateUlSec?: ?number,
+}): Array<CommandCreator> {
+  const {
+    pipette,
+    labware,
+    well,
+    volume,
+    times,
+    aspirateOffsetFromBottomMm,
+    dispenseOffsetFromBottomMm,
+    aspirateFlowRateUlSec,
+    dispenseFlowRateUlSec,
+  } = args
   return repeatArray([
-    aspirate({pipette, volume, labware, well, offsetFromBottomMm: aspirateOffsetFromBottomMm}),
-    dispense({pipette, volume, labware, well, offsetFromBottomMm: dispenseOffsetFromBottomMm}),
+    aspirate({pipette, volume, labware, well, offsetFromBottomMm: aspirateOffsetFromBottomMm, 'flow-rate': aspirateFlowRateUlSec}),
+    dispense({pipette, volume, labware, well, offsetFromBottomMm: dispenseOffsetFromBottomMm, 'flow-rate': dispenseFlowRateUlSec}),
   ], times)
 }
 
@@ -47,6 +56,8 @@ const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: Robo
     changeTip,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
+    aspirateFlowRateUlSec,
+    dispenseFlowRateUlSec,
   } = data
 
   // Errors
@@ -87,28 +98,31 @@ const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: Robo
         ]
         : []
 
-      const blowoutCommands = data.blowout
-        ? [blowout({
-          pipette,
-          labware: data.blowout,
-          well: 'A1',
-        })]
-        : []
+      const blowoutCommand = blowoutUtil(
+        data.pipette,
+        data.labware,
+        well,
+        data.labware,
+        well,
+        data.blowoutLocation,
+      )
 
-      const mixCommands = mixUtil(
+      const mixCommands = mixUtil({
         pipette,
         labware,
         well,
         volume,
         times,
         aspirateOffsetFromBottomMm,
-        dispenseOffsetFromBottomMm
-      )
+        dispenseOffsetFromBottomMm,
+        aspirateFlowRateUlSec,
+        dispenseFlowRateUlSec,
+      })
 
       return [
         ...tipCommands,
         ...mixCommands,
-        ...blowoutCommands,
+        ...blowoutCommand,
         ...touchTipCommands,
       ]
     }

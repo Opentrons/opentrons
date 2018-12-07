@@ -474,7 +474,12 @@ export default function client (dispatch) {
       const labware = {_id, name, slot, type, isTiprack}
 
       if (isTiprack && apiContainer.instruments.length > 0) {
-        labware.calibratorMount = apiContainer.instruments[0].mount
+        // if tiprack used by both pipettes, prefer single for calibration
+        const calibrator =
+          find(apiContainer.instruments, {channels: 1}) ||
+          apiContainer.instruments[0]
+
+        if (calibrator) labware.calibratorMount = calibrator.mount
       }
 
       update.labwareBySlot[slot] = labware

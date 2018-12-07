@@ -1,5 +1,5 @@
 // @flow
-import type {PauseFormData, RobotState, CommandCreator} from './'
+import type {PauseFormData, RobotState, CommandCreator} from '../../types'
 
 const pause = (data: PauseFormData): CommandCreator => (prevRobotState: RobotState) => {
   return {

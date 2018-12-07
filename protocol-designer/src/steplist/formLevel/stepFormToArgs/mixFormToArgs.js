@@ -29,15 +29,19 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
 
   const volume = Number(hydratedFormData.volume) || 0
   const times = Number(hydratedFormData.times) || 0
+
+  const aspirateFlowRateUlSec = hydratedFormData['aspirate_flowRate']
+  const dispenseFlowRateUlSec = hydratedFormData['dispense_flowRate']
+
   // NOTE: for mix, there is only one tip offset field,
   // and it applies to both aspirate and dispense
-  const aspirateOffsetFromBottomMm = Number(hydratedFormData['mix_mmFromBottom'])
-  const dispenseOffsetFromBottomMm = Number(hydratedFormData['mix_mmFromBottom'])
+  const aspirateOffsetFromBottomMm = hydratedFormData['mix_mmFromBottom']
+  const dispenseOffsetFromBottomMm = hydratedFormData['mix_mmFromBottom']
 
   // It's radiobutton, so one should always be selected.
   const changeTip = hydratedFormData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION
 
-  const blowoutLabwareId = hydratedFormData['dispense_blowout_labware']
+  const blowoutLocation = hydratedFormData['dispense_blowout_checkbox'] ? hydratedFormData['dispense_blowout_location'] : null
 
   return {
     stepType: 'mix',
@@ -50,8 +54,10 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
     touchTip,
     touchTipMmFromBottom,
     changeTip,
-    blowout: blowoutLabwareId,
+    blowoutLocation,
     pipette: pipette.id,
+    aspirateFlowRateUlSec,
+    dispenseFlowRateUlSec,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
   }

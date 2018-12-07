@@ -1,5 +1,5 @@
 // @flow
-import _mix from '../mix'
+import _mix from '../commandCreators/compound/mix'
 import {
   createRobotState,
   compoundCommandCreatorNoErrors,
@@ -30,6 +30,7 @@ beforeEach(() => {
     pipette: 'p300SingleId',
     labware: 'sourcePlateId',
 
+    blowoutLocation: null,
     touchTip: false,
   }
 })
@@ -129,6 +130,43 @@ describe('mix: advanced options', () => {
   const times = 2
   const blowoutLabwareId = 'destPlateId'
 
+  test('flow rate', () => {
+    const ASPIRATE_OFFSET = 11
+    const DISPENSE_OFFSET = 12
+    const ASPIRATE_FLOW_RATE = 3
+    const DISPENSE_FLOW_RATE = 6
+    const args: MixFormData = {
+      ...mixinArgs,
+      volume,
+      times,
+      wells: ['A1'],
+      changeTip: 'once',
+      aspirateOffsetFromBottomMm: ASPIRATE_OFFSET,
+      dispenseOffsetFromBottomMm: DISPENSE_OFFSET,
+      aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
+      dispenseFlowRateUlSec: DISPENSE_FLOW_RATE,
+    }
+
+    const aspirateParams = {
+      'flow-rate': ASPIRATE_FLOW_RATE,
+      offsetFromBottomMm: ASPIRATE_OFFSET,
+    }
+    const dispenseParams = {
+      'flow-rate': DISPENSE_FLOW_RATE,
+      offsetFromBottomMm: DISPENSE_OFFSET,
+    }
+
+    const result = mix(args)(robotInitialState)
+    expect(result.commands).toEqual([
+      ...cmd.replaceTipCommands(0),
+      {...cmd.aspirate('A1', volume, aspirateParams)},
+      {...cmd.dispense('A1', volume, dispenseParams)},
+
+      {...cmd.aspirate('A1', volume, aspirateParams)},
+      {...cmd.dispense('A1', volume, dispenseParams)},
+    ])
+  })
+
   test('touch tip (after each dispense)', () => {
     const args: MixFormData = {
       ...mixinArgs,
@@ -137,6 +175,10 @@ describe('mix: advanced options', () => {
       changeTip: 'always',
       touchTip: true,
       wells: ['A1', 'B1', 'C1'],
+      aspirateOffsetFromBottomMm: null,
+      dispenseOffsetFromBottomMm: null,
+      aspirateFlowRateUlSec: null,
+      dispenseFlowRateUlSec: null,
     }
 
     const result = mix(args)(robotInitialState)
@@ -174,7 +216,7 @@ describe('mix: advanced options', () => {
       volume,
       times,
       changeTip: 'always',
-      blowout: blowoutLabwareId,
+      blowoutLocation: blowoutLabwareId,
       wells: ['A1', 'B1', 'C1'],
     }
 
@@ -213,8 +255,8 @@ describe('mix: advanced options', () => {
       volume,
       times,
       changeTip: 'always',
+      blowoutLocation: blowoutLabwareId,
       touchTip: true,
-      blowout: blowoutLabwareId,
       wells: ['A1', 'B1', 'C1'],
     }
 

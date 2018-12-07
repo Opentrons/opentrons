@@ -6,7 +6,7 @@ import {
   compoundCommandCreatorHasErrors,
   commandFixtures as cmd,
 } from './fixtures'
-import _transfer from '../transfer'
+import _transfer from '../commandCreators/compound/transfer'
 
 const transfer = compoundCommandCreatorNoErrors(_transfer)
 const transferWithErrors = compoundCommandCreatorHasErrors(_transfer)
@@ -26,12 +26,11 @@ beforeEach(() => {
 
     preWetTip: false,
     touchTipAfterAspirate: false,
-    disposalVolume: null,
     mixBeforeAspirate: null,
 
     touchTipAfterDispense: false,
     mixInDestination: null,
-    blowout: null,
+    blowoutLocation: null,
   }
 
   robotInitialState = createRobotState({
@@ -404,7 +403,6 @@ describe('advanced options', () => {
       ])
     })
     test('air gap => ???') // TODO determine behavior
-    test('disposal volume => ???') // TODO determine behavior
   })
 
   describe('...dispense options', () => {

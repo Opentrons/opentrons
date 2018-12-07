@@ -1,12 +1,12 @@
 // @flow
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
-import {FIXED_TRASH_ID} from '../constants'
-import {aspirate, dispense, blowout, replaceTip, touchTip} from './'
+import * as errorCreators from '../../errorCreators'
+import {getPipetteWithTipMaxVol} from '../../robotStateSelectors'
+import type {ConsolidateFormData, RobotState, CommandCreator, CompoundCommandCreator} from '../../types'
+import {blowoutUtil} from '../../utils'
+import {aspirate, dispense, replaceTip, touchTip} from '../atomic'
 import {mixUtil} from './mix'
-import * as errorCreators from './errorCreators'
-import {getPipetteWithTipMaxVol} from './robotStateSelectors'
-import type {ConsolidateFormData, RobotState, CommandCreator, CompoundCommandCreator} from './'
 
 const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prevRobotState: RobotState) => {
   /**
@@ -36,17 +36,14 @@ const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prev
   }
 
   const {
+    aspirateFlowRateUlSec,
+    dispenseFlowRateUlSec,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
   } = data
 
-  // TODO error on negative data.disposalVolume?
-  const disposalVolume = (data.disposalVolume && data.disposalVolume > 0)
-    ? data.disposalVolume
-    : 0
-
   const maxWellsPerChunk = Math.floor(
-    (getPipetteWithTipMaxVol(data.pipette, prevRobotState) - disposalVolume) / data.volume
+    getPipetteWithTipMaxVol(data.pipette, prevRobotState) / data.volume
   )
 
   const commandCreators = flatMap(
@@ -54,8 +51,6 @@ const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prev
     (sourceWellChunk: Array<string>, chunkIndex: number): Array<CommandCreator> => {
       // Aspirate commands for all source wells in the chunk
       const aspirateCommands = flatMap(sourceWellChunk, (sourceWell: string, wellIndex: number): Array<CommandCreator> => {
-        const isFirstWellInChunk = wellIndex === 0
-
         const touchTipAfterAspirateCommand = data.touchTipAfterAspirate
           ? [touchTip({
             pipette: data.pipette,
@@ -68,9 +63,10 @@ const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prev
         return [
           aspirate({
             pipette: data.pipette,
-            volume: data.volume + (isFirstWellInChunk ? disposalVolume : 0),
+            volume: data.volume,
             labware: data.sourceLabware,
             well: sourceWell,
+            'flow-rate': aspirateFlowRateUlSec,
             offsetFromBottomMm: aspirateOffsetFromBottomMm,
           }),
           ...touchTipAfterAspirateCommand,
@@ -95,62 +91,55 @@ const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prev
         })]
         : []
 
-      const trashTheDisposalVol = disposalVolume
-        ? [
-          blowout({
-            pipette: data.pipette,
-            labware: FIXED_TRASH_ID,
-            well: 'A1',
-          }),
-        ]
-        : []
-
       const mixBeforeCommands = (data.mixFirstAspirate)
-        ? mixUtil(
-          data.pipette,
-          data.sourceLabware,
-          sourceWellChunk[0],
-          data.mixFirstAspirate.volume,
-          data.mixFirstAspirate.times,
+        ? mixUtil({
+          pipette: data.pipette,
+          labware: data.sourceLabware,
+          well: sourceWellChunk[0],
+          volume: data.mixFirstAspirate.volume,
+          times: data.mixFirstAspirate.times,
           aspirateOffsetFromBottomMm,
-          dispenseOffsetFromBottomMm
-        )
+          dispenseOffsetFromBottomMm,
+          aspirateFlowRateUlSec,
+          dispenseFlowRateUlSec,
+        })
         : []
 
       const preWetTipCommands = (data.preWetTip)
         // Pre-wet tip is equivalent to a single mix, with volume equal to the consolidate volume.
-        ? mixUtil(
-          data.pipette,
-          data.sourceLabware,
-          sourceWellChunk[0],
-          data.volume,
-          1,
+        ? mixUtil({
+          pipette: data.pipette,
+          labware: data.sourceLabware,
+          well: sourceWellChunk[0],
+          volume: data.volume,
+          times: 1,
           aspirateOffsetFromBottomMm,
-          dispenseOffsetFromBottomMm
-        )
+          dispenseOffsetFromBottomMm,
+          aspirateFlowRateUlSec,
+          dispenseFlowRateUlSec,
+        })
         : []
 
       const mixAfterCommands = (data.mixInDestination)
-        ? mixUtil(
-          data.pipette,
-          data.destLabware,
-          data.destWell,
-          data.mixInDestination.volume,
-          data.mixInDestination.times,
+        ? mixUtil({
+          pipette: data.pipette,
+          labware: data.destLabware,
+          well: data.destWell,
+          volume: data.mixInDestination.volume,
+          times: data.mixInDestination.times,
           aspirateOffsetFromBottomMm,
-          dispenseOffsetFromBottomMm
-        )
+          dispenseOffsetFromBottomMm,
+        })
         : []
 
-      const blowoutCommand = (data.blowout)
-        ? [
-          blowout({
-            pipette: data.pipette,
-            labware: data.blowout, // TODO Ian 2018-05-04 more explicit test for non-trash blowout destination
-            well: 'A1', // TODO LATER: should user be able to specify the blowout well?
-          }),
-        ]
-        : []
+      const blowoutCommand = blowoutUtil(
+        data.pipette,
+        data.sourceLabware,
+        sourceWellChunk[0],
+        data.destLabware,
+        data.destWell,
+        data.blowoutLocation,
+      )
 
       return [
         ...tipCommands,
@@ -162,10 +151,10 @@ const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prev
           volume: data.volume * sourceWellChunk.length,
           labware: data.destLabware,
           well: data.destWell,
+          'flow-rate': dispenseFlowRateUlSec,
           offsetFromBottomMm: dispenseOffsetFromBottomMm,
         }),
         ...touchTipAfterDispenseCommands,
-        ...trashTheDisposalVol,
         ...mixAfterCommands,
         ...blowoutCommand,
       ]

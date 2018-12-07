@@ -1,8 +1,10 @@
 // @flow
 import cloneDeep from 'lodash/cloneDeep'
-import {dropTip, getNextTiprack, tiprackWellNamesByCol} from './'
-import {insufficientTips} from './errorCreators'
-import type {RobotState, CommandCreator} from './types'
+import {getNextTiprack} from '../../robotStateSelectors'
+import {tiprackWellNamesByCol} from '../../data'
+import {insufficientTips} from '../../errorCreators'
+import type {RobotState, CommandCreator} from '../../types'
+import dropTip from './dropTip'
 
 const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: RobotState) => {
   /**
@@ -46,12 +48,6 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
 
   // pipette now has tip
   robotState.tipState.pipettes[pipetteId] = true
-
-  // update tiprack-to-pipette assignment
-  robotState.tiprackAssignment = {
-    ...robotState.tiprackAssignment,
-    [nextTiprack.tiprackId]: pipetteId,
-  }
 
   // remove tips from tiprack
   if (pipetteData.channels === 1 && nextTiprack.well) {

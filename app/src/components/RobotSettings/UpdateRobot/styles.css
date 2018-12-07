@@ -13,5 +13,10 @@
 }
 
 .sync_message {
-  margin-bottom: 1.5rem;
+  margin-left: 1rem;
+  padding-bottom: 1rem;
+}
+
+.reinstall_message {
+  margin-left: 1rem;
 }

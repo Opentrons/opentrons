@@ -14,7 +14,10 @@ import {selectors as pipetteSelectors} from '../../pipettes'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import {hydrateField} from '../../steplist/fieldLevel'
 import type {StepFieldName} from '../../steplist/fieldLevel'
-import {SOURCE_WELL_DISPOSAL_DESTINATION} from '../../steplist/formLevel/stepFormToArgs/transferLikeFormToArgs'
+import {
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+  DEST_WELL_BLOWOUT_DESTINATION,
+} from '../../step-generation/utils'
 import type {ChangeTipOptions} from '../../step-generation/types'
 import type {BaseState} from '../../types'
 import type {StepType} from '../../form-types'
@@ -120,12 +123,30 @@ export const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldProps) 
     )} />
 ))
 
-type DisposalDestinationDropdownOP = {name: StepFieldName, className?: string} & FocusHandlers
-type DisposalDestinationDropdownSP = {options: Options}
-const DisposalDestinationDropdownSTP = (state: BaseState): DisposalDestinationDropdownSP => ({
-  options: labwareIngredSelectors.disposalLabwareOptions(state),
-})
-export const DisposalDestinationDropdown = connect(DisposalDestinationDropdownSTP)((props: DisposalDestinationDropdownOP & DisposalDestinationDropdownSP) => {
+type BlowoutLocationDropdownOP = {
+  name: StepFieldName,
+  className?: string,
+  includeSourceWell?: ?boolean,
+  includeDestWell?: ?boolean,
+} & FocusHandlers
+type BlowoutLocationDropdownSP = {options: Options}
+const BlowoutLocationDropdownSTP = (state: BaseState, ownProps: BlowoutLocationDropdownOP): BlowoutLocationDropdownSP => {
+  let options = labwareIngredSelectors.disposalLabwareOptions(state)
+  if (ownProps.includeDestWell) {
+    options = [
+      ...options,
+      {name: 'Destination Well', value: DEST_WELL_BLOWOUT_DESTINATION},
+    ]
+  }
+  if (ownProps.includeSourceWell) {
+    options = [
+      ...options,
+      {name: 'Source Well', value: SOURCE_WELL_BLOWOUT_DESTINATION},
+    ]
+  }
+  return {options}
+}
+export const BlowoutLocationDropdown = connect(BlowoutLocationDropdownSTP)((props: BlowoutLocationDropdownOP & BlowoutLocationDropdownSP) => {
   const {options, name, className, focusedField, dirtyFields, onFieldBlur, onFieldFocus} = props
   return (
     <StepField
@@ -135,7 +156,7 @@ export const DisposalDestinationDropdown = connect(DisposalDestinationDropdownST
       render={({value, updateValue}) => (
         <DropdownField
           className={className}
-          options={[...options, {name: 'Source Well', value: SOURCE_WELL_DISPOSAL_DESTINATION}]}
+          options={options}
           onBlur={() => { onFieldBlur(name) }}
           onFocus={() => { onFieldFocus(name) }}
           value={value ? String(value) : null}

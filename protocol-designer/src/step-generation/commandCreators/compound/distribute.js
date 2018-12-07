@@ -4,12 +4,12 @@ import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import flatten from 'lodash/flatten'
 // import {FIXED_TRASH_ID} from '../constants'
-import {aspirate, dispense, blowout, replaceTip, touchTip} from './'
+import * as errorCreators from '../../errorCreators'
+import {getPipetteWithTipMaxVol} from '../../robotStateSelectors'
+import type {DistributeFormData, RobotState, CommandCreator, CompoundCommandCreator, TransferLikeFormDataFields, TransferFormData} from '../../types'
+import {aspirate, dispense, blowout, replaceTip, touchTip} from '../atomic'
 import transfer from './transfer'
 import {mixUtil} from './mix'
-import * as errorCreators from './errorCreators'
-import {getPipetteWithTipMaxVol} from './robotStateSelectors'
-import type {DistributeFormData, RobotState, CommandCreator, CompoundCommandCreator, TransferLikeFormDataFields, TransferFormData} from './'
 
 const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRobotState: RobotState) => {
   /**
@@ -40,6 +40,8 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
   }
 
   const {
+    aspirateFlowRateUlSec,
+    dispenseFlowRateUlSec,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
   } = data
@@ -57,15 +59,22 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
 
   if (maxWellsPerChunk === 0) {
     // distribute vol exceeds pipette vol, break up into 1 transfer per dest well
-    const transferCommands = data.destWells.map((destWell) => {
+    const transferCommands = data.destWells.map((destWell, wellIndex) => {
+      let changeTip = data.changeTip
+      // 'once' means 'once per all inner transfers'
+      // so it should only apply to the first inner transfer
+      if (data.changeTip === 'once') {
+        changeTip = (wellIndex === 0) ? 'once' : 'never'
+      }
       const transferData: TransferFormData = {
         ...(data: TransferLikeFormDataFields),
+        changeTip,
         stepType: 'transfer',
         sourceWells: [data.sourceWell],
         destWells: [destWell],
         mixBeforeAspirate: data.mixBeforeAspirate,
         mixInDestination: null,
-        blowout: null,
+        blowoutLocation: null,
       }
       return transfer(transferData)
     })
@@ -96,6 +105,7 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
               volume: data.volume,
               labware: data.destLabware,
               well: destWell,
+              'flow-rate': dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
             }),
             ...touchTipAfterDispenseCommand,
@@ -112,6 +122,7 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
         tipCommands = [replaceTip(data.pipette)]
       }
 
+      // TODO: BC 2018-11-29 instead of disposalLabware and disposalWell use blowoutLocation
       let blowoutCommands = []
       if (data.disposalVolume && data.disposalLabware && data.disposalWell) {
         blowoutCommands = [blowout({
@@ -133,15 +144,17 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
         : []
 
       const mixBeforeAspirateCommands = (data.mixBeforeAspirate)
-        ? mixUtil(
-          data.pipette,
-          data.sourceLabware,
-          data.sourceWell,
-          data.mixBeforeAspirate.volume,
-          data.mixBeforeAspirate.times,
+        ? mixUtil({
+          pipette: data.pipette,
+          labware: data.sourceLabware,
+          well: data.sourceWell,
+          volume: data.mixBeforeAspirate.volume,
+          times: data.mixBeforeAspirate.times,
           aspirateOffsetFromBottomMm,
-          dispenseOffsetFromBottomMm
-        )
+          dispenseOffsetFromBottomMm,
+          aspirateFlowRateUlSec,
+          dispenseFlowRateUlSec,
+        })
         : []
 
       return [
@@ -152,6 +165,7 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
           volume: data.volume * destWellChunk.length + disposalVolume,
           labware: data.sourceLabware,
           well: data.sourceWell,
+          'flow-rate': aspirateFlowRateUlSec,
           offsetFromBottomMm: aspirateOffsetFromBottomMm,
         }),
         ...touchTipAfterAspirateCommand,

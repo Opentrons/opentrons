@@ -7,6 +7,7 @@ import {getInitialRobotState, getRobotStateTimeline} from './commands'
 import {selectors as dismissSelectors} from '../../dismiss'
 import {selectors as ingredSelectors} from '../../labware-ingred/reducers'
 import {selectors as steplistSelectors} from '../../steplist'
+import {selectors as pipetteSelectors} from '../../pipettes'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
@@ -42,6 +43,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
   ingredSelectors.getLiquidsByLabwareId,
   steplistSelectors.getSavedForms,
   steplistSelectors.getOrderedSteps,
+  pipetteSelectors.getEquippedPipettes,
   (
     fileMetadata,
     initialRobotState,
@@ -50,7 +52,8 @@ export const createFile: BaseState => ProtocolFile = createSelector(
     ingredients,
     ingredLocations,
     savedStepForms,
-    orderedSteps
+    orderedSteps,
+    equippedPipettes,
   ) => {
     const {author, description, created} = fileMetadata
     const name = fileMetadata['protocol-name'] || 'untitled'
@@ -106,7 +109,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
         _internalAppBuildDate,
         data: {
           pipetteTiprackAssignments: mapValues(
-            initialRobotState.instruments,
+            equippedPipettes,
             (p: PipetteData): ?string => p.tiprackModel
           ),
           dismissedWarnings,

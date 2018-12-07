@@ -1,7 +1,7 @@
 // @flow
 // import cloneDeep from 'lodash/cloneDeep'
-import {noTipOnPipette, pipetteDoesNotExist} from './errorCreators'
-import type {RobotState, CommandCreator, CommandCreatorError, TouchTipArgs} from './'
+import {noTipOnPipette, pipetteDoesNotExist} from '../../errorCreators'
+import type {RobotState, CommandCreator, CommandCreatorError, TouchTipArgs} from '../../types'
 
 const touchTip = (args: TouchTipArgs): CommandCreator => (prevRobotState: RobotState) => {
   /** touchTip with given args. Requires tip. */
