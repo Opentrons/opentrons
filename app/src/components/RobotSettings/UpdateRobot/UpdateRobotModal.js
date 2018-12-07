@@ -74,6 +74,8 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
     if (appUpdateAvailable && !ignoreAppUpdate) {
       return (
         <UpdateAppModal
+          updateInfo={robotUpdateInfo}
+          parentUrl={parentUrl}
           onClick={onClick}
           versionProps={versionProps}
           ignoreUpdate={this.props.ignoreUpdate}
