@@ -31,9 +31,11 @@ import ResetRobotModal from '../../components/RobotSettings/ResetRobotModal'
 
 import type {State, Dispatch, Error} from '../../types'
 import type {ViewableRobot} from '../../discovery'
+import type {ShellUpdateState} from '../../shell'
 
 type OP = {
   robot: ViewableRobot,
+  appUpdate: ShellUpdateState,
   match: Match,
 }
 
@@ -71,6 +73,7 @@ const RESET_FRAGMENT = 'reset'
 function RobotSettingsPage (props: Props) {
   const {
     robot,
+    appUpdate,
     homeInProgress,
     homeError,
     closeHomeAlert,
@@ -108,7 +111,7 @@ function RobotSettingsPage (props: Props) {
           path={`${path}/${UPDATE_FRAGMENT}`}
           render={() => {
             if (props.__featureEnabled) {
-              return <UpdateRobot robot={robot} />
+              return <UpdateRobot robot={robot} appUpdate={appUpdate} />
             } else {
               return <RobotUpdateModal robot={robot} />
             }

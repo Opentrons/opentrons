@@ -10,9 +10,10 @@ import RestartRobotModal from './RestartRobotModal'
 
 import type {State} from '../../../types'
 import type {ViewableRobot} from '../../../discovery'
+import type {ShellUpdateState} from '../../../shell'
 import type {RobotServerUpdate} from '../../../http-api-client'
 
-type OP = {robot: ViewableRobot}
+type OP = {robot: ViewableRobot, appUpdate: ShellUpdateState}
 
 type SP = {|
   updateRequest: RobotServerUpdate,
@@ -29,7 +30,7 @@ export default connect(
 )(UpdateRobot)
 
 function UpdateRobot (props: Props) {
-  const {updateRequest, robot} = props
+  const {updateRequest, robot, appUpdate} = props
   if (updateRequest.response) {
     return <RestartRobotModal robot={robot} />
   }
@@ -37,7 +38,7 @@ function UpdateRobot (props: Props) {
     // TODO (ka 2018-11-27): Clarify update message with UX
     return <SpinnerModal message="Robot is updating" alertOverlay />
   } else {
-    return <UpdateRobotModal robot={robot} />
+    return <UpdateRobotModal robot={robot} appUpdate={appUpdate} />
   }
 }
 
@@ -45,9 +46,8 @@ function makeMapStateToProps (): (State, OP) => Props {
   const getRobotUpdateRequest = makeGetRobotUpdateRequest()
 
   return (state, ownProps) => {
-    const {robot} = ownProps
     return {
-      robot,
+      ...ownProps,
       updateRequest: getRobotUpdateRequest(state, ownProps.robot),
     }
   }

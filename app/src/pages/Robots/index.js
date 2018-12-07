@@ -4,14 +4,19 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {withRouter, Route, Switch, Redirect, type Match} from 'react-router'
 import find from 'lodash/find'
+import {getIn} from '@thi.ng/paths'
 
+import {getConfig} from '../../config'
 import createLogger from '../../logger'
+
 import {
   CONNECTABLE,
   getConnectedRobot,
   getConnectableRobots,
   getReachableRobots,
 } from '../../discovery'
+
+import {getShellUpdateState} from '../../shell'
 
 import {Splash} from '@opentrons/components'
 import Page from '../../components/Page'
@@ -20,10 +25,13 @@ import InstrumentSettings from './InstrumentSettings'
 
 import type {State} from '../../types'
 import type {ViewableRobot} from '../../discovery'
+import type {ShellUpdateState} from '../../shell'
 
 type SP = {
   robot: ?ViewableRobot,
   connectedName: ?string,
+  appUpdate: ShellUpdateState,
+  __featureEnabled: boolean,
 }
 
 type OP = {match: Match}
@@ -31,6 +39,8 @@ type OP = {match: Match}
 type Props = SP & OP
 
 const log = createLogger(__filename)
+
+const __FEATURE_FLAG = 'devInternal.newUpdateModal'
 
 export default withRouter(
   connect(
@@ -43,12 +53,18 @@ function Robots (props: Props) {
   const {
     robot,
     connectedName,
+    appUpdate,
     match: {
       path,
       url,
       params: {name},
     },
   } = props
+
+  if (appUpdate.available && !appUpdate.seen && props.__featureEnabled) {
+    log.warn('App update available on load, redirecting to app update.')
+    return <Redirect to={'menu/app/update'} />
+  }
 
   if (name && !robot) {
     const redirectUrl = url.replace(`/${name}`, '')
@@ -76,7 +92,10 @@ function Robots (props: Props) {
           render={props => <InstrumentSettings {...props} robot={robot} />}
         />
       )}
-      <Route path={path} render={() => <RobotSettings robot={robot} />} />
+      <Route
+        path={path}
+        render={() => <RobotSettings robot={robot} appUpdate={appUpdate} />}
+      />
     </Switch>
   )
 }
@@ -97,5 +116,7 @@ function mapStateToProps (state: State, ownProps: OP): SP {
   return {
     robot,
     connectedName,
+    appUpdate: getShellUpdateState(state),
+    __featureEnabled: !!getIn(getConfig(state), __FEATURE_FLAG),
   }
 }
