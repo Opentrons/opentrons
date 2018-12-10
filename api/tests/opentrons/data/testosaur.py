@@ -1,5 +1,12 @@
 from opentrons import containers, instruments, robot
 
+metadata = {
+    'protocolName': 'Testosaur',
+    'author': 'Opentrons <engineering@opentrons.com>',
+    'description': 'A variant on "Dinosaur" for testing',
+    'source': 'Opentrons Repository'
+}
+
 p200rack = containers.load('tiprack-200ul', '5', 'tiprack')
 
 # create a p200 pipette on robot axis B
