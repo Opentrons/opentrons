@@ -634,7 +634,7 @@ class API(HardwareAPILike):
                     deck_max = self._deck_from_smoothie({ax: bound[1]
                                                          for ax, bound
                                                          in bounds.items()})
-                    raise RuntimeError(
+                    self._log.warning(
                         "Out of bounds move: {}={} (transformed: {}) not in"
                         "limits ({}, {}) (transformed: ({}, {})"
                         .format(ax.name,
