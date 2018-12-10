@@ -349,13 +349,12 @@ class Session(object):
             self._hardware.home_z()
 
 
-def extract_metadata(parsed: ast.Module) -> dict:
+def extract_metadata(parsed):
     metadata = {}
-    assigns = [obj for obj in parsed.body if
-               isinstance(obj, ast.Assign)]
+    assigns = [
+        obj for obj in parsed.body if isinstance(obj, ast.Assign)]
     for obj in assigns:
-        if obj.targets[0].id == 'metadata' and isinstance(obj.value,
-                                                          ast.Dict):
+        if obj.targets[0].id == 'metadata' and isinstance(obj.value, ast.Dict):
             keys = [k.s for k in obj.value.keys]
             values = [v.s for v in obj.value.values]
             metadata = dict(zip(keys, values))
