@@ -346,8 +346,6 @@ class ProtocolContext:
         return self._deck_layout
 
 
-
-
 class InstrumentContext:
     """ A context for a specific pipette or instrument.
 

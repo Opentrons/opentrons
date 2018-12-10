@@ -9,6 +9,7 @@ from aiohttp import web
 from aiohttp import WSCloseCode
 from asyncio import Queue
 from opentrons.server import serialize
+from opentrons.protocol_api.execute import ExceptionInProtocolError
 from concurrent.futures import ThreadPoolExecutor
 
 
@@ -246,7 +247,7 @@ class RPCServer(object):
                         args=data.get('args', []))
                     self.send_ack(token)
                 except Exception as e:
-                    log.exception("Excption during rpc.Server.process:")
+                    log.exception("Exception during rpc.Server.process:")
                     error = '{0}: {1}'.format(e.__class__.__name__, e)
                     self.send_error(error, token)
                 else:
@@ -276,21 +277,32 @@ class RPCServer(object):
             call_result = await self.loop.run_in_executor(
                 self.executor, self.call_and_serialize, func)
             response['$']['status'] = 'success'
+        except ExceptionInProtocolError as eipe:
+            log.exception("Smart exception in protocol")
+            response['$']['status'] = 'error'
+            call_result = {
+                'message': str(eipe),
+                'traceback': ''.join(traceback.format_exception(
+                    type(eipe.original_exc),
+                    eipe.original_exc,
+                    eipe.original_tb))
+            }
         except Exception as e:
+            log.exception("Exception during RPC call:")
             trace = traceback.format_exc()
             try:
-                line_no = [
+                line_msg = ' [line ' + [
                     l.split(',')[0].strip()
                     for l in trace.split('line')
-                    if '<module>' in l][0]
+                    if '<module>' in l][0] + ']'
             except Exception:
-                line_no = 'unknown'
+                line_msg = ''
             finally:
                 response['$']['status'] = 'error'
                 call_result = {
-                    'message': '{0} [line {1}]: {2}'.format(
-                        e.__class__.__name__, line_no, str(e)),
-                    'traceback': traceback.format_exc()
+                    'message': '{0}{1}: {2}'.format(
+                        e.__class__.__name__, line_msg, str(e)),
+                    'traceback': trace
                 }
         finally:
             response['data'] = call_result

@@ -13,7 +13,9 @@ from opentrons.legacy_api.containers.placeable import (
 from opentrons.commands import tree, types
 from opentrons.protocols import execute_protocol
 from opentrons.config import feature_flags as ff
-from opentrons.protocol_api import ProtocolContext, run_protocol, labware
+from opentrons.protocol_api import (ProtocolContext,
+                                    labware,
+                                    run_protocol)
 from opentrons.hardware_control import adapters, API
 from opentrons.types import Location, Point
 
@@ -186,6 +188,7 @@ class Session(object):
                     instrs,
                     [mod.name() for mod in self._hardware.attached_modules])
                 context = ProtocolContext(hardware=sim, loop=self._loop)
+                context.home()
                 run_protocol(self._protocol, simulate=True, context=context)
                 sim.join()
             else:
@@ -281,6 +284,7 @@ class Session(object):
                 self._hardware.cache_instruments()
                 ctx = ProtocolContext(loop=self._loop)
                 ctx.connect(self._hardware)
+                ctx.home()
                 run_protocol(self._protocol, context=ctx)
             else:
                 if self._is_json_protocol:

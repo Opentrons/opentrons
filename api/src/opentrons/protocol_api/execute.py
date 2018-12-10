@@ -1,16 +1,62 @@
 import inspect
 import logging
 import os
+import traceback
+import sys
 from typing import Any, Callable
 
 from .contexts import ProtocolContext
 
 MODULE_LOG = logging.getLogger(__name__)
 
+PROTOCOL_MALFORMED = """
+
+A Python protocol for the OT2 must define a function called 'run' that takes a
+single argument: the protocol context to call functions on. For instance, a run
+function might look like this:
+
+def run(ctx):
+    ctx.comment('hello, world')
+
+This function is called by the robot when the robot executes the protol.
+This function is not present in the current protocol and must be added.
+"""
+
+
+class ExceptionInProtocolError(Exception):
+    """ This exception wraps an exception that was raised from a protocol
+    for proper error message formatting by the rpc, since it's only here that
+    we can properly figure out formatting
+    """
+    def __init__(self, original_exc, original_tb, message, line):
+        self.original_exc = original_exc
+        self.original_tb = original_tb
+        self.message = message
+        self.line = line
+        super().__init__(original_exc, original_tb, message, line)
+
+    def __str__(self):
+        return '{}{}: {}'.format(
+            self.original_exc.__class__.__name__,
+            ' [line {}]'.format(self.line) if self.line else '',
+            self.message)
+
+
+class MalformedProtocolError(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(message)
+
+    def __str__(self):
+        return self._msg + PROTOCOL_MALFORMED
+
+    def __repr__(self):
+        return '<{}: {}>'.format(self.__class__.__name__, self.message)
+
 
 def _runfunc_ok(run_func: Any) -> Callable[[ProtocolContext], None]:
     if not callable(run_func):
-        raise SyntaxError("No function 'run()' defined")
+        raise SyntaxError("No function 'run(ctx)' defined")
     sig = inspect.Signature.from_callable(run_func)
     if not sig.parameters:
         raise SyntaxError("Function 'run()' does not take any parameters")
@@ -24,9 +70,22 @@ def _runfunc_ok(run_func: Any) -> Callable[[ProtocolContext], None]:
     return run_func  # type: ignore
 
 
+def _find_protocol_error(tb, proto_name):
+    """Return the FrameInfo for the lowest frame in the traceback from the
+    protocol.
+    """
+    tb_info = traceback.extract_tb(tb)
+    for frame in reversed(tb_info):
+        if frame.filename == proto_name:
+            return frame
+    else:
+        raise KeyError
+
+
 def _run_python(proto: Any, context: ProtocolContext):
     new_locs = locals()
     new_globs = globals()
+    name = getattr(proto, 'co_filename', '<protocol>')
     exec(proto, new_globs, new_locs)
     # If the protocol is written correctly, it will have defined a function
     # like run(context: ProtocolContext). If so, that function is now in the
@@ -34,20 +93,18 @@ def _run_python(proto: Any, context: ProtocolContext):
     try:
         _runfunc_ok(new_locs.get('run'))
     except SyntaxError as se:
-        raise SyntaxError(
-            str(se),
-            "No function run(ctx) defined"
-            "\nA Python protocol for the OT2 must define a function "
-            "called 'run' that takes a single argument - the"
-            "protocol context to call functions on. For instance, "
-            "a run function might look like\n\n"
-            "def run(ctx):\n"
-            "    ctx.comment('hello, world')"
-            "\n\nThis function is called by the robot when the "
-            "robot executes the protol. However, it is not "
-            "present.")
+        raise MalformedProtocolError(str(se))
     new_globs.update(new_locs)
-    exec('run(context)', new_globs, new_locs)
+    try:
+        exec('run(context)', new_globs, new_locs)
+    except Exception as e:
+        exc_type, exc_value, tb = sys.exc_info()
+        try:
+            frame = _find_protocol_error(tb, name)
+        except KeyError:
+            # No pretty names, just raise it
+            raise e
+        raise ExceptionInProtocolError(e, tb, str(e), frame.lineno)
 
 
 def run_protocol(protocol_code: Any = None,
@@ -76,4 +133,8 @@ def run_protocol(protocol_code: Any = None,
     else:
         raise RuntimeError(
             'Will not automatically generate hardware controller')
-    _run_python(protocol_code, true_context)
+    try:
+        _run_python(protocol_code, true_context)
+    except Exception:
+        MODULE_LOG.exception("Exception in protocol")
+        raise
