@@ -9,6 +9,7 @@ import KnowledgeBaseLink from '../../components/KnowledgeBaseLink'
 ********************/
 
 export type FormWarningType =
+  | 'BELOW_PIPETTE_MINIMUM_VOLUME'
   | 'OVER_MAX_WELL_VOLUME'
   | 'BELOW_MIN_DISPOSAL_VOLUME'
 
@@ -20,6 +21,11 @@ export type FormWarning = {
 }
 // TODO: Ian 2018-12-06 use i18n for title/body text
 const FORM_WARNINGS: {[FormWarningType]: FormWarning} = {
+  BELOW_PIPETTE_MINIMUM_VOLUME: {
+    type: 'BELOW_PIPETTE_MINIMUM_VOLUME',
+    title: 'Specified volume is below pipette minimum',
+    dependentFields: ['pipette', 'volume'],
+  },
   OVER_MAX_WELL_VOLUME: {
     type: 'OVER_MAX_WELL_VOLUME',
     title: 'Dispense volume will overflow a destination well',
@@ -45,6 +51,13 @@ export type WarningChecker = (mixed) => ?FormWarning
 ********************/
 // TODO: real HydratedFormData type
 type HydratedFormData = any
+
+export const belowPipetteMinimumVolume = (fields: HydratedFormData): ?FormWarning => {
+  const {pipette, volume} = fields
+  const pipetteSpecs = getPipetteNameSpecs(pipette.model)
+  if (!pipetteSpecs) return null
+  return volume < pipetteSpecs.minVolume ? FORM_WARNINGS.BELOW_PIPETTE_MINIMUM_VOLUME : null
+}
 
 export const maxDispenseWellVolume = (fields: HydratedFormData): ?FormWarning => {
   const {dispense_labware, dispense_wells, volume} = fields
