@@ -80,6 +80,7 @@ class Session(object):
         self.instruments = None
         self.containers = None
         self.modules = None
+        self.metadata = {}
 
         self.startTime = None
 
@@ -210,7 +211,8 @@ class Session(object):
             # warning/error here if the protocol_text doesn't follow the schema
             self._protocol = json.loads(self.protocol_text)
         else:
-            parsed = ast.parse(self.protocol_text)
+            parsed = ast.parse(self.protocol_text, filename=self.name)
+            self.metadata = extract_metadata(parsed)
             self._protocol = compile(parsed, filename=self.name, mode='exec')
         commands = await self._simulate()
         self.commands = tree.from_list(commands)
@@ -345,6 +347,19 @@ class Session(object):
             await self._hardware.home_z()
         else:
             self._hardware.home_z()
+
+
+def extract_metadata(parsed: ast.Module) -> dict:
+    metadata = {}
+    assigns = [obj for obj in parsed.body if
+               isinstance(obj, ast.Assign)]
+    for obj in assigns:
+        if obj.targets[0].id == 'metadata' and isinstance(obj.value,
+                                                          ast.Dict):
+            keys = [k.s for k in obj.value.keys]
+            values = [v.s for v in obj.value.values]
+            metadata = dict(zip(keys, values))
+    return metadata
 
 
 def _accumulate(iterable):
