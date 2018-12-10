@@ -10,7 +10,6 @@ import {
   makeGetRobotIgnoredUpdateRequest,
   makeGetRobotUpdateRequest,
   makeGetRobotRestartRequest,
-  getAnyRobotUpdateAvailable,
   restartRobotServer,
   fetchIgnoredUpdate,
   setIgnoredUpdate,
@@ -127,22 +126,6 @@ describe('server API client', () => {
       expect(getIngoredUpdate(state, {name: 'foo'})).toEqual({
         inProgress: false,
       })
-    })
-
-    // TODO(mc, 2018-09-25): re-evaluate this selector
-    test.skip('getAnyRobotUpdateAvailable is true if any robot has update', () => {
-      state.api.server.anotherBot = {availableUpdate: null}
-      expect(getAnyRobotUpdateAvailable(state)).toBe(true)
-
-      state = {
-        api: {
-          server: {
-            ...state.api.server,
-            [robot.name]: {availableUpdate: null},
-          },
-        },
-      }
-      expect(getAnyRobotUpdateAvailable(state)).toBe(false)
     })
   })
 

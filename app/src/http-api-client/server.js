@@ -308,13 +308,6 @@ export const makeGetRobotIgnoredUpdateRequest = () => {
   return selector
 }
 
-// TODO(mc, 2018-10-10): this selector is broken
-export const getAnyRobotUpdateAvailable: OutputSelector<State,
-  void,
-  boolean> = createSelector(selectServerState, state =>
-    Object.keys(state).some(name => state[name].availableUpdate)
-  )
-
 function selectServerState (state: State) {
   return state.api.server
 }
