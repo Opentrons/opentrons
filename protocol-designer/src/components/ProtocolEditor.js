@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-
+import cx from 'classnames'
 import ConnectedMoreOptionsModal from '../containers/ConnectedMoreOptionsModal'
 import ConnectedNav from '../containers/ConnectedNav'
 import ConnectedSidebar from '../containers/ConnectedSidebar'
@@ -11,7 +11,7 @@ import FileUploadErrorModal from './modals/FileUploadErrorModal'
 import AnalyticsModal from './modals/AnalyticsModal'
 import {PortalRoot as MainPageModalPortalRoot} from '../components/portals/MainPageModalPortal'
 import {PortalRoot as TopPortalRoot} from './portals/TopPortal'
-
+import {SCROLL_ON_SELECT_STEP_CLASSNAME} from '../steplist/actions'
 import styles from './ProtocolEditor.css'
 
 const SelectorDebugger = process.env.NODE_ENV === 'development'
@@ -26,7 +26,7 @@ export default function ProtocolEditor () {
       <div className={styles.wrapper}>
         <ConnectedNav />
         <ConnectedSidebar />
-        <div className={styles.main_page_wrapper}>
+        <div className={cx(styles.main_page_wrapper, SCROLL_ON_SELECT_STEP_CLASSNAME)}>
           <ConnectedTitleBar />
 
           <div className={styles.main_page_content}>

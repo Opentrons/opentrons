@@ -6,18 +6,31 @@ import type {MixFormData, RobotState, CommandCreator, CompoundCommandCreator} fr
 import {aspirate, dispense, replaceTip, touchTip} from '../atomic'
 
 /** Helper fn to make mix command creators w/ minimal arguments */
-export function mixUtil (
+export function mixUtil (args: {
   pipette: string,
   labware: string,
   well: string,
   volume: number,
   times: number,
   aspirateOffsetFromBottomMm?: ?number,
-  dispenseOffsetFromBottomMm?: ?number
-): Array<CommandCreator> {
+  dispenseOffsetFromBottomMm?: ?number,
+  aspirateFlowRateUlSec?: ?number,
+  dispenseFlowRateUlSec?: ?number,
+}): Array<CommandCreator> {
+  const {
+    pipette,
+    labware,
+    well,
+    volume,
+    times,
+    aspirateOffsetFromBottomMm,
+    dispenseOffsetFromBottomMm,
+    aspirateFlowRateUlSec,
+    dispenseFlowRateUlSec,
+  } = args
   return repeatArray([
-    aspirate({pipette, volume, labware, well, offsetFromBottomMm: aspirateOffsetFromBottomMm}),
-    dispense({pipette, volume, labware, well, offsetFromBottomMm: dispenseOffsetFromBottomMm}),
+    aspirate({pipette, volume, labware, well, offsetFromBottomMm: aspirateOffsetFromBottomMm, 'flow-rate': aspirateFlowRateUlSec}),
+    dispense({pipette, volume, labware, well, offsetFromBottomMm: dispenseOffsetFromBottomMm, 'flow-rate': dispenseFlowRateUlSec}),
   ], times)
 }
 
@@ -43,6 +56,8 @@ const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: Robo
     changeTip,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
+    aspirateFlowRateUlSec,
+    dispenseFlowRateUlSec,
   } = data
 
   // Errors
@@ -92,15 +107,17 @@ const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: Robo
         data.blowoutLocation,
       )
 
-      const mixCommands = mixUtil(
+      const mixCommands = mixUtil({
         pipette,
         labware,
         well,
         volume,
         times,
         aspirateOffsetFromBottomMm,
-        dispenseOffsetFromBottomMm
-      )
+        dispenseOffsetFromBottomMm,
+        aspirateFlowRateUlSec,
+        dispenseFlowRateUlSec,
+      })
 
       return [
         ...tipCommands,

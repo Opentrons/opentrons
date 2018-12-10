@@ -34,3 +34,7 @@ def disable_home_on_boot():
 
 def use_protocol_api_v2():
     return get_setting_with_env_overload('useProtocolApi2')
+
+
+def use_new_p10_aspiration():
+    return get_setting_with_env_overload('useNewP10Aspiration')

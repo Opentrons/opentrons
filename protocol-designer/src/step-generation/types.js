@@ -38,6 +38,8 @@ export type TransferLikeFormDataFields = {
   touchTipAfterAspirateOffsetMmFromBottom?: ?number,
   /** changeTip is interpreted differently by different Step types */
   changeTip: ChangeTipOptions,
+  /** Flow rate in uL/sec for all aspirates */
+  aspirateFlowRateUlSec?: ?number,
   /** offset from bottom of well in mm */
   aspirateOffsetFromBottomMm?: ?number,
 
@@ -46,6 +48,8 @@ export type TransferLikeFormDataFields = {
   touchTipAfterDispense: boolean,
   /** Optional offset for touch tip after dispense (if null, use PD default) */
   touchTipAfterDispenseOffsetMmFromBottom?: ?number,
+  /** Flow rate in uL/sec for all dispenses */
+  dispenseFlowRateUlSec?: ?number,
   /** offset from bottom of well in mm */
   dispenseOffsetFromBottomMm?: ?number,
 }
@@ -118,6 +122,9 @@ export type MixFormData = {
   /** offset from bottom of well in mm */
   aspirateOffsetFromBottomMm?: ?number,
   dispenseOffsetFromBottomMm?: ?number,
+  /** flow rates in uL/sec */
+  aspirateFlowRateUlSec?: ?number,
+  dispenseFlowRateUlSec?: ?number,
 }
 
 export type PauseFormData = {|
@@ -215,6 +222,7 @@ export type AspirateDispenseArgs = {|
   ...PipetteLabwareFields,
   volume: number,
   offsetFromBottomMm?: ?number,
+  'flow-rate'?: ?number,
 |}
 
 export type Command = {|

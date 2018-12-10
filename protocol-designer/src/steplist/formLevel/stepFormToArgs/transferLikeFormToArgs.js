@@ -31,6 +31,9 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
   const sourceLabware = hydratedFormData['aspirate_labware']
   const destLabware = hydratedFormData['dispense_labware']
 
+  const aspirateFlowRateUlSec = hydratedFormData['aspirate_flowRate']
+  const dispenseFlowRateUlSec = hydratedFormData['dispense_flowRate']
+
   const aspirateOffsetFromBottomMm = hydratedFormData['aspirate_mmFromBottom']
   const dispenseOffsetFromBottomMm = hydratedFormData['dispense_mmFromBottom']
 
@@ -75,6 +78,8 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
     sourceLabware: sourceLabware.id,
     destLabware: destLabware.id,
 
+    aspirateFlowRateUlSec,
+    dispenseFlowRateUlSec,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
 
