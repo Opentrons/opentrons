@@ -8,6 +8,13 @@ may show up in a users' 'workflow'
 3. Tests different constructor set-ups
 """
 
+metadata = {
+    'protocolName': 'Everything Test',
+    'author': 'Opentrons <engineering@opentrons.com>',
+    'description': 'A protocol for exercising the API',
+    'source': 'Opentrons Repository'
+}
+
 # Labware Set-up
 # Test whether slot naming conventions hold true
 tiprack = labware.load('tiprack-200ul', '1')
