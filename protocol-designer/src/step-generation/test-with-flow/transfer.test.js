@@ -299,6 +299,41 @@ describe('single transfer exceeding pipette max', () => {
       expectedFinalLiquidState
     ))
   })
+
+  test('split up volume without going below pipette min', () => {
+    transferArgs = {
+      ...transferArgs,
+      volume: 629,
+      changeTip: 'never', // don't test tip use here
+    }
+    // begin with tip on pipette
+    robotInitialState.tipState.pipettes.p300SingleId = true
+
+    const result = transfer(transferArgs)(robotInitialState)
+    expect(result.commands).toEqual([
+      cmd.aspirate('A1', 300),
+      cmd.dispense('A3', 300, {labware: 'destPlateId'}),
+      // last 2 chunks split evenly
+      cmd.aspirate('A1', 164.5),
+      cmd.dispense('A3', 164.5, {labware: 'destPlateId'}),
+      cmd.aspirate('A1', 164.5),
+      cmd.dispense('A3', 164.5, {labware: 'destPlateId'}),
+
+      cmd.aspirate('B1', 300),
+      cmd.dispense('B3', 300, {labware: 'destPlateId'}),
+      // last 2 chunks split evenly
+      cmd.aspirate('B1', 164.5),
+      cmd.dispense('B3', 164.5, {labware: 'destPlateId'}),
+      cmd.aspirate('B1', 164.5),
+      cmd.dispense('B3', 164.5, {labware: 'destPlateId'}),
+    ])
+
+    expect(result.robotState.liquidState).toEqual(merge(
+      {},
+      robotInitialState.liquidState,
+      expectedFinalLiquidState
+    ))
+  })
 })
 
 describe('advanced options', () => {
