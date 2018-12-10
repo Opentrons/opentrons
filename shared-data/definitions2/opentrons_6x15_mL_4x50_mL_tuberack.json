@@ -36,8 +36,8 @@
         ]
     },
     "cornerOffsetFromSlot": {
-        "x": -0.01,
-        "y": 0.02,
+        "x": 0.01,
+        "y": -0.02,
         "z": 0
     },
     "dimensions": {
@@ -48,7 +48,7 @@
     "parameters": {
         "isTiprack": false,
         "format": "irregular",
-        "loadName": "Opentrons_6x15_mL_4x50_mL_tuberack",
+        "loadName": "opentrons_6x15_mL_4x50_mL_tuberack",
         "isMagneticModuleCompatible": false
     },
     "wells": {
@@ -144,6 +144,7 @@
         }
     },
     "brand": {
-        "brand": "Opentrons"
+        "brand": "Opentrons",
+        "brandId": ["352096", "352070"]
     }
 }

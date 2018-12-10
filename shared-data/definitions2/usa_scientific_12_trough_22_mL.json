@@ -1,0 +1,192 @@
+{
+    "ordering": [
+        [
+            "A1"
+        ],
+        [
+            "A2"
+        ],
+        [
+            "A3"
+        ],
+        [
+            "A4"
+        ],
+        [
+            "A5"
+        ],
+        [
+            "A6"
+        ],
+        [
+            "A7"
+        ],
+        [
+            "A8"
+        ],
+        [
+            "A9"
+        ],
+        [
+            "A10"
+        ],
+        [
+            "A11"
+        ],
+        [
+            "A12"
+        ]
+    ],
+    "otId": "a41d9ef0-f4b6-11e8-90c2-7106f0eae5a7",
+    "deprecated": false,
+    "metadata": {
+        "displayName": "12 Channel Trough",
+        "displayVolumeUnits": "mL",
+        "displayLengthUnits": "mm",
+        "displayCategory": "trough"
+    },
+    "cornerOffsetFromSlot": {
+        "x": 0,
+        "y": 0.32,
+        "z": 0
+    },
+    "dimensions": {
+        "overallLength": 127.76,
+        "overallWidth": 85.8,
+        "overallHeight": 44.45
+    },
+    "parameters": {
+        "format": "trough",
+        "isTiprack": false,
+        "isMagneticModuleCompatible": false,
+        "loadName": "usa_scientific_12_trough_22_mL"
+    },
+    "wells": {
+        "A1": {
+            "shape": "rectangular",
+            "depth": 42.16,
+            "length": 8.33,
+            "width": 71.88,
+            "totalLiquidVolume": 22,
+            "x": 13.94,
+            "y": 42.9,
+            "z": 2.29
+        },
+        "A2": {
+            "shape": "rectangular",
+            "depth": 42.16,
+            "length": 8.33,
+            "width": 71.88,
+            "totalLiquidVolume": 22,
+            "x": 23.03,
+            "y": 42.9,
+            "z": 2.29
+        },
+        "A3": {
+            "shape": "rectangular",
+            "depth": 42.16,
+            "length": 8.33,
+            "width": 71.88,
+            "totalLiquidVolume": 22,
+            "x": 32.12,
+            "y": 42.9,
+            "z": 2.29
+        },
+        "A4": {
+            "shape": "rectangular",
+            "depth": 42.16,
+            "length": 8.33,
+            "width": 71.88,
+            "totalLiquidVolume": 22,
+            "x": 41.21,
+            "y": 42.9,
+            "z": 2.29
+        },
+        "A5": {
+            "shape": "rectangular",
+            "depth": 42.16,
+            "length": 8.33,
+            "width": 71.88,
+            "totalLiquidVolume": 22,
+            "x": 50.3,
+            "y": 42.9,
+            "z": 2.29
+        },
+        "A6": {
+            "shape": "rectangular",
+            "depth": 42.16,
+            "length": 8.33,
+            "width": 71.88,
+            "totalLiquidVolume": 22,
+            "x": 59.39,
+            "y": 42.9,
+            "z": 2.29
+        },
+        "A7": {
+            "shape": "rectangular",
+            "depth": 42.16,
+            "length": 8.33,
+            "width": 71.88,
+            "totalLiquidVolume": 22,
+            "x": 68.48,
+            "y": 42.9,
+            "z": 2.29
+        },
+        "A8": {
+            "shape": "rectangular",
+            "depth": 42.16,
+            "length": 8.33,
+            "width": 71.88,
+            "totalLiquidVolume": 22,
+            "x": 77.57,
+            "y": 42.9,
+            "z": 2.29
+        },
+        "A9": {
+            "shape": "rectangular",
+            "depth": 42.16,
+            "length": 8.33,
+            "width": 71.88,
+            "totalLiquidVolume": 22,
+            "x": 86.66,
+            "y": 42.9,
+            "z": 2.29
+        },
+        "A10": {
+            "shape": "rectangular",
+            "depth": 42.16,
+            "length": 8.33,
+            "width": 71.88,
+            "totalLiquidVolume": 22,
+            "x": 95.75,
+            "y": 42.9,
+            "z": 2.29
+        },
+        "A11": {
+            "shape": "rectangular",
+            "depth": 42.16,
+            "length": 8.33,
+            "width": 71.88,
+            "totalLiquidVolume": 22,
+            "x": 104.84,
+            "y": 42.9,
+            "z": 2.29
+        },
+        "A12": {
+            "shape": "rectangular",
+            "depth": 42.16,
+            "length": 8.33,
+            "width": 71.88,
+            "totalLiquidVolume": 22,
+            "x": 113.93,
+            "y": 42.9,
+            "z": 2.29
+        }
+    },
+    "brand": {
+        "brand": "USA Scientific",
+        "brandId": [
+            "1061-8150"
+        ]
+    }
+}
