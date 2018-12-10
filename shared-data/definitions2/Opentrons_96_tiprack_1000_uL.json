@@ -150,7 +150,7 @@
         "isTiprack": true,
         "isMagneticModuleCompatible": false,
         "tipLength": 87.9,
-        "loadName": "Opentrons_96_tiprack_1000_uL"
+        "loadName": "opentrons_96_tiprack_1000_uL"
     },
     "wells": {
         "H1": {

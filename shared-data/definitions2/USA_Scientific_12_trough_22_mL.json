@@ -59,7 +59,7 @@
         "format": "trough",
         "isTiprack": false,
         "isMagneticModuleCompatible": false,
-        "loadName": "USA_Scientific_12_trough_22_mL"
+        "loadName": "usa_scientific_12_trough_22_mL"
     },
     "wells": {
         "A1": {

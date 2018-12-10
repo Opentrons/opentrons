@@ -59,7 +59,7 @@
         "format": "irregular",
         "isTiprack": false,
         "isMagneticModuleCompatible": false,
-        "loadName": "Opentrons_24_aluminum_tuberack_2_mL"
+        "loadName": "opentrons_24_aluminum_tuberack_2_mL"
     },
     "wells": {
         "D1": {

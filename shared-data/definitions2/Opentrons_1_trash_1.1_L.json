@@ -30,7 +30,7 @@
     "parameters": {
         "format": "trash",
         "isTiprack": false,
-        "loadName": "Opentrons_1_trash_1.1_L",
+        "loadName": "opentrons_1_trash_1.1_L",
         "isMagneticModuleCompatible": false
     },
     "wells": {
