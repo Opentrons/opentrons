@@ -13,6 +13,7 @@ import {
   restartRobotServer,
   fetchIgnoredUpdate,
   setIgnoredUpdate,
+  getConnectedRobotUpgradeAvailable,
   reducer,
 } from '..'
 
@@ -92,6 +93,17 @@ describe('server API client', () => {
       expect(getRobotUpdateInfo(state, {name: 'foo'})).toEqual({
         version,
         type: null,
+      })
+
+      test('getConnectedRobotUpgradeAvailable', () => {
+        robot = setCurrent(robot, '3.0.0')
+        expect(getConnectedRobotUpgradeAvailable(state)).toEqual(true)
+
+        robot = setCurrent(robot, '4.0.0')
+        expect(getConnectedRobotUpgradeAvailable(state)).toEqual(false)
+
+        robot = setCurrent(robot, '5.0.0')
+        expect(getConnectedRobotUpgradeAvailable(state)).toEqual(false)
       })
     })
 

@@ -6,7 +6,8 @@ import semver from 'semver'
 import {chainActions} from '../util'
 import client, {FetchError} from './client'
 import {fetchHealth} from './health'
-import {getRobotApiVersion} from '../discovery'
+import {getRobotApiVersion, getConnectedRobot} from '../discovery'
+
 import {
   getApiUpdateVersion,
   getApiUpdateFilename,
@@ -306,6 +307,18 @@ export const makeGetRobotIgnoredUpdateRequest = () => {
     )
 
   return selector
+}
+
+export function getConnectedRobotUpgradeAvailable (state: State) {
+  const connectedRobot = getConnectedRobot(state)
+  if (!connectedRobot) {
+    return false
+  }
+  const currentVersion = getRobotApiVersion(connectedRobot)
+  const updateVersion = getApiUpdateVersion(state)
+  const current = semver.valid(currentVersion)
+  const upgradeAvailable = current && semver.gt(updateVersion, current)
+  return upgradeAvailable
 }
 
 function selectServerState (state: State) {
