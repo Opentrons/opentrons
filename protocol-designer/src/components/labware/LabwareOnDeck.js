@@ -66,8 +66,15 @@ type DragDropLabwareProps = React.ElementProps<typeof LabwareContainer> & {
 }
 class DragSourceLabware extends React.Component<DragDropLabwareProps> {
   componentDidUpdate (prevProps) {
-    if (!prevProps.isOver && this.props.isOver) {
-      this.props.moveLabware(this.props.draggedSlot, this.props.slot)
+    if (this.props.draggedItem) {
+      if (prevProps.isOver && !this.props.isOver) {
+        const {slot} = this.props.draggedItem
+        this.props.moveLabware(this.props.slot, slot)
+      }
+      if (!prevProps.isOver && this.props.isOver) {
+        const {slot} = this.props.draggedItem
+        this.props.moveLabware(slot, this.props.slot)
+      }
     }
   }
   render () {
@@ -102,7 +109,7 @@ const labwareTarget = {
 const collectLabwareTarget = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
-  draggedSlot: monitor.getItem(),
+  draggedItem: monitor.getItem(),
 })
 const DragDropLabware = DropTarget(DND_TYPES.LABWARE, labwareTarget, collectLabwareTarget)(DraggableLabware)
 
