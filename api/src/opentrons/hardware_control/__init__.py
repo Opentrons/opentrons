@@ -272,6 +272,17 @@ class API(HardwareAPILike):
             instruments[mount]['has_tip'] = instr.has_tip
         return instruments
 
+    def get_attached_pipettes(self):
+        instruments = self.attached_instruments
+        instruments[top_types.Mount.LEFT]['mount_axis'] = 'z'
+        instruments[top_types.Mount.RIGHT]['mount_axis'] = 'a'
+        instruments[top_types.Mount.LEFT]['plunger_axis'] = 'b'
+        instruments[top_types.Mount.RIGHT]['plunger_axis'] = 'c'
+        for mount in top_types.Mount:
+            instruments[mount]['model'] = instruments[mount]['name']
+            instruments[mount]['id'] = instruments[mount]['pipette_id']
+        return instruments
+
     @property
     def attached_modules(self):
         return self._attached_modules
@@ -726,9 +737,9 @@ class API(HardwareAPILike):
     def update_config(self, **kwargs):
         """ Update values of the robot's configuration.
 
-        `kwargs` should contain keys of the robot's configuration. For instace,
-        `update_config(log_level='debug)` would change the API server log level
-        to :py:attr:`logging.DEBUG`.
+        `kwargs` should contain keys of the robot's configuration. For
+        instance, `update_config(log_level='debug)` would change the API
+        server log level to :py:attr:`logging.DEBUG`.
 
         Documentation on keys can be found in the documentation for
         :py:class:`.robot_config`.

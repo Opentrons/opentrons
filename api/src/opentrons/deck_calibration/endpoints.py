@@ -1,8 +1,8 @@
 from aiohttp import web
 from uuid import uuid1
 from opentrons.config import pipette_config
-from opentrons import instruments, robot
-from opentrons.config import robot_configs
+from opentrons import instruments
+from opentrons.config import robot_configs, advanced_settings
 from . import jog, position, dots_set, z_pos
 from opentrons.util.linal import add_z, solve
 from typing import Dict, Tuple
@@ -12,6 +12,11 @@ import json
 
 session = None
 log = logging.getLogger(__name__)
+
+
+def hw_from_req(req):
+    """ Utility function to get the hardware resource from requests """
+    return req.app['com.opentrons.hardware']
 
 
 def expected_points():
@@ -63,7 +68,7 @@ class SessionManager:
     2. Initialize a pipette
     3. Select the current pipette
     """
-    def __init__(self):
+    def __init__(self, hardware):
         self.id = _get_uuid()
         self.pipettes = {}
         self.current_mount = None
@@ -72,8 +77,9 @@ class SessionManager:
         self.points = {k: None for k in expected_points().keys()}
         self.z_value = None
 
-        default = robot_configs._build_config({}, {}).gantry_calibration
-        robot.config = robot.config._replace(gantry_calibration=default)
+        if not advanced_settings.get_adv_setting('useProtocolApi2'):
+            default = robot_configs._build_config({}, {}).gantry_calibration
+            hardware.update_config(gantry_calibration=default)
 
 
 # -------------- Route Fns -----------------------------------------------
@@ -81,7 +87,7 @@ class SessionManager:
 # session protections are applied--should be called through the dispatch
 # endpoint
 # ------------------------------------------------------------------------
-def init_pipette():
+def init_pipette(hardware):
     """
     Finds pipettes attached to the robot currently and chooses the correct one
     to add to the session.
@@ -89,7 +95,7 @@ def init_pipette():
     :return: The pipette type and mount chosen for deck calibration
     """
     global session
-    pipette_info = set_current_mount(robot.get_attached_pipettes())
+    pipette_info = set_current_mount(hardware.get_attached_pipettes())
     pipette = pipette_info['pipette']
     res = {}
     if pipette:
@@ -121,16 +127,16 @@ def set_current_mount(attached_pipettes):
 
     pipette = None
     model = None
+    if not advanced_settings.get_adv_setting('useProtocolApi2'):
+        if left['model'] in pipette_config.configs:
+            pip_config = pipette_config.load(left['model'])
+            left_pipette = instruments._create_pipette_from_config(
+                mount='left', config=pip_config, name=left['model'])
 
-    if left['model'] in pipette_config.configs:
-        pip_config = pipette_config.load(left['model'])
-        left_pipette = instruments._create_pipette_from_config(
-            mount='left', config=pip_config, name=left['model'])
-
-    if right['model'] in pipette_config.configs:
-        pip_config = pipette_config.load(right['model'])
-        right_pipette = instruments._create_pipette_from_config(
-            mount='right', config=pip_config, name=right['model'])
+        if right['model'] in pipette_config.configs:
+            pip_config = pipette_config.load(right['model'])
+            right_pipette = instruments._create_pipette_from_config(
+                mount='right', config=pip_config, name=right['model'])
 
     if right_pipette and right_pipette.channels == 1:
         session.current_mount = 'A'
@@ -152,7 +158,7 @@ def set_current_mount(attached_pipettes):
     return {'pipette': pipette, 'model': model}
 
 
-async def attach_tip(data):
+async def attach_tip(data, hardware):
     """
     Attach a tip to the current pipette
 
@@ -175,19 +181,20 @@ async def attach_tip(data):
         message = 'Error: "tipLength" must be specified in request'
         status = 400
     else:
-        if pipette.tip_attached:
-            log.warning('attach tip called while tip already attached')
-            pipette._remove_tip(pipette._tip_length)
+        if not advanced_settings.get_adv_setting('useProtocolApi2'):
+            if pipette.tip_attached:
+                log.warning('attach tip called while tip already attached')
+                pipette._remove_tip(pipette._tip_length)
 
-        session.tip_length = tip_length
-        pipette._add_tip(tip_length)
+            session.tip_length = tip_length
+            pipette._add_tip(tip_length)
         message = "Tip length set: {}".format(tip_length)
         status = 200
 
     return web.json_response({'message': message}, status=status)
 
 
-async def detach_tip(data):
+async def detach_tip(data, hardware):
     """
     Detach the tip from the current pipette
 
@@ -203,16 +210,17 @@ async def detach_tip(data):
     mount = 'left' if session.current_mount == 'Z' else 'right'
     pipette = session.pipettes[mount]
 
-    if not pipette.tip_attached:
-        log.warning('detach tip called with no tip')
+    if not advanced_settings.get_adv_setting('useProtocolApi2'):
+        if not pipette.tip_attached:
+            log.warning('detach tip called with no tip')
 
-    pipette._remove_tip(session.tip_length)
+            pipette._remove_tip(session.tip_length)
     session.tip_length = None
 
     return web.json_response({'message': "Tip removed"}, status=200)
 
 
-async def run_jog(data):
+async def run_jog(data, hardware):
     """
     Allow the user to jog the selected pipette around the deck map
 
@@ -246,14 +254,14 @@ async def run_jog(data):
         if axis == 'z':
             axis = session.current_mount
         # print("=---> Jogging {} {}".format(axis, direction * step))
-        position = jog(axis.upper(), direction, step)
+        position = jog(axis.upper(), direction, step, hardware)
         message = 'Jogged to {}'.format(position)
         status = 200
 
     return web.json_response({'message': message}, status=status)
 
 
-async def move(data):
+async def move(data, hardware):
     """
     Allow the user to move the selected pipette to a specific point
 
@@ -291,8 +299,8 @@ async def move(data):
             y = point[1] + pipette_config.Y_OFFSET_MULTI * 2
             z = point[2]
             point = (x, y, z)
-
-        pipette.move_to((robot.deck, point), strategy='arc')
+        if not advanced_settings.get_adv_setting('useProtocolApi2'):
+            pipette.move_to((hardware.deck, point), strategy='arc')
         message = 'Moved to {}'.format(point)
         status = 200
     else:
@@ -302,7 +310,7 @@ async def move(data):
     return web.json_response({'message': message}, status=status)
 
 
-async def save_xy(data):
+async def save_xy(data, hardware):
     """
     Save the current XY values for the calibration data
 
@@ -325,10 +333,10 @@ async def save_xy(data):
         message = "Mount must be set before calibrating"
         status = 400
     else:
-        x, y, z = position(session.current_mount)
+        x, y, z = position(session.current_mount, hardware)
         mount = 'left' if session.current_mount == 'Z' else 'right'
         if mount == 'left':
-            dx, dy, dz = robot.config.mount_offset
+            dx, dy, dz = hardware.config.mount_offset
             x = x + dx
             y = y + dy
             z = z + dz
@@ -342,7 +350,7 @@ async def save_xy(data):
     return web.json_response({'message': message}, status=status)
 
 
-async def save_z(data):
+async def save_z(data, hardware):
     """
     Save the current Z height value for the calibration data
 
@@ -358,7 +366,7 @@ async def save_z(data):
         message = "Tip length must be set before calibrating"
         status = 400
     else:
-        actual_z = position(session.current_mount)[-1]
+        actual_z = position(session.current_mount, hardware)[-1]
         length_offset = pipette_config.load(
             session.current_model).model_offset[-1]
         session.z_value = actual_z - session.tip_length + length_offset
@@ -367,7 +375,7 @@ async def save_z(data):
     return web.json_response({'message': message}, status=status)
 
 
-async def save_transform(data):
+async def save_transform(data, hardware):
     """
     Calculate the transormation matrix that calibrates the gantry to the deck
     :param data: Information obtained from a POST request.
@@ -393,18 +401,18 @@ async def save_transform(data):
         # Add the z component to form the 3 dimensional transform
         calibration_matrix = add_z(flat_matrix, session.z_value)
 
-        robot.config = robot.config._replace(
-            gantry_calibration=list(
-                map(lambda i: list(i), calibration_matrix)))
+        if not advanced_settings.get_adv_setting('useProtocolApi2'):
+            hardware.update_config(gantry_calibration=list(
+                    map(lambda i: list(i), calibration_matrix)))
 
-        robot_configs.save_deck_calibration(robot.config)
-        robot_configs.backup_configuration(robot.config)
+        robot_configs.save_deck_calibration(hardware.config)
+        robot_configs.backup_configuration(hardware.config)
         message = "Config file saved and backed up"
         status = 200
     return web.json_response({'message': message}, status=status)
 
 
-async def release(data):
+async def release(data, hardware):
     """
     Release a session
 
@@ -418,9 +426,12 @@ async def release(data):
     """
     global session
     session = None
-    robot.remove_instrument('left')
-
-    robot.remove_instrument('right')
+    if not advanced_settings.get_adv_setting('useProtocolApi2'):
+        hardware.remove_instrument('left')
+        hardware.remove_instrument('right')
+    else:
+        # need to create an event loop
+        hardware.cache_instruments()
     return web.json_response({"message": "calibration session released"})
 
 # ---------------------- End Route Fns -------------------------
@@ -456,11 +467,14 @@ async def start(request):
         body = {}
 
     if not session or body.get('force'):
+        hardware = hw_from_req(request)
         if body.get('force'):
-            robot.remove_instrument('left')
-            robot.remove_instrument('right')
-        session = SessionManager()
-        res = init_pipette()
+            if not advanced_settings.get_adv_setting('useProtocolApi2'):
+                hardware.remove_instrument('left')
+                hardware.remove_instrument('right')
+
+        session = SessionManager(hardware)
+        res = init_pipette(hardware)
         if res:
             status = 201
             data = {'token': session.id, 'pipette': res}
@@ -494,7 +508,8 @@ async def dispatch(request):
                 raise AssertionError
 
             if _id == session.id:
-                res = await router[command](data)
+                hardware = hw_from_req(request)
+                res = await router[command](data, hardware)
             else:
                 res = web.json_response(
                     {'message': 'Invalid token: {}'.format(_id)}, status=403)

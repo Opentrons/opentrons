@@ -1,6 +1,5 @@
-from opentrons import robot
-from opentrons.config import feature_flags as ff
-
+from opentrons.config import feature_flags as ff, advanced_settings
+from opentrons import types
 # Application constants
 SAFE_HEIGHT = 130
 
@@ -63,33 +62,43 @@ y_row = 1
 z_row = 2
 
 
-def position(axis: str):
+def position(axis, hardware):
     """
     Read position from driver into a tuple and map 3-rd value
     to the axis of a pipette currently used
     """
-    p = robot._driver.position
-    return (p['X'], p['Y'], p[axis.upper()])
-
-
-def jog(axis, direction, step):
-    robot._driver.move(
-        {axis: robot._driver.position[axis] + direction * step})
-
-    return position(axis)
-
-
-def set_calibration_value(rbt, axis: str, value: float):
-    if axis == 'x':
-        row = x_row
-    elif axis == 'y':
-        row = y_row
+    if axis == 'A':
+        mount = types.Mount.RIGHT
     else:
-        row = z_row
-    rbt.config.gantry_calibration[row][xyz_column] = value
+        mount = types.Mount.LEFT
+    p = hardware.current_position(mount)
+    return (p['X'], p['Y'], p['Z'])
 
 
-def apply_mount_offset(point: tuple) -> tuple:
+def jog(axis, direction, step, hardware):
+    if not advanced_settings.get_adv_setting('useProtocolApi2'):
+        hardware._driver.move(
+            {axis: hardware._driver.position[axis] + direction * step})
+    else:
+        if axis == 'A':
+            mount = types.Mount.RIGHT
+        else:
+            mount = types.Mount.LEFT
+
+        if axis == 'X':
+            pt = types.Point(x=direction*step, y=0, z=0)
+        elif axis == 'Y':
+            pt = types.Point(x=0, y=direction*step, z=0)
+        else:
+            pt = types.Point(x=0, y=0, z=direction*step)
+
+        hardware.move_rel(mount, pt)
+
+    return position(axis, hardware)
+
+
+def apply_mount_offset(point, hardware):
     px, py, pz = point
-    mx, my, mz = robot.config.mount_offset
+    if not advanced_settings.get_adv_setting('useProtocolApi2'):
+        mx, my, mz = hardware.config.mount_offset
     return (px - mx, py - my, pz - mz)
