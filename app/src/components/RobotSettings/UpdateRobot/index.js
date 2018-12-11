@@ -35,7 +35,6 @@ function UpdateRobot (props: Props) {
     return <RestartRobotModal robot={robot} />
   }
   if (updateRequest.inProgress) {
-    // TODO (ka 2018-11-27): Clarify update message with UX
     return <SpinnerModal message="Robot is updating" alertOverlay />
   } else {
     return <UpdateRobotModal robot={robot} appUpdate={appUpdate} />
