@@ -7,6 +7,7 @@ import {
   ContainerNameOverlay,
   EmptyDeckSlot,
   humanizeLabwareType,
+  SLOT_OFFSET_MM,
   type DeckSlot,
 } from '@opentrons/components'
 import {
@@ -29,20 +30,24 @@ const DND_TYPES: {LABWARE: "LABWARE"} = {
 
 type DragPreviewProps = {
   getXY: (rawX: number, rawY: number) => {scaledX?: number, scaledY?: number},
-  isDragging: boolean, currentOffset: ?number, itemType: string}
+  isDragging: boolean,
+  currentOffset: ?number,
+  item: {slot: DeckSlot, labwareOrSlot: React.Node},
+  itemType: string,
+  containerType: string,
+  children: React.Node,
+}
 const DragPreview = (props: DragPreviewProps) => {
-  const {itemType, isDragging, currentOffset, getXY} = props
+  const {item, itemType, isDragging, currentOffset, getXY} = props
   const {scaledX, scaledY} = getXY(currentOffset && currentOffset.x, currentOffset && currentOffset.y)
+  const {containerId} = item || {}
   if (itemType !== DND_TYPES.LABWARE || !isDragging || !currentOffset) return null
   return (
-    <circle
-      transform={`translate(${10} ${10})`}
-      cx={scaledX}
-      cy={scaledY}
-      r={22}
-      fill="red"
-      stroke="black"
-      strokeWidth={2}/>
+    <g transform={`translate(${SLOT_OFFSET_MM} ${SLOT_OFFSET_MM})`}>
+      <LabwareContainer x={scaledX} y={scaledY}>
+        <HighlightableLabware containerId={containerId} />
+      </LabwareContainer>
+    </g>
   )
 }
 
@@ -50,19 +55,19 @@ export const DragPreviewLayer = DragLayer(monitor => ({
   currentOffset: monitor.getSourceClientOffset(),
   isDragging: monitor.isDragging(),
   itemType: monitor.getItemType(),
+  item: monitor.getItem(),
 }))(DragPreview)
 
 type DragDropLabwareProps = React.ElementProps<typeof LabwareContainer> & {
   connectDragSource: mixed => React.Element<any>,
   connectDropTarget: mixed => React.Element<any>,
   slot: DeckSlot,
-  onDrag: () => void,
   moveLabware: (DeckSlot, DeckSlot) => void,
 }
 class DragSourceLabware extends React.Component<DragDropLabwareProps> {
   componentDidUpdate (prevProps) {
     if (!prevProps.isOver && this.props.isOver) {
-      this.props.moveLabware(this.props.draggedSlo, this.props.slot)
+      this.props.moveLabware(this.props.draggedSlot, this.props.slot)
     }
   }
   render () {
@@ -81,12 +86,10 @@ class DragSourceLabware extends React.Component<DragDropLabwareProps> {
   }
 }
 
-const labwareSource = {
-  beginDrag: (props) => {
-    props.onDrag()
-    return {slot: props.slot}
-  },
-}
+const labwareSource = { beginDrag: (props) => ({
+  slot: props.slot,
+  containerId: props.containerId,
+}) }
 const collectLabwareSource = (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging(),
@@ -320,9 +323,8 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
 
     return (
       <DragDropLabware
-        onDrag={() => { console.log('DRUGged') }}
         moveLabware={swapSlotContents}
-        {...{slot, highlighted, labwareOrSlot, overlay}} />
+        {...{slot, highlighted, labwareOrSlot, overlay, containerId}} />
     )
   }
 }
