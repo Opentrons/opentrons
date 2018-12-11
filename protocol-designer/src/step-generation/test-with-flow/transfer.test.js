@@ -306,6 +306,7 @@ describe('single transfer exceeding pipette max', () => {
       volume: 629,
       changeTip: 'never', // don't test tip use here
     }
+
     // begin with tip on pipette
     robotInitialState.tipState.pipettes.p300SingleId = true
 
@@ -327,12 +328,6 @@ describe('single transfer exceeding pipette max', () => {
       cmd.aspirate('B1', 164.5),
       cmd.dispense('B3', 164.5, {labware: 'destPlateId'}),
     ])
-
-    expect(result.robotState.liquidState).toEqual(merge(
-      {},
-      robotInitialState.liquidState,
-      expectedFinalLiquidState
-    ))
   })
 })
 
