@@ -8,7 +8,8 @@ import {
   selectors as robotSelectors,
   constants as robotConstants,
 } from '../../robot'
-import {getAnyRobotUpdateAvailable} from '../../http-api-client'
+
+import {getConnectedRobotUpgradeAvailable} from '../../http-api-client'
 import {getAvailableShellUpdate} from '../../shell'
 import {NavButton} from '@opentrons/components'
 
@@ -29,7 +30,7 @@ function mapStateToProps (state: State, ownProps: OP): Props {
   const isProtocolDone = robotSelectors.getIsDone(state)
   const isConnected =
     robotSelectors.getConnectionStatus(state) === robotConstants.CONNECTED
-  const robotNotification = getAnyRobotUpdateAvailable(state)
+  const robotNotification = getConnectedRobotUpgradeAvailable(state)
   const moreNotification = getAvailableShellUpdate(state) != null
 
   switch (name) {

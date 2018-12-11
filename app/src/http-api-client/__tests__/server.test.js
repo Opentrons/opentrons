@@ -10,10 +10,10 @@ import {
   makeGetRobotIgnoredUpdateRequest,
   makeGetRobotUpdateRequest,
   makeGetRobotRestartRequest,
-  getAnyRobotUpdateAvailable,
   restartRobotServer,
   fetchIgnoredUpdate,
   setIgnoredUpdate,
+  getConnectedRobotUpgradeAvailable,
   reducer,
 } from '..'
 
@@ -94,6 +94,17 @@ describe('server API client', () => {
         version,
         type: null,
       })
+
+      test('getConnectedRobotUpgradeAvailable', () => {
+        robot = setCurrent(robot, '3.0.0')
+        expect(getConnectedRobotUpgradeAvailable(state)).toEqual(true)
+
+        robot = setCurrent(robot, '4.0.0')
+        expect(getConnectedRobotUpgradeAvailable(state)).toEqual(false)
+
+        robot = setCurrent(robot, '5.0.0')
+        expect(getConnectedRobotUpgradeAvailable(state)).toEqual(false)
+      })
     })
 
     test('makeGetRobotUpdateRequest', () => {
@@ -127,22 +138,6 @@ describe('server API client', () => {
       expect(getIngoredUpdate(state, {name: 'foo'})).toEqual({
         inProgress: false,
       })
-    })
-
-    // TODO(mc, 2018-09-25): re-evaluate this selector
-    test.skip('getAnyRobotUpdateAvailable is true if any robot has update', () => {
-      state.api.server.anotherBot = {availableUpdate: null}
-      expect(getAnyRobotUpdateAvailable(state)).toBe(true)
-
-      state = {
-        api: {
-          server: {
-            ...state.api.server,
-            [robot.name]: {availableUpdate: null},
-          },
-        },
-      }
-      expect(getAnyRobotUpdateAvailable(state)).toBe(false)
     })
   })
 
