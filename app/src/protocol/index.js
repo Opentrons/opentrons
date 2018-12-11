@@ -70,14 +70,14 @@ export function protocolReducer (
       return {...state, ...action.payload}
 
     case 'robot:SESSION_RESPONSE': {
-      const {name, protocolText: contents} = action.payload
+      const {name, metadata, protocolText: contents} = action.payload
       const file =
         !state.file || name !== state.file.name
           ? {name, type: filenameToType(name), lastModified: null}
           : state.file
       const data =
-        !state.contents || contents !== state.contents
-          ? parseProtocolData(file, contents)
+        !state.data || contents !== state.contents
+          ? parseProtocolData(file, contents, metadata)
           : state.data
 
       return {file, contents, data}
