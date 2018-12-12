@@ -1,6 +1,8 @@
 // @flow
 // robot actions and action types
 import {_NAME as NAME} from './constants'
+
+import type {ProtocolData} from '../protocol'
 import type {Mount, Slot, Axis, Direction, SessionUpdate} from './types'
 
 // TODO(mc, 2017-11-22): rename this function to actionType
@@ -128,6 +130,7 @@ export type SessionResponseAction = {|
   payload: {|
     name: string,
     protocolText: string,
+    metadata?: ?$PropertyType<ProtocolData, 'metadata'>,
   |},
 |}
 

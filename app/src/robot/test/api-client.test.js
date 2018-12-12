@@ -458,6 +458,30 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
+    test('maps api metadata to session metadata', () => {
+      const expected = actions.sessionResponse(null, expect.objectContaining({
+        metadata: {
+          'protocol-name': 'foo',
+          description: 'bar',
+          author: 'baz',
+          source: 'qux',
+        },
+      }))
+
+      session.metadata = {
+        _id: 1234,
+        some: () => {},
+        rpc: () => {},
+        cruft: () => {},
+        protocolName: 'foo',
+        description: 'bar',
+        author: 'baz',
+        source: 'qux',
+      }
+
+      return sendConnect().then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
     test('sends error if received malformed session from API', () => {
       const expected = actions.sessionResponse(expect.anything())
 
