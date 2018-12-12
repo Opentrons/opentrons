@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Union, Tuple
 from .labware import Well, Labware, load, load_module, ModuleGeometry
 from opentrons import types, hardware_control as hc
 import opentrons.config.robot_configs as rc
+from opentrons.config import advanced_settings
 from opentrons.hardware_control import adapters, modules
 from . import geometry
 
@@ -283,6 +284,7 @@ class InstrumentContext:
                  mount: types.Mount,
                  log_parent: logging.Logger,
                  tip_racks: List[Labware] = None,
+                 trash: Labware = None,
                  **config_kwargs) -> None:
         self._hardware = hardware
         self._ctx = ctx
@@ -291,8 +293,18 @@ class InstrumentContext:
         self._tip_racks = tip_racks or list()
         for tip_rack in self.tip_racks:
             assert tip_rack.is_tiprack
+        if trash is None:
+            if advanced_settings.get_adv_setting('shortFixedTrash'):
+                trash_name = 'opentrons_1_trash_0.85_L'
+            else:
+                trash_name = 'opentrons_1_trash_1.1_L'
+            self.trash_container = self._ctx.load_labware_by_name(
+                trash_name, '12')
+        else:
+            self.trash_container = trash
 
         self._last_location: Union[Labware, Well, None] = None
+        self._last_tip_picked_up_from: Union[Well, None] = None
         self._log = log_parent.getChild(repr(self))
         self._log.info("attached")
         self._well_bottom_clearance = 0.5
@@ -427,7 +439,22 @@ class InstrumentContext:
         raise NotImplementedError
 
     def return_tip(self) -> 'InstrumentContext':
-        raise NotImplementedError
+        """
+        If a tip is currently attached to the pipette, then it will return the
+        tip to it's location in the tiprack.
+
+        It will not reset tip tracking so the well flag will remain False.
+
+        :returns: This instance
+        """
+        if not self.hw_pipette['has_tip']:
+            self._log.warning('Pipette has no tip to return')
+        loc = self._last_tip_picked_up_from
+        if not isinstance(loc, Well):
+            raise TypeError('Last tip location should be a Well but it is: '
+                            '{}'.format(loc))
+        self.drop_tip(loc.top())
+        return self
 
     def pick_up_tip(self, location: types.Location = None,
                     presses: int = 3,
@@ -489,7 +516,7 @@ class InstrumentContext:
         # Note that the hardware API pick_up_tip action includes homing z after
 
         tiprack.use_tips(target, num_channels)
-
+        self._last_tip_picked_up_from = target
         return self
 
     def drop_tip(self, location: types.Location = None) -> 'InstrumentContext':
@@ -678,11 +705,11 @@ class InstrumentContext:
         liquids when calling :py:meth:`drop_tip` or :py:meth:`blow_out` without
         arguments.
         """
-        raise NotImplementedError
+        return self._trash
 
     @trash_container.setter
     def trash_container(self, trash: Labware):
-        raise NotImplementedError
+        self._trash = trash
 
     @property
     def name(self) -> str:

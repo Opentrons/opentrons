@@ -132,8 +132,12 @@ class Deck(UserDict):
     def __setitem__(self, key: types.DeckLocation, val: DeckItem) -> None:
         key_int = self._check_name(key)
         if self.data.get(key_int) is not None:
-            raise ValueError('Deck location {} already has an item: {}'
-                             .format(key, self.data[key_int]))
+            if key_int == 12 and \
+                    self.data[key_int].name.split('_')[2] == 'trash':
+                pass
+            else:
+                raise ValueError('Deck location {} already has an item: {}'
+                                 .format(key, self.data[key_int]))
         self.data[key_int] = val
         self._highest_z = max(val.highest_z, self._highest_z)
 
