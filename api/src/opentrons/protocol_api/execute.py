@@ -127,6 +127,7 @@ def run_protocol(protocol_code: Any = None,
         simulate = True # noqa - will be used later
     if None is context and simulate:
         true_context = ProtocolContext()
+        true_context.home()
         MODULE_LOG.info("Generating blank protocol context for simulate")
     elif context:
         true_context = context

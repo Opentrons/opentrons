@@ -10,5 +10,7 @@ if __name__ == '__main__':
                         type=argparse.FileType('rb'),
                         help='The python protocol file to run')
     args = parser.parse_args()
-    protocol_api.run(protocol_bytes=args.protocol.read(),
-                     simulate=True)
+    print("Running protocol {}".format(args.protocol.name))
+    protocol_api.execute.run_protocol(protocol_code=args.protocol.read(),
+                                      simulate=True)
+    print("Protocol simulation complete: OK")

@@ -15,7 +15,7 @@ from opentrons.types import Location
 def _stringify_new_loc(loc: Union[Location, Well]) -> str:
     if isinstance(loc, Location):
         if isinstance(loc.labware, str):
-            return loc.parent
+            return loc.labware
         elif isinstance(loc.labware, (Labware, Well, ModuleGeometry)):
             return repr(loc.labware)
         else:

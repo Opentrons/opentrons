@@ -1,4 +1,3 @@
-import asyncio
 import itertools
 
 import pytest
@@ -382,7 +381,6 @@ print('wat?')
     assert metadata == expected
 
 
-@pytest.mark.api1_only
 async def test_session_metadata(main_router):
     expected = {
         'hello': 'world',
@@ -397,9 +395,12 @@ metadata = {
 'hello': 'world'
 }
 print('wat?')
+
+def run(ctx):
+    print('hi there')
 """
 
-    session = await main_router.session_manager.create(
+    session = main_router.session_manager.create(
         name='<blank>',
         text=prot)
     assert session.metadata == expected

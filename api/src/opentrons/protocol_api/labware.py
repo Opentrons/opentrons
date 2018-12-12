@@ -474,7 +474,7 @@ class Labware:
         :param num_channels: The number of channels for the current pipette
         :type num_channels: int
         """
-        assert num_channels > 0
+        assert num_channels > 0, 'Bad call to use_tips: num_channels==0'
         # Select the column of the labware that contains the target well
         target_column: List[Well] = [
             col for col in self.columns() if start_well in col][0]
@@ -488,7 +488,8 @@ class Labware:
         num_tips = min(len(target_column) - well_idx, num_channels)
         target_wells = target_column[well_idx: well_idx + num_tips]
 
-        assert all([well.has_tip for well in target_wells])
+        assert all([well.has_tip for well in target_wells]),\
+            '{} is out of tips'.format(str(self))
 
         for well in target_wells:
             well.has_tip = False

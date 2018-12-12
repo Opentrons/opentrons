@@ -96,7 +96,7 @@ class ProtocolContext:
 
         self._hw_manager = ProtocolContext.HardwareManager(hardware)
         self._log = MODULE_LOG.getChild(self.__class__.__name__)
-        self._commands = []
+        self._commands: List[str] = []
         self._unsubscribe_commands = None
         self.clear_commands()
 
@@ -441,8 +441,14 @@ class InstrumentContext:
             raise TypeError(
                 'location should be a Well or Location, but it is {}'
                 .format(location))
-        else:
+        elif self._ctx.location_cache:
             loc = self._ctx.location_cache
+        else:
+            raise RuntimeError(
+                "If aspirate is called without an explicit location, another"
+                " method that moves to a location (such as move_to or "
+                "dispense) must previously have been called so the robot "
+                "knows where it is.")
         cmds.do_publish(cmds.aspirate, self.aspirate, 'before', None, None,
                         self, volume, loc, rate)
         self._hw_manager.hardware.aspirate(self._mount, volume, rate)
@@ -499,8 +505,14 @@ class InstrumentContext:
             raise TypeError(
                 'location should be a Well or Location, but it is {}'
                 .format(location))
-        else:
+        elif self._ctx.location_cache:
             loc = self._ctx.location_cache
+        else:
+            raise RuntimeError(
+                "If dispense is called without an explicit location, another"
+                " method that moves to a location (such as move_to or "
+                "aspirate) must previously have been called so the robot "
+                "knows where it is.")
         cmds.do_publish(cmds.dispense, self.dispense, 'before', None, None,
                         self, volume, loc, rate)
         self._hw_manager.hardware.dispense(self._mount, volume, rate)
