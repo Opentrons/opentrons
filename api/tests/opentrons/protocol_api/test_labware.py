@@ -127,12 +127,6 @@ def test_backcompat():
     well_b2_name = repr(lw.wells_by_index()['B2'])
     well_c3_name = repr(lw.wells_by_index()['C3'])
 
-    w0 = lw[0]
-    assert repr(w0) == well_a1_name
-
-    w1 = lw['A1']
-    assert repr(w1) == well_a1_name
-
     w2 = lw.well(0)
     assert repr(w2) == well_a1_name
 
@@ -159,15 +153,6 @@ def test_backcompat():
     assert len(w8) == 2
     assert repr(w8[0][0]) == well_a1_name
     assert repr(w8[1][2]) == well_c3_name
-
-    w9 = lw.cols('2')
-    assert len(w9) == 1
-    assert len(w9[0]) == len(labware_def['ordering'][1])
-    assert repr(w9[0][1]) == well_b2_name
-
-    w10 = lw.cols('2', '5')
-    assert len(w10) == 2
-    assert repr(w10[0][1]) == well_b2_name
 
     w11 = lw.columns('2', '3', '6')
     assert len(w11) == 3
