@@ -347,8 +347,8 @@ def test_set_acceleration(smoothie, monkeypatch):
         ['M204 S10000 A40 B50 C60 X10 Y20 Z30 M400'],
         ['M204 S10000 A4 B5 C6 X1 Y2 Z3 M400']
     ]
-    from pprint import pprint
-    pprint(command_log)
+    # from pprint import pprint
+    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
 
 

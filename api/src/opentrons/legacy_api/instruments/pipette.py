@@ -24,6 +24,7 @@ PLUNGER_POSITIONS = {
 }
 
 DROP_TIP_RELEASE_DISTANCE = 20
+DROP_TIP_SPEED = 5
 
 BLOW_OUT_ACCELERATION = 1500
 
@@ -1055,10 +1056,13 @@ class Pipette:
                 x=pos_bottom
             )
             self.instrument_actuator.set_active_current(self._drop_tip_current)
+            self.instrument_actuator.push_speed()
+            self.instrument_actuator.set_speed(DROP_TIP_SPEED)
             self.robot.poses = self.instrument_actuator.move(
                 self.robot.poses,
                 x=pos_drop_tip
             )
+            self.instrument_actuator.pop_speed()
             self._shake_off_tips(location)
             if home_after:
                 self._home_after_drop_tip()
