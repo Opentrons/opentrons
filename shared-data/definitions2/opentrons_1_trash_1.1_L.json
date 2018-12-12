@@ -31,7 +31,8 @@
         "format": "trash",
         "isTiprack": false,
         "loadName": "opentrons_1_trash_1.1_L",
-        "isMagneticModuleCompatible": false
+        "isMagneticModuleCompatible": false,
+        "quirk": "fixedTrash"
     },
     "wells": {
         "A1": {

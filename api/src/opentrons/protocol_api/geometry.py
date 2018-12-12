@@ -131,9 +131,10 @@ class Deck(UserDict):
 
     def __setitem__(self, key: types.DeckLocation, val: DeckItem) -> None:
         key_int = self._check_name(key)
-        if self.data.get(key_int) is not None:
+        labware = self.data.get(key_int)
+        if labware is not None:
             if key_int == 12 and \
-                    self.data[key_int].name.split('_')[2] == 'trash':
+                    labware.parameters.get('quirk') == 'fixedTrash':
                 pass
             else:
                 raise ValueError('Deck location {} already has an item: {}'

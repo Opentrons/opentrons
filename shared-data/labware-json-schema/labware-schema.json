@@ -77,6 +77,10 @@
           "type": "string",
           "enum": ["96Standard", "384Standard", "trough", "irregular", "trash"]
         },
+        "quirk": {
+          "description": "Property to classify a specific behavior this labware should have",
+          "type": "string"
+        },
         "isTiprack": {
           "description": "Flag marking whether a labware is a tiprack or not",
           "type": "boolean"

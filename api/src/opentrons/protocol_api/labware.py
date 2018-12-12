@@ -209,6 +209,11 @@ class Labware:
         return self._definition['parameters']['loadName']
 
     @property
+    def parameters(self) -> dict:
+        """Internal properties of a labware including type and quirks"""
+        return self._parameters
+
+    @property
     def magdeck_engage_height(self) -> Optional[float]:
         if not self._parameters['isMagneticModuleCompatible']:
             return None
