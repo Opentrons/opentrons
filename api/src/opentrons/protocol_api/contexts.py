@@ -195,7 +195,7 @@ class ProtocolContext:
     def load_instrument(
             self,
             instrument_name: str,
-            mount: types.Mount,
+            mount: Union[types.Mount, str],
             tip_racks: List[Labware] = None,
             replace: bool = False) -> 'InstrumentContext':
         """ Load a specific instrument required by the protocol.
@@ -208,8 +208,11 @@ class ProtocolContext:
                                     prefix. For instance, 'p10_single' may be
                                     used to request a P10 single regardless of
                                     the version.
-        :param types.Mount mount: The mount in which this instrument should be
-                                  attached.
+        :param mount: The mount in which this instrument should be attached.
+                      This can either be an instance of the enum type
+                      :py:class:`.types.Mount` or one of the strings `'left'`
+                      and `'right'`.
+        :type mount: types.Mount or str
         :param tip_racks: A list of tip racks from which to pick tips if
                           :py:meth:`.InstrumentContext.pick_up_tip` is called
                           without arguments.
@@ -218,17 +221,31 @@ class ProtocolContext:
                              `mount` (if such an instrument exists) should be
                              replaced by `instrument_name`.
         """
+        if isinstance(mount, str):
+            try:
+                checked_mount = types.Mount[mount.upper()]
+            except KeyError:
+                raise ValueError(
+                    "If mount is specified as a string, it should be either"
+                    "'left' or 'right' (ignoring capitalization, which the"
+                    " system strips), not {}".format(mount))
+        elif isinstance(mount, types.Mount):
+            checked_mount = mount
+        else:
+            raise TypeError(
+                "mount should be either an instance of opentrons.types.Mount"
+                " or a string, but is {}.".format(mount))
         self._log.info("Trying to load {} on {} mount"
-                       .format(instrument_name, mount.name.lower()))
-        instr = self._instruments[mount]
+                       .format(instrument_name, checked_mount.name.lower()))
+        instr = self._instruments[checked_mount]
         if instr and not replace:
             raise RuntimeError("Instrument already present in {} mount: {}"
-                               .format(mount.name.lower(),
+                               .format(checked_mount.name.lower(),
                                        instr.name))
         attached = {att_mount: instr.get('name', None)
                     for att_mount, instr
                     in self._hw_manager.hardware.attached_instruments.items()}
-        attached[mount] = instrument_name
+        attached[checked_mount] = instrument_name
         self._log.debug("cache instruments expectation: {}"
                         .format(attached))
         self._hw_manager.hardware.cache_instruments(attached)
@@ -236,10 +253,10 @@ class ProtocolContext:
         new_instr = InstrumentContext(
             ctx=self,
             hardware_mgr=self._hw_manager,
-            mount=mount,
+            mount=checked_mount,
             tip_racks=tip_racks,
             log_parent=self._log)
-        self._instruments[mount] = new_instr
+        self._instruments[checked_mount] = new_instr
         self._log.info("Instrument {} loaded".format(new_instr))
         return new_instr
 
@@ -571,19 +588,36 @@ class InstrumentContext:
         self.drop_tip(loc.top())
         return self
 
-    @cmds.publish.both(command=cmds.pick_up_tip)
-    def pick_up_tip(self, location: types.Location = None,
+    @cmds.publish.both(command=cmds.pick_up_tip)  # noqa(C901)
+    def pick_up_tip(self, location: Union[types.Location, Well] = None,
                     presses: int = 3,
                     increment: float = 1.0) -> 'InstrumentContext':
         """
         Pick up a tip for the pipette to run liquid-handling commands with
 
-        A tip can be manually set by passing a :py:class:`.types.Location`.
         If no location is passed, the Pipette will pick up the next available
-        tip in its :py:attr:`InstrumentContext.tip_racks` list
+        tip in its :py:attr:`InstrumentContext.tip_racks` list.
+
+        The tip to pick up can be manually specified with the `location`
+        argument. The `location` argument can be specified in several ways:
+
+            - If the only thing to specify is which well from which to pick
+              up a tip, `location` can be a :py:class:`.Well`. For instance,
+              if you have a tip rack in a variable called `tiprack`, you can
+              pick up a specific tip from it with
+              `instr.pick_up_tip(tiprack.wells()[0])`. This style of call can
+              be used to make the robot pick up a tip from a tip rack that
+              was not specified when creating the
+              :py:class:`.InstrumentContext`.
+            - If the position to move to in the well needs to be specified,
+              for instance to tell the robot to run its pick up tip routine
+              starting closer to or farther from the top of the tip, `location`
+              can be a :py:class:`.types.Location`; for instance, you can call
+              `instr.pick_up_tip(tiprack.wells()[0].top())`.
 
         :param location: The location from which to pick up a tip.
-        :type location: :py:class:`.types.Location`
+        :type location: :py:class:`.types.Location` or :py:class:`.Well` to
+                        pick up a tip from.
         :param presses: The number of times to lower and then raise the pipette
                         when picking up a tip, to ensure a good seal (0 [zero]
                         will result in the pipette hovering over the tip but
@@ -610,19 +644,28 @@ class InstrumentContext:
             else:
                 return _select_tiprack_from_list(tip_racks[1:])
 
-        if location and isinstance(location.labware, Labware):
-            tiprack = location.labware
-            target: Optional[Well] = tiprack.next_tip(num_channels)
-        elif location and isinstance(location.labware, Well):
-            tiprack = location.labware.parent
-            target = location.labware
-        else:
+        if location and isinstance(location, types.Location):
+            if isinstance(location.labware, Labware):
+                tiprack = location.labware
+                target: Well = tiprack.next_tip(num_channels)  # type: ignore
+                if not target:
+                    raise OutOfTipsError
+            elif isinstance(location.labware, Well):
+                tiprack = location.labware.parent
+                target = location.labware
+        elif location and isinstance(location, Well):
+            tiprack = location.parent
+            target = location
+        elif not location:
             tiprack, target = _select_tiprack_from_list(self.tip_racks)
-        if target is None:
-            # This is primarily for type checking--should raise earlier
-            raise OutOfTipsError
+        else:
+            raise TypeError(
+                "If specified, location should be an instance of "
+                "types.Location (e.g. the return value from "
+                "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
+                " However, it is a {}".format(location))
 
-        assert tiprack.is_tiprack
+        assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
 
         self.move_to(target.top())
 
@@ -635,12 +678,33 @@ class InstrumentContext:
         return self
 
     @cmds.publish.both(command=cmds.drop_tip)
-    def drop_tip(self, location: types.Location = None) -> 'InstrumentContext':
+    def drop_tip(
+            self,
+            location: Union[types.Location, Well] = None)\
+            -> 'InstrumentContext':
         """
         Drop the current tip.
 
-        If a location is specified, drop the tip there, otherwise drop it into
-        the fixed trash.
+        If no location is passed, the Pipette will drop the tip into its
+        :py:attr:`trash_container`, which if not specified defaults to
+        the fixed trash in slot 12.
+
+        The location in which to drop the tip can be manually specified with
+        the `location` argument. The `location` argument can be specified in
+        several ways:
+
+            - If the only thing to specify is which well into which to drop
+              a tip, `location` can be a :py:class:`.Well`. For instance,
+              if you have a tip rack in a variable called `tiprack`, you can
+              drop a tip into a specific well on that tiprack with the call
+              `instr.pick_up_tip(tiprack.wells()[0])`. This style of call can
+              be used to make the robot drop a tip into arbitrary labware.
+            - If the position to drop the tip from as well as the
+              :py:class:`.Well` to drop the tip into needs to be specified,
+              for instance to tell the robot to drop a tip from an unusually
+              large height above the tiprack, `location`
+              can be a :py:class:`.types.Location`; for instance, you can call
+              `instr.pick_up_tip(tiprack.wells()[0].top())`.
 
         .. note::
             OT1 required homing the plunger after dropping tips, so the prior
@@ -649,16 +713,32 @@ class InstrumentContext:
             :py:meth:`home_plunger`.
 
         :param location: The location to drop the tip
-        :type location: :py:class:`.types.Location` or None
+        :type location: :py:class:`.types.Location` or :py:class:`.Well` or
+                        None
 
         :returns: This instance
         """
-        if location and isinstance(location.labware, Labware):
-            target: Well = location.labware.wells()[0]
-        elif location and isinstance(location.labware, Well):
-            target = location.labware
-        else:
+        if location and isinstance(location, types.Location):
+            if isinstance(location.labware, Well):
+                target = location.labware
+            else:
+                raise TypeError(
+                    "If a location is specified as a types.Location (for "
+                    "instance, as the result of a call to "
+                    "tiprack.wells()[0].top()) it must be a location "
+                    "relative to a well, since that is where a tip is "
+                    "dropped. The passed location, however, is in "
+                    "reference to {}".format(location.labware))
+        elif location and isinstance(location, Well):
+            target = location
+        elif not location:
             target = self.trash_container.wells()[0]
+        else:
+            raise TypeError(
+                "If specified, location should be an instance of "
+                "types.Location (e.g. the return value from "
+                "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
+                " However, it is a {}".format(location))
 
         self.move_to(target.top())
         self._hw_manager.hardware.drop_tip(self._mount)
