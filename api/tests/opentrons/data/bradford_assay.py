@@ -1,5 +1,12 @@
 from opentrons import containers, instruments
 
+metadata = {
+    'protocolName': 'Bradford Assay',
+    'author': 'Opentrons <engineering@opentrons.com>',
+    'description': 'A protien quantification assay',
+    'source': 'Opentrons Repository'
+}
+
 tiprack = containers.load('tiprack-200ul', '9')
 tiprack2 = containers.load('tiprack-200ul', '11')
 

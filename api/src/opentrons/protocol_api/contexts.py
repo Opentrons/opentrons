@@ -801,7 +801,7 @@ class TemperatureModuleContext(ModuleContext):
     def __init__(self, ctx: ProtocolContext,
                  hw_module: modules.tempdeck.TempDeck,
                  geometry: ModuleGeometry,
-                 loop: asyncio.AbstractEventLoop):
+                 loop: asyncio.AbstractEventLoop) -> None:
         self._module = hw_module
         self._loop = loop
         super().__init__(ctx, geometry)

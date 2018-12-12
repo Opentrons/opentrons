@@ -1,6 +1,6 @@
 # Overview
 
-This is a simple browser tool which can be used to generate labware definitions for _regular_ labware (labware that is 
+This is a simple browser tool which can be used to generate labware definitions for _regular_ labware (labware that is
 laid out on a grid, and where all wells have consistent dimensions), or _irregular_ labware.
 
 ### What is a 'regular' labware?
@@ -191,6 +191,11 @@ brand = {
 "brand" is the name of the manufacturer
 
 "brandId" is used when a definition accurately reflects several products
+
+## Explanation of Numerical inputs
+See diagram below:
+
+![Labware Dimension Diagram](https://user-images.githubusercontent.com/31892318/48797647-c35ffa80-ecd0-11e8-823a-e40f903a90c8.png)
 
 ## Example Input-Output
 

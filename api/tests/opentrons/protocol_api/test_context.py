@@ -115,7 +115,7 @@ def test_pipette_info(loop):
 def test_pick_up_and_drop_tip(loop, load_my_labware):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    tiprack = ctx.load_labware_by_name('Opentrons_96_tiprack_300_uL', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 1)
     tip_lenth = tiprack.tip_length
     mount = Mount.LEFT
 
@@ -139,10 +139,10 @@ def test_pick_up_tip_no_location(loop, load_my_labware):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
 
-    tiprack1 = ctx.load_labware_by_name('Opentrons_96_tiprack_300_uL', 1)
+    tiprack1 = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 1)
     tip_lenth1 = tiprack1.tip_length
 
-    tiprack2 = ctx.load_labware_by_name('Opentrons_96_tiprack_300_uL', 2)
+    tiprack2 = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 2)
     tip_length2 = tip_lenth1 + 1.0
     tiprack2.tip_length = tip_length2
 

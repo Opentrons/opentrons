@@ -1,5 +1,11 @@
 from opentrons import containers, instruments
 
+metadata = {
+    'protocolName': 'Dinosaur',
+    'author': 'Opentrons <engineering@opentrons.com>',
+    'description': 'Simple protocol to draw a dinosaur in a 96 well plate',
+    'source': 'Opentrons Repository'
+}
 
 # a 12 row trough for sources, and 96 well plate for output
 trough = containers.load('trough-12row', '3', 'trough')

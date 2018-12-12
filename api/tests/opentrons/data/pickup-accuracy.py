@@ -1,5 +1,12 @@
 from opentrons import containers, instruments
 
+metadata = {
+    'protocolName': 'Pickup accuracy',
+    'author': 'Opentrons <engineering@opentrons.com>',
+    'description': 'A protocol for testing pick up and drop tip',
+    'source': 'Opentrons Repository'
+}
+
 # from opentrons import robot
 # robot.connect()
 # robot.home()

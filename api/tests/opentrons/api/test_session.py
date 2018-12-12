@@ -5,7 +5,8 @@ import pytest
 
 from opentrons.broker import publish
 from opentrons.api import Session
-from opentrons.api.session import _accumulate, _get_labware, _dedupe
+from opentrons.api.session import (
+    _accumulate, _get_labware, _dedupe, extract_metadata)
 from tests.opentrons.conftest import state
 from opentrons.legacy_api.robot.robot import Robot
 from functools import partial
@@ -315,3 +316,49 @@ async def test_session_create_error(main_router):
     with pytest.raises(TimeoutError):
         # No state change is expected
         await main_router.wait_until(lambda _: True)
+
+
+def test_extract_metadata():
+    import ast
+
+    expected = {
+        'hello': 'world',
+        'what?': 'no'
+    }
+
+    prot = """
+this = 0
+that = 1
+metadata = {
+'what?': 'no',
+'hello': 'world'
+}
+print('wat?')
+"""
+
+    parsed = ast.parse(prot, filename='testy', mode='exec')
+    metadata = extract_metadata(parsed)
+    assert metadata == expected
+
+
+@pytest.mark.api1_only
+async def test_session_metadata(main_router):
+    expected = {
+        'hello': 'world',
+        'what?': 'no'
+    }
+
+    prot = """
+this = 0
+that = 1
+metadata = {
+'what?': 'no',
+'hello': 'world'
+}
+print('wat?')
+"""
+
+    session = await main_router.session_manager.create(
+        name='<blank>',
+        text=prot)
+    assert session.metadata == expected
