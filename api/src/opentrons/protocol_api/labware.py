@@ -392,10 +392,6 @@ class Labware:
         col_dict = self._create_indexed_dictionary(group=2)
         return col_dict
 
-    def cols(self, *args):
-        """Deprecated--use `columns`"""
-        return self.columns(*args)
-
     @property
     def highest_z(self) -> float:
         """
@@ -491,15 +487,6 @@ class Labware:
 
     def __repr__(self):
         return self._display_name
-
-    def __getitem__(self, item):
-        """Deprecated--use `wells` or `wells_by_index`"""
-        if isinstance(item, str):
-            return self.wells_by_index()[item]
-        elif isinstance(item, int):
-            return self.wells()[item]
-        else:
-            raise KeyError
 
 
 class ModuleGeometry:
