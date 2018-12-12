@@ -9,7 +9,6 @@ import ControlsCard from './ControlsCard'
 import ConnectionCard from './ConnectionCard'
 import AdvancedSettingsCard from './AdvancedSettingsCard'
 import ConnectAlertModal from './ConnectAlertModal'
-import RobotUpdateModal from './RobotUpdateModal'
 
 import type {ViewableRobot} from '../../discovery'
 
@@ -44,4 +43,4 @@ export default function RobotSettings (props: Props) {
   )
 }
 
-export {ConnectAlertModal, RobotUpdateModal}
+export {ConnectAlertModal}
