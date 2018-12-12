@@ -154,7 +154,7 @@ class Deck(UserDict):
 
     def position_for(self, key: types.DeckLocation) -> types.Location:
         key_int = self._check_name(key)
-        return types.Location(self._positions[key_int], "Slot " + str(key))
+        return types.Location(self._positions[key_int], str(key))
 
     def recalculate_high_z(self):
         self._highest_z = 0.0

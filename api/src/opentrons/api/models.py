@@ -20,8 +20,9 @@ class Container:
             self.type = container.get_type()
             self.slot = _get_parent_slot(container).get_name()
         else:
-            self.name = str(container)
+            self.name = container.name
             self.type = container.name
+            self.slot = container.parent
         self.instruments = [
             Instrument(instrument)
             for instrument in instruments]

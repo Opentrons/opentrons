@@ -284,7 +284,7 @@ class ProtocolContext:
         raise NotImplementedError
 
     @cmds.publish.both(command=cmds.pause)
-    def pause(self, msg):
+    def pause(self, msg=None):
         """ Pause execution of the protocol until resume is called.
 
         This function returns immediately, but the next function call that
@@ -293,12 +293,12 @@ class ProtocolContext:
 
         :param str msg: A message to echo back to connected clients.
         """
-        raise NotImplementedError
+        self._hw_manager.hardware.pause()
 
     @cmds.publish.both(command=cmds.resume)
     def resume(self):
         """ Resume a previously-paused protocol """
-        raise NotImplementedError
+        self._hw_manager.hardware.resume()
 
     @cmds.publish.both(command=cmds.comment)
     def comment(self, msg):

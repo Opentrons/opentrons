@@ -7,7 +7,7 @@ import pkgutil
 from collections import defaultdict
 from enum import Enum, auto
 from itertools import takewhile, dropwhile
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Union
 
 from opentrons.types import Location
 from opentrons.types import Point
@@ -200,11 +200,18 @@ class Labware:
                           for well in col]
         self._offset\
             = Point(offset['x'], offset['y'], offset['z']) + parent.point
+        self._parent = parent.labware
         # Applied properties
         self.set_calibration(self._calibrated_offset)
 
         self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
         self._definition = definition
+
+    @property
+    def parent(self) -> Union['Labware', 'Well', str, 'ModuleGeometry', None]:
+        """ The parent of this labware. Usually a slot name.
+        """
+        return self._parent
 
     @property
     def name(self) -> str:

@@ -443,11 +443,11 @@ def _get_labware(command):
 
     if location:
         if isinstance(location, (Placeable)) or type(location) == tuple:
-            # tyoe()== used here instead of isinstance because a specific
+            # type()== used here instead of isinstance because a specific
             # named tuple like location descends from tuple and therefore
             # passes the check
             containers.append(get_container(location))
-        elif isinstance(location, Location):
+        elif isinstance(location, (Location, labware.Well, labware.Labware)):
             containers.append(_get_new_labware(location))
 
     if locations:
