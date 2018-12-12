@@ -1,0 +1,6 @@
+@import '@opentrons/components';
+
+.width_auto {
+  width: auto;
+  padding: 0.5rem 2rem;
+}
