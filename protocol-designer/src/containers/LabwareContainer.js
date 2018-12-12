@@ -14,8 +14,8 @@ import {
   drillDownOnLabware,
   drillUpFromLabware,
 
-  setMoveLabwareMode,
-  moveLabware,
+  // setMoveLabwareMode,
+  // moveLabware,
   swapSlotContents,
 } from '../labware-ingred/actions'
 import {selectors as steplistSelectors, START_TERMINAL_ITEM_ID} from '../steplist'
@@ -35,9 +35,9 @@ type DP = {
   editLiquids: () => mixed,
   deleteLabware: () => mixed,
 
-  cancelMove: () => mixed,
-  moveLabwareDestination: () => mixed,
-  moveLabwareSource: () => mixed,
+  // cancelMove: () => mixed,
+  // moveLabwareDestination: () => mixed,
+  // moveLabwareSource: () => mixed,
 
   setLabwareName: (name: ?string) => mixed,
   setDefaultLabwareName: () => mixed,
@@ -67,11 +67,11 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const isTiprack = getIsTiprack(containerType)
   const showNameOverlay = container && !isTiprack && !labwareHasName
 
-  const slotToMoveFrom = selectors.getSlotToMoveFrom(state)
+  // const slotToMoveFrom = selectors.getSlotToMoveFrom(state)
 
   const slotHasLabware = !!containerType
   const addLabwareMode = selectors.getLabwareSelectionMode(state)
-  const moveLabwareMode = Boolean(slotToMoveFrom)
+  // const moveLabwareMode = Boolean(slotToMoveFrom)
 
   const setDefaultLabwareName = () => renameLabware({
     labwareId: containerId,
@@ -89,14 +89,14 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   return {
     slotHasLabware,
     addLabwareMode,
-    moveLabwareMode,
+    // moveLabwareMode,
     setDefaultLabwareName,
     canAddIngreds,
     isTiprack,
     labwareInfo,
 
     showNameOverlay,
-    slotToMoveFrom,
+    // slotToMoveFrom,
     highlighted: selectedTerminalItem === START_TERMINAL_ITEM_ID
     // in deckSetupMode, labware is highlighted when selected (currently editing ingredients)
     // or when targeted by an open "Add Labware" modal
@@ -126,9 +126,9 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}, own
     ),
     drillDown: () => dispatch(drillDownOnLabware(containerId)),
     drillUp: () => dispatch(drillUpFromLabware()),
-    cancelMove: () => dispatch(setMoveLabwareMode()),
-    moveLabwareDestination: () => dispatch(moveLabware(slot)),
-    moveLabwareSource: () => dispatch(setMoveLabwareMode(slot)),
+    // cancelMove: () => dispatch(setMoveLabwareMode()),
+    // moveLabwareDestination: () => dispatch(moveLabware(slot)),
+    // moveLabwareSource: () => dispatch(setMoveLabwareMode(slot)),
     swapSlotContents: (sourceSlot, destSlot) => dispatch(swapSlotContents(sourceSlot, destSlot)),
 
     setLabwareName: (name: ?string) => dispatch(renameLabware({
