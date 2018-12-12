@@ -127,7 +127,18 @@ def set_current_mount(attached_pipettes):
 
     pipette = None
     model = None
+
     if not advanced_settings.get_adv_setting('useProtocolApi2'):
+        if left['model'] in pipette_config.configs:
+            pip_config = pipette_config.load(left['model'])
+            left_pipette = instruments._create_pipette_from_config(
+                mount='left', config=pip_config, name=left['model'])
+
+        if right['model'] in pipette_config.configs:
+            pip_config = pipette_config.load(right['model'])
+            right_pipette = instruments._create_pipette_from_config(
+                mount='right', config=pip_config, name=right['model'])
+    else:
         if left['model'] in pipette_config.configs:
             pip_config = pipette_config.load(left['model'])
             left_pipette = instruments._create_pipette_from_config(
