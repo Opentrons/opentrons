@@ -1,0 +1,107 @@
+{
+    "ordering": [
+        [
+            "A1",
+            "B1"
+        ],
+        [
+            "A2",
+            "B2"
+        ],
+        [
+            "A3",
+            "B3"
+        ]
+    ],
+    "otId": "14807fb0-e8f4-11e8-b93b-5f6727dde048",
+    "deprecated": false,
+    "metadata": {
+        "displayLengthUnits": "mm",
+        "displayVolumeUnits": "mL",
+        "displayCategory": "tuberack",
+        "displayName": "Opentrons 50 mL tuberack",
+        "tags": [
+            "50",
+            "mL",
+            "falcon",
+            "tuberack",
+            "Opentrons"
+        ]
+    },
+    "cornerOffsetFromSlot": {
+        "x": 6.76,
+        "y": 6.73,
+        "z": 0
+    },
+    "dimensions": {
+        "overallLength": 121,
+        "overallWidth": 78.75,
+        "overallHeight": 123.76
+    },
+    "parameters": {
+        "format": "irregular",
+        "isTiprack": false,
+        "loadName": "opentrons_6_tuberack_50_mL_falcon",
+        "isMagneticModuleCompatible": false
+    },
+    "wells": {
+        "B1": {
+            "depth": 113.85,
+            "diameter": 26.45,
+            "shape": "circular",
+            "totalLiquidVolume": 50,
+            "x": 33,
+            "y": 21.88,
+            "z": 6.04
+        },
+        "A1": {
+            "depth": 113.85,
+            "diameter": 26.45,
+            "shape": "circular",
+            "totalLiquidVolume": 50,
+            "x": 33,
+            "y": 56.88,
+            "z": 6.04
+        },
+        "B2": {
+            "depth": 113.85,
+            "diameter": 26.45,
+            "shape": "circular",
+            "totalLiquidVolume": 50,
+            "x": 68,
+            "y": 21.88,
+            "z": 6.04
+        },
+        "A2": {
+            "depth": 113.85,
+            "diameter": 26.45,
+            "shape": "circular",
+            "totalLiquidVolume": 50,
+            "x": 68,
+            "y": 56.88,
+            "z": 6.04
+        },
+        "B3": {
+            "depth": 113.85,
+            "diameter": 26.45,
+            "shape": "circular",
+            "totalLiquidVolume": 50,
+            "x": 103,
+            "y": 21.88,
+            "z": 6.04
+        },
+        "A3": {
+            "depth": 113.85,
+            "diameter": 26.45,
+            "shape": "circular",
+            "totalLiquidVolume": 50,
+            "x": 103,
+            "y": 56.88,
+            "z": 6.04
+        }
+    },
+    "brand": {
+        "brand": "Opentrons",
+        "brandId": ["352070"]
+    }
+}

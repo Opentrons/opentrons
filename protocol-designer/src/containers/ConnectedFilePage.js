@@ -32,7 +32,7 @@ const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
   goToNextPage: () => dispatch(navActions.navigateToPage('liquids')),
   saveFileMetadata: (nextFormValues: FileMetadataFields) =>
     dispatch(actions.saveFileMetadata(nextFormValues)),
-  swapPipettes: () => dispatch(pipetteActions.swapPipettes),
+  swapPipettes: () => dispatch(pipetteActions.swapPipettes()),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(FilePage)

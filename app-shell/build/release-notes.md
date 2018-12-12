@@ -1,4 +1,4 @@
-# Changes from 3.5.1 to 3.6.1
+# Changes from 3.5.1 to 3.6.2
 
 For more details, please see the full [technical change log][changelog]
 
@@ -10,6 +10,7 @@ For more details, please see the full [technical change log][changelog]
 ### Bug fixes
 
 - Lost connection alert messages will no longer trigger when your robot is restarting for normal reasons (e.g. software update or deck calibration). Sorry for the confusion this caused!
+- The notification dot for available robot upgrade on the main Robots nav button has been fixed
 
 ### New features
 
@@ -39,7 +40,7 @@ executing, but it does not ([#2020][2020])
 
 **Important**: This release updates the calibration of the P10 single pipette.
 
-This update includes a refinement to the aspiration function of the P10 single-channel pipette based on an expanded data set.
+This update includes a refinement to the aspiration function of the P10 single-channel pipette based on an expanded data set. The updated configuration is available as an **opt-in** in the "Advanced Settings" section of your robot's settings page.
 
 Please note this is a small but material change to the P10's pipetting performance, in particular decreasing the low-volume µl-to-mm conversion factor to address under-aspiration users have reported.
 
@@ -48,6 +49,7 @@ As always, please reach out to our team with any questions.
 ### Bug fixes
 
 - **Updated the configuration of the P10 single based on an expanded dataset**
+- Fixed a bug that was overwriting robot configuration with defaults when using the internal USB flash drive for configuration storage
 - Fixed the iteration order of labware created with `labware.create` to match documentation
 - Fixed various misconfigurations with pipette motor current/position settings
 

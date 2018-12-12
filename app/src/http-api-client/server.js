@@ -6,7 +6,8 @@ import semver from 'semver'
 import {chainActions} from '../util'
 import client, {FetchError} from './client'
 import {fetchHealth} from './health'
-import {getRobotApiVersion} from '../discovery'
+import {getRobotApiVersion, getConnectedRobot} from '../discovery'
+
 import {
   getApiUpdateVersion,
   getApiUpdateFilename,
@@ -250,28 +251,45 @@ export type RobotUpdateType = 'upgrade' | 'downgrade' | null
 
 export type RobotUpdateInfo = {version: string, type: RobotUpdateType}
 
+const compareCurrentVersionToUpdate = (
+  currentVersion: ?string,
+  updateVersion: string
+): RobotUpdateInfo => {
+  const current = semver.valid(currentVersion)
+  let type = null
+
+  if (current && semver.gt(updateVersion, currentVersion)) {
+    type = 'upgrade'
+  } else if (current && semver.lt(updateVersion, currentVersion)) {
+    type = 'downgrade'
+  }
+
+  return {version: updateVersion, type: type}
+}
+
 export const makeGetRobotUpdateInfo = () => {
   const selector: OutputSelector<State,
     AnyRobot,
     RobotUpdateInfo> = createSelector(
       (_, robot) => getRobotApiVersion(robot),
       getApiUpdateVersion,
-      (currentVersion, updateVersion) => {
-        const current = semver.valid(currentVersion)
-        const upgrade = current && semver.gt(updateVersion, current)
-        const downgrade = current && semver.lt(updateVersion, current)
-        let type
-        if (!upgrade && !downgrade) {
-          type = null
-        } else {
-          type = upgrade ? 'upgrade' : 'downgrade'
-        }
-        return {version: updateVersion, type: type}
-      }
+      compareCurrentVersionToUpdate
     )
 
   return selector
 }
+
+export const getConnectedRobotUpgradeAvailable: OutputSelector<State,
+  void,
+  boolean> = createSelector(
+    getConnectedRobot,
+    getApiUpdateVersion,
+    (robot, updateVersion) => {
+      const currentVersion = robot && getRobotApiVersion(robot)
+      const info = compareCurrentVersionToUpdate(currentVersion, updateVersion)
+      return info.type === 'upgrade'
+    }
+  )
 
 // TODO(mc, 2018-09-25): this is broken until some planned discovery work is
 // done for https://github.com/Opentrons/opentrons/milestone/68
@@ -307,13 +325,6 @@ export const makeGetRobotIgnoredUpdateRequest = () => {
 
   return selector
 }
-
-// TODO(mc, 2018-10-10): this selector is broken
-export const getAnyRobotUpdateAvailable: OutputSelector<State,
-  void,
-  boolean> = createSelector(selectServerState, state =>
-    Object.keys(state).some(name => state[name].availableUpdate)
-  )
 
 function selectServerState (state: State) {
   return state.api.server

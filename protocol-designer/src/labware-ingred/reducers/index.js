@@ -198,22 +198,23 @@ export const containers = handleActions({
     state: ContainersState,
     action: {payload: NewProtocolFields}
   ): ContainersState => {
-    const initialTipracks = [action.payload.left, action.payload.right].reduce((acc, mount) => {
+    const nextState = [action.payload.left, action.payload.right].reduce((acc: ContainersState, mount): ContainersState => {
       if (mount.tiprackModel) {
         const id = `${uuid()}:${String(mount.tiprackModel)}`
         return {
           ...acc,
           [id]: {
-            slot: nextEmptySlot(_loadedContainersBySlot(acc || {})),
+            slot: nextEmptySlot(_loadedContainersBySlot(acc)),
             type: mount.tiprackModel,
-            disambiguationNumber: getNextDisambiguationNumber(acc || {}, String(mount.tiprackModel)),
+            disambiguationNumber: getNextDisambiguationNumber(acc, String(mount.tiprackModel)),
             id,
-            name: null, // create with null name, so we force explicit naming.
+            name: null,
           },
         }
       }
+      return acc
     }, state)
-    return initialTipracks || {}
+    return nextState
   },
 }, initialLabwareState)
 

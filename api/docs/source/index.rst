@@ -59,9 +59,17 @@ If we were to rewrite this with the Opentrons API, it would look like the follow
     # imports
     from opentrons import labware, instruments
 
+    # metadata
+    metadata = {
+        'protocolName': 'My Protocol',
+        'author': 'Name <email@address.com>',
+        'description': 'Simple protocol to get started using OT2',
+        'source': 'Opentrons Protocol Tutorial'
+    }
+
     # labware
     plate = labware.load('96-flat', '2')
-    tiprack = labware.load('tiprack-200ul', '1')
+    tiprack = labware.load('opentrons-tiprack-300ul', '1')
 
     # pipettes
     pipette = instruments.P300_Single(mount='left', tip_racks=[tiprack])
@@ -74,12 +82,13 @@ If we were to rewrite this with the Opentrons API, it would look like the follow
 How it's Organized
 ------------------
 
-When writing protocols using the Opentrons API, there are generally three sections:
+When writing protocols using the Opentrons API, there are generally five sections:
 
 1) Imports
-2) Labware
-3) Pipettes
-4) Commands
+2) Metadata
+3) Labware
+4) Pipettes
+5) Commands
 
 Imports
 ^^^^^^^
@@ -92,6 +101,13 @@ From the example above, the "imports" section looked like:
 
     from opentrons import labware, instruments
 
+
+Metadata
+^^^^^^^^
+
+Metadata is a dictionary of data that is read by the server and returned to client applications (such as the Opentrons Run App). It is not needed to run a protocol (and is entirely optional), but if present can help the client application display additional data about the protocol currently being executed.
+
+The fields above ("protocolName", "author", "description", and "source") are the recommended fields, but the metadata dictionary can contain fewer fields, or additional fields as desired (though non-standard fields may not be rendered by the client, depending on how it is designed).
 
 Labware
 ^^^^^^^

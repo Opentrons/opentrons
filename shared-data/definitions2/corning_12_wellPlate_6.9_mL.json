@@ -1,0 +1,173 @@
+{
+    "ordering": [
+        [
+            "A1",
+            "B1",
+            "C1"
+        ],
+        [
+            "A2",
+            "B2",
+            "C2"
+        ],
+        [
+            "A3",
+            "B3",
+            "C3"
+        ],
+        [
+            "A4",
+            "B4",
+            "C4"
+        ]
+    ],
+    "otId": "47299f60-f4dd-11e8-bb2a-e7b1dd90654d",
+    "deprecated": false,
+    "metadata": {
+        "displayName": "Corning 12 Well Plate",
+        "displayVolumeUnits": "mL",
+        "displayLengthUnits": "mm",
+        "displayCategory": "wellPlate",
+        "tags": [
+            "SBS",
+            "microplate",
+            "6.9",
+            "mL",
+            "12 wells"
+        ]
+    },
+    "cornerOffsetFromSlot": {
+        "x": 0.13,
+        "y": 0.12,
+        "z": 0
+    },
+    "dimensions": {
+        "overallLength": 127.89,
+        "overallWidth": 85.6,
+        "overallHeight": 20.02
+    },
+    "parameters": {
+        "format": "irregular",
+        "isTiprack": false,
+        "isMagneticModuleCompatible": false,
+        "loadName": "corning_12_wellPlate_6.9_mL"
+    },
+    "wells": {
+        "C1": {
+            "shape": "circular",
+            "depth": 17.53,
+            "diameter": 22.73,
+            "totalLiquidVolume": 6.9,
+            "x": 24.94,
+            "y": 16.79,
+            "z": 2.49
+        },
+        "B1": {
+            "shape": "circular",
+            "depth": 17.53,
+            "diameter": 22.73,
+            "totalLiquidVolume": 6.9,
+            "x": 24.94,
+            "y": 42.8,
+            "z": 2.49
+        },
+        "A1": {
+            "shape": "circular",
+            "depth": 17.53,
+            "diameter": 22.73,
+            "totalLiquidVolume": 6.9,
+            "x": 24.94,
+            "y": 68.81,
+            "z": 2.49
+        },
+        "C2": {
+            "shape": "circular",
+            "depth": 17.53,
+            "diameter": 22.73,
+            "totalLiquidVolume": 6.9,
+            "x": 60.95,
+            "y": 16.79,
+            "z": 2.49
+        },
+        "B2": {
+            "shape": "circular",
+            "depth": 17.53,
+            "diameter": 22.73,
+            "totalLiquidVolume": 6.9,
+            "x": 60.95,
+            "y": 42.8,
+            "z": 2.49
+        },
+        "A2": {
+            "shape": "circular",
+            "depth": 17.53,
+            "diameter": 22.73,
+            "totalLiquidVolume": 6.9,
+            "x": 60.95,
+            "y": 68.81,
+            "z": 2.49
+        },
+        "C3": {
+            "shape": "circular",
+            "depth": 17.53,
+            "diameter": 22.73,
+            "totalLiquidVolume": 6.9,
+            "x": 96.96,
+            "y": 16.79,
+            "z": 2.49
+        },
+        "B3": {
+            "shape": "circular",
+            "depth": 17.53,
+            "diameter": 22.73,
+            "totalLiquidVolume": 6.9,
+            "x": 96.96,
+            "y": 42.8,
+            "z": 2.49
+        },
+        "A3": {
+            "shape": "circular",
+            "depth": 17.53,
+            "diameter": 22.73,
+            "totalLiquidVolume": 6.9,
+            "x": 96.96,
+            "y": 68.81,
+            "z": 2.49
+        },
+        "C4": {
+            "shape": "circular",
+            "depth": 17.53,
+            "diameter": 22.73,
+            "totalLiquidVolume": 6.9,
+            "x": 132.97,
+            "y": 16.79,
+            "z": 2.49
+        },
+        "B4": {
+            "shape": "circular",
+            "depth": 17.53,
+            "diameter": 22.73,
+            "totalLiquidVolume": 6.9,
+            "x": 132.97,
+            "y": 42.8,
+            "z": 2.49
+        },
+        "A4": {
+            "shape": "circular",
+            "depth": 17.53,
+            "diameter": 22.73,
+            "totalLiquidVolume": 6.9,
+            "x": 132.97,
+            "y": 68.81,
+            "z": 2.49
+        }
+    },
+    "brand": {
+        "brand": "corning",
+        "brandId": [
+            "3336",
+            "3512",
+            "3513"
+        ]
+    }
+}

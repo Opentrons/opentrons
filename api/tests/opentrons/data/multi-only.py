@@ -1,5 +1,12 @@
 from opentrons import containers, instruments
 
+metadata = {
+    'protocolName': 'Multi-only',
+    'author': 'Opentrons <engineering@opentrons.com>',
+    'description': 'A protocol that only uses an 8-channel pipette',
+    'source': 'Opentrons Repository'
+}
+
 tiprack = containers.load('tiprack-200ul', '8')
 trough = containers.load('trough-12row', '9')
 
