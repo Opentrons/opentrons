@@ -2,6 +2,8 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
+import cx from 'classnames'
+import isEmpty from 'lodash/isEmpty'
 
 import styles from './LiquidPlacementModal.css'
 
@@ -49,7 +51,7 @@ class LiquidPlacementModal extends React.Component<Props, State> {
 
   render () {
     return (
-      <div className={styles.liquid_placement_modal}>
+      <div className={cx(styles.liquid_placement_modal, {[styles.expanded]: !isEmpty(this.props.selectedWells)})}>
         <LiquidPlacementForm />
 
         <SingleLabwareWrapper showLabels>
