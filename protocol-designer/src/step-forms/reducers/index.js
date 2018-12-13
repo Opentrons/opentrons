@@ -45,12 +45,13 @@ type UnsavedFormActions =
   | SaveStepFormAction
   | DeleteStepAction
   | SaveMoreOptionsModal
-const unsavedForm = (state: FormState = null, action: UnsavedFormActions): FormState => {
+const unsavedForm = (rootState: RootState, action: UnsavedFormActions): FormState => {
+  const unsavedFormState = rootState.unsavedForm
   switch (action.type) {
     case 'CHANGE_FORM_INPUT':
       // TODO: Ian 2018-12-13 use handleFormChange
       return {
-        ...state,
+        ...unsavedFormState,
         ...action.payload.update,
       }
     case 'POPULATE_FORM': return action.payload
@@ -60,9 +61,9 @@ const unsavedForm = (state: FormState = null, action: UnsavedFormActions): FormS
     // save the modal state into the unsavedForm --
     // it was 2 levels away from savedStepForms, now it's one level away
     case 'SAVE_MORE_OPTIONS_MODAL':
-      return {...state, ...action.payload}
+      return {...unsavedFormState, ...action.payload}
     default:
-      return state
+      return unsavedFormState
   }
 }
 
@@ -96,10 +97,10 @@ function _migratePreDeckSetupStep (fileData: ProtocolFile): FormData {
 
 // TODO Ian 2018-12-13 replace the other savedStepForms with this new one
 const savedStepForms = (
-  state: AllStepsState,
+  rootState: RootState,
   action: SaveStepFormAction | DeleteStepAction | LoadFileAction | CreateContainerAction | DeleteContainerAction
 ) => {
-  const {savedStepForms} = state
+  const {savedStepForms} = rootState
   switch (action.type) {
     case 'SAVE_STEP_FORM':
       return {
@@ -131,7 +132,7 @@ const savedStepForms = (
       const prevInitialDeckSetupStep = savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
       const {id, slot} = action.payload
       return {
-        ...state,
+        ...savedStepForms,
         [INITIAL_DECK_SETUP_STEP_ID]: {
           ...prevInitialDeckSetupStep,
           labwareLocationUpdate: {
@@ -265,7 +266,7 @@ const pipetteInvariantProperties = handleActions({
   },
 }, {})
 
-type AllStepsState = {
+export type RootState = {
   labwareInvariantProperties: LabwareState,
   pipetteInvariantProperties: PipetteState,
   savedStepForms: SavedStepFormState,
@@ -274,24 +275,20 @@ type AllStepsState = {
 
 // TODO Ian 2018-12-13: find some existing util to do this nested version of combineReducers
 // which avoids: 1) duplicating specifying initial state and 2) returning a new object when there's no change
-const initialAllStepsState: AllStepsState = {
+const initialRootState: RootState = {
   labwareInvariantProperties: initialLabwareState,
   pipetteInvariantProperties: {},
   savedStepForms: initialSavedStepFormsState,
   unsavedForm: null,
 }
-// TODO Ian 2018-12-13 remove this 'any' type
-const allSteps = (state: AllStepsState = initialAllStepsState, action: any) => {
+// TODO: Ian 2018-12-13 remove this 'any' type
+const rootReducer = (state: RootState = initialRootState, action: any) => {
   return {
     labwareInvariantProperties: labwareInvariantProperties(state.labwareInvariantProperties, action),
     pipetteInvariantProperties: pipetteInvariantProperties(state.pipetteInvariantProperties, action),
     savedStepForms: savedStepForms(state, action),
-    unsavedFrom: unsavedForm(state.unsavedForm, action),
+    unsavedForm: unsavedForm(state, action),
   }
 }
-
-export type RootState = AllStepsState
-
-const rootReducer = allSteps
 
 export default rootReducer
