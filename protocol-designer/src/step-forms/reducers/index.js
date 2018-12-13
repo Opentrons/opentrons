@@ -2,6 +2,7 @@
 import {handleActions} from 'redux-actions'
 import type {ActionType} from 'redux-actions'
 import mapValues from 'lodash/mapValues'
+import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 
@@ -172,10 +173,25 @@ const savedStepForms = (
       })
     case 'CHANGE_SAVED_STEP_FORM':
       // TODO Ian 2018-12-13 do handleFormChange here with full state
+      const {stepId} = action.payload
+      const previousForm = savedStepForms[stepId]
+      if (previousForm.stepType === 'manualIntervention') {
+        // since manualIntervention steps are nested, use a recursive merge
+        return {
+          ...savedStepForms,
+          [stepId]: merge(
+            {},
+            previousForm,
+            action.payload.update,
+          ),
+        }
+      }
+      // other step form types are not designed to be deeply merged
+      // (eg `wells` arrays should be reset, not appended to)
       return {
         ...savedStepForms,
-        [action.payload.stepId]: {
-          ...(action.payload.stepId != null ? savedStepForms[action.payload.stepId] : {}),
+        [stepId]: {
+          ...previousForm,
           ...action.payload.update,
         },
       }

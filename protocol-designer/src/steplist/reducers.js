@@ -7,13 +7,13 @@ import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 
 import {getPDMetadata} from '../file-types'
+import {getDefaultsForStepType} from './formLevel'
+import {INITIAL_DECK_SETUP_STEP_ID} from '../constants'
 
 import type {StepItemData} from './types'
-import {INITIAL_DECK_SETUP_STEP_ID} from '../constants'
 import type {LoadFileAction} from '../load-file'
 import type {DeleteContainerAction} from '../labware-ingred/actions'
 import type {FormData, StepIdType} from '../form-types'
-import {getDefaultsForStepType} from './formLevel'
 
 import type {
   AddStepAction,
