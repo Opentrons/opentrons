@@ -69,12 +69,24 @@ class DragSourceLabware extends React.Component<DragDropLabwareProps> {
     if (this.props.draggedItem) {
       if (prevProps.isOver && !this.props.isOver) {
         const {slot} = this.props.draggedItem
-        this.props.moveLabware(this.props.slot, slot)
+        // this.props.moveLabware(this.props.slot, slot)
       }
       if (!prevProps.isOver && this.props.isOver) {
         const {slot} = this.props.draggedItem
-        this.props.moveLabware(slot, this.props.slot)
+        // this.props.moveLabware(slot, this.props.slot)
       }
+    }
+  }
+
+  renderOverlay = () => {
+    if (this.props.draggedItem) {
+      if (this.props.draggedItem.slot === this.props.slot) {
+        return <DisabledSelectSlotOverlay /> // this labware is being dragged, disable it
+      } else if (this.props.isOver) {
+        return <EmptyDestinationSlotOverlay />
+      }
+    } else {
+      return this.props.overlay
     }
   }
   render () {
@@ -84,7 +96,7 @@ class DragSourceLabware extends React.Component<DragDropLabwareProps> {
           <g>
             <LabwareContainer slot={this.props.slot} highlighted={this.props.highlighted}>
               {this.props.labwareOrSlot}
-              {this.props.overlay}
+              {this.renderOverlay()}
             </LabwareContainer>
           </g>
         )
@@ -295,26 +307,22 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
     // determine what overlay to show
     let overlay = null
     if (selectedTerminalItem === START_TERMINAL_ITEM_ID && !addLabwareMode) {
-      if (moveLabwareMode) {
-        overlay = (slotToMoveFrom === slot)
-          ? <DisabledSelectSlotOverlay
-            onClickOutside={cancelMove}
-            cancelMove={cancelMove} />
-          : <EmptyDestinationSlotOverlay {...{moveLabwareDestination}}/>
-      } else if (showNameOverlay) {
-        overlay = <NameThisLabwareOverlay {...{
-          setLabwareName,
-          editLiquids,
-        }}
-        onClickOutside={setDefaultLabwareName} />
+      // if (moveLabwareMode) {
+      //   overlay = (slotToMoveFrom === slot)
+      //     ? <DisabledSelectSlotOverlay
+      //       onClickOutside={cancelMove}
+      //       cancelMove={cancelMove} />
+      //     : <EmptyDestinationSlotOverlay {...{moveLabwareDestination}}/>
+      // }
+      if (showNameOverlay) {
+        overlay = (
+          <NameThisLabwareOverlay
+            {...{setLabwareName, editLiquids}}
+            onClickOutside={setDefaultLabwareName} />
+        )
       } else {
         overlay = (slotHasLabware)
-          ? <LabwareDeckSlotOverlay {...{
-            canAddIngreds,
-            deleteLabware,
-            editLiquids,
-            moveLabwareSource,
-          }} />
+          ? <LabwareDeckSlotOverlay {...{canAddIngreds, deleteLabware, editLiquids}} />
           : <EmptyDeckSlotOverlay {...{addLabware}} />
       }
     } else if (selectedTerminalItem === END_TERMINAL_ITEM_ID && slotHasLabware && !isTiprack) {
