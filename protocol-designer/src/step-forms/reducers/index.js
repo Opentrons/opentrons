@@ -4,22 +4,23 @@ import type {ActionType} from 'redux-actions'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
-import {uuid} from '../../utils'
+
+import {pipetteModelToName} from '../utils'
 import {
   INITIAL_DECK_SETUP_STEP_ID,
   FIXED_TRASH_ID,
 } from '../../constants.js'
-
 import {getPDMetadata} from '../../file-types'
 import {getDefaultsForStepType} from '../../steplist/formLevel'
 
-import type {LoadFileAction} from '../../load-file'
+import type {CreateNewProtocolAction, LoadFileAction} from '../../load-file'
 import type {
   CreateContainerAction,
   DeleteContainerAction,
 } from '../../labware-ingred/actions'
 import type {FormData, StepIdType} from '../../form-types'
 import type {FileLabware, FilePipette} from '../../file-types'
+import type {UpdatePipettesAction} from '../../pipettes'
 
 import type {
   ChangeFormInputAction,
@@ -125,7 +126,7 @@ const savedStepForms = (
         }
       })
     case 'CHANGE_SAVED_STEP_FORM':
-      // TODO IMMEDIATELY do handleFormChange here with full state
+      // TODO Ian 2018-12-13 do handleFormChange here with full state
       return {
         ...savedStepForms,
         [action.payload.stepId]: {
@@ -150,16 +151,11 @@ type LabwareState = {[labwareId: string]: {|
   type: string,
 |}}
 
-type PipetteState = {[pipetteId: string]: {|
-  name: string,
-|}}
-
 const initialLabwareState: LabwareState = {
   [FIXED_TRASH_ID]: {type: 'fixed-trash'},
 }
 
-// EXPERIMENT NOTE: copied from `containers` reducer. Slot + UI stuff stripped out.
-// TODO IMMEDIATELY add * types back in
+// MIGRATION NOTE: copied from `containers` reducer. Slot + UI stuff stripped out.
 const labwareInvariantProperties = handleActions({
   CREATE_CONTAINER: (state: LabwareState, action: CreateContainerAction) => {
     return {
@@ -172,55 +168,38 @@ const labwareInvariantProperties = handleActions({
     console.log({res})
     return res
   },
-  // EXPERIMENT NOTE: 'RENAME_LABWARE' doesn't matter, no name in this reducer
-  // EXPERIMENT NOTE: 'MOVE_LABWARE' doesn't matter, b/c steps don't care about slots
   LOAD_FILE: (state: LabwareState, action: LoadFileAction): LabwareState => {
     const file = action.payload
-    // EXPERIMENT NOTE: no migration required!
     // TODO Ian 2018-12-13: this is just reconciling a 'type' vs
-    // 'model' word mismatch, they mean the same thing just inconsistent
+    // 'model' word mismatch, they mean the same thing just are inconsistent :(
     return mapValues(file.labware, (fileLabware: FileLabware, id: string) => ({
       type: fileLabware.model,
     }))
   },
-  CREATE_NEW_PROTOCOL: (
-    state: LabwareState,
-    action: {payload: *}
-  ): LabwareState => {
-    // EXPERIMENT TODO: to keep partitioned labware in sync, the uuid of the tiprackmodel
-    // needs to be included in the action payload. This shouldn't require a thunk?
-    const nextState = [action.payload.left, action.payload.right].reduce((acc: LabwareState, mount): LabwareState => {
-      if (mount.tiprackModel) {
-        const id = `${uuid()}:${String(mount.tiprackModel)}`
-        return {
-          ...acc,
-          [id]: {
-            // slot: nextEmptySlot(_loadedContainersBySlot(acc)),
-            type: mount.tiprackModel,
-            // disambiguationNumber: getNextDisambiguationNumber(acc, String(mount.tiprackModel)),
-            id,
-            // name: null,
-          },
-        }
+  CREATE_NEW_PROTOCOL: (state: LabwareState, action: CreateNewProtocolAction): LabwareState => {
+    const nextState = action.payload.tipracks.reduce((acc: LabwareState, tiprack): LabwareState => {
+      const {id, model} = tiprack
+      return {
+        ...acc,
+        [id]: {type: model},
       }
-      return acc
     }, state)
     return nextState
   },
 }, initialLabwareState)
 
-// TODO IMMEDIATELY add 'any' types back in
+type PipetteState = {[pipetteId: string]: {|
+  name: string,
+|}}
+
 const pipetteInvariantProperties = handleActions({
   LOAD_FILE: (state: PipetteState, action: LoadFileAction): PipetteState => {
     return mapValues(action.payload.pipettes, (filePipette: FilePipette): $Values<PipetteState> => ({
-      name: filePipette.name || filePipette.model, // drop other fields.
-      // EXPERIMENT HACK: in real life the model fallback needs to drop
-      // the version suffix to convert back to a name;
-      // this is an old backwards-compat thing anyway
+      name: filePipette.name || pipetteModelToName(filePipette.model),
     }))
   },
-  UPDATE_PIPETTES: (state: PipetteState, action: any): PipetteState => {
-    // EXPERIMENT HACK: messy code for annoying by-mount action shape
+  UPDATE_PIPETTES: (state: PipetteState, action: UpdatePipettesAction): PipetteState => {
+    // TODO Ian 2018-12-13: messy code for annoying by-mount action shape
     // in the future, pipette ids could be created in these actions
     const left = action.payload.left
     const right = action.payload.right
@@ -229,16 +208,17 @@ const pipetteInvariantProperties = handleActions({
       ...(right && right.model ? {right: {name: right.model}} : {}),
     }
   },
-  CREATE_NEW_PROTOCOL: (state: PipetteState, action: any): PipetteState => {
-    // EXPERIMENT HACK: messy code for annoying by-mount action shape - same as UPDATE_PIPETTES
+  CREATE_NEW_PROTOCOL: (state: PipetteState, action: CreateNewProtocolAction): PipetteState => {
+    // TODO Ian 2018-12-13: messy code for annoying by-mount action shape
+    // in the future, pipette ids could be created in these actions
+    // (slightly different than for UPDATE_PIPETTES above)
     const left = action.payload.left
     const right = action.payload.right
     return {
-      ...(left && left.model ? {left: {name: left.model}} : {}),
-      ...(right && right.model ? {right: {name: right.model}} : {}),
+      ...(left && left.pipetteModel ? {left: {name: left.pipetteModel}} : {}),
+      ...(right && right.pipetteModel ? {right: {name: right.pipetteModel}} : {}),
     }
   },
-  // EXPERIMENT NOTE: we don't care about mount, so 'SWAP_PIPETTES' doesn't matter in this reducer
 }, {})
 
 type AllStepsState = {
@@ -248,14 +228,15 @@ type AllStepsState = {
   unsavedForm: FormState,
 }
 
-// EXPERIMENT TODO: find some existing util to do this nested version of combineReducers
-// which handles: 1) avoid duplicating initial state and 2) avoid creating new objects when there's no changes
+// TODO Ian 2018-12-13: find some existing util to do this nested version of combineReducers
+// which avoids: 1) duplicating specifying initial state and 2) returning a new object when there's no change
 const initialAllStepsState: AllStepsState = {
-  labwareInvariantProperties: initialLabwareState, // labware ID to type
-  pipetteInvariantProperties: {}, // pipette ID to specName (wrongly called 'model' as carry-over from existing pipettes reducer -- TODO rename (and in all selectors))
+  labwareInvariantProperties: initialLabwareState,
+  pipetteInvariantProperties: {},
   savedStepForms: initialSavedStepFormsState,
   unsavedForm: null,
 }
+// TODO Ian 2018-12-13 remove this 'any' type
 const allSteps = (state: AllStepsState = initialAllStepsState, action: any) => {
   return {
     labwareInvariantProperties: labwareInvariantProperties(state.labwareInvariantProperties, action),
