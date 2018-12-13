@@ -4,16 +4,16 @@ import {handleActions} from 'redux-actions'
 import type {ActionType, Reducer} from 'redux-actions'
 import omit from 'lodash/omit'
 
-import {getPDMetadata} from '../file-types'
+import {getPDMetadata} from '../../file-types'
 
-import {START_TERMINAL_ITEM_ID} from './types'
+import {START_TERMINAL_ITEM_ID} from '../../steplist'
+import type {LoadFileAction} from '../../load-file'
+import type {StepIdType, FormModalFields} from '../../form-types'
 import type {
   FormSectionState,
   SubstepIdentifier,
   TerminalItemId,
 } from './types'
-import type {LoadFileAction} from '../load-file'
-import type {StepIdType, FormModalFields} from '../form-types'
 
 import type {
   SelectStepAction,
@@ -21,19 +21,12 @@ import type {
   CollapseFormSectionAction,
   ChangeMoreOptionsModalInputAction,
   OpenMoreOptionsModal,
-} from './actions'
-
-import {
-  cancelStepForm, // TODO try collapsing them all into a single Action type
-  saveStepForm,
   hoverOnSubstep,
   expandAddStepButton,
   hoverOnStep,
   hoverOnTerminalItem,
   toggleStepCollapsed,
-  type ChangeSavedStepFormAction,
 } from './actions'
-import {getChangeLabwareEffects} from './actions/handleFormChange'
 
 // Handles aspirate / dispense form sections opening / closing
 export const initialFormSectionState: FormSectionState = {aspirate: true, dispense: true}
