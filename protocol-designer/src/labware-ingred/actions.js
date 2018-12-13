@@ -3,7 +3,7 @@ import {createAction} from 'redux-actions'
 import type {Dispatch} from 'redux'
 
 import {selectors} from './reducers'
-
+import {uuid} from '../utils'
 import type {GetState} from '../types'
 import type {IngredInputs} from './types'
 import type {DeckSlot} from '@opentrons/components'
@@ -53,12 +53,24 @@ export const drillUpFromLabware = createAction(
 
 // ==== Create/delete/modify labware =====
 
+type CreateContainerArgs = {
+  slot: DeckSlot,
+  containerType: string,
+}
+
+export type CreateContainerAction = {
+  type: 'CREATE_CONTAINER',
+  payload: {
+    id: string,
+  } & CreateContainerArgs,
+}
+
 export const createContainer = createAction(
   'CREATE_CONTAINER',
-  (args: {|
-    slot: DeckSlot,
-    containerType: string,
-  |}) => args
+  (args: CreateContainerArgs) => ({
+    id: `${uuid()}:${args.containerType}`,
+    ...args,
+  })
 )
 
 export type DeleteContainerAction = {

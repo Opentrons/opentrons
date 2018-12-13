@@ -37,6 +37,7 @@ export type StepFieldName =
   | 'dispense_wellOrder_second'
   | 'dispense_wells'
   | 'labware'
+  | 'labwareLocationUpdate'
   | 'pauseForAmountOfTime'
   | 'pauseHour'
   | 'pauseMessage'
@@ -59,6 +60,7 @@ export const stepIconsByType: {[string]: IconName} = {
   'consolidate': 'ot-consolidate',
   'mix': 'ot-mix',
   'pause': 'pause',
+  'manualIntervention': 'pause', // TODO Ian 2018-12-13 pause icon for this is a placeholder
 }
 
 export type StepType = $Keys<typeof stepIconsByType>
