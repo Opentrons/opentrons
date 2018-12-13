@@ -46,6 +46,10 @@ export type Config = {
     seenOptIn: boolean,
   },
 
+  p10WarningSeen: {
+    [id: string]: ?boolean,
+  },
+
   support: {
     userId: string,
     createdAt: number,

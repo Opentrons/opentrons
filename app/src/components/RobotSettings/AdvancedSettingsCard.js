@@ -3,16 +3,20 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Link} from 'react-router-dom'
+import get from 'lodash/get'
+import reduce from 'lodash/reduce'
 
 import {
   fetchSettings,
   setSettings,
   makeGetRobotSettings,
 } from '../../http-api-client'
+import {getConfig, updateConfig} from '../../config'
 import {CONNECTABLE} from '../../discovery'
 import {downloadLogs} from '../../shell'
 import {RefreshCard} from '@opentrons/components'
 import {LabeledButton, LabeledToggle} from '../controls'
+import OptInPipetteModal from './OptInPipetteModal'
 
 import type {State, Dispatch} from '../../types'
 import type {ViewableRobot} from '../../discovery'
@@ -23,12 +27,16 @@ type OP = {
   resetUrl: string,
 }
 
-type SP = {|settings: Array<Setting>|}
+type SP = {|
+  settings: Array<Setting>,
+  showP10Warning: boolean,
+|}
 
 type DP = {|
   fetch: () => mixed,
   set: (id: string, value: boolean) => mixed,
   download: () => mixed,
+  setP10WarningSeen: () => mixed,
 |}
 
 type Props = {...$Exact<OP>, ...SP, ...DP}
@@ -42,6 +50,7 @@ type BooleanSettingProps = {
 }
 
 const TITLE = 'Advanced Settings'
+const P10_OPT_IN_SETTING_ID = 'useNewP10Aspiration'
 
 export default connect(
   makeMapStateToProps,
@@ -65,11 +74,19 @@ class BooleanSettingToggle extends React.Component<BooleanSettingProps> {
 }
 
 function AdvancedSettingsCard (props: Props) {
-  const {settings, set, fetch, download, resetUrl} = props
+  const {
+    settings,
+    set,
+    fetch,
+    download,
+    resetUrl,
+    showP10Warning,
+    setP10WarningSeen,
+  } = props
   const {name, health, status} = props.robot
   const disabled = status !== CONNECTABLE
   const logsAvailable = health && health.logs
-
+  const setP10Setting = () => set(P10_OPT_IN_SETTING_ID, true)
   return (
     <RefreshCard
       watch={name}
@@ -99,31 +116,64 @@ function AdvancedSettingsCard (props: Props) {
       >
         <p>Restore robot to factory configuration</p>
       </LabeledButton>
-      {settings.map(s => <BooleanSettingToggle {...s} key={s.id} set={set} />)}
+      {showP10Warning && (
+        <OptInPipetteModal
+          setP10Setting={setP10Setting}
+          setP10WarningSeen={setP10WarningSeen}
+        />
+      )}
+      {settings.map(s => (
+        <BooleanSettingToggle {...s} key={s.id} set={set} />
+      ))}
     </RefreshCard>
   )
 }
+
+const seenP10WarningConfigPath = (name: string) => `p10WarningSeen.${name}`
 
 function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   const getRobotSettings = makeGetRobotSettings()
 
   return (state, ownProps) => {
-    const settingsRequest = getRobotSettings(state, ownProps.robot)
+    const {robot} = ownProps
+    const config = getConfig(state)
+    const settingsRequest = getRobotSettings(state, robot)
     const settings =
       settingsRequest &&
       settingsRequest.response &&
       settingsRequest.response.settings
 
-    return {settings: settings || []}
+    const p10OptedIn = reduce(
+      settings,
+      (result, setting) => {
+        if (setting.id === P10_OPT_IN_SETTING_ID) return setting.value
+        return result
+      },
+      null
+    )
+
+    const seenP10Warning = get(config, seenP10WarningConfigPath(robot.name))
+
+    return {
+      settings: settings || [],
+      showP10Warning: !seenP10Warning && p10OptedIn === false,
+    }
   }
 }
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   const {robot} = ownProps
-
+  const setP10WarningSeen = () =>
+    dispatch(updateConfig(seenP10WarningConfigPath(robot.name), true))
   return {
     fetch: () => dispatch(fetchSettings(robot)),
-    set: (id, value) => dispatch(setSettings(robot, {id, value})),
+    set: (id, value) => {
+      if (id === P10_OPT_IN_SETTING_ID) {
+        setP10WarningSeen()
+      }
+      dispatch(setSettings(robot, {id, value}))
+    },
     download: () => dispatch(downloadLogs(robot)),
+    setP10WarningSeen,
   }
 }
