@@ -12,6 +12,8 @@ import {
 } from '../../constants.js'
 import {getPDMetadata} from '../../file-types'
 import {getDefaultsForStepType} from '../../steplist/formLevel'
+import {cancelStepForm} from '../../steplist/actions'
+import {getChangeLabwareEffects} from '../../steplist/actions/handleFormChange'
 
 import type {CreateNewProtocolAction, LoadFileAction} from '../../load-file'
 import type {
@@ -19,7 +21,7 @@ import type {
   DeleteContainerAction,
 } from '../../labware-ingred/actions'
 import type {FormData, StepIdType} from '../../form-types'
-import type {FileLabware, FilePipette} from '../../file-types'
+import type {FileLabware, FilePipette, ProtocolFile} from '../../file-types'
 import type {UpdatePipettesAction} from '../../pipettes'
 
 import type {
@@ -31,9 +33,6 @@ import type {
 import type {
   SaveMoreOptionsModal,
 } from '../../ui/steps/actions'
-
-import {cancelStepForm} from '../../steplist/actions'
-import {getChangeLabwareEffects} from '../../steplist/actions/handleFormChange'
 
 type FormState = FormData | null
 
@@ -71,14 +70,27 @@ type SavedStepFormState = {
   [StepIdType]: FormData,
 }
 
-const initialSavedStepFormsState: SavedStepFormState = {
-  [INITIAL_DECK_SETUP_STEP_ID]: {
-    stepType: 'manualIntervention',
-    id: INITIAL_DECK_SETUP_STEP_ID,
-    labwareLocationUpdate: {
-      [FIXED_TRASH_ID]: '12',
-    },
+const initialDeckSetupStepForm: FormData = {
+  stepType: 'manualIntervention',
+  id: INITIAL_DECK_SETUP_STEP_ID,
+  labwareLocationUpdate: {
+    [FIXED_TRASH_ID]: '12',
   },
+}
+
+const initialSavedStepFormsState: SavedStepFormState = {
+  [INITIAL_DECK_SETUP_STEP_ID]: initialDeckSetupStepForm,
+}
+
+function _migratePreDeckSetupStep (fileData: ProtocolFile): FormData {
+  const additionalLabware = mapValues(fileData.labware, (labware: FileLabware) => labware.slot)
+  return {
+    ...initialDeckSetupStepForm,
+    labwareLocationUpdate: {
+      ...initialDeckSetupStepForm.labwareLocationUpdate,
+      ...additionalLabware,
+    },
+  }
 }
 
 // TODO Ian 2018-12-13 replace the other savedStepForms with this new one
@@ -96,12 +108,17 @@ const savedStepForms = (
     case 'DELETE_STEP':
       return omit(savedStepForms, action.payload.toString())
     case 'LOAD_FILE':
-      // backwards compatibility: adds in INITIAL_DECK_SETUP_STEP_ID with fixed-trash
-      // if protocol didn't have it
-      const loadedStepForms = {
-        ...initialSavedStepFormsState,
-        ...getPDMetadata(action.payload).savedStepForms,
-      }
+      // backwards compatibility: adds in INITIAL_DECK_SETUP_STEP_ID with
+      // all labware (from PD metadata) if there was no such step form
+      const fileData = action.payload
+      const stepFormsFromFile = getPDMetadata(action.payload).savedStepForms
+
+      const loadedStepForms = (stepFormsFromFile[INITIAL_DECK_SETUP_STEP_ID])
+        ? stepFormsFromFile
+        : {
+          [INITIAL_DECK_SETUP_STEP_ID]: _migratePreDeckSetupStep(fileData),
+          ...stepFormsFromFile,
+        }
       return mapValues(loadedStepForms, stepForm => ({
         ...getDefaultsForStepType(stepForm.stepType),
         ...stepForm,
