@@ -3,7 +3,8 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {Link} from 'react-router-dom'
-import {reduce, get} from 'lodash'
+import get from 'lodash/get'
+import reduce from 'lodash/reduce'
 
 import {
   fetchSettings,
@@ -121,7 +122,9 @@ function AdvancedSettingsCard (props: Props) {
           setP10WarningSeen={setP10WarningSeen}
         />
       )}
-      {settings.map(s => <BooleanSettingToggle {...s} key={s.id} set={set} />)}
+      {settings.map(s => (
+        <BooleanSettingToggle {...s} key={s.id} set={set} />
+      ))}
     </RefreshCard>
   )
 }
