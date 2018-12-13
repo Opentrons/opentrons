@@ -133,8 +133,8 @@ class Deck(UserDict):
         key_int = self._check_name(key)
         labware = self.data.get(key_int)
         if labware is not None:
-            if key_int == 12 and labware.parameters.get('quirks'):
-                if labware.parameters.get('quirks')[0] == 'fixedTrash':
+            if key_int == 12:
+                if 'fixedTrash' in labware.parameters.get('quirks', []):
                     pass
                 else:
                     raise ValueError('Deck location {} is for fixed trash only'
