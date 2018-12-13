@@ -61,8 +61,9 @@ type CreateContainerArgs = {
 export type CreateContainerAction = {
   type: 'CREATE_CONTAINER',
   payload: {
+    ...$Exact<CreateContainerArgs>,
     id: string,
-  } & CreateContainerArgs,
+  },
 }
 
 export const createContainer = createAction(

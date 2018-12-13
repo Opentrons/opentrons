@@ -37,7 +37,6 @@ export type StepFieldName =
   | 'dispense_wellOrder_second'
   | 'dispense_wells'
   | 'labware'
-  | 'labwareLocationUpdate'
   | 'pauseForAmountOfTime'
   | 'pauseHour'
   | 'pauseMessage'
