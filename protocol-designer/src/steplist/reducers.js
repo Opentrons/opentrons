@@ -64,6 +64,7 @@ const unsavedForm: Reducer<FormState, *> = handleActions({
   },
   POPULATE_FORM: (state, action: PopulateFormAction) => action.payload,
   CANCEL_STEP_FORM: (state, action: ActionType<typeof cancelStepForm>) => null,
+  SELECT_TERMINAL_ITEM: (state, action: ActionType<typeof cancelStepForm>) => null,
   SAVE_STEP_FORM: (state, action: ActionType<typeof saveStepForm>) => null,
   DELETE_STEP: () => null,
   // save the modal state into the unsavedForm --
