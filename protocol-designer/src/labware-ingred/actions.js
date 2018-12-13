@@ -130,7 +130,6 @@ export const moveLabware = (toSlot: DeckSlot) => (dispatch: Dispatch<*>, getStat
 
   if (fromSlot) {
     if (fromLabwareId) {
-      // WARNING: Ian 2018-12-13 during REFACTOR, this affects the legact `steplist.savedForms` reducer. but I don't see any problems since it's not in orderedSteps?
       const updateInitialDeckSetupStep: ChangeSavedStepFormAction = {
         type: 'CHANGE_SAVED_STEP_FORM',
         payload: {

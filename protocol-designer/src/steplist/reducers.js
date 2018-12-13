@@ -9,6 +9,7 @@ import reduce from 'lodash/reduce'
 import {getPDMetadata} from '../file-types'
 
 import {START_TERMINAL_ITEM_ID} from './types'
+import {INITIAL_DECK_SETUP_STEP_ID} from '../constants'
 import type {
   StepItemData,
   FormSectionState,
@@ -175,13 +176,20 @@ const savedStepForms: Reducer<SavedStepFormState, *> = handleActions({
       }
     })
   ),
-  CHANGE_SAVED_STEP_FORM: (state: SavedStepFormState, action: ChangeSavedStepFormAction): SavedStepFormState => ({
-    ...state,
-    [action.payload.stepId]: {
-      ...(action.payload.stepId != null ? state[action.payload.stepId] : {}),
-      ...action.payload.update,
-    },
-  }),
+  CHANGE_SAVED_STEP_FORM: (state: SavedStepFormState, action: ChangeSavedStepFormAction): SavedStepFormState => {
+    if (action.payload.stepId === INITIAL_DECK_SETUP_STEP_ID) {
+      // these are newfangled actions from the step-forms refactor
+      // which are not supposed to affect this old reducer, ignore them.
+      return state
+    }
+    return {
+      ...state,
+      [action.payload.stepId]: {
+        ...(action.payload.stepId != null ? state[action.payload.stepId] : {}),
+        ...action.payload.update,
+      },
+    }
+  },
   DUPLICATE_STEP: (state: SavedStepFormState, action: DuplicateStepAction): SavedStepFormState => ({
     ...state,
     [action.payload.duplicateStepId]: {
