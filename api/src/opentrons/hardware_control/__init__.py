@@ -245,6 +245,7 @@ class API(HardwareAPILike):
             instr_dict = instr.as_dict()
             for key in configs:
                 instruments[mount][key] = instr_dict[key]
+            instruments[mount]['has_tip'] = instr.has_tip
         return instruments
 
     @property
