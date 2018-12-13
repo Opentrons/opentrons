@@ -1,6 +1,6 @@
 // @flow
 import {getPipetteNameSpecs, getLabware} from '@opentrons/shared-data'
-
+import {pipetteModelToName} from '../step-forms'
 import type {Mount} from '@opentrons/components'
 import type {PipetteData} from '../step-generation'
 
@@ -10,9 +10,7 @@ export function createPipette (
   tiprackModel: ?string,
   overrideId?: string
 ): ?PipetteData {
-  // for backwards compatibility, strip version suffix (_v1, _v1.3 etc)
-  // from model string, if it exists
-  const model = _model.replace(/_v\d(\.|\d+)*$/, '')
+  const model = pipetteModelToName(_model)
   // TODO: Ian 2018-11-01 once the schema is updated to always exclude versions
   // (breaking change to schema), this version removal would be handled in schema migration.
 

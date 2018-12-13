@@ -3,6 +3,7 @@
 import rootReducer from './reducers'
 import type {RootState} from './reducers'
 import * as selectors from './selectors'
+export * from './utils'
 
 export type {
   RootState,
