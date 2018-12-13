@@ -37,7 +37,6 @@ export type StepFieldName =
   | 'dispense_wellOrder_second'
   | 'dispense_wells'
   | 'labware'
-  | 'labwareLocationUpdate'
   | 'pauseForAmountOfTime'
   | 'pauseHour'
   | 'pauseMessage'
@@ -52,6 +51,9 @@ export type StepFieldName =
   | 'touchTip'
   | 'volume'
   | 'wells'
+  // deck setup form fields
+  | 'labwareLocationUpdate'
+  | 'pipetteLocationUpdate'
 
 // TODO Ian 2018-01-16 factor out to some constants.js ?
 export const stepIconsByType: {[string]: IconName} = {

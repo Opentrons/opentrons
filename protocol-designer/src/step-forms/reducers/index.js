@@ -74,6 +74,7 @@ const initialDeckSetupStepForm: FormData = {
   labwareLocationUpdate: {
     [FIXED_TRASH_ID]: '12',
   },
+  pipetteLocationUpdate: {}, // TODO SOON Ian 2018-12-13 sync pipette location with LOAD_FILE, SWAP_PIPETTE, UPDATE_PIPETTES, and CREATE_NEW_PROTOCOL.
 }
 
 const initialSavedStepFormsState: SavedStepFormState = {
@@ -94,7 +95,7 @@ function _migratePreDeckSetupStep (fileData: ProtocolFile): FormData {
 // TODO Ian 2018-12-13 replace the other savedStepForms with this new one
 const savedStepForms = (
   state: AllStepsState,
-  action: SaveStepFormAction | DeleteStepAction | LoadFileAction | DeleteContainerAction
+  action: SaveStepFormAction | DeleteStepAction | LoadFileAction | CreateContainerAction | DeleteContainerAction
 ) => {
   const {savedStepForms} = state
   switch (action.type) {
@@ -121,8 +122,34 @@ const savedStepForms = (
         ...getDefaultsForStepType(stepForm.stepType),
         ...stepForm,
       }))
+    // TODO: Ian 2018-12-13 make the createLabware thunk separate into 2 actions:
+    // create labware, then edit initial deck setup step form. This reducer will not have to handle CREATE_CONTAINER
+    case 'CREATE_CONTAINER':
+    // auto-update initial deck setup state.
+      const prevInitialDeckSetupStep = savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+      const {id, slot} = action.payload
+      return {
+        ...state,
+        [INITIAL_DECK_SETUP_STEP_ID]: {
+          ...prevInitialDeckSetupStep,
+          labwareLocationUpdate: {
+            ...prevInitialDeckSetupStep.labwareLocationUpdate,
+            [id]: slot,
+          },
+        },
+      }
     case 'DELETE_CONTAINER':
       return mapValues(savedStepForms, savedForm => {
+        if (
+          action.type === 'DELETE_CONTAINER' && // TODO Ian 2018-12-13 flow is not doing a good job understanding this switch-case
+          savedForm.stepType === 'manualIntervention'
+        ) {
+          // remove instances of labware from all manualIntervention steps
+          return {
+            ...savedForm,
+            labwareLocationUpdate: omit(savedForm.labwareLocationUpdate, action.payload.containerId),
+          }
+        }
         const deleteLabwareUpdate = reduce(savedForm, (acc, value, fieldName) => {
           if (value === action.payload.containerId) {
             const formLabwareFieldUpdate = {[fieldName]: null}
