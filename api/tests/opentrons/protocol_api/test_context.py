@@ -117,7 +117,7 @@ def test_pick_up_and_drop_tip(loop, load_my_labware):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
     tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 1)
-    tip_lenth = tiprack.tip_length
+    tip_length = tiprack.tip_length
     mount = Mount.LEFT
 
     instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
@@ -129,7 +129,8 @@ def test_pick_up_and_drop_tip(loop, load_my_labware):
 
     instr.pick_up_tip(target_location)
 
-    new_offset = model_offset - Point(0, 0, tip_lenth)
+    new_offset = model_offset - Point(0, 0,
+                                      tip_length - pipette.config.tip_overlap)
     assert pipette.critical_point() == new_offset
 
     instr.drop_tip(target_location)
@@ -166,10 +167,10 @@ def test_pick_up_tip_no_location(loop, load_my_labware):
     ctx.home()
 
     tiprack1 = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 1)
-    tip_lenth1 = tiprack1.tip_length
+    tip_length1 = tiprack1.tip_length
 
     tiprack2 = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 2)
-    tip_length2 = tip_lenth1 + 1.0
+    tip_length2 = tip_length1 + 1.0
     tiprack2.tip_length = tip_length2
 
     mount = Mount.LEFT
@@ -186,7 +187,8 @@ def test_pick_up_tip_no_location(loop, load_my_labware):
     assert 'picking up tip' in ','.join([cmd.lower()
                                          for cmd in ctx.commands()])
 
-    new_offset = model_offset - Point(0, 0, tip_lenth1)
+    new_offset = model_offset - Point(0, 0,
+                                      tip_length1 - pipette.config.tip_overlap)
     assert pipette.critical_point() == new_offset
 
     # TODO: remove argument and verify once trash container is added
