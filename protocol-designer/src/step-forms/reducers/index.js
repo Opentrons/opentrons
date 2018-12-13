@@ -2,28 +2,24 @@
 import {handleActions} from 'redux-actions'
 import type {ActionType} from 'redux-actions'
 import mapValues from 'lodash/mapValues'
-import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
-
-import {pipetteModelToName} from '../utils'
+import {uuid} from '../../utils'
 import {
   INITIAL_DECK_SETUP_STEP_ID,
   FIXED_TRASH_ID,
 } from '../../constants.js'
+
 import {getPDMetadata} from '../../file-types'
 import {getDefaultsForStepType} from '../../steplist/formLevel'
-import {cancelStepForm} from '../../steplist/actions'
-import {getChangeLabwareEffects} from '../../steplist/actions/handleFormChange'
 
-import type {CreateNewProtocolAction, LoadFileAction} from '../../load-file'
+import type {LoadFileAction} from '../../load-file'
 import type {
   CreateContainerAction,
   DeleteContainerAction,
 } from '../../labware-ingred/actions'
 import type {FormData, StepIdType} from '../../form-types'
-import type {FileLabware, FilePipette, ProtocolFile} from '../../file-types'
-import type {UpdatePipettesAction} from '../../pipettes'
+import type {FileLabware, FilePipette} from '../../file-types'
 
 import type {
   ChangeFormInputAction,
@@ -31,7 +27,12 @@ import type {
   SaveStepFormAction,
   PopulateFormAction,
 } from '../../steplist/actions'
-import type {SaveMoreOptionsModal} from '../../ui/steps/actions'
+import type {
+  SaveMoreOptionsModal,
+} from '../../ui/steps/actions'
+
+import {cancelStepForm} from '../../steplist/actions'
+import {getChangeLabwareEffects} from '../../steplist/actions/handleFormChange'
 
 type FormState = FormData | null
 
@@ -44,13 +45,12 @@ type UnsavedFormActions =
   | SaveStepFormAction
   | DeleteStepAction
   | SaveMoreOptionsModal
-const unsavedForm = (rootState: RootState, action: UnsavedFormActions): FormState => {
-  const unsavedFormState = rootState.unsavedForm
+const unsavedForm = (state: FormState = null, action: UnsavedFormActions): FormState => {
   switch (action.type) {
     case 'CHANGE_FORM_INPUT':
       // TODO: Ian 2018-12-13 use handleFormChange
       return {
-        ...unsavedFormState,
+        ...state,
         ...action.payload.update,
       }
     case 'POPULATE_FORM': return action.payload
@@ -60,9 +60,9 @@ const unsavedForm = (rootState: RootState, action: UnsavedFormActions): FormStat
     // save the modal state into the unsavedForm --
     // it was 2 levels away from savedStepForms, now it's one level away
     case 'SAVE_MORE_OPTIONS_MODAL':
-      return {...unsavedFormState, ...action.payload}
+      return {...state, ...action.payload}
     default:
-      return unsavedFormState
+      return state
   }
 }
 
@@ -70,36 +70,22 @@ type SavedStepFormState = {
   [StepIdType]: FormData,
 }
 
-const initialDeckSetupStepForm: FormData = {
-  stepType: 'manualIntervention',
-  id: INITIAL_DECK_SETUP_STEP_ID,
-  labwareLocationUpdate: {
-    [FIXED_TRASH_ID]: '12',
-  },
-  pipetteLocationUpdate: {}, // TODO SOON Ian 2018-12-13 sync pipette location with LOAD_FILE, SWAP_PIPETTE, UPDATE_PIPETTES, and CREATE_NEW_PROTOCOL.
-}
-
 const initialSavedStepFormsState: SavedStepFormState = {
-  [INITIAL_DECK_SETUP_STEP_ID]: initialDeckSetupStepForm,
-}
-
-function _migratePreDeckSetupStep (fileData: ProtocolFile): FormData {
-  const additionalLabware = mapValues(fileData.labware, (labware: FileLabware) => labware.slot)
-  return {
-    ...initialDeckSetupStepForm,
+  [INITIAL_DECK_SETUP_STEP_ID]: {
+    stepType: 'manualIntervention',
+    id: INITIAL_DECK_SETUP_STEP_ID,
     labwareLocationUpdate: {
-      ...initialDeckSetupStepForm.labwareLocationUpdate,
-      ...additionalLabware,
+      [FIXED_TRASH_ID]: '12',
     },
-  }
+  },
 }
 
 // TODO Ian 2018-12-13 replace the other savedStepForms with this new one
 const savedStepForms = (
-  rootState: RootState,
-  action: SaveStepFormAction | DeleteStepAction | LoadFileAction | CreateContainerAction | DeleteContainerAction
+  state: AllStepsState,
+  action: SaveStepFormAction | DeleteStepAction | LoadFileAction | DeleteContainerAction
 ) => {
-  const {savedStepForms} = rootState
+  const {savedStepForms} = state
   switch (action.type) {
     case 'SAVE_STEP_FORM':
       return {
@@ -109,49 +95,18 @@ const savedStepForms = (
     case 'DELETE_STEP':
       return omit(savedStepForms, action.payload.toString())
     case 'LOAD_FILE':
-      // backwards compatibility: adds in INITIAL_DECK_SETUP_STEP_ID with
-      // all labware (from PD metadata) if there was no such step form
-      const fileData = action.payload
-      const stepFormsFromFile = getPDMetadata(action.payload).savedStepForms
-
-      const loadedStepForms = (stepFormsFromFile[INITIAL_DECK_SETUP_STEP_ID])
-        ? stepFormsFromFile
-        : {
-          [INITIAL_DECK_SETUP_STEP_ID]: _migratePreDeckSetupStep(fileData),
-          ...stepFormsFromFile,
-        }
+      // backwards compatibility: adds in INITIAL_DECK_SETUP_STEP_ID with fixed-trash
+      // if protocol didn't have it
+      const loadedStepForms = {
+        ...initialSavedStepFormsState,
+        ...getPDMetadata(action.payload).savedStepForms,
+      }
       return mapValues(loadedStepForms, stepForm => ({
         ...getDefaultsForStepType(stepForm.stepType),
         ...stepForm,
       }))
-    // TODO: Ian 2018-12-13 make the createLabware thunk separate into 2 actions:
-    // create labware, then edit initial deck setup step form. This reducer will not have to handle CREATE_CONTAINER
-    case 'CREATE_CONTAINER':
-    // auto-update initial deck setup state.
-      const prevInitialDeckSetupStep = savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
-      const {id, slot} = action.payload
-      return {
-        ...savedStepForms,
-        [INITIAL_DECK_SETUP_STEP_ID]: {
-          ...prevInitialDeckSetupStep,
-          labwareLocationUpdate: {
-            ...prevInitialDeckSetupStep.labwareLocationUpdate,
-            [id]: slot,
-          },
-        },
-      }
     case 'DELETE_CONTAINER':
       return mapValues(savedStepForms, savedForm => {
-        if (
-          action.type === 'DELETE_CONTAINER' && // TODO Ian 2018-12-13 flow is not doing a good job understanding this switch-case
-          savedForm.stepType === 'manualIntervention'
-        ) {
-          // remove instances of labware from all manualIntervention steps
-          return {
-            ...savedForm,
-            labwareLocationUpdate: omit(savedForm.labwareLocationUpdate, action.payload.containerId),
-          }
-        }
         const deleteLabwareUpdate = reduce(savedForm, (acc, value, fieldName) => {
           if (value === action.payload.containerId) {
             const formLabwareFieldUpdate = {[fieldName]: null}
@@ -170,26 +125,11 @@ const savedStepForms = (
         }
       })
     case 'CHANGE_SAVED_STEP_FORM':
-      // TODO Ian 2018-12-13 do handleFormChange here with full state
-      const {stepId} = action.payload
-      const previousForm = savedStepForms[stepId]
-      if (previousForm.stepType === 'manualIntervention') {
-        // since manualIntervention steps are nested, use a recursive merge
-        return {
-          ...savedStepForms,
-          [stepId]: merge(
-            {},
-            previousForm,
-            action.payload.update,
-          ),
-        }
-      }
-      // other step form types are not designed to be deeply merged
-      // (eg `wells` arrays should be reset, not appended to)
+      // TODO IMMEDIATELY do handleFormChange here with full state
       return {
         ...savedStepForms,
-        [stepId]: {
-          ...previousForm,
+        [action.payload.stepId]: {
+          ...(action.payload.stepId != null ? savedStepForms[action.payload.stepId] : {}),
           ...action.payload.update,
         },
       }
@@ -210,11 +150,16 @@ type LabwareState = {[labwareId: string]: {|
   type: string,
 |}}
 
+type PipetteState = {[pipetteId: string]: {|
+  name: string,
+|}}
+
 const initialLabwareState: LabwareState = {
   [FIXED_TRASH_ID]: {type: 'fixed-trash'},
 }
 
-// MIGRATION NOTE: copied from `containers` reducer. Slot + UI stuff stripped out.
+// EXPERIMENT NOTE: copied from `containers` reducer. Slot + UI stuff stripped out.
+// TODO IMMEDIATELY add * types back in
 const labwareInvariantProperties = handleActions({
   CREATE_CONTAINER: (state: LabwareState, action: CreateContainerAction) => {
     return {
@@ -227,38 +172,55 @@ const labwareInvariantProperties = handleActions({
     console.log({res})
     return res
   },
+  // EXPERIMENT NOTE: 'RENAME_LABWARE' doesn't matter, no name in this reducer
+  // EXPERIMENT NOTE: 'MOVE_LABWARE' doesn't matter, b/c steps don't care about slots
   LOAD_FILE: (state: LabwareState, action: LoadFileAction): LabwareState => {
     const file = action.payload
+    // EXPERIMENT NOTE: no migration required!
     // TODO Ian 2018-12-13: this is just reconciling a 'type' vs
-    // 'model' word mismatch, they mean the same thing just are inconsistent :(
+    // 'model' word mismatch, they mean the same thing just inconsistent
     return mapValues(file.labware, (fileLabware: FileLabware, id: string) => ({
       type: fileLabware.model,
     }))
   },
-  CREATE_NEW_PROTOCOL: (state: LabwareState, action: CreateNewProtocolAction): LabwareState => {
-    const nextState = action.payload.tipracks.reduce((acc: LabwareState, tiprack): LabwareState => {
-      const {id, model} = tiprack
-      return {
-        ...acc,
-        [id]: {type: model},
+  CREATE_NEW_PROTOCOL: (
+    state: LabwareState,
+    action: {payload: *}
+  ): LabwareState => {
+    // EXPERIMENT TODO: to keep partitioned labware in sync, the uuid of the tiprackmodel
+    // needs to be included in the action payload. This shouldn't require a thunk?
+    const nextState = [action.payload.left, action.payload.right].reduce((acc: LabwareState, mount): LabwareState => {
+      if (mount.tiprackModel) {
+        const id = `${uuid()}:${String(mount.tiprackModel)}`
+        return {
+          ...acc,
+          [id]: {
+            // slot: nextEmptySlot(_loadedContainersBySlot(acc)),
+            type: mount.tiprackModel,
+            // disambiguationNumber: getNextDisambiguationNumber(acc, String(mount.tiprackModel)),
+            id,
+            // name: null,
+          },
+        }
       }
+      return acc
     }, state)
     return nextState
   },
 }, initialLabwareState)
 
-type PipetteState = {[pipetteId: string]: {|
-  name: string,
-|}}
-
+// TODO IMMEDIATELY add 'any' types back in
 const pipetteInvariantProperties = handleActions({
   LOAD_FILE: (state: PipetteState, action: LoadFileAction): PipetteState => {
     return mapValues(action.payload.pipettes, (filePipette: FilePipette): $Values<PipetteState> => ({
-      name: filePipette.name || pipetteModelToName(filePipette.model),
+      name: filePipette.name || filePipette.model, // drop other fields.
+      // EXPERIMENT HACK: in real life the model fallback needs to drop
+      // the version suffix to convert back to a name;
+      // this is an old backwards-compat thing anyway
     }))
   },
-  UPDATE_PIPETTES: (state: PipetteState, action: UpdatePipettesAction): PipetteState => {
-    // TODO Ian 2018-12-13: messy code for annoying by-mount action shape
+  UPDATE_PIPETTES: (state: PipetteState, action: any): PipetteState => {
+    // EXPERIMENT HACK: messy code for annoying by-mount action shape
     // in the future, pipette ids could be created in these actions
     const left = action.payload.left
     const right = action.payload.right
@@ -267,42 +229,44 @@ const pipetteInvariantProperties = handleActions({
       ...(right && right.model ? {right: {name: right.model}} : {}),
     }
   },
-  CREATE_NEW_PROTOCOL: (state: PipetteState, action: CreateNewProtocolAction): PipetteState => {
-    // TODO Ian 2018-12-13: messy code for annoying by-mount action shape
-    // in the future, pipette ids could be created in these actions
-    // (slightly different than for UPDATE_PIPETTES above)
+  CREATE_NEW_PROTOCOL: (state: PipetteState, action: any): PipetteState => {
+    // EXPERIMENT HACK: messy code for annoying by-mount action shape - same as UPDATE_PIPETTES
     const left = action.payload.left
     const right = action.payload.right
     return {
-      ...(left && left.pipetteModel ? {left: {name: left.pipetteModel}} : {}),
-      ...(right && right.pipetteModel ? {right: {name: right.pipetteModel}} : {}),
+      ...(left && left.model ? {left: {name: left.model}} : {}),
+      ...(right && right.model ? {right: {name: right.model}} : {}),
     }
   },
+  // EXPERIMENT NOTE: we don't care about mount, so 'SWAP_PIPETTES' doesn't matter in this reducer
 }, {})
 
-export type RootState = {
+type AllStepsState = {
   labwareInvariantProperties: LabwareState,
   pipetteInvariantProperties: PipetteState,
   savedStepForms: SavedStepFormState,
   unsavedForm: FormState,
 }
 
-// TODO Ian 2018-12-13: find some existing util to do this nested version of combineReducers
-// which avoids: 1) duplicating specifying initial state and 2) returning a new object when there's no change
-const initialRootState: RootState = {
-  labwareInvariantProperties: initialLabwareState,
-  pipetteInvariantProperties: {},
+// EXPERIMENT TODO: find some existing util to do this nested version of combineReducers
+// which handles: 1) avoid duplicating initial state and 2) avoid creating new objects when there's no changes
+const initialAllStepsState: AllStepsState = {
+  labwareInvariantProperties: initialLabwareState, // labware ID to type
+  pipetteInvariantProperties: {}, // pipette ID to specName (wrongly called 'model' as carry-over from existing pipettes reducer -- TODO rename (and in all selectors))
   savedStepForms: initialSavedStepFormsState,
   unsavedForm: null,
 }
-// TODO: Ian 2018-12-13 remove this 'any' type
-const rootReducer = (state: RootState = initialRootState, action: any) => {
+const allSteps = (state: AllStepsState = initialAllStepsState, action: any) => {
   return {
     labwareInvariantProperties: labwareInvariantProperties(state.labwareInvariantProperties, action),
     pipetteInvariantProperties: pipetteInvariantProperties(state.pipetteInvariantProperties, action),
     savedStepForms: savedStepForms(state, action),
-    unsavedForm: unsavedForm(state, action),
+    unsavedFrom: unsavedForm(state.unsavedForm, action),
   }
 }
+
+export type RootState = AllStepsState
+
+const rootReducer = allSteps
 
 export default rootReducer
