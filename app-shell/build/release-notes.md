@@ -1,4 +1,4 @@
-# Changes from 3.5.1 to 3.6.2
+# Changes from 3.5.1 to 3.6.3
 
 For more details, please see the full [technical change log][changelog]
 
@@ -21,6 +21,7 @@ For more details, please see the full [technical change log][changelog]
     - The robot settings page now displays the IP and MAC addresses of the Wi-Fi and Ethernet-to-USB interfaces
     - Please see our support documentation for more details
 - After tip-probe is completed, the app will now move the pipette out of the way so you have better access to the deck
+- App and robot update messages should now be clearer and easier to follow
 
 ### Known issues
 
@@ -56,6 +57,18 @@ As always, please reach out to our team with any questions.
 ### New features
 
 - Added support for `v1.4` pipette models
+- Python protocols can now include arbitrary metadata for display in the app
+
+```
+from opentrons import containers, instruments
+
+metadata = {
+    'protocolName': 'My Protocol',
+    'description': 'This protocol is mine and it is good',
+}
+
+# ...
+```
 
 ### Known issues
 
