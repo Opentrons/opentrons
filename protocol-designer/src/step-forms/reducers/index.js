@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import {handleActions} from 'redux-actions'
 import type {ActionType} from 'redux-actions'
 import mapValues from 'lodash/mapValues'
@@ -86,12 +87,19 @@ const initialSavedStepFormsState: SavedStepFormState = {
 }
 
 function _migratePreDeckSetupStep (fileData: ProtocolFile): FormData {
+  // builds the initial deck setup step for older protocols that didn't have one.
   const additionalLabware = mapValues(fileData.labware, (labware: FileLabware) => labware.slot)
+  const pipetteLocations = mapValues(fileData.pipettes, (pipette: FilePipette) => pipette.mount)
+
   return {
     ...initialDeckSetupStepForm,
     labwareLocationUpdate: {
       ...initialDeckSetupStepForm.labwareLocationUpdate,
       ...additionalLabware,
+    },
+    pipetteLocationUpdate: {
+      ...initialDeckSetupStepForm.pipetteLocationUpdate,
+      ...pipetteLocations,
     },
   }
 }
@@ -116,6 +124,7 @@ const savedStepForms = (
       const fileData = action.payload
       const stepFormsFromFile = getPDMetadata(action.payload).savedStepForms
 
+      // only migrate if there's no initial deck setup step
       const loadedStepForms = (stepFormsFromFile[INITIAL_DECK_SETUP_STEP_ID])
         ? stepFormsFromFile
         : {
@@ -171,6 +180,22 @@ const savedStepForms = (
           ...deleteLabwareUpdate,
         }
       })
+    case 'SWAP_PIPETTES':
+      const formToSwap = savedStepForms[action.payload.stepId]
+      assert(
+        formToSwap && formToSwap.stepType === 'manualIntervention',
+        'expected SWAP_PIPETTES to reference a manualIntervention step')
+      const swappedPipetteLocations = mapValues(formToSwap.pipetteLocationUpdate, (mount: ?string) => {
+        if (!mount) return mount
+        return mount === 'left' ? 'right' : 'left'
+      })
+      return {
+        ...savedStepForms,
+        [action.payload.stepId]: {
+          ...formToSwap,
+          pipetteLocationUpdate: swappedPipetteLocations,
+        },
+      }
     case 'CHANGE_SAVED_STEP_FORM':
       // TODO Ian 2018-12-13 do handleFormChange here with full state
       const {stepId} = action.payload

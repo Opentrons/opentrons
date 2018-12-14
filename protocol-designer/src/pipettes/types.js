@@ -2,10 +2,16 @@
 
 import type {PipetteData} from '../step-generation'
 import type {PipetteFields} from '../load-file'
+import type {StepIdType} from '../form-types'
 
 export type PipettesByMount = {
   left?: ?PipetteData,
   right?: ?PipetteData,
+}
+
+export type SwapPipettesAction = {
+  type: 'SWAP_PIPETTES',
+  payload: {stepId: StepIdType}, // manualIntervention step to swap pipettes on
 }
 
 export type UpdatePipettesAction = {
