@@ -58,7 +58,7 @@ export const maxDispenseWellVolume = (fields: HydratedFormData): ?FormWarning =>
 
 export const minDisposalVolume = (fields: HydratedFormData): ?FormWarning => {
   const {aspirate_disposalVol_checkbox, aspirate_disposalVol_volume, pipette} = fields
-  const pipetteSpecs = getPipetteNameSpecs(pipette.model)
+  const pipetteSpecs = pipette && getPipetteNameSpecs(pipette.model)
   if (!pipette || !pipetteSpecs) return null
   const isUnselected = !aspirate_disposalVol_checkbox || !aspirate_disposalVol_volume
   if (isUnselected) return FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME
