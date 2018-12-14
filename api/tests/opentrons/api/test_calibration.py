@@ -3,6 +3,7 @@ from unittest import mock
 from functools import partial
 from tests.opentrons.conftest import state
 from opentrons.util import calibration_functions
+from opentrons.config import robot_configs
 
 state = partial(state, 'calibration')
 
@@ -22,7 +23,7 @@ async def test_tip_probe(main_router, model):
 
             probe_patch.assert_called_with(
                 instrument=model.instrument._instrument,
-                robot=model.robot)
+                robot=model.instrument._instrument.robot)
 
             update_patch.assert_called_with(
                 instrument=model.instrument._instrument,
@@ -36,17 +37,18 @@ async def test_tip_probe(main_router, model):
 async def test_correct_hotspots(main_router, model):
 
     robot = model.robot
+    robot.config = robot_configs._build_config([], {})
 
     tip_length = robot.config.tip_length[model.instrument._instrument.name]
     switch_clearance = 7.5
-    x_switch_offset = 5.0
-    y_switch_offset = 2.0
+    x_switch_offset = 2.0
+    y_switch_offset = 5.0
     z_switch_offset = 5.0
     deck_clearance = 5.0
     z_probe_clearance = 5.0
     z_start_clearance = 20.0
 
-    size_x, size_y, size_z = robot.config.probe_dimensions
+    size_x, size_y, size_z = robot.config.tip_probe.dimensions
 
     rel_x_start = (size_x / 2) + switch_clearance
     rel_y_start = (size_y / 2) + switch_clearance
@@ -83,13 +85,7 @@ async def test_correct_hotspots(main_router, model):
     actual = calibration_functions._calculate_hotspots(
         robot,
         tip_length,
-        switch_clearance,
-        x_switch_offset,
-        y_switch_offset,
-        z_switch_offset,
-        deck_clearance,
-        z_probe_clearance,
-        z_start_clearance)
+        robot.config.tip_probe)
 
     assert expected == actual
 
@@ -111,9 +107,9 @@ async def test_move_to_front(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
-@pytest.mark.api1_only
 async def test_pick_up_tip(main_router, model):
-    with mock.patch.object(model.instrument._instrument, 'pick_up_tip') as pick_up_tip:  # NOQA
+    with mock.patch.object(
+            model.instrument._instrument, 'pick_up_tip') as pick_up_tip:
         main_router.calibration_manager.pick_up_tip(
             model.instrument,
             model.container)
@@ -125,15 +121,15 @@ async def test_pick_up_tip(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
-@pytest.mark.api1_only
 async def test_drop_tip(main_router, model):
-    with mock.patch.object(model.instrument._instrument, 'drop_tip') as drop_tip:  # NOQA
+    with mock.patch.object(
+            model.instrument._instrument, 'drop_tip') as drop_tip:
         main_router.calibration_manager.drop_tip(
             model.instrument,
             model.container)
 
         drop_tip.assert_called_with(
-            model.container._container[0], home_after=True)
+            model.container._container[0])
 
         await main_router.wait_until(state('moving'))
         await main_router.wait_until(state('ready'))
@@ -141,10 +137,11 @@ async def test_drop_tip(main_router, model):
 
 @pytest.mark.api1_only
 async def test_return_tip(main_router, model):
-    with mock.patch.object(model.instrument._instrument, 'return_tip') as return_tip:  # NOQA
+    with mock.patch.object(
+            model.instrument._instrument, 'return_tip') as return_tip:
         main_router.calibration_manager.return_tip(model.instrument)
 
-        return_tip.assert_called_with(home_after=True)
+        return_tip.assert_called_with()
 
         await main_router.wait_until(state('moving'))
         await main_router.wait_until(state('ready'))
@@ -190,7 +187,7 @@ async def test_jog(main_router, model):
                 instrument=model.instrument._instrument,
                 distance=distance,
                 axis=axis,
-                robot=model.robot)
+                robot=model.instrument._instrument.robot)
             for axis, distance in zip('xyz', (1, 2, 3))]
 
         assert jog.mock_calls == expected

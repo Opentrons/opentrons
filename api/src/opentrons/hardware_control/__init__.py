@@ -1011,3 +1011,24 @@ class API(HardwareAPILike):
             new_details = new_mod.port + new_mod.device_info['model']
             self._attached_modules[new_details] = new_mod
             return True, 'firmware update successful'
+
+    @_log_call
+    async def locate_tip_probe_center(self, mount) -> Dict[Axis, float]:
+        """ Use the specified mount (which should have a tip) to find the
+        position of the tip probe target center relative to its definition
+
+        The return value is a dict mapping axes to the difference in position
+        from definition of the tip probe center.
+        """
+        pip = self._attached_instruments[mount]
+        assert pip and pip.has_tip,\
+            '{} has either no pipette or no tip'.format(mount)
+
+        # Move to clearance height if necessary
+        pos = self.current_position(mount)
+        if pos[Axis.Z] < 35:
+            await self.move_to(mount,
+                               top_types.Point(pos[Axis.X],
+                                               pos[Axis.Y],
+                                               35))
+        return {}

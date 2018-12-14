@@ -3,7 +3,7 @@ from copy import copy
 
 from opentrons.util import calibration_functions
 from opentrons.broker import publish
-from opentrons import robot
+
 
 from .models import Container
 
@@ -65,7 +65,7 @@ class CalibrationManager:
         log.info('Picking up tip from {} in {} with {}'.format(
             container.name, container.slot, instrument.name))
         self._set_state('moving')
-        inst.pick_up_tip(container._container[0])
+        inst.pick_up_tip(container._container.wells()[0])
         self._set_state('ready')
 
     def drop_tip(self, instrument, container):
@@ -78,20 +78,21 @@ class CalibrationManager:
         log.info('Dropping tip from {} in {} with {}'.format(
             container.name, container.slot, instrument.name))
         self._set_state('moving')
-        inst.drop_tip(container._container[0], home_after=True)
+        inst.drop_tip(container._container.wells()[0])
         self._set_state('ready')
 
     def return_tip(self, instrument):
         inst = instrument._instrument
         log.info('Returning tip from {}'.format(instrument.name))
         self._set_state('moving')
-        inst.return_tip(home_after=True)
+        inst.return_tip()
         self._set_state('ready')
 
     def move_to_front(self, instrument):
         inst = instrument._instrument
         log.info('Moving {}'.format(instrument.name))
         self._set_state('moving')
+
         calibration_functions.move_instrument_for_probing_prep(
             inst, inst.robot
         )
@@ -153,5 +154,6 @@ class CalibrationManager:
         }
 
     def _on_state_changed(self):
-        robot._use_safest_height = (self.state in ['probing', 'moving'])
+        self._hardware._use_safest_height = (self.state in
+                                             ['probing', 'moving'])
         publish(CalibrationManager.TOPIC, self._snapshot())
