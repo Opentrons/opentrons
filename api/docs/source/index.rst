@@ -45,6 +45,8 @@ The design goal of the Opentrons API is to make code readable and easy to unders
 
     Use the Opentrons API's labware and instruments
 
+    This protocol is by me; it’s called Opentrons Protocol Tutorial and is used for demonstrating the Opentrons API
+
     Add a 96 well plate, and place it in slot '2' of the robot deck
     Add a 200uL tip rack, and place it in slot '1' of the robot deck
 
