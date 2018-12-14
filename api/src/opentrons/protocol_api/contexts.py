@@ -740,7 +740,7 @@ class InstrumentContext:
                 "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
                 " However, it is a {}".format(location))
 
-        self.move_to(target.top())
+        self.move_to(target.bottom())
         self._hw_manager.hardware.drop_tip(self._mount)
         return self
 
