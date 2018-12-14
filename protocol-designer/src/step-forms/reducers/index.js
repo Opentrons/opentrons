@@ -35,6 +35,9 @@ import type {
 import type {
   SaveMoreOptionsModal,
 } from '../../ui/steps/actions'
+import type {
+  MovePipettesAction,
+} from '../actions'
 
 type FormState = FormData | null
 
@@ -79,7 +82,7 @@ const initialDeckSetupStepForm: FormData = {
   labwareLocationUpdate: {
     [FIXED_TRASH_ID]: '12',
   },
-  pipetteLocationUpdate: {}, // TODO SOON Ian 2018-12-13 sync pipette location with LOAD_FILE, SWAP_PIPETTE, UPDATE_PIPETTES, and CREATE_NEW_PROTOCOL.
+  pipetteLocationUpdate: {}, // TODO SOON Ian 2018-12-13 sync pipette location with LOAD_FILE, MOVE_PIPETTES, UPDATE_PIPETTES, and CREATE_NEW_PROTOCOL.
 }
 
 const initialSavedStepFormsState: SavedStepFormState = {
@@ -107,7 +110,7 @@ function _migratePreDeckSetupStep (fileData: ProtocolFile): FormData {
 // TODO Ian 2018-12-13 replace the other savedStepForms with this new one
 const savedStepForms = (
   rootState: RootState,
-  action: SaveStepFormAction | DeleteStepAction | LoadFileAction | CreateContainerAction | DeleteContainerAction
+  action: SaveStepFormAction | DeleteStepAction | LoadFileAction | CreateContainerAction | DeleteContainerAction | MovePipettesAction
 ) => {
   const {savedStepForms} = rootState
   switch (action.type) {
@@ -180,20 +183,20 @@ const savedStepForms = (
           ...deleteLabwareUpdate,
         }
       })
-    case 'SWAP_PIPETTES':
-      const formToSwap = savedStepForms[action.payload.stepId]
+    case 'MOVE_PIPETTES':
+      const formToMove = savedStepForms[action.payload.stepId]
       assert(
-        formToSwap && formToSwap.stepType === 'manualIntervention',
-        'expected SWAP_PIPETTES to reference a manualIntervention step')
-      const swappedPipetteLocations = mapValues(formToSwap.pipetteLocationUpdate, (mount: ?string) => {
-        if (!mount) return mount
-        return mount === 'left' ? 'right' : 'left'
-      })
+        formToMove && formToMove.stepType === 'manualIntervention',
+        'expected MOVE_PIPETTES to reference a manualIntervention step')
+
       return {
         ...savedStepForms,
         [action.payload.stepId]: {
-          ...formToSwap,
-          pipetteLocationUpdate: swappedPipetteLocations,
+          ...formToMove,
+          pipetteLocationUpdate: {
+            ...formToMove.pipetteLocationUpdate,
+            ...action.payload.update,
+          },
         },
       }
     case 'CHANGE_SAVED_STEP_FORM':
