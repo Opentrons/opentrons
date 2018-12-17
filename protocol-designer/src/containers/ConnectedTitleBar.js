@@ -8,6 +8,7 @@ import styles from './TitleBar.css'
 import i18n from '../localization'
 import {START_TERMINAL_TITLE, END_TERMINAL_TITLE} from '../constants'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
+import {selectors as stepsSelectors} from '../ui/steps'
 import {
   selectors as steplistSelectors,
   actions as steplistActions,
@@ -48,14 +49,14 @@ function TitleWithIcon (props: TitleWithIconProps) {
 function mapStateToProps (state: BaseState): SP {
   const _page = selectors.getCurrentPage(state)
   const fileName = fileDataSelectors.protocolName(state)
-  const selectedStep = steplistSelectors.getSelectedStep(state)
-  const selectedTerminalId = steplistSelectors.getSelectedTerminalItemId(state)
+  const selectedStep = stepsSelectors.getSelectedStep(state)
+  const selectedTerminalId = stepsSelectors.getSelectedTerminalItemId(state)
   const labware = labwareIngredSelectors.getSelectedLabware(state)
   const labwareNames = labwareIngredSelectors.getLabwareNames(state)
   const labwareNickname = labware && labware.id && labwareNames[labware.id]
   const drilledDownLabwareId = labwareIngredSelectors.getDrillDownLabwareId(state)
   const liquidPlacementMode = !!labwareIngredSelectors.getSelectedLabware(state)
-  const wellSelectionLabwareKey = steplistSelectors.getWellSelectionLabwareKey(state)
+  const wellSelectionLabwareKey = stepsSelectors.getWellSelectionLabwareKey(state)
 
   switch (_page) {
     case 'liquids':

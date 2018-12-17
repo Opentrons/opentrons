@@ -7,6 +7,7 @@ import {actions as dismissActions, selectors as dismissSelectors} from '../../di
 import {getVisibleAlerts} from './helpers'
 import type {StepIdType} from '../../form-types'
 import {selectors as steplistSelectors} from '../../steplist'
+import {selectors as stepsSelectors} from '../../ui/steps'
 import type {StepFieldName} from '../../steplist/fieldLevel'
 import type {FormError, FormWarning} from '../../steplist/formLevel'
 import type {BaseState} from '../../types'
@@ -79,7 +80,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   return {
     errors: filteredErrors,
     warnings: visibleWarnings,
-    stepId: steplistSelectors.getSelectedStepId(state),
+    stepId: stepsSelectors.getSelectedStepId(state),
   }
 }
 

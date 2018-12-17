@@ -6,7 +6,7 @@ import omit from 'lodash/omit'
 
 import {getPDMetadata} from '../../file-types'
 
-import {START_TERMINAL_ITEM_ID} from '../../steplist'
+import {START_TERMINAL_ITEM_ID} from '../../steplist/types'
 import type {LoadFileAction} from '../../load-file'
 import type {StepIdType, FormModalFields} from '../../form-types'
 import type {

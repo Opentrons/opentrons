@@ -6,11 +6,12 @@ import type {StepIdType, StepType} from '../../form-types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../../types'
 import {selectors as steplistSelectors} from '../../steplist'
 import * as pipetteSelectors from '../../pipettes/selectors'
-import {getNextDefaultPipetteId} from '../formLevel'
-import type {TerminalItemId, SubstepIdentifier, FormSectionNames} from '../types'
+import {getNextDefaultPipetteId} from '../../steplist/formLevel'
+import type {TerminalItemId, SubstepIdentifier, FormSectionNames} from '../../steplist/types'
 
+import selectors from './selectors'
 import type {ChangeFormPayload} from './types'
-import handleFormChange from './handleFormChange'
+import handleFormChange from '../../steplist/actions/handleFormChange'
 
 type ExpandAddStepButtonAction = {type: 'EXPAND_ADD_STEP_BUTTON', payload: boolean}
 export const expandAddStepButton = (payload: boolean): ExpandAddStepButtonAction => ({
@@ -83,7 +84,7 @@ export type SaveMoreOptionsModal = {type: 'SAVE_MORE_OPTIONS_MODAL', payload: an
 export const saveMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
   dispatch({
     type: 'SAVE_MORE_OPTIONS_MODAL',
-    payload: steplistSelectors.getFormModalData(getState()),
+    payload: selectors.getFormModalData(getState()),
   })
 }
 

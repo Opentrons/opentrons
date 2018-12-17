@@ -12,6 +12,7 @@ import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
 } from '../steplist'
+import {selectors as stepsSelectors} from '../ui/steps'
 import * as highlightSelectors from '../top-selectors/substep-highlight'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
 import * as tipContentsSelectors from '../top-selectors/tip-contents'
@@ -46,7 +47,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const wellSelectionModeForLabware = selectedContainerId === containerId
   let wellContents: ContentsByWell = {}
 
-  const activeItem = steplistSelectors.getActiveItem(state)
+  const activeItem = stepsSelectors.getActiveItem(state)
   if (
     !activeItem.isStep && activeItem.id === START_TERMINAL_ITEM_ID
   ) {

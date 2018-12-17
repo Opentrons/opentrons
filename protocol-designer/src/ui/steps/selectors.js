@@ -1,11 +1,17 @@
 // @flow
 import {createSelector} from 'reselect'
 import last from 'lodash/last'
+import isEmpty from 'lodash/isEmpty'
 
-import {selectors as steplistSelectors} from '../../steplist'
-import {initialSelectedItemState} from './reducers'
-import type {RootState, SelectableItem} from './reducers'
+import steplistSelectors from '../../steplist/selectors'
+import type {RootState as SteplistRootState} from '../../steplist/reducers'
+import type {StepIdType} from '../form-types'
 import type {BaseState, Selector} from '../types'
+import {
+  initialSelectedItemState,
+  RootState,
+  SelectableItem,
+} from './reducers'
 
 import type {
   FormSectionState,
@@ -13,18 +19,17 @@ import type {
   TerminalItemId,
 } from './types'
 
-import type {StepIdType} from '../form-types'
-
-const rootSelector = (state: BaseState): RootState => state.steplist
+const rootSelector = (state: BaseState): RootState => state.ui.steps
 
 // ======= Selectors ===============================================
 
 /** fallbacks for selectedItem reducer, when null */
 const getNonNullSelectedItem: Selector<SelectableItem> = createSelector(
   rootSelector,
-  (state: RootState) => {
+  steplistSelectors.rootSelector,
+  (state: RootState, steplistState: SteplistRootState) => {
     if (state.selectedItem != null) return state.selectedItem
-    if (state.orderedSteps.length > 0) return {isStep: true, id: last(state.orderedSteps)}
+    if (steplistState.orderedSteps.length > 0) return {isStep: true, id: last(steplistState.orderedSteps)}
     return initialSelectedItemState
   }
 )
@@ -49,6 +54,49 @@ const getHoveredStepId: Selector<?StepIdType> = createSelector(
   (item) => (item && item.isStep) ? item.id : null
 )
 
+/** Array of labware (labwareId's) involved in hovered Step, or [] */
+const getHoveredStepLabware: Selector<Array<string>> = createSelector(
+  steplistSelectors.getArgsAndErrorsByStepId,
+  getHoveredStepId,
+  (allStepArgsAndErrors, hoveredStep) => {
+    const blank = []
+    if (!hoveredStep || !allStepArgsAndErrors[hoveredStep]) {
+      return blank
+    }
+
+    const stepForm = allStepArgsAndErrors[hoveredStep].stepArgs
+
+    if (!stepForm) {
+      return blank
+    }
+
+    if (
+      stepForm.stepType === 'consolidate' ||
+      stepForm.stepType === 'distribute' ||
+      stepForm.stepType === 'transfer'
+    ) {
+      // source and dest labware
+      const src = stepForm.sourceLabware
+      const dest = stepForm.destLabware
+
+      return [src, dest]
+    }
+
+    if (stepForm.stepType === 'mix') {
+      // only 1 labware
+      return [stepForm.labware]
+    }
+
+    // step types that have no labware that gets highlighted
+    if (!(stepForm.stepType === 'pause')) {
+      // TODO Ian 2018-05-08 use assert here
+      console.warn(`getHoveredStepLabware does not support step type "${stepForm.stepType}"`)
+    }
+
+    return blank
+  }
+)
+
 const getHoveredTerminalItemId: Selector<?TerminalItemId> = createSelector(
   getHoveredItem,
   (item) => (item && !item.isStep) ? item.id : null
@@ -69,16 +117,19 @@ const getActiveItem: Selector<SelectableItem> = createSelector(
     : selected
 )
 
+// TODO: BC 2018-12-17 refactor as react state
 const getCollapsedSteps = createSelector(
   rootSelector,
   (state: RootState) => state.collapsedSteps
 )
 
+// TODO: BC 2018-12-17 refactor as react state
 const getStepCreationButtonExpanded: Selector<boolean> = createSelector(
   rootSelector,
   (state: RootState) => state.stepCreationButtonExpanded
 )
 
+// TODO: BC 2018-12-17 refactor as react state
 const getFormSectionCollapsed: Selector<FormSectionState> = createSelector(
   rootSelector,
   s => s.formSectionCollapse
@@ -98,7 +149,18 @@ const getSelectedStep = createSelector(
   }
 )
 
-export const getWellSelectionLabwareKey: Selector<?string> = createSelector(
+// TODO: BC: 2018-10-26 remove this when we decide to not block save
+export const getCurrentFormCanBeSaved: Selector<boolean | null> = createSelector(
+  steplistSelectors.getHydratedUnsavedForm,
+  getSelectedStepId,
+  steplistSelectors.getAllSteps,
+  (hydratedForm, selectedStepId, allSteps) => {
+    if (selectedStepId == null || !allSteps[selectedStepId] || !hydratedForm) return null
+    return isEmpty(steplistSelectors.getAllErrorsFromHydratedForm(hydratedForm))
+  }
+)
+
+const getWellSelectionLabwareKey: Selector<?string> = createSelector(
   rootSelector,
   (state: RootState) => state.wellSelectionLabwareKey
 )
@@ -118,11 +180,13 @@ export default {
   getSelectedTerminalItemId,
   getHoveredTerminalItemId,
   getHoveredStepId,
+  getHoveredStepLabware,
   getActiveItem,
   getHoveredSubstep,
   getFormSectionCollapsed,
   getWellSelectionLabwareKey,
   getFormModalData,
+  getCurrentFormCanBeSaved,
 
   // NOTE: this is exposed only for substeps/selectors.js
   getCollapsedSteps,

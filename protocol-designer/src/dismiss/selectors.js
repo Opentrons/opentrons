@@ -6,6 +6,7 @@ import {createSelector} from 'reselect'
 // imports getDismissedWarnings selector from 'dismiss/
 import {timelineWarningsPerStep} from '../file-data/selectors/commands'
 import {selectors as steplistSelectors, type FormWarning} from '../steplist'
+import {selectors as stepsSelectors} from '../ui/steps'
 import type {CommandCreatorWarning} from '../step-generation'
 import type {BaseState, Selector} from '../types'
 import type {RootState, DismissedWarningsAllSteps} from './reducers'
@@ -55,14 +56,14 @@ export const getTimelineWarningsPerStep: Selector<DismissedWarningsAllSteps<Comm
 
 export const getTimelineWarningsForSelectedStep: Selector<Array<CommandCreatorWarning>> = createSelector(
   getTimelineWarningsPerStep,
-  steplistSelectors.getSelectedStepId,
+  stepsSelectors.getSelectedStepId,
   (warningsPerStep, stepId) =>
     (stepId && warningsPerStep[stepId]) || []
 )
 
 export const getDismissedFormWarningsForSelectedStep: Selector<Array<FormWarning>> = createSelector(
   getDismissedFormWarnings,
-  steplistSelectors.getSelectedStepId,
+  stepsSelectors.getSelectedStepId,
   (dismissedWarnings, stepId) =>
     (stepId && dismissedWarnings[stepId]) || []
 )

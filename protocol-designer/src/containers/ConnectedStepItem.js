@@ -9,6 +9,7 @@ import {hoverOnSubstep, selectStep, hoverOnStep, toggleStepCollapsed} from '../s
 import * as substepSelectors from '../top-selectors/substeps'
 import {selectors as dismissSelectors} from '../dismiss'
 import {selectors as steplistSelectors} from '../steplist'
+import {selectors as stepsSelectors} from '../ui/steps'
 import {selectors as fileDataSelectors} from '../file-data'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import StepItem from '../components/steplist/StepItem' // TODO Ian 2018-05-10 why is importing StepItem from index.js not working?
@@ -37,10 +38,10 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {stepId} = ownProps
   const allSteps = steplistSelectors.getAllSteps(state)
 
-  const hoveredSubstep = steplistSelectors.getHoveredSubstep(state)
-  const hoveredStep = steplistSelectors.getHoveredStepId(state)
-  const selected = steplistSelectors.getSelectedStepId(state) === stepId
-  const collapsed = steplistSelectors.getCollapsedSteps(state)[stepId]
+  const hoveredSubstep = stepsSelectors.getHoveredSubstep(state)
+  const hoveredStep = stepsSelectors.getHoveredStepId(state)
+  const selected = stepsSelectors.getSelectedStepId(state) === stepId
+  const collapsed = stepsSelectors.getCollapsedSteps(state)[stepId]
   const formAndFieldErrors = steplistSelectors.getFormAndFieldErrorsByStepId(state)[stepId]
   const hasError = fileDataSelectors.getErrorStepId(state) === stepId || !isEmpty(formAndFieldErrors)
   const warnings = (typeof stepId === 'number') // TODO: Ian 2018-07-13 remove when stepId always number

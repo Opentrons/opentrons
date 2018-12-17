@@ -8,6 +8,7 @@ import {allSubsteps} from './substeps'
 import * as StepGeneration from '../step-generation'
 import {selectors as steplistSelectors} from '../steplist'
 import {selectors as fileDataSelectors} from '../file-data'
+import {selectors as stepsSelectors} from '../ui/steps'
 
 import type {Selector} from '../types'
 import type {SubstepItemData} from '../steplist/types'
@@ -137,8 +138,8 @@ function _getSelectedWellsForSubstep (
 export const wellHighlightsByLabwareId: Selector<AllWellHighlightsAllLabware> = createSelector(
   fileDataSelectors.getRobotStateTimeline,
   steplistSelectors.getArgsAndErrorsByStepId,
-  steplistSelectors.getHoveredStepId,
-  steplistSelectors.getHoveredSubstep,
+  stepsSelectors.getHoveredStepId,
+  stepsSelectors.getHoveredSubstep,
   allSubsteps,
   steplistSelectors.getOrderedSteps,
   (robotStateTimeline, allStepArgsAndErrors, hoveredStepId, hoveredSubstep, allSubsteps, orderedSteps) => {

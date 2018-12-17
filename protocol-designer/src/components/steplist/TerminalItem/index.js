@@ -5,10 +5,10 @@ import type {BaseState, ThunkDispatch} from '../../../types'
 
 import {
   actions as steplistActions,
-  selectors as steplistSelectors,
   type TerminalItemId,
 } from '../../../steplist'
 
+import {selectors as stepsSelectors} from '../../../ui/steps'
 import {PDTitledList} from '../../lists'
 export {default as TerminalItemLink} from './TerminalItemLink'
 
@@ -27,8 +27,8 @@ type SP = {
 
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {id} = ownProps
-  const hovered = steplistSelectors.getHoveredTerminalItemId(state) === id
-  const selected = steplistSelectors.getSelectedTerminalItemId(state) === id
+  const hovered = stepsSelectors.getHoveredTerminalItemId(state) === id
+  const selected = stepsSelectors.getSelectedTerminalItemId(state) === id
   return {
     hovered,
     selected,

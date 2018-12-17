@@ -8,6 +8,7 @@ import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
 } from '../../steplist'
+import {selectors as stepsSelectors} from '../../ui/steps'
 import {selectors as fileDataSelectors} from '../../file-data'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
 
@@ -89,12 +90,12 @@ const getLastValidTips: GetTipSelector = createSelector(
 export const getTipsForCurrentStep: GetTipSelector = createSelector(
   steplistSelectors.getOrderedSteps,
   fileDataSelectors.getRobotStateTimeline,
-  steplistSelectors.getHoveredStepId,
-  steplistSelectors.getActiveItem,
+  stepsSelectors.getHoveredStepId,
+  stepsSelectors.getActiveItem,
   getInitialTips,
   getLastValidTips,
   getLabwareIdProp,
-  steplistSelectors.getHoveredSubstep,
+  stepsSelectors.getHoveredSubstep,
   getAllSubsteps,
   (orderedSteps, robotStateTimeline, hoveredStepId, activeItem, initialTips, lastValidTips, labwareId, hoveredSubstepIdentifier, allSubsteps) => {
     if (!activeItem.isStep) {

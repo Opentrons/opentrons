@@ -2,6 +2,7 @@
 import type {Dispatch} from 'redux'
 
 import {selectors} from '../index'
+import {selectors as stepsSelectors} from '../../ui/steps'
 import type {StepType, StepIdType, FormModalFields, FormData} from '../../form-types'
 import type {ChangeFormPayload, ChangeSavedFormPayload} from './types'
 import type {TerminalItemId, SubstepIdentifier, FormSectionNames} from '../types'
@@ -122,7 +123,7 @@ export const saveStepForm = () =>
   (dispatch: Dispatch<*>, getState: GetState) => {
     const state = getState()
 
-    if (selectors.getCurrentFormCanBeSaved(state)) {
+    if (stepsSelectors.getCurrentFormCanBeSaved(state)) {
       dispatch({
         type: 'SAVE_STEP_FORM',
         payload: selectors.getUnsavedForm(state),
@@ -175,17 +176,17 @@ export const changeMoreOptionsModalInput = (payload: ChangeFormPayload): ChangeM
   payload,
 })
 
-export type SaveMoreOptionsModal = {
-  type: 'SAVE_MORE_OPTIONS_MODAL',
-  payload: any, // TODO
-}
+// export type SaveMoreOptionsModal = {
+//   type: 'SAVE_MORE_OPTIONS_MODAL',
+//   payload: any, // TODO
+// }
 
-export const saveMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
-  dispatch({
-    type: 'SAVE_MORE_OPTIONS_MODAL',
-    payload: selectors.getFormModalData(getState()),
-  })
-}
+// export const saveMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
+//   dispatch({
+//     type: 'SAVE_MORE_OPTIONS_MODAL',
+//     payload: selectors.getFormModalData(getState()),
+//   })
+// }
 
 export const setWellSelectionLabwareKey = (labwareName: ?string): * => ({
   type: 'SET_WELL_SELECTION_LABWARE_KEY',
