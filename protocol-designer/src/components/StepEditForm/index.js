@@ -104,8 +104,8 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
             this.props.formData && deleteStep(this.props.formData.id)
           }}
         />}
+        <FormAlerts focusedField={this.state.focusedField} dirtyFields={this.state.dirtyFields} />
         <div className={cx(formStyles.form, styles[formData.stepType])}>
-          <FormAlerts focusedField={this.state.focusedField} dirtyFields={this.state.dirtyFields} />
           <FormComponent
             stepType={formData.stepType}
             focusHandlers={{
