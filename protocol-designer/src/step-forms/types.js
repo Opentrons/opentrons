@@ -1,6 +1,5 @@
 // @flow
 
-// TODO IMMEDIATELY standardize type vs model vs name for labware and pipettes >:(
 export type InitialDeckSetup = {
   labware: {[labwareId: string]: {
     type: string,
@@ -8,9 +7,24 @@ export type InitialDeckSetup = {
   }},
   pipettes: {
     [pipetteId: string]: {
-      model: string,
+      model: string, // TODO: Ian 2018-12-17 make pipettes always name, never model. This is vestige of when pipettes had both name and model
       mount: string,
-      tiprackType: string,
+      tiprackModel: string,
     },
   },
+}
+
+// "entities" have only properties that are time-invariant
+
+export type PipetteEntities = {
+  [pipetteId: string]: {|
+    name: string,
+    tiprackModel: string,
+  |},
+}
+
+export type LabwareEntities = {
+  [labwareId: string]: {|
+    type: string,
+  |},
 }

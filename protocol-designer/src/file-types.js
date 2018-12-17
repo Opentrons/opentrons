@@ -28,8 +28,8 @@ export type FlowRateForPipettes = {
 }
 
 export type PDMetadata = {
-  // pipetteId to tiprackModel. may be unassigned
-  pipetteTiprackAssignments: {[pipetteId: string]: ?string},
+  // pipetteId to tiprackModel
+  pipetteTiprackAssignments: {[pipetteId: string]: string},
 
   dismissedWarnings: $PropertyType<DismissRoot, 'dismissedWarnings'>,
 

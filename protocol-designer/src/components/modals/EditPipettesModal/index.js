@@ -2,7 +2,6 @@
 import * as React from 'react'
 import cx from 'classnames'
 import {connect} from 'react-redux'
-
 import {
   AlertModal,
   DropdownField,
@@ -12,11 +11,20 @@ import {
 import startCase from 'lodash/startCase'
 import isEmpty from 'lodash/isEmpty'
 import isEqual from 'lodash/isEqual'
+import mapValues from 'lodash/mapValues'
 
 import i18n from '../../../localization'
+import {uuid} from '../../../utils'
+import {INITIAL_DECK_SETUP_STEP_ID} from '../../../constants'
 import type {BaseState, ThunkDispatch} from '../../../types'
 import {pipetteOptions} from '../../../pipettes/pipetteData'
 import type {PipetteFields} from '../../../load-file'
+import {
+  actions as stepFormActions,
+  selectors as stepFormSelectors,
+  type PipetteEntities,
+} from '../../../step-forms'
+import {actions as steplistActions} from '../../../steplist'
 import {
   thunks as pipetteThunks,
   selectors as pipetteSelectors,
@@ -33,16 +41,19 @@ import StepChangesWarningModal from './StepChangesWarningModal'
 
 type State = EditPipettesFields & {isWarningModalOpen: boolean}
 
-type OP = {closeModal: () => void}
-type SP = {
+type Props = {
+  closeModal: () => void,
   initialLeft: ?FormattedPipette,
   initialRight: ?FormattedPipette,
-}
-type DP = {
   updatePipettes: (EditPipettesFields) => mixed,
 }
 
-type Props = SP & DP & OP
+type OP = {closeModal: $PropertyType<Props, 'closeModal'>}
+type SP = {
+  initialLeft: $PropertyType<Props, 'initialLeft'>,
+  initialRight: $PropertyType<Props, 'initialRight'>,
+  _prevPipettes: PipetteEntities,
+}
 
 const pipetteOptionsWithNone = [
   {name: 'None', value: ''},
@@ -206,13 +217,71 @@ const mapSTP = (state: BaseState): SP => {
   return {
     initialLeft: pipetteData.find(i => i.mount === 'left'),
     initialRight: pipetteData.find(i => i.mount === 'right'),
+    _prevPipettes: stepFormSelectors.getPipetteInvariantProperties(state),
   }
 }
 
-const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
-  updatePipettes: (fields: EditPipettesFields) => {
-    dispatch(pipetteThunks.editPipettes(fields))
-  },
-})
+const mergeProps = (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>}, ownProps: OP): Props => {
+  const {dispatch} = dispatchProps
+  const {_prevPipettes, ...passThruStateProps} = stateProps
+  const updatePipettes = (fields: EditPipettesFields) => {
+    dispatch(pipetteThunks.editPipettes(fields)) // TODO: Ian 2018-12-17 editPipettes is DEPRECATED, remove once old reducers are removed
+    // new flow for new reducers
 
-export default connect(mapSTP, mapDTP)(EditPipettesModal)
+    let usedPrevPipettes = [] // IDs of pipettes in prevPipettes that were already used
+    // TODO: Ian 2018-12-17 after dropping the above,
+    // refactor EditPipettesFields to make this building part cleaner?
+    // TODO IMMEDIATELY there's a buncha funkiness below, clean up immediately
+    let nextPipettes = {}
+    const prevPipetteIds = Object.keys(_prevPipettes)
+    const mounts = ['left', 'right']
+    mounts.forEach(mount => {
+      const newPipette = fields[mount]
+      if (newPipette && newPipette.pipetteModel && newPipette.tiprackModel) {
+        const candidatePipetteIds = prevPipetteIds.filter(id => {
+          const prevPip = _prevPipettes[id]
+          const alreadyUsed = usedPrevPipettes.some(usedId => usedId === id)
+          return !alreadyUsed && prevPip.name === newPipette.pipetteModel
+        })
+        const pipetteId: ?string = candidatePipetteIds[0]
+        const newPipetteBody = {
+          name: newPipette.pipetteModel,
+          tiprackModel: newPipette.tiprackModel,
+          mount,
+        }
+        if (pipetteId) {
+          // update used pipette list
+          usedPrevPipettes.push(pipetteId)
+          nextPipettes[pipetteId] = newPipetteBody
+        } else {
+          nextPipettes[uuid()] = newPipetteBody
+        }
+      }
+    })
+
+    dispatch(stepFormActions.createPipettes(
+      mapValues(nextPipettes, p => ({name: p.name, tiprackModel: p.tiprackModel}))))
+
+    // set/update pipette locations in initial deck setup step
+    dispatch(steplistActions.changeSavedStepForm({
+      stepId: INITIAL_DECK_SETUP_STEP_ID,
+      update: {
+        pipetteLocationUpdate: mapValues(nextPipettes, p => p.mount),
+      },
+    }))
+
+    // delete any pipettes no longer in use
+    const pipetteIdsToDelete = Object.keys(_prevPipettes).filter(id => !(id in nextPipettes))
+    if (pipetteIdsToDelete.length > 0) {
+      dispatch(stepFormActions.deletePipettes(pipetteIdsToDelete))
+    }
+  }
+
+  return {
+    ...ownProps,
+    ...passThruStateProps,
+    updatePipettes,
+  }
+}
+
+export default connect(mapSTP, null, mergeProps)(EditPipettesModal)

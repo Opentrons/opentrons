@@ -6,7 +6,8 @@ import type {BaseState} from '../types'
 import FilePage from '../components/FilePage'
 import {actions, selectors as fileSelectors} from '../file-data'
 import {actions as pipetteActions, selectors as pipetteSelectors} from '../pipettes'
-import {actions as stepFormActions, selectors as stepFormSelectors} from '../step-forms'
+import {selectors as stepFormSelectors} from '../step-forms'
+import {actions as steplistActions} from '../steplist'
 import {INITIAL_DECK_SETUP_STEP_ID} from '../constants'
 import type {InitialDeckSetup} from '../step-forms'
 import type {FileMetadataFields} from '../file-data'
@@ -39,6 +40,7 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
     if (!pipette.mount) return pipette.mount
     return pipette.mount === 'left' ? 'right' : 'left'
   })
+  console.log({_initialDeckSetup})
   return {
     ...passThruProps,
     ...dispatchProps,
@@ -46,9 +48,9 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
     saveFileMetadata: (nextFormValues: FileMetadataFields) =>
       dispatch(actions.saveFileMetadata(nextFormValues)),
     swapPipettes: () => {
-      dispatch(stepFormActions.movePipettes({
+      dispatch(steplistActions.changeSavedStepForm({
         stepId: INITIAL_DECK_SETUP_STEP_ID,
-        update: swapPipetteUpdate,
+        update: {pipetteLocationUpdate: swapPipetteUpdate},
       }))
       dispatch(pipetteActions.swapPipettes())
     },

@@ -30,7 +30,7 @@ import type {
 import * as actions from '../actions'
 import {getPDMetadata} from '../../file-types'
 import type {BaseState, Options} from '../../types'
-import type {LoadFileAction, CreateNewProtocolAction} from '../../load-file'
+import type {LoadFileAction} from '../../load-file'
 import type {
   RemoveWellsContents,
   DeleteLiquidGroup,
@@ -192,22 +192,6 @@ export const containers = handleActions({
         },
       }
     }, {})
-  },
-  CREATE_NEW_PROTOCOL: (state: ContainersState, action: CreateNewProtocolAction): ContainersState => {
-    const nextState = action.payload.tipracks.reduce((acc: ContainersState, tiprack): ContainersState => {
-      const {id, model} = tiprack
-      return {
-        ...acc,
-        [id]: {
-          slot: nextEmptySlot(_loadedContainersBySlot(acc)),
-          type: model,
-          disambiguationNumber: getNextDisambiguationNumber(acc, String(model)),
-          id,
-          name: null,
-        },
-      }
-    }, state)
-    return nextState
   },
 }, initialLabwareState)
 
