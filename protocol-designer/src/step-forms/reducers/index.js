@@ -17,6 +17,7 @@ import {
 import {getPDMetadata} from '../../file-types'
 import {getDefaultsForStepType} from '../../steplist/formLevel'
 import {cancelStepForm} from '../../steplist/actions'
+
 import {getChangeLabwareEffects} from '../../steplist/actions/handleFormChange'
 
 import type {PipetteEntities, LabwareEntities} from '../types'
@@ -29,10 +30,14 @@ import type {FormData, StepIdType} from '../../form-types'
 import type {FileLabware, FilePipette, ProtocolFile} from '../../file-types'
 
 import type {
+  AddStepAction,
   ChangeFormInputAction,
   DeleteStepAction,
-  SaveStepFormAction,
+  DuplicateStepAction,
   PopulateFormAction,
+  ReorderSelectedStepAction,
+  ReorderStepsAction,
+  SaveStepFormAction,
 } from '../../steplist/actions'
 import type {
   SaveMoreOptionsModal,
@@ -297,7 +302,49 @@ const pipetteInvariantProperties = handleActions({
   },
 }, {})
 
+// TODO: Ian 2018-12-17 remove the old orderedSteps + OrderedStepsState in steplist/reducers
+// which this was copy-pasted from
+export type OrderedStepsState = Array<StepIdType>
+
+const orderedSteps = handleActions({
+  ADD_STEP: (state: OrderedStepsState, action: AddStepAction) =>
+    [...state, action.payload.id],
+  DELETE_STEP: (state: OrderedStepsState, action: DeleteStepAction) =>
+    state.filter(stepId => stepId !== action.payload),
+  LOAD_FILE: (state: OrderedStepsState, action: LoadFileAction): OrderedStepsState =>
+    getPDMetadata(action.payload).orderedSteps,
+  REORDER_SELECTED_STEP: (state: OrderedStepsState, action: ReorderSelectedStepAction): OrderedStepsState => {
+    // TODO: BC 2018-11-27 make util function for reordering and use it everywhere
+    const {delta, stepId} = action.payload
+    const stepsWithoutSelectedStep = state.filter(s => s !== stepId)
+    const selectedIndex = state.findIndex(s => s === stepId)
+    const nextIndex = selectedIndex + delta
+
+    if (delta <= 0 && selectedIndex === 0) return state
+
+    return [
+      ...stepsWithoutSelectedStep.slice(0, nextIndex),
+      stepId,
+      ...stepsWithoutSelectedStep.slice(nextIndex),
+    ]
+  },
+  DUPLICATE_STEP: (state: OrderedStepsState, action: DuplicateStepAction): OrderedStepsState => {
+    const {stepId, duplicateStepId} = action.payload
+    const selectedIndex = state.findIndex(s => s === stepId)
+
+    return [
+      ...state.slice(0, selectedIndex + 1),
+      duplicateStepId,
+      ...state.slice(selectedIndex + 1, state.length),
+    ]
+  },
+  REORDER_STEPS: (state: OrderedStepsState, action: ReorderStepsAction): OrderedStepsState => (
+    action.payload.stepIds
+  ),
+}, [])
+
 export type RootState = {
+  orderedSteps: OrderedStepsState,
   labwareInvariantProperties: LabwareEntities,
   pipetteInvariantProperties: PipetteEntities,
   savedStepForms: SavedStepFormState,
@@ -307,6 +354,7 @@ export type RootState = {
 // TODO Ian 2018-12-13: find some existing util to do this nested version of combineReducers
 // which avoids: 1) duplicating specifying initial state and 2) returning a new object when there's no change
 const initialRootState: RootState = {
+  orderedSteps: [],
   labwareInvariantProperties: initialLabwareState,
   pipetteInvariantProperties: {},
   savedStepForms: initialSavedStepFormsState,
@@ -315,6 +363,7 @@ const initialRootState: RootState = {
 // TODO: Ian 2018-12-13 remove this 'any' type
 const rootReducer = (state: RootState = initialRootState, action: any) => {
   return {
+    orderedSteps: orderedSteps(state.orderedSteps, action),
     labwareInvariantProperties: labwareInvariantProperties(state.labwareInvariantProperties, action),
     pipetteInvariantProperties: pipetteInvariantProperties(state.pipetteInvariantProperties, action),
     savedStepForms: savedStepForms(state, action),
