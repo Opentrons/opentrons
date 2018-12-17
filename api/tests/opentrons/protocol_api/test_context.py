@@ -141,7 +141,6 @@ def test_return_tip(loop, load_my_labware):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
     tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 1)
-    tip_lenth = tiprack.tip_length
     mount = Mount.LEFT
 
     instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
@@ -149,17 +148,16 @@ def test_return_tip(loop, load_my_labware):
     with pytest.raises(TypeError):
         instr.return_tip()
 
-    pipette: Pipette = ctx._hardware._attached_instruments[mount]
-    model_offset = Point(*pipette.config.model_offset)
+    pipette: Pipette\
+        = ctx._hw_manager.hardware._attached_instruments[mount]
 
     target_location = tiprack.wells_by_index()['A1'].top()
     instr.pick_up_tip(target_location)
 
-    new_offset = model_offset - Point(0, 0, tip_lenth)
-    assert pipette.critical_point() == new_offset
+    assert pipette.has_tip
 
     instr.return_tip()
-    assert pipette.critical_point() == model_offset
+    assert not pipette.has_tip
 
 
 def test_pick_up_tip_no_location(loop, load_my_labware):
