@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.6.4"></a>
+## [3.6.4](https://github.com/opentrons/opentrons/compare/v3.6.3...v3.6.4) (2018-12-17)
+
+
+### Bug Fixes
+
+* **protocol-designer:** fix bug with null distribute step ([#2826](https://github.com/opentrons/opentrons/issues/2826)) ([3eecb29](https://github.com/opentrons/opentrons/commit/3eecb29))
+
+
+### Features
+
+* **api:** Adds optional arg to QC scripts to specify UART port ([#2825](https://github.com/opentrons/opentrons/issues/2825)) ([5d622ad](https://github.com/opentrons/opentrons/commit/5d622ad))
+
+
+### Performance Improvements
+
+* **api:** Update P1000S aspirate function ([#2830](https://github.com/opentrons/opentrons/issues/2830)) ([ca65283](https://github.com/opentrons/opentrons/commit/ca65283))
+
+
+
+
+
 <a name="3.6.3"></a>
 ## [3.6.3](https://github.com/Opentrons/opentrons/compare/v3.6.2...v3.6.3) (2018-12-13)
 

@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.6.4"></a>
+## [3.6.4](https://github.com/Opentrons/opentrons/compare/v3.6.3...v3.6.4) (2018-12-17)
+
+
+### Features
+
+* **api:** Adds optional arg to QC scripts to specify UART port ([#2825](https://github.com/Opentrons/opentrons/issues/2825)) ([5d622ad](https://github.com/Opentrons/opentrons/commit/5d622ad))
+
+
+
+
+
 <a name="3.6.3"></a>
 ## [3.6.3](https://github.com/Opentrons/opentrons/compare/v3.6.2...v3.6.3) (2018-12-13)
 
