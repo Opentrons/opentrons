@@ -355,9 +355,9 @@ def extract_metadata(parsed):
         obj for obj in parsed.body if isinstance(obj, ast.Assign)]
     for obj in assigns:
         print(obj.targets[0])
-        if obj.targets[0].id == 'metadata' \
-                and isinstance(obj.value, ast.Dict) \
-                and isinstance(obj.targets[0], ast.Name):
+        if isinstance(obj.targets[0], ast.Name) \
+                and obj.targets[0].id == 'metadata' \
+                and isinstance(obj.value, ast.Dict):
             keys = [k.s for k in obj.value.keys]
             values = [v.s for v in obj.value.values]
             metadata = dict(zip(keys, values))
