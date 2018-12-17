@@ -19,7 +19,7 @@ export type SelectStepAction = {
 }
 
 // get new or existing step for given stepId
-function getStepFormData (state: BaseState, stepId: StepIdType, newStepType?: StepType): ?FormData {
+export function getStepFormData (state: BaseState, stepId: StepIdType, newStepType?: StepType): ?FormData {
   const existingStep = steplistSelectors.getSavedForms(state)[stepId]
 
   if (existingStep) {

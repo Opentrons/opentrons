@@ -2,15 +2,16 @@
 import type {Dispatch} from 'redux'
 import forEach from 'lodash/forEach'
 
-import type {StepIdType, StepType} from '../../form-types'
+import type {StepIdType, StepType, FormModalFields} from '../../form-types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../../types'
 import {selectors as steplistSelectors} from '../../steplist'
 import * as pipetteSelectors from '../../pipettes/selectors'
 import {getNextDefaultPipetteId} from '../../steplist/formLevel'
+import {getStepFormData} from '../../steplist/actions'
 import type {TerminalItemId, SubstepIdentifier, FormSectionNames} from '../../steplist/types'
 
 import selectors from './selectors'
-import type {ChangeFormPayload} from './types'
+import type {ChangeFormPayload} from '../../steplist/actions/types'
 import handleFormChange from '../../steplist/actions/handleFormChange'
 
 type ExpandAddStepButtonAction = {type: 'EXPAND_ADD_STEP_BUTTON', payload: boolean}
@@ -61,6 +62,7 @@ export const collapseFormSection = (payload: FormSectionNames): CollapseFormSect
 // Effectively another unsaved form, that saves to unsavedForm's "hidden" fields
 
 // Populate newly-opened options modal with fields from unsaved form
+export type OpenMoreOptionsModalAction = {type: 'OPEN_MORE_OPTIONS_MODAL', payload: FormModalFields}
 export const openMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
   dispatch({
     type: 'OPEN_MORE_OPTIONS_MODAL',
@@ -68,7 +70,7 @@ export const openMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetS
   })
 }
 
-export type CancelMoreOptionsModalAction = {type: 'CANCEL_MORE_OPTIONS_MODAL', payload: void}
+export type CancelMoreOptionsModalAction = {type: 'CANCEL_MORE_OPTIONS_MODAL', payload: null}
 export const cancelMoreOptionsModal = (): CancelMoreOptionsModalAction => ({
   type: 'CANCEL_MORE_OPTIONS_MODAL',
   payload: null,
@@ -88,13 +90,13 @@ export const saveMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetS
   })
 }
 
-type SetWellSelectionLabwareKeyAction = {type: 'SET_WELL_SELECTION_LABWARE_KEY', payload: string}
+type SetWellSelectionLabwareKeyAction = {type: 'SET_WELL_SELECTION_LABWARE_KEY', payload: ?string}
 export const setWellSelectionLabwareKey = (labwareName: ?string): SetWellSelectionLabwareKeyAction => ({
   type: 'SET_WELL_SELECTION_LABWARE_KEY',
   payload: labwareName,
 })
 
-type ClearWellSelectionLabwareKeyAction = {type: 'CLEAR_WELL_SELECTION_LABWARE_KEY', payload: void}
+type ClearWellSelectionLabwareKeyAction = {type: 'CLEAR_WELL_SELECTION_LABWARE_KEY', payload: null}
 export const clearWellSelectionLabwareKey = (): ClearWellSelectionLabwareKeyAction => ({
   type: 'CLEAR_WELL_SELECTION_LABWARE_KEY',
   payload: null,
@@ -114,7 +116,7 @@ export const selectStep = (stepId: StepIdType, newStepType?: StepType): ThunkAct
     dispatch(selectStepAction)
 
     const state = getState()
-    let formData = steplistSelectors.getStepFormData(state, stepId, newStepType)
+    let formData = getStepFormData(state, stepId, newStepType)
 
     const defaultPipetteId = getNextDefaultPipetteId(
       steplistSelectors.getSavedForms(state),

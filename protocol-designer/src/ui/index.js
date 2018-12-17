@@ -7,7 +7,7 @@ export type RootState = {|
   steps: StepsState,
 |}
 
-export const _uiSubReducers: RootState = {
+export const _uiSubReducers = {
   steps: stepsReducer,
 }
 

@@ -6,21 +6,18 @@ import omit from 'lodash/omit'
 
 import {getPDMetadata} from '../../file-types'
 
-import {START_TERMINAL_ITEM_ID} from '../../steplist/types'
 import type {LoadFileAction} from '../../load-file'
 import type {StepIdType, FormModalFields} from '../../form-types'
-import type {
-  FormSectionState,
-  SubstepIdentifier,
-  TerminalItemId,
-} from './types'
+import {START_TERMINAL_ITEM_ID, type SubstepIdentifier, type TerminalItemId} from '../../steplist/types'
+
+import type {FormSectionState} from './types'
 
 import type {
   SelectStepAction,
   SelectTerminalItemAction,
   CollapseFormSectionAction,
   ChangeMoreOptionsModalInputAction,
-  OpenMoreOptionsModal,
+  OpenMoreOptionsModalAction,
   hoverOnSubstep,
   expandAddStepButton,
   hoverOnStep,
@@ -43,7 +40,7 @@ const formSectionCollapse = handleActions({
 // the form modal (MORE OPTIONS) is an unsaved version of unsavedForm.
 // It's 2 degrees away from actual savedStepForms.
 const unsavedFormModal = handleActions({
-  OPEN_MORE_OPTIONS_MODAL: (state, action: OpenMoreOptionsModal) => action.payload,
+  OPEN_MORE_OPTIONS_MODAL: (state, action: OpenMoreOptionsModalAction) => action.payload,
   CHANGE_MORE_OPTIONS_MODAL_INPUT: (state, action: ChangeMoreOptionsModalInputAction) =>
     ({...state, ...action.payload.update}),
   CANCEL_MORE_OPTIONS_MODAL: () => null,

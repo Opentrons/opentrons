@@ -23,8 +23,8 @@ import type {
   DuplicateStepAction,
   SaveStepFormAction,
   PopulateFormAction,
-  SaveMoreOptionsModal,
 } from './actions' // Thunk action creators
+import type {SaveMoreOptionsModal} from '../ui/steps/actions'
 
 import {
   cancelStepForm, // TODO try collapsing them all into a single Action type
