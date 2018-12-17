@@ -8,6 +8,7 @@ import type {RootState as Navigation} from './navigation'
 import type {RootState as Pipettes} from './pipettes'
 import type {RootState as StepList} from './steplist'
 import type {RootState as Tutorial} from './tutorial'
+import type {RootState as UI} from './ui'
 import type {RootState as WellSelection} from './well-selection/reducers'
 export type BaseState = {
   analytics: Analytics,
@@ -19,6 +20,7 @@ export type BaseState = {
   pipettes: Pipettes,
   steplist: StepList,
   tutorial: Tutorial,
+  ui: UI,
   wellSelection: WellSelection,
 }
 

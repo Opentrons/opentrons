@@ -5,21 +5,21 @@ import isEmpty from 'lodash/isEmpty'
 
 import steplistSelectors from '../../steplist/selectors'
 import type {RootState as SteplistRootState} from '../../steplist/reducers'
-import type {StepIdType} from '../form-types'
-import type {BaseState, Selector} from '../types'
+import type {StepIdType} from '../../form-types'
+import type {BaseState, Selector} from '../../types'
+import type {FormSectionState} from './types'
 import {
   initialSelectedItemState,
-  RootState,
-  SelectableItem,
+  type SelectableItem,
+  type StepsState,
 } from './reducers'
 
 import type {
-  FormSectionState,
   SubstepIdentifier,
   TerminalItemId,
-} from './types'
+} from '../../steplist/types'
 
-const rootSelector = (state: BaseState): RootState => state.ui.steps
+const rootSelector = (state: BaseState): StepsState => state.ui.steps
 
 // ======= Selectors ===============================================
 
@@ -27,7 +27,7 @@ const rootSelector = (state: BaseState): RootState => state.ui.steps
 const getNonNullSelectedItem: Selector<SelectableItem> = createSelector(
   rootSelector,
   steplistSelectors.rootSelector,
-  (state: RootState, steplistState: SteplistRootState) => {
+  (state: StepsState, steplistState: SteplistRootState) => {
     if (state.selectedItem != null) return state.selectedItem
     if (steplistState.orderedSteps.length > 0) return {isStep: true, id: last(steplistState.orderedSteps)}
     return initialSelectedItemState
@@ -46,7 +46,7 @@ const getSelectedTerminalItemId: Selector<?TerminalItemId> = createSelector(
 
 const getHoveredItem: Selector<?SelectableItem> = createSelector(
   rootSelector,
-  (state: RootState) => state.hoveredItem
+  (state: StepsState) => state.hoveredItem
 )
 
 const getHoveredStepId: Selector<?StepIdType> = createSelector(
@@ -104,7 +104,7 @@ const getHoveredTerminalItemId: Selector<?TerminalItemId> = createSelector(
 
 const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
   rootSelector,
-  (state: RootState) => state.hoveredSubstep
+  (state: StepsState) => state.hoveredSubstep
 )
 
 // Hovered or selected item. Hovered has priority.
@@ -120,13 +120,13 @@ const getActiveItem: Selector<SelectableItem> = createSelector(
 // TODO: BC 2018-12-17 refactor as react state
 const getCollapsedSteps = createSelector(
   rootSelector,
-  (state: RootState) => state.collapsedSteps
+  (state: StepsState) => state.collapsedSteps
 )
 
 // TODO: BC 2018-12-17 refactor as react state
 const getStepCreationButtonExpanded: Selector<boolean> = createSelector(
   rootSelector,
-  (state: RootState) => state.stepCreationButtonExpanded
+  (state: StepsState) => state.stepCreationButtonExpanded
 )
 
 // TODO: BC 2018-12-17 refactor as react state
@@ -162,12 +162,12 @@ export const getCurrentFormCanBeSaved: Selector<boolean | null> = createSelector
 
 const getWellSelectionLabwareKey: Selector<?string> = createSelector(
   rootSelector,
-  (state: RootState) => state.wellSelectionLabwareKey
+  (state: StepsState) => state.wellSelectionLabwareKey
 )
 
 const getFormModalData = createSelector(
   rootSelector,
-  (state: RootState) => state.unsavedFormModal
+  (state: StepsState) => state.unsavedFormModal
 )
 
 export default {

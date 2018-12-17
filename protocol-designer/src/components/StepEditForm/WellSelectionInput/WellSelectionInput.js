@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import {FormGroup, InputField} from '@opentrons/components'
 import WellSelectionModal from './WellSelectionModal'
 import {Portal} from '../../portals/MainPageModalPortal'
-import {selectors as steplistSelectors, actions as steplistActions} from '../../../steplist'
+import {actions as steplistActions} from '../../../steplist'
 import {selectors as stepsSelectors} from '../../../ui/steps'
 import styles from '../StepEditForm.css'
 

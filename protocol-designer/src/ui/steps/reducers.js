@@ -9,20 +9,24 @@ import {getPDMetadata} from '../../file-types'
 import type {LoadFileAction} from '../../load-file'
 import type {StepIdType, FormModalFields} from '../../form-types'
 import {START_TERMINAL_ITEM_ID, type SubstepIdentifier, type TerminalItemId} from '../../steplist/types'
+import type {
+  AddStepAction,
+  DeleteStepAction,
+} from '../../steplist/actions'
 
 import type {FormSectionState} from './types'
 
-import type {
-  SelectStepAction,
-  SelectTerminalItemAction,
-  CollapseFormSectionAction,
-  ChangeMoreOptionsModalInputAction,
-  OpenMoreOptionsModalAction,
+import {
   hoverOnSubstep,
   expandAddStepButton,
   hoverOnStep,
   hoverOnTerminalItem,
   toggleStepCollapsed,
+  type SelectStepAction,
+  type SelectTerminalItemAction,
+  type CollapseFormSectionAction,
+  type ChangeMoreOptionsModalInputAction,
+  type OpenMoreOptionsModalAction,
 } from './actions'
 
 // Handles aspirate / dispense form sections opening / closing
@@ -48,6 +52,7 @@ const unsavedFormModal = handleActions({
   DELETE_STEP: () => null,
 }, null)
 
+type CollapsedStepsState = {[StepIdType]: boolean}
 const collapsedSteps: Reducer<CollapsedStepsState, *> = handleActions({
   ADD_STEP: (state: CollapsedStepsState, action: AddStepAction) => ({
     ...state,

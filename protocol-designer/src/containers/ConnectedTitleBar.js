@@ -9,12 +9,7 @@ import i18n from '../localization'
 import {START_TERMINAL_TITLE, END_TERMINAL_TITLE} from '../constants'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {selectors as stepsSelectors} from '../ui/steps'
-import {
-  selectors as steplistSelectors,
-  actions as steplistActions,
-  END_TERMINAL_ITEM_ID,
-  START_TERMINAL_ITEM_ID,
-} from '../steplist'
+import {actions as steplistActions, END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID} from '../steplist'
 import {selectors as fileDataSelectors} from '../file-data'
 import {closeIngredientSelector} from '../labware-ingred/actions'
 import {stepIconsByType} from '../form-types'
