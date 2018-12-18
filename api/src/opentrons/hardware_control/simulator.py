@@ -212,3 +212,7 @@ class Simulator:
 
     def halt(self):
         self._run_flag.set()
+
+    def probe(self, axis: str, distance: float) -> Dict[str, float]:
+        self._position[axis.upper()] = self._position[axis.upper()] + distance
+        return self._position

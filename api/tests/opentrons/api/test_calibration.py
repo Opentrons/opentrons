@@ -2,14 +2,74 @@ import pytest
 from unittest import mock
 from functools import partial
 from tests.opentrons.conftest import state
-from opentrons.util import calibration_functions
 from opentrons.config import robot_configs
+from opentrons.protocol_api import labware
+from opentrons.api import models
+from opentrons.types import Point, Location, Mount
 
 state = partial(state, 'calibration')
 
 
+@pytest.mark.api2_only
+async def test_tip_probe_v2(main_router, model, monkeypatch):
+
+    def fake_locate(mount, tip_length):
+        assert mount == Mount[model.instrument.mount.upper()]
+        assert tip_length is None
+        return Point(0, 0, 0)
+
+    def fake_update(mount, new_offset=None, from_tip_probe=None):
+        assert mount == Mount[model.instrument.mount.upper()]
+        if new_offset:
+            assert new_offset == Point(0, 0, 0)
+        elif from_tip_probe:
+            assert from_tip_probe == Point(0, 0, 0)
+        else:
+            assert False, "fake_update called with no args"
+
+    def fake_move(instrument):
+        assert instrument == model.instrument
+
+    def fake_add_tip(tip_length):
+        assert tip_length == 51.7
+
+    def fake_remove_tip():
+        pass
+
+    monkeypatch.setattr(main_router.calibration_manager._hardware._api,
+                        'locate_tip_probe_center', fake_locate)
+    monkeypatch.setattr(main_router.calibration_manager._hardware._api,
+                        'update_mount_offset', fake_update)
+    monkeypatch.setattr(main_router.calibration_manager,
+                        'move_to_front', fake_move)
+    main_router.calibration_manager.tip_probe(model.instrument)
+
+    await main_router.wait_until(state('probing'))
+    await main_router.wait_until(state('ready'))
+
+    tr = labware.load('opentrons_96_tiprack_300_uL', Location(Point(), 'test'))
+    tr.tip_length = 2
+
+    model.instrument.tip_racks = [
+        models.Container(tr,
+                         [model.instrument._instrument],
+                         model.instrument._context)]
+
+    def new_fake_locate(mount, tip_length):
+        assert tip_length == 2
+        return Point(0, 0, 0)
+
+    monkeypatch.setattr(main_router.calibration_manager._hardware._api,
+                        'locate_tip_probe_center', new_fake_locate)
+    main_router.calibration_manager.tip_probe(model.instrument)
+    await main_router.wait_until(state('ready'))
+    model.instrument.containers = model.instrument.tip_racks
+    model.instrument.tip_racks = []
+    main_router.calibration_manager.tip_probe(model.instrument)
+
+
 @pytest.mark.api1_only
-async def test_tip_probe(main_router, model):
+async def test_tip_probe_v1(main_router, model):
     with mock.patch(
             'opentrons.util.calibration_functions.probe_instrument'
          ) as probe_patch:
@@ -30,16 +90,14 @@ async def test_tip_probe(main_router, model):
                 measured_center=(0, 0, 0))
 
     await main_router.wait_until(state('probing'))
+    await main_router.wait_until(state('moving'))
     await main_router.wait_until(state('ready'))
 
 
-@pytest.mark.api1_only
-async def test_correct_hotspots(main_router, model):
+async def test_correct_hotspots():
+    config = robot_configs._build_config([], {})
 
-    robot = model.robot
-    robot.config = robot_configs._build_config([], {})
-
-    tip_length = robot.config.tip_length[model.instrument._instrument.name]
+    tip_length = 47
     switch_clearance = 7.5
     x_switch_offset = 2.0
     y_switch_offset = 5.0
@@ -48,56 +106,67 @@ async def test_correct_hotspots(main_router, model):
     z_probe_clearance = 5.0
     z_start_clearance = 20.0
 
-    size_x, size_y, size_z = robot.config.tip_probe.dimensions
+    size_x, size_y, size_z = config.tip_probe.dimensions
 
     rel_x_start = (size_x / 2) + switch_clearance
     rel_y_start = (size_y / 2) + switch_clearance
+    center = [293.03, 301.27, 77.0]
 
     nozzle_safe_z = round((size_z - tip_length) + z_probe_clearance, 3)
     z_start = max(deck_clearance, nozzle_safe_z)
     expected = [('x',
-                 -rel_x_start,
-                 x_switch_offset,
+                 center[0] - rel_x_start,
+                 center[1] + x_switch_offset,
                  z_start,
                  size_x),
                 ('x',
-                 rel_x_start,
-                 x_switch_offset,
+                 center[0] + rel_x_start,
+                 center[1] + x_switch_offset,
                  z_start,
                  -size_x),
                 ('y',
-                 y_switch_offset,
-                 -rel_y_start,
+                 center[0] + y_switch_offset,
+                 center[1] - rel_y_start,
                  z_start,
                  size_y),
                 ('y',
-                y_switch_offset,
-                rel_y_start,
-                z_start,
-                -size_y),
+                 center[0] + y_switch_offset,
+                 center[1] + rel_y_start,
+                 z_start,
+                 -size_y),
                 ('z',
-                 0.0,
-                 z_switch_offset,
-                 z_start_clearance,
+                 center[0],
+                 center[1] + z_switch_offset,
+                 center[2] + z_start_clearance,
                  -size_z)
                 ]
 
-    actual = calibration_functions._calculate_hotspots(
-        robot,
+    actual = robot_configs.calculate_tip_probe_hotspots(
         tip_length,
-        robot.config.tip_probe)
+        config.tip_probe)
 
     assert expected == actual
 
 
+@pytest.mark.api2_only
+async def test_move_to_front_api2(main_router, model):
+    with mock.patch.object(main_router.calibration_manager._hardware._api,
+                           'move_to') as patch:
+        main_router.calibration_manager.move_to_front(model.instrument)
+        patch.assert_called_with(Mount.RIGHT, Point(132.5, 90.5, 150))
+
+        await main_router.wait_until(state('moving'))
+        await main_router.wait_until(state('ready'))
+
+
 @pytest.mark.api1_only
-async def test_move_to_front(main_router, model):
+async def test_move_to_front_api1(main_router, model):
     robot = model.robot
 
     robot.home()
 
     with mock.patch(
-         'opentrons.util.calibration_functions.move_instrument_for_probing_prep') as patch:  # NOQA
+            'opentrons.util.calibration_functions.move_instrument_for_probing_prep') as patch:  # NOQA(E501)
         main_router.calibration_manager.move_to_front(model.instrument)
         patch.assert_called_with(
             model.instrument._instrument,
@@ -107,7 +176,7 @@ async def test_move_to_front(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
-async def test_pick_up_tip(main_router, model):
+async def test_pick_up_tip_api1(main_router, model):
     with mock.patch.object(
             model.instrument._instrument, 'pick_up_tip') as pick_up_tip:
         main_router.calibration_manager.pick_up_tip(
@@ -115,7 +184,7 @@ async def test_pick_up_tip(main_router, model):
             model.container)
 
         pick_up_tip.assert_called_with(
-            model.container._container[0])
+            model.container._container.wells()[0])
 
         await main_router.wait_until(state('moving'))
         await main_router.wait_until(state('ready'))
@@ -129,13 +198,12 @@ async def test_drop_tip(main_router, model):
             model.container)
 
         drop_tip.assert_called_with(
-            model.container._container[0])
+            model.container._container.wells()[0])
 
         await main_router.wait_until(state('moving'))
         await main_router.wait_until(state('ready'))
 
 
-@pytest.mark.api1_only
 async def test_return_tip(main_router, model):
     with mock.patch.object(
             model.instrument._instrument, 'return_tip') as return_tip:
@@ -147,9 +215,10 @@ async def test_return_tip(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
-@pytest.mark.api1_only
-async def test_home(main_router, model):
-    with mock.patch.object(model.instrument._instrument, 'home') as home:
+@pytest.mark.api2_only
+async def test_home_api2(main_router, model):
+    with mock.patch.object(
+            main_router.calibration_manager._hardware._api, 'home') as home:
         main_router.calibration_manager.home(
             model.instrument)
 
@@ -160,21 +229,55 @@ async def test_home(main_router, model):
 
 
 @pytest.mark.api1_only
+async def test_home_api1(main_router, model):
+    with mock.patch.object(model.instrument._instrument, 'home') as home:
+        main_router.calibration_manager.home(
+            model.instrument)
+
+        home.assert_called_with()
+
+        await main_router.wait_until(state('moving'))
+        await main_router.wait_until(state('ready'))
+
+
 async def test_move_to_top(main_router, model):
     with mock.patch.object(model.instrument._instrument, 'move_to') as move_to:
         main_router.calibration_manager.move_to(
             model.instrument,
             model.container)
-        target = model.container._container[0]
+        target = model.container._container.wells()[0].top()
         move_to.assert_called_with(target)
 
         await main_router.wait_until(state('moving'))
         await main_router.wait_until(state('ready'))
 
 
+@pytest.mark.api2_only
+async def test_jog_api2(main_router, model):
+    main_router.calibration_manager.home(model.instrument)
+    with mock.patch.object(
+            main_router.calibration_manager._hardware._api, 'move_rel') as jog:
+        for distance, axis in zip((1, 2, 3), 'xyz'):
+            main_router.calibration_manager.jog(
+                model.instrument,
+                distance,
+                axis
+            )
+
+        expected = [
+            mock.call(Mount.RIGHT, point)
+            for point in [Point(x=1), Point(y=2), Point(z=3)]]
+
+        assert jog.mock_calls == expected
+
+        await main_router.wait_until(state('moving'))
+        await main_router.wait_until(state('ready'))
+
+
 @pytest.mark.api1_only
-async def test_jog(main_router, model):
-    with mock.patch('opentrons.util.calibration_functions.jog_instrument') as jog:  # NOQA
+async def test_jog_api1(main_router, model):
+    with mock.patch(
+            'opentrons.util.calibration_functions.jog_instrument') as jog:
         for distance, axis in zip((1, 2, 3), 'xyz'):
             main_router.calibration_manager.jog(
                 model.instrument,

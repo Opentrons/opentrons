@@ -4,12 +4,6 @@ from opentrons import hardware_control as hc
 from opentrons.hardware_control.types import Axis, CriticalPoint
 
 
-@pytest.fixture
-def hardware_api(loop):
-    hw_api = hc.API.build_hardware_simulator(loop=loop)
-    return hw_api
-
-
 async def test_controller_home(loop):
     c = hc.API.build_hardware_simulator(loop=loop)
     await c.home()

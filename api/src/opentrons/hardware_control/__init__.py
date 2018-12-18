@@ -12,6 +12,7 @@ functions are available elsewhere.
 
 import asyncio
 from collections import OrderedDict
+import contextlib
 import functools
 import logging
 from typing import Any, Dict, Union, List, Optional, Tuple
@@ -227,7 +228,9 @@ class API(HardwareAPILike):
         for mount, instrument_data in found.items():
             model = instrument_data.get('model')
             if model is not None:
-                p = Pipette(model, instrument_data['id'])
+                p = Pipette(model,
+                            self._config.instrument_offset[mount.name.lower()],
+                            instrument_data['id'])
                 self._attached_instruments[mount] = p
             else:
                 self._attached_instruments[mount] = None
@@ -634,7 +637,7 @@ class API(HardwareAPILike):
                     deck_max = self._deck_from_smoothie({ax: bound[1]
                                                          for ax, bound
                                                          in bounds.items()})
-                    self._log.warning(
+                    raise RuntimeError(
                         "Out of bounds move: {}={} (transformed: {}) not in"
                         "limits ({}, {}) (transformed: ({}, {})"
                         .format(ax.name,
@@ -1013,22 +1016,146 @@ class API(HardwareAPILike):
             return True, 'firmware update successful'
 
     @_log_call
-    async def locate_tip_probe_center(self, mount) -> Dict[Axis, float]:
+    async def locate_tip_probe_center(
+            self, mount, tip_length=None) -> top_types.Point:
         """ Use the specified mount (which should have a tip) to find the
         position of the tip probe target center relative to its definition
 
-        The return value is a dict mapping axes to the difference in position
-        from definition of the tip probe center.
+        :param mount: The mount to use for the probe
+        :param tip_length: If specified (it should usually be specified),
+                           the length of the tip assumed to be attached.
+
+        The tip length specification is for the use case during protocol
+        calibration, when the machine cannot yet pick up a tip on its own.
+        For that reason, it is not universally necessary. Instead, there
+        are several cases:
+
+        1. A tip has previously been picked up with :py:meth:`pick_up_tip`.
+           ``tip_length`` should not be specified since the tip length is
+           known. If ``tip_length`` is not ``None``, this function asserts.
+        2. A tip has not previously been picked up, and ``tip_length`` is
+           specified. The pipette will internally have a tip added of the
+           specified length.
+        3. A tip has not previously been picked up, and ``tip_length`` is
+           not specified. The pipette will use the tip length from its
+           config.
+
+        The return value is a dict containing the updated position, in deck
+        coordinates, of the tip probe center.
         """
         pip = self._attached_instruments[mount]
-        assert pip and pip.has_tip,\
-            '{} has either no pipette or no tip'.format(mount)
+        assert pip, '{} has no pipette'.format(mount.name.lower())
 
-        # Move to clearance height if necessary
-        pos = self.current_position(mount)
-        if pos[Axis.Z] < 35:
-            await self.move_to(mount,
-                               top_types.Point(pos[Axis.X],
-                                               pos[Axis.Y],
-                                               35))
-        return {}
+        assert not (pip.has_tip and tip_length),\
+            '{} has a tip, tip length must not be specified'.format(pip)
+
+        safe_z = self._config.tip_probe.z_clearance.crossover + \
+            self._config.tip_probe.center[2]
+
+        new_pos = {ax: 0.0
+                   for ax in Axis.gantry_axes() if ax != Axis.A}
+
+        if not tip_length and not pip.has_tip:
+            tip_length = pip.config.tip_length
+
+        # assure_tip lets us make sure we don’t pollute the pipette
+        # state even if there’s an exception in tip probe, though
+        # it leads to the ugly code with the nested function
+        @contextlib.contextmanager
+        def _assure_tip():
+            should_manage = not pip.has_tip
+            if should_manage:
+                pip.add_tip(tip_length)
+            try:
+                yield
+            finally:
+                if should_manage:
+                    pip.remove_tip()
+
+        async def _do_tp() -> top_types.Point:
+            # Clear the old offset during calibration
+            pip.update_instrument_offset(top_types.Point())
+            # Hotspots based on our expectation of tip length and config
+            hotspots = robot_configs.calculate_tip_probe_hotspots(
+                pip.current_tip_length, self._config.tip_probe)
+            for ax, x0, y0, z0, probe_distance in hotspots:
+                pos = self.current_position(mount)
+                # Move safely to the setup point for the probe
+                await self.move_to(mount,
+                                   top_types.Point(pos[Axis.X],
+                                                   pos[Axis.Y],
+                                                   safe_z))
+                await self.move_to(mount,
+                                   top_types.Point(x0, y0, safe_z))
+                await self.move_to(mount,
+                                   top_types.Point(x0, y0, z0))
+                ax_en = Axis[ax.upper()]
+                if ax_en == Axis.Z:
+                    to_probe = Axis.by_mount(mount)
+                else:
+                    to_probe = ax_en
+                # Probe and retrieve the position afterwards
+                self._current_position = self._deck_from_smoothie(
+                    self._backend.probe(to_probe.name.lower(), probe_distance))
+                xyz = self.gantry_position(mount)
+                # Store the upated position. We can average for X and Y since
+                # we hit a switch on either side of the tip probe box, but for
+                # Z we have to just use the single value
+                if ax_en != Axis.Z:
+                    new_pos[ax_en] += xyz[ax_en.value] / 2.0
+                else:
+                    new_pos[ax_en] = xyz.z
+                # Before moving up, move back to clear the switches
+                bounce = self._config.tip_probe.bounce_distance\
+                    * (-1.0 if probe_distance > 0 else 1.0)
+                await self.move_rel(mount,
+                                    top_types.Point(
+                                        **{ax: bounce}))
+                await self.move_to(mount, xyz._replace(z=safe_z))
+
+            self._log.info("Tip probe complete with {} {} on {}. "
+                           "New position: {} (default {})"
+                           .format(pip.name, pip.pipette_id, mount.name,
+                                   new_pos, self._config.tip_probe.center))
+            return top_types.Point(**{ax.name.lower(): val
+                                      for ax, val in new_pos.items()})
+
+        with _assure_tip():
+            return await _do_tp()
+
+    def update_mount_offset(self, mount,
+                            new_offset: top_types.Point = None,
+                            from_tip_probe: top_types.Point = None):
+        """ Update the mount offset for a pipette on the specified mount.
+
+        This will update both the stored value in the robot settings and
+        the live value in the currently-loaded pipette.
+
+        This can be specified either directly by using the new_offset arg
+        or using the result of a previous call to
+        :py:meth:`locate_tip_probe_center` with the same mount.
+
+        :note: Z differences in the mount offset cannot be
+               disambiguated between differences in the position of the
+               nozzle and differences in the length of the nozzle/tip
+               interface (assuming that tips are of reasonably uniform
+               length). For this reason, they are saved as adjustments
+               to the nozzle interface length and only applied when a
+               tip is present.
+        """
+        if from_tip_probe:
+            new_offset = (from_tip_probe
+                          - top_types.Point(*self._config.tip_probe.center))
+        elif not new_offset:
+            raise ValueError(
+                "Either from_tip_probe or new_offset must be specified")
+        pip = self._attached_instruments[mount]
+        assert pip, '{} has no pipette'.format(mount.name.lower())
+        inst_offs = self._config.instrument_offset
+        pip_type = 'multi' if pip.config.channels > 1 else 'single'
+        inst_offs[mount.name.lower()][pip_type] = [new_offset.x,
+                                                   new_offset.y,
+                                                   new_offset.z]
+        self.update_config(instrument_offset=inst_offs)
+        pip.update_instrument_offset(new_offset)
+        robot_configs.save_robot_settings(self._config)

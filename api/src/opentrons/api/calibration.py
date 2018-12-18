@@ -2,8 +2,9 @@ import logging
 from copy import copy
 
 from opentrons.util import calibration_functions
+from opentrons.config import feature_flags as ff
 from opentrons.broker import publish
-
+from opentrons.types import Point, Mount
 
 from .models import Container
 
@@ -36,23 +37,39 @@ class CalibrationManager:
         log.info('Probing tip with {}'.format(instrument.name))
         self._set_state('probing')
 
-        measured_center = calibration_functions.probe_instrument(
-            instrument=inst,
-            robot=inst.robot)
+        if ff.use_protocol_api_v2():
+            mount = Mount[instrument._instrument.mount.upper()]
+            if instrument.tip_racks:
+                tip_length = instrument.tip_racks[0]._container.tip_length
+            else:
+                tipracks = [cont for cont in instrument.containers
+                            if cont._container.is_tiprack]
+                if tipracks:
+                    tip_length = tipracks[0]._container.tip_length
+                else:
+                    tip_length = None
+            measured_center = self._hardware.locate_tip_probe_center(
+                mount, tip_length)
+        else:
+            measured_center = calibration_functions.probe_instrument(
+                instrument=inst,
+                robot=inst.robot)
 
-        log.debug('Measured probe top center: {0}'.format(measured_center))
+        log.info('Measured probe top center: {0}'.format(measured_center))
 
-        config = calibration_functions.update_instrument_config(
-            instrument=inst,
-            measured_center=measured_center
-        )
+        if ff.use_protocol_api_v2():
+            self._hardware.update_mount_offset(
+                Mount[instrument._instrument.mount.upper()],
+                from_tip_probe=measured_center)
+            config = self._hardware.config
+        else:
+            config = calibration_functions.update_instrument_config(
+                instrument=inst,
+                measured_center=measured_center)
 
         log.info('New config: {0}'.format(config))
 
-        calibration_functions.move_instrument_for_probing_prep(
-            inst, inst.robot
-        )
-
+        self.move_to_front(instrument)
         self._set_state('ready')
 
     def pick_up_tip(self, instrument, container):
@@ -65,7 +82,11 @@ class CalibrationManager:
         log.info('Picking up tip from {} in {} with {}'.format(
             container.name, container.slot, instrument.name))
         self._set_state('moving')
-        inst.pick_up_tip(container._container.wells()[0])
+        if ff.use_protocol_api_v2():
+            with instrument._context.temp_connect(self._hardware):
+                inst.pick_up_tip(container._container.wells()[0])
+        else:
+            inst.pick_up_tip(container._container.wells()[0])
         self._set_state('ready')
 
     def drop_tip(self, instrument, container):
@@ -78,24 +99,35 @@ class CalibrationManager:
         log.info('Dropping tip from {} in {} with {}'.format(
             container.name, container.slot, instrument.name))
         self._set_state('moving')
-        inst.drop_tip(container._container.wells()[0])
+        if ff.use_protocol_api_v2():
+            with instrument._context.temp_connect(self._hardware):
+                inst.drop_tip(container._container.wells()[0])
+        else:
+            inst.drop_tip(container._container.wells()[0])
         self._set_state('ready')
 
     def return_tip(self, instrument):
         inst = instrument._instrument
         log.info('Returning tip from {}'.format(instrument.name))
         self._set_state('moving')
-        inst.return_tip()
+        if ff.use_protocol_api_v2():
+            with instrument._context.temp_connect(self._hardware):
+                inst.return_tip()
+        else:
+            inst.return_tip()
         self._set_state('ready')
 
     def move_to_front(self, instrument):
         inst = instrument._instrument
         log.info('Moving {}'.format(instrument.name))
         self._set_state('moving')
-
-        calibration_functions.move_instrument_for_probing_prep(
-            inst, inst.robot
-        )
+        if ff.use_protocol_api_v2():
+            dest = instrument._context.deck.position_for(5)\
+                                           .point._replace(z=150)
+            self._hardware.move_to(Mount[inst.mount.upper()], dest)
+        else:
+            calibration_functions.move_instrument_for_probing_prep(
+                inst, inst.robot)
         self._set_state('ready')
 
     def move_to(self, instrument, container):
@@ -107,13 +139,17 @@ class CalibrationManager:
         inst = instrument._instrument
         cont = container._container
 
-        target = cont[0]
+        target = cont.wells()[0].top()
 
         log.info('Moving {} to {} in {}'.format(
             instrument.name, container.name, container.slot))
         self._set_state('moving')
 
-        inst.move_to(target)
+        if ff.use_protocol_api_v2():
+            with instrument._context.temp_connect(self._hardware):
+                inst.move_to(target)
+        else:
+            inst.move_to(target)
 
         self._set_state('ready')
 
@@ -122,19 +158,25 @@ class CalibrationManager:
         log.info('Jogging {} by {} in {}'.format(
             instrument.name, distance, axis))
         self._set_state('moving')
-        calibration_functions.jog_instrument(
-            instrument=inst,
-            distance=distance,
-            axis=axis,
-            robot=inst.robot
-        )
+        if ff.use_protocol_api_v2():
+            self._hardware.move_rel(
+                Mount[inst.mount.upper()], Point(**{axis: distance}))
+        else:
+            calibration_functions.jog_instrument(
+                instrument=inst,
+                distance=distance,
+                axis=axis,
+                robot=inst.robot)
         self._set_state('ready')
 
     def home(self, instrument):
         inst = instrument._instrument
         log.info('Homing {}'.format(instrument.name))
         self._set_state('moving')
-        inst.home()
+        if ff.use_protocol_api_v2():
+            self._hardware.home()
+        else:
+            inst.home()
         self._set_state('ready')
 
     def update_container_offset(self, container, instrument):

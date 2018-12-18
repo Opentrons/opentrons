@@ -325,3 +325,56 @@ def _save_json(data, filename):
         return data
     except OSError:
         log.exception('Write failed with exception:')
+
+
+def calculate_tip_probe_hotspots(
+        tip_length,
+        tip_probe_settings):
+    # probe_dimensions is the external bounding box of the probe unit
+    size_x, size_y, size_z = tip_probe_settings.dimensions
+
+    rel_x_start = (size_x / 2) + tip_probe_settings.switch_clearance
+    rel_y_start = (size_y / 2) + tip_probe_settings.switch_clearance
+
+    # Ensure that the nozzle will clear the probe unit and tip will clear deck
+    nozzle_safe_z = round((size_z - tip_length)
+                          + tip_probe_settings.z_clearance.normal, 3)
+
+    z_start = max(tip_probe_settings.z_clearance.deck, nozzle_safe_z)
+    center = tip_probe_settings.center
+    switch_offset = tip_probe_settings.switch_offset
+    # Each list item defines axis we are probing for, starting position vector
+    # and travel distance
+    neg_x = ('x',
+             center[0] - rel_x_start,
+             center[1] + switch_offset[0],
+             z_start,
+             size_x)
+    pos_x = ('x',
+             center[0] + rel_x_start,
+             center[1] + switch_offset[0],
+             z_start,
+             -size_x)
+    neg_y = ('y',
+             center[0] + switch_offset[1],
+             center[1] - rel_y_start,
+             z_start,
+             size_y)
+    pos_y = ('y',
+             center[0] + switch_offset[1],
+             center[1] + rel_y_start,
+             z_start,
+             -size_y)
+    z = ('z',
+         center[0],
+         center[1] + switch_offset[2],
+         center[2] + tip_probe_settings.z_clearance.start,
+         -size_z)
+
+    return [
+        neg_x,
+        pos_x,
+        neg_y,
+        pos_y,
+        z
+    ]

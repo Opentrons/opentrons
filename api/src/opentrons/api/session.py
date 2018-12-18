@@ -31,10 +31,7 @@ class SessionManager(object):
         self._loop = loop or asyncio.get_event_loop()
         self.session = None
         self._session_lock = False
-        if ff.use_protocol_api_v2():
-            self._hardware = adapters.SynchronousAdapter(hardware)
-        else:
-            self._hardware = hardware
+        self._hardware = hardware
 
     def __del__(self):
         if isinstance(getattr(self, '_hardware', None),
@@ -83,6 +80,7 @@ class Session(object):
         self.protocol_text = text
         self._protocol = None
         self._hardware = hardware
+        self._simulating_ctx = ProtocolContext(loop=self._loop)
         self.state = None
         self.commands = []
         self.command_log = {}
@@ -113,7 +111,8 @@ class Session(object):
                     for _instrument, container in
                     self._interactions
                     if _instrument == instrument
-                ])
+                ],
+                context=self._simulating_ctx)
             for instrument in self._instruments
         ]
 
@@ -126,13 +125,14 @@ class Session(object):
                     for instrument, _container in
                     self._interactions
                     if _container == container
-                ])
+                ],
+                context=self._simulating_ctx)
             for container in self._containers
         ]
 
     def get_modules(self):
         return [
-            Module(module=module)
+            Module(module=module, context=self._simulating_ctx)
             for module in self._modules
         ]
 
@@ -187,9 +187,11 @@ class Session(object):
                     API.build_hardware_simulator,
                     instrs,
                     [mod.name() for mod in self._hardware.attached_modules])
-                context = ProtocolContext(hardware=sim, loop=self._loop)
-                context.home()
-                run_protocol(self._protocol, simulate=True, context=context)
+                sim.home()
+                self._simulating_ctx = ProtocolContext(self._loop,
+                                                       sim)
+                run_protocol(self._protocol, simulate=True,
+                             context=self._simulating_ctx)
                 sim.join()
             else:
                 # TODO (artyom, 20171005): this will go away

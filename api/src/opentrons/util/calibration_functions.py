@@ -20,8 +20,7 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
     # probe_center is the point at the center of the switch pcb
     center = Point(*tp.center)
 
-    hot_spots = _calculate_hotspots(
-        robot,
+    hot_spots = robot_configs.calculate_tip_probe_hotspots(
         tip_length,
         tp)
 
@@ -33,19 +32,10 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
     log.info("Moving to safe z: {}".format(safe_height))
     robot.poses = instrument._move(robot.poses, z=safe_height)
 
-    for axis, x, y, z, distance in hot_spots:
-        if axis == 'z':
-
-            x = x + center.x
-            y = y + center.y
-            z = z + center.z
-        else:
-            x = x + center.x
-            y = y + center.y
-
-        log.info("Moving to {}".format((x, y, z)))
-        robot.poses = instrument._move(robot.poses, x=x, y=y)
-        robot.poses = instrument._move(robot.poses, z=z)
+    for axis, x0, y0, z0, distance in hot_spots:
+        log.info("Moving to {}".format((x0, y0, z0)))
+        robot.poses = instrument._move(robot.poses, x=x0, y=y0)
+        robot.poses = instrument._move(robot.poses, z=z0)
 
         axis_index = 'xyz'.index(axis)
         robot.poses = instrument._probe(robot.poses, axis, distance)
@@ -80,59 +70,6 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
     instrument._remove_tip(tip_length)
 
     return center
-
-
-def _calculate_hotspots(
-        robot,
-        tip_length,
-        tip_probe_settings):
-    # probe_dimensions is the external bounding box of the probe unit
-    size_x, size_y, size_z = tip_probe_settings.dimensions
-
-    rel_x_start = (size_x / 2) + tip_probe_settings.switch_clearance
-    rel_y_start = (size_y / 2) + tip_probe_settings.switch_clearance
-
-    # Ensure that the nozzle will clear the probe unit and tip will clear deck
-    nozzle_safe_z = round((size_z - tip_length)
-                          + tip_probe_settings.z_clearance.normal, 3)
-
-    z_start = max(tip_probe_settings.z_clearance.deck, nozzle_safe_z)
-
-    # Each list item defines axis we are probing for, starting position vector
-    # relative to probe top center and travel distance
-    neg_x = ('x',
-             -rel_x_start,
-             tip_probe_settings.switch_offset[0],
-             z_start,
-             size_x)
-    pos_x = ('x',
-             rel_x_start,
-             tip_probe_settings.switch_offset[0],
-             z_start,
-             -size_x)
-    neg_y = ('y',
-             tip_probe_settings.switch_offset[1],
-             -rel_y_start,
-             z_start,
-             size_y)
-    pos_y = ('y',
-             tip_probe_settings.switch_offset[1],
-             rel_y_start,
-             z_start,
-             -size_y)
-    z = ('z',
-         0.0,
-         tip_probe_settings.switch_offset[2],
-         tip_probe_settings.z_clearance.start,
-         -size_z)
-
-    return [
-        neg_x,
-        pos_x,
-        neg_y,
-        pos_y,
-        z
-    ]
 
 
 def _calculate_safeheight(robot, z_crossover_clearance):

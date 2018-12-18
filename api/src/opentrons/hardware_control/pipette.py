@@ -14,12 +14,21 @@ class Pipette:
     control API. Its only purpose is to gather state.
     """
 
-    def __init__(self, model: str, pipette_id: str = None) -> None:
+    def __init__(self,
+                 model: str,
+                 inst_offset_config: Dict[str, float],
+                 pipette_id: str = None) -> None:
         self._config = pipette_config.load(model)
         self._name = model
         self._current_volume = 0.0
         self._current_tip_length = 0.0
+        self._has_tip = False
         self._pipette_id = pipette_id
+        pip_type = 'multi' if self._config.channels > 1 else 'single'
+        self._instrument_offset = Point(*inst_offset_config[pip_type])
+
+    def update_instrument_offset(self, new_offset: Point):
+        self._instrument_offset = new_offset
 
     @property
     def config(self) -> pipette_config.pipette_config:
@@ -46,13 +55,14 @@ class Pipette:
         :py:attr:`CriticalPoint.NOZZLE` or :py:attr:`CriticalPoint.TIP` when
         we have a tip - the specified critical point will be used.
         """
-        if cp_override == CriticalPoint.NOZZLE:
+        if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
             tip_length = 0.0
         else:
             tip_length = self.current_tip_length
-        return Point(self.config.model_offset[0],
-                     self.config.model_offset[1],
-                     self.config.model_offset[2] - tip_length)
+        mod_and_tip = Point(self.config.model_offset[0],
+                            self.config.model_offset[1],
+                            self.config.model_offset[2] - tip_length)
+        return mod_and_tip + self._instrument_offset._replace(z=0)
 
     @property
     def current_volume(self) -> float:
@@ -62,7 +72,9 @@ class Pipette:
     @property
     def current_tip_length(self) -> float:
         """ The length of the current tip attached (0.0 if no tip) """
-        return self._current_tip_length
+        return (self._current_tip_length
+                - self._config.tip_overlap
+                + self._instrument_offset.z)
 
     @property
     def available_volume(self) -> float:
@@ -96,7 +108,8 @@ class Pipette:
         """
         assert tip_length > 0.0, "tip_length must be greater than 0"
         assert not self.has_tip
-        self._current_tip_length = tip_length - self._config.tip_overlap
+        self._has_tip = True
+        self._current_tip_length = tip_length
 
     def remove_tip(self) -> None:
         """
@@ -104,11 +117,12 @@ class Pipette:
         critical point)
         """
         assert self.has_tip
+        self._has_tip = False
         self._current_tip_length = 0.0
 
     @property
     def has_tip(self) -> bool:
-        return self.current_tip_length != 0.0
+        return self._has_tip
 
     def ul_per_mm(self, ul: float, action: str) -> float:
         sequence = self._config.ul_per_mm[action]

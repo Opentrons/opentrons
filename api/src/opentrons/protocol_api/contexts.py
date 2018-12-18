@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import logging
 import time
 from typing import Any, Dict, List, Optional, Union, Tuple
@@ -57,7 +58,7 @@ class ProtocolContext:
                 self._current.join()
             if isinstance(hardware, adapters.SynchronousAdapter):
                 self._current = hardware
-            elif isinstance(hardware, hc.API):
+            elif isinstance(hardware, hc.HardwareAPILike):
                 self._current = adapters.SynchronousAdapter(hardware)
             else:
                 raise TypeError(
@@ -119,6 +120,27 @@ class ProtocolContext:
 
         self._unsubscribe_commands = broker.subscribe(
             cmds.types.COMMAND, on_command)
+
+    @contextlib.contextmanager
+    def temp_connect(self, hardware: hc.API):
+        """ Connect temporarily to the specified hardware controller.
+
+        This should be used as a context manager:
+
+        .. code-block ::
+            with ctx.temp_connect(hw):
+                # do some tasks
+                ctx.home()
+            # after the with block, the context is connected to the same
+            # hardware control API it was connected to before, even if
+            # an error occured in the code inside the with block
+        """
+        old_hw = self._hw_manager.hardware
+        try:
+            self._hw_manager.set_hw(hardware)
+            yield self
+        finally:
+            self._hw_manager.set_hw(old_hw)
 
     def connect(self, hardware: hc.API):
         """ Connect to a running hardware API.
@@ -820,6 +842,7 @@ class InstrumentContext:
 
     @property
     def mount(self) -> str:
+        """ Return the name of the mount this pipette is attached to """
         return self._mount.name.lower()
 
     @property

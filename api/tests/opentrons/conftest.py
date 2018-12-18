@@ -24,6 +24,8 @@ from opentrons.server import init
 from opentrons.deck_calibration import endpoints
 from opentrons.util import environment
 from opentrons import hardware_control as hc
+from opentrons.protocol_api import ProtocolContext
+from opentrons.types import Mount
 
 
 Session = namedtuple(
@@ -379,18 +381,30 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
 
 
 @pytest.fixture
-def model(robot):
+def model(robot, hardware, loop):
     from opentrons.legacy_api.containers import load
     from opentrons.legacy_api.instruments.pipette import Pipette
 
-    pipette = Pipette(robot, ul_per_mm=18.5, max_volume=300, mount='right')
-    plate = load(robot, '96-flat', '1')
-
-    instrument = models.Instrument(pipette)
-    container = models.Container(plate)
+    if isinstance(hardware, hc.HardwareAPILike):
+        ctx = ProtocolContext(loop=loop, hardware=hardware)
+        pip = ctx.load_instrument('p300_single', 'right')
+        loop.run_until_complete(hardware.cache_instruments(
+            {Mount.RIGHT: 'p300_single'}))
+        instrument = models.Instrument(pip, context=ctx)
+        plate = ctx.load_labware_by_name('generic_96_wellPlate_380_uL', 1)
+        rob = hardware
+        container = models.Container(plate, context=ctx)
+    else:
+        print("hardware is {}".format(hardware))
+        pipette = Pipette(robot,
+                          ul_per_mm=18.5, max_volume=300, mount='right')
+        plate = load(robot, '96-flat', '1')
+        rob = robot
+        instrument = models.Instrument(pipette)
+        container = models.Container(plate)
 
     return namedtuple('model', 'robot instrument container')(
-            robot=robot,
+            robot=rob,
             instrument=instrument,
             container=container
         )
@@ -456,6 +470,12 @@ def cntrlr_mock_connect(monkeypatch):
     async def mock_connect(obj, port=None):
         return
     monkeypatch.setattr(hc.Controller, 'connect', mock_connect)
+
+
+@pytest.fixture
+def hardware_api(loop):
+    hw_api = hc.API.build_hardware_simulator(loop=loop)
+    return hw_api
 
 
 setup_testing_env()

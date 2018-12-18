@@ -237,3 +237,8 @@ class Controller:
     def halt(self):
         self._smoothie_driver.kill()
         self._smoothie_driver.resume()
+
+    def probe(self, axis: str, distance: float) -> Dict[str, float]:
+        """ Run a probe and return the new position dict
+        """
+        return self._smoothie_driver.probe_axis(axis, distance)
