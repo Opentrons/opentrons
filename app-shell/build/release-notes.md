@@ -49,8 +49,9 @@ As always, please reach out to our team with any questions.
 
 ### Bug fixes
 
-- Fixed a bug causing a very incorrect aspirate function when the "Use New P10 Single Calibration" advanced option was selected
-- Fixed a bug causing errors in protocols that assigned to a dictionary or list at the top level (caused by metadata parsing)
+- **Fixed a bug causing a very incorrect aspirate function when the "Use New P10 Single Calibration" advanced option was selected**
+  - This bug was introduced in version 3.6.2 and fixed in version 3.6.5
+- **Fixed a bug causing errors in protocols that assigned to a dictionary or list at the top level (caused by metadata parsing)**
 - Updated the configuration of the P1000 single based on an expanded dataset
 - Updated the configuration of the P10 single based on an expanded dataset
 - Fixed a bug that was overwriting robot configuration with defaults when using the internal USB flash drive for configuration storage
