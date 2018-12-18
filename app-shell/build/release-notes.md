@@ -50,6 +50,7 @@ As always, please reach out to our team with any questions.
 ### Bug fixes
 
 - Fixed a bug causing a very incorrect aspirate function when the "Use New P10 Single Calibration" advanced option was selected
+- Fixed a bug causing errors in protocols that assigned to a dictionary or list at the top level (caused by metadata parsing)
 - Updated the configuration of the P1000 single based on an expanded dataset
 - Updated the configuration of the P10 single based on an expanded dataset
 - Fixed a bug that was overwriting robot configuration with defaults when using the internal USB flash drive for configuration storage
@@ -78,23 +79,6 @@ metadata = {
     3. Insert plate and calibrate normally
         - After the plate has been calibrated once, the issue will not reoccur
 - Extremely long aspirations and dispenses can incorrectly trigger a serial timeout issue. If you see such an issue, make sure your protocol’s combination of aspirate/dispense speeds and aspirate/dispense volumes does not include a command that will take more than 30 seconds.
-- Python protocols that contain code in the top level assigning to the result of an index, for instance:
-
-```
-some_dict = {'hi': 2}
-some_dict[0] = True  # This will cause an error
-```
-
-If this kind of code is necessary, please structure it in a function:
-
-```
-def build_some_dict():
-    some_dict = {'hi': 2}
-    some_dict[0] = True
-    return some_dict
-```
-
-which avoids the issue.
 
 
 
