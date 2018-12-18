@@ -217,17 +217,18 @@ Our release process is still a work-in-progress. All projects are currently vers
 1.  `make bump` (see details below)
 2.  Inspect version bumps and changelogs
 3.  Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes
-4.  `git add --all`
-5.  `git cz`
+4. `git checkout -b release_${version}` (The branch name _must_ match `release_*` to trigger signed builds that can be used as RCs)
+5.  `git add --all`
+6.  `git cz`
     - Type: `chore`
     - Scope: `release`
     - Message: `${version}`
-6.  Open a PR into `edge`
-7.  Squash merge the PR once approved
-8.  Verify that CI is green on `edge` and test the build artifacts
-9.  Pull latest `edge` to your machine
-10.  `git tag -a v${version} -m 'chore(release): ${version}'`
-11. `git push --tags`
+7.  Open a PR into `edge`
+8.  Squash merge the PR once approved
+9.  Verify that CI is green on `edge` and test the build artifacts
+10.  Pull latest `edge` to your machine
+11.  `git tag -a v${version} -m 'chore(release): ${version}'`
+12. `git push --tags`
 
 #### `make bump` usage
 
