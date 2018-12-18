@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.6.5"></a>
+## [3.6.5](https://github.com/Opentrons/opentrons/compare/v3.6.4...v3.6.5) (2018-12-18)
+
+
+### Bug Fixes
+
+* **protocol-designer:** ensure pipettes are removed from step forms when nuked ([#2813](https://github.com/Opentrons/opentrons/issues/2813)) ([46fee8b](https://github.com/Opentrons/opentrons/commit/46fee8b))
+
+
+### Features
+
+* **protocol-designer:** display timeline and form alerts in same fashion ([#2817](https://github.com/Opentrons/opentrons/issues/2817)) ([e27d2ae](https://github.com/Opentrons/opentrons/commit/e27d2ae)), closes [#1990](https://github.com/Opentrons/opentrons/issues/1990)
+
+
+
+
+
 <a name="3.6.4"></a>
 ## [3.6.4](https://github.com/Opentrons/opentrons/compare/v3.6.3...v3.6.4) (2018-12-17)
 

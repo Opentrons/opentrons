@@ -1,4 +1,4 @@
-# Changes from 3.5.1 to 3.6.4
+# Changes from 3.5.1 to 3.6.5
 
 For more details, please see the full [technical change log][changelog]
 
@@ -49,7 +49,8 @@ As always, please reach out to our team with any questions.
 
 ### Bug fixes
 
-- **Updated the configuration of the P1000 single based on an expanded dataset**
+- Fixed a bug causing a very incorrect aspirate function when the "Use New P10 Single Calibration" advanced option was selected
+- Updated the configuration of the P1000 single based on an expanded dataset
 - Updated the configuration of the P10 single based on an expanded dataset
 - Fixed a bug that was overwriting robot configuration with defaults when using the internal USB flash drive for configuration storage
 - Fixed the iteration order of labware created with `labware.create` to match documentation
