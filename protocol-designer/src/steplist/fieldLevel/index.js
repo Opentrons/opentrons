@@ -29,7 +29,7 @@ const hydrateLabware = (state: StepFormContextualState, id: string) => {
     // new
     // $FlowFixMe
     const labware = state.labware[id]
-    return {
+    return labware && {
       id,
       ...labware,
       ...getLabware(labware.type),
@@ -41,7 +41,7 @@ const hydratePipette = (state: StepFormContextualState, id: string) => {
   if (state.labware) {
     // new
     const pipette = state.pipettes[id]
-    return {
+    return pipette && {
       id,
       ...pipette,
       ...getPipetteNameSpecs(pipette.name),
