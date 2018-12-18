@@ -67,22 +67,23 @@ export type FormErrorChecker = (mixed) => ?FormError
 // TODO: real HydratedFormData type
 type HydratedFormData = any
 
+// TODO: Ian 2018-12-17 remove pipette.model, always use pipette.name
 export const incompatibleLabware = (fields: HydratedFormData): ?FormError => {
   const {labware, pipette} = fields
   if (!labware || !pipette) return null
-  return (!canPipetteUseLabware(pipette.model, labware.type)) ? FORM_ERRORS.INCOMPATIBLE_LABWARE : null
+  return (!canPipetteUseLabware(pipette.model || pipette.name, labware.type)) ? FORM_ERRORS.INCOMPATIBLE_LABWARE : null
 }
 
 export const incompatibleDispenseLabware = (fields: HydratedFormData): ?FormError => {
   const {dispense_labware, pipette} = fields
   if (!dispense_labware || !pipette) return null
-  return (!canPipetteUseLabware(pipette.model, dispense_labware.type)) ? FORM_ERRORS.INCOMPATIBLE_DISPENSE_LABWARE : null
+  return (!canPipetteUseLabware(pipette.model || pipette.name, dispense_labware.type)) ? FORM_ERRORS.INCOMPATIBLE_DISPENSE_LABWARE : null
 }
 
 export const incompatibleAspirateLabware = (fields: HydratedFormData): ?FormError => {
   const {aspirate_labware, pipette} = fields
   if (!aspirate_labware || !pipette) return null
-  return (!canPipetteUseLabware(pipette.model, aspirate_labware.type)) ? FORM_ERRORS.INCOMPATIBLE_ASPIRATE_LABWARE : null
+  return (!canPipetteUseLabware(pipette.model || pipette.name, aspirate_labware.type)) ? FORM_ERRORS.INCOMPATIBLE_ASPIRATE_LABWARE : null
 }
 
 export const pauseForTimeOrUntilTold = (fields: HydratedFormData): ?FormError => {

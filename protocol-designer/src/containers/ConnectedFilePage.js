@@ -40,7 +40,7 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
     if (!pipette.mount) return pipette.mount
     return pipette.mount === 'left' ? 'right' : 'left'
   })
-  console.log({_initialDeckSetup})
+
   return {
     ...passThruProps,
     ...dispatchProps,

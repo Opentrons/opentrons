@@ -7,8 +7,11 @@ import each from 'lodash/each'
 import some from 'lodash/some'
 
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
-import {selectors as pipetteSelectors} from '../pipettes'
-import {getFormWarnings, getFormErrors, stepFormToArgs} from './formLevel'
+import {
+  getFormWarnings,
+  getFormErrors,
+  stepFormToArgs,
+} from './formLevel'
 import type {FormError, FormWarning} from './formLevel'
 import {hydrateField, getFieldErrors} from './fieldLevel'
 import type {RootState, OrderedStepsState} from './reducers'
@@ -32,9 +35,10 @@ const rootSelector = (state: BaseState): RootState => state.steplist
 
 const getUnsavedForm: Selector<?FormData> = createSelector(rootSelector, (state: RootState) => state.unsavedForm)
 
+// TODO IMMEDIATELY remove this selector. It's deprecated. Diff for manually-written labware/pipette selectors to resolve circular dependency error
 const getStepFormContextualState: Selector<StepFormContextualState> = createSelector(
-  labwareIngredSelectors.rootSelector,
-  pipetteSelectors.rootSelector,
+  state => state.labwareIngred,
+  state => state.pipettes,
   (labwareIngred, pipettes) => ({
     labwareIngred,
     pipettes,
