@@ -140,7 +140,7 @@ describe('dispense', () => {
     // TODO Ian 2018-02-12... what is excessive volume?
     // Is it OK to dispense vol > pipette max vol?
     // LATER: shouldn't dispense > volume of liquid in pipette
-    test.skip('dispense with excessive volume should... ?')
+    test.skip('dispense with excessive volume should... ?', () => {})
   })
 
   describe('liquid tracking', () => {
