@@ -56,7 +56,7 @@ export const drillUpFromLabware = createAction(
 // ==== Create/delete/modify labware =====
 
 type CreateContainerArgs = {
-  slot: DeckSlot,
+  slot?: DeckSlot,
   containerType: string,
 }
 
