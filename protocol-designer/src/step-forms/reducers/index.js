@@ -70,6 +70,7 @@ const unsavedForm = (rootState: RootState, action: UnsavedFormActions): FormStat
       }
     case 'POPULATE_FORM': return action.payload
     case 'CANCEL_STEP_FORM': return null
+    case 'SELECT_TERMINAL_ITEM': return null
     case 'SAVE_STEP_FORM': return null
     case 'DELETE_STEP': return null
     // save the modal state into the unsavedForm --
