@@ -198,8 +198,8 @@ const getAllSteps: Selector<{[stepId: StepIdType]: StepItemData}> = createSelect
         // Assign the step title
         let title
 
-        if (savedForm && savedForm['step-name']) {
-          title = savedForm['step-name']
+        if (savedForm && savedForm.stepName) {
+          title = savedForm.stepName
         } else {
           title = step.stepType
         }
@@ -208,7 +208,7 @@ const getAllSteps: Selector<{[stepId: StepIdType]: StepItemData}> = createSelect
           ...steps[id],
           formData: savedForm,
           title,
-          description: savedForm ? savedForm['step-details'] : null,
+          description: savedForm ? savedForm.stepDetails : null,
         }
       }
     )

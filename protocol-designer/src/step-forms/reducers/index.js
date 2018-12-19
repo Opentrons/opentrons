@@ -31,7 +31,6 @@ import type {
   SaveStepFormAction,
   PopulateFormAction,
 } from '../../steplist/actions'
-import type {SaveMoreOptionsModal} from '../../ui/steps/actions'
 
 type FormState = FormData | null
 
@@ -43,7 +42,6 @@ type UnsavedFormActions =
   | ActionType<typeof cancelStepForm>
   | SaveStepFormAction
   | DeleteStepAction
-  | SaveMoreOptionsModal
 const unsavedForm = (rootState: RootState, action: UnsavedFormActions): FormState => {
   const unsavedFormState = rootState.unsavedForm
   switch (action.type) {
@@ -57,10 +55,6 @@ const unsavedForm = (rootState: RootState, action: UnsavedFormActions): FormStat
     case 'CANCEL_STEP_FORM': return null
     case 'SAVE_STEP_FORM': return null
     case 'DELETE_STEP': return null
-    // save the modal state into the unsavedForm --
-    // it was 2 levels away from savedStepForms, now it's one level away
-    case 'SAVE_MORE_OPTIONS_MODAL':
-      return {...unsavedFormState, ...action.payload}
     default:
       return unsavedFormState
   }

@@ -69,9 +69,9 @@ export type StepType = $Keys<typeof stepIconsByType>
 
 // ===== Unprocessed form types =====
 
-export type FormModalFields = {|
-  'step-name': string,
-  'step-details': string,
+export type AnnotationFields = {|
+  'stepName': string,
+  'stepDetails': string,
 |}
 
 export type BlowoutFields = {|
@@ -86,7 +86,7 @@ export type ChangeTipFields = {|
 export type TransferLikeStepType = 'transfer' | 'consolidate' | 'distribute'
 
 export type TransferLikeForm = {|
-  ...FormModalFields,
+  ...AnnotationFields,
   ...BlowoutFields,
   ...ChangeTipFields,
 
@@ -115,7 +115,7 @@ export type TransferLikeForm = {|
 |}
 
 export type MixForm = {|
-  ...FormModalFields,
+  ...AnnotationFields,
   ...BlowoutFields,
   ...ChangeTipFields,
   stepType: 'mix',
@@ -130,7 +130,7 @@ export type MixForm = {|
 |}
 
 export type PauseForm = {|
-  ...FormModalFields,
+  ...AnnotationFields,
   stepType: 'pause',
   id: StepIdType,
 
@@ -145,8 +145,6 @@ export type PauseForm = {|
 export type FormData = {
   stepType: StepType,
   id: StepIdType,
-  'step-name'?: string,
-  'step-details'?: string,
   [StepFieldName]: any, // TODO: form value processing to ensure type
 }
 //  | MixForm
@@ -154,7 +152,7 @@ export type FormData = {
 //  | TransferLikeForm
 
 export type BlankForm = {
-  ...FormModalFields,
+  ...AnnotationFields,
   stepType: StepType,
   id: StepIdType,
 }

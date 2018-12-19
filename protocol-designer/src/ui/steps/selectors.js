@@ -165,11 +165,6 @@ const getWellSelectionLabwareKey: Selector<?string> = createSelector(
   (state: StepsState) => state.wellSelectionLabwareKey
 )
 
-const getFormModalData = createSelector(
-  rootSelector,
-  (state: StepsState) => state.unsavedFormModal
-)
-
 export default {
   rootSelector,
 
@@ -185,7 +180,6 @@ export default {
   getHoveredSubstep,
   getFormSectionCollapsed,
   getWellSelectionLabwareKey,
-  getFormModalData,
   getCurrentFormCanBeSaved,
 
   // NOTE: this is exposed only for substeps/selectors.js

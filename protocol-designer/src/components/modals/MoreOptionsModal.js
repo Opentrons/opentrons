@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import {connect} from 'react-redux'
 import {
   FlatButton,
   FormGroup,
@@ -7,45 +8,69 @@ import {
   Modal,
 } from '@opentrons/components'
 
-import type {FormModalFields} from '../../form-types'
-import {formConnectorFactory} from '../../utils'
+import {actions as steplistActions} from '../../steplist'
+import type {StepFieldName} from '../../steplist/fieldLevel'
+import type {FormData} from '../../form-types'
+import type {ThunkDispatch} from '../../types'
 import styles from './MoreOptionsModal.css'
 import modalStyles from './modal.css'
 
-type Props = {
-  onCancel: (event: SyntheticEvent<>) => void,
-  onSave: (event: SyntheticEvent<>) => void,
-  handleChange: (accessor: string) => (event: SyntheticEvent<HTMLInputElement> | SyntheticEvent<HTMLSelectElement>) => void,
-  formData: FormModalFields,
-  hideModal: boolean,
+type OP = {
+  close: (event: ?SyntheticEvent<>) => mixed,
+  formData: FormData,
 }
-
-export default function MoreOptionsModal (props: Props) {
-  const formConnector = formConnectorFactory(props.handleChange, props.formData)
-
-  if (props.hideModal) {
-    return null
+type DP = {
+  saveValuesToForm: ({[StepFieldName]: ?mixed}) => mixed,
+}
+type Props = OP & DP
+type State = {[StepFieldName]: ?mixed}
+class MoreOptionsModal extends React.Component<Props, State> {
+  constructor (props: Props) {
+    super(props)
+    const {stepName, stepDetails} = props.formData || {}
+    this.state = {stepName, stepDetails}
   }
 
-  return (
-    <Modal
-      onCloseClick={props.onCancel}
-      className={modalStyles.modal}
-      contentsClassName={modalStyles.modal_contents}
-    >
-      <div>
-        <FormGroup label='Step Name' className={styles.column_1_2}>
-          <InputField {...formConnector('step-name')} />
-        </FormGroup>
-        <FormGroup label='Step Notes' className={styles.column_1_2}>
-          {/* TODO: need textarea input in component library for big text boxes. */}
-          <textarea className={styles.big_text_box} {...formConnector('step-details')} />
-        </FormGroup>
-        <div className={styles.button_row}>
-          <FlatButton onClick={props.onCancel}>CANCEL</FlatButton>
-          <FlatButton onClick={props.onSave}>SAVE</FlatButton>
+  makeHandleChange = (fieldName: StepFieldName) => (e: SyntheticInputEvent<*>) => {
+    this.setState({[fieldName]: e.currentTarget.value})
+  }
+
+  handleSave = () => {
+    this.props.saveValuesToForm(this.state)
+    this.props.close()
+  }
+
+  render () {
+    return (
+      <Modal
+        onCloseClick={this.props.close}
+        className={modalStyles.modal}
+        contentsClassName={modalStyles.modal_contents}>
+        <div>
+          <FormGroup label='Step Name' className={styles.column_1_2}>
+            <InputField
+              onChange={this.makeHandleChange('stepName')}
+              value={String(this.state.stepName)} />
+          </FormGroup>
+          <FormGroup label='Step Notes' className={styles.column_1_2}>
+            {/* TODO: need textarea input in component library for big text boxes. */}
+            <textarea
+              className={styles.big_text_box}
+              onChange={this.makeHandleChange('stepDetails')}
+              value={this.state.stepDetails} />
+          </FormGroup>
+          <div className={styles.button_row}>
+            <FlatButton onClick={this.props.close}>CANCEL</FlatButton>
+            <FlatButton onClick={this.handleSave}>SAVE</FlatButton>
+          </div>
         </div>
-      </div>
-    </Modal>
-  )
+      </Modal>
+    )
+  }
 }
+
+const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
+  saveValuesToForm: (update) => dispatch(steplistActions.changeFormInput({update})),
+})
+
+export default connect(null, mapDispatchToProps)(MoreOptionsModal)

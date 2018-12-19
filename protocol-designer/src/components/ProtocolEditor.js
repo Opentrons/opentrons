@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import ConnectedMoreOptionsModal from '../containers/ConnectedMoreOptionsModal'
 import ConnectedNav from '../containers/ConnectedNav'
 import ConnectedSidebar from '../containers/ConnectedSidebar'
 import ConnectedTitleBar from '../containers/ConnectedTitleBar'
@@ -32,7 +31,6 @@ export default function ProtocolEditor () {
           <div className={styles.main_page_content}>
             <AnalyticsModal />
             <ConnectedNewFileModal />
-            <ConnectedMoreOptionsModal />
             <FileUploadErrorModal />
             {/* TODO: Ian 2018-06-28 All main page modals will go here */}
             <MainPageModalPortalRoot />

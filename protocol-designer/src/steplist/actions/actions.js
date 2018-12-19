@@ -3,7 +3,7 @@ import type {Dispatch} from 'redux'
 
 import {selectors} from '../index'
 import {selectors as stepsSelectors} from '../../ui/steps'
-import type {StepType, StepIdType, FormModalFields, FormData} from '../../form-types'
+import type {StepType, StepIdType, FormData} from '../../form-types'
 import type {ChangeFormPayload, ChangeSavedFormPayload} from './types'
 import type {TerminalItemId, SubstepIdentifier, FormSectionNames} from '../types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../../types'
@@ -145,48 +145,6 @@ export function collapseFormSection (payload: FormSectionNames): CollapseFormSec
     payload,
   }
 }
-
-// ========= MORE OPTIONS MODAL =======
-// Effectively another unsaved form, that saves to unsavedForm's "hidden" fields
-
-// Populate newly-opened options modal with fields from unsaved form
-export type OpenMoreOptionsModal = {
-  type: 'OPEN_MORE_OPTIONS_MODAL',
-  payload: FormModalFields,
-}
-export const openMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
-  dispatch({
-    type: 'OPEN_MORE_OPTIONS_MODAL',
-    payload: selectors.getUnsavedForm(getState()), // TODO only pull in relevant fields?
-  })
-}
-
-export const cancelMoreOptionsModal = () => ({
-  type: 'CANCEL_MORE_OPTIONS_MODAL',
-  payload: null,
-})
-
-export type ChangeMoreOptionsModalInputAction = {
-  type: 'CHANGE_MORE_OPTIONS_MODAL_INPUT',
-  payload: ChangeFormPayload,
-}
-
-export const changeMoreOptionsModalInput = (payload: ChangeFormPayload): ChangeMoreOptionsModalInputAction => ({
-  type: 'CHANGE_MORE_OPTIONS_MODAL_INPUT',
-  payload,
-})
-
-// export type SaveMoreOptionsModal = {
-//   type: 'SAVE_MORE_OPTIONS_MODAL',
-//   payload: any, // TODO
-// }
-
-// export const saveMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
-//   dispatch({
-//     type: 'SAVE_MORE_OPTIONS_MODAL',
-//     payload: selectors.getFormModalData(getState()),
-//   })
-// }
 
 export const setWellSelectionLabwareKey = (labwareName: ?string): * => ({
   type: 'SET_WELL_SELECTION_LABWARE_KEY',

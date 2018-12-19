@@ -1,8 +1,7 @@
 // @flow
-import type {Dispatch} from 'redux'
 import forEach from 'lodash/forEach'
 
-import type {StepIdType, StepType, FormModalFields} from '../../form-types'
+import type {StepIdType, StepType} from '../../form-types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../../types'
 import {selectors as steplistSelectors} from '../../steplist'
 import * as pipetteSelectors from '../../pipettes/selectors'
@@ -10,8 +9,6 @@ import {getNextDefaultPipetteId} from '../../steplist/formLevel'
 import {getStepFormData} from '../../steplist/actions'
 import type {TerminalItemId, SubstepIdentifier, FormSectionNames} from '../../steplist/types'
 
-import selectors from './selectors'
-import type {ChangeFormPayload} from '../../steplist/actions/types'
 import handleFormChange from '../../steplist/actions/handleFormChange'
 
 type ExpandAddStepButtonAction = {type: 'EXPAND_ADD_STEP_BUTTON', payload: boolean}
@@ -56,39 +53,6 @@ export const collapseFormSection = (payload: FormSectionNames): CollapseFormSect
   type: 'COLLAPSE_FORM_SECTION',
   payload,
 })
-
-// TODO: BC 2018-12-13 this should be in react state, form and all
-// ========= MORE OPTIONS MODAL =======
-// Effectively another unsaved form, that saves to unsavedForm's "hidden" fields
-
-// Populate newly-opened options modal with fields from unsaved form
-export type OpenMoreOptionsModalAction = {type: 'OPEN_MORE_OPTIONS_MODAL', payload: FormModalFields}
-export const openMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
-  dispatch({
-    type: 'OPEN_MORE_OPTIONS_MODAL',
-    payload: steplistSelectors.getUnsavedForm(getState()), // TODO only pull in relevant fields?
-  })
-}
-
-export type CancelMoreOptionsModalAction = {type: 'CANCEL_MORE_OPTIONS_MODAL', payload: null}
-export const cancelMoreOptionsModal = (): CancelMoreOptionsModalAction => ({
-  type: 'CANCEL_MORE_OPTIONS_MODAL',
-  payload: null,
-})
-
-export type ChangeMoreOptionsModalInputAction = {type: 'CHANGE_MORE_OPTIONS_MODAL_INPUT', payload: ChangeFormPayload}
-export const changeMoreOptionsModalInput = (payload: ChangeFormPayload): ChangeMoreOptionsModalInputAction => ({
-  type: 'CHANGE_MORE_OPTIONS_MODAL_INPUT',
-  payload,
-})
-
-export type SaveMoreOptionsModal = {type: 'SAVE_MORE_OPTIONS_MODAL', payload: any} // TODO
-export const saveMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
-  dispatch({
-    type: 'SAVE_MORE_OPTIONS_MODAL',
-    payload: selectors.getFormModalData(getState()),
-  })
-}
 
 type SetWellSelectionLabwareKeyAction = {type: 'SET_WELL_SELECTION_LABWARE_KEY', payload: ?string}
 export const setWellSelectionLabwareKey = (labwareName: ?string): SetWellSelectionLabwareKeyAction => ({

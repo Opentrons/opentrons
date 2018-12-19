@@ -9,10 +9,12 @@ import type {BaseState, ThunkDispatch} from '../../types'
 import styles from './StepEditForm.css'
 import formStyles from '../Form.css'
 
-type OP = {onDelete?: (event: SyntheticEvent<>) => mixed}
+type OP = {
+  onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
+  onDelete?: (event: SyntheticEvent<>) => mixed,
+}
 type SP = {canSave?: ?boolean}
 type DP = {
-  onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
   onCancel: (event: SyntheticEvent<>) => mixed,
   onSave: (event: SyntheticEvent<>) => mixed,
 }
@@ -37,7 +39,6 @@ const STP = (state: BaseState): SP => ({
 const DTP = (dispatch: ThunkDispatch<*>): DP => ({
   onCancel: () => dispatch(actions.cancelStepForm()),
   onSave: () => dispatch(actions.saveStepForm()),
-  onClickMoreOptions: () => dispatch(actions.openMoreOptionsModal()),
 })
 
 export default connect(STP, DTP)(ButtonRow)

@@ -25,7 +25,6 @@ import type {
   SaveStepFormAction,
   PopulateFormAction,
 } from './actions' // Thunk action creators
-import type {SaveMoreOptionsModal} from '../ui/steps/actions'
 
 import {
   cancelStepForm, // TODO try collapsing them all into a single Action type
@@ -51,9 +50,6 @@ const unsavedForm: Reducer<FormState, *> = handleActions({
   SELECT_TERMINAL_ITEM: (state, action: ActionType<typeof cancelStepForm>) => null,
   SAVE_STEP_FORM: (state, action: ActionType<typeof saveStepForm>) => null,
   DELETE_STEP: () => null,
-  // save the modal state into the unsavedForm --
-  // it was 2 levels away from savedStepForms, now it's one level away
-  SAVE_MORE_OPTIONS_MODAL: (state, action: SaveMoreOptionsModal) => ({...state, ...action.payload}),
 }, null)
 
 // Add default title (and later, other default values) to newly-created Step
@@ -85,7 +81,7 @@ const steps: Reducer<StepsState, *> = handleActions({
         ...acc,
         [stepId]: {
           id: stepId,
-          title: stepForm['step-name'],
+          title: stepForm.stepName,
           stepType: stepForm.stepType,
         },
       }
