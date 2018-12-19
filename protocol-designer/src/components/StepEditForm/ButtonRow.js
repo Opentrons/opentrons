@@ -3,8 +3,8 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {OutlineButton, PrimaryButton} from '@opentrons/components'
 
-import {actions} from '../../steplist'
-import {selectors as stepsSelectors} from '../../ui/steps'
+import {actions as steplistActions} from '../../steplist'
+import {actions as stepsActions, selectors as stepsSelectors} from '../../ui/steps'
 import type {BaseState, ThunkDispatch} from '../../types'
 import styles from './StepEditForm.css'
 import formStyles from '../Form.css'
@@ -35,9 +35,9 @@ const STP = (state: BaseState): SP => ({
 })
 
 const DTP = (dispatch: ThunkDispatch<*>): DP => ({
-  onCancel: () => dispatch(actions.cancelStepForm()),
-  onSave: () => dispatch(actions.saveStepForm()),
-  onClickMoreOptions: () => dispatch(actions.openMoreOptionsModal()),
+  onCancel: () => dispatch(steplistActions.cancelStepForm()),
+  onSave: () => dispatch(steplistActions.saveStepForm()),
+  onClickMoreOptions: () => dispatch(stepsActions.openMoreOptionsModal()),
 })
 
 export default connect(STP, DTP)(ButtonRow)

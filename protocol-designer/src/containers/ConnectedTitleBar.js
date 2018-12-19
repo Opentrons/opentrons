@@ -8,8 +8,8 @@ import styles from './TitleBar.css'
 import i18n from '../localization'
 import {START_TERMINAL_TITLE, END_TERMINAL_TITLE} from '../constants'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
-import {selectors as stepsSelectors} from '../ui/steps'
-import {actions as steplistActions, END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID} from '../steplist'
+import {selectors as stepsSelectors, actions as stepsActions} from '../ui/steps'
+import {END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID} from '../steplist'
 import {selectors as fileDataSelectors} from '../file-data'
 import {closeIngredientSelector} from '../labware-ingred/actions'
 import {stepIconsByType} from '../form-types'
@@ -121,7 +121,7 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
     if (_liquidPlacementMode) {
       onBackClick = () => dispatch(closeIngredientSelector())
     } else if (_wellSelectionMode) {
-      onBackClick = () => dispatch(steplistActions.clearWellSelectionLabwareKey())
+      onBackClick = () => dispatch(stepsActions.clearWellSelectionLabwareKey())
     } else if (props.backButtonLabel) {
       onBackClick = () => {}
     }

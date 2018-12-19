@@ -3,27 +3,18 @@ import type {Dispatch} from 'redux'
 
 import {selectors} from '../index'
 import {selectors as stepsSelectors} from '../../ui/steps'
-import type {StepType, StepIdType, FormModalFields, FormData} from '../../form-types'
+import type {StepType, StepIdType, FormData} from '../../form-types'
 import type {ChangeFormPayload, ChangeSavedFormPayload} from './types'
-import type {TerminalItemId, SubstepIdentifier, FormSectionNames} from '../types'
-import type {GetState, ThunkAction, ThunkDispatch} from '../../types'
+import type {GetState, ThunkDispatch} from '../../types'
 import handleFormChange from './handleFormChange'
 
-export type ChangeSavedStepFormAction = {
-  type: 'CHANGE_SAVED_STEP_FORM',
-  payload: ChangeSavedFormPayload,
-}
-
+export type ChangeSavedStepFormAction = {type: 'CHANGE_SAVED_STEP_FORM', payload: ChangeSavedFormPayload}
 export const changeSavedStepForm = (payload: ChangeSavedFormPayload) => ({
   type: 'CHANGE_SAVED_STEP_FORM',
   payload,
 })
 
-export type ChangeFormInputAction = {
-  type: 'CHANGE_FORM_INPUT',
-  payload: ChangeFormPayload,
-}
-
+export type ChangeFormInputAction = {type: 'CHANGE_FORM_INPUT', payload: ChangeFormPayload}
 export const changeFormInput = (payload: ChangeFormPayload) =>
   (dispatch: ThunkDispatch<ChangeFormInputAction>, getState: GetState) => {
     const unsavedForm = selectors.getUnsavedForm(getState())
@@ -35,90 +26,19 @@ export const changeFormInput = (payload: ChangeFormPayload) =>
 
 // Populate form with selected action (only used in thunks)
 
-export type PopulateFormAction = {
-  type: 'POPULATE_FORM',
-  payload: FormData,
-}
+export type PopulateFormAction = {type: 'POPULATE_FORM', payload: FormData}
 
 // Create new step
 
-export type AddStepAction = {
-  type: 'ADD_STEP',
-  payload: {
-    id: StepIdType,
-    stepType: StepType,
-  },
-}
+export type AddStepAction = {type: 'ADD_STEP', payload: {id: StepIdType, stepType: StepType }}
 
-export type DeleteStepAction = {
-  type: 'DELETE_STEP',
-  payload: StepIdType,
-}
-
+export type DeleteStepAction = {type: 'DELETE_STEP', payload: StepIdType}
 export const deleteStep = (stepId: StepIdType) => ({
   type: 'DELETE_STEP',
   payload: stepId,
 })
 
-type ExpandAddStepButtonAction = {
-  type: 'EXPAND_ADD_STEP_BUTTON',
-  payload: boolean,
-}
-
-export const expandAddStepButton = (payload: boolean): ExpandAddStepButtonAction => ({
-  type: 'EXPAND_ADD_STEP_BUTTON',
-  payload,
-})
-
-type ToggleStepCollapsedAction = {
-  type: 'TOGGLE_STEP_COLLAPSED',
-  payload: StepIdType,
-}
-
-export const toggleStepCollapsed = (stepId: StepIdType): ToggleStepCollapsedAction => ({
-  type: 'TOGGLE_STEP_COLLAPSED',
-  payload: stepId,
-})
-
-export const hoverOnSubstep = (payload: SubstepIdentifier): * => ({
-  type: 'HOVER_ON_SUBSTEP',
-  payload: payload,
-})
-
-export type SelectTerminalItemAction = {
-  type: 'SELECT_TERMINAL_ITEM',
-  payload: TerminalItemId,
-}
-
-export const selectTerminalItem = (terminalId: TerminalItemId): ThunkAction<*> =>
-  (dispatch: ThunkDispatch<*>, getState: GetState) => {
-    const selectTerminalItemAction: SelectTerminalItemAction = {
-      type: 'SELECT_TERMINAL_ITEM',
-      payload: terminalId,
-    }
-
-    dispatch(cancelStepForm())
-    dispatch(selectTerminalItemAction)
-  }
-
-// TODO: Ian 2018-07-31 types aren't being inferred by ActionType in hoveredItem reducer...
-export const hoverOnStep = (stepId: ?StepIdType) => ({
-  type: 'HOVER_ON_STEP',
-  payload: stepId,
-})
-
-export const hoverOnTerminalItem = (terminalId: ?TerminalItemId) => ({
-  type: 'HOVER_ON_TERMINAL_ITEM',
-  payload: terminalId,
-})
-
-export type SaveStepFormAction = {
-  type: 'SAVE_STEP_FORM',
-  payload: {
-    id: StepIdType,
-  },
-}
-
+export type SaveStepFormAction = {type: 'SAVE_STEP_FORM', payload: {id: StepIdType}}
 export const saveStepForm = () =>
   (dispatch: Dispatch<*>, getState: GetState) => {
     const state = getState()
@@ -131,80 +51,10 @@ export const saveStepForm = () =>
     }
   }
 
-export function cancelStepForm () {
-  return {
-    type: 'CANCEL_STEP_FORM',
-    payload: null,
-  }
-}
+export type CancelStepFormAction = {type: 'CANCEL_STEP_FORM', payload: null}
+export const cancelStepForm = () => ({type: 'CANCEL_STEP_FORM', payload: null})
 
-export type CollapseFormSectionAction = {type: 'COLLAPSE_FORM_SECTION', payload: FormSectionNames}
-export function collapseFormSection (payload: FormSectionNames): CollapseFormSectionAction {
-  return {
-    type: 'COLLAPSE_FORM_SECTION',
-    payload,
-  }
-}
-
-// ========= MORE OPTIONS MODAL =======
-// Effectively another unsaved form, that saves to unsavedForm's "hidden" fields
-
-// Populate newly-opened options modal with fields from unsaved form
-export type OpenMoreOptionsModal = {
-  type: 'OPEN_MORE_OPTIONS_MODAL',
-  payload: FormModalFields,
-}
-export const openMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
-  dispatch({
-    type: 'OPEN_MORE_OPTIONS_MODAL',
-    payload: selectors.getUnsavedForm(getState()), // TODO only pull in relevant fields?
-  })
-}
-
-export const cancelMoreOptionsModal = () => ({
-  type: 'CANCEL_MORE_OPTIONS_MODAL',
-  payload: null,
-})
-
-export type ChangeMoreOptionsModalInputAction = {
-  type: 'CHANGE_MORE_OPTIONS_MODAL_INPUT',
-  payload: ChangeFormPayload,
-}
-
-export const changeMoreOptionsModalInput = (payload: ChangeFormPayload): ChangeMoreOptionsModalInputAction => ({
-  type: 'CHANGE_MORE_OPTIONS_MODAL_INPUT',
-  payload,
-})
-
-// export type SaveMoreOptionsModal = {
-//   type: 'SAVE_MORE_OPTIONS_MODAL',
-//   payload: any, // TODO
-// }
-
-// export const saveMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
-//   dispatch({
-//     type: 'SAVE_MORE_OPTIONS_MODAL',
-//     payload: selectors.getFormModalData(getState()),
-//   })
-// }
-
-export const setWellSelectionLabwareKey = (labwareName: ?string): * => ({
-  type: 'SET_WELL_SELECTION_LABWARE_KEY',
-  payload: labwareName,
-})
-
-export const clearWellSelectionLabwareKey = (): * => ({
-  type: 'CLEAR_WELL_SELECTION_LABWARE_KEY',
-  payload: null,
-})
-
-export type ReorderStepsAction = {
-  type: 'REORDER_STEPS',
-  payload: {
-    stepIds: Array<StepIdType>,
-  },
-}
-
+export type ReorderStepsAction = {type: 'REORDER_STEPS', payload: {stepIds: Array<StepIdType>}}
 export const reorderSteps = (stepIds: Array<StepIdType>): ReorderStepsAction => ({
   type: 'REORDER_STEPS',
   payload: {stepIds},
