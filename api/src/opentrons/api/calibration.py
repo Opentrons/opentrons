@@ -5,6 +5,7 @@ from opentrons.util import calibration_functions
 from opentrons.config import feature_flags as ff
 from opentrons.broker import publish
 from opentrons.types import Point, Mount
+from opentrons.protocol_api import labware
 
 from .models import Container
 
@@ -182,11 +183,20 @@ class CalibrationManager:
     def update_container_offset(self, container, instrument):
         inst = instrument._instrument
         log.info('Updating {} in {}'.format(container.name, container.slot))
-        inst.robot.calibrate_container_with_instrument(
-            container=container._container,
-            instrument=inst,
-            save=True
-        )
+        if ff.use_protocol_api_v2():
+            here = self._hardware.gantry_position(Mount[inst.mount.upper()])
+            if ff.calibrate_to_bottom():
+                orig = container._container.wells()[0].bottom().point
+            else:
+                orig = container._container.wells()[0].top().point
+            delta = here - orig
+            labware.save_calibration(container._container, delta)
+        else:
+            inst.robot.calibrate_container_with_instrument(
+                container=container._container,
+                instrument=inst,
+                save=True
+            )
 
     def _snapshot(self):
         return {

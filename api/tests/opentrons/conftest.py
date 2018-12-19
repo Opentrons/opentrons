@@ -381,7 +381,7 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
 
 
 @pytest.fixture
-def model(robot, hardware, loop):
+def model(robot, hardware, loop, apiv2_labware_cal):
     from opentrons.legacy_api.containers import load
     from opentrons.legacy_api.instruments.pipette import Pipette
 
@@ -476,6 +476,14 @@ def cntrlr_mock_connect(monkeypatch):
 def hardware_api(loop):
     hw_api = hc.API.build_hardware_simulator(loop=loop)
     return hw_api
+
+
+@pytest.fixture
+def apiv2_labware_cal(monkeypatch):
+    with tempfile.TemporaryDirectory() as td:
+        monkeypatch.setattr(
+            'opentrons.protocol_api.labware.persistent_path', td)
+        yield td
 
 
 setup_testing_env()
