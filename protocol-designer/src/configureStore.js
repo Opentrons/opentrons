@@ -15,6 +15,7 @@ function getRootReducer () {
     stepForms: require('./step-forms').rootReducer,
     steplist: require('./steplist').rootReducer,
     tutorial: require('./tutorial').rootReducer,
+    ui: require('./ui').rootReducer,
     wellSelection: require('./well-selection/reducers').default,
   })
 
@@ -74,6 +75,7 @@ export default function configureStore () {
       './step-forms/reducers',
       './steplist/reducers',
       './tutorial/reducers',
+      './ui/steps/reducers',
       './well-selection/reducers',
     ], replaceReducers)
   }

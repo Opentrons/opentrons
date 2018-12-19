@@ -5,6 +5,7 @@ import {uuid} from '../../utils'
 import {selectors as labwareIngredsSelectors} from '../../labware-ingred/reducers'
 import * as pipetteSelectors from '../../pipettes/selectors'
 import {selectors as steplistSelectors} from '../../steplist'
+import {selectors as stepsSelectors} from '../../ui/steps'
 import {actions as tutorialActions} from '../../tutorial'
 import {getNextDefaultPipetteId, generateNewForm} from '../formLevel'
 import type {StepType, StepIdType, FormData} from '../../form-types'
@@ -18,7 +19,7 @@ export type SelectStepAction = {
 }
 
 // get new or existing step for given stepId
-function getStepFormData (state: BaseState, stepId: StepIdType, newStepType?: StepType): ?FormData {
+export function getStepFormData (state: BaseState, stepId: StepIdType, newStepType?: StepType): ?FormData {
   const existingStep = steplistSelectors.getSavedForms(state)[stepId]
 
   if (existingStep) {
@@ -126,7 +127,7 @@ export type ReorderSelectedStepAction = {
 
 export const reorderSelectedStep = (delta: number) =>
   (dispatch: ThunkDispatch<ReorderSelectedStepAction>, getState: GetState) => {
-    const stepId = steplistSelectors.getSelectedStepId(getState())
+    const stepId = stepsSelectors.getSelectedStepId(getState())
 
     if (stepId != null) {
       dispatch({

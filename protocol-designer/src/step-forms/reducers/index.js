@@ -30,8 +30,8 @@ import type {
   DeleteStepAction,
   SaveStepFormAction,
   PopulateFormAction,
-  SaveMoreOptionsModal,
 } from '../../steplist/actions'
+import type {SaveMoreOptionsModal} from '../../ui/steps/actions'
 
 type FormState = FormData | null
 

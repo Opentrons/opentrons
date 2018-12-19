@@ -16,8 +16,9 @@ import StepEditForm from '../components/StepEditForm'
 import TimelineAlerts from '../components/alerts/TimelineAlerts'
 
 import {selectors} from '../labware-ingred/reducers'
-import * as actions from '../labware-ingred/actions'
-import {selectors as steplistSelectors, START_TERMINAL_ITEM_ID, type TerminalItemId} from '../steplist'
+import * as labwareIngredActions from '../labware-ingred/actions'
+import {START_TERMINAL_ITEM_ID, type TerminalItemId} from '../steplist'
+import {selectors as stepsSelectors} from '../ui/steps'
 
 import type {BaseState, ThunkDispatch} from '../types'
 
@@ -39,15 +40,15 @@ type Props = {
 }
 
 const mapStateToProps = (state: BaseState): StateProps => ({
-  selectedTerminalItemId: steplistSelectors.getSelectedTerminalItemId(state),
+  selectedTerminalItemId: stepsSelectors.getSelectedTerminalItemId(state),
   ingredSelectionMode: Boolean(selectors.getSelectedLabware(state)),
   drilledDown: !!selectors.getDrillDownLabwareId(state),
   _moveLabwareMode: !!selectors.getSlotToMoveFrom(state),
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DispatchProps => ({
-  cancelMoveLabwareMode: () => dispatch(actions.setMoveLabwareMode()),
-  drillUpFromLabware: () => dispatch(actions.drillUpFromLabware()),
+  cancelMoveLabwareMode: () => dispatch(labwareIngredActions.setMoveLabwareMode()),
+  drillUpFromLabware: () => dispatch(labwareIngredActions.drillUpFromLabware()),
 })
 
 const mergeProps = (stateProps: StateProps, dispatchProps: DispatchProps): Props => ({
