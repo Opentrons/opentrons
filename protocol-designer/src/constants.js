@@ -47,6 +47,9 @@ export const FIXED_TRASH_ID: 'trashId' = 'trashId'
 export const START_TERMINAL_TITLE = 'STARTING DECK STATE'
 export const END_TERMINAL_TITLE = 'FINAL DECK STATE'
 
+// special ID for invisible deck setup step-form
+export const INITIAL_DECK_SETUP_STEP_ID = '__INITIAL_DECK_SETUP_STEP__'
+
 export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
 export const DEFAULT_MM_FROM_BOTTOM_ASPIRATE = 1
 export const DEFAULT_MM_FROM_BOTTOM_DISPENSE = 0.5

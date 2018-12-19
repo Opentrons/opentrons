@@ -6,6 +6,7 @@ import type {RootState as LabwareIngred} from './labware-ingred/reducers'
 import type {RootState as LoadFile} from './load-file'
 import type {RootState as Navigation} from './navigation'
 import type {RootState as Pipettes} from './pipettes'
+import type {RootState as StepForms} from './step-forms'
 import type {RootState as StepList} from './steplist'
 import type {RootState as Tutorial} from './tutorial'
 import type {RootState as WellSelection} from './well-selection/reducers'
@@ -18,6 +19,7 @@ export type BaseState = {
   navigation: Navigation,
   pipettes: Pipettes,
   steplist: StepList,
+  stepForms: StepForms,
   tutorial: Tutorial,
   wellSelection: WellSelection,
 }
