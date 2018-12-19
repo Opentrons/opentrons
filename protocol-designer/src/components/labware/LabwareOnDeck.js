@@ -65,19 +65,6 @@ type DragDropLabwareProps = React.ElementProps<typeof LabwareContainer> & {
   moveLabware: (DeckSlot, DeckSlot) => void,
 }
 class DragSourceLabware extends React.Component<DragDropLabwareProps> {
-  componentDidUpdate (prevProps) {
-    if (this.props.draggedItem) {
-      if (prevProps.isOver && !this.props.isOver) {
-        const {slot} = this.props.draggedItem
-        // this.props.moveLabware(this.props.slot, slot)
-      }
-      if (!prevProps.isOver && this.props.isOver) {
-        const {slot} = this.props.draggedItem
-        // this.props.moveLabware(slot, this.props.slot)
-      }
-    }
-  }
-
   renderOverlay = () => {
     if (this.props.draggedItem) {
       if (this.props.draggedItem.slot === this.props.slot) {
@@ -105,23 +92,35 @@ class DragSourceLabware extends React.Component<DragDropLabwareProps> {
   }
 }
 
-const labwareSource = { beginDrag: (props) => ({
-  slot: props.slot,
-  containerId: props.containerId,
-}) }
+const labwareSource = {
+  beginDrag: (props) => ({
+    slot: props.slot,
+    containerId: props.containerId,
+  }),
+  canDrag: (props) => !!props.containerId,
+}
 const collectLabwareSource = (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging(),
+  draggedItem: monitor.getItem(),
 })
 const DraggableLabware = DragSource(DND_TYPES.LABWARE, labwareSource, collectLabwareSource)(DragSourceLabware)
 
 const labwareTarget = {
-  canDrop: () => { return false },
+  canDrop: (props, monitor) => {
+    const draggedItem = monitor.getItem()
+    return draggedItem && (draggedItem.slot !== props.slot)
+  },
+  drop: (props, monitor) => {
+    const draggedItem = monitor.getItem()
+    if (draggedItem) {
+      props.moveLabware(draggedItem.slot, props.slot)
+    }
+  },
 }
 const collectLabwareTarget = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
-  draggedItem: monitor.getItem(),
 })
 const DragDropLabware = DropTarget(DND_TYPES.LABWARE, labwareTarget, collectLabwareTarget)(DraggableLabware)
 
@@ -130,11 +129,13 @@ function LabwareDeckSlotOverlay ({
   deleteLabware,
   editLiquids,
   moveLabwareSource,
+  duplicateLabware,
 }: {
   canAddIngreds: boolean,
   deleteLabware: () => mixed,
   editLiquids: () => mixed,
   moveLabwareSource: () => mixed,
+  duplicateLabware: () => mixed,
 }) {
   return (
     <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
@@ -145,8 +146,8 @@ function LabwareDeckSlotOverlay ({
           iconName='pencil' y='15%' text='Name & Liquids' />
       }
       <ClickableText
-        onClick={moveLabwareSource}
-        iconName='cursor-move' y='40%' text='Move' />
+        onClick={duplicateLabware}
+        iconName='content-copy' y='40%' text='Duplicate' />
       <ClickableText
         onClick={deleteLabware}
         iconName='close' y='65%' text='Delete' />
@@ -183,29 +184,14 @@ function SlotWithLabware (props: SlotWithLabwareProps) {
   )
 }
 
-type EmptyDestinationSlotOverlayProps = {
-  moveLabwareDestination: (e?: SyntheticEvent<*>) => mixed,
-}
-function EmptyDestinationSlotOverlay (props: EmptyDestinationSlotOverlayProps) {
-  const {moveLabwareDestination} = props
-
-  const handleSelectMoveDestination = (e: SyntheticEvent<*>) => {
-    e.preventDefault()
-    moveLabwareDestination()
-  }
-
-  return (
-    <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
-      <rect className={styles.overlay_panel} onClick={moveLabwareDestination} />
-      <ClickableText
-        onClick={handleSelectMoveDestination}
-        iconName='cursor-move'
-        y='40%'
-        text='Place Here'
-      />
+const EmptyDestinationSlotOverlay = () => (
+  <g className={cx(styles.slot_overlay)}>
+    <rect className={styles.overlay_panel} />
+    <g className={styles.clickable_text}>
+      <text x='0' y='40%'>Place Here</text>
     </g>
-  )
-}
+  </g>
+)
 
 type EmptyDeckSlotOverlayProps = {
   addLabware: (e: SyntheticEvent<*>) => mixed,
@@ -216,10 +202,7 @@ function EmptyDeckSlotOverlay (props: EmptyDeckSlotOverlayProps) {
     <g className={cx(styles.slot_overlay, styles.appear_on_mouseover, styles.add_labware)}>
       <rect className={styles.overlay_panel} />
       <ClickableText onClick={addLabware}
-        iconName='plus' y='30%' text='Add Labware' />
-      <ClickableText
-        onClick={e => window.alert('NOT YET IMPLEMENTED: Add Copy') /* TODO: New Copy feature */}
-        iconName='content-copy' y='55%' text='Add Copy' />
+        iconName='plus' y='40%' text='Add Labware' />
     </g>
   )
 }
@@ -245,6 +228,7 @@ type LabwareOnDeckProps = {
   drillDown: () => mixed,
   drillUp: () => mixed,
   deleteLabware: () => mixed,
+  duplicateLabware: (string) => mixed,
 
   cancelMove: () => mixed,
   moveLabwareDestination: () => mixed,
@@ -286,18 +270,14 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
       canAddIngreds,
       isTiprack,
       selectedTerminalItem,
-      moveLabwareMode,
       drillDown,
       drillUp,
 
       addLabware,
+      duplicateLabware,
       editLiquids,
       deleteLabware,
 
-      cancelMove,
-      moveLabwareDestination,
-      moveLabwareSource,
-      slotToMoveFrom,
       swapSlotContents,
 
       setDefaultLabwareName,
@@ -307,13 +287,6 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
     // determine what overlay to show
     let overlay = null
     if (selectedTerminalItem === START_TERMINAL_ITEM_ID && !addLabwareMode) {
-      // if (moveLabwareMode) {
-      //   overlay = (slotToMoveFrom === slot)
-      //     ? <DisabledSelectSlotOverlay
-      //       onClickOutside={cancelMove}
-      //       cancelMove={cancelMove} />
-      //     : <EmptyDestinationSlotOverlay {...{moveLabwareDestination}}/>
-      // }
       if (showNameOverlay) {
         overlay = (
           <NameThisLabwareOverlay
@@ -322,8 +295,11 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
         )
       } else {
         overlay = (slotHasLabware)
-          ? <LabwareDeckSlotOverlay {...{canAddIngreds, deleteLabware, editLiquids}} />
-          : <EmptyDeckSlotOverlay {...{addLabware}} />
+          ? (
+            <LabwareDeckSlotOverlay
+              duplicateLabware={() => duplicateLabware(containerId)}
+              {...{canAddIngreds, deleteLabware, editLiquids}} />
+          ) : <EmptyDeckSlotOverlay {...{addLabware}} />
       }
     } else if (selectedTerminalItem === END_TERMINAL_ITEM_ID && slotHasLabware && !isTiprack) {
       overlay = <BrowseLabwareOverlay drillDown={drillDown} drillUp={drillUp} />

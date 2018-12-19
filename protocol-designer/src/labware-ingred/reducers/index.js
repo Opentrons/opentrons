@@ -189,6 +189,25 @@ export const containers = handleActions({
       ...toLabware,
     }
   },
+  DUPLICATE_LABWARE: (state: ContainersState, action: DuplicateLabwareAction): ContainersState => {
+    const {templateLabwareId, duplicateLabwareId} = action.payload
+    const templateLabware = state[templateLabwareId]
+    const nextSlot = nextEmptySlot(_loadedContainersBySlot(state))
+    if (!nextSlot) {
+      console.info('there are no available slots to place the duplicate into')
+      return state
+    }
+    return {
+      ...state,
+      [duplicateLabwareId]: {
+        slot: nextSlot,
+        type: templateLabware.type,
+        disambiguationNumber: getNextDisambiguationNumber(state, templateLabware.type),
+        id: duplicateLabwareId,
+        name: null, // create with null name, so we force explicit naming.
+      },
+    }
+  },
   LOAD_FILE: (state: ContainersState, action: LoadFileAction): ContainersState => {
     const file = action.payload
     const allFileLabware = file.labware
@@ -221,6 +240,10 @@ export const savedLabware = handleActions({
   RENAME_LABWARE: (state: SavedLabwareState, action: ActionType<typeof actions.renameLabware>) => ({
     ...state,
     [action.payload.labwareId]: true,
+  }),
+  DUPLICATE_LABWARE: (state: SavedLabwareState, action: DuplicateLabwareAction) => ({
+    ...state,
+    [action.payload.duplicateLabwareId]: true,
   }),
   LOAD_FILE: (state: SavedLabwareState, action: LoadFileAction): SavedLabwareState => (
     mapValues(action.payload.labware, () => true)
@@ -260,6 +283,15 @@ export const ingredLocations = handleActions({
       [labwareId]: {
         ...state[labwareId],
         ...updatedWells,
+      },
+    }
+  },
+  DUPLICATE_LABWARE: (state: LocationsState, action: DuplicateLabwareAction): LocationsState => {
+    const {templateLabwareId, duplicateLabwareId} = action.payload
+    return {
+      ...state,
+      [duplicateLabwareId]: {
+        ...state[templateLabwareId],
       },
     }
   },

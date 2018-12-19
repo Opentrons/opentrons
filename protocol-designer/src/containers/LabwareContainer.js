@@ -16,6 +16,7 @@ import {
 
   // setMoveLabwareMode,
   // moveLabware,
+  duplicateLabware,
   swapSlotContents,
 } from '../labware-ingred/actions'
 import {selectors as steplistSelectors, START_TERMINAL_ITEM_ID} from '../steplist'
@@ -126,6 +127,7 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}, own
     ),
     drillDown: () => dispatch(drillDownOnLabware(containerId)),
     drillUp: () => dispatch(drillUpFromLabware()),
+    duplicateLabware: (id) => dispatch(duplicateLabware(id)),
     // cancelMove: () => dispatch(setMoveLabwareMode()),
     // moveLabwareDestination: () => dispatch(moveLabware(slot)),
     // moveLabwareSource: () => dispatch(setMoveLabwareMode(slot)),

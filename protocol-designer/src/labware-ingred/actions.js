@@ -1,6 +1,7 @@
 // @flow
 import {createAction} from 'redux-actions'
 import type {Dispatch} from 'redux'
+import uuid from 'uuid'
 
 import {selectors} from './reducers'
 
@@ -121,6 +122,21 @@ export type SwapSlotContents = {
 export const swapSlotContents = (sourceSlot: DeckSlot, destSlot: DeckSlot): SwapSlotContents => ({
   type: 'SWAP_SLOT_CONTENTS',
   payload: {sourceSlot, destSlot},
+})
+
+export type DuplicateLabwareAction = {
+  type: 'DUPLICATE_LABWARE',
+  payload: {
+    templateLabwareId: string,
+    duplicateLabwareId: string,
+  },
+}
+export const duplicateLabware = (templateLabwareId: string): DuplicateLabwareAction => ({
+  type: 'DUPLICATE_LABWARE',
+  payload: {
+    templateLabwareId,
+    duplicateLabwareId: uuid(),
+  },
 })
 
 export type RemoveWellsContents = {
