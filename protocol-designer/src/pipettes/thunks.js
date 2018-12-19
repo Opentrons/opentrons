@@ -32,7 +32,7 @@ export const editPipettes = (payload: EditPipettesFields) =>
         const nextPipetteModel = pipetteFields.pipetteModel
         const nextTiprackModel = isEmpty(pipetteFields.tiprackModel) ? null : pipetteFields.tiprackModel
         const nextPipette: ?PipetteData = nextPipetteModel ? createPipette(mount, nextPipetteModel, nextTiprackModel) : null
-        return nextPipette ? {...acc, [mount]: nextPipette} : acc
+        return {...acc, [mount]: nextPipette}
       },
       {}
     )

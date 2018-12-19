@@ -11,7 +11,6 @@ import pickBy from 'lodash/pickBy'
 import reduce from 'lodash/reduce'
 
 import {sortedSlotnames, FIXED_TRASH_ID} from '../../constants.js'
-import {uuid} from '../../utils'
 import {labwareToDisplayName} from '../utils'
 
 import type {DeckSlot} from '@opentrons/components'
@@ -31,7 +30,7 @@ import type {
 import * as actions from '../actions'
 import {getPDMetadata} from '../../file-types'
 import type {BaseState, Options} from '../../types'
-import type {LoadFileAction, NewProtocolFields} from '../../load-file'
+import type {LoadFileAction, CreateNewProtocolAction} from '../../load-file'
 import type {
   RemoveWellsContents,
   DeleteLiquidGroup,
@@ -131,7 +130,7 @@ function getNextDisambiguationNumber (allLabwareById: ContainersState, labwareTy
 
 export const containers = handleActions({
   CREATE_CONTAINER: (state: ContainersState, action: ActionType<typeof actions.createContainer>) => {
-    const id = uuid() + ':' + action.payload.containerType
+    const id = action.payload.id
     return {
       ...state,
       [id]: {
@@ -194,25 +193,19 @@ export const containers = handleActions({
       }
     }, {})
   },
-  CREATE_NEW_PROTOCOL: (
-    state: ContainersState,
-    action: {payload: NewProtocolFields}
-  ): ContainersState => {
-    const nextState = [action.payload.left, action.payload.right].reduce((acc: ContainersState, mount): ContainersState => {
-      if (mount.tiprackModel) {
-        const id = `${uuid()}:${String(mount.tiprackModel)}`
-        return {
-          ...acc,
-          [id]: {
-            slot: nextEmptySlot(_loadedContainersBySlot(acc)),
-            type: mount.tiprackModel,
-            disambiguationNumber: getNextDisambiguationNumber(acc, String(mount.tiprackModel)),
-            id,
-            name: null,
-          },
-        }
+  CREATE_NEW_PROTOCOL: (state: ContainersState, action: CreateNewProtocolAction): ContainersState => {
+    const nextState = action.payload.tipracks.reduce((acc: ContainersState, tiprack): ContainersState => {
+      const {id, model} = tiprack
+      return {
+        ...acc,
+        [id]: {
+          slot: nextEmptySlot(_loadedContainersBySlot(acc)),
+          type: model,
+          disambiguationNumber: getNextDisambiguationNumber(acc, String(model)),
+          id,
+          name: null,
+        },
       }
-      return acc
     }, state)
     return nextState
   },

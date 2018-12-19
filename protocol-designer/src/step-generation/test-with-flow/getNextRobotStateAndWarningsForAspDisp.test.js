@@ -332,5 +332,5 @@ describe('...8-channel pipette', () => {
     })
   })
 
-  test('aspirate from 384 plate starting from B row') // TODO
+  test.skip('aspirate from 384 plate starting from B row', () => {}) // TODO
 })

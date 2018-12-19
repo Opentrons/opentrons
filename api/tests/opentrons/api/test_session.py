@@ -333,7 +333,13 @@ metadata = {
 'what?': 'no',
 'hello': 'world'
 }
+fakedata = {
+'who?': 'me',
+'what?': 'green eggs'
+}
 print('wat?')
+metadata['hello'] = 'moon'
+fakedata['what?'] = 'ham'
 """
 
     parsed = ast.parse(prot, filename='testy', mode='exec')

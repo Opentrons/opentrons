@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.6.5"></a>
+## [3.6.5](https://github.com/Opentrons/opentrons/compare/v3.6.4...v3.6.5) (2018-12-18)
+
+
+### Bug Fixes
+
+* **api:** Fix extract metadata ([#2833](https://github.com/Opentrons/opentrons/issues/2833)) ([0930915](https://github.com/Opentrons/opentrons/commit/0930915))
+* **api:** Remove the intermingled old aspirate function from p10s ([#2839](https://github.com/Opentrons/opentrons/issues/2839)) ([696184c](https://github.com/Opentrons/opentrons/commit/696184c))
+
+
+
+
+
+<a name="3.6.4"></a>
+## [3.6.4](https://github.com/Opentrons/opentrons/compare/v3.6.3...v3.6.4) (2018-12-17)
+
+
+### Features
+
+* **api:** Adds optional arg to QC scripts to specify UART port ([#2825](https://github.com/Opentrons/opentrons/issues/2825)) ([5d622ad](https://github.com/Opentrons/opentrons/commit/5d622ad))
+
+
+
+
+
 <a name="3.6.3"></a>
 ## [3.6.3](https://github.com/Opentrons/opentrons/compare/v3.6.2...v3.6.3) (2018-12-13)
 

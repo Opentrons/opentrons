@@ -402,7 +402,8 @@ describe('advanced options', () => {
         cmd.dispense('B1', 50, {labware: 'destPlateId'}),
       ])
     })
-    test('air gap => ???') // TODO determine behavior
+
+    test.skip('air gap => ???', () => {}) // TODO determine behavior
   })
 
   describe('...dispense options', () => {
@@ -438,6 +439,6 @@ describe('advanced options', () => {
       ])
     })
 
-    test('blowout should blowout in specified labware after each dispense') // TODO
+    test.skip('blowout should blowout in specified labware after each dispense', () => {}) // TODO
   })
 })

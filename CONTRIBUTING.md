@@ -216,17 +216,18 @@ Our release process is still a work-in-progress. All projects are currently vers
 
 1.  `make bump` (see details below)
 2.  Inspect version bumps and changelogs
-3.  `git add --all`
-4.  `git cz`
+3.  Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes
+4.  `git add --all`
+5.  `git cz`
     - Type: `chore`
     - Scope: `release`
     - Message: `${version}`
-5.  Open a PR into `edge`
-6.  Squash merge the PR once approved
-7.  Verify that CI is green on `edge` and test the build artifacts
-8.  Pull latest `edge` to your machine
-9.  `git tag -a v${version} -m 'chore(release): ${version}'`
-10. `git push --tags`
+6.  Open a PR into `edge`
+7.  Squash merge the PR once approved
+8.  Verify that CI is green on `edge` and test the build artifacts
+9.  Pull latest `edge` to your machine
+10.  `git tag -a v${version} -m 'chore(release): ${version}'`
+11. `git push --tags`
 
 #### `make bump` usage
 
@@ -250,7 +251,7 @@ make bump
 # equivalent to above
 make bump opts="--preid=alpha --cd-version=prerelease"
 
-# bump to a beta version
+# bump to a beta version, the standard practice for a new release
 make bump opts="--preid=beta"
 
 # prerelease minor version bump (e.g. 3.0.0 -> 3.1.0-alpha.0)
@@ -261,6 +262,9 @@ make bump opts="--cd-version=minor"
 
 # bump to an explicit version
 make bump opts="--repo-version=42.0.0"
+
+# bump a patch version, e.g. for a hotfix that does not require a beta
+make bump opts="--cd-version=patch"
 ```
 
 We use [lerna][], a monorepo management tool, to work with our various projects. You can use lerna to do things like see which projects have changed since the last release, or run a command in every project directory. To run a one-off lerna command, use:
