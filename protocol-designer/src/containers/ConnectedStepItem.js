@@ -5,11 +5,10 @@ import isEmpty from 'lodash/isEmpty'
 import type {BaseState, ThunkDispatch} from '../types'
 
 import type {SubstepIdentifier} from '../steplist/types'
-import {hoverOnSubstep, selectStep, hoverOnStep, toggleStepCollapsed} from '../steplist/actions'
 import * as substepSelectors from '../top-selectors/substeps'
 import {selectors as dismissSelectors} from '../dismiss'
 import {selectors as steplistSelectors} from '../steplist'
-import {selectors as stepsSelectors} from '../ui/steps'
+import {selectors as stepsSelectors, actions as stepsActions} from '../ui/steps'
 import {selectors as fileDataSelectors} from '../file-data'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import StepItem from '../components/steplist/StepItem' // TODO Ian 2018-05-10 why is importing StepItem from index.js not working?
@@ -72,12 +71,12 @@ function mapDispatchToProps (dispatch: ThunkDispatch<*>, ownProps: OP): DP {
   const {stepId} = ownProps
 
   return {
-    handleSubstepHover: (payload: SubstepIdentifier) => dispatch(hoverOnSubstep(payload)),
+    handleSubstepHover: (payload: SubstepIdentifier) => dispatch(stepsActions.hoverOnSubstep(payload)),
 
-    onStepClick: () => dispatch(selectStep(stepId)),
-    onStepItemCollapseToggle: () => dispatch(toggleStepCollapsed(stepId)),
-    onStepHover: () => dispatch(hoverOnStep(stepId)),
-    onStepMouseLeave: () => dispatch(hoverOnStep(null)),
+    onStepClick: () => dispatch(stepsActions.selectStep(stepId)),
+    onStepItemCollapseToggle: () => dispatch(stepsActions.toggleStepCollapsed(stepId)),
+    onStepHover: () => dispatch(stepsActions.hoverOnStep(stepId)),
+    onStepMouseLeave: () => dispatch(stepsActions.hoverOnStep(null)),
   }
 }
 

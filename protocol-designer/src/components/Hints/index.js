@@ -3,10 +3,8 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {AlertModal, CheckboxField, OutlineButton} from '@opentrons/components'
 import i18n from '../../localization'
-import {
-  actions as steplistActions,
-  type TerminalItemId,
-} from '../../steplist'
+import {actions as stepsActions} from '../../ui/steps'
+import type {TerminalItemId} from '../../steplist'
 import {actions, selectors} from '../../tutorial'
 import {Portal} from '../portals/MainPageModalPortal'
 import styles from './hints.css'
@@ -108,7 +106,7 @@ const mapStateToProps = (state: BaseState): SP => ({
 })
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
   removeHint: (hint, rememberDismissal) => dispatch(actions.removeHint(hint, rememberDismissal)),
-  selectTerminalItem: (terminalId) => dispatch(steplistActions.selectTerminalItem(terminalId)),
+  selectTerminalItem: (terminalId) => dispatch(stepsActions.selectTerminalItem(terminalId)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Hints)

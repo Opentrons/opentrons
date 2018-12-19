@@ -5,10 +5,6 @@ import {connect} from 'react-redux'
 import MoreOptionsModal from '../components/modals/MoreOptionsModal'
 
 import {actions as stepsActions, selectors} from '../ui/steps'
-import {
-  cancelMoreOptionsModal,
-  changeMoreOptionsModalInput,
-} from '../steplist/actions'
 
 import type {BaseState, ThunkDispatch} from '../types'
 
@@ -22,15 +18,15 @@ function mapStateToProps (state: BaseState) {
 
 function mapDispatchToProps (dispatch: ThunkDispatch<*>) {
   return {
-    onCancel: () => dispatch(cancelMoreOptionsModal()),
+    onCancel: () => dispatch(stepsActions.cancelMoreOptionsModal()),
     onSave: () => dispatch(stepsActions.saveMoreOptionsModal()),
 
     handleChange: (accessor: string) => (e: SyntheticInputEvent<*>) => {
       // NOTE this is similar to ConnectedStepEdit form, is it possible to make a more general reusable fn?
-      dispatch(changeMoreOptionsModalInput({update: {[accessor]: e.target.value}}))
+      dispatch(stepsActions.changeMoreOptionsModalInput({update: {[accessor]: e.target.value}}))
     },
 
-    onClickAway: () => dispatch(cancelMoreOptionsModal()),
+    onClickAway: () => dispatch(stepsActions.cancelMoreOptionsModal()),
   }
 }
 

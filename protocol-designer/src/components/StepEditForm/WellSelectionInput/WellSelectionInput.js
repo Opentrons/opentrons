@@ -4,8 +4,7 @@ import {connect} from 'react-redux'
 import {FormGroup, InputField} from '@opentrons/components'
 import WellSelectionModal from './WellSelectionModal'
 import {Portal} from '../../portals/MainPageModalPortal'
-import {actions as steplistActions} from '../../../steplist'
-import {selectors as stepsSelectors} from '../../../ui/steps'
+import {actions as stepsActions, selectors as stepsSelectors} from '../../../ui/steps'
 import styles from '../StepEditForm.css'
 
 import type {Dispatch} from 'redux'
@@ -86,8 +85,8 @@ const mapStateToProps = (state: BaseState): SP => ({
   wellSelectionLabwareKey: stepsSelectors.getWellSelectionLabwareKey(state),
 })
 const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
-  onOpen: key => dispatch(steplistActions.setWellSelectionLabwareKey(key)),
-  onClose: () => dispatch(steplistActions.clearWellSelectionLabwareKey()),
+  onOpen: key => dispatch(stepsActions.setWellSelectionLabwareKey(key)),
+  onClose: () => dispatch(stepsActions.clearWellSelectionLabwareKey()),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(WellSelectionInput)
