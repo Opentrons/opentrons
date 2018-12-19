@@ -4,9 +4,8 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import mapValues from 'lodash/mapValues'
 
-// import {selectors as steplist} from '../steplist'
-// import {selectors as labwareIngred} from '../labware-ingred/reducers'
-// import {selectors as fileDataSelectors} from '../file-data'
+import {selectors as labwareIngred} from '../labware-ingred/reducers'
+import {selectors as fileDataSelectors} from '../file-data'
 import {selectors as stepFormSelectors} from '../step-forms'
 import type {BaseState} from '../types'
 
@@ -71,9 +70,8 @@ function mapStateToProps (state: BaseState): Props {
   return {
     selectors: {
       stepForms: callSelectors(stepFormSelectors, state),
-      // fileData: callSelectors(fileDataSelectors, state),
-      // steplist: callSelectors(steplist, state),
-      // labwareIngred: callSelectors(labwareIngred, state),
+      fileData: callSelectors(fileDataSelectors, state),
+      labwareIngred: callSelectors(labwareIngred, state),
     },
   }
 }
