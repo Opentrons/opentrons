@@ -142,6 +142,10 @@ class API(HardwareAPILike):
                              config, loop),
                    config=config, loop=loop)
 
+    def __repr__(self):
+        return '<{} using backend {}>'.format(type(self),
+                                              type(self._backend))
+
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
         """ The event loop used by this instance. """
@@ -630,7 +634,7 @@ class API(HardwareAPILike):
                     deck_max = self._deck_from_smoothie({ax: bound[1]
                                                          for ax, bound
                                                          in bounds.items()})
-                    raise RuntimeError(
+                    self._log.warning(
                         "Out of bounds move: {}={} (transformed: {}) not in"
                         "limits ({}, {}) (transformed: ({}, {})"
                         .format(ax.name,

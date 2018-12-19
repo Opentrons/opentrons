@@ -32,7 +32,7 @@ async def test_controller_unique_per_thread(hardware_controller_lockfile,
         loop = asyncio.new_event_loop()
         with pytest.raises(RuntimeError):
             _ = loop.run_until_complete(  # noqa(F841)
-                c.API.build_hardware_controller(loop=loop))
+                hc.API.build_hardware_controller(loop=loop))
 
     thread = threading.Thread(target=_create_in_new_thread)
     thread.start()

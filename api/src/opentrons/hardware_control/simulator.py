@@ -37,6 +37,29 @@ class Simulator:
             attached_instruments: Dict[types.Mount, Dict[str, Optional[str]]],
             attached_modules: List[str],
             config, loop) -> None:
+        """ Build the simulator.
+
+        :param attached_instruments: A dictionary describing the instruments
+                                     the simulator should consider attached.
+                                     If this argument is specified and
+                                     :py:meth:`get_attached_instruments` is
+                                     called with expectations that do not
+                                     match, the call fails. This is useful for
+                                     making the simulator match the real
+                                     hardware, for instance to check if a
+                                     protocol asks for the right instruments.
+                                     This dict should map mounts to either
+                                     empty dicts or to dicts containing
+                                     'model' and 'id' keys.
+        :param attached_modules: A list of module model names (e.g.
+                                 `'tempdeck'` or `'magdeck'`) representing
+                                 modules the simulator should assume are
+                                 attached. Like `attached_instruments`, used
+                                 to make the simnulator match the setup of the
+                                 real hardware.
+        :param config: The robot config to use
+        :param loop: The asyncio event loop to use.
+        """
         self._config = config
         self._loop = loop
         self._attached_instruments = attached_instruments

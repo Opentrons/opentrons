@@ -96,7 +96,7 @@ class Pipette:
         """
         assert tip_length > 0.0, "tip_length must be greater than 0"
         assert not self.has_tip
-        self._current_tip_length = tip_length
+        self._current_tip_length = tip_length - self._config.tip_overlap
 
     def remove_tip(self) -> None:
         """

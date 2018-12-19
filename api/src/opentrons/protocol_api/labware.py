@@ -7,7 +7,7 @@ import pkgutil
 from collections import defaultdict
 from enum import Enum, auto
 from itertools import takewhile, dropwhile
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Union
 
 from opentrons.types import Location
 from opentrons.types import Point
@@ -160,6 +160,9 @@ class Well:
             return NotImplemented
         return self.top().point == other.top().point
 
+    def __hash__(self):
+        return hash(self.top().point)
+
 
 class Labware:
     """
@@ -197,11 +200,18 @@ class Labware:
                           for well in col]
         self._offset\
             = Point(offset['x'], offset['y'], offset['z']) + parent.point
+        self._parent = parent.labware
         # Applied properties
         self.set_calibration(self._calibrated_offset)
 
         self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
         self._definition = definition
+
+    @property
+    def parent(self) -> Union['Labware', 'Well', str, 'ModuleGeometry', None]:
+        """ The parent of this labware. Usually a slot name.
+        """
+        return self._parent
 
     @property
     def name(self) -> str:
@@ -471,7 +481,7 @@ class Labware:
         :param num_channels: The number of channels for the current pipette
         :type num_channels: int
         """
-        assert num_channels > 0
+        assert num_channels > 0, 'Bad call to use_tips: num_channels==0'
         # Select the column of the labware that contains the target well
         target_column: List[Well] = [
             col for col in self.columns() if start_well in col][0]
@@ -485,7 +495,8 @@ class Labware:
         num_tips = min(len(target_column) - well_idx, num_channels)
         target_wells = target_column[well_idx: well_idx + num_tips]
 
-        assert all([well.has_tip for well in target_wells])
+        assert all([well.has_tip for well in target_wells]),\
+            '{} is out of tips'.format(str(self))
 
         for well in target_wells:
             well.has_tip = False

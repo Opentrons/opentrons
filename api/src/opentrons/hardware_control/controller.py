@@ -132,7 +132,7 @@ class Controller:
             if expected_instr and\
                (not found_model or not found_model.startswith(expected_instr)):
                 raise RuntimeError(
-                    'mount {}: expected instrument {} but got {}'
+                    'mount {}: instrument {} was requested but {} is present'
                     .format(mount.name, expected_instr, found_model))
             to_return[mount] = {
                 'model': found_model,

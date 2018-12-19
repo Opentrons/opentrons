@@ -1,9 +1,10 @@
 import asyncio
 import logging
+import time
 from typing import Any, Dict, List, Optional, Union, Tuple
 
 from .labware import Well, Labware, load, load_module, ModuleGeometry
-from opentrons import types, hardware_control as hc
+from opentrons import types, hardware_control as hc, broker, commands as cmds
 import opentrons.config.robot_configs as rc
 from opentrons.config import advanced_settings
 from opentrons.hardware_control import adapters, modules
@@ -33,8 +34,54 @@ class ProtocolContext:
     compatibility and should be used less and less as time goes by.
     """
 
+    class HardwareManager:
+        def __init__(self, hardware):
+            if None is hardware:
+                self._is_orig = True
+                self._current = adapters.SynchronousAdapter.build(
+                    hc.API.build_hardware_simulator)
+            elif isinstance(hardware, adapters.SynchronousAdapter):
+                self._is_orig = False
+                self._current = hardware
+            else:
+                self._is_orig = False
+                self._current = adapters.SynchronousAdapter(hardware)
+
+        @property
+        def hardware(self):
+            return self._current
+
+        def set_hw(self, hardware):
+            if self._is_orig:
+                self._is_orig = False
+                self._current.join()
+            if isinstance(hardware, adapters.SynchronousAdapter):
+                self._current = hardware
+            elif isinstance(hardware, hc.API):
+                self._current = adapters.SynchronousAdapter(hardware)
+            else:
+                raise TypeError(
+                    "hardware should be API or synch adapter but is {}"
+                    .format(hardware))
+            return self._current
+
+        def reset_hw(self):
+            if self._is_orig:
+                self._current.join()
+            self._current = adapters.SynchronousAdapter.build(
+                    hc.API.build_hardware_simulator)
+            self._is_orig = True
+            return self._current
+
+        def __del__(self):
+            orig = getattr(self, '_is_orig', False)
+            cur = getattr(self, '_current', None)
+            if orig and cur:
+                cur.join()
+
     def __init__(self,
-                 loop: asyncio.AbstractEventLoop = None) -> None:
+                 loop: asyncio.AbstractEventLoop = None,
+                 hardware: hc.API = None) -> None:
         """ Build a :py:class:`.ProtocolContext`.
 
         :param loop: An event loop to use. If not specified, this ctor will
@@ -46,8 +93,32 @@ class ProtocolContext:
             = {mount: None for mount in types.Mount}
         self._last_moved_instrument: Optional[types.Mount] = None
         self._location_cache: Optional[types.Location] = None
-        self._hardware = self._build_hardware_adapter(self._loop)
+
+        self._hw_manager = ProtocolContext.HardwareManager(hardware)
         self._log = MODULE_LOG.getChild(self.__class__.__name__)
+        self._commands: List[str] = []
+        self._unsubscribe_commands = None
+        self.clear_commands()
+
+    def commands(self):
+        return self._commands
+
+    def clear_commands(self):
+        self._commands.clear()
+        if self._unsubscribe_commands:
+            self._unsubscribe_commands()
+
+        def on_command(message):
+            payload = message.get('payload')
+            text = payload.get('text')
+            if text is None:
+                return
+
+            if message['$'] == 'before':
+                self._commands.append(text.format(**payload))
+
+        self._unsubscribe_commands = broker.subscribe(
+            cmds.types.COMMAND, on_command)
 
     def connect(self, hardware: hc.API):
         """ Connect to a running hardware API.
@@ -58,13 +129,13 @@ class ProtocolContext:
         :py:class:`.ProtocolContext`; :py:meth:`disconnect` simply creates
         a new simulator and replaces the current hardware with it.
         """
-        self._hardware = self._build_hardware_adapter(self._loop, hardware)
-        self._hardware.cache_instruments()
+        self._hw_manager.set_hw(hardware)
+        self._hw_manager.hardware.cache_instruments()
 
     def disconnect(self):
         """ Disconnect from currently-connected hardware and simulate instead
         """
-        self._hardware = self._build_hardware_adapter(self._loop)
+        self._hw_manager.reset_hw()
 
     def load_labware(
             self, labware_obj: Labware, location: types.DeckLocation,
@@ -96,7 +167,7 @@ class ProtocolContext:
     def load_module(
             self, module_name: str,
             location: types.DeckLocation) -> ModuleTypes:
-        for mod in self._hardware.discover_modules():
+        for mod in self._hw_manager.hardware.discover_modules():
             if mod.name() == module_name:
                 mod_class = {'magdeck': MagneticModuleContext,
                              'tempdeck': TemperatureModuleContext}[module_name]
@@ -124,7 +195,7 @@ class ProtocolContext:
     def load_instrument(
             self,
             instrument_name: str,
-            mount: types.Mount,
+            mount: Union[types.Mount, str],
             tip_racks: List[Labware] = None,
             replace: bool = False) -> 'InstrumentContext':
         """ Load a specific instrument required by the protocol.
@@ -137,8 +208,11 @@ class ProtocolContext:
                                     prefix. For instance, 'p10_single' may be
                                     used to request a P10 single regardless of
                                     the version.
-        :param types.Mount mount: The mount in which this instrument should be
-                                  attached.
+        :param mount: The mount in which this instrument should be attached.
+                      This can either be an instance of the enum type
+                      :py:class:`.types.Mount` or one of the strings `'left'`
+                      and `'right'`.
+        :type mount: types.Mount or str
         :param tip_racks: A list of tip racks from which to pick tips if
                           :py:meth:`.InstrumentContext.pick_up_tip` is called
                           without arguments.
@@ -147,28 +221,42 @@ class ProtocolContext:
                              `mount` (if such an instrument exists) should be
                              replaced by `instrument_name`.
         """
+        if isinstance(mount, str):
+            try:
+                checked_mount = types.Mount[mount.upper()]
+            except KeyError:
+                raise ValueError(
+                    "If mount is specified as a string, it should be either"
+                    "'left' or 'right' (ignoring capitalization, which the"
+                    " system strips), not {}".format(mount))
+        elif isinstance(mount, types.Mount):
+            checked_mount = mount
+        else:
+            raise TypeError(
+                "mount should be either an instance of opentrons.types.Mount"
+                " or a string, but is {}.".format(mount))
         self._log.info("Trying to load {} on {} mount"
-                       .format(instrument_name, mount.name.lower()))
-        instr = self._instruments[mount]
+                       .format(instrument_name, checked_mount.name.lower()))
+        instr = self._instruments[checked_mount]
         if instr and not replace:
             raise RuntimeError("Instrument already present in {} mount: {}"
-                               .format(mount.name.lower(),
+                               .format(checked_mount.name.lower(),
                                        instr.name))
         attached = {att_mount: instr.get('name', None)
                     for att_mount, instr
-                    in self._hardware.attached_instruments.items()}
-        attached[mount] = instrument_name
+                    in self._hw_manager.hardware.attached_instruments.items()}
+        attached[checked_mount] = instrument_name
         self._log.debug("cache instruments expectation: {}"
                         .format(attached))
-        self._hardware.cache_instruments(attached)
+        self._hw_manager.hardware.cache_instruments(attached)
         # If the cache call didn’t raise, the instrument is attached
         new_instr = InstrumentContext(
             ctx=self,
-            hardware=self._hardware,
-            mount=mount,
+            hardware_mgr=self._hw_manager,
+            mount=checked_mount,
             tip_racks=tip_racks,
             log_parent=self._log)
-        self._instruments[mount] = new_instr
+        self._instruments[checked_mount] = new_instr
         self._log.info("Instrument {} loaded".format(new_instr))
         return new_instr
 
@@ -195,22 +283,42 @@ class ProtocolContext:
         """
         raise NotImplementedError
 
-    def pause(self):
+    @cmds.publish.both(command=cmds.pause)
+    def pause(self, msg=None):
         """ Pause execution of the protocol until resume is called.
 
-        Note: This function call will not return until the protocol
-        is resumed (presumably by a user in the run app).
+        This function returns immediately, but the next function call that
+        is blocked by a paused robot (anything that involves moving) will
+        not return until :py:meth:`resume` is called.
+
+        :param str msg: A message to echo back to connected clients.
         """
-        raise NotImplementedError
+        self._hw_manager.hardware.pause()
 
+    @cmds.publish.both(command=cmds.resume)
     def resume(self):
-        """ Resume a previously-paused protocol. """
-        raise NotImplementedError
+        """ Resume a previously-paused protocol """
+        self._hw_manager.hardware.resume()
 
+    @cmds.publish.both(command=cmds.comment)
     def comment(self, msg):
         """ Add a user-readable comment string that will be echoed to the
         Opentrons app. """
-        raise NotImplementedError
+        pass
+
+    @cmds.publish.both(command=cmds.delay)
+    def delay(self, seconds=0, minutes=0):
+        """ Delay protocol execution for a specific amount of time.
+
+        :param float seconds: A time to delay in seconds
+        :param float minutes: A time to delay in minutes
+
+        If both `seconds` and `minutes` are specified, they will be added.
+        """
+        delay_time = seconds + minutes*60
+        self.pause()
+        time.sleep(delay_time)
+        self.resume()
 
     @property
     def config(self) -> rc.robot_config:
@@ -218,7 +326,7 @@ class ProtocolContext:
 
         :returns .robot_config: The loaded configuration.
         """
-        return self._hardware.config
+        return self._hw_manager.hardware.config
 
     def update_config(self, **kwargs):
         """ Update values of the robot's configuration.
@@ -229,14 +337,14 @@ class ProtocolContext:
         Documentation on keys can be found in the documentation for
         :py:class:`.robot_config`.
         """
-        self._hardware.update_config(**kwargs)
+        self._hw_manager.hardware.update_config(**kwargs)
 
     def home(self):
         """ Homes the robot.
         """
         self._log.debug("home")
         self._location_cache = None
-        self._hardware.home()
+        self._hw_manager.hardware.home()
 
     @property
     def location_cache(self) -> Optional[types.Location]:
@@ -253,14 +361,6 @@ class ProtocolContext:
         """ The object holding the deck layout of the robot.
         """
         return self._deck_layout
-
-    @staticmethod
-    def _build_hardware_adapter(
-            loop: asyncio.AbstractEventLoop,
-            hardware: hc.API = None) -> adapters.SynchronousAdapter:
-        if not hardware:
-            hardware = hc.API.build_hardware_simulator(loop=loop)
-        return adapters.SynchronousAdapter(hardware)
 
 
 class InstrumentContext:
@@ -280,13 +380,13 @@ class InstrumentContext:
 
     def __init__(self,
                  ctx: ProtocolContext,
-                 hardware: adapters.SynchronousAdapter,
+                 hardware_mgr: ProtocolContext.HardwareManager,
                  mount: types.Mount,
                  log_parent: logging.Logger,
                  tip_racks: List[Labware] = None,
                  trash: Labware = None,
                  **config_kwargs) -> None:
-        self._hardware = hardware
+        self._hw_manager = hardware_mgr
         self._ctx = ctx
         self._mount = mount
 
@@ -344,19 +444,33 @@ class InstrumentContext:
                         .format(volume,
                                 location if location else 'current position',
                                 rate))
+
         if isinstance(location, Well):
             point, well = location.bottom()
-            self.move_to(
-                types.Location(point + types.Point(0, 0,
-                                                   self.well_bottom_clearance),
-                               well))
+            loc = types.Location(
+                point + types.Point(0, 0, self.well_bottom_clearance),
+                well)
+            self.move_to(loc)
         elif isinstance(location, types.Location):
+            loc = location
             self.move_to(location)
         elif location is not None:
             raise TypeError(
                 'location should be a Well or Location, but it is {}'
                 .format(location))
-        self._hardware.aspirate(self._mount, volume, rate)
+        elif self._ctx.location_cache:
+            loc = self._ctx.location_cache
+        else:
+            raise RuntimeError(
+                "If aspirate is called without an explicit location, another"
+                " method that moves to a location (such as move_to or "
+                "dispense) must previously have been called so the robot "
+                "knows where it is.")
+        cmds.do_publish(cmds.aspirate, self.aspirate, 'before', None, None,
+                        self, volume, loc, rate)
+        self._hw_manager.hardware.aspirate(self._mount, volume, rate)
+        cmds.do_publish(cmds.aspirate, self.aspirate, 'after', self, None,
+                        self, volume, loc, rate)
         return self
 
     def dispense(self,
@@ -397,19 +511,33 @@ class InstrumentContext:
                                 rate))
         if isinstance(location, Well):
             point, well = location.bottom()
-            self.move_to(
-                types.Location(point + types.Point(0, 0,
-                                                   self.well_bottom_clearance),
-                               well))
+            loc = types.Location(
+                point + types.Point(0, 0, self.well_bottom_clearance),
+                well)
+            self.move_to(loc)
         elif isinstance(location, types.Location):
+            loc = location
             self.move_to(location)
         elif location is not None:
             raise TypeError(
                 'location should be a Well or Location, but it is {}'
                 .format(location))
-        self._hardware.dispense(self._mount, volume, rate)
+        elif self._ctx.location_cache:
+            loc = self._ctx.location_cache
+        else:
+            raise RuntimeError(
+                "If dispense is called without an explicit location, another"
+                " method that moves to a location (such as move_to or "
+                "aspirate) must previously have been called so the robot "
+                "knows where it is.")
+        cmds.do_publish(cmds.dispense, self.dispense, 'before', None, None,
+                        self, volume, loc, rate)
+        self._hw_manager.hardware.dispense(self._mount, volume, rate)
+        cmds.do_publish(cmds.dispense, self.dispense, 'after', self, None,
+                        self, volume, loc, rate)
         return self
 
+    @cmds.publish.both(command=cmds.mix)
     def mix(self,
             repetitions: int = 1,
             volume: float = None,
@@ -417,6 +545,7 @@ class InstrumentContext:
             rate: float = 1.0) -> 'InstrumentContext':
         raise NotImplementedError
 
+    @cmds.publish.both(command=cmds.blow_out)
     def blow_out(self, location: Well = None) -> 'InstrumentContext':
         """
         Blow liquid out of the tip.
@@ -426,6 +555,7 @@ class InstrumentContext:
         """
         raise NotImplementedError
 
+    @cmds.publish.both(command=cmds.touch_tip)
     def touch_tip(self,
                   location: Well = None,
                   radius: float = 1.0,
@@ -433,11 +563,13 @@ class InstrumentContext:
                   speed: float = 60.0) -> 'InstrumentContext':
         raise NotImplementedError
 
+    @cmds.publish.both(command=cmds.air_gap)
     def air_gap(self,
                 volume: float = None,
                 height: float = None) -> 'InstrumentContext':
         raise NotImplementedError
 
+    @cmds.publish.both(command=cmds.return_tip)
     def return_tip(self) -> 'InstrumentContext':
         """
         If a tip is currently attached to the pipette, then it will return the
@@ -456,18 +588,36 @@ class InstrumentContext:
         self.drop_tip(loc.top())
         return self
 
-    def pick_up_tip(self, location: types.Location = None,
+    @cmds.publish.both(command=cmds.pick_up_tip)  # noqa(C901)
+    def pick_up_tip(self, location: Union[types.Location, Well] = None,
                     presses: int = 3,
                     increment: float = 1.0) -> 'InstrumentContext':
         """
         Pick up a tip for the pipette to run liquid-handling commands with
 
-        A tip can be manually set by passing a :py:class:`.types.Location`.
         If no location is passed, the Pipette will pick up the next available
-        tip in its :py:attr:`InstrumentContext.tip_racks` list
+        tip in its :py:attr:`InstrumentContext.tip_racks` list.
+
+        The tip to pick up can be manually specified with the `location`
+        argument. The `location` argument can be specified in several ways:
+
+            - If the only thing to specify is which well from which to pick
+              up a tip, `location` can be a :py:class:`.Well`. For instance,
+              if you have a tip rack in a variable called `tiprack`, you can
+              pick up a specific tip from it with
+              `instr.pick_up_tip(tiprack.wells()[0])`. This style of call can
+              be used to make the robot pick up a tip from a tip rack that
+              was not specified when creating the
+              :py:class:`.InstrumentContext`.
+            - If the position to move to in the well needs to be specified,
+              for instance to tell the robot to run its pick up tip routine
+              starting closer to or farther from the top of the tip, `location`
+              can be a :py:class:`.types.Location`; for instance, you can call
+              `instr.pick_up_tip(tiprack.wells()[0].top())`.
 
         :param location: The location from which to pick up a tip.
-        :type location: :py:class:`.types.Location`
+        :type location: :py:class:`.types.Location` or :py:class:`.Well` to
+                        pick up a tip from.
         :param presses: The number of times to lower and then raise the pipette
                         when picking up a tip, to ensure a good seal (0 [zero]
                         will result in the pipette hovering over the tip but
@@ -481,8 +631,7 @@ class InstrumentContext:
         :type increment: float
         :returns: This instance
         """
-        num_channels = \
-            self._hardware.attached_instruments[self._mount]['channels']
+        num_channels = self.channels
 
         def _select_tiprack_from_list(tip_racks) -> Tuple[Labware, Well]:
             try:
@@ -495,23 +644,32 @@ class InstrumentContext:
             else:
                 return _select_tiprack_from_list(tip_racks[1:])
 
-        if location and isinstance(location.labware, Labware):
-            tiprack = location.labware
-            target: Optional[Well] = tiprack.next_tip(num_channels)
-        elif location and isinstance(location.labware, Well):
-            tiprack = location.labware.parent
-            target = location.labware
-        else:
+        if location and isinstance(location, types.Location):
+            if isinstance(location.labware, Labware):
+                tiprack = location.labware
+                target: Well = tiprack.next_tip(num_channels)  # type: ignore
+                if not target:
+                    raise OutOfTipsError
+            elif isinstance(location.labware, Well):
+                tiprack = location.labware.parent
+                target = location.labware
+        elif location and isinstance(location, Well):
+            tiprack = location.parent
+            target = location
+        elif not location:
             tiprack, target = _select_tiprack_from_list(self.tip_racks)
-        if target is None:
-            # This is primarily for type checking--should raise earlier
-            raise OutOfTipsError
+        else:
+            raise TypeError(
+                "If specified, location should be an instance of "
+                "types.Location (e.g. the return value from "
+                "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
+                " However, it is a {}".format(location))
 
-        assert tiprack.is_tiprack
+        assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
 
         self.move_to(target.top())
 
-        self._hardware.pick_up_tip(
+        self._hw_manager.hardware.pick_up_tip(
             self._mount, tiprack.tip_length, presses, increment)
         # Note that the hardware API pick_up_tip action includes homing z after
 
@@ -519,12 +677,34 @@ class InstrumentContext:
         self._last_tip_picked_up_from = target
         return self
 
-    def drop_tip(self, location: types.Location = None) -> 'InstrumentContext':
+    @cmds.publish.both(command=cmds.drop_tip)
+    def drop_tip(
+            self,
+            location: Union[types.Location, Well] = None)\
+            -> 'InstrumentContext':
         """
         Drop the current tip.
 
-        If a location is specified, drop the tip there, otherwise drop it into
-        the fixed trash.
+        If no location is passed, the Pipette will drop the tip into its
+        :py:attr:`trash_container`, which if not specified defaults to
+        the fixed trash in slot 12.
+
+        The location in which to drop the tip can be manually specified with
+        the `location` argument. The `location` argument can be specified in
+        several ways:
+
+            - If the only thing to specify is which well into which to drop
+              a tip, `location` can be a :py:class:`.Well`. For instance,
+              if you have a tip rack in a variable called `tiprack`, you can
+              drop a tip into a specific well on that tiprack with the call
+              `instr.pick_up_tip(tiprack.wells()[0])`. This style of call can
+              be used to make the robot drop a tip into arbitrary labware.
+            - If the position to drop the tip from as well as the
+              :py:class:`.Well` to drop the tip into needs to be specified,
+              for instance to tell the robot to drop a tip from an unusually
+              large height above the tiprack, `location`
+              can be a :py:class:`.types.Location`; for instance, you can call
+              `instr.pick_up_tip(tiprack.wells()[0].top())`.
 
         .. note::
             OT1 required homing the plunger after dropping tips, so the prior
@@ -533,19 +713,35 @@ class InstrumentContext:
             :py:meth:`home_plunger`.
 
         :param location: The location to drop the tip
-        :type location: :py:class:`.types.Location` or None
+        :type location: :py:class:`.types.Location` or :py:class:`.Well` or
+                        None
 
         :returns: This instance
         """
-        if location and isinstance(location.labware, Labware):
-            target: Well = location.labware.wells()[0]
-        elif location and isinstance(location.labware, Well):
-            target = location.labware
-        else:
+        if location and isinstance(location, types.Location):
+            if isinstance(location.labware, Well):
+                target = location.labware
+            else:
+                raise TypeError(
+                    "If a location is specified as a types.Location (for "
+                    "instance, as the result of a call to "
+                    "tiprack.wells()[0].top()) it must be a location "
+                    "relative to a well, since that is where a tip is "
+                    "dropped. The passed location, however, is in "
+                    "reference to {}".format(location.labware))
+        elif location and isinstance(location, Well):
+            target = location
+        elif not location:
             target = self.trash_container.wells()[0]
+        else:
+            raise TypeError(
+                "If specified, location should be an instance of "
+                "types.Location (e.g. the return value from "
+                "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
+                " However, it is a {}".format(location))
 
-        self.move_to(target.top())
-        self._hardware.drop_tip(self._mount)
+        self.move_to(target.bottom())
+        self._hw_manager.hardware.drop_tip(self._mount)
         return self
 
     def home(self) -> 'InstrumentContext':
@@ -553,7 +749,12 @@ class InstrumentContext:
 
         :returns: This instance.
         """
+        def home_dummy(mount): pass
+        cmds.do_publish(cmds.home, home_dummy, 'before', None, None,
+                        self._mount.name.lower())
         self._ctx.home()
+        cmds.do_publish(cmds.home, home_dummy, 'after', self, None,
+                        self._mount.name.lower())
         return self
 
     def home_plunger(self) -> 'InstrumentContext':
@@ -561,9 +762,10 @@ class InstrumentContext:
 
         :returns: This instance.
         """
-        self._hardware.home_plunger(self.mount)
+        self._hw_manager.hardware.home_plunger(self.mount)
         return self
 
+    @cmds.publish.both(command=cmds.distribute)
     def distribute(self,
                    volume: float,
                    source: Well,
@@ -571,6 +773,7 @@ class InstrumentContext:
                    *args, **kwargs) -> 'InstrumentContext':
         raise NotImplementedError
 
+    @cmds.publish.both(command=cmds.consolidate)
     def consolidate(self,
                     volume: float,
                     source: Well,
@@ -578,12 +781,16 @@ class InstrumentContext:
                     *args, **kwargs) -> 'InstrumentContext':
         raise NotImplementedError
 
+    @cmds.publish.both(command=cmds.transfer)
     def transfer(self,
                  volume: float,
                  source: Well,
                  dest: Well,
                  **kwargs) -> 'InstrumentContext':
         raise NotImplementedError
+
+    def delay(self):
+        return self._ctx.delay()
 
     def move_to(self, location: types.Location) -> 'InstrumentContext':
         """ Move the instrument.
@@ -595,14 +802,15 @@ class InstrumentContext:
             from_lw = self._ctx.location_cache.labware
         else:
             from_lw = None
-        from_loc = types.Location(self._hardware.gantry_position(self._mount),
-                                  from_lw)
+        from_loc = types.Location(
+            self._hw_manager.hardware.gantry_position(self._mount),
+            from_lw)
         moves = geometry.plan_moves(from_loc, location, self._ctx.deck)
         self._log.debug("move {}->{}: {}"
                         .format(from_loc, location, moves))
         try:
             for move in moves:
-                self._hardware.move_to(self._mount, move)
+                self._hw_manager.hardware.move_to(self._mount, move)
         except Exception:
             self._ctx.location_cache = None
             raise
@@ -739,10 +947,15 @@ class InstrumentContext:
         :raises: a :py:class:`.types.PipetteNotAttachedError` if the pipette is
                  no longer attached (should not happen).
         """
-        pipette = self._hardware.attached_instruments[self._mount]
+        pipette = self._hw_manager.hardware.attached_instruments[self._mount]
         if pipette is None:
             raise types.PipetteNotAttachedError
         return pipette
+
+    @property
+    def channels(self) -> int:
+        """ The number of channels on the pipette. """
+        return self.hw_pipette['channels']
 
     @property
     def well_bottom_clearance(self) -> float:
@@ -833,6 +1046,7 @@ class TemperatureModuleContext(ModuleContext):
         self._loop = loop
         super().__init__(ctx, geometry)
 
+    @cmds.publish.both(command=cmds.tempdeck_set_temp)
     def set_temperature(self, celsius: float):
         """ Set the target temperature, in C.
 
@@ -842,6 +1056,7 @@ class TemperatureModuleContext(ModuleContext):
         """
         return self._module.set_temperature(celsius)
 
+    @cmds.publish.both(command=cmds.tempdeck_deactivate)
     def deactivate(self):
         """ Stop heating (or cooling) and turn off the fan.
         """
@@ -878,6 +1093,7 @@ class MagneticModuleContext(ModuleContext):
         self._loop = loop
         super().__init__(ctx, geometry)
 
+    @cmds.publish.both(command=cmds.magdeck_calibrate)
     def calibrate(self):
         """ Calibrate the Magnetic Module.
 
@@ -897,6 +1113,7 @@ class MagneticModuleContext(ModuleContext):
                 " calling engage().")
         return super().load_labware(labware)
 
+    @cmds.publish.both(command=cmds.magdeck_engage)
     def engage(self, height: float = None, offset: float = None):
         """ Raise the Magnetic Module's magnets.
 
@@ -934,6 +1151,7 @@ class MagneticModuleContext(ModuleContext):
                 .format(self.labware))
         self._module.engage(dist)
 
+    @cmds.publish.both(command=cmds.magdeck_disengage)
     def disengage(self):
         """ Lower the magnets back into the Magnetic Module.
         """

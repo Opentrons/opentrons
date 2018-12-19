@@ -31,7 +31,8 @@ pipette_config = namedtuple(
         'ul_per_mm',
         'quirks',
         'tip_length',  # TODO (andy): remove from pipette, move to tip-rack
-        'display_name'
+        'display_name',
+        'tip_overlap'
     ]
 )
 
@@ -104,7 +105,8 @@ def load(pipette_model: str) -> pipette_config:
         ul_per_mm=cfg.get('ulPerMm'),
         quirks=cfg.get('quirks'),
         tip_length=cfg.get('tipLength'),
-        display_name=cfg.get('displayName')
+        display_name=cfg.get('displayName'),
+        tip_overlap=cfg.get('tipOverlap')
     )
 
     # Verify that stored values agree with calculations
