@@ -6,7 +6,7 @@ import {getFileMetadata} from './fileFields'
 import {getInitialRobotState, getRobotStateTimeline} from './commands'
 import {selectors as dismissSelectors} from '../../dismiss'
 import {selectors as ingredSelectors} from '../../labware-ingred/reducers'
-import {selectors as steplistSelectors} from '../../steplist'
+import {selectors as stepFormSelectors} from '../../step-forms'
 import {selectors as pipetteSelectors} from '../../pipettes'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
@@ -41,8 +41,8 @@ export const createFile: BaseState => ProtocolFile = createSelector(
   dismissSelectors.getAllDismissedWarnings,
   ingredSelectors.getLiquidGroupsById,
   ingredSelectors.getLiquidsByLabwareId,
-  steplistSelectors.getSavedForms,
-  steplistSelectors.getOrderedSteps,
+  stepFormSelectors.getSavedStepForms,
+  stepFormSelectors.getOrderedSteps,
   pipetteSelectors.getEquippedPipettes,
   (
     fileMetadata,

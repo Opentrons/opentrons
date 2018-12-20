@@ -6,8 +6,8 @@ import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import {selectors as pipetteSelectors} from '../../../pipettes'
 import {
   actions as steplistActions,
-  selectors as steplistSelectors,
 } from '../../../steplist'
+import {selectors as stepFormSelectors} from '../../../step-forms'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import type {BaseState, ThunkDispatch} from '../../../types'
 
@@ -37,7 +37,7 @@ function FlowRateFieldWithKey (props: Props) {
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {flowRateType, pipetteFieldName, name} = ownProps
 
-  const formData = steplistSelectors.getUnsavedForm(state)
+  const formData = stepFormSelectors.getUnsavedForm(state)
 
   const pipetteId = formData ? formData[pipetteFieldName] : null
   const pipette = pipetteId && pipetteSelectors.getPipettesById(state)[pipetteId]

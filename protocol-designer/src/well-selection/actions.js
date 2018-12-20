@@ -3,7 +3,7 @@ import {createAction} from 'redux-actions'
 import selectors from './selectors'
 import {changeFormInput} from '../steplist/actions'
 
-import {selectors as steplistSelectors} from '../steplist'
+import {selectors as stepFormSelectors} from '../step-forms'
 import {selectors as pipetteSelectors} from '../pipettes'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 
@@ -59,7 +59,7 @@ export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload) =
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
     const state = getState()
     const accessor = payload.formFieldAccessor
-    const formData = steplistSelectors.getUnsavedForm(state)
+    const formData = stepFormSelectors.getUnsavedForm(state)
 
     const wells: Wells = (accessor && formData && formData[accessor] &&
       _wellArrayToObj(formData[accessor])) || {}

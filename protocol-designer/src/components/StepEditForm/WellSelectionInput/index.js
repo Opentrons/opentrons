@@ -3,7 +3,7 @@ import * as React from 'react'
 import WellSelectionInput from './WellSelectionInput'
 import {connect} from 'react-redux'
 import {selectors as pipetteSelectors} from '../../../pipettes'
-import {selectors as steplistSelectors} from '../../../steplist'
+import {selectors as stepFormSelectors} from '../../../step-forms'
 import {getFieldErrors} from '../../../steplist/fieldLevel'
 import {showFieldErrors} from '../StepFormField'
 import type {BaseState, ThunkDispatch} from '../../../types'
@@ -31,7 +31,7 @@ type SP = {
 }
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
-  const formData = steplistSelectors.getUnsavedForm(state)
+  const formData = stepFormSelectors.getUnsavedForm(state)
   const pipetteId = formData && formData[ownProps.pipetteFieldName]
   const selectedWells = formData ? formData[ownProps.name] : []
   const pipetteData = pipetteId && pipetteSelectors.getPipettesById(state)[pipetteId]

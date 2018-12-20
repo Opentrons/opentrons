@@ -13,7 +13,7 @@ import {selectors as pipetteSelectors} from '../../../pipettes'
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import {selectors} from '../../../labware-ingred/reducers'
 import type {Wells, ContentsByWell} from '../../../labware-ingred/types'
-import {selectors as steplistSelectors} from '../../../steplist'
+import {selectors as stepFormSelectors} from '../../../step-forms'
 import {selectors as stepsSelectors} from '../../../ui/steps'
 import type {WellIngredientNames} from '../../../steplist/types'
 import {changeFormInput} from '../../../steplist/actions'
@@ -122,10 +122,10 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 
   const stepId = stepsSelectors.getSelectedStepId(state)
   // TODO: Ian 2018-07-31 replace with util function, "findIndexOrNull"?
-  const orderedSteps = steplistSelectors.getOrderedSteps(state)
+  const orderedSteps = stepFormSelectors.getOrderedSteps(state)
   const timelineIdx = orderedSteps.findIndex(id => id === stepId)
   const allWellContentsForStep = allWellContentsForSteps[timelineIdx]
-  const formData = steplistSelectors.getUnsavedForm(state)
+  const formData = stepFormSelectors.getUnsavedForm(state)
   const ingredNames = selectors.getLiquidNamesById(state)
 
   return {

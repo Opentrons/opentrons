@@ -28,6 +28,7 @@ import type {FormData, StepIdType} from '../form-types'
 
 const NO_SAVED_FORM_ERROR = 'NO_SAVED_FORM_ERROR'
 
+// TODO IMMEDIATELY: this selectors.js file can be deleted once pipette thunks are removed
 // TODO Ian 2018-01-19 Rethink the hard-coded 'steplist' key in Redux root
 const rootSelector = (state: BaseState): RootState => state.steplist
 

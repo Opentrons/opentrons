@@ -8,6 +8,7 @@ import some from 'lodash/some'
 import {createSelector} from 'reselect'
 import {INITIAL_DECK_SETUP_STEP_ID} from '../../constants'
 import {
+  generateNewForm,
   getFormWarnings,
   getFormErrors,
   stepFormToArgs,
@@ -24,18 +25,14 @@ import type {
 } from '../../steplist/formLevel'
 
 import type {
-  // StepItemData,
-  // FormSectionState,
-  // SubstepIdentifier,
-  // TerminalItemId,
-  StepFormAndFieldErrors,
   StepArgsAndErrors,
-  // StepFormContextualState,
+  StepFormAndFieldErrors,
+  StepItemData,
 } from '../../steplist/types'
 import type {InitialDeckSetup} from '../types'
 import type {RootState} from '../reducers'
 import type {BaseState, Selector} from '../../types'
-import type {FormData, StepIdType} from '../../form-types'
+import type {FormData, StepIdType, StepType} from '../../form-types'
 // TODO: Ian 2018-12-13 make selectors
 
 // TODO IMMEDIATELY this is copied from steplist, put it somewhere common
@@ -88,7 +85,7 @@ export const getOrderedSteps: Selector<Array<StepIdType>> = createSelector(
   (state) => state.orderedSteps
 )
 
-const getSavedStepForms: Selector<*> = createSelector(
+export const getSavedStepForms: Selector<*> = createSelector(
   rootSelector,
   (state) => state.savedStepForms
 )
@@ -126,6 +123,22 @@ const _getAllErrorsFromHydratedForm = (hydratedForm: FormData): StepFormAndField
 
   return errors
 }
+
+export const getHydratedUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSelector(
+  getUnsavedForm,
+  getLabwareInvariantProperties,
+  getPipetteInvariantProperties,
+  (unsavedForm, labware, pipettes) => {
+    if (!unsavedForm) return null
+    const contextualState = {labware, pipettes}
+    const hydratedForm = mapValues(unsavedForm, (value, name) => (
+      hydrateField(contextualState, name, value)
+    ))
+
+    const errors = _getAllErrorsFromHydratedForm(hydratedForm)
+    return errors
+  }
+)
 
 export const getArgsAndErrorsByStepId: Selector<{[StepIdType]: StepArgsAndErrors}> = createSelector(
   getOrderedSavedForms,
@@ -197,5 +210,59 @@ export const getFormLevelErrors: Selector<Array<FormError>> = createSelector(
     const contextualState = {labware, pipettes}
     const hydratedFields = mapValues(fields, (value, name) => hydrateField(contextualState, name, value))
     return getFormErrors(stepType, hydratedFields)
+  }
+)
+
+// TODO: Ian 2018-12-19 this is DEPRECATED, should be removed once legacySteps reducer is removed
+const getSteps = (state: BaseState) => rootSelector(state).legacySteps
+export function _getStepFormData (state: BaseState, stepId: StepIdType, newStepType?: StepType): ?FormData {
+  const existingStep = getSavedStepForms(state)[stepId]
+
+  if (existingStep) {
+    return existingStep
+  }
+
+  const steps = getSteps(state)
+  const stepTypeFromStepReducer = steps[stepId] && steps[stepId].stepType
+  const stepType = newStepType || stepTypeFromStepReducer
+
+  if (!stepType) {
+    console.error(`New step with id "${stepId}" was added with no stepType, could not generate form`)
+    return null
+  }
+
+  return generateNewForm({
+    stepId,
+    stepType: stepType,
+  })
+}
+
+// TODO: Ian 2018-12-19 this is DEPRECATED, should be removed once legacySteps reducer is removed
+export const getAllSteps: Selector<{[stepId: StepIdType]: StepItemData}> = createSelector(
+  getSteps,
+  getSavedStepForms,
+  (steps, savedForms) => {
+    return mapValues(
+      steps,
+      (step: StepItemData, id: StepIdType): StepItemData => {
+        const savedForm = (savedForms && savedForms[id]) || null
+
+        // Assign the step title
+        let title
+
+        if (savedForm && savedForm['step-name']) {
+          title = savedForm['step-name']
+        } else {
+          title = step.stepType
+        }
+
+        return {
+          ...steps[id],
+          formData: savedForm,
+          title,
+          description: savedForm ? savedForm['step-details'] : null,
+        }
+      }
+    )
   }
 )

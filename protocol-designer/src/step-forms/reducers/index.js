@@ -39,6 +39,7 @@ import type {
   ReorderStepsAction,
   SaveStepFormAction,
 } from '../../steplist/actions'
+import type {StepItemData} from '../../steplist/types'
 import type {
   SaveMoreOptionsModal,
 } from '../../ui/steps/actions'
@@ -344,12 +345,50 @@ const orderedSteps = handleActions({
   ),
 }, [])
 
+// TODO: Ian 2018-12-19 DEPRECATED. This should be removed soon, but we need it until we
+// move to not having unsaved/pristine steps
+type LegacyStepsState = {[StepIdType]: StepItemData}
+const initialLegacyStepState: LegacyStepsState = {}
+const legacySteps = handleActions({
+  ADD_STEP: (state, action: AddStepAction): LegacyStepsState => ({
+    ...state,
+    [action.payload.id]: action.payload,
+  }),
+  DELETE_STEP: (state, action: DeleteStepAction) => omit(state, action.payload.toString()),
+  LOAD_FILE: (state: LegacyStepsState, action: LoadFileAction): LegacyStepsState => {
+    const {savedStepForms, orderedSteps} = getPDMetadata(action.payload)
+    return orderedSteps.reduce((acc: LegacyStepsState, stepId) => {
+      const stepForm = savedStepForms[stepId]
+      if (!stepForm) {
+        console.warn(`Step id ${stepId} found in orderedSteps but not in savedStepForms`)
+        return acc
+      }
+      return {
+        ...acc,
+        [stepId]: {
+          id: stepId,
+          title: stepForm['step-name'],
+          stepType: stepForm.stepType,
+        },
+      }
+    }, {...initialLegacyStepState})
+  },
+  DUPLICATE_STEP: (state: LegacyStepsState, action: DuplicateStepAction): LegacyStepsState => ({
+    ...state,
+    [action.payload.duplicateStepId]: {
+      ...(action.payload.stepId != null ? state[action.payload.stepId] : {}),
+      id: action.payload.duplicateStepId,
+    },
+  }),
+}, initialLegacyStepState)
+
 export type RootState = {
   orderedSteps: OrderedStepsState,
   labwareInvariantProperties: LabwareEntities,
   pipetteInvariantProperties: PipetteEntities,
   savedStepForms: SavedStepFormState,
   unsavedForm: FormState,
+  legacySteps: LegacyStepsState,
 }
 
 // TODO Ian 2018-12-13: find some existing util to do this nested version of combineReducers
@@ -360,6 +399,7 @@ const initialRootState: RootState = {
   pipetteInvariantProperties: {},
   savedStepForms: initialSavedStepFormsState,
   unsavedForm: null,
+  legacySteps: initialLegacyStepState,
 }
 // TODO: Ian 2018-12-13 remove this 'any' type
 const rootReducer = (state: RootState = initialRootState, action: any) => {
@@ -369,6 +409,7 @@ const rootReducer = (state: RootState = initialRootState, action: any) => {
     pipetteInvariantProperties: pipetteInvariantProperties(state.pipetteInvariantProperties, action),
     savedStepForms: savedStepForms(state, action),
     unsavedForm: unsavedForm(state, action),
+    legacySteps: legacySteps(state.legacySteps, action),
   }
 }
 

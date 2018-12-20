@@ -6,7 +6,7 @@ import mapValues from 'lodash/mapValues'
 
 import {selectors as labwareIngred} from '../labware-ingred/reducers'
 import {selectors as fileDataSelectors} from '../file-data'
-import {selectors as stepFormSelectors} from '../step-forms'
+import {selectors as stepSelectors} from '../ui/steps'
 import type {BaseState} from '../types'
 
 type Selector = (BaseState) => mixed
@@ -69,9 +69,9 @@ function callSelectors (selectors, state) {
 function mapStateToProps (state: BaseState): Props {
   return {
     selectors: {
-      stepForms: callSelectors(stepFormSelectors, state),
       fileData: callSelectors(fileDataSelectors, state),
       labwareIngred: callSelectors(labwareIngred, state),
+      UIStepSelectors: callSelectors(stepSelectors, state),
     },
   }
 }
