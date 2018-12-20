@@ -1058,8 +1058,9 @@ class API(HardwareAPILike):
         The return value is a dict containing the updated position, in deck
         coordinates, of the tip probe center.
         """
-        pip = self._attached_instruments[mount]
-        assert pip, '{} has no pipette'.format(mount.name.lower())
+        opt_pip = self._attached_instruments[mount]
+        assert opt_pip, '{} has no pipette'.format(mount.name.lower())
+        pip = opt_pip
 
         assert not (pip.has_tip and tip_length),\
             '{} has a tip, tip length must not be specified'.format(pip)
@@ -1166,8 +1167,9 @@ class API(HardwareAPILike):
         elif not new_offset:
             raise ValueError(
                 "Either from_tip_probe or new_offset must be specified")
-        pip = self._attached_instruments[mount]
-        assert pip, '{} has no pipette'.format(mount.name.lower())
+        opt_pip = self._attached_instruments[mount]
+        assert opt_pip, '{} has no pipette'.format(mount.name.lower())
+        pip = opt_pip
         inst_offs = self._config.instrument_offset
         pip_type = 'multi' if pip.config.channels > 1 else 'single'
         inst_offs[mount.name.lower()][pip_type] = [new_offset.x,

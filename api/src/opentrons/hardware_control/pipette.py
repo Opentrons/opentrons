@@ -1,6 +1,6 @@
 """ Classes and functions for pipette state tracking
 """
-from typing import Any, Dict, Union, Optional
+from typing import Any, Dict, Optional, Tuple, Union
 
 from opentrons.types import Point
 from opentrons.config import pipette_config
@@ -16,7 +16,7 @@ class Pipette:
 
     def __init__(self,
                  model: str,
-                 inst_offset_config: Dict[str, float],
+                 inst_offset_config: Dict[str, Tuple[float, float, float]],
                  pipette_id: str = None) -> None:
         self._config = pipette_config.load(model)
         self._name = model
