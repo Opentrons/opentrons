@@ -10,7 +10,7 @@ import {
   type DropdownOption,
 } from '@opentrons/components'
 import i18n from '../../localization'
-import {selectors as pipetteSelectors} from '../../pipettes'
+import {selectors as stepFormSelectors} from '../../step-forms'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import {hydrateField} from '../../steplist/fieldLevel'
 import type {StepFieldName} from '../../steplist/fieldLevel'
@@ -101,7 +101,7 @@ type PipetteFieldOP = {name: StepFieldName, stepType?: StepType} & FocusHandlers
 type PipetteFieldSP = {pipetteOptions: Options, getHydratedPipette: (string) => any} // TODO: real hydrated pipette type
 type PipetteFieldProps = PipetteFieldOP & PipetteFieldSP
 const PipetteFieldSTP = (state: BaseState, ownProps: PipetteFieldOP): PipetteFieldSP => ({
-  pipetteOptions: pipetteSelectors.getEquippedPipetteOptions(state),
+  pipetteOptions: stepFormSelectors.getEquippedPipetteOptions(state),
   getHydratedPipette: (value) => hydrateField(state, ownProps.name, value),
 })
 export const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldProps) => (

@@ -1,16 +1,15 @@
 // @flow
 import * as actions from './actions'
-import * as thunks from './thunks'
 import {rootReducer, type RootState} from './reducers'
-import * as selectors from './selectors'
+// import * as selectors from './selectors'
+// TODO IMMEDIATELY delete selectors.js
 export * from './types'
 export * from './utils'
 
 export {
   actions,
-  thunks,
   rootReducer,
-  selectors,
+  // selectors,
 }
 
 export type {

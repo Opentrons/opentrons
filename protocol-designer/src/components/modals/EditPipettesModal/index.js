@@ -25,11 +25,9 @@ import {
   type PipetteEntities,
 } from '../../../step-forms'
 import {actions as steplistActions} from '../../../steplist'
-import {
-  thunks as pipetteThunks,
-  selectors as pipetteSelectors,
-  type EditPipettesFields,
-  type FormattedPipette,
+import type {
+  EditPipettesFields,
+  FormattedPipette,
 } from '../../../pipettes'
 
 import PipetteDiagram from '../NewFileModal/PipetteDiagram'
@@ -213,10 +211,10 @@ class EditPipettesModal extends React.Component<Props, State> {
 }
 
 const mapSTP = (state: BaseState): SP => {
-  const pipetteData = pipetteSelectors.getPipettesForEditPipettes(state)
+  const initialPipettes = stepFormSelectors.getPipettesForEditPipetteForm(state)
   return {
-    initialLeft: pipetteData.find(i => i.mount === 'left'),
-    initialRight: pipetteData.find(i => i.mount === 'right'),
+    initialLeft: initialPipettes.left,
+    initialRight: initialPipettes.right,
     _prevPipettes: stepFormSelectors.getPipetteInvariantProperties(state),
   }
 }
@@ -225,9 +223,6 @@ const mergeProps = (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>},
   const {dispatch} = dispatchProps
   const {_prevPipettes, ...passThruStateProps} = stateProps
   const updatePipettes = (fields: EditPipettesFields) => {
-    dispatch(pipetteThunks.editPipettes(fields)) // TODO: Ian 2018-12-17 editPipettes is DEPRECATED, remove once old reducers are removed
-    // new flow for new reducers
-
     let usedPrevPipettes = [] // IDs of pipettes in prevPipettes that were already used
     // TODO: Ian 2018-12-17 after dropping the above,
     // refactor EditPipettesFields to make this building part cleaner?
@@ -259,6 +254,7 @@ const mergeProps = (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>},
       }
     })
 
+    // TODO IMMEDIATELY: don't create pipettes that already exist -- or should this be called UPSERT_PIPETTES?
     dispatch(stepFormActions.createPipettes(
       mapValues(nextPipettes, p => ({name: p.name, tiprackModel: p.tiprackModel}))))
 

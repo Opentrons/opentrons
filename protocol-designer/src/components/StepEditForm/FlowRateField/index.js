@@ -3,7 +3,6 @@ import * as React from 'react'
 import FlowRateField from './FlowRateField'
 import {connect} from 'react-redux'
 import {getPipetteNameSpecs} from '@opentrons/shared-data'
-import {selectors as pipetteSelectors} from '../../../pipettes'
 import {
   actions as steplistActions,
 } from '../../../steplist'
@@ -39,17 +38,18 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 
   const formData = stepFormSelectors.getUnsavedForm(state)
 
+  // TODO IMMEDIATELY clean up
   const pipetteId = formData ? formData[pipetteFieldName] : null
-  const pipette = pipetteId && pipetteSelectors.getPipettesById(state)[pipetteId]
-  const pipetteConfig = pipette && getPipetteNameSpecs(pipette.model)
-  const pipetteDisplayName = pipetteConfig ? pipetteConfig.displayName : 'pipette'
+  const pipette = pipetteId && stepFormSelectors.getPipetteInvariantProperties(state)[pipetteId]
+  const pipetteSpecs = pipette && getPipetteNameSpecs(pipette.name)
+  const pipetteDisplayName = pipetteSpecs ? pipetteSpecs.displayName : 'pipette'
 
   let defaultFlowRate
-  if (pipetteConfig) {
+  if (pipetteSpecs) {
     if (flowRateType === 'aspirate') {
-      defaultFlowRate = pipetteConfig.defaultAspirateFlowRate
+      defaultFlowRate = pipetteSpecs.defaultAspirateFlowRate
     } else if (flowRateType === 'dispense') {
-      defaultFlowRate = pipetteConfig.defaultDispenseFlowRate
+      defaultFlowRate = pipetteSpecs.defaultDispenseFlowRate
     }
   }
 
@@ -61,13 +61,13 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   return {
     innerKey,
     defaultFlowRate,
-    disabled: pipette == null,
+    disabled: pipetteId == null,
     formFlowRate,
     flowRateType,
     label: ownProps.label,
     minFlowRate: 0,
     // NOTE: since we only have rule-of-thumb, max is entire volume in 1 second
-    maxFlowRate: pipetteConfig ? pipetteConfig.maxVolume : Infinity,
+    maxFlowRate: pipetteSpecs ? pipetteSpecs.maxVolume : Infinity,
     pipetteDisplayName,
   }
 }

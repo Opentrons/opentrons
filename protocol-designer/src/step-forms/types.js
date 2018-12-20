@@ -15,6 +15,9 @@ export type InitialDeckSetup = {
   },
 }
 
+export type LabwareOnDeck = $Values<$PropertyType<InitialDeckSetup, 'labware'>>
+export type PipetteOnDeck = $Values<$PropertyType<InitialDeckSetup, 'pipettes'>>
+
 // "entities" have only properties that are time-invariant
 
 export type PipetteEntities = {

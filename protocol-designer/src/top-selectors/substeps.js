@@ -1,7 +1,6 @@
 // @flow
 import {createSelector} from 'reselect'
 
-import {selectors as pipetteSelectors} from '../pipettes'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 import {selectors as stepFormSelectors} from '../step-forms'
 import {selectors as fileDataSelectors} from '../file-data'
@@ -17,21 +16,21 @@ import type {SubstepItemData} from '../steplist/types'
 type AllSubsteps = {[StepIdType]: ?SubstepItemData}
 export const allSubsteps: Selector<AllSubsteps> = createSelector(
   stepFormSelectors.getArgsAndErrorsByStepId,
-  pipetteSelectors.getEquippedPipettes,
+  stepFormSelectors.getInitialDeckSetup, // TODO IMMEDIATELY more appropriate selector for just pipettes?
   labwareIngredSelectors.getLabwareTypes,
   stepFormSelectors.getOrderedSteps,
   fileDataSelectors.getRobotStateTimeline,
   fileDataSelectors.getInitialRobotState,
   (
     allStepArgsAndErrors,
-    allPipetteData,
+    initialDeckSetup,
     allLabwareTypes,
     orderedSteps,
     robotStateTimeline,
     _initialRobotState,
   ) => {
     const timeline = [{robotState: _initialRobotState}, ...robotStateTimeline.timeline]
-
+    const allPipetteData = initialDeckSetup.pipettes
     return orderedSteps.reduce((acc: AllSubsteps, stepId, timelineIndex) => {
       const robotState = timeline[timelineIndex] && timeline[timelineIndex].robotState
 

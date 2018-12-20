@@ -12,6 +12,7 @@ import * as StepGeneration from '../../step-generation'
 import {selectors as stepFormSelectors} from '../../step-forms'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import type {StepIdType} from '../../form-types'
+import type {LabwareOnDeck, PipetteOnDeck} from '../../step-forms'
 
 const all96Tips = reduce(
   StepGeneration.tiprackWellNamesFlat,
@@ -52,15 +53,15 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   stepFormSelectors.getInitialDeckSetup,
   getLabwareLiquidState,
   (initialDeckSetup, labwareLiquidState) => {
-    const labware = mapValues(initialDeckSetup.labware, (l: $Values<typeof initialDeckSetup.labware>, id: string): StepGeneration.LabwareData => ({
+    const labware = mapValues(initialDeckSetup.labware, (l: LabwareOnDeck, id: string): StepGeneration.LabwareData => ({
       type: l.type,
-      name: l.type, // TODO IMMEDIATELY after other refactor PR: also mix in labware names from ui.steps
+      name: l.type, // TODO IMMEDIATELY: what is 'name' for here?
       slot: l.slot,
     }))
 
     // TODO: Ian 2018-12-17 pare down PipetteData type to not have shared-data fields,
     // then you can skip this conversion here:
-    const pipettes = mapValues(initialDeckSetup.pipettes, (p: $Values<typeof initialDeckSetup.pipettes>, id: string): StepGeneration.PipetteData => {
+    const pipettes = mapValues(initialDeckSetup.pipettes, (p: PipetteOnDeck, id: string): StepGeneration.PipetteData => {
       const pipetteSpecs = getPipetteNameSpecs(p.name)
       if (!pipetteSpecs) {
         // this should never happen this far along

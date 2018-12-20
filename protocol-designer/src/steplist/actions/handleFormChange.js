@@ -2,7 +2,7 @@
 import uniq from 'lodash/uniq'
 import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
-import {selectors as pipetteSelectors} from '../../pipettes'
+import {selectors as stepFormSelectors} from '../../step-forms'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 
 import type {PipetteChannels} from '@opentrons/shared-data'
@@ -31,12 +31,11 @@ function _getAllWells (
   return uniq(allWells)
 }
 
-// TODO: Ian 2018-08-28 revisit this,
-// maybe remove channels from pipette state and use shared-data?
-// or if not, make this its own selector in pipettes/ atom
+// TODO: Ian 2018-12-20 revisit this, make general helper or selector
+// TODO IMMEDIATELY
 const getChannels = (pipetteId: string, state: BaseState): PipetteChannels => {
-  const pipettes = pipetteSelectors.getPipettesById(state)
-  const pipette = pipettes[pipetteId]
+  const pipettes = stepFormSelectors.getPipetteInvariantProperties(state)
+  const pipette = pipettes[pipetteId] && getPipetteNameSpecs(pipettes[pipetteId].name)
   if (!pipette) {
     console.error(`${pipetteId} not found in pipettes, cannot handleFormChange properly`)
     return 1
@@ -76,8 +75,8 @@ function handleFormChange (
 
   if (baseForm.stepType === 'distribute') {
     if (typeof payload.update.pipette === 'string') {
-      const pipetteData = pipetteSelectors.getPipettesById(baseState)[payload.update.pipette]
-      const pipetteSpecs = getPipetteNameSpecs(pipetteData.model)
+      const pipetteData = stepFormSelectors.getPipetteInvariantProperties(baseState)[payload.update.pipette]
+      const pipetteSpecs = getPipetteNameSpecs(pipetteData.name)
       const disposalVol = pipetteSpecs
         ? pipetteSpecs.minVolume
         : null

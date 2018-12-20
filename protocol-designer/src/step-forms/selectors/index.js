@@ -6,6 +6,7 @@ import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import some from 'lodash/some'
 import {createSelector} from 'reselect'
+import {getPipetteNameSpecs, getLabware} from '@opentrons/shared-data'
 import {INITIAL_DECK_SETUP_STEP_ID} from '../../constants'
 import {
   generateNewForm,
@@ -18,7 +19,10 @@ import {
   getFieldErrors,
 } from '../../steplist/fieldLevel'
 
-import type {Mount} from '@opentrons/components'
+import type {ElementProps} from 'react'
+import type {DropdownOption, Mount} from '@opentrons/components'
+import {typeof InstrumentGroup as InstrumentGroupProps} from '@opentrons/components'
+
 import type {
   FormError,
   FormWarning,
@@ -29,10 +33,11 @@ import type {
   StepFormAndFieldErrors,
   StepItemData,
 } from '../../steplist/types'
-import type {InitialDeckSetup} from '../types'
+import type {InitialDeckSetup, LabwareEntities, PipetteOnDeck, PipetteEntities} from '../types'
 import type {RootState} from '../reducers'
 import type {BaseState, Selector} from '../../types'
 import type {FormData, StepIdType, StepType} from '../../form-types'
+import type {FormattedPipette} from '../../pipettes/types'
 // TODO: Ian 2018-12-13 make selectors
 
 // TODO IMMEDIATELY this is copied from steplist, put it somewhere common
@@ -41,13 +46,13 @@ const NO_SAVED_FORM_ERROR = 'NO_SAVED_FORM_ERROR'
 const rootSelector = (state: BaseState): RootState => state.stepForms
 
 // TODO: Ian 2018-12-14 type properly
-export const getLabwareInvariantProperties: Selector<*> = createSelector(
+export const getLabwareInvariantProperties: Selector<LabwareEntities> = createSelector(
   rootSelector,
   (state) => state.labwareInvariantProperties
 )
 
 // TODO: Ian 2018-12-14 type properly
-export const getPipetteInvariantProperties: Selector<*> = createSelector(
+export const getPipetteInvariantProperties: Selector<PipetteEntities> = createSelector(
   rootSelector,
   (state) => state.pipetteInvariantProperties
 )
@@ -73,6 +78,91 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
       }),
     }
   }
+)
+
+export const getPermittedTipracks: Selector<Array<string>> = createSelector(
+  getInitialDeckSetup,
+  (initialDeckSetup) =>
+    reduce(initialDeckSetup.pipettes, (acc: Array<string>, pipette: PipetteOnDeck) => {
+      return (pipette.tiprackModel)
+        ? [...acc, pipette.tiprackModel]
+        : acc
+    }, [])
+)
+
+function _getPipetteDisplayName (name: string): string {
+  const pipetteSpecs = getPipetteNameSpecs(name)
+  if (!pipetteSpecs) return 'Unknown Pipette'
+  return pipetteSpecs.displayName
+}
+
+// TODO: Ian 2018-12-20 make this `getEquippedPipetteOptionsForStepId`, so it tells you
+// equipped pipettes per step id instead of always using initial deck setup
+// (for when we support multiple deck setup steps)
+export const getEquippedPipetteOptions: Selector<Array<DropdownOption>> = createSelector(
+  getInitialDeckSetup,
+  (initialDeckSetup) =>
+    reduce(initialDeckSetup.pipettes, (acc: Array<DropdownOption>, pipette: PipetteOnDeck, id: string) => {
+      const nextOption = {
+        name: _getPipetteDisplayName(pipette.name),
+        value: id,
+      }
+      return [...acc, nextOption]
+    }, [])
+)
+
+// Formats pipette data specifically for file page InstrumentGroup component
+type PipettesForInstrumentGroup = ElementProps<InstrumentGroupProps>
+export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup> = createSelector(
+  getInitialDeckSetup,
+  (initialDeckSetup) => reduce(initialDeckSetup.pipettes, (acc: PipettesForInstrumentGroup, pipetteOnDeck: PipetteOnDeck, pipetteId) => {
+    const pipetteSpec = getPipetteNameSpecs(pipetteOnDeck.name)
+    const tiprackSpec = getLabware(pipetteOnDeck.tiprackModel)
+
+    const pipetteForInstrumentGroup = {
+      mount: pipetteOnDeck.mount,
+      channels: pipetteSpec ? pipetteSpec.channels : undefined,
+      description: _getPipetteDisplayName(pipetteOnDeck.name),
+      isDisabled: false,
+      tiprackModel: tiprackSpec ? `${tiprackSpec.metadata.tipVolume || '?'} uL` : undefined,
+      tiprack: {model: pipetteOnDeck.tiprackModel},
+    }
+
+    return {
+      ...acc,
+      [pipetteOnDeck.mount]: pipetteForInstrumentGroup,
+    }
+  }, {})
+)
+
+// TODO: Ian 2018-12-20 this is very similar to `getPipettesForInstrumentGroup`,
+// can we merge the 2 similar return types here and in the 2 components that use these?
+type EditPipetteFieldsByMount = {left: ?FormattedPipette, right: ?FormattedPipette}
+export const getPipettesForEditPipetteForm: Selector<EditPipetteFieldsByMount> = createSelector(
+  getInitialDeckSetup,
+  (initialDeckSetup) => reduce(initialDeckSetup.pipettes, (acc: EditPipetteFieldsByMount, pipetteOnDeck: PipetteOnDeck, id): EditPipetteFieldsByMount => {
+    const pipetteSpec = getPipetteNameSpecs(pipetteOnDeck.name)
+    const tiprackSpec = getLabware(pipetteOnDeck.tiprackModel)
+
+    if (!pipetteSpec) return acc
+
+    const pipetteForInstrumentGroup = {
+      id: id,
+      mount: pipetteOnDeck.mount,
+      model: pipetteOnDeck.name,
+      maxVolume: pipetteSpec.maxVolume,
+      channels: pipetteSpec.channels,
+      description: _getPipetteDisplayName(pipetteOnDeck.name),
+      isDisabled: false,
+      tiprackModel: tiprackSpec ? `${tiprackSpec.metadata.tipVolume || '?'} uL` : undefined,
+      tiprack: {model: pipetteOnDeck.tiprackModel},
+    }
+
+    return {
+      ...acc,
+      [pipetteOnDeck.mount]: pipetteForInstrumentGroup,
+    }
+  }, {left: null, right: null})
 )
 
 export const getUnsavedForm: Selector<?FormData> = createSelector(

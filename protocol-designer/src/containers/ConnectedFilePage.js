@@ -5,7 +5,7 @@ import mapValues from 'lodash/mapValues'
 import type {BaseState} from '../types'
 import FilePage from '../components/FilePage'
 import {actions, selectors as fileSelectors} from '../file-data'
-import {actions as pipetteActions, selectors as pipetteSelectors} from '../pipettes'
+import {actions as pipetteActions} from '../pipettes'
 import {selectors as stepFormSelectors} from '../step-forms'
 import {actions as steplistActions} from '../steplist'
 import {INITIAL_DECK_SETUP_STEP_ID} from '../constants'
@@ -22,13 +22,9 @@ type SP = {
 }
 
 const mapStateToProps = (state: BaseState): SP => {
-  const pipetteData = pipetteSelectors.getPipettesForInstrumentGroup(state)
   return {
     formValues: fileSelectors.getFileMetadata(state),
-    instruments: {
-      left: pipetteData.find(i => i.mount === 'left'),
-      right: pipetteData.find(i => i.mount === 'right'),
-    },
+    instruments: stepFormSelectors.getPipettesForInstrumentGroup(state),
     _initialDeckSetup: stepFormSelectors.getInitialDeckSetup(state),
   }
 }

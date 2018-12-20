@@ -8,7 +8,6 @@ import {connect} from 'react-redux'
 import {Modal, OutlineButton, LabeledValue} from '@opentrons/components'
 import {getPipetteNameSpecs, sortWells} from '@opentrons/shared-data'
 import type {BaseState, ThunkDispatch} from '../../../types'
-import {selectors as pipetteSelectors} from '../../../pipettes'
 
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import {selectors} from '../../../labware-ingred/reducers'
@@ -18,7 +17,7 @@ import {selectors as stepsSelectors} from '../../../ui/steps'
 import type {WellIngredientNames} from '../../../steplist/types'
 import {changeFormInput} from '../../../steplist/actions'
 import type {StepFieldName} from '../../../form-types'
-import type {PipetteData} from '../../../step-generation/types'
+import type {NewPipetteData} from '../../../step-generation/types'
 
 import {SelectableLabware} from '../../labware'
 import SingleLabwareWrapper from '../../SingleLabware'
@@ -35,7 +34,7 @@ type OP = {
   name: StepFieldName,
 }
 type SP = {
-  pipette: ?PipetteData,
+  pipette: ?NewPipetteData,
   initialSelectedWells: Array<string>,
   wellContents: ContentsByWell,
   containerType: string,
@@ -76,7 +75,7 @@ class WellSelectionModal extends React.Component<Props, State> {
   render () {
     if (!this.props.isOpen) return null
     const {pipette} = this.props
-    const pipetteConfig = pipette && getPipetteNameSpecs(pipette.model)
+    const pipetteSpecs = pipette && getPipetteNameSpecs(pipette.name)
 
     return (
       <Modal
@@ -86,7 +85,7 @@ class WellSelectionModal extends React.Component<Props, State> {
         <div className={styles.top_row}>
           <LabeledValue
             label='Pipette'
-            value={pipetteConfig ? pipetteConfig.displayName : ''}
+            value={pipetteSpecs ? pipetteSpecs.displayName : ''}
             className={styles.inverted_text}
           />
           <OutlineButton onClick={this.handleSave} inverted>
@@ -103,7 +102,7 @@ class WellSelectionModal extends React.Component<Props, State> {
             updateHighlightedWells={this.updateHighlightedWells}
             wellContents={this.props.wellContents}
             containerType={this.props.containerType}
-            pipetteChannels={pipette && pipette.channels}
+            pipetteChannels={pipetteSpecs && pipetteSpecs.channels}
             ingredNames={this.props.ingredNames} />
         </SingleLabwareWrapper>
 
@@ -121,16 +120,26 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const allWellContentsForSteps = wellContentsSelectors.getAllWellContentsForSteps(state)
 
   const stepId = stepsSelectors.getSelectedStepId(state)
-  // TODO: Ian 2018-07-31 replace with util function, "findIndexOrNull"?
   const orderedSteps = stepFormSelectors.getOrderedSteps(state)
   const timelineIdx = orderedSteps.findIndex(id => id === stepId)
   const allWellContentsForStep = allWellContentsForSteps[timelineIdx]
   const formData = stepFormSelectors.getUnsavedForm(state)
   const ingredNames = selectors.getLiquidNamesById(state)
 
+  // TODO IMMEDIATELY clean up
+  const pipetteInvariantProps = pipetteId && stepFormSelectors.getPipetteInvariantProperties(state)[pipetteId]
+  const pipetteSpec = pipetteInvariantProps && getPipetteNameSpecs(pipetteInvariantProps.name)
+  const pipetteInitialProps = pipetteId && stepFormSelectors.getInitialDeckSetup(state).pipettes[pipetteId]
+  const pipette = (pipetteSpec && pipetteInitialProps)
+    ? {
+      ...pipetteInitialProps,
+      ...pipetteSpec,
+    }
+    : null
+
   return {
     initialSelectedWells: formData ? formData[ownProps.name] : [],
-    pipette: pipetteId ? pipetteSelectors.getEquippedPipettes(state)[pipetteId] : null,
+    pipette,
     wellContents: labware && allWellContentsForStep ? allWellContentsForStep[labware.id] : {},
     containerType: labware ? labware.type : 'missing labware',
     ingredNames,

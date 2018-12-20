@@ -3,8 +3,8 @@ import {createAction} from 'redux-actions'
 import selectors from './selectors'
 import {changeFormInput} from '../steplist/actions'
 
+import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import {selectors as stepFormSelectors} from '../step-forms'
-import {selectors as pipetteSelectors} from '../pipettes'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 
 import type {ThunkDispatch, GetState} from '../types'
@@ -67,7 +67,9 @@ export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload) =
     // initially selected wells in form get selected in state before modal opens
     dispatch(selectWells(wells))
 
-    const pipettes = pipetteSelectors.getEquippedPipettes(state)
+    const pipetteInvariantProperties = payload.pipetteId != null &&
+      stepFormSelectors.getPipetteInvariantProperties(state)[payload.pipetteId]
+    const pipetteSpecs = pipetteInvariantProperties && getPipetteNameSpecs(pipetteInvariantProperties.name)
     const labware = labwareIngredSelectors.getLabwareById(state)
     // TODO type this action, make an underline fn action creator
 
@@ -75,7 +77,7 @@ export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload) =
       type: 'OPEN_WELL_SELECTION_MODAL',
       payload: {
         ...payload,
-        pipetteChannels: pipettes && pipettes[payload.pipetteId] && pipettes[payload.pipetteId].channels,
+        pipetteChannels: pipetteSpecs ? pipetteSpecs.channels : null,
         labwareName: labware && labware[payload.labwareId] && labware[payload.labwareId].type,
       },
     })

@@ -36,7 +36,6 @@ const rootSelector = (state: BaseState): RootState => state.steplist
 
 const getUnsavedForm: Selector<?FormData> = createSelector(rootSelector, (state: RootState) => state.unsavedForm)
 
-// TODO IMMEDIATELY remove this selector. It's deprecated. Diff for manually-written labware/pipette selectors to resolve circular dependency error
 const getStepFormContextualState: Selector<StepFormContextualState> = createSelector(
   state => state.labwareIngred,
   state => state.pipettes,

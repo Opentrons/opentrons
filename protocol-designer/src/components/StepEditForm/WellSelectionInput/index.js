@@ -1,8 +1,9 @@
 // @flow
 import * as React from 'react'
-import WellSelectionInput from './WellSelectionInput'
 import {connect} from 'react-redux'
-import {selectors as pipetteSelectors} from '../../../pipettes'
+import assert from 'assert'
+import {getPipetteNameSpecs} from '@opentrons/shared-data'
+import WellSelectionInput from './WellSelectionInput'
 import {selectors as stepFormSelectors} from '../../../step-forms'
 import {getFieldErrors} from '../../../steplist/fieldLevel'
 import {showFieldErrors} from '../StepFormField'
@@ -34,8 +35,11 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const formData = stepFormSelectors.getUnsavedForm(state)
   const pipetteId = formData && formData[ownProps.pipetteFieldName]
   const selectedWells = formData ? formData[ownProps.name] : []
-  const pipetteData = pipetteId && pipetteSelectors.getPipettesById(state)[pipetteId]
-  const isMulti = pipetteData && (pipetteData.channels > 1)
+  // TODO IMMEDIATELY
+  const pipetteInvariantProps = pipetteId && stepFormSelectors.getPipetteInvariantProperties(state)[pipetteId]
+  const pipetteSpecs = pipetteInvariantProps && getPipetteNameSpecs(pipetteInvariantProps.name)
+  assert(pipetteSpecs, `could not get name specs for pipette ${String(pipetteId)}`)
+  const isMulti = pipetteSpecs ? (pipetteSpecs.channels > 1) : false
 
   return {
     _pipetteId: pipetteId,

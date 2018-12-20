@@ -155,6 +155,13 @@ export type PipetteData = {| // TODO refactor all 'pipette fields', split Pipett
   tiprackModel: string, // NOTE: this will go away when tiprack choice-per-step and/or tiprack sharing is implemented
 |}
 
+// TODO: replace above `PipetteData` with this one
+export type NewPipetteData = {
+  mount: Mount,
+  name: string,
+  tiprackModel: string,
+}
+
 export type LabwareData = {|
   type: string, // TODO Ian 2018-04-17 keys from JSON. Also, rename 'type' to 'model' (or something??)
   name: ?string, // user-defined nickname

@@ -4,6 +4,7 @@ import range from 'lodash/range'
 import mapValues from 'lodash/mapValues'
 import isEmpty from 'lodash/isEmpty'
 
+import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import substepTimeline from './substepTimeline'
 import {
   utils as steplistUtils,
@@ -29,7 +30,7 @@ import type {StepIdType} from '../form-types'
 import type {RobotState} from '../step-generation'
 
 import type {
-  PipetteData,
+  NewPipetteData,
   ConsolidateFormData,
   DistributeFormData,
   MixFormData,
@@ -37,7 +38,7 @@ import type {
   TransferFormData,
 } from '../step-generation/types'
 
-type AllPipetteData = {[pipetteId: string]: PipetteData}
+type AllPipetteData = {[pipetteId: string]: NewPipetteData}
 
 export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 type GetLabwareType = (labwareId: string) => ?string
@@ -62,11 +63,12 @@ function transferLikeSubsteps (args: {
   robotState.tipState.pipettes = mapValues(robotState.tipState.pipettes, () => true)
   const {pipette: pipetteId} = stepArgs
 
-  const pipette = allPipetteData[pipetteId]
+  const pipette = allPipetteData[pipetteId] && getPipetteNameSpecs(allPipetteData[pipetteId].name)
 
   // TODO Ian 2018-04-06 use assert here
   if (!pipette) {
     console.warn(`Pipette "${pipetteId}" does not exist, step ${stepId} can't determine channels`)
+    return null
   }
 
   // if false, show aspirate vol instead

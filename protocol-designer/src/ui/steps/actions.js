@@ -5,7 +5,6 @@ import forEach from 'lodash/forEach'
 import type {StepIdType, StepType, FormModalFields} from '../../form-types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../../types'
 import {selectors as stepFormSelectors} from '../../step-forms'
-import * as pipetteSelectors from '../../pipettes/selectors'
 import {getNextDefaultPipetteId} from '../../steplist/formLevel'
 import type {TerminalItemId, SubstepIdentifier, FormSectionNames} from '../../steplist/types'
 
@@ -120,7 +119,7 @@ export const selectStep = (stepId: StepIdType, newStepType?: StepType): ThunkAct
     const defaultPipetteId = getNextDefaultPipetteId(
       stepFormSelectors.getSavedStepForms(state),
       stepFormSelectors.getOrderedSteps(state),
-      pipetteSelectors.getEquippedPipettes(state),
+      stepFormSelectors.getInitialDeckSetup(state).pipettes,
     )
 
     // For a pristine step, if there is a `pipette` field in the form
