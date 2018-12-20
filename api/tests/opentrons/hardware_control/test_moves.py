@@ -31,14 +31,14 @@ async def test_controller_home(loop):
                                    Axis.B: 19,
                                    Axis.C: 19}
     # Check that we subsequently apply mount offset
-    assert c.current_position(types.Mount.RIGHT) == {Axis.X: 408,
-                                                     Axis.Y: 333,
-                                                     Axis.A: 188,
-                                                     Axis.C: 19}
-    assert c.current_position(types.Mount.LEFT) == {Axis.X: 408,
-                                                    Axis.Y: 333,
-                                                    Axis.Z: 198,
-                                                    Axis.B: 19}
+    assert await c.current_position(types.Mount.RIGHT) == {Axis.X: 408,
+                                                           Axis.Y: 333,
+                                                           Axis.A: 188,
+                                                           Axis.C: 19}
+    assert await c.current_position(types.Mount.LEFT) == {Axis.X: 408,
+                                                          Axis.Y: 333,
+                                                          Axis.Z: 198,
+                                                          Axis.B: 19}
 
 
 async def test_controller_musthome(hardware_api):
@@ -136,7 +136,7 @@ async def test_critical_point_applied(hardware_api, monkeypatch):
               Axis.Y: 0,
               Axis.A: 0,
               Axis.C: 19}
-    assert hardware_api.current_position(types.Mount.RIGHT) == target
+    assert await hardware_api.current_position(types.Mount.RIGHT) == target
     p10_tip_length = 33
     # Specifiying critical point overrides as mount should not use model offset
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0),
@@ -145,8 +145,8 @@ async def test_critical_point_applied(hardware_api, monkeypatch):
                                               Axis.Z: 218,
                                               Axis.A: 0,
                                               Axis.B: 19, Axis.C: 19}
-    assert hardware_api.current_position(types.Mount.RIGHT,
-                                         critical_point=CriticalPoint.MOUNT)\
+    assert await hardware_api.current_position(
+        types.Mount.RIGHT, critical_point=CriticalPoint.MOUNT)\
         == {Axis.X: 0.0, Axis.Y: 0.0, Axis.A: 0, Axis.C: 19}
     # Specifying the critical point as nozzle should have the same behavior
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0),
@@ -157,14 +157,14 @@ async def test_critical_point_applied(hardware_api, monkeypatch):
     # pos_after_pickup + model_offset + critical point
     target[Axis.A] = 218 + (-13) + (-1 * p10_tip_length)
     target_no_offset[Axis.C] = target[Axis.C] = 2
-    assert hardware_api.current_position(types.Mount.RIGHT) == target
+    assert await hardware_api.current_position(types.Mount.RIGHT) == target
     # This move should take the new critical point into account
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
     target_no_offset[Axis.A] = 46
     assert hardware_api._current_position == target_no_offset
     # But the position with offset should be back to the original
     target[Axis.A] = 0
-    assert hardware_api.current_position(types.Mount.RIGHT) == target
+    assert await hardware_api.current_position(types.Mount.RIGHT) == target
     # And removing the tip should move us back to the original
     await hardware_api.move_rel(types.Mount.RIGHT, types.Point(2.5, 0, 0))
     await hardware_api.drop_tip(types.Mount.RIGHT)
@@ -172,14 +172,14 @@ async def test_critical_point_applied(hardware_api, monkeypatch):
     target[Axis.A] = 33 + hc.DROP_TIP_RELEASE_DISTANCE
     target_no_offset[Axis.X] = 2.5
     target[Axis.X] = 2.5
-    assert hardware_api.current_position(types.Mount.RIGHT) == target
+    assert await hardware_api.current_position(types.Mount.RIGHT) == target
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
     target[Axis.X] = 0
     target_no_offset[Axis.X] = 0
     target_no_offset[Axis.A] = 13
     target[Axis.A] = 0
     assert hardware_api._current_position == target_no_offset
-    assert hardware_api.current_position(types.Mount.RIGHT) == target
+    assert await hardware_api.current_position(types.Mount.RIGHT) == target
 
 
 async def test_deck_cal_applied(monkeypatch, loop):
@@ -213,10 +213,10 @@ async def test_deck_cal_applied(monkeypatch, loop):
 async def test_other_mount_retracted(hardware_api):
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
-    assert hardware_api.gantry_position(types.Mount.RIGHT)\
+    assert await hardware_api.gantry_position(types.Mount.RIGHT)\
         == types.Point(0, 0, 0)
     await hardware_api.move_to(types.Mount.LEFT, types.Point(20, 20, 0))
-    assert hardware_api.gantry_position(types.Mount.RIGHT) \
+    assert await hardware_api.gantry_position(types.Mount.RIGHT) \
         == types.Point(54, 20, 218)
 
 
@@ -225,7 +225,7 @@ async def catch_oob_moves(hardware_api):
     # Check axis max checking for move and move rel
     with pytest.raises(RuntimeError):
         await hardware_api.move_rel(types.Mount.RIGHT, types.Point(1, 0, 0))
-    assert hardware_api.gantry_position(types.Mount.RIGHT)\
+    assert await hardware_api.gantry_position(types.Mount.RIGHT)\
         == types.Point(418, 353, 218)
     with pytest.raises(RuntimeError):
         await hardware_api.move_rel(types.Mount.RIGHT, types.Point(0, 1, 0))
@@ -240,13 +240,13 @@ async def catch_oob_moves(hardware_api):
     with pytest.raises(RuntimeError):
         await hardware_api.move_to(types.Mount.RIGHT,
                                    types.Point(418, 353, 219))
-    assert hardware_api.gantry_position(types.Mount.RIGHT)\
+    assert await hardware_api.gantry_position(types.Mount.RIGHT)\
         == types.Point(418, 353, 218)
     # Axis min checking for move and move rel
     with pytest.raises(RuntimeError):
         await hardware_api.move_to(types.Mount.RIGHT,
                                    types.Point(-1, 353, 218))
-    assert hardware_api.gantry_position(types.Mount.RIGHT)\
+    assert await hardware_api.gantry_position(types.Mount.RIGHT)\
         == types.Point(418, 353, 218)
     with pytest.raises(RuntimeError):
         await hardware_api.move_to(types.Mount.RIGHT,
@@ -260,7 +260,7 @@ async def catch_oob_moves(hardware_api):
         await hardware_api.move_rel(types.Mount.RIGHT, types.Point(0, -354, 0))
     with pytest.raises(RuntimeError):
         await hardware_api.move_rel(types.Mount.RIGHT, types.Point(0, 0, -219))
-    assert hardware_api.gantry_position(types.Mount.RIGHT)\
+    assert await hardware_api.gantry_position(types.Mount.RIGHT)\
         == types.Point(418, 353, 218)
     # Make sure we are checking after mount offset and critical points
     # are applied

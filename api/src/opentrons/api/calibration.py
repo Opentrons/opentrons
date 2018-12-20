@@ -85,6 +85,7 @@ class CalibrationManager:
         self._set_state('moving')
         if ff.use_protocol_api_v2():
             with instrument._context.temp_connect(self._hardware):
+                instrument._context.location_cache = None
                 inst.pick_up_tip(container._container.wells()[0])
         else:
             inst.pick_up_tip(container._container.wells()[0])
@@ -102,6 +103,7 @@ class CalibrationManager:
         self._set_state('moving')
         if ff.use_protocol_api_v2():
             with instrument._context.temp_connect(self._hardware):
+                instrument._context.location_cache = None
                 inst.drop_tip(container._container.wells()[0])
         else:
             inst.drop_tip(container._container.wells()[0])
@@ -113,6 +115,7 @@ class CalibrationManager:
         self._set_state('moving')
         if ff.use_protocol_api_v2():
             with instrument._context.temp_connect(self._hardware):
+                instrument._context.location_cache = None
                 inst.return_tip()
         else:
             inst.return_tip()
@@ -148,6 +151,7 @@ class CalibrationManager:
 
         if ff.use_protocol_api_v2():
             with instrument._context.temp_connect(self._hardware):
+                instrument._context.location_cache = None
                 inst.move_to(target)
         else:
             inst.move_to(target)

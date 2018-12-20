@@ -92,6 +92,12 @@ class API(HardwareAPILike):
         }
         self._attached_modules: Dict[str, Any] = {}
         self._last_moved_mount: Optional[top_types.Mount] = None
+        # The motion lock synchronizes calls to long-running physical tasks
+        # involved in motion. This fixes issue where for instance a move()
+        # or home() call is in flight and something else calls
+        # current_position(), which will not be updated until the move() or
+        # home() call succeeds or fails.
+        self._motion_lock = asyncio.Lock(loop=self._loop)
 
     @classmethod
     async def build_hardware_controller(
@@ -151,6 +157,11 @@ class API(HardwareAPILike):
     def loop(self) -> asyncio.AbstractEventLoop:
         """ The event loop used by this instance. """
         return self._loop
+
+    @loop.setter
+    def loop(self, loop: asyncio.AbstractEventLoop):
+        self._loop = loop
+        self._lock = asyncio.Lock(loop=loop)
 
     @property
     def is_simulator(self) -> bool:
@@ -368,13 +379,15 @@ class API(HardwareAPILike):
         gantry = [ax for ax in checked_axes if ax in Axis.gantry_axes()]
         smoothie_gantry = [ax.name.upper() for ax in gantry]
         smoothie_pos = {}
-        if smoothie_gantry:
-            smoothie_pos.update(self._backend.home(smoothie_gantry))
-        plungers = [ax for ax in checked_axes if ax not in Axis.gantry_axes()]
+        plungers = [ax for ax in checked_axes
+                    if ax not in Axis.gantry_axes()]
         smoothie_plungers = [ax.name.upper() for ax in plungers]
-        if smoothie_plungers:
-            smoothie_pos.update(self._backend.home(smoothie_plungers))
-        self._current_position = self._deck_from_smoothie(smoothie_pos)
+        async with self._motion_lock:
+            if smoothie_gantry:
+                smoothie_pos.update(self._backend.home(smoothie_gantry))
+            if smoothie_plungers:
+                smoothie_pos.update(self._backend.home(smoothie_plungers))
+            self._current_position = self._deck_from_smoothie(smoothie_pos)
 
     def _deck_from_smoothie(
             self, smoothie_pos: Dict[str, float]) -> Dict[Axis, float]:
@@ -417,7 +430,7 @@ class API(HardwareAPILike):
         deck_pos.update(plunger_axes)
         return deck_pos
 
-    def current_position(
+    async def current_position(
             self,
             mount: top_types.Mount,
             critical_point: CriticalPoint = None) -> Dict[Axis, float]:
@@ -437,21 +450,22 @@ class API(HardwareAPILike):
         """
         if not self._current_position:
             raise MustHomeError
-        if mount == mount.RIGHT:
-            offset = top_types.Point(0, 0, 0)
-        else:
-            offset = top_types.Point(*self.config.mount_offset)
-        z_ax = Axis.by_mount(mount)
-        plunger_ax = Axis.of_plunger(mount)
-        cp = self._critical_point_for(mount, critical_point)
-        return {
-            Axis.X: self._current_position[Axis.X] + offset[0] + cp.x,
-            Axis.Y: self._current_position[Axis.Y] + offset[1] + cp.y,
-            z_ax: self._current_position[z_ax] + offset[2] + cp.z,
-            plunger_ax: self._current_position[plunger_ax]
-        }
+        async with self._motion_lock:
+            if mount == mount.RIGHT:
+                offset = top_types.Point(0, 0, 0)
+            else:
+                offset = top_types.Point(*self.config.mount_offset)
+            z_ax = Axis.by_mount(mount)
+            plunger_ax = Axis.of_plunger(mount)
+            cp = self._critical_point_for(mount, critical_point)
+            return {
+                Axis.X: self._current_position[Axis.X] + offset[0] + cp.x,
+                Axis.Y: self._current_position[Axis.Y] + offset[1] + cp.y,
+                z_ax: self._current_position[z_ax] + offset[2] + cp.z,
+                plunger_ax: self._current_position[plunger_ax]
+            }
 
-    def gantry_position(
+    async def gantry_position(
             self,
             mount: top_types.Mount,
             critical_point: CriticalPoint = None) -> top_types.Point:
@@ -463,7 +477,7 @@ class API(HardwareAPILike):
         `critical_point` specifies an override to the current critical point to
         use (see :py:meth:`current_position`).
         """
-        cur_pos = self.current_position(mount, critical_point)
+        cur_pos = await self.current_position(mount, critical_point)
         return top_types.Point(x=cur_pos[Axis.X],
                                y=cur_pos[Axis.Y],
                                z=cur_pos[Axis.by_mount(mount)])
@@ -563,7 +577,6 @@ class API(HardwareAPILike):
 
     async def _move_plunger(self, mount: top_types.Mount, dist: float,
                             speed: float = None):
-
         z_axis = Axis.by_mount(mount)
         pl_axis = Axis.of_plunger(mount)
         all_axes_pos = OrderedDict(
@@ -645,15 +658,16 @@ class API(HardwareAPILike):
                                 smoothie_pos[ax.name],
                                 deck_mins[ax], deck_max[ax],
                                 bounds[ax.name][0], bounds[ax.name][1]))
-        try:
-            self._backend.move(smoothie_pos, speed=speed,
-                               home_flagged_axes=home_flagged_axes)
-        except Exception:
-            self._log.exception('Move failed')
-            self._current_position.clear()
-            raise
-        else:
-            self._current_position.update(target_position)
+        async with self._motion_lock:
+            try:
+                self._backend.move(smoothie_pos, speed=speed,
+                                   home_flagged_axes=home_flagged_axes)
+            except Exception:
+                self._log.exception('Move failed')
+                self._current_position.clear()
+                raise
+            else:
+                self._current_position.update(target_position)
 
     @property
     def engaged_axes(self) -> Dict[Axis, bool]:
@@ -671,8 +685,9 @@ class API(HardwareAPILike):
         Works regardless of critical point or home status.
         """
         smoothie_ax = Axis.by_mount(mount).name.upper()
-        smoothie_pos = self._backend.fast_home(smoothie_ax, margin)
-        self._current_position = self._deck_from_smoothie(smoothie_pos)
+        async with self._motion_lock:
+            smoothie_pos = self._backend.fast_home(smoothie_ax, margin)
+            self._current_position = self._deck_from_smoothie(smoothie_pos)
 
     def _critical_point_for(
             self, mount: top_types.Mount,
@@ -1079,7 +1094,7 @@ class API(HardwareAPILike):
             hotspots = robot_configs.calculate_tip_probe_hotspots(
                 pip.current_tip_length, self._config.tip_probe)
             for ax, x0, y0, z0, probe_distance in hotspots:
-                pos = self.current_position(mount)
+                pos = await self.current_position(mount)
                 # Move safely to the setup point for the probe
                 await self.move_to(mount,
                                    top_types.Point(pos[Axis.X],
@@ -1095,9 +1110,11 @@ class API(HardwareAPILike):
                 else:
                     to_probe = ax_en
                 # Probe and retrieve the position afterwards
-                self._current_position = self._deck_from_smoothie(
-                    self._backend.probe(to_probe.name.lower(), probe_distance))
-                xyz = self.gantry_position(mount)
+                async with self._motion_lock:
+                    self._current_position = self._deck_from_smoothie(
+                        self._backend.probe(
+                            to_probe.name.lower(), probe_distance))
+                xyz = await self.gantry_position(mount)
                 # Store the upated position. We can average for X and Y since
                 # we hit a switch on either side of the tip probe box, but for
                 # Z we have to just use the single value

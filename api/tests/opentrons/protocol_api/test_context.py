@@ -34,17 +34,17 @@ def test_load_instrument(loop):
         assert loaded.name.startswith(prefix)
 
 
-def test_motion(loop):
+async def test_motion(loop):
     hardware = API.build_hardware_simulator(loop=loop)
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
     instr = ctx.load_instrument('p10_single', Mount.RIGHT)
     instr.home()
     assert instr.move_to(Location(Point(0, 0, 0), None)) is instr
-    assert hardware.current_position(instr._mount) == {Axis.X: 0,
-                                                       Axis.Y: 0,
-                                                       Axis.A: 0,
-                                                       Axis.C: 19}
+    assert await hardware.current_position(instr._mount) == {Axis.X: 0,
+                                                             Axis.Y: 0,
+                                                             Axis.A: 0,
+                                                             Axis.C: 19}
 
 
 def test_location_cache(loop, monkeypatch, load_my_labware):
