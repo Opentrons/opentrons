@@ -7,7 +7,6 @@ import steplistSelectors from '../../steplist/selectors'
 import type {RootState as SteplistRootState} from '../../steplist/reducers'
 import type {StepIdType} from '../../form-types'
 import type {BaseState, Selector} from '../../types'
-import type {FormSectionState} from './types'
 import {
   initialSelectedItemState,
   type SelectableItem,
@@ -129,12 +128,6 @@ const getStepCreationButtonExpanded: Selector<boolean> = createSelector(
   (state: StepsState) => state.stepCreationButtonExpanded
 )
 
-// TODO: BC 2018-12-17 refactor as react state
-const getFormSectionCollapsed: Selector<FormSectionState> = createSelector(
-  rootSelector,
-  s => s.formSectionCollapse
-)
-
 const getSelectedStep = createSelector(
   steplistSelectors.getAllSteps,
   getSelectedStepId,
@@ -183,7 +176,6 @@ export default {
   getHoveredStepLabware,
   getActiveItem,
   getHoveredSubstep,
-  getFormSectionCollapsed,
   getWellSelectionLabwareKey,
   getFormModalData,
   getCurrentFormCanBeSaved,

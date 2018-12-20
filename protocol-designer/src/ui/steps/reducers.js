@@ -14,8 +14,6 @@ import type {
   DeleteStepAction,
 } from '../../steplist/actions'
 
-import type {FormSectionState} from './types'
-
 import {
   hoverOnSubstep,
   expandAddStepButton,
@@ -24,22 +22,9 @@ import {
   toggleStepCollapsed,
   type SelectStepAction,
   type SelectTerminalItemAction,
-  type CollapseFormSectionAction,
   type ChangeMoreOptionsModalInputAction,
   type OpenMoreOptionsModalAction,
 } from './actions'
-
-// Handles aspirate / dispense form sections opening / closing
-export const initialFormSectionState: FormSectionState = {aspirate: true, dispense: true}
-
-const formSectionCollapse = handleActions({
-  COLLAPSE_FORM_SECTION: (state, action: CollapseFormSectionAction) =>
-    ({...state, [action.payload]: !state[action.payload]}),
-  // exiting the form resets the collapse state
-  CANCEL_STEP_FORM: () => initialFormSectionState,
-  SAVE_STEP_FORM: () => initialFormSectionState,
-  POPULATE_FORM: () => initialFormSectionState,
-}, initialFormSectionState)
 
 // the form modal (MORE OPTIONS) is an unsaved version of unsavedForm.
 // It's 2 degrees away from actual savedStepForms.
@@ -136,7 +121,6 @@ const wellSelectionLabwareKey = handleActions({
 
 export type StepsState = {|
   unsavedFormModal: FormModalFields,
-  formSectionCollapse: FormSectionState,
   collapsedSteps: CollapsedStepsState,
   selectedItem: SelectedItemState,
   hoveredItem: HoveredItemState,
@@ -147,7 +131,6 @@ export type StepsState = {|
 
 export const _allReducers = {
   unsavedFormModal,
-  formSectionCollapse,
   collapsedSteps,
   selectedItem,
   hoveredItem,

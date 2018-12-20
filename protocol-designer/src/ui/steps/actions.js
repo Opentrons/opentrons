@@ -8,7 +8,7 @@ import {selectors as steplistSelectors} from '../../steplist'
 import * as pipetteSelectors from '../../pipettes/selectors'
 import {getNextDefaultPipetteId} from '../../steplist/formLevel'
 import {getStepFormData} from '../../steplist/actions'
-import type {TerminalItemId, SubstepIdentifier, FormSectionNames} from '../../steplist/types'
+import type {TerminalItemId, SubstepIdentifier} from '../../steplist/types'
 
 import selectors from './selectors'
 import type {ChangeFormPayload} from '../../steplist/actions/types'
@@ -49,12 +49,6 @@ type HoverOnTerminalItemAction = {type: 'HOVER_ON_TERMINAL_ITEM', payload: ?Term
 export const hoverOnTerminalItem = (terminalId: ?TerminalItemId): HoverOnTerminalItemAction => ({
   type: 'HOVER_ON_TERMINAL_ITEM',
   payload: terminalId,
-})
-
-export type CollapseFormSectionAction = {type: 'COLLAPSE_FORM_SECTION', payload: FormSectionNames}
-export const collapseFormSection = (payload: FormSectionNames): CollapseFormSectionAction => ({
-  type: 'COLLAPSE_FORM_SECTION',
-  payload,
 })
 
 // TODO: BC 2018-12-13 this should be in react state, form and all
