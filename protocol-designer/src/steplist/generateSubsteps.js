@@ -30,15 +30,14 @@ import type {StepIdType} from '../form-types'
 import type {RobotState} from '../step-generation'
 
 import type {
-  NewPipetteData,
   ConsolidateFormData,
   DistributeFormData,
   MixFormData,
   PauseFormData,
   TransferFormData,
 } from '../step-generation/types'
-
-type AllPipetteData = {[pipetteId: string]: NewPipetteData}
+import type {PipetteOnDeck} from '../step-forms'
+type AllPipetteData = {[pipetteId: string]: PipetteOnDeck}
 
 export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 type GetLabwareType = (labwareId: string) => ?string

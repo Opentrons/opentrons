@@ -55,7 +55,8 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   (initialDeckSetup, labwareLiquidState) => {
     const labware = mapValues(initialDeckSetup.labware, (l: LabwareOnDeck, id: string): StepGeneration.LabwareData => ({
       type: l.type,
-      name: l.type, // TODO IMMEDIATELY: what is 'name' for here?
+      // TODO: Ian 2018-12-20 Clarify that this is 'name' is 'nickname', and get it from UI state. BUG: nickname won't save to file right now b/c of this HACK
+      name: l.type,
       slot: l.slot,
     }))
 

@@ -1,6 +1,5 @@
 // @flow
-import {getLabware, getPipetteNameSpecs} from '@opentrons/shared-data'
-import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
+import {getLabware} from '@opentrons/shared-data'
 import {
   requiredField,
   minimumWellCount,
@@ -24,29 +23,20 @@ export type {
 }
 
 const hydrateLabware = (state: StepFormContextualState, id: string) => {
-  if (state.labware) {
-    // new
-    // $FlowFixMe
-    const labware = state.labware[id]
-    return labware && {
-      id,
-      ...labware,
-      ...getLabware(labware.type),
-    }
+  const labware = state.labware[id]
+  return labware && {
+    id,
+    ...labware,
+    ...getLabware(labware.type),
   }
-  return labwareIngredSelectors.getLabwareById(state)[id] // deprecated
 }
 const hydratePipette = (state: StepFormContextualState, id: string) => {
-  if (state.labware) {
-    // new
-    const pipette = state.pipettes[id]
-    return pipette && {
-      id,
-      ...pipette,
-      ...getPipetteNameSpecs(pipette.name),
-    }
+  const pipette = state.pipettes[id]
+  return pipette && {
+    id,
+    ...pipette,
+    ...pipette.spec, // TODO: Ian 2018-12-20 don't spread this
   }
-  return state.pipettes[id]
 }
 
 type StepFieldHelpers = {

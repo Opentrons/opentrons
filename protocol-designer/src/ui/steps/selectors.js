@@ -3,7 +3,7 @@ import {createSelector} from 'reselect'
 import last from 'lodash/last'
 import isEmpty from 'lodash/isEmpty'
 
-import * as stepFormSelectors from '../../step-forms/selectors' // TODO IMMEDIATELY: fix circular dependency so this doesn't blow up
+import * as stepFormSelectors from '../../step-forms/selectors' // TODO Ian 2018-12-20: fix circular dependency so this direct import isn't required
 import type {StepIdType} from '../../form-types'
 import type {BaseState, Selector} from '../../types'
 import type {FormSectionState} from './types'

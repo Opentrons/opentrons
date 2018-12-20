@@ -5,7 +5,6 @@ import mapValues from 'lodash/mapValues'
 import type {BaseState} from '../types'
 import FilePage from '../components/FilePage'
 import {actions, selectors as fileSelectors} from '../file-data'
-import {actions as pipetteActions} from '../pipettes'
 import {selectors as stepFormSelectors} from '../step-forms'
 import {actions as steplistActions} from '../steplist'
 import {INITIAL_DECK_SETUP_STEP_ID} from '../constants'
@@ -43,13 +42,11 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
     goToNextPage: () => dispatch(navActions.navigateToPage('liquids')),
     saveFileMetadata: (nextFormValues: FileMetadataFields) =>
       dispatch(actions.saveFileMetadata(nextFormValues)),
-    swapPipettes: () => {
+    swapPipettes: () =>
       dispatch(steplistActions.changeSavedStepForm({
         stepId: INITIAL_DECK_SETUP_STEP_ID,
         update: {pipetteLocationUpdate: swapPipetteUpdate},
-      }))
-      dispatch(pipetteActions.swapPipettes())
-    },
+      })),
   }
 }
 

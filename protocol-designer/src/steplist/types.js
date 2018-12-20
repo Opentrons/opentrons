@@ -8,7 +8,6 @@ import type {
   TransferLikeStepType,
 } from '../form-types'
 import type {LabwareEntities, PipetteEntities} from '../step-forms'
-import type {BaseState} from '../types'
 import type {FormError} from './formLevel/errors'
 
 // sections of the form that are expandable/collapsible
@@ -106,10 +105,7 @@ export type StepArgsAndErrors = {
   stepArgs: CommandCreatorData | null, // TODO: incompleteData field when this is null?
 }
 
-export type StepFormContextualState = { // TODO IMMEDIATELY delete first case
-  labwareIngred: $PropertyType<BaseState, 'labwareIngred'>,
-  pipettes: $PropertyType<BaseState, 'pipettes'>,
-} | {
+export type StepFormContextualState = {
   labware: LabwareEntities,
   pipettes: PipetteEntities,
 }

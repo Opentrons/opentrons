@@ -146,6 +146,7 @@ export type CommandCreatorData =
   | PauseFormData
   | TransferFormData
 
+// TODO: Ian 2018-12-20 replace `PipetteData` with something like `PipetteOnDeck` type
 export type PipetteData = {| // TODO refactor all 'pipette fields', split PipetteData into its own export type
   id: string, // TODO PipetteId export type here instead of string?
   mount: Mount,
@@ -154,13 +155,6 @@ export type PipetteData = {| // TODO refactor all 'pipette fields', split Pipett
   channels: Channels,
   tiprackModel: string, // NOTE: this will go away when tiprack choice-per-step and/or tiprack sharing is implemented
 |}
-
-// TODO: replace above `PipetteData` with this one
-export type NewPipetteData = {
-  mount: Mount,
-  name: string,
-  tiprackModel: string,
-}
 
 export type LabwareData = {|
   type: string, // TODO Ian 2018-04-17 keys from JSON. Also, rename 'type' to 'model' (or something??)

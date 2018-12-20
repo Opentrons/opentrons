@@ -32,29 +32,44 @@ import type {
   StepArgsAndErrors,
   StepFormAndFieldErrors,
   StepItemData,
+  StepFormContextualState,
 } from '../../steplist/types'
-import type {InitialDeckSetup, LabwareEntities, PipetteOnDeck, PipetteEntities} from '../types'
+import type {
+  InitialDeckSetup,
+  LabwareEntities,
+  PipetteOnDeck,
+  PipetteEntities,
+  PipetteEntity,
+  EditPipetteFieldsByMount,
+} from '../types'
 import type {RootState} from '../reducers'
 import type {BaseState, Selector} from '../../types'
 import type {FormData, StepIdType, StepType} from '../../form-types'
-import type {FormattedPipette} from '../../pipettes/types'
-// TODO: Ian 2018-12-13 make selectors
 
-// TODO IMMEDIATELY this is copied from steplist, put it somewhere common
+// TODO: BC 2018-10-30 after separation of getStepArgs and getStepErrors
+// , move the NO_SAVED_FORM_ERROR into a separate wrapping selector
+// it is currently there to keep the step item error state from appearing
+// before you've saved the form once
 const NO_SAVED_FORM_ERROR = 'NO_SAVED_FORM_ERROR'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 
-// TODO: Ian 2018-12-14 type properly
 export const getLabwareInvariantProperties: Selector<LabwareEntities> = createSelector(
   rootSelector,
   (state) => state.labwareInvariantProperties
 )
 
-// TODO: Ian 2018-12-14 type properly
 export const getPipetteInvariantProperties: Selector<PipetteEntities> = createSelector(
   rootSelector,
-  (state) => state.pipetteInvariantProperties
+  (state) => reduce(
+    state.pipetteInvariantProperties,
+    (acc: PipetteEntities, pipette: PipetteEntity, id: string): PipetteEntities => {
+      const spec = getPipetteNameSpecs(pipette.name)
+      assert(spec, `no pipette spec for pipette id "${id}", name "${pipette.name}"`)
+      return spec
+        ? {...acc, [id]: {...pipette, spec}}
+        : acc
+    }, {})
 )
 
 // TODO: Ian 2018-12-14 type properly
@@ -135,27 +150,17 @@ export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup>
   }, {})
 )
 
-// TODO: Ian 2018-12-20 this is very similar to `getPipettesForInstrumentGroup`,
-// can we merge the 2 similar return types here and in the 2 components that use these?
-type EditPipetteFieldsByMount = {left: ?FormattedPipette, right: ?FormattedPipette}
 export const getPipettesForEditPipetteForm: Selector<EditPipetteFieldsByMount> = createSelector(
   getInitialDeckSetup,
   (initialDeckSetup) => reduce(initialDeckSetup.pipettes, (acc: EditPipetteFieldsByMount, pipetteOnDeck: PipetteOnDeck, id): EditPipetteFieldsByMount => {
     const pipetteSpec = getPipetteNameSpecs(pipetteOnDeck.name)
     const tiprackSpec = getLabware(pipetteOnDeck.tiprackModel)
 
-    if (!pipetteSpec) return acc
+    if (!pipetteSpec || !tiprackSpec) return acc
 
     const pipetteForInstrumentGroup = {
-      id: id,
-      mount: pipetteOnDeck.mount,
-      model: pipetteOnDeck.name,
-      maxVolume: pipetteSpec.maxVolume,
-      channels: pipetteSpec.channels,
-      description: _getPipetteDisplayName(pipetteOnDeck.name),
-      isDisabled: false,
-      tiprackModel: tiprackSpec ? `${tiprackSpec.metadata.tipVolume || '?'} uL` : undefined,
-      tiprack: {model: pipetteOnDeck.tiprackModel},
+      pipetteModel: pipetteOnDeck.name,
+      tiprackModel: tiprackSpec.metadata.name,
     }
 
     return {
@@ -214,13 +219,17 @@ const _getAllErrorsFromHydratedForm = (hydratedForm: FormData): StepFormAndField
   return errors
 }
 
-export const getHydratedUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSelector(
-  getUnsavedForm,
+export const getHydrationContext: Selector<StepFormContextualState> = createSelector(
   getLabwareInvariantProperties,
   getPipetteInvariantProperties,
-  (unsavedForm, labware, pipettes) => {
+  (labware, pipettes) => ({labware, pipettes})
+)
+
+export const getHydratedUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSelector(
+  getUnsavedForm,
+  getHydrationContext,
+  (unsavedForm, contextualState) => {
     if (!unsavedForm) return null
-    const contextualState = {labware, pipettes}
     const hydratedForm = mapValues(unsavedForm, (value, name) => (
       hydrateField(contextualState, name, value)
     ))
@@ -232,10 +241,8 @@ export const getHydratedUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = c
 
 export const getArgsAndErrorsByStepId: Selector<{[StepIdType]: StepArgsAndErrors}> = createSelector(
   getOrderedSavedForms,
-  getLabwareInvariantProperties,
-  getPipetteInvariantProperties,
-  (stepForms, labware, pipettes) => {
-    const contextualState = {labware, pipettes}
+  getHydrationContext,
+  (stepForms, contextualState) => {
     return reduce(stepForms, (acc, stepForm) => {
       const hydratedForm = mapValues(stepForm, (value, name) => (
         hydrateField(contextualState, name, value)
@@ -279,11 +286,9 @@ export const getIsNewStepForm = createSelector(
 // TODO: Ian 2018-12-17 rename for clarity: it's for unsaved form, not saved forms
 export const getFormLevelWarnings: Selector<Array<FormWarning>> = createSelector(
   getUnsavedForm,
-  getLabwareInvariantProperties,
-  getPipetteInvariantProperties,
-  (unsavedFormData, labware, pipettes) => {
+  getHydrationContext,
+  (unsavedFormData, contextualState) => {
     if (!unsavedFormData) return []
-    const contextualState = {labware, pipettes}
     const {id, stepType, ...fields} = unsavedFormData
     const hydratedFields = mapValues(fields, (value, name) => hydrateField(contextualState, name, value))
     return getFormWarnings(stepType, hydratedFields)
@@ -292,12 +297,10 @@ export const getFormLevelWarnings: Selector<Array<FormWarning>> = createSelector
 
 export const getFormLevelErrors: Selector<Array<FormError>> = createSelector(
   getUnsavedForm,
-  getLabwareInvariantProperties,
-  getPipetteInvariantProperties,
-  (unsavedFormData, labware, pipettes) => {
+  getHydrationContext,
+  (unsavedFormData, contextualState) => {
     if (!unsavedFormData) return []
     const {id, stepType, ...fields} = unsavedFormData
-    const contextualState = {labware, pipettes}
     const hydratedFields = mapValues(fields, (value, name) => hydrateField(contextualState, name, value))
     return getFormErrors(stepType, hydratedFields)
   }

@@ -1,7 +1,7 @@
 // @flow
 
-export type CreatePipettesAction = {
-  type: 'CREATE_PIPETTES',
+export type UpsertPipettesAction = {
+  type: 'UPSERT_PIPETTES',
   payload: {
     [pipetteId: string]: {
       name: string,
@@ -10,8 +10,8 @@ export type CreatePipettesAction = {
   },
 }
 
-export const createPipettes = (payload: $PropertyType<CreatePipettesAction, 'payload'>): CreatePipettesAction => ({
-  type: 'CREATE_PIPETTES',
+export const upsertPipettes = (payload: $PropertyType<UpsertPipettesAction, 'payload'>): UpsertPipettesAction => ({
+  type: 'UPSERT_PIPETTES',
   payload,
 })
 

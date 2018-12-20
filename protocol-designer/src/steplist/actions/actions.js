@@ -1,7 +1,7 @@
 // @flow
 import type {Dispatch} from 'redux'
 
-import {selectors as stepFormSelectors} from '../index'
+import {selectors as stepFormSelectors} from '../../step-forms'
 import {selectors as stepsSelectors} from '../../ui/steps'
 import type {StepType, StepIdType, FormData} from '../../form-types'
 import type {ChangeFormPayload, ChangeSavedFormPayload} from './types'

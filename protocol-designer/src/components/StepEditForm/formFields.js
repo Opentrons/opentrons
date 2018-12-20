@@ -102,7 +102,7 @@ type PipetteFieldSP = {pipetteOptions: Options, getHydratedPipette: (string) => 
 type PipetteFieldProps = PipetteFieldOP & PipetteFieldSP
 const PipetteFieldSTP = (state: BaseState, ownProps: PipetteFieldOP): PipetteFieldSP => ({
   pipetteOptions: stepFormSelectors.getEquippedPipetteOptions(state),
-  getHydratedPipette: (value) => hydrateField(state, ownProps.name, value),
+  getHydratedPipette: (value) => hydrateField(stepFormSelectors.getHydrationContext(state), ownProps.name, value),
 })
 export const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldProps) => (
   <StepField

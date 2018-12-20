@@ -20,7 +20,7 @@ import {cancelStepForm} from '../../steplist/actions'
 
 import {getChangeLabwareEffects} from '../../steplist/actions/handleFormChange'
 
-import type {PipetteEntities, LabwareEntities} from '../types'
+import type {PipetteEntity, LabwareEntities} from '../types'
 import type {LoadFileAction} from '../../load-file'
 import type {
   CreateContainerAction,
@@ -44,14 +44,13 @@ import type {
   SaveMoreOptionsModal,
 } from '../../ui/steps/actions'
 import type {
-  CreatePipettesAction,
+  UpsertPipettesAction,
   DeletePipettesAction,
   ModifyPipettesTiprackAssignmentAction,
 } from '../actions'
 
 type FormState = FormData | null
 
-// TODO Ian 2018-12-13 replace the other unsavedForm reducer with this new one
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
 type UnsavedFormActions =
   | ChangeFormInputAction
@@ -123,7 +122,6 @@ function _getNextAvailableSlot (labwareLocations: {[labwareId: string]: DeckSlot
   return sortedSlotnames.find(slot => !filledLocations.some(filledSlot => filledSlot === slot))
 }
 
-// TODO Ian 2018-12-13 replace the other savedStepForms with this new one
 const savedStepForms = (
   rootState: RootState,
   action: SaveStepFormAction | DeleteStepAction | LoadFileAction | CreateContainerAction | DeleteContainerAction
@@ -275,10 +273,11 @@ const labwareInvariantProperties = handleActions({
   },
 }, initialLabwareState)
 
+type PipetteInvariantState = {[pipetteId: string]: $Diff<PipetteEntity, {'spec': *}>}
 const pipetteInvariantProperties = handleActions({
-  LOAD_FILE: (state: PipetteEntities, action: LoadFileAction): PipetteEntities => {
+  LOAD_FILE: (state: PipetteInvariantState, action: LoadFileAction): PipetteInvariantState => {
     const metadata = getPDMetadata(action.payload)
-    return mapValues(action.payload.pipettes, (filePipette: FilePipette, pipetteId: string): $Values<PipetteEntities> => {
+    return mapValues(action.payload.pipettes, (filePipette: FilePipette, pipetteId: string): $Values<PipetteInvariantState> => {
       const tiprackModel = metadata.pipetteTiprackAssignments[pipetteId]
       assert(tiprackModel, `expected tiprackModel in file metadata for pipette ${pipetteId}`)
       return {
@@ -287,16 +286,16 @@ const pipetteInvariantProperties = handleActions({
       }
     })
   },
-  CREATE_PIPETTES: (state: PipetteEntities, action: CreatePipettesAction): PipetteEntities => {
+  UPSERT_PIPETTES: (state: PipetteInvariantState, action: UpsertPipettesAction): PipetteInvariantState => {
     return {
       ...state,
       ...action.payload,
     }
   },
-  DELETE_PIPETTES: (state: PipetteEntities, action: DeletePipettesAction): PipetteEntities => {
+  DELETE_PIPETTES: (state: PipetteInvariantState, action: DeletePipettesAction): PipetteInvariantState => {
     return omit(state, action.payload)
   },
-  MODIFY_PIPETTES_TIPRACK_ASSIGNMENT: (state: PipetteEntities, action: ModifyPipettesTiprackAssignmentAction): PipetteEntities => {
+  MODIFY_PIPETTES_TIPRACK_ASSIGNMENT: (state: PipetteInvariantState, action: ModifyPipettesTiprackAssignmentAction): PipetteInvariantState => {
     assert(
       Object.keys(action.payload).forEach(pipetteId => pipetteId in state),
       `pipettes in ${action.type} payload do not exist in state ${JSON.stringify(action.payload)}`)
@@ -304,9 +303,7 @@ const pipetteInvariantProperties = handleActions({
   },
 }, {})
 
-// TODO: Ian 2018-12-17 remove the old orderedSteps + OrderedStepsState in steplist/reducers
-// which this was copy-pasted from
-export type OrderedStepsState = Array<StepIdType>
+type OrderedStepsState = Array<StepIdType>
 
 const orderedSteps = handleActions({
   ADD_STEP: (state: OrderedStepsState, action: AddStepAction) =>
@@ -367,7 +364,6 @@ const legacySteps = handleActions({
         ...acc,
         [stepId]: {
           id: stepId,
-          title: stepForm['step-name'],
           stepType: stepForm.stepType,
         },
       }
@@ -385,7 +381,7 @@ const legacySteps = handleActions({
 export type RootState = {
   orderedSteps: OrderedStepsState,
   labwareInvariantProperties: LabwareEntities,
-  pipetteInvariantProperties: PipetteEntities,
+  pipetteInvariantProperties: PipetteInvariantState,
   savedStepForms: SavedStepFormState,
   unsavedForm: FormState,
   legacySteps: LegacyStepsState,
@@ -411,6 +407,11 @@ const rootReducer = (state: RootState = initialRootState, action: any) => {
     unsavedForm: unsavedForm(state, action),
     legacySteps: legacySteps(state.legacySteps, action),
   }
+}
+
+export const _allReducers = {
+  orderedSteps,
+  legacySteps,
 }
 
 export default rootReducer

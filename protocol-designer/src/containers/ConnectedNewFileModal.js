@@ -63,8 +63,8 @@ function mapDispatchToProps (dispatch: Dispatch<*>): DP {
       }, {})
 
       // create new pipette entities
-      // TODO: Ian 2018-12-17 clean up types to createPipettes action
-      dispatch(stepFormActions.createPipettes(mapValues(pipettes, (p: $Values<PipettesWithMount>) => ({
+      // TODO: Ian IMMEDIATELY
+      dispatch(stepFormActions.upsertPipettes(mapValues(pipettes, (p: $Values<PipettesWithMount>) => ({
         name: p.name,
         tiprackModel: p.tiprackModel,
       }))))

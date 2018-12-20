@@ -1,6 +1,6 @@
 // @flow
+import assert from 'assert'
 import uniq from 'lodash/uniq'
-import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
 import {selectors as stepFormSelectors} from '../../step-forms'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
@@ -31,16 +31,13 @@ function _getAllWells (
   return uniq(allWells)
 }
 
-// TODO: Ian 2018-12-20 revisit this, make general helper or selector
-// TODO IMMEDIATELY
-const getChannels = (pipetteId: string, state: BaseState): PipetteChannels => {
-  const pipettes = stepFormSelectors.getPipetteInvariantProperties(state)
-  const pipette = pipettes[pipetteId] && getPipetteNameSpecs(pipettes[pipetteId].name)
+function getChannels (pipetteId: string, state: BaseState): PipetteChannels {
+  const pipette: ?* = stepFormSelectors.getPipetteInvariantProperties(state)[pipetteId]
   if (!pipette) {
-    console.error(`${pipetteId} not found in pipettes, cannot handleFormChange properly`)
+    assert(false, `${pipetteId} not found in pipettes, cannot handleFormChange properly`)
     return 1
   }
-  return pipette.channels
+  return pipette.spec.channels
 }
 
 // TODO: Ian 2018-09-20 this is only usable by 'unsavedForm'.
@@ -75,11 +72,9 @@ function handleFormChange (
 
   if (baseForm.stepType === 'distribute') {
     if (typeof payload.update.pipette === 'string') {
-      const pipetteData = stepFormSelectors.getPipetteInvariantProperties(baseState)[payload.update.pipette]
-      const pipetteSpecs = getPipetteNameSpecs(pipetteData.name)
-      const disposalVol = pipetteSpecs
-        ? pipetteSpecs.minVolume
-        : null
+      const pipette = stepFormSelectors.getPipetteInvariantProperties(baseState)[payload.update.pipette]
+      assert(pipette, `handleFormChange expected pipette to exist ${String(payload.update.pipette)}`)
+      const disposalVol = pipette.spec.minVolume
 
       updateOverrides = {
         ...updateOverrides,

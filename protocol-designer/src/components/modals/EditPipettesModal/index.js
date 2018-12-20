@@ -25,10 +25,6 @@ import {
   type PipetteEntities,
 } from '../../../step-forms'
 import {actions as steplistActions} from '../../../steplist'
-import type {
-  EditPipettesFields,
-  FormattedPipette,
-} from '../../../pipettes'
 
 import PipetteDiagram from '../NewFileModal/PipetteDiagram'
 import TiprackDiagram from '../NewFileModal/TiprackDiagram'
@@ -37,7 +33,17 @@ import styles from './EditPipettesModal.css'
 import modalStyles from '../modal.css'
 import StepChangesWarningModal from './StepChangesWarningModal'
 
+type EditPipettesFields = {
+  left: PipetteFields,
+  right: PipetteFields,
+}
+
 type State = EditPipettesFields & {isWarningModalOpen: boolean}
+
+type FormattedPipette = {
+  pipetteModel: string,
+  tiprackModel: string,
+}
 
 type Props = {
   closeModal: () => void,
@@ -70,9 +76,10 @@ const tiprackOptions = [
 
 const DEFAULT_SELECTION = {pipetteModel: '', tiprackModel: null}
 
-const pipetteDataToFormState = (pipetteData) => ({
-  pipetteModel: (pipetteData && pipetteData.model) ? pipetteData.model : '',
-  tiprackModel: (pipetteData && pipetteData.tiprack && pipetteData.tiprack.model) ? pipetteData.tiprack.model : null,
+// TODO IMMEDIATELY type this
+const pipetteDataToFormState = (pipette: ?FormattedPipette) => ({
+  pipetteModel: (pipette && pipette.pipetteModel) || '',
+  tiprackModel: (pipette && pipette.tiprackModel) || null,
 })
 
 class EditPipettesModal extends React.Component<Props, State> {
@@ -254,9 +261,9 @@ const mergeProps = (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>},
       }
     })
 
-    // TODO IMMEDIATELY: don't create pipettes that already exist -- or should this be called UPSERT_PIPETTES?
-    dispatch(stepFormActions.createPipettes(
-      mapValues(nextPipettes, p => ({name: p.name, tiprackModel: p.tiprackModel}))))
+    dispatch(stepFormActions.upsertPipettes(
+      mapValues(nextPipettes, (p: $Values<typeof nextPipettes>) =>
+        ({name: p.name, tiprackModel: p.tiprackModel}))))
 
     // set/update pipette locations in initial deck setup step
     dispatch(steplistActions.changeSavedStepForm({
