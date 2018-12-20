@@ -16,7 +16,6 @@ import type {
 
 import {
   hoverOnSubstep,
-  expandAddStepButton,
   hoverOnStep,
   hoverOnTerminalItem,
   toggleStepCollapsed,
@@ -102,18 +101,6 @@ const hoveredSubstep = handleActions({
   HOVER_ON_SUBSTEP: (state: SubstepIdentifier, action: ActionType<typeof hoverOnSubstep>) => action.payload,
 }, null)
 
-type StepCreationButtonExpandedState = boolean
-
-const stepCreationButtonExpanded = handleActions({
-  ADD_STEP: () => false,
-  EXPAND_ADD_STEP_BUTTON: (
-    state: StepCreationButtonExpandedState,
-    {payload}: ActionType<typeof expandAddStepButton>
-  ) => (
-    payload
-  ),
-}, false)
-
 const wellSelectionLabwareKey = handleActions({
   SET_WELL_SELECTION_LABWARE_KEY: (state, action: {payload: string}) => action.payload,
   CLEAR_WELL_SELECTION_LABWARE_KEY: () => null,
@@ -125,7 +112,6 @@ export type StepsState = {|
   selectedItem: SelectedItemState,
   hoveredItem: HoveredItemState,
   hoveredSubstep: SubstepIdentifier,
-  stepCreationButtonExpanded: StepCreationButtonExpandedState,
   wellSelectionLabwareKey: ?string,
 |}
 
@@ -135,7 +121,6 @@ export const _allReducers = {
   selectedItem,
   hoveredItem,
   hoveredSubstep,
-  stepCreationButtonExpanded,
   wellSelectionLabwareKey,
 }
 

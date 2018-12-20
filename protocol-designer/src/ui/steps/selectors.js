@@ -122,12 +122,6 @@ const getCollapsedSteps = createSelector(
   (state: StepsState) => state.collapsedSteps
 )
 
-// TODO: BC 2018-12-17 refactor as react state
-const getStepCreationButtonExpanded: Selector<boolean> = createSelector(
-  rootSelector,
-  (state: StepsState) => state.stepCreationButtonExpanded
-)
-
 const getSelectedStep = createSelector(
   steplistSelectors.getAllSteps,
   getSelectedStepId,
@@ -168,7 +162,6 @@ export default {
 
   getSelectedStep,
 
-  getStepCreationButtonExpanded,
   getSelectedStepId,
   getSelectedTerminalItemId,
   getHoveredTerminalItemId,
