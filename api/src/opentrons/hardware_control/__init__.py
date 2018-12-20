@@ -1170,8 +1170,8 @@ class API(HardwareAPILike):
                tip is present.
         """
         if from_tip_probe:
-            new_offset = (from_tip_probe
-                          - top_types.Point(*self._config.tip_probe.center))
+            new_offset = (top_types.Point(*self._config.tip_probe.center)
+                          - from_tip_probe)
         elif not new_offset:
             raise ValueError(
                 "Either from_tip_probe or new_offset must be specified")
