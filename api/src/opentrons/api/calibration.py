@@ -189,6 +189,9 @@ class CalibrationManager:
         log.info('Updating {} in {}'.format(container.name, container.slot))
         if ff.use_protocol_api_v2():
             here = self._hardware.gantry_position(Mount[inst.mount.upper()])
+            # Reset calibration so we don’t actually calibrate the offset
+            # relative to the old calibration
+            container._container.set_calibration(Point(0, 0, 0))
             if ff.calibrate_to_bottom():
                 orig = container._container.wells()[0].bottom().point
             else:

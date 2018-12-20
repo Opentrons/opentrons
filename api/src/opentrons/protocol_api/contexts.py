@@ -607,7 +607,9 @@ class InstrumentContext:
         if not isinstance(loc, Well):
             raise TypeError('Last tip location should be a Well but it is: '
                             '{}'.format(loc))
-        self.drop_tip(loc.top())
+        bot = loc.bottom()
+        bot = bot._replace(point=bot.point._replace(z=bot.point.z + 10))
+        self.drop_tip(bot)
         return self
 
     @cmds.publish.both(command=cmds.pick_up_tip)  # noqa(C901)
@@ -742,7 +744,7 @@ class InstrumentContext:
         """
         if location and isinstance(location, types.Location):
             if isinstance(location.labware, Well):
-                target = location.labware
+                target = location
             else:
                 raise TypeError(
                     "If a location is specified as a types.Location (for "
@@ -752,9 +754,11 @@ class InstrumentContext:
                     "dropped. The passed location, however, is in "
                     "reference to {}".format(location.labware))
         elif location and isinstance(location, Well):
-            target = location
+            bot = location.bottom()
+            target = bot._replace(point=bot.point._replace(z=bot.point.z + 10))
         elif not location:
-            target = self.trash_container.wells()[0]
+            loc = self.trash_container.wells()[0].bottom()
+            target = loc._replace(point=loc.point._replace(z=loc.point.z + 10))
         else:
             raise TypeError(
                 "If specified, location should be an instance of "
@@ -762,7 +766,7 @@ class InstrumentContext:
                 "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
                 " However, it is a {}".format(location))
 
-        self.move_to(target.bottom())
+        self.move_to(target)
         self._hw_manager.hardware.drop_tip(self._mount)
         return self
 

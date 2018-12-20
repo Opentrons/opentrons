@@ -910,26 +910,34 @@ class API(HardwareAPILike):
         await self.retract(mount, instr.config.pick_up_distance)
 
     @_log_call
-    async def drop_tip(self, mount):
+    async def drop_tip(self, mount, home_after=True):
         """
         Drop tip at the current location
+
+        :param Mount mount: The mount to drop a tip from
+        :param bool home_after: Home the plunger motor after dropping tip. This
+                                is used in case the plunger motor skipped while
+                                dropping the tip, and is also used to recover
+                                the ejector shroud after a drop.
         """
         instr = self._attached_instruments[mount]
         assert instr
         assert instr.has_tip, 'Cannot drop tip without a tip attached'
         self._log.info("Dropping tip off from {}".format(instr.name))
         plunger_ax = Axis.of_plunger(mount)
+        droptip = instr.config.plunger_positions['drop_tip']
+        bottom = instr.config.plunger_positions['bottom']
         self._backend.set_active_current(plunger_ax,
                                          instr.config.plunger_current)
-        await self._move_plunger(mount,
-                                 instr.config.plunger_positions['bottom'])
+        await self._move_plunger(mount, bottom)
         self._backend.set_active_current(plunger_ax,
                                          instr.config.drop_tip_current)
-        await self._move_plunger(mount,
-                                 instr.config.plunger_positions['drop_tip'])
+        await self._move_plunger(mount, droptip)
         await self._shake_off_tips(mount)
         instr.set_current_volume(0)
         instr.remove_tip()
+        if home_after:
+            await self.home_plunger(mount)
 
     async def _shake_off_tips(self, mount):
         # tips don't always fall off, especially if resting against

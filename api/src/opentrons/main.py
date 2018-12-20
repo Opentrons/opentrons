@@ -172,7 +172,8 @@ def run(**kwargs):
     log.info("API server version:  {}".format(__version__))
     if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
         initialize_robot(loop)
-
+        if ff.use_protocol_api_v2():
+            loop.run_until_complete(hardware.cache_instruments())
         if not ff.disable_home_on_boot():
             log.info("Homing Z axes")
             if ff.use_protocol_api_v2():
