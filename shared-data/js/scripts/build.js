@@ -14,7 +14,7 @@ if (!buildDir) {
 
 let output = {}
 
-const files = glob.sync(path.join(__dirname, '../../definitions/*.json'))
+const files = glob.sync(path.join(__dirname, '../../definitions*/*.json'))
 
 files.forEach((filename) => {
   const contents = require(filename)
