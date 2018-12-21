@@ -223,12 +223,12 @@ async def async_client(request, virtual_smoothie_env, loop, test_client):
 
 
 @pytest.fixture
-def dc_session(virtual_smoothie_env, monkeypatch, loop):
+def dc_session(virtual_smoothie_env, monkeypatch, loop, hardware):
     """
     Mock session manager for deck calibation
     """
     with using_api1(loop):
-        ses = endpoints.SessionManager()
+        ses = endpoints.SessionManager(hardware)
         monkeypatch.setattr(endpoints, 'session', ses)
         yield ses
 

@@ -120,6 +120,9 @@ class Robot():
         self._unsubscribe_commands = None
         self.reset()
 
+    def config(self):
+        return self.config
+
     def _get_placement_location(self, placement):
         location = None
         # If `placement` is a string, assume it is a slot

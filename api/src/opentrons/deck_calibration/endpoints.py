@@ -1,8 +1,7 @@
 from aiohttp import web
 from uuid import uuid1
-from opentrons.config import pipette_config
-from opentrons import instruments
-from opentrons.config import robot_configs, advanced_settings
+from opentrons.config import pipette_config, robot_configs, advanced_settings
+from opentrons import instruments, types
 from . import jog, position, dots_set, z_pos
 from opentrons.util.linal import add_z, solve
 from typing import Dict, Tuple
@@ -95,7 +94,8 @@ def init_pipette(hardware):
     :return: The pipette type and mount chosen for deck calibration
     """
     global session
-    pipette_info = set_current_mount(hardware.get_attached_pipettes())
+    pipette_info = set_current_mount(
+        hardware, hardware.get_attached_pipettes())
     pipette = pipette_info['pipette']
     res = {}
     if pipette:
@@ -108,7 +108,7 @@ def init_pipette(hardware):
     return res
 
 
-def set_current_mount(attached_pipettes):
+def set_current_mount(hardware, attached_pipettes):
     """
     Choose the pipette in which to execute commands. If there is no pipette,
     or it is uncommissioned, the pipette is not mounted.
@@ -140,14 +140,10 @@ def set_current_mount(attached_pipettes):
                 mount='right', config=pip_config, name=right['model'])
     else:
         if left['model'] in pipette_config.configs:
-            pip_config = pipette_config.load(left['model'])
-            left_pipette = instruments._create_pipette_from_config(
-                mount='left', config=pip_config, name=left['model'])
+            left_pipette = hardware.attached_pipettes()[types.Mount.LEFT]
 
         if right['model'] in pipette_config.configs:
-            pip_config = pipette_config.load(right['model'])
-            right_pipette = instruments._create_pipette_from_config(
-                mount='right', config=pip_config, name=right['model'])
+            right_pipette = hardware.attached_pipettes()[types.Mount.RIGHT]
 
     if right_pipette and right_pipette.channels == 1:
         session.current_mount = 'A'
@@ -169,7 +165,7 @@ def set_current_mount(attached_pipettes):
     return {'pipette': pipette, 'model': model}
 
 
-async def attach_tip(data, hardware):
+async def attach_tip(data):
     """
     Attach a tip to the current pipette
 
@@ -196,9 +192,14 @@ async def attach_tip(data, hardware):
             if pipette.tip_attached:
                 log.warning('attach tip called while tip already attached')
                 pipette._remove_tip(pipette._tip_length)
-
-            session.tip_length = tip_length
             pipette._add_tip(tip_length)
+        else:
+            if pipette.has_tip:
+                log.warning('attach tip called while tip already attached')
+                pipette.remove_tip(pipette.tip_length)
+            pipette.add_tip(tip_length)
+        session.tip_length = tip_length
+
         message = "Tip length set: {}".format(tip_length)
         status = 200
 
@@ -224,8 +225,11 @@ async def detach_tip(data, hardware):
     if not advanced_settings.get_adv_setting('useProtocolApi2'):
         if not pipette.tip_attached:
             log.warning('detach tip called with no tip')
-
             pipette._remove_tip(session.tip_length)
+    else:
+        if not pipette.has_tip:
+            log.warning('detach tip called with no tip')
+            pipette.remove_tip(session.tip_length)
     session.tip_length = None
 
     return web.json_response({'message': "Tip removed"}, status=200)
@@ -312,6 +316,12 @@ async def move(data, hardware):
             point = (x, y, z)
         if not advanced_settings.get_adv_setting('useProtocolApi2'):
             pipette.move_to((hardware.deck, point), strategy='arc')
+        else:
+            if mount == 'left':
+                mount = types.Mount.LEFT
+            else:
+                mount = types.Mount.RIGHT
+            hardware.move_to(mount, point)
         message = 'Moved to {}'.format(point)
         status = 200
     else:
@@ -412,9 +422,8 @@ async def save_transform(data, hardware):
         # Add the z component to form the 3 dimensional transform
         calibration_matrix = add_z(flat_matrix, session.z_value)
 
-        if not advanced_settings.get_adv_setting('useProtocolApi2'):
-            hardware.update_config(gantry_calibration=list(
-                    map(lambda i: list(i), calibration_matrix)))
+        hardware.update_config(gantry_calibration=list(
+                map(lambda i: list(i), calibration_matrix)))
 
         robot_configs.save_deck_calibration(hardware.config)
         robot_configs.backup_configuration(hardware.config)

@@ -47,13 +47,13 @@ async def test_add_and_remove_tip(dc_session):
     assert pip.tip_attached
 
     # Check correct detach command
-    res3 = await endpoints.detach_tip({})
+    res3 = await endpoints.detach_tip({}, robot)
     assert res3.status == 200
     assert dc_session.tip_length is None
     assert not pip.tip_attached
 
     # Check command with no tip
-    res4 = await endpoints.detach_tip({})
+    res4 = await endpoints.detach_tip({}, robot)
     assert res4.status == 200
     assert dc_session.tip_length is None
     assert not pip.tip_attached
@@ -77,7 +77,7 @@ async def test_save_xy(dc_session):
     data = {
         'point': point
     }
-    await endpoints.save_xy(data)
+    await endpoints.save_xy(data, robot)
 
     actual = dc_session.points[point]
     expected = (
@@ -103,7 +103,7 @@ async def test_save_z(dc_session):
     z_target = 80.0
     dc_session.pipettes.get(mount).move_to((robot.deck, (0, 0, z_target)))
 
-    await endpoints.save_z({})
+    await endpoints.save_z({}, robot)
 
     new_z = dc_session.z_value
     expected_z = z_target
@@ -126,7 +126,7 @@ async def test_save_calibration_file(dc_session, monkeypatch):
 
     monkeypatch.setattr(robot_configs, 'save_deck_calibration', dummy_save)
 
-    await endpoints.save_transform({})
+    await endpoints.save_transform({}, robot)
 
     in_memory = robot.config.gantry_calibration
     assert len(persisted_data) == 2
@@ -166,7 +166,7 @@ async def test_transform_calculation(dc_session):
         '3': [34.87002331, 256.36103295]
     }
 
-    await endpoints.save_transform({})
+    await endpoints.save_transform({}, robot)
 
     assert np.allclose(robot.config.gantry_calibration, expected_transform)
 
@@ -406,7 +406,7 @@ async def test_set_and_jog_integration(async_client, monkeypatch):
     smoothie_axis = 'Z' if sess.current_mount == 'left' else 'A'
 
     robot.reset()
-    prior_x, prior_y, prior_z = dc.position(smoothie_axis)
+    prior_x, prior_y, prior_z = dc.position(smoothie_axis, robot)
     resp = await async_client.post(
         '/calibration/deck',
         json={
