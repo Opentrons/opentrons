@@ -411,7 +411,7 @@ const rootReducer = (state: RootState, action: any) => {
   return nextState
 }
 
-export const _allReducers = {
+export const _testExports = {
   orderedSteps,
   legacySteps,
 }

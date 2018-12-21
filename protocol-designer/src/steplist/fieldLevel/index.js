@@ -25,17 +25,17 @@ export type {
 const hydrateLabware = (state: StepFormContextualState, id: string) => {
   const labware = state.labware[id]
   return labware && {
-    id,
-    ...labware,
     ...getLabware(labware.type),
+    ...labware,
+    id,
   }
 }
 const hydratePipette = (state: StepFormContextualState, id: string) => {
   const pipette = state.pipettes[id]
   return pipette && {
-    id,
-    ...pipette,
     ...pipette.spec, // TODO: Ian 2018-12-20 don't spread this
+    ...pipette,
+    id,
   }
 }
 

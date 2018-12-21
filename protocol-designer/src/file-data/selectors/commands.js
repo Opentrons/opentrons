@@ -55,9 +55,8 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   (initialDeckSetup, labwareLiquidState) => {
     const labware = mapValues(initialDeckSetup.labware, (l: LabwareOnDeck, id: string): StepGeneration.LabwareData => ({
       type: l.type,
-      // TODO: Ian 2018-12-20 Clarify that this is 'name' is 'nickname', and get it from UI state. BUG: nickname won't save to file right now b/c of this HACK
-      name: l.type,
       slot: l.slot,
+      name: l.type, // TODO: Ian 2018-12-20 take this `name` (it's the nickname) out of RobotState - requires a little type alias refactoring
     }))
 
     // TODO: Ian 2018-12-17 pare down PipetteData type to not have shared-data fields,
