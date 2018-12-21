@@ -16,7 +16,7 @@ import type {SubstepItemData} from '../steplist/types'
 type AllSubsteps = {[StepIdType]: ?SubstepItemData}
 export const allSubsteps: Selector<AllSubsteps> = createSelector(
   stepFormSelectors.getArgsAndErrorsByStepId,
-  stepFormSelectors.getInitialDeckSetup, // TODO IMMEDIATELY more appropriate selector for just pipettes?
+  stepFormSelectors.getInitialDeckSetup,
   labwareIngredSelectors.getLabwareTypes,
   stepFormSelectors.getOrderedSteps,
   fileDataSelectors.getRobotStateTimeline,

@@ -20,7 +20,11 @@ import {
 } from '../../steplist/fieldLevel'
 
 import type {ElementProps} from 'react'
-import type {DropdownOption, Mount} from '@opentrons/components'
+import type {
+  DeckSlot,
+  DropdownOption,
+  Mount,
+} from '@opentrons/components'
 import {typeof InstrumentGroup as InstrumentGroupProps} from '@opentrons/components'
 
 import type {
@@ -37,9 +41,10 @@ import type {
 import type {
   InitialDeckSetup,
   LabwareEntities,
-  PipetteOnDeck,
-  PipetteEntities,
+  LabwareOnDeck,
   PipetteEntity,
+  PipetteEntities,
+  PipetteOnDeck,
   EditPipetteFieldsByMount,
 } from '../types'
 import type {RootState} from '../reducers'
@@ -72,7 +77,6 @@ export const getPipetteInvariantProperties: Selector<PipetteEntities> = createSe
     }, {})
 )
 
-// TODO: Ian 2018-12-14 type properly
 export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   rootSelector,
   getLabwareInvariantProperties,
@@ -85,10 +89,10 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
     const labwareLocations = (initialSetupStep && initialSetupStep.labwareLocationUpdate) || {}
     const pipetteLocations = (initialSetupStep && initialSetupStep.pipetteLocationUpdate) || {}
     return {
-      labware: mapValues(labwareLocations, (slot: string, labwareId: string) => {
+      labware: mapValues(labwareLocations, (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
         return {slot, ...labwareInvariantProperties[labwareId]}
       }),
-      pipettes: mapValues(pipetteLocations, (mount: Mount, pipetteId: string) => {
+      pipettes: mapValues(pipetteLocations, (mount: Mount, pipetteId: string): PipetteOnDeck => {
         return {mount, ...pipetteInvariantProperties[pipetteId]}
       }),
     }
@@ -111,7 +115,7 @@ function _getPipetteDisplayName (name: string): string {
   return pipetteSpecs.displayName
 }
 
-// TODO: Ian 2018-12-20 make this `getEquippedPipetteOptionsForStepId`, so it tells you
+// TODO: Ian 2018-12-20 EVENTUALLY make this `getEquippedPipetteOptionsForStepId`, so it tells you
 // equipped pipettes per step id instead of always using initial deck setup
 // (for when we support multiple deck setup steps)
 export const getEquippedPipetteOptions: Selector<Array<DropdownOption>> = createSelector(
@@ -283,8 +287,7 @@ export const getIsNewStepForm = createSelector(
     Boolean(formData && formData.id != null && !savedForms[formData.id])
 )
 
-// TODO: Ian 2018-12-17 rename for clarity: it's for unsaved form, not saved forms
-export const getFormLevelWarnings: Selector<Array<FormWarning>> = createSelector(
+export const getFormLevelWarningsForUnsavedForm: Selector<Array<FormWarning>> = createSelector(
   getUnsavedForm,
   getHydrationContext,
   (unsavedFormData, contextualState) => {

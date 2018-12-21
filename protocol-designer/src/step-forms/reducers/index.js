@@ -51,6 +51,7 @@ import type {
 
 type FormState = FormData | null
 
+const unsavedFormInitialState = null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
 type UnsavedFormActions =
   | ChangeFormInputAction
@@ -60,7 +61,7 @@ type UnsavedFormActions =
   | DeleteStepAction
   | SaveMoreOptionsModal
 const unsavedForm = (rootState: RootState, action: UnsavedFormActions): FormState => {
-  const unsavedFormState = rootState.unsavedForm
+  const unsavedFormState = rootState ? rootState.unsavedForm : unsavedFormInitialState
   switch (action.type) {
     case 'CHANGE_FORM_INPUT':
       // TODO: Ian 2018-12-13 use handleFormChange
@@ -69,10 +70,10 @@ const unsavedForm = (rootState: RootState, action: UnsavedFormActions): FormStat
         ...action.payload.update,
       }
     case 'POPULATE_FORM': return action.payload
-    case 'CANCEL_STEP_FORM': return null
-    case 'SELECT_TERMINAL_ITEM': return null
-    case 'SAVE_STEP_FORM': return null
-    case 'DELETE_STEP': return null
+    case 'CANCEL_STEP_FORM': return unsavedFormInitialState
+    case 'SELECT_TERMINAL_ITEM': return unsavedFormInitialState
+    case 'SAVE_STEP_FORM': return unsavedFormInitialState
+    case 'DELETE_STEP': return unsavedFormInitialState
     // save the modal state into the unsavedForm --
     // it was 2 levels away from savedStepForms, now it's one level away
     case 'SAVE_MORE_OPTIONS_MODAL':
@@ -93,10 +94,6 @@ const initialDeckSetupStepForm: FormData = {
     [FIXED_TRASH_ID]: '12',
   },
   pipetteLocationUpdate: {},
-}
-
-const initialSavedStepFormsState: SavedStepFormState = {
-  [INITIAL_DECK_SETUP_STEP_ID]: initialDeckSetupStepForm,
 }
 
 function _migratePreDeckSetupStep (fileData: ProtocolFile): FormData {
@@ -122,11 +119,15 @@ function _getNextAvailableSlot (labwareLocations: {[labwareId: string]: DeckSlot
   return sortedSlotnames.find(slot => !filledLocations.some(filledSlot => filledSlot === slot))
 }
 
+const initialSavedStepFormsState: SavedStepFormState = {
+  [INITIAL_DECK_SETUP_STEP_ID]: initialDeckSetupStepForm,
+}
 const savedStepForms = (
   rootState: RootState,
   action: SaveStepFormAction | DeleteStepAction | LoadFileAction | CreateContainerAction | DeleteContainerAction
 ) => {
-  const {savedStepForms} = rootState
+  const savedStepForms = rootState ? rootState.savedStepForms : initialSavedStepFormsState
+  // TODO: Ian 2018-12-20 this switch-case makes it easy to get namespace conflicts using const's, and messes up flow. Try it a different way.
   switch (action.type) {
     case 'SAVE_STEP_FORM':
       return {
@@ -152,7 +153,6 @@ const savedStepForms = (
         ...getDefaultsForStepType(stepForm.stepType),
         ...stepForm,
       }))
-    // TODO: Ian 2018-12-13 make labware creation distinct from setting labware location in deck setup
     case 'CREATE_CONTAINER':
     // auto-update initial deck setup state.
       const prevInitialDeckSetupStep = savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
@@ -273,6 +273,7 @@ const labwareInvariantProperties = handleActions({
   },
 }, initialLabwareState)
 
+const initialPipetteState = {}
 type PipetteInvariantState = {[pipetteId: string]: $Diff<PipetteEntity, {'spec': *}>}
 const pipetteInvariantProperties = handleActions({
   LOAD_FILE: (state: PipetteInvariantState, action: LoadFileAction): PipetteInvariantState => {
@@ -301,10 +302,10 @@ const pipetteInvariantProperties = handleActions({
       `pipettes in ${action.type} payload do not exist in state ${JSON.stringify(action.payload)}`)
     return merge({}, state, action.payload)
   },
-}, {})
+}, initialPipetteState)
 
 type OrderedStepsState = Array<StepIdType>
-
+const initialOrderedStepsState = []
 const orderedSteps = handleActions({
   ADD_STEP: (state: OrderedStepsState, action: AddStepAction) =>
     [...state, action.payload.id],
@@ -340,10 +341,10 @@ const orderedSteps = handleActions({
   REORDER_STEPS: (state: OrderedStepsState, action: ReorderStepsAction): OrderedStepsState => (
     action.payload.stepIds
   ),
-}, [])
+}, initialOrderedStepsState)
 
 // TODO: Ian 2018-12-19 DEPRECATED. This should be removed soon, but we need it until we
-// move to not having unsaved/pristine steps
+// move to not having "pristine" steps
 type LegacyStepsState = {[StepIdType]: StepItemData}
 const initialLegacyStepState: LegacyStepsState = {}
 const legacySteps = handleActions({
@@ -382,31 +383,32 @@ export type RootState = {
   orderedSteps: OrderedStepsState,
   labwareInvariantProperties: LabwareEntities,
   pipetteInvariantProperties: PipetteInvariantState,
+  legacySteps: LegacyStepsState,
   savedStepForms: SavedStepFormState,
   unsavedForm: FormState,
-  legacySteps: LegacyStepsState,
 }
 
-// TODO Ian 2018-12-13: find some existing util to do this nested version of combineReducers
-// which avoids: 1) duplicating specifying initial state and 2) returning a new object when there's no change
-const initialRootState: RootState = {
-  orderedSteps: [],
-  labwareInvariantProperties: initialLabwareState,
-  pipetteInvariantProperties: {},
-  savedStepForms: initialSavedStepFormsState,
-  unsavedForm: null,
-  legacySteps: initialLegacyStepState,
-}
-// TODO: Ian 2018-12-13 remove this 'any' type
-const rootReducer = (state: RootState = initialRootState, action: any) => {
-  return {
-    orderedSteps: orderedSteps(state.orderedSteps, action),
-    labwareInvariantProperties: labwareInvariantProperties(state.labwareInvariantProperties, action),
-    pipetteInvariantProperties: pipetteInvariantProperties(state.pipetteInvariantProperties, action),
+// TODO Ian 2018-12-13: find some existing util to do this
+// semi-nested version of combineReducers?
+// TODO: Ian 2018-12-13 remove this 'action: any' type
+const rootReducer = (state: RootState, action: any) => {
+  const prevStateFallback = state || {}
+  const nextState = {
+    orderedSteps: orderedSteps(prevStateFallback.orderedSteps, action),
+    labwareInvariantProperties: labwareInvariantProperties(prevStateFallback.labwareInvariantProperties, action),
+    pipetteInvariantProperties: pipetteInvariantProperties(prevStateFallback.pipetteInvariantProperties, action),
+    legacySteps: legacySteps(prevStateFallback.legacySteps, action),
+    // 'forms' reducers get full rootReducer state
     savedStepForms: savedStepForms(state, action),
     unsavedForm: unsavedForm(state, action),
-    legacySteps: legacySteps(state.legacySteps, action),
   }
+  if (state && Object.keys(nextState).every(stateKey =>
+    state[stateKey] === nextState[stateKey])
+  ) {
+    // no change
+    return state
+  }
+  return nextState
 }
 
 export const _allReducers = {

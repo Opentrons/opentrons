@@ -76,7 +76,6 @@ const tiprackOptions = [
 
 const DEFAULT_SELECTION = {pipetteModel: '', tiprackModel: null}
 
-// TODO IMMEDIATELY type this
 const pipetteDataToFormState = (pipette: ?FormattedPipette) => ({
   pipetteModel: (pipette && pipette.pipetteModel) || '',
   tiprackModel: (pipette && pipette.tiprackModel) || null,

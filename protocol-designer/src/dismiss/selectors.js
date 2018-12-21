@@ -71,7 +71,7 @@ export const getDismissedFormWarningsForSelectedStep: Selector<Array<FormWarning
 
 /** Non-dismissed form-level warnings for selected step */
 export const getFormWarningsForSelectedStep: Selector<Array<FormWarning>> = createSelector(
-  stepFormSelectors.getFormLevelWarnings,
+  stepFormSelectors.getFormLevelWarningsForUnsavedForm,
   getDismissedFormWarningsForSelectedStep,
   (warnings, dismissedWarnings) => {
     const dismissedTypesForStep = dismissedWarnings.map(dw => dw.type)
