@@ -44,7 +44,7 @@ import type {
   SaveMoreOptionsModal,
 } from '../../ui/steps/actions'
 import type {
-  UpsertPipettesAction,
+  CreatePipettesAction,
   DeletePipettesAction,
   ModifyPipettesTiprackAssignmentAction,
 } from '../actions'
@@ -60,7 +60,7 @@ type UnsavedFormActions =
   | SaveStepFormAction
   | DeleteStepAction
   | SaveMoreOptionsModal
-const unsavedForm = (rootState: RootState, action: UnsavedFormActions): FormState => {
+export const unsavedForm = (rootState: RootState, action: UnsavedFormActions): FormState => {
   const unsavedFormState = rootState ? rootState.unsavedForm : unsavedFormInitialState
   switch (action.type) {
     case 'CHANGE_FORM_INPUT':
@@ -122,7 +122,7 @@ function _getNextAvailableSlot (labwareLocations: {[labwareId: string]: DeckSlot
 const initialSavedStepFormsState: SavedStepFormState = {
   [INITIAL_DECK_SETUP_STEP_ID]: initialDeckSetupStepForm,
 }
-const savedStepForms = (
+export const savedStepForms = (
   rootState: RootState,
   action: SaveStepFormAction | DeleteStepAction | LoadFileAction | CreateContainerAction | DeleteContainerAction
 ) => {
@@ -255,7 +255,7 @@ const initialLabwareState: LabwareEntities = {
 }
 
 // MIGRATION NOTE: copied from `containers` reducer. Slot + UI stuff stripped out.
-const labwareInvariantProperties = handleActions({
+export const labwareInvariantProperties = handleActions({
   CREATE_CONTAINER: (state: LabwareEntities, action: CreateContainerAction) => {
     return {
       ...state,
@@ -275,7 +275,7 @@ const labwareInvariantProperties = handleActions({
 
 const initialPipetteState = {}
 type PipetteInvariantState = {[pipetteId: string]: $Diff<PipetteEntity, {'spec': *}>}
-const pipetteInvariantProperties = handleActions({
+export const pipetteInvariantProperties = handleActions({
   LOAD_FILE: (state: PipetteInvariantState, action: LoadFileAction): PipetteInvariantState => {
     const metadata = getPDMetadata(action.payload)
     return mapValues(action.payload.pipettes, (filePipette: FilePipette, pipetteId: string): $Values<PipetteInvariantState> => {
@@ -287,7 +287,7 @@ const pipetteInvariantProperties = handleActions({
       }
     })
   },
-  UPSERT_PIPETTES: (state: PipetteInvariantState, action: UpsertPipettesAction): PipetteInvariantState => {
+  CREATE_PIPETTES: (state: PipetteInvariantState, action: CreatePipettesAction): PipetteInvariantState => {
     return {
       ...state,
       ...action.payload,
@@ -306,7 +306,7 @@ const pipetteInvariantProperties = handleActions({
 
 type OrderedStepsState = Array<StepIdType>
 const initialOrderedStepsState = []
-const orderedSteps = handleActions({
+export const orderedSteps = handleActions({
   ADD_STEP: (state: OrderedStepsState, action: AddStepAction) =>
     [...state, action.payload.id],
   DELETE_STEP: (state: OrderedStepsState, action: DeleteStepAction) =>
@@ -347,7 +347,7 @@ const orderedSteps = handleActions({
 // move to not having "pristine" steps
 type LegacyStepsState = {[StepIdType]: StepItemData}
 const initialLegacyStepState: LegacyStepsState = {}
-const legacySteps = handleActions({
+export const legacySteps = handleActions({
   ADD_STEP: (state, action: AddStepAction): LegacyStepsState => ({
     ...state,
     [action.payload.id]: action.payload,
@@ -409,11 +409,6 @@ const rootReducer = (state: RootState, action: any) => {
     return state
   }
   return nextState
-}
-
-export const _testExports = {
-  orderedSteps,
-  legacySteps,
 }
 
 export default rootReducer

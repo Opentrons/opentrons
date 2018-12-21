@@ -1,7 +1,5 @@
 // @flow
-import {_testExports} from '../reducers'
-
-const {legacySteps: steps, orderedSteps} = _testExports
+import {legacySteps as steps, orderedSteps} from '../reducers'
 
 describe('steps reducer', () => {
   test('initial add step', () => {

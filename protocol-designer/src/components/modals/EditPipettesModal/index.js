@@ -260,7 +260,7 @@ const mergeProps = (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>},
       }
     })
 
-    dispatch(stepFormActions.upsertPipettes(
+    dispatch(stepFormActions.createPipettes(
       mapValues(nextPipettes, (p: $Values<typeof nextPipettes>) =>
         ({name: p.name, tiprackModel: p.tiprackModel}))))
 
