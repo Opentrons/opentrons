@@ -1,5 +1,5 @@
 // @flow
-import * as React from 'react'
+import type {ElementProps} from 'react'
 import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
 import mapValues from 'lodash/mapValues'
@@ -18,7 +18,11 @@ import type {PipetteOnDeck} from '../step-forms'
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(NewFileModal)
 
-type Props = React.ElementProps<typeof NewFileModal>
+type Props = ElementProps<typeof NewFileModal>
+
+type OP = {
+  useProtocolFields: $PropertyType<Props, 'useProtocolFields'>,
+}
 
 type SP = {
   hideModal: $PropertyType<Props, 'hideModal'>,
@@ -53,7 +57,7 @@ function mapDispatchToProps (dispatch: Dispatch<*>): DP {
       dispatch(steplistActions.changeSavedStepForm({
         stepId: INITIAL_DECK_SETUP_STEP_ID,
         update: {
-          pipetteLocationUpdate: mapValues(pipettesById, (p: $Values<typeof pipettesById>) => p.mount), // TODO IMMEDIATELY check type checked or blue
+          pipetteLocationUpdate: mapValues(pipettesById, (p: $Values<typeof pipettesById>) => p.mount),
         },
       }))
 
@@ -67,8 +71,9 @@ function mapDispatchToProps (dispatch: Dispatch<*>): DP {
   }
 }
 
-function mergeProps (stateProps: SP, dispatchProps: DP): Props {
+function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   return {
+    ...ownProps,
     hideModal: stateProps.hideModal,
     onCancel: dispatchProps.onCancel,
     onSave: (fields) => {

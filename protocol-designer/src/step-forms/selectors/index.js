@@ -45,7 +45,7 @@ import type {
   PipetteEntity,
   PipetteEntities,
   PipetteOnDeck,
-  EditPipetteFieldsByMount,
+  FormPipettesByMount,
 } from '../types'
 import type {RootState} from '../reducers'
 import type {BaseState, Selector} from '../../types'
@@ -154,16 +154,16 @@ export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup>
   }, {})
 )
 
-export const getPipettesForEditPipetteForm: Selector<EditPipetteFieldsByMount> = createSelector(
+export const getPipettesForEditPipetteForm: Selector<FormPipettesByMount> = createSelector(
   getInitialDeckSetup,
-  (initialDeckSetup) => reduce(initialDeckSetup.pipettes, (acc: EditPipetteFieldsByMount, pipetteOnDeck: PipetteOnDeck, id): EditPipetteFieldsByMount => {
+  (initialDeckSetup) => reduce(initialDeckSetup.pipettes, (acc: FormPipettesByMount, pipetteOnDeck: PipetteOnDeck, id): FormPipettesByMount => {
     const pipetteSpec = getPipetteNameSpecs(pipetteOnDeck.name)
     const tiprackSpec = getLabware(pipetteOnDeck.tiprackModel)
 
     if (!pipetteSpec || !tiprackSpec) return acc
 
     const pipetteForInstrumentGroup = {
-      pipetteModel: pipetteOnDeck.name,
+      pipetteName: pipetteOnDeck.name,
       tiprackModel: tiprackSpec.metadata.name,
     }
 
@@ -171,7 +171,7 @@ export const getPipettesForEditPipetteForm: Selector<EditPipetteFieldsByMount> =
       ...acc,
       [pipetteOnDeck.mount]: pipetteForInstrumentGroup,
     }
-  }, {left: null, right: null})
+  }, {left: {pipetteName: null, tiprackModel: null}, right: {pipetteName: null, tiprackModel: null}})
 )
 
 export const getUnsavedForm: Selector<?FormData> = createSelector(

@@ -30,7 +30,7 @@ export default function ProtocolEditor () {
 
           <div className={styles.main_page_content}>
             <AnalyticsModal />
-            <ConnectedNewFileModal />
+            <ConnectedNewFileModal useProtocolFields />
             <FileUploadErrorModal />
             {/* TODO: Ian 2018-06-28 All main page modals will go here */}
             <MainPageModalPortalRoot />
