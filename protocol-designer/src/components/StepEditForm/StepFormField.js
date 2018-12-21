@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {actions, selectors} from '../../steplist'
+import {actions} from '../../steplist'
+import {selectors as stepFormSelectors} from '../../step-forms'
 import {getFieldErrors, processField} from '../../steplist/fieldLevel'
 import getTooltipForField from './getTooltipForField'
 import {HoverTooltip, type HoverTooltipHandlers} from '@opentrons/components'
@@ -57,7 +58,7 @@ export const showFieldErrors = ({name, focusedField, dirtyFields}: ShowFieldErro
 )
 
 const STP = (state: BaseState, ownProps: OP): SP => {
-  const formData = selectors.getUnsavedForm(state)
+  const formData = stepFormSelectors.getUnsavedForm(state)
   return {
     value: formData ? formData[ownProps.name] : null,
     stepType: formData ? formData.stepType : null,

@@ -1,7 +1,5 @@
 // @flow
-import {_allReducers} from '../reducers.js'
-
-const {steps, orderedSteps} = _allReducers
+import {legacySteps as steps, orderedSteps} from '../reducers'
 
 describe('steps reducer', () => {
   test('initial add step', () => {
@@ -15,7 +13,6 @@ describe('steps reducer', () => {
       '123': {
         id: '123',
         stepType: 'transfer',
-        title: 'transfer', // title gets added
       },
     })
   })
@@ -25,7 +22,6 @@ describe('steps reducer', () => {
       '333': {
         id: '333',
         stepType: 'mix',
-        title: 'mix',
       },
     }
     const action = {
@@ -37,12 +33,10 @@ describe('steps reducer', () => {
       '333': {
         id: '333',
         stepType: 'mix',
-        title: 'mix',
       },
       '123': {
         id: '123',
         stepType: 'transfer',
-        title: 'transfer',
       },
     })
   })

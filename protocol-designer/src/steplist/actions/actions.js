@@ -1,7 +1,7 @@
 // @flow
 import type {Dispatch} from 'redux'
 
-import {selectors} from '../index'
+import {selectors as stepFormSelectors} from '../../step-forms'
 import {selectors as stepsSelectors} from '../../ui/steps'
 import type {StepType, StepIdType, FormData} from '../../form-types'
 import type {ChangeFormPayload, ChangeSavedFormPayload} from './types'
@@ -17,7 +17,7 @@ export const changeSavedStepForm = (payload: ChangeSavedFormPayload) => ({
 export type ChangeFormInputAction = {type: 'CHANGE_FORM_INPUT', payload: ChangeFormPayload}
 export const changeFormInput = (payload: ChangeFormPayload) =>
   (dispatch: ThunkDispatch<ChangeFormInputAction>, getState: GetState) => {
-    const unsavedForm = selectors.getUnsavedForm(getState())
+    const unsavedForm = stepFormSelectors.getUnsavedForm(getState())
     dispatch({
       type: 'CHANGE_FORM_INPUT',
       payload: handleFormChange(payload, unsavedForm, getState),
@@ -46,7 +46,7 @@ export const saveStepForm = () =>
     if (stepsSelectors.getCurrentFormCanBeSaved(state)) {
       dispatch({
         type: 'SAVE_STEP_FORM',
-        payload: selectors.getUnsavedForm(state),
+        payload: stepFormSelectors.getUnsavedForm(state),
       })
     }
   }

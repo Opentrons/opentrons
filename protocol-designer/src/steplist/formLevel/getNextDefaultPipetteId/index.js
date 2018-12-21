@@ -1,7 +1,7 @@
 // @flow
 import findKey from 'lodash/findKey'
 import last from 'lodash/last'
-import type {PipetteData} from '../../../step-generation'
+import type {PipetteOnDeck} from '../../../step-forms'
 import type {StepIdType, FormData} from '../../../form-types'
 
 // TODO: Ian 2018-09-18 once we support switching pipettes mid-protocol,
@@ -13,7 +13,7 @@ import type {StepIdType, FormData} from '../../../form-types'
 export default function getNextDefaultPipetteId (
   savedForms: {[StepIdType]: FormData},
   orderedSteps: Array<StepIdType>,
-  equippedPipettesById: {[string]: PipetteData}
+  equippedPipettesById: {[pipetteId: string]: PipetteOnDeck}
 ): string {
   const prevPipetteSteps = orderedSteps
     .map(stepId => savedForms[stepId])

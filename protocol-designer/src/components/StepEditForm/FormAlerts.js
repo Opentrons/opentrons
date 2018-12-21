@@ -6,8 +6,8 @@ import {AlertItem} from '@opentrons/components'
 import {actions as dismissActions, selectors as dismissSelectors} from '../../dismiss'
 import {getVisibleAlerts} from './helpers'
 import type {StepIdType} from '../../form-types'
-import {selectors as steplistSelectors} from '../../steplist'
 import {selectors as stepsSelectors} from '../../ui/steps'
+import {selectors as stepFormSelectors} from '../../step-forms'
 import type {StepFieldName} from '../../steplist/fieldLevel'
 import type {FormError, FormWarning} from '../../steplist/formLevel'
 import type {BaseState} from '../../types'
@@ -70,7 +70,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
     alerts: dismissSelectors.getFormWarningsForSelectedStep(state),
   })
 
-  const errors = steplistSelectors.getFormLevelErrors(state)
+  const errors = stepFormSelectors.getFormLevelErrors(state)
   const filteredErrors = getVisibleAlerts({
     focusedField,
     dirtyFields,

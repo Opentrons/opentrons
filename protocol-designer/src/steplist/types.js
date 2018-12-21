@@ -7,7 +7,7 @@ import type {
   StepType,
   TransferLikeStepType,
 } from '../form-types'
-import type {BaseState} from '../types'
+import type {LabwareEntities, PipetteEntities} from '../step-forms'
 import type {FormError} from './formLevel/errors'
 
 // timeline start and end
@@ -102,6 +102,6 @@ export type StepArgsAndErrors = {
 }
 
 export type StepFormContextualState = {
-  labwareIngred: $PropertyType<BaseState, 'labwareIngred'>,
-  pipettes: $PropertyType<BaseState, 'pipettes'>,
+  labware: LabwareEntities,
+  pipettes: PipetteEntities,
 }

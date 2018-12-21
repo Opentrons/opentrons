@@ -7,7 +7,7 @@ import type {BaseState, ThunkDispatch} from '../types'
 import type {SubstepIdentifier} from '../steplist/types'
 import * as substepSelectors from '../top-selectors/substeps'
 import {selectors as dismissSelectors} from '../dismiss'
-import {selectors as steplistSelectors} from '../steplist'
+import {selectors as stepFormSelectors} from '../step-forms'
 import {selectors as stepsSelectors, actions as stepsActions} from '../ui/steps'
 import {selectors as fileDataSelectors} from '../file-data'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
@@ -35,13 +35,13 @@ type DP = $Diff<$Diff<Props, SP>, OP>
 
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {stepId} = ownProps
-  const allSteps = steplistSelectors.getAllSteps(state)
+  const allSteps = stepFormSelectors.getAllSteps(state)
 
   const hoveredSubstep = stepsSelectors.getHoveredSubstep(state)
   const hoveredStep = stepsSelectors.getHoveredStepId(state)
   const selected = stepsSelectors.getSelectedStepId(state) === stepId
   const collapsed = stepsSelectors.getCollapsedSteps(state)[stepId]
-  const formAndFieldErrors = steplistSelectors.getFormAndFieldErrorsByStepId(state)[stepId]
+  const formAndFieldErrors = stepFormSelectors.getFormAndFieldErrorsByStepId(state)[stepId]
   const hasError = fileDataSelectors.getErrorStepId(state) === stepId || !isEmpty(formAndFieldErrors)
   const warnings = (typeof stepId === 'number') // TODO: Ian 2018-07-13 remove when stepId always number
     ? dismissSelectors.getTimelineWarningsPerStep(state)[stepId]

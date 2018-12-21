@@ -5,15 +5,14 @@ import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import takeWhile from 'lodash/takeWhile'
 import uniqBy from 'lodash/uniqBy'
-import { getIsTiprack } from '@opentrons/shared-data'
+import {getIsTiprack, getPipetteNameSpecs} from '@opentrons/shared-data'
 import type {BaseState, Selector} from '../../types'
 import {getAllWellsForLabware} from '../../constants'
 import * as StepGeneration from '../../step-generation'
-import {selectors as steplistSelectors} from '../../steplist'
-import {selectors as pipetteSelectors} from '../../pipettes'
+import {selectors as stepFormSelectors} from '../../step-forms'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
-import type {Labware} from '../../labware-ingred/types'
 import type {StepIdType} from '../../form-types'
+import type {LabwareOnDeck, PipetteOnDeck} from '../../step-forms'
 
 const all96Tips = reduce(
   StepGeneration.tiprackWellNamesFlat,
@@ -48,25 +47,35 @@ export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> 
   }
 )
 
-function labwareConverter (labwareAppState: {[labwareId: string]: ?Labware}): {[labwareId: string]: StepGeneration.LabwareData} {
-  // Convert internal PD labware objects into JSON spec labware objects
-  // (just removes keys & makes flow happy)
-  return mapValues(labwareAppState, (l: Labware): StepGeneration.LabwareData => ({
-    name: l.name,
-    type: l.type,
-    slot: l.slot,
-  }))
-}
-
+type TipState = $PropertyType<StepGeneration.RobotState, 'tipState'>
+type TiprackTipState = $PropertyType<TipState, 'tipracks'>
 export const getInitialRobotState: BaseState => StepGeneration.RobotState = createSelector(
-  pipetteSelectors.getEquippedPipettes,
-  labwareIngredSelectors.getLabwareById,
+  stepFormSelectors.getInitialDeckSetup,
   getLabwareLiquidState,
-  (pipettes, labwareAppState, labwareLiquidState) => {
-    type TipState = $PropertyType<StepGeneration.RobotState, 'tipState'>
-    type TiprackTipState = $PropertyType<TipState, 'tipracks'>
+  (initialDeckSetup, labwareLiquidState) => {
+    const labware = mapValues(initialDeckSetup.labware, (l: LabwareOnDeck, id: string): StepGeneration.LabwareData => ({
+      type: l.type,
+      slot: l.slot,
+      name: l.type, // TODO: Ian 2018-12-20 take this `name` (it's the nickname) out of RobotState - requires a little type alias refactoring
+    }))
 
-    const labware = labwareConverter(labwareAppState)
+    // TODO: Ian 2018-12-17 pare down PipetteData type to not have shared-data fields,
+    // then you can skip this conversion here:
+    const pipettes = mapValues(initialDeckSetup.pipettes, (p: PipetteOnDeck, id: string): StepGeneration.PipetteData => {
+      const pipetteSpecs = getPipetteNameSpecs(p.name)
+      if (!pipetteSpecs) {
+        // this should never happen this far along
+        throw new Error(`no pipette spec for ${p && p.name}`)
+      }
+      return {
+        id: id,
+        mount: p.mount,
+        model: p.name, // TODO Ian 2018-11-05 rename 'model' to 'name' when breaking change is made in JSON protocols
+        maxVolume: pipetteSpecs.maxVolume,
+        channels: pipetteSpecs.channels,
+        tiprackModel: p.tiprackModel,
+      }
+    })
 
     const tipracks: TiprackTipState = reduce(
       labware,
@@ -134,8 +143,8 @@ function compoundCommandCreatorFromStepArgs (stepArgs: StepGeneration.CommandCre
 
 // exposes errors and last valid robotState
 export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSelector(
-  steplistSelectors.getArgsAndErrorsByStepId,
-  steplistSelectors.getOrderedSteps,
+  stepFormSelectors.getArgsAndErrorsByStepId,
+  stepFormSelectors.getOrderedSteps,
   getInitialRobotState,
   (allStepArgsAndErrors, orderedSteps, initialRobotState) => {
     const allStepArgs: Array<StepGeneration.CommandCreatorData | null> = orderedSteps.map(stepId => {
@@ -198,7 +207,7 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
 
 type WarningsPerStep = {[stepId: number | string]: ?Array<StepGeneration.CommandCreatorWarning>}
 export const timelineWarningsPerStep: Selector<WarningsPerStep> = createSelector(
-  steplistSelectors.getOrderedSteps,
+  stepFormSelectors.getOrderedSteps,
   getRobotStateTimeline,
   (orderedSteps, timeline) => timeline.timeline.reduce((acc: WarningsPerStep, frame, timelineIndex) => {
     const stepId = orderedSteps[timelineIndex]
@@ -212,7 +221,7 @@ export const timelineWarningsPerStep: Selector<WarningsPerStep> = createSelector
 )
 
 export const getErrorStepId: Selector<?StepIdType> = createSelector(
-  steplistSelectors.getOrderedSteps,
+  stepFormSelectors.getOrderedSteps,
   getRobotStateTimeline,
   (orderedSteps, timeline) => {
     const hasErrors = timeline.errors && timeline.errors.length > 0

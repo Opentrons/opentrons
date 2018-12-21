@@ -20,7 +20,7 @@ import {cancelStepForm} from '../../steplist/actions'
 
 import {getChangeLabwareEffects} from '../../steplist/actions/handleFormChange'
 
-import type {PipetteEntities, LabwareEntities} from '../types'
+import type {PipetteEntity, LabwareEntities} from '../types'
 import type {LoadFileAction} from '../../load-file'
 import type {
   CreateContainerAction,
@@ -39,6 +39,7 @@ import type {
   ReorderStepsAction,
   SaveStepFormAction,
 } from '../../steplist/actions'
+import type {StepItemData} from '../../steplist/types'
 import type {
   SaveMoreOptionsModal,
 } from '../../ui/steps/actions'
@@ -50,7 +51,7 @@ import type {
 
 type FormState = FormData | null
 
-// TODO Ian 2018-12-13 replace the other unsavedForm reducer with this new one
+const unsavedFormInitialState = null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
 type UnsavedFormActions =
   | ChangeFormInputAction
@@ -59,8 +60,8 @@ type UnsavedFormActions =
   | SaveStepFormAction
   | DeleteStepAction
   | SaveMoreOptionsModal
-const unsavedForm = (rootState: RootState, action: UnsavedFormActions): FormState => {
-  const unsavedFormState = rootState.unsavedForm
+export const unsavedForm = (rootState: RootState, action: UnsavedFormActions): FormState => {
+  const unsavedFormState = rootState ? rootState.unsavedForm : unsavedFormInitialState
   switch (action.type) {
     case 'CHANGE_FORM_INPUT':
       // TODO: Ian 2018-12-13 use handleFormChange
@@ -69,10 +70,10 @@ const unsavedForm = (rootState: RootState, action: UnsavedFormActions): FormStat
         ...action.payload.update,
       }
     case 'POPULATE_FORM': return action.payload
-    case 'CANCEL_STEP_FORM': return null
-    case 'SELECT_TERMINAL_ITEM': return null
-    case 'SAVE_STEP_FORM': return null
-    case 'DELETE_STEP': return null
+    case 'CANCEL_STEP_FORM': return unsavedFormInitialState
+    case 'SELECT_TERMINAL_ITEM': return unsavedFormInitialState
+    case 'SAVE_STEP_FORM': return unsavedFormInitialState
+    case 'DELETE_STEP': return unsavedFormInitialState
     // save the modal state into the unsavedForm --
     // it was 2 levels away from savedStepForms, now it's one level away
     case 'SAVE_MORE_OPTIONS_MODAL':
@@ -93,10 +94,6 @@ const initialDeckSetupStepForm: FormData = {
     [FIXED_TRASH_ID]: '12',
   },
   pipetteLocationUpdate: {},
-}
-
-const initialSavedStepFormsState: SavedStepFormState = {
-  [INITIAL_DECK_SETUP_STEP_ID]: initialDeckSetupStepForm,
 }
 
 function _migratePreDeckSetupStep (fileData: ProtocolFile): FormData {
@@ -122,12 +119,15 @@ function _getNextAvailableSlot (labwareLocations: {[labwareId: string]: DeckSlot
   return sortedSlotnames.find(slot => !filledLocations.some(filledSlot => filledSlot === slot))
 }
 
-// TODO Ian 2018-12-13 replace the other savedStepForms with this new one
-const savedStepForms = (
+const initialSavedStepFormsState: SavedStepFormState = {
+  [INITIAL_DECK_SETUP_STEP_ID]: initialDeckSetupStepForm,
+}
+export const savedStepForms = (
   rootState: RootState,
   action: SaveStepFormAction | DeleteStepAction | LoadFileAction | CreateContainerAction | DeleteContainerAction
 ) => {
-  const {savedStepForms} = rootState
+  const savedStepForms = rootState ? rootState.savedStepForms : initialSavedStepFormsState
+  // TODO: Ian 2018-12-20 this switch-case makes it easy to get namespace conflicts using const's, and messes up flow. Try it a different way.
   switch (action.type) {
     case 'SAVE_STEP_FORM':
       return {
@@ -153,7 +153,6 @@ const savedStepForms = (
         ...getDefaultsForStepType(stepForm.stepType),
         ...stepForm,
       }))
-    // TODO: Ian 2018-12-13 make labware creation distinct from setting labware location in deck setup
     case 'CREATE_CONTAINER':
     // auto-update initial deck setup state.
       const prevInitialDeckSetupStep = savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
@@ -256,7 +255,7 @@ const initialLabwareState: LabwareEntities = {
 }
 
 // MIGRATION NOTE: copied from `containers` reducer. Slot + UI stuff stripped out.
-const labwareInvariantProperties = handleActions({
+export const labwareInvariantProperties = handleActions({
   CREATE_CONTAINER: (state: LabwareEntities, action: CreateContainerAction) => {
     return {
       ...state,
@@ -274,10 +273,12 @@ const labwareInvariantProperties = handleActions({
   },
 }, initialLabwareState)
 
-const pipetteInvariantProperties = handleActions({
-  LOAD_FILE: (state: PipetteEntities, action: LoadFileAction): PipetteEntities => {
+const initialPipetteState = {}
+type PipetteInvariantState = {[pipetteId: string]: $Diff<PipetteEntity, {'spec': *}>}
+export const pipetteInvariantProperties = handleActions({
+  LOAD_FILE: (state: PipetteInvariantState, action: LoadFileAction): PipetteInvariantState => {
     const metadata = getPDMetadata(action.payload)
-    return mapValues(action.payload.pipettes, (filePipette: FilePipette, pipetteId: string): $Values<PipetteEntities> => {
+    return mapValues(action.payload.pipettes, (filePipette: FilePipette, pipetteId: string): $Values<PipetteInvariantState> => {
       const tiprackModel = metadata.pipetteTiprackAssignments[pipetteId]
       assert(tiprackModel, `expected tiprackModel in file metadata for pipette ${pipetteId}`)
       return {
@@ -286,28 +287,26 @@ const pipetteInvariantProperties = handleActions({
       }
     })
   },
-  CREATE_PIPETTES: (state: PipetteEntities, action: CreatePipettesAction): PipetteEntities => {
+  CREATE_PIPETTES: (state: PipetteInvariantState, action: CreatePipettesAction): PipetteInvariantState => {
     return {
       ...state,
       ...action.payload,
     }
   },
-  DELETE_PIPETTES: (state: PipetteEntities, action: DeletePipettesAction): PipetteEntities => {
+  DELETE_PIPETTES: (state: PipetteInvariantState, action: DeletePipettesAction): PipetteInvariantState => {
     return omit(state, action.payload)
   },
-  MODIFY_PIPETTES_TIPRACK_ASSIGNMENT: (state: PipetteEntities, action: ModifyPipettesTiprackAssignmentAction): PipetteEntities => {
+  MODIFY_PIPETTES_TIPRACK_ASSIGNMENT: (state: PipetteInvariantState, action: ModifyPipettesTiprackAssignmentAction): PipetteInvariantState => {
     assert(
       Object.keys(action.payload).forEach(pipetteId => pipetteId in state),
       `pipettes in ${action.type} payload do not exist in state ${JSON.stringify(action.payload)}`)
     return merge({}, state, action.payload)
   },
-}, {})
+}, initialPipetteState)
 
-// TODO: Ian 2018-12-17 remove the old orderedSteps + OrderedStepsState in steplist/reducers
-// which this was copy-pasted from
-export type OrderedStepsState = Array<StepIdType>
-
-const orderedSteps = handleActions({
+type OrderedStepsState = Array<StepIdType>
+const initialOrderedStepsState = []
+export const orderedSteps = handleActions({
   ADD_STEP: (state: OrderedStepsState, action: AddStepAction) =>
     [...state, action.payload.id],
   DELETE_STEP: (state: OrderedStepsState, action: DeleteStepAction) =>
@@ -342,34 +341,74 @@ const orderedSteps = handleActions({
   REORDER_STEPS: (state: OrderedStepsState, action: ReorderStepsAction): OrderedStepsState => (
     action.payload.stepIds
   ),
-}, [])
+}, initialOrderedStepsState)
+
+// TODO: Ian 2018-12-19 DEPRECATED. This should be removed soon, but we need it until we
+// move to not having "pristine" steps
+type LegacyStepsState = {[StepIdType]: StepItemData}
+const initialLegacyStepState: LegacyStepsState = {}
+export const legacySteps = handleActions({
+  ADD_STEP: (state, action: AddStepAction): LegacyStepsState => ({
+    ...state,
+    [action.payload.id]: action.payload,
+  }),
+  DELETE_STEP: (state, action: DeleteStepAction) => omit(state, action.payload.toString()),
+  LOAD_FILE: (state: LegacyStepsState, action: LoadFileAction): LegacyStepsState => {
+    const {savedStepForms, orderedSteps} = getPDMetadata(action.payload)
+    return orderedSteps.reduce((acc: LegacyStepsState, stepId) => {
+      const stepForm = savedStepForms[stepId]
+      if (!stepForm) {
+        console.warn(`Step id ${stepId} found in orderedSteps but not in savedStepForms`)
+        return acc
+      }
+      return {
+        ...acc,
+        [stepId]: {
+          id: stepId,
+          stepType: stepForm.stepType,
+        },
+      }
+    }, {...initialLegacyStepState})
+  },
+  DUPLICATE_STEP: (state: LegacyStepsState, action: DuplicateStepAction): LegacyStepsState => ({
+    ...state,
+    [action.payload.duplicateStepId]: {
+      ...(action.payload.stepId != null ? state[action.payload.stepId] : {}),
+      id: action.payload.duplicateStepId,
+    },
+  }),
+}, initialLegacyStepState)
 
 export type RootState = {
   orderedSteps: OrderedStepsState,
   labwareInvariantProperties: LabwareEntities,
-  pipetteInvariantProperties: PipetteEntities,
+  pipetteInvariantProperties: PipetteInvariantState,
+  legacySteps: LegacyStepsState,
   savedStepForms: SavedStepFormState,
   unsavedForm: FormState,
 }
 
-// TODO Ian 2018-12-13: find some existing util to do this nested version of combineReducers
-// which avoids: 1) duplicating specifying initial state and 2) returning a new object when there's no change
-const initialRootState: RootState = {
-  orderedSteps: [],
-  labwareInvariantProperties: initialLabwareState,
-  pipetteInvariantProperties: {},
-  savedStepForms: initialSavedStepFormsState,
-  unsavedForm: null,
-}
-// TODO: Ian 2018-12-13 remove this 'any' type
-const rootReducer = (state: RootState = initialRootState, action: any) => {
-  return {
-    orderedSteps: orderedSteps(state.orderedSteps, action),
-    labwareInvariantProperties: labwareInvariantProperties(state.labwareInvariantProperties, action),
-    pipetteInvariantProperties: pipetteInvariantProperties(state.pipetteInvariantProperties, action),
+// TODO Ian 2018-12-13: find some existing util to do this
+// semi-nested version of combineReducers?
+// TODO: Ian 2018-12-13 remove this 'action: any' type
+const rootReducer = (state: RootState, action: any) => {
+  const prevStateFallback = state || {}
+  const nextState = {
+    orderedSteps: orderedSteps(prevStateFallback.orderedSteps, action),
+    labwareInvariantProperties: labwareInvariantProperties(prevStateFallback.labwareInvariantProperties, action),
+    pipetteInvariantProperties: pipetteInvariantProperties(prevStateFallback.pipetteInvariantProperties, action),
+    legacySteps: legacySteps(prevStateFallback.legacySteps, action),
+    // 'forms' reducers get full rootReducer state
     savedStepForms: savedStepForms(state, action),
     unsavedForm: unsavedForm(state, action),
   }
+  if (state && Object.keys(nextState).every(stateKey =>
+    state[stateKey] === nextState[stateKey])
+  ) {
+    // no change
+    return state
+  }
+  return nextState
 }
 
 export default rootReducer
