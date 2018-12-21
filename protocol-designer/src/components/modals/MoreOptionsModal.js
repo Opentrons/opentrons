@@ -8,6 +8,7 @@ import {
   Modal,
 } from '@opentrons/components'
 
+import i18n from '../../localization'
 import {actions as steplistActions} from '../../steplist'
 import type {StepFieldName} from '../../steplist/fieldLevel'
 import type {FormData} from '../../form-types'
@@ -47,12 +48,12 @@ class MoreOptionsModal extends React.Component<Props, State> {
         className={modalStyles.modal}
         contentsClassName={modalStyles.modal_contents}>
         <div>
-          <FormGroup label='Step Name' className={styles.column_1_2}>
+          <FormGroup label={i18n.t('form.step_edit_form.field.step_name.label')} className={styles.column_1_2}>
             <InputField
               onChange={this.makeHandleChange('stepName')}
               value={String(this.state.stepName)} />
           </FormGroup>
-          <FormGroup label='Step Notes' className={styles.column_1_2}>
+          <FormGroup label={i18n.t('form.step_edit_form.field.step_notes.label')} className={styles.column_1_2}>
             {/* TODO: need textarea input in component library for big text boxes. */}
             <textarea
               className={styles.big_text_box}
@@ -60,8 +61,8 @@ class MoreOptionsModal extends React.Component<Props, State> {
               value={this.state.stepDetails} />
           </FormGroup>
           <div className={styles.button_row}>
-            <FlatButton onClick={this.props.close}>CANCEL</FlatButton>
-            <FlatButton onClick={this.handleSave}>SAVE</FlatButton>
+            <FlatButton onClick={this.props.close}>{i18n.t('button.cancel')}</FlatButton>
+            <FlatButton onClick={this.handleSave}>{i18n.t('button.save')}</FlatButton>
           </div>
         </div>
       </Modal>
