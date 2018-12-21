@@ -42,7 +42,7 @@ type State = EditPipettesFields & {isWarningModalOpen: boolean}
 
 type FormattedPipette = {
   pipetteModel: string,
-  tiprackModel: string,
+  tiprackModel: ?string,
 }
 
 type Props = {
@@ -96,7 +96,12 @@ class EditPipettesModal extends React.Component<Props, State> {
     const value: string = e.target.value
     let nextMountState = {[fieldName]: value}
     if (fieldName === 'pipetteModel') nextMountState = {...nextMountState, tiprackModel: null}
-    this.setState({[mount]: {...this.state[mount], ...nextMountState}})
+    this.setState({
+      pipettesByMount: {
+        ...this.state.pipettesByMount,
+        [mount]: nextMountState,
+      },
+    })
   }
 
   handleSubmit = () => {

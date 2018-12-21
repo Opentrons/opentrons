@@ -1,4 +1,6 @@
 // @flow
+import mapValues from 'lodash/mapValues'
+import pick from 'lodash/pick'
 
 export type CreatePipettesAction = {
   type: 'CREATE_PIPETTES',
@@ -10,10 +12,14 @@ export type CreatePipettesAction = {
   },
 }
 
-export const createPipettes = (payload: $PropertyType<CreatePipettesAction, 'payload'>): CreatePipettesAction => ({
-  type: 'CREATE_PIPETTES',
-  payload,
-})
+export const createPipettes = (arg: $PropertyType<CreatePipettesAction, 'payload'>): CreatePipettesAction => {
+  // for convenience of caller, strip out 'mount' etc
+  const payload = mapValues(arg, (pipette) => pick(pipette, ['name', 'tiprackModel']))
+  return {
+    type: 'CREATE_PIPETTES',
+    payload,
+  }
+}
 
 export type DeletePipettesAction = {
   type: 'DELETE_PIPETTES',

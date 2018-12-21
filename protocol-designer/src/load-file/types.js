@@ -10,26 +10,16 @@ export type FileError = {
     message?: string,
   } | null
 
-export type PipetteFields = {
+export type PipetteFields = { // TOOD IMMEDIATELY deprecate???
   pipetteModel: string,
-  tiprackModel: ?string,
+  tiprackModel: string,
 }
 
 export type NewProtocolFields = {|
   name: ?string,
-  left: PipetteFields,
-  right: PipetteFields,
 |}
 
 export type LoadFileAction = {
   type: 'LOAD_FILE',
   payload: ProtocolFile,
-}
-
-export type CreateNewProtocolAction = {
-  type: 'CREATE_NEW_PROTOCOL',
-  payload: {
-    ...NewProtocolFields,
-    tipracks: Array<{id: string, model: string}>,
-  },
 }

@@ -12,10 +12,9 @@ import {actions as fileActions, selectors as loadFileSelectors} from '../load-fi
 import * as labwareIngredActions from '../labware-ingred/actions'
 import {actions as stepFormActions} from '../step-forms'
 import {actions as steplistActions} from '../steplist'
-import type {BaseState} from '../types'
-import type {NewProtocolFields} from '../load-file'
-
 import NewFileModal from '../components/modals/NewFileModal'
+import type {BaseState} from '../types'
+import type {PipetteOnDeck} from '../step-forms'
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(NewFileModal)
 
@@ -27,7 +26,7 @@ type SP = {
 }
 type DP = {
   onCancel: () => mixed,
-  _createNewProtocol: (NewProtocolFields) => mixed,
+  _createNewProtocol: $PropertyType<Props, 'onSave'>,
 }
 
 function mapStateToProps (state: BaseState): SP {
@@ -40,45 +39,26 @@ function mapStateToProps (state: BaseState): SP {
 function mapDispatchToProps (dispatch: Dispatch<*>): DP {
   return {
     onCancel: () => dispatch(navigationActions.toggleNewProtocolModal(false)),
-    _createNewProtocol: fields => {
-      dispatch(fileActions.createNewProtocol(fields))
-      // TODO: Ian 2018-12-17 after old rerefactor, change NewProtocolFields type
-      // to have `{pipettes: {[pipetteId: string]: {name: string, tiprackModel: string, mount: Mount}}`
-      // instead of left/right keys
-      type PipettesWithMount = {[pipetteId: string]: {name: string, tiprackModel: string, mount: string}}
-      const mounts = ['left', 'right']
-      const pipettes: PipettesWithMount = mounts.reduce((acc, mount) => {
-        const pip = fields[mount]
-        if (pip && pip.pipetteModel && pip.tiprackModel) {
-          return {
-            ...acc,
-            [uuid()]: {
-              name: pip.pipetteModel,
-              tiprackModel: pip.tiprackModel,
-              mount,
-            },
-          }
-        }
-        return acc
-      }, {})
+    _createNewProtocol: ({newProtocolFields, pipettes}) => {
+      dispatch(fileActions.createNewProtocol(newProtocolFields))
+
+      const pipettesById: {[pipetteId: string]: PipetteOnDeck} = pipettes.reduce((acc, pipette) =>
+        ({...acc, [uuid()]: pipette}), {})
 
       // create new pipette entities
-      dispatch(stepFormActions.createPipettes(mapValues(pipettes, (p: $Values<PipettesWithMount>) => ({
-        name: p.name,
-        tiprackModel: p.tiprackModel,
-      }))))
+      // TODO: Ian 2018-12-21 $FlowFixMe flow doesn't want 'mount' to go in `createPipettes`, though this is handled with a `pick` in createPipettes already. I tried typing the arg to createPipettes differently but couldn't get anything to work
+      dispatch(stepFormActions.createPipettes(pipettesById))
 
       // update pipette locations in initial deck setup step
       dispatch(steplistActions.changeSavedStepForm({
         stepId: INITIAL_DECK_SETUP_STEP_ID,
         update: {
-          pipetteLocationUpdate: mapValues(pipettes, (p: $Values<PipettesWithMount>) => p.mount),
+          pipetteLocationUpdate: mapValues(pipettesById, (p: $Values<typeof pipettesById>) => p.mount), // TODO IMMEDIATELY check type checked or blue
         },
       }))
 
       // auto-generate tipracks for pipettes
-      const newTiprackModels = uniq(Object.values(pipettes)
-        .map((pipette: any) => pipette.tiprackModel))
+      const newTiprackModels = uniq(pipettes.map((pipette) => pipette.tiprackModel))
 
       newTiprackModels.forEach(tiprackModel => {
         dispatch(labwareIngredActions.createContainer({containerType: tiprackModel}))
