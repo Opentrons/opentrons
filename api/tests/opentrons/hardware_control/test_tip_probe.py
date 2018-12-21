@@ -107,19 +107,19 @@ async def test_moves_to_hotspot(hardware_api, monkeypatch,
 
 @pytest.mark.parametrize('mount', [Mount.RIGHT, Mount.LEFT])
 @pytest.mark.parametrize('pipette_model', pipette_config.configs)
-async def test_update_mount_offset(hardware_api, mount, pipette_model):
+async def test_update_instrument_offset(hardware_api, mount, pipette_model):
     await hardware_api.cache_instruments({mount: pipette_model})
     p = Point(1, 2, 3)
     with pytest.raises(ValueError):
-        hardware_api.update_mount_offset(mount)
-    hardware_api.update_mount_offset(mount, new_offset=p)
+        hardware_api.update_instrument_offset(mount)
+    hardware_api.update_instrument_offset(mount, new_offset=p)
     pip_type = 'multi' if 'multi' in pipette_model else 'single'
     assert\
         hardware_api._config.instrument_offset[mount.name.lower()][pip_type]\
         == [1, 2, 3]
     assert hardware_api._attached_instruments[mount]._instrument_offset == p
     center = Point(*hardware_api._config.tip_probe.center) + Point(3, 2, 1)
-    hardware_api.update_mount_offset(mount, from_tip_probe=center)
+    hardware_api.update_instrument_offset(mount, from_tip_probe=center)
     assert\
         hardware_api._config.instrument_offset[mount.name.lower()][pip_type]\
         == [-3, -2, -1]

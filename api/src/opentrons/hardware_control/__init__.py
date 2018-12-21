@@ -1149,10 +1149,10 @@ class API(HardwareAPILike):
         with _assure_tip():
             return await _do_tp()
 
-    def update_mount_offset(self, mount,
-                            new_offset: top_types.Point = None,
-                            from_tip_probe: top_types.Point = None):
-        """ Update the mount offset for a pipette on the specified mount.
+    def update_instrument_offset(self, mount,
+                                 new_offset: top_types.Point = None,
+                                 from_tip_probe: top_types.Point = None):
+        """ Update the instrument offset for a pipette on the specified mount.
 
         This will update both the stored value in the robot settings and
         the live value in the currently-loaded pipette.
@@ -1161,7 +1161,7 @@ class API(HardwareAPILike):
         or using the result of a previous call to
         :py:meth:`locate_tip_probe_center` with the same mount.
 
-        :note: Z differences in the mount offset cannot be
+        :note: Z differences in the instrument offset cannot be
                disambiguated between differences in the position of the
                nozzle and differences in the length of the nozzle/tip
                interface (assuming that tips are of reasonably uniform

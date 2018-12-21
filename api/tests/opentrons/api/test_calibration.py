@@ -39,7 +39,7 @@ async def test_tip_probe_v2(main_router, model, monkeypatch):
     monkeypatch.setattr(main_router.calibration_manager._hardware._api,
                         'locate_tip_probe_center', fake_locate)
     monkeypatch.setattr(main_router.calibration_manager._hardware._api,
-                        'update_mount_offset', fake_update)
+                        'update_instrument_offset', fake_update)
     monkeypatch.setattr(main_router.calibration_manager,
                         'move_to_front', fake_move)
     main_router.calibration_manager.tip_probe(model.instrument)

@@ -59,7 +59,7 @@ class CalibrationManager:
         log.info('Measured probe top center: {0}'.format(measured_center))
 
         if ff.use_protocol_api_v2():
-            self._hardware.update_mount_offset(
+            self._hardware.update_instrument_offset(
                 Mount[instrument._instrument.mount.upper()],
                 from_tip_probe=measured_center)
             config = self._hardware.config
