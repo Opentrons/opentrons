@@ -5,7 +5,7 @@ import type {Dispatch} from 'redux'
 import LabwareSelectionModal from './LabwareSelectionModal'
 import {closeLabwareSelector, createContainer} from '../../labware-ingred/actions'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
-import {selectors as pipetteSelectors} from '../../pipettes'
+import {selectors as stepFormSelectors} from '../../step-forms'
 import type {BaseState} from '../../types'
 
 type Props = React.ElementProps<typeof LabwareSelectionModal>
@@ -18,7 +18,7 @@ type SP = {
 function mapStateToProps (state: BaseState): SP {
   return {
     slot: labwareIngredSelectors.selectedAddLabwareSlot(state) || null,
-    permittedTipracks: pipetteSelectors.getPermittedTipracks(state),
+    permittedTipracks: stepFormSelectors.getPermittedTipracks(state),
   }
 }
 

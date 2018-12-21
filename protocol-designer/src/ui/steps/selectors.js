@@ -3,8 +3,7 @@ import {createSelector} from 'reselect'
 import last from 'lodash/last'
 import isEmpty from 'lodash/isEmpty'
 
-import steplistSelectors from '../../steplist/selectors'
-import type {RootState as SteplistRootState} from '../../steplist/reducers'
+import * as stepFormSelectors from '../../step-forms/selectors' // TODO Ian 2018-12-20: fix circular dependency so this direct import isn't required
 import type {StepIdType} from '../../form-types'
 import type {BaseState, Selector} from '../../types'
 import type {FormSectionState} from './types'
@@ -26,10 +25,10 @@ const rootSelector = (state: BaseState): StepsState => state.ui.steps
 /** fallbacks for selectedItem reducer, when null */
 const getNonNullSelectedItem: Selector<SelectableItem> = createSelector(
   rootSelector,
-  steplistSelectors.rootSelector,
-  (state: StepsState, steplistState: SteplistRootState) => {
+  stepFormSelectors.getOrderedSteps,
+  (state, orderedSteps) => {
     if (state.selectedItem != null) return state.selectedItem
-    if (steplistState.orderedSteps.length > 0) return {isStep: true, id: last(steplistState.orderedSteps)}
+    if (orderedSteps.length > 0) return {isStep: true, id: last(orderedSteps)}
     return initialSelectedItemState
   }
 )
@@ -56,7 +55,7 @@ const getHoveredStepId: Selector<?StepIdType> = createSelector(
 
 /** Array of labware (labwareId's) involved in hovered Step, or [] */
 const getHoveredStepLabware: Selector<Array<string>> = createSelector(
-  steplistSelectors.getArgsAndErrorsByStepId,
+  stepFormSelectors.getArgsAndErrorsByStepId,
   getHoveredStepId,
   (allStepArgsAndErrors, hoveredStep) => {
     const blank = []
@@ -136,7 +135,7 @@ const getFormSectionCollapsed: Selector<FormSectionState> = createSelector(
 )
 
 const getSelectedStep = createSelector(
-  steplistSelectors.getAllSteps,
+  stepFormSelectors.getAllSteps,
   getSelectedStepId,
   (allSteps, selectedStepId) => {
     const stepId = selectedStepId
@@ -150,13 +149,10 @@ const getSelectedStep = createSelector(
 )
 
 // TODO: BC: 2018-10-26 remove this when we decide to not block save
-export const getCurrentFormCanBeSaved: Selector<boolean | null> = createSelector(
-  steplistSelectors.getHydratedUnsavedForm,
-  getSelectedStepId,
-  steplistSelectors.getAllSteps,
-  (hydratedForm, selectedStepId, allSteps) => {
-    if (selectedStepId == null || !allSteps[selectedStepId] || !hydratedForm) return null
-    return isEmpty(steplistSelectors.getAllErrorsFromHydratedForm(hydratedForm))
+export const getCurrentFormCanBeSaved: Selector<boolean> = createSelector(
+  stepFormSelectors.getHydratedUnsavedFormErrors,
+  (formErrors) => {
+    return Boolean(formErrors && isEmpty(formErrors))
   }
 )
 

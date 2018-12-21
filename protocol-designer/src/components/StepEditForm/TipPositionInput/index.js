@@ -5,7 +5,7 @@ import {HoverTooltip, FormGroup, InputField} from '@opentrons/components'
 import { getLabware } from '@opentrons/shared-data'
 import {selectors as labwareIngredsSelectors} from '../../../labware-ingred/reducers'
 import i18n from '../../../localization'
-import {selectors} from '../../../steplist'
+import {selectors as stepFormSelectors} from '../../../step-forms'
 import stepFormStyles from '../StepEditForm.css'
 import styles from './TipPositionInput.css'
 import TipPositionModal from './TipPositionModal'
@@ -93,7 +93,7 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
 }
 
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
-  const formData = selectors.getUnsavedForm(state)
+  const formData = stepFormSelectors.getUnsavedForm(state)
   const {fieldName} = ownProps
   const labwareFieldName = getLabwareFieldForPositioningField(ownProps.fieldName)
 

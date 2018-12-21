@@ -1,45 +1,16 @@
 // @flow
 import {uuid} from '../../utils'
 import {selectors as labwareIngredsSelectors} from '../../labware-ingred/reducers'
-import {selectors as steplistSelectors} from '../../steplist'
 import {selectors as stepsSelectors, actions as stepsActions} from '../../ui/steps'
 import {actions as tutorialActions} from '../../tutorial'
-import {generateNewForm} from '../formLevel'
-import type {StepType, StepIdType, FormData} from '../../form-types'
-import type {BaseState, GetState, ThunkDispatch} from '../../types'
+import type {StepType, StepIdType} from '../../form-types'
+import type {GetState, ThunkDispatch} from '../../types'
 
 export const SCROLL_ON_SELECT_STEP_CLASSNAME = 'scroll_on_select_step'
 
 export type SelectStepAction = {
   type: 'SELECT_STEP',
   payload: StepIdType,
-}
-
-// get new or existing step for given stepId
-export function getStepFormData (state: BaseState, stepId: StepIdType, newStepType?: StepType): ?FormData {
-  const existingStep = steplistSelectors.getSavedForms(state)[stepId]
-
-  if (existingStep) {
-    return existingStep
-  }
-
-  // TODO: Ian 2018-09-19 sunset 'steps' reducer. Right now, it's needed here to get stepType
-  // for any step that was created but never saved (never clicked Save button).
-  // Instead, new steps should have their stepType immediately added
-  // to 'savedStepForms' upon creation.
-  const steps = steplistSelectors.getSteps(state)
-  const stepTypeFromStepReducer = steps[stepId] && steps[stepId].stepType
-  const stepType = newStepType || stepTypeFromStepReducer
-
-  if (!stepType) {
-    console.error(`New step with id "${stepId}" was added with no stepType, could not generate form`)
-    return null
-  }
-
-  return generateNewForm({
-    stepId,
-    stepType: stepType,
-  })
 }
 
 // addStep thunk adds an incremental integer ID for Step reducers.

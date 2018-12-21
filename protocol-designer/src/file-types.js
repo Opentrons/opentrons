@@ -2,7 +2,7 @@
 import type {DeckSlot, Mount} from '@opentrons/components'
 import type {Command} from './step-generation/types'
 import type {RootState as IngredRoot} from './labware-ingred/reducers'
-import type {RootState as StepformRoot} from './steplist/reducers'
+import type {RootState as StepformRoot} from './step-forms'
 import type {RootState as DismissRoot} from './dismiss'
 
 type MsSinceEpoch = number

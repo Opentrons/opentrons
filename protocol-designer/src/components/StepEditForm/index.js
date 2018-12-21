@@ -5,7 +5,8 @@ import get from 'lodash/get'
 import without from 'lodash/without'
 import cx from 'classnames'
 
-import {actions, selectors} from '../../steplist'
+import {actions} from '../../steplist'
+import {selectors as stepFormSelectors} from '../../step-forms'
 import type {FormData, StepType, StepFieldName, StepIdType} from '../../form-types'
 import type {BaseState, ThunkDispatch} from '../../types'
 import formStyles from '../forms.css'
@@ -137,8 +138,8 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
 }
 
 const mapStateToProps = (state: BaseState): SP => ({
-  formData: selectors.getUnsavedForm(state),
-  isNewStep: selectors.getIsNewStepForm(state),
+  formData: stepFormSelectors.getUnsavedForm(state),
+  isNewStep: stepFormSelectors.getIsNewStepForm(state),
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({

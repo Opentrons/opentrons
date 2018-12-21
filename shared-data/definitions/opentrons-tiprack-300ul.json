@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "name": "GEB-tiprack-300ul",
+    "name": "opentrons-tiprack-300ul",
     "format": "96-standard",
     "tipVolume": 300,
     "displayCategory": "tiprack",
