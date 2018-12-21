@@ -8,10 +8,10 @@ import HighlightableLabware from '../components/HighlightableLabware'
 
 import {selectors} from '../labware-ingred/reducers'
 import {
-  selectors as steplistSelectors,
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
 } from '../steplist'
+import {selectors as stepFormSelectors} from '../step-forms'
 import {selectors as stepsSelectors} from '../ui/steps'
 import * as highlightSelectors from '../top-selectors/substep-highlight'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
@@ -63,7 +63,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   } else {
     const stepId = activeItem.id
     // TODO: Ian 2018-07-31 replace with util function, "findIndexOrNull"?
-    const orderedSteps = steplistSelectors.getOrderedSteps(state)
+    const orderedSteps = stepFormSelectors.getOrderedSteps(state)
     const timelineIdx = orderedSteps.includes(stepId)
       ? orderedSteps.findIndex(id => id === stepId)
       : null

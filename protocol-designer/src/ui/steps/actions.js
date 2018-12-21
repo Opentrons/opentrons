@@ -4,10 +4,8 @@ import forEach from 'lodash/forEach'
 
 import type {StepIdType, StepType, FormModalFields} from '../../form-types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../../types'
-import {selectors as steplistSelectors} from '../../steplist'
-import * as pipetteSelectors from '../../pipettes/selectors'
+import {selectors as stepFormSelectors} from '../../step-forms'
 import {getNextDefaultPipetteId} from '../../steplist/formLevel'
-import {getStepFormData} from '../../steplist/actions'
 import type {TerminalItemId, SubstepIdentifier, FormSectionNames} from '../../steplist/types'
 
 import selectors from './selectors'
@@ -66,7 +64,7 @@ export type OpenMoreOptionsModalAction = {type: 'OPEN_MORE_OPTIONS_MODAL', paylo
 export const openMoreOptionsModal = () => (dispatch: Dispatch<*>, getState: GetState) => {
   dispatch({
     type: 'OPEN_MORE_OPTIONS_MODAL',
-    payload: steplistSelectors.getUnsavedForm(getState()), // TODO only pull in relevant fields?
+    payload: stepFormSelectors.getUnsavedForm(getState()), // TODO only pull in relevant fields?
   })
 }
 
@@ -116,12 +114,12 @@ export const selectStep = (stepId: StepIdType, newStepType?: StepType): ThunkAct
     dispatch(selectStepAction)
 
     const state = getState()
-    let formData = getStepFormData(state, stepId, newStepType)
+    let formData = stepFormSelectors._getStepFormData(state, stepId, newStepType)
 
     const defaultPipetteId = getNextDefaultPipetteId(
-      steplistSelectors.getSavedForms(state),
-      steplistSelectors.getOrderedSteps(state),
-      pipetteSelectors.getEquippedPipettes(state),
+      stepFormSelectors.getSavedStepForms(state),
+      stepFormSelectors.getOrderedSteps(state),
+      stepFormSelectors.getInitialDeckSetup(state).pipettes,
     )
 
     // For a pristine step, if there is a `pipette` field in the form

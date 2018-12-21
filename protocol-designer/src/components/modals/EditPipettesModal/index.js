@@ -25,12 +25,6 @@ import {
   type PipetteEntities,
 } from '../../../step-forms'
 import {actions as steplistActions} from '../../../steplist'
-import {
-  thunks as pipetteThunks,
-  selectors as pipetteSelectors,
-  type EditPipettesFields,
-  type FormattedPipette,
-} from '../../../pipettes'
 
 import PipetteDiagram from '../NewFileModal/PipetteDiagram'
 import TiprackDiagram from '../NewFileModal/TiprackDiagram'
@@ -39,7 +33,17 @@ import styles from './EditPipettesModal.css'
 import modalStyles from '../modal.css'
 import StepChangesWarningModal from './StepChangesWarningModal'
 
+type EditPipettesFields = {
+  left: PipetteFields,
+  right: PipetteFields,
+}
+
 type State = EditPipettesFields & {isWarningModalOpen: boolean}
+
+type FormattedPipette = {
+  pipetteModel: string,
+  tiprackModel: string,
+}
 
 type Props = {
   closeModal: () => void,
@@ -72,9 +76,9 @@ const tiprackOptions = [
 
 const DEFAULT_SELECTION = {pipetteModel: '', tiprackModel: null}
 
-const pipetteDataToFormState = (pipetteData) => ({
-  pipetteModel: (pipetteData && pipetteData.model) ? pipetteData.model : '',
-  tiprackModel: (pipetteData && pipetteData.tiprack && pipetteData.tiprack.model) ? pipetteData.tiprack.model : null,
+const pipetteDataToFormState = (pipette: ?FormattedPipette) => ({
+  pipetteModel: (pipette && pipette.pipetteModel) || '',
+  tiprackModel: (pipette && pipette.tiprackModel) || null,
 })
 
 class EditPipettesModal extends React.Component<Props, State> {
@@ -213,10 +217,10 @@ class EditPipettesModal extends React.Component<Props, State> {
 }
 
 const mapSTP = (state: BaseState): SP => {
-  const pipetteData = pipetteSelectors.getPipettesForEditPipettes(state)
+  const initialPipettes = stepFormSelectors.getPipettesForEditPipetteForm(state)
   return {
-    initialLeft: pipetteData.find(i => i.mount === 'left'),
-    initialRight: pipetteData.find(i => i.mount === 'right'),
+    initialLeft: initialPipettes.left,
+    initialRight: initialPipettes.right,
     _prevPipettes: stepFormSelectors.getPipetteInvariantProperties(state),
   }
 }
@@ -225,9 +229,6 @@ const mergeProps = (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>},
   const {dispatch} = dispatchProps
   const {_prevPipettes, ...passThruStateProps} = stateProps
   const updatePipettes = (fields: EditPipettesFields) => {
-    dispatch(pipetteThunks.editPipettes(fields)) // TODO: Ian 2018-12-17 editPipettes is DEPRECATED, remove once old reducers are removed
-    // new flow for new reducers
-
     let usedPrevPipettes = [] // IDs of pipettes in prevPipettes that were already used
     // TODO: Ian 2018-12-17 after dropping the above,
     // refactor EditPipettesFields to make this building part cleaner?
@@ -260,7 +261,8 @@ const mergeProps = (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>},
     })
 
     dispatch(stepFormActions.createPipettes(
-      mapValues(nextPipettes, p => ({name: p.name, tiprackModel: p.tiprackModel}))))
+      mapValues(nextPipettes, (p: $Values<typeof nextPipettes>) =>
+        ({name: p.name, tiprackModel: p.tiprackModel}))))
 
     // set/update pipette locations in initial deck setup step
     dispatch(steplistActions.changeSavedStepForm({

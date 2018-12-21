@@ -5,7 +5,6 @@ import mapValues from 'lodash/mapValues'
 import type {BaseState} from '../types'
 import FilePage from '../components/FilePage'
 import {actions, selectors as fileSelectors} from '../file-data'
-import {actions as pipetteActions, selectors as pipetteSelectors} from '../pipettes'
 import {selectors as stepFormSelectors} from '../step-forms'
 import {actions as steplistActions} from '../steplist'
 import {INITIAL_DECK_SETUP_STEP_ID} from '../constants'
@@ -22,13 +21,9 @@ type SP = {
 }
 
 const mapStateToProps = (state: BaseState): SP => {
-  const pipetteData = pipetteSelectors.getPipettesForInstrumentGroup(state)
   return {
     formValues: fileSelectors.getFileMetadata(state),
-    instruments: {
-      left: pipetteData.find(i => i.mount === 'left'),
-      right: pipetteData.find(i => i.mount === 'right'),
-    },
+    instruments: stepFormSelectors.getPipettesForInstrumentGroup(state),
     _initialDeckSetup: stepFormSelectors.getInitialDeckSetup(state),
   }
 }
@@ -40,19 +35,18 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
     if (!pipette.mount) return pipette.mount
     return pipette.mount === 'left' ? 'right' : 'left'
   })
+
   return {
     ...passThruProps,
     ...dispatchProps,
     goToNextPage: () => dispatch(navActions.navigateToPage('liquids')),
     saveFileMetadata: (nextFormValues: FileMetadataFields) =>
       dispatch(actions.saveFileMetadata(nextFormValues)),
-    swapPipettes: () => {
+    swapPipettes: () =>
       dispatch(steplistActions.changeSavedStepForm({
         stepId: INITIAL_DECK_SETUP_STEP_ID,
         update: {pipetteLocationUpdate: swapPipetteUpdate},
-      }))
-      dispatch(pipetteActions.swapPipettes())
-    },
+      })),
   }
 }
 

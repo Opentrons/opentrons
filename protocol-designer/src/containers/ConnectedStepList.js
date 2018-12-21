@@ -8,8 +8,10 @@ import type {StepIdType} from '../form-types'
 
 import {
   actions as steplistActions,
-  selectors as steplistSelectors,
 } from '../steplist'
+import {
+  selectors as stepFormSelectors,
+} from '../step-forms'
 import {StepList} from '../components/steplist'
 
 type Props = React.ElementProps<typeof StepList>
@@ -22,7 +24,7 @@ type DP = $Diff<Props, SP>
 
 function mapStateToProps (state: BaseState): SP {
   return {
-    orderedSteps: steplistSelectors.getOrderedSteps(state),
+    orderedSteps: stepFormSelectors.getOrderedSteps(state),
   }
 }
 

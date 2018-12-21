@@ -6,7 +6,7 @@ import mapValues from 'lodash/mapValues'
 
 import {allSubsteps} from './substeps'
 import * as StepGeneration from '../step-generation'
-import {selectors as steplistSelectors} from '../steplist'
+import {selectors as stepFormSelectors} from '../step-forms'
 import {selectors as fileDataSelectors} from '../file-data'
 import {selectors as stepsSelectors} from '../ui/steps'
 
@@ -137,11 +137,11 @@ function _getSelectedWellsForSubstep (
 
 export const wellHighlightsByLabwareId: Selector<AllWellHighlightsAllLabware> = createSelector(
   fileDataSelectors.getRobotStateTimeline,
-  steplistSelectors.getArgsAndErrorsByStepId,
+  stepFormSelectors.getArgsAndErrorsByStepId,
   stepsSelectors.getHoveredStepId,
   stepsSelectors.getHoveredSubstep,
   allSubsteps,
-  steplistSelectors.getOrderedSteps,
+  stepFormSelectors.getOrderedSteps,
   (robotStateTimeline, allStepArgsAndErrors, hoveredStepId, hoveredSubstep, allSubsteps, orderedSteps) => {
     const timeline = robotStateTimeline.timeline
     const stepId = hoveredStepId

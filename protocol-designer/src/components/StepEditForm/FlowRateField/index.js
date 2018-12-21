@@ -2,12 +2,10 @@
 import * as React from 'react'
 import FlowRateField from './FlowRateField'
 import {connect} from 'react-redux'
-import {getPipetteNameSpecs} from '@opentrons/shared-data'
-import {selectors as pipetteSelectors} from '../../../pipettes'
 import {
   actions as steplistActions,
-  selectors as steplistSelectors,
 } from '../../../steplist'
+import {selectors as stepFormSelectors} from '../../../step-forms'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import type {BaseState, ThunkDispatch} from '../../../types'
 
@@ -37,19 +35,20 @@ function FlowRateFieldWithKey (props: Props) {
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {flowRateType, pipetteFieldName, name} = ownProps
 
-  const formData = steplistSelectors.getUnsavedForm(state)
+  const formData = stepFormSelectors.getUnsavedForm(state)
 
   const pipetteId = formData ? formData[pipetteFieldName] : null
-  const pipette = pipetteId && pipetteSelectors.getPipettesById(state)[pipetteId]
-  const pipetteConfig = pipette && getPipetteNameSpecs(pipette.model)
-  const pipetteDisplayName = pipetteConfig ? pipetteConfig.displayName : 'pipette'
+  const pipette = (pipetteId != null)
+    ? stepFormSelectors.getPipetteInvariantProperties(state)[pipetteId]
+    : null
+  const pipetteDisplayName = pipette ? pipette.spec.displayName : 'pipette'
 
   let defaultFlowRate
-  if (pipetteConfig) {
+  if (pipette) {
     if (flowRateType === 'aspirate') {
-      defaultFlowRate = pipetteConfig.defaultAspirateFlowRate
+      defaultFlowRate = pipette.spec.defaultAspirateFlowRate
     } else if (flowRateType === 'dispense') {
-      defaultFlowRate = pipetteConfig.defaultDispenseFlowRate
+      defaultFlowRate = pipette.spec.defaultDispenseFlowRate
     }
   }
 
@@ -61,13 +60,13 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   return {
     innerKey,
     defaultFlowRate,
-    disabled: pipette == null,
+    disabled: pipetteId == null,
     formFlowRate,
     flowRateType,
     label: ownProps.label,
     minFlowRate: 0,
     // NOTE: since we only have rule-of-thumb, max is entire volume in 1 second
-    maxFlowRate: pipetteConfig ? pipetteConfig.maxVolume : Infinity,
+    maxFlowRate: pipette ? pipette.spec.maxVolume : Infinity,
     pipetteDisplayName,
   }
 }

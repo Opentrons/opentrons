@@ -4,10 +4,10 @@ import noop from 'lodash/noop'
 import * as StepGeneration from '../../step-generation'
 import {allSubsteps as getAllSubsteps} from '../substeps'
 import {
-  selectors as steplistSelectors,
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
 } from '../../steplist'
+import {selectors as stepFormSelectors} from '../../step-forms'
 import {selectors as stepsSelectors} from '../../ui/steps'
 import {selectors as fileDataSelectors} from '../../file-data'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
@@ -88,7 +88,7 @@ const getLastValidTips: GetTipSelector = createSelector(
 )
 
 export const getTipsForCurrentStep: GetTipSelector = createSelector(
-  steplistSelectors.getOrderedSteps,
+  stepFormSelectors.getOrderedSteps,
   fileDataSelectors.getRobotStateTimeline,
   stepsSelectors.getHoveredStepId,
   stepsSelectors.getActiveItem,
