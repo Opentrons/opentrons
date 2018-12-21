@@ -31,7 +31,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
   return (
     <React.Fragment>
       <FormSection
-        sectionName="aspirate"
+        sectionName={i18n.t('form.step_edit_form.section.aspirate')}
         headerRow={(
           <div className={formStyles.row_wrapper}>
             <FormGroup label="Labware:" className={styles.labware_field}>
@@ -114,7 +114,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
       </FormSection>
 
       <FormSection
-        sectionName='dispense'
+        sectionName={i18n.t('form.step_edit_form.section.dispense')}
         headerRow={(
           <div className={formStyles.row_wrapper}>
             <FormGroup label='Labware:' className={styles.labware_field}>

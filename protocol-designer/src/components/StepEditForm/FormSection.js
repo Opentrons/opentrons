@@ -7,13 +7,11 @@ import i18n from '../../localization'
 import styles from './FormSection.css'
 
 type Props = {
-  sectionName?: string, // TODO: get these from src/steplist/types.js
+  sectionName?: string,
   headerRow?: React.Node,
   children?: React.Node,
 }
-type State = {
-  collapsed?: boolean,
-}
+type State = {collapsed?: boolean}
 
 class FormSection extends React.Component<Props, State> {
   state = {collapsed: true}

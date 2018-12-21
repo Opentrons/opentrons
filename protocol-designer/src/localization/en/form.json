@@ -65,6 +65,10 @@
           "b2t": "Bottom to top"
         }
       }
+    },
+    "section": {
+      "aspirate": "aspirate",
+      "dispense": "dispense"
     }
   }
 }
