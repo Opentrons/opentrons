@@ -138,7 +138,7 @@ function determineLayout (
   const wellMap = {}
   grids.forEach((gridObj, gridIdx) => {
     range(gridObj.column).forEach(colIdx => {
-      range(gridObj.row).forEach(rowIdx => {
+      range(gridObj.row, 0).forEach(rowIdx => {
         const wellName = _irregularWellName(rowIdx, colIdx, gridStart[gridIdx])
         wellMap[wellName] = _calculateWellCoord(rowIdx, colIdx, spacing[gridIdx], offset[gridIdx], wells[gridIdx])
       })
