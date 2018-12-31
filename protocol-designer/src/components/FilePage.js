@@ -127,7 +127,10 @@ class FilePage extends React.Component<Props, State> {
 
         <Portal>
           {this.state.isEditPipetteModalOpen &&
-            <EditPipettesModal key={String(this.state.isEditPipetteModalOpen)} closeModal={this.closeEditPipetteModal} />}
+            <EditPipettesModal
+              key={String(this.state.isEditPipetteModalOpen)}
+              closeModal={this.closeEditPipetteModal}
+            />}
         </Portal>
       </div>
     )

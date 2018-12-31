@@ -5,7 +5,7 @@ import mapValues from 'lodash/mapValues'
 
 import {uuid} from '../../../utils'
 import {INITIAL_DECK_SETUP_STEP_ID} from '../../../constants'
-import {actions as steplistActions} from '../../../steplist' // TODO IMMEDIATELY
+import {actions as steplistActions} from '../../../steplist'
 import {
   actions as stepFormActions,
   selectors as stepFormSelectors,
@@ -17,8 +17,6 @@ import type {PipetteEntities} from '../../../step-forms'
 type Props = ElementProps<typeof NewFileModal>
 
 type SP = {
-  hideModal: $PropertyType<Props, 'hideModal'>,
-  // _hasUnsavedChanges: ?boolean, // TODO IMMEDIATELY delete right?
   _prevPipettes: PipetteEntities,
 }
 
@@ -29,7 +27,6 @@ type OP = {
 const mapSTP = (state: BaseState): SP => {
   const initialPipettes = stepFormSelectors.getPipettesForEditPipetteForm(state)
   return {
-    hideModal: false, // TODO IMMEDIATELY
     initialPipetteValues: initialPipettes,
     _prevPipettes: stepFormSelectors.getPipetteInvariantProperties(state),
   }

@@ -30,7 +30,7 @@ type State = {
 
 type Props = {
   useProtocolFields?: ?boolean,
-  hideModal: boolean,
+  hideModal?: boolean,
   onCancel: () => mixed,
   initialPipetteValues?: $PropertyType<State, 'pipettesByMount'>,
   onSave: ({
@@ -62,7 +62,6 @@ const initialState = {
   },
 }
 
-// TODO IMMEDIATELY: factor this out to its own file
 type PipProps = {
   initialTabIndex?: number,
   values: {[Mount]: FormPipette},
@@ -139,7 +138,6 @@ const ChangePipetteFields = (props: PipProps) => {
   )
 }
 
-// TODO IMMEDIATELY rename this component
 export default class NewFileModal extends React.Component<Props, State> {
   constructor (props: Props) {
     super(props)
@@ -219,8 +217,7 @@ export default class NewFileModal extends React.Component<Props, State> {
         className={cx(modalStyles.modal, styles.new_file_modal)}>
         <form onSubmit={() => { canSubmit && this.handleSubmit() }}>
           <h2 className={styles.new_file_modal_title}>
-            {/* TODO IMMEDIATELY: use i18n */}
-            {useProtocolFields ? 'Create New Protocol' : 'Edit Pipettes'}
+            {useProtocolFields ? i18n.t('modal.new_protocol.title') : i18n.t('modal.edit_pipettes.title')}
           </h2>
 
           {useProtocolFields && (

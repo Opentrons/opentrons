@@ -10,11 +10,6 @@ export type FileError = {
     message?: string,
   } | null
 
-export type PipetteFields = { // TOOD IMMEDIATELY deprecate???
-  pipetteModel: string,
-  tiprackModel: string,
-}
-
 export type NewProtocolFields = {|
   name: ?string,
 |}
