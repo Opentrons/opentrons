@@ -12,7 +12,7 @@ import {
 } from '../../../step-forms'
 import NewFileModal from '../NewFileModal'
 import type {BaseState, ThunkDispatch} from '../../../types'
-import type {PipetteEntities} from '../../../step-forms'
+import type {PipetteEntities, PipetteOnDeck} from '../../../step-forms'
 
 type Props = ElementProps<typeof NewFileModal>
 
@@ -32,20 +32,17 @@ const mapSTP = (state: BaseState): SP => {
   }
 }
 
-const mergeProps = (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>}, ownProps: OP): Props => {
-  const {dispatch} = dispatchProps
-  const {_prevPipettes, ...passThruStateProps} = stateProps
-  const updatePipettes = ({pipettes}) => {
-    const prevPipetteIds = Object.keys(_prevPipettes)
+const makeUpdatePipettes = (prevPipettes, dispatch, closeModal) =>
+  ({pipettes}) => {
+    const prevPipetteIds = Object.keys(prevPipettes)
     let usedPrevPipettes = [] // IDs of pipettes in prevPipettes that were already used
-    // TODO IMMEDIATELY there's a buncha funkiness below, clean up immediately
-    let nextPipettes = {}
+    let nextPipettes: {[pipetteId: string]: PipetteOnDeck} = {}
     pipettes.forEach(newPipette => {
       if (newPipette && newPipette.name && newPipette.tiprackModel) {
         const candidatePipetteIds = prevPipetteIds.filter(id => {
-          const prevPip = _prevPipettes[id]
+          const prevPipette = prevPipettes[id]
           const alreadyUsed = usedPrevPipettes.some(usedId => usedId === id)
-          return !alreadyUsed && prevPip.name === newPipette.name
+          return !alreadyUsed && prevPipette.name === newPipette.name
         })
         const pipetteId: ?string = candidatePipetteIds[0]
         if (pipetteId) {
@@ -71,11 +68,18 @@ const mergeProps = (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>},
     }))
 
     // delete any pipettes no longer in use
-    const pipetteIdsToDelete = Object.keys(_prevPipettes).filter(id => !(id in nextPipettes))
+    const pipetteIdsToDelete = Object.keys(prevPipettes).filter(id => !(id in nextPipettes))
     if (pipetteIdsToDelete.length > 0) {
       dispatch(stepFormActions.deletePipettes(pipetteIdsToDelete))
     }
+
+    closeModal()
   }
+
+const mergeProps = (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>}, ownProps: OP): Props => {
+  const {dispatch} = dispatchProps
+  const {_prevPipettes, ...passThruStateProps} = stateProps
+  const updatePipettes = makeUpdatePipettes(_prevPipettes, dispatch, ownProps.closeModal)
 
   return {
     ...ownProps,
