@@ -41,9 +41,6 @@ import type {
 } from '../../steplist/actions'
 import type {StepItemData} from '../../steplist/types'
 import type {
-  SaveMoreOptionsModal,
-} from '../../ui/steps/actions'
-import type {
   CreatePipettesAction,
   DeletePipettesAction,
   ModifyPipettesTiprackAssignmentAction,
@@ -59,7 +56,6 @@ type UnsavedFormActions =
   | ActionType<typeof cancelStepForm>
   | SaveStepFormAction
   | DeleteStepAction
-  | SaveMoreOptionsModal
 export const unsavedForm = (rootState: RootState, action: UnsavedFormActions): FormState => {
   const unsavedFormState = rootState ? rootState.unsavedForm : unsavedFormInitialState
   switch (action.type) {
@@ -74,10 +70,6 @@ export const unsavedForm = (rootState: RootState, action: UnsavedFormActions): F
     case 'SELECT_TERMINAL_ITEM': return unsavedFormInitialState
     case 'SAVE_STEP_FORM': return unsavedFormInitialState
     case 'DELETE_STEP': return unsavedFormInitialState
-    // save the modal state into the unsavedForm --
-    // it was 2 levels away from savedStepForms, now it's one level away
-    case 'SAVE_MORE_OPTIONS_MODAL':
-      return {...unsavedFormState, ...action.payload}
     default:
       return unsavedFormState
   }
@@ -149,7 +141,15 @@ export const savedStepForms = (
           [INITIAL_DECK_SETUP_STEP_ID]: _migratePreDeckSetupStep(fileData),
           ...stepFormsFromFile,
         }
-      return mapValues(loadedStepForms, stepForm => ({
+
+      // migrate old kebab-case keys to camelCase
+      const cleanedLoadedStepForms = mapValues(loadedStepForms, (stepForm) => ({
+        ...omit(stepForm, ['step-name', 'step-details']),
+        stepName: stepForm['step-name'],
+        stepDetails: stepForm['step-details'],
+      }))
+
+      return mapValues(cleanedLoadedStepForms, stepForm => ({
         ...getDefaultsForStepType(stepForm.stepType),
         ...stepForm,
       }))
