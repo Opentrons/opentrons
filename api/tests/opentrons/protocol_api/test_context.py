@@ -21,7 +21,7 @@ def load_my_labware(monkeypatch):
                              'shared_data/definitions2/{}.json'.format(
                                  labware_name)))
         return labware_def
-    monkeypatch.setattr(papi.labware, '_load_definition_by_name', dummy_load)
+    monkeypatch.setattr(papi.labware, 'load_definition_by_name', dummy_load)
 
 
 def test_load_instrument(loop):

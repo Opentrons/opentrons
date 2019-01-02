@@ -1002,7 +1002,7 @@ class API(HardwareAPILike):
         if aspirate:
             this_pipette.update_config_item('aspirate_flow_rate', aspirate)
         if dispense:
-            this_pipette.update_config_item('dispense_float_rate', dispense)
+            this_pipette.update_config_item('dispense_flow_rate', dispense)
 
     @_log_call
     async def discover_modules(self):

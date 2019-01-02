@@ -674,7 +674,7 @@ def _read_file(filepath: str) -> dict:
     return calibration_data
 
 
-def _load_definition_by_name(name: str) -> dict:
+def load_definition_by_name(name: str) -> dict:
     """
     Look up and return a definition by name (name is expected to correspond to
     the filename of the definition, with the .json extension) and return it or
@@ -702,7 +702,7 @@ def load(name: str, parent: Location) -> Labware:
                    the front and left most point of the outside of labware is
                    (often the front-left corner of a slot on the deck).
     """
-    definition = _load_definition_by_name(name)
+    definition = load_definition_by_name(name)
     return load_from_definition(definition, parent)
 
 

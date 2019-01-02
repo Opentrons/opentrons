@@ -100,6 +100,12 @@ class ProtocolContext:
         self._commands: List[str] = []
         self._unsubscribe_commands = None
         self.clear_commands()
+        if advanced_settings.get_adv_setting('shortFixedTrash'):
+            trash_name = 'opentrons_1_trash_0.85_L'
+        else:
+            trash_name = 'opentrons_1_trash_1.1_L'
+        self.load_labware_by_name(
+            trash_name, '12')
 
     def commands(self):
         return self._commands
@@ -384,6 +390,14 @@ class ProtocolContext:
         """
         return self._deck_layout
 
+    @property
+    def fixed_trash(self) -> Labware:
+        """ The trash fixed to slot 12 of the robot deck. """
+        trash = self._deck_layout['12']
+        if not trash:
+            raise RuntimeError("Robot must have a trash container in 12")
+        return trash  # type: ignore
+
 
 class InstrumentContext:
     """ A context for a specific pipette or instrument.
@@ -416,12 +430,7 @@ class InstrumentContext:
         for tip_rack in self.tip_racks:
             assert tip_rack.is_tiprack
         if trash is None:
-            if advanced_settings.get_adv_setting('shortFixedTrash'):
-                trash_name = 'opentrons_1_trash_0.85_L'
-            else:
-                trash_name = 'opentrons_1_trash_1.1_L'
-            self.trash_container = self._ctx.load_labware_by_name(
-                trash_name, '12')
+            self.trash_container = self._ctx.fixed_trash
         else:
             self.trash_container = trash
 
@@ -880,7 +889,8 @@ class InstrumentContext:
         :note: This property is equivalent to :py:attr:`speeds`; the only
         difference is the units in which this property is specified.
         """
-        raise NotImplementedError
+        return {'aspirate': self.hw_pipette['aspirate_flow_rate'],
+                'dispense': self.hw_pipette['dispense_flow_rate']}
 
     @flow_rate.setter
     def flow_rate(self, new_flow_rate: Dict[str, float]) -> None:
@@ -889,7 +899,7 @@ class InstrumentContext:
         :param new_flow_rates: A dict containing at least one of 'aspirate
         and 'dispense', mapping to new speeds in uL/s.
         """
-        raise NotImplementedError
+        self._hw_manager.hardware.set_flow_rate(self._mount, **new_flow_rate)
 
     @property
     def pick_up_current(self) -> float:

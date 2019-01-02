@@ -21,4 +21,4 @@ def test_loaded(loop):
 
 def test_load_incorrect_definition_by_name():
     with pytest.raises(FileNotFoundError):
-        papi.labware._load_definition_by_name('fake_labware')
+        papi.labware.load_definition_by_name('fake_labware')
