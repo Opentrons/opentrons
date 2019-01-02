@@ -65,6 +65,13 @@ async def test_tip_probe_v2(main_router, model, monkeypatch):
     await main_router.wait_until(state('ready'))
     model.instrument.containers = model.instrument.tip_racks
     model.instrument.tip_racks = []
+
+    def new_fake_locate2(mount, tip_length):
+        assert tip_length is None
+        return Point(0, 0, 0)
+
+    monkeypatch.setattr(main_router.calibration_manager._hardware._api,
+                        'locate_tip_probe_center', new_fake_locate2)
     main_router.calibration_manager.tip_probe(model.instrument)
 
 

@@ -43,12 +43,7 @@ class CalibrationManager:
             if instrument.tip_racks:
                 tip_length = instrument.tip_racks[0]._container.tip_length
             else:
-                tipracks = [cont for cont in instrument.containers
-                            if cont._container.is_tiprack]
-                if tipracks:
-                    tip_length = tipracks[0]._container.tip_length
-                else:
-                    tip_length = None
+                tip_length = None
             measured_center = self._hardware.locate_tip_probe_center(
                 mount, tip_length)
         else:
