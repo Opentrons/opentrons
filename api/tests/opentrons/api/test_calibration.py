@@ -10,7 +10,7 @@ from opentrons.types import Point, Location, Mount
 state = partial(state, 'calibration')
 
 
-@pytest.mark.api2_only
+@pytest.mark.api2_only  # noqa(C901)
 async def test_tip_probe_v2(main_router, model, monkeypatch):
 
     def fake_locate(mount, tip_length):
