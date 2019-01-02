@@ -127,7 +127,7 @@ def set_current_mount(hardware, attached_pipettes):
 
     pipette = None
     model = None
-
+    print(attached_pipettes)
     if not advanced_settings.get_adv_setting('useProtocolApi2'):
         if left['model'] in pipette_config.configs:
             pip_config = pipette_config.load(left['model'])
@@ -225,11 +225,11 @@ async def detach_tip(data, hardware):
     if not advanced_settings.get_adv_setting('useProtocolApi2'):
         if not pipette.tip_attached:
             log.warning('detach tip called with no tip')
-            pipette._remove_tip(session.tip_length)
+        pipette._remove_tip(session.tip_length)
     else:
         if not pipette.has_tip:
             log.warning('detach tip called with no tip')
-            pipette.remove_tip(session.tip_length)
+        pipette.remove_tip(session.tip_length)
     session.tip_length = None
 
     return web.json_response({'message': "Tip removed"}, status=200)
@@ -450,7 +450,6 @@ async def release(data, hardware):
         hardware.remove_instrument('left')
         hardware.remove_instrument('right')
     else:
-        # need to create an event loop
         hardware.cache_instruments()
     return web.json_response({"message": "calibration session released"})
 
@@ -490,8 +489,12 @@ async def start(request):
         hardware = hw_from_req(request)
         if body.get('force'):
             if not advanced_settings.get_adv_setting('useProtocolApi2'):
+                print("hardware type")
+                print(hardware)
                 hardware.remove_instrument('left')
                 hardware.remove_instrument('right')
+            else:
+                hardware.cache_instruments()
 
         session = SessionManager(hardware)
         res = init_pipette(hardware)

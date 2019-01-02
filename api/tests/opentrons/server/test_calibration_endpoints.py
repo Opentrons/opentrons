@@ -7,7 +7,7 @@ from opentrons import robot, instruments
 from opentrons import deck_calibration as dc
 from opentrons.deck_calibration import endpoints
 from opentrons.config import robot_configs
-
+from opentrons import types
 
 # Note that several tests in this file have target/expected values that do not
 # accurately reflect robot operation, because of differences between return
@@ -172,7 +172,6 @@ async def test_transform_calculation(dc_session):
 
 
 # ------------ Session and token tests ----------------------
-@pytest.mark.api1_only
 async def test_create_session(async_client, monkeypatch):
     """
     Tests that the POST request to initiate a session manager for factory
@@ -216,7 +215,6 @@ async def test_create_session(async_client, monkeypatch):
         assert resp.status == 201
 
 
-@pytest.mark.api1_only
 async def test_create_session_fail(async_client, monkeypatch):
     """
     Tests that the GET request to initiate a session manager for factory
@@ -253,7 +251,6 @@ async def test_create_session_fail(async_client, monkeypatch):
     assert endpoints.session is None
 
 
-@pytest.mark.api1_only
 async def test_release(async_client, monkeypatch):
     """
     Tests that the GET request to initiate a session manager for factory
@@ -290,7 +287,6 @@ async def test_release(async_client, monkeypatch):
     assert resp3.status == 201
 
 
-@pytest.mark.api1_only
 async def test_forcing_new_session(async_client, monkeypatch):
     """
     Tests that the GET request to initiate a session manager for factory
@@ -334,28 +330,11 @@ async def test_forcing_new_session(async_client, monkeypatch):
     assert text2 == expected2
 
 
-@pytest.mark.api1_only
-async def test_incorrect_token(async_client, monkeypatch):
+async def test_incorrect_token(async_client, dc_session):
     """
     Test that putting in an incorrect token for a POST request does not work
     after a session was already created with a different token.
     """
-    test_model = 'p300_multi_v1'
-
-    def dummy_read_model(mount):
-        return test_model
-
-    monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_read_model)
-    robot.reset()
-    dummy_token = 'Test Token'
-
-    def uuid_mock():
-        return dummy_token
-
-    monkeypatch.setattr(endpoints, '_get_uuid', uuid_mock)
-
-    await async_client.post('/calibration/deck/start')
-
     resp = await async_client.post(
         '/calibration/deck',
         json={
@@ -370,7 +349,6 @@ async def test_incorrect_token(async_client, monkeypatch):
 
 # ------------ Router tests (integration) ----------------------
 # TODO(mc, 2018-05-02): this does not adequately test z to smoothie axis logic
-@pytest.mark.api1_only
 async def test_set_and_jog_integration(async_client, monkeypatch):
     """
     Test that the jog function works.

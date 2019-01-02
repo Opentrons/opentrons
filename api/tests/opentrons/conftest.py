@@ -178,7 +178,7 @@ def using_api2(loop):
             os.environ.pop('OT_FF_useProtocolApi2')
         else:
             os.environ['OT_FF_useProtocolApi2'] = oldenv
-        opentrons.reset_globals()
+        opentrons.reset_globals(loop=loop)
 
 
 @pytest.fixture
@@ -199,7 +199,7 @@ def using_api1(loop):
         opentrons.hardware.reset()
         if None is not oldenv:
             os.environ['OT_FF_useProtocolApi2'] = oldenv
-        opentrons.reset_globals()
+        opentrons.reset_globals(loop=loop)
 
 
 @pytest.fixture(params=[using_api1, using_api2])
@@ -222,15 +222,25 @@ async def async_client(request, virtual_smoothie_env, loop, test_client):
         yield cli
 
 
-@pytest.fixture
-def dc_session(virtual_smoothie_env, monkeypatch, loop, hardware):
+@pytest.fixture(params=[using_api1, using_api2])
+def dc_session(request, virtual_smoothie_env, monkeypatch, loop):
     """
     Mock session manager for deck calibation
     """
-    with using_api1(loop):
-        ses = endpoints.SessionManager(hardware)
-        monkeypatch.setattr(endpoints, 'session', ses)
-        yield ses
+    if request.node.get_marker('api1_only') and request.param != using_api1:
+            pytest.skip('requires api1 only')
+    elif request.node.get_marker('api2_only') and request.param != using_api2:
+            pytest.skip('requires api2 only')
+    if request.param == using_api1:
+        with using_api1(loop) as hw1:
+            ses = endpoints.SessionManager(hw1)
+            monkeypatch.setattr(endpoints, 'session', ses)
+            yield ses
+    else:
+        with using_api2(loop) as hw1:
+            ses = endpoints.SessionManager(hw1)
+            monkeypatch.setattr(endpoints, 'session', ses)
+            yield ses
 
 
 @pytest.fixture
