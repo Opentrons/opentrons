@@ -9,7 +9,11 @@ import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 
 import {sortedSlotnames, type DeckSlot} from '@opentrons/components'
-import {pipetteModelToName, getIdsInRange} from '../utils'
+import {
+  getIdsInRange,
+  pipetteModelToName,
+  pipetteEntitiesFromReducer,
+} from '../utils'
 import {
   INITIAL_DECK_SETUP_STEP_ID,
   FIXED_TRASH_ID,
@@ -18,7 +22,7 @@ import {getPDMetadata} from '../../file-types'
 import {getDefaultsForStepType} from '../../steplist/formLevel'
 import {cancelStepForm} from '../../steplist/actions'
 
-import {getChangeLabwareEffects} from '../../steplist/actions/handleFormChange'
+import handleFormChange from '../../steplist/actions/handleFormChange'
 
 import type {PipetteEntity, LabwareEntities} from '../types'
 import type {LoadFileAction} from '../../load-file'
@@ -60,17 +64,44 @@ type UnsavedFormActions =
 export const unsavedForm = (rootState: RootState, action: UnsavedFormActions): FormState => {
   const unsavedFormState = rootState ? rootState.unsavedForm : unsavedFormInitialState
   switch (action.type) {
-    case 'CHANGE_FORM_INPUT':
-      // TODO: Ian 2018-12-13 use handleFormChange
+    case 'CHANGE_FORM_INPUT': {
+      const fieldUpdate = handleFormChange(
+        action.payload.update,
+        unsavedFormState,
+        pipetteEntitiesFromReducer(rootState.pipetteInvariantProperties),
+        rootState.labwareInvariantProperties
+      )
       return {
         ...unsavedFormState,
-        ...action.payload.update,
+        ...fieldUpdate,
       }
+    }
     case 'POPULATE_FORM': return action.payload
     case 'CANCEL_STEP_FORM': return unsavedFormInitialState
     case 'SELECT_TERMINAL_ITEM': return unsavedFormInitialState
     case 'SAVE_STEP_FORM': return unsavedFormInitialState
     case 'DELETE_STEP': return unsavedFormInitialState
+    case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
+      const {substitutionMap} = action.payload
+
+      if (
+        !unsavedFormState ||
+        !unsavedFormState.pipette ||
+        !(unsavedFormState.pipette in substitutionMap)
+      ) {
+        return unsavedFormState
+      }
+
+      return {
+        ...unsavedFormState,
+        ...handleFormChange(
+          {pipette: substitutionMap[unsavedFormState.pipette]},
+          unsavedFormState,
+          pipetteEntitiesFromReducer(rootState.pipetteInvariantProperties),
+          rootState.labwareInvariantProperties
+        ),
+      }
+    }
     default:
       return unsavedFormState
   }
@@ -200,16 +231,19 @@ export const savedStepForms = (
         }
         const deleteLabwareUpdate = reduce(savedForm, (acc, value, fieldName) => {
           if (value === labwareIdToDelete) {
-            const formLabwareFieldUpdate = {[fieldName]: null}
             return {
               ...acc,
-              ...formLabwareFieldUpdate,
-              ...getChangeLabwareEffects(formLabwareFieldUpdate),
+              ...handleFormChange(
+                {[fieldName]: null},
+                acc,
+                pipetteEntitiesFromReducer(rootState.pipetteInvariantProperties),
+                rootState.labwareInvariantProperties
+              ),
             }
           } else {
             return acc
           }
-        }, {})
+        }, savedForm)
         return {
           ...savedForm,
           ...deleteLabwareUpdate,
@@ -228,14 +262,18 @@ export const savedStepForms = (
         } else if (deletedPipetteIds.includes(form.pipette)) {
           return {
             ...form,
-            pipette: null,
+            ...handleFormChange(
+              {pipette: null},
+              form,
+              pipetteEntitiesFromReducer(rootState.pipetteInvariantProperties),
+              rootState.labwareInvariantProperties
+            ),
           }
         }
         return form
       })
     }
     case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
-      // TODO: Ian 2019-01-02 use some more general fn to get pipette fields, eventually. But right now the only pipette field is 'pipette'
       const {startStepId, endStepId, substitutionMap} = action.payload
       const stepIdsToUpdate = getIdsInRange(rootState.orderedSteps, startStepId, endStepId)
       const savedStepsUpdate = stepIdsToUpdate.reduce((acc, stepId) => {
@@ -243,19 +281,29 @@ export const savedStepForms = (
 
         if (!prevStepForm.pipette || !(prevStepForm.pipette in substitutionMap)) return acc
 
+        const updatedFields = handleFormChange(
+          {pipette: substitutionMap[prevStepForm.pipette]},
+          prevStepForm,
+          pipetteEntitiesFromReducer(rootState.pipetteInvariantProperties),
+          rootState.labwareInvariantProperties
+        )
+
         return {
           ...acc,
           [stepId]: {
             ...prevStepForm,
-            pipette: substitutionMap[prevStepForm.pipette],
+            ...updatedFields,
           },
         }
       }, {})
       return {...savedStepForms, ...savedStepsUpdate}
     }
     case 'CHANGE_SAVED_STEP_FORM': {
-      // TODO Ian 2018-12-13 do handleFormChange here with full state
       const {stepId} = action.payload
+      if (stepId == null) {
+        assert(false, `savedStepForms got CHANGE_SAVED_STEP_FORM action without a stepId`)
+        return savedStepForms
+      }
       const previousForm = savedStepForms[stepId]
       if (previousForm.stepType === 'manualIntervention') {
         // since manualIntervention steps are nested, use a recursive merge
@@ -274,7 +322,12 @@ export const savedStepForms = (
         ...savedStepForms,
         [stepId]: {
           ...previousForm,
-          ...action.payload.update,
+          ...handleFormChange(
+            action.payload.update,
+            previousForm,
+            pipetteEntitiesFromReducer(rootState.pipetteInvariantProperties),
+            rootState.labwareInvariantProperties
+          ),
         },
       }
     }
@@ -316,7 +369,7 @@ export const labwareInvariantProperties = handleActions({
 }, initialLabwareState)
 
 const initialPipetteState = {}
-type PipetteInvariantState = {[pipetteId: string]: $Diff<PipetteEntity, {'spec': *}>}
+export type PipetteInvariantState = {[pipetteId: string]: $Diff<PipetteEntity, {'spec': *}>}
 export const pipetteInvariantProperties = handleActions({
   LOAD_FILE: (state: PipetteInvariantState, action: LoadFileAction): PipetteInvariantState => {
     const metadata = getPDMetadata(action.payload)

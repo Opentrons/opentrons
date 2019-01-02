@@ -4,25 +4,20 @@ import type {Dispatch} from 'redux'
 import {selectors as stepFormSelectors} from '../../step-forms'
 import {selectors as stepsSelectors} from '../../ui/steps'
 import type {StepType, StepIdType, FormData} from '../../form-types'
-import type {ChangeFormPayload, ChangeSavedFormPayload} from './types'
-import type {GetState, ThunkDispatch} from '../../types'
-import handleFormChange from './handleFormChange'
+import type {ChangeFormPayload} from './types'
+import type {GetState} from '../../types'
 
-export type ChangeSavedStepFormAction = {type: 'CHANGE_SAVED_STEP_FORM', payload: ChangeSavedFormPayload}
-export const changeSavedStepForm = (payload: ChangeSavedFormPayload) => ({
+export type ChangeSavedStepFormAction = {type: 'CHANGE_SAVED_STEP_FORM', payload: ChangeFormPayload}
+export const changeSavedStepForm = (payload: ChangeFormPayload) => ({
   type: 'CHANGE_SAVED_STEP_FORM',
   payload,
 })
 
 export type ChangeFormInputAction = {type: 'CHANGE_FORM_INPUT', payload: ChangeFormPayload}
-export const changeFormInput = (payload: ChangeFormPayload) =>
-  (dispatch: ThunkDispatch<ChangeFormInputAction>, getState: GetState) => {
-    const unsavedForm = stepFormSelectors.getUnsavedForm(getState())
-    dispatch({
-      type: 'CHANGE_FORM_INPUT',
-      payload: handleFormChange(payload, unsavedForm, getState),
-    })
-  }
+export const changeFormInput = (payload: ChangeFormPayload): ChangeFormInputAction => ({
+  type: 'CHANGE_FORM_INPUT',
+  payload,
+})
 
 // Populate form with selected action (only used in thunks)
 

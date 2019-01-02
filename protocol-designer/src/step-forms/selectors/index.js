@@ -18,6 +18,7 @@ import {
   hydrateField,
   getFieldErrors,
 } from '../../steplist/fieldLevel'
+import {pipetteEntitiesFromReducer} from '../utils'
 
 import type {ElementProps} from 'react'
 import type {
@@ -42,7 +43,6 @@ import type {
   InitialDeckSetup,
   LabwareEntities,
   LabwareOnDeck,
-  PipetteEntity,
   PipetteEntities,
   PipetteOnDeck,
   FormPipettesByMount,
@@ -66,15 +66,7 @@ export const getLabwareInvariantProperties: Selector<LabwareEntities> = createSe
 
 export const getPipetteInvariantProperties: Selector<PipetteEntities> = createSelector(
   rootSelector,
-  (state) => reduce(
-    state.pipetteInvariantProperties,
-    (acc: PipetteEntities, pipette: PipetteEntity, id: string): PipetteEntities => {
-      const spec = getPipetteNameSpecs(pipette.name)
-      assert(spec, `no pipette spec for pipette id "${id}", name "${pipette.name}"`)
-      return spec
-        ? {...acc, [id]: {...pipette, spec}}
-        : acc
-    }, {})
+  (state) => pipetteEntitiesFromReducer(state.pipetteInvariantProperties)
 )
 
 export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(

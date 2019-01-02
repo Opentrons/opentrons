@@ -1,5 +1,9 @@
 // @flow
 import assert from 'assert'
+import reduce from 'lodash/reduce'
+import {getPipetteNameSpecs} from '@opentrons/shared-data'
+import type {PipetteInvariantState} from './reducers'
+import type {PipetteEntity, PipetteEntities} from './types'
 
 // for backwards compatibility, strip version suffix (_v1, _v1.3 etc)
 // from model string, if it exists
@@ -14,4 +18,17 @@ export function getIdsInRange<T: string | number> (orderedIds: Array<T>, startId
   assert(endIdx !== -1, `end step "${String(endId)}" does not exist in orderedSteps`)
   assert(endIdx >= startIdx, `expected end index to be greater than or equal to start index, got "${startIdx}", "${endIdx}"`)
   return orderedIds.slice(startIdx, endIdx + 1)
+}
+
+// helper to add the 'spec' key to pipette entities safely
+export function pipetteEntitiesFromReducer (pipetteInvariantProperties: PipetteInvariantState): PipetteEntities {
+  return reduce(
+    pipetteInvariantProperties,
+    (acc: PipetteEntities, pipette: PipetteEntity, id: string): PipetteEntities => {
+      const spec = getPipetteNameSpecs(pipette.name)
+      assert(spec, `no pipette spec for pipette id "${id}", name "${pipette.name}"`)
+      return spec
+        ? {...acc, [id]: {...pipette, spec}}
+        : acc
+    }, {})
 }
