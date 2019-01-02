@@ -7,7 +7,7 @@ import omit from 'lodash/omit'
 import {getPDMetadata} from '../../file-types'
 
 import type {LoadFileAction} from '../../load-file'
-import type {StepIdType, FormModalFields} from '../../form-types'
+import type {StepIdType} from '../../form-types'
 import {START_TERMINAL_ITEM_ID, type SubstepIdentifier, type TerminalItemId} from '../../steplist/types'
 import type {
   AddStepAction,
@@ -21,20 +21,7 @@ import {
   toggleStepCollapsed,
   type SelectStepAction,
   type SelectTerminalItemAction,
-  type ChangeMoreOptionsModalInputAction,
-  type OpenMoreOptionsModalAction,
 } from './actions'
-
-// the form modal (MORE OPTIONS) is an unsaved version of unsavedForm.
-// It's 2 degrees away from actual savedStepForms.
-const unsavedFormModal = handleActions({
-  OPEN_MORE_OPTIONS_MODAL: (state, action: OpenMoreOptionsModalAction) => action.payload,
-  CHANGE_MORE_OPTIONS_MODAL_INPUT: (state, action: ChangeMoreOptionsModalInputAction) =>
-    ({...state, ...action.payload.update}),
-  CANCEL_MORE_OPTIONS_MODAL: () => null,
-  SAVE_MORE_OPTIONS_MODAL: () => null,
-  DELETE_STEP: () => null,
-}, null)
 
 type CollapsedStepsState = {[StepIdType]: boolean}
 const collapsedSteps: Reducer<CollapsedStepsState, *> = handleActions({
@@ -107,7 +94,6 @@ const wellSelectionLabwareKey = handleActions({
 }, null)
 
 export type StepsState = {|
-  unsavedFormModal: FormModalFields,
   collapsedSteps: CollapsedStepsState,
   selectedItem: SelectedItemState,
   hoveredItem: HoveredItemState,
@@ -116,7 +102,6 @@ export type StepsState = {|
 |}
 
 export const _allReducers = {
-  unsavedFormModal,
   collapsedSteps,
   selectedItem,
   hoveredItem,

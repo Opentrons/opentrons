@@ -342,21 +342,11 @@ export const getAllSteps: Selector<{[stepId: StepIdType]: StepItemData}> = creat
       steps,
       (step: StepItemData, id: StepIdType): StepItemData => {
         const savedForm = (savedForms && savedForms[id]) || null
-
-        // Assign the step title
-        let title
-
-        if (savedForm && savedForm['step-name']) {
-          title = savedForm['step-name']
-        } else {
-          title = step.stepType
-        }
-
         return {
           ...steps[id],
           formData: savedForm,
-          title,
-          description: savedForm ? savedForm['step-details'] : null,
+          title: savedForm ? savedForm.stepName : step.stepType,
+          description: savedForm ? savedForm.stepDetails : null,
         }
       }
     )

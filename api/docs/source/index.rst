@@ -31,7 +31,7 @@ __ https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#development-
 
 or this `support article`__
 
-__ https://support.opentrons.com/ot-2/getting-started-software-setup/installing-the-opentrons-api-on-your-computer
+__ https://support.opentrons.com/ot-2/getting-started-software-setup/installing-the-opentrons-api-on-your-computer-for-simulation
 
 
 **********************
