@@ -39,9 +39,9 @@ type DragPreviewProps = {
 }
 const DragPreview = (props: DragPreviewProps) => {
   const {item, itemType, isDragging, currentOffset, getXY} = props
+  if (itemType !== DND_TYPES.LABWARE || !isDragging || !currentOffset) return null
   const {scaledX, scaledY} = getXY(currentOffset && currentOffset.x, currentOffset && currentOffset.y)
   const {containerId} = item || {}
-  if (itemType !== DND_TYPES.LABWARE || !isDragging || !currentOffset) return null
   return (
     <g>
       <LabwareContainer x={scaledX} y={scaledY}>
@@ -221,20 +221,12 @@ type LabwareOnDeckProps = {
   canAddIngreds: boolean,
   isTiprack: boolean,
   selectedTerminalItem: ?TerminalItemId,
-  moveLabwareMode: boolean,
 
   addLabware: () => mixed,
   editLiquids: () => mixed,
   drillDown: () => mixed,
   drillUp: () => mixed,
   deleteLabware: () => mixed,
-  duplicateLabware: (string) => mixed,
-
-  cancelMove: () => mixed,
-  moveLabwareDestination: () => mixed,
-  moveLabwareSource: () => mixed,
-  slotToMoveFrom: ?DeckSlot,
-
   setLabwareName: (name: ?string) => mixed,
   setDefaultLabwareName: () => mixed,
 }
@@ -246,8 +238,6 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
   // shouldComponentUpdate (nextProps: LabwareOnDeckProps) {
   //   const shouldAlwaysUpdate = this.props.addLabwareMode ||
   //     nextProps.addLabwareMode ||
-  //     this.props.moveLabwareMode ||
-  //     nextProps.moveLabwareMode
 
   //   const labwarePresenceChange = this.props.containerId !== nextProps.containerId
   //   const nameOverlayChange = this.props.showNameOverlay !== nextProps.showNameOverlay

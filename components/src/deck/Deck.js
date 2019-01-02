@@ -27,7 +27,7 @@ export type LabwareComponentProps = {
 type Props = {
   className?: string,
   LabwareComponent?: React.ComponentType<LabwareComponentProps>,
-  DragPreviewLayer?: React.Element<*>,
+  DragPreviewLayer?: React.Element<*> | React.Portal<*>,
 }
 
 const VIEW_BOX_WIDTH = 427

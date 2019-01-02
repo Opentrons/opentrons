@@ -91,14 +91,12 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   return {
     slotHasLabware,
     addLabwareMode,
-    // moveLabwareMode,
     setDefaultLabwareName,
     canAddIngreds,
     isTiprack,
     labwareInfo,
 
     showNameOverlay,
-    // slotToMoveFrom,
     highlighted: selectedTerminalItem === START_TERMINAL_ITEM_ID
     // in deckSetupMode, labware is highlighted when selected (currently editing ingredients)
     // or when targeted by an open "Add Labware" modal
@@ -129,9 +127,6 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}, own
     drillDown: () => dispatch(drillDownOnLabware(containerId)),
     drillUp: () => dispatch(drillUpFromLabware()),
     duplicateLabware: (id) => dispatch(duplicateLabware(id)),
-    // cancelMove: () => dispatch(setMoveLabwareMode()),
-    // moveLabwareDestination: () => dispatch(moveLabware(slot)),
-    // moveLabwareSource: () => dispatch(setMoveLabwareMode(slot)),
     swapSlotContents: (sourceSlot, destSlot) => dispatch(swapSlotContents(sourceSlot, destSlot)),
 
     setLabwareName: (name: ?string) => dispatch(renameLabware({
