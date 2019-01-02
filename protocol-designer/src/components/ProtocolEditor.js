@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
+import {DragDropContext} from 'react-dnd'
+import MouseBackEnd from 'react-dnd-mouse-backend'
 import ConnectedNav from '../containers/ConnectedNav'
 import ConnectedSidebar from '../containers/ConnectedSidebar'
 import ConnectedTitleBar from '../containers/ConnectedTitleBar'
@@ -17,7 +19,7 @@ const SelectorDebugger = process.env.NODE_ENV === 'development'
   ? require('../containers/SelectorDebugger').default
   : () => null
 
-export default function ProtocolEditor () {
+function ProtocolEditor () {
   return (
     <div>
       <SelectorDebugger />
@@ -42,3 +44,5 @@ export default function ProtocolEditor () {
     </div>
   )
 }
+
+export default DragDropContext(MouseBackEnd)(ProtocolEditor)

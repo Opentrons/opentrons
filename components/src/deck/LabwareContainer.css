@@ -62,3 +62,7 @@ NOTE: available defs are:
   font-weight: var(--fw-semibold);
   text-transform: uppercase;
 }
+
+.deck_slot:active {
+  cursor: grabbing;
+}
