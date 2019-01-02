@@ -1,7 +1,6 @@
 // @flow
 import {createAction} from 'redux-actions'
 import type {Dispatch} from 'redux'
-import uuid from 'uuid'
 
 import {selectors} from './reducers'
 import {INITIAL_DECK_SETUP_STEP_ID} from '../constants'

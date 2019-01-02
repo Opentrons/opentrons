@@ -307,6 +307,7 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
 
     const labwareOrSlot = (slotHasLabware)
       ? <SlotWithLabware
+        key={`${containerType}`}
         {...{containerType, containerId}}
         displayName={containerName || containerType}
       />

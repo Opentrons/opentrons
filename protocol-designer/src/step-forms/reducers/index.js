@@ -2,8 +2,8 @@
 import assert from 'assert'
 import {handleActions} from 'redux-actions'
 import type {ActionType} from 'redux-actions'
-import cloneDeep from 'lodash/cloneDeep'
 import mapValues from 'lodash/mapValues'
+import cloneDeep from 'lodash/cloneDeep'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
@@ -153,10 +153,11 @@ export const savedStepForms = (
         ...getDefaultsForStepType(stepForm.stepType),
         ...stepForm,
       }))
+    case 'DUPLICATE_LABWARE':
     case 'CREATE_CONTAINER':
     // auto-update initial deck setup state.
       const prevInitialDeckSetupStep = savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
-      const {id} = action.payload
+      const {id, duplicateLabwareId} = action.payload
       const slot = action.payload.slot || _getNextAvailableSlot(prevInitialDeckSetupStep.labwareLocationUpdate)
       if (!slot) {
         console.warn('no slots available, ignoring action:', action)
@@ -168,7 +169,7 @@ export const savedStepForms = (
           ...prevInitialDeckSetupStep,
           labwareLocationUpdate: {
             ...prevInitialDeckSetupStep.labwareLocationUpdate,
-            [id]: slot,
+            [id || duplicateLabwareId]: slot,
           },
         },
       }
@@ -260,6 +261,12 @@ export const labwareInvariantProperties = handleActions({
     return {
       ...state,
       [action.payload.id]: {type: action.payload.containerType},
+    }
+  },
+  DUPLICATE_LABWARE: (state: LabwareEntities, action: DuplicateLabwareAction) => {
+    return {
+      ...state,
+      [action.payload.duplicateLabwareId]: {type: state[action.payload.templateLabwareId].type},
     }
   },
   DELETE_CONTAINER: (state: LabwareEntities, action: DeleteContainerAction): LabwareEntities => {
