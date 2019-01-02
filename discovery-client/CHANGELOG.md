@@ -3,6 +3,51 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.6.5"></a>
+## [3.6.5](https://github.com/Opentrons/opentrons/compare/v3.6.4...v3.6.5) (2018-12-18)
+
+**Note:** Version bump only for package @opentrons/discovery-client
+
+
+
+
+
+<a name="3.6.4"></a>
+## [3.6.4](https://github.com/Opentrons/opentrons/compare/v3.6.3...v3.6.4) (2018-12-17)
+
+**Note:** Version bump only for package @opentrons/discovery-client
+
+
+
+
+
+<a name="3.6.3"></a>
+## [3.6.3](https://github.com/Opentrons/opentrons/compare/v3.6.2...v3.6.3) (2018-12-13)
+
+**Note:** Version bump only for package @opentrons/discovery-client
+
+
+
+
+
+<a name="3.6.2"></a>
+## [3.6.2](https://github.com/Opentrons/opentrons/compare/v3.6.0...v3.6.2) (2018-12-11)
+
+**Note:** Version bump only for package @opentrons/discovery-client
+
+
+
+
+
+<a name="3.6.1"></a>
+## [3.6.1](https://github.com/Opentrons/opentrons/compare/v3.6.0...v3.6.1) (2018-12-05)
+
+**Note:** Version bump only for package @opentrons/discovery-client
+
+
+
+
+
 <a name="3.6.0"></a>
 # [3.6.0](https://github.com/Opentrons/opentrons/compare/v3.6.0-beta.1...v3.6.0) (2018-11-29)
 

@@ -4,4 +4,11 @@
   @apply(--absolute-fill);
 
   background-color: rgba(100, 100, 100, 0.8);
+
+  /* make up lost space for overlay */
+  height: 103%;
+
+  &.expanded {
+    height: 127%;
+  }
 }

@@ -14,7 +14,7 @@ class MainRouter:
             CalibrationManager.TOPIC,
             self._notifications.on_notify)]
 
-        self.session_manager = SessionManager(hardware)
+        self.session_manager = SessionManager(hardware=hardware, loop=loop)
         self.calibration_manager = CalibrationManager(hardware=hardware,
                                                       loop=loop)
 

@@ -3,12 +3,8 @@ import {connect} from 'react-redux'
 import * as React from 'react'
 import type {BaseState, ThunkDispatch} from '../../../types'
 
-import {
-  actions as steplistActions,
-  selectors as steplistSelectors,
-  type TerminalItemId,
-} from '../../../steplist'
-
+import type {TerminalItemId} from '../../../steplist'
+import {selectors as stepsSelectors, actions as stepsActions} from '../../../ui/steps'
 import {PDTitledList} from '../../lists'
 export {default as TerminalItemLink} from './TerminalItemLink'
 
@@ -27,8 +23,8 @@ type SP = {
 
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {id} = ownProps
-  const hovered = steplistSelectors.getHoveredTerminalItemId(state) === id
-  const selected = steplistSelectors.getSelectedTerminalItemId(state) === id
+  const hovered = stepsSelectors.getHoveredTerminalItemId(state) === id
+  const selected = stepsSelectors.getSelectedTerminalItemId(state) === id
   return {
     hovered,
     selected,
@@ -43,9 +39,9 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>}
     ...stateProps,
     title,
     children,
-    onClick: () => dispatch(steplistActions.selectTerminalItem(id)),
-    onMouseEnter: () => dispatch(steplistActions.hoverOnTerminalItem(id)),
-    onMouseLeave: () => dispatch(steplistActions.hoverOnTerminalItem(null)),
+    onClick: () => dispatch(stepsActions.selectTerminalItem(id)),
+    onMouseEnter: () => dispatch(stepsActions.hoverOnTerminalItem(id)),
+    onMouseLeave: () => dispatch(stepsActions.hoverOnTerminalItem(null)),
   }
 }
 

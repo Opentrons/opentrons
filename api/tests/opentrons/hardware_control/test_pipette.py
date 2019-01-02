@@ -30,7 +30,8 @@ def test_critical_points():
         assert pip.critical_point(types.CriticalPoint.TIP) == mod_offset
         tip_length = 25.0
         pip.add_tip(tip_length)
-        new = mod_offset._replace(z=mod_offset.z - tip_length)
+        new = mod_offset._replace(z=mod_offset.z
+                                  - (tip_length - pip._config.tip_overlap))
         assert pip.critical_point() == new
         assert pip.critical_point(types.CriticalPoint.NOZZLE) == mod_offset
         assert pip.critical_point(types.CriticalPoint.TIP) == new

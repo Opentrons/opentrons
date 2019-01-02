@@ -46,6 +46,10 @@ export type Config = {
     seenOptIn: boolean,
   },
 
+  p10WarningSeen: {
+    [id: string]: ?boolean,
+  },
+
   support: {
     userId: string,
     createdAt: number,
@@ -55,11 +59,6 @@ export type Config = {
 
   discovery: {
     candidates: string | Array<string>,
-  },
-
-  // internal development flags
-  devInternal?: {
-    newUpdateModal?: boolean,
   },
 }
 

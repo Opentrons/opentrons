@@ -1,5 +1,12 @@
 from opentrons import containers, instruments
 
+metadata = {
+    'protocolName': 'Multi/Single',
+    'author': 'Opentrons <engineering@opentrons.com>',
+    'description': 'A protocol that uses both 8- and 1-channel pipettes',
+    'source': 'Opentrons Repository'
+}
+
 # from opentrons import robot
 # robot.connect()
 # robot.home()

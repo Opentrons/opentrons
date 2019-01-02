@@ -5,13 +5,42 @@ from opentrons import instruments, robot
 from opentrons.legacy_api.containers import load as containers_load
 from opentrons.config import pipette_config
 from opentrons.trackers import pose_tracker
+from opentrons.config import feature_flags as ff
 from numpy import isclose
 import pytest
 
 
-def test_pipette_version_1_0_and_1_3_extended_travel():
-    from opentrons.config import pipette_config
+def test_p10_single_aspiration(monkeypatch):
+    """ test that the p10 single aspiration function changes
+    depending on the feature flag
+    """
+    # Without modifying anything, the old ul per mm should be loaded
+    old_aspiration = [
+        [1.8263, -0.0958, 1.088],
+        [2.5222, -0.104, 1.1031],
+        [3.2354, -0.0447, 0.9536],
+        [3.9984, -0.012, 0.8477],
+        [12.5135, -0.0021, 0.8079]
+      ]
+    new_aspiration = [
+        [1.438649211,	0.01931415115,	0.691538317],
+        [1.836824579,	0.03868955123,	0.6636639129],
+        [2.960052684,	0.00470371018,	0.7260899411],
+        [4.487508789,	0.005175245625,	0.7246941713],
+        [10.59661421,	0.001470408978,	0.7413196584]
+    ]
+    models = ['p10_single_v1', 'p10_single_v1.3', 'p10_single_v1.4']
+    for model in models:
+        conf = pipette_config.load(model)
+        assert conf.ul_per_mm['aspirate'] == old_aspiration
+    monkeypatch.setattr(ff, 'use_new_p10_aspiration',
+                        lambda: True)
+    for model in models:
+        conf = pipette_config.load(model)
+        assert conf.ul_per_mm['aspirate'] == new_aspiration
 
+
+def test_pipette_version_1_0_and_1_3_extended_travel():
     models = [
         'p10_single', 'p10_multi', 'p50_single', 'p50_multi',
         'p300_single', 'p300_multi', 'p1000_single'

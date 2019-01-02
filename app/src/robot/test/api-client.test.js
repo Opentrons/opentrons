@@ -412,7 +412,10 @@ describe('api client', () => {
           slot: '1',
           name: 'a',
           type: 'tiprack',
-          instruments: [{mount: 'right'}],
+          instruments: [
+            {mount: 'left', channels: 8},
+            {mount: 'right', channels: 1},
+          ],
         },
         {_id: 2, slot: '5', name: 'b', type: 'B'},
         {_id: 3, slot: '9', name: 'c', type: 'C'},
@@ -453,6 +456,30 @@ describe('api client', () => {
 
       return sendConnect()
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    test('maps api metadata to session metadata', () => {
+      const expected = actions.sessionResponse(null, expect.objectContaining({
+        metadata: {
+          'protocol-name': 'foo',
+          description: 'bar',
+          author: 'baz',
+          source: 'qux',
+        },
+      }))
+
+      session.metadata = {
+        _id: 1234,
+        some: () => {},
+        rpc: () => {},
+        cruft: () => {},
+        protocolName: 'foo',
+        description: 'bar',
+        author: 'baz',
+        source: 'qux',
+      }
+
+      return sendConnect().then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
     test('sends error if received malformed session from API', () => {

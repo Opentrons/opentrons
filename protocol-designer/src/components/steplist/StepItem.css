@@ -151,3 +151,28 @@
 .labware_display_name {
   cursor: default;
 }
+
+.context_menu {
+  position: absolute;
+  color: var(--c-font-light);
+  background-color: var(--c-bg-dark);
+  box-shadow: 0 2px 6px #999;
+  z-index: 100000;
+}
+
+.context_menu_item {
+  padding: 6px 50px 5px 10px;
+  min-width: 160px;
+  cursor: default;
+  font-size: var(--fs-body-1);
+}
+
+.context_menu_item:hover {
+  background-color: color(var(--c-bg-dark) shade(30%));
+  color: var(--c-font-light);
+}
+
+.context_menu_item:active {
+  color: white;
+  background-color: color(var(--c-bg-dark) shade(30%));
+}

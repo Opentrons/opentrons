@@ -1,7 +1,7 @@
 // @flow
 import merge from 'lodash/merge'
 import {createRobotState, commandCreatorNoErrors} from './fixtures'
-import _dropTip from '../dropTip'
+import _dropTip from '../commandCreators/atomic/dropTip'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
 

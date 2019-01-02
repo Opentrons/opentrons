@@ -5,10 +5,12 @@ import get from 'lodash/get'
 import without from 'lodash/without'
 import cx from 'classnames'
 
-import {actions, selectors} from '../../steplist'
-import type {FormData, StepType, StepFieldName} from '../../form-types'
+import {actions} from '../../steplist'
+import {selectors as stepFormSelectors} from '../../step-forms'
+import type {FormData, StepType, StepFieldName, StepIdType} from '../../form-types'
 import type {BaseState, ThunkDispatch} from '../../types'
 import formStyles from '../forms.css'
+import MoreOptionsModal from '../modals/MoreOptionsModal'
 import styles from './StepEditForm.css'
 import FormAlerts from './FormAlerts'
 import MixForm from './MixForm'
@@ -37,10 +39,11 @@ type SP = {
   formData?: ?FormData,
   isNewStep?: boolean,
 }
-type DP = { deleteStep: () => mixed }
+type DP = { deleteStep: (StepIdType) => mixed }
 
 type StepEditFormState = {
   showConfirmDeleteModal: boolean,
+  showMoreOptionsModal: boolean,
   focusedField: StepFieldName | null,
   dirtyFields: Array<StepFieldName>,
 }
@@ -58,6 +61,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
     const {isNewStep, formData} = props
     this.state = {
       showConfirmDeleteModal: false,
+      showMoreOptionsModal: false,
       focusedField: null,
       dirtyFields: getDirtyFields(isNewStep, formData),
     }
@@ -87,6 +91,12 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
     })
   }
 
+  toggleMoreOptionsModal = () => {
+    this.setState({
+      showMoreOptionsModal: !this.state.showMoreOptionsModal,
+    })
+  }
+
   render () {
     if (!this.props.formData) return null // early-exit if connected formData is absent
     const {formData, deleteStep} = this.props
@@ -101,11 +111,15 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
           onCancelClick={this.toggleConfirmDeleteModal}
           onContinueClick={() => {
             this.toggleConfirmDeleteModal()
-            deleteStep()
+            this.props.formData && deleteStep(this.props.formData.id)
           }}
         />}
+        {this.state.showMoreOptionsModal && <MoreOptionsModal
+          formData={this.props.formData}
+          close={this.toggleMoreOptionsModal}
+        />}
+        <FormAlerts focusedField={this.state.focusedField} dirtyFields={this.state.dirtyFields} />
         <div className={cx(formStyles.form, styles[formData.stepType])}>
-          <FormAlerts focusedField={this.state.focusedField} dirtyFields={this.state.dirtyFields} />
           <FormComponent
             stepType={formData.stepType}
             focusHandlers={{
@@ -114,7 +128,9 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
               onFieldFocus: this.onFieldFocus,
               onFieldBlur: this.onFieldBlur,
             }} />
-          <ButtonRow onDelete={this.toggleConfirmDeleteModal}/>
+          <ButtonRow
+            onClickMoreOptions={this.toggleMoreOptionsModal}
+            onDelete={this.toggleConfirmDeleteModal}/>
         </div>
       </React.Fragment>
     )
@@ -122,12 +138,12 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
 }
 
 const mapStateToProps = (state: BaseState): SP => ({
-  formData: selectors.getUnsavedForm(state),
-  isNewStep: selectors.getIsNewStepForm(state),
+  formData: stepFormSelectors.getUnsavedForm(state),
+  isNewStep: stepFormSelectors.getIsNewStepForm(state),
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
-  deleteStep: () => dispatch(actions.deleteStep()),
+  deleteStep: (stepId: StepIdType) => dispatch(actions.deleteStep(stepId)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(StepEditForm)

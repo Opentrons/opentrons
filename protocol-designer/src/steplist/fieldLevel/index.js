@@ -1,6 +1,5 @@
 // @flow
-import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
-import {selectors as pipetteSelectors} from '../../pipettes'
+import {getLabware} from '@opentrons/shared-data'
 import {
   requiredField,
   minimumWellCount,
@@ -23,12 +22,22 @@ export type {
   StepFieldName,
 }
 
-const hydrateLabware = (state: StepFormContextualState, id: string) => (
-  labwareIngredSelectors.getLabwareById(state)[id]
-)
-const hydratePipette = (state: StepFormContextualState, id: string) => (
-  pipetteSelectors.getPipettesById(state)[id]
-)
+const hydrateLabware = (state: StepFormContextualState, id: string) => {
+  const labware = state.labware[id]
+  return labware && {
+    ...getLabware(labware.type),
+    ...labware,
+    id,
+  }
+}
+const hydratePipette = (state: StepFormContextualState, id: string) => {
+  const pipette = state.pipettes[id]
+  return pipette && {
+    ...pipette.spec, // TODO: Ian 2018-12-20 don't spread this
+    ...pipette,
+    id,
+  }
+}
 
 type StepFieldHelpers = {
   getErrors?: (mixed) => Array<string>,
@@ -45,12 +54,6 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
   'aspirate_wells': {
     getErrors: composeErrors(requiredField, minimumWellCount(1)),
     processValue: defaultTo([]),
-  },
-  'dispense_delayMinutes': {
-    processValue: composeProcessors(castToNumber, defaultTo(0)),
-  },
-  'dispense_delaySeconds': {
-    processValue: composeProcessors(castToNumber, defaultTo(0)),
   },
   'dispense_labware': {
     getErrors: composeErrors(requiredField),

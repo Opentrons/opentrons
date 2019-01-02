@@ -3,6 +3,69 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.6.5"></a>
+## [3.6.5](https://github.com/Opentrons/opentrons/compare/v3.6.4...v3.6.5) (2018-12-18)
+
+
+### Bug Fixes
+
+* **api:** Fix extract metadata ([#2833](https://github.com/Opentrons/opentrons/issues/2833)) ([0930915](https://github.com/Opentrons/opentrons/commit/0930915))
+* **api:** Remove the intermingled old aspirate function from p10s ([#2839](https://github.com/Opentrons/opentrons/issues/2839)) ([696184c](https://github.com/Opentrons/opentrons/commit/696184c))
+
+
+
+
+
+<a name="3.6.4"></a>
+## [3.6.4](https://github.com/Opentrons/opentrons/compare/v3.6.3...v3.6.4) (2018-12-17)
+
+
+### Features
+
+* **api:** Adds optional arg to QC scripts to specify UART port ([#2825](https://github.com/Opentrons/opentrons/issues/2825)) ([5d622ad](https://github.com/Opentrons/opentrons/commit/5d622ad))
+
+
+
+
+
+<a name="3.6.3"></a>
+## [3.6.3](https://github.com/Opentrons/opentrons/compare/v3.6.2...v3.6.3) (2018-12-13)
+
+**Note:** Version bump only for package @opentrons/api-server
+
+
+
+
+
+<a name="3.6.2"></a>
+## [3.6.2](https://github.com/Opentrons/opentrons/compare/v3.6.0...v3.6.2) (2018-12-11)
+
+
+### Bug Fixes
+
+* **api:** Do not overwrite settings every time we get config files ([#2802](https://github.com/Opentrons/opentrons/issues/2802)) ([c679c5c](https://github.com/Opentrons/opentrons/commit/c679c5c))
+
+
+### Features
+
+* **api:** Add metadata to session for Python protocols ([#2799](https://github.com/Opentrons/opentrons/issues/2799)) ([1da19bb](https://github.com/Opentrons/opentrons/commit/1da19bb)), closes [#2616](https://github.com/Opentrons/opentrons/issues/2616)
+* **api:** p10 behavior feature flag ([#2794](https://github.com/Opentrons/opentrons/issues/2794)) ([c468b06](https://github.com/Opentrons/opentrons/commit/c468b06)), closes [#2792](https://github.com/Opentrons/opentrons/issues/2792)
+
+
+
+
+
+<a name="3.6.1"></a>
+## [3.6.1](https://github.com/Opentrons/opentrons/compare/v3.6.0...v3.6.1) (2018-12-05)
+
+### Bug Fixes
+
+* **api:** Fix bad P10S config causing under-aspirations ([#2774](https://github.com/Opentrons/opentrons/issues/2774)) ([9c5e0a2](https://github.com/Opentrons/opentrons/commit/9c5e0a2))
+
+
+
+
+
 <a name="3.6.0"></a>
 # [3.6.0](https://github.com/Opentrons/opentrons/compare/v3.6.0-beta.1...v3.6.0) (2018-11-29)
 

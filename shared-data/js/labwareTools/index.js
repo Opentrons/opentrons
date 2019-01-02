@@ -201,6 +201,12 @@ function calculateCoordinates (
   }, {})
 }
 
+export function _calculateCornerOffset (dimensions: Dimensions): Offset {
+  return {
+    x: round(SLOT_LENGTH_MM - dimensions.overallLength, 2),
+    y: round(SLOT_WIDTH_MM - dimensions.overallWidth, 2),
+    z: 0}
+}
 // Generator function for labware definitions within a regular grid format
 // e.g. well plates, regular tuberacks (NOT 15_50ml) etc.
 // For further info on these parameters look at labware examples in __tests__
@@ -212,10 +218,7 @@ export function createRegularLabware (args: RegularLabwareProps): Schema {
     otId: assignId(),
     deprecated: false,
     metadata: args.metadata,
-    cornerOffsetFromSlot: {
-      x: round(args.dimensions.overallLength - SLOT_LENGTH_MM, 2),
-      y: round(args.dimensions.overallWidth - SLOT_WIDTH_MM, 2),
-      z: 0},
+    cornerOffsetFromSlot: _calculateCornerOffset(args.dimensions),
     dimensions: args.dimensions,
     parameters: args.parameters,
     wells: calculateCoordinates(args.well, ordering, args.spacing, args.offset),
@@ -253,10 +256,7 @@ export function createIrregularLabware (args: IrregularLabwareProps): Schema {
     otId: assignId(),
     deprecated: false,
     metadata: args.metadata,
-    cornerOffsetFromSlot: {
-      x: round(args.dimensions.overallLength - SLOT_LENGTH_MM, 2),
-      y: round(args.dimensions.overallWidth - SLOT_WIDTH_MM, 2),
-      z: 0},
+    cornerOffsetFromSlot: _calculateCornerOffset(args.dimensions),
     dimensions: args.dimensions,
     parameters: {
       ...args.parameters,
@@ -264,6 +264,7 @@ export function createIrregularLabware (args: IrregularLabwareProps): Schema {
     wells: wellsArray,
   }
 
+  // TODO: Handle spaces in brand name
   const brand = (args.brand && args.brand.brand) || 'generic'
   if (args.brand) definition.brand = args.brand
 

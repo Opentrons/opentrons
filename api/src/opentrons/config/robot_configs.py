@@ -223,10 +223,10 @@ def _load_json(filename) -> dict:
         with open(filename, 'r') as file:
             res = json.load(file)
     except FileNotFoundError:
-        print('Warning: {0} not found. Loading defaults'.format(filename))
+        log.warning('{0} not found. Loading defaults'.format(filename))
         res = {}
     except json.decoder.JSONDecodeError:
-        print('Error: {0} is corrupt. Loading defaults'.format(filename))
+        log.warning('{0} is corrupt. Loading defaults'.format(filename))
         res = {}
     return res
 

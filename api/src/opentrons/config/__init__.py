@@ -79,7 +79,7 @@ def get_config_index() -> dict:
     file_path = os.path.join(base_path, index_filename)
     with open(file_path) as base_config_file:
         res = json.load(base_config_file)
-    defaults = _generate_base_config()[1]
+    defaults = _generate_base_config(skip_usb=True)[1]
     for key, default_val in defaults.items():
         if key not in res.keys():
             res[key] = default_val

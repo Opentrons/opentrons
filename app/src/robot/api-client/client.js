@@ -3,6 +3,9 @@
 // TODO(mc, 2018-01-26): typecheck with flow
 import {push} from 'react-router-redux'
 import find from 'lodash/find'
+import kebabCase from 'lodash/kebabCase'
+import mapKeys from 'lodash/mapKeys'
+import pick from 'lodash/pick'
 
 import RpcClient from '../../rpc/client'
 import {actions, actionTypes} from '../actions'
@@ -433,6 +436,17 @@ export default function client (dispatch) {
 
       if (apiSession.name) update.name = apiSession.name
 
+      // strip RPC cruft and map to JSON protocol data shape
+      // pick + mapKeys guard against bad input shape and/or type
+      if (apiSession.metadata) {
+        update.metadata = pick(
+          // TODO(mc, 2018-12-10): switch to camelCase when JSON protocols do
+          mapKeys(apiSession.metadata, (value, key) => kebabCase(key)),
+          // TODO(mc, 2018-12-10): codify "source" in JSON protocol schema
+          ['protocol-name', 'description', 'author', 'source']
+        )
+      }
+
       dispatch(actions.sessionResponse(null, update))
     } catch (error) {
       dispatch(actions.sessionResponse(error))
@@ -474,7 +488,12 @@ export default function client (dispatch) {
       const labware = {_id, name, slot, type, isTiprack}
 
       if (isTiprack && apiContainer.instruments.length > 0) {
-        labware.calibratorMount = apiContainer.instruments[0].mount
+        // if tiprack used by both pipettes, prefer single for calibration
+        const calibrator =
+          find(apiContainer.instruments, {channels: 1}) ||
+          apiContainer.instruments[0]
+
+        if (calibrator) labware.calibratorMount = calibrator.mount
       }
 
       update.labwareBySlot[slot] = labware

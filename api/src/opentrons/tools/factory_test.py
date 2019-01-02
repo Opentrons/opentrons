@@ -1,4 +1,5 @@
 import atexit
+import optparse
 import os
 import socket
 import subprocess
@@ -90,7 +91,7 @@ def run_quiet_process(command):
     subprocess.check_output('{} &> /dev/null'.format(command), shell=True)
 
 
-def test_smoothie_gpio():
+def test_smoothie_gpio(port_name=''):
     from opentrons.drivers import serial_communication
     from opentrons.drivers.smoothie_drivers.driver_3_0 import SMOOTHIE_ACK
 
@@ -102,7 +103,10 @@ def test_smoothie_gpio():
             timeout=1)
 
     print('CONNECT')
-    robot.connect()
+    if port_name:
+        robot.connect(port_name)
+    else:
+        robot.connect()
     d = robot._driver
     # make sure the driver is currently working as expected
     version_response = _write_and_return('version')
@@ -154,7 +158,7 @@ def test_smoothie_gpio():
         print(RESULT_SPACE.format(FAIL))
 
 
-def test_switches_and_lights():
+def test_switches_and_lights(port_name=''):
     print('\n')
     print('* BUTTON\t--> BLUE')
     print('* PROBE\t\t--> GREEN')
@@ -164,7 +168,10 @@ def test_switches_and_lights():
     print('Next\t--> CTRL-C')
     print('')
     # enter button-read loop
-    robot.connect()
+    if port_name:
+        robot.connect(port_name)
+    else:
+        robot.connect()
     try:
         while True:
             state = _get_state_of_inputs()
@@ -238,6 +245,16 @@ def start_server(folder, filepath):
         pass
 
 
+def get_optional_port_name():
+    parser = optparse.OptionParser(usage='usage: %prog [options] ')
+    parser.add_option(
+        "-p", "--p", dest="port", default='',
+        type='str', help='serial port of the smoothie'
+    )
+    options, _ = parser.parse_args(args=None, values=None)
+    return options.port
+
+
 if __name__ == '__main__':
     # put quotes around filepaths to allow whitespaces
     data_folder_quoted = '"{}"'.format(DATA_FOLDER)
@@ -246,8 +263,9 @@ if __name__ == '__main__':
     atexit.register(_erase_data, video_filepath_quoted)
     _reset_lights()
     _erase_data(video_filepath_quoted)
-    test_smoothie_gpio()
-    test_switches_and_lights()
+    port_name = get_optional_port_name()
+    test_smoothie_gpio(port_name)
+    test_switches_and_lights(port_name)
     test_speaker()
     record_camera(video_filepath_quoted)
     copy_to_usb_drive_and_back(video_filepath_quoted)

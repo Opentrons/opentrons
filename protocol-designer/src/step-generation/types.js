@@ -38,8 +38,8 @@ export type TransferLikeFormDataFields = {
   touchTipAfterAspirateOffsetMmFromBottom?: ?number,
   /** changeTip is interpreted differently by different Step types */
   changeTip: ChangeTipOptions,
-  /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
-  disposalVolume: ?number,
+  /** Flow rate in uL/sec for all aspirates */
+  aspirateFlowRateUlSec?: ?number,
   /** offset from bottom of well in mm */
   aspirateOffsetFromBottomMm?: ?number,
 
@@ -48,8 +48,8 @@ export type TransferLikeFormDataFields = {
   touchTipAfterDispense: boolean,
   /** Optional offset for touch tip after dispense (if null, use PD default) */
   touchTipAfterDispenseOffsetMmFromBottom?: ?number,
-  /** Number of seconds to delay at the very end of the step (TODO: or after each dispense ?) */
-  delayAfterDispense: ?number,
+  /** Flow rate in uL/sec for all dispenses */
+  dispenseFlowRateUlSec?: ?number,
   /** offset from bottom of well in mm */
   dispenseOffsetFromBottomMm?: ?number,
 }
@@ -60,8 +60,9 @@ export type ConsolidateFormData = {
   sourceWells: Array<string>,
   destWell: string,
 
-  /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
-  blowout: ?string, // TODO LATER LabwareId export type here instead of string?
+  /** If given, blow out in the specified destination after dispense at the end of each asp-asp-dispense cycle */
+  blowoutLocation: ?string,
+
   /** Mix in first well in chunk */
   mixFirstAspirate: ?MixArgs,
   /** Mix in destination well after dispense */
@@ -74,8 +75,9 @@ export type TransferFormData = {
   sourceWells: Array<string>,
   destWells: Array<string>,
 
-  /** If given, blow out in the specified labware after dispense at the end of each asp-asp-dispense cycle */
-  blowout: ?string, // TODO LATER LabwareId export type here instead of string?
+  /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
+  blowoutLocation: ?string,
+
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?MixArgs,
   /** Mix in destination well after dispense */
@@ -88,6 +90,8 @@ export type DistributeFormData = {
   sourceWell: string,
   destWells: Array<string>,
 
+  /** Disposal volume is added to the volume of the first aspirate of each asp-asp-disp cycle */
+  disposalVolume: ?number,
   /** Disposal labware and well for final blowout destination of disposalVolume contents (e.g. trash, source well, etc.) */
   disposalLabware: ?string,
   disposalWell: ?string,
@@ -109,15 +113,18 @@ export type MixFormData = {
   /** Touch tip after mixing */
   touchTip: boolean,
   touchTipMmFromBottom?: ?number,
-  /** Delay in seconds */
-  delay: ?number,
   /** change tip: see comments in step-generation/mix.js */
   changeTip: ChangeTipOptions,
-  /** If given, blow out in the specified labware after mixing each well */
-  blowout?: string,
+
+  /** If given, blow out in the specified destination after mixing each well */
+  blowoutLocation: ?string,
+
   /** offset from bottom of well in mm */
   aspirateOffsetFromBottomMm?: ?number,
   dispenseOffsetFromBottomMm?: ?number,
+  /** flow rates in uL/sec */
+  aspirateFlowRateUlSec?: ?number,
+  dispenseFlowRateUlSec?: ?number,
 }
 
 export type PauseFormData = {|
@@ -139,6 +146,7 @@ export type CommandCreatorData =
   | PauseFormData
   | TransferFormData
 
+// TODO: Ian 2018-12-20 replace `PipetteData` with something like `PipetteOnDeck` type
 export type PipetteData = {| // TODO refactor all 'pipette fields', split PipetteData into its own export type
   id: string, // TODO PipetteId export type here instead of string?
   mount: Mount,
@@ -174,12 +182,6 @@ export type RobotState = {|
   },
   labware: {
     [labwareId: string]: LabwareData,
-  },
-  // tiprackAssignment: maps tiprackLabwareId to its assigned PipetteId.
-  // Each tiprack is either unassigned, or assigned to one pipette.
-  // `tiprackAssignment` will go away when tiprack sharing is implemented
-  tiprackAssignment?: ?{
-    [tiprackLabwareId: string]: ?string,
   },
   tipState: {
     tipracks: {
@@ -221,6 +223,7 @@ export type AspirateDispenseArgs = {|
   ...PipetteLabwareFields,
   volume: number,
   offsetFromBottomMm?: ?number,
+  'flow-rate'?: ?number,
 |}
 
 export type Command = {|
@@ -292,3 +295,8 @@ export type Timeline = {|
   timeline: Array<CommandsAndRobotState>, // TODO: Ian 2018-06-14 avoid timeline.timeline shape, better names
   errors?: ?Array<CommandCreatorError>,
 |}
+
+export type RobotStateAndWarnings = {
+  robotState: RobotState,
+  warnings: Array<CommandCreatorWarning>,
+}

@@ -973,7 +973,7 @@ class Robot():
         `robot.update_config(name='Grace Hopper')` will update the `name` key
         of the configuration.
         """
-        self.config._replace(**kwargs)
+        self.config = self.config._replace(**kwargs)
 
     async def update_firmware(self,
                               filename,

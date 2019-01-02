@@ -127,12 +127,6 @@ def test_backcompat():
     well_b2_name = repr(lw.wells_by_index()['B2'])
     well_c3_name = repr(lw.wells_by_index()['C3'])
 
-    w0 = lw[0]
-    assert repr(w0) == well_a1_name
-
-    w1 = lw['A1']
-    assert repr(w1) == well_a1_name
-
     w2 = lw.well(0)
     assert repr(w2) == well_a1_name
 
@@ -160,15 +154,6 @@ def test_backcompat():
     assert repr(w8[0][0]) == well_a1_name
     assert repr(w8[1][2]) == well_c3_name
 
-    w9 = lw.cols('2')
-    assert len(w9) == 1
-    assert len(w9[0]) == len(labware_def['ordering'][1])
-    assert repr(w9[0][1]) == well_b2_name
-
-    w10 = lw.cols('2', '5')
-    assert len(w10) == 2
-    assert repr(w10[0][1]) == well_b2_name
-
     w11 = lw.columns('2', '3', '6')
     assert len(w11) == 3
     assert repr(w11[1][2]) == well_c3_name
@@ -195,7 +180,7 @@ def test_well_parent():
 
 
 def test_tip_tracking_init():
-    labware_name = 'Opentrons_96_tiprack_300_uL'
+    labware_name = 'opentrons_96_tiprack_300_uL'
     labware_def = labware._load_definition_by_name(labware_name)
     tiprack = labware.Labware(labware_def,
                               Location(Point(0, 0, 0), 'Test Slot'))
@@ -215,7 +200,7 @@ def test_tip_tracking_init():
 
 
 def test_use_tips():
-    labware_name = 'Opentrons_96_tiprack_300_uL'
+    labware_name = 'opentrons_96_tiprack_300_uL'
     labware_def = labware._load_definition_by_name(labware_name)
     tiprack = labware.Labware(labware_def,
                               Location(Point(0, 0, 0), 'Test Slot'))
@@ -254,7 +239,7 @@ def test_use_tips():
 
 
 def test_select_next_tip():
-    labware_name = 'Opentrons_96_tiprack_300_uL'
+    labware_name = 'opentrons_96_tiprack_300_uL'
     labware_def = labware._load_definition_by_name(labware_name)
     tiprack = labware.Labware(labware_def,
                               Location(Point(0, 0, 0), 'Test Slot'))

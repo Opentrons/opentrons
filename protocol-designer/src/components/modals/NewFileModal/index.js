@@ -2,14 +2,16 @@
 import * as React from 'react'
 import cx from 'classnames'
 import {
-  AlertModal,
+  Modal,
   DropdownField,
   FormGroup,
   InputField,
+  OutlineButton,
   type Mount,
 } from '@opentrons/components'
 import startCase from 'lodash/startCase'
 import isEmpty from 'lodash/isEmpty'
+import i18n from '../../../localization'
 import {pipetteOptions} from '../../../pipettes/pipetteData'
 import PipetteDiagram from './PipetteDiagram'
 import TiprackDiagram from './TiprackDiagram'
@@ -26,21 +28,9 @@ type Props = {
   onSave: (NewProtocolFields) => mixed,
 }
 
-// 'USER_HAS_NOT_SELECTED' state is just a concern of these dropdowns,
-// not selected pipette state in general
-// It's needed b/c user must select 'None' explicitly,
-// they cannot just leave the dropdown blank.
-const USER_HAS_NOT_SELECTED = 'USER_HAS_NOT_SELECTED'
-// TODO: Ian 2018-06-22 use pristinity instead of this?
-
 const pipetteOptionsWithNone = [
   {name: 'None', value: ''},
   ...pipetteOptions,
-]
-
-const pipetteOptionsWithInvalid = [
-  {name: '', value: USER_HAS_NOT_SELECTED},
-  ...pipetteOptionsWithNone,
 ]
 
 // TODO: Ian 2018-06-22 get this programatically from shared-data labware defs
@@ -51,13 +41,12 @@ const tiprackOptions = [
   {name: '200 μL', value: 'tiprack-200ul'},
   {name: '300 μL', value: 'opentrons-tiprack-300ul'},
   {name: '1000 μL', value: 'tiprack-1000ul'},
-  {name: '1000 μL Chem', value: 'tiprack-1000ul-chem'},
 ]
 
 const initialState = {
   name: '',
-  left: {pipetteModel: USER_HAS_NOT_SELECTED, tiprackModel: null},
-  right: {pipetteModel: USER_HAS_NOT_SELECTED, tiprackModel: null},
+  left: {pipetteModel: '', tiprackModel: null},
+  right: {pipetteModel: '', tiprackModel: null},
 }
 
 // TODO: BC 2018-11-06 there is a lot of copy pasta between this component and the edit pipettes modal, lets consolidate
@@ -88,8 +77,6 @@ export default class NewFileModal extends React.Component<Props, State> {
     const {name, left, right} = this.state
 
     const pipetteSelectionIsValid = (
-      // neither can be invalid
-      (left.pipetteModel !== USER_HAS_NOT_SELECTED && right.pipetteModel !== USER_HAS_NOT_SELECTED) &&
       // at least one must not be none (empty string)
       (left.pipetteModel || right.pipetteModel)
     )
@@ -103,18 +90,12 @@ export default class NewFileModal extends React.Component<Props, State> {
     const canSubmit = pipetteSelectionIsValid && tiprackSelectionIsValid
 
     return (
-      <AlertModal
-        className={cx(modalStyles.modal, styles.new_file_modal)}
-        buttons={[
-          {onClick: this.props.onCancel, children: 'Cancel', tabIndex: 7},
-          {onClick: this.handleSubmit, disabled: !canSubmit, children: 'Save', tabIndex: 6},
-        ]}>
-        <form
-          className={modalStyles.modal_contents}
-          onSubmit={() => { canSubmit && this.handleSubmit() }}>
-          <h2>Create New Protocol</h2>
-
-          <FormGroup label='Name:'>
+      <Modal
+        contentsClassName={styles.new_file_modal_contents}
+        className={cx(modalStyles.modal, styles.new_file_modal)}>
+        <form onSubmit={() => { canSubmit && this.handleSubmit() }}>
+          <h2 className={styles.new_file_modal_title}>Create New Protocol</h2>
+          <FormGroup className={formStyles.stacked_row} label='Name:'>
             <InputField
               autoFocus
               tabIndex={1}
@@ -122,14 +103,13 @@ export default class NewFileModal extends React.Component<Props, State> {
               value={name}
               onChange={this.handleNameChange} />
           </FormGroup>
-          <BetaRestrictions />
 
           <div className={styles.mount_fields_row}>
             <div className={styles.mount_column}>
               <FormGroup key="leftPipetteModel" label="Left Pipette" className={formStyles.stacked_row}>
                 <DropdownField
                   tabIndex={2}
-                  options={this.state.left.pipetteModel === USER_HAS_NOT_SELECTED ? pipetteOptionsWithInvalid : pipetteOptionsWithNone}
+                  options={pipetteOptionsWithNone}
                   value={this.state.left.pipetteModel}
                   onChange={this.makeHandleMountChange('left', 'pipetteModel')} />
               </FormGroup>
@@ -150,7 +130,7 @@ export default class NewFileModal extends React.Component<Props, State> {
               <FormGroup key="rightPipetteModel" label="Right Pipette" className={formStyles.stacked_row}>
                 <DropdownField
                   tabIndex={4}
-                  options={this.state.right.pipetteModel === USER_HAS_NOT_SELECTED ? pipetteOptionsWithInvalid : pipetteOptionsWithNone}
+                  options={pipetteOptionsWithNone}
                   value={this.state.right.pipetteModel}
                   onChange={this.makeHandleMountChange('right', 'pipetteModel')} />
               </FormGroup>
@@ -178,19 +158,22 @@ export default class NewFileModal extends React.Component<Props, State> {
             <TiprackDiagram containerType={this.state.right.tiprackModel} />
           </div>
         </form>
-      </AlertModal>
+        <div className={styles.button_row}>
+          <OutlineButton
+            onClick={this.props.onCancel}
+            tabIndex={7}
+            className={styles.button}>
+            {i18n.t('button.cancel')}
+          </OutlineButton>
+          <OutlineButton
+            onClick={this.handleSubmit}
+            disabled={!canSubmit}
+            tabIndex={6}
+            className={styles.button}>
+            {i18n.t('button.save')}
+          </OutlineButton>
+        </div>
+      </Modal>
     )
   }
 }
-
-const BetaRestrictions = () => (
-  <React.Fragment>
-    <h3>Beta Pipette Restrictions:</h3>
-    <ol>
-      <li>
-        Pipettes can&apos;t share tip racks. There needs to be at least 1 tip rack per
-        pipette on the deck.
-      </li>
-    </ol>
-  </React.Fragment>
-)

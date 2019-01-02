@@ -6,8 +6,7 @@ import cx from 'classnames'
 import {IconButton, HoverTooltip} from '@opentrons/components'
 
 import i18n from '../../localization'
-import {selectors as steplistSelectors} from '../../steplist'
-import {collapseFormSection} from '../../steplist/actions'
+import {selectors as stepsSelectors, actions as stepsActions} from '../../ui/steps'
 import type {BaseState, ThunkDispatch} from '../../types'
 import styles from './FormSection.css'
 
@@ -54,10 +53,10 @@ const FormSection = (props: FormSectionProps) => {
 }
 
 const FormSectionSTP = (state: BaseState, ownProps: OP) => ({
-  collapsed: steplistSelectors.getFormSectionCollapsed(state)[ownProps.sectionName],
+  collapsed: stepsSelectors.getFormSectionCollapsed(state)[ownProps.sectionName],
 })
 const FormSectionDTP = (dispatch: ThunkDispatch<*>, ownProps: OP) => ({
-  onCollapseToggle: () => dispatch(collapseFormSection(ownProps.sectionName)),
+  onCollapseToggle: () => dispatch(stepsActions.collapseFormSection(ownProps.sectionName)),
 })
 const ConnectedFormSection = connect(FormSectionSTP, FormSectionDTP)(FormSection)
 

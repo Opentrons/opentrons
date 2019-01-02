@@ -1,4 +1,4 @@
-# Changes from 3.5.1 to 3.6.0
+# Changes from 3.5.1 to 3.6.5
 
 For more details, please see the full [technical change log][changelog]
 
@@ -10,6 +10,7 @@ For more details, please see the full [technical change log][changelog]
 ### Bug fixes
 
 - Lost connection alert messages will no longer trigger when your robot is restarting for normal reasons (e.g. software update or deck calibration). Sorry for the confusion this caused!
+- The notification dot for available robot upgrade on the main Robots nav button has been fixed
 
 ### New features
 
@@ -20,6 +21,7 @@ For more details, please see the full [technical change log][changelog]
     - The robot settings page now displays the IP and MAC addresses of the Wi-Fi and Ethernet-to-USB interfaces
     - Please see our support documentation for more details
 - After tip-probe is completed, the app will now move the pipette out of the way so you have better access to the deck
+- App and robot update messages should now be clearer and easier to follow
 
 ### Known issues
 
@@ -37,14 +39,37 @@ executing, but it does not ([#2020][2020])
 <!-- start:@opentrons/api -->
 ## OT2 and Protocol API
 
+**Important**: This release includes version 3.6.3, which updates the calibration of the P10 single pipette.
+
+This update includes a refinement to the aspiration function of the P10 single-channel pipette based on an expanded data set. The updated configuration is available as an **opt-in** in the "Advanced Settings" section of your robot's settings page.
+
+Please note this is a small but material change to the P10's pipetting performance, in particular decreasing the low-volume µl-to-mm conversion factor to address under-aspiration users have reported.
+
+As always, please reach out to our team with any questions.
+
 ### Bug fixes
 
+- **Fixed a bug causing a very incorrect aspirate function when the "Use New P10 Single Calibration" advanced option was selected**
+  - This bug was introduced in version 3.6.2 and fixed in version 3.6.5
+- **Fixed a bug causing errors in protocols that assigned to a dictionary or list at the top level (caused by metadata parsing)**
+- Updated the configuration of the P1000 single based on an expanded dataset
+- Updated the configuration of the P10 single based on an expanded dataset
+- Fixed a bug that was overwriting robot configuration with defaults when using the internal USB flash drive for configuration storage
 - Fixed the iteration order of labware created with `labware.create` to match documentation
-- Fixed various misconfigurations with pipette motor current/position settings
 
 ### New features
 
 - Added support for `v1.4` pipette models
+- Python protocols can now include arbitrary metadata for display in the app
+
+```
+from opentrons import containers, instruments
+
+metadata = {
+    'protocolName': 'My Protocol',
+    'description': 'This protocol is mine and it is good',
+}
+```
 
 ### Known issues
 
@@ -54,6 +79,8 @@ executing, but it does not ([#2020][2020])
     2. Jog the pipette up until there is enough room to insert the plate
     3. Insert plate and calibrate normally
         - After the plate has been calibrated once, the issue will not reoccur
+- Extremely long aspirations and dispenses can incorrectly trigger a serial timeout issue. If you see such an issue, make sure your protocol’s combination of aspirate/dispense speeds and aspirate/dispense volumes does not include a command that will take more than 30 seconds.
+
 
 
 <!-- end:@opentrons/api -->

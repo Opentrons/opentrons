@@ -9,7 +9,6 @@ export type StepFieldName =
   | 'aspirate_airGap_volume'
   | 'aspirate_changeTip'
   | 'aspirate_disposalVol_checkbox'
-  | 'aspirate_disposalVol_destination'
   | 'aspirate_disposalVol_volume'
   | 'aspirate_flowRate'
   | 'aspirate_labware'
@@ -25,10 +24,7 @@ export type StepFieldName =
   | 'aspirate_wells'
   | 'changeTip'
   | 'dispense_blowout_checkbox'
-  | 'dispense_blowout_labware'
-  | 'dispense_delay_checkbox'
-  | 'dispense_delayMinutes'
-  | 'dispense_delaySeconds'
+  | 'dispense_blowout_location'
   | 'dispense_flowRate'
   | 'dispense_labware'
   | 'dispense_touchTip'
@@ -41,6 +37,7 @@ export type StepFieldName =
   | 'dispense_wellOrder_second'
   | 'dispense_wells'
   | 'labware'
+  | 'labwareLocationUpdate'
   | 'pauseForAmountOfTime'
   | 'pauseHour'
   | 'pauseMessage'
@@ -55,6 +52,9 @@ export type StepFieldName =
   | 'touchTip'
   | 'volume'
   | 'wells'
+  // deck setup form fields
+  | 'labwareLocationUpdate'
+  | 'pipetteLocationUpdate'
 
 // TODO Ian 2018-01-16 factor out to some constants.js ?
 export const stepIconsByType: {[string]: IconName} = {
@@ -63,26 +63,21 @@ export const stepIconsByType: {[string]: IconName} = {
   'consolidate': 'ot-consolidate',
   'mix': 'ot-mix',
   'pause': 'pause',
+  'manualIntervention': 'pause', // TODO Ian 2018-12-13 pause icon for this is a placeholder
 }
 
 export type StepType = $Keys<typeof stepIconsByType>
 
 // ===== Unprocessed form types =====
 
-export type FormModalFields = {|
-  'step-name': string,
-  'step-details': string,
-|}
-
-export type DelayFields = {|
-  'dispense_delay_checkbox'?: boolean,
-  'dispense_delayMinutes'?: string,
-  'dispense_delaySeconds'?: string,
+export type AnnotationFields = {|
+  'stepName': string,
+  'stepDetails': string,
 |}
 
 export type BlowoutFields = {|
   'dispense_blowout_checkbox'?: boolean,
-  'dispense_blowout_labware'?: string,
+  'dispense_blowout_location'?: string,
 |}
 
 export type ChangeTipFields = {|
@@ -92,10 +87,9 @@ export type ChangeTipFields = {|
 export type TransferLikeStepType = 'transfer' | 'consolidate' | 'distribute'
 
 export type TransferLikeForm = {|
-  ...FormModalFields,
+  ...AnnotationFields,
   ...BlowoutFields,
   ...ChangeTipFields,
-  ...DelayFields,
 
   stepType: TransferLikeStepType,
   id: StepIdType,
@@ -122,10 +116,9 @@ export type TransferLikeForm = {|
 |}
 
 export type MixForm = {|
-  ...FormModalFields,
+  ...AnnotationFields,
   ...BlowoutFields,
   ...ChangeTipFields,
-  ...DelayFields,
   stepType: 'mix',
   id: StepIdType,
 
@@ -138,7 +131,7 @@ export type MixForm = {|
 |}
 
 export type PauseForm = {|
-  ...FormModalFields,
+  ...AnnotationFields,
   stepType: 'pause',
   id: StepIdType,
 
@@ -153,8 +146,6 @@ export type PauseForm = {|
 export type FormData = {
   stepType: StepType,
   id: StepIdType,
-  'step-name'?: string,
-  'step-details'?: string,
   [StepFieldName]: any, // TODO: form value processing to ensure type
 }
 //  | MixForm
@@ -162,7 +153,7 @@ export type FormData = {
 //  | TransferLikeForm
 
 export type BlankForm = {
-  ...FormModalFields,
+  ...AnnotationFields,
   stepType: StepType,
   id: StepIdType,
 }

@@ -1,68 +1,53 @@
 // @flow
 import {connect} from 'react-redux'
+import * as React from 'react'
+import mapValues from 'lodash/mapValues'
 import type {BaseState} from '../types'
 import FilePage from '../components/FilePage'
-import type {Props as FilePageProps} from '../components/FilePage'
 import {actions, selectors as fileSelectors} from '../file-data'
-import {actions as pipetteActions, selectors as pipetteSelectors} from '../pipettes'
-import type {FileMetadataFields, FileMetadataFieldAccessors} from '../file-data'
+import {selectors as stepFormSelectors} from '../step-forms'
+import {actions as steplistActions} from '../steplist'
+import {INITIAL_DECK_SETUP_STEP_ID} from '../constants'
+import type {InitialDeckSetup} from '../step-forms'
+import type {FileMetadataFields} from '../file-data'
 import {actions as navActions} from '../navigation'
-import {formConnectorFactory, type FormConnector} from '../utils'
+
+type Props = React.ElementProps<typeof FilePage>
 
 type SP = {
-  instruments: $PropertyType<FilePageProps, 'instruments'>,
-  isFormAltered: $PropertyType<FilePageProps, 'isFormAltered'>,
-  _values: {[accessor: FileMetadataFieldAccessors]: any},
-}
-
-type DP = {
-  _updateFileMetadataFields: typeof actions.updateFileMetadataFields,
-  _saveFileMetadata: ({[accessor: FileMetadataFieldAccessors]: mixed}) => mixed,
-  goToNextPage: $PropertyType<FilePageProps, 'goToNextPage'>,
-  swapPipettes: $PropertyType<FilePageProps, 'swapPipettes'>,
+  instruments: $PropertyType<Props, 'instruments'>,
+  formValues: $PropertyType<Props, 'formValues'>,
+  _initialDeckSetup: InitialDeckSetup,
 }
 
 const mapStateToProps = (state: BaseState): SP => {
-  const pipetteData = pipetteSelectors.getPipettesForInstrumentGroup(state)
   return {
-    _values: fileSelectors.fileFormValues(state),
-    isFormAltered: fileSelectors.isUnsavedMetadatFormAltered(state),
-    instruments: {
-      left: pipetteData.find(i => i.mount === 'left'),
-      right: pipetteData.find(i => i.mount === 'right'),
-    },
+    formValues: fileSelectors.getFileMetadata(state),
+    instruments: stepFormSelectors.getPipettesForInstrumentGroup(state),
+    _initialDeckSetup: stepFormSelectors.getInitialDeckSetup(state),
   }
 }
 
-const mapDispatchToProps: DP = {
-  _updateFileMetadataFields: actions.updateFileMetadataFields,
-  _saveFileMetadata: actions.saveFileMetadata,
-  goToNextPage: () => navActions.navigateToPage('liquids'),
-  swapPipettes: pipetteActions.swapPipettes,
-}
-
-const mergeProps = (
-  {instruments, isFormAltered, _values}: SP,
-  {_updateFileMetadataFields, _saveFileMetadata, goToNextPage, swapPipettes}: DP
-): FilePageProps => {
-  const onChange = (accessor) => (e: SyntheticInputEvent<*>) => {
-    if (accessor === 'protocol-name' || accessor === 'description' || accessor === 'author') {
-      _updateFileMetadataFields({[accessor]: e.target.value})
-    } else {
-      console.warn('Invalid accessor in ConnectedFilePage:', accessor)
-    }
-  }
-
-  const formConnector: FormConnector<FileMetadataFields> = formConnectorFactory(onChange, _values)
+function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Props {
+  const {_initialDeckSetup, ...passThruProps} = stateProps
+  const {dispatch} = dispatchProps
+  const swapPipetteUpdate = mapValues(_initialDeckSetup.pipettes, (pipette) => {
+    if (!pipette.mount) return pipette.mount
+    return pipette.mount === 'left' ? 'right' : 'left'
+  })
 
   return {
-    formConnector,
-    isFormAltered,
-    instruments,
-    goToNextPage,
-    saveFileMetadata: () => _saveFileMetadata(_values),
-    swapPipettes,
+    ...passThruProps,
+    ...dispatchProps,
+    goToNextPage: () => dispatch(navActions.navigateToPage('liquids')),
+    saveFileMetadata: (nextFormValues: FileMetadataFields) =>
+      dispatch(actions.saveFileMetadata(nextFormValues)),
+    swapPipettes: () =>
+      dispatch(steplistActions.changeSavedStepForm({
+        stepId: INITIAL_DECK_SETUP_STEP_ID,
+        update: {pipetteLocationUpdate: swapPipetteUpdate},
+      })),
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(FilePage)
+export default connect(mapStateToProps, null, mergeProps)(FilePage)

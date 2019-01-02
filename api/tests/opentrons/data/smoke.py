@@ -1,5 +1,12 @@
 from opentrons import containers, instruments
 
+metadata = {
+    'protocolName': 'Smoke',
+    'author': 'Opentrons <engineering@opentrons.com>',
+    'description': 'Simple protocol to test the server',
+    'source': 'Opentrons Repository'
+}
+
 tiprack = containers.load('tiprack-200ul', '8')
 plate = containers.load('96-PCR-flat', '5')
 

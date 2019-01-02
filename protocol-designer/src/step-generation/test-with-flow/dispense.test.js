@@ -4,7 +4,7 @@ import {
   commandCreatorNoErrors,
   commandCreatorHasErrors,
 } from './fixtures'
-import _dispense from '../dispense'
+import _dispense from '../commandCreators/atomic/dispense'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
 
@@ -43,22 +43,69 @@ describe('dispense', () => {
   })
 
   describe('tip tracking & commands:', () => {
-    test('dispense with tip', () => {
-      const result = dispense({
+    describe('dispense normally (with tip)', () => {
+      const optionalArgsCases = [
+        {
+          description: 'no optional args',
+          expectInParams: false,
+          args: {},
+        },
+        {
+          description: 'null optional args',
+          expectInParams: false,
+          args: {
+            offsetFromBottomMm: null,
+            'flow-rate': null,
+          },
+        },
+        {
+          description: 'all optional args',
+          expectInParams: true,
+          args: {
+            offsetFromBottomMm: 5,
+            'flow-rate': 6,
+          },
+        },
+      ]
+      optionalArgsCases.forEach(testCase => {
+        test(testCase.description, () => {
+          const result = dispense({
+            pipette: 'p300SingleId',
+            volume: 50,
+            labware: 'sourcePlateId',
+            well: 'A1',
+            ...testCase.args,
+          })(robotStateWithTip)
+
+          expect(result.commands).toEqual([{
+            command: 'dispense',
+            params: {
+              pipette: 'p300SingleId',
+              volume: 50,
+              labware: 'sourcePlateId',
+              well: 'A1',
+              ...(testCase.expectInParams ? testCase.args : {}),
+            },
+          }])
+        })
+      })
+    })
+
+    test('dispense normally (with tip) and optional args', () => {
+      const args = {
         pipette: 'p300SingleId',
         volume: 50,
         labware: 'sourcePlateId',
         well: 'A1',
-      })(robotStateWithTip)
+        offsetFromBottomMm: 5,
+        'flow-rate': 6,
+      }
+
+      const result = dispense(args)(robotStateWithTip)
 
       expect(result.commands).toEqual([{
         command: 'dispense',
-        params: {
-          pipette: 'p300SingleId',
-          volume: 50,
-          labware: 'sourcePlateId',
-          well: 'A1',
-        },
+        params: args,
       }])
     })
 
@@ -93,7 +140,7 @@ describe('dispense', () => {
     // TODO Ian 2018-02-12... what is excessive volume?
     // Is it OK to dispense vol > pipette max vol?
     // LATER: shouldn't dispense > volume of liquid in pipette
-    test.skip('dispense with excessive volume should... ?')
+    test.skip('dispense with excessive volume should... ?', () => {})
   })
 
   describe('liquid tracking', () => {

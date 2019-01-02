@@ -1,8 +1,10 @@
 import asyncio
 import pytest
+import sys
 import time
 
 from opentrons.server import rpc
+from opentrons.protocol_api.execute import ExceptionInProtocolError
 from threading import Event
 
 from uuid import uuid4 as uuid
@@ -28,6 +30,15 @@ class Foo(object):
 
     def throw(self):
         raise Exception('Kaboom!')
+
+    def throw_eipe(self):
+        try:
+            raise Exception('Kaboom!')
+        except Exception:
+            t, v, b = sys.exc_info()
+        raise ExceptionInProtocolError(v, b,
+                                       'This is a test',
+                                       10)
 
 
 class Notifications(object):
@@ -139,6 +150,7 @@ async def test_get_object_by_id(session, root):
                         'STATIC',
                         'value',
                         'throw',
+                        'throw_eipe',
                         'next',
                         'combine',
                         'add'
@@ -205,7 +217,26 @@ async def test_exception_on_call(session, root):
         'status': 'error',
         'type': rpc.CALL_RESULT_MESSAGE
     }
-    expectedMessage = 'Exception [line unknown]: Kaboom!'
+    expectedMessage = 'Exception: Kaboom!'
+
+    assert res['$'] == expectedMeta
+    assert res['data']['message'] == expectedMessage
+    assert isinstance(res['data']['traceback'], str)
+
+    await session.call(
+        id=id(root),
+        name='throw_eipe',
+        args=[]
+    )
+
+    await session.socket.receive_json()  # Skip ack
+    res = await session.socket.receive_json()  # Get call result
+    expectedMeta = {
+        'token': session.token,
+        'status': 'error',
+        'type': rpc.CALL_RESULT_MESSAGE
+    }
+    expectedMessage = 'Exception [line 10]: This is a test'
 
     assert res['$'] == expectedMeta
     assert res['data']['message'] == expectedMessage
@@ -284,6 +315,7 @@ async def test_notifications(session, root):
         'data': 'Done!'}
 
 
+@pytest.mark.api1_only
 @pytest.mark.parametrize('root', [TickTock()])
 async def test_concurrent_calls(session, root):
     await session.socket.receive_json()  # Skip init
@@ -401,6 +433,7 @@ def message_key(message):
     return str(meta.get('type')) + meta.get('token', '') + str(data)
 
 
+@pytest.mark.api1_only
 @pytest.mark.parametrize('root', [TickTock()])
 async def test_concurrent_and_disconnect(loop, root, session, connect):  # noqa C901
     n_sockets = 20

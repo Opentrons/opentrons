@@ -75,7 +75,14 @@
         "format": {
           "description": "Property to determine compatibility with multichannel pipette",
           "type": "string",
-          "enum": ["96Standard", "384Standard", "trough", "irregular"]
+          "enum": ["96Standard", "384Standard", "trough", "irregular", "trash"]
+        },
+        "quirks": {
+          "description": "Property to classify a specific behavior this labware should have",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "isTiprack": {
           "description": "Flag marking whether a labware is a tiprack or not",

@@ -9,7 +9,6 @@ const _fileMap = {
   'Tiprack-10ul': require('./Tiprack-10ul.png'),
   'Tiprack-200ul': require('./Tiprack-200ul.png'),
   'Tiprack-1000': require('./Tiprack-1000.png'),
-  'Tiprack-1000ul-chem': require('./Tiprack-1000ul-chem.png'),
   'Trough-12row': require('./Trough-12row.png'),
   'Tuberack-2ml': require('./Tuberack-2ml.png'),
   'Tuberack-15-50ml': require('./Tuberack-15-50ml.png'),

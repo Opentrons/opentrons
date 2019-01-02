@@ -1,5 +1,11 @@
 from opentrons import containers, instruments
 
+metadata = {
+    'protocolName': 'No-clear-tips',
+    'author': 'Opentrons <engineering@opentrons.com>',
+    'description': 'A test protocol that does not drop tips at the end',
+    'source': 'Opentrons Repository'
+}
 
 # a 12 row trough for sources, and 96 well plate for output
 trough = containers.load('trough-12row', '3', 'trough')

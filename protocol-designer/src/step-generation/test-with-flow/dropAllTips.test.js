@@ -1,7 +1,7 @@
 // @flow
 import type {RobotState} from '../types'
 import {createRobotState, commandCreatorNoErrors} from './fixtures'
-import _dropAllTips from '../dropAllTips'
+import _dropAllTips from '../commandCreators/atomic/dropAllTips'
 
 const dropAllTips = commandCreatorNoErrors(_dropAllTips)
 

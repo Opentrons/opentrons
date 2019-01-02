@@ -54,13 +54,17 @@ describe('test schemas of all definitions', () => {
   })
 
   labwarePaths.forEach(labwarePath => {
-    test(path.parse(labwarePath).name, () => {
-      const labware = require(labwarePath)
-      const valid = validate(labware)
+    const filename = path.parse(labwarePath).name
+    const labwareDef = require(labwarePath)
+    test(filename, () => {
+      const valid = validate(labwareDef)
       const validationErrors = validate.errors
 
       expect(validationErrors).toBe(null)
       expect(valid).toBe(true)
+    })
+    test(`file name matches loadName: ${filename}`, () => {
+      expect(labwareDef.parameters.loadName).toEqual(filename)
     })
   })
 })

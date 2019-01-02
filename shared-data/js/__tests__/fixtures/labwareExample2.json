@@ -14,8 +14,8 @@
     "isMagneticModuleCompatible": false
   },
   "cornerOffsetFromSlot": {
-    "x": -77.76,
-    "y": -35.48,
+    "x": 77.76,
+    "y": 35.48,
     "z": 0
   },
   "dimensions": {

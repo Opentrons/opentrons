@@ -13,7 +13,8 @@ import {
   DropdownField,
 } from '@opentrons/components'
 import modalStyles from '../../modals/modal.css'
-import {actions, selectors} from '../../../steplist'
+import {actions} from '../../../steplist'
+import {selectors as stepFormSelectors} from '../../../step-forms'
 import type {BaseState} from '../../../types'
 import WellOrderViz from './WellOrderViz'
 import type {WellOrderOption} from './types'
@@ -156,7 +157,7 @@ class WellOrderModal extends React.Component<Props, State> {
 }
 
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
-  const formData = selectors.getUnsavedForm(state)
+  const formData = stepFormSelectors.getUnsavedForm(state)
   // NOTE: not interpolating prefix because breaks flow string enum
   const firstName = ownProps.prefix === 'aspirate' ? 'aspirate_wellOrder_first' : 'dispense_wellOrder_first'
   const secondName = ownProps.prefix === 'aspirate' ? 'aspirate_wellOrder_second' : 'dispense_wellOrder_second'

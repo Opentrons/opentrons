@@ -1,6 +1,13 @@
 # validate labware calibration instrument selection
 from opentrons import containers, instruments
 
+metadata = {
+    'protocolName': 'Calibration Validation',
+    'author': 'Opentrons <engineering@opentrons.com>',
+    'description': 'For validating the accuracy of a pipette',
+    'source': 'Opentrons Repository'
+}
+
 tiprack_s1 = containers.load('tiprack-200ul', '6', label='s1')
 tiprack_s2 = containers.load('tiprack-200ul', '3', label='s2')
 

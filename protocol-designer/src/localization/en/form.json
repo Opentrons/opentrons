@@ -64,6 +64,12 @@
           "t2b": "Top to bottom",
           "b2t": "Bottom to top"
         }
+      },
+      "step_name": {
+        "label": "Step Name"
+      },
+      "step_notes": {
+        "label": "Step Notes"
       }
     }
   }

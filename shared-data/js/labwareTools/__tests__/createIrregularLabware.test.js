@@ -6,6 +6,7 @@ import {
   _irregularWellName,
   _generateIrregularLoadName,
   _calculateWellCoord,
+  _calculateCornerOffset,
 } from '../index.js'
 import {splitWellsOnColumn, sortWells} from '../../helpers/index.js'
 
@@ -14,6 +15,19 @@ import exampleLabware1 from '../../__tests__/fixtures/irregularLabwareExample1.j
 jest.mock('../assignId', () => jest.fn(() => 'mock-id'))
 
 describe('test helper functions', () => {
+  test('cornerOffsetFromSLot outputs correctly', () => {
+    // If smaller than slot, positive values
+    // If larger than slot, negative values
+    const smallerDims = {overallLength: 100, overallWidth: 80, overallHeight: 10}
+    const largerDims = {overallLength: 200, overallWidth: 90, overallHeight: 10}
+    const offset = _calculateCornerOffset(smallerDims)
+    const offset2 = _calculateCornerOffset(largerDims)
+
+    expect(offset.x).toBeGreaterThan(0)
+    expect(offset.y).toBeGreaterThan(0)
+    expect(offset2.x).toBeLessThan(0)
+    expect(offset2.y).toBeLessThan(0)
+  })
   test('Well name generated correctly', () => {
     const grid = {row: 2, column: 2}
     const gridStart = [{rowStart: 'A', colStart: '1', rowStride: 1, colStride: 2}, {rowStart: 'B', colStart: '1', rowStride: 3, colStride: 1}]

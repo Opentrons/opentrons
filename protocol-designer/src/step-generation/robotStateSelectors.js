@@ -5,7 +5,7 @@ import sortBy from 'lodash/sortBy'
 import type {Channels} from '@opentrons/components'
 import {getLabware} from '@opentrons/shared-data'
 import {tiprackWellNamesByCol, tiprackWellNamesFlat} from './'
-import type {RobotState, PipetteData, LabwareData} from './'
+import type {RobotState, PipetteData} from './'
 
 // SELECTOR UTILITIES
 
@@ -59,26 +59,6 @@ export function _getNextTip (
   return fullColumn ? fullColumn[0] : null
 }
 
-/** Tipracks are "available" if they match the assignment type,
-  * and are not assigned to another pipette. */
-export function tiprackIsAvailableToPipette (
-  pipette: PipetteData,
-  tiprackData: LabwareData,
-  assignedPipetteId: ?string
-): boolean {
-  const matchingTiprackModel = pipette.tiprackModel === tiprackData.type
-
-  // robotState.tiprackAssignment key may not exist,
-  // or tiprack id may not be in tiprackAssignment
-  // both these indicate that the tiprack is unassigned
-  const tiprackAssignmentOk = (
-    assignedPipetteId == null ||
-    assignedPipetteId === pipette.id
-  )
-
-  return matchingTiprackModel && tiprackAssignmentOk
-}
-
 type NextTiprack = {|tiprackId: string, well: string|} | null
 export function getNextTiprack (pipette: PipetteData, robotState: RobotState): NextTiprack {
   /** Returns the next tiprack that has tips.
@@ -89,11 +69,7 @@ export function getNextTiprack (pipette: PipetteData, robotState: RobotState): N
   const sortedTipracksIds = sortLabwareBySlot(robotState).filter(labwareId =>
     // assume if labwareId is not in tipState.tipracks, it's not a tiprack
     robotState.tipState.tipracks[labwareId] &&
-    tiprackIsAvailableToPipette(
-      pipette,
-      robotState.labware[labwareId],
-      robotState.tiprackAssignment && robotState.tiprackAssignment[labwareId]
-    )
+    (pipette.tiprackModel === robotState.labware[labwareId].type)
   )
 
   const firstAvailableTiprack = sortedTipracksIds.find(tiprackId =>

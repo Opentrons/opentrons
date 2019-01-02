@@ -11,6 +11,7 @@ Example of calling this script:
 
 '''
 
+import optparse
 import time
 import logging
 
@@ -212,11 +213,25 @@ def test_axis(driver, logger, axis):
     driver.set_speed(DEFAULT_AXES_SPEED)
 
 
+def connect_to_port():
+    parser = optparse.OptionParser(usage='usage: %prog [options] ')
+    parser.add_option(
+        "-p", "--p", dest="port", default='',
+        type='str', help='serial port of the smoothie'
+    )
+
+    options, _ = parser.parse_args(args=None, values=None)
+    if options.port:
+        robot.connect(options.port)
+    else:
+        robot.connect()
+
+
 if __name__ == '__main__':
     logger = setup_logging()
     logger.info('Starting 24-hours Test')
     try:
-        robot.connect()
+        connect_to_port()
         driver = robot._driver
         button_green()
         attempt_homing(robot._driver, logger)

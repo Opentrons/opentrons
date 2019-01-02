@@ -8,29 +8,22 @@ import type {
   FormData,
 } from '../../form-types'
 
-const FORMS_WITH_PIPETTE = ['transfer', 'mix', 'distribute', 'consolidate']
-
 type NewFormArgs = {
   stepId: StepIdType,
   stepType: StepType,
-  defaultNextPipette: string,
 }
 
 // Add default values to a new step form
 export default function generateNewForm (args: NewFormArgs): FormData {
-  const {stepId, stepType, defaultNextPipette} = args
+  const {stepId, stepType} = args
   const baseForm: BlankForm = {
     id: stepId,
     stepType: stepType,
-    'step-name': startCase(stepType),
-    'step-details': '',
+    stepName: startCase(stepType),
+    stepDetails: '',
   }
 
   let additionalFields = {}
-
-  if (FORMS_WITH_PIPETTE.includes(stepType)) {
-    additionalFields.pipette = defaultNextPipette
-  }
 
   return {
     ...baseForm,

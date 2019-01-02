@@ -1,9 +1,10 @@
 // @flow
+import assert from 'assert'
 import uniq from 'lodash/uniq'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
-import {selectors} from '../index'
-import {selectors as pipetteSelectors} from '../../pipettes'
+import {selectors as stepFormSelectors} from '../../step-forms'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
+
 import type {PipetteChannels} from '@opentrons/shared-data'
 import type {BaseState, GetState} from '../../types'
 import type {FormData} from '../../form-types'
@@ -30,34 +31,33 @@ function _getAllWells (
   return uniq(allWells)
 }
 
-// TODO: Ian 2018-08-28 revisit this,
-// maybe remove channels from pipette state and use shared-data?
-// or if not, make this its own selector in pipettes/ atom
-const getChannels = (pipetteId: string, state: BaseState): PipetteChannels => {
-  const pipettes = pipetteSelectors.getPipettesById(state)
-  const pipette = pipettes[pipetteId]
+function getChannels (pipetteId: string, state: BaseState): PipetteChannels {
+  const pipette: ?* = stepFormSelectors.getPipetteInvariantProperties(state)[pipetteId]
   if (!pipette) {
-    console.error(`${pipetteId} not found in pipettes, cannot handleFormChange properly`)
+    assert(false, `${pipetteId} not found in pipettes, cannot handleFormChange properly`)
     return 1
   }
-  return pipette.channels
+  return pipette.spec.channels
 }
 
 // TODO: Ian 2018-09-20 this is only usable by 'unsavedForm'.
 // Eventually we gotta allow arbitrary actions like DELETE_LABWARE
 // (or more speculatively, CHANGE_PIPETTE etc), which affect saved forms from
 // 'outside', to cause changes that run thru all the logic in this block
-function handleFormChange (payload: ChangeFormPayload, getState: GetState): ChangeFormPayload {
+function handleFormChange (
+  payload: ChangeFormPayload,
+  baseForm: ?FormData,
+  getState: GetState,
+): ChangeFormPayload {
   // Use state to handle form changes
   const baseState = getState()
-  const unsavedForm = selectors.getUnsavedForm(baseState)
 
   // pass thru, unchanged
-  if (unsavedForm == null) { return payload }
+  if (baseForm == null) { return payload }
 
   let updateOverrides = getChangeLabwareEffects(payload.update)
 
-  if (unsavedForm.pipette && payload.update.pipette) {
+  if (baseForm.pipette && payload.update.pipette) {
     if (typeof payload.update.pipette !== 'string') {
       // this should not happen!
       console.error('no next pipette, could not handleFormChange')
@@ -66,7 +66,21 @@ function handleFormChange (payload: ChangeFormPayload, getState: GetState): Chan
     const nextChannels = getChannels(payload.update.pipette, baseState)
     updateOverrides = {
       ...updateOverrides,
-      ...reconcileFormPipette(unsavedForm, baseState, payload.update.pipette, nextChannels),
+      ...reconcileFormPipette(baseForm, baseState, payload.update.pipette, nextChannels),
+    }
+  }
+
+  if (baseForm.stepType === 'distribute') {
+    if (typeof payload.update.pipette === 'string') {
+      const pipette = stepFormSelectors.getPipetteInvariantProperties(baseState)[payload.update.pipette]
+      assert(pipette, `handleFormChange expected pipette to exist ${String(payload.update.pipette)}`)
+      const disposalVol = pipette.spec.minVolume
+
+      updateOverrides = {
+        ...updateOverrides,
+        'aspirate_disposalVol_checkbox': true,
+        'aspirate_disposalVol_volume': disposalVol,
+      }
     }
   }
 
@@ -183,6 +197,7 @@ export const reconcileFormPipette = (formData: FormData, baseState: BaseState, n
       }
     }
   }
+
   return updateOverrides
 }
 

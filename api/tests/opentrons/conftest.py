@@ -179,6 +179,12 @@ def using_api2(loop):
         opentrons.reset_globals()
 
 
+@pytest.fixture
+def ensure_api2(request, loop):
+    with using_api2(loop):
+        yield
+
+
 @contextlib.contextmanager
 def using_api1(loop):
     oldenv = os.environ.get('OT_FF_useProtocolApi2')

@@ -10,10 +10,10 @@ import {
   makeGetRobotIgnoredUpdateRequest,
   makeGetRobotUpdateRequest,
   makeGetRobotRestartRequest,
-  getAnyRobotUpdateAvailable,
   restartRobotServer,
   fetchIgnoredUpdate,
   setIgnoredUpdate,
+  getConnectedRobotUpgradeAvailable,
   reducer,
 } from '..'
 
@@ -28,22 +28,31 @@ const REQUESTS_TO_TEST = [
 
 const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
-
-const robot = {name: 'opentrons', ip: '1.2.3.4', port: '1234'}
-const availableUpdate = '42.0.0'
+const availableUpdate = '4.0.0'
 
 describe('server API client', () => {
+  let robot
+
   beforeEach(() => {
     client.__clearMock()
     electron.__clearMock()
+    robot = {
+      name: 'opentrons',
+      ip: '1.2.3.4',
+      port: '1234',
+      local: false,
+      ok: true,
+      serverOk: true,
+      health: {},
+      serverHealth: {},
+    }
   })
 
   describe('selectors', () => {
+    const setCurrent = setter(`health.api_version`)
     let state
-    let robot
 
     beforeEach(() => {
-      robot = {name: 'opentrons', ip: '1.2.3.4', port: '1234'}
       state = {
         api: {
           server: {
@@ -56,16 +65,21 @@ describe('server API client', () => {
         },
         shell: {
           apiUpdate: {
-            version: '4.0.0',
+            version: availableUpdate,
           },
         },
+        discovery: {
+          robotsByName: {
+            [robot.name]: [robot],
+          },
+        },
+        robot: {connection: {connectedTo: robot.name}},
       }
     })
 
     test('makeGetRobotUpdateInfo', () => {
       const version = state.shell.apiUpdate.version
       const getRobotUpdateInfo = makeGetRobotUpdateInfo()
-      const setCurrent = setter(`health.api_version`)
 
       // test upgrade available
       robot = setCurrent(robot, '3.0.0')
@@ -94,6 +108,26 @@ describe('server API client', () => {
         version,
         type: null,
       })
+    })
+
+    test('getConnectedRobotUpgradeAvailable', () => {
+      const setCurrent = setter([
+        'discovery',
+        'robotsByName',
+        robot.name,
+        0,
+        'serverHealth',
+        'apiServerVersion',
+      ])
+
+      state = setCurrent(state, '3.0.0')
+      expect(getConnectedRobotUpgradeAvailable(state)).toEqual(true)
+
+      state = setCurrent(state, '4.0.0')
+      expect(getConnectedRobotUpgradeAvailable(state)).toEqual(false)
+
+      state = setCurrent(state, '5.0.0')
+      expect(getConnectedRobotUpgradeAvailable(state)).toEqual(false)
     })
 
     test('makeGetRobotUpdateRequest', () => {
@@ -127,22 +161,6 @@ describe('server API client', () => {
       expect(getIngoredUpdate(state, {name: 'foo'})).toEqual({
         inProgress: false,
       })
-    })
-
-    // TODO(mc, 2018-09-25): re-evaluate this selector
-    test.skip('getAnyRobotUpdateAvailable is true if any robot has update', () => {
-      state.api.server.anotherBot = {availableUpdate: null}
-      expect(getAnyRobotUpdateAvailable(state)).toBe(true)
-
-      state = {
-        api: {
-          server: {
-            ...state.api.server,
-            [robot.name]: {availableUpdate: null},
-          },
-        },
-      }
-      expect(getAnyRobotUpdateAvailable(state)).toBe(false)
     })
   })
 
@@ -304,12 +322,14 @@ describe('server API client', () => {
   describe('reducer', () => {
     let state
 
-    beforeEach(() =>
-      (state = {
-        server: {
-          [robot.name]: {},
-        },
-      }))
+    beforeEach(
+      () =>
+        (state = {
+          server: {
+            [robot.name]: {},
+          },
+        })
+    )
 
     REQUESTS_TO_TEST.forEach(request => {
       const {path, response} = request

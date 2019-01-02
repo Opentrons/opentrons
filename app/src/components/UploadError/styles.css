@@ -16,6 +16,7 @@
   @apply --font-body-2-dark;
 
   margin-left: 2rem;
+  padding-bottom: 2rem;
   max-width: 24rem;
 }
 
@@ -23,6 +24,7 @@
 .error_message {
   font-weight: var(--fw-semibold);
   margin-bottom: 0.75rem;
+  white-space: pre-wrap;
 }
 
 .error_icon,

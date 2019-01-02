@@ -66,6 +66,7 @@ export default function updateLiquidState (
   // Remove liquid from source well(s)
   const labwareLiquidState: SingleLabwareLiquidState = {
     ...prevLiquidState.labware[labwareId],
+    // $FlowFixMe: flow is having a hard time with this reduce for some reason
     ...wellsForTips.reduce((acc: SingleLabwareLiquidState, well) => ({
       ...acc,
       [well]: splitLiquid(

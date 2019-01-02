@@ -23,7 +23,10 @@ export default function getDefaultsForStepType (stepType: StepType) {
         'dispense_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
         'dispense_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
         'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+        'dispense_blowout_checkbox': false,
+        'dispense_blowout_location': FIXED_TRASH_ID,
         'dispense_wells': [],
+        'pipette': null,
         'volume': undefined,
       }
     case 'consolidate':
@@ -36,7 +39,10 @@ export default function getDefaultsForStepType (stepType: StepType) {
         'aspirate_wells': [],
         'dispense_labware': null,
         'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+        'dispense_blowout_checkbox': false,
+        'dispense_blowout_location': FIXED_TRASH_ID,
         'dispense_wells': [],
+        'pipette': null,
         'volume': undefined,
       }
     case 'mix':
@@ -45,15 +51,18 @@ export default function getDefaultsForStepType (stepType: StepType) {
         'labware': null,
         'aspirate_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
         'aspirate_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
-        'wells': [],
+        'dispense_blowout_checkbox': false,
+        'dispense_blowout_location': FIXED_TRASH_ID,
         'mix_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE, // NOTE: mix uses dispense for both asp + disp, for now
+        'pipette': null,
         'volume': undefined,
+        'wells': [],
       }
     case 'distribute':
       return {
         'aspirate_changeTip': DEFAULT_CHANGE_TIP_OPTION,
         'aspirate_disposalVol_checkbox': true,
-        'aspirate_disposalVol_destination': FIXED_TRASH_ID,
+        'dispense_blowout_location': FIXED_TRASH_ID, // only blowout location for disposalVol
         'aspirate_labware': null,
         'aspirate_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
         'aspirate_wells': [],
@@ -62,6 +71,7 @@ export default function getDefaultsForStepType (stepType: StepType) {
         'dispense_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
         'dispense_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
         'dispense_wells': [],
+        'pipette': null,
         'volume': undefined,
       }
     default:

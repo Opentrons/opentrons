@@ -1,6 +1,6 @@
 // @flow
 import {expectTimelineError} from './testMatchers'
-import _touchTip from '../touchTip'
+import _touchTip from '../commandCreators/atomic/touchTip'
 import {
   createRobotState,
   commandCreatorNoErrors,

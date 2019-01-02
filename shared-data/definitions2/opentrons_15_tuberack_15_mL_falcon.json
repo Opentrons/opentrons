@@ -1,0 +1,201 @@
+{
+    "ordering": [
+        [
+            "A1",
+            "B1",
+            "C1"
+        ],
+        [
+            "A2",
+            "B2",
+            "C2"
+        ],
+        [
+            "A3",
+            "B3",
+            "C3"
+        ],
+        [
+            "A4",
+            "B4",
+            "C4"
+        ],
+        [
+            "A5",
+            "B5",
+            "C5"
+        ]
+    ],
+    "otId": "01b7cd80-e8f3-11e8-b93b-5f6727dde048",
+    "deprecated": false,
+    "metadata": {
+        "displayLengthUnits": "mm",
+        "displayVolumeUnits": "mL",
+        "displayCategory": "tuberack",
+        "displayName": "Opentrons 15 mL tuberack",
+        "tags": [
+            "15",
+            "mL",
+            "Opentrons",
+            "falcon",
+            "tuberack"
+        ]
+    },
+    "cornerOffsetFromSlot": {
+        "x": 6.76,
+        "y": 6.73,
+        "z": 0
+    },
+    "dimensions": {
+        "overallLength": 121,
+        "overallWidth": 78.75,
+        "overallHeight": 123.76
+    },
+    "parameters": {
+        "format": "irregular",
+        "isTiprack": false,
+        "loadName": "opentrons_15_tuberack_15_mL_falcon",
+        "isMagneticModuleCompatible": false
+    },
+    "wells": {
+        "C1": {
+            "depth": 117.98,
+            "diameter": 14.5,
+            "shape": "circular",
+            "totalLiquidVolume": 15,
+            "x": 10.5,
+            "y": 14.38,
+            "z": 5.78
+        },
+        "B1": {
+            "depth": 117.98,
+            "diameter": 14.5,
+            "shape": "circular",
+            "totalLiquidVolume": 15,
+            "x": 10.5,
+            "y": 39.38,
+            "z": 5.78
+        },
+        "A1": {
+            "depth": 117.98,
+            "diameter": 14.5,
+            "shape": "circular",
+            "totalLiquidVolume": 15,
+            "x": 10.5,
+            "y": 64.38,
+            "z": 5.78
+        },
+        "C2": {
+            "depth": 117.98,
+            "diameter": 14.5,
+            "shape": "circular",
+            "totalLiquidVolume": 15,
+            "x": 35.5,
+            "y": 14.38,
+            "z": 5.78
+        },
+        "B2": {
+            "depth": 117.98,
+            "diameter": 14.5,
+            "shape": "circular",
+            "totalLiquidVolume": 15,
+            "x": 35.5,
+            "y": 39.38,
+            "z": 5.78
+        },
+        "A2": {
+            "depth": 117.98,
+            "diameter": 14.5,
+            "shape": "circular",
+            "totalLiquidVolume": 15,
+            "x": 35.5,
+            "y": 64.38,
+            "z": 5.78
+        },
+        "C3": {
+            "depth": 117.98,
+            "diameter": 14.5,
+            "shape": "circular",
+            "totalLiquidVolume": 15,
+            "x": 60.5,
+            "y": 14.38,
+            "z": 5.78
+        },
+        "B3": {
+            "depth": 117.98,
+            "diameter": 14.5,
+            "shape": "circular",
+            "totalLiquidVolume": 15,
+            "x": 60.5,
+            "y": 39.38,
+            "z": 5.78
+        },
+        "A3": {
+            "depth": 117.98,
+            "diameter": 14.5,
+            "shape": "circular",
+            "totalLiquidVolume": 15,
+            "x": 60.5,
+            "y": 64.38,
+            "z": 5.78
+        },
+        "C4": {
+            "depth": 117.98,
+            "diameter": 14.5,
+            "shape": "circular",
+            "totalLiquidVolume": 15,
+            "x": 85.5,
+            "y": 14.38,
+            "z": 5.78
+        },
+        "B4": {
+            "depth": 117.98,
+            "diameter": 14.5,
+            "shape": "circular",
+            "totalLiquidVolume": 15,
+            "x": 85.5,
+            "y": 39.38,
+            "z": 5.78
+        },
+        "A4": {
+            "depth": 117.98,
+            "diameter": 14.5,
+            "shape": "circular",
+            "totalLiquidVolume": 15,
+            "x": 85.5,
+            "y": 64.38,
+            "z": 5.78
+        },
+        "C5": {
+            "depth": 117.98,
+            "diameter": 14.5,
+            "shape": "circular",
+            "totalLiquidVolume": 15,
+            "x": 110.5,
+            "y": 14.38,
+            "z": 5.78
+        },
+        "B5": {
+            "depth": 117.98,
+            "diameter": 14.5,
+            "shape": "circular",
+            "totalLiquidVolume": 15,
+            "x": 110.5,
+            "y": 39.38,
+            "z": 5.78
+        },
+        "A5": {
+            "depth": 117.98,
+            "diameter": 14.5,
+            "shape": "circular",
+            "totalLiquidVolume": 15,
+            "x": 110.5,
+            "y": 64.38,
+            "z": 5.78
+        }
+    },
+    "brand": {
+        "brand": "Opentrons",
+        "brandId": ["352096"]
+    }
+}
