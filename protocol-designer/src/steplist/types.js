@@ -10,10 +10,6 @@ import type {
 import type {LabwareEntities, PipetteEntities} from '../step-forms'
 import type {FormError} from './formLevel/errors'
 
-// sections of the form that are expandable/collapsible
-export type FormSectionState = {aspirate: boolean, dispense: boolean}
-export type FormSectionNames = 'aspirate' | 'dispense'
-
 // timeline start and end
 export const START_TERMINAL_ITEM_ID: '__initial_setup__' = '__initial_setup__'
 export const END_TERMINAL_ITEM_ID: '__end__' = '__end__'

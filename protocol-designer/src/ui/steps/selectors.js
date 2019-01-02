@@ -6,7 +6,6 @@ import isEmpty from 'lodash/isEmpty'
 import * as stepFormSelectors from '../../step-forms/selectors' // TODO Ian 2018-12-20: fix circular dependency so this direct import isn't required
 import type {StepIdType} from '../../form-types'
 import type {BaseState, Selector} from '../../types'
-import type {FormSectionState} from './types'
 import {
   initialSelectedItemState,
   type SelectableItem,
@@ -122,18 +121,6 @@ const getCollapsedSteps = createSelector(
   (state: StepsState) => state.collapsedSteps
 )
 
-// TODO: BC 2018-12-17 refactor as react state
-const getStepCreationButtonExpanded: Selector<boolean> = createSelector(
-  rootSelector,
-  (state: StepsState) => state.stepCreationButtonExpanded
-)
-
-// TODO: BC 2018-12-17 refactor as react state
-const getFormSectionCollapsed: Selector<FormSectionState> = createSelector(
-  rootSelector,
-  s => s.formSectionCollapse
-)
-
 const getSelectedStep = createSelector(
   stepFormSelectors.getAllSteps,
   getSelectedStepId,
@@ -166,7 +153,6 @@ export default {
 
   getSelectedStep,
 
-  getStepCreationButtonExpanded,
   getSelectedStepId,
   getSelectedTerminalItemId,
   getHoveredTerminalItemId,
@@ -174,7 +160,6 @@ export default {
   getHoveredStepLabware,
   getActiveItem,
   getHoveredSubstep,
-  getFormSectionCollapsed,
   getWellSelectionLabwareKey,
   getCurrentFormCanBeSaved,
 

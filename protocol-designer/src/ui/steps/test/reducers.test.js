@@ -1,7 +1,7 @@
 // @flow
 import {_allReducers} from '../reducers.js'
 
-const {collapsedSteps, selectedItem, stepCreationButtonExpanded} = _allReducers
+const {collapsedSteps, selectedItem} = _allReducers
 
 describe('collapsedSteps reducer', () => {
   test('add step', () => {
@@ -77,28 +77,5 @@ describe('selectedItem reducer', () => {
       isStep: false,
       id: terminalId,
     })
-  })
-})
-
-describe('stepCreationButtonExpanded reducer', () => {
-  test('close (or stay closed) on newly added step', () => {
-    const action = {
-      type: 'ADD_STEP',
-      payload: {id: '123', stepType: 'transfer'},
-    }
-    expect(stepCreationButtonExpanded(true, action)).toEqual(false)
-    expect(stepCreationButtonExpanded(false, action)).toEqual(false)
-  })
-
-  test('update with EXPAND_ADD_STEP_BUTTON action payload', () => {
-    expect(stepCreationButtonExpanded(false, {
-      type: 'EXPAND_ADD_STEP_BUTTON',
-      payload: true,
-    })).toEqual(true)
-
-    expect(stepCreationButtonExpanded(true, {
-      type: 'EXPAND_ADD_STEP_BUTTON',
-      payload: false,
-    })).toEqual(false)
   })
 })

@@ -71,6 +71,10 @@
       "step_notes": {
         "label": "Step Notes"
       }
+    },
+    "section": {
+      "aspirate": "aspirate",
+      "dispense": "dispense"
     }
   }
 }

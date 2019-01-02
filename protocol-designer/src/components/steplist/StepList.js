@@ -3,11 +3,11 @@ import * as React from 'react'
 import {SidePanel} from '@opentrons/components'
 
 import StartingDeckStateTerminalItem from './StartingDeckStateTerminalItem'
-import StepCreationButton from '../../containers/StepCreationButton'
 import TerminalItem from './TerminalItem'
 import {END_TERMINAL_TITLE} from '../../constants'
 import {END_TERMINAL_ITEM_ID} from '../../steplist'
 
+import StepCreationButton from '../StepCreationButton'
 import type {StepIdType} from '../../form-types'
 import {PortalRoot} from './TooltipPortal'
 import DraggableStepItems from './DraggableStepItems'
