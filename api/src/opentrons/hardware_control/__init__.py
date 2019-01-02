@@ -360,16 +360,8 @@ class API(HardwareAPILike):
         :param mount: the mount associated with the target plunger
         :type mount: :py:class:`.top_types.Mount`
         """
-        # incase plunger motor stalled while dropping a tip, add a
-        # safety margin of the distance between `bottom` and `drop_tip`
         instr = self._attached_instruments[mount]
         if instr:
-            b = instr.config.plunger_positions['bottom']
-            d = instr.config.plunger_positions['drop_tip']
-            safety_margin = abs(b-d)
-            self._backend.set_active_current(Axis.of_plunger(mount),
-                                             instr.config.plunger_current)
-            await self._move_plunger(mount, safety_margin)
             await self.home([Axis.of_plunger(mount)])
             await self._move_plunger(mount,
                                      instr.config.plunger_positions['bottom'])
@@ -941,10 +933,17 @@ class API(HardwareAPILike):
         await self._move_plunger(
             mount, droptip, speed=instr.config.drop_tip_speed)
         await self._shake_off_tips(mount)
+        self._backend.set_active_current(plunger_ax,
+                                         instr.config.plunger_current)
         instr.set_current_volume(0)
         instr.remove_tip()
         if home_after:
-            await self.home_plunger(mount)
+            safety_margin = abs(bottom-droptip)
+            async with self._motion_lock:
+                smoothie_pos = self._backend.fast_home(
+                    plunger_ax.name.upper(), safety_margin)
+                self._current_position = self._deck_from_smoothie(smoothie_pos)
+            await self._move_plunger(mount, safety_margin)
 
     async def _shake_off_tips(self, mount):
         # tips don't always fall off, especially if resting against
