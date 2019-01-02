@@ -32,13 +32,18 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
     log.info("Moving to safe z: {}".format(safe_height))
     robot.poses = instrument._move(robot.poses, z=safe_height)
 
-    for axis, x0, y0, z0, distance in hot_spots:
+    for hs in hot_spots:
+        x0 = tp.center[0] + hs.x_start_offs
+        y0 = tp.center[1] + hs.y_start_offs
+        z0 = hs.z_start_abs
+
         log.info("Moving to {}".format((x0, y0, z0)))
         robot.poses = instrument._move(robot.poses, x=x0, y=y0)
         robot.poses = instrument._move(robot.poses, z=z0)
 
-        axis_index = 'xyz'.index(axis)
-        robot.poses = instrument._probe(robot.poses, axis, distance)
+        axis_index = 'xyz'.index(hs.axis)
+        robot.poses = instrument._probe(
+            robot.poses, hs.axis, hs.probe_distance)
 
         # Tip position is stored in accumulator and averaged for each axis
         # to be used for more accurate positioning for the next axis
@@ -48,21 +53,23 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
         # after probing two points along the same axis
         # average them out, update center and clear accumulator
         # except Z, we're only probing that once
-        if axis == 'z':
-            center = center._replace(**{axis: axis_pos[0]})
+        if hs.axis == 'z':
+            center = center._replace(**{hs.axis: axis_pos[0]})
             axis_pos.clear()
         elif len(axis_pos) == 2:
-            center = center._replace(**{axis:
+            center = center._replace(**{hs.axis:
                                         (axis_pos[0] + axis_pos[1]) / 2.0})
 
             axis_pos.clear()
 
-        log.debug("Current axis positions for {}: {}".format(axis, axis_pos))
+        log.debug("Current axis positions for {}: {}".format(
+            hs.axis, axis_pos))
 
         # Bounce back to release end stop
-        bounce = value + (tp.bounce_distance * (-distance / abs(distance)))
+        sgn = hs.probe_distance / abs(hs.probe_distance)
+        bounce = value + (tp.bounce_distance * -sgn)
 
-        robot.poses = instrument._move(robot.poses, **{axis: bounce})
+        robot.poses = instrument._move(robot.poses, **{hs.axis: bounce})
         robot.poses = instrument._move(robot.poses, z=safe_height)
 
         log.debug("Updated center point tip probe {}".format(center))

@@ -81,20 +81,24 @@ async def test_moves_to_hotspot(hardware_api, monkeypatch,
     rel_iter = iter(rel_calls)
     probe_iter = iter(probe_calls)
     bounce_base = hardware_api._config.tip_probe.bounce_distance
-    for ax, x0, y0, z0, dist in hotspots:
+    old_center = hardware_api._config.tip_probe.center
+    for hs in hotspots:
+        x0 = old_center[0] + hs.x_start_offs
+        y0 = old_center[1] + hs.y_start_offs
+        z0 = hs.z_start_abs
         next(move_iter)
         next(move_iter)
         rel = next(rel_iter)
-        if dist < 0:
+        if hs.probe_distance < 0:
             bounce = bounce_base
         else:
             bounce = -bounce_base
-        assert rel[1] == Point(**{ax: bounce})
+        assert rel[1] == Point(**{hs.axis: bounce})
         prep_point = next(move_iter)
         assert prep_point[1] == Point(x0, y0, z0)
         probe = next(probe_iter)
-        assert probe[0] == ax if ax != 'z' else 'a'
-        assert probe[1] == dist
+        assert probe[0] == hs.axis if hs.axis != 'z' else 'a'
+        assert probe[1] == hs.probe_distance
         next(move_iter)
 
     targ = Point(*hardware_api._config.tip_probe.center)

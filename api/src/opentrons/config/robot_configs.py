@@ -2,7 +2,7 @@ from collections import namedtuple
 import json
 import logging
 import os
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, NamedTuple, Tuple
 
 from opentrons.config import get_config_index, feature_flags as fflags
 
@@ -327,9 +327,22 @@ def _save_json(data, filename):
         log.exception('Write failed with exception:')
 
 
+class HotSpot(NamedTuple):
+    axis: str
+    x_start_offs: float
+    y_start_offs: float
+    z_start_abs: float
+    probe_distance: float
+
+
 def calculate_tip_probe_hotspots(
-        tip_length,
-        tip_probe_settings):
+        tip_length: float,
+        tip_probe_settings: tip_probe_config)\
+        -> List[HotSpot]:
+    """
+    Generate a list of tuples describing motions for doing the xy part of
+    tip probe based on the config's description of the tip probe box.
+    """
     # probe_dimensions is the external bounding box of the probe unit
     size_x, size_y, size_z = tip_probe_settings.dimensions
 
@@ -341,35 +354,35 @@ def calculate_tip_probe_hotspots(
                           + tip_probe_settings.z_clearance.normal, 3)
 
     z_start = max(tip_probe_settings.z_clearance.deck, nozzle_safe_z)
-    center = tip_probe_settings.center
     switch_offset = tip_probe_settings.switch_offset
     # Each list item defines axis we are probing for, starting position vector
     # and travel distance
-    neg_x = ('x',
-             center[0] - rel_x_start,
-             center[1] + switch_offset[0],
-             z_start,
-             size_x)
-    pos_x = ('x',
-             center[0] + rel_x_start,
-             center[1] + switch_offset[0],
-             z_start,
-             -size_x)
-    neg_y = ('y',
-             center[0] + switch_offset[1],
-             center[1] - rel_y_start,
-             z_start,
-             size_y)
-    pos_y = ('y',
-             center[0] + switch_offset[1],
-             center[1] + rel_y_start,
-             z_start,
-             -size_y)
-    z = ('z',
-         center[0],
-         center[1] + switch_offset[2],
-         center[2] + tip_probe_settings.z_clearance.start,
-         -size_z)
+    neg_x = HotSpot('x',
+                    -rel_x_start,
+                    switch_offset[0],
+                    z_start,
+                    size_x)
+    pos_x = HotSpot('x',
+                    rel_x_start,
+                    switch_offset[0],
+                    z_start,
+                    -size_x)
+    neg_y = HotSpot('y',
+                    switch_offset[1],
+                    -rel_y_start,
+                    z_start,
+                    size_y)
+    pos_y = HotSpot('y',
+                    switch_offset[1],
+                    rel_y_start,
+                    z_start,
+                    -size_y)
+    z = HotSpot(
+        'z',
+        0,
+        switch_offset[2],
+        tip_probe_settings.center[2] + tip_probe_settings.z_clearance.start,
+        -size_z)
 
     return [
         neg_x,

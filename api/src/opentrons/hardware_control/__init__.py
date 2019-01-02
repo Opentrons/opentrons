@@ -650,7 +650,7 @@ class API(HardwareAPILike):
                     deck_max = self._deck_from_smoothie({ax: bound[1]
                                                          for ax, bound
                                                          in bounds.items()})
-                    raise RuntimeError(
+                    self._log.warning(
                         "Out of bounds move: {}={} (transformed: {}) not in"
                         "limits ({}, {}) (transformed: ({}, {})"
                         .format(ax.name,
@@ -1076,8 +1076,8 @@ class API(HardwareAPILike):
         safe_z = self._config.tip_probe.z_clearance.crossover + \
             self._config.tip_probe.center[2]
 
-        new_pos = {ax: 0.0
-                   for ax in Axis.gantry_axes() if ax != Axis.A}
+        new_pos: Dict[Axis, List[float]] = {
+            ax: [] for ax in Axis.gantry_axes() if ax != Axis.A}
 
         if not tip_length and not pip.has_tip:
             tip_length = pip.config.tip_length
@@ -1102,8 +1102,19 @@ class API(HardwareAPILike):
             # Hotspots based on our expectation of tip length and config
             hotspots = robot_configs.calculate_tip_probe_hotspots(
                 pip.current_tip_length, self._config.tip_probe)
-            for ax, x0, y0, z0, probe_distance in hotspots:
+            for hs in hotspots:
+                ax_en = Axis[hs.axis.upper()]
+                overridden_center = {
+                    ax: sum(vals)/len(vals)
+                    if len(vals) == 2
+                    else self._config.tip_probe.center[ax.value]
+                    for ax, vals in new_pos.items()
+                }
+                x0 = overridden_center[Axis.X] + hs.x_start_offs
+                y0 = overridden_center[Axis.Y] + hs.y_start_offs
+                z0 = hs.z_start_abs
                 pos = await self.current_position(mount)
+
                 # Move safely to the setup point for the probe
                 await self.move_to(mount,
                                    top_types.Point(pos[Axis.X],
@@ -1113,7 +1124,6 @@ class API(HardwareAPILike):
                                    top_types.Point(x0, y0, safe_z))
                 await self.move_to(mount,
                                    top_types.Point(x0, y0, z0))
-                ax_en = Axis[ax.upper()]
                 if ax_en == Axis.Z:
                     to_probe = Axis.by_mount(mount)
                 else:
@@ -1122,29 +1132,29 @@ class API(HardwareAPILike):
                 async with self._motion_lock:
                     self._current_position = self._deck_from_smoothie(
                         self._backend.probe(
-                            to_probe.name.lower(), probe_distance))
+                            to_probe.name.lower(), hs.probe_distance))
                 xyz = await self.gantry_position(mount)
-                # Store the upated position. We can average for X and Y since
-                # we hit a switch on either side of the tip probe box, but for
-                # Z we have to just use the single value
-                if ax_en != Axis.Z:
-                    new_pos[ax_en] += xyz[ax_en.value] / 2.0
-                else:
-                    new_pos[ax_en] = xyz.z
+                # Store the upated position.
+                self._log.debug(
+                    "tip probe: hs {}: start: ({} {} {}) status {} will add {}"
+                    .format(hs, x0, y0, z0, new_pos, xyz[ax_en.value]))
+                new_pos[ax_en].append(xyz[ax_en.value])
                 # Before moving up, move back to clear the switches
                 bounce = self._config.tip_probe.bounce_distance\
-                    * (-1.0 if probe_distance > 0 else 1.0)
+                    * (-1.0 if hs.probe_distance > 0 else 1.0)
                 await self.move_rel(mount,
                                     top_types.Point(
-                                        **{ax: bounce}))
+                                        **{hs.axis: bounce}))
                 await self.move_to(mount, xyz._replace(z=safe_z))
 
+            to_ret = top_types.Point(**{ax.name.lower(): sum(vals)/len(vals)
+                                        for ax, vals in new_pos.items()})
             self._log.info("Tip probe complete with {} {} on {}. "
-                           "New position: {} (default {})"
+                           "New position: {} (default {}), averaged from {}"
                            .format(pip.name, pip.pipette_id, mount.name,
-                                   new_pos, self._config.tip_probe.center))
-            return top_types.Point(**{ax.name.lower(): val
-                                      for ax, val in new_pos.items()})
+                                   to_ret, self._config.tip_probe.center,
+                                   new_pos))
+            return to_ret
 
         with _assure_tip():
             return await _do_tp()
