@@ -191,10 +191,7 @@ export const containers = handleActions({
     const {templateLabwareId, duplicateLabwareId} = action.payload
     const templateLabware = state[templateLabwareId]
     const nextSlot = nextEmptySlot(_loadedContainersBySlot(state))
-    if (!nextSlot) {
-      console.info('there are no available slots to place the duplicate into')
-      return state
-    }
+    if (!nextSlot) return state
     return {
       ...state,
       [duplicateLabwareId]: {

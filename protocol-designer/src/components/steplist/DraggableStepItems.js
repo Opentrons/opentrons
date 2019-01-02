@@ -128,11 +128,13 @@ class StepItems extends React.Component<StepItemsProps, StepItemsState> {
   }
 }
 
+const NAV_OFFSET = 64
+
 const StepDragPreview = (props: StepDragPreviewProps) => {
   const {itemType, isDragging, currentOffset, stepType, stepName} = props
   if (itemType !== DND_TYPES.STEP_ITEM || !isDragging || !stepType || !currentOffset) return null
   return (
-    <div className={styles.step_drag_preview} style={{left: currentOffset.x, top: currentOffset.y}}>
+    <div className={styles.step_drag_preview} style={{left: currentOffset.x - NAV_OFFSET, top: currentOffset.y}}>
       <PDTitledList
         iconName={stepIconsByType[stepType]}
         title={stepName}

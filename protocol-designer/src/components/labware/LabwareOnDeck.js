@@ -43,8 +43,8 @@ const DragPreview = (props: DragPreviewProps) => {
   const {containerId} = item || {}
   if (itemType !== DND_TYPES.LABWARE || !isDragging || !currentOffset) return null
   return (
-    <g transform={`translate(${SLOT_OFFSET_MM} ${SLOT_OFFSET_MM})`}>
-      <LabwareContainer x={scaledX} y={scaledY}>
+    <g>
+      <LabwareContainer x={scaledX - SLOT_OFFSET_MM + 2} y={scaledY - SLOT_OFFSET_MM + 2}>
         <HighlightableLabware containerId={containerId} />
       </LabwareContainer>
     </g>
