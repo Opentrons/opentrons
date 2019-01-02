@@ -154,7 +154,15 @@ export const savedStepForms = (
           [INITIAL_DECK_SETUP_STEP_ID]: _migratePreDeckSetupStep(fileData),
           ...stepFormsFromFile,
         }
-      return mapValues(loadedStepForms, stepForm => ({
+
+      // migrate old kebab-case keys to camelCase
+      const cleanedLoadedStepForms = mapValues(loadedStepForms, (stepForm) => ({
+        ...omit(stepForm, ['step-name', 'step-details']),
+        stepName: stepForm['step-name'],
+        stepDetails: stepForm['step-details'],
+      }))
+
+      return mapValues(cleanedLoadedStepForms, stepForm => ({
         ...getDefaultsForStepType(stepForm.stepType),
         ...stepForm,
       }))
