@@ -27,21 +27,32 @@ export type LabwareComponentProps = {
 type Props = {
   className?: string,
   LabwareComponent?: React.ComponentType<LabwareComponentProps>,
-  DragPreviewLayer: React.Element<*>,
+  DragPreviewLayer?: React.Element<*>,
 }
 
 const VIEW_BOX_WIDTH = 427
 const VIEW_BOX_HEIGHT = 390
 
 export default class Deck extends React.Component<Props> {
-  parentRef: ?SVGElement
+  // TODO Ian 2018-02-22 No support in Flow for SVGElement yet: https://github.com/facebook/flow/issues/2332
+  // this `parentRef` should be HTMLElement | SVGElement
+  parentRef: ?any
 
   getXY = (rawX: number, rawY: number) => {
     if (!this.parentRef) return {}
     const clientRect: {width: number, height: number, left: number, top: number} = this.parentRef.getBoundingClientRect()
 
-    const scaledX = (rawX - clientRect.left) * (VIEW_BOX_WIDTH / clientRect.width)
-    const scaledY = (rawY - clientRect.top) * (VIEW_BOX_HEIGHT / clientRect.height)
+    const widthCoefficient = (VIEW_BOX_WIDTH - (SLOT_OFFSET_MM * 2) - (SLOT_SPACING_MM * 2)) / clientRect.width
+    const heightCoefficient = (VIEW_BOX_HEIGHT - (SLOT_OFFSET_MM * 2) - (SLOT_SPACING_MM * 3)) / clientRect.height
+    const scaledXOffset = (SLOT_OFFSET_MM / VIEW_BOX_WIDTH) * clientRect.width
+    const scaledYOffset = (SLOT_OFFSET_MM / VIEW_BOX_HEIGHT) * clientRect.height
+    const scaledX = ((rawX - clientRect.left) * widthCoefficient) + scaledXOffset
+    const scaledY = ((rawY - clientRect.top) * heightCoefficient) + scaledYOffset
+    console.table({
+      rawX,
+      rawY,
+      clientRect,
+    })
     return {scaledX, scaledY}
   }
   render () {
@@ -56,8 +67,8 @@ export default class Deck extends React.Component<Props> {
           ref={ref => { this.parentRef = ref }}
           transform={`translate(${SLOT_OFFSET_MM} ${SLOT_OFFSET_MM})`}>
           {renderLabware(LabwareComponent)}
-          <DragPreviewLayer getXY={this.getXY} />
         </g>
+        <DragPreviewLayer getXY={this.getXY} />
       </svg>
     )
   }

@@ -7,7 +7,7 @@ import {
   ContainerNameOverlay,
   EmptyDeckSlot,
   humanizeLabwareType,
-  SLOT_OFFSET_MM,
+  // SLOT_OFFSET_MM,
   type DeckSlot,
 } from '@opentrons/components'
 import {
@@ -44,7 +44,7 @@ const DragPreview = (props: DragPreviewProps) => {
   if (itemType !== DND_TYPES.LABWARE || !isDragging || !currentOffset) return null
   return (
     <g>
-      <LabwareContainer x={scaledX - SLOT_OFFSET_MM + 2} y={scaledY - SLOT_OFFSET_MM + 2}>
+      <LabwareContainer x={scaledX} y={scaledY}>
         <HighlightableLabware containerId={containerId} />
       </LabwareContainer>
     </g>
