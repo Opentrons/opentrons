@@ -2,7 +2,7 @@
 import * as React from 'react'
 import {Labware} from '@opentrons/components'
 import SingleLabware from '../../SingleLabware'
-import styles from './NewFileModal.css'
+import styles from './FilePipettesModal.css'
 
 type Props = {containerType: ?string}
 

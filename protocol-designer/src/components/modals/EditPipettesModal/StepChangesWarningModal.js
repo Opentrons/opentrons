@@ -4,7 +4,7 @@ import * as React from 'react'
 import {AlertModal, OutlineButton} from '@opentrons/components'
 import i18n from '../../../localization'
 
-import styles from './EditPipettesModal.css'
+import styles from './StepChangesWarningModal.css'
 import modalStyles from '../modal.css'
 
 type Props = {onCancel: () => void, onConfirm: () => void}

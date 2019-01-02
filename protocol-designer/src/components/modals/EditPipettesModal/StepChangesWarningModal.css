@@ -1,0 +1,25 @@
+@import '@opentrons/components';
+
+.button_row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+.continue_button {
+  margin-left: 1rem;
+}
+
+.cause {
+  font-weight: var(--fw-semibold);
+  padding-bottom: 0;
+  margin-bottom: 0.5rem;
+}
+
+.cause_effect_item {
+  margin: 1rem 0;
+}
+
+.cause_effect_list {
+  margin-left: 2rem;
+}

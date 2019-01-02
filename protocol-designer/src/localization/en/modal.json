@@ -17,15 +17,18 @@
   "new_protocol": {
     "title": "Create New Protocol"
   },
-  "edit_pipettes": {
-    "title": "Edit Pipettes"
-  },
   "well_order": {
     "title": "Well Order",
     "body": "Change the order in which the robot aspirates from the selected wells",
     "field_label": "Order",
     "then": "then",
     "viz_label": "Pattern"
+  },
+  "pipette_fields": {
+    "left_pipette": "Left Pipette",
+    "right_pipette": "Right Pipette",
+    "left_tiprack": "Left Tiprack*",
+    "right_tiprack": "Right Tiprack*"
   },
   "edit_pipettes": {
     "title": "Change Pipette Selection",

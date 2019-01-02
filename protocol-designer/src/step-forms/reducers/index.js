@@ -9,7 +9,7 @@ import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 
 import {sortedSlotnames, type DeckSlot} from '@opentrons/components'
-import {pipetteModelToName} from '../utils'
+import {pipetteModelToName, getIdsInRange} from '../utils'
 import {
   INITIAL_DECK_SETUP_STEP_ID,
   FIXED_TRASH_ID,
@@ -32,6 +32,7 @@ import type {FileLabware, FilePipette, ProtocolFile} from '../../file-types'
 import type {
   AddStepAction,
   ChangeFormInputAction,
+  ChangeSavedStepFormAction,
   DeleteStepAction,
   DuplicateStepAction,
   PopulateFormAction,
@@ -43,7 +44,7 @@ import type {StepItemData} from '../../steplist/types'
 import type {
   CreatePipettesAction,
   DeletePipettesAction,
-  ModifyPipettesTiprackAssignmentAction,
+  SubstituteStepFormPipettesAction,
 } from '../actions'
 
 type FormState = FormData | null
@@ -114,140 +115,179 @@ function _getNextAvailableSlot (labwareLocations: {[labwareId: string]: DeckSlot
 const initialSavedStepFormsState: SavedStepFormState = {
   [INITIAL_DECK_SETUP_STEP_ID]: initialDeckSetupStepForm,
 }
+type SavedStepFormsActions =
+  | SaveStepFormAction
+  | DeleteStepAction
+  | LoadFileAction
+  | CreateContainerAction
+  | DeleteContainerAction
+  | SubstituteStepFormPipettesAction
+  | DeletePipettesAction
+  | DuplicateStepAction
+  | ChangeSavedStepFormAction
+
 export const savedStepForms = (
   rootState: RootState,
-  action: SaveStepFormAction | DeleteStepAction | LoadFileAction | CreateContainerAction | DeleteContainerAction
+  action: SavedStepFormsActions
 ) => {
   const savedStepForms = rootState ? rootState.savedStepForms : initialSavedStepFormsState
-  // TODO: Ian 2018-12-20 this switch-case makes it easy to get namespace conflicts using const's, and messes up flow. Try it a different way.
-  switch (action.type) {
-    case 'SAVE_STEP_FORM':
-      return {
-        ...savedStepForms,
-        [action.payload.id]: action.payload,
+  if (action.type === 'SAVE_STEP_FORM') {
+    return {
+      ...savedStepForms,
+      [action.payload.id]: action.payload,
+    }
+  }
+  if (action.type === 'DELETE_STEP') {
+    return omit(savedStepForms, action.payload)
+  }
+  if (action.type === 'LOAD_FILE') {
+    // backwards compatibility: adds in INITIAL_DECK_SETUP_STEP_ID with
+    // all labware (from PD metadata) if there was no such step form
+    const fileData = action.payload
+    const stepFormsFromFile = getPDMetadata(fileData).savedStepForms
+
+    // only migrate if there's no initial deck setup step
+    const loadedStepForms = (stepFormsFromFile[INITIAL_DECK_SETUP_STEP_ID])
+      ? stepFormsFromFile
+      : {
+        [INITIAL_DECK_SETUP_STEP_ID]: _migratePreDeckSetupStep(fileData),
+        ...stepFormsFromFile,
       }
-    case 'DELETE_STEP':
-      return omit(savedStepForms, action.payload.toString())
-    case 'LOAD_FILE':
-      // backwards compatibility: adds in INITIAL_DECK_SETUP_STEP_ID with
-      // all labware (from PD metadata) if there was no such step form
-      const fileData = action.payload
-      const stepFormsFromFile = getPDMetadata(action.payload).savedStepForms
 
-      // only migrate if there's no initial deck setup step
-      const loadedStepForms = (stepFormsFromFile[INITIAL_DECK_SETUP_STEP_ID])
-        ? stepFormsFromFile
-        : {
-          [INITIAL_DECK_SETUP_STEP_ID]: _migratePreDeckSetupStep(fileData),
-          ...stepFormsFromFile,
-        }
+    // migrate old kebab-case keys to camelCase
+    const cleanedLoadedStepForms = mapValues(loadedStepForms, (stepForm) => ({
+      ...omit(stepForm, ['step-name', 'step-details']),
+      stepName: stepForm['step-name'],
+      stepDetails: stepForm['step-details'],
+    }))
 
-      // migrate old kebab-case keys to camelCase
-      const cleanedLoadedStepForms = mapValues(loadedStepForms, (stepForm) => ({
-        ...omit(stepForm, ['step-name', 'step-details']),
-        stepName: stepForm['step-name'],
-        stepDetails: stepForm['step-details'],
-      }))
-
-      return mapValues(cleanedLoadedStepForms, stepForm => ({
-        ...getDefaultsForStepType(stepForm.stepType),
-        ...stepForm,
-      }))
-    case 'CREATE_CONTAINER':
+    return mapValues(cleanedLoadedStepForms, stepForm => ({
+      ...getDefaultsForStepType(stepForm.stepType),
+      ...stepForm,
+    }))
+  }
+  if (action.type === 'CREATE_CONTAINER') {
     // auto-update initial deck setup state.
-      const prevInitialDeckSetupStep = savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
-      const {id} = action.payload
-      const slot = action.payload.slot || _getNextAvailableSlot(prevInitialDeckSetupStep.labwareLocationUpdate)
-      if (!slot) {
-        console.warn('no slots available, ignoring action:', action)
-        return savedStepForms
-      }
-      return {
-        ...savedStepForms,
-        [INITIAL_DECK_SETUP_STEP_ID]: {
-          ...prevInitialDeckSetupStep,
-          labwareLocationUpdate: {
-            ...prevInitialDeckSetupStep.labwareLocationUpdate,
-            [id]: slot,
-          },
+    const prevInitialDeckSetupStep = savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+    assert(prevInitialDeckSetupStep, 'expected initial deck setup step to exist, could not handle CREATE_CONTAINER')
+    const {id} = action.payload
+    const slot = action.payload.slot || _getNextAvailableSlot(prevInitialDeckSetupStep.labwareLocationUpdate)
+    if (!slot) {
+      console.warn('no slots available, ignoring action:', action)
+      return savedStepForms
+    }
+    return {
+      ...savedStepForms,
+      [INITIAL_DECK_SETUP_STEP_ID]: {
+        ...prevInitialDeckSetupStep,
+        labwareLocationUpdate: {
+          ...prevInitialDeckSetupStep.labwareLocationUpdate,
+          [id]: slot,
         },
-      }
-    case 'DELETE_CONTAINER':
-      return mapValues(savedStepForms, savedForm => {
-        if (
-          action.type === 'DELETE_CONTAINER' && // TODO Ian 2018-12-13 flow is not doing a good job understanding this switch-case
-          savedForm.stepType === 'manualIntervention'
-        ) {
-          // remove instances of labware from all manualIntervention steps
-          return {
-            ...savedForm,
-            labwareLocationUpdate: omit(savedForm.labwareLocationUpdate, action.payload.containerId),
-          }
-        }
-        const deleteLabwareUpdate = reduce(savedForm, (acc, value, fieldName) => {
-          if (value === action.payload.containerId) {
-            const formLabwareFieldUpdate = {[fieldName]: null}
-            return {
-              ...acc,
-              ...formLabwareFieldUpdate,
-              ...getChangeLabwareEffects(formLabwareFieldUpdate),
-            }
-          } else {
-            return acc
-          }
-        }, {})
+      },
+    }
+  }
+  if (action.type === 'DELETE_CONTAINER') {
+    const labwareIdToDelete = action.payload.containerId
+    return mapValues(savedStepForms, (savedForm: FormData) => {
+      if (savedForm.stepType === 'manualIntervention') {
+        // remove instances of labware from all manualIntervention steps
         return {
           ...savedForm,
-          ...deleteLabwareUpdate,
+          labwareLocationUpdate: omit(savedForm.labwareLocationUpdate, labwareIdToDelete),
         }
-      })
-    case 'DELETE_PIPETTES':
-      // remove references to pipettes that have been deleted
-      const deletedPipetteIds = action.payload
-      return mapValues(savedStepForms, (form: FormData) => {
-        if (form.stepType !== 'manualIntervention') {
-          return omit(form, deletedPipetteIds)
+      }
+      const deleteLabwareUpdate = reduce(savedForm, (acc, value, fieldName) => {
+        if (value === labwareIdToDelete) {
+          const formLabwareFieldUpdate = {[fieldName]: null}
+          return {
+            ...acc,
+            ...formLabwareFieldUpdate,
+            ...getChangeLabwareEffects(formLabwareFieldUpdate),
+          }
+        } else {
+          return acc
         }
+      }, {})
+      return {
+        ...savedForm,
+        ...deleteLabwareUpdate,
+      }
+    })
+  }
+  if (action.type === 'DELETE_PIPETTES') {
+    // remove references to pipettes that have been deleted
+    const deletedPipetteIds = action.payload
+    return mapValues(savedStepForms, (form: FormData) => {
+      if (form.stepType === 'manualIntervention') {
         return {
           ...form,
           pipetteLocationUpdate: omit(form.pipetteLocationUpdate, deletedPipetteIds),
         }
-      })
-    case 'CHANGE_SAVED_STEP_FORM':
-      // TODO Ian 2018-12-13 do handleFormChange here with full state
-      const {stepId} = action.payload
-      const previousForm = savedStepForms[stepId]
-      if (previousForm.stepType === 'manualIntervention') {
-        // since manualIntervention steps are nested, use a recursive merge
+      } else if (deletedPipetteIds.includes(form.pipette)) {
         return {
-          ...savedStepForms,
-          [stepId]: merge(
-            {},
-            previousForm,
-            action.payload.update,
-          ),
+          ...form,
+          pipette: null,
         }
       }
-      // other step form types are not designed to be deeply merged
-      // (eg `wells` arrays should be reset, not appended to)
-      return {
-        ...savedStepForms,
-        [stepId]: {
-          ...previousForm,
-          ...action.payload.update,
-        },
-      }
-    case 'DUPLICATE_STEP':
-      return {
-        ...savedStepForms,
-        [action.payload.duplicateStepId]: {
-          ...cloneDeep(action.payload.stepId != null ? savedStepForms[action.payload.stepId] : {}),
-          id: action.payload.duplicateStepId,
-        },
-      }
-    default:
-      return savedStepForms
+      return form
+    })
   }
+  if (action.type === 'SUBSTITUTE_STEP_FORM_PIPETTES') {
+    // TODO: Ian 2019-01-02 use some more general fn to get pipette fields, eventually. But right now the only pipette field is 'pipette'
+    const {startStepId, endStepId, substitutionMap} = action.payload
+    const stepIdsToUpdate = getIdsInRange(rootState.orderedSteps, startStepId, endStepId)
+    const savedStepsUpdate = stepIdsToUpdate.reduce((acc, stepId) => {
+      const prevStepForm = savedStepForms[stepId]
+
+      if (!prevStepForm.pipette || !(prevStepForm.pipette in substitutionMap)) return acc
+
+      return {
+        ...acc,
+        [stepId]: {
+          ...prevStepForm,
+          pipette: substitutionMap[prevStepForm.pipette],
+        },
+      }
+    }, {})
+    return {...savedStepForms, ...savedStepsUpdate}
+  }
+  if (action.type === 'CHANGE_SAVED_STEP_FORM') {
+    // TODO Ian 2018-12-13 do handleFormChange here with full state
+    const {stepId} = action.payload
+    const previousForm = savedStepForms[stepId]
+    if (previousForm.stepType === 'manualIntervention') {
+      // since manualIntervention steps are nested, use a recursive merge
+      return {
+        ...savedStepForms,
+        [stepId]: merge(
+          {},
+          previousForm,
+          action.payload.update,
+        ),
+      }
+    }
+    // other step form types are not designed to be deeply merged
+    // (eg `wells` arrays should be reset, not appended to)
+    return {
+      ...savedStepForms,
+      [stepId]: {
+        ...previousForm,
+        ...action.payload.update,
+      },
+    }
+  }
+  if (action.type === 'DUPLICATE_STEP') {
+    return {
+      ...savedStepForms,
+      [action.payload.duplicateStepId]: {
+        ...cloneDeep(action.payload.stepId != null ? savedStepForms[action.payload.stepId] : {}),
+        id: action.payload.duplicateStepId,
+      },
+    }
+  }
+
+  return savedStepForms
 }
 
 const initialLabwareState: LabwareEntities = {
@@ -295,12 +335,6 @@ export const pipetteInvariantProperties = handleActions({
   },
   DELETE_PIPETTES: (state: PipetteInvariantState, action: DeletePipettesAction): PipetteInvariantState => {
     return omit(state, action.payload)
-  },
-  MODIFY_PIPETTES_TIPRACK_ASSIGNMENT: (state: PipetteInvariantState, action: ModifyPipettesTiprackAssignmentAction): PipetteInvariantState => {
-    assert(
-      Object.keys(action.payload).forEach(pipetteId => pipetteId in state),
-      `pipettes in ${action.type} payload do not exist in state ${JSON.stringify(action.payload)}`)
-    return merge({}, state, action.payload)
   },
 }, initialPipetteState)
 
