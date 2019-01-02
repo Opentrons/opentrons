@@ -8,6 +8,8 @@ api-server-lib/.*
 audio/.*
 compute/.*
 update-server/.*
+shared-data/definitions/.*
+shared-data/definitions2/.*
 
 [include]
 
