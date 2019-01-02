@@ -12,7 +12,7 @@ export type ChangeFormPayload = {
 }
 
 export type ChangeSavedFormPayload = {
-  stepId?: string,
+  stepId: string,
   update: {
     [StepFieldName]: ?mixed, // string | boolean | Array<string> | null,
   },

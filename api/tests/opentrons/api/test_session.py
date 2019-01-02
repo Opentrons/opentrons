@@ -1,4 +1,3 @@
-import asyncio
 import itertools
 
 import pytest
@@ -15,11 +14,11 @@ state = partial(state, 'session')
 
 
 @pytest.fixture
-async def run_session(request, session_manager):
+def run_session(request, session_manager):
     if not isinstance(session_manager._hardware, Robot):
         pytest.skip('requires api1 only')
         return None
-    return await session_manager.create('dino', 'from opentrons import robot')
+    return session_manager.create('dino', 'from opentrons import robot')
 
 
 @pytest.fixture
@@ -57,7 +56,7 @@ def labware_setup(hardware):
 
 @pytest.mark.api1_only
 async def test_load_from_text(session_manager, protocol):
-    session = await session_manager.create(name='<blank>', text=protocol.text)
+    session = session_manager.create(name='<blank>', text=protocol.text)
     assert session.name == '<blank>'
 
     acc = []
@@ -73,7 +72,7 @@ async def test_load_from_text(session_manager, protocol):
 
 @pytest.mark.api1_only
 async def test_clear_tips(session_manager, tip_clear_protocol):
-    session = await session_manager.create(
+    session = session_manager.create(
         name='<blank>', text=tip_clear_protocol.text)
 
     assert len(session._instruments) == 1
@@ -90,14 +89,57 @@ async def test_async_notifications(main_router):
     assert res == {'name': 'foo', 'payload': {'bar': 'baz'}}
 
 
-@pytest.mark.api1_only
-async def test_load_protocol_with_error(session_manager):
+def test_load_protocol_with_error(session_manager):
     with pytest.raises(Exception) as e:
-        session = await session_manager.create(name='<blank>', text='blah')
+        session = session_manager.create(name='<blank>', text='blah')
         assert session is None
 
     args, = e.value.args
     assert args == "name 'blah' is not defined"
+
+
+@pytest.mark.api2_only
+@pytest.mark.parametrize('protocol_file', ['testosaur_v2.py'])
+async def test_load_and_run_v2(
+            main_router,
+            protocol,
+            protocol_file,
+            loop
+        ):
+    session = main_router.session_manager.create(
+        name='<blank>',
+        text=protocol.text)
+    assert main_router.notifications.queue.qsize() == 1
+    assert session.state == 'loaded'
+    assert session.command_log == {}
+    # main_router.calibration_manager.tip_probe(session.instruments[0])
+
+    def run():
+        session.run()
+
+    await loop.run_in_executor(executor=None, func=run)
+    assert len(session.command_log) == 4
+
+    res = []
+    index = 0
+    async for notification in main_router.notifications:
+        payload = notification['payload']
+        index += 1  # Command log in sync with add-command events emitted
+        if type(payload) is dict:
+            state = payload.get('state')
+        else:
+            state = payload.state
+        res.append(state)
+        if state == 'finished':
+            break
+
+    assert [key for key, _ in itertools.groupby(res)] == \
+        ['loaded', 'running', 'finished']
+    assert main_router.notifications.queue.qsize() == 0,\
+        'Notification should be empty after receiving "finished" event'
+    session.run()
+    assert len(session.command_log) == 4, \
+        "Clears command log on the next run"
 
 
 @pytest.mark.api1_only
@@ -108,7 +150,7 @@ async def test_load_and_run(
             protocol_file,
             loop
         ):
-    session = await main_router.session_manager.create(
+    session = main_router.session_manager.create(
         name='<blank>',
         text=protocol.text)
     assert main_router.notifications.queue.qsize() == 1
@@ -117,13 +159,10 @@ async def test_load_and_run(
     main_router.calibration_manager.tip_probe(session.instruments[0])
 
     def run():
-        loop = asyncio.new_event_loop()
-        loop.run_until_complete(session.run())
+        session.run()
 
-    task = loop.run_in_executor(executor=None,
-                                func=run)
-
-    await task
+    await loop.run_in_executor(executor=None,
+                               func=run)
     assert len(session.command_log) == 7
 
     res = []
@@ -141,8 +180,9 @@ async def test_load_and_run(
 
     assert [key for key, _ in itertools.groupby(res)] == \
         ['loaded', 'probing', 'ready', 'running', 'finished']
-    assert main_router.notifications.queue.qsize() == 0, 'Notification should be empty after receiving "finished" state change event'  # noqa
-    await session.run()
+    assert main_router.notifications.queue.qsize() == 0,\
+        'Notification should be empty after receiving "finished" state change'
+    session.run()
     assert len(session.command_log) == 7, \
         "Clears command log on the next run"
 
@@ -190,7 +230,8 @@ async def test_get_instruments_and_containers(labware_setup,
     instruments, containers, modules, interactions = \
         _accumulate([_get_labware(command) for command in commands])
 
-    session = await Session.build_and_prep(name='', text='', hardware=hardware)
+    session = Session.build_and_prep(name='', text='',
+                                     hardware=hardware, loop=loop)
     # We are calling dedupe directly for testing purposes.
     # Normally it is called from within a session
     session._instruments.extend(_dedupe(instruments))
@@ -203,7 +244,6 @@ async def test_get_instruments_and_containers(labware_setup,
     modules = session.get_modules()
 
     assert [i.name for i in instruments] == ['p50_multi_v1', 'p1000_single_v1']
-    assert [i.axis for i in instruments] == ['a', 'b']
     assert [i.id for i in instruments] == [id(p50), id(p1000)]
     assert [[t.slot for t in i.tip_racks] for i in instruments] == \
         [['1', '4'], ['1', '4']]
@@ -272,7 +312,7 @@ def test_get_labware(labware_setup):
 
 @pytest.mark.api1_only
 async def test_session_model_functional(session_manager, protocol):
-    session = await session_manager.create(name='<blank>', text=protocol.text)
+    session = session_manager.create(name='<blank>', text=protocol.text)
     assert [container.name for container in session.containers] == \
            ['tiprack', 'trough', 'plate', 'tall-fixed-trash']
     names = [instrument.name for instrument in session.instruments]
@@ -290,7 +330,7 @@ async def test_drop_tip_with_trash(session_manager, protocol, protocol_file):
     is listed as a container for a protocol, as well as a container
     instruments are interacting with.
     """
-    session = await session_manager.create(name='<blank>', text=protocol.text)
+    session = session_manager.create(name='<blank>', text=protocol.text)
 
     assert 'tall-fixed-trash' in [c.name for c in session.get_containers()]
     containers = sum([i.containers for i in session.get_instruments()], [])
@@ -300,7 +340,7 @@ async def test_drop_tip_with_trash(session_manager, protocol, protocol_file):
 @pytest.mark.api1_only
 async def test_session_create_error(main_router):
     with pytest.raises(SyntaxError):
-        await main_router.session_manager.create(
+        main_router.session_manager.create(
             name='<blank>',
             text='syntax error ;(')
 
@@ -309,7 +349,7 @@ async def test_session_create_error(main_router):
         await main_router.wait_until(lambda _: True)
 
     with pytest.raises(ZeroDivisionError):
-        await main_router.session_manager.create(
+        main_router.session_manager.create(
             name='<blank>',
             text='1/0')
 
@@ -333,7 +373,13 @@ metadata = {
 'what?': 'no',
 'hello': 'world'
 }
+fakedata = {
+'who?': 'me',
+'what?': 'green eggs'
+}
 print('wat?')
+metadata['hello'] = 'moon'
+fakedata['what?'] = 'ham'
 """
 
     parsed = ast.parse(prot, filename='testy', mode='exec')
@@ -341,7 +387,6 @@ print('wat?')
     assert metadata == expected
 
 
-@pytest.mark.api1_only
 async def test_session_metadata(main_router):
     expected = {
         'hello': 'world',
@@ -356,9 +401,12 @@ metadata = {
 'hello': 'world'
 }
 print('wat?')
+
+def run(ctx):
+    print('hi there')
 """
 
-    session = await main_router.session_manager.create(
+    session = main_router.session_manager.create(
         name='<blank>',
         text=prot)
     assert session.metadata == expected

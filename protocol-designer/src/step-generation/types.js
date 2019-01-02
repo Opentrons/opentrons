@@ -146,6 +146,7 @@ export type CommandCreatorData =
   | PauseFormData
   | TransferFormData
 
+// TODO: Ian 2018-12-20 replace `PipetteData` with something like `PipetteOnDeck` type
 export type PipetteData = {| // TODO refactor all 'pipette fields', split PipetteData into its own export type
   id: string, // TODO PipetteId export type here instead of string?
   mount: Mount,

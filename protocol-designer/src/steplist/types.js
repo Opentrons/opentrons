@@ -7,12 +7,8 @@ import type {
   StepType,
   TransferLikeStepType,
 } from '../form-types'
-import type {BaseState} from '../types'
+import type {LabwareEntities, PipetteEntities} from '../step-forms'
 import type {FormError} from './formLevel/errors'
-
-// sections of the form that are expandable/collapsible
-export type FormSectionState = {aspirate: boolean, dispense: boolean}
-export type FormSectionNames = 'aspirate' | 'dispense'
 
 // timeline start and end
 export const START_TERMINAL_ITEM_ID: '__initial_setup__' = '__initial_setup__'
@@ -106,6 +102,6 @@ export type StepArgsAndErrors = {
 }
 
 export type StepFormContextualState = {
-  labwareIngred: $PropertyType<BaseState, 'labwareIngred'>,
-  pipettes: $PropertyType<BaseState, 'pipettes'>,
+  labware: LabwareEntities,
+  pipettes: PipetteEntities,
 }

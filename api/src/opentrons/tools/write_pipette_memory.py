@@ -41,9 +41,20 @@ def connect_to_robot():
     Connect over Serial to the Smoothieware motor driver
     '''
     print()
+    import optparse
     from opentrons import robot
     print('Connecting to robot...')
-    robot.connect()
+    parser = optparse.OptionParser(usage='usage: %prog [options] ')
+    parser.add_option(
+        "-p", "--p", dest="port", default='',
+        type='str', help='serial port of the smoothie'
+    )
+
+    options, _ = parser.parse_args(args=None, values=None)
+    if options.port:
+        robot.connect(options.port)
+    else:
+        robot.connect()
     return robot
 
 

@@ -17,7 +17,8 @@ import {
   setMoveLabwareMode,
   moveLabware,
 } from '../labware-ingred/actions'
-import {selectors as steplistSelectors, START_TERMINAL_ITEM_ID} from '../steplist'
+import {START_TERMINAL_ITEM_ID} from '../steplist'
+import {selectors as stepsSelectors} from '../ui/steps'
 
 import {LabwareOnDeck} from '../components/labware'
 import type {BaseState} from '../types'
@@ -61,7 +62,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const selectedContainer = selectors.getSelectedLabware(state)
   const isSelectedSlot = !!(selectedContainer && selectedContainer.slot === slot)
 
-  const selectedTerminalItem = steplistSelectors.getSelectedTerminalItemId(state)
+  const selectedTerminalItem = stepsSelectors.getSelectedTerminalItemId(state)
   const labwareHasName = container && selectors.getSavedLabware(state)[containerId]
   const isTiprack = getIsTiprack(containerType)
   const showNameOverlay = container && !isTiprack && !labwareHasName
@@ -101,7 +102,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     // or when targeted by an open "Add Labware" modal
       ? (isSelectedSlot || selectors.selectedAddLabwareSlot(state) === slot)
     // outside of deckSetupMode, labware is highlighted when step/substep is hovered
-      : steplistSelectors.getHoveredStepLabware(state).includes(containerId),
+      : stepsSelectors.getHoveredStepLabware(state).includes(containerId),
     selectedTerminalItem,
 
     slot,

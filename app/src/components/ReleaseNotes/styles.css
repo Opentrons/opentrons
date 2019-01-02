@@ -56,5 +56,7 @@
 
   & p {
     @apply --font-body-2-dark;
+
+    margin-bottom: 1rem;
   }
 }

@@ -3,8 +3,7 @@ import {createAction} from 'redux-actions'
 import selectors from './selectors'
 import {changeFormInput} from '../steplist/actions'
 
-import {selectors as steplistSelectors} from '../steplist'
-import {selectors as pipetteSelectors} from '../pipettes'
+import {selectors as stepFormSelectors} from '../step-forms'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
 
 import type {ThunkDispatch, GetState} from '../types'
@@ -59,7 +58,7 @@ export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload) =
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
     const state = getState()
     const accessor = payload.formFieldAccessor
-    const formData = steplistSelectors.getUnsavedForm(state)
+    const formData = stepFormSelectors.getUnsavedForm(state)
 
     const wells: Wells = (accessor && formData && formData[accessor] &&
       _wellArrayToObj(formData[accessor])) || {}
@@ -67,7 +66,11 @@ export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload) =
     // initially selected wells in form get selected in state before modal opens
     dispatch(selectWells(wells))
 
-    const pipettes = pipetteSelectors.getEquippedPipettes(state)
+    const pipette = (
+      payload.pipetteId != null &&
+      stepFormSelectors.getPipetteInvariantProperties(state)[payload.pipetteId]
+    ) || null
+
     const labware = labwareIngredSelectors.getLabwareById(state)
     // TODO type this action, make an underline fn action creator
 
@@ -75,7 +78,7 @@ export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload) =
       type: 'OPEN_WELL_SELECTION_MODAL',
       payload: {
         ...payload,
-        pipetteChannels: pipettes && pipettes[payload.pipetteId] && pipettes[payload.pipetteId].channels,
+        pipetteChannels: pipette && pipette.spec.channels,
         labwareName: labware && labware[payload.labwareId] && labware[payload.labwareId].type,
       },
     })

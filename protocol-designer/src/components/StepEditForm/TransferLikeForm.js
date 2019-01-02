@@ -30,23 +30,26 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
   const {focusHandlers, stepType} = props
   return (
     <React.Fragment>
-      <FormSection sectionName="aspirate">
-        <div className={formStyles.row_wrapper}>
-          <FormGroup label="Labware:" className={styles.labware_field}>
-            <LabwareDropdown name="aspirate_labware" {...focusHandlers} />
-          </FormGroup>
-          <WellSelectionInput
-            name="aspirate_wells"
-            labwareFieldName="aspirate_labware"
-            pipetteFieldName="pipette"
-            {...focusHandlers} />
-          <PipetteField name="pipette" stepType={stepType} {...focusHandlers} />
-          {stepType === 'consolidate' &&
-            <FormGroup label='Volume:' className={styles.volume_field}>
-              <StepInputField name="volume" units='μL' {...focusHandlers} />
+      <FormSection
+        sectionName={i18n.t('form.step_edit_form.section.aspirate')}
+        headerRow={(
+          <div className={formStyles.row_wrapper}>
+            <FormGroup label="Labware:" className={styles.labware_field}>
+              <LabwareDropdown name="aspirate_labware" {...focusHandlers} />
             </FormGroup>
-          }
-        </div>
+            <WellSelectionInput
+              name="aspirate_wells"
+              labwareFieldName="aspirate_labware"
+              pipetteFieldName="pipette"
+              {...focusHandlers} />
+            <PipetteField name="pipette" stepType={stepType} {...focusHandlers} />
+            {stepType === 'consolidate' &&
+              <FormGroup label='Volume:' className={styles.volume_field}>
+                <StepInputField name="volume" units='μL' {...focusHandlers} />
+              </FormGroup>
+            }
+          </div>
+        )}>
 
         <div className={formStyles.row_wrapper}>
           <div className={styles.left_settings_column}>
@@ -110,32 +113,35 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
         </div>
       </FormSection>
 
-      <FormSection sectionName='dispense'>
-        <div className={formStyles.row_wrapper}>
-          <FormGroup label='Labware:' className={styles.labware_field}>
-            <LabwareDropdown name="dispense_labware" {...focusHandlers} />
-          </FormGroup>
-          <WellSelectionInput
-            name="dispense_wells"
-            labwareFieldName="dispense_labware"
-            pipetteFieldName="pipette"
-            {...focusHandlers} />
-          {(stepType === 'transfer' || stepType === 'distribute') && (
-            // TODO: Ian 2018-08-30 make volume field not be a one-off
-            <HoverTooltip
-              tooltipComponent={getTooltipForField(stepType, 'volume')}
-              placement='top-start'>
-              {(hoverTooltipHandlers) =>
-                <FormGroup
-                  label='Volume:'
-                  className={styles.volume_field}
-                  hoverTooltipHandlers={hoverTooltipHandlers}>
-                  <StepInputField name="volume" units="μL" {...focusHandlers} />
-                </FormGroup>
-              }
-            </HoverTooltip>
-          )}
-        </div>
+      <FormSection
+        sectionName={i18n.t('form.step_edit_form.section.dispense')}
+        headerRow={(
+          <div className={formStyles.row_wrapper}>
+            <FormGroup label='Labware:' className={styles.labware_field}>
+              <LabwareDropdown name="dispense_labware" {...focusHandlers} />
+            </FormGroup>
+            <WellSelectionInput
+              name="dispense_wells"
+              labwareFieldName="dispense_labware"
+              pipetteFieldName="pipette"
+              {...focusHandlers} />
+            {(stepType === 'transfer' || stepType === 'distribute') && (
+              // TODO: Ian 2018-08-30 make volume field not be a one-off
+              <HoverTooltip
+                tooltipComponent={getTooltipForField(stepType, 'volume')}
+                placement='top-start'>
+                {(hoverTooltipHandlers) =>
+                  <FormGroup
+                    label='Volume:'
+                    className={styles.volume_field}
+                    hoverTooltipHandlers={hoverTooltipHandlers}>
+                    <StepInputField name="volume" units="μL" {...focusHandlers} />
+                  </FormGroup>
+                }
+              </HoverTooltip>
+            )}
+          </div>
+        )}>
 
         <div className={formStyles.row_wrapper}>
           <div className={styles.left_settings_column}>

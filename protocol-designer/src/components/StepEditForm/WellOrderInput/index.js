@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import {FormGroup} from '@opentrons/components'
 import cx from 'classnames'
 import i18n from '../../../localization'
-import {selectors} from '../../../steplist'
+import {selectors as stepFormSelectors} from '../../../step-forms'
 import styles from './WellOrderInput.css'
 import WellOrderModal from './WellOrderModal'
 import ZIG_ZAG_IMAGE from '../../../images/zig_zag_icon.svg'
@@ -39,7 +39,7 @@ class WellOrderInput extends React.Component<OP & SP, WellOrderInputState> {
 }
 
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
-  const formData = selectors.getUnsavedForm(state)
+  const formData = stepFormSelectors.getUnsavedForm(state)
   // NOTE: not interpolating prefix because breaks flow string enum
   const firstName = ownProps.prefix === 'aspirate' ? 'aspirate_wellOrder_first' : 'dispense_wellOrder_first'
   const secondName = ownProps.prefix === 'aspirate' ? 'aspirate_wellOrder_second' : 'dispense_wellOrder_second'

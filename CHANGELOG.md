@@ -3,6 +3,66 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.6.5"></a>
+## [3.6.5](https://github.com/opentrons/opentrons/compare/v3.6.4...v3.6.5) (2018-12-18)
+
+
+### Bug Fixes
+
+* **api:** Fix extract metadata ([#2833](https://github.com/opentrons/opentrons/issues/2833)) ([0930915](https://github.com/opentrons/opentrons/commit/0930915))
+* **api:** Remove the intermingled old aspirate function from p10s ([#2839](https://github.com/opentrons/opentrons/issues/2839)) ([696184c](https://github.com/opentrons/opentrons/commit/696184c))
+* **protocol-designer:** ensure pipettes are removed from step forms when nuked ([#2813](https://github.com/opentrons/opentrons/issues/2813)) ([46fee8b](https://github.com/opentrons/opentrons/commit/46fee8b))
+
+
+### Features
+
+* **protocol-designer:** display timeline and form alerts in same fashion ([#2817](https://github.com/opentrons/opentrons/issues/2817)) ([e27d2ae](https://github.com/opentrons/opentrons/commit/e27d2ae)), closes [#1990](https://github.com/opentrons/opentrons/issues/1990)
+
+
+
+
+
+<a name="3.6.4"></a>
+## [3.6.4](https://github.com/opentrons/opentrons/compare/v3.6.3...v3.6.4) (2018-12-17)
+
+
+### Bug Fixes
+
+* **protocol-designer:** fix bug with null distribute step ([#2826](https://github.com/opentrons/opentrons/issues/2826)) ([3eecb29](https://github.com/opentrons/opentrons/commit/3eecb29))
+
+
+### Features
+
+* **api:** Adds optional arg to QC scripts to specify UART port ([#2825](https://github.com/opentrons/opentrons/issues/2825)) ([5d622ad](https://github.com/opentrons/opentrons/commit/5d622ad))
+
+
+### Performance Improvements
+
+* **api:** Update P1000S aspirate function ([#2830](https://github.com/opentrons/opentrons/issues/2830)) ([ca65283](https://github.com/opentrons/opentrons/commit/ca65283))
+
+
+
+
+
+<a name="3.6.3"></a>
+## [3.6.3](https://github.com/Opentrons/opentrons/compare/v3.6.2...v3.6.3) (2018-12-13)
+
+
+### Bug Fixes
+
+* **api:** raise p300s droptip pose by 1mm to increase QC yield ([#2808](https://github.com/Opentrons/opentrons/issues/2808)) ([40759b2](https://github.com/Opentrons/opentrons/commit/40759b2))
+
+
+### Features
+
+* **app:** Add opt-in modal for new p10s ([#2816](https://github.com/Opentrons/opentrons/issues/2816)) ([cd69e19](https://github.com/Opentrons/opentrons/commit/cd69e19)), closes [#2793](https://github.com/Opentrons/opentrons/issues/2793)
+* **app:** Display Python protocol metadata in the app ([#2805](https://github.com/Opentrons/opentrons/issues/2805)) ([f854953](https://github.com/Opentrons/opentrons/commit/f854953)), closes [#2617](https://github.com/Opentrons/opentrons/issues/2617)
+* **app:** Implement clearer robot server upgrade/downgrade information ([#2807](https://github.com/Opentrons/opentrons/issues/2807)) ([d37e3aa](https://github.com/Opentrons/opentrons/commit/d37e3aa)), closes [#2401](https://github.com/Opentrons/opentrons/issues/2401)
+
+
+
+
+
 <a name="3.6.2"></a>
 ## [3.6.2](https://github.com/Opentrons/opentrons/compare/v3.6.0...v3.6.2) (2018-12-11)
 

@@ -1,4 +1,4 @@
-from opentrons.legacy_api.containers import Slot
+from opentrons.legacy_api.containers import Slot, placeable
 
 
 def _get_parent_slot(placeable):
@@ -13,11 +13,16 @@ class Container:
     def __init__(self, container, instruments=None):
         instruments = instruments or []
         self._container = container
-
         self.id = id(container)
-        self.name = container.get_name()
-        self.type = container.get_type()
-        self.slot = _get_parent_slot(container).get_name()
+
+        if isinstance(container, placeable.Placeable):
+            self.name = container.get_name()
+            self.type = container.get_type()
+            self.slot = _get_parent_slot(container).get_name()
+        else:
+            self.name = container.name
+            self.type = container.name
+            self.slot = container.parent
         self.instruments = [
             Instrument(instrument)
             for instrument in instruments]
@@ -32,10 +37,6 @@ class Instrument:
         self.name = instrument.name
         self.channels = instrument.channels
         self.mount = instrument.mount
-        # Although axis has been deprecated from the instrument
-        # we still need to pass it to the UI for now
-        # Warning: this does not correspond to the Smoothie axis!
-        self.axis = 'a' if self.mount == 'right' else 'b'
         self.tip_racks = [
             Container(container)
             for container in instrument.tip_racks]

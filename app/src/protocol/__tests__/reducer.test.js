@@ -51,6 +51,27 @@ describe('protocolReducer', () => {
       },
     },
     {
+      name: 'handles robot:SESSION_RESPONSE with Python protocol metadata',
+      action: {
+        type: 'robot:SESSION_RESPONSE',
+        payload: {
+          name: 'foo.py',
+          protocolText: '# foo.py',
+          metadata: {'protocol-name': 'foo'},
+        },
+      },
+      initialState: {file: null, contents: null, data: null},
+      expectedState: {
+        file: {
+          name: 'foo.py',
+          type: 'text/x-python-script',
+          lastModified: null,
+        },
+        contents: '# foo.py',
+        data: {metadata: {'protocol-name': 'foo'}},
+      },
+    },
+    {
       name: 'handles robot:DISCONNECT by clearing state',
       action: {type: 'robot:DISCONNECT_RESPONSE'},
       initialState: {file: {name: 'proto.py'}, contents: 'foo', data: {}},

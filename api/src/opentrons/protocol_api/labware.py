@@ -7,7 +7,7 @@ import pkgutil
 from collections import defaultdict
 from enum import Enum, auto
 from itertools import takewhile, dropwhile
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Union
 
 from opentrons.types import Location
 from opentrons.types import Point
@@ -160,6 +160,9 @@ class Well:
             return NotImplemented
         return self.top().point == other.top().point
 
+    def __hash__(self):
+        return hash(self.top().point)
+
 
 class Labware:
     """
@@ -197,6 +200,7 @@ class Labware:
                           for well in col]
         self._offset\
             = Point(offset['x'], offset['y'], offset['z']) + parent.point
+        self._parent = parent.labware
         # Applied properties
         self.set_calibration(self._calibrated_offset)
 
@@ -204,9 +208,20 @@ class Labware:
         self._definition = definition
 
     @property
+    def parent(self) -> Union['Labware', 'Well', str, 'ModuleGeometry', None]:
+        """ The parent of this labware. Usually a slot name.
+        """
+        return self._parent
+
+    @property
     def name(self) -> str:
         """ The canonical name of the labware, which is used to load it """
         return self._definition['parameters']['loadName']
+
+    @property
+    def parameters(self) -> dict:
+        """Internal properties of a labware including type and quirks"""
+        return self._parameters
 
     @property
     def magdeck_engage_height(self) -> Optional[float]:
@@ -392,10 +407,6 @@ class Labware:
         col_dict = self._create_indexed_dictionary(group=2)
         return col_dict
 
-    def cols(self, *args):
-        """Deprecated--use `columns`"""
-        return self.columns(*args)
-
     @property
     def highest_z(self) -> float:
         """
@@ -470,7 +481,7 @@ class Labware:
         :param num_channels: The number of channels for the current pipette
         :type num_channels: int
         """
-        assert num_channels > 0
+        assert num_channels > 0, 'Bad call to use_tips: num_channels==0'
         # Select the column of the labware that contains the target well
         target_column: List[Well] = [
             col for col in self.columns() if start_well in col][0]
@@ -484,22 +495,14 @@ class Labware:
         num_tips = min(len(target_column) - well_idx, num_channels)
         target_wells = target_column[well_idx: well_idx + num_tips]
 
-        assert all([well.has_tip for well in target_wells])
+        assert all([well.has_tip for well in target_wells]),\
+            '{} is out of tips'.format(str(self))
 
         for well in target_wells:
             well.has_tip = False
 
     def __repr__(self):
         return self._display_name
-
-    def __getitem__(self, item):
-        """Deprecated--use `wells` or `wells_by_index`"""
-        if isinstance(item, str):
-            return self.wells_by_index()[item]
-        elif isinstance(item, int):
-            return self.wells()[item]
-        else:
-            raise KeyError
 
 
 class ModuleGeometry:

@@ -1,64 +1,44 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
 import startCase from 'lodash/startCase'
-import cx from 'classnames'
 import {IconButton, HoverTooltip} from '@opentrons/components'
 
 import i18n from '../../localization'
-import {selectors as steplistSelectors} from '../../steplist'
-import {collapseFormSection} from '../../steplist/actions'
-import type {BaseState, ThunkDispatch} from '../../types'
 import styles from './FormSection.css'
 
-// TODO: get these from src/steplist/types.js
-type OP = {sectionName: 'aspirate' | 'dispense'}
-type FormSectionProps = {
+type Props = {
   sectionName?: string,
+  headerRow?: React.Node,
   children?: React.Node,
-  className?: string,
-  /** if defined, carat shows */
-  onCollapseToggle?: (event: SyntheticEvent<>) => mixed,
-  collapsed?: boolean,
 }
+type State = {collapsed?: boolean}
 
-const FormSection = (props: FormSectionProps) => {
-  const childrenArray = React.Children.toArray(props.children)
-  return (
-    <div className={cx(styles.form_section, props.className)}>
-      <div className={styles.title}>{startCase(props.sectionName)}</div>
+class FormSection extends React.Component<Props, State> {
+  state = {collapsed: true}
 
-      <div className={styles.content}>
-        {/* First child always visible, following children only visible if not collapsed */}
-        {childrenArray[0]}
-        {props.collapsed !== true && childrenArray.slice(1)}
-      </div>
+  handleClick = (e: SyntheticEvent<>) => {
+    this.setState({collapsed: !this.state.collapsed})
+  }
+  render () {
+    return (
+      <div className={styles.form_section}>
+        <div className={styles.title}>{startCase(this.props.sectionName)}</div>
 
-      {props.collapsed !== undefined && // if doesn't exist in redux
+        <div className={styles.content}>
+          {this.props.headerRow}
+          {this.state.collapsed !== true && this.props.children}
+        </div>
+
         <HoverTooltip tooltipComponent={i18n.t('tooltip.advanced_settings')}>
           {(hoverTooltipHandlers) => (
-            <div {...hoverTooltipHandlers}
-              onClick={props.onCollapseToggle}
-              className={styles.carat}
-            >
-              <IconButton
-                name='settings'
-                hover={!props.collapsed}
-              />
+            <div {...hoverTooltipHandlers} onClick={this.handleClick} className={styles.carat} >
+              <IconButton name='settings' hover={!this.state.collapsed} />
             </div>
           )}
         </HoverTooltip>
-      }
-    </div>
-  )
+      </div>
+    )
+  }
 }
 
-const FormSectionSTP = (state: BaseState, ownProps: OP) => ({
-  collapsed: steplistSelectors.getFormSectionCollapsed(state)[ownProps.sectionName],
-})
-const FormSectionDTP = (dispatch: ThunkDispatch<*>, ownProps: OP) => ({
-  onCollapseToggle: () => dispatch(collapseFormSection(ownProps.sectionName)),
-})
-const ConnectedFormSection = connect(FormSectionSTP, FormSectionDTP)(FormSection)
-
-export default ConnectedFormSection
+export default FormSection

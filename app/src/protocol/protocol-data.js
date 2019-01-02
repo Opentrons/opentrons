@@ -8,7 +8,8 @@ import type {ProtocolFile, ProtocolData} from './types'
 
 const log = createLogger(__filename)
 
-const MIME_TYPE_JSON = 'application/json'
+export const MIME_TYPE_JSON = 'application/json'
+export const MIME_TYPE_PYTHON = 'text/x-python-script'
 
 export function fileToProtocolFile (file: File): ProtocolFile {
   return {
@@ -21,7 +22,9 @@ export function fileToProtocolFile (file: File): ProtocolFile {
 
 export function parseProtocolData (
   file: ProtocolFile,
-  contents: string
+  contents: string,
+  // optional Python protocol metadata
+  metadata: ?$PropertyType<ProtocolData, 'metadata'>
 ): ?ProtocolData {
   if (fileIsJson(file)) {
     try {
@@ -30,6 +33,9 @@ export function parseProtocolData (
       // TODO(mc, 2018-09-05): surface parse error to user prior to upload
       log.warn('Failed to parse JSON', {contents, message: e.message})
     }
+  } else if (metadata) {
+    // grab Python protocol metadata, if any
+    return {metadata}
   }
 
   return null
@@ -37,6 +43,7 @@ export function parseProtocolData (
 
 export function filenameToType (name: string): ?string {
   if (name.endsWith('.json')) return MIME_TYPE_JSON
+  if (name.endsWith('.py')) return MIME_TYPE_PYTHON
   return null
 }
 

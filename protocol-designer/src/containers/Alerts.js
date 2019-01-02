@@ -7,7 +7,7 @@ import {
   actions as dismissActions,
   selectors as dismissSelectors,
 } from '../dismiss'
-import {selectors as steplistSelectors} from '../steplist'
+import {selectors as stepsSelectors} from '../ui/steps'
 import {selectors as fileDataSelectors} from '../file-data'
 import {AlertItem} from '@opentrons/components'
 import type {BaseState} from '../types'
@@ -67,7 +67,7 @@ function mapStateToProps (state: BaseState): SP {
   const timeline = fileDataSelectors.getRobotStateTimeline(state)
   const errors = timeline.errors || []
   const warnings = dismissSelectors.getTimelineWarningsForSelectedStep(state)
-  const _stepId = steplistSelectors.getSelectedStepId(state)
+  const _stepId = stepsSelectors.getSelectedStepId(state)
 
   return {
     errors,

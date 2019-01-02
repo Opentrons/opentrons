@@ -19,8 +19,8 @@ export default function generateNewForm (args: NewFormArgs): FormData {
   const baseForm: BlankForm = {
     id: stepId,
     stepType: stepType,
-    'step-name': startCase(stepType),
-    'step-details': '',
+    stepName: startCase(stepType),
+    stepDetails: '',
   }
 
   let additionalFields = {}

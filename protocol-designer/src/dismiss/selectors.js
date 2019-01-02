@@ -5,7 +5,9 @@ import {createSelector} from 'reselect'
 // PD won't start, b/c of circular dependency when fileData/selectors/fileCreator
 // imports getDismissedWarnings selector from 'dismiss/
 import {timelineWarningsPerStep} from '../file-data/selectors/commands'
-import {selectors as steplistSelectors, type FormWarning} from '../steplist'
+import {selectors as stepFormSelectors} from '../step-forms'
+import {selectors as stepsSelectors} from '../ui/steps'
+import type {FormWarning} from '../steplist'
 import type {CommandCreatorWarning} from '../step-generation'
 import type {BaseState, Selector} from '../types'
 import type {RootState, DismissedWarningsAllSteps} from './reducers'
@@ -30,7 +32,7 @@ export const getDismissedTimelineWarnings: Selector<DismissedWarningsAllSteps<Co
 export const getTimelineWarningsPerStep: Selector<DismissedWarningsAllSteps<CommandCreatorWarning>> = createSelector(
   getDismissedTimelineWarnings,
   timelineWarningsPerStep,
-  steplistSelectors.getOrderedSteps,
+  stepFormSelectors.getOrderedSteps,
   (dismissedWarnings, warningsPerStep, orderedSteps) => {
     return orderedSteps.reduce(
       (stepAcc: DismissedWarningsAllSteps<CommandCreatorWarning>, stepId) => {
@@ -55,21 +57,21 @@ export const getTimelineWarningsPerStep: Selector<DismissedWarningsAllSteps<Comm
 
 export const getTimelineWarningsForSelectedStep: Selector<Array<CommandCreatorWarning>> = createSelector(
   getTimelineWarningsPerStep,
-  steplistSelectors.getSelectedStepId,
+  stepsSelectors.getSelectedStepId,
   (warningsPerStep, stepId) =>
     (stepId && warningsPerStep[stepId]) || []
 )
 
 export const getDismissedFormWarningsForSelectedStep: Selector<Array<FormWarning>> = createSelector(
   getDismissedFormWarnings,
-  steplistSelectors.getSelectedStepId,
+  stepsSelectors.getSelectedStepId,
   (dismissedWarnings, stepId) =>
     (stepId && dismissedWarnings[stepId]) || []
 )
 
 /** Non-dismissed form-level warnings for selected step */
 export const getFormWarningsForSelectedStep: Selector<Array<FormWarning>> = createSelector(
-  steplistSelectors.getFormLevelWarnings,
+  stepFormSelectors.getFormLevelWarningsForUnsavedForm,
   getDismissedFormWarningsForSelectedStep,
   (warnings, dismissedWarnings) => {
     const dismissedTypesForStep = dismissedWarnings.map(dw => dw.type)

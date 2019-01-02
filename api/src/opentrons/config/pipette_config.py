@@ -31,7 +31,8 @@ pipette_config = namedtuple(
         'ul_per_mm',
         'quirks',
         'tip_length',  # TODO (andy): remove from pipette, move to tip-rack
-        'display_name'
+        'display_name',
+        'tip_overlap'
     ]
 )
 
@@ -104,7 +105,8 @@ def load(pipette_model: str) -> pipette_config:
         ul_per_mm=cfg.get('ulPerMm'),
         quirks=cfg.get('quirks'),
         tip_length=cfg.get('tipLength'),
-        display_name=cfg.get('displayName')
+        display_name=cfg.get('displayName'),
+        tip_overlap=cfg.get('tipOverlap')
     )
 
     # Verify that stored values agree with calculations
@@ -122,13 +124,9 @@ def load(pipette_model: str) -> pipette_config:
             log.info("Using new P10 single aspiration")
             res.ul_per_mm['aspirate'] = [
                 [1.438649211,	0.01931415115,	0.691538317],
-                [2.5222, -0.104, 1.1031],
                 [1.836824579,	0.03868955123,	0.6636639129],
-                [3.2354, -0.0447, 0.9536],
                 [2.960052684,	0.00470371018,	0.7260899411],
-                [3.9984, -0.012, 0.8477],
                 [4.487508789,	0.005175245625,	0.7246941713],
-                [12.5135, -0.0021, 0.8079],
                 [10.59661421,	0.001470408978,	0.7413196584]]
         elif not new_aspirate:
             log.info("Using old P10 single aspiration")

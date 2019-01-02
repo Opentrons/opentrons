@@ -131,9 +131,17 @@ class Deck(UserDict):
 
     def __setitem__(self, key: types.DeckLocation, val: DeckItem) -> None:
         key_int = self._check_name(key)
-        if self.data.get(key_int) is not None:
-            raise ValueError('Deck location {} already has an item: {}'
-                             .format(key, self.data[key_int]))
+        labware = self.data.get(key_int)
+        if labware is not None:
+            if key_int == 12:
+                if 'fixedTrash' in labware.parameters.get('quirks', []):
+                    pass
+                else:
+                    raise ValueError('Deck location {} is for fixed trash only'
+                                     .format(key))
+            else:
+                raise ValueError('Deck location {} already has an item: {}'
+                                 .format(key, self.data[key_int]))
         self.data[key_int] = val
         self._highest_z = max(val.highest_z, self._highest_z)
 
@@ -146,7 +154,7 @@ class Deck(UserDict):
 
     def position_for(self, key: types.DeckLocation) -> types.Location:
         key_int = self._check_name(key)
-        return types.Location(self._positions[key_int], "Slot " + str(key))
+        return types.Location(self._positions[key_int], str(key))
 
     def recalculate_high_z(self):
         self._highest_z = 0.0

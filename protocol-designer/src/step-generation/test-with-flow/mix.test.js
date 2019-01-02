@@ -329,6 +329,6 @@ describe('mix: errors', () => {
   })
 
   // TODO Ian 2018-05-08
-  test('"times" arg non-integer')
-  test('"times" arg negative')
+  test.skip('"times" arg non-integer', () => {})
+  test.skip('"times" arg negative', () => {})
 })

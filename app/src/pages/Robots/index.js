@@ -4,9 +4,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {withRouter, Route, Switch, Redirect, type Match} from 'react-router'
 import find from 'lodash/find'
-import {getIn} from '@thi.ng/paths'
 
-import {getConfig} from '../../config'
 import createLogger from '../../logger'
 
 import {
@@ -31,7 +29,6 @@ type SP = {
   robot: ?ViewableRobot,
   connectedName: ?string,
   appUpdate: ShellUpdateState,
-  __featureEnabled: boolean,
 }
 
 type OP = {match: Match}
@@ -39,8 +36,6 @@ type OP = {match: Match}
 type Props = SP & OP
 
 const log = createLogger(__filename)
-
-const __FEATURE_FLAG = 'devInternal.newUpdateModal'
 
 export default withRouter(
   connect(
@@ -61,7 +56,7 @@ function Robots (props: Props) {
     },
   } = props
 
-  if (appUpdate.available && !appUpdate.seen && props.__featureEnabled) {
+  if (appUpdate.available && !appUpdate.seen) {
     log.warn('App update available on load, redirecting to app update.')
     return <Redirect to={'menu/app/update'} />
   }
@@ -117,6 +112,5 @@ function mapStateToProps (state: State, ownProps: OP): SP {
     robot,
     connectedName,
     appUpdate: getShellUpdateState(state),
-    __featureEnabled: !!getIn(getConfig(state), __FEATURE_FLAG),
   }
 }

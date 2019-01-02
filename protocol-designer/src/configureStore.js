@@ -11,9 +11,9 @@ function getRootReducer () {
     labwareIngred: require('./labware-ingred/reducers').default,
     loadFile: require('./load-file').rootReducer,
     navigation: require('./navigation').rootReducer,
-    pipettes: require('./pipettes').rootReducer,
-    steplist: require('./steplist').rootReducer,
+    stepForms: require('./step-forms').rootReducer,
     tutorial: require('./tutorial').rootReducer,
+    ui: require('./ui').rootReducer,
     wellSelection: require('./well-selection/reducers').default,
   })
 
@@ -69,9 +69,9 @@ export default function configureStore () {
       './labware-ingred/reducers',
       './load-file/reducers',
       './navigation/reducers',
-      './pipettes',
-      './steplist/reducers',
+      './step-forms/reducers',
       './tutorial/reducers',
+      './ui/steps/reducers',
       './well-selection/reducers',
     ], replaceReducers)
   }

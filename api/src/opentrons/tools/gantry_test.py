@@ -7,6 +7,7 @@ with Max speed. This will result to a good assembly vs a bad assembly process.
 
 Author: Carlos Fernandez
 """
+import optparse
 
 from opentrons import robot
 from opentrons.drivers.smoothie_drivers.driver_3_0 import \
@@ -102,6 +103,20 @@ def run_y_axis(cycles, x_max, y_max, tolerance):
             robot._driver.home('Y')  # we tell it to home Y manually
 
 
+def connect_to_port():
+    parser = optparse.OptionParser(usage='usage: %prog [options] ')
+    parser.add_option(
+        "-p", "--p", dest="port", default='',
+        type='str', help='serial port of the smoothie'
+    )
+
+    options, _ = parser.parse_args(args=None, values=None)
+    if options.port:
+        robot.connect(options.port)
+    else:
+        robot.connect()
+
+
 def _exit_test():
     robot._driver._smoothie_reset()
     robot._driver._setup()
@@ -116,7 +131,7 @@ if __name__ == '__main__':
     tolerance_mm = 0.5
 
     try:
-        robot.connect()
+        connect_to_port()
         robot.home()
         run_x_axis(num_cycles, b_x_max, b_y_max, tolerance_mm)
         run_y_axis(num_cycles, b_x_max, b_y_max, tolerance_mm)
