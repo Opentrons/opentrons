@@ -96,7 +96,6 @@ export default class FilePipettesModal extends React.Component<Props, State> {
         ? [...acc, {mount, name: formPipette.pipetteName, tiprackModel: formPipette.tiprackModel}]
         : acc
     }, [])
-    this.setState({showEditPipetteWarning: false}) // TODO IMMEDIATELY is this necessary?
     this.props.onSave({pipettes, newProtocolFields})
   }
 
