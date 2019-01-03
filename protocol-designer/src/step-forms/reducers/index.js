@@ -155,7 +155,7 @@ export const savedStepForms = (
         ...stepForm,
       }))
     case 'DUPLICATE_LABWARE': {
-      // NOTE: almost identical to 'CREATE_CONTAINER' case, but flow...
+      // NOTE: almost identical to 'CREATE_CONTAINER' case, but flow doesn't like different payloads
       const prevInitialDeckSetupStep = savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
       const {duplicateLabwareId} = action.payload
       const slot = _getNextAvailableSlot(prevInitialDeckSetupStep.labwareLocationUpdate)

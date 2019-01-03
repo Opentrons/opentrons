@@ -489,7 +489,6 @@ const getLabwareSelectionMode: Selector<boolean> = createSelector(
   }
 )
 
-
 const getLiquidGroupsOnDeck: Selector<Array<string>> = createSelector(
   getLiquidsByLabwareId,
   (ingredLocationsByLabware) => {
