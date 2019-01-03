@@ -7,6 +7,7 @@ import sys
 from typing import Any, Callable, Dict
 
 from .contexts import ProtocolContext, InstrumentContext
+from .back_compat import BCLabware
 from . import labware
 from opentrons.types import Point
 
@@ -138,6 +139,7 @@ def load_labware_from_json(
         protocol: Dict[Any, Any]) -> Dict[str, labware.Labware]:
     data = protocol.get('labware', {})
     loaded_labware = {}
+    bc = BCLabware(ctx)
     for labware_id, props in data.items():
         slot = props.get('slot')
         model = props.get('model')
@@ -151,16 +153,8 @@ def load_labware_from_json(
                     "this protocol attempts to load a {} there."
                     .format(model))
         else:
-            labware_def = labware.load_definition_by_name(model)
-
-            # Patch in the user-specified display name
-            display_name = props.get('display-name')
-            if display_name:
-                labware_def['metadata']['displayName'] = display_name
-            labware_obj = labware.load_from_definition(
-                labware_def, ctx.deck.position_for(slot))
-            loaded_labware[labware_id] = ctx.load_labware(labware_obj,
-                                                          slot)
+            loaded_labware[labware_id] = bc.load(
+                model, slot, label=props.get('display-name'))
 
     return loaded_labware
 

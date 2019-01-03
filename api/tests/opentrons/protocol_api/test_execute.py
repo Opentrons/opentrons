@@ -173,13 +173,22 @@ def test_load_labware(loop):
               "model": "generic_96_wellPlate_380_uL",
               "display-name": "Destination Plate"
             },
+            "oldPlateId": {
+              "slot": "9",
+              "model": "96-flat",
+              "display-name": "Test Plate"
+            },
         }
     }
     loaded_labware = execute.load_labware_from_json(ctx, data)
 
     # objects in loaded_labware should be same objs as labware objs in the deck
     assert loaded_labware['sourcePlateId'] == ctx.loaded_labwares[10]
+    assert 'Source (Buffer)' in str(loaded_labware['sourcePlateId'])
     assert loaded_labware['destPlateId'] == ctx.loaded_labwares[11]
+    assert 'Destination Plate' in str(loaded_labware['destPlateId'])
+    assert loaded_labware['oldPlateId'].name == 'generic_96_wellPlate_380_uL'
+    assert 'Test Plate' in str(loaded_labware['oldPlateId'])
 
 
 def test_load_labware_trash(loop):

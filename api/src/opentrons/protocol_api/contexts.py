@@ -166,19 +166,25 @@ class ProtocolContext:
         self._hw_manager.reset_hw()
 
     def load_labware(
-            self, labware_obj: Labware, location: types.DeckLocation,
-            label: str = None, share: bool = False) -> Labware:
+            self, labware_obj: Labware,
+            location: types.DeckLocation) -> Labware:
         """ Specify the presence of a piece of labware on the OT2 deck.
 
         This function loads the labware specified by `labware`
         (previously loaded from a configuration file) to the location
         specified by `location`.
+
+        :param Labware labware: The labware object to load
+        :param location: The slot into which to load the labware such as
+                         1 or '1'
+        :type location: int or str
         """
         self._deck_layout[location] = labware_obj
         return labware_obj
 
     def load_labware_by_name(
-            self, labware_name: str, location: types.DeckLocation) -> Labware:
+            self, labware_name: str,
+            location: types.DeckLocation, label: str = None) -> Labware:
         """ A convenience function to specify a piece of labware by name.
 
         For labware already defined by Opentrons, this is a convient way
@@ -187,9 +193,19 @@ class ProtocolContext:
 
         This function returns the created and initialized labware for use
         later in the protocol.
+
+        :param str labware_name: The name of the labware to load
+        :param location: The slot into which to load the labware such as
+                         1 or '1'
+        :type location: int or str
+        :param str label: An optional special name to give the labware. If
+                          specified, this is the name the labware will appear
+                          as in the run log and the calibration view in the
+                          Opentrons app.
         """
         labware = load(labware_name,
-                       self._deck_layout.position_for(location))
+                       self._deck_layout.position_for(location),
+                       label)
         return self.load_labware(labware, location)
 
     def load_module(
