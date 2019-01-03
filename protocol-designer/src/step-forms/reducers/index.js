@@ -12,7 +12,7 @@ import {sortedSlotnames, type DeckSlot} from '@opentrons/components'
 import {
   getIdsInRange,
   pipetteModelToName,
-  pipetteEntitiesFromReducer,
+  addSpecsToPipetteInvariantProps,
 } from '../utils'
 import {
   INITIAL_DECK_SETUP_STEP_ID,
@@ -68,7 +68,7 @@ export const unsavedForm = (rootState: RootState, action: UnsavedFormActions): F
       const fieldUpdate = handleFormChange(
         action.payload.update,
         unsavedFormState,
-        pipetteEntitiesFromReducer(rootState.pipetteInvariantProperties),
+        addSpecsToPipetteInvariantProps(rootState.pipetteInvariantProperties),
         rootState.labwareInvariantProperties
       )
       return {
@@ -97,7 +97,7 @@ export const unsavedForm = (rootState: RootState, action: UnsavedFormActions): F
         ...handleFormChange(
           {pipette: substitutionMap[unsavedFormState.pipette]},
           unsavedFormState,
-          pipetteEntitiesFromReducer(rootState.pipetteInvariantProperties),
+          addSpecsToPipetteInvariantProps(rootState.pipetteInvariantProperties),
           rootState.labwareInvariantProperties
         ),
       }
@@ -236,7 +236,7 @@ export const savedStepForms = (
               ...handleFormChange(
                 {[fieldName]: null},
                 acc,
-                pipetteEntitiesFromReducer(rootState.pipetteInvariantProperties),
+                addSpecsToPipetteInvariantProps(rootState.pipetteInvariantProperties),
                 rootState.labwareInvariantProperties
               ),
             }
@@ -265,7 +265,7 @@ export const savedStepForms = (
             ...handleFormChange(
               {pipette: null},
               form,
-              pipetteEntitiesFromReducer(rootState.pipetteInvariantProperties),
+              addSpecsToPipetteInvariantProps(rootState.pipetteInvariantProperties),
               rootState.labwareInvariantProperties
             ),
           }
@@ -284,7 +284,7 @@ export const savedStepForms = (
         const updatedFields = handleFormChange(
           {pipette: substitutionMap[prevStepForm.pipette]},
           prevStepForm,
-          pipetteEntitiesFromReducer(rootState.pipetteInvariantProperties),
+          addSpecsToPipetteInvariantProps(rootState.pipetteInvariantProperties),
           rootState.labwareInvariantProperties
         )
 
@@ -325,7 +325,7 @@ export const savedStepForms = (
           ...handleFormChange(
             action.payload.update,
             previousForm,
-            pipetteEntitiesFromReducer(rootState.pipetteInvariantProperties),
+            addSpecsToPipetteInvariantProps(rootState.pipetteInvariantProperties),
             rootState.labwareInvariantProperties
           ),
         },

@@ -14,7 +14,7 @@ import i18n from '../../../localization'
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms.css'
 import modalStyles from '../modal.css'
-import StepChangesWarningModal from '../EditPipettesModal/StepChangesWarningModal'
+import StepChangesConfirmModal from '../EditPipettesModal/StepChangesConfirmModal'
 import PipetteFields from './PipetteFields'
 
 import type {NewProtocolFields} from '../../../load-file'
@@ -23,7 +23,7 @@ import type {PipetteOnDeck, FormPipette, FormPipettesByMount} from '../../../ste
 type State = {
   fields: NewProtocolFields,
   pipettesByMount: FormPipettesByMount,
-  showEditPipetteWarning: boolean,
+  showEditPipetteConfirmation: boolean,
 }
 
 type Props = {
@@ -39,7 +39,7 @@ type Props = {
 
 const initialState = {
   fields: {name: ''},
-  showEditPipetteWarning: false,
+  showEditPipetteConfirmation: false,
   pipettesByMount: {
     left: {pipetteName: '', tiprackModel: null},
     right: {pipetteName: '', tiprackModel: null},
@@ -99,12 +99,12 @@ export default class FilePipettesModal extends React.Component<Props, State> {
     this.props.onSave({pipettes, newProtocolFields})
   }
 
-  showEditPipetteWarningModal = () => {
-    this.setState({showEditPipetteWarning: true})
+  showEditPipetteConfirmationModal = () => {
+    this.setState({showEditPipetteConfirmation: true})
   }
 
   handleCancel = () => {
-    this.setState({showEditPipetteWarning: false})
+    this.setState({showEditPipetteConfirmation: false})
   }
 
   render () {
@@ -144,7 +144,7 @@ export default class FilePipettesModal extends React.Component<Props, State> {
                 <InputField
                   autoFocus
                   tabIndex={1}
-                  placeholder='Untitled'
+                  placeholder={i18n.t('form.generic.default_protocol_name')}
                   value={name}
                   onChange={this.handleNameChange} />
               </FormGroup>
@@ -166,7 +166,7 @@ export default class FilePipettesModal extends React.Component<Props, State> {
             <OutlineButton
               onClick={useProtocolFields
                 ? this.handleSubmit
-                : this.showEditPipetteWarningModal
+                : this.showEditPipetteConfirmationModal
               }
               disabled={!canSubmit}
               tabIndex={6}
@@ -175,8 +175,8 @@ export default class FilePipettesModal extends React.Component<Props, State> {
             </OutlineButton>
           </div>
         </Modal>
-        {this.state.showEditPipetteWarning &&
-          <StepChangesWarningModal
+        {this.state.showEditPipetteConfirmation &&
+          <StepChangesConfirmModal
             onCancel={this.handleCancel}
             onConfirm={this.handleSubmit} />}
       </React.Fragment>

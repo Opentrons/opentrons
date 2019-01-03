@@ -4,12 +4,12 @@ import * as React from 'react'
 import {AlertModal, OutlineButton} from '@opentrons/components'
 import i18n from '../../../localization'
 
-import styles from './StepChangesWarningModal.css'
+import styles from './StepChangesConfirmModal.css'
 import modalStyles from '../modal.css'
 
 type Props = {onCancel: () => void, onConfirm: () => void}
 
-const StepChangesWarningModal = (props: Props) => {
+const StepChangesConfirmModal = (props: Props) => {
   const {onCancel, onConfirm} = props
 
   return (
@@ -58,4 +58,4 @@ const StepChangesWarningModal = (props: Props) => {
   )
 }
 
-export default StepChangesWarningModal
+export default StepChangesConfirmModal

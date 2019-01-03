@@ -5,7 +5,8 @@
     "error": {
       "required": "{{name}} is required",
       "more_than_zero": "Must be more than 0"
-    }
+    },
+    "default_protocol_name": "Untitled"
   },
   "liquid_edit": {
     "details": "Details",

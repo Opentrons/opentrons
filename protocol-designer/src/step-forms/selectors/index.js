@@ -18,7 +18,7 @@ import {
   hydrateField,
   getFieldErrors,
 } from '../../steplist/fieldLevel'
-import {pipetteEntitiesFromReducer} from '../utils'
+import {addSpecsToPipetteInvariantProps} from '../utils'
 
 import type {ElementProps} from 'react'
 import type {
@@ -59,20 +59,20 @@ const NO_SAVED_FORM_ERROR = 'NO_SAVED_FORM_ERROR'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 
-export const getLabwareInvariantProperties: Selector<LabwareEntities> = createSelector(
+export const getLabwareEntities: Selector<LabwareEntities> = createSelector(
   rootSelector,
   (state) => state.labwareInvariantProperties
 )
 
-export const getPipetteInvariantProperties: Selector<PipetteEntities> = createSelector(
+export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
   rootSelector,
-  (state) => pipetteEntitiesFromReducer(state.pipetteInvariantProperties)
+  (state) => addSpecsToPipetteInvariantProps(state.pipetteInvariantProperties)
 )
 
 export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   rootSelector,
-  getLabwareInvariantProperties,
-  getPipetteInvariantProperties,
+  getLabwareEntities,
+  getPipetteEntities,
   (state, labwareInvariantProperties, pipetteInvariantProperties) => {
     const initialSetupStep = state.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
     assert(
@@ -216,8 +216,8 @@ const _getAllErrorsFromHydratedForm = (hydratedForm: FormData): StepFormAndField
 }
 
 export const getHydrationContext: Selector<StepFormContextualState> = createSelector(
-  getLabwareInvariantProperties,
-  getPipetteInvariantProperties,
+  getLabwareEntities,
+  getPipetteEntities,
   (labware, pipettes) => ({labware, pipettes})
 )
 

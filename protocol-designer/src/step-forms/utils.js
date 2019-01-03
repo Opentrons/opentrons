@@ -21,7 +21,7 @@ export function getIdsInRange<T: string | number> (orderedIds: Array<T>, startId
 }
 
 // helper to add the 'spec' key to pipette entities safely
-export function pipetteEntitiesFromReducer (pipetteInvariantProperties: PipetteInvariantState): PipetteEntities {
+export function addSpecsToPipetteInvariantProps (pipetteInvariantProperties: PipetteInvariantState): PipetteEntities {
   return reduce(
     pipetteInvariantProperties,
     (acc: PipetteEntities, pipette: PipetteEntity, id: string): PipetteEntities => {

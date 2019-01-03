@@ -91,8 +91,8 @@ export const selectStep = (stepId: StepIdType, newStepType?: StepType): ThunkAct
       const updatedFields = handleFormChange(
         {pipette: defaultPipetteId},
         formData,
-        stepFormSelectors.getPipetteInvariantProperties(state),
-        stepFormSelectors.getLabwareInvariantProperties(state)
+        stepFormSelectors.getPipetteEntities(state),
+        stepFormSelectors.getLabwareEntities(state)
       )
 
       formData = {
