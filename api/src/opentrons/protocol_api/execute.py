@@ -149,7 +149,7 @@ def load_labware_from_json(
                 raise RuntimeError(
                     "Nothing but the fixed trash may be loaded in slot 12; "
                     "this protocol attempts to load a {} there."
-                    .format(labware_id))
+                    .format(model))
         else:
             labware_def = labware.load_definition_by_name(model)
 
