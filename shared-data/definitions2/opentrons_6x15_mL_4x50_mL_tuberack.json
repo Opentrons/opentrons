@@ -19,7 +19,7 @@
             "B4"
         ]
     ],
-    "otId": "e6488590-e388-11e8-b14b-2f570f23ab54",
+    "otId": "f65f2960-0f76-11e9-8659-e18ed15996f5",
     "deprecated": false,
     "metadata": {
         "displayName": "Opentrons 15x50mL tuberack",
@@ -46,10 +46,10 @@
         "overallHeight": 123.76
     },
     "parameters": {
-        "isTiprack": false,
         "format": "irregular",
-        "loadName": "opentrons_6x15_mL_4x50_mL_tuberack",
-        "isMagneticModuleCompatible": false
+        "isTiprack": false,
+        "isMagneticModuleCompatible": false,
+        "loadName": "Opentrons_6x15_mL_4x50_mL_tuberack"
     },
     "wells": {
         "A1": {
@@ -58,7 +58,7 @@
             "shape": "circular",
             "depth": 117.98,
             "x": 13.88,
-            "y": 17.75,
+            "y": 92.75,
             "z": 5.78
         },
         "B1": {
@@ -67,7 +67,7 @@
             "shape": "circular",
             "depth": 117.98,
             "x": 13.88,
-            "y": 42.75,
+            "y": 67.75,
             "z": 5.78
         },
         "C1": {
@@ -76,7 +76,7 @@
             "shape": "circular",
             "depth": 117.98,
             "x": 13.88,
-            "y": 67.75,
+            "y": 42.75,
             "z": 5.78
         },
         "A2": {
@@ -85,7 +85,7 @@
             "shape": "circular",
             "depth": 117.98,
             "x": 38.88,
-            "y": 17.75,
+            "y": 92.75,
             "z": 5.78
         },
         "B2": {
@@ -94,7 +94,7 @@
             "shape": "circular",
             "depth": 117.98,
             "x": 38.88,
-            "y": 42.75,
+            "y": 67.75,
             "z": 5.78
         },
         "C2": {
@@ -103,7 +103,7 @@
             "shape": "circular",
             "depth": 117.98,
             "x": 38.88,
-            "y": 67.75,
+            "y": 42.75,
             "z": 5.78
         },
         "A3": {
@@ -112,7 +112,7 @@
             "shape": "circular",
             "depth": 113.85,
             "x": 71.38,
-            "y": 25.25,
+            "y": 95.25,
             "z": 5.95
         },
         "B3": {
@@ -130,7 +130,7 @@
             "shape": "circular",
             "depth": 113.85,
             "x": 106.38,
-            "y": 25.25,
+            "y": 95.25,
             "z": 5.95
         },
         "B4": {
@@ -144,7 +144,6 @@
         }
     },
     "brand": {
-        "brand": "Opentrons",
-        "brandId": ["352096", "352070"]
+        "brand": "Opentrons"
     }
 }
