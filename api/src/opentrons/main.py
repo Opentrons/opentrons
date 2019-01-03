@@ -94,8 +94,8 @@ def log_init():
                 'handlers': ['serial'],
                 'level': logging.DEBUG
             },
-            'opentrons.protocol_api.contexts': {
-                'handlers': ['api'],
+            'opentrons.protocol_api': {
+                'handlers': ['api', 'debug'],
                 'level': level_value
             },
             'opentrons.hardware_control': {

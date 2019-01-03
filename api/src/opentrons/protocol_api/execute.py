@@ -9,7 +9,7 @@ from typing import Any, Callable, Dict
 from .contexts import ProtocolContext, InstrumentContext
 from .back_compat import BCLabware
 from . import labware
-from opentrons.types import Point
+from opentrons.types import Point, Location
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -159,7 +159,9 @@ def load_labware_from_json(
     return loaded_labware
 
 
-def _get_location(loaded_labware, command_type, params, default_values):
+def _get_location(loaded_labware: Dict[str, labware.Labware],
+                  command_type: str, params: Dict[str, Any],
+                  default_values: Dict[str, float]) -> Location:
     labwareId = params.get('labware')
     if not labwareId:
         # not all commands use labware param
@@ -187,13 +189,21 @@ def _get_location(loaded_labware, command_type, params, default_values):
         if command_type == 'touch-tip':
             # TODO: Ian 2018-10-29 remove this `-1` when
             # touch-tip-mm-from-top is a required field
-            return plate.wells_by_index()[well].top().move(
+            top = plate.wells_by_index()[well].top()
+            with_offs = top.move(
                 Point(z=default_values.get('touch-tip-mm-from-top', -1)))
+            MODULE_LOG.debug("touch tip offset from {} to {}"
+                             .format(top, with_offs))
+            return with_offs
 
+        MODULE_LOG.debug("no offset from bottom and not touch tip")
         return plate.wells_by_index()[well]
 
-    return plate.wells_by_index()[well].bottom()\
-                                       .move(Point(z=offset_from_bottom))
+    bot = plate.wells_by_index()[well].bottom()
+    with_offs = bot.move(Point(z=offset_from_bottom))
+    MODULE_LOG.debug("offset from bottom for {}: {}->{}"
+                     .format(command_type, bot, with_offs))
+    return with_offs
 
 
 # TODO (Ian 2018-08-22) once Pipette has more sensible way of managing
