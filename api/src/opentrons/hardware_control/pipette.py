@@ -1,11 +1,13 @@
 """ Classes and functions for pipette state tracking
 """
+import logging
 from typing import Any, Dict, Optional, Tuple, Union
 
 from opentrons.types import Point
 from opentrons.config import pipette_config
 from .types import CriticalPoint
 
+mod_log = logging.getLogger(__name__)
 
 class Pipette:
     """ A class to gather and track pipette state and configs.
@@ -26,8 +28,13 @@ class Pipette:
         self._pipette_id = pipette_id
         pip_type = 'multi' if self._config.channels > 1 else 'single'
         self._instrument_offset = Point(*inst_offset_config[pip_type])
+        self._log = mod_log.getChild(self._pipette_id
+                                     if self._pipette_id else '<unknown>')
+        self._log.info("loaded: {}, instr offset {}"
+                       .format(model, self._instrument_offset))
 
     def update_instrument_offset(self, new_offset: Point):
+        self._log.info("updated instrument offset to {}".format(new_offset))
         self._instrument_offset = new_offset
 
     @property
@@ -35,6 +42,7 @@ class Pipette:
         return self._config
 
     def update_config_item(self, elem_name: str, elem_val: Any):
+        self._log.info("updated config: {}={}".format(elem_name, elem_val))
         self._config = self._config._replace(**{elem_name: elem_val})
 
     @property
@@ -56,13 +64,28 @@ class Pipette:
         we have a tip - the specified critical point will be used.
         """
         if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
+            cp_type = CriticalPoint.NOZZLE
             tip_length = 0.0
         else:
+            cp_type = CriticalPoint.TIP
             tip_length = self.current_tip_length
         mod_and_tip = Point(self.config.model_offset[0],
                             self.config.model_offset[1],
                             self.config.model_offset[2] - tip_length)
-        return mod_and_tip + self._instrument_offset._replace(z=0)
+        cp = mod_and_tip + self._instrument_offset._replace(z=0)
+        if self._log.isEnabledFor(logging.DEBUG):
+            info_str = 'cp: {}{}: {}=(model offset: {} + instr offset xy: {}'\
+                .format(cp_type, '(from override)' if cp_override else '',
+                        cp, self.config.model_offset,
+                        self._instrument_offset._replace(z=0))
+            if cp_type == CriticalPoint.TIP:
+                info_str += '- current_tip_length: {}=(true tip length: {}'\
+                    ' + inst z: {}) (z only)'.format(
+                        self.current_tip_length, self._current_tip_length,
+                        self._instrument_offset.z)
+            info_str += ')'
+            self._log.debug(info_str)
+        return cp
 
     @property
     def current_volume(self) -> float:
