@@ -7,7 +7,6 @@ import {
   ContainerNameOverlay,
   EmptyDeckSlot,
   humanizeLabwareType,
-  // SLOT_OFFSET_MM,
   type DeckSlot,
 } from '@opentrons/components'
 import {
@@ -24,7 +23,7 @@ import DisabledSelectSlotOverlay from './DisabledSelectSlotOverlay'
 import BrowseLabwareOverlay from './BrowseLabwareOverlay'
 import {type TerminalItemId, START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID} from '../../steplist'
 
-// TODO: consolidate with DraggableStepItems DND_TYPES
+// TODO: BC 2019-01-03 consolidate with DraggableStepItems DND_TYPES
 const DND_TYPES: {LABWARE: "LABWARE"} = {
   LABWARE: 'LABWARE',
 }
