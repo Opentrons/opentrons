@@ -49,7 +49,7 @@
         "format": "irregular",
         "isTiprack": false,
         "isMagneticModuleCompatible": false,
-        "loadName": "Opentrons_6x15_mL_4x50_mL_tuberack"
+        "loadName": "opentrons_6x15_mL_4x50_mL_tuberack"
     },
     "wells": {
         "A1": {
@@ -144,6 +144,7 @@
         }
     },
     "brand": {
-        "brand": "Opentrons"
+        "brand": "Opentrons",
+        "brandId": ["352096", "352070"]
     }
 }
