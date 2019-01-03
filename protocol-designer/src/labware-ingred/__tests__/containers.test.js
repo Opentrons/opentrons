@@ -47,7 +47,7 @@ describe('DELETE_CONTAINER action', () => {
   })
 })
 
-// TODO: BC 2018-7-25 test MOVE_LABWARE
+// TODO: BC 2018-7-25 test SWAP_SLOT_CONTENTS && DUPLICATE_LABWARE
 describe.skip('COPY_LABWARE action', () => {
   test('copy correct container', () => {
     expect(containers(

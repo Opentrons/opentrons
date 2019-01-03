@@ -25,6 +25,7 @@ import type {LoadFileAction} from '../../load-file'
 import type {
   CreateContainerAction,
   DeleteContainerAction,
+  DuplicateLabwareAction,
 } from '../../labware-ingred/actions'
 import type {FormData, StepIdType} from '../../form-types'
 import type {FileLabware, FilePipette, ProtocolFile} from '../../file-types'
@@ -116,7 +117,7 @@ const initialSavedStepFormsState: SavedStepFormState = {
 }
 export const savedStepForms = (
   rootState: RootState,
-  action: SaveStepFormAction | DeleteStepAction | LoadFileAction | CreateContainerAction | DeleteContainerAction
+  action: SaveStepFormAction | DeleteStepAction | LoadFileAction | CreateContainerAction | DeleteContainerAction | DuplicateLabwareAction
 ) => {
   const savedStepForms = rootState ? rootState.savedStepForms : initialSavedStepFormsState
   // TODO: Ian 2018-12-20 this switch-case makes it easy to get namespace conflicts using const's, and messes up flow. Try it a different way.
@@ -153,11 +154,30 @@ export const savedStepForms = (
         ...getDefaultsForStepType(stepForm.stepType),
         ...stepForm,
       }))
-    case 'DUPLICATE_LABWARE':
-    case 'CREATE_CONTAINER':
-    // auto-update initial deck setup state.
+    case 'DUPLICATE_LABWARE': {
+      // NOTE: almost identical to 'CREATE_CONTAINER' case, but flow...
       const prevInitialDeckSetupStep = savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
-      const {id, duplicateLabwareId} = action.payload
+      const {duplicateLabwareId} = action.payload
+      const slot = _getNextAvailableSlot(prevInitialDeckSetupStep.labwareLocationUpdate)
+      if (!slot) {
+        console.warn('no slots available, ignoring action:', action)
+        return savedStepForms
+      }
+      return {
+        ...savedStepForms,
+        [INITIAL_DECK_SETUP_STEP_ID]: {
+          ...prevInitialDeckSetupStep,
+          labwareLocationUpdate: {
+            ...prevInitialDeckSetupStep.labwareLocationUpdate,
+            [duplicateLabwareId]: slot,
+          },
+        },
+      }
+    }
+    case 'CREATE_CONTAINER': {
+      // auto-update initial deck setup state.
+      const prevInitialDeckSetupStep = savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+      const {id} = action.payload
       const slot = action.payload.slot || _getNextAvailableSlot(prevInitialDeckSetupStep.labwareLocationUpdate)
       if (!slot) {
         console.warn('no slots available, ignoring action:', action)
@@ -169,10 +189,11 @@ export const savedStepForms = (
           ...prevInitialDeckSetupStep,
           labwareLocationUpdate: {
             ...prevInitialDeckSetupStep.labwareLocationUpdate,
-            [id || duplicateLabwareId]: slot,
+            [id]: slot,
           },
         },
       }
+    }
     case 'DELETE_CONTAINER':
       return mapValues(savedStepForms, savedForm => {
         if (

@@ -16,8 +16,9 @@ import {
 } from '@opentrons/shared-data'
 import styles from './labware.css'
 
-import ClickableText from './ClickableText'
+import type {StepIdType} from '../../form-types'
 import HighlightableLabware from '../../containers/HighlightableLabware'
+import ClickableText from './ClickableText'
 import NameThisLabwareOverlay from './NameThisLabwareOverlay'
 import DisabledSelectSlotOverlay from './DisabledSelectSlotOverlay'
 import BrowseLabwareOverlay from './BrowseLabwareOverlay'
@@ -31,8 +32,8 @@ const DND_TYPES: {LABWARE: "LABWARE"} = {
 type DragPreviewProps = {
   getXY: (rawX: number, rawY: number) => {scaledX?: number, scaledY?: number},
   isDragging: boolean,
-  currentOffset: ?number,
-  item: {slot: DeckSlot, labwareOrSlot: React.Node},
+  currentOffset?: {x: number, y: number},
+  item: {slot: DeckSlot, labwareOrSlot: React.Node, containerId: string},
   itemType: string,
   containerType: string,
   children: React.Node,
@@ -41,7 +42,7 @@ const DragPreview = (props: DragPreviewProps) => {
   const {item, itemType, isDragging, currentOffset, getXY} = props
   if (itemType !== DND_TYPES.LABWARE || !isDragging || !currentOffset) return null
   const {scaledX, scaledY} = getXY(currentOffset && currentOffset.x, currentOffset && currentOffset.y)
-  const {containerId} = item || {}
+  const containerId = item && item.containerId
   return (
     <g>
       <LabwareContainer x={scaledX} y={scaledY}>
@@ -61,8 +62,12 @@ export const DragPreviewLayer = DragLayer(monitor => ({
 type DragDropLabwareProps = React.ElementProps<typeof LabwareContainer> & {
   connectDragSource: mixed => React.Element<any>,
   connectDropTarget: mixed => React.Element<any>,
+  draggedItem?: {slot: DeckSlot},
+  isOver: boolean,
   slot: DeckSlot,
-  moveLabware: (DeckSlot, DeckSlot) => void,
+  overlay?: React.Node,
+  labwareOrSlot: React.Node,
+  swapSlotContents: (DeckSlot, DeckSlot) => void,
 }
 class DragSourceLabware extends React.Component<DragDropLabwareProps> {
   renderOverlay = () => {
@@ -114,7 +119,7 @@ const labwareTarget = {
   drop: (props, monitor) => {
     const draggedItem = monitor.getItem()
     if (draggedItem) {
-      props.moveLabware(draggedItem.slot, props.slot)
+      props.swapSlotContents(draggedItem.slot, props.slot)
     }
   },
 }
@@ -128,13 +133,11 @@ function LabwareDeckSlotOverlay ({
   canAddIngreds,
   deleteLabware,
   editLiquids,
-  moveLabwareSource,
   duplicateLabware,
 }: {
   canAddIngreds: boolean,
   deleteLabware: () => mixed,
   editLiquids: () => mixed,
-  moveLabwareSource: () => mixed,
   duplicateLabware: () => mixed,
 }) {
   return (
@@ -226,7 +229,11 @@ type LabwareOnDeckProps = {
   editLiquids: () => mixed,
   drillDown: () => mixed,
   drillUp: () => mixed,
+
   deleteLabware: () => mixed,
+  duplicateLabware: (StepIdType) => mixed,
+  swapSlotContents: (DeckSlot, DeckSlot) => void,
+
   setLabwareName: (name: ?string) => mixed,
   setDefaultLabwareName: () => mixed,
 }
@@ -267,7 +274,6 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
       duplicateLabware,
       editLiquids,
       deleteLabware,
-
       swapSlotContents,
 
       setDefaultLabwareName,
@@ -304,9 +310,7 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
       : <EmptyDeckSlot slot={slot} />
 
     return (
-      <DragDropLabware
-        moveLabware={swapSlotContents}
-        {...{slot, highlighted, labwareOrSlot, overlay, containerId}} />
+      <DragDropLabware {...{slot, highlighted, labwareOrSlot, overlay, containerId, swapSlotContents}} />
     )
   }
 }

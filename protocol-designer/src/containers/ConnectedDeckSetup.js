@@ -27,10 +27,8 @@ type StateProps = {
   selectedTerminalItemId: ?TerminalItemId,
   ingredSelectionMode: boolean,
   drilledDown: boolean,
-  _moveLabwareMode: boolean,
 }
 type DispatchProps = {
-  cancelMoveLabwareMode: () => mixed,
   drillUpFromLabware: () => mixed,
 }
 type Props = {
@@ -44,11 +42,9 @@ const mapStateToProps = (state: BaseState): StateProps => ({
   selectedTerminalItemId: stepsSelectors.getSelectedTerminalItemId(state),
   ingredSelectionMode: Boolean(selectors.getSelectedLabware(state)),
   drilledDown: !!selectors.getDrillDownLabwareId(state),
-  _moveLabwareMode: !!selectors.getSlotToMoveFrom(state),
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DispatchProps => ({
-  cancelMoveLabwareMode: () => dispatch(labwareIngredActions.setMoveLabwareMode()),
   drillUpFromLabware: () => dispatch(labwareIngredActions.drillUpFromLabware()),
 })
 
@@ -57,7 +53,6 @@ const mergeProps = (stateProps: StateProps, dispatchProps: DispatchProps): Props
   ingredSelectionMode: stateProps.ingredSelectionMode,
   drilledDown: stateProps.drilledDown,
   handleClickOutside: () => {
-    if (stateProps._moveLabwareMode) dispatchProps.cancelMoveLabwareMode()
     if (stateProps.drilledDown) dispatchProps.drillUpFromLabware()
   },
 })

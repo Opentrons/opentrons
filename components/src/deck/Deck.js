@@ -27,7 +27,7 @@ export type LabwareComponentProps = {
 type Props = {
   className?: string,
   LabwareComponent?: React.ComponentType<LabwareComponentProps>,
-  DragPreviewLayer?: React.Element<*> | React.Portal<*>,
+  DragPreviewLayer?: any, // TODO: BC 2019-01-03 flow doesn't like portals
 }
 
 const VIEW_BOX_WIDTH = 427
@@ -48,11 +48,6 @@ export default class Deck extends React.Component<Props> {
     const scaledYOffset = (SLOT_OFFSET_MM / VIEW_BOX_HEIGHT) * clientRect.height
     const scaledX = ((rawX - clientRect.left) * widthCoefficient) + scaledXOffset
     const scaledY = ((rawY - clientRect.top) * heightCoefficient) + scaledYOffset
-    console.table({
-      rawX,
-      rawY,
-      clientRect,
-    })
     return {scaledX, scaledY}
   }
   render () {
@@ -68,7 +63,7 @@ export default class Deck extends React.Component<Props> {
           transform={`translate(${SLOT_OFFSET_MM} ${SLOT_OFFSET_MM})`}>
           {renderLabware(LabwareComponent)}
         </g>
-        <DragPreviewLayer getXY={this.getXY} />
+        {DragPreviewLayer && <DragPreviewLayer getXY={this.getXY} />}
       </svg>
     )
   }

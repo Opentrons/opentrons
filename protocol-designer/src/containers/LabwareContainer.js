@@ -6,16 +6,11 @@ import {getLabware, getIsTiprack} from '@opentrons/shared-data'
 import {selectors} from '../labware-ingred/reducers'
 import {
   openIngredientSelector,
-
   deleteContainer,
   renameLabware,
-
   openAddLabwareModal,
   drillDownOnLabware,
   drillUpFromLabware,
-
-  // setMoveLabwareMode,
-  // moveLabware,
   duplicateLabware,
   swapSlotContents,
 } from '../labware-ingred/actions'
@@ -23,6 +18,7 @@ import {START_TERMINAL_ITEM_ID} from '../steplist'
 import {selectors as stepsSelectors} from '../ui/steps'
 
 import {LabwareOnDeck} from '../components/labware'
+import type {StepIdType} from '../form-types'
 import type {BaseState} from '../types'
 import type {DeckSlot} from '@opentrons/components'
 
@@ -36,11 +32,8 @@ type DP = {
   addLabware: () => mixed,
   editLiquids: () => mixed,
   deleteLabware: () => mixed,
-
-  // cancelMove: () => mixed,
-  // moveLabwareDestination: () => mixed,
-  // moveLabwareSource: () => mixed,
-
+  duplicateLabware: (StepIdType) => mixed,
+  swapSlotContents: (DeckSlot, DeckSlot) => void,
   setLabwareName: (name: ?string) => mixed,
   setDefaultLabwareName: () => mixed,
 }
@@ -69,11 +62,8 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const isTiprack = getIsTiprack(containerType)
   const showNameOverlay = container && !isTiprack && !labwareHasName
 
-  // const slotToMoveFrom = selectors.getSlotToMoveFrom(state)
-
   const slotHasLabware = !!containerType
   const addLabwareMode = selectors.getLabwareSelectionMode(state)
-  // const moveLabwareMode = Boolean(slotToMoveFrom)
 
   const setDefaultLabwareName = () => renameLabware({
     labwareId: containerId,
