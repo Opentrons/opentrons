@@ -37,6 +37,18 @@ const mapSTP = (state: BaseState): SP => {
   }
 }
 
+// NOTE: this function is doing some weird stuff because we are envisioning
+// that the following changes will happen, and working to support them cleanly.
+// We anticipate that:
+// * pipettes will be created/deleted outside of the timeline (like liquids)
+// * there will be multiple manualIntervention steps which set/unset pipettes
+// on robot mounts on the timeline
+// * there will be a facility to substitute pipettes used in steps across a
+// selection of multiple steps
+//
+// Currently, PD's Edit Pipettes functionality is doing several of these steps
+// in one click (create, change manualIntervention step, substitute pipettes
+// across all steps, delete pipettes), which is why it's so funky!
 const makeUpdatePipettes = (prevPipettes, orderedSteps, dispatch, closeModal) =>
   ({pipettes: newPipetteArray}) => {
     const prevPipetteIds = Object.keys(prevPipettes)
