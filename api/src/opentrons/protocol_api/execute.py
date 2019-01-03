@@ -4,7 +4,7 @@ import logging
 import os
 import traceback
 import sys
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Optional
 
 from .contexts import ProtocolContext, InstrumentContext
 from .back_compat import BCLabware
@@ -159,20 +159,21 @@ def load_labware_from_json(
     return loaded_labware
 
 
-def _get_location(loaded_labware: Dict[str, labware.Labware],
-                  command_type: str, params: Dict[str, Any],
-                  default_values: Dict[str, float]) -> Location:
-    labwareId = params.get('labware')
-    if not labwareId:
-        # not all commands use labware param
-        return None
-    well = params.get('well')
+def _get_well(loaded_labware: Dict[str, labware.Labware],
+              params: Dict[str, Any]):
+    labwareId = params['labware']
+    well = params['well']
     plate = loaded_labware.get(labwareId)
     if not plate:
         raise ValueError(
             'Command tried to use labware "{}", but that ID does not exist '
             'in protocol\'s "labware" section'.format(labwareId))
+    return plate.wells_by_index()[well]
 
+
+def _get_bottom_offset(command_type: str,
+                       params: Dict[str, Any],
+                       default_values: Dict[str, float]) -> Optional[float]:
     # default offset from bottom for aspirate/dispense commands
     offset_default = default_values.get(
         '{}-mm-from-bottom'.format(command_type))
@@ -181,26 +182,22 @@ def _get_location(loaded_labware: Dict[str, labware.Labware],
     offset_from_bottom = params.get(
         'offsetFromBottomMm', offset_default)
 
-    if offset_from_bottom is None:
-        # not all commands use offsets
+    return offset_from_bottom
 
-        # touch-tip uses offset from top, not bottom, as default
-        # when offsetFromBottomMm command-specific value is unset
-        if command_type == 'touch-tip':
-            # TODO: Ian 2018-10-29 remove this `-1` when
-            # touch-tip-mm-from-top is a required field
-            top = plate.wells_by_index()[well].top()
-            with_offs = top.move(
-                Point(z=default_values.get('touch-tip-mm-from-top', -1)))
-            MODULE_LOG.debug("touch tip offset from {} to {}"
-                             .format(top, with_offs))
-            return with_offs
 
-        MODULE_LOG.debug("no offset from bottom and not touch tip")
-        return plate.wells_by_index()[well]
+def _get_location_with_offset(loaded_labware: Dict[str, labware.Labware],
+                              command_type: str,
+                              params: Dict[str, Any],
+                              default_values: Dict[str, float]) -> Location:
+    well = _get_well(loaded_labware, params)
+    offset_from_bottom = _get_bottom_offset(
+        command_type, params, default_values)
 
-    bot = plate.wells_by_index()[well].bottom()
-    with_offs = bot.move(Point(z=offset_from_bottom))
+    bot = well.bottom()
+    if offset_from_bottom:
+        with_offs = bot.move(Point(z=offset_from_bottom))
+    else:
+        with_offs = bot
     MODULE_LOG.debug("offset from bottom for {}: {}->{}"
                      .format(command_type, bot, with_offs))
     return with_offs
@@ -268,17 +265,6 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
             # pipettes is dropped (next JSON protocol schema major bump)
             pipette_name = protocol_pipette_data.get('model')
 
-        location = _get_location(labware, command_type, params, default_values)
-        volume = params.get('volume')
-
-        if pipette:
-            # Aspirate/Dispense flow rate must be set each time for commands
-            # which use pipettes right now.
-            # Flow rate is persisted inside the Pipette object
-            # and is settable but not easily gettable
-            _set_flow_rate(
-                pipette_name, pipette, command_type, params, default_values)
-
         if command_type == 'delay':
             wait = params.get('wait')
             if wait is None:
@@ -290,34 +276,39 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
                 context.delay(seconds=wait)
 
         elif command_type == 'blowout':
-            pipette.blow_out(location)  # type: ignore
+            well = _get_well(labware, params)
+            pipette.blow_out(well)  # type: ignore
 
         elif command_type == 'pick-up-tip':
-            pipette.pick_up_tip(location)  # type: ignore
+            well = _get_well(labware, params)
+            pipette.pick_up_tip(well)  # type: ignore
 
         elif command_type == 'drop-tip':
-            pipette.drop_tip(location)  # type: ignore
+            well = _get_well(labware, params)
+            pipette.drop_tip(well)  # type: ignore
 
         elif command_type == 'aspirate':
+            location = _get_location_with_offset(
+                labware, 'aspirate', params, default_values)
+            volume = params['volume']
+            _set_flow_rate(
+                pipette_name, pipette, command_type, params, default_values)
             pipette.aspirate(volume, location)  # type: ignore
 
         elif command_type == 'dispense':
+            location = _get_location_with_offset(
+                labware, 'dispense', params, default_values)
+            volume = params['volume']
+            _set_flow_rate(
+                pipette_name, pipette, command_type, params, default_values)
             pipette.dispense(volume, location)  # type: ignore
 
         elif command_type == 'touch-tip':
-            # NOTE: if touch_tip can take a location tuple,
-            # this can be much simpler
-            (well_object, loc_tuple) = location
-
-            # Use the offset baked into the well_object.
-            # Do not allow API to apply its v_offset kwarg default value,
-            # and do not apply the JSON protocol's default offset.
-            z_from_bottom = loc_tuple[2]
-            offset_from_top = (
-                well_object.properties['depth'] - z_from_bottom) * -1
-
-            pipette.touch_tip(  # type: ignore
-                well_object, v_offset=offset_from_top)
+            well = _get_well(labware, params)
+            offset = default_values.get('touch-tip-mm-from-top', -1)
+            pipette.touch_tip(location, v_offset=offset)  # type: ignore
+        else:
+            MODULE_LOG.warning("Bad command type {}".format(command_type))
 
 
 def run_protocol(protocol_code: Any = None,

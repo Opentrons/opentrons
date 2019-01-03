@@ -119,7 +119,7 @@ async def test_load_pipettes(loop, protocol_data):
 
 
 @pytest.mark.parametrize('command_type', ['aspirate', 'dispense'])
-def test_get_location(loop, command_type):
+def test_get_location_with_offset(loop, command_type):
     ctx = ProtocolContext(loop=loop)
     plate = ctx.load_labware_by_name("generic_96_wellPlate_380_uL", 1)
     well = "B2"
@@ -140,7 +140,10 @@ def test_get_location(loop, command_type):
             "well": well,
             "offsetFromBottomMm": offset
         }
-        result = execute._get_location(
+        offs = execute._get_bottom_offset(
+            command_type, command_params, default_values)
+        assert offs == offset
+        result = execute._get_location_with_offset(
             loaded_labware, command_type, command_params, default_values)
         assert result.labware == plate.wells_by_index()[well]
         assert result.point\
@@ -152,9 +155,11 @@ def test_get_location(loop, command_type):
     }
 
     # no command-specific offset, use default
-    result = execute._get_location(
+    result = execute._get_location_with_offset(
         loaded_labware, command_type, command_params, default_values)
     default = default_values['{}-mm-from-bottom'.format(command_type)]
+    assert execute._get_bottom_offset(
+        command_type, command_params, default_values) == default
     assert result.point\
         == plate.wells_by_index()[well].bottom().point + Point(z=default)
 
@@ -298,9 +303,9 @@ def test_dispatch_commands(monkeypatch, loop):
         ctx, protocol_data, insts, loaded_labware)
 
     assert cmd == [
-        ("aspirate", 5, source_plate.wells_by_index()['A1']),
+        ("aspirate", 5, source_plate.wells_by_index()['A1'].bottom()),
         ("sleep", 42),
-        ("dispense", 4.5, dest_plate.wells_by_index()['B1'])
+        ("dispense", 4.5, dest_plate.wells_by_index()['B1'].bottom())
     ]
 
     assert flow_rates == [
