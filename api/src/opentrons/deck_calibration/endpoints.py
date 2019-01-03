@@ -1,6 +1,6 @@
 from aiohttp import web
 from uuid import uuid1
-from opentrons.config import pipette_config, robot_configs, advanced_settings
+from opentrons.config import pipette_config, robot_configs, feature_flags
 from opentrons import instruments, types
 from . import jog, position, dots_set, z_pos
 from opentrons.util.linal import add_z, solve
@@ -69,6 +69,7 @@ class SessionManager:
     """
     def __init__(self, hardware):
         self.id = _get_uuid()
+        print("Initializing SM w/ id {}".format(self.id))
         self.pipettes = {}
         self.current_mount = None
         self.current_model = None
@@ -76,7 +77,7 @@ class SessionManager:
         self.points = {k: None for k in expected_points().keys()}
         self.z_value = None
 
-        if not advanced_settings.get_adv_setting('useProtocolApi2'):
+        if not feature_flags.use_protocol_api_v2():
             default = robot_configs._build_config({}, {}).gantry_calibration
             hardware.update_config(gantry_calibration=default)
 
@@ -94,8 +95,8 @@ def init_pipette(hardware):
     :return: The pipette type and mount chosen for deck calibration
     """
     global session
-    pipette_info = set_current_mount(
-        hardware, hardware.get_attached_pipettes())
+    pipette_info = set_current_mount(hardware)
+    print("Initializing pipettes: {}".format(pipette_info))
     pipette = pipette_info['pipette']
     res = {}
     if pipette:
@@ -108,7 +109,32 @@ def init_pipette(hardware):
     return res
 
 
-def set_current_mount(hardware, attached_pipettes):
+def get_pipettes(hardware):
+    attached_pipettes = hardware.get_attached_pipettes()
+    left_pipette = None
+    right_pipette = None
+    left = attached_pipettes.get('left')
+    right = attached_pipettes.get('right')
+    if feature_flags.use_protocol_api_v2():
+        if left['model'] in pipette_config.configs:
+            left_pipette = hardware.attached_pipettes()[types.Mount.LEFT]
+
+        if right['model'] in pipette_config.configs:
+            right_pipette = hardware.attached_pipettes()[types.Mount.RIGHT]
+    else:
+        if left['model'] in pipette_config.configs:
+            pip_config = pipette_config.load(left['model'])
+            left_pipette = instruments._create_pipette_from_config(
+                mount='left', config=pip_config, name=left['model'])
+
+        if right['model'] in pipette_config.configs:
+            pip_config = pipette_config.load(right['model'])
+            right_pipette = instruments._create_pipette_from_config(
+                mount='right', config=pip_config, name=right['model'])
+    return right_pipette, left_pipette
+
+
+def set_current_mount(hardware):
     """
     Choose the pipette in which to execute commands. If there is no pipette,
     or it is uncommissioned, the pipette is not mounted.
@@ -120,48 +146,24 @@ def set_current_mount(hardware, attached_pipettes):
     :return: The selected pipette
     """
     global session
-    left = attached_pipettes.get('left')
-    right = attached_pipettes.get('right')
-    left_pipette = None
-    right_pipette = None
-
     pipette = None
     model = None
-    print(attached_pipettes)
-    if not advanced_settings.get_adv_setting('useProtocolApi2'):
-        if left['model'] in pipette_config.configs:
-            pip_config = pipette_config.load(left['model'])
-            left_pipette = instruments._create_pipette_from_config(
-                mount='left', config=pip_config, name=left['model'])
-
-        if right['model'] in pipette_config.configs:
-            pip_config = pipette_config.load(right['model'])
-            right_pipette = instruments._create_pipette_from_config(
-                mount='right', config=pip_config, name=right['model'])
-    else:
-        if left['model'] in pipette_config.configs:
-            left_pipette = hardware.attached_pipettes()[types.Mount.LEFT]
-
-        if right['model'] in pipette_config.configs:
-            right_pipette = hardware.attached_pipettes()[types.Mount.RIGHT]
-
+    right_pipette, left_pipette = get_pipettes(hardware)
     if right_pipette and right_pipette.channels == 1:
         session.current_mount = 'A'
         pipette = right_pipette
-        model = right['model']
     elif left_pipette and left_pipette.channels == 1:
         session.current_mount = 'Z'
         pipette = left_pipette
-        model = left['model']
     else:
         if right_pipette:
             session.current_mount = 'A'
             pipette = right_pipette
-            model = right['model']
         elif left_pipette:
             session.current_mount = 'Z'
             pipette = left_pipette
-            model = left['model']
+    if pipette:
+        model = pipette.name
     return {'pipette': pipette, 'model': model}
 
 
@@ -188,7 +190,7 @@ async def attach_tip(data):
         message = 'Error: "tipLength" must be specified in request'
         status = 400
     else:
-        if not advanced_settings.get_adv_setting('useProtocolApi2'):
+        if not feature_flags.use_protocol_api_v2():
             if pipette.tip_attached:
                 log.warning('attach tip called while tip already attached')
                 pipette._remove_tip(pipette._tip_length)
@@ -222,7 +224,7 @@ async def detach_tip(data, hardware):
     mount = 'left' if session.current_mount == 'Z' else 'right'
     pipette = session.pipettes[mount]
 
-    if not advanced_settings.get_adv_setting('useProtocolApi2'):
+    if not feature_flags.use_protocol_api_v2():
         if not pipette.tip_attached:
             log.warning('detach tip called with no tip')
         pipette._remove_tip(session.tip_length)
@@ -314,7 +316,7 @@ async def move(data, hardware):
             y = point[1] + pipette_config.Y_OFFSET_MULTI * 2
             z = point[2]
             point = (x, y, z)
-        if not advanced_settings.get_adv_setting('useProtocolApi2'):
+        if not feature_flags.use_protocol_api_v2():
             pipette.move_to((hardware.deck, point), strategy='arc')
         else:
             if mount == 'left':
@@ -446,11 +448,9 @@ async def release(data, hardware):
     """
     global session
     session = None
-    if not advanced_settings.get_adv_setting('useProtocolApi2'):
+    if not feature_flags.use_protocol_api_v2():
         hardware.remove_instrument('left')
         hardware.remove_instrument('right')
-    else:
-        hardware.cache_instruments()
     return web.json_response({"message": "calibration session released"})
 
 # ---------------------- End Route Fns -------------------------
@@ -487,14 +487,8 @@ async def start(request):
 
     if not session or body.get('force'):
         hardware = hw_from_req(request)
-        if body.get('force'):
-            if not advanced_settings.get_adv_setting('useProtocolApi2'):
-                print("hardware type")
-                print(hardware)
-                hardware.remove_instrument('left')
-                hardware.remove_instrument('right')
-            else:
-                hardware.cache_instruments()
+        if body.get('force') and session:
+            await release(data={}, hardware=hardware)
 
         session = SessionManager(hardware)
         res = init_pipette(hardware)

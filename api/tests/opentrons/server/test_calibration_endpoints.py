@@ -287,36 +287,38 @@ async def test_release(async_client, monkeypatch):
     assert resp3.status == 201
 
 
-async def test_forcing_new_session(async_client, monkeypatch):
+@pytest.mark.api2_only
+async def test_forcing_new_session_v2(async_client, monkeypatch, dc_session):
     """
     Tests that the GET request to initiate a session manager for factory
     calibration returns an error if a session is in progress, and can be
     overridden.
     """
-    test_model = 'p300_multi_v1'
-
-    def dummy_read_model(mount):
-        return test_model
-
-    monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_read_model)
-    robot.reset()
-
-    dummy_token = 'Test Token'
-
-    def uuid_mock():
-        nonlocal dummy_token
-        dummy_token = dummy_token + '+'
-        return dummy_token
-
-    monkeypatch.setattr(endpoints, '_get_uuid', uuid_mock)
-
-    resp = await async_client.post('/calibration/deck/start')
-    text = await resp.json()
-
-    assert resp.status == 201
-    expected = {'token': dummy_token,
-                'pipette': {'mount': 'right', 'model': test_model}}
-    assert text == expected
+    # TODO: remember to put the commented section back in as a v1 test
+    # test_model = 'p300_multi_v1'
+    #
+    # def dummy_read_model(mount):
+    #     return test_model
+    #
+    # monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_read_model)
+    # robot.reset()
+    #
+    # dummy_token = 'Test Token'
+    #
+    # def uuid_mock():
+    #     nonlocal dummy_token
+    #     dummy_token = dummy_token + '+'
+    #     return dummy_token
+    #
+    # monkeypatch.setattr(endpoints, '_get_uuid', uuid_mock)
+    #
+    # resp = await async_client.post('/calibration/deck/start')
+    # text = await resp.json()
+    #
+    # # assert resp.status == 201
+    # expected = {'token': dummy_token,
+    #             'pipette': {'mount': 'right', 'model': test_model}}
+    # assert text == expected
 
     resp1 = await async_client.post('/calibration/deck/start')
     assert resp1.status == 409
@@ -325,9 +327,9 @@ async def test_forcing_new_session(async_client, monkeypatch):
         '/calibration/deck/start', json={'force': 'true'})
     text2 = await resp2.json()
     assert resp2.status == 201
-    expected2 = {'token': dummy_token,
-                 'pipette': {'mount': 'right', 'model': test_model}}
-    assert text2 == expected2
+    # expected2 = {'token': dummy_token,
+    #              'pipette': {'mount': 'right', 'model': test_model}}
+    # assert text2 == expected2
 
 
 async def test_incorrect_token(async_client, dc_session):

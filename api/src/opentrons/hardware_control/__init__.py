@@ -272,16 +272,16 @@ class API(HardwareAPILike):
             instruments[mount]['has_tip'] = instr.has_tip
         return instruments
 
-    def get_attached_pipettes(self):
-        instruments = self.attached_instruments
-        instruments[top_types.Mount.LEFT]['mount_axis'] = 'z'
-        instruments[top_types.Mount.RIGHT]['mount_axis'] = 'a'
-        instruments[top_types.Mount.LEFT]['plunger_axis'] = 'b'
-        instruments[top_types.Mount.RIGHT]['plunger_axis'] = 'c'
-        for mount in top_types.Mount:
-            instruments[mount]['model'] = instruments[mount]['name']
-            instruments[mount]['id'] = instruments[mount]['pipette_id']
-        return instruments
+    # def get_attached_pipettes(self):
+    #     instruments = self.attached_instruments
+    #     instruments[top_types.Mount.LEFT]['mount_axis'] = 'z'
+    #     instruments[top_types.Mount.RIGHT]['mount_axis'] = 'a'
+    #     instruments[top_types.Mount.LEFT]['plunger_axis'] = 'b'
+    #     instruments[top_types.Mount.RIGHT]['plunger_axis'] = 'c'
+    #     for mount in top_types.Mount:
+    #         instruments[mount]['model'] = instruments[mount]['name']
+    #         instruments[mount]['id'] = instruments[mount]['pipette_id']
+    #     return instruments
 
     @property
     def attached_modules(self):

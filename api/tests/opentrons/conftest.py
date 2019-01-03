@@ -18,7 +18,7 @@ import opentrons
 from opentrons.api import models
 from opentrons.data_storage import database
 from opentrons.server import rpc
-from opentrons import config
+from opentrons import config, types
 from opentrons.config import advanced_settings as advs
 from opentrons.server import init
 from opentrons.deck_calibration import endpoints
@@ -192,7 +192,7 @@ def using_api1(loop):
     oldenv = os.environ.get('OT_FF_useProtocolApi2')
     if oldenv:
         os.environ.pop('OT_FF_useProtocolApi2')
-    opentrons.reset_globals(1)
+    opentrons.reset_globals(version=1, loop=loop)
     try:
         yield opentrons.hardware
     finally:
@@ -203,44 +203,36 @@ def using_api1(loop):
 
 
 @pytest.fixture(params=[using_api1, using_api2])
-async def async_client(request, virtual_smoothie_env, loop, test_client):
+async def async_server(request, virtual_smoothie_env, loop):
     if request.node.get_marker('api1_only') and request.param != using_api1:
-            pytest.skip('requires api1 only')
+        pytest.skip('requires api1 only')
     elif request.node.get_marker('api2_only') and request.param != using_api2:
-            pytest.skip('requires api2 only')
-    with request.param(loop) as hw:
-        app = init(loop)
-        cli = await loop.create_task(test_client(app))
-        setattr(cli, 'hw', hw)
-        if request.param == using_api1:
-            setattr(cli, 'version', 1)
-        elif request.param == using_api2:
-            setattr(cli, 'version', 2)
-        else:
-            raise RuntimeError("Bad version? Bad param? Somethings broken")
-        endpoints.session = None
-        yield cli
+        pytest.skip('requires api2 only')
+    app = init(loop)
+    app['api_version'] = 1 if request.param == using_api1 else 2
+    yield app
 
 
-@pytest.fixture(params=[using_api1, using_api2])
-def dc_session(request, virtual_smoothie_env, monkeypatch, loop):
+@pytest.fixture
+async def async_client(async_server, loop, test_client):
+    cli = await loop.create_task(test_client(async_server))
+    yield cli
+
+
+@pytest.fixture
+async def dc_session(request, async_server, monkeypatch, loop):
     """
     Mock session manager for deck calibation
     """
-    if request.node.get_marker('api1_only') and request.param != using_api1:
-            pytest.skip('requires api1 only')
-    elif request.node.get_marker('api2_only') and request.param != using_api2:
-            pytest.skip('requires api2 only')
-    if request.param == using_api1:
-        with using_api1(loop) as hw1:
-            ses = endpoints.SessionManager(hw1)
-            monkeypatch.setattr(endpoints, 'session', ses)
-            yield ses
-    else:
-        with using_api2(loop) as hw1:
-            ses = endpoints.SessionManager(hw1)
-            monkeypatch.setattr(endpoints, 'session', ses)
-            yield ses
+    hw = async_server['com.opentrons.hardware']
+    if async_server['api_version'] == 2:
+        await hw.cache_instruments({
+            types.Mount.LEFT: None,
+            types.Mount.RIGHT: 'p300_multi_v1'})
+
+    ses = endpoints.SessionManager(hw)
+    monkeypatch.setattr(endpoints, 'session', ses)
+    yield ses
 
 
 @pytest.fixture
