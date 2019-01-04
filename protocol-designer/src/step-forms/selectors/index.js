@@ -18,6 +18,7 @@ import {
   hydrateField,
   getFieldErrors,
 } from '../../steplist/fieldLevel'
+import {addSpecsToPipetteInvariantProps} from '../utils'
 
 import type {ElementProps} from 'react'
 import type {
@@ -42,10 +43,9 @@ import type {
   InitialDeckSetup,
   LabwareEntities,
   LabwareOnDeck,
-  PipetteEntity,
   PipetteEntities,
   PipetteOnDeck,
-  EditPipetteFieldsByMount,
+  FormPipettesByMount,
 } from '../types'
 import type {RootState} from '../reducers'
 import type {BaseState, Selector} from '../../types'
@@ -59,28 +59,20 @@ const NO_SAVED_FORM_ERROR = 'NO_SAVED_FORM_ERROR'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 
-export const getLabwareInvariantProperties: Selector<LabwareEntities> = createSelector(
+export const getLabwareEntities: Selector<LabwareEntities> = createSelector(
   rootSelector,
   (state) => state.labwareInvariantProperties
 )
 
-export const getPipetteInvariantProperties: Selector<PipetteEntities> = createSelector(
+export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
   rootSelector,
-  (state) => reduce(
-    state.pipetteInvariantProperties,
-    (acc: PipetteEntities, pipette: PipetteEntity, id: string): PipetteEntities => {
-      const spec = getPipetteNameSpecs(pipette.name)
-      assert(spec, `no pipette spec for pipette id "${id}", name "${pipette.name}"`)
-      return spec
-        ? {...acc, [id]: {...pipette, spec}}
-        : acc
-    }, {})
+  (state) => addSpecsToPipetteInvariantProps(state.pipetteInvariantProperties)
 )
 
 export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   rootSelector,
-  getLabwareInvariantProperties,
-  getPipetteInvariantProperties,
+  getLabwareEntities,
+  getPipetteEntities,
   (state, labwareInvariantProperties, pipetteInvariantProperties) => {
     const initialSetupStep = state.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
     assert(
@@ -154,16 +146,16 @@ export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup>
   }, {})
 )
 
-export const getPipettesForEditPipetteForm: Selector<EditPipetteFieldsByMount> = createSelector(
+export const getPipettesForEditPipetteForm: Selector<FormPipettesByMount> = createSelector(
   getInitialDeckSetup,
-  (initialDeckSetup) => reduce(initialDeckSetup.pipettes, (acc: EditPipetteFieldsByMount, pipetteOnDeck: PipetteOnDeck, id): EditPipetteFieldsByMount => {
+  (initialDeckSetup) => reduce(initialDeckSetup.pipettes, (acc: FormPipettesByMount, pipetteOnDeck: PipetteOnDeck, id): FormPipettesByMount => {
     const pipetteSpec = getPipetteNameSpecs(pipetteOnDeck.name)
     const tiprackSpec = getLabware(pipetteOnDeck.tiprackModel)
 
     if (!pipetteSpec || !tiprackSpec) return acc
 
     const pipetteForInstrumentGroup = {
-      pipetteModel: pipetteOnDeck.name,
+      pipetteName: pipetteOnDeck.name,
       tiprackModel: tiprackSpec.metadata.name,
     }
 
@@ -171,7 +163,7 @@ export const getPipettesForEditPipetteForm: Selector<EditPipetteFieldsByMount> =
       ...acc,
       [pipetteOnDeck.mount]: pipetteForInstrumentGroup,
     }
-  }, {left: null, right: null})
+  }, {left: {pipetteName: null, tiprackModel: null}, right: {pipetteName: null, tiprackModel: null}})
 )
 
 export const getUnsavedForm: Selector<?FormData> = createSelector(
@@ -224,8 +216,8 @@ const _getAllErrorsFromHydratedForm = (hydratedForm: FormData): StepFormAndField
 }
 
 export const getHydrationContext: Selector<StepFormContextualState> = createSelector(
-  getLabwareInvariantProperties,
-  getPipetteInvariantProperties,
+  getLabwareEntities,
+  getPipetteEntities,
   (labware, pipettes) => ({labware, pipettes})
 )
 

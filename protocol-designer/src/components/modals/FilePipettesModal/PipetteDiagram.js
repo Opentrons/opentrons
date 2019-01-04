@@ -2,7 +2,7 @@
 
 import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import * as React from 'react'
-import styles from './NewFileModal.css'
+import styles from './FilePipettesModal.css'
 import {InstrumentDiagram} from '@opentrons/components'
 
 function getChannels (pipetteName: ?string): ?number {

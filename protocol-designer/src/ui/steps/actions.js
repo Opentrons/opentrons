@@ -5,7 +5,7 @@ import type {StepIdType, StepType} from '../../form-types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../../types'
 import {selectors as stepFormSelectors} from '../../step-forms'
 import {getNextDefaultPipetteId} from '../../steplist/formLevel'
-import type {TerminalItemId, SubstepIdentifier, FormSectionNames} from '../../steplist/types'
+import type {TerminalItemId, SubstepIdentifier} from '../../steplist/types'
 
 import handleFormChange from '../../steplist/actions/handleFormChange'
 
@@ -44,12 +44,6 @@ type HoverOnTerminalItemAction = {type: 'HOVER_ON_TERMINAL_ITEM', payload: ?Term
 export const hoverOnTerminalItem = (terminalId: ?TerminalItemId): HoverOnTerminalItemAction => ({
   type: 'HOVER_ON_TERMINAL_ITEM',
   payload: terminalId,
-})
-
-export type CollapseFormSectionAction = {type: 'COLLAPSE_FORM_SECTION', payload: FormSectionNames}
-export const collapseFormSection = (payload: FormSectionNames): CollapseFormSectionAction => ({
-  type: 'COLLAPSE_FORM_SECTION',
-  payload,
 })
 
 type SetWellSelectionLabwareKeyAction = {type: 'SET_WELL_SELECTION_LABWARE_KEY', payload: ?string}
@@ -94,11 +88,12 @@ export const selectStep = (stepId: StepIdType, newStepType?: StepType): ThunkAct
     // update the form thru handleFormChange.
     const formHasPipetteField = formData && 'pipette' in formData
     if (newStepType && formHasPipetteField && defaultPipetteId) {
-      const updatePayload = {update: {pipette: defaultPipetteId}}
       const updatedFields = handleFormChange(
-        updatePayload,
+        {pipette: defaultPipetteId},
         formData,
-        getState).update
+        stepFormSelectors.getPipetteEntities(state),
+        stepFormSelectors.getLabwareEntities(state)
+      )
 
       formData = {
         ...formData,

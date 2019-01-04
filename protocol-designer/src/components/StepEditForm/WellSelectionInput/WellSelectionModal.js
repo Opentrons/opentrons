@@ -126,7 +126,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const ingredNames = selectors.getLiquidNamesById(state)
 
   const pipette = (pipetteId != null)
-    ? stepFormSelectors.getPipetteInvariantProperties(state)[pipetteId]
+    ? stepFormSelectors.getPipetteEntities(state)[pipetteId]
     : null
 
   return {

@@ -2,14 +2,12 @@
 import assert from 'assert'
 import uniq from 'lodash/uniq'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
-import {selectors as stepFormSelectors} from '../../step-forms'
-import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 
 import type {PipetteChannels} from '@opentrons/shared-data'
-import type {BaseState, GetState} from '../../types'
 import type {FormData} from '../../form-types'
 import type {StepFieldName} from '../fieldLevel'
-import type {ChangeFormPayload} from './types'
+import type {FormPatch} from './types'
+import type {LabwareEntities, PipetteEntities} from '../../step-forms/types'
 
 function _getAllWells (
   primaryWells: ?Array<string>,
@@ -31,8 +29,8 @@ function _getAllWells (
   return uniq(allWells)
 }
 
-function getChannels (pipetteId: string, state: BaseState): PipetteChannels {
-  const pipette: ?* = stepFormSelectors.getPipetteInvariantProperties(state)[pipetteId]
+function getChannels (pipetteId: string, pipetteEntities: PipetteEntities): PipetteChannels {
+  const pipette: ?* = pipetteEntities[pipetteId]
   if (!pipette) {
     assert(false, `${pipetteId} not found in pipettes, cannot handleFormChange properly`)
     return 1
@@ -40,40 +38,34 @@ function getChannels (pipetteId: string, state: BaseState): PipetteChannels {
   return pipette.spec.channels
 }
 
-// TODO: Ian 2018-09-20 this is only usable by 'unsavedForm'.
-// Eventually we gotta allow arbitrary actions like DELETE_LABWARE
-// (or more speculatively, CHANGE_PIPETTE etc), which affect saved forms from
-// 'outside', to cause changes that run thru all the logic in this block
 function handleFormChange (
-  payload: ChangeFormPayload,
+  patch: FormPatch,
   baseForm: ?FormData,
-  getState: GetState,
-): ChangeFormPayload {
-  // Use state to handle form changes
-  const baseState = getState()
-
+  pipetteEntities: PipetteEntities,
+  labwareEntities: LabwareEntities
+): FormPatch {
   // pass thru, unchanged
-  if (baseForm == null) { return payload }
+  if (baseForm == null) { return patch }
 
-  let updateOverrides = getChangeLabwareEffects(payload.update)
+  let updateOverrides = getChangeLabwareEffects(patch)
 
-  if (baseForm.pipette && payload.update.pipette) {
-    if (typeof payload.update.pipette !== 'string') {
+  if (baseForm.pipette && patch.pipette) {
+    if (typeof patch.pipette !== 'string') {
       // this should not happen!
       console.error('no next pipette, could not handleFormChange')
-      return payload
+      return patch
     }
-    const nextChannels = getChannels(payload.update.pipette, baseState)
+    const nextChannels = getChannels(patch.pipette, pipetteEntities)
     updateOverrides = {
       ...updateOverrides,
-      ...reconcileFormPipette(baseForm, baseState, payload.update.pipette, nextChannels),
+      ...reconcileFormPipette(baseForm, labwareEntities, pipetteEntities, patch.pipette, nextChannels),
     }
   }
 
   if (baseForm.stepType === 'distribute') {
-    if (typeof payload.update.pipette === 'string') {
-      const pipette = stepFormSelectors.getPipetteInvariantProperties(baseState)[payload.update.pipette]
-      assert(pipette, `handleFormChange expected pipette to exist ${String(payload.update.pipette)}`)
+    if (typeof patch.pipette === 'string') {
+      const pipette = pipetteEntities[patch.pipette]
+      assert(pipette, `handleFormChange expected pipette to exist ${String(patch.pipette)}`)
       const disposalVol = pipette.spec.minVolume
 
       updateOverrides = {
@@ -85,14 +77,12 @@ function handleFormChange (
   }
 
   return {
-    update: {
-      ...payload.update,
-      ...updateOverrides,
-    },
+    ...patch,
+    ...updateOverrides,
   }
 }
 
-export const getChangeLabwareEffects = (updateFormData: {[StepFieldName]: ?mixed}) => {
+const getChangeLabwareEffects = (updateFormData: {[StepFieldName]: ?mixed}) => {
   let updateOverrides = {}
   // Changing labware clears wells selection: source labware
   if ('aspirate_labware' in updateFormData) {
@@ -124,8 +114,8 @@ export const getChangeLabwareEffects = (updateFormData: {[StepFieldName]: ?mixed
   return updateOverrides
 }
 
-export const reconcileFormPipette = (formData: FormData, baseState: BaseState, nextPipetteId: ?mixed, nextChannels: ?number) => {
-  const prevChannels = getChannels(formData.pipette, baseState)
+const reconcileFormPipette = (formData: FormData, labwareEntities: LabwareEntities, pipetteEntities: PipetteEntities, nextPipetteId: ?mixed, nextChannels: ?number) => {
+  const prevChannels = getChannels(formData.pipette, pipetteEntities)
 
   const singleToMulti = prevChannels === 1 && nextChannels === 8
   const multiToSingle = prevChannels === 8 && nextChannels === 1
@@ -168,7 +158,7 @@ export const reconcileFormPipette = (formData: FormData, baseState: BaseState, n
     } else if (multiToSingle) {
       // multi-channel to single-channel: convert primary wells to all wells
       const labwareId = formData.labware
-      const labware = labwareId && labwareIngredSelectors.getLabwareById(baseState)[labwareId]
+      const labware = labwareId && labwareEntities[labwareId]
       const labwareType = labware && labware.type
 
       updateOverrides = {
@@ -185,9 +175,9 @@ export const reconcileFormPipette = (formData: FormData, baseState: BaseState, n
       const sourceLabwareId = formData['aspirate_labware']
       const destLabwareId = formData['dispense_labware']
 
-      const sourceLabware = sourceLabwareId && labwareIngredSelectors.getLabwareById(baseState)[sourceLabwareId]
+      const sourceLabware = sourceLabwareId && labwareEntities[sourceLabwareId]
       const sourceLabwareType = sourceLabware && sourceLabware.type
-      const destLabware = destLabwareId && labwareIngredSelectors.getLabwareById(baseState)[destLabwareId]
+      const destLabware = destLabwareId && labwareEntities[destLabwareId]
       const destLabwareType = destLabware && destLabware.type
 
       updateOverrides = {

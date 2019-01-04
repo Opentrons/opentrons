@@ -1,4 +1,7 @@
 // @flow
+import mapValues from 'lodash/mapValues'
+import pick from 'lodash/pick'
+import type {StepIdType} from '../../form-types'
 
 export type CreatePipettesAction = {
   type: 'CREATE_PIPETTES',
@@ -10,10 +13,14 @@ export type CreatePipettesAction = {
   },
 }
 
-export const createPipettes = (payload: $PropertyType<CreatePipettesAction, 'payload'>): CreatePipettesAction => ({
-  type: 'CREATE_PIPETTES',
-  payload,
-})
+export const createPipettes = (arg: $PropertyType<CreatePipettesAction, 'payload'>): CreatePipettesAction => {
+  // for convenience of caller, strip out 'mount' etc
+  const payload = mapValues(arg, (pipette) => pick(pipette, ['name', 'tiprackModel']))
+  return {
+    type: 'CREATE_PIPETTES',
+    payload,
+  }
+}
 
 export type DeletePipettesAction = {
   type: 'DELETE_PIPETTES',
@@ -25,14 +32,21 @@ export const deletePipettes = (payload: $PropertyType<DeletePipettesAction, 'pay
   payload,
 })
 
-export type ModifyPipettesTiprackAssignmentAction = {
-  type: 'MODIFY_PIPETTES_TIPRACK_ASSIGNMENT',
+export type SubstituteStepFormPipettesAction = {
+  type: 'SUBSTITUTE_STEP_FORM_PIPETTES',
   payload: {
-    [pipetteId: string]: string, // new assigned tiprack model
+    // step range to modify (inclusive)
+    startStepId: StepIdType,
+    endStepId: StepIdType,
+
+    // old pipette id -> new id
+    substitutionMap: {[oldPipetteId: string]: string},
   },
 }
 
-export const modifyPipettesTiprackAssignment = (payload: $PropertyType<ModifyPipettesTiprackAssignmentAction, 'payload'>): ModifyPipettesTiprackAssignmentAction => ({
-  type: 'MODIFY_PIPETTES_TIPRACK_ASSIGNMENT',
+export const substituteStepFormPipettes = (
+  payload: $PropertyType<SubstituteStepFormPipettesAction, 'payload'>
+): SubstituteStepFormPipettesAction => ({
+  type: 'SUBSTITUTE_STEP_FORM_PIPETTES',
   payload,
 })

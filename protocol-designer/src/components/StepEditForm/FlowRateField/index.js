@@ -39,7 +39,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 
   const pipetteId = formData ? formData[pipetteFieldName] : null
   const pipette = (pipetteId != null)
-    ? stepFormSelectors.getPipetteInvariantProperties(state)[pipetteId]
+    ? stepFormSelectors.getPipetteEntities(state)[pipetteId]
     : null
   const pipetteDisplayName = pipette ? pipette.spec.displayName : 'pipette'
 

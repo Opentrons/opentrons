@@ -6,10 +6,6 @@ import type {
 } from '../../form-types'
 import type {WellIngredientVolumeData, TipLocation} from '../../steplist/types'
 
-// sections of the form that are expandable/collapsible
-export type FormSectionState = {aspirate: boolean, dispense: boolean}
-export type FormSectionNames = 'aspirate' | 'dispense'
-
 export type SourceDestData = {
   wells: Array<string>,
   preIngreds: WellIngredientVolumeData,
