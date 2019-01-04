@@ -187,7 +187,8 @@ class Session(object):
                     API.build_hardware_simulator,
                     instrs,
                     [mod.name()
-                     for mod in self._hardware.attached_modules.values()])
+                     for mod in self._hardware.attached_modules.values()],
+                    strict_attached_instruments=False)
                 sim.home()
                 self._simulating_ctx = ProtocolContext(self._loop,
                                                        sim)

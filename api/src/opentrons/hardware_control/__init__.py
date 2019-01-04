@@ -133,7 +133,8 @@ class API(HardwareAPILike):
             attached_instruments: Dict[top_types.Mount, Dict[str, Optional[str]]] = None,  # noqa E501
             attached_modules: List[str] = None,
             config: robot_configs.robot_config = None,
-            loop: asyncio.AbstractEventLoop = None) -> 'API':
+            loop: asyncio.AbstractEventLoop = None,
+            strict_attached_instruments: bool = True) -> 'API':
         """ Build a simulating hardware controller.
 
         This method may be used both on a real robot and on dev machines.
@@ -146,7 +147,8 @@ class API(HardwareAPILike):
             attached_modules = []
         return cls(Simulator(attached_instruments,
                              attached_modules,
-                             config, loop),
+                             config, loop,
+                             strict_attached_instruments),
                    config=config, loop=loop)
 
     def __repr__(self):
