@@ -6,6 +6,7 @@ from opentrons.config import robot_configs
 from opentrons.protocol_api import labware
 from opentrons.api import models
 from opentrons.types import Point, Location, Mount
+from opentrons.hardware_control import CriticalPoint
 
 state = partial(state, 'calibration')
 
@@ -159,7 +160,8 @@ async def test_move_to_front_api2(main_router, model):
     with mock.patch.object(main_router.calibration_manager._hardware._api,
                            'move_to') as patch:
         main_router.calibration_manager.move_to_front(model.instrument)
-        patch.assert_called_with(Mount.RIGHT, Point(132.5, 90.5, 150))
+        patch.assert_called_with(Mount.RIGHT, Point(132.5, 90.5, 150),
+                                 critical_point=CriticalPoint.NOZZLE)
 
         await main_router.wait_until(state('moving'))
         await main_router.wait_until(state('ready'))
@@ -223,15 +225,11 @@ async def test_return_tip(main_router, model):
 
 @pytest.mark.api2_only
 async def test_home_api2(main_router, model):
-    with mock.patch.object(
-            main_router.calibration_manager._hardware._api, 'home') as home:
-        main_router.calibration_manager.home(
-            model.instrument)
+    main_router.calibration_manager.home(
+        model.instrument)
 
-        home.assert_called_with()
-
-        await main_router.wait_until(state('moving'))
-        await main_router.wait_until(state('ready'))
+    await main_router.wait_until(state('moving'))
+    await main_router.wait_until(state('ready'))
 
 
 @pytest.mark.api1_only

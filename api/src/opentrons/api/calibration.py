@@ -6,6 +6,7 @@ from opentrons.config import feature_flags as ff
 from opentrons.broker import publish
 from opentrons.types import Point, Mount
 from opentrons.protocol_api import labware
+from opentrons.hardware_control import CriticalPoint
 
 from .models import Container
 
@@ -123,7 +124,8 @@ class CalibrationManager:
         if ff.use_protocol_api_v2():
             dest = instrument._context.deck.position_for(5)\
                                            .point._replace(z=150)
-            self._hardware.move_to(Mount[inst.mount.upper()], dest)
+            self._hardware.move_to(Mount[inst.mount.upper()], dest,
+                                   critical_point=CriticalPoint.NOZZLE)
         else:
             calibration_functions.move_instrument_for_probing_prep(
                 inst, inst.robot)
@@ -174,7 +176,9 @@ class CalibrationManager:
         log.info('Homing {}'.format(instrument.name))
         self._set_state('moving')
         if ff.use_protocol_api_v2():
-            self._hardware.home()
+            with instrument._context.temp_connect(self._hardware):
+                instrument._context.location_cache = None
+                inst.home()
         else:
             inst.home()
         self._set_state('ready')

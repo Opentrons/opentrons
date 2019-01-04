@@ -341,9 +341,13 @@ class API(HardwareAPILike):
 
     # Gantry/frame (i.e. not pipette) action API
     @_log_call
-    async def home_z(self):
+    async def home_z(self, mount: top_types.Mount = None):
         """ Home the two z-axes """
-        await self.home([Axis.Z, Axis.A])
+        if not mount:
+            axes = [Axis.Z, Axis.A]
+        else:
+            axes = [Axis.by_mount(mount)]
+        await self.home(axes)
 
     @_log_call
     async def home_plunger(self, mount: top_types.Mount):
@@ -1070,8 +1074,8 @@ class API(HardwareAPILike):
         assert opt_pip, '{} has no pipette'.format(mount.name.lower())
         pip = opt_pip
 
-        assert not (pip.has_tip and tip_length),\
-            '{} has a tip, tip length must not be specified'.format(pip)
+        if pip.has_tip and tip_length:
+            pip.remove_tip()
 
         safe_z = self._config.tip_probe.z_clearance.crossover + \
             self._config.tip_probe.center[2]
@@ -1079,22 +1083,29 @@ class API(HardwareAPILike):
         new_pos: Dict[Axis, List[float]] = {
             ax: [] for ax in Axis.gantry_axes() if ax != Axis.A}
 
-        if not tip_length and not pip.has_tip:
-            tip_length = pip.config.tip_length
+        if not tip_length:
+            if not pip.has_tip:
+                tip_length = pip.config.tip_length
+            if not tip_length and pip.has_tip:
+                tip_length = pip._current_tip_length
 
         # assure_tip lets us make sure we don’t pollute the pipette
         # state even if there’s an exception in tip probe, though
         # it leads to the ugly code with the nested function
         @contextlib.contextmanager
         def _assure_tip():
-            should_manage = not pip.has_tip
-            if should_manage:
-                pip.add_tip(tip_length)
+            if pip.has_tip:
+                old_tip = pip._current_tip_length
+                pip.remove_tip()
+            else:
+                old_tip = None
+            pip.add_tip(tip_length)
             try:
                 yield
             finally:
-                if should_manage:
-                    pip.remove_tip()
+                pip.remove_tip()
+                if old_tip:
+                    pip.add_tip(old_tip)
 
         async def _do_tp() -> top_types.Point:
             # Clear the old offset during calibration

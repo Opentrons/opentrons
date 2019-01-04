@@ -778,7 +778,8 @@ class InstrumentContext:
         def home_dummy(mount): pass
         cmds.do_publish(cmds.home, home_dummy, 'before', None, None,
                         self._mount.name.lower())
-        self._ctx.home()
+        self._hw_manager.hardware.home_z(self._mount)
+        self._hw_manager.hardware.home_plunger(self._mount)
         cmds.do_publish(cmds.home, home_dummy, 'after', self, None,
                         self._mount.name.lower())
         return self

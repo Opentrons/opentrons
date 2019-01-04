@@ -56,8 +56,8 @@ def test_old_probe_height(short_trash_flag):
 
 def test_default_probe_height():
     cfg = robot_configs.load()
-    assert cfg.tip_probe.center[2] == 77.0
-    assert cfg.tip_probe.dimensions[2] == 82.0
+    assert cfg.tip_probe.center[2] == 74.3
+    assert cfg.tip_probe.dimensions[2] == 79.3
 
 
 def test_load_corrupt_json():
