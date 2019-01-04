@@ -154,6 +154,7 @@ class SingletonAdapter(HardwareAPILike):
             port=port,
             config=copy.copy(old_api.config),
             force=force))
+        print("Connecting to Adaptor")
         old_api._loop.run_until_complete(new_api.cache_instruments())
         setattr(self, '_api', new_api)
 
@@ -176,6 +177,7 @@ class SingletonAdapter(HardwareAPILike):
 
     def get_attached_pipettes(self):
         """ Mimic the behavior of robot.get_attached_pipettes"""
+
         api = object.__getattribute__(self, '_api')
         instrs = {}
         for mount, data in api.attached_instruments.items():

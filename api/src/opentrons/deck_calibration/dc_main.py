@@ -13,10 +13,10 @@ from numpy.linalg import inv
 from numpy import dot, array
 import opentrons
 from opentrons import robot, instruments, types
-from opentrons.config import robot_configs, advanced_settings
+from opentrons.config import robot_configs, feature_flags
 from opentrons.util.calibration_functions import probe_instrument
 from opentrons.util.linal import solve, add_z, apply_transform
-from deck_calibration import (
+from . import (
     left, right, SAFE_HEIGHT, cli_dots_set,
     position, jog, apply_mount_offset)
 
@@ -71,7 +71,7 @@ class CLITool:
         self._pile = urwid.Pile([self._tip_text_box, self._status_text_box])
         self._filler = urwid.Filler(self._pile, 'top')
 
-        if not advanced_settings.get_adv_setting('useProtocolApi2'):
+        if not feature_flags.use_protocol_api_v2():
             self.hardware = robot
         else:
             self.hardware = opentrons.hardware
@@ -320,7 +320,7 @@ class CLITool:
             self.move_to_safe_height()
 
         tx, ty, tz = self._deck_to_driver_coords(point)
-        if not advanced_settings.get_adv_setting('useProtocolApi2'):
+        if not feature_flags.use_protocol_api_v2():
             self.hardware._driver.move({'X': tx, 'Y': ty})
             self.hardware._driver.move({self._current_pipette: tz})
         else:
@@ -338,7 +338,7 @@ class CLITool:
     def move_to_safe_height(self):
         cx, cy, _ = self._driver_to_deck_coords(self._position())
         _, _, sz = self._deck_to_driver_coords((cx, cy, SAFE_HEIGHT))
-        if not advanced_settings.get_adv_setting('useProtocolApi2'):
+        if not feature_flags.use_protocol_api_v2():
             self.hardware._driver.move({self._current_pipette: sz})
         else:
             if self._current_pipette == right:

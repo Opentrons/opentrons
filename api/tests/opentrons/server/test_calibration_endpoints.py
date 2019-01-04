@@ -9,6 +9,7 @@ from opentrons.deck_calibration import endpoints
 from opentrons.config import robot_configs
 from opentrons import types
 
+
 # Note that several tests in this file have target/expected values that do not
 # accurately reflect robot operation, because of differences between return
 # values from the driver during simulating vs. non-simulating modes. In
@@ -20,6 +21,7 @@ from opentrons import types
 # operation, and then these tests should be revised to match expected reality.
 
 # ------------ Function tests (unit) ----------------------
+@pytest.mark.api1_only
 async def test_add_and_remove_tip(dc_session):
     robot.reset()
     mount = 'left'
@@ -59,6 +61,7 @@ async def test_add_and_remove_tip(dc_session):
     assert not pip.tip_attached
 
 
+@pytest.mark.api1_only
 async def test_save_xy(dc_session):
     robot.reset()
     mount = 'left'
@@ -87,6 +90,7 @@ async def test_save_xy(dc_session):
     assert actual == expected
 
 
+@pytest.mark.api1_only
 async def test_save_z(dc_session):
     robot.reset()
     mount = 'left'
@@ -110,6 +114,7 @@ async def test_save_z(dc_session):
     assert new_z == expected_z
 
 
+@pytest.mark.api1_only
 async def test_save_calibration_file(dc_session, monkeypatch):
     robot.reset()
     expected_pos = endpoints.expected_points()
@@ -172,7 +177,7 @@ async def test_transform_calculation(dc_session):
 
 
 # ------------ Session and token tests ----------------------
-async def test_create_session(async_client, monkeypatch):
+async def test_create_session(async_client, async_server, monkeypatch):
     """
     Tests that the POST request to initiate a session manager for factory
     calibration returns a good token, along with the correct preferred pipette
@@ -200,12 +205,14 @@ async def test_create_session(async_client, monkeypatch):
             else:
                 res = right_model
             return res
+        if async_server['api_version'] == 1:
+            monkeypatch.setattr(
+                robot._driver, 'read_pipette_model', dummy_read_model)
 
-        monkeypatch.setattr(
-            robot._driver, 'read_pipette_model', dummy_read_model)
-
-        robot.reset()
-
+            robot.reset()
+        else:
+            await async_server['com.opentrons.hardware'].cache_instruments(
+                {types.Mount.LEFT: left_model, types.Mount.RIGHT: right_model})
         resp = await async_client.post('/calibration/deck/start')
         start_result = await resp.json()
         endpoints.session = None
@@ -251,24 +258,20 @@ async def test_create_session_fail(async_client, monkeypatch):
     assert endpoints.session is None
 
 
-async def test_release(async_client, monkeypatch):
+async def test_release(async_client, async_server, monkeypatch, dc_session):
     """
     Tests that the GET request to initiate a session manager for factory
     calibration returns an error if a session is in progress, and can be
     overridden.
     """
-    test_model = 'p300_multi_v1'
+    if async_server['api_version'] == 1:
+        test_model = 'p300_multi_v1'
 
-    def dummy_read_model(mount):
-        return test_model
+        def dummy_read_model(mount):
+            return test_model
 
-    monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_read_model)
-    robot.reset()
-
-    resp = await async_client.post('/calibration/deck/start')
-    assert resp.status == 201
-    body = await resp.json()
-    token = body.get('token')
+        monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_read_model)
+        robot.reset()
 
     resp1 = await async_client.post('/calibration/deck/start')
     assert resp1.status == 409
@@ -277,7 +280,7 @@ async def test_release(async_client, monkeypatch):
     resp2 = await async_client.post(
         '/calibration/deck',
         json={
-            'token': token,
+            'token': dc_session.id,
             'command': 'release'
         })
     assert resp2.status == 200
@@ -351,6 +354,7 @@ async def test_incorrect_token(async_client, dc_session):
 
 # ------------ Router tests (integration) ----------------------
 # TODO(mc, 2018-05-02): this does not adequately test z to smoothie axis logic
+@pytest.mark.api1_only
 async def test_set_and_jog_integration(async_client, monkeypatch):
     """
     Test that the jog function works.
@@ -361,6 +365,7 @@ async def test_set_and_jog_integration(async_client, monkeypatch):
     Then jog requests will work as expected.
     """
     test_model = 'p300_multi_v1'
+    # hardware = async_server['com.opentrons.hardware']
 
     def dummy_read_model(mount):
         return test_model
@@ -376,6 +381,7 @@ async def test_set_and_jog_integration(async_client, monkeypatch):
 
     token_res = await async_client.post('/calibration/deck/start')
     token_text = await token_res.json()
+    print("Token Text {}".format(token_text))
     token = token_text['token']
 
     axis = 'z'

@@ -144,6 +144,7 @@ class API(HardwareAPILike):
         This method may be used both on a real robot and on dev machines.
         Multiple simulating hardware controllers may be active at one time.
         """
+
         if None is attached_instruments:
             attached_instruments = {}
 

@@ -208,14 +208,16 @@ async def async_server(request, virtual_smoothie_env, loop):
         pytest.skip('requires api1 only')
     elif request.node.get_marker('api2_only') and request.param != using_api2:
         pytest.skip('requires api2 only')
-    app = init(loop)
-    app['api_version'] = 1 if request.param == using_api1 else 2
-    yield app
+    with request.param(loop):
+        app = init(loop)
+        app['api_version'] = 1 if request.param == using_api1 else 2
+        yield app
 
 
 @pytest.fixture
 async def async_client(async_server, loop, test_client):
     cli = await loop.create_task(test_client(async_server))
+    endpoints.session = None
     yield cli
 
 
@@ -225,13 +227,18 @@ async def dc_session(request, async_server, monkeypatch, loop):
     Mock session manager for deck calibation
     """
     hw = async_server['com.opentrons.hardware']
+    print("Current Server Version {}".format(async_server['api_version']))
+    print("Current Hw type --->")
+    print(type(hw))
     if async_server['api_version'] == 2:
         await hw.cache_instruments({
             types.Mount.LEFT: None,
             types.Mount.RIGHT: 'p300_multi_v1'})
-
+        print("Cache instruments called \n")
+    # endpoints.session = None
     ses = endpoints.SessionManager(hw)
-    monkeypatch.setattr(endpoints, 'session', ses)
+    endpoints.session = ses
+    # monkeypatch.setattr(endpoints, 'session', ses)
     yield ses
 
 

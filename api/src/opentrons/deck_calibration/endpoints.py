@@ -69,7 +69,6 @@ class SessionManager:
     """
     def __init__(self, hardware):
         self.id = _get_uuid()
-        print("Initializing SM w/ id {}".format(self.id))
         self.pipettes = {}
         self.current_mount = None
         self.current_model = None
@@ -96,13 +95,17 @@ def init_pipette(hardware):
     """
     global session
     pipette_info = set_current_mount(hardware)
-    print("Initializing pipettes: {}".format(pipette_info))
+    # print("Initializing pipettes: {}".format(pipette_info))
     pipette = pipette_info['pipette']
     res = {}
     if pipette:
         session.current_model = pipette_info['model']
-        session.pipettes[pipette.mount] = pipette
-        res = {'mount': pipette.mount, 'model': pipette_info['model']}
+        if not feature_flags.use_protocol_api_v2():
+            mount = pipette.mount
+        else:
+            mount = pipette.get('mount')
+        session.pipettes[mount] = pipette
+        res = {'mount': mount, 'model': pipette_info['model']}
 
     log.info("Pipette info {}".format(session.pipettes))
 
@@ -117,10 +120,10 @@ def get_pipettes(hardware):
     right = attached_pipettes.get('right')
     if feature_flags.use_protocol_api_v2():
         if left['model'] in pipette_config.configs:
-            left_pipette = hardware.attached_pipettes()[types.Mount.LEFT]
+            left_pipette = hardware.attached_instruments[types.Mount.LEFT]
 
         if right['model'] in pipette_config.configs:
-            right_pipette = hardware.attached_pipettes()[types.Mount.RIGHT]
+            right_pipette = hardware.attached_instruments[types.Mount.RIGHT]
     else:
         if left['model'] in pipette_config.configs:
             pip_config = pipette_config.load(left['model'])
@@ -148,11 +151,24 @@ def set_current_mount(hardware):
     global session
     pipette = None
     model = None
+    right_channel = None
+    left_channel = None
     right_pipette, left_pipette = get_pipettes(hardware)
-    if right_pipette and right_pipette.channels == 1:
+    if not feature_flags.use_protocol_api_v2():
+        if right_pipette:
+            right_channel = right_pipette.channels
+        if left_pipette:
+            left_channel = left_pipette.channels
+    else:
+        if right_pipette:
+            right_channel = right_pipette.get('channels')
+        if left_pipette:
+            left_channel = left_pipette.get('channels')
+
+    if right_channel == 1:
         session.current_mount = 'A'
         pipette = right_pipette
-    elif left_pipette and left_pipette.channels == 1:
+    elif left_channel == 1:
         session.current_mount = 'Z'
         pipette = left_pipette
     else:
@@ -162,8 +178,12 @@ def set_current_mount(hardware):
         elif left_pipette:
             session.current_mount = 'Z'
             pipette = left_pipette
+
     if pipette:
-        model = pipette.name
+        if not feature_flags.use_protocol_api_v2():
+            model = pipette.name
+        else:
+            model = pipette.get('name')
     return {'pipette': pipette, 'model': model}
 
 
@@ -270,7 +290,7 @@ async def run_jog(data, hardware):
     else:
         if axis == 'z':
             axis = session.current_mount
-        # print("=---> Jogging {} {}".format(axis, direction * step))
+
         position = jog(axis.upper(), direction, step, hardware)
         message = 'Jogged to {}'.format(position)
         status = 200

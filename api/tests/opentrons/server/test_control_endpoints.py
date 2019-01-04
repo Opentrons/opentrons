@@ -54,7 +54,7 @@ async def test_get_pipettes(async_server, async_client, monkeypatch):
     test_model = 'p300_multi_v1'
     test_id = '123abc'
 
-    hw = async_server['com.opentrons.hardware']._backend
+    hw = async_server['com.opentrons.hardware']
     if async_server['api_version'] == 1:
         def dummy_read_model(mount):
             return test_model
