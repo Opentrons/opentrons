@@ -41,7 +41,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
   ingredSelectors.getLiquidGroupsById,
   ingredSelectors.getLiquidsByLabwareId,
   stepFormSelectors.getSavedStepForms,
-  stepFormSelectors.getOrderedSteps,
+  stepFormSelectors.getOrderedStepIds,
   stepFormSelectors.getPipetteEntities,
   (
     fileMetadata,
@@ -51,7 +51,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
     ingredients,
     ingredLocations,
     savedStepForms,
-    orderedSteps,
+    orderedStepIds,
     pipetteInvariantProperties,
   ) => {
     const {author, description, created} = fileMetadata
@@ -82,7 +82,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
     // TODO: Ian 2018-07-10 allow user to save steps in JSON file, even if those
     // step never have saved forms.
     // (We could just export the `steps` reducer, but we've sunset it)
-    const savedOrderedSteps = orderedSteps.filter(stepId => savedStepForms[stepId])
+    const savedOrderedStepIds = orderedStepIds.filter(stepId => savedStepForms[stepId])
 
     return {
       'protocol-schema': protocolSchemaVersion,
@@ -115,7 +115,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
           ingredients,
           ingredLocations,
           savedStepForms,
-          orderedSteps: savedOrderedSteps,
+          orderedStepIds: savedOrderedStepIds,
         },
       },
 

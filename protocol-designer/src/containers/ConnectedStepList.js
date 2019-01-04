@@ -17,14 +17,14 @@ import {StepList} from '../components/steplist'
 type Props = React.ElementProps<typeof StepList>
 
 type SP = {
-  orderedSteps: $PropertyType<Props, 'orderedSteps'>,
+  orderedStepIds: $PropertyType<Props, 'orderedStepIds'>,
 }
 
 type DP = $Diff<Props, SP>
 
 function mapStateToProps (state: BaseState): SP {
   return {
-    orderedSteps: stepFormSelectors.getOrderedSteps(state),
+    orderedStepIds: stepFormSelectors.getOrderedStepIds(state),
   }
 }
 

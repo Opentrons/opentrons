@@ -13,7 +13,7 @@ import {PortalRoot} from './TooltipPortal'
 import DraggableStepItems from './DraggableStepItems'
 
 type Props = {
-  orderedSteps: Array<StepIdType>,
+  orderedStepIds: Array<StepIdType>,
   reorderSelectedStep: (delta: number) => mixed,
   reorderSteps: (Array<StepIdType>) => mixed,
 }
@@ -51,7 +51,7 @@ export default class StepList extends React.Component<Props> {
           title='Protocol Timeline'>
           <StartingDeckStateTerminalItem />
           <DraggableStepItems
-            orderedSteps={this.props.orderedSteps.slice()}
+            orderedStepIds={this.props.orderedStepIds.slice()}
             reorderSteps={this.props.reorderSteps} />
           <StepCreationButton />
           <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />

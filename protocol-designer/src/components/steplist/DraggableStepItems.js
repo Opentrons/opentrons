@@ -59,7 +59,7 @@ const collectStepTarget = (connect) => ({
 const DragDropStepItem = DropTarget(DND_TYPES.STEP_ITEM, stepItemTarget, collectStepTarget)(DraggableStepItem)
 
 type StepItemsProps = {
-  orderedSteps: Array<StepIdType>,
+  orderedStepIds: Array<StepIdType>,
   reorderSteps: (Array<StepIdType>) => mixed,
   isOver: boolean,
   connectDropTarget: mixed => React.Element<any>,
@@ -68,11 +68,11 @@ type StepItemsState = {stepIds: Array<StepIdType>}
 class StepItems extends React.Component<StepItemsProps, StepItemsState> {
   constructor (props) {
     super(props)
-    this.state = {stepIds: this.props.orderedSteps}
+    this.state = {stepIds: this.props.orderedStepIds}
   }
 
   onDrag = () => {
-    this.setState({stepIds: this.props.orderedSteps})
+    this.setState({stepIds: this.props.orderedStepIds})
   }
 
   submitReordering = () => {
@@ -102,7 +102,7 @@ class StepItems extends React.Component<StepItemsProps, StepItemsState> {
   )
 
   render () {
-    const currentIds = this.props.isOver ? this.state.stepIds : this.props.orderedSteps
+    const currentIds = this.props.isOver ? this.state.stepIds : this.props.orderedStepIds
     return this.props.connectDropTarget(
       <div>
         <ContextMenu>
@@ -125,7 +125,7 @@ class StepItems extends React.Component<StepItemsProps, StepItemsState> {
 
 const listTarget = {
   drop: (props, monitor, component) => {
-    if (!isEqual(props.orderedSteps, component.state.stepIds)) {
+    if (!isEqual(props.orderedStepIds, component.state.stepIds)) {
       component.submitReordering()
     }
   },

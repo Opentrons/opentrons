@@ -144,10 +144,10 @@ function compoundCommandCreatorFromStepArgs (stepArgs: StepGeneration.CommandCre
 // exposes errors and last valid robotState
 export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSelector(
   stepFormSelectors.getArgsAndErrorsByStepId,
-  stepFormSelectors.getOrderedSteps,
+  stepFormSelectors.getOrderedStepIds,
   getInitialRobotState,
-  (allStepArgsAndErrors, orderedSteps, initialRobotState) => {
-    const allStepArgs: Array<StepGeneration.CommandCreatorData | null> = orderedSteps.map(stepId => {
+  (allStepArgsAndErrors, orderedStepIds, initialRobotState) => {
+    const allStepArgs: Array<StepGeneration.CommandCreatorData | null> = orderedStepIds.map(stepId => {
       return (allStepArgsAndErrors[stepId] && allStepArgsAndErrors[stepId].stepArgs) || null
     })
 
@@ -207,10 +207,10 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
 
 type WarningsPerStep = {[stepId: number | string]: ?Array<StepGeneration.CommandCreatorWarning>}
 export const timelineWarningsPerStep: Selector<WarningsPerStep> = createSelector(
-  stepFormSelectors.getOrderedSteps,
+  stepFormSelectors.getOrderedStepIds,
   getRobotStateTimeline,
-  (orderedSteps, timeline) => timeline.timeline.reduce((acc: WarningsPerStep, frame, timelineIndex) => {
-    const stepId = orderedSteps[timelineIndex]
+  (orderedStepIds, timeline) => timeline.timeline.reduce((acc: WarningsPerStep, frame, timelineIndex) => {
+    const stepId = orderedStepIds[timelineIndex]
 
     // remove warnings of duplicate 'type'. chosen arbitrarily
     return {
@@ -221,14 +221,14 @@ export const timelineWarningsPerStep: Selector<WarningsPerStep> = createSelector
 )
 
 export const getErrorStepId: Selector<?StepIdType> = createSelector(
-  stepFormSelectors.getOrderedSteps,
+  stepFormSelectors.getOrderedStepIds,
   getRobotStateTimeline,
-  (orderedSteps, timeline) => {
+  (orderedStepIds, timeline) => {
     const hasErrors = timeline.errors && timeline.errors.length > 0
     if (hasErrors) {
       // the frame *after* the last frame in the timeline is the error-throwing one
       const errorIndex = timeline.timeline.length
-      const errorStepId = orderedSteps[errorIndex]
+      const errorStepId = orderedStepIds[errorIndex]
       return errorStepId
     }
     return null

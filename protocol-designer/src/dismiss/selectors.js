@@ -32,9 +32,9 @@ export const getDismissedTimelineWarnings: Selector<DismissedWarningsAllSteps<Co
 export const getTimelineWarningsPerStep: Selector<DismissedWarningsAllSteps<CommandCreatorWarning>> = createSelector(
   getDismissedTimelineWarnings,
   timelineWarningsPerStep,
-  stepFormSelectors.getOrderedSteps,
-  (dismissedWarnings, warningsPerStep, orderedSteps) => {
-    return orderedSteps.reduce(
+  stepFormSelectors.getOrderedStepIds,
+  (dismissedWarnings, warningsPerStep, orderedStepIds) => {
+    return orderedStepIds.reduce(
       (stepAcc: DismissedWarningsAllSteps<CommandCreatorWarning>, stepId) => {
         const warningsForCurrentStep = warningsPerStep[stepId]
         const dismissedWarningsForStep = dismissedWarnings[stepId] || []

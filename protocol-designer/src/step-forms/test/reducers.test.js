@@ -1,5 +1,5 @@
 // @flow
-import {legacySteps as steps, orderedSteps} from '../reducers'
+import {legacySteps as steps, orderedStepIds} from '../reducers'
 
 describe('steps reducer', () => {
   test('initial add step', () => {
@@ -42,14 +42,14 @@ describe('steps reducer', () => {
   })
 })
 
-describe('orderedSteps reducer', () => {
+describe('orderedStepIds reducer', () => {
   test('initial add step', () => {
     const state = []
     const action = {
       type: 'ADD_STEP',
       payload: {id: '123', stepType: 'transfer'},
     }
-    expect(orderedSteps(state, action)).toEqual(['123'])
+    expect(orderedStepIds(state, action)).toEqual(['123'])
   })
 
   test('second add step', () => {
@@ -58,7 +58,7 @@ describe('orderedSteps reducer', () => {
       type: 'ADD_STEP',
       payload: {id: '22', stepType: 'transfer'},
     }
-    expect(orderedSteps(state, action)).toEqual(['123', '22'])
+    expect(orderedStepIds(state, action)).toEqual(['123', '22'])
   })
 
   describe('reorder steps', () => {
@@ -138,7 +138,7 @@ describe('orderedSteps reducer', () => {
           type: 'REORDER_SELECTED_STEP',
           payload,
         }
-        expect(orderedSteps(state, action)).toEqual(expected)
+        expect(orderedStepIds(state, action)).toEqual(expected)
       })
     })
   })
