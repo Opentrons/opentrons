@@ -82,25 +82,28 @@ export const unsavedForm = (rootState: RootState, action: UnsavedFormActions): F
     case 'SAVE_STEP_FORM': return unsavedFormInitialState
     case 'DELETE_STEP': return unsavedFormInitialState
     case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
-      const {substitutionMap} = action.payload
+      // only substitute unsaved step form if its ID is in the start-end range
+      const {substitutionMap, startStepId, endStepId} = action.payload
+      const stepIdsToUpdate = getIdsInRange(rootState.orderedSteps, startStepId, endStepId)
 
       if (
-        !unsavedFormState ||
-        !unsavedFormState.pipette ||
-        !(unsavedFormState.pipette in substitutionMap)
+        unsavedFormState &&
+        unsavedFormState.pipette &&
+        (unsavedFormState.pipette in substitutionMap) &&
+        unsavedFormState.id &&
+        stepIdsToUpdate.includes(unsavedFormState.id)
       ) {
-        return unsavedFormState
+        return {
+          ...unsavedFormState,
+          ...handleFormChange(
+            {pipette: substitutionMap[unsavedFormState.pipette]},
+            unsavedFormState,
+            addSpecsToPipetteInvariantProps(rootState.pipetteInvariantProperties),
+            rootState.labwareInvariantProperties
+          ),
+        }
       }
-
-      return {
-        ...unsavedFormState,
-        ...handleFormChange(
-          {pipette: substitutionMap[unsavedFormState.pipette]},
-          unsavedFormState,
-          addSpecsToPipetteInvariantProps(rootState.pipetteInvariantProperties),
-          rootState.labwareInvariantProperties
-        ),
-      }
+      return unsavedFormState
     }
     default:
       return unsavedFormState
@@ -279,7 +282,13 @@ export const savedStepForms = (
       const savedStepsUpdate = stepIdsToUpdate.reduce((acc, stepId) => {
         const prevStepForm = savedStepForms[stepId]
 
-        if (!prevStepForm.pipette || !(prevStepForm.pipette in substitutionMap)) return acc
+        const shouldSubstitute = Boolean(
+          prevStepForm && // pristine forms will not exist in savedStepForms
+          prevStepForm.pipette &&
+          prevStepForm.pipette in substitutionMap
+        )
+
+        if (!shouldSubstitute) return acc
 
         const updatedFields = handleFormChange(
           {pipette: substitutionMap[prevStepForm.pipette]},
