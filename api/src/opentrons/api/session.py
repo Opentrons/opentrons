@@ -437,10 +437,10 @@ def _get_labware(command):
     instrument = command.get('instrument')
 
     placeable = location
-    if isinstance(location, tuple):
-        placeable = location[0]
-    elif isinstance(location, Location):
+    if isinstance(location, Location):
         placeable = location.labware
+    elif isinstance(location, tuple):
+        placeable = location[0]
 
     maybe_module = _get_parent_module(placeable)
     modules.append(maybe_module)

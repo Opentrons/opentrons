@@ -9,6 +9,7 @@ from .types import CriticalPoint
 
 mod_log = logging.getLogger(__name__)
 
+
 class Pipette:
     """ A class to gather and track pipette state and configs.
 

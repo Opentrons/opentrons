@@ -1,3 +1,4 @@
+from opentrons.protocol_api import labware
 from opentrons.legacy_api.containers import Slot, placeable
 
 
@@ -51,6 +52,10 @@ class Instrument:
 class Module:
     def __init__(self, module, context=None):
         self.id = id(module)
-        self.name = module.get_name()
-        self.slot = module.parent.get_name()
+        if isinstance(module, labware.ModuleGeometry):
+            self.name = module.load_name
+            self.slow = module.parent
+        else:
+            self.name = module.get_name()
+            self.slot = module.parent.get_name()
         self._context = context

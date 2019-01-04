@@ -537,6 +537,7 @@ class ModuleGeometry:
         self._parent = parent
         self._display_name = "{} on {}".format(definition["displayName"],
                                                str(parent.labware))
+        self._load_name = definition["loadName"]
         self._offset = Point(definition["labwareOffset"]["x"],
                              definition["labwareOffset"]["y"],
                              definition["labwareOffset"]["z"])
@@ -555,6 +556,14 @@ class ModuleGeometry:
 
     def reset_labware(self):
         self._labware = None
+
+    @property
+    def load_name(self):
+        return self._load_name
+
+    @property
+    def parent(self):
+        return self._parent.labware
 
     @property
     def labware(self) -> Optional[Labware]:
