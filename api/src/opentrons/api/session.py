@@ -186,7 +186,8 @@ class Session(object):
                 sim = adapters.SynchronousAdapter.build(
                     API.build_hardware_simulator,
                     instrs,
-                    [mod.name() for mod in self._hardware.attached_modules])
+                    [mod.name()
+                     for mod in self._hardware.attached_modules.values()])
                 sim.home()
                 self._simulating_ctx = ProtocolContext(self._loop,
                                                        sim)
