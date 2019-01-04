@@ -301,11 +301,14 @@ describe('single transfer exceeding pipette max', () => {
   })
 
   test('split up volume without going below pipette min', () => {
-    transferArgs = {
+    // TODO: Ian 2019-01-04 for some reason, doing transferArgs = {...transferArgs, ...etc}
+    // works everywhere but here - here, it makes Jest fail with "Jest encountered an unexpected token"
+    const _transferArgs = {
       ...transferArgs,
       volume: 629,
       changeTip: 'never', // don't test tip use here
     }
+    transferArgs = _transferArgs
 
     // begin with tip on pipette
     robotInitialState.tipState.pipettes.p300SingleId = true
