@@ -154,30 +154,12 @@ export const savedStepForms = (
         ...getDefaultsForStepType(stepForm.stepType),
         ...stepForm,
       }))
-    case 'DUPLICATE_LABWARE': {
-      // NOTE: almost identical to 'CREATE_CONTAINER' case, but flow doesn't like different payloads
-      const prevInitialDeckSetupStep = savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
-      const {duplicateLabwareId} = action.payload
-      const slot = _getNextAvailableSlot(prevInitialDeckSetupStep.labwareLocationUpdate)
-      if (!slot) {
-        console.warn('no slots available, ignoring action:', action)
-        return savedStepForms
-      }
-      return {
-        ...savedStepForms,
-        [INITIAL_DECK_SETUP_STEP_ID]: {
-          ...prevInitialDeckSetupStep,
-          labwareLocationUpdate: {
-            ...prevInitialDeckSetupStep.labwareLocationUpdate,
-            [duplicateLabwareId]: slot,
-          },
-        },
-      }
-    }
-    case 'CREATE_CONTAINER': {
+    case 'DUPLICATE_LABWARE':
+    case 'CREATE_CONTAINER':
       // auto-update initial deck setup state.
       const prevInitialDeckSetupStep = savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
-      const {id} = action.payload
+      const labwareId = action.type === 'CREATE_CONTAINER' ? action.payload.id : action.payload.duplicateLabwareId
+
       const slot = action.payload.slot || _getNextAvailableSlot(prevInitialDeckSetupStep.labwareLocationUpdate)
       if (!slot) {
         console.warn('no slots available, ignoring action:', action)
@@ -189,11 +171,10 @@ export const savedStepForms = (
           ...prevInitialDeckSetupStep,
           labwareLocationUpdate: {
             ...prevInitialDeckSetupStep.labwareLocationUpdate,
-            [id]: slot,
+            [labwareId]: slot,
           },
         },
       }
-    }
     case 'DELETE_CONTAINER':
       return mapValues(savedStepForms, savedForm => {
         if (
