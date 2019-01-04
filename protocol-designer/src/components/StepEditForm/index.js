@@ -2,6 +2,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import get from 'lodash/get'
+import isEqual from 'lodash/isEqual'
 import without from 'lodash/without'
 import cx from 'classnames'
 
@@ -9,6 +10,7 @@ import {actions} from '../../steplist'
 import {selectors as stepFormSelectors} from '../../step-forms'
 import type {FormData, StepType, StepFieldName, StepIdType} from '../../form-types'
 import type {BaseState, ThunkDispatch} from '../../types'
+import getDefaultsForStepType from '../../steplist/formLevel/getDefaultsForStepType.js'
 import formStyles from '../forms.css'
 import MoreOptionsModal from '../modals/MoreOptionsModal'
 import styles from './StepEditForm.css'
@@ -51,9 +53,27 @@ type StepEditFormState = {
 type Props = SP & DP
 
 // TODO: type fieldNames, don't use `any`
-const getDirtyFields = (isNewStep: ?boolean, formData: ?FormData): Array<any> => (
-  isNewStep ? [] : without(Object.keys(formData || {}), 'stepType', 'id')
-)
+const getDirtyFields = (isNewStep: ?boolean, formData: ?FormData): Array<any> => {
+  let dirtyFields = []
+  if (!isNewStep && formData) {
+    dirtyFields = Object.keys(formData)
+  } else if (formData && formData.stepType) {
+    // new step, but may have auto-populated fields.
+    // "Dirty" any fields that differ from default new form values
+    const defaultFormData = getDefaultsForStepType(formData.stepType)
+    dirtyFields = Object.keys(defaultFormData).reduce((acc, fieldName: StepFieldName) => {
+      // $FlowFixMe formData is no longer a Maybe type b/c of the `if` above, but flow forgets
+      const currentValue = formData[fieldName]
+      const initialValue = defaultFormData[fieldName]
+
+      return isEqual(currentValue, initialValue)
+        ? acc
+        : [...acc, fieldName]
+    }, [])
+  }
+  // exclude form "metadata" (not really fields)
+  return without(dirtyFields, 'stepType', 'id')
+}
 
 class StepEditForm extends React.Component<Props, StepEditFormState> {
   constructor (props: Props) {

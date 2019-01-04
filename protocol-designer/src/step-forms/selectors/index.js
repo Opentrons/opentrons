@@ -276,7 +276,9 @@ export const getIsNewStepForm = createSelector(
   getUnsavedForm,
   getSavedStepForms,
   (formData, savedForms) =>
-    Boolean(formData && formData.id != null && !savedForms[formData.id])
+    (formData && formData.id != null)
+      ? !savedForms[formData.id]
+      : true
 )
 
 export const getFormLevelWarningsForUnsavedForm: Selector<Array<FormWarning>> = createSelector(
