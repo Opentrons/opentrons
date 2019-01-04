@@ -117,7 +117,7 @@ async def test_correct_hotspots():
 
     rel_x_start = (size_x / 2) + switch_clearance
     rel_y_start = (size_y / 2) + switch_clearance
-    center = [293.03, 301.27, 77.0]
+    center = [293.03, 301.27, 74.3]
 
     nozzle_safe_z = round((size_z - tip_length) + z_probe_clearance, 3)
     z_start = max(deck_clearance, nozzle_safe_z)
