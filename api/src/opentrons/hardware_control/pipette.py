@@ -81,7 +81,7 @@ class Pipette:
                         self._instrument_offset._replace(z=0))
             if cp_type == CriticalPoint.TIP:
                 info_str += '- current_tip_length: {}=(true tip length: {}'\
-                    ' + inst z: {}) (z only)'.format(
+                    ' - inst z: {}) (z only)'.format(
                         self.current_tip_length, self._current_tip_length,
                         self._instrument_offset.z)
             info_str += ')'
@@ -98,7 +98,7 @@ class Pipette:
         """ The length of the current tip attached (0.0 if no tip) """
         return (self._current_tip_length
                 - self._config.tip_overlap
-                + self._instrument_offset.z)
+                - self._instrument_offset.z)
 
     @property
     def available_volume(self) -> float:
