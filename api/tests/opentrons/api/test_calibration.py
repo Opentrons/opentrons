@@ -157,6 +157,7 @@ async def test_correct_hotspots():
 
 @pytest.mark.api2_only
 async def test_move_to_front_api2(main_router, model):
+    main_router.calibration_manager._hardware.home()
     with mock.patch.object(main_router.calibration_manager._hardware._api,
                            'move_to') as patch:
         main_router.calibration_manager.move_to_front(model.instrument)

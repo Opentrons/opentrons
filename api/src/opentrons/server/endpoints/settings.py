@@ -2,29 +2,50 @@ import logging
 import shutil
 import os
 from aiohttp import web
-from opentrons.config import advanced_settings as advs, robot_configs as rc
+from opentrons.config import (advanced_settings as advs,
+                              robot_configs as rc,
+                              feature_flags as ff)
 from opentrons.data_storage import database as db
 from opentrons.protocol_api import labware
 
 log = logging.getLogger(__name__)
 
-_settings_reset_options = [
-    {
-        'id': 'tipProbe',
-        'name': 'Tip Length',
-        'description': 'Clear tip probe data'
-    },
-    {
-        'id': 'labwareCalibration',
-        'name': 'Labware Calibration',
-        'description': 'Clear labware calibration'
-    },
-    {
-        'id': 'bootScripts',
-        'name': 'Boot Scripts',
-        'description': 'Clear custom boot scripts'
-    }
-]
+if ff.use_protocol_api_v2():
+    _settings_reset_options = [
+        {
+            'id': 'tipProbe',
+            'name': 'Tip Length',
+            'description': 'Clear tip probe data'
+        },
+        {
+            'id': 'labwareCalibration',
+            'name': 'Labware Calibration',
+            'description': 'Clear labware calibration'
+        },
+        {
+            'id': 'bootScripts',
+            'name': 'Boot Scripts',
+            'description': 'Clear custom boot scripts'
+        }
+    ]
+else:
+    _settings_reset_options = [
+        {
+            'id': 'tipProbe',
+            'name': 'Instrument Offset',
+            'description': 'Clear instrument offset calibration data'
+        },
+        {
+            'id': 'labwareCalibration',
+            'name': 'Labware Calibration',
+            'description': 'Clear labware calibration'
+        },
+        {
+            'id': 'bootScripts',
+            'name': 'Boot Scripts',
+            'description': 'Clear custom boot scripts'
+        }
+    ]
 
 
 async def get_advanced_settings(request: web.Request) -> web.Response:
@@ -77,11 +98,18 @@ async def reset(request: web.Request) -> web.Response:
     log.info("Reset requested for {}".format(', '.join(data.keys())))
     if data.get('tipProbe'):
         config = rc.load()
-        config.tip_length.clear()
+        if ff.use_protocol_api_v2():
+            config = config._replace(
+                instrument_offset=rc.build_fallback_instrument_offset({}))
+        else:
+            config.tip_length.clear()
         rc.save_robot_settings(config)
     if data.get('labwareCalibration'):
-        db.reset()
-        labware.clear_calibrations()
+        if ff.use_protocol_api_v2():
+            labware.clear_calibrations()
+        else:
+            db.reset()
+
     if data.get('bootScripts'):
         if os.environ.get('RUNNING_ON_PI'):
             if os.path.exists('/data/boot.d'):

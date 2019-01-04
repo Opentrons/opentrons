@@ -168,7 +168,7 @@ def _default_probe_dimensions():
     return [35.0, 40.0, probe_height + 5.0]
 
 
-def _build_fallback_instrument_offset(robot_settings: dict) -> dict:
+def build_fallback_instrument_offset(robot_settings: dict) -> dict:
     # because `instrument_offset` is a dict of dicts, we must loop through it
     # and replace empty values with the default offset
     inst_offs: dict = {'right': {}, 'left': {}}
@@ -211,7 +211,7 @@ def _build_tip_probe(tip_probe_settings: dict) -> tip_probe_config:
                                                 TIP_PROBE_SWITCH_CLEARANCE),
         z_clearance=_build_z_clearance(tip_probe_settings.get('z_clearance',
                                                               {})),
-        center=tip_probe_settings.get('center', _default_probe_center()),
+        center=_default_probe_center(),
         dimensions=tip_probe_settings.get('dimensions',
                                           _default_probe_dimensions())
     )
@@ -225,7 +225,7 @@ def _build_config(deck_cal: List[List[float]],
         steps_per_mm=robot_settings.get('steps_per_mm', DEFAULT_STEPS_PER_MM),
         acceleration=robot_settings.get('acceleration', DEFAULT_ACCELERATION),
         gantry_calibration=deck_cal or DEFAULT_DECK_CALIBRATION,
-        instrument_offset=_build_fallback_instrument_offset(robot_settings),
+        instrument_offset=build_fallback_instrument_offset(robot_settings),
         tip_length=robot_settings.get('tip_length', DEFAULT_TIP_LENGTH_DICT),
         mount_offset=robot_settings.get('mount_offset', DEFAULT_MOUNT_OFFSET),
         serial_speed=robot_settings.get('serial_speed', SERIAL_SPEED),

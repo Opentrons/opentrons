@@ -35,8 +35,7 @@ async def test_input_checks(hardware_api, monkeypatch):
     await hardware_api.locate_tip_probe_center(Mount.RIGHT)
 
     assert hardware_api._attached_instruments[Mount.RIGHT].has_tip
-    with pytest.raises(AssertionError):
-        await hardware_api.locate_tip_probe_center(Mount.RIGHT, 20)
+    await hardware_api.locate_tip_probe_center(Mount.RIGHT, 20)
 
 
 @pytest.mark.parametrize('mount', [Mount.RIGHT, Mount.LEFT])

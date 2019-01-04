@@ -122,10 +122,17 @@ class CalibrationManager:
         log.info('Moving {}'.format(instrument.name))
         self._set_state('moving')
         if ff.use_protocol_api_v2():
+            current = self._hardware.gantry_position(Mount[inst.mount.upper()])
             dest = instrument._context.deck.position_for(5)\
                                            .point._replace(z=150)
-            self._hardware.move_to(Mount[inst.mount.upper()], dest,
+            self._hardware.move_to(Mount[inst.mount.upper()],
+                                   current,
                                    critical_point=CriticalPoint.NOZZLE)
+            self._hardware.move_to(Mount[inst.mount.upper()],
+                                   dest._replace(z=current.z),
+                                   critical_point=CriticalPoint.NOZZLE)
+            self._hardware.move_to(Mount[inst.mount.upper()],
+                                   dest, critical_point=CriticalPoint.NOZZLE)
         else:
             calibration_functions.move_instrument_for_probing_prep(
                 inst, inst.robot)
