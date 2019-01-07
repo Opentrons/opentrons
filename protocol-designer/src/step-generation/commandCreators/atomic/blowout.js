@@ -11,7 +11,7 @@ const blowout = (args: PipetteLabwareFields): CommandCreator => (prevRobotState:
   const actionName = 'blowout'
   let errors: Array<CommandCreatorError> = []
 
-  const pipetteData = prevRobotState.instruments[pipette]
+  const pipetteData = prevRobotState.pipettes[pipette]
 
   // TODO Ian 2018-04-30 this logic using command creator args + robotstate to push errors
   // is duplicated across several command creators (eg aspirate & blowout overlap).

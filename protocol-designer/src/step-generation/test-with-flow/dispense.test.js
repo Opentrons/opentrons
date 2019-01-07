@@ -165,7 +165,7 @@ describe('dispense', () => {
           volume: 152,
           well: 'A1',
           labwareType: 'trough-12row',
-          pipetteData: robotStateWithTip.instruments.p300SingleId,
+          pipetteData: robotStateWithTip.pipettes.p300SingleId,
         },
         robotStateWithTip.liquidState
       )

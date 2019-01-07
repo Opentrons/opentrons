@@ -27,7 +27,7 @@ const consolidate = (data: ConsolidateFormData): CompoundCommandCreator => (prev
   */
   const actionName = 'consolidate'
 
-  const pipetteData = prevRobotState.instruments[data.pipette]
+  const pipetteData = prevRobotState.pipettes[data.pipette]
   if (!pipetteData) {
     // bail out before doing anything else
     return [(_robotState) => ({

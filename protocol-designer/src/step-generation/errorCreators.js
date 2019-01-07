@@ -25,7 +25,7 @@ export function noTipOnPipette (args: {
 export function pipetteDoesNotExist (args: {actionName: string, pipette: string}): CommandCreatorError {
   const {actionName, pipette} = args
   return {
-    message: `Attempted to ${actionName} with pipette id "${pipette}", this pipette was not found under "instruments"`,
+    message: `Attempted to ${actionName} with pipette id "${pipette}", this pipette was not found under "pipettes"`,
     type: 'PIPETTE_DOES_NOT_EXIST',
   }
 }

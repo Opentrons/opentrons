@@ -1,6 +1,7 @@
 // @flow
 import range from 'lodash/range'
 import isEmpty from 'lodash/isEmpty'
+import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import {mergeLiquid, splitLiquid, getWellsForTips, totalVolume} from './utils'
 import * as warningCreators from './warningCreators'
 import type {
@@ -26,7 +27,11 @@ export default function updateLiquidState (
   prevLiquidState: LiquidState
 ): LiquidStateAndWarnings {
   const {pipetteId, pipetteData, volume, labwareId, labwareType, well} = args
-  const {wellsForTips} = getWellsForTips(pipetteData.channels, labwareType, well)
+  const pipetteSpec = getPipetteNameSpecs(pipetteData.name)
+  if (!pipetteSpec) {
+    throw Error(`No pipette spec for ${pipetteId} ${pipetteData.name}, could not aspirateUpdateLiquidState`)
+  }
+  const {wellsForTips} = getWellsForTips(pipetteSpec.channels, labwareType, well)
 
   // Blend tip's liquid contents (if any) with liquid of the source
   // to update liquid state in all pipette tips
@@ -34,7 +39,7 @@ export default function updateLiquidState (
     pipetteLiquidState: SingleLabwareLiquidState,
     pipetteWarnings: Array<CommandCreatorWarning>,
   }
-  const {pipetteLiquidState, pipetteWarnings} = range(pipetteData.channels).reduce(
+  const {pipetteLiquidState, pipetteWarnings} = range(pipetteSpec.channels).reduce(
     (acc: PipetteLiquidStateAcc, tipIndex) => {
       const prevTipLiquidState = prevLiquidState.pipettes[pipetteId][tipIndex.toString()]
       const prevSourceLiquidState = prevLiquidState.labware[labwareId][wellsForTips[tipIndex]]

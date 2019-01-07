@@ -41,15 +41,15 @@ function _getSelectedWellsForStep (
   }
 
   const pipetteId = form.pipette
-  const pipetteChannels = StepGeneration.getPipetteChannels(pipetteId, robotState)
+  const pipetteSpec = StepGeneration.getPipetteSpecFromId(pipetteId, robotState)
   const labwareType = StepGeneration.getLabwareType(labwareId, robotState)
 
-  if (!pipetteChannels || !labwareType) {
+  if (!pipetteSpec || !labwareType) {
     return []
   }
 
   const getWells = (wells: Array<string>) =>
-    _wellsForPipette(pipetteChannels, labwareType, wells)
+    _wellsForPipette(pipetteSpec.channels, labwareType, wells)
 
   let wells = []
 

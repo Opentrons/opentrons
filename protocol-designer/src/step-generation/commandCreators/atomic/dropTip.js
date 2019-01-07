@@ -34,7 +34,7 @@ const dropTip = (pipetteId: string): CommandCreator => (prevRobotState: RobotSta
       ...nextRobotState,
       liquidState: updateLiquidState({
         pipetteId: pipetteId,
-        pipetteData: prevRobotState.instruments[pipetteId],
+        pipetteData: prevRobotState.pipettes[pipetteId],
         labwareId: FIXED_TRASH_ID,
         labwareType: 'fixed-trash',
         useFullVolume: true,

@@ -8,7 +8,7 @@ const touchTip = (args: TouchTipArgs): CommandCreator => (prevRobotState: RobotS
   const actionName = 'touchTip'
   const {pipette, labware, well, offsetFromBottomMm} = args
 
-  const pipetteData = prevRobotState.instruments[pipette]
+  const pipetteData = prevRobotState.pipettes[pipette]
 
   let errors: Array<CommandCreatorError> = []
 

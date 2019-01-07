@@ -23,7 +23,7 @@ function mapStateToProps (state: BaseState): SP {
   const props = (labwareData)
     ? {
       labwareType: labwareData.type,
-      nickname: labwareData.name || 'Unnamed Labware',
+      nickname: labwareData.nickname || 'Unnamed Labware',
     }
     : {
       labwareType: '?',

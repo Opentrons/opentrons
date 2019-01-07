@@ -2,6 +2,7 @@
 import range from 'lodash/range'
 import isEmpty from 'lodash/isEmpty'
 import {mergeLiquid, splitLiquid, getWellsForTips, totalVolume} from '../utils'
+import {getPipetteSpecFromId} from '../robotStateSelectors'
 import * as warningCreators from '../warningCreators'
 import type {
   RobotState,
@@ -18,10 +19,10 @@ export default function getNextRobotStateAndWarningsForAspDisp (
   const {pipette: pipetteId, volume, labware: labwareId, well} = args
 
   const {liquidState: prevLiquidState} = prevRobotState
-  const pipetteData = prevRobotState.instruments[pipetteId]
+  const pipetteSpec = getPipetteSpecFromId(pipetteId, prevRobotState)
   const labwareType = prevRobotState.labware[labwareId].type
 
-  const {wellsForTips} = getWellsForTips(pipetteData.channels, labwareType, well)
+  const {wellsForTips} = getWellsForTips(pipetteSpec.channels, labwareType, well)
 
   // Blend tip's liquid contents (if any) with liquid of the source
   // to update liquid state in all pipette tips
@@ -29,7 +30,7 @@ export default function getNextRobotStateAndWarningsForAspDisp (
     pipetteLiquidState: SingleLabwareLiquidState,
     pipetteWarnings: Array<CommandCreatorWarning>,
   }
-  const {pipetteLiquidState, pipetteWarnings} = range(pipetteData.channels).reduce(
+  const {pipetteLiquidState, pipetteWarnings} = range(pipetteSpec.channels).reduce(
     (acc: PipetteLiquidStateAcc, tipIndex) => {
       const prevTipLiquidState = prevLiquidState.pipettes[pipetteId][tipIndex.toString()]
       const prevSourceLiquidState = prevLiquidState.labware[labwareId][wellsForTips[tipIndex]]

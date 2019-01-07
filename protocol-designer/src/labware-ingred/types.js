@@ -9,6 +9,7 @@ import type {LabwareData, LocationLiquidState} from '../step-generation'
 export type Labware = {|
   ...LabwareData,
   id: string,
+  nickname?: string,
   disambiguationNumber: number,
 |}
 

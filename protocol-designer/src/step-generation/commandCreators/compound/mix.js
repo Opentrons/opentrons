@@ -61,7 +61,7 @@ const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: Robo
   } = data
 
   // Errors
-  if (!prevRobotState.instruments[pipette]) {
+  if (!prevRobotState.pipettes[pipette]) {
     // bail out before doing anything else
     return [(_robotState) => ({
       errors: [errorCreators.pipetteDoesNotExist({actionName, pipette})],

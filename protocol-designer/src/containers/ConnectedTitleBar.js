@@ -47,7 +47,7 @@ function mapStateToProps (state: BaseState): SP {
   const selectedStep = stepsSelectors.getSelectedStep(state)
   const selectedTerminalId = stepsSelectors.getSelectedTerminalItemId(state)
   const labware = labwareIngredSelectors.getSelectedLabware(state)
-  const labwareNames = labwareIngredSelectors.getLabwareNames(state)
+  const labwareNames = labwareIngredSelectors.getLabwareNicknamesById(state)
   const labwareNickname = labware && labware.id && labwareNames[labware.id]
   const drilledDownLabwareId = labwareIngredSelectors.getDrillDownLabwareId(state)
   const liquidPlacementMode = !!labwareIngredSelectors.getSelectedLabware(state)
@@ -87,7 +87,7 @@ function mapStateToProps (state: BaseState): SP {
         if (drilledDownLabwareId) {
           backButtonLabel = 'Deck'
           const drilledDownLabware = labwareIngredSelectors.getLabwareById(state)[drilledDownLabwareId]
-          title = drilledDownLabware && drilledDownLabware.name
+          title = drilledDownLabware && drilledDownLabware.nickname
           subtitle = drilledDownLabware && humanizeLabwareType(drilledDownLabware.type)
         }
       } else if (selectedStep) {
