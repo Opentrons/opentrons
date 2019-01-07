@@ -15,8 +15,8 @@ if ff.use_protocol_api_v2():
     _settings_reset_options = [
         {
             'id': 'tipProbe',
-            'name': 'Tip Length',
-            'description': 'Clear tip probe data'
+            'name': 'Instrument Offset',
+            'description': 'Clear instrument offset calibration data'
         },
         {
             'id': 'labwareCalibration',
@@ -33,8 +33,8 @@ else:
     _settings_reset_options = [
         {
             'id': 'tipProbe',
-            'name': 'Instrument Offset',
-            'description': 'Clear instrument offset calibration data'
+            'name': 'Tip Length',
+            'description': 'Clear tip probe data'
         },
         {
             'id': 'labwareCalibration',
