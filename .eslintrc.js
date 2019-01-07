@@ -12,6 +12,7 @@ module.exports = {
   plugins: [
     'flowtype',
     'react',
+    'json',
   ],
 
   rules: {
