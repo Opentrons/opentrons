@@ -22,7 +22,7 @@ const ErrorContents = (props: ErrorContentsProps) => {
       default:
         return (
           <React.Fragment>
-            {i18n.t(`alert.timeline.error.${props.errorType}.body`, {defaultValue: ''})}
+            {i18n.t(`alert.timeline.error.${props.errorType}.body`, {defaultValue: ''}) || null}
           </React.Fragment>
         )
     }
