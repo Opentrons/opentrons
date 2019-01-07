@@ -8,13 +8,13 @@ import type {LabwareComponentProps} from '@opentrons/components'
 
 import {
   ContainerNameOverlay,
+  ModuleNameOverlay,
   LabwareContainer,
   Labware as LabwareComponent,
   humanizeLabwareType,
 } from '@opentrons/components'
 
 import LabwareSpinner from './LabwareSpinner'
-import ModuleNameOverlay from './ModuleNameOverlay'
 import styles from './styles.css'
 
 export type LabwareItemProps = LabwareComponentProps & {

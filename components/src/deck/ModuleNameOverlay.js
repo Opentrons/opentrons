@@ -1,10 +1,11 @@
 // @flow
 import * as React from 'react'
 
-import styles from './styles.css'
+import styles from './Module.css'
 
 type Props = {name: string}
 
+// TODO (ka 2019-1-7): should these be optionally overridden with props?
 const HEIGHT = 20
 const PADDING_LEFT = 4
 

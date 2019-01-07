@@ -8,6 +8,7 @@ import Well from './Well'
 import Tip from './Tip'
 import type {SingleWell} from './Well'
 import Module from './Module'
+import ModuleNameOverlay from './ModuleNameOverlay'
 import type {ModuleType} from './Module'
 
 import {ContainerNameOverlay} from './ContainerNameOverlay'
@@ -26,6 +27,7 @@ export {
   LabwareOutline,
   LabwareLabels,
   Module,
+  ModuleNameOverlay,
   SlotOverlay,
   Well,
   Tip,
