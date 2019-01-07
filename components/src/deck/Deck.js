@@ -27,21 +27,46 @@ export type LabwareComponentProps = {
 type Props = {
   className?: string,
   LabwareComponent?: React.ComponentType<LabwareComponentProps>,
+  DragPreviewLayer?: any, // TODO: BC 2019-01-03 flow doesn't like portals
 }
 
-export default function Deck (props: Props) {
-  const {className, LabwareComponent} = props
+const VIEW_BOX_WIDTH = 427
+const VIEW_BOX_HEIGHT = 390
 
-  return (
-    // TODO(mc, 2018-07-16): is this viewBox in mm?
-    <svg viewBox={'0 0 427 390'} className={cx(styles.deck, className)}>
-      <DeckOutline />
-      {/* All containers */}
-      <g transform={`translate(${SLOT_OFFSET_MM} ${SLOT_OFFSET_MM})`}>
-        {renderLabware(LabwareComponent)}
-      </g>
-    </svg>
-  )
+export default class Deck extends React.Component<Props> {
+  // TODO Ian 2018-02-22 No support in Flow for SVGElement yet: https://github.com/facebook/flow/issues/2332
+  // this `parentRef` should be HTMLElement | SVGElement
+  parentRef: ?any
+
+  getXY = (rawX: number, rawY: number) => {
+    if (!this.parentRef) return {}
+    const clientRect: {width: number, height: number, left: number, top: number} = this.parentRef.getBoundingClientRect()
+
+    const widthCoefficient = (VIEW_BOX_WIDTH - (SLOT_OFFSET_MM * 2) - (SLOT_SPACING_MM * 2)) / clientRect.width
+    const heightCoefficient = (VIEW_BOX_HEIGHT - (SLOT_OFFSET_MM * 2) - (SLOT_SPACING_MM * 3)) / clientRect.height
+    const scaledXOffset = (SLOT_OFFSET_MM / VIEW_BOX_WIDTH) * clientRect.width
+    const scaledYOffset = (SLOT_OFFSET_MM / VIEW_BOX_HEIGHT) * clientRect.height
+    const scaledX = ((rawX - clientRect.left) * widthCoefficient) + scaledXOffset
+    const scaledY = ((rawY - clientRect.top) * heightCoefficient) + scaledYOffset
+    return {scaledX, scaledY}
+  }
+  render () {
+    const {className, LabwareComponent, DragPreviewLayer} = this.props
+
+    return (
+      // TODO(mc, 2018-07-16): is this viewBox in mm?
+      <svg viewBox={'0 0 427 390'} className={cx(styles.deck, className)}>
+        <DeckOutline />
+        {/* All containers */}
+        <g
+          ref={ref => { this.parentRef = ref }}
+          transform={`translate(${SLOT_OFFSET_MM} ${SLOT_OFFSET_MM})`}>
+          {renderLabware(LabwareComponent)}
+        </g>
+        {DragPreviewLayer && <DragPreviewLayer getXY={this.getXY} />}
+      </svg>
+    )
+  }
 }
 
 function renderLabware (LabwareComponent): React.Node[] {

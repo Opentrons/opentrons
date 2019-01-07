@@ -1,11 +1,16 @@
 // @flow
 import * as React from 'react'
-import { DragSource, DropTarget } from 'react-dnd'
+import {connect} from 'react-redux'
+import { DragSource, DropTarget, DragLayer } from 'react-dnd'
 import isEqual from 'lodash/isEqual'
 
+import {PDTitledList} from '../lists'
 import StepItem from '../../containers/ConnectedStepItem'
-import type {StepIdType} from '../../form-types'
+import {stepIconsByType, type StepIdType, type StepType} from '../../form-types'
+import {selectors as stepFormSelectors} from '../../step-forms'
+import type {BaseState} from '../../types'
 import ContextMenu from './ContextMenu'
+import styles from './StepItem.css'
 
 const DND_TYPES: {STEP_ITEM: "STEP_ITEM"} = {
   STEP_ITEM: 'STEP_ITEM',
@@ -118,10 +123,48 @@ class StepItems extends React.Component<StepItemsProps, StepItemsState> {
             ))
           )}
         </ContextMenu>
+        <StepDragPreviewLayer />
       </div>
     )
   }
 }
+
+const NAV_OFFSET = 64
+
+type StepDragPreviewSP = {stepType: ?StepType, stepName: ?string}
+type StepDragPreviewProps = {
+  currentOffset?: {y: number, x: number},
+  itemType: string,
+  isDragging: boolean,
+  item: {stepId: StepIdType},
+}
+const StepDragPreview = (props: StepDragPreviewProps & StepDragPreviewSP) => {
+  const {itemType, isDragging, currentOffset, stepType, stepName} = props
+  if (itemType !== DND_TYPES.STEP_ITEM || !isDragging || !stepType || !currentOffset) return null
+  return (
+    <div className={styles.step_drag_preview} style={{left: currentOffset.x - NAV_OFFSET, top: currentOffset.y}}>
+      <PDTitledList
+        iconName={stepIconsByType[stepType]}
+        title={stepName || ''}
+        onCollapseToggle={() => {}} // NOTE: necessary to render chevron
+        collapsed>
+      </PDTitledList>
+    </div>
+  )
+}
+
+const mapSTPForPreview = (state: BaseState, ownProps: StepDragPreviewProps): StepDragPreviewSP => {
+  const savedForm = ownProps.item && stepFormSelectors.getSavedStepForms(state)[ownProps.item.stepId]
+  const {stepType, stepName} = savedForm || {}
+  return {stepType, stepName}
+}
+
+export const StepDragPreviewLayer = DragLayer(monitor => ({
+  currentOffset: monitor.getSourceClientOffset(),
+  isDragging: monitor.isDragging(),
+  itemType: monitor.getItemType(),
+  item: monitor.getItem(),
+}))(connect(mapSTPForPreview)(StepDragPreview))
 
 const listTarget = {
   drop: (props, monitor, component) => {

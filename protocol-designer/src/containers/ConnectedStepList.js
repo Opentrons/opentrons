@@ -1,8 +1,6 @@
 // @flow
 import * as React from 'react'
-import HTML5Backend from 'react-dnd-html5-backend'
 import {connect} from 'react-redux'
-import { DragDropContext } from 'react-dnd'
 import type {BaseState, ThunkDispatch} from '../types'
 import type {StepIdType} from '../form-types'
 
@@ -39,4 +37,4 @@ function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export default DragDropContext(HTML5Backend)(connect(mapStateToProps, mapDispatchToProps)(StepList))
+export default connect(mapStateToProps, mapDispatchToProps)(StepList)
