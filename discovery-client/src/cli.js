@@ -1,5 +1,6 @@
 // @flow
 import DiscoveryClient from '.'
+import {version} from '../package.json'
 
 const LOG_LVLS = ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly']
 const noop = (...args: Array<*>) => {}
@@ -65,7 +66,7 @@ require('yargs')
     },
     find
   )
-  .version()
+  .version(version)
   .help()
   .parse()
 

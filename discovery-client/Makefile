@@ -8,9 +8,10 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # source and output directories for main process code
 src_dir := src
 lib_dir := lib
-src_ignore := "**/__@(tests|mocks|fixtures)__/**"
-babel := babel $(src_dir) --ignore $(src_ignore) --out-dir $(lib_dir)
-flow_copy := flow-copy-source --ignore $(src_ignore) $(src_dir) $(lib_dir)
+src_ignore_glob := "**/__@(tests|mocks|fixtures)__/**"
+src_ignore := "**/__tests__/**","**/__mocks__/**","**/__fixtures__/**"
+babel := babel $(src_dir) --root-mode upward --ignore $(src_ignore) --out-dir $(lib_dir)
+flow_copy := flow-copy-source --ignore $(src_ignore_glob) $(src_dir) $(lib_dir)
 
 # standard targets
 #####################################################################
