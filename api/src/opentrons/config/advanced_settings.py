@@ -66,13 +66,12 @@ settings = [
                     ' power cycle the robot after changing this setting.'
     ),
     Setting(
-        _id='useNewP10Aspiration',
-        title='Use New P10 Single Calibration',
-        description="""This calibration includes a refinement to the aspiration
-        function based on an expanded data set. This is a small but material
-        change to the P10's pipetting performance, in particular decreasing the
-        low-volume µl-to-mm conversion factor to address under-aspiration
-        issues"""
+        _id='useOldAspirationFunctions',
+        title='Use older pipette calibrations',
+        description='Use the older pipette calibrations for P10S, P10M, P50S,'
+                    ' P50M, and P300S pipettes. Note this will cause the '
+                    ' default aspirate behavior (ul to mm conversion) to '
+                    ' function as it did prior to version 3.7.0.'
     )
 ]
 

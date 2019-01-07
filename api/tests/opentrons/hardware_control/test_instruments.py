@@ -113,7 +113,20 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
     await sim.cache_instruments({types.Mount.LEFT: 'p300_multi'})
 
 
-async def test_aspirate(dummy_instruments, loop):
+async def test_aspirate_new(dummy_instruments, loop):
+    hw_api = hc.API.build_hardware_simulator(
+        attached_instruments=dummy_instruments, loop=loop)
+    await hw_api.home()
+    await hw_api.cache_instruments()
+    aspirate_ul = 3.0
+    aspirate_rate = 2
+    await hw_api.aspirate(types.Mount.LEFT, aspirate_ul, aspirate_rate)
+    new_plunger_pos = 6.05285
+    pos = await hw_api.current_position(types.Mount.LEFT)
+    assert pos[Axis.B] == new_plunger_pos
+
+
+async def test_aspirate_old(dummy_instruments, loop, old_aspiration):
     hw_api = hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments, loop=loop)
     await hw_api.home()

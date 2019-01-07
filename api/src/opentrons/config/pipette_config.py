@@ -85,6 +85,20 @@ def load(pipette_model: str) -> pipette_config:
 
     plunger_pos = cfg.get('plungerPositions', {})
 
+    # the ulPerMm functions are structured in pipetteModelSpecs.json as
+    # a list sorted from oldest to newest. That means the latest functions
+    # are always the last element and, as of right now, the older ones are
+    # the first element (for models that only have one function, the first
+    # and last elements are the same, which is fine). If we add more in the
+    # future, we’ll have to change this code to select items more
+    # intelligently
+    if ff.use_old_aspiration_functions():
+        log.info("Using old aspiration functions")
+        ul_per_mm = cfg['ulPerMm'][0]
+    else:
+        log.info("Using new aspiration functions")
+        ul_per_mm = cfg['ulPerMm'][-1]
+
     res = pipette_config(
         plunger_positions={
             'top': plunger_pos.get('top'),
@@ -103,7 +117,7 @@ def load(pipette_model: str) -> pipette_config:
         drop_tip_speed=cfg.get('dropTipSpeed'),
         min_volume=cfg.get('minVolume'),
         max_volume=cfg.get('maxVolume'),
-        ul_per_mm=cfg.get('ulPerMm'),
+        ul_per_mm=ul_per_mm,
         quirks=cfg.get('quirks'),
         tip_length=cfg.get('tipLength'),
         display_name=cfg.get('displayName')
@@ -119,17 +133,6 @@ def load(pipette_model: str) -> pipette_config:
     elif 'p10' in pipette_model:
         assert res.model_offset[1] == 0.0
         assert res.model_offset[2] == Z_OFFSET_P10
-        new_aspirate = ff.use_new_p10_aspiration()
-        if 'single' in pipette_model and new_aspirate:
-            log.info("Using new P10 single aspiration")
-            res.ul_per_mm['aspirate'] = [
-                [1.438649211,	0.01931415115,	0.691538317],
-                [1.836824579,	0.03868955123,	0.6636639129],
-                [2.960052684,	0.00470371018,	0.7260899411],
-                [4.487508789,	0.005175245625,	0.7246941713],
-                [10.59661421,	0.001470408978,	0.7413196584]]
-        elif not new_aspirate:
-            log.info("Using old P10 single aspiration")
     elif 'p300' in pipette_model:
         assert res.model_offset[1] == 0.0
         assert res.model_offset[2] == Z_OFFSET_P300
