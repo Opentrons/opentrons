@@ -6,6 +6,7 @@ import subprocess
 
 from opentrons import robot
 from opentrons.util import environment
+from opentrons.drivers.rpi_drivers import gpio
 
 
 RESULT_SPACE = '\t- {}'
@@ -53,7 +54,7 @@ def _erase_data(filepath):
 
 def _reset_lights():
     robot._driver.turn_off_rail_lights()
-    robot._driver._set_button_light(blue=True)
+    gpio.set_button_light(blue=True)
 
 
 def _get_state_of_inputs():
@@ -84,7 +85,7 @@ def _set_lights(state):
         green = True
     if state['button']:
         blue = True
-    robot._driver._set_button_light(red=red, green=green, blue=blue)
+    gpio.set_button_light(red=red, green=green, blue=blue)
 
 
 def run_quiet_process(command):

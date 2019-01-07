@@ -10,6 +10,7 @@ Author: Carlos Fernandez
 import optparse
 
 from opentrons import robot
+from opentrons.drivers.rpi_drivers import gpio
 from opentrons.drivers.smoothie_drivers.driver_3_0 import \
     SmoothieError, DEFAULT_AXES_SPEED
 
@@ -135,7 +136,7 @@ if __name__ == '__main__':
         robot.home()
         run_x_axis(num_cycles, b_x_max, b_y_max, tolerance_mm)
         run_y_axis(num_cycles, b_x_max, b_y_max, tolerance_mm)
-        robot._driver._set_button_light(red=False, green=True, blue=False)
+        gpio.set_button_light(red=False, green=True, blue=False)
         print("PASS")
         _exit_test()
     except KeyboardInterrupt:
