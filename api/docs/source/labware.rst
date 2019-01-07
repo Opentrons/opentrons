@@ -13,19 +13,22 @@ We spend a fair amount of time organizing and counting wells when writing Python
 Labware Library
 ******************
 
-The Opentrons API comes with many common labware containers built in. These containers can be loaded into you Python protocol using the ``labware.load()`` method, and the specific name of the labware you need.
+The Opentrons API comes with many common labware built in. These can be loaded into you Python protocol using the ``labware.load()`` method, and the specific name of the labware you need.
 
-`Check out this webpage`__ to see a visualization of all the API's current built-in containers.
+Under the `Opentrons Labware`_ are a list of some of the most commonly used labware in the API, as well as images for how they look.
 
-__ https://andysigler.github.io/ot-api-containerviz/
-
-Below are a list of some of the most commonly used containers in the API, as well as images for how they look.
-
-If you are interested in using your own container that is not included in the API, please take a look at how to create custom containers using ``labware.create()``, or contact Opentrons Support.
+If you are interested in using your own labware that is not included in the API, please take a look at how to create custom labware definitions using ``labware.create()``, or contact Opentrons Support.
 
 .. note::
 
     All names are case-sensitive, copying and pasting from this list into the protocol editor will ensure no errors are made.
+
+.. note::
+
+    We are in the process of revising the labware definitions used on the OT2. Documentation for previously existing definitions is left over from OT1, and is incomplete. `Check out this webpage`__ to see a visualization of all the API's legacy built-in labware definitions. For JSON protocols and APIv4 protocols, see the visualizations and descriptions under `Opentrons Labware`_.
+
+__ https://andysigler.github.io/ot-api-containerviz/
+
 
 **********************
 
@@ -47,20 +50,11 @@ after importing labware as follows:
 
   samples_rack = labware.load('tube-rack-2ml', slot='1')
 
-Putting multiple containers in the same slot
------
-
-Some containers might only take up half a slot. You must explicitly say `share=True`, indicating that it is okay to share the slot.
-
-.. code-block:: python
-
-  tubes = labware.load('T25-flask', slot='2')
-  more_tubes = labware.load('T25-flask', slot='2', share=True)
 
 **********************
 
 *********************
-Opentrons Containers
+Opentrons Labware
 *********************
 
 Tipracks
@@ -204,13 +198,13 @@ opentrons-tuberack-15_50ml
 Point
 =====
 
-Use ``point`` when there is only one position per container, such as a scale.
+Use ``point`` when there is only one position per labware, such as a scale.
 
 .. code-block:: python
 
     my_container = labware.load('point', slot)
 
-You can access the point position as ``my_container.wells('A1')`` or ``my_container.container.wells(0)``.
+You can access the point position as ``my_labware.wells('A1')`` or ``my_labware.wells(0)``.
 
 **********************
 
@@ -419,12 +413,8 @@ See dimensions in diagram below.
 
 
 **************
-Containers
+Labware Module
 **************
-
-The containers module allows you to load common labware into your protocol. `Go here`__ to see a visualization of all built-in containers.
-
-__ https://andysigler.github.io/ot-api-containerviz/
 
 .. code-block:: python
 
@@ -457,53 +447,52 @@ A third optional argument can be used to give a labware a unique name.
 
     p = labware.load('96-flat', '2', 'any-name-you-want')
 
-Unique names are useful in a few scenarios. First, they allow the container to have independent calibration data from other containers in the same slot. In the example above, the container named 'any-name-you-want' will assume different calibration data from the unnamed plate, even though they are the same type and in the same slot.
+Unique names are useful in a few scenarios. First, they allow the labware to have independent calibration data from other labware in the same slot. In the example above, the container named 'any-name-you-want' will assume different calibration data from the unnamed plate, even though they are the same type and in the same slot.
 
 .. note::
 
-    Calibration data refers to the saved positions for each container on deck, and is a part of the `Opentrons App calibration procedure`__.
+    Calibration data refers to the saved positions for each labware on deck, and is a part of the `Opentrons App calibration procedure`__.
 
 __ https://support.opentrons.com/ot-2/getting-started-software-setup/running-your-first-ot-2-protocol
-
-Names can also be used to place multiple containers in the same slot all at once, using the `share=True` argument. For example, the flasks below are all placed in slot 3. So in order for the Opentrons API to tell them apart, we have given them each a unique name.
-
-.. code-block:: python
-
-    fa = labware.load('T25-flask', '3', 'flask_a')
-    fb = labware.load('T25-flask', '3', 'flask_b', share=True)
-    fc = labware.load('T25-flask', '3', 'flask_c', share=True)
 
 Create
 ======
 
-In addition to the default containers that come with the Opentrons API, you can create your own custom containers.
+In addition to the default labware that come with the Opentrons API, you can create your own custom labware.
 
-Through the API's call labware.create(), you can create simple grid containers, which consist of circular wells arranged in columns and rows.
+Through the API's call labware.create(), you can create simple grid labware, which consist of circular wells arranged in columns and rows.
 
 .. code-block:: python
 
-    custom_plate = labware.create(
-        '3x6_plate',                    # name of you container
-        grid=(3, 6),                    # specify amount of (columns, rows)
-        spacing=(12, 12),               # distances (mm) between each (column, row)
-        diameter=5,                     # diameter (mm) of each well on the plate
-        depth=10,                       # depth (mm) of each well on the plate
-        volume=200)
+    plate_name = '3x6_plate'
+    if plate_name not in labware.list():
+        custom_plate = labware.create(
+            plate_name,                    # name of you labware
+            grid=(3, 6),                    # specify amount of (columns, rows)
+            spacing=(12, 12),               # distances (mm) between each (column, row)
+            diameter=5,                     # diameter (mm) of each well on the plate
+            depth=10,                       # depth (mm) of each well on the plate
+            volume=200)
 
-When you create your custom container it will return the custom plate. You should only need to run
-this once among all of your protocols for the same custom container because the data is automatically saved on the robot.
+When you create your custom labware it will return the custom plate. You should only need to run
+this once among all of your protocols for the same custom labware because the data is automatically saved on the robot.
 
-**Note** There is some specialty labware that will require you to specify the type within your container name.
-If you are creating a custom tiprack, it must be `tiprack`-REST-OF-CONTAINER-NAME in order for the program to act reliably.
+In this example, the call to `labware.create` is wrapped in an if-block, so that it does not try to add the definition
+to a robot where this has already been run (which would cause an error). If a labware has already been added to the database
+(by previously calling `labware.create`, the if-block will not execute, and the rest of the protocol will use the definition
+that was already created and calibrated.
 
-If you would like to delete a container you have already added to the database, you can do the following:
+**Note** There is some specialty labware that will require you to specify the type within your labware name.
+If you are creating a custom tiprack, it must be `tiprack`-REST-OF-LABWARE-NAME in order for the program to act reliably.
+
+If you would like to delete a labware you have already added to the database, you can do the following:
 
 .. code-block:: python
 
     from opentrons.data_storage import database
     database.delete_container('3x6_plate')
 
-This allows you to make changes to the container within the database under the same name.
+This allows you to make changes to the labware within the database under the same name.
 
 .. code-block:: python
 
@@ -551,7 +540,7 @@ Individual Wells
 
 When writing a protocol using the API, you will be spending most of your time selecting which wells to transfer liquids to and from.
 
-The OT-One deck and containers are all set up with the same coordinate system - lettered rows ``['A']-['END']`` and numbered columns ``['1']-['END']``.
+The OT-One deck and labware are all set up with the same coordinate system - lettered rows ``['A']-['END']`` and numbered columns ``['1']-['END']``.
 
 .. image:: img/well_iteration/Well_Iteration.png
 
@@ -568,7 +557,7 @@ The OT-One deck and containers are all set up with the same coordinate system - 
 Wells by Name
 -------------
 
-Once a container is loaded into your protocol, you can easily access the many wells within it using ``wells()`` method. ``wells()`` takes the name of the well as an argument, and will return the well at that location.
+Once a labware is loaded into your protocol, you can easily access the many wells within it using ``wells()`` method. ``wells()`` takes the name of the well as an argument, and will return the well at that location.
 
 .. code-block:: python
 
@@ -578,7 +567,7 @@ Once a container is loaded into your protocol, you can easily access the many we
 Wells by Index
 --------------
 
-Wells can be referenced by their "string" name, as demonstrated above. However, they can also be referenced with zero-indexing, with the first well in a container being at position 0.
+Wells can be referenced by their "string" name, as demonstrated above. However, they can also be referenced with zero-indexing, with the first well in a labware being at position 0.
 
 .. code-block:: python
 
@@ -588,13 +577,13 @@ Wells can be referenced by their "string" name, as demonstrated above. However, 
 Columns and Rows
 ----------------
 
-A container's wells are organized within a series of columns and rows, which are also labelled on standard labware. In the API, rows are given letter names (``'A'`` through ``'H'`` for example) and go left to right, while columns are given numbered names (``'1'`` through ``'12'`` for example) and go from front to back.
-You can access a specific row or column by using the ``rows()`` and ``cols()`` methods on a container. These will return all wells within that row or column.
+A labware's wells are organized within a series of columns and rows, which are also labelled on standard labware. In the API, rows are given letter names (``'A'`` through ``'H'`` for example) and go left to right, while columns are given numbered names (``'1'`` through ``'12'`` for example) and go from front to back.
+You can access a specific row or column by using the ``rows()`` and ``columns()`` methods on a labware. These will return all wells within that row or column.
 
 .. code-block:: python
 
     row = plate.rows('A')
-    column = plate.cols('1')
+    column = plate.columns('1')
 
     print('Column "1" has', len(column), 'wells')
     print('Row "A" has', len(row), 'wells')
@@ -696,7 +685,7 @@ will print out...
     <Well G1>
     <Well H1>
 
-These lists of wells can also move in the reverse direction along your container. For example, setting the ``to=`` argument to a well that comes before the starting position is allowed:
+These lists of wells can also move in the reverse direction along your labware. For example, setting the ``to=`` argument to a well that comes before the starting position is allowed:
 
 .. code-block:: python
 
@@ -789,7 +778,7 @@ will print out...
 Slices
 ------
 
-Containers can also be treating similarly to Python lists, and can therefore handle slices.
+Labware can also be treating similarly to Python lists, and can therefore handle slices.
 
 .. code-block:: python
 
@@ -805,7 +794,7 @@ will print out...
     <Well E1>
     <Well G1>
 
-The API's containers are also prepared to take string values for the slice's ``start`` and ``stop`` positions.
+The API's labware are also prepared to take string values for the slice's ``start`` and ``stop`` positions.
 
 .. code-block:: python
 
