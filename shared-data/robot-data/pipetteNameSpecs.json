@@ -42,7 +42,7 @@
     "channels": 1,
     "minVolume": 30,
     "maxVolume": 300,
-    "tipOverlap": 7
+    "tipOverlap": 0
   },
   "p300_multi": {
     "displayName": "P300 8-Channel",
@@ -51,7 +51,7 @@
     "channels": 8,
     "minVolume": 30,
     "maxVolume": 300,
-    "tipOverlap": 7
+    "tipOverlap": 0
   },
   "p1000_single": {
     "displayName": "P1000 Single-channel",

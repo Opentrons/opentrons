@@ -293,13 +293,13 @@ async def move(request):
             mount = Mount[mount.upper()]
             target = Point(*point)
             await hw.home_z()
-            pos = hw.gantry_position(mount, critical_point)
+            pos = await hw.gantry_position(mount, critical_point)
             await hw.move_to(mount, target._replace(z=pos.z),
                              critical_point=critical_point)
             await hw.move_to(mount, target,
                              critical_point=critical_point)
-            message = 'Move complete. New position: {}'\
-                .format(hw.gantry_position(mount))
+            pos = await hw.gantry_position(mount)
+            message = 'Move complete. New position: {}'.format(pos)
         else:
             if target == 'mount':
                 message = _move_mount(hw, mount, point)

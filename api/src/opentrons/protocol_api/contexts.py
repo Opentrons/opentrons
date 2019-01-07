@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import logging
 import time
 from typing import Any, Dict, List, Optional, Union, Tuple
@@ -57,7 +58,7 @@ class ProtocolContext:
                 self._current.join()
             if isinstance(hardware, adapters.SynchronousAdapter):
                 self._current = hardware
-            elif isinstance(hardware, hc.API):
+            elif isinstance(hardware, hc.HardwareAPILike):
                 self._current = adapters.SynchronousAdapter(hardware)
             else:
                 raise TypeError(
@@ -119,6 +120,27 @@ class ProtocolContext:
 
         self._unsubscribe_commands = broker.subscribe(
             cmds.types.COMMAND, on_command)
+
+    @contextlib.contextmanager
+    def temp_connect(self, hardware: hc.API):
+        """ Connect temporarily to the specified hardware controller.
+
+        This should be used as a context manager:
+
+        .. code-block ::
+            with ctx.temp_connect(hw):
+                # do some tasks
+                ctx.home()
+            # after the with block, the context is connected to the same
+            # hardware control API it was connected to before, even if
+            # an error occured in the code inside the with block
+        """
+        old_hw = self._hw_manager.hardware
+        try:
+            self._hw_manager.set_hw(hardware)
+            yield self
+        finally:
+            self._hw_manager.set_hw(old_hw)
 
     def connect(self, hardware: hc.API):
         """ Connect to a running hardware API.
@@ -585,7 +607,9 @@ class InstrumentContext:
         if not isinstance(loc, Well):
             raise TypeError('Last tip location should be a Well but it is: '
                             '{}'.format(loc))
-        self.drop_tip(loc.top())
+        bot = loc.bottom()
+        bot = bot._replace(point=bot.point._replace(z=bot.point.z + 10))
+        self.drop_tip(bot)
         return self
 
     @cmds.publish.both(command=cmds.pick_up_tip)  # noqa(C901)
@@ -720,7 +744,7 @@ class InstrumentContext:
         """
         if location and isinstance(location, types.Location):
             if isinstance(location.labware, Well):
-                target = location.labware
+                target = location
             else:
                 raise TypeError(
                     "If a location is specified as a types.Location (for "
@@ -730,9 +754,11 @@ class InstrumentContext:
                     "dropped. The passed location, however, is in "
                     "reference to {}".format(location.labware))
         elif location and isinstance(location, Well):
-            target = location
+            bot = location.bottom()
+            target = bot._replace(point=bot.point._replace(z=bot.point.z + 10))
         elif not location:
-            target = self.trash_container.wells()[0]
+            loc = self.trash_container.wells()[0].bottom()
+            target = loc._replace(point=loc.point._replace(z=loc.point.z + 10))
         else:
             raise TypeError(
                 "If specified, location should be an instance of "
@@ -740,7 +766,7 @@ class InstrumentContext:
                 "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
                 " However, it is a {}".format(location))
 
-        self.move_to(target.bottom())
+        self.move_to(target)
         self._hw_manager.hardware.drop_tip(self._mount)
         return self
 
@@ -752,7 +778,8 @@ class InstrumentContext:
         def home_dummy(mount): pass
         cmds.do_publish(cmds.home, home_dummy, 'before', None, None,
                         self._mount.name.lower())
-        self._ctx.home()
+        self._hw_manager.hardware.home_z(self._mount)
+        self._hw_manager.hardware.home_plunger(self._mount)
         cmds.do_publish(cmds.home, home_dummy, 'after', self, None,
                         self._mount.name.lower())
         return self
@@ -820,6 +847,7 @@ class InstrumentContext:
 
     @property
     def mount(self) -> str:
+        """ Return the name of the mount this pipette is attached to """
         return self._mount.name.lower()
 
     @property

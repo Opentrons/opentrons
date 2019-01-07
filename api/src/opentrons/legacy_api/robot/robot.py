@@ -3,7 +3,6 @@ import os
 import logging
 from functools import lru_cache
 
-import opentrons.util.calibration_functions as calib
 from numpy import add, subtract
 
 from opentrons import commands, drivers
@@ -934,7 +933,7 @@ class Robot():
             delta_y = delta[1]
             delta_z = delta[2]
 
-        self.poses = calib.calibrate_container_with_delta(
+        self.poses = self._calibrate_container_with_delta(
             self.poses,
             container,
             delta_x,
@@ -944,6 +943,32 @@ class Robot():
         )
 
         self.max_deck_height.cache_clear()
+
+    @staticmethod
+    def _calibrate_container_with_delta(
+            pose_tree, container, delta_x,
+            delta_y, delta_z, save, new_container_name=None):
+
+        delta = pose_tracker.Point(delta_x, delta_y, delta_z)
+
+        new_coordinates = pose_tracker.change_base(
+            pose_tree,
+            src=container,
+            dst=container.parent) + delta
+
+        pose_tree = pose_tracker.update(pose_tree, container, new_coordinates)
+
+        if fflags.split_labware_definitions():
+            for well in container.wells():
+                well._coordinates = well._coordinates + delta
+        else:
+            container._coordinates = container._coordinates + delta
+
+        if save and new_container_name:
+            database.save_new_container(container, new_container_name)
+        elif save:
+            database.overwrite_container(container)
+        return pose_tree
 
     @lru_cache()
     def max_deck_height(self):

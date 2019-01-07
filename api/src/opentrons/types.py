@@ -15,9 +15,9 @@ class PipetteNotAttachedError(KeyError):
 
 
 class Point(NamedTuple):
-    x: float
-    y: float
-    z: float
+    x: float = 0.0
+    y: float = 0.0
+    z: float = 0.0
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Point):

@@ -179,7 +179,7 @@ async def test_load_and_run(
             break
 
     assert [key for key, _ in itertools.groupby(res)] == \
-        ['loaded', 'probing', 'ready', 'running', 'finished']
+        ['loaded', 'probing', 'moving', 'ready', 'running', 'finished']
     assert main_router.notifications.queue.qsize() == 0,\
         'Notification should be empty after receiving "finished" state change'
     session.run()

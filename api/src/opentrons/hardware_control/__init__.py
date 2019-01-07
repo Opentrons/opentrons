@@ -12,6 +12,7 @@ functions are available elsewhere.
 
 import asyncio
 from collections import OrderedDict
+import contextlib
 import functools
 import logging
 from typing import Any, Dict, Union, List, Optional, Tuple
@@ -91,6 +92,12 @@ class API(HardwareAPILike):
         }
         self._attached_modules: Dict[str, Any] = {}
         self._last_moved_mount: Optional[top_types.Mount] = None
+        # The motion lock synchronizes calls to long-running physical tasks
+        # involved in motion. This fixes issue where for instance a move()
+        # or home() call is in flight and something else calls
+        # current_position(), which will not be updated until the move() or
+        # home() call succeeds or fails.
+        self._motion_lock = asyncio.Lock(loop=self._loop)
 
     @classmethod
     async def build_hardware_controller(
@@ -150,6 +157,11 @@ class API(HardwareAPILike):
     def loop(self) -> asyncio.AbstractEventLoop:
         """ The event loop used by this instance. """
         return self._loop
+
+    @loop.setter
+    def loop(self, loop: asyncio.AbstractEventLoop):
+        self._loop = loop
+        self._lock = asyncio.Lock(loop=loop)
 
     @property
     def is_simulator(self) -> bool:
@@ -227,7 +239,9 @@ class API(HardwareAPILike):
         for mount, instrument_data in found.items():
             model = instrument_data.get('model')
             if model is not None:
-                p = Pipette(model, instrument_data['id'])
+                p = Pipette(model,
+                            self._config.instrument_offset[mount.name.lower()],
+                            instrument_data['id'])
                 self._attached_instruments[mount] = p
             else:
                 self._attached_instruments[mount] = None
@@ -327,9 +341,13 @@ class API(HardwareAPILike):
 
     # Gantry/frame (i.e. not pipette) action API
     @_log_call
-    async def home_z(self):
+    async def home_z(self, mount: top_types.Mount = None):
         """ Home the two z-axes """
-        await self.home([Axis.Z, Axis.A])
+        if not mount:
+            axes = [Axis.Z, Axis.A]
+        else:
+            axes = [Axis.by_mount(mount)]
+        await self.home(axes)
 
     @_log_call
     async def home_plunger(self, mount: top_types.Mount):
@@ -365,13 +383,15 @@ class API(HardwareAPILike):
         gantry = [ax for ax in checked_axes if ax in Axis.gantry_axes()]
         smoothie_gantry = [ax.name.upper() for ax in gantry]
         smoothie_pos = {}
-        if smoothie_gantry:
-            smoothie_pos.update(self._backend.home(smoothie_gantry))
-        plungers = [ax for ax in checked_axes if ax not in Axis.gantry_axes()]
+        plungers = [ax for ax in checked_axes
+                    if ax not in Axis.gantry_axes()]
         smoothie_plungers = [ax.name.upper() for ax in plungers]
-        if smoothie_plungers:
-            smoothie_pos.update(self._backend.home(smoothie_plungers))
-        self._current_position = self._deck_from_smoothie(smoothie_pos)
+        async with self._motion_lock:
+            if smoothie_gantry:
+                smoothie_pos.update(self._backend.home(smoothie_gantry))
+            if smoothie_plungers:
+                smoothie_pos.update(self._backend.home(smoothie_plungers))
+            self._current_position = self._deck_from_smoothie(smoothie_pos)
 
     def _deck_from_smoothie(
             self, smoothie_pos: Dict[str, float]) -> Dict[Axis, float]:
@@ -414,7 +434,7 @@ class API(HardwareAPILike):
         deck_pos.update(plunger_axes)
         return deck_pos
 
-    def current_position(
+    async def current_position(
             self,
             mount: top_types.Mount,
             critical_point: CriticalPoint = None) -> Dict[Axis, float]:
@@ -434,21 +454,22 @@ class API(HardwareAPILike):
         """
         if not self._current_position:
             raise MustHomeError
-        if mount == mount.RIGHT:
-            offset = top_types.Point(0, 0, 0)
-        else:
-            offset = top_types.Point(*self.config.mount_offset)
-        z_ax = Axis.by_mount(mount)
-        plunger_ax = Axis.of_plunger(mount)
-        cp = self._critical_point_for(mount, critical_point)
-        return {
-            Axis.X: self._current_position[Axis.X] + offset[0] + cp.x,
-            Axis.Y: self._current_position[Axis.Y] + offset[1] + cp.y,
-            z_ax: self._current_position[z_ax] + offset[2] + cp.z,
-            plunger_ax: self._current_position[plunger_ax]
-        }
+        async with self._motion_lock:
+            if mount == mount.RIGHT:
+                offset = top_types.Point(0, 0, 0)
+            else:
+                offset = top_types.Point(*self.config.mount_offset)
+            z_ax = Axis.by_mount(mount)
+            plunger_ax = Axis.of_plunger(mount)
+            cp = self._critical_point_for(mount, critical_point)
+            return {
+                Axis.X: self._current_position[Axis.X] + offset[0] + cp.x,
+                Axis.Y: self._current_position[Axis.Y] + offset[1] + cp.y,
+                z_ax: self._current_position[z_ax] + offset[2] + cp.z,
+                plunger_ax: self._current_position[plunger_ax]
+            }
 
-    def gantry_position(
+    async def gantry_position(
             self,
             mount: top_types.Mount,
             critical_point: CriticalPoint = None) -> top_types.Point:
@@ -460,7 +481,7 @@ class API(HardwareAPILike):
         `critical_point` specifies an override to the current critical point to
         use (see :py:meth:`current_position`).
         """
-        cur_pos = self.current_position(mount, critical_point)
+        cur_pos = await self.current_position(mount, critical_point)
         return top_types.Point(x=cur_pos[Axis.X],
                                y=cur_pos[Axis.Y],
                                z=cur_pos[Axis.by_mount(mount)])
@@ -560,7 +581,6 @@ class API(HardwareAPILike):
 
     async def _move_plunger(self, mount: top_types.Mount, dist: float,
                             speed: float = None):
-
         z_axis = Axis.by_mount(mount)
         pl_axis = Axis.of_plunger(mount)
         all_axes_pos = OrderedDict(
@@ -642,15 +662,16 @@ class API(HardwareAPILike):
                                 smoothie_pos[ax.name],
                                 deck_mins[ax], deck_max[ax],
                                 bounds[ax.name][0], bounds[ax.name][1]))
-        try:
-            self._backend.move(smoothie_pos, speed=speed,
-                               home_flagged_axes=home_flagged_axes)
-        except Exception:
-            self._log.exception('Move failed')
-            self._current_position.clear()
-            raise
-        else:
-            self._current_position.update(target_position)
+        async with self._motion_lock:
+            try:
+                self._backend.move(smoothie_pos, speed=speed,
+                                   home_flagged_axes=home_flagged_axes)
+            except Exception:
+                self._log.exception('Move failed')
+                self._current_position.clear()
+                raise
+            else:
+                self._current_position.update(target_position)
 
     @property
     def engaged_axes(self) -> Dict[Axis, bool]:
@@ -668,8 +689,9 @@ class API(HardwareAPILike):
         Works regardless of critical point or home status.
         """
         smoothie_ax = Axis.by_mount(mount).name.upper()
-        smoothie_pos = self._backend.fast_home(smoothie_ax, margin)
-        self._current_position = self._deck_from_smoothie(smoothie_pos)
+        async with self._motion_lock:
+            smoothie_pos = self._backend.fast_home(smoothie_ax, margin)
+            self._current_position = self._deck_from_smoothie(smoothie_pos)
 
     def _critical_point_for(
             self, mount: top_types.Mount,
@@ -892,26 +914,34 @@ class API(HardwareAPILike):
         await self.retract(mount, instr.config.pick_up_distance)
 
     @_log_call
-    async def drop_tip(self, mount):
+    async def drop_tip(self, mount, home_after=True):
         """
         Drop tip at the current location
+
+        :param Mount mount: The mount to drop a tip from
+        :param bool home_after: Home the plunger motor after dropping tip. This
+                                is used in case the plunger motor skipped while
+                                dropping the tip, and is also used to recover
+                                the ejector shroud after a drop.
         """
         instr = self._attached_instruments[mount]
         assert instr
         assert instr.has_tip, 'Cannot drop tip without a tip attached'
         self._log.info("Dropping tip off from {}".format(instr.name))
         plunger_ax = Axis.of_plunger(mount)
+        droptip = instr.config.plunger_positions['drop_tip']
+        bottom = instr.config.plunger_positions['bottom']
         self._backend.set_active_current(plunger_ax,
                                          instr.config.plunger_current)
-        await self._move_plunger(mount,
-                                 instr.config.plunger_positions['bottom'])
+        await self._move_plunger(mount, bottom)
         self._backend.set_active_current(plunger_ax,
                                          instr.config.drop_tip_current)
-        await self._move_plunger(mount,
-                                 instr.config.plunger_positions['drop_tip'])
+        await self._move_plunger(mount, droptip)
         await self._shake_off_tips(mount)
         instr.set_current_volume(0)
         instr.remove_tip()
+        if home_after:
+            await self.home_plunger(mount)
 
     async def _shake_off_tips(self, mount):
         # tips don't always fall off, especially if resting against
@@ -1011,3 +1041,178 @@ class API(HardwareAPILike):
             new_details = new_mod.port + new_mod.device_info['model']
             self._attached_modules[new_details] = new_mod
             return True, 'firmware update successful'
+
+    async def _do_tp(self, pip, mount) -> top_types.Point:
+        """ Execute the work of tip probe.
+
+        This is a separate function so that it can be encapsulated in
+        a context manager that ensures the state of the pipette tip tracking
+        is reset properly. It should not be called outside of
+        :py:meth:`locate_tip_probe_center`.
+
+        :param pip: The pipette to use
+        :type pip: opentrons.hardware_control.pipette.Pipette
+        :param mount: The mount on which the pipette is attached
+        :type mount: opentrons.types.Mount
+        """
+        # Clear the old offset during calibration
+        pip.update_instrument_offset(top_types.Point())
+        # Hotspots based on our expectation of tip length and config
+        hotspots = robot_configs.calculate_tip_probe_hotspots(
+            pip.current_tip_length, self._config.tip_probe)
+        new_pos: Dict[Axis, List[float]] = {
+            ax: [] for ax in Axis.gantry_axes() if ax != Axis.A}
+        safe_z = self._config.tip_probe.z_clearance.crossover + \
+            self._config.tip_probe.center[2]
+        for hs in hotspots:
+            ax_en = Axis[hs.axis.upper()]
+            overridden_center = {
+                ax: sum(vals)/len(vals)
+                if len(vals) == 2
+                else self._config.tip_probe.center[ax.value]
+                for ax, vals in new_pos.items()
+            }
+            x0 = overridden_center[Axis.X] + hs.x_start_offs
+            y0 = overridden_center[Axis.Y] + hs.y_start_offs
+            z0 = hs.z_start_abs
+            pos = await self.current_position(mount)
+
+            # Move safely to the setup point for the probe
+            await self.move_to(mount,
+                               top_types.Point(pos[Axis.X],
+                                               pos[Axis.Y],
+                                               safe_z))
+            await self.move_to(mount,
+                               top_types.Point(x0, y0, safe_z))
+            await self.move_to(mount,
+                               top_types.Point(x0, y0, z0))
+            if ax_en == Axis.Z:
+                to_probe = Axis.by_mount(mount)
+            else:
+                to_probe = ax_en
+            # Probe and retrieve the position afterwards
+            async with self._motion_lock:
+                self._current_position = self._deck_from_smoothie(
+                    self._backend.probe(
+                        to_probe.name.lower(), hs.probe_distance))
+            xyz = await self.gantry_position(mount)
+            # Store the upated position.
+            self._log.debug(
+                "tip probe: hs {}: start: ({} {} {}) status {} will add {}"
+                .format(hs, x0, y0, z0, new_pos, xyz[ax_en.value]))
+            new_pos[ax_en].append(xyz[ax_en.value])
+            # Before moving up, move back to clear the switches
+            bounce = self._config.tip_probe.bounce_distance\
+                * (-1.0 if hs.probe_distance > 0 else 1.0)
+            await self.move_rel(mount,
+                                top_types.Point(
+                                    **{hs.axis: bounce}))
+            await self.move_to(mount, xyz._replace(z=safe_z))
+
+        to_ret = top_types.Point(**{ax.name.lower(): sum(vals)/len(vals)
+                                    for ax, vals in new_pos.items()})
+        self._log.info("Tip probe complete with {} {} on {}. "
+                       "New position: {} (default {}), averaged from {}"
+                       .format(pip.name, pip.pipette_id, mount.name,
+                               to_ret, self._config.tip_probe.center,
+                               new_pos))
+        return to_ret
+
+    @_log_call
+    async def locate_tip_probe_center(
+            self, mount, tip_length=None) -> top_types.Point:
+        """ Use the specified mount (which should have a tip) to find the
+        position of the tip probe target center relative to its definition
+
+        :param mount: The mount to use for the probe
+        :param tip_length: If specified (it should usually be specified),
+                           the length of the tip assumed to be attached.
+
+        The tip length specification is for the use case during protocol
+        calibration, when the machine cannot yet pick up a tip on its own.
+        For that reason, it is not universally necessary. Instead, there
+        are several cases:
+
+        1. A tip has previously been picked up with :py:meth:`pick_up_tip`.
+           ``tip_length`` should not be specified since the tip length is
+           known. If ``tip_length`` is not ``None``, this function asserts.
+        2. A tip has not previously been picked up, and ``tip_length`` is
+           specified. The pipette will internally have a tip added of the
+           specified length.
+        3. A tip has not previously been picked up, and ``tip_length`` is
+           not specified. The pipette will use the tip length from its
+           config.
+
+        The return value is a dict containing the updated position, in deck
+        coordinates, of the tip probe center.
+        """
+        opt_pip = self._attached_instruments[mount]
+        assert opt_pip, '{} has no pipette'.format(mount.name.lower())
+        pip = opt_pip
+
+        if pip.has_tip and tip_length:
+            pip.remove_tip()
+
+        if not tip_length:
+            if not pip.has_tip:
+                tip_length = pip.config.tip_length
+            if not tip_length and pip.has_tip:
+                tip_length = pip._current_tip_length
+
+        # assure_tip lets us make sure we don’t pollute the pipette
+        # state even if there’s an exception in tip probe
+        @contextlib.contextmanager
+        def _assure_tip():
+            if pip.has_tip:
+                old_tip = pip._current_tip_length
+                pip.remove_tip()
+            else:
+                old_tip = None
+            pip.add_tip(tip_length)
+            try:
+                yield
+            finally:
+                pip.remove_tip()
+                if old_tip:
+                    pip.add_tip(old_tip)
+
+        with _assure_tip():
+            return await self._do_tp(pip, mount)
+
+    def update_instrument_offset(self, mount,
+                                 new_offset: top_types.Point = None,
+                                 from_tip_probe: top_types.Point = None):
+        """ Update the instrument offset for a pipette on the specified mount.
+
+        This will update both the stored value in the robot settings and
+        the live value in the currently-loaded pipette.
+
+        This can be specified either directly by using the new_offset arg
+        or using the result of a previous call to
+        :py:meth:`locate_tip_probe_center` with the same mount.
+
+        :note: Z differences in the instrument offset cannot be
+               disambiguated between differences in the position of the
+               nozzle and differences in the length of the nozzle/tip
+               interface (assuming that tips are of reasonably uniform
+               length). For this reason, they are saved as adjustments
+               to the nozzle interface length and only applied when a
+               tip is present.
+        """
+        if from_tip_probe:
+            new_offset = (top_types.Point(*self._config.tip_probe.center)
+                          - from_tip_probe)
+        elif not new_offset:
+            raise ValueError(
+                "Either from_tip_probe or new_offset must be specified")
+        opt_pip = self._attached_instruments[mount]
+        assert opt_pip, '{} has no pipette'.format(mount.name.lower())
+        pip = opt_pip
+        inst_offs = self._config.instrument_offset
+        pip_type = 'multi' if pip.config.channels > 1 else 'single'
+        inst_offs[mount.name.lower()][pip_type] = [new_offset.x,
+                                                   new_offset.y,
+                                                   new_offset.z]
+        self.update_config(instrument_offset=inst_offs)
+        pip.update_instrument_offset(new_offset)
+        robot_configs.save_robot_settings(self._config)

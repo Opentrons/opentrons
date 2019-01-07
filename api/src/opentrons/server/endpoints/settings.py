@@ -1,30 +1,52 @@
 import logging
 import shutil
 import os
+from typing import Dict, Tuple
 from aiohttp import web
-from opentrons.config import advanced_settings as advs, robot_configs as rc
+from opentrons.config import (advanced_settings as advs,
+                              robot_configs as rc,
+                              feature_flags as ff)
 from opentrons.data_storage import database as db
 from opentrons.protocol_api import labware
 
 log = logging.getLogger(__name__)
 
-_settings_reset_options = [
-    {
-        'id': 'tipProbe',
-        'name': 'Tip Length',
-        'description': 'Clear tip probe data'
-    },
-    {
-        'id': 'labwareCalibration',
-        'name': 'Labware Calibration',
-        'description': 'Clear labware calibration'
-    },
-    {
-        'id': 'bootScripts',
-        'name': 'Boot Scripts',
-        'description': 'Clear custom boot scripts'
-    }
-]
+if ff.use_protocol_api_v2():
+    _settings_reset_options = [
+        {
+            'id': 'tipProbe',
+            'name': 'Instrument Offset',
+            'description': 'Clear instrument offset calibration data'
+        },
+        {
+            'id': 'labwareCalibration',
+            'name': 'Labware Calibration',
+            'description': 'Clear labware calibration'
+        },
+        {
+            'id': 'bootScripts',
+            'name': 'Boot Scripts',
+            'description': 'Clear custom boot scripts'
+        }
+    ]
+else:
+    _settings_reset_options = [
+        {
+            'id': 'tipProbe',
+            'name': 'Tip Length',
+            'description': 'Clear tip probe data'
+        },
+        {
+            'id': 'labwareCalibration',
+            'name': 'Labware Calibration',
+            'description': 'Clear labware calibration'
+        },
+        {
+            'id': 'bootScripts',
+            'name': 'Boot Scripts',
+            'description': 'Clear custom boot scripts'
+        }
+    ]
 
 
 async def get_advanced_settings(request: web.Request) -> web.Response:
@@ -62,26 +84,40 @@ async def set_advanced_setting(request: web.Request) -> web.Response:
     return web.json_response(res, status=status)
 
 
+def _check_reset(reset_req: Dict[str, str]) -> Tuple[bool, str]:
+    for requested_reset in reset_req.keys():
+        if requested_reset not in [opt['id']
+                                   for opt in _settings_reset_options]:
+            log.error('Bad reset option {} requested'.format(requested_reset))
+            return (False, requested_reset)
+    return (True, '')
+
+
 async def reset(request: web.Request) -> web.Response:
     """ Execute a reset of the requested parts of the user configuration.
     """
     data = await request.json()
-    for requested_reset in data.keys():
-        if requested_reset not in [opt['id']
-                                   for opt in _settings_reset_options]:
-            log.error('Bad reset option {} requested'.format(requested_reset))
-            return web.json_response(
-                {'message': '{} is not a valid reset option'
-                 .format(requested_reset)},
-                status=400)
+    ok, bad_key = _check_reset(data)
+    if not ok:
+        return web.json_response(
+            {'message': '{} is not a valid reset option'
+             .format(bad_key)},
+            status=400)
     log.info("Reset requested for {}".format(', '.join(data.keys())))
     if data.get('tipProbe'):
         config = rc.load()
-        config.tip_length.clear()
+        if ff.use_protocol_api_v2():
+            config = config._replace(
+                instrument_offset=rc.build_fallback_instrument_offset({}))
+        else:
+            config.tip_length.clear()
         rc.save_robot_settings(config)
     if data.get('labwareCalibration'):
-        db.reset()
-        labware.clear_calibrations()
+        if ff.use_protocol_api_v2():
+            labware.clear_calibrations()
+        else:
+            db.reset()
+
     if data.get('bootScripts'):
         if os.environ.get('RUNNING_ON_PI'):
             if os.path.exists('/data/boot.d'):
