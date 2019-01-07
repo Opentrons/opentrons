@@ -69,11 +69,7 @@ export default function AlertItem (props: AlertProps) {
           <IconButton name='close' onClick={props.onCloseClick} className={styles.close}/>
         )}
       </div>
-      {props.children && (
-        <div className = {styles.message}>
-          {props.children}
-        </div>
-      )}
+      {props.children}
     </div>
   )
 }

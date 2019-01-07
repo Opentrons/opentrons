@@ -1,0 +1,11 @@
+@import '@opentrons/components';
+
+.message {
+  padding: 1rem 3rem;
+  background-color: white;
+
+  & a {
+    text-decoration: underline;
+    color: inherit;
+  }
+}

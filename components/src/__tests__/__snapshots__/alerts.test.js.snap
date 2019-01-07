@@ -145,12 +145,8 @@ exports[`alerts warning alert with message body renders correctly 1`] = `
       </svg>
     </button>
   </div>
-  <div
-    className="message"
-  >
-    <h3>
-      Title
-    </h3>
-  </div>
+  <h3>
+    Title
+  </h3>
 </div>
 `;
