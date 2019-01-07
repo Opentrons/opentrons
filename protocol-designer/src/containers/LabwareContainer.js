@@ -53,7 +53,7 @@ type SP = $Diff<Props, {...DP, ...MP}>
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {slot} = ownProps
   const container = selectors.containersBySlot(state)[ownProps.slot]
-  const labwareNames = selectors.getLabwareNames(state)
+  const labwareNames = selectors.getLabwareNicknamesById(state)
 
   const containerType = container && container.type
   const containerId = container && container.id

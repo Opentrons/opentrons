@@ -109,7 +109,7 @@ const initialLabwareState: ContainersState = {
     id: FIXED_TRASH_ID,
     type: 'fixed-trash',
     disambiguationNumber: 1,
-    name: 'Trash',
+    nickname: 'Trash',
     slot: '12',
   },
 }
@@ -138,7 +138,7 @@ export const containers = handleActions({
         type: action.payload.containerType,
         disambiguationNumber: getNextDisambiguationNumber(state, action.payload.containerType),
         id,
-        name: null, // create with null name, so we force explicit naming.
+        nickname: null, // create with null name, so we force explicit naming.
       },
     }
   },
@@ -187,7 +187,7 @@ export const containers = handleActions({
           slot: fileLabware.slot,
           id,
           type: fileLabware.model,
-          name: fileLabware['display-name'],
+          nickname: fileLabware['display-name'],
           disambiguationNumber: getNextDisambiguationNumber(acc, fileLabware.model),
         },
       }
@@ -306,7 +306,7 @@ const getLabwareById: Selector<{[labwareId: string]: ?Labware}> = createSelector
   rootState => rootState.containers
 )
 
-const getLabwareNames: Selector<{[labwareId: string]: string}> = createSelector(
+const getLabwareNicknamesById: Selector<{[labwareId: string]: string}> = createSelector(
   getLabwareById,
   (labwareById) => mapValues(
     labwareById,
@@ -362,7 +362,7 @@ const loadedContainersBySlot = createSelector(
 /** Returns options for dropdowns, excluding tiprack labware */
 const labwareOptions: Selector<Options> = createSelector(
   getLabwareById,
-  getLabwareNames,
+  getLabwareNicknamesById,
   (labwareById, names) => reduce(labwareById, (acc: Options, labware: Labware, labwareId): Options => {
     const isTiprack = getIsTiprack(labware.type)
     if (!labware.type || isTiprack) {
@@ -382,7 +382,7 @@ const DISPOSAL_LABWARE_TYPES = ['trash-box', 'fixed-trash']
 /** Returns options for disposal (e.g. fixed trash and trash box) */
 const disposalLabwareOptions: Selector<Options> = createSelector(
   getLabwareById,
-  getLabwareNames,
+  getLabwareNicknamesById,
   (labwareById, names) => reduce(labwareById, (acc: Options, labware: Labware, labwareId): Options => {
     if (!labware.type || !DISPOSAL_LABWARE_TYPES.includes(labware.type)) {
       return acc
@@ -500,7 +500,7 @@ export const selectors = {
   getLiquidsByLabwareId,
   getLiquidNamesById,
   getLabwareById,
-  getLabwareNames,
+  getLabwareNicknamesById,
   getLabwareSelectionMode,
   getLabwareTypes,
   getLiquidSelectionOptions,

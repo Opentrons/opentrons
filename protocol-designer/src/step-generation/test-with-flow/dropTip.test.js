@@ -129,7 +129,7 @@ describe('dropTip', () => {
           useFullVolume: true,
           well: 'A1',
           labwareType: 'fixed-trash',
-          pipetteData: robotStateWithTip.instruments.p300MultiId,
+          pipetteData: robotStateWithTip.pipettes.p300MultiId,
         },
         robotStateWithTip.liquidState
       )

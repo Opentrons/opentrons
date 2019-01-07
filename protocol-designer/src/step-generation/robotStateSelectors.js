@@ -3,9 +3,9 @@ import assert from 'assert'
 import min from 'lodash/min'
 import sortBy from 'lodash/sortBy'
 import type {Channels} from '@opentrons/components'
-import {getLabware} from '@opentrons/shared-data'
+import {getLabware, getPipetteNameSpecs, type PipetteNameSpecs} from '@opentrons/shared-data'
 import {tiprackWellNamesByCol, tiprackWellNamesFlat} from './'
-import type {RobotState, PipetteData} from './'
+import type {RobotState} from './'
 
 // SELECTOR UTILITIES
 
@@ -15,16 +15,19 @@ export function sortLabwareBySlot (robotState: RobotState) {
 
 // SELECTORS
 
-export function getPipetteChannels (pipetteId: string, robotState: RobotState): ?Channels {
-  const pipette = robotState.instruments[pipetteId]
+export function getPipetteSpecFromId (pipetteId: string, robotState: RobotState): PipetteNameSpecs {
+  const pipette = robotState.pipettes[pipetteId]
 
   if (!pipette) {
-    assert(false, `no pipette with ID {pipetteId} found in robot state`)
-    return null
+    throw Error(`no pipette with ID ${pipetteId} found in robot state`)
   }
 
-  const pipetteChannels = pipette.channels
-  return pipetteChannels
+  const pipetteSpec = getPipetteNameSpecs(pipette.name)
+  if (!pipetteSpec) {
+    throw Error(`no pipette spec for pipette with ID ${pipetteId}`)
+  }
+
+  return pipetteSpec
 }
 
 export function getLabwareType (labwareId: string, robotState: RobotState): ?string {
@@ -60,25 +63,32 @@ export function _getNextTip (
 }
 
 type NextTiprack = {|tiprackId: string, well: string|} | null
-export function getNextTiprack (pipette: PipetteData, robotState: RobotState): NextTiprack {
+export function getNextTiprack (pipetteId: string, robotState: RobotState): NextTiprack {
   /** Returns the next tiprack that has tips.
     Tipracks are any labwareIds that exist in tipState.tipracks.
     For 8-channel pipette, tipracks need a full column of tips.
     If there are no available tipracks, returns null.
   */
+  const pipetteData = robotState.pipettes[pipetteId]
+  if (!pipetteData) {
+    assert(false, `pipette ID ${pipetteId} not in robotState, could not getNextTiprack`)
+    return null
+  }
+  const pipetteSpec = getPipetteSpecFromId(pipetteId, robotState)
+
   const sortedTipracksIds = sortLabwareBySlot(robotState).filter(labwareId =>
     // assume if labwareId is not in tipState.tipracks, it's not a tiprack
     robotState.tipState.tipracks[labwareId] &&
-    (pipette.tiprackModel === robotState.labware[labwareId].type)
+    (pipetteData.tiprackModel === robotState.labware[labwareId].type)
   )
 
   const firstAvailableTiprack = sortedTipracksIds.find(tiprackId =>
-    _getNextTip(pipette.channels, robotState.tipState.tipracks[tiprackId])
+    _getNextTip(pipetteSpec.channels, robotState.tipState.tipracks[tiprackId])
   )
 
   // TODO Ian 2018-02-12: avoid calling _getNextTip twice
   const nextTip = firstAvailableTiprack &&
-    _getNextTip(pipette.channels, robotState.tipState.tipracks[firstAvailableTiprack])
+    _getNextTip(pipetteSpec.channels, robotState.tipState.tipracks[firstAvailableTiprack])
 
   if (firstAvailableTiprack && nextTip) {
     return {
@@ -93,8 +103,9 @@ export function getNextTiprack (pipette: PipetteData, robotState: RobotState): N
 export function getPipetteWithTipMaxVol (pipetteId: string, robotState: RobotState): number {
   // NOTE: this fn assumes each pipette is assigned to exactly one tiprack type,
   // across the entire timeline
-  const pipetteData = robotState.instruments[pipetteId]
-  const pipetteMaxVol = pipetteData && pipetteData.maxVolume
+  const pipetteData = robotState.pipettes[pipetteId]
+  const pipetteSpec = getPipetteSpecFromId(pipetteId, robotState)
+  const pipetteMaxVol = pipetteSpec && pipetteSpec.maxVolume
 
   const tiprackData = pipetteData && pipetteData.tiprackModel && getLabware(pipetteData.tiprackModel)
   const tiprackTipVol = tiprackData && tiprackData.metadata.tipVolume

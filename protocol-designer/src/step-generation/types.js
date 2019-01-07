@@ -1,5 +1,5 @@
 // @flow
-import type {DeckSlot, Mount, Channels} from '@opentrons/components'
+import type {DeckSlot, Mount} from '@opentrons/components'
 
 // ===== MIX-IN TYPES =====
 
@@ -146,19 +146,18 @@ export type CommandCreatorData =
   | PauseFormData
   | TransferFormData
 
-// TODO: Ian 2018-12-20 replace `PipetteData` with something like `PipetteOnDeck` type
-export type PipetteData = {| // TODO refactor all 'pipette fields', split PipetteData into its own export type
-  id: string, // TODO PipetteId export type here instead of string?
+// TODO: Ian 2018-01-07 with multiple deck setup steps, we might want to
+// separate 'entities' from 'locations' for pipettes/labware, and remove
+// 'entities' (pipette name / labware type) from the timeline to protect it
+// from being different btw frames
+export type PipetteData = {|
+  name: string,
   mount: Mount,
-  model: string, // TODO Ian 2018-11-05 rename 'model' to 'name' when breaking change is made in JSON protocols
-  maxVolume: number,
-  channels: Channels,
   tiprackModel: string, // NOTE: this will go away when tiprack choice-per-step and/or tiprack sharing is implemented
 |}
 
 export type LabwareData = {|
   type: string, // TODO Ian 2018-04-17 keys from JSON. Also, rename 'type' to 'model' (or something??)
-  name: ?string, // user-defined nickname
   slot: DeckSlot,
 |}
 
@@ -175,9 +174,9 @@ export type LabwareLiquidState = {[labwareId: string]: SingleLabwareLiquidState}
 
 export type SourceAndDest = {|source: LocationLiquidState, dest: LocationLiquidState|}
 
-// TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": RobotSimulationState?
+// TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": `TimelineFrame`?
 export type RobotState = {|
-  instruments: { // TODO Ian 2018-05-23 rename this 'pipettes' to match tipState (& to disambiguate from future 'modules')
+  pipettes: {
     [instrumentId: string]: PipetteData,
   },
   labware: {
@@ -211,7 +210,6 @@ export type PipetteLabwareFields = {|
   pipette: string,
   labware: string,
   well: string,
-  /* TODO optional uL/sec (or uL/minute???) speed here */
 |}
 
 export type TouchTipArgs = {|

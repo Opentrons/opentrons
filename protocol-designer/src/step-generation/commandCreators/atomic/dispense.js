@@ -45,7 +45,7 @@ const dispense = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState
       ...prevRobotState,
       liquidState: updateLiquidState({
         pipetteId: pipette,
-        pipetteData: prevRobotState.instruments[pipette],
+        pipetteData: prevRobotState.pipettes[pipette],
         labwareId: labware,
         labwareType: prevRobotState.labware[labware].type,
         volume,

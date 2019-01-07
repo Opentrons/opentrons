@@ -31,7 +31,7 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...
   const actionName = 'transfer'
 
-  const pipetteData = prevRobotState.instruments[data.pipette]
+  const pipetteData = prevRobotState.pipettes[data.pipette]
   if (!pipetteData) {
     // bail out before doing anything else
     return [(_robotState) => ({

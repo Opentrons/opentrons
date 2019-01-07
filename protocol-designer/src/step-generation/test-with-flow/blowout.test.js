@@ -115,7 +115,7 @@ describe('blowout', () => {
         useFullVolume: true,
         well: 'A1',
         labwareType: 'trough-12row',
-        pipetteData: robotStateWithTip.instruments.p300SingleId,
+        pipetteData: robotStateWithTip.pipettes.p300SingleId,
       }, robotStateWithTip.liquidState)
 
       expect(result.robotState.liquidState).toBe(mockLiquidReturnValue)

@@ -31,7 +31,7 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
   // TODO Ian 2018-05-03 next ~20 lines match consolidate.js
   const actionName = 'distribute'
 
-  const pipetteData = prevRobotState.instruments[data.pipette]
+  const pipetteData = prevRobotState.pipettes[data.pipette]
   if (!pipetteData) {
     // bail out before doing anything else
     return [(_robotState) => ({

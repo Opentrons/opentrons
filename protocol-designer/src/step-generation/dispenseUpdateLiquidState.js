@@ -3,6 +3,7 @@ import assert from 'assert'
 import cloneDeep from 'lodash/cloneDeep'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
+import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import {splitLiquid, mergeLiquid, getWellsForTips, getLocationTotalVolume} from './utils'
 import type {RobotState, LocationLiquidState, PipetteData, SourceAndDest} from './types'
 
@@ -22,7 +23,10 @@ export default function updateLiquidState (
 ): LiquidState {
   // TODO: Ian 2018-06-14 return same shape as aspirateUpdateLiquidState fn: {liquidState, warnings}.
   const {pipetteId, pipetteData, volume, useFullVolume, labwareId, labwareType, well} = args
-
+  const pipetteSpec = getPipetteNameSpecs(pipetteData.name)
+  if (!pipetteSpec) {
+    throw Error(`No pipette spec found for pipette ${pipetteData.name}, could not updateLiquidState`)
+  }
   assert(
     !(useFullVolume && typeof volume === 'number'),
     'dispenseUpdateLiquidState takes either `volume` or `useFullVolume`, but got both')
@@ -30,7 +34,7 @@ export default function updateLiquidState (
     'in dispenseUpdateLiquidState, either volume or useFullVolume are required')
 
   const {wellsForTips, allWellsShared} = getWellsForTips(
-    pipetteData.channels, labwareType, well)
+    pipetteSpec.channels, labwareType, well)
 
   // remove liquid from pipette tips,
   // create intermediate object where sources are updated tip liquid states

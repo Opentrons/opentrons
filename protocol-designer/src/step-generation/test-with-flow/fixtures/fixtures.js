@@ -1,5 +1,5 @@
 // @flow
-import {getLabware} from '@opentrons/shared-data'
+import {getLabware, getPipetteNameSpecs} from '@opentrons/shared-data'
 import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
@@ -79,22 +79,16 @@ export function createLabwareLiquidState<T> (labwareType: string, contents: T): 
 
 // TODO Ian 2018-03-14: these pipette fixtures should use file-data/pipetteData.js,
 // which should in turn be lifted out to a general pipette data project?
-export const p300Single = {
-  id: 'p300SingleId',
+export const p300Single: PipetteData = {
   mount: 'right',
-  model: 'p300_single_v1',
+  name: 'p300_single',
   tiprackModel: 'opentrons-tiprack-300ul',
-  maxVolume: 300,
-  channels: 1,
 }
 
-export const p300Multi = {
-  id: 'p300MultiId',
+export const p300Multi: PipetteData = {
   mount: 'left',
-  model: 'p300_multi_v1',
+  name: 'p300_multi',
   tiprackModel: 'opentrons-tiprack-300ul',
-  maxVolume: 300,
-  channels: 8,
 }
 
 export function getWellsForLabware (labwareType: string) {
@@ -111,7 +105,7 @@ export function getWellsForLabware (labwareType: string) {
 export function createEmptyLiquidState (args: {
   sourcePlateType?: string,
   destPlateType?: string,
-  pipettes: $PropertyType<RobotState, 'instruments'>,
+  pipettes: $PropertyType<RobotState, 'pipettes'>,
 }) {
   const {sourcePlateType, destPlateType, pipettes} = args
 
@@ -128,10 +122,16 @@ export function createEmptyLiquidState (args: {
   return {
     pipettes: reduce(
       pipettes,
-      (acc, pipetteData: PipetteData, pipetteId: string) => ({
-        ...acc,
-        [pipetteId]: createTipLiquidState(pipetteData.channels, {}),
-      }), {}),
+      (acc, pipetteData: PipetteData, pipetteId: string) => {
+        const pipetteSpec = getPipetteNameSpecs(pipetteData.name)
+        if (!pipetteSpec) {
+          throw Error(`no pipette spec for ${pipetteData.name}, cannot make tip liquid state for fixture`)
+        }
+        return {
+          ...acc,
+          [pipetteId]: createTipLiquidState(pipetteSpec.channels, {}),
+        }
+      }, {}),
     labware: {
       ...sourceLabware,
       ...destLabware,
@@ -152,11 +152,11 @@ type CreateRobotArgs = {
 }
 /** RobotState with empty liquid state */
 export function createRobotState (args: CreateRobotArgs): RobotState {
-  const {labware, instruments, tipState} = createRobotStateFixture(args)
+  const {labware, pipettes, tipState} = createRobotStateFixture(args)
 
   return {
     labware,
-    instruments,
+    pipettes,
     tipState,
     liquidState: createEmptyLiquidState({
       ...args,
@@ -189,7 +189,7 @@ export function createRobotStateFixture (args: CreateRobotArgs): RobotStateNoLiq
     return slot.toString()
   }
 
-  const instruments = {
+  const pipettes = {
     p300SingleId: p300Single,
     p300MultiId: p300Multi,
   }
@@ -199,7 +199,6 @@ export function createRobotStateFixture (args: CreateRobotArgs): RobotStateNoLiq
       destPlateId: {
         slot: '11',
         type: args.destPlateType,
-        name: 'Destination Plate',
       },
     }
     : {}
@@ -209,12 +208,10 @@ export function createRobotStateFixture (args: CreateRobotArgs): RobotStateNoLiq
     sourcePlateId: {
       slot: '10',
       type: args.sourcePlateType,
-      name: 'Source Plate',
     },
     trashId: {
       slot: '12',
       type: 'fixed-trash',
-      name: 'Trash',
     },
   }
 
@@ -232,7 +229,7 @@ export function createRobotStateFixture (args: CreateRobotArgs): RobotStateNoLiq
   }, {})
 
   return {
-    instruments,
+    pipettes,
 
     labware: {
       ...baseLabware,

@@ -35,18 +35,18 @@ function getTipHighlighted (
       const commandWellName = c.params.well
       const pipetteId = c.params.pipette
       const labwareType = StepGeneration.getLabwareType(labwareId, robotState)
-      const channels = StepGeneration.getPipetteChannels(pipetteId, robotState)
+      const pipetteSpec = StepGeneration.getPipetteSpecFromId(pipetteId, robotState)
 
       if (!labwareType) {
         console.error(`Labware ${labwareId} missing labwareType. Could not get tip highlight state`)
         return false
-      } else if (channels === 1) {
+      } else if (pipetteSpec.channels === 1) {
         return commandWellName === wellName
-      } else if (channels === 8) {
+      } else if (pipetteSpec.channels === 8) {
         const wellSet = getWellSetForMultichannel(labwareType, commandWellName)
         return Boolean(wellSet && wellSet.includes(wellName))
       } else {
-        console.error(`Unexpected number of channels: ${channels || '?'}. Could not get tip highlight state`)
+        console.error(`Unexpected number of channels: ${pipetteSpec.channels || '?'}. Could not get tip highlight state`)
         return false
       }
     }
