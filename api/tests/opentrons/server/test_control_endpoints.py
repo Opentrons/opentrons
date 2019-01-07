@@ -99,7 +99,7 @@ async def test_get_pipettes(async_server, async_client, monkeypatch):
 @pytest.mark.api2_only
 async def test_get_modules_v2(
         async_server, loop, async_client, monkeypatch):
-    hw = async_server['com.opentrons.hardware']._backend
+    hw = async_server['com.opentrons.hardware']
     monkeypatch.setattr(hw._backend,
                         '_attached_modules',
                         [('/dev/modules/tty1_magdeck', 'magdeck')])
@@ -135,7 +135,7 @@ async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
     test_model = 'p300_multi_v1'
     test_id = '123abc'
 
-    hw = async_server['com.opentrons.hardware']._backend
+    hw = async_server['com.opentrons.hardware']
     if async_server['api_version'] == 1:
         def dummy_read_model(mount):
             return test_model
@@ -295,7 +295,7 @@ async def test_home_pipette(async_client):
 
 
 async def test_instrument_reuse(async_server, async_client, monkeypatch):
-    hw = async_server['com.opentrons.hardware']._backend
+    hw = async_server['com.opentrons.hardware']
     if async_server['api_version'] == 1:
         hw.reset()
     else:
@@ -420,10 +420,6 @@ async def test_move_mount(async_client):
     resp = await async_client.post('/robot/home',
                                    json={'target': 'robot'})
     assert resp.status == 200
-    # from opentrons.trackers import pose_tracker
-    # print("Before: {}".format(tuple(
-    #             pose_tracker.absolute(
-    #                 robot.poses, robot._actuators['right']['carriage']))))
     data = {
         'target': 'mount',
         'point': [100, 200, 50],
@@ -431,11 +427,6 @@ async def test_move_mount(async_client):
     }
     res = await async_client.post('/robot/move', json=data)
     assert res.status == 200
-    # text = await res.text()
-    # print("After: {}".format(tuple(
-    #             pose_tracker.absolute(
-    #                 robot.poses, robot._actuators['right']['carriage']))))
-    # print("=-> Result: {}".format(text))
 
 
 async def test_move_pipette(async_client):
@@ -453,7 +444,7 @@ async def test_move_pipette(async_client):
 
 
 async def test_move_and_home_existing_pipette(async_server, async_client):
-    hw = async_server['com.opentrons.hardware']._backend
+    hw = async_server['com.opentrons.hardware']
     if async_server['api_version'] == 1:
         hw.reset()
     else:

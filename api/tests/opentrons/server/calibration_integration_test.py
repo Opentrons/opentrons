@@ -43,7 +43,8 @@ async def test_transform_from_moves(async_client, monkeypatch):
 
     assert start_res.get('pipette', {}).get('mount') == test_mount
     assert start_res.get('pipette', {}).get('model') == test_model
-
+    print("Start Results")
+    print(start_res)
     res = await async_client.post('/calibration/deck', json={
         'token': token, 'command': 'attach tip', 'tipLength': 51.7})
     assert res.status == 200

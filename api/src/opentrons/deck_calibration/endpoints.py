@@ -187,7 +187,7 @@ def set_current_mount(hardware):
     return {'pipette': pipette, 'model': model}
 
 
-async def attach_tip(data):
+async def attach_tip(data, hardware):
     """
     Attach a tip to the current pipette
 

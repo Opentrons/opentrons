@@ -30,20 +30,20 @@ async def test_add_and_remove_tip(dc_session):
     dc_session.current_mount = 'Z'
 
     # Check malformed packet
-    res0 = await endpoints.attach_tip({})
+    res0 = await endpoints.attach_tip({}, robot)
     assert res0.status == 400
     assert dc_session.tip_length is None
     assert not pip.tip_attached
 
     # Check correct attach command
     tip_length = 50
-    res1 = await endpoints.attach_tip({'tipLength': tip_length})
+    res1 = await endpoints.attach_tip({'tipLength': tip_length}, robot)
     assert res1.status == 200
     assert dc_session.tip_length == tip_length
     assert pip.tip_attached
 
     # Check command with tip already attached
-    res2 = await endpoints.attach_tip({'tipLength': tip_length + 5})
+    res2 = await endpoints.attach_tip({'tipLength': tip_length + 5}, robot)
     assert res2.status == 200
     assert dc_session.tip_length == tip_length + 5
     assert pip.tip_attached
