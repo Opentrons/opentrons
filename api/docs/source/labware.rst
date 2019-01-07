@@ -13,7 +13,7 @@ We spend a fair amount of time organizing and counting wells when writing Python
 Labware Library
 ******************
 
-The Opentrons API comes with many common labware labware built in. These labware can be loaded into you Python protocol using the ``labware.load()`` method, and the specific name of the labware you need.
+The Opentrons API comes with many common labware built in. These can be loaded into you Python protocol using the ``labware.load()`` method, and the specific name of the labware you need.
 
 Under the `Opentrons Labware`_ are a list of some of the most commonly used labware in the API, as well as images for how they look.
 
@@ -50,15 +50,6 @@ after importing labware as follows:
 
   samples_rack = labware.load('tube-rack-2ml', slot='1')
 
-Putting multiple labware in the same slot
------
-
-Some labware might only take up half a slot. You must explicitly say `share=True`, indicating that it is okay to share the slot.
-
-.. code-block:: python
-
-  tubes = labware.load('T25-flask', slot='2')
-  more_tubes = labware.load('T25-flask', slot='2', share=True)
 
 **********************
 
@@ -464,14 +455,6 @@ Unique names are useful in a few scenarios. First, they allow the labware to hav
 
 __ https://support.opentrons.com/ot-2/getting-started-software-setup/running-your-first-ot-2-protocol
 
-Names can also be used to place multiple labware in the same slot all at once, using the `share=True` argument. For example, the flasks below are all placed in slot 3. So in order for the Opentrons API to tell them apart, we have given them each a unique name.
-
-.. code-block:: python
-
-    fa = labware.load('T25-flask', '3', 'flask_a')
-    fb = labware.load('T25-flask', '3', 'flask_b', share=True)
-    fc = labware.load('T25-flask', '3', 'flask_c', share=True)
-
 Create
 ======
 
@@ -481,16 +464,23 @@ Through the API's call labware.create(), you can create simple grid labware, whi
 
 .. code-block:: python
 
-    custom_plate = labware.create(
-        '3x6_plate',                    # name of you labware
-        grid=(3, 6),                    # specify amount of (columns, rows)
-        spacing=(12, 12),               # distances (mm) between each (column, row)
-        diameter=5,                     # diameter (mm) of each well on the plate
-        depth=10,                       # depth (mm) of each well on the plate
-        volume=200)
+    plate_name = '3x6_plate'
+    if plate_name not in labware.list():
+        custom_plate = labware.create(
+            plate_name,                    # name of you labware
+            grid=(3, 6),                    # specify amount of (columns, rows)
+            spacing=(12, 12),               # distances (mm) between each (column, row)
+            diameter=5,                     # diameter (mm) of each well on the plate
+            depth=10,                       # depth (mm) of each well on the plate
+            volume=200)
 
 When you create your custom labware it will return the custom plate. You should only need to run
 this once among all of your protocols for the same custom labware because the data is automatically saved on the robot.
+
+In this example, the call to `labware.create` is wrapped in an if-block, so that it does not try to add the definition
+to a robot where this has already been run (which would cause an error). If a labware has already been added to the database
+(by previously calling `labware.create`, the if-block will not execute, and the rest of the protocol will use the definition
+that was already created and calibrated.
 
 **Note** There is some specialty labware that will require you to specify the type within your labware name.
 If you are creating a custom tiprack, it must be `tiprack`-REST-OF-LABWARE-NAME in order for the program to act reliably.
