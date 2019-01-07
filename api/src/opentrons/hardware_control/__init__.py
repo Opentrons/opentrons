@@ -1156,10 +1156,9 @@ class API(HardwareAPILike):
             pip.remove_tip()
 
         if not tip_length:
-            if not pip.has_tip:
-                tip_length = pip.config.tip_length
-            if not tip_length and pip.has_tip:
-                tip_length = pip._current_tip_length
+            assert pip.has_tip,\
+                'If pipette has no tip a tip length must be specified'
+            tip_length = pip._current_tip_length
 
         # assure_tip lets us make sure we don’t pollute the pipette
         # state even if there’s an exception in tip probe

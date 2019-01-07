@@ -1,3 +1,4 @@
+from opentrons.config import feature_flags as ff
 from opentrons.protocol_api import labware
 from opentrons.legacy_api.containers import Slot, placeable
 
@@ -40,13 +41,16 @@ class Instrument:
         self.name = instrument.name
         self.channels = instrument.channels
         self.mount = instrument.mount
-        self.tip_racks = [
-            Container(container)
-            for container in instrument.tip_racks]
         self.containers = [
             Container(container)
             for container in containers
         ]
+        self.tip_racks = [
+            Container(container)
+            for container in instrument.tip_racks]
+        if ff.use_protocol_api_v2():
+            self.tip_racks.extend([
+                c for c in self.containers if c._container.is_tiprack])
 
 
 class Module:
