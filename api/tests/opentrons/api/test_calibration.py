@@ -43,10 +43,6 @@ async def test_tip_probe_v2(main_router, model, monkeypatch):
                         'update_instrument_offset', fake_update)
     monkeypatch.setattr(main_router.calibration_manager,
                         'move_to_front', fake_move)
-    main_router.calibration_manager.tip_probe(model.instrument)
-
-    await main_router.wait_until(state('probing'))
-    await main_router.wait_until(state('ready'))
 
     tr = labware.load('opentrons_96_tiprack_300_uL', Location(Point(), 'test'))
     tr.tip_length = 2
@@ -57,18 +53,16 @@ async def test_tip_probe_v2(main_router, model, monkeypatch):
                          model.instrument._context)]
 
     def new_fake_locate(mount, tip_length):
-        assert tip_length == 2
+        assert tip_length == pytest.approx(2)
         return Point(0, 0, 0)
 
     monkeypatch.setattr(main_router.calibration_manager._hardware._api,
                         'locate_tip_probe_center', new_fake_locate)
     main_router.calibration_manager.tip_probe(model.instrument)
     await main_router.wait_until(state('ready'))
-    model.instrument.containers = model.instrument.tip_racks
-    model.instrument.tip_racks = []
 
     def new_fake_locate2(mount, tip_length):
-        assert tip_length is None
+        assert tip_length == pytest.approx(2)
         return Point(0, 0, 0)
 
     monkeypatch.setattr(main_router.calibration_manager._hardware._api,

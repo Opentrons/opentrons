@@ -133,7 +133,7 @@ def test_pick_up_and_drop_tip(loop, load_my_labware):
     instr.pick_up_tip(target_location)
 
     new_offset = model_offset - Point(0, 0,
-                                      tip_length - pipette.config.tip_overlap)
+                                      tip_length)
     assert pipette.critical_point() == new_offset
 
     instr.drop_tip(target_location)
@@ -189,7 +189,7 @@ def test_pick_up_tip_no_location(loop, load_my_labware):
                                          for cmd in ctx.commands()])
 
     new_offset = model_offset - Point(0, 0,
-                                      tip_length1 - pipette.config.tip_overlap)
+                                      tip_length1)
     assert pipette.critical_point() == new_offset
 
     # TODO: remove argument and verify once trash container is added

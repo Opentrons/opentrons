@@ -97,7 +97,6 @@ class Pipette:
     def current_tip_length(self) -> float:
         """ The length of the current tip attached (0.0 if no tip) """
         return (self._current_tip_length
-                - self._config.tip_overlap
                 - self._instrument_offset.z)
 
     @property

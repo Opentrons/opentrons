@@ -430,11 +430,11 @@ class Labware:
 
     @property
     def tip_length(self) -> float:
-        return self._parameters['tipLength']
+        return self._parameters['tipLength'] - self._parameters['tipOverlap']
 
     @tip_length.setter
     def tip_length(self, length: float):
-        self._parameters['tipLength'] = length
+        self._parameters['tipLength'] = length + self._parameters['tipOverlap']
 
     def next_tip(self, num_tips: int = 1) -> Optional[Well]:
         """
