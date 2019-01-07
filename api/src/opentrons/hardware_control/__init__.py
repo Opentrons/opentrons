@@ -1042,6 +1042,82 @@ class API(HardwareAPILike):
             self._attached_modules[new_details] = new_mod
             return True, 'firmware update successful'
 
+    async def _do_tp(self, pip, mount) -> top_types.Point:
+        """ Execute the work of tip probe.
+
+        This is a separate function so that it can be encapsulated in
+        a context manager that ensures the state of the pipette tip tracking
+        is reset properly. It should not be called outside of
+        :py:meth:`locate_tip_probe_center`.
+
+        :param pip: The pipette to use
+        :type pip: opentrons.hardware_control.pipette.Pipette
+        :param mount: The mount on which the pipette is attached
+        :type mount: opentrons.types.Mount
+        """
+        # Clear the old offset during calibration
+        pip.update_instrument_offset(top_types.Point())
+        # Hotspots based on our expectation of tip length and config
+        hotspots = robot_configs.calculate_tip_probe_hotspots(
+            pip.current_tip_length, self._config.tip_probe)
+        new_pos: Dict[Axis, List[float]] = {
+            ax: [] for ax in Axis.gantry_axes() if ax != Axis.A}
+        safe_z = self._config.tip_probe.z_clearance.crossover + \
+            self._config.tip_probe.center[2]
+        for hs in hotspots:
+            ax_en = Axis[hs.axis.upper()]
+            overridden_center = {
+                ax: sum(vals)/len(vals)
+                if len(vals) == 2
+                else self._config.tip_probe.center[ax.value]
+                for ax, vals in new_pos.items()
+            }
+            x0 = overridden_center[Axis.X] + hs.x_start_offs
+            y0 = overridden_center[Axis.Y] + hs.y_start_offs
+            z0 = hs.z_start_abs
+            pos = await self.current_position(mount)
+
+            # Move safely to the setup point for the probe
+            await self.move_to(mount,
+                               top_types.Point(pos[Axis.X],
+                                               pos[Axis.Y],
+                                               safe_z))
+            await self.move_to(mount,
+                               top_types.Point(x0, y0, safe_z))
+            await self.move_to(mount,
+                               top_types.Point(x0, y0, z0))
+            if ax_en == Axis.Z:
+                to_probe = Axis.by_mount(mount)
+            else:
+                to_probe = ax_en
+            # Probe and retrieve the position afterwards
+            async with self._motion_lock:
+                self._current_position = self._deck_from_smoothie(
+                    self._backend.probe(
+                        to_probe.name.lower(), hs.probe_distance))
+            xyz = await self.gantry_position(mount)
+            # Store the upated position.
+            self._log.debug(
+                "tip probe: hs {}: start: ({} {} {}) status {} will add {}"
+                .format(hs, x0, y0, z0, new_pos, xyz[ax_en.value]))
+            new_pos[ax_en].append(xyz[ax_en.value])
+            # Before moving up, move back to clear the switches
+            bounce = self._config.tip_probe.bounce_distance\
+                * (-1.0 if hs.probe_distance > 0 else 1.0)
+            await self.move_rel(mount,
+                                top_types.Point(
+                                    **{hs.axis: bounce}))
+            await self.move_to(mount, xyz._replace(z=safe_z))
+
+        to_ret = top_types.Point(**{ax.name.lower(): sum(vals)/len(vals)
+                                    for ax, vals in new_pos.items()})
+        self._log.info("Tip probe complete with {} {} on {}. "
+                       "New position: {} (default {}), averaged from {}"
+                       .format(pip.name, pip.pipette_id, mount.name,
+                               to_ret, self._config.tip_probe.center,
+                               new_pos))
+        return to_ret
+
     @_log_call
     async def locate_tip_probe_center(
             self, mount, tip_length=None) -> top_types.Point:
@@ -1077,12 +1153,6 @@ class API(HardwareAPILike):
         if pip.has_tip and tip_length:
             pip.remove_tip()
 
-        safe_z = self._config.tip_probe.z_clearance.crossover + \
-            self._config.tip_probe.center[2]
-
-        new_pos: Dict[Axis, List[float]] = {
-            ax: [] for ax in Axis.gantry_axes() if ax != Axis.A}
-
         if not tip_length:
             if not pip.has_tip:
                 tip_length = pip.config.tip_length
@@ -1090,8 +1160,7 @@ class API(HardwareAPILike):
                 tip_length = pip._current_tip_length
 
         # assure_tip lets us make sure we don’t pollute the pipette
-        # state even if there’s an exception in tip probe, though
-        # it leads to the ugly code with the nested function
+        # state even if there’s an exception in tip probe
         @contextlib.contextmanager
         def _assure_tip():
             if pip.has_tip:
@@ -1107,68 +1176,8 @@ class API(HardwareAPILike):
                 if old_tip:
                     pip.add_tip(old_tip)
 
-        async def _do_tp() -> top_types.Point:
-            # Clear the old offset during calibration
-            pip.update_instrument_offset(top_types.Point())
-            # Hotspots based on our expectation of tip length and config
-            hotspots = robot_configs.calculate_tip_probe_hotspots(
-                pip.current_tip_length, self._config.tip_probe)
-            for hs in hotspots:
-                ax_en = Axis[hs.axis.upper()]
-                overridden_center = {
-                    ax: sum(vals)/len(vals)
-                    if len(vals) == 2
-                    else self._config.tip_probe.center[ax.value]
-                    for ax, vals in new_pos.items()
-                }
-                x0 = overridden_center[Axis.X] + hs.x_start_offs
-                y0 = overridden_center[Axis.Y] + hs.y_start_offs
-                z0 = hs.z_start_abs
-                pos = await self.current_position(mount)
-
-                # Move safely to the setup point for the probe
-                await self.move_to(mount,
-                                   top_types.Point(pos[Axis.X],
-                                                   pos[Axis.Y],
-                                                   safe_z))
-                await self.move_to(mount,
-                                   top_types.Point(x0, y0, safe_z))
-                await self.move_to(mount,
-                                   top_types.Point(x0, y0, z0))
-                if ax_en == Axis.Z:
-                    to_probe = Axis.by_mount(mount)
-                else:
-                    to_probe = ax_en
-                # Probe and retrieve the position afterwards
-                async with self._motion_lock:
-                    self._current_position = self._deck_from_smoothie(
-                        self._backend.probe(
-                            to_probe.name.lower(), hs.probe_distance))
-                xyz = await self.gantry_position(mount)
-                # Store the upated position.
-                self._log.debug(
-                    "tip probe: hs {}: start: ({} {} {}) status {} will add {}"
-                    .format(hs, x0, y0, z0, new_pos, xyz[ax_en.value]))
-                new_pos[ax_en].append(xyz[ax_en.value])
-                # Before moving up, move back to clear the switches
-                bounce = self._config.tip_probe.bounce_distance\
-                    * (-1.0 if hs.probe_distance > 0 else 1.0)
-                await self.move_rel(mount,
-                                    top_types.Point(
-                                        **{hs.axis: bounce}))
-                await self.move_to(mount, xyz._replace(z=safe_z))
-
-            to_ret = top_types.Point(**{ax.name.lower(): sum(vals)/len(vals)
-                                        for ax, vals in new_pos.items()})
-            self._log.info("Tip probe complete with {} {} on {}. "
-                           "New position: {} (default {}), averaged from {}"
-                           .format(pip.name, pip.pipette_id, mount.name,
-                                   to_ret, self._config.tip_probe.center,
-                                   new_pos))
-            return to_ret
-
         with _assure_tip():
-            return await _do_tp()
+            return await self._do_tp(pip, mount)
 
     def update_instrument_offset(self, mount,
                                  new_offset: top_types.Point = None,

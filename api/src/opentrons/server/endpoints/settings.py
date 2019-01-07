@@ -1,6 +1,7 @@
 import logging
 import shutil
 import os
+from typing import Dict, Tuple
 from aiohttp import web
 from opentrons.config import (advanced_settings as advs,
                               robot_configs as rc,
@@ -83,18 +84,25 @@ async def set_advanced_setting(request: web.Request) -> web.Response:
     return web.json_response(res, status=status)
 
 
+def _check_reset(reset_req: Dict[str, str]) -> Tuple[bool, str]:
+    for requested_reset in reset_req.keys():
+        if requested_reset not in [opt['id']
+                                   for opt in _settings_reset_options]:
+            log.error('Bad reset option {} requested'.format(requested_reset))
+            return (False, requested_reset)
+    return (True, '')
+
+
 async def reset(request: web.Request) -> web.Response:
     """ Execute a reset of the requested parts of the user configuration.
     """
     data = await request.json()
-    for requested_reset in data.keys():
-        if requested_reset not in [opt['id']
-                                   for opt in _settings_reset_options]:
-            log.error('Bad reset option {} requested'.format(requested_reset))
-            return web.json_response(
-                {'message': '{} is not a valid reset option'
-                 .format(requested_reset)},
-                status=400)
+    ok, bad_key = _check_reset(data)
+    if not ok:
+        return web.json_response(
+            {'message': '{} is not a valid reset option'
+             .format(bad_key)},
+            status=400)
     log.info("Reset requested for {}".format(', '.join(data.keys())))
     if data.get('tipProbe'):
         config = rc.load()
