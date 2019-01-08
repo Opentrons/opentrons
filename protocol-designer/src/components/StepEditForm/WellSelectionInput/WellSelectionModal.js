@@ -119,8 +119,8 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const allWellContentsForSteps = wellContentsSelectors.getAllWellContentsForSteps(state)
 
   const stepId = stepsSelectors.getSelectedStepId(state)
-  const orderedSteps = stepFormSelectors.getOrderedSteps(state)
-  const timelineIdx = orderedSteps.findIndex(id => id === stepId)
+  const orderedStepIds = stepFormSelectors.getOrderedStepIds(state)
+  const timelineIdx = orderedStepIds.findIndex(id => id === stepId)
   const allWellContentsForStep = allWellContentsForSteps[timelineIdx]
   const formData = stepFormSelectors.getUnsavedForm(state)
   const ingredNames = selectors.getLiquidNamesById(state)

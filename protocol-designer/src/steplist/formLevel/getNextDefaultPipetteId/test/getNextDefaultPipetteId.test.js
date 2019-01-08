@@ -22,11 +22,11 @@ describe('getNextDefaultPipetteId', () => {
     testCases.forEach(({testMsg, equippedPipettesById, expected}) => {
       test(testMsg, () => {
         const savedForms = {}
-        const orderedSteps = []
+        const orderedStepIds = []
 
         const result = getNextDefaultPipetteId(
           savedForms,
-          orderedSteps,
+          orderedStepIds,
           equippedPipettesById)
 
         expect(result).toBe(expected)
@@ -38,32 +38,32 @@ describe('getNextDefaultPipetteId', () => {
     const testCases = [
       {
         testMsg: 'last used pipette',
-        orderedSteps: ['a', 'a', 'b'],
+        orderedStepIds: ['a', 'a', 'b'],
         expected: 'pipetteId_B',
       },
       {
         testMsg: 'no previous forms use pipettes',
-        orderedSteps: ['x', 'x', 'x'],
+        orderedStepIds: ['x', 'x', 'x'],
         expected: 'defaultId',
       },
       {
         testMsg: 'mix of steps with and without pipettes',
-        orderedSteps: ['x', 'a', 'x'],
+        orderedStepIds: ['x', 'a', 'x'],
         expected: 'pipetteId_A',
       },
       {
         testMsg: 'missing steps (no key in savedForms)',
-        orderedSteps: ['missingStep', 'a', 'missingStep', 'b', 'missingStep'],
+        orderedStepIds: ['missingStep', 'a', 'missingStep', 'b', 'missingStep'],
         expected: 'pipetteId_B',
       },
       {
         testMsg: 'only missing steps',
-        orderedSteps: ['missingStep', 'missingStep'],
+        orderedStepIds: ['missingStep', 'missingStep'],
         expected: 'defaultId',
       },
     ]
 
-    testCases.forEach(({testMsg, orderedSteps, expected}) => {
+    testCases.forEach(({testMsg, orderedStepIds, expected}) => {
       test(testMsg, () => {
         const savedForms = {
           a: {pipette: 'pipetteId_A'},
@@ -75,7 +75,7 @@ describe('getNextDefaultPipetteId', () => {
 
         const result = getNextDefaultPipetteId(
           savedForms,
-          orderedSteps,
+          orderedStepIds,
           equippedPipettesById)
 
         expect(result).toBe(expected)

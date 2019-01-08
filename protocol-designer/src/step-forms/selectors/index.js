@@ -171,9 +171,9 @@ export const getUnsavedForm: Selector<?FormData> = createSelector(
   (state) => state.unsavedForm
 )
 
-export const getOrderedSteps: Selector<Array<StepIdType>> = createSelector(
+export const getOrderedStepIds: Selector<Array<StepIdType>> = createSelector(
   rootSelector,
-  (state) => state.orderedSteps
+  (state) => state.orderedStepIds
 )
 
 export const getSavedStepForms: Selector<*> = createSelector(
@@ -182,10 +182,10 @@ export const getSavedStepForms: Selector<*> = createSelector(
 )
 
 const getOrderedSavedForms: Selector<Array<FormData>> = createSelector(
-  getOrderedSteps,
+  getOrderedStepIds,
   getSavedStepForms,
-  (orderedSteps, savedStepForms) => {
-    return orderedSteps
+  (orderedStepIds, savedStepForms) => {
+    return orderedStepIds
       .map(stepId => savedStepForms[stepId])
       .filter(form => form && form.id != null) // NOTE: for old protocols where stepId could === 0, need to do != null here
   }

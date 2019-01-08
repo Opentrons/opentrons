@@ -37,7 +37,7 @@ export type PDMetadata = {
   ingredLocations: $PropertyType<IngredRoot, 'ingredLocations'>,
 
   savedStepForms: $PropertyType<StepformRoot, 'savedStepForms'>,
-  orderedSteps: $PropertyType<StepformRoot, 'orderedSteps'>,
+  orderedStepIds: $PropertyType<StepformRoot, 'orderedStepIds'>,
 }
 
 // A JSON protocol
