@@ -2,6 +2,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 
+import {getModuleDisplayName} from '@opentrons/shared-data'
 import {getConnectedRobot} from '../../discovery'
 import {
   fetchModules,
@@ -53,9 +54,10 @@ class TempDeckStatusCard extends React.Component<Props> {
     // again once we've received the response from the last call
     const currentTemp = (tempdeckData && tempdeckData.data.currentTemp) || tempdeck.data.currentTemp
     const targetTemp = (tempdeckData && tempdeckData.data.targetTemp) || tempdeck.data.targetTemp
+    const displayName = getModuleDisplayName(tempdeck.name)
     return (
       <IntervalWrapper refresh={fetchModuleData} interval={POLL_TEMPDECK_INTERVAL_MS}>
-        <StatusCard title={tempdeck.displayName}>
+        <StatusCard title={displayName}>
           <CardContentRow>
             <StatusItem status={(tempdeckData && tempdeckData.status) || tempdeck.status } />
           </CardContentRow>
