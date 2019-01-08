@@ -24,10 +24,10 @@ const rootSelector = (state: BaseState): StepsState => state.ui.steps
 /** fallbacks for selectedItem reducer, when null */
 const getNonNullSelectedItem: Selector<SelectableItem> = createSelector(
   rootSelector,
-  stepFormSelectors.getOrderedSteps,
-  (state, orderedSteps) => {
+  stepFormSelectors.getOrderedStepIds,
+  (state, orderedStepIds) => {
     if (state.selectedItem != null) return state.selectedItem
-    if (orderedSteps.length > 0) return {isStep: true, id: last(orderedSteps)}
+    if (orderedStepIds.length > 0) return {isStep: true, id: last(orderedStepIds)}
     return initialSelectedItemState
   }
 )

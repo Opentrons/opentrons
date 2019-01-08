@@ -76,7 +76,7 @@ export const selectStep = (stepId: StepIdType, newStepType?: StepType): ThunkAct
 
     const defaultPipetteId = getNextDefaultPipetteId(
       stepFormSelectors.getSavedStepForms(state),
-      stepFormSelectors.getOrderedSteps(state),
+      stepFormSelectors.getOrderedStepIds(state),
       stepFormSelectors.getInitialDeckSetup(state).pipettes,
     )
 

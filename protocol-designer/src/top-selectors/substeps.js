@@ -18,20 +18,20 @@ export const allSubsteps: Selector<AllSubsteps> = createSelector(
   stepFormSelectors.getArgsAndErrorsByStepId,
   stepFormSelectors.getInitialDeckSetup,
   labwareIngredSelectors.getLabwareTypes,
-  stepFormSelectors.getOrderedSteps,
+  stepFormSelectors.getOrderedStepIds,
   fileDataSelectors.getRobotStateTimeline,
   fileDataSelectors.getInitialRobotState,
   (
     allStepArgsAndErrors,
     initialDeckSetup,
     allLabwareTypes,
-    orderedSteps,
+    orderedStepIds,
     robotStateTimeline,
     _initialRobotState,
   ) => {
     const timeline = [{robotState: _initialRobotState}, ...robotStateTimeline.timeline]
     const allPipetteData = initialDeckSetup.pipettes
-    return orderedSteps.reduce((acc: AllSubsteps, stepId, timelineIndex) => {
+    return orderedStepIds.reduce((acc: AllSubsteps, stepId, timelineIndex) => {
       const robotState = timeline[timelineIndex] && timeline[timelineIndex].robotState
 
       const substeps = generateSubsteps(

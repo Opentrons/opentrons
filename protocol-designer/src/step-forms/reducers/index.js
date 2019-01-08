@@ -32,7 +32,7 @@ import type {
   DuplicateLabwareAction,
 } from '../../labware-ingred/actions'
 import type {FormData, StepIdType} from '../../form-types'
-import type {FileLabware, FilePipette, ProtocolFile} from '../../file-types'
+import type {FileLabware, FilePipette} from '../../file-types'
 
 import type {
   AddStepAction,
@@ -85,7 +85,7 @@ export const unsavedForm = (rootState: RootState, action: UnsavedFormActions): F
     case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
       // only substitute unsaved step form if its ID is in the start-end range
       const {substitutionMap, startStepId, endStepId} = action.payload
-      const stepIdsToUpdate = getIdsInRange(rootState.orderedSteps, startStepId, endStepId)
+      const stepIdsToUpdate = getIdsInRange(rootState.orderedStepIds, startStepId, endStepId)
 
       if (
         unsavedFormState &&
@@ -111,35 +111,17 @@ export const unsavedForm = (rootState: RootState, action: UnsavedFormActions): F
   }
 }
 
-type SavedStepFormState = {
+export type SavedStepFormState = {
   [StepIdType]: FormData,
 }
 
-const initialDeckSetupStepForm: FormData = {
+export const initialDeckSetupStepForm: FormData = {
   stepType: 'manualIntervention',
   id: INITIAL_DECK_SETUP_STEP_ID,
   labwareLocationUpdate: {
     [FIXED_TRASH_ID]: '12',
   },
   pipetteLocationUpdate: {},
-}
-
-function _migratePreDeckSetupStep (fileData: ProtocolFile): FormData {
-  // builds the initial deck setup step for older protocols that didn't have one.
-  const additionalLabware = mapValues(fileData.labware, (labware: FileLabware) => labware.slot)
-  const pipetteLocations = mapValues(fileData.pipettes, (pipette: FilePipette) => pipette.mount)
-
-  return {
-    ...initialDeckSetupStepForm,
-    labwareLocationUpdate: {
-      ...initialDeckSetupStepForm.labwareLocationUpdate,
-      ...additionalLabware,
-    },
-    pipetteLocationUpdate: {
-      ...initialDeckSetupStepForm.pipetteLocationUpdate,
-      ...pipetteLocations,
-    },
-  }
 }
 
 function _getNextAvailableSlot (labwareLocations: {[labwareId: string]: DeckSlot}): ?DeckSlot {
@@ -178,27 +160,10 @@ export const savedStepForms = (
       return omit(savedStepForms, action.payload)
     }
     case 'LOAD_FILE': {
-      // backwards compatibility: adds in INITIAL_DECK_SETUP_STEP_ID with
-      // all labware (from PD metadata) if there was no such step form
       const fileData = action.payload
       const stepFormsFromFile = getPDMetadata(fileData).savedStepForms
 
-      // only migrate if there's no initial deck setup step
-      const loadedStepForms = (stepFormsFromFile[INITIAL_DECK_SETUP_STEP_ID])
-        ? stepFormsFromFile
-        : {
-          [INITIAL_DECK_SETUP_STEP_ID]: _migratePreDeckSetupStep(fileData),
-          ...stepFormsFromFile,
-        }
-
-      // migrate old kebab-case keys to camelCase
-      const cleanedLoadedStepForms = mapValues(loadedStepForms, (stepForm) => ({
-        ...omit(stepForm, ['step-name', 'step-details']),
-        stepName: stepForm.stepName || stepForm['step-name'],
-        stepDetails: stepForm.stepDetails || stepForm['step-details'],
-      }))
-
-      return mapValues(cleanedLoadedStepForms, stepForm => ({
+      return mapValues(stepFormsFromFile, stepForm => ({
         ...getDefaultsForStepType(stepForm.stepType),
         ...stepForm,
       }))
@@ -281,7 +246,7 @@ export const savedStepForms = (
     }
     case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
       const {startStepId, endStepId, substitutionMap} = action.payload
-      const stepIdsToUpdate = getIdsInRange(rootState.orderedSteps, startStepId, endStepId)
+      const stepIdsToUpdate = getIdsInRange(rootState.orderedStepIds, startStepId, endStepId)
       const savedStepsUpdate = stepIdsToUpdate.reduce((acc, stepId) => {
         const prevStepForm = savedStepForms[stepId]
 
@@ -411,16 +376,16 @@ export const pipetteInvariantProperties = handleActions({
   },
 }, initialPipetteState)
 
-type OrderedStepsState = Array<StepIdType>
-const initialOrderedStepsState = []
-export const orderedSteps = handleActions({
-  ADD_STEP: (state: OrderedStepsState, action: AddStepAction) =>
+type OrderedStepIdsState = Array<StepIdType>
+const initialOrderedStepIdsState = []
+export const orderedStepIds = handleActions({
+  ADD_STEP: (state: OrderedStepIdsState, action: AddStepAction) =>
     [...state, action.payload.id],
-  DELETE_STEP: (state: OrderedStepsState, action: DeleteStepAction) =>
+  DELETE_STEP: (state: OrderedStepIdsState, action: DeleteStepAction) =>
     state.filter(stepId => stepId !== action.payload),
-  LOAD_FILE: (state: OrderedStepsState, action: LoadFileAction): OrderedStepsState =>
-    getPDMetadata(action.payload).orderedSteps,
-  REORDER_SELECTED_STEP: (state: OrderedStepsState, action: ReorderSelectedStepAction): OrderedStepsState => {
+  LOAD_FILE: (state: OrderedStepIdsState, action: LoadFileAction): OrderedStepIdsState =>
+    getPDMetadata(action.payload).orderedStepIds,
+  REORDER_SELECTED_STEP: (state: OrderedStepIdsState, action: ReorderSelectedStepAction): OrderedStepIdsState => {
     // TODO: BC 2018-11-27 make util function for reordering and use it everywhere
     const {delta, stepId} = action.payload
     const stepsWithoutSelectedStep = state.filter(s => s !== stepId)
@@ -435,7 +400,7 @@ export const orderedSteps = handleActions({
       ...stepsWithoutSelectedStep.slice(nextIndex),
     ]
   },
-  DUPLICATE_STEP: (state: OrderedStepsState, action: DuplicateStepAction): OrderedStepsState => {
+  DUPLICATE_STEP: (state: OrderedStepIdsState, action: DuplicateStepAction): OrderedStepIdsState => {
     const {stepId, duplicateStepId} = action.payload
     const selectedIndex = state.findIndex(s => s === stepId)
 
@@ -445,10 +410,10 @@ export const orderedSteps = handleActions({
       ...state.slice(selectedIndex + 1, state.length),
     ]
   },
-  REORDER_STEPS: (state: OrderedStepsState, action: ReorderStepsAction): OrderedStepsState => (
+  REORDER_STEPS: (state: OrderedStepIdsState, action: ReorderStepsAction): OrderedStepIdsState => (
     action.payload.stepIds
   ),
-}, initialOrderedStepsState)
+}, initialOrderedStepIdsState)
 
 // TODO: Ian 2018-12-19 DEPRECATED. This should be removed soon, but we need it until we
 // move to not having "pristine" steps
@@ -461,11 +426,11 @@ export const legacySteps = handleActions({
   }),
   DELETE_STEP: (state, action: DeleteStepAction) => omit(state, action.payload.toString()),
   LOAD_FILE: (state: LegacyStepsState, action: LoadFileAction): LegacyStepsState => {
-    const {savedStepForms, orderedSteps} = getPDMetadata(action.payload)
-    return orderedSteps.reduce((acc: LegacyStepsState, stepId) => {
+    const {savedStepForms, orderedStepIds} = getPDMetadata(action.payload)
+    return orderedStepIds.reduce((acc: LegacyStepsState, stepId) => {
       const stepForm = savedStepForms[stepId]
       if (!stepForm) {
-        console.warn(`Step id ${stepId} found in orderedSteps but not in savedStepForms`)
+        console.warn(`Step id ${stepId} found in orderedStepIds but not in savedStepForms`)
         return acc
       }
       return {
@@ -487,7 +452,7 @@ export const legacySteps = handleActions({
 }, initialLegacyStepState)
 
 export type RootState = {
-  orderedSteps: OrderedStepsState,
+  orderedStepIds: OrderedStepIdsState,
   labwareInvariantProperties: LabwareEntities,
   pipetteInvariantProperties: PipetteInvariantState,
   legacySteps: LegacyStepsState,
@@ -501,7 +466,7 @@ export type RootState = {
 const rootReducer = (state: RootState, action: any) => {
   const prevStateFallback = state || {}
   const nextState = {
-    orderedSteps: orderedSteps(prevStateFallback.orderedSteps, action),
+    orderedStepIds: orderedStepIds(prevStateFallback.orderedStepIds, action),
     labwareInvariantProperties: labwareInvariantProperties(prevStateFallback.labwareInvariantProperties, action),
     pipetteInvariantProperties: pipetteInvariantProperties(prevStateFallback.pipetteInvariantProperties, action),
     legacySteps: legacySteps(prevStateFallback.legacySteps, action),

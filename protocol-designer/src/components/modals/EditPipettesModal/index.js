@@ -21,7 +21,7 @@ type Props = ElementProps<typeof FilePipettesModal>
 
 type SP = {
   _prevPipettes: {[pipetteId: string]: PipetteOnDeck},
-  _orderedSteps: Array<StepIdType>,
+  _orderedStepIds: Array<StepIdType>,
 }
 
 type OP = {
@@ -33,7 +33,7 @@ const mapSTP = (state: BaseState): SP => {
   return {
     initialPipetteValues: initialPipettes,
     _prevPipettes: stepFormSelectors.getInitialDeckSetup(state).pipettes, // TODO: Ian 2019-01-02 when multi-step editing is supported, don't use initial deck state. Instead, show the pipettes available for the selected step range
-    _orderedSteps: stepFormSelectors.getOrderedSteps(state),
+    _orderedStepIds: stepFormSelectors.getOrderedStepIds(state),
   }
 }
 
@@ -49,7 +49,7 @@ const mapSTP = (state: BaseState): SP => {
 // Currently, PD's Edit Pipettes functionality is doing several of these steps
 // in one click (create, change manualIntervention step, substitute pipettes
 // across all steps, delete pipettes), which is why it's so funky!
-const makeUpdatePipettes = (prevPipettes, orderedSteps, dispatch, closeModal) =>
+const makeUpdatePipettes = (prevPipettes, orderedStepIds, dispatch, closeModal) =>
   ({pipettes: newPipetteArray}) => {
     const prevPipetteIds = Object.keys(prevPipettes)
     let usedPrevPipettes: Array<string> = [] // IDs of pipettes in prevPipettes that were already put into nextPipettes
@@ -98,12 +98,12 @@ const makeUpdatePipettes = (prevPipettes, orderedSteps, dispatch, closeModal) =>
     }, {})
 
     // substitute deleted pipettes with new pipettes on the same mount, if any
-    if (!isEmpty(substitutionMap) && orderedSteps.length > 0) {
+    if (!isEmpty(substitutionMap) && orderedStepIds.length > 0) {
       // NOTE: using start/end here is meant to future-proof this action for multi-step editing
       dispatch(stepFormActions.substituteStepFormPipettes({
         substitutionMap,
-        startStepId: orderedSteps[0],
-        endStepId: last(orderedSteps),
+        startStepId: orderedStepIds[0],
+        endStepId: last(orderedStepIds),
       }))
     }
 
@@ -117,8 +117,8 @@ const makeUpdatePipettes = (prevPipettes, orderedSteps, dispatch, closeModal) =>
 
 const mergeProps = (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>}, ownProps: OP): Props => {
   const {dispatch} = dispatchProps
-  const {_prevPipettes, _orderedSteps, ...passThruStateProps} = stateProps
-  const updatePipettes = makeUpdatePipettes(_prevPipettes, _orderedSteps, dispatch, ownProps.closeModal)
+  const {_prevPipettes, _orderedStepIds, ...passThruStateProps} = stateProps
+  const updatePipettes = makeUpdatePipettes(_prevPipettes, _orderedStepIds, dispatch, ownProps.closeModal)
 
   return {
     ...ownProps,
