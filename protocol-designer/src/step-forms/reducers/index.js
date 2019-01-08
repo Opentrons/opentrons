@@ -418,8 +418,11 @@ export const orderedStepIds = handleActions({
     [...state, action.payload.id],
   DELETE_STEP: (state: OrderedStepIdsState, action: DeleteStepAction) =>
     state.filter(stepId => stepId !== action.payload),
-  LOAD_FILE: (state: OrderedStepIdsState, action: LoadFileAction): OrderedStepIdsState =>
-    getPDMetadata(action.payload).orderedStepIds,
+  LOAD_FILE: (state: OrderedStepIdsState, action: LoadFileAction): OrderedStepIdsState => {
+    const fileMetadata = getPDMetadata(action.payload)
+    // TODO: Ian 2019-01-08 remove this "migration" fallback for renamed key
+    return fileMetadata.orderedStepIds || fileMetadata.orderedSteps
+  },
   REORDER_SELECTED_STEP: (state: OrderedStepIdsState, action: ReorderSelectedStepAction): OrderedStepIdsState => {
     // TODO: BC 2018-11-27 make util function for reordering and use it everywhere
     const {delta, stepId} = action.payload
