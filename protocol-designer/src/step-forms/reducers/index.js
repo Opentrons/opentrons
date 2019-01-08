@@ -194,8 +194,8 @@ export const savedStepForms = (
       // migrate old kebab-case keys to camelCase
       const cleanedLoadedStepForms = mapValues(loadedStepForms, (stepForm) => ({
         ...omit(stepForm, ['step-name', 'step-details']),
-        stepName: stepForm['step-name'],
-        stepDetails: stepForm['step-details'],
+        stepName: stepForm.stepName || stepForm['step-name'],
+        stepDetails: stepForm.stepDetails || stepForm['step-details'],
       }))
 
       return mapValues(cleanedLoadedStepForms, stepForm => ({
