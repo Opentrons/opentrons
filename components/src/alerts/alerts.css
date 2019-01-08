@@ -69,6 +69,10 @@
     text-decoration: underline;
     color: inherit;
   }
+
+  &:empty {
+    padding: 0;
+  }
 }
 
 .icon {
