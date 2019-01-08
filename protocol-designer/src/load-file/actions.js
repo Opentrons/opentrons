@@ -1,4 +1,5 @@
 // @flow
+import migrateFile from './migration'
 import type {ProtocolFile} from '../file-types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../types'
 import type {
@@ -15,7 +16,7 @@ export const fileErrors = (payload: FileError) => ({
 // expects valid, parsed JSON protocol.
 const loadFileAction = (payload: ProtocolFile): LoadFileAction => ({
   type: 'LOAD_FILE',
-  payload,
+  payload: migrateFile(payload),
 })
 
 // load file thunk, handles file loading errors
