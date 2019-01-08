@@ -2,6 +2,8 @@
 import * as React from 'react'
 import cx from 'classnames'
 
+import {getModuleDisplayName} from '@opentrons/shared-data'
+
 import {Icon} from '../icons'
 import LabwareContainer from './LabwareContainer'
 import {CenteredTextSvg} from '../CenteredTextSvg'
@@ -42,6 +44,7 @@ export default function Module (props: Props) {
 function ModuleItemContents (props: Props) {
   // TODO(mc, 2018-07-23): displayName?
   const {mode, name} = props
+  const displayName = getModuleDisplayName(name)
 
   if (!mode || mode === 'default') {
     // generic/empty display - just show USB icon
@@ -60,10 +63,10 @@ function ModuleItemContents (props: Props) {
     ? (
       <React.Fragment>
         <tspan x='55%' dy='-6'>Missing:</tspan>
-        <tspan x='55%' dy='12'>{name}</tspan>
+        <tspan x='55%' dy='12'>{displayName}</tspan>
       </React.Fragment>
     )
-    : (<tspan x='55%'>{name}</tspan>)
+    : (<tspan x='55%'>{displayName}</tspan>)
 
   const iconClassName = cx(styles.module_review_icon, {
     [styles.module_review_icon_missing]: mode === 'missing',

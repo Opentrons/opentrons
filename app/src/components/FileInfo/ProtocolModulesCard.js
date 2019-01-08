@@ -46,7 +46,7 @@ function ProtocolModulesCard (props: Props) {
 
   const moduleInfo = modules.map(module => {
     const displayName =
-      module.name === 'tempdeck' ? 'Temperature Module' : 'Magnetic Bead Module'
+      module.name === 'tempdeck' ? 'Temperature Module' : 'Magnetic Module'
 
     const actualModel =
       actualModules && actualModules.modules.find(m => m.name === module.name)

@@ -56,7 +56,6 @@ export default function LabwareItem (props: LabwareItemProps) {
         )}
 
         {!showSpinner && module && (
-          // TODO(mc, 2018-07-23): displayName?
           <ModuleNameOverlay name={module.name} />
         )}
 
