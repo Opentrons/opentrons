@@ -4,11 +4,14 @@ import logging
 import time
 from typing import Any, Dict, List, Optional, Union, Tuple
 
-from .labware import Well, Labware, load, load_module, ModuleGeometry
+from .labware import (Well, Labware, load, load_module, ModuleGeometry,
+                      quirks_from_any_parent)
 from opentrons import types, hardware_control as hc, broker, commands as cmds
 import opentrons.config.robot_configs as rc
 from opentrons.config import advanced_settings
 from opentrons.hardware_control import adapters, modules
+from opentrons.hardware_control.types import CriticalPoint
+
 from . import geometry
 
 
@@ -854,15 +857,21 @@ class InstrumentContext:
             from_lw = self._ctx.location_cache.labware
         else:
             from_lw = None
+
+        from_center = 'centerMultichannelOnWells'\
+            in quirks_from_any_parent(from_lw)
+        cp_override = CriticalPoint.XY_CENTER if from_center else None
         from_loc = types.Location(
-            self._hw_manager.hardware.gantry_position(self._mount),
+            self._hw_manager.hardware.gantry_position(
+                self._mount, critical_point=cp_override),
             from_lw)
         moves = geometry.plan_moves(from_loc, location, self._ctx.deck)
-        self._log.debug("move {}->{}: {}"
+        self._log.debug("move_to: {}->{} via:\n\t{}"
                         .format(from_loc, location, moves))
         try:
             for move in moves:
-                self._hw_manager.hardware.move_to(self._mount, move)
+                self._hw_manager.hardware.move_to(
+                    self._mount, move[0], critical_point=move[1])
         except Exception:
             self._ctx.location_cache = None
             raise

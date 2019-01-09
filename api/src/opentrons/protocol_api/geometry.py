@@ -4,7 +4,8 @@ import logging
 from typing import List, Optional, Tuple, Union
 
 from opentrons import types
-from .labware import Labware, Well, ModuleGeometry
+from .labware import Labware, Well, ModuleGeometry, quirks_from_any_parent
+from opentrons.hardware_control.types import CriticalPoint
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -14,11 +15,13 @@ def max_many(*args):
     return functools.reduce(max, args[1:], args[0])
 
 
-def plan_moves(from_loc: types.Location,
-               to_loc: types.Location,
-               deck: 'Deck',
-               well_z_margin: float = 5.0,
-               lw_z_margin: float = 20.0) -> List[types.Point]:
+def plan_moves(
+        from_loc: types.Location,
+        to_loc: types.Location,
+        deck: 'Deck',
+        well_z_margin: float = 5.0,
+        lw_z_margin: float = 20.0) -> List[Tuple[types.Point,
+                                                 Optional[CriticalPoint]]]:
     """ Plan moves between one :py:class:`.Location` and another.
 
     Each :py:class:`.Location` instance might or might not have a specific
@@ -36,7 +39,8 @@ def plan_moves(from_loc: types.Location,
                               the bare minimum to clear different pieces of
                               labware. Default: 20mm
 
-    :returns: A list of :py:class:`.Point` to move through.
+    :returns: A list of tuples of :py:class:`.Point` and critical point
+              overrides to move through.
     """
 
     def _split_loc_labware(
@@ -52,11 +56,19 @@ def plan_moves(from_loc: types.Location,
     to_lw, to_well = _split_loc_labware(to_loc)
     from_point = from_loc.point
     from_lw, from_well = _split_loc_labware(from_loc)
+    dest_quirks = quirks_from_any_parent(to_lw)
+    from_quirks = quirks_from_any_parent(from_lw)
+    from_center = 'centerMultichannelOnWells' in from_quirks
+    to_center = 'centerMultichannelOnWells' in dest_quirks
+    dest_cp_override = CriticalPoint.XY_CENTER if to_center else None
+    origin_cp_override = CriticalPoint.XY_CENTER if from_center else None
 
     if to_lw and to_lw == from_lw:
         # Two valid labwares. We’ll either raise to clear a well or go direct
         if to_well and to_well == from_well:
-            return [to_point]
+            # If we’re going direct, we can assume we’re already in the correct
+            # cp so we can use the override without prep
+            return [(to_point, dest_cp_override)]
         else:
             if to_well:
                 to_safety = to_well.top().point.z + well_z_margin
@@ -76,9 +88,12 @@ def plan_moves(from_loc: types.Location,
         safe = max_many(to_point.z,
                         from_point.z,
                         deck.highest_z + lw_z_margin)
-    return [from_point._replace(z=safe),
-            to_point._replace(z=safe),
-            to_point]
+
+    # We should use the origin’s cp for the first move since it should
+    # move only in z and the destination’s cp subsequently
+    return [(from_point._replace(z=safe), origin_cp_override),
+            (to_point._replace(z=safe), dest_cp_override),
+            (to_point, dest_cp_override)]
 
 
 DeckItem = Union[Labware, ModuleGeometry]

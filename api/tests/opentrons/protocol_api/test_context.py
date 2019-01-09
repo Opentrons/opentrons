@@ -65,7 +65,9 @@ def test_location_cache(loop, monkeypatch, load_my_labware):
                        lw_z_margin=None):
         nonlocal test_args
         test_args = (from_loc, to_loc, deck, well_z_margin, lw_z_margin)
-        return [Point(0, 1, 10), Point(1, 2, 10), Point(1, 2, 3)]
+        return [(Point(0, 1, 10), None),
+                (Point(1, 2, 10), None),
+                (Point(1, 2, 3), None)]
 
     monkeypatch.setattr(papi.geometry, 'plan_moves', fake_plan_move)
     # When we move without a cache, the from location should be the gantry
@@ -93,9 +95,9 @@ def test_move_uses_arc(loop, monkeypatch, load_my_labware):
 
     targets = []
 
-    async def fake_move(mount, target_pos):
+    async def fake_move(mount, target_pos, **kwargs):
         nonlocal targets
-        targets.append((mount, target_pos))
+        targets.append((mount, target_pos, kwargs))
     monkeypatch.setattr(hardware, 'move_to', fake_move)
 
     right.move_to(lw.wells()[0].top())
@@ -236,9 +238,9 @@ def test_aspirate(loop, load_my_labware, monkeypatch):
 
     move_called_with = None
 
-    def fake_move(mount, loc):
+    def fake_move(mount, loc, **kwargs):
         nonlocal move_called_with
-        move_called_with = (mount, loc)
+        move_called_with = (mount, loc, kwargs)
 
     monkeypatch.setattr(ctx._hw_manager.hardware._api,
                         'aspirate', fake_hw_aspirate)
@@ -248,13 +250,15 @@ def test_aspirate(loop, load_my_labware, monkeypatch):
     assert 'aspirating' in ','.join([cmd.lower() for cmd in ctx.commands()])
 
     assert asp_called_with == (Mount.RIGHT, 2.0, 1.0)
-    assert move_called_with == (Mount.RIGHT, lw.wells()[0].bottom().point)
+    assert move_called_with == (Mount.RIGHT, lw.wells()[0].bottom().point,
+                                {'critical_point': None})
 
     instr.well_bottom_clearance = 1.0
     instr.aspirate(2.0, lw.wells()[0])
     dest_point, dest_lw = lw.wells()[0].bottom()
     dest_point = dest_point._replace(z=dest_point.z + 1.0)
-    assert move_called_with == (Mount.RIGHT, dest_point)
+    assert move_called_with == (Mount.RIGHT, dest_point,
+                                {'critical_point': None})
 
     move_called_with = None
     instr.aspirate(2.0)
@@ -275,9 +279,9 @@ def test_dispense(loop, load_my_labware, monkeypatch):
 
     move_called_with = None
 
-    def fake_move(mount, loc):
+    def fake_move(mount, loc, **kwargs):
         nonlocal move_called_with
-        move_called_with = (mount, loc)
+        move_called_with = (mount, loc, kwargs)
 
     monkeypatch.setattr(ctx._hw_manager.hardware._api,
                         'dispense', fake_hw_dispense)
@@ -286,13 +290,15 @@ def test_dispense(loop, load_my_labware, monkeypatch):
     instr.dispense(2.0, lw.wells()[0].bottom())
     assert 'dispensing' in ','.join([cmd.lower() for cmd in ctx.commands()])
     assert disp_called_with == (Mount.RIGHT, 2.0, 1.0)
-    assert move_called_with == (Mount.RIGHT, lw.wells()[0].bottom().point)
+    assert move_called_with == (Mount.RIGHT, lw.wells()[0].bottom().point,
+                                {'critical_point': None})
 
     instr.well_bottom_clearance = 1.0
     instr.dispense(2.0, lw.wells()[0])
     dest_point, dest_lw = lw.wells()[0].bottom()
     dest_point = dest_point._replace(z=dest_point.z + 1.0)
-    assert move_called_with == (Mount.RIGHT, dest_point)
+    assert move_called_with == (Mount.RIGHT, dest_point,
+                                {'critical_point': None})
 
     move_called_with = None
     instr.dispense(2.0)

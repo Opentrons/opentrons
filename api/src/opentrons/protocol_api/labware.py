@@ -782,3 +782,16 @@ def load_module(name: str, parent: Location) -> ModuleGeometry:
     module_def = json.loads(  # type: ignore
         pkgutil.get_data('opentrons', def_path))
     return load_module_from_definition(module_def[name], parent)
+
+
+def quirks_from_any_parent(
+        loc: Union[Labware, Well, str, ModuleGeometry, None]) -> List[str]:
+    """ Walk the tree of wells and labwares and extract quirks """
+    def recursive_get_quirks(obj, found):
+        if isinstance(obj, Labware):
+            return found + obj.parameters.get('quirks', [])
+        elif isinstance(obj, Well):
+            return recursive_get_quirks(obj.parent, found)
+        else:
+            return found
+    return recursive_get_quirks(loc, [])

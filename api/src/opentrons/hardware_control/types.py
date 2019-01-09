@@ -42,6 +42,37 @@ class HardwareAPILike:
 
 
 class CriticalPoint(enum.Enum):
+    """ Possibilities for the point to move in a move call.
+
+    The active critical point determines the offsets that are added to the
+    gantry position when moving a pipette around.
+    """
     MOUNT = enum.auto()
+    """
+    For legacy reasons, the position of the end of a P300 single. The default
+    when no pipette is attached, and used for consistent behavior in certain
+    contexts (like change pipette) when a variety of different pipettes might
+    be attached.
+    """
+
     NOZZLE = enum.auto()
+    """
+    The end of the nozzle of a single pipette or the end of the back-most
+    nozzle of a multipipette. Only relevant when a pipette is present.
+    """
+
     TIP = enum.auto()
+    """
+    The end of the tip of a single pipette or the end of the back-most
+    tip of a multipipette. Only relevant when a pipette is present and
+    a tip with known tip length is attached.
+    """
+
+    XY_CENTER = enum.auto()
+    """
+    Separately from the z component of the critical point, XY_CENTER means
+    the critical point under consideration is the XY center of the pipette.
+    This changes nothing for single pipettes, but makes multipipettes
+    move their centers - so between channels 4 and 5 - to the specified
+    point.
+    """
