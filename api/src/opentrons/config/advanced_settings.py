@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from copy import copy
 from opentrons.config import get_config_index
 
@@ -54,7 +55,9 @@ settings = [
     Setting(
         _id='useProtocolApi2',
         title='Use Protocol API version 2',
-        description='Use new implementation of protocol API. This should not be activated except by developers.' # noqa
+        description='Use new implementation of protocol API. This should not'
+                    ' be activated except by developers or testers. Please'
+                    ' power cycle the robot after changing this setting.'
     ),
     Setting(
         _id='useNewP10Aspiration',
@@ -151,6 +154,8 @@ def _write_settings_file(data: dict, settings_file: str):
     try:
         with open(settings_file, 'w') as fd:
             json.dump(data, fd)
+            fd.flush()
+            os.fsync(fd.fileno())
     except OSError:
         log.exception('Failed to write advanced settings file to: {}'.format(
             settings_file))
