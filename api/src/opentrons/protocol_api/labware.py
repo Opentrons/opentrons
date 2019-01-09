@@ -231,6 +231,11 @@ class Labware:
         return self._parameters
 
     @property
+    def quirks(self) -> List[str]:
+        """ Quirks specific to this labware. """
+        return self.parameters.get('quirks', [])
+
+    @property
     def magdeck_engage_height(self) -> Optional[float]:
         if not self._parameters['isMagneticModuleCompatible']:
             return None
@@ -789,7 +794,7 @@ def quirks_from_any_parent(
     """ Walk the tree of wells and labwares and extract quirks """
     def recursive_get_quirks(obj, found):
         if isinstance(obj, Labware):
-            return found + obj.parameters.get('quirks', [])
+            return found + obj.quirks
         elif isinstance(obj, Well):
             return recursive_get_quirks(obj.parent, found)
         else:
