@@ -101,7 +101,7 @@ const labwareSource = {
     slot: props.slot,
     containerId: props.containerId,
   }),
-  canDrag: (props) => !!props.containerId,
+  canDrag: (props) => !!props.containerId && props.isManualInterventionStep,
 }
 const collectLabwareSource = (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
@@ -281,7 +281,9 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
 
     // determine what overlay to show
     let overlay = null
+    let isManualInterventionStep = false
     if (selectedTerminalItem === START_TERMINAL_ITEM_ID && !addLabwareMode) {
+      isManualInterventionStep = true
       if (showNameOverlay) {
         overlay = (
           <NameThisLabwareOverlay
@@ -309,7 +311,7 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
       : <EmptyDeckSlot slot={slot} />
 
     return (
-      <DragDropLabware {...{slot, highlighted, labwareOrSlot, overlay, containerId, swapSlotContents}} />
+      <DragDropLabware {...{slot, highlighted, labwareOrSlot, overlay, containerId, swapSlotContents, isManualInterventionStep}} />
     )
   }
 }
