@@ -327,6 +327,8 @@ def _save_json(data, filename):
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(filename, 'w') as file:
             json.dump(data, file, sort_keys=True, indent=4)
+            file.flush()
+            os.fsync(file.fileno())
         return data
     except OSError:
         log.exception('Write failed with exception:')
