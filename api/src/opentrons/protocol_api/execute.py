@@ -190,6 +190,11 @@ def _get_location_with_offset(loaded_labware: Dict[str, labware.Labware],
                               params: Dict[str, Any],
                               default_values: Dict[str, float]) -> Location:
     well = _get_well(loaded_labware, params)
+
+    # Never move to the bottom of the fixed trash
+    if 'fixedTrash' in labware.quirks_from_any_parent(well):
+        return well.top()
+
     offset_from_bottom = _get_bottom_offset(
         command_type, params, default_values)
 

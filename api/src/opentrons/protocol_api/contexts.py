@@ -560,10 +560,13 @@ class InstrumentContext:
                                 location if location else 'current position',
                                 rate))
         if isinstance(location, Well):
-            point, well = location.bottom()
-            loc = types.Location(
-                point + types.Point(0, 0, self.well_bottom_clearance),
-                well)
+            if 'fixedTrash' in quirks_from_any_parent(location):
+                loc = location.top()
+            else:
+                point, well = location.bottom()
+                loc = types.Location(
+                    point + types.Point(0, 0, self.well_bottom_clearance),
+                    well)
             self.move_to(loc)
         elif isinstance(location, types.Location):
             loc = location
@@ -782,11 +785,14 @@ class InstrumentContext:
                     "dropped. The passed location, however, is in "
                     "reference to {}".format(location.labware))
         elif location and isinstance(location, Well):
-            bot = location.bottom()
-            target = bot._replace(point=bot.point._replace(z=bot.point.z + 10))
+            if 'fixedTrash' in quirks_from_any_parent(location):
+                target = location.top()
+            else:
+                bot = location.bottom()
+                target = bot._replace(
+                    point=bot.point._replace(z=bot.point.z + 10))
         elif not location:
-            loc = self.trash_container.wells()[0].bottom()
-            target = loc._replace(point=loc.point._replace(z=loc.point.z + 10))
+            target = self.trash_container.wells()[0].top()
         else:
             raise TypeError(
                 "If specified, location should be an instance of "
