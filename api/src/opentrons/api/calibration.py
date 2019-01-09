@@ -41,10 +41,9 @@ class CalibrationManager:
 
         if ff.use_protocol_api_v2():
             mount = Mount[instrument._instrument.mount.upper()]
-            if instrument.tip_racks:
-                tip_length = instrument.tip_racks[0]._container.tip_length
-            else:
-                tip_length = None
+            assert instrument.tip_racks,\
+                'No known tipracks for {}'.format(instrument)
+            tip_length = instrument.tip_racks[0]._container.tip_length
             measured_center = self._hardware.locate_tip_probe_center(
                 mount, tip_length)
         else:

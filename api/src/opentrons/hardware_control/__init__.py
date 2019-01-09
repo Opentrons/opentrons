@@ -133,7 +133,8 @@ class API(HardwareAPILike):
             attached_instruments: Dict[top_types.Mount, Dict[str, Optional[str]]] = None,  # noqa E501
             attached_modules: List[str] = None,
             config: robot_configs.robot_config = None,
-            loop: asyncio.AbstractEventLoop = None) -> 'API':
+            loop: asyncio.AbstractEventLoop = None,
+            strict_attached_instruments: bool = True) -> 'API':
         """ Build a simulating hardware controller.
 
         This method may be used both on a real robot and on dev machines.
@@ -146,7 +147,8 @@ class API(HardwareAPILike):
             attached_modules = []
         return cls(Simulator(attached_instruments,
                              attached_modules,
-                             config, loop),
+                             config, loop,
+                             strict_attached_instruments),
                    config=config, loop=loop)
 
     def __repr__(self):
@@ -1002,7 +1004,7 @@ class API(HardwareAPILike):
         if aspirate:
             this_pipette.update_config_item('aspirate_flow_rate', aspirate)
         if dispense:
-            this_pipette.update_config_item('dispense_float_rate', dispense)
+            this_pipette.update_config_item('dispense_flow_rate', dispense)
 
     @_log_call
     async def discover_modules(self):
@@ -1154,10 +1156,9 @@ class API(HardwareAPILike):
             pip.remove_tip()
 
         if not tip_length:
-            if not pip.has_tip:
-                tip_length = pip.config.tip_length
-            if not tip_length and pip.has_tip:
-                tip_length = pip._current_tip_length
+            assert pip.has_tip,\
+                'If pipette has no tip a tip length must be specified'
+            tip_length = pip._current_tip_length
 
         # assure_tip lets us make sure we don’t pollute the pipette
         # state even if there’s an exception in tip probe

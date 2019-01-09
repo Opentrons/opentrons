@@ -97,7 +97,7 @@ DEFAULT_DECK_CALIBRATION = [
 DEFAULT_ACCELERATION = 'M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000'
 DEFAULT_STEPS_PER_MM = 'M92 X80.00 Y80.00 Z400 A400 B768 C768'
 # This probe height is ~73 from deck to the top surface of the switch body
-# per CAD; 74.9mm is the nominal for engagement from the switch drawing.
+# per CAD; 74.3mm is the nominal for engagement from the switch drawing.
 # Note that this has a piece-to-piece tolerance stackup of +-1.5mm
 # Switch drawing: https://www.mouser.com/datasheet/2/307/en-d2f-587403.pdf
 # model no D2F-01L

@@ -187,12 +187,19 @@ class Session(object):
                     API.build_hardware_simulator,
                     instrs,
                     [mod.name()
-                     for mod in self._hardware.attached_modules.values()])
+                     for mod in self._hardware.attached_modules.values()],
+                    strict_attached_instruments=False)
                 sim.home()
                 self._simulating_ctx = ProtocolContext(self._loop,
                                                        sim)
-                run_protocol(self._protocol, simulate=True,
-                             context=self._simulating_ctx)
+                if self._is_json_protocol:
+                    run_protocol(protocol_json=self._protocol,
+                                 simulate=True,
+                                 context=self._simulating_ctx)
+                else:
+                    run_protocol(protocol_code=self._protocol,
+                                 simulate=True,
+                                 context=self._simulating_ctx)
                 sim.join()
             else:
                 # TODO (artyom, 20171005): this will go away
@@ -265,7 +272,7 @@ class Session(object):
         self.set_state('running')
         return self
 
-    def run(self):
+    def run(self):  # noqa(C901)
         def on_command(message):
             if message['$'] == 'before':
                 self.log_append()
@@ -288,7 +295,10 @@ class Session(object):
                 ctx = ProtocolContext(loop=self._loop)
                 ctx.connect(self._hardware)
                 ctx.home()
-                run_protocol(self._protocol, context=ctx)
+                if self._is_json_protocol:
+                    run_protocol(protocol_json=self._protocol, context=ctx)
+                else:
+                    run_protocol(protocol_code=self._protocol, context=ctx)
             else:
                 if self._is_json_protocol:
                     execute_protocol(self._protocol)

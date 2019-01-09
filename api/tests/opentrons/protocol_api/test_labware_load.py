@@ -21,4 +21,10 @@ def test_loaded(loop):
 
 def test_load_incorrect_definition_by_name():
     with pytest.raises(FileNotFoundError):
-        papi.labware._load_definition_by_name('fake_labware')
+        papi.labware.load_definition_by_name('fake_labware')
+
+
+def test_load_label(loop):
+    ctx = papi.ProtocolContext(loop=loop)
+    labware = ctx.load_labware_by_name(labware_name, '1', 'my cool labware')
+    assert 'my cool labware' in str(labware)

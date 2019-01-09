@@ -100,6 +100,12 @@ class ProtocolContext:
         self._commands: List[str] = []
         self._unsubscribe_commands = None
         self.clear_commands()
+        if advanced_settings.get_adv_setting('shortFixedTrash'):
+            trash_name = 'opentrons_1_trash_0.85_L'
+        else:
+            trash_name = 'opentrons_1_trash_1.1_L'
+        self.load_labware_by_name(
+            trash_name, '12')
 
     def commands(self):
         return self._commands
@@ -160,19 +166,25 @@ class ProtocolContext:
         self._hw_manager.reset_hw()
 
     def load_labware(
-            self, labware_obj: Labware, location: types.DeckLocation,
-            label: str = None, share: bool = False) -> Labware:
+            self, labware_obj: Labware,
+            location: types.DeckLocation) -> Labware:
         """ Specify the presence of a piece of labware on the OT2 deck.
 
         This function loads the labware specified by `labware`
         (previously loaded from a configuration file) to the location
         specified by `location`.
+
+        :param Labware labware: The labware object to load
+        :param location: The slot into which to load the labware such as
+                         1 or '1'
+        :type location: int or str
         """
         self._deck_layout[location] = labware_obj
         return labware_obj
 
     def load_labware_by_name(
-            self, labware_name: str, location: types.DeckLocation) -> Labware:
+            self, labware_name: str,
+            location: types.DeckLocation, label: str = None) -> Labware:
         """ A convenience function to specify a piece of labware by name.
 
         For labware already defined by Opentrons, this is a convient way
@@ -181,9 +193,19 @@ class ProtocolContext:
 
         This function returns the created and initialized labware for use
         later in the protocol.
+
+        :param str labware_name: The name of the labware to load
+        :param location: The slot into which to load the labware such as
+                         1 or '1'
+        :type location: int or str
+        :param str label: An optional special name to give the labware. If
+                          specified, this is the name the labware will appear
+                          as in the run log and the calibration view in the
+                          Opentrons app.
         """
         labware = load(labware_name,
-                       self._deck_layout.position_for(location))
+                       self._deck_layout.position_for(location),
+                       label)
         return self.load_labware(labware, location)
 
     def load_module(
@@ -384,6 +406,14 @@ class ProtocolContext:
         """
         return self._deck_layout
 
+    @property
+    def fixed_trash(self) -> Labware:
+        """ The trash fixed to slot 12 of the robot deck. """
+        trash = self._deck_layout['12']
+        if not trash:
+            raise RuntimeError("Robot must have a trash container in 12")
+        return trash  # type: ignore
+
 
 class InstrumentContext:
     """ A context for a specific pipette or instrument.
@@ -416,12 +446,7 @@ class InstrumentContext:
         for tip_rack in self.tip_racks:
             assert tip_rack.is_tiprack
         if trash is None:
-            if advanced_settings.get_adv_setting('shortFixedTrash'):
-                trash_name = 'opentrons_1_trash_0.85_L'
-            else:
-                trash_name = 'opentrons_1_trash_1.1_L'
-            self.trash_container = self._ctx.load_labware_by_name(
-                trash_name, '12')
+            self.trash_container = self._ctx.fixed_trash
         else:
             self.trash_container = trash
 
@@ -880,7 +905,8 @@ class InstrumentContext:
         :note: This property is equivalent to :py:attr:`speeds`; the only
         difference is the units in which this property is specified.
         """
-        raise NotImplementedError
+        return {'aspirate': self.hw_pipette['aspirate_flow_rate'],
+                'dispense': self.hw_pipette['dispense_flow_rate']}
 
     @flow_rate.setter
     def flow_rate(self, new_flow_rate: Dict[str, float]) -> None:
@@ -889,7 +915,7 @@ class InstrumentContext:
         :param new_flow_rates: A dict containing at least one of 'aspirate
         and 'dispense', mapping to new speeds in uL/s.
         """
-        raise NotImplementedError
+        self._hw_manager.hardware.set_flow_rate(self._mount, **new_flow_rate)
 
     @property
     def pick_up_current(self) -> float:

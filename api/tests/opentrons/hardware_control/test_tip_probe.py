@@ -18,20 +18,16 @@ async def test_input_checks(hardware_api, monkeypatch):
 
     await hardware_api.cache_instruments({Mount.RIGHT: 'p300_single'})
     await hardware_api.home()
-    overlap =\
-        hardware_api._attached_instruments[Mount.RIGHT]._config.tip_overlap
-    default_tl = \
-        hardware_api._attached_instruments[Mount.RIGHT]._config.tip_length
-    expected_tl = default_tl - overlap
-    await hardware_api.locate_tip_probe_center(Mount.RIGHT)
-    assert not hardware_api._attached_instruments[Mount.RIGHT].has_tip
 
-    expected_tl = 10 - overlap
+    with pytest.raises(AssertionError):
+        await hardware_api.locate_tip_probe_center(Mount.RIGHT)
+
+    expected_tl = 10
     await hardware_api.locate_tip_probe_center(Mount.RIGHT, 10)
     assert not hardware_api._attached_instruments[Mount.RIGHT].has_tip
 
     await hardware_api.pick_up_tip(Mount.RIGHT, 20)
-    expected_tl = 20-overlap
+    expected_tl = 20
     await hardware_api.locate_tip_probe_center(Mount.RIGHT)
 
     assert hardware_api._attached_instruments[Mount.RIGHT].has_tip
@@ -70,10 +66,8 @@ async def test_moves_to_hotspot(hardware_api, monkeypatch,
     await hardware_api.home()
 
     center = await hardware_api.locate_tip_probe_center(mount, 30)
-    overlap =\
-        hardware_api._attached_instruments[mount]._config.tip_overlap
     hotspots = robot_configs.calculate_tip_probe_hotspots(
-        30 - overlap, hardware_api._config.tip_probe)
+        30, hardware_api._config.tip_probe)
     assert len(move_calls) == len(hotspots) * 4
     assert len(rel_calls) == len(hotspots)
     move_iter = iter(move_calls)

@@ -170,7 +170,9 @@ class Labware:
     tip rack, etc. It defines the physical geometry of the labware, and
     provides methods for accessing wells within the labware.
     """
-    def __init__(self, definition: dict, parent: Location) -> None:
+    def __init__(
+            self, definition: dict,
+            parent: Location, label: str = None) -> None:
         """
         :param definition: A dict representing all required data for a labware,
                            including metadata such as the display name of the
@@ -183,9 +185,14 @@ class Labware:
                        the front and left most point of the outside of the
                        labware is (often the front-left corner of a slot on the
                        deck).
+        :param str label: An optional label to use instead of the displayName
+                          from the definition's metadata element
         """
-        self._display_name = "{} on {}".format(
-            definition['metadata']['displayName'], str(parent.labware))
+        if label:
+            dn = label
+        else:
+            dn = definition['metadata']['displayName']
+        self._display_name = "{} on {}".format(dn, str(parent.labware))
         self._calibrated_offset: Point = Point(0, 0, 0)
         self._wells: List[Well] = []
         # Directly from definition
@@ -423,11 +430,11 @@ class Labware:
 
     @property
     def tip_length(self) -> float:
-        return self._parameters['tipLength']
+        return self._parameters['tipLength'] - self._parameters['tipOverlap']
 
     @tip_length.setter
     def tip_length(self, length: float):
-        self._parameters['tipLength'] = length
+        self._parameters['tipLength'] = length + self._parameters['tipOverlap']
 
     def next_tip(self, num_tips: int = 1) -> Optional[Well]:
         """
@@ -674,7 +681,7 @@ def _read_file(filepath: str) -> dict:
     return calibration_data
 
 
-def _load_definition_by_name(name: str) -> dict:
+def load_definition_by_name(name: str) -> dict:
     """
     Look up and return a definition by name (name is expected to correspond to
     the filename of the definition, with the .json extension) and return it or
@@ -689,7 +696,7 @@ def _load_definition_by_name(name: str) -> dict:
     return labware_def
 
 
-def load(name: str, parent: Location) -> Labware:
+def load(name: str, parent: Location, label: str = None) -> Labware:
     """
     Return a labware object constructed from a labware definition dict looked
     up by name (definition must have been previously stored locally on the
@@ -701,12 +708,15 @@ def load(name: str, parent: Location) -> Labware:
     :param parent: A :py:class:`.Location` representing the location where
                    the front and left most point of the outside of labware is
                    (often the front-left corner of a slot on the deck).
+    :param str label: An optional label that will override the labware's
+                      display name from its definition
     """
-    definition = _load_definition_by_name(name)
-    return load_from_definition(definition, parent)
+    definition = load_definition_by_name(name)
+    return load_from_definition(definition, parent, label)
 
 
-def load_from_definition(definition: dict, parent: Location) -> Labware:
+def load_from_definition(
+        definition: dict, parent: Location, label: str = None) -> Labware:
     """
     Return a labware object constructed from a provided labware definition dict
 
@@ -719,8 +729,10 @@ def load_from_definition(definition: dict, parent: Location) -> Labware:
     :param parent: A :py:class:`.Location` representing the location where
                    the front and left most point of the outside of labware is
                    (often the front-left corner of a slot on the deck).
+    :param str label: An optional label that will override the labware's
+                      display name from its definition
     """
-    labware = Labware(definition, parent)
+    labware = Labware(definition, parent, label)
     load_calibration(labware)
     return labware
 

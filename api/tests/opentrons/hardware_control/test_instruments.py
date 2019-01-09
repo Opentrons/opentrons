@@ -105,6 +105,12 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
     # get a RuntimeError
     with pytest.raises(RuntimeError):
         await sim.cache_instruments({types.Mount.LEFT: 'p300_multi'})
+    # Unless we specifically told the simulator to not strictly enforce
+    # correspondence between expectations and preconfiguration
+    sim = hc.API.build_hardware_simulator(
+        attached_instruments=dummy_instruments,
+        loop=loop, strict_attached_instruments=False)
+    await sim.cache_instruments({types.Mount.LEFT: 'p300_multi'})
 
 
 async def test_aspirate(dummy_instruments, loop):
