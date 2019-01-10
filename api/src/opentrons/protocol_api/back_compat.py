@@ -190,15 +190,73 @@ class BCLabware:
     def __init__(self, ctx: ProtocolContext) -> None:
         self._ctx = ctx
 
-    def load(self, *args, **kwargs):
+    LW_NO_EQUIVALENT = {'24-vial-plate', '48-vial-plate', '5ml-3x4',
+                        '96-PCR-tall', '96-deep-well', '96-well-plate-20mm',
+                        'MALDI-plate', 'PCR-strip-tall', 'T25-flask',
+                        'T75-flask', 'alum-block-pcr-strips', 'e-gelgol',
+                        'hampton-1ml-deep-block', 'point',
+                        'opentrons-aluminum-block-PCR-strips-200ul',
+                        'rigaku-compact-crystallization-plate',
+                        'small_vial_rack_16x45', 'temperature-plate',
+                        'tiprack-10ul-H', 'tiprack-200ul',
+                        'trough-12row-short', 'trough-1row-25ml',
+                        'trough-1row-test', 'tube-rack-.75ml',
+                        'tube-rack-2ml-9x9', 'tube-rack-5ml-96',
+                        'tube-rack-80well', 'wheaton_vial_rack',
+                        'tube-rack-15_50ml', 'tube-rack-2ml'}
+    """ Labwares that are no longer supported in this version """
+
+    LW_TRANSLATION = {
+        '12-well-plate': 'corning_12_wellPlate_6.9_mL',
+        '24-well-plate': 'corning_24_wellPlate_3.4_mL',
+        '384-plate': 'corning_384_wellPlate_112_uL',
+        '48-well-plate': 'corning_48_wellPlate_1.6_mL',
+        '6-well-plate': 'corning_6_wellPlate_16.8_mL',
+        '96-PCR-flat': 'biorad_96_wellPlate_pcr_200_uL',
+        '96-flat': 'generic_96_wellPlate_380_uL',
+        'biorad-hardshell-96-PCR': 'biorad_96_wellPlate_pcr_200_uL',
+        'opentrons-aluminum-block-2ml-eppendorf': 'opentrons_24_aluminum_tuberack_2_mL',       # noqa(E501)
+        'opentrons-aluminum-block-2ml-screwcap': 'opentrons_24_aluminum_tuberack_2_mL',        # noqa(E501)
+        'opentrons-aluminum-block-96-PCR-plate': 'opentrons_96_aluminum_biorad_plate_200_uL',  # noqa(E501)
+        'opentrons-tiprack-300ul': 'opentrons_96_tiprack_300_uL',
+        'opentrons-tuberack-1.5ml-eppendorf': 'opentrons_24_tuberack_1.5_mL_eppendorf',        # noqa(E501)
+        'opentrons-tuberack-15_50ml': 'opentrons_6x15_mL_4x50_mL_tuberack',
+        'opentrons-tuberack-15ml': 'opentrons_15_tuberack_15_mL_falcon',
+        'opentrons-tuberack-2ml-eppendorf': 'opentrons_24_tuberack_2_mL_eppendorf',            # noqa(E501)
+        'opentrons-tuberack-2ml-screwcap': 'opentrons_24_tuberack_2_mL_screwcap',              # noqa(E501)
+        'opentrons-tuberack-50ml': 'opentrons_6_tuberack_50_mL_falcon',
+        'tiprack-1000ul': 'opentrons_96_tiprack_1000_uL',
+        'tiprack-10ul': 'opentrons_96_tiprack_10_uL',
+        'trough-12row': 'usa_scientific_12_trough_22_mL'
+    }
+    """ A table mapping old labware names to new labware names"""
+
+    def load(self, container_name, slot, label=None, share=False):
         """ Load a piece of labware by specifying its name and position.
 
         This method calls :py:meth:`.ProtocolContext.load_labware_by_name`;
         see that documentation for more information on arguments and return
         values. Calls to this function should be replaced with calls to
         :py:meth:`.Protocolcontext.load_labware_by_name`.
+
+        In addition, this function contains translations between old
+        labware names and new labware names.
         """
-        return self._ctx.load_labware_by_name(*args, **kwargs)
+        if share:
+            raise NotImplementedError("Sharing not supported")
+
+        try:
+            name = self.LW_TRANSLATION[container_name]
+        except KeyError:
+            if container_name in self.LW_NO_EQUIVALENT:
+                raise NotImplementedError("Labware {} is not supported"
+                                          .format(container_name))
+            elif container_name in ('magdeck', 'tempdeck'):
+                raise NotImplementedError("Module load not yet implemented")
+            else:
+                name = container_name
+
+        return self._ctx.load_labware_by_name(name, slot, label)
 
     def create(self,  *args, **kwargs):
         raise NotImplementedError

@@ -1,261 +1,76 @@
 // @flow
-import * as React from 'react'
-import cx from 'classnames'
+import type {ElementProps} from 'react'
 import {connect} from 'react-redux'
-import {
-  AlertModal,
-  DropdownField,
-  FormGroup,
-  type Mount,
-} from '@opentrons/components'
-import startCase from 'lodash/startCase'
 import isEmpty from 'lodash/isEmpty'
-import isEqual from 'lodash/isEqual'
+import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
 
-import i18n from '../../../localization'
 import {uuid} from '../../../utils'
 import {INITIAL_DECK_SETUP_STEP_ID} from '../../../constants'
-import type {BaseState, ThunkDispatch} from '../../../types'
-import {pipetteOptions} from '../../../pipettes/pipetteData'
-import type {PipetteFields} from '../../../load-file'
+import {actions as steplistActions} from '../../../steplist'
 import {
   actions as stepFormActions,
   selectors as stepFormSelectors,
-  type PipetteEntities,
 } from '../../../step-forms'
-import {actions as steplistActions} from '../../../steplist'
+import FilePipettesModal from '../FilePipettesModal'
+import type {BaseState, ThunkDispatch} from '../../../types'
+import type {PipetteOnDeck} from '../../../step-forms'
+import type {StepIdType} from '../../../form-types'
 
-import PipetteDiagram from '../NewFileModal/PipetteDiagram'
-import TiprackDiagram from '../NewFileModal/TiprackDiagram'
-import formStyles from '../../forms.css'
-import styles from './EditPipettesModal.css'
-import modalStyles from '../modal.css'
-import StepChangesWarningModal from './StepChangesWarningModal'
+type Props = ElementProps<typeof FilePipettesModal>
 
-type EditPipettesFields = {
-  left: PipetteFields,
-  right: PipetteFields,
-}
-
-type State = EditPipettesFields & {isWarningModalOpen: boolean}
-
-type FormattedPipette = {
-  pipetteModel: string,
-  tiprackModel: string,
-}
-
-type Props = {
-  closeModal: () => void,
-  initialLeft: ?FormattedPipette,
-  initialRight: ?FormattedPipette,
-  updatePipettes: (EditPipettesFields) => mixed,
-}
-
-type OP = {closeModal: $PropertyType<Props, 'closeModal'>}
 type SP = {
-  initialLeft: $PropertyType<Props, 'initialLeft'>,
-  initialRight: $PropertyType<Props, 'initialRight'>,
-  _prevPipettes: PipetteEntities,
+  _prevPipettes: {[pipetteId: string]: PipetteOnDeck},
+  _orderedStepIds: Array<StepIdType>,
 }
 
-const pipetteOptionsWithNone = [
-  {name: 'None', value: ''},
-  ...pipetteOptions,
-]
-
-// TODO: Ian 2018-06-22 get this programatically from shared-data labware defs
-// and exclude options that are incompatible with pipette
-// and also auto-select tiprack if there's only one compatible tiprack for a pipette
-const tiprackOptions = [
-  {name: '10 μL', value: 'tiprack-10ul'},
-  {name: '200 μL', value: 'tiprack-200ul'},
-  {name: '300 μL', value: 'opentrons-tiprack-300ul'},
-  {name: '1000 μL', value: 'tiprack-1000ul'},
-]
-
-const DEFAULT_SELECTION = {pipetteModel: '', tiprackModel: null}
-
-const pipetteDataToFormState = (pipette: ?FormattedPipette) => ({
-  pipetteModel: (pipette && pipette.pipetteModel) || '',
-  tiprackModel: (pipette && pipette.tiprackModel) || null,
-})
-
-class EditPipettesModal extends React.Component<Props, State> {
-  constructor (props) {
-    super(props)
-    const {initialLeft, initialRight} = props
-    this.state = {
-      left: initialLeft ? pipetteDataToFormState(initialLeft) : DEFAULT_SELECTION,
-      right: initialRight ? pipetteDataToFormState(initialRight) : DEFAULT_SELECTION,
-      isWarningModalOpen: false,
-    }
-  }
-
-  makeHandleMountChange = (mount: Mount, fieldName: $Keys<PipetteFields>) => (e: SyntheticInputEvent<*>) => {
-    const value: string = e.target.value
-    let nextMountState = {[fieldName]: value}
-    if (fieldName === 'pipetteModel') nextMountState = {...nextMountState, tiprackModel: null}
-    this.setState({[mount]: {...this.state[mount], ...nextMountState}})
-  }
-
-  handleSubmit = () => {
-    const {initialLeft, initialRight} = this.props
-    const {left, right} = this.state
-    const initialLeftFormData = pipetteDataToFormState(initialLeft)
-    const initialRightFormData = pipetteDataToFormState(initialRight)
-    const leftChanged = !isEqual(initialLeft, left)
-    const rightChanged = !isEqual(initialRight, right)
-    if ((leftChanged && !isEmpty(initialLeftFormData.pipetteModel)) || (rightChanged && !isEmpty(initialRightFormData.pipetteModel))) {
-      this.setState({isWarningModalOpen: true})
-    } else {
-      this.savePipettes()
-    }
-  }
-
-  savePipettes = () => {
-    const {left, right} = this.state
-    this.props.updatePipettes({left, right})
-    this.props.closeModal()
-  }
-
-  handleCancel = () => {
-    this.props.closeModal()
-  }
-
-  render () {
-    const {left, right} = this.state
-
-    const pipetteSelectionIsValid = (
-      // at least one must not be none (empty string)
-      (left.pipetteModel || right.pipetteModel)
-    )
-
-    // if pipette selected, corresponding tiprack type also selected
-    const tiprackSelectionIsValid = (
-      (left.pipetteModel ? Boolean(left.tiprackModel) : true) &&
-      (right.pipetteModel ? Boolean(right.tiprackModel) : true)
-    )
-
-    const canSubmit = pipetteSelectionIsValid && tiprackSelectionIsValid
-
-    return (
-      <React.Fragment>
-        <AlertModal
-          className={cx(modalStyles.modal, styles.new_file_modal)}
-          contentsClassName={styles.modal_contents}
-          buttons={[
-            {onClick: this.handleCancel, children: 'Cancel', tabIndex: 7},
-            {onClick: this.handleSubmit, disabled: !canSubmit, children: 'Save', tabIndex: 6},
-          ]}>
-          <form onSubmit={() => { canSubmit && this.handleSubmit() }}>
-            <h2>{i18n.t('modal.edit_pipettes.title')}</h2>
-            <p className={styles.edit_pipettes_description}>{i18n.t('modal.edit_pipettes.body')}</p>
-
-            <div className={styles.mount_fields_row}>
-              <div className={styles.mount_column}>
-                <FormGroup key="leftPipetteModel" label="Left Pipette" className={formStyles.stacked_row}>
-                  <DropdownField
-                    tabIndex={2}
-                    options={pipetteOptionsWithNone}
-                    value={this.state.left.pipetteModel}
-                    onChange={this.makeHandleMountChange('left', 'pipetteModel')} />
-                </FormGroup>
-                <FormGroup
-                  disabled={isEmpty(this.state.left.pipetteModel)}
-                  key={'leftTiprackModel'}
-                  label={`${startCase('left')} Tiprack*`}
-                  className={formStyles.stacked_row}>
-                  <DropdownField
-                    tabIndex={3}
-                    disabled={isEmpty(this.state.left.pipetteModel)}
-                    options={tiprackOptions}
-                    value={this.state.left.tiprackModel}
-                    onChange={this.makeHandleMountChange('left', 'tiprackModel')} />
-                </FormGroup>
-              </div>
-              <div className={styles.mount_column}>
-                <FormGroup key="rightPipetteModel" label="Right Pipette" className={formStyles.stacked_row}>
-                  <DropdownField
-                    tabIndex={4}
-                    options={pipetteOptionsWithNone}
-                    value={this.state.right.pipetteModel}
-                    onChange={this.makeHandleMountChange('right', 'pipetteModel')} />
-                </FormGroup>
-                <FormGroup
-                  disabled={isEmpty(this.state.right.pipetteModel)}
-                  key={'rightTiprackModel'}
-                  label={`${startCase('right')} Tiprack*`}
-                  className={formStyles.stacked_row}>
-                  <DropdownField
-                    tabIndex={5}
-                    disabled={isEmpty(this.state.right.pipetteModel)}
-                    options={tiprackOptions}
-                    value={this.state.right.tiprackModel}
-                    onChange={this.makeHandleMountChange('right', 'tiprackModel')} />
-                </FormGroup>
-              </div>
-            </div>
-
-            <div className={styles.diagrams}>
-              <TiprackDiagram containerType={this.state.left.tiprackModel} />
-              <PipetteDiagram
-                leftPipette={this.state.left.pipetteModel}
-                rightPipette={this.state.right.pipetteModel}
-              />
-              <TiprackDiagram containerType={this.state.right.tiprackModel} />
-            </div>
-          </form>
-        </AlertModal>
-        {
-          this.state.isWarningModalOpen &&
-          <StepChangesWarningModal onCancel={this.handleCancel} onConfirm={this.savePipettes} />
-        }
-      </React.Fragment>
-    )
-  }
+type OP = {
+  closeModal: () => mixed,
 }
 
 const mapSTP = (state: BaseState): SP => {
   const initialPipettes = stepFormSelectors.getPipettesForEditPipetteForm(state)
   return {
-    initialLeft: initialPipettes.left,
-    initialRight: initialPipettes.right,
-    _prevPipettes: stepFormSelectors.getPipetteInvariantProperties(state),
+    initialPipetteValues: initialPipettes,
+    _prevPipettes: stepFormSelectors.getInitialDeckSetup(state).pipettes, // TODO: Ian 2019-01-02 when multi-step editing is supported, don't use initial deck state. Instead, show the pipettes available for the selected step range
+    _orderedStepIds: stepFormSelectors.getOrderedStepIds(state),
   }
 }
 
-const mergeProps = (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>}, ownProps: OP): Props => {
-  const {dispatch} = dispatchProps
-  const {_prevPipettes, ...passThruStateProps} = stateProps
-  const updatePipettes = (fields: EditPipettesFields) => {
-    let usedPrevPipettes = [] // IDs of pipettes in prevPipettes that were already used
-    // TODO: Ian 2018-12-17 after dropping the above,
-    // refactor EditPipettesFields to make this building part cleaner?
-    // TODO IMMEDIATELY there's a buncha funkiness below, clean up immediately
-    let nextPipettes = {}
-    const prevPipetteIds = Object.keys(_prevPipettes)
-    const mounts = ['left', 'right']
-    mounts.forEach(mount => {
-      const newPipette = fields[mount]
-      if (newPipette && newPipette.pipetteModel && newPipette.tiprackModel) {
+// NOTE: this function is doing some weird stuff because we are envisioning
+// that the following changes will happen, and working to support them cleanly.
+// We anticipate that:
+// * pipettes will be created/deleted outside of the timeline (like liquids)
+// * there will be multiple manualIntervention steps which set/unset pipettes
+// on robot mounts on the timeline
+// * there will be a facility to substitute pipettes used in steps across a
+// selection of multiple steps
+//
+// Currently, PD's Edit Pipettes functionality is doing several of these steps
+// in one click (create, change manualIntervention step, substitute pipettes
+// across all steps, delete pipettes), which is why it's so funky!
+const makeUpdatePipettes = (prevPipettes, orderedStepIds, dispatch, closeModal) =>
+  ({pipettes: newPipetteArray}) => {
+    const prevPipetteIds = Object.keys(prevPipettes)
+    let usedPrevPipettes: Array<string> = [] // IDs of pipettes in prevPipettes that were already put into nextPipettes
+    let nextPipettes: {[pipetteId: string]: PipetteOnDeck} = {}
+
+    // from array of pipettes from Edit Pipette form (with no IDs),
+    // assign IDs and populate nextPipettes
+    newPipetteArray.forEach(newPipette => {
+      if (newPipette && newPipette.name && newPipette.tiprackModel) {
         const candidatePipetteIds = prevPipetteIds.filter(id => {
-          const prevPip = _prevPipettes[id]
+          const prevPipette = prevPipettes[id]
           const alreadyUsed = usedPrevPipettes.some(usedId => usedId === id)
-          return !alreadyUsed && prevPip.name === newPipette.pipetteModel
+          return !alreadyUsed && prevPipette.name === newPipette.name
         })
         const pipetteId: ?string = candidatePipetteIds[0]
-        const newPipetteBody = {
-          name: newPipette.pipetteModel,
-          tiprackModel: newPipette.tiprackModel,
-          mount,
-        }
         if (pipetteId) {
           // update used pipette list
           usedPrevPipettes.push(pipetteId)
-          nextPipettes[pipetteId] = newPipetteBody
+          nextPipettes[pipetteId] = newPipette
         } else {
-          nextPipettes[uuid()] = newPipetteBody
+          nextPipettes[uuid()] = newPipette
         }
       }
     })
@@ -268,22 +83,50 @@ const mergeProps = (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>},
     dispatch(steplistActions.changeSavedStepForm({
       stepId: INITIAL_DECK_SETUP_STEP_ID,
       update: {
-        pipetteLocationUpdate: mapValues(nextPipettes, p => p.mount),
+        pipetteLocationUpdate: mapValues(nextPipettes, (p: PipetteOnDeck) => p.mount),
       },
     }))
 
+    const pipetteIdsToDelete: Array<string> = Object.keys(prevPipettes).filter(id => !(id in nextPipettes))
+    const substitutionMap = pipetteIdsToDelete.reduce((acc: {[string]: string}, deletedId: string): {[string]: string} => {
+      const deletedPipette = prevPipettes[deletedId]
+      const replacementId = Object.keys(nextPipettes)
+        .find(newId => nextPipettes[newId].mount === deletedPipette.mount)
+      return (replacementId && replacementId !== -1)
+        ? {...acc, [deletedId]: replacementId}
+        : acc
+    }, {})
+
+    // substitute deleted pipettes with new pipettes on the same mount, if any
+    if (!isEmpty(substitutionMap) && orderedStepIds.length > 0) {
+      // NOTE: using start/end here is meant to future-proof this action for multi-step editing
+      dispatch(stepFormActions.substituteStepFormPipettes({
+        substitutionMap,
+        startStepId: orderedStepIds[0],
+        endStepId: last(orderedStepIds),
+      }))
+    }
+
     // delete any pipettes no longer in use
-    const pipetteIdsToDelete = Object.keys(_prevPipettes).filter(id => !(id in nextPipettes))
     if (pipetteIdsToDelete.length > 0) {
       dispatch(stepFormActions.deletePipettes(pipetteIdsToDelete))
     }
+
+    closeModal()
   }
+
+const mergeProps = (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>}, ownProps: OP): Props => {
+  const {dispatch} = dispatchProps
+  const {_prevPipettes, _orderedStepIds, ...passThruStateProps} = stateProps
+  const updatePipettes = makeUpdatePipettes(_prevPipettes, _orderedStepIds, dispatch, ownProps.closeModal)
 
   return {
     ...ownProps,
+    useProtocolFields: false,
     ...passThruStateProps,
-    updatePipettes,
+    onSave: updatePipettes,
+    onCancel: ownProps.closeModal,
   }
 }
 
-export default connect(mapSTP, null, mergeProps)(EditPipettesModal)
+export default connect(mapSTP, null, mergeProps)(FilePipettesModal)

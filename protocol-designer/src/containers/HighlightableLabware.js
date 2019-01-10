@@ -63,9 +63,9 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   } else {
     const stepId = activeItem.id
     // TODO: Ian 2018-07-31 replace with util function, "findIndexOrNull"?
-    const orderedSteps = stepFormSelectors.getOrderedSteps(state)
-    const timelineIdx = orderedSteps.includes(stepId)
-      ? orderedSteps.findIndex(id => id === stepId)
+    const orderedStepIds = stepFormSelectors.getOrderedStepIds(state)
+    const timelineIdx = orderedStepIds.includes(stepId)
+      ? orderedStepIds.findIndex(id => id === stepId)
       : null
 
     // shows liquids the current step in timeline

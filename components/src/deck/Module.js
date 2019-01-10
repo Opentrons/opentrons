@@ -2,12 +2,12 @@
 import * as React from 'react'
 import cx from 'classnames'
 
+import {getModuleDisplayName, type ModuleType} from '@opentrons/shared-data'
+
 import {Icon} from '../icons'
 import LabwareContainer from './LabwareContainer'
 import {CenteredTextSvg} from '../CenteredTextSvg'
 import styles from './Module.css'
-
-export type ModuleType = 'magdeck' | 'tempdeck'
 
 export type Props = {
   /** name of module, eg 'magdeck' or 'tempdeck' */
@@ -28,11 +28,11 @@ export default function Module (props: Props) {
     <LabwareContainer {...DIMENSIONS}>
       <rect
         className={styles.module}
-        rx='6'
-        ry='6'
-        width='100%'
-        height='100%'
-        fill='#000'
+        rx="6"
+        ry="6"
+        width="100%"
+        height="100%"
+        fill="#000"
       />
       <ModuleItemContents {...props} />
     </LabwareContainer>
@@ -42,28 +42,28 @@ export default function Module (props: Props) {
 function ModuleItemContents (props: Props) {
   // TODO(mc, 2018-07-23): displayName?
   const {mode, name} = props
+  const displayName = getModuleDisplayName(name)
 
   if (!mode || mode === 'default') {
     // generic/empty display - just show USB icon
     return (
-      <Icon
-        className={styles.module_icon}
-        x='8'
-        y='20'
-        width='16'
-        name='usb'
-      />
+      <Icon className={styles.module_icon} x="8" y="20" width="16" name="usb" />
     )
   }
 
-  const message = (mode === 'missing')
-    ? (
+  const message =
+    mode === 'missing' ? (
       <React.Fragment>
-        <tspan x='55%' dy='-6'>Missing:</tspan>
-        <tspan x='55%' dy='12'>{name}</tspan>
+        <tspan x="55%" dy="-6">
+          Missing:
+        </tspan>
+        <tspan x="55%" dy="12">
+          {displayName}
+        </tspan>
       </React.Fragment>
+    ) : (
+      <tspan x="55%">{displayName}</tspan>
     )
-    : (<tspan x='55%'>{name}</tspan>)
 
   const iconClassName = cx(styles.module_review_icon, {
     [styles.module_review_icon_missing]: mode === 'missing',
@@ -71,18 +71,18 @@ function ModuleItemContents (props: Props) {
   })
 
   const iconNameByMode = {
-    'missing': 'alert-circle',
-    'present': 'check-circle',
-    'info': 'usb',
+    missing: 'alert-circle',
+    present: 'check-circle',
+    info: 'usb',
   }
 
   return (
     <React.Fragment>
       <Icon
         className={iconClassName}
-        x='8'
-        y='0'
-        width='16'
+        x="8"
+        y="0"
+        width="16"
         name={iconNameByMode[mode]}
       />
       <CenteredTextSvg className={styles.module_review_text} text={message} />

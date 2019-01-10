@@ -12,6 +12,7 @@ import {
 } from './errors'
 import {
   composeWarnings,
+  belowPipetteMinimumVolume,
   maxDispenseWellVolume,
   minDisposalVolume,
   type FormWarning,
@@ -26,19 +27,22 @@ export {default as stepFormToArgs} from './stepFormToArgs'
 
 type FormHelpers = {getErrors?: (mixed) => Array<FormError>, getWarnings?: (mixed) => Array<FormWarning>}
 const stepFormHelperMap: {[StepType]: FormHelpers} = {
-  mix: {getErrors: composeErrors(incompatibleLabware)},
+  mix: {
+    getErrors: composeErrors(incompatibleLabware),
+    getWarnings: composeWarnings(belowPipetteMinimumVolume),
+  },
   pause: {getErrors: composeErrors(pauseForTimeOrUntilTold)},
   transfer: {
     getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware, wellRatioTransfer),
-    getWarnings: composeWarnings(maxDispenseWellVolume),
+    getWarnings: composeWarnings(belowPipetteMinimumVolume, maxDispenseWellVolume),
   },
   consolidate: {
     getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware, wellRatioConsolidate),
-    getWarnings: composeWarnings(maxDispenseWellVolume),
+    getWarnings: composeWarnings(belowPipetteMinimumVolume, maxDispenseWellVolume),
   },
   distribute: {
     getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware, wellRatioDistribute),
-    getWarnings: composeWarnings(maxDispenseWellVolume, minDisposalVolume),
+    getWarnings: composeWarnings(belowPipetteMinimumVolume, maxDispenseWellVolume, minDisposalVolume),
   },
 }
 

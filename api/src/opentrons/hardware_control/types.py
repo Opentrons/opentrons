@@ -5,12 +5,12 @@ import opentrons.types
 
 
 class Axis(enum.Enum):
-    X = enum.auto()
-    Y = enum.auto()
-    Z = enum.auto()
-    A = enum.auto()
-    B = enum.auto()
-    C = enum.auto()
+    X = 0
+    Y = 1
+    Z = 2
+    A = 3
+    B = 4
+    C = 5
 
     @classmethod
     def by_mount(cls, mount: opentrons.types.Mount):

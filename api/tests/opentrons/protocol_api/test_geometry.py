@@ -96,7 +96,7 @@ def test_basic_arc():
 
 
 def test_no_labware_loc():
-    labware_def = labware._load_definition_by_name(labware_name)
+    labware_def = labware.load_definition_by_name(labware_name)
 
     deck = Deck()
     lw1 = labware.load(labware_name, deck.position_for(1))

@@ -19,7 +19,8 @@ minimalLabwareDef = {
     "otId": "minimalLabwareDef",
     "parameters": {
         "isTiprack": True,
-        "tipLength": 55.3
+        "tipLength": 55.3,
+        "tipOverlap": 2.8
     },
     "ordering": [["A1"], ["A2"]],
     "wells": {
@@ -132,7 +133,7 @@ def test_load_calibration(monkeypatch, clear_calibration):
                                    Location(Point(0, 0, 0), 'deck'))
 
     test_offset = Point(1, 1, 1)
-    test_tip_length = 34.5
+    test_tip_length = 31.7
 
     labware.save_calibration(test_labware, test_offset)
     labware.save_tip_length(test_labware, test_tip_length)

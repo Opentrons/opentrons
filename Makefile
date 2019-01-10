@@ -98,7 +98,7 @@ test-js:
 
 # lints and typechecks
 .PHONY: lint
-lint: lint-py lint-js lint-css check-js
+lint: lint-py lint-js lint-json lint-css check-js
 
 .PHONY: lint-py
 lint-py:
@@ -108,6 +108,10 @@ lint-py:
 .PHONY: lint-js
 lint-js:
 	eslint '.*.js' '**/*.js'
+
+.PHONY: lint-json
+lint-json:
+	eslint --max-warnings 0 --ext .json .
 
 .PHONY: lint-css
 lint-css:

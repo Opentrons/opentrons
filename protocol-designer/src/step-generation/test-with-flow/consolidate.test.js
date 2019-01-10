@@ -41,7 +41,7 @@ const robotInitialStateNoLiquidState = createRobotStateFixture({
 const emptyLiquidState = createEmptyLiquidState({
   sourcePlateType: 'trough-12row',
   destPlateType: '96-flat',
-  pipettes: robotInitialStateNoLiquidState.instruments,
+  pipettes: robotInitialStateNoLiquidState.pipettes,
 })
 
 const robotStatePickedUpOneTipNoLiquidState = merge(

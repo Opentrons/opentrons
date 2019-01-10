@@ -68,7 +68,7 @@ export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload) =
 
     const pipette = (
       payload.pipetteId != null &&
-      stepFormSelectors.getPipetteInvariantProperties(state)[payload.pipetteId]
+      stepFormSelectors.getPipetteEntities(state)[payload.pipetteId]
     ) || null
 
     const labware = labwareIngredSelectors.getLabwareById(state)

@@ -2,17 +2,15 @@
 import React from 'react'
 import startCase from 'lodash/startCase'
 import styles from './URLDeck.css'
+
 import {
   ContainerNameOverlay,
   Deck,
   Labware,
   Module,
 } from '@opentrons/components'
-import type {
-  DeckSlot,
-  LabwareComponentProps,
-  ModuleType,
-} from '@opentrons/components'
+import type {DeckSlot, LabwareComponentProps} from '@opentrons/components'
+import type {ModuleType} from '@opentrons/shared-data'
 
 // URI-encoded JSON expected as URL param "data" (eg `?data=...`)
 type UrlData = {
@@ -76,7 +74,7 @@ export default class URLDeck extends React.Component<{}> {
     }
 
     if (moduleData) {
-      module = <Module mode='default' name='tempdeck' />
+      module = <Module mode="default" name="tempdeck" />
     }
 
     return (

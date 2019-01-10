@@ -23,7 +23,7 @@ export default function MixHeader (props: Props) {
         tooltipComponent={<LabwareTooltipContents labware={labware} />}>
         {(hoverTooltipHandlers) => (
           <span {...hoverTooltipHandlers} className={cx(styles.emphasized_cell, styles.labware_display_name)}>
-            {labware && labware.name}
+            {labware && labware.nickname}
           </span>
         )}
       </HoverTooltip>

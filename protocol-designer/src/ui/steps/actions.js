@@ -76,7 +76,7 @@ export const selectStep = (stepId: StepIdType, newStepType?: StepType): ThunkAct
 
     const defaultPipetteId = getNextDefaultPipetteId(
       stepFormSelectors.getSavedStepForms(state),
-      stepFormSelectors.getOrderedSteps(state),
+      stepFormSelectors.getOrderedStepIds(state),
       stepFormSelectors.getInitialDeckSetup(state).pipettes,
     )
 
@@ -88,11 +88,12 @@ export const selectStep = (stepId: StepIdType, newStepType?: StepType): ThunkAct
     // update the form thru handleFormChange.
     const formHasPipetteField = formData && 'pipette' in formData
     if (newStepType && formHasPipetteField && defaultPipetteId) {
-      const updatePayload = {update: {pipette: defaultPipetteId}}
       const updatedFields = handleFormChange(
-        updatePayload,
+        {pipette: defaultPipetteId},
         formData,
-        getState).update
+        stepFormSelectors.getPipetteEntities(state),
+        stepFormSelectors.getLabwareEntities(state)
+      )
 
       formData = {
         ...formData,

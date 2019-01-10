@@ -36,7 +36,8 @@ class Simulator:
             self,
             attached_instruments: Dict[types.Mount, Dict[str, Optional[str]]],
             attached_modules: List[str],
-            config, loop) -> None:
+            config, loop,
+            strict_attached_instruments=True) -> None:
         """ Build the simulator.
 
         :param attached_instruments: A dictionary describing the instruments
@@ -59,6 +60,17 @@ class Simulator:
                                  real hardware.
         :param config: The robot config to use
         :param loop: The asyncio event loop to use.
+        :param strict_attached_instruments: This param changes the behavior of
+                                            the instrument cache. If ``True``,
+                                            (default), ``cache_instrument``
+                                            calls requesting instruments not
+                                            in ``attached_instruments`` will
+                                            fail as if the instrument was not
+                                            present. If ``False``, those calls
+                                            will still pass but give a response
+                                            version of 1, while calls
+                                            requesting instruments that _are_
+                                            present get the full number.
         """
         self._config = config
         self._loop = loop
@@ -73,6 +85,7 @@ class Simulator:
         self._lights = {'button': False, 'rails': False}
         self._run_flag = Event()
         self._log = MODULE_LOG.getChild(repr(self))
+        self._strict_attached = bool(strict_attached_instruments)
 
     def move(self, target_position: Dict[str, float],
              home_flagged_axes: bool = True, speed: float = None):
@@ -127,9 +140,14 @@ class Simulator:
             found_model = init_instr.get('model', '')
             if expected_instr and found_model\
                     and not found_model.startswith(expected_instr):
-                raise RuntimeError(
-                    'mount {}: expected instrument {} but got {}'
-                    .format(mount.name, expected_instr, init_instr))
+                if self._strict_attached:
+                    raise RuntimeError(
+                        'mount {}: expected instrument {} but got {}'
+                        .format(mount.name, expected_instr, init_instr))
+                else:
+                    to_return[mount] = {
+                        'model': find_config(expected_instr),
+                        'id': None}
             elif found_model and expected_instr:
                 # Instrument detected matches instrument expected (note:
                 # "instrument detected" means passed as an argument to the
@@ -212,3 +230,7 @@ class Simulator:
 
     def halt(self):
         self._run_flag.set()
+
+    def probe(self, axis: str, distance: float) -> Dict[str, float]:
+        self._position[axis.upper()] = self._position[axis.upper()] + distance
+        return self._position

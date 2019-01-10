@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import logging
 import time
 from typing import Any, Dict, List, Optional, Union, Tuple
@@ -57,7 +58,7 @@ class ProtocolContext:
                 self._current.join()
             if isinstance(hardware, adapters.SynchronousAdapter):
                 self._current = hardware
-            elif isinstance(hardware, hc.API):
+            elif isinstance(hardware, hc.HardwareAPILike):
                 self._current = adapters.SynchronousAdapter(hardware)
             else:
                 raise TypeError(
@@ -99,6 +100,12 @@ class ProtocolContext:
         self._commands: List[str] = []
         self._unsubscribe_commands = None
         self.clear_commands()
+        if advanced_settings.get_adv_setting('shortFixedTrash'):
+            trash_name = 'opentrons_1_trash_0.85_L'
+        else:
+            trash_name = 'opentrons_1_trash_1.1_L'
+        self.load_labware_by_name(
+            trash_name, '12')
 
     def commands(self):
         return self._commands
@@ -120,6 +127,27 @@ class ProtocolContext:
         self._unsubscribe_commands = broker.subscribe(
             cmds.types.COMMAND, on_command)
 
+    @contextlib.contextmanager
+    def temp_connect(self, hardware: hc.API):
+        """ Connect temporarily to the specified hardware controller.
+
+        This should be used as a context manager:
+
+        .. code-block ::
+            with ctx.temp_connect(hw):
+                # do some tasks
+                ctx.home()
+            # after the with block, the context is connected to the same
+            # hardware control API it was connected to before, even if
+            # an error occured in the code inside the with block
+        """
+        old_hw = self._hw_manager.hardware
+        try:
+            self._hw_manager.set_hw(hardware)
+            yield self
+        finally:
+            self._hw_manager.set_hw(old_hw)
+
     def connect(self, hardware: hc.API):
         """ Connect to a running hardware API.
 
@@ -138,19 +166,25 @@ class ProtocolContext:
         self._hw_manager.reset_hw()
 
     def load_labware(
-            self, labware_obj: Labware, location: types.DeckLocation,
-            label: str = None, share: bool = False) -> Labware:
+            self, labware_obj: Labware,
+            location: types.DeckLocation) -> Labware:
         """ Specify the presence of a piece of labware on the OT2 deck.
 
         This function loads the labware specified by `labware`
         (previously loaded from a configuration file) to the location
         specified by `location`.
+
+        :param Labware labware: The labware object to load
+        :param location: The slot into which to load the labware such as
+                         1 or '1'
+        :type location: int or str
         """
         self._deck_layout[location] = labware_obj
         return labware_obj
 
     def load_labware_by_name(
-            self, labware_name: str, location: types.DeckLocation) -> Labware:
+            self, labware_name: str,
+            location: types.DeckLocation, label: str = None) -> Labware:
         """ A convenience function to specify a piece of labware by name.
 
         For labware already defined by Opentrons, this is a convient way
@@ -159,9 +193,19 @@ class ProtocolContext:
 
         This function returns the created and initialized labware for use
         later in the protocol.
+
+        :param str labware_name: The name of the labware to load
+        :param location: The slot into which to load the labware such as
+                         1 or '1'
+        :type location: int or str
+        :param str label: An optional special name to give the labware. If
+                          specified, this is the name the labware will appear
+                          as in the run log and the calibration view in the
+                          Opentrons app.
         """
         labware = load(labware_name,
-                       self._deck_layout.position_for(location))
+                       self._deck_layout.position_for(location),
+                       label)
         return self.load_labware(labware, location)
 
     def load_module(
@@ -362,6 +406,14 @@ class ProtocolContext:
         """
         return self._deck_layout
 
+    @property
+    def fixed_trash(self) -> Labware:
+        """ The trash fixed to slot 12 of the robot deck. """
+        trash = self._deck_layout['12']
+        if not trash:
+            raise RuntimeError("Robot must have a trash container in 12")
+        return trash  # type: ignore
+
 
 class InstrumentContext:
     """ A context for a specific pipette or instrument.
@@ -394,12 +446,7 @@ class InstrumentContext:
         for tip_rack in self.tip_racks:
             assert tip_rack.is_tiprack
         if trash is None:
-            if advanced_settings.get_adv_setting('shortFixedTrash'):
-                trash_name = 'opentrons_1_trash_0.85_L'
-            else:
-                trash_name = 'opentrons_1_trash_1.1_L'
-            self.trash_container = self._ctx.load_labware_by_name(
-                trash_name, '12')
+            self.trash_container = self._ctx.fixed_trash
         else:
             self.trash_container = trash
 
@@ -585,7 +632,9 @@ class InstrumentContext:
         if not isinstance(loc, Well):
             raise TypeError('Last tip location should be a Well but it is: '
                             '{}'.format(loc))
-        self.drop_tip(loc.top())
+        bot = loc.bottom()
+        bot = bot._replace(point=bot.point._replace(z=bot.point.z + 10))
+        self.drop_tip(bot)
         return self
 
     @cmds.publish.both(command=cmds.pick_up_tip)  # noqa(C901)
@@ -720,7 +769,7 @@ class InstrumentContext:
         """
         if location and isinstance(location, types.Location):
             if isinstance(location.labware, Well):
-                target = location.labware
+                target = location
             else:
                 raise TypeError(
                     "If a location is specified as a types.Location (for "
@@ -730,9 +779,11 @@ class InstrumentContext:
                     "dropped. The passed location, however, is in "
                     "reference to {}".format(location.labware))
         elif location and isinstance(location, Well):
-            target = location
+            bot = location.bottom()
+            target = bot._replace(point=bot.point._replace(z=bot.point.z + 10))
         elif not location:
-            target = self.trash_container.wells()[0]
+            loc = self.trash_container.wells()[0].bottom()
+            target = loc._replace(point=loc.point._replace(z=loc.point.z + 10))
         else:
             raise TypeError(
                 "If specified, location should be an instance of "
@@ -740,7 +791,7 @@ class InstrumentContext:
                 "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
                 " However, it is a {}".format(location))
 
-        self.move_to(target.bottom())
+        self.move_to(target)
         self._hw_manager.hardware.drop_tip(self._mount)
         return self
 
@@ -752,7 +803,8 @@ class InstrumentContext:
         def home_dummy(mount): pass
         cmds.do_publish(cmds.home, home_dummy, 'before', None, None,
                         self._mount.name.lower())
-        self._ctx.home()
+        self._hw_manager.hardware.home_z(self._mount)
+        self._hw_manager.hardware.home_plunger(self._mount)
         cmds.do_publish(cmds.home, home_dummy, 'after', self, None,
                         self._mount.name.lower())
         return self
@@ -820,6 +872,7 @@ class InstrumentContext:
 
     @property
     def mount(self) -> str:
+        """ Return the name of the mount this pipette is attached to """
         return self._mount.name.lower()
 
     @property
@@ -852,7 +905,8 @@ class InstrumentContext:
         :note: This property is equivalent to :py:attr:`speeds`; the only
         difference is the units in which this property is specified.
         """
-        raise NotImplementedError
+        return {'aspirate': self.hw_pipette['aspirate_flow_rate'],
+                'dispense': self.hw_pipette['dispense_flow_rate']}
 
     @flow_rate.setter
     def flow_rate(self, new_flow_rate: Dict[str, float]) -> None:
@@ -861,7 +915,7 @@ class InstrumentContext:
         :param new_flow_rates: A dict containing at least one of 'aspirate
         and 'dispense', mapping to new speeds in uL/s.
         """
-        raise NotImplementedError
+        self._hw_manager.hardware.set_flow_rate(self._mount, **new_flow_rate)
 
     @property
     def pick_up_current(self) -> float:

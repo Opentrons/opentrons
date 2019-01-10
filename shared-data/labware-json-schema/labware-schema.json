@@ -89,7 +89,11 @@
           "type": "boolean"
         },
         "tipLength": {
-          "description": "Required if labware is tiprack",
+          "description": "Required if labware is tiprack, specifies length of tip from drawing or as measured with calipers",
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "tipOverlap": {
+          "description": "Required if labware is tiprack, specifies the length of the area of the tip that overlaps the nozzle of the pipette",
           "$ref": "#/definitions/positiveNumber"
         },
         "loadName": {

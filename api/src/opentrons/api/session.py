@@ -31,10 +31,7 @@ class SessionManager(object):
         self._loop = loop or asyncio.get_event_loop()
         self.session = None
         self._session_lock = False
-        if ff.use_protocol_api_v2():
-            self._hardware = adapters.SynchronousAdapter(hardware)
-        else:
-            self._hardware = hardware
+        self._hardware = hardware
 
     def __del__(self):
         if isinstance(getattr(self, '_hardware', None),
@@ -83,6 +80,7 @@ class Session(object):
         self.protocol_text = text
         self._protocol = None
         self._hardware = hardware
+        self._simulating_ctx = ProtocolContext(loop=self._loop)
         self.state = None
         self.commands = []
         self.command_log = {}
@@ -113,7 +111,8 @@ class Session(object):
                     for _instrument, container in
                     self._interactions
                     if _instrument == instrument
-                ])
+                ],
+                context=self._simulating_ctx)
             for instrument in self._instruments
         ]
 
@@ -126,13 +125,14 @@ class Session(object):
                     for instrument, _container in
                     self._interactions
                     if _container == container
-                ])
+                ],
+                context=self._simulating_ctx)
             for container in self._containers
         ]
 
     def get_modules(self):
         return [
-            Module(module=module)
+            Module(module=module, context=self._simulating_ctx)
             for module in self._modules
         ]
 
@@ -186,10 +186,20 @@ class Session(object):
                 sim = adapters.SynchronousAdapter.build(
                     API.build_hardware_simulator,
                     instrs,
-                    [mod.name() for mod in self._hardware.attached_modules])
-                context = ProtocolContext(hardware=sim, loop=self._loop)
-                context.home()
-                run_protocol(self._protocol, simulate=True, context=context)
+                    [mod.name()
+                     for mod in self._hardware.attached_modules.values()],
+                    strict_attached_instruments=False)
+                sim.home()
+                self._simulating_ctx = ProtocolContext(self._loop,
+                                                       sim)
+                if self._is_json_protocol:
+                    run_protocol(protocol_json=self._protocol,
+                                 simulate=True,
+                                 context=self._simulating_ctx)
+                else:
+                    run_protocol(protocol_code=self._protocol,
+                                 simulate=True,
+                                 context=self._simulating_ctx)
                 sim.join()
             else:
                 # TODO (artyom, 20171005): this will go away
@@ -262,7 +272,7 @@ class Session(object):
         self.set_state('running')
         return self
 
-    def run(self):
+    def run(self):  # noqa(C901)
         def on_command(message):
             if message['$'] == 'before':
                 self.log_append()
@@ -285,7 +295,10 @@ class Session(object):
                 ctx = ProtocolContext(loop=self._loop)
                 ctx.connect(self._hardware)
                 ctx.home()
-                run_protocol(self._protocol, context=ctx)
+                if self._is_json_protocol:
+                    run_protocol(protocol_json=self._protocol, context=ctx)
+                else:
+                    run_protocol(protocol_code=self._protocol, context=ctx)
             else:
                 if self._is_json_protocol:
                     execute_protocol(self._protocol)
@@ -434,10 +447,10 @@ def _get_labware(command):
     instrument = command.get('instrument')
 
     placeable = location
-    if isinstance(location, tuple):
-        placeable = location[0]
-    elif isinstance(location, Location):
+    if isinstance(location, Location):
         placeable = location.labware
+    elif isinstance(location, tuple):
+        placeable = location[0]
 
     maybe_module = _get_parent_module(placeable)
     modules.append(maybe_module)

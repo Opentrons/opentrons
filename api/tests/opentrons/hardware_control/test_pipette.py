@@ -5,7 +5,10 @@ from opentrons.config import pipette_config
 
 
 def test_tip_tracking():
-    pip = pipette.Pipette('p10_single_v1', 'testID')
+    pip = pipette.Pipette('p10_single_v1',
+                          {'single': [0, 0, 0],
+                           'multi': [0, 0, 0]},
+                          'testID')
     with pytest.raises(AssertionError):
         pip.remove_tip()
     assert not pip.has_tip
@@ -23,7 +26,9 @@ def test_tip_tracking():
 def test_critical_points():
     for config in pipette_config.configs:
         loaded = pipette_config.load(config)
-        pip = pipette.Pipette(config, 'testID')
+        pip = pipette.Pipette(config,
+                              {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                              'testID')
         mod_offset = Point(*loaded.model_offset)
         assert pip.critical_point() == mod_offset
         assert pip.critical_point(types.CriticalPoint.NOZZLE) == mod_offset
@@ -31,7 +36,7 @@ def test_critical_points():
         tip_length = 25.0
         pip.add_tip(tip_length)
         new = mod_offset._replace(z=mod_offset.z
-                                  - (tip_length - pip._config.tip_overlap))
+                                  - tip_length)
         assert pip.critical_point() == new
         assert pip.critical_point(types.CriticalPoint.NOZZLE) == mod_offset
         assert pip.critical_point(types.CriticalPoint.TIP) == new
@@ -44,7 +49,9 @@ def test_critical_points():
 def test_volume_tracking():
     for config in pipette_config.configs:
         loaded = pipette_config.load(config)
-        pip = pipette.Pipette(config, 'testID')
+        pip = pipette.Pipette(config,
+                              {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                              'testID')
         assert pip.current_volume == 0.0
         assert pip.available_volume == loaded.max_volume
         assert pip.ok_to_add_volume(loaded.max_volume - 0.1)
@@ -67,7 +74,9 @@ def test_volume_tracking():
 
 def test_config_update():
     for config in pipette_config.configs:
-        pip = pipette.Pipette(config, 'testID')
+        pip = pipette.Pipette(config,
+                              {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                              'testID')
         sample_plunger_pos = {'top': 19.5,
                               'bottom': 2,
                               'blowOut': -1,

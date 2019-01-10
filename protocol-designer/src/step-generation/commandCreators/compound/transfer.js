@@ -1,6 +1,7 @@
 // @flow
 import flatMap from 'lodash/flatMap'
 import zip from 'lodash/zip'
+import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import {getPipetteWithTipMaxVol} from '../../robotStateSelectors'
 import type {TransferFormData, RobotState, CommandCreator, CompoundCommandCreator} from '../../types'
@@ -31,8 +32,10 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...
   const actionName = 'transfer'
 
-  const pipetteData = prevRobotState.instruments[data.pipette]
-  if (!pipetteData) {
+  const pipetteData = prevRobotState.pipettes[data.pipette]
+  const pipetteSpec = pipetteData && pipetteData.name && getPipetteNameSpecs(pipetteData.name)
+
+  if (!pipetteData || !pipetteSpec) {
     // bail out before doing anything else
     return [(_robotState) => ({
       errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: data.pipette})],
@@ -47,6 +50,7 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
   } = data
 
   const effectiveTransferVol = getPipetteWithTipMaxVol(data.pipette, prevRobotState)
+  const pipetteMinVol = pipetteSpec.minVolume
 
   const chunksPerSubTransfer = Math.ceil(
     data.volume / effectiveTransferVol
@@ -54,9 +58,18 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
   const lastSubTransferVol = data.volume - ((chunksPerSubTransfer - 1) * effectiveTransferVol)
 
   // volume of each chunk in a sub-transfer
-  const subTransferVolumes: Array<number> = Array(chunksPerSubTransfer - 1)
+  let subTransferVolumes: Array<number> = Array(chunksPerSubTransfer - 1)
     .fill(effectiveTransferVol)
     .concat(lastSubTransferVol)
+
+  if (chunksPerSubTransfer > 1 && lastSubTransferVol < pipetteMinVol) {
+    // last chunk volume is below pipette min, split the last
+    const splitLastVol = (effectiveTransferVol + lastSubTransferVol) / 2
+    subTransferVolumes = Array(chunksPerSubTransfer - 2)
+      .fill(effectiveTransferVol)
+      .concat(splitLastVol)
+      .concat(splitLastVol)
+  }
 
   const sourceDestPairs = zip(data.sourceWells, data.destWells)
   const commandCreators = flatMap(

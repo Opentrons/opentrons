@@ -137,10 +137,11 @@ function determineLayout (
   wells: Array<Well>): {[wellName: string]: Well} {
   const wellMap = {}
   grids.forEach((gridObj, gridIdx) => {
+    const reverseRowIdx = range(gridObj.row - 1, -1)
     range(gridObj.column).forEach(colIdx => {
       range(gridObj.row).forEach(rowIdx => {
         const wellName = _irregularWellName(rowIdx, colIdx, gridStart[gridIdx])
-        wellMap[wellName] = _calculateWellCoord(rowIdx, colIdx, spacing[gridIdx], offset[gridIdx], wells[gridIdx])
+        wellMap[wellName] = _calculateWellCoord(reverseRowIdx[rowIdx], colIdx, spacing[gridIdx], offset[gridIdx], wells[gridIdx])
       })
     })
   })

@@ -105,6 +105,12 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
     # get a RuntimeError
     with pytest.raises(RuntimeError):
         await sim.cache_instruments({types.Mount.LEFT: 'p300_multi'})
+    # Unless we specifically told the simulator to not strictly enforce
+    # correspondence between expectations and preconfiguration
+    sim = hc.API.build_hardware_simulator(
+        attached_instruments=dummy_instruments,
+        loop=loop, strict_attached_instruments=False)
+    await sim.cache_instruments({types.Mount.LEFT: 'p300_multi'})
 
 
 async def test_aspirate(dummy_instruments, loop):
@@ -116,7 +122,8 @@ async def test_aspirate(dummy_instruments, loop):
     aspirate_rate = 2
     await hw_api.aspirate(types.Mount.LEFT, aspirate_ul, aspirate_rate)
     new_plunger_pos = 5.660769
-    assert hw_api.current_position(types.Mount.LEFT)[Axis.B] == new_plunger_pos
+    pos = await hw_api.current_position(types.Mount.LEFT)
+    assert pos[Axis.B] == new_plunger_pos
 
 
 async def test_dispense(dummy_instruments, loop):
@@ -132,11 +139,13 @@ async def test_dispense(dummy_instruments, loop):
     dispense_1 = 3.0
     await hw_api.dispense(types.Mount.LEFT, dispense_1)
     plunger_pos_1 = 10.810573
-    assert hw_api.current_position(types.Mount.LEFT)[Axis.B] == plunger_pos_1
+    assert (await hw_api.current_position(types.Mount.LEFT))[Axis.B]\
+        == plunger_pos_1
 
     await hw_api.dispense(types.Mount.LEFT, rate=2)
     plunger_pos_2 = 2
-    assert hw_api.current_position(types.Mount.LEFT)[Axis.B] == plunger_pos_2
+    assert (await hw_api.current_position(types.Mount.LEFT))[Axis.B]\
+        == plunger_pos_2
 
 
 async def test_no_pipette(dummy_instruments, loop):

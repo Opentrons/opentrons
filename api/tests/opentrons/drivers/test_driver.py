@@ -8,9 +8,9 @@ def position(x, y, z, a, b, c):
     return {axis: value for axis, value in zip('XYZABC', [x, y, z, a, b, c])}
 
 
-def test_update_position(model):
+def test_update_position(smoothie):
     import types
-    driver = model.robot._driver
+    driver = smoothie
     driver.simulating = False
     _old_send_command = driver._send_command
 
@@ -388,6 +388,7 @@ def test_functional(smoothie):
     assert smoothie.position == smoothie.homed_position
 
 
+@pytest.mark.api1_only
 def test_set_pick_upcurrent(model):
     import types
     driver = model.robot._driver
@@ -429,6 +430,7 @@ def test_set_pick_upcurrent(model):
     driver._save_current = set_current
 
 
+@pytest.mark.api1_only
 def test_drop_tip_current(model):
     import types
     driver = model.robot._driver
@@ -481,11 +483,11 @@ def test_parse_pipette_data():
     assert parsed.decode() == msg
 
 
-def test_read_and_write_pipettes(model):
+def test_read_and_write_pipettes(smoothie):
     import types
     from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODES
 
-    driver = model.robot._driver
+    driver = smoothie
     _old_send_command = driver._send_command
 
     written_id = ''
@@ -522,12 +524,12 @@ def test_read_and_write_pipettes(model):
     driver._send_command = types.MethodType(_old_send_command, driver)
 
 
-def test_read_pipette_v13(model):
+def test_read_pipette_v13(smoothie):
     import types
     from opentrons.drivers.smoothie_drivers.driver_3_0 import \
         _byte_array_to_hex_string
 
-    driver = model.robot._driver
+    driver = smoothie
     _old_send_command = driver._send_command
     driver.simulating = False
 
@@ -542,9 +544,9 @@ def test_read_pipette_v13(model):
     driver._send_command = types.MethodType(_old_send_command, driver)
 
 
-def test_fast_home(model):
+def test_fast_home(smoothie):
     import types
-    driver = model.robot._driver
+    driver = smoothie
 
     move = driver.move
     coords = []
@@ -562,9 +564,9 @@ def test_fast_home(model):
     assert driver.position['X'] == driver.homed_position['X']
 
 
-def test_homing_flags(model):
+def test_homing_flags(smoothie):
     import types
-    driver = model.robot._driver
+    driver = smoothie
 
     def is_connected_mock(self):
         return True
@@ -587,12 +589,14 @@ def test_homing_flags(model):
         'C': True
     }
     driver.update_homed_flags()
-    assert driver.homed_flags == expected
+    flags = driver.homed_flags
+    driver.is_connected = types.MethodType(lambda s: False, driver)
+    assert flags == expected
 
 
-def test_switch_state(model):
+def test_switch_state(smoothie):
     import types
-    driver = model.robot._driver
+    driver = smoothie
 
     def send_mock(self, target):
         smoothie_switch_res = 'X_max:0 Y_max:0 Z_max:0 A_max:0 B_max:0 C_max:0'
@@ -635,7 +639,7 @@ def test_switch_state(model):
     assert driver.switch_state == expected
 
 
-def test_clear_limit_switch(virtual_smoothie_env, model, monkeypatch):
+def test_clear_limit_switch(smoothie, monkeypatch):
     """
     This functions as a contract test around recovery from a limit-switch hit.
     Note that this *does not* itself guarantee correct physical behavior--this
@@ -646,8 +650,8 @@ def test_clear_limit_switch(virtual_smoothie_env, model, monkeypatch):
     from opentrons.drivers.smoothie_drivers.driver_3_0 import (
         serial_communication, GCODES, SmoothieError)
 
-    driver = model.robot._driver
-    model.robot.home()
+    driver = smoothie
+    driver.home('xyza')
     cmd_list = []
 
     def write_mock(command, ack, serial_connection, timeout):
@@ -685,6 +689,7 @@ def test_clear_limit_switch(virtual_smoothie_env, model, monkeypatch):
     ]
 
 
+@pytest.mark.api1_only
 def test_pause_resume(model):
     """
     This test has to use an ugly work-around with the `simulating` member of
@@ -728,6 +733,7 @@ def test_pause_resume(model):
     assert isclose(coords, expected_coords).all()
 
 
+@pytest.mark.api1_only
 def test_speed_change(model, monkeypatch):
 
     pipette = model.instrument._instrument
@@ -764,6 +770,7 @@ def test_speed_change(model, monkeypatch):
     fuzzy_assert(result=command_log, expected=expected)
 
 
+@pytest.mark.api1_only
 def test_max_speed_change(model, monkeypatch):
 
     robot = model.robot
@@ -800,6 +807,7 @@ def test_max_speed_change(model, monkeypatch):
     fuzzy_assert(result=command_log, expected=expected)
 
 
+@pytest.mark.api1_only
 def test_pause_in_protocol(model):
     model.robot._driver.simulating = True
 
@@ -808,6 +816,7 @@ def test_pause_in_protocol(model):
     assert model.robot._driver.run_flag.is_set()
 
 
+@pytest.mark.api1_only
 def test_send_command_with_retry(model, monkeypatch):
     from opentrons.drivers import serial_communication
 
@@ -837,6 +846,7 @@ def test_send_command_with_retry(model, monkeypatch):
         robot._driver._send_command('test')
 
 
+@pytest.mark.api1_only
 def test_unstick_axes(model):
     import types
     driver = model.robot._driver

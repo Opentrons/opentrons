@@ -10,11 +10,6 @@ from . import API
 from .types import Axis, HardwareAPILike
 
 
-def sync_call(loop, to_call, *args, **kwargs):
-    fut = asyncio.run_coroutine_threadsafe(to_call(*args, **kwargs), loop)
-    return fut.result()
-
-
 class SynchronousAdapter(HardwareAPILike, threading.Thread):
     """ A wrapper to make every call into :py:class:`.hardware_control.API`
     synchronous.
@@ -59,9 +54,10 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
                      for the worker thread.
         """
         checked_loop = loop or asyncio.new_event_loop()
-        api._loop = checked_loop
+        api.loop = checked_loop
         self._loop = checked_loop
         self._api = api
+        self._call_lock = threading.Lock()
         super().__init__(
             target=self._event_loop_in_thread,
             name='SynchAdapter thread for {}'.format(repr(api)))
@@ -88,6 +84,11 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
             if thread_loop.is_running():
                 thread_loop.call_soon_threadsafe(lambda: thread_loop.stop())
 
+    @staticmethod
+    def call_coroutine_sync(loop, to_call, *args, **kwargs):
+        fut = asyncio.run_coroutine_threadsafe(to_call(*args, **kwargs), loop)
+        return fut.result()
+
     def __getattribute__(self, attr_name):
         """ Retrieve attributes from our API and wrap coroutines """
         # Almost every attribute retrieved from us will be fore people actually
@@ -106,7 +107,7 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
         if asyncio.iscoroutinefunction(check):
             loop = object.__getattribute__(self, '_loop')
             # Return a synchronized version of the coroutine
-            return functools.partial(sync_call, loop, attr)
+            return functools.partial(self.call_coroutine_sync, loop, attr)
 
         return attr
 

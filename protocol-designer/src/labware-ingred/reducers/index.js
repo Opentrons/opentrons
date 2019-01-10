@@ -34,8 +34,9 @@ import type {LoadFileAction} from '../../load-file'
 import type {
   RemoveWellsContents,
   DeleteLiquidGroup,
+  DuplicateLabwareAction,
   EditLiquidGroupAction,
-  MoveLabware,
+  SwapSlotContentsAction,
   SelectLiquidAction,
   SetWellContentsAction,
 } from '../actions'
@@ -60,13 +61,6 @@ const modeLabwareSelection = handleActions({
     action.payload.slot,
   CLOSE_LABWARE_SELECTOR: () => false,
   CREATE_CONTAINER: () => false,
-}, false)
-
-// If falsey, we aren't moving labware. Else, value should be the containerID we're
-// ready to move.
-const moveLabwareMode = handleActions({
-  SET_MOVE_LABWARE_MODE: (state, action: ActionType<typeof actions.setMoveLabwareMode>) => action.payload,
-  MOVE_LABWARE: (state, action: MoveLabware) => false, // leave move mode after performing a move action
 }, false)
 
 type SelectedContainerId = string | null
@@ -109,7 +103,7 @@ const initialLabwareState: ContainersState = {
     id: FIXED_TRASH_ID,
     type: 'fixed-trash',
     disambiguationNumber: 1,
-    name: 'Trash',
+    nickname: 'Trash',
     slot: '12',
   },
 }
@@ -138,7 +132,7 @@ export const containers = handleActions({
         type: action.payload.containerType,
         disambiguationNumber: getNextDisambiguationNumber(state, action.payload.containerType),
         id,
-        name: null, // create with null name, so we force explicit naming.
+        nickname: null, // create with null name, so we force explicit naming.
       },
     }
   },
@@ -159,18 +153,34 @@ export const containers = handleActions({
       }
       : state
   },
-  MOVE_LABWARE: (state: ContainersState, action: MoveLabware): ContainersState => {
-    const { toSlot, fromSlot } = action.payload
-    const fromContainers = reduce(state, (acc, container, id) => (
-      container.slot === fromSlot ? {...acc, [id]: {...container, slot: toSlot}} : acc
+  SWAP_SLOT_CONTENTS: (state: ContainersState, action: SwapSlotContentsAction): ContainersState => {
+    const { sourceSlot, destSlot } = action.payload
+    const fromLabware = reduce(state, (acc, container, id) => (
+      container.slot === destSlot ? {...acc, [id]: {...container, slot: sourceSlot}} : acc
     ), {})
-    const toContainers = reduce(state, (acc, container, id) => (
-      container.slot === toSlot ? {...acc, [id]: {...container, slot: fromSlot}} : acc
+    const toLabware = reduce(state, (acc, container, id) => (
+      container.slot === sourceSlot ? {...acc, [id]: {...container, slot: destSlot}} : acc
     ), {})
     return {
       ...state,
-      ...fromContainers,
-      ...toContainers,
+      ...fromLabware,
+      ...toLabware,
+    }
+  },
+  DUPLICATE_LABWARE: (state: ContainersState, action: DuplicateLabwareAction): ContainersState => {
+    const {templateLabwareId, duplicateLabwareId} = action.payload
+    const templateLabware = state[templateLabwareId]
+    const nextSlot = nextEmptySlot(_loadedContainersBySlot(state))
+    if (!nextSlot || !templateLabware) return state
+    return {
+      ...state,
+      [duplicateLabwareId]: {
+        slot: nextSlot,
+        type: templateLabware.type,
+        disambiguationNumber: getNextDisambiguationNumber(state, templateLabware.type),
+        id: duplicateLabwareId,
+        name: null, // create with null name, so we force explicit naming.
+      },
     }
   },
   LOAD_FILE: (state: ContainersState, action: LoadFileAction): ContainersState => {
@@ -187,7 +197,7 @@ export const containers = handleActions({
           slot: fileLabware.slot,
           id,
           type: fileLabware.model,
-          name: fileLabware['display-name'],
+          nickname: fileLabware['display-name'],
           disambiguationNumber: getNextDisambiguationNumber(acc, fileLabware.model),
         },
       }
@@ -205,6 +215,10 @@ export const savedLabware = handleActions({
   RENAME_LABWARE: (state: SavedLabwareState, action: ActionType<typeof actions.renameLabware>) => ({
     ...state,
     [action.payload.labwareId]: true,
+  }),
+  DUPLICATE_LABWARE: (state: SavedLabwareState, action: DuplicateLabwareAction) => ({
+    ...state,
+    [action.payload.duplicateLabwareId]: true,
   }),
   LOAD_FILE: (state: SavedLabwareState, action: LoadFileAction): SavedLabwareState => (
     mapValues(action.payload.labware, () => true)
@@ -247,6 +261,15 @@ export const ingredLocations = handleActions({
       },
     }
   },
+  DUPLICATE_LABWARE: (state: LocationsState, action: DuplicateLabwareAction): LocationsState => {
+    const {templateLabwareId, duplicateLabwareId} = action.payload
+    return {
+      ...state,
+      [duplicateLabwareId]: {
+        ...state[templateLabwareId],
+      },
+    }
+  },
   REMOVE_WELLS_CONTENTS: (state: LocationsState, action: RemoveWellsContents): LocationsState => {
     const {wells, labwareId} = action.payload
     return {
@@ -273,7 +296,6 @@ export const ingredLocations = handleActions({
 
 export type RootState = {|
   modeLabwareSelection: ?DeckSlot,
-  moveLabwareMode: ?DeckSlot,
   selectedContainerId: SelectedContainerId,
   drillDownLabwareId: DrillDownLabwareId,
   containers: ContainersState,
@@ -286,7 +308,6 @@ export type RootState = {|
 // TODO Ian 2018-01-15 factor into separate files
 const rootReducer = combineReducers({
   modeLabwareSelection,
-  moveLabwareMode,
   selectedContainerId,
   selectedLiquidGroup,
   drillDownLabwareId,
@@ -306,7 +327,7 @@ const getLabwareById: Selector<{[labwareId: string]: ?Labware}> = createSelector
   rootState => rootState.containers
 )
 
-const getLabwareNames: Selector<{[labwareId: string]: string}> = createSelector(
+const getLabwareNicknamesById: Selector<{[labwareId: string]: string}> = createSelector(
   getLabwareById,
   (labwareById) => mapValues(
     labwareById,
@@ -362,7 +383,7 @@ const loadedContainersBySlot = createSelector(
 /** Returns options for dropdowns, excluding tiprack labware */
 const labwareOptions: Selector<Options> = createSelector(
   getLabwareById,
-  getLabwareNames,
+  getLabwareNicknamesById,
   (labwareById, names) => reduce(labwareById, (acc: Options, labware: Labware, labwareId): Options => {
     const isTiprack = getIsTiprack(labware.type)
     if (!labware.type || isTiprack) {
@@ -382,7 +403,7 @@ const DISPOSAL_LABWARE_TYPES = ['trash-box', 'fixed-trash']
 /** Returns options for disposal (e.g. fixed trash and trash box) */
 const disposalLabwareOptions: Selector<Options> = createSelector(
   getLabwareById,
-  getLabwareNames,
+  getLabwareNicknamesById,
   (labwareById, names) => reduce(labwareById, (acc: Options, labware: Labware, labwareId): Options => {
     if (!labware.type || !DISPOSAL_LABWARE_TYPES.includes(labware.type)) {
       return acc
@@ -468,8 +489,6 @@ const getLabwareSelectionMode: Selector<boolean> = createSelector(
   }
 )
 
-const getSlotToMoveFrom = (state: BaseState) => rootSelector(state).moveLabwareMode
-
 const getLiquidGroupsOnDeck: Selector<Array<string>> = createSelector(
   getLiquidsByLabwareId,
   (ingredLocationsByLabware) => {
@@ -500,7 +519,7 @@ export const selectors = {
   getLiquidsByLabwareId,
   getLiquidNamesById,
   getLabwareById,
-  getLabwareNames,
+  getLabwareNicknamesById,
   getLabwareSelectionMode,
   getLabwareTypes,
   getLiquidSelectionOptions,
@@ -511,8 +530,6 @@ export const selectors = {
   getSelectedLabwareId,
   getSelectedLiquidGroupState,
   getDrillDownLabwareId,
-
-  getSlotToMoveFrom,
 
   allIngredientGroupFields,
   allIngredientNamesIds,

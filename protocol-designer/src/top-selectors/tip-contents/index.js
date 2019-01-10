@@ -35,18 +35,18 @@ function getTipHighlighted (
       const commandWellName = c.params.well
       const pipetteId = c.params.pipette
       const labwareType = StepGeneration.getLabwareType(labwareId, robotState)
-      const channels = StepGeneration.getPipetteChannels(pipetteId, robotState)
+      const pipetteSpec = StepGeneration.getPipetteSpecFromId(pipetteId, robotState)
 
       if (!labwareType) {
         console.error(`Labware ${labwareId} missing labwareType. Could not get tip highlight state`)
         return false
-      } else if (channels === 1) {
+      } else if (pipetteSpec.channels === 1) {
         return commandWellName === wellName
-      } else if (channels === 8) {
+      } else if (pipetteSpec.channels === 8) {
         const wellSet = getWellSetForMultichannel(labwareType, commandWellName)
         return Boolean(wellSet && wellSet.includes(wellName))
       } else {
-        console.error(`Unexpected number of channels: ${channels || '?'}. Could not get tip highlight state`)
+        console.error(`Unexpected number of channels: ${pipetteSpec.channels || '?'}. Could not get tip highlight state`)
         return false
       }
     }
@@ -88,7 +88,7 @@ const getLastValidTips: GetTipSelector = createSelector(
 )
 
 export const getTipsForCurrentStep: GetTipSelector = createSelector(
-  stepFormSelectors.getOrderedSteps,
+  stepFormSelectors.getOrderedStepIds,
   fileDataSelectors.getRobotStateTimeline,
   stepsSelectors.getHoveredStepId,
   stepsSelectors.getActiveItem,
@@ -97,7 +97,7 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
   getLabwareIdProp,
   stepsSelectors.getHoveredSubstep,
   getAllSubsteps,
-  (orderedSteps, robotStateTimeline, hoveredStepId, activeItem, initialTips, lastValidTips, labwareId, hoveredSubstepIdentifier, allSubsteps) => {
+  (orderedStepIds, robotStateTimeline, hoveredStepId, activeItem, initialTips, lastValidTips, labwareId, hoveredSubstepIdentifier, allSubsteps) => {
     if (!activeItem.isStep) {
       const terminalId = activeItem.id
       if (terminalId === START_TERMINAL_ITEM_ID) {
@@ -113,8 +113,8 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
     const stepId = activeItem.id
     const hovered = stepId === hoveredStepId
     const timeline = robotStateTimeline.timeline
-    const timelineIdx = orderedSteps.includes(stepId)
-      ? orderedSteps.findIndex(id => id === stepId)
+    const timelineIdx = orderedStepIds.includes(stepId)
+      ? orderedStepIds.findIndex(id => id === stepId)
       : null
 
     if (timelineIdx == null) {

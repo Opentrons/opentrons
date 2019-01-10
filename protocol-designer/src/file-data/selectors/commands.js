@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import {createSelector} from 'reselect'
 import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
@@ -56,11 +57,8 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
     const labware = mapValues(initialDeckSetup.labware, (l: LabwareOnDeck, id: string): StepGeneration.LabwareData => ({
       type: l.type,
       slot: l.slot,
-      name: l.type, // TODO: Ian 2018-12-20 take this `name` (it's the nickname) out of RobotState - requires a little type alias refactoring
     }))
 
-    // TODO: Ian 2018-12-17 pare down PipetteData type to not have shared-data fields,
-    // then you can skip this conversion here:
     const pipettes = mapValues(initialDeckSetup.pipettes, (p: PipetteOnDeck, id: string): StepGeneration.PipetteData => {
       const pipetteSpecs = getPipetteNameSpecs(p.name)
       if (!pipetteSpecs) {
@@ -68,11 +66,8 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
         throw new Error(`no pipette spec for ${p && p.name}`)
       }
       return {
-        id: id,
         mount: p.mount,
-        model: p.name, // TODO Ian 2018-11-05 rename 'model' to 'name' when breaking change is made in JSON protocols
-        maxVolume: pipetteSpecs.maxVolume,
-        channels: pipetteSpecs.channels,
+        name: p.name,
         tiprackModel: p.tiprackModel,
       }
     })
@@ -95,25 +90,30 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
     type PipetteTipState = {[pipetteId: string]: boolean}
     const pipetteTipState: PipetteTipState = reduce(
       pipettes,
-      (acc: PipetteTipState, pipetteData: StepGeneration.PipetteData) =>
+      (acc: PipetteTipState, pipetteData: StepGeneration.PipetteData, pipetteId: string) =>
         ({
           ...acc,
-          [pipetteData.id]: false, // start with no tips
+          [pipetteId]: false, // start with no tips
         }),
       {})
 
     const pipetteLiquidState = reduce(
       pipettes,
-      (acc, pipetteData: StepGeneration.PipetteData, pipetteId: string) => ({
-        ...acc,
-        [pipetteId]: (pipetteData.channels > 1)
-          ? {'0': {}, '1': {}, '2': {}, '3': {}, '4': {}, '5': {}, '6': {}, '7': {}}
-          : {'0': {}},
-      }),
-      {})
+      (acc, pipetteData: StepGeneration.PipetteData, pipetteId: string) => {
+        const pipetteSpec = getPipetteNameSpecs(pipetteData.name)
+        assert(pipetteSpec, `expected pipette spec for ${pipetteId} ${pipetteData.name}, could not make pipetteLiquidState for initial frame correctly`)
+        const channels = pipetteSpec ? pipetteSpec.channels : 1
+        assert(channels === 1 || channels === 8, 'expected pipette with 1 or 8 channels')
+        return {
+          ...acc,
+          [pipetteId]: (channels > 1)
+            ? {'0': {}, '1': {}, '2': {}, '3': {}, '4': {}, '5': {}, '6': {}, '7': {}}
+            : {'0': {}},
+        }
+      }, {})
 
     return {
-      instruments: pipettes,
+      pipettes,
       labware,
       tipState: {
         tipracks,
@@ -144,10 +144,10 @@ function compoundCommandCreatorFromStepArgs (stepArgs: StepGeneration.CommandCre
 // exposes errors and last valid robotState
 export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSelector(
   stepFormSelectors.getArgsAndErrorsByStepId,
-  stepFormSelectors.getOrderedSteps,
+  stepFormSelectors.getOrderedStepIds,
   getInitialRobotState,
-  (allStepArgsAndErrors, orderedSteps, initialRobotState) => {
-    const allStepArgs: Array<StepGeneration.CommandCreatorData | null> = orderedSteps.map(stepId => {
+  (allStepArgsAndErrors, orderedStepIds, initialRobotState) => {
+    const allStepArgs: Array<StepGeneration.CommandCreatorData | null> = orderedStepIds.map(stepId => {
       return (allStepArgsAndErrors[stepId] && allStepArgsAndErrors[stepId].stepArgs) || null
     })
 
@@ -207,10 +207,10 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
 
 type WarningsPerStep = {[stepId: number | string]: ?Array<StepGeneration.CommandCreatorWarning>}
 export const timelineWarningsPerStep: Selector<WarningsPerStep> = createSelector(
-  stepFormSelectors.getOrderedSteps,
+  stepFormSelectors.getOrderedStepIds,
   getRobotStateTimeline,
-  (orderedSteps, timeline) => timeline.timeline.reduce((acc: WarningsPerStep, frame, timelineIndex) => {
-    const stepId = orderedSteps[timelineIndex]
+  (orderedStepIds, timeline) => timeline.timeline.reduce((acc: WarningsPerStep, frame, timelineIndex) => {
+    const stepId = orderedStepIds[timelineIndex]
 
     // remove warnings of duplicate 'type'. chosen arbitrarily
     return {
@@ -221,14 +221,14 @@ export const timelineWarningsPerStep: Selector<WarningsPerStep> = createSelector
 )
 
 export const getErrorStepId: Selector<?StepIdType> = createSelector(
-  stepFormSelectors.getOrderedSteps,
+  stepFormSelectors.getOrderedStepIds,
   getRobotStateTimeline,
-  (orderedSteps, timeline) => {
+  (orderedStepIds, timeline) => {
     const hasErrors = timeline.errors && timeline.errors.length > 0
     if (hasErrors) {
       // the frame *after* the last frame in the timeline is the error-throwing one
       const errorIndex = timeline.timeline.length
-      const errorStepId = orderedSteps[errorIndex]
+      const errorStepId = orderedStepIds[errorIndex]
       return errorStepId
     }
     return null

@@ -6,31 +6,33 @@ from opentrons.util.calibration_functions import update_instrument_config
 @pytest.fixture
 def config(monkeypatch):
     default = robot_configs._build_config({}, {})._replace(
-            gantry_calibration=[
-                [1.0, 0.0, 0.0, 0.0],
-                [0.0, 1.0, 0.0, 0.0],
-                [0.0, 0.0, 1.0, 0.0],
-                [0.0, 0.0, 0.0, 1.0]
-            ],
-            # probe top center
-            probe_center=[5.0, 5.0, 100.0],
+        gantry_calibration=[
+            [1.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0, 0.0],
+            [0.0, 0.0, 0.0, 1.0]
+        ],
+        # probe top center
+        tip_probe=robot_configs._build_tip_probe({})._replace(
+            center=[5.0, 5.0, 100.0],
             # Bounding box relative to top center
-            probe_dimensions=[50.0, 50.0, 100.0],
-            # left relative to right
-            instrument_offset={
-                'right': {
-                    'single': [0.0, 0.0, 0.0],
-                    'multi': [0.0, 0.0, 0.0]
-                },
-                'left': {
-                    'single': [0.0, 0.0, 0.0],
-                    'multi': [0.0, 0.0, 0.0]
-                }
+            dimensions=[50.0, 50.0, 100.0]
+        ),
+        # left relative to right
+        instrument_offset={
+            'right': {
+                'single': [0.0, 0.0, 0.0],
+                'multi': [0.0, 0.0, 0.0]
             },
-            tip_length={
-                'Pipette': 50
+            'left': {
+                'single': [0.0, 0.0, 0.0],
+                'multi': [0.0, 0.0, 0.0]
             }
-        )
+        },
+        tip_length={
+            'Pipette': 50
+        }
+    )
 
     def dummy_default(a, b):
         return default
@@ -116,8 +118,8 @@ def test_update_instrument_config(fixture):
         "Expected instrument position to update relative to mover in pose tree"
 
     filename = get_config_index().get('robotSettingsFile')
-    expected = dict(robot_configs._build_config({}, {})._asdict())
-    expected.pop('gantry_calibration')
+    _, expected = robot_configs._config_to_save(
+        robot_configs._build_config([[]], {}))
     expected['instrument_offset']['right']['single'] = [5.0, 5.0, 0.0]
     expected['tip_length']['Pipette'] = 55.0
 

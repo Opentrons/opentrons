@@ -21,7 +21,7 @@ def load_my_labware(monkeypatch):
                              'shared_data/definitions2/{}.json'.format(
                                  labware_name)))
         return labware_def
-    monkeypatch.setattr(papi.labware, '_load_definition_by_name', dummy_load)
+    monkeypatch.setattr(papi.labware, 'load_definition_by_name', dummy_load)
 
 
 def test_load_instrument(loop):
@@ -34,17 +34,20 @@ def test_load_instrument(loop):
         assert loaded.name.startswith(prefix)
 
 
-def test_motion(loop):
+async def test_motion(loop):
     hardware = API.build_hardware_simulator(loop=loop)
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
+    ctx.home()
     instr = ctx.load_instrument('p10_single', Mount.RIGHT)
+    old_pos = await hardware.current_position(instr._mount)
     instr.home()
     assert instr.move_to(Location(Point(0, 0, 0), None)) is instr
-    assert hardware.current_position(instr._mount) == {Axis.X: 0,
-                                                       Axis.Y: 0,
-                                                       Axis.A: 0,
-                                                       Axis.C: 19}
+    old_pos[Axis.X] = 0
+    old_pos[Axis.Y] = 0
+    old_pos[Axis.A] = 0
+    old_pos[Axis.C] = 2
+    assert await hardware.current_position(instr._mount) == old_pos
 
 
 def test_location_cache(loop, monkeypatch, load_my_labware):
@@ -130,7 +133,7 @@ def test_pick_up_and_drop_tip(loop, load_my_labware):
     instr.pick_up_tip(target_location)
 
     new_offset = model_offset - Point(0, 0,
-                                      tip_length - pipette.config.tip_overlap)
+                                      tip_length)
     assert pipette.critical_point() == new_offset
 
     instr.drop_tip(target_location)
@@ -186,7 +189,7 @@ def test_pick_up_tip_no_location(loop, load_my_labware):
                                          for cmd in ctx.commands()])
 
     new_offset = model_offset - Point(0, 0,
-                                      tip_length1 - pipette.config.tip_overlap)
+                                      tip_length1)
     assert pipette.critical_point() == new_offset
 
     # TODO: remove argument and verify once trash container is added

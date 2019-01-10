@@ -95,7 +95,7 @@ describe('aspirate', () => {
   })
 
   test('aspirate with volume > tip max volume should throw error', () => {
-    robotStateWithTip.instruments['p300SingleId'].tiprackModel = 'tiprack-200ul'
+    robotStateWithTip.pipettes['p300SingleId'].tiprackModel = 'tiprack-200ul'
     const result = aspirateWithErrors({
       pipette: 'p300SingleId',
       volume: 201,
@@ -111,7 +111,7 @@ describe('aspirate', () => {
 
   test('aspirate with volume > pipette max volume should throw error', () => {
     // NOTE: assigning p300 to a 1000uL tiprack is nonsense, just for this test
-    robotStateWithTip.instruments['p300SingleId'].tiprackModel = 'tiprack-1000ul'
+    robotStateWithTip.pipettes['p300SingleId'].tiprackModel = 'tiprack-1000ul'
     const result = aspirateWithErrors({
       pipette: 'p300SingleId',
       volume: 301,

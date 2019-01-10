@@ -8,6 +8,7 @@ import i18n from '../localization'
 
 import {Portal} from '../components/portals/MainPageModalPortal'
 import BrowseLabwareModal from '../components/labware/BrowseLabwareModal'
+import {DragPreviewLayer} from '../components/labware/LabwareOnDeck'
 import Hints from '../components/Hints'
 import LiquidPlacementModal from '../components/LiquidPlacementModal.js'
 import LabwareContainer from '../containers/LabwareContainer.js'
@@ -26,10 +27,8 @@ type StateProps = {
   selectedTerminalItemId: ?TerminalItemId,
   ingredSelectionMode: boolean,
   drilledDown: boolean,
-  _moveLabwareMode: boolean,
 }
 type DispatchProps = {
-  cancelMoveLabwareMode: () => mixed,
   drillUpFromLabware: () => mixed,
 }
 type Props = {
@@ -43,11 +42,9 @@ const mapStateToProps = (state: BaseState): StateProps => ({
   selectedTerminalItemId: stepsSelectors.getSelectedTerminalItemId(state),
   ingredSelectionMode: Boolean(selectors.getSelectedLabware(state)),
   drilledDown: !!selectors.getDrillDownLabwareId(state),
-  _moveLabwareMode: !!selectors.getSlotToMoveFrom(state),
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DispatchProps => ({
-  cancelMoveLabwareMode: () => dispatch(labwareIngredActions.setMoveLabwareMode()),
   drillUpFromLabware: () => dispatch(labwareIngredActions.drillUpFromLabware()),
 })
 
@@ -56,7 +53,6 @@ const mergeProps = (stateProps: StateProps, dispatchProps: DispatchProps): Props
   ingredSelectionMode: stateProps.ingredSelectionMode,
   drilledDown: stateProps.drilledDown,
   handleClickOutside: () => {
-    if (stateProps._moveLabwareMode) dispatchProps.cancelMoveLabwareMode()
     if (stateProps.drilledDown) dispatchProps.drillUpFromLabware()
   },
 })
@@ -79,7 +75,10 @@ class DeckSetup extends React.Component<Props> {
           <ClickOutside onClickOutside={this.props.handleClickOutside}>
             {({ref}) => (
               <div ref={ref}>
-                <Deck LabwareComponent={LabwareContainer} className={styles.deck} />
+                <Deck
+                  DragPreviewLayer={DragPreviewLayer}
+                  LabwareComponent={LabwareContainer}
+                  className={styles.deck} />
               </div>
             )}
           </ClickOutside>

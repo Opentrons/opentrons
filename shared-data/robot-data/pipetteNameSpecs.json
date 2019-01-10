@@ -5,8 +5,7 @@
     "maxVolume": 10,
     "channels": 1,
     "defaultAspirateFlowRate": 5,
-    "defaultDispenseFlowRate": 10,
-    "tipOverlap": 0
+    "defaultDispenseFlowRate": 10
   },
   "p10_multi": {
     "displayName": "P10 8-Channel",
@@ -14,8 +13,7 @@
     "maxVolume": 10,
     "defaultAspirateFlowRate": 5,
     "defaultDispenseFlowRate": 10,
-    "channels": 8,
-    "tipOverlap": 0
+    "channels": 8
   },
   "p50_single": {
     "displayName": "P50 Single-Channel",
@@ -23,8 +21,7 @@
     "defaultDispenseFlowRate": 50,
     "channels": 1,
     "minVolume": 5,
-    "maxVolume": 50,
-    "tipOverlap": 0
+    "maxVolume": 50
   },
   "p50_multi": {
     "displayName": "P50 8-Channel",
@@ -32,8 +29,7 @@
     "defaultDispenseFlowRate": 50,
     "channels": 8,
     "minVolume": 5,
-    "maxVolume": 50,
-    "tipOverlap": 0
+    "maxVolume": 50
   },
   "p300_single": {
     "displayName": "P300 Single-Channel",
@@ -41,8 +37,7 @@
     "defaultDispenseFlowRate": 300,
     "channels": 1,
     "minVolume": 30,
-    "maxVolume": 300,
-    "tipOverlap": 7
+    "maxVolume": 300
   },
   "p300_multi": {
     "displayName": "P300 8-Channel",
@@ -50,8 +45,7 @@
     "defaultDispenseFlowRate": 300,
     "channels": 8,
     "minVolume": 30,
-    "maxVolume": 300,
-    "tipOverlap": 7
+    "maxVolume": 300
   },
   "p1000_single": {
     "displayName": "P1000 Single-channel",
@@ -59,7 +53,6 @@
     "defaultDispenseFlowRate": 1000,
     "channels": 1,
     "minVolume": 100,
-    "maxVolume": 1000,
-    "tipOverlap": 0
+    "maxVolume": 1000
   }
 }

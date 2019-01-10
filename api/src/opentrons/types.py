@@ -15,9 +15,9 @@ class PipetteNotAttachedError(KeyError):
 
 
 class Point(NamedTuple):
-    x: float
-    y: float
-    z: float
+    x: float = 0.0
+    y: float = 0.0
+    z: float = 0.0
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Point):
@@ -66,6 +66,21 @@ class Location(NamedTuple):
     """
     point: Point
     labware: 'Union[Labware, Well, str, ModuleGeometry, None]'
+
+    def move(self, point: Point) -> 'Location':
+        """
+        Alter the point stored in the location while preserving the labware.
+
+        This returns a new Location and does not alter the current one. It
+        should be used like
+
+        .. code-block:: python
+            >>> loc = Location(Point(1, 1, 1), 'Hi')
+            >>> new_loc = loc.move(Point(1, 1, 1))
+            >>> assert loc_2.point == Point(2, 2, 2)  # True
+            >>> assert loc.point == Point(1, 1, 1)  # True
+        """
+        return self._replace(point=self.point + point)
 
 
 class Mount(enum.Enum):

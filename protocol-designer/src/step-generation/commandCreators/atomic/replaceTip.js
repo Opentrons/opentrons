@@ -1,6 +1,6 @@
 // @flow
 import cloneDeep from 'lodash/cloneDeep'
-import {getNextTiprack} from '../../robotStateSelectors'
+import {getNextTiprack, getPipetteSpecFromId} from '../../robotStateSelectors'
 import {tiprackWellNamesByCol} from '../../data'
 import {insufficientTips} from '../../errorCreators'
 import type {RobotState, CommandCreator} from '../../types'
@@ -12,12 +12,10 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
     Expects 96-well format tip naming system on the tiprack.
     If there's already a tip on the pipette, this will drop it before getting a new one
   */
-  const pipetteData = prevRobotState.instruments[pipetteId]
-
   let robotState = cloneDeep(prevRobotState)
 
-  // get next full tiprack in slot order
-  const nextTiprack = getNextTiprack(pipetteData, robotState)
+  const pipetteSpec = getPipetteSpecFromId(pipetteId, robotState)
+  const nextTiprack = getNextTiprack(pipetteId, robotState)
 
   if (!nextTiprack) {
     // no valid next tip / tiprack, bail out
@@ -27,7 +25,7 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
   }
 
   // drop tip if you have one
-  const dropTipResult = dropTip(pipetteData.id)(robotState)
+  const dropTipResult = dropTip(pipetteId)(robotState)
   if (dropTipResult.errors) {
     return dropTipResult
   }
@@ -39,7 +37,7 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
     {
       command: 'pick-up-tip',
       params: {
-        pipette: pipetteData.id,
+        pipette: pipetteId,
         labware: nextTiprack.tiprackId,
         well: nextTiprack.well,
       },
@@ -50,10 +48,10 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
   robotState.tipState.pipettes[pipetteId] = true
 
   // remove tips from tiprack
-  if (pipetteData.channels === 1 && nextTiprack.well) {
+  if (pipetteSpec.channels === 1 && nextTiprack.well) {
     robotState.tipState.tipracks[nextTiprack.tiprackId][nextTiprack.well] = false
   }
-  if (pipetteData.channels === 8) {
+  if (pipetteSpec.channels === 8) {
     const allWells = tiprackWellNamesByCol.find(col => col[0] === nextTiprack.well)
     if (!allWells) {
       // TODO Ian 2018-04-30 return {errors}, don't throw

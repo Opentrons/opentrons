@@ -14,12 +14,21 @@
     },
     "field_label": "Distance from bottom of well"
   },
+  "new_protocol": {
+    "title": "Create New Protocol"
+  },
   "well_order": {
     "title": "Well Order",
     "body": "Change the order in which the robot aspirates from the selected wells",
     "field_label": "Order",
     "then": "then",
     "viz_label": "Pattern"
+  },
+  "pipette_fields": {
+    "left_pipette": "Left Pipette",
+    "right_pipette": "Right Pipette",
+    "left_tiprack": "Left Tiprack*",
+    "right_tiprack": "Right Tiprack*"
   },
   "edit_pipettes": {
     "title": "Change Pipette Selection",

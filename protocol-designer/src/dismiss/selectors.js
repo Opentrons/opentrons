@@ -32,9 +32,9 @@ export const getDismissedTimelineWarnings: Selector<DismissedWarningsAllSteps<Co
 export const getTimelineWarningsPerStep: Selector<DismissedWarningsAllSteps<CommandCreatorWarning>> = createSelector(
   getDismissedTimelineWarnings,
   timelineWarningsPerStep,
-  stepFormSelectors.getOrderedSteps,
-  (dismissedWarnings, warningsPerStep, orderedSteps) => {
-    return orderedSteps.reduce(
+  stepFormSelectors.getOrderedStepIds,
+  (dismissedWarnings, warningsPerStep, orderedStepIds) => {
+    return orderedStepIds.reduce(
       (stepAcc: DismissedWarningsAllSteps<CommandCreatorWarning>, stepId) => {
         const warningsForCurrentStep = warningsPerStep[stepId]
         const dismissedWarningsForStep = dismissedWarnings[stepId] || []
@@ -59,14 +59,14 @@ export const getTimelineWarningsForSelectedStep: Selector<Array<CommandCreatorWa
   getTimelineWarningsPerStep,
   stepsSelectors.getSelectedStepId,
   (warningsPerStep, stepId) =>
-    (stepId && warningsPerStep[stepId]) || []
+    (stepId != null && warningsPerStep[stepId]) || []
 )
 
 export const getDismissedFormWarningsForSelectedStep: Selector<Array<FormWarning>> = createSelector(
   getDismissedFormWarnings,
   stepsSelectors.getSelectedStepId,
   (dismissedWarnings, stepId) =>
-    (stepId && dismissedWarnings[stepId]) || []
+    (stepId != null && dismissedWarnings[stepId]) || []
 )
 
 /** Non-dismissed form-level warnings for selected step */

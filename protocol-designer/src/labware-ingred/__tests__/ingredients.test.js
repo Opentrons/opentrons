@@ -1,6 +1,6 @@
 import {ingredients, ingredLocations} from '../reducers'
 
-// TODO: BC 2018-7-24 test MOVE_LABWARE instead
+// TODO: BC 2018-7-24 test SWAP_SLOT_CONTENTS && DUPLICATE_LABWARE instead
 describe.skip('COPY_LABWARE action', () => {
   test('copy ingredient locations from cloned container', () => {
     const copyLabwareAction = {

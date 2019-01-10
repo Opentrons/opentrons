@@ -41,15 +41,15 @@ function _getSelectedWellsForStep (
   }
 
   const pipetteId = form.pipette
-  const pipetteChannels = StepGeneration.getPipetteChannels(pipetteId, robotState)
+  const pipetteSpec = StepGeneration.getPipetteSpecFromId(pipetteId, robotState)
   const labwareType = StepGeneration.getLabwareType(labwareId, robotState)
 
-  if (!pipetteChannels || !labwareType) {
+  if (!pipetteSpec || !labwareType) {
     return []
   }
 
   const getWells = (wells: Array<string>) =>
-    _wellsForPipette(pipetteChannels, labwareType, wells)
+    _wellsForPipette(pipetteSpec.channels, labwareType, wells)
 
   let wells = []
 
@@ -141,11 +141,11 @@ export const wellHighlightsByLabwareId: Selector<AllWellHighlightsAllLabware> = 
   stepsSelectors.getHoveredStepId,
   stepsSelectors.getHoveredSubstep,
   allSubsteps,
-  stepFormSelectors.getOrderedSteps,
-  (robotStateTimeline, allStepArgsAndErrors, hoveredStepId, hoveredSubstep, allSubsteps, orderedSteps) => {
+  stepFormSelectors.getOrderedStepIds,
+  (robotStateTimeline, allStepArgsAndErrors, hoveredStepId, hoveredSubstep, allSubsteps, orderedStepIds) => {
     const timeline = robotStateTimeline.timeline
     const stepId = hoveredStepId
-    const timelineIndex = orderedSteps.findIndex(i => i === stepId)
+    const timelineIndex = orderedStepIds.findIndex(i => i === stepId)
     const frame = timeline[timelineIndex]
     const robotState = frame && frame.robotState
     const stepArgs = stepId != null && allStepArgsAndErrors[stepId] && allStepArgsAndErrors[stepId].stepArgs

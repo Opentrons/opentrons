@@ -1,9 +1,10 @@
 // @flow
 import * as React from 'react'
 
-import type {Module} from '../../http-api-client'
-
+import {getModuleDisplayName} from '@opentrons/shared-data'
 import {LabeledValue} from '@opentrons/components'
+
+import type {Module} from '../../http-api-client'
 
 import styles from './styles.css'
 
@@ -12,7 +13,8 @@ type Props = {
 }
 
 export default function ModuleInfo (props: Props) {
-  const {displayName, serial, status, fwVersion} = props.module
+  const {name, serial, status, fwVersion} = props.module
+  const displayName = getModuleDisplayName(name)
   return (
     <div className={styles.module_info}>
       <div className={styles.grid_50} >

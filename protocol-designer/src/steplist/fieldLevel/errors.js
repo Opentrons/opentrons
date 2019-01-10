@@ -22,11 +22,11 @@ const FIELD_ERRORS: {[FieldError]: string} = {
 /*******************
 ** Error Checkers **
 ********************/
-type errorChecker = (value: mixed) => ?string
+type ErrorChecker = (value: mixed) => ?string
 
 export const requiredField = (value: mixed): ?string => !value ? FIELD_ERRORS.REQUIRED : null
 export const nonZero = (value: mixed) => (value && Number(value) === 0) ? FIELD_ERRORS.NON_ZERO : null
-export const minimumWellCount = (minimum: number): errorChecker => (wells: mixed): ?string => (
+export const minimumWellCount = (minimum: number): ErrorChecker => (wells: mixed): ?string => (
   (isArray(wells) && (wells.length < minimum)) ? `${minimum} ${FIELD_ERRORS.UNDER_WELL_MINIMUM}` : null
 )
 
@@ -34,7 +34,7 @@ export const minimumWellCount = (minimum: number): errorChecker => (wells: mixed
 **     Helpers    **
 ********************/
 
-export const composeErrors = (...errorCheckers: Array<errorChecker>) => (value: mixed): Array<string> => (
+export const composeErrors = (...errorCheckers: Array<ErrorChecker>) => (value: mixed): Array<string> => (
   errorCheckers.reduce((accumulatedErrors, errorChecker) => {
     const possibleError = errorChecker(value)
     return possibleError ? [...accumulatedErrors, possibleError] : accumulatedErrors

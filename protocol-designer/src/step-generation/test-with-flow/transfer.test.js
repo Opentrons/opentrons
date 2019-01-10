@@ -299,6 +299,39 @@ describe('single transfer exceeding pipette max', () => {
       expectedFinalLiquidState
     ))
   })
+
+  test('split up volume without going below pipette min', () => {
+    // TODO: Ian 2019-01-04 for some reason, doing transferArgs = {...transferArgs, ...etc}
+    // works everywhere but here - here, it makes Jest fail with "Jest encountered an unexpected token"
+    const _transferArgs = {
+      ...transferArgs,
+      volume: 629,
+      changeTip: 'never', // don't test tip use here
+    }
+    transferArgs = _transferArgs
+
+    // begin with tip on pipette
+    robotInitialState.tipState.pipettes.p300SingleId = true
+
+    const result = transfer(transferArgs)(robotInitialState)
+    expect(result.commands).toEqual([
+      cmd.aspirate('A1', 300),
+      cmd.dispense('A3', 300, {labware: 'destPlateId'}),
+      // last 2 chunks split evenly
+      cmd.aspirate('A1', 164.5),
+      cmd.dispense('A3', 164.5, {labware: 'destPlateId'}),
+      cmd.aspirate('A1', 164.5),
+      cmd.dispense('A3', 164.5, {labware: 'destPlateId'}),
+
+      cmd.aspirate('B1', 300),
+      cmd.dispense('B3', 300, {labware: 'destPlateId'}),
+      // last 2 chunks split evenly
+      cmd.aspirate('B1', 164.5),
+      cmd.dispense('B3', 164.5, {labware: 'destPlateId'}),
+      cmd.aspirate('B1', 164.5),
+      cmd.dispense('B3', 164.5, {labware: 'destPlateId'}),
+    ])
+  })
 })
 
 describe('advanced options', () => {

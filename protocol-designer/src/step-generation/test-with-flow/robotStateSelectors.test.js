@@ -8,36 +8,35 @@ const basicLiquidState = {
   labware: {},
 }
 
+let _pipettesState
+
+beforeEach(() => {
+  _pipettesState = {
+    p300SingleId: p300Single,
+    p300MultiId: p300Multi,
+  }
+})
 describe('sortLabwareBySlot', () => {
   test('sorts all labware by slot', () => {
     // TODO use a fixture, standardize
-    const _instrumentsState = {
-      p300SingleId: p300Single,
-      p300MultiId: p300Multi,
-    }
-
     const robotState = {
-      instruments: _instrumentsState,
+      pipettes: _pipettesState,
       labware: {
         six: {
           slot: '6',
           type: '96-flat',
-          name: 'Destination Plate',
         },
         one: {
           slot: '1',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack',
         },
         eleven: {
           slot: '11',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack',
         },
         two: {
           slot: '2',
           type: 'trough-12row',
-          name: 'Source (Buffer)',
         },
       },
       tipState: {
@@ -51,7 +50,7 @@ describe('sortLabwareBySlot', () => {
       liquidState: createEmptyLiquidState({
         sourcePlateType: '96-flat',
         destPlateType: '96-flat',
-        pipettes: _instrumentsState,
+        pipettes: _pipettesState,
       }),
     }
     expect(sortLabwareBySlot(robotState)).toEqual(['one', 'two', 'six', 'eleven'])
@@ -59,9 +58,7 @@ describe('sortLabwareBySlot', () => {
 
   test('with no labware, return empty array', () => {
     const robotState = {
-      instruments: {
-        p300SingleId: p300Single,
-      },
+      pipettes: _pipettesState,
       labware: {},
       tipState: {
         tipracks: {
@@ -73,9 +70,7 @@ describe('sortLabwareBySlot', () => {
       },
       liquidState: {
         pipettes: {},
-        labware: {
-          p300SingleId: {'0': {}},
-        },
+        labware: {},
       },
     }
     expect(sortLabwareBySlot(robotState)).toEqual([])
@@ -121,29 +116,23 @@ describe('getNextTiprack - single-channel', () => {
   test('single tiprack, missing A1', () => {
     // TODO use a fixture, standardize
     const robotState = {
-      instruments: {
-        p300SingleId: p300Single,
-      },
+      pipettes: _pipettesState,
       labware: {
         tiprack2Id: {
           slot: '2',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 2',
         },
         sourcePlateId: {
           slot: '10',
           type: 'trough-12row',
-          name: 'Source (Buffer)',
         },
         destPlateId: {
           slot: '11',
           type: '96-flat',
-          name: 'Destination Plate',
         },
         trashId: {
           slot: '12',
           type: 'fixed-trash',
-          name: 'Trash',
         },
       },
       tipState: {
@@ -160,7 +149,7 @@ describe('getNextTiprack - single-channel', () => {
       liquidState: basicLiquidState,
     }
 
-    const result = getNextTiprack(p300Single, robotState)
+    const result = getNextTiprack('p300SingleId', robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack2Id')
     expect(result && result.well).toEqual('B1')
@@ -169,24 +158,19 @@ describe('getNextTiprack - single-channel', () => {
   test('single tiprack, empty, should return null', () => {
     // TODO use a fixture, standardize
     const robotState = {
-      instruments: {
-        p300SingleId: p300Single,
-      },
+      pipettes: _pipettesState,
       labware: {
         sourcePlateId: {
           slot: '10',
           type: 'trough-12row',
-          name: 'Source (Buffer)',
         },
         destPlateId: {
           slot: '1',
           type: '96-flat',
-          name: 'Destination Plate',
         },
         trashId: {
           slot: '12',
           type: 'fixed-trash',
-          name: 'Trash',
         },
       },
       tipState: {
@@ -198,7 +182,7 @@ describe('getNextTiprack - single-channel', () => {
       liquidState: basicLiquidState,
     }
 
-    const result = getNextTiprack(p300Single, robotState)
+    const result = getNextTiprack('p300SingleId', robotState)
 
     expect(result).toEqual(null)
   })
@@ -206,34 +190,27 @@ describe('getNextTiprack - single-channel', () => {
   test('multiple tipracks, all full, should return the filled tiprack in the lowest slot', () => {
     // TODO use a fixture, standardize
     const robotState = {
-      instruments: {
-        p300SingleId: p300Single,
-      },
+      pipettes: _pipettesState,
       labware: {
         tiprack2Id: {
           slot: '2',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 2',
         },
         tiprack11Id: {
           slot: '11',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 11',
         },
         sourcePlateId: {
           slot: '10',
           type: 'trough-12row',
-          name: 'Source (Buffer)',
         },
         destPlateId: {
           slot: '1',
           type: '96-flat',
-          name: 'Destination Plate',
         },
         trashId: {
           slot: '12',
           type: 'fixed-trash',
-          name: 'Trash',
         },
       },
       tipState: {
@@ -252,7 +229,7 @@ describe('getNextTiprack - single-channel', () => {
       liquidState: basicLiquidState,
     }
 
-    const result = getNextTiprack(p300Single, robotState)
+    const result = getNextTiprack('p300SingleId', robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack2Id')
     expect(result && result.well).toEqual('A1')
@@ -261,34 +238,27 @@ describe('getNextTiprack - single-channel', () => {
   test('multiple tipracks, some partially full, should return the filled tiprack in the lowest slot', () => {
     // TODO use a fixture, standardize
     const robotState = {
-      instruments: {
-        p300SingleId: p300Single,
-      },
+      pipettes: _pipettesState,
       labware: {
         tiprack2Id: {
           slot: '2',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 2',
         },
         tiprack11Id: {
           slot: '11',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 11',
         },
         sourcePlateId: {
           slot: '10',
           type: 'trough-12row',
-          name: 'Source (Buffer)',
         },
         destPlateId: {
           slot: '1',
           type: '96-flat',
-          name: 'Destination Plate',
         },
         trashId: {
           slot: '12',
           type: 'fixed-trash',
-          name: 'Trash',
         },
       },
       tipState: {
@@ -309,7 +279,7 @@ describe('getNextTiprack - single-channel', () => {
       liquidState: basicLiquidState,
     }
 
-    const result = getNextTiprack(p300Single, robotState)
+    const result = getNextTiprack('p300SingleId', robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack2Id')
     expect(result && result.well).toEqual('B1')
@@ -318,34 +288,27 @@ describe('getNextTiprack - single-channel', () => {
   test('multiple tipracks, all empty, should return null', () => {
     // TODO use a fixture, standardize
     const robotState = {
-      instruments: {
-        p300SingleId: p300Single,
-      },
+      pipettes: _pipettesState,
       labware: {
         tiprack2Id: {
           slot: '2',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 2',
         },
         tiprack11Id: {
           slot: '11',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 11',
         },
         sourcePlateId: {
           slot: '10',
           type: 'trough-12row',
-          name: 'Source (Buffer)',
         },
         destPlateId: {
           slot: '1',
           type: '96-flat',
-          name: 'Destination Plate',
         },
         trashId: {
           slot: '12',
           type: 'fixed-trash',
-          name: 'Trash',
         },
       },
       tipState: {
@@ -364,7 +327,7 @@ describe('getNextTiprack - single-channel', () => {
       liquidState: basicLiquidState,
     }
 
-    const result = getNextTiprack(p300Single, robotState)
+    const result = getNextTiprack('p300SingleId', robotState)
 
     expect(result).toBe(null)
   })
@@ -374,29 +337,23 @@ describe('getNextTiprack - 8-channel', () => {
   test('single tiprack, totally full', () => {
     // TODO use a fixture, standardize
     const robotState = {
-      instruments: {
-        p300SingleId: p300Single,
-      },
+      pipettes: _pipettesState,
       labware: {
         tiprack2Id: {
           slot: '2',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 2',
         },
         sourcePlateId: {
           slot: '10',
           type: 'trough-12row',
-          name: 'Source (Buffer)',
         },
         destPlateId: {
           slot: '1',
           type: '96-flat',
-          name: 'Destination Plate',
         },
         trashId: {
           slot: '12',
           type: 'fixed-trash',
-          name: 'Trash',
         },
       },
       tipState: {
@@ -410,7 +367,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState,
     }
 
-    const result = getNextTiprack(p300Multi, robotState)
+    const result = getNextTiprack('p300MultiId', robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack2Id')
     expect(result && result.well).toEqual('A1')
@@ -419,29 +376,23 @@ describe('getNextTiprack - 8-channel', () => {
   test('single tiprack, partially full', () => {
     // TODO use a fixture, standardize
     const robotState = {
-      instruments: {
-        p300SingleId: p300Single,
-      },
+      pipettes: _pipettesState,
       labware: {
         tiprack2Id: {
           slot: '2',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 2',
         },
         sourcePlateId: {
           slot: '10',
           type: 'trough-12row',
-          name: 'Source (Buffer)',
         },
         destPlateId: {
           slot: '1',
           type: '96-flat',
-          name: 'Destination Plate',
         },
         trashId: {
           slot: '12',
           type: 'fixed-trash',
-          name: 'Trash',
         },
       },
       tipState: {
@@ -460,7 +411,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState,
     }
 
-    const result = getNextTiprack(p300Multi, robotState)
+    const result = getNextTiprack('p300MultiId', robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack2Id')
     expect(result && result.well).toEqual('A3')
@@ -468,24 +419,19 @@ describe('getNextTiprack - 8-channel', () => {
 
   test('single tiprack, empty, should return null', () => {
     const robotState = {
-      instruments: {
-        p300SingleId: p300Single,
-      },
+      pipettes: _pipettesState,
       labware: {
         sourcePlateId: {
           slot: '10',
           type: 'trough-12row',
-          name: 'Source (Buffer)',
         },
         destPlateId: {
           slot: '1',
           type: '96-flat',
-          name: 'Destination Plate',
         },
         trashId: {
           slot: '12',
           type: 'fixed-trash',
-          name: 'Trash',
         },
       },
       tipState: {
@@ -497,7 +443,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState,
     }
 
-    const result = getNextTiprack(p300Multi, robotState)
+    const result = getNextTiprack('p300MultiId', robotState)
 
     expect(result).toEqual(null)
   })
@@ -505,29 +451,23 @@ describe('getNextTiprack - 8-channel', () => {
   test('single tiprack, a well missing from each column, should return null', () => {
     // TODO use a fixture, standardize
     const robotState = {
-      instruments: {
-        p300SingleId: p300Single,
-      },
+      pipettes: _pipettesState,
       labware: {
         tiprack2Id: {
           slot: '2',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 2',
         },
         sourcePlateId: {
           slot: '10',
           type: 'trough-12row',
-          name: 'Source (Buffer)',
         },
         destPlateId: {
           slot: '1',
           type: '96-flat',
-          name: 'Destination Plate',
         },
         trashId: {
           slot: '12',
           type: 'fixed-trash',
-          name: 'Trash',
         },
       },
       tipState: {
@@ -555,7 +495,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState,
     }
 
-    const result = getNextTiprack(p300Multi, robotState)
+    const result = getNextTiprack('p300MultiId', robotState)
 
     expect(result).toEqual(null)
   })
@@ -563,39 +503,31 @@ describe('getNextTiprack - 8-channel', () => {
   test('multiple tipracks, all full, should return the filled tiprack in the lowest slot', () => {
     // TODO use a fixture, standardize
     const robotState = {
-      instruments: {
-        p300SingleId: p300Single,
-      },
+      pipettes: _pipettesState,
       labware: {
         tiprack2Id: {
           slot: '2',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 2',
         },
         tiprack3Id: {
           slot: '3',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 3',
         },
         tiprack10Id: {
           slot: '10',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 10',
         },
         sourcePlateId: {
           slot: '9',
           type: 'trough-12row',
-          name: 'Source (Buffer)',
         },
         destPlateId: {
           slot: '1',
           type: '96-flat',
-          name: 'Destination Plate',
         },
         trashId: {
           slot: '12',
           type: 'fixed-trash',
-          name: 'Trash',
         },
       },
       tipState: {
@@ -617,7 +549,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState,
     }
 
-    const result = getNextTiprack(p300Multi, robotState)
+    const result = getNextTiprack('p300MultiId', robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack2Id')
     expect(result && result.well).toEqual('A1')
@@ -626,39 +558,31 @@ describe('getNextTiprack - 8-channel', () => {
   test('multiple tipracks, some partially full, should return the filled tiprack in the lowest slot', () => {
     // TODO use a fixture, standardize
     const robotState = {
-      instruments: {
-        p300SingleId: p300Single,
-      },
+      pipettes: _pipettesState,
       labware: {
         tiprack2Id: {
           slot: '2',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 2',
         },
         tiprack3Id: {
           slot: '3',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 3',
         },
         tiprack10Id: {
           slot: '10',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 10',
         },
         sourcePlateId: {
           slot: '9',
           type: 'trough-12row',
-          name: 'Source (Buffer)',
         },
         destPlateId: {
           slot: '1',
           type: '96-flat',
-          name: 'Destination Plate',
         },
         trashId: {
           slot: '12',
           type: 'fixed-trash',
-          name: 'Trash',
         },
       },
       tipState: {
@@ -707,7 +631,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState,
     }
 
-    const result = getNextTiprack(p300Multi, robotState)
+    const result = getNextTiprack('p300MultiId', robotState)
 
     expect(result && result.tiprackId).toEqual('tiprack10Id')
     expect(result && result.well).toEqual('A2')
@@ -716,39 +640,31 @@ describe('getNextTiprack - 8-channel', () => {
   test('multiple tipracks, all empty, should return null', () => {
     // TODO use a fixture, standardize
     const robotState = {
-      instruments: {
-        p300SingleId: p300Single,
-      },
+      pipettes: _pipettesState,
       labware: {
         tiprack2Id: {
           slot: '2',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 2',
         },
         tiprack3Id: {
           slot: '3',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 3',
         },
         tiprack10Id: {
           slot: '10',
           type: 'opentrons-tiprack-300ul',
-          name: 'Tip rack 10',
         },
         sourcePlateId: {
           slot: '9',
           type: 'trough-12row',
-          name: 'Source (Buffer)',
         },
         destPlateId: {
           slot: '1',
           type: '96-flat',
-          name: 'Destination Plate',
         },
         trashId: {
           slot: '12',
           type: 'fixed-trash',
-          name: 'Trash',
         },
       },
       tipState: {
@@ -806,7 +722,7 @@ describe('getNextTiprack - 8-channel', () => {
       liquidState: basicLiquidState,
     }
 
-    const result = getNextTiprack(p300Multi, robotState)
+    const result = getNextTiprack('p300MultiId', robotState)
 
     expect(result).toEqual(null)
   })

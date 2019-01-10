@@ -4,9 +4,12 @@ import os
 import shutil
 import tempfile
 
+import pytest
+
 from opentrons.server import init
 from opentrons.data_storage import database as db
 from opentrons.config import robot_configs as rc
+from opentrons.protocol_api import labware
 
 
 def validate_response_body(body):
@@ -62,7 +65,7 @@ async def test_available_resets(virtual_smoothie_env, loop, test_client):
             raise KeyError(key)
 
 
-async def execute_reset_tests(cli):
+async def execute_reset_tests_v1(cli):
     # Make sure we actually delete the database
     resp = await cli.post('/settings/reset', json={'labwareCalibration': True})
     body = await resp.json()
@@ -96,6 +99,40 @@ async def execute_reset_tests(cli):
     assert 'aksgjajhadjasl' in body['message']
 
 
+async def execute_reset_tests_v2(cli):
+    # Make sure we actually delete the database
+    resp = await cli.post('/settings/reset', json={'labwareCalibration': True})
+    body = await resp.json()
+    assert not os.listdir(labware.persistent_path)
+    assert resp.status == 200
+    assert body == {}
+
+    # Make sure this one is idempotent
+    resp = await cli.post('/settings/reset', json={'labwareCalibration': True})
+    body = await resp.json()
+    assert resp.status == 200
+    assert body == {}
+
+    # Check that we properly delete only the tip length key
+    resp = await cli.post('/settings/reset', json={'tipProbe': True})
+    body = await resp.json()
+    assert resp.status == 200
+    assert body == {}
+
+    index = rc.get_config_index()
+    robot_settings = index['robotSettingsFile']
+    with open(robot_settings, 'r') as f:
+        data = json.load(f)
+    assert data['instrument_offset'] == rc.build_fallback_instrument_offset({})
+
+    # Check the inpost validation
+    resp = await cli.post('/settings/reset', json={'aksgjajhadjasl': False})
+    body = await resp.json()
+    assert resp.status // 100 == 4
+    assert 'message' in body
+    assert 'aksgjajhadjasl' in body['message']
+
+
 @contextlib.contextmanager
 def restore_db(db_path):
     db_name = os.path.basename(db_path)
@@ -109,14 +146,22 @@ def restore_db(db_path):
                         db_path)
 
 
-async def test_reset(virtual_smoothie_env, loop, test_client):
-    app = init(loop)
-    cli = await loop.create_task(test_client(app))
-
+@pytest.mark.api1_only
+async def test_reset_v1(virtual_smoothie_env, loop, async_client):
     # This test runs each reset individually (except /data/boot.d which won’t
     # work locally) and checks the error handling
 
     # precondition
     assert os.path.exists(db.database_path)
     with restore_db(db.database_path):
-        await execute_reset_tests(cli)
+        await execute_reset_tests_v1(async_client)
+
+
+@pytest.mark.api2_only
+async def test_reset_v2(virtual_smoothie_env, loop, async_client):
+
+    # This test runs each reset individually (except /data/boot.d which won’t
+    # work locally) and checks the error handling
+
+    # precondition
+    await execute_reset_tests_v2(async_client)

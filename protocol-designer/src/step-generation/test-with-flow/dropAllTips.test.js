@@ -29,7 +29,7 @@ function expectNoTipsRemaining (robotState: RobotState) {
 
 describe('drop all tips', () => {
   test('should do nothing with no pipettes', () => {
-    initialRobotState.instruments = {}
+    initialRobotState.pipettes = {}
     initialRobotState.tipState.pipettes = {}
 
     const result = dropAllTips()(initialRobotState)

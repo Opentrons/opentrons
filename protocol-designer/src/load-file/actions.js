@@ -1,10 +1,9 @@
 // @flow
-import {uuid} from '../utils'
+import migrateFile from './migration'
 import type {ProtocolFile} from '../file-types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../types'
 import type {
   FileError,
-  CreateNewProtocolAction,
   LoadFileAction,
   NewProtocolFields,
 } from './types'
@@ -17,7 +16,7 @@ export const fileErrors = (payload: FileError) => ({
 // expects valid, parsed JSON protocol.
 const loadFileAction = (payload: ProtocolFile): LoadFileAction => ({
   type: 'LOAD_FILE',
-  payload,
+  payload: migrateFile(payload),
 })
 
 // load file thunk, handles file loading errors
@@ -56,28 +55,15 @@ export const loadProtocolFile = (event: SyntheticInputEvent<HTMLInputElement>): 
     }
   }
 
-export const createNewProtocol = (args: NewProtocolFields): CreateNewProtocolAction => {
-  const tipracks = [args.left, args.right].reduce((acc, pipetteByMount) => {
-    const model = pipetteByMount && pipetteByMount.tiprackModel
-    if (model) {
-      return [
-        ...acc,
-        {
-          id: `${uuid()}:${model}`,
-          model: model,
-        },
-      ]
-    }
-    return acc
-  }, [])
-  return {
-    type: 'CREATE_NEW_PROTOCOL',
-    payload: {
-      ...args,
-      tipracks,
-    },
-  }
+export type CreateNewProtocolAction = {
+  type: 'CREATE_NEW_PROTOCOL',
+  payload: NewProtocolFields,
 }
+
+export const createNewProtocol = (payload: $PropertyType<CreateNewProtocolAction, 'payload'>): CreateNewProtocolAction => ({
+  type: 'CREATE_NEW_PROTOCOL',
+  payload,
+})
 
 export const saveProtocolFile = () => ({
   type: 'SAVE_PROTOCOL_FILE',

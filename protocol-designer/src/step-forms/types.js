@@ -19,10 +19,10 @@ export type InitialDeckSetup = {
 export type LabwareOnDeck = $Values<$PropertyType<InitialDeckSetup, 'labware'>>
 export type PipetteOnDeck = $Values<$PropertyType<InitialDeckSetup, 'pipettes'>>
 
-type EditPipetteFields = {pipetteModel: string, tiprackModel: string}
-export type EditPipetteFieldsByMount = {
-  left: ?EditPipetteFields,
-  right: ?EditPipetteFields,
+export type FormPipette = {pipetteName: ?string, tiprackModel: ?string}
+export type FormPipettesByMount = {
+  left: FormPipette,
+  right: FormPipette,
 }
 
 // "entities" have only properties that are time-invariant

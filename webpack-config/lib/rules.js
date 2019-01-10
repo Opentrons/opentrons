@@ -2,7 +2,7 @@
 'use strict'
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const DEV_MODE = require('./dev-mode')
+const {DEV_MODE} = require('./env')
 
 const CSS_LOADER = {
   loader: 'css-loader',
@@ -40,6 +40,7 @@ module.exports = {
       loader: 'babel-loader',
       options: {
         cacheDirectory: true,
+        rootMode: 'upward',
       },
     },
   },

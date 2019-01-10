@@ -3,9 +3,7 @@ import {createAction} from 'redux-actions'
 import type {Dispatch} from 'redux'
 
 import {selectors} from './reducers'
-import {INITIAL_DECK_SETUP_STEP_ID} from '../constants'
 import {uuid} from '../utils'
-import type {ChangeSavedStepFormAction} from '../steplist/actions'
 import type {GetState} from '../types'
 import type {IngredInputs} from './types'
 import type {DeckSlot} from '@opentrons/components'
@@ -22,11 +20,6 @@ export const openAddLabwareModal = createAction(
 export const closeLabwareSelector = createAction(
   'CLOSE_LABWARE_SELECTOR',
   () => {}
-)
-
-export const setMoveLabwareMode = createAction(
-  'SET_MOVE_LABWARE_MODE',
-  (slot: ?DeckSlot) => slot
 )
 
 // ===== Open and close Ingredient Selector modal ====
@@ -106,52 +99,33 @@ export const renameLabware = (
 
 // ===========
 
-export type MoveLabware = {
-  type: 'MOVE_LABWARE',
+export type SwapSlotContentsAction = {
+  type: 'SWAP_SLOT_CONTENTS',
   payload: {
-    fromSlot: DeckSlot,
-    toSlot: DeckSlot,
+    sourceSlot: DeckSlot,
+    destSlot: DeckSlot,
   },
 }
 
-export const moveLabware = (toSlot: DeckSlot) => (dispatch: Dispatch<*>, getState: GetState) => {
-  const state = getState()
-  const fromSlot = selectors.getSlotToMoveFrom(state)
+export const swapSlotContents = (sourceSlot: DeckSlot, destSlot: DeckSlot): SwapSlotContentsAction => ({
+  type: 'SWAP_SLOT_CONTENTS',
+  payload: {sourceSlot, destSlot},
+})
 
-  // TODO: Ian 2018-12-13 this is a HACK during the refactor.
-  // Make this a selector in step-forms/ (and move this action to step-forms/)
-  // Also, 'moveLabware' should probably act on labwareId, not slot,
-  // especially if labware can share slots in the future
-  const prevLabwareLocations = state.stepForms.savedStepForms[INITIAL_DECK_SETUP_STEP_ID] &&
-    state.stepForms.savedStepForms[INITIAL_DECK_SETUP_STEP_ID].labwareLocationUpdate
-  const allLabwareIds = Object.keys(prevLabwareLocations || {})
-  // assumes 1 labware per slot:
-  const fromLabwareId: ?string = allLabwareIds.filter(id => prevLabwareLocations[id] === fromSlot)[0]
-
-  if (fromSlot) {
-    if (fromLabwareId) {
-      const updateInitialDeckSetupStep: ChangeSavedStepFormAction = {
-        type: 'CHANGE_SAVED_STEP_FORM',
-        payload: {
-          stepId: INITIAL_DECK_SETUP_STEP_ID,
-          update: {
-            labwareLocationUpdate: {
-              [fromLabwareId]: toSlot,
-            },
-          },
-        },
-      }
-      dispatch(updateInitialDeckSetupStep)
-    }
-
-    // TODO: Ian 2018-12-13 after step-forms refactor, MOVE_LABWARE can be removed.
-    const moveLabwareAction: MoveLabware = {
-      type: 'MOVE_LABWARE',
-      payload: {fromSlot, toSlot},
-    }
-    dispatch(moveLabwareAction)
-  }
+export type DuplicateLabwareAction = {
+  type: 'DUPLICATE_LABWARE',
+  payload: {
+    templateLabwareId: string,
+    duplicateLabwareId: string,
+  },
 }
+export const duplicateLabware = (templateLabwareId: string): DuplicateLabwareAction => ({
+  type: 'DUPLICATE_LABWARE',
+  payload: {
+    templateLabwareId,
+    duplicateLabwareId: uuid(),
+  },
+})
 
 export type RemoveWellsContents = {
   type: 'REMOVE_WELLS_CONTENTS',
