@@ -1,6 +1,4 @@
 # opentrons platform travis config
-sudo: false
-
 cache:
   pip: true
   yarn: true
