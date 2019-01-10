@@ -4,7 +4,6 @@ import React from 'react'
 import {Deck} from '@opentrons/components'
 import ConnectedSlotItem from './ConnectedSlotItem'
 import LabwareItem from './LabwareItem'
-import ModuleNameOverlay from './ModuleNameOverlay'
 
 import styles from './styles.css'
 
@@ -18,5 +17,5 @@ export default function DeckMap () {
   )
 }
 
-export {LabwareItem, ModuleNameOverlay}
+export {LabwareItem}
 export type {LabwareItemProps} from './LabwareItem'

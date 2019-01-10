@@ -3,6 +3,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 
+import {getModuleDisplayName} from '@opentrons/shared-data'
 import {selectors as robotSelectors} from '../../robot'
 import {
   makeGetRobotModules,
@@ -45,8 +46,7 @@ function ProtocolModulesCard (props: Props) {
   if (modules.length < 1) return null
 
   const moduleInfo = modules.map(module => {
-    const displayName =
-      module.name === 'tempdeck' ? 'Temperature Module' : 'Magnetic Bead Module'
+    const displayName = getModuleDisplayName(module.name)
 
     const actualModel =
       actualModules && actualModules.modules.find(m => m.name === module.name)
