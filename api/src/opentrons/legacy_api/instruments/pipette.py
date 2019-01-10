@@ -686,10 +686,6 @@ class Pipette:
         self.instrument_actuator.set_active_current(self._plunger_current)
         self.robot.poses = self.instrument_actuator.move(
             self.robot.poses,
-            x=self._get_plunger_position('bottom')
-        )
-        self.robot.poses = self.instrument_actuator.move(
-            self.robot.poses,
             x=self._get_plunger_position('blow_out')
         )
         self.current_volume = 0
