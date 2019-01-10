@@ -4,11 +4,14 @@ import logging
 import time
 from typing import Any, Dict, List, Optional, Union, Tuple
 
-from .labware import Well, Labware, load, load_module, ModuleGeometry
+from .labware import (Well, Labware, load, load_module, ModuleGeometry,
+                      quirks_from_any_parent)
 from opentrons import types, hardware_control as hc, broker, commands as cmds
 import opentrons.config.robot_configs as rc
 from opentrons.config import advanced_settings
 from opentrons.hardware_control import adapters, modules
+from opentrons.hardware_control.types import CriticalPoint
+
 from . import geometry
 
 
@@ -557,10 +560,13 @@ class InstrumentContext:
                                 location if location else 'current position',
                                 rate))
         if isinstance(location, Well):
-            point, well = location.bottom()
-            loc = types.Location(
-                point + types.Point(0, 0, self.well_bottom_clearance),
-                well)
+            if 'fixedTrash' in quirks_from_any_parent(location):
+                loc = location.top()
+            else:
+                point, well = location.bottom()
+                loc = types.Location(
+                    point + types.Point(0, 0, self.well_bottom_clearance),
+                    well)
             self.move_to(loc)
         elif isinstance(location, types.Location):
             loc = location
@@ -779,11 +785,14 @@ class InstrumentContext:
                     "dropped. The passed location, however, is in "
                     "reference to {}".format(location.labware))
         elif location and isinstance(location, Well):
-            bot = location.bottom()
-            target = bot._replace(point=bot.point._replace(z=bot.point.z + 10))
+            if 'fixedTrash' in quirks_from_any_parent(location):
+                target = location.top()
+            else:
+                bot = location.bottom()
+                target = bot._replace(
+                    point=bot.point._replace(z=bot.point.z + 10))
         elif not location:
-            loc = self.trash_container.wells()[0].bottom()
-            target = loc._replace(point=loc.point._replace(z=loc.point.z + 10))
+            target = self.trash_container.wells()[0].top()
         else:
             raise TypeError(
                 "If specified, location should be an instance of "
@@ -854,15 +863,21 @@ class InstrumentContext:
             from_lw = self._ctx.location_cache.labware
         else:
             from_lw = None
+
+        from_center = 'centerMultichannelOnWells'\
+            in quirks_from_any_parent(from_lw)
+        cp_override = CriticalPoint.XY_CENTER if from_center else None
         from_loc = types.Location(
-            self._hw_manager.hardware.gantry_position(self._mount),
+            self._hw_manager.hardware.gantry_position(
+                self._mount, critical_point=cp_override),
             from_lw)
         moves = geometry.plan_moves(from_loc, location, self._ctx.deck)
-        self._log.debug("move {}->{}: {}"
+        self._log.debug("move_to: {}->{} via:\n\t{}"
                         .format(from_loc, location, moves))
         try:
             for move in moves:
-                self._hw_manager.hardware.move_to(self._mount, move)
+                self._hw_manager.hardware.move_to(
+                    self._mount, move[0], critical_point=move[1])
         except Exception:
             self._ctx.location_cache = None
             raise

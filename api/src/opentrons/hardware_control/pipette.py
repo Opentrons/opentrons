@@ -62,7 +62,8 @@ class Pipette:
 
         If `cp_override` is specified and valid - so is either
         :py:attr:`CriticalPoint.NOZZLE` or :py:attr:`CriticalPoint.TIP` when
-        we have a tip - the specified critical point will be used.
+        we have a tip, or :py:attr:`CriticalPoint.XY_CENTER` - the specified
+        critical point will be used.
         """
         if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
             cp_type = CriticalPoint.NOZZLE
@@ -70,14 +71,21 @@ class Pipette:
         else:
             cp_type = CriticalPoint.TIP
             tip_length = self.current_tip_length
-        mod_and_tip = Point(self.config.model_offset[0],
-                            self.config.model_offset[1],
-                            self.config.model_offset[2] - tip_length)
+        if cp_override == CriticalPoint.XY_CENTER:
+            mod_offset_xy = [0, 0, self.config.model_offset[2]]
+            cp_type = CriticalPoint.XY_CENTER
+        else:
+            mod_offset_xy = self.config.model_offset
+        mod_and_tip = Point(mod_offset_xy[0],
+                            mod_offset_xy[1],
+                            mod_offset_xy[2] - tip_length)
         cp = mod_and_tip + self._instrument_offset._replace(z=0)
         if self._log.isEnabledFor(logging.DEBUG):
-            info_str = 'cp: {}{}: {}=(model offset: {} + instr offset xy: {}'\
+            mo = 'model offset: {} + '.format(self.config.model_offset)\
+                if cp_type != CriticalPoint.XY_CENTER else ''
+            info_str = 'cp: {}{}: {}=({}instr offset xy: {}'\
                 .format(cp_type, '(from override)' if cp_override else '',
-                        cp, self.config.model_offset,
+                        cp, mo,
                         self._instrument_offset._replace(z=0))
             if cp_type == CriticalPoint.TIP:
                 info_str += '- current_tip_length: {}=(true tip length: {}'\

@@ -121,7 +121,9 @@ class CalibrationManager:
         log.info('Moving {}'.format(instrument.name))
         self._set_state('moving')
         if ff.use_protocol_api_v2():
-            current = self._hardware.gantry_position(Mount[inst.mount.upper()])
+            current = self._hardware.gantry_position(
+                Mount[inst.mount.upper()],
+                critical_point=CriticalPoint.NOZZLE)
             dest = instrument._context.deck.position_for(5)\
                                            .point._replace(z=150)
             self._hardware.move_to(Mount[inst.mount.upper()],
@@ -193,7 +195,12 @@ class CalibrationManager:
         inst = instrument._instrument
         log.info('Updating {} in {}'.format(container.name, container.slot))
         if ff.use_protocol_api_v2():
-            here = self._hardware.gantry_position(Mount[inst.mount.upper()])
+            if 'centerMultichannelOnWells' in container._container.quirks:
+                cp = CriticalPoint.XY_CENTER
+            else:
+                cp = None
+            here = self._hardware.gantry_position(Mount[inst.mount.upper()],
+                                                  critical_point=cp)
             # Reset calibration so we don’t actually calibrate the offset
             # relative to the old calibration
             container._container.set_calibration(Point(0, 0, 0))
