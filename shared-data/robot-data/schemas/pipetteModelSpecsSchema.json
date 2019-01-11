@@ -38,6 +38,7 @@
         "modelOffset",
         "plungerCurrent",
         "dropTipCurrent",
+        "dropTipSpeed",
         "ulPerMm",
         "quirks",
         "tipLength"
@@ -64,6 +65,7 @@
         "modelOffset": {"$ref": "#/definitions/xyzArray"},
         "plungerCurrent": {"type": "number"},
         "dropTipCurrent": {"type": "number"},
+        "dropTipSpeed": {"type": "number"},
         "ulPerMm": {
           "type": "object",
           "required": ["aspirate", "dispense"],
