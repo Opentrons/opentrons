@@ -249,6 +249,7 @@ class InstrumentsWrapper(object):
             max_volume=config.max_volume,
             plunger_current=config.plunger_current,
             drop_tip_current=config.drop_tip_current,
+            drop_tip_speed=config.drop_tip_speed,
             plunger_positions=config.plunger_positions.copy(),
             ul_per_mm=config.ul_per_mm,
             pick_up_current=config.pick_up_current,
