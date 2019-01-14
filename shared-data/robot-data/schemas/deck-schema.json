@@ -1,0 +1,286 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+
+  "definitions": {
+    "pipetteName": {
+      "description": "Name of a pipette. Does not contain info about specific model/version. Should match keys in pipetteNameSpecs.json",
+      "type": "string",
+      "enum": [
+        "p10_single",
+        "p10_multi",
+        "p50_single",
+        "p50_multi",
+        "p300_single",
+        "p300_multi",
+        "p1000_single",
+        "p1000_multi"
+      ]
+    },
+    "pipette-model": {
+      "description": "DEPRECATED. Exists to support backwards compatibility",
+      "type": "string",
+      "$comment": "TODO: Ian 2018-11-06 remove this def and every usage of it",
+      "enum": [
+        "p10_single_v1",
+        "p10_multi_v1",
+        "p50_single_v1",
+        "p50_multi_v1",
+        "p300_single_v1",
+        "p300_multi_v1",
+        "p1000_single_v1",
+        "p1000_multi_v1",
+
+        "p10_single_v1.3",
+        "p10_multi_v1.3",
+        "p50_single_v1.3",
+        "p50_multi_v1.3",
+        "p300_single_v1.3",
+        "p300_multi_v1.3",
+        "p1000_single_v1.3",
+        "p1000_multi_v1.3"
+      ]
+    },
+
+    "mm-offset": {
+      "description": "Millimeters for pipette location offsets",
+      "type": "number"
+    },
+
+    "flow-rate-for-pipettes": {
+      "description": "Flow rate in mm/sec for each pipette model used in the protocol",
+      "type": "object",
+      "propertyNames": {"$ref": "#/definitions/pipetteName"},
+      "patternProperties": {".*": {"type": "number"}},
+      "additionalProperties": false
+    },
+
+    "flow-rate-params": {
+      "properties": {
+        "flow-rate": {
+          "description": "Flow rate for aspirate/dispense. If omitted, defaults to the corresponding values in \"default-values\"",
+          "type": "number"
+        }
+      }
+    },
+
+    "offsetFromBottomMm": {
+      "description": "Offset from bottom of well in millimeters",
+      "properties": {
+        "offsetFromBottomMm": {"$ref": "#/definitions/mm-offset"}
+      }
+    },
+
+    "pipette-access-params": {
+      "required": ["pipette", "labware", "well"],
+      "properties": {
+        "pipette": {
+          "type": "string"
+        },
+        "labware": {
+          "type": "string"
+        },
+        "well": {
+          "type": "string"
+        }
+      }
+    },
+
+    "volume-params": {
+      "required": ["volume"],
+      "volume": {
+        "type": "number"
+      }
+    }
+  },
+
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol-schema",
+    "default-values",
+    "metadata",
+    "robot",
+    "slots",
+    "labware",
+    "procedure"
+  ],
+  "properties": {
+    "metadata": {
+      "description": "Optional metadata about the Deck",
+      "type": "object",
+
+      "properties": {
+        "name": {
+          "description": "A short, human-readable name for the deck",
+          "type": "string"
+        },
+
+        "tags": {
+          "description": "Tags to be used in searching for this deck",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+
+    "robot": {
+      "required": ["model"],
+      "properties": {
+        "model": {
+          "description": "Model of the robot (currently only OT-2 Standard is supported)",
+          "type": "string",
+          "enum": ["OT-2 Standard"]
+        }
+      }
+    },
+
+    "slots": {
+      "description": "The slots available to place labware",
+      "patternProperties": {
+        ".+": {
+          "type": "object",
+          "required": ["position"],
+          "properties": {
+            "position": {
+              "description": "The (x, y, z) coordinates of the front bottom left corner of the slot.",
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                },
+                "z": {
+                  "type": "number"
+                },
+              }
+            },
+            "display-name": {
+              "description": "An optional human-readable nickname for this slot Eg \"Slot 1\"",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+
+    "procedure": {
+      "description": "An array of \"subprocedure\" objects representing the steps to be executed on the robot",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["subprocedure"],
+        "properties": {
+          "annotation": {
+            "description": "Optional info annotating the subprocedure",
+            "type": "object",
+            "required": ["name", "description"],
+            "properties": {
+              "name": {
+                "type": ["string", "null"]
+              },
+              "description": {
+                "type": ["string", "null"]
+              }
+            }
+          },
+
+          "subprocedure": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "description": "Aspirate / dispense / air gap commands",
+                  "type": "object",
+                  "required": ["command", "params"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "command": {
+                      "enum": ["aspirate", "dispense", "air-gap"]
+                    },
+                    "params": {
+                      "allOf": [
+                        {"$ref": "#/definitions/flow-rate-params"},
+                        {"$ref": "#/definitions/pipette-access-params"},
+                        {"$ref": "#/definitions/volume-params"},
+                        {"$ref": "#/definitions/offsetFromBottomMm"}
+                      ]
+                    }
+                  }
+                },
+
+                {
+                  "description": "Touch tip commands",
+                  "type": "object",
+                  "required": ["command", "params"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "command": {
+                      "enum": ["touch-tip"]
+                    },
+                    "params": {
+                      "allOf": [
+                        {"$ref": "#/definitions/pipette-access-params"},
+                        {"$ref": "#/definitions/offsetFromBottomMm"}
+                      ]
+                    }
+                  }
+                },
+
+
+                {
+                  "description": "Pick up tip / drop tip / blowout commands",
+                  "type": "object",
+                  "required": ["command", "params"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "command": {
+                      "enum": ["pick-up-tip", "drop-tip", "blowout"]
+                    },
+                    "params": {
+                      "allOf": [
+                        {"$ref": "#/definitions/pipette-access-params"}
+                      ]
+                    }
+                  }
+                },
+
+                {
+                  "description": "Delay command",
+                  "type": "object",
+                  "required": ["command", "params"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "command": {
+                      "enum": ["delay"]
+                    },
+                    "params": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["wait"],
+                      "properties": {
+                        "wait": {
+                          "description": "either a number of seconds to wait (fractional values OK), or `true` to wait indefinitely until the user manually resumes the protocol",
+                          "anyOf": [
+                            {"type": "number"},
+                            {"enum": [true]}
+                          ]
+                        },
+                        "message": {
+                          "description": "optional message describing the delay"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}
