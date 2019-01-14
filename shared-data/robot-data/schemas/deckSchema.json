@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+
+  "definitions": {
+    "positiveNumber": {
+      "type": "number",
+      "minimum": 0
+    },
+    "xyzArray": {
+      "type": "array",
+      "description": "Array of 3 numbers, [x, y, z]",
+      "items": {"type": "number"},
+      "minItems": 3,
+      "maxItems": 3
+    }
+  },
+
+  "description": "Deck specifications, where x,y,z (0,0,0) is at front the bottom left corner.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "otId",
+    "metadata",
+    "robot",
+    "slots"
+  ],
+  "properties": {
+    "otId": {
+      "description": "Unique internal ID generated using UUID",
+      "type": "string"
+    },
+
+    "metadata": {
+      "description": "Optional metadata about the Deck",
+      "type": "object",
+
+      "properties": {
+        "name": {
+          "description": "A short, human-readable name for the deck",
+          "type": "string"
+        },
+
+        "tags": {
+          "description": "Tags to be used in searching for this deck",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+
+    "robot": {
+      "type": "object",
+      "required": ["model"],
+      "properties": {
+        "model": {
+          "description": "Model of the robot (currently only OT-2 Standard is supported)",
+          "type": "string",
+          "enum": ["OT-2 Standard"]
+        }
+      }
+    },
+
+    "slots": {
+      "type": "object",
+      "description": "The slots available to place labware",
+      "patternProperties": {
+        ".+": {
+          "type": "object",
+          "required": ["position", "boundingRectangle"],
+          "properties": {
+            "position": {"$ref": "#/definitions/xyzArray"},
+            "boundingRectangle": {
+              "type": "object",
+              "required": ["xDimension", "yDimension", "zDimension"],
+              "properties": {
+                "xDimension": {"$ref": "#/definitions/positiveNumber"},
+                "yDimension": {"$ref": "#/definitions/positiveNumber"},
+                "zDimension": {"$ref": "#/definitions/positiveNumber"}
+              }
+            },
+            "display-name": {
+              "description": "An optional human-readable nickname for this slot Eg \"Slot 1\"",
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+
+  }
+}

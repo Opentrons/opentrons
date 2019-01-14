@@ -1,0 +1,20 @@
+{
+	"otId": "FAKEID",
+    "metadata": {
+    	"name": "OT-2 deck standard",
+      "tags": ["ot2", "12 slots"]
+    },
+    "robot": {
+    	"model": "OT-2 Standard"
+    },
+    "slots": {
+    	"1": {
+        	"position": [0,0,0],
+            "boundingRectangle": {
+            	"xDimension": 127.75,
+                "yDimension": 85.5,
+                "zDimension": 0
+            }
+        }
+    }
+}
