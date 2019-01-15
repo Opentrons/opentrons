@@ -9,14 +9,24 @@
     },
     "locations": {
     	"1": {
-        	"position": [0,0,0],
-          "boundingRectangle": {
-            "xDimension": 127.75,
-            "yDimension": 85.5,
-            "zDimension": 0
-          },
-          "type": "Slot",
-          "nickname": "Slot 1"
-        }
+        "position": [0,0,0],
+        "boundingRectangle": {
+          "xDimension": 127.75,
+          "yDimension": 85.5,
+          "zDimension": 0
+        },
+        "type": "Slot",
+        "nickname": "Slot 1"
+      },
+      "2": {
+        "position": [0,0,0],
+        "boundingRectangle": {
+          "xDimension": 127.75,
+          "yDimension": 85.5,
+          "zDimension": 0
+        },
+        "type": "Slot",
+        "nickname": "Slot 1"
+      }
     }
 }
