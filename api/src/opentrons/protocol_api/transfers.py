@@ -96,7 +96,9 @@ Transfer.gradient_function.__doc__ = """
     to determine the path the transfer takes between the volume
     gradient minimum and maximum if the transfer volume is specified as
     a gradient. For instance, specifying the function as
+
     .. code-block:: python
+
         def gradient(a):
             if a > 0.5:
                 return 1.0
@@ -180,7 +182,7 @@ Transfer.touch_tip_strategy.__doc__ = """
 
 class PickUpTipOpts(NamedTuple):
         """
-        Options to customize :py:attr:`.TransferOptions.Transfer.new_tip`.
+        Options to customize :py:attr:`.Transfer.new_tip`.
 
         These options will be passed to
         :py:meth:`InstrumentContext.pick_up_tip` when it is called during
@@ -313,32 +315,32 @@ TransferOptions.transfer.__doc__ = """
 
 TransferOptions.pick_up_tip.__doc__ = """
     Options used when picking up a tip during transfer.
-    See :py:class:`.TransferOptions.PickUpTipsOpts`.
+    See :py:class:`.PickUpTipOpts`.
     """
 
 TransferOptions.mix.__doc__ = """
     Options to control mix behavior before aspirate and after dispense.
-    See :py:class:`.TransferOptions.Mix`.
+    See :py:class:`.Mix`.
     """
 
 TransferOptions.blow_out.__doc__ = """
     Option to specify custom location for blow out. See
-    :py:class:`.TransferOptions.BlowOutOpts`.
+    :py:class:`.BlowOutOpts`.
     """
 
 TransferOptions.touch_tip.__doc__ = """
     Options to customize touch tip. See
-    :py:class:`.TransferOptions.TouchTipOpts`.
+    :py:class:`.TouchTipOpts`.
     """
 
 TransferOptions.aspirate.__doc__ = """
     Option to customize aspirate rate. See
-    :py:class:`.TransferOptions.AspirateOpts`.
+    :py:class:`.AspirateOpts`.
     """
 
 TransferOptions.dispense.__doc__ = """
     Option to customize dispense rate. See
-    :py:class:`.TransferOptions.DispenseOpts`.
+    :py:class:`.DispenseOpts`.
     """
 
 
@@ -412,7 +414,7 @@ class TransferPlan:
 
     def __iter__(self):
         if self._strategy.new_tip == types.TransferTipPolicy.ONCE:
-            yield self._format_dict('pick_up_tip', self._tip_opts)
+            yield self._format_dict('pick_up_tip', kwargs=self._tip_opts)
         yield from {TransferMode.CONSOLIDATE: self._plan_consolidate,
                     TransferMode.DISTRIBUTE: self._plan_distribute,
                     TransferMode.TRANSFER: self._plan_transfer}[self._mode]()
@@ -421,9 +423,6 @@ class TransferPlan:
                 yield self._format_dict('return_tip')
             else:
                 yield self._format_dict('drop_tip')
-
-    # def update_option(self, option_name, new_value):
-    #     if option_name in self._options
 
     def _plan_transfer(self):
         """
@@ -453,19 +452,18 @@ class TransferPlan:
             -> Blow out -> Touch tip -> Drop tip
         """
         plan_iter = zip(self._volumes, self._sources, self._dests)
-        for step_params in plan_iter:
+        for step_vol, src, dest in plan_iter:
             if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
-                yield self._format_dict('pick_up_tip', self._tip_opts)
-            step_vol = step_params[0]
+                yield self._format_dict('pick_up_tip', kwargs=self._tip_opts)
             max_vol = self._instr.max_volume - self._strategy.disposal_volume \
                 - self._strategy.air_gap
             xferred_vol = 0
-            while xferred_vol != step_vol:
+            while xferred_vol < step_vol:
                 # TODO: account for unequal length sources, dests
                 # TODO: ensure last transfer is > min_vol
                 vol = min(max_vol, step_vol - xferred_vol)
-                yield from self._aspirate_actions(vol, step_params[1])
-                yield from self._dispense_actions(vol, step_params[2])
+                yield from self._aspirate_actions(vol, src)
+                yield from self._dispense_actions(vol, dest)
                 xferred_vol += vol
             yield from self._new_tip_action()
 
@@ -514,7 +512,7 @@ class TransferPlan:
         done = False
         current_xfer = next(plan_iter)
         if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
-            yield self._format_dict('pick_up_tip', self._tip_opts)
+            yield self._format_dict('pick_up_tip', kwargs=self._tip_opts)
         while not done:
             asp_grouped = []
             try:
@@ -572,7 +570,7 @@ class TransferPlan:
         plan_iter = zip(self._volumes, self._sources)
         current_xfer = next(plan_iter)
         if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
-            yield self._format_dict('pick_up_tip', self._tip_opts)
+            yield self._format_dict('pick_up_tip', kwargs=self._tip_opts)
         done = False
         while not done:
             asp_grouped = []
@@ -614,13 +612,13 @@ class TransferPlan:
         if self._strategy.mix_strategy == MixStrategy.BEFORE or \
                 self._strategy.mix_strategy == MixStrategy.BOTH:
             if self._instr.current_volume == 0:
-                yield self._format_dict('mix', self._mix_before_opts)
+                yield self._format_dict('mix', kwargs=self._mix_before_opts)
 
     def _after_aspirate(self):
         if self._strategy.air_gap:
             yield self._format_dict('air_gap', [self._strategy.air_gap])
         if self._strategy.touch_tip_strategy == TouchTipStrategy.ALWAYS:
-            yield self._format_dict('touch_tip', self._touch_tip_opts)
+            yield self._format_dict('touch_tip', kwargs=self._touch_tip_opts)
 
     def _before_dispense(self):
         if self._strategy.air_gap:
@@ -634,19 +632,19 @@ class TransferPlan:
             if self._instr.current_volume == 0:
                 if self._strategy.mix_strategy == MixStrategy.AFTER or \
                         self._strategy.mix_strategy == MixStrategy.BOTH:
-                    yield self._format_dict('mix', self._mix_after_opts)
+                    yield self._format_dict('mix', kwargs=self._mix_after_opts)
                 if self._strategy.blow_out_strategy \
                    == BlowOutStrategy.DEST_IF_EMPTY:
                     yield self._format_dict('blow_out', [loc])
             else:
                 # Custom location. Or trash if not specified
-                yield self._format_dict('blow_out', self._blow_opts)
+                yield self._format_dict('blow_out', kwargs=self._blow_opts)
         else:
             # Used by distribute
             if self._strategy.air_gap:
                 yield self._format_dict('air_gap', [self._strategy.air_gap])
         if self._strategy.touch_tip_strategy == TouchTipStrategy.ALWAYS:
-            yield self._format_dict('touch_tip', self._touch_tip_opts)
+            yield self._format_dict('touch_tip', kwargs=self._touch_tip_opts)
 
     def _new_tip_action(self):
         if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
@@ -655,29 +653,15 @@ class TransferPlan:
             else:
                 yield self._format_dict('drop_tip')
 
-    def _format_dict(self, method: str, params: Any = []):
-        # TODO: verify if this is a good way to check for NamedTuple
-        if getattr(type(params), '_fields', None):
-            params = {key: val for key, val in params._asdict().items() if val}
-        return {'method': method, 'params': params}
-
-    def _create_source_target_lists(self, s, t):
-        # No longer used. Preserved for future use possibility
-        s = helpers._get_list(s)
-        t = helpers._get_list(t)
-        len_s = len(s)
-        len_t = len(t)
-        if len_s < len_t:
-            if (len_t / len_s) % 1 > 0:
-                raise ValueError(
-                    'Source and destination lists must be divisible')
-            s = [source for source in s for i in range(int(len_t / len_s))]
-        elif len_s > len_t:
-            if (len_s / len_t) % 1 > 0:
-                raise ValueError(
-                    'Source and destination lists must be divisible')
-            t = [dest for dest in t for i in range(int(len_s / len_t))]
-        return (s, t)
+    def _format_dict(self, method: str,
+                     args: List = None, kwargs: Any = None):
+        if kwargs:
+            params = {key: val for key, val in kwargs._asdict().items() if val}
+        else:
+            params = {}
+        if not args:
+            args = []
+        return {'method': method, 'args': args, 'kwargs': params}
 
     def _create_volume_list(self, volume, total_xfers):
         if isinstance(volume, (float, int)):

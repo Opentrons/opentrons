@@ -538,3 +538,15 @@ def test_blow_out(loop, monkeypatch):
     monkeypatch.setattr(instr, 'move_to', fake_move)
     instr.blow_out()
     assert move_location == lw.wells()[0].top()
+
+@pytest.mark.xfail
+def test_transfer(loop):
+    ctx = papi.ProtocolContext(loop)
+    lw1 = ctx.load_labware_by_name('biorad_96_wellPlate_pcr_200_uL', 1)
+    lw2 = ctx.load_labware_by_name('generic_96_wellPlate_380_uL', 2)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 3)
+    instr = ctx.load_instrument('p300_single', Mount.RIGHT,
+                                tip_racks=[tiprack])
+
+    ctx.home()
+    instr.transfer(10, lw1.columns()[0], lw2.columns()[0])

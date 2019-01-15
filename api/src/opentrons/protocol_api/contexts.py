@@ -593,22 +593,21 @@ class InstrumentContext:
     def mix(self,
             repetitions: int = 1,
             volume: float = None,
-            location: Well = None,
+            location: Union[types.Location, Well] = None,
             rate: float = 1.0) -> 'InstrumentContext':
         """
         Mix a volume of liquid (uL) using this pipette.
         If no location is specified, the pipette will mix from its current
-        position. If no Volume is passed, 'mix' will default to its max_volume
+        position. If no Volume is passed, 'mix' will default to its max_volume.
 
         :param repetitions: how many times the pipette should mix (default: 1)
         :param volume: number of microlitres to mix (default: self.max_volume)
-        :param location: a Well or a position relative to well
-        e.g, `plate.wells('A1').bottom()` (types.Location type)
-        :param rate: Set plunger speed for this mix, where
-        speed = rate * (aspirate_speed or dispense_speed)
-
-        :raises NoTipAttachedError: If no tip is attached to the pipette
-
+        :param location: a Well or a position relative to well.
+                         e.g, `plate.rows()[0][0].bottom()`
+                         (types.Location type).
+        :param rate: Set plunger speed for this mix, where,
+                     speed = rate * (aspirate_speed or dispense_speed)
+        :raises NoTipAttachedError: If no tip is attached to the pipette.
         :returns: This instance
         """
         self._log.debug(
@@ -1204,10 +1203,7 @@ class InstrumentContext:
         plan = transfers.TransferPlan(volume, source, dest, self,
                                       kwargs['mode'], transfer_options)
         for cmd in plan:
-            if isinstance(cmd['params'], dict):
-                getattr(self, cmd['method'])(**cmd['params'])
-            else:
-                getattr(self, cmd['method'])(*cmd['params'])
+            getattr(self, cmd['method'])(*cmd['args'], **cmd['kwargs'])
         return self
 
     def delay(self):

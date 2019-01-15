@@ -93,17 +93,21 @@ class Well:
 
     def top(self, z: float = 0.0) -> Location:
         """
+        :param z: the z distance in mm
         :return: a Point corresponding to the absolute position of the
-        top-center of the well relative to the deck (with the front-left corner
-        of slot 1 as (0,0,0))
+                 top-center of the well relative to the deck (with the
+                 front-left corner of slot 1 as (0,0,0)). If z is specified,
+                 returns a point offset by z mm from top-center
         """
         return Location(self._position + Point(0, 0, z), self)
 
     def bottom(self, z: float = 0.0) -> Location:
         """
+        :param z: the z distance in mm
         :return: a Point corresponding to the absolute position of the
-        bottom-center of the well (with the front-left corner of slot 1 as
-        (0,0,0))
+                 bottom-center of the well (with the front-left corner of
+                 slot 1 as (0,0,0)). If z is specified, returns a point
+                 offset by z mm from bottom-center
         """
         top = self.top()
         bottom_z = top.point.z - self._depth + z
