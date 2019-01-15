@@ -111,7 +111,6 @@ class Deck(UserDict):
                                               0)
                            for idx in range(12)}
 
-        MODULE_LOG.info("\n\n\n\n DECK POSITIONS: {}\n\n\n\n".format(self._positions))
         self._highest_z = 0.0
 
     @staticmethod
