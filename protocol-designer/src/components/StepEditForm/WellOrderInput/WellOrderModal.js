@@ -17,7 +17,7 @@ import {actions} from '../../../steplist'
 import {selectors as stepFormSelectors} from '../../../step-forms'
 import type {BaseState} from '../../../types'
 import WellOrderViz from './WellOrderViz'
-import type {WellOrderOption} from './types'
+import type {WellOrderOption} from '../../../form-types'
 
 import styles from './WellOrderInput.css'
 

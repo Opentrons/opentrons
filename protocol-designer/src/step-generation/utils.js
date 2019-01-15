@@ -19,8 +19,8 @@ import blowout from './commandCreators/atomic/blowout'
 import {AIR} from '@opentrons/components'
 export {AIR}
 
-export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
-export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
+export const SOURCE_WELL_BLOWOUT_DESTINATION: 'SOURCE_WELL' = 'SOURCE_WELL'
+export const DEST_WELL_BLOWOUT_DESTINATION: 'DEST_WELL' = 'DEST_WELL'
 
 export function repeatArray<T> (array: Array<T>, repeats: number): Array<T> {
   return flatMap(range(repeats), (i: number): Array<T> => array)

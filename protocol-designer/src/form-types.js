@@ -152,6 +152,10 @@ export type FormData = {
 //  | PauseForm
 //  | TransferLikeForm
 
+export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
+
+export type WellOrderOption = 'l2r' | 'r2l' | 't2b' | 'b2t'
+
 export type BlankForm = {
   ...AnnotationFields,
   stepType: StepType,
