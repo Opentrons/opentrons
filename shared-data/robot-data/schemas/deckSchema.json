@@ -62,13 +62,13 @@
       }
     },
 
-    "slots": {
+    "locations": {
       "type": "object",
-      "description": "The slots available to place labware",
+      "description": "Locations of interest on the deck.",
       "patternProperties": {
         ".+": {
           "type": "object",
-          "required": ["position", "boundingRectangle"],
+          "required": ["position", "boundingRectangle", "type"],
           "properties": {
             "position": {"$ref": "#/definitions/xyzArray"},
             "boundingRectangle": {
@@ -80,8 +80,13 @@
                 "zDimension": {"$ref": "#/definitions/positiveNumber"}
               }
             },
-            "display-name": {
-              "description": "An optional human-readable nickname for this slot Eg \"Slot 1\"",
+            "type": {
+              "description": "Type of deck location (e.g. Slot, Fixed Trash, etc.)",
+              "type": "string",
+              "enum": ["Slot", "Fixed Trash", "Calibration Cross", "Calibration Dot"]
+            },
+            "nickname": {
+              "description": "An optional human-readable nickname for this slot Eg \"Slot 1\" or \"Fixed Trash\"",
               "type": "string"
             }
           }

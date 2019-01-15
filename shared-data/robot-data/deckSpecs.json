@@ -7,14 +7,16 @@
     "robot": {
     	"model": "OT-2 Standard"
     },
-    "slots": {
+    "locations": {
     	"1": {
         	"position": [0,0,0],
-            "boundingRectangle": {
-            	"xDimension": 127.75,
-                "yDimension": 85.5,
-                "zDimension": 0
-            }
+          "boundingRectangle": {
+            "xDimension": 127.75,
+            "yDimension": 85.5,
+            "zDimension": 0
+          },
+          "type": "Slot",
+          "nickname": "Slot 1"
         }
     }
 }
