@@ -1,5 +1,5 @@
 // @flow
-import flatMap from 'lodash/flatMap'
+import flatten from 'lodash/flatten'
 import zip from 'lodash/zip'
 import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
@@ -27,6 +27,9 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
     * 'always': before each aspirate, get a fresh tip
     * 'once': get a new tip at the beginning of the transfer step, and use it throughout
     * 'never': reuse the tip from the last step
+    * 'perSource': change tip each time you encounter a new source well (including the first one)
+    * 'perDest': change tip each time you encounter a new destination well (including the first one)
+    NOTE: In some situations, different changeTip options have equivalent outcomes. That's OK.
   */
 
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...
@@ -72,17 +75,28 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
   }
 
   const sourceDestPairs = zip(data.sourceWells, data.destWells)
-  const commandCreators = flatMap(
-    sourceDestPairs,
-    (wellPair: [string, string], pairIdx: number): Array<CommandCreator> => {
+  let prevSourceWell = null
+  let prevDestWell = null
+  const commandCreators = sourceDestPairs.reduce(
+    (outerAcc: Array<CommandCreator>, wellPair: [string, string], pairIdx: number): Array<CommandCreator> => {
       const [sourceWell, destWell] = wellPair
 
-      return flatMap(
-        subTransferVolumes,
-        (subTransferVol: number, chunkIdx: number): Array<CommandCreator> => {
-          const tipCommands: Array<CommandCreator> = (
-            (data.changeTip === 'once' && pairIdx === 0 && chunkIdx === 0) ||
-            data.changeTip === 'always')
+      const commands = subTransferVolumes.reduce(
+        (innerAcc: Array<CommandCreator>, subTransferVol: number, chunkIdx: number): Array<CommandCreator> => {
+          const isInitialSubtransfer = (pairIdx === 0 && chunkIdx === 0)
+          let changeTipNow = false // 'never' by default
+
+          if (data.changeTip === 'always') {
+            changeTipNow = true
+          } else if (data.changeTip === 'once') {
+            changeTipNow = isInitialSubtransfer
+          } else if (data.changeTip === 'perSource') {
+            changeTipNow = sourceWell !== prevSourceWell
+          } else if (data.changeTip === 'perDest') {
+            changeTipNow = isInitialSubtransfer || destWell !== prevDestWell
+          }
+
+          const tipCommands: Array<CommandCreator> = changeTipNow
             ? [replaceTip(data.pipette)]
             : []
 
@@ -155,7 +169,7 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
             data.blowoutLocation,
           )
 
-          return [
+          const nextCommands = [
             ...tipCommands,
             ...preWetTipCommands,
             ...mixBeforeAspirateCommands,
@@ -180,10 +194,16 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
             ...mixInDestinationCommands,
             ...blowoutCommand,
           ]
-        }
-      )
-    }
-  )
+
+          // NOTE: side-effecting
+          prevSourceWell = sourceWell
+          prevDestWell = destWell
+
+          return [...innerAcc, ...flatten(nextCommands)]
+        }, [])
+
+      return [...outerAcc, ...commands]
+    }, [])
   return commandCreators
 }
 

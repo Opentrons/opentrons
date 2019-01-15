@@ -269,6 +269,82 @@ describe('single transfer exceeding pipette max', () => {
     ))
   })
 
+  test('changeTip="perSource"', () => {
+    transferArgs = {
+      ...transferArgs,
+      sourceWells: ['A1', 'A1', 'A2'],
+      destWells: ['B1', 'B2', 'B2'],
+      changeTip: 'perSource',
+    }
+
+    const result = transfer(transferArgs)(robotInitialState)
+    expect(result.commands).toEqual([
+      cmd.pickUpTip('A1'),
+
+      cmd.aspirate('A1', 300),
+      cmd.dispense('B1', 300, {labware: 'destPlateId'}),
+
+      cmd.aspirate('A1', 50),
+      cmd.dispense('B1', 50, {labware: 'destPlateId'}),
+
+      // same source, different dest: no change
+      cmd.aspirate('A1', 300),
+      cmd.dispense('B2', 300, {labware: 'destPlateId'}),
+
+      cmd.aspirate('A1', 50),
+      cmd.dispense('B2', 50, {labware: 'destPlateId'}),
+
+      // new source, different dest: change tip
+      cmd.dropTip('A1'),
+      cmd.pickUpTip('B1'),
+
+      cmd.aspirate('A2', 300),
+      cmd.dispense('B2', 300, {labware: 'destPlateId'}),
+
+      cmd.aspirate('A2', 50),
+      cmd.dispense('B2', 50, {labware: 'destPlateId'}),
+    ])
+  })
+
+  test('changeTip="perDest"', () => {
+    // NOTE: same wells as perSource test
+    transferArgs = {
+      ...transferArgs,
+      sourceWells: ['A1', 'A1', 'A2'],
+      destWells: ['B1', 'B2', 'B2'],
+      changeTip: 'perDest',
+    }
+
+    const result = transfer(transferArgs)(robotInitialState)
+    expect(result.commands).toEqual([
+      cmd.pickUpTip('A1'),
+
+      cmd.aspirate('A1', 300),
+      cmd.dispense('B1', 300, {labware: 'destPlateId'}),
+
+      cmd.aspirate('A1', 50),
+      cmd.dispense('B1', 50, {labware: 'destPlateId'}),
+
+      // same source, different dest: change tip
+      cmd.dropTip('A1'),
+      cmd.pickUpTip('B1'),
+
+      cmd.aspirate('A1', 300),
+      cmd.dispense('B2', 300, {labware: 'destPlateId'}),
+
+      cmd.aspirate('A1', 50),
+      cmd.dispense('B2', 50, {labware: 'destPlateId'}),
+
+      // different source, same dest: no change
+
+      cmd.aspirate('A2', 300),
+      cmd.dispense('B2', 300, {labware: 'destPlateId'}),
+
+      cmd.aspirate('A2', 50),
+      cmd.dispense('B2', 50, {labware: 'destPlateId'}),
+    ])
+  })
+
   test('changeTip="never"', () => {
     transferArgs = {
       ...transferArgs,
