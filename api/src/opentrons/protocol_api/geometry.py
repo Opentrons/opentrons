@@ -110,6 +110,8 @@ class Deck(UserDict):
                                               idx//3 * row_offset,
                                               0)
                            for idx in range(12)}
+
+        MODULE_LOG.info("\n\n\n\n DECK POSITIONS: {}\n\n\n\n".format(self._positions))
         self._highest_z = 0.0
 
     @staticmethod

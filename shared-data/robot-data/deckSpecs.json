@@ -8,25 +8,168 @@
     	"model": "OT-2 Standard"
     },
     "locations": {
-    	"1": {
-        "position": [0,0,0],
-        "boundingRectangle": {
-          "xDimension": 127.75,
-          "yDimension": 85.5,
-          "zDimension": 0
+      "slots": {
+        "1": {
+          "position": [0.0, 0.0, 0.0],
+          "boundingBox": {
+            "xDimension": 127.75,
+            "yDimension": 85.5,
+            "zDimension": 0
+          },
+          "displayName": "Slot 1"
         },
-        "type": "Slot",
-        "nickname": "Slot 1"
+        "2": {
+          "position": [132.5, 0.0, 0.0],
+          "boundingBox": {
+            "xDimension": 127.75,
+            "yDimension": 85.5,
+            "zDimension": 0
+          },
+          "displayName": "Slot 2"
+        },
+        "3": {
+          "position": [265.0, 0.0, 0.0],
+          "boundingBox": {
+            "xDimension": 127.75,
+            "yDimension": 85.5,
+            "zDimension": 0
+          },
+          "displayName": "Slot 3"
+        },
+        "4": {
+          "position": [0.0, 90.5, 0.0],
+          "boundingBox": {
+            "xDimension": 127.75,
+            "yDimension": 85.5,
+            "zDimension": 0
+          },
+          "displayName": "Slot 4"
+        },
+        "5": {
+          "position": [132.5, 90.5, 0.0],
+          "boundingBox": {
+            "xDimension": 127.75,
+            "yDimension": 85.5,
+            "zDimension": 0
+          },
+          "displayName": "Slot 5"
+        },
+        "6": {
+          "position": [265.0, 90.5, 0.0],
+          "boundingBox": {
+            "xDimension": 127.75,
+            "yDimension": 85.5,
+            "zDimension": 0
+          },
+          "displayName": "Slot 6"
+        },
+        "7": {
+          "position": [0.0, 181.0, 0.0],
+          "boundingBox": {
+            "xDimension": 127.75,
+            "yDimension": 85.5,
+            "zDimension": 0
+          },
+          "displayName": "Slot 7"
+        },
+        "8": {
+          "position": [132.5, 181.0, 0.0],
+          "boundingBox": {
+            "xDimension": 127.75,
+            "yDimension": 85.5,
+            "zDimension": 0
+          },
+          "displayName": "Slot 8"
+        },
+        "9": {
+          "position": [265.0, 181.0, 0.0],
+          "boundingBox": {
+            "xDimension": 127.75,
+            "yDimension": 85.5,
+            "zDimension": 0
+          },
+          "displayName": "Slot 9"
+        },
+        "10": {
+          "position": [0.0, 271.5, 0.0],
+          "boundingBox": {
+            "xDimension": 127.75,
+            "yDimension": 85.5,
+            "zDimension": 0
+          },
+          "displayName": "Slot 10"
+        },
+        "11": {
+          "position": [132.5, 271.5, 0.0],
+          "boundingBox": {
+            "xDimension": 127.75,
+            "yDimension": 85.5,
+            "zDimension": 0
+          },
+          "displayName": "Slot 11"
+        }
       },
-      "2": {
-        "position": [0,0,0],
-        "boundingRectangle": {
-          "xDimension": 127.75,
-          "yDimension": 85.5,
-          "zDimension": 0
+      "calibrationPoints": {
+        "1C": {
+          "position": [, , ],
+          "displayName": "Slot 1 Cross"
         },
-        "type": "Slot",
-        "nickname": "Slot 1"
+        "3C": {
+          "position": [, , ],
+          "displayName": "Slot 3 Cross"
+        },
+        "7C": {
+          "position": [, , ],
+          "displayName": "Slot 7 Cross"
+        },
+        "9C": {
+          "position": [, , ],
+          "displayName": "Slot 9 Cross"
+        },
+        "10C": {
+          "position": [, , ],
+          "displayName": "Slot 10 Cross"
+        },
+        "11C": {
+          "position": [, , ],
+          "displayName": "Slot 11 Cross"
+        },
+        "1D": {
+          "position": [, , ],
+          "displayName": "Slot 1 Dot"
+        },
+        "3D": {
+          "position": [, , ],
+          "displayName": "Slot 3 Dot"
+        },
+        "7D": {
+          "position": [, , ],
+          "displayName": "Slot 7 Dot"
+        },
+        "9D": {
+          "position": [, , ],
+          "displayName": "Slot 9 Dot"
+        },
+        "10D": {
+          "position": [, , ],
+          "displayName": "Slot 10 Dot"
+        },
+        "11D": {
+          "position": [, , ],
+          "displayName": "Slot 11 Dot"
+        },
+      },
+      "fixtures": {
+        "fixedTrashTall": {
+          "position": [265.0, 271.5, 0.0],
+          "boundingBox": {
+            "xDimension": 127.75,
+            "yDimension": 85.5,
+            "zDimension": 0
+          },
+          "displayName": "Fixed Trash"
+        }
       }
     }
+  }
 }
