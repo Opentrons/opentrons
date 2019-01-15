@@ -22,7 +22,7 @@
     "otId",
     "metadata",
     "robot",
-    "slots"
+    "locations"
   ],
   "properties": {
     "otId": {
@@ -64,73 +64,76 @@
 
     "locations": {
       "type": "object",
-      "required": ["slots", "calibration"],
-      "slots": {
-        "type": "object",
-        "description": "Slots available for placing labware",
-        "patternProperties": {
-          ".+": {
-            "type": "object",
-            "required": ["position", "boundingBox", "type"],
-            "properties": {
-              "position": {"$ref": "#/definitions/xyzArray"},
-              "boundingBox": {
-                "type": "object",
-                "required": ["xDimension", "yDimension", "zDimension"],
-                "properties": {
-                  "xDimension": {"$ref": "#/definitions/positiveNumber"},
-                  "yDimension": {"$ref": "#/definitions/positiveNumber"},
-                  "zDimension": {"$ref": "#/definitions/positiveNumber"}
+      "required": ["slots", "calibrationPoints"],
+      "properties": {
+        "slots": {
+          "type": "object",
+          "description": "Slots available for placing labware",
+          "patternProperties": {
+            ".+": {
+              "type": "object",
+              "required": ["position", "boundingBox"],
+              "properties": {
+                "position": {"$ref": "#/definitions/xyzArray"},
+                "boundingBox": {
+                  "type": "object",
+                  "required": ["xDimension", "yDimension", "zDimension"],
+                  "properties": {
+                    "xDimension": {"$ref": "#/definitions/positiveNumber"},
+                    "yDimension": {"$ref": "#/definitions/positiveNumber"},
+                    "zDimension": {"$ref": "#/definitions/positiveNumber"}
+                  }
+                },
+                "displayName": {
+                  "description": "An optional human-readable nickname for this slot Eg \"Slot 1\" or \"Fixed Trash\"",
+                  "type": "string"
                 }
-              },
-              "displayName": {
-                "description": "An optional human-readable nickname for this slot Eg \"Slot 1\" or \"Fixed Trash\"",
-                "type": "string"
               }
             }
           }
-        }
-      },
+        },
 
-      "calibrationPoints": {
-        "type": "object",
-        "description": "Key points for deck calibration",
-        "patternProperties": {
-          ".+": {
-            "type": "object",
-            "required": ["position"],
-            "properties": {
-              "position": {"$ref": "#/definitions/xyzArray"},
-              "displayName": {
-                "description": "An optional human-readable nickname for this position Eg \"Slot 3 Cross\" or \"Slot 1 Dot\"",
-                "type": "string"
+        "calibrationPoints": {
+          "type": "object",
+          "description": "Key points for deck calibration",
+          "patternProperties": {
+            ".+": {
+              "type": "object",
+              "required": ["position"],
+              "properties": {
+                "position": {"$ref": "#/definitions/xyzArray"},
+                "displayName": {
+                  "description": "An optional human-readable nickname for this position Eg \"Slot 3 Cross\" or \"Slot 1 Dot\"",
+                  "type": "string"
+                }
               }
             }
           }
-        }
-      },
+        },
 
-      "fixtures": {
-        "type": "object",
-        "description": "Fixed position objects on the deck.",
-        "patternProperties": {
-          ".+": {
-            "type": "object",
-            "required": ["position", "boundingRectangle", "type"],
-            "properties": {
-              "position": {"$ref": "#/definitions/xyzArray"},
-              "boundingBox": {
-                "type": "object",
-                "required": ["xDimension", "yDimension", "zDimension"],
-                "properties": {
-                  "xDimension": {"$ref": "#/definitions/positiveNumber"},
-                  "yDimension": {"$ref": "#/definitions/positiveNumber"},
-                  "zDimension": {"$ref": "#/definitions/positiveNumber"}
+        "fixtures": {
+          "type": "object",
+          "description": "Fixed position objects on the deck.",
+          "patternProperties": {
+            ".+": {
+              "type": "object",
+              "required": ["position", "boundingBox", "displayName"],
+              "properties": {
+                "position": {"$ref": "#/definitions/xyzArray"},
+                "boundingBox": {
+                  "type": "object",
+                  "description": "The active area (both pipettes can reach) of a fixture on the deck",
+                  "required": ["xDimension", "yDimension", "zDimension"],
+                  "properties": {
+                    "xDimension": {"$ref": "#/definitions/positiveNumber"},
+                    "yDimension": {"$ref": "#/definitions/positiveNumber"},
+                    "zDimension": {"$ref": "#/definitions/positiveNumber"}
+                  }
+                },
+                "displayName": {
+                  "description": "An optional human-readable nickname for this fixture Eg \"Tall Fixed Trash\" or \"Short Fixed Trash\"",
+                  "type": "string"
                 }
-              },
-              "displayName": {
-                "description": "An optional human-readable nickname for this fixture Eg \"Tall Fixed Trash\" or \"Short Fixed Trash\"",
-                "type": "string"
               }
             }
           }
