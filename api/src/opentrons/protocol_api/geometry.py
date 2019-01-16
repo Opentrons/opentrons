@@ -110,7 +110,6 @@ class Deck(UserDict):
                                               idx//3 * row_offset,
                                               0)
                            for idx in range(12)}
-
         self._highest_z = 0.0
 
     @staticmethod
