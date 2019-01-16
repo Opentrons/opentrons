@@ -1,5 +1,6 @@
-from opentrons.config import feature_flags as ff, advanced_settings
+from opentrons.config import feature_flags as ff
 from opentrons import types
+
 # Application constants
 SAFE_HEIGHT = 130
 
@@ -11,6 +12,9 @@ holes = 'holes'
 crosses = 'crosses'
 
 z_pos = (170.5, 129.0, 5.0)
+
+mount_by_name = {'left': types.Mount.LEFT, 'right': types.Mount.RIGHT}
+mount_by_axis = {'Z': types.Mount.LEFT, 'A': types.Mount.RIGHT}
 
 
 def dots_set():
@@ -76,29 +80,12 @@ def position(axis, hardware):
 
 
 def jog(axis, direction, step, hardware):
-    if not advanced_settings.get_adv_setting('useProtocolApi2'):
-        hardware._driver.move(
-            {axis: hardware._driver.position[axis] + direction * step})
-    else:
-        if axis == 'A':
-            mount = types.Mount.RIGHT
-        else:
-            mount = types.Mount.LEFT
-
-        if axis == 'X':
-            pt = types.Point(x=direction*step, y=0, z=0)
-        elif axis == 'Y':
-            pt = types.Point(x=0, y=direction*step, z=0)
-        else:
-            pt = types.Point(x=0, y=0, z=direction*step)
-
-        hardware.move_rel(mount, pt)
-
+    hardware._driver.move(
+        {axis: hardware._driver.position[axis] + direction * step})
     return position(axis, hardware)
 
 
 def apply_mount_offset(point, hardware):
     px, py, pz = point
-    if not advanced_settings.get_adv_setting('useProtocolApi2'):
-        mx, my, mz = hardware.config.mount_offset
+    mx, my, mz = hardware.config.mount_offset
     return (px - mx, py - my, pz - mz)

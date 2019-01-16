@@ -119,9 +119,10 @@ class Robot():
         self._commands = []
         self._unsubscribe_commands = None
         self.reset()
-
-    def config(self):
-        return self.config
+    #
+    # @property
+    # def config(self):
+    #     return self.config
 
     def _get_placement_location(self, placement):
         location = None
@@ -365,32 +366,22 @@ class Robot():
         This will create a pipette and call :func:`add_instrument`
         to attach the instrument.
         """
-        print("Mount {}".format(mount))
-        print("Instrument {}".format(instrument))
-        print("21")
         if mount in self._instruments:
             prev_instr = self._instruments[mount]
             raise RuntimeError('Instrument {0} already on {1} mount'.format(
                 prev_instr.name, mount))
         self._instruments[mount] = instrument
-        print("22")
         instrument.instrument_actuator = self._actuators[mount]['plunger']
         instrument.instrument_mover = self._actuators[mount]['carriage']
-        print("23")
         # instrument_offset is the distance found (with tip-probe) between
         # the pipette's expected position, and the actual position
         # this is expected to be no greater than ~3mm
         # Z is not included, because Z offsets found during tip-probe are used
         # to determined the tip's length
-        print("Config {}".format(self.config))
-        print("Offset {}".format(self.config.instrument_offset['left']))
-        print("Instrument Type {}".format(instrument.type))
         cx, cy, _ = self.config.instrument_offset[mount][instrument.type]
-        print("24")
         # model_offset is the expected position of the pipette, determined
         # by designed dimensions of that model (eg: p10-multi vs p300-single)
         mx, my, mz = instrument.model_offset
-        print("25")
         # combine each offset to get the pipette's position relative to gantry
         _x, _y, _z = (
             mx + cx,
@@ -404,7 +395,6 @@ class Robot():
                _y + self.config.mount_offset[1],
                _z + self.config.mount_offset[2]
             )
-        print("26")
         self.poses = pose_tracker.add(
             self.poses,
             instrument,
@@ -846,6 +836,7 @@ class Robot():
         else:
             z_axis = 'A'
         position = self._driver.position
+        log.info("DRIVER POSITION {}".format(position))
         return {'X': position['X'], 'Y': position['Y'], 'Z': position[z_axis]}
 
     def get_attached_pipettes(self):

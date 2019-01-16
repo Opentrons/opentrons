@@ -1,13 +1,13 @@
 import json
 
 import numpy as np
-import pytest
 
 from opentrons import robot, instruments
 from opentrons import deck_calibration as dc
 from opentrons.deck_calibration import endpoints
 from opentrons.config import robot_configs
 from opentrons import types
+from opentrons.hardware_control.types import Axis
 
 
 # Note that several tests in this file have target/expected values that do not
@@ -21,102 +21,166 @@ from opentrons import types
 # operation, and then these tests should be revised to match expected reality.
 
 # ------------ Function tests (unit) ----------------------
-@pytest.mark.api1_only
-async def test_add_and_remove_tip(dc_session):
-    robot.reset()
+async def test_add_and_remove_tip(async_server, dc_session):
+    hardware = async_server['com.opentrons.hardware']
     mount = 'left'
-    pip = instruments.P10_Single(mount=mount)
+    version = async_server['api_version']
+    if version == 1:
+        hardware.reset()
+        pip = instruments.P10_Single(mount=mount)
+    else:
+        await hardware.reset()
+        await hardware.cache_instruments({
+                    types.Mount.LEFT: 'p10_single_v1',
+                    types.Mount.RIGHT: None})
+        pip = hardware.attached_instruments[types.Mount.LEFT]
     dc_session.pipettes = {mount: pip}
     dc_session.current_mount = 'Z'
 
     # Check malformed packet
-    res0 = await endpoints.attach_tip({}, robot)
+    res0 = await endpoints.attach_tip({}, hardware)
     assert res0.status == 400
     assert dc_session.tip_length is None
-    assert not pip.tip_attached
+    if version == 1:
+        assert not pip.tip_attached
+    else:
+        assert pip['has_tip'] is False
 
     # Check correct attach command
     tip_length = 50
-    res1 = await endpoints.attach_tip({'tipLength': tip_length}, robot)
+    res1 = await endpoints.attach_tip({'tipLength': tip_length}, hardware)
     assert res1.status == 200
     assert dc_session.tip_length == tip_length
-    assert pip.tip_attached
+    if version == 1:
+        assert pip.tip_attached
+    else:
+        assert pip['has_tip'] is True
 
     # Check command with tip already attached
-    res2 = await endpoints.attach_tip({'tipLength': tip_length + 5}, robot)
+    res2 = await endpoints.attach_tip({'tipLength': tip_length + 5}, hardware)
     assert res2.status == 200
     assert dc_session.tip_length == tip_length + 5
-    assert pip.tip_attached
+    if version == 1:
+        assert pip.tip_attached
+    else:
+        assert pip['has_tip'] is True
 
     # Check correct detach command
-    res3 = await endpoints.detach_tip({}, robot)
+    res3 = await endpoints.detach_tip({}, hardware)
     assert res3.status == 200
     assert dc_session.tip_length is None
-    assert not pip.tip_attached
+    if version == 1:
+        assert not pip.tip_attached
+    else:
+        assert pip['has_tip'] is False
 
     # Check command with no tip
-    res4 = await endpoints.detach_tip({}, robot)
+    res4 = await endpoints.detach_tip({}, hardware)
     assert res4.status == 200
     assert dc_session.tip_length is None
-    assert not pip.tip_attached
+    if version == 1:
+        assert not pip.tip_attached
+    else:
+        assert pip['has_tip'] is False
 
 
-@pytest.mark.api1_only
-async def test_save_xy(dc_session):
-    robot.reset()
+async def test_save_xy(async_server, dc_session):
+    hardware = async_server['com.opentrons.hardware']
     mount = 'left'
-    pip = instruments.P10_Single(mount=mount)
+    version = async_server['api_version']
+    if version == 1:
+        hardware.reset()
+        pip = instruments.P10_Single(mount=mount)
+    else:
+        await hardware.reset()
+        await hardware.cache_instruments({
+            types.Mount.LEFT: 'p10_single_v1',
+            types.Mount.RIGHT: None})
+        pip = hardware.attached_instruments[types.Mount.LEFT]
     dc_session.pipettes = {mount: pip}
     dc_session.current_mount = 'Z'
     dc_session.tip_length = 25
-    dc_session.pipettes.get(mount)._add_tip(dc_session.tip_length)
-
-    robot.home()
+    if version == 1:
+        dc_session.pipettes.get(mount)._add_tip(dc_session.tip_length)
+        hardware.home()
+    else:
+        dc_session.pipettes.get(mount)['has_tip'] = True
+        dc_session.pipettes.get(mount)['tip_length'] = dc_session.tip_length
+        hardware._add_tip(types.Mount.LEFT, dc_session.tip_length)
+        await hardware.home()
     x = 100
     y = 101
-    dc_session.pipettes.get(mount).move_to((robot.deck, (x, y, 102)))
+    if version == 1:
+        dc_session.pipettes.get(mount).move_to((hardware.deck, (x, y, 102)))
+    else:
+        # relative move or not?
+        await hardware.move_to(types.Mount.LEFT, types.Point(x=x, y=y, z=102))
 
     point = '1'
     data = {
         'point': point
     }
-    await endpoints.save_xy(data, robot)
+    await endpoints.save_xy(data, hardware)
 
     actual = dc_session.points[point]
-    expected = (
-        robot._driver.position['X'] + robot.config.mount_offset[0],
-        robot._driver.position['Y']
-    )
+    if version == 1:
+        expected = (
+            robot._driver.position['X'] + hardware.config.mount_offset[0],
+            robot._driver.position['Y']
+        )
+    else:
+        coordinates = await hardware.current_position(types.Mount.LEFT)
+        expected = (
+            coordinates[Axis.X] + hardware.config.mount_offset[0],
+            coordinates[Axis.Y])
     assert actual == expected
 
 
-@pytest.mark.api1_only
-async def test_save_z(dc_session):
-    robot.reset()
+async def test_save_z(async_server, dc_session):
+    hardware = async_server['com.opentrons.hardware']
     mount = 'left'
     model = 'p10_single_v1'
-    pip = instruments.P10_Single(mount=mount)
+    if async_server['api_version'] == 1:
+        hardware.reset()
+        pip = instruments.P10_Single(mount=mount)
+    else:
+        await hardware.reset()
+        await hardware.cache_instruments({
+                    types.Mount.LEFT: 'p10_single_v1',
+                    types.Mount.RIGHT: None})
+        pip = hardware.attached_instruments[types.Mount.LEFT]
     dc_session.pipettes = {mount: pip}
     dc_session.current_mount = 'Z'
     dc_session.current_model = model
     dc_session.tip_length = 25
-    dc_session.pipettes.get(mount)._add_tip(dc_session.tip_length)
-
-    robot.home()
+    if async_server['api_version'] == 1:
+        dc_session.pipettes.get(mount)._add_tip(dc_session.tip_length)
+    else:
+        dc_session.pipettes.get(mount)['has_tip'] = True
+        dc_session.pipettes.get(mount)['tip_length'] = dc_session.tip_length
 
     z_target = 80.0
-    dc_session.pipettes.get(mount).move_to((robot.deck, (0, 0, z_target)))
+    if async_server['api_version'] == 1:
+        hardware.home()
+        dc_session.pipettes.get(mount).move_to(
+            (hardware.deck, (0, 0, z_target)))
+    else:
+        await hardware.home()
+        # Unsure whether to use move_to or move_rel
+        await hardware.move_to(
+            types.Mount.LEFT, types.Point(x=0, y=0, z=z_target))
 
-    await endpoints.save_z({}, robot)
+    await endpoints.save_z({}, hardware)
 
     new_z = dc_session.z_value
     expected_z = z_target
     assert new_z == expected_z
 
 
-@pytest.mark.api1_only
-async def test_save_calibration_file(dc_session, monkeypatch):
-    robot.reset()
+async def test_save_calibration_file(async_server, dc_session, monkeypatch):
+    hardware = async_server['com.opentrons.hardware']
+    if async_server['api_version'] == 1:
+        hardware.reset()
     expected_pos = endpoints.expected_points()
     dc_session.points = {
         k: (v[0], v[1] + 0.3)
@@ -131,9 +195,9 @@ async def test_save_calibration_file(dc_session, monkeypatch):
 
     monkeypatch.setattr(robot_configs, 'save_deck_calibration', dummy_save)
 
-    await endpoints.save_transform({}, robot)
+    await endpoints.save_transform({}, hardware)
 
-    in_memory = robot.config.gantry_calibration
+    in_memory = hardware.config.gantry_calibration
     assert len(persisted_data) == 2
     assert persisted_data[0][0].gantry_calibration == in_memory
     assert persisted_data[1][0].gantry_calibration == in_memory
@@ -146,10 +210,11 @@ async def test_save_calibration_file(dc_session, monkeypatch):
     assert np.allclose(in_memory, expected)
 
 
-async def test_transform_calculation(dc_session):
+async def test_transform_calculation(async_server, dc_session):
     # This transform represents a 5 degree rotation, with a shift in x, y, & z.
     # Values for the points and expected transform come from a hand-crafted
     # transformation matrix and the points that would generate that matrix.
+    hardware = async_server['com.opentrons.hardware']
     cos_5deg_p = 0.99619469809
     sin_5deg_p = 0.08715574274
     sin_5deg_n = -sin_5deg_p
@@ -171,9 +236,9 @@ async def test_transform_calculation(dc_session):
         '3': [34.87002331, 256.36103295]
     }
 
-    await endpoints.save_transform({}, robot)
+    await endpoints.save_transform({}, hardware)
 
-    assert np.allclose(robot.config.gantry_calibration, expected_transform)
+    assert np.allclose(hardware.config.gantry_calibration, expected_transform)
 
 
 # ------------ Session and token tests ----------------------
@@ -197,7 +262,7 @@ async def test_create_session(async_client, async_server, monkeypatch):
         (None, 'p10_single_v1', 'p10_single_v1'),
         ('p300_multi_v1', None, 'p300_multi_v1'),
         ('p10_single_v1', 'p300_multi_v1', 'p10_single_v1')]
-
+    hardware = async_server['com.opentrons.hardware']
     for left_model, right_model, preferred in pipette_combinations:
         def dummy_read_model(mount):
             if mount == 'left':
@@ -207,11 +272,11 @@ async def test_create_session(async_client, async_server, monkeypatch):
             return res
         if async_server['api_version'] == 1:
             monkeypatch.setattr(
-                robot._driver, 'read_pipette_model', dummy_read_model)
+                hardware._driver, 'read_pipette_model', dummy_read_model)
 
-            robot.reset()
+            hardware.reset()
         else:
-            await async_server['com.opentrons.hardware'].cache_instruments(
+            await hardware.cache_instruments(
                 {types.Mount.LEFT: left_model, types.Mount.RIGHT: right_model})
         resp = await async_client.post('/calibration/deck/start')
         start_result = await resp.json()
@@ -270,7 +335,8 @@ async def test_release(async_client, async_server, monkeypatch, dc_session):
         def dummy_read_model(mount):
             return test_model
 
-        monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_read_model)
+        monkeypatch.setattr(
+            robot._driver, 'read_pipette_model', dummy_read_model)
         robot.reset()
 
     resp1 = await async_client.post('/calibration/deck/start')
@@ -290,38 +356,29 @@ async def test_release(async_client, async_server, monkeypatch, dc_session):
     assert resp3.status == 201
 
 
-@pytest.mark.api2_only
-async def test_forcing_new_session_v2(async_client, monkeypatch, dc_session):
+async def test_forcing_new_session_v2(
+        async_server, async_client, monkeypatch, dc_session):
     """
     Tests that the GET request to initiate a session manager for factory
     calibration returns an error if a session is in progress, and can be
     overridden.
     """
-    # TODO: remember to put the commented section back in as a v1 test
-    # test_model = 'p300_multi_v1'
-    #
-    # def dummy_read_model(mount):
-    #     return test_model
-    #
-    # monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_read_model)
-    # robot.reset()
-    #
-    # dummy_token = 'Test Token'
-    #
-    # def uuid_mock():
-    #     nonlocal dummy_token
-    #     dummy_token = dummy_token + '+'
-    #     return dummy_token
-    #
-    # monkeypatch.setattr(endpoints, '_get_uuid', uuid_mock)
-    #
-    # resp = await async_client.post('/calibration/deck/start')
-    # text = await resp.json()
-    #
-    # # assert resp.status == 201
-    # expected = {'token': dummy_token,
-    #             'pipette': {'mount': 'right', 'model': test_model}}
-    # assert text == expected
+    test_model = 'p300_multi_v1'
+    if async_server['api_version'] == 1:
+
+        def dummy_read_model(mount):
+            return test_model
+
+        monkeypatch.setattr(
+            robot._driver, 'read_pipette_model', dummy_read_model)
+        robot.reset()
+
+    dummy_token = 'fake token'
+
+    def uuid_mock():
+        return dummy_token
+
+    monkeypatch.setattr(endpoints, '_get_uuid', uuid_mock)
 
     resp1 = await async_client.post('/calibration/deck/start')
     assert resp1.status == 409
@@ -330,9 +387,9 @@ async def test_forcing_new_session_v2(async_client, monkeypatch, dc_session):
         '/calibration/deck/start', json={'force': 'true'})
     text2 = await resp2.json()
     assert resp2.status == 201
-    # expected2 = {'token': dummy_token,
-    #              'pipette': {'mount': 'right', 'model': test_model}}
-    # assert text2 == expected2
+    expected2 = {'token': dummy_token,
+                 'pipette': {'mount': 'right', 'model': test_model}}
+    assert text2 == expected2
 
 
 async def test_incorrect_token(async_client, dc_session):
@@ -354,8 +411,8 @@ async def test_incorrect_token(async_client, dc_session):
 
 # ------------ Router tests (integration) ----------------------
 # TODO(mc, 2018-05-02): this does not adequately test z to smoothie axis logic
-@pytest.mark.api1_only
-async def test_set_and_jog_integration(async_client, monkeypatch):
+async def test_set_and_jog_integration(
+        async_client, async_server, monkeypatch):
     """
     Test that the jog function works.
     Note that in order for the jog function to work, the following must
@@ -365,13 +422,19 @@ async def test_set_and_jog_integration(async_client, monkeypatch):
     Then jog requests will work as expected.
     """
     test_model = 'p300_multi_v1'
-    # hardware = async_server['com.opentrons.hardware']
+    hardware = async_server['com.opentrons.hardware']
+    if async_server['api_version'] == 1:
 
-    def dummy_read_model(mount):
-        return test_model
+        def dummy_read_model(mount):
+            return test_model
 
-    monkeypatch.setattr(robot._driver, 'read_pipette_model', dummy_read_model)
-    robot.reset()
+        monkeypatch.setattr(
+            hardware._driver, 'read_pipette_model', dummy_read_model)
+        hardware.reset()
+    else:
+        await hardware.cache_instruments(
+            {types.Mount.LEFT: None, types.Mount.RIGHT: test_model})
+
     dummy_token = 'Test Token'
 
     def uuid_mock():
@@ -391,8 +454,20 @@ async def test_set_and_jog_integration(async_client, monkeypatch):
     sess = dc.endpoints.session
     smoothie_axis = 'Z' if sess.current_mount == 'left' else 'A'
 
-    robot.reset()
-    prior_x, prior_y, prior_z = dc.position(smoothie_axis, robot)
+    if async_server['api_version'] == 1:
+        hardware.reset()
+        prior_x, prior_y, prior_z = dc.position(smoothie_axis, hardware)
+    else:
+        await hardware.home()
+        if smoothie_axis == 'A':
+            mount = types.Mount.RIGHT
+        else:
+            mount = types.Mount.LEFT
+        position = await hardware.current_position(mount)
+        print(position)
+        prior_x = position[Axis.X]
+        prior_y = position[Axis.Y]
+        prior_z = position[Axis.by_mount(mount)]
     resp = await async_client.post(
         '/calibration/deck',
         json={

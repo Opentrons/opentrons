@@ -154,7 +154,6 @@ class SingletonAdapter(HardwareAPILike):
             port=port,
             config=copy.copy(old_api.config),
             force=force))
-        print("Connecting to Adaptor")
         old_api._loop.run_until_complete(new_api.cache_instruments())
         setattr(self, '_api', new_api)
 

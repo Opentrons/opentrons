@@ -1,12 +1,11 @@
 import numpy as np
-import pytest
 
-from opentrons import robot
+from opentrons import types
 from opentrons import deck_calibration as dc
 from opentrons.deck_calibration import endpoints
 from opentrons.trackers.pose_tracker import absolute
 from opentrons.config.pipette_config import Y_OFFSET_MULTI
-
+from opentrons.hardware_control.types import Axis
 
 # Note that several values in this file have target/expected values that do not
 # accurately reflect robot operation, because of differences between return
@@ -18,37 +17,43 @@ from opentrons.config.pipette_config import Y_OFFSET_MULTI
 # should be replaced with something that accurately reflects actual robot
 # operation, and then these tests should be revised to match expected reality.
 
-@pytest.mark.api1_only
-async def test_transform_from_moves(async_client, monkeypatch):
+
+async def test_transform_from_moves(async_server, async_client, monkeypatch):
     test_mount, test_model = ('left', 'p300_multi_v1')
     # test_mount, test_model = ('right', 'p300_single_v1')
+    hardware = async_server['com.opentrons.hardware']
+    version = async_server['api_version']
+    print(hardware.config.gantry_calibration)
+    if version == 1:
+        def dummy_read_model(mount):
+            if mount == test_mount:
+                return test_model
+            else:
+                return None
 
-    def dummy_read_model(mount):
-        if mount == test_mount:
-            return test_model
-        else:
-            return None
+        monkeypatch.setattr(
+            hardware._driver, 'read_pipette_model', dummy_read_model)
 
-    monkeypatch.setattr(
-        robot._driver, 'read_pipette_model', dummy_read_model)
-
-    robot.reset()
-    robot.home()
-
+        hardware.reset()
+        hardware.home()
+    else:
+        await hardware.reset()
+        await hardware.cache_instruments({
+            types.Mount.LEFT: test_model,
+            types.Mount.RIGHT: None})
+        await hardware.home()
+        print(await hardware.current_position(types.Mount.LEFT))
     # This is difficult to test without the `async_client` because it has to
     # take an `aiohttp.web.Request` object as a parameter instead of a dict
     resp = await async_client.post('/calibration/deck/start')
     start_res = await resp.json()
     token = start_res.get('token')
-
     assert start_res.get('pipette', {}).get('mount') == test_mount
     assert start_res.get('pipette', {}).get('model') == test_model
-    print("Start Results")
-    print(start_res)
+
     res = await async_client.post('/calibration/deck', json={
         'token': token, 'command': 'attach tip', 'tipLength': 51.7})
     assert res.status == 200
-
     res = await async_client.post('/calibration/deck', json={
         'token': token, 'command': 'move', 'point': 'safeZ'})
     assert res.status == 200
@@ -62,12 +67,12 @@ async def test_transform_from_moves(async_client, monkeypatch):
     res = await async_client.post('/calibration/deck', json={
         'token': token, 'command': 'save z'})
     assert res.status == 200
-
     pipette = endpoints.session.pipettes[test_mount]
 
     res = await async_client.post('/calibration/deck', json={
         'token': token, 'command': 'move', 'point': '1'})
     assert res.status == 200
+
     pt1 = endpoints.safe_points().get('1')
     if 'multi' in test_model:
         expected1 = (
@@ -76,7 +81,20 @@ async def test_transform_from_moves(async_client, monkeypatch):
             pt1[2])
     else:
         expected1 = pt1
-    assert np.isclose(absolute(robot.poses, pipette), expected1).all()
+
+    if async_server['api_version'] == 1:
+        assert np.isclose(absolute(hardware.poses, pipette), expected1).all()
+    else:
+        if pipette.get('mount') == 'left':
+            mount = types.Mount.LEFT
+        else:
+            mount = types.Mount.RIGHT
+        coordinates = await hardware.current_position(mount)
+        position = (
+            coordinates[Axis.X],
+            coordinates[Axis.Y],
+            coordinates[Axis.by_mount(mount)])
+        assert np.isclose(position, expected1).all()
 
     # Jog to calculated position for transform
     x_delta1 = 13.16824337 - dc.endpoints.safe_points()['1'][0]
@@ -111,7 +129,19 @@ async def test_transform_from_moves(async_client, monkeypatch):
             pt2[2])
     else:
         expected2 = pt2
-    assert np.isclose(absolute(robot.poses, pipette), expected2).all()
+    if async_server['api_version'] == 1:
+        assert np.isclose(absolute(hardware.poses, pipette), expected2).all()
+    else:
+        if pipette.get('mount') == 'left':
+            mount = types.Mount.LEFT
+        else:
+            mount = types.Mount.RIGHT
+        coordinates = await hardware.current_position(mount)
+        position = (
+            coordinates[Axis.X],
+            coordinates[Axis.Y],
+            coordinates[Axis.by_mount(mount)])
+        assert np.isclose(position, expected2).all()
 
     # Jog to calculated position for transform
     x_delta2 = 380.50507635 - dc.endpoints.safe_points()['2'][0]
@@ -146,7 +176,19 @@ async def test_transform_from_moves(async_client, monkeypatch):
             pt3[2])
     else:
         expected3 = pt3
-    assert np.isclose(absolute(robot.poses, pipette), expected3).all()
+    if async_server['api_version'] == 1:
+        assert np.isclose(absolute(hardware.poses, pipette), expected3).all()
+    else:
+        if pipette.get('mount') == 'left':
+            mount = types.Mount.LEFT
+        else:
+            mount = types.Mount.RIGHT
+        coordinates = await hardware.current_position(mount)
+        position = (
+            coordinates[Axis.X],
+            coordinates[Axis.Y],
+            coordinates[Axis.by_mount(mount)])
+        assert np.isclose(position, expected3).all()
 
     # Jog to calculated position for transform
     x_delta3 = 34.87002331 - dc.endpoints.safe_points()['3'][0]
@@ -194,7 +236,7 @@ async def test_transform_from_moves(async_client, monkeypatch):
         [const_zero, const_zero, const_one_, delta_z___],
         [const_zero, const_zero, const_zero, const_one_]]
 
-    actual_transform = robot.config.gantry_calibration
+    actual_transform = hardware.config.gantry_calibration
     from pprint import pprint
     print()
     print("Expected transform [type: {}]:".format(type(expected_transform)))

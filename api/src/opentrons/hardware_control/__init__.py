@@ -273,17 +273,6 @@ class API(HardwareAPILike):
             instruments[mount]['has_tip'] = instr.has_tip
         return instruments
 
-    # def get_attached_pipettes(self):
-    #     instruments = self.attached_instruments
-    #     instruments[top_types.Mount.LEFT]['mount_axis'] = 'z'
-    #     instruments[top_types.Mount.RIGHT]['mount_axis'] = 'a'
-    #     instruments[top_types.Mount.LEFT]['plunger_axis'] = 'b'
-    #     instruments[top_types.Mount.RIGHT]['plunger_axis'] = 'c'
-    #     for mount in top_types.Mount:
-    #         instruments[mount]['model'] = instruments[mount]['name']
-    #         instruments[mount]['id'] = instruments[mount]['pipette_id']
-    #     return instruments
-
     @property
     def attached_modules(self):
         return self._attached_modules
@@ -402,6 +391,19 @@ class API(HardwareAPILike):
             if smoothie_plungers:
                 smoothie_pos.update(self._backend.home(smoothie_plungers))
             self._current_position = self._deck_from_smoothie(smoothie_pos)
+
+    def _add_tip(
+            self,
+            mount: top_types.Mount,
+            tip_length: float):
+        instr = self._attached_instruments[mount]
+        if not instr.has_tip:
+            instr.add_tip(tip_length=tip_length)
+
+    def _remove_tip(self, mount: top_types.Mount):
+        instr = self._attached_instruments[mount]
+        if instr.has_tip:
+            instr.remove_tip()
 
     def _deck_from_smoothie(
             self, smoothie_pos: Dict[str, float]) -> Dict[Axis, float]:
@@ -536,7 +538,6 @@ class API(HardwareAPILike):
             raise MustHomeError
 
         await self._cache_and_maybe_retract_mount(mount)
-
         z_axis = Axis.by_mount(mount)
         if mount == top_types.Mount.LEFT:
             offset = top_types.Point(*self.config.mount_offset)

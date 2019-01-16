@@ -227,14 +227,10 @@ async def dc_session(request, async_server, monkeypatch, loop):
     Mock session manager for deck calibation
     """
     hw = async_server['com.opentrons.hardware']
-    print("Current Server Version {}".format(async_server['api_version']))
-    print("Current Hw type --->")
-    print(type(hw))
     if async_server['api_version'] == 2:
         await hw.cache_instruments({
             types.Mount.LEFT: None,
             types.Mount.RIGHT: 'p300_multi_v1'})
-        print("Cache instruments called \n")
     # endpoints.session = None
     ses = endpoints.SessionManager(hw)
     endpoints.session = ses
