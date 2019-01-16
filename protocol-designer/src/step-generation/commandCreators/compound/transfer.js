@@ -1,5 +1,4 @@
 // @flow
-import flatten from 'lodash/flatten'
 import zip from 'lodash/zip'
 import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
@@ -199,7 +198,7 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
           prevSourceWell = sourceWell
           prevDestWell = destWell
 
-          return [...innerAcc, ...flatten(nextCommands)]
+          return [...innerAcc, ...nextCommands]
         }, [])
 
       return [...outerAcc, ...commands]
