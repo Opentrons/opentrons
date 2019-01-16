@@ -736,6 +736,10 @@ class API(HardwareAPILike):
         """
         return self._config
 
+    @config.setter
+    def config(self, config):
+        self._config = config
+
     def update_config(self, **kwargs):
         """ Update values of the robot's configuration.
 

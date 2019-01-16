@@ -113,7 +113,7 @@ class CLITool:
             '-': lambda: self.decrease_step(),
             '=': lambda: self.increase_step(),
             'z': lambda: self.save_z_value(),
-            'p': lambda: probe(self._tip_length, self.loop),
+            'p': lambda: probe(self._tip_length, self.asyncio_loop),
             'enter': lambda: self.save_point(),
             '\\': lambda: self.home(),
             ' ': lambda: self.save_transform(),
@@ -146,11 +146,11 @@ class CLITool:
 
     @property
     def calibration_matrix(self):
-        return self._config.gantry_calibration
+        return self._calibration_matrix
 
     @calibration_matrix.setter
     def calibration_matrix(self, calibration):
-        self.calibration_matrix = calibration
+        self._calibration_matrix = calibration
 
     def current_step(self):
         return self._steps[self._steps_index]
@@ -196,7 +196,7 @@ class CLITool:
             res = position(self._current_mount, self.hardware)
         else:
             mount_obj = mount_by_axis[self._current_mount]
-            points = self.loop.run_until_complete(
+            points = self.asyncio_loop.run_until_complete(
                 self.hardware.current_position(mount_obj))
             res = (
                 points[Axis.X],
@@ -219,7 +219,7 @@ class CLITool:
             else:
                 pt = types.Point(x=0, y=0, z=direction*step)
             mount_obj = mount_by_axis[self._current_mount]
-            self.loop.run_until_complete(
+            self.asyncio_loop.run_until_complete(
                 self.hardware.move_rel(mount_obj, pt))
         self.current_position = self._position()
         return 'Jog: {}'.format([axis, str(direction), str(step)])
@@ -231,7 +231,7 @@ class CLITool:
         if not feature_flags.use_protocol_api_v2():
             self.hardware.home()
         else:
-            self.loop.run_until_complete(
+            self.asyncio_loop.run_until_complete(
                 self.hardware.home())
         self.current_position = self._position()
         return 'Homed'
@@ -352,7 +352,8 @@ class CLITool:
         else:
             mount_obj = mount_by_axis[self._current_mount]
             pt = types.Point(x=tx, y=ty, z=tz)
-            self.loop.run_until_complete(self.hardware.move_to(mount_obj, pt))
+            self.asyncio_loop.run_until_complete(
+                self.hardware.move_to(mount_obj, pt))
         return 'moved to point {}'.format(point)
 
     def move_to_safe_height(self):
@@ -363,7 +364,8 @@ class CLITool:
         else:
             mount_obj = mount_by_axis[self._current_mount]
             pt = types.Point(x=cx, y=cy, z=sz)
-            self.loop.run_until_complete(self.hardware.move_to(mount_obj, pt))
+            self.asyncio_loop.run_until_complete(
+                self.hardware.move_to(mount_obj, pt))
 
     def exit(self):
         raise urwid.ExitMainLoop
@@ -432,12 +434,12 @@ def clear_configuration_and_reload(hardware):
         hardware.reset()
 
 
-def backup_configuration(tag):
-    robot_configs.backup_configuration(tag)
+def backup_configuration(hardware, tag):
+    robot_configs.backup_configuration(hardware.config, tag)
 
 
 def backup_configuration_and_reload(hardware, tag=None):
-    backup_configuration(tag)
+    backup_configuration(hardware, tag)
     # if not feature_flags.use_protocol_api_v2():
     clear_configuration_and_reload(hardware)
 
@@ -482,31 +484,30 @@ def main():
     if prompt not in ['y', 'Y', 'yes']:
         print('Exiting--prior configuration data not changed')
         sys.exit()
-
     # Notes:
     #  - 200ul tip is 51.7mm long when attached to a pipette
     #  - For xyz coordinates, (0, 0, 0) is the lower-left corner of the robot
     cli = CLITool(
         point_set=get_calibration_points(),
         tip_length=51.7)
-    backup_configuration_and_reload(cli.hardware)
+    hardware = cli.hardware
+    backup_configuration_and_reload(hardware)
     if not feature_flags.use_protocol_api_v2():
-        cli.hardware.connect()
-        cli.hardware.turn_on_rail_lights()
-        atexit.register(cli.hardware.turn_off_rail_lights)
+        hardware.connect()
+        hardware.turn_on_rail_lights()
+        atexit.register(hardware.turn_off_rail_lights)
     else:
-        cli.hardware.set_lights(rails=True)
-        atexit.register(cli.hardware.set_lights(rails=True))
+        hardware.set_lights(rails=True)
+        # atexit.register()
     cli.home()
     # lights help the script user to see the points on the deck
     cli.ui_loop.run()
-
+    hardware.set_lights(rails=False)
     print('Robot config: \n', cli._config)
 
 
 def notify_and_restart():
     print('Exiting configuration tool and restarting system')
-    backup_configuration(tag=None)
     os.system("kill 1")
 
 
@@ -514,5 +515,4 @@ if __name__ == "__main__":
     # Register hook to reboot the robot after exiting this tool (regardless of
     # whether this process exits normally or not)
     atexit.register(notify_and_restart)
-
     main()

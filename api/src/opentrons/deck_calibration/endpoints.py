@@ -6,6 +6,7 @@ from opentrons.types import Mount, Point
 from . import jog, position, dots_set, z_pos, mount_by_axis, mount_by_name
 from opentrons.util.linal import add_z, solve
 from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control import adapters
 from typing import Dict, Tuple
 
 import logging
@@ -575,11 +576,12 @@ async def start(request):
 
     if not session or body.get('force'):
         hardware = hw_from_req(request)
+        sync_adapter = adapters.SynchronousAdapter(hardware)
         if body.get('force') and session:
             await release(data={}, hardware=hardware)
 
-        session = SessionManager(hardware)
-        res = init_pipette(hardware)
+        session = SessionManager(sync_adapter)
+        res = init_pipette(sync_adapter)
         if res:
             status = 201
             data = {'token': session.id, 'pipette': res}
