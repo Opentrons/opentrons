@@ -1,8 +1,8 @@
 {
 	"otId": "FAKEID",
   "metadata": {
-    "name": "OT-2 deck standard",
-    "tags": ["ot2", "12 slots"]
+    "name": "OT-2 Standard Deck",
+    "tags": ["ot2", "12 slots", "standard"]
   },
   "robot": {
     "model": "OT-2 Standard"
@@ -194,16 +194,10 @@
     ],
     "fixtures": [
       {
-        "id": "fixedTrashTall",
+        "id": "fixedTrash",
         "slot": "12",
         "labware": "opentrons_1_trash_1.1_L",
-        "displayName": "Fixed Trash Tall"
-      },
-      {
-        "id": "fixedTrashShort",
-        "slot": "12",
-        "labware": "opentrons_1_trash_0.85_L",
-        "displayName": "Fixed Trash Short"
+        "displayName": "Fixed Trash"
       }
     ]
   }
