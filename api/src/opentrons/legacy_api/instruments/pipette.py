@@ -1225,10 +1225,11 @@ class Pipette:
             Single :any:`Placeable` or list of :any:`Placeable`s, where
             liquid will be :any:`dispense`ed to.
 
-        new_tip : number
-            The number of clean tips this transfer command will use. If 0,
-            no tips will be picked up nor dropped. If 1, a single tip will be
-            used for all commands.
+        new_tip : str
+            The number of clean tips this transfer command will use. If
+            'never', no tips will be picked up nor dropped. If 'once', a
+            single tip will be used for all commands. If 'always', a new tip
+            will be used for each transfer. Default is 'once'.
 
         trash : boolean
             If `False` (default behavior) tips will be returned to their
