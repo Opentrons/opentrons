@@ -17,17 +17,18 @@ import styles from './StepEditForm.css'
 import FormAlerts from './FormAlerts'
 import MixForm from './MixForm'
 import TransferLikeForm from './TransferLikeForm'
+import MoveLiquidForm from './MoveLiquidForm'
 import PauseForm from './PauseForm'
 import ConfirmDeleteModal from './ConfirmDeleteModal'
 import ButtonRow from './ButtonRow'
 
-type StepForm = typeof MixForm | typeof PauseForm | typeof TransferLikeForm
-const STEP_FORM_MAP: {[StepType]: StepForm} = {
+const STEP_FORM_MAP: {[StepType]: *} = {
   mix: MixForm,
   pause: PauseForm,
   transfer: TransferLikeForm,
   consolidate: TransferLikeForm,
   distribute: TransferLikeForm,
+  moveLiquid: MoveLiquidForm,
 }
 
 export type FocusHandlers = {
@@ -141,7 +142,8 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
         <FormAlerts focusedField={this.state.focusedField} dirtyFields={this.state.dirtyFields} />
         <div className={cx(formStyles.form, styles[formData.stepType])}>
           <FormComponent
-            stepType={formData.stepType}
+            stepType={formData.stepType} // TODO: Ian 2019-01-17 deprecate passing this during #2916, it's in formData
+            formData={formData}
             focusHandlers={{
               focusedField: this.state.focusedField,
               dirtyFields: this.state.dirtyFields,

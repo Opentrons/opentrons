@@ -27,7 +27,8 @@ export const addStep = (payload: {stepType: StepType}) =>
       },
     })
     const deckHasLiquid = labwareIngredsSelectors.getDeckHasLiquid(state)
-    const stepNeedsLiquid = ['transfer', 'distribute', 'consolidate', 'mix'].includes(payload.stepType)
+    // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
+    const stepNeedsLiquid = ['transfer', 'distribute', 'consolidate', 'mix', 'moveLiquid'].includes(payload.stepType)
     if (stepNeedsLiquid && !deckHasLiquid) {
       dispatch(tutorialActions.addHint('add_liquids_and_labware'))
     }

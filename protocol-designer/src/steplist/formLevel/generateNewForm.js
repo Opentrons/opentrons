@@ -1,5 +1,5 @@
 // @flow
-import startCase from 'lodash/startCase'
+import i18n from '../../localization'
 import getDefaultsForStepType from './getDefaultsForStepType'
 import type {
   StepType,
@@ -19,7 +19,7 @@ export default function generateNewForm (args: NewFormArgs): FormData {
   const baseForm: BlankForm = {
     id: stepId,
     stepType: stepType,
-    stepName: startCase(stepType),
+    stepName: i18n.t(`button.stepType.${stepType}`),
     stepDetails: '',
   }
 

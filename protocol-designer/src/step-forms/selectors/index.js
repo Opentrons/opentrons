@@ -7,6 +7,7 @@ import reduce from 'lodash/reduce'
 import some from 'lodash/some'
 import {createSelector} from 'reselect'
 import {getPipetteNameSpecs, getLabware} from '@opentrons/shared-data'
+import i18n from '../../localization'
 import {INITIAL_DECK_SETUP_STEP_ID} from '../../constants'
 import {
   generateNewForm,
@@ -339,7 +340,7 @@ export const getAllSteps: Selector<{[stepId: StepIdType]: StepItemData}> = creat
         return {
           ...steps[id],
           formData: savedForm,
-          title: savedForm ? savedForm.stepName : step.stepType,
+          title: savedForm ? savedForm.stepName : i18n.t(`button.stepType.${step.stepType}`),
           description: savedForm ? savedForm.stepDetails : null,
         }
       }

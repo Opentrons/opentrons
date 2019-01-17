@@ -6,15 +6,11 @@ import {
 } from '../../../step-generation/utils'
 import {getOrderedWells} from '../../utils'
 
-import type {
-  PathOption,
-  WellOrderOption,
-} from '../../../form-types'
+import type {HydratedMoveLiquidFormData} from '../../../form-types'
 import type {
   ConsolidateFormData,
   DistributeFormData,
   TransferFormData,
-  ChangeTipOptions,
   MixArgs,
 } from '../../../step-generation'
 
@@ -39,54 +35,6 @@ export function getMixData (
 }
 
 type MoveLiquidStepArgs = ConsolidateFormData | DistributeFormData | TransferFormData | null
-
-// TODO: Ian 2018-01-15 once this function gets connected, move these
-// 3 type defs somewhere else and import them.
-type HydratedLabware = {id: string, type: string}
-type HydratedPipette = {id: string, model: string}
-type HydratedMoveLiquidFormData = {
-  stepType: 'moveLiquid',
-  stepName: string,
-  description: ?string,
-
-  fields: {
-    pipette: HydratedPipette,
-    volume: number,
-    path: PathOption,
-    changeTip: ChangeTipOptions,
-    aspirate_wells_grouped: ?boolean,
-    preWetTip: ?boolean,
-
-    aspirate_labware: HydratedLabware,
-    aspirate_wells: Array<string>,
-    aspirate_wellOrder_first: WellOrderOption,
-    aspirate_wellOrder_second: WellOrderOption,
-    aspirate_flowRate: ?number,
-    aspirate_mmFromBottom: ?number,
-    aspirate_touchTip_checkbox: ?boolean,
-    aspirate_touchTip_mmFromBottom: ?number,
-    aspirate_mix_checkbox: ?boolean,
-    aspirate_mix_volume: ?number,
-    aspirate_mix_times: ?number,
-
-    dispense_labware: HydratedLabware,
-    dispense_wells: Array<string>,
-    dispense_wellOrder_first: WellOrderOption,
-    dispense_wellOrder_second: WellOrderOption,
-    dispense_flowRate: ?number,
-    dispense_mmFromBottom: ?number,
-    dispense_touchTip_checkbox: ?boolean,
-    dispense_touchTip_mmFromBottom: ?number,
-    dispense_mix_checkbox: ?boolean,
-    dispense_mix_volume: ?number,
-    dispense_mix_times: ?number,
-
-    disposalVolume_checkbox: ?boolean,
-    disposalVolume_volume: ?number,
-    blowout_checkbox: ?boolean,
-    blowout_location: ?string, // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
-  },
-}
 
 const moveLiquidFormToArgs = (hydratedFormData: HydratedMoveLiquidFormData): MoveLiquidStepArgs => {
   assert(

@@ -1,9 +1,8 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {HoverTooltip, PrimaryButton} from '@opentrons/components'
-
 import i18n from '../localization'
+import {HoverTooltip, PrimaryButton} from '@opentrons/components'
 import {actions as steplistActions} from '../steplist'
 import {stepIconsByType, type StepType} from '../form-types'
 import type {ThunkDispatch} from '../types'
@@ -25,7 +24,8 @@ class StepCreationButton extends React.Component<DP, State> {
   }
 
   render () {
-    const supportedSteps = ['transfer', 'distribute', 'consolidate', 'mix', 'pause']
+    // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
+    const supportedSteps = ['transfer', 'distribute', 'consolidate', 'mix', 'pause', 'moveLiquid']
 
     return (
       <div className={styles.list_item_button} onMouseLeave={this.handleMouseLeave}>
@@ -47,7 +47,7 @@ class StepCreationButton extends React.Component<DP, State> {
                     hoverTooltipHandlers={hoverTooltipHandlers}
                     onClick={this.props.makeAddStep(stepType)}
                     iconName={stepIconsByType[stepType]}>
-                    {stepType}
+                    {i18n.t(`button.stepType.${stepType}`, stepType)}
                   </PrimaryButton>
                 )}
               </HoverTooltip>

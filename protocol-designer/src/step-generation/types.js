@@ -146,7 +146,7 @@ export type CommandCreatorData =
   | PauseFormData
   | TransferFormData
 
-// TODO: Ian 2018-01-07 with multiple deck setup steps, we might want to
+// TODO: Ian 2019-01-07 with multiple deck setup steps, we might want to
 // separate 'entities' from 'locations' for pipettes/labware, and remove
 // 'entities' (pipette name / labware type) from the timeline to protect it
 // from being different btw frames

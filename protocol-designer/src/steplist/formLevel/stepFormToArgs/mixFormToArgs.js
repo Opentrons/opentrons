@@ -19,7 +19,7 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
   const orderFirst = hydratedFormData.aspirate_wellOrder_first
   const orderSecond = hydratedFormData.aspirate_wellOrder_second
 
-  // TODO: Ian 2018-01-15 use getOrderedWells instead of orderWells to avoid this duplicated code
+  // TODO: Ian 2019-01-15 use getOrderedWells instead of orderWells to avoid this duplicated code
   const labwareDef = labware && getLabware(labware.type)
   if (labwareDef) {
     const allWellsOrdered = orderWells(labwareDef.ordering, orderFirst, orderSecond)
