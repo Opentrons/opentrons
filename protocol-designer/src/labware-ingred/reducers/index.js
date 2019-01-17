@@ -148,7 +148,7 @@ export const containers = handleActions({
         ...state,
         [labwareId]: {
           ...state[labwareId],
-          name,
+          nickname: name,
         },
       }
       : state
