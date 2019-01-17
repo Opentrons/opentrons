@@ -1,7 +1,7 @@
 {
-	"otId": "FAKEID",
+	"otId": "b57c32f0-1a8c-11e9-a2de-d3e23d313b0f",
   "metadata": {
-    "name": "OT-2 Standard Deck",
+    "displayName": "OT-2 Standard Deck",
     "tags": ["ot2", "12 slots", "standard"]
   },
   "robot": {

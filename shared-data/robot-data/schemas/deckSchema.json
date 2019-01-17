@@ -12,6 +12,16 @@
       "items": {"type": "number"},
       "minItems": 3,
       "maxItems": 3
+    },
+    "boundingBox": {
+      "type": "object",
+      "description": "The active area (both pipettes can reach) of a fixture on the deck",
+      "required": ["xDimension", "yDimension", "zDimension"],
+      "properties": {
+        "xDimension": {"$ref": "#/definitions/positiveNumber"},
+        "yDimension": {"$ref": "#/definitions/positiveNumber"},
+        "zDimension": {"$ref": "#/definitions/positiveNumber"}
+      }
     }
   },
 
@@ -35,7 +45,7 @@
       "type": "object",
 
       "properties": {
-        "name": {
+        "displayName": {
           "description": "A short, human-readable name for the deck",
           "type": "string"
         },
@@ -78,15 +88,7 @@
                 "type": "string"
               },
               "position": {"$ref": "#/definitions/xyzArray"},
-              "boundingBox": {
-                "type": "object",
-                "required": ["xDimension", "yDimension", "zDimension"],
-                "properties": {
-                  "xDimension": {"$ref": "#/definitions/positiveNumber"},
-                  "yDimension": {"$ref": "#/definitions/positiveNumber"},
-                  "zDimension": {"$ref": "#/definitions/positiveNumber"}
-                }
-              },
+              "boundingBox": {"$ref": "#/definitions/boundingBox"},
               "displayName": {
                 "description": "An optional human-readable nickname for this slot Eg \"Slot 1\" or \"Fixed Trash\"",
                 "type": "string"
@@ -130,20 +132,12 @@
                 "description": "Valid labware loadName for fixed object",
                 "type": "string"
               },
+              "boundingBox": {"$ref": "#/definitions/boundingBox"},
               "slot": {
                 "description": "Slot location of the fixed object",
                 "type": "string"
               },
-              "boundingBox": {
-                "type": "object",
-                "description": "The active area (both pipettes can reach) of a fixture on the deck",
-                "required": ["xDimension", "yDimension", "zDimension"],
-                "properties": {
-                  "xDimension": {"$ref": "#/definitions/positiveNumber"},
-                  "yDimension": {"$ref": "#/definitions/positiveNumber"},
-                  "zDimension": {"$ref": "#/definitions/positiveNumber"}
-                }
-              },
+              "position": {"$ref": "#/definitions/xyzArray"},
               "displayName": {
                 "description": "An optional human-readable nickname for this fixture Eg \"Tall Fixed Trash\" or \"Short Fixed Trash\"",
                 "type": "string"

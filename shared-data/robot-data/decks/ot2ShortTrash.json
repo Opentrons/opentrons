@@ -1,7 +1,7 @@
 {
-	"otId": "FAKEID",
+	"otId": "a4446480-1a8c-11e9-a2de-d3e23d313b0f",
   "metadata": {
-    "name": "OT-2 Short-Trash Deck",
+    "displayName": "OT-2 Short-Trash Deck",
     "tags": ["ot2", "12 slots", "short trash"]
   },
   "robot": {
