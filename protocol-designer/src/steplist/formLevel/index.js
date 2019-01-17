@@ -20,6 +20,7 @@ import {
 } from './warnings'
 import type {StepType} from '../../form-types'
 
+export {default as handleFormChange} from './handleFormChange'
 export {default as generateNewForm} from './generateNewForm'
 export {default as getDefaultsForStepType} from './getDefaultsForStepType'
 export {default as getNextDefaultPipetteId} from './getNextDefaultPipetteId'

@@ -1,13 +1,13 @@
 // @flow
 import assert from 'assert'
 import uniq from 'lodash/uniq'
-import {getWellSetForMultichannel} from '../../well-selection/utils'
+import {getWellSetForMultichannel} from '../../../well-selection/utils'
 
 import type {PipetteChannels} from '@opentrons/shared-data'
-import type {FormData} from '../../form-types'
-import type {StepFieldName} from '../fieldLevel'
-import type {FormPatch} from './types'
-import type {LabwareEntities, PipetteEntities} from '../../step-forms/types'
+import type {FormData} from '../../../form-types'
+import type {StepFieldName} from '../../fieldLevel'
+import type {FormPatch} from '../../actions/types'
+import type {LabwareEntities, PipetteEntities} from '../../../step-forms/types'
 
 function _getAllWells (
   primaryWells: ?Array<string>,
