@@ -3,7 +3,7 @@ import type {DeckSlot, Mount} from '@opentrons/components'
 
 // ===== MIX-IN TYPES =====
 
-export type ChangeTipOptions = 'always' | 'once' | 'never'
+export type ChangeTipOptions = 'always' | 'once' | 'never' | 'perDest' | 'perSource'
 
 export type MixArgs = {|
   volume: number,
