@@ -7,7 +7,8 @@
     "distribute": "One well to multiple wells",
     "consolidate": "Multiple wells to one well",
     "mix": "Mix content of wells",
-    "pause": "OT-2 will pause before proceeding"
+    "pause": "OT-2 will pause before proceeding",
+    "moveLiquid": "Move liquid! TODO IMMEDIATELY real copy here"
   },
 
   "step_fields": {
