@@ -1,0 +1,204 @@
+{
+	"otId": "b57c32f0-1a8c-11e9-a2de-d3e23d313b0f",
+  "metadata": {
+    "displayName": "OT-2 Standard Deck",
+    "tags": ["ot2", "12 slots", "standard"]
+  },
+  "robot": {
+    "model": "OT-2 Standard"
+  },
+  "locations": {
+    "orderedSlots": [
+      {
+        "id": "1",
+        "position": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot 1"
+      },
+      {
+        "id": "2",
+        "position": [132.5, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot 2"
+      },
+      {
+        "id": "3",
+        "position": [265.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot 3"
+      },
+      {
+        "id": "4",
+        "position": [0.0, 90.5, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot 4"
+      },
+      {
+        "id": "5",
+        "position": [132.5, 90.5, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot 5"
+      },
+      {
+        "id": "6",
+        "position": [265.0, 90.5, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot 6"
+      },
+      {
+      "id": "7",
+        "position": [0.0, 181.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot 7"
+      },
+      {
+        "id": "8",
+        "position": [132.5, 181.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot 8"
+      },
+      {
+        "id": "9",
+        "position": [265.0, 181.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot 9"
+      },
+      {
+        "id": "10",
+        "position": [0.0, 271.5, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot 10"
+      },
+      {
+        "id": "11",
+        "position": [132.5, 271.5, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot 11"
+      },
+      {
+        "id": "12",
+        "position": [265.0, 271.5, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot 12"
+      }
+    ],
+    "calibrationPoints": [
+      {
+        "id": "1BLC",
+        "position": [12.13, 9.0, 0.0],
+        "displayName": "Slot 1 Bottom Left Cross"
+      },
+      {
+        "id": "3BRC",
+        "position": [380.87, 9.0, 0.0],
+        "displayName": "Slot 3 Bottom Right Cross"
+      },
+      {
+        "id": "7TLC",
+        "position": [12.13, 258.0, 0.0],
+        "displayName": "Slot 7 Top Left Cross"
+      },
+      {
+        "id": "9TRC",
+        "position": [380.87, 258.0, 0.0],
+        "displayName": "Slot 9 Top Right Cross"
+      },
+      {
+        "id": "10TLC",
+        "position": [12.13, 348.5, 0.0],
+        "displayName": "Slot 10 Top Left Cross"
+      },
+      {
+        "id": "11TRC",
+        "position": [248.37, 348.5, 0.0],
+        "displayName": "Slot 11 Top Right Cross"
+      },
+      {
+        "id": "1BLD",
+        "position": [12.13, 6.0, 0.0],
+        "displayName": "Slot 1 Bottom Left Dot"
+      },
+      {
+        "id": "3BRD",
+        "position": [380.87, 6.0, 0.0],
+        "displayName": "Slot 3 Bottom Right Dot"
+      },
+      {
+        "id": "7TLD",
+        "position": [12.13, 261.0, 0.0],
+        "displayName": "Slot 7 Top Left Dot"
+      },
+      {
+        "id": "9TRD",
+        "position": [380.87, 261.0, 0.0],
+        "displayName": "Slot 9 Top Right Dot"
+      },
+      {
+        "id": "10TLD",
+        "position": [12.13, 351.5, 0.0],
+        "displayName": "Slot 10 Top Left Dot"
+      },
+      {
+        "id": "11TRD",
+        "position": [248.37, 351.5, 0.0],
+        "displayName": "Slot 11 Top Right Dot"
+      }
+    ],
+    "fixtures": [
+      {
+        "id": "fixedTrash",
+        "slot": "12",
+        "labware": "opentrons_1_trash_1.1_L",
+        "displayName": "Fixed Trash"
+      }
+    ]
+  }
+}
