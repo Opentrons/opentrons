@@ -1062,7 +1062,7 @@ class InstrumentContext:
         # TODO: ..trash or the original well.
         # TODO: What should happen if the user passes a non-first-row well
         # TODO: ..as src/dest *while using multichannel pipette?
-        """
+        r"""
         Transfer will move a volume of liquid from a source location(s)
         to a dest location(s). It is a higher-level command, incorporating
         other :py:class:`InstrumentContext` commands, like :py:meth:`aspirate`
@@ -1076,68 +1076,57 @@ class InstrumentContext:
                        tuple with two elements, like `(20, 100)`, then a list
                        of volumes will be generated with a linear gradient
                        between the two volumes in the tuple.
-
         :param source: A single well or a list of wells from where liquid
                        will be aspirated.
-
         :param dest: A single well or a list of wells where liquid
                      will be dispensed to.
+        :param \**kwargs: See below
 
-        :param kwargs:
-                      new_tip : :py:class:`string`
-                                'never': no tips will be picked up or dropped
-                                during the transfer.
-                                'once': (default) a single tip will be used for
-                                all commands.
-                                'always': use a new tip for each transfer.
+        :Keyword Arguments:
 
-                      trash : :py:class:`boolean`
-                              If `False` (default behavior), tips will be
-                              returned to their tip rack. If `True` and a trash
-                              container has been attached to this `Pipette`,
-                              then the tip will be sent to the trash container.
+            * *new_tip* (``string``) --
 
-                      touch_tip : :py:class:`boolean`
-                                  If `True`, a :py:meth:`touch_tip` will occur
-                                  following each :py:meth:`aspirate` and
-                                  :py:meth:`dispense`. If set to `False`
-                                  (default behavior), no :py:meth:`touch_tip`
-                                  will occur.
+                - 'never': no tips will be picked up or dropped during transfer
+                - 'once': (default) a single tip will be used for all commands.
+                - 'always': use a new tip for each transfer.
 
-                      blow_out : :py:class:`boolean`
-                                 If `True`, a :py:meth:`blow_out` will occur
-                                 following each :py:meth:`dispense`, but only
-                                 if the pipette has no liquid left in it.
-                                 If set to `False` (default), no
-                                 :py:meth:`blow_out` will occur.
+            * *trash* (``boolean``) --
+              If `False` (default behavior), tips will be
+              returned to their tip rack. If `True` and a trash
+              container has been attached to this `Pipette`,
+              then the tip will be sent to the trash container.
 
-                      mix_before : :py:class:`tuple`
-                                   The tuple, if specified, gives the amount of
-                                   volume to :py:meth:`mix` preceding each
-                                   :py:meth:`aspirate` during the transfer.
-                                   The tuple is interpreted as
-                                   (repetitions, volume).
+            * *touch_tip* (``boolean``) --
+              If `True`, a :py:meth:`touch_tip` will occur following each
+              :py:meth:`aspirate` and :py:meth:`dispense`. If set to `False`
+              (default behavior), no :py:meth:`touch_tip` will occur.
 
-                      mix_after : :py:class:`tuple`
-                                  The tuple, if specified, gives the amount of
-                                  volume to :py:meth:`mix` after each
-                                  :py:meth:`dispense` during the transfer.
-                                  The tuple is interpreted as
-                                  (repetitions, volume).
+            * *blow_out* (``boolean``) --
+              If `True`, a :py:meth:`blow_out` will occur following each
+              :py:meth:`dispense`, but only if the pipette has no liquid left
+              in it. If set to `False` (default), no :py:meth:`blow_out` will
+              occur.
 
-                      carryover : :py:class:`boolean`
-                                  If `True` (default), any `volume` that
-                                  exceeds the maximum volume of this Pipette
-                                  will be split into multiple smaller volumes.
+            * *mix_before* (``tuple``) --
+              The tuple, if specified, gives the amount of volume to
+              :py:meth:`mix` preceding each :py:meth:`aspirate` during the
+              transfer. The tuple is interpreted as (repetitions, volume).
 
-                      gradient : lambda
-                                 Function for calculating the curve used for
-                                 gradient volumes. When `volume` is a tuple of
-                                 length 2, its values are used to create a list
-                                 of gradient volumes. The default curve for
-                                 this gradient is linear (lambda x: x), however
-                                 a method can be passed with the `gradient`
-                                 keyword argument to create a custom curve.
+            * *mix_after* (``tuple``) --
+              The tuple, if specified, gives the amount of volume to
+              :py:meth:`mix` after each :py:meth:`dispense` during the
+              transfer. The tuple is interpreted as (repetitions, volume).
+
+            * *carryover* (``boolean``) --
+              If `True` (default), any `volume` that exceeds the maximum volume
+              of this Pipette will be split into multiple smaller volumes.
+
+            * *gradient* (``lambda``) --
+              Function for calculating the curve used for gradient volumes.
+              When `volume` is a tuple of length 2, its values are used to
+              create a list of gradient volumes. The default curve for this
+              gradient is linear (lambda x: x), however a method can be passed
+              with the `gradient` keyword argument to create a custom curve.
 
         :returns: This instance
         """
@@ -1182,22 +1171,21 @@ class InstrumentContext:
         touch_tip = None
         if kwargs.get('touch_tip'):
             touch_tip = transfers.TouchTipStrategy.ALWAYS
-
+        default_args = transfers.Transfer()
         transfer_args = transfers.Transfer(
-            new_tip=kwargs.get('new_tip') or transfers.Transfer.new_tip,
-            air_gap=kwargs.get('air_gap') or transfers.Transfer.air_gap,
-            carryover=kwargs.get('carryover') or transfers.Transfer.carryover,
+            new_tip=kwargs.get('new_tip') or default_args.new_tip,
+            air_gap=kwargs.get('air_gap') or default_args.air_gap,
+            carryover=kwargs.get('carryover') or default_args.carryover,
             gradient_function=(kwargs.get('gradient_function') or
-                               transfers.Transfer.gradient_function),
+                               default_args.gradient_function),
             disposal_volume=(kwargs.get('disposal_volume') or
-                             transfers.Transfer.disposal_volume),
+                             default_args.disposal_volume),
             mix_strategy=mix_strategy,
             drop_tip_strategy=drop_tip,
-            blow_out_strategy=blow_out or transfers.Transfer.blow_out_strategy,
+            blow_out_strategy=blow_out or default_args.blow_out_strategy,
             touch_tip_strategy=(touch_tip or
-                                transfers.Transfer.touch_tip_strategy)
+                                default_args.touch_tip_strategy)
         )
-
         transfer_options = transfers.TransferOptions(transfer=transfer_args,
                                                      mix=mix_opts)
         plan = transfers.TransferPlan(volume, source, dest, self,

@@ -501,7 +501,6 @@ def test_touch_tip_default_args(loop, monkeypatch):
     async def fake_hw_move(mount, abs_position, speed=None,
                            critical_point=None):
         nonlocal total_hw_moves
-        print("new_move_pos:{}".format(abs_position))
         total_hw_moves.append((abs_position, speed))
 
     instr.aspirate(10, lw.wells()[0])
@@ -513,8 +512,6 @@ def test_touch_tip_default_args(loop, monkeypatch):
              lw.wells()[0]._from_center_cartesian(-1, 0, 1) - z_offset,
              lw.wells()[0]._from_center_cartesian(0, 1, 1) - z_offset,
              lw.wells()[0]._from_center_cartesian(0, -1, 1) - z_offset]
-    print("Well bottom clearance: {}".format(instr.well_bottom_clearance))
-
     for i in range(1, 5):
         assert total_hw_moves[i] == (edges[i-1], speed)
 
@@ -550,3 +547,4 @@ def test_transfer(loop):
 
     ctx.home()
     instr.transfer(10, lw1.columns()[0], lw2.columns()[0])
+

@@ -2,7 +2,6 @@ import enum
 from typing import (Any, List, Optional, Union, NamedTuple,
                     Callable, TYPE_CHECKING)
 from .labware import Well
-from opentrons import helpers
 from opentrons import types
 
 if TYPE_CHECKING:
@@ -426,37 +425,42 @@ class TransferPlan:
 
     def _plan_transfer(self):
         """
-        Source/ Dest: Multiple sources to multiple destinations.
-                      Src & dest should be equal length
-        Volume: Single volume or List of volumes is acceptable. This list
-                should be same length as sources/destinations
-        # Behavior with transfer options:
-            New_tip: can be either NEVER or ONCE or ALWAYS
-            Air_gap: if specified, will be performed after every aspirate
-            Blow_out: can be performed after each dispense (after mix,
-                      before touch_tip) at the location specified. If there is
-                      liquid present in the tip (as in the case of nonzero
-                      disposal volume), blow_out will be performed at either
-                      user-defined location or (default) trash.
-                      If no liquid is supposed to be present in the tip after
-                      dispense, blow_out will be performed at dispense well loc
-                      (if blow out strategy is DEST_IF_EMPTY)
-            Touch_tip: can be performed after each aspirate and/or after
-                       each dispense
-            Mix: can be performed before aspirate and/or after dispense
-                 if there is no disposal volume (i.e. can be performed
-                 only when the tip is supposed to be empty)
+        * **Source/ Dest:** Multiple sources to multiple destinations.
+                            Src & dest should be equal length
+
+        * **Volume:** Single volume or List of volumes is acceptable. This list
+                      should be same length as sources/destinations
+
+        * **Behavior with transfer options:**
+
+            - New_tip: can be either NEVER or ONCE or ALWAYS
+            - Air_gap: if specified, will be performed after every aspirate
+            - Blow_out: can be performed after each dispense (after mix, before
+                        touch_tip) at the location specified. If there is
+                        liquid present in the tip (as in the case of nonzero
+                        disposal volume), blow_out will be performed at either
+                        user-defined location or (default) trash.
+                        If no liquid is supposed to be present in the tip after
+                        dispense, blow_out will be performed at dispense well
+                        location (if blow out strategy is DEST_IF_EMPTY)
+            - Touch_tip: can be performed after each aspirate and/or after
+                         each dispense
+            - Mix: can be performed before aspirate and/or after dispense
+                   if there is no disposal volume (i.e. can be performed
+                   only when the tip is supposed to be empty)
+
             Considering all options, the sequence of actions is:
-            New Tip -> Mix -> Aspirate (with disposal volume) -> Air gap ->
+            *New Tip -> Mix -> Aspirate (with disposal volume) -> Air gap ->
             -> Touch tip -> Dispense air gap -> Dispense -> Mix if empty ->
-            -> Blow out -> Touch tip -> Drop tip
+            -> Blow out -> Touch tip -> Drop tip*
         """
         plan_iter = zip(self._volumes, self._sources, self._dests)
         for step_vol, src, dest in plan_iter:
             if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
                 yield self._format_dict('pick_up_tip', kwargs=self._tip_opts)
-            max_vol = self._instr.max_volume - self._strategy.disposal_volume \
-                - self._strategy.air_gap
+            max_vol = self._instr.max_volume - \
+                      self._strategy.disposal_volume - \
+                      self._strategy.air_gap
             xferred_vol = 0
             while xferred_vol < step_vol:
                 # TODO: account for unequal length sources, dests
@@ -469,37 +473,39 @@ class TransferPlan:
 
     def _plan_distribute(self):
         """
-        Source/ Dest: One source to many destinations
-        Volume: Single volume or List of volumes is acceptable. This list
-                should be same length as destinations
-        # Behavior with transfer options:
-            New_tip: can be either NEVER or ONCE
-                    (ALWAYS will fallback to ONCE)
-            Air_gap: if specified, will be performed after every aspirate and
-                     also in-between dispenses (to keep air gap while moving
-                     between wells)
-            Blow_out: can be performed at the end of distribute (after mix,
-                      before touch_tip) at the location specified. If there is
-                      liquid present in the tip, blow_out will be performed at
-                      either user-defined location or (default) trash.
-                      If no liquid is supposed to be present in the tip at the
-                      end of distribute, blow_out will be performed at the last
-                      well the liquid was dispensed to (if strategy is
-                      DEST_IF_EMPTY)
-            Touch_tip: can be performed after each aspirate and/or after
-                       every dispense
-            Mix: can be performed before aspirate and/or after the last
-                 dispense if there is no disposal volume (i.e. can be performed
-                 only when the tip is supposed to be empty)
+        * **Source/ Dest:** One source to many destinations
+        * **Volume:** Single volume or List of volumes is acceptable. This list
+                      should be same length as destinations
+        * **Behavior with transfer options:**
+
+            - New_tip: can be either NEVER or ONCE
+                       (ALWAYS will fallback to ONCE)
+            - Air_gap: if specified, will be performed after every aspirate and
+                       also in-between dispenses (to keep air gap while moving
+                       between wells)
+            - Blow_out: can be performed at the end of distribute (after mix,
+                        before touch_tip) at the location specified. If there
+                        is liquid present in the tip, blow_out will be
+                        performed at either user-defined location or (default)
+                        trash. If no liquid is supposed to be present in the
+                        tip at the end of distribute, blow_out will be
+                        performed at the last well the liquid was dispensed to
+                        (if strategy is DEST_IF_EMPTY)
+            - Touch_tip: can be performed after each aspirate and/or after
+                         every dispense
+            - Mix: can be performed before aspirate and/or after the last
+                   dispense if there is no disposal volume (i.e. can be
+                   performed only when the tip is supposed to be empty)
 
             Considering all options, the sequence of actions is:
+
             1. Going from source to dest1:
-               New Tip -> Mix -> Aspirate (with disposal volume) -> Air gap ->
+               *New Tip -> Mix -> Aspirate (with disposal volume) -> Air gap ->
                -> Touch tip -> Dispense air gap -> Dispense -> Mix if empty ->
-               -> Blow out -> Touch tip -> Drop tip
+               -> Blow out -> Touch tip -> Drop tip*
             2. Going from destn to destn+1:
-               .. Dispense air gap -> Dispense -> Touch tip -> Air gap ->
-               .. Dispense air gap -> ...
+               *.. Dispense air gap -> Dispense -> Touch tip -> Air gap ->
+               .. Dispense air gap -> ...*
 
         """
         # TODO: decide whether default disposal vol for distribute should be
@@ -534,38 +540,40 @@ class TransferPlan:
 
     def _plan_consolidate(self):
         """
-        Source/ Dest: Many sources to one destination
-        Volume: Single volume or List of volumes is acceptable. This list
-                should be same length as sources
-        # Behavior with transfer options:
-            New_tip: can be either NEVER or ONCE
-                    (ALWAYS will fallback to ONCE)
-            Air_gap: if specified, will be performed after every aspirate
-                     so that the aspirated liquids do not mix inside the tip.
-                     The air gap will be dispensed while dispensing the liquid
-                     into the destination well.
-            Blow_out: can be performed after a dispense (after mix,
-                      before touch_tip) at the location specified. If there is
-                      liquid present in the tip (which shouldn't happen since
-                      consolidate doesn't take a disposal vol, yet), blow_out
-                      will be performed at either user-defined location or
-                      (default) trash.
-                      If no liquid is supposed to be present in the tip after
-                      dispense, blow_out will be performed at dispense well loc
-                      (if blow out strategy is DEST_IF_EMPTY)
-            Touch_tip: can be performed after each aspirate and/or after
-                       dispense
-            Mix: can be performed before the first aspirate and/or after
-                 dispense if there is no disposal volume (i.e. can be performed
-                 only when the tip is supposed to be empty)
+        * **Source/ Dest:** Many sources to one destination
+        * **Volume:** Single volume or List of volumes is acceptable. This list
+                      should be same length as sources
+        * **Behavior with transfer options:**
+
+            - New_tip: can be either NEVER or ONCE
+                      (ALWAYS will fallback to ONCE)
+            - Air_gap: if specified, will be performed after every aspirate
+                       so that the aspirated liquids do not mix inside the tip.
+                       The air gap will be dispensed while dispensing the
+                       liquid into the destination well.
+            - Blow_out: can be performed after a dispense (after mix,
+                        before touch_tip) at the location specified. If there
+                        is liquid present in the tip (which shouldn't happen
+                        since consolidate doesn't take a disposal vol, yet),
+                        blow_out will be performed at either user-defined
+                        location or (default) trash.
+                        If no liquid is supposed to be present in the tip after
+                        dispense, blow_out will be performed at dispense well
+                        loc (if blow out strategy is DEST_IF_EMPTY)
+            - Touch_tip: can be performed after each aspirate and/or after
+                         dispense
+            - Mix: can be performed before the first aspirate and/or after
+                   dispense if there is no disposal volume (i.e. can be
+                   performed only when the tip is supposed to be empty)
+
             Considering all options, the sequence of actions is:
             1. Going from source to dest1:
-               New Tip -> Mix -> Aspirate (with disposal volume?) -> Air gap ->
+               *New Tip -> Mix -> Aspirate (with disposal volume?) -> Air gap ->
                -> Touch tip -> Dispense air gap -> Dispense -> Mix if empty ->
-               -> Blow out -> Touch tip -> Drop tip
+               -> Blow out -> Touch tip -> Drop tip*
             2. Going from source(n) to source(n+1):
-               .. Aspirate -> Air gap -> Touch tip ->..
-               .. Aspirate -> .....
+               *.. Aspirate -> Air gap -> Touch tip ->..
+               .. Aspirate -> .....*
         """
         plan_iter = zip(self._volumes, self._sources)
         current_xfer = next(plan_iter)
@@ -667,7 +675,7 @@ class TransferPlan:
         if isinstance(volume, (float, int)):
             return [volume] * total_xfers
         elif isinstance(volume, tuple):
-            return helpers._create_volume_gradient(
+            return self._create_volume_gradient(
                 volume[0], volume[-1], total_xfers,
                 self._strategy.gradient_function)
         else:
@@ -678,6 +686,18 @@ class TransferPlan:
                 raise RuntimeError("List of volumes should be equal to number "
                                    "of transfers")
             return volume
+
+    def _create_volume_gradient(self, min_v, max_v, total, gradient=None):
+
+        diff_vol = max_v - min_v
+
+        def _map_volume(i):
+            nonlocal diff_vol, total
+            rel_x = i / (total - 1)
+            rel_y = gradient(rel_x) if gradient else rel_x
+            return (rel_y * diff_vol) + min_v
+
+        return [_map_volume(i) for i in range(total)]
 
     def _multichannel_transfer(self, s, d):
         # TODO: add a check for container being multi-channel compatible?
@@ -692,25 +712,27 @@ class TransferPlan:
             'Target should be a Well or List[Well] but is {}'.format(d)
 
         # TODO: Account for cases where a src/dest list has a non-first-row
-        # TODO: ..well (eg, 'B1') and would expect the robot/pipette to
-        # TODO: ..understand that it is referring to the whole first column
+        # well (eg, 'B1') and would expect the robot/pipette to
+        # understand that it is referring to the whole first column
         if isinstance(s, List) and isinstance(s[0], List):
             # s is a List[List]]; flatten to 1D list
             s = [well for list_elem in s for well in list_elem]
+        new_src = []
         for well in s:
-            if not self._is_first_row(well):
-                # For now, just remove wells that aren't in first row
-                s.remove(well)
+            if self._is_first_row(well):
+                # For now, just use wells that are in first row
+                new_src.append(well)
 
         if isinstance(d, List) and isinstance(d[0], List):
             # s is a List[List]]; flatten to 1D list
             d = [well for list_elem in d for well in list_elem]
+        new_dst = []
         for well in d:
-            if not self._is_first_row(well):
-                # For now, just remove wells that aren't in first row
-                d.remove(well)
+            if self._is_first_row(well):
+                # For now, just use wells that are in first row
+                new_dst.append(well)
 
-        return s, d
+        return new_src, new_dst
 
     def _is_first_row(self, well: Well):
-        return True if 'A' in str(well) else False
+        return well in well.parent.rows()[0]

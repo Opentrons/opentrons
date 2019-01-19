@@ -20,8 +20,8 @@ test_data = {
         'shape': 'rectangular',
         'depth': 20,
         'totalLiquidVolume': 200,
-        'length': 50,
-        'width': 120,
+        'length': 120,
+        'width': 50,
         'x': 45,
         'y': 10,
         'z': 22
@@ -102,9 +102,9 @@ def test_from_center_cartesian():
     percent2_z = 0.9
     point2 = well2._from_center_cartesian(percent2_x, percent2_y, percent2_z)
 
-    # slot.x + well.x - 0.25 * well.width/2
+    # slot.x + well.x - 0.25 * well.length/2
     expected_x = 13 + 45 - 15
-    # slot.y + well.y + 0.1 * well.length/2
+    # slot.y + well.y + 0.1 * well.width/2
     expected_y = 14 + 10 + 2.5
     # slot.z + well.z + (1 + 0.9) * well.depth/2
     expected_z = 15 + 22 + 19

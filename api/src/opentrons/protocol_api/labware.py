@@ -135,9 +135,9 @@ class Well:
         inside of the well.
 
         :param x: a float in the range [-1.0, 1.0] for a percentage of half of
-            the radius/width in the X axis
+            the radius/length in the X axis
         :param y: a float in the range [-1.0, 1.0] for a percentage of half of
-            the radius/length in the Y axis
+            the radius/width in the Y axis
         :param z: a float in the range [-1.0, 1.0] for a percentage of half of
             the height above/below the center
 
@@ -146,8 +146,8 @@ class Well:
         """
         center = self.center()
         if self._shape is WellShape.RECTANGULAR:
-            x_size = self._width
-            y_size = self._length
+            x_size = self._length
+            y_size = self._width
         else:
             x_size = self._diameter
             y_size = self._diameter
