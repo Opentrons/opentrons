@@ -78,9 +78,10 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
               mmFromBottom={mmFromBottom}
               isOpen={this.state.isModalOpen} />
             <InputField
-              className={isTouchTipField
-                ? stepFormStyles.full_width
-                : undefined} // TODO Ian 2018-11-16 change InputField props.className to be `?string` so this can be `null` not `undefined`?
+              className={stepFormStyles.small_field}
+              // className={isTouchTipField
+              //   ? stepFormStyles.small_field
+              //   : undefined} // TODO Ian 2018-11-16 change InputField props.className to be `?string` so this can be `null` not `undefined`?
               readOnly
               onClick={this.handleOpen}
               value={value}

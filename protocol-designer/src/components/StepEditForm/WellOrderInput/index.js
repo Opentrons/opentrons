@@ -22,9 +22,7 @@ class WellOrderInput extends React.Component<OP & SP, WellOrderInputState> {
 
   render () {
     return (
-      <FormGroup
-        label={i18n.t('form.step_edit_form.field.well_order.label')}
-        className={styles.well_order_input}>
+      <FormGroup className={styles.small_field}>
         <WellOrderModal
           prefix={this.props.prefix}
           closeModal={this.handleClose}

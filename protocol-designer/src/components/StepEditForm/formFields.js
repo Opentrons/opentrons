@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
+import cx from 'classnames'
 import {
   FormGroup,
   CheckboxField,
@@ -110,7 +111,7 @@ export const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldProps) 
     focusedField={props.focusedField}
     dirtyFields={props.dirtyFields}
     render={({value, updateValue, hoverTooltipHandlers}) => (
-      <FormGroup label='Pipette:' className={styles.pipette_field} hoverTooltipHandlers={hoverTooltipHandlers}>
+      <FormGroup label='Pipette:' className={cx(styles.pipette_field, styles.large_field)} hoverTooltipHandlers={hoverTooltipHandlers}>
         <DropdownField
           options={props.pipetteOptions}
           value={value ? String(value) : null}
