@@ -1,26 +1,20 @@
 // events map tests
-import {LOCATION_CHANGE} from 'react-router-redux'
-
 import makeEvent from '../make-event'
 import {actions as robotActions} from '../../robot'
+import * as selectors from '../selectors'
+
+jest.mock('../selectors')
 
 describe('analytics events map', () => {
-  test('@@router/LOCATION_CHANGE -> url event', () => {
-    const state = {}
-    // TODO(mc, 2018-05-28): this type has changed since @beta.6
-    const action = {type: LOCATION_CHANGE, payload: {pathname: '/foo'}}
-
-    expect(makeEvent(state, action)).toEqual({
-      name: 'url',
-      properties: {pathname: '/foo'},
-    })
+  beforeEach(() => {
+    jest.resetAllMocks()
   })
 
   test('robot:CONNECT_RESPONSE -> robotConnected event', () => {
     const state = name => ({
       robot: {
         connection: {
-          connectRequest: {name},
+          connectedTo: name,
         },
       },
       discovery: {
@@ -56,133 +50,191 @@ describe('analytics events map', () => {
     const success = robotActions.connectResponse()
     const failure = robotActions.connectResponse(new Error('AH'))
 
-    expect(makeEvent(state('wired'), success)).toEqual({
+    expect(makeEvent(success, state('wired'))).toEqual({
       name: 'robotConnect',
       properties: {method: 'usb', success: true, error: ''},
     })
 
-    expect(makeEvent(state('wired'), failure)).toEqual({
+    expect(makeEvent(failure, state('wired'))).toEqual({
       name: 'robotConnect',
       properties: {method: 'usb', success: false, error: 'AH'},
     })
 
-    expect(makeEvent(state('wireless'), success)).toEqual({
+    expect(makeEvent(success, state('wireless'))).toEqual({
       name: 'robotConnect',
       properties: {method: 'wifi', success: true, error: ''},
     })
 
-    expect(makeEvent(state('wireless'), failure)).toEqual({
+    expect(makeEvent(failure, state('wireless'))).toEqual({
       name: 'robotConnect',
       properties: {method: 'wifi', success: false, error: 'AH'},
     })
   })
 
-  test('robot:SESSION_RESPONSE/ERROR -> protocolUpload event', () => {
-    const state = {}
-    const success = {type: 'robot:SESSION_RESPONSE', payload: {}}
-    const failure = {
-      type: 'robot:SESSION_ERROR',
-      payload: {error: new Error('AH')},
-    }
+  describe('events with protocol data', () => {
+    var protocolData = {foo: 'bar'}
 
-    expect(makeEvent(state, success)).toEqual({
-      name: 'protocolUpload',
-      properties: {success: true, error: ''},
+    beforeEach(() => {
+      selectors.getProtocolAnalyticsData.mockResolvedValue(protocolData)
     })
 
-    expect(makeEvent(state, failure)).toEqual({
-      name: 'protocolUpload',
-      properties: {success: false, error: 'AH'},
-    })
-  })
+    test('robot:PROTOCOL_UPLOAD > protocolUploadRequest', () => {
+      const prevState = {}
+      const nextState = {}
+      const success = {type: 'protocol:UPLOAD', payload: {}}
 
-  test('robot:RUN -> runStart event', () => {
-    const state = {}
-    const action = {type: 'robot:RUN'}
-
-    expect(makeEvent(state, action)).toEqual({
-      name: 'runStart',
-      properties: {},
-    })
-  })
-
-  test('robot:PAUSE_RESPONSE -> runPause event', () => {
-    const state = {}
-    const success = {type: 'robot:PAUSE_RESPONSE'}
-    const failure = {type: 'robot:PAUSE_RESPONSE', error: new Error('AH')}
-
-    expect(makeEvent(state, success)).toEqual({
-      name: 'runPause',
-      properties: {
-        success: true,
-        error: '',
-      },
+      return expect(makeEvent(success, nextState, prevState)).resolves.toEqual({
+        name: 'protocolUploadRequest',
+        properties: protocolData,
+      })
     })
 
-    expect(makeEvent(state, failure)).toEqual({
-      name: 'runPause',
-      properties: {
-        success: false,
-        error: 'AH',
-      },
-    })
-  })
+    test('robot:SESSION_RESPONSE with upload in flight', () => {
+      const prevState = {robot: {session: {sessionRequest: {inProgress: true}}}}
+      const nextState = {}
+      const success = {type: 'robot:SESSION_RESPONSE', payload: {}}
 
-  test('robot:CANCEL_REPSONSE -> runCancel event', () => {
-    const state = {
-      robot: {
-        session: {
-          startTime: 1000,
-          runTime: 5000,
+      return expect(makeEvent(success, nextState, prevState)).resolves.toEqual({
+        name: 'protocolUploadResponse',
+        properties: {success: true, error: '', ...protocolData},
+      })
+    })
+
+    test('robot:SESSION_ERROR with upload in flight', () => {
+      const prevState = {robot: {session: {sessionRequest: {inProgress: true}}}}
+      const nextState = {}
+      const failure = {
+        type: 'robot:SESSION_ERROR',
+        payload: {error: new Error('AH')},
+      }
+
+      return expect(makeEvent(failure, nextState, prevState)).resolves.toEqual({
+        name: 'protocolUploadResponse',
+        properties: {success: false, error: 'AH', ...protocolData},
+      })
+    })
+
+    test('robot:SESSION_RESPONSE/ERROR with no upload in flight', () => {
+      const prevState = {
+        robot: {session: {sessionRequest: {inProgress: false}}},
+      }
+      const nextState = {}
+      const success = {type: 'robot:SESSION_RESPONSE', payload: {}}
+      const failure = {
+        type: 'robot:SESSION_ERROR',
+        payload: {error: new Error('AH')},
+      }
+
+      expect(makeEvent(success, nextState, prevState)).toBeNull()
+      expect(makeEvent(failure, nextState, prevState)).toBeNull()
+    })
+
+    test('robot:RUN -> runStart event', () => {
+      const state = {}
+      const action = {type: 'robot:RUN'}
+
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'runStart',
+        properties: protocolData,
+      })
+    })
+
+    test('robot:RUN_RESPONSE success -> runFinish event', () => {
+      const state = {
+        robot: {
+          session: {
+            startTime: 1000,
+            runTime: 5000,
+          },
         },
-      },
-    }
-    const success = {type: 'robot:CANCEL_RESPONSE'}
-    const failure = {type: 'robot:CANCEL_RESPONSE', error: new Error('AH')}
+      }
+      const action = {type: 'robot:RUN_RESPONSE', error: false}
 
-    expect(makeEvent(state, success)).toEqual({
-      name: 'runCancel',
-      properties: {
-        runTime: 4,
-        success: true,
-        error: '',
-      },
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'runFinish',
+        properties: {...protocolData, runTime: 4, success: true, error: ''},
+      })
     })
 
-    expect(makeEvent(state, failure)).toEqual({
-      name: 'runCancel',
-      properties: {
-        runTime: 4,
-        success: false,
-        error: 'AH',
-      },
-    })
-  })
-
-  test('robot:RUN_RESPONSE success -> runFinish event', () => {
-    const state = {
-      robot: {
-        session: {
-          startTime: 1000,
-          runTime: 5000,
+    test('robot:RUN_RESPONSE error -> runFinish event', () => {
+      const state = {
+        robot: {
+          session: {
+            startTime: 1000,
+            runTime: 5000,
+          },
         },
-      },
-    }
-    const action = {type: 'robot:RUN_RESPONSE', error: false}
+      }
+      const action = {
+        type: 'robot:RUN_RESPONSE',
+        error: true,
+        payload: new Error('AH'),
+      }
 
-    expect(makeEvent(state, action)).toEqual({
-      name: 'runFinish',
-      properties: {runTime: 4},
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'runFinish',
+        properties: {...protocolData, runTime: 4, success: false, error: 'AH'},
+      })
     })
-  })
 
-  test('robot:RUN_RESPONSE error -> runError event', () => {
-    const state = {}
-    const action = {type: 'robot:RUN_RESPONSE', error: new Error('AH')}
+    test('robot:PAUSE -> runPause event', () => {
+      const state = {
+        robot: {
+          session: {
+            startTime: 1000,
+            runTime: 5000,
+          },
+        },
+      }
+      const action = {type: 'robot:PAUSE'}
 
-    expect(makeEvent(state, action)).toEqual({
-      name: 'runError',
-      properties: {error: 'AH'},
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'runPause',
+        properties: {
+          ...protocolData,
+          runTime: 4,
+        },
+      })
+    })
+
+    test('robot:RESUME -> runResume event', () => {
+      const state = {
+        robot: {
+          session: {
+            startTime: 1000,
+            runTime: 5000,
+          },
+        },
+      }
+      const action = {type: 'robot:RESUME'}
+
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'runResume',
+        properties: {
+          ...protocolData,
+          runTime: 4,
+        },
+      })
+    })
+
+    test('robot:CANCEL-> runCancel event', () => {
+      const state = {
+        robot: {
+          session: {
+            startTime: 1000,
+            runTime: 5000,
+          },
+        },
+      }
+      const action = {type: 'robot:CANCEL'}
+
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'runCancel',
+        properties: {
+          ...protocolData,
+          runTime: 4,
+        },
+      })
     })
   })
 })

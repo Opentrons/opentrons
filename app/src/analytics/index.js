@@ -3,13 +3,14 @@
 import noop from 'lodash/noop'
 import mixpanel from 'mixpanel-browser'
 
-import type {State, ThunkAction, Middleware} from '../types'
-import type {Config} from '../config'
-
 import {version} from '../../package.json'
 import {updateConfig} from '../config'
 import createLogger from '../logger'
 import makeEvent from './make-event'
+
+import type {State, Action, ThunkAction, Middleware} from '../types'
+import type {Config} from '../config'
+import type {AnalyticsEvent} from './types'
 
 type AnalyticsConfig = $PropertyType<Config, 'analytics'>
 
@@ -50,32 +51,32 @@ export function setAnalyticsSeen () {
   return updateConfig('analytics.seenOptIn', true)
 }
 
-export const analyticsMiddleware: Middleware =
-  (store) => (next) => (action) => {
-    const state = store.getState()
-    const event = makeEvent(store.getState(), action)
+export const analyticsMiddleware: Middleware = store => next => action => {
+  const prevState = store.getState()
 
-    if (event) {
-      log.debug('Trackable event', {type: action.type, event})
-      track(event.name, event.properties)
+  // hit reducers to get the next state
+  const result = next(action)
+  const nextState = store.getState()
+  const event = makeEvent(action, nextState, prevState)
+
+  trackEvent(action, event)
+
+  // enable mixpanel tracking if optedIn goes to true
+  if (
+    action.type === 'config:SET' &&
+    action.payload.path === 'analytics.optedIn'
+  ) {
+    const config = nextState.config.analytics
+
+    if (action.payload.value === true) {
+      enableMixpanelTracking(config)
+    } else {
+      disableMixpanelTracking(config)
     }
-
-    // enable mixpanel tracking if optedIn goes to true
-    if (
-      action.type === 'config:SET' &&
-      action.payload.path === 'analytics.optedIn'
-    ) {
-      const config = state.config.analytics
-
-      if (action.payload.value === true) {
-        enableMixpanelTracking(config)
-      } else {
-        disableMixpanelTracking(config)
-      }
-    }
-
-    return next(action)
   }
+
+  return result
+}
 
 export function getAnalyticsOptedIn (state: State) {
   return state.config.analytics.optedIn
@@ -83,6 +84,18 @@ export function getAnalyticsOptedIn (state: State) {
 
 export function getAnalyticsSeen (state: State) {
   return state.config.analytics.seenOptIn
+}
+
+function trackEvent (
+  action: Action,
+  event: null | AnalyticsEvent | Promise<AnalyticsEvent | null>
+) {
+  if (event && event instanceof Promise) {
+    event.then(e => trackEvent(action, e))
+  } else if (event) {
+    log.debug('Trackable event', {type: action.type, event})
+    track(event.name, event.properties)
+  }
 }
 
 function initializeMixpanel (config: AnalyticsConfig) {

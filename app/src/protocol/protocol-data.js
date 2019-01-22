@@ -4,7 +4,7 @@
 // import {getter} from '@thi.ng/paths'
 import createLogger from '../logger'
 
-import type {ProtocolFile, ProtocolData} from './types'
+import type {ProtocolFile, ProtocolData, ProtocolType} from './types'
 
 const log = createLogger(__filename)
 
@@ -25,7 +25,7 @@ export function parseProtocolData (
   contents: string,
   // optional Python protocol metadata
   metadata: ?$PropertyType<ProtocolData, 'metadata'>
-): ?ProtocolData {
+): ProtocolData | null {
   if (fileIsJson(file)) {
     try {
       return JSON.parse(contents)
@@ -41,9 +41,15 @@ export function parseProtocolData (
   return null
 }
 
-export function filenameToType (name: string): ?string {
+export function filenameToMimeType (name: string): string | null {
   if (name.endsWith('.json')) return MIME_TYPE_JSON
   if (name.endsWith('.py')) return MIME_TYPE_PYTHON
+  return null
+}
+
+export function fileToType (file: ProtocolFile): ProtocolType | null {
+  if (file.type === MIME_TYPE_JSON) return 'json'
+  if (file.type === MIME_TYPE_PYTHON) return 'python'
   return null
 }
 
