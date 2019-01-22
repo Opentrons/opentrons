@@ -1,17 +1,12 @@
 // @flow
 import makeFieldUpdater from './makeFieldUpdater'
-import {chainFormUpdaters, getChannels, getAllWells} from './utils'
+import {chainFormUpdaters, getChannels, getAllWellsFromPrimaryWells} from './utils'
+import {getPipetteCapacity} from '../../../pipettes/pipetteData'
 import type {FormData} from '../../../form-types'
 import type {FormPatch} from '../../actions/types'
 import type {LabwareEntities, PipetteEntities} from '../../../step-forms/types'
 
-type WellRatio = 'n:n' | '1:many' | 'many:1' // TODO IMMEDIATELY import from somewhere more general
-
-// type WellRatioUpdate = {
-//   prevKeyValue: WellRatio,
-//   nextKeyValue: WellRatio,
-//   fields: Array<{name: string, prev: string, next: string}>,
-// }
+type WellRatio = 'n:n' | '1:many' | 'many:1'
 
 const wellRatioUpdatesMap = [
   {
@@ -90,18 +85,24 @@ function updatePathField (patch, baseForm, pipetteEntities) {
   // pass-thru: incomplete form
   if (!path) return patch
 
-  // TODO IMMEDIATELY: why are tests not failing when this is true?
-  // TODO IMMEDIATELY: pipette capacity from hydrated form, not placeholder `false`
-  const pipetteCapacityExceeded = false
+  let pipetteCapacityExceeded = false
+  if (appliedPatch.volume && appliedPatch.pipette && appliedPatch.pipette in pipetteEntities) {
+    const pipetteCapacity = getPipetteCapacity(pipetteEntities[appliedPatch.pipette])
+    if (pipetteCapacity) {
+      pipetteCapacityExceeded = appliedPatch.volume > pipetteCapacity
+    }
+  }
+
   if (pipetteCapacityExceeded) {
     return {...patch, path: 'single'}
   }
 
-  // changeTip value incompatible with path -> 'single'
-  if (
+  // changeTip value incompatible with next path value
+  const incompatiblePath = (
     (changeTip === 'perSource' && path === 'multiAspirate') ||
-    (changeTip === 'perDest' && path === 'multiDispense')
-  ) {
+    (changeTip === 'perDest' && path === 'multiDispense'))
+
+  if (pipetteCapacityExceeded || incompatiblePath) {
     return {...patch, path: 'single'}
   }
   return patch
@@ -183,8 +184,8 @@ const updateFieldsOnPipetteChannelChange = (
     const destLabwareType = destLabware && destLabware.type
 
     update = {
-      aspirate_wells: getAllWells(baseForm.aspirate_wells, sourceLabwareType),
-      dispense_wells: getAllWells(baseForm.dispense_wells, destLabwareType),
+      aspirate_wells: getAllWellsFromPrimaryWells(baseForm.aspirate_wells, sourceLabwareType),
+      dispense_wells: getAllWellsFromPrimaryWells(baseForm.dispense_wells, destLabwareType),
     }
   }
   return {...patch, ...update}

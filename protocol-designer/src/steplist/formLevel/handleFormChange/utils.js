@@ -7,16 +7,19 @@ import type {PipetteChannels} from '@opentrons/shared-data'
 import type {FormPatch} from '../../actions/types'
 import type {PipetteEntities} from '../../../step-forms/types'
 
-// TODO IMMEDIATELY describe with comment
-export function chainFormUpdaters (patch: FormPatch, fns: Array<?(FormPatch => FormPatch)>): FormPatch {
+// process a form patch thru an chain of functions, each taking as its input
+// the output of the previous function
+export function chainFormUpdaters (initialPatch: FormPatch, fns: Array<?(FormPatch => FormPatch)>): FormPatch {
   return fns.reduce((patchAcc: FormPatch, fn) => {
-    // passing in a null acts like an identity function in the chain
+    // passing in a null acts like an identity function in the chain,
+    // which allows you to do conditional functions in the array
     return fn ? fn(patchAcc) : patchAcc
-  }, {...patch})
+  }, {...initialPatch})
 }
 
-// TODO IMMEDIATELY describe with comment
-export function getAllWells (
+// given an array of primary wells (for a multichannel), return all unique wells
+// included in that set. Used to convert multi to single.
+export function getAllWellsFromPrimaryWells (
   primaryWells: ?Array<string>,
   labwareType: ?string
 ): Array<string> {
