@@ -21,10 +21,10 @@ const makeFieldUpdater = (updateMaps: FieldUpdateMaps) =>
       return {}
     }
     const fieldUpdates = updateForKeyChange.fields
-    return fieldUpdates.reduce((acc, {name, prev, next}) => {
+    return fieldUpdates.reduce((patchAcc, {name, prev, next}) => {
       return fields[name] !== undefined && fields[name] === prev
-        ? {...acc, [name]: next}
-        : acc
+        ? {...patchAcc, [name]: next}
+        : patchAcc
     }, {})
   }
 
