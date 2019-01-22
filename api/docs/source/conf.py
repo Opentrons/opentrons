@@ -137,22 +137,24 @@ html_theme = 'alabaster'
 # documentation.
 #
 html_theme_options = {
-    'travis_button': 'True',
+    'travis_button': False,
     'font_size': '14px',
     'font_family': "'Open Sans', sans-serif",
     'head_font_family': "'AkkoPro-Regular', 'Open Sans'",
     'sidebar_collapse': 'True',
-    'logo': 'logo.png',
     'fixed_sidebar': 'False',
-    'github_user': 'OpenTrons',
-    'github_repo': 'opentrons-api',
-    'github_button': 'True',
+    'github_user': 'opentrons',
+    'github_repo': 'opentrons',
+    'github_button': True,
     # 'analytics_id': 'UA-83820700-1',
     'description': 'Simple Biology Lab Protocol Coding',
     'link': '#006FFF',
     'link_hover': '#05C1B3',
     'sidebar_list': '#05C1B3',
-    'sidebar_link_underscore': '#DDDDDD'
+    'sidebar_link_underscore': '#DDDDDD',
+    'extra_nav_links': {
+        'Download As PDF': '_static/OpentronsAPI.pdf'
+    }
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -204,9 +206,9 @@ html_static_path = ['static']
 #
 html_sidebars = {
     '**': [
-        'globaltoc.html',
+        'about.html',
+        'navigation.html',
         'relations.html',
-        'sourcelink.html',
         'searchbox.html'
     ],
 }
