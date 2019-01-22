@@ -1,7 +1,7 @@
 // @flow
-import makeFieldUpdater from '../makeFieldUpdater'
+import makeConditionalFieldUpdater from '../makeConditionalFieldUpdater'
 
-describe('makeFieldUpdater', () => {
+describe('makeConditionalFieldUpdater', () => {
   const foodUpdateMap = [
     {
       prevKeyValue: 'apple',
@@ -12,7 +12,7 @@ describe('makeFieldUpdater', () => {
       ],
     },
   ]
-  const updateForFood = makeFieldUpdater(foodUpdateMap)
+  const updateForFood = makeConditionalFieldUpdater(foodUpdateMap)
   test('unhandled key field values case', () => {
     expect(updateForFood('blorg', 'zvvvvvvargh', {spam: 'blah'})).toEqual({})
   })

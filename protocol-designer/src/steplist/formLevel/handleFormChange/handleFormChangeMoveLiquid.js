@@ -1,5 +1,5 @@
 // @flow
-import makeFieldUpdater from './makeFieldUpdater'
+import makeConditionalFieldUpdater from './makeConditionalFieldUpdater'
 import {chainFormUpdaters, getChannels, getAllWellsFromPrimaryWells} from './utils'
 import {getPipetteCapacity} from '../../../pipettes/pipetteData'
 import type {FormData} from '../../../form-types'
@@ -57,7 +57,7 @@ const wellRatioUpdatesMap = [
     ],
   },
 ]
-const wellRatioUpdater = makeFieldUpdater(wellRatioUpdatesMap)
+const wellRatioUpdater = makeConditionalFieldUpdater(wellRatioUpdatesMap)
 
 function getWellRatio (sourceWells: mixed, destWells: mixed): ?WellRatio {
   if (
