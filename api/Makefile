@@ -82,6 +82,11 @@ docs: local-install
 	shx mkdir -p docs/dist
 	shx cp -R docs/build/html/. docs/public/. docs/dist
 
+.PHONY: docs-pdf
+docs-pdf: local-install
+	pipenv run sphinx-build -b latex -d docs/build/doctrees docs/source docs/build/pdf
+	$(MAKE) -C docs/build/pdf all-pdf
+
 .PHONY: publish
 publish:
 	cd scripts && publish.sh && doc-deploy.sh
