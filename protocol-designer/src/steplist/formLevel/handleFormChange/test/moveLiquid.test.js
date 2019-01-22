@@ -13,6 +13,17 @@ beforeEach(() => {
   )
 })
 
+describe('no-op cases should pass through the patch unchanged (same identity)', () => {
+  test('empty patch', () => {
+    const patch = {}
+    expect(handleFormHelper(patch, {blah: 'blaaah'})).toBe(patch)
+  })
+  test('patch with unhandled field', () => {
+    const patch = {fooField: 123}
+    expect(handleFormHelper(patch, {blah: 'blaaah'})).toBe(patch)
+  })
+})
+
 describe('path should update...', () => {
   describe('if path is multi and volume exceeds pipette/tip capacity', () => {
     const multiPaths = ['multiAspirate', 'multiDispense']

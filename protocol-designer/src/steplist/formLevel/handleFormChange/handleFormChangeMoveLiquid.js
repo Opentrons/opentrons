@@ -10,50 +10,50 @@ type WellRatio = 'n:n' | '1:many' | 'many:1'
 
 const wellRatioUpdatesMap = [
   {
-    prevKeyValue: 'n:n',
-    nextKeyValue: '1:many',
-    fields: [
-      {name: 'changeTip', prev: 'perSource', next: 'always'},
-      {name: 'changeTip', prev: 'perDest', next: 'always'},
+    prevValue: 'n:n',
+    nextValue: '1:many',
+    dependentFields: [
+      {name: 'changeTip', prevValue: 'perSource', nextValue: 'always'},
+      {name: 'changeTip', prevValue: 'perDest', nextValue: 'always'},
     ],
   },
   {
-    prevKeyValue: 'n:n',
-    nextKeyValue: 'many:1',
-    fields: [
+    prevValue: 'n:n',
+    nextValue: 'many:1',
+    dependentFields: [
       // no updates, all possible values are OK
     ],
   },
   {
-    prevKeyValue: '1:many',
-    nextKeyValue: 'n:n',
-    fields: [
-      {name: 'changeTip', prev: 'perSource', next: 'always'},
-      {name: 'changeTip', prev: 'perDest', next: 'always'},
+    prevValue: '1:many',
+    nextValue: 'n:n',
+    dependentFields: [
+      {name: 'changeTip', prevValue: 'perSource', nextValue: 'always'},
+      {name: 'changeTip', prevValue: 'perDest', nextValue: 'always'},
     ],
   },
   {
-    prevKeyValue: '1:many',
-    nextKeyValue: 'many:1',
-    fields: [
-      {name: 'changeTip', prev: 'perSource', next: 'always'},
-      {name: 'changeTip', prev: 'perDest', next: 'always'},
-      {name: 'path', prev: 'multiDispense', next: 'single'},
+    prevValue: '1:many',
+    nextValue: 'many:1',
+    dependentFields: [
+      {name: 'changeTip', prevValue: 'perSource', nextValue: 'always'},
+      {name: 'changeTip', prevValue: 'perDest', nextValue: 'always'},
+      {name: 'path', prevValue: 'multiDispense', nextValue: 'single'},
     ],
   },
   {
-    prevKeyValue: 'many:1',
-    nextKeyValue: 'n:n',
-    fields: [
-      {name: 'path', prev: 'multiAspirate', next: 'single'},
+    prevValue: 'many:1',
+    nextValue: 'n:n',
+    dependentFields: [
+      {name: 'path', prevValue: 'multiAspirate', nextValue: 'single'},
     ],
   },
   {
-    prevKeyValue: 'many:1',
-    nextKeyValue: '1:many',
-    fields: [
-      {name: 'changeTip', prev: 'perSource', next: 'always'},
-      {name: 'path', prev: 'multiAspirate', next: 'single'},
+    prevValue: 'many:1',
+    nextValue: '1:many',
+    dependentFields: [
+      {name: 'changeTip', prevValue: 'perSource', nextValue: 'always'},
+      {name: 'path', prevValue: 'multiAspirate', nextValue: 'single'},
     ],
   },
 ]

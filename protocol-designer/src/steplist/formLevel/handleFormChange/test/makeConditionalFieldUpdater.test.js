@@ -4,11 +4,11 @@ import makeConditionalFieldUpdater from '../makeConditionalFieldUpdater'
 describe('makeConditionalFieldUpdater', () => {
   const foodUpdateMap = [
     {
-      prevKeyValue: 'apple',
-      nextKeyValue: 'banana',
-      fields: [
-        {name: 'color', prev: 'red', next: 'yellow'},
-        {name: 'flavor', prev: 'sour', next: 'sweet'},
+      prevValue: 'apple',
+      nextValue: 'banana',
+      dependentFields: [
+        {name: 'color', prevValue: 'red', nextValue: 'yellow'},
+        {name: 'flavor', prevValue: 'sour', nextValue: 'sweet'},
       ],
     },
   ]
