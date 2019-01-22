@@ -105,6 +105,14 @@
   margin: 0.5em 0 0.5em 20px;
 }
 
+.button_row {
+  lost-utility: clearfix;
+  margin-top: 2rem;
+
+  & > * {
+    lost-column: 1/6;
+  }
+}
 
 /* NEW STYLES */
 
@@ -127,6 +135,12 @@
   justify-content: flex-end;
 }
 
+.wrap_group {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
 .large_field {
   width: 14rem;
   margin-right: 0.5rem;
@@ -144,7 +158,24 @@
   margin-right: 0.5rem;
 }
 
+.no_label {
+  margin-top: 1rem;
+}
+
 .advanced_settings_icon {
   height: 3rem;
   width: 3rem;
+}
+
+.section_divider {
+  height: 1px;
+  width: 100%;
+  background-color: var(--c-light-gray);
+  margin: 1em 0;
+}
+
+@media screen and (max-width: 1279px) {
+  .field_row {
+    flex-wrap: wrap;
+  }
 }

@@ -22,7 +22,7 @@ class WellOrderInput extends React.Component<OP & SP, WellOrderInputState> {
 
   render () {
     return (
-      <FormGroup className={styles.small_field}>
+      <FormGroup className={cx(styles.small_field, styles.no_label)}>
         <WellOrderModal
           prefix={this.props.prefix}
           closeModal={this.handleClose}

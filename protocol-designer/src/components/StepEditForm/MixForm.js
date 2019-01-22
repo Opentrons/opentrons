@@ -17,7 +17,7 @@ import WellSelectionInput from './WellSelectionInput'
 import TipPositionInput from './TipPositionInput'
 import WellOrderInput from './WellOrderInput'
 import type {FocusHandlers} from './index'
-import formStyles from '../forms.css'
+import formStyles from '../forms/forms.css'
 import styles from './StepEditForm.css'
 
 type MixFormProps = {focusHandlers: FocusHandlers}

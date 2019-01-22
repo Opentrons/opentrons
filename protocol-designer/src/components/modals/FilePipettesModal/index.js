@@ -12,7 +12,7 @@ import {
 import reduce from 'lodash/reduce'
 import i18n from '../../../localization'
 import styles from './FilePipettesModal.css'
-import formStyles from '../../forms.css'
+import formStyles from '../../forms/forms.css'
 import modalStyles from '../modal.css'
 import StepChangesConfirmModal from '../EditPipettesModal/StepChangesConfirmModal'
 import PipetteFields from './PipetteFields'

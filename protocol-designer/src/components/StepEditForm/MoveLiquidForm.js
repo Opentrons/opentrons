@@ -4,8 +4,14 @@ import {FormGroup, HoverTooltip} from '@opentrons/components'
 import cx from 'classnames'
 
 import i18n from '../../localization'
-import {StepInputField, PipetteField} from './formFields'
-
+import {
+  StepInputField,
+  PipetteField,
+  ChangeTipField,
+  BlowoutLocationDropdown,
+} from './formFields'
+import StepField from './StepFormField'
+import {CheckboxField} from '../forms'
 import SourceDestFields from './SourceDestFields'
 import getTooltipForField from './getTooltipForField'
 import styles from './StepEditForm.css'
@@ -45,9 +51,48 @@ const MoveLiquidForm = (props: MoveLiquidFormProps) => {
         </HoverTooltip>
       </div>
 
+      <div className={styles.section_divider}></div>
+
       <SourceDestFields focusHandlers={focusHandlers} prefix="aspirate" />
 
+      <div className={styles.section_divider}></div>
+
       <SourceDestFields focusHandlers={focusHandlers} prefix="dispense" />
+
+      <div className={styles.section_divider}></div>
+
+      <ChangeTipField stepType={stepType} name="changeTip" />
+
+      {stepType === 'distribute' && // TODO: this should be based on path not stepType
+        <StepField
+          name="aspirate_disposalVol_checkbox"
+          render={({value, updateValue}) => (
+            <React.Fragment>
+              <div className={styles.field_row}>
+                <CheckboxField
+                  label="Disposal Volume"
+                  value={!!value}
+                  onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)} />
+                {value
+                  ? <div>
+                    <StepInputField name="aspirate_disposalVol_volume" units="μL" {...focusHandlers} />
+                  </div>
+                  : null}
+              </div>
+              {value
+                ? <div className={styles.field_row}>
+                  <div className={styles.sub_select_label}>Blowout</div>
+                  <BlowoutLocationDropdown
+                    name="blowout_location"
+                    className={styles.full_width}
+                    includeSourceWell
+                    {...focusHandlers} />
+                </div>
+                : null
+              }
+            </React.Fragment>
+          )} />
+      }
 
     </React.Fragment>
   )

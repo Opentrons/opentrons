@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import {FormGroup, IconButton, HoverTooltip} from '@opentrons/components'
+import cx from 'classnames'
 
 import type {FocusHandlers} from './index'
 import {
@@ -36,6 +37,7 @@ class FormSection extends React.Component<Props, State> {
     const path = 'single' // TODO: IMMEDIATELY this is stubbed, replace with formData (probably in downstream connected components)
     const addFieldNamePrefix = makeAddFieldNamePrefix(this.props.prefix)
     const labwareLabel = this.props.prefix === 'aspirate' ? 'Source:' : 'Destination:'
+    const hiddenFieldsLabel = this.props.prefix === 'aspirate' ? 'Aspirate Options:' : 'Dispense Options:'
     return (
       <div className={styles.field_row}>
         <div className={styles.start_group}>
@@ -69,35 +71,37 @@ class FormSection extends React.Component<Props, State> {
             )}
           </HoverTooltip>
         </div>
-        {this.state.collapsed !== true &&
-          <div>
-            {this.props.prefix === 'aspirate' &&
-              <React.Fragment>
-                <StepCheckboxRow name="preWetTip" label="Pre-wet tip" />
-                <StepCheckboxRow disabled tooltipComponent={i18n.t('tooltip.not_in_beta')} name="aspirate_airGap_checkbox" label="Air Gap">
-                  <StepInputField disabled name="aspirate_airGap_volume" units="μL" {...this.props.focusHandlers} />
-                </StepCheckboxRow>
-              </React.Fragment>
-            }
-            <StepCheckboxRow name={addFieldNamePrefix('touchTip_checkbox')} label="Touch tip">
-              <TipPositionInput fieldName={addFieldNamePrefix('touchTipMmFromBottom')} />
-            </StepCheckboxRow>
-            <StepCheckboxRow name={addFieldNamePrefix('mix_checkbox')} label='Mix'>
-              <StepInputField name={addFieldNamePrefix('dispense_mix_volume')} units="μL" {...this.props.focusHandlers} />
-              <StepInputField name={addFieldNamePrefix('dispense_mix_times')} units="Times" {...this.props.focusHandlers} />
-            </StepCheckboxRow>
-            {(this.props.prefix === 'dispense' && path !== 'multiDispense') &&
-              <StepCheckboxRow name='blowout_checkbox' label='Blow out'>
-                <BlowoutLocationDropdown
-                  name="blowout_location"
-                  className={styles.full_width}
-                  includeSourceWell={path === 'single'}
-                  includeDestWell
-                  {...this.props.focusHandlers} />
+        <div className={cx(styles.start_group, styles.wrap_group)}>
+          {this.state.collapsed !== true &&
+            <FormGroup label={hiddenFieldsLabel}>
+              {this.props.prefix === 'aspirate' &&
+                <React.Fragment>
+                  <StepCheckboxRow name="preWetTip" label="Pre-wet tip" />
+                  <StepCheckboxRow disabled tooltipComponent={i18n.t('tooltip.not_in_beta')} name="aspirate_airGap_checkbox" label="Air Gap">
+                    <StepInputField disabled name="aspirate_airGap_volume" units="μL" {...this.props.focusHandlers} />
+                  </StepCheckboxRow>
+                </React.Fragment>
+              }
+              <StepCheckboxRow name={addFieldNamePrefix('touchTip_checkbox')} label="Touch tip">
+                <TipPositionInput fieldName={addFieldNamePrefix('touchTipMmFromBottom')} />
               </StepCheckboxRow>
-            }
-          </div>
-        }
+              <StepCheckboxRow name={addFieldNamePrefix('mix_checkbox')} label='Mix'>
+                <StepInputField name={addFieldNamePrefix('dispense_mix_volume')} units="μL" {...this.props.focusHandlers} />
+                <StepInputField name={addFieldNamePrefix('dispense_mix_times')} units="Times" {...this.props.focusHandlers} />
+              </StepCheckboxRow>
+              {(this.props.prefix === 'dispense' && path !== 'multiDispense') &&
+                <StepCheckboxRow name='blowout_checkbox' label='Blow out'>
+                  <BlowoutLocationDropdown
+                    name="blowout_location"
+                    className={styles.full_width}
+                    includeSourceWell={path === 'single'}
+                    includeDestWell
+                    {...this.props.focusHandlers} />
+                </StepCheckboxRow>
+              }
+            </FormGroup>
+          }
+        </div>
       </div>
     )
   }

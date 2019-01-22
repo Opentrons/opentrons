@@ -29,9 +29,9 @@
 }
 
 .form_group_label {
-  @apply --font-body-2-dark;
+  @apply --font-body-1-dark;
 
-  font-weight: var(--fw-bold);
+  font-weight: var(--fw-semibold);
   margin-bottom: 0.15rem;
 }
 
