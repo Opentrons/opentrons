@@ -207,7 +207,7 @@ html_static_path = ['static']
 html_sidebars = {
     '**': [
         'about.html',
-        'navigation.html',
+        'toc-with-nav.html',
         'relations.html',
         'searchbox.html'
     ],
