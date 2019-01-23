@@ -938,7 +938,8 @@ class API(HardwareAPILike):
         await self._move_plunger(mount, bottom)
         self._backend.set_active_current(plunger_ax,
                                          instr.config.drop_tip_current)
-        await self._move_plunger(mount, droptip)
+        await self._move_plunger(
+            mount, droptip, speed=instr.config.drop_tip_speed)
         await self._shake_off_tips(mount)
         instr.set_current_volume(0)
         instr.remove_tip()
