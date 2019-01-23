@@ -75,12 +75,23 @@ lint: $(ot_py_sources)
 	$(python) -m mypy src/opentrons
 	$(python) -m pylama src/opentrons tests
 
-.PHONY: docs
-docs: local-install
+.PHONY: docs docs-html docs-doctest docs-pdf
+
+docs-html: local-install
 	pipenv run sphinx-build -b html -d docs/build/doctrees docs/source docs/build/html
+
+docs-doctest: local-install
 	pipenv run sphinx-build -b doctest -d docs/build/doctrees docs/source docs/build/doctest
+
+docs-pdf: local-install
+	-pipenv run sphinx-build -b latex -d docs/build/doctrees docs/source docs/build/pdf
+	-$(MAKE) -C docs/build/pdf all-pdf
+
+.PHONY: docs
+docs: docs-pdf docs-html
 	shx mkdir -p docs/dist
 	shx cp -R docs/build/html/. docs/public/. docs/dist
+	-shx cp docs/build/pdf/OpentronsAPI.pdf docs/dist/_static
 
 .PHONY: publish
 publish:

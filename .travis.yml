@@ -44,6 +44,8 @@ jobs:
       name: 'Python API unit tests, build/deploy API docs'
       language: python
       python: 3.6
+      before_install:
+        - sudo apt-get install -y --no-install-recommends texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra dvipng texlive-latex-recommended
       install:
         - pip install awscli
         - nvm install
@@ -52,7 +54,7 @@ jobs:
       script:
         - make test-py
         - make lint-py
-        - make -C api docs
+        - make -C api docs docs-pdf
       after_success:
         - make coverage
         - aws s3 sync ./api/dist $OT_CI_TEMP_S3_PATH/api/dist
