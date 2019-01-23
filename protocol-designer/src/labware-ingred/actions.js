@@ -2,7 +2,7 @@
 import {createAction} from 'redux-actions'
 import type {Dispatch} from 'redux'
 
-import {selectors} from './reducers'
+import {selectors} from './selectors'
 import {uuid} from '../utils'
 import type {GetState} from '../types'
 import type {IngredInputs} from './types'

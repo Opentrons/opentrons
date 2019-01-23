@@ -5,7 +5,7 @@ import {getPropertyAllPipettes} from '@opentrons/shared-data'
 import {getFileMetadata} from './fileFields'
 import {getInitialRobotState, getRobotStateTimeline} from './commands'
 import {selectors as dismissSelectors} from '../../dismiss'
-import {selectors as ingredSelectors} from '../../labware-ingred/reducers'
+import {selectors as ingredSelectors} from '../../labware-ingred/selectors'
 import {selectors as stepFormSelectors} from '../../step-forms'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,

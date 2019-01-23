@@ -7,7 +7,7 @@ import {TitleBar, Icon, humanizeLabwareType, type IconName} from '@opentrons/com
 import styles from './TitleBar.css'
 import i18n from '../localization'
 import {START_TERMINAL_TITLE, END_TERMINAL_TITLE} from '../constants'
-import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
+import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
 import {selectors as stepsSelectors, actions as stepsActions} from '../ui/steps'
 import {END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID} from '../steplist'
 import {selectors as fileDataSelectors} from '../file-data'

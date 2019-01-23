@@ -17,7 +17,7 @@ import type {BaseState, ThunkDispatch} from '../../types'
 import i18n from '../../localization'
 
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
-import {selectors} from '../../labware-ingred/reducers'
+import {selectors} from '../../labware-ingred/selectors'
 import * as labwareIngredsActions from '../../labware-ingred/actions'
 import type {ContentsByWell} from '../../labware-ingred/types'
 import type {WellIngredientNames} from '../../steplist/types'

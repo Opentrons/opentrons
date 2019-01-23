@@ -4,7 +4,7 @@ import selectors from './selectors'
 import {changeFormInput} from '../steplist/actions'
 
 import {selectors as stepFormSelectors} from '../step-forms'
-import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
+import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
 
 import type {ThunkDispatch, GetState} from '../types'
 import type {StepFieldName} from '../form-types'

@@ -4,7 +4,7 @@ import {createSelector} from 'reselect'
 import reduce from 'lodash/reduce'
 
 import {getLabware, type WellDefinition} from '@opentrons/shared-data'
-import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
+import {selectors as labwareIngredSelectors} from '../../labware-ingred/selectors'
 import wellSelectionSelectors from '../../well-selection/selectors'
 
 import type {Selector} from '../../types'

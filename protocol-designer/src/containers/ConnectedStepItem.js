@@ -10,7 +10,7 @@ import {selectors as dismissSelectors} from '../dismiss'
 import {selectors as stepFormSelectors} from '../step-forms'
 import {selectors as stepsSelectors, actions as stepsActions} from '../ui/steps'
 import {selectors as fileDataSelectors} from '../file-data'
-import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
+import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
 import StepItem from '../components/steplist/StepItem' // TODO Ian 2018-05-10 why is importing StepItem from index.js not working?
 
 type Props = React.ElementProps<typeof StepItem>

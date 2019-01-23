@@ -11,7 +11,7 @@ import type {BaseState, Selector} from '../../types'
 import {getAllWellsForLabware} from '../../constants'
 import * as StepGeneration from '../../step-generation'
 import {selectors as stepFormSelectors} from '../../step-forms'
-import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
+import {selectors as labwareIngredSelectors} from '../../labware-ingred/selectors'
 import type {StepIdType} from '../../form-types'
 import type {LabwareOnDeck, PipetteOnDeck} from '../../step-forms'
 

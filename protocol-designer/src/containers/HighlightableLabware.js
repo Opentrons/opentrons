@@ -6,7 +6,7 @@ import noop from 'lodash/noop'
 
 import HighlightableLabware from '../components/HighlightableLabware'
 
-import {selectors} from '../labware-ingred/reducers'
+import {selectors} from '../labware-ingred/selectors'
 import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
@@ -33,7 +33,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const selectedContainerId = selectors.getSelectedLabwareId(state)
   const containerId = ownProps.containerId || selectedContainerId
 
-  if (containerId === null) {
+  if (containerId == null) {
     console.error('HighlightableLabware: No container is selected, and no containerId was given to Connected HighlightableLabware')
     return {
       containerId: '',

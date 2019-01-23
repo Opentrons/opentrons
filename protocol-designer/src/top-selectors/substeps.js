@@ -1,7 +1,7 @@
 // @flow
 import {createSelector} from 'reselect'
 
-import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
+import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
 import {selectors as stepFormSelectors} from '../step-forms'
 import {selectors as fileDataSelectors} from '../file-data'
 

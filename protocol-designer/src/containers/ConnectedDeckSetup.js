@@ -16,7 +16,7 @@ import LabwareSelectionModal from '../components/LabwareSelectionModal'
 import StepEditForm from '../components/StepEditForm'
 import TimelineAlerts from '../components/alerts/TimelineAlerts'
 
-import {selectors} from '../labware-ingred/reducers'
+import {selectors} from '../labware-ingred/selectors'
 import * as labwareIngredActions from '../labware-ingred/actions'
 import {START_TERMINAL_ITEM_ID, type TerminalItemId} from '../steplist'
 import {selectors as stepsSelectors} from '../ui/steps'

@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
 import LabwareSelectionModal from './LabwareSelectionModal'
 import {closeLabwareSelector, createContainer} from '../../labware-ingred/actions'
-import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
+import {selectors as labwareIngredSelectors} from '../../labware-ingred/selectors'
 import {selectors as stepFormSelectors} from '../../step-forms'
 import type {BaseState} from '../../types'
 

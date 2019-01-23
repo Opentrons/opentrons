@@ -11,7 +11,7 @@ import type {PipetteNameSpecs} from '@opentrons/shared-data'
 import type {BaseState, ThunkDispatch} from '../../../types'
 
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
-import {selectors} from '../../../labware-ingred/reducers'
+import {selectors} from '../../../labware-ingred/selectors'
 import type {Wells, ContentsByWell} from '../../../labware-ingred/types'
 import {selectors as stepFormSelectors} from '../../../step-forms'
 import {selectors as stepsSelectors} from '../../../ui/steps'

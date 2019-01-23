@@ -6,7 +6,7 @@ import {PDListItem} from '../lists'
 import {START_TERMINAL_TITLE} from '../../constants'
 import type {BaseState} from '../../types'
 import {START_TERMINAL_ITEM_ID} from '../../steplist'
-import {selectors as labwareIngredsSelectors} from '../../labware-ingred/reducers'
+import {selectors as labwareIngredsSelectors} from '../../labware-ingred/selectors'
 
 type Props = {
   showHint: boolean,

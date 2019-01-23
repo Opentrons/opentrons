@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {selectors} from '../labware-ingred/reducers'
+import {selectors} from '../labware-ingred/selectors'
 import * as wellSelectionSelectors from '../top-selectors/well-contents'
 import {removeWellsContents} from '../labware-ingred/actions'
 import type {Dispatch} from 'redux'

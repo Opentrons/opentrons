@@ -3,7 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 
 import {getLabware, getIsTiprack} from '@opentrons/shared-data'
-import {selectors} from '../labware-ingred/reducers'
+import {selectors} from '../labware-ingred/selectors'
 import {
   openIngredientSelector,
   deleteContainer,

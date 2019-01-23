@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 import i18n from '../../localization'
 import {selectors as stepFormSelectors} from '../../step-forms'
-import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
+import {selectors as labwareIngredSelectors} from '../../labware-ingred/selectors'
 import {hydrateField} from '../../steplist/fieldLevel'
 import type {StepFieldName} from '../../steplist/fieldLevel'
 import {

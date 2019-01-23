@@ -2,7 +2,7 @@
 import {connect} from 'react-redux'
 import assert from 'assert'
 import LabwareDetailsCard from './LabwareDetailsCard'
-import {selectors as labwareIngredSelectors} from '../../../labware-ingred/reducers'
+import {selectors as labwareIngredSelectors} from '../../../labware-ingred/selectors'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import type {ElementProps} from 'react'
 import type {Dispatch} from 'redux'

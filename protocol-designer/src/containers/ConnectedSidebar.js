@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {selectors as labwareIngredSelectors} from '../labware-ingred/reducers'
+import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
 import {selectors} from '../navigation'
 
 import ConnectedStepList from './ConnectedStepList'
