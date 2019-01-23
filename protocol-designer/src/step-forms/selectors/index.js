@@ -94,14 +94,24 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
 )
 
 // TODO IMMEDIATELY: deprecated, is it reasonable to replace Labware -> LabwareEntity? If not, rename getLabwareByIdDeprecated
-// TODO IMMEDIATELY: take slot and type out of labware-ingred containers reducer
+// $FlowFixMe TODO IMMEDIATELY
 export const getLabwareById: Selector<{[labwareId: string]: ?Labware}> = createSelector(
-  getLabwareEntities,
+  getInitialDeckSetup,
   state => state.labwareIngred.containers,
-  (labwareEntities, oldLabwareById) => mapValues(
-    labwareEntities,
-    (labwareEntity: $Values<LabwareEntities>, id: string): ?Labware =>
-      ({...oldLabwareById[id], ...labwareEntity}))
+  (initialDeckSetup, displayLabwareById) => mapValues(
+    initialDeckSetup.labware,
+    (l: LabwareOnDeck, id: string): ?Labware => {
+      const displayLabware = displayLabwareById[id]
+      return displayLabware
+        ? {
+          nickname: displayLabware.nickname,
+          disambiguationNumber: displayLabware.disambiguationNumber,
+          id,
+          type: l.type,
+          slot: l.slot,
+        }
+        : null
+    })
 )
 
 export const getLabwareNicknamesById: Selector<{[labwareId: string]: string}> = createSelector(

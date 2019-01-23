@@ -16,7 +16,7 @@ export type Labware = {|
 
 // TODO IMMEDIATELY: this is the type that should be used in labwareIngred.containers
 export type DisplayLabware = {|
-  nickname?: string,
+  nickname: ?string,
   disambiguationNumber: number,
 |}
 

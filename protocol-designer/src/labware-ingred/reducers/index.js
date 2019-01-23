@@ -4,36 +4,25 @@ import {handleActions, type ActionType} from 'redux-actions'
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
-import reduce from 'lodash/reduce'
 
 import * as actions from '../actions'
-import {_loadedContainersBySlot} from '../utils'
-import {sortedSlotnames, FIXED_TRASH_ID} from '../../constants'
+import {FIXED_TRASH_ID} from '../../constants'
 import {getPDMetadata} from '../../file-types'
 import type {DeckSlot} from '@opentrons/components'
 import type {SingleLabwareLiquidState, LabwareLiquidState} from '../../step-generation'
-import type {LiquidGroupsById, Labware} from '../types'
+import type {LiquidGroupsById, Labware, DisplayLabware} from '../types'
 import type {LoadFileAction} from '../../load-file'
 import type {
   RemoveWellsContents,
   DeleteLiquidGroup,
   DuplicateLabwareAction,
   EditLiquidGroupAction,
-  SwapSlotContentsAction,
   SelectLiquidAction,
   SetWellContentsAction,
 } from '../actions'
 
 // external actions (for types)
 import typeof {openWellSelectionModal} from '../../well-selection/actions'
-
-// UTILS
-const nextEmptySlot = loadedContainersSubstate => {
-  // Next empty slot in the sorted slotnames order. Or null if no more slots.
-  const nextEmptySlotIdx = sortedSlotnames.findIndex(slot => !(slot in loadedContainersSubstate))
-  const result = nextEmptySlotIdx >= sortedSlotnames.length ? null : sortedSlotnames[nextEmptySlotIdx]
-  return result
-}
 
 // REDUCERS
 
@@ -64,7 +53,7 @@ const drillDownLabwareId = handleActions({
 }, null)
 
 export type ContainersState = {
-  [id: string]: ?Labware, // TODO IMMEDIATELY: switch to DisplayLabware type
+  [id: string]: ?DisplayLabware,
 }
 
 export type SelectedLiquidGroupState = {liquidGroupId: ?string, newLiquidGroup?: true}
@@ -83,19 +72,18 @@ const selectedLiquidGroup = handleActions({
 
 const initialLabwareState: ContainersState = {
   [FIXED_TRASH_ID]: {
-    id: FIXED_TRASH_ID,
-    type: 'fixed-trash',
     disambiguationNumber: 1,
     nickname: 'Trash',
-    slot: '12',
   },
 }
 
+// TODO IMMEDIATELY
 function getNextDisambiguationNumber (allLabwareById: ContainersState, labwareType: string): number {
-  const allIds = Object.keys(allLabwareById)
-  const sameTypeLabware = allIds.filter(labwareId =>
-    allLabwareById[labwareId] &&
-    allLabwareById[labwareId].type === labwareType)
+  // const allIds = Object.keys(allLabwareById)
+  const sameTypeLabware = [] // TODO IMMEDIATELY
+  // const sameTypeLabware = allIds.filter(labwareId =>
+  // allLabwareById[labwareId] &&
+  // allLabwareById[labwareId].type === labwareType)
   const disambigNumbers = sameTypeLabware.map(labwareId =>
     (allLabwareById[labwareId] &&
     allLabwareById[labwareId].disambiguationNumber) || 0)
@@ -134,33 +122,29 @@ export const containers = handleActions({
       }
       : state
   },
-  SWAP_SLOT_CONTENTS: (state: ContainersState, action: SwapSlotContentsAction): ContainersState => {
-    const { sourceSlot, destSlot } = action.payload
-    const fromLabware = reduce(state, (acc, container, id) => (
-      container.slot === destSlot ? {...acc, [id]: {...container, slot: sourceSlot}} : acc
-    ), {})
-    const toLabware = reduce(state, (acc, container, id) => (
-      container.slot === sourceSlot ? {...acc, [id]: {...container, slot: destSlot}} : acc
-    ), {})
-    return {
-      ...state,
-      ...fromLabware,
-      ...toLabware,
-    }
-  },
+  // TODO IMMEDIATELY move to stepForm (thunk like pipette stuff?)
+  // SWAP_SLOT_CONTENTS: (state: ContainersState, action: SwapSlotContentsAction): ContainersState => {
+  //   const { sourceSlot, destSlot } = action.payload
+  //   const fromLabware = reduce(state, (acc, container, id) => (
+  //     container.slot === destSlot ? {...acc, [id]: {...container, slot: sourceSlot}} : acc
+  //   ), {})
+  //   const toLabware = reduce(state, (acc, container, id) => (
+  //     container.slot === sourceSlot ? {...acc, [id]: {...container, slot: destSlot}} : acc
+  //   ), {})
+  //   return {
+  //     ...state,
+  //     ...fromLabware,
+  //     ...toLabware,
+  //   }
+  // },
   DUPLICATE_LABWARE: (state: ContainersState, action: DuplicateLabwareAction): ContainersState => {
-    const {templateLabwareId, duplicateLabwareId} = action.payload
-    const templateLabware = state[templateLabwareId]
-    const nextSlot = nextEmptySlot(_loadedContainersBySlot(state))
-    if (!nextSlot || !templateLabware) return state
+    const {duplicateLabwareId} = action.payload // templateLabwareId,
+    // const templateLabware = state[templateLabwareId]
     return {
       ...state,
       [duplicateLabwareId]: {
-        slot: nextSlot,
-        type: templateLabware.type,
-        disambiguationNumber: getNextDisambiguationNumber(state, templateLabware.type),
-        id: duplicateLabwareId,
-        name: null, // create with null name, so we force explicit naming.
+        disambiguationNumber: 'todo!', // TODO IMMEDIATELY
+        nickname: null, // create with null name, so we force explicit naming.
       },
     }
   },
