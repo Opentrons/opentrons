@@ -1,4 +1,5 @@
 import json
+import pytest
 
 import numpy as np
 
@@ -28,17 +29,18 @@ async def test_add_and_remove_tip(async_server, dc_session):
     if version == 1:
         hardware.reset()
         pip = instruments.P10_Single(mount=mount)
+        dc_session.current_mount = mount
     else:
         await hardware.reset()
         await hardware.cache_instruments({
                     types.Mount.LEFT: 'p10_single_v1',
                     types.Mount.RIGHT: None})
         pip = hardware.attached_instruments[types.Mount.LEFT]
+        dc_session.current_mount = types.Mount.LEFT
     dc_session.pipettes = {mount: pip}
-    dc_session.current_mount = 'Z'
 
     # Check malformed packet
-    res0 = await endpoints.attach_tip({}, hardware)
+    res0 = await endpoints.attach_tip({})
     assert res0.status == 400
     assert dc_session.tip_length is None
     if version == 1:
@@ -48,7 +50,7 @@ async def test_add_and_remove_tip(async_server, dc_session):
 
     # Check correct attach command
     tip_length = 50
-    res1 = await endpoints.attach_tip({'tipLength': tip_length}, hardware)
+    res1 = await endpoints.attach_tip({'tipLength': tip_length})
     assert res1.status == 200
     assert dc_session.tip_length == tip_length
     if version == 1:
@@ -57,7 +59,7 @@ async def test_add_and_remove_tip(async_server, dc_session):
         assert pip['has_tip'] is True
 
     # Check command with tip already attached
-    res2 = await endpoints.attach_tip({'tipLength': tip_length + 5}, hardware)
+    res2 = await endpoints.attach_tip({'tipLength': tip_length + 5})
     assert res2.status == 200
     assert dc_session.tip_length == tip_length + 5
     if version == 1:
@@ -66,7 +68,7 @@ async def test_add_and_remove_tip(async_server, dc_session):
         assert pip['has_tip'] is True
 
     # Check correct detach command
-    res3 = await endpoints.detach_tip({}, hardware)
+    res3 = await endpoints.detach_tip({})
     assert res3.status == 200
     assert dc_session.tip_length is None
     if version == 1:
@@ -75,7 +77,7 @@ async def test_add_and_remove_tip(async_server, dc_session):
         assert pip['has_tip'] is False
 
     # Check command with no tip
-    res4 = await endpoints.detach_tip({}, hardware)
+    res4 = await endpoints.detach_tip({})
     assert res4.status == 200
     assert dc_session.tip_length is None
     if version == 1:
@@ -85,20 +87,22 @@ async def test_add_and_remove_tip(async_server, dc_session):
 
 
 async def test_save_xy(async_server, dc_session):
-    hardware = async_server['com.opentrons.hardware']
-    mount = 'left'
+    hardware = dc_session.adapter
     version = async_server['api_version']
+
     if version == 1:
+        mount = 'left'
         hardware.reset()
         pip = instruments.P10_Single(mount=mount)
     else:
-        await hardware.reset()
-        await hardware.cache_instruments({
-            types.Mount.LEFT: 'p10_single_v1',
+        mount = types.Mount.LEFT
+        hardware.reset()
+        hardware.cache_instruments({
+            mount: 'p10_single_v1',
             types.Mount.RIGHT: None})
-        pip = hardware.attached_instruments[types.Mount.LEFT]
+        pip = hardware.attached_instruments[mount]
     dc_session.pipettes = {mount: pip}
-    dc_session.current_mount = 'Z'
+    dc_session.current_mount = mount
     dc_session.tip_length = 25
     if version == 1:
         dc_session.pipettes.get(mount)._add_tip(dc_session.tip_length)
@@ -107,20 +111,20 @@ async def test_save_xy(async_server, dc_session):
         dc_session.pipettes.get(mount)['has_tip'] = True
         dc_session.pipettes.get(mount)['tip_length'] = dc_session.tip_length
         hardware._add_tip(types.Mount.LEFT, dc_session.tip_length)
-        await hardware.home()
+        hardware.home()
     x = 100
     y = 101
     if version == 1:
         dc_session.pipettes.get(mount).move_to((hardware.deck, (x, y, 102)))
     else:
         # relative move or not?
-        await hardware.move_to(types.Mount.LEFT, types.Point(x=x, y=y, z=102))
+        hardware.move_to(types.Mount.LEFT, types.Point(x=x, y=y, z=102))
 
     point = '1'
     data = {
         'point': point
     }
-    await endpoints.save_xy(data, hardware)
+    await endpoints.save_xy(data)
 
     actual = dc_session.points[point]
     if version == 1:
@@ -129,28 +133,29 @@ async def test_save_xy(async_server, dc_session):
             robot._driver.position['Y']
         )
     else:
-        coordinates = await hardware.current_position(types.Mount.LEFT)
+        coordinates = hardware.gantry_position(types.Mount.LEFT)
         expected = (
-            coordinates[Axis.X] + hardware.config.mount_offset[0],
-            coordinates[Axis.Y])
+            coordinates.x + hardware.config.mount_offset[0],
+            coordinates.y)
     assert actual == expected
 
 
 async def test_save_z(async_server, dc_session):
-    hardware = async_server['com.opentrons.hardware']
-    mount = 'left'
+    hardware = dc_session.adapter
     model = 'p10_single_v1'
     if async_server['api_version'] == 1:
+        mount = 'left'
         hardware.reset()
         pip = instruments.P10_Single(mount=mount)
     else:
-        await hardware.reset()
-        await hardware.cache_instruments({
-                    types.Mount.LEFT: 'p10_single_v1',
+        mount = types.Mount.LEFT
+        hardware.reset()
+        hardware.cache_instruments({
+                    mount: 'p10_single_v1',
                     types.Mount.RIGHT: None})
-        pip = hardware.attached_instruments[types.Mount.LEFT]
+        pip = hardware.attached_instruments[mount]
     dc_session.pipettes = {mount: pip}
-    dc_session.current_mount = 'Z'
+    dc_session.current_mount = mount
     dc_session.current_model = model
     dc_session.tip_length = 25
     if async_server['api_version'] == 1:
@@ -165,12 +170,12 @@ async def test_save_z(async_server, dc_session):
         dc_session.pipettes.get(mount).move_to(
             (hardware.deck, (0, 0, z_target)))
     else:
-        await hardware.home()
+        hardware.home()
         # Unsure whether to use move_to or move_rel
-        await hardware.move_to(
+        hardware.move_to(
             types.Mount.LEFT, types.Point(x=0, y=0, z=z_target))
 
-    await endpoints.save_z({}, hardware)
+    await endpoints.save_z({})
 
     new_z = dc_session.z_value
     expected_z = z_target
@@ -195,7 +200,7 @@ async def test_save_calibration_file(async_server, dc_session, monkeypatch):
 
     monkeypatch.setattr(robot_configs, 'save_deck_calibration', dummy_save)
 
-    await endpoints.save_transform({}, hardware)
+    await endpoints.save_transform({})
 
     in_memory = hardware.config.gantry_calibration
     assert len(persisted_data) == 2
@@ -236,7 +241,7 @@ async def test_transform_calculation(async_server, dc_session):
         '3': [34.87002331, 256.36103295]
     }
 
-    await endpoints.save_transform({}, hardware)
+    await endpoints.save_transform({})
 
     assert np.allclose(hardware.config.gantry_calibration, expected_transform)
 
@@ -432,6 +437,7 @@ async def test_set_and_jog_integration(
             hardware._driver, 'read_pipette_model', dummy_read_model)
         hardware.reset()
     else:
+        # Why does this need to be awaited for a synch adapter
         await hardware.cache_instruments(
             {types.Mount.LEFT: None, types.Mount.RIGHT: test_model})
 
@@ -453,21 +459,23 @@ async def test_set_and_jog_integration(
     # left pipette z carriage motor is smoothie axis "Z", right is "A"
     sess = dc.endpoints.session
     smoothie_axis = 'Z' if sess.current_mount == 'left' else 'A'
-
     if async_server['api_version'] == 1:
         hardware.reset()
-        prior_x, prior_y, prior_z = dc.position(smoothie_axis, hardware)
+        prior_x, prior_y, prior_z = dc.position(smoothie_axis, sess.adapter)
     else:
-        await hardware.home()
-        if smoothie_axis == 'A':
-            mount = types.Mount.RIGHT
-        else:
-            mount = types.Mount.LEFT
-        position = await hardware.current_position(mount)
-        print(position)
-        prior_x = position[Axis.X]
-        prior_y = position[Axis.Y]
-        prior_z = position[Axis.by_mount(mount)]
+        sess.adapter.home()
+        prior_x, prior_y, prior_z = dc.position(sess.current_mount, sess.adapter)
+    # else:
+    #     await hardware.home()
+    #     if smoothie_axis == 'A':
+    #         mount = types.Mount.RIGHT
+    #     else:
+    #         mount = types.Mount.LEFT
+    #     position = await hardware.current_position(mount)
+    #     print(position)
+    #     prior_x = position[Axis.X]
+    #     prior_y = position[Axis.Y]
+    #     prior_z = position[Axis.by_mount(mount)]
     resp = await async_client.post(
         '/calibration/deck',
         json={
@@ -479,6 +487,7 @@ async def test_set_and_jog_integration(
         })
 
     body = await resp.json()
+    print(body)
     msg = body.get('message')
 
     assert '{}'.format((prior_x, prior_y, prior_z + step)) in msg

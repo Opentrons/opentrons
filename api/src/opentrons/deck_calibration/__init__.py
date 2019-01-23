@@ -71,18 +71,33 @@ def position(axis, hardware):
     Read position from driver into a tuple and map 3-rd value
     to the axis of a pipette currently used
     """
-    if axis == 'A':
-        mount = types.Mount.RIGHT
+
+    if not ff.use_protocol_api_v2():
+        p = hardware._driver.position
+        return (p['X'], p['Y'], p[axis])
     else:
-        mount = types.Mount.LEFT
-    p = hardware.current_position(mount)
-    return (p['X'], p['Y'], p['Z'])
+        p = hardware.gantry_position(axis)
+        return (p.x, p.y, p.z)
 
 
-def jog(axis, direction, step, hardware):
-    hardware._driver.move(
-        {axis: hardware._driver.position[axis] + direction * step})
-    return position(axis, hardware)
+def jog(axis, direction, step, hardware, mount):
+    if not ff.use_protocol_api_v2():
+        if axis == 'z':
+            axis = 'Z' if mount == 'left' else 'A'
+        hardware._driver.move(
+            {axis.upper():
+                hardware._driver.position[axis.upper()] + direction * step})
+        return position(axis.upper(), hardware)
+    else:
+        # if axis == 'x':
+        #     pt = types.Point(x=direction*step, y=0, z=0)
+        # elif axis == 'y':
+        #     pt = types.Point(x=0, y=direction*step, z=0)
+        # else:
+        #     pt = types.Point(x=0, y=0, z=direction*step)
+        pt = types.Point(**{axis: direction*step})
+        hardware.move_rel(mount, pt)
+        return position(mount, hardware)
 
 
 def apply_mount_offset(point, hardware):

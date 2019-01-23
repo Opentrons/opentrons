@@ -830,15 +830,6 @@ class Robot():
         self.reset()
         self.home()
 
-    def current_position(self, mount):
-        if mount == types.Mount.LEFT:
-            z_axis = 'Z'
-        else:
-            z_axis = 'A'
-        position = self._driver.position
-        log.info("DRIVER POSITION {}".format(position))
-        return {'X': position['X'], 'Y': position['Y'], 'Z': position[z_axis]}
-
     def get_attached_pipettes(self):
         """
         Gets model names of attached pipettes

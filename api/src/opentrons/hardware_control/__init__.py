@@ -493,6 +493,7 @@ class API(HardwareAPILike):
         `critical_point` specifies an override to the current critical point to
         use (see :py:meth:`current_position`).
         """
+        print("Gantry Mount {}".format(mount))
         cur_pos = await self.current_position(mount, critical_point)
         return top_types.Point(x=cur_pos[Axis.X],
                                y=cur_pos[Axis.Y],

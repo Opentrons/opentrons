@@ -234,7 +234,7 @@ async def dc_session(request, async_server, monkeypatch, loop):
     # endpoints.session = None
     ses = endpoints.SessionManager(hw)
     endpoints.session = ses
-    # monkeypatch.setattr(endpoints, 'session', ses)
+    monkeypatch.setattr(endpoints, 'session', ses)
     yield ses
 
 

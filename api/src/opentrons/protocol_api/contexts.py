@@ -144,6 +144,8 @@ class ProtocolContext:
             # an error occured in the code inside the with block
         """
         old_hw = self._hw_manager.hardware
+        print("OLD HW CONTEXT MANAGER PROTOCOLS")
+        print(old_hw)
         try:
             self._hw_manager.set_hw(hardware)
             yield self

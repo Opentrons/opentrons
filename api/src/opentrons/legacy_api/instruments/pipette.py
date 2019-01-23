@@ -224,9 +224,7 @@ class Pipette:
         self.placeables = []
         self.previous_placeable = None
         self.current_volume = 0
-        print('15')
         self.reset_tip_tracking()
-        print('16')
 
     def has_tip_rack(self):
         """

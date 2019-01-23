@@ -13,7 +13,8 @@ from numpy.linalg import inv
 from numpy import dot, array
 import opentrons
 from opentrons import robot, instruments, types
-from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control import adapters
+# from opentrons.hardware_control.types import Axis
 from opentrons.config import robot_configs, feature_flags
 from opentrons.util.calibration_functions import probe_instrument
 from opentrons.util.linal import solve, add_z, apply_transform
@@ -71,15 +72,17 @@ class CLITool:
         self._status_text_box = urwid.Text('')
         self._pile = urwid.Pile([self._tip_text_box, self._status_text_box])
         self._filler = urwid.Filler(self._pile, 'top')
-        async_loop = asyncio.get_event_loop()
+        # async_loop = asyncio.get_event_loop()
         if not feature_flags.use_protocol_api_v2():
             self.hardware = robot
+            self._current_mount = right
         else:
             api = opentrons.hardware_control.API
-            self.hardware = async_loop.run_until_complete(
-                api.build_hardware_controller(force=True))
+            self.hardware = adapters.SynchronousAdapter.build(
+                api.build_hardware_simulator).api
+            self._current_mount = types.Mount.RIGHT
 
-        self.asyncio_loop = async_loop
+        # self.asyncio_loop = async_loop
         self.ui_loop = urwid.MainLoop(
             self._filler,
             handle_mouse=False,
@@ -93,7 +96,6 @@ class CLITool:
         self.current_position = (0, 0, 0)
         self._steps = [0.1, 0.25, 0.5, 1, 5, 10, 20, 40, 80]
         self._steps_index = 2
-        self._current_mount = right
         self._current_point = 1
 
         self._expected_points = {
@@ -113,7 +115,7 @@ class CLITool:
             '-': lambda: self.decrease_step(),
             '=': lambda: self.increase_step(),
             'z': lambda: self.save_z_value(),
-            'p': lambda: probe(self._tip_length, self.asyncio_loop),
+            'p': lambda: probe(self._tip_length),
             'enter': lambda: self.save_point(),
             '\\': lambda: self.home(),
             ' ': lambda: self.save_transform(),
@@ -192,16 +194,16 @@ class CLITool:
         to the axis of a pipette currently used
         """
 
-        if not feature_flags.use_protocol_api_v2():
-            res = position(self._current_mount, self.hardware)
-        else:
-            mount_obj = mount_by_axis[self._current_mount]
-            points = self.asyncio_loop.run_until_complete(
-                self.hardware.current_position(mount_obj))
-            res = (
-                points[Axis.X],
-                points[Axis.Y],
-                points[Axis.by_mount(mount_obj)])
+        # if not feature_flags.use_protocol_api_v2():
+        res = position(self._current_mount, self.hardware)
+        # else:
+        #     mount_obj = mount_by_axis[self._current_mount]
+        #     points = self.asyncio_loop.run_until_complete(
+        #         self.hardware.current_position(mount_obj))
+        #     res = (
+        #         points[Axis.X],
+        #         points[Axis.Y],
+        #         points[Axis.by_mount(mount_obj)])
         return res
 
     def _jog(self, axis, direction, step):
@@ -209,18 +211,13 @@ class CLITool:
         Move the pipette on `axis` in `direction` by `step` and update the
         position tracker
         """
-        if not feature_flags.use_protocol_api_v2():
-            jog(axis, direction, step, robot)
-        else:
-            if axis == 'x':
-                pt = types.Point(x=direction*step, y=0, z=0)
-            elif axis == 'y':
-                pt = types.Point(x=0, y=direction*step, z=0)
-            else:
-                pt = types.Point(x=0, y=0, z=direction*step)
-            mount_obj = mount_by_axis[self._current_mount]
-            self.asyncio_loop.run_until_complete(
-                self.hardware.move_rel(mount_obj, pt))
+        # if not feature_flags.use_protocol_api_v2():
+        jog(axis, direction, step, self.hardware, self._current_mount)
+        # else:
+        #
+        #     mount_obj = mount_by_axis[self._current_mount]
+        #     self.asyncio_loop.run_until_complete(
+        #         self.hardware.move_rel(mount_obj, pt))
         self.current_position = self._position()
         return 'Jog: {}'.format([axis, str(direction), str(step)])
 
@@ -228,11 +225,11 @@ class CLITool:
         """
         Return the robot to the home position and update the position tracker
         """
-        if not feature_flags.use_protocol_api_v2():
-            self.hardware.home()
-        else:
-            self.asyncio_loop.run_until_complete(
-                self.hardware.home())
+        # if not feature_flags.use_protocol_api_v2():
+        self.hardware.home()
+        # else:
+        #     self.asyncio_loop.run_until_complete(
+        #         self.hardware.home()
         self.current_position = self._position()
         return 'Homed'
 
@@ -242,7 +239,7 @@ class CLITool:
         current position once the 'Enter' key is pressed to the 'actual points'
         vector.
         """
-        if self._current_mount is left:
+        if self._current_mount is left or types.Mount.LEFT:
             msg = self.save_mount_offset()
         else:
             pos = self._position()[:-1]
@@ -348,24 +345,32 @@ class CLITool:
         tx, ty, tz = self._deck_to_driver_coords(point)
         if not feature_flags.use_protocol_api_v2():
             self.hardware._driver.move({'X': tx, 'Y': ty})
-            self.hardware._driver.move({self._current_mount: tz})
+            z_axis = self._get_z_axis(self._current_mount)
+            self.hardware._driver.move({z_axis: tz})
         else:
-            mount_obj = mount_by_axis[self._current_mount]
+            # mount_obj = mount_by_axis[self._current_mount]
             pt = types.Point(x=tx, y=ty, z=tz)
-            self.asyncio_loop.run_until_complete(
-                self.hardware.move_to(mount_obj, pt))
+            self.hardware.move_to(self._current_mount, pt)
         return 'moved to point {}'.format(point)
+
+    def _get_z_axis(self, mount):
+        z_axis = None
+        if self._current_mount == 'left':
+            z_axis = 'Z'
+        elif self._current_mount == 'right':
+            z_axis = 'A'
+        return z_axis
 
     def move_to_safe_height(self):
         cx, cy, _ = self._driver_to_deck_coords(self._position())
         _, _, sz = self._deck_to_driver_coords((cx, cy, SAFE_HEIGHT))
         if not feature_flags.use_protocol_api_v2():
-            self.hardware._driver.move({self._current_mount: sz})
+            z_axis = self._get_z_axis(self._current_mount)
+            self.hardware._driver.move({z_axis: sz})
         else:
-            mount_obj = mount_by_axis[self._current_mount]
+            # mount_obj = mount_by_axis[self._current_mount]
             pt = types.Point(x=cx, y=cy, z=sz)
-            self.asyncio_loop.run_until_complete(
-                self.hardware.move_to(mount_obj, pt))
+            self.hardware.move_to(self._current_mount, pt)
 
     def exit(self):
         raise urwid.ExitMainLoop
