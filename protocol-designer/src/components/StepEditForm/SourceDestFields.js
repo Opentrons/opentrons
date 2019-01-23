@@ -3,6 +3,9 @@ import * as React from 'react'
 import {FormGroup, IconButton, HoverTooltip} from '@opentrons/components'
 import cx from 'classnames'
 
+import type {StepFieldName} from '../../steplist/fieldLevel'
+import i18n from '../../localization'
+
 import type {FocusHandlers} from './index'
 import {
   LabwareDropdown,
@@ -16,7 +19,6 @@ import FlowRateField from './FlowRateField'
 import WellSelectionInput from './WellSelectionInput'
 import WellOrderInput from './WellOrderInput'
 
-import i18n from '../../localization'
 import styles from './StepEditForm.css'
 
 type Props = {
@@ -25,7 +27,7 @@ type Props = {
 }
 type State = {collapsed?: boolean}
 
-const makeAddFieldNamePrefix = (prefix: string) => (fieldName: string) => `${prefix}_${fieldName}`
+const makeAddFieldNamePrefix = (prefix: string) => (fieldName: string): StepFieldName => `${prefix}_${fieldName}`
 
 class FormSection extends React.Component<Props, State> {
   state = {collapsed: true}

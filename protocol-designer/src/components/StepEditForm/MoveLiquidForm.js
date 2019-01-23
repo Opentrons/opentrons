@@ -3,7 +3,6 @@ import * as React from 'react'
 import {FormGroup, HoverTooltip} from '@opentrons/components'
 import cx from 'classnames'
 
-import i18n from '../../localization'
 import {
   StepInputField,
   PipetteField,
@@ -11,8 +10,6 @@ import {
   DisposalVolumeFields,
   PathField,
 } from './formFields'
-import StepField from './StepFormField'
-import {CheckboxField} from '../forms'
 import SourceDestFields from './SourceDestFields'
 import getTooltipForField from './getTooltipForField'
 import styles from './StepEditForm.css'

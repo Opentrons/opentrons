@@ -44,8 +44,8 @@
 }
 
 .pipette_field {
-  lost-column: 7/16; */
-/* } */
+  lost-column: 7/16;
+} */
 
 /* Style overrides for particular step types */
 
@@ -62,15 +62,19 @@
 
 /* ------------------- */
 
-/* .field_row {
+/*
+.field_row {
   lost-utility: clearfix;
   min-height: 2.25rem;
   max-width: 24rem;
+*/
 
-  /* Field row is for: (optional checkbox) + label + associated fields
-   * All items in field row sum to 15/16, leaving 1/16 gap on the right.
-   */
-  /* & label {
+/* Field row is for: (optional checkbox) + label + associated fields
+  * All items in field row sum to 15/16, leaving 1/16 gap on the right.
+  */
+
+/*
+  & label {
     lost-column: 7/16;
     max-width: 8.5rem;
   }
@@ -81,8 +85,9 @@
 
   & .full_width {
     lost-column: 8/16;
-  } */
-/* } */
+  }
+}
+*/
 
 .repetitions_row {
   padding: 1.5rem 0;
