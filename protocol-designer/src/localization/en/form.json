@@ -50,9 +50,18 @@
         "never": "Never"
       }
     },
+    "moveLiquid": {
+      "change_tip_option": {
+        "always": "Always",
+        "once": "Once",
+        "perSource": "Per Source",
+        "perDest": "Per Destination",
+        "never": "Never"
+      }
+    },
     "field": {
       "change_tip": {
-        "label": "Get new tip"
+        "label": "Change Tip"
       },
       "tip_position": {
         "label": "Tip Position"

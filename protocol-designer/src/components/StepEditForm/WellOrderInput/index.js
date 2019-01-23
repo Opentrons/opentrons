@@ -6,6 +6,7 @@ import cx from 'classnames'
 import i18n from '../../../localization'
 import {selectors as stepFormSelectors} from '../../../step-forms'
 import styles from './WellOrderInput.css'
+import stepEditStyles from '../StepEditForm.css'
 import WellOrderModal from './WellOrderModal'
 import ZIG_ZAG_IMAGE from '../../../images/zig_zag_icon.svg'
 import type {BaseState} from '../../../types'
@@ -22,7 +23,7 @@ class WellOrderInput extends React.Component<OP & SP, WellOrderInputState> {
 
   render () {
     return (
-      <FormGroup className={cx(styles.small_field, styles.no_label)}>
+      <FormGroup className={cx(styles.small_field, stepEditStyles.no_label)}>
         <WellOrderModal
           prefix={this.props.prefix}
           closeModal={this.handleClose}

@@ -201,7 +201,7 @@ export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdo
   )
 })
 
-const CHANGE_TIP_VALUES: Array<ChangeTipOptions> = ['always', 'once', 'never']
+const CHANGE_TIP_VALUES: Array<ChangeTipOptions> = ['always', 'once', 'perSource', 'perDest', 'never']
 
 // NOTE: ChangeTipField not validated as of 6/27/18 so no focusHandlers needed
 type ChangeTipFieldProps = {name: StepFieldName, stepType: StepType}
@@ -217,8 +217,8 @@ export const ChangeTipField = (props: ChangeTipFieldProps) => {
       render={({value, updateValue, hoverTooltipHandlers}) => (
         <FormGroup
           label={i18n.t('form.step_edit_form.field.change_tip.label')}
-          hoverTooltipHandlers={hoverTooltipHandlers}
-        >
+          className={styles.large_field}
+          hoverTooltipHandlers={hoverTooltipHandlers}>
           <DropdownField
             options={options}
             value={value ? String(value) : null}
@@ -227,3 +227,71 @@ export const ChangeTipField = (props: ChangeTipFieldProps) => {
       )} />
   )
 }
+
+type DisposalVolumeFieldProps = {focusHandlers: FocusHandlers}
+export const DisposalVolumeFields = (props: DisposalVolumeFieldProps) => (
+  <FormGroup label='Multi-Dispense Options:'>
+    <StepField
+      name="aspirate_disposalVol_checkbox"
+      render={({value, updateValue}) => (
+        <React.Fragment>
+          <div className={styles.field_row}>
+            <CheckboxField
+              label="Disposal Volume"
+              value={!!value}
+              onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)} />
+            {
+              value
+                ? (
+                  <div>
+                    <StepInputField name="aspirate_disposalVol_volume" units="μL" {...props.focusHandlers} />
+                  </div>
+                )
+                : null
+            }
+          </div>
+          {
+            value
+              ? (
+                <div className={styles.field_row}>
+                  <div className={styles.sub_select_label}>Blowout</div>
+                  <BlowoutLocationDropdown
+                    name="blowout_location"
+                    className={styles.full_width}
+                    includeSourceWell
+                    {...props.focusHandlers} />
+                </div>
+              )
+              : null
+          }
+        </React.Fragment>
+      )} />
+  </FormGroup>
+)
+
+type PathFieldProps = {focusHandlers: FocusHandlers}
+export const PathField = (props: PathFieldProps) => (
+  <FormGroup label='Path:'>
+    <StepField
+      name="path"
+      render={({value, updateValue}) => (
+        <ul className={styles.path_options}>
+          <li
+            className={cx(styles.path_option, {[styles.selected]: value === 'single'})}
+            onClick={(e: SyntheticMouseEvent<*>) => updateValue('single')}>
+            Single
+          </li>
+          <li
+            className={cx(styles.path_option, {[styles.selected]: value === 'multiDispense'})}
+            onClick={(e: SyntheticMouseEvent<*>) => updateValue('multiDispense')}>
+            Multi-Dispense
+          </li>
+          <li
+            className={cx(styles.path_option, {[styles.selected]: value === 'multiAspirate'})}
+            onClick={(e: SyntheticMouseEvent<*>) => updateValue('multiAspirate')}>
+            Multi-Aspirate
+          </li>
+        </ul>
+      )} />
+  </FormGroup>
+)

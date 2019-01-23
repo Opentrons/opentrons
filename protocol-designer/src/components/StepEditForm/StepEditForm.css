@@ -159,7 +159,7 @@
 }
 
 .no_label {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
 .advanced_settings_icon {
@@ -172,6 +172,27 @@
   width: 100%;
   background-color: var(--c-light-gray);
   margin: 1em 0;
+}
+
+/* TODO: real styles using rem and canonical colors */
+.path_option {
+  width: 35px;
+  height: 24px;
+  margin-right: 0.5rem;
+  border-radius: 3px;
+  border: 1px solid #9b9b9b;
+  font-size: 0.5rem;
+  cursor: pointer;
+}
+
+.path_option.selected {
+  background-color: var(--c-light-gray);
+}
+
+.path_options {
+  display: flex;
+  flex-direction: row;
+  list-style: none;
 }
 
 @media screen and (max-width: 1279px) {
