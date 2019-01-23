@@ -26,6 +26,7 @@ class TouchTipStrategy(enum.Enum):
 
 
 class BlowOutStrategy(enum.Enum):
+    NONE = enum.auto()
     TRASH = enum.auto()
     DEST_IF_EMPTY = enum.auto()
     CUSTOM_LOCATION = enum.auto()
@@ -50,7 +51,7 @@ class Transfer(NamedTuple):
     disposal_volume: Optional[float] = 0
     mix_strategy: MixStrategy = MixStrategy.NEVER
     drop_tip_strategy: DropTipStrategy = DropTipStrategy.TRASH
-    blow_out_strategy: BlowOutStrategy = BlowOutStrategy.TRASH
+    blow_out_strategy: BlowOutStrategy = BlowOutStrategy.NONE
     touch_tip_strategy: TouchTipStrategy = TouchTipStrategy.NEVER
 
 
@@ -459,8 +460,7 @@ class TransferPlan:
             if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
                 yield self._format_dict('pick_up_tip', kwargs=self._tip_opts)
             max_vol = self._instr.max_volume - \
-                      self._strategy.disposal_volume - \
-                      self._strategy.air_gap
+                self._strategy.disposal_volume - self._strategy.air_gap
             xferred_vol = 0
             while xferred_vol < step_vol:
                 # TODO: account for unequal length sources, dests
@@ -568,7 +568,7 @@ class TransferPlan:
 
             Considering all options, the sequence of actions is:
             1. Going from source to dest1:
-               *New Tip -> Mix -> Aspirate (with disposal volume?) -> Air gap ->
+               *New Tip -> Mix -> Aspirate (with disposal volume?) -> Air gap
                -> Touch tip -> Dispense air gap -> Dispense -> Mix if empty ->
                -> Blow out -> Touch tip -> Drop tip*
             2. Going from source(n) to source(n+1):
@@ -634,9 +634,7 @@ class TransferPlan:
 
     def _after_dispense(self, loc, is_disp_next=False):
         # This sequence of actions is subject to change
-        # TODO: write a proper sequence for blow_out. Current sequence is buggy
         if not is_disp_next:
-            # TODO: check this logic. Esp blow_out
             if self._instr.current_volume == 0:
                 if self._strategy.mix_strategy == MixStrategy.AFTER or \
                         self._strategy.mix_strategy == MixStrategy.BOTH:
@@ -644,9 +642,13 @@ class TransferPlan:
                 if self._strategy.blow_out_strategy \
                    == BlowOutStrategy.DEST_IF_EMPTY:
                     yield self._format_dict('blow_out', [loc])
-            else:
-                # Custom location. Or trash if not specified
+            if self._strategy.blow_out_strategy == BlowOutStrategy.TRASH:
+                yield self._format_dict('blow_out', [
+                    self._instr.trash_container.wells()[0]])
+            elif self._strategy.blow_out_strategy == \
+                    BlowOutStrategy.CUSTOM_LOCATION:
                 yield self._format_dict('blow_out', kwargs=self._blow_opts)
+
         else:
             # Used by distribute
             if self._strategy.air_gap:
@@ -717,6 +719,8 @@ class TransferPlan:
         if isinstance(s, List) and isinstance(s[0], List):
             # s is a List[List]]; flatten to 1D list
             s = [well for list_elem in s for well in list_elem]
+        elif isinstance(s, Well):
+            s = [s]
         new_src = []
         for well in s:
             if self._is_first_row(well):
@@ -726,6 +730,8 @@ class TransferPlan:
         if isinstance(d, List) and isinstance(d[0], List):
             # s is a List[List]]; flatten to 1D list
             d = [well for list_elem in d for well in list_elem]
+        elif isinstance(d, Well):
+            d = [d]
         new_dst = []
         for well in d:
             if self._is_first_row(well):

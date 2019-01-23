@@ -536,6 +536,7 @@ def test_blow_out(loop, monkeypatch):
     instr.blow_out()
     assert move_location == lw.wells()[0].top()
 
+
 @pytest.mark.xfail
 def test_transfer(loop):
     ctx = papi.ProtocolContext(loop)
@@ -547,4 +548,3 @@ def test_transfer(loop):
 
     ctx.home()
     instr.transfer(10, lw1.columns()[0], lw2.columns()[0])
-

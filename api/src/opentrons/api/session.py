@@ -11,6 +11,7 @@ from opentrons.legacy_api.containers import get_container, location_to_list
 from opentrons.legacy_api.containers.placeable import (
     Module as ModulePlaceable, Placeable)
 from opentrons.commands import tree, types as command_types
+from opentrons.commands.commands import is_new_loc, listify
 from opentrons.protocols import execute_protocol
 from opentrons.config import feature_flags as ff
 from opentrons.protocol_api import (ProtocolContext,
@@ -467,19 +468,12 @@ def _get_labware(command):
             containers.append(_get_new_labware(location))
 
     if locations:
-        try:
-            list_of_locations = location_to_list(locations)
-        except ValueError:
-            if isinstance(locations, list):
-                if isinstance(locations[0], list):
-                    # unpack
-                    locations = [loc
-                                 for loc_list in locations for loc in loc_list]
-                if(isinstance(loc, (Location, labware.Well, labware.Labware))
-                   for loc in locations):
-                    containers.extend(
-                        [_get_new_labware(loc) for loc in locations])
+        if is_new_loc(locations):
+            list_of_locations = listify(locations)
+            containers.extend(
+                [_get_new_labware(loc) for loc in list_of_locations])
         else:
+            list_of_locations = location_to_list(locations)
             containers.extend(
                 [get_container(location) for location in list_of_locations])
 

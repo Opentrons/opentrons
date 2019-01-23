@@ -2,7 +2,7 @@ from . import types as command_types
 from ..broker import broker
 import functools
 import inspect
-from typing import Union, Sequence
+from typing import Union, Sequence, List, Any
 
 from opentrons.legacy_api.containers import (Well as OldWell,
                                              Container as OldContainer,
@@ -12,24 +12,15 @@ from opentrons.protocol_api.labware import Well, Labware, ModuleGeometry
 from opentrons.types import Location
 
 
-def _get_loc_info(location: Union[Location, Well, Sequence]) -> dict:
-    loc_info = {'type': type(location), 'is_2D': False, 'is_new_loc': False}
-    if isinstance(location, list):
-        if isinstance(location[0], list):
-            loc_info['is_2D'] = True
-            location = [loc for loc_list in location for loc in loc_list]
-        if isinstance(location[0], (Location, Well)):
-            loc_info['is_new_loc'] = True
-    elif isinstance(location, (Location, Well)):
-        loc_info['is_new_loc'] = True
-    return loc_info
+def is_new_loc(location: Union[Location, Well, None,
+                               OldWell, OldContainer,
+                               OldSlot, Sequence]) -> bool:
+    return isinstance(listify(location)[0], (Location, Well))
 
 
-def _listify_new_loc(location: Union[Location, Well, Sequence]) -> list:
+def listify(location: Any) -> List:
     if isinstance(location, list):
-        if _get_loc_info(location)['is_2D']:
-            location = [loc for loc_list in location for loc in loc_list]
-        return location
+        return sum([listify(loc) for loc in location], [])
     else:
         return [location]
 
@@ -81,18 +72,12 @@ def _stringify_legacy_loc(loc: Union[OldWell, OldContainer,
 def stringify_location(location: Union[Location, None,
                                        OldWell, OldContainer,
                                        OldSlot, Sequence]) -> str:
-    if _get_loc_info(location)['is_new_loc']:
-        if isinstance(location, list):
-            if _get_loc_info(location)['is_2D']:
-                location = [loc for loc_list in location for loc in loc_list]
-            loc_str_list = []
-            for loc in location:
-                loc_str_list.append(_stringify_new_loc(loc))
-            return ','.join(loc_str_list)
-        else:
-            return _stringify_new_loc(location)
+    if is_new_loc(location):
+        loc_str_list = [_stringify_new_loc(loc)
+                        for loc in listify(location)]
+        return ', '.join(loc_str_list)
     else:
-        return _stringify_legacy_loc(location)
+        return _stringify_legacy_loc(location)  # type: ignore
 
 
 def make_command(name, payload):
@@ -151,9 +136,9 @@ def consolidate(instrument, volume, source, dest):
         source=stringify_location(source),
         dest=stringify_location(dest)
     )
-    if _get_loc_info(source)['is_new_loc']:
+    if is_new_loc(source):
         # Dest is assumed as new location too
-        locations = [] + _listify_new_loc(source) + _listify_new_loc(dest)
+        locations = [] + listify(source) + listify(dest)
     else:
         # incase either source or dest is list of tuple location
         # strip both down to simply lists of Placeables
@@ -177,9 +162,9 @@ def distribute(instrument, volume, source, dest):
         source=stringify_location(source),
         dest=stringify_location(dest)
     )
-    if _get_loc_info(source)['is_new_loc']:
+    if is_new_loc(source):
         # Dest is assumed as new location too
-        locations = [] + _listify_new_loc(source) + _listify_new_loc(dest)
+        locations = [] + listify(source) + listify(dest)
     else:
         # incase either source or dest is list of tuple location
         # strip both down to simply lists of Placeables
@@ -203,9 +188,9 @@ def transfer(instrument, volume, source, dest):
         source=stringify_location(source),
         dest=stringify_location(dest)
     )
-    if _get_loc_info(source)['is_new_loc']:
+    if is_new_loc(source):
         # Dest is assumed as new location too
-        locations = [] + _listify_new_loc(source) + _listify_new_loc(dest)
+        locations = [] + listify(source) + listify(dest)
     else:
         # incase either source or dest is list of tuple location
         # strip both down to simply lists of Placeables
