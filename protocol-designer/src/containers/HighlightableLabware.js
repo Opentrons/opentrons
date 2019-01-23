@@ -42,7 +42,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     }
   }
 
-  const labware = selectors.getLabwareById(state)[containerId]
+  const labware = stepFormSelectors.getLabwareById(state)[containerId]
   const allWellContentsForSteps = wellContentsSelectors.getAllWellContentsForSteps(state)
   const wellSelectionModeForLabware = selectedContainerId === containerId
   let wellContents: ContentsByWell = {}

@@ -64,7 +64,7 @@ const drillDownLabwareId = handleActions({
 }, null)
 
 export type ContainersState = {
-  [id: string]: ?Labware,
+  [id: string]: ?Labware, // TODO IMMEDIATELY: switch to DisplayLabware type
 }
 
 export type SelectedLiquidGroupState = {liquidGroupId: ?string, newLiquidGroup?: true}
@@ -111,10 +111,8 @@ export const containers = handleActions({
     return {
       ...state,
       [id]: {
-        slot: action.payload.slot || nextEmptySlot(_loadedContainersBySlot(state)),
         type: action.payload.containerType,
         disambiguationNumber: getNextDisambiguationNumber(state, action.payload.containerType),
-        id,
         nickname: null, // create with null name, so we force explicit naming.
       },
     }

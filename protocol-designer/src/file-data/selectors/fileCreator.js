@@ -43,7 +43,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
   stepFormSelectors.getSavedStepForms,
   stepFormSelectors.getOrderedStepIds,
   stepFormSelectors.getPipetteEntities,
-  ingredSelectors.getLabwareNicknamesById,
+  stepFormSelectors.getLabwareNicknamesById,
   (
     fileMetadata,
     initialRobotState,

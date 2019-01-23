@@ -6,7 +6,7 @@ import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import some from 'lodash/some'
 import {createSelector} from 'reselect'
-import {getPipetteNameSpecs, getLabware} from '@opentrons/shared-data'
+import {getIsTiprack, getPipetteNameSpecs, getLabware} from '@opentrons/shared-data'
 import {INITIAL_DECK_SETUP_STEP_ID} from '../../constants'
 import {
   generateNewForm,
@@ -19,6 +19,7 @@ import {
   getFieldErrors,
 } from '../../steplist/fieldLevel'
 import {addSpecsToPipetteInvariantProps} from '../utils'
+import {labwareToDisplayName} from '../../labware-ingred/utils' // TODO IMMEDIATELY - move into local utils
 
 import type {ElementProps} from 'react'
 import type {
@@ -48,8 +49,9 @@ import type {
   FormPipettesByMount,
 } from '../types'
 import type {RootState} from '../reducers'
-import type {BaseState, Selector} from '../../types'
+import type {BaseState, Selector, Options} from '../../types'
 import type {FormData, StepIdType, StepType} from '../../form-types'
+import type {Labware, LabwareTypeById} from '../../labware-ingred/types'
 
 // TODO: BC 2018-10-30 after separation of getStepArgs and getStepErrors
 // , move the NO_SAVED_FORM_ERROR into a separate wrapping selector
@@ -89,6 +91,93 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
       }),
     }
   }
+)
+
+// TODO IMMEDIATELY: deprecated, is it reasonable to replace Labware -> LabwareEntity? If not, rename getLabwareByIdDeprecated
+// TODO IMMEDIATELY: take slot and type out of labware-ingred containers reducer
+export const getLabwareById: Selector<{[labwareId: string]: ?Labware}> = createSelector(
+  getLabwareEntities,
+  state => state.labwareIngred.containers,
+  (labwareEntities, oldLabwareById) => mapValues(
+    labwareEntities,
+    (labwareEntity: $Values<LabwareEntities>, id: string): ?Labware =>
+      ({...oldLabwareById[id], ...labwareEntity}))
+)
+
+export const getLabwareNicknamesById: Selector<{[labwareId: string]: string}> = createSelector(
+  getLabwareById,
+  (labwareById) => mapValues(
+    labwareById,
+    labwareToDisplayName,
+  )
+)
+
+// TODO IMMEDIATELY move to general constants
+const DISPOSAL_LABWARE_TYPES = ['trash-box', 'fixed-trash']
+/** Returns options for disposal (e.g. fixed trash and trash box) */
+export const getDisposalLabwareOptions: Selector<Options> = createSelector(
+  getLabwareById,
+  getLabwareNicknamesById,
+  (labwareById, names) => reduce(labwareById, (acc: Options, labware: Labware, labwareId): Options => {
+    if (!labware.type || !DISPOSAL_LABWARE_TYPES.includes(labware.type)) {
+      return acc
+    }
+    return [
+      ...acc,
+      {
+        name: names[labwareId],
+        value: labwareId,
+      },
+    ]
+  }, [])
+)
+
+// TODO IMMEDIATELY
+/** Returns options for dropdowns, excluding tiprack labware */
+export const getLabwareOptions: Selector<Options> = createSelector(
+  getLabwareById,
+  getLabwareNicknamesById,
+  (labwareById, names) => reduce(labwareById, (acc: Options, labware: Labware, labwareId): Options => {
+    const isTiprack = getIsTiprack(labware.type)
+    if (!labware.type || isTiprack) {
+      return acc
+    }
+    return [
+      ...acc,
+      {
+        name: names[labwareId],
+        value: labwareId,
+      },
+    ]
+  }, [])
+)
+
+export const getLabwareTypes: Selector<LabwareTypeById> = createSelector(
+  getLabwareById,
+  (labwareById) => mapValues(
+    labwareById,
+    (labware: Labware) => labware.type
+  )
+)
+
+export const getSelectedLabware: Selector<?Labware> = createSelector(
+  state => state.labwareIngred.selectedContainerId, // HACK TODO IMMEDIATELY
+  getLabwareById,
+  (selectedLabwareId, labware) =>
+    (selectedLabwareId && labware[selectedLabwareId]) || null
+)
+
+type ContainersBySlot = {[DeckSlot]: {...Labware, containerId: string}}
+export const getContainersBySlot: Selector<ContainersBySlot> = createSelector(
+  getLabwareById,
+  containers => reduce(
+    containers,
+    (acc: ContainersBySlot, containerObj: Labware, containerId: string) => ({
+      ...acc,
+      // NOTE: containerId added in so you still have a reference
+      [containerObj.slot]: {...containerObj, containerId},
+    }),
+    {})
 )
 
 export const getPermittedTipracks: Selector<Array<string>> = createSelector(

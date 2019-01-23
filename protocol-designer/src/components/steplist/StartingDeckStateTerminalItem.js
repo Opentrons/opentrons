@@ -6,7 +6,7 @@ import {PDListItem} from '../lists'
 import {START_TERMINAL_TITLE} from '../../constants'
 import type {BaseState} from '../../types'
 import {START_TERMINAL_ITEM_ID} from '../../steplist'
-import {selectors as labwareIngredsSelectors} from '../../labware-ingred/selectors'
+import {selectors as stepFormSelectors} from '../../step-forms'
 
 type Props = {
   showHint: boolean,
@@ -29,7 +29,7 @@ function StartingDeckStateTerminalItem (props: Props) {
 
 function mapStateToProps (state: BaseState): Props {
   // since default-trash counts as 1, labwareCount <= 1 means "user did not add labware"
-  const noLabware = Object.keys(labwareIngredsSelectors.getLabwareById(state)).length <= 1
+  const noLabware = Object.keys(stepFormSelectors.getLabwareById(state)).length <= 1
   return {showHint: noLabware}
 }
 

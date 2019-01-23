@@ -8,6 +8,7 @@ import styles from './TitleBar.css'
 import i18n from '../localization'
 import {START_TERMINAL_TITLE, END_TERMINAL_TITLE} from '../constants'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
+import {selectors as stepFormSelectors} from '../step-forms'
 import {selectors as stepsSelectors, actions as stepsActions} from '../ui/steps'
 import {END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID} from '../steplist'
 import {selectors as fileDataSelectors} from '../file-data'
@@ -42,15 +43,16 @@ function TitleWithIcon (props: TitleWithIconProps) {
 }
 
 function mapStateToProps (state: BaseState): SP {
+  const selectedLabware = stepFormSelectors.getSelectedLabware(state)
   const _page = selectors.getCurrentPage(state)
   const fileName = fileDataSelectors.protocolName(state)
   const selectedStep = stepsSelectors.getSelectedStep(state)
   const selectedTerminalId = stepsSelectors.getSelectedTerminalItemId(state)
-  const labware = labwareIngredSelectors.getSelectedLabware(state)
-  const labwareNames = labwareIngredSelectors.getLabwareNicknamesById(state)
+  const labware = selectedLabware
+  const labwareNames = stepFormSelectors.getLabwareNicknamesById(state)
   const labwareNickname = labware && labware.id && labwareNames[labware.id]
   const drilledDownLabwareId = labwareIngredSelectors.getDrillDownLabwareId(state)
-  const liquidPlacementMode = !!labwareIngredSelectors.getSelectedLabware(state)
+  const liquidPlacementMode = Boolean(selectedLabware)
   const wellSelectionLabwareKey = stepsSelectors.getWellSelectionLabwareKey(state)
 
   switch (_page) {
@@ -86,7 +88,7 @@ function mapStateToProps (state: BaseState): SP {
         subtitle = END_TERMINAL_TITLE
         if (drilledDownLabwareId) {
           backButtonLabel = 'Deck'
-          const drilledDownLabware = labwareIngredSelectors.getLabwareById(state)[drilledDownLabwareId]
+          const drilledDownLabware = stepFormSelectors.getLabwareById(state)[drilledDownLabwareId]
           title = drilledDownLabware && drilledDownLabware.nickname
           subtitle = drilledDownLabware && humanizeLabwareType(drilledDownLabware.type)
         }

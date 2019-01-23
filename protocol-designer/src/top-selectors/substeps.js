@@ -1,7 +1,6 @@
 // @flow
 import {createSelector} from 'reselect'
 
-import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
 import {selectors as stepFormSelectors} from '../step-forms'
 import {selectors as fileDataSelectors} from '../file-data'
 
@@ -17,7 +16,7 @@ type AllSubsteps = {[StepIdType]: ?SubstepItemData}
 export const allSubsteps: Selector<AllSubsteps> = createSelector(
   stepFormSelectors.getArgsAndErrorsByStepId,
   stepFormSelectors.getInitialDeckSetup,
-  labwareIngredSelectors.getLabwareTypes,
+  stepFormSelectors.getLabwareTypes,
   stepFormSelectors.getOrderedStepIds,
   fileDataSelectors.getRobotStateTimeline,
   fileDataSelectors.getInitialRobotState,

@@ -4,7 +4,6 @@ import selectors from './selectors'
 import {changeFormInput} from '../steplist/actions'
 
 import {selectors as stepFormSelectors} from '../step-forms'
-import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
 
 import type {ThunkDispatch, GetState} from '../types'
 import type {StepFieldName} from '../form-types'
@@ -71,7 +70,7 @@ export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload) =
       stepFormSelectors.getPipetteEntities(state)[payload.pipetteId]
     ) || null
 
-    const labware = labwareIngredSelectors.getLabwareById(state)
+    const labware = stepFormSelectors.getLabwareById(state)
     // TODO type this action, make an underline fn action creator
 
     dispatch({

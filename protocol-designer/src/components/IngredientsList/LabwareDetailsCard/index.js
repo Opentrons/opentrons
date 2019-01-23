@@ -2,7 +2,7 @@
 import {connect} from 'react-redux'
 import assert from 'assert'
 import LabwareDetailsCard from './LabwareDetailsCard'
-import {selectors as labwareIngredSelectors} from '../../../labware-ingred/selectors'
+import {selectors as stepFormSelectors} from '../../../step-forms'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import type {ElementProps} from 'react'
 import type {Dispatch} from 'redux'
@@ -17,7 +17,7 @@ type DP = {
 type SP = $Diff<Props, DP> & {_labwareId: ?string}
 
 function mapStateToProps (state: BaseState): SP {
-  const labwareData = labwareIngredSelectors.getSelectedLabware(state)
+  const labwareData = stepFormSelectors.getSelectedLabware(state)
   assert(labwareData, 'Expected labware data to exist in connected labware details card')
 
   const props = (labwareData)

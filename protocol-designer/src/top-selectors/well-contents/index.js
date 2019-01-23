@@ -10,6 +10,7 @@ import omitBy from 'lodash/omitBy'
 import * as StepGeneration from '../../step-generation'
 import {selectors as fileDataSelectors} from '../../file-data'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/selectors'
+import {selectors as stepFormSelectors} from '../../step-forms'
 import wellSelectionSelectors from '../../well-selection/selectors'
 import {getAllWellsForLabware, getMaxVolumes} from '../../constants'
 
@@ -111,7 +112,7 @@ export const getLastValidWellContents: Selector<WellContentsByLabware> = createS
 
 export const getSelectedWellsMaxVolume: Selector<number> = createSelector(
   wellSelectionSelectors.getSelectedWells,
-  labwareIngredSelectors.getSelectedLabware,
+  stepFormSelectors.getSelectedLabware,
   (selectedWells, selectedContainer) => {
     const selectedWellNames = Object.keys(selectedWells)
     const selectedContainerType = selectedContainer && selectedContainer.type

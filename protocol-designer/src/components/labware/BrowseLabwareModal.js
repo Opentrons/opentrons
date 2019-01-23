@@ -18,6 +18,7 @@ import i18n from '../../localization'
 
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import {selectors} from '../../labware-ingred/selectors'
+import {selectors as stepFormSelectors} from '../../step-forms'
 import * as labwareIngredsActions from '../../labware-ingred/actions'
 import type {ContentsByWell} from '../../labware-ingred/types'
 import type {WellIngredientNames} from '../../steplist/types'
@@ -91,7 +92,7 @@ class BrowseLabwareModal extends React.Component<Props> {
 
 function mapStateToProps (state: BaseState): SP {
   const labwareId = selectors.getDrillDownLabwareId(state)
-  const allLabware = selectors.getLabwareById(state)
+  const allLabware = stepFormSelectors.getLabwareById(state)
   const labware = labwareId && allLabware ? allLabware[labwareId] : null
   const allWellContents = wellContentsSelectors.getLastValidWellContents(state)
   const wellContents = labwareId && allWellContents ? allWellContents[labwareId] : {}

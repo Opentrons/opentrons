@@ -14,6 +14,7 @@ import SingleLabwareWrapper from '../components/SingleLabware'
 import WellSelectionInstructions from './WellSelectionInstructions'
 
 import {selectors} from '../labware-ingred/selectors'
+import {selectors as stepFormSelectors} from '../step-forms'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
 import wellSelectionSelectors from '../well-selection/selectors'
 import {
@@ -85,7 +86,7 @@ const mapStateToProps = (state: BaseState): SP => {
     }
   }
 
-  const labware = selectors.getLabwareById(state)[containerId]
+  const labware = stepFormSelectors.getLabwareById(state)[containerId]
   let wellContents: ContentsByWell = {}
 
   // selection for deck setup: shows initial state of liquids
