@@ -10,7 +10,7 @@ import {
 import {PDTitledList} from '../lists'
 import listButtonStyles from '../listButtons.css'
 
-import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
+import {selectors as labwareIngredSelectors} from '../../labware-ingred/selectors'
 import type {OrderedLiquids} from '../../labware-ingred/types'
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import type {BaseState} from '../../types'
