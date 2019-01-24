@@ -107,11 +107,11 @@ export const containers = handleActions({
       : state
   },
   DUPLICATE_LABWARE: (state: ContainersState, action: DuplicateLabwareAction): ContainersState => {
-    const {duplicateLabwareId, newDisambiguationNumber} = action.payload
+    const {duplicateLabwareId, duplicateDisambiguationNumber} = action.payload
     return {
       ...state,
       [duplicateLabwareId]: {
-        disambiguationNumber: newDisambiguationNumber,
+        disambiguationNumber: duplicateDisambiguationNumber,
         nickname: null, // create with null nickname, so we force explicit naming.
       },
     }

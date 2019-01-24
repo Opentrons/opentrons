@@ -49,7 +49,7 @@ export const duplicateLabware = (templateLabwareId: string) =>
     dispatch({
       type: 'DUPLICATE_LABWARE',
       payload: {
-        newDisambiguationNumber: getNextDisambiguationNumber(state, templateLabwareEntity.type),
+        duplicateDisambiguationNumber: getNextDisambiguationNumber(state, templateLabwareEntity.type),
         templateLabwareId,
         duplicateLabwareId: uuid(),
       },

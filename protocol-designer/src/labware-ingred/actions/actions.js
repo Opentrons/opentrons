@@ -111,7 +111,7 @@ export type DuplicateLabwareAction = {
   payload: {
     templateLabwareId: string,
     duplicateLabwareId: string,
-    newDisambiguationNumber: number,
+    duplicateDisambiguationNumber: number,
   },
 }
 
