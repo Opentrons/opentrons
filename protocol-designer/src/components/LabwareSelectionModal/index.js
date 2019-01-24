@@ -1,12 +1,11 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import type {Dispatch} from 'redux'
 import LabwareSelectionModal from './LabwareSelectionModal'
 import {closeLabwareSelector, createContainer} from '../../labware-ingred/actions'
 import {selectors as labwareIngredSelectors} from '../../labware-ingred/selectors'
 import {selectors as stepFormSelectors} from '../../step-forms'
-import type {BaseState} from '../../types'
+import type {BaseState, ThunkDispatch} from '../../types'
 
 type Props = React.ElementProps<typeof LabwareSelectionModal>
 
@@ -22,7 +21,7 @@ function mapStateToProps (state: BaseState): SP {
   }
 }
 
-function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Props {
+function mergeProps (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>}): Props {
   const dispatch = dispatchProps.dispatch
 
   return {

@@ -24,6 +24,11 @@ type RootSlice = {labwareIngred: RootState}
 
 const rootSelector = (state: RootSlice): RootState => state.labwareIngred
 
+const getLabwareNameInfo = createSelector(
+  rootSelector,
+  s => s.containers
+)
+
 const getLiquidGroupsById = (state: RootSlice) => rootSelector(state).ingredients
 const getLiquidsByLabwareId = (state: RootSlice) => rootSelector(state).ingredLocations
 
@@ -130,6 +135,7 @@ export const selectors = {
   getLiquidsByLabwareId,
   getLiquidNamesById,
   getLabwareSelectionMode,
+  getLabwareNameInfo,
   getLiquidSelectionOptions,
   getLiquidGroupsOnDeck,
   getNextLiquidGroupId,

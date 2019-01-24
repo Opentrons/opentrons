@@ -14,6 +14,7 @@ import type {LiquidGroupsById, Labware, DisplayLabware} from '../types'
 import type {LoadFileAction} from '../../load-file'
 import type {
   RemoveWellsContents,
+  CreateContainerAction,
   DeleteLiquidGroup,
   DuplicateLabwareAction,
   EditLiquidGroupAction,
@@ -77,31 +78,14 @@ const initialLabwareState: ContainersState = {
   },
 }
 
-// TODO IMMEDIATELY
-function getNextDisambiguationNumber (allLabwareById: ContainersState, labwareType: string): number {
-  // const allIds = Object.keys(allLabwareById)
-  const sameTypeLabware = [] // TODO IMMEDIATELY
-  // const sameTypeLabware = allIds.filter(labwareId =>
-  // allLabwareById[labwareId] &&
-  // allLabwareById[labwareId].type === labwareType)
-  const disambigNumbers = sameTypeLabware.map(labwareId =>
-    (allLabwareById[labwareId] &&
-    allLabwareById[labwareId].disambiguationNumber) || 0)
-
-  return disambigNumbers.length > 0
-    ? Math.max(...disambigNumbers) + 1
-    : 1
-}
-
 export const containers = handleActions({
-  CREATE_CONTAINER: (state: ContainersState, action: ActionType<typeof actions.createContainer>) => {
+  CREATE_CONTAINER: (state: ContainersState, action: CreateContainerAction): ContainersState => {
     const id = action.payload.id
     return {
       ...state,
       [id]: {
-        type: action.payload.containerType,
-        disambiguationNumber: getNextDisambiguationNumber(state, action.payload.containerType),
-        nickname: null, // create with null name, so we force explicit naming.
+        disambiguationNumber: action.payload.disambiguationNumber,
+        nickname: null, // create with null nickname, so we force explicit naming.
       },
     }
   },
@@ -109,7 +93,7 @@ export const containers = handleActions({
     state,
     (value: Labware, key: string) => key !== action.payload.containerId
   ),
-  RENAME_LABWARE: (state: ContainersState, action: ActionType<typeof actions.renameLabware>) => {
+  RENAME_LABWARE: (state: ContainersState, action: ActionType<typeof actions.renameLabware>): ContainersState => {
     const {labwareId, name} = action.payload
     // ignore renaming to whitespace
     return (name && name.trim())
@@ -123,32 +107,32 @@ export const containers = handleActions({
       : state
   },
   DUPLICATE_LABWARE: (state: ContainersState, action: DuplicateLabwareAction): ContainersState => {
-    const {duplicateLabwareId} = action.payload // templateLabwareId,
-    // const templateLabware = state[templateLabwareId]
+    const {duplicateLabwareId, newDisambiguationNumber} = action.payload
     return {
       ...state,
       [duplicateLabwareId]: {
-        disambiguationNumber: 'todo!', // TODO IMMEDIATELY
-        nickname: null, // create with null name, so we force explicit naming.
+        disambiguationNumber: newDisambiguationNumber,
+        nickname: null, // create with null nickname, so we force explicit naming.
       },
     }
   },
   LOAD_FILE: (state: ContainersState, action: LoadFileAction): ContainersState => {
     const file = action.payload
     const allFileLabware = file.labware
-    const labwareIds: Array<string> = Object.keys(allFileLabware).sort((a, b) =>
+    const sortedLabwareIds: Array<string> = Object.keys(allFileLabware).sort((a, b) =>
       Number(allFileLabware[a].slot) - Number(allFileLabware[b].slot))
 
-    return labwareIds.reduce((acc: ContainersState, id): ContainersState => {
+    return sortedLabwareIds.reduce((acc: ContainersState, id): ContainersState => {
       const fileLabware = allFileLabware[id]
+      const nickname = fileLabware['display-name']
+      console.log({fileLabware, ids: Object.keys(acc)})
+      const disambiguationNumber = Object.keys(acc)
+        .filter(filterId => allFileLabware[filterId]['display-name'] === nickname).length + 1
       return {
         ...acc,
         [id]: {
-          slot: fileLabware.slot,
-          id,
-          type: fileLabware.model,
-          nickname: fileLabware['display-name'],
-          disambiguationNumber: getNextDisambiguationNumber(acc, fileLabware.model),
+          nickname,
+          disambiguationNumber,
         },
       }
     }, {})

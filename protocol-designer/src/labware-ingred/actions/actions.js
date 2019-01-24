@@ -2,11 +2,10 @@
 import {createAction} from 'redux-actions'
 import type {Dispatch} from 'redux'
 
-import {selectors} from './selectors'
-import {uuid} from '../utils'
-import type {GetState} from '../types'
-import type {IngredInputs} from './types'
+import {selectors} from '../selectors'
 import type {DeckSlot} from '@opentrons/components'
+import type {GetState} from '../../types'
+import type {IngredInputs} from '../types'
 
 type IngredInputsExact = $Exact<IngredInputs>
 
@@ -48,26 +47,19 @@ export const drillUpFromLabware = createAction(
 
 // ==== Create/delete/modify labware =====
 
-type CreateContainerArgs = {
+export type CreateContainerArgs = {|
   slot?: DeckSlot,
   containerType: string,
-}
+|}
 
 export type CreateContainerAction = {
   type: 'CREATE_CONTAINER',
   payload: {
-    ...$Exact<CreateContainerArgs>,
+    ...CreateContainerArgs,
     id: string,
+    disambiguationNumber: number,
   },
 }
-
-export const createContainer = createAction(
-  'CREATE_CONTAINER',
-  (args: CreateContainerArgs) => ({
-    id: `${uuid()}:${args.containerType}`,
-    ...args,
-  })
-)
 
 export type DeleteContainerAction = {
   type: 'DELETE_CONTAINER',
@@ -119,15 +111,9 @@ export type DuplicateLabwareAction = {
   payload: {
     templateLabwareId: string,
     duplicateLabwareId: string,
+    newDisambiguationNumber: number,
   },
 }
-export const duplicateLabware = (templateLabwareId: string): DuplicateLabwareAction => ({
-  type: 'DUPLICATE_LABWARE',
-  payload: {
-    templateLabwareId,
-    duplicateLabwareId: uuid(),
-  },
-})
 
 export type RemoveWellsContents = {
   type: 'REMOVE_WELLS_CONTENTS',

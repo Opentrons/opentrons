@@ -4,9 +4,7 @@ import type {LabwareData, LocationLiquidState} from '../step-generation'
 
 //  ===== LABWARE ===========
 
-// NOTE: In labware-ingred, labware objects have a `disambiguationNumber` field
-// so that UI can render "96 Flat (2)"
-// TODO IMMEDIATELY deprecate, right???
+// TODO: Ian 2019-01-24 deprecate this type, use LabwareEntity or DisplayLabware instead
 export type Labware = {|
   ...LabwareData,
   id: string,
@@ -14,7 +12,6 @@ export type Labware = {|
   disambiguationNumber: number,
 |}
 
-// TODO IMMEDIATELY: this is the type that should be used in labwareIngred.containers
 export type DisplayLabware = {|
   nickname: ?string,
   disambiguationNumber: number,

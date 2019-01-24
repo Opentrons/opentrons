@@ -1,7 +1,6 @@
 // @flow
 import type {ElementProps} from 'react'
 import {connect} from 'react-redux'
-import type {Dispatch} from 'redux'
 import mapValues from 'lodash/mapValues'
 import uniq from 'lodash/uniq'
 import {INITIAL_DECK_SETUP_STEP_ID} from '../../../constants'
@@ -13,7 +12,7 @@ import * as labwareIngredActions from '../../../labware-ingred/actions'
 import {actions as stepFormActions} from '../../../step-forms'
 import {actions as steplistActions} from '../../../steplist'
 import FilePipettesModal from '../FilePipettesModal'
-import type {BaseState} from '../../../types'
+import type {BaseState, ThunkDispatch} from '../../../types'
 import type {PipetteOnDeck} from '../../../step-forms'
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(FilePipettesModal)
@@ -40,7 +39,7 @@ function mapStateToProps (state: BaseState): SP {
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch<*>): DP {
+function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
   return {
     onCancel: () => dispatch(navigationActions.toggleNewProtocolModal(false)),
     _createNewProtocol: ({newProtocolFields, pipettes}) => {
