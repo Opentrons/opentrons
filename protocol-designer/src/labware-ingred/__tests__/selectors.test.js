@@ -1,4 +1,5 @@
-import {selectors} from '../reducers'
+// @flow
+import {selectors} from '../selectors'
 
 // FIXTURES
 

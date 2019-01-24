@@ -1,6 +1,6 @@
 // @flow
 import {uuid} from '../../utils'
-import {selectors as labwareIngredsSelectors} from '../../labware-ingred/reducers'
+import {selectors as labwareIngredsSelectors} from '../../labware-ingred/selectors'
 import {selectors as stepsSelectors, actions as stepsActions} from '../../ui/steps'
 import {actions as tutorialActions} from '../../tutorial'
 import type {StepType, StepIdType} from '../../form-types'
