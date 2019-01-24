@@ -81,6 +81,7 @@ class CLITool:
             self.hardware = adapters.SynchronousAdapter.build(
                 api.build_hardware_controller, force=True)
             self._current_mount = types.Mount.RIGHT
+            self.hardware.cache_instruments()
 
         # self.asyncio_loop = async_loop
         self.ui_loop = urwid.MainLoop(
@@ -379,7 +380,7 @@ class CLITool:
 
     def exit(self):
         if feature_flags.use_protocol_api_v2():
-            self.hardware.remove_tip(self.current_mount)
+            self.hardware.remove_tip(self._current_mount)
         raise urwid.ExitMainLoop
 
     # Private methods for URWID

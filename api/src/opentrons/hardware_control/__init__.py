@@ -398,7 +398,7 @@ class API(HardwareAPILike):
             tip_length: float):
         instr = self._attached_instruments[mount]
         instr_dict = self.attached_instruments[mount]
-        if not instr.has_tip:
+        if instr and not instr.has_tip:
             instr.add_tip(tip_length=tip_length)
             instr_dict['has_tip'] = True
             instr_dict['tip_length'] = tip_length
@@ -408,7 +408,7 @@ class API(HardwareAPILike):
     def remove_tip(self, mount: top_types.Mount):
         instr = self._attached_instruments[mount]
         instr_dict = self.attached_instruments[mount]
-        if instr.has_tip:
+        if instr and instr.has_tip:
             instr.remove_tip()
             instr_dict['has_tip'] = False
             instr_dict['tip_length'] = 0.0
