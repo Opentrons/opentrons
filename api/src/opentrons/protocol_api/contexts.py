@@ -1022,7 +1022,7 @@ class InstrumentContext:
         self._log.debug("Distributing {} from {} to {}"
                         .format(volume, source, dest))
         kwargs['mode'] = 'distribute'
-        kwargs['disposal_vol'] = kwargs.get('disposal_volume', self.min_volume)
+        kwargs['disposal_volume'] = kwargs.get('disposal_vol', self.min_volume)
         return self.transfer(volume, source, dest, **kwargs)
 
     @cmds.publish.both(command=cmds.consolidate)
@@ -1044,7 +1044,6 @@ class InstrumentContext:
         self._log.debug("Consolidate {} from {} to {}"
                         .format(volume, source, dest))
         kwargs['mode'] = 'consolidate'
-        kwargs['disposal_vol'] = kwargs.get('disposal_volume', 0)
         return self.transfer(volume, source, dest, **kwargs)
 
     @cmds.publish.both(command=cmds.transfer)
@@ -1116,6 +1115,12 @@ class InstrumentContext:
               :py:meth:`mix` after each :py:meth:`dispense` during the
               transfer. The tuple is interpreted as (repetitions, volume).
 
+            * *disposal_vol* (``float``) --
+              (:py:meth:`distribute` only) Volume of liquid to be disposed off
+              after distributing. When dispensing multiple times from the same
+              tip, it is recommended to aspirate an extra amount of liquid to
+              be disposed off after distributing.
+
             * *carryover* (``boolean``) --
               If `True` (default), any `volume` that exceeds the maximum volume
               of this Pipette will be split into multiple smaller volumes.
@@ -1163,6 +1168,10 @@ class InstrumentContext:
         else:
             drop_tip = transfers.DropTipStrategy.RETURN
 
+        new_tip = kwargs.get('new_tip')
+        if isinstance(new_tip, str):
+            new_tip = types.TransferTipPolicy[new_tip.upper()]
+
         blow_out = None
         if kwargs.get('blow_out'):
             blow_out = transfers.BlowOutStrategy.TRASH
@@ -1172,7 +1181,7 @@ class InstrumentContext:
             touch_tip = transfers.TouchTipStrategy.ALWAYS
         default_args = transfers.Transfer()
         transfer_args = transfers.Transfer(
-            new_tip=kwargs.get('new_tip') or default_args.new_tip,
+            new_tip=new_tip or default_args.new_tip,
             air_gap=kwargs.get('air_gap') or default_args.air_gap,
             carryover=kwargs.get('carryover') or default_args.carryover,
             gradient_function=(kwargs.get('gradient_function') or
@@ -1189,9 +1198,12 @@ class InstrumentContext:
                                                      mix=mix_opts)
         plan = transfers.TransferPlan(volume, source, dest, self,
                                       kwargs['mode'], transfer_options)
+        self._execute_transfer(plan)
+        return self
+
+    def _execute_transfer(self, plan: transfers.TransferPlan):
         for cmd in plan:
             getattr(self, cmd['method'])(*cmd['args'], **cmd['kwargs'])
-        return self
 
     def delay(self):
         return self._ctx.delay()
