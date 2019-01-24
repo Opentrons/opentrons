@@ -392,18 +392,28 @@ class API(HardwareAPILike):
                 smoothie_pos.update(self._backend.home(smoothie_plungers))
             self._current_position = self._deck_from_smoothie(smoothie_pos)
 
-    def _add_tip(
+    def add_tip(
             self,
             mount: top_types.Mount,
             tip_length: float):
         instr = self._attached_instruments[mount]
+        instr_dict = self.attached_instruments[mount]
         if not instr.has_tip:
             instr.add_tip(tip_length=tip_length)
+            instr_dict['has_tip'] = True
+            instr_dict['tip_length'] = tip_length
+        else:
+            mod_log.warning('attach tip called while tip already attached')
 
-    def _remove_tip(self, mount: top_types.Mount):
+    def remove_tip(self, mount: top_types.Mount):
         instr = self._attached_instruments[mount]
+        instr_dict = self.attached_instruments[mount]
         if instr.has_tip:
             instr.remove_tip()
+            instr_dict['has_tip'] = False
+            instr_dict['tip_length'] = 0.0
+        else:
+            mod_log.warning('detach tip called with no tip')
 
     def _deck_from_smoothie(
             self, smoothie_pos: Dict[str, float]) -> Dict[Axis, float]:
@@ -493,7 +503,6 @@ class API(HardwareAPILike):
         `critical_point` specifies an override to the current critical point to
         use (see :py:meth:`current_position`).
         """
-        print("Gantry Mount {}".format(mount))
         cur_pos = await self.current_position(mount, critical_point)
         return top_types.Point(x=cur_pos[Axis.X],
                                y=cur_pos[Axis.Y],
@@ -550,6 +559,7 @@ class API(HardwareAPILike):
              (Axis.Y, abs_position.y - offset.y - cp.y),
              (z_axis, abs_position.z - offset.z - cp.z))
         )
+
         await self._move(target_position, speed=speed)
 
     @_log_call

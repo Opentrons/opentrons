@@ -13,9 +13,6 @@ crosses = 'crosses'
 
 z_pos = (170.5, 129.0, 5.0)
 
-mount_by_name = {'left': types.Mount.LEFT, 'right': types.Mount.RIGHT}
-mount_by_axis = {'Z': types.Mount.LEFT, 'A': types.Mount.RIGHT}
-
 
 def dots_set():
     """
@@ -84,18 +81,13 @@ def jog(axis, direction, step, hardware, mount):
     if not ff.use_protocol_api_v2():
         if axis == 'z':
             axis = 'Z' if mount == 'left' else 'A'
+
         hardware._driver.move(
             {axis.upper():
                 hardware._driver.position[axis.upper()] + direction * step})
         return position(axis.upper(), hardware)
     else:
-        # if axis == 'x':
-        #     pt = types.Point(x=direction*step, y=0, z=0)
-        # elif axis == 'y':
-        #     pt = types.Point(x=0, y=direction*step, z=0)
-        # else:
-        #     pt = types.Point(x=0, y=0, z=direction*step)
-        pt = types.Point(**{axis: direction*step})
+        pt = types.Point(**{axis.lower(): direction*step})
         hardware.move_rel(mount, pt)
         return position(mount, hardware)
 

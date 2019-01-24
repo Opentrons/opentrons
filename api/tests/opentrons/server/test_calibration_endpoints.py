@@ -1,5 +1,4 @@
 import json
-import pytest
 
 import numpy as np
 
@@ -8,7 +7,7 @@ from opentrons import deck_calibration as dc
 from opentrons.deck_calibration import endpoints
 from opentrons.config import robot_configs
 from opentrons import types
-from opentrons.hardware_control.types import Axis
+# from opentrons.hardware_control.types import Axis
 
 
 # Note that several tests in this file have target/expected values that do not
@@ -23,7 +22,7 @@ from opentrons.hardware_control.types import Axis
 
 # ------------ Function tests (unit) ----------------------
 async def test_add_and_remove_tip(async_server, dc_session):
-    hardware = async_server['com.opentrons.hardware']
+    hardware = dc_session.adapter
     mount = 'left'
     version = async_server['api_version']
     if version == 1:
@@ -31,12 +30,13 @@ async def test_add_and_remove_tip(async_server, dc_session):
         pip = instruments.P10_Single(mount=mount)
         dc_session.current_mount = mount
     else:
-        await hardware.reset()
-        await hardware.cache_instruments({
+        hardware.reset()
+        hardware.cache_instruments({
                     types.Mount.LEFT: 'p10_single_v1',
                     types.Mount.RIGHT: None})
         pip = hardware.attached_instruments[types.Mount.LEFT]
         dc_session.current_mount = types.Mount.LEFT
+        mount = dc_session.current_mount
     dc_session.pipettes = {mount: pip}
 
     # Check malformed packet
@@ -46,7 +46,7 @@ async def test_add_and_remove_tip(async_server, dc_session):
     if version == 1:
         assert not pip.tip_attached
     else:
-        assert pip['has_tip'] is False
+        assert hardware.attached_instruments[mount]['has_tip'] is False
 
     # Check correct attach command
     tip_length = 50
@@ -56,7 +56,7 @@ async def test_add_and_remove_tip(async_server, dc_session):
     if version == 1:
         assert pip.tip_attached
     else:
-        assert pip['has_tip'] is True
+        assert hardware.attached_instruments[mount]['has_tip'] is True
 
     # Check command with tip already attached
     res2 = await endpoints.attach_tip({'tipLength': tip_length + 5})
@@ -65,7 +65,7 @@ async def test_add_and_remove_tip(async_server, dc_session):
     if version == 1:
         assert pip.tip_attached
     else:
-        assert pip['has_tip'] is True
+        assert hardware.attached_instruments[mount]['has_tip'] is True
 
     # Check correct detach command
     res3 = await endpoints.detach_tip({})
@@ -74,7 +74,7 @@ async def test_add_and_remove_tip(async_server, dc_session):
     if version == 1:
         assert not pip.tip_attached
     else:
-        assert pip['has_tip'] is False
+        assert hardware.attached_instruments[mount]['has_tip'] is False
 
     # Check command with no tip
     res4 = await endpoints.detach_tip({})
@@ -83,7 +83,7 @@ async def test_add_and_remove_tip(async_server, dc_session):
     if version == 1:
         assert not pip.tip_attached
     else:
-        assert pip['has_tip'] is False
+        assert hardware.attached_instruments[mount]['has_tip'] is False
 
 
 async def test_save_xy(async_server, dc_session):
@@ -110,7 +110,7 @@ async def test_save_xy(async_server, dc_session):
     else:
         dc_session.pipettes.get(mount)['has_tip'] = True
         dc_session.pipettes.get(mount)['tip_length'] = dc_session.tip_length
-        hardware._add_tip(types.Mount.LEFT, dc_session.tip_length)
+        hardware.add_tip(types.Mount.LEFT, dc_session.tip_length)
         hardware.home()
     x = 100
     y = 101
@@ -182,10 +182,9 @@ async def test_save_z(async_server, dc_session):
     assert new_z == expected_z
 
 
-async def test_save_calibration_file(async_server, dc_session, monkeypatch):
-    hardware = async_server['com.opentrons.hardware']
-    if async_server['api_version'] == 1:
-        hardware.reset()
+async def test_save_calibration_file(dc_session, monkeypatch):
+    hardware = dc_session.adapter
+    hardware.reset()
     expected_pos = endpoints.expected_points()
     dc_session.points = {
         k: (v[0], v[1] + 0.3)
@@ -215,11 +214,11 @@ async def test_save_calibration_file(async_server, dc_session, monkeypatch):
     assert np.allclose(in_memory, expected)
 
 
-async def test_transform_calculation(async_server, dc_session):
+async def test_transform_calculation(dc_session):
     # This transform represents a 5 degree rotation, with a shift in x, y, & z.
     # Values for the points and expected transform come from a hand-crafted
     # transformation matrix and the points that would generate that matrix.
-    hardware = async_server['com.opentrons.hardware']
+    hardware = dc_session.adapter
     cos_5deg_p = 0.99619469809
     sin_5deg_p = 0.08715574274
     sin_5deg_n = -sin_5deg_p
@@ -450,7 +449,6 @@ async def test_set_and_jog_integration(
 
     token_res = await async_client.post('/calibration/deck/start')
     token_text = await token_res.json()
-    print("Token Text {}".format(token_text))
     token = token_text['token']
 
     axis = 'z'
@@ -464,18 +462,9 @@ async def test_set_and_jog_integration(
         prior_x, prior_y, prior_z = dc.position(smoothie_axis, sess.adapter)
     else:
         sess.adapter.home()
-        prior_x, prior_y, prior_z = dc.position(sess.current_mount, sess.adapter)
-    # else:
-    #     await hardware.home()
-    #     if smoothie_axis == 'A':
-    #         mount = types.Mount.RIGHT
-    #     else:
-    #         mount = types.Mount.LEFT
-    #     position = await hardware.current_position(mount)
-    #     print(position)
-    #     prior_x = position[Axis.X]
-    #     prior_y = position[Axis.Y]
-    #     prior_z = position[Axis.by_mount(mount)]
+        prior_x, prior_y, prior_z = dc.position(
+            sess.current_mount, sess.adapter)
+
     resp = await async_client.post(
         '/calibration/deck',
         json={
@@ -487,7 +476,6 @@ async def test_set_and_jog_integration(
         })
 
     body = await resp.json()
-    print(body)
     msg = body.get('message')
 
     assert '{}'.format((prior_x, prior_y, prior_z + step)) in msg

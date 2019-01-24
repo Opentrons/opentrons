@@ -17,7 +17,6 @@ from opentrons.hardware_control.types import Axis
 # should be replaced with something that accurately reflects actual robot
 # operation, and then these tests should be revised to match expected reality.
 
-
 async def test_transform_from_moves(async_server, async_client, monkeypatch):
     test_mount, test_model = ('left', 'p300_multi_v1')
     # test_mount, test_model = ('right', 'p300_single_v1')

@@ -180,7 +180,6 @@ class SingletonAdapter(HardwareAPILike):
 
     def get_attached_pipettes(self):
         """ Mimic the behavior of robot.get_attached_pipettes"""
-
         api = object.__getattribute__(self, '_api')
         instrs = {}
         for mount, data in api.attached_instruments.items():

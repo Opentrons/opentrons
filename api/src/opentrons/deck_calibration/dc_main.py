@@ -20,7 +20,7 @@ from opentrons.util.calibration_functions import probe_instrument
 from opentrons.util.linal import solve, add_z, apply_transform
 from . import (
     left, right, SAFE_HEIGHT, cli_dots_set,
-    position, jog, apply_mount_offset, mount_by_axis)
+    position, jog, apply_mount_offset)
 
 # TODO: add tests for methods, split out current point behavior per comment
 # TODO:   below, and total result on robot against prior version of this app
@@ -79,7 +79,7 @@ class CLITool:
         else:
             api = opentrons.hardware_control.API
             self.hardware = adapters.SynchronousAdapter.build(
-                api.build_hardware_simulator).api
+                api.build_hardware_controller, force=True)
             self._current_mount = types.Mount.RIGHT
 
         # self.asyncio_loop = async_loop
@@ -93,6 +93,8 @@ class CLITool:
         self.calibration_matrix = self._config.gantry_calibration
         # Other state
         self._tip_length = tip_length
+        if feature_flags.use_protocol_api_v2():
+            self.hardware.add_tip(self._current_mount, self._tip_length)
         self.current_position = (0, 0, 0)
         self._steps = [0.1, 0.25, 0.5, 1, 5, 10, 20, 40, 80]
         self._steps_index = 2
@@ -120,22 +122,27 @@ class CLITool:
             '\\': lambda: self.home(),
             ' ': lambda: self.save_transform(),
             'esc': lambda: self.exit(),
-            'q': lambda: self._jog(
-                self._current_mount, +1, self.current_step()),
-            'a': lambda: self._jog(
-                self._current_mount, -1, self.current_step()),
+            'q': lambda: self._jog('z', +1, self.current_step()),
+            'a': lambda: self._jog('z', -1, self.current_step()),
             'up': lambda: self._jog('Y', +1, self.current_step()),
             'down': lambda: self._jog('Y', -1, self.current_step()),
             'left': lambda: self._jog('X', -1, self.current_step()),
             'right': lambda: self._jog('X', +1, self.current_step()),
             'm': lambda: self.validate_mount_offset(),
-            '1': lambda: self.validate(self._expected_points[1], 1, right),
-            '2': lambda: self.validate(self._expected_points[2], 2, right),
-            '3': lambda: self.validate(self._expected_points[3], 3, right),
-            '4': lambda: self.validate(self._test_points['slot5'], 4, right),
-            '5': lambda: self.validate(self._test_points['corner3'], 5, right),
-            '6': lambda: self.validate(self._test_points['corner8'], 6, right),
-            '7': lambda: self.validate(self._test_points['corner9'], 7, right)
+            '1': lambda: self.validate(
+                self._expected_points[1], 1, self._current_mount),
+            '2': lambda: self.validate(
+                self._expected_points[2], 2, self._current_mount),
+            '3': lambda: self.validate(
+                self._expected_points[3], 3, self._current_mount),
+            '4': lambda: self.validate(
+                self._test_points['slot5'], 4, self._current_mount),
+            '5': lambda: self.validate(
+                self._test_points['corner3'], 5, self._current_mount),
+            '6': lambda: self.validate(
+                self._test_points['corner8'], 6, self._current_mount),
+            '7': lambda: self.validate(
+                self._test_points['corner9'], 7, self._current_mount)
         }
 
     @property
@@ -225,11 +232,7 @@ class CLITool:
         """
         Return the robot to the home position and update the position tracker
         """
-        # if not feature_flags.use_protocol_api_v2():
         self.hardware.home()
-        # else:
-        #     self.asyncio_loop.run_until_complete(
-        #         self.hardware.home()
         self.current_position = self._position()
         return 'Homed'
 
@@ -239,7 +242,9 @@ class CLITool:
         current position once the 'Enter' key is pressed to the 'actual points'
         vector.
         """
-        if self._current_mount is left or types.Mount.LEFT:
+        if self._current_mount is left:
+            msg = self.save_mount_offset()
+        elif self._current_mount is types.Mount.LEFT:
             msg = self.save_mount_offset()
         else:
             pos = self._position()[:-1]
@@ -314,16 +319,17 @@ class CLITool:
     def validate_mount_offset(self):
         # move the RIGHT pipette to expected point, then immediately after
         # move the LEFT pipette to that same point
-        self.validate(self._expected_points[1], 1, right)
+        self.validate(self._expected_points[1], 1, self._current_mount)
         self.validate(
-            apply_mount_offset(
-                self._expected_points[1], self.hardware), 0, left)
+            apply_mount_offset(self._expected_points[1], self.hardware),
+            0,
+            self._current_mount)
 
     def validate(
             self,
             point: Tuple[float, float, float],
             point_num: int,
-            pipette: str) -> str:
+            pipette_mount) -> str:
         """
         :param point: Expected values from mechanical drawings
         :param point_num: The current position attempting to be validated
@@ -332,10 +338,10 @@ class CLITool:
         :return:
         """
         _, _, cz = self._driver_to_deck_coords(self._position())
-        if self._current_mount != pipette and cz < SAFE_HEIGHT:
+        if self._current_mount != pipette_mount and cz < SAFE_HEIGHT:
             self.move_to_safe_height()
 
-        self._current_mount = pipette
+        self._current_mount = pipette_mount
         self._current_point = point_num
 
         _, _, cz = self._driver_to_deck_coords(self._position())
@@ -348,16 +354,15 @@ class CLITool:
             z_axis = self._get_z_axis(self._current_mount)
             self.hardware._driver.move({z_axis: tz})
         else:
-            # mount_obj = mount_by_axis[self._current_mount]
             pt = types.Point(x=tx, y=ty, z=tz)
             self.hardware.move_to(self._current_mount, pt)
         return 'moved to point {}'.format(point)
 
     def _get_z_axis(self, mount):
         z_axis = None
-        if self._current_mount == 'left':
+        if mount == 'left':
             z_axis = 'Z'
-        elif self._current_mount == 'right':
+        elif mount == 'right':
             z_axis = 'A'
         return z_axis
 
@@ -373,6 +378,8 @@ class CLITool:
             self.hardware.move_to(self._current_mount, pt)
 
     def exit(self):
+        if feature_flags.use_protocol_api_v2():
+            self.hardware.remove_tip(self.current_mount)
         raise urwid.ExitMainLoop
 
     # Private methods for URWID

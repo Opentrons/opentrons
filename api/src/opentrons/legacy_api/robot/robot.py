@@ -5,7 +5,7 @@ from functools import lru_cache
 
 from numpy import add, subtract
 
-from opentrons import commands, drivers, types
+from opentrons import commands, drivers
 from opentrons.broker import subscribe
 
 from opentrons.data_storage import database, old_container_loading,\
@@ -119,10 +119,6 @@ class Robot():
         self._commands = []
         self._unsubscribe_commands = None
         self.reset()
-    #
-    # @property
-    # def config(self):
-    #     return self.config
 
     def _get_placement_location(self, placement):
         location = None
@@ -371,17 +367,21 @@ class Robot():
             raise RuntimeError('Instrument {0} already on {1} mount'.format(
                 prev_instr.name, mount))
         self._instruments[mount] = instrument
+
         instrument.instrument_actuator = self._actuators[mount]['plunger']
         instrument.instrument_mover = self._actuators[mount]['carriage']
+
         # instrument_offset is the distance found (with tip-probe) between
         # the pipette's expected position, and the actual position
         # this is expected to be no greater than ~3mm
         # Z is not included, because Z offsets found during tip-probe are used
         # to determined the tip's length
         cx, cy, _ = self.config.instrument_offset[mount][instrument.type]
+
         # model_offset is the expected position of the pipette, determined
         # by designed dimensions of that model (eg: p10-multi vs p300-single)
         mx, my, mz = instrument.model_offset
+
         # combine each offset to get the pipette's position relative to gantry
         _x, _y, _z = (
             mx + cx,
