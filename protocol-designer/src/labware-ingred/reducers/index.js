@@ -122,21 +122,6 @@ export const containers = handleActions({
       }
       : state
   },
-  // TODO IMMEDIATELY move to stepForm (thunk like pipette stuff?)
-  // SWAP_SLOT_CONTENTS: (state: ContainersState, action: SwapSlotContentsAction): ContainersState => {
-  //   const { sourceSlot, destSlot } = action.payload
-  //   const fromLabware = reduce(state, (acc, container, id) => (
-  //     container.slot === destSlot ? {...acc, [id]: {...container, slot: sourceSlot}} : acc
-  //   ), {})
-  //   const toLabware = reduce(state, (acc, container, id) => (
-  //     container.slot === sourceSlot ? {...acc, [id]: {...container, slot: destSlot}} : acc
-  //   ), {})
-  //   return {
-  //     ...state,
-  //     ...fromLabware,
-  //     ...toLabware,
-  //   }
-  // },
   DUPLICATE_LABWARE: (state: ContainersState, action: DuplicateLabwareAction): ContainersState => {
     const {duplicateLabwareId} = action.payload // templateLabwareId,
     // const templateLabware = state[templateLabwareId]

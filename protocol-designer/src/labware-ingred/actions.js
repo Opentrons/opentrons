@@ -107,6 +107,8 @@ export type SwapSlotContentsAction = {
   },
 }
 
+// TODO: Ian 2019-01-24 later, this should work on stepId or a range of steps.
+// We could follow the pattern of SubstituteStepFormPipettesAction.
 export const swapSlotContents = (sourceSlot: DeckSlot, destSlot: DeckSlot): SwapSlotContentsAction => ({
   type: 'SWAP_SLOT_CONTENTS',
   payload: {sourceSlot, destSlot},
