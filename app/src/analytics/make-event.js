@@ -1,27 +1,23 @@
 // @flow
 // redux action types to analytics events map
-import find from 'lodash/find'
 import createLogger from '../logger'
 import {selectors as robotSelectors} from '../robot'
-import {getConnectableRobots} from '../discovery'
+import {getConnectedRobot} from '../discovery'
+import {getProtocolAnalyticsData} from './selectors'
 
 import type {State, Action} from '../types'
-
-type Event = {
-  name: string,
-  properties: {},
-}
+import type {AnalyticsEvent} from './types'
 
 const log = createLogger(__filename)
 
-export default function makeEvent (state: State, action: Action): ?Event {
+export default function makeEvent (
+  action: Action,
+  nextState: State,
+  prevState: State
+): null | AnalyticsEvent | Promise<AnalyticsEvent | null> {
   switch (action.type) {
-    case '@@router/LOCATION_CHANGE':
-      return {name: 'url', properties: {pathname: action.payload.pathname}}
-
     case 'robot:CONNECT_RESPONSE':
-      const name = state.robot.connection.connectRequest.name
-      const robot = find(getConnectableRobots(state), {name})
+      const robot = getConnectedRobot(nextState)
 
       if (!robot) {
         log.warn('No robot found for connect response')
@@ -37,55 +33,82 @@ export default function makeEvent (state: State, action: Action): ?Event {
         },
       }
 
+    // TODO (ka, 2018-6-6): add file open type 'button' | 'drag-n-drop' (work required in action meta)
+    case 'protocol:UPLOAD': {
+      return getProtocolAnalyticsData(nextState).then(data => ({
+        name: 'protocolUploadRequest',
+        properties: data,
+      }))
+    }
+
     case 'robot:SESSION_RESPONSE':
-    case 'robot:SESSION_ERROR':
-      // TODO (ka, 2018-6-6): add file open type 'button' | 'drag-n-drop' (work required in action meta)
-      return {
-        name: 'protocolUpload',
+    case 'robot:SESSION_ERROR': {
+      // only fire event if we had a protocol upload in flight; we don't want
+      // to fire if user connects to robot with protocol already loaded
+      if (!prevState.robot.session.sessionRequest.inProgress) return null
+      const {type: actionType, payload: actionPayload} = action
+
+      return getProtocolAnalyticsData(nextState).then(data => ({
+        name: 'protocolUploadResponse',
         properties: {
-          success: action.type === 'robot:SESSION_RESPONSE',
-          error: (action.payload.error && action.payload.error.message) || '',
+          ...data,
+          success: actionType === 'robot:SESSION_RESPONSE',
+          error: (actionPayload.error && actionPayload.error.message) || '',
         },
-      }
+      }))
+    }
 
     // $FlowFixMe(mc, 2018-05-28): flow type robot:RUN
-    case 'robot:RUN':
-      return {name: 'runStart', properties: {}}
+    case 'robot:RUN': {
+      return getProtocolAnalyticsData(nextState).then(data => ({
+        name: 'runStart',
+        properties: data,
+      }))
+    }
 
+    // TODO(mc, 2019-01-22): we only get this event if the user keeps their app
+    // open for the entire run. Fixing this is blocked until we can fix
+    // session.stop from triggering a run error
     // $FlowFixMe(mc, 2018-05-28): flow type robot:RUN_RESPONSE
-    case 'robot:RUN_RESPONSE':
-      if (!action.error) {
-        const runTime = robotSelectors.getRunSeconds(state)
-        return {name: 'runFinish', properties: {runTime}}
-      } else {
-        return {
-          name: 'runError',
-          properties: {
-            error: action.error.message,
-          },
-        }
-      }
-    // $FlowFixMe(ka, 2018-06-5): flow type robot:PAUSE_RESPONSE
-    case 'robot:PAUSE_RESPONSE':
-      return {
+    case 'robot:RUN_RESPONSE': {
+      const runTime = robotSelectors.getRunSeconds(nextState)
+      const success = !action.error
+      const error = action.error ? action.payload.message || '' : ''
+
+      return getProtocolAnalyticsData(nextState).then(data => ({
+        name: 'runFinish',
+        properties: {...data, runTime, success, error},
+      }))
+    }
+
+    // $FlowFixMe(ka, 2018-06-5): flow type robot:PAUSE
+    case 'robot:PAUSE': {
+      const runTime = robotSelectors.getRunSeconds(nextState)
+
+      return getProtocolAnalyticsData(nextState).then(data => ({
         name: 'runPause',
-        properties: {
-          success: !action.error,
-          error: (action.error && action.error.message) || '',
-        },
-      }
+        properties: {...data, runTime},
+      }))
+    }
+
+    // $FlowFixMe(ka, 2018-06-5): flow type robot:RESUME
+    case 'robot:RESUME': {
+      const runTime = robotSelectors.getRunSeconds(nextState)
+
+      return getProtocolAnalyticsData(nextState).then(data => ({
+        name: 'runResume',
+        properties: {...data, runTime},
+      }))
+    }
 
     // $FlowFixMe(ka, 2018-06-5): flow type robot:CANCEL
-    case 'robot:CANCEL_RESPONSE':
-      const runTime = robotSelectors.getRunSeconds(state)
-      return {
+    case 'robot:CANCEL':
+      const runTime = robotSelectors.getRunSeconds(nextState)
+
+      return getProtocolAnalyticsData(nextState).then(data => ({
         name: 'runCancel',
-        properties: {
-          runTime,
-          success: !action.error,
-          error: (action.error && action.error.message) || '',
-        },
-      }
+        properties: {...data, runTime},
+      }))
   }
 
   return null

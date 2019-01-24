@@ -8,12 +8,18 @@ import {
   fileToProtocolFile,
   parseProtocolData,
   fileIsJson,
-  filenameToType,
+  fileToType,
+  filenameToMimeType,
 } from './protocol-data'
 
 import type {OutputSelector} from 'reselect'
 import type {State, Action, ThunkAction} from '../types'
-import type {ProtocolState, ProtocolFile, ProtocolData} from './types'
+import type {
+  ProtocolState,
+  ProtocolFile,
+  ProtocolData,
+  ProtocolType,
+} from './types'
 
 export * from './types'
 
@@ -73,7 +79,7 @@ export function protocolReducer (
       const {name, metadata, protocolText: contents} = action.payload
       const file =
         !state.file || name !== state.file.name
-          ? {name, type: filenameToType(name), lastModified: null}
+          ? {name, type: filenameToMimeType(name), lastModified: null}
           : state.file
       const data =
         !state.data || contents !== state.contents
@@ -94,12 +100,17 @@ type StringGetter = (?ProtocolData) => ?string
 type NumberGetter = (?ProtocolData) => ?number
 type StringSelector = OutputSelector<State, void, ?string>
 type NumberSelector = OutputSelector<State, void, ?number>
+type ProtocolTypeSelector = OutputSelector<State, void, ProtocolType | null>
+type CreatorAppSelector = OutputSelector<State,
+  void,
+  {name: ?string, version: ?string}>
 
 const getName: StringGetter = getter('metadata.protocol-name')
 const getAuthor: StringGetter = getter('metadata.author')
 const getDesc: StringGetter = getter('metadata.description')
 const getCreated: NumberGetter = getter('metadata.created')
 const getLastModified: NumberGetter = getter('metadata.last-modified')
+const getSource: NumberGetter = getter('metadata.source')
 const getAppName: StringGetter = getter('designer-application.application-name')
 const getAppVersion: StringGetter = getter(
   'designer-application.application-version'
@@ -136,11 +147,26 @@ export const getProtocolDescription: StringSelector = createSelector(
   data => getDesc(data)
 )
 
+export const getProtocolSource: StringSelector = createSelector(
+  getProtocolData,
+  data => getSource(data)
+)
+
 export const getProtocolLastUpdated: NumberSelector = createSelector(
   getProtocolFile,
   getProtocolData,
   (file, data) =>
     getLastModified(data) || getCreated(data) || (file && file.lastModified)
+)
+
+export const getProtocolType: ProtocolTypeSelector = createSelector(
+  getProtocolFile,
+  fileToType
+)
+
+export const getProtocolCreatorApp: CreatorAppSelector = createSelector(
+  getProtocolData,
+  data => ({name: getAppName(data), version: getAppVersion(data)})
 )
 
 const METHOD_OT_API = 'Opentrons API'
