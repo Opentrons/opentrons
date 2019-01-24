@@ -1,5 +1,5 @@
 // @flow
-import i18n from '../../localization'
+import i18n from '../../../localization'
 
 export default function getTooltipForField (stepType: ?string, name: string): ?string {
   if (!stepType) {

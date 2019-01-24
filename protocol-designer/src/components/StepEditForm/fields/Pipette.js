@@ -1,0 +1,45 @@
+// @flow
+import * as React from 'react'
+import {connect} from 'react-redux'
+import cx from 'classnames'
+import {
+  FormGroup,
+  DropdownField,
+  type DropdownOption,
+} from '@opentrons/components'
+import {selectors as stepFormSelectors} from '../../../step-forms'
+import {hydrateField} from '../../../steplist/fieldLevel'
+import type {StepFieldName} from '../../steplist/fieldLevel'
+import type {BaseState} from '../../types'
+import type {StepType} from '../../form-types'
+import styles from './StepEditForm.css'
+import StepField from './StepFormField'
+import type {FocusHandlers} from './index'
+
+type Options = Array<DropdownOption>
+
+type PipetteFieldOP = {name: StepFieldName, stepType?: StepType} & FocusHandlers
+type PipetteFieldSP = {pipetteOptions: Options, getHydratedPipette: (string) => any} // TODO: real hydrated pipette type
+type PipetteFieldProps = PipetteFieldOP & PipetteFieldSP
+const PipetteFieldSTP = (state: BaseState, ownProps: PipetteFieldOP): PipetteFieldSP => ({
+  pipetteOptions: stepFormSelectors.getEquippedPipetteOptions(state),
+  getHydratedPipette: (value) => hydrateField(stepFormSelectors.getHydrationContext(state), ownProps.name, value),
+})
+export const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldProps) => (
+  <StepField
+    name={props.name}
+    focusedField={props.focusedField}
+    dirtyFields={props.dirtyFields}
+    render={({value, updateValue, hoverTooltipHandlers}) => (
+      <FormGroup label='Pipette:' className={cx(styles.pipette_field, styles.large_field)} hoverTooltipHandlers={hoverTooltipHandlers}>
+        <DropdownField
+          options={props.pipetteOptions}
+          value={value ? String(value) : null}
+          onBlur={() => { props.onFieldBlur(props.name) }}
+          onFocus={() => { props.onFieldFocus(props.name) }}
+          onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
+            updateValue(e.currentTarget.value)
+          }} />
+      </FormGroup>
+    )} />
+))

@@ -10,7 +10,7 @@ import {
 import {Portal} from '../../portals/MainPageModalPortal'
 import modalStyles from '../../modals/modal.css'
 import stepFormStyles from '../StepEditForm.css'
-import styles from './FlowRateField.css'
+import styles from './FlowRateInput.css'
 
 const DEFAULT_LABEL = 'Flow Rate'
 const DECIMALS_ALLOWED = 1
@@ -35,7 +35,7 @@ type State = {
   pristine: boolean,
 }
 
-export default class FlowRateField extends React.Component<Props, State> {
+export default class FlowRateInput extends React.Component<Props, State> {
   constructor (props: Props) {
     super(props)
     this.state = this.getStateFromProps(props)

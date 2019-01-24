@@ -10,15 +10,15 @@ import {
   RadioGroup,
   type DropdownOption,
 } from '@opentrons/components'
-import i18n from '../../localization'
-import {selectors as stepFormSelectors} from '../../step-forms'
-import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
-import {hydrateField} from '../../steplist/fieldLevel'
+import i18n from '../../../localization'
+import {selectors as stepFormSelectors} from '../../../step-forms'
+import {selectors as labwareIngredSelectors} from '../../../labware-ingred/reducers'
+import {hydrateField} from '../../../steplist/fieldLevel'
 import type {StepFieldName} from '../../steplist/fieldLevel'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
-} from '../../step-generation/utils'
+} from '../../../step-generation/utils'
 import type {ChangeTipOptions} from '../../step-generation/types'
 import type {BaseState} from '../../types'
 import type {StepType} from '../../form-types'

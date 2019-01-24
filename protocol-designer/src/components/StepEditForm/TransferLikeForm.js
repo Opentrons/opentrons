@@ -10,12 +10,12 @@ import {
   BlowoutLocationDropdown,
   LabwareDropdown,
   ChangeTipField,
-} from './formFields'
+} from './fields/formFields'
 
-import StepField from './StepFormField'
+import StepField from './fields/StepFormField'
 import TipPositionInput from './TipPositionInput'
-import getTooltipForField from './getTooltipForField'
-import FlowRateField from './FlowRateField'
+import getTooltipForField from './fields/getTooltipForField'
+import {FlowRateField} from './fields'
 import WellSelectionInput from './WellSelectionInput'
 import WellOrderInput from './WellOrderInput'
 import type {StepType} from '../../form-types'

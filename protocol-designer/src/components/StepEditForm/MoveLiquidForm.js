@@ -1,17 +1,15 @@
 // @flow
 import * as React from 'react'
-import {FormGroup, HoverTooltip} from '@opentrons/components'
 import cx from 'classnames'
 
 import {
-  StepInputField,
+  VolumeField,
   PipetteField,
   ChangeTipField,
-  DisposalVolumeFields,
+  DisposalVolumeField,
   PathField,
-} from './formFields'
-import SourceDestFields from './SourceDestFields'
-import getTooltipForField from './getTooltipForField'
+} from './fields'
+import SourceDestFields from './fields/SourceDestFields'
 import styles from './StepEditForm.css'
 import type {FocusHandlers} from './index'
 import type {StepType, HydratedMoveLiquidFormDataLegacy} from '../../form-types'
@@ -34,19 +32,7 @@ const MoveLiquidForm = (props: MoveLiquidFormProps) => {
     <React.Fragment>
       <div className={cx(styles.field_row, styles.start_group)}>
         <PipetteField name="pipette" stepType={stepType} {...focusHandlers} />
-        {/*  TODO: Ian 2018-08-30 make volume field not be a one-off */}
-        <HoverTooltip
-          tooltipComponent={getTooltipForField(stepType, 'volume')}
-          placement='top-start'>
-          {(hoverTooltipHandlers) =>
-            <FormGroup
-              label='Transfer Vol:'
-              className={cx(styles.volume_field, styles.small_field)}
-              hoverTooltipHandlers={hoverTooltipHandlers}>
-              <StepInputField name="volume" units="μL" {...focusHandlers} />
-            </FormGroup>
-          }
-        </HoverTooltip>
+        <VolumeField focusHandlers={focusHandlers} stepType={stepType} />
       </div>
       <div className={styles.section_divider}></div>
 
@@ -62,7 +48,7 @@ const MoveLiquidForm = (props: MoveLiquidFormProps) => {
           <PathField focusHandlers={focusHandlers} />
         </div>
         <div className={styles.end_group}>
-          {path === 'multiDispense' && <DisposalVolumeFields focusHandlers={focusHandlers} />}
+          {path === 'multiDispense' && <DisposalVolumeField focusHandlers={focusHandlers} />}
         </div>
       </div>
     </React.Fragment>

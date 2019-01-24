@@ -10,9 +10,9 @@ import {
   PipetteField,
   LabwareDropdown,
   ChangeTipField,
-} from './formFields'
+} from './fields/formFields'
 
-import FlowRateField from './FlowRateField'
+import {FlowRateField} from './fields'
 import WellSelectionInput from './WellSelectionInput'
 import TipPositionInput from './TipPositionInput'
 import WellOrderInput from './WellOrderInput'
