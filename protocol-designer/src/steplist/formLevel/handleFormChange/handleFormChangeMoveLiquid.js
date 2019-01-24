@@ -1,6 +1,6 @@
 // @flow
-import makeConditionalFieldUpdater from './makeConditionalFieldUpdater'
-import {chainFormUpdaters, getChannels, getAllWellsFromPrimaryWells} from './utils'
+import makeConditionalPatchUpdater from './makeConditionalPatchUpdater'
+import {chainPatchUpdaters, getChannels, getAllWellsFromPrimaryWells} from './utils'
 import {getPipetteCapacity} from '../../../pipettes/pipetteData'
 import type {FormData} from '../../../form-types'
 import type {FormPatch} from '../../actions/types'
@@ -57,7 +57,7 @@ const wellRatioUpdatesMap = [
     ],
   },
 ]
-const wellRatioUpdater = makeConditionalFieldUpdater(wellRatioUpdatesMap)
+const wellRatioUpdater = makeConditionalPatchUpdater(wellRatioUpdatesMap)
 
 function getWellRatio (sourceWells: mixed, destWells: mixed): ?WellRatio {
   if (
@@ -79,8 +79,8 @@ function getWellRatio (sourceWells: mixed, destWells: mixed): ?WellRatio {
   return null
 }
 
-function updatePathField (patch, baseForm, pipetteEntities) {
-  const appliedPatch = {...baseForm, ...patch}
+function updatePatchPathField (patch, rawForm, pipetteEntities) {
+  const appliedPatch = {...rawForm, ...patch}
   const {path, changeTip} = appliedPatch
   // pass-thru: incomplete form
   if (!path) return patch
@@ -108,11 +108,11 @@ function updatePathField (patch, baseForm, pipetteEntities) {
   return patch
 }
 
-const updateFieldsOnLabwareChange = (patch: FormPatch, baseForm: FormData): FormPatch => {
+const updatePatchOnLabwareChange = (patch: FormPatch, rawForm: FormData): FormPatch => {
   const sourceLabwareChanged = patch.aspirate_labware &&
-    patch.aspirate_labware !== baseForm.aspirate_labware
+    patch.aspirate_labware !== rawForm.aspirate_labware
   const destLabwareChanged = patch.dispense_labware &&
-    patch.dispense_labware !== baseForm.dispense_labware
+    patch.dispense_labware !== rawForm.dispense_labware
 
   if (!sourceLabwareChanged && !destLabwareChanged) return patch
 
@@ -132,14 +132,14 @@ const updateFieldsOnLabwareChange = (patch: FormPatch, baseForm: FormData): Form
   }
 }
 
-const clearFieldsOnPipetteChange = (
+const updatePatchOnPipetteChange = (
   patch: FormPatch,
-  baseForm: FormData,
+  rawForm: FormData,
   pipetteEntities: PipetteEntities
 ) => {
   // when pipette ID is changed (to another ID, or to null),
   // set any flow rates, mix volumes, air gaps, or disposal volumes to null
-  if (patch.pipette !== undefined && baseForm.pipette !== patch.pipette) {
+  if (patch.pipette !== undefined && rawForm.pipette !== patch.pipette) {
     return {
       ...patch,
       aspirate_flowRate: null,
@@ -153,16 +153,16 @@ const clearFieldsOnPipetteChange = (
   return patch
 }
 
-const updateFieldsOnPipetteChannelChange = (
+const updatePatchOnPipetteChannelChange = (
   patch: FormPatch,
-  baseForm: FormData,
+  rawForm: FormData,
   labwareEntities: LabwareEntities,
   pipetteEntities: PipetteEntities
 ) => {
   if (patch.pipette === undefined) return patch
   let update = {}
 
-  const prevChannels = getChannels(baseForm.pipette, pipetteEntities)
+  const prevChannels = getChannels(rawForm.pipette, pipetteEntities)
   const nextChannels = typeof patch.pipette === 'string'
     ? getChannels(patch.pipette, pipetteEntities)
     : null
@@ -175,8 +175,8 @@ const updateFieldsOnPipetteChannelChange = (
     update = {aspirate_wells: null, dispense_wells: null}
   } else if (multiToSingle) {
     // multi-channel to single-channel: convert primary wells to all wells
-    const sourceLabwareId = baseForm.aspirate_labware
-    const destLabwareId = baseForm.dispense_labware
+    const sourceLabwareId = rawForm.aspirate_labware
+    const destLabwareId = rawForm.dispense_labware
 
     const sourceLabware = sourceLabwareId && labwareEntities[sourceLabwareId]
     const sourceLabwareType = sourceLabware && sourceLabware.type
@@ -184,8 +184,8 @@ const updateFieldsOnPipetteChannelChange = (
     const destLabwareType = destLabware && destLabware.type
 
     update = {
-      aspirate_wells: getAllWellsFromPrimaryWells(baseForm.aspirate_wells, sourceLabwareType),
-      dispense_wells: getAllWellsFromPrimaryWells(baseForm.dispense_wells, destLabwareType),
+      aspirate_wells: getAllWellsFromPrimaryWells(rawForm.aspirate_wells, sourceLabwareType),
+      dispense_wells: getAllWellsFromPrimaryWells(rawForm.dispense_wells, destLabwareType),
     }
   }
   return {...patch, ...update}
@@ -193,26 +193,26 @@ const updateFieldsOnPipetteChannelChange = (
 
 export default function handleFormChangeMoveLiquid (
   originalPatch: FormPatch,
-  baseForm: FormData, // NOTE: this is NOT hydrated, it's the raw form as stored in the reducer
+  rawForm: FormData, // raw = NOT hydrated
   pipetteEntities: PipetteEntities,
   labwareEntities: LabwareEntities
 ): FormPatch {
-  const updateFieldsOnWellRatioChange = (chainPatch) => {
-    const prevWellRatio = getWellRatio(baseForm.aspirate_wells, baseForm.dispense_wells)
+  const updatePatchOnWellRatioChange = (chainPatch) => {
+    const prevWellRatio = getWellRatio(rawForm.aspirate_wells, rawForm.dispense_wells)
     const nextWellRatio = getWellRatio(chainPatch.aspirate_wells, chainPatch.dispense_wells)
 
     if (prevWellRatio && nextWellRatio) {
-      return wellRatioUpdater(prevWellRatio, nextWellRatio, {...baseForm, ...chainPatch})
+      return wellRatioUpdater(prevWellRatio, nextWellRatio, {...rawForm, ...chainPatch})
     }
     return chainPatch
   }
 
   // sequentially modify parts of the patch until it's fully updated
-  return chainFormUpdaters(originalPatch, [
-    chainPatch => updateFieldsOnLabwareChange(chainPatch, baseForm),
-    chainPatch => updateFieldsOnPipetteChannelChange(chainPatch, baseForm, labwareEntities, pipetteEntities),
-    chainPatch => clearFieldsOnPipetteChange(chainPatch, baseForm, pipetteEntities),
-    chainPatch => updatePathField(chainPatch, baseForm, pipetteEntities),
-    updateFieldsOnWellRatioChange,
+  return chainPatchUpdaters(originalPatch, [
+    chainPatch => updatePatchOnLabwareChange(chainPatch, rawForm),
+    chainPatch => updatePatchOnPipetteChannelChange(chainPatch, rawForm, labwareEntities, pipetteEntities),
+    chainPatch => updatePatchOnPipetteChange(chainPatch, rawForm, pipetteEntities),
+    chainPatch => updatePatchPathField(chainPatch, rawForm, pipetteEntities),
+    updatePatchOnWellRatioChange,
   ])
 }

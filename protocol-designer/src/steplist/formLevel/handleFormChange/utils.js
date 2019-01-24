@@ -7,7 +7,7 @@ import type {PipetteChannels} from '@opentrons/shared-data'
 import type {FormPatch} from '../../actions/types'
 import type {PipetteEntities} from '../../../step-forms/types'
 
-export function chainFormUpdaters (initialPatch: FormPatch, fns: Array<(FormPatch => FormPatch)>): FormPatch {
+export function chainPatchUpdaters (initialPatch: FormPatch, fns: Array<(FormPatch => FormPatch)>): FormPatch {
   return fns.reduce((patchAcc: FormPatch, fn) => {
     return fn(patchAcc)
   }, initialPatch)

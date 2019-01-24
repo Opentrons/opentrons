@@ -6,19 +6,19 @@ export type FieldUpdateMaps = Array<{
   dependentFields: Array<{name: string, prevValue: mixed, nextValue: mixed}>,
 }>
 
-// A "key value" is a value derived from one or more fields, which can trigger
-// other fields to change when it changes
-// (example in Move Liquid form: "well ratio" is derived
-// from aspirate_wells + dispense_wells).
-// This style of updater assumes that the previous key value matters
-const makeConditionalFieldUpdater = (updateMaps: FieldUpdateMaps) =>
+// the "value" in the outer prevValue/nextValue can be a field value,
+// or derived from the form (example in Move Liquid form: "well ratio" is
+// derived from aspirate_wells + dispense_wells).
+//
+// This style of updater is useful when the previous independent value matters
+const makeConditionalPatchUpdater = (updateMaps: FieldUpdateMaps) =>
   (prevValue: mixed, nextValue: mixed, dependentFields: Object) => {
     // get relevant update map (if any) via key values
     const updateMap = updateMaps.find(u =>
       u.prevValue === prevValue &&
       u.nextValue === nextValue)
     if (!updateMap) {
-      console.warn(`expected ${String(prevValue)} and ${String(nextValue)} in update maps`)
+      console.warn(`expected prevValue "${String(prevValue)}" and nextValue "${String(nextValue)}" in update maps`)
       return {}
     }
     const fieldUpdates = updateMap.dependentFields
@@ -29,4 +29,4 @@ const makeConditionalFieldUpdater = (updateMaps: FieldUpdateMaps) =>
     }, {})
   }
 
-export default makeConditionalFieldUpdater
+export default makeConditionalPatchUpdater
