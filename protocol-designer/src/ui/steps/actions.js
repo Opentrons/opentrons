@@ -4,10 +4,8 @@ import forEach from 'lodash/forEach'
 import type {StepIdType, StepType} from '../../form-types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../../types'
 import {selectors as stepFormSelectors} from '../../step-forms'
-import {getNextDefaultPipetteId} from '../../steplist/formLevel'
+import {getNextDefaultPipetteId, handleFormChange} from '../../steplist/formLevel'
 import type {TerminalItemId, SubstepIdentifier} from '../../steplist/types'
-
-import handleFormChange from '../../steplist/actions/handleFormChange'
 
 type ExpandAddStepButtonAction = {type: 'EXPAND_ADD_STEP_BUTTON', payload: boolean}
 export const expandAddStepButton = (payload: boolean): ExpandAddStepButtonAction => ({
