@@ -6,7 +6,7 @@ import {
   removeWellsContents,
   setWellContents,
 } from '../../labware-ingred/actions'
-import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
+import {selectors as labwareIngredSelectors} from '../../labware-ingred/selectors'
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import wellSelectionSelectors from '../../well-selection/selectors'
 import {deselectAllWells} from '../../well-selection/actions'
