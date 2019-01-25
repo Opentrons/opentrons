@@ -3,7 +3,7 @@ from copy import copy
 
 from opentrons.util import calibration_functions
 from opentrons.config import feature_flags as ff
-from opentrons.broker import publish
+from opentrons.broker import Broker
 from opentrons.types import Point, Mount
 from opentrons.protocol_api import labware
 from opentrons.hardware_control import CriticalPoint
@@ -22,7 +22,8 @@ class CalibrationManager:
     """
     TOPIC = 'calibration'
 
-    def __init__(self, hardware, loop=None):
+    def __init__(self, hardware, loop=None, broker=None):
+        self._broker = broker or Broker()
         self._hardware = hardware
         self._loop = loop
         self.state = None
@@ -227,4 +228,4 @@ class CalibrationManager:
     def _on_state_changed(self):
         self._hardware._use_safest_height = (self.state in
                                              ['probing', 'moving'])
-        publish(CalibrationManager.TOPIC, self._snapshot())
+        self._broker.publish(CalibrationManager.TOPIC, self._snapshot())

@@ -23,7 +23,7 @@ class OutOfTipsError(Exception):
     pass
 
 
-class ProtocolContext:
+class ProtocolContext(CommandPublisher):
     """ The Context class is a container for the state of a protocol.
 
     It encapsulates many of the methods formerly found in the Robot class,
@@ -84,12 +84,14 @@ class ProtocolContext:
 
     def __init__(self,
                  loop: asyncio.AbstractEventLoop = None,
-                 hardware: hc.API = None) -> None:
+                 hardware: hc.API = None,
+                 broker=None) -> None:
         """ Build a :py:class:`.ProtocolContext`.
 
         :param loop: An event loop to use. If not specified, this ctor will
                      (eventually) call :py:meth:`asyncio.get_event_loop`.
         """
+        super().__init__(broker)
         self._loop = loop or asyncio.get_event_loop()
         self._deck_layout = geometry.Deck()
         self._instruments: Dict[types.Mount, Optional[InstrumentContext]]\
@@ -109,6 +111,10 @@ class ProtocolContext:
         self.load_labware_by_name(
             trash_name, '12')
 
+    def __del__(self):
+        if getattr(self, '_unsubscribe_commands', None):
+            self._unsubscribe_commands()
+
     def commands(self):
         return self._commands
 
@@ -126,7 +132,7 @@ class ProtocolContext:
             if message['$'] == 'before':
                 self._commands.append(text.format(**payload))
 
-        self._unsubscribe_commands = broker.subscribe(
+        self._unsubscribe_commands = self.broker.subscribe(
             cmds.types.COMMAND, on_command)
 
     @contextlib.contextmanager
@@ -144,8 +150,6 @@ class ProtocolContext:
             # an error occured in the code inside the with block
         """
         old_hw = self._hw_manager.hardware
-        print("OLD HW CONTEXT MANAGER PROTOCOLS")
-        print(old_hw)
         try:
             self._hw_manager.set_hw(hardware)
             yield self
@@ -419,7 +423,7 @@ class ProtocolContext:
         return trash  # type: ignore
 
 
-class InstrumentContext:
+class InstrumentContext(CommandPublisher):
     """ A context for a specific pipette or instrument.
 
     This can be used to call methods related to pipettes - moves or
@@ -442,6 +446,8 @@ class InstrumentContext:
                  tip_racks: List[Labware] = None,
                  trash: Labware = None,
                  **config_kwargs) -> None:
+
+        super().__init__(ctx.broker)
         self._hw_manager = hardware_mgr
         self._ctx = ctx
         self._mount = mount
@@ -517,11 +523,11 @@ class InstrumentContext:
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
                 "knows where it is.")
-        cmds.do_publish(cmds.aspirate, self.aspirate, 'before', None, None,
-                        self, volume, loc, rate)
+        cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
+                        'before', None, None, self, volume, loc, rate)
         self._hw_manager.hardware.aspirate(self._mount, volume, rate)
-        cmds.do_publish(cmds.aspirate, self.aspirate, 'after', self, None,
-                        self, volume, loc, rate)
+        cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
+                        'after', self, None, self, volume, loc, rate)
         return self
 
     def dispense(self,
@@ -584,11 +590,11 @@ class InstrumentContext:
                 " method that moves to a location (such as move_to or "
                 "aspirate) must previously have been called so the robot "
                 "knows where it is.")
-        cmds.do_publish(cmds.dispense, self.dispense, 'before', None, None,
-                        self, volume, loc, rate)
+        cmds.do_publish(self.broker, cmds.dispense, self.dispense,
+                        'before', None, None, self, volume, loc, rate)
         self._hw_manager.hardware.dispense(self._mount, volume, rate)
-        cmds.do_publish(cmds.dispense, self.dispense, 'after', self, None,
-                        self, volume, loc, rate)
+        cmds.do_publish(self.broker, cmds.dispense, self.dispense,
+                        'after', self, None, self, volume, loc, rate)
         return self
 
     @cmds.publish.both(command=cmds.mix)
@@ -989,12 +995,12 @@ class InstrumentContext:
         :returns: This instance.
         """
         def home_dummy(mount): pass
-        cmds.do_publish(cmds.home, home_dummy, 'before', None, None,
-                        self._mount.name.lower())
+        cmds.do_publish(self.broker, cmds.home, home_dummy,
+                        'before', None, None, self._mount.name.lower())
         self._hw_manager.hardware.home_z(self._mount)
         self._hw_manager.hardware.home_plunger(self._mount)
-        cmds.do_publish(cmds.home, home_dummy, 'after', self, None,
-                        self._mount.name.lower())
+        cmds.do_publish(self.broker, cmds.home, home_dummy,
+                        'after', self, None, self._mount.name.lower())
         return self
 
     def home_plunger(self) -> 'InstrumentContext':
@@ -1413,7 +1419,7 @@ class InstrumentContext:
                                        self._mount.name.lower())
 
 
-class ModuleContext:
+class ModuleContext(CommandPublisher):
     """ An object representing a connected module. """
 
     def __init__(self, ctx: ProtocolContext, geometry: ModuleGeometry) -> None:
@@ -1425,6 +1431,7 @@ class ModuleContext:
         :param ctx: The parent context for the module
         :param geometry: The :py:class:`.ModuleGeometry` for the module
         """
+        super().__init__(ctx.broker)
         self._geometry = geometry
         self._ctx = ctx
 

@@ -31,9 +31,9 @@ def test_smoke(virtual_smoothie_env, smoke):
 async def test_multi_single(main_router, protocol, protocol_file, dummy_db):
     robot.connect()
     robot.home()
-
     session = main_router.session_manager.create(
         name='<blank>', text=protocol.text)
+
     await main_router.wait_until(state('session', 'loaded'))
 
     main_router.calibration_manager.move_to(

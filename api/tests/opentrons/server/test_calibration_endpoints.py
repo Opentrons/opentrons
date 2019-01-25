@@ -135,8 +135,9 @@ async def test_save_xy(async_server, dc_session):
     else:
         coordinates = hardware.gantry_position(types.Mount.LEFT)
         expected = (
-            coordinates.x + hardware.config.mount_offset[0],
+            coordinates.x,
             coordinates.y)
+
     assert actual == expected
 
 

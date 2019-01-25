@@ -6,7 +6,7 @@ import json
 import logging
 from time import time
 
-from opentrons.broker import publish, subscribe
+from opentrons.broker import Broker
 from opentrons.legacy_api.containers import get_container, location_to_list
 from opentrons.legacy_api.containers.placeable import (
     Module as ModulePlaceable, Placeable)
@@ -28,7 +28,8 @@ VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused', 'error'}
 
 
 class SessionManager(object):
-    def __init__(self, hardware, loop=None):
+    def __init__(self, hardware, loop=None, broker=None):
+        self._broker = broker or Broker()
         self._loop = loop or asyncio.get_event_loop()
         self.session = None
         self._session_lock = False
@@ -47,7 +48,11 @@ class SessionManager(object):
         self._session_lock = True
         try:
             self.session = Session.build_and_prep(
-                name=name, text=text, hardware=self._hardware, loop=self._loop)
+                name=name,
+                text=text,
+                hardware=self._hardware,
+                loop=self._loop,
+                broker=self._broker)
         finally:
             self._session_lock = False
 
@@ -70,18 +75,20 @@ class Session(object):
     TOPIC = 'session'
 
     @classmethod
-    def build_and_prep(cls, name, text, hardware, loop):
-        sess = cls(name, text, hardware, loop)
+    def build_and_prep(cls, name, text, hardware, loop, broker):
+        sess = cls(name, text, hardware, loop, broker)
         sess.prepare()
         return sess
 
-    def __init__(self, name, text, hardware, loop):
+    def __init__(self, name, text, hardware, loop, broker):
+        self._broker = broker
         self._loop = loop
         self.name = name
         self.protocol_text = text
         self._protocol = None
         self._hardware = hardware
-        self._simulating_ctx = ProtocolContext(loop=self._loop)
+        self._simulating_ctx = ProtocolContext(
+            loop=self._loop, broker=self._broker)
         self.state = None
         self.commands = []
         self.command_log = {}
@@ -173,7 +180,7 @@ class Session(object):
             else:
                 stack.pop()
 
-        unsubscribe = subscribe(command_types.COMMAND, on_command)
+        unsubscribe = self._broker.subscribe(types.COMMAND, on_command)
 
         try:
             # ensure actual pipettes are cached before driver is disconnected
@@ -192,7 +199,8 @@ class Session(object):
                     strict_attached_instruments=False)
                 sim.home()
                 self._simulating_ctx = ProtocolContext(self._loop,
-                                                       sim)
+                                                       sim,
+                                                       self._broker)
                 if self._is_json_protocol:
                     run_protocol(protocol_json=self._protocol,
                                  simulate=True,
@@ -205,6 +213,7 @@ class Session(object):
             else:
                 # TODO (artyom, 20171005): this will go away
                 # once robot / driver simulation flow is fixed
+                self._hardware.broker = self._broker
                 self._hardware.cache_instrument_models()
                 self._hardware.disconnect()
                 if self._is_json_protocol:
@@ -237,6 +246,7 @@ class Session(object):
         return res
 
     def refresh(self):
+        assert not self._loop.is_closed()
         self._reset()
         self._is_json_protocol = self.name.endswith('.json')
 
@@ -249,6 +259,7 @@ class Session(object):
             self.metadata = extract_metadata(parsed)
             self._protocol = compile(parsed, filename=self.name, mode='exec')
         commands = self._simulate()
+        assert not self._loop.is_closed()
         self.commands = tree.from_list(commands)
 
         self.containers = self.get_containers()
@@ -284,7 +295,8 @@ class Session(object):
 
         self._reset()
 
-        _unsubscribe = subscribe(command_types.COMMAND, on_command)
+        _unsubscribe = self._broker.subscribe(types.COMMAND, on_command)
+
         self.startTime = now()
         self.set_state('running')
 
@@ -293,7 +305,7 @@ class Session(object):
             self._pre_run_hooks()
             if ff.use_protocol_api_v2():
                 self._hardware.cache_instruments()
-                ctx = ProtocolContext(loop=self._loop)
+                ctx = ProtocolContext(loop=self._loop, broker=self._broker)
                 ctx.connect(self._hardware)
                 ctx.home()
                 if self._is_json_protocol:
@@ -301,6 +313,7 @@ class Session(object):
                 else:
                     run_protocol(protocol_code=self._protocol, context=ctx)
             else:
+                self._hardware.broker = self._broker
                 if self._is_json_protocol:
                     execute_protocol(self._protocol)
                 else:
@@ -375,7 +388,8 @@ class Session(object):
         }
 
     def _on_state_changed(self):
-        publish(Session.TOPIC, self._snapshot())
+        snap = self._snapshot()
+        self._broker.publish(Session.TOPIC, snap)
 
     def _pre_run_hooks(self):
         self._hardware.home_z()
@@ -386,7 +400,6 @@ def extract_metadata(parsed):
     assigns = [
         obj for obj in parsed.body if isinstance(obj, ast.Assign)]
     for obj in assigns:
-        print(obj.targets[0])
         if isinstance(obj.targets[0], ast.Name) \
                 and obj.targets[0].id == 'metadata' \
                 and isinstance(obj.value, ast.Dict):

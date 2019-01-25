@@ -118,7 +118,7 @@ class CLITool:
             '-': lambda: self.decrease_step(),
             '=': lambda: self.increase_step(),
             'z': lambda: self.save_z_value(),
-            'p': lambda: probe(self._tip_length),
+            'p': lambda: probe(self._tip_length, self.hardware),
             'enter': lambda: self.save_point(),
             '\\': lambda: self.home(),
             ' ': lambda: self.save_transform(),
@@ -415,7 +415,7 @@ class CLITool:
 
 
 # Functions for backing key-press
-def probe(tip_length: float, loop, hardware) -> str:
+def probe(tip_length: float, hardware) -> str:
     if not feature_flags.use_protocol_api_v2():
         hardware.reset()
 
@@ -424,8 +424,7 @@ def probe(tip_length: float, loop, hardware) -> str:
             pipette, robot, tip_length=tip_length))
         log.debug("Setting probe center to {}".format(probe_center))
     else:
-        probe_center = loop.run_until_complete(
-            hardware.locate_tip_probe_center(tip_length))
+        probe_center = hardware.locate_tip_probe_center(tip_length)
     hardware.update_config(probe_center=probe_center)
     return 'Tip probe'
 

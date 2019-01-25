@@ -1,5 +1,5 @@
-from opentrons.broker import subscribe
 from opentrons import commands
+from opentrons.commands import CommandPublisher
 
 
 def my_command(arg1, meta=None, arg2='', arg3=''):
@@ -11,26 +11,30 @@ def my_command(arg1, meta=None, arg2='', arg3=''):
     }
 
 
-@commands.publish.both(command=my_command, meta='{arg1} {arg2} {arg3}')
-def A(arg1, arg2, arg3='foo'):
-    B(0)
-    return 100
+class FakeClass(CommandPublisher):
 
+    def __init__(self):
+        super().__init__(None)
 
-@commands.publish.both(command=my_command, meta='{arg1} {arg2} {arg3}')
-def C(arg1, arg2, arg3='bar'):
-    B(0)
-    return 100
+    @commands.publish.both(command=my_command, meta='{arg1} {arg2} {arg3}')
+    def A(self, arg1, arg2, arg3='foo'):
+        self.B(0)
+        return 100
 
+    @commands.publish.both(command=my_command, meta='{arg1} {arg2} {arg3}')
+    def C(self, arg1, arg2, arg3='bar'):
+        self.B(0)
+        return 100
 
-@commands.publish.both(command=my_command, meta='{arg1}')
-def B(arg1):
-    return None
+    @commands.publish.both(command=my_command, meta='{arg1}')
+    def B(self, arg1):
+        return None
 
 
 def test_add_listener():
     stack = []
     calls = []
+    fake_obj = FakeClass()
 
     def on_notify(message):
         assert message['name'] == 'command'
@@ -43,11 +47,11 @@ def test_add_listener():
         else:
             stack.pop()
 
-    unsubscribe = subscribe('command', on_notify)
+    unsubscribe = fake_obj.broker.subscribe('command', on_notify)
 
-    A(0, 1)
-    B(2)
-    C(3, 4)
+    fake_obj.A(0, 1)
+    fake_obj.B(2)
+    fake_obj.C(3, 4)
 
     expected = [
         {'level': 1, 'description': '0 1 foo'},
@@ -59,6 +63,6 @@ def test_add_listener():
     assert calls == expected
 
     unsubscribe()
-    A(0, 2)
+    fake_obj.A(0, 2)
 
     assert calls == expected, 'No calls expected after unsubscribe()'

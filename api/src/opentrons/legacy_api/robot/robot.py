@@ -6,7 +6,8 @@ from functools import lru_cache
 from numpy import add, subtract
 
 from opentrons import commands, drivers
-from opentrons.broker import subscribe
+from opentrons.commands import CommandPublisher
+# from opentrons.broker import subscribe
 
 from opentrons.data_storage import database, old_container_loading,\
     database_migration
@@ -60,7 +61,7 @@ def _setup_container(container_name):
     return container
 
 
-class Robot():
+class Robot(CommandPublisher):
     """
     This class is the main interface to the robot.
 
@@ -92,7 +93,7 @@ class Robot():
     See :class:`Pipette` for the list of supported instructions.
     """
 
-    def __init__(self, config=None):
+    def __init__(self, config=None, broker=None):
         """
         Initializes a robot instance.
 
@@ -102,6 +103,7 @@ class Robot():
         :func:`__init__` the same instance will be returned. There's
         only once instance of a robot.
         """
+        super().__init__(broker)
         self.config = config or load()
         self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
         self.modules = []
@@ -119,6 +121,11 @@ class Robot():
         self._commands = []
         self._unsubscribe_commands = None
         self.reset()
+
+    def __del__(self):
+        print("Robot del called")
+        if getattr(self, '_unsubscribe_commands', None):
+            self._unsubscribe_commands()
 
     def _get_placement_location(self, placement):
         location = None
@@ -902,7 +909,7 @@ class Robot():
             if message['$'] == 'before':
                 self._commands.append(text.format(**payload))
 
-        self._unsubscribe_commands = subscribe(
+        self._unsubscribe_commands = self.broker.subscribe(
             commands.types.COMMAND, on_command)
 
     def calibrate_container_with_instrument(self,

@@ -14,7 +14,7 @@ from opentrons.util.linal import add_z, solve
 # from opentrons.hardware_control import adapters
 
 session = None
-
+mount_by_name = {'left': Mount.LEFT, 'right': Mount.RIGHT}
 log = logging.getLogger(__name__)
 
 
@@ -111,10 +111,11 @@ def init_pipette():
         session.current_model = pipette_info['model']
         if not feature_flags.use_protocol_api_v2():
             mount = pipette.mount
+            session.current_mount = mount
         else:
             mount = pipette.get('mount')
+            session.current_mount = mount_by_name[mount]
         session.pipettes[mount] = pipette
-        print("Session Pipettes {}".format(session.pipettes))
         res = {'mount': mount, 'model': pipette_info['model']}
 
     log.info("Pipette info {}".format(session.pipettes))
@@ -158,20 +159,20 @@ def set_current_mount(hardware):
     """
     global session
     pipette = None
-    model = None
     right_channel = None
     left_channel = None
     right_pipette, left_pipette = get_pipettes(hardware)
-    if not feature_flags.use_protocol_api_v2():
-        if right_pipette:
+    if right_pipette:
+        if not feature_flags.use_protocol_api_v2():
             right_channel = right_pipette.channels
-        if left_pipette:
-            left_channel = left_pipette.channels
-    else:
-        if right_pipette:
+        else:
             right_channel = right_pipette.get('channels')
             right_pipette['mount'] = 'right'
-        if left_pipette:
+
+    if left_pipette:
+        if not feature_flags.use_protocol_api_v2():
+            left_channel = left_pipette.channels
+        else:
             left_channel = left_pipette.get('channels')
             left_pipette['mount'] = 'left'
 
@@ -179,25 +180,24 @@ def set_current_mount(hardware):
         pipette = right_pipette
     elif left_channel == 1:
         pipette = left_pipette
-    else:
-        if right_pipette:
-            pipette = right_pipette
-        elif left_pipette:
-            pipette = left_pipette
+    elif right_pipette:
+        pipette = right_pipette
+    elif left_pipette:
+        pipette = left_pipette
 
+    model = _get_model_name(pipette)
+
+    return {'pipette': pipette, 'model': model}
+
+
+def _get_model_name(pipette):
+    model = None
     if pipette:
         if not feature_flags.use_protocol_api_v2():
             model = pipette.name
-            session.current_mount = pipette.mount
         else:
             model = pipette.get('name')
-            if pipette.get('mount') == 'left':
-                mount = Mount.LEFT
-            else:
-                mount = Mount.RIGHT
-            session.current_mount = mount
-
-    return {'pipette': pipette, 'model': model}
+    return model
 
 
 async def attach_tip(data):
@@ -325,39 +325,33 @@ async def move(data):
         if not feature_flags.use_protocol_api_v2():
             pipette = session.pipettes[session.current_mount]
             channels = pipette.channels
-        else:
-            pipette = session.adapter.attached_instruments[session.current_mount]
-            channels = pipette.get('channels')
-            print("Move channels {}".format(channels))
-        # For multichannel pipettes, we use the tip closest to the front of the
-        # robot rather than the back (this is the tip that would go into well
-        # H1 of a plate when pipetting from the first row of a 96 well plate,
-        # for instance). Since moves are issued for the A1 tip, we have to
-        # adjust the target point by 2 * Y_OFFSET_MULTI (where the offset value
-        # is the distance from the axial center of the pipette to the A1 tip).
-        # By sending the A1 tip to to the adjusted target, the H1 tip should
-        # go to the desired point. Y_OFFSET_MULT must then be backed out of xy
-        # positions saved in the `save_xy` handler (not 2 * Y_OFFSET_MULTI,
-        # because the axial center of the pipette will only be off by
-        # 1* Y_OFFSET_MULTI).
-        if not channels == 1:
-            x = point[0]
-            y = point[1] + pipette_config.Y_OFFSET_MULTI * 2
-            z = point[2]
-            point = (x, y, z)
-        log.info("Move to point {}".format(point))
+        # For multichannel pipettes in the V1 session, we use the tip closest
+        # to the front of the robot rather than the back (this is the tip that
+        # would go into well H1 of a plate when pipetting from the first row of
+        # a 96 well plate, for instance). Since moves are issued for the A1 tip
+        # we have to adjust the target point by 2 * Y_OFFSET_MULTI (where the
+        # offset value is the distance from the axial center of the pipette to
+        # the A1 tip). By sending the A1 tip to to the adjusted target, the H1
+        # tip should go to the desired point. Y_OFFSET_MULT must then be backed
+        # out of xy positions saved in the `save_xy` handler
+        # (not 2 * Y_OFFSET_MULTI, because the axial center of the pipette
+        # will only be off by 1* Y_OFFSET_MULTI).
         if not feature_flags.use_protocol_api_v2():
+            if not channels == 1:
+                x = point[0]
+                y = point[1] + pipette_config.Y_OFFSET_MULTI * 2
+                z = point[2]
+                point = (x, y, z)
             pipette.move_to((session.adapter.deck, point), strategy='arc')
         else:
-            # intermediate_pos = position(
-            #     session.current_mount, session.adapter)
-            # session.adapter.move_to(
-            #     session.current_mount,
-            #     Point(
-            #         x=intermediate_pos[0],
-            #         y=intermediate_pos[1],
-            #         z=intermediate_pos[2] + session.tip_length))
-            print(type(session.current_mount))
+            intermediate_pos = position(
+                session.current_mount, session.adapter)
+            session.adapter.move_to(
+                session.current_mount,
+                Point(
+                    x=intermediate_pos[0],
+                    y=intermediate_pos[1],
+                    z=intermediate_pos[2] + session.tip_length))
             session.adapter.move_to(
                 session.current_mount,
                 Point(x=point[0], y=point[1], z=point[2]))
@@ -406,9 +400,7 @@ async def save_xy(data):
         else:
             x, y, _ = position(session.current_mount, session.adapter)
 
-        # Does mount offset matter for v2?
         session.points[point] = (x, y)
-        log.info("Points actually recorded {}{}".format(x, y))
         message = "Saved point {} value: {}".format(
             point, session.points[point])
         status = 200
@@ -432,7 +424,6 @@ async def save_z(data):
         status = 400
     else:
         if not feature_flags.use_protocol_api_v2():
-            print("Current Mount {}".format(session.current_mount))
             mount = 'Z' if session.current_mount == 'left' else 'A'
             actual_z = position(
                 mount, session.adapter)[-1]
@@ -469,8 +460,7 @@ async def save_transform(data):
             expected_pos[p] for p in expected_pos.keys()]
         # measured data
         actual = [session.points[p] for p in sorted(session.points.keys())]
-        print("Expected {}".format(expected))
-        print("Actual {}".format(actual))
+
         # Generate a 2 dimensional transform matrix from the two matricies
         flat_matrix = solve(expected, actual)
         # Add the z component to form the 3 dimensional transform

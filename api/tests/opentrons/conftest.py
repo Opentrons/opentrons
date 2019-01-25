@@ -212,6 +212,7 @@ async def async_server(request, virtual_smoothie_env, loop):
         app = init(loop)
         app['api_version'] = 1 if request.param == using_api1 else 2
         yield app
+        await app.shutdown()
 
 
 @pytest.fixture
@@ -362,12 +363,12 @@ def hardware(request, loop, virtual_smoothie_env):
 @pytest.fixture
 def main_router(loop, virtual_smoothie_env, hardware):
     from opentrons.api.routers import MainRouter
-    with MainRouter(hardware, loop) as router:
-        router.wait_until = partial(
-            wait_until,
-            notifications=router.notifications,
-            loop=loop)
-        yield router
+    router = MainRouter(hardware, loop)
+    router.wait_until = partial(
+        wait_until,
+        notifications=router.notifications,
+        loop=loop)
+    yield router
 
 
 async def wait_until(matcher, notifications, timeout=1, loop=None):
