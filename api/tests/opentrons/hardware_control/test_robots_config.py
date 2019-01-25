@@ -14,7 +14,7 @@ dummy_settings = {
     'name': 'Andy',
     'version': 42,
     'steps_per_mm': 'steps_rulz',
-    'acceleration': 'acceleration_rulz',
+    'acceleration': {'X': 3, 'Y': 2, 'Z': 15, 'A': 15, 'B': 2, 'C': 2},
     'instrument_offset': {
         'left': {
             'single': [1, 2, 3],

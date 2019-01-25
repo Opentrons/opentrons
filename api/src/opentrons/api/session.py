@@ -10,7 +10,8 @@ from opentrons.broker import publish, subscribe
 from opentrons.legacy_api.containers import get_container, location_to_list
 from opentrons.legacy_api.containers.placeable import (
     Module as ModulePlaceable, Placeable)
-from opentrons.commands import tree, types
+from opentrons.commands import tree, types as command_types
+from opentrons.commands.commands import is_new_loc, listify
 from opentrons.protocols import execute_protocol
 from opentrons.config import feature_flags as ff
 from opentrons.protocol_api import (ProtocolContext,
@@ -172,7 +173,7 @@ class Session(object):
             else:
                 stack.pop()
 
-        unsubscribe = subscribe(types.COMMAND, on_command)
+        unsubscribe = subscribe(command_types.COMMAND, on_command)
 
         try:
             # ensure actual pipettes are cached before driver is disconnected
@@ -276,14 +277,14 @@ class Session(object):
         def on_command(message):
             if message['$'] == 'before':
                 self.log_append()
-            if message['name'] == types.PAUSE:
+            if message['name'] == command_types.PAUSE:
                 self.set_state('paused')
-            if message['name'] == types.RESUME:
+            if message['name'] == command_types.RESUME:
                 self.set_state('running')
 
         self._reset()
 
-        _unsubscribe = subscribe(types.COMMAND, on_command)
+        _unsubscribe = subscribe(command_types.COMMAND, on_command)
         self.startTime = now()
         self.set_state('running')
 
@@ -467,9 +468,14 @@ def _get_labware(command):
             containers.append(_get_new_labware(location))
 
     if locations:
-        list_of_locations = location_to_list(locations)
-        containers.extend(
-            [get_container(location) for location in list_of_locations])
+        if is_new_loc(locations):
+            list_of_locations = listify(locations)
+            containers.extend(
+                [_get_new_labware(loc) for loc in list_of_locations])
+        else:
+            list_of_locations = location_to_list(locations)
+            containers.extend(
+                [get_container(location) for location in list_of_locations])
 
     containers = [c for c in containers if c is not None]
     modules = [m for m in modules if m is not None]

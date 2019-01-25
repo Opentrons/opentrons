@@ -19,10 +19,8 @@ import {
   FIXED_TRASH_ID,
 } from '../../constants.js'
 import {getPDMetadata} from '../../file-types'
-import {getDefaultsForStepType} from '../../steplist/formLevel'
+import {getDefaultsForStepType, handleFormChange} from '../../steplist/formLevel'
 import {cancelStepForm} from '../../steplist/actions'
-
-import handleFormChange from '../../steplist/actions/handleFormChange'
 
 import type {PipetteEntity, LabwareEntities} from '../types'
 import type {LoadFileAction} from '../../load-file'

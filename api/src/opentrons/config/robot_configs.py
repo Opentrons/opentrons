@@ -2,7 +2,7 @@ from collections import namedtuple
 import json
 import logging
 import os
-from typing import Any, Dict, List, NamedTuple, Tuple
+from typing import Any, Dict, List, NamedTuple, Tuple, Union
 
 from opentrons.config import get_config_index, feature_flags as fflags
 
@@ -42,7 +42,7 @@ Y_CURRENT_LOW = 0.3
 Y_CURRENT_HIGH = 1.25
 
 
-HIGH_CURRENT = {
+HIGH_CURRENT: Dict[str, float] = {
     'X': X_CURRENT_HIGH,
     'Y': Y_CURRENT_HIGH,
     'Z': MOUNT_CURRENT_HIGH,
@@ -51,7 +51,7 @@ HIGH_CURRENT = {
     'C': PLUNGER_CURRENT_HIGH
 }
 
-LOW_CURRENT = {
+LOW_CURRENT: Dict[str, float] = {
     'X': X_CURRENT_LOW,
     'Y': Y_CURRENT_LOW,
     'Z': MOUNT_CURRENT_LOW,
@@ -60,7 +60,7 @@ LOW_CURRENT = {
     'C': PLUNGER_CURRENT_LOW
 }
 
-DEFAULT_CURRENT = {
+DEFAULT_CURRENT: Dict[str, float] = {
     'X': HIGH_CURRENT['X'],
     'Y': HIGH_CURRENT['Y'],
     'Z': HIGH_CURRENT['Z'],
@@ -76,7 +76,7 @@ A_MAX_SPEED = 125
 B_MAX_SPEED = 40
 C_MAX_SPEED = 40
 
-DEFAULT_MAX_SPEEDS = {
+DEFAULT_MAX_SPEEDS: Dict[str, float] = {
     'X': X_MAX_SPEED,
     'Y': Y_MAX_SPEED,
     'Z': Z_MAX_SPEED,
@@ -88,13 +88,28 @@ DEFAULT_MAX_SPEEDS = {
 DEFAULT_CURRENT_STRING = ' '.join(
     ['{}{}'.format(key, value) for key, value in DEFAULT_CURRENT.items()])
 
-DEFAULT_DECK_CALIBRATION = [
+DEFAULT_DECK_CALIBRATION: List[List[float]] = [
     [1.00, 0.00, 0.00,  0.00],
     [0.00, 1.00, 0.00,  0.00],
     [0.00, 0.00, 1.00,  0.00],
     [0.00, 0.00, 0.00,  1.00]]
 
-DEFAULT_ACCELERATION = 'M204 S10000 X3000 Y2000 Z1500 A1500 B2000 C2000'
+X_ACCELERATION = 3000
+Y_ACCELERATION = 2000
+Z_ACCELERATION = 1500
+A_ACCELERATION = 1500
+B_ACCELERATION = 200
+C_ACCELERATION = 200
+
+DEFAULT_ACCELERATION: Dict[str, float] = {
+    'X': X_ACCELERATION,
+    'Y': Y_ACCELERATION,
+    'Z': Z_ACCELERATION,
+    'A': A_ACCELERATION,
+    'B': B_ACCELERATION,
+    'C': C_ACCELERATION
+}
+
 DEFAULT_STEPS_PER_MM = 'M92 X80.00 Y80.00 Z400 A400 B768 C768'
 # This probe height is ~73 from deck to the top surface of the switch body
 # per CAD; 74.3mm is the nominal for engagement from the switch drawing.
@@ -217,13 +232,20 @@ def _build_tip_probe(tip_probe_settings: dict) -> tip_probe_config:
     )
 
 
+def _build_acceleration(from_conf: Union[Dict, str, None]) -> Dict[str, float]:
+    if not from_conf or isinstance(from_conf, str):
+        return DEFAULT_ACCELERATION
+    else:
+        return from_conf
+
+
 def _build_config(deck_cal: List[List[float]],
                   robot_settings: Dict[str, Any]) -> robot_config:
     cfg = robot_config(
         name=robot_settings.get('name', 'Ada Lovelace'),
         version=int(robot_settings.get('version', ROBOT_CONFIG_VERSION)),
         steps_per_mm=robot_settings.get('steps_per_mm', DEFAULT_STEPS_PER_MM),
-        acceleration=robot_settings.get('acceleration', DEFAULT_ACCELERATION),
+        acceleration=_build_acceleration(robot_settings.get('acceleration')),
         gantry_calibration=deck_cal or DEFAULT_DECK_CALIBRATION,
         instrument_offset=build_fallback_instrument_offset(robot_settings),
         tip_length=robot_settings.get('tip_length', DEFAULT_TIP_LENGTH_DICT),

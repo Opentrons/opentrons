@@ -12,6 +12,7 @@
     "modelOffset": [0.0, 0.0, -13],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [1.8263, -0.0958, 1.088],
@@ -40,6 +41,7 @@
     "modelOffset": [0.0, 0.0, -13],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [1.8263, -0.0958, 1.088],
@@ -68,6 +70,7 @@
     "modelOffset": [0.0, 0.0, -13],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [1.8263, -0.0958, 1.088],
@@ -96,6 +99,7 @@
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [1.893415617, -1.1069, 3.042593193],
@@ -123,6 +127,7 @@
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [1.893415617, -1.1069, 3.042593193],
@@ -150,6 +155,7 @@
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [1.893415617, -1.1069, 3.042593193],
@@ -177,6 +183,7 @@
     "modelOffset": [0.0, 0.0, 0.0],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [11.79687499, -0.0098, 3.064988953],
@@ -202,6 +209,7 @@
     "modelOffset": [0.0, 0.0, 0.0],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [11.79687499, -0.0098, 3.064988953],
@@ -227,6 +235,7 @@
     "modelOffset": [0.0, 0.0, 0.0],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [11.79687499, -0.0098, 3.064988953],
@@ -252,6 +261,7 @@
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [12.29687531, -0.0049, 3.134703694],
@@ -277,6 +287,7 @@
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [12.29687531, -0.0049, 3.134703694],
@@ -302,6 +313,7 @@
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [12.29687531, -0.0049, 3.134703694],
@@ -327,6 +339,7 @@
     "modelOffset": [0.0, 0.0, 0.0],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [36.19844973, 0.043, 16.548],
@@ -355,6 +368,7 @@
     "modelOffset": [0.0, 0.0, 0.0],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [36.19844973, 0.043, 16.548],
@@ -383,6 +397,7 @@
     "modelOffset": [0.0, 0.0, 0.0],
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [36.19844973, 0.043, 16.548],
@@ -411,6 +426,7 @@
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [57.25698968, 0.017, 18.132],
@@ -436,6 +452,7 @@
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [57.25698968, 0.017, 18.132],
@@ -461,6 +478,7 @@
     "modelOffset": [0.0, 31.5, -25.8],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [57.25698968, 0.017, 18.132],
@@ -486,6 +504,7 @@
     "modelOffset": [0.0, 0.0, 20.0],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [148.9157,	0.0213,	56.3986],
@@ -515,6 +534,7 @@
     "modelOffset": [0.0, 0.0, 20.0],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.7,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [148.9157,	0.0213,	56.3986],
@@ -544,6 +564,7 @@
     "modelOffset": [0.0, 0.0, 20.0],
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.7,
+    "dropTipSpeed": 5,
     "ulPerMm": {
       "aspirate": [
         [148.9157,	0.0213,	56.3986],

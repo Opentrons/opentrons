@@ -24,6 +24,7 @@ PLUNGER_POSITIONS = {
 }
 
 DROP_TIP_RELEASE_DISTANCE = 20
+DEFAULT_DROP_TIP_SPEED = 5
 
 DEFAULT_ASPIRATE_SPEED = 5
 DEFAULT_DISPENSE_SPEED = 10
@@ -122,6 +123,7 @@ class Pipette:
             dispense_flow_rate=None,
             plunger_current=0.5,
             drop_tip_current=0.5,
+            drop_tip_speed=DEFAULT_DROP_TIP_SPEED,
             plunger_positions=PLUNGER_POSITIONS,
             pick_up_current=DEFAULT_PLUNGE_CURRENT,
             pick_up_distance=DEFAULT_TIP_PRESS_MM,
@@ -197,13 +199,12 @@ class Pipette:
         self._pick_up_distance = pick_up_distance
         self._pick_up_current = pick_up_current
 
-        # TODO (andy) these values maybe should persist between sessions,
-        # by saving within `robot_config`
         self._plunger_current = plunger_current
         self._drop_tip_current = drop_tip_current
 
         self.speeds = {}
         self.set_speed(aspirate=aspirate_speed, dispense=dispense_speed)
+        self._drop_tip_speed = drop_tip_speed
 
         self.set_flow_rate(
             aspirate=aspirate_flow_rate, dispense=dispense_flow_rate)
@@ -1046,10 +1047,13 @@ class Pipette:
                 x=pos_bottom
             )
             self.instrument_actuator.set_active_current(self._drop_tip_current)
+            self.instrument_actuator.push_speed()
+            self.instrument_actuator.set_speed(self._drop_tip_speed)
             self.robot.poses = self.instrument_actuator.move(
                 self.robot.poses,
                 x=pos_drop_tip
             )
+            self.instrument_actuator.pop_speed()
             self._shake_off_tips(location)
             if home_after:
                 self._home_after_drop_tip()

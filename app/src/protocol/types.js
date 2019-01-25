@@ -29,3 +29,5 @@ export type ProtocolState = {
   contents: ?string,
   data: ?ProtocolData,
 }
+
+export type ProtocolType = 'json' | 'python'

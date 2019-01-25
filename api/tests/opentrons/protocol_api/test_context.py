@@ -4,11 +4,12 @@ import json
 import pkgutil
 
 import opentrons.protocol_api as papi
-from opentrons.types import Mount, Point, Location
+from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, adapters
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.config.pipette_config import configs
+from opentrons.protocol_api import transfers as tf
 
 import pytest
 
@@ -444,3 +445,169 @@ def test_hw_manager(loop):
     del mgr
     # but not its new one, even if deleted
     assert passed.is_alive()
+
+
+def test_mix(loop, monkeypatch):
+    ctx = papi.ProtocolContext(loop)
+    ctx.home()
+    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_mL_eppendorf', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 3)
+    instr = ctx.load_instrument('p300_single', Mount.RIGHT,
+                                tip_racks=[tiprack])
+
+    instr.pick_up_tip()
+    mix_steps = []
+    aspirate_called_with = None
+    dispense_called_with = None
+
+    def fake_aspirate(vol=None, loc=None, rate=None):
+        nonlocal aspirate_called_with
+        nonlocal mix_steps
+        aspirate_called_with = ('aspirate', vol, loc, rate)
+        mix_steps.append(aspirate_called_with)
+
+    def fake_dispense(vol=None, loc=None, rate=None):
+        nonlocal dispense_called_with
+        nonlocal mix_steps
+        dispense_called_with = ('dispense', vol, loc, rate)
+        mix_steps.append(dispense_called_with)
+
+    monkeypatch.setattr(instr, 'aspirate', fake_aspirate)
+    monkeypatch.setattr(instr, 'dispense', fake_dispense)
+
+    repetitions = 2
+    volume = 5
+    location = lw.wells()[0]
+    rate = 2
+    instr.mix(repetitions, volume, location, rate)
+    expected_mix_steps = [('aspirate', volume, location, 2),
+                          ('dispense', volume, None, 2),
+                          ('aspirate', volume, None, 2),
+                          ('dispense', volume, None, 2)]
+
+    assert mix_steps == expected_mix_steps
+
+
+def test_touch_tip_default_args(loop, monkeypatch):
+    ctx = papi.ProtocolContext(loop)
+    ctx.home()
+    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_mL_eppendorf', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 3)
+    instr = ctx.load_instrument('p300_single', Mount.RIGHT,
+                                tip_racks=[tiprack])
+
+    instr.pick_up_tip()
+    total_hw_moves = []
+
+    async def fake_hw_move(mount, abs_position, speed=None,
+                           critical_point=None):
+        nonlocal total_hw_moves
+        total_hw_moves.append((abs_position, speed))
+
+    instr.aspirate(10, lw.wells()[0])
+    monkeypatch.setattr(ctx._hw_manager.hardware._api, 'move_to', fake_hw_move)
+    instr.touch_tip()
+    z_offset = Point(0, 0, 1)   # default z offset of 1mm
+    speed = 60                  # default speed
+    edges = [lw.wells()[0]._from_center_cartesian(1, 0, 1) - z_offset,
+             lw.wells()[0]._from_center_cartesian(-1, 0, 1) - z_offset,
+             lw.wells()[0]._from_center_cartesian(0, 1, 1) - z_offset,
+             lw.wells()[0]._from_center_cartesian(0, -1, 1) - z_offset]
+    for i in range(1, 5):
+        assert total_hw_moves[i] == (edges[i-1], speed)
+
+
+def test_blow_out(loop, monkeypatch):
+    ctx = papi.ProtocolContext(loop)
+    ctx.home()
+    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_mL_eppendorf', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 3)
+    instr = ctx.load_instrument('p300_single', Mount.RIGHT,
+                                tip_racks=[tiprack])
+
+    move_location = None
+    instr.pick_up_tip()
+    instr.aspirate(10, lw.wells()[0])
+
+    def fake_move(loc):
+        nonlocal move_location
+        move_location = loc
+
+    monkeypatch.setattr(instr, 'move_to', fake_move)
+    instr.blow_out()
+    assert move_location == lw.wells()[0].top()
+
+
+def test_transfer_options(loop, monkeypatch):
+    ctx = papi.ProtocolContext(loop)
+    lw1 = ctx.load_labware_by_name('biorad_96_wellPlate_pcr_200_uL', 1)
+    lw2 = ctx.load_labware_by_name('generic_96_wellPlate_380_uL', 2)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 3)
+    instr = ctx.load_instrument('p300_single', Mount.RIGHT,
+                                tip_racks=[tiprack])
+
+    ctx.home()
+    transfer_options = None
+
+    def fake_execute_transfer(xfer_plan):
+        nonlocal transfer_options
+        transfer_options = xfer_plan._options
+
+    monkeypatch.setattr(instr, '_execute_transfer', fake_execute_transfer)
+    instr.transfer(10, lw1.columns()[0], lw2.columns()[0],
+                   new_tip='always', mix_before=(2, 10), blow_out=True)
+    expected_xfer_options1 = tf.TransferOptions(
+        transfer=tf.Transfer(
+            new_tip=TransferTipPolicy.ALWAYS,
+            air_gap=0,
+            carryover=True,
+            gradient_function=None,
+            disposal_volume=0,
+            mix_strategy=tf.MixStrategy.BEFORE,
+            drop_tip_strategy=tf.DropTipStrategy.RETURN,
+            blow_out_strategy=tf.BlowOutStrategy.TRASH,
+            touch_tip_strategy=tf.TouchTipStrategy.NEVER
+        ),
+        pick_up_tip=tf.PickUpTipOpts(),
+        mix=tf.Mix(mix_before=tf.MixOpts(
+            repetitions=2,
+            volume=10,
+            rate=None),
+            mix_after=tf.MixOpts()
+        ),
+        blow_out=tf.BlowOutOpts(),
+        touch_tip=tf.TouchTipOpts(),
+        aspirate=tf.AspirateOpts(),
+        dispense=tf.DispenseOpts()
+    )
+    assert transfer_options == expected_xfer_options1
+
+    instr.pick_up_tip()
+    instr.distribute(50, lw1.rows()[0][0], lw2.columns()[0],
+                     new_tip='never', touch_tip=True, trash=True,
+                     disposal_vol=10, mix_after=(3, 20))
+    instr.drop_tip()
+    expected_xfer_options2 = tf.TransferOptions(
+        transfer=tf.Transfer(
+            new_tip=TransferTipPolicy.NEVER,
+            air_gap=0,
+            carryover=True,
+            gradient_function=None,
+            disposal_volume=10,
+            mix_strategy=tf.MixStrategy.AFTER,
+            drop_tip_strategy=tf.DropTipStrategy.TRASH,
+            blow_out_strategy=tf.BlowOutStrategy.NONE,
+            touch_tip_strategy=tf.TouchTipStrategy.ALWAYS
+        ),
+        pick_up_tip=tf.PickUpTipOpts(),
+        mix=tf.Mix(mix_before=tf.MixOpts(),
+                   mix_after=tf.MixOpts(repetitions=3,
+                                        volume=20,
+                                        rate=None)
+                   ),
+        blow_out=tf.BlowOutOpts(),
+        touch_tip=tf.TouchTipOpts(),
+        aspirate=tf.AspirateOpts(),
+        dispense=tf.DispenseOpts()
+    )
+    assert transfer_options == expected_xfer_options2

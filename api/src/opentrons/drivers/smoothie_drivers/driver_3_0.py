@@ -86,7 +86,8 @@ GCODES = {'HOME': 'G28.2',
           'SET_MAX_SPEED': 'M203.1',
           'SET_CURRENT': 'M907',
           'DISENGAGE_MOTOR': 'M18',
-          'HOMING_STATUS': 'G28.6'}
+          'HOMING_STATUS': 'G28.6',
+          'ACCELERATION': 'M204 S10000'}
 
 # Number of digits after the decimal point for coordinates being sent
 # to Smoothie
@@ -300,6 +301,9 @@ class SmoothieDriver_3_0_0:
         self._saved_max_speed_settings = self._max_speed_settings.copy()
         self._combined_speed = float(DEFAULT_AXES_SPEED)
         self._saved_axes_speed = float(self._combined_speed)
+
+        self._acceleration = config.acceleration.copy()
+        self._saved_acceleration = config.acceleration.copy()
 
         # position after homing
         self._homed_position = HOMED_POSITION.copy()
@@ -598,6 +602,30 @@ class SmoothieDriver_3_0_0:
 
     def pop_axis_max_speed(self):
         self.set_axis_max_speed(self._saved_max_speed_settings)
+
+    def set_acceleration(self, settings):
+        '''
+        Sets the acceleration (mm/sec^2) that a given axis will move
+
+        settings
+            Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
+            and floating point number for mm-per-second-squared (mm/sec^2)
+        '''
+        self._acceleration.update(settings)
+        values = ['{}{}'.format(axis.upper(), value)
+                  for axis, value in sorted(settings.items())]
+        command = '{} {}'.format(
+            GCODES['ACCELERATION'],
+            ' '.join(values)
+        )
+        log.debug("set_acceleration: {}".format(command))
+        self._send_command(command)
+
+    def push_acceleration(self):
+        self._saved_acceleration = self._acceleration.copy()
+
+    def pop_acceleration(self):
+        self.set_acceleration(self._saved_acceleration)
 
     def set_active_current(self, settings):
         '''
@@ -956,13 +984,13 @@ class SmoothieDriver_3_0_0:
             # use gpio to reset into a known state
             self._smoothie_reset()
         self._reset_from_error()
-        self._send_command(self._config.acceleration)
         self._send_command(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
         self._save_current(self.current, axes_active=False)
         self.update_position(default=self.homed_position)
         self.pop_axis_max_speed()
         self.pop_speed()
+        self.pop_acceleration()
 
     def _read_from_pipette(self, gcode, mount) -> Optional[str]:
         '''

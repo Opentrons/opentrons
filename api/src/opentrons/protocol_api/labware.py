@@ -28,6 +28,12 @@ persistent_path = os.path.join(env.get_path('APP_DATA_DIR'), 'offsets')
 
 
 class Well:
+    """
+    The Well class represents a  single well in a :py:class:`Labware`
+
+    It provides functions to return positions used in operations on the well
+    such as :py:meth:`top`, :py:meth:`bottom`
+    """
     def __init__(self, well_props: dict,
                  parent: Location,
                  display_name: str,
@@ -85,22 +91,26 @@ class Well:
     def has_tip(self, value: bool):
         self._has_tip = value
 
-    def top(self) -> Location:
+    def top(self, z: float = 0.0) -> Location:
         """
+        :param z: the z distance in mm
         :return: a Point corresponding to the absolute position of the
-        top-center of the well relative to the deck (with the front-left corner
-        of slot 1 as (0,0,0))
+                 top-center of the well relative to the deck (with the
+                 front-left corner of slot 1 as (0,0,0)). If z is specified,
+                 returns a point offset by z mm from top-center
         """
-        return Location(self._position, self)
+        return Location(self._position + Point(0, 0, z), self)
 
-    def bottom(self) -> Location:
+    def bottom(self, z: float = 0.0) -> Location:
         """
+        :param z: the z distance in mm
         :return: a Point corresponding to the absolute position of the
-        bottom-center of the well (with the front-left corner of slot 1 as
-        (0,0,0))
+                 bottom-center of the well (with the front-left corner of
+                 slot 1 as (0,0,0)). If z is specified, returns a point
+                 offset by z mm from bottom-center
         """
         top = self.top()
-        bottom_z = top.point.z - self._depth
+        bottom_z = top.point.z - self._depth + z
         return Location(Point(x=top.point.x, y=top.point.y, z=bottom_z), self)
 
     def center(self) -> Location:
@@ -125,9 +135,9 @@ class Well:
         inside of the well.
 
         :param x: a float in the range [-1.0, 1.0] for a percentage of half of
-            the radius/width in the X axis
+            the radius/length in the X axis
         :param y: a float in the range [-1.0, 1.0] for a percentage of half of
-            the radius/length in the Y axis
+            the radius/width in the Y axis
         :param z: a float in the range [-1.0, 1.0] for a percentage of half of
             the height above/below the center
 
@@ -136,8 +146,8 @@ class Well:
         """
         center = self.center()
         if self._shape is WellShape.RECTANGULAR:
-            x_size = self._width
-            y_size = self._length
+            x_size = self._length
+            y_size = self._width
         else:
             x_size = self._diameter
             y_size = self._diameter

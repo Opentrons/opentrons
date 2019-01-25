@@ -159,6 +159,8 @@ cd opentrons
 make install
 ```
 
+In addition, if (and only if) you want to build a PDF version of the Opentrons API documentation, you must install a latex distribution that includes a callable pdflatex. If that is installed, you can do `make -C api docs-pdf`.
+
 ### Testing and Linting
 
 You can test with:

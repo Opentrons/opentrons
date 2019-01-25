@@ -153,7 +153,8 @@ export default function client (dispatch) {
       .create(name, contents)
       .then(apiSession => {
         remote.session_manager.session = apiSession
-        handleApiSession(apiSession)
+        // state change will trigger a session notification, which will
+        // dispatch a successful sessionResponse
       })
       .catch(error => dispatch(actions.sessionResponse(error)))
   }
