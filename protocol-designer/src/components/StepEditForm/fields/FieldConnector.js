@@ -26,7 +26,7 @@ type SP = {value?: ?mixed, stepType: ?string}
 type DP = {updateValue: (?mixed) => void}
 type StepFieldProps = OP & SP & DP
 
-const StepField = (props: StepFieldProps) => {
+const FieldConnector = (props: StepFieldProps) => {
   const {
     name,
     render,
@@ -72,6 +72,6 @@ const DTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   },
 })
 
-const ConnectedStepField = connect(STP, DTP)(StepField)
+const ConnectedFieldConnector = connect(STP, DTP)(FieldConnector)
 
-export default ConnectedStepField
+export default ConnectedFieldConnector
