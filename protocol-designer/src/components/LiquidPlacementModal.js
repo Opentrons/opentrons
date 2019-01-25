@@ -13,7 +13,8 @@ import LiquidPlacementForm from '../components/LiquidPlacementForm'
 import SingleLabwareWrapper from '../components/SingleLabware'
 import WellSelectionInstructions from './WellSelectionInstructions'
 
-import {selectors} from '../labware-ingred/reducers'
+import {selectors} from '../labware-ingred/selectors'
+import {selectors as stepFormSelectors} from '../step-forms'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
 import wellSelectionSelectors from '../well-selection/selectors'
 import {
@@ -75,7 +76,7 @@ class LiquidPlacementModal extends React.Component<Props, State> {
 const mapStateToProps = (state: BaseState): SP => {
   const containerId = selectors.getSelectedLabwareId(state)
   const selectedWells = wellSelectionSelectors.getSelectedWells(state)
-  if (containerId === null) {
+  if (containerId == null) {
     console.error('LiquidPlacementModal: No labware is selected, and no labwareId was given to LiquidPlacementModal')
     return {
       selectedWells: {},
@@ -85,7 +86,7 @@ const mapStateToProps = (state: BaseState): SP => {
     }
   }
 
-  const labware = selectors.getLabwareById(state)[containerId]
+  const labware = stepFormSelectors.getLabwareById(state)[containerId]
   let wellContents: ContentsByWell = {}
 
   // selection for deck setup: shows initial state of liquids

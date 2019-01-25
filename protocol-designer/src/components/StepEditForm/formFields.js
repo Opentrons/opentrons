@@ -12,7 +12,6 @@ import {
 } from '@opentrons/components'
 import i18n from '../../localization'
 import {selectors as stepFormSelectors} from '../../step-forms'
-import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
 import {hydrateField} from '../../steplist/fieldLevel'
 import type {StepFieldName} from '../../steplist/fieldLevel'
 import {
@@ -132,7 +131,7 @@ type BlowoutLocationDropdownOP = {
 } & FocusHandlers
 type BlowoutLocationDropdownSP = {options: Options}
 const BlowoutLocationDropdownSTP = (state: BaseState, ownProps: BlowoutLocationDropdownOP): BlowoutLocationDropdownSP => {
-  let options = labwareIngredSelectors.disposalLabwareOptions(state)
+  let options = stepFormSelectors.getDisposalLabwareOptions(state)
   if (ownProps.includeDestWell) {
     options = [
       ...options,
@@ -169,7 +168,7 @@ export const BlowoutLocationDropdown = connect(BlowoutLocationDropdownSTP)((prop
 type LabwareDropdownOP = {name: StepFieldName, className?: string} & FocusHandlers
 type LabwareDropdownSP = {labwareOptions: Options}
 const LabwareDropdownSTP = (state: BaseState): LabwareDropdownSP => ({
-  labwareOptions: labwareIngredSelectors.labwareOptions(state),
+  labwareOptions: stepFormSelectors.getLabwareOptions(state),
 })
 export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdownOP & LabwareDropdownSP) => {
   const {labwareOptions, name, className, focusedField, dirtyFields, onFieldBlur, onFieldFocus} = props

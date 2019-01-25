@@ -6,7 +6,7 @@ import assert from 'assert'
 import LiquidEditForm from './LiquidEditForm'
 import LiquidsPageInfo from './LiquidsPageInfo'
 import * as labwareIngredActions from '../../labware-ingred/actions'
-import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
+import {selectors as labwareIngredSelectors} from '../../labware-ingred/selectors'
 
 import type {LiquidGroup} from '../../labware-ingred/types'
 import type {BaseState, ThunkDispatch} from '../../types'

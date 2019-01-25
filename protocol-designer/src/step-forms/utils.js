@@ -2,6 +2,7 @@
 import assert from 'assert'
 import reduce from 'lodash/reduce'
 import {getPipetteNameSpecs} from '@opentrons/shared-data'
+import type {DeckSlot} from '@opentrons/components'
 import type {PipetteInvariantState} from './reducers'
 import type {PipetteEntity, PipetteEntities} from './types'
 
@@ -18,6 +19,17 @@ export function getIdsInRange<T: string | number> (orderedIds: Array<T>, startId
   assert(endIdx !== -1, `end step "${String(endId)}" does not exist in orderedStepIds`)
   assert(endIdx >= startIdx, `expected end index to be greater than or equal to start index, got "${startIdx}", "${endIdx}"`)
   return orderedIds.slice(startIdx, endIdx + 1)
+}
+
+export function getLabwareIdInSlot (
+  labwareIdToSlot: {[labwareId: string]: DeckSlot},
+  slot: DeckSlot
+): ?string {
+  const labwareIdsForSourceSlot = Object.entries(labwareIdToSlot)
+    .filter(([id, labwareSlot]) => labwareSlot === slot)
+    .map(([id, labwareSlot]) => id)
+  assert(labwareIdsForSourceSlot.length < 2, `multiple labware in slot ${slot}, expected none or one`)
+  return labwareIdsForSourceSlot[0]
 }
 
 // helper to add the 'spec' key to pipette entities safely

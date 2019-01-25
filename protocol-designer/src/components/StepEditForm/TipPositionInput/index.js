@@ -3,7 +3,6 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {HoverTooltip, FormGroup, InputField} from '@opentrons/components'
 import { getLabware } from '@opentrons/shared-data'
-import {selectors as labwareIngredsSelectors} from '../../../labware-ingred/reducers'
 import i18n from '../../../localization'
 import {selectors as stepFormSelectors} from '../../../step-forms'
 import stepFormStyles from '../StepEditForm.css'
@@ -100,7 +99,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
 
   let wellHeightMM = null
   if (formData && formData[labwareFieldName]) {
-    const labwareById = labwareIngredsSelectors.getLabwareById(state)
+    const labwareById = stepFormSelectors.getLabwareById(state)
     const labware = labwareById[formData[labwareFieldName]]
     const labwareDef = labware && labware.type && getLabware(labware.type)
     if (labwareDef) {

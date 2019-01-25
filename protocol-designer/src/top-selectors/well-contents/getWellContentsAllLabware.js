@@ -4,7 +4,8 @@ import {createSelector} from 'reselect'
 import reduce from 'lodash/reduce'
 
 import {getLabware, type WellDefinition} from '@opentrons/shared-data'
-import {selectors as labwareIngredSelectors} from '../../labware-ingred/reducers'
+import {selectors as stepFormSelectors} from '../../step-forms'
+import {selectors as labwareIngredSelectors} from '../../labware-ingred/selectors'
 import wellSelectionSelectors from '../../well-selection/selectors'
 
 import type {Selector} from '../../types'
@@ -55,9 +56,9 @@ const _getWellContents = (
 }
 
 const getWellContentsAllLabware: Selector<WellContentsByLabware> = createSelector(
-  labwareIngredSelectors.getLabwareById,
+  stepFormSelectors.getLabwareById,
   labwareIngredSelectors.getLiquidsByLabwareId,
-  labwareIngredSelectors.getSelectedLabware,
+  stepFormSelectors.getSelectedLabware,
   wellSelectionSelectors.getSelectedWells,
   wellSelectionSelectors.getHighlightedWells,
   (labwareById, liquidsByLabware, selectedLabware, selectedWells, highlightedWells) => {
