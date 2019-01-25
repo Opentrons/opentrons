@@ -7,7 +7,7 @@ import {
   StepRadioGroup,
 } from './formFields'
 import type {FocusHandlers} from './index'
-import formStyles from '../forms.css'
+import formStyles from '../forms/forms.css'
 
 type PauseFormProps = {focusHandlers: FocusHandlers}
 function PauseForm (props: PauseFormProps): React.Element<'div'> {

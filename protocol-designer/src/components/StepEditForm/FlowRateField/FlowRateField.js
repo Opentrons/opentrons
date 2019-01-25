@@ -9,6 +9,7 @@ import {
 } from '@opentrons/components'
 import {Portal} from '../../portals/MainPageModalPortal'
 import modalStyles from '../../modals/modal.css'
+import stepFormStyles from '../StepEditForm.css'
 import styles from './FlowRateField.css'
 
 const DEFAULT_LABEL = 'Flow Rate'
@@ -198,6 +199,7 @@ export default class FlowRateField extends React.Component<Props, State> {
             readOnly
             disabled={disabled}
             onClick={this.openModal}
+            className={stepFormStyles.small_field}
             value={formFlowRate ? `${formFlowRate}` : 'Default'}
           />
         </FormGroup>

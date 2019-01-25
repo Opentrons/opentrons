@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 import i18n from '../../localization'
 import styles from './LiquidPlacementForm.css'
-import formStyles from '../forms.css'
+import formStyles from '../forms/forms.css'
 import type {Options} from '../../types'
 
 export type ValidFormValues = {

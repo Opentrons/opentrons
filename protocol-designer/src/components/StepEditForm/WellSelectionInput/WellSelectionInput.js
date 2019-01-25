@@ -59,7 +59,7 @@ class WellSelectionInput extends React.Component<Props> {
       <FormGroup
         label={this.props.isMulti ? 'Columns:' : 'Wells:'}
         disabled={this.props.disabled}
-        className={styles.well_selection_input}>
+        className={styles.small_field}>
         <InputField
           readOnly
           name={this.props.name}

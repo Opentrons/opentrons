@@ -15,7 +15,7 @@ import i18n from '../localization'
 import {Portal} from './portals/MainPageModalPortal'
 import styles from './FilePage.css'
 import EditPipettesModal from './modals/EditPipettesModal'
-import formStyles from '../components/forms.css'
+import formStyles from '../components/forms/forms.css'
 import type {FileMetadataFields} from '../file-data'
 
 export type Props = {

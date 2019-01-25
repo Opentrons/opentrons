@@ -31,7 +31,7 @@
  * to accommodate carat on right.
  */
 
-.well_selection_input {
+/* .well_selection_input {
   lost-column: 2/16;
 }
 
@@ -45,7 +45,7 @@
 
 .pipette_field {
   lost-column: 7/16;
-}
+} */
 
 /* Style overrides for particular step types */
 
@@ -62,14 +62,18 @@
 
 /* ------------------- */
 
+/*
 .field_row {
   lost-utility: clearfix;
   min-height: 2.25rem;
   max-width: 24rem;
+*/
 
-  /* Field row is for: (optional checkbox) + label + associated fields
-   * All items in field row sum to 15/16, leaving 1/16 gap on the right.
-   */
+/* Field row is for: (optional checkbox) + label + associated fields
+  * All items in field row sum to 15/16, leaving 1/16 gap on the right.
+  */
+
+/*
   & label {
     lost-column: 7/16;
     max-width: 8.5rem;
@@ -83,6 +87,7 @@
     lost-column: 8/16;
   }
 }
+*/
 
 .repetitions_row {
   padding: 1.5rem 0;
@@ -103,4 +108,100 @@
   flex: 0 0 auto;
   padding: 0 0.5rem;
   margin: 0.5em 0 0.5em 20px;
+}
+
+.button_row {
+  lost-utility: clearfix;
+  margin-top: 2rem;
+
+  & > * {
+    lost-column: 1/6;
+  }
+}
+
+/* NEW STYLES */
+
+.field_row {
+  min-height: 2.25rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.start_group {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.end_group {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.wrap_group {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.large_field {
+  width: 14rem;
+  margin-right: 0.5rem;
+}
+
+.medium_field {
+  width: 8em;
+  margin-right: 0.5rem;
+
+  /* 144 */
+}
+
+.small_field {
+  width: 6rem;
+  margin-right: 0.5rem;
+}
+
+.no_label {
+  margin-top: 0.5rem;
+}
+
+.advanced_settings_icon {
+  height: 3rem;
+  width: 3rem;
+}
+
+.section_divider {
+  height: 1px;
+  width: 100%;
+  background-color: var(--c-light-gray);
+  margin: 1em 0;
+}
+
+/* TODO: real styles using rem and canonical colors */
+.path_option {
+  width: 35px;
+  height: 24px;
+  margin-right: 0.5rem;
+  border-radius: 3px;
+  border: 1px solid #9b9b9b;
+  font-size: 0.5rem;
+  cursor: pointer;
+}
+
+.path_option.selected {
+  background-color: var(--c-light-gray);
+}
+
+.path_options {
+  display: flex;
+  flex-direction: row;
+  list-style: none;
+}
+
+@media screen and (max-width: 1279px) {
+  .field_row {
+    flex-wrap: wrap;
+  }
 }

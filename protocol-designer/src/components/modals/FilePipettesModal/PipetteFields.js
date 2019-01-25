@@ -11,7 +11,7 @@ import {pipetteOptions} from '../../../pipettes/pipetteData'
 import PipetteDiagram from './PipetteDiagram'
 import TiprackDiagram from './TiprackDiagram'
 import styles from './FilePipettesModal.css'
-import formStyles from '../../forms.css'
+import formStyles from '../../forms/forms.css'
 import type {FormPipette} from '../../../step-forms'
 
 const pipetteOptionsWithNone = [

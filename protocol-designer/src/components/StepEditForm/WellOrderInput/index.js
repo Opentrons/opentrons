@@ -3,9 +3,9 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {FormGroup} from '@opentrons/components'
 import cx from 'classnames'
-import i18n from '../../../localization'
 import {selectors as stepFormSelectors} from '../../../step-forms'
 import styles from './WellOrderInput.css'
+import stepEditStyles from '../StepEditForm.css'
 import WellOrderModal from './WellOrderModal'
 import ZIG_ZAG_IMAGE from '../../../images/zig_zag_icon.svg'
 import type {BaseState} from '../../../types'
@@ -22,9 +22,7 @@ class WellOrderInput extends React.Component<OP & SP, WellOrderInputState> {
 
   render () {
     return (
-      <FormGroup
-        label={i18n.t('form.step_edit_form.field.well_order.label')}
-        className={styles.well_order_input}>
+      <FormGroup className={cx(styles.small_field, stepEditStyles.no_label)}>
         <WellOrderModal
           prefix={this.props.prefix}
           closeModal={this.handleClose}

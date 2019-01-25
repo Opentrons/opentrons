@@ -12,7 +12,7 @@ import {
   PrimaryButton,
 } from '@opentrons/components'
 import styles from './LiquidEditForm.css'
-import formStyles from '../forms.css'
+import formStyles from '../forms/forms.css'
 import type {LiquidGroup} from '../../labware-ingred/types'
 
 type Props = {
