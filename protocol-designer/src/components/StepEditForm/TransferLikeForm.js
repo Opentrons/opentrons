@@ -14,7 +14,7 @@ import {
   LabwareField,
   ChangeTipField,
   FlowRateField,
-  StepFormField,
+  FieldConnector,
   TipPositionField,
   getTooltipForField,
   WellSelectionField,
@@ -69,7 +69,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                 <TextField name="aspirate_mix_times" units='Times' {...focusHandlers} />
               </CheckboxRowField>
               {stepType === 'distribute' &&
-                <StepFormField
+                <FieldConnector
                   name="aspirate_disposalVol_checkbox"
                   render={({value, updateValue}) => (
                     <React.Fragment>

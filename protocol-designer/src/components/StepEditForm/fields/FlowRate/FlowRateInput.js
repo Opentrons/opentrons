@@ -4,8 +4,8 @@ import round from 'lodash/round'
 import {
   AlertModal,
   FormGroup,
-  InputField,
   RadioGroup,
+  InputField,
 } from '@opentrons/components'
 import {Portal} from '../../../portals/MainPageModalPortal'
 import modalStyles from '../../../modals/modal.css'
@@ -200,7 +200,7 @@ export default class FlowRateInput extends React.Component<Props, State> {
             disabled={disabled}
             onClick={this.openModal}
             className={stepFormStyles.small_field}
-            value={formFlowRate ? `${formFlowRate}` : 'Default'}
+            value={formFlowRate ? `${formFlowRate}` : 'default'}
           />
         </FormGroup>
 

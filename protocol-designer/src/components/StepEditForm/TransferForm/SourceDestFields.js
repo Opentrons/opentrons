@@ -88,8 +88,16 @@ class SourceDestFields extends React.Component<Props, State> {
                 <TipPositionField fieldName={addFieldNamePrefix('touchTipMmFromBottom')} />
               </CheckboxRowField>
               <CheckboxRowField name={addFieldNamePrefix('mix_checkbox')} label='Mix'>
-                <TextField name={addFieldNamePrefix('dispense_mix_volume')} units="μL" {...this.props.focusHandlers} />
-                <TextField name={addFieldNamePrefix('dispense_mix_times')} units="Times" {...this.props.focusHandlers} />
+                <TextField
+                  name={addFieldNamePrefix('dispense_mix_volume')}
+                  units="μL"
+                  className={styles.small_field}
+                  {...this.props.focusHandlers} />
+                <TextField
+                  name={addFieldNamePrefix('dispense_mix_times')}
+                  units="Times"
+                  className={styles.small_field}
+                  {...this.props.focusHandlers} />
               </CheckboxRowField>
               {(this.props.prefix === 'dispense' && path !== 'multiDispense') &&
                 <CheckboxRowField name='blowout_checkbox' label='Blow out'>

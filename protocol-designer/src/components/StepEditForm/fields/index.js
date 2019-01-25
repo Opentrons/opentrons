@@ -3,7 +3,7 @@
 // TODO: BC 2019-1-25 this connector and tooltip helper should not be exported from this directory,
 // as it should only be used by field components inside ./fields
 // We can remove it once TransferLikeForm is deleted
-export {default as StepFormField} from './StepFormField'
+export {default as FieldConnector} from './FieldConnector'
 export {default as getTooltipForField} from './getTooltipForField'
 
 /* Generic Fields */
