@@ -1,8 +1,8 @@
-from . import types
+from . import types as command_types
 from ..broker import broker
 import functools
 import inspect
-from typing import Union
+from typing import Union, Sequence, List, Any
 
 from opentrons.legacy_api.containers import (Well as OldWell,
                                              Container as OldContainer,
@@ -10,6 +10,19 @@ from opentrons.legacy_api.containers import (Well as OldWell,
                                              location_to_list)
 from opentrons.protocol_api.labware import Well, Labware, ModuleGeometry
 from opentrons.types import Location
+
+
+def is_new_loc(location: Union[Location, Well, None,
+                               OldWell, OldContainer,
+                               OldSlot, Sequence]) -> bool:
+    return isinstance(listify(location)[0], (Location, Well))
+
+
+def listify(location: Any) -> List:
+    if isinstance(location, list):
+        return sum([listify(loc) for loc in location], [])
+    else:
+        return [location]
 
 
 def _stringify_new_loc(loc: Union[Location, Well]) -> str:
@@ -57,11 +70,14 @@ def _stringify_legacy_loc(loc: Union[OldWell, OldContainer,
 
 
 def stringify_location(location: Union[Location, None,
-                                       OldWell, OldContainer, OldSlot]) -> str:
-    if isinstance(location, (Location, Well)):
-        return _stringify_new_loc(location)
+                                       OldWell, OldContainer,
+                                       OldSlot, Sequence]) -> str:
+    if is_new_loc(location):
+        loc_str_list = [_stringify_new_loc(loc)
+                        for loc in listify(location)]
+        return ', '.join(loc_str_list)
     else:
-        return _stringify_legacy_loc(location)
+        return _stringify_legacy_loc(location)  # type: ignore
 
 
 def make_command(name, payload):
@@ -71,7 +87,7 @@ def make_command(name, payload):
 def home(mount):
     text = 'Homing pipette plunger on mount {mount}'.format(mount=mount)
     return make_command(
-        name=types.HOME,
+        name=command_types.HOME,
         payload={
             'axis': mount,
             'text': text
@@ -85,7 +101,7 @@ def aspirate(instrument, volume, location, rate):
         volume=volume, location=location_text, rate=rate
     )
     return make_command(
-        name=types.ASPIRATE,
+        name=command_types.ASPIRATE,
         payload={
             'instrument': instrument,
             'volume': volume,
@@ -103,7 +119,7 @@ def dispense(instrument, volume, location, rate):
     )
 
     return make_command(
-        name=types.DISPENSE,
+        name=command_types.DISPENSE,
         payload={
             'instrument': instrument,
             'volume': volume,
@@ -120,11 +136,15 @@ def consolidate(instrument, volume, source, dest):
         source=stringify_location(source),
         dest=stringify_location(dest)
     )
-    # incase either source or dest is list of tuple location
-    # strip both down to simply lists of Placeables
-    locations = [] + location_to_list(source) + location_to_list(dest)
+    if is_new_loc(source):
+        # Dest is assumed as new location too
+        locations = [] + listify(source) + listify(dest)
+    else:
+        # incase either source or dest is list of tuple location
+        # strip both down to simply lists of Placeables
+        locations = [] + location_to_list(source) + location_to_list(dest)
     return make_command(
-        name=types.CONSOLIDATE,
+        name=command_types.CONSOLIDATE,
         payload={
             'instrument': instrument,
             'locations': locations,
@@ -142,11 +162,15 @@ def distribute(instrument, volume, source, dest):
         source=stringify_location(source),
         dest=stringify_location(dest)
     )
-    # incase either source or dest is list of tuple location
-    # strip both down to simply lists of Placeables
-    locations = [] + location_to_list(source) + location_to_list(dest)
+    if is_new_loc(source):
+        # Dest is assumed as new location too
+        locations = [] + listify(source) + listify(dest)
+    else:
+        # incase either source or dest is list of tuple location
+        # strip both down to simply lists of Placeables
+        locations = [] + location_to_list(source) + location_to_list(dest)
     return make_command(
-        name=types.DISTRIBUTE,
+        name=command_types.DISTRIBUTE,
         payload={
             'instrument': instrument,
             'locations': locations,
@@ -164,11 +188,15 @@ def transfer(instrument, volume, source, dest):
         source=stringify_location(source),
         dest=stringify_location(dest)
     )
-    # incase either source or dest is list of tuple location
-    # strip both down to simply lists of Placeables
-    locations = [] + location_to_list(source) + location_to_list(dest)
+    if is_new_loc(source):
+        # Dest is assumed as new location too
+        locations = [] + listify(source) + listify(dest)
+    else:
+        # incase either source or dest is list of tuple location
+        # strip both down to simply lists of Placeables
+        locations = [] + location_to_list(source) + location_to_list(dest)
     return make_command(
-        name=types.TRANSFER,
+        name=command_types.TRANSFER,
         payload={
             'instrument': instrument,
             'locations': locations,
@@ -183,7 +211,7 @@ def transfer(instrument, volume, source, dest):
 def comment(msg):
     text = msg
     return make_command(
-        name=types.COMMENT,
+        name=command_types.COMMENT,
         payload={
             'text': text
         }
@@ -195,7 +223,7 @@ def mix(instrument, repetitions, volume, location):
         repetitions=repetitions, volume=volume
     )
     return make_command(
-        name=types.MIX,
+        name=command_types.MIX,
         payload={
             'instrument': instrument,
             'location': location,
@@ -214,7 +242,7 @@ def blow_out(instrument, location):
         text += ' at {location}'.format(location=location_text)
 
     return make_command(
-        name=types.BLOW_OUT,
+        name=command_types.BLOW_OUT,
         payload={
             'instrument': instrument,
             'location': location,
@@ -226,7 +254,7 @@ def blow_out(instrument, location):
 def touch_tip(instrument):
     text = 'Touching tip'
     return make_command(
-        name=types.TOUCH_TIP,
+        name=command_types.TOUCH_TIP,
         payload={
             'instrument': instrument,
             'text': text
@@ -237,7 +265,7 @@ def touch_tip(instrument):
 def air_gap():
     text = 'Air gap'
     return make_command(
-        name=types.AIR_GAP,
+        name=command_types.AIR_GAP,
         payload={
             'text': text
         }
@@ -247,7 +275,7 @@ def air_gap():
 def return_tip():
     text = 'Returning tip'
     return make_command(
-        name=types.RETURN_TIP,
+        name=command_types.RETURN_TIP,
         payload={
             'text': text
         }
@@ -258,7 +286,7 @@ def pick_up_tip(instrument, location):
     location_text = stringify_location(location)
     text = 'Picking up tip {location}'.format(location=location_text)
     return make_command(
-        name=types.PICK_UP_TIP,
+        name=command_types.PICK_UP_TIP,
         payload={
             'instrument': instrument,
             'location': location,
@@ -271,7 +299,7 @@ def drop_tip(instrument, location):
     location_text = stringify_location(location)
     text = 'Dropping tip {location}'.format(location=location_text)
     return make_command(
-        name=types.DROP_TIP,
+        name=command_types.DROP_TIP,
         payload={
             'instrument': instrument,
             'location': location,
@@ -283,7 +311,7 @@ def drop_tip(instrument, location):
 def magdeck_engage():
     text = "Engaging magnetic deck module"
     return make_command(
-        name=types.MAGDECK_ENGAGE,
+        name=command_types.MAGDECK_ENGAGE,
         payload={'text': text}
     )
 
@@ -291,7 +319,7 @@ def magdeck_engage():
 def magdeck_disengage():
     text = "Disengaging magnetic deck module"
     return make_command(
-        name=types.MAGDECK_DISENGAGE,
+        name=command_types.MAGDECK_DISENGAGE,
         payload={'text': text}
     )
 
@@ -299,7 +327,7 @@ def magdeck_disengage():
 def magdeck_calibrate():
     text = "Calibrating magnetic deck module"
     return make_command(
-        name=types.MAGDECK_CALIBRATE,
+        name=command_types.MAGDECK_CALIBRATE,
         payload={'text': text}
     )
 
@@ -308,7 +336,7 @@ def tempdeck_set_temp():
     text = "Setting temperature deck module temperature " \
            "(rounded off to nearest integer)"
     return make_command(
-        name=types.TEMPDECK_SET_TEMP,
+        name=command_types.TEMPDECK_SET_TEMP,
         payload={'text': text}
     )
 
@@ -316,7 +344,7 @@ def tempdeck_set_temp():
 def tempdeck_deactivate():
     text = "Deactivating temperature deck module"
     return make_command(
-        name=types.TEMPDECK_DEACTIVATE,
+        name=command_types.TEMPDECK_DEACTIVATE,
         payload={'text': text}
     )
 
@@ -324,7 +352,7 @@ def tempdeck_deactivate():
 def delay(seconds, minutes):
     text = "Delaying for {minutes}m {seconds}s"
     return make_command(
-        name=types.DELAY,
+        name=command_types.DELAY,
         payload={
             'minutes': minutes,
             'seconds': seconds,
@@ -338,7 +366,7 @@ def pause(msg):
     if msg:
         text = text + ': {}'.format(msg)
     return make_command(
-        name=types.PAUSE,
+        name=command_types.PAUSE,
         payload={
             'text': text
         }
@@ -347,7 +375,7 @@ def pause(msg):
 
 def resume():
     return make_command(
-        name=types.RESUME,
+        name=command_types.RESUME,
         payload={
             'text': 'Resuming robot operation'
         }
@@ -358,7 +386,7 @@ def do_publish(cmd, f, when, res, meta, *args, **kwargs):
     """ Implement the publish so it can be called outside the decorator """
     publish_command = functools.partial(
         broker.publish,
-        topic=types.COMMAND)
+        topic=command_types.COMMAND)
     call_args = _get_args(f, args, kwargs)
     command_args = dict(
         zip(
@@ -399,7 +427,7 @@ def do_publish(cmd, f, when, res, meta, *args, **kwargs):
 
 def _publish_dec(before, after, command, meta=None):
     def decorator(f):
-        @functools.wraps(f)
+        @functools.wraps(f, updated=functools.WRAPPER_UPDATES+('__globals__',))
         def decorated(*args, **kwargs):
             if before:
                 do_publish(command, f, 'before', None, meta, *args, **kwargs)

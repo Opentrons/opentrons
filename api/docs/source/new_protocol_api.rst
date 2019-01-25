@@ -145,7 +145,7 @@ From the example above, the "commands" section looked like:
 .. code-block:: python
 
     pipette.aspirate(100, plate.wells_by_index()['A1'])
-    pipette.dispense(100, plate.wells_by_index()[’B2’])
+    pipette.dispense(100, plate.wells_by_index()['B2'])
 
 which does exactly what it says - aspirate 100 uL from A1 and dispense it all in B2.
 
@@ -160,6 +160,32 @@ Robot and Pipette
 .. autoclass:: opentrons.protocol_api.contexts.InstrumentContext
    :members:
 
+.. autoclass:: opentrons.protocol_api.transfers.TransferOptions
+   :members:
+
+.. autoclass:: opentrons.protocol_api.transfers.Transfer
+   :members:
+
+.. autoclass:: opentrons.protocol_api.transfers.PickUpTipOpts
+   :members:
+
+.. autoclass:: opentrons.protocol_api.transfers.MixOpts
+   :members:
+
+.. autoclass:: opentrons.protocol_api.transfers.Mix
+   :members:
+
+.. autoclass:: opentrons.protocol_api.transfers.BlowOutOpts
+   :members:
+
+.. autoclass:: opentrons.protocol_api.transfers.TouchTipOpts
+   :members:
+
+.. autoclass:: opentrons.protocol_api.transfers.AspirateOpts
+   :members:
+
+.. autoclass:: opentrons.protocol_api.transfers.DispenseOpts
+   :members:
 
 .. _protocol-api-labware:
 
