@@ -1,9 +1,8 @@
 // @flow
 import * as React from 'react'
 import {getWellTotalVolume} from '@opentrons/shared-data'
-import type {StepFieldName} from '../../form-types'
 import KnowledgeBaseLink from '../../components/KnowledgeBaseLink'
-
+import type {FormError} from './errors'
 /*******************
 ** Warning Messages **
 ********************/
@@ -14,10 +13,8 @@ export type FormWarningType =
   | 'BELOW_MIN_DISPOSAL_VOLUME'
 
 export type FormWarning = {
+  ...$Exact<FormError>,
   type: FormWarningType,
-  title: string,
-  body?: React.Node,
-  dependentFields: Array<StepFieldName>,
 }
 // TODO: Ian 2018-12-06 use i18n for title/body text
 const FORM_WARNINGS: {[FormWarningType]: FormWarning} = {
