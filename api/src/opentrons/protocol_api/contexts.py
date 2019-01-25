@@ -5,7 +5,8 @@ import time
 from .labware import (Well, Labware, load, load_module, ModuleGeometry,
                       quirks_from_any_parent)
 from typing import Any, Dict, List, Optional, Union, Tuple, Sequence
-from opentrons import types, hardware_control as hc, broker, commands as cmds
+from opentrons import types, hardware_control as hc, commands as cmds
+from opentrons.commands import CommandPublisher
 import opentrons.config.robot_configs as rc
 from opentrons.config import advanced_settings
 from opentrons.hardware_control import adapters, modules
