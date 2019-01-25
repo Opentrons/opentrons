@@ -4,7 +4,7 @@ import cx from 'classnames'
 import {FormGroup} from '@opentrons/components'
 import styles from '../StepEditForm.css'
 import type {FocusHandlers} from '../index'
-import StepField from './StepFormField'
+import StepField from './FieldConnector'
 
 type PathFieldProps = {focusHandlers: FocusHandlers}
 const PathField = (props: PathFieldProps) => (

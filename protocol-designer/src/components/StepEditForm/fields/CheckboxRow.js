@@ -5,7 +5,7 @@ import {
 } from '@opentrons/components'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import styles from '../StepEditForm.css'
-import StepField from './StepFormField'
+import StepField from './FieldConnector'
 
 type CheckboxRowProps = {
   label?: string,

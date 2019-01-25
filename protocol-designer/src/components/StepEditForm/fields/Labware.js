@@ -5,9 +5,8 @@ import {DropdownField, type DropdownOption} from '@opentrons/components'
 import {selectors as labwareIngredSelectors} from '../../../labware-ingred/reducers'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import type {BaseState} from '../../../types'
-import {} from '../../forms'
 import type {FocusHandlers} from '../index'
-import StepField from './StepFormField'
+import StepField from './FieldConnector'
 
 type Options = Array<DropdownOption>
 

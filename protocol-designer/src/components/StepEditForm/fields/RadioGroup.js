@@ -3,7 +3,7 @@ import * as React from 'react'
 import {RadioGroup} from '@opentrons/components'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import type {FocusHandlers} from '../index'
-import StepField from './StepFormField'
+import StepField from './FieldConnector'
 
 type RadioGroupFieldProps = {
   name: StepFieldName,

@@ -10,7 +10,7 @@ import {
 } from '../../../step-generation/utils'
 import type {BaseState} from '../../../types'
 import type {FocusHandlers} from '../index'
-import StepField from './StepFormField'
+import StepField from './FieldConnector'
 
 type Options = Array<DropdownOption>
 

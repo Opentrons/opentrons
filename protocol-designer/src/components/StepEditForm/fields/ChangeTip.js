@@ -6,7 +6,7 @@ import type {StepFieldName} from '../../../steplist/fieldLevel'
 import type {ChangeTipOptions} from '../../../step-generation/types'
 import type {StepType} from '../../../form-types'
 import styles from '../StepEditForm.css'
-import StepField from './StepFormField'
+import StepField from './FieldConnector'
 
 const CHANGE_TIP_VALUES: Array<ChangeTipOptions> = ['always', 'once', 'perSource', 'perDest', 'never']
 

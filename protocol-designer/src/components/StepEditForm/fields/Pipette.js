@@ -13,7 +13,7 @@ import type {BaseState} from '../../../types'
 import type {StepType} from '../../../form-types'
 import styles from '../StepEditForm.css'
 import type {FocusHandlers} from '../index'
-import StepField from './StepFormField'
+import StepField from './FieldConnector'
 
 type Options = Array<DropdownOption>
 
