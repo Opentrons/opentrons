@@ -1,15 +1,15 @@
 // @flow
 import * as React from 'react'
 import {RadioGroup} from '@opentrons/components'
-import type {StepFieldName} from '../../steplist/fieldLevel'
+import type {StepFieldName} from '../../../steplist/fieldLevel'
+import type {FocusHandlers} from '../index'
 import StepField from './StepFormField'
-import type {FocusHandlers} from './index'
 
-type StepRadioGroupProps = {
+type RadioGroupFieldProps = {
   name: StepFieldName,
   options: $PropertyType<React.ElementProps<typeof RadioGroup>, 'options'>,
 } & FocusHandlers
-export const StepRadioGroup = (props: StepRadioGroupProps) => {
+const RadioGroupField = (props: RadioGroupFieldProps) => {
   const {name, onFieldFocus, onFieldBlur, focusedField, dirtyFields, ...radioGroupProps} = props
   return (
     <StepField
@@ -28,3 +28,5 @@ export const StepRadioGroup = (props: StepRadioGroupProps) => {
       )} />
   )
 }
+
+export default RadioGroupField

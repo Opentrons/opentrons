@@ -1,11 +1,15 @@
 // @flow
 
+// TODO: BC 2019-1-25 this connector and tooltip helper should not be exported from this directory,
+// as it should only be used by field components inside ./fields
+// We can remove it once TransferLikeForm is deleted
 export {default as StepFormField} from './StepFormField'
+export {default as getTooltipForField} from './getTooltipForField'
 
 /* Generic Fields */
 
-export {default as CheckboxRow} from './CheckboxRow'
-export {default as RadioGroup} from './RadioGroup'
+export {default as CheckboxRowField} from './CheckboxRow'
+export {default as RadioGroupField} from './RadioGroup'
 export {default as TextField} from './Text'
 
 /* Specialized Fields */
@@ -21,5 +25,3 @@ export {default as LabwareField} from './Labware'
 export {default as PathField} from './Path'
 export {default as PipetteField} from './Pipette'
 export {default as VolumeField} from './Volume'
-
-export {default as SourceDestFields} from './SourceDestFields'

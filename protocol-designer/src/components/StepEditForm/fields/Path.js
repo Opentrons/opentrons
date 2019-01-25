@@ -2,12 +2,12 @@
 import * as React from 'react'
 import cx from 'classnames'
 import {FormGroup} from '@opentrons/components'
-import styles from './StepEditForm.css'
+import styles from '../StepEditForm.css'
+import type {FocusHandlers} from '../index'
 import StepField from './StepFormField'
-import type {FocusHandlers} from './index'
 
 type PathFieldProps = {focusHandlers: FocusHandlers}
-export const PathField = (props: PathFieldProps) => (
+const PathField = (props: PathFieldProps) => (
   <FormGroup label='Path:'>
     <StepField
       name="path"
@@ -32,3 +32,5 @@ export const PathField = (props: PathFieldProps) => (
       )} />
   </FormGroup>
 )
+
+export default PathField

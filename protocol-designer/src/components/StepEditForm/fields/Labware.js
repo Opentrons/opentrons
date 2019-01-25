@@ -3,19 +3,19 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {DropdownField, type DropdownOption} from '@opentrons/components'
 import {selectors as labwareIngredSelectors} from '../../../labware-ingred/reducers'
-import type {StepFieldName} from '../../steplist/fieldLevel'
-import type {BaseState} from '../../types'
+import type {StepFieldName} from '../../../steplist/fieldLevel'
+import type {BaseState} from '../../../types'
+import type {FocusHandlers} from '../index'
 import StepField from './StepFormField'
-import type {FocusHandlers} from './index'
 
 type Options = Array<DropdownOption>
 
-type LabwareDropdownOP = {name: StepFieldName, className?: string} & FocusHandlers
-type LabwareDropdownSP = {labwareOptions: Options}
-const LabwareDropdownSTP = (state: BaseState): LabwareDropdownSP => ({
+type LabwareFieldOP = {name: StepFieldName, className?: string} & FocusHandlers
+type LabwareFieldSP = {labwareOptions: Options}
+const LabwareFieldSTP = (state: BaseState): LabwareFieldSP => ({
   labwareOptions: labwareIngredSelectors.labwareOptions(state),
 })
-export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdownOP & LabwareDropdownSP) => {
+const LabwareField = connect(LabwareFieldSTP)((props: LabwareFieldOP & LabwareFieldSP) => {
   const {labwareOptions, name, className, focusedField, dirtyFields, onFieldBlur, onFieldFocus} = props
   return (
     // TODO: BC abstract e.currentTarget.value inside onChange with fn like onChangeValue of type (value: mixed) => {}
@@ -44,3 +44,5 @@ export const LabwareDropdown = connect(LabwareDropdownSTP)((props: LabwareDropdo
     />
   )
 })
+
+export default LabwareField

@@ -3,8 +3,8 @@ import * as React from 'react'
 import cx from 'classnames'
 import {connect} from 'react-redux'
 
-import i18n from '../../../localization'
-import {Portal} from '../../portals/MainPageModalPortal'
+import i18n from '../../../../localization'
+import {Portal} from '../../../portals/MainPageModalPortal'
 import {
   Modal,
   OutlineButton,
@@ -12,12 +12,12 @@ import {
   FormGroup,
   DropdownField,
 } from '@opentrons/components'
-import modalStyles from '../../modals/modal.css'
-import {actions} from '../../../steplist'
-import {selectors as stepFormSelectors} from '../../../step-forms'
-import type {BaseState} from '../../../types'
+import modalStyles from '../../../modals/modal.css'
+import {actions} from '../../../../steplist'
+import {selectors as stepFormSelectors} from '../../../../step-forms'
+import type {BaseState} from '../../../../types'
 import WellOrderViz from './WellOrderViz'
-import type {WellOrderOption} from '../../../form-types'
+import type {WellOrderOption} from '../../../../form-types'
 
 import styles from './WellOrderInput.css'
 

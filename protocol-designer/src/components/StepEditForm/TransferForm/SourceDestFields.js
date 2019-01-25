@@ -3,23 +3,23 @@ import * as React from 'react'
 import {FormGroup, IconButton, HoverTooltip} from '@opentrons/components'
 import cx from 'classnames'
 
-import type {StepFieldName} from '../../steplist/fieldLevel'
-import i18n from '../../localization'
+import type {StepFieldName} from '../../../steplist/fieldLevel'
+import i18n from '../../../localization'
 
-import type {FocusHandlers} from './index'
+import type {FocusHandlers} from '../index'
+
 import {
-  LabwareDropdown,
-  StepInputField,
-  StepCheckboxRow,
-  BlowoutLocationDropdown,
-} from './formFields'
+  LabwareField,
+  TextField,
+  CheckboxRowField,
+  BlowoutLocationField,
+  TipPositionField,
+  FlowRateField,
+  WellSelectionField,
+  WellOrderField,
+} from '../fields'
 
-import TipPositionInput from './TipPositionInput'
-import FlowRateField from './FlowRateField'
-import WellSelectionInput from './WellSelectionInput'
-import WellOrderInput from './WellOrderInput'
-
-import styles from './StepEditForm.css'
+import styles from '../StepEditForm.css'
 
 type Props = {
   focusHandlers: FocusHandlers,
@@ -29,7 +29,7 @@ type State = {collapsed?: boolean}
 
 const makeAddFieldNamePrefix = (prefix: string) => (fieldName: string): StepFieldName => `${prefix}_${fieldName}`
 
-class FormSection extends React.Component<Props, State> {
+class SourceDestFields extends React.Component<Props, State> {
   state = {collapsed: true}
 
   handleClick = (e: SyntheticEvent<>) => {
@@ -44,24 +44,24 @@ class FormSection extends React.Component<Props, State> {
       <div className={styles.field_row}>
         <div className={styles.start_group}>
           <FormGroup label={labwareLabel} className={styles.labware_field}>
-            <LabwareDropdown
+            <LabwareField
               name={addFieldNamePrefix('labware')}
               className={styles.large_field}
               {...this.props.focusHandlers} />
           </FormGroup>
-          <WellSelectionInput
+          <WellSelectionField
             name={addFieldNamePrefix('wells')}
             labwareFieldName={addFieldNamePrefix('labware')}
             pipetteFieldName="pipette"
             {...this.props.focusHandlers} />
-          <WellOrderInput prefix={this.props.prefix} />
+          <WellOrderField prefix={this.props.prefix} />
         </div>
         <div className={styles.end_group}>
           <FlowRateField
             name={addFieldNamePrefix('flowRate')}
             pipetteFieldName="pipette"
             flowRateType={this.props.prefix} /> {/* TODO: this should be a variable */}
-          <TipPositionInput fieldName={addFieldNamePrefix('mmFromBottom')} />
+          <TipPositionField fieldName={addFieldNamePrefix('mmFromBottom')} />
           <HoverTooltip tooltipComponent={i18n.t('tooltip.advanced_settings')}>
             {(hoverTooltipHandlers) => (
               <div
@@ -78,28 +78,28 @@ class FormSection extends React.Component<Props, State> {
             <FormGroup label={hiddenFieldsLabel}>
               {this.props.prefix === 'aspirate' &&
                 <React.Fragment>
-                  <StepCheckboxRow name="preWetTip" label="Pre-wet tip" />
-                  <StepCheckboxRow disabled tooltipComponent={i18n.t('tooltip.not_in_beta')} name="aspirate_airGap_checkbox" label="Air Gap">
-                    <StepInputField disabled name="aspirate_airGap_volume" units="μL" {...this.props.focusHandlers} />
-                  </StepCheckboxRow>
+                  <CheckboxRowField name="preWetTip" label="Pre-wet tip" />
+                  <CheckboxRowField disabled tooltipComponent={i18n.t('tooltip.not_in_beta')} name="aspirate_airGap_checkbox" label="Air Gap">
+                    <TextField disabled name="aspirate_airGap_volume" units="μL" {...this.props.focusHandlers} />
+                  </CheckboxRowField>
                 </React.Fragment>
               }
-              <StepCheckboxRow name={addFieldNamePrefix('touchTip_checkbox')} label="Touch tip">
-                <TipPositionInput fieldName={addFieldNamePrefix('touchTipMmFromBottom')} />
-              </StepCheckboxRow>
-              <StepCheckboxRow name={addFieldNamePrefix('mix_checkbox')} label='Mix'>
-                <StepInputField name={addFieldNamePrefix('dispense_mix_volume')} units="μL" {...this.props.focusHandlers} />
-                <StepInputField name={addFieldNamePrefix('dispense_mix_times')} units="Times" {...this.props.focusHandlers} />
-              </StepCheckboxRow>
+              <CheckboxRowField name={addFieldNamePrefix('touchTip_checkbox')} label="Touch tip">
+                <TipPositionField fieldName={addFieldNamePrefix('touchTipMmFromBottom')} />
+              </CheckboxRowField>
+              <CheckboxRowField name={addFieldNamePrefix('mix_checkbox')} label='Mix'>
+                <TextField name={addFieldNamePrefix('dispense_mix_volume')} units="μL" {...this.props.focusHandlers} />
+                <TextField name={addFieldNamePrefix('dispense_mix_times')} units="Times" {...this.props.focusHandlers} />
+              </CheckboxRowField>
               {(this.props.prefix === 'dispense' && path !== 'multiDispense') &&
-                <StepCheckboxRow name='blowout_checkbox' label='Blow out'>
-                  <BlowoutLocationDropdown
+                <CheckboxRowField name='blowout_checkbox' label='Blow out'>
+                  <BlowoutLocationField
                     name="blowout_location"
                     className={styles.full_width}
                     includeSourceWell={path === 'single'}
                     includeDestWell
                     {...this.props.focusHandlers} />
-                </StepCheckboxRow>
+                </CheckboxRowField>
               }
             </FormGroup>
           }
@@ -109,4 +109,4 @@ class FormSection extends React.Component<Props, State> {
   }
 }
 
-export default FormSection
+export default SourceDestFields

@@ -17,7 +17,7 @@ import styles from './StepEditForm.css'
 import FormAlerts from './FormAlerts'
 import MixForm from './MixForm'
 import TransferLikeForm from './TransferLikeForm'
-import MoveLiquidForm from './MoveLiquidForm'
+import TransferForm from './TransferForm'
 import PauseForm from './PauseForm'
 import ConfirmDeleteModal from './ConfirmDeleteModal'
 import ButtonRow from './ButtonRow'
@@ -28,7 +28,7 @@ const STEP_FORM_MAP: {[StepType]: *} = {
   transfer: TransferLikeForm,
   consolidate: TransferLikeForm,
   distribute: TransferLikeForm,
-  moveLiquid: MoveLiquidForm,
+  moveLiquid: TransferForm,
 }
 
 export type FocusHandlers = {

@@ -1,14 +1,16 @@
 // @flow
 import * as React from 'react'
 import {FormGroup, CheckboxField} from '@opentrons/components'
-import styles from './StepEditForm.css'
+
+import styles from '../StepEditForm.css'
+import type {FocusHandlers} from '../index'
+
 import StepField from './StepFormField'
 import TextField from './Text'
 import BlowoutLocationField from './BlowoutLocation'
-import type {FocusHandlers} from './index'
 
 type DisposalVolumeFieldProps = {focusHandlers: FocusHandlers}
-export const DisposalVolumeFields = (props: DisposalVolumeFieldProps) => (
+const DisposalVolumeField = (props: DisposalVolumeFieldProps) => (
   <FormGroup label='Multi-Dispense Options:'>
     <StepField
       name="aspirate_disposalVol_checkbox"
@@ -47,3 +49,5 @@ export const DisposalVolumeFields = (props: DisposalVolumeFieldProps) => (
       )} />
   </FormGroup>
 )
+
+export default DisposalVolumeField

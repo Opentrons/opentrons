@@ -2,17 +2,17 @@
 import * as React from 'react'
 import {FormGroup, DropdownField} from '@opentrons/components'
 import i18n from '../../../localization'
-import type {StepFieldName} from '../../steplist/fieldLevel'
-import type {ChangeTipOptions} from '../../step-generation/types'
-import type {StepType} from '../../form-types'
-import styles from './StepEditForm.css'
+import type {StepFieldName} from '../../../steplist/fieldLevel'
+import type {ChangeTipOptions} from '../../../step-generation/types'
+import type {StepType} from '../../../form-types'
+import styles from '../StepEditForm.css'
 import StepField from './StepFormField'
 
 const CHANGE_TIP_VALUES: Array<ChangeTipOptions> = ['always', 'once', 'perSource', 'perDest', 'never']
 
 // NOTE: ChangeTipField not validated as of 6/27/18 so no focusHandlers needed
 type ChangeTipFieldProps = {name: StepFieldName, stepType: StepType}
-export const ChangeTipField = (props: ChangeTipFieldProps) => {
+const ChangeTipField = (props: ChangeTipFieldProps) => {
   const {name, stepType} = props
   const options = CHANGE_TIP_VALUES.map((value) => ({
     value,
@@ -34,3 +34,5 @@ export const ChangeTipField = (props: ChangeTipFieldProps) => {
       )} />
   )
 }
+
+export default ChangeTipField

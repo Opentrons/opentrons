@@ -2,19 +2,19 @@
 import * as React from 'react'
 import cx from 'classnames'
 
+import type {StepType, HydratedMoveLiquidFormDataLegacy} from '../../../form-types'
 import {
   VolumeField,
   PipetteField,
   ChangeTipField,
   DisposalVolumeField,
   PathField,
-} from './fields'
-import SourceDestFields from './fields/SourceDestFields'
-import styles from './StepEditForm.css'
-import type {FocusHandlers} from './index'
-import type {StepType, HydratedMoveLiquidFormDataLegacy} from '../../form-types'
+} from '../fields'
+import styles from '../StepEditForm.css'
+import type {FocusHandlers} from '../index'
+import SourceDestFields from './SourceDestFields'
 
-type MoveLiquidFormProps = {
+type TransferFormProps = {
   focusHandlers: FocusHandlers,
   stepType: StepType,
   formData: HydratedMoveLiquidFormDataLegacy,
@@ -25,7 +25,7 @@ type MoveLiquidFormProps = {
 // TODO: BC: IMMEDIATELY i18n all across SourceDestFields
 // TODO: BC: IMMEDIATELY instead of passing path from here, put it in connect fields where needed
 
-const MoveLiquidForm = (props: MoveLiquidFormProps) => {
+const TransferForm = (props: TransferFormProps) => {
   const {focusHandlers, stepType} = props
   const {path} = props.formData
   return (
@@ -55,4 +55,4 @@ const MoveLiquidForm = (props: MoveLiquidFormProps) => {
   )
 }
 
-export default MoveLiquidForm
+export default TransferForm

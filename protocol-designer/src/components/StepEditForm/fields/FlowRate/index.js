@@ -4,10 +4,10 @@ import FlowRateInput from './FlowRateInput'
 import {connect} from 'react-redux'
 import {
   actions as steplistActions,
-} from '../../../steplist'
-import {selectors as stepFormSelectors} from '../../../step-forms'
-import type {StepFieldName} from '../../../steplist/fieldLevel'
-import type {BaseState, ThunkDispatch} from '../../../types'
+} from '../../../../steplist'
+import {selectors as stepFormSelectors} from '../../../../step-forms'
+import type {StepFieldName} from '../../../../steplist/fieldLevel'
+import type {BaseState, ThunkDispatch} from '../../../../types'
 
 type Props = React.ElementProps<typeof FlowRateInput> & {
   innerKey: string,

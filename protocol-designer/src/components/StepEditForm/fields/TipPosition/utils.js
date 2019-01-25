@@ -4,9 +4,9 @@ import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
-} from '../../../constants'
+} from '../../../../constants'
 
-import {getIsTouchTipField, type TipOffsetFields} from '../../../form-types'
+import {getIsTouchTipField, type TipOffsetFields} from '../../../../form-types'
 
 export function getDefaultMmFromBottom (args: {
   fieldName: TipOffsetFields,

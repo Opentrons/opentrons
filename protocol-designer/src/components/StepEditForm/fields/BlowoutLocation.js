@@ -3,14 +3,14 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {DropdownField, type DropdownOption} from '@opentrons/components'
 import {selectors as labwareIngredSelectors} from '../../../labware-ingred/reducers'
-import type {StepFieldName} from '../../steplist/fieldLevel'
+import type {StepFieldName} from '../../../steplist/fieldLevel'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../../../step-generation/utils'
-import type {BaseState} from '../../types'
+import type {BaseState} from '../../../types'
+import type {FocusHandlers} from '../index'
 import StepField from './StepFormField'
-import type {FocusHandlers} from './index'
 
 type Options = Array<DropdownOption>
 
@@ -57,3 +57,5 @@ export const BlowoutLocationDropdown = connect(BlowoutLocationDropdownSTP)((prop
       )} />
   )
 })
+
+export default BlowoutLocationDropdown

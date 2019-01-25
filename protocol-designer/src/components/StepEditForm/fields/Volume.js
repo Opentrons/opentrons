@@ -4,7 +4,7 @@ import cx from 'classnames'
 import {FormGroup, HoverTooltip} from '@opentrons/components'
 import type {StepType} from '../../../form-types'
 import type {FocusHandlers} from '../index'
-import styles from './StepEditForm.css'
+import styles from '../StepEditForm.css'
 import getTooltipForField from './getTooltipForField'
 import TextField from './Text'
 

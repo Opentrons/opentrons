@@ -3,11 +3,11 @@ import * as React from 'react'
 import {
   CheckboxField,
 } from '@opentrons/components'
-import type {StepFieldName} from '../../steplist/fieldLevel'
-import styles from './StepEditForm.css'
+import type {StepFieldName} from '../../../steplist/fieldLevel'
+import styles from '../StepEditForm.css'
 import StepField from './StepFormField'
 
-type StepCheckboxRowProps = {
+type CheckboxRowProps = {
   label?: string,
   name: StepFieldName,
   children?: ?React.Node,
@@ -15,7 +15,7 @@ type StepCheckboxRowProps = {
   disabled?: boolean,
   tooltipComponent?: React.Node,
 }
-export const StepCheckboxRow = (props: StepCheckboxRowProps) => (
+export const CheckboxRow = (props: CheckboxRowProps) => (
   <StepField
     name={props.name}
     tooltipComponent={props.tooltipComponent}
@@ -32,3 +32,5 @@ export const StepCheckboxRow = (props: StepCheckboxRowProps) => (
       </div>
     )} />
 )
+
+export default CheckboxRow

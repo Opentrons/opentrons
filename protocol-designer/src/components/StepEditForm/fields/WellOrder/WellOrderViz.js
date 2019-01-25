@@ -2,10 +2,10 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import WELLS_IMAGE from '../../../images/well_order_wells.svg'
-import PATH_IMAGE from '../../../images/well_order_path.svg'
+import WELLS_IMAGE from '../../../../images/well_order_wells.svg'
+import PATH_IMAGE from '../../../../images/well_order_path.svg'
 
-import type {WellOrderOption} from '../../../form-types'
+import type {WellOrderOption} from '../../../../form-types'
 
 import styles from './WellOrderInput.css'
 

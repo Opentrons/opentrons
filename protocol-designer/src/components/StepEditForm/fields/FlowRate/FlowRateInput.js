@@ -7,9 +7,9 @@ import {
   InputField,
   RadioGroup,
 } from '@opentrons/components'
-import {Portal} from '../../portals/MainPageModalPortal'
-import modalStyles from '../../modals/modal.css'
-import stepFormStyles from '../StepEditForm.css'
+import {Portal} from '../../../portals/MainPageModalPortal'
+import modalStyles from '../../../modals/modal.css'
+import stepFormStyles from '../../StepEditForm.css'
 import styles from './FlowRateInput.css'
 
 const DEFAULT_LABEL = 'Flow Rate'
