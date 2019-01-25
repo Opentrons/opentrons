@@ -180,7 +180,7 @@ class Session(object):
             else:
                 stack.pop()
 
-        unsubscribe = self._broker.subscribe(types.COMMAND, on_command)
+        unsubscribe = self._broker.subscribe(command_types.COMMAND, on_command)
 
         try:
             # ensure actual pipettes are cached before driver is disconnected
@@ -295,7 +295,8 @@ class Session(object):
 
         self._reset()
 
-        _unsubscribe = self._broker.subscribe(types.COMMAND, on_command)
+        _unsubscribe = self._broker.subscribe(
+            command_types.COMMAND, on_command)
 
         self.startTime = now()
         self.set_state('running')
