@@ -71,4 +71,4 @@ Simulating Python Protocols
 As our OT 2 software is no longer bundled with our desktop app, there are a few more steps you have to follow in order
 to simulate your protocol without being connected to a robot.
 
-To set up your environment, please view `this article <https://support.opentrons.com/ot-2/getting-started-software-setup/installing-the-opentrons-api-on-your-computer-for-simulation>`_
+To set up your environment, please view `this support article <https://support.opentrons.com/ot-2/getting-started-software-setup/installing-the-opentrons-api-on-your-computer-for-simulation>`_
