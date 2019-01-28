@@ -33,6 +33,7 @@ If Python is new to you, we suggest going through a few simple tutorials to acqu
 
 After going through the above tutorials, you should have enough of an understanding of Python to work with the Opentrons API and start designing your experiments!
 More detailed information on python can always be found at `the python docs <https://docs.python.org/3/index.html>`_
+
 *******************************
 
 *******************
