@@ -66,9 +66,10 @@ function updatePatchPathField (patch, rawForm, pipetteEntities) {
 
   let pipetteCapacityExceeded = false
   if (appliedPatch.volume && appliedPatch.pipette && appliedPatch.pipette in pipetteEntities) {
+    // TODO IMMEDIATELY also apply 2x-well-rule and add disposal volume -- make this a util, and search for other places this happens
     const pipetteCapacity = getPipetteCapacity(pipetteEntities[appliedPatch.pipette])
     if (pipetteCapacity) {
-      pipetteCapacityExceeded = appliedPatch.volume > pipetteCapacity
+      pipetteCapacityExceeded = appliedPatch.volume > pipetteCapacity // TODO IMMEDIATELY also apply disposal volume
     }
   }
 

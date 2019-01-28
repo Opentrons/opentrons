@@ -1,9 +1,9 @@
 // @flow
+import {defaultMemoize} from 'reselect'
 import getDisabledFieldsMoveLiquidForm from './getDisabledFieldsMoveLiquidForm'
 import type {FormData} from '../../../form-types'
 
-// TODO: Ian 2019-01-28 perf: this fn could be memoized
-export default function getDisabledFields (rawForm: FormData): Set<string> {
+function _getDisabledFields (rawForm: FormData): Set<string> {
   switch (rawForm.stepType) {
     case 'moveLiquid': return getDisabledFieldsMoveLiquidForm(rawForm)
     default: {
@@ -12,3 +12,9 @@ export default function getDisabledFields (rawForm: FormData): Set<string> {
     }
   }
 }
+
+// shallow-memoized because every disable-able field in the form calls this function once
+// WARNING: do not mutate the same rawForm obj or this memoization will break
+const getDisabledFields = defaultMemoize(_getDisabledFields)
+
+export default getDisabledFields
