@@ -2,7 +2,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {DropdownField, type DropdownOption} from '@opentrons/components'
-import {selectors as labwareIngredSelectors} from '../../../labware-ingred/selectors'
+import {selectors as stepFormSelectors} from '../../../step-forms'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -24,7 +24,7 @@ type BlowoutLocationDropdownOP = {
 } & FocusHandlers
 type BlowoutLocationDropdownSP = {options: Options}
 const BlowoutLocationDropdownSTP = (state: BaseState, ownProps: BlowoutLocationDropdownOP): BlowoutLocationDropdownSP => {
-  let options = labwareIngredSelectors.disposalLabwareOptions(state)
+  let options = stepFormSelectors.getDisposalLabwareOptions(state)
   if (ownProps.includeDestWell) {
     options = [
       ...options,
