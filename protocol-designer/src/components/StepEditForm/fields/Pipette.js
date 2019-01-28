@@ -8,7 +8,7 @@ import {
   type DropdownOption,
 } from '@opentrons/components'
 import {selectors as stepFormSelectors} from '../../../step-forms'
-import {hydrateField, type StepFieldName} from '../../../steplist/fieldLevel'
+import type {StepFieldName} from '../../../steplist/fieldLevel'
 import type {BaseState} from '../../../types'
 import type {StepType} from '../../../form-types'
 import styles from '../StepEditForm.css'
@@ -18,11 +18,10 @@ import StepField from './FieldConnector'
 type Options = Array<DropdownOption>
 
 type PipetteFieldOP = {name: StepFieldName, stepType?: StepType} & FocusHandlers
-type PipetteFieldSP = {pipetteOptions: Options, getHydratedPipette: (string) => any} // TODO: real hydrated pipette type
+type PipetteFieldSP = {pipetteOptions: Options}
 type PipetteFieldProps = PipetteFieldOP & PipetteFieldSP
 const PipetteFieldSTP = (state: BaseState, ownProps: PipetteFieldOP): PipetteFieldSP => ({
   pipetteOptions: stepFormSelectors.getEquippedPipetteOptions(state),
-  getHydratedPipette: (value) => hydrateField(stepFormSelectors.getHydrationContext(state), ownProps.name, value),
 })
 const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldProps) => (
   <StepField
