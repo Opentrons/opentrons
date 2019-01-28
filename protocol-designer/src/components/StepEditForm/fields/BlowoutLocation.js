@@ -2,7 +2,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {DropdownField, type DropdownOption} from '@opentrons/components'
-import {selectors as labwareIngredSelectors} from '../../../labware-ingred/reducers'
+import {selectors as labwareIngredSelectors} from '../../../labware-ingred/selectors'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
