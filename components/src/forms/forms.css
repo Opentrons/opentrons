@@ -148,6 +148,7 @@
     border: 0;
     padding: 0.25rem 0.5rem;
     outline: none;
+    height: 1.5rem;
     border-radius: 3px;
     color: var(--c-dark-gray);
     background-color: var(--c-light-gray);

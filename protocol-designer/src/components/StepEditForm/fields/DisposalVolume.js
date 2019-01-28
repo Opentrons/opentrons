@@ -30,7 +30,7 @@ const DisposalVolumeField = (props: DisposalVolumeFieldProps) => (
                     <TextField
                       name="aspirate_disposalVol_volume"
                       units="μL"
-                      className={styles.small_field}
+                      className={cx(styles.small_field, styles.orphan_field)}
                       {...props.focusHandlers} />
                   </div>
                 )
@@ -44,7 +44,7 @@ const DisposalVolumeField = (props: DisposalVolumeFieldProps) => (
                   <div className={styles.sub_select_label}>Blowout</div>
                   <BlowoutLocationField
                     name="blowout_location"
-                    className={styles.medium_field}
+                    className={cx(styles.medium_field, styles.orphan_field)}
                     includeSourceWell
                     {...props.focusHandlers} />
                 </div>

@@ -39,7 +39,7 @@ class MixForm extends React.Component<Props, State> {
       <React.Fragment>
         <div className={cx(styles.form_row, styles.start_group)}>
           <PipetteField name="pipette" {...focusHandlers} />
-          <VolumeField label="Mix Vol:" focusHandlers={focusHandlers} />
+          <VolumeField label="Mix Vol:" focusHandlers={focusHandlers} stepType="mix" />
           <FormGroup label='Repetitions:' className={styles.small_field}>
             <TextField name="times" units='times' {...focusHandlers} />
           </FormGroup>

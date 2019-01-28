@@ -137,18 +137,10 @@
   margin-right: 0.5rem;
 }
 
-.large_field:last-child {
-  margin-right: 0;
-}
-
 .medium_field {
   font-size: var(--fs-body-1);
   width: 12em;
   margin-right: 0.5rem;
-}
-
-.medium_field:last-child {
-  margin-right: 0;
 }
 
 .small_field {
@@ -157,8 +149,8 @@
   margin-right: 0.5rem;
 }
 
-.small_field:last-child {
-  margin-right: 0;
+.orphan_field {
+  margin: 0;
 }
 
 .checkbox_row {
@@ -209,6 +201,12 @@
 
 .path_option.selected {
   background-color: var(--c-light-gray);
+}
+
+.path_option.disabled {
+  color: var(--c-light-gray);
+  background-color: var(--c-med-gray);
+  cursor: default;
 }
 
 .path_options {

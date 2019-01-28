@@ -2,11 +2,10 @@
 import makeConditionalPatchUpdater from './makeConditionalPatchUpdater'
 import {chainPatchUpdaters, getChannels, getAllWellsFromPrimaryWells} from './utils'
 import {getPipetteCapacity} from '../../../pipettes/pipetteData'
+import {getWellRatio} from '../../utils'
 import type {FormData} from '../../../form-types'
 import type {FormPatch} from '../../actions/types'
 import type {LabwareEntities, PipetteEntities} from '../../../step-forms/types'
-
-type WellRatio = 'n:n' | '1:many' | 'many:1'
 
 const wellRatioUpdatesMap = [
   {
@@ -59,26 +58,6 @@ const wellRatioUpdatesMap = [
 ]
 const wellRatioUpdater = makeConditionalPatchUpdater(wellRatioUpdatesMap)
 
-function getWellRatio (sourceWells: mixed, destWells: mixed): ?WellRatio {
-  if (
-    !Array.isArray(sourceWells) || sourceWells.length === 0 ||
-    !Array.isArray(destWells) || destWells.length === 0
-  ) {
-    return null
-  }
-  if (sourceWells.length === destWells.length) {
-    return 'n:n'
-  }
-  if (sourceWells.length === 1 && destWells.length > 1) {
-    return '1:many'
-  }
-  if (sourceWells.length > 1 && destWells.length === 1) {
-    return 'many:1'
-  }
-  console.assert(false, `unexpected well ratio: ${sourceWells.length}:${destWells.length}`)
-  return null
-}
-
 function updatePatchPathField (patch, rawForm, pipetteEntities) {
   const appliedPatch = {...rawForm, ...patch}
   const {path, changeTip} = appliedPatch
@@ -87,9 +66,10 @@ function updatePatchPathField (patch, rawForm, pipetteEntities) {
 
   let pipetteCapacityExceeded = false
   if (appliedPatch.volume && appliedPatch.pipette && appliedPatch.pipette in pipetteEntities) {
+    // TODO IMMEDIATELY also apply 2x-well-rule and add disposal volume -- make this a util, and search for other places this happens
     const pipetteCapacity = getPipetteCapacity(pipetteEntities[appliedPatch.pipette])
     if (pipetteCapacity) {
-      pipetteCapacityExceeded = appliedPatch.volume > pipetteCapacity
+      pipetteCapacityExceeded = appliedPatch.volume > pipetteCapacity // TODO IMMEDIATELY also apply disposal volume
     }
   }
 
