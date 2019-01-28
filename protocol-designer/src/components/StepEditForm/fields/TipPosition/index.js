@@ -50,7 +50,7 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
     const Wrapper = ({children, hoverTooltipHandlers}) => isTouchTipField
       ? <React.Fragment>{children}</React.Fragment>
       : <FormGroup
-        label={i18n.t('form.step_edit_form.field.tip_position.label')}
+        label={`${i18n.t('form.step_edit_form.field.tip_position.label')}:`}
         disabled={disabled}
         className={styles.well_order_input}
         hoverTooltipHandlers={hoverTooltipHandlers}>
@@ -62,7 +62,7 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
       // show default value for field in parens if no mmFromBottom value is selected
       value = (mmFromBottom != null)
         ? mmFromBottom
-        : `Default (${getDefaultMmFromBottom({fieldName, wellHeightMM})})`
+        : getDefaultMmFromBottom({fieldName, wellHeightMM})
     }
 
     return (

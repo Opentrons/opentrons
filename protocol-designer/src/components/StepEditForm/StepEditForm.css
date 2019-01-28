@@ -146,30 +146,56 @@
   justify-content: flex-start;
 }
 
+.fixed_width {
+  width: 17rem;
+}
+
 .large_field {
+  font-size: var(--fs-body-1);
   width: 14rem;
   margin-right: 0.5rem;
 }
 
 .medium_field {
-  width: 8em;
+  font-size: var(--fs-body-1);
+  width: 12em;
   margin-right: 0.5rem;
-
-  /* 144 */
 }
 
 .small_field {
-  width: 6rem;
+  font-size: var(--fs-body-1);
+  width: 5rem;
   margin-right: 0.5rem;
+}
+
+.checkbox_row {
+  margin-top: 0.25rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.checkbox_field {
+  font-size: var(--fs-body-1);
+}
+
+.hidden_fields {
+  margin: 0 1rem 0 2.5rem;
+  min-width: 14.5rem;
 }
 
 .no_label {
   margin-top: 0.5rem;
 }
 
-.advanced_settings_icon {
+.advanced_settings_button_wrapper {
   height: 2.25rem;
   width: 2.25rem;
+  margin-top: 0.375rem;
+}
+
+.advanced_settings_button {
+  padding: 0.375rem;
 }
 
 .section_divider {

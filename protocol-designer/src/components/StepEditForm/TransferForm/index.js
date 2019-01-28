@@ -32,7 +32,7 @@ const TransferForm = (props: TransferFormProps) => {
     <React.Fragment>
       <div className={cx(styles.field_row, styles.start_group)}>
         <PipetteField name="pipette" stepType={stepType} {...focusHandlers} />
-        <VolumeField focusHandlers={focusHandlers} stepType={stepType} />
+        <VolumeField label="Transfer Vol:" focusHandlers={focusHandlers} stepType={stepType} />
       </div>
       <div className={styles.section_divider}></div>
 

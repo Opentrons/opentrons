@@ -2,10 +2,12 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {DropdownField, type DropdownOption} from '@opentrons/components'
+import cx from 'classnames'
 import {selectors as stepFormSelectors} from '../../../step-forms'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import type {BaseState} from '../../../types'
 import type {FocusHandlers} from '../index'
+import styles from '../StepEditForm.css'
 import StepField from './FieldConnector'
 
 type Options = Array<DropdownOption>
@@ -32,7 +34,7 @@ const LabwareField = connect(LabwareFieldSTP)((props: LabwareFieldOP & LabwareFi
         return (
           <DropdownField
             error={errorToShow}
-            className={className}
+            className={cx(styles.large_field, className)}
             options={labwareOptions}
             onBlur={() => { onFieldBlur(name) }}
             onFocus={() => { onFieldFocus(name) }}
