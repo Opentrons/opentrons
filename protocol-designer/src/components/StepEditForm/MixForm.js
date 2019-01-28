@@ -37,7 +37,7 @@ class MixForm extends React.Component<Props, State> {
     const {focusHandlers} = this.props
     return (
       <React.Fragment>
-        <div className={cx(styles.field_row, styles.start_group)}>
+        <div className={cx(styles.form_row, styles.start_group)}>
           <PipetteField name="pipette" {...focusHandlers} />
           <VolumeField label="Mix Vol:" focusHandlers={focusHandlers} />
           <FormGroup label='Repetitions:' className={styles.small_field}>
@@ -46,7 +46,7 @@ class MixForm extends React.Component<Props, State> {
         </div>
         <div className={styles.section_divider}></div>
 
-        <div className={styles.field_row}>
+        <div className={styles.form_row}>
           <div className={styles.start_group}>
             <FormGroup label='Labware:' className={styles.labware_field}>
               <LabwareField name="labware" {...focusHandlers} />
@@ -64,7 +64,7 @@ class MixForm extends React.Component<Props, State> {
           </div>
           <div className={styles.fixed_width}></div>
         </div>
-        <div className={cx(styles.field_row, styles.end_group)}>
+        <div className={cx(styles.form_row, styles.end_group)}>
           <div className={cx(styles.start_group, styles.fixed_width)}>
             <FlowRateField
               name='dispense_flowRate'

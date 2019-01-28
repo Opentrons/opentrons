@@ -16,7 +16,7 @@ const DisposalVolumeField = (props: DisposalVolumeFieldProps) => (
       name="aspirate_disposalVol_checkbox"
       render={({value, updateValue}) => (
         <React.Fragment>
-          <div className={styles.field_row}>
+          <div className={styles.form_row}>
             <CheckboxField
               label="Disposal Volume"
               value={!!value}
@@ -34,7 +34,7 @@ const DisposalVolumeField = (props: DisposalVolumeFieldProps) => (
           {
             value
               ? (
-                <div className={styles.field_row}>
+                <div className={styles.form_row}>
                   <div className={styles.sub_select_label}>Blowout</div>
                   <BlowoutLocationField
                     name="blowout_location"

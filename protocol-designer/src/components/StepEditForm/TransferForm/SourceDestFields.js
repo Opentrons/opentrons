@@ -42,7 +42,7 @@ class SourceDestFields extends React.Component<Props, State> {
     const labwareLabel = this.props.prefix === 'aspirate' ? 'Source:' : 'Destination:'
     const hiddenFieldsLabel = this.props.prefix === 'aspirate' ? 'Aspirate Options:' : 'Dispense Options:'
     return (
-      <div className={styles.field_row}>
+      <div className={styles.form_row}>
         <div className={styles.start_group}>
           <FormGroup label={labwareLabel} className={styles.labware_field}>
             <LabwareField name={addFieldNamePrefix('labware')} {...focusHandlers} />
