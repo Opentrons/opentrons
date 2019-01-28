@@ -33,6 +33,7 @@ If Python is new to you, we suggest going through a few simple tutorials to acqu
 
 After going through the above tutorials, you should have enough of an understanding of Python to work with the Opentrons API and start designing your experiments!
 More detailed information on python can always be found at `the python docs <https://docs.python.org/3/index.html>`_
+
 *******************************
 
 *******************
@@ -71,4 +72,4 @@ Simulating Python Protocols
 As our OT 2 software is no longer bundled with our desktop app, there are a few more steps you have to follow in order
 to simulate your protocol without being connected to a robot.
 
-To set up your environment, please view `this article <https://support.opentrons.com/ot-2/getting-started-software-setup/installing-the-opentrons-api-on-your-computer>`_
+To set up your environment, please view `this support article <https://support.opentrons.com/ot-2/getting-started-software-setup/installing-the-opentrons-api-on-your-computer-for-simulation>`_
