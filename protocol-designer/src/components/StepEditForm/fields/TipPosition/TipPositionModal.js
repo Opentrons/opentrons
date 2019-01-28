@@ -13,15 +13,15 @@ import {
   Icon,
   HandleKeypress,
 } from '@opentrons/components'
-import i18n from '../../../localization'
-import {Portal} from '../../portals/MainPageModalPortal'
-import modalStyles from '../../modals/modal.css'
-import {actions} from '../../../steplist'
+import i18n from '../../../../localization'
+import {Portal} from '../../../portals/MainPageModalPortal'
+import modalStyles from '../../../modals/modal.css'
+import {actions} from '../../../../steplist'
 import TipPositionZAxisViz from './TipPositionZAxisViz'
 
 import styles from './TipPositionInput.css'
 import * as utils from './utils'
-import {getIsTouchTipField, type TipOffsetFields} from '../../../form-types'
+import {getIsTouchTipField, type TipOffsetFields} from '../../../../form-types'
 
 const SMALL_STEP_MM = 1
 const LARGE_STEP_MM = 10

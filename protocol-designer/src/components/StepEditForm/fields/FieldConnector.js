@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {actions} from '../../steplist'
-import {selectors as stepFormSelectors} from '../../step-forms'
-import {getFieldErrors, processField} from '../../steplist/fieldLevel'
-import getTooltipForField from './getTooltipForField'
 import {HoverTooltip, type HoverTooltipHandlers} from '@opentrons/components'
-import type {BaseState, ThunkDispatch} from '../../types'
-import type {StepFieldName} from '../../form-types'
+import {actions} from '../../../steplist'
+import {selectors as stepFormSelectors} from '../../../step-forms'
+import {getFieldErrors, processField} from '../../../steplist/fieldLevel'
+import type {BaseState, ThunkDispatch} from '../../../types'
+import type {StepFieldName} from '../../../form-types'
+import getTooltipForField from './getTooltipForField'
 
 type FieldRenderProps = {
   value: ?mixed,
@@ -26,7 +26,7 @@ type SP = {value?: ?mixed, stepType: ?string}
 type DP = {updateValue: (?mixed) => void}
 type StepFieldProps = OP & SP & DP
 
-const StepField = (props: StepFieldProps) => {
+const FieldConnector = (props: StepFieldProps) => {
   const {
     name,
     render,
@@ -72,6 +72,6 @@ const DTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   },
 })
 
-const ConnectedStepField = connect(STP, DTP)(StepField)
+const ConnectedFieldConnector = connect(STP, DTP)(FieldConnector)
 
-export default ConnectedStepField
+export default ConnectedFieldConnector

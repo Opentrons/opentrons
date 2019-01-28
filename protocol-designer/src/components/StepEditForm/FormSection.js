@@ -6,6 +6,8 @@ import {IconButton, HoverTooltip} from '@opentrons/components'
 import i18n from '../../localization'
 import styles from './FormSection.css'
 
+// TODO: BC 2019-01-24 this can be removed with TransferLikeForm
+
 type Props = {
   sectionName?: string,
   headerRow?: React.Node,

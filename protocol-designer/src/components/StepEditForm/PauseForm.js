@@ -2,12 +2,10 @@
 import * as React from 'react'
 import {FormGroup} from '@opentrons/components'
 
-import {
-  StepInputField,
-  StepRadioGroup,
-} from './formFields'
-import type {FocusHandlers} from './index'
 import formStyles from '../forms/forms.css'
+
+import {TextField, RadioGroupField} from './fields'
+import type {FocusHandlers} from './index'
 
 type PauseFormProps = {focusHandlers: FocusHandlers}
 function PauseForm (props: PauseFormProps): React.Element<'div'> {
@@ -15,27 +13,27 @@ function PauseForm (props: PauseFormProps): React.Element<'div'> {
   return (
     <div className={formStyles.row_wrapper}>
       <div className={formStyles.column_1_2}>
-        <StepRadioGroup
+        <RadioGroupField
           name="pauseForAmountOfTime"
           options={[{name: 'Pause for an amount of time', value: 'true'}]}
           {...focusHandlers} />
         <FormGroup className={formStyles.stacked_row}>
-          <StepInputField units="hr" name="pauseHour" {...focusHandlers} />
+          <TextField units="hr" name="pauseHour" {...focusHandlers} />
         </FormGroup>
         <FormGroup className={formStyles.stacked_row}>
-          <StepInputField units="m" name="pauseMinute" {...focusHandlers} />
+          <TextField units="m" name="pauseMinute" {...focusHandlers} />
         </FormGroup>
         <FormGroup className={formStyles.stacked_row}>
-          <StepInputField units="s" name="pauseSecond" {...focusHandlers} />
+          <TextField units="s" name="pauseSecond" {...focusHandlers} />
         </FormGroup>
       </div>
       <div className={formStyles.column_1_2}>
-        <StepRadioGroup
+        <RadioGroupField
           name="pauseForAmountOfTime"
           options={[{name: 'Pause until told to resume', value: 'false'}]}
           {...focusHandlers} />
         <FormGroup label='Message to display'>
-          <StepInputField name="pauseMessage" {...focusHandlers} />
+          <TextField name="pauseMessage" {...focusHandlers} />
         </FormGroup>
       </div>
     </div>

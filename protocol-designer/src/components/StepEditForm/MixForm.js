@@ -4,18 +4,18 @@ import cx from 'classnames'
 import {FormGroup} from '@opentrons/components'
 
 import {
-  StepInputField,
-  StepCheckboxRow,
-  BlowoutLocationDropdown,
+  TextField,
+  CheckboxRowField,
+  BlowoutLocationField,
   PipetteField,
-  LabwareDropdown,
+  LabwareField,
   ChangeTipField,
-} from './formFields'
+  FlowRateField,
+  WellSelectionField,
+  TipPositionField,
+  WellOrderField,
+} from './fields'
 
-import FlowRateField from './FlowRateField'
-import WellSelectionInput from './WellSelectionInput'
-import TipPositionInput from './TipPositionInput'
-import WellOrderInput from './WellOrderInput'
 import type {FocusHandlers} from './index'
 import formStyles from '../forms/forms.css'
 import styles from './StepEditForm.css'
@@ -28,38 +28,38 @@ const MixForm = (props: MixFormProps): React.Element<typeof React.Fragment> => {
     <React.Fragment>
       <div className={formStyles.row_wrapper}>
         <FormGroup label='Labware:' className={styles.labware_field}>
-          <LabwareDropdown name="labware" {...focusHandlers} />
+          <LabwareField name="labware" className={styles.large_field} {...focusHandlers} />
         </FormGroup>
-        <WellSelectionInput name="wells" labwareFieldName="labware" pipetteFieldName="pipette" {...focusHandlers} />
+        <WellSelectionField name="wells" labwareFieldName="labware" pipetteFieldName="pipette" {...focusHandlers} />
         <PipetteField name="pipette" {...focusHandlers} />
       </div>
 
       <div className={cx(formStyles.row_wrapper)}>
         <FormGroup label='Repetitions' className={cx(styles.field_row, styles.repetitions_row)}>
-          <StepInputField name="volume" units='μL' {...focusHandlers} />
-          <StepInputField name="times" units='Times' {...focusHandlers} />
+          <TextField name="volume" units='μL' {...focusHandlers} />
+          <TextField name="times" units='Times' {...focusHandlers} />
         </FormGroup>
       </div>
 
       <div className={formStyles.row_wrapper}>
         <div className={styles.left_settings_column}>
           <FormGroup label='TECHNIQUE'>
-            <StepCheckboxRow name="dispense_blowout_checkbox" label='Blow out'>
-              <BlowoutLocationDropdown
+            <CheckboxRowField name="dispense_blowout_checkbox" label='Blow out'>
+              <BlowoutLocationField
                 name="dispense_blowout_location"
                 className={styles.full_width}
                 includeDestWell
                 {...focusHandlers} />
-            </StepCheckboxRow>
-            <StepCheckboxRow name="touchTip" label='Touch tip'>
-              <TipPositionInput fieldName="mix_touchTipMmFromBottom" />
-            </StepCheckboxRow>
+            </CheckboxRowField>
+            <CheckboxRowField name="touchTip" label='Touch tip'>
+              <TipPositionField fieldName="mix_touchTipMmFromBottom" />
+            </CheckboxRowField>
           </FormGroup>
         </div>
 
         <div className={styles.middle_settings_column}>
           <ChangeTipField stepType="mix" name="aspirate_changeTip" />
-          <TipPositionInput fieldName="mix_mmFromBottom" />
+          <TipPositionField fieldName="mix_mmFromBottom" />
         </div>
         <div className={styles.right_settings_column}>
           <FlowRateField
@@ -68,7 +68,7 @@ const MixForm = (props: MixFormProps): React.Element<typeof React.Fragment> => {
             pipetteFieldName='pipette'
             flowRateType='aspirate'
           />
-          <WellOrderInput prefix="aspirate" />
+          <WellOrderField prefix="aspirate" />
           <FlowRateField
             name='dispense_flowRate'
             label='Dispense Flow Rate'

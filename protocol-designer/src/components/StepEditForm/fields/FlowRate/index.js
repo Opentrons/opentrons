@@ -1,15 +1,13 @@
 // @flow
 import * as React from 'react'
-import FlowRateField from './FlowRateField'
+import FlowRateInput from './FlowRateInput'
 import {connect} from 'react-redux'
-import {
-  actions as steplistActions,
-} from '../../../steplist'
-import {selectors as stepFormSelectors} from '../../../step-forms'
-import type {StepFieldName} from '../../../steplist/fieldLevel'
-import type {BaseState, ThunkDispatch} from '../../../types'
+import {actions as steplistActions} from '../../../../steplist'
+import {selectors as stepFormSelectors} from '../../../../step-forms'
+import type {StepFieldName} from '../../../../steplist/fieldLevel'
+import type {BaseState, ThunkDispatch} from '../../../../types'
 
-type Props = React.ElementProps<typeof FlowRateField> & {
+type Props = React.ElementProps<typeof FlowRateInput> & {
   innerKey: string,
 }
 
@@ -27,9 +25,9 @@ type DP = {
 type SP = $Diff<Props, DP>
 
 // Add a key to force re-constructing component when values change
-function FlowRateFieldWithKey (props: Props) {
+function FlowRateInputWithKey (props: Props) {
   const {innerKey, ...otherProps} = props
-  return <FlowRateField key={innerKey} {...otherProps} />
+  return <FlowRateInput key={innerKey} {...otherProps} />
 }
 
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
@@ -83,4 +81,4 @@ function mapDispatchToProps (dispatch: ThunkDispatch<*>, ownProps: OP): DP {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(FlowRateFieldWithKey)
+export default connect(mapStateToProps, mapDispatchToProps)(FlowRateInputWithKey)

@@ -3,12 +3,12 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {FormGroup} from '@opentrons/components'
 import cx from 'classnames'
-import {selectors as stepFormSelectors} from '../../../step-forms'
+import {selectors as stepFormSelectors} from '../../../../step-forms'
 import styles from './WellOrderInput.css'
-import stepEditStyles from '../StepEditForm.css'
+import stepEditStyles from '../../StepEditForm.css'
 import WellOrderModal from './WellOrderModal'
-import ZIG_ZAG_IMAGE from '../../../images/zig_zag_icon.svg'
-import type {BaseState} from '../../../types'
+import ZIG_ZAG_IMAGE from '../../../../images/zig_zag_icon.svg'
+import type {BaseState} from '../../../../types'
 
 type OP = {prefix: 'aspirate' | 'dispense'}
 type SP = {iconClassNames: Array<string>}

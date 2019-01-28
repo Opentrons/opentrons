@@ -2,12 +2,12 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import WellSelectionInput from './WellSelectionInput'
-import {selectors as stepFormSelectors} from '../../../step-forms'
-import {getFieldErrors} from '../../../steplist/fieldLevel'
-import {showFieldErrors} from '../StepFormField'
-import type {BaseState, ThunkDispatch} from '../../../types'
-import type {StepFieldName} from '../../../form-types'
-import type {FocusHandlers} from '../index'
+import {selectors as stepFormSelectors} from '../../../../step-forms'
+import {getFieldErrors} from '../../../../steplist/fieldLevel'
+import type {BaseState, ThunkDispatch} from '../../../../types'
+import type {StepFieldName} from '../../../../form-types'
+import type {FocusHandlers} from '../../index'
+import {showFieldErrors} from '../FieldConnector'
 
 type Props = React.ElementProps<typeof WellSelectionInput>
 

@@ -65,7 +65,7 @@
   flex: 1 1;
   background-color: var(--c-light-gray);
   border-radius: 3px;
-  padding: 0.25rem 0.25rem 0.25rem 1rem;
+  padding: 0.25rem 0.25rem 0.25rem 0.5rem;
 
   & input {
     background-color: inherit;
@@ -74,7 +74,7 @@
     flex: 1 1 auto;
     color: var(--c-dark-gray);
     width: 100%;
-    font-size: 1rem;
+    font-size: var(--fs-body-1);
 
     /* TODO: Ian 2018-09-14 Firefox has 1px padding on input element,
     * but I can't figure out how to fix it in Firefox without breaking it in Chrome.
@@ -145,7 +145,7 @@
 
   & select {
     border: 0;
-    padding: 0.25rem 1rem;
+    padding: 0.25rem 0.5rem;
     outline: none;
     border-radius: 3px;
     color: var(--c-dark-gray);

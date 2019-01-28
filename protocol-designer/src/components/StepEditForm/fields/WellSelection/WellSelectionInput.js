@@ -3,14 +3,14 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {FormGroup, InputField} from '@opentrons/components'
 import WellSelectionModal from './WellSelectionModal'
-import {Portal} from '../../portals/MainPageModalPortal'
-import {actions as stepsActions, selectors as stepsSelectors} from '../../../ui/steps'
-import styles from '../StepEditForm.css'
+import {Portal} from '../../../portals/MainPageModalPortal'
+import {actions as stepsActions, selectors as stepsSelectors} from '../../../../ui/steps'
+import styles from '../../StepEditForm.css'
 
 import type {Dispatch} from 'redux'
-import type {StepIdType, StepFieldName} from '../../../form-types'
-import type {BaseState} from '../../../types'
-import type { FocusHandlers } from '../index'
+import type {StepIdType, StepFieldName} from '../../../../form-types'
+import type {BaseState} from '../../../../types'
+import type { FocusHandlers } from '../../index'
 
 type SP = {
   stepId: ?StepIdType,

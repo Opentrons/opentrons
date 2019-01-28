@@ -3,23 +3,24 @@ import * as React from 'react'
 import {FormGroup, HoverTooltip, CheckboxField} from '@opentrons/components'
 
 import i18n from '../../localization'
-import {
-  StepInputField,
-  StepCheckboxRow,
-  PipetteField,
-  BlowoutLocationDropdown,
-  LabwareDropdown,
-  ChangeTipField,
-} from './formFields'
-
-import StepField from './StepFormField'
-import TipPositionInput from './TipPositionInput'
-import getTooltipForField from './getTooltipForField'
-import FlowRateField from './FlowRateField'
-import WellSelectionInput from './WellSelectionInput'
-import WellOrderInput from './WellOrderInput'
 import type {StepType} from '../../form-types'
 import formStyles from '../forms/forms.css'
+
+import {
+  TextField,
+  CheckboxRowField,
+  PipetteField,
+  BlowoutLocationField,
+  LabwareField,
+  ChangeTipField,
+  FlowRateField,
+  FieldConnector,
+  TipPositionField,
+  getTooltipForField,
+  WellSelectionField,
+  WellOrderField,
+} from './fields'
+
 import styles from './StepEditForm.css'
 import FormSection from './FormSection'
 import type {FocusHandlers} from './index'
@@ -35,9 +36,9 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
         headerRow={(
           <div className={formStyles.row_wrapper}>
             <FormGroup label="Labware:" className={styles.labware_field}>
-              <LabwareDropdown name="aspirate_labware" {...focusHandlers} />
+              <LabwareField name="aspirate_labware" {...focusHandlers} />
             </FormGroup>
-            <WellSelectionInput
+            <WellSelectionField
               name="aspirate_wells"
               labwareFieldName="aspirate_labware"
               pipetteFieldName="pipette"
@@ -45,7 +46,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
             <PipetteField name="pipette" stepType={stepType} {...focusHandlers} />
             {stepType === 'consolidate' &&
               <FormGroup label='Volume:' className={styles.volume_field}>
-                <StepInputField name="volume" units='μL' {...focusHandlers} />
+                <TextField name="volume" units='μL' {...focusHandlers} />
               </FormGroup>
             }
           </div>
@@ -54,21 +55,21 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
         <div className={formStyles.row_wrapper}>
           <div className={styles.left_settings_column}>
             <FormGroup label='TECHNIQUE'>
-              <StepCheckboxRow name="aspirate_preWetTip" label="Pre-wet tip" />
-              <StepCheckboxRow name="aspirate_touchTip" label="Touch tip">
-                <TipPositionInput fieldName="aspirate_touchTipMmFromBottom" />
-              </StepCheckboxRow>
+              <CheckboxRowField name="aspirate_preWetTip" label="Pre-wet tip" />
+              <CheckboxRowField name="aspirate_touchTip" label="Touch tip">
+                <TipPositionField fieldName="aspirate_touchTipMmFromBottom" />
+              </CheckboxRowField>
 
-              <StepCheckboxRow disabled tooltipComponent={i18n.t('tooltip.not_in_beta')} name="aspirate_airGap_checkbox" label="Air Gap">
-                <StepInputField disabled name="aspirate_airGap_volume" units="μL" {...focusHandlers} />
-              </StepCheckboxRow>
+              <CheckboxRowField disabled tooltipComponent={i18n.t('tooltip.not_in_beta')} name="aspirate_airGap_checkbox" label="Air Gap">
+                <TextField disabled name="aspirate_airGap_volume" units="μL" {...focusHandlers} />
+              </CheckboxRowField>
 
-              <StepCheckboxRow name="aspirate_mix_checkbox" label='Mix'>
-                <StepInputField name="aspirate_mix_volume" units='μL' {...focusHandlers} />
-                <StepInputField name="aspirate_mix_times" units='Times' {...focusHandlers} />
-              </StepCheckboxRow>
+              <CheckboxRowField name="aspirate_mix_checkbox" label='Mix'>
+                <TextField name="aspirate_mix_volume" units='μL' {...focusHandlers} />
+                <TextField name="aspirate_mix_times" units='Times' {...focusHandlers} />
+              </CheckboxRowField>
               {stepType === 'distribute' &&
-                <StepField
+                <FieldConnector
                   name="aspirate_disposalVol_checkbox"
                   render={({value, updateValue}) => (
                     <React.Fragment>
@@ -79,14 +80,14 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                           onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)} />
                         {value
                           ? <div>
-                            <StepInputField name="aspirate_disposalVol_volume" units="μL" {...focusHandlers} />
+                            <TextField name="aspirate_disposalVol_volume" units="μL" {...focusHandlers} />
                           </div>
                           : null}
                       </div>
                       {value
                         ? <div className={styles.field_row}>
                           <div className={styles.sub_select_label}>Blowout</div>
-                          <BlowoutLocationDropdown
+                          <BlowoutLocationField
                             name="dispense_blowout_location"
                             className={styles.full_width}
                             includeSourceWell
@@ -101,10 +102,10 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
           </div>
           <div className={styles.middle_settings_column}>
             <ChangeTipField stepType={stepType} name="aspirate_changeTip" />
-            <TipPositionInput fieldName="aspirate_mmFromBottom" />
+            <TipPositionField fieldName="aspirate_mmFromBottom" />
           </div>
           <div className={styles.right_settings_column}>
-            {stepType !== 'distribute' && <WellOrderInput prefix="aspirate" />}
+            {stepType !== 'distribute' && <WellOrderField prefix="aspirate" />}
             <FlowRateField
               name='aspirate_flowRate'
               pipetteFieldName='pipette'
@@ -118,9 +119,9 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
         headerRow={(
           <div className={formStyles.row_wrapper}>
             <FormGroup label='Labware:' className={styles.labware_field}>
-              <LabwareDropdown name="dispense_labware" {...focusHandlers} />
+              <LabwareField name="dispense_labware" {...focusHandlers} />
             </FormGroup>
-            <WellSelectionInput
+            <WellSelectionField
               name="dispense_wells"
               labwareFieldName="dispense_labware"
               pipetteFieldName="pipette"
@@ -135,7 +136,7 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
                     label='Volume:'
                     className={styles.volume_field}
                     hoverTooltipHandlers={hoverTooltipHandlers}>
-                    <StepInputField name="volume" units="μL" {...focusHandlers} />
+                    <TextField name="volume" units="μL" {...focusHandlers} />
                   </FormGroup>
                 }
               </HoverTooltip>
@@ -146,30 +147,30 @@ const TransferLikeForm = (props: TransferLikeFormProps) => {
         <div className={formStyles.row_wrapper}>
           <div className={styles.left_settings_column}>
             <FormGroup label='TECHNIQUE'>
-              <StepCheckboxRow name="dispense_touchTip" label="Touch tip">
-                <TipPositionInput fieldName="dispense_touchTipMmFromBottom" />
-              </StepCheckboxRow>
-              <StepCheckboxRow name="dispense_mix_checkbox" label='Mix'>
-                <StepInputField name="dispense_mix_volume" units="μL" {...focusHandlers} />
-                <StepInputField name="dispense_mix_times" units="Times" {...focusHandlers} />
-              </StepCheckboxRow>
+              <CheckboxRowField name="dispense_touchTip" label="Touch tip">
+                <TipPositionField fieldName="dispense_touchTipMmFromBottom" />
+              </CheckboxRowField>
+              <CheckboxRowField name="dispense_mix_checkbox" label='Mix'>
+                <TextField name="dispense_mix_volume" units="μL" {...focusHandlers} />
+                <TextField name="dispense_mix_times" units="Times" {...focusHandlers} />
+              </CheckboxRowField>
               {stepType !== 'distribute' &&
-                <StepCheckboxRow name='dispense_blowout_checkbox' label='Blow out'>
-                  <BlowoutLocationDropdown
+                <CheckboxRowField name='dispense_blowout_checkbox' label='Blow out'>
+                  <BlowoutLocationField
                     name="dispense_blowout_location"
                     className={styles.full_width}
                     includeSourceWell={stepType === 'transfer'}
                     includeDestWell
                     {...focusHandlers} />
-                </StepCheckboxRow>
+                </CheckboxRowField>
               }
             </FormGroup>
           </div>
           <div className={styles.middle_settings_column}>
-            <TipPositionInput fieldName="dispense_mmFromBottom" />
+            <TipPositionField fieldName="dispense_mmFromBottom" />
           </div>
           <div className={styles.right_settings_column}>
-            {stepType !== 'consolidate' && <WellOrderInput prefix="dispense" />}
+            {stepType !== 'consolidate' && <WellOrderField prefix="dispense" />}
             <FlowRateField
               name='dispense_flowRate'
               pipetteFieldName='pipette'
