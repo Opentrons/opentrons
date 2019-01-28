@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import {FormGroup, CheckboxField} from '@opentrons/components'
+import cx from 'classnames'
 
 import styles from '../StepEditForm.css'
 import type {FocusHandlers} from '../index'
@@ -16,16 +17,21 @@ const DisposalVolumeField = (props: DisposalVolumeFieldProps) => (
       name="aspirate_disposalVol_checkbox"
       render={({value, updateValue}) => (
         <React.Fragment>
-          <div className={styles.form_row}>
+          <div className={cx(styles.checkbox_row, styles.multi_dispense_options)}>
             <CheckboxField
               label="Disposal Volume"
               value={!!value}
+              className={styles.checkbox_field}
               onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)} />
             {
               value
                 ? (
                   <div>
-                    <TextField name="aspirate_disposalVol_volume" units="μL" {...props.focusHandlers} />
+                    <TextField
+                      name="aspirate_disposalVol_volume"
+                      units="μL"
+                      className={styles.small_field}
+                      {...props.focusHandlers} />
                   </div>
                 )
                 : null
@@ -34,11 +40,11 @@ const DisposalVolumeField = (props: DisposalVolumeFieldProps) => (
           {
             value
               ? (
-                <div className={styles.form_row}>
+                <div className={styles.checkbox_row}>
                   <div className={styles.sub_select_label}>Blowout</div>
                   <BlowoutLocationField
                     name="blowout_location"
-                    className={styles.full_width}
+                    className={styles.medium_field}
                     includeSourceWell
                     {...props.focusHandlers} />
                 </div>

@@ -81,7 +81,7 @@
 }
 
 .sub_select_label {
-  @apply --font-body-2-dark;
+  @apply --font-body-1-dark;
 
   display: flex;
   align-items: center;
@@ -137,16 +137,28 @@
   margin-right: 0.5rem;
 }
 
+.large_field:last-child {
+  margin-right: 0;
+}
+
 .medium_field {
   font-size: var(--fs-body-1);
   width: 12em;
   margin-right: 0.5rem;
 }
 
+.medium_field:last-child {
+  margin-right: 0;
+}
+
 .small_field {
   font-size: var(--fs-body-1);
   width: 5rem;
   margin-right: 0.5rem;
+}
+
+.small_field:last-child {
+  margin-right: 0;
 }
 
 .checkbox_row {
@@ -203,6 +215,14 @@
   display: flex;
   flex-direction: row;
   list-style: none;
+}
+
+.disposal_vol_wrapper {
+  min-height: 3.5rem;
+}
+
+.multi_dispense_options {
+  min-width: 14.25rem;
 }
 
 @media screen and (max-width: 1279px) {

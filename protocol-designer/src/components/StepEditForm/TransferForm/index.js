@@ -47,9 +47,10 @@ const TransferForm = (props: TransferFormProps) => {
           <ChangeTipField stepType={stepType} name="changeTip" />
           <PathField focusHandlers={focusHandlers} />
         </div>
-        <div className={styles.end_group}>
+        <div className={cx(styles.end_group, styles.disposal_vol_wrapper)}>
           {path === 'multiDispense' && <DisposalVolumeField focusHandlers={focusHandlers} />}
         </div>
+        <div className={styles.hidden_fields}></div>
       </div>
     </React.Fragment>
   )
