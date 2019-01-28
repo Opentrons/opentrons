@@ -4,6 +4,7 @@ import FlowRateInput from './FlowRateInput'
 import {connect} from 'react-redux'
 import {actions as steplistActions} from '../../../../steplist'
 import {selectors as stepFormSelectors} from '../../../../step-forms'
+import {getDisabledFields} from '../../../../steplist/formLevel'
 import type {StepFieldName} from '../../../../steplist/fieldLevel'
 import type {BaseState, ThunkDispatch} from '../../../../types'
 
@@ -58,7 +59,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   return {
     innerKey,
     defaultFlowRate,
-    disabled: pipetteId == null,
+    disabled: formData ? getDisabledFields(formData).has(name) : false,
     formFlowRate,
     flowRateType,
     label: ownProps.label,

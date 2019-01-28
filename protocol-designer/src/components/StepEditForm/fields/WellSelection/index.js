@@ -4,6 +4,7 @@ import {connect} from 'react-redux'
 import WellSelectionInput from './WellSelectionInput'
 import {selectors as stepFormSelectors} from '../../../../step-forms'
 import {getFieldErrors} from '../../../../steplist/fieldLevel'
+import {getDisabledFields} from '../../../../steplist/formLevel'
 import type {BaseState, ThunkDispatch} from '../../../../types'
 import type {StepFieldName} from '../../../../form-types'
 import type {FocusHandlers} from '../../index'
@@ -22,6 +23,7 @@ type OP = {
 }
 
 type SP = {
+  disabled: boolean,
   isMulti: $PropertyType<Props, 'isMulti'>,
   primaryWellCount: $PropertyType<Props, 'primaryWellCount'>,
   _pipetteId: ?string,
@@ -33,11 +35,13 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const formData = stepFormSelectors.getUnsavedForm(state)
   const pipetteId = formData && formData[ownProps.pipetteFieldName]
   const selectedWells = formData ? formData[ownProps.name] : []
+  const disabled = formData ? getDisabledFields(formData).has(ownProps.name) : false
 
   const pipette = pipetteId && stepFormSelectors.getPipetteEntities(state)[pipetteId]
   const isMulti = pipette ? (pipette.spec.channels > 1) : false
 
   return {
+    disabled,
     _pipetteId: pipetteId,
     _selectedLabwareId: formData && formData[ownProps.labwareFieldName],
     _wellFieldErrors: getFieldErrors(ownProps.name, selectedWells) || [],
@@ -52,13 +56,12 @@ function mergeProps (
   ownProps: OP
 ): Props {
   const {_pipetteId, _selectedLabwareId, _wellFieldErrors} = stateProps
-  const disabled = !(_pipetteId && _selectedLabwareId)
   const {name, focusedField, dirtyFields, onFieldBlur, onFieldFocus} = ownProps
   const showErrors = showFieldErrors({name, focusedField, dirtyFields})
 
   return {
     name,
-    disabled,
+    disabled: stateProps.disabled,
     pipetteId: _pipetteId,
     labwareId: _selectedLabwareId,
     isMulti: stateProps.isMulti,

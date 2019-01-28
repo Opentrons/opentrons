@@ -194,6 +194,12 @@
   background-color: var(--c-light-gray);
 }
 
+.path_option.disabled {
+  color: var(--c-light-gray);
+  background-color: var(--c-med-gray);
+  cursor: default;
+}
+
 .path_options {
   display: flex;
   flex-direction: row;
