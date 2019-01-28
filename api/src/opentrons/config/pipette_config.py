@@ -198,6 +198,7 @@ def piecewise_volume_conversion(
     return i[1]*ul + i[2]
 
 
+<<<<<<< HEAD
 def save_overrides(pipette_id: str, overrides: Dict[str, Any]):
     override_dir = CONFIG['pipette_config_overrides_dir']
     existing = load_overrides(pipette_id)
@@ -216,3 +217,7 @@ def load_overrides(pipette_id: str) -> Dict[str, Any]:
     except json.JSONDecodeError as e:
         log.warning(f'pipette override for {pipette_id} is corrupt: {e}')
         return {}
+=======
+def plunger_position_offset(plunger_position: float) -> float:
+    return plunger_position
+>>>>>>> Add function to determine position from offset
