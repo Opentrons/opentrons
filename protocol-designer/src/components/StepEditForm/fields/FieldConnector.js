@@ -5,6 +5,7 @@ import {HoverTooltip, type HoverTooltipHandlers} from '@opentrons/components'
 import {actions} from '../../../steplist'
 import {selectors as stepFormSelectors} from '../../../step-forms'
 import {getFieldErrors, processField} from '../../../steplist/fieldLevel'
+import {getDisabledFields} from '../../../steplist/formLevel'
 import type {BaseState, ThunkDispatch} from '../../../types'
 import type {StepFieldName} from '../../../form-types'
 import getTooltipForField from './getTooltipForField'
@@ -14,6 +15,7 @@ type FieldRenderProps = {
   updateValue: (?mixed) => void,
   errorToShow: ?string,
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
+  disabled: boolean,
 }
 type OP = {
   name: StepFieldName,
@@ -22,7 +24,7 @@ type OP = {
   focusedField?: StepFieldName,
   tooltipComponent?: React.Node,
 }
-type SP = {value?: ?mixed, stepType: ?string}
+type SP = {value?: ?mixed, stepType: ?string, disabled: boolean}
 type DP = {updateValue: (?mixed) => void}
 type StepFieldProps = OP & SP & DP
 
@@ -35,6 +37,7 @@ const FieldConnector = (props: StepFieldProps) => {
     updateValue,
     focusedField,
     dirtyFields,
+    disabled,
   } = props
   const showErrors = showFieldErrors({name, focusedField, dirtyFields})
   const errors = getFieldErrors(name, value)
@@ -42,12 +45,12 @@ const FieldConnector = (props: StepFieldProps) => {
 
   const tooltipComponent = props.tooltipComponent || getTooltipForField(stepType, name)
 
-  if (!tooltipComponent) return render({value, updateValue, errorToShow})
+  if (!tooltipComponent) return render({value, updateValue, errorToShow, disabled})
 
   return (
     <HoverTooltip tooltipComponent={tooltipComponent} placement='top'>
       {(hoverTooltipHandlers) =>
-        render({value, updateValue, errorToShow, hoverTooltipHandlers})}
+        render({value, updateValue, errorToShow, hoverTooltipHandlers, disabled})}
     </HoverTooltip>
   )
 }
@@ -62,6 +65,7 @@ const STP = (state: BaseState, ownProps: OP): SP => {
   return {
     value: formData ? formData[ownProps.name] : null,
     stepType: formData ? formData.stepType : null,
+    disabled: formData ? getDisabledFields(formData).has(ownProps.name) : false,
   }
 }
 

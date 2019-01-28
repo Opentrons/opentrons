@@ -5,6 +5,7 @@ import {HoverTooltip, FormGroup, InputField} from '@opentrons/components'
 import { getLabware } from '@opentrons/shared-data'
 import i18n from '../../../../localization'
 import {selectors as stepFormSelectors} from '../../../../step-forms'
+import {getDisabledFields} from '../../../../steplist/formLevel'
 import stepFormStyles from '../../StepEditForm.css'
 import styles from './TipPositionInput.css'
 import TipPositionModal from './TipPositionModal'
@@ -27,6 +28,7 @@ function getLabwareFieldForPositioningField (fieldName: TipOffsetFields): StepFi
 
 type OP = {fieldName: TipOffsetFields}
 type SP = {
+  disabled: boolean,
   mmFromBottom: ?string,
   wellHeightMM: ?number,
 }
@@ -43,8 +45,7 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
   handleClose = () => { this.setState({isModalOpen: false}) }
 
   render () {
-    const {fieldName, mmFromBottom, wellHeightMM} = this.props
-    const disabled = !this.props.wellHeightMM
+    const {disabled, fieldName, mmFromBottom, wellHeightMM} = this.props
     const isTouchTipField = getIsTouchTipField(this.props.fieldName)
 
     const Wrapper = ({children, hoverTooltipHandlers}) => isTouchTipField
@@ -78,9 +79,6 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
               isOpen={this.state.isModalOpen} />
             <InputField
               className={stepFormStyles.small_field}
-              // className={isTouchTipField
-              //   ? stepFormStyles.small_field
-              //   : undefined} // TODO Ian 2018-11-16 change InputField props.className to be `?string` so this can be `null` not `undefined`?
               readOnly
               onClick={this.handleOpen}
               value={value}
@@ -112,6 +110,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   }
 
   return {
+    disabled: formData ? getDisabledFields(formData).has(fieldName) : false,
     wellHeightMM,
     mmFromBottom: formData && formData[fieldName],
   }

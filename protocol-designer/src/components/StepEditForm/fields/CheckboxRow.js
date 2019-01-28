@@ -19,16 +19,16 @@ export const CheckboxRow = (props: CheckboxRowProps) => (
   <StepField
     name={props.name}
     tooltipComponent={props.tooltipComponent}
-    render={({value, updateValue, hoverTooltipHandlers}) => (
+    render={({value, updateValue, hoverTooltipHandlers, disabled}) => (
       <div className={styles.field_row}>
         <CheckboxField
           label={props.label}
           hoverTooltipHandlers={hoverTooltipHandlers}
-          disabled={props.disabled}
+          disabled={disabled || props.disabled}
           className={props.className}
           value={!!value}
           onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)} />
-        {value ? props.children : null}
+        {(value && !disabled) ? props.children : null}
       </div>
     )} />
 )
