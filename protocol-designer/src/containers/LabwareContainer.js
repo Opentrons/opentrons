@@ -3,7 +3,8 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 
 import {getLabware, getIsTiprack} from '@opentrons/shared-data'
-import {selectors} from '../labware-ingred/reducers'
+import {selectors} from '../labware-ingred/selectors'
+import {selectors as stepFormSelectors} from '../step-forms'
 import {
   openIngredientSelector,
   deleteContainer,
@@ -47,14 +48,14 @@ type SP = $Diff<Props, {...DP, ...MP}>
 
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {slot} = ownProps
-  const container = selectors.containersBySlot(state)[ownProps.slot]
-  const labwareNames = selectors.getLabwareNicknamesById(state)
+  const container = stepFormSelectors.getContainersBySlot(state)[ownProps.slot]
+  const labwareNames = stepFormSelectors.getLabwareNicknamesById(state)
 
   const containerType = container && container.type
   const containerId = container && container.id
   const containerName = containerId && labwareNames[containerId]
 
-  const selectedContainer = selectors.getSelectedLabware(state)
+  const selectedContainer = stepFormSelectors.getSelectedLabware(state)
   const isSelectedSlot = !!(selectedContainer && selectedContainer.slot === slot)
 
   const selectedTerminalItem = stepsSelectors.getSelectedTerminalItemId(state)

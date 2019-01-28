@@ -10,9 +10,10 @@ import reduce from 'lodash/reduce'
 
 import {sortedSlotnames, type DeckSlot} from '@opentrons/components'
 import {
-  getIdsInRange,
-  pipetteModelToName,
   addSpecsToPipetteInvariantProps,
+  getIdsInRange,
+  getLabwareIdInSlot,
+  pipetteModelToName,
 } from '../utils'
 import {
   INITIAL_DECK_SETUP_STEP_ID,
@@ -28,6 +29,7 @@ import type {
   CreateContainerAction,
   DeleteContainerAction,
   DuplicateLabwareAction,
+  SwapSlotContentsAction,
 } from '../../labware-ingred/actions'
 import type {FormData, StepIdType} from '../../form-types'
 import type {FileLabware, FilePipette} from '../../file-types'
@@ -141,6 +143,7 @@ type SavedStepFormsActions =
   | DuplicateStepAction
   | ChangeSavedStepFormAction
   | DuplicateLabwareAction
+  | SwapSlotContentsAction
 
 export const savedStepForms = (
   rootState: RootState,
@@ -187,6 +190,28 @@ export const savedStepForms = (
           },
         },
       }
+    }
+    case 'SWAP_SLOT_CONTENTS': {
+      const {sourceSlot, destSlot} = action.payload
+      return mapValues(savedStepForms, (savedForm: FormData) => {
+        if (savedForm.stepType === 'manualIntervention') {
+          // swap labware slots from all manualIntervention steps
+          const sourceLabwareId = getLabwareIdInSlot(
+            savedForm.labwareLocationUpdate, sourceSlot)
+          const destLabwareId = getLabwareIdInSlot(
+            savedForm.labwareLocationUpdate, destSlot)
+
+          return {
+            ...savedForm,
+            labwareLocationUpdate: {
+              ...savedForm.labwareLocationUpdate,
+              ...(sourceLabwareId ? {[sourceLabwareId]: destSlot} : {}),
+              ...(destLabwareId ? {[destLabwareId]: sourceSlot} : {}),
+            },
+          }
+        }
+        return savedForm
+      })
     }
     case 'DELETE_CONTAINER': {
       const labwareIdToDelete = action.payload.containerId
