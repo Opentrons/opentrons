@@ -10,7 +10,7 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../../../step-generation/utils'
 import type {BaseState} from '../../../types'
-import type {FocusHandlers} from '../index'
+import type {FocusHandlers} from '../types'
 import FieldConnector from './FieldConnector'
 import styles from '../StepEditForm.css'
 

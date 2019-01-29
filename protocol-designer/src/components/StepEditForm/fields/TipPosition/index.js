@@ -26,7 +26,7 @@ function getLabwareFieldForPositioningField (fieldName: TipOffsetFields): StepFi
   return fieldMap[fieldName]
 }
 
-type OP = {fieldName: TipOffsetFields, className: ?string}
+type OP = {fieldName: TipOffsetFields, className?: string}
 type SP = {
   disabled: boolean,
   mmFromBottom: ?string,

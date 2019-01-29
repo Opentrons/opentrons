@@ -19,7 +19,7 @@ export default function generateNewForm (args: NewFormArgs): FormData {
   const baseForm: BlankForm = {
     id: stepId,
     stepType: stepType,
-    stepName: i18n.t(`button.stepType.${stepType}`),
+    stepName: i18n.t(`application.stepType.${stepType}`),
     stepDetails: '',
   }
 

@@ -2,16 +2,16 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import type {StepType, HydratedMoveLiquidFormDataLegacy} from '../../../form-types'
+import type {StepType, HydratedMoveLiquidFormDataLegacy} from '../../../../form-types'
 import {
   VolumeField,
   PipetteField,
   ChangeTipField,
   DisposalVolumeField,
   PathField,
-} from '../fields'
-import styles from '../StepEditForm.css'
-import type {FocusHandlers} from '../index'
+} from '../../fields'
+import styles from '../../StepEditForm.css'
+import type {FocusHandlers} from '../../types'
 import SourceDestFields from './SourceDestFields'
 
 type TransferFormProps = {

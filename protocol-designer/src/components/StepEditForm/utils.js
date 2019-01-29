@@ -1,7 +1,20 @@
 // @flow
-import i18n from '../../../localization'
+import difference from 'lodash/difference'
+import i18n from '../../localization'
 
-export default function getTooltipForField (stepType: ?string, name: string): ?string {
+export function getVisibleAlerts<Field, Alert: {dependentFields: Array<Field>}> (args: {
+  focusedField: ?Field,
+  dirtyFields: Array<Field>,
+  alerts: Array<Alert>,
+}): Array<Alert> {
+  const {focusedField, dirtyFields, alerts} = args
+  return alerts.filter(alert => (
+    !alert.dependentFields.includes(focusedField) &&
+    difference(alert.dependentFields, dirtyFields).length === 0)
+  )
+}
+
+export function getTooltipForField (stepType: ?string, name: string): ?string {
   if (!stepType) {
     console.error(`expected stepType for form, cannot getTooltipText for ${name}`)
     return null

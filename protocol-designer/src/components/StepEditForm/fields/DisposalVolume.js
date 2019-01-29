@@ -4,7 +4,7 @@ import {FormGroup, CheckboxField} from '@opentrons/components'
 import cx from 'classnames'
 
 import styles from '../StepEditForm.css'
-import type {FocusHandlers} from '../index'
+import type {FocusHandlers} from '../types'
 
 import StepField from './FieldConnector'
 import TextField from './Text'

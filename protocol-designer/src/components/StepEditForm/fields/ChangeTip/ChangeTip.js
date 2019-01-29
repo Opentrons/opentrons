@@ -25,7 +25,7 @@ const ChangeTipField = (props: Props) => {
   }
   const options = props.options.map((value) => ({
     value,
-    name: i18n.t(`form.step_edit_form.${stepType}.change_tip_option.${value}`),
+    name: i18n.t(`form.step_edit_form.field.change_tip.option.${value}`),
     disabled: disabledOptions ? disabledOptions.has(value) : false,
   }))
   return (

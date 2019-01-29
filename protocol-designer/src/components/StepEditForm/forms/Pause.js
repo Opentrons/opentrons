@@ -2,10 +2,10 @@
 import * as React from 'react'
 import {FormGroup} from '@opentrons/components'
 
-import formStyles from '../forms/forms.css'
+import formStyles from '../../forms/forms.css'
 
-import {TextField, RadioGroupField} from './fields'
-import type {FocusHandlers} from './index'
+import {TextField, RadioGroupField} from '../fields'
+import type {FocusHandlers} from '../types'
 
 type PauseFormProps = {focusHandlers: FocusHandlers}
 function PauseForm (props: PauseFormProps): React.Element<'div'> {

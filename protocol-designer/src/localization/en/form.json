@@ -22,46 +22,16 @@
     "volume_exceeded": "Warning: exceeded max volume per well: {{volume}}µL"
   },
   "step_edit_form": {
-    "consolidate": {
-      "change_tip_option": {
-        "always": "For each dispense",
-        "once": "Only the first aspirate",
-        "never": "Never"
-      }
-    },
-    "distribute": {
-      "change_tip_option": {
-        "always": "For each aspirate",
-        "once": "Only the first aspirate",
-        "never": "Never"
-      }
-    },
-    "mix": {
-      "change_tip_option": {
-        "always": "For each well",
-        "once": "Only the first aspirate",
-        "never": "Never"
-      }
-    },
-    "transfer": {
-      "change_tip_option": {
-        "always": "For each aspirate",
-        "once": "Only the first aspirate",
-        "never": "Never"
-      }
-    },
-    "moveLiquid": {
-      "change_tip_option": {
-        "always": "Always",
-        "once": "Once",
-        "perSource": "Per Source",
-        "perDest": "Per Destination",
-        "never": "Never"
-      }
-    },
     "field": {
       "change_tip": {
-        "label": "Change Tip"
+        "label": "Change Tip",
+        "option": {
+          "always": "Always",
+          "once": "Once",
+          "perSource": "Per Source",
+          "perDest": "Per Destination",
+          "never": "Never"
+        }
       },
       "tip_position": {
         "label": "Tip Position"

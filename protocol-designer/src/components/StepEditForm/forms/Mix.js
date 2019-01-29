@@ -3,9 +3,9 @@ import * as React from 'react'
 import cx from 'classnames'
 import {FormGroup, IconButton, HoverTooltip} from '@opentrons/components'
 
-import i18n from '../../localization'
+import i18n from '../../../localization'
 
-import formStyles from '../forms/forms.css'
+import formStyles from '../../forms/forms.css'
 
 import {
   TextField,
@@ -19,10 +19,10 @@ import {
   WellSelectionField,
   TipPositionField,
   WellOrderField,
-} from './fields'
+} from '../fields'
 
-import type {FocusHandlers} from './index'
-import styles from './StepEditForm.css'
+import type {FocusHandlers} from '../types'
+import styles from '../StepEditForm.css'
 
 type Props = {focusHandlers: FocusHandlers}
 type State = {collapsed?: boolean}

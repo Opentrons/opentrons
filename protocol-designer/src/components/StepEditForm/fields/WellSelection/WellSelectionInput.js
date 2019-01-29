@@ -10,7 +10,7 @@ import styles from '../../StepEditForm.css'
 import type {Dispatch} from 'redux'
 import type {StepIdType, StepFieldName} from '../../../../form-types'
 import type {BaseState} from '../../../../types'
-import type { FocusHandlers } from '../../index'
+import type { FocusHandlers } from '../../types'
 
 type SP = {
   stepId: ?StepIdType,

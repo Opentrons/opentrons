@@ -2,10 +2,10 @@
 import * as React from 'react'
 import {FormGroup, IconButton, HoverTooltip} from '@opentrons/components'
 
-import type {StepFieldName} from '../../../steplist/fieldLevel'
-import i18n from '../../../localization'
+import type {StepFieldName} from '../../../../steplist/fieldLevel'
+import i18n from '../../../../localization'
 
-import type {FocusHandlers} from '../index'
+import type {FocusHandlers} from '../../types'
 
 import {
   LabwareField,
@@ -16,9 +16,9 @@ import {
   FlowRateField,
   WellSelectionField,
   WellOrderField,
-} from '../fields'
+} from '../../fields'
 
-import styles from '../StepEditForm.css'
+import styles from '../../StepEditForm.css'
 
 type Props = {
   focusHandlers: FocusHandlers,

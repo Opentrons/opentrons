@@ -442,7 +442,7 @@ export const getAllSteps: Selector<{[stepId: StepIdType]: StepItemData}> = creat
         return {
           ...steps[id],
           formData: savedForm,
-          title: savedForm ? savedForm.stepName : i18n.t(`button.stepType.${step.stepType}`),
+          title: savedForm ? savedForm.stepName : i18n.t(`application.stepType.${step.stepType}`),
           description: savedForm ? savedForm.stepDetails : null,
         }
       }
