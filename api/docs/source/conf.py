@@ -158,7 +158,8 @@ html_theme_options = {
     'sidebar_list': '#05C1B3',
     'sidebar_link_underscore': '#DDDDDD',
     'extra_nav_links': {
-        'Download As PDF': '_static/OpentronsAPI.pdf'
+        'Download As PDF': '_static/OpentronsAPI.pdf',
+        'OT 1 API': 'ot1/index.html'
     }
 }
 

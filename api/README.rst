@@ -2,22 +2,40 @@
 Opentrons API
 =============
 
-.. image:: https://travis-ci.org/Opentrons/opentrons.svg?branch=edge
+.. image:: https://badgen.net/travis/Opentrons/opentrons
    :target: https://travis-ci.org/Opentrons/opentrons
    :alt: Build Status
 
-.. image:: https://coveralls.io/repos/github/Opentrons/opentrons/badge.svg?branch=edge
-   :target: https://coveralls.io/github/Opentrons/opentrons?branch=edge
+.. image:: https://badgen.net/codecov/c/github/Opentrons/opentrons
+   :target: https://codecov.io/gh/Opentrons/opentrons
    :alt: Coverage Status
 
+.. image:: https://badgen.net/pypi/v/opentrons
+   :target: https://pypi.org/project/opentrons/
+   :alt: Download From PyPI
+
 .. _Full API Documentation: http://docs.opentrons.com
+
+Note On Versions
+----------------
+
+This API is for locally simulating protocols for the OT 2 without connecting to a robot. It no longer controls an OT 1.
+
+`Version 2.5.2 <https://pypi.org/project/opentrons/2.5.2/>`_ was the final release of this API for the OT 1. If you want to download this API to use the OT 1, you should download it with
+
+.. code-block:: shell
+
+   pip install opentrons==2.5.2
+
+For APIs between 2.5.2 and 3.7.0, there is no PyPI package available. Those APIs should be installed by cloning this repo and following the instructions in `the Development Setup section of CONTRIBUTING.md <https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#development-setup>`_ and `the API CONTRIBUTING.rst <https://github.com/Opentrons/opentrons/blob/edge/api/CONTRIBUTING.rst>`_.
+
 
 Introduction
 ------------
 
-Please refer to `Full API Documentation`_ for detailed instructions.
+Please refer to our `Full API Documentation`_ for detailed instructions.
 
-The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy. 
+The Opentrons API is a simple framework designed to make writing automated biology lab protocols for the Opentrons OT2 easy.
 
 We've designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook. 
 
@@ -103,38 +121,6 @@ Below is a short protocol that will pick up a tip and use it to move 100ul volum
 
   p300.return_tip()
 
-Using This Repo Outside Of A Robot
-----------------------------------
-
-The code in this subdirectory can be used outside of a robot to check protocols; however, because the code requires extra shared data files and dependencies, you cannot simply run a python interpreter - it must be installed.
-
-There are two ways to install the Opentrons software. The first is to create a virtual environment unique to this particular checkout of the Opentrons software; this is useful to avoid affecting the rest of your system. The second way is to install the Opentrons software to your entire system, and is much easier to use with other Python packages like Jupyter.
-
-Before either step is taken, please follow the instructions in the Environment and Repository section of CONTRIBUTING.md in the repository root, up to and including running ``make install``.
-
-
-Configuration
--------------
-
-The module has a lot of configuration, some of which is only relevant when running on an actual robot, but some of which could be useful during simulation. When the module is first imported, it will try and write configuration files in ``~/.opentrons/config.json`` (``C:\Users\%USERNAME%\.opentrons\config.json`` on Windows). This contains mostly paths to other configuration files and directories, most of which will be in that folder. The location can be changed by setting the environment variable ``OT_API_CONFIG_DIR`` to another path. Inividual settings in the config file can be overridden by setting environment variables named like ``OT_API_${UPPERCASED_VAR_NAME}`` (for instance, to override the ``serial_log_file`` config element you could set the environment variable ``OT_API_SERIAL_LOG_FILE`` to a different path). Feature flags may be overridden with ``OT_API_FF_${featureFlagName}``; for instance, setting the flag for a robot with a short fixed trash could be done with ``OT_API_FF_shortFixedTrash=1``.
-
-
-Virtual Environment Setup
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Once ``make install`` has been run, the virtual environment is ready to use. For more information on virtual environments see the Python documentation at https://docs.python.org/3/library/venv.html . The API Makefile contains a useful command to ensure that the version of the API installed to the virtual environment is up to date and start the virtual environment: ``make local-shell``. After running ``make local-shell``, the terminal in which you ran it is now in the virtual environment, and other Python scripts or applications started from that terminal will be able to see the Opentrons software.
-
-In addition to running scripts that ``import opentrons``, the local installation makes it easy to run an API server locally on your machine. This is only important if you want to interact with the system the same way the opentrons app does; if you only want to test protocols, you can simply run the protocol in the virtual environment. To run the server, do ``make dev``.
-
-Systemwide Setup
-~~~~~~~~~~~~~~~~
-
-Sometimes it can be inconvenient to activate a virtual environment and run things from it every time you want to use the API to simulate a protocol. This workflow is easier in that case, and is best used when you do not intend to modify the API. In that case, in addition to running ``make install``, we recommend that you check out the latest release of the API rather than using the ``edge`` branch. Instead, go to the root of the repository on GitHub at https://github.com/Opentrons/opentrons , click the branch dropdown, click the tags tab, and find the numerically highest tag, then check that out locally.
-
-Once the most recent tag is checked out, in this directory run ``make wheel``. This command builds the API into an installable Python object. Then, in this directory run ``pip install dist/opentrons-*.whl``. This command installs the API on your system. Finally, set the environment variable ``ENABLE_VIRTUAL_SMOOTHIE=true``. This prevents the API from accessing your computer as it would the robot. If you see errors about the directory ``data``, it means you have not set the environment variable.
-
-Once the API is installed and the environment variable is set, you should be able to ``import opentrons`` from anywhere on your system, including from inside Jupyter.
-
 Simulating Protocols
 --------------------
 
@@ -152,4 +138,10 @@ This also provides an entrypoint to use the Opentrons simulation package from ot
 
 
 The function will either run and return or raise an  exception if there is a problem with the protocol.
+
+Configuration
+-------------
+
+The module has a lot of configuration, some of which is only relevant when running on an actual robot, but some of which could be useful during simulation. When the module is first imported, it will try and write configuration files in ``~/.opentrons/config.json`` (``C:\Users\%USERNAME%\.opentrons\config.json`` on Windows). This contains mostly paths to other configuration files and directories, most of which will be in that folder. The location can be changed by setting the environment variable ``OT_CONFIG_DIR`` to another path. Inividual settings in the config file can be overridden by setting environment variables named like ``OT_${UPPERCASED_VAR_NAME}`` (for instance, to override the ``serial_log_file`` config element you could set the environment variable ``OT_SERIAL_LOG_FILE`` to a different path).
+
 

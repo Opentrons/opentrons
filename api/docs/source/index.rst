@@ -1,37 +1,10 @@
-.. Opentrons API documentation master file, created by
-   sphinx-quickstart on Thu Oct 27 12:10:26 2016.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 ===============
 Opentrons API
 ===============
 
-For the OT 1 API, `please go to this link`__
-
-__ https://docs.opentrons.com/ot1/
-
 The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy.
 
 We’ve designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook.
-
-`View source code on GitHub`__
-
-__ https://github.com/Opentrons/opentrons
-
-
-Adding the API to your local computer
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Our new API no longer uses pypi and thus `pip install opentrons` will only give you
-software from OT 1. To install on your computer please follow instructions either from
-our `contributing guide`__
-
-__ https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#development-setup
-
-or this `support article`__
-
-__ https://support.opentrons.com/ot-2/getting-started-software-setup/installing-the-opentrons-api-on-your-computer-for-simulation
 
 
 **********************
@@ -85,11 +58,13 @@ How it's Organized
 
 When writing protocols using the Opentrons API, there are generally five sections:
 
-1) Imports
-2) Metadata
-3) Labware
-4) Pipettes
-5) Commands
+1) :ref:`index-imports`
+2) :ref:`index-metadata`
+3) :ref:`index-labware`
+4) :ref:`index-pipettes`
+5) :ref:`index-commands`
+
+.. _index-imports:
 
 Imports
 ^^^^^^^
@@ -102,6 +77,7 @@ From the example above, the "imports" section looked like:
 
     from opentrons import labware, instruments
 
+.. _index-metadata:
 
 Metadata
 ^^^^^^^^
@@ -111,6 +87,8 @@ Metadata is a dictionary of data that is read by the server and returned to clie
 The fields above ("protocolName", "author", and "description") are the recommended fields, but the metadata dictionary can contain fewer or additional fields as desired (though non-standard fields may not be rendered by the client, depending on how it is designed).
 
 You may see a metadata field called "source" in protocols you download directly from Opentrons. The "source" field is used for anonymously tracking protocol usage if you opt-in to analytics in the Opentrons App. For example, protocols from the Opentrons Protocol Library may have "source" set to "Opentrons Protocol Library". You shouldn't define "source" in your own protocols.
+
+.. _index-labware:
 
 Labware
 ^^^^^^^
@@ -126,6 +104,8 @@ From the example above, the "labware" section looked like:
     plate = labware.load('96-flat', '2')
     tiprack = labware.load('tiprack-200ul', '1')
 
+.. _index-pipettes:
+
 Pipettes
 ^^^^^^^^
 
@@ -138,6 +118,8 @@ From the example above, the "pipettes" section looked like:
 .. code-block:: python
 
     pipette = instruments.P300_Single(mount='left', tip_racks=[tiprack])
+
+.. _index-commands:
 
 Commands
 ^^^^^^^^
@@ -152,12 +134,9 @@ From the example above, the "commands" section looked like:
 
     pipette.transfer(100, plate.wells('A1'), plate.wells('B1'))
 
-
-Table of Contents
------------------
-
 .. toctree::
   :maxdepth: 3
+  :hidden:
 
   writing
   labware

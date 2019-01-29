@@ -38,7 +38,8 @@ class SDistWithSharedData(sdist.sdist):
         + " Also, include opentrons data files."
 
     def make_release_tree(self, base_dir, files):
-        self.announce("adding opentrons data files to base dir {}".format(base_dir))
+        self.announce("adding opentrons data files to base dir {}"
+                      .format(base_dir))
         for data_file in get_shared_data_files():
             sdist_dest = os.path.join(base_dir, DEST_BASE_PATH)
             self.mkpath(os.path.join(sdist_dest, 'opentrons',
@@ -124,7 +125,6 @@ if __name__ == "__main__":
         name=DISTNAME,
         description=DESCRIPTION,
         license=LICENSE,
-        url=URL,
         version=VERSION,
         author=AUTHOR,
         author_email=EMAIL,
@@ -148,5 +148,11 @@ if __name__ == "__main__":
             'console_scripts': [
                 'opentrons_simulate = opentrons.simulate:main'
             ]
+        },
+        project_urls={
+            'opentrons.com': "https://www.opentrons.com",
+            'Source Code On Github':
+            "https://github.com/Opentrons/opentrons/tree/edge/api",
+            'Documentation': "https://docs.opentrons.com"
         }
     )

@@ -40,10 +40,6 @@ More detailed information on python can always be found at `the python docs <htt
 Working with Python
 *******************
 
-Currently, we recommend writing your protocols in one of two ways:
-
-Text Editor
-===========
 
 Using a popular and free code editor, like `Sublime Text 3`__, is a common method for writing Python protocols. Download onto your computer, and you can now write and save Python scripts.
 
@@ -53,23 +49,88 @@ __ https://www.sublimetext.com/3
 
     Make sure that when saving a protocol file, it ends with the ``.py`` file extension. This will ensure the App and other programs are able to properly read it.
 
-    For example, ``my_protocol_file.py``
-
-Jupyter Notebook
-================
-
-For a more interactive environment to write and debug using some of our API tools, we recommend using Jupyter Notebook.
-
-You can access Jupyter Notebook using the following:
-
-1. Open your Opentrons App and look for the IP address of your robot on the robot information page.
-2. Type in ``(Your Robot's IP Address):48888`` into any browser on your computer.
+    For example, ``my_protocol.py``
 
 ***************************
 Simulating Python Protocols
 ***************************
 
-As our OT 2 software is no longer bundled with our desktop app, there are a few more steps you have to follow in order
-to simulate your protocol without being connected to a robot.
+In general, the best way to simulate a protocol is to simply upload it to an OT 2 through the Opentrons app. When you upload a protocol via the Opentrons app, the robot simulates the protocol and the app displays any errors. However, if you want to simulate protocols without being connected to a robot, you can download the Opentrons python package.
 
-To set up your environment, please view `this support article <https://support.opentrons.com/ot-2/getting-started-software-setup/installing-the-opentrons-api-on-your-computer-for-simulation>`_
+Installing
+==========
+
+To install the Opentrons package, you must install it from Python’s package manager, `pip`. The exact method of installation is slightly different depending on whether you use Jupyter on your computer (note: you do not need to do this if you want to use the :ref:`writing-robot-jupyter`, ONLY for your locally-installed notebook) or not.
+
+Non-Jupyter Installation
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+First, install Python 3.6 (`Windows x64 <https://www.python.org/ftp/python/3.6.4/python-3.6.4-amd64.exe>`_, `Windows x86 <https://www.python.org/ftp/python/3.6.4/python-3.6.4.exe>`_, `OS X <https://www.python.org/ftp/python/3.6.4/python-3.6.4-macosx10.6.pkg>`_) on your local computer.
+
+Once the installer is done, make sure that Python is properly installed by opening a terminal and doing ``python --version``. If this is not 3.6.4, you have another version of Python installed; this happens frequently on OS X and sometimes on windows. We recommend using a tool like `pyenv <https://github.com/pyenv/pyenv>`_ to manage multiple Python versions. This is particularly useful on OS X, whch has a built in install of Python 2.7 that should not be removed.
+
+Once python is installed, install the `opentrons package <https://pypi.org/project/opentrons/>`_ using ``pip``:
+
+.. code-block:: shell
+
+   pip install opentrons
+
+You should see some output that ends with ``Successfully installed opentrons-3.6.5`` (the version number may be different).
+
+Jupyter Installation
+^^^^^^^^^^^^^^^^^^^^
+
+You must make sure that you install the `opentrons` package for whichever kernel and virtual environment the notebook is using. A generally good way to do this is
+
+.. code-block:: python
+
+   import sys
+   !{sys.executable} -m pip install numpy
+
+
+Simulating
+==========
+
+Once the Opentrons Python package is installed, you can simulate protocols in your terminal using the ``opentrons_simulate`` command:
+
+.. code-block:: shell
+
+   opentrons_simulate.exe my_protocol.py
+
+or, on OS X or linux,
+
+.. code-block:: shell
+
+   opentrons_simulate my_protocol.py
+
+If the simulation was successful, the simulator will print ``Simulation successful!``. If there was an error, it will print the error.
+
+.. _writing-robot-jupyter:
+
+****************
+Robot’s Jupyter Notebook
+****************
+
+For a more interactive environment to write and debug using some of our API tools, we recommend using the Jupyter notebook which is installed on the robot. Using this notebook, you can develop a protocol by running its commands line-by-line, ensuring they do exactly what you want, before saving the protocol for later execution.
+
+You can access the robot’s Jupyter notebook by following these steps:
+
+1. Open your Opentrons App and look for the IP address of your robot on the robot information page.
+2. Type in ``(Your Robot's IP Address):48888`` into any browser on your computer.
+
+Here, you can select a notebook and develop protocols that will be saved on the robot itself. Note that these protocols will only be on the robot unless specifically downloaded to your computer using the ``File / Download As`` buttons in the notebook.
+
+.. note::
+
+   When running protocol code in a Jupyter notebook, before executing protocol steps you must call :py:meth:`robot.connect`:
+
+   .. code-block:: python
+
+      from opentrons import robot
+      robot.connect()
+
+   This tells the notebook to connect to the robot’s hardware so the commands you enter actually cause the robot to move.
+
+   However, this happens automatically when you upload a protocol through the Opentrons app, and connecting twice will cause errors. To avoid this, **remove the call to robot.connect()** before uploading the protocol through the Opentrons app.
+
+
