@@ -193,7 +193,7 @@ export default class FlowRateInput extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <FormGroup label={label || DEFAULT_LABEL} disabled={disabled}>
+        <FormGroup label={`${label || DEFAULT_LABEL}:`} disabled={disabled}>
           <InputField
             units='μL/s'
             readOnly

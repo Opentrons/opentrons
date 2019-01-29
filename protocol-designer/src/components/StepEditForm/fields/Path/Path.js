@@ -6,8 +6,24 @@ import StepField from '../FieldConnector'
 import styles from '../../StepEditForm.css'
 import type {FocusHandlers} from '../../index'
 import type {PathOption} from '../../../../form-types'
+import SINGLE_IMAGE from '../../../../images/path_single_transfers.svg'
+import MULTI_DISPENSE_IMAGE from '../../../../images/path_multi_dispense.svg'
+import MULTI_ASPIRATE_IMAGE from '../../../../images/path_multi_aspirate.svg'
 
-const ALL_PATH_OPTIONS = ['single', 'multiAspirate', 'multiDispense']
+const ALL_PATH_OPTIONS = [
+  {
+    name: 'single',
+    image: SINGLE_IMAGE,
+  },
+  {
+    name: 'multiAspirate',
+    image: MULTI_ASPIRATE_IMAGE,
+  },
+  {
+    name: 'multiDispense',
+    image: MULTI_DISPENSE_IMAGE,
+  },
+]
 
 type PathFieldProps = {
   focusHandlers: FocusHandlers,
@@ -40,12 +56,12 @@ const PathField = (props: PathFieldProps) => (
         <ul className={styles.path_options}>
           {ALL_PATH_OPTIONS.map(option => (
             <PathButton
-              key={option}
-              selected={option === value}
-              disabled={props.disabledPaths && props.disabledPaths.has(option)}
-              onClick={() => updateValue(option)}
-              // TODO Ian 2019-01-28: use icon instead of passing in `{option}` as text
-            >{option}</PathButton>
+              key={option.name}
+              selected={option.name === value}
+              disabled={props.disabledPaths && props.disabledPaths.has(option.name)}
+              onClick={() => updateValue(option.name)}>
+              <img src={option.image} className={styles.path_image} />
+            </PathButton>
           ))}
         </ul>
       )} />

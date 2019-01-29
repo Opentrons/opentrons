@@ -30,9 +30,9 @@ const TransferForm = (props: TransferFormProps) => {
   const {path} = props.formData
   return (
     <React.Fragment>
-      <div className={cx(styles.field_row, styles.start_group)}>
+      <div className={cx(styles.form_row, styles.start_group)}>
         <PipetteField name="pipette" stepType={stepType} {...focusHandlers} />
-        <VolumeField focusHandlers={focusHandlers} stepType={stepType} />
+        <VolumeField label="Transfer Vol:" focusHandlers={focusHandlers} stepType={stepType} />
       </div>
       <div className={styles.section_divider}></div>
 
@@ -42,14 +42,15 @@ const TransferForm = (props: TransferFormProps) => {
       <SourceDestFields focusHandlers={focusHandlers} prefix="dispense" />
       <div className={styles.section_divider}></div>
 
-      <div className={styles.field_row}>
+      <div className={styles.form_row}>
         <div className={styles.start_group}>
           <ChangeTipField stepType={stepType} name="changeTip" />
           <PathField focusHandlers={focusHandlers} />
         </div>
-        <div className={styles.end_group}>
+        <div className={cx(styles.end_group, styles.disposal_vol_wrapper)}>
           {path === 'multiDispense' && <DisposalVolumeField focusHandlers={focusHandlers} />}
         </div>
+        <div className={styles.hidden_fields}></div>
       </div>
     </React.Fragment>
   )

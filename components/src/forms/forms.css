@@ -74,6 +74,7 @@
     flex: 1 1 auto;
     color: var(--c-dark-gray);
     width: 100%;
+    height: 1rem;
     font-size: var(--fs-body-1);
 
     /* TODO: Ian 2018-09-14 Firefox has 1px padding on input element,
@@ -147,6 +148,7 @@
     border: 0;
     padding: 0.25rem 0.5rem;
     outline: none;
+    height: 1.5rem;
     border-radius: 3px;
     color: var(--c-dark-gray);
     background-color: var(--c-light-gray);

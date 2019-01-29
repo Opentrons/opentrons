@@ -62,45 +62,26 @@
 
 /* ------------------- */
 
-/*
-.field_row {
-  lost-utility: clearfix;
-  min-height: 2.25rem;
-  max-width: 24rem;
-*/
-
-/* Field row is for: (optional checkbox) + label + associated fields
-  * All items in field row sum to 15/16, leaving 1/16 gap on the right.
-  */
-
-/*
-  & label {
-    lost-column: 7/16;
-    max-width: 8.5rem;
-  }
-
-  & > * {
-    lost-column: 4/16;
-  }
-
-  & .full_width {
-    lost-column: 8/16;
-  }
-}
-*/
-
 .repetitions_row {
   padding: 1.5rem 0;
 }
 
 /* form buttons */
 
-.cancel_button {
-  lost-offset: 2/6;
+.form_footer {
+  margin: 2rem 0 1rem 0;
+}
+
+.form_button {
+  width: 6.25rem;
+}
+
+.form_button:not(:last-child) {
+  margin-right: 0.625rem;
 }
 
 .sub_select_label {
-  @apply --font-body-2-dark;
+  @apply --font-body-1-dark;
 
   display: flex;
   align-items: center;
@@ -110,18 +91,18 @@
   margin: 0.5em 0 0.5em 20px;
 }
 
-.button_row {
+/* .button_row {
   lost-utility: clearfix;
   margin-top: 2rem;
 
   & > * {
     lost-column: 1/6;
   }
-}
+} */
 
 /* NEW STYLES */
 
-.field_row {
+.form_row {
   min-height: 2.25rem;
   display: flex;
   flex-direction: row;
@@ -146,30 +127,60 @@
   justify-content: flex-start;
 }
 
+.fixed_width {
+  width: 17rem;
+}
+
 .large_field {
+  font-size: var(--fs-body-1);
   width: 14rem;
   margin-right: 0.5rem;
 }
 
 .medium_field {
-  width: 8em;
+  font-size: var(--fs-body-1);
+  width: 12em;
   margin-right: 0.5rem;
-
-  /* 144 */
 }
 
 .small_field {
-  width: 6rem;
+  font-size: var(--fs-body-1);
+  width: 5rem;
   margin-right: 0.5rem;
+}
+
+.orphan_field {
+  margin: 0;
+}
+
+.checkbox_row {
+  margin-top: 0.25rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.checkbox_field {
+  font-size: var(--fs-body-1);
+}
+
+.hidden_fields {
+  margin: 0 1rem 0 2.5rem;
+  min-width: 14.5rem;
 }
 
 .no_label {
   margin-top: 0.5rem;
 }
 
-.advanced_settings_icon {
+.advanced_settings_button_wrapper {
   height: 2.25rem;
   width: 2.25rem;
+  margin-top: 0.375rem;
+}
+
+.advanced_settings_button {
+  padding: 0.375rem;
 }
 
 .section_divider {
@@ -179,14 +190,12 @@
   margin: 1em 0;
 }
 
-/* TODO: real styles using rem and canonical colors */
 .path_option {
-  width: 35px;
-  height: 24px;
-  margin-right: 0.5rem;
-  border-radius: 3px;
-  border: 1px solid #9b9b9b;
-  font-size: 0.5rem;
+  width: 2.275rem;
+  height: 1.55rem;
+  margin-right: 0.25rem;
+  border-radius: 2px;
+  border: 1px solid var(--c-med-gray);
   cursor: pointer;
 }
 
@@ -196,7 +205,7 @@
 
 .path_option.disabled {
   color: var(--c-light-gray);
-  background-color: var(--c-med-gray);
+  opacity: 0.16;
   cursor: default;
 }
 
@@ -206,8 +215,16 @@
   list-style: none;
 }
 
+.disposal_vol_wrapper {
+  min-height: 3.5rem;
+}
+
+.multi_dispense_options {
+  min-width: 14.25rem;
+}
+
 @media screen and (max-width: 1279px) {
-  .field_row {
+  .form_row {
     flex-wrap: wrap;
   }
 }
