@@ -232,7 +232,7 @@ async def dc_session(request, async_server, monkeypatch, loop):
         await hw.cache_instruments({
             types.Mount.LEFT: None,
             types.Mount.RIGHT: 'p300_multi_v1'})
-    # endpoints.session = None
+
     ses = endpoints.SessionManager(hw)
     endpoints.session = ses
     monkeypatch.setattr(endpoints, 'session', ses)

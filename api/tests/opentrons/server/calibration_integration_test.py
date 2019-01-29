@@ -22,7 +22,6 @@ from opentrons.hardware_control.types import Axis
 @pytest.mark.api1_only
 async def test_transform_from_moves(async_server, async_client, monkeypatch):
     test_mount, test_model = ('left', 'p300_multi_v1')
-    # test_mount, test_model = ('right', 'p300_single_v1')
     hardware = async_server['com.opentrons.hardware']
 
     def dummy_read_model(mount):
@@ -207,7 +206,6 @@ async def test_transform_from_moves(async_server, async_client, monkeypatch):
 async def test_transform_from_moves_v2(
         async_server, async_client, monkeypatch):
     test_mount, test_model = (types.Mount.LEFT, 'p300_multi_v1')
-    # test_mount, test_model = ('right', 'p300_single_v1')
     hardware = async_server['com.opentrons.hardware']
 
     await hardware.reset()

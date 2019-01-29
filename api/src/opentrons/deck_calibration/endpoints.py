@@ -10,8 +10,6 @@ from opentrons import instruments, hardware_control
 from opentrons.types import Mount, Point
 from . import jog, position, dots_set, z_pos
 from opentrons.util.linal import add_z, solve
-# from opentrons.hardware_control.types import Axis
-# from opentrons.hardware_control import adapters
 
 session = None
 mount_by_name = {'left': Mount.LEFT, 'right': Mount.RIGHT}
@@ -250,7 +248,7 @@ async def detach_tip(data):
     }
     """
     global session
-    # mount = 'left' if session.current_mount == 'Z' else 'right'
+
     if not feature_flags.use_protocol_api_v2():
         pipette = session.pipettes[session.current_mount]
         if not pipette.tip_attached:
@@ -321,7 +319,6 @@ async def move(data):
     point_name = data.get('point')
     point = safe_points().get(point_name)
     if point and len(point) == 3:
-        # mount = 'left' if session.current_mount == 'Z' else 'right'
         if not feature_flags.use_protocol_api_v2():
             pipette = session.pipettes[session.current_mount]
             channels = pipette.channels
@@ -336,7 +333,6 @@ async def move(data):
         # out of xy positions saved in the `save_xy` handler
         # (not 2 * Y_OFFSET_MULTI, because the axial center of the pipette
         # will only be off by 1* Y_OFFSET_MULTI).
-        if not feature_flags.use_protocol_api_v2():
             if not channels == 1:
                 x = point[0]
                 y = point[1] + pipette_config.Y_OFFSET_MULTI * 2

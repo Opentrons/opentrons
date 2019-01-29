@@ -7,7 +7,6 @@ from opentrons import deck_calibration as dc
 from opentrons.deck_calibration import endpoints
 from opentrons.config import robot_configs
 from opentrons import types
-# from opentrons.hardware_control.types import Axis
 
 
 # Note that several tests in this file have target/expected values that do not

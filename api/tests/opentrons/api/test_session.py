@@ -113,7 +113,6 @@ async def test_load_and_run_v2(
     assert main_router.notifications.queue.qsize() == 1
     assert session.state == 'loaded'
     assert session.command_log == {}
-    # main_router.calibration_manager.tip_probe(session.instruments[0])
 
     def run():
         session.run()

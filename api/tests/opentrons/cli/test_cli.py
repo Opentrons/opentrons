@@ -38,7 +38,7 @@ def test_save_and_clear_config(mock_config, async_server):
     root, ext = os.path.splitext(base_filename)
     filename = "{}-{}{}".format(root, tag, ext)
     dc_main.backup_configuration_and_reload(hardware, tag=tag)
-    # hardware.update_config(name='Ada Lovelace')
+
     assert hardware.config == robot_configs._build_config({}, {})
 
     saved_config = robot_configs.load(filename)

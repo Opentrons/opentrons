@@ -40,16 +40,6 @@ async def test_multi_single(main_router, protocol, protocol_file, dummy_db):
         session.instruments[0],
         session.containers[2])
 
-    # print(coords)
-    # Move to pick up tip
-    # assert (111.0, 244.0, 74.0) in coords
-    # assert (111.0, 244.0, 64.0) in coords
-    # assert (111.0, 244.0, 59.0) in coords
-
-    # # Aspirate and move
-    # assert (110.0, 135.0, 67.0) in coords
-    # assert (110.0, 144.0, 58.0) in coords
-
 
 @pytest.mark.api1_only
 @pytest.mark.parametrize('protocol_file', ['multi-single.py'])

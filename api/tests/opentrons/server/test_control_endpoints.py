@@ -6,7 +6,6 @@ import pytest
 from opentrons import robot, types
 from opentrons.legacy_api import modules as legacy_modules
 
-# from opentrons.server import init
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 from opentrons import instruments
 from opentrons.config import pipette_config

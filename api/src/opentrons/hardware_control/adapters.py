@@ -68,7 +68,6 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
         super().start()
 
     def _event_loop_in_thread(self):
-        # asyncio.set_event_loop(self._loop)
         loop = object.__getattribute__(self, '_loop')
         loop.run_forever()
         loop.close()

@@ -24,7 +24,6 @@ from . import (
 # TODO: add tests for methods, split out current point behavior per comment
 # TODO:   below, and total result on robot against prior version of this app
 
-# logging.basicConfig(level=logging.DEBUG, filename="/data/calibration.log")
 log = logging.getLogger(__name__)
 
 
@@ -209,13 +208,8 @@ class CLITool:
         Move the pipette on `axis` in `direction` by `step` and update the
         position tracker
         """
-        # if not feature_flags.use_protocol_api_v2():
         jog(axis, direction, step, self.hardware, self._current_mount)
-        # else:
-        #
-        #     mount_obj = mount_by_axis[self._current_mount]
-        #     self.asyncio_loop.run_until_complete(
-        #         self.hardware.move_rel(mount_obj, pt))
+
         self.current_position = self._position()
         return 'Jog: {}'.format([axis, str(direction), str(step)])
 
@@ -290,8 +284,7 @@ class CLITool:
 
         self.hardware.update_config(gantry_calibration=gantry_calibration)
         res = str(self.hardware.config)
-        print("HARDWARE CONFIG")
-        print(res)
+
         return '{}\n{}'.format(res, save_config(self.hardware.config))
 
     def save_z_value(self) -> str:
@@ -364,7 +357,6 @@ class CLITool:
             z_axis = self._get_z_axis(self._current_mount)
             self.hardware._driver.move({z_axis: sz})
         else:
-            # mount_obj = mount_by_axis[self._current_mount]
             pt = types.Point(x=cx, y=cy, z=sz)
             self.hardware.move_to(self._current_mount, pt)
 
@@ -394,7 +386,6 @@ class CLITool:
 
         text = '\n'.join([
             points,
-            # 'Smoothie: {}'.format(self.current_position),
             'World: {}'.format(apply_transform(
                 inv(self.calibration_matrix), self.current_position)),
             'Step: {}'.format(self.current_step()),
@@ -442,7 +433,6 @@ def backup_configuration(hardware, tag):
 
 def backup_configuration_and_reload(hardware, tag=None):
     backup_configuration(hardware, tag)
-    # if not feature_flags.use_protocol_api_v2():
     clear_configuration_and_reload(hardware)
 
 
@@ -500,11 +490,11 @@ def main():
         atexit.register(hardware.turn_off_rail_lights)
     else:
         hardware.set_lights(rails=True)
-        # atexit.register()
     cli.home()
     # lights help the script user to see the points on the deck
     cli.ui_loop.run()
-    hardware.set_lights(rails=False)
+    if feature_flags.use_protocol_api_v2():
+        hardware.set_lights(rails=False)
     print('Robot config: \n', cli._config)
 
 

@@ -3,8 +3,6 @@ import asyncio
 from asyncio import Queue
 from contextlib import contextmanager
 
-# subscriptions: dict = {}
-
 
 class Notifications(object):
     def __init__(self, topics, broker, loop=None):

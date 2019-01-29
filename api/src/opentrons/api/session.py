@@ -359,7 +359,6 @@ class Session(object):
                 'error': error
             }
         )
-        # self._on_state_changed()
 
     def _reset(self):
         self._hardware.reset()

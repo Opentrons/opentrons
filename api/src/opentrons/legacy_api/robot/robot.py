@@ -7,7 +7,6 @@ from numpy import add, subtract
 
 from opentrons import commands, drivers
 from opentrons.commands import CommandPublisher
-# from opentrons.broker import subscribe
 
 from opentrons.data_storage import database, old_container_loading,\
     database_migration
