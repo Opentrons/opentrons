@@ -26,6 +26,7 @@ type Props = {
   maxFlowRate: number,
   updateValue: (flowRate: ?number) => mixed,
   pipetteDisplayName: ?string,
+  className: ?string
 }
 
 type State = {
@@ -199,7 +200,7 @@ export default class FlowRateInput extends React.Component<Props, State> {
             readOnly
             disabled={disabled}
             onClick={this.openModal}
-            className={stepFormStyles.small_field}
+            className={this.props.className || stepFormStyles.small_field}
             value={formFlowRate ? `${formFlowRate}` : 'default'}
           />
         </FormGroup>

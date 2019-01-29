@@ -155,6 +155,7 @@
 
 .checkbox_row {
   margin-top: 0.25rem;
+  height: 1.5rem;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -167,6 +168,12 @@
 .hidden_fields {
   margin: 0 1rem 0 2.5rem;
   min-width: 14.5rem;
+}
+
+.mix_hidden_fields {
+  margin: 0 0 0 1rem;
+  min-width: 0;
+  width: 14rem;
 }
 
 .no_label {
