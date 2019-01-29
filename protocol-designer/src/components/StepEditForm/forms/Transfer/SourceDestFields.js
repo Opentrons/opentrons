@@ -92,12 +92,12 @@ class SourceDestFields extends React.Component<Props, State> {
                     className={styles.small_field}
                     {...focusHandlers} />
                 </CheckboxRowField>
-                {(this.props.prefix === 'dispense' && path !== 'multiDispense') &&
+                {this.props.prefix === 'dispense' &&
                   <CheckboxRowField name='blowout_checkbox' label='Blowout'>
                     <BlowoutLocationField
                       name="blowout_location"
                       className={styles.full_width}
-                      includeSourceWell={path === 'single'}
+                      includeSourceWell
                       includeDestWell
                       {...focusHandlers} />
                   </CheckboxRowField>
