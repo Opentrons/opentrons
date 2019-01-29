@@ -205,7 +205,7 @@
 
 .path_option.disabled {
   color: var(--c-light-gray);
-  background-color: var(--c-med-gray);
+  opacity: 0.16;
   cursor: default;
 }
 
