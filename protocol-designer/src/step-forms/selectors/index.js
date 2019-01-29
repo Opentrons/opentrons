@@ -4,7 +4,6 @@ import forEach from 'lodash/forEach'
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import some from 'lodash/some'
 import {createSelector} from 'reselect'
 import {getIsTiprack, getPipetteNameSpecs, getLabware} from '@opentrons/shared-data'
 import i18n from '../../localization'
@@ -31,7 +30,6 @@ import type {
 import {typeof InstrumentGroup as InstrumentGroupProps} from '@opentrons/components'
 
 import type {
-  FormError,
   FormWarning,
 } from '../../steplist/formLevel'
 
@@ -53,12 +51,6 @@ import type {RootState} from '../reducers'
 import type {BaseState, Selector, Options} from '../../types'
 import type {FormData, StepIdType, StepType} from '../../form-types'
 import type {Labware, LabwareTypeById} from '../../labware-ingred/types'
-
-// TODO: BC 2018-10-30 after separation of getStepArgs and getStepErrors
-// , move the NO_SAVED_FORM_ERROR into a separate wrapping selector
-// it is currently there to keep the step item error state from appearing
-// before you've saved the form once
-const NO_SAVED_FORM_ERROR = 'NO_SAVED_FORM_ERROR'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 
@@ -294,8 +286,16 @@ const getOrderedSavedForms: Selector<Array<FormData>> = createSelector(
   }
 )
 
+// TODO: Ian 2019-01-25 type with hydrated form type
+function _getHydratedForm (rawForm: FormData, contextualState: StepFormContextualState) {
+  const hydratedForm = mapValues(rawForm, (value, name) => (
+    hydrateField(contextualState, name, value)
+  ))
+  return hydratedForm
+}
+
 // TODO type with hydrated form type
-const _getAllErrorsFromHydratedForm = (hydratedForm: FormData): StepFormAndFieldErrors => {
+const _getFormAndFieldErrorsFromHydratedForm = (hydratedForm: FormData): StepFormAndFieldErrors => {
   let errors: StepFormAndFieldErrors = {}
 
   forEach(hydratedForm, (value, fieldName) => {
@@ -324,16 +324,13 @@ export const getHydrationContext: Selector<StepFormContextualState> = createSele
   (labware, pipettes) => ({labware, pipettes})
 )
 
-export const getHydratedUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSelector(
+export const getUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSelector(
   getUnsavedForm,
   getHydrationContext,
   (unsavedForm, contextualState) => {
     if (!unsavedForm) return null
-    const hydratedForm = mapValues(unsavedForm, (value, name) => (
-      hydrateField(contextualState, name, value)
-    ))
-
-    const errors = _getAllErrorsFromHydratedForm(hydratedForm)
+    const hydratedForm = _getHydratedForm(unsavedForm, contextualState)
+    const errors = _getFormAndFieldErrorsFromHydratedForm(hydratedForm)
     return errors
   }
 )
@@ -343,10 +340,8 @@ export const getArgsAndErrorsByStepId: Selector<{[StepIdType]: StepArgsAndErrors
   getHydrationContext,
   (stepForms, contextualState) => {
     return reduce(stepForms, (acc, stepForm) => {
-      const hydratedForm = mapValues(stepForm, (value, name) => (
-        hydrateField(contextualState, name, value)
-      ))
-      const errors = _getAllErrorsFromHydratedForm(hydratedForm)
+      const hydratedForm = _getHydratedForm(stepForm, contextualState)
+      const errors = _getFormAndFieldErrorsFromHydratedForm(hydratedForm)
       const nextStepData = isEmpty(errors)
         ? {stepArgs: stepFormToArgs(hydratedForm)}
         : {errors, stepArgs: null}
@@ -357,22 +352,6 @@ export const getArgsAndErrorsByStepId: Selector<{[StepIdType]: StepArgsAndErrors
       }
     }, {})
   }
-)
-
-export const getFormAndFieldErrorsByStepId: Selector<{[StepIdType]: StepFormAndFieldErrors}> = createSelector(
-  getArgsAndErrorsByStepId,
-  (stepsArgsAndErrors) => (
-    mapValues(stepsArgsAndErrors, (argsAndErrors) => {
-      const formErrors = argsAndErrors.errors && argsAndErrors.errors.form
-      if (
-        formErrors &&
-        some(formErrors, error => error.title === NO_SAVED_FORM_ERROR)
-      ) {
-        return {}
-      }
-      return argsAndErrors.errors
-    })
-  )
 )
 
 export const getIsNewStepForm = createSelector(
@@ -387,22 +366,10 @@ export const getIsNewStepForm = createSelector(
 export const getFormLevelWarningsForUnsavedForm: Selector<Array<FormWarning>> = createSelector(
   getUnsavedForm,
   getHydrationContext,
-  (unsavedFormData, contextualState) => {
-    if (!unsavedFormData) return []
-    const {id, stepType, ...fields} = unsavedFormData
-    const hydratedFields = mapValues(fields, (value, name) => hydrateField(contextualState, name, value))
-    return getFormWarnings(stepType, hydratedFields)
-  }
-)
-
-export const getFormLevelErrors: Selector<Array<FormError>> = createSelector(
-  getUnsavedForm,
-  getHydrationContext,
-  (unsavedFormData, contextualState) => {
-    if (!unsavedFormData) return []
-    const {id, stepType, ...fields} = unsavedFormData
-    const hydratedFields = mapValues(fields, (value, name) => hydrateField(contextualState, name, value))
-    return getFormErrors(stepType, hydratedFields)
+  (unsavedForm, contextualState) => {
+    if (!unsavedForm) return []
+    const hydratedForm = _getHydratedForm(unsavedForm, contextualState)
+    return getFormWarnings(unsavedForm.stepType, hydratedForm)
   }
 )
 

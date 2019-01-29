@@ -137,7 +137,7 @@ const getSelectedStep = createSelector(
 
 // TODO: BC: 2018-10-26 remove this when we decide to not block save
 export const getCurrentFormCanBeSaved: Selector<boolean> = createSelector(
-  stepFormSelectors.getHydratedUnsavedFormErrors,
+  stepFormSelectors.getUnsavedFormErrors,
   (formErrors) => {
     return Boolean(formErrors && isEmpty(formErrors))
   }
