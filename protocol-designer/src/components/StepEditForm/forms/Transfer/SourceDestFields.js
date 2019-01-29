@@ -36,7 +36,6 @@ class SourceDestFields extends React.Component<Props, State> {
   }
   render () {
     const {focusHandlers} = this.props
-    const path = 'single' // TODO: IMMEDIATELY this is stubbed, replace with formData (probably in downstream connected components)
     const addFieldNamePrefix = makeAddFieldNamePrefix(this.props.prefix)
     const labwareLabel = this.props.prefix === 'aspirate' ? 'Source:' : 'Destination:'
     const hiddenFieldsLabel = this.props.prefix === 'aspirate' ? 'Aspirate Options:' : 'Dispense Options:'
@@ -97,8 +96,6 @@ class SourceDestFields extends React.Component<Props, State> {
                     <BlowoutLocationField
                       name="blowout_location"
                       className={styles.full_width}
-                      includeSourceWell
-                      includeDestWell
                       {...focusHandlers} />
                   </CheckboxRowField>
                 }

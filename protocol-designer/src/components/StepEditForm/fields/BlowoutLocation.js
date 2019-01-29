@@ -21,8 +21,6 @@ type Options = Array<DropdownOption>
 type BlowoutLocationDropdownOP = {
   name: StepFieldName,
   className?: string,
-  includeSourceWell?: ?boolean,
-  includeDestWell?: ?boolean,
 } & FocusHandlers
 type BlowoutLocationDropdownSP = {options: Options}
 const BlowoutLocationDropdownSTP = (state: BaseState, ownProps: BlowoutLocationDropdownOP): BlowoutLocationDropdownSP => {
@@ -56,7 +54,6 @@ export const BlowoutLocationDropdown = connect(BlowoutLocationDropdownSTP)((prop
           onBlur={() => { onFieldBlur(name) }}
           onFocus={() => { onFieldFocus(name) }}
           value={value ? String(value) : null}
-          disabled={disabled}
           onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
       )} />
   )

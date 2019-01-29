@@ -62,7 +62,6 @@ export const showFieldErrors = ({name, focusedField, dirtyFields}: ShowFieldErro
 
 const STP = (state: BaseState, ownProps: OP): SP => {
   const formData = stepFormSelectors.getUnsavedForm(state)
-  console.log(getDisabledFields(formData))
   return {
     value: formData ? formData[ownProps.name] : null,
     stepType: formData ? formData.stepType : null,

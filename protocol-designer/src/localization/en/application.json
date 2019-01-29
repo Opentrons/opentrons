@@ -1,6 +1,5 @@
 {
   "stepType": {
-    "transfer": "OLD transfer",
     "mix": "mix",
     "moveLiquid": "transfer",
     "pause": "pause"

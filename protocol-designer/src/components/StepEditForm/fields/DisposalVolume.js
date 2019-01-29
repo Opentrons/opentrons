@@ -56,8 +56,8 @@ const DisposalVolumeField = (props: Props) => (
                       <DropdownField
                         className={cx(styles.medium_field, styles.orphan_field)}
                         options={props.disposalDestinationOptions}
-                        onBlur={() => { props.focusHandlers.onFieldBlur(name) }}
-                        onFocus={() => { props.focusHandlers.onFieldFocus(name) }}
+                        onBlur={() => { props.focusHandlers.onFieldBlur('blowout_location') }}
+                        onFocus={() => { props.focusHandlers.onFieldFocus('blowout_location') }}
                         value={value ? String(value) : null}
                         onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
                     )} />

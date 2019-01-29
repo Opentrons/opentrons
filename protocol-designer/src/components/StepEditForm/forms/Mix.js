@@ -95,7 +95,6 @@ class MixForm extends React.Component<Props, State> {
                     <BlowoutLocationField
                       name="dispense_blowout_location"
                       className={cx(styles.medium_field, styles.orphan_field)}
-                      includeDestWell
                       {...focusHandlers} />
                   </CheckboxRowField>
                 </FormGroup>
