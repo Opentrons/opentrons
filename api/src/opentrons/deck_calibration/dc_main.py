@@ -14,7 +14,6 @@ from numpy import dot, array
 import opentrons
 from opentrons import robot, instruments, types
 from opentrons.hardware_control import adapters
-# from opentrons.hardware_control.types import Axis
 from opentrons.config import robot_configs, feature_flags
 from opentrons.util.calibration_functions import probe_instrument
 from opentrons.util.linal import solve, add_z, apply_transform
@@ -72,7 +71,7 @@ class CLITool:
         self._status_text_box = urwid.Text('')
         self._pile = urwid.Pile([self._tip_text_box, self._status_text_box])
         self._filler = urwid.Filler(self._pile, 'top')
-        # async_loop = asyncio.get_event_loop()
+
         if not feature_flags.use_protocol_api_v2():
             self.hardware = robot
             self._current_mount = right
@@ -83,7 +82,6 @@ class CLITool:
             self._current_mount = types.Mount.RIGHT
             self.hardware.cache_instruments()
 
-        # self.asyncio_loop = async_loop
         self.ui_loop = urwid.MainLoop(
             self._filler,
             handle_mouse=False,
@@ -202,16 +200,8 @@ class CLITool:
         to the axis of a pipette currently used
         """
 
-        # if not feature_flags.use_protocol_api_v2():
         res = position(self._current_mount, self.hardware)
-        # else:
-        #     mount_obj = mount_by_axis[self._current_mount]
-        #     points = self.asyncio_loop.run_until_complete(
-        #         self.hardware.current_position(mount_obj))
-        #     res = (
-        #         points[Axis.X],
-        #         points[Axis.Y],
-        #         points[Axis.by_mount(mount_obj)])
+
         return res
 
     def _jog(self, axis, direction, step):

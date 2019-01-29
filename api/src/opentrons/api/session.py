@@ -246,7 +246,6 @@ class Session(object):
         return res
 
     def refresh(self):
-        assert not self._loop.is_closed()
         self._reset()
         self._is_json_protocol = self.name.endswith('.json')
 
@@ -259,7 +258,6 @@ class Session(object):
             self.metadata = extract_metadata(parsed)
             self._protocol = compile(parsed, filename=self.name, mode='exec')
         commands = self._simulate()
-        assert not self._loop.is_closed()
         self.commands = tree.from_list(commands)
 
         self.containers = self.get_containers()

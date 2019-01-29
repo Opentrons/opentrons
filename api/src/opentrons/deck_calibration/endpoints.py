@@ -344,14 +344,15 @@ async def move(data):
                 point = (x, y, z)
             pipette.move_to((session.adapter.deck, point), strategy='arc')
         else:
-            intermediate_pos = position(
-                session.current_mount, session.adapter)
-            session.adapter.move_to(
-                session.current_mount,
-                Point(
-                    x=intermediate_pos[0],
-                    y=intermediate_pos[1],
-                    z=intermediate_pos[2] + session.tip_length))
+            if not point_name == 'attachTip':
+                intermediate_pos = position(
+                    session.current_mount, session.adapter)
+                session.adapter.move_to(
+                    session.current_mount,
+                    Point(
+                        x=intermediate_pos[0],
+                        y=intermediate_pos[1],
+                        z=intermediate_pos[2] + session.tip_length))
             session.adapter.move_to(
                 session.current_mount,
                 Point(x=point[0], y=point[1], z=point[2]))

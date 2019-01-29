@@ -123,7 +123,6 @@ class Robot(CommandPublisher):
         self.reset()
 
     def __del__(self):
-        print("Robot del called")
         if getattr(self, '_unsubscribe_commands', None):
             self._unsubscribe_commands()
 
