@@ -86,7 +86,7 @@ const getHoveredStepLabware: Selector<Array<string>> = createSelector(
     }
 
     // step types that have no labware that gets highlighted
-    if (!(stepArgs.commandCreatorFnName === 'pause')) {
+    if (!(stepArgs.commandCreatorFnName === 'delay')) {
       // TODO Ian 2018-05-08 use assert here
       console.warn(`getHoveredStepLabware does not support step type "${stepArgs.commandCreatorFnName}"`)
     }

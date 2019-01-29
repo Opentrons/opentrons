@@ -5,7 +5,6 @@ import type {
   StepIdType,
   StepFieldName,
   StepType,
-  TransferLikeStepType,
 } from '../form-types'
 import type {LabwareEntities, PipetteEntities} from '../step-forms'
 import type {FormError} from './formLevel/errors'
@@ -59,16 +58,24 @@ export type StepItemSourceDestRow = {
   channelId?: number,
 }
 
+// NOTE: delay is NOT a source-dest-style command creator, this type exists
+// mostly to tell flow that :/
+type SourceDestCommandCreatorName =
+  | 'transfer'
+  | 'distribute'
+  | 'consolidate'
+  | 'mix'
+
 export type SourceDestSubstepItemSingleChannel = {|
   multichannel: false,
-  stepType: TransferLikeStepType | 'mix',
+  commandCreatorFnName: SourceDestCommandCreatorName,
   parentStepId: StepIdType,
   rows: Array<StepItemSourceDestRow>,
 |}
 
 export type SourceDestSubstepItemMultiChannel = {|
   multichannel: true,
-  stepType: TransferLikeStepType | 'mix',
+  commandCreatorFnName: SourceDestCommandCreatorName,
   parentStepId: StepIdType,
   volume?: ?number, // uniform volume for all steps
   multiRows: Array<Array<StepItemSourceDestRow>>, // Array of arrays.
@@ -79,7 +86,7 @@ export type SourceDestSubstepItem = SourceDestSubstepItemSingleChannel | SourceD
 
 export type SubstepItemData =
   | SourceDestSubstepItem
-  | PauseFormData // Pause substep uses same data as processed form
+  | PauseFormData // Pause substep uses same data as delay args
 
 export type StepItemData = {
   id: StepIdType,

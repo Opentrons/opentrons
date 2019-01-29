@@ -168,7 +168,7 @@ function transferLikeSubsteps (args: {
     )
     return {
       multichannel: true,
-      stepType: stepArgs.commandCreatorFnName,
+      commandCreatorFnName: stepArgs.commandCreatorFnName,
       parentStepId: stepId,
       multiRows: mergedMultiRows,
     }
@@ -219,7 +219,7 @@ function transferLikeSubsteps (args: {
 
     return {
       multichannel: false,
-      stepType: stepArgs.commandCreatorFnName,
+      commandCreatorFnName: stepArgs.commandCreatorFnName,
       parentStepId: stepId,
       rows: mergedRows,
     }
@@ -248,7 +248,7 @@ export function generateSubsteps (
 
   const {stepArgs} = stepArgsAndErrors
 
-  if (stepArgs.commandCreatorFnName === 'pause') {
+  if (stepArgs.commandCreatorFnName === 'delay') {
     // just returns formData
     const formData: PauseFormData = stepArgs
     return formData

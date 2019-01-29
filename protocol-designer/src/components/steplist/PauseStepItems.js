@@ -4,20 +4,20 @@ import type {PauseFormData} from '../../step-generation'
 import {PDListItem} from '../lists'
 
 type Props = {
-  substeps: PauseFormData,
+  pauseArgs: PauseFormData,
 }
 
 export default function PauseStepItems (props: Props) {
-  const {substeps} = props
-  if (substeps.wait === true) {
+  const {pauseArgs} = props
+  if (pauseArgs.wait === true) {
     // Show message if waiting indefinitely
-    return <PDListItem>{substeps.message}</PDListItem>
+    return <PDListItem>{pauseArgs.message}</PDListItem>
   }
-  if (!substeps.meta) {
+  if (!pauseArgs.meta) {
     // No message or time, show nothing
     return null
   }
-  const {hours, minutes, seconds} = substeps.meta
+  const {hours, minutes, seconds} = pauseArgs.meta
   return <PDListItem>
     <span>{hours} hr</span>
     <span>{minutes} m</span>
