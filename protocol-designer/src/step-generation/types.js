@@ -55,7 +55,7 @@ export type TransferLikeFormDataFields = {
 }
 
 export type ConsolidateFormData = {
-  stepType: 'consolidate',
+  commandCreatorFnName: 'consolidate',
 
   sourceWells: Array<string>,
   destWell: string,
@@ -70,7 +70,7 @@ export type ConsolidateFormData = {
 } & TransferLikeFormDataFields
 
 export type TransferFormData = {
-  stepType: 'transfer',
+  commandCreatorFnName: 'transfer',
 
   sourceWells: Array<string>,
   destWells: Array<string>,
@@ -85,7 +85,7 @@ export type TransferFormData = {
 } & TransferLikeFormDataFields
 
 export type DistributeFormData = {
-  stepType: 'distribute',
+  commandCreatorFnName: 'distribute',
 
   sourceWell: string,
   destWells: Array<string>,
@@ -101,8 +101,8 @@ export type DistributeFormData = {
 } & TransferLikeFormDataFields
 
 export type MixFormData = {
-  ...SharedFormDataFields,
-  stepType: 'mix',
+  ...$Exact<SharedFormDataFields>,
+  commandCreatorFnName: 'mix',
   labware: string,
   pipette: string,
   wells: Array<string>,
@@ -127,9 +127,9 @@ export type MixFormData = {
   dispenseFlowRateUlSec?: ?number,
 }
 
-export type PauseFormData = {|
-  ...SharedFormDataFields,
-  stepType: 'pause',
+export type PauseFormData = {
+  ...$Exact<SharedFormDataFields>,
+  commandCreatorFnName: 'delay',
   message?: string,
   wait: number | true,
   meta: ?{
@@ -137,7 +137,7 @@ export type PauseFormData = {|
     minutes?: number,
     seconds?: number,
   },
-|}
+}
 
 export type CommandCreatorData =
   | ConsolidateFormData

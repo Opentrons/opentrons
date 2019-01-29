@@ -71,13 +71,13 @@ function transferLikeSubsteps (args: {
   }
 
   // if false, show aspirate vol instead
-  const showDispenseVol = stepArgs.stepType === 'distribute'
+  const showDispenseVol = stepArgs.commandCreatorFnName === 'distribute'
 
   let substepCommandCreators
 
   // Call appropriate command creator with the validateForm fields.
   // Disable any mix args so those aspirate/dispenses don't show up in substeps
-  if (stepArgs.stepType === 'transfer') {
+  if (stepArgs.commandCreatorFnName === 'transfer') {
     const commandCallArgs = {
       ...stepArgs,
       mixBeforeAspirate: null,
@@ -86,7 +86,7 @@ function transferLikeSubsteps (args: {
     }
 
     substepCommandCreators = transfer(commandCallArgs)(robotState)
-  } else if (stepArgs.stepType === 'distribute') {
+  } else if (stepArgs.commandCreatorFnName === 'distribute') {
     const commandCallArgs = {
       ...stepArgs,
       mixBeforeAspirate: null,
@@ -94,7 +94,7 @@ function transferLikeSubsteps (args: {
     }
 
     substepCommandCreators = distribute(commandCallArgs)(robotState)
-  } else if (stepArgs.stepType === 'consolidate') {
+  } else if (stepArgs.commandCreatorFnName === 'consolidate') {
     const commandCallArgs = {
       ...stepArgs,
       mixFirstAspirate: null,
@@ -103,11 +103,11 @@ function transferLikeSubsteps (args: {
     }
 
     substepCommandCreators = consolidate(commandCallArgs)(robotState)
-  } else if (stepArgs.stepType === 'mix') {
+  } else if (stepArgs.commandCreatorFnName === 'mix') {
     substepCommandCreators = mix(stepArgs)(robotState)
   } else {
     // TODO Ian 2018-05-21 Use assert here. Should be unreachable
-    console.warn(`transferLikeSubsteps got unsupported stepType "${stepArgs.stepType}"`)
+    console.warn(`transferLikeSubsteps got unsupported stepType "${stepArgs.commandCreatorFnName}"`)
     return null
   }
 
@@ -144,7 +144,7 @@ function transferLikeSubsteps (args: {
           return {
             activeTips,
             source,
-            dest: stepArgs.stepType === 'mix' ? source : dest, // NOTE: since source and dest are same for mix, we're showing source on both sides. Otherwise dest would show the intermediate volume state
+            dest: stepArgs.commandCreatorFnName === 'mix' ? source : dest, // NOTE: since source and dest are same for mix, we're showing source on both sides. Otherwise dest would show the intermediate volume state
             volume: showDispenseVol ? nextMultiRow.volume : currentMultiRow.volume,
           }
         })
@@ -168,7 +168,7 @@ function transferLikeSubsteps (args: {
     )
     return {
       multichannel: true,
-      stepType: stepArgs.stepType,
+      stepType: stepArgs.commandCreatorFnName,
       parentStepId: stepId,
       multiRows: mergedMultiRows,
     }
@@ -219,7 +219,7 @@ function transferLikeSubsteps (args: {
 
     return {
       multichannel: false,
-      stepType: stepArgs.stepType,
+      stepType: stepArgs.commandCreatorFnName,
       parentStepId: stepId,
       rows: mergedRows,
     }
@@ -248,17 +248,17 @@ export function generateSubsteps (
 
   const {stepArgs} = stepArgsAndErrors
 
-  if (stepArgs.stepType === 'pause') {
+  if (stepArgs.commandCreatorFnName === 'pause') {
     // just returns formData
     const formData: PauseFormData = stepArgs
     return formData
   }
 
   if (
-    stepArgs.stepType === 'consolidate' ||
-    stepArgs.stepType === 'distribute' ||
-    stepArgs.stepType === 'transfer' ||
-    stepArgs.stepType === 'mix'
+    stepArgs.commandCreatorFnName === 'consolidate' ||
+    stepArgs.commandCreatorFnName === 'distribute' ||
+    stepArgs.commandCreatorFnName === 'transfer' ||
+    stepArgs.commandCreatorFnName === 'mix'
   ) {
     return transferLikeSubsteps({
       stepArgs,
@@ -269,6 +269,6 @@ export function generateSubsteps (
     })
   }
 
-  console.warn('allSubsteps doesn\'t support step type: ', stepArgs.stepType, stepId)
+  console.warn('allSubsteps doesn\'t support commandCreatorFnName: ', stepArgs.commandCreatorFnName, stepId)
   return null
 }

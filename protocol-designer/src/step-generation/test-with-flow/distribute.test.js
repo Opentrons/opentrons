@@ -23,7 +23,7 @@ let blowoutSingleToSourceA1
 
 beforeEach(() => {
   mixinArgs = {
-    stepType: 'distribute',
+    commandCreatorFnName: 'distribute',
     name: 'distribute test',
     description: 'test blah blah',
 

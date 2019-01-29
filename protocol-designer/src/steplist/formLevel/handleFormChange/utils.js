@@ -1,5 +1,4 @@
 // @flow
-import assert from 'assert'
 import uniq from 'lodash/uniq'
 import {getWellSetForMultichannel} from '../../../well-selection/utils'
 
@@ -35,11 +34,10 @@ export function getAllWellsFromPrimaryWells (
   return uniq(allWells)
 }
 
-export function getChannels (pipetteId: string, pipetteEntities: PipetteEntities): PipetteChannels {
+export function getChannels (pipetteId: string, pipetteEntities: PipetteEntities): ?PipetteChannels {
   const pipette: ?* = pipetteEntities[pipetteId]
   if (!pipette) {
-    assert(false, `${pipetteId} not found in pipettes, cannot handleFormChange properly`)
-    return 1
+    return null
   }
   return pipette.spec.channels
 }

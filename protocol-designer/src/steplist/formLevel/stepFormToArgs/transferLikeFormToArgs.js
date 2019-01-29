@@ -146,7 +146,7 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
       const transferStepArguments: TransferFormData = {
         ...commonFields,
         blowoutLocation,
-        stepType: 'transfer',
+        commandCreatorFnName: 'transfer',
         sourceWells,
         destWells,
         mixBeforeAspirate,
@@ -161,7 +161,7 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
         mixFirstAspirate,
         sourceWells,
         destWell: destWells[0],
-        stepType: 'consolidate',
+        commandCreatorFnName: 'consolidate',
         name: `Consolidate ${hydratedFormData.id}`, // TODO Ian 2018-04-03 real name for steps
       }
       return consolidateStepArguments
@@ -175,7 +175,7 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
         mixBeforeAspirate,
         sourceWell: sourceWells[0],
         destWells,
-        stepType: 'distribute',
+        commandCreatorFnName: 'distribute',
         name: `Distribute ${hydratedFormData.id}`, // TODO Ian 2018-04-03 real name for steps
       }
       return distributeStepArguments

@@ -32,15 +32,15 @@ function _wellsForPipette (pipetteChannels: 1 | 8, labwareType: string, wells: A
 }
 
 function _getSelectedWellsForStep (
-  form: StepGeneration.CommandCreatorData,
+  stepArgs: StepGeneration.CommandCreatorData,
   labwareId: string,
   robotState: StepGeneration.RobotState
 ): Array<string> {
-  if (form.stepType === 'pause') {
+  if (stepArgs.commandCreatorFnName === 'delay') {
     return []
   }
 
-  const pipetteId = form.pipette
+  const pipetteId = stepArgs.pipette
   const pipetteSpec = StepGeneration.getPipetteSpecFromId(pipetteId, robotState)
   const labwareType = StepGeneration.getLabwareType(labwareId, robotState)
 
@@ -55,30 +55,30 @@ function _getSelectedWellsForStep (
 
   // If we're moving liquids within a single labware,
   // both the source and dest wells together need to be selected.
-  if (form.stepType === 'mix') {
-    if (form.labware === labwareId) {
-      wells.push(...getWells(form.wells))
+  if (stepArgs.commandCreatorFnName === 'mix') {
+    if (stepArgs.labware === labwareId) {
+      wells.push(...getWells(stepArgs.wells))
     }
-  } else if (form.stepType === 'transfer') {
-    if (form.sourceLabware === labwareId) {
-      wells.push(...getWells(form.sourceWells))
+  } else if (stepArgs.commandCreatorFnName === 'transfer') {
+    if (stepArgs.sourceLabware === labwareId) {
+      wells.push(...getWells(stepArgs.sourceWells))
     }
-    if (form.destLabware === labwareId) {
-      wells.push(...getWells(form.destWells))
+    if (stepArgs.destLabware === labwareId) {
+      wells.push(...getWells(stepArgs.destWells))
     }
-  } else if (form.stepType === 'consolidate') {
-    if (form.sourceLabware === labwareId) {
-      wells.push(...getWells(form.sourceWells))
+  } else if (stepArgs.commandCreatorFnName === 'consolidate') {
+    if (stepArgs.sourceLabware === labwareId) {
+      wells.push(...getWells(stepArgs.sourceWells))
     }
-    if (form.destLabware === labwareId) {
-      wells.push(...getWells([form.destWell]))
+    if (stepArgs.destLabware === labwareId) {
+      wells.push(...getWells([stepArgs.destWell]))
     }
-  } else if (form.stepType === 'distribute') {
-    if (form.sourceLabware === labwareId) {
-      wells.push(...getWells([form.sourceWell]))
+  } else if (stepArgs.commandCreatorFnName === 'distribute') {
+    if (stepArgs.sourceLabware === labwareId) {
+      wells.push(...getWells([stepArgs.sourceWell]))
     }
-    if (form.destLabware === labwareId) {
-      wells.push(...getWells(form.destWells))
+    if (stepArgs.destLabware === labwareId) {
+      wells.push(...getWells(stepArgs.destWells))
     }
   }
 
@@ -87,7 +87,7 @@ function _getSelectedWellsForStep (
 
 /** Scan through given substep rows to get a list of source/dest wells for the given labware */
 function _getSelectedWellsForSubstep (
-  form: StepGeneration.CommandCreatorData,
+  stepArgs: StepGeneration.CommandCreatorData,
   labwareId: string,
   substeps: ?SubstepItemData,
   substepIndex: number
@@ -98,13 +98,17 @@ function _getSelectedWellsForSubstep (
 
   // TODO: Ian 2018-10-01 proper type for wellField enum
   function getWells (wellField: 'source' | 'dest'): Array<string> {
-    if (substeps && substeps.rows && substeps.rows[substepIndex]) {
+    // ignore substeps with no well fields
+    // TODO: Ian 2019-01-29 be more explicit about commandCreatorFnName,
+    // don't rely so heavily on the fact that their well fields are the same now
+    if (!substeps || substeps.commandCreatorFnName === 'delay') return []
+    if (substeps.rows && substeps.rows[substepIndex]) {
       // single-channel
       const wellData = substeps.rows[substepIndex][wellField]
       return (wellData && wellData.well) ? [wellData.well] : []
     }
 
-    if (substeps && substeps.multiRows && substeps.multiRows[substepIndex]) {
+    if (substeps.multiRows && substeps.multiRows[substepIndex]) {
       // multi-channel
       return substeps.multiRows[substepIndex].reduce((acc, multiRow) => {
         const wellData = multiRow[wellField]
@@ -116,19 +120,18 @@ function _getSelectedWellsForSubstep (
 
   let wells: Array<string> = []
 
-  // TODO Ian 2018-05-09 re-evaluate the steptype handling here
   // single-labware steps
-  if (form.stepType === 'mix' && form.labware && form.labware === labwareId) {
+  if (stepArgs.commandCreatorFnName === 'mix' && stepArgs.labware && stepArgs.labware === labwareId) {
     return getWells('source')
   }
 
   // source + dest steps
   // $FlowFixMe: property `sourceLabware` is missing in `MixFormData`
-  if (form.sourceLabware && form.sourceLabware === labwareId) {
+  if (stepArgs.sourceLabware && stepArgs.sourceLabware === labwareId) {
     wells.push(...getWells('source'))
   }
   // $FlowFixMe: property `destLabware` is missing in `MixFormData`
-  if (form.destLabware && form.destLabware === labwareId) {
+  if (stepArgs.destLabware && stepArgs.destLabware === labwareId) {
     wells.push(...getWells('dest'))
   }
 

@@ -23,7 +23,7 @@ beforeEach(() => {
   })
 
   mixinArgs = {
-    stepType: 'mix',
+    commandCreatorFnName: 'mix',
     name: 'mix test',
     description: 'test blah blah',
 

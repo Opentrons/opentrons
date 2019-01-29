@@ -69,7 +69,7 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
       const transferData: TransferFormData = {
         ...(data: TransferLikeFormDataFields),
         changeTip,
-        stepType: 'transfer',
+        commandCreatorFnName: 'transfer',
         sourceWells: [data.sourceWell],
         destWells: [destWell],
         mixBeforeAspirate: data.mixBeforeAspirate,

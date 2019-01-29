@@ -132,10 +132,10 @@ function getStepItemContents (stepItemProps: StepItemProps) {
 
   if (
     substeps && (
-      substeps.stepType === 'transfer' ||
-      substeps.stepType === 'consolidate' ||
-      substeps.stepType === 'distribute' ||
-      substeps.stepType === 'mix'
+      substeps.commandCreatorFnName === 'transfer' ||
+      substeps.commandCreatorFnName === 'consolidate' ||
+      substeps.commandCreatorFnName === 'distribute' ||
+      substeps.commandCreatorFnName === 'mix'
     )
   ) {
     result.push(

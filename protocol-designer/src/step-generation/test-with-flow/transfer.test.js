@@ -16,7 +16,7 @@ let robotInitialState
 
 beforeEach(() => {
   transferArgs = {
-    stepType: 'transfer',
+    commandCreatorFnName: 'transfer',
     name: 'Transfer Test',
     description: 'test blah blah',
     pipette: 'p300SingleId',
