@@ -64,6 +64,7 @@
 .mount_fields_row {
   display: flex;
   justify-content: space-between;
+  font-size: var(--fs-body-1);
 }
 
 .mount_column {
