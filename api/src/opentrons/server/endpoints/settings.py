@@ -1,11 +1,12 @@
 import logging
-import shutil
 import os
+import shutil
 from typing import Dict, Tuple
 from aiohttp import web
 from opentrons.config import (advanced_settings as advs,
                               robot_configs as rc,
-                              feature_flags as ff)
+                              feature_flags as ff,
+                              IS_ROBOT)
 from opentrons.data_storage import database as db
 from opentrons.protocol_api import labware
 
@@ -119,7 +120,7 @@ async def reset(request: web.Request) -> web.Response:
             db.reset()
 
     if data.get('bootScripts'):
-        if os.environ.get('RUNNING_ON_PI'):
+        if IS_ROBOT:
             if os.path.exists('/data/boot.d'):
                 shutil.rmtree('/data/boot.d')
         else:

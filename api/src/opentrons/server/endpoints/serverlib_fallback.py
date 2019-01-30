@@ -9,11 +9,11 @@ from aiohttp import web
 from threading import Thread
 from typing import Dict, Any
 
-from opentrons import robot
+from opentrons import robot, config
 
 log = logging.getLogger(__name__)
 ignore_file = 'ignore.json'
-if os.environ.get('RUNNING_ON_PI'):
+if config.IS_ROBOT:
     filedir = '/data/user_storage/opentrons_data'
 else:
     filedir = os.path.abspath(os.path.dirname(__file__))

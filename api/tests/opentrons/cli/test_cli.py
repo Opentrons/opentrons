@@ -1,6 +1,7 @@
 import pytest
-from opentrons.config import get_config_index, robot_configs
-from opentrons.config import advanced_settings as advs
+from opentrons.config import (CONFIG,
+                              robot_configs,
+                              advanced_settings as advs)
 
 
 @pytest.fixture
@@ -32,7 +33,7 @@ def test_save_and_clear_config(mock_config, async_server):
     hardware = async_server['com.opentrons.hardware']
     hardware.update_config(name='Ada Lovelace')
     old_config = hardware.config
-    base_filename = get_config_index().get('deckCalibrationFile')
+    base_filename = CONFIG['deck_calibration_file']
 
     tag = "testing"
     root, ext = os.path.splitext(base_filename)

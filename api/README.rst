@@ -113,6 +113,12 @@ There are two ways to install the Opentrons software. The first is to create a v
 Before either step is taken, please follow the instructions in the Environment and Repository section of CONTRIBUTING.md in the repository root, up to and including running ``make install``.
 
 
+Configuration
+-------------
+
+The module has a lot of configuration, some of which is only relevant when running on an actual robot, but some of which could be useful during simulation. When the module is first imported, it will try and write configuration files in ``~/.opentrons/config.json`` (``C:\Users\%USERNAME%\.opentrons\config.json`` on Windows). This contains mostly paths to other configuration files and directories, most of which will be in that folder. The location can be changed by setting the environment variable ``OT_CONFIG_DIR`` to another path. Inividual settings in the config file can be overridden by setting environment variables named like ``OT_${UPPERCASED_VAR_NAME}`` (for instance, to override the ``serial_log_file`` config element you could set the environment variable ``OT_SERIAL_LOG_FILE`` to a different path). 
+
+
 Virtual Environment Setup
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 

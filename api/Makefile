@@ -50,7 +50,6 @@ all: lint test
 .PHONY: install
 install:
 	pipenv sync $(pipenv_opts)
-	@$(python) build_tools.py write_local_env
 
 .PHONY: clean
 clean:

@@ -1,3 +1,4 @@
+from opentrons import config
 import os
 import logging
 
@@ -6,7 +7,7 @@ lock_file_path = '/tmp/resin/resin-updates.lock'
 
 
 def lock_updates():
-    if os.environ.get('RUNNING_ON_PI'):
+    if config.IS_ROBOT:
         import fcntl
 
         try:
@@ -19,5 +20,5 @@ def lock_updates():
 
 
 def unlock_updates():
-    if os.environ.get('RUNNING_ON_PI') and os.path.exists(lock_file_path):
+    if config.IS_ROBOT and os.path.exists(lock_file_path):
         os.remove(lock_file_path)

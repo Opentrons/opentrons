@@ -4,7 +4,7 @@ from opentrons.data_storage.old_container_loading import \
     load_all_containers_from_disk, \
     list_container_names, \
     get_persisted_container
-from opentrons.util import environment
+from opentrons.config import CONFIG
 from opentrons.data_storage.schema_changes import \
     create_table_ContainerWells, create_table_Containers
 from opentrons.util.vector import Vector
@@ -74,7 +74,7 @@ def execute_schema_change(conn, sql_command):
 # should have a more thought out structure for migrations
 # and schema changes
 def check_version_and_perform_necessary_migrations():
-    db_path = environment.get_path('DATABASE_FILE')
+    db_path = str(CONFIG['labware_database_file'])
     conn = sqlite3.connect(db_path)
     db_version = database.get_version()
     if db_version == 0:

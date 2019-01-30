@@ -21,6 +21,8 @@ import os
 from shlex import quote
 from asyncio import subprocess as as_subprocess
 
+from opentrons import config
+
 
 log = logging.getLogger(__name__)
 
@@ -672,7 +674,7 @@ def _get_host_data_prefix() -> str:
 
 
 def _get_resin_app_id() -> str:
-    if not os.environ.get('RUNNING_ON_PI'):
+    if not config.IS_ROBOT:
         raise RuntimeError('Resin app id is only available on the pi')
     p1_env = open('/proc/1/environ').read()
     # /proc/x/environ is pretty much just the raw memory segment of the

@@ -2,9 +2,9 @@ import os
 import sys
 import json
 HERE = os.path.abspath(os.path.dirname(__file__))
+from opentrons import config  # noqa(E402)
 from opentrons.data_storage import database_migration  # noqa(E402)
-from opentrons.config import feature_flags as ff  # noqa(E402)
-if not ff.split_labware_definitions():
+if not config.feature_flags.split_labware_definitions():
     database_migration.check_version_and_perform_necessary_migrations()
 
 import opentrons.hardware_control.adapters as adapters  # noqa(E402)
@@ -36,7 +36,8 @@ if version < (3, 5):
 
 def build_globals(version=None, loop=None):
     if version is None:
-        checked_version = 2 if ff.use_protocol_api_v2() else 1
+        checked_version =\
+            2 if config.feature_flags.use_protocol_api_v2() else 1
     else:
         checked_version = version
     if checked_version == 1:

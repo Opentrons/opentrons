@@ -4,266 +4,369 @@ configuration data is found in the robot, and is able to search for data to
 construct an index if an existing index is not found. All other modules that
 use persistent configuration data should use this module to read and write it.
 
-Also, each persistent data file should only have one writer. At a minimum, this
-module should be the only writer of the index file that keeps track of where
-all other data can be found. If another module writes persistent data directly,
-it should read the index via this module, update the index, and then write the
-updated copy via this module again. Alternately, functions can be added to this
-module to provide persistent data management for other components.
+The settings file defined here is opentrons.json. This file should be located
 
-If no USB drive is mounted, the index will be in /data and will point to other
-files and directories under /data and /etc. If a USB drive is mounted, the
-index and config files should reside there. If it doesn't exist yet, data is
-copied there from the prior index, and a new index is written in the USB drive.
+- On the robot, in /data
+- Not on the robot, either in
+  - the directory from which the python importing this module was launched
+  - ~/.opentrons for the current user (where it will be written if nothing is
+    found)
+
+The keys in opentrons.json are defined by the CONFIG_ELEMENTS tuple below.
+The keys in the file are the name elements of the CONFIG_ELEMENTS. They can
+also be specified via environment variables, the names of which are
+OT_${UPPERCASED_NAME_ELEMENT}. For instance, to override the
+robot_settings_file option from an environment variable, you would set the
+OT_ROBOT_CONFIG_FILE variable.
+
+This module's interface to the rest of the system are the IS_* attributes and
+the CONFIG attribute.
 """
+import enum
 import os
 import json
 import logging
+from pathlib import Path
 import shutil
-from typing import List, Tuple
+import sys
+from typing import Dict, NamedTuple, Optional, Union
+
+_CONFIG_FILENAME = 'config.json'
+_LEGACY_INDICES = (Path('/mnt') / 'usbdrive' / 'config' / 'index.json',
+                   Path('/data') / 'index.json')
 
 log = logging.getLogger(__file__)
 
-override_settings_dir = os.environ.get('OVERRIDE_SETTINGS_DIR')
-usb_mount_point = '/mnt/usbdrive'
-usb_settings_dir = os.path.join(usb_mount_point, 'config')
-resin_settings_dir = '/data'
-resin_ot_data_dir = os.path.join(
-    resin_settings_dir, 'user_storage', 'opentrons_data')
-backup_robot_conf = '/etc/robot-data'
-backup_labware_def = '/etc/labware'
-index_filename = 'index.json'
+IS_WIN = sys.platform.startswith('win')
+IS_OSX = sys.platform == 'darwin'
+IS_LINUX = sys.platform.startswith('linux')
+IS_ROBOT = IS_LINUX and os.environ.get('RUNNING_ON_PI')
+#: This is the correct thing to check to see if we’re running on a robot
 
 
-def settings_dir():
+class ConfigElementType(enum.Enum):
+    FILE = enum.auto()
+    DIR = enum.auto()
+
+
+class ConfigElement(NamedTuple):
+    name: str
+    display_name: str
+    default: Path
+    kind: ConfigElementType
+    help: str
+
+
+CONFIG_ELEMENTS = (
+    ConfigElement('labware_database_file',
+                  'API V3 Labware Database',
+                  Path('opentrons.db'),
+                  ConfigElementType.FILE,
+                  'The SQLite database where labware definitions and offsets'
+                  ' are stored'),
+    ConfigElement('labware_user_definitions_dir_v3',
+                  'API V3/Split Definitions Custom Labware Directory',
+                  Path('labware')/'v3'/'definitions',
+                  ConfigElementType.DIR,
+                  'The location where APIV3 custom labware definition files'
+                  ' are stored (if the split labware definitions feature flag)'
+                  ' is set'),
+    ConfigElement('labware_calibration_offsets_dir_v3',
+                  'API V3/Split Definitions Labware Calibration Directory',
+                  Path('labware')/'v3'/'offsets',
+                  ConfigElementType.DIR,
+                  'The location where APIV3 labware calibration is stored'
+                  ' (if the split labware definitions feature flag is set'),
+    ConfigElement('labware_calibration_offsets_dir_v4',
+                  'API V4 Custom Labware Directory',
+                  Path('labware')/'v4'/'offsets',
+                  ConfigElementType.DIR,
+                  'The location where APIV4 labware calibration is stored'),
+    ConfigElement('labware_user_definitions_dir_v4',
+                  'API V4 Custom Labware Directory',
+                  Path('labware')/'v4'/'offsets',
+                  ConfigElementType.DIR,
+                  'The location where APIV4 labware calibration is stored'),
+    ConfigElement('feature_flags_file',
+                  'Feature Flags',
+                  Path('feature_flags.json'),
+                  ConfigElementType.FILE,
+                  'The file storing the feature flags accessible via '
+                  'Opentrons app'),
+    ConfigElement('robot_settings_file',
+                  'Robot Settings',
+                  Path('robot_settings.json'),
+                  ConfigElementType.FILE,
+                  'The file storing settings relevant to motion'),
+    ConfigElement('deck_calibration_file',
+                  'Deck Calibration',
+                  Path('deck_calibration.json'),
+                  ConfigElementType.FILE,
+                  'The file storing the deck calibration'),
+    ConfigElement('log_dir',
+                  'Log Directory',
+                  Path('logs'),
+                  ConfigElementType.FILE,
+                  'The location for saving log files'),
+    ConfigElement('api_log_file',
+                  'API Log File',
+                  Path('logs')/'api.log',
+                  ConfigElementType.FILE,
+                  'The location of the file to save API logs to. If this is an'
+                  ' absolute path, it will be used directly. If it is a '
+                  'relative path it will be relative to log_dir'),
+    ConfigElement('serial_log_file',
+                  'Serial Log File',
+                  Path('logs')/'serial.log',
+                  ConfigElementType.FILE,
+                  'The location of the file to save serial logs to. If this is'
+                  ' an absolute path, it will be used directly. If it is a '
+                  'relative path it will be relative to log_dir'
+                  'The location of the file to save serial logs to'),
+    ConfigElement('wifi_keys_dir',
+                  'Wifi Keys Dir',
+                  Path('network_keys'),
+                  ConfigElementType.FILE,
+                  'The directory in which to save any key material for wifi'
+                  ' auth. Not relevant outside of a robot.'),
+    ConfigElement('hardware_controller_lockfile',
+                  'Hardware Controller Lockfile',
+                  Path('hardware.lock'),
+                  ConfigElementType.FILE,
+                  'The file to use for a hardware controller lockfile.')
+)
+#: The available configuration file elements to modify. All of these can be
+#: changed by editing opentrons.json, where the keys are the name elements,
+#: or by specifying as environment variables, where the keys are uppercase
+#: versions of the name elements.
+#: In addition to these flags, the OT_CONFIG_DIR env var (if present)
+#: will change where the API looks for these settings by prepending it to the
+#: normal search path.
+
+
+def infer_config_base_dir() -> Path:
+    """ Return the directory to store data in.
+
+    Defaults are ~/.opentrons if not on a pi; OT_CONFIG_DIR is
+    respected here.
+
+    When this module is imported, this function is called automatically
+    and the result stored in :py:attr:`APP_DATA_DIR`.
+
+    This directory may not exist when the module is imported. Even if it
+    does exist, it may not contain data, or may require data to be moved
+    to it.
+
+    :return pathlib.Path: The path to the desired root settings dir.
     """
-    Looks for an index file in /mnt/usbdrive/config, and then in /data. If
-    neither is found, generates an index file and places it in one of those
-    locations, preferring the usb drive.
-
-    :return the path where the preferred index.json can be found
-    """
-    usb_index_file = os.path.join(usb_settings_dir, index_filename)
-    resin_index_file = os.path.join(resin_settings_dir, index_filename)
-    if override_settings_dir:
-        res = override_settings_dir
-    elif os.path.exists(usb_index_file):
-        res = usb_settings_dir
-    elif os.path.exists(resin_index_file):
-        res = resin_settings_dir
+    if 'OT_CONFIG_DIR' in os.environ:
+        return Path(os.environ['OT_CONFIG_DIR'])
+    elif IS_ROBOT:
+        return Path('/data')
     else:
-        new_path, new_cfg = _generate_base_config()
-        try:
-            write_base_config(new_path, new_cfg)
-        except OSError:
-            # If a USB is mounted read-only:
-            log.error("Unable to write to {}. Is the mount read-only?".format(
-                new_path))
-            new_path, new_cfg = _generate_base_config(skip_usb=True)
-            write_base_config(new_path, new_cfg)
-        finally:
-            res = new_path
-
-    return res
-
-
-def get_config_index() -> dict:
-    """
-    Load the config index file from the settings directory. The `settings_dir`
-    function should guarantee that this file exists.
-    :return: the contents of the the base config file
-    """
-    rewrite_needed = False
-    base_path = settings_dir()
-    log.info("Using settings dir {}".format(base_path))
-    file_path = os.path.join(base_path, index_filename)
-    with open(file_path) as base_config_file:
-        res = json.load(base_config_file)
-    defaults = _generate_base_config(skip_usb=True)[1]
-    for key, default_val in defaults.items():
-        if key not in res.keys():
-            res[key] = default_val
-            rewrite_needed = True
-    if rewrite_needed:
-        try:
-            write_base_config(base_path, res)
-        except OSError:
-            log.error("Unable to update base config. Is the mount read-only?")
-    return res
-
-
-def _move_settings_data(source_path_dict, dest_path_dict):
-    try:
-        for key, pth in source_path_dict.items():
-            tgt_dir = os.path.dirname(dest_path_dict[key])
-            os.makedirs(tgt_dir, exist_ok=True)
-            if key.endswith('Dir'):
-                log.debug("Copying directory contents onto USB drive")
-                # Source directory may not exist, or may be empty
-                # If target directory does exist, do not copy
-                os.makedirs(pth, exist_ok=True)
-                if os.listdir(pth) and not os.path.exists(dest_path_dict[key]):
-                    shutil.copytree(pth, dest_path_dict[key])
-                else:
-                    log.debug("Directory copy preconditions failed:")
-                    log.debug("|- Source path exists: {}".format(
-                        os.path.exists(pth)))
-                    log.debug("|- Number of source files: {}".format(
-                        len(os.listdir(pth))))
-                    log.debug("|- Target path {} already exists: {}".format(
-                        tgt_dir, os.path.exists(tgt_dir)))
-            else:
-                if os.path.exists(pth):
-                    shutil.copy2(pth, dest_path_dict[key])
-    except OSError:
-        log.exception("Unable to move settings data due to:")
-
-
-def _flatten_dict(input_dict: dict) -> dict:
-    """
-    Flattens a nested dictionary, keeping only keys with non-dict values. Note
-    that keys will be the underscore-delimited concatenation of the nested path
-    of keys from the original dict.
-    """
-    res = {}
-    for k, v in input_dict.items():
-        if type(v) is not dict:
-            res[k] = v
+        search = (Path.cwd(),
+                  Path.home()/'.opentrons')
+        for path in search:
+            if (path/_CONFIG_FILENAME).exists():
+                return path
         else:
-            nest = _flatten_dict(v)
-            for key, value in nest.items():
-                new_key = "{}_{}".format(k, key)
-                res[new_key] = value
-    return res
+            return search[-1]
 
 
-def _generate_base_config(skip_usb=False) -> Tuple[str, dict]:
+def load_and_migrate() -> Dict[str, Path]:
+    """ Ensure the settings directory tree is properly configured.
+
+    This function does most of its work on the actual robot. It will move
+    all settings files from wherever they happen to be to the proper
+    place. On non-robots, this mostly just loads. In addition, it writes
+    a default config and makes sue all directories required exist (though
+    the files in them may not).
+    """
+    if IS_ROBOT:
+        _migrate_robot()
+    base = infer_config_base_dir()
+    base.mkdir(parents=True, exist_ok=True)
+    overrides = _get_environ_overrides()
+    try:
+        index = json.load((base/_CONFIG_FILENAME).open())
+    except (OSError, json.JSONDecodeError) as e:
+        sys.stderr.write("Error loading config from {}: {}\nRewriting...\n"
+                         .format(str(base), e))
+        index = generate_config_index(overrides)
+        try:
+            write_config(index, path=base)
+        except Exception as e:
+            sys.stderr.write(
+                "Error writing config to {}: {}\nProceeding with defaults\n"
+                .format(str(base), e))
+    index.update(overrides)
+    configs_by_name = {ce.name: ce for ce in CONFIG_ELEMENTS}
+    correct_types: Dict[str, Path] = {}
+    for key, item in index.items():
+        if key not in configs_by_name:  # old config, ignore
+            continue
+        if configs_by_name[key].kind == ConfigElementType.FILE:
+            it = Path(item)
+            it.parent.mkdir(parents=True, exist_ok=True)
+            correct_types[key] = it
+        elif configs_by_name[key].kind == ConfigElementType.DIR:
+            it = Path(item)
+            it.mkdir(parents=True, exist_ok=True)
+            correct_types[key] = it
+        else:
+            raise RuntimeError(
+                f"unhandled kind in ConfigElements: {key}: "
+                f"{configs_by_name[key].kind}")
+    return correct_types
+
+
+def _get_environ_overrides() -> Dict[str, str]:
+    """ Pull any overrides for the config elements from the environ and return
+    a mapping from the names to the values (as strings). Config elements that
+    are not overridden will not be in the mapping.
+    """
+    return {
+        ce.name: os.environ['OT_' + ce.name.upper()]
+        for ce in CONFIG_ELEMENTS
+        if 'OT_' + ce.name.upper() in os.environ}
+
+
+def _legacy_index() -> Union[None, Dict[str, str]]:
+    """ Try and load an index file from the various places it might exist.
+
+    If the legacy file cannot be found or cannot be parsed, return None.
+
+    This method should only be called on a robot.
+    """
+    for index in _LEGACY_INDICES:
+        if index.exists():
+            try:
+                return json.load(open(index))
+            except (OSError, json.JSONDecodeError):
+                return None
+    return None
+
+
+def _erase_old_indices():
+    """ Remove old index files so they don't pollute future loads.
+
+    This method should only be called on a robot.
+    """
+    for index in _LEGACY_INDICES:
+        if index.exists():
+            index.unlink()
+
+
+def _do_migrate(index: Dict[str, str]):
+    base = infer_config_base_dir()
+    new_index = generate_config_index(_get_environ_overrides(), base)
+    moves = (('/data/user_storage/opentrons_data/opentrons.db',
+              new_index['labware_database_file']),
+             (index.get('robotSettingsFile'),
+              new_index['robot_settings_file']),
+             (index.get('deckCalibrationFile'),
+              new_index['deck_calibration_file']),
+             (index.get('featureFlagFile'),
+              new_index['feature_flags_file']),
+             (index.get('labware', {})  # type: ignore
+              .get('userDefinitionDir'),
+              new_index['labware_user_definitions_dir_v3']),
+             (index.get('labware', {}).get('offsetDir'),  # type: ignore
+              new_index['labware_calibration_offsets_dir_v3']))
+    sys.stdout.write(f"config migration: new base {base}\n")
+    for old, new in moves:
+        if not old:
+            continue
+        old_path = Path(old)
+        new_path = Path(new)
+        if old_path.exists() and not old_path.is_symlink():
+            sys.stdout.write(f"config migration: {old}->{new}\n")
+            if new_path.is_dir():
+                shutil.rmtree(new_path)
+            shutil.move(old_path, new_path)
+        else:
+            sys.stdout.write(f"config migration: not moving {old}:")
+            sys.stdout.write(f" exists={old_path.exists()}")
+            sys.stdout.write(f" symlink={old_path.is_symlink()}\n")
+
+    write_config(new_index, base)
+
+
+def _migrate_robot():
+    old_index = _legacy_index()
+    if old_index:
+        _do_migrate(old_index)
+        _erase_old_indices()
+
+
+def generate_config_index(defaults: Dict[str, str],
+                          base_dir=None) -> Dict[str, Path]:
     """
     Determines where existing info can be found in the system, and creates a
     corresponding data dict that can be written to index.json in the
     baseDataDir.
-    :return:
+
+    The information in the files defined by the config index is information
+    required by the API itself and nothing else - labware definitions, feature
+    flags, robot configurations. It does not include configuration files that
+    relate to the rest of the system, such as network description file
+    definitions.
+
+    :param defaults: A dict of defaults to write, useful for specifying part
+                     (but not all) of the index succinctly. This is used both
+                     when loading a configuration file from disk and when
+                     generating a new one.
+    :param base_dir: If specified, a base path used if this function has to
+                     generate defaults. If not specified, falls back to
+                     :py:attr:`CONFIG_BASE_DIR`
+    :returns: The config object
     """
-    # Determine where the most preferred place for settings files
-    usb_config = {
-        'labware': {
-            'baseDefinitionDir': os.path.join(
-                usb_settings_dir, 'base-definitions'),
-            'userDefinitionDir': os.path.join(
-                usb_settings_dir, 'user-definitions'),
-            'offsetDir': os.path.join(usb_settings_dir, 'offsets')
-        },
-        'pipetteConfigFile': os.path.join(
-            usb_settings_dir, 'pipetteData.json'),
-        'featureFlagFile': os.path.join(
-            usb_settings_dir, 'flags', 'settings.json'),
-        'deckCalibrationFile': os.path.join(
-            usb_settings_dir, 'deckCalibration.json'),
-        'robotSettingsFile': os.path.join(
-            usb_settings_dir, 'robotSettings.json')
+    base = Path(base_dir) if base_dir else infer_config_base_dir()
+
+    def parse_or_default(
+            ce: ConfigElement, val: Optional[str]) -> Path:
+        if not val:
+            return base / Path(ce.default)
+        else:
+            return Path(val)
+
+    return {
+        ce.name: parse_or_default(ce,
+                                  defaults.get(ce.name))
+        for ce in CONFIG_ELEMENTS
     }
 
-    resin_config = {
-        'labware': {
-            'baseDefinitionDir': '/etc/labware',
-            'userDefinitionDir': os.path.join(
-                resin_ot_data_dir, 'labware', 'definitions'),
-            'offsetDir': os.path.join(
-                resin_ot_data_dir, 'labware', 'offsets')
-        },
-        'pipetteConfigFile': '/etc/robot-data/pipette-config.json',
-        'featureFlagFile': os.path.join(resin_settings_dir, 'settings.json'),
-        'deckCalibrationFile': os.path.join(
-            resin_settings_dir,
-            'user_storage',
-            'opentrons_data',
-            'config.json'),
-        'robotSettingsFile': os.path.join(
-            resin_settings_dir,
-            'user_storage',
-            'opentrons_data',
-            'robotSettings.json')
-    }
-    usb_mount_available = os.path.ismount(usb_mount_point)
-    if usb_mount_available and not skip_usb:
-        try:
-            # TODO: it's not clear if this is required, or if the makedirs call
-            # TODO: under _move_settings_data is enough. Most of the settings
-            # TODO: covered by this module should be in code and configs should
-            # TODO: only be stored in one place anyway, so this should be
-            # TODO: simplified with that change
-            os.makedirs(usb_settings_dir, exist_ok=True)
-        except OSError:
-            log.exception('Failed to make directories with exception:')
-        base_data_dir = usb_settings_dir
-        new_cfg = usb_config
 
-        move_source = _flatten_dict(resin_config)
-        move_target = _flatten_dict(usb_config)
-        _move_settings_data(move_source, move_target)
-    else:
-        base_data_dir = resin_settings_dir
-        new_cfg = resin_config
+def write_config(config_data: Dict[str, Path],
+                 path: Path = None):
+    """ Save the config file.
 
-    return base_data_dir, new_cfg
+    :param config_data: The index to save
+    :param base_dir: The place to save the file. If ``None``,
+                     :py:meth:`infer_config_base_dir()` will be used
 
-
-def write_base_config(path: str, config_data: dict):
+    Only keys that are in the config elements will be saved.
+    """
+    path = Path(path) if path else infer_config_base_dir()
+    valid_names = [ce.name for ce in CONFIG_ELEMENTS]
     try:
         os.makedirs(path, exist_ok=True)
-        with open(os.path.join(path, index_filename), 'w') as base_f:
-            json.dump(config_data, base_f, indent=2)
-    except OSError:
-        log.exception("Base config write failed with exception:")
+        with (path/_CONFIG_FILENAME).open('w') as base_f:
+            json.dump({k: str(v) for k, v in config_data.items()
+                       if k in valid_names},
+                      base_f, indent=2)
+    except OSError as e:
+        sys.stderr.write("Config index write to {} failed: {}\n"
+                         .format(path/_CONFIG_FILENAME, e))
 
 
-# ---- Utility functions ----
-# These are used for merging override settings with data stored in json,
-# primarily in opentrons.robot.robot_configs
-
-def children(value, path=None) -> List[Tuple[tuple, object]]:
-    """
-    Returns list of tuples containing the full path to the value
-    and the value itself
-    """
-    path = path or []
-
-    return sum([
-        children(value=value, path=path+[key])
-        for key, value in value.items()
-    ], []) if isinstance(value, dict) and value else [
-        (tuple(path), value)
-    ]
+def reload():
+    global CONFIG
+    CONFIG.clear()
+    CONFIG.update(load_and_migrate())
 
 
-def build(pairs: List[Tuple[tuple, object]]) -> dict:
-    """
-    Builds a tree out of key-value pairs consisting of full
-    path to the value and the value itself
-    """
-    tree: dict = {}
-
-    def append(tree, path, value):
-        if not path:
-            return
-
-        key, *tail = path
-
-        if tail:
-            tree[key] = tree.get(key, {})
-            append(tree[key], tail, value)
-        else:
-            tree[key] = value
-
-    for path, value in pairs:
-        append(tree, path, value)
-
-    return tree
-
-
-def merge(trees: List[dict]) -> dict:
-    """
-    Merges trees observing the order,
-    adding new elements and overriding existing ones
-    """
-    return build(sum([children(tree) for tree in trees], []))
+CONFIG = load_and_migrate()
+#: The currently loaded config. This should not change for the lifetime
+#: of the program. This is a dict much like os.environ() where the keys
+#: are config element names
