@@ -14,7 +14,7 @@ import styles from '../../StepEditForm.css'
 import type {FocusHandlers} from '../../types'
 import SourceDestFields from './SourceDestFields'
 
-type TransferFormProps = {
+type MoveLiquidFormProps = {
   focusHandlers: FocusHandlers,
   stepType: StepType,
   formData: HydratedMoveLiquidFormDataLegacy,
@@ -25,7 +25,7 @@ type TransferFormProps = {
 // TODO: BC: IMMEDIATELY i18n all across SourceDestFields
 // TODO: BC: IMMEDIATELY instead of passing path from here, put it in connect fields where needed
 
-const TransferForm = (props: TransferFormProps) => {
+const MoveLiquidForm = (props: MoveLiquidFormProps) => {
   const {focusHandlers, stepType} = props
   const {path} = props.formData
   return (
@@ -56,4 +56,4 @@ const TransferForm = (props: TransferFormProps) => {
   )
 }
 
-export default TransferForm
+export default MoveLiquidForm

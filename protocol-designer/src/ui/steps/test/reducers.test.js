@@ -8,7 +8,7 @@ describe('collapsedSteps reducer', () => {
     const state = {}
     const action = {
       type: 'ADD_STEP',
-      payload: {id: '1', stepType: 'transfer'},
+      payload: {id: '1', stepType: 'moveLiquid'},
     }
     expect(collapsedSteps(state, action)).toEqual({
       '1': false, // default is false: not collapsed

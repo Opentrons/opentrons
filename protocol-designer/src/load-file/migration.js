@@ -7,7 +7,7 @@ import {INITIAL_DECK_SETUP_STEP_ID} from '../constants'
 import type {ProtocolFile, FileLabware, FilePipette} from '../file-types'
 import type {FormData} from '../form-types'
 
-function _addDeckSetupStepIfMissing (fileData: ProtocolFile): ProtocolFile{
+function _addDeckSetupStepIfMissing (fileData: ProtocolFile): ProtocolFile {
   // builds the initial deck setup step for older protocols that didn't have one.
   const savedStepForms = fileData['designer-application'].data.savedStepForms
 
@@ -37,37 +37,60 @@ function _addDeckSetupStepIfMissing (fileData: ProtocolFile): ProtocolFile{
         savedStepForms: {
           ...savedStepForms,
           [INITIAL_DECK_SETUP_STEP_ID]: deckSetupStep,
-        }
-      }
-    }
+        },
+      },
+    },
   }
 }
 
-function _consolidateToFlexibleTransfer (formData: FormData): FormData {
+function _consolidateToMoveLiquid (formData: FormData): FormData {
   return {
     ...formData,
     stepType: 'moveLiquid',
   }
 }
 
-function _distributeToFlexibleTransfer (formData: FormData): FormData {
-
+function _distributeToMoveLiquid (formData: FormData): FormData {
+  return {
+    ...formData,
+    stepType: 'moveLiquid',
+  }
 }
 
-function _migrateToFlexibleTransfer (fileData: ProtocolFile): $PropertyType<ProtocolFile, 'designer-application'>{
+function _transferToMoveLiquid (formData: FormData): FormData {
+  return {
+    ...formData,
+    stepType: 'moveLiquid',
+  }
+}
+
+const FLEXIBLE_TRANSFER_MIGRATION_VERSION = 1
+function _migrateToMoveLiquid (fileData: ProtocolFile): $PropertyType<ProtocolFile, 'designer-application'> {
+  const {migrationVersion} = fileData['designer-application']
+  if (migrationVersion && migrationVersion >= FLEXIBLE_TRANSFER_MIGRATION_VERSION) return fileData
+
   const savedStepForms = fileData['designer-application'].data.savedStepForms
-  return mapValues(savedStepForms, (formData) => {
+  const migratedStepForms = mapValues(savedStepForms, (formData) => {
     const {stepType} = formData
-    if (stepType) return formData
-    let migratedFormData = {formData
     if (stepType === 'consolidate') {
-      return _consolidateToFlexibleTransfer(formData)
+      return _consolidateToMoveLiquid(formData)
     } else if (stepType === 'distribute') {
-      return _distributeToFlexibleTransfer(formData)
+      return _distributeToMoveLiquid(formData)
     } else if (stepType === 'transfer') {
-      return _distributeToFlexibleTransfer(formData)
+      return _transferToMoveLiquid(formData)
     }
   })
+  return {
+    ...fileData,
+    'designer-application': {
+      ...fileData['designer-application'],
+      migrationVersion: FLEXIBLE_TRANSFER_MIGRATION_VERSION,
+      data: {
+        ...fileData['designer-application'].data,
+        savedStepForms: migratedStepForms,
+      },
+    },
+  }
 }
 
 function migrateSavedStepForms (fileData: ProtocolFile): SavedStepFormState {
@@ -80,7 +103,7 @@ function migrateSavedStepForms (fileData: ProtocolFile): SavedStepFormState {
     stepDetails: stepForm.stepDetails || stepForm['step-details'],
   }))
 
-  return _migrateToFlexibleTransfer(withDeckSetupAndCamelCase)
+  return _migrateToMoveLiquid(withDeckSetupAndCamelCase)
 }
 
 export default function migrateFile (file: any): ProtocolFile {
