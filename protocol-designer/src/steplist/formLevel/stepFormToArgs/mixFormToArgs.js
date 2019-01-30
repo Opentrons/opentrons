@@ -42,7 +42,7 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
   // It's radiobutton, so one should always be selected.
   const changeTip = hydratedFormData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION
 
-  const blowoutLocation = hydratedFormData['dispense_blowout_checkbox'] ? hydratedFormData['dispense_blowout_location'] : null
+  const blowoutLocation = hydratedFormData['blowout_checkbox'] ? hydratedFormData['blowout_location'] : null
 
   return {
     commandCreatorFnName: 'mix',

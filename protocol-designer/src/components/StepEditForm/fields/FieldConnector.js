@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import {HoverTooltip, type HoverTooltipHandlers} from '@opentrons/components'
 import {actions} from '../../../steplist'
 import {selectors as stepFormSelectors} from '../../../step-forms'
-import {getFieldErrors, processField} from '../../../steplist/fieldLevel'
+import {getFieldErrors, maskField} from '../../../steplist/fieldLevel'
 import {getDisabledFields} from '../../../steplist/formLevel'
 import type {BaseState, ThunkDispatch} from '../../../types'
 import type {StepFieldName} from '../../../form-types'
@@ -71,8 +71,8 @@ const STP = (state: BaseState, ownProps: OP): SP => {
 
 const DTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   updateValue: (value: mixed) => {
-    const processedValue = processField(ownProps.name, value)
-    dispatch(actions.changeFormInput({update: {[ownProps.name]: processedValue}}))
+    const maskedValue = maskField(ownProps.name, value)
+    dispatch(actions.changeFormInput({update: {[ownProps.name]: maskedValue}}))
   },
 })
 

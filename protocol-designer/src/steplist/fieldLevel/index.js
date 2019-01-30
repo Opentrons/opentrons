@@ -7,13 +7,14 @@ import {
   composeErrors,
 } from './errors'
 import {
-  castToNumber,
-  castToFloat,
+  maskToNumber,
+  maskToFloat,
   onlyPositiveNumbers,
   onlyIntegers,
   defaultTo,
-  composeProcessors,
-  type ValueProcessor,
+  composeMaskers,
+  type ValueMasker,
+  type ValueCaster,
 } from './processing'
 import type {StepFieldName} from '../../form-types'
 import type {StepFormContextualState} from '../types'
@@ -39,46 +40,57 @@ const hydratePipette = (state: StepFormContextualState, id: string) => {
   }
 }
 
-type StepFieldHelpers = {
+type StepFieldHelpers = {|
   getErrors?: (mixed) => Array<string>,
-  processValue?: ValueProcessor,
+  maskValue?: ValueMasker,
+  castValue?: ValueCaster,
   hydrate?: (state: StepFormContextualState, id: string) => mixed,
-}
+|}
 const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
-  'aspirate_airGap_volume': { processValue: composeProcessors(castToFloat, onlyPositiveNumbers) },
+  'aspirate_airGap_volume': {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: Number,
+  },
   'aspirate_labware': {
     getErrors: composeErrors(requiredField),
     hydrate: hydrateLabware,
   },
-  'aspirate_mix_volume': { processValue: composeProcessors(castToFloat, onlyPositiveNumbers) },
+  'aspirate_mix_volume': {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: Number,
+  },
   'aspirate_wells': {
     getErrors: composeErrors(requiredField, minimumWellCount(1)),
-    processValue: defaultTo([]),
+    maskValue: defaultTo([]),
   },
   'dispense_labware': {
     getErrors: composeErrors(requiredField),
     hydrate: hydrateLabware,
   },
-  'dispense_mix_volume': { processValue: composeProcessors(castToFloat, onlyPositiveNumbers) },
+  'dispense_mix_volume': {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: Number,
+  },
   'dispense_wells': {
     getErrors: composeErrors(requiredField, minimumWellCount(1)),
-    processValue: defaultTo([]),
+    maskValue: defaultTo([]),
   },
-  'aspirate_disposalVol_volume': {
-    processValue: composeProcessors(castToFloat, onlyPositiveNumbers),
+  'disposalVolume_volume': {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: Number,
   },
   'labware': {
     getErrors: composeErrors(requiredField),
     hydrate: hydrateLabware,
   },
   'pauseHour': {
-    processValue: composeProcessors(castToNumber, onlyPositiveNumbers, onlyIntegers),
+    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers, onlyIntegers),
   },
   'pauseMinute': {
-    processValue: composeProcessors(castToNumber, onlyPositiveNumbers, onlyIntegers),
+    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers, onlyIntegers),
   },
   'pauseSecond': {
-    processValue: composeProcessors(castToNumber, onlyPositiveNumbers, onlyIntegers),
+    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers, onlyIntegers),
   },
   'pipette': {
     getErrors: composeErrors(requiredField),
@@ -86,15 +98,16 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
   },
   'times': {
     getErrors: composeErrors(requiredField),
-    processValue: composeProcessors(castToNumber, onlyPositiveNumbers, onlyIntegers, defaultTo(0)),
+    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers, onlyIntegers, defaultTo(0)),
   },
   'volume': {
     getErrors: composeErrors(requiredField, nonZero),
-    processValue: composeProcessors(castToFloat, onlyPositiveNumbers, defaultTo(0)),
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers, defaultTo(0)),
+    castValue: Number,
   },
   'wells': {
     getErrors: composeErrors(requiredField, minimumWellCount(1)),
-    processValue: defaultTo([]),
+    maskValue: defaultTo([]),
   },
 }
 
@@ -104,12 +117,17 @@ export const getFieldErrors = (name: StepFieldName, value: mixed): Array<string>
   return errors
 }
 
-export const processField = (name: StepFieldName, value: mixed): ?mixed => {
-  const fieldProcessor = stepFieldHelperMap[name] && stepFieldHelperMap[name].processValue
-  return fieldProcessor ? fieldProcessor(value) : value
+export const castField = (name: StepFieldName, value: mixed): mixed => {
+  const fieldCaster = stepFieldHelperMap[name] && stepFieldHelperMap[name].castValue
+  return fieldCaster ? fieldCaster(value) : value
 }
 
-export const hydrateField = (state: StepFormContextualState, name: StepFieldName, value: string): ?mixed => {
+export const maskField = (name: StepFieldName, value: mixed): mixed => {
+  const fieldMasker = stepFieldHelperMap[name] && stepFieldHelperMap[name].maskValue
+  return fieldMasker ? fieldMasker(value) : value
+}
+
+export const hydrateField = (state: StepFormContextualState, name: StepFieldName, value: string): mixed => {
   const hydrator = stepFieldHelperMap[name] && stepFieldHelperMap[name].hydrate
   return hydrator ? hydrator(state, value) : value
 }

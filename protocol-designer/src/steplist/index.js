@@ -2,7 +2,7 @@
 // TODO Ian 2018-01-23 use this index.js for all `steplist` imports across PD
 import * as actions from './actions'
 import * as utils from './utils'
-import {getFieldErrors, processField} from './fieldLevel'
+import {getFieldErrors, castField, maskField} from './fieldLevel'
 import {getDefaultsForStepType} from './formLevel'
 import type {FormWarning, FormWarningType} from './formLevel'
 export * from './types'
@@ -14,6 +14,7 @@ export {
   actions,
   getFieldErrors,
   getDefaultsForStepType,
-  processField,
+  castField,
+  maskField,
   utils,
 }

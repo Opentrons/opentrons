@@ -25,6 +25,5 @@ export function getWellRatio (sourceWells: mixed, destWells: mixed): ?WellRatio 
   if (sourceWells.length > 1 && destWells.length === 1) {
     return 'many:1'
   }
-  console.assert(false, `unexpected well ratio: ${sourceWells.length}:${destWells.length}`)
   return null
 }

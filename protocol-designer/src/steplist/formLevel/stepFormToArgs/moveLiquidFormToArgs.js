@@ -106,18 +106,32 @@ const moveLiquidFormToArgs = (hydratedFormData: HydratedMoveLiquidFormData): Mov
 
   assert(sourceWellsUnordered.length > 0, 'expected sourceWells to have length > 0')
   assert(destWellsUnordered.length > 0, 'expected destWells to have length > 0')
+  assert(
+    sourceWellsUnordered.length === 1 ||
+    destWellsUnordered.length === 1 ||
+    sourceWellsUnordered.length === destWellsUnordered.length,
+    `cannot do moveLiquidFormToArgs. Mismatched wells (not 1:N, N:1, or N:N!) for path="single". Neither source (${sourceWellsUnordered.length}) nor dest (${destWellsUnordered.length}) equal 1`)
 
-  const sourceWells = getOrderedWells(
+  let sourceWells = getOrderedWells(
     fields.aspirate_wells,
     sourceLabware.type,
     fields.aspirate_wellOrder_first,
     fields.aspirate_wellOrder_second)
 
-  const destWells = getOrderedWells(
+  let destWells = getOrderedWells(
     fields.dispense_wells,
     destLabware.type,
     fields.dispense_wellOrder_first,
     fields.dispense_wellOrder_second)
+
+  // 1:many with single path: spread well array of length 1 to match other well array
+  if (path === 'single' && sourceWells.length !== destWells.length) {
+    if (sourceWells.length === 1) {
+      sourceWells = Array(destWells.length).fill(sourceWells[0])
+    } else if (destWells.length === 1) {
+      destWells = Array(sourceWells.length).fill(destWells[0])
+    }
+  }
 
   let disposalVolume = null
   let blowoutDestination = null
