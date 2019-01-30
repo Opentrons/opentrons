@@ -2,7 +2,7 @@
 import * as React from 'react'
 import {InputField} from '@opentrons/components'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
-import type {FocusHandlers} from '../index'
+import type {FocusHandlers} from '../types'
 import StepField from './FieldConnector'
 
 type TextFieldProps = {name: StepFieldName} & FocusHandlers

@@ -13,10 +13,9 @@ export default function getDisabledFieldsMoveLiquidForm (
     disabled.add('aspirate_mix_checkbox')
   } else if (rawForm.path === 'multiDispense') {
     disabled.add('dispense_mix_checkbox')
-  }
-
-  if (rawForm.disposalVolume_checkbox) {
-    disabled.add('blowout_checkbox')
+    if (rawForm.disposalVolume_checkbox) {
+      disabled.add('blowout_checkbox')
+    }
   }
 
   // fields which require a pipette & a corresponding labware to be selected

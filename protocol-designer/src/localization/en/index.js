@@ -1,6 +1,7 @@
 // @flow
 
 import alert from './alert.json'
+import application from './application.json'
 import button from './button.json'
 import card from './card.json'
 import context_menu from './context_menu.json'
@@ -14,6 +15,7 @@ import well_selection from './well_selection.json'
 export default {
   translation: {
     alert,
+    application,
     button,
     card,
     context_menu,

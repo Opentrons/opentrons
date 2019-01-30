@@ -26,7 +26,7 @@ function getLabwareFieldForPositioningField (fieldName: TipOffsetFields): StepFi
   return fieldMap[fieldName]
 }
 
-type OP = {fieldName: TipOffsetFields}
+type OP = {fieldName: TipOffsetFields, className?: string}
 type SP = {
   disabled: boolean,
   mmFromBottom: ?string,
@@ -78,7 +78,7 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
               mmFromBottom={mmFromBottom}
               isOpen={this.state.isModalOpen} />
             <InputField
-              className={stepFormStyles.small_field}
+              className={this.props.className || stepFormStyles.small_field}
               readOnly
               onClick={this.handleOpen}
               value={String(value)}

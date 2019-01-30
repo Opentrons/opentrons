@@ -8,7 +8,7 @@ import {getFieldErrors, processField} from '../../../steplist/fieldLevel'
 import {getDisabledFields} from '../../../steplist/formLevel'
 import type {BaseState, ThunkDispatch} from '../../../types'
 import type {StepFieldName} from '../../../form-types'
-import getTooltipForField from './getTooltipForField'
+import {getTooltipForField} from '../utils'
 
 type FieldRenderProps = {
   value: ?mixed,

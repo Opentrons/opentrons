@@ -3,9 +3,9 @@ import * as React from 'react'
 import cx from 'classnames'
 import {FormGroup, HoverTooltip} from '@opentrons/components'
 import type {StepType} from '../../../form-types'
-import type {FocusHandlers} from '../index'
+import type {FocusHandlers} from '../types'
 import styles from '../StepEditForm.css'
-import getTooltipForField from './getTooltipForField'
+import {getTooltipForField} from '../utils'
 import TextField from './Text'
 
 type Props = {stepType: StepType, focusHandlers: FocusHandlers, label: string}

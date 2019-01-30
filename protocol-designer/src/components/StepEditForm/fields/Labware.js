@@ -6,7 +6,7 @@ import cx from 'classnames'
 import {selectors as stepFormSelectors} from '../../../step-forms'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import type {BaseState} from '../../../types'
-import type {FocusHandlers} from '../index'
+import type {FocusHandlers} from '../types'
 import styles from '../StepEditForm.css'
 import StepField from './FieldConnector'
 

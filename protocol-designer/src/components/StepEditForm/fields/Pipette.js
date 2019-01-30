@@ -11,7 +11,7 @@ import type {StepFieldName} from '../../../steplist/fieldLevel'
 import type {BaseState} from '../../../types'
 import type {StepType} from '../../../form-types'
 import styles from '../StepEditForm.css'
-import type {FocusHandlers} from '../index'
+import type {FocusHandlers} from '../types'
 import StepField from './FieldConnector'
 
 type Options = Array<DropdownOption>

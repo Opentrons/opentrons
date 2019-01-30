@@ -15,10 +15,5 @@
   "restored": "restored",
   "save": "save",
   "swap": "swap",
-  "yes": "yes",
-
-  "stepType": {
-    "transfer": "OLD transfer",
-    "moveLiquid": "transfer"
-  }
+  "yes": "yes"
 }

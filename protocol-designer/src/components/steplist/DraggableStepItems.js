@@ -20,6 +20,7 @@ type DragDropStepItemProps = React.ElementProps<typeof StepItem> & {
   connectDragSource: mixed => React.Element<any>,
   connectDropTarget: mixed => React.Element<any>,
   stepId: StepIdType,
+  stepNumber: number,
   findStepIndex: (StepIdType) => number,
   onDrag: () => void,
   moveStep: (StepIdType, number) => void,
@@ -112,9 +113,10 @@ class StepItems extends React.Component<StepItemsProps, StepItemsState> {
       <div>
         <ContextMenu>
           {({makeStepOnContextMenu}) => (
-            currentIds.map((stepId: StepIdType) => (
+            currentIds.map((stepId: StepIdType, index: number) => (
               <DragDropStepItem
                 key={stepId}
+                stepNumber={index + 1}
                 stepId={stepId}
                 onStepContextMenu={makeStepOnContextMenu(stepId)}
                 findStepIndex={this.findStepIndex}

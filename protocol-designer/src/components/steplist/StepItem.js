@@ -19,6 +19,7 @@ import type {
 
 type StepItemProps = {
   stepId: StepIdType,
+  stepNumber: number,
   step: ?StepItemData,
   substeps: ?SubstepItemData,
 
@@ -41,6 +42,7 @@ type StepItemProps = {
 function StepItem (props: StepItemProps) {
   const {
     step,
+    stepNumber,
 
     collapsed,
     error,
@@ -63,7 +65,7 @@ function StepItem (props: StepItemProps) {
       description={Description}
       iconName={error ? 'alert-circle' : iconName}
       iconProps={{className: error ? styles.error_icon : ''}}
-      title={title || ''}
+      title={title ? `${stepNumber}. ${title}` : ''}
       onClick={onStepClick}
       onContextMenu={onStepContextMenu}
       onMouseEnter={onStepHover}

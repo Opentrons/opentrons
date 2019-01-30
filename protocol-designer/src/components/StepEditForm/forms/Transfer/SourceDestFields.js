@@ -2,10 +2,10 @@
 import * as React from 'react'
 import {FormGroup, IconButton, HoverTooltip} from '@opentrons/components'
 
-import type {StepFieldName} from '../../../steplist/fieldLevel'
-import i18n from '../../../localization'
+import type {StepFieldName} from '../../../../steplist/fieldLevel'
+import i18n from '../../../../localization'
 
-import type {FocusHandlers} from '../index'
+import type {FocusHandlers} from '../../types'
 
 import {
   LabwareField,
@@ -16,9 +16,9 @@ import {
   FlowRateField,
   WellSelectionField,
   WellOrderField,
-} from '../fields'
+} from '../../fields'
 
-import styles from '../StepEditForm.css'
+import styles from '../../StepEditForm.css'
 
 type Props = {
   focusHandlers: FocusHandlers,
@@ -36,7 +36,6 @@ class SourceDestFields extends React.Component<Props, State> {
   }
   render () {
     const {focusHandlers} = this.props
-    const path = 'single' // TODO: IMMEDIATELY this is stubbed, replace with formData (probably in downstream connected components)
     const addFieldNamePrefix = makeAddFieldNamePrefix(this.props.prefix)
     const labwareLabel = this.props.prefix === 'aspirate' ? 'Source:' : 'Destination:'
     const hiddenFieldsLabel = this.props.prefix === 'aspirate' ? 'Aspirate Options:' : 'Dispense Options:'
@@ -92,13 +91,11 @@ class SourceDestFields extends React.Component<Props, State> {
                     className={styles.small_field}
                     {...focusHandlers} />
                 </CheckboxRowField>
-                {(this.props.prefix === 'dispense' && path !== 'multiDispense') &&
+                {this.props.prefix === 'dispense' &&
                   <CheckboxRowField name='blowout_checkbox' label='Blowout'>
                     <BlowoutLocationField
                       name="blowout_location"
                       className={styles.full_width}
-                      includeSourceWell={path === 'single'}
-                      includeDestWell
                       {...focusHandlers} />
                   </CheckboxRowField>
                 }

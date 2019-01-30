@@ -7,7 +7,7 @@ import {getFieldErrors} from '../../../../steplist/fieldLevel'
 import {getDisabledFields} from '../../../../steplist/formLevel'
 import type {BaseState, ThunkDispatch} from '../../../../types'
 import type {StepFieldName} from '../../../../form-types'
-import type {FocusHandlers} from '../../index'
+import type {FocusHandlers} from '../../types'
 import {showFieldErrors} from '../FieldConnector'
 
 type Props = React.ElementProps<typeof WellSelectionInput>

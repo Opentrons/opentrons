@@ -31,6 +31,9 @@ function getDisabledChangeTipOptions (
       // path is multi
       return new Set(['perSource', 'perDest'])
     }
+    case 'mix': {
+      return new Set(['perSource', 'perDest'])
+    }
     default: {
       console.warn(`getChangeTipOptions for stepType ${rawForm.stepType} not yet implemented!`)
       return null

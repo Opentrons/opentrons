@@ -1,107 +1,5 @@
 @import '@opentrons/components';
 
-@lost gutter 0.5rem;
-
-/* "Advanced options" columns.
- * Row should add up to 15/16 max to accomodate carat on right.
- */
-
-.left_settings_column,
-.middle_settings_column,
-.right_settings_column {
-  & > * {
-    margin: 1rem 0;
-  }
-}
-
-.left_settings_column {
-  lost-column: 7/16;
-}
-
-.middle_settings_column {
-  lost-column: 5/16;
-}
-
-.right_settings_column {
-  lost-column: 4/16;
-}
-
-/* Special fields: default sizes.
- * Row of these fields should add up to max of 15/16
- * to accommodate carat on right.
- */
-
-/* .well_selection_input {
-  lost-column: 2/16;
-}
-
-.labware_field {
-  lost-column: 6/16;
-}
-
-.volume_field {
-  lost-column: 7/16;
-}
-
-.pipette_field {
-  lost-column: 7/16;
-} */
-
-/* Style overrides for particular step types */
-
-.consolidate {
-  & .pipette_field,
-  & .volume_field {
-    lost-column: 4/16;
-  }
-
-  & .labware_field {
-    lost-column: 5/16;
-  }
-}
-
-/* ------------------- */
-
-.repetitions_row {
-  padding: 1.5rem 0;
-}
-
-/* form buttons */
-
-.form_footer {
-  margin: 2rem 0 1rem 0;
-}
-
-.form_button {
-  width: 6.25rem;
-}
-
-.form_button:not(:last-child) {
-  margin-right: 0.625rem;
-}
-
-.sub_select_label {
-  @apply --font-body-1-dark;
-
-  display: flex;
-  align-items: center;
-  line-height: 1;
-  flex: 0 0 auto;
-  padding: 0 0.5rem;
-  margin: 0.5em 0 0.5em 20px;
-}
-
-/* .button_row {
-  lost-utility: clearfix;
-  margin-top: 2rem;
-
-  & > * {
-    lost-column: 1/6;
-  }
-} */
-
-/* NEW STYLES */
-
 .form_row {
   min-height: 2.25rem;
   display: flex;
@@ -155,6 +53,7 @@
 
 .checkbox_row {
   margin-top: 0.25rem;
+  height: 1.5rem;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -169,8 +68,37 @@
   min-width: 14.5rem;
 }
 
+.mix_hidden_fields {
+  margin: 0 0 0 1rem;
+  min-width: 0;
+  width: 14rem;
+}
+
 .no_label {
   margin-top: 0.5rem;
+}
+
+.form_footer {
+  margin: 2rem 0 1rem 0;
+}
+
+.form_button {
+  width: 6.25rem;
+}
+
+.form_button:not(:last-child) {
+  margin-right: 0.625rem;
+}
+
+.sub_select_label {
+  @apply --font-body-1-dark;
+
+  display: flex;
+  align-items: center;
+  line-height: 1;
+  flex: 0 0 auto;
+  padding: 0 0.5rem;
+  margin: 0.5em 0 0.5em 20px;
 }
 
 .advanced_settings_button_wrapper {

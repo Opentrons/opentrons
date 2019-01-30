@@ -1,0 +1,7 @@
+{
+  "stepType": {
+    "mix": "mix",
+    "moveLiquid": "transfer",
+    "pause": "pause"
+  }
+}

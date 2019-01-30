@@ -17,6 +17,7 @@ type Props = React.ElementProps<typeof StepItem>
 
 type OP = {
   stepId: $PropertyType<Props, 'stepId'>,
+  stepNumber: $PropertyType<Props, 'stepNumber'>,
 }
 
 type SP = {|

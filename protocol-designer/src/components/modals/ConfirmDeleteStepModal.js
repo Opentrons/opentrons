@@ -1,21 +1,20 @@
 // @flow
 import * as React from 'react'
 import {ContinueModal} from '@opentrons/components'
+import i18n from '../../localization'
 import {Portal} from '../portals/MainPageModalPortal'
-import modalStyles from '../modals/modal.css'
-
-const CONFIRM_DELETE_TEXT = 'Are you sure you want to delete this step?'
+import modalStyles from './modal.css'
 
 type Props = $Diff<React.ElementProps<typeof ContinueModal>, {children: *}>
 
-function ConfirmDeleteModal (props: Props) {
+function ConfirmDeleteStepModal (props: Props) {
   return (
     <Portal>
       <ContinueModal className={modalStyles.modal} {...props}>
-        {CONFIRM_DELETE_TEXT}
+        {i18n.t('modal.delete_step.body')}
       </ContinueModal>
     </Portal>
   )
 }
 
-export default ConfirmDeleteModal
+export default ConfirmDeleteStepModal

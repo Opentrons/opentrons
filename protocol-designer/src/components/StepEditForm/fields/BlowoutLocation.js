@@ -10,7 +10,7 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../../../step-generation/utils'
 import type {BaseState} from '../../../types'
-import type {FocusHandlers} from '../index'
+import type {FocusHandlers} from '../types'
 import FieldConnector from './FieldConnector'
 import styles from '../StepEditForm.css'
 
@@ -21,24 +21,22 @@ type Options = Array<DropdownOption>
 type BlowoutLocationDropdownOP = {
   name: StepFieldName,
   className?: string,
-  includeSourceWell?: ?boolean,
-  includeDestWell?: ?boolean,
 } & FocusHandlers
 type BlowoutLocationDropdownSP = {options: Options}
 const BlowoutLocationDropdownSTP = (state: BaseState, ownProps: BlowoutLocationDropdownOP): BlowoutLocationDropdownSP => {
+  const unsavedForm = stepFormSelectors.getUnsavedForm(state)
+  const {stepType, path} = unsavedForm || {}
+
   let options = stepFormSelectors.getDisposalLabwareOptions(state)
-  if (ownProps.includeDestWell) {
-    options = [
-      ...options,
-      {name: 'Destination Well', value: DEST_WELL_BLOWOUT_DESTINATION},
-    ]
+  if (stepType === 'mix') {
+    options = [...options, {name: 'Destination Well', value: DEST_WELL_BLOWOUT_DESTINATION}]
+  } else if (stepType === 'moveLiquid') {
+    options = [...options, {name: 'Destination Well', value: DEST_WELL_BLOWOUT_DESTINATION}]
+    if (path === 'single') {
+      options = [...options, {name: 'Source Well', value: SOURCE_WELL_BLOWOUT_DESTINATION}]
+    }
   }
-  if (ownProps.includeSourceWell) {
-    options = [
-      ...options,
-      {name: 'Source Well', value: SOURCE_WELL_BLOWOUT_DESTINATION},
-    ]
-  }
+
   return {options}
 }
 export const BlowoutLocationDropdown = connect(BlowoutLocationDropdownSTP)((props: BlowoutLocationDropdownOP & BlowoutLocationDropdownSP) => {
@@ -48,10 +46,11 @@ export const BlowoutLocationDropdown = connect(BlowoutLocationDropdownSTP)((prop
       name={name}
       focusedField={focusedField}
       dirtyFields={dirtyFields}
-      render={({value, updateValue}) => (
+      render={({value, updateValue, disabled}) => (
         <DropdownField
-          className={cx(styles.medium_field, className)}
+          className={cx(styles.medium_field, styles.orphan_field, className)}
           options={options}
+          disabled={disabled}
           onBlur={() => { onFieldBlur(name) }}
           onFocus={() => { onFieldFocus(name) }}
           value={value ? String(value) : null}

@@ -13,29 +13,17 @@ import type {BaseState, ThunkDispatch} from '../../types'
 import getDefaultsForStepType from '../../steplist/formLevel/getDefaultsForStepType.js'
 import formStyles from '../forms/forms.css'
 import MoreOptionsModal from '../modals/MoreOptionsModal'
+import ConfirmDeleteStepModal from '../modals/ConfirmDeleteStepModal'
 import styles from './StepEditForm.css'
+
+import {MixForm, TransferForm, PauseForm} from './forms'
 import FormAlerts from './FormAlerts'
-import MixForm from './MixForm'
-import TransferLikeForm from './TransferLikeForm'
-import TransferForm from './TransferForm'
-import PauseForm from './PauseForm'
-import ConfirmDeleteModal from './ConfirmDeleteModal'
 import ButtonRow from './ButtonRow'
 
 const STEP_FORM_MAP: {[StepType]: *} = {
   mix: MixForm,
   pause: PauseForm,
-  transfer: TransferLikeForm,
-  consolidate: TransferLikeForm,
-  distribute: TransferLikeForm,
   moveLiquid: TransferForm,
-}
-
-export type FocusHandlers = {
-  focusedField: StepFieldName,
-  dirtyFields: Array<StepFieldName>,
-  onFieldFocus: (StepFieldName) => void,
-  onFieldBlur: (StepFieldName) => void,
 }
 
 type SP = {
@@ -128,7 +116,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
     }
     return (
       <React.Fragment>
-        {this.state.showConfirmDeleteModal && <ConfirmDeleteModal
+        {this.state.showConfirmDeleteModal && <ConfirmDeleteStepModal
           onCancelClick={this.toggleConfirmDeleteModal}
           onContinueClick={() => {
             this.toggleConfirmDeleteModal()

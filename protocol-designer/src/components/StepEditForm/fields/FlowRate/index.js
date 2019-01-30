@@ -17,13 +17,14 @@ type OP = {
   pipetteFieldName: StepFieldName,
   flowRateType: $PropertyType<Props, 'flowRateType'>,
   label?: $PropertyType<Props, 'label'>,
+  className?: string,
 }
 
 type DP = {
   updateValue: $PropertyType<Props, 'updateValue'>,
 }
 
-type SP = $Diff<Props, DP>
+type SP = $Diff<Props, {...DP, ...OP}>
 
 // Add a key to force re-constructing component when values change
 function FlowRateInputWithKey (props: Props) {
