@@ -149,7 +149,7 @@ const moveLiquidFormToArgs = (hydratedFormData: HydratedMoveLiquidFormData): Mov
     case 'single': {
       const transferStepArguments: TransferFormData = {
         ...commonFields,
-        stepType: 'transfer', // TODO: Ian 2019-01-15 remove stepType from FormData types
+        commandCreatorFnName: 'transfer',
         blowoutLocation,
         sourceWells,
         destWells,
@@ -160,7 +160,7 @@ const moveLiquidFormToArgs = (hydratedFormData: HydratedMoveLiquidFormData): Mov
     case 'multiAspirate': {
       const consolidateStepArguments: ConsolidateFormData = {
         ...commonFields,
-        stepType: 'consolidate', // TODO: Ian 2019-01-15 remove stepType from FormData types
+        commandCreatorFnName: 'consolidate',
         blowoutLocation,
         mixFirstAspirate: mixBeforeAspirate,
         sourceWells,
@@ -171,7 +171,7 @@ const moveLiquidFormToArgs = (hydratedFormData: HydratedMoveLiquidFormData): Mov
     case 'multiDispense': {
       const distributeStepArguments: DistributeFormData = {
         ...commonFields,
-        stepType: 'distribute', // TODO: Ian 2019-01-15 remove stepType from FormData types
+        commandCreatorFnName: 'distribute',
         disposalVolume,
         // TODO: Ian 2019-01-15 these args have TODOs to get renamed, let's do it after deleting Distribute step
         disposalLabware: blowoutLabware,

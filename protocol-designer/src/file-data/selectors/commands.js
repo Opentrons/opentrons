@@ -126,19 +126,20 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
     }
   }
 )
+
 function compoundCommandCreatorFromStepArgs (stepArgs: StepGeneration.CommandCreatorData): ?StepGeneration.CompoundCommandCreator {
-  switch (stepArgs.stepType) {
-    case 'consolidate':
-      return StepGeneration.consolidate(stepArgs)
-    case 'transfer':
-      return StepGeneration.transfer(stepArgs)
-    case 'distribute':
-      return StepGeneration.distribute(stepArgs)
-    case 'mix':
-      return StepGeneration.mix(stepArgs)
-    default:
-      return null
+  switch (stepArgs.commandCreatorFnName) {
+    case 'consolidate': return StepGeneration.consolidate(stepArgs)
+    case 'delay': {
+      // $FlowFixMe TODO: Ian 2019-01-29 homogenize compound vs non-compound command creator type, maybe flow will get un-confused here
+      return prevRobotState => [prevRobotState => StepGeneration.delay(stepArgs)(prevRobotState)]
+    }
+    case 'distribute': return StepGeneration.distribute(stepArgs)
+    case 'transfer': return StepGeneration.transfer(stepArgs)
+    case 'mix': return StepGeneration.mix(stepArgs)
   }
+  console.warn(`unhandled commandCreatorFnName: ${stepArgs.commandCreatorFnName}`)
+  return null
 }
 
 // exposes errors and last valid robotState
@@ -160,18 +161,13 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
 
     const commandCreators = continuousStepArgs.reduce(
       (acc: Array<StepGeneration.CommandCreator>, stepArgs, stepIndex) => {
-        const {stepType} = stepArgs
         let reducedCommandCreator = null
 
-        if (stepArgs.stepType === 'pause') {
-          reducedCommandCreator = StepGeneration.delay(stepArgs)
-        } else { // NOTE: compound return an array of command creators, atomic steps only return one command creator
-          const compoundCommandCreator: ?StepGeneration.CompoundCommandCreator = compoundCommandCreatorFromStepArgs(stepArgs)
-          reducedCommandCreator = compoundCommandCreator && StepGeneration.reduceCommandCreators(compoundCommandCreator(initialRobotState))
-        }
+        const compoundCommandCreator: ?StepGeneration.CompoundCommandCreator = compoundCommandCreatorFromStepArgs(stepArgs)
+        reducedCommandCreator = compoundCommandCreator && StepGeneration.reduceCommandCreators(compoundCommandCreator(initialRobotState))
+
         if (!reducedCommandCreator) {
-          // TODO Ian 2018-05-08 use assert
-          console.warn(`StepType "${stepType}" not yet implemented`)
+          console.warn(`commandCreatorFnName "${stepArgs.commandCreatorFnName}" not yet implemented for robotStateTimeline`)
           return acc
         }
 

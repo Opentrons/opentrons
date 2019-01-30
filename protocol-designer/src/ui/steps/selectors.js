@@ -62,33 +62,33 @@ const getHoveredStepLabware: Selector<Array<string>> = createSelector(
       return blank
     }
 
-    const stepForm = allStepArgsAndErrors[hoveredStep].stepArgs
+    const stepArgs = allStepArgsAndErrors[hoveredStep].stepArgs
 
-    if (!stepForm) {
+    if (!stepArgs) {
       return blank
     }
 
     if (
-      stepForm.stepType === 'consolidate' ||
-      stepForm.stepType === 'distribute' ||
-      stepForm.stepType === 'transfer'
+      stepArgs.commandCreatorFnName === 'consolidate' ||
+      stepArgs.commandCreatorFnName === 'distribute' ||
+      stepArgs.commandCreatorFnName === 'transfer'
     ) {
       // source and dest labware
-      const src = stepForm.sourceLabware
-      const dest = stepForm.destLabware
+      const src = stepArgs.sourceLabware
+      const dest = stepArgs.destLabware
 
       return [src, dest]
     }
 
-    if (stepForm.stepType === 'mix') {
+    if (stepArgs.commandCreatorFnName === 'mix') {
       // only 1 labware
-      return [stepForm.labware]
+      return [stepArgs.labware]
     }
 
     // step types that have no labware that gets highlighted
-    if (!(stepForm.stepType === 'pause')) {
+    if (!(stepArgs.commandCreatorFnName === 'delay')) {
       // TODO Ian 2018-05-08 use assert here
-      console.warn(`getHoveredStepLabware does not support step type "${stepForm.stepType}"`)
+      console.warn(`getHoveredStepLabware does not support step type "${stepArgs.commandCreatorFnName}"`)
     }
 
     return blank

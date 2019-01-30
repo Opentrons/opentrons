@@ -2,7 +2,7 @@
 import assert from 'assert'
 import uniq from 'lodash/uniq'
 import {getWellSetForMultichannel} from '../../../well-selection/utils'
-
+import dependentFieldsUpdateMoveLiquid from './dependentFieldsUpdateMoveLiquid'
 import type {PipetteChannels} from '@opentrons/shared-data'
 import type {FormData} from '../../../form-types'
 import type {StepFieldName} from '../../fieldLevel'
@@ -40,13 +40,20 @@ function getChannels (pipetteId: string, pipetteEntities: PipetteEntities): Pipe
 
 function handleFormChange (
   patch: FormPatch,
-  baseForm: ?FormData,
+  rawForm: ?FormData,
   pipetteEntities: PipetteEntities,
   labwareEntities: LabwareEntities
 ): FormPatch {
   // pass thru, unchanged
-  if (baseForm == null) { return patch }
+  if (rawForm == null) { return patch }
 
+  if (rawForm.stepType === 'moveLiquid') {
+    const dependentFieldsPatch = dependentFieldsUpdateMoveLiquid(patch, rawForm, pipetteEntities, labwareEntities)
+    return {...patch, ...dependentFieldsPatch}
+  }
+
+  // everything below is legacy: remove in #2916
+  const baseForm = rawForm
   let updateOverrides = getChangeLabwareEffects(patch)
 
   if (baseForm.pipette && patch.pipette) {

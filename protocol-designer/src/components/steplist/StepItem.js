@@ -93,20 +93,20 @@ function getStepItemContents (stepItemProps: StepItemProps) {
   if (!step) {
     return null
   }
-
-  if (substeps && substeps.stepType === 'pause') {
-    return <PauseStepItems {...{substeps}} />
+  // pause substep component uses the delay args directly
+  if (substeps && substeps.commandCreatorFnName === 'delay') {
+    return <PauseStepItems pauseArgs={substeps} />
   }
 
   const result = []
 
   // headers
-
   if (
     formData && (
       formData.stepType === 'transfer' ||
       formData.stepType === 'consolidate' ||
-      formData.stepType === 'distribute'
+      formData.stepType === 'distribute' ||
+      formData.stepType === 'moveLiquid'
     )
   ) {
     const sourceLabware = getLabware(formData['aspirate_labware'])
@@ -131,13 +131,13 @@ function getStepItemContents (stepItemProps: StepItemProps) {
   }
 
   // non-header substeps
-
   if (
     substeps && (
-      substeps.stepType === 'transfer' ||
-      substeps.stepType === 'consolidate' ||
-      substeps.stepType === 'distribute' ||
-      substeps.stepType === 'mix'
+      substeps.commandCreatorFnName === 'transfer' ||
+      substeps.commandCreatorFnName === 'consolidate' ||
+      substeps.commandCreatorFnName === 'distribute' ||
+      substeps.commandCreatorFnName === 'moveLiquid' ||
+      substeps.commandCreatorFnName === 'mix'
     )
   ) {
     result.push(
