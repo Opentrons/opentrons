@@ -2,23 +2,60 @@
   "p10_single_v1": {
     "name": "p10_single",
     "plungerPositions": {
-      "top": 19.5,
-      "bottom": 2,
-      "blowOut": -1,
-      "dropTip": -4.5
+      "top": {
+          "default": 19.5,
+          "edit": true,
+          "min": 5,
+          "max": 19.5
+        },
+      "bottom": {
+        "default": 2,
+        "edit": true,
+        "min": -2,
+        "max": 19.0},
+      "blowOut": {
+        "default": -1,
+        "edit": true,
+        "min": -4,
+        "max": 10},
+      "dropTip": {
+        "default": -4.5,
+        "edit": true,
+        "min": -6,
+        "max": 2}
     },
-    "pickUpCurrent": 0.1,
-    "pickUpDistance": 10,
+    "pickUpCurrent": {
+      "default": 0.1,
+      "edit": true,
+      "min": 0.05,
+      "max": 1.2},
+    "pickUpDistance": {
+      "default": 10,
+      "edit": true,
+      "min": 1,
+      "max": 30},
     "modelOffset": [0.0, 0.0, -13],
-    "plungerCurrent": 0.3,
-    "dropTipCurrent": 0.5,
-    "dropTipSpeed": 5,
-    "ulPerMm": [
-      {"aspirate": [
-          [1.8263, -0.0958, 1.088],
-          [2.5222, -0.104, 1.1031],
-          [3.2354, -0.0447, 0.9536],
-          [3.9984, -0.012, 0.8477],
+    "plungerCurrent": {
+      "default": 0.3,
+      "edit": true,
+      "min": 0.1,
+      "max": 0.5},
+    "dropTipCurrent": {
+      "default": 0.5,
+      "edit": true,
+      "min": 0.1,
+      "max": 0.8},
+    "dropTipSpeed": {
+      "default": 5,
+      "edit": true,
+      "min": 0.001,
+      "max": 30},
+    "ulPerMm": [{
+      "aspirate": [
+        [1.8263, -0.0958, 1.088],
+        [ 2.5222, -0.104, 1.1031],
+        [ 3.2354, -0.0447, 0.9536],
+        [ 3.9984, -0.012, 0.8477],
         [12.5135, -0.0021, 0.8079]
       ],
         "dispense": [
@@ -44,10 +81,27 @@
   "p10_single_v1.3": {
     "name": "p10_single",
     "plungerPositions": {
-      "top": 19.5,
-      "bottom": 0.5,
-      "blowOut": -2.5,
-      "dropTip": -6
+      "top": {
+          "default": 19.5,
+          "edit": true,
+          "min": 5,
+          "max": 19.5
+        },
+      "bottom": {
+        "default": 0.5,
+        "edit": true,
+        "min": -2,
+        "max": 19.0},
+      "blowOut": {
+        "default": -2.5,
+        "edit": true,
+        "min": -4,
+        "max": 10},
+      "dropTip": {
+        "default": -6,
+        "edit": true,
+        "min": -6,
+        "max": 2}
     },
     "pickUpCurrent": 0.1,
     "pickUpDistance": 10,

@@ -23,6 +23,7 @@
         "maxItems": 3
       }
     },
+<<<<<<< HEAD
     "liquidHandlingSpecs": {
       "description": "Object containing linear equations for translating between uL of liquid and mm of plunger travel. There is one linear equation for aspiration and one for dispense",
       "type": "object",
@@ -33,6 +34,19 @@
         "dispense": {"$ref": "#/definitions/linearEquations"}
       }
     }
+=======
+    "editConfigurations": {
+            "type": "object",
+            "description": "Object allowing you to modify a config",
+            "required": ["edit", "default"],
+             "properties": {
+               "default": {"type": "number"},
+               "edit": {"type": "boolean"},
+               "min": {"type": "number"},
+               "max": {"type": "number"}
+            }
+      }
+>>>>>>> Change data schema
   },
 
   "description": "Version-level pipette specifications, which may vary across different versions of the same pipette",
@@ -64,17 +78,17 @@
           "required": ["top", "bottom", "blowOut", "dropTip"],
           "additionalProperties": false,
           "properties": {
-            "top": {"type": "number"},
-            "bottom": {"type": "number"},
-            "blowOut": {"type": "number"},
-            "dropTip": {"type": "number"}
+            "top": {"$ref": "#/definitions/editConfigurations"},
+            "bottom": {"$ref": "#/definitions/editConfigurations"},
+            "blowOut": {"$ref": "#/definitions/editConfigurations"},
+            "dropTip": {"$ref": "#/definitions/editConfigurations"}
           }
         },
-        "pickUpCurrent": {"type": "number"},
-        "pickUpDistance": {"type": "number"},
+        "pickUpCurrent": {"$ref": "#/definitions/editConfigurations"},
+        "pickUpDistance": {"$ref": "#/definitions/editConfigurations"},
         "modelOffset": {"$ref": "#/definitions/xyzArray"},
-        "plungerCurrent": {"type": "number"},
-        "dropTipCurrent": {"type": "number"},
+        "plungerCurrent": {"$ref": "#/definitions/editConfigurations"},
+        "dropTipCurrent": {"$ref": "#/definitions/editConfigurations"},
         "dropTipSpeed": {"type": "number"},
         "ulPerMm": {
           "type": "array",
