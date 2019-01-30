@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { AppContainer } from 'react-hot-loader'
 
-import configureStore from './configureStore.js'
+import configureStore from './configureStore'
 import i18n from './localization'
 import App from './components/App'
 import {selectors as loadFileSelectors} from './load-file'
