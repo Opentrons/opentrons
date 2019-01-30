@@ -1,5 +1,5 @@
 // @flow
-import handleFormChangeMoveLiquid from '../handleFormChangeMoveLiquid'
+import dependentFieldsUpdateMoveLiquid from '../dependentFieldsUpdateMoveLiquid'
 
 let pipetteEntities
 let labwareEntities
@@ -8,7 +8,7 @@ let handleFormHelper
 beforeEach(() => {
   pipetteEntities = {pipetteId: {name: 'p10_single', tiprackModel: 'tiprack-10ul'}}
   labwareEntities = {}
-  handleFormHelper = (patch, baseForm) => handleFormChangeMoveLiquid(
+  handleFormHelper = (patch, baseForm) => dependentFieldsUpdateMoveLiquid(
     patch, baseForm, pipetteEntities, labwareEntities
   )
 })

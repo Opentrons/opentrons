@@ -2,7 +2,7 @@
 import assert from 'assert'
 import uniq from 'lodash/uniq'
 import {getWellSetForMultichannel} from '../../../well-selection/utils'
-import handleFormChangeMoveLiquid from './handleFormChangeMoveLiquid'
+import dependentFieldsUpdateMoveLiquid from './dependentFieldsUpdateMoveLiquid'
 import type {PipetteChannels} from '@opentrons/shared-data'
 import type {FormData} from '../../../form-types'
 import type {StepFieldName} from '../../fieldLevel'
@@ -48,9 +48,8 @@ function handleFormChange (
   if (rawForm == null) { return patch }
 
   if (rawForm.stepType === 'moveLiquid') {
-    // TODO IMMEDIATELY rename handleFormChangeMoveLiquid to processPatchMoveLiquid or something?
-    const d = handleFormChangeMoveLiquid(patch, rawForm, pipetteEntities, labwareEntities)
-    return {...patch, ...d}
+    const dependentFieldsPatch = dependentFieldsUpdateMoveLiquid(patch, rawForm, pipetteEntities, labwareEntities)
+    return {...patch, ...dependentFieldsPatch}
   }
 
   // everything below is legacy: remove in #2916
