@@ -101,14 +101,7 @@ function getStepItemContents (stepItemProps: StepItemProps) {
   const result = []
 
   // headers
-  if (
-    formData && (
-      formData.stepType === 'transfer' ||
-      formData.stepType === 'consolidate' ||
-      formData.stepType === 'distribute' ||
-      formData.stepType === 'moveLiquid'
-    )
-  ) {
+  if (formData && formData.stepType === 'moveLiquid') {
     const sourceLabware = getLabware(formData['aspirate_labware'])
     const destLabware = getLabware(formData['dispense_labware'])
 
@@ -136,7 +129,6 @@ function getStepItemContents (stepItemProps: StepItemProps) {
       substeps.commandCreatorFnName === 'transfer' ||
       substeps.commandCreatorFnName === 'consolidate' ||
       substeps.commandCreatorFnName === 'distribute' ||
-      substeps.commandCreatorFnName === 'moveLiquid' ||
       substeps.commandCreatorFnName === 'mix'
     )
   ) {

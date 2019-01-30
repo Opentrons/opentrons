@@ -4,7 +4,6 @@ import type {FormData} from '../../../form-types'
 import type {CommandCreatorData} from '../../../step-generation'
 import mixFormToArgs from './mixFormToArgs'
 import pauseFormToArgs from './pauseFormToArgs'
-import transferLikeFormToArgs from './transferLikeFormToArgs'
 import moveLiquidFormToArgs from './moveLiquidFormToArgs'
 
 // NOTE: this acts as an adapter for the PD defined data shape of the step forms
@@ -18,10 +17,6 @@ const stepFormToArgs = (hydratedForm: FormData): StepArgs => {
   switch (hydratedForm.stepType) {
     case 'moveLiquid':
       return moveLiquidFormToArgs({...hydratedForm, fields: hydratedForm}) // TODO: Ian 2019-01-29 nest all fields under `fields` (in #2917 ?)
-    case 'transfer':
-    case 'consolidate':
-    case 'distribute':
-      return transferLikeFormToArgs(hydratedForm)
     case 'pause':
       return pauseFormToArgs(hydratedForm)
     case 'mix':

@@ -7,7 +7,7 @@ import {INITIAL_DECK_SETUP_STEP_ID} from '../constants'
 import type {ProtocolFile, FileLabware, FilePipette} from '../file-types'
 import type {FormData} from '../form-types'
 
-function _addDeckSetupStepIfMissing (fileData: ProtocolFile): SavedStepFormState {
+function _addDeckSetupStepIfMissing (fileData: ProtocolFile): ProtocolFile{
   // builds the initial deck setup step for older protocols that didn't have one.
   const savedStepForms = fileData['designer-application'].data.savedStepForms
 
@@ -29,42 +29,58 @@ function _addDeckSetupStepIfMissing (fileData: ProtocolFile): SavedStepFormState
     },
   }
   return {
-    ...savedStepForms,
-    [INITIAL_DECK_SETUP_STEP_ID]: deckSetupStep,
+    ...fileData,
+    'designer-application': {
+      ...fileData['designer-application'],
+      data: {
+        ...fileData['designer-application'].data,
+        savedStepForms: {
+          ...savedStepForms,
+          [INITIAL_DECK_SETUP_STEP_ID]: deckSetupStep,
+        }
+      }
+    }
   }
 }
 
 function _consolidateToFlexibleTransfer (formData: FormData): FormData {
-
+  return {
+    ...formData,
+    stepType: 'moveLiquid',
+  }
 }
 
 function _distributeToFlexibleTransfer (formData: FormData): FormData {
 
 }
 
-function _migrateToFlexibleTransfer (savedStepForms: SavedStepFormState): SavedStepFormState {
+function _migrateToFlexibleTransfer (fileData: ProtocolFile): $PropertyType<ProtocolFile, 'designer-application'>{
+  const savedStepForms = fileData['designer-application'].data.savedStepForms
   return mapValues(savedStepForms, (formData) => {
     const {stepType} = formData
     if (stepType) return formData
+    let migratedFormData = {formData
     if (stepType === 'consolidate') {
       return _consolidateToFlexibleTransfer(formData)
     } else if (stepType === 'distribute') {
+      return _distributeToFlexibleTransfer(formData)
+    } else if (stepType === 'transfer') {
       return _distributeToFlexibleTransfer(formData)
     }
   })
 }
 
 function migrateSavedStepForms (fileData: ProtocolFile): SavedStepFormState {
-  const savedStepFormsWithDeckSetup = _addDeckSetupStepIfMissing(fileData)
+  const withDeckSetup = _addDeckSetupStepIfMissing(fileData)
 
   // migrate old kebab-case keys to camelCase
-  const savedStepFormsWithDeckSetupAndCamelCase = mapValues(savedStepFormsWithDeckSetup, (stepForm) => ({
+  const withDeckSetupAndCamelCase = mapValues(withDeckSetup, (stepForm) => ({
     ...omit(stepForm, ['step-name', 'step-details']),
     stepName: stepForm.stepName || stepForm['step-name'],
     stepDetails: stepForm.stepDetails || stepForm['step-details'],
   }))
 
-  return _migrateToFlexibleTransfer(savedStepFormsWithDeckSetupAndCamelCase)
+  return _migrateToFlexibleTransfer(withDeckSetupAndCamelCase)
 }
 
 export default function migrateFile (file: any): ProtocolFile {
