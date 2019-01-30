@@ -463,7 +463,7 @@ async def test_set_and_jog_integration(
     else:
         sess.adapter.home()
         prior_x, prior_y, prior_z = dc.position(
-            sess.current_mount, sess.adapter)
+            sess.current_mount, sess.adapter, sess.cp)
 
     resp = await async_client.post(
         '/calibration/deck',

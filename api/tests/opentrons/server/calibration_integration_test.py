@@ -6,7 +6,7 @@ from opentrons import deck_calibration as dc
 from opentrons.deck_calibration import endpoints
 from opentrons.trackers.pose_tracker import absolute
 from opentrons.config.pipette_config import Y_OFFSET_MULTI
-from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.types import CriticalPoint
 
 # Note that several values in this file have target/expected values that do not
 # accurately reflect robot operation, because of differences between return
@@ -243,12 +243,12 @@ async def test_transform_from_moves_v2(
     assert res.status == 200
 
     expected1 = endpoints.safe_points().get('1')
-
-    coordinates = await hardware.current_position(test_mount)
+    coordinates = await hardware.gantry_position(
+        test_mount, critical_point=CriticalPoint.FRONT_NOZZLE)
     position = (
-        coordinates[Axis.X],
-        coordinates[Axis.Y],
-        coordinates[Axis.by_mount(test_mount)])
+        coordinates.x,
+        coordinates.y,
+        coordinates.z)
     assert np.isclose(position, expected1).all()
 
     # Jog to calculated position for transform
@@ -277,12 +277,13 @@ async def test_transform_from_moves_v2(
         'token': token, 'command': 'move', 'point': '2'})
     assert res.status == 200
     expected2 = endpoints.safe_points().get('2')
-
-    coordinates = await hardware.current_position(test_mount)
+    coordinates = await hardware.gantry_position(
+        test_mount, critical_point=CriticalPoint.FRONT_NOZZLE)
     position = (
-        coordinates[Axis.X],
-        coordinates[Axis.Y],
-        coordinates[Axis.by_mount(test_mount)])
+        coordinates.x,
+        coordinates.y,
+        coordinates.z)
+
     assert np.isclose(position, expected2).all()
 
     # Jog to calculated position for transform
@@ -311,12 +312,12 @@ async def test_transform_from_moves_v2(
         'token': token, 'command': 'move', 'point': '3'})
     assert res.status == 200
     expected3 = endpoints.safe_points().get('3')
-
-    coordinates = await hardware.current_position(test_mount)
+    coordinates = await hardware.gantry_position(
+        test_mount, critical_point=CriticalPoint.FRONT_NOZZLE)
     position = (
-        coordinates[Axis.X],
-        coordinates[Axis.Y],
-        coordinates[Axis.by_mount(test_mount)])
+        coordinates.x,
+        coordinates.y,
+        coordinates.z)
     assert np.isclose(position, expected3).all()
 
     # Jog to calculated position for transform

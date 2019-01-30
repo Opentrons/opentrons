@@ -8,6 +8,7 @@ import json
 from opentrons.config import pipette_config, robot_configs, feature_flags
 from opentrons import instruments, hardware_control
 from opentrons.types import Mount, Point
+from opentrons.hardware_control.types import CriticalPoint
 from . import jog, position, dots_set, z_pos
 from opentrons.util.linal import add_z, solve
 
@@ -78,6 +79,7 @@ class SessionManager:
         self.tip_length = None
         self.points = {k: None for k in expected_points().keys()}
         self.z_value = None
+        self.cp = None
         self.adapter = hardware
 
         if feature_flags.use_protocol_api_v2():
@@ -102,7 +104,7 @@ def init_pipette():
     :return: The pipette type and mount chosen for deck calibration
     """
     global session
-    pipette_info = set_current_mount(session.adapter)
+    pipette_info = set_current_mount(session.adapter, session)
     pipette = pipette_info['pipette']
     res = {}
     if pipette:
@@ -144,7 +146,7 @@ def get_pipettes(hardware):
     return right_pipette, left_pipette
 
 
-def set_current_mount(hardware):
+def set_current_mount(hardware, session):
     """
     Choose the pipette in which to execute commands. If there is no pipette,
     or it is uncommissioned, the pipette is not mounted.
@@ -155,7 +157,7 @@ def set_current_mount(hardware):
     mount, or 'uncommissioned' if no model string available
     :return: The selected pipette
     """
-    global session
+
     pipette = None
     right_channel = None
     left_channel = None
@@ -180,8 +182,10 @@ def set_current_mount(hardware):
         pipette = left_pipette
     elif right_pipette:
         pipette = right_pipette
+        session.cp = CriticalPoint.FRONT_NOZZLE
     elif left_pipette:
         pipette = left_pipette
+        session.cp = CriticalPoint.FRONT_NOZZLE
 
     model = _get_model_name(pipette)
 
@@ -293,7 +297,12 @@ async def run_jog(data):
         status = 400
     else:
         position = jog(
-            axis, direction, step, session.adapter, session.current_mount)
+            axis,
+            direction,
+            step,
+            session.adapter,
+            session.current_mount,
+            session.cp)
         message = 'Jogged to {}'.format(position)
         status = 200
 
@@ -342,16 +351,19 @@ async def move(data):
         else:
             if not point_name == 'attachTip':
                 intermediate_pos = position(
-                    session.current_mount, session.adapter)
+                    session.current_mount, session.adapter, session.cp)
                 session.adapter.move_to(
                     session.current_mount,
                     Point(
                         x=intermediate_pos[0],
                         y=intermediate_pos[1],
-                        z=intermediate_pos[2] + session.tip_length))
+                        z=session.tip_length),
+                    critical_point=session.cp)
+
             session.adapter.move_to(
                 session.current_mount,
-                Point(x=point[0], y=point[1], z=point[2]))
+                Point(x=point[0], y=point[1], z=point[2]),
+                critical_point=session.cp)
         message = 'Moved to {}'.format(point)
         status = 200
     else:
@@ -395,7 +407,8 @@ async def save_xy(data):
                 x = x + dx
                 y = y + dy
         else:
-            x, y, _ = position(session.current_mount, session.adapter)
+            x, y, _ = position(
+                session.current_mount, session.adapter, session.cp)
 
         session.points[point] = (x, y)
         message = "Saved point {} value: {}".format(
@@ -429,7 +442,7 @@ async def save_z(data):
             session.z_value = actual_z - session.tip_length + length_offset
         else:
             session.z_value = position(
-                session.current_mount, session.adapter)[-1]
+                session.current_mount, session.adapter, session.cp)[-1]
 
         message = "Saved z: {}".format(session.z_value)
         status = 200
