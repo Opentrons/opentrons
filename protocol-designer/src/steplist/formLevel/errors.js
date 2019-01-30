@@ -24,15 +24,15 @@ export type FormError = {
 
 const FORM_ERRORS: {[FormErrorKey]: FormError} = {
   INCOMPATIBLE_ASPIRATE_LABWARE: {
-    title: 'Selected aspirate labware may be incompatible with selected pipette',
+    title: 'Selected aspirate labware is incompatible with selected pipette',
     dependentFields: ['aspirate_labware', 'pipette'],
   },
   INCOMPATIBLE_DISPENSE_LABWARE: {
-    title: 'Selected dispense labware may be incompatible with selected pipette',
+    title: 'Selected dispense labware is incompatible with selected pipette',
     dependentFields: ['dispense_labware', 'pipette'],
   },
   INCOMPATIBLE_LABWARE: {
-    title: 'Selected labware may be incompatible with selected pipette',
+    title: 'Selected labware is incompatible with selected pipette',
     dependentFields: ['labware', 'pipette'],
   },
   PAUSE_TYPE_REQUIRED: {
