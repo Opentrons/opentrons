@@ -450,7 +450,7 @@ describe('distribute volume exceeds pipette max volume', () => {
       destWells: ['A2', 'A3'],
       changeTip,
       volume: 250,
-      disposalVolume: 100, // TODO additional test with blowout
+      disposalVolume: 100,
       disposalLabware: 'trashId',
       disposalWell: 'A1',
     }
