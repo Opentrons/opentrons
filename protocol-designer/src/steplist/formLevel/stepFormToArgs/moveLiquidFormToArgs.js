@@ -8,10 +8,10 @@ import {getOrderedWells} from '../../utils'
 
 import type {HydratedMoveLiquidFormData} from '../../../form-types'
 import type {
-  ConsolidateFormData,
-  DistributeFormData,
-  TransferFormData,
-  MixArgs,
+  ConsolidateArgs,
+  DistributeArgs,
+  TransferArgs,
+  InnerMixArgs,
 } from '../../../step-generation'
 
 export function getMixData (
@@ -19,7 +19,7 @@ export function getMixData (
   checkboxField: *,
   volumeField: *,
   timesField: *
-): ?MixArgs {
+): ?InnerMixArgs {
   const checkbox = hydratedFormData[checkboxField]
   const volume = hydratedFormData[volumeField]
   const times = hydratedFormData[timesField]
@@ -34,7 +34,7 @@ export function getMixData (
   return null
 }
 
-type MoveLiquidStepArgs = ConsolidateFormData | DistributeFormData | TransferFormData | null
+type MoveLiquidStepArgs = ConsolidateArgs | DistributeArgs | TransferArgs | null
 
 const moveLiquidFormToArgs = (hydratedFormData: HydratedMoveLiquidFormData): MoveLiquidStepArgs => {
   assert(
@@ -161,7 +161,7 @@ const moveLiquidFormToArgs = (hydratedFormData: HydratedMoveLiquidFormData): Mov
 
   switch (path) {
     case 'single': {
-      const transferStepArguments: TransferFormData = {
+      const transferStepArguments: TransferArgs = {
         ...commonFields,
         commandCreatorFnName: 'transfer',
         blowoutLocation,
@@ -172,7 +172,7 @@ const moveLiquidFormToArgs = (hydratedFormData: HydratedMoveLiquidFormData): Mov
       return transferStepArguments
     }
     case 'multiAspirate': {
-      const consolidateStepArguments: ConsolidateFormData = {
+      const consolidateStepArguments: ConsolidateArgs = {
         ...commonFields,
         commandCreatorFnName: 'consolidate',
         blowoutLocation,
@@ -183,7 +183,7 @@ const moveLiquidFormToArgs = (hydratedFormData: HydratedMoveLiquidFormData): Mov
       return consolidateStepArguments
     }
     case 'multiDispense': {
-      const distributeStepArguments: DistributeFormData = {
+      const distributeStepArguments: DistributeArgs = {
         ...commonFields,
         commandCreatorFnName: 'distribute',
         disposalVolume,

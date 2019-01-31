@@ -3,11 +3,11 @@
 import { getLabware } from '@opentrons/shared-data'
 import intersection from 'lodash/intersection'
 import type { FormData } from '../../../form-types'
-import type { MixFormData } from '../../../step-generation'
+import type { MixArgs } from '../../../step-generation'
 import { DEFAULT_CHANGE_TIP_OPTION } from '../../../constants'
 import { orderWells } from '../../utils'
 
-type MixStepArgs = MixFormData
+type MixStepArgs = MixArgs
 
 // TODO: BC 2018-10-30 move getting labwareDef into hydration layer upstream
 const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {

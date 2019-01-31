@@ -4,12 +4,12 @@ import zip from 'lodash/zip'
 import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import {getPipetteWithTipMaxVol} from '../../robotStateSelectors'
-import type {TransferFormData, RobotState, CommandCreator, CompoundCommandCreator} from '../../types'
+import type {TransferArgs, RobotState, CommandCreator, CompoundCommandCreator} from '../../types'
 import {blowoutUtil} from '../../utils'
 import {aspirate, dispense, replaceTip, touchTip} from '../atomic'
 import {mixUtil} from './mix'
 
-const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotState: RobotState) => {
+const transfer = (args: TransferArgs): CompoundCommandCreator => (prevRobotState: RobotState) => {
   /**
     Transfer will iterate through a set of 1 or more source and destination wells.
     For each pair, it will aspirate from the source well, then dispense into the destination well.
@@ -31,18 +31,18 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
     * 'perDest': change tip each time you encounter a new destination well (including the first one)
     NOTE: In some situations, different changeTip options have equivalent outcomes. That's OK.
   */
-  assert(data.sourceWells.length === data.destWells.length,
-    `Transfer command creator expected N:N source-to-dest wells ratio. Got ${data.sourceWells.length}:${data.destWells.length}`)
+  assert(args.sourceWells.length === args.destWells.length,
+    `Transfer command creator expected N:N source-to-dest wells ratio. Got ${args.sourceWells.length}:${args.destWells.length}`)
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...
   const actionName = 'transfer'
 
-  const pipetteData = prevRobotState.pipettes[data.pipette]
+  const pipetteData = prevRobotState.pipettes[args.pipette]
   const pipetteSpec = pipetteData && pipetteData.name && getPipetteNameSpecs(pipetteData.name)
 
   if (!pipetteData || !pipetteSpec) {
     // bail out before doing anything else
     return [(_robotState) => ({
-      errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: data.pipette})],
+      errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: args.pipette})],
     })]
   }
 
@@ -51,15 +51,15 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
     dispenseFlowRateUlSec,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
-  } = data
+  } = args
 
-  const effectiveTransferVol = getPipetteWithTipMaxVol(data.pipette, prevRobotState)
+  const effectiveTransferVol = getPipetteWithTipMaxVol(args.pipette, prevRobotState)
   const pipetteMinVol = pipetteSpec.minVolume
 
   const chunksPerSubTransfer = Math.ceil(
-    data.volume / effectiveTransferVol
+    args.volume / effectiveTransferVol
   )
-  const lastSubTransferVol = data.volume - ((chunksPerSubTransfer - 1) * effectiveTransferVol)
+  const lastSubTransferVol = args.volume - ((chunksPerSubTransfer - 1) * effectiveTransferVol)
 
   // volume of each chunk in a sub-transfer
   let subTransferVolumes: Array<number> = Array(chunksPerSubTransfer - 1)
@@ -75,7 +75,7 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
       .concat(splitLastVol)
   }
 
-  const sourceDestPairs = zip(data.sourceWells, data.destWells)
+  const sourceDestPairs = zip(args.sourceWells, args.destWells)
   let prevSourceWell = null
   let prevDestWell = null
   const commandCreators = sourceDestPairs.reduce(
@@ -87,24 +87,24 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
           const isInitialSubtransfer = (pairIdx === 0 && chunkIdx === 0)
           let changeTipNow = false // 'never' by default
 
-          if (data.changeTip === 'always') {
+          if (args.changeTip === 'always') {
             changeTipNow = true
-          } else if (data.changeTip === 'once') {
+          } else if (args.changeTip === 'once') {
             changeTipNow = isInitialSubtransfer
-          } else if (data.changeTip === 'perSource') {
+          } else if (args.changeTip === 'perSource') {
             changeTipNow = sourceWell !== prevSourceWell
-          } else if (data.changeTip === 'perDest') {
+          } else if (args.changeTip === 'perDest') {
             changeTipNow = isInitialSubtransfer || destWell !== prevDestWell
           }
 
           const tipCommands: Array<CommandCreator> = changeTipNow
-            ? [replaceTip(data.pipette)]
+            ? [replaceTip(args.pipette)]
             : []
 
-          const preWetTipCommands = (data.preWetTip && chunkIdx === 0)
+          const preWetTipCommands = (args.preWetTip && chunkIdx === 0)
             ? mixUtil({
-              pipette: data.pipette,
-              labware: data.sourceLabware,
+              pipette: args.pipette,
+              labware: args.sourceLabware,
               well: sourceWell,
               volume: Math.max(subTransferVol),
               times: 1,
@@ -115,13 +115,13 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
             })
             : []
 
-          const mixBeforeAspirateCommands = (data.mixBeforeAspirate)
+          const mixBeforeAspirateCommands = (args.mixBeforeAspirate)
             ? mixUtil({
-              pipette: data.pipette,
-              labware: data.sourceLabware,
+              pipette: args.pipette,
+              labware: args.sourceLabware,
               well: sourceWell,
-              volume: data.mixBeforeAspirate.volume,
-              times: data.mixBeforeAspirate.times,
+              volume: args.mixBeforeAspirate.volume,
+              times: args.mixBeforeAspirate.times,
               aspirateOffsetFromBottomMm,
               dispenseOffsetFromBottomMm,
               aspirateFlowRateUlSec,
@@ -129,31 +129,31 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
             })
             : []
 
-          const touchTipAfterAspirateCommands = (data.touchTipAfterAspirate)
+          const touchTipAfterAspirateCommands = (args.touchTipAfterAspirate)
             ? [touchTip({
-              pipette: data.pipette,
-              labware: data.sourceLabware,
+              pipette: args.pipette,
+              labware: args.sourceLabware,
               well: sourceWell,
-              offsetFromBottomMm: data.touchTipAfterAspirateOffsetMmFromBottom,
+              offsetFromBottomMm: args.touchTipAfterAspirateOffsetMmFromBottom,
             })]
             : []
 
-          const touchTipAfterDispenseCommands = (data.touchTipAfterDispense)
+          const touchTipAfterDispenseCommands = (args.touchTipAfterDispense)
             ? [touchTip({
-              pipette: data.pipette,
-              labware: data.destLabware,
+              pipette: args.pipette,
+              labware: args.destLabware,
               well: destWell,
-              offsetFromBottomMm: data.touchTipAfterDispenseOffsetMmFromBottom,
+              offsetFromBottomMm: args.touchTipAfterDispenseOffsetMmFromBottom,
             })]
             : []
 
-          const mixInDestinationCommands = (data.mixInDestination)
+          const mixInDestinationCommands = (args.mixInDestination)
             ? mixUtil({
-              pipette: data.pipette,
-              labware: data.destLabware,
+              pipette: args.pipette,
+              labware: args.destLabware,
               well: destWell,
-              volume: data.mixInDestination.volume,
-              times: data.mixInDestination.times,
+              volume: args.mixInDestination.volume,
+              times: args.mixInDestination.times,
               aspirateOffsetFromBottomMm,
               dispenseOffsetFromBottomMm,
               aspirateFlowRateUlSec,
@@ -162,12 +162,12 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
             : []
 
           const blowoutCommand = blowoutUtil(
-            data.pipette,
-            data.sourceLabware,
+            args.pipette,
+            args.sourceLabware,
             sourceWell,
-            data.destLabware,
+            args.destLabware,
             destWell,
-            data.blowoutLocation,
+            args.blowoutLocation,
           )
 
           const nextCommands = [
@@ -175,18 +175,18 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
             ...preWetTipCommands,
             ...mixBeforeAspirateCommands,
             aspirate({
-              pipette: data.pipette,
+              pipette: args.pipette,
               volume: subTransferVol,
-              labware: data.sourceLabware,
+              labware: args.sourceLabware,
               well: sourceWell,
               'flow-rate': aspirateFlowRateUlSec,
               offsetFromBottomMm: aspirateOffsetFromBottomMm,
             }),
             ...touchTipAfterAspirateCommands,
             dispense({
-              pipette: data.pipette,
+              pipette: args.pipette,
               volume: subTransferVol,
-              labware: data.destLabware,
+              labware: args.destLabware,
               well: destWell,
               'flow-rate': dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,

@@ -6,7 +6,7 @@ import {
   compoundCommandCreatorHasErrors,
   commandFixtures as cmd,
 } from './fixtures'
-import type {MixFormData} from '../types'
+import type {MixArgs} from '../types'
 const mix = compoundCommandCreatorNoErrors(_mix)
 const mixWithErrors = compoundCommandCreatorHasErrors(_mix)
 
@@ -38,7 +38,7 @@ beforeEach(() => {
 describe('mix: change tip', () => {
   const volume = 5
   const times = 2
-  const makeArgs = (changeTip): MixFormData => ({
+  const makeArgs = (changeTip): MixArgs => ({
     ...mixinArgs,
     volume,
     times,
@@ -135,7 +135,7 @@ describe('mix: advanced options', () => {
     const DISPENSE_OFFSET = 12
     const ASPIRATE_FLOW_RATE = 3
     const DISPENSE_FLOW_RATE = 6
-    const args: MixFormData = {
+    const args: MixArgs = {
       ...mixinArgs,
       volume,
       times,
@@ -168,7 +168,7 @@ describe('mix: advanced options', () => {
   })
 
   test('touch tip (after each dispense)', () => {
-    const args: MixFormData = {
+    const args: MixArgs = {
       ...mixinArgs,
       volume,
       times,
@@ -211,7 +211,7 @@ describe('mix: advanced options', () => {
   })
 
   test('blowout', () => {
-    const args: MixFormData = {
+    const args: MixArgs = {
       ...mixinArgs,
       volume,
       times,
@@ -250,7 +250,7 @@ describe('mix: advanced options', () => {
   })
 
   test('touch tip after blowout', () => {
-    const args: MixFormData = {
+    const args: MixArgs = {
       ...mixinArgs,
       volume,
       times,
@@ -305,7 +305,7 @@ describe('mix: errors', () => {
     }
   })
   test('invalid labware', () => {
-    const args: MixFormData = {
+    const args: MixArgs = {
       ...errorArgs,
       labware: 'invalidLabwareId',
     }
@@ -317,7 +317,7 @@ describe('mix: errors', () => {
   })
 
   test('invalid pipette', () => {
-    const args: MixFormData = {
+    const args: MixArgs = {
       ...errorArgs,
       pipette: 'invalidPipetteId',
     }

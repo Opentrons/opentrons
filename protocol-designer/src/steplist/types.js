@@ -1,5 +1,5 @@
 // @flow
-import type {PauseFormData, CommandCreatorData} from '../step-generation'
+import type {DelayArgs, CommandCreatorArgs} from '../step-generation'
 import type {
   FormData,
   StepIdType,
@@ -86,7 +86,7 @@ export type SourceDestSubstepItem = SourceDestSubstepItemSingleChannel | SourceD
 
 export type SubstepItemData =
   | SourceDestSubstepItem
-  | PauseFormData // Pause substep uses same data as delay args
+  | DelayArgs // Pause substep uses same data as delay args
 
 export type StepItemData = {
   id: StepIdType,
@@ -105,7 +105,7 @@ export type StepFormAndFieldErrors = {
 
 export type StepArgsAndErrors = {
   errors: StepFormAndFieldErrors,
-  stepArgs: CommandCreatorData | null, // TODO: incompleteData field when this is null?
+  stepArgs: CommandCreatorArgs | null, // TODO: incompleteData field when this is null?
 }
 
 export type StepFormContextualState = {

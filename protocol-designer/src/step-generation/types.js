@@ -5,12 +5,12 @@ import type {DeckSlot, Mount} from '@opentrons/components'
 
 export type ChangeTipOptions = 'always' | 'once' | 'never' | 'perDest' | 'perSource'
 
-export type MixArgs = {|
+export type InnerMixArgs = {|
   volume: number,
   times: number,
 |}
 
-export type SharedFormDataFields = {|
+type CommonArgs = {|
   /** Optional user-readable name for this step */
   name: ?string,
   /** Optional user-readable description/notes for this step */
@@ -19,8 +19,8 @@ export type SharedFormDataFields = {|
 
 // ===== Processed form types. Used as args to call command creator fns =====
 
-export type TransferLikeFormDataFields = {
-  ...SharedFormDataFields,
+export type SharedTransferLikeArgs = {
+  ...CommonArgs,
 
   pipette: string, // PipetteId
 
@@ -54,7 +54,7 @@ export type TransferLikeFormDataFields = {
   dispenseOffsetFromBottomMm?: ?number,
 }
 
-export type ConsolidateFormData = {
+export type ConsolidateArgs = {
   commandCreatorFnName: 'consolidate',
 
   sourceWells: Array<string>,
@@ -64,12 +64,12 @@ export type ConsolidateFormData = {
   blowoutLocation: ?string,
 
   /** Mix in first well in chunk */
-  mixFirstAspirate: ?MixArgs,
+  mixFirstAspirate: ?InnerMixArgs,
   /** Mix in destination well after dispense */
-  mixInDestination: ?MixArgs,
-} & TransferLikeFormDataFields
+  mixInDestination: ?InnerMixArgs,
+} & SharedTransferLikeArgs
 
-export type TransferFormData = {
+export type TransferArgs = {
   commandCreatorFnName: 'transfer',
 
   sourceWells: Array<string>,
@@ -79,12 +79,12 @@ export type TransferFormData = {
   blowoutLocation: ?string,
 
   /** Mix in first well in chunk */
-  mixBeforeAspirate: ?MixArgs,
+  mixBeforeAspirate: ?InnerMixArgs,
   /** Mix in destination well after dispense */
-  mixInDestination: ?MixArgs,
-} & TransferLikeFormDataFields
+  mixInDestination: ?InnerMixArgs,
+} & SharedTransferLikeArgs
 
-export type DistributeFormData = {
+export type DistributeArgs = {
   commandCreatorFnName: 'distribute',
 
   sourceWell: string,
@@ -97,11 +97,11 @@ export type DistributeFormData = {
   disposalWell: ?string,
 
   /** Mix in first well in chunk */
-  mixBeforeAspirate: ?MixArgs,
-} & TransferLikeFormDataFields
+  mixBeforeAspirate: ?InnerMixArgs,
+} & SharedTransferLikeArgs
 
-export type MixFormData = {
-  ...$Exact<SharedFormDataFields>,
+export type MixArgs = {
+  ...$Exact<CommonArgs>,
   commandCreatorFnName: 'mix',
   labware: string,
   pipette: string,
@@ -127,8 +127,8 @@ export type MixFormData = {
   dispenseFlowRateUlSec?: ?number,
 }
 
-export type PauseFormData = {
-  ...$Exact<SharedFormDataFields>,
+export type DelayArgs = {
+  ...$Exact<CommonArgs>,
   commandCreatorFnName: 'delay',
   message?: string,
   wait: number | true,
@@ -139,12 +139,12 @@ export type PauseFormData = {
   },
 }
 
-export type CommandCreatorData =
-  | ConsolidateFormData
-  | DistributeFormData
-  | MixFormData
-  | PauseFormData
-  | TransferFormData
+export type CommandCreatorArgs =
+  | ConsolidateArgs
+  | DistributeArgs
+  | MixArgs
+  | DelayArgs
+  | TransferArgs
 
 // TODO: Ian 2019-01-07 with multiple deck setup steps, we might want to
 // separate 'entities' from 'locations' for pipettes/labware, and remove
