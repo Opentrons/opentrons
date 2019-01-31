@@ -142,6 +142,10 @@ test('transfer with multiple sets of wells', () => {
 test('invalid pipette ID should throw error', () => {
   transferArgs = {
     ...transferArgs,
+    sourceWells: ['A1'],
+    destWells: ['B1'],
+    volume: 10,
+    changeTip: 'always',
     pipette: 'no-such-pipette-id-here',
   }
 

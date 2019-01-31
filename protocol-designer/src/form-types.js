@@ -83,12 +83,12 @@ export type AnnotationFields = {|
 |}
 
 export type BlowoutFields = {|
-  'dispense_blowout_checkbox'?: boolean,
-  'dispense_blowout_location'?: string,
+  'blowout_checkbox'?: boolean,
+  'blowout_location'?: string,
 |}
 
 export type ChangeTipFields = {|
-  'aspirate_changeTip'?: ChangeTipOptions,
+  'changeTip'?: ChangeTipOptions,
 |}
 
 export type MixForm = {|

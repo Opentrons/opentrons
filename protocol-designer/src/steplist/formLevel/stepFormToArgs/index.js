@@ -1,10 +1,11 @@
 // @flow
-
-import type {FormData} from '../../../form-types'
-import type {CommandCreatorData} from '../../../step-generation'
+import mapValues from 'lodash/mapValues'
+import {castField} from '../../../steplist'
 import mixFormToArgs from './mixFormToArgs'
 import pauseFormToArgs from './pauseFormToArgs'
 import moveLiquidFormToArgs from './moveLiquidFormToArgs'
+import type {FormData} from '../../../form-types'
+import type {CommandCreatorData} from '../../../step-generation'
 
 // NOTE: this acts as an adapter for the PD defined data shape of the step forms
 // to create arguments that the step generation service is expecting
@@ -14,15 +15,18 @@ type StepArgs = CommandCreatorData | null
 
 // TODO: Ian 2019-01-29 use hydrated form type
 const stepFormToArgs = (hydratedForm: FormData): StepArgs => {
-  switch (hydratedForm.stepType) {
+  // cast all fields that have 'fieldCaster' in stepFieldHelperMap
+  const castForm = mapValues(hydratedForm, (value, name) => castField(name, value))
+
+  switch (castForm.stepType) {
     case 'moveLiquid':
-      return moveLiquidFormToArgs({...hydratedForm, fields: hydratedForm}) // TODO: Ian 2019-01-29 nest all fields under `fields` (in #2917 ?)
+      return moveLiquidFormToArgs({...castForm, fields: castForm}) // TODO: Ian 2019-01-29 nest all fields under `fields` (in #2917 ?)
     case 'pause':
-      return pauseFormToArgs(hydratedForm)
+      return pauseFormToArgs(castForm)
     case 'mix':
-      return mixFormToArgs(hydratedForm)
+      return mixFormToArgs(castForm)
     default:
-      console.warn(`stepFormToArgs not implemented for ${hydratedForm.stepType}`)
+      console.warn(`stepFormToArgs not implemented for ${castForm.stepType}`)
       return null
   }
 }

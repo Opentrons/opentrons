@@ -5,9 +5,7 @@ import {
   incompatibleDispenseLabware,
   incompatibleLabware,
   pauseForTimeOrUntilTold,
-  wellRatioTransfer,
-  wellRatioConsolidate,
-  wellRatioDistribute,
+  wellRatioMoveLiquid,
   type FormError,
 } from './errors'
 import {
@@ -34,16 +32,8 @@ const stepFormHelperMap: {[StepType]: FormHelpers} = {
     getWarnings: composeWarnings(belowPipetteMinimumVolume),
   },
   pause: {getErrors: composeErrors(pauseForTimeOrUntilTold)},
-  transfer: {
-    getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware, wellRatioTransfer),
-    getWarnings: composeWarnings(belowPipetteMinimumVolume, maxDispenseWellVolume),
-  },
-  consolidate: {
-    getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware, wellRatioConsolidate),
-    getWarnings: composeWarnings(belowPipetteMinimumVolume, maxDispenseWellVolume),
-  },
-  distribute: {
-    getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware, wellRatioDistribute),
+  moveLiquid: {
+    getErrors: composeErrors(incompatibleAspirateLabware, incompatibleDispenseLabware, wellRatioMoveLiquid),
     getWarnings: composeWarnings(belowPipetteMinimumVolume, maxDispenseWellVolume, minDisposalVolume),
   },
 }
