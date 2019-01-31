@@ -231,6 +231,8 @@ async def attach_tip(data):
             pipette._add_tip(tip_length)
         else:
             session.adapter.add_tip(session.current_mount, tip_length)
+            if session.cp:
+                session.cp = CriticalPoint.FRONT_NOZZLE
         session.tip_length = tip_length
 
         message = "Tip length set: {}".format(tip_length)
@@ -260,6 +262,8 @@ async def detach_tip(data):
         pipette._remove_tip(session.tip_length)
     else:
         session.adapter.remove_tip(session.current_mount)
+        if session.cp:
+            session.cp = CriticalPoint.NOZZLE
     session.tip_length = None
 
     return web.json_response({'message': "Tip removed"}, status=200)
@@ -368,6 +372,8 @@ async def move(data):
                     Point(x=point[0], y=point[1], z=point[2]),
                     critical_point=session.cp)
             else:
+                if session.cp:
+                    session.cp = CriticalPoint.NOZZLE
                 session.adapter.move_to(
                     session.current_mount,
                     Point(x=point[0], y=point[1], z=point[2]),
