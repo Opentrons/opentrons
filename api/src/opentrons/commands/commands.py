@@ -1,5 +1,6 @@
 from . import types as command_types
-from ..broker import broker
+from opentrons.broker import Broker
+
 import functools
 import inspect
 from typing import Union, Sequence, List, Any
@@ -23,6 +24,19 @@ def listify(location: Any) -> List:
         return sum([listify(loc) for loc in location], [])
     else:
         return [location]
+
+
+class CommandPublisher:
+    def __init__(self, broker):
+        self._broker = broker or Broker()
+
+    @property
+    def broker(self):
+        return self._broker
+
+    @broker.setter
+    def broker(self, broker):
+        self._broker = broker
 
 
 def _stringify_new_loc(loc: Union[Location, Well]) -> str:
@@ -382,7 +396,7 @@ def resume():
     )
 
 
-def do_publish(cmd, f, when, res, meta, *args, **kwargs):
+def do_publish(broker, cmd, f, when, res, meta, *args, **kwargs):
     """ Implement the publish so it can be called outside the decorator """
     publish_command = functools.partial(
         broker.publish,
@@ -429,11 +443,18 @@ def _publish_dec(before, after, command, meta=None):
     def decorator(f):
         @functools.wraps(f, updated=functools.WRAPPER_UPDATES+('__globals__',))
         def decorated(*args, **kwargs):
+            try:
+                broker = args[0].broker
+            except AttributeError:
+                raise RuntimeError("Only methods of CommandPublisher \
+                    classes should be decorated.")
             if before:
-                do_publish(command, f, 'before', None, meta, *args, **kwargs)
+                do_publish(
+                    broker, command, f, 'before', None, meta, *args, **kwargs)
             res = f(*args, **kwargs)
             if after:
-                do_publish(command, f, 'after', res, meta, *args, **kwargs)
+                do_publish(
+                    broker, command, f, 'after', res, meta, *args, **kwargs)
             return res
         return decorated
 
@@ -449,6 +470,9 @@ class publish:
 
     Making a simple class with these as attributes does the same thing
     but in a way that mypy can actually verify.
+
+    Only commands inheriting from class CommandPublisher should contain
+    decorators.
     """
     before = functools.partial(_publish_dec, before=True, after=False)
     after = functools.partial(_publish_dec, before=False, after=True)

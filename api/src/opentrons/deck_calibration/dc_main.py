@@ -11,16 +11,19 @@ import logging
 from typing import Tuple
 from numpy.linalg import inv
 from numpy import dot, array
-from opentrons import robot, instruments
-from opentrons.config import robot_configs
+import opentrons
+from opentrons import robot, instruments, types
+from opentrons.hardware_control import adapters
+from opentrons.config import robot_configs, feature_flags
 from opentrons.util.calibration_functions import probe_instrument
 from opentrons.util.linal import solve, add_z, apply_transform
-from opentrons.deck_calibration import *
+from . import (
+    left, right, SAFE_HEIGHT, cli_dots_set,
+    position, jog, apply_mount_offset)
 
 # TODO: add tests for methods, split out current point behavior per comment
 # TODO:   below, and total result on robot against prior version of this app
 
-# logging.basicConfig(level=logging.DEBUG, filename="/data/calibration.log")
 log = logging.getLogger(__name__)
 
 
@@ -68,21 +71,32 @@ class CLITool:
         self._pile = urwid.Pile([self._tip_text_box, self._status_text_box])
         self._filler = urwid.Filler(self._pile, 'top')
 
+        if not feature_flags.use_protocol_api_v2():
+            self.hardware = robot
+            self._current_mount = right
+        else:
+            api = opentrons.hardware_control.API
+            self.hardware = adapters.SynchronousAdapter.build(
+                api.build_hardware_controller, force=True)
+            self._current_mount = types.Mount.RIGHT
+            self.hardware.cache_instruments()
+
         self.ui_loop = urwid.MainLoop(
             self._filler,
             handle_mouse=False,
             unhandled_input=self._on_key_press,
             event_loop=loop
         )
-
+        self._config = self.hardware.config
+        self.calibration_matrix = self._config.gantry_calibration
         # Other state
         self._tip_length = tip_length
+        if feature_flags.use_protocol_api_v2():
+            self.hardware.add_tip(self._current_mount, self._tip_length)
         self.current_position = (0, 0, 0)
         self._steps = [0.1, 0.25, 0.5, 1, 5, 10, 20, 40, 80]
         self._steps_index = 2
-        self._current_pipette = right
         self._current_point = 1
-        self._calibration_matrix = robot.config.gantry_calibration
 
         self._expected_points = {
             key: (vX, vY, tip_length)
@@ -101,28 +115,49 @@ class CLITool:
             '-': lambda: self.decrease_step(),
             '=': lambda: self.increase_step(),
             'z': lambda: self.save_z_value(),
-            'p': lambda: probe(self._tip_length),
+            'p': lambda: probe(self._tip_length, self.hardware),
             'enter': lambda: self.save_point(),
             '\\': lambda: self.home(),
             ' ': lambda: self.save_transform(),
             'esc': lambda: self.exit(),
-            'q': lambda: self._jog(
-                self._current_pipette, +1, self.current_step()),
-            'a': lambda: self._jog(
-                self._current_pipette, -1, self.current_step()),
+            'q': lambda: self._jog('z', +1, self.current_step()),
+            'a': lambda: self._jog('z', -1, self.current_step()),
             'up': lambda: self._jog('Y', +1, self.current_step()),
             'down': lambda: self._jog('Y', -1, self.current_step()),
             'left': lambda: self._jog('X', -1, self.current_step()),
             'right': lambda: self._jog('X', +1, self.current_step()),
             'm': lambda: self.validate_mount_offset(),
-            '1': lambda: self.validate(self._expected_points[1], 1, right),
-            '2': lambda: self.validate(self._expected_points[2], 2, right),
-            '3': lambda: self.validate(self._expected_points[3], 3, right),
-            '4': lambda: self.validate(self._test_points['slot5'], 4, right),
-            '5': lambda: self.validate(self._test_points['corner3'], 5, right),
-            '6': lambda: self.validate(self._test_points['corner8'], 6, right),
-            '7': lambda: self.validate(self._test_points['corner9'], 7, right)
+            '1': lambda: self.validate(
+                self._expected_points[1], 1, self._current_mount),
+            '2': lambda: self.validate(
+                self._expected_points[2], 2, self._current_mount),
+            '3': lambda: self.validate(
+                self._expected_points[3], 3, self._current_mount),
+            '4': lambda: self.validate(
+                self._test_points['slot5'], 4, self._current_mount),
+            '5': lambda: self.validate(
+                self._test_points['corner3'], 5, self._current_mount),
+            '6': lambda: self.validate(
+                self._test_points['corner8'], 6, self._current_mount),
+            '7': lambda: self.validate(
+                self._test_points['corner9'], 7, self._current_mount)
         }
+
+    @property
+    def hardware(self):
+        return self._hardware
+
+    @hardware.setter
+    def hardware(self, hardware):
+        self._hardware = hardware
+
+    @property
+    def calibration_matrix(self):
+        return self._calibration_matrix
+
+    @calibration_matrix.setter
+    def calibration_matrix(self, calibration):
+        self._calibration_matrix = calibration
 
     def current_step(self):
         return self._steps[self._steps_index]
@@ -148,14 +183,14 @@ class CLITool:
         # TODO (ben 20180201): create a function in linal module so we don't
         # TODO                 have to do dot product & etc here
         point = array(list(point) + [1])
-        x, y, z, _ = dot(robot.config.gantry_calibration, point)
+        x, y, z, _ = dot(self.calibration_matrix, point)
         return (x, y, z)
 
     def _driver_to_deck_coords(self, point):
         # TODO (ben 20180201): create a function in linal module so we don't
         # TODO                 have to do dot product & etc here
         point = array(list(point) + [1])
-        x, y, z, _ = dot(inv(robot.config.gantry_calibration), point)
+        x, y, z, _ = dot(inv(self.calibration_matrix), point)
         return (x, y, z)
 
     def _position(self):
@@ -164,7 +199,7 @@ class CLITool:
         to the axis of a pipette currently used
         """
 
-        res = position(self._current_pipette)
+        res = position(self._current_mount, self.hardware)
 
         return res
 
@@ -173,7 +208,8 @@ class CLITool:
         Move the pipette on `axis` in `direction` by `step` and update the
         position tracker
         """
-        jog(axis, direction, step)
+        jog(axis, direction, step, self.hardware, self._current_mount)
+
         self.current_position = self._position()
         return 'Jog: {}'.format([axis, str(direction), str(step)])
 
@@ -181,7 +217,7 @@ class CLITool:
         """
         Return the robot to the home position and update the position tracker
         """
-        robot.home()
+        self.hardware.home()
         self.current_position = self._position()
         return 'Homed'
 
@@ -191,7 +227,9 @@ class CLITool:
         current position once the 'Enter' key is pressed to the 'actual points'
         vector.
         """
-        if self._current_pipette is left:
+        if self._current_mount is left:
+            msg = self.save_mount_offset()
+        elif self._current_mount is types.Mount.LEFT:
             msg = self.save_mount_offset()
         else:
             pos = self._position()[:-1]
@@ -207,17 +245,18 @@ class CLITool:
         log.debug("save_mount_offset position: {}".format(pos))
         cx, cy, cz = self._driver_to_deck_coords(pos)
         log.debug("save_mount_offset cxyz: {}".format((cx, cy, cz)))
-        ex, ey, ez = apply_mount_offset(self._expected_points[1])
+        ex, ey, ez = apply_mount_offset(
+            self._expected_points[1], self.hardware)
         log.debug("save_mount_offset exyz: {}".format((ex, ey, ez)))
         dx, dy, dz = (cx - ex, cy - ey, cz - ez)
         log.debug("save_mount_offset dxyz: {}".format((dx, dy, dz)))
-        mx, my, mz = robot.config.mount_offset
+        mx, my, mz = self.hardware.config.mount_offset
         log.debug("save_mount_offset mxyz: {}".format((mx, my, mz)))
         offset = (mx - dx, my - dy, mz - dz)
         log.debug("save_mount_offset mount offset: {}".format(offset))
-        robot.update_config(mount_offset=offset)
+        self.hardware.update_config(mount_offset=offset)
         msg = 'saved mount-offset: {}'.format(
-            robot.config.mount_offset)
+            self.hardware.config.mount_offset)
         return msg
 
     def save_transform(self) -> str:
@@ -235,43 +274,46 @@ class CLITool:
         # Generate a 2 dimensional transform matrix from the two matricies
         flat_matrix = solve(expected, actual)
         log.debug("save_transform flat_matrix: {}".format(flat_matrix))
-        current_z = self._calibration_matrix[2][3]
+        current_z = self.calibration_matrix[2][3]
         # Add the z component to form the 3 dimensional transform
-        self._calibration_matrix = add_z(flat_matrix, current_z)
+        self.calibration_matrix = add_z(flat_matrix, current_z)
         gantry_calibration = list(
-                map(lambda i: list(i), self._calibration_matrix))
+                map(lambda i: list(i), self.calibration_matrix))
         log.debug("save_transform calibration_matrix: {}".format(
             gantry_calibration))
 
-        robot.update_config(gantry_calibration=gantry_calibration)
-        res = str(robot.config)
+        self.hardware.update_config(gantry_calibration=gantry_calibration)
+        res = str(self.hardware.config)
 
-        return '{}\n{}'.format(res, save_config())
+        return '{}\n{}'.format(res, save_config(self.hardware.config))
 
     def save_z_value(self) -> str:
         actual_z = self._position()[-1]
-        expected_z = self._calibration_matrix[2][3] + self._tip_length
-        new_z = self._calibration_matrix[2][3] + actual_z - expected_z
+        expected_z = self.calibration_matrix[2][3] + self._tip_length
+        new_z = self.calibration_matrix[2][3] + actual_z - expected_z
         log.debug("Saving z value: {}".format(new_z))
-        self._calibration_matrix[2][3] = new_z
+        self.calibration_matrix[2][3] = new_z
         return 'saved Z-Offset: {}'.format(new_z)
 
     def _left_mount_offset(self):
         lx, ly, lz = self._expected_points[1]
-        mx, my, mz = robot.config.mount_offset
+        mx, my, mz = self.hardware.config.mount_offset
         return (lx - mx, ly - my, lz - mz)
 
     def validate_mount_offset(self):
         # move the RIGHT pipette to expected point, then immediately after
         # move the LEFT pipette to that same point
-        self.validate(self._expected_points[1], 1, right)
-        self.validate(apply_mount_offset(self._expected_points[1]), 0, left)
+        self.validate(self._expected_points[1], 1, self._current_mount)
+        self.validate(
+            apply_mount_offset(self._expected_points[1], self.hardware),
+            0,
+            self._current_mount)
 
     def validate(
             self,
             point: Tuple[float, float, float],
             point_num: int,
-            pipette: str) -> str:
+            pipette_mount) -> str:
         """
         :param point: Expected values from mechanical drawings
         :param point_num: The current position attempting to be validated
@@ -280,10 +322,10 @@ class CLITool:
         :return:
         """
         _, _, cz = self._driver_to_deck_coords(self._position())
-        if self._current_pipette != pipette and cz < SAFE_HEIGHT:
+        if self._current_mount != pipette_mount and cz < SAFE_HEIGHT:
             self.move_to_safe_height()
 
-        self._current_pipette = pipette
+        self._current_mount = pipette_mount
         self._current_point = point_num
 
         _, _, cz = self._driver_to_deck_coords(self._position())
@@ -291,17 +333,36 @@ class CLITool:
             self.move_to_safe_height()
 
         tx, ty, tz = self._deck_to_driver_coords(point)
-        robot._driver.move({'X': tx, 'Y': ty})
-        robot._driver.move({self._current_pipette: tz})
-
+        if not feature_flags.use_protocol_api_v2():
+            self.hardware._driver.move({'X': tx, 'Y': ty})
+            z_axis = self._get_z_axis(self._current_mount)
+            self.hardware._driver.move({z_axis: tz})
+        else:
+            pt = types.Point(x=tx, y=ty, z=tz)
+            self.hardware.move_to(self._current_mount, pt)
         return 'moved to point {}'.format(point)
+
+    def _get_z_axis(self, mount):
+        z_axis = None
+        if mount == 'left':
+            z_axis = 'Z'
+        elif mount == 'right':
+            z_axis = 'A'
+        return z_axis
 
     def move_to_safe_height(self):
         cx, cy, _ = self._driver_to_deck_coords(self._position())
         _, _, sz = self._deck_to_driver_coords((cx, cy, SAFE_HEIGHT))
-        robot._driver.move({self._current_pipette: sz})
+        if not feature_flags.use_protocol_api_v2():
+            z_axis = self._get_z_axis(self._current_mount)
+            self.hardware._driver.move({z_axis: sz})
+        else:
+            pt = types.Point(x=cx, y=cy, z=sz)
+            self.hardware.move_to(self._current_mount, pt)
 
     def exit(self):
+        if feature_flags.use_protocol_api_v2():
+            self.hardware.remove_tip(self._current_mount)
         raise urwid.ExitMainLoop
 
     # Private methods for URWID
@@ -325,9 +386,8 @@ class CLITool:
 
         text = '\n'.join([
             points,
-            # 'Smoothie: {}'.format(self.current_position),
             'World: {}'.format(apply_transform(
-                inv(self._calibration_matrix), self.current_position)),
+                inv(self.calibration_matrix), self.current_position)),
             'Step: {}'.format(self.current_step()),
             'Message: {}'.format(msg)
         ])
@@ -336,43 +396,44 @@ class CLITool:
 
 
 # Functions for backing key-press
-def probe(tip_length: float) -> str:
-    robot.reset()
+def probe(tip_length: float, hardware) -> str:
+    if not feature_flags.use_protocol_api_v2():
+        hardware.reset()
 
-    # TODO seth, 10/29/2018: Change this to not use a deprecated ctor
-    pipette = instruments.Pipette(  # type: ignore
-        mount='right', channels=1,
-        max_volume=1000, ul_per_mm=1000)
-    probe_center = tuple(probe_instrument(
-        pipette, robot, tip_length=tip_length))
-    log.debug("Setting probe center to {}".format(probe_center))
-    robot.update_config(probe_center=probe_center)
+        pipette = instruments.P300_Single(mount='right')   # type: ignore
+        probe_center = tuple(probe_instrument(
+            pipette, robot, tip_length=tip_length))
+        log.debug("Setting probe center to {}".format(probe_center))
+    else:
+        probe_center = hardware.locate_tip_probe_center(tip_length)
+    hardware.update_config(probe_center=probe_center)
     return 'Tip probe'
 
 
-def save_config() -> str:
+def save_config(config) -> str:
     try:
-        robot_configs.save_robot_settings(robot.config)
-        robot_configs.save_deck_calibration(robot.config)
+        robot_configs.save_robot_settings(config)
+        robot_configs.save_deck_calibration(config)
         result = robot_configs.load()
     except Exception as e:
         result = repr(e)
     return result
 
 
-def clear_configuration_and_reload():
+def clear_configuration_and_reload(hardware):
     robot_configs.clear()
-    robot.config = robot_configs.load()
-    robot.reset()
+    hardware.config = robot_configs.load()
+    if not feature_flags.use_protocol_api_v2():
+        hardware.reset()
 
 
-def backup_configuration(tag):
-    robot_configs.backup_configuration(robot.config, tag)
+def backup_configuration(hardware, tag):
+    robot_configs.backup_configuration(hardware.config, tag)
 
 
-def backup_configuration_and_reload(tag=None):
-    backup_configuration(tag)
-    clear_configuration_and_reload()
+def backup_configuration_and_reload(hardware, tag=None):
+    backup_configuration(hardware, tag)
+    clear_configuration_and_reload(hardware)
 
 
 def get_calibration_points():
@@ -415,29 +476,30 @@ def main():
     if prompt not in ['y', 'Y', 'yes']:
         print('Exiting--prior configuration data not changed')
         sys.exit()
-    backup_configuration_and_reload()
-
-    robot.connect()
-    robot.home()
-
-    # lights help the script user to see the points on the deck
-    robot.turn_on_rail_lights()
-    atexit.register(robot.turn_off_rail_lights)
-
     # Notes:
     #  - 200ul tip is 51.7mm long when attached to a pipette
     #  - For xyz coordinates, (0, 0, 0) is the lower-left corner of the robot
     cli = CLITool(
         point_set=get_calibration_points(),
         tip_length=51.7)
+    hardware = cli.hardware
+    backup_configuration_and_reload(hardware)
+    if not feature_flags.use_protocol_api_v2():
+        hardware.connect()
+        hardware.turn_on_rail_lights()
+        atexit.register(hardware.turn_off_rail_lights)
+    else:
+        hardware.set_lights(rails=True)
+    cli.home()
+    # lights help the script user to see the points on the deck
     cli.ui_loop.run()
-
-    print('Robot config: \n', robot.config)
+    if feature_flags.use_protocol_api_v2():
+        hardware.set_lights(rails=False)
+    print('Robot config: \n', cli._config)
 
 
 def notify_and_restart():
     print('Exiting configuration tool and restarting system')
-    backup_configuration(tag=None)
     os.system("kill 1")
 
 
@@ -445,5 +507,4 @@ if __name__ == "__main__":
     # Register hook to reboot the robot after exiting this tool (regardless of
     # whether this process exits normally or not)
     atexit.register(notify_and_restart)
-
     main()

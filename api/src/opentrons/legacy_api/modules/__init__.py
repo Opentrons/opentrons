@@ -45,7 +45,8 @@ def load(name, slot):
         if _mod_robot.is_simulating():
             labware_instance = _mod_labware.load(name, slot)
             module_class = SUPPORTED_MODULES.get(name)
-            module_instance = module_class(lw=labware_instance)
+            module_instance = module_class(
+                lw=labware_instance, broker=_mod_robot.broker)
         else:
             # TODO: BC 2018-08-01 this currently loads the first module of
             # that type that is on the robot, in the future we should add
@@ -87,7 +88,8 @@ def discover_and_connect():
         if match:
             module_class = SUPPORTED_MODULES.get(match.group().lower())
             absolute_port = '/dev/modules/{}'.format(port)
-            discovered_modules.append(module_class(port=absolute_port))
+            discovered_modules.append(
+                module_class(port=absolute_port, broker=_mod_robot.broker))
 
     log.debug('Discovered modules: {}'.format(discovered_modules))
     for module in discovered_modules:

@@ -1,5 +1,5 @@
-from opentrons import robot
 from opentrons.config import feature_flags as ff
+from opentrons import types
 
 # Application constants
 SAFE_HEIGHT = 130
@@ -63,33 +63,36 @@ y_row = 1
 z_row = 2
 
 
-def position(axis: str):
+def position(axis, hardware, cp=None):
     """
     Read position from driver into a tuple and map 3-rd value
     to the axis of a pipette currently used
     """
-    p = robot._driver.position
-    return (p['X'], p['Y'], p[axis.upper()])
 
-
-def jog(axis, direction, step):
-    robot._driver.move(
-        {axis: robot._driver.position[axis] + direction * step})
-
-    return position(axis)
-
-
-def set_calibration_value(rbt, axis: str, value: float):
-    if axis == 'x':
-        row = x_row
-    elif axis == 'y':
-        row = y_row
+    if not ff.use_protocol_api_v2():
+        p = hardware._driver.position
+        return (p['X'], p['Y'], p[axis])
     else:
-        row = z_row
-    rbt.config.gantry_calibration[row][xyz_column] = value
+        p = hardware.gantry_position(axis, critical_point=cp)
+        return (p.x, p.y, p.z)
 
 
-def apply_mount_offset(point: tuple) -> tuple:
+def jog(axis, direction, step, hardware, mount, cp=None):
+    if not ff.use_protocol_api_v2():
+        if axis == 'z':
+            axis = 'Z' if mount == 'left' else 'A'
+
+        hardware._driver.move(
+            {axis.upper():
+                hardware._driver.position[axis.upper()] + direction * step})
+        return position(axis.upper(), hardware)
+    else:
+        pt = types.Point(**{axis.lower(): direction*step})
+        hardware.move_rel(mount, pt)
+        return position(mount, hardware, cp)
+
+
+def apply_mount_offset(point, hardware):
     px, py, pz = point
-    mx, my, mz = robot.config.mount_offset
+    mx, my, mz = hardware.config.mount_offset
     return (px - mx, py - my, pz - mz)

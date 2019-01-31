@@ -25,7 +25,7 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
     """
 
     @classmethod
-    def build(cls, builder, *args, **kwargs):
+    def build(cls, builder, *args, build_loop=None, **kwargs):
         """ Build a hardware control API and initialize the adapter in one call
 
         :param builder: the builder method to use (e.g.
@@ -37,7 +37,11 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
         kwargs['loop'] = loop
         args = [arg for arg in args
                 if not isinstance(arg, asyncio.AbstractEventLoop)]
-        api = builder(*args, **kwargs)
+        if asyncio.iscoroutinefunction(builder):
+            checked_loop = build_loop or asyncio.get_event_loop()
+            api = checked_loop.run_until_complete(builder(*args, **kwargs))
+        else:
+            api = builder(*args, **kwargs)
         return cls(api, loop)
 
     def __init__(self,
@@ -64,7 +68,6 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
         super().start()
 
     def _event_loop_in_thread(self):
-        # asyncio.set_event_loop(self._loop)
         loop = object.__getattribute__(self, '_loop')
         loop.run_forever()
         loop.close()

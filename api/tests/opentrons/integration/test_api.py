@@ -31,24 +31,14 @@ def test_smoke(virtual_smoothie_env, smoke):
 async def test_multi_single(main_router, protocol, protocol_file, dummy_db):
     robot.connect()
     robot.home()
-
     session = main_router.session_manager.create(
         name='<blank>', text=protocol.text)
+
     await main_router.wait_until(state('session', 'loaded'))
 
     main_router.calibration_manager.move_to(
         session.instruments[0],
         session.containers[2])
-
-    # print(coords)
-    # Move to pick up tip
-    # assert (111.0, 244.0, 74.0) in coords
-    # assert (111.0, 244.0, 64.0) in coords
-    # assert (111.0, 244.0, 59.0) in coords
-
-    # # Aspirate and move
-    # assert (110.0, 135.0, 67.0) in coords
-    # assert (110.0, 144.0, 58.0) in coords
 
 
 @pytest.mark.api1_only

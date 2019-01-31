@@ -76,7 +76,7 @@ class TickTock(object):
         for i in range(5):
             self.running.wait()
             self.notifications.put(i)
-            time.sleep(0.1)
+            time.sleep(.1)
         return "Done!"
 
     def pause(self):

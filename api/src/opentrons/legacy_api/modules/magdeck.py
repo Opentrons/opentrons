@@ -12,11 +12,12 @@ class MissingDevicePortError(Exception):
 # TODO: BC 2018-08-03 this class shares a fair amount verbatim from TempDeck,
 # there should be an upstream ABC in the future to contain shared logic
 # between modules
-class MagDeck:
+class MagDeck(commands.CommandPublisher):
     '''
     Under development. API subject to change
     '''
-    def __init__(self, lw=None, port=None):
+    def __init__(self, lw=None, port=None, broker=None):
+        super().__init__(broker)
         self.labware = lw
         self._port = port
         self._engaged = False

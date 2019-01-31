@@ -3,14 +3,14 @@ import asyncio
 from asyncio import Queue
 from contextlib import contextmanager
 
-subscriptions: dict = {}
-
 
 class Notifications(object):
-    def __init__(self, loop=None):
+    def __init__(self, topics, broker, loop=None):
         self.loop = loop or asyncio.get_event_loop()
         self.queue = Queue(loop=self.loop)
         self.snoozed = False
+        self._unsubscribe = [
+            broker.subscribe(topic, self.on_notify) for topic in topics]
 
     @contextmanager
     def snooze(self):
@@ -32,18 +32,20 @@ class Notifications(object):
         return self
 
 
-def subscribe(topic, handler):
-    handlers = subscriptions[topic] = subscriptions.get(topic, [])
-    if handler in handlers:
-        return
+class Broker:
 
-    handlers.append(handler)
+    def __init__(self):
+        self.subscriptions = {}
 
-    def unsubscribe():
-        handlers.remove(handler)
+    def subscribe(self, topic, handler):
+        if handler in self.subscriptions.setdefault(topic, []):
+            return
+        self.subscriptions[topic].append(handler)
 
-    return unsubscribe
+        def unsubscribe():
+            self.subscriptions[topic].remove(handler)
 
+        return unsubscribe
 
-def publish(topic, message):
-    [handler(message) for handler in subscriptions.get(topic, [])]
+    def publish(self, topic, message):
+        [handler(message) for handler in self.subscriptions.get(topic, [])]

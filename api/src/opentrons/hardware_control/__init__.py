@@ -144,6 +144,7 @@ class API(HardwareAPILike):
         This method may be used both on a real robot and on dev machines.
         Multiple simulating hardware controllers may be active at one time.
         """
+
         if None is attached_instruments:
             attached_instruments = {}
 
@@ -391,6 +392,29 @@ class API(HardwareAPILike):
                 smoothie_pos.update(self._backend.home(smoothie_plungers))
             self._current_position = self._deck_from_smoothie(smoothie_pos)
 
+    def add_tip(
+            self,
+            mount: top_types.Mount,
+            tip_length: float):
+        instr = self._attached_instruments[mount]
+        instr_dict = self.attached_instruments[mount]
+        if instr and not instr.has_tip:
+            instr.add_tip(tip_length=tip_length)
+            instr_dict['has_tip'] = True
+            instr_dict['tip_length'] = tip_length
+        else:
+            mod_log.warning('attach tip called while tip already attached')
+
+    def remove_tip(self, mount: top_types.Mount):
+        instr = self._attached_instruments[mount]
+        instr_dict = self.attached_instruments[mount]
+        if instr and instr.has_tip:
+            instr.remove_tip()
+            instr_dict['has_tip'] = False
+            instr_dict['tip_length'] = 0.0
+        else:
+            mod_log.warning('detach tip called with no tip')
+
     def _deck_from_smoothie(
             self, smoothie_pos: Dict[str, float]) -> Dict[Axis, float]:
         """ Build a deck-abs position store from the smoothie's position
@@ -524,7 +548,6 @@ class API(HardwareAPILike):
             raise MustHomeError
 
         await self._cache_and_maybe_retract_mount(mount)
-
         z_axis = Axis.by_mount(mount)
         if mount == top_types.Mount.LEFT:
             offset = top_types.Point(*self.config.mount_offset)
@@ -536,6 +559,7 @@ class API(HardwareAPILike):
              (Axis.Y, abs_position.y - offset.y - cp.y),
              (z_axis, abs_position.z - offset.z - cp.z))
         )
+
         await self._move(target_position, speed=speed)
 
     @_log_call
@@ -723,12 +747,16 @@ class API(HardwareAPILike):
         """
         return self._config
 
+    @config.setter
+    def config(self, config):
+        self._config = config
+
     def update_config(self, **kwargs):
         """ Update values of the robot's configuration.
 
-        `kwargs` should contain keys of the robot's configuration. For instace,
-        `update_config(log_level='debug)` would change the API server log level
-        to :py:attr:`logging.DEBUG`.
+        `kwargs` should contain keys of the robot's configuration. For
+        instance, `update_config(log_level='debug)` would change the API
+        server log level to :py:attr:`logging.DEBUG`.
 
         Documentation on keys can be found in the documentation for
         :py:class:`.robot_config`.
