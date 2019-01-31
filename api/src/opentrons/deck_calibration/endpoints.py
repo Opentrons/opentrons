@@ -359,11 +359,19 @@ async def move(data):
                         y=intermediate_pos[1],
                         z=session.tip_length),
                     critical_point=session.cp)
-
-            session.adapter.move_to(
-                session.current_mount,
-                Point(x=point[0], y=point[1], z=point[2]),
-                critical_point=session.cp)
+                session.adapter.move_to(
+                    session.current_mount,
+                    Point(x=point[0], y=point[1], z=session.tip_length),
+                    critical_point=session.cp)
+                session.adapter.move_to(
+                    session.current_mount,
+                    Point(x=point[0], y=point[1], z=point[2]),
+                    critical_point=session.cp)
+            else:
+                session.adapter.move_to(
+                    session.current_mount,
+                    Point(x=point[0], y=point[1], z=point[2]),
+                    critical_point=session.cp)
         message = 'Moved to {}'.format(point)
         status = 200
     else:
@@ -502,6 +510,8 @@ async def release(data):
     if not feature_flags.use_protocol_api_v2():
         session.adapter.remove_instrument('left')
         session.adapter.remove_instrument('right')
+    else:
+        session.adapter.cache_instruments()
     session = None
     return web.json_response({"message": "calibration session released"})
 

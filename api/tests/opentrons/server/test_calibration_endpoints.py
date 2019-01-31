@@ -355,12 +355,16 @@ async def test_release(async_client, async_server, monkeypatch, dc_session):
         })
     assert resp2.status == 200
     assert endpoints.session is None
-
+    if async_server['api_version'] == 2:
+        await async_server['com.opentrons.hardware'].cache_instruments({
+            types.Mount.LEFT:  None,
+            types.Mount.RIGHT: 'p300_multi_v1'
+        })
     resp3 = await async_client.post('/calibration/deck/start')
     assert resp3.status == 201
 
 
-async def test_forcing_new_session_v2(
+async def test_forcing_new_session(
         async_server, async_client, monkeypatch, dc_session):
     """
     Tests that the GET request to initiate a session manager for factory
@@ -382,10 +386,16 @@ async def test_forcing_new_session_v2(
     def uuid_mock():
         return dummy_token
 
+    async def mock_release(data):
+        return data
+
     monkeypatch.setattr(endpoints, '_get_uuid', uuid_mock)
 
     resp1 = await async_client.post('/calibration/deck/start')
     assert resp1.status == 409
+
+    if async_server['api_version'] == 2:
+        monkeypatch.setattr(endpoints, 'release', mock_release)
 
     resp2 = await async_client.post(
         '/calibration/deck/start', json={'force': 'true'})
