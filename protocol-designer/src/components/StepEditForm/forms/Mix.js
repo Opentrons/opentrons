@@ -93,7 +93,7 @@ class MixForm extends React.Component<Props, State> {
 
                   <CheckboxRowField name='blowout_checkbox' label='Blow out'>
                     <BlowoutLocationField
-                      name="dispense_blowout_location"
+                      name="blowout_location"
                       className={cx(styles.medium_field, styles.orphan_field)}
                       {...focusHandlers} />
                   </CheckboxRowField>

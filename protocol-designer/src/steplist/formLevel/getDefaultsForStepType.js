@@ -52,8 +52,8 @@ export default function getDefaultsForStepType (stepType: StepType): {[StepField
         'labware': null,
         'aspirate_wellOrder_first': DEFAULT_WELL_ORDER_FIRST_OPTION,
         'aspirate_wellOrder_second': DEFAULT_WELL_ORDER_SECOND_OPTION,
-        'dispense_blowout_checkbox': false,
-        'dispense_blowout_location': FIXED_TRASH_ID,
+        'blowout_checkbox': false,
+        'blowout_location': FIXED_TRASH_ID,
         'mix_mmFromBottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE, // NOTE: mix uses dispense for both asp + disp, for now
         'pipette': null,
         'volume': undefined,
@@ -78,9 +78,9 @@ export default function getDefaultsForStepType (stepType: StepType): {[StepField
     case 'moveLiquid':
       return {
         pipette: null,
-        volume: undefined, // TODO IMMEDIATELY why not null?
+        volume: null,
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
-        path: 'single', // TODO IMMEDIATELY move out to DEFAULT_PATH_OPTION
+        path: 'single',
         aspirate_wells_grouped: false,
 
         aspirate_labware: null,

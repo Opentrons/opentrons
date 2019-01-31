@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import {getWellRatio} from '../utils'
 import {canPipetteUseLabware} from '@opentrons/shared-data'
 import type {StepFieldName} from '../../form-types'
 
@@ -10,9 +11,7 @@ export type FormErrorKey =
   | 'INCOMPATIBLE_ASPIRATE_LABWARE'
   | 'INCOMPATIBLE_DISPENSE_LABWARE'
   | 'INCOMPATIBLE_LABWARE'
-  | 'WELL_RATIO_TRANSFER'
-  | 'WELL_RATIO_CONSOLIDATE'
-  | 'WELL_RATIO_DISTRIBUTE'
+  | 'WELL_RATIO_MOVE_LIQUID'
   | 'PAUSE_TYPE_REQUIRED'
   | 'TIME_PARAM_REQUIRED'
 
@@ -43,17 +42,8 @@ const FORM_ERRORS: {[FormErrorKey]: FormError} = {
     title: 'Must include hours, minutes, or seconds',
     dependentFields: ['pauseForAmountOfTime'],
   },
-  WELL_RATIO_TRANSFER: {
-    title: 'In transfer actions the number of source and destination wells must match',
-    body: 'You may want to use a Distribute or Consolidate instead of Transfer',
-    dependentFields: ['aspirate_wells', 'dispense_wells'],
-  },
-  WELL_RATIO_CONSOLIDATE: {
-    title: 'In consolidate actions there must be multiple source wells and one destination well',
-    dependentFields: ['aspirate_wells', 'dispense_wells'],
-  },
-  WELL_RATIO_DISTRIBUTE: {
-    title: 'In distribute actions there must be one source well and multiple destination wells',
+  WELL_RATIO_MOVE_LIQUID: {
+    title: 'Well selection must be 1 to many, many to 1, or N to N',
     dependentFields: ['aspirate_wells', 'dispense_wells'],
   },
 }
@@ -103,22 +93,10 @@ export const pauseForTimeOrUntilTold = (fields: HydratedFormData): ?FormError =>
   }
 }
 
-export const wellRatioTransfer = (fields: HydratedFormData): ?FormError => {
+export const wellRatioMoveLiquid = (fields: HydratedFormData): ?FormError => {
   const {aspirate_wells, dispense_wells} = fields
   if (!aspirate_wells || !dispense_wells) return null
-  return aspirate_wells.length !== dispense_wells.length ? FORM_ERRORS.WELL_RATIO_TRANSFER : null
-}
-
-export const wellRatioDistribute = (fields: HydratedFormData): ?FormError => {
-  const {aspirate_wells, dispense_wells} = fields
-  if (!aspirate_wells || !dispense_wells) return null
-  return aspirate_wells.length !== 1 || dispense_wells.length <= 1 ? FORM_ERRORS.WELL_RATIO_DISTRIBUTE : null
-}
-
-export const wellRatioConsolidate = (fields: HydratedFormData): ?FormError => {
-  const {aspirate_wells, dispense_wells} = fields
-  if (!aspirate_wells || !dispense_wells) return null
-  return aspirate_wells.length <= 1 || dispense_wells.length !== 1 ? FORM_ERRORS.WELL_RATIO_CONSOLIDATE : null
+  return getWellRatio(aspirate_wells, dispense_wells) ? null : FORM_ERRORS.WELL_RATIO_MOVE_LIQUID
 }
 
 /*******************

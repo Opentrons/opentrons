@@ -71,11 +71,11 @@ export default class LiquidPlacementForm extends React.Component <Props> {
 
   handleChangeVolume = (setFieldValue: *) => (e: SyntheticInputEvent<*>) => {
     const value: ?string = e.currentTarget.value
-    const processed = fieldProcessors.composeProcessors(
-      fieldProcessors.castToFloat,
+    const masked = fieldProcessors.composeMaskers(
+      fieldProcessors.maskToFloat,
       fieldProcessors.onlyPositiveNumbers,
     )(value)
-    setFieldValue('volume', processed)
+    setFieldValue('volume', masked)
   }
 
   handleSubmit = (values: ValidFormValues) => {

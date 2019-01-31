@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import zip from 'lodash/zip'
 import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
@@ -30,7 +31,8 @@ const transfer = (data: TransferFormData): CompoundCommandCreator => (prevRobotS
     * 'perDest': change tip each time you encounter a new destination well (including the first one)
     NOTE: In some situations, different changeTip options have equivalent outcomes. That's OK.
   */
-
+  assert(data.sourceWells.length === data.destWells.length,
+    `Transfer command creator expected N:N source-to-dest wells ratio. Got ${data.sourceWells.length}:${data.destWells.length}`)
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...
   const actionName = 'transfer'
 

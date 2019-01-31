@@ -33,11 +33,11 @@ const FORM_WARNINGS: {[FormWarningType]: FormWarning} = {
     title: 'Below Recommended disposal volume',
     body: (
       <React.Fragment>
-        For accuracy in distribute actions we recommend you use a disposal volume of at least the pipette&apos;s minimum.
+        For accuracy in multi-dispense actions we recommend you use a disposal volume of at least the pipette&apos;s minimum.
         Read more <KnowledgeBaseLink to='distribute'>here</KnowledgeBaseLink>.
       </React.Fragment>
     ),
-    dependentFields: ['aspirate_disposalVol_volume', 'pipette'],
+    dependentFields: ['disposalVol_volume', 'pipette'],
   },
 }
 export type WarningChecker = (mixed) => ?FormWarning
@@ -66,11 +66,11 @@ export const maxDispenseWellVolume = (fields: HydratedFormData): ?FormWarning =>
 }
 
 export const minDisposalVolume = (fields: HydratedFormData): ?FormWarning => {
-  const {aspirate_disposalVol_checkbox, aspirate_disposalVol_volume, pipette} = fields
+  const {disposalVol_checkbox, disposalVol_volume, pipette} = fields
   if (!(pipette && pipette.spec)) return null
-  const isUnselected = !aspirate_disposalVol_checkbox || !aspirate_disposalVol_volume
+  const isUnselected = !disposalVol_checkbox || !disposalVol_volume
   if (isUnselected) return FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME
-  const isBelowMin = aspirate_disposalVol_volume < (pipette.spec.minVolume)
+  const isBelowMin = disposalVol_volume < (pipette.spec.minVolume)
   return isBelowMin ? FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME : null
 }
 
