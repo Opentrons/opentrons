@@ -1,7 +1,6 @@
 # pylama:ignore=W0612
 import json
 import os
-import tempfile
 import time
 
 import pytest

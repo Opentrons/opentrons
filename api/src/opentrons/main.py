@@ -13,6 +13,7 @@ from opentrons.system import udev, resin
 
 log = logging.getLogger(__name__)
 
+
 def log_init():
     """
     Function that sets log levels and format strings. Checks for the
