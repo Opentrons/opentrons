@@ -1,14 +1,31 @@
 // @flow
 import mapValues from 'lodash/mapValues'
-import merge from 'lodash/merge'
 import omit from 'lodash/omit'
-import {initialDeckSetupStepForm, type SavedStepFormState} from '../step-forms/reducers'
-import {INITIAL_DECK_SETUP_STEP_ID} from '../constants'
-import type {ProtocolFile, FileLabware, FilePipette} from '../file-types'
-import type {FormData} from '../form-types'
+import flow from 'lodash/flow'
+import {initialDeckSetupStepForm} from '../../step-forms/reducers'
+import {INITIAL_DECK_SETUP_STEP_ID} from '../../constants'
+import type {ProtocolFile, FileLabware, FilePipette} from '../../file-types'
+import type {FormData} from '../../form-types'
 
-function _addDeckSetupStepIfMissing (fileData: ProtocolFile): ProtocolFile {
-  // builds the initial deck setup step for older protocols that didn't have one.
+const PRESENT_MIGRATION_VERSION = 1
+
+function renameOrderedSteps (fileData: ProtocolFile): ProtocolFile {
+  const {data} = fileData['designer-application']
+  return {
+    ...fileData,
+    'designer-application': {
+      ...fileData['designer-application'],
+      data: {
+        ...data,
+        orderedStepIds: data.orderedStepIds || data.orderedSteps,
+        orderedSteps: undefined,
+      },
+    },
+  }
+}
+
+// builds the initial deck setup step for older protocols that didn't have one.
+function addInitialDeckSetupStep (fileData: ProtocolFile): ProtocolFile {
   const savedStepForms = fileData['designer-application'].data.savedStepForms
 
   // already has deck setup step, pass thru
@@ -43,6 +60,24 @@ function _addDeckSetupStepIfMissing (fileData: ProtocolFile): ProtocolFile {
   }
 }
 
+function stepFormKeysToCamelCase (fileData: ProtocolFile): ProtocolFile {
+  // migrate old kebab-case keys to camelCase
+  return {
+    ...fileData,
+    'designer-application': {
+      ...fileData['designer-application'],
+      data: {
+        ...fileData['designer-application'].data,
+        savedStepForms: mapValues(fileData['designer-application'].data.savedStepForms, (stepForm) => ({
+          ...omit(stepForm, ['step-name', 'step-details']),
+          stepName: stepForm.stepName || stepForm['step-name'],
+          stepDetails: stepForm.stepDetails || stepForm['step-details'],
+        })),
+      },
+    },
+  }
+}
+
 function _consolidateToMoveLiquid (formData: FormData): FormData {
   return {
     ...formData,
@@ -64,11 +99,7 @@ function _transferToMoveLiquid (formData: FormData): FormData {
   }
 }
 
-const FLEXIBLE_TRANSFER_MIGRATION_VERSION = 1
-function _migrateToMoveLiquid (fileData: ProtocolFile): $PropertyType<ProtocolFile, 'designer-application'> {
-  const {migrationVersion} = fileData['designer-application']
-  if (migrationVersion && migrationVersion >= FLEXIBLE_TRANSFER_MIGRATION_VERSION) return fileData
-
+function replaceTCDStepsWithMoveLiquidStep (fileData: ProtocolFile): ProtocolFile {
   const savedStepForms = fileData['designer-application'].data.savedStepForms
   const migratedStepForms = mapValues(savedStepForms, (formData) => {
     const {stepType} = formData
@@ -80,11 +111,11 @@ function _migrateToMoveLiquid (fileData: ProtocolFile): $PropertyType<ProtocolFi
       return _transferToMoveLiquid(formData)
     }
   })
+
   return {
     ...fileData,
     'designer-application': {
       ...fileData['designer-application'],
-      migrationVersion: FLEXIBLE_TRANSFER_MIGRATION_VERSION,
       data: {
         ...fileData['designer-application'].data,
         savedStepForms: migratedStepForms,
@@ -93,36 +124,27 @@ function _migrateToMoveLiquid (fileData: ProtocolFile): $PropertyType<ProtocolFi
   }
 }
 
-function migrateSavedStepForms (fileData: ProtocolFile): SavedStepFormState {
-  const withDeckSetup = _addDeckSetupStepIfMissing(fileData)
-
-  // migrate old kebab-case keys to camelCase
-  const withDeckSetupAndCamelCase = mapValues(withDeckSetup, (stepForm) => ({
-    ...omit(stepForm, ['step-name', 'step-details']),
-    stepName: stepForm.stepName || stepForm['step-name'],
-    stepDetails: stepForm.stepDetails || stepForm['step-details'],
-  }))
-
-  return _migrateToMoveLiquid(withDeckSetupAndCamelCase)
-}
-
-export default function migrateFile (file: any): ProtocolFile {
-  const updatePdMetadata = {
+function updateMigrationVersion (fileData: ProtocolFile): ProtocolFile {
+  return {
+    ...fileData,
     'designer-application': {
-      data: {
-        // orderedSteps -> orderedStepIds renaming
-        orderedStepIds: file['designer-application'].data.orderedStepIds ||
-          file['designer-application'].data.orderedSteps,
-        orderedSteps: undefined,
-        // add initial deck setup step if missing
-        savedStepForms: migrateSavedStepForms(file),
-      },
+      ...fileData['designer-application'],
+      migrationVersion: PRESENT_MIGRATION_VERSION,
     },
   }
+}
 
-  return merge(
-    {},
-    file,
-    updatePdMetadata,
-  )
+export default function migrateFile (fileData: any): ProtocolFile {
+  const {migrationVersion} = fileData['designer-application']
+  if (migrationVersion && migrationVersion >= PRESENT_MIGRATION_VERSION) {
+    return fileData
+  } else {
+    return flow([
+      renameOrderedSteps,
+      addInitialDeckSetupStep,
+      stepFormKeysToCamelCase,
+      replaceTCDStepsWithMoveLiquidStep,
+      updateMigrationVersion,
+    ])
+  }
 }

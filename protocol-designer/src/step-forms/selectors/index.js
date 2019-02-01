@@ -1,4 +1,11 @@
 // @flow
+import type {ElementProps} from 'react'
+import type {
+  DeckSlot,
+  DropdownOption,
+  Mount,
+} from '@opentrons/components'
+import {typeof InstrumentGroup as InstrumentGroupProps} from '@opentrons/components'
 import assert from 'assert'
 import forEach from 'lodash/forEach'
 import isEmpty from 'lodash/isEmpty'
@@ -8,31 +15,15 @@ import {createSelector} from 'reselect'
 import {getIsTiprack, getPipetteNameSpecs, getLabware} from '@opentrons/shared-data'
 import i18n from '../../localization'
 import {DISPOSAL_LABWARE_TYPES, INITIAL_DECK_SETUP_STEP_ID} from '../../constants'
-import {
-  generateNewForm,
-  getFormWarnings,
-  getFormErrors,
-  stepFormToArgs,
-} from '../../steplist/formLevel'
-import {
-  hydrateField,
-  getFieldErrors,
-} from '../../steplist/fieldLevel'
+import {generateNewForm, getFormWarnings, getFormErrors, stepFormToArgs} from '../../steplist/formLevel'
+import {hydrateField, getFieldErrors} from '../../steplist/fieldLevel'
 import {addSpecsToPipetteInvariantProps} from '../utils'
 import {labwareToDisplayName} from '../../labware-ingred/utils'
 
-import type {ElementProps} from 'react'
-import type {
-  DeckSlot,
-  DropdownOption,
-  Mount,
-} from '@opentrons/components'
-import {typeof InstrumentGroup as InstrumentGroupProps} from '@opentrons/components'
-
-import type {
-  FormWarning,
-} from '../../steplist/formLevel'
-
+import type {FormWarning} from '../../steplist/formLevel'
+import type {BaseState, Selector, Options} from '../../types'
+import type {FormData, StepIdType, StepType} from '../../form-types'
+import type {Labware, LabwareTypeById} from '../../labware-ingred/types'
 import type {
   StepArgsAndErrors,
   StepFormAndFieldErrors,
@@ -48,9 +39,6 @@ import type {
   FormPipettesByMount,
 } from '../types'
 import type {RootState} from '../reducers'
-import type {BaseState, Selector, Options} from '../../types'
-import type {FormData, StepIdType, StepType} from '../../form-types'
-import type {Labware, LabwareTypeById} from '../../labware-ingred/types'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 

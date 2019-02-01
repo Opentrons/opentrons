@@ -6,16 +6,8 @@ import isEmpty from 'lodash/isEmpty'
 import * as stepFormSelectors from '../../step-forms/selectors' // TODO Ian 2018-12-20: fix circular dependency so this direct import isn't required
 import type {StepIdType} from '../../form-types'
 import type {BaseState, Selector} from '../../types'
-import {
-  initialSelectedItemState,
-  type SelectableItem,
-  type StepsState,
-} from './reducers'
-
-import type {
-  SubstepIdentifier,
-  TerminalItemId,
-} from '../../steplist/types'
+import {initialSelectedItemState, type SelectableItem, type StepsState} from './reducers'
+import type {SubstepIdentifier, TerminalItemId} from '../../steplist/types'
 
 const rootSelector = (state: BaseState): StepsState => state.ui.steps
 
