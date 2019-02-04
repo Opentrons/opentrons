@@ -58,7 +58,7 @@ const wellRatioUpdatesMap = [
 ]
 const wellRatioUpdater = makeConditionalPatchUpdater(wellRatioUpdatesMap)
 
-function updatePatchPathField (patch, rawForm, pipetteEntities) {
+export function updatePatchPathField (patch, rawForm, pipetteEntities) {
   const appliedPatch = {...rawForm, ...patch}
   const {path, changeTip} = appliedPatch
   // pass-thru: incomplete form

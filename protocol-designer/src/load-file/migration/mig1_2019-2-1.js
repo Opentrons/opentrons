@@ -3,6 +3,7 @@ import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import flow from 'lodash/flow'
 import {initialDeckSetupStepForm} from '../../step-forms/reducers'
+import {updatePatchPathField} from '../../steplist/formLevel/handleFormChange/dependentFieldsUpdateMoveLiquid'
 import {INITIAL_DECK_SETUP_STEP_ID} from '../../constants'
 import type {ProtocolFile, FileLabware, FilePipette} from '../../file-types'
 import type {FormData} from '../../form-types'
@@ -78,32 +79,12 @@ function stepFormKeysToCamelCase (fileData: ProtocolFile): ProtocolFile {
   }
 }
 
-function _consolidateToMoveLiquid (formData: FormData): FormData {
-  return {
-    ...formData,
-    stepType: 'moveLiquid',
-  }
-}
-
-function _distributeToMoveLiquid (formData: FormData): FormData {
-  const passThroughFormData = {}
-  return {
-    ...passThroughFormData,
-    stepType: 'moveLiquid',
-  }
-}
-
-function _transferToMoveLiquid (formData: FormData): FormData {
-  return {
-    ...formData,
-    stepType: 'moveLiquid',
-  }
-}
-
 function replaceTCDStepsWithMoveLiquidStep (fileData: ProtocolFile): ProtocolFile {
   const savedStepForms = fileData['designer-application'].data.savedStepForms
   const migratedStepForms = mapValues(savedStepForms, (formData) => {
     const {stepType} = formData
+
+    if (!['transfer', 'consolidate', 'distribute'].includes(stepType)) return formData
 
     const deprecatedFieldNames = [
       'aspirate_changeTip',
@@ -115,23 +96,25 @@ function replaceTCDStepsWithMoveLiquidStep (fileData: ProtocolFile): ProtocolFil
 
     const passThroughFormData = {
       ...omit(formData, deprecatedFieldNames),
-      'aspirate_wells_grouped': formData.aspirate_wells_grouped || false,
-      'disposalVolume_checkbox': formData.aspirate_disposalVol_checkbox || formData['aspirate_disposalVol_checkbox'],
-      'disposalVolume_volume': formData.aspirate_disposalVol_volume || formData['aspirate_disposalVol_volume'],
-      'changeTip': formData.changeTip || formData['aspirate_changeTip'],
-      'blowout_checkbox': formData.blowout_checkbox || formData['dispense_blowout_checkbox'],
-      'blowout_location': formData.blowout_location || formData['dispense_blowout_labware'],
+      disposalVolume_checkbox: formData.disposalVolume_checkbox || formData['aspirate_disposalVol_checkbox'],
+      disposalVolume_volume: formData.disposalVolume_volume || formData['aspirate_disposalVol_volume'],
+      changeTip: formData.changeTip || formData['aspirate_changeTip'],
+      blowout_checkbox: formData.blowout_checkbox || formData['dispense_blowout_checkbox'],
+      blowout_location: formData.blowout_location || formData['dispense_blowout_labware'],
     }
 
+    let path = 'single'
+
     if (stepType === 'consolidate') {
-      return _consolidateToMoveLiquid(formData)
+      path = 'multiAspirate'
     } else if (stepType === 'distribute') {
-      return _distributeToMoveLiquid(formData)
-    } else if (stepType === 'transfer') {
-      return _transferToMoveLiquid(formData)
-    } else {
-      return formData
+      path = 'multiDispense'
     }
+
+    const proposedPatch = {path, stepType: 'moveLiquid', aspirate_wells_grouped: false}
+
+    const resolvedPatch = updatePatchPathField(proposedPatch, passThroughFormData, fileData['pipettes'])
+    return {...passThroughFormData, ...resolvedPatch}
   })
 
   return {
