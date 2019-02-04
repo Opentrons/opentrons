@@ -106,8 +106,12 @@ function replaceTCDStepsWithMoveLiquidStep (fileData: ProtocolFile): ProtocolFil
     const pathMap = {transfer: 'single', consolidate: 'multiAspirate', distribute: 'multiDispense'}
     const proposedPatch = {path: pathMap[stepType], stepType: 'moveLiquid', aspirate_wells_grouped: false}
 
+    const pipetteEntities = mapValues(fileData['pipettes'], pipette => ({
+      ...pipette,
+      tiprackModel: fileData['designer-application'].data.pipetteTiprackAssignments[pipette.name]
+    }))
     // update path field patch if incompatible; fallback to 'single'
-    const resolvedPatch = updatePatchPathField(proposedPatch, passThroughFormData, fileData['pipettes'])
+    const resolvedPatch = updatePatchPathField(proposedPatch, passThroughFormData, pipetteEntities)
     return {...passThroughFormData, ...resolvedPatch}
   })
 
