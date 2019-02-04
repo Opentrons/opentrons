@@ -125,7 +125,6 @@ export const containers = handleActions({
     return sortedLabwareIds.reduce((acc: ContainersState, id): ContainersState => {
       const fileLabware = allFileLabware[id]
       const nickname = fileLabware['display-name']
-      console.log({fileLabware, ids: Object.keys(acc)})
       const disambiguationNumber = Object.keys(acc)
         .filter(filterId => allFileLabware[filterId]['display-name'] === nickname).length + 1
       return {

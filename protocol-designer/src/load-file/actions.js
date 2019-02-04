@@ -14,6 +14,7 @@ export const fileErrors = (payload: FileError) => ({
 })
 
 // expects valid, parsed JSON protocol.
+// TODO: IMMEDIATELY pass boolean `didMigrate` in payload, to effect unsavedChanges reducer
 const loadFileAction = (payload: ProtocolFile): LoadFileAction => ({
   type: 'LOAD_FILE',
   payload: migrateFile(payload),
@@ -49,6 +50,7 @@ export const loadProtocolFile = (event: SyntheticInputEvent<HTMLInputElement>): 
           })
         }
 
+        console.log('pP:  ', parsedProtocol)
         if (parsedProtocol) dispatch(loadFileAction(parsedProtocol))
       }
       reader.readAsText(file)

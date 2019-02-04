@@ -29,7 +29,7 @@ function addInitialDeckSetupStep (fileData: ProtocolFile): ProtocolFile {
   const savedStepForms = fileData['designer-application'].data.savedStepForms
 
   // already has deck setup step, pass thru
-  if (savedStepForms[INITIAL_DECK_SETUP_STEP_ID]) return savedStepForms
+  if (savedStepForms[INITIAL_DECK_SETUP_STEP_ID]) return fileData
 
   const additionalLabware = mapValues(fileData.labware, (labware: FileLabware) => labware.slot)
   const pipetteLocations = mapValues(fileData.pipettes, (pipette: FilePipette) => pipette.mount)
@@ -86,8 +86,9 @@ function _consolidateToMoveLiquid (formData: FormData): FormData {
 }
 
 function _distributeToMoveLiquid (formData: FormData): FormData {
+  const passThroughFormData = {}
   return {
-    ...formData,
+    ...passThroughFormData,
     stepType: 'moveLiquid',
   }
 }
@@ -103,12 +104,31 @@ function replaceTCDStepsWithMoveLiquidStep (fileData: ProtocolFile): ProtocolFil
   const savedStepForms = fileData['designer-application'].data.savedStepForms
   const migratedStepForms = mapValues(savedStepForms, (formData) => {
     const {stepType} = formData
+
+    const deprecatedFieldNames = [
+      'aspirate_changeTip',
+      'aspirate_disposalVol_checkbox',
+      'aspirate_disposalVol_volume',
+      'dispense_blowout_checkbox',
+      'dispense_blowout_labware',
+    ]
+
+    const passThroughFormData = {
+      ...omit(formData, deprecatedFieldNames),
+      'aspirate_wells_grouped': formData.aspirate_wells_grouped || false,
+      'changeTip': formData.changeTip || formData['aspirate_changeTip'],
+      'blowout_checkbox': formData.blowout_checkbox || formData['dispense_blowout_checkbox'],
+      'blowout_location': formData.blowout_location || formData['dispense_blowout_labware'],
+    }
+
     if (stepType === 'consolidate') {
       return _consolidateToMoveLiquid(formData)
     } else if (stepType === 'distribute') {
       return _distributeToMoveLiquid(formData)
     } else if (stepType === 'transfer') {
       return _transferToMoveLiquid(formData)
+    } else {
+      return formData
     }
   })
 
@@ -139,12 +159,14 @@ export default function migrateFile (fileData: any): ProtocolFile {
   if (migrationVersion && migrationVersion >= PRESENT_MIGRATION_VERSION) {
     return fileData
   } else {
-    return flow([
+    const migratedFile = flow([
       renameOrderedSteps,
       addInitialDeckSetupStep,
       stepFormKeysToCamelCase,
       replaceTCDStepsWithMoveLiquidStep,
       updateMigrationVersion,
-    ])
+    ])(fileData)
+    console.log('mG: ', migratedFile)
+    return migratedFile
   }
 }
