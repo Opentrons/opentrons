@@ -50,6 +50,19 @@
       },
       "step_notes": {
         "label": "Step Notes"
+      },
+      "path": {
+        "title": {
+          "single": "Single Transfers",
+          "multiAspirate": "Multi-Aspirate",
+          "multiDispense": "Multi-Dispense"
+        },
+        "subtitle": {
+          "single": "Speed: slower",
+          "multiAspirate": "Speed: faster",
+          "multiDispense": "Speed: faster"
+        },
+        "not_compatible": "Not compatible with current step settings"
       }
     },
     "section": {
