@@ -116,6 +116,8 @@ function replaceTCDStepsWithMoveLiquidStep (fileData: ProtocolFile): ProtocolFil
     const passThroughFormData = {
       ...omit(formData, deprecatedFieldNames),
       'aspirate_wells_grouped': formData.aspirate_wells_grouped || false,
+      'disposalVolume_checkbox': formData.aspirate_disposalVol_checkbox || formData['aspirate_disposalVol_checkbox'],
+      'disposalVolume_volume': formData.aspirate_disposalVol_volume || formData['aspirate_disposalVol_volume'],
       'changeTip': formData.changeTip || formData['aspirate_changeTip'],
       'blowout_checkbox': formData.blowout_checkbox || formData['dispense_blowout_checkbox'],
       'blowout_location': formData.blowout_location || formData['dispense_blowout_labware'],
