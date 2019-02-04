@@ -30,7 +30,7 @@ import type {
   WifiConfigureRequest,
 } from '../../../http-api-client'
 
-import type {SelectOption} from '../../SelectField'
+import type {SelectOption} from '@opentrons/components'
 
 type Props = {
   ssid: ?string,

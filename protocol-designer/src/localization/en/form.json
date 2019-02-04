@@ -31,6 +31,13 @@
           "perSource": "Per Source",
           "perDest": "Per Destination",
           "never": "Never"
+        },
+        "option_tooltip": {
+          "always": "Avoid contaminating both source & destination wells",
+          "once": "Only at start of step",
+          "perSource": "Avoid cross-contaminating source wells",
+          "perDest": "Avoid cross-contaminating destination wells",
+          "never": "Use same tip as last step"
         }
       },
       "tip_position": {
