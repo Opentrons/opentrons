@@ -128,3 +128,22 @@ Sometimes it can be inconvenient to activate a virtual environment and run thing
 Once the most recent tag is checked out, in this directory run ``make wheel``. This command builds the API into an installable Python object. Then, in this directory run ``pip install dist/opentrons-*.whl``. This command installs the API on your system. Finally, set the environment variable ``ENABLE_VIRTUAL_SMOOTHIE=true``. This prevents the API from accessing your computer as it would the robot. If you see errors about the directory ``data``, it means you have not set the environment variable.
 
 Once the API is installed and the environment variable is set, you should be able to ``import opentrons`` from anywhere on your system, including from inside Jupyter.
+
+Simulating Protocols
+--------------------
+
+To simulate a protocol using this package, you can use the console script ``opentrons_simulate``, which is installed when this package is installed from pip. For detailed information on how to run the script, run ``opentrons_simulate --help``. In general, however, simulating a protocol is as simple as running ``opentrons_simulate.exe C:\path\to\protocol`` on Windows or ``opentrons_simulate /path/to/protocol`` on OSX or Linux.
+
+The simulation script can also be invoked through python with ``python -m opentrons.simulate /path/to/protocol``.
+
+This also provides an entrypoint to use the Opentrons simulation package from other Python contexts such as an interactive prompt or Jupyter. To simulate a protocol in python, open a file containing a protocol and pass it to ``opentrons.simulate.simulate``:
+
+.. code-block:: python
+
+   import opentrons.simulate
+   protocol_file = open(’/path/to/protocol.py’)
+   opentrons.simulate.simulate(protocol_file)
+
+
+The function will either run and return or raise an  exception if there is a problem with the protocol.
+

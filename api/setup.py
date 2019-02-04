@@ -143,5 +143,10 @@ if __name__ == "__main__":
         cmdclass={
             'build_py': BuildWithSharedData,
             'sdist': SDistWithSharedData
+        },
+        entry_points={
+            'console_scripts': [
+                'opentrons_simulate = opentrons.simulate:main'
+            ]
         }
     )
