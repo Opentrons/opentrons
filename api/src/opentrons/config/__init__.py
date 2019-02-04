@@ -179,7 +179,7 @@ def load_and_migrate() -> Dict[str, Path]:
     This function does most of its work on the actual robot. It will move
     all settings files from wherever they happen to be to the proper
     place. On non-robots, this mostly just loads. In addition, it writes
-    a default config and makes sue all directories required exist (though
+    a default config and makes sure all directories required exist (though
     the files in them may not).
     """
     if IS_ROBOT:
