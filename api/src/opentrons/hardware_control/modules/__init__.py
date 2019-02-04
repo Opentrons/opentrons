@@ -7,7 +7,7 @@ from typing import List, Optional, Tuple
 from .mod_abc import AbstractModule
 # Must import tempdeck and magdeck (and other modules going forward) so they
 # actually create the subclasses
-from . import update, tempdeck, magdeck # noqa(W0611)
+from . import update, tempdeck, magdeck, thermocycler  # noqa(W0611)
 
 log = logging.getLogger(__name__)
 
