@@ -120,7 +120,9 @@ def _read_json_file(path: Union[str, 'Path']) -> Dict[str, Any]:
     try:
         with open(path, 'r') as fd:
             data = json.load(fd)
-    except (FileNotFoundError, json.JSONDecodeError) as e:
+    except FileNotFoundError:
+        data = {}
+    except json.JSONDecodeError as e:
         sys.stderr.write(
             f'Could not load advanced settings file {path}: {e}\n')
         data = {}
