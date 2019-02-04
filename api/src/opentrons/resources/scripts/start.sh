@@ -26,15 +26,6 @@ echo "[ $0 ] Starting Jupyter Notebook server"
 mkdir -p /data/user_storage/opentrons_data/jupyter
 jupyter notebook --allow-root &
 
-# Check if config exists, and alert if not found
-echo "[ $0 ] Checking for deck calibration data..."
-config_path=`python -c "from opentrons import config; print(config.get_config_index().get('deckCalibrationFile'))"`
-
-if [ ! -e "$config_path" ]; then
-    echo $config_path
-    echo "[ $0 ] Config file not found. Please perform factory calibration and then restart robot"
-fi
-
 export ENABLE_NETWORKING_ENDPOINTS=true
 echo "[ $0 ] Starting Opentrons API server"
 python -m opentrons.main -U $OT_SERVER_UNIX_SOCKET_PATH

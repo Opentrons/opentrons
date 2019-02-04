@@ -1,7 +1,6 @@
 import inspect
 import itertools
 import logging
-import os
 import traceback
 import sys
 from typing import Any, Callable, Dict, Optional
@@ -10,6 +9,7 @@ from .contexts import ProtocolContext, InstrumentContext
 from .back_compat import BCLabware
 from . import labware
 from opentrons.types import Point, Location
+from opentrons import config
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -332,7 +332,7 @@ def run_protocol(protocol_code: Any = None,
     :param context: The context to use. If ``None``, create a new
     ProtocolContext.
     """
-    if not os.environ.get('RUNNING_ON_PI'):
+    if not config.IS_ROBOT:
         simulate = True # noqa - will be used later
     if None is context and simulate:
         true_context = ProtocolContext()

@@ -4,7 +4,7 @@ import re
 import asyncio
 from .magdeck import MagDeck
 from .tempdeck import TempDeck
-from opentrons import HERE as package_root
+from opentrons import HERE as package_root, config
 
 log = logging.getLogger(__name__)
 
@@ -75,7 +75,7 @@ def load(name, slot):
 # Note: this function should be called outside the robot class, because
 # of the circular dependency that it would create if imported into robot.py
 def discover_and_connect():
-    if os.environ.get('RUNNING_ON_PI') and os.path.isdir('/dev/modules'):
+    if config.IS_ROBOT and os.path.isdir('/dev/modules'):
         devices = os.listdir('/dev/modules')
     else:
         devices = []

@@ -11,7 +11,7 @@ from typing import List, Dict, Optional, Union
 
 from opentrons.types import Location
 from opentrons.types import Point
-from opentrons.util import environment as env
+from opentrons.config import CONFIG
 
 
 class WellShape(Enum):
@@ -23,8 +23,6 @@ well_shapes = {
     'rectangular': WellShape.RECTANGULAR,
     'circular': WellShape.CIRCULAR
 }
-
-persistent_path = os.path.join(env.get_path('APP_DATA_DIR'), 'offsets')
 
 
 class Well:
@@ -616,12 +614,13 @@ def save_calibration(labware: Labware, delta: Point):
     using labware id as the filename. If the file does exist, load it and
     modify the delta and the lastModified fields under the "default" key.
     """
-    if not os.path.exists(persistent_path):
-        os.mkdir(persistent_path)
-    labware_offset_path = os.path.join(
-        persistent_path, "{}.json".format(labware._id))
-    calibration_data = _helper_offset_data_format(labware_offset_path, delta)
-    with open(labware_offset_path, 'w') as f:
+    calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
+    if not calibration_path.exists():
+        calibration_path.mkdir(parents=True, exist_ok=True)
+    labware_offset_path = calibration_path/'{}.json'.format(labware._id)
+    calibration_data = _helper_offset_data_format(
+        str(labware_offset_path), delta)
+    with labware_offset_path.open('w') as f:
         json.dump(calibration_data, f)
     labware.set_calibration(delta)
 
@@ -633,13 +632,13 @@ def save_tip_length(labware: Labware, length: float):
     using labware id as the filename. If the file does exist, load it and
     modify the length and the lastModified fields under the "tipLength" key.
     """
-    if not os.path.exists(persistent_path):
-        os.mkdir(persistent_path)
-    labware_offset_path = os.path.join(
-        persistent_path, "{}.json".format(labware._id))
+    calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
+    if not calibration_path.exists():
+        calibration_path.mkdir(parents=True, exist_ok=True)
+    labware_offset_path = calibration_path/'{}.json'.format(labware._id)
     calibration_data = _helper_tip_length_data_format(
-        labware_offset_path, length)
-    with open(labware_offset_path, 'w') as f:
+        str(labware_offset_path), length)
+    with labware_offset_path.open('w') as f:
         json.dump(calibration_data, f)
     labware.tip_length = length
 
@@ -648,10 +647,10 @@ def load_calibration(labware: Labware):
     """
     Look up a calibration if it exists and apply it to the given labware.
     """
-    labware_offset_path = os.path.join(
-        persistent_path, "{}.json".format(labware._id))
-    if os.path.exists(labware_offset_path):
-        calibration_data = _read_file(labware_offset_path)
+    calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
+    labware_offset_path = calibration_path/'{}.json'.format(labware._id)
+    if labware_offset_path.exists():
+        calibration_data = _read_file(str(labware_offset_path))
         offset_array = calibration_data['default']['offset']
         offset = Point(x=offset_array[0], y=offset_array[1], z=offset_array[2])
         labware.set_calibration(offset)
@@ -757,11 +756,12 @@ def clear_calibrations():
     Delete all calibration files for labware. This includes deleting tip-length
     data for tipracks.
     """
+    calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
     try:
         targets = [
-            f for f in os.listdir(persistent_path) if f.endswith('.json')]
+            f for f in calibration_path.iterdir() if f.suffix == '.json']
         for target in targets:
-            os.remove(os.path.join(persistent_path, target))
+            target.unlink()
     except FileNotFoundError:
         pass
 

@@ -1,6 +1,5 @@
-import os
 import json
-from opentrons import main
+from opentrons import config
 from opentrons.server import init
 
 
@@ -11,7 +10,7 @@ async def test_log_endpoints(
 
     # # Test that values are set correctly
     serial_name = "serial.log"
-    serial_file = os.path.join(main.log_file_path, serial_name)
+    serial_file = config.CONFIG['log_dir']/serial_name
     data1 = {'serial': 'No, CEREAL!'}
     with open(serial_file, 'w') as data_file:
         json.dump(data1, data_file)
@@ -21,7 +20,7 @@ async def test_log_endpoints(
     assert json.loads(s1body) == data1
 
     api_name = "api.log"
-    api_file = os.path.join(main.log_file_path, api_name)
+    api_file = config.CONFIG['log_dir']/api_name
     data2 = {'api': 'application program interface'}
     with open(api_file, 'w') as data_file:
         json.dump(data2, data_file)

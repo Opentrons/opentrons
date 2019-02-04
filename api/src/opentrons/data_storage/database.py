@@ -5,18 +5,17 @@ from typing import List
 from opentrons.legacy_api.containers.placeable\
     import Container, Well, Module, Placeable
 from opentrons.data_storage import database_queries as db_queries
-from opentrons.util import environment
 from opentrons.util.vector import Vector
 from opentrons.data_storage import labware_definitions as ldef
 from opentrons.data_storage import serializers
-from opentrons.config import feature_flags as fflags
+from opentrons.config import feature_flags as fflags, CONFIG
 import logging
 import os
 
 SUPPORTED_MODULES = ['magdeck', 'tempdeck']
 
 log = logging.getLogger(__file__)
-database_path = environment.get_path('DATABASE_FILE')
+database_path = str(CONFIG['labware_database_file'])
 if not fflags.split_labware_definitions():
     log.debug("Database path: {}".format(database_path))
 

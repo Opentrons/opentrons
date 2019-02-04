@@ -1,8 +1,14 @@
 import json
 import logging
 import os
-from copy import copy
-from opentrons.config import get_config_index
+import sys
+from typing import Any, Dict, Mapping, TYPE_CHECKING, Union
+
+from opentrons.config import CONFIG
+
+if TYPE_CHECKING:
+    from pathlib import Path  # noqa(F401) - imported for types
+
 
 log = logging.getLogger(__name__)
 
@@ -74,31 +80,31 @@ settings_by_id = {s.id: s for s in settings}
 settings_by_old_id = {s.old_id: s for s in settings}
 
 
-def get_adv_setting(_id: str) -> bool:
-    _id = _clean_id(_id)
+# TODO: LRU cache?
+def get_adv_setting(setting: str) -> bool:
+    setting = _clean_id(setting)
     s = get_all_adv_settings()
-    return s[_id].get('value')
+    return s[setting]['value']  # type: ignore
 
 
-def get_all_adv_settings() -> dict:
+def get_all_adv_settings() -> Dict[str, Dict[str, Union[str, bool]]]:
     """
     :return: a dict of settings keyed by setting ID, where each value is a
         dict with keys "id", "title", "description", and "value"
     """
-    settings_file = get_config_index()['featureFlagFile']
+    settings_file = CONFIG['feature_flags_file']
 
     values = _read_settings_file(settings_file)
-    for key, value in values.items():
-        s = copy(settings_by_id[key].__dict__)
-        s.pop('old_id')
-        values[key] = s
-        values[key]['value'] = value
-    return values
+    return {
+        key: {**settings_by_id[key].__dict__,
+              'value': value}
+        for key, value in values.items()
+    }
 
 
-def set_adv_setting(_id: str, value):
+def set_adv_setting(_id: str, value: bool):
     _id = _clean_id(_id)
-    settings_file = get_config_index()['featureFlagFile']
+    settings_file = CONFIG['feature_flags_file']
     s = _read_settings_file(settings_file)
     s[_id] = value
     _write_settings_file(s, settings_file)
@@ -110,16 +116,20 @@ def _clean_id(_id: str) -> str:
     return _id
 
 
-def _read_json_file(path: str) -> dict:
+def _read_json_file(path: Union[str, 'Path']) -> Dict[str, Any]:
     try:
         with open(path, 'r') as fd:
             data = json.load(fd)
     except FileNotFoundError:
         data = {}
+    except json.JSONDecodeError as e:
+        sys.stderr.write(
+            f'Could not load advanced settings file {path}: {e}\n')
+        data = {}
     return data
 
 
-def _read_settings_file(settings_file: str) -> dict:
+def _read_settings_file(settings_file: 'Path') -> Dict[str, bool]:
     """
     Read the settings file, which is a json object with settings IDs as keys
     and boolean values. For each key, look up the `Settings` object with that
@@ -138,10 +148,10 @@ def _read_settings_file(settings_file: str) -> dict:
     # If any old keys are stored in the file, replace them with the new key
     old_keys = settings_by_old_id.keys()
     if any([k in old_keys for k in data.keys()]):
-        for v in data.keys():
+        for v in list(data.keys()):
             if v in old_keys:
                 new_key = settings_by_old_id[v].id
-                data[new_key] = data[v]
+                data[new_key] = bool(data[v])
                 data.pop(v)
         _write_settings_file(data, settings_file)
 
@@ -150,12 +160,12 @@ def _read_settings_file(settings_file: str) -> dict:
     return res
 
 
-def _write_settings_file(data: dict, settings_file: str):
+def _write_settings_file(data: Mapping[str, bool], settings_file: 'Path'):
     try:
-        with open(settings_file, 'w') as fd:
+        with settings_file.open('w') as fd:
             json.dump(data, fd)
             fd.flush()
             os.fsync(fd.fileno())
     except OSError:
-        log.exception('Failed to write advanced settings file to: {}'.format(
-            settings_file))
+        log.exception(
+            f'Failed to write advanced settings file to {settings_file}')

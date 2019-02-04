@@ -7,19 +7,17 @@ from opentrons import server
 from opentrons.server.main import build_arg_parser
 from argparse import ArgumentParser
 from opentrons import hardware, __version__
-from opentrons.config import feature_flags as ff
+from opentrons.config import feature_flags as ff, CONFIG
 from logging.config import dictConfig
-from opentrons.util import environment
 from opentrons.system import udev, resin
 
 log = logging.getLogger(__name__)
-log_file_path = environment.get_path('LOG_DIR')
 
 
 def log_init():
     """
     Function that sets log levels and format strings. Checks for the
-    OT_LOG_LEVEL environment variable otherwise defaults to DEBUG.
+    OT_API_LOG_LEVEL environment variable otherwise defaults to DEBUG.
     """
     fallback_log_level = 'INFO'
     ot_log_level = hardware.config.log_level
@@ -30,8 +28,8 @@ def log_init():
 
     level_value = logging._nameToLevel[ot_log_level]
 
-    serial_log_filename = environment.get_path('SERIAL_LOG_FILE')
-    api_log_filename = environment.get_path('LOG_FILE')
+    serial_log_filename = CONFIG['serial_log_file']
+    api_log_filename = CONFIG['api_log_file']
 
     logging_config = dict(
         version=1,

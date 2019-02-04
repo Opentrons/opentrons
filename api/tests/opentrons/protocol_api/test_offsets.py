@@ -1,11 +1,14 @@
 # pylama:ignore=W0612
-import tempfile
-import os
 import json
+import os
 import time
+
+import pytest
+
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Location
-import pytest
+from opentrons import config
+
 
 minimalLabwareDef = {
     "metadata": {
@@ -50,27 +53,28 @@ minimalLabwareDef = {
     }
 }
 
-labware.persistent_path = tempfile.mkdtemp("offsets")
-path = os.path.join(
-    labware.persistent_path, "{}.json".format(minimalLabwareDef["otId"]))
+
+def path():
+    return config.CONFIG['labware_calibration_offsets_dir_v4']\
+        / '{}.json'.format(minimalLabwareDef['otId'])
 
 
 @pytest.fixture
 def clear_calibration(monkeypatch):
     try:
-        os.remove(path)
+        os.remove(path())
     except FileNotFoundError:
         pass
     yield
     try:
-        os.remove(path)
+        os.remove(path())
     except FileNotFoundError:
         pass
 
 
 def test_save_calibration(monkeypatch, clear_calibration):
     # Test the save calibration file
-    assert not os.path.exists(path)
+    assert not os.path.exists(path())
     calibration_point = None
 
     def mock_set_calibration(self, delta):
@@ -85,19 +89,19 @@ def test_save_calibration(monkeypatch, clear_calibration):
                                    Location(Point(0, 0, 0), 'deck'))
 
     labware.save_calibration(test_labware, Point(1, 1, 1))
-    assert os.path.exists(path)
+    assert os.path.exists(path())
     assert calibration_point == Point(1, 1, 1)
 
 
 def test_save_tip_length(monkeypatch, clear_calibration):
-    assert not os.path.exists(path)
+    assert not os.path.exists(path())
 
     test_labware = labware.Labware(minimalLabwareDef,
                                    Location(Point(0, 0, 0), 'deck'))
     calibrated_length = 22.0
     labware.save_tip_length(test_labware, calibrated_length)
-    assert os.path.exists(path)
-    with open(path) as calibration_file:
+    assert os.path.exists(path())
+    with open(path()) as calibration_file:
         data = json.load(calibration_file)
         assert data['tipLength']['length'] == calibrated_length
 
@@ -112,7 +116,7 @@ def test_schema_shape(monkeypatch, clear_calibration):
 
     labware.save_calibration(test_labware, Point(1, 1, 1))
     expected = {"default": {"offset": [1, 1, 1], "lastModified": 1}}
-    with open(path) as f:
+    with open(path()) as f:
         result = json.load(f)
     assert result == expected
 
@@ -162,8 +166,8 @@ def test_wells_rebuilt_with_offset():
 
 
 def test_clear_calibrations():
-    with open(os.path.join(
-            labware.persistent_path, '1.json'), 'w') as offset_file:
+    calpath = config.CONFIG['labware_calibration_offsets_dir_v4']
+    with open(calpath/'1.json', 'w') as offset_file:
         test_offset = {
             "default": {
                 "offset": [1, 2, 3],
@@ -173,6 +177,6 @@ def test_clear_calibrations():
         }
         json.dump(test_offset, offset_file)
 
-    assert len(os.listdir(labware.persistent_path)) > 0
+    assert len(os.listdir(calpath)) > 0
     labware.clear_calibrations()
-    assert len(os.listdir(labware.persistent_path)) == 0
+    assert len(os.listdir(calpath)) == 0

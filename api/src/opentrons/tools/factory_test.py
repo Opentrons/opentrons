@@ -5,7 +5,7 @@ import socket
 import subprocess
 
 from opentrons import robot
-from opentrons.util import environment
+from opentrons.config import infer_config_base_dir
 from opentrons.drivers.rpi_drivers import gpio
 
 
@@ -14,7 +14,7 @@ FAIL = 'FAIL\t*** !!! ***'
 PASS = 'PASS'
 
 USB_MOUNT_FILEPATH = '/mnt/usbdrive'
-DATA_FOLDER = environment.get_path('APP_DATA_DIR')
+DATA_FOLDER = str(infer_config_base_dir())
 VIDEO_FILEPATH = os.path.join(DATA_FOLDER, 'cam_test.mp4')
 AUDIO_FILE_PATH = '/etc/audio/speaker-test.mp3'
 

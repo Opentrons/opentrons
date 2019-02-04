@@ -1,9 +1,12 @@
 # pylama:ignore=E252
-import os
 import json
-from typing import List
-from opentrons.config import get_config_index
 import logging
+import os
+import pkgutil
+import sys
+from typing import List
+
+from opentrons.config import CONFIG
 
 """
 There will be 3 directories for json blobs to define labware:
@@ -113,16 +116,12 @@ FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 log = logging.getLogger(__name__)
 
 
-def default_definition_dir():
-    return get_config_index().get('labware', {}).get('baseDefinitionDir')
-
-
 def user_defn_dir():
-    return get_config_index().get('labware', {}).get('userDefinitionDir')
+    return CONFIG['labware_user_definitions_dir_v3']
 
 
 def offset_dir():
-    return get_config_index().get('labware', {}).get('offsetDir')
+    return CONFIG['labware_calibration_offsets_dir_v3']
 
 
 def _load_definition(path: str, labware_name: str) -> dict:
@@ -152,19 +151,17 @@ def _load_offset(path: str, labware_name: str) -> dict:
     return offs
 
 
-def _load(default_defn_dir: str,
-          user_defn_root_path: str,
+def _load(user_defn_root_path: str,
           labware_name: str,
           offset_dir_path: str,
           with_offset: bool) -> dict:
     """
     Try to find definition file in <user_defn_dir> first, then fall back to
-    <default_defn_dir>. If a definition is found in either place, look for an
-    offset file in <offset_dir> and apply it if found.
+    the internal defaults. If a definition is found in either place, look
+    for an offset file in <offset_dir> and apply it if found.
 
     If no definition file is found, raise a FileNotFoundException.
 
-    :param default_defn_dir: Opentrons default labware definition directory
     :param user_defn_root_path: User labware definition directory
     :param labware_name: Name of labware definition file (without extension)
     :param with_offset: A boolean flag to control whether the offset file
@@ -173,9 +170,14 @@ def _load(default_defn_dir: str,
     """
     lw = _load_definition(user_defn_root_path, labware_name)
     if not lw:
-        lw = _load_definition(default_defn_dir, labware_name)
-    if not lw:
-        raise FileNotFoundError
+        # This raises FileNotFoundError if it can’t be found
+        contents = pkgutil.get_data(
+            'opentrons',
+            'shared_data/definitions/{}.json'.format(labware_name))
+        if not contents:
+            raise FileNotFoundError
+        lw = json.loads(contents)
+
     offs = _load_offset(offset_dir_path, labware_name) if with_offset else None
 
     if offs:
@@ -190,7 +192,6 @@ def _load(default_defn_dir: str,
 
 def load_json(labware_name: str, with_offset: bool=True) -> dict:
     return _load(
-        default_definition_dir(),
         user_defn_dir(),
         labware_name,
         offset_dir(),
@@ -207,7 +208,8 @@ def _list_labware(path: str) -> List[str]:
 
 def list_all_labware() -> List[str]:
     user_list = _list_labware(user_defn_dir())
-    default_list = _list_labware(default_definition_dir())
+    d = os.path.dirname(sys.modules['opentrons'].__file__)
+    default_list = _list_labware(os.path.join(d, 'shared_data', 'definitions'))
     return sorted(list(set(user_list + default_list)))
 
 

@@ -1,14 +1,12 @@
 import asyncio
 from contextlib import contextmanager
 import fcntl
-import os
 import threading
 from typing import Any, Dict, List, Optional, Tuple
 
-from opentrons.util import environment
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.drivers.rpi_drivers import gpio
-from opentrons.config import robot_configs
+import opentrons.config
 from opentrons.types import Mount
 
 from . import modules
@@ -22,8 +20,6 @@ class _Locker:
 
     There should be one instance of this per process.
     """
-    LOCK_FILE_PATH = environment.settings['HARDWARE_CONTROLLER_LOCKFILE']
-
     def __init__(self, force=False):
         global _lock
 
@@ -34,7 +30,9 @@ class _Locker:
                 'Only one hardware controller may be instantiated')
 
     def _try_acquire_file_lock(self):
-        self._file = open(self.LOCK_FILE_PATH, 'w')
+        self._file = open(
+            opentrons.config.CONFIG['hardware_controller_lockfile'],
+            'w')
         try:
             fcntl.lockf(self._file, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except OSError:
@@ -71,7 +69,7 @@ class Controller:
         version but does not disconnect. It should only be specified true
         by the opentrons main server process.
         """
-        if not os.environ.get('RUNNING_ON_PI'):
+        if not opentrons.config.IS_ROBOT:
             raise RuntimeError('{} may only be instantiated on a robot'
                                .format(self.__class__.__name__))
         try:
@@ -82,7 +80,7 @@ class Controller:
             else:
                 raise
 
-        self.config = config or robot_configs.load()
+        self.config = config or opentrons.config.robot_configs.load()
         self._smoothie_driver = driver_3_0.SmoothieDriver_3_0_0(
             config=self.config)
         self._attached_modules = {}

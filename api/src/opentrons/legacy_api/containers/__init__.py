@@ -1,7 +1,5 @@
 from collections import OrderedDict
-import json
-import os
-import warnings
+import logging
 
 from opentrons.data_storage import database
 from .placeable import (
@@ -15,7 +13,6 @@ from .placeable import (
     get_container
 )
 from opentrons.helpers import helpers
-from opentrons.util import environment
 
 __all__ = [
     'Deck',
@@ -26,6 +23,8 @@ __all__ = [
     'unpack_location',
     'location_to_list',
     'get_container']
+
+log = logging.getLogger(__name__)
 
 
 def load(robot, container_name, slot, label=None, share=False):
@@ -50,7 +49,7 @@ def load(robot, container_name, slot, label=None, share=False):
         col = 'ABCD'.index(slot[0])
         row = int(slot[1]) - 1
         slot_number = col + (row * robot.get_max_robot_cols()) + 1
-        warnings.warn('Changing deprecated slot name "{}" to "{}"'.format(
+        log.warning('Changing deprecated slot name "{}" to "{}"'.format(
             slot, slot_number))
         return slot_number
 
@@ -142,13 +141,6 @@ def container_to_json(container, name):
 
 
 def save_custom_container(data):
-    container_file_path = environment.get_path('CONTAINERS_FILE')
-    if not os.path.isfile(container_file_path):
-        with open(container_file_path, 'w') as f:
-            f.write(json.dumps({'containers': {}}))
-    with open(container_file_path, 'r+') as f:
-        old_data = json.load(f)
-        old_data['containers'].update(data)
-        f.seek(0)
-        f.write(json.dumps(old_data, indent=4))
-        f.truncate()
+    raise RuntimeError(
+        "This method is deprecated and should not be used. To save a custom"
+        "labware, please use opentrons.containers.create()")

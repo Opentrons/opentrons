@@ -2,124 +2,113 @@ from collections import OrderedDict
 import json
 import os
 import shutil
-import unittest
+
+import pytest
 
 from opentrons.data_storage import old_container_loading
 from opentrons.legacy_api.containers.placeable import Container, Well
-from opentrons.util import environment
-from opentrons.config import feature_flags as ff
-# TODO: Remove
+from opentrons.config import infer_config_base_dir
 
 
-if not ff.split_labware_definitions():
-    class PersistedContainersTestCase(unittest.TestCase):
-        @classmethod
-        def setUpClass(cls):
-            # here we are copying containers from data and
-            # re-defining APP_DATA_DIR. This way we can
-            # load a few more custom containers
-            old_container_loading.persisted_containers_dict.clear()
-            os.environ['APP_DATA_DIR'] = os.path.join(
-                os.path.dirname(__file__),
-                'opentrons-data')
-            environment.refresh()
+@pytest.fixture(scope='module')
+def clear_container_cache():
+    old_container_loading.persisted_containers_dict.clear()
 
-            source = os.path.join(
-                os.path.dirname(__file__),
-                'data'
-            )
 
-            containers_dir = environment.get_path('CONTAINERS_DIR')
-            shutil.rmtree(containers_dir)
-            shutil.copytree(source, containers_dir)
+@pytest.fixture
+def old_container_data(config_tempdir):
 
-        @classmethod
-        def tearDownClass(cls):
-            shutil.rmtree(environment.get_path('APP_DATA_DIR'))
-            del os.environ['APP_DATA_DIR']
-            environment.refresh()
+    source = os.path.join(
+        os.path.dirname(__file__),
+        'data'
+    )
+    containers_dir = os.path.join(config_tempdir, 'containers')
+    shutil.copytree(source, containers_dir)
+    yield config_tempdir
 
-        def test_get_custom_container_files(self):
-            old_container_loading.get_custom_container_files()
 
-        def test_load_all_containers(self):
-            old_container_loading.load_all_containers_from_disk()
-            old_container_loading.get_persisted_container("24-vial-rack")
-            old_container_loading.get_persisted_container("container-1")
-            old_container_loading.get_persisted_container("container-2")
+def test_get_custom_container_files(old_container_data):
+    old_container_loading.get_custom_container_files()
 
-            # Skip container-3 is defined in .secret/containers-3.json.
-            with self.assertRaisesRegex(
-                ValueError,
-                'Container type "container-3" not found in files: .*'
-            ):
-                old_container_loading.get_persisted_container("container-3")
 
-            # Skip container-4 is defined in .containers-4.json.
-            with self.assertRaisesRegex(
-                ValueError,
-                'Container type "container-4" not found in files: .*'
-            ):
-                old_container_loading.get_persisted_container("container-4")
+def test_load_all_containers(old_container_data):
+    old_container_loading.load_all_containers_from_disk()
+    old_container_loading.get_persisted_container("24-vial-rack")
+    print("Old container data: {} infer: {}".format(old_container_data,
+                                                    infer_config_base_dir()))
+    old_container_loading.get_persisted_container("container-1")
+    old_container_loading.get_persisted_container("container-2")
 
-        def test_load_persisted_container(self):
-            plate = old_container_loading.get_persisted_container(
-                "24-vial-rack")
-            self.assertIsInstance(plate, Container)
+    # Skip container-3 is defined in .secret/containers-3.json.
+    with pytest.raises(
+            ValueError,
+            match='Container type "container-3" not found in files: .*'):
+        old_container_loading.get_persisted_container("container-3")
 
-            self.assertIsInstance(plate, Container)
+    # Skip container-4 is defined in .containers-4.json.
+    with pytest.raises(
+            ValueError,
+            match='Container type "container-4" not found in files: .*'):
+        old_container_loading.get_persisted_container("container-4")
 
-            wells = [well for well in plate]
-            self.assertTrue(all([isinstance(i, Well) for i in wells]))
 
-            well_1 = wells[0]
-            well_2 = wells[1]
+def test_load_persisted_container(old_container_data):
+    plate = old_container_loading.get_persisted_container(
+        "24-vial-rack")
+    assert isinstance(plate, Container)
 
-            self.assertEqual(well_1.coordinates(), (5.86 + 0, 8.19 + 0, 0))
-            self.assertEqual(well_2.coordinates(), (5.86 + 0, 8.19 + 19.3, 0))
+    wells = [well for well in plate]
+    assert all([isinstance(i, Well) for i in wells])
 
-        def test_create_container_obj_from_dict(self):
-            container_data = """{
-                "origin-offset":{
-                    "x":13.3,
-                    "y":17.5
-                },
-                "locations":{
-                    "A1":{
-                        "x":0.0,
-                        "total-liquid-volume":3400,
-                        "y":0.0,
-                        "depth":16.2,
-                        "z":0,
-                        "diameter":15.62
-                    },
-                    "A2":{
-                        "x":0.0,
-                        "total-liquid-volume":3400,
-                        "y":19.3,
-                        "depth":16.2,
-                        "z":0,
-                        "diameter":15.62
-                    }
-                }
-            }"""
+    well_1 = wells[0]
+    well_2 = wells[1]
 
-            container_data = json.loads(
-                container_data,
-                object_pairs_hook=OrderedDict
-            )
+    assert well_1.coordinates() == (5.86 + 0, 8.19 + 0, 0)
+    assert well_2.coordinates() == (5.86 + 0, 8.19 + 19.3, 0)
 
-            res_container = \
-                old_container_loading.create_container_obj_from_dict(
-                    container_data)
-            self.assertIsInstance(res_container, Container)
-            self.assertEqual(len(res_container), 2)
 
-            wells = [well for well in res_container]
-            self.assertTrue(all([isinstance(i, Well) for i in wells]))
+def test_create_container_obj_from_dict(old_container_data):
+    container_data = """{
+        "origin-offset":{
+            "x":13.3,
+            "y":17.5
+        },
+        "locations":{
+            "A1":{
+                "x":0.0,
+                "total-liquid-volume":3400,
+                "y":0.0,
+                "depth":16.2,
+                "z":0,
+                "diameter":15.62
+            },
+            "A2":{
+                "x":0.0,
+                "total-liquid-volume":3400,
+                "y":19.3,
+                "depth":16.2,
+                "z":0,
+                "diameter":15.62
+            }
+        }
+    }"""
 
-            well_1 = wells[0]
-            well_2 = wells[1]
+    container_data = json.loads(
+        container_data,
+        object_pairs_hook=OrderedDict
+    )
 
-            self.assertEqual(well_1.coordinates(), (5.49 + 0, 9.69 + 0, 0))
-            self.assertEqual(well_2.coordinates(), (5.49 + 0, 9.69 + 19.3, 0))
+    res_container = \
+        old_container_loading.create_container_obj_from_dict(
+            container_data)
+    assert isinstance(res_container, Container)
+    assert len(res_container) == 2
+
+    wells = [well for well in res_container]
+    assert all([isinstance(i, Well) for i in wells])
+
+    well_1 = wells[0]
+    well_2 = wells[1]
+
+    assert well_1.coordinates() == (5.49 + 0, 9.69 + 0, 0)
+    assert well_2.coordinates() == (5.49 + 0, 9.69 + 19.3, 0)
