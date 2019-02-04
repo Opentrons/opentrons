@@ -1599,20 +1599,3 @@ class MagneticModuleContext(ModuleContext):
     def status(self):
         """ The status of the module. either 'engaged' or 'disengaged' """
         return self._module.status
-
-
-class ThermocyclerContext(ModuleContext):
-    """ An object representing a connected Temperature Module.
-
-        It should not be instantiated directly; instead, it should be
-        created through :py:meth:`.ProtocolContext.load_module`.
-        """
-
-    def __init__(self,
-                 ctx: ProtocolContext,
-                 hw_module: modules.thermocycler.Thermocycler,
-                 geometry: ModuleGeometry,
-                 loop: asyncio.AbstractEventLoop) -> None:
-        self._module = hw_module
-        self._loop = loop
-        super().__init__(ctx, geometry)
