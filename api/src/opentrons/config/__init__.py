@@ -15,9 +15,9 @@ The settings file defined here is opentrons.json. This file should be located
 The keys in opentrons.json are defined by the CONFIG_ELEMENTS tuple below.
 The keys in the file are the name elements of the CONFIG_ELEMENTS. They can
 also be specified via environment variables, the names of which are
-OT_${UPPERCASED_NAME_ELEMENT}. For instance, to override the
+OT_API_${UPPERCASED_NAME_ELEMENT}. For instance, to override the
 robot_settings_file option from an environment variable, you would set the
-OT_ROBOT_CONFIG_FILE variable.
+OT_API_ROBOT_CONFIG_FILE variable.
 
 This module's interface to the rest of the system are the IS_* attributes and
 the CONFIG attribute.
@@ -139,7 +139,7 @@ CONFIG_ELEMENTS = (
 #: changed by editing opentrons.json, where the keys are the name elements,
 #: or by specifying as environment variables, where the keys are uppercase
 #: versions of the name elements.
-#: In addition to these flags, the OT_CONFIG_DIR env var (if present)
+#: In addition to these flags, the OT_API_CONFIG_DIR env var (if present)
 #: will change where the API looks for these settings by prepending it to the
 #: normal search path.
 
@@ -147,7 +147,7 @@ CONFIG_ELEMENTS = (
 def infer_config_base_dir() -> Path:
     """ Return the directory to store data in.
 
-    Defaults are ~/.opentrons if not on a pi; OT_CONFIG_DIR is
+    Defaults are ~/.opentrons if not on a pi; OT_API_CONFIG_DIR is
     respected here.
 
     When this module is imported, this function is called automatically
@@ -159,8 +159,8 @@ def infer_config_base_dir() -> Path:
 
     :return pathlib.Path: The path to the desired root settings dir.
     """
-    if 'OT_CONFIG_DIR' in os.environ:
-        return Path(os.environ['OT_CONFIG_DIR'])
+    if 'OT_API_CONFIG_DIR' in os.environ:
+        return Path(os.environ['OT_API_CONFIG_DIR'])
     elif IS_ROBOT:
         return Path('/data')
     else:
@@ -239,9 +239,9 @@ def _get_environ_overrides() -> Dict[str, str]:
     are not overridden will not be in the mapping.
     """
     return {
-        ce.name: os.environ['OT_' + ce.name.upper()]
+        ce.name: os.environ['OT_API_' + ce.name.upper()]
         for ce in CONFIG_ELEMENTS
-        if 'OT_' + ce.name.upper() in os.environ}
+        if 'OT_API_' + ce.name.upper() in os.environ}
 
 
 def _legacy_index() -> Union[None, Dict[str, str]]:

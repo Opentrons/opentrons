@@ -74,7 +74,7 @@ def print_db_path(db):
 
 @pytest.fixture
 def config_tempdir(tmpdir):
-    os.environ['OT_CONFIG_DIR'] = str(tmpdir)
+    os.environ['OT_API_CONFIG_DIR'] = str(tmpdir)
     config.reload()
     database.change_database(config.CONFIG['labware_database_file'])
     yield tmpdir
@@ -168,8 +168,8 @@ def split_labware_def():
 
 @contextlib.contextmanager
 def using_api2(loop):
-    oldenv = os.environ.get('OT_FF_useProtocolApi2')
-    os.environ['OT_FF_useProtocolApi2'] = '1'
+    oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
+    os.environ['OT_API_FF_useProtocolApi2'] = '1'
     opentrons.reset_globals(version=2, loop=loop)
     try:
         yield opentrons.hardware
@@ -179,9 +179,9 @@ def using_api2(loop):
         except RuntimeError:
             loop.create_task(opentrons.hardware.reset())
         if None is oldenv:
-            os.environ.pop('OT_FF_useProtocolApi2')
+            os.environ.pop('OT_API_FF_useProtocolApi2')
         else:
-            os.environ['OT_FF_useProtocolApi2'] = oldenv
+            os.environ['OT_API_FF_useProtocolApi2'] = oldenv
         opentrons.reset_globals(loop=loop)
 
 
@@ -193,16 +193,16 @@ def ensure_api2(request, loop):
 
 @contextlib.contextmanager
 def using_api1(loop):
-    oldenv = os.environ.get('OT_FF_useProtocolApi2')
+    oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
     if oldenv:
-        os.environ.pop('OT_FF_useProtocolApi2')
+        os.environ.pop('OT_API_FF_useProtocolApi2')
     opentrons.reset_globals(version=1, loop=loop)
     try:
         yield opentrons.hardware
     finally:
         opentrons.hardware.reset()
         if None is not oldenv:
-            os.environ['OT_FF_useProtocolApi2'] = oldenv
+            os.environ['OT_API_FF_useProtocolApi2'] = oldenv
         opentrons.reset_globals(loop=loop)
 
 

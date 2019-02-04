@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 def log_init():
     """
     Function that sets log levels and format strings. Checks for the
-    OT_LOG_LEVEL environment variable otherwise defaults to DEBUG.
+    OT_API_LOG_LEVEL environment variable otherwise defaults to DEBUG.
     """
     fallback_log_level = 'INFO'
     ot_log_level = hardware.config.log_level
