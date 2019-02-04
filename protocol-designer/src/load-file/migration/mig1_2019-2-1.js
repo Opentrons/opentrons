@@ -103,16 +103,10 @@ function replaceTCDStepsWithMoveLiquidStep (fileData: ProtocolFile): ProtocolFil
       blowout_location: formData.blowout_location || formData['dispense_blowout_labware'],
     }
 
-    let path = 'single'
+    const pathMap = {transfer: 'single', consolidate: 'multiAspirate', distribute: 'multiDispense'}
+    const proposedPatch = {path: pathMap[stepType], stepType: 'moveLiquid', aspirate_wells_grouped: false}
 
-    if (stepType === 'consolidate') {
-      path = 'multiAspirate'
-    } else if (stepType === 'distribute') {
-      path = 'multiDispense'
-    }
-
-    const proposedPatch = {path, stepType: 'moveLiquid', aspirate_wells_grouped: false}
-
+    // update path field patch if incompatible; fallback to 'single'
     const resolvedPatch = updatePatchPathField(proposedPatch, passThroughFormData, fileData['pipettes'])
     return {...passThroughFormData, ...resolvedPatch}
   })
