@@ -60,6 +60,7 @@ $(wheel_pattern): setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py bdist_wheel
 	shx rm -rf build
+	$(python) -m twine --version
 	$(python)	-m twine check $@
 	shx ls dist
 
