@@ -45,10 +45,11 @@ describe('path should update...', () => {
       ['perSource', 'multiAspirate'],
       ['perDest', 'multiDispense'],
     ]
+
     cases.forEach(([changeTip, badPath]) => {
       test(`"${changeTip}" selected: path → single`, () => {
         const patch = {changeTip}
-        const result = handleFormHelper({...patch, path: badPath}, {})
+        const result = handleFormHelper({...patch, path: badPath}, {pipette: 'pipetteId'})
         expect(result).toEqual({...patch, path: 'single'})
       })
     })

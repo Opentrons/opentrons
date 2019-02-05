@@ -6,7 +6,6 @@ import {initialDeckSetupStepForm} from '../../step-forms/reducers'
 import {updatePatchPathField} from '../../steplist/formLevel/handleFormChange/dependentFieldsUpdateMoveLiquid'
 import {INITIAL_DECK_SETUP_STEP_ID} from '../../constants'
 import type {ProtocolFile, FileLabware, FilePipette} from '../../file-types'
-import type {FormData} from '../../form-types'
 
 const PRESENT_MIGRATION_VERSION = 1
 
@@ -106,9 +105,9 @@ function replaceTCDStepsWithMoveLiquidStep (fileData: ProtocolFile): ProtocolFil
     const pathMap = {transfer: 'single', consolidate: 'multiAspirate', distribute: 'multiDispense'}
     const proposedPatch = {path: pathMap[stepType], stepType: 'moveLiquid', aspirate_wells_grouped: false}
 
-    const pipetteEntities = mapValues(fileData['pipettes'], pipette => ({
+    const pipetteEntities = mapValues(fileData['pipettes'], (pipette, pipetteId) => ({
       ...pipette,
-      tiprackModel: fileData['designer-application'].data.pipetteTiprackAssignments[pipette.name]
+      tiprackModel: fileData['designer-application'].data.pipetteTiprackAssignments[pipetteId],
     }))
     // update path field patch if incompatible; fallback to 'single'
     const resolvedPatch = updatePatchPathField(proposedPatch, passThroughFormData, pipetteEntities)

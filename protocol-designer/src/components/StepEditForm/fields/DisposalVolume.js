@@ -36,6 +36,7 @@ const DisposalVolumeField = (props: Props) => (
                     <TextField
                       name="disposalVolume_volume"
                       units="μL"
+                      caption={`between 1 and ${5}`}
                       className={cx(styles.small_field, styles.orphan_field)}
                       {...props.focusHandlers} />
                   </div>
