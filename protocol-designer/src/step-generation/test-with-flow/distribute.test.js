@@ -7,7 +7,7 @@ import {
   compoundCommandCreatorHasErrors,
   commandFixtures as cmd,
 } from './fixtures'
-import type {DistributeFormData} from '../types'
+import type {DistributeArgs} from '../types'
 const distribute = compoundCommandCreatorNoErrors(_distribute)
 const distributeWithErrors = compoundCommandCreatorHasErrors(_distribute)
 
@@ -65,7 +65,7 @@ describe('distribute: minimal example', () => {
   test('single channel; 60uL from A1 -> A2, A3; no tip pickup', () => {
     // TODO Ian 2018-05-03 distributeArgs needs to be typed because the
     // commandCreatorNoErrors wrapper casts the arg type to any :(
-    const distributeArgs: DistributeFormData = {
+    const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
       destWells: ['A2', 'A3'],
@@ -85,7 +85,7 @@ describe('distribute: minimal example', () => {
 
 describe('tip handling for multiple distribute chunks', () => {
   test('changeTip: "once"', () => {
-    const distributeArgs: DistributeFormData = {
+    const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
       destWells: ['A2', 'A3', 'A4', 'A5'],
@@ -112,7 +112,7 @@ describe('tip handling for multiple distribute chunks', () => {
   })
 
   test('changeTip: "always"', () => {
-    const distributeArgs: DistributeFormData = {
+    const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
       destWells: ['A2', 'A3', 'A4', 'A5'],
@@ -142,7 +142,7 @@ describe('tip handling for multiple distribute chunks', () => {
 
   test('changeTip: "never" with carried-over tip', () => {
     // NOTE: this has been used as BASE CASE for the "advanced settings" tests
-    const distributeArgs: DistributeFormData = {
+    const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
       destWells: ['A2', 'A3', 'A4', 'A5'],
@@ -164,7 +164,7 @@ describe('tip handling for multiple distribute chunks', () => {
   })
 
   test('changeTip: "never" should fail with no initial tip', () => {
-    const distributeArgs: DistributeFormData = {
+    const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
       destWells: ['A2', 'A3', 'A4', 'A5'],
@@ -185,7 +185,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
   test('mix before aspirate, then aspirate disposal volume', () => {
     // NOTE this also tests "uneven final chunk" eg A6 in [A2 A3 | A4 A5 | A6]
     // which is especially relevant to disposal volume
-    const distributeArgs: DistributeFormData = {
+    const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
       destWells: ['A2', 'A3', 'A4', 'A5', 'A6'],
@@ -219,7 +219,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
 
   test.skip('pre-wet tip', () => {
     // TODO Ian 2018-05-04 pre-wet volume is TBD.
-    const distributeArgs: DistributeFormData = {
+    const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
       destWells: ['A2', 'A3', 'A4', 'A5'],
@@ -298,7 +298,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
   })
 
   test('touch tip after aspirate', () => {
-    const distributeArgs: DistributeFormData = {
+    const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
       destWells: ['A2', 'A3', 'A4', 'A5'],
@@ -324,7 +324,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
   })
 
   test('touch tip after dispense', () => {
-    const distributeArgs: DistributeFormData = {
+    const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
       destWells: ['A2', 'A3', 'A4', 'A5'],
@@ -361,7 +361,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
     const disposalLabware = 'sourcePlateId'
     const disposalWell = 'A1'
     const aspirateVol = (volume * 2) + disposalVolume
-    const distributeArgs: DistributeFormData = {
+    const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
       destWells: ['A2', 'A3', 'A4', 'A5'],
@@ -405,7 +405,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
 
 describe('invalid input + state errors', () => {
   test('invalid pipette ID should throw error', () => {
-    const distributeArgs: DistributeFormData = {
+    const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
       destWells: ['A2', 'A3'],
@@ -424,104 +424,39 @@ describe('invalid input + state errors', () => {
 })
 
 describe('distribute volume exceeds pipette max volume', () => {
-  test(`change tip: always`, () => {
-    const changeTip = 'always'
-    const distributeArgs: DistributeFormData = {
-      ...mixinArgs,
-      sourceWell: 'A1',
-      destWells: ['A2', 'A3'],
-      changeTip,
-      volume: 350,
-      disposalVolume: null, // TODO additional test with blowout
-      disposalLabware: null,
-      disposalWell: null,
-    }
-    const result = distribute(distributeArgs)(robotInitialState)
-
-    expect(result.commands).toEqual([
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('A1'),
-
-      cmd.aspirate('A1', 300),
-      dispense('A2', 300),
-
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('B1'),
-
-      cmd.aspirate('A1', 50),
-      dispense('A2', 50),
-
-      // A2 done, move to A3
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('C1'),
-
-      cmd.aspirate('A1', 300),
-      dispense('A3', 300),
-
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('D1'),
-
-      cmd.aspirate('A1', 50),
-      dispense('A3', 50),
-    ])
-  })
-
-  test(`change tip: once`, () => {
+  test(`no disposal volume`, () => {
     const changeTip = 'once'
-    const distributeArgs: DistributeFormData = {
+    const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
       destWells: ['A2', 'A3'],
       changeTip,
       volume: 350,
-      disposalVolume: null, // TODO additional test with blowout
+      disposalVolume: null,
       disposalLabware: null,
       disposalWell: null,
     }
-    const result = distribute(distributeArgs)(robotInitialState)
+    const result = distributeWithErrors(distributeArgs)(robotInitialState)
 
-    expect(result.commands).toEqual([
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('A1'),
-
-      cmd.aspirate('A1', 300),
-      dispense('A2', 300),
-      cmd.aspirate('A1', 50),
-      dispense('A2', 50),
-
-      // A2 done, move to A3
-      cmd.aspirate('A1', 300),
-      dispense('A3', 300),
-      cmd.aspirate('A1', 50),
-      dispense('A3', 50),
-    ])
+    expect(result.errors).toHaveLength(1)
+    expect(result.errors[0].type).toEqual('PIPETTE_VOLUME_EXCEEDED')
   })
 
-  test(`change tip: never`, () => {
-    const changeTip = 'never'
-    const distributeArgs: DistributeFormData = {
+  test(`with disposal volume`, () => {
+    const changeTip = 'once'
+    const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
       destWells: ['A2', 'A3'],
       changeTip,
-      volume: 350,
-      disposalVolume: null, // TODO additional test with blowout
-      disposalLabware: null,
-      disposalWell: null,
+      volume: 250,
+      disposalVolume: 100,
+      disposalLabware: 'trashId',
+      disposalWell: 'A1',
     }
-    const result = distribute(distributeArgs)(robotInitialState)
+    const result = distributeWithErrors(distributeArgs)(robotInitialState)
 
-    expect(result.commands).toEqual([
-      cmd.aspirate('A1', 300),
-      dispense('A2', 300),
-      cmd.aspirate('A1', 50),
-      dispense('A2', 50),
-
-      // A2 done, move to A3
-      cmd.aspirate('A1', 300),
-      dispense('A3', 300),
-      cmd.aspirate('A1', 50),
-      dispense('A3', 50),
-    ])
+    expect(result.errors).toHaveLength(1)
+    expect(result.errors[0].type).toEqual('PIPETTE_VOLUME_EXCEEDED')
   })
 })

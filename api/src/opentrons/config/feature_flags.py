@@ -4,7 +4,7 @@ from opentrons.config import advanced_settings as advs
 
 
 def get_setting_with_env_overload(setting_name):
-    env_name = 'OT_FF_' + setting_name
+    env_name = 'OT_API_FF_' + setting_name
     if env_name in os.environ:
         return os.environ[env_name].lower() in ('1', 'true', 'on')
     else:

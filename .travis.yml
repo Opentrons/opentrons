@@ -41,7 +41,7 @@ jobs:
   include:
     # test, build, and upload wheels for Python projects
     - stage: test
-      name: 'Python API unit tests, build/deploy API docs'
+      name: 'Python API unit tests, build API docs'
       language: python
       python: 3.6
       before_install:
@@ -59,15 +59,38 @@ jobs:
         - make coverage
         - aws s3 sync ./api/dist $OT_CI_TEMP_S3_PATH/api/dist
       deploy:
-        # api docs deploy
+        # push docs on tag
         - provider: pages
           skip_cleanup: true
           keep-history: false
           local-dir: api/docs/dist
           github-token: $GITHUB_TOKEN
           on:
+            all_branches: true
+            tags: true
             repo: Opentrons/opentrons
             branch: edge
+        # push to real pypi on tag
+        - provider: pypi
+          distributions: "bdist_wheel"
+          skip_cleanup: true
+          user: $PYPI_USER
+          password: $PYPI_PASSWORD
+          on:
+            all_branches: true
+            tags: true
+            repo: Opentrons/opentrons
+            branch: edge
+        # push to test pypi on pr
+        - provider: pypi
+          distributions: "bdist_wheel"
+          skip_cleanup: true
+          user: $TEST_PYPI_USER
+          password: $TEST_PYPI_PASSWORD
+          on:
+            repo: Opentrons/opentrons
+            branch: edge
+          skip_existing: true
 
     # test, build, and upload for JavaScript projects
     - stage: test
@@ -129,6 +152,8 @@ jobs:
       script: make -C app-shell dist-osx
       if: tag IS present OR branch =~ ^(edge|release_.+)$
 
+
+
 env:
   global:
     # include $HOME/.local/bin for `aws`
@@ -155,3 +180,4 @@ env:
 
     # OT_PD_FULLSTORY_ORG
     - secure: "N/WWTWYdEPF7UfWIefSnOIKYVj9/q8ti7kCiB9DNfeKIsjJwsmg6S5yrwn6N4B/9ZMSp0yswo442n09CvH4jMG99BodXdYxg3JhuJ5dxWReAUTWO0PTiyihWeFhd2sbQ3VZa+o85OoFWFHO8UCXqcG//iUZ4l05t9DY5CGUBsPnyJTptsjPCb+CFUc+xkckv9RBfhLeyGBDWodJVfjU4xb124f5MBVF67OlHJ20HmbuH/kRNLDXSiRW4BD9UIXyWrIaPZHW612dX6inETz0vhUOJbUftgn8kdpjjBqa1394TjnjW5fey1n73KH4KpaDPZeGJ5GnYRpk9Wvw7uQkWH7xjkXbFq6cqd0vIWWS5uYmdsMsNDjUtTyELqG01rj813jbmcItuzK2tAcuQ5kBPwikLsHYeQY/68GKlws9POd444YQXXiTYgCoHgYq8O3nxaLoMZBgabFq6Rtz0xJb3Hu99PkU6flI4hgT82RZGf32PgYSKznaGps9DGf2as8FU+wui/So89eQwkDyhirzGvC31OlRHdZitjWYvI27nGgiPWheuZR5zAtf6tJeZaZ1N/PZGBwJW6ykfjG+vyRep/IIW5r0ujnBcmgxT7USVpW0E45QolZBS75t29kkTxP0/EHLMavv7QqP3LNpDJpptPrMQ8mLINxlB7FCQ2AQLbDY="
+

@@ -7,7 +7,7 @@ import subprocess
 from typing import Dict, Any, List
 from aiohttp import web
 from opentrons.system import nmcli
-from opentrons.util import environment
+from opentrons.config import CONFIG
 
 log = logging.getLogger(__name__)
 
@@ -64,7 +64,7 @@ async def list_networks(request: web.Request) -> web.Response:
 
 
 def _get_key_file(arg: str) -> str:
-    keys_dir = environment.get_path('WIFI_KEYS_DIR')
+    keys_dir = CONFIG['wifi_keys_dir']
     available_keys = os.listdir(keys_dir)
     if arg not in available_keys:
         raise ConfigureArgsError('Key ID {} is not valid on the system'
@@ -376,7 +376,7 @@ async def add_key(request: web.Request) -> web.Response:
     }
     ```
     """
-    keys_dir = environment.get_path('WIFI_KEYS_DIR')
+    keys_dir = CONFIG['wifi_keys_dir']
     if not request.can_read_body:
         return web.json_response({'message': "Must upload key file"},
                                  status=400)
@@ -433,7 +433,7 @@ async def list_keys(request: web.Request) -> web.Response:
     }
     ```
     """
-    keys_dir = environment.get_path('WIFI_KEYS_DIR')
+    keys_dir = CONFIG['wifi_keys_dir']
     keys: List[Dict[str, str]] = []
     # TODO(mc, 2018-10-24): add last modified info to keys for sort purposes
     for path in os.listdir(keys_dir):
@@ -461,7 +461,7 @@ async def remove_key(request: web.Request) -> web.Response:
     {message: 'Removed key keyfile.pem'}
     ```
     """
-    keys_dir = environment.get_path('WIFI_KEYS_DIR')
+    keys_dir = CONFIG['wifi_keys_dir']
     available_keys = os.listdir(keys_dir)
     requested_hash = request.match_info['key_uuid']
     if requested_hash not in available_keys:

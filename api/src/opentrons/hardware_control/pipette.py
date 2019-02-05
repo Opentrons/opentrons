@@ -74,6 +74,10 @@ class Pipette:
         if cp_override == CriticalPoint.XY_CENTER:
             mod_offset_xy = [0, 0, self.config.model_offset[2]]
             cp_type = CriticalPoint.XY_CENTER
+        elif cp_override == CriticalPoint.FRONT_NOZZLE:
+            mod_offset_xy = [
+                0, -self.config.model_offset[1], self.config.model_offset[2]]
+            cp_type = CriticalPoint.FRONT_NOZZLE
         else:
             mod_offset_xy = self.config.model_offset
         mod_and_tip = Point(mod_offset_xy[0],

@@ -18,9 +18,9 @@ def get_version(path) -> str:
     :return: the version string or "unknown"
     """
     if path and os.path.exists(path):
-            with open(path) as pkg:
-                package_dict = json.load(pkg)
-                version = package_dict.get('version')
+        with open(path) as pkg:
+            package_dict = json.load(pkg)
+            version = package_dict.get('version')
     else:
         version = 'not available'
     return version

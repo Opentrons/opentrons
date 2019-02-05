@@ -53,7 +53,6 @@ async def test_controller_unique_per_proc(hardware_controller_lockfile,
 
     script = '''import os
 import asyncio
-os.environ.pop('RUNNING_ON_PI')
 import opentrons.hardware_control as hc
 os.environ['RUNNING_ON_PI'] = '1'
 loop = asyncio.get_event_loop()

@@ -4,10 +4,11 @@ import os
 import re
 from typing import List, Optional, Tuple
 
+from opentrons.config import IS_ROBOT
 from .mod_abc import AbstractModule
 # Must import tempdeck and magdeck (and other modules going forward) so they
 # actually create the subclasses
-from . import update, tempdeck, magdeck # noqa(W0611)
+from . import update, tempdeck, magdeck, thermocycler  # noqa(W0611)
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +36,7 @@ def build(port: str, which: str, simulate: bool) -> AbstractModule:
 def discover() -> List[Tuple[str, str]]:
     """ Scan for connected modules and instantiate handler classes
     """
-    if os.environ.get('RUNNING_ON_PI') and os.path.isdir('/dev/modules'):
+    if IS_ROBOT and os.path.isdir('/dev/modules'):
         devices = os.listdir('/dev/modules')
     else:
         devices = []

@@ -5,6 +5,7 @@
 import asyncio
 import contextlib
 import os
+import pathlib
 import re
 import shutil
 import tempfile
@@ -18,14 +19,13 @@ import opentrons
 from opentrons.api import models
 from opentrons.data_storage import database
 from opentrons.server import rpc
-from opentrons import config
-from opentrons.config import advanced_settings as advs
+from opentrons import config, types
 from opentrons.server import init
 from opentrons.deck_calibration import endpoints
-from opentrons.util import environment
 from opentrons import hardware_control as hc
 from opentrons.protocol_api import ProtocolContext
 from opentrons.types import Mount
+from opentrons.data_storage import labware_definitions as ldef
 
 
 Session = namedtuple(
@@ -72,9 +72,17 @@ def print_db_path(db):
     print("Database: ", db_info[2])
 
 
+@pytest.fixture
+def config_tempdir(tmpdir):
+    os.environ['OT_API_CONFIG_DIR'] = str(tmpdir)
+    config.reload()
+    database.change_database(config.CONFIG['labware_database_file'])
+    yield tmpdir
+
+
 @pytest.fixture(autouse=True)
-def clear_feature_flags():
-    ff_file = config.get_config_index().get('featureFlagFile')
+def clear_feature_flags(config_tempdir):
+    ff_file = config.CONFIG['feature_flags_file']
     if os.path.exists(ff_file):
         os.remove(ff_file)
     yield
@@ -83,20 +91,19 @@ def clear_feature_flags():
 
 
 @pytest.fixture
-def wifi_keys_tempdir():
-    old_wifi_keys = environment.settings['WIFI_KEYS_DIR']
+def wifi_keys_tempdir(config_tempdir):
+    old_wifi_keys = config.CONFIG['wifi_keys_dir']
     with tempfile.TemporaryDirectory() as td:
-        environment.settings['WIFI_KEYS_DIR'] = td
+        config.CONFIG['wifi_keys_dir'] = pathlib.Path(td)
         yield td
-        environment.settings['WIFI_KEYS_DIR'] = old_wifi_keys
+        config.CONFIG['wifi_keys_dir'] = old_wifi_keys
 
 
 @pytest.fixture(autouse=True)
-def labware_test_data():
-    index = config.get_config_index()
-    user_def_dir = index.get('labware', {}).get('userDefinitionDir', '')
-    offset_dir = index.get('labware', {}).get('offsetDir', '')
-    deck_calibration_dir = os.path.dirname(index.get('deckCalibrationFile'))
+def labware_test_data(config_tempdir):
+    user_def_dir = config.CONFIG['labware_user_definitions_dir_v3']
+    assert user_def_dir == ldef.user_defn_dir()
+    offset_dir = config.CONFIG['labware_calibration_offsets_dir_v3']
     dummy_lw_name = '4-well-plate'
     filename = '{}.json'.format(dummy_lw_name)
     dummy_lw_defn = {
@@ -113,22 +120,19 @@ def labware_test_data():
       "ordering": [["A1", "B1"],
                    ["A2", "B2"]]}
     dummy_lw_offset = {"x": 10, "y": -10, "z": 100}
-    os.makedirs(user_def_dir, exist_ok=True)
-    with open(os.path.join(user_def_dir, filename), 'w') as usr_def:
+    with (user_def_dir/filename).open('w') as usr_def:
         json.dump(dummy_lw_defn, usr_def)
-    os.makedirs(offset_dir, exist_ok=True)
-    with open(os.path.join(offset_dir, filename), 'w') as offs:
+    with (offset_dir/filename).open('w') as offs:
         json.dump(dummy_lw_offset, offs)
-    os.makedirs(deck_calibration_dir, exist_ok=True)
+    print("labware test data put in: {}".format(os.listdir(user_def_dir)))
     yield
     shutil.rmtree(os.path.dirname(user_def_dir), ignore_errors=True)
     shutil.rmtree(os.path.dirname(offset_dir), ignore_errors=True)
-    shutil.rmtree(deck_calibration_dir, ignore_errors=True)
 
 
 # Builds a temp db to allow mutations during testing
 @pytest.fixture(autouse=True)
-def dummy_db(tmpdir):
+def dummy_db(config_tempdir, tmpdir):
     temp_db_path = str(tmpdir.mkdir('testing').join("database.db"))
     shutil.copy2(MAIN_TESTER_DB, temp_db_path)
     database.change_database(temp_db_path)
@@ -140,23 +144,23 @@ def dummy_db(tmpdir):
 # -------feature flag fixtures-------------
 @pytest.fixture
 def calibrate_bottom_flag():
-    advs.set_adv_setting('calibrateToBottom', True)
+    config.advanced_settings.set_adv_setting('calibrateToBottom', True)
     yield
-    advs.set_adv_setting('calibrateToBottom', False)
+    config.advanced_settings.set_adv_setting('calibrateToBottom', False)
 
 
 @pytest.fixture
 def short_trash_flag():
-    advs.set_adv_setting('shortFixedTrash', True)
+    config.advanced_settings.set_adv_setting('shortFixedTrash', True)
     yield
-    advs.set_adv_setting('shortFixedTrash', False)
+    config.advanced_settings.set_adv_setting('shortFixedTrash', False)
 
 
 @pytest.fixture
 def split_labware_def():
-    advs.set_adv_setting('splitLabwareDefinitions', True)
+    config.advanced_settings.set_adv_setting('splitLabwareDefinitions', True)
     yield
-    advs.set_adv_setting('splitLabwareDefinitions', False)
+    config.advanced_settings.set_adv_setting('splitLabwareDefinitions', False)
 
 
 # -----end feature flag fixtures-----------
@@ -164,8 +168,8 @@ def split_labware_def():
 
 @contextlib.contextmanager
 def using_api2(loop):
-    oldenv = os.environ.get('OT_FF_useProtocolApi2')
-    os.environ['OT_FF_useProtocolApi2'] = '1'
+    oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
+    os.environ['OT_API_FF_useProtocolApi2'] = '1'
     opentrons.reset_globals(version=2, loop=loop)
     try:
         yield opentrons.hardware
@@ -175,10 +179,10 @@ def using_api2(loop):
         except RuntimeError:
             loop.create_task(opentrons.hardware.reset())
         if None is oldenv:
-            os.environ.pop('OT_FF_useProtocolApi2')
+            os.environ.pop('OT_API_FF_useProtocolApi2')
         else:
-            os.environ['OT_FF_useProtocolApi2'] = oldenv
-        opentrons.reset_globals()
+            os.environ['OT_API_FF_useProtocolApi2'] = oldenv
+        opentrons.reset_globals(loop=loop)
 
 
 @pytest.fixture
@@ -189,48 +193,54 @@ def ensure_api2(request, loop):
 
 @contextlib.contextmanager
 def using_api1(loop):
-    oldenv = os.environ.get('OT_FF_useProtocolApi2')
+    oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
     if oldenv:
-        os.environ.pop('OT_FF_useProtocolApi2')
-    opentrons.reset_globals(1)
+        os.environ.pop('OT_API_FF_useProtocolApi2')
+    opentrons.reset_globals(version=1, loop=loop)
     try:
         yield opentrons.hardware
     finally:
         opentrons.hardware.reset()
         if None is not oldenv:
-            os.environ['OT_FF_useProtocolApi2'] = oldenv
-        opentrons.reset_globals()
+            os.environ['OT_API_FF_useProtocolApi2'] = oldenv
+        opentrons.reset_globals(loop=loop)
 
 
 @pytest.fixture(params=[using_api1, using_api2])
-async def async_client(request, virtual_smoothie_env, loop, test_client):
+async def async_server(request, virtual_smoothie_env, loop):
     if request.node.get_marker('api1_only') and request.param != using_api1:
-            pytest.skip('requires api1 only')
+        pytest.skip('requires api1 only')
     elif request.node.get_marker('api2_only') and request.param != using_api2:
-            pytest.skip('requires api2 only')
-    with request.param(loop) as hw:
+        pytest.skip('requires api2 only')
+    with request.param(loop):
         app = init(loop)
-        cli = await loop.create_task(test_client(app))
-        setattr(cli, 'hw', hw)
-        if request.param == using_api1:
-            setattr(cli, 'version', 1)
-        elif request.param == using_api2:
-            setattr(cli, 'version', 2)
-        else:
-            raise RuntimeError("Bad version? Bad param? Somethings broken")
-        endpoints.session = None
-        yield cli
+        app['api_version'] = 1 if request.param == using_api1 else 2
+        yield app
+        await app.shutdown()
 
 
 @pytest.fixture
-def dc_session(virtual_smoothie_env, monkeypatch, loop):
+async def async_client(async_server, loop, test_client):
+    cli = await loop.create_task(test_client(async_server))
+    endpoints.session = None
+    yield cli
+
+
+@pytest.fixture
+async def dc_session(request, async_server, monkeypatch, loop):
     """
     Mock session manager for deck calibation
     """
-    with using_api1(loop):
-        ses = endpoints.SessionManager()
-        monkeypatch.setattr(endpoints, 'session', ses)
-        yield ses
+    hw = async_server['com.opentrons.hardware']
+    if async_server['api_version'] == 2:
+        await hw.cache_instruments({
+            types.Mount.LEFT: None,
+            types.Mount.RIGHT: 'p300_multi_v1'})
+
+    ses = endpoints.SessionManager(hw)
+    endpoints.session = ses
+    monkeypatch.setattr(endpoints, 'session', ses)
+    yield ses
 
 
 @pytest.fixture
@@ -332,10 +342,6 @@ def connect(session, test_client):
     return _connect
 
 
-def setup_testing_env():
-    database.change_database(MAIN_TESTER_DB)
-
-
 @pytest.fixture
 def virtual_smoothie_env(monkeypatch):
     # TODO (ben 20180426): move this to the .env file
@@ -357,12 +363,12 @@ def hardware(request, loop, virtual_smoothie_env):
 @pytest.fixture
 def main_router(loop, virtual_smoothie_env, hardware):
     from opentrons.api.routers import MainRouter
-    with MainRouter(hardware, loop) as router:
-        router.wait_until = partial(
-            wait_until,
-            notifications=router.notifications,
-            loop=loop)
-        yield router
+    router = MainRouter(hardware, loop)
+    router.wait_until = partial(
+        wait_until,
+        notifications=router.notifications,
+        loop=loop)
+    yield router
 
 
 async def wait_until(matcher, notifications, timeout=1, loop=None):
@@ -381,7 +387,7 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
 
 
 @pytest.fixture
-def model(robot, hardware, loop, apiv2_labware_cal):
+def model(robot, hardware, loop):
     from opentrons.legacy_api.containers import load
     from opentrons.legacy_api.instruments.pipette import Pipette
 
@@ -444,22 +450,20 @@ def smoothie(monkeypatch):
 
 @pytest.fixture
 def hardware_controller_lockfile():
-    old_lockfile = environment.settings['HARDWARE_CONTROLLER_LOCKFILE']
-    with tempfile.NamedTemporaryFile() as td:
-        environment.settings['HARDWARE_CONTROLLER_LOCKFILE'] = td
+    old_lockfile = config.CONFIG['hardware_controller_lockfile']
+    with tempfile.TemporaryDirectory() as td:
+        config.CONFIG['hardware_controller_lockfile']\
+            = pathlib.Path(td)/'hardware.lock'
         yield td
-        environment.settings['HARDWARE_CONTROLLER_LOCKFILE'] = old_lockfile
+        config.CONFIG['hardware_controller_lockfile'] = old_lockfile
 
 
 @pytest.fixture
 def running_on_pi():
-    oldpi = os.environ.get('RUNNING_ON_PI')
-    os.environ['RUNNING_ON_PI'] = '1'
+    oldpi = config.IS_ROBOT
+    config.IS_ROBOT = True
     yield
-    if None is oldpi:
-        os.environ.pop('RUNNING_ON_PI')
-    else:
-        os.environ['RUNNING_ON_PI'] = oldpi
+    config.IS_ROBOT = oldpi
 
 
 @pytest.mark.skipif(not hc.Controller,
@@ -476,14 +480,3 @@ def cntrlr_mock_connect(monkeypatch):
 def hardware_api(loop):
     hw_api = hc.API.build_hardware_simulator(loop=loop)
     return hw_api
-
-
-@pytest.fixture
-def apiv2_labware_cal(monkeypatch):
-    with tempfile.TemporaryDirectory() as td:
-        monkeypatch.setattr(
-            'opentrons.protocol_api.labware.persistent_path', td)
-        yield td
-
-
-setup_testing_env()

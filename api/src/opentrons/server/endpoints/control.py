@@ -238,7 +238,7 @@ def _validate_move_data(data):
         message = "Point must be an ordered iterable. Got: {}".format(
             type(point))
         error = True
-    if point is not None and len(point) is not 3:
+    if point is not None and len(point) != 3:
         message = "Point must have 3 values--got {}".format(point)
         error = True
     if target == 'mount' and float(point[2]) < 30:

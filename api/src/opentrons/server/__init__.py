@@ -5,7 +5,7 @@ import traceback
 from typing import TYPE_CHECKING
 from aiohttp import web
 
-from opentrons.util import environment
+from opentrons.config import CONFIG
 from .rpc import RPCServer
 from .http import HTTPServer
 from opentrons.api.routers import MainRouter
@@ -15,7 +15,6 @@ if TYPE_CHECKING:
     from opentons.hardware_control.types import HardwareAPILike  # noqa(F501)
 
 log = logging.getLogger(__name__)
-log_file_path = environment.get_path('LOG_DIR')
 
 
 @web.middleware
@@ -59,7 +58,7 @@ def init(loop=None, hardware: 'HardwareAPILike' = None):
         checked_hardware = opentrons.hardware
     app['com.opentrons.hardware'] = checked_hardware
     app['com.opentrons.rpc'] = RPCServer(app, MainRouter(checked_hardware))
-    app['com.opentrons.http'] = HTTPServer(app, log_file_path)
+    app['com.opentrons.http'] = HTTPServer(app, CONFIG['log_dir'])
 
     return app
 

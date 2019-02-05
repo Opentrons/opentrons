@@ -16,7 +16,7 @@ python := pipenv run python
 pip := pipenv run pip
 pytest := pipenv run py.test
 pipenv_opts := --dev
-pipenv_opts += $(and $(CI),--keep-outdated)
+pipenv_opts += $(and $(CI),--keep-outdated --clear)
 
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
@@ -50,7 +50,6 @@ all: lint test
 .PHONY: install
 install:
 	pipenv sync $(pipenv_opts)
-	@$(python) build_tools.py write_local_env
 
 .PHONY: clean
 clean:
@@ -61,6 +60,7 @@ $(wheel_pattern): setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py bdist_wheel
 	shx rm -rf build
+	$(python)	-m twine check $@
 	shx ls dist
 
 .PHONY: wheel

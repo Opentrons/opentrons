@@ -1,9 +1,9 @@
 // @flow
 
 import type { FormData } from '../../../form-types'
-import type { PauseFormData } from '../../../step-generation'
+import type { DelayArgs } from '../../../step-generation'
 
-type PauseStepArgs = PauseFormData
+type PauseStepArgs = DelayArgs
 
 const pauseFormToArgs = (formData: FormData): PauseStepArgs => {
   const hours = parseFloat(formData['pauseHour']) || 0

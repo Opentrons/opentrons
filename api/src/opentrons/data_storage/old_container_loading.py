@@ -13,7 +13,7 @@ import pkg_resources
 from collections import OrderedDict
 from typing import Dict, Any, List
 from opentrons.legacy_api.containers.placeable import Container, Well
-from opentrons.util import environment
+from opentrons.config import infer_config_base_dir
 from opentrons.util.vector import Vector
 
 persisted_containers_dict: Dict[str, Any] = {}
@@ -66,7 +66,7 @@ def get_custom_container_files():
 
     res = []
 
-    top = environment.get_path('CONTAINERS_DIR')
+    top = infer_config_base_dir()/'containers'
     for root, dirnames, files in os.walk(top):
         for name in filter(is_special_file, dirnames):
             dirnames.remove(name)

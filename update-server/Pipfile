@@ -19,7 +19,7 @@ pytest = "==3.4.2"
 pytest-cov = "==2.5.1"
 pytest-aiohttp = "==0.2.0"
 sphinx = "==1.4.8"
-twine = "==1.8.1"
+twine = "==1.12.1"
 wheel = "==0.30.0"
 coverage = "==4.4.2"
 

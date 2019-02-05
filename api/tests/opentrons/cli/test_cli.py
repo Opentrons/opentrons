@@ -1,6 +1,7 @@
 import pytest
-from opentrons.config import get_config_index, robot_configs
-from opentrons.config import advanced_settings as advs
+from opentrons.config import (CONFIG,
+                              robot_configs,
+                              advanced_settings as advs)
 
 
 @pytest.fixture
@@ -12,35 +13,34 @@ def mock_config():
     return robot_configs
 
 
-def test_clear_config(mock_config):
+@pytest.mark.api1_only
+def test_clear_config(mock_config, async_server):
     # Clear should happen automatically after the following import, resetting
     # the robot config to the default value from robot_configs
     from opentrons.deck_calibration import dc_main
-    dc_main.clear_configuration_and_reload()
+    hardware = async_server['com.opentrons.hardware']
+    dc_main.clear_configuration_and_reload(hardware)
 
-    from opentrons import robot
-
-    assert robot.config == robot_configs._build_config({}, {})
+    assert hardware.config == robot_configs._build_config({}, {})
 
 
-def test_save_and_clear_config(mock_config):
+def test_save_and_clear_config(mock_config, async_server):
     # Clear should happen automatically after the following import, resetting
     # the robot config to the default value from robot_configs
     from opentrons.deck_calibration import dc_main
-    from opentrons import robot
     import os
 
-    old_config = robot.config
-    base_filename = get_config_index().get('deckCalibrationFile')
+    hardware = async_server['com.opentrons.hardware']
+    hardware.update_config(name='Ada Lovelace')
+    old_config = hardware.config
+    base_filename = CONFIG['deck_calibration_file']
 
     tag = "testing"
     root, ext = os.path.splitext(base_filename)
     filename = "{}-{}{}".format(root, tag, ext)
-    dc_main.backup_configuration_and_reload(tag=tag)
+    dc_main.backup_configuration_and_reload(hardware, tag=tag)
 
-    from opentrons import robot
-
-    assert robot.config == robot_configs._build_config({}, {})
+    assert hardware.config == robot_configs._build_config({}, {})
 
     saved_config = robot_configs.load(filename)
     assert saved_config == old_config

@@ -9,6 +9,7 @@ from ..containers import unpack_location
 from ..containers.placeable import (
     Container, Placeable, WellSeries
 )
+from opentrons.commands import CommandPublisher, do_publish
 from opentrons.helpers import helpers
 from opentrons.trackers import pose_tracker
 from opentrons.config import pipette_config
@@ -45,7 +46,7 @@ class PipetteTip:
         self.length = length
 
 
-class Pipette:
+class Pipette(CommandPublisher):
     """
     DIRECT USE OF THIS CLASS IS DEPRECATED -- this class should not be used
     directly. Its parameters, defaults, methods, and behaviors are subject to
@@ -130,6 +131,7 @@ class Pipette:
             quirks=[],
             fallback_tip_length=51.7):  # TODO (andy): move to tip-rack
 
+        super().__init__(robot.broker)
         self.robot = robot
 
         # Uses information from axis to decide if a pipette is on the left
@@ -820,7 +822,7 @@ class Pipette:
             log.warning("Cannot perform air_gap without a tip attached.")
 
         # if volumes is specified as 0uL, do nothing
-        if volume is 0:
+        if volume == 0:
             return self
 
         if height is None:
@@ -928,7 +930,6 @@ class Pipette:
 
         presses = (1 if not helpers.is_number(presses) else presses)
 
-        @commands.publish.both(command=commands.pick_up_tip)
         def _pick_up_tip(
                 self, location, presses, increment):
             self.instrument_actuator.set_active_current(self._plunger_current)
@@ -970,12 +971,13 @@ class Pipette:
                 self.robot.poses, self._pick_up_distance)
 
             return self
-
-        return _pick_up_tip(
-            self,
-            location=location,
-            presses=presses,
-            increment=increment)
+        do_publish(self.broker, commands.pick_up_tip, self.pick_up_tip,
+                   'before', None, None, self, location, presses, increment)
+        _pick_up_tip(
+            self, location=location, presses=presses, increment=increment)
+        do_publish(self.broker, commands.pick_up_tip, self.pick_up_tip,
+                   'after', self, None, self, location, presses, increment)
+        return self
 
     def drop_tip(self, location=None, home_after=True):
         """
@@ -1033,7 +1035,6 @@ class Pipette:
             else:
                 location = location.top()
 
-        @commands.publish.both(command=commands.drop_tip)
         def _drop_tip(location, instrument=self):
             if location:
                 self.move_to(location)
@@ -1064,8 +1065,12 @@ class Pipette:
                 length=self._tip_length
             )
 
-            return self
-        return _drop_tip(location)
+        do_publish(self.broker, commands.drop_tip, self.drop_tip,
+                   'before', None, None, self, location)
+        _drop_tip(location)
+        do_publish(self.broker, commands.drop_tip, self.drop_tip,
+                   'after', self, None, self, location)
+        return self
 
     def _shake_off_tips(self, location):
         # tips don't always fall off, especially if resting against
@@ -1129,7 +1134,6 @@ class Pipette:
         >>> p300 = instruments.P300_Single(mount='right') # doctest: +SKIP
         >>> p300.home() # doctest: +SKIP
         """
-        @commands.publish.both(command=commands.home)
         def _home(mount):
             self.current_volume = 0
             self.instrument_actuator.set_active_current(self._plunger_current)
@@ -1137,8 +1141,11 @@ class Pipette:
                 self.robot.poses)
             self.robot.poses = self.instrument_mover.home(self.robot.poses)
             self.previous_placeable = None  # no longer inside a placeable
-
+        do_publish(self.broker, commands.home, _home,
+                   'before', None, None, self.mount)
         _home(self.mount)
+        do_publish(self.broker, commands.home, _home,
+                   'after', self, None, self.mount)
         return self
 
     @commands.publish.both(command=commands.distribute)
@@ -1537,14 +1544,14 @@ class Pipette:
                 if step is plan[-1] or plan[i + 1].get('aspirate'):
                     self._blowout_during_transfer(
                         dispense['location'], **kwargs)
-                    if touch_tip or touch_tip is 0:
+                    if touch_tip or touch_tip is 0:  # noqa(pyflakes)
                         self.touch_tip(touch_tip)
                     tips = self._drop_tip_during_transfer(
                         tips, i, total_transfers, **kwargs)
                 else:
                     if air_gap:
                         self.air_gap(air_gap)
-                    if touch_tip or touch_tip is 0:
+                    if touch_tip or touch_tip is 0:  # noqa(pyflakes)
                         self.touch_tip(touch_tip)
 
     def _add_tip_during_transfer(self, tips, **kwargs):
@@ -1572,7 +1579,7 @@ class Pipette:
         self.aspirate(vol, loc, rate=rate)
         if air_gap:
             self.air_gap(air_gap)
-        if touch_tip or touch_tip is 0:
+        if touch_tip or touch_tip is 0:  # noqa(pyflakes)
             self.touch_tip(touch_tip)
 
     def _dispense_during_transfer(self, vol, loc, **kwargs):

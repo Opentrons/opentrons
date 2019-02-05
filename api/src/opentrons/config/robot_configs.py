@@ -4,7 +4,7 @@ import logging
 import os
 from typing import Any, Dict, List, NamedTuple, Tuple, Union
 
-from opentrons.config import get_config_index, feature_flags as fflags
+from opentrons.config import CONFIG, feature_flags as fflags
 
 log = logging.getLogger(__name__)
 
@@ -273,11 +273,10 @@ def _config_to_save(
 
 
 def load(deck_cal_file=None):
-    deck_cal_file = deck_cal_file or get_config_index().get(
-        'deckCalibrationFile')
+    deck_cal_file = deck_cal_file or CONFIG['deck_calibration_file']
     log.info("Loading deck calibration from {}".format(deck_cal_file))
     deck_cal = _load_json(deck_cal_file).get('gantry_calibration', {})
-    settings_file = get_config_index().get('robotSettingsFile')
+    settings_file = CONFIG['robot_settings_file']
     log.info("Loading robot settings from {}".format(settings_file))
     robot_settings = _load_json(settings_file) or {}
     return _build_config(deck_cal, robot_settings)
@@ -286,7 +285,7 @@ def load(deck_cal_file=None):
 def save_deck_calibration(config: robot_config, dc_filename=None, tag=None):
     cal_lists, _ = _config_to_save(config)
 
-    dc_filename = dc_filename or get_config_index().get('deckCalibrationFile')
+    dc_filename = dc_filename or CONFIG['deck_calibration_file']
     if tag:
         root, ext = os.path.splitext(dc_filename)
         dc_filename = "{}-{}{}".format(root, tag, ext)
@@ -299,7 +298,7 @@ def save_robot_settings(config: robot_config, rs_filename=None, tag=None):
     _, config_dict = _config_to_save(config)
 
     # Save everything else in a different file
-    rs_filename = rs_filename or get_config_index().get('robotSettingsFile')
+    rs_filename = rs_filename or CONFIG['robot_settings_file']
     if tag:
         root, ext = os.path.splitext(rs_filename)
         rs_filename = "{}-{}{}".format(root, tag, ext)
@@ -318,9 +317,9 @@ def backup_configuration(config: robot_config, tag=None):
 
 def clear(calibration=True, robot=True):
     if calibration:
-        _clear_file(get_config_index().get('deckCalibrationFile'))
+        _clear_file(CONFIG['deck_calibration_file'])
     if robot:
-        _clear_file(get_config_index().get('robotSettingsFile'))
+        _clear_file(CONFIG['robot_settings_file'])
 
 
 def _clear_file(filename):

@@ -1,5 +1,5 @@
 import pytest
-from opentrons.config import get_config_index, robot_configs
+from opentrons.config import robot_configs, CONFIG
 from opentrons.util.calibration_functions import update_instrument_config
 
 
@@ -117,7 +117,7 @@ def test_update_instrument_config(fixture):
         dst=inst.instrument_mover)) == (5.0, 5.0, 0), \
         "Expected instrument position to update relative to mover in pose tree"
 
-    filename = get_config_index().get('robotSettingsFile')
+    filename = CONFIG['robot_settings_file']
     _, expected = robot_configs._config_to_save(
         robot_configs._build_config([[]], {}))
     expected['instrument_offset']['right']['single'] = [5.0, 5.0, 0.0]

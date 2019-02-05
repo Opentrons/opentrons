@@ -26,8 +26,8 @@ async def update_module_firmware(request):
                                         request.loop)
     if 'successful' not in res['message']:
         if 'avrdudeResponse' in res and \
-                'checksum mismatch' in res['avrdudeResponse']:
-                status = 400
+           'checksum mismatch' in res['avrdudeResponse']:
+            status = 400
         elif 'not found' in res['message']:
             status = 404
         else:
@@ -40,7 +40,6 @@ async def update_module_firmware(request):
 
 
 async def _update_module_firmware(hw, module_serial, data, loop=None):
-
     fw_filename = data.filename
     content = data.file.read()
     log.info('Preparing to flash firmware image {}'.format(fw_filename))

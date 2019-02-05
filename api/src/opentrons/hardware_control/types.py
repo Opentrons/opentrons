@@ -76,3 +76,9 @@ class CriticalPoint(enum.Enum):
     move their centers - so between channels 4 and 5 - to the specified
     point.
     """
+
+    FRONT_NOZZLE = enum.auto()
+    """
+    The end of the front-most nozzle of a multipipette with a tip attached.
+    Only relevant when a multichannel pipette is present.
+    """

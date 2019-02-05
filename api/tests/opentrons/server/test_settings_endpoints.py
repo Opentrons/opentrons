@@ -8,8 +8,7 @@ import pytest
 
 from opentrons.server import init
 from opentrons.data_storage import database as db
-from opentrons.config import robot_configs as rc
-from opentrons.protocol_api import labware
+from opentrons import config
 
 
 def validate_response_body(body):
@@ -85,8 +84,7 @@ async def execute_reset_tests_v1(cli):
     assert resp.status == 200
     assert body == {}
 
-    index = rc.get_config_index()
-    robot_settings = index['robotSettingsFile']
+    robot_settings = config.CONFIG['robot_settings_file']
     with open(robot_settings, 'r') as f:
         data = json.load(f)
     assert data['tip_length'] == {}
@@ -103,7 +101,7 @@ async def execute_reset_tests_v2(cli):
     # Make sure we actually delete the database
     resp = await cli.post('/settings/reset', json={'labwareCalibration': True})
     body = await resp.json()
-    assert not os.listdir(labware.persistent_path)
+    assert not os.listdir(config.CONFIG['labware_calibration_offsets_dir_v4'])
     assert resp.status == 200
     assert body == {}
 
@@ -119,11 +117,11 @@ async def execute_reset_tests_v2(cli):
     assert resp.status == 200
     assert body == {}
 
-    index = rc.get_config_index()
-    robot_settings = index['robotSettingsFile']
+    robot_settings = config.CONFIG['robot_settings_file']
     with open(robot_settings, 'r') as f:
         data = json.load(f)
-    assert data['instrument_offset'] == rc.build_fallback_instrument_offset({})
+    assert data['instrument_offset']\
+        == config.robot_configs.build_fallback_instrument_offset({})
 
     # Check the inpost validation
     resp = await cli.post('/settings/reset', json={'aksgjajhadjasl': False})

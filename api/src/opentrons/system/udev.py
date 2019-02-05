@@ -26,10 +26,10 @@ def setup_rules_file():
 
     res0 = subprocess.run('udevadm control --reload-rules',
                           shell=True, stdout=subprocess.PIPE).stdout.decode()
-    if res0 is not '':
+    if res0:
         log.warning(res0.strip())
 
     res1 = subprocess.run('udevadm trigger',
                           shell=True, stdout=subprocess.PIPE).stdout.decode()
-    if res1 is not '':
+    if res1:
         log.warning(res1.strip())

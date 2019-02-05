@@ -2,13 +2,13 @@ import itertools
 
 import pytest
 
-from opentrons.broker import publish
 from opentrons.api import Session
 from opentrons.api.session import (
     _accumulate, _get_labware, _dedupe, extract_metadata)
 from tests.opentrons.conftest import state
 from opentrons.legacy_api.robot.robot import Robot
 from functools import partial
+from opentrons.broker import Broker
 
 state = partial(state, 'session')
 
@@ -81,7 +81,8 @@ async def test_clear_tips(session_manager, tip_clear_protocol):
 
 
 async def test_async_notifications(main_router):
-    publish('session', {'name': 'foo', 'payload': {'bar': 'baz'}})
+    main_router.broker.publish(
+        'session', {'name': 'foo', 'payload': {'bar': 'baz'}})
     # Get async iterator
     aiter = main_router.notifications.__aiter__()
     # Then read the first item
@@ -112,7 +113,6 @@ async def test_load_and_run_v2(
     assert main_router.notifications.queue.qsize() == 1
     assert session.state == 'loaded'
     assert session.command_log == {}
-    # main_router.calibration_manager.tip_probe(session.instruments[0])
 
     def run():
         session.run()
@@ -231,7 +231,9 @@ async def test_get_instruments_and_containers(labware_setup,
         _accumulate([_get_labware(command) for command in commands])
 
     session = Session.build_and_prep(name='', text='',
-                                     hardware=hardware, loop=loop)
+                                     hardware=hardware,
+                                     loop=loop,
+                                     broker=Broker())
     # We are calling dedupe directly for testing purposes.
     # Normally it is called from within a session
     session._instruments.extend(_dedupe(instruments))

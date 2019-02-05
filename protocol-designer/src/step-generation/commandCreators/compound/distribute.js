@@ -1,17 +1,13 @@
 // @flow
-// TODO Ian 2018-05-03
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
-import flatten from 'lodash/flatten'
-// import {FIXED_TRASH_ID} from '../constants'
 import * as errorCreators from '../../errorCreators'
 import {getPipetteWithTipMaxVol} from '../../robotStateSelectors'
-import type {DistributeFormData, RobotState, CommandCreator, CompoundCommandCreator, TransferLikeFormDataFields, TransferFormData} from '../../types'
+import type {DistributeArgs, RobotState, CommandCreator, CompoundCommandCreator} from '../../types'
 import {aspirate, dispense, blowout, replaceTip, touchTip} from '../atomic'
-import transfer from './transfer'
 import {mixUtil} from './mix'
 
-const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRobotState: RobotState) => {
+const distribute = (args: DistributeArgs): CompoundCommandCreator => (prevRobotState: RobotState) => {
   /**
     Distribute will aspirate from a single source well into multiple destination wells.
 
@@ -31,11 +27,11 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
   // TODO Ian 2018-05-03 next ~20 lines match consolidate.js
   const actionName = 'distribute'
 
-  const pipetteData = prevRobotState.pipettes[data.pipette]
+  const pipetteData = prevRobotState.pipettes[args.pipette]
   if (!pipetteData) {
     // bail out before doing anything else
     return [(_robotState) => ({
-      errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: data.pipette})],
+      errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: args.pipette})],
     })]
   }
 
@@ -44,57 +40,40 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
     dispenseFlowRateUlSec,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
-  } = data
+  } = args
 
-  // TODO error on negative data.disposalVolume?
-  const disposalVolume = (data.disposalVolume && data.disposalVolume > 0)
-    ? data.disposalVolume
+  // TODO error on negative args.disposalVolume?
+  const disposalVolume = (args.disposalVolume && args.disposalVolume > 0)
+    ? args.disposalVolume
     : 0
 
+  const maxVolume = getPipetteWithTipMaxVol(args.pipette, prevRobotState)
   const maxWellsPerChunk = Math.floor(
-    (getPipetteWithTipMaxVol(data.pipette, prevRobotState) - disposalVolume) / data.volume
+    (maxVolume - disposalVolume) / args.volume
   )
 
-  const {pipette} = data
+  const {pipette} = args
 
   if (maxWellsPerChunk === 0) {
-    // distribute vol exceeds pipette vol, break up into 1 transfer per dest well
-    const transferCommands = data.destWells.map((destWell, wellIndex) => {
-      let changeTip = data.changeTip
-      // 'once' means 'once per all inner transfers'
-      // so it should only apply to the first inner transfer
-      if (data.changeTip === 'once') {
-        changeTip = (wellIndex === 0) ? 'once' : 'never'
-      }
-      const transferData: TransferFormData = {
-        ...(data: TransferLikeFormDataFields),
-        changeTip,
-        commandCreatorFnName: 'transfer',
-        sourceWells: [data.sourceWell],
-        destWells: [destWell],
-        mixBeforeAspirate: data.mixBeforeAspirate,
-        mixInDestination: null,
-        blowoutLocation: null,
-      }
-      return transfer(transferData)
-    })
-
-    return flatten(transferCommands.map(tC => tC(prevRobotState)))
+    // distribute vol exceeds pipette vol
+    return [(_robotState) => ({
+      errors: [errorCreators.pipetteVolumeExceeded({actionName, volume: args.volume, maxVolume, disposalVolume})],
+    })]
   }
 
   const commandCreators = flatMap(
-    chunk(data.destWells, maxWellsPerChunk),
+    chunk(args.destWells, maxWellsPerChunk),
     (destWellChunk: Array<string>, chunkIndex: number): Array<CommandCreator> => {
       const dispenseCommands = flatMap(
         destWellChunk,
         (destWell: string, wellIndex: number): Array<CommandCreator> => {
-          const touchTipAfterDispenseCommand = data.touchTipAfterDispense
+          const touchTipAfterDispenseCommand = args.touchTipAfterDispense
             ? [
               touchTip({
                 pipette,
-                labware: data.destLabware,
+                labware: args.destLabware,
                 well: destWell,
-                offsetFromBottomMm: data.touchTipAfterDispenseOffsetMmFromBottom,
+                offsetFromBottomMm: args.touchTipAfterDispenseOffsetMmFromBottom,
               }),
             ]
             : []
@@ -102,8 +81,8 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
           return [
             dispense({
               pipette,
-              volume: data.volume,
-              labware: data.destLabware,
+              volume: args.volume,
+              labware: args.destLabware,
               well: destWell,
               'flow-rate': dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
@@ -116,40 +95,40 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
       let tipCommands: Array<CommandCreator> = []
 
       if (
-        data.changeTip === 'always' ||
-        (data.changeTip === 'once' && chunkIndex === 0)
+        args.changeTip === 'always' ||
+        (args.changeTip === 'once' && chunkIndex === 0)
       ) {
-        tipCommands = [replaceTip(data.pipette)]
+        tipCommands = [replaceTip(args.pipette)]
       }
 
       // TODO: BC 2018-11-29 instead of disposalLabware and disposalWell use blowoutLocation
       let blowoutCommands = []
-      if (data.disposalVolume && data.disposalLabware && data.disposalWell) {
+      if (args.disposalVolume && args.disposalLabware && args.disposalWell) {
         blowoutCommands = [blowout({
-          pipette: data.pipette,
-          labware: data.disposalLabware,
-          well: data.disposalWell,
+          pipette: args.pipette,
+          labware: args.disposalLabware,
+          well: args.disposalWell,
         })]
       }
 
-      const touchTipAfterAspirateCommand = data.touchTipAfterAspirate
+      const touchTipAfterAspirateCommand = args.touchTipAfterAspirate
         ? [
           touchTip({
-            pipette: data.pipette,
-            labware: data.sourceLabware,
-            well: data.sourceWell,
-            offsetFromBottomMm: data.touchTipAfterAspirateOffsetMmFromBottom,
+            pipette: args.pipette,
+            labware: args.sourceLabware,
+            well: args.sourceWell,
+            offsetFromBottomMm: args.touchTipAfterAspirateOffsetMmFromBottom,
           }),
         ]
         : []
 
-      const mixBeforeAspirateCommands = (data.mixBeforeAspirate)
+      const mixBeforeAspirateCommands = (args.mixBeforeAspirate)
         ? mixUtil({
-          pipette: data.pipette,
-          labware: data.sourceLabware,
-          well: data.sourceWell,
-          volume: data.mixBeforeAspirate.volume,
-          times: data.mixBeforeAspirate.times,
+          pipette: args.pipette,
+          labware: args.sourceLabware,
+          well: args.sourceWell,
+          volume: args.mixBeforeAspirate.volume,
+          times: args.mixBeforeAspirate.times,
           aspirateOffsetFromBottomMm,
           dispenseOffsetFromBottomMm,
           aspirateFlowRateUlSec,
@@ -162,9 +141,9 @@ const distribute = (data: DistributeFormData): CompoundCommandCreator => (prevRo
         ...mixBeforeAspirateCommands,
         aspirate({
           pipette,
-          volume: data.volume * destWellChunk.length + disposalVolume,
-          labware: data.sourceLabware,
-          well: data.sourceWell,
+          volume: args.volume * destWellChunk.length + disposalVolume,
+          labware: args.sourceLabware,
+          well: args.sourceWell,
           'flow-rate': aspirateFlowRateUlSec,
           offsetFromBottomMm: aspirateOffsetFromBottomMm,
         }),
