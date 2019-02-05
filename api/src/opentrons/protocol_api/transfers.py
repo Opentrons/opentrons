@@ -181,16 +181,16 @@ Transfer.touch_tip_strategy.__doc__ = """
 
 
 class PickUpTipOpts(NamedTuple):
-        """
-        Options to customize :py:attr:`.Transfer.new_tip`.
+    """
+    Options to customize :py:attr:`.Transfer.new_tip`.
 
-        These options will be passed to
-        :py:meth:`InstrumentContext.pick_up_tip` when it is called during
-        the transfer.
-        """
-        location: Optional[types.Location] = None
-        presses: Optional[int] = None
-        increment: Optional[int] = None
+    These options will be passed to
+    :py:meth:`InstrumentContext.pick_up_tip` when it is called during
+    the transfer.
+    """
+    location: Optional[types.Location] = None
+    presses: Optional[int] = None
+    increment: Optional[int] = None
 
 
 PickUpTipOpts.location.__doc__ = ':py:class:`types.Location`'

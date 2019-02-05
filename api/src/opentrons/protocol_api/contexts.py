@@ -1360,7 +1360,7 @@ class InstrumentContext(CommandPublisher):
         return self.hw_pipette['name']
 
     @property
-    def min_volume(self) ->float:
+    def min_volume(self) -> float:
         return self.hw_pipette['min_volume']
 
     @property

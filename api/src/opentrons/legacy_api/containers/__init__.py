@@ -43,7 +43,7 @@ def load(robot, container_name, slot, label=None, share=False):
     # OT-One users specify columns in the A1, B3 fashion
     # below methods help convert to the 1, 2, etc integer names
     def is_ot_one_slot_name(s):
-        return isinstance(s, str) and len(s) is 2 and s[0] in 'ABCD'
+        return isinstance(s, str) and len(s) == 2 and s[0] in 'ABCD'
 
     def convert_ot_one_slot_names(s):
         col = 'ABCD'.index(slot[0])

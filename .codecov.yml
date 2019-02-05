@@ -1,0 +1,15 @@
+fixes:
+  -"api/src/opentrons/"::"opentrons/"
+ignore:
+  - "architecture-and-planning"
+  - "audio"
+  - "compute"
+  - "**/node_modules"
+  - "protocol-library-kludge"
+  - "shared-data/definitions"
+  - "shared-data/definitions2"
+  - "shared-data/robot-data"
+  - "shared-data/protocol-json-schema"
+  - "shared-data/labware-json-schema"
+  - "webpack-config"
+
