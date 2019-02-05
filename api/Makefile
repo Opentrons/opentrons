@@ -16,7 +16,7 @@ python := pipenv run python
 pip := pipenv run pip
 pytest := pipenv run py.test
 pipenv_opts := --dev
-pipenv_opts += $(and $(CI),--keep-outdated)
+# pipenv_opts += $(and $(CI),--keep-outdated)
 
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
