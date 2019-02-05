@@ -15,7 +15,7 @@ firmware = $(wildcard smoothie/*.hex)
 python := pipenv run python
 pip := pipenv run pip
 pytest := pipenv run py.test
-pipenv_opts := --dev
+pipenv_opts := --dev --verbose
 # pipenv_opts += $(and $(CI),--keep-outdated)
 
 # Find the version of the wheel from package.json using a helper script. We
