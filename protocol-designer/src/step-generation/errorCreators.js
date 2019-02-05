@@ -55,10 +55,14 @@ export function pipetteVolumeExceeded (args: {
   actionName: string,
   volume: string | number,
   maxVolume: string | number,
+  disposalVolume?: string | number,
 }): CommandCreatorError {
-  const {actionName, volume, maxVolume} = args
+  const {actionName, volume, maxVolume, disposalVolume} = args
+  const message = disposalVolume != null
+    ? `Attemped to ${actionName} volume + disposal volume greater than pipette max volume (${volume} + ${disposalVolume} > ${maxVolume})`
+    : `Attempted to ${actionName} volume greater than pipette max volume (${volume} > ${maxVolume})`
   return {
-    message: `Attempted to ${actionName} volume greater than pipette max volume (${volume} > ${maxVolume})`,
+    message,
     type: 'PIPETTE_VOLUME_EXCEEDED',
   }
 }

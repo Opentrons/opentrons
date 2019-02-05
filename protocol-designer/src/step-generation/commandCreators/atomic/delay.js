@@ -1,17 +1,17 @@
 // @flow
-import type {PauseFormData, RobotState, CommandCreator} from '../../types'
+import type {DelayArgs, RobotState, CommandCreator} from '../../types'
 
-const pause = (data: PauseFormData): CommandCreator => (prevRobotState: RobotState) => {
+const delay = (args: DelayArgs): CommandCreator => (prevRobotState: RobotState) => {
   return {
     robotState: prevRobotState,
     commands: [{
       command: 'delay',
       params: {
-        message: data.message,
-        wait: data.wait,
+        message: args.message,
+        wait: args.wait,
       },
     }],
   }
 }
 
-export default pause
+export default delay

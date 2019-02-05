@@ -30,11 +30,11 @@ import type {StepIdType} from '../form-types'
 import type {RobotState} from '../step-generation'
 
 import type {
-  ConsolidateFormData,
-  DistributeFormData,
-  MixFormData,
-  PauseFormData,
-  TransferFormData,
+  ConsolidateArgs,
+  DistributeArgs,
+  MixArgs,
+  DelayArgs,
+  TransferArgs,
 } from '../step-generation/types'
 import type {PipetteOnDeck} from '../step-forms'
 type AllPipetteData = {[pipetteId: string]: PipetteOnDeck}
@@ -43,7 +43,7 @@ export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 type GetLabwareType = (labwareId: string) => ?string
 
 function transferLikeSubsteps (args: {
-  stepArgs: ConsolidateFormData | DistributeFormData | TransferFormData | MixFormData,
+  stepArgs: ConsolidateArgs | DistributeArgs | TransferArgs | MixArgs,
   allPipetteData: AllPipetteData,
   getLabwareType: GetLabwareType,
   robotState: RobotState,
@@ -250,7 +250,7 @@ export function generateSubsteps (
 
   if (stepArgs.commandCreatorFnName === 'delay') {
     // just returns formData
-    const formData: PauseFormData = stepArgs
+    const formData: DelayArgs = stepArgs
     return formData
   }
 

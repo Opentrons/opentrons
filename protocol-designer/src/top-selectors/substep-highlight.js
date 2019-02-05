@@ -32,7 +32,7 @@ function _wellsForPipette (pipetteChannels: 1 | 8, labwareType: string, wells: A
 }
 
 function _getSelectedWellsForStep (
-  stepArgs: StepGeneration.CommandCreatorData,
+  stepArgs: StepGeneration.CommandCreatorArgs,
   labwareId: string,
   robotState: StepGeneration.RobotState
 ): Array<string> {
@@ -87,7 +87,7 @@ function _getSelectedWellsForStep (
 
 /** Scan through given substep rows to get a list of source/dest wells for the given labware */
 function _getSelectedWellsForSubstep (
-  stepArgs: StepGeneration.CommandCreatorData,
+  stepArgs: StepGeneration.CommandCreatorArgs,
   labwareId: string,
   substeps: ?SubstepItemData,
   substepIndex: number
@@ -126,11 +126,11 @@ function _getSelectedWellsForSubstep (
   }
 
   // source + dest steps
-  // $FlowFixMe: property `sourceLabware` is missing in `MixFormData`
+  // $FlowFixMe: property `sourceLabware` is missing in `MixArgs`
   if (stepArgs.sourceLabware && stepArgs.sourceLabware === labwareId) {
     wells.push(...getWells('source'))
   }
-  // $FlowFixMe: property `destLabware` is missing in `MixFormData`
+  // $FlowFixMe: property `destLabware` is missing in `MixArgs`
   if (stepArgs.destLabware && stepArgs.destLabware === labwareId) {
     wells.push(...getWells('dest'))
   }

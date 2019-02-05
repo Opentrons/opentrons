@@ -2,7 +2,7 @@
 import flatMap from 'lodash/flatMap'
 import {repeatArray, blowoutUtil} from '../../utils'
 import * as errorCreators from '../../errorCreators'
-import type {MixFormData, RobotState, CommandCreator, CompoundCommandCreator} from '../../types'
+import type {MixArgs, RobotState, CommandCreator, CompoundCommandCreator} from '../../types'
 import {aspirate, dispense, replaceTip, touchTip} from '../atomic'
 
 /** Helper fn to make mix command creators w/ minimal arguments */
@@ -34,7 +34,7 @@ export function mixUtil (args: {
   ], times)
 }
 
-const mix = (data: MixFormData): CompoundCommandCreator => (prevRobotState: RobotState) => {
+const mix = (data: MixArgs): CompoundCommandCreator => (prevRobotState: RobotState) => {
   /**
     Mix will aspirate and dispense a uniform volume some amount of times from a set of wells
     in a single labware.

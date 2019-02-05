@@ -127,7 +127,7 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   }
 )
 
-function compoundCommandCreatorFromStepArgs (stepArgs: StepGeneration.CommandCreatorData): ?StepGeneration.CompoundCommandCreator {
+function compoundCommandCreatorFromStepArgs (stepArgs: StepGeneration.CommandCreatorArgs): ?StepGeneration.CompoundCommandCreator {
   switch (stepArgs.commandCreatorFnName) {
     case 'consolidate': return StepGeneration.consolidate(stepArgs)
     case 'delay': {
@@ -148,13 +148,13 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
   stepFormSelectors.getOrderedStepIds,
   getInitialRobotState,
   (allStepArgsAndErrors, orderedStepIds, initialRobotState) => {
-    const allStepArgs: Array<StepGeneration.CommandCreatorData | null> = orderedStepIds.map(stepId => {
+    const allStepArgs: Array<StepGeneration.CommandCreatorArgs | null> = orderedStepIds.map(stepId => {
       return (allStepArgsAndErrors[stepId] && allStepArgsAndErrors[stepId].stepArgs) || null
     })
 
     // TODO: Ian 2018-06-14 `takeWhile` isn't inferring the right type
     // $FlowFixMe
-    const continuousStepArgs: Array<StepGeneration.CommandCreatorData> = takeWhile(
+    const continuousStepArgs: Array<StepGeneration.CommandCreatorArgs> = takeWhile(
       allStepArgs,
       stepArgs => stepArgs
     )

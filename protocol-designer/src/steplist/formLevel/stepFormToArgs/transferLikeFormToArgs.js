@@ -4,9 +4,9 @@ import { getLabware } from '@opentrons/shared-data'
 import intersection from 'lodash/intersection'
 import type { FormData } from '../../../form-types'
 import type {
-  ConsolidateFormData,
-  DistributeFormData,
-  TransferFormData,
+  ConsolidateArgs,
+  DistributeArgs,
+  TransferArgs,
 } from '../../../step-generation'
 import {SOURCE_WELL_BLOWOUT_DESTINATION} from '../../../step-generation/utils'
 import { DEFAULT_CHANGE_TIP_OPTION } from '../../../constants'
@@ -21,7 +21,7 @@ function getMixData (hydratedFormData, checkboxField, volumeField, timesField) {
     : null
 }
 
-type TransferLikeStepArgs = ConsolidateFormData | DistributeFormData | TransferFormData | null
+type TransferLikeStepArgs = ConsolidateArgs | DistributeArgs | TransferArgs | null
 
 // TODO: BC 2018-10-30 move getting labwareDef into hydration layer upstream
 const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArgs => {
@@ -143,7 +143,7 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
 
   switch (stepType) {
     case 'transfer': {
-      const transferStepArguments: TransferFormData = {
+      const transferStepArguments: TransferArgs = {
         ...commonFields,
         blowoutLocation,
         commandCreatorFnName: 'transfer',
@@ -155,7 +155,7 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
       return transferStepArguments
     }
     case 'consolidate': {
-      const consolidateStepArguments: ConsolidateFormData = {
+      const consolidateStepArguments: ConsolidateArgs = {
         ...commonFields,
         blowoutLocation,
         mixFirstAspirate,
@@ -167,7 +167,7 @@ const transferLikeFormToArgs = (hydratedFormData: FormData): TransferLikeStepArg
       return consolidateStepArguments
     }
     case 'distribute': {
-      const distributeStepArguments: DistributeFormData = {
+      const distributeStepArguments: DistributeArgs = {
         ...commonFields,
         disposalVolume,
         disposalLabware,

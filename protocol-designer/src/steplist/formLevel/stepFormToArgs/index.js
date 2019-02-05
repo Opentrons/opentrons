@@ -5,13 +5,13 @@ import mixFormToArgs from './mixFormToArgs'
 import pauseFormToArgs from './pauseFormToArgs'
 import moveLiquidFormToArgs from './moveLiquidFormToArgs'
 import type {FormData} from '../../../form-types'
-import type {CommandCreatorData} from '../../../step-generation'
+import type {CommandCreatorArgs} from '../../../step-generation'
 
 // NOTE: this acts as an adapter for the PD defined data shape of the step forms
 // to create arguments that the step generation service is expecting
 // in order to generate command creators
 
-type StepArgs = CommandCreatorData | null
+type StepArgs = CommandCreatorArgs | null
 
 // TODO: Ian 2019-01-29 use hydrated form type
 const stepFormToArgs = (hydratedForm: FormData): StepArgs => {
