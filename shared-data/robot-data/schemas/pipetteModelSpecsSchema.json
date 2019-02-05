@@ -72,19 +72,32 @@
         },
         "pickUpCurrent": {"$ref": "#/definitions/editConfigurations"},
         "pickUpDistance": {"$ref": "#/definitions/editConfigurations"},
-        "modelOffset": {"$ref": "#/definitions/xyzArray"},
+        "modelOffset": {
+          "value": {"$ref": "#/definitions/xyzArray"},
+          "edit": false},
         "plungerCurrent": {"$ref": "#/definitions/editConfigurations"},
         "dropTipCurrent": {"$ref": "#/definitions/editConfigurations"},
-        "dropTipSpeed": {"type": "number"},
+        "dropTipSpeed": {"$ref": "#/definitions/editConfigurations"},
         "ulPerMm": {
+<<<<<<< HEAD
           "type": "array",
           "items": {"$ref": "#/definitions/liquidHandlingSpecs"}
+=======
+          "type": "object",
+          "required": ["aspirate", "dispense", "edit"],
+          "additionalProperties": false,
+          "properties": {
+            "aspirate": {"$ref": "#/definitions/linearEquations"},
+            "dispense": {"$ref": "#/definitions/linearEquations"},
+            "edit": {"type": "boolean"}
+          }
+>>>>>>> Update schemas to have the same shape moving forward
         },
-        "quirks": {
-          "type": "array",
-          "items": {"type": "string"}
-        },
-        "tipLength": {"$ref": "#/definitions/positiveNumber"}
+        "quirks": {"$ref": "#/definitions/editConfigurations"},
+        "tipLength": {
+          "value": {"$ref": "#/definitions/positiveNumber"},
+          "edit": {"type": "boolean"}
+        }
       }
     }
   }

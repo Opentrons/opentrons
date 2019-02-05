@@ -135,11 +135,12 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
 
     res = pipette_config(
         plunger_positions={
-            'top': plunger_pos.get('top')['current'],
-            'bottom': plunger_pos.get('bottom')['current'],
-            'blow_out': plunger_pos.get('blowOut')['current'],
-            'drop_tip': plunger_pos.get('dropTip')['current'],
+            'top': plunger_pos.get('top')['value'],
+            'bottom': plunger_pos.get('bottom')['value'],
+            'blow_out': plunger_pos.get('blowOut')['value'],
+            'drop_tip': plunger_pos.get('dropTip')['value'],
         },
+<<<<<<< HEAD
         pick_up_current=cfg.get('pickUpCurrent')['current'],
         pick_up_distance=cfg.get('pickUpDistance')['current'],
         aspirate_flow_rate=cfg.get('defaultAspirateFlowRate'),
@@ -155,6 +156,23 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
         quirks=cfg.get('quirks'),
         tip_length=cfg.get('tipLength'),
         display_name=cfg.get('displayName')
+=======
+        pick_up_current=cfg.get('pickUpCurrent')['value'],
+        pick_up_distance=cfg.get('pickUpDistance')['value'],
+        aspirate_flow_rate=cfg.get('defaultAspirateFlowRate')['value'],
+        dispense_flow_rate=cfg.get('defaultDispenseFlowRate')['value'],
+        channels=cfg.get('channels')['value'],
+        model_offset=cfg.get('modelOffset')['value'],
+        plunger_current=cfg.get('plungerCurrent')['value'],
+        drop_tip_current=cfg.get('dropTipCurrent')['value'],
+        drop_tip_speed=cfg.get('dropTipSpeed')['value'],
+        min_volume=cfg.get('minVolume')['value'],
+        max_volume=cfg.get('maxVolume')['value'],
+        ul_per_mm=cfg.get('ulPerMm'),
+        quirks=cfg.get('quirks')['value'],
+        tip_length=cfg.get('tipLength')['value'],
+        display_name=cfg.get('displayName')['value']
+>>>>>>> Update schemas to have the same shape moving forward
     )
 
     # Verify that stored values agree with calculations

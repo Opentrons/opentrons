@@ -3,76 +3,61 @@
     "name": "p10_single",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 2,
-        "current": 2,
+        "value": 2,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": -1,
-        "current": -1,
+        "value": -1,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -4.5,
-        "current": -4.5,
+        "value": -4.5,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.1,
-      "current": 0.1,
+      "value": 0.1,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 10,
-      "current": 10,
+      "value": 10,
       "edit": true,
       "min": 1,
       "max": 30
     },
-    "modelOffset": [0.0, 0.0, -13],
+    "modelOffset": {"value": [0.0, 0.0, -13], "edit": false},
     "plungerCurrent": {
-      "default": 0.3,
-      "current": 0.3,
+      "value": 0.3,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
-<<<<<<< HEAD
       "max": 30},
     "ulPerMm": [{
-=======
-      "max": 30
-    },
-    "ulPerMm": {
->>>>>>> Update pipette_config to load properly, fix tests
       "aspirate": [
         [1.8263, -0.0958, 1.088],
         [2.5222, -0.104, 1.1031],
@@ -104,50 +89,43 @@
     "name": "p10_single",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 0.5,
-        "current": 0.5,
+        "value": 0.5,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": -2.5,
-        "current": -2.5,
+        "value": -2.5,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -6,
-        "current": -6,
+        "value": -6,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.1,
-      "current": 0.1,
+      "value": 0.1,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 10,
-      "current": 10,
+      "value": 10,
       "edit": true,
       "min": 1,
       "max": 30
     },
     "modelOffset": [0.0, 0.0, -13],
-<<<<<<< HEAD
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
     "dropTipSpeed": 5,
@@ -177,24 +155,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.3,
-      "current": 0.3,
+      "value": 0.3,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -209,67 +183,21 @@
       ],
       "dispense": [
         [12.5135, 0, 0.7945]
-      ]
+      ],
+      "edit": true
     },
->>>>>>> Update pipette_config to load properly, fix tests
     "quirks": [],
     "tipLength": 33
   },
   "p10_single_v1.4": {
     "name": "p10_single",
     "plungerPositions": {
-<<<<<<< HEAD
       "top": 19.5,
       "bottom": 2.5,
       "blowOut": -0.5,
       "dropTip": -5.2
-=======
-      "top": {
-        "default": 19.5,
-        "current": 19.5,
-        "edit": true,
-        "min": 5,
-        "max": 19.5
-      },
-      "bottom": {
-        "default": 1.5,
-        "current": 1.5,
-        "edit": true,
-        "min": -2,
-        "max": 19.0
-      },
-      "blowOut": {
-        "default": -1.5,
-        "current": -1.5,
-        "edit": true,
-        "min": -4,
-        "max": 10
-      },
-      "dropTip": {
-        "default": -5.5,
-        "current": -5.5,
-        "edit": true,
-        "min": -6,
-        "max": 2
-      }
-    },
-    "pickUpCurrent": {
-      "default": 0.1,
-      "current": 0.1,
-      "edit": true,
-      "min": 0.05,
-      "max": 1.2
-    },
-    "pickUpDistance": {
-      "default": 10,
-      "current": 10,
-      "edit": true,
-      "min": 1,
-      "max": 30
->>>>>>> Update pipette_config to load properly, fix tests
     },
     "modelOffset": [0.0, 0.0, -13],
-<<<<<<< HEAD
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
     "dropTipSpeed": 5,
@@ -299,24 +227,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.3,
-      "current": 0.3,
+      "value": 0.3,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -331,60 +255,53 @@
       ],
       "dispense": [
         [12.5135, 0, 0.7945]
-      ]
+      ],
+      "edit": false
     },
->>>>>>> Update pipette_config to load properly, fix tests
-    "quirks": [],
-    "tipLength": 33
+    "quirks": {"value": [], "edit": false},
+    "tipLength": {"value": 33, "edit": false}
   },
   "p10_multi_v1": {
     "name": "p10_multi",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 2,
-        "current": 2,
+        "value": 2,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": -1,
-        "current": -1,
+        "value": -1,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -4,
-        "current": -4,
+        "value": -4,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.4,
-      "current": 0.4,
+      "value": 0.4,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 10,
-      "current": 10,
+      "value": 10,
       "edit": true,
       "min": 1,
       "max": 30
     },
     "modelOffset": [0.0, 31.5, -25.8],
-<<<<<<< HEAD
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
     "dropTipSpeed": 5,
@@ -413,24 +330,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -444,60 +357,53 @@
       ],
       "dispense": [
         [12.74444519, 0, 0.8058688085]
-      ]
+      ],
+      "edit": false
     },
->>>>>>> Update pipette_config to load properly, fix tests
-    "quirks": [],
-    "tipLength": 33
+    "quirks": {"value": [], "edit": false},
+    "tipLength": {"value": 33, "edit": false}
   },
   "p10_multi_v1.3": {
     "name": "p10_multi",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 0.5,
-        "current": 0.5,
+        "value": 0.5,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": -2.5,
-        "current": -2.5,
+        "value": -2.5,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -5.5,
-        "current": -5.5,
+        "value": -5.5,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.4,
-      "current": 0.4,
+      "value": 0.4,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 10,
-      "current": 10,
+      "value": 10,
       "edit": true,
       "min": 1,
       "max": 30
     },
     "modelOffset": [0.0, 31.5, -25.8],
-<<<<<<< HEAD
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
     "dropTipSpeed": 5,
@@ -526,24 +432,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -557,60 +459,53 @@
       ],
       "dispense": [
         [12.74444519, 0, 0.8058688085]
-      ]
+      ],
+      "edit": false
     },
->>>>>>> Update pipette_config to load properly, fix tests
-    "quirks": [],
-    "tipLength": 33
+    "quirks": {"value": [], "edit": false},
+    "tipLength": {"value": 33, "edit": false}
   },
   "p10_multi_v1.4": {
     "name": "p10_multi",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 2,
-        "current": 2,
+        "value": 2,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": -1,
-        "current": -1,
+        "value": -1,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -4.5,
-        "current": -4.5,
+        "value": -4.5,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.4,
-      "current": 0.4,
+      "value": 0.4,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 10,
-      "current": 10,
+      "value": 10,
       "edit": true,
       "min": 1,
       "max": 30
     },
     "modelOffset": [0.0, 31.5, -25.8],
-<<<<<<< HEAD
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
     "dropTipSpeed": 5,
@@ -639,24 +534,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -670,60 +561,53 @@
       ],
       "dispense": [
         [12.74444519, 0, 0.8058688085]
-      ]
+      ],
+      "edit": false
     },
->>>>>>> Update pipette_config to load properly, fix tests
-    "quirks": [],
-    "tipLength": 33
+    "quirks": {"value": [], "edit": false},
+    "tipLength": {"value": 33, "edit": false}
   },
   "p50_single_v1": {
     "name": "p50_single",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 2.01,
-        "current": 2.01,
+        "value": 2.01,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": 2,
-        "current": 2,
+        "value": 2,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -4.5,
-        "current": -4.5,
+        "value": -4.5,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.1,
-      "current": 0.1,
+      "value": 0.1,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 10,
-      "current": 10,
+      "value": 10,
       "edit": true,
       "min": 1,
       "max": 30
     },
     "modelOffset": [0.0, 0.0, 0.0],
-<<<<<<< HEAD
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
     "dropTipSpeed": 5,
@@ -750,24 +634,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.3,
-      "current": 0.3,
+      "value": 0.3,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -779,45 +659,40 @@
       ],
       "dispense": [
         [50, 0, 2.931601299]
-      ]
+      ],
+      "edit": false
     },
->>>>>>> Update pipette_config to load properly, fix tests
-    "quirks": [],
-    "tipLength": 51.7
+    "quirks": {"value": [], "edit": false},
+    "tipLength": {"value": 51.7, "edit": false}
   },
   "p50_single_v1.3": {
     "name": "p50_single",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 2,
-        "current": 2,
+        "value": 2,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": 0.5,
-        "current": 0.5,
+        "value": 0.5,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -6,
-        "current": -6,
+        "value": -6,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
-<<<<<<< HEAD
     "pickUpCurrent": 0.1,
     "pickUpDistance": 10,
     "modelOffset": [0.0, 0.0, 0.0],
@@ -857,24 +732,8 @@
       "bottom": 2,
       "blowOut": 0.5,
       "dropTip": -5
-=======
-    "pickUpCurrent": {
-      "default": 0.1,
-      "current": 0.1,
-      "edit": true,
-      "min": 0.05,
-      "max": 1.2
-    },
-    "pickUpDistance": {
-      "default": 10,
-      "current": 10,
-      "edit": true,
-      "min": 1,
-      "max": 30
->>>>>>> Update pipette_config to load properly, fix tests
     },
     "modelOffset": [0.0, 0.0, 0.0],
-<<<<<<< HEAD
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
     "dropTipSpeed": 5,
@@ -901,24 +760,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.3,
-      "current": 0.3,
+      "value": 0.3,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -930,75 +785,69 @@
       ],
       "dispense": [
         [50, 0, 2.931601299]
-      ]
+      ],
+      "edit": false
     },
-    "quirks": [],
-    "tipLength": 51.7
+    "quirks": {"value": [], "edit": false},
+    "tipLength": {"value": 51.7, "edit": false}
   },
   "p50_single_v1.4": {
     "name": "p50_single",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 2,
-        "current": 2,
+        "value": 2,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": 0.5,
-        "current": 0.5,
+        "value": 0.5,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -5,
-        "current": -5,
+        "value": -5,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.1,
-      "current": 0.1,
+      "value": 0.1,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 10,
-      "current": 10,
+      "value": 10,
       "edit": true,
       "min": 1,
       "max": 30
     },
-    "modelOffset": [0.0, 0.0, 0.0],
+    "modelOffset": {
+      "value": [0.0, 0.0, 0.0],
+      "edit": false},
     "plungerCurrent": {
-      "default": 0.3,
-      "current": 0.3,
+      "value": 0.3,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -1010,60 +859,53 @@
       ],
       "dispense": [
         [50, 0, 2.931601299]
-      ]
+      ],
+      "edit": false
     },
->>>>>>> Update pipette_config to load properly, fix tests
-    "quirks": [],
-    "tipLength": 51.7
+    "quirks": {"value": [], "edit": false},
+    "tipLength": {"value": 51.7, "edit": false}
   },
   "p50_multi_v1": {
     "name": "p50_multi",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 2.5,
-        "current": 2.5,
+        "value": 2.5,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": 2,
-        "current": 2,
+        "value": 2,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -3.5,
-        "current": -3.5,
+        "value": -3.5,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.6,
-      "current": 0.6,
+      "value": 0.6,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 10,
-      "current": 10,
+      "value": 10,
       "edit": true,
       "min": 1,
       "max": 30
     },
     "modelOffset": [0.0, 31.5, -25.8],
-<<<<<<< HEAD
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
     "dropTipSpeed": 5,
@@ -1090,24 +932,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -1119,60 +957,53 @@
       ],
       "dispense": [
         [50, 0, 3.06368702]
-      ]
+      ],
+      "edit": false
     },
->>>>>>> Update pipette_config to load properly, fix tests
-    "quirks": [],
-    "tipLength": 51.7
+    "quirks": {"value":[], "edit": false},
+    "tipLength": {"value": 51.7, "edit": false}
   },
   "p50_multi_v1.3": {
     "name": "p50_multi",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 2,
-        "current": 2,
+        "value": 2,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": 0.5,
-        "current": 0.5,
+        "value": 0.5,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -5,
-        "current": -5,
+        "value": -5,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.6,
-      "current": 0.6,
+      "value": 0.6,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 10,
-      "current": 10,
+      "value": 10,
       "edit": true,
       "min": 1,
       "max": 30
     },
     "modelOffset": [0.0, 31.5, -25.8],
-<<<<<<< HEAD
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
     "dropTipSpeed": 5,
@@ -1199,24 +1030,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -1228,60 +1055,53 @@
       ],
       "dispense": [
         [50, 0, 3.06368702]
-      ]
+      ],
+      "edit": false
     },
->>>>>>> Update pipette_config to load properly, fix tests
-    "quirks": [],
-    "tipLength": 51.7
+    "quirks": {"value": [], "edit": false},
+    "tipLength": {"value": 51.7, "edit": false}
   },
   "p50_multi_v1.4": {
     "name": "p50_multi",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 2,
-        "current": 2,
+        "value": 2,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": 0.5,
-        "current": 0.5,
+        "value": 0.5,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -4,
-        "current": -4,
+        "value": -4,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.6,
-      "current": 0.6,
+      "value": 0.6,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 10,
-      "current": 10,
+      "value": 10,
       "edit": true,
       "min": 1,
       "max": 30
     },
     "modelOffset": [0.0, 31.5, -25.8],
-<<<<<<< HEAD
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
     "dropTipSpeed": 5,
@@ -1308,24 +1128,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -1337,60 +1153,53 @@
       ],
       "dispense": [
         [50, 0, 3.06368702]
-      ]
+      ],
+      "edit": false
     },
->>>>>>> Update pipette_config to load properly, fix tests
-    "quirks": [],
-    "tipLength": 51.7
+    "quirks": {"value": [], "edit": false},
+    "tipLength": {"value": 51.7, "edit": false}
   },
   "p300_single_v1": {
     "name": "p300_single",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 1.5,
-        "current": 1.5,
+        "value": 1.5,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": 0,
-        "current": 0,
+        "value": 0,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -4,
-        "current": -4,
+        "value": -4,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.1,
-      "current": 0.1,
+      "value": 0.1,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 10,
-      "current": 10,
+      "value": 10,
       "edit": true,
       "min": 1,
       "max": 30
     },
     "modelOffset": [0.0, 0.0, 0.0],
-<<<<<<< HEAD
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
     "dropTipSpeed": 5,
@@ -1421,24 +1230,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.3,
-      "current": 0.3,
+      "value": 0.3,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -1453,60 +1258,53 @@
       ],
       "dispense": [
         [302.3895337, 0, 18.83156277]
-      ]
+      ],
+      "edit": false
     },
->>>>>>> Update pipette_config to load properly, fix tests
-    "quirks": [],
-    "tipLength": 51.7
+    "quirks": {"value": [], "edit": false},
+    "tipLength": {"value": 51.7, "edit": false}
   },
   "p300_single_v1.3": {
     "name": "p300_single",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 1.5,
-        "current": 1.5,
+        "value": 1.5,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": -1.5,
-        "current": -1.5,
+        "value": -1.5,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -5.5,
-        "current": -5.5,
+        "value": -5.5,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.1,
-      "current": 0.1,
+      "value": 0.1,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 10,
-      "current": 10,
+      "value": 10,
       "edit": true,
       "min": 1,
       "max": 30
     },
     "modelOffset": [0.0, 0.0, 0.0],
-<<<<<<< HEAD
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
     "dropTipSpeed": 5,
@@ -1537,24 +1335,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.3,
-      "current": 0.3,
+      "value": 0.3,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -1569,60 +1363,53 @@
       ],
       "dispense": [
         [302.3895337, 0, 18.83156277]
-      ]
+      ],
+      "edit": false
     },
->>>>>>> Update pipette_config to load properly, fix tests
-    "quirks": [],
-    "tipLength": 51.7
+    "quirks": {"value": [], "edit": false},
+    "tipLength": {"value": 51.7, "edit": false}
   },
   "p300_single_v1.4": {
     "name": "p300_single",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 3,
-        "current": 3,
+        "value": 3,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": 0,
-        "current": 0,
+        "value": 0,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -4.5,
-        "current": -4.5,
+        "value": -4.5,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.1,
-      "current": 0.1,
+      "value": 0.1,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 10,
-      "current": 10,
+      "value": 10,
       "edit": true,
       "min": 1,
       "max": 30
     },
     "modelOffset": [0.0, 0.0, 0.0],
-<<<<<<< HEAD
     "plungerCurrent": 0.3,
     "dropTipCurrent": 0.5,
     "dropTipSpeed": 5,
@@ -1653,24 +1440,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.3,
-      "current": 0.3,
+      "value": 0.3,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -1685,60 +1468,53 @@
       ],
       "dispense": [
         [302.3895337, 0, 18.83156277]
-      ]
+      ],
+      "edit": false
     },
->>>>>>> Update pipette_config to load properly, fix tests
-    "quirks": [],
-    "tipLength": 51.7
+    "quirks": {"value": [], "edit": false},
+    "tipLength": {"value": 51.7, "edit": false}
   },
   "p300_multi_v1": {
     "name": "p300_multi",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 3.5,
-        "current": 3.5,
+        "value": 3.5,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": 3,
-        "current": 3,
+        "value": 3,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -2,
-        "current": -2,
+        "value": -2,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.6,
-      "current": 0.6,
+      "value": 0.6,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 10,
-      "current": 10,
+      "value": 10,
       "edit": true,
       "min": 1,
       "max": 30
     },
     "modelOffset": [0.0, 31.5, -25.8],
-<<<<<<< HEAD
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
     "dropTipSpeed": 5,
@@ -1753,24 +1529,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -1782,60 +1554,53 @@
       ],
       "dispense": [
         [309.2612689, 0, 19.29389273]
-      ]
+      ],
+      "edit": false
     },
->>>>>>> Update pipette_config to load properly, fix tests
-    "quirks": [],
-    "tipLength": 51.7
+    "quirks": {"value": [], "edit": false},
+    "tipLength": {"value": 51.7, "edit": false}
   },
   "p300_multi_v1.3": {
     "name": "p300_multi",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 3.5,
-        "current": 3.5,
+        "value": 3.5,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": 1.5,
-        "current": 1.5,
+        "value": 1.5,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -3.5,
-        "current": -3.5,
+        "value": -3.5,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.6,
-      "current": 0.6,
+      "value": 0.6,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 10,
-      "current": 10,
+      "value": 10,
       "edit": true,
       "min": 1,
       "max": 30
     },
     "modelOffset": [0.0, 31.5, -25.8],
-<<<<<<< HEAD
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
     "dropTipSpeed": 5,
@@ -1850,24 +1615,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -1879,60 +1640,53 @@
       ],
       "dispense": [
         [309.2612689, 0, 19.29389273]
-      ]
+      ],
+      "edit": false
     },
->>>>>>> Update pipette_config to load properly, fix tests
-    "quirks": [],
-    "tipLength": 51.7
+    "quirks": {"value": [], "edit": false},
+    "tipLength": {"value": 51.7, "edit": false}
   },
   "p300_multi_v1.4": {
     "name": "p300_multi",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 3.5,
-        "current": 3.5,
+        "value": 3.5,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": 1.5,
-        "current": 1.5,
+        "value": 1.5,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -3.5,
-        "current": -3.5,
+        "value": -3.5,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.6,
-      "current": 0.6,
+      "value": 0.6,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 10,
-      "current": 10,
+      "value": 10,
       "edit": true,
       "min": 1,
       "max": 30
     },
     "modelOffset": [0.0, 31.5, -25.8],
-<<<<<<< HEAD
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
     "dropTipSpeed": 5,
@@ -1947,24 +1701,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -1976,60 +1726,53 @@
       ],
       "dispense": [
         [309.2612689, 0, 19.29389273]
-      ]
+      ],
+      "edit": false
     },
->>>>>>> Update pipette_config to load properly, fix tests
-    "quirks": [],
-    "tipLength": 51.7
+    "quirks": {"value": [], "edit": false},
+    "tipLength": {"value": 51.7, "edit": false}
   },
   "p1000_single_v1": {
     "name": "p1000_single",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 3,
-        "current": 3,
+        "value": 3,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": 1,
-        "current": 1,
+        "value": 1,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -2.2,
-        "current": -2.2,
+        "value": -2.2,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.1,
-      "current": 0.1,
+      "value": 0.1,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 15,
-      "current": 15,
+      "value": 15,
       "edit": true,
       "min": 1,
       "max": 30
     },
     "modelOffset": [0.0, 0.0, 20.0],
-<<<<<<< HEAD
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.5,
     "dropTipSpeed": 5,
@@ -2048,24 +1791,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -2081,60 +1820,53 @@
       ],
       "dispense": [
         [1000, 0, 61.3275]
-      ]
+      ],
+      "edit": false
     },
->>>>>>> Update pipette_config to load properly, fix tests
-    "quirks": ["needs-pickup-shake"],
-    "tipLength": 76.7
+    "quirks": {"value": ["needs-pickup-shake"], "edit": false},
+    "tipLength": {"value": 76.7, "edit": false}
   },
   "p1000_single_v1.3": {
     "name": "p1000_single",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 2.5,
-        "current": 2.5,
+        "value": 2.5,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": 0.5,
-        "current": 0.5,
+        "value": 0.5,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -4,
-        "current": -4,
+        "value": -4,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.1,
-      "current": 0.1,
+      "value": 0.1,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 15,
-      "current": 15,
+      "value": 15,
       "edit": true,
       "min": 1,
       "max": 30
     },
     "modelOffset": [0.0, 0.0, 20.0],
-<<<<<<< HEAD
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.7,
     "dropTipSpeed": 5,
@@ -2153,24 +1885,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.7,
-      "current": 0.7,
+      "value": 0.7,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -2186,60 +1914,53 @@
       ],
       "dispense": [
         [1000, 0, 61.3275]
-      ]
+      ],
+      "edit": false
     },
->>>>>>> Update pipette_config to load properly, fix tests
-    "quirks": ["needs-pickup-shake"],
-    "tipLength": 76.7
+    "quirks": {"value": ["needs-pickup-shake"], "edit": false},
+    "tipLength": {"value": 76.7, "edit": false}
   },
   "p1000_single_v1.4": {
     "name": "p1000_single",
     "plungerPositions": {
       "top": {
-        "default": 19.5,
-        "current": 19.5,
+        "value": 19.5,
         "edit": true,
         "min": 5,
         "max": 19.5
       },
       "bottom": {
-        "default": 2.5,
-        "current": 2.5,
+        "value": 2.5,
         "edit": true,
         "min": -2,
         "max": 19.0
       },
       "blowOut": {
-        "default": 0.5,
-        "current": 0.5,
+        "value": 0.5,
         "edit": true,
         "min": -4,
         "max": 10
       },
       "dropTip": {
-        "default": -4,
-        "current": -4,
+        "value": -4,
         "edit": true,
         "min": -6,
         "max": 2
       }
     },
     "pickUpCurrent": {
-      "default": 0.1,
-      "current": 0.1,
+      "value": 0.1,
       "edit": true,
       "min": 0.05,
       "max": 1.2
     },
     "pickUpDistance": {
-      "default": 15,
-      "current": 15,
+      "value": 15,
       "edit": true,
       "min": 1,
       "max": 30
     },
     "modelOffset": [0.0, 0.0, 20.0],
-<<<<<<< HEAD
     "plungerCurrent": 0.5,
     "dropTipCurrent": 0.7,
     "dropTipSpeed": 5,
@@ -2258,24 +1979,20 @@
         ]
       }
     ],
-=======
     "plungerCurrent": {
-      "default": 0.5,
-      "current": 0.5,
+      "value": 0.5,
       "edit": true,
       "min": 0.1,
       "max": 0.5
     },
     "dropTipCurrent": {
-      "default": 0.7,
-      "current": 0.7,
+      "value": 0.7,
       "edit": true,
       "min": 0.1,
       "max": 0.8
     },
     "dropTipSpeed": {
-      "default": 5,
-      "current": 5,
+      "value": 5,
       "edit": true,
       "min": 0.001,
       "max": 30
@@ -2291,10 +2008,10 @@
       ],
       "dispense": [
         [1000, 0, 61.3275]
-      ]
+      ],
+      "edit": false
     },
->>>>>>> Update pipette_config to load properly, fix tests
-    "quirks": ["needs-pickup-shake"],
-    "tipLength": 76.7
+    "quirks": {"value": ["needs-pickup-shake"], "edit": false},
+    "tipLength": {"value": 76.7, "edit": false}
   }
 }
