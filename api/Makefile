@@ -50,6 +50,7 @@ all: lint test
 .PHONY: install
 install:
 	pipenv sync $(pipenv_opts)
+	$(python) -m pip freeze --all
 
 .PHONY: clean
 clean:
