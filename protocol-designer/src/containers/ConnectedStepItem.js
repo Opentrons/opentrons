@@ -76,12 +76,11 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 
 function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
   return {
-    handleSubstepHover: (payload: SubstepIdentifier) => dispatch(stepsActions.hoverOnSubstep(payload)),
-
+    highlightSubstep: (payload: SubstepIdentifier) => dispatch(stepsActions.hoverOnSubstep(payload)),
     selectStep: (stepId) => dispatch(stepsActions.selectStep(stepId)),
     toggleStepCollapsed: (stepId) => dispatch(stepsActions.toggleStepCollapsed(stepId)),
-    hoverStep: (stepId) => dispatch(stepsActions.hoverOnStep(stepId)),
-    onStepMouseLeave: (stepId) => dispatch(stepsActions.hoverOnStep(null)),
+    highlightStep: (stepId) => dispatch(stepsActions.hoverOnStep(stepId)),
+    unhighlightStep: (stepId) => dispatch(stepsActions.hoverOnStep(null)),
   }
 }
 

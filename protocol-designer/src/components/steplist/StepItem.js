@@ -34,12 +34,12 @@ type StepItemProps = {
   ingredNames: WellIngredientNames,
 
   labwareById: {[labwareId: string]: ?Labware},
-  handleSubstepHover: SubstepIdentifier => mixed,
+  highlightSubstep: SubstepIdentifier => mixed,
   selectStep: (stepId: StepIdType) => mixed,
   onStepContextMenu?: (event?: SyntheticEvent<>) => mixed,
   toggleStepCollapsed: (stepId: StepIdType) => mixed,
-  hoverStep: (stepId: StepIdType) => mixed,
-  onStepMouseLeave?: (event?: SyntheticEvent<>) => mixed,
+  highlightStep: (stepId: StepIdType) => mixed,
+  unhighlightStep?: (event?: SyntheticEvent<>) => mixed,
 }
 
 class StepItem extends React.PureComponent<StepItemProps> {
@@ -56,11 +56,11 @@ class StepItem extends React.PureComponent<StepItemProps> {
       selected,
       hovered,
 
-      onStepMouseLeave,
+      unhighlightStep,
       selectStep,
       onStepContextMenu,
       toggleStepCollapsed,
-      hoverStep,
+      highlightStep,
     } = this.props
 
     const iconName = stepIconsByType[stepType]
@@ -74,8 +74,8 @@ class StepItem extends React.PureComponent<StepItemProps> {
         title={title ? `${stepNumber}. ${title}` : ''}
         onClick={() => selectStep(stepId)}
         onContextMenu={onStepContextMenu}
-        onMouseEnter={() => hoverStep(stepId)}
-        onMouseLeave={onStepMouseLeave}
+        onMouseEnter={() => highlightStep(stepId)}
+        onMouseLeave={unhighlightStep}
         onCollapseToggle={() => toggleStepCollapsed(stepId)}
         {...{selected, collapsed, hovered}}
       >
@@ -92,7 +92,7 @@ function getStepItemContents (stepItemProps: StepItemProps) {
     substeps,
     labwareById,
     hoveredSubstep,
-    handleSubstepHover,
+    highlightSubstep,
     ingredNames,
   } = stepItemProps
 
@@ -154,7 +154,7 @@ function getStepItemContents (stepItemProps: StepItemProps) {
         ingredNames={ingredNames}
         substeps={substeps}
         hoveredSubstep={hoveredSubstep}
-        selectSubstep={handleSubstepHover}
+        selectSubstep={highlightSubstep}
       />
     )
   }
