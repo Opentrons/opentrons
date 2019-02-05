@@ -252,7 +252,7 @@ def _add_security_type_to_scan(scan_out: Dict[str, Any]) -> Dict[str, Any]:
         scan_out['securityType'] = 'wpa-eap'
     elif 'WPA2' in sec:
         scan_out['securityType'] = 'wpa-psk'
-    elif '' is sec:
+    elif '' == sec:
         scan_out['securityType'] = 'none'
     else:
         scan_out['securityType'] = 'unsupported'

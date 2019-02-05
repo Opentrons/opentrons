@@ -663,7 +663,7 @@ class Container(Placeable):
         else:
             new_wells = self._parse_wells_to_and_length(*args, **kwargs)
 
-        if len(new_wells) is 1:
+        if len(new_wells) == 1:
             return new_wells[0]
         return new_wells
 

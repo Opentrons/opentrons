@@ -822,7 +822,7 @@ class Pipette(CommandPublisher):
             log.warning("Cannot perform air_gap without a tip attached.")
 
         # if volumes is specified as 0uL, do nothing
-        if volume is 0:
+        if volume == 0:
             return self
 
         if height is None:
@@ -1544,14 +1544,14 @@ class Pipette(CommandPublisher):
                 if step is plan[-1] or plan[i + 1].get('aspirate'):
                     self._blowout_during_transfer(
                         dispense['location'], **kwargs)
-                    if touch_tip or touch_tip is 0:
+                    if touch_tip or touch_tip is 0:  # noqa(pyflakes)
                         self.touch_tip(touch_tip)
                     tips = self._drop_tip_during_transfer(
                         tips, i, total_transfers, **kwargs)
                 else:
                     if air_gap:
                         self.air_gap(air_gap)
-                    if touch_tip or touch_tip is 0:
+                    if touch_tip or touch_tip is 0:  # noqa(pyflakes)
                         self.touch_tip(touch_tip)
 
     def _add_tip_during_transfer(self, tips, **kwargs):
@@ -1579,7 +1579,7 @@ class Pipette(CommandPublisher):
         self.aspirate(vol, loc, rate=rate)
         if air_gap:
             self.air_gap(air_gap)
-        if touch_tip or touch_tip is 0:
+        if touch_tip or touch_tip is 0:  # noqa(pyflakes)
             self.touch_tip(touch_tip)
 
     def _dispense_during_transfer(self, vol, loc, **kwargs):
