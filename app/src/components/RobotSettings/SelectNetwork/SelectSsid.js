@@ -3,13 +3,11 @@ import * as React from 'react'
 import find from 'lodash/find'
 import map from 'lodash/map'
 
-import {Icon} from '@opentrons/components'
-import SelectField from '../../SelectField'
+import {Icon, SelectField} from '@opentrons/components'
 import styles from './styles.css'
 
-import type {IconName} from '@opentrons/components'
+import type {GroupType, IconName, OptionType} from '@opentrons/components'
 import type {WifiNetwork, WifiNetworkList} from '../../../http-api-client'
-import type {OptionType, GroupType} from '../../SelectField'
 
 type Props = {
   list: ?WifiNetworkList,

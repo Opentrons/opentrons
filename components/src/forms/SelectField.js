@@ -1,17 +1,16 @@
 // @flow
-// TODO(mc, 2018-10-23): eventually move to components library
 import * as React from 'react'
 import cx from 'classnames'
 import find from 'lodash/find'
 import flatMap from 'lodash/flatMap'
 
 import Select, {components} from 'react-select'
-import {Icon} from '@opentrons/components'
-import styles from './styles.css'
+import {Icon} from '../icons'
+import styles from './SelectField.css'
 
 // TODO(mc, 2018-10-23): we use "name", react-select uses "label"; align usage
 export type ValueType = ?string
-export type OptionType = {|value: ValueType, label: React.Node|}
+export type OptionType = {|value: ValueType, label: React.Node, isDisabled?: boolean |}
 export type GroupType = {|options: Array<OptionType>, label: React.Node|}
 export type SelectOption = OptionType | GroupType
 

@@ -36,5 +36,5 @@ def use_protocol_api_v2():
     return get_setting_with_env_overload('useProtocolApi2')
 
 
-def use_new_p10_aspiration():
-    return get_setting_with_env_overload('useNewP10Aspiration')
+def use_old_aspiration_functions():
+    return get_setting_with_env_overload('useOldAspirationFunctions')

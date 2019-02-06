@@ -8,11 +8,11 @@ import AspirateDispenseHeader from './AspirateDispenseHeader'
 import MixHeader from './MixHeader'
 import PauseStepItems from './PauseStepItems'
 import StepDescription from '../StepDescription'
-import {stepIconsByType, type StepIdType} from '../../form-types'
+import {stepIconsByType} from '../../form-types'
+import type {FormData, StepIdType, StepType} from '../../form-types'
 import type {Labware} from '../../labware-ingred/types'
 import type {
   SubstepIdentifier,
-  StepItemData,
   SubstepItemData,
   WellIngredientNames,
 } from '../../steplist/types'
@@ -20,8 +20,11 @@ import type {
 type StepItemProps = {
   stepId: StepIdType,
   stepNumber: number,
-  step: ?StepItemData,
+  stepType: StepType,
+  title: string,
+  description: ?string,
   substeps: ?SubstepItemData,
+  rawForm: ?FormData,
 
   collapsed?: boolean,
   error?: ?boolean,
@@ -30,69 +33,76 @@ type StepItemProps = {
   hoveredSubstep: ?SubstepIdentifier,
   ingredNames: WellIngredientNames,
 
-  getLabware: (labwareId: ?string) => ?Labware,
-  handleSubstepHover: SubstepIdentifier => mixed,
-  onStepClick?: (event?: SyntheticEvent<>) => mixed,
+  labwareById: {[labwareId: string]: ?Labware},
+  highlightSubstep: SubstepIdentifier => mixed,
+  selectStep: (stepId: StepIdType) => mixed,
   onStepContextMenu?: (event?: SyntheticEvent<>) => mixed,
-  onStepItemCollapseToggle?: (event?: SyntheticEvent<>) => mixed,
-  onStepHover?: (event?: SyntheticEvent<>) => mixed,
-  onStepMouseLeave?: (event?: SyntheticEvent<>) => mixed,
+  toggleStepCollapsed: (stepId: StepIdType) => mixed,
+  highlightStep: (stepId: StepIdType) => mixed,
+  unhighlightStep?: (event?: SyntheticEvent<>) => mixed,
 }
 
-function StepItem (props: StepItemProps) {
-  const {
-    step,
-    stepNumber,
+class StepItem extends React.PureComponent<StepItemProps> {
+  render () {
+    const {
+      stepType,
+      title,
+      description,
+      stepId,
+      stepNumber,
 
-    collapsed,
-    error,
-    selected,
-    hovered,
+      collapsed,
+      error,
+      selected,
+      hovered,
 
-    onStepMouseLeave,
-    onStepClick,
-    onStepContextMenu,
-    onStepItemCollapseToggle,
-    onStepHover,
-  } = props
+      unhighlightStep,
+      selectStep,
+      onStepContextMenu,
+      toggleStepCollapsed,
+      highlightStep,
+    } = this.props
 
-  const iconName = step && stepIconsByType[step.stepType]
-  const title = step && step.title
-  const Description = <StepDescription description={step && step.description} />
+    const iconName = stepIconsByType[stepType]
+    const Description = <StepDescription description={description} />
 
-  return (
-    <PDTitledList
-      description={Description}
-      iconName={error ? 'alert-circle' : iconName}
-      iconProps={{className: error ? styles.error_icon : ''}}
-      title={title ? `${stepNumber}. ${title}` : ''}
-      onClick={onStepClick}
-      onContextMenu={onStepContextMenu}
-      onMouseEnter={onStepHover}
-      onMouseLeave={onStepMouseLeave}
-      onCollapseToggle={onStepItemCollapseToggle}
-      {...{selected, collapsed, hovered}}
-    >
-      {getStepItemContents(props)}
-    </PDTitledList>
-  )
+    return (
+      <PDTitledList
+        description={Description}
+        iconName={error ? 'alert-circle' : iconName}
+        iconProps={{className: error ? styles.error_icon : ''}}
+        title={title ? `${stepNumber}. ${title}` : ''}
+        onClick={() => selectStep(stepId)}
+        onContextMenu={onStepContextMenu}
+        onMouseEnter={() => highlightStep(stepId)}
+        onMouseLeave={unhighlightStep}
+        onCollapseToggle={() => toggleStepCollapsed(stepId)}
+        {...{selected, collapsed, hovered}}
+      >
+        {getStepItemContents(this.props)}
+      </PDTitledList>
+    )
+  }
 }
 
 function getStepItemContents (stepItemProps: StepItemProps) {
   const {
-    step,
+    rawForm,
+    stepType,
     substeps,
-    getLabware,
+    labwareById,
     hoveredSubstep,
-    handleSubstepHover,
+    highlightSubstep,
     ingredNames,
   } = stepItemProps
 
-  const formData = step && step.formData
-
-  if (!step) {
+  if (!rawForm) {
     return null
   }
+
+  const getLabware = (labwareId: ?string) =>
+    labwareId != null ? labwareById[labwareId] : null
+
   // pause substep component uses the delay args directly
   if (substeps && substeps.commandCreatorFnName === 'delay') {
     return <PauseStepItems pauseArgs={substeps} />
@@ -101,24 +111,19 @@ function getStepItemContents (stepItemProps: StepItemProps) {
   const result = []
 
   // headers
-  if (formData && formData.stepType === 'moveLiquid') {
-    const sourceLabware = getLabware(formData['aspirate_labware'])
-    const destLabware = getLabware(formData['dispense_labware'])
+  if (stepType === 'moveLiquid') {
+    const sourceLabware = getLabware(rawForm['aspirate_labware'])
+    const destLabware = getLabware(rawForm['dispense_labware'])
 
-    result.push(
-      <AspirateDispenseHeader
-        key='transferlike-header'
-        {...{sourceLabware, destLabware}}
-      />
-    )
+    result.push(<AspirateDispenseHeader key='moveLiquid-header' {...{sourceLabware, destLabware}} />)
   }
 
-  if (formData && formData.stepType === 'mix') {
+  if (stepType === 'mix') {
     result.push(
       <MixHeader key='mix-header'
-        volume={formData.volume}
-        times={formData.times}
-        labware={getLabware(formData.labware)}
+        volume={rawForm.volume}
+        times={rawForm.times}
+        labware={getLabware(rawForm.labware)}
       />
     )
   }
@@ -138,7 +143,7 @@ function getStepItemContents (stepItemProps: StepItemProps) {
         ingredNames={ingredNames}
         substeps={substeps}
         hoveredSubstep={hoveredSubstep}
-        onSelectSubstep={handleSubstepHover}
+        selectSubstep={highlightSubstep}
       />
     )
   }

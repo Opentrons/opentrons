@@ -163,6 +163,13 @@ def split_labware_def():
     config.advanced_settings.set_adv_setting('splitLabwareDefinitions', False)
 
 
+@pytest.fixture
+def old_aspiration(monkeypatch):
+    config.advanced_settings.set_adv_setting('useOldAspirationFunctions', True)
+    yield
+    config.advanced_settings.set_adv_setting(
+        'useOldAspirationFunctions', False)
+
 # -----end feature flag fixtures-----------
 
 

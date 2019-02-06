@@ -21,14 +21,17 @@ type OP = {
 }
 
 type SP = {|
-  step: $PropertyType<Props, 'step'>,
+  stepType: $PropertyType<Props, 'stepType'>,
+  title: $PropertyType<Props, 'title'>,
+  description: $PropertyType<Props, 'description'>,
+  rawForm: $PropertyType<Props, 'rawForm'>,
   substeps: $PropertyType<Props, 'substeps'>,
   collapsed: $PropertyType<Props, 'collapsed'>,
   error: $PropertyType<Props, 'error'>,
   selected: $PropertyType<Props, 'selected'>,
   hovered: $PropertyType<Props, 'hovered'>,
   hoveredSubstep: $PropertyType<Props, 'hoveredSubstep'>,
-  getLabware: $PropertyType<Props, 'getLabware'>,
+  labwareById: $PropertyType<Props, 'labwareById'>,
   ingredNames: $PropertyType<Props, 'ingredNames'>,
 |}
 
@@ -45,15 +48,17 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const argsAndErrorsByStepId = stepFormSelectors.getArgsAndErrorsByStepId(state)
   const formAndFieldErrors = argsAndErrorsByStepId[stepId] && argsAndErrorsByStepId[stepId].errors
   const hasError = fileDataSelectors.getErrorStepId(state) === stepId || !isEmpty(formAndFieldErrors)
-  const warnings = (typeof stepId === 'number') // TODO: Ian 2018-07-13 remove when stepId always number
-    ? dismissSelectors.getTimelineWarningsPerStep(state)[stepId]
-    : []
+  const warnings = dismissSelectors.getTimelineWarningsPerStep(state)[stepId]
   const hasWarnings = warnings && warnings.length > 0
 
   const showErrorState = hasError || hasWarnings
+  const step = allSteps[stepId]
 
   return {
-    step: allSteps[stepId],
+    stepType: step.stepType,
+    title: step.title,
+    description: step.description,
+    rawForm: step.formData,
     substeps: substepSelectors.allSubsteps(state)[stepId],
     hoveredSubstep,
     collapsed,
@@ -64,21 +69,18 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     // user is not hovering on substep.
     hovered: (hoveredStep === stepId) && !hoveredSubstep,
 
-    getLabware: (labwareId: ?string) => labwareId ? stepFormSelectors.getLabwareById(state)[labwareId] : null,
+    labwareById: stepFormSelectors.getLabwareById(state),
     ingredNames: labwareIngredSelectors.getLiquidNamesById(state),
   }
 }
 
-function mapDispatchToProps (dispatch: ThunkDispatch<*>, ownProps: OP): DP {
-  const {stepId} = ownProps
-
+function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
   return {
-    handleSubstepHover: (payload: SubstepIdentifier) => dispatch(stepsActions.hoverOnSubstep(payload)),
-
-    onStepClick: () => dispatch(stepsActions.selectStep(stepId)),
-    onStepItemCollapseToggle: () => dispatch(stepsActions.toggleStepCollapsed(stepId)),
-    onStepHover: () => dispatch(stepsActions.hoverOnStep(stepId)),
-    onStepMouseLeave: () => dispatch(stepsActions.hoverOnStep(null)),
+    highlightSubstep: (payload: SubstepIdentifier) => dispatch(stepsActions.hoverOnSubstep(payload)),
+    selectStep: (stepId) => dispatch(stepsActions.selectStep(stepId)),
+    toggleStepCollapsed: (stepId) => dispatch(stepsActions.toggleStepCollapsed(stepId)),
+    highlightStep: (stepId) => dispatch(stepsActions.hoverOnStep(stepId)),
+    unhighlightStep: (stepId) => dispatch(stepsActions.hoverOnStep(null)),
   }
 }
 

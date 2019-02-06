@@ -22,6 +22,16 @@
         "minItems": 3,
         "maxItems": 3
       }
+    },
+    "liquidHandlingSpecs": {
+      "description": "Object containing linear equations for translating between uL of liquid and mm of plunger travel. There is one linear equation for aspiration and one for dispense",
+      "type": "object",
+      "required": ["aspirate", "dispense"],
+      "additionalProperties": false,
+      "properties": {
+        "aspirate": {"$ref": "#/definitions/linearEquations"},
+        "dispense": {"$ref": "#/definitions/linearEquations"}
+      }
     }
   },
 
@@ -67,13 +77,8 @@
         "dropTipCurrent": {"type": "number"},
         "dropTipSpeed": {"type": "number"},
         "ulPerMm": {
-          "type": "object",
-          "required": ["aspirate", "dispense"],
-          "additionalProperties": false,
-          "properties": {
-            "aspirate": {"$ref": "#/definitions/linearEquations"},
-            "dispense": {"$ref": "#/definitions/linearEquations"}
-          }
+          "type": "array",
+          "items": {"$ref": "#/definitions/liquidHandlingSpecs"}
         },
         "quirks": {
           "type": "array",
