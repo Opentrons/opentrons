@@ -148,7 +148,6 @@ export default function migrateFile (fileData: any): ProtocolFile {
       replaceTCDStepsWithMoveLiquidStep,
       updateMigrationVersion,
     ])(fileData)
-    console.log('mG: ', migratedFile)
     return migratedFile
   }
 }
