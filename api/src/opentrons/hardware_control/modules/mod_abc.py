@@ -16,7 +16,7 @@ class AbstractModule(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def disengage(self):
+    def deactivate(self):
         """ Deactivate the module. """
         pass
 

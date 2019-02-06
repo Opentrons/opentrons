@@ -192,8 +192,7 @@ class TempDeck:
             return None
         return self._connection.port
 
-    # TODO: change to 'deactivate'/'stop'
-    def disengage(self) -> str:
+    def deactivate(self) -> str:
         self.run_flag.wait()
 
         try:

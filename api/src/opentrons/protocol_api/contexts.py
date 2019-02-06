@@ -17,7 +17,11 @@ from . import transfers
 
 MODULE_LOG = logging.getLogger(__name__)
 
-ModuleTypes = Union['TemperatureModuleContext', 'MagneticModuleContext']
+ModuleTypes = Union[
+    'TemperatureModuleContext',
+    'MagneticModuleContext',
+    'ThermocyclerContext'
+]
 
 
 class OutOfTipsError(Exception):
@@ -1499,7 +1503,7 @@ class TemperatureModuleContext(ModuleContext):
     def deactivate(self):
         """ Stop heating (or cooling) and turn off the fan.
         """
-        return self._module.disengage()
+        return self._module.deactivate()
 
     def wait_for_temp(self):
         """ Block until the module reaches its setpoint.
@@ -1594,7 +1598,7 @@ class MagneticModuleContext(ModuleContext):
     def disengage(self):
         """ Lower the magnets back into the Magnetic Module.
         """
-        self._module.disengage()
+        self._module.deactivate()
 
     @property
     def status(self):
@@ -1620,3 +1624,53 @@ class ThermocyclerContext(ModuleContext):
     @property
     def status(self):
         return self._module.status
+
+    @cmds.publish.both(command=cmds.thermocycler_set_temp)
+    def set_temperature(self,
+                        temp: float,
+                        hold_time: float=None,
+                        ramp_rate: float=None):
+        """ Set the target temperature, in C.
+
+        Must be between 4 and 95C based on Opentrons QA.
+
+        :param temp: The target temperature, in degrees C.
+        :param hold_time: The time to hold after reaching temperature. If
+                          `hold_time` is not specified, the Thermocycler will
+                          hold this temperature indefinitely (requiring manual
+                          intervention to end the cycle).
+        :param ramp_rate: The target rate of temperature change, in degC/sec.
+                          If `ramp_rate` is not specified, it will default to
+                          the maximum ramp rate as defined in the device
+                          configuration.
+        """
+        return self._module.set_temperature(temp, hold_time, ramp_rate)
+
+    @cmds.publish.both(command=cmds.thermocycler_deactivate)
+    def deactivate(self):
+        return self._module.deactivate()
+
+    def wait_for_temp(self):
+        """ Block until the module reaches its setpoint.
+        """
+        self._loop.run_until_complete(self._module.wait_for_temp())
+
+    @property
+    def temperature(self):
+        """ Current temperature in C"""
+        return self._module.temperature
+
+    @property
+    def target(self):
+        """ Current target temperature in C"""
+        return self._module.target
+
+    @property
+    def ramp_rate(self):
+        """ Current ramp rate in degC/sec"""
+        return self._module.ramp_rate
+
+    @property
+    def hold_time(self):
+        """ Current hold time in sec"""
+        return self._module.hold_time

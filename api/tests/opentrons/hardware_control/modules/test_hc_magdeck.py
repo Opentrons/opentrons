@@ -22,5 +22,5 @@ def test_sim_state_update():
     assert mag.status == 'disengaged'
     mag.engage(2)
     assert mag.status == 'engaged'
-    mag.disengage()
+    mag.deactivate()
     assert mag.status == 'disengaged'

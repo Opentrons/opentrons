@@ -155,7 +155,7 @@ def test_turn_off_temp_deck(monkeypatch):
 
     temp_deck._send_command = types.MethodType(_mock_send_command, temp_deck)
 
-    temp_deck.disengage()
+    temp_deck.deactivate()
     assert command_log == ['M18']
 
 

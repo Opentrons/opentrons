@@ -20,7 +20,7 @@ class SimulatingDriver:
         self._target_temp = celsius
         self._active = True
 
-    def disengage(self):
+    def deactivate(self):
         self._target_temp = 0
         self._active = False
 
@@ -109,9 +109,9 @@ class TempDeck(mod_abc.AbstractModule):
         """
         return self._driver.set_temperature(celsius)
 
-    def disengage(self):
+    def deactivate(self):
         """ Stop heating/cooling and turn off the fan """
-        self._driver.disengage()
+        self._driver.deactivate()
 
     async def wait_for_temp(self):
         """
