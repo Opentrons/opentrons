@@ -1,43 +1,12 @@
 # pylama:ignore=E501
 # TODO: Modify all calls to get a Well to use the `wells` method
+from numpy import isclose
+import pytest
 
 from opentrons import instruments, robot
 from opentrons.legacy_api.containers import load as containers_load
 from opentrons.config import pipette_config
 from opentrons.trackers import pose_tracker
-from opentrons.config import feature_flags as ff
-from numpy import isclose
-import pytest
-
-
-def test_p10_single_aspiration(monkeypatch):
-    """ test that the p10 single aspiration function changes
-    depending on the feature flag
-    """
-    # Without modifying anything, the old ul per mm should be loaded
-    old_aspiration = [
-        [1.8263, -0.0958, 1.088],
-        [2.5222, -0.104, 1.1031],
-        [3.2354, -0.0447, 0.9536],
-        [3.9984, -0.012, 0.8477],
-        [12.5135, -0.0021, 0.8079]
-      ]
-    new_aspiration = [
-        [1.438649211,	0.01931415115,	0.691538317],
-        [1.836824579,	0.03868955123,	0.6636639129],
-        [2.960052684,	0.00470371018,	0.7260899411],
-        [4.487508789,	0.005175245625,	0.7246941713],
-        [10.59661421,	0.001470408978,	0.7413196584]
-    ]
-    models = ['p10_single_v1', 'p10_single_v1.3', 'p10_single_v1.4']
-    for model in models:
-        conf = pipette_config.load(model)
-        assert conf.ul_per_mm['aspirate'] == old_aspiration
-    monkeypatch.setattr(ff, 'use_new_p10_aspiration',
-                        lambda: True)
-    for model in models:
-        conf = pipette_config.load(model)
-        assert conf.ul_per_mm['aspirate'] == new_aspiration
 
 
 def test_pipette_version_1_0_and_1_3_extended_travel():
@@ -112,31 +81,6 @@ def test_pipette_models_reach_max_volume():
             robot.poses,
             pipette.instrument_actuator)
         assert pos[0] < pipette.plunger_positions['top']
-
-
-# TODO: fix this test to work with the new piecewise functions, and add a test
-# TODO: to make some guarantees that the functions are continuous, and that the
-# TODO: mm of movement for max volume aspirate and max volume dispense agree
-def test_ul_per_mm_continuous():
-    """
-    For each model of pipette, for each boundary between pieces of the
-    piecewise function describing the ul/mm relationship, test that the
-    function is continuous by checking the boundary volume on the curves of
-    the pieces immediately above and below the boundary
-    """
-    for model in pipette_config.configs:
-        config = pipette_config.load(model)
-        sequence = config.ul_per_mm['aspirate']
-
-        for line in range(len(sequence) - 1):
-            volume = sequence[line][0]
-            ul_per_mm_top = sequence[line][1]*volume + sequence[line][2]
-            ul_per_mm_bottom = sequence[line+1][1]*volume + sequence[line+1][2]
-
-            diff_mm = abs(ul_per_mm_top - ul_per_mm_bottom) / volume
-
-            assert diff_mm < 1e-2, 'Continuity failed for {}, line {}'.format(
-                model, line)
 
 
 def test_flow_rate():
@@ -230,7 +174,7 @@ def test_retract():
     assert current_pos[2] == HOMED_POSITION['A']
 
 
-def test_aspirate_move_to():
+def test_aspirate_move_to(old_aspiration):
     # TODO: it seems like this test is checking that the aspirate point is
     # TODO: *fully* at the bottom of the well, which isn't the expected
     # TODO: behavior of aspirate when a location is not specified. This should
@@ -262,7 +206,7 @@ def test_aspirate_move_to():
     assert isclose(current_pos, (161,  116.7,   10.5)).all()
 
 
-def test_dispense_move_to():
+def test_dispense_move_to(old_aspiration):
     # TODO: same as for aspirate
     robot.reset()
     tip_rack = containers_load(robot, 'tiprack-200ul', '3')
