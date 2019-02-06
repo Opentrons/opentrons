@@ -32,73 +32,86 @@
         "aspirate": {"$ref": "#/definitions/linearEquations"},
         "dispense": {"$ref": "#/definitions/linearEquations"}
       }
-    }
-  },
-
-  "description": "Version-level pipette specifications, which may vary across different versions of the same pipette",
-  "type": "object",
-  "$comment": "Example key: 'p10_single_v1.3'",
-  "patternProperties": {
-    ".*": {
-      "required": [
-        "name",
-        "plungerPositions",
-        "pickUpCurrent",
-        "pickUpDistance",
-        "modelOffset",
-        "plungerCurrent",
-        "dropTipCurrent",
-        "dropTipSpeed",
-        "ulPerMm",
-        "quirks",
-        "tipLength"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "name": {
-          "description": "reference to name of this version, should match a key in pipetteNameSpecs.json",
-          "type": "string"
-        },
-        "plungerPositions": {
-          "type": "object",
-          "required": ["top", "bottom", "blowOut", "dropTip"],
-          "additionalProperties": false,
-          "properties": {
-            "top": {"$ref": "#/definitions/editConfigurations"},
-            "bottom": {"$ref": "#/definitions/editConfigurations"},
-            "blowOut": {"$ref": "#/definitions/editConfigurations"},
-            "dropTip": {"$ref": "#/definitions/editConfigurations"}
-          }
-        },
-        "pickUpCurrent": {"$ref": "#/definitions/editConfigurations"},
-        "pickUpDistance": {"$ref": "#/definitions/editConfigurations"},
-        "modelOffset": {
-          "value": {"$ref": "#/definitions/xyzArray"},
-          "edit": false},
-        "plungerCurrent": {"$ref": "#/definitions/editConfigurations"},
-        "dropTipCurrent": {"$ref": "#/definitions/editConfigurations"},
-        "dropTipSpeed": {"$ref": "#/definitions/editConfigurations"},
-        "ulPerMm": {
-<<<<<<< HEAD
-          "type": "array",
-          "items": {"$ref": "#/definitions/liquidHandlingSpecs"}
-=======
-          "type": "object",
-          "required": ["aspirate", "dispense", "edit"],
-          "additionalProperties": false,
-          "properties": {
-            "aspirate": {"$ref": "#/definitions/linearEquations"},
-            "dispense": {"$ref": "#/definitions/linearEquations"},
-            "edit": {"type": "boolean"}
-          }
->>>>>>> Update schemas to have the same shape moving forward
-        },
-        "quirks": {"$ref": "#/definitions/editConfigurations"},
-        "tipLength": {
-          "value": {"$ref": "#/definitions/positiveNumber"},
-          "edit": {"type": "boolean"}
-        }
-      }
+    },
+    "editConfigurations": {
+    "type": "object",
+    "description": "Object allowing you to modify a config",
+    "required": ["value"],
+     "properties": {
+       "value": {"type": ["number", "array"]},
+       "min": {"type": "number"},
+       "max": {"type": "number"}
     }
   }
+  },
+
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["config","mutableConfigs"],
+  "properties": {
+    "config": {
+      "description": "Version-level pipette specifications, which may vary across different versions of the same pipette",
+      "type": "object",
+      "$comment": "Example key: 'p10_single_v1.3'",
+      "patternProperties": {
+        ".*": {
+          "required": [
+            "name",
+            "plungerPositions",
+            "pickUpCurrent",
+            "pickUpDistance",
+            "modelOffset",
+            "plungerCurrent",
+            "dropTipCurrent",
+            "dropTipSpeed",
+            "ulPerMm",
+            "quirks",
+            "tipLength"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "description": "reference to name of this version, should match a key in pipetteNameSpecs.json",
+              "type": "string"
+            },
+            "plungerPositions": {
+              "type": "object",
+              "required": ["top", "bottom", "blowOut", "dropTip"],
+              "additionalProperties": false,
+              "properties": {
+                "top": {"$ref": "#/definitions/editConfigurations"},
+                "bottom": {"$ref": "#/definitions/editConfigurations"},
+                "blowOut": {"$ref": "#/definitions/editConfigurations"},
+                "dropTip": {"$ref": "#/definitions/editConfigurations"}
+              }
+            },
+            "pickUpCurrent": {"$ref": "#/definitions/editConfigurations"},
+            "pickUpDistance": {"$ref": "#/definitions/editConfigurations"},
+            "modelOffset": {"$ref": "#/definitions/xyzArray"},
+            "plungerCurrent": {"$ref": "#/definitions/editConfigurations"},
+            "dropTipCurrent": {"$ref": "#/definitions/editConfigurations"},
+            "dropTipSpeed": {"$ref": "#/definitions/editConfigurations"},
+            "ulPerMm": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/liquidHandlingSpecs"}
+            },
+            "quirks": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "tipLength": {
+              "type": "object",
+              "value": {"$ref": "#/definitions/positiveNumber"}
+            }
+          }
+        }
+      }
+    },
+    "mutableConfigs": {
+      "type": "array",
+      "description": "Array of mutable configs for a given pipette",
+      "items": {"type": "string"}
+    }
+  }
+
 }

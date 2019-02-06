@@ -108,6 +108,13 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
 
     :returns pipette_config: The configuration, loaded and checked
     """
+<<<<<<< HEAD
+=======
+    with open(config_model_file) as model_cfg_file:
+        model = json.load(model_cfg_file)
+        mutable_configs = model['mutableConfigs']
+        cfg = model['config'][pipette_model]
+>>>>>>> refactor config shapes
 
     # Load the model config and update with the name config
     cfg = copy.copy(model_config()[pipette_model])
@@ -117,7 +124,7 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
     if pipette_id:
         cfg.update(load_overrides(pipette_id))
 
-    plunger_pos = cfg.get('plungerPositions', {})
+    plunger_pos = is_mutable(cfg, 'plungerPositions',  mutable_configs)
 
     # the ulPerMm functions are structured in pipetteModelSpecs.json as
     # a list sorted from oldest to newest. That means the latest functions
@@ -135,44 +142,26 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
 
     res = pipette_config(
         plunger_positions={
-            'top': plunger_pos.get('top')['value'],
-            'bottom': plunger_pos.get('bottom')['value'],
-            'blow_out': plunger_pos.get('blowOut')['value'],
-            'drop_tip': plunger_pos.get('dropTip')['value'],
+            'top': plunger_pos.get('top'),
+            'bottom': plunger_pos.get('bottom'),
+            'blow_out': plunger_pos.get('blowOut'),
+            'drop_tip': plunger_pos.get('dropTip'),
         },
-<<<<<<< HEAD
-        pick_up_current=cfg.get('pickUpCurrent')['current'],
-        pick_up_distance=cfg.get('pickUpDistance')['current'],
-        aspirate_flow_rate=cfg.get('defaultAspirateFlowRate'),
-        dispense_flow_rate=cfg.get('defaultDispenseFlowRate'),
-        channels=cfg.get('channels'),
-        model_offset=cfg.get('modelOffset'),
-        plunger_current=cfg.get('plungerCurrent')['current'],
-        drop_tip_current=cfg.get('dropTipCurrent')['current'],
-        drop_tip_speed=cfg.get('dropTipSpeed')['current'],
-        min_volume=cfg.get('minVolume'),
-        max_volume=cfg.get('maxVolume'),
+        pick_up_current=is_mutable(cfg, 'pickUpCurrent', mutable_configs),
+        pick_up_distance=is_mutable(cfg, 'pickUpDistance', mutable_configs),
+        aspirate_flow_rate=is_mutable(cfg, 'defaultAspirateFlowRate', mutable_configs),
+        dispense_flow_rate=is_mutable(cfg, 'defaultDispenseFlowRate', mutable_configs),
+        channels=is_mutable(cfg, 'channels', mutable_configs),
+        model_offset=is_mutable(cfg, 'modelOffset', mutable_configs),
+        plunger_current=is_mutable(cfg, 'plungerCurrent', mutable_configs),
+        drop_tip_current=is_mutable(cfg, 'dropTipCurrent', mutable_configs),
+        drop_tip_speed=is_mutable(cfg, 'dropTipSpeed', mutable_configs),
+        min_volume=is_mutable(cfg, 'minVolume', mutable_configs),
+        max_volume=is_mutable(cfg, 'maxVolume', mutable_configs),
         ul_per_mm=ul_per_mm,
-        quirks=cfg.get('quirks'),
-        tip_length=cfg.get('tipLength'),
-        display_name=cfg.get('displayName')
-=======
-        pick_up_current=cfg.get('pickUpCurrent')['value'],
-        pick_up_distance=cfg.get('pickUpDistance')['value'],
-        aspirate_flow_rate=cfg.get('defaultAspirateFlowRate')['value'],
-        dispense_flow_rate=cfg.get('defaultDispenseFlowRate')['value'],
-        channels=cfg.get('channels')['value'],
-        model_offset=cfg.get('modelOffset')['value'],
-        plunger_current=cfg.get('plungerCurrent')['value'],
-        drop_tip_current=cfg.get('dropTipCurrent')['value'],
-        drop_tip_speed=cfg.get('dropTipSpeed')['value'],
-        min_volume=cfg.get('minVolume')['value'],
-        max_volume=cfg.get('maxVolume')['value'],
-        ul_per_mm=cfg.get('ulPerMm'),
-        quirks=cfg.get('quirks')['value'],
-        tip_length=cfg.get('tipLength')['value'],
-        display_name=cfg.get('displayName')['value']
->>>>>>> Update schemas to have the same shape moving forward
+        quirks=is_mutable(cfg, 'quirks', mutable_configs),
+        tip_length=is_mutable(cfg, 'tipLength', mutable_configs),
+        display_name=is_mutable(cfg, 'displayName', mutable_configs)
     )
 
     # Verify that stored values agree with calculations
@@ -216,6 +205,7 @@ def piecewise_volume_conversion(
     return i[1]*ul + i[2]
 
 
+<<<<<<< HEAD
 def save_overrides(pipette_id: str, overrides: Dict[str, Any]):
     override_dir = CONFIG['pipette_config_overrides_dir']
     existing = load_overrides(pipette_id)
@@ -234,3 +224,16 @@ def load_overrides(pipette_id: str) -> Dict[str, Any]:
     except json.JSONDecodeError as e:
         log.warning(f'pipette override for {pipette_id} is corrupt: {e}')
         return {}
+=======
+def is_mutable(config: dict, name: str, mutable_config_list: List[str]):
+    if len(config.get(name)) > 1:
+        value = {}
+        for key in config.keys():
+            if key in mutable_config_list:
+                value[key] = config.get(key)['value']
+    else:
+        value = config.get(name)
+        if name in mutable_config_list:
+            value = value['value']
+    return value
+>>>>>>> refactor config shapes
