@@ -110,6 +110,19 @@ local-install: wheel
 local-shell: local-install
 	pipenv shell
 
+.PHONY: deploy-staging
+deploy-staging: wheel
+	-$(python) -m twine upload --repository-url "https://test.pypi.org/legacy/"\
+                             --username $(PYPI_TEST_USERNAME)\
+                             --password $(PYPI_TEST_PASSWORD)\
+                             $(wheel_file)
+
+.PHONY: deploy
+deploy: wheel
+	$(python) -m twine upload --username $(PYPI_USERNAME)\
+                            --password $(PYPI_PASSWORD)\
+                            $(wheel_file)
+
 .PHONY: push
 push: wheel
 	curl -X POST \
