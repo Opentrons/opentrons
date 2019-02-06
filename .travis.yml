@@ -78,7 +78,8 @@ jobs:
           distributions: "bdist_wheel"
           skip_cleanup: true
           user: $PYPI_USER
-          password: $PYPI_PASSWORD
+          password:
+            secure: $PYPI_PASSWORD
           on:
             all_branches: true
             tags: true
@@ -89,7 +90,8 @@ jobs:
           distributions: "bdist_wheel"
           skip_cleanup: true
           user: $TEST_PYPI_USER
-          password: $TEST_PYPI_PASSWORD
+          password:
+            secure: $TEST_PYPI_PASSWORD
           on:
             repo: Opentrons/opentrons
             all_branches: true
