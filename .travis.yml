@@ -63,7 +63,7 @@ jobs:
         - provider: pages
           skip_cleanup: true
           keep-history: false
-          local-dir: docs/dist
+          local-dir: api/docs/dist
           github-token: $GITHUB_TOKEN
           on:
             all_branches: true
