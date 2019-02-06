@@ -50,7 +50,6 @@ export const loadProtocolFile = (event: SyntheticInputEvent<HTMLInputElement>): 
           })
         }
 
-        console.log('pP:  ', parsedProtocol)
         if (parsedProtocol) dispatch(loadFileAction(parsedProtocol))
       }
       reader.readAsText(file)
