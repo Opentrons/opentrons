@@ -58,12 +58,15 @@ jobs:
       after_success:
         - make coverage
         - aws s3 sync ./api/dist $OT_CI_TEMP_S3_PATH/api/dist
+      before_deploy:
+        # get into the right path for deploy
+        - cd api
       deploy:
         # push docs on tag
         - provider: pages
           skip_cleanup: true
           keep-history: false
-          local-dir: api/docs/dist
+          local-dir: docs/dist
           github-token: $GITHUB_TOKEN
           on:
             all_branches: true
@@ -89,7 +92,8 @@ jobs:
           password: $TEST_PYPI_PASSWORD
           on:
             repo: Opentrons/opentrons
-            branch: edge
+            all_branches: true
+            #branch: edge
           skip_existing: true
 
     # test, build, and upload for JavaScript projects
