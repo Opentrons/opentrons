@@ -58,9 +58,6 @@ jobs:
       after_success:
         - make coverage
         - aws s3 sync ./api/dist $OT_CI_TEMP_S3_PATH/api/dist
-      before_deploy:
-        # get into the right path for deploy
-        - cd api
       deploy:
         # push docs on tag
         - provider: pages
