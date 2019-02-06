@@ -133,7 +133,12 @@ CONFIG_ELEMENTS = (
                   'Hardware Controller Lockfile',
                   Path('hardware.lock'),
                   ConfigElementType.FILE,
-                  'The file to use for a hardware controller lockfile.')
+                  'The file to use for a hardware controller lockfile.'),
+    ConfigElement('pipette_config_overrides_dir',
+                  'Pipette Config User Overrides',
+                  Path('pipettes'),
+                  ConfigElementType.DIR,
+                  'The dir where settings overrides for pipettes are stored')
 )
 #: The available configuration file elements to modify. All of these can be
 #: changed by editing opentrons.json, where the keys are the name elements,
@@ -192,18 +197,30 @@ def load_and_migrate() -> Dict[str, Path]:
 
 def _load_with_overrides(base) -> Dict[str, str]:
     """ Load an config or write its defaults """
+    should_write = False
     overrides = _get_environ_overrides()
     try:
         index = json.load((base/_CONFIG_FILENAME).open())
     except (OSError, json.JSONDecodeError) as e:
         sys.stderr.write("Error loading config from {}: {}\nRewriting...\n"
                          .format(str(base), e))
+        should_write = True
         index = generate_config_index(overrides)
+
+    for key in CONFIG_ELEMENTS:
+        if key.name not in index:
+            sys.stderr.write(
+                f"New config index key {key.name}={key.default}"
+                "\nRewriting...\n")
+            index[key.name] = key.default
+            should_write = True
+
+    if should_write:
         try:
             write_config(index, path=base)
         except Exception as e:
             sys.stderr.write(
-                "Error writing config to {}: {}\nProceeding with defaults\n"
+                "Error writing config to {}: {}\nProceeding memory-only\n"
                 .format(str(base), e))
     index.update(overrides)
     return index

@@ -3,7 +3,7 @@ import pkgutil
 
 import pytest
 
-from opentrons.config import pipette_config, feature_flags as ff
+from opentrons.config import pipette_config, feature_flags as ff, CONFIG
 
 
 defs = json.loads(
@@ -58,3 +58,52 @@ def test_ul_per_mm_continuous(pipette_model):
         diff_mm = abs(ul_per_mm_top - ul_per_mm_bottom) / volume
 
         assert diff_mm < 1e-2
+
+
+def test_override_load():
+    cdir = CONFIG['pipette_config_overrides_dir']
+
+    existing_overrides = {
+        'pickUpCurrent': 1231.213,
+        'dropTipSpeed': 121
+    }
+
+    existing_id = 'ohoahflaseh08102qa'
+    with (cdir/f'{existing_id}.json').open('w') as ovf:
+        json.dump(existing_overrides, ovf)
+
+    pconf = pipette_config.load('p300_multi_v1.4', existing_id)
+
+    assert pconf.pick_up_current == existing_overrides['pickUpCurrent']
+    assert pconf.drop_tip_speed == existing_overrides['dropTipSpeed']
+
+    new_id = '0djaisoa921jas'
+    new_pconf = pipette_config.load('p300_multi_v1.4', new_id)
+
+    # We shouldn’t write a new file for a nonexistent id
+    assert not (cdir/f'{new_id}.json').is_file()
+
+    assert new_pconf != pconf
+
+    unspecced = pipette_config.load('p300_multi_v1.4')
+    assert unspecced == new_pconf
+
+
+def test_override_save():
+    cdir = CONFIG['pipette_config_overrides_dir']
+
+    overrides = {
+        'pickUpCurrent': 1231.213,
+        'dropTipSpeed': 121
+    }
+
+    new_id = 'aoa2109j09cj2a'
+
+    pipette_config.save_overrides(new_id, overrides)
+
+    assert (cdir/f'{new_id}.json').is_file()
+
+    loaded = pipette_config.load_overrides(new_id)
+
+    assert loaded['pickUpCurrent'] == overrides['pickUpCurrent']
+    assert loaded['dropTipSpeed'] == overrides['dropTipSpeed']

@@ -1,17 +1,14 @@
+import copy
 import logging
-import os
 import json
+import re
 from collections import namedtuple
-from typing import List
-from opentrons import __file__ as root_file
-from opentrons.config import feature_flags as ff
+from typing import Any, Dict, List
+import pkgutil
+
+from opentrons.config import feature_flags as ff, CONFIG
 
 
-root_dir = os.path.abspath(os.path.dirname(root_file))
-config_name_file = os.path.join(
-    root_dir, 'shared_data', 'robot-data', 'pipetteNameSpecs.json')
-config_model_file = os.path.join(
-    root_dir, 'shared_data', 'robot-data', 'pipetteModelSpecs.json')
 log = logging.getLogger(__name__)
 
 pipette_config = namedtuple(
@@ -57,31 +54,68 @@ Z_OFFSET_P50 = 0
 Z_OFFSET_P300 = 0
 Z_OFFSET_P1000 = 20  # shortest single-channel pipette
 
+HAS_MODEL_RE = re.compile('^p.+_v.+$')
+#: If a prospective model string matches this, it has a full model number
 
-with open(config_model_file) as cfg_file:
-    configs = list(json.load(cfg_file).keys())
+
+def model_config() -> Dict[str, Any]:
+    """ Load the per-pipette-model config file from within the wheel """
+    return json.loads(
+        pkgutil.get_data(
+            'opentrons', 'shared_data/robot-data/pipetteModelSpecs.json')
+        or '{}')
 
 
-def load(pipette_model: str) -> pipette_config:
+def name_config() -> Dict[str, Any]:
+    """ Load the per-pipette-name config file from within the wheel """
+    return json.loads(
+        pkgutil.get_data(
+            'opentrons', 'shared_data/robot-data/pipetteNameSpecs.json')
+        or '{}')
+
+
+configs = list(model_config().keys())
+#: A list of pipette model names for which we have config entries
+
+
+def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
     """
-    Lazily loads pipette config data from disk. This means that changes to the
-    configuration data should be picked up on newly instantiated objects
-    without requiring a restart. If :param pipette_model is not in the top-
-    level keys of the "pipetteModelSpecs.json" file, this function will raise
-    a KeyError
-    :param pipette_model: a pipette model string corresponding to a top-level
-        key in the "pipetteModelSpecs.json" file
-    :return: a `pipette_config` instance
+    Load pipette config data
+
+
+    This function loads from a combination of
+
+    - the pipetteModelSpecs.json file in the wheel (should never be edited)
+    - the pipetteNameSpecs.json file in the wheel(should never be edited)
+    - any config overrides found in
+      ``opentrons.config.CONFIG['pipette_config_overrides_dir']``
+
+    This function reads from disk each time, so changes to the overrides
+    will be picked up in subsequent calls.
+
+    :param str pipette_model: The pipette model name (i.e. "p10_single_v1.3")
+                              for which to load configuration
+    :param pipette_id: An (optional) unique ID for the pipette to locate
+                       config overrides. If the ID is not specified, the system
+                       assumes this is a simulated pipette and does not
+                       save settings. If the ID is specified but no overrides
+                       corresponding to the ID are found, the system creates a
+                       new overrides file for it.
+    :type pipette_id: str or None
+    :raises KeyError: if ``pipette_model`` is not in the top-level keys of
+                      pipetteModeLSpecs.json (and therefore not in
+                      :py:attr:`configs`)
+
+    :returns pipette_config: The configuration, loaded and checked
     """
-    with open(config_model_file) as model_cfg_file:
-        cfg = json.load(model_cfg_file)[pipette_model]
 
-    name_key = cfg.get('name')
+    # Load the model config and update with the name config
+    cfg = copy.copy(model_config()[pipette_model])
+    cfg.update(copy.copy(name_config()[cfg['name']]))
 
-    # spread name keys into model-specific dict
-    with open(config_name_file) as name_cfg_file:
-        name_data = json.load(name_cfg_file)[name_key]
-        cfg.update(name_data)
+    # Load overrides if we have a pipette id
+    if pipette_id:
+        cfg.update(load_overrides(pipette_id))
 
     plunger_pos = cfg.get('plungerPositions', {})
 
@@ -162,3 +196,23 @@ def piecewise_volume_conversion(
     i = list(filter(lambda x: ul <= x[0], sequence))[0]
     # use that element to calculate the movement distance in mm
     return i[1]*ul + i[2]
+
+
+def save_overrides(pipette_id: str, overrides: Dict[str, Any]):
+    override_dir = CONFIG['pipette_config_overrides_dir']
+    existing = load_overrides(pipette_id)
+    existing.update(overrides)
+    json.dump(existing, (override_dir/f'{pipette_id}.json').open('w'))
+
+
+def load_overrides(pipette_id: str) -> Dict[str, Any]:
+    overrides = CONFIG['pipette_config_overrides_dir']
+    try:
+        fi = (overrides/f'{pipette_id}.json').open()
+    except FileNotFoundError:
+        return {}
+    try:
+        return json.load(fi)
+    except json.JSONDecodeError as e:
+        log.warning(f'pipette override for {pipette_id} is corrupt')
+        return {}

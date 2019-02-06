@@ -1,7 +1,6 @@
 import time
 from itertools import chain
 from opentrons import instruments, labware, robot
-from opentrons.config import pipette_config
 
 
 def _sleep(seconds):
@@ -23,15 +22,7 @@ def load_pipettes(protocol_data):
         name = props.get('name')
         if not name:
             name = model.split('_v')[0]
-
-        pipette_name_version = instruments.retrieve_version_number(
-            mount, name)
-        config = pipette_config.load(pipette_name_version)
-
-        pipette = instruments._create_pipette_from_config(
-            config=config,
-            mount=mount,
-            name=pipette_name_version)
+        pipette = instruments.pipette_by_name(mount, name)
 
         pipettes_by_id[pipette_id] = pipette
 

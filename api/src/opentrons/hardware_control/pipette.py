@@ -21,7 +21,7 @@ class Pipette:
                  model: str,
                  inst_offset_config: Dict[str, Tuple[float, float, float]],
                  pipette_id: str = None) -> None:
-        self._config = pipette_config.load(model)
+        self._config = pipette_config.load(model, pipette_id)
         self._name = model
         self._current_volume = 0.0
         self._current_tip_length = 0.0
