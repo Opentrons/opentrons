@@ -214,5 +214,5 @@ def load_overrides(pipette_id: str) -> Dict[str, Any]:
     try:
         return json.load(fi)
     except json.JSONDecodeError as e:
-        log.warning(f'pipette override for {pipette_id} is corrupt')
+        log.warning(f'pipette override for {pipette_id} is corrupt: {e}')
         return {}
