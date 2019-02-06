@@ -1,3 +1,5 @@
+`DropdownField` is similar to `SelectField`, but more normal. It uses a `<select>` component and has an onChange/onBlur/etc that use DOM events.
+
 When `value` prop is truthy, the "blank" option isn't shown:
 
 ```js

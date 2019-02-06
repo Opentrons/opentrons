@@ -1,12 +1,9 @@
 // @flow
 import * as React from 'react'
 
-import {InputField, CheckboxField} from '@opentrons/components'
-import SelectField from '../../SelectField'
+import {InputField, CheckboxField, SelectField, type SelectOption} from '@opentrons/components'
 import {FormTableRow} from './FormTable'
 import styles from './styles.css'
-
-import type {SelectOption} from '../../SelectField'
 
 type BaseFieldProps = {|
   name: string,
