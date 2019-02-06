@@ -31,6 +31,14 @@ wheel_pattern := dist/opentrons-%-py2.py3-none-any.whl
 tests ?= tests
 test_opts ?=
 
+# These variables must be overridden when make deploy or make deploy-staging is run
+# to set the auth details for pypi
+pypi_username ?=
+pypi_password ?=
+
+twine_auth_args := --username $(pypi_username) --password $(pypi_password)
+
+
 # Source discovery
 # For the python sources
 ot_py_sources := $(filter %.py,$(shell $(SHX) find src/opentrons/))
@@ -113,14 +121,12 @@ local-shell: local-install
 .PHONY: deploy-staging
 deploy-staging: wheel
 	-$(python) -m twine upload --repository-url "https://test.pypi.org/legacy/"\
-                             --username $(PYPI_TEST_USERNAME)\
-                             --password $(PYPI_TEST_PASSWORD)\
+                             $(twine_auth_args)\
                              $(wheel_file)
 
 .PHONY: deploy
 deploy: wheel
-	$(python) -m twine upload --username $(PYPI_USERNAME)\
-                            --password $(PYPI_PASSWORD)\
+	$(python) -m twine upload $(twine_auth_args)\
                             $(wheel_file)
 
 .PHONY: push

@@ -82,7 +82,7 @@ jobs:
         # push to test pypi on pr
         - provider: script
           skip_cleanup: true
-          script: make -C api deploy-staging
+          script: make -C api deploy-staging pypi_username=${PYPI_TEST_USERNAME} pypi_password=${PYPI_TEST_PASSWORD}
           on:
             repo: Opentrons/opentrons
             all_branches: true
