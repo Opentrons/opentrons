@@ -15,7 +15,7 @@ export const fileErrors = (payload: FileError) => ({
 
 // expects valid, parsed JSON protocol.
 // TODO: IMMEDIATELY pass boolean `didMigrate` in payload, to effect unsavedChanges reducer
-const loadFileAction = (payload: ProtocolFile): LoadFileAction => ({
+export const loadFileAction = (payload: ProtocolFile): LoadFileAction => ({
   type: 'LOAD_FILE',
   payload: migrateFile(payload),
 })

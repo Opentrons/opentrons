@@ -3,6 +3,7 @@
 import path from 'path'
 import configureStore from '../configureStore'
 import {selectors as fileDataSelectors} from '../file-data'
+import {actions as loadFileActions} from '../load-file'
 
 function makeTestCaseFromFixture (fileName) {
   const fullFile = require(path.join(__dirname, './fixtures', fileName))
@@ -28,11 +29,11 @@ const fixtures = [
 ]
 
 // TODO #2917: restore these tests
-describe.skip('snapshot integration test: JSON protocol fixture to procedures', () => {
+describe('snapshot integration test: JSON protocol fixture to procedures', () => {
   fixtures.forEach(({testName, inputFile, expectedProcedure}) => {
     test(testName, () => {
       const store = configureStore()
-      store.dispatch({type: 'LOAD_FILE', payload: inputFile})
+      store.dispatch(loadFileActions.loadFileAction(inputFile))
       const outputFile = fileDataSelectors.createFile(store.getState())
       expect(outputFile.procedure).toEqual(expectedProcedure)
     })
