@@ -3,7 +3,7 @@ import opentrons.hardware_control as hardware_control
 
 
 async def test_get_modules_simulating():
-    mods = ['tempdeck', 'magdeck']
+    mods = ['tempdeck', 'magdeck', 'thermocycler']
     api = hardware_control.API.build_hardware_simulator(attached_modules=mods)
     from_api = await api.discover_modules()
     assert sorted([mod.name() for mod in from_api]) == sorted(mods)

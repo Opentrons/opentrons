@@ -223,7 +223,8 @@ class ProtocolContext(CommandPublisher):
         for mod in self._hw_manager.hardware.discover_modules():
             if mod.name() == module_name:
                 mod_class = {'magdeck': MagneticModuleContext,
-                             'tempdeck': TemperatureModuleContext}[module_name]
+                             'tempdeck': TemperatureModuleContext,
+                             'thermocycler': ThermocyclerContext}[module_name]
                 break
         else:
             raise KeyError(module_name)
@@ -1598,4 +1599,24 @@ class MagneticModuleContext(ModuleContext):
     @property
     def status(self):
         """ The status of the module. either 'engaged' or 'disengaged' """
+        return self._module.status
+
+
+class ThermocyclerContext(ModuleContext):
+    """ An object representing a connected Temperature Module.
+
+    It should not be instantiated directly; instead, it should be
+    created through :py:meth:`.ProtocolContext.load_module`.
+    """
+    def __init__(self,
+                 ctx: ProtocolContext,
+                 hw_module: modules.thermocycler.Thermocycler,
+                 geometry: ModuleGeometry,
+                 loop: asyncio.AbstractEventLoop) -> None:
+        self._module = hw_module
+        self._loop = loop
+        super().__init__(ctx, geometry)
+
+    @property
+    def status(self):
         return self._module.status
