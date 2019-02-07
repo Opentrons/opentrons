@@ -45,8 +45,8 @@ export function getChannels (pipetteId: string, pipetteEntities: PipetteEntities
   return pipette.spec.channels
 }
 
-export function getMaxDisposalVolume (rawForm: ?FormData, pipetteEntities: PipetteEntities) {
-  // calculate max disposal volume for given volume & pipette
+export function getMaxDisposalVolume (rawForm: ?FormData, pipetteEntities: PipetteEntities): ?number {
+  // calculate max disposal volume for given volume & pipette. Might be negative!
   if (!rawForm) return null
   assert(rawForm.path === 'multiDispense', `getMaxDisposalVolume expected multiDispense, got path ${rawForm.path}`)
   const volume = Number(rawForm.volume)

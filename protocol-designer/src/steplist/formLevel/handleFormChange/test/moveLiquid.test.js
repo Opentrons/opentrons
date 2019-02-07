@@ -88,6 +88,28 @@ describe('disposal volume should update...', () => {
       disposalVolume_volume: form.disposalVolume_volume})
   })
 
+  describe('when volume is raised so that disposal vol must be exactly zero, clear/zero disposal volume fields', () => {
+    const volume = '5' // 5 + 5 = 10 which is P10 capacity ==> max disposal volume is zero
+    test('when form is newly changed to multiDispense: clear the fields', () => {
+      const patch = {path: 'multiDispense'}
+      const result = handleFormHelper(patch, {...form, path: 'single', volume})
+      expect(result).toEqual({
+        ...patch,
+        disposalVolume_volume: null,
+        disposalVolume_checkbox: false,
+      })
+    })
+
+    test('when form was multiDispense already: set to zero', () => {
+      const patch = {volume}
+      const result = handleFormHelper(patch, form)
+      expect(result).toEqual({
+        ...patch,
+        disposalVolume_volume: '0',
+      })
+    })
+  })
+
   test('when volume is raised past disposal volume, lower disposal volume', () => {
     const result = handleFormHelper({volume: '4.6'}, form)
     expect(result).toEqual({
@@ -100,7 +122,7 @@ describe('disposal volume should update...', () => {
   })
 
   test('when disposal volume is not > zero, clear the disposal volume fields', () => {
-    const expected = {disposalVolume_volume: null, disposalVolume_checkbox: false}
+    const expected = {disposalVolume_volume: '0'}
     const testCases = ['-999', '0', '', null]
     testCases.forEach(dispVol => {
       expect(

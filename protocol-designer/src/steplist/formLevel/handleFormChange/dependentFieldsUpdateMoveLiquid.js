@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import clamp from 'lodash/clamp'
 import floor from 'lodash/floor'
 import {getPipetteNameSpecs} from '@opentrons/shared-data'
@@ -186,13 +187,24 @@ const clampDisposalVolume = (
   if (appliedPatch.path !== 'multiDispense') return patch
 
   const maxDisposalVolume = getMaxDisposalVolume(appliedPatch, pipetteEntities)
-  if (!maxDisposalVolume) return patch
+  if (maxDisposalVolume == null) {
+    assert(false, `clampDisposalVolume got null maxDisposalVolume for pipette, something weird happened`)
+    return patch
+  }
 
   const nextDisposalVolume = clamp(Number(appliedPatch.disposalVolume_volume), 0, maxDisposalVolume)
-  return nextDisposalVolume > 0
-    ? {
+
+  if (nextDisposalVolume > 0) {
+    return {
       ...patch,
       disposalVolume_volume: String(floor(nextDisposalVolume, DISPOSAL_VOL_DIGITS)),
+    }
+  }
+  // clear out if path is new, or set to zero/null depending on checkbox
+  return rawForm.path === 'multiDispense'
+    ? {
+      ...patch,
+      disposalVolume_volume: appliedPatch.disposalVolume_checkbox ? '0' : null,
     }
     : {
       ...patch,
