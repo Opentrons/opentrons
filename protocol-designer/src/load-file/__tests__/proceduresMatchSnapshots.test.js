@@ -1,12 +1,12 @@
 // strip 'procedure' from PD JSON protocol file and expect it to be output
 // exactly the same, given everything else in the protocol file
 import path from 'path'
-import configureStore from '../configureStore'
-import {selectors as fileDataSelectors} from '../file-data'
-import {actions as loadFileActions} from '../load-file'
+import configureStore from '../../../configureStore'
+import {selectors as fileDataSelectors} from '../../../file-data'
+import {actions as loadFileActions} from '../../index'
 
 function makeTestCaseFromFixture (fileName) {
-  const fullFile = require(path.join(__dirname, './fixtures', fileName))
+  const fullFile = require(path.join(__dirname, './fixtures/throughMigration0', fileName))
   const inputFile = {...fullFile, procedure: []}
   const expectedProcedure = fullFile.procedure
   return {inputFile, expectedProcedure}
