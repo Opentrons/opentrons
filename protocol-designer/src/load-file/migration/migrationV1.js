@@ -62,19 +62,38 @@ export function addInitialDeckSetupStep (fileData: ProtocolFile): ProtocolFile {
   }
 }
 
-export function stepFormKeysToCamelCase (fileData: ProtocolFile): ProtocolFile {
-  // migrate old kebab-case keys to camelCase
+export function updateStepFormKeys (fileData: ProtocolFile): ProtocolFile {
+  const savedStepForms = fileData['designer-application'].data.savedStepForms
+  const migratedStepForms = mapValues(savedStepForms, (formData) => {
+    const deprecatedFieldNames = [
+      'aspirate_changeTip',
+      'aspirate_disposalVol_checkbox',
+      'aspirate_disposalVol_volume',
+      'dispense_blowout_checkbox',
+      'dispense_blowout_labware',
+      'step-name',
+      'step-details',
+    ]
+
+    return {
+      ...omit(formData, deprecatedFieldNames),
+      blowout_checkbox: formData.blowout_checkbox || formData['dispense_blowout_checkbox'],
+      blowout_location: formData.blowout_location || formData['dispense_blowout_labware'],
+      disposalVolume_checkbox: formData.disposalVolume_checkbox || formData['aspirate_disposalVol_checkbox'],
+      disposalVolume_volume: formData.disposalVolume_volume || formData['aspirate_disposalVol_volume'],
+      changeTip: formData.changeTip || formData['aspirate_changeTip'],
+      stepName: formData.stepName || formData['step-name'],
+      stepDetails: formData.stepDetails || formData['step-details'],
+    }
+  })
+
   return {
     ...fileData,
     'designer-application': {
       ...fileData['designer-application'],
       data: {
         ...fileData['designer-application'].data,
-        savedStepForms: mapValues(fileData['designer-application'].data.savedStepForms, (stepForm) => ({
-          ...omit(stepForm, ['step-name', 'step-details']),
-          stepName: stepForm.stepName || stepForm['step-name'],
-          stepDetails: stepForm.stepDetails || stepForm['step-details'],
-        })),
+        savedStepForms: migratedStepForms,
       },
     },
   }
@@ -87,23 +106,6 @@ export function replaceTCDStepsWithMoveLiquidStep (fileData: ProtocolFile): Prot
 
     if (!['transfer', 'consolidate', 'distribute'].includes(stepType)) return formData
 
-    const deprecatedFieldNames = [
-      'aspirate_changeTip',
-      'aspirate_disposalVol_checkbox',
-      'aspirate_disposalVol_volume',
-      'dispense_blowout_checkbox',
-      'dispense_blowout_labware',
-    ]
-
-    const passThroughFormData = {
-      ...omit(formData, deprecatedFieldNames),
-      disposalVolume_checkbox: formData.disposalVolume_checkbox || formData['aspirate_disposalVol_checkbox'],
-      disposalVolume_volume: formData.disposalVolume_volume || formData['aspirate_disposalVol_volume'],
-      changeTip: formData.changeTip || formData['aspirate_changeTip'],
-      blowout_checkbox: formData.blowout_checkbox || formData['dispense_blowout_checkbox'],
-      blowout_location: formData.blowout_location || formData['dispense_blowout_labware'],
-    }
-
     const pathMap = {transfer: 'single', consolidate: 'multiAspirate', distribute: 'multiDispense'}
     const proposedPatch = {path: pathMap[stepType], stepType: 'moveLiquid', aspirate_wells_grouped: false}
 
@@ -112,8 +114,8 @@ export function replaceTCDStepsWithMoveLiquidStep (fileData: ProtocolFile): Prot
       tiprackModel: fileData['designer-application'].data.pipetteTiprackAssignments[pipetteId],
     }))
     // update path field patch if incompatible; fallback to 'single'
-    const resolvedPatch = updatePatchPathField(proposedPatch, passThroughFormData, pipetteEntities)
-    return {...passThroughFormData, ...resolvedPatch}
+    const resolvedPatch = updatePatchPathField(proposedPatch, formData, pipetteEntities)
+    return {...formData, ...resolvedPatch}
   })
 
   return {
@@ -146,7 +148,7 @@ export default function migrateFile (fileData: any): ProtocolFile {
     const migratedFile = flow([
       renameOrderedSteps,
       addInitialDeckSetupStep,
-      stepFormKeysToCamelCase,
+      updateStepFormKeys,
       replaceTCDStepsWithMoveLiquidStep,
       updateMigrationVersion,
     ])(fileData)
