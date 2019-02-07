@@ -39,6 +39,19 @@ class InstrumentsWrapper(object):
         """
         return inst.Pipette(self.robot, *args, **kwargs)
 
+    def _pipette_details(self, mount, name_or_model):
+        self.robot.cache_instrument_models()
+        pipette_model_version = self.retrieve_version_number(
+            mount, name_or_model)
+        attached = self.robot.get_attached_pipettes()
+        if attached[mount]['model'] == pipette_model_version\
+           and attached[mount]['id']\
+           and attached[mount]['id'] != 'uncommissioned':
+            pip_id = attached[mount]['id']
+        else:
+            pip_id = None
+        return (pipette_model_version, pip_id)
+
     def P10_Single(
             self,
             mount,
@@ -48,21 +61,10 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-
-        pipette_model_version = self.retrieve_version_number(
-            mount, 'p10_single')
-        config = pipette_config.load(pipette_model_version)
-
-        return self._create_pipette_from_config(
-            config=config,
-            mount=mount,
-            name=pipette_model_version,
-            trash_container=trash_container,
-            tip_racks=tip_racks,
-            aspirate_flow_rate=aspirate_flow_rate,
-            dispense_flow_rate=dispense_flow_rate,
-            min_volume=min_volume,
-            max_volume=max_volume)
+        return self.pipette_by_name(mount, 'p10_single',
+                                    trash_container, tip_racks,
+                                    aspirate_flow_rate, dispense_flow_rate,
+                                    min_volume, max_volume)
 
     def P10_Multi(
             self,
@@ -73,21 +75,10 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-
-        pipette_model_version = self.retrieve_version_number(
-            mount, 'p10_multi')
-        config = pipette_config.load(pipette_model_version)
-
-        return self._create_pipette_from_config(
-            config=config,
-            mount=mount,
-            name=pipette_model_version,
-            trash_container=trash_container,
-            tip_racks=tip_racks,
-            aspirate_flow_rate=aspirate_flow_rate,
-            dispense_flow_rate=dispense_flow_rate,
-            min_volume=min_volume,
-            max_volume=max_volume)
+        return self.pipette_by_name(mount, 'p10_multi',
+                                    trash_container, tip_racks,
+                                    aspirate_flow_rate, dispense_flow_rate,
+                                    min_volume, max_volume)
 
     def P50_Single(
             self,
@@ -98,21 +89,10 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-
-        pipette_model_version = self.retrieve_version_number(
-            mount, 'p50_single')
-        config = pipette_config.load(pipette_model_version)
-
-        return self._create_pipette_from_config(
-            config=config,
-            mount=mount,
-            name=pipette_model_version,
-            trash_container=trash_container,
-            tip_racks=tip_racks,
-            aspirate_flow_rate=aspirate_flow_rate,
-            dispense_flow_rate=dispense_flow_rate,
-            min_volume=min_volume,
-            max_volume=max_volume)
+        return self.pipette_by_name(mount, 'p50_single',
+                                    trash_container, tip_racks,
+                                    aspirate_flow_rate, dispense_flow_rate,
+                                    min_volume, max_volume)
 
     def P50_Multi(
             self,
@@ -123,21 +103,10 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-
-        pipette_model_version = self.retrieve_version_number(
-            mount, 'p50_multi')
-        config = pipette_config.load(pipette_model_version)
-
-        return self._create_pipette_from_config(
-            config=config,
-            mount=mount,
-            name=pipette_model_version,
-            trash_container=trash_container,
-            tip_racks=tip_racks,
-            aspirate_flow_rate=aspirate_flow_rate,
-            dispense_flow_rate=dispense_flow_rate,
-            min_volume=min_volume,
-            max_volume=max_volume)
+        return self.pipette_by_name(mount, 'p50_multi',
+                                    trash_container, tip_racks,
+                                    aspirate_flow_rate, dispense_flow_rate,
+                                    min_volume, max_volume)
 
     def P300_Single(
             self,
@@ -148,21 +117,10 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-
-        pipette_model_version = self.retrieve_version_number(
-            mount, 'p300_single')
-        config = pipette_config.load(pipette_model_version)
-
-        return self._create_pipette_from_config(
-            config=config,
-            mount=mount,
-            name=pipette_model_version,
-            trash_container=trash_container,
-            tip_racks=tip_racks,
-            aspirate_flow_rate=aspirate_flow_rate,
-            dispense_flow_rate=dispense_flow_rate,
-            min_volume=min_volume,
-            max_volume=max_volume)
+        return self.pipette_by_name(mount, 'p300_single',
+                                    trash_container, tip_racks,
+                                    aspirate_flow_rate, dispense_flow_rate,
+                                    min_volume, max_volume)
 
     def P300_Multi(
             self,
@@ -173,21 +131,10 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-
-        pipette_model_version = self.retrieve_version_number(
-            mount, 'p300_multi')
-        config = pipette_config.load(pipette_model_version)
-
-        return self._create_pipette_from_config(
-            config=config,
-            mount=mount,
-            name=pipette_model_version,
-            trash_container=trash_container,
-            tip_racks=tip_racks,
-            aspirate_flow_rate=aspirate_flow_rate,
-            dispense_flow_rate=dispense_flow_rate,
-            min_volume=min_volume,
-            max_volume=max_volume)
+        return self.pipette_by_name(mount, 'p300_multi',
+                                    trash_container, tip_racks,
+                                    aspirate_flow_rate, dispense_flow_rate,
+                                    min_volume, max_volume)
 
     def P1000_Single(
             self,
@@ -198,10 +145,24 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
+        return self.pipette_by_name(mount, 'p1000_single',
+                                    trash_container, tip_racks,
+                                    aspirate_flow_rate, dispense_flow_rate,
+                                    min_volume, max_volume)
 
-        pipette_model_version = self.retrieve_version_number(
-            mount, 'p1000_single')
-        config = pipette_config.load(pipette_model_version)
+    def pipette_by_name(
+            self,
+            mount,
+            name_or_model,
+            trash_container='',
+            tip_racks=[],
+            aspirate_flow_rate=None,
+            dispense_flow_rate=None,
+            min_volume=None,
+            max_volume=None):
+        pipette_model_version, pip_id = self._pipette_details(
+            mount, name_or_model)
+        config = pipette_config.load(pipette_model_version, pip_id)
 
         return self._create_pipette_from_config(
             config=config,
@@ -260,6 +221,9 @@ class InstrumentsWrapper(object):
         return p
 
     def retrieve_version_number(self, mount, expected_model_substring):
+        if pipette_config.HAS_MODEL_RE.match(expected_model_substring):
+            return expected_model_substring
+
         attached_model = robot.get_attached_pipettes()[mount]['model']
 
         if attached_model and expected_model_substring in attached_model:
