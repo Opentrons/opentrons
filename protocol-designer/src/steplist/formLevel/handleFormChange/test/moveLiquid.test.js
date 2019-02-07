@@ -31,7 +31,6 @@ describe('path should update...', () => {
       test(`path ${path} → single`, () => {
         // volume is updated, existing path was multi
         // NOTE: 6 exceeds multi-well capacity of P10 (cannot fit 2 wells)
-        console.log('test path', path)
         const result2 = handleFormHelper(
           {volume: '6'},
           {
