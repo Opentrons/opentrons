@@ -86,12 +86,15 @@ lint: $(ot_py_sources)
 .PHONY: docs docs-html docs-doctest docs-pdf
 
 docs-html: local-install
+	shx rm -rf docs/build/html
 	pipenv run sphinx-build -b html -d docs/build/doctrees docs/source docs/build/html
 
 docs-doctest: local-install
+	shx rm -rf docs/build/doctest
 	pipenv run sphinx-build -b doctest -d docs/build/doctrees docs/source docs/build/doctest
 
 docs-pdf: local-install
+	-shx rm -rf docs/build/pdf
 	-pipenv run sphinx-build -b latex -d docs/build/doctrees docs/source docs/build/pdf
 	-$(MAKE) -C docs/build/pdf all-pdf
 
