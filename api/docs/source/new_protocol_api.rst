@@ -158,21 +158,22 @@ A Temperature Module, for example, can be loaded and used in a protocol like thi
 
 .. code-block:: python
 
-    temp_mod = protocol_context.load_module('Temperature Module', '10')
-    temp_plate = temp_mod.load_labware('biorad_96_wellPlate_pcr_200_uL')
+    def run(protocol_context):
+        temp_mod = protocol_context.load_module('Temperature Module', '10')
+        temp_plate = temp_mod.load_labware('biorad_96_wellPlate_pcr_200_uL')
 
-    master_mix = labware.load('opentrons_6_tuberack_50_mL_falcon')
+        master_mix = labware.load('opentrons_6_tuberack_50_mL_falcon')
 
-    for target_well in temp_plate.wells():
-        pipette.transfer(50, master_mix.wells_by_index()['A1'], target_well)
+        for target_well in temp_plate.wells():
+            pipette.transfer(50, master_mix.wells_by_index()['A1'], target_well)
 
-    target_temp = 80.0  # degrees Celcius
-    temp_mod.set_temp(target_temp)
-    temp_mod.wait_for_temp()
+        target_temp = 80.0  # degrees Celcius
+        temp_mod.set_temp(target_temp)
+        temp_mod.wait_for_temp()
 
-    # perform other operations
+        # perform other operations
 
-    temp_mod.deactivate()
+        temp_mod.deactivate()
 
 Robot and Pipette
 -----------------
@@ -224,12 +225,15 @@ Modules
 -------
 .. autoclass:: opentrons.protocol_api.contexts.TemperatureModuleContext
    :members:
+   :inherited-members:
 
 .. autoclass:: opentrons.protocol_api.contexts.MagneticModuleContext
    :members:
+   :inherited-members:
 
 .. autoclass:: opentrons.protocol_api.contexts.ThermocyclerContext
    :members:
+   :inherited-members:
 
 .. _protocol-api-valid-labware:
 
