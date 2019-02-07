@@ -18,6 +18,7 @@ function getDisabledPaths (
 ): ?Set<PathOption> {
   if (!rawForm) return null
 
+  // TODO IMMEDIATELY share this fn with dependentFieldsUpdateMoveLiquid
   const pipetteCapacity = rawForm.pipette && getPipetteCapacity(pipetteEntities[rawForm.pipette])
   // NOTE: ensuring that disposalVolume_volume will not exceed pipette capacity is responsibility of dependentFieldsUpdateMoveLiquid
   const withinCapacityForMultiPath = (
