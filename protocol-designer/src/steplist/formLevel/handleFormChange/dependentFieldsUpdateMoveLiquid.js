@@ -1,4 +1,5 @@
 // @flow
+import clamp from 'lodash/clamp'
 import floor from 'lodash/floor'
 import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import makeConditionalPatchUpdater from './makeConditionalPatchUpdater'
@@ -153,8 +154,8 @@ const updatePatchDisposalVolumeFields = (
 ) => {
   const appliedPatch = {...rawForm, ...patch}
 
-  if (appliedPatch.path !== 'multiDispense') {
-    // clear disposal volume whenever path is not multiDispense
+  if (patch.path && patch.path !== 'multiDispense' && rawForm.path === 'multiDispense') {
+    // clear disposal volume whenever path was changed from multiDispense
     return {
       ...patch,
       ...clearedDisposalVolumeFields,
@@ -167,11 +168,6 @@ const updatePatchDisposalVolumeFields = (
   )
   if (shouldReinitializeDisposalVolume) {
     const pipetteEntity = pipetteEntities[appliedPatch.pipette]
-    // const pipetteCapacity = getPipetteCapacity(pipetteEntity)
-    // at least 2 well's worth of volume must fit in pipette
-    // const availableVolume = pipetteCapacity - Number(appliedPatch.volume) * 2
-    // const canAddDisposalVolume = availableVolume > 0
-
     const pipetteSpec = getPipetteNameSpecs(pipetteEntity.name)
     const recommendedMinimumDisposalVol = (pipetteSpec && pipetteSpec.minVolume) || 0
 
@@ -195,25 +191,18 @@ const clampDisposalVolume = (
   if (appliedPatch.path !== 'multiDispense') return patch
 
   const maxDisposalVolume = getMaxDisposalVolume(appliedPatch, pipetteEntities)
-  if (
-    maxDisposalVolume != null &&
-    Number(appliedPatch.disposalVolume_volume) > maxDisposalVolume
-  ) {
-    const nextDisposalVolume = Math.max(
-      floor(maxDisposalVolume || 0, DISPOSAL_VOL_DIGITS),
-      0)
+  if (!maxDisposalVolume) return patch
 
-    return nextDisposalVolume
-      ? {
-        ...patch,
-        disposalVolume_volume: String(nextDisposalVolume),
-      }
-      : {
-        ...patch,
-        ...clearedDisposalVolumeFields,
-      }
-  }
-  return patch
+  const nextDisposalVolume = clamp(Number(appliedPatch.disposalVolume_volume), 0, maxDisposalVolume)
+  return nextDisposalVolume > 0
+    ? {
+      ...patch,
+      disposalVolume_volume: String(floor(nextDisposalVolume, DISPOSAL_VOL_DIGITS)),
+    }
+    : {
+      ...patch,
+      ...clearedDisposalVolumeFields,
+    }
 }
 
 const updatePatchOnPipetteChannelChange = (
