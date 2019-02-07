@@ -1,12 +1,18 @@
 // @flow
 import * as React from 'react'
 import map from 'lodash/map'
+import noop from 'lodash/noop'
 import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
 
 import {HoverTooltip, swatchColors} from '@opentrons/components'
 import type {LocationLiquidState} from '../../step-generation'
-import type {SubstepWellData, WellIngredientVolumeData, WellIngredientNames} from '../../steplist/types'
+import type {
+  SubstepIdentifier,
+  SubstepWellData,
+  WellIngredientVolumeData,
+  WellIngredientNames,
+} from '../../steplist/types'
 import IngredPill from './IngredPill'
 import {PDListItem} from '../lists'
 import styles from './StepItem.css'
@@ -19,8 +25,9 @@ type SubstepRowProps = {|
   dest?: SubstepWellData,
   ingredNames: WellIngredientNames,
   className?: string,
-  onMouseEnter?: (e: SyntheticMouseEvent<*>) => mixed,
-  onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed,
+  stepId: string,
+  substepIndex: number,
+  selectSubstep?: SubstepIdentifier => mixed,
 |}
 
 type PillTooltipContentsProps = {
@@ -68,15 +75,16 @@ export const PillTooltipContents = (props: PillTooltipContentsProps) => {
   )
 }
 
-export default function SubstepRow (props: SubstepRowProps) {
+function SubstepRow (props: SubstepRowProps) {
   const compactedSourcePreIngreds = props.source ? omitBy(props.source.preIngreds, ingred => ingred.volume <= 0) : {}
   const compactedDestPreIngreds = props.dest ? omitBy(props.dest.preIngreds, ingred => ingred.volume <= 0) : {}
+  const selectSubstep = props.selectSubstep || noop
   return (
     <PDListItem
       border
       className={props.className}
-      onMouseEnter={props.onMouseEnter}
-      onMouseLeave={props.onMouseLeave}>
+      onMouseEnter={() => selectSubstep({stepId: props.stepId, substepIndex: props.substepIndex})}
+      onMouseLeave={() => selectSubstep(null)}>
       <HoverTooltip
         portal={Portal}
         tooltipComponent={(
@@ -113,3 +121,6 @@ export default function SubstepRow (props: SubstepRowProps) {
     </PDListItem>
   )
 }
+
+// TODO: Ian 2019-02-04 need to update Flow defs for React.memo $FlowFixMe
+export default React.memo(SubstepRow)

@@ -9,7 +9,7 @@ import type {ProtocolFile, FileLabware, FilePipette} from '../../file-types'
 
 const PRESENT_MIGRATION_VERSION = 1
 
-function renameOrderedSteps (fileData: ProtocolFile): ProtocolFile {
+export function renameOrderedSteps (fileData: ProtocolFile): ProtocolFile {
   const {data} = fileData['designer-application']
   return {
     ...fileData,

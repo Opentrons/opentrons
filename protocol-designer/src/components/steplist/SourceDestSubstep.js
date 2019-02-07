@@ -19,12 +19,12 @@ export type StepSubItemProps = {|
 type SourceDestSubstepProps = {|
   ...StepSubItemProps,
   ingredNames: WellIngredientNames,
-  onSelectSubstep: SubstepIdentifier => mixed,
+  selectSubstep: SubstepIdentifier => mixed,
   hoveredSubstep: ?SubstepIdentifier,
 |}
 
 export default function SourceDestSubstep (props: SourceDestSubstepProps) {
-  const {substeps, onSelectSubstep, hoveredSubstep} = props
+  const {substeps, selectSubstep, hoveredSubstep} = props
   if (substeps.multichannel) {
     // multi-channel row item (collapsible)
     return <li>
@@ -32,12 +32,10 @@ export default function SourceDestSubstep (props: SourceDestSubstepProps) {
         <MultiChannelSubstep
           key={groupKey}
           rowGroup={rowGroup}
-          onMouseEnter={() => onSelectSubstep({
-            stepId: substeps.parentStepId,
-            substepIndex: groupKey,
-          })}
+          stepId={substeps.parentStepId}
+          substepIndex={groupKey}
+          selectSubstep={selectSubstep}
           ingredNames={props.ingredNames}
-          onMouseLeave={() => onSelectSubstep(null)}
           highlighted={!!hoveredSubstep &&
             hoveredSubstep.stepId === substeps.parentStepId &&
             hoveredSubstep.substepIndex === groupKey
@@ -59,8 +57,9 @@ export default function SourceDestSubstep (props: SourceDestSubstepProps) {
           substepIndex === hoveredSubstep.substepIndex,
         }
       )}
-      onMouseEnter={() => onSelectSubstep({stepId: substeps.parentStepId, substepIndex})}
-      onMouseLeave={() => onSelectSubstep(null)}
+      selectSubstep={selectSubstep}
+      stepId={substeps.parentStepId}
+      substepIndex={substepIndex}
       ingredNames={props.ingredNames}
       volume={row.volume}
       source={row.source}

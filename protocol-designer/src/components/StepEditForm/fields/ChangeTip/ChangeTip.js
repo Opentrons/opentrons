@@ -1,7 +1,7 @@
 // @flow
 import assert from 'assert'
 import * as React from 'react'
-import {FormGroup, DropdownField} from '@opentrons/components'
+import {FormGroup, HoverTooltip, SelectField} from '@opentrons/components'
 import i18n from '../../../../localization'
 import StepField from '../FieldConnector'
 import styles from '../../StepEditForm.css'
@@ -23,11 +23,20 @@ const ChangeTipField = (props: Props) => {
     assert(false, 'ChangeTipField expected stepType prop')
     return null
   }
-  const options = props.options.map((value) => ({
-    value,
-    name: i18n.t(`form.step_edit_form.field.change_tip.option.${value}`),
-    disabled: disabledOptions ? disabledOptions.has(value) : false,
-  }))
+  const options = props.options.map((value) => {
+    const toolTip = i18n.t(`form.step_edit_form.field.change_tip.option_tooltip.${value}`)
+    const option = i18n.t(`form.step_edit_form.field.change_tip.option.${value}`)
+    const label = (
+      <HoverTooltip tooltipComponent={toolTip} positionFixed placement='top'>
+        {(hoverTooltipHandlers) => <div {...hoverTooltipHandlers}>{option}</div>}
+      </HoverTooltip>
+    )
+    return {
+      value,
+      label,
+      isDisabled: disabledOptions ? disabledOptions.has(value) : false,
+    }
+  })
   return (
     <StepField
       name={name}
@@ -36,10 +45,11 @@ const ChangeTipField = (props: Props) => {
           label={i18n.t('form.step_edit_form.field.change_tip.label')}
           className={styles.large_field}
           hoverTooltipHandlers={hoverTooltipHandlers}>
-          <DropdownField
+          <SelectField
+            name={name}
             options={options}
             value={value ? String(value) : null}
-            onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
+            onValueChange={(name, value) => updateValue(value)} />
         </FormGroup>
       )} />
   )

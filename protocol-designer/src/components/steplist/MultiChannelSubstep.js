@@ -8,7 +8,11 @@ import SubstepRow from './SubstepRow'
 import styles from './StepItem.css'
 import {formatVolume} from './utils'
 
-import type {StepItemSourceDestRow, WellIngredientNames} from '../../steplist/types'
+import type {
+  StepItemSourceDestRow,
+  SubstepIdentifier,
+  WellIngredientNames,
+} from '../../steplist/types'
 
 const DEFAULT_COLLAPSED_STATE = true
 
@@ -16,15 +20,16 @@ type MultiChannelSubstepProps = {|
   rowGroup: Array<StepItemSourceDestRow>,
   ingredNames: WellIngredientNames,
   highlighted?: boolean,
-  onMouseEnter?: (e: SyntheticMouseEvent<*>) => mixed,
-  onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed,
+  stepId: string,
+  substepIndex: number,
+  selectSubstep: SubstepIdentifier => mixed,
 |}
 
 type MultiChannelSubstepState = {
   collapsed: boolean,
 }
 
-export default class MultiChannelSubstep extends React.Component<MultiChannelSubstepProps, MultiChannelSubstepState> {
+export default class MultiChannelSubstep extends React.PureComponent<MultiChannelSubstepProps, MultiChannelSubstepState> {
   state = {collapsed: DEFAULT_COLLAPSED_STATE}
 
   handleToggleCollapsed = () => {
@@ -32,7 +37,7 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
   }
 
   render () {
-    const {rowGroup, highlighted} = this.props
+    const {rowGroup, highlighted, stepId, selectSubstep, substepIndex} = this.props
     const {collapsed} = this.state
 
     // NOTE: need verbose null check for flow to be happy
@@ -44,8 +49,8 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
     const destWellRange = `${firstChannelDest ? firstChannelDest.well : ''}:${lastChannelDest ? lastChannelDest.well : ''}`
     return (
       <ol
-        onMouseEnter={this.props.onMouseEnter}
-        onMouseLeave={this.props.onMouseLeave}
+        onMouseEnter={() => selectSubstep({stepId, substepIndex})}
+        onMouseLeave={() => selectSubstep(null)}
         className={cx({[styles.highlighted]: highlighted})} >
 
         {/* Header row */}
@@ -71,6 +76,8 @@ export default class MultiChannelSubstep extends React.Component<MultiChannelSub
               ingredNames={this.props.ingredNames}
               source={row.source}
               dest={row.dest}
+              stepId={stepId}
+              substepIndex={substepIndex}
             />
           )
         }

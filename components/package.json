@@ -25,6 +25,7 @@
     "react-router-dom": "^4.2.2"
   },
   "dependencies": {
-    "react-popper": "^1.0.0"
+    "react-popper": "^1.0.0",
+    "react-select": "^2.3.0"
   }
 }
