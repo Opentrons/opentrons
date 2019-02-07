@@ -1,10 +1,13 @@
 // @flow
+import assert from 'assert'
 import uniq from 'lodash/uniq'
+import {getPipetteCapacity} from '../../../pipettes/pipetteData'
 import {getWellSetForMultichannel} from '../../../well-selection/utils'
 
 import type {PipetteChannels} from '@opentrons/shared-data'
 import type {FormPatch} from '../../actions/types'
-import type {PipetteEntities} from '../../../step-forms/types'
+import type {FormData} from '../../../form-types'
+import type {PipetteEntities} from '../../../step-forms'
 
 export function chainPatchUpdaters (initialPatch: FormPatch, fns: Array<(FormPatch => FormPatch)>): FormPatch {
   return fns.reduce((patchAcc: FormPatch, fn) => {
@@ -40,4 +43,14 @@ export function getChannels (pipetteId: string, pipetteEntities: PipetteEntities
     return null
   }
   return pipette.spec.channels
+}
+
+export function getMaxDisposalVolume (rawForm: ?FormData, pipetteEntities: PipetteEntities) {
+  // calculate max disposal volume for given volume & pipette
+  if (!rawForm) return null
+  assert(rawForm.path === 'multiDispense', `getMaxDisposalVolume expected multiDispense, got path ${rawForm.path}`)
+  const volume = Number(rawForm.volume)
+  const pipetteEntity = pipetteEntities[rawForm.pipette]
+  const pipetteCapacity = getPipetteCapacity(pipetteEntity)
+  return pipetteCapacity - (volume * 2)
 }

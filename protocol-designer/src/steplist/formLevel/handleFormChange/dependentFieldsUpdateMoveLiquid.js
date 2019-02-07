@@ -1,11 +1,20 @@
 // @flow
+import floor from 'lodash/floor'
+import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import makeConditionalPatchUpdater from './makeConditionalPatchUpdater'
-import {chainPatchUpdaters, getChannels, getAllWellsFromPrimaryWells} from './utils'
+import {
+  chainPatchUpdaters,
+  getChannels,
+  getAllWellsFromPrimaryWells,
+  getMaxDisposalVolume,
+} from './utils'
 import {getPipetteCapacity} from '../../../pipettes/pipetteData'
 import {getWellRatio} from '../../utils'
 import type {FormData} from '../../../form-types'
 import type {FormPatch} from '../../actions/types'
 import type {LabwareEntities, PipetteEntities} from '../../../step-forms/types'
+
+const DISPOSAL_VOL_DIGITS = 2
 
 const wellRatioUpdatesMap = [
   {
@@ -69,12 +78,9 @@ export function updatePatchPathField (patch: FormPatch, rawForm: FormData, pipet
   let pipetteCapacityExceeded = numericVolume > pipetteCapacity
 
   if (appliedPatch.volume && appliedPatch.pipette && appliedPatch.pipette in pipetteEntities) {
-    // TODO IMMEDIATELY make this a util, and search for other places this happens
-    if (pipetteCapacity) {
-      if (!pipetteCapacityExceeded && ['multiDispense', 'multiAspirate'].includes(appliedPatch.path)) {
-        const disposalVolume = (appliedPatch.disposalVolume_checkbox && appliedPatch.disposalVolume_volume) ? appliedPatch.disposalVolume_volume : 0
-        pipetteCapacityExceeded = ((numericVolume * 2) + disposalVolume) > pipetteCapacity
-      }
+    const pipetteCapacity = getPipetteCapacity(pipetteEntities[appliedPatch.pipette])
+    if (appliedPatch.volume * 2 > pipetteCapacity) {
+      pipetteCapacityExceeded = appliedPatch.volume > pipetteCapacity
     }
   }
 
@@ -138,6 +144,81 @@ const updatePatchOnPipetteChange = (
   return patch
 }
 
+const clearedDisposalVolumeFields = {
+  disposalVolume_volume: null,
+  disposalVolume_checkbox: false,
+}
+
+const updatePatchDisposalVolumeFields = (
+  patch: FormPatch,
+  rawForm: FormData,
+  pipetteEntities: PipetteEntities
+) => {
+  const appliedPatch = {...rawForm, ...patch}
+
+  if (appliedPatch.path !== 'multiDispense') {
+    // clear disposal volume whenever path is not multiDispense
+    return {
+      ...patch,
+      ...clearedDisposalVolumeFields,
+    }
+  }
+
+  const shouldReinitializeDisposalVolume = (
+    (patch.path === 'multiDispense' && rawForm.path !== 'multiDispense') ||
+    (patch.pipette && patch.pipette !== rawForm.pipette)
+  )
+  if (shouldReinitializeDisposalVolume) {
+    const pipetteEntity = pipetteEntities[appliedPatch.pipette]
+    // const pipetteCapacity = getPipetteCapacity(pipetteEntity)
+    // at least 2 well's worth of volume must fit in pipette
+    // const availableVolume = pipetteCapacity - Number(appliedPatch.volume) * 2
+    // const canAddDisposalVolume = availableVolume > 0
+
+    const pipetteSpec = getPipetteNameSpecs(pipetteEntity.name)
+    const recommendedMinimumDisposalVol = (pipetteSpec && pipetteSpec.minVolume) || 0
+
+    // reset to recommended vol. Expects `clampDisposalVolume` to reduce it if needed
+    return {
+      ...patch,
+      disposalVolume_checkbox: true,
+      disposalVolume_volume: String(recommendedMinimumDisposalVol || 0),
+    }
+  }
+  return patch
+}
+
+// clamp disposal volume so it cannot be negative, or exceed the capacity for multiDispense
+const clampDisposalVolume = (
+  patch: FormPatch,
+  rawForm: FormData,
+  pipetteEntities: PipetteEntities
+) => {
+  const appliedPatch = {...rawForm, ...patch}
+  if (appliedPatch.path !== 'multiDispense') return patch
+
+  const maxDisposalVolume = getMaxDisposalVolume(appliedPatch, pipetteEntities)
+  if (
+    maxDisposalVolume != null &&
+    Number(appliedPatch.disposalVolume_volume) > maxDisposalVolume
+  ) {
+    const nextDisposalVolume = Math.max(
+      floor(maxDisposalVolume || 0, DISPOSAL_VOL_DIGITS),
+      0)
+
+    return nextDisposalVolume
+      ? {
+        ...patch,
+        disposalVolume_volume: String(nextDisposalVolume),
+      }
+      : {
+        ...patch,
+        ...clearedDisposalVolumeFields,
+      }
+  }
+  return patch
+}
+
 const updatePatchOnPipetteChannelChange = (
   patch: FormPatch,
   rawForm: FormData,
@@ -198,6 +279,8 @@ export default function dependentFieldsUpdateMoveLiquid (
     chainPatch => updatePatchOnPipetteChannelChange(chainPatch, rawForm, labwareEntities, pipetteEntities),
     chainPatch => updatePatchOnPipetteChange(chainPatch, rawForm, pipetteEntities),
     chainPatch => updatePatchPathField(chainPatch, rawForm, pipetteEntities),
+    chainPatch => updatePatchDisposalVolumeFields(chainPatch, rawForm, pipetteEntities),
+    chainPatch => clampDisposalVolume(chainPatch, rawForm, pipetteEntities),
     updatePatchOnWellRatioChange,
   ])
 }

@@ -18,13 +18,12 @@ function getDisabledPaths (
 ): ?Set<PathOption> {
   if (!rawForm) return null
 
-  const disposalVolume = (rawForm.disposalVolume_checkbox && rawForm.disposalVolume_volume) || 0
   const pipetteCapacity = rawForm.pipette && getPipetteCapacity(pipetteEntities[rawForm.pipette])
-  // TODO IMMEDIATELY also apply 2x-well-rule and add disposal volume -- make this a util, and search for other places this happens
+  // NOTE: ensuring that disposalVolume_volume will not exceed pipette capacity is responsibility of dependentFieldsUpdateMoveLiquid
   const withinCapacityForMultiPath = (
     rawForm.volume > 0 &&
     pipetteCapacity > 0 &&
-    rawForm.volume * 2 + disposalVolume <= pipetteCapacity
+    rawForm.volume * 2 <= pipetteCapacity
   )
   const wellRatio = getWellRatio(rawForm.aspirate_wells, rawForm.dispense_wells)
 

@@ -63,6 +63,10 @@
   font-size: var(--fs-body-1);
 }
 
+.captioned_field {
+  margin-bottom: 1rem;
+}
+
 .hidden_fields {
   margin: 0 1rem 0 2.5rem;
   min-width: 14.5rem;
