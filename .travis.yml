@@ -71,26 +71,21 @@ jobs:
             repo: Opentrons/opentrons
             branch: edge
         # push to real pypi on tag
-        - provider: pypi
-          distributions: "bdist_wheel"
+        - provider: script
           skip_cleanup: true
-          user: $PYPI_USER
-          password: $PYPI_PASSWORD
+          script: make -C api deploy pypi_username=${PYPI_USER} pypi_password=${PYPI_PASSWORD}
           on:
             all_branches: true
             tags: true
             repo: Opentrons/opentrons
             branch: edge
         # push to test pypi on pr
-        - provider: pypi
-          distributions: "bdist_wheel"
+        - provider: script
           skip_cleanup: true
-          user: $TEST_PYPI_USER
-          password: $TEST_PYPI_PASSWORD
+          script: make -C api deploy-staging pypi_username=${TEST_PYPI_USER} pypi_password=${TEST_PYPI_PASSWORD}
           on:
             repo: Opentrons/opentrons
             branch: edge
-          skip_existing: true
 
     # test, build, and upload for JavaScript projects
     - stage: test

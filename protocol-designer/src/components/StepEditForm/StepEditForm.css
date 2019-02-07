@@ -143,6 +143,20 @@
   list-style: none;
 }
 
+.path_tooltip_image {
+  padding: 0.5rem;
+}
+
+.path_tooltip_title {
+  font-size: var(--fs-header);
+  text-align: center;
+}
+
+.path_tooltip_subtitle {
+  font-size: var(--fs-body-2);
+  text-align: center;
+}
+
 .disposal_vol_wrapper {
   min-height: 3.5rem;
 }

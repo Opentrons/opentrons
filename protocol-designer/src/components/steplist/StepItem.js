@@ -115,12 +115,7 @@ function getStepItemContents (stepItemProps: StepItemProps) {
     const sourceLabware = getLabware(rawForm['aspirate_labware'])
     const destLabware = getLabware(rawForm['dispense_labware'])
 
-    result.push(
-      <AspirateDispenseHeader
-        key='transferlike-header'
-        {...{sourceLabware, destLabware}}
-      />
-    )
+    result.push(<AspirateDispenseHeader key='moveLiquid-header' {...{sourceLabware, destLabware}} />)
   }
 
   if (stepType === 'mix') {
