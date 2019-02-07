@@ -58,18 +58,23 @@ const wellRatioUpdatesMap = [
 ]
 const wellRatioUpdater = makeConditionalPatchUpdater(wellRatioUpdatesMap)
 
-function updatePatchPathField (patch, rawForm, pipetteEntities) {
+export function updatePatchPathField (patch: FormPatch, rawForm: FormData, pipetteEntities: PipetteEntities) {
   const appliedPatch = {...rawForm, ...patch}
   const {path, changeTip} = appliedPatch
   // pass-thru: incomplete form
   if (!path) return patch
 
-  let pipetteCapacityExceeded = false
+  const numericVolume = Number(appliedPatch.volume) || 0
+  const pipetteCapacity = getPipetteCapacity(pipetteEntities[appliedPatch.pipette])
+  let pipetteCapacityExceeded = numericVolume > pipetteCapacity
+
   if (appliedPatch.volume && appliedPatch.pipette && appliedPatch.pipette in pipetteEntities) {
-    // TODO IMMEDIATELY also apply 2x-well-rule and add disposal volume -- make this a util, and search for other places this happens
-    const pipetteCapacity = getPipetteCapacity(pipetteEntities[appliedPatch.pipette])
+    // TODO IMMEDIATELY make this a util, and search for other places this happens
     if (pipetteCapacity) {
-      pipetteCapacityExceeded = appliedPatch.volume > pipetteCapacity // TODO IMMEDIATELY also apply disposal volume
+      if (!pipetteCapacityExceeded && ['multiDispense', 'multiAspirate'].includes(appliedPatch.path)) {
+        const disposalVolume = (appliedPatch.disposalVolume_checkbox && appliedPatch.disposalVolume_volume) ? appliedPatch.disposalVolume_volume : 0
+        pipetteCapacityExceeded = ((numericVolume * 2) + disposalVolume) > pipetteCapacity
+      }
     }
   }
 

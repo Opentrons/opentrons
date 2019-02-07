@@ -6,13 +6,13 @@ describe('steps reducer', () => {
     const state = {}
     const action = {
       type: 'ADD_STEP',
-      payload: {id: '123', stepType: 'transfer'},
+      payload: {id: '123', stepType: 'moveLiquid'},
     }
 
     expect(steps(state, action)).toEqual({
       '123': {
         id: '123',
-        stepType: 'transfer',
+        stepType: 'moveLiquid',
       },
     })
   })
@@ -26,7 +26,7 @@ describe('steps reducer', () => {
     }
     const action = {
       type: 'ADD_STEP',
-      payload: {id: '123', stepType: 'transfer'},
+      payload: {id: '123', stepType: 'moveLiquid'},
     }
 
     expect(steps(state, action)).toEqual({
@@ -36,7 +36,7 @@ describe('steps reducer', () => {
       },
       '123': {
         id: '123',
-        stepType: 'transfer',
+        stepType: 'moveLiquid',
       },
     })
   })
@@ -47,7 +47,7 @@ describe('orderedStepIds reducer', () => {
     const state = []
     const action = {
       type: 'ADD_STEP',
-      payload: {id: '123', stepType: 'transfer'},
+      payload: {id: '123', stepType: 'moveLiquid'},
     }
     expect(orderedStepIds(state, action)).toEqual(['123'])
   })
@@ -56,7 +56,7 @@ describe('orderedStepIds reducer', () => {
     const state = ['123']
     const action = {
       type: 'ADD_STEP',
-      payload: {id: '22', stepType: 'transfer'},
+      payload: {id: '22', stepType: 'moveLiquid'},
     }
     expect(orderedStepIds(state, action)).toEqual(['123', '22'])
   })

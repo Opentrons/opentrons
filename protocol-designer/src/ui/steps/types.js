@@ -1,9 +1,6 @@
 // @flow
 import type {DelayArgs} from '../../step-generation'
-import type {
-  StepIdType,
-  TransferLikeStepType,
-} from '../../form-types'
+import type {StepIdType} from '../../form-types'
 import type {WellIngredientVolumeData, TipLocation} from '../../steplist/types'
 
 export type SourceDestData = {
@@ -38,14 +35,14 @@ export type StepItemSourceDestRow = {
 
 export type SourceDestSubstepItemSingleChannel = {|
   multichannel: false,
-  stepType: TransferLikeStepType | 'mix',
+  stepType: 'moveLiquid' | 'mix',
   parentStepId: StepIdType,
   rows: Array<StepItemSourceDestRow>,
 |}
 
 export type SourceDestSubstepItemMultiChannel = {|
   multichannel: true,
-  stepType: TransferLikeStepType | 'mix',
+  stepType: 'moveLiquid' | 'mix',
   parentStepId: StepIdType,
   volume?: ?number, // uniform volume for all steps
   multiRows: Array<Array<StepItemSourceDestRow>>, // Array of arrays.

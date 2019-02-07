@@ -12,7 +12,7 @@ const fileErrors = handleActions({
 // "changes to the protocol", those action types need to be updated here.
 const unsavedChanges = (state: boolean = false, action: {type: string}): boolean => {
   switch (action.type) {
-    case 'LOAD_FILE':
+    case 'LOAD_FILE': // TODO: BC 2019-2-1 send a boolean in LOAD_FILE payload `didMigrate`? if so, then set unsavedChanges to true
     case 'SAVE_PROTOCOL_FILE':
       return false
     case 'CREATE_NEW_PROTOCOL':

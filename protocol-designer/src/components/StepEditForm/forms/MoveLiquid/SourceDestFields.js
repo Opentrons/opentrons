@@ -81,12 +81,12 @@ class SourceDestFields extends React.Component<Props, State> {
                 </CheckboxRowField>
                 <CheckboxRowField name={addFieldNamePrefix('mix_checkbox')} label='Mix'>
                   <TextField
-                    name={addFieldNamePrefix('dispense_mix_volume')}
+                    name={addFieldNamePrefix('mix_volume')}
                     units="μL"
                     className={styles.small_field}
                     {...focusHandlers} />
                   <TextField
-                    name={addFieldNamePrefix('dispense_mix_times')}
+                    name={addFieldNamePrefix('mix_times')}
                     units="Times"
                     className={styles.small_field}
                     {...focusHandlers} />

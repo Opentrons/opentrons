@@ -111,21 +111,11 @@ function getStepItemContents (stepItemProps: StepItemProps) {
   const result = []
 
   // headers
-  if (
-    stepType === 'transfer' ||
-    stepType === 'consolidate' ||
-    stepType === 'distribute' ||
-    stepType === 'moveLiquid'
-  ) {
+  if (stepType === 'moveLiquid') {
     const sourceLabware = getLabware(rawForm['aspirate_labware'])
     const destLabware = getLabware(rawForm['dispense_labware'])
 
-    result.push(
-      <AspirateDispenseHeader
-        key='transferlike-header'
-        {...{sourceLabware, destLabware}}
-      />
-    )
+    result.push(<AspirateDispenseHeader key='moveLiquid-header' {...{sourceLabware, destLabware}} />)
   }
 
   if (stepType === 'mix') {
@@ -144,7 +134,6 @@ function getStepItemContents (stepItemProps: StepItemProps) {
       substeps.commandCreatorFnName === 'transfer' ||
       substeps.commandCreatorFnName === 'consolidate' ||
       substeps.commandCreatorFnName === 'distribute' ||
-      substeps.commandCreatorFnName === 'moveLiquid' ||
       substeps.commandCreatorFnName === 'mix'
     )
   ) {

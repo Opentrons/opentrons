@@ -16,14 +16,14 @@ import MoreOptionsModal from '../modals/MoreOptionsModal'
 import ConfirmDeleteStepModal from '../modals/ConfirmDeleteStepModal'
 import styles from './StepEditForm.css'
 
-import {MixForm, TransferForm, PauseForm} from './forms'
+import {MixForm, MoveLiquidForm, PauseForm} from './forms'
 import FormAlerts from './FormAlerts'
 import ButtonRow from './ButtonRow'
 
 const STEP_FORM_MAP: {[StepType]: *} = {
   mix: MixForm,
   pause: PauseForm,
-  moveLiquid: TransferForm,
+  moveLiquid: MoveLiquidForm,
 }
 
 type SP = {

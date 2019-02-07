@@ -67,13 +67,10 @@ export type StepFieldName = any
 
 // TODO Ian 2019-01-16 factor out to some constants.js ? See #2926
 export const stepIconsByType: {[string]: IconName} = {
-  'transfer': 'ot-transfer',
-  'distribute': 'ot-distribute',
-  'consolidate': 'ot-consolidate',
+  'moveLiquid': 'ot-transfer',
   'mix': 'ot-mix',
   'pause': 'pause',
   'manualIntervention': 'pause', // TODO Ian 2018-12-13 pause icon for this is a placeholder
-  'moveLiquid': 'ot-transfer',
 }
 
 export type StepType = $Keys<typeof stepIconsByType>
@@ -92,37 +89,6 @@ export type BlowoutFields = {|
 
 export type ChangeTipFields = {|
   'changeTip'?: ChangeTipOptions,
-|}
-
-export type TransferLikeStepType = 'transfer' | 'consolidate' | 'distribute'
-
-export type TransferLikeForm = {|
-  ...AnnotationFields,
-  ...BlowoutFields,
-  ...ChangeTipFields,
-
-  stepType: TransferLikeStepType,
-  id: StepIdType,
-
-  'aspirate_labware'?: string,
-  'aspirate_wells'?: Array<string>,
-  'pipette'?: string,
-  'aspirate_preWetTip'?: boolean,
-  'aspirate_airGap_checkbox'?: boolean,
-  'aspirate_airGap_volume'?: string,
-  'aspirate_mix_checkbox'?: boolean,
-  'aspirate_mix_volume'?: string,
-  'aspirate_mix_times'?: string,
-  'aspirate_disposalVol_checkbox'?: boolean,
-  'aspirate_disposalVol_volume'?: string,
-
-  'volume'?: string,
-  'dispense_labware'?: string,
-  'dispense_wells'?: Array<string>,
-  'dispense_touchTip'?: boolean,
-  'dispense_mix_checkbox'?: boolean,
-  'dispense_mix_volume'?: string,
-  'dispense_mix_times'?: string,
 |}
 
 export type MixForm = {|
@@ -158,9 +124,6 @@ export type FormData = {
   id: StepIdType,
   [StepFieldName]: any, // TODO: form value processing to ensure type
 }
-//  | MixForm
-//  | PauseForm
-//  | TransferLikeForm
 
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 
