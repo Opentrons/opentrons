@@ -9,7 +9,12 @@ from opentrons import HERE as package_root, config
 log = logging.getLogger(__name__)
 
 PORT_SEARCH_TIMEOUT = 5.5
-SUPPORTED_MODULES = {'magdeck': MagDeck, 'tempdeck': TempDeck}
+SUPPORTED_MODULES = {
+    'magdeck': MagDeck,
+    'Magnetic Module': MagDeck,
+    'tempdeck': TempDeck,
+    'Temperature Module': TempDeck
+}
 
 # avrdude_options
 PART_NO = 'atmega32u4'

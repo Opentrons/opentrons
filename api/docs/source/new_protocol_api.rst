@@ -1,13 +1,13 @@
 .. _protocol-api:
 
-Opentrons API Version 4
+Opentrons API Version 2
 ================
 
 For the OT 1 API, `please go to this link`__
 
 __ https://docs.opentrons.com/ot1/
 
-For Version 3 of the OT 2 API, `please go to this link`__
+For Version 1 of the OT 2 API, `please go to this link`__
 
 __ https://docs.opentrons.com
 
@@ -45,27 +45,27 @@ If we were to rewrite this with the Opentrons API, it would look like the follow
 
 .. code-block:: python
 
-  # metadata
-  metadata = {
-      'protocolName': 'My Protocol',
-      'author': 'Name <email@address.com>',
-      'description': 'Simple protocol to get started using OT2',
-      'source': 'Opentrons Protocol Tutorial'
-  }
+    # metadata
+    metadata = {
+        'protocolName': 'My Protocol',
+        'author': 'Name <email@address.com>',
+        'description': 'Simple protocol to get started using OT2',
+        'source': 'Opentrons Protocol Tutorial'
+    }
 
-  # protocol run function
-  def run(protocol_context):
+    # protocol run function
+    def run(protocol_context):
 
-      # labware
-      plate = protocol_context.load_labware_by_name('generic_96_wellPlate_380_uL', '2')
-      tiprack = protocol_context.load_labware_by_name('opentrons_96_tiprack_300_uL', '1')
+        # labware
+        plate = protocol_context.load_labware_by_name('generic_96_wellPlate_380_uL', '2')
+        tiprack = protocol_context.load_labware_by_name('opentrons_96_tiprack_300_uL', '1')
 
-      # pipettes
-      pipette = protocol_context.load_instrument(’p300_single’, ’left’, tip_racks=[tiprack])
+        # pipettes
+        pipette = protocol_context.load_instrument('p300_single', 'left', tip_racks=[tiprack])
 
-      # commands
-      pipette.aspirate(100, plate.wells_by_index()[’A1’])
-      pipette.dispense(100, plate.wells_by_index()[’B2’])
+        # commands
+        pipette.aspirate(100, plate.wells_by_index()['A1'])
+        pipette.dispense(100, plate.wells_by_index()['B2'])
 
 
 **********************
@@ -130,7 +130,7 @@ From the example above, the "pipettes" section looked like:
 
 .. code-block:: python
 
-    pipette = protocol_context.load_instrument(’p300_single’, ’left’, tip_racks=[tiprack])
+    pipette = protocol_context.load_instrument('p300_single', 'left', tip_racks=[tiprack])
 
 
 Commands
@@ -149,6 +149,30 @@ From the example above, the "commands" section looked like:
 
 which does exactly what it says - aspirate 100 uL from A1 and dispense it all in B2.
 
+Modules
+^^^^^^^
+
+Modules are peripherals that attach to the OT-2 to extend its capabilities. Modules currently supported are the Temperature Module and the Magnetic Module.  The Thermocycler is under development.
+
+A Temperature Module, for example, can be loaded and used in a protocol like this:
+
+.. code-block:: python
+
+    temp_mod = protocol_context.load_module('Temperature Module', '10')
+    temp_plate = temp_mod.load_labware('biorad_96_wellPlate_pcr_200_uL')
+
+    master_mix = labware.load('opentrons_6_tuberack_50_mL_falcon')
+
+    for target_well in temp_plate.wells():
+        pipette.transfer(50, master_mix.wells_by_index()['A1'], target_well)
+
+    target_temp = 80.0  # degrees Celcius
+    temp_mod.set_temp(target_temp)
+    temp_mod.wait_for_temp()
+
+    # perform other operations
+
+    temp_mod.deactivate()
 
 Robot and Pipette
 -----------------
@@ -194,6 +218,18 @@ Labware and Wells
 .. automodule:: opentrons.protocol_api.labware
    :members:
 
+.. _protocol-api-modules:
+
+Modules
+-------
+.. autoclass:: opentrons.protocol_api.contexts.TemperatureModuleContext
+   :members:
+
+.. autoclass:: opentrons.protocol_api.contexts.MagneticModuleContext
+   :members:
+
+.. autoclass:: opentrons.protocol_api.contexts.ThermocyclerContext
+   :members:
 
 .. _protocol-api-valid-labware:
 

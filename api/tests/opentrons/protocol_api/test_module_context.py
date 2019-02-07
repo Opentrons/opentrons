@@ -46,16 +46,16 @@ def test_magdeck(loop):
     with pytest.raises(ValueError):
         mod.engage()
     mod.engage(2)
-    assert 'engaging magnetic' in ','.join([cmd.lower()
-                                            for cmd in ctx.commands()])
+    assert 'engaging magnetic' in ','.join(
+        [cmd.lower() for cmd in ctx.commands()])
     assert mod.status == 'engaged'
     mod.disengage()
-    assert 'disengaging magnetic' in ','.join([cmd.lower()
-                                               for cmd in ctx.commands()])
+    assert 'disengaging magnetic' in ','.join(
+        [cmd.lower() for cmd in ctx.commands()])
     assert mod.status == 'disengaged'
     mod.calibrate()
-    assert 'calibrating magnetic' in ','.join([cmd.lower()
-                                               for cmd in ctx.commands()])
+    assert 'calibrating magnetic' in ','.join(
+        [cmd.lower() for cmd in ctx.commands()])
 
 
 def test_thermocycler(loop):
@@ -69,8 +69,8 @@ def test_thermocycler(loop):
 
     # Test default ramp rate
     mod.set_temperature(20, hold_time=5.0)
-    assert 'setting thermocycler temperature' in ','.join([cmd.lower()
-                                              for cmd in ctx.commands()])
+    assert 'setting thermocycler temperature' in ','.join(
+        [cmd.lower() for cmd in ctx.commands()])
     mod.wait_for_temp()
     assert mod.target == 20
     assert mod.temperature == 20
