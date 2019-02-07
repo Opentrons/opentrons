@@ -2,14 +2,59 @@
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import flow from 'lodash/flow'
+import {getPipetteCapacity} from '../../pipettes/pipetteData'
 import {initialDeckSetupStepForm} from '../../step-forms/reducers'
-import {updatePatchPathField} from '../../steplist/formLevel/handleFormChange/dependentFieldsUpdateMoveLiquid'
 import type {ProtocolFile, FileLabware, FilePipette} from '../../file-types'
 
 const PRESENT_MIGRATION_VERSION = 1
 
+// NOTE: these constants are copied here because
+// the default-values key did not exist for most protocols
+// pre migrationV1 in later migration files many of these values
+// should be taken from the default-values key
 export const INITIAL_DECK_SETUP_STEP_ID: '__INITIAL_DECK_SETUP_STEP__' = '__INITIAL_DECK_SETUP_STEP__'
 export const FIXED_TRASH_ID: 'trashId' = 'trashId'
+export const DEFAULT_MM_FROM_BOTTOM_ASPIRATE = 1
+export const DEFAULT_MM_FROM_BOTTOM_DISPENSE = 0.5
+export const DEFAULT_WELL_ORDER_FIRST_OPTION: 't2b' = 't2b'
+export const DEFAULT_WELL_ORDER_SECOND_OPTION: 'l2r' = 'l2r'
+
+// NOTE: this function was copied on 2019-2-7 from
+// formLevel/handleFormChange/dependentFieldsUpdateMoveLiquid.js
+// in order to avoid further inadvertent changes to this migration
+export function updatePatchPathField (patch: FormPatch, rawForm: FormData, pipetteEntities: PipetteEntities) {
+  const appliedPatch = {...rawForm, ...patch}
+  const {path, changeTip} = appliedPatch
+  // pass-thru: incomplete form
+  if (!path) return patch
+
+  const numericVolume = Number(appliedPatch.volume) || 0
+  const pipetteCapacity = getPipetteCapacity(pipetteEntities[appliedPatch.pipette])
+  let pipetteCapacityExceeded = numericVolume > pipetteCapacity
+
+  if (appliedPatch.volume && appliedPatch.pipette && appliedPatch.pipette in pipetteEntities) {
+    if (pipetteCapacity) {
+      if (!pipetteCapacityExceeded && ['multiDispense', 'multiAspirate'].includes(appliedPatch.path)) {
+        const disposalVolume = (appliedPatch.disposalVolume_checkbox && appliedPatch.disposalVolume_volume) ? appliedPatch.disposalVolume_volume : 0
+        pipetteCapacityExceeded = ((numericVolume * 2) + disposalVolume) > pipetteCapacity
+      }
+    }
+  }
+
+  if (pipetteCapacityExceeded) {
+    return {...patch, path: 'single'}
+  }
+
+  // changeTip value incompatible with next path value
+  const incompatiblePath = (
+    (changeTip === 'perSource' && path === 'multiAspirate') ||
+    (changeTip === 'perDest' && path === 'multiDispense'))
+
+  if (pipetteCapacityExceeded || incompatiblePath) {
+    return {...patch, path: 'single'}
+  }
+  return patch
+}
 
 export function renameOrderedSteps (fileData: ProtocolFile): ProtocolFile {
   const {data} = fileData['designer-application']
@@ -69,21 +114,35 @@ export function updateStepFormKeys (fileData: ProtocolFile): ProtocolFile {
       'aspirate_changeTip',
       'aspirate_disposalVol_checkbox',
       'aspirate_disposalVol_volume',
+      'aspirate_preWetTip',
+      'aspirate_touchTip',
       'dispense_blowout_checkbox',
       'dispense_blowout_labware',
+      'flow-rate',
+      'offsetFromBottomMm',
       'step-name',
       'step-details',
     ]
 
     return {
       ...omit(formData, deprecatedFieldNames),
+      aspirate_touchTip_checkbox: formData.aspirate_touchTip_checkbox || formData['aspirate_touchTip'],
       blowout_checkbox: formData.blowout_checkbox || formData['dispense_blowout_checkbox'],
       blowout_location: formData.blowout_location || formData['dispense_blowout_labware'],
+      changeTip: formData.changeTip || formData['aspirate_changeTip'],
+      dispense_touchTip_checkbox: formData.dispense_touchTip_checkbox || formData['dispense_touchTip'],
       disposalVolume_checkbox: formData.disposalVolume_checkbox || formData['aspirate_disposalVol_checkbox'],
       disposalVolume_volume: formData.disposalVolume_volume || formData['aspirate_disposalVol_volume'],
-      changeTip: formData.changeTip || formData['aspirate_changeTip'],
+      preWetTip: formData.preWetTip || formData['aspirate_preWetTip'],
       stepName: formData.stepName || formData['step-name'],
       stepDetails: formData.stepDetails || formData['step-details'],
+      aspirate_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+      dispense_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+      aspirate_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
+      aspirate_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
+      dispense_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
+      dispense_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
+      aspirate_wells_grouped: false,
     }
   })
 
