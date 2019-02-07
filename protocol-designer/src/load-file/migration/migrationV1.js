@@ -4,10 +4,12 @@ import omit from 'lodash/omit'
 import flow from 'lodash/flow'
 import {initialDeckSetupStepForm} from '../../step-forms/reducers'
 import {updatePatchPathField} from '../../steplist/formLevel/handleFormChange/dependentFieldsUpdateMoveLiquid'
-import {INITIAL_DECK_SETUP_STEP_ID} from '../../constants'
 import type {ProtocolFile, FileLabware, FilePipette} from '../../file-types'
 
 const PRESENT_MIGRATION_VERSION = 1
+
+export const INITIAL_DECK_SETUP_STEP_ID: '__INITIAL_DECK_SETUP_STEP__' = '__INITIAL_DECK_SETUP_STEP__'
+export const FIXED_TRASH_ID: 'trashId' = 'trashId'
 
 export function renameOrderedSteps (fileData: ProtocolFile): ProtocolFile {
   const {data} = fileData['designer-application']
@@ -25,7 +27,7 @@ export function renameOrderedSteps (fileData: ProtocolFile): ProtocolFile {
 }
 
 // builds the initial deck setup step for older protocols that didn't have one.
-function addInitialDeckSetupStep (fileData: ProtocolFile): ProtocolFile {
+export function addInitialDeckSetupStep (fileData: ProtocolFile): ProtocolFile {
   const savedStepForms = fileData['designer-application'].data.savedStepForms
 
   // already has deck setup step, pass thru
@@ -60,7 +62,7 @@ function addInitialDeckSetupStep (fileData: ProtocolFile): ProtocolFile {
   }
 }
 
-function stepFormKeysToCamelCase (fileData: ProtocolFile): ProtocolFile {
+export function stepFormKeysToCamelCase (fileData: ProtocolFile): ProtocolFile {
   // migrate old kebab-case keys to camelCase
   return {
     ...fileData,
@@ -78,7 +80,7 @@ function stepFormKeysToCamelCase (fileData: ProtocolFile): ProtocolFile {
   }
 }
 
-function replaceTCDStepsWithMoveLiquidStep (fileData: ProtocolFile): ProtocolFile {
+export function replaceTCDStepsWithMoveLiquidStep (fileData: ProtocolFile): ProtocolFile {
   const savedStepForms = fileData['designer-application'].data.savedStepForms
   const migratedStepForms = mapValues(savedStepForms, (formData) => {
     const {stepType} = formData
@@ -126,7 +128,7 @@ function replaceTCDStepsWithMoveLiquidStep (fileData: ProtocolFile): ProtocolFil
   }
 }
 
-function updateMigrationVersion (fileData: ProtocolFile): ProtocolFile {
+export function updateMigrationVersion (fileData: ProtocolFile): ProtocolFile {
   return {
     ...fileData,
     'designer-application': {
