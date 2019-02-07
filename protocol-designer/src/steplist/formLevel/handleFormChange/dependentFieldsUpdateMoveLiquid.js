@@ -1,22 +1,21 @@
 // @flow
 import assert from 'assert'
 import clamp from 'lodash/clamp'
-import floor from 'lodash/floor'
+import round from 'lodash/round'
 import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import makeConditionalPatchUpdater from './makeConditionalPatchUpdater'
 import {
   chainPatchUpdaters,
   getChannels,
   getAllWellsFromPrimaryWells,
-  getMaxDisposalVolume,
+  getMaxDisposalVolumeForMultidispense,
+  volumeInCapacityForMulti,
+  DISPOSAL_VOL_DIGITS,
 } from './utils'
-import {getPipetteCapacity} from '../../../pipettes/pipetteData'
 import {getWellRatio} from '../../utils'
 import type {FormData} from '../../../form-types'
 import type {FormPatch} from '../../actions/types'
 import type {LabwareEntities, PipetteEntities} from '../../../step-forms/types'
-
-const DISPOSAL_VOL_DIGITS = 2
 
 const wellRatioUpdatesMap = [
   {
@@ -75,11 +74,9 @@ function updatePatchPathField (patch, rawForm, pipetteEntities) {
   // pass-thru: incomplete form
   if (!path) return patch
 
-  const volumeNum = Number(appliedPatch.volume)
   let pipetteCapacityExceeded = false
   if (appliedPatch.volume && appliedPatch.pipette && appliedPatch.pipette in pipetteEntities) {
-    const pipetteCapacity = getPipetteCapacity(pipetteEntities[appliedPatch.pipette])
-    pipetteCapacityExceeded = (volumeNum * 2) > pipetteCapacity
+    pipetteCapacityExceeded = !volumeInCapacityForMulti(appliedPatch, pipetteEntities)
   }
 
   // changeTip value incompatible with next path value
@@ -178,6 +175,7 @@ const updatePatchDisposalVolumeFields = (
 }
 
 // clamp disposal volume so it cannot be negative, or exceed the capacity for multiDispense
+// also rounds it to acceptable digits before clamping
 const clampDisposalVolume = (
   patch: FormPatch,
   rawForm: FormData,
@@ -186,18 +184,21 @@ const clampDisposalVolume = (
   const appliedPatch = {...rawForm, ...patch}
   if (appliedPatch.path !== 'multiDispense') return patch
 
-  const maxDisposalVolume = getMaxDisposalVolume(appliedPatch, pipetteEntities)
+  const maxDisposalVolume = getMaxDisposalVolumeForMultidispense(appliedPatch, pipetteEntities)
   if (maxDisposalVolume == null) {
     assert(false, `clampDisposalVolume got null maxDisposalVolume for pipette, something weird happened`)
     return patch
   }
 
-  const nextDisposalVolume = clamp(Number(appliedPatch.disposalVolume_volume), 0, maxDisposalVolume)
+  const nextDisposalVolume = clamp(
+    round(Number(appliedPatch.disposalVolume_volume), DISPOSAL_VOL_DIGITS),
+    0,
+    maxDisposalVolume)
 
   if (nextDisposalVolume > 0) {
     return {
       ...patch,
-      disposalVolume_volume: String(floor(nextDisposalVolume, DISPOSAL_VOL_DIGITS)),
+      disposalVolume_volume: String(nextDisposalVolume),
     }
   }
   // clear out if path is new, or set to zero/null depending on checkbox

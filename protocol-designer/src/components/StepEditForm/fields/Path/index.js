@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 import Path from './Path'
 import {selectors as stepFormSelectors} from '../../../../step-forms'
 import {getWellRatio} from '../../../../steplist/utils'
-import {getPipetteCapacity} from '../../../../pipettes/pipetteData'
+import {volumeInCapacityForMulti} from '../../../../steplist/formLevel/handleFormChange/utils'
 import type {ElementProps} from 'react'
 import type {PipetteEntities} from '../../../../step-forms'
 import type {FormData, PathOption} from '../../../../form-types'
@@ -16,16 +16,9 @@ function getDisabledPaths (
   rawForm: ?FormData,
   pipetteEntities: PipetteEntities
 ): ?Set<PathOption> {
-  if (!rawForm) return null
+  if (!rawForm || !rawForm.pipette) return null
 
-  // TODO IMMEDIATELY share this fn with dependentFieldsUpdateMoveLiquid
-  const pipetteCapacity = rawForm.pipette && getPipetteCapacity(pipetteEntities[rawForm.pipette])
-  // NOTE: ensuring that disposalVolume_volume will not exceed pipette capacity is responsibility of dependentFieldsUpdateMoveLiquid
-  const withinCapacityForMultiPath = (
-    rawForm.volume > 0 &&
-    pipetteCapacity > 0 &&
-    rawForm.volume * 2 <= pipetteCapacity
-  )
+  const withinCapacityForMultiPath = volumeInCapacityForMulti(rawForm, pipetteEntities)
   const wellRatio = getWellRatio(rawForm.aspirate_wells, rawForm.dispense_wells)
 
   if (withinCapacityForMultiPath) {
