@@ -107,42 +107,48 @@ export function addInitialDeckSetupStep (fileData: ProtocolFile): ProtocolFile {
   }
 }
 
+const DEPRECATED_FIELD_NAMES = [
+  'aspirate_changeTip',
+  'aspirate_disposalVol_checkbox',
+  'aspirate_disposalVol_volume',
+  'aspirate_preWetTip',
+  'aspirate_touchTip',
+  'dispense_blowout_checkbox',
+  'dispense_blowout_labware',
+  'flow-rate',
+  'offsetFromBottomMm',
+  'step-name',
+  'step-details',
+]
 export function updateStepFormKeys (fileData: ProtocolFile): ProtocolFile {
   const savedStepForms = fileData['designer-application'].data.savedStepForms
   const migratedStepForms = mapValues(savedStepForms, (formData) => {
-    const deprecatedFieldNames = [
-      'aspirate_changeTip',
-      'aspirate_disposalVol_checkbox',
-      'aspirate_disposalVol_volume',
-      'aspirate_preWetTip',
-      'aspirate_touchTip',
-      'dispense_blowout_checkbox',
-      'dispense_blowout_labware',
-      'flow-rate',
-      'offsetFromBottomMm',
-      'step-name',
-      'step-details',
-    ]
-
-    return {
-      ...omit(formData, deprecatedFieldNames),
-      aspirate_touchTip_checkbox: formData.aspirate_touchTip_checkbox || formData['aspirate_touchTip'],
-      blowout_checkbox: formData.blowout_checkbox || formData['dispense_blowout_checkbox'],
-      blowout_location: formData.blowout_location || formData['dispense_blowout_labware'],
-      changeTip: formData.changeTip || formData['aspirate_changeTip'],
-      dispense_touchTip_checkbox: formData.dispense_touchTip_checkbox || formData['dispense_touchTip'],
-      disposalVolume_checkbox: formData.disposalVolume_checkbox || formData['aspirate_disposalVol_checkbox'],
-      disposalVolume_volume: formData.disposalVolume_volume || formData['aspirate_disposalVol_volume'],
-      preWetTip: formData.preWetTip || formData['aspirate_preWetTip'],
-      stepName: formData.stepName || formData['step-name'],
-      stepDetails: formData.stepDetails || formData['step-details'],
-      aspirate_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-      dispense_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
-      aspirate_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
-      aspirate_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
-      dispense_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
-      dispense_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
-      aspirate_wells_grouped: false,
+    if (['transfer', 'consolidate', 'distribute'].includes(formData.stepType)) {
+      return {
+        aspirate_touchTip_checkbox: formData['aspirate_touchTip'],
+        blowout_checkbox: formData['dispense_blowout_checkbox'],
+        blowout_location: formData['dispense_blowout_labware'] || formData['dispense_blowout_labware'],
+        changeTip: formData['aspirate_changeTip'],
+        dispense_touchTip_checkbox: formData['dispense_touchTip'],
+        disposalVolume_checkbox: formData['aspirate_disposalVol_checkbox'],
+        disposalVolume_volume: formData['aspirate_disposalVol_volume'],
+        preWetTip: formData['aspirate_preWetTip'],
+        stepName: formData['step-name'],
+        stepDetails: formData['step-details'],
+        aspirate_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+        dispense_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+        aspirate_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
+        aspirate_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
+        dispense_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
+        dispense_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
+        aspirate_wells_grouped: false,
+        ...omit(formData, DEPRECATED_FIELD_NAMES),
+      }
+    } else if (formData.stepType === 'mix') {
+      return {
+        // TODO: BC 2019-02-07 migrate mix fields over
+        ...omit(formData, DEPRECATED_FIELD_NAMES),
+      }
     }
   })
 
