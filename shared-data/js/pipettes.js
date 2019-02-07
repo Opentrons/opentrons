@@ -10,14 +10,14 @@ export type PipetteNameSpecs = {
   displayName: string,
   minVolume: number,
   maxVolume: number,
-  defaultAspirateFlowRate: number,
-  defaultDispenseFlowRate: number,
+  defaultAspirateFlowRate: {value: number},
+  defaultDispenseFlowRate: {value: number},
   channels: PipetteChannels,
 }
 
 export type PipetteModelSpecs = {
   model: string,
-  tipLength: number,
+  tipLength: {value: number},
 } & PipetteNameSpecs
 
 export type PipetteModel =
@@ -44,6 +44,7 @@ const ALL_PIPETTES: Array<PipetteNameSpecs> = ALL_PIPETTE_NAMES
 
 // use a name like 'p10_single' to get specs true for all models under that name
 export function getPipetteNameSpecs (name: string): ?PipetteNameSpecs {
+  console.log(name)
   const config = pipetteNameSpecs[name]
 
   return config && {...config, name}

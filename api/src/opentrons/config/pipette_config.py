@@ -228,7 +228,7 @@ def load_overrides(pipette_id: str) -> Dict[str, Any]:
 def is_mutable(config: dict, name: str, mutable_config_list: List[str]):
     if len(config.get(name)) > 1:
         value = {}
-        for key in config.keys():
+        for key in config.get(name).keys():
             if key in mutable_config_list:
                 value[key] = config.get(key)['value']
     else:

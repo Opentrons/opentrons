@@ -77,7 +77,6 @@ def test_config_update():
         pip = pipette.Pipette(config,
                               {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                               'testID')
-        print("Printout before update")
         sample_plunger_pos = {'top': {"value": 19.5,
                                       "edit": True,
                                       "min": 0,
