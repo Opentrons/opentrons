@@ -74,19 +74,11 @@ export function updatePatchPathField (patch: FormPatch, rawForm: FormData, pipet
   // pass-thru: incomplete form
   if (!path) return patch
 
-  const numericVolume = Number(appliedPatch.volume) || 0
-  const pipetteCapacity = getPipetteCapacity(pipetteEntities[appliedPatch.pipette])
-  let pipetteCapacityExceeded = numericVolume > pipetteCapacity
-
+  const volumeNum = Number(appliedPatch.volume)
+  let pipetteCapacityExceeded = false
   if (appliedPatch.volume && appliedPatch.pipette && appliedPatch.pipette in pipetteEntities) {
     const pipetteCapacity = getPipetteCapacity(pipetteEntities[appliedPatch.pipette])
-    if (appliedPatch.volume * 2 > pipetteCapacity) {
-      pipetteCapacityExceeded = appliedPatch.volume > pipetteCapacity
-    }
-  }
-
-  if (pipetteCapacityExceeded) {
-    return {...patch, path: 'single'}
+    pipetteCapacityExceeded = (volumeNum * 2) > pipetteCapacity
   }
 
   // changeTip value incompatible with next path value

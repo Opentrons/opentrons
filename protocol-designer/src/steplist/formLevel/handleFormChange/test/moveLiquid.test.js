@@ -25,13 +25,21 @@ describe('no-op cases should pass through the patch unchanged (same identity)', 
 })
 
 describe('path should update...', () => {
-  describe('if path is multi and volume exceeds pipette/tip capacity', () => {
+  describe('if path is multi and volume*2 exceeds pipette/tip capacity', () => {
     const multiPaths = ['multiAspirate', 'multiDispense']
     multiPaths.forEach(path => {
       test(`path ${path} → single`, () => {
         // volume is updated, existing path was multi
-        const result2 = handleFormHelper({volume: '9999'}, {path, volume: '1', pipette: 'pipetteId'})
-        expect(result2).toMatchObject({path: 'single', volume: '9999'})
+        // NOTE: 6 exceeds multi-well capacity of P10 (cannot fit 2 wells)
+        console.log('test path', path)
+        const result2 = handleFormHelper(
+          {volume: '6'},
+          {
+            path,
+            volume: '1',
+            pipette: 'pipetteId',
+          })
+        expect(result2).toMatchObject({path: 'single', volume: '6'})
       })
     })
   })
