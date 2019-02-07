@@ -1,8 +1,8 @@
 import omit from 'lodash/omit'
-import oldProtocol from '../../../test/fixtures/preFlexGrandfatheredProtocol.json'
+import oldProtocol from '../../__tests__/fixtures/throughMigrationV0/doItAll.json'
 import {
   renameOrderedSteps,
-} from '../mig1_2019-2-1.js'
+} from '../migrationV1.js'
 
 describe('renameOrderedSteps', () => {
   const migratedFile = renameOrderedSteps(oldProtocol)
