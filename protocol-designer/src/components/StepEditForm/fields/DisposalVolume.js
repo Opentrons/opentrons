@@ -1,11 +1,10 @@
 // @flow
 import * as React from 'react'
-import round from 'lodash/round'
 import {FormGroup, CheckboxField, type DropdownOption, DropdownField} from '@opentrons/components'
 import {connect} from 'react-redux'
 import cx from 'classnames'
 
-import {getMaxDisposalVolume} from '../../../steplist/formLevel/handleFormChange/utils'
+import {getMaxDisposalVolumeForMultidispense} from '../../../steplist/formLevel/handleFormChange/utils'
 import {SOURCE_WELL_BLOWOUT_DESTINATION} from '../../../step-generation/utils'
 import {selectors as stepFormSelectors} from '../../../step-forms'
 
@@ -23,8 +22,6 @@ type SP = {
 
 type Props = SP & {focusHandlers: FocusHandlers}
 
-const DISPOSAL_VOL_MAX_DIGITS = 2
-
 const DisposalVolumeField = (props: Props) => (
   <FormGroup label='Multi-Dispense Options:'>
     <FieldConnector
@@ -32,7 +29,7 @@ const DisposalVolumeField = (props: Props) => (
       render={({value, updateValue}) => {
         const {maxDisposalVolume} = props
         const volumeBoundsCaption = maxDisposalVolume != null
-          ? `max ${round(maxDisposalVolume, DISPOSAL_VOL_MAX_DIGITS)} μL`
+          ? `max ${maxDisposalVolume} μL`
           : null
 
         const volumeField = (
@@ -94,7 +91,7 @@ const DisposalVolumeField = (props: Props) => (
 
 const mapSTP = (state: BaseState): SP => {
   return {
-    maxDisposalVolume: getMaxDisposalVolume(stepFormSelectors.getUnsavedForm(state), stepFormSelectors.getPipetteEntities(state)),
+    maxDisposalVolume: getMaxDisposalVolumeForMultidispense(stepFormSelectors.getUnsavedForm(state), stepFormSelectors.getPipetteEntities(state)),
     disposalDestinationOptions: [
       ...stepFormSelectors.getDisposalLabwareOptions(state),
       {name: 'Source Well', value: SOURCE_WELL_BLOWOUT_DESTINATION},
