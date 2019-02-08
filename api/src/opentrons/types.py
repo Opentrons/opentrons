@@ -75,10 +75,12 @@ class Location(NamedTuple):
         should be used like
 
         .. code-block:: python
+
             >>> loc = Location(Point(1, 1, 1), 'Hi')
             >>> new_loc = loc.move(Point(1, 1, 1))
             >>> assert loc_2.point == Point(2, 2, 2)  # True
             >>> assert loc.point == Point(1, 1, 1)  # True
+
         """
         return self._replace(point=self.point + point)
 

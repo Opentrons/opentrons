@@ -7,7 +7,7 @@ from opentrons.types import Point
 import pytest
 
 
-def test_load_module(loop, monkeypatch):
+def test_load_module(loop):
     ctx = papi.ProtocolContext(loop)
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'tempdeck')]
@@ -16,11 +16,11 @@ def test_load_module(loop, monkeypatch):
     assert isinstance(mod, papi.TemperatureModuleContext)
 
 
-def test_tempdeck(loop, monkeypatch):
+def test_tempdeck(loop):
     ctx = papi.ProtocolContext(loop)
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'tempdeck')]
-    mod = ctx.load_module('tempdeck', 1)
+    mod = ctx.load_module('Temperature Module', 1)
     assert ctx.deck[1] == mod._geometry
     assert mod.target is None
     mod.set_temperature(20)
@@ -37,37 +37,75 @@ def test_tempdeck(loop, monkeypatch):
     assert mod.target == 0
 
 
-def test_magdeck(loop, monkeypatch):
+def test_magdeck(loop):
     ctx = papi.ProtocolContext(loop)
     ctx._hw_manager.hardware._backend._attached_modules = [('mod0', 'magdeck')]
-    mod = ctx.load_module('magdeck', 1)
+    mod = ctx.load_module('Magnetic Module', 1)
     assert ctx.deck[1] == mod._geometry
     assert mod.status == 'disengaged'
     with pytest.raises(ValueError):
         mod.engage()
     mod.engage(2)
-    assert 'engaging magnetic' in ','.join([cmd.lower()
-                                            for cmd in ctx.commands()])
+    assert 'engaging magnetic' in ','.join(
+        [cmd.lower() for cmd in ctx.commands()])
     assert mod.status == 'engaged'
     mod.disengage()
-    assert 'disengaging magnetic' in ','.join([cmd.lower()
-                                               for cmd in ctx.commands()])
+    assert 'disengaging magnetic' in ','.join(
+        [cmd.lower() for cmd in ctx.commands()])
     assert mod.status == 'disengaged'
     mod.calibrate()
-    assert 'calibrating magnetic' in ','.join([cmd.lower()
-                                               for cmd in ctx.commands()])
+    assert 'calibrating magnetic' in ','.join(
+        [cmd.lower() for cmd in ctx.commands()])
 
 
-def test_thermocycler(loop, monkeypatch):
+def test_thermocycler(loop):
     ctx = papi.ProtocolContext(loop)
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'thermocycler')]
-    mod = ctx.load_module('thermocycler', 1)
+    mod = ctx.load_module('Thermocycler', 1)
     assert ctx.deck[1] == mod._geometry
     # TODO: expand test with method calls and statuses
+    assert mod.target is None
+
+    # Test default ramp rate
+    mod.set_temperature(20, hold_time=5.0)
+    assert 'setting thermocycler temperature' in ','.join(
+        [cmd.lower() for cmd in ctx.commands()])
+    mod.wait_for_temp()
+    assert mod.target == 20
+    assert mod.temperature == 20
+    assert mod.hold_time == 5.0
+    assert mod.ramp_rate is None
+
+    # Test specified ramp rate
+    mod.set_temperature(41.3, hold_time=25.5, ramp_rate=2.0)
+    assert 'setting thermocycler temperature' in ','.join(
+        [cmd.lower() for cmd in ctx.commands()])
+    mod.wait_for_temp()
+    assert mod.target == 41.3
+    assert mod.temperature == 41.3
+    assert mod.hold_time == 25.5
+    assert mod.ramp_rate == 2.0
+
+    # Test infinite hold
+    mod.set_temperature(13.2)
+    assert 'setting thermocycler temperature' in ','.join(
+        [cmd.lower() for cmd in ctx.commands()])
+    mod.wait_for_temp()
+    assert mod.target == 13.2
+    assert mod.temperature == 13.2
+    assert mod.hold_time is None
+    assert mod.ramp_rate is None
+
+    mod.deactivate()
+    assert 'deactivating thermocycler' in ','.join(
+        [cmd.lower() for cmd in ctx.commands()])
+    assert mod.target is None
+    mod.set_temperature(0)
+    assert mod.target == 0
 
 
-def test_module_load_labware(loop, monkeypatch):
+def test_module_load_labware(loop):
     ctx = papi.ProtocolContext(loop)
     labware_name = 'generic_96_wellPlate_380_uL'
     labware_def = json.loads(
@@ -76,7 +114,7 @@ def test_module_load_labware(loop, monkeypatch):
                              labware_name)))
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'tempdeck')]
-    mod = ctx.load_module('tempdeck', 1)
+    mod = ctx.load_module('Temperature Module', 1)
     assert mod.labware is None
     lw = mod.load_labware_by_name(labware_name)
     lw_offset = Point(labware_def['cornerOffsetFromSlot']['x'],
@@ -84,6 +122,7 @@ def test_module_load_labware(loop, monkeypatch):
                       labware_def['cornerOffsetFromSlot']['z'])
     assert lw._offset == lw_offset + mod._geometry.location.point
     assert lw.name == labware_name
+    # Test load with old name
     mod2 = ctx.load_module('tempdeck', 2)
     lw2 = mod2.load_labware_by_name(labware_name)
     assert lw2._offset == lw_offset + mod2._geometry.location.point

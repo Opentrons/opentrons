@@ -40,7 +40,7 @@ class TempDeck(commands.CommandPublisher):
     def deactivate(self):
         """ Stop heating/cooling and turn off the fan """
         if self._driver and self._driver.is_connected():
-            self._driver.disengage()
+            self._driver.deactivate()
 
     def wait_for_temp(self):
         """

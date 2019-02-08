@@ -87,7 +87,7 @@ class MagDeck(mod_abc.AbstractModule):
         self._driver.move(height)
         self._engaged = True
 
-    def disengage(self):
+    def deactivate(self):
         """
         Home the magnet
         """

@@ -17,7 +17,11 @@ from . import transfers
 
 MODULE_LOG = logging.getLogger(__name__)
 
-ModuleTypes = Union['TemperatureModuleContext', 'MagneticModuleContext']
+ModuleTypes = Union[
+    'TemperatureModuleContext',
+    'MagneticModuleContext',
+    'ThermocyclerContext'
+]
 
 
 class OutOfTipsError(Exception):
@@ -142,13 +146,15 @@ class ProtocolContext(CommandPublisher):
 
         This should be used as a context manager:
 
-        .. code-block ::
+        .. code-block :: python
+
             with ctx.temp_connect(hw):
                 # do some tasks
                 ctx.home()
             # after the with block, the context is connected to the same
             # hardware control API it was connected to before, even if
             # an error occured in the code inside the with block
+
         """
         old_hw = self._hw_manager.hardware
         try:
@@ -221,15 +227,21 @@ class ProtocolContext(CommandPublisher):
             self, module_name: str,
             location: types.DeckLocation) -> ModuleTypes:
         for mod in self._hw_manager.hardware.discover_modules():
-            if mod.name() == module_name:
+            hc_mod_name = {
+                'magdeck': 'magdeck',
+                'magnetic module': 'magdeck',
+                'tempdeck': 'tempdeck',
+                'temperature module': 'tempdeck',
+                'thermocycler': 'thermocycler'}[module_name.lower()]
+            if mod.name() == hc_mod_name:
                 mod_class = {'magdeck': MagneticModuleContext,
                              'tempdeck': TemperatureModuleContext,
-                             'thermocycler': ThermocyclerContext}[module_name]
+                             'thermocycler': ThermocyclerContext}[hc_mod_name]
                 break
         else:
             raise KeyError(module_name)
         geometry = load_module(
-            module_name, self._deck_layout.position_for(location))
+            hc_mod_name, self._deck_layout.position_for(location))
         mod_ctx = mod_class(self,
                             mod,
                             geometry,
@@ -697,36 +709,33 @@ class InstrumentContext(CommandPublisher):
 
         :param location: If no location is passed, pipette will
                          touch tip at current well's edges
-                        .. NOTE:: This is behavior change from legacy API
-                                  (which accepts any :py:class:`.Placeable`
-                                  as location)
         :type location: :py:class:`.Well` or None
-
         :param radius: Describes the proportion of the target well's
                        radius. When `radius=1.0`, the pipette tip will move to
                        the edge of the target well; when `radius=0.5`, it will
                        move to 50% of the well's radius. Default: 1.0 (100%)
         :type radius: float
-
         :param v_offset: The offset in mm from the top of the well to touch tip
                          A positive offset moves the tip higher above the well,
                          while a negative offset moves it lower into the well
                          Default: -1.0 mm
         :type v_offset: float
-
         :param speed: The speed for touch tip motion, in mm/s.
                       Default: 60.0 mm/s, Max: 80.0 mm/s, Min: 20.0 mm/s
         :type speed: float
-
         :raises NoTipAttachedError: if no tip is attached to the pipette
-
         :raises RuntimeError: If no location is specified and location cache is
                               None. This should happen if `touch_tip` is called
                               without first calling a method that takes a
                               location (eg, :py:meth:`.aspirate`,
                               :py:meth:`dispense`)
-
         :returns: This instance
+
+        .. note::
+
+            This is behavior change from legacy API (which accepts any
+            :py:class:`.Placeable` as the ``location`` parameter)
+
         """
         if not self.hw_pipette['has_tip']:
             raise hc.NoTipAttachedError('Pipette has no tip to touch_tip()')
@@ -843,19 +852,19 @@ class InstrumentContext(CommandPublisher):
         The tip to pick up can be manually specified with the `location`
         argument. The `location` argument can be specified in several ways:
 
-            - If the only thing to specify is which well from which to pick
-              up a tip, `location` can be a :py:class:`.Well`. For instance,
-              if you have a tip rack in a variable called `tiprack`, you can
-              pick up a specific tip from it with
-              `instr.pick_up_tip(tiprack.wells()[0])`. This style of call can
-              be used to make the robot pick up a tip from a tip rack that
-              was not specified when creating the
-              :py:class:`.InstrumentContext`.
-            - If the position to move to in the well needs to be specified,
-              for instance to tell the robot to run its pick up tip routine
-              starting closer to or farther from the top of the tip, `location`
-              can be a :py:class:`.types.Location`; for instance, you can call
-              `instr.pick_up_tip(tiprack.wells()[0].top())`.
+        * If the only thing to specify is which well from which to pick
+          up a tip, `location` can be a :py:class:`.Well`. For instance,
+          if you have a tip rack in a variable called `tiprack`, you can
+          pick up a specific tip from it with
+          ``instr.pick_up_tip(tiprack.wells()[0])``. This style of call can
+          be used to make the robot pick up a tip from a tip rack that
+          was not specified when creating the :py:class:`.InstrumentContext`.
+
+        * If the position to move to in the well needs to be specified,
+          for instance to tell the robot to run its pick up tip routine
+          starting closer to or farther from the top of the tip,
+          `location` can be a :py:class:`.types.Location`; for instance,
+          you can call ``instr.pick_up_tip(tiprack.wells()[0].top())``.
 
         :param location: The location from which to pick up a tip.
         :type location: :py:class:`.types.Location` or :py:class:`.Well` to
@@ -871,6 +880,7 @@ class InstrumentContext(CommandPublisher):
                           the first press will travel down into the tip by
                           3.5mm, the second by 4.5mm, and the third by 5.5mm).
         :type increment: float
+
         :returns: This instance
         """
         num_channels = self.channels
@@ -949,6 +959,7 @@ class InstrumentContext(CommandPublisher):
               `instr.pick_up_tip(tiprack.wells()[0].top())`.
 
         .. note::
+
             OT1 required homing the plunger after dropping tips, so the prior
             version of `drop_tip` automatically homed the plunger. This is no
             longer needed in OT2. If you need to home the plunger, use
@@ -1272,7 +1283,7 @@ class InstrumentContext(CommandPublisher):
         """ Update the speeds (in mm/s) set for the pipette.
 
         :param new_speeds: A dict containing at least one of 'aspirate'
-        and 'dispense',  mapping to new speeds in mm/s.
+                           and 'dispense',  mapping to new speeds in mm/s.
         """
         raise NotImplementedError
 
@@ -1280,7 +1291,8 @@ class InstrumentContext(CommandPublisher):
     def flow_rate(self) -> Dict[str, float]:
         """ The speeds (in uL/s) configured for the pipette, as a dict.
 
-        The  keys will be 'aspirate' and 'dispense'.
+        Returns a dict with the keys 'aspirate' and 'dispense' and correspoding
+        values are the flow rates for each operation.
 
         :note: This property is equivalent to :py:attr:`speeds`; the only
         difference is the units in which this property is specified.
@@ -1292,8 +1304,8 @@ class InstrumentContext(CommandPublisher):
     def flow_rate(self, new_flow_rate: Dict[str, float]) -> None:
         """ Update the speeds (in uL/s) for the pipette.
 
-        :param new_flow_rates: A dict containing at least one of 'aspirate
-        and 'dispense', mapping to new speeds in uL/s.
+        :param new_flow_rate: A dict containing at least one of 'aspirate'
+                              and 'dispense', mapping to new speeds in uL/s.
         """
         self._hw_manager.hardware.set_flow_rate(self._mount, **new_flow_rate)
 
@@ -1475,7 +1487,30 @@ class TemperatureModuleContext(ModuleContext):
     """ An object representing a connected Temperature Module.
 
     It should not be instantiated directly; instead, it should be
-    created through :py:meth:`.ProtocolContext.load_module`.
+    created through :py:meth:`.ProtocolContext.load_module` using:
+    ``ctx.load_module('Temperature Module', slot_number)``.
+
+    A minimal protocol with a Temperature module would look like this:
+
+    .. code block:: python
+
+        def run(ctx):
+            slot_number = 10
+            temp_mod = ctx.load_module('Temperature Module', slot_number)
+            temp_plate = temp_mod.load_labware(
+                'biorad_96_wellPlate_pcr_200_uL')
+
+            temp_mod.set_temperature(45.5)
+            temp_mod.wait_for_temp()
+            temp_mod.deactivate()
+
+    .. note::
+
+        In order to prevent physical obstruction of other slots, place the
+        Temperature Module in a slot on the horizontal edges of the deck (such
+        as 1, 4, 7, or 10 on the left or 3, 6, or 7 on the right), with the USB
+        cable and power cord pointing away from the deck.
+
     """
     def __init__(self, ctx: ProtocolContext,
                  hw_module: modules.tempdeck.TempDeck,
@@ -1499,7 +1534,7 @@ class TemperatureModuleContext(ModuleContext):
     def deactivate(self):
         """ Stop heating (or cooling) and turn off the fan.
         """
-        return self._module.disengage()
+        return self._module.deactivate()
 
     def wait_for_temp(self):
         """ Block until the module reaches its setpoint.
@@ -1594,7 +1629,7 @@ class MagneticModuleContext(ModuleContext):
     def disengage(self):
         """ Lower the magnets back into the Magnetic Module.
         """
-        self._module.disengage()
+        self._module.deactivate()
 
     @property
     def status(self):
@@ -1620,3 +1655,53 @@ class ThermocyclerContext(ModuleContext):
     @property
     def status(self):
         return self._module.status
+
+    @cmds.publish.both(command=cmds.thermocycler_set_temp)
+    def set_temperature(self,
+                        temp: float,
+                        hold_time: float = None,
+                        ramp_rate: float = None):
+        """ Set the target temperature, in C.
+
+        Valid operational range yet to be determined.
+
+        :param temp: The target temperature, in degrees C.
+        :param hold_time: The time to hold after reaching temperature. If
+                          ``hold_time`` is not specified, the Thermocycler will
+                          hold this temperature indefinitely (requiring manual
+                          intervention to end the cycle).
+        :param ramp_rate: The target rate of temperature change, in degC/sec.
+                          If ``ramp_rate`` is not specified, it will default to
+                          the maximum ramp rate as defined in the device
+                          configuration.
+        """
+        return self._module.set_temperature(temp, hold_time, ramp_rate)
+
+    @cmds.publish.both(command=cmds.thermocycler_deactivate)
+    def deactivate(self):
+        return self._module.deactivate()
+
+    def wait_for_temp(self):
+        """ Block until the module reaches its setpoint.
+        """
+        self._loop.run_until_complete(self._module.wait_for_temp())
+
+    @property
+    def temperature(self):
+        """ Current temperature in C"""
+        return self._module.temperature
+
+    @property
+    def target(self):
+        """ Current target temperature in C"""
+        return self._module.target
+
+    @property
+    def ramp_rate(self):
+        """ Current ramp rate in degC/sec"""
+        return self._module.ramp_rate
+
+    @property
+    def hold_time(self):
+        """ Current hold time in sec"""
+        return self._module.hold_time

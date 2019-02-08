@@ -363,6 +363,22 @@ def tempdeck_deactivate():
     )
 
 
+def thermocycler_set_temp():
+    text = "Setting thermocycler temperature"
+    return make_command(
+        name=command_types.THERMOCYCLER_SET_TEMP,
+        payload={'text': text}
+    )
+
+
+def thermocycler_deactivate():
+    text = "Deactivating thermocycler"
+    return make_command(
+        name=command_types.THERMOCYCLER_DEACTIVATE,
+        payload={'text': text}
+    )
+
+
 def delay(seconds, minutes):
     text = "Delaying for {minutes}m {seconds}s"
     return make_command(
