@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 import Path from './Path'
 import {selectors as stepFormSelectors} from '../../../../step-forms'
 import {getWellRatio} from '../../../../steplist/utils'
-import {getPipetteCapacity} from '../../../../pipettes/pipetteData'
+import {volumeInCapacityForMulti} from '../../../../steplist/formLevel/handleFormChange/utils'
 import type {ElementProps} from 'react'
 import type {PipetteEntities} from '../../../../step-forms'
 import type {FormData, PathOption} from '../../../../form-types'
@@ -16,16 +16,9 @@ function getDisabledPaths (
   rawForm: ?FormData,
   pipetteEntities: PipetteEntities
 ): ?Set<PathOption> {
-  if (!rawForm) return null
+  if (!rawForm || !rawForm.pipette) return null
 
-  const disposalVolume = (rawForm.disposalVolume_checkbox && rawForm.disposalVolume_volume) || 0
-  const pipetteCapacity = rawForm.pipette && getPipetteCapacity(pipetteEntities[rawForm.pipette])
-  // TODO IMMEDIATELY also apply 2x-well-rule and add disposal volume -- make this a util, and search for other places this happens
-  const withinCapacityForMultiPath = (
-    rawForm.volume > 0 &&
-    pipetteCapacity > 0 &&
-    rawForm.volume * 2 + disposalVolume <= pipetteCapacity
-  )
+  const withinCapacityForMultiPath = volumeInCapacityForMulti(rawForm, pipetteEntities)
   const wellRatio = getWellRatio(rawForm.aspirate_wells, rawForm.dispense_wells)
 
   if (withinCapacityForMultiPath) {
