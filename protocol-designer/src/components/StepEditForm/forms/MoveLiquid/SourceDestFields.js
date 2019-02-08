@@ -42,7 +42,7 @@ class SourceDestFields extends React.Component<Props, State> {
     return (
       <div className={styles.form_row}>
         <div className={styles.start_group}>
-          <FormGroup label={labwareLabel} className={styles.labware_field}>
+          <FormGroup label={labwareLabel}>
             <LabwareField name={addFieldNamePrefix('labware')} {...focusHandlers} />
           </FormGroup>
           <WellSelectionField
