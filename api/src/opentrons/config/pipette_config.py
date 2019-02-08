@@ -3,7 +3,7 @@ import logging
 import json
 import re
 from collections import namedtuple
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union, Tuple
 import pkgutil
 
 from opentrons.config import feature_flags as ff, CONFIG
@@ -74,7 +74,7 @@ def name_config() -> Dict[str, Any]:
         or '{}')
 
 
-configs = list(model_config().keys())
+configs = list(model_config()['config'].keys())
 #: A list of pipette model names for which we have config entries
 
 
@@ -111,14 +111,13 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
 
 
     # Load the model config and update with the name config
-    cfg = copy.copy(model_config()[pipette_model])
+    cfg = copy.copy(model_config()['config'][pipette_model])
+    mutable_configs = copy.copy(model_config()['mutableConfigs'])
     cfg.update(copy.copy(name_config()[cfg['name']]))
 
     # Load overrides if we have a pipette id
     if pipette_id:
         cfg.update(load_overrides(pipette_id))
-
-    plunger_pos = is_mutable(cfg, 'plungerPositions',  mutable_configs)
 
     # the ulPerMm functions are structured in pipetteModelSpecs.json as
     # a list sorted from oldest to newest. That means the latest functions
@@ -136,44 +135,33 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
 
     res = pipette_config(
         plunger_positions={
-            'top': plunger_pos.get('top'),
-            'bottom': plunger_pos.get('bottom'),
-            'blow_out': plunger_pos.get('blowOut'),
-            'drop_tip': plunger_pos.get('dropTip'),
+            'top': ensure_value(
+                cfg, ('plungerPositions', 'top'), mutable_configs),
+            'bottom': ensure_value(
+                cfg, ('plungerPositions', 'bottom'), mutable_configs),
+            'blow_out': ensure_value(
+                cfg, ('plungerPositions', 'blowOut'), mutable_configs),
+            'drop_tip': ensure_value(
+                cfg, ('plungerPositions', 'dropTip'), mutable_configs),
         },
-        pick_up_current=is_mutable(cfg, 'pickUpCurrent', mutable_configs),
-        pick_up_distance=is_mutable(cfg, 'pickUpDistance', mutable_configs),
-        aspirate_flow_rate=is_mutable(cfg, 'defaultAspirateFlowRate', mutable_configs),
-        dispense_flow_rate=is_mutable(cfg, 'defaultDispenseFlowRate', mutable_configs),
-        channels=is_mutable(cfg, 'channels', mutable_configs),
-        model_offset=is_mutable(cfg, 'modelOffset', mutable_configs),
-        plunger_current=is_mutable(cfg, 'plungerCurrent', mutable_configs),
-        drop_tip_current=is_mutable(cfg, 'dropTipCurrent', mutable_configs),
-        drop_tip_speed=is_mutable(cfg, 'dropTipSpeed', mutable_configs),
-        min_volume=is_mutable(cfg, 'minVolume', mutable_configs),
-        max_volume=is_mutable(cfg, 'maxVolume', mutable_configs),
+        pick_up_current=ensure_value(cfg, 'pickUpCurrent', mutable_configs),
+        pick_up_distance=ensure_value(cfg, 'pickUpDistance', mutable_configs),
+        aspirate_flow_rate=ensure_value(
+            cfg, 'defaultAspirateFlowRate', mutable_configs),
+        dispense_flow_rate=ensure_value(
+            cfg, 'defaultDispenseFlowRate', mutable_configs),
+        channels=ensure_value(cfg, 'channels', mutable_configs),
+        model_offset=ensure_value(cfg, 'modelOffset', mutable_configs),
+        plunger_current=ensure_value(cfg, 'plungerCurrent', mutable_configs),
+        drop_tip_current=ensure_value(cfg, 'dropTipCurrent', mutable_configs),
+        drop_tip_speed=ensure_value(cfg, 'dropTipSpeed', mutable_configs),
+        min_volume=ensure_value(cfg, 'minVolume', mutable_configs),
+        max_volume=ensure_value(cfg, 'maxVolume', mutable_configs),
         ul_per_mm=ul_per_mm,
-        quirks=is_mutable(cfg, 'quirks', mutable_configs),
-        tip_length=is_mutable(cfg, 'tipLength', mutable_configs),
-        display_name=is_mutable(cfg, 'displayName', mutable_configs)
+        quirks=ensure_value(cfg, 'quirks', mutable_configs),
+        tip_length=ensure_value(cfg, 'tipLength', mutable_configs),
+        display_name=ensure_value(cfg, 'displayName', mutable_configs)
     )
-
-    # Verify that stored values agree with calculations
-    if 'multi' in pipette_model:
-        assert res.model_offset[1] == Y_OFFSET_MULTI
-        assert res.model_offset[2] == Z_OFFSET_MULTI
-    elif 'p1000' in pipette_model:
-        assert res.model_offset[1] == 0.0
-        assert res.model_offset[2] == Z_OFFSET_P1000
-    elif 'p10' in pipette_model:
-        assert res.model_offset[1] == 0.0
-        assert res.model_offset[2] == Z_OFFSET_P10
-    elif 'p300' in pipette_model:
-        assert res.model_offset[1] == 0.0
-        assert res.model_offset[2] == Z_OFFSET_P300
-    else:
-        assert res.model_offset[1] == 0.0
-        assert res.model_offset[2] == Z_OFFSET_P50
 
     return res
 
@@ -219,14 +207,23 @@ def load_overrides(pipette_id: str) -> Dict[str, Any]:
         return {}
 
 
-def is_mutable(config: dict, name: str, mutable_config_list: List[str]):
-    if len(config.get(name)) > 1:
-        value = {}
-        for key in config.keys():
-            if key in mutable_config_list:
-                value[key] = config.get(key)['value']
+def ensure_value(
+    config: dict,
+    name: Union[str, Tuple[str, ...]],
+    mutable_config_list: List[str]):
+    """
+    Pull value of config data from file. Shape can either be a dictionary with
+    a value key -- indicating that it can be changed -- or another
+    data structure such as an array.
+    """
+    if not isinstance(name, tuple):
+        path = (name,)
     else:
-        value = config.get(name)
-        if name in mutable_config_list:
-            value = value['value']
+        path = name
+    for element in path[:-1]:
+        config = config[element]
+
+    value = config[path[-1]]
+    if path[-1] in mutable_config_list:
+        value = value['value']
     return value
