@@ -32,7 +32,7 @@
         "defaultDispenseFlowRate": {"value": {"$ref": "#/definitions/positiveNumber"}},
         "displayName": {"type": "string"},
         "maxVolume": {"$ref": "#/definitions/positiveNumber"},
-        "minVolume": {"$ref": "#/definitions/positiveNumber"},
+        "minVolume": {"$ref": "#/definitions/positiveNumber"}
       }
     }
   }

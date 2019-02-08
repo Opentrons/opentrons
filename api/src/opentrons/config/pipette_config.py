@@ -109,7 +109,6 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
     :returns pipette_config: The configuration, loaded and checked
     """
 
-
     # Load the model config and update with the name config
     cfg = copy.copy(model_config()['config'][pipette_model])
     mutable_configs = copy.copy(model_config()['mutableConfigs'])
@@ -208,16 +207,16 @@ def load_overrides(pipette_id: str) -> Dict[str, Any]:
 
 
 def ensure_value(
-    config: dict,
-    name: Union[str, Tuple[str, ...]],
-    mutable_config_list: List[str]):
+        config: dict,
+        name: Union[str, Tuple[str, ...]],
+        mutable_config_list: List[str]):
     """
     Pull value of config data from file. Shape can either be a dictionary with
     a value key -- indicating that it can be changed -- or another
     data structure such as an array.
     """
     if not isinstance(name, tuple):
-        path = (name,)
+        path: Tuple[str, ...] = (name,)
     else:
         path = name
     for element in path[:-1]:

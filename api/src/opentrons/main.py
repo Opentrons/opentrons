@@ -80,7 +80,7 @@ def log_init():
                 'handlers': ['debug', 'api'],
                 'level': level_value
             },
-            'opentrons.config.robot_configs': {
+            'opentrons.config': {
                 'handlers': ['debug', 'api'],
                 'level': level_value
             },

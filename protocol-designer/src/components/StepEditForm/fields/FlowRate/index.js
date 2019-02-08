@@ -46,9 +46,9 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   let defaultFlowRate
   if (pipette) {
     if (flowRateType === 'aspirate') {
-      defaultFlowRate = pipette.spec.defaultAspirateFlowRate
+      defaultFlowRate = pipette.spec.defaultAspirateFlowRate.value
     } else if (flowRateType === 'dispense') {
-      defaultFlowRate = pipette.spec.defaultDispenseFlowRate
+      defaultFlowRate = pipette.spec.defaultDispenseFlowRate.value
     }
   }
 
