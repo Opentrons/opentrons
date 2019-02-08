@@ -227,17 +227,21 @@ class ProtocolContext(CommandPublisher):
             self, module_name: str,
             location: types.DeckLocation) -> ModuleTypes:
         for mod in self._hw_manager.hardware.discover_modules():
-            if mod.name() == module_name:
+            hc_mod_name = {
+                'magdeck': 'magdeck',
+                'magnetic module': 'magdeck',
+                'tempdeck': 'tempdeck',
+                'temperature module': 'tempdeck',
+                'thermocycler': 'thermocycler'}[module_name.lower()]
+            if mod.name() == hc_mod_name:
                 mod_class = {'magdeck': MagneticModuleContext,
-                             'Magnetic Module': MagneticModuleContext,
                              'tempdeck': TemperatureModuleContext,
-                             'Temperature Module': TemperatureModuleContext,
-                             'Thermocycler': ThermocyclerContext}[module_name]
+                             'thermocycler': ThermocyclerContext}[hc_mod_name]
                 break
         else:
             raise KeyError(module_name)
         geometry = load_module(
-            module_name, self._deck_layout.position_for(location))
+            hc_mod_name, self._deck_layout.position_for(location))
         mod_ctx = mod_class(self,
                             mod,
                             geometry,
@@ -1483,7 +1487,30 @@ class TemperatureModuleContext(ModuleContext):
     """ An object representing a connected Temperature Module.
 
     It should not be instantiated directly; instead, it should be
-    created through :py:meth:`.ProtocolContext.load_module`.
+    created through :py:meth:`.ProtocolContext.load_module` using:
+    ``ctx.load_module('Temperature Module', slot_number)``.
+
+    A minimal protocol with a Temperature module would look like this:
+
+    .. code block:: python
+
+        def run(ctx):
+            slot_number = 10
+            temp_mod = ctx.load_module('Temperature Module', slot_number)
+            temp_plate = temp_mod.load_labware(
+                'biorad_96_wellPlate_pcr_200_uL')
+
+            temp_mod.set_temperature(45.5)
+            temp_mod.wait_for_temp()
+            temp_mod.deactivate()
+
+    .. note::
+
+        In order to prevent physical obstruction of other slots, place the
+        Temperature Module in a slot on the horizontal edges of the deck (such
+        as 1, 4, 7, or 10 on the left or 3, 6, or 7 on the right), with the USB
+        cable and power cord pointing away from the deck.
+
     """
     def __init__(self, ctx: ProtocolContext,
                  hw_module: modules.tempdeck.TempDeck,

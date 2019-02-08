@@ -20,7 +20,7 @@ def test_tempdeck(loop):
     ctx = papi.ProtocolContext(loop)
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'tempdeck')]
-    mod = ctx.load_module('tempdeck', 1)
+    mod = ctx.load_module('Temperature Module', 1)
     assert ctx.deck[1] == mod._geometry
     assert mod.target is None
     mod.set_temperature(20)
@@ -40,7 +40,7 @@ def test_tempdeck(loop):
 def test_magdeck(loop):
     ctx = papi.ProtocolContext(loop)
     ctx._hw_manager.hardware._backend._attached_modules = [('mod0', 'magdeck')]
-    mod = ctx.load_module('magdeck', 1)
+    mod = ctx.load_module('Magnetic Module', 1)
     assert ctx.deck[1] == mod._geometry
     assert mod.status == 'disengaged'
     with pytest.raises(ValueError):
@@ -62,7 +62,7 @@ def test_thermocycler(loop):
     ctx = papi.ProtocolContext(loop)
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'thermocycler')]
-    mod = ctx.load_module('thermocycler', 1)
+    mod = ctx.load_module('Thermocycler', 1)
     assert ctx.deck[1] == mod._geometry
     # TODO: expand test with method calls and statuses
     assert mod.target is None
@@ -114,7 +114,7 @@ def test_module_load_labware(loop):
                              labware_name)))
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'tempdeck')]
-    mod = ctx.load_module('tempdeck', 1)
+    mod = ctx.load_module('Temperature Module', 1)
     assert mod.labware is None
     lw = mod.load_labware_by_name(labware_name)
     lw_offset = Point(labware_def['cornerOffsetFromSlot']['x'],
@@ -122,6 +122,7 @@ def test_module_load_labware(loop):
                       labware_def['cornerOffsetFromSlot']['z'])
     assert lw._offset == lw_offset + mod._geometry.location.point
     assert lw.name == labware_name
+    # Test load with old name
     mod2 = ctx.load_module('tempdeck', 2)
     lw2 = mod2.load_labware_by_name(labware_name)
     assert lw2._offset == lw_offset + mod2._geometry.location.point

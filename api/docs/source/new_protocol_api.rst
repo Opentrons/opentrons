@@ -118,129 +118,11 @@ From the example above, the "labware" section looked like:
 
 and informed the protocol context that the deck contains a 300 uL tiprack in slot 1 and a 96 well plate in slot 2.
 
-
-Pipettes
-^^^^^^^^
-
-Next, pipettes are created and attached to a specific mount on the OT-2 (``'left'`` or ``'right'``).
-
-There are other parameters for pipettes, but the most important are the tip rack(s) it will use during the protocol.
-
-From the example above, the "pipettes" section looked like:
-
-.. code-block:: python
-
-    pipette = protocol_context.load_instrument('p300_single', 'left', tip_racks=[tiprack])
-
-
-Commands
-^^^^^^^^
-
-And finally, the most fun section, the actual protocol commands! The most common commands are ``transfer()``, ``aspirate()``, ``dispense()``, ``pick_up_tip()``, ``drop_tip()``, and much more.
-
-This section can tend to get long, relative to the complexity of your protocol. However, with a better understanding of Python you can learn to compress and simplify even the most complex-seeming protocols.
-
-From the example above, the "commands" section looked like:
-
-.. code-block:: python
-
-    pipette.aspirate(100, plate.wells_by_index()['A1'])
-    pipette.dispense(100, plate.wells_by_index()['B2'])
-
-which does exactly what it says - aspirate 100 uL from A1 and dispense it all in B2.
-
-Modules
-^^^^^^^
-
-Modules are peripherals that attach to the OT-2 to extend its capabilities. Modules currently supported are the Temperature Module and the Magnetic Module.  The Thermocycler is under development.
-
-A Temperature Module, for example, can be loaded and used in a protocol like this:
-
-.. code-block:: python
-
-    def run(protocol_context):
-        temp_mod = protocol_context.load_module('Temperature Module', '10')
-        temp_plate = temp_mod.load_labware('biorad_96_wellPlate_pcr_200_uL')
-
-        master_mix = labware.load('opentrons_6_tuberack_50_mL_falcon')
-
-        for target_well in temp_plate.wells():
-            pipette.transfer(50, master_mix.wells_by_index()['A1'], target_well)
-
-        target_temp = 80.0  # degrees Celcius
-        temp_mod.set_temp(target_temp)
-        temp_mod.wait_for_temp()
-
-        # perform other operations
-
-        temp_mod.deactivate()
-
-Robot and Pipette
------------------
-.. module:: opentrons.protocol_api.contexts
-
-.. autoclass:: opentrons.protocol_api.contexts.ProtocolContext
-   :members:
-
-.. autoclass:: opentrons.protocol_api.contexts.InstrumentContext
-   :members:
-
-.. autoclass:: opentrons.protocol_api.transfers.TransferOptions
-   :members:
-
-.. autoclass:: opentrons.protocol_api.transfers.Transfer
-   :members:
-
-.. autoclass:: opentrons.protocol_api.transfers.PickUpTipOpts
-   :members:
-
-.. autoclass:: opentrons.protocol_api.transfers.MixOpts
-   :members:
-
-.. autoclass:: opentrons.protocol_api.transfers.Mix
-   :members:
-
-.. autoclass:: opentrons.protocol_api.transfers.BlowOutOpts
-   :members:
-
-.. autoclass:: opentrons.protocol_api.transfers.TouchTipOpts
-   :members:
-
-.. autoclass:: opentrons.protocol_api.transfers.AspirateOpts
-   :members:
-
-.. autoclass:: opentrons.protocol_api.transfers.DispenseOpts
-   :members:
-
-.. _protocol-api-labware:
-
-Labware and Wells
------------------
-.. automodule:: opentrons.protocol_api.labware
-   :members:
-
-.. _protocol-api-modules:
-
-Modules
--------
-.. autoclass:: opentrons.protocol_api.contexts.TemperatureModuleContext
-   :members:
-   :inherited-members:
-
-.. autoclass:: opentrons.protocol_api.contexts.MagneticModuleContext
-   :members:
-   :inherited-members:
-
-.. autoclass:: opentrons.protocol_api.contexts.ThermocyclerContext
-   :members:
-   :inherited-members:
+More complete documentation on labware methods (such as the ``.wells()`` method) is available in :ref:`protocol-api-labware`.
 
 .. _protocol-api-valid-labware:
 
-Valid Labware
-^^^^^^^^^^^^^
-
-This section lists the names of valid labwares that can be loaded with :py:meth:`.ProtocolContext.load_labware_by_name`, along with the name of the legacy labware definition each is equivalent to (if any).
+This table lists the names of valid labwares that can be loaded with :py:meth:`.ProtocolContext.load_labware_by_name`, along with the name of the legacy labware definition each is equivalent to (if any).
 
 +-------------------------------------------+----------------------------------------+
 | API 4.0 Labware Name                      | API 3.x Labware Name                   |
@@ -290,6 +172,98 @@ This section lists the names of valid labwares that can be loaded with :py:meth:
 | usa_scientific_12_trough_22_mL            | usa_scientific_12_trough_22_mL         |
 +-------------------------------------------+----------------------------------------+
 
+
+Pipettes
+^^^^^^^^
+
+Next, pipettes are created and attached to a specific mount on the OT-2 (``'left'`` or ``'right'``).
+
+There are other parameters for pipettes, but the most important are the tip rack(s) it will use during the protocol.
+
+From the example above, the "pipettes" section looked like:
+
+.. code-block:: python
+
+    pipette = protocol_context.load_instrument('p300_single', 'left', tip_racks=[tiprack])
+
+
+And finally, the actual protocol commands! The most common commands are ``transfer()``, ``aspirate()``, ``dispense()``, ``pick_up_tip()``, ``drop_tip()``, and much more.
+
+This section can tend to get long, relative to the complexity of your protocol. However, with a better understanding of Python you can learn to compress and simplify even the most complex-seeming protocols.
+
+From the example above, the "commands" section looked like:
+
+.. code-block:: python
+
+    pipette.aspirate(100, plate.wells_by_index()['A1'])
+    pipette.dispense(100, plate.wells_by_index()['B2'])
+
+which does exactly what it says - aspirate 100 uL from A1 and dispense it all in B2.
+
+Complete documentation of pipettes and pipette commands can be found in :ref:`protocol_api-protocols-and-instruments`.
+
+Modules
+^^^^^^^
+
+Modules are peripherals that attach to the OT-2 to extend its capabilities. Modules currently supported are the Temperature Module and the Magnetic Module.  The Thermocycler is under development.
+
+A Temperature Module, for example, can be loaded and used in a protocol like this:
+
+.. code-block:: python
+
+    def run(protocol_context):
+        temp_mod = protocol_context.load_module('Temperature Module', '10')
+        temp_plate = temp_mod.load_labware('biorad_96_wellPlate_pcr_200_uL')
+
+        master_mix = labware.load('opentrons_6_tuberack_50_mL_falcon')
+
+        for target_well in temp_plate.wells():
+            pipette.transfer(50, master_mix.wells_by_index()['A1'], target_well)
+
+        target_temp = 80.0  # degrees Celcius
+        temp_mod.set_temp(target_temp)
+        temp_mod.wait_for_temp()
+
+        # perform other operations
+
+        temp_mod.deactivate()
+
+Complete documentation on all module classes is available in :ref:`protocol-api-modules`.
+
+.. _protocol_api-protocols-and-instruments:
+
+Protocols and Instruments
+-----------------
+.. module:: opentrons.protocol_api.contexts
+
+.. autoclass:: opentrons.protocol_api.contexts.ProtocolContext
+   :members:
+
+.. autoclass:: opentrons.protocol_api.contexts.InstrumentContext
+   :members:
+
+.. _protocol-api-labware:
+
+Labware and Wells
+-----------------
+.. automodule:: opentrons.protocol_api.labware
+   :members:
+
+.. _protocol-api-modules:
+
+Modules
+-------
+.. autoclass:: opentrons.protocol_api.contexts.TemperatureModuleContext
+   :members:
+   :inherited-members:
+
+.. autoclass:: opentrons.protocol_api.contexts.MagneticModuleContext
+   :members:
+   :inherited-members:
+
+.. autoclass:: opentrons.protocol_api.contexts.ThermocyclerContext
+   :members:
+   :inherited-members:
 
 
 .. _protocol-api-types:

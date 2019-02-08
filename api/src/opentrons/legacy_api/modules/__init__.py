@@ -11,9 +11,9 @@ log = logging.getLogger(__name__)
 PORT_SEARCH_TIMEOUT = 5.5
 SUPPORTED_MODULES = {
     'magdeck': MagDeck,
-    'Magnetic Module': MagDeck,
+    'magnetic module': MagDeck,
     'tempdeck': TempDeck,
-    'Temperature Module': TempDeck
+    'temperature module': TempDeck
 }
 
 # avrdude_options
@@ -46,6 +46,7 @@ def provide_labware(lw):
 
 def load(name, slot):
     module_instance = None
+    name = name.lower()
     if name in SUPPORTED_MODULES:
         if _mod_robot.is_simulating():
             labware_instance = _mod_labware.load(name, slot)
