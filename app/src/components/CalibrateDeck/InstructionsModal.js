@@ -113,7 +113,7 @@ function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
 
   if (step === '1') {
     actions = [
-      dcCommand(robot, {command: 'attach tip', tipLength: pipette.tipLength}),
+      dcCommand(robot, {command: 'attach tip', tipLength: pipette.tipLength.value}),
       dcCommand(robot, {command: 'move', point: 'safeZ'}),
       goToNext,
     ]

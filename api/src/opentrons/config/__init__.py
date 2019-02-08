@@ -212,7 +212,10 @@ def _load_with_overrides(base) -> Dict[str, str]:
             sys.stderr.write(
                 f"New config index key {key.name}={key.default}"
                 "\nRewriting...\n")
-            index[key.name] = key.default
+            if key.kind in (ConfigElementType.DIR, ConfigElementType.FILE):
+                index[key.name] = base/key.default
+            else:
+                index[key.name] = key.default
             should_write = True
 
     if should_write:

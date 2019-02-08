@@ -21,17 +21,21 @@ def test_versioned_aspiration(pipette_model, monkeypatch):
                         lambda: True)
     was = pipette_config.load(pipette_model)
     assert was.ul_per_mm['aspirate']\
-        == pytest.approx(defs[pipette_model]['ulPerMm'][0]['aspirate'])
+        == pytest.approx(
+            defs['config'][pipette_model]['ulPerMm'][0]['aspirate'])
     assert was.ul_per_mm['dispense']\
-        == pytest.approx(defs[pipette_model]['ulPerMm'][0]['dispense'])
+        == pytest.approx(
+            defs['config'][pipette_model]['ulPerMm'][0]['dispense'])
 
     monkeypatch.setattr(ff, 'use_old_aspiration_functions',
                         lambda: False)
     now = pipette_config.load(pipette_model)
     assert now.ul_per_mm['aspirate']\
-        == pytest.approx(defs[pipette_model]['ulPerMm'][-1]['aspirate'])
+        == pytest.approx(
+            defs['config'][pipette_model]['ulPerMm'][-1]['aspirate'])
     assert now.ul_per_mm['dispense']\
-        == pytest.approx(defs[pipette_model]['ulPerMm'][-1]['dispense'])
+        == pytest.approx(
+            defs['config'][pipette_model]['ulPerMm'][-1]['dispense'])
 
     assert now.ul_per_mm['aspirate'] != was.ul_per_mm['aspirate']
 
@@ -64,8 +68,8 @@ def test_override_load():
     cdir = CONFIG['pipette_config_overrides_dir']
 
     existing_overrides = {
-        'pickUpCurrent': 1231.213,
-        'dropTipSpeed': 121
+        'pickUpCurrent': {"value": 1231.213},
+        'dropTipSpeed': {"value": 121}
     }
 
     existing_id = 'ohoahflaseh08102qa'
@@ -74,8 +78,9 @@ def test_override_load():
 
     pconf = pipette_config.load('p300_multi_v1.4', existing_id)
 
-    assert pconf.pick_up_current == existing_overrides['pickUpCurrent']
-    assert pconf.drop_tip_speed == existing_overrides['dropTipSpeed']
+    assert pconf.pick_up_current == \
+        existing_overrides['pickUpCurrent']['value']
+    assert pconf.drop_tip_speed == existing_overrides['dropTipSpeed']['value']
 
     new_id = '0djaisoa921jas'
     new_pconf = pipette_config.load('p300_multi_v1.4', new_id)
@@ -93,8 +98,8 @@ def test_override_save():
     cdir = CONFIG['pipette_config_overrides_dir']
 
     overrides = {
-        'pickUpCurrent': 1231.213,
-        'dropTipSpeed': 121
+        'pickUpCurrent': {"value": 1231.213},
+        'dropTipSpeed': {"value": 121}
     }
 
     new_id = 'aoa2109j09cj2a'

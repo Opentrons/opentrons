@@ -40,11 +40,11 @@ describe('validate pipette specs with JSON schemas', () => {
 
 describe('model -> name referencing', () => {
   test('ensure all pipette model specs reference a valid pipette name', () => {
-    const modelKeys = Object.keys(pipetteModelSpecs)
+    const modelKeys = Object.keys(pipetteModelSpecs.config)
     const nameKeys = Object.keys(pipetteNameSpecs)
 
     modelKeys.forEach(model => {
-      const nameForVersion = pipetteModelSpecs[model].name
+      const nameForVersion = pipetteModelSpecs.config[model].name
       expect(nameKeys).toContain(nameForVersion)
     })
   })

@@ -77,9 +77,21 @@ def test_config_update():
         pip = pipette.Pipette(config,
                               {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                               'testID')
-        sample_plunger_pos = {'top': 19.5,
-                              'bottom': 2,
-                              'blowOut': -1,
-                              'dropTip': -4.5}
+        sample_plunger_pos = {'top': {"value": 19.5,
+                                      "edit": True,
+                                      "min": 0,
+                                      "max": 5},
+                              'bottom': {"value": 2,
+                                         "edit": True,
+                                         "min": 0,
+                                         "max": 5},
+                              'blowOut': {"value": -1,
+                                          "edit": True,
+                                          "min": -6,
+                                          "max": 5},
+                              'dropTip': {"value": -4.5,
+                                          "edit": True,
+                                          "min": -6,
+                                          "max": 5}}
         pip.update_config_item('plunger_positions', sample_plunger_pos)
         assert pip.config.plunger_positions == sample_plunger_pos

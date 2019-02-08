@@ -28,8 +28,8 @@
       "additionalProperties": false,
       "properties": {
         "channels": {"$ref": "#/definitions/channels"},
-        "defaultAspirateFlowRate": {"$ref": "#/definitions/positiveNumber"},
-        "defaultDispenseFlowRate": {"$ref": "#/definitions/positiveNumber"},
+        "defaultAspirateFlowRate": {"value": {"$ref": "#/definitions/positiveNumber"}},
+        "defaultDispenseFlowRate": {"value": {"$ref": "#/definitions/positiveNumber"}},
         "displayName": {"type": "string"},
         "maxVolume": {"$ref": "#/definitions/positiveNumber"},
         "minVolume": {"$ref": "#/definitions/positiveNumber"}
