@@ -71,6 +71,17 @@ describe('disposal volume should update...', () => {
       disposalVolume_volume: '1.1',
     }
   })
+
+  describe('should not remove valid decimal', () => {
+    const testCases = ['.', '0.', '.1', '1.', '']
+    testCases.forEach(disposalVolume_volume => {
+      test(`input is ${disposalVolume_volume}`, () => {
+        const result = handleFormHelper({disposalVolume_volume}, form)
+        expect(result.disposalVolume_volume).toBe(disposalVolume_volume)
+      })
+    })
+  })
+
   test('when path is changed: multiDispense → single', () => {
     const result = handleFormHelper({path: 'single'}, form)
     expect(result).toEqual({
@@ -82,9 +93,7 @@ describe('disposal volume should update...', () => {
   test('when volume is raised but disposal vol is still in capacity, do not change (noop case)', () => {
     const patch = {volume: '2.5'}
     const result = handleFormHelper(patch, form)
-    expect(result).toEqual({
-      volume: '2.5',
-      disposalVolume_volume: form.disposalVolume_volume})
+    expect(result).toEqual(patch)
   })
 
   describe('when volume is raised so that disposal vol must be exactly zero, clear/zero disposal volume fields', () => {
@@ -120,13 +129,8 @@ describe('disposal volume should update...', () => {
     expect(result).toEqual({disposalVolume_volume: '6'})
   })
 
-  test('when disposal volume is not > zero, clear the disposal volume fields', () => {
-    const expected = {disposalVolume_volume: '0'}
-    const testCases = ['-999', '0', '', null]
-    testCases.forEach(dispVol => {
-      expect(
-        handleFormHelper({disposalVolume_volume: dispVol}, form)
-      ).toEqual(expected)
-    })
+  test('when disposal volume is a negative number, set to zero', () => {
+    const result = handleFormHelper({disposalVolume_volume: '-2'}, form)
+    expect(result).toEqual({disposalVolume_volume: '0'})
   })
 })

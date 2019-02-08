@@ -182,7 +182,8 @@ const clampDisposalVolume = (
   pipetteEntities: PipetteEntities
 ) => {
   const appliedPatch = {...rawForm, ...patch}
-  if (appliedPatch.path !== 'multiDispense') return patch
+  const isDecimalString = appliedPatch.disposalVolume_volume === '.'
+  if (appliedPatch.path !== 'multiDispense' || isDecimalString) return patch
 
   const maxDisposalVolume = getMaxDisposalVolumeForMultidispense(appliedPatch, pipetteEntities)
   if (maxDisposalVolume == null) {
@@ -190,10 +191,17 @@ const clampDisposalVolume = (
     return patch
   }
 
+  const candidateDispVolNum = Number(appliedPatch.disposalVolume_volume)
+
   const nextDisposalVolume = clamp(
-    round(Number(appliedPatch.disposalVolume_volume), DISPOSAL_VOL_DIGITS),
+    round(candidateDispVolNum, DISPOSAL_VOL_DIGITS),
     0,
     maxDisposalVolume)
+
+  if (nextDisposalVolume === candidateDispVolNum) {
+    // this preserves decimals
+    return patch
+  }
 
   if (nextDisposalVolume > 0) {
     return {
