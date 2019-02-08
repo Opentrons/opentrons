@@ -21,17 +21,17 @@ def test_versioned_aspiration(pipette_model, monkeypatch):
                         lambda: True)
     was = pipette_config.load(pipette_model)
     assert was.ul_per_mm['aspirate']\
-        == pytest.approx(defs[pipette_model]['ulPerMm'][0]['aspirate'])
+        == pytest.approx(defs['config'][pipette_model]['ulPerMm'][0]['aspirate'])
     assert was.ul_per_mm['dispense']\
-        == pytest.approx(defs[pipette_model]['ulPerMm'][0]['dispense'])
+        == pytest.approx(defs['config'][pipette_model]['ulPerMm'][0]['dispense'])
 
     monkeypatch.setattr(ff, 'use_old_aspiration_functions',
                         lambda: False)
     now = pipette_config.load(pipette_model)
     assert now.ul_per_mm['aspirate']\
-        == pytest.approx(defs[pipette_model]['ulPerMm'][-1]['aspirate'])
+        == pytest.approx(defs['config'][pipette_model]['ulPerMm'][-1]['aspirate'])
     assert now.ul_per_mm['dispense']\
-        == pytest.approx(defs[pipette_model]['ulPerMm'][-1]['dispense'])
+        == pytest.approx(defs['config'][pipette_model]['ulPerMm'][-1]['dispense'])
 
     assert now.ul_per_mm['aspirate'] != was.ul_per_mm['aspirate']
 

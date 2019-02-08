@@ -108,13 +108,7 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
 
     :returns pipette_config: The configuration, loaded and checked
     """
-<<<<<<< HEAD
-=======
-    with open(config_model_file) as model_cfg_file:
-        model = json.load(model_cfg_file)
-        mutable_configs = model['mutableConfigs']
-        cfg = model['config'][pipette_model]
->>>>>>> refactor config shapes
+
 
     # Load the model config and update with the name config
     cfg = copy.copy(model_config()[pipette_model])
@@ -205,7 +199,6 @@ def piecewise_volume_conversion(
     return i[1]*ul + i[2]
 
 
-<<<<<<< HEAD
 def save_overrides(pipette_id: str, overrides: Dict[str, Any]):
     override_dir = CONFIG['pipette_config_overrides_dir']
     existing = load_overrides(pipette_id)
@@ -224,11 +217,12 @@ def load_overrides(pipette_id: str) -> Dict[str, Any]:
     except json.JSONDecodeError as e:
         log.warning(f'pipette override for {pipette_id} is corrupt: {e}')
         return {}
-=======
+
+
 def is_mutable(config: dict, name: str, mutable_config_list: List[str]):
     if len(config.get(name)) > 1:
         value = {}
-        for key in config.get(name).keys():
+        for key in config.keys():
             if key in mutable_config_list:
                 value[key] = config.get(key)['value']
     else:
@@ -236,4 +230,3 @@ def is_mutable(config: dict, name: str, mutable_config_list: List[str]):
         if name in mutable_config_list:
             value = value['value']
     return value
->>>>>>> refactor config shapes
