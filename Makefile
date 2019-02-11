@@ -30,7 +30,7 @@ usb_host = $(shell yarn run -s discovery find -i 169.254 fd00 -c "[fd00:0:cafe:f
 
 # install all project dependencies
 .PHONY: install
-install: install-py install-js
+install: install-js install-py
 
 .PHONY: install-py
 install-py:
@@ -49,6 +49,7 @@ install-js:
 # TODO(mc, 2018-03-22): API uninstall via pipenv --rm in api/Makefile
 .PHONY: uninstall
 uninstall:
+	$(MAKE) -C $(API_DIR) clean uninstall
 	shx rm -rf '**/node_modules'
 
 # install flow typed definitions for all JS projects that use flow

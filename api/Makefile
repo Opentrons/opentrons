@@ -53,7 +53,7 @@ ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources)
 clean_cmd = shx rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc'
 
 .PHONY: all
-all: lint test
+all: clean wheel
 
 .PHONY: install
 install:
@@ -62,6 +62,9 @@ install:
 .PHONY: clean
 clean:
 	$(clean_cmd)
+
+.PHONY: uninstall
+uninstall:
 	pipenv --rm
 
 $(wheel_pattern): setup.py $(ot_sources)
@@ -71,7 +74,6 @@ $(wheel_pattern): setup.py $(ot_sources)
 	$(python)	-m twine check $@
 	shx ls dist
 
-.PHONY: wheel
 wheel: $(wheel_file)
 
 .PHONY: test
