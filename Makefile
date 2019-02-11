@@ -35,7 +35,7 @@ install: install-js install-py
 .PHONY: install-py
 install-py:
 	$(OT_PYTHON) -m pip install pipenv==2018.10.9
-	$(MAKE) -C $(API_DIR) clean install
+	$(MAKE) -C $(API_DIR) install
 	$(MAKE) -C $(UPDATE_SERVER_DIR) install
 
 # front-end dependecies handled by yarn
@@ -49,6 +49,7 @@ install-js:
 # TODO(mc, 2018-03-22): API uninstall via pipenv --rm in api/Makefile
 .PHONY: uninstall
 uninstall:
+	$(MAKE) -C $(API_DIR) clean uninstall
 	shx rm -rf '**/node_modules'
 
 # install flow typed definitions for all JS projects that use flow
