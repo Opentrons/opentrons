@@ -30,7 +30,7 @@ usb_host = $(shell yarn run -s discovery find -i 169.254 fd00 -c "[fd00:0:cafe:f
 
 # install all project dependencies
 .PHONY: install
-install: install-py install-js
+install: install-js install-py
 
 .PHONY: install-py
 install-py:
