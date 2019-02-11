@@ -22,7 +22,7 @@ export const DEFAULT_WELL_ORDER_SECOND_OPTION: 'l2r' = 'l2r'
 // NOTE: this function was copied on 2019-2-7 from
 // formLevel/handleFormChange/dependentFieldsUpdateMoveLiquid.js
 // in order to avoid further inadvertent changes to this migration
-export function updatePatchPathField (patch: FormPatch, rawForm: FormData, pipetteEntities: PipetteEntities) {
+function _updatePatchPathField (patch: FormPatch, rawForm: FormData, pipetteEntities: PipetteEntities) {
   const appliedPatch = {...rawForm, ...patch}
   const {path, changeTip} = appliedPatch
   // pass-thru: incomplete form
@@ -107,7 +107,7 @@ export function addInitialDeckSetupStep (fileData: ProtocolFile): ProtocolFile {
   }
 }
 
-const DEPRECATED_FIELD_NAMES = [
+export const TCD_DEPRECATED_FIELD_NAMES = [
   'aspirate_changeTip',
   'aspirate_disposalVol_checkbox',
   'aspirate_disposalVol_volume',
@@ -120,6 +120,11 @@ const DEPRECATED_FIELD_NAMES = [
   'step-name',
   'step-details',
 ]
+export const MIX_DEPRECATED_FIELD_NAMES = [
+  'mix_mmFromBottom',
+  'step-name',
+  'step-details',
+]
 export function updateStepFormKeys (fileData: ProtocolFile): ProtocolFile {
   const savedStepForms = fileData['designer-application'].data.savedStepForms
   const migratedStepForms = mapValues(savedStepForms, (formData) => {
@@ -127,7 +132,7 @@ export function updateStepFormKeys (fileData: ProtocolFile): ProtocolFile {
       return {
         aspirate_touchTip_checkbox: formData['aspirate_touchTip'],
         blowout_checkbox: formData['dispense_blowout_checkbox'],
-        blowout_location: formData['dispense_blowout_labware'] || formData['dispense_blowout_labware'],
+        blowout_location: formData['dispense_blowout_location'] || formData['dispense_blowout_labware'],
         changeTip: formData['aspirate_changeTip'],
         dispense_touchTip_checkbox: formData['dispense_touchTip'],
         disposalVolume_checkbox: formData['aspirate_disposalVol_checkbox'],
@@ -142,12 +147,31 @@ export function updateStepFormKeys (fileData: ProtocolFile): ProtocolFile {
         dispense_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
         dispense_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
         aspirate_wells_grouped: false,
-        ...omit(formData, DEPRECATED_FIELD_NAMES),
+        ...omit(formData, TCD_DEPRECATED_FIELD_NAMES),
       }
     } else if (formData.stepType === 'mix') {
       return {
         // TODO: BC 2019-02-07 migrate mix fields over
-        ...omit(formData, DEPRECATED_FIELD_NAMES),
+
+        stepName: formData['step-name'],
+        stepDetails: formData['step-details'],
+        aspirate_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
+        aspirate_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
+        blowout_checkbox: formData['dispense_blowout_checkbox'],
+        blowout_location: formData['dispense_blowout_location'] || formData['dispense_blowout_labware'],
+        aspirate_mmFromBottom: formData['mix_mmFromBottom'] || DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+        aspirate_flowRate: formData['flow-rate'],
+        dispense_flowRate: formData['flow-rate'],
+        "touchTip": true,
+        "mix_touchTipMmFromBottom": 25.5
+
+        ...omit(formData, TCD_DEPRECATED_FIELD_NAMES),
+      }
+    } else {
+      return {
+        stepName: formData['step-name'],
+        stepDetails: formData['step-details'],
+        ...omit(formData, TCD_DEPRECATED_FIELD_NAMES),
       }
     }
   })
@@ -179,7 +203,7 @@ export function replaceTCDStepsWithMoveLiquidStep (fileData: ProtocolFile): Prot
       tiprackModel: fileData['designer-application'].data.pipetteTiprackAssignments[pipetteId],
     }))
     // update path field patch if incompatible; fallback to 'single'
-    const resolvedPatch = updatePatchPathField(proposedPatch, formData, pipetteEntities)
+    const resolvedPatch = _updatePatchPathField(proposedPatch, formData, pipetteEntities)
     return {...formData, ...resolvedPatch}
   })
 
