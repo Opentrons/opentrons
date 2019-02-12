@@ -107,7 +107,6 @@ describe('updateStepFormKeys', () => {
               'dispense_labware': 'ccad1a20-2b08-11e9-9054-4913062421c2:96-flat',
               'dispense_wells': ['A1', 'A2'],
               'volume': 30,
-              'flow-rate': 15,
               'offsetFromBottomMm': 2,
             },
             '2': {
@@ -128,7 +127,6 @@ describe('updateStepFormKeys', () => {
               'dispense_labware': 'ccad1a20-2b08-11e9-9054-4913062421c2:96-flat',
               'dispense_wells': ['A1', 'A2'],
               'volume': 30,
-              'flow-rate': 15,
               'offsetFromBottomMm': 2,
             },
             '3': {
@@ -149,7 +147,6 @@ describe('updateStepFormKeys', () => {
               'dispense_labware': 'ccad1a20-2b08-11e9-9054-4913062421c2:96-flat',
               'dispense_wells': ['A1', 'A2'],
               'volume': 30,
-              'flow-rate': 15,
               'offsetFromBottomMm': 2,
             },
           },

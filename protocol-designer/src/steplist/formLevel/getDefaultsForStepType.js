@@ -14,10 +14,10 @@ export default function getDefaultsForStepType (stepType: StepType): {[StepField
   switch (stepType) {
     case 'mix':
       return {
-        aspirate_changeTip: DEFAULT_CHANGE_TIP_OPTION,
+        changeTip: DEFAULT_CHANGE_TIP_OPTION,
         labware: null,
-        aspirate_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
-        aspirate_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
+        mix_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
+        mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
         blowout_checkbox: false,
         blowout_location: FIXED_TRASH_ID,
         mix_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE, // NOTE: mix uses dispense for both asp + disp, for now

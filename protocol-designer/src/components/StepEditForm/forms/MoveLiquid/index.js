@@ -20,10 +20,9 @@ type MoveLiquidFormProps = {
   formData: HydratedMoveLiquidFormDataLegacy,
 }
 
-// TODO: BC: IMMEDIATELY field label font weight from 800 to 600
-// TODO: BC: IMMEDIATELY flowrate Type is hardcoded in SourceDestFields
-// TODO: BC: IMMEDIATELY i18n all across SourceDestFields
-// TODO: BC: IMMEDIATELY instead of passing path from here, put it in connect fields where needed
+// TODO: BC 2019-01-25 i18n all across step form and fields
+// TODO: BC 2019-01-25 instead of passing path from here, put it in connect fields where needed
+// or question if it even needs path
 
 const MoveLiquidForm = (props: MoveLiquidFormProps) => {
   const {focusHandlers, stepType} = props

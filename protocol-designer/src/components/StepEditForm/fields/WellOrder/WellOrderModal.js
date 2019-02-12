@@ -167,18 +167,13 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-const mapDTP = (dispatch: Dispatch, ownProps: OP): DP => {
-  // NOTE: not interpolating prefix because breaks flow string enum
-  const firstName = ownProps.prefix === 'aspirate' ? 'aspirate_wellOrder_first' : 'dispense_wellOrder_first'
-  const secondName = ownProps.prefix === 'aspirate' ? 'aspirate_wellOrder_second' : 'dispense_wellOrder_second'
-  return {
-    updateValues: (firstValue, secondValue) => {
-      dispatch(actions.changeFormInput({update: {
-        [firstName]: firstValue,
-        [secondName]: secondValue,
-      }}))
-    },
-  }
-}
+const mapDTP = (dispatch: Dispatch, ownProps: OP): DP => ({
+  updateValues: (firstValue, secondValue) => {
+    dispatch(actions.changeFormInput({update: {
+      [`${ownProps.prefix}_wellOrder_first`]: firstValue,
+      [`${ownProps.prefix}_wellOrder_second`]: secondValue,
+    }}))
+  },
+})
 
 export default connect(mapSTP, mapDTP)(WellOrderModal)

@@ -52,7 +52,7 @@ class MixForm extends React.Component<Props, State> {
               <LabwareField name="labware" {...focusHandlers} />
             </FormGroup>
             <WellSelectionField name="wells" labwareFieldName="labware" pipetteFieldName="pipette" {...focusHandlers} />
-            <WellOrderField prefix="aspirate" />
+            <WellOrderField prefix="mix" />
           </div>
           <div className={cx(styles.end_group, styles.fixed_width)}>
             <FlowRateField
@@ -87,7 +87,7 @@ class MixForm extends React.Component<Props, State> {
             <div className={styles.mix_hidden_fields}>
               {this.state.collapsed !== true &&
                 <FormGroup label="Dispense Options">
-                  <CheckboxRowField name={'touchTip'} label="Touch tip">
+                  <CheckboxRowField name={'mix_touchTip_checkbox'} label="Touch tip">
                     <TipPositionField className={cx(styles.small_field, styles.orphan_field)} fieldName={'mix_touchTipMmFromBottom'} />
                   </CheckboxRowField>
 
@@ -104,7 +104,7 @@ class MixForm extends React.Component<Props, State> {
         </div>
 
         <div className={formStyles.form_row}>
-          <ChangeTipField stepType="mix" name="aspirate_changeTip" />
+          <ChangeTipField stepType="mix" name="changeTip" />
         </div>
       </React.Fragment>
     )

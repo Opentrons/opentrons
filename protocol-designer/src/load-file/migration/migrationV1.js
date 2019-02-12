@@ -108,6 +108,8 @@ export function addInitialDeckSetupStep (fileData: ProtocolFile): ProtocolFile {
 }
 
 export const TCD_DEPRECATED_FIELD_NAMES = [
+  'step-name',
+  'step-details',
   'aspirate_changeTip',
   'aspirate_disposalVol_checkbox',
   'aspirate_disposalVol_volume',
@@ -115,31 +117,38 @@ export const TCD_DEPRECATED_FIELD_NAMES = [
   'aspirate_touchTip',
   'dispense_blowout_checkbox',
   'dispense_blowout_labware',
-  'flow-rate',
+  'dispense_blowout_location',
   'offsetFromBottomMm',
-  'step-name',
-  'step-details',
+  'dispense_touchTip',
+  'aspirate_touchTip',
 ]
 export const MIX_DEPRECATED_FIELD_NAMES = [
-  'mix_mmFromBottom',
   'step-name',
   'step-details',
+  'aspirate_changeTip',
+  'dispense_mmFromBottom',
+  'aspirate_wellOrder_first',
+  'aspirate_wellOrder_second',
+  'dispense_blowout_checkbox',
+  'dispense_blowout_labware',
+  'dispense_blowout_location',
+  'touchTip',
 ]
 export function updateStepFormKeys (fileData: ProtocolFile): ProtocolFile {
   const savedStepForms = fileData['designer-application'].data.savedStepForms
   const migratedStepForms = mapValues(savedStepForms, (formData) => {
     if (['transfer', 'consolidate', 'distribute'].includes(formData.stepType)) {
       return {
-        aspirate_touchTip_checkbox: formData['aspirate_touchTip'],
+        stepName: formData['step-name'],
+        stepDetails: formData['step-details'],
+        changeTip: formData['aspirate_changeTip'],
         blowout_checkbox: formData['dispense_blowout_checkbox'],
         blowout_location: formData['dispense_blowout_location'] || formData['dispense_blowout_labware'],
-        changeTip: formData['aspirate_changeTip'],
+        aspirate_touchTip_checkbox: formData['aspirate_touchTip'],
         dispense_touchTip_checkbox: formData['dispense_touchTip'],
         disposalVolume_checkbox: formData['aspirate_disposalVol_checkbox'],
         disposalVolume_volume: formData['aspirate_disposalVol_volume'],
         preWetTip: formData['aspirate_preWetTip'],
-        stepName: formData['step-name'],
-        stepDetails: formData['step-details'],
         aspirate_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
         dispense_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
         aspirate_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
@@ -151,20 +160,14 @@ export function updateStepFormKeys (fileData: ProtocolFile): ProtocolFile {
       }
     } else if (formData.stepType === 'mix') {
       return {
-        // TODO: BC 2019-02-07 migrate mix fields over
-
         stepName: formData['step-name'],
         stepDetails: formData['step-details'],
-        aspirate_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
-        aspirate_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
+        changeTip: formData['aspirate_changeTip'],
+        mix_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
+        mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
+        mix_touchTip_checkbox: formData['touchTip'],
         blowout_checkbox: formData['dispense_blowout_checkbox'],
         blowout_location: formData['dispense_blowout_location'] || formData['dispense_blowout_labware'],
-        aspirate_mmFromBottom: formData['mix_mmFromBottom'] || DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-        aspirate_flowRate: formData['flow-rate'],
-        dispense_flowRate: formData['flow-rate'],
-        "touchTip": true,
-        "mix_touchTipMmFromBottom": 25.5
-
         ...omit(formData, TCD_DEPRECATED_FIELD_NAMES),
       }
     } else {
