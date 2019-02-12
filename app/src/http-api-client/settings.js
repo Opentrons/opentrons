@@ -14,7 +14,7 @@ import type {ApiAction, RequestMaker} from './actions'
 type Id = string
 
 // TODO(mc, 2018-07-02): support more value types
-type Value = boolean
+type Value = boolean | null
 
 export type Setting = {
   id: Id,
@@ -27,7 +27,9 @@ type SettingsRequest = ?{id: Id, value: Value}
 
 type SettingsResponse = {settings: Array<Setting>}
 
-export type SettingsAction = ApiAction<'settings', SettingsRequest, SettingsResponse>
+export type SettingsAction = ApiAction<'settings',
+  SettingsRequest,
+  SettingsResponse>
 
 export type RobotSettingsCall = ApiCall<SettingsRequest, SettingsResponse>
 
@@ -39,15 +41,23 @@ const SETTINGS: 'settings' = 'settings'
 
 type SettingsRequestMaker = RequestMaker<SettingsRequest>
 
-export const fetchSettings: SettingsRequestMaker =
-  buildRequestMaker('GET', SETTINGS)
+export const fetchSettings: SettingsRequestMaker = buildRequestMaker(
+  'GET',
+  SETTINGS
+)
 
-export const setSettings: SettingsRequestMaker =
-  buildRequestMaker('POST', SETTINGS)
+export const setSettings: SettingsRequestMaker = buildRequestMaker(
+  'POST',
+  SETTINGS
+)
 
 export function makeGetRobotSettings () {
-  const selector: OutputSelector<State, BaseRobot, RobotSettingsCall> =
-    createSelector(getRobotApiState, getSettingsRequest)
+  const selector: OutputSelector<State,
+    BaseRobot,
+    RobotSettingsCall> = createSelector(
+      getRobotApiState,
+      getSettingsRequest
+    )
 
   return selector
 }
