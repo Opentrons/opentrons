@@ -18,6 +18,7 @@ export const DEFAULT_MM_FROM_BOTTOM_ASPIRATE = 1
 export const DEFAULT_MM_FROM_BOTTOM_DISPENSE = 0.5
 export const DEFAULT_WELL_ORDER_FIRST_OPTION: 't2b' = 't2b'
 export const DEFAULT_WELL_ORDER_SECOND_OPTION: 'l2r' = 'l2r'
+export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
 
 // NOTE: this function was copied on 2019-2-7 from
 // formLevel/handleFormChange/dependentFieldsUpdateMoveLiquid.js
@@ -162,19 +163,20 @@ export function updateStepFormKeys (fileData: ProtocolFile): ProtocolFile {
       return {
         stepName: formData['step-name'],
         stepDetails: formData['step-details'],
-        changeTip: formData['aspirate_changeTip'],
-        mix_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
-        mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
+        changeTip: formData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION,
+        mix_mmFromBottom: formData['dispense_mmFromBottom'] || DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+        mix_wellOrder_first: formData['aspirate_wellOrder_first'] || DEFAULT_WELL_ORDER_FIRST_OPTION,
+        mix_wellOrder_second: formData['aspirate_wellOrder_second'] || DEFAULT_WELL_ORDER_SECOND_OPTION,
         mix_touchTip_checkbox: formData['touchTip'],
         blowout_checkbox: formData['dispense_blowout_checkbox'],
         blowout_location: formData['dispense_blowout_location'] || formData['dispense_blowout_labware'],
-        ...omit(formData, TCD_DEPRECATED_FIELD_NAMES),
+        ...omit(formData, MIX_DEPRECATED_FIELD_NAMES),
       }
     } else {
       return {
         stepName: formData['step-name'],
         stepDetails: formData['step-details'],
-        ...omit(formData, TCD_DEPRECATED_FIELD_NAMES),
+        ...omit(formData, ['step-name', 'step-details']),
       }
     }
   })

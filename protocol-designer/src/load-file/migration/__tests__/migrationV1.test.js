@@ -8,7 +8,8 @@ import {
   INITIAL_DECK_SETUP_STEP_ID,
   FIXED_TRASH_ID,
   updateStepFormKeys,
-  DEPRECATED_FIELD_NAMES,
+  TCD_DEPRECATED_FIELD_NAMES,
+  MIX_DEPRECATED_FIELD_NAMES,
   DEFAULT_WELL_ORDER_FIRST_OPTION,
   DEFAULT_WELL_ORDER_SECOND_OPTION,
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
@@ -99,8 +100,10 @@ describe('updateStepFormKeys', () => {
               'aspirate_changeTip': 'always',
               'aspirate_preWetTip': true,
               'aspirate_touchTip': true,
+              'dispense_touchTip': true,
               'dispense_blowout_checkbox': true,
               'dispense_blowout_labware': 'trashId',
+              'dispense_blowout_location': 'trashId',
               'aspirate_labware': 'db17bed0-2b08-11e9-9054-4913062421c2:trough-12row',
               'aspirate_wells': ['A12'],
               'pipette': 'pipette:p300_multi_v1.3:b45b5d11-2b08-11e9-9054-4913062421c2',
@@ -119,8 +122,10 @@ describe('updateStepFormKeys', () => {
               'aspirate_changeTip': 'always',
               'aspirate_preWetTip': true,
               'aspirate_touchTip': true,
+              'dispense_touchTip': true,
               'dispense_blowout_checkbox': true,
               'dispense_blowout_labware': 'trashId',
+              'dispense_blowout_location': 'trashId',
               'aspirate_labware': 'db17bed0-2b08-11e9-9054-4913062421c2:trough-12row',
               'aspirate_wells': ['A12'],
               'pipette': 'pipette:p300_multi_v1.3:b45b5d11-2b08-11e9-9054-4913062421c2',
@@ -139,8 +144,10 @@ describe('updateStepFormKeys', () => {
               'aspirate_changeTip': 'always',
               'aspirate_preWetTip': true,
               'aspirate_touchTip': true,
+              'dispense_touchTip': true,
               'dispense_blowout_checkbox': true,
               'dispense_blowout_labware': 'trashId',
+              'dispense_blowout_location': 'trashId',
               'aspirate_labware': 'db17bed0-2b08-11e9-9054-4913062421c2:trough-12row',
               'aspirate_wells': ['A12'],
               'pipette': 'pipette:p300_multi_v1.3:b45b5d11-2b08-11e9-9054-4913062421c2',
@@ -155,7 +162,7 @@ describe('updateStepFormKeys', () => {
     }
     const migratedFile = updateStepFormKeys(stubbedTCDStepsFile)
     test('deprecates all indicated field names', () => {
-      each(DEPRECATED_FIELD_NAMES, fieldName => {
+      each(TCD_DEPRECATED_FIELD_NAMES, fieldName => {
         each(stubbedTCDStepsFile['designer-application'].data.savedStepForms, stepForm => {
           expect(stepForm[fieldName]).not.toEqual(undefined)
         })
@@ -169,7 +176,7 @@ describe('updateStepFormKeys', () => {
       const addedFields = {
         aspirate_touchTip_checkbox: oldFields['aspirate_touchTip'],
         blowout_checkbox: oldFields['dispense_blowout_checkbox'],
-        blowout_location: oldFields['dispense_blowout_location'] || oldFields['dispense_blowout_labware'],
+        blowout_location: oldFields['dispense_blowout_location'],
         changeTip: oldFields['aspirate_changeTip'],
         dispense_touchTip_checkbox: oldFields['dispense_touchTip'],
         disposalVolume_checkbox: oldFields['aspirate_disposalVol_checkbox'],
@@ -214,6 +221,10 @@ describe('updateStepFormKeys', () => {
               'times': 2,
               'dispense_blowout_checkbox': true,
               'dispense_blowout_labware': 'trashId',
+              'dispense_blowout_location': 'trashId',
+              'dispense_mmFromBottom': 2,
+              'aspirate_wellOrder_first': 'l2r',
+              'aspirate_wellOrder_second': 't2b',
               'touchTip': true,
             },
           },
@@ -222,13 +233,35 @@ describe('updateStepFormKeys', () => {
     }
     const migratedFile = updateStepFormKeys(stubbedMixStepFile)
     test('deprecates all indicated field names', () => {
-      each(DEPRECATED_FIELD_NAMES, fieldName => {
+      each(MIX_DEPRECATED_FIELD_NAMES, fieldName => {
         each(stubbedMixStepFile['designer-application'].data.savedStepForms, stepForm => (
           expect(stepForm[fieldName]).not.toEqual(undefined)
         ))
         each(migratedFile['designer-application'].data.savedStepForms, stepForm => (
           expect(stepForm[fieldName]).toEqual(undefined)
         ))
+      })
+    })
+    test('creates non-existent new fields', () => {
+      const oldFields = stubbedMixStepFile['designer-application'].data.savedStepForms['1']
+      const addedFields = {
+        stepName: oldFields['step-name'],
+        stepDetails: oldFields['step-details'],
+        changeTip: oldFields['aspirate_changeTip'],
+        mix_mmFromBottom: oldFields['dispense_mmFromBottom'],
+        mix_wellOrder_first: oldFields['aspirate_wellOrder_first'],
+        mix_wellOrder_second: oldFields['aspirate_wellOrder_second'],
+        mix_touchTip_checkbox: oldFields['touchTip'],
+        blowout_checkbox: oldFields['dispense_blowout_checkbox'],
+        blowout_location: oldFields['dispense_blowout_location'],
+      }
+      each(Object.keys(addedFields), fieldName => {
+        each(stubbedMixStepFile['designer-application'].data.savedStepForms, stepForm => {
+          expect(stepForm[fieldName]).toEqual(undefined)
+        })
+        each(migratedFile['designer-application'].data.savedStepForms, stepForm => {
+          expect(stepForm[fieldName]).toEqual(addedFields[fieldName])
+        })
       })
     })
   })
