@@ -62,6 +62,9 @@ export type ProtocolFile = {
   'default-values': {
     'aspirate-flow-rate': FlowRateForPipettes,
     'dispense-flow-rate': FlowRateForPipettes,
+    'aspirate-mm-from-bottom': number,
+    'dispense-mm-from-bottom': number,
+    'touch-tip-mm-from-top'?: number, // TODO: Ian 2019-02-12 make required in protocol schema breaking change
   },
 
   'designer-application': {
