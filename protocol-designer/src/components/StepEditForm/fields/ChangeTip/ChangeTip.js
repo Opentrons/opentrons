@@ -1,5 +1,4 @@
 // @flow
-import assert from 'assert'
 import * as React from 'react'
 import {FormGroup, HoverTooltip, SelectField} from '@opentrons/components'
 import i18n from '../../../../localization'

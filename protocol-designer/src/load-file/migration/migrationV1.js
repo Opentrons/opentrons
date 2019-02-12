@@ -4,6 +4,8 @@ import omit from 'lodash/omit'
 import flow from 'lodash/flow'
 import {getPipetteCapacity} from '../../pipettes/pipetteData'
 import {initialDeckSetupStepForm} from '../../step-forms/reducers'
+import type {PipetteEntities} from '../../step-forms'
+import type {FormPatch} from '../../steplist/actions'
 import type {ProtocolFile, FileLabware, FilePipette} from '../../file-types'
 
 const PRESENT_MIGRATION_VERSION = 1

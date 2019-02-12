@@ -10,7 +10,7 @@ import WellOrderModal from './WellOrderModal'
 import ZIG_ZAG_IMAGE from '../../../../images/zig_zag_icon.svg'
 import type {BaseState} from '../../../../types'
 
-type OP = {prefix: 'aspirate' | 'dispense'}
+type OP = {prefix: 'aspirate' | 'dispense' | 'mix'}
 type SP = {iconClassNames: Array<string>}
 
 type WellOrderInputState = {isModalOpen: boolean}

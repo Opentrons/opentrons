@@ -38,7 +38,7 @@ type DP = {
 type OP = {
   isOpen: boolean,
   closeModal: () => mixed,
-  prefix: 'aspirate' | 'dispense',
+  prefix: 'aspirate' | 'dispense' | 'mix',
 }
 
 type Props = OP & SP & DP
