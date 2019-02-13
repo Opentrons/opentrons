@@ -2,13 +2,15 @@ import json
 import logging
 import os
 import sys
-from typing import Any, Dict, Mapping, TYPE_CHECKING, Union
+from typing import Any, Dict, Mapping, Tuple, Union, Optional, TYPE_CHECKING
 
 from opentrons.config import CONFIG
 
 if TYPE_CHECKING:
     from pathlib import Path  # noqa(F401) - imported for types
 
+SettingsMap = Dict[str, Optional[bool]]
+SettingsData = Tuple[SettingsMap, int]
 
 log = logging.getLogger(__name__)
 
@@ -24,6 +26,9 @@ class Setting:
         return '{}: {}'.format(self.__class__, self.id)
 
 
+# If you add or remove any settings here BE SURE TO ADD A MIGRATION below.
+# You will also need to update the migration tests in:
+# api/tests/opentrons/config/test_advanced_settings_migration.py
 settings = [
     Setting(
         _id='shortFixedTrash',
@@ -80,20 +85,21 @@ settings_by_old_id = {s.old_id: s for s in settings}
 
 
 # TODO: LRU cache?
-def get_adv_setting(setting: str) -> bool:
+def get_adv_setting(setting: str) -> Optional[bool]:
     setting = _clean_id(setting)
     s = get_all_adv_settings()
     return s[setting]['value']  # type: ignore
 
 
-def get_all_adv_settings() -> Dict[str, Dict[str, Union[str, bool]]]:
+def get_all_adv_settings() -> Dict[str, Dict[str, Union[str, bool, None]]]:
     """
     :return: a dict of settings keyed by setting ID, where each value is a
         dict with keys "id", "title", "description", and "value"
     """
     settings_file = CONFIG['feature_flags_file']
 
-    values = _read_settings_file(settings_file)
+    values, _ = _read_settings_file(settings_file)
+
     return {
         key: {**settings_by_id[key].__dict__,
               'value': value}
@@ -101,12 +107,12 @@ def get_all_adv_settings() -> Dict[str, Dict[str, Union[str, bool]]]:
     }
 
 
-def set_adv_setting(_id: str, value: bool):
+def set_adv_setting(_id: str, value: Optional[bool]):
     _id = _clean_id(_id)
     settings_file = CONFIG['feature_flags_file']
-    s = _read_settings_file(settings_file)
-    s[_id] = value
-    _write_settings_file(s, settings_file)
+    settings, version = _read_settings_file(settings_file)
+    settings[_id] = value
+    _write_settings_file(settings, version, settings_file)
 
 
 def _clean_id(_id: str) -> str:
@@ -128,7 +134,7 @@ def _read_json_file(path: Union[str, 'Path']) -> Dict[str, Any]:
     return data
 
 
-def _read_settings_file(settings_file: 'Path') -> Dict[str, bool]:
+def _read_settings_file(settings_file: 'Path') -> SettingsData:
     """
     Read the settings file, which is a json object with settings IDs as keys
     and boolean values. For each key, look up the `Settings` object with that
@@ -142,29 +148,73 @@ def _read_settings_file(settings_file: 'Path') -> Dict[str, bool]:
     """
     # Read settings from persistent file
     data = _read_json_file(settings_file)
-    all_ids = [s.id for s in settings]
+    settings, version = _migrate(data)
 
-    # If any old keys are stored in the file, replace them with the new key
-    old_keys = settings_by_old_id.keys()
-    if any([k in old_keys for k in data.keys()]):
-        for v in list(data.keys()):
-            if v in old_keys:
-                new_key = settings_by_old_id[v].id
-                data[new_key] = bool(data[v])
-                data.pop(v)
-        _write_settings_file(data, settings_file)
+    if (data.get('_version') != version):
+        _write_settings_file(settings, version, settings_file)
 
-    # If any settings do not have a key in the data, default to `False`
-    res = {key: data.get(key, False) for key in all_ids}
-    return res
+    return settings, version
 
 
-def _write_settings_file(data: Mapping[str, bool], settings_file: 'Path'):
+def _write_settings_file(data: Mapping[str, Any],
+                         version: int,
+                         settings_file: 'Path'):
     try:
         with settings_file.open('w') as fd:
-            json.dump(data, fd)
+            json.dump({**data, '_version': version}, fd)
             fd.flush()
             os.fsync(fd.fileno())
     except OSError:
         log.exception(
             f'Failed to write advanced settings file to {settings_file}')
+
+
+def _migrate0to1(previous: Mapping[str, Any]) -> SettingsMap:
+    """
+    Migrate to version 1 of the feature flags file. Replaces old IDs with new
+    IDs and sets any False values to None
+    """
+    next: SettingsMap = {}
+
+    for s in settings:
+        id = s.id
+        old_id = s.old_id
+
+        if previous.get(id) is True:
+            next[id] = True
+        elif previous.get(old_id) is True:
+            next[id] = True
+        else:
+            next[id] = None
+
+    return next
+
+
+_MIGRATIONS = [_migrate0to1]
+"""
+List of all migrations to apply, indexed by (version - 1). See _migrate below
+for how the migration functions are applied. Each migration function should
+return a new dictionary (rather than modify their input)
+"""
+
+
+def _migrate(data: Mapping[str, Any]) -> SettingsData:
+    """
+    Check the version integer of the JSON file data a run any necessary
+    migrations to get us to the latest file format. Returns dictionary of
+    settings and version migrated to
+    """
+    next = dict(data)
+    version = next.pop('_version', 0)
+    target_version = len(_MIGRATIONS)
+    migrations = _MIGRATIONS[version:]
+
+    if len(migrations) > 0:
+        log.info(
+            "Migrating advanced settings from version {} to {}"
+            .format(version, target_version))
+
+    for m in migrations:
+        next = m(next)
+
+    return next, target_version

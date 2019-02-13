@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional, Union, Tuple, Sequence
 from opentrons import types, hardware_control as hc, commands as cmds
 from opentrons.commands import CommandPublisher
 import opentrons.config.robot_configs as rc
-from opentrons.config import advanced_settings
+from opentrons.config import feature_flags as fflags
 from opentrons.hardware_control import adapters, modules
 from opentrons.hardware_control.types import CriticalPoint
 
@@ -109,10 +109,12 @@ class ProtocolContext(CommandPublisher):
         self._commands: List[str] = []
         self._unsubscribe_commands = None
         self.clear_commands()
-        if advanced_settings.get_adv_setting('shortFixedTrash'):
+
+        if fflags.short_fixed_trash():
             trash_name = 'opentrons_1_trash_0.85_L'
         else:
             trash_name = 'opentrons_1_trash_1.1_L'
+
         self.load_labware_by_name(
             trash_name, '12')
 
