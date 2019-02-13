@@ -1,5 +1,5 @@
 // @flow
-import mapValues from 'lodash/mapValues'
+import reduce from 'lodash/reduce'
 import pipetteNameSpecs from '../robot-data/pipetteNameSpecs.json'
 import pipetteModelSpecs from '../robot-data/pipetteModelSpecs.json'
 
@@ -44,9 +44,7 @@ const ALL_PIPETTES: Array<PipetteNameSpecs> = ALL_PIPETTE_NAMES
 
 // use a name like 'p10_single' to get specs true for all models under that name
 export function getPipetteNameSpecs (name: string): ?PipetteNameSpecs {
-  console.log(name)
   const config = pipetteNameSpecs[name]
-
   return config && {...config, name}
 }
 
@@ -115,6 +113,9 @@ function comparePipettes (sortBy: Array<SortableProps>) {
   }
 }
 
-export function getPropertyAllPipettes (propertyName: $Keys<PipetteNameSpecs>) {
-  return mapValues(pipetteNameSpecs, config => config[propertyName])
+export function getFlowRateDefaultsAllPipettes (flowRateName: 'defaultAspirateFlowRate' | 'defaultDispenseFlowRate'): {[pipetteName: string]: number} {
+  return reduce(pipetteNameSpecs, (acc, spec: PipetteNameSpecs, pipetteName: string) => ({
+    ...acc,
+    [pipetteName]: spec[flowRateName].value,
+  }), {})
 }

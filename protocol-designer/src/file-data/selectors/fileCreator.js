@@ -1,7 +1,7 @@
 // @flow
 import {createSelector} from 'reselect'
 import mapValues from 'lodash/mapValues'
-import {getPropertyAllPipettes} from '@opentrons/shared-data'
+import {getFlowRateDefaultsAllPipettes} from '@opentrons/shared-data'
 import {getFileMetadata} from './fileFields'
 import {getInitialRobotState, getRobotStateTimeline} from './commands'
 import {selectors as dismissSelectors} from '../../dismiss'
@@ -25,9 +25,9 @@ const applicationVersion = process.env.OT_PD_VERSION || 'unknown version'
 // when we look at saved protocols (without requiring us to trace thru git logs)
 const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
 
-const executionDefaults = {
-  'aspirate-flow-rate': getPropertyAllPipettes('defaultAspirateFlowRate'),
-  'dispense-flow-rate': getPropertyAllPipettes('defaultDispenseFlowRate'),
+const executionDefaults: $PropertyType<ProtocolFile, 'default-values'> = {
+  'aspirate-flow-rate': getFlowRateDefaultsAllPipettes('defaultAspirateFlowRate'),
+  'dispense-flow-rate': getFlowRateDefaultsAllPipettes('defaultDispenseFlowRate'),
   'aspirate-mm-from-bottom': DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   'dispense-mm-from-bottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   'touch-tip-mm-from-top': DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
