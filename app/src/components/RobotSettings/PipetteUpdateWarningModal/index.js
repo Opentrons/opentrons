@@ -33,44 +33,27 @@ export default class PipetteUpdateWarningModal extends React.Component<Props> {
           alertOverlay
         >
           <p>
-            This release includes an update to the default aspiration behavior
-            of the <strong>P10S</strong>, <strong>P10M</strong>,{' '}
-            <strong>P50S</strong>, <strong>P50M</strong>, and{' '}
-            <strong>P300S</strong> pipettes. The update refines the{' '}
-            {"pipettes' "}
-            µl-to-mm calibrations to incrementally improve their accuracy.
+            This release includes updated calibrations for the{' '}
+            <strong>P10S</strong>, <strong>P10M</strong>, <strong>P50S</strong>,{' '}
+            <strong>P50M</strong>, and <strong>P300S</strong> pipettes.
           </p>
 
           <p>
-            This change results in materially different aspiration volumes. The
-            volumes will be <strong>more accurate</strong>, but a change to
-            pipetting behavior may not be immediately desirable for some users.
-          </p>
-
-          <ul>
-            <li>
-              If you are in the middle of an experimental run where <em>any</em>{' '}
-              change in aspiration volumes would be detrimental...
-            </li>
-            <li>
-              If you have made manual adjustments to your {"robot's"} software
-              or protocols to adjust for inaccuracy...
-            </li>
-          </ul>
-
-          <p>
-            ...you may want to consider reverting the calibration change until
-            you are ready to make the switch.
-          </p>
-
-          <p>
+            This update is an incremental refinement to aspiration volume
+            accuracy, reflecting extensive additional test data.{' '}
             <strong>
-              Your robot is configured to use these new calibrations.
-            </strong>{' '}
-            However, if you prefer to use the previous µl-to-mm settings, you
-            can revert by enabling {'"Use older pipette calibrations"'} in your{' '}
-            {"robot's"} {'"Advanced Settings"'} menu. Please reach out to our
-            team with any questions.
+              Your robot is now configured to use these new calibrations.
+            </strong>
+          </p>
+
+          <p>
+            Please note this change may result in materially different
+            aspiration volumes. If you do not wish to use the updated
+            calibrations immediately (for example, if you are in the middle of
+            an experimental run, or if you are already using a custom aspiration
+            method), you can revert these changes by enabling{' '}
+            <em>&quot;Use older pipette calibrations&quot;</em> in your
+            robot&apos;s <em>&quot;Advanced Settings&quot;</em> menu.
           </p>
           <div className={styles.button_bar}>
             <OutlineButton
