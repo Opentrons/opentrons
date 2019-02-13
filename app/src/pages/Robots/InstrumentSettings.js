@@ -8,7 +8,6 @@ import ConfigurePipette from '../../components/ConfigurePipette'
 import Page from '../../components/Page'
 
 import type {Match} from 'react-router'
-import type {Mount} from '../../robot'
 import type {Robot} from '../../discovery'
 
 type Props = {
@@ -25,7 +24,6 @@ export default function InstrumentSettingsPage (props: Props) {
     match: {path, url},
   } = props
   const titleBarProps = {title: robot.displayName}
-  const mount: Mount = (props.match.params.mount: any)
   return (
     <React.Fragment>
       <Page titleBarProps={titleBarProps}>
@@ -42,7 +40,11 @@ export default function InstrumentSettingsPage (props: Props) {
         <Route
           path={`${path}/pipettes/config/:mount${RE_MOUNT}`}
           render={props => (
-            <ConfigurePipette mount={mount} robot={robot} parentUrl={url} />
+            <ConfigurePipette
+              mount={(props.match.params.mount: any)}
+              robot={robot}
+              parentUrl={url}
+            />
           )}
         />
       </Switch>
