@@ -1,12 +1,13 @@
 // @flow
-import startCase from 'lodash/startCase'
 import {
   swatchColors,
   MIXED_WELL_COLOR,
   AIR,
 } from '@opentrons/components'
 
-export const humanizeLabwareType = startCase
+export const humanizeLabwareType = (labwareType: string): string => {
+  return labwareType.replace(/-|_/g, ' ')
+}
 
 export const wellNameSplit = (wellName: string): [string, string] => {
   // Eg B9 => ['B', '9']
