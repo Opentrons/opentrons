@@ -19,8 +19,20 @@ echo "[ $0 ] Running user boot scripts"
 mkdir -p /data/boot.d
 run-parts /data/boot.d
 
+# Starting the update server backgrounded and then immediately moving on to
+# the api server can cause boot failures due to resource contention on the
+# smoothie’s serial port, since the update server tries to talk to the
+# smoothie to get its firmware version. To fix this, we need to make the
+# update server actually close out the smoothie connection so we can hook
+# in some synch logic, but barring that we
+# - set a magic env var in the update server so that when it imports the
+#   api wheel, the api wheel knows to not do some long-lasting tasks at
+#   import time, which lessons the time we need to-
+# - sleep in between the update server and api server starting. Sorry.
+
 echo "[ $0 ] Starting Opentrons update server"
-python -m otupdate --debug --port 34000 &
+OT_UPDATE_SERVER=true python -m otupdate --debug --port 34000 &
+sleep 15
 
 echo "[ $0 ] Starting Jupyter Notebook server"
 mkdir -p /data/user_storage/opentrons_data/jupyter
