@@ -2,11 +2,8 @@
 // view info about the app and update
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {getIn} from '@thi.ng/paths'
 import {Route, Switch, Redirect, type ContextRouter} from 'react-router'
 import {push} from 'react-router-redux'
-
-import {getConfig} from '../../config'
 
 import {
   getShellUpdateState,
@@ -18,7 +15,7 @@ import {
 } from '../../shell'
 
 import Page from '../../components/Page'
-import AppSettings, {AppUpdateModal} from '../../components/AppSettings'
+import AppSettings from '../../components/AppSettings'
 import UpdateApp from '../../components/AppSettings/UpdateApp'
 import {ErrorModal} from '../../components/modals'
 
@@ -30,7 +27,6 @@ type OP = ContextRouter
 type SP = {
   update: ShellUpdateState,
   availableVersion: ?string,
-  __featureEnabled: boolean,
 }
 
 type DP = {
@@ -41,8 +37,6 @@ type DP = {
 }
 
 type Props = OP & SP & DP
-
-const __FEATURE_FLAG = 'devInternal.newUpdateModal'
 
 export default connect(
   mapStateToProps,
@@ -56,7 +50,6 @@ function AppSettingsPage (props: Props) {
     closeModal,
     update: {available, seen, error},
     match: {path},
-    __featureEnabled,
   } = props
 
   return (
@@ -72,11 +65,7 @@ function AppSettingsPage (props: Props) {
           path={`${path}/update`}
           render={() =>
             !error ? (
-              __featureEnabled ? (
-                <UpdateApp {...props} />
-              ) : (
-                <AppUpdateModal {...props} />
-              )
+              <UpdateApp {...props} />
             ) : (
               <ErrorModal
                 heading="Update Error"
@@ -101,7 +90,6 @@ function mapStateToProps (state: State): SP {
   return {
     update: getShellUpdateState(state),
     availableVersion: getAvailableShellUpdate(state),
-    __featureEnabled: !!getIn(getConfig(state), __FEATURE_FLAG),
   }
 }
 

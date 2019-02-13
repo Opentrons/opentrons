@@ -5,7 +5,6 @@ import * as React from 'react'
 import {AnalyticsSettingsCard} from '../analytics-settings'
 import AdvancedSettingsCard from './AdvancedSettingsCard'
 import AppInfoCard from './AppInfoCard'
-import AppUpdateModal from './AppUpdateModal'
 import {CardContainer, CardRow} from '../layout'
 
 type Props = {
@@ -31,5 +30,3 @@ export default function AppSettings (props: Props) {
     </CardContainer>
   )
 }
-
-export {AppUpdateModal}
