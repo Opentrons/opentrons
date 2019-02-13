@@ -2,8 +2,13 @@
 // attached pipettes container card
 import * as React from 'react'
 import {connect} from 'react-redux'
+import {getIn} from '@thi.ng/paths'
 
-import {makeGetRobotPipettes, fetchPipettes, clearMoveResponse} from '../../http-api-client'
+import {
+  makeGetRobotPipettes,
+  fetchPipettes,
+  clearMoveResponse,
+} from '../../http-api-client'
 import InstrumentInfo from './InstrumentInfo'
 import {CardContentFlex} from '../layout'
 import {RefreshCard} from '@opentrons/components'
@@ -11,13 +16,14 @@ import {RefreshCard} from '@opentrons/components'
 import type {State} from '../../types'
 import type {Robot} from '../../discovery'
 import type {Pipette} from '../../http-api-client'
-
+import {getConfig} from '../../config'
 type OP = Robot
 
 type SP = {
   inProgress: boolean,
   left: ?Pipette,
   right: ?Pipette,
+  __featureEnabled: boolean,
 }
 
 type DP = {
@@ -26,6 +32,8 @@ type DP = {
 }
 
 type Props = OP & SP & DP
+
+const __FEATURE_FLAG = 'devInternal.newPipetteConfig'
 
 const TITLE = 'Pipettes'
 
@@ -43,8 +51,20 @@ function AttachedPipettesCard (props: Props) {
       refreshing={props.inProgress}
     >
       <CardContentFlex>
-        <InstrumentInfo mount='left' name={props.name} {...props.left} onClick={props.clearMove} />
-        <InstrumentInfo mount='right' name={props.name} {...props.right} onClick={props.clearMove} />
+        <InstrumentInfo
+          mount="left"
+          name={props.name}
+          {...props.left}
+          onChangeClick={props.clearMove}
+          __enableConfig={props.__featureEnabled}
+        />
+        <InstrumentInfo
+          mount="right"
+          name={props.name}
+          {...props.right}
+          onChangeClick={props.clearMove}
+          __enableConfig={props.__featureEnabled}
+        />
       </CardContentFlex>
     </RefreshCard>
   )
@@ -57,7 +77,12 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     const {inProgress, response} = getRobotPipettes(state, ownProps)
     const {left, right} = response || {left: null, right: null}
 
-    return {inProgress, left, right}
+    return {
+      inProgress,
+      left,
+      right,
+      __featureEnabled: !!getIn(getConfig(state), __FEATURE_FLAG),
+    }
   }
 }
 

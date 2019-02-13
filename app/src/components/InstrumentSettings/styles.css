@@ -5,15 +5,9 @@
   display: flex;
   position: relative;
   flex-direction: row;
-  align-items: center;
+  align-items: top;
   justify-content: space-between;
-  height: 4rem;
-  padding-top: 1rem;
   width: 49.5%;
-
-  & > a {
-    width: 8rem;
-  }
 }
 
 .pipette_diagram {
@@ -30,7 +24,6 @@
 .image {
   height: 8rem;
   width: 2.25rem;
-  margin-top: -3rem;
   border: 1px solid var(--c-light-gray);
 }
 
@@ -45,5 +38,15 @@
 
   & > a {
     order: 3;
+  }
+}
+
+.button_group {
+  max-width: 9rem;
+  text-align: right;
+
+  & > a {
+    width: 8rem;
+    margin-bottom: 1rem;
   }
 }

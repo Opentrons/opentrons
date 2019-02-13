@@ -1,0 +1,12 @@
+@import '@opentrons/components';
+
+.warning_title {
+  @apply --font-body-2-dark;
+
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.warning_text {
+  @apply --font-body-1-dark;
+}

@@ -16,7 +16,8 @@ type Props = {
   mount: Mount,
   model: ?string,
   name: string,
-  onClick: () => mixed,
+  onChangeClick: () => mixed,
+  __enableConfig: boolean,
 }
 
 // TODO(mc, 2018-03-30): volume and channels should come from the API
@@ -28,15 +29,14 @@ const LABEL_BY_MOUNT = {
 }
 
 export default function PipetteInfo (props: Props) {
-  const {mount, model, name, onClick} = props
+  const {mount, model, name, onChangeClick} = props
   const label = LABEL_BY_MOUNT[mount]
   const channelsMatch = model && model.match(RE_CHANNELS)
   const channels = channelsMatch && channelsMatch[1]
-  const direction = props.model
-    ? 'change'
-    : 'attach'
+  const direction = props.model ? 'change' : 'attach'
 
-  const url = `/robots/${name}/instruments/pipettes/${mount}`
+  const changeUrl = `/robots/${name}/instruments/pipettes/change/${mount}`
+  const configUrl = `/robots/${name}/instruments/pipettes/config/${mount}`
 
   const className = cx(styles.pipette_card, {
     [styles.right]: props.mount === 'right',
@@ -48,9 +48,17 @@ export default function PipetteInfo (props: Props) {
         label={label}
         value={(model || 'None').split('_').join(' ')}
       />
-      <OutlineButton Component={Link} to={url} onClick={onClick}>
-        {direction}
-      </OutlineButton>
+
+      <div className={styles.button_group}>
+        <OutlineButton Component={Link} to={changeUrl} onClick={onChangeClick}>
+          {direction}
+        </OutlineButton>
+        {props.__enableConfig && model && (
+          <OutlineButton Component={Link} to={configUrl}>
+            settings
+          </OutlineButton>
+        )}
+      </div>
       <div className={styles.image}>
         {channels && (
           <InstrumentDiagram
