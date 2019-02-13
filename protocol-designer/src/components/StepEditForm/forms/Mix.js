@@ -48,7 +48,7 @@ class MixForm extends React.Component<Props, State> {
 
         <div className={styles.form_row}>
           <div className={styles.start_group}>
-            <FormGroup label='Labware:' className={styles.labware_field}>
+            <FormGroup label='Labware:'>
               <LabwareField name="labware" {...focusHandlers} />
             </FormGroup>
             <WellSelectionField name="wells" labwareFieldName="labware" pipetteFieldName="pipette" {...focusHandlers} />
