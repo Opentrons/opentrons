@@ -10,7 +10,7 @@ import type {WellOrderOption} from '../../../../form-types'
 import styles from './WellOrderInput.css'
 
 type Props = {
-  prefix: 'aspirate' | 'dispense',
+  prefix: 'aspirate' | 'dispense' | 'mix',
   firstValue: ?WellOrderOption,
   secondValue: ?WellOrderOption,
 }

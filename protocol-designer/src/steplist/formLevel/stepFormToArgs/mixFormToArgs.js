@@ -16,8 +16,8 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
   const touchTipMmFromBottom = hydratedFormData['mix_touchTipMmFromBottom']
 
   let wells = hydratedFormData.wells || []
-  const orderFirst = hydratedFormData.aspirate_wellOrder_first
-  const orderSecond = hydratedFormData.aspirate_wellOrder_second
+  const orderFirst = hydratedFormData.mix_wellOrder_first
+  const orderSecond = hydratedFormData.mix_wellOrder_second
 
   // TODO: Ian 2019-01-15 use getOrderedWells instead of orderWells to avoid this duplicated code
   const labwareDef = labware && getLabware(labware.type)

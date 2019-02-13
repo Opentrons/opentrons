@@ -39,7 +39,7 @@ type DP = {
 type OP = {
   isOpen: boolean,
   closeModal: () => mixed,
-  prefix: 'aspirate' | 'dispense',
+  prefix: 'aspirate' | 'dispense' | 'mix',
 }
 
 type Props = OP & SP & DP
@@ -159,27 +159,19 @@ class WellOrderModal extends React.Component<Props, State> {
 
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
   const formData = stepFormSelectors.getUnsavedForm(state)
-  // NOTE: not interpolating prefix because breaks flow string enum
-  const firstName = ownProps.prefix === 'aspirate' ? 'aspirate_wellOrder_first' : 'dispense_wellOrder_first'
-  const secondName = ownProps.prefix === 'aspirate' ? 'aspirate_wellOrder_second' : 'dispense_wellOrder_second'
   return {
-    initialFirstValue: formData && formData[firstName],
-    initialSecondValue: formData && formData[secondName],
+    initialFirstValue: formData && formData[`${ownProps.prefix}_wellOrder_first`],
+    initialSecondValue: formData && formData[`${ownProps.prefix}_wellOrder_second`],
   }
 }
 
-const mapDTP = (dispatch: Dispatch, ownProps: OP): DP => {
-  // NOTE: not interpolating prefix because breaks flow string enum
-  const firstName = ownProps.prefix === 'aspirate' ? 'aspirate_wellOrder_first' : 'dispense_wellOrder_first'
-  const secondName = ownProps.prefix === 'aspirate' ? 'aspirate_wellOrder_second' : 'dispense_wellOrder_second'
-  return {
-    updateValues: (firstValue, secondValue) => {
-      dispatch(actions.changeFormInput({update: {
-        [firstName]: firstValue,
-        [secondName]: secondValue,
-      }}))
-    },
-  }
-}
+const mapDTP = (dispatch: Dispatch, ownProps: OP): DP => ({
+  updateValues: (firstValue, secondValue) => {
+    dispatch(actions.changeFormInput({update: {
+      [`${ownProps.prefix}_wellOrder_first`]: firstValue,
+      [`${ownProps.prefix}_wellOrder_second`]: secondValue,
+    }}))
+  },
+})
 
 export default connect(mapSTP, mapDTP)(WellOrderModal)

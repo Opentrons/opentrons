@@ -2,11 +2,11 @@
 
 import flow from 'lodash/flow'
 import type {ProtocolFile} from '../../file-types'
-import mig1 from './mig1_2019-2-1'
+import migrationV1 from './migrationV1'
 
 const masterMigration = (file: any): ProtocolFile => (
   flow([
-    mig1,
+    migrationV1,
   ])(file)
 )
 

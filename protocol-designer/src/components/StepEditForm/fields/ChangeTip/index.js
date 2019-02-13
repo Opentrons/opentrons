@@ -43,9 +43,7 @@ function getDisabledChangeTipOptions (
 
 const mapSTP = (state: BaseState, ownProps: OP): $Diff<Props, OP> => {
   const rawForm = stepFormSelectors.getUnsavedForm(state)
-  const stepType = rawForm ? rawForm.stepType : null
   return {
-    stepType,
     options: ALL_CHANGE_TIP_VALUES, // TODO Ian 2019-01-28 these may vary for different step types
     disabledOptions: rawForm ? getDisabledChangeTipOptions(rawForm) : null,
   }
