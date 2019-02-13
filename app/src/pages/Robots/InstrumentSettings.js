@@ -31,8 +31,7 @@ export default function InstrumentSettingsPage (props: Props) {
       </Page>
       <Switch>
         <Route
-          exact
-          path={`${path}/pipettes`}
+          path={`${path}/pipettes/change`}
           render={props => (
             <ChangePipette {...props} robot={robot} parentUrl={url} />
           )}

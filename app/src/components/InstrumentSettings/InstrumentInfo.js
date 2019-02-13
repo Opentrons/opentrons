@@ -35,7 +35,7 @@ export default function PipetteInfo (props: Props) {
   const channels = channelsMatch && channelsMatch[1]
   const direction = props.model ? 'change' : 'attach'
 
-  const changeUrl = `/robots/${name}/instruments/pipettes/${mount}`
+  const changeUrl = `/robots/${name}/instruments/pipettes/change/${mount}`
   const configUrl = `/robots/${name}/instruments/pipettes/config/${mount}`
 
   const className = cx(styles.pipette_card, {
