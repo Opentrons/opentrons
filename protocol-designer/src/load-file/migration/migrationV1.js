@@ -1,6 +1,8 @@
 // @flow
+import isUndefined from 'lodash/isUndefined'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
+import omitBy from 'lodash/omitBy'
 import flow from 'lodash/flow'
 import {getPipetteCapacity} from '../../pipettes/pipetteData'
 import type {PipetteEntities} from '../../step-forms'
@@ -140,9 +142,12 @@ export const MIX_DEPRECATED_FIELD_NAMES = [
 ]
 export function updateStepFormKeys (fileData: ProtocolFile): ProtocolFile {
   const savedStepForms = fileData['designer-application'].data.savedStepForms
+  // NOTE: on LOAD_FILE, savedStepForms reducer will spread the form values
+  // on top of over getDefaultsForStepType, so the defaults do not need to be
+  // included here
   const migratedStepForms = mapValues(savedStepForms, (formData) => {
     if (['transfer', 'consolidate', 'distribute'].includes(formData.stepType)) {
-      return {
+      const updatedFields = {
         stepName: formData['step-name'],
         stepDetails: formData['step-details'],
         changeTip: formData['aspirate_changeTip'],
@@ -153,10 +158,14 @@ export function updateStepFormKeys (fileData: ProtocolFile): ProtocolFile {
         disposalVolume_checkbox: formData['aspirate_disposalVol_checkbox'],
         disposalVolume_volume: formData['aspirate_disposalVol_volume'],
         preWetTip: formData['aspirate_preWetTip'],
+      }
+
+      return {
+        ...omitBy(updatedFields, isUndefined),
         ...omit(formData, TCD_DEPRECATED_FIELD_NAMES),
       }
     } else if (formData.stepType === 'mix') {
-      return {
+      const updatedFields = {
         stepName: formData['step-name'],
         stepDetails: formData['step-details'],
         changeTip: formData['aspirate_changeTip'],
@@ -166,7 +175,11 @@ export function updateStepFormKeys (fileData: ProtocolFile): ProtocolFile {
         mix_touchTip_checkbox: formData['touchTip'],
         blowout_checkbox: formData['dispense_blowout_checkbox'],
         blowout_location: formData['dispense_blowout_location'] || formData['dispense_blowout_labware'],
+      }
+      return {
+        ...omitBy(updatedFields, isUndefined),
         ...omit(formData, MIX_DEPRECATED_FIELD_NAMES),
+
       }
     } else {
       return {
