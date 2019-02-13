@@ -6,14 +6,9 @@ import {
   renameOrderedSteps,
   addInitialDeckSetupStep,
   INITIAL_DECK_SETUP_STEP_ID,
-  FIXED_TRASH_ID,
   updateStepFormKeys,
   TCD_DEPRECATED_FIELD_NAMES,
   MIX_DEPRECATED_FIELD_NAMES,
-  DEFAULT_WELL_ORDER_FIRST_OPTION,
-  DEFAULT_WELL_ORDER_SECOND_OPTION,
-  DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   replaceTCDStepsWithMoveLiquidStep,
   updateMigrationVersion,
   default as wholeMigration,
@@ -62,7 +57,7 @@ describe('addInitialDeckSetupStep', () => {
     const wellFormedSetupStep = {
       stepType: 'manualIntervention',
       id: INITIAL_DECK_SETUP_STEP_ID,
-      labwareLocationUpdate: {[FIXED_TRASH_ID]: '12'},
+      labwareLocationUpdate: {trashId: '12'},
       pipetteLocationUpdate: {},
     }
     const deckSetupStepForm = migratedFile['designer-application'].data.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
@@ -187,13 +182,6 @@ describe('updateStepFormKeys', () => {
         preWetTip: oldFields['aspirate_preWetTip'],
         stepName: oldFields['step-name'],
         stepDetails: oldFields['step-details'],
-        aspirate_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-        dispense_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
-        aspirate_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
-        aspirate_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
-        dispense_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
-        dispense_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
-        aspirate_wells_grouped: false,
       }
       each(Object.keys(addedFields), fieldName => {
         each(stubbedTCDStepsFile['designer-application'].data.savedStepForms, stepForm => {

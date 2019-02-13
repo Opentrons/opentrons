@@ -8,6 +8,8 @@ import {
 
 import {getIsTouchTipField, type TipOffsetFields} from '../../../../form-types'
 
+// TODO: Ian + Brian 2019-02-13 this should switch on stepType, not use field
+// name to infer step type!
 export function getDefaultMmFromBottom (args: {
   fieldName: TipOffsetFields,
   wellHeightMM: number,

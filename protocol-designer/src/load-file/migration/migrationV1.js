@@ -3,7 +3,6 @@ import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import flow from 'lodash/flow'
 import {getPipetteCapacity} from '../../pipettes/pipetteData'
-import {initialDeckSetupStepForm} from '../../step-forms/reducers'
 import type {PipetteEntities} from '../../step-forms'
 import type {FormPatch} from '../../steplist/actions'
 import type {ProtocolFile, FileLabware, FilePipette} from '../../file-types'
@@ -15,12 +14,14 @@ const PRESENT_MIGRATION_VERSION = 1
 // pre migrationV1 in later migration files many of these values
 // should be taken from the default-values key
 export const INITIAL_DECK_SETUP_STEP_ID: '__INITIAL_DECK_SETUP_STEP__' = '__INITIAL_DECK_SETUP_STEP__'
-export const FIXED_TRASH_ID: 'trashId' = 'trashId'
-export const DEFAULT_MM_FROM_BOTTOM_ASPIRATE = 1
-export const DEFAULT_MM_FROM_BOTTOM_DISPENSE = 0.5
-export const DEFAULT_WELL_ORDER_FIRST_OPTION: 't2b' = 't2b'
-export const DEFAULT_WELL_ORDER_SECOND_OPTION: 'l2r' = 'l2r'
-export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
+export const initialDeckSetupStepForm = {
+  stepType: 'manualIntervention',
+  id: INITIAL_DECK_SETUP_STEP_ID,
+  labwareLocationUpdate: {
+    'trashId': '12',
+  },
+  pipetteLocationUpdate: {},
+}
 
 // NOTE: this function was copied on 2019-2-7 from
 // formLevel/handleFormChange/dependentFieldsUpdateMoveLiquid.js
@@ -152,23 +153,16 @@ export function updateStepFormKeys (fileData: ProtocolFile): ProtocolFile {
         disposalVolume_checkbox: formData['aspirate_disposalVol_checkbox'],
         disposalVolume_volume: formData['aspirate_disposalVol_volume'],
         preWetTip: formData['aspirate_preWetTip'],
-        aspirate_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-        dispense_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
-        aspirate_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
-        aspirate_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
-        dispense_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
-        dispense_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
-        aspirate_wells_grouped: false,
         ...omit(formData, TCD_DEPRECATED_FIELD_NAMES),
       }
     } else if (formData.stepType === 'mix') {
       return {
         stepName: formData['step-name'],
         stepDetails: formData['step-details'],
-        changeTip: formData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION,
-        mix_mmFromBottom: formData['dispense_mmFromBottom'] || DEFAULT_MM_FROM_BOTTOM_DISPENSE,
-        mix_wellOrder_first: formData['aspirate_wellOrder_first'] || DEFAULT_WELL_ORDER_FIRST_OPTION,
-        mix_wellOrder_second: formData['aspirate_wellOrder_second'] || DEFAULT_WELL_ORDER_SECOND_OPTION,
+        changeTip: formData['aspirate_changeTip'],
+        mix_mmFromBottom: formData['dispense_mmFromBottom'],
+        mix_wellOrder_first: formData['aspirate_wellOrder_first'],
+        mix_wellOrder_second: formData['aspirate_wellOrder_second'],
         mix_touchTip_checkbox: formData['touchTip'],
         blowout_checkbox: formData['dispense_blowout_checkbox'],
         blowout_location: formData['dispense_blowout_location'] || formData['dispense_blowout_labware'],
