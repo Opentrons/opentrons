@@ -91,7 +91,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
 
     // TODO(mc, 2018-07-23): make diagram component a container
     const calToBottomFlag = settings && settings.find(s => s.id === 'calibrateToBottom')
-    const calibrateToBottom = !!calToBottomFlag && calToBottomFlag.value
+    const calibrateToBottom = !!calToBottomFlag && calToBottomFlag.value === true
 
     const modulesRequired = robotSelectors.getModules(state).length > 0
     const modulesReviewed = robotSelectors.getModulesReviewed(state)

@@ -61,6 +61,7 @@ const DEFAULTS: Config = {
     seenOptIn: false,
   },
 
+  // deprecated; remove with first migration
   p10WarningSeen: {},
 
   // user support (intercom)

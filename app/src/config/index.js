@@ -46,6 +46,7 @@ export type Config = {
     seenOptIn: boolean,
   },
 
+  // deprecated; remove with first migration
   p10WarningSeen: {
     [id: string]: ?boolean,
   },
