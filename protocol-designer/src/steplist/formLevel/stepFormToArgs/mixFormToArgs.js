@@ -28,8 +28,8 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
     console.warn('the specified labware definition could not be located')
   }
 
-  const volume = Number(hydratedFormData.volume) || 0
-  const times = Number(hydratedFormData.times) || 0
+  const volume = hydratedFormData.volume
+  const times = hydratedFormData.times
 
   const aspirateFlowRateUlSec = hydratedFormData['aspirate_flowRate']
   const dispenseFlowRateUlSec = hydratedFormData['dispense_flowRate']

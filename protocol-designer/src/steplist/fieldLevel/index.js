@@ -55,6 +55,10 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
     getErrors: composeErrors(requiredField),
     hydrate: hydrateLabware,
   },
+  'aspirate_mix_times': {
+    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers, onlyIntegers, defaultTo(1)),
+    castValue: Number,
+  },
   'aspirate_mix_volume': {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
     castValue: Number,
@@ -66,6 +70,10 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
   'dispense_labware': {
     getErrors: composeErrors(requiredField),
     hydrate: hydrateLabware,
+  },
+  'dispense_mix_times': {
+    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers, onlyIntegers, defaultTo(1)),
+    castValue: Number,
   },
   'dispense_mix_volume': {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
@@ -99,6 +107,7 @@ const stepFieldHelperMap: {[StepFieldName]: StepFieldHelpers} = {
   'times': {
     getErrors: composeErrors(requiredField),
     maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers, onlyIntegers, defaultTo(0)),
+    castValue: Number,
   },
   'volume': {
     getErrors: composeErrors(requiredField, nonZero),
