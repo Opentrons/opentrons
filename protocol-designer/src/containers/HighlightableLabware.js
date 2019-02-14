@@ -42,7 +42,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     }
   }
 
-  const labwareEntity = stepFormSelectors.getLabwareEntities(state)[containerId]
+  const labwareType = stepFormSelectors.getLabwareTypesById(state)[containerId]
   const allWellContentsForSteps = wellContentsSelectors.getAllWellContentsForSteps(state)
   const wellSelectionModeForLabware = selectedContainerId === containerId
   let wellContents: ContentsByWell = {}
@@ -113,7 +113,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   return {
     wellContents,
     getTipProps: getTipProps || noop,
-    containerType: labwareEntity ? labwareEntity.type : 'missing labware',
+    containerType: labwareType || 'missing labware',
   }
 }
 

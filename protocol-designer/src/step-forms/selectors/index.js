@@ -43,9 +43,21 @@ import type {RootState} from '../reducers'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 
+// NOTE Ian 2019-02-14: in Redux containers world, you probably only care about
+// the labware type, in which case you ought to use `getLabwareTypesById` instead.
+// `getLabwareEntities` is intended for uses tied to the LabwareEntities type
+// (which currently contains only `type`, but may expand)
 export const getLabwareEntities: Selector<LabwareEntities> = createSelector(
   rootSelector,
   (state) => state.labwareInvariantProperties
+)
+
+export const getLabwareTypesById: Selector<LabwareTypeById> = createSelector(
+  getLabwareEntities,
+  (labwareEntities) => mapValues(
+    labwareEntities,
+    (labware: LabwareEntity) => labware.type
+  )
 )
 
 export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
@@ -75,26 +87,6 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   }
 )
 
-// TODO IMMEDIATELY: remove!!!
-export const getLabwareById: Selector<{[labwareId: string]: ?Labware}> = createSelector(
-  getInitialDeckSetup,
-  state => state.labwareIngred.containers, // HACK to avoid circular dependency
-  (initialDeckSetup, displayLabwareById) => mapValues(
-    initialDeckSetup.labware,
-    (l: LabwareOnDeck, id: string): ?Labware => {
-      const displayLabware = displayLabwareById[id]
-      return displayLabware
-        ? {
-          nickname: displayLabware.nickname,
-          disambiguationNumber: displayLabware.disambiguationNumber,
-          id,
-          type: l.type,
-          slot: l.slot,
-        }
-        : null
-    })
-)
-
 // $FlowFixMe TODO IMMEDIATELY
 export const getLabwareNicknamesById: Selector<{[labwareId: string]: string}> = createSelector(
   getLabwareEntities,
@@ -106,6 +98,7 @@ export const getLabwareNicknamesById: Selector<{[labwareId: string]: string}> = 
   )
 )
 
+// TODO IMMEDIATELY move out to ui or something?
 /** Returns options for disposal (e.g. fixed trash and trash box) */
 export const getDisposalLabwareOptions: Selector<Options> = createSelector(
   getLabwareEntities,
@@ -124,19 +117,10 @@ export const getDisposalLabwareOptions: Selector<Options> = createSelector(
   }, [])
 )
 
-// TODO IMMEDIATELY use this instead of getLabwareEntities where it's only used to get the type!
-export const getLabwareTypes: Selector<LabwareTypeById> = createSelector(
-  getLabwareEntities,
-  (labwareEntities) => mapValues(
-    labwareEntities,
-    (labware: LabwareEntity) => labware.type
-  )
-)
-
 // TODO IMMEDIATELY move out to ui or something?
 /** Returns options for dropdowns, excluding tiprack labware */
 export const getLabwareOptions: Selector<Options> = createSelector(
-  getLabwareTypes,
+  getLabwareTypesById,
   getLabwareNicknamesById,
   (labwareTypesById, nicknamesById) => reduce(labwareTypesById, (acc: Options, labwareType: string, labwareId): Options => {
     return getIsTiprack(labwareType)

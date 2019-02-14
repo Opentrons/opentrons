@@ -114,8 +114,7 @@ class WellSelectionModal extends React.Component<Props, State> {
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {pipetteId, labwareId} = ownProps
 
-  const labwareEntities = stepFormSelectors.getLabwareEntities(state)
-  const labware = labwareId ? labwareEntities[labwareId] : null
+  const labwareType = labwareId ? stepFormSelectors.getLabwareTypesById(state)[labwareId] : null
   const allWellContentsForSteps = wellContentsSelectors.getAllWellContentsForSteps(state)
 
   const stepId = stepsSelectors.getSelectedStepId(state)
@@ -133,7 +132,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     initialSelectedWells: formData ? formData[ownProps.name] : [],
     pipetteSpec: pipette && pipette.spec,
     wellContents: labwareId && allWellContentsForStep ? allWellContentsForStep[labwareId] : {},
-    containerType: labware ? labware.type : 'missing labware',
+    containerType: labwareType || 'missing labware',
     ingredNames,
   }
 }

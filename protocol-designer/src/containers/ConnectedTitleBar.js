@@ -53,7 +53,7 @@ function mapStateToProps (state: BaseState): SP {
   const wellSelectionLabwareKey = stepsSelectors.getWellSelectionLabwareKey(state)
 
   const labwareNickname = selectedLabwareId != null && labwareNames[selectedLabwareId]
-  const labwareType = selectedLabwareId != null && stepFormSelectors.getLabwareTypes(state)[selectedLabwareId]
+  const labwareType = selectedLabwareId != null && stepFormSelectors.getLabwareTypesById(state)[selectedLabwareId]
   const liquidPlacementMode = selectedLabwareId != null
 
   switch (_page) {
@@ -89,10 +89,10 @@ function mapStateToProps (state: BaseState): SP {
         subtitle = END_TERMINAL_TITLE
         if (drilledDownLabwareId) {
           backButtonLabel = 'Deck'
-          const labwareEntity = stepFormSelectors.getLabwareEntities(state)[drilledDownLabwareId]
+          const labwareType = stepFormSelectors.getLabwareTypesById(state)[drilledDownLabwareId]
           const displayLabware = labwareIngredSelectors.getLabwareNameInfo(state)[drilledDownLabwareId]
           title = displayLabware && displayLabware.nickname
-          subtitle = labwareEntity && humanizeLabwareType(labwareEntity.type)
+          subtitle = labwareType && humanizeLabwareType(labwareType)
         }
       } else if (selectedStep) {
         if (wellSelectionLabwareKey) { // well selection modal

@@ -113,7 +113,7 @@ export const getLastValidWellContents: Selector<WellContentsByLabware> = createS
 export const getSelectedWellsMaxVolume: Selector<number> = createSelector(
   wellSelectionSelectors.getSelectedWells,
   labwareIngredSelectors.getSelectedLabwareId,
-  stepFormSelectors.getLabwareTypes,
+  stepFormSelectors.getLabwareTypesById,
   (selectedWells, selectedLabwareId, labwareTypes) => {
     const selectedWellNames = Object.keys(selectedWells)
     const selectedLabwareType = selectedLabwareId && labwareTypes[selectedLabwareId]

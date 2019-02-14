@@ -15,26 +15,24 @@ type DP = {
   renameLabware: $PropertyType<Props, 'renameLabware'>,
 }
 
-type SP = $Diff<Props, DP> & {_labwareId: ?string}
+type SP = $Diff<Props, DP> & {_labwareId?: string}
 
 function mapStateToProps (state: BaseState): SP {
-  const labwareId = labwareIngredSelectors.getSelectedLabwareId(state)
-  const labwareEntities = stepFormSelectors.getLabwareEntities(state)
   const labwareNicknamesById = stepFormSelectors.getLabwareNicknamesById(state)
-  assert(labwareId, 'Expected labware id to exist in connected labware details card')
+  const labwareId = labwareIngredSelectors.getSelectedLabwareId(state)
+  const labwareType = labwareId && stepFormSelectors.getLabwareTypesById(state)[labwareId]
 
-  const props = (labwareId)
-    ? {
-      labwareType: labwareEntities[labwareId] && labwareEntities[labwareId].type,
-      nickname: labwareNicknamesById[labwareId] || 'Unnamed Labware',
-    }
-    : {
+  assert(labwareId && labwareType, 'Expected labware id & type to exist in connected labware details card')
+  if (!labwareId || !labwareType) {
+    return {
       labwareType: '?',
       nickname: '?',
     }
+  }
 
   return {
-    ...props,
+    labwareType: labwareType,
+    nickname: labwareNicknamesById[labwareId] || 'Unnamed Labware',
     _labwareId: labwareId,
   }
 }

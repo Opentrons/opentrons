@@ -2,7 +2,6 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import isEmpty from 'lodash/isEmpty'
-import mapValues from 'lodash/mapValues'
 import type {BaseState, ThunkDispatch} from '../types'
 
 import type {SubstepIdentifier} from '../steplist/types'
@@ -72,8 +71,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     hovered: (hoveredStep === stepId) && !hoveredSubstep,
 
     labwareNicknamesById: stepFormSelectors.getLabwareNicknamesById(state),
-    // TODO IMMEDIATELY: make this a selector, it is widely used. use it in the diff'd other containers
-    labwareTypesById: mapValues(stepFormSelectors.getLabwareEntities(state), l => l.type),
+    labwareTypesById: stepFormSelectors.getLabwareTypesById(state),
     ingredNames: labwareIngredSelectors.getLiquidNamesById(state),
   }
 }

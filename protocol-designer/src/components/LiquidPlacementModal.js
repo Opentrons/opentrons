@@ -87,7 +87,7 @@ const mapStateToProps = (state: BaseState): SP => {
     }
   }
 
-  const labware = stepFormSelectors.getLabwareEntities(state)[labwareId]
+  const labwareType = stepFormSelectors.getLabwareTypesById(state)[labwareId]
   let wellContents: ContentsByWell = {}
 
   // selection for deck setup: shows initial state of liquids
@@ -96,7 +96,7 @@ const mapStateToProps = (state: BaseState): SP => {
   return {
     selectedWells,
     wellContents,
-    containerType: labware ? labware.type : 'missing labware',
+    containerType: labwareType || 'missing labware',
     liquidNamesById: selectors.getLiquidNamesById(state),
   }
 }

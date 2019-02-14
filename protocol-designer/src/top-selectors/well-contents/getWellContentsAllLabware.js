@@ -56,29 +56,32 @@ const _getWellContents = (
 }
 
 const getWellContentsAllLabware: Selector<WellContentsByLabware> = createSelector(
-  stepFormSelectors.getLabwareById,
+  stepFormSelectors.getLabwareTypesById,
   labwareIngredSelectors.getLiquidsByLabwareId,
   labwareIngredSelectors.getSelectedLabwareId,
   wellSelectionSelectors.getSelectedWells,
   wellSelectionSelectors.getHighlightedWells,
-  (labwareById, liquidsByLabware, selectedLabwareId, selectedWells, highlightedWells) => {
-    const allLabwareIds: Array<string> = Object.keys(labwareById) // TODO Ian 2018-05-29 weird flow error w/o annotation
+  (labwareTypesById, liquidsByLabware, selectedLabwareId, selectedWells, highlightedWells) => {
+    // TODO: Ian 2019-02-14 weird flow error without explicit Array<string> annotation
+    const allLabwareIds: Array<string> = Object.keys(labwareTypesById)
 
-    return allLabwareIds.reduce((acc: {[labwareId: string]: ContentsByWell | null}, labwareId: string) => {
+    return allLabwareIds.reduce((acc: WellContentsByLabware, labwareId: string) => {
       const liquidsForLabware = liquidsByLabware[labwareId]
       const isSelectedLabware = selectedLabwareId === labwareId
+      console.log({isSelectedLabware, labwareId, selectedLabwareId})
+
+      const wellContents = _getWellContents(
+        labwareTypesById[labwareId],
+        liquidsForLabware,
+        // Only give _getWellContents the selection data if it's a selected container
+        isSelectedLabware ? selectedWells : null,
+        isSelectedLabware ? highlightedWells : null
+      )
 
       // Skip labware ids with no liquids
-      return {
-        ...acc,
-        [labwareId]: _getWellContents(
-          labwareById[labwareId] && labwareById[labwareId].type,
-          liquidsForLabware,
-          // Only give _getWellContents the selection data if it's a selected container
-          isSelectedLabware ? selectedWells : null,
-          isSelectedLabware ? highlightedWells : null
-        ),
-      }
+      return wellContents
+        ? {...acc, [labwareId]: wellContents}
+        : acc
     }, {})
   }
 )

@@ -1,25 +1,13 @@
 import {getLabwareLiquidState} from '../selectors'
 
-let labwareState
+let labwareTypesById
 let ingredLocs
 
 beforeEach(() => {
-  labwareState = {
-    'FIXED_TRASH_ID': {
-      type: 'fixed-trash',
-      name: 'Trash',
-      slot: '12',
-    },
-    wellPlateId: {
-      slot: '10',
-      type: '96-flat',
-      name: 'Labware 1',
-    },
-    troughId: {
-      slot: '8',
-      type: 'trough-12row',
-      name: 'Labware 2',
-    },
+  labwareTypesById = {
+    FIXED_TRASH_ID: 'fixed-trash',
+    wellPlateId: '96-flat',
+    troughId: 'trough-12row',
   }
 
   ingredLocs = {
@@ -54,7 +42,7 @@ describe('getLabwareLiquidState', () => {
   test('labware + no ingreds: generate empty well keys', () => {
     const result = getLabwareLiquidState.resultFunc(
       {},
-      labwareState
+      labwareTypesById
     )
 
     hasAllWellKeys(result)
@@ -63,7 +51,7 @@ describe('getLabwareLiquidState', () => {
   test('selects liquids with multiple ingredient groups & multiple labware: generate all well keys', () => {
     const result = getLabwareLiquidState.resultFunc(
       ingredLocs,
-      labwareState
+      labwareTypesById
     )
 
     expect(result).toMatchObject(ingredLocs)

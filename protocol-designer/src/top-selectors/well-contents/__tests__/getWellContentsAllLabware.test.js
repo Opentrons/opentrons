@@ -1,78 +1,60 @@
 import getWellContentsAllLabware from '../getWellContentsAllLabware'
 
-// FIXTURES
-const baseIngredFields = {
-  groupId: '0',
-  name: 'Some Ingred',
-  description: null,
-  serialize: false,
-}
-
-const containerState = {
-  'FIXED_TRASH_ID': {
-    type: 'trash-box',
-    name: 'Trash',
-    slot: '12',
-  },
-  container1Id: {
-    slot: '10',
-    type: '96-flat',
-    name: 'Labware 1',
-  },
-  container2Id: {
-    slot: '8',
-    type: '96-deep-well',
-    name: 'Labware 2',
-  },
-  container3Id: {
-    slot: '9',
-    type: 'tube-rack-2ml',
-    name: 'Labware 3',
-  },
-}
-
-const ingredsByLabwareXXSingleIngred = {
-  'container1Id': {
-    '0': {
-      ...baseIngredFields,
-      wells: {
-        A1: {volume: 100},
-        B1: {volume: 150},
-      },
-    },
-  },
-  'container2Id': {},
-  'container3Id': {},
-  'FIXED_TRASH_ID': {},
-}
-
-const defaultWellContents = {
-  highlighted: false,
-  selected: false,
-}
-
-const container1MaxVolume = 400
-
 describe('getWellContentsAllLabware', () => {
-  const singleIngredResult = getWellContentsAllLabware.resultFunc(
-    containerState, // all labware
-    ingredsByLabwareXXSingleIngred,
-    {id: 'container1Id'}, // selected labware
-    {A1: 'A1', B1: 'B1'}, // selected
-    {A3: 'A3'} // highlighted
-  )
+  const container1MaxVolume = 400
+  let baseIngredFields
+  let labwareTypesById
+  let ingredsByLabwareXXSingleIngred
+  let defaultWellContents
+  let singleIngredResult
 
-  // TODO: 2nd test case
-  // const twoIngredResult = selectors.getWellContentsAllLabware.resultFunc(
-  //   containerState, // all labware
-  //   ingredsByLabwareXXTwoIngred,
-  //   containerState.container2Id, // selected labware
-  //   {A1: 'A1', B1: 'B1'}, // selected
-  //   {A3: 'A3'} // highlighted
-  // )
+  beforeEach(() => {
+    baseIngredFields = {
+      groupId: '0',
+      name: 'Some Ingred',
+      description: null,
+      serialize: false,
+    }
 
-  test('container has expected number of wells', () => {
+    labwareTypesById = {
+      FIXED_TRASH_ID: 'trash-box',
+      container1Id: '96-flat',
+      container2Id: '96-deep-well',
+      container3Id: 'tube-rack-2ml',
+    }
+
+    ingredsByLabwareXXSingleIngred = {
+      'container1Id': {
+        '0': {
+          ...baseIngredFields,
+          wells: {
+            A1: {volume: 100},
+            B1: {volume: 150},
+          },
+        },
+      },
+      'container2Id': {},
+      'container3Id': {},
+      'FIXED_TRASH_ID': {},
+    }
+
+    defaultWellContents = {
+      highlighted: false,
+      selected: false,
+    }
+
+    singleIngredResult = getWellContentsAllLabware.resultFunc(
+      labwareTypesById, // all labware types
+      ingredsByLabwareXXSingleIngred,
+      'container1Id', // selected labware id
+      {A1: 'A1', B1: 'B1'}, // selected
+      {A3: 'A3'} // highlighted
+    )
+  })
+
+  test('containers have expected number of wells', () => {
     expect(Object.keys(singleIngredResult.container1Id).length).toEqual(96)
+    expect(Object.keys(singleIngredResult.container2Id).length).toEqual(96)
   })
 
   test('selects well contents of all labware (for Plate props)', () => {
@@ -110,5 +92,16 @@ describe('getWellContentsAllLabware', () => {
         },
       },
     })
+  })
+
+  test('no selected wells when labwareId is not selected', () => {
+    const result = getWellContentsAllLabware.resultFunc(
+      labwareTypesById, // all labware types
+      ingredsByLabwareXXSingleIngred,
+      null, // selected labware id
+      {A1: 'A1', B1: 'B1'}, // selected
+      {A3: 'A3'} // highlighted
+    )
+    expect(result.container1Id.A1.selected).toBe(false)
   })
 })

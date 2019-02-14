@@ -11,12 +11,11 @@ import type {
 import type {BaseState, GetState, ThunkDispatch} from '../../types'
 
 function getNextDisambiguationNumber (state: BaseState, newLabwareType: string): number {
-  const labwareEntities = stepFormSelectors.getLabwareEntities(state)
+  const labwareTypesById = stepFormSelectors.getLabwareTypesById(state)
   const labwareNamesMap = labwareIngredsSelectors.getLabwareNameInfo(state)
-  const allIds = Object.keys(labwareEntities)
+  const allIds = Object.keys(labwareTypesById)
   const sameTypeLabware = allIds.filter(labwareId =>
-    labwareEntities[labwareId] &&
-    labwareEntities[labwareId].type === newLabwareType)
+    labwareTypesById[labwareId] === newLabwareType)
   const disambigNumbers = sameTypeLabware.map(labwareId =>
     (labwareNamesMap[labwareId] &&
     labwareNamesMap[labwareId].disambiguationNumber) || 0)
@@ -43,15 +42,16 @@ export const createContainer = (args: CreateContainerArgs) =>
 export const duplicateLabware = (templateLabwareId: string) =>
   (dispatch: ThunkDispatch<DuplicateLabwareAction>, getState: GetState) => {
     const state = getState()
-    const templateLabwareEntity = stepFormSelectors.getLabwareEntities(state)[templateLabwareId]
-    assert(templateLabwareEntity, `no entity for labware ${templateLabwareId}, cannot run duplicateLabware thunk`)
-    if (!templateLabwareEntity) return
-    dispatch({
-      type: 'DUPLICATE_LABWARE',
-      payload: {
-        duplicateDisambiguationNumber: getNextDisambiguationNumber(state, templateLabwareEntity.type),
-        templateLabwareId,
-        duplicateLabwareId: uuid(),
-      },
-    })
+    const templateLabwareType = stepFormSelectors.getLabwareTypesById(state)[templateLabwareId]
+    assert(templateLabwareType, `no type for labware ${templateLabwareId}, cannot run duplicateLabware thunk`)
+    if (templateLabwareType) {
+      dispatch({
+        type: 'DUPLICATE_LABWARE',
+        payload: {
+          duplicateDisambiguationNumber: getNextDisambiguationNumber(state, templateLabwareType),
+          templateLabwareId,
+          duplicateLabwareId: uuid(),
+        },
+      })
+    }
   }
