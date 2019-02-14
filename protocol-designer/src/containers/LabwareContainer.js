@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-
+import noop from 'lodash/noop'
 import {getLabware, getIsTiprack} from '@opentrons/shared-data'
-import {selectors} from '../labware-ingred/selectors'
+import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
 import {selectors as stepFormSelectors} from '../step-forms'
 import {
   openIngredientSelector,
@@ -48,39 +48,57 @@ type SP = $Diff<Props, {...DP, ...MP}>
 
 function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {slot} = ownProps
-  const container = stepFormSelectors.getContainersBySlot(state)[ownProps.slot]
+  // TODO: Ian 2019-02-14 to enable multiple deck setup steps, this needs to be timeline aware.
+  // For multiple deck setup support, pick by slot without using timeline frame index is a HACK.
   const labwareNames = stepFormSelectors.getLabwareNicknamesById(state)
-
-  const containerType = container && container.type
-  const containerId = container && container.id
-  const containerName = containerId && labwareNames[containerId]
-
-  const selectedContainer = stepFormSelectors.getSelectedLabware(state)
-  const isSelectedSlot = !!(selectedContainer && selectedContainer.slot === slot)
-
+  const initialLabware = stepFormSelectors.getInitialDeckSetup(state).labware
+  const selectedLabwareId = labwareIngredSelectors.getSelectedLabwareId(state)
   const selectedTerminalItem = stepsSelectors.getSelectedTerminalItemId(state)
-  const labwareHasName = container && selectors.getSavedLabware(state)[containerId]
-  const isTiprack = getIsTiprack(containerType)
-  const showNameOverlay = container && !isTiprack && !labwareHasName
+  const addLabwareMode = labwareIngredSelectors.getLabwareSelectionMode(state)
 
-  const slotHasLabware = !!containerType
-  const addLabwareMode = selectors.getLabwareSelectionMode(state)
+  const labwareId = Object.keys(initialLabware).find(id => initialLabware[id].slot === slot)
 
-  const setDefaultLabwareName = () => renameLabware({
-    labwareId: containerId,
-    name: null,
-  })
+  if (labwareId == null) {
+    // TODO: Ian 2019-02-14 this should be easier to null out, since
+    // it's totally valid for LabwareOnDeck to have no labware in its slot!
+    return {
+      slot,
+      showNameOverlay: false,
+      selectedTerminalItem,
+      isTiprack: false,
+      slotHasLabware: false,
+      containerId: '',
+      containerName: null,
+      containerType: '',
+      canAddIngreds: false,
+      addLabwareMode,
+      highlighted: false,
+    }
+  }
+  const isSelectedSlot = selectedLabwareId === labwareId
+
+  const labwareOnDeck: ?* = initialLabware[labwareId]
+  const labwareType = labwareOnDeck && labwareOnDeck.type
+  const isTiprack = labwareType ? getIsTiprack(labwareType) : false
+
+  const containerName = labwareNames[labwareId]
+  const labwareHasName = labwareIngredSelectors.getSavedLabware(state)[labwareId]
+  const showNameOverlay = !isTiprack && !labwareHasName
+
+  const setDefaultLabwareName = labwareId != null
+    ? () => renameLabware({labwareId, name: null})
+    : noop
 
   // labware definition's metadata.isValidSource defaults to true,
   // only use it when it is defined as false
   let canAddIngreds: boolean = !showNameOverlay
-  const labwareInfo = getLabware(containerType)
+  const labwareInfo = labwareType ? getLabware(labwareType) : null
   if (!labwareInfo || labwareInfo.metadata.isValidSource === false) {
     canAddIngreds = false
   }
 
   return {
-    slotHasLabware,
+    slotHasLabware: true,
     addLabwareMode,
     setDefaultLabwareName,
     canAddIngreds,
@@ -91,15 +109,16 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     highlighted: selectedTerminalItem === START_TERMINAL_ITEM_ID
     // in deckSetupMode, labware is highlighted when selected (currently editing ingredients)
     // or when targeted by an open "Add Labware" modal
-      ? (isSelectedSlot || selectors.selectedAddLabwareSlot(state) === slot)
+      ? (isSelectedSlot || labwareIngredSelectors.selectedAddLabwareSlot(state) === slot)
     // outside of deckSetupMode, labware is highlighted when step/substep is hovered
-      : stepsSelectors.getHoveredStepLabware(state).includes(containerId),
+      : stepsSelectors.getHoveredStepLabware(state).includes(labwareId),
     selectedTerminalItem,
 
     slot,
     containerName,
-    containerType,
-    containerId,
+    // TODO: Ian 2019-02-14 this fallback to '' is weird
+    containerType: labwareType || '',
+    containerId: labwareId,
   }
 }
 
@@ -107,25 +126,26 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}, own
   const {slot} = ownProps
   const {dispatch} = dispatchProps
   const {containerId, containerName, containerType} = stateProps
+  const labwareId = containerId // TODO Ian 2019-02-14 rename the prop
 
   const actions = {
     addLabware: () => dispatch(openAddLabwareModal({slot})),
-    editLiquids: () => dispatch(openIngredientSelector(containerId)),
+    editLiquids: () => dispatch(openIngredientSelector(labwareId)),
     deleteLabware: () => (
       window.confirm(`Are you sure you want to permanently delete ${containerName || containerType} in slot ${slot}?`) &&
-      dispatch(deleteContainer({containerId, slot, containerType}))
+      dispatch(deleteContainer({labwareId}))
     ),
-    drillDown: () => dispatch(drillDownOnLabware(containerId)),
+    drillDown: () => dispatch(drillDownOnLabware(labwareId)),
     drillUp: () => dispatch(drillUpFromLabware()),
     duplicateLabware: (id) => dispatch(duplicateLabware(id)),
     swapSlotContents: (sourceSlot, destSlot) => dispatch(swapSlotContents(sourceSlot, destSlot)),
 
     setLabwareName: (name: ?string) => dispatch(renameLabware({
-      labwareId: containerId,
+      labwareId,
       name,
     })),
     setDefaultLabwareName: () => dispatch(renameLabware({
-      labwareId: containerId,
+      labwareId,
       name: null,
     })),
   }

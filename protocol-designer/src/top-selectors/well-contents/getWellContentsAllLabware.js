@@ -58,15 +58,15 @@ const _getWellContents = (
 const getWellContentsAllLabware: Selector<WellContentsByLabware> = createSelector(
   stepFormSelectors.getLabwareById,
   labwareIngredSelectors.getLiquidsByLabwareId,
-  stepFormSelectors.getSelectedLabware,
+  labwareIngredSelectors.getSelectedLabwareId,
   wellSelectionSelectors.getSelectedWells,
   wellSelectionSelectors.getHighlightedWells,
-  (labwareById, liquidsByLabware, selectedLabware, selectedWells, highlightedWells) => {
+  (labwareById, liquidsByLabware, selectedLabwareId, selectedWells, highlightedWells) => {
     const allLabwareIds: Array<string> = Object.keys(labwareById) // TODO Ian 2018-05-29 weird flow error w/o annotation
 
     return allLabwareIds.reduce((acc: {[labwareId: string]: ContentsByWell | null}, labwareId: string) => {
       const liquidsForLabware = liquidsByLabware[labwareId]
-      const isSelectedLabware = selectedLabware && (selectedLabware.id === labwareId)
+      const isSelectedLabware = selectedLabwareId === labwareId
 
       // Skip labware ids with no liquids
       return {

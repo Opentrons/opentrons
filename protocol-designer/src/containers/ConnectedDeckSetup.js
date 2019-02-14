@@ -16,10 +16,9 @@ import LabwareSelectionModal from '../components/LabwareSelectionModal'
 import StepEditForm from '../components/StepEditForm'
 import TimelineAlerts from '../components/alerts/TimelineAlerts'
 
-import {selectors} from '../labware-ingred/selectors'
+import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
 import * as labwareIngredActions from '../labware-ingred/actions'
 import {START_TERMINAL_ITEM_ID, type TerminalItemId} from '../steplist'
-import {selectors as stepFormSelectors} from '../step-forms'
 import {selectors as stepsSelectors} from '../ui/steps'
 
 import type {BaseState, ThunkDispatch} from '../types'
@@ -41,8 +40,8 @@ type Props = {
 
 const mapStateToProps = (state: BaseState): StateProps => ({
   selectedTerminalItemId: stepsSelectors.getSelectedTerminalItemId(state),
-  ingredSelectionMode: Boolean(stepFormSelectors.getSelectedLabware(state)),
-  drilledDown: !!selectors.getDrillDownLabwareId(state),
+  ingredSelectionMode: labwareIngredSelectors.getSelectedLabwareId(state) != null,
+  drilledDown: labwareIngredSelectors.getDrillDownLabwareId(state) != null,
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DispatchProps => ({

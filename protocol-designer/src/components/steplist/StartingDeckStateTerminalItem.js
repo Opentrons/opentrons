@@ -29,7 +29,7 @@ function StartingDeckStateTerminalItem (props: Props) {
 
 function mapStateToProps (state: BaseState): Props {
   // since default-trash counts as 1, labwareCount <= 1 means "user did not add labware"
-  const noLabware = Object.keys(stepFormSelectors.getLabwareById(state)).length <= 1
+  const noLabware = Object.keys(stepFormSelectors.getLabwareEntities(state)).length <= 1
   return {showHint: noLabware}
 }
 

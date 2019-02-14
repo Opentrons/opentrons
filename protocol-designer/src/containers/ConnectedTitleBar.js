@@ -43,17 +43,18 @@ function TitleWithIcon (props: TitleWithIconProps) {
 }
 
 function mapStateToProps (state: BaseState): SP {
-  const selectedLabware = stepFormSelectors.getSelectedLabware(state)
+  const selectedLabwareId = labwareIngredSelectors.getSelectedLabwareId(state)
   const _page = selectors.getCurrentPage(state)
   const fileName = fileDataSelectors.protocolName(state)
   const selectedStep = stepsSelectors.getSelectedStep(state)
   const selectedTerminalId = stepsSelectors.getSelectedTerminalItemId(state)
-  const labware = selectedLabware
   const labwareNames = stepFormSelectors.getLabwareNicknamesById(state)
-  const labwareNickname = labware && labware.id && labwareNames[labware.id]
   const drilledDownLabwareId = labwareIngredSelectors.getDrillDownLabwareId(state)
-  const liquidPlacementMode = Boolean(selectedLabware)
   const wellSelectionLabwareKey = stepsSelectors.getWellSelectionLabwareKey(state)
+
+  const labwareNickname = selectedLabwareId != null && labwareNames[selectedLabwareId]
+  const labwareType = selectedLabwareId != null && stepFormSelectors.getLabwareTypes(state)[selectedLabwareId]
+  const liquidPlacementMode = selectedLabwareId != null
 
   switch (_page) {
     case 'liquids':
@@ -74,8 +75,8 @@ function mapStateToProps (state: BaseState): SP {
         return {
           _page,
           _liquidPlacementMode: liquidPlacementMode,
-          title: labwareNickname || null,
-          subtitle: labware && humanizeLabwareType(labware.type),
+          title: labwareNickname,
+          subtitle: labwareType,
           backButtonLabel: 'Deck',
         }
       }
@@ -88,9 +89,10 @@ function mapStateToProps (state: BaseState): SP {
         subtitle = END_TERMINAL_TITLE
         if (drilledDownLabwareId) {
           backButtonLabel = 'Deck'
-          const drilledDownLabware = stepFormSelectors.getLabwareById(state)[drilledDownLabwareId]
-          title = drilledDownLabware && drilledDownLabware.nickname
-          subtitle = drilledDownLabware && humanizeLabwareType(drilledDownLabware.type)
+          const labwareEntity = stepFormSelectors.getLabwareEntities(state)[drilledDownLabwareId]
+          const displayLabware = labwareIngredSelectors.getLabwareNameInfo(state)[drilledDownLabwareId]
+          title = displayLabware && displayLabware.nickname
+          subtitle = labwareEntity && humanizeLabwareType(labwareEntity.type)
         }
       } else if (selectedStep) {
         if (wellSelectionLabwareKey) { // well selection modal

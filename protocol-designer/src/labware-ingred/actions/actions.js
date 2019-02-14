@@ -64,9 +64,7 @@ export type CreateContainerAction = {
 export type DeleteContainerAction = {
   type: 'DELETE_CONTAINER',
   payload: {
-    containerId: string,
-    slot: DeckSlot,
-    containerType: string,
+    labwareId: string,
   },
 }
 export const deleteContainer = createAction(

@@ -45,6 +45,7 @@ const selectedWells = handleActions({
   SET_WELL_CONTENTS: () => selectedWellsInitialState,
 }, selectedWellsInitialState)
 
+// TODO IMMEDIATELY address or ticket this
 // TODO: BC 2018-11-01 unused, remove and all references to the actions
 type WellSelectionModalState = OpenWellSelectionModalPayload | null
 const wellSelectionModal = handleActions({

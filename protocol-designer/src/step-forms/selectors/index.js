@@ -23,7 +23,7 @@ import {labwareToDisplayName} from '../../labware-ingred/utils'
 import type {FormWarning} from '../../steplist/formLevel'
 import type {BaseState, Selector, Options} from '../../types'
 import type {FormData, StepIdType, StepType} from '../../form-types'
-import type {Labware, LabwareTypeById} from '../../labware-ingred/types'
+import type {LabwareTypeById} from '../../labware-ingred/types'
 import type {
   StepArgsAndErrors,
   StepFormAndFieldErrors,
@@ -33,6 +33,7 @@ import type {
 import type {
   InitialDeckSetup,
   LabwareEntities,
+  LabwareEntity,
   LabwareOnDeck,
   PipetteEntities,
   PipetteOnDeck,
@@ -74,11 +75,7 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   }
 )
 
-// TODO: Ian 2019-01-24 this selector needs info from the labware atoms's
-// `containers` reducer as well as stepForms,
-// so it probably doesn't belong in step-forms/...
-// Also, the `Labware` type should probably be deprecated later on
-// $FlowFixMe I think it's a flow bug?
+// TODO IMMEDIATELY: remove!!!
 export const getLabwareById: Selector<{[labwareId: string]: ?Labware}> = createSelector(
   getInitialDeckSetup,
   state => state.labwareIngred.containers, // HACK to avoid circular dependency
@@ -98,19 +95,22 @@ export const getLabwareById: Selector<{[labwareId: string]: ?Labware}> = createS
     })
 )
 
+// $FlowFixMe TODO IMMEDIATELY
 export const getLabwareNicknamesById: Selector<{[labwareId: string]: string}> = createSelector(
-  getLabwareById,
-  (labwareById) => mapValues(
-    labwareById,
-    labwareToDisplayName,
+  getLabwareEntities,
+  state => state.labwareIngred.containers, // TODO IMMEDIATELY: move this selector to ui and use real labwareIngred selector
+  (labwareEntities, displayLabware) => mapValues(
+    labwareEntities,
+    (labwareEntity: LabwareEntity, id: string) =>
+      labwareToDisplayName(displayLabware[id], labwareEntity.type),
   )
 )
 
 /** Returns options for disposal (e.g. fixed trash and trash box) */
 export const getDisposalLabwareOptions: Selector<Options> = createSelector(
-  getLabwareById,
+  getLabwareEntities,
   getLabwareNicknamesById,
-  (labwareById, names) => reduce(labwareById, (acc: Options, labware: Labware, labwareId): Options => {
+  (labwareById, names) => reduce(labwareById, (acc: Options, labware: LabwareEntity, labwareId): Options => {
     if (!labware.type || !DISPOSAL_LABWARE_TYPES.includes(labware.type)) {
       return acc
     }
@@ -124,54 +124,31 @@ export const getDisposalLabwareOptions: Selector<Options> = createSelector(
   }, [])
 )
 
-/** Returns options for dropdowns, excluding tiprack labware */
-export const getLabwareOptions: Selector<Options> = createSelector(
-  getLabwareById,
-  getLabwareNicknamesById,
-  (labwareById, names) => reduce(labwareById, (acc: Options, labware: Labware, labwareId): Options => {
-    const isTiprack = getIsTiprack(labware.type)
-    if (!labware.type || isTiprack) {
-      return acc
-    }
-    return [
-      ...acc,
-      {
-        name: names[labwareId],
-        value: labwareId,
-      },
-    ]
-  }, [])
-)
-
+// TODO IMMEDIATELY use this instead of getLabwareEntities where it's only used to get the type!
 export const getLabwareTypes: Selector<LabwareTypeById> = createSelector(
-  getLabwareById,
-  (labwareById) => mapValues(
-    labwareById,
-    (labware: Labware) => labware.type
+  getLabwareEntities,
+  (labwareEntities) => mapValues(
+    labwareEntities,
+    (labware: LabwareEntity) => labware.type
   )
 )
 
-// TODO: Ian 2019-01-24 this selector needs info from the labware atoms's
-// `containers` reducer as well as stepForms,
-// so it probably doesn't belong in step-forms/...
-export const getSelectedLabware: Selector<?Labware> = createSelector(
-  state => state.labwareIngred.selectedContainerId, // HACK to avoid circular dependency
-  getLabwareById,
-  (selectedLabwareId, labware) =>
-    (selectedLabwareId && labware[selectedLabwareId]) || null
-)
-
-type ContainersBySlot = {[DeckSlot]: {...Labware, containerId: string}}
-export const getContainersBySlot: Selector<ContainersBySlot> = createSelector(
-  getLabwareById,
-  containers => reduce(
-    containers,
-    (acc: ContainersBySlot, containerObj: Labware, containerId: string) => ({
-      ...acc,
-      // NOTE: containerId added in so you still have a reference
-      [containerObj.slot]: {...containerObj, containerId},
-    }),
-    {})
+// TODO IMMEDIATELY move out to ui or something?
+/** Returns options for dropdowns, excluding tiprack labware */
+export const getLabwareOptions: Selector<Options> = createSelector(
+  getLabwareTypes,
+  getLabwareNicknamesById,
+  (labwareTypesById, nicknamesById) => reduce(labwareTypesById, (acc: Options, labwareType: string, labwareId): Options => {
+    return getIsTiprack(labwareType)
+      ? acc
+      : [
+        ...acc,
+        {
+          name: nicknamesById[labwareId],
+          value: labwareId,
+        },
+      ]
+  }, [])
 )
 
 export const getPermittedTipracks: Selector<Array<string>> = createSelector(

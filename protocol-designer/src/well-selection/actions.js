@@ -42,6 +42,10 @@ export type OpenWellSelectionModalPayload = {
   pipetteChannels?: ?Channels,
   labwareName?: string,
 }
+export type OpenWellSelectionModalAction = {
+  type: 'OPEN_WELL_SELECTION_MODAL',
+  payload: OpenWellSelectionModalPayload,
+}
 
 function _wellArrayToObj (wells: ?Array<string>): Wells {
   if (!wells) {
@@ -70,7 +74,7 @@ export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload) =
       stepFormSelectors.getPipetteEntities(state)[payload.pipetteId]
     ) || null
 
-    const labware = stepFormSelectors.getLabwareById(state)
+    // const labware = stepFormSelectors.getLabwareById(state)
     // TODO type this action, make an underline fn action creator
 
     dispatch({
@@ -78,7 +82,7 @@ export const openWellSelectionModal = (payload: OpenWellSelectionModalPayload) =
       payload: {
         ...payload,
         pipetteChannels: pipette && pipette.spec.channels,
-        labwareName: labware && labware[payload.labwareId] && labware[payload.labwareId].type,
+        labwareName: 'TODO IMMEDIATELY labwareName', // labware && labware[payload.labwareId] && labware[payload.labwareId].type,
       },
     })
   }

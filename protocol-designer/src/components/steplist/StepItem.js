@@ -10,7 +10,6 @@ import PauseStepItems from './PauseStepItems'
 import StepDescription from '../StepDescription'
 import {stepIconsByType} from '../../form-types'
 import type {FormData, StepIdType, StepType} from '../../form-types'
-import type {Labware} from '../../labware-ingred/types'
 import type {
   SubstepIdentifier,
   SubstepItemData,
@@ -33,7 +32,8 @@ type StepItemProps = {
   hoveredSubstep: ?SubstepIdentifier,
   ingredNames: WellIngredientNames,
 
-  labwareById: {[labwareId: string]: ?Labware},
+  labwareNicknamesById: {[labwareId: string]: ?string},
+  labwareTypesById: {[labwareId: string]: ?string},
   highlightSubstep: SubstepIdentifier => mixed,
   selectStep: (stepId: StepIdType) => mixed,
   onStepContextMenu?: (event?: SyntheticEvent<>) => mixed,
@@ -90,7 +90,8 @@ function getStepItemContents (stepItemProps: StepItemProps) {
     rawForm,
     stepType,
     substeps,
-    labwareById,
+    labwareNicknamesById,
+    labwareTypesById,
     hoveredSubstep,
     highlightSubstep,
     ingredNames,
@@ -99,9 +100,6 @@ function getStepItemContents (stepItemProps: StepItemProps) {
   if (!rawForm) {
     return null
   }
-
-  const getLabware = (labwareId: ?string) =>
-    labwareId != null ? labwareById[labwareId] : null
 
   // pause substep component uses the delay args directly
   if (substeps && substeps.commandCreatorFnName === 'delay') {
@@ -112,18 +110,26 @@ function getStepItemContents (stepItemProps: StepItemProps) {
 
   // headers
   if (stepType === 'moveLiquid') {
-    const sourceLabware = getLabware(rawForm['aspirate_labware'])
-    const destLabware = getLabware(rawForm['dispense_labware'])
+    const sourceLabwareId = rawForm['aspirate_labware']
+    const destLabwareId = rawForm['dispense_labware']
 
-    result.push(<AspirateDispenseHeader key='moveLiquid-header' {...{sourceLabware, destLabware}} />)
+    result.push(<AspirateDispenseHeader
+      key='moveLiquid-header'
+      sourceLabwareNickname={labwareNicknamesById[sourceLabwareId]}
+      sourceLabwareType={labwareTypesById[sourceLabwareId]}
+      destLabwareNickname={labwareNicknamesById[destLabwareId]}
+      destLabwareType={labwareTypesById[destLabwareId]}
+    />)
   }
 
   if (stepType === 'mix') {
+    const mixLabwareId = rawForm['labware']
     result.push(
       <MixHeader key='mix-header'
         volume={rawForm.volume}
         times={rawForm.times}
-        labware={getLabware(rawForm.labware)}
+        labwareNickname={labwareNicknamesById[mixLabwareId]}
+        labwareType={labwareTypesById[mixLabwareId]}
       />
     )
   }

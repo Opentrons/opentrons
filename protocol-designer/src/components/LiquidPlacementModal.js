@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import * as React from 'react'
 import {connect} from 'react-redux'
 import type {Dispatch} from 'redux'
@@ -74,10 +75,10 @@ class LiquidPlacementModal extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: BaseState): SP => {
-  const containerId = selectors.getSelectedLabwareId(state)
+  const labwareId = selectors.getSelectedLabwareId(state)
   const selectedWells = wellSelectionSelectors.getSelectedWells(state)
-  if (containerId == null) {
-    console.error('LiquidPlacementModal: No labware is selected, and no labwareId was given to LiquidPlacementModal')
+  if (labwareId == null) {
+    assert(false, 'LiquidPlacementModal: No labware is selected, and no labwareId was given to LiquidPlacementModal')
     return {
       selectedWells: {},
       wellContents: {},
@@ -86,11 +87,11 @@ const mapStateToProps = (state: BaseState): SP => {
     }
   }
 
-  const labware = stepFormSelectors.getLabwareById(state)[containerId]
+  const labware = stepFormSelectors.getLabwareEntities(state)[labwareId]
   let wellContents: ContentsByWell = {}
 
   // selection for deck setup: shows initial state of liquids
-  wellContents = wellContentsSelectors.getWellContentsAllLabware(state)[containerId]
+  wellContents = wellContentsSelectors.getWellContentsAllLabware(state)[labwareId]
 
   return {
     selectedWells,

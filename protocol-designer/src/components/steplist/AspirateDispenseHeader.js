@@ -5,17 +5,22 @@ import {Icon, HoverTooltip} from '@opentrons/components'
 import {PDListItem} from '../lists'
 import styles from './StepItem.css'
 import LabwareTooltipContents from './LabwareTooltipContents'
-import type {Labware} from '../../labware-ingred/types'
-import {labwareToDisplayName} from '../../labware-ingred/utils'
 import {Portal} from './TooltipPortal'
 
 type AspirateDispenseHeaderProps = {
-  sourceLabware: ?Labware,
-  destLabware: ?Labware,
+  sourceLabwareNickname: ?string,
+  sourceLabwareType: ?string,
+  destLabwareNickname: ?string,
+  destLabwareType: ?string,
 }
 
 function AspirateDispenseHeader (props: AspirateDispenseHeaderProps) {
-  const {sourceLabware, destLabware} = props
+  const {
+    sourceLabwareNickname,
+    sourceLabwareType,
+    destLabwareNickname,
+    destLabwareType,
+  } = props
 
   return (
     <React.Fragment>
@@ -28,10 +33,14 @@ function AspirateDispenseHeader (props: AspirateDispenseHeaderProps) {
       <PDListItem className={cx(styles.step_subitem_column_header, styles.emphasized_cell)}>
         <HoverTooltip
           portal={Portal}
-          tooltipComponent={<LabwareTooltipContents labware={sourceLabware} />}>
+          tooltipComponent={(
+            <LabwareTooltipContents
+              labwareNickname={sourceLabwareNickname}
+              labwareType={sourceLabwareType} />
+          )}>
           {(hoverTooltipHandlers) => (
             <span {...hoverTooltipHandlers} className={styles.labware_display_name}>
-              {sourceLabware && labwareToDisplayName(sourceLabware)}
+              {sourceLabwareNickname}
             </span>
           )}
         </HoverTooltip>
@@ -39,10 +48,14 @@ function AspirateDispenseHeader (props: AspirateDispenseHeaderProps) {
         <Icon name='ot-transfer' />
         <HoverTooltip
           portal={Portal}
-          tooltipComponent={<LabwareTooltipContents labware={destLabware} />}>
+          tooltipComponent={(
+            <LabwareTooltipContents
+              labwareNickname={destLabwareNickname}
+              labwareType={destLabwareType} />
+          )}>
           {(hoverTooltipHandlers) => (
             <span {...hoverTooltipHandlers} className={styles.labware_display_name}>
-              {destLabware && labwareToDisplayName(destLabware)}
+              {destLabwareNickname}
             </span>
           )}
         </HoverTooltip>

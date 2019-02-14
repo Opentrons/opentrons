@@ -1,8 +1,7 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {selectors} from '../labware-ingred/selectors'
-import {selectors as stepFormSelectors} from '../step-forms'
+import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
 import * as wellSelectionSelectors from '../top-selectors/well-contents'
 import {removeWellsContents} from '../labware-ingred/actions'
 import type {Dispatch} from 'redux'
@@ -19,15 +18,18 @@ type DP = {
 type SP = $Diff<Props, DP> & {_labwareId: ?string}
 
 function mapStateToProps (state: BaseState): SP {
-  const container = stepFormSelectors.getSelectedLabware(state)
-  const _labwareId = container && container.id
+  const selectedLabwareId = labwareIngredSelectors.getSelectedLabwareId(state)
+  const labwareWellContents = (
+    selectedLabwareId &&
+    labwareIngredSelectors.getLiquidsByLabwareId(state)[selectedLabwareId]
+  ) || {}
 
   return {
-    liquidGroupsById: selectors.getLiquidGroupsById(state),
-    labwareWellContents: (container && selectors.getLiquidsByLabwareId(state)[container.id]) || {},
+    liquidGroupsById: labwareIngredSelectors.getLiquidGroupsById(state),
+    labwareWellContents,
     selectedIngredientGroupId: wellSelectionSelectors.getSelectedWellsCommonIngredId(state),
     selected: false,
-    _labwareId,
+    _labwareId: selectedLabwareId,
   }
 }
 
