@@ -9,7 +9,7 @@ import type {PipetteEntities} from '../../step-forms'
 import type {FormPatch} from '../../steplist/actions'
 import type {ProtocolFile, FileLabware, FilePipette} from '../../file-types'
 
-const PRESENT_MIGRATION_VERSION = 1
+export const PRESENT_MIGRATION_VERSION = 1
 
 // NOTE: these constants are copied here because
 // the default-values key did not exist for most protocols
@@ -243,7 +243,7 @@ export function updateMigrationVersion (fileData: ProtocolFile): ProtocolFile {
   }
 }
 
-export default function migrateFile (fileData: any): ProtocolFile {
+export function migrateFile (fileData: any): ProtocolFile {
   const {migrationVersion} = fileData['designer-application']
   if (migrationVersion && migrationVersion >= PRESENT_MIGRATION_VERSION) {
     return fileData
@@ -257,4 +257,9 @@ export default function migrateFile (fileData: any): ProtocolFile {
     ])(fileData)
     return migratedFile
   }
+}
+
+export default {
+  version: PRESENT_MIGRATION_VERSION,
+  migrateFile,
 }
