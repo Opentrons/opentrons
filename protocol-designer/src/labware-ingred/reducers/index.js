@@ -22,9 +22,6 @@ import type {
   SetWellContentsAction,
 } from '../actions'
 
-// external actions (for types)
-import type {OpenWellSelectionModalAction} from '../../well-selection/actions'
-
 // REDUCERS
 
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
@@ -40,10 +37,6 @@ export type SelectedContainerId = ?string
 const selectedContainerId = handleActions({
   OPEN_INGREDIENT_SELECTOR: (state, action: ActionType<typeof actions.openIngredientSelector>): SelectedContainerId => action.payload,
   CLOSE_INGREDIENT_SELECTOR: (state, action: ActionType<typeof actions.closeIngredientSelector>): SelectedContainerId => null,
-  // TODO IMMEDIATELY is this needed? If not, remove the action.
-  OPEN_WELL_SELECTION_MODAL: (state, action: OpenWellSelectionModalAction): SelectedContainerId =>
-    action.payload.labwareId,
-  CLOSE_WELL_SELECTION_MODAL: (): SelectedContainerId => null,
 }, null)
 
 export type DrillDownLabwareId = ?string
