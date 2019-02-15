@@ -15,7 +15,7 @@ import type {ResetState} from './reset'
 import type {SettingsState} from './settings'
 import type {NetworkingState} from './networking'
 
-type RobotApiState = {|
+export type RobotApiState = {|
   ...HealthState,
   ...PipettesState,
   ...ModulesState,
@@ -34,7 +34,10 @@ export default function apiReducer (
   switch (action.type) {
     case 'api:REQUEST': {
       const {request} = action.payload
-      const {name, path, stateByName, stateByPath} = getUpdateInfo(state, action)
+      const {name, path, stateByName, stateByPath} = getUpdateInfo(
+        state,
+        action
+      )
 
       return {
         ...state,
@@ -47,7 +50,10 @@ export default function apiReducer (
 
     case 'api:SUCCESS': {
       const {response} = action.payload
-      const {name, path, stateByName, stateByPath} = getUpdateInfo(state, action)
+      const {name, path, stateByName, stateByPath} = getUpdateInfo(
+        state,
+        action
+      )
 
       return {
         ...state,
@@ -60,7 +66,10 @@ export default function apiReducer (
 
     case 'api:FAILURE': {
       const {error} = action.payload
-      const {name, path, stateByName, stateByPath} = getUpdateInfo(state, action)
+      const {name, path, stateByName, stateByPath} = getUpdateInfo(
+        state,
+        action
+      )
       if (!stateByPath || !stateByPath.inProgress) return state
 
       return {
@@ -73,13 +82,21 @@ export default function apiReducer (
     }
 
     case 'api:CLEAR_RESPONSE': {
-      const {name, path, stateByName, stateByPath} = getUpdateInfo(state, action)
+      const {name, path, stateByName, stateByPath} = getUpdateInfo(
+        state,
+        action
+      )
 
       return {
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, response: null, inProgress: false, error: null},
+          [path]: {
+            ...stateByPath,
+            response: null,
+            inProgress: false,
+            error: null,
+          },
         },
       }
     }
@@ -113,7 +130,10 @@ export function getRobotApiState (
 }
 
 function getUpdateInfo (state: ApiState, action: *): * {
-  const {path, robot: {name}} = action.payload
+  const {
+    path,
+    robot: {name},
+  } = action.payload
   const stateByName = state[name] || {}
   // $FlowFixMe: type RobotApiState properly
   const stateByPath = stateByName[path] || {}

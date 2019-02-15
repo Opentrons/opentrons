@@ -10,13 +10,27 @@ import {
   getProtocolContents,
 } from '../protocol'
 
+import {
+  getConnectedRobot,
+  getRobotApiVersion,
+  getRobotFirmwareVersion,
+} from '../discovery'
+
+import {
+  getRobotApiState,
+  getSettingsRequest,
+  getPipettesRequest,
+} from '../http-api-client'
+
 import hash from './hash'
 
 import type {OutputSelector} from 'reselect'
 import type {State} from '../types'
-import type {ProtocolAnalyticsData} from './types'
+import type {ProtocolAnalyticsData, RobotAnalyticsData} from './types'
 
 type ProtocolDataSelector = OutputSelector<State, void, ProtocolAnalyticsData>
+
+export const FF_PREFIX = 'robotFF_'
 
 const _getUnhashedProtocolAnalyticsData: ProtocolDataSelector = createSelector(
   getProtocolType,
@@ -49,4 +63,39 @@ export function getProtocolAnalyticsData (
 
     return {...data, protocolAuthor, protocolText}
   })
+}
+
+export function getRobotAnalyticsData (state: State): RobotAnalyticsData | null {
+  const robot = getConnectedRobot(state)
+
+  if (robot) {
+    const api = getRobotApiState(state, robot)
+    const settingsRequest = getSettingsRequest(api)
+    const pipettesRequest = getPipettesRequest(api)
+    const settings = settingsRequest.response
+      ? settingsRequest.response.settings
+      : []
+
+    const pipettes = pipettesRequest.response
+      ? {
+        left: pipettesRequest.response.left.model,
+        right: pipettesRequest.response.right.model,
+      }
+      : {left: null, right: null}
+
+    return settings.reduce(
+      (result, setting) => ({
+        ...result,
+        [`${FF_PREFIX}${setting.id}`]: !!setting.value,
+      }),
+      {
+        robotApiServerVersion: getRobotApiVersion(robot) || '',
+        robotSmoothieVersion: getRobotFirmwareVersion(robot) || '',
+        robotLeftPipette: pipettes.left || '',
+        robotRightPipette: pipettes.right || '',
+      }
+    )
+  }
+
+  return null
 }

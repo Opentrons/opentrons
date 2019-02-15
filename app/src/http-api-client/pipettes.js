@@ -10,6 +10,7 @@ import type {OutputSelector} from 'reselect'
 import type {State, ThunkPromiseAction} from '../types'
 import type {BaseRobot, RobotService} from '../robot'
 import type {ApiCall, ApiRequestError} from './types'
+import type {RobotApiState} from './reducer'
 import type {ApiAction} from './actions'
 import type {MotorAxis} from './motors'
 
@@ -44,7 +45,7 @@ export function fetchPipettes (
   let path = PIPETTES
   if (refresh) path += '?refresh=true'
 
-  return (dispatch) => {
+  return dispatch => {
     dispatch(apiRequest(robot, path, null))
 
     return client(robot, 'GET', path)
@@ -57,10 +58,16 @@ export function fetchPipettes (
 }
 
 export const makeGetRobotPipettes = () => {
-  const selector: OutputSelector<State, BaseRobot, RobotPipettes> = createSelector(
-    getRobotApiState,
-    (state) => state[PIPETTES] || {inProgress: false}
-  )
+  const selector: OutputSelector<State,
+    BaseRobot,
+    RobotPipettes> = createSelector(
+      getRobotApiState,
+      getPipettesRequest
+    )
 
   return selector
+}
+
+export function getPipettesRequest (state: RobotApiState): RobotPipettes {
+  return state[PIPETTES] || {inProgress: false}
 }
