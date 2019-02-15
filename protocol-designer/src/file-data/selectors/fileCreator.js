@@ -4,7 +4,7 @@ import mapValues from 'lodash/mapValues'
 import {getFlowRateDefaultsAllPipettes} from '@opentrons/shared-data'
 import {getFileMetadata} from './fileFields'
 import {getInitialRobotState, getRobotStateTimeline} from './commands'
-import {MOST_RECENT_MIGRATION_VERSION} from '../../load-file/migration'
+import {LATEST_MIGRATION_VERSION} from '../../load-file/migration'
 import {selectors as dismissSelectors} from '../../dismiss'
 import {selectors as ingredSelectors} from '../../labware-ingred/selectors'
 import {selectors as stepFormSelectors} from '../../step-forms'
@@ -108,7 +108,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
       'designer-application': {
         'application-name': 'opentrons/protocol-designer',
         'application-version': applicationVersion,
-        migrationVersion: MOST_RECENT_MIGRATION_VERSION,
+        migrationVersion: LATEST_MIGRATION_VERSION,
         _internalAppBuildDate,
         data: {
           pipetteTiprackAssignments: mapValues(
