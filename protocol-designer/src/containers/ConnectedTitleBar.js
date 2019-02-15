@@ -53,8 +53,8 @@ function mapStateToProps (state: BaseState): SP {
   const drilledDownLabwareId = labwareIngredSelectors.getDrillDownLabwareId(state)
   const wellSelectionLabwareKey = stepsSelectors.getWellSelectionLabwareKey(state)
 
-  const labwareNickname = selectedLabwareId != null && labwareNames[selectedLabwareId]
-  const labwareType = selectedLabwareId != null && stepFormSelectors.getLabwareTypesById(state)[selectedLabwareId]
+  const labwareNickname = selectedLabwareId != null ? labwareNames[selectedLabwareId] : null
+  const labwareType = selectedLabwareId != null ? stepFormSelectors.getLabwareTypesById(state)[selectedLabwareId] : null
   const liquidPlacementMode = selectedLabwareId != null
 
   switch (_page) {

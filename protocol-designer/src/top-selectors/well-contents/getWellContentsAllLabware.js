@@ -68,7 +68,6 @@ const getWellContentsAllLabware: Selector<WellContentsByLabware> = createSelecto
     return allLabwareIds.reduce((acc: WellContentsByLabware, labwareId: string) => {
       const liquidsForLabware = liquidsByLabware[labwareId]
       const isSelectedLabware = selectedLabwareId === labwareId
-      console.log({isSelectedLabware, labwareId, selectedLabwareId})
 
       const wellContents = _getWellContents(
         labwareTypesById[labwareId],
