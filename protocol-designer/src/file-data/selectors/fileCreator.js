@@ -7,6 +7,7 @@ import {getInitialRobotState, getRobotStateTimeline} from './commands'
 import {selectors as dismissSelectors} from '../../dismiss'
 import {selectors as ingredSelectors} from '../../labware-ingred/selectors'
 import {selectors as stepFormSelectors} from '../../step-forms'
+import {selectors as uiLabwareSelectors} from '../../ui/labware'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
@@ -43,7 +44,7 @@ export const createFile: BaseState => ProtocolFile = createSelector(
   stepFormSelectors.getSavedStepForms,
   stepFormSelectors.getOrderedStepIds,
   stepFormSelectors.getPipetteEntities,
-  stepFormSelectors.getLabwareNicknamesById,
+  uiLabwareSelectors.getLabwareNicknamesById,
   (
     fileMetadata,
     initialRobotState,

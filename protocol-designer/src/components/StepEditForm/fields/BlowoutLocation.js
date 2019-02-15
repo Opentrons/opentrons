@@ -4,6 +4,7 @@ import {connect} from 'react-redux'
 import {DropdownField, type DropdownOption} from '@opentrons/components'
 import cx from 'classnames'
 import {selectors as stepFormSelectors} from '../../../step-forms'
+import {selectors as uiLabwareSelectors} from '../../../ui/labware'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -27,7 +28,7 @@ const BlowoutLocationDropdownSTP = (state: BaseState, ownProps: BlowoutLocationD
   const unsavedForm = stepFormSelectors.getUnsavedForm(state)
   const {stepType, path} = unsavedForm || {}
 
-  let options = stepFormSelectors.getDisposalLabwareOptions(state)
+  let options = uiLabwareSelectors.getDisposalLabwareOptions(state)
   if (stepType === 'mix') {
     options = [...options, {name: 'Destination Well', value: DEST_WELL_BLOWOUT_DESTINATION}]
   } else if (stepType === 'moveLiquid') {

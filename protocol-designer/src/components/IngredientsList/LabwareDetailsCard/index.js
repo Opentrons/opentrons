@@ -3,6 +3,7 @@ import {connect} from 'react-redux'
 import assert from 'assert'
 import LabwareDetailsCard from './LabwareDetailsCard'
 import {selectors as stepFormSelectors} from '../../../step-forms'
+import {selectors as uiLabwareSelectors} from '../../../ui/labware'
 import {selectors as labwareIngredSelectors} from '../../../labware-ingred/selectors'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import type {ElementProps} from 'react'
@@ -18,7 +19,7 @@ type DP = {
 type SP = $Diff<Props, DP> & {_labwareId?: string}
 
 function mapStateToProps (state: BaseState): SP {
-  const labwareNicknamesById = stepFormSelectors.getLabwareNicknamesById(state)
+  const labwareNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
   const labwareId = labwareIngredSelectors.getSelectedLabwareId(state)
   const labwareType = labwareId && stepFormSelectors.getLabwareTypesById(state)[labwareId]
 

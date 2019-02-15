@@ -8,6 +8,7 @@ import styles from './TitleBar.css'
 import i18n from '../localization'
 import {START_TERMINAL_TITLE, END_TERMINAL_TITLE} from '../constants'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
+import {selectors as uiLabwareSelectors} from '../ui/labware'
 import {selectors as stepFormSelectors} from '../step-forms'
 import {selectors as stepsSelectors, actions as stepsActions} from '../ui/steps'
 import {END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID} from '../steplist'
@@ -48,7 +49,7 @@ function mapStateToProps (state: BaseState): SP {
   const fileName = fileDataSelectors.protocolName(state)
   const selectedStep = stepsSelectors.getSelectedStep(state)
   const selectedTerminalId = stepsSelectors.getSelectedTerminalItemId(state)
-  const labwareNames = stepFormSelectors.getLabwareNicknamesById(state)
+  const labwareNames = uiLabwareSelectors.getLabwareNicknamesById(state)
   const drilledDownLabwareId = labwareIngredSelectors.getDrillDownLabwareId(state)
   const wellSelectionLabwareKey = stepsSelectors.getWellSelectionLabwareKey(state)
 
@@ -90,8 +91,8 @@ function mapStateToProps (state: BaseState): SP {
         if (drilledDownLabwareId) {
           backButtonLabel = 'Deck'
           const labwareType = stepFormSelectors.getLabwareTypesById(state)[drilledDownLabwareId]
-          const displayLabware = labwareIngredSelectors.getLabwareNameInfo(state)[drilledDownLabwareId]
-          title = displayLabware && displayLabware.nickname
+          const nickname = uiLabwareSelectors.getLabwareNicknamesById(state)[drilledDownLabwareId]
+          title = nickname
           subtitle = labwareType && humanizeLabwareType(labwareType)
         }
       } else if (selectedStep) {

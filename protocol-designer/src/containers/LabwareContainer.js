@@ -4,6 +4,7 @@ import {connect} from 'react-redux'
 import noop from 'lodash/noop'
 import {getLabware, getIsTiprack} from '@opentrons/shared-data'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
+import {selectors as uiLabwareSelectors} from '../ui/labware'
 import {selectors as stepFormSelectors} from '../step-forms'
 import {
   openIngredientSelector,
@@ -50,7 +51,7 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const {slot} = ownProps
   // TODO: Ian 2019-02-14 to enable multiple deck setup steps, this needs to be timeline aware.
   // For multiple deck setup support, pick by slot without using timeline frame index is a HACK.
-  const labwareNames = stepFormSelectors.getLabwareNicknamesById(state)
+  const labwareNames = uiLabwareSelectors.getLabwareNicknamesById(state)
   const initialLabware = stepFormSelectors.getInitialDeckSetup(state).labware
   const selectedLabwareId = labwareIngredSelectors.getSelectedLabwareId(state)
   const selectedTerminalItem = stepsSelectors.getSelectedTerminalItemId(state)

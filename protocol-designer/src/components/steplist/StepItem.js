@@ -32,7 +32,7 @@ type StepItemProps = {
   hoveredSubstep: ?SubstepIdentifier,
   ingredNames: WellIngredientNames,
 
-  labwareNicknamesById: {[labwareId: string]: ?string},
+  labwareNicknamesById: {[labwareId: string]: string},
   labwareTypesById: {[labwareId: string]: ?string},
   highlightSubstep: SubstepIdentifier => mixed,
   selectStep: (stepId: StepIdType) => mixed,

@@ -12,16 +12,15 @@ import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import {createSelector} from 'reselect'
-import {getIsTiprack, getPipetteNameSpecs, getLabware} from '@opentrons/shared-data'
+import {getPipetteNameSpecs, getLabware} from '@opentrons/shared-data'
 import i18n from '../../localization'
-import {DISPOSAL_LABWARE_TYPES, INITIAL_DECK_SETUP_STEP_ID} from '../../constants'
+import {INITIAL_DECK_SETUP_STEP_ID} from '../../constants'
 import {generateNewForm, getFormWarnings, getFormErrors, stepFormToArgs} from '../../steplist/formLevel'
 import {hydrateField, getFieldErrors} from '../../steplist/fieldLevel'
 import {addSpecsToPipetteInvariantProps} from '../utils'
-import {labwareToDisplayName} from '../../labware-ingred/utils'
 
 import type {FormWarning} from '../../steplist/formLevel'
-import type {BaseState, Selector, Options} from '../../types'
+import type {BaseState, Selector} from '../../types'
 import type {FormData, StepIdType, StepType} from '../../form-types'
 import type {LabwareTypeById} from '../../labware-ingred/types'
 import type {
@@ -85,54 +84,6 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
       }),
     }
   }
-)
-
-// $FlowFixMe TODO IMMEDIATELY
-export const getLabwareNicknamesById: Selector<{[labwareId: string]: string}> = createSelector(
-  getLabwareEntities,
-  state => state.labwareIngred.containers, // TODO IMMEDIATELY: move this selector to ui and use real labwareIngred selector
-  (labwareEntities, displayLabware) => mapValues(
-    labwareEntities,
-    (labwareEntity: LabwareEntity, id: string) =>
-      labwareToDisplayName(displayLabware[id], labwareEntity.type),
-  )
-)
-
-// TODO IMMEDIATELY move out to ui or something?
-/** Returns options for disposal (e.g. fixed trash and trash box) */
-export const getDisposalLabwareOptions: Selector<Options> = createSelector(
-  getLabwareEntities,
-  getLabwareNicknamesById,
-  (labwareById, names) => reduce(labwareById, (acc: Options, labware: LabwareEntity, labwareId): Options => {
-    if (!labware.type || !DISPOSAL_LABWARE_TYPES.includes(labware.type)) {
-      return acc
-    }
-    return [
-      ...acc,
-      {
-        name: names[labwareId],
-        value: labwareId,
-      },
-    ]
-  }, [])
-)
-
-// TODO IMMEDIATELY move out to ui or something?
-/** Returns options for dropdowns, excluding tiprack labware */
-export const getLabwareOptions: Selector<Options> = createSelector(
-  getLabwareTypesById,
-  getLabwareNicknamesById,
-  (labwareTypesById, nicknamesById) => reduce(labwareTypesById, (acc: Options, labwareType: string, labwareId): Options => {
-    return getIsTiprack(labwareType)
-      ? acc
-      : [
-        ...acc,
-        {
-          name: nicknamesById[labwareId],
-          value: labwareId,
-        },
-      ]
-  }, [])
 )
 
 export const getPermittedTipracks: Selector<Array<string>> = createSelector(

@@ -141,7 +141,6 @@ type SavedLabwareState = {[labwareId: string]: boolean}
 /** Keeps track of which labware have saved nicknames */
 export const savedLabware = handleActions({
   DELETE_CONTAINER: (state: SavedLabwareState, action: ActionType<typeof actions.deleteContainer>) => ({
-    // TODO IMMEDIATELY should this be omit?
     ...state,
     [action.payload.labwareId]: false,
   }),
