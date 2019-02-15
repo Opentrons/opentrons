@@ -22,14 +22,15 @@ type ConfigFields = {[FieldName]: FieldProps}
 
 type PipetteConfigOptions = {
   info: {
-    name: string,
-    model: string,
+    name: ?string,
+    model: ?string,
+    id: ?string,
   },
   fields: ConfigFields,
 }
 
 type OP = {
-  pipette: ?Pipette,
+  pipette: Pipette,
 }
 
 type SP = {
@@ -48,6 +49,8 @@ export default class ConfigForm extends React.Component<Props> {
   render () {
     const {fields} = OPTIONS
     const plungerFields = getFieldsByKey(PLUNGER_KEYS, fields)
+    const powerFields = getFieldsByKey(POWER_KEYS, fields)
+    const tipFields = getFieldsByKey(TIP_KEYS, fields)
     console.log(plungerFields)
     return (
       <Formik
@@ -58,6 +61,46 @@ export default class ConfigForm extends React.Component<Props> {
               <FormColumn>
                 <ConfigFormGroup groupLabel="Plunger Positions">
                   {plungerFields.map(f => {
+                    const value = this.getFieldValue(f.name, values)
+                    return (
+                      <ConfigInput
+                        key={f.name}
+                        name={f.name}
+                        label={f.displayName}
+                        units={f.units}
+                        value={value}
+                        placeholder={f.default}
+                        min={f.min}
+                        max={f.max}
+                        onChange={handleChange}
+                        error={null}
+                      />
+                    )
+                  })}
+                </ConfigFormGroup>
+                <ConfigFormGroup groupLabel="Power / Force">
+                  {powerFields.map(f => {
+                    const value = this.getFieldValue(f.name, values)
+                    return (
+                      <ConfigInput
+                        key={f.name}
+                        name={f.name}
+                        label={f.displayName}
+                        units={f.units}
+                        value={value}
+                        placeholder={f.default}
+                        min={f.min}
+                        max={f.max}
+                        onChange={handleChange}
+                        error={null}
+                      />
+                    )
+                  })}
+                </ConfigFormGroup>
+              </FormColumn>
+              <FormColumn>
+                <ConfigFormGroup groupLabel="Tip Pickup / Drop ">
+                  {tipFields.map(f => {
                     const value = this.getFieldValue(f.name, values)
                     return (
                       <ConfigInput
@@ -97,42 +140,114 @@ function getFieldsByKey (keys: Array<string>, fields: any) {
   })
 }
 
-const PLUNGER_KEYS = ['top', 'bottom', 'blowOut', 'dropTip']
+const PLUNGER_KEYS = ['top', 'bottom', 'blowout', 'dropTip']
+const POWER_KEYS = ['plungerCurrent', 'pickUpCurrent', 'dropTipCurrent']
+const TIP_KEYS = ['dropTipSpeed', 'pickUpDistance']
 
-// TODO (ka 2019-2-14): Replace with API response
+// GET /settings/pipettes/?id='P50MV1318110626'
+
 const OPTIONS = {
   info: {
-    name: 'P50 Single',
-    model: '1234567',
+    name: null,
+    model: null,
+    id: 'P50MV1318110626',
   },
   fields: {
     top: {
-      value: null,
-      default: 10,
-      min: 1,
-      max: 15,
+      value: 19.5,
+      min: 5,
+      max: 19.5,
       units: 'mm',
+      type: 'float',
+      displayName: 'Top Plunger Position',
+      default: 19.5,
     },
     bottom: {
-      value: null,
-      default: 9,
-      min: 1,
-      max: 15,
+      value: 2,
+      min: -2,
+      max: 19,
       units: 'mm',
+      type: 'float',
+      displayName: 'Bottom Plunger Position',
+      default: 2,
     },
-    blowOut: {
-      value: null,
-      default: 8,
-      min: 1,
-      max: 15,
+    blowout: {
+      value: 0.5,
+      min: -4,
+      max: 10,
       units: 'mm',
+      type: 'float',
+      displayName: 'Blow Out Plunger Position',
+      default: 0.5,
     },
     dropTip: {
-      value: null,
-      default: 7,
-      min: 1,
-      max: 15,
+      value: -5,
+      min: -6,
+      max: 2,
       units: 'mm',
+      type: 'float',
+      displayName: 'Drop Tip Plunger Position',
+      default: -5,
+    },
+    pickUpCurrent: {
+      value: 0.6,
+      min: 0.05,
+      max: 1.2,
+      units: 'A',
+      type: 'float',
+      displayName: 'Pick Up Current',
+      default: 0.6,
+    },
+    pickUpDistance: {
+      value: 10,
+      min: 1,
+      max: 30,
+      units: 'mm',
+      type: 'float',
+      displayName: 'Pick Up Distance',
+      default: 10,
+    },
+    plungerCurrent: {
+      value: 0.5,
+      min: 0.1,
+      max: 0.5,
+      units: 'A',
+      type: 'float',
+      displayName: 'Plunger Current',
+      default: 0.5,
+    },
+    dropTipCurrent: {
+      value: 0.5,
+      min: 0.1,
+      max: 0.8,
+      units: 'A',
+      type: 'float',
+      displayName: 'Drop Tip Current',
+      default: 0.5,
+    },
+    dropTipSpeed: {
+      value: 5,
+      min: 0.001,
+      max: 30,
+      units: 'mm/sec',
+      type: 'float',
+      displayName: 'Drop Tip Speed',
+      default: 5,
+    },
+    tipLength: {
+      value: 51.7,
+      units: 'mm',
+      type: 'float',
+      displayName: 'Tip Length',
+      default: 51.7,
+    },
+    defaultAspirateFlowRate: {
+      value: 25,
+      default: 25,
+    },
+    defaultDispenseFlowRate: {
+      value: 50,
+      default: 50,
     },
   },
 }

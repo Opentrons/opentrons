@@ -11,7 +11,11 @@ type FormGroupProps = {
 }
 
 export default function ConfigFormGroup (props: FormGroupProps) {
-  return <FormGroup label={props.groupLabel}>{props.children}</FormGroup>
+  return (
+    <FormGroup label={props.groupLabel} className={styles.form_group}>
+      {props.children}
+    </FormGroup>
+  )
 }
 
 type FormColProps = {
