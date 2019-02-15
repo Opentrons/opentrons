@@ -40,7 +40,10 @@
      "properties": {
        "value": {"type": ["number", "array"]},
        "min": {"type": "number"},
-       "max": {"type": "number"}
+       "max": {"type": "number"},
+       "units": {"type": "string"},
+       "type": {"type": "string"},
+       "displayName": {"type": "string"}
     }
   }
   },
@@ -57,7 +60,10 @@
         ".*": {
           "required": [
             "name",
-            "plungerPositions",
+            "topPlungerPosition",
+            "bottomPlungerPosition",
+            "blowOutPlungerPosition",
+            "dropTipPlungerPosition",
             "pickUpCurrent",
             "pickUpDistance",
             "modelOffset",
@@ -74,17 +80,10 @@
               "description": "reference to name of this version, should match a key in pipetteNameSpecs.json",
               "type": "string"
             },
-            "plungerPositions": {
-              "type": "object",
-              "required": ["top", "bottom", "blowOut", "dropTip"],
-              "additionalProperties": false,
-              "properties": {
-                "top": {"$ref": "#/definitions/editConfigurations"},
-                "bottom": {"$ref": "#/definitions/editConfigurations"},
-                "blowOut": {"$ref": "#/definitions/editConfigurations"},
-                "dropTip": {"$ref": "#/definitions/editConfigurations"}
-              }
-            },
+            "topPlungerPosition": {"$ref": "#/definitions/editConfigurations"},
+            "bottomPlungerPosition": {"$ref": "#/definitions/editConfigurations"},
+            "blowOutPlungerPosition": {"$ref": "#/definitions/editConfigurations"},
+            "dropTipPlungerPosition": {"$ref": "#/definitions/editConfigurations"},
             "pickUpCurrent": {"$ref": "#/definitions/editConfigurations"},
             "pickUpDistance": {"$ref": "#/definitions/editConfigurations"},
             "modelOffset": {"$ref": "#/definitions/xyzArray"},

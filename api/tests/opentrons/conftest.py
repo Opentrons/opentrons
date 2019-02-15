@@ -89,6 +89,16 @@ def clear_feature_flags(config_tempdir):
     if os.path.exists(ff_file):
         os.remove(ff_file)
 
+#
+# @pytest.fixture
+# def pipette_config_tempdir(config_tempdir):
+#     default_config = config.CONFIG['pipette_config_overrides_dir']
+#     tmpdirpath = tempfile.mkdtemp()
+#     config.CONFIG['pipette_config_overrides_dir'] = pathlib.Path(tmpdirpath)
+#     yield
+#     shutil.rmtree(tmpdirpath)
+#     config.CONFIG['pipette_config_overrides_dir'] = default_config
+
 
 @pytest.fixture
 def wifi_keys_tempdir(config_tempdir):

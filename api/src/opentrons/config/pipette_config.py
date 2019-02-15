@@ -3,7 +3,7 @@ import logging
 import json
 import re
 from collections import namedtuple
-from typing import Any, Dict, List, Union, Tuple
+from typing import Any, Dict, List, Union, Tuple, Sequence
 import pkgutil
 
 from opentrons.config import feature_flags as ff, CONFIG
@@ -14,7 +14,10 @@ log = logging.getLogger(__name__)
 pipette_config = namedtuple(
     'pipette_config',
     [
-        'plunger_positions',
+        'top',
+        'bottom',
+        'blow_out',
+        'drop_tip',
         'pick_up_current',
         'pick_up_distance',
         'aspirate_flow_rate',
@@ -74,9 +77,11 @@ def name_config() -> Dict[str, Any]:
         or '{}')
 
 
-configs = list(model_config()['config'].keys())
+config_models = list(model_config()['config'].keys())
+configs = model_config()['config']
 #: A list of pipette model names for which we have config entries
-
+mutable_configs = model_config()['mutableConfigs']
+#: A list of mutable configs for pipettes
 
 def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
     """
@@ -110,13 +115,20 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
     """
 
     # Load the model config and update with the name config
-    cfg = copy.copy(model_config()['config'][pipette_model])
-    mutable_configs = copy.copy(model_config()['mutableConfigs'])
-    cfg.update(copy.copy(name_config()[cfg['name']]))
+    cfg = copy.deepcopy(configs[pipette_model])
+    cfg.update(copy.deepcopy(name_config()[cfg['name']]))
 
     # Load overrides if we have a pipette id
     if pipette_id:
-        cfg.update(load_overrides(pipette_id))
+        try:
+            override = load_overrides(pipette_id)
+        except FileNotFoundError:
+            save_overrides(pipette_id, {}, pipette_model)
+            log.info(
+                "Save defaults for pipette model {} and id {}".format(
+                    pipette_model, pipette_id))
+        else:
+            cfg.update(override)
 
     # the ulPerMm functions are structured in pipetteModelSpecs.json as
     # a list sorted from oldest to newest. That means the latest functions
@@ -133,16 +145,14 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
         ul_per_mm = cfg['ulPerMm'][-1]
 
     res = pipette_config(
-        plunger_positions={
-            'top': ensure_value(
-                cfg, ('plungerPositions', 'top'), mutable_configs),
-            'bottom': ensure_value(
-                cfg, ('plungerPositions', 'bottom'), mutable_configs),
-            'blow_out': ensure_value(
-                cfg, ('plungerPositions', 'blowOut'), mutable_configs),
-            'drop_tip': ensure_value(
-                cfg, ('plungerPositions', 'dropTip'), mutable_configs),
-        },
+        top=ensure_value(
+            cfg, 'topPlungerPosition', mutable_configs),
+        bottom=ensure_value(
+            cfg, 'bottomPlungerPosition', mutable_configs),
+        blow_out=ensure_value(
+            cfg, 'blowOutPlungerPosition', mutable_configs),
+        drop_tip=ensure_value(
+            cfg, 'dropTipPlungerPosition', mutable_configs),
         pick_up_current=ensure_value(cfg, 'pickUpCurrent', mutable_configs),
         pick_up_distance=ensure_value(cfg, 'pickUpDistance', mutable_configs),
         aspirate_flow_rate=ensure_value(
@@ -186,24 +196,36 @@ def piecewise_volume_conversion(
     return i[1]*ul + i[2]
 
 
-def save_overrides(pipette_id: str, overrides: Dict[str, Any]):
+def save_overrides(pipette_id: str, overrides: Dict[str, Any], model: str):
     override_dir = CONFIG['pipette_config_overrides_dir']
-    existing = load_overrides(pipette_id)
-    existing.update(overrides)
+    try:
+        existing = load_overrides(pipette_id)
+    except FileNotFoundError:
+        existing = {}
+
+    for key, value in overrides.items():
+        # If an existing override is saved as null from endpoint, remove from
+        # overrides file
+        if value is None:
+            if existing.get(key):
+                del existing[key]
+        else:
+            existing[key] = value
+    assert model in config_models
+    existing['model'] = model
     json.dump(existing, (override_dir/f'{pipette_id}.json').open('w'))
 
 
 def load_overrides(pipette_id: str) -> Dict[str, Any]:
     overrides = CONFIG['pipette_config_overrides_dir']
-    try:
-        fi = (overrides/f'{pipette_id}.json').open()
-    except FileNotFoundError:
-        return {}
+    print("Override section {}".format(overrides))
+    fi = (overrides/f'{pipette_id}.json').open()
     try:
         return json.load(fi)
     except json.JSONDecodeError as e:
         log.warning(f'pipette override for {pipette_id} is corrupt: {e}')
-        return {}
+        (overrides/f'{pipette_id}.json').unlink()
+        raise FileNotFoundError(str(overrides/f'{pipette_id}.json'))
 
 
 def ensure_value(
@@ -226,3 +248,54 @@ def ensure_value(
     if path[-1] in mutable_config_list:
         value = value['value']
     return value
+
+
+def known_pipettes() -> Sequence[str]:
+    """ List pipette IDs for which we have known overrides """
+    for fi in CONFIG['pipette_config_overrides_dir'].iterdir():
+        print("files in directory")
+        print(fi)
+    # print("config dict {}".format(CONFIG['pipette_config_overrides_dir'].iterdir))
+    return [fi.stem
+            for fi in CONFIG['pipette_config_overrides_dir'].iterdir()
+            if fi.is_file() and '.json' in fi.suffixes]
+
+
+def load_config_dict(pipette_id: str) -> Dict:
+    """ Give updated config with overrides for a pipette. This will add
+    the default value for a mutable config before returning the modified
+    config value.
+    """
+    override = load_overrides(pipette_id)
+    model = override['model']
+    config = copy.deepcopy(model_config()['config'][model])
+    config.update(copy.deepcopy(name_config()[config['name']]))
+    def add_default(cfg):
+        if isinstance(cfg, dict):
+            if 'value' in cfg.keys():
+                cfg['default'] = cfg['value']
+            else:
+                for top_level_key in cfg.keys():
+                    add_default(cfg[top_level_key])
+    for top_level_key in config.keys():
+        add_default(config[top_level_key])
+    # {'dropTipCurrent': {'value': 10, 'min': 2, 'max': 20}}
+    config.update(override) # if this had {'dropTipCurrent': {'value': 15}}
+    # -> {'dropTipCurrent': {'value': 15, 'min': 2, 'max': 20}}
+    # want : {'dropTipCurrent': {'value': 15, 'default': 10, 'min': 2, 'max': 20}}
+    return config
+
+
+def list_mutable_configs(pipette_id: str = None, model: str = None) -> Dict:
+    """
+    Returns dict of mutable configs only.
+    """
+    if pipette_id in known_pipettes():
+        config = load_config_dict(pipette_id)
+    else:
+        config = configs[model]
+    cfg = {}
+    for key in config:
+        if key in mutable_configs:
+            cfg[key] = config[key]
+    return cfg

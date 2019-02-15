@@ -85,13 +85,17 @@ def test_config_update():
                                          "edit": True,
                                          "min": 0,
                                          "max": 5},
-                              'blowOut': {"value": -1,
+                              'blow_out': {"value": -1,
                                           "edit": True,
                                           "min": -6,
                                           "max": 5},
-                              'dropTip': {"value": -4.5,
+                              'drop_tip': {"value": -4.5,
                                           "edit": True,
                                           "min": -6,
                                           "max": 5}}
-        pip.update_config_item('plunger_positions', sample_plunger_pos)
-        assert pip.config.plunger_positions == sample_plunger_pos
+        for key in sample_plunger_pos.keys():
+            pip.update_config_item(key, sample_plunger_pos.get(key))
+        assert pip.config.top == sample_plunger_pos.get('top')
+        assert pip.config.bottom == sample_plunger_pos.get('bottom')
+        assert pip.config.blow_out == sample_plunger_pos.get('blow_out')
+        assert pip.config.drop_tip == sample_plunger_pos.get('drop_tip')

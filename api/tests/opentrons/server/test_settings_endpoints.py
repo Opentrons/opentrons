@@ -6,10 +6,11 @@ import tempfile
 
 import pytest
 
+from opentrons import instruments
 from opentrons.server import init
 from opentrons.data_storage import database as db
-from opentrons import config
-
+from opentrons.config import pipette_config
+from opentrons import config, types, hardware_control
 
 def validate_response_body(body):
     settings_list = body.get('settings')
@@ -163,3 +164,106 @@ async def test_reset_v2(virtual_smoothie_env, loop, async_client):
 
     # precondition
     await execute_reset_tests_v2(async_client)
+
+
+
+async def test_receive_pipette_settings(
+        async_server, loop, async_client):
+
+    cli = async_client
+    test_model = 'p300_multi_v1'
+    test_id = 'abc123'
+    test_id2 = 'abcd123'
+    hw = async_server['com.opentrons.hardware']
+
+    if async_server['api_version'] == 1:
+        hw.model_by_mount = {'left': {'model': test_model, 'id': test_id},
+                            'right': {'model': test_model, 'id': test_id2}}
+        hw.get_attached_pipettes()
+    else:
+        hw._backend._attached_instruments = {
+            types.Mount.RIGHT: {'model': test_model, 'id': test_id},
+            types.Mount.LEFT: {'model': test_model, 'id': test_id2}
+        }
+
+        await hw.cache_instruments()
+
+    resp = await cli.get('/settings/pipettes')
+    body = await resp.json()
+    assert test_id in body
+    assert body[test_id]['fields'] == pipette_config.list_mutable_configs(
+        pipette_id=test_id)
+
+
+async def test_receive_pipette_settings_one_pipette(
+        async_server, loop, async_client):
+    # This is
+    cli = async_client
+    test_model = 'p300_multi_v1'
+    test_id = 'abc123'
+    test_id2 = 'abcd123'
+
+    hw = async_server['com.opentrons.hardware']
+    if async_server['api_version'] == 1:
+        hw.model_by_mount = {'left': {'model': test_model, 'id': test_id},
+                            'right': {'model': test_model, 'id': test_id2}}
+        hw.get_attached_pipettes()
+    else:
+        hw._backend._attached_instruments = {
+            types.Mount.RIGHT: {'model': test_model, 'id': test_id},
+            types.Mount.LEFT: {'model': test_model, 'id': test_id2}}
+        await hw.cache_instruments()
+    resp = await cli.get('/settings/pipettes/{}'.format(test_id))
+    body = await resp.json()
+    assert body['fields'] == pipette_config.list_mutable_configs(
+        pipette_id=test_id)
+
+    # Non-existent pipette id and get 404
+
+async def test_modify_pipette_settings(async_server, loop, async_client):
+    # This test will check that setting modified pipette configs
+    # works as expected
+
+    cli = async_client
+    test_model = 'p300_multi_v1'
+    test_id = 'abc123'
+    test_id2 = 'abcd123'
+
+    changes = {'info': {'model': test_model, 'id': test_id}, 'fields': {'pickUpCurrent': {'value': 1}}}
+
+    hw = async_server['com.opentrons.hardware']
+    if async_server['api_version'] == 1:
+        hw.model_by_mount = {'left': {'model': test_model, 'id': test_id},
+                            'right': {'model': test_model, 'id': test_id2}}
+        hw.get_attached_pipettes()
+    else:
+        hw._backend._attached_instruments = {
+            types.Mount.RIGHT: {'model': test_model, 'id': test_id},
+            types.Mount.LEFT: {'model': test_model, 'id': test_id2}}
+        await hw.cache_instruments()
+
+    resp = await cli.get('/settings/pipettes/{}'.format(test_id))
+    body = await resp.json()
+    assert body['fields']['pickUpCurrent'] == pipette_config.list_mutable_configs(
+        pipette_id=test_id)['pickUpCurrent']
+
+    resp = await cli.patch(
+        '/settings/pipettes/{}/fields'.format(test_id),
+        json=changes)
+    assert resp.status == 204
+    check = await cli.get('/settings/pipettes/{}'.format(test_id))
+    body = await check.json()
+    assert body['fields']['pickUpCurrent'] == changes['fields']['pickUpCurrent']
+
+    changes2 = {'info': {'model': test_model, 'id': test_id}, 'fields': {'pickUpCurrent': None}}
+    resp = await cli.patch(
+        '/settings/pipettes/{}/fields'.format(test_id),
+        json=changes2)
+    assert resp.status == 204
+    check = await cli.get('/settings/pipettes/{}'.format(test_id))
+    body = await check.json()
+    assert body['fields']['pickUpCurrent'] == pipette_config.list_mutable_configs(
+        pipette_id=test_id)['pickUpCurrent']
+#
+#
+#     assert None

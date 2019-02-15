@@ -103,8 +103,9 @@ def test_override_save():
     }
 
     new_id = 'aoa2109j09cj2a'
+    model = 'p300_multi_v1'
 
-    pipette_config.save_overrides(new_id, overrides)
+    pipette_config.save_overrides(new_id, overrides, model)
 
     assert (cdir/f'{new_id}.json').is_file()
 
@@ -112,3 +113,11 @@ def test_override_save():
 
     assert loaded['pickUpCurrent'] == overrides['pickUpCurrent']
     assert loaded['dropTipSpeed'] == overrides['dropTipSpeed']
+
+
+def test_mutable_configs_only():
+    # Test that only set mutable configs are populated in this dictionary
+    pipette_config.mutable_configs = ['tipLength', 'plungerCurrent']
+    id = 'aoa2109j09cj2a'
+    config = pipette_config.list_mutable_configs(id)
+    assert config.keys() == pipette_config.mutable_configs
