@@ -136,29 +136,13 @@ async def available_resets(request: web.Request) -> web.Response:
 
 
 async def pipette_settings(request: web.Request) -> web.Response:
-    hw = request.app['com.opentrons.hardware']
     res = {}
-    # known_pips = pc.known_pipettes()
-    # for mount, data in hw.get_attached_pipettes().items():
-    #     if data['id'] in known_pips:
-    #         fields = pc.list_mutable_configs(pipette_id=data['id'])
-    #         known_pips.pop(known_pips.index(data['id']))
-    #     else:
-    #         fields = pc.list_mutable_configs(
-    #             model=data['model'], pipette_id=data['id'])
-    #     res[data['id']] = {
-    #         'info': {
-    #             'name': data.get('name'),
-    #             'model': data.get('model')
-    #         },
-    #         'fields': fields
-    #     }
     for id in pc.known_pipettes():
-        print("IDs {}".format(id))
+        whole_config = pc.load_config_dict(id)
         res[id] = {
             'info': {
-                'name': None,
-                'model': None
+                'name': whole_config.get('name'),
+                'model': whole_config.get('model')
             },
             'fields': pc.list_mutable_configs(pipette_id=id)
         }
@@ -167,6 +151,10 @@ async def pipette_settings(request: web.Request) -> web.Response:
 
 async def pipette_settings_id(request: web.Request) -> web.Response:
     pipette_id = request.match_info['id']
+    if pipette_id not in pc.known_pipettes():
+        return web.json_response(
+            {'message': '{} is not a valid pipette id'.format(pipette_id)},
+            status=404)
     whole_config = pc.load_config_dict(pipette_id)
     res = {
         'info': {
@@ -196,9 +184,18 @@ async def modify_pipette_settings(request: web.Request) -> web.Response:
     }
     """
     pipette_id = request.match_info['id']
+    config_match = pc.list_mutable_configs(pipette_id)
     data = await request.json()
-    status = 204
-    if not data['fields'] or not data['info']:
-        status = 400
+    if not data.get('fields') or not data.get('info'):
+        return web.json_response(status=400)
+
+    for key, value in data['fields'].items():
+        if value:
+            config = value['value']
+            default = config_match[key]
+            if config < default['min'] or config > default['max']:
+                return web.json_response(
+                    {'message': '{} out of range with {}'.format(key, value)},
+                    status=412)
     pc.save_overrides(pipette_id, data['fields'], data['info']['model'])
-    return web.json_response(status=status)
+    return web.json_response(status=204)

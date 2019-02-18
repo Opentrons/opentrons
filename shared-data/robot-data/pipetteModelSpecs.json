@@ -2,28 +2,28 @@
   "config": {
     "p10_single_v1": {
       "name": "p10_single",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
         "units": "mm",
         "type": "float"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 2,
         "min": -2,
         "max": 19.0,
         "type": "float",
         "units": "mm"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": -1,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -4.5,
         "min": -6,
         "max": 2,
@@ -100,28 +100,28 @@
     },
     "p10_single_v1.3": {
       "name": "p10_single",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
         "units": "mm",
         "type": "float"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 0.5,
         "min": -2,
         "max": 19.0,
         "units": "mm",
         "type": "float"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": -2.5,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -6,
         "min": -6,
         "max": 2,
@@ -200,28 +200,28 @@
     },
     "p10_single_v1.4": {
       "name": "p10_single",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
         "units": "mm",
         "type": "float"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 2.5,
         "min": -2,
         "max": 19.0,
         "units": "mm",
         "type": "float"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": -0.5,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -5.2,
         "min": -6,
         "max": 2,
@@ -298,28 +298,28 @@
     },
     "p10_multi_v1": {
       "name": "p10_multi",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
         "units": "mm",
         "type": "float"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 2,
         "min": -2,
         "max": 19.0,
         "units": "mm",
         "type": "float"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": -1,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -4,
         "min": -6,
         "max": 2,
@@ -396,28 +396,28 @@
     },
     "p10_multi_v1.3": {
       "name": "p10_multi",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
         "units": "mm",
         "type": "float"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 0.5,
         "min": -2,
         "max": 19.0,
         "units": "mm",
         "type": "float"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": -2.5,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -5.5,
         "min": -6,
         "max": 2,
@@ -490,28 +490,28 @@
     },
     "p10_multi_v1.4": {
       "name": "p10_multi",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
         "units": "mm",
         "type": "float"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 2,
         "min": -2,
         "max": 19.0,
         "units": "mm",
         "type": "float"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": -1,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -4.5,
         "min": -6,
         "max": 2,
@@ -588,28 +588,28 @@
     },
     "p50_single_v1": {
       "name": "p50_single",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
         "units": "mm",
         "type": "float"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 2.01,
         "min": -2,
         "max": 19.0,
         "units": "mm",
         "type": "float"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": 2,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -4.5,
         "min": -6,
         "max": 2,
@@ -680,28 +680,28 @@
     },
     "p50_single_v1.3": {
       "name": "p50_single",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
         "units": "mm",
         "type": "float"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 2,
         "min": -2,
         "max": 19.0,
         "units": "mm",
         "type": "float"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": 0.5,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -6,
         "min": -6,
         "max": 2,
@@ -776,28 +776,28 @@
     },
     "p50_single_v1.4": {
       "name": "p50_single",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
         "units": "mm",
         "type": "float"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 2,
         "min": -2,
         "max": 19.0,
         "units": "mm",
         "type": "float"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": 0.5,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -5,
         "min": -6,
         "max": 2,
@@ -873,7 +873,7 @@
     },
     "p50_multi_v1": {
       "name": "p50_multi",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
@@ -881,7 +881,7 @@
         "type": "float",
         "displayName": "Top Plunger Position"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 2.5,
         "min": -2,
         "max": 19.0,
@@ -889,7 +889,7 @@
         "type": "float",
         "displayName": "Bottom Plunger Position"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": 2,
         "min": -4,
         "max": 10,
@@ -897,7 +897,7 @@
         "type": "float",
         "displayName": "Blow Out Plunger Position"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -3.5,
         "min": -6,
         "max": 2,
@@ -974,7 +974,7 @@
     },
     "p50_multi_v1.3": {
       "name": "p50_multi",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
@@ -982,7 +982,7 @@
         "type": "float",
         "displayName": "Top Plunger Position"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 2,
         "min": -2,
         "max": 19.0,
@@ -990,7 +990,7 @@
         "type": "float",
         "displayName": "Bottom Plunger Position"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": 0.5,
         "min": -4,
         "max": 10,
@@ -998,7 +998,7 @@
         "type": "float",
         "displayName": "Blow Out Plunger Position"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -5,
         "min": -6,
         "max": 2,
@@ -1080,7 +1080,7 @@
     },
     "p50_multi_v1.4": {
       "name": "p50_multi",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
@@ -1088,7 +1088,7 @@
         "type": "float",
         "displayName": "Top Plunger Position"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 2,
         "min": -2,
         "max": 19.0,
@@ -1096,7 +1096,7 @@
         "type": "float",
         "displayName": "Bottom Plunger Position"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": 0.5,
         "min": -4,
         "max": 10,
@@ -1104,7 +1104,7 @@
         "type": "float",
         "displayName": "Blow Out Plunger Position"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -4,
         "min": -6,
         "max": 2,
@@ -1181,28 +1181,28 @@
     },
     "p300_single_v1": {
       "name": "p300_single",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
         "units": "mm",
         "type": "float"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 1.5,
         "min": -2,
         "max": 19.0,
         "units": "mm",
         "type": "float"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": 0,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -4,
         "min": -6,
         "max": 2,
@@ -1281,28 +1281,28 @@
     },
     "p300_single_v1.3": {
       "name": "p300_single",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
         "units": "mm",
         "type": "float"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 1.5,
         "min": -2,
         "max": 19.0,
         "units": "mm",
         "type": "float"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": -1.5,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -5.5,
         "min": -6,
         "max": 2,
@@ -1381,28 +1381,28 @@
     },
     "p300_single_v1.4": {
       "name": "p300_single",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
         "units": "mm",
         "type": "float"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 3,
         "min": -2,
         "max": 19.0,
         "units": "mm",
         "type": "float"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": 0,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -4.5,
         "min": -6,
         "max": 2,
@@ -1481,28 +1481,28 @@
     },
     "p300_multi_v1": {
       "name": "p300_multi",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
         "units": "mm",
         "type": "float"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 3.5,
         "min": -2,
         "max": 19.0,
         "units": "mm",
         "type": "float"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": 3,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -2,
         "min": -6,
         "max": 2,
@@ -1565,28 +1565,28 @@
     },
     "p300_multi_v1.3": {
       "name": "p300_multi",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
         "units": "mm",
         "type": "float"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 3.5,
         "min": -2,
         "max": 19.0,
         "units": "mm",
         "type": "float"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": 1.5,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -3.5,
         "min": -6,
         "max": 2,
@@ -1649,28 +1649,28 @@
     },
     "p300_multi_v1.4": {
       "name": "p300_multi",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
         "units": "mm",
         "type": "float"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 3.5,
         "min": -2,
         "max": 19.0,
         "units": "mm",
         "type": "float"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": 1.5,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -3.5,
         "min": -6,
         "max": 2,
@@ -1733,28 +1733,28 @@
     },
     "p1000_single_v1": {
       "name": "p1000_single",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
         "units": "mm",
         "type": "float"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 3,
         "min": -2,
         "max": 19.0,
         "units": "mm",
         "type": "float"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": 1,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -2.2,
         "min": -6,
         "max": 2,
@@ -1821,28 +1821,28 @@
     },
     "p1000_single_v1.3": {
       "name": "p1000_single",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
         "units": "mm",
         "type": "float"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 2.5,
         "min": -2,
         "max": 19.0,
         "units": "mm",
         "type": "float"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": 0.5,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -4,
         "min": -6,
         "max": 2,
@@ -1909,28 +1909,28 @@
     },
     "p1000_single_v1.4": {
       "name": "p1000_single",
-      "topPlungerPosition": {
+      "top": {
         "value": 19.5,
         "min": 5,
         "max": 19.5,
         "units": "mm",
         "type": "float"
       },
-      "bottomPlungerPosition": {
+      "bottom": {
         "value": 2.5,
         "min": -2,
         "max": 19.0,
         "units": "mm",
         "type": "float"
       },
-      "blowOutPlungerPosition": {
+      "blowout": {
         "value": 0.5,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
-      "dropTipPlungerPosition": {
+      "dropTip": {
         "value": -4,
         "min": -6,
         "max": 2,
@@ -1996,6 +1996,6 @@
       }
     }
   },
-  "mutableConfigs": ["topPlungerPosition", "bottomPlungerPosition", "blowOutPlungerPosition", "dropTipPlungerPosition", "pickUpCurrent", "pickUpDistance", "plungerCurrent", "dropTipCurrent", "dropTipSpeed", "tipLength", "defaultAspirateFlowRate", "defaultDispenseFlowRate"]
+  "mutableConfigs": ["top", "bottom", "blowout", "dropTip", "pickUpCurrent", "pickUpDistance", "plungerCurrent", "dropTipCurrent", "dropTipSpeed", "tipLength", "defaultAspirateFlowRate", "defaultDispenseFlowRate"]
 
 }

@@ -24,7 +24,7 @@ def test_tip_tracking():
 
 
 def test_critical_points():
-    for config in pipette_config.configs:
+    for config in pipette_config.config_models:
         loaded = pipette_config.load(config)
         pip = pipette.Pipette(config,
                               {'single': [0, 0, 0], 'multi': [0, 0, 0]},
@@ -47,7 +47,7 @@ def test_critical_points():
 
 
 def test_volume_tracking():
-    for config in pipette_config.configs:
+    for config in pipette_config.config_models:
         loaded = pipette_config.load(config)
         pip = pipette.Pipette(config,
                               {'single': [0, 0, 0], 'multi': [0, 0, 0]},
@@ -73,7 +73,7 @@ def test_volume_tracking():
 
 
 def test_config_update():
-    for config in pipette_config.configs:
+    for config in pipette_config.config_models:
         pip = pipette.Pipette(config,
                               {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                               'testID')
@@ -86,13 +86,13 @@ def test_config_update():
                                          "min": 0,
                                          "max": 5},
                               'blow_out': {"value": -1,
-                                          "edit": True,
-                                          "min": -6,
-                                          "max": 5},
+                                           "edit": True,
+                                           "min": -6,
+                                           "max": 5},
                               'drop_tip': {"value": -4.5,
-                                          "edit": True,
-                                          "min": -6,
-                                          "max": 5}}
+                                           "edit": True,
+                                           "min": -6,
+                                           "max": 5}}
         for key in sample_plunger_pos.keys():
             pip.update_config_item(key, sample_plunger_pos.get(key))
         assert pip.config.top == sample_plunger_pos.get('top')

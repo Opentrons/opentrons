@@ -182,8 +182,6 @@ class SingletonAdapter(HardwareAPILike):
         api = object.__getattribute__(self, '_api')
         instrs = {}
         for mount, data in api.attached_instruments.items():
-            print(type(api))
-            print("pipette data {}".format(data))
             instrs[mount.name.lower()] = {
                 'model': data.get('name', None),
                 'id': data.get('pipette_id', None),
