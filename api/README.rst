@@ -26,9 +26,9 @@ This document is about the structure and purpose of the source code. For informa
 
 The Opentrons API Server package has two purposes:
 
-1. Control an Opentrons OT-2 robot.  When controlling a robot, we use the entry point in `opentrons.main <https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/main.py>`_. We boot up a server for the robot’s HTTP endpoints, and a server for its WebSockets-based RPC system for control during protocols. We are configured by files in the robot’s filesystem in ``/data``.
+1. **Control an Opentrons OT-2 robot.**  When controlling a robot, we use the entry point in `opentrons.main <https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/main.py>`_. We boot up a server for the robot’s HTTP endpoints, and a server for its WebSockets-based RPC system for control during protocols. We are configured by files in the robot’s filesystem in ``/data``.
 
-2. Simulate protocols on users’ computers. When simulating a protocol on a user’s computer, we use the entry point in `opentrons.simulate <https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/simulate.py>`_. We set up simulators for the protocol, but do not run any kind of web servers. We are configured by files in the user’s home directory (for more information see configuration_).
+2. **Simulate protocols on users’ computers.** When simulating a protocol on a user’s computer, we use the entry point in `opentrons.simulate <https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/simulate.py>`_. We set up simulators for the protocol, but do not run any kind of web servers. We are configured by files in the user’s home directory (for more information see configuration_).
 
 
 Setting Up For Development
