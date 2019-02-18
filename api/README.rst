@@ -26,13 +26,9 @@ This document is about the structure and purpose of the source code. For informa
 
 The Opentrons API Server package has two purposes:
 
-1. Control an Opentrons OT-2 robot.
+1. Control an Opentrons OT-2 robot.  When controlling a robot, we use the entry point in `opentrons.main <https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/main.py>`_. We boot up a server for the robot’s HTTP endpoints, and a server for its WebSockets-based RPC system for control during protocols. We are configured by files in the robot’s filesystem in ``/data``.
 
-    When controlling a robot, we use the entry point in `opentrons.main <https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/main.py>`_. We boot up a server for the robot’s HTTP endpoints, and a server for its WebSockets-based RPC system for control during protocols. We are configured by files in the robot’s filesystem in ``/data``.
-
-2. Simulate protocols on users’ computers.
-
-    When simulating a protocol on a user’s computer, we use the entry point in `opentrons.simulate <https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/simulate.py>`_. We set up simulators for the protocol, but do not run any kind of web servers. We are configured by files in the user’s home directory (for more information see configuration_).
+2. Simulate protocols on users’ computers. When simulating a protocol on a user’s computer, we use the entry point in `opentrons.simulate <https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/simulate.py>`_. We set up simulators for the protocol, but do not run any kind of web servers. We are configured by files in the user’s home directory (for more information see configuration_).
 
 
 Setting Up For Development
@@ -70,7 +66,7 @@ Tests and Linting
 
 All code changes should be accompanied by test changes as a rule of thumb. The only exceptions are to changes that are mostly about invoking different things in the system or changing hardware behavior; these should be documented with tests run on physical robots.
 
-Our tests live in ``tests/opentrons`` and are run with `pytest <https://docs.pytest.org/en/latest/>`_. Tests are run in CI on every pull request and on `edge`; PRs will not be merged with failing tests.
+Our tests live in ``tests/opentrons`` and are run with `pytest <https://docs.pytest.org/en/latest/>`_. Tests are run in CI on every pull request and on ``edge``; PRs will not be merged with failing tests.
 
 Tests should be organized similarly to the organization of the module itself.
 
@@ -93,7 +89,7 @@ This also provides an entrypoint to use the Opentrons simulation package from ot
 .. code-block:: python
 
    import opentrons.simulate
-   protocol_file = open(’/path/to/protocol.py’)
+   protocol_file = open('/path/to/protocol.py')
    opentrons.simulate.simulate(protocol_file)
 
 
