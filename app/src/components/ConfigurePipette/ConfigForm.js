@@ -3,6 +3,7 @@ import * as React from 'react'
 import {Formik} from 'formik'
 import startCase from 'lodash/startCase'
 import get from 'lodash/get'
+import mapValues from 'lodash/mapValues'
 
 import ConfigFormGroup, {FormColumn, ConfigInput} from './ConfigFormGroup'
 
@@ -48,12 +49,17 @@ export default class ConfigForm extends React.Component<Props> {
 
   render () {
     const {fields} = OPTIONS
+    const initialValues = mapValues(fields, f => {
+      // const _value =
+      return f.value !== f.default ? f.value.toString() : null
+    })
     const plungerFields = getFieldsByKey(PLUNGER_KEYS, fields)
     const powerFields = getFieldsByKey(POWER_KEYS, fields)
     const tipFields = getFieldsByKey(TIP_KEYS, fields)
     console.log(plungerFields)
     return (
       <Formik
+        initialValues={initialValues}
         render={formProps => {
           const {values, handleChange} = formProps
           return (
@@ -144,13 +150,12 @@ const PLUNGER_KEYS = ['top', 'bottom', 'blowout', 'dropTip']
 const POWER_KEYS = ['plungerCurrent', 'pickUpCurrent', 'dropTipCurrent']
 const TIP_KEYS = ['dropTipSpeed', 'pickUpDistance']
 
-// GET /settings/pipettes/?id='P50MV1318110626'
+// GET /settings/pipettes/P50MV1318060102
 
 const OPTIONS = {
   info: {
-    name: null,
-    model: null,
-    id: 'P50MV1318110626',
+    name: 'p50_multi',
+    model: 'p50_multi_v1.3',
   },
   fields: {
     top: {
@@ -163,7 +168,7 @@ const OPTIONS = {
       default: 19.5,
     },
     bottom: {
-      value: 2,
+      value: 0,
       min: -2,
       max: 19,
       units: 'mm',
@@ -243,10 +248,14 @@ const OPTIONS = {
     },
     defaultAspirateFlowRate: {
       value: 25,
+      min: 0.001,
+      max: 100,
       default: 25,
     },
     defaultDispenseFlowRate: {
       value: 50,
+      min: 0.001,
+      max: 100,
       default: 50,
     },
   },
