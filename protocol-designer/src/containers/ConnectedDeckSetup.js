@@ -75,11 +75,10 @@ class DeckSetup extends React.Component<Props> {
           {this.props.drilledDown && <BrowseLabwareModal />}
           <ClickOutside onClickOutside={this.props.handleClickOutside}>
             {({ref}) => (
-              <div ref={ref}>
+              <div ref={ref} className={styles.deck_wrapper}>
                 <Deck
                   DragPreviewLayer={DragPreviewLayer}
-                  LabwareComponent={LabwareContainer}
-                  className={styles.deck} />
+                  LabwareComponent={LabwareContainer} />
               </div>
             )}
           </ClickOutside>

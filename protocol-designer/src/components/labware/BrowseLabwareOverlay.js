@@ -4,6 +4,7 @@ import cx from 'classnames'
 import styles from './labware.css'
 
 import ClickableText from './ClickableText'
+import OverlayPanel from './OverlayPanel'
 
 type Props = {
   drillDown: () => mixed,
@@ -13,7 +14,7 @@ type Props = {
 function BrowseLabwareOverlay (props: Props) {
   return (
     <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
-      <rect className={styles.overlay_panel} />
+      <OverlayPanel />
       <ClickableText
         onClick={props.drillDown}
         iconName='water' y='40%' text='View Liquids' />

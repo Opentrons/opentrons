@@ -19,6 +19,7 @@ import type {StepIdType} from '../../form-types'
 import HighlightableLabware from '../../containers/HighlightableLabware'
 import ClickableText from './ClickableText'
 import NameThisLabwareOverlay from './NameThisLabwareOverlay'
+import OverlayPanel from './OverlayPanel'
 import DisabledSelectSlotOverlay from './DisabledSelectSlotOverlay'
 import BrowseLabwareOverlay from './BrowseLabwareOverlay'
 import {type TerminalItemId, START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID} from '../../steplist'
@@ -141,7 +142,7 @@ function LabwareDeckSlotOverlay ({
 }) {
   return (
     <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
-      <rect className={styles.overlay_panel} />
+      <OverlayPanel />
       {canAddIngreds &&
         <ClickableText
           onClick={editLiquids}
@@ -188,7 +189,7 @@ function SlotWithLabware (props: SlotWithLabwareProps) {
 
 const EmptyDestinationSlotOverlay = () => (
   <g className={cx(styles.slot_overlay)}>
-    <rect className={styles.overlay_panel} />
+    <OverlayPanel />
     <g className={styles.clickable_text}>
       <text x='0' y='40%'>Place Here</text>
     </g>
@@ -202,7 +203,7 @@ function EmptyDeckSlotOverlay (props: EmptyDeckSlotOverlayProps) {
   const {addLabware} = props
   return (
     <g className={cx(styles.slot_overlay, styles.appear_on_mouseover, styles.add_labware)}>
-      <rect className={styles.overlay_panel} />
+      <OverlayPanel />
       <ClickableText onClick={addLabware}
         iconName='plus' y='40%' text='Add Labware' />
     </g>
