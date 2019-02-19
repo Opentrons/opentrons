@@ -3,7 +3,7 @@
 import createLogger from '../logger'
 import {selectors as robotSelectors} from '../robot'
 import {getConnectedRobot} from '../discovery'
-import {getProtocolAnalyticsData} from './selectors'
+import {getProtocolAnalyticsData, getRobotAnalyticsData} from './selectors'
 
 import type {State, Action} from '../types'
 import type {AnalyticsEvent} from './types'
@@ -37,7 +37,10 @@ export default function makeEvent (
     case 'protocol:UPLOAD': {
       return getProtocolAnalyticsData(nextState).then(data => ({
         name: 'protocolUploadRequest',
-        properties: data,
+        properties: {
+          ...data,
+          ...getRobotAnalyticsData(nextState),
+        },
       }))
     }
 
@@ -52,6 +55,7 @@ export default function makeEvent (
         name: 'protocolUploadResponse',
         properties: {
           ...data,
+          ...getRobotAnalyticsData(nextState),
           success: actionType === 'robot:SESSION_RESPONSE',
           error: (actionPayload.error && actionPayload.error.message) || '',
         },
@@ -62,7 +66,10 @@ export default function makeEvent (
     case 'robot:RUN': {
       return getProtocolAnalyticsData(nextState).then(data => ({
         name: 'runStart',
-        properties: data,
+        properties: {
+          ...data,
+          ...getRobotAnalyticsData(nextState),
+        },
       }))
     }
 
@@ -77,7 +84,13 @@ export default function makeEvent (
 
       return getProtocolAnalyticsData(nextState).then(data => ({
         name: 'runFinish',
-        properties: {...data, runTime, success, error},
+        properties: {
+          ...data,
+          ...getRobotAnalyticsData(nextState),
+          runTime,
+          success,
+          error,
+        },
       }))
     }
 

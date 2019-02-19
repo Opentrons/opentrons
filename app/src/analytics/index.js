@@ -12,6 +12,8 @@ import type {State, Action, ThunkAction, Middleware} from '../types'
 import type {Config} from '../config'
 import type {AnalyticsEvent} from './types'
 
+export * from './selectors'
+
 type AnalyticsConfig = $PropertyType<Config, 'analytics'>
 
 const log = createLogger(__filename)

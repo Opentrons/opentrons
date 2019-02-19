@@ -25,7 +25,7 @@ const store = createStore(reducer, middleware)
 For a given Redux action, add a `case` to the `action.type` switch in [`app/src/analytics/make-event.js`](./make-event.js). `makeEvent` will be passed the full state and the action. Any new case should return either `null` or an object `{name: string, properties: {}}`
 
 ```js
-export default function makeEvent (
+export default function makeEvent(
   action: Action,
   nextState: State,
   prevState: State
@@ -44,16 +44,72 @@ export default function makeEvent (
 
 ## events
 
-| name                     | redux action                   | payload                                 |
-| ------------------------ | ------------------------------ | --------------------------------------- |
-| `robotConnect`           | `robot:CONNECT_RESPONSE`       | success, method, error                  |
-| `protocolUploadRequest`  | `protocol:UPLOAD`              | protocol data                           |
-| `protocolUploadResponse` | `robot:SESSION_RESPONSE/ERROR` | protocol data, success, error           |
-| `runStart`               | `robot:RUN`                    | protocol data                           |
-| `runFinish`              | `robot:RUN_RESPONSE`           | protocol data, success, error, run time |
-| `runPause`               | `robot:PAUSE`                  | protocol, run time data                 |
-| `runResume`              | `robot:RESUME`                 | protocol, run time data                 |
-| `runCancel`              | `robot:CANCEL`                 | protocol, run time data                 |
+### event names and payloads
+
+#### robotConnect
+
+- Redux action: `robot:CONNECT_RESPONSE`
+- Payload:
+  - success: boolean
+  - method: 'usb' | 'wifi'
+  - error: string
+
+#### protocolUploadRequest
+
+- Redux action: `protocol:UPLOAD`
+- Payload:
+  - ...protocol data (see below)
+  - ...robot data (see below)
+
+#### protocolUploadResponse
+
+- Redux action:
+  - `robot:SESSION_RESPONSE`
+  - `robot:SESSION_ERROR`
+- Payload:
+  - ...protocol data (see below)
+  - ...robot data (see below)
+  - success: boolean
+  - error: string
+
+#### runStart
+
+- Redux action: `robot:RUN`
+- Payload:
+
+  - ...protocol data (see below)
+  - ...robot data (see below)
+
+#### runFinish
+
+- Redux action: `robot:RUN_RESPONSE`
+- Payload:
+  - ...protocol data (see below)
+  - ...robot data (see below)
+  - success: boolean
+  - error: string
+  - runTime: number
+
+#### runPause
+
+- Redux action: `robot:PAUSE`
+- Payload:
+  - ...protocol data (see below)
+  - runTime: number
+
+#### runResume
+
+- Redux action: `robot:RESUME`
+- Payload:
+  - ...protocol data (see below)
+  - runTime: number
+
+#### runCancel
+
+- Redux action: `robot:CANCEL`
+- Payload:
+  - ...protocol data (see below)
+  - runTime: number
 
 ### hashing
 
@@ -68,5 +124,16 @@ Some payload fields are [hashed][] for user anonymity while preserving our abili
 - Protocol `metadata.protocolName`
 - Protocol `metadata.author` (hashed for anonymity)
 - Protocol `metadata.protocolText` (hashed for anonymity)
+
+### robot data sent
+
+- Pipette models
+  - `robotLeftPipette: string`
+  - `robotRightPipette: string`
+- Software versions
+  - `robotApiServerVersion: string`
+  - `robotSmoothieVersion: string`
+- Feature flags
+  - `robotFF_someFeatureFlagId: boolean`
 
 [hashed]: https://en.wikipedia.org/wiki/Hash_function

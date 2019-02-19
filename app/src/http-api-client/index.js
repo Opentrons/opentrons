@@ -55,6 +55,8 @@ export type Action =
   | ServerAction
   | SettingsAction
 
+export {getRobotApiState} from './reducer'
+
 export {
   startDeckCalibration,
   deckCalibrationCommand,

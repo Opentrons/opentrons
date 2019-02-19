@@ -10,6 +10,7 @@ import type {State} from '../types'
 import type {BaseRobot} from '../robot'
 import type {ApiCall} from './types'
 import type {ApiAction, RequestMaker} from './actions'
+import type {RobotApiState} from './reducer'
 
 type Id = string
 
@@ -62,7 +63,7 @@ export function makeGetRobotSettings () {
   return selector
 }
 
-function getSettingsRequest (state: SettingsState): RobotSettingsCall {
+export function getSettingsRequest (state: RobotApiState): RobotSettingsCall {
   let requestState = state[SETTINGS] || {inProgress: false}
 
   // guard against an older version of GET /settings
