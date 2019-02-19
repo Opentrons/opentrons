@@ -2,30 +2,15 @@
 import * as React from 'react'
 import {Formik} from 'formik'
 import startCase from 'lodash/startCase'
-import get from 'lodash/get'
+
 import mapValues from 'lodash/mapValues'
 
-import ConfigFormGroup, {FormColumn, ConfigInput} from './ConfigFormGroup'
+import ConfigFormGroup, {FormColumn} from './ConfigFormGroup'
 
 import type {Pipette} from '../../http-api-client'
 
 // TODO (ka 2-19-2019):
 // Move to settings.js when no longer mock data based
-// defaultAspirateFlowRate, defaultDispenseFlowRate and tipLength
-// do not have the same data shape as other fields
-type FieldName =
-  | 'top'
-  | 'bottom'
-  | 'blowout'
-  | 'dropTip'
-  | 'pickUpCurrent'
-  | 'plungerCurrent'
-  | 'dropTipCurrent'
-  | 'dropTipSpeed'
-  | 'pickUpDistance'
-  | 'tipLength'
-  | 'defaultAspirateFlowRate'
-  | 'defaultDispenseFlowRate'
 
 type FieldProps = {
   value: ?number,
@@ -36,7 +21,12 @@ type FieldProps = {
   type?: string,
 }
 
-type ConfigFields = {[FieldName]: FieldProps}
+export type DisplayFieldProps = FieldProps & {
+  name: string,
+  displayName: string,
+}
+
+type ConfigFields = {[string]: FieldProps}
 
 type PipetteConfigOptions = {
   info: {
@@ -57,19 +47,15 @@ type SP = {
 
 type Props = SP & OP
 
-type FormValues = {[string]: ?(string | {[string]: string})}
-
 const PLUNGER_KEYS = ['top', 'bottom', 'blowout', 'dropTip']
 const POWER_KEYS = ['plungerCurrent', 'pickUpCurrent', 'dropTipCurrent']
 const TIP_KEYS = ['dropTipSpeed', 'pickUpDistance']
 
 export default class ConfigForm extends React.Component<Props> {
-  getFieldValue (name: string, values: FormValues): ?string {
-    return get(values, name)
-  }
-
-  // TODO (ka 2-19-2019): type this
-  getFieldsByKey (keys: Array<FieldName>, fields: ConfigFields): any {
+  getFieldsByKey (
+    keys: Array<string>,
+    fields: ConfigFields
+  ): Array<DisplayFieldProps> {
     return keys.map(k => {
       const field = fields[k]
       const displayName = startCase(k)
@@ -98,59 +84,30 @@ export default class ConfigForm extends React.Component<Props> {
           return (
             <form>
               <FormColumn>
-                <ConfigFormGroup groupLabel="Plunger Positions">
-                  {plungerFields.map(f => {
-                    const value = this.getFieldValue(f.name, values)
-                    const _default = f.default.toString()
-                    const {name, displayName, units, min, max} = f
-                    return (
-                      <ConfigInput
-                        {...{name, units, value, min, max}}
-                        key={name}
-                        label={displayName}
-                        placeholder={_default}
-                        onChange={handleChange}
-                        error={null}
-                      />
-                    )
-                  })}
-                </ConfigFormGroup>
-                <ConfigFormGroup groupLabel="Power / Force">
-                  {powerFields.map(f => {
-                    const value = this.getFieldValue(f.name, values)
-                    const _default = f.default.toString()
-                    const {name, displayName, units, min, max} = f
-                    return (
-                      <ConfigInput
-                        {...{name, units, value, min, max}}
-                        key={name}
-                        label={displayName}
-                        placeholder={_default}
-                        onChange={handleChange}
-                        error={null}
-                      />
-                    )
-                  })}
-                </ConfigFormGroup>
+                <ConfigFormGroup
+                  groupLabel="Plunger Positions"
+                  values={values}
+                  formFields={plungerFields}
+                  onChange={handleChange}
+                  error={null}
+                />
+
+                <ConfigFormGroup
+                  groupLabel="Power / Force"
+                  values={values}
+                  formFields={powerFields}
+                  onChange={handleChange}
+                  error={null}
+                />
               </FormColumn>
               <FormColumn>
-                <ConfigFormGroup groupLabel="Tip Pickup / Drop ">
-                  {tipFields.map(f => {
-                    const value = this.getFieldValue(f.name, values)
-                    const _default = f.default.toString()
-                    const {name, displayName, units, min, max} = f
-                    return (
-                      <ConfigInput
-                        {...{name, units, value, min, max}}
-                        key={name}
-                        label={displayName}
-                        placeholder={_default}
-                        onChange={handleChange}
-                        error={null}
-                      />
-                    )
-                  })}
-                </ConfigFormGroup>
+                <ConfigFormGroup
+                  groupLabel="Tip Pickup / Drop "
+                  values={values}
+                  formFields={tipFields}
+                  onChange={handleChange}
+                  error={null}
+                />
               </FormColumn>
             </form>
           )

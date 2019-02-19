@@ -1,29 +1,54 @@
 // @flow
 import * as React from 'react'
-
+import get from 'lodash/get'
 import {FormGroup, InputField} from '@opentrons/components'
 
 import styles from './styles.css'
 
-type FormGroupProps = {
-  groupLabel: string,
-  children: React.Node,
-}
-
-export default function ConfigFormGroup (props: FormGroupProps) {
-  return (
-    <FormGroup label={props.groupLabel} className={styles.form_group}>
-      {props.children}
-    </FormGroup>
-  )
-}
+import type {DisplayFieldProps} from './ConfigForm'
 
 type FormColProps = {
   children: React.Node,
   className?: string,
 }
+
 export function FormColumn (props: FormColProps) {
   return <div className={styles.form_column}>{props.children}</div>
+}
+
+type FormValues = {[string]: ?(string | {[string]: string})}
+
+type FormGroupProps = {
+  groupLabel: string,
+  values: FormValues,
+  formFields: Array<DisplayFieldProps>,
+  onChange: (event: *) => mixed,
+  error: ?string,
+}
+
+function getFieldValue (name: string, values: FormValues): ?string {
+  return get(values, name)
+}
+
+export default function ConfigFormGroup (props: FormGroupProps) {
+  const {groupLabel, values, formFields, onChange, error} = props
+  return (
+    <FormGroup label={groupLabel} className={styles.form_group}>
+      {formFields.map(f => {
+        const value = getFieldValue(f.name, values)
+        const _default = f.default.toString()
+        const {name, displayName, units, min, max} = f
+        return (
+          <ConfigInput
+            key={name}
+            label={displayName}
+            placeholder={_default}
+            {...{name, units, value, min, max, onChange, error}}
+          />
+        )
+      })}
+    </FormGroup>
+  )
 }
 
 type FormRowProps = {
