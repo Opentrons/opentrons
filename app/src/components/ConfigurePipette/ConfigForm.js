@@ -9,14 +9,30 @@ import ConfigFormGroup, {FormColumn, ConfigInput} from './ConfigFormGroup'
 
 import type {Pipette} from '../../http-api-client'
 
-type FieldName = 'top' | 'bottom' | 'blowout' | 'droptip'
+// TODO (ka 2-19-2019):
+// defaultAspirateFlowRate, defaultDispenseFlowRate and tipLength
+// do not have the same data shape as other fields
+type FieldName =
+  | 'top'
+  | 'bottom'
+  | 'blowout'
+  | 'dropTip'
+  | 'pickUpCurrent'
+  | 'plungerCurrent'
+  | 'dropTipCurrent'
+  | 'dropTipSpeed'
+  | 'pickUpDistance'
+  | 'tipLength'
+  | 'defaultAspirateFlowRate'
+  | 'defaultDispenseFlowRate'
 
-export type FieldProps = {
+type FieldProps = {
   value: ?number,
   default: number,
-  min: number,
-  max: number,
-  units: string,
+  min?: number,
+  max?: number,
+  units?: string,
+  type?: string,
 }
 
 type ConfigFields = {[FieldName]: FieldProps}
@@ -50,7 +66,6 @@ export default class ConfigForm extends React.Component<Props> {
   render () {
     const {fields} = OPTIONS
     const initialValues = mapValues(fields, f => {
-      // const _value =
       return f.value !== f.default ? f.value.toString() : null
     })
     const plungerFields = getFieldsByKey(PLUNGER_KEYS, fields)
@@ -68,16 +83,18 @@ export default class ConfigForm extends React.Component<Props> {
                 <ConfigFormGroup groupLabel="Plunger Positions">
                   {plungerFields.map(f => {
                     const value = this.getFieldValue(f.name, values)
+                    const _default = f.default.toString()
+                    const {name, displayName, units, min, max} = f
                     return (
                       <ConfigInput
-                        key={f.name}
-                        name={f.name}
-                        label={f.displayName}
-                        units={f.units}
+                        key={name}
+                        name={name}
+                        label={displayName}
+                        units={units}
                         value={value}
-                        placeholder={f.default}
-                        min={f.min}
-                        max={f.max}
+                        placeholder={_default}
+                        min={min}
+                        max={max}
                         onChange={handleChange}
                         error={null}
                       />
@@ -87,16 +104,18 @@ export default class ConfigForm extends React.Component<Props> {
                 <ConfigFormGroup groupLabel="Power / Force">
                   {powerFields.map(f => {
                     const value = this.getFieldValue(f.name, values)
+                    const _default = f.default.toString()
+                    const {name, displayName, units, min, max} = f
                     return (
                       <ConfigInput
-                        key={f.name}
-                        name={f.name}
-                        label={f.displayName}
-                        units={f.units}
+                        key={name}
+                        name={name}
+                        label={displayName}
+                        units={units}
                         value={value}
-                        placeholder={f.default}
-                        min={f.min}
-                        max={f.max}
+                        placeholder={_default}
+                        min={min}
+                        max={max}
                         onChange={handleChange}
                         error={null}
                       />
@@ -108,16 +127,18 @@ export default class ConfigForm extends React.Component<Props> {
                 <ConfigFormGroup groupLabel="Tip Pickup / Drop ">
                   {tipFields.map(f => {
                     const value = this.getFieldValue(f.name, values)
+                    const _default = f.default.toString()
+                    const {name, displayName, units, min, max} = f
                     return (
                       <ConfigInput
-                        key={f.name}
-                        name={f.name}
-                        label={f.displayName}
-                        units={f.units}
+                        key={name}
+                        name={name}
+                        label={displayName}
+                        units={units}
                         value={value}
-                        placeholder={f.default}
-                        min={f.min}
-                        max={f.max}
+                        placeholder={_default}
+                        min={min}
+                        max={max}
                         onChange={handleChange}
                         error={null}
                       />
@@ -133,7 +154,7 @@ export default class ConfigForm extends React.Component<Props> {
   }
 }
 
-function getFieldsByKey (keys: Array<string>, fields: any) {
+function getFieldsByKey (keys: Array<FieldName>, fields: ConfigFields) {
   return keys.map(k => {
     const field = fields[k]
     const displayName = startCase(k)
@@ -164,7 +185,6 @@ const OPTIONS = {
       max: 19.5,
       units: 'mm',
       type: 'float',
-      displayName: 'Top Plunger Position',
       default: 19.5,
     },
     bottom: {
@@ -173,7 +193,6 @@ const OPTIONS = {
       max: 19,
       units: 'mm',
       type: 'float',
-      displayName: 'Bottom Plunger Position',
       default: 2,
     },
     blowout: {
@@ -182,7 +201,6 @@ const OPTIONS = {
       max: 10,
       units: 'mm',
       type: 'float',
-      displayName: 'Blow Out Plunger Position',
       default: 0.5,
     },
     dropTip: {
@@ -191,7 +209,6 @@ const OPTIONS = {
       max: 2,
       units: 'mm',
       type: 'float',
-      displayName: 'Drop Tip Plunger Position',
       default: -5,
     },
     pickUpCurrent: {
@@ -200,7 +217,6 @@ const OPTIONS = {
       max: 1.2,
       units: 'A',
       type: 'float',
-      displayName: 'Pick Up Current',
       default: 0.6,
     },
     pickUpDistance: {
@@ -209,7 +225,6 @@ const OPTIONS = {
       max: 30,
       units: 'mm',
       type: 'float',
-      displayName: 'Pick Up Distance',
       default: 10,
     },
     plungerCurrent: {
@@ -218,7 +233,6 @@ const OPTIONS = {
       max: 0.5,
       units: 'A',
       type: 'float',
-      displayName: 'Plunger Current',
       default: 0.5,
     },
     dropTipCurrent: {
@@ -227,7 +241,6 @@ const OPTIONS = {
       max: 0.8,
       units: 'A',
       type: 'float',
-      displayName: 'Drop Tip Current',
       default: 0.5,
     },
     dropTipSpeed: {
@@ -236,14 +249,12 @@ const OPTIONS = {
       max: 30,
       units: 'mm/sec',
       type: 'float',
-      displayName: 'Drop Tip Speed',
       default: 5,
     },
     tipLength: {
       value: 51.7,
       units: 'mm',
       type: 'float',
-      displayName: 'Tip Length',
       default: 51.7,
     },
     defaultAspirateFlowRate: {
