@@ -105,11 +105,31 @@ or, on OS X or linux,
 
 If the simulation was successful, the simulator will print ``Simulation successful!``. If there was an error, it will print the error.
 
+The simulation script can also be invoked through python with ``python -m opentrons.simulate /path/to/protocol``.
+
+This also provides an entrypoint to use the Opentrons simulation package from other Python contexts such as an interactive prompt or Jupyter. To simulate a protocol in python, open a file containing a protocol and pass it to ``opentrons.simulate.simulate``:
+
+.. code-block:: python
+
+   import opentrons.simulate
+   protocol_file = open('/path/to/protocol.py')
+   opentrons.simulate.simulate(protocol_file)
+
+
+The function will either run and return or raise an  exception if there is a problem with the protocol.
+
+
+Configuration and Local Storage
+===============================
+
+The module uses a folder in your user directory as a place to store and read configuration and changes to its internal data. For instance, if your protocol creates a custom labware, the custom labware will live in the local storage location. This location is ``~/.opentrons`` on Linux or OSX and ``C:\Users\%USERNAME%\.opentrons`` on Windows.
+
+
 .. _writing-robot-jupyter:
 
-****************
+************************
 Robot’s Jupyter Notebook
-****************
+************************
 
 For a more interactive environment to write and debug using some of our API tools, we recommend using the Jupyter notebook which is installed on the robot. Using this notebook, you can develop a protocol by running its commands line-by-line, ensuring they do exactly what you want, before saving the protocol for later execution.
 

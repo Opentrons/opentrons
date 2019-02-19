@@ -131,7 +131,7 @@ if __name__ == "__main__":
         maintainer=AUTHOR,
         maintainer_email=EMAIL,
         keywords=KEYWORDS,
-        long_description=read("README.rst"),
+        long_description=read("pypi-readme.rst"),
         packages=PACKAGES,
         zip_safe=False,
         classifiers=CLASSIFIERS,

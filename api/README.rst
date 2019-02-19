@@ -2,7 +2,7 @@
 Opentrons API
 =============
 
-.. image:: https://badgen.net/travis/Opentrons/opentrons
+.. image:: https://badgen.net/travis/Opentrons/opentrons/edge
    :target: https://travis-ci.org/Opentrons/opentrons
    :alt: Build Status
 
@@ -16,110 +16,66 @@ Opentrons API
 
 .. _Full API Documentation: http://docs.opentrons.com
 
-Note On Versions
-----------------
-
-This API is for locally simulating protocols for the OT 2 without connecting to a robot. It no longer controls an OT 1.
-
-`Version 2.5.2 <https://pypi.org/project/opentrons/2.5.2/>`_ was the final release of this API for the OT 1. If you want to download this API to use the OT 1, you should download it with
-
-.. code-block:: shell
-
-   pip install opentrons==2.5.2
-
-For APIs between 2.5.2 and 3.7.0, there is no PyPI package available. Those APIs should be installed by cloning this repo and following the instructions in `the Development Setup section of CONTRIBUTING.md <https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#development-setup>`_ and `the API CONTRIBUTING.rst <https://github.com/Opentrons/opentrons/blob/edge/api/CONTRIBUTING.rst>`_.
-
 
 Introduction
 ------------
 
-Please refer to our `Full API Documentation`_ for detailed instructions.
+This is the Opentrons API Server, the Python module that runs the Opentrons OT-2. It contains the code that interprets and executes protocols; code that controls the hardware both during and outside of protocols; and all the other small tasks and capabilities that the robot fulfills.
 
-The Opentrons API is a simple framework designed to make writing automated biology lab protocols for the Opentrons OT2 easy.
+This document is about the structure and purpose of the source code. For information on how to use the Opentrons API or the robot in general, please refer to our  `Full API Documentation`_ for detailed instructions.
 
-We've designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook. 
+The Opentrons API Server package has two purposes:
 
-.. code-block:: python
-   
-   pipette.aspirate(tube_1).dispense(tube_2)
+1. **Control an Opentrons OT-2 robot.**  When controlling a robot, we use the entry point in `opentrons.main <https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/main.py>`_. We boot up a server for the robot’s HTTP endpoints, and a server for its WebSockets-based RPC system for control during protocols. We are configured by files in the robot’s filesystem in ``/data``.
 
-That is how you tell the Opentrons robot to aspirate its the maximum volume of the current pipette from one tube and dispense it into another one. 
+2. **Simulate protocols on users’ computers.** When simulating a protocol on a user’s computer, we use the entry point in `opentrons.simulate <https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/simulate.py>`_. We set up simulators for the protocol, but do not run any kind of web servers. We are configured by files in the user’s home directory (for more information see configuration_).
 
-You string these commands into full protocols that anyone with Opentrons can run. This one way to program the robot to use a p300 pipette to pick up 200ul and dispense 50ul into the first four wells in a 96 well plate called 'plate'.
 
-.. code-block:: python
-   
-   p300.aspirate(trough[1])
-   p300.dispense(50, plate[0])
-   p300.dispense(50, plate[1])
-   p300.dispense(50, plate[2])
-   p300.dispense(50, plate[3])
+Setting Up For Development
+--------------------------
 
-If you wanted to do this 96 times, you could write it like this:
+First, read the `top-level contributing guide section on setup <https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#environment-and-repository>`_. As that document states, once you have installed the prerequisites you can simply run ``make install`` in this subdirectory.
 
-.. code-block:: python
-   
-  for i in range(96):
-      if p300.current_volume < 50:
-          p300.aspirate(trough[1])
-      p300.dispense(50, plate[i])
+The only additional prerequisite concerns building documentation. If you want to build the PDF version of the documentation, you will need an installation of `LaTeX <https://www.latex-project.org/get/>`_ that includes the ``pdflatex`` tool. Note that if you don’t install this, everything will still work - you just won’t get the PDF documentation.
 
-Basic Principles
+
+.. _venvs:
+
+Pipenv, Virtual Environments, and Using Built Wheels
+----------------------------------------------------
+
+The API server is not importable in source form: if you put a terminal in ``src``, doing ``python -im opentrons`` won’t work even after you’ve installed all the dependencies. This is because we bundle data files from elsewhere in the repository (namely labware definitions from `shared-data <https://github.com/Opentrons/opentrons/tree/edge/shared-data>`_) into the Python module when we build it. This is also why we can’t do an editable install with ``pip -e`` - the way that Python does editable installs would point back to ``api/src``, which can’t be imported because it’s missing data files.
+
+In addition, because we use `pipenv <https://pipenv.readthedocs.io/en/latest/>`_ to control the Python environment of the API server during development, we don’t expect the developer’s system in general to have the python docs.
+
+The way we get around this is by using the virtualenvs that ``pipenv`` creates and installs dependencies into, and the associated commands like ``pipenv run`` and ``pipenv shell``. What this all adds up to is that if you, the developer, want to run changes you’ve just made, you need to run ``make local-shell`` (which will build the Python package and invoke a shell in the virtualenv with the built wheel) to do so.
+
+Also, our use of a ``src`` subdirectory may require special handling in `some IDEs <https://www.jetbrains.com/help/pycharm/configuring-folders-within-a-content-root.html>`_.
+
+
+Updating A Robot
 ----------------
 
-**Human Readable**: API strikes a balance between human and machine readability of the protocol. Protocol written with Opentrons API sound similar to what the protocol will look in real life. For example:
+Since the API server runs on a robot, we need to have easy ways of getting newly-built wheels to the robot and interacting with it in general. This is provided by the ``push-api`` target of the top-level makefile. To send an API to the robot, navigate to the top-level ``opentrons`` directory and run ``make push-api host=<robot ip>``. If you forget the ``host=`` part, the makefile will look for a robot connected via USB. Note that the update facility relies on the `update-server <https://github.com/Opentrons/opentrons/tree/edge/update-server>`_ running.
 
-.. code-block:: python
+The top level makefile (and the API makefile) also have a target called ``term``, which will give you an SSH terminal in the robot. This is just a light skin over invoking SSH with some options that make it more tolerant about frequently-changing IP addresses. It also takes an argument: ``make term host=<robot ip>`` connects to a specific ip, and if you don’t specify ``host=`` the makefile will look for a robot connected via USB. Unlike ``push-api``, this command only needs the robot to be booted to function.
 
-  p300.aspirate(100, plate['A1']).dispense(plate['A2'])
 
-Is exactly what you think it would do: 
-  * Take p300 pipette
-  * Aspirate 100 uL from well A1 on your plate
-  * Dispense everything into well A2 on the same plate
+Tests and Linting
+-----------------
 
-**Permissive**: everyone's process is different and we are not trying to impose our way of thinking on you. Instead, our API allows for different ways of expressing your protocol and adding fine details as you need them. 
-For example:
+All code changes should be accompanied by test changes as a rule of thumb. The only exceptions are to changes that are mostly about invoking different things in the system or changing hardware behavior; these should be documented with tests run on physical robots.
 
-.. code-block:: python
+Our tests live in ``tests/opentrons`` and are run with `pytest <https://docs.pytest.org/en/latest/>`_. Tests are run in CI on every pull request and on ``edge``; PRs will not be merged with failing tests.
 
-  p300.aspirate(100, plate[0]).dispense(plate[1])
+Tests should be organized similarly to the organization of the module itself.
 
-while using 0 or 1 instead of 'A1' and 'B1' will do just the same.
+We use `PyLama <https://github.com/klen/pylama>`_ for lint checks, and `mypy <http://mypy-lang.org/>`_ for type-checking annotations. Both of these tools are run in the ``lint`` makefile target, and is run in CI; PRs will not be merged with failing lint. Usage of ``noqa`` to temporarily disable lint is discouraged, but if you need to please disable only a specific rule and leave a comment explaining exactly why. The same goes with ``type: ignore``.
 
-or
+New code should have appropriate type annotations, and refactors of old code should try to add type annotations. We’re flexible about the refactor part, though - if adding type annotations greatly expands the scope of a PR, it’s OK to not add them as long as you explain this in the PR message.
 
-.. code-block:: python
+Note that because of the reasons explained in venvs_ you can’t just run the ``py.test``, ``pylama``, and ``mypy`` tools directly; you have to use the Makefile ``test`` and ``lint`` targets, which run these tools inside a virtualenv and make sure that the module is properly built first.
 
-  p300.aspirate(100, plate[0].bottom())
-
-will aspirate 100, from the bottom of a well.
-
-Hello World
------------
-
-Below is a short protocol that will pick up a tip and use it to move 100ul volume across all the wells on a plate:
-
-.. code-block:: python
-
-  from opentrons import labware, instruments
-
-  tiprack = labware.load(
-      'tiprack-200ul',  # container type
-      '1'               # slot
-  )
-
-  plate = labware.load('96-flat', '2')
-  
-  p300 = instruments.P300_Single(mount='left')
-
-  p300.pick_up_tip(tiprack[0])
-
-  for i in range(95):
-      p300.aspirate(100, plate[i])
-      p300.dispense(plate[i + 1])
-
-  p300.return_tip()
 
 Simulating Protocols
 --------------------
@@ -133,15 +89,14 @@ This also provides an entrypoint to use the Opentrons simulation package from ot
 .. code-block:: python
 
    import opentrons.simulate
-   protocol_file = open(’/path/to/protocol.py’)
+   protocol_file = open('/path/to/protocol.py')
    opentrons.simulate.simulate(protocol_file)
 
 
 The function will either run and return or raise an  exception if there is a problem with the protocol.
 
+
 Configuration
 -------------
 
-The module has a lot of configuration, some of which is only relevant when running on an actual robot, but some of which could be useful during simulation. When the module is first imported, it will try and write configuration files in ``~/.opentrons/config.json`` (``C:\Users\%USERNAME%\.opentrons\config.json`` on Windows). This contains mostly paths to other configuration files and directories, most of which will be in that folder. The location can be changed by setting the environment variable ``OT_CONFIG_DIR`` to another path. Inividual settings in the config file can be overridden by setting environment variables named like ``OT_${UPPERCASED_VAR_NAME}`` (for instance, to override the ``serial_log_file`` config element you could set the environment variable ``OT_SERIAL_LOG_FILE`` to a different path).
-
-
+The module has a lot of configuration, some of which is only relevant when running on an actual robot, but some of which could be useful during simulation. When the module is first imported, it will try and write configuration files in ``~/.opentrons/config.json`` (``C:\Users\%USERNAME%\.opentrons\config.json`` on Windows). This contains mostly paths to other configuration files and directories, most of which will be in that folder. The location can be changed by setting the environment variable ``OT_API_CONFIG_DIR`` to another path. Inividual settings in the config file can be overridden by setting environment variables named like ``OT_API_${UPPERCASED_VAR_NAME}`` (for instance, to override the ``serial_log_file`` config element you could set the environment variable ``OT_API_SERIAL_LOG_FILE`` to a different path).
