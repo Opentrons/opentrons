@@ -39,6 +39,7 @@ const wellRatioUpdatesMap = [
     dependentFields: [
       {name: 'changeTip', prevValue: 'perSource', nextValue: 'always'},
       {name: 'changeTip', prevValue: 'perDest', nextValue: 'always'},
+      {name: 'path', prevValue: 'multiDispense', nextValue: 'single'},
     ],
   },
   {
@@ -71,8 +72,11 @@ const wellRatioUpdater = makeConditionalPatchUpdater(wellRatioUpdatesMap)
 export function updatePatchPathField (patch: FormPatch, rawForm: FormData, pipetteEntities: PipetteEntities) {
   const appliedPatch = {...rawForm, ...patch}
   const {path, changeTip} = appliedPatch
-  // pass-thru: incomplete form
-  if (!path) return patch
+
+  if (!path) {
+    // invalid well ratio - fall back to 'single'
+    return {...patch, path: 'single'}
+  }
 
   let pipetteCapacityExceeded = false
   if (appliedPatch.volume && appliedPatch.pipette && appliedPatch.pipette in pipetteEntities) {
@@ -259,30 +263,42 @@ const updatePatchOnPipetteChannelChange = (
   return {...patch, ...update}
 }
 
+function updatePatchOnWellRatioChange (patch: FormPatch, rawForm: FormData) {
+  const appliedPatch = {...rawForm, ...patch}
+  const prevWellRatio = getWellRatio(rawForm.aspirate_wells, rawForm.dispense_wells)
+  const nextWellRatio = getWellRatio(appliedPatch.aspirate_wells, appliedPatch.dispense_wells)
+
+  if (!nextWellRatio || !prevWellRatio) {
+    // selected invalid well combo (eg 2:3, 0:1, etc). Reset path to 'single' and reset changeTip if invalid
+    const resetChangeTip = ['perSource', 'perDest'].includes(appliedPatch.changeTip)
+    const resetPath = {...patch, path: 'single'}
+    return resetChangeTip
+      ? {...resetPath, changeTip: 'always'}
+      : resetPath
+  }
+
+  if (nextWellRatio === prevWellRatio) return patch
+
+  return {
+    ...patch,
+    ...wellRatioUpdater(prevWellRatio, nextWellRatio, appliedPatch),
+  }
+}
+
 export default function dependentFieldsUpdateMoveLiquid (
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
   pipetteEntities: PipetteEntities,
   labwareEntities: LabwareEntities
 ): FormPatch {
-  const updatePatchOnWellRatioChange = (chainPatch) => {
-    const prevWellRatio = getWellRatio(rawForm.aspirate_wells, rawForm.dispense_wells)
-    const nextWellRatio = getWellRatio(chainPatch.aspirate_wells, chainPatch.dispense_wells)
-
-    if (prevWellRatio && nextWellRatio) {
-      return wellRatioUpdater(prevWellRatio, nextWellRatio, {...rawForm, ...chainPatch})
-    }
-    return chainPatch
-  }
-
   // sequentially modify parts of the patch until it's fully updated
   return chainPatchUpdaters(originalPatch, [
     chainPatch => updatePatchOnLabwareChange(chainPatch, rawForm),
     chainPatch => updatePatchOnPipetteChannelChange(chainPatch, rawForm, labwareEntities, pipetteEntities),
     chainPatch => updatePatchOnPipetteChange(chainPatch, rawForm, pipetteEntities),
+    chainPatch => updatePatchOnWellRatioChange(chainPatch, rawForm),
     chainPatch => updatePatchPathField(chainPatch, rawForm, pipetteEntities),
     chainPatch => updatePatchDisposalVolumeFields(chainPatch, rawForm, pipetteEntities),
     chainPatch => clampDisposalVolume(chainPatch, rawForm, pipetteEntities),
-    updatePatchOnWellRatioChange,
   ])
 }
