@@ -12,7 +12,7 @@ import {analyticsMiddleware} from './path/to/analytics'
 // add the middleware to the store
 const middleware = applyMiddleware(
   // ...
-  analyticsMiddleware
+  analyticsMiddleware,
   // ...
 )
 
@@ -117,6 +117,7 @@ Some payload fields are [hashed][] for user anonymity while preserving our abili
 
 ### protocol data sent
 
+- Protocol type (Python or JSON)
 - Application Name (e.g. "Opentrons Protocol Designer")
 - Application Version
 - Protocol `metadata.source`
