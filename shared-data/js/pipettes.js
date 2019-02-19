@@ -52,7 +52,7 @@ export function getPipetteNameSpecs (name: string): ?PipetteNameSpecs {
 // both the name specs + model-specific specs
 // NOTE: this should NEVER be used in PD, which is model-agnostic
 export function getPipetteModelSpecs (model: string): ?PipetteModelSpecs {
-  const modelSpecificFields = pipetteModelSpecs[model]
+  const modelSpecificFields = pipetteModelSpecs.config[model]
   const modelFields = modelSpecificFields &&
     getPipetteNameSpecs(modelSpecificFields.name)
   return modelFields && {...modelFields, ...modelSpecificFields}
