@@ -1,4 +1,4 @@
-# Changes from 3.5.1 to 3.6.5
+# Changes from 3.6.5 to 3.7.0
 
 For more details, please see the full [technical change log][changelog]
 
@@ -9,19 +9,11 @@ For more details, please see the full [technical change log][changelog]
 
 ### Bug fixes
 
-- Lost connection alert messages will no longer trigger when your robot is restarting for normal reasons (e.g. software update or deck calibration). Sorry for the confusion this caused!
-- The notification dot for available robot upgrade on the main Robots nav button has been fixed
+- Added a warning message to the app update flow to remind you that you need to update your robot _after_ you update your app
 
 ### New features
 
-- We've put a lot of work into improving the Wi-Fi setup experience of your robot:
-    - Most 802.1X enterprise networks (e.g. eduroam) are now supported!
-    - Hidden SSID networks are also supported
-    - Generally, it should be easier to tell what Wi-Fi network your robot is currently connected to, along with signal strength and whether or not the network is secured
-    - The robot settings page now displays the IP and MAC addresses of the Wi-Fi and Ethernet-to-USB interfaces
-    - Please see our support documentation for more details
-- After tip-probe is completed, the app will now move the pipette out of the way so you have better access to the deck
-- App and robot update messages should now be clearer and easier to follow
+- The app now sends more detailed robot configuration information automatically to support chat so our Support Team can more efficiently diagnose any issues
 
 ### Known issues
 
@@ -39,37 +31,28 @@ executing, but it does not ([#2020][2020])
 <!-- start:@opentrons/api -->
 ## OT2 and Protocol API
 
-**Important**: This release includes version 3.6.3, which updates the calibration of the P10 single pipette.
+This release includes updated calibrations for the **P10S**, **P10M**, **P50S**, **P50M**, and **P300S** pipettes.
 
-This update includes a refinement to the aspiration function of the P10 single-channel pipette based on an expanded data set. The updated configuration is available as an **opt-in** in the "Advanced Settings" section of your robot's settings page.
+This update is an incremental refinement to aspiration volume accuracy, reflecting extensive additional test data. **After updating, your robot will be configured to use these new calibrations**.
 
-Please note this is a small but material change to the P10's pipetting performance, in particular decreasing the low-volume µl-to-mm conversion factor to address under-aspiration users have reported.
+Please note this change may result in materially different aspiration volumes. If you do not wish to use the updated calibrations immediately (for example, if you are in the middle of an experimental run, or if you are already using a custom aspiration method), you can revert these changes by enabling _"Use older pipette calibrations"_ in your robot's _"Advanced Settings"_ menu.
 
 As always, please reach out to our team with any questions.
 
 ### Bug fixes
 
-- **Fixed a bug causing a very incorrect aspirate function when the "Use New P10 Single Calibration" advanced option was selected**
-  - This bug was introduced in version 3.6.2 and fixed in version 3.6.5
-- **Fixed a bug causing errors in protocols that assigned to a dictionary or list at the top level (caused by metadata parsing)**
-- Updated the configuration of the P1000 single based on an expanded dataset
-- Updated the configuration of the P10 single based on an expanded dataset
-- Fixed a bug that was overwriting robot configuration with defaults when using the internal USB flash drive for configuration storage
-- Fixed the iteration order of labware created with `labware.create` to match documentation
+- Updated pipette aspiration functions for increased accuracy
+- Boot reliability improvements
 
 ### New features
 
-- Added support for `v1.4` pipette models
-- Python protocols can now include arbitrary metadata for display in the app
-
-```
-from opentrons import containers, instruments
-
-metadata = {
-    'protocolName': 'My Protocol',
-    'description': 'This protocol is mine and it is good',
-}
-```
+- Python protocols can now be simulated from your own computer **without needing to clone our entire code repository**
+    - See the [Opentrons package on PyPI](https://pypi.org/project/opentrons/) for more details
+    ```
+    pip install opentrons
+    opentrons_simulate /path/to/protocol.py
+    ```
+- Underlying architectural improvements for future user-facing features
 
 ### Known issues
 
@@ -80,7 +63,5 @@ metadata = {
     3. Insert plate and calibrate normally
         - After the plate has been calibrated once, the issue will not reoccur
 - Extremely long aspirations and dispenses can incorrectly trigger a serial timeout issue. If you see such an issue, make sure your protocol’s combination of aspirate/dispense speeds and aspirate/dispense volumes does not include a command that will take more than 30 seconds.
-
-
 
 <!-- end:@opentrons/api -->
