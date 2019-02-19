@@ -10,6 +10,7 @@ import ConfigFormGroup, {FormColumn, ConfigInput} from './ConfigFormGroup'
 import type {Pipette} from '../../http-api-client'
 
 // TODO (ka 2-19-2019):
+// Move to settings.js when no longer mock data based
 // defaultAspirateFlowRate, defaultDispenseFlowRate and tipLength
 // do not have the same data shape as other fields
 type FieldName =
@@ -58,9 +59,27 @@ type Props = SP & OP
 
 type FormValues = {[string]: ?(string | {[string]: string})}
 
+const PLUNGER_KEYS = ['top', 'bottom', 'blowout', 'dropTip']
+const POWER_KEYS = ['plungerCurrent', 'pickUpCurrent', 'dropTipCurrent']
+const TIP_KEYS = ['dropTipSpeed', 'pickUpDistance']
+
 export default class ConfigForm extends React.Component<Props> {
   getFieldValue (name: string, values: FormValues): ?string {
     return get(values, name)
+  }
+
+  // TODO (ka 2-19-2019): type this
+  getFieldsByKey (keys: Array<FieldName>, fields: ConfigFields): any {
+    return keys.map(k => {
+      const field = fields[k]
+      const displayName = startCase(k)
+      const name = k
+      return {
+        ...field,
+        name,
+        displayName,
+      }
+    })
   }
 
   render () {
@@ -68,10 +87,9 @@ export default class ConfigForm extends React.Component<Props> {
     const initialValues = mapValues(fields, f => {
       return f.value !== f.default ? f.value.toString() : null
     })
-    const plungerFields = getFieldsByKey(PLUNGER_KEYS, fields)
-    const powerFields = getFieldsByKey(POWER_KEYS, fields)
-    const tipFields = getFieldsByKey(TIP_KEYS, fields)
-    console.log(plungerFields)
+    const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
+    const powerFields = this.getFieldsByKey(POWER_KEYS, fields)
+    const tipFields = this.getFieldsByKey(TIP_KEYS, fields)
     return (
       <Formik
         initialValues={initialValues}
@@ -87,14 +105,10 @@ export default class ConfigForm extends React.Component<Props> {
                     const {name, displayName, units, min, max} = f
                     return (
                       <ConfigInput
+                        {...{name, units, value, min, max}}
                         key={name}
-                        name={name}
                         label={displayName}
-                        units={units}
-                        value={value}
                         placeholder={_default}
-                        min={min}
-                        max={max}
                         onChange={handleChange}
                         error={null}
                       />
@@ -108,14 +122,10 @@ export default class ConfigForm extends React.Component<Props> {
                     const {name, displayName, units, min, max} = f
                     return (
                       <ConfigInput
+                        {...{name, units, value, min, max}}
                         key={name}
-                        name={name}
                         label={displayName}
-                        units={units}
-                        value={value}
                         placeholder={_default}
-                        min={min}
-                        max={max}
                         onChange={handleChange}
                         error={null}
                       />
@@ -131,14 +141,10 @@ export default class ConfigForm extends React.Component<Props> {
                     const {name, displayName, units, min, max} = f
                     return (
                       <ConfigInput
+                        {...{name, units, value, min, max}}
                         key={name}
-                        name={name}
                         label={displayName}
-                        units={units}
-                        value={value}
                         placeholder={_default}
-                        min={min}
-                        max={max}
                         onChange={handleChange}
                         error={null}
                       />
@@ -154,25 +160,7 @@ export default class ConfigForm extends React.Component<Props> {
   }
 }
 
-function getFieldsByKey (keys: Array<FieldName>, fields: ConfigFields) {
-  return keys.map(k => {
-    const field = fields[k]
-    const displayName = startCase(k)
-    const name = k
-    return {
-      ...field,
-      name,
-      displayName,
-    }
-  })
-}
-
-const PLUNGER_KEYS = ['top', 'bottom', 'blowout', 'dropTip']
-const POWER_KEYS = ['plungerCurrent', 'pickUpCurrent', 'dropTipCurrent']
-const TIP_KEYS = ['dropTipSpeed', 'pickUpDistance']
-
 // GET /settings/pipettes/P50MV1318060102
-
 const OPTIONS = {
   info: {
     name: 'p50_multi',
