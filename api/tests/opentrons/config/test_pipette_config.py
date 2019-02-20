@@ -129,8 +129,8 @@ def test_mutable_configs_only(monkeypatch):
 
     config = pipette_config.list_mutable_configs(new_id)
     # instead of dealing with unordered lists, convert to set and check whether
-    # these lists have an intersection
-    intersection = set(list(config.keys())) - \
+    # these lists have a difference between them
+    difference = set(list(config.keys())) - \
         set(pipette_config.mutable_configs)
     # ensure empty
-    assert bool(intersection) is False
+    assert bool(difference) is False
