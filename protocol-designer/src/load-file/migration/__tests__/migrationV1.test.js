@@ -11,7 +11,6 @@ import {
   MIX_DEPRECATED_FIELD_NAMES,
   replaceTCDStepsWithMoveLiquidStep,
   updateMigrationVersion,
-  default as wholeMigration,
 } from '../migrationV1.js'
 
 describe('renameOrderedSteps', () => {
@@ -291,22 +290,5 @@ describe('updateMigrationVersion', () => {
   const migratedFile = updateMigrationVersion(oldProtocol)
   test('update migrationVersion', () => {
     expect(migratedFile['designer-application'].migrationVersion).toEqual(1)
-  })
-})
-
-describe('version gated migration', () => {
-  test('migration occurs when migrationVersion not present in file', () => {
-    const migratedFile = wholeMigration(oldProtocol)
-    expect(oldProtocol).not.toEqual(migratedFile)
-  })
-  test('migration does not occur when migrationVersion is 1', () => {
-    const stubbedNewFile = {'designer-application': {migrationVersion: 1}}
-    const migratedFile = wholeMigration(stubbedNewFile)
-    expect(migratedFile).toEqual(stubbedNewFile)
-  })
-  test('migration does not occur when migrationVersion is past 1', () => {
-    const stubbedNewFile = {'designer-application': {migrationVersion: 45}}
-    const migratedFile = wholeMigration(stubbedNewFile)
-    expect(migratedFile).toEqual(stubbedNewFile)
   })
 })
