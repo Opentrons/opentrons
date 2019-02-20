@@ -1,6 +1,6 @@
 @import '@opentrons/components';
 
-.deck {
+.deck_wrapper {
   padding: 1rem;
   max-width: 100%;
   width: 100vh;

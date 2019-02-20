@@ -17,11 +17,6 @@
   fill: var(--c-light-gray);
 }
 
-.overlay_panel {
-  width: 100%;
-  height: 100%;
-}
-
 .slot_overlay.disabled .overlay_panel {
   opacity: 0.9;
 }
@@ -52,11 +47,14 @@
   cursor: pointer;
   transform: translate(20%, 0);
   text-transform: uppercase;
-  dominant-baseline: text-before-edge;
+}
 
-  & .icon {
-    transform: translate(-60%, 0);
-  }
+.clickable_text_text {
+  dominant-baseline: text-before-edge;
+}
+
+.clickable_text_icon {
+  transform: translate(-60%, 0);
 }
 
 .clickable_area {

@@ -28,9 +28,11 @@ export default function ClickableText (props: Props) {
       />
 
       <g className={styles.clickable_text}>
-        <text x='0' y={props.y}>{props.text}</text>
+        <text x='0' y={props.y} className={styles.clickable_text_text}>
+          {props.text}
+        </text>
         {props.iconName && (
-          <g className={styles.icon}>
+          <g className={styles.clickable_text_icon}>
             <Icon name={props.iconName} y={props.y} height={height} />
           </g>
         )}

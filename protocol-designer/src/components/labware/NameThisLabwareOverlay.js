@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import ClickableText from './ClickableText'
+import OverlayPanel from './OverlayPanel'
 import styles from './labware.css'
 import ForeignDiv from '../../components/ForeignDiv'
 import i18n from '../../localization'
@@ -54,7 +55,7 @@ export default class NameThisLabwareOverlay extends React.Component<Props, State
       <ClickOutside onClickOutside={this.onSubmit}>
         {({ref}) => (
           <g className={styles.slot_overlay} ref={ref}>
-            <rect className={styles.overlay_panel} />
+            <OverlayPanel />
             <g transform='translate(5, 0)'>
               <ForeignDiv x='0' y='15%' width='92%'>
                 <input
