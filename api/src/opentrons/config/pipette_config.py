@@ -213,6 +213,7 @@ def save_overrides(pipette_id: str, overrides: Dict[str, Any], model: str):
                 del existing[key]
         else:
             model_configs[key]['value'] = value['value']
+            add_default(model_configs[key])
             existing[key] = model_configs[key]
     assert model in config_models
     existing['model'] = model
@@ -259,6 +260,15 @@ def known_pipettes() -> Sequence[str]:
             if fi.is_file() and '.json' in fi.suffixes]
 
 
+def add_default(cfg):
+    if isinstance(cfg, dict):
+        if 'value' in cfg.keys():
+            cfg['default'] = cfg['value']
+        else:
+            for top_level_key in cfg.keys():
+                add_default(cfg[top_level_key])
+
+
 def load_config_dict(pipette_id: str) -> Dict:
     """ Give updated config with overrides for a pipette. This will add
     the default value for a mutable config before returning the modified
@@ -269,13 +279,6 @@ def load_config_dict(pipette_id: str) -> Dict:
     config = copy.deepcopy(model_config()['config'][model])
     config.update(copy.deepcopy(name_config()[config['name']]))
 
-    def add_default(cfg):
-        if isinstance(cfg, dict):
-            if 'value' in cfg.keys():
-                cfg['default'] = cfg['value']
-            else:
-                for top_level_key in cfg.keys():
-                    add_default(cfg[top_level_key])
     for top_level_key in config.keys():
         add_default(config[top_level_key])
 
