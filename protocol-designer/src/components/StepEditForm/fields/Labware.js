@@ -3,7 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {DropdownField, type DropdownOption} from '@opentrons/components'
 import cx from 'classnames'
-import {selectors as stepFormSelectors} from '../../../step-forms'
+import {selectors as uiLabwareSelectors} from '../../../ui/labware'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import type {BaseState} from '../../../types'
 import type {FocusHandlers} from '../types'
@@ -15,7 +15,7 @@ type Options = Array<DropdownOption>
 type LabwareFieldOP = {name: StepFieldName, className?: string} & FocusHandlers
 type LabwareFieldSP = {labwareOptions: Options}
 const LabwareFieldSTP = (state: BaseState): LabwareFieldSP => ({
-  labwareOptions: stepFormSelectors.getLabwareOptions(state),
+  labwareOptions: uiLabwareSelectors.getLabwareOptions(state),
 })
 const LabwareField = connect(LabwareFieldSTP)((props: LabwareFieldOP & LabwareFieldSP) => {
   const {labwareOptions, name, className, focusedField, dirtyFields, onFieldBlur, onFieldFocus} = props

@@ -7,6 +7,7 @@ import cx from 'classnames'
 import {getMaxDisposalVolumeForMultidispense} from '../../../steplist/formLevel/handleFormChange/utils'
 import {SOURCE_WELL_BLOWOUT_DESTINATION} from '../../../step-generation/utils'
 import {selectors as stepFormSelectors} from '../../../step-forms'
+import {selectors as uiLabwareSelectors} from '../../../ui/labware'
 
 import FieldConnector from './FieldConnector'
 import TextField from './Text'
@@ -93,7 +94,7 @@ const mapSTP = (state: BaseState): SP => {
   return {
     maxDisposalVolume: getMaxDisposalVolumeForMultidispense(stepFormSelectors.getUnsavedForm(state), stepFormSelectors.getPipetteEntities(state)),
     disposalDestinationOptions: [
-      ...stepFormSelectors.getDisposalLabwareOptions(state),
+      ...uiLabwareSelectors.getDisposalLabwareOptions(state),
       {name: 'Source Well', value: SOURCE_WELL_BLOWOUT_DESTINATION},
     ],
   }

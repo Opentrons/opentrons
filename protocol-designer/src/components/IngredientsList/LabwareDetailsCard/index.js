@@ -3,6 +3,8 @@ import {connect} from 'react-redux'
 import assert from 'assert'
 import LabwareDetailsCard from './LabwareDetailsCard'
 import {selectors as stepFormSelectors} from '../../../step-forms'
+import {selectors as uiLabwareSelectors} from '../../../ui/labware'
+import {selectors as labwareIngredSelectors} from '../../../labware-ingred/selectors'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import type {ElementProps} from 'react'
 import type {Dispatch} from 'redux'
@@ -14,25 +16,25 @@ type DP = {
   renameLabware: $PropertyType<Props, 'renameLabware'>,
 }
 
-type SP = $Diff<Props, DP> & {_labwareId: ?string}
+type SP = $Diff<Props, DP> & {_labwareId?: string}
 
 function mapStateToProps (state: BaseState): SP {
-  const labwareData = stepFormSelectors.getSelectedLabware(state)
-  assert(labwareData, 'Expected labware data to exist in connected labware details card')
+  const labwareNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
+  const labwareId = labwareIngredSelectors.getSelectedLabwareId(state)
+  const labwareType = labwareId && stepFormSelectors.getLabwareTypesById(state)[labwareId]
 
-  const props = (labwareData)
-    ? {
-      labwareType: labwareData.type,
-      nickname: labwareData.nickname || 'Unnamed Labware',
-    }
-    : {
+  assert(labwareId && labwareType, 'Expected labware id & type to exist in connected labware details card')
+  if (!labwareId || !labwareType) {
+    return {
       labwareType: '?',
       nickname: '?',
     }
+  }
 
   return {
-    ...props,
-    _labwareId: labwareData && labwareData.id,
+    labwareType: labwareType,
+    nickname: labwareNicknamesById[labwareId] || 'Unnamed Labware',
+    _labwareId: labwareId,
   }
 }
 

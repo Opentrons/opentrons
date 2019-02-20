@@ -24,14 +24,14 @@ const all96Tips = reduce(
 // NOTE this just adds missing well keys to the labware-ingred 'deck setup' liquid state
 export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> = createSelector(
   labwareIngredSelectors.getLiquidsByLabwareId,
-  stepFormSelectors.getLabwareById,
-  (ingredLocations, allLabware) => {
-    const allLabwareIds: Array<string> = Object.keys(allLabware)
+  stepFormSelectors.getLabwareTypesById,
+  (ingredLocations, labwareTypes) => {
+    const allLabwareIds: Array<string> = Object.keys(labwareTypes)
     return allLabwareIds.reduce((
       acc: StepGeneration.LabwareLiquidState,
       labwareId
     ): StepGeneration.LabwareLiquidState => {
-      const labwareType = allLabware[labwareId] && allLabware[labwareId].type
+      const labwareType = labwareTypes[labwareId]
       const allWells = labwareType ? getAllWellsForLabware(labwareType) : []
       const liquidStateForLabwareAllWells = allWells.reduce(
         (innerAcc: StepGeneration.SingleLabwareLiquidState, well) => ({

@@ -1,19 +1,20 @@
 // @flow
 import * as React from 'react'
-import type {Labware} from '../../labware-ingred/types'
-import {labwareToDisplayName} from '../../labware-ingred/utils'
 import styles from './StepItem.css'
 
-type LabwareTooltipContentsProps = {labware: ?Labware}
-const LabwareTooltipContents = ({labware}: LabwareTooltipContentsProps) => {
-  const displayName = labware && labwareToDisplayName(labware)
+type LabwareTooltipContentsProps = {
+  labwareNickname: ?string,
+  labwareType: ?string,
+}
+const LabwareTooltipContents = (props: LabwareTooltipContentsProps) => {
+  const {labwareNickname, labwareType} = props
   return (
     <div className={styles.labware_tooltip_contents}>
-      <p className={styles.labware_name}>{displayName}</p>
-      {labware && labware.type !== displayName &&
+      <p className={styles.labware_name}>{labwareNickname}</p>
+      {labwareNickname &&
         <React.Fragment>
           <div className={styles.labware_spacer} />
-          <p>{labware && labware.type}</p>
+          <p>{labwareType}</p>
         </React.Fragment>
       }
     </div>

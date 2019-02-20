@@ -1,6 +1,7 @@
 @import '@opentrons/components';
 
 .form_row {
+  margin-top: 1.5rem;
   min-height: 2.25rem;
   display: flex;
   flex-direction: row;
@@ -52,7 +53,7 @@
 }
 
 .checkbox_row {
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
   height: 1.5rem;
   display: flex;
   flex-direction: row;

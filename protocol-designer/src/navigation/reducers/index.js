@@ -27,7 +27,6 @@ export const _allReducers = {
 export type RootState = {
   page: Page,
   newProtocolModal: boolean,
-  wellSelectionModal: boolean,
 }
 
 const rootReducer = combineReducers(_allReducers)

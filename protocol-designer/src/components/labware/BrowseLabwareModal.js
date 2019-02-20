@@ -92,15 +92,14 @@ class BrowseLabwareModal extends React.Component<Props> {
 
 function mapStateToProps (state: BaseState): SP {
   const labwareId = selectors.getDrillDownLabwareId(state)
-  const allLabware = stepFormSelectors.getLabwareById(state)
-  const labware = labwareId && allLabware ? allLabware[labwareId] : null
+  const labwareType = (labwareId && stepFormSelectors.getLabwareTypesById(state)[labwareId]) || 'missing labware'
   const allWellContents = wellContentsSelectors.getLastValidWellContents(state)
   const wellContents = labwareId && allWellContents ? allWellContents[labwareId] : {}
   const ingredNames = selectors.getLiquidNamesById(state)
   return {
     wellContents,
     ingredNames,
-    labwareType: labware ? labware.type : 'missing labware',
+    labwareType,
   }
 }
 

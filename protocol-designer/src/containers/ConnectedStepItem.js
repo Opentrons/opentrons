@@ -11,6 +11,7 @@ import {selectors as stepFormSelectors} from '../step-forms'
 import {selectors as stepsSelectors, actions as stepsActions} from '../ui/steps'
 import {selectors as fileDataSelectors} from '../file-data'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
+import {selectors as uiLabwareSelectors} from '../ui/labware'
 import StepItem from '../components/steplist/StepItem' // TODO Ian 2018-05-10 why is importing StepItem from index.js not working?
 
 type Props = React.ElementProps<typeof StepItem>
@@ -31,7 +32,8 @@ type SP = {|
   selected: $PropertyType<Props, 'selected'>,
   hovered: $PropertyType<Props, 'hovered'>,
   hoveredSubstep: $PropertyType<Props, 'hoveredSubstep'>,
-  labwareById: $PropertyType<Props, 'labwareById'>,
+  labwareNicknamesById: $PropertyType<Props, 'labwareNicknamesById'>,
+  labwareTypesById: $PropertyType<Props, 'labwareTypesById'>,
   ingredNames: $PropertyType<Props, 'ingredNames'>,
 |}
 
@@ -69,7 +71,8 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     // user is not hovering on substep.
     hovered: (hoveredStep === stepId) && !hoveredSubstep,
 
-    labwareById: stepFormSelectors.getLabwareById(state),
+    labwareNicknamesById: uiLabwareSelectors.getLabwareNicknamesById(state),
+    labwareTypesById: stepFormSelectors.getLabwareTypesById(state),
     ingredNames: labwareIngredSelectors.getLiquidNamesById(state),
   }
 }

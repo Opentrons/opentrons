@@ -17,14 +17,15 @@ import type {
   LiquidGroup,
   OrderedLiquids,
 } from './types'
-import type {BaseState, Options} from './../types'
+import type {BaseState, Options, Selector} from './../types'
 
-type Selector<T> = (RootSlice) => T
+// TODO: Ian 2019-02-15 no RootSlice, use BaseState
 type RootSlice = {labwareIngred: RootState}
 
 const rootSelector = (state: RootSlice): RootState => state.labwareIngred
 
-const getLabwareNameInfo = createSelector(
+// NOTE: not intended for UI use! Use getLabwareNicknamesById for the string.
+const getLabwareNameInfo: Selector<*> = createSelector(
   rootSelector,
   s => s.containers
 )

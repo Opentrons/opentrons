@@ -41,3 +41,5 @@ export type LabwareEntities = {
     type: string,
   |},
 }
+
+export type LabwareEntity = $Values<LabwareEntities>

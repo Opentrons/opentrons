@@ -1,16 +1,8 @@
 // @flow
-import type {LabwareData, LocationLiquidState} from '../step-generation'
+import type {LocationLiquidState} from '../step-generation'
 // TODO Ian 2018-02-19 make these shared in component library, standardize with Run App
 
 //  ===== LABWARE ===========
-
-// TODO: Ian 2019-01-24 deprecate this type, use LabwareEntity or DisplayLabware instead
-export type Labware = {|
-  ...LabwareData,
-  id: string,
-  nickname?: string,
-  disambiguationNumber: number,
-|}
 
 export type DisplayLabware = {|
   nickname: ?string,

@@ -91,15 +91,15 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
 }
 
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
-  const formData = stepFormSelectors.getUnsavedForm(state)
+  const rawForm = stepFormSelectors.getUnsavedForm(state)
   const {fieldName} = ownProps
   const labwareFieldName = getLabwareFieldForPositioningField(ownProps.fieldName)
 
   let wellHeightMM = null
-  if (formData && formData[labwareFieldName]) {
-    const labwareById = stepFormSelectors.getLabwareById(state)
-    const labware = labwareById[formData[labwareFieldName]]
-    const labwareDef = labware && labware.type && getLabware(labware.type)
+  const labwareId: ?string = rawForm && rawForm[labwareFieldName]
+  if (labwareId != null) {
+    const labwareType = stepFormSelectors.getLabwareTypesById(state)[labwareId]
+    const labwareDef = labwareType && getLabware(labwareType)
     if (labwareDef) {
       // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
       const firstWell = labwareDef.wells['A1']
@@ -110,9 +110,9 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   }
 
   return {
-    disabled: formData ? getDisabledFields(formData).has(fieldName) : false,
+    disabled: rawForm ? getDisabledFields(rawForm).has(fieldName) : false,
     wellHeightMM,
-    mmFromBottom: formData && formData[fieldName],
+    mmFromBottom: rawForm && rawForm[fieldName],
   }
 }
 

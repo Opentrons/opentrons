@@ -8,6 +8,7 @@ import styles from './TitleBar.css'
 import i18n from '../localization'
 import {START_TERMINAL_TITLE, END_TERMINAL_TITLE} from '../constants'
 import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
+import {selectors as uiLabwareSelectors} from '../ui/labware'
 import {selectors as stepFormSelectors} from '../step-forms'
 import {selectors as stepsSelectors, actions as stepsActions} from '../ui/steps'
 import {END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID} from '../steplist'
@@ -43,17 +44,18 @@ function TitleWithIcon (props: TitleWithIconProps) {
 }
 
 function mapStateToProps (state: BaseState): SP {
-  const selectedLabware = stepFormSelectors.getSelectedLabware(state)
+  const selectedLabwareId = labwareIngredSelectors.getSelectedLabwareId(state)
   const _page = selectors.getCurrentPage(state)
   const fileName = fileDataSelectors.protocolName(state)
   const selectedStep = stepsSelectors.getSelectedStep(state)
   const selectedTerminalId = stepsSelectors.getSelectedTerminalItemId(state)
-  const labware = selectedLabware
-  const labwareNames = stepFormSelectors.getLabwareNicknamesById(state)
-  const labwareNickname = labware && labware.id && labwareNames[labware.id]
+  const labwareNames = uiLabwareSelectors.getLabwareNicknamesById(state)
   const drilledDownLabwareId = labwareIngredSelectors.getDrillDownLabwareId(state)
-  const liquidPlacementMode = Boolean(selectedLabware)
   const wellSelectionLabwareKey = stepsSelectors.getWellSelectionLabwareKey(state)
+
+  const labwareNickname = selectedLabwareId != null ? labwareNames[selectedLabwareId] : null
+  const labwareType = selectedLabwareId != null ? stepFormSelectors.getLabwareTypesById(state)[selectedLabwareId] : null
+  const liquidPlacementMode = selectedLabwareId != null
 
   switch (_page) {
     case 'liquids':
@@ -74,8 +76,8 @@ function mapStateToProps (state: BaseState): SP {
         return {
           _page,
           _liquidPlacementMode: liquidPlacementMode,
-          title: labwareNickname || null,
-          subtitle: labware && humanizeLabwareType(labware.type),
+          title: labwareNickname,
+          subtitle: labwareType,
           backButtonLabel: 'Deck',
         }
       }
@@ -88,9 +90,10 @@ function mapStateToProps (state: BaseState): SP {
         subtitle = END_TERMINAL_TITLE
         if (drilledDownLabwareId) {
           backButtonLabel = 'Deck'
-          const drilledDownLabware = stepFormSelectors.getLabwareById(state)[drilledDownLabwareId]
-          title = drilledDownLabware && drilledDownLabware.nickname
-          subtitle = drilledDownLabware && humanizeLabwareType(drilledDownLabware.type)
+          const labwareType = stepFormSelectors.getLabwareTypesById(state)[drilledDownLabwareId]
+          const nickname = uiLabwareSelectors.getLabwareNicknamesById(state)[drilledDownLabwareId]
+          title = nickname
+          subtitle = labwareType && humanizeLabwareType(labwareType)
         }
       } else if (selectedStep) {
         if (wellSelectionLabwareKey) { // well selection modal

@@ -112,15 +112,16 @@ export const getLastValidWellContents: Selector<WellContentsByLabware> = createS
 
 export const getSelectedWellsMaxVolume: Selector<number> = createSelector(
   wellSelectionSelectors.getSelectedWells,
-  stepFormSelectors.getSelectedLabware,
-  (selectedWells, selectedContainer) => {
+  labwareIngredSelectors.getSelectedLabwareId,
+  stepFormSelectors.getLabwareTypesById,
+  (selectedWells, selectedLabwareId, labwareTypes) => {
     const selectedWellNames = Object.keys(selectedWells)
-    const selectedContainerType = selectedContainer && selectedContainer.type
-    if (!selectedContainerType) {
+    const selectedLabwareType = selectedLabwareId && labwareTypes[selectedLabwareId]
+    if (!selectedLabwareType) {
       console.warn('No container type selected, cannot get max volume')
       return Infinity
     }
-    const maxVolumesByWell = getMaxVolumes(selectedContainerType)
+    const maxVolumesByWell = getMaxVolumes(selectedLabwareType)
     const maxVolumesList = (selectedWellNames.length > 0)
       // when wells are selected, only look at vols of selected wells
       ? Object.values(pick(maxVolumesByWell, selectedWellNames))

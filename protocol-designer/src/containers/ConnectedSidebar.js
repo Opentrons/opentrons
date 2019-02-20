@@ -2,7 +2,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {selectors} from '../navigation'
-import {selectors as stepFormSelectors} from '../step-forms'
+import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
 
 import ConnectedStepList from './ConnectedStepList'
 import IngredientsList from './IngredientsList'
@@ -36,7 +36,7 @@ function Sidebar (props: Props) {
 
 function mapStateToProps (state: BaseState): Props {
   const page = selectors.getCurrentPage(state)
-  const liquidPlacementMode = Boolean(stepFormSelectors.getSelectedLabware(state))
+  const liquidPlacementMode = labwareIngredSelectors.getSelectedLabwareId(state) != null
 
   return {
     page,

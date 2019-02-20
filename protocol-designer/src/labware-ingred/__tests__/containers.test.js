@@ -8,12 +8,12 @@ describe('DELETE_CONTAINER action', () => {
       containersInitialState,
       {
         type: 'DELETE_CONTAINER',
-        payload: {containerId: '123'},
+        payload: {labwareId: '123'},
       }
     )).toEqual(containersInitialState)
   })
 
-  test('no-op with nonexistent containerId', () => {
+  test('no-op with nonexistent labwareId', () => {
     expect(containers(
       {
         '1': 'blah',
@@ -21,7 +21,7 @@ describe('DELETE_CONTAINER action', () => {
       },
       {
         type: 'DELETE_CONTAINER',
-        payload: {containerId: '123'},
+        payload: {labwareId: '123'},
       }
     )).toEqual({
       '1': 'blah',
@@ -29,7 +29,7 @@ describe('DELETE_CONTAINER action', () => {
     })
   })
 
-  test('delete given containerId', () => {
+  test('delete given labwareId', () => {
     expect(containers(
       {
         '1': 'blah',
@@ -38,7 +38,7 @@ describe('DELETE_CONTAINER action', () => {
       },
       {
         type: 'DELETE_CONTAINER',
-        payload: {containerId: '123'},
+        payload: {labwareId: '123'},
       }
     )).toEqual({
       '1': 'blah',

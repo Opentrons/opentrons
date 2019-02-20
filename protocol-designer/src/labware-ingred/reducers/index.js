@@ -10,7 +10,7 @@ import {FIXED_TRASH_ID} from '../../constants'
 import {getPDMetadata} from '../../file-types'
 import type {DeckSlot} from '@opentrons/components'
 import type {SingleLabwareLiquidState, LabwareLiquidState} from '../../step-generation'
-import type {LiquidGroupsById, Labware, DisplayLabware} from '../types'
+import type {LiquidGroupsById, DisplayLabware} from '../types'
 import type {LoadFileAction} from '../../load-file'
 import type {
   RemoveWellsContents,
@@ -21,9 +21,6 @@ import type {
   SelectLiquidAction,
   SetWellContentsAction,
 } from '../actions'
-
-// external actions (for types)
-import typeof {openWellSelectionModal} from '../../well-selection/actions'
 
 // REDUCERS
 
@@ -40,11 +37,6 @@ export type SelectedContainerId = ?string
 const selectedContainerId = handleActions({
   OPEN_INGREDIENT_SELECTOR: (state, action: ActionType<typeof actions.openIngredientSelector>): SelectedContainerId => action.payload,
   CLOSE_INGREDIENT_SELECTOR: (state, action: ActionType<typeof actions.closeIngredientSelector>): SelectedContainerId => null,
-
-  // $FlowFixMe: Cannot get `action.payload` because property `payload` is missing in function
-  OPEN_WELL_SELECTION_MODAL: (state, action: ActionType<openWellSelectionModal>): SelectedContainerId =>
-    action.payload.labwareId,
-  CLOSE_WELL_SELECTION_MODAL: (): SelectedContainerId => null,
 }, null)
 
 export type DrillDownLabwareId = ?string
@@ -89,9 +81,9 @@ export const containers = handleActions({
       },
     }
   },
-  DELETE_CONTAINER: (state: ContainersState, action: ActionType<typeof actions.deleteContainer>) => pickBy(
+  DELETE_CONTAINER: (state: ContainersState, action: ActionType<typeof actions.deleteContainer>): ContainersState => pickBy(
     state,
-    (value: Labware, key: string) => key !== action.payload.containerId
+    (value: DisplayLabware, key: string) => key !== action.payload.labwareId
   ),
   RENAME_LABWARE: (state: ContainersState, action: ActionType<typeof actions.renameLabware>): ContainersState => {
     const {labwareId, name} = action.payload
@@ -143,7 +135,7 @@ type SavedLabwareState = {[labwareId: string]: boolean}
 export const savedLabware = handleActions({
   DELETE_CONTAINER: (state: SavedLabwareState, action: ActionType<typeof actions.deleteContainer>) => ({
     ...state,
-    [action.payload.containerId]: false,
+    [action.payload.labwareId]: false,
   }),
   RENAME_LABWARE: (state: SavedLabwareState, action: ActionType<typeof actions.renameLabware>) => ({
     ...state,
@@ -222,7 +214,7 @@ export const ingredLocations = handleActions({
     state: LocationsState,
     action: ActionType<typeof actions.deleteContainer>
   ): LocationsState =>
-    omit(state, action.payload.containerId),
+    omit(state, action.payload.labwareId),
   LOAD_FILE: (state: LocationsState, action: LoadFileAction): LocationsState =>
     getPDMetadata(action.payload).ingredLocations,
 }, {})

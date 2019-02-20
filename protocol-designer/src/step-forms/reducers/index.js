@@ -214,7 +214,7 @@ export const savedStepForms = (
       })
     }
     case 'DELETE_CONTAINER': {
-      const labwareIdToDelete = action.payload.containerId
+      const labwareIdToDelete = action.payload.labwareId
       return mapValues(savedStepForms, (savedForm: FormData) => {
         if (savedForm.stepType === 'manualIntervention') {
           // remove instances of labware from all manualIntervention steps
@@ -364,7 +364,7 @@ export const labwareInvariantProperties = handleActions({
     }
   },
   DELETE_CONTAINER: (state: LabwareEntities, action: DeleteContainerAction): LabwareEntities => {
-    return omit(state, action.payload.containerId)
+    return omit(state, action.payload.labwareId)
   },
   LOAD_FILE: (state: LabwareEntities, action: LoadFileAction): LabwareEntities => {
     const file = action.payload

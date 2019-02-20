@@ -12,18 +12,17 @@ import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import {createSelector} from 'reselect'
-import {getIsTiprack, getPipetteNameSpecs, getLabware} from '@opentrons/shared-data'
+import {getPipetteNameSpecs, getLabware} from '@opentrons/shared-data'
 import i18n from '../../localization'
-import {DISPOSAL_LABWARE_TYPES, INITIAL_DECK_SETUP_STEP_ID} from '../../constants'
+import {INITIAL_DECK_SETUP_STEP_ID} from '../../constants'
 import {generateNewForm, getFormWarnings, getFormErrors, stepFormToArgs} from '../../steplist/formLevel'
 import {hydrateField, getFieldErrors} from '../../steplist/fieldLevel'
 import {addSpecsToPipetteInvariantProps} from '../utils'
-import {labwareToDisplayName} from '../../labware-ingred/utils'
 
 import type {FormWarning} from '../../steplist/formLevel'
-import type {BaseState, Selector, Options} from '../../types'
+import type {BaseState, Selector} from '../../types'
 import type {FormData, StepIdType, StepType} from '../../form-types'
-import type {Labware, LabwareTypeById} from '../../labware-ingred/types'
+import type {LabwareTypeById} from '../../labware-ingred/types'
 import type {
   StepArgsAndErrors,
   StepFormAndFieldErrors,
@@ -33,6 +32,7 @@ import type {
 import type {
   InitialDeckSetup,
   LabwareEntities,
+  LabwareEntity,
   LabwareOnDeck,
   PipetteEntities,
   PipetteOnDeck,
@@ -42,9 +42,21 @@ import type {RootState} from '../reducers'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 
+// NOTE Ian 2019-02-14: in Redux containers world, you probably only care about
+// the labware type, in which case you ought to use `getLabwareTypesById` instead.
+// `getLabwareEntities` is intended for uses tied to the LabwareEntities type
+// (which currently contains only `type`, but may expand)
 export const getLabwareEntities: Selector<LabwareEntities> = createSelector(
   rootSelector,
   (state) => state.labwareInvariantProperties
+)
+
+export const getLabwareTypesById: Selector<LabwareTypeById> = createSelector(
+  getLabwareEntities,
+  (labwareEntities) => mapValues(
+    labwareEntities,
+    (labware: LabwareEntity) => labware.type
+  )
 )
 
 export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
@@ -72,106 +84,6 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
       }),
     }
   }
-)
-
-// TODO: Ian 2019-01-24 this selector needs info from the labware atoms's
-// `containers` reducer as well as stepForms,
-// so it probably doesn't belong in step-forms/...
-// Also, the `Labware` type should probably be deprecated later on
-// $FlowFixMe I think it's a flow bug?
-export const getLabwareById: Selector<{[labwareId: string]: ?Labware}> = createSelector(
-  getInitialDeckSetup,
-  state => state.labwareIngred.containers, // HACK to avoid circular dependency
-  (initialDeckSetup, displayLabwareById) => mapValues(
-    initialDeckSetup.labware,
-    (l: LabwareOnDeck, id: string): ?Labware => {
-      const displayLabware = displayLabwareById[id]
-      return displayLabware
-        ? {
-          nickname: displayLabware.nickname,
-          disambiguationNumber: displayLabware.disambiguationNumber,
-          id,
-          type: l.type,
-          slot: l.slot,
-        }
-        : null
-    })
-)
-
-export const getLabwareNicknamesById: Selector<{[labwareId: string]: string}> = createSelector(
-  getLabwareById,
-  (labwareById) => mapValues(
-    labwareById,
-    labwareToDisplayName,
-  )
-)
-
-/** Returns options for disposal (e.g. fixed trash and trash box) */
-export const getDisposalLabwareOptions: Selector<Options> = createSelector(
-  getLabwareById,
-  getLabwareNicknamesById,
-  (labwareById, names) => reduce(labwareById, (acc: Options, labware: Labware, labwareId): Options => {
-    if (!labware.type || !DISPOSAL_LABWARE_TYPES.includes(labware.type)) {
-      return acc
-    }
-    return [
-      ...acc,
-      {
-        name: names[labwareId],
-        value: labwareId,
-      },
-    ]
-  }, [])
-)
-
-/** Returns options for dropdowns, excluding tiprack labware */
-export const getLabwareOptions: Selector<Options> = createSelector(
-  getLabwareById,
-  getLabwareNicknamesById,
-  (labwareById, names) => reduce(labwareById, (acc: Options, labware: Labware, labwareId): Options => {
-    const isTiprack = getIsTiprack(labware.type)
-    if (!labware.type || isTiprack) {
-      return acc
-    }
-    return [
-      ...acc,
-      {
-        name: names[labwareId],
-        value: labwareId,
-      },
-    ]
-  }, [])
-)
-
-export const getLabwareTypes: Selector<LabwareTypeById> = createSelector(
-  getLabwareById,
-  (labwareById) => mapValues(
-    labwareById,
-    (labware: Labware) => labware.type
-  )
-)
-
-// TODO: Ian 2019-01-24 this selector needs info from the labware atoms's
-// `containers` reducer as well as stepForms,
-// so it probably doesn't belong in step-forms/...
-export const getSelectedLabware: Selector<?Labware> = createSelector(
-  state => state.labwareIngred.selectedContainerId, // HACK to avoid circular dependency
-  getLabwareById,
-  (selectedLabwareId, labware) =>
-    (selectedLabwareId && labware[selectedLabwareId]) || null
-)
-
-type ContainersBySlot = {[DeckSlot]: {...Labware, containerId: string}}
-export const getContainersBySlot: Selector<ContainersBySlot> = createSelector(
-  getLabwareById,
-  containers => reduce(
-    containers,
-    (acc: ContainersBySlot, containerObj: Labware, containerId: string) => ({
-      ...acc,
-      // NOTE: containerId added in so you still have a reference
-      [containerObj.slot]: {...containerObj, containerId},
-    }),
-    {})
 )
 
 export const getPermittedTipracks: Selector<Array<string>> = createSelector(
