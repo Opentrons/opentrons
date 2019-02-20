@@ -27,7 +27,7 @@ const DisposalVolumeField = (props: Props) => (
   <FormGroup label='Multi-Dispense Options:'>
     <FieldConnector
       name="disposalVolume_checkbox"
-      render={({value, updateValue}) => {
+      render={({value, updateValue, hoverTooltipHandlers}) => {
         const {maxDisposalVolume} = props
         const volumeBoundsCaption = maxDisposalVolume != null
           ? `max ${maxDisposalVolume} μL`
@@ -46,7 +46,7 @@ const DisposalVolumeField = (props: Props) => (
 
         return (
           <React.Fragment>
-            <div className={cx(
+            <div {...hoverTooltipHandlers} className={cx(
               styles.checkbox_row,
               styles.multi_dispense_options,
               {[styles.captioned_field]: volumeBoundsCaption}
@@ -65,13 +65,13 @@ const DisposalVolumeField = (props: Props) => (
             {
               value
                 ? (
-                  <div className={styles.checkbox_row}>
-                    <div className={styles.sub_select_label}>Blowout</div>
-                    <FieldConnector
-                      name="blowout_location"
-                      focusedField={props.focusHandlers.focusedField}
-                      dirtyFields={props.focusHandlers.dirtyFields}
-                      render={({value, updateValue}) => (
+                  <FieldConnector
+                    name="blowout_location"
+                    focusedField={props.focusHandlers.focusedField}
+                    dirtyFields={props.focusHandlers.dirtyFields}
+                    render={({value, updateValue, hoverTooltipHandlers}) => (
+                      <div {...hoverTooltipHandlers} className={styles.checkbox_row} >
+                        <div className={styles.sub_select_label}>Blowout</div>
                         <DropdownField
                           className={cx(styles.medium_field, styles.orphan_field)}
                           options={props.disposalDestinationOptions}
@@ -79,8 +79,8 @@ const DisposalVolumeField = (props: Props) => (
                           onFocus={() => { props.focusHandlers.onFieldFocus('blowout_location') }}
                           value={value ? String(value) : null}
                           onChange={(e: SyntheticEvent<HTMLSelectElement>) => { updateValue(e.currentTarget.value) } } />
-                      )} />
-                  </div>
+                      </div>
+                    )} />
                 )
                 : null
             }

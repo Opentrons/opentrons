@@ -148,6 +148,11 @@
   list-style: none;
 }
 
+.tooltip {
+  line-height: 1rem;
+  max-width: 18rem;
+}
+
 .path_tooltip_image {
   padding: 0.5rem;
 }
