@@ -26,7 +26,7 @@ export function getTooltipForField (stepType: ?string, name: string): ?string {
     : name
 
   // specificity cascade for names.
-  // first level: try getting from step_fields.transfer, fallback to step_fields.default
+  // first level: try getting from step_fields.moveLiquid, fallback to step_fields.default
   // second level: prefix. "aspirate_foo" wins over "foo"
   const text: string = i18n.t([
     `tooltip.step_fields.${stepType}.${name}`,
