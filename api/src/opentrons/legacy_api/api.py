@@ -40,7 +40,6 @@ class InstrumentsWrapper(object):
         return inst.Pipette(self.robot, *args, **kwargs)
 
     def _pipette_details(self, mount, name_or_model):
-        self.robot.cache_instrument_models()
         pipette_model_version = self.retrieve_version_number(
             mount, name_or_model)
         attached = self.robot.get_attached_pipettes()
