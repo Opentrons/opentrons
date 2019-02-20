@@ -9,8 +9,6 @@ export type StepFieldName = any
 // | 'aspirate_airGap_checkbox'
 // | 'aspirate_airGap_volume'
 // | 'aspirate_changeTip'
-// | 'aspirate_disposalVol_checkbox'
-// | 'aspirate_disposalVol_volume'
 // | 'aspirate_flowRate'
 // | 'aspirate_labware'
 // | 'aspirate_mix_checkbox'
@@ -37,6 +35,8 @@ export type StepFieldName = any
 // | 'dispense_wellOrder_first'
 // | 'dispense_wellOrder_second'
 // | 'dispense_wells'
+// | 'disposalVolume_checkbox',
+// | 'disposalVolume_volume',
 // | 'labware'
 // | 'labwareLocationUpdate'
 // | 'mix_mmFromBottom'
@@ -64,6 +64,8 @@ export type StepFieldName = any
 // | 'dispense_blowout_checkbox'
 // | 'dispense_blowout_location'
 // | 'dispense_touchTip'
+// | 'aspirate_disposalVol_checkbox'
+// | 'aspirate_disposalVol_volume'
 
 // TODO Ian 2019-01-16 factor out to some constants.js ? See #2926
 export const stepIconsByType: {[string]: IconName} = {
