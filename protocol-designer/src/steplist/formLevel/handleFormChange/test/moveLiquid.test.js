@@ -13,18 +13,30 @@ beforeEach(() => {
   )
 })
 
-describe('no-op cases should pass through the patch unchanged (same identity)', () => {
+describe('no-op cases should pass through the patch unchanged', () => {
+  const minimalBaseForm = {
+    blah: 'blaaah',
+    // NOTE: without these fields below, `path` gets added to the result
+    path: 'single',
+    aspirate_wells: ['A1'],
+    dispense_wells: ['B1'],
+  }
+
   test('empty patch', () => {
     const patch = {}
-    expect(handleFormHelper(patch, {blah: 'blaaah'})).toBe(patch)
+    expect(handleFormHelper(patch, minimalBaseForm)).toBe(patch)
   })
   test('patch with unhandled field', () => {
     const patch = {fooField: 123}
-    expect(handleFormHelper(patch, {blah: 'blaaah'})).toBe(patch)
+    expect(handleFormHelper(patch, minimalBaseForm)).toBe(patch)
   })
 })
 
 describe('path should update...', () => {
+  test('if there is no path in base form', () => {
+    const patch = {}
+    expect(handleFormHelper(patch, {blah: 'blaaah'})).toEqual({path: 'single'})
+  })
   describe('if path is multi and volume*2 exceeds pipette/tip capacity', () => {
     const multiPaths = ['multiAspirate', 'multiDispense']
     multiPaths.forEach(path => {
@@ -65,6 +77,8 @@ describe('disposal volume should update...', () => {
   beforeEach(() => {
     form = {
       path: 'multiDispense',
+      aspirate_wells: ['A1'],
+      dispense_wells: ['B2', 'B3'],
       volume: '2',
       pipette: 'pipetteId',
       disposalVolume_checkbox: true,
