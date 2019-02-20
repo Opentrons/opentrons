@@ -147,8 +147,12 @@ const updatePatchDisposalVolumeFields = (
 ) => {
   const appliedPatch = {...rawForm, ...patch}
 
-  if (patch.path && patch.path !== 'multiDispense' && rawForm.path === 'multiDispense') {
-    // clear disposal volume whenever path was changed from multiDispense
+  const pathChangedFromMultiDispense = patch.path &&
+    patch.path !== 'multiDispense' &&
+    rawForm.path === 'multiDispense'
+  if (pathChangedFromMultiDispense || patch.disposalVolume_checkbox === false) {
+    // clear disposal volume whenever path is changed from multiDispense
+    // or whenever disposalVolume_checkbox is cleared
     return {
       ...patch,
       ...clearedDisposalVolumeFields,
@@ -157,7 +161,8 @@ const updatePatchDisposalVolumeFields = (
 
   const shouldReinitializeDisposalVolume = (
     (patch.path === 'multiDispense' && rawForm.path !== 'multiDispense') ||
-    (patch.pipette && patch.pipette !== rawForm.pipette)
+    (patch.pipette && patch.pipette !== rawForm.pipette) ||
+    patch.disposalVolume_checkbox
   )
   if (shouldReinitializeDisposalVolume) {
     const pipetteEntity = pipetteEntities[appliedPatch.pipette]
