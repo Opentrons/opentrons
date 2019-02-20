@@ -1,13 +1,14 @@
 // @flow
+import assert from 'assert'
 import * as React from 'react'
-import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
 import {AlertItem} from '@opentrons/components'
 import {actions as dismissActions, selectors as dismissSelectors} from '../../dismiss'
 import {getVisibleAlerts} from './utils'
-import type {StepIdType} from '../../form-types'
 import {selectors as stepsSelectors} from '../../ui/steps'
 import {selectors as stepFormSelectors} from '../../step-forms'
+import type {Dispatch} from 'redux'
+import type {StepIdType} from '../../form-types'
 import type {StepFieldName} from '../../steplist/fieldLevel'
 import type {FormError, FormWarning} from '../../steplist/formLevel'
 import type {BaseState} from '../../types'
@@ -87,13 +88,8 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
 
 const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
   dismissWarning: (warning, stepId) => {
-    if (typeof stepId === 'string') {
-      // TODO: Ian 2018-07-13 remove this conditional once stepIds are always numbers
-      console.warn(`Tried to dismiss form-level warning for "special" stepId ${stepId}`)
-      return
-    }
     if (stepId == null) {
-      console.warn('Tried to dismiss form-level warning with no stepId.')
+      assert(false, 'Tried to dismiss form-level warning with no stepId.')
       return
     }
     dispatch(dismissActions.dismissFormWarning({warning, stepId}))
