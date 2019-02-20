@@ -1,6 +1,8 @@
 // @flow
+import * as React from 'react'
 import difference from 'lodash/difference'
 import i18n from '../../localization'
+import styles from './StepEditForm.css'
 
 export function getVisibleAlerts<Field, Alert: {dependentFields: Array<Field>}> (args: {
   focusedField: ?Field,
@@ -14,7 +16,7 @@ export function getVisibleAlerts<Field, Alert: {dependentFields: Array<Field>}> 
   )
 }
 
-export function getTooltipForField (stepType: ?string, name: string): ?string {
+export function getTooltipForField (stepType: ?string, name: string): ?React.Node {
   if (!stepType) {
     console.error(`expected stepType for form, cannot getTooltipText for ${name}`)
     return null
@@ -36,5 +38,5 @@ export function getTooltipForField (stepType: ?string, name: string): ?string {
     '',
   ])
 
-  return text || null
+  return text ? (<div className={styles.tooltip}>{text}</div>) : null
 }
