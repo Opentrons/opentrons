@@ -1,5 +1,12 @@
 // @flow
-import dependentFieldsUpdateMoveLiquid from '../dependentFieldsUpdateMoveLiquid'
+import dependentFieldsUpdateMoveLiquid, {
+  updatePatchBlowoutFields,
+} from '../dependentFieldsUpdateMoveLiquid'
+
+import {
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+  DEST_WELL_BLOWOUT_DESTINATION,
+} from '../../../../step-generation'
 
 let pipetteEntities
 let labwareEntities
@@ -171,6 +178,36 @@ describe('disposal volume should update...', () => {
         aspirate_mix_checkbox: false,
         aspirate_mix_times: null,
         aspirate_mix_volume: null,
+      })
+    })
+  })
+
+  describe('blowout location should reset via updatePatchBlowoutFields...', () => {
+    const resetBlowoutLocation = {
+      blowout_location: 'trashId',
+    }
+
+    const testCases = [
+      {prevPath: 'single', nextPath: 'multiAspirate', incompatible: SOURCE_WELL_BLOWOUT_DESTINATION},
+      {prevPath: 'single', nextPath: 'multiDispense', incompatible: DEST_WELL_BLOWOUT_DESTINATION},
+    ]
+
+    testCases.forEach(({prevPath, nextPath, incompatible}) => {
+      const patch = {path: nextPath}
+      test(`when changing path ${prevPath} → ${nextPath}, arbitrary labware still allowed`, () => {
+        const result = updatePatchBlowoutFields(patch, {
+          path: prevPath,
+          blowout_location: 'someKindaTrashLabwareIdHere',
+        })
+        expect(result).toEqual(patch)
+      })
+
+      test(`when changing path ${prevPath} → ${nextPath}, ${incompatible} reset to trashId`, () => {
+        const result = updatePatchBlowoutFields(patch, {
+          path: prevPath,
+          blowout_location: incompatible,
+        })
+        expect(result).toEqual({...patch, ...resetBlowoutLocation})
       })
     })
   })

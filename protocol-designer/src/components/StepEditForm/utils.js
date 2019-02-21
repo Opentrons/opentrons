@@ -20,6 +20,7 @@ export function getBlowoutLocationOptionsForForm (
     return disposalLabwareOptions
   }
   const {stepType} = rawForm
+  // TODO: Ian 2019-02-21 use i18n for names
   const destOption = {name: 'Destination Well', value: DEST_WELL_BLOWOUT_DESTINATION}
   const sourceOption = {name: 'Source Well', value: SOURCE_WELL_BLOWOUT_DESTINATION}
 
