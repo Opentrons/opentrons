@@ -290,6 +290,28 @@ function updatePatchOnWellRatioChange (patch: FormPatch, rawForm: FormData) {
   }
 }
 
+function updatePatchMixFields (patch: FormPatch, rawForm: FormData): FormPatch {
+  if (patch.path) {
+    if (patch.path === 'multiAspirate') {
+      return {
+        ...patch,
+        aspirate_mix_checkbox: false,
+        aspirate_mix_times: null,
+        aspirate_mix_volume: null,
+      }
+    }
+    if (patch.path === 'multiDispense') {
+      return {
+        ...patch,
+        dispense_mix_checkbox: false,
+        dispense_mix_times: null,
+        dispense_mix_volume: null,
+      }
+    }
+  }
+  return patch
+}
+
 export default function dependentFieldsUpdateMoveLiquid (
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
@@ -305,5 +327,6 @@ export default function dependentFieldsUpdateMoveLiquid (
     chainPatch => updatePatchPathField(chainPatch, rawForm, pipetteEntities),
     chainPatch => updatePatchDisposalVolumeFields(chainPatch, rawForm, pipetteEntities),
     chainPatch => clampDisposalVolume(chainPatch, rawForm, pipetteEntities),
+    chainPatch => updatePatchMixFields(chainPatch, rawForm),
   ])
 }
