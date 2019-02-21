@@ -3,17 +3,18 @@ import flow from 'lodash/flow'
 import max from 'lodash/max'
 import sortBy from 'lodash/sortBy'
 import findIndex from 'lodash/findIndex'
+import compareVersions from 'compare-versions'
 import type {ProtocolFile} from '../../file-types'
-import {default as migrationV1} from './migrationV1'
+import {default as migrate_to_1_1_0} from './1_1_0'
 
 const allMigrations = [
-  migrationV1,
+  migrate_to_1_1_0,
 ]
 
 export const LATEST_MIGRATION_VERSION = max(allMigrations.map(m => m.version))
 
 const masterMigration = (file: any): ProtocolFile => {
-  const sortedMigrations = sortBy(allMigrations, m => m.version)
+  const sortedMigrations = sortBy(allMigrations, m => compareVersions(m.version))
 
   const designerApplication = file.designerApplication || file['designer-application']
 
