@@ -9,7 +9,8 @@ import {selectors as labwareIngredSelectors} from '../../labware-ingred/selector
 import {labwareToDisplayName} from '../../labware-ingred/utils'
 import {DISPOSAL_LABWARE_TYPES} from '../../constants'
 
-import type {Selector, Options} from '../../types'
+import type {Options} from '@opentrons/components'
+import type {Selector} from '../../types'
 import type {LabwareEntity} from '../../step-forms'
 
 export const getLabwareNicknamesById: Selector<{[labwareId: string]: string}> = createSelector(

@@ -1,8 +1,50 @@
 // @flow
+import assert from 'assert'
 import * as React from 'react'
 import difference from 'lodash/difference'
 import i18n from '../../localization'
+import {
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+  DEST_WELL_BLOWOUT_DESTINATION,
+} from '../../step-generation/utils'
 import styles from './StepEditForm.css'
+import type {Options} from '@opentrons/components'
+import type {FormData} from '../../form-types'
+
+export function getBlowoutLocationOptionsForForm (
+  disposalLabwareOptions: Options,
+  rawForm: ?FormData,
+): Options {
+  if (!rawForm) {
+    assert(rawForm, `getBlowoutLocationOptionsForForm expected a form`)
+    return disposalLabwareOptions
+  }
+  const {stepType} = rawForm
+  const destOption = {name: 'Destination Well', value: DEST_WELL_BLOWOUT_DESTINATION}
+  const sourceOption = {name: 'Source Well', value: SOURCE_WELL_BLOWOUT_DESTINATION}
+
+  if (stepType === 'mix') {
+    return [...disposalLabwareOptions, destOption]
+  } else if (stepType === 'moveLiquid') {
+    const path = rawForm.path
+    switch (path) {
+      case 'single': {
+        return [...disposalLabwareOptions, sourceOption, destOption]
+      }
+      case 'multiDispense': {
+        return [...disposalLabwareOptions, sourceOption, {...destOption, disabled: true}]
+      }
+      case 'multiAspirate': {
+        return [...disposalLabwareOptions, {...sourceOption, disabled: true}, destOption]
+      }
+      default: {
+        assert(false, `getBlowoutLocationOptionsForForm got unexpected path for moveLiquid step: ${path}`)
+        return disposalLabwareOptions
+      }
+    }
+  }
+  return disposalLabwareOptions
+}
 
 export function getVisibleAlerts<Field, Alert: {dependentFields: Array<Field>}> (args: {
   focusedField: ?Field,

@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react'
-import {FormGroup, CheckboxField, type DropdownOption, DropdownField} from '@opentrons/components'
+import {FormGroup, CheckboxField, DropdownField, type Options} from '@opentrons/components'
 import {connect} from 'react-redux'
 import cx from 'classnames'
 
 import {getMaxDisposalVolumeForMultidispense} from '../../../steplist/formLevel/handleFormChange/utils'
-import {SOURCE_WELL_BLOWOUT_DESTINATION} from '../../../step-generation/utils'
 import {selectors as stepFormSelectors} from '../../../step-forms'
 import {selectors as uiLabwareSelectors} from '../../../ui/labware'
+import {getBlowoutLocationOptionsForForm} from '../utils'
 
 import FieldConnector from './FieldConnector'
 import TextField from './Text'
@@ -17,7 +17,7 @@ import type {FocusHandlers} from '../types'
 import styles from '../StepEditForm.css'
 
 type SP = {
-  disposalDestinationOptions: Array<DropdownOption>,
+  disposalDestinationOptions: Options,
   maxDisposalVolume: ?number,
 }
 
@@ -91,12 +91,13 @@ const DisposalVolumeField = (props: Props) => (
 )
 
 const mapSTP = (state: BaseState): SP => {
+  const rawForm = stepFormSelectors.getUnsavedForm(state)
   return {
-    maxDisposalVolume: getMaxDisposalVolumeForMultidispense(stepFormSelectors.getUnsavedForm(state), stepFormSelectors.getPipetteEntities(state)),
-    disposalDestinationOptions: [
-      ...uiLabwareSelectors.getDisposalLabwareOptions(state),
-      {name: 'Source Well', value: SOURCE_WELL_BLOWOUT_DESTINATION},
-    ],
+    maxDisposalVolume: getMaxDisposalVolumeForMultidispense(rawForm, stepFormSelectors.getPipetteEntities(state)),
+    disposalDestinationOptions: getBlowoutLocationOptionsForForm(
+      uiLabwareSelectors.getDisposalLabwareOptions(state),
+      rawForm
+    ),
   }
 }
 

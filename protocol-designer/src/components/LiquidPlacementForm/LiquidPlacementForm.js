@@ -14,7 +14,7 @@ import {
 import i18n from '../../localization'
 import styles from './LiquidPlacementForm.css'
 import formStyles from '../forms/forms.css'
-import type {Options} from '../../types'
+import type {Options} from '@opentrons/components'
 
 export type ValidFormValues = {
   selectedLiquidId: string,
