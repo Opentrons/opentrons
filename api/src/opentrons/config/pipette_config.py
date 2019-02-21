@@ -212,8 +212,9 @@ def save_overrides(pipette_id: str, overrides: Dict[str, Any], model: str):
             if existing.get(key):
                 del existing[key]
         else:
+            if not model_configs[key].get('default'):
+                model_configs[key]['default'] = model_configs[key]['value']
             model_configs[key]['value'] = value['value']
-            add_default(model_configs[key])
             existing[key] = model_configs[key]
     assert model in config_models
     existing['model'] = model
