@@ -1655,55 +1655,21 @@ class ThermocyclerContext(ModuleContext):
         super().__init__(ctx, geometry)
 
     @property
+    def lid_status(self):
+        return self._module.lid_status
+
+    @property
     def status(self):
         return self._module.status
 
-    @cmds.publish.both(command=cmds.thermocycler_set_temp)
-    def set_temperature(self,
-                        temp: float,
-                        hold_time: float = None,
-                        ramp_rate: float = None):
-        """ Set the target temperature, in C.
+    @cmds.publish.both(command=cmds.thermocycler_open)
+    def open(self):
+        return self._module.open()
 
-        Valid operational range yet to be determined.
-
-        :param temp: The target temperature, in degrees C.
-        :param hold_time: The time to hold after reaching temperature. If
-                          ``hold_time`` is not specified, the Thermocycler will
-                          hold this temperature indefinitely (requiring manual
-                          intervention to end the cycle).
-        :param ramp_rate: The target rate of temperature change, in degC/sec.
-                          If ``ramp_rate`` is not specified, it will default to
-                          the maximum ramp rate as defined in the device
-                          configuration.
-        """
-        return self._module.set_temperature(temp, hold_time, ramp_rate)
+    @cmds.publish.both(command=cmds.thermocycler_close)
+    def close(self):
+        return self._module.close()
 
     @cmds.publish.both(command=cmds.thermocycler_deactivate)
     def deactivate(self):
         return self._module.deactivate()
-
-    def wait_for_temp(self):
-        """ Block until the module reaches its setpoint.
-        """
-        self._loop.run_until_complete(self._module.wait_for_temp())
-
-    @property
-    def temperature(self):
-        """ Current temperature in C"""
-        return self._module.temperature
-
-    @property
-    def target(self):
-        """ Current target temperature in C"""
-        return self._module.target
-
-    @property
-    def ramp_rate(self):
-        """ Current ramp rate in degC/sec"""
-        return self._module.ramp_rate
-
-    @property
-    def hold_time(self):
-        """ Current hold time in sec"""
-        return self._module.hold_time

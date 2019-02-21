@@ -29,8 +29,13 @@ MODULE_TYPES = {cls.name(): cls
                 for cls in AbstractModule.__subclasses__()}  # type: ignore
 
 
-def build(port: str, which: str, simulate: bool) -> AbstractModule:
-    return MODULE_TYPES[which].build(port, simulate)
+def build(
+        port: str,
+        which: str,
+        simulating: bool,
+        interrupt_callback) -> AbstractModule:
+    return MODULE_TYPES[which].build(
+        port, interrupt_callback=interrupt_callback, simulating=simulating)
 
 
 def discover() -> List[Tuple[str, str]]:
@@ -74,10 +79,11 @@ async def update_firmware(
 
     Otherwise, raises an UpdateError with the reason for the failure.
     """
-    simulated = module.is_simulated
+    simulating = module.is_simulated
     cls = type(module)
     old_port = module.port
     flash_port = await module.prep_for_update()
+    callback = module.interrupt_callback
     del module
     after_port, results = await update.update_firmware(flash_port,
                                                        firmware_file,
@@ -86,4 +92,7 @@ async def update_firmware(
     new_port = after_port or old_port
     if not results[0]:
         raise UpdateError(results[1])
-    return cls.build(new_port, simulated)
+    return cls.build(
+        port=new_port,
+        interrupt_callback=callback,
+        simulating=simulating)

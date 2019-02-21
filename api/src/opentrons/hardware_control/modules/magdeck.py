@@ -47,7 +47,9 @@ class MagDeck(mod_abc.AbstractModule):
     Under development. API subject to change
     """
     @classmethod
-    def build(cls, port, simulating=False):
+    def build(cls, port, interrupt_callback, simulating=False):
+        # MagDeck does not currently use interrupts, so the callback is not
+        # passed on
         mod = cls(port, simulating)
         mod._connect()
         return mod
@@ -122,6 +124,10 @@ class MagDeck(mod_abc.AbstractModule):
     @property
     def is_simulated(self):
         return isinstance(self._driver, SimulatingDriver)
+
+    @property
+    def interrupt_callback(self):
+        return lambda x: None
 
     # Internal Methods
 

@@ -87,6 +87,7 @@ class API(HardwareAPILike):
             self._loop = asyncio.get_event_loop()
         else:
             self._loop = loop
+        self._callbacks: set = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: Dict[Axis, float] = {}
 
@@ -174,6 +175,17 @@ class API(HardwareAPILike):
     def is_simulator(self) -> bool:
         """ `True` if this is a simulator; `False` otherwise. """
         return isinstance(self._backend, Simulator)
+
+    async def register_callback(self, cb):
+        """ Allows the caller to register a callback, and returns a closure
+        that can be used to unregister the provided callback
+        """
+        self._callbacks.add(cb)
+
+        def unregister():
+            self._callbacks.remove(cb)
+
+        return unregister
 
     # Query API
     @property
@@ -316,6 +328,12 @@ class API(HardwareAPILike):
         :py:meth:`resume`.
         """
         self._backend.pause()
+
+    def pause_with_message(self, message):
+        self._log.warning('Pause with message: {}'.format(message))
+        for cb in self._callbacks:
+            cb(message)
+        self.pause()
 
     @_log_call
     def resume(self):
@@ -1051,7 +1069,8 @@ class API(HardwareAPILike):
         for mod in new:
             self._attached_modules[mod]\
                 = self._backend.build_module(discovered[mod][0],
-                                             discovered[mod][1])
+                                             discovered[mod][1],
+                                             self.pause_with_message)
         return list(self._attached_modules.values())
 
     @_log_call

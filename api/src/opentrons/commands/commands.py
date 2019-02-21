@@ -363,10 +363,18 @@ def tempdeck_deactivate():
     )
 
 
-def thermocycler_set_temp():
-    text = "Setting thermocycler temperature"
+def thermocycler_open():
+    text = "Opening thermocycler lid"
     return make_command(
-        name=command_types.THERMOCYCLER_SET_TEMP,
+        name=command_types.THERMOCYCLER_OPEN,
+        payload={'text': text}
+    )
+
+
+def thermocycler_close():
+    text = "Closing thermocycler lid"
+    return make_command(
+        name=command_types.THERMOCYCLER_CLOSE,
         payload={'text': text}
     )
 

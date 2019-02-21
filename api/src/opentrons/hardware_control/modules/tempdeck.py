@@ -75,9 +75,10 @@ class TempDeck(mod_abc.AbstractModule):
     Under development. API subject to change without a version bump
     """
     @classmethod
-    def build(cls, port, simulating=False):
-        """ Build and connect to a TempDeck.
-        """
+    def build(cls, port, interrupt_callback, simulating=False):
+        """ Build and connect to a TempDeck"""
+        # MagDeck does not currently use interrupts, so the callback is not
+        # passed on
         mod = cls(port, simulating)
         mod._connect()
         return mod
@@ -153,6 +154,10 @@ class TempDeck(mod_abc.AbstractModule):
     @property
     def is_simulated(self):
         return isinstance(self._driver, SimulatingDriver)
+
+    @property
+    def interrupt_callback(self):
+        return lambda x: None
 
     def _connect(self):
         """

@@ -19,9 +19,10 @@ GCODES = {
     'SET_LID_TEMP': 'M140',
     'DEACTIVATE_LID_HEATING': 'M108',
     'EDIT_PID_PARAMS': 'M301',
-    'SET_PLATE_TEMP': 'M104',
+    'SET_PLATE_TEMP': 'M104 S',
     'GET_PLATE_TEMP': 'M105',
     'SET_RAMP_RATE': 'M566',
+    'SET_HOLD_TIME': 'H',
     'PAUSE': '',
     'DEACTIVATE': 'M18'
 }
@@ -48,10 +49,11 @@ class ParseError(Exception):
 
 
 class TCPoller(threading.Thread):
-    def __init__(self, port, interrupt_callback):
+    def __init__(self, port, interrupt_callback, status_callback):
         self._port = port
         self._connection = self._connect_to_port()
         self._interrupt_callback = interrupt_callback
+        self._status_callback = status_callback
         self._lock = threading.Lock()
         self._command_queue = Queue()
 
@@ -96,7 +98,7 @@ class TCPoller(threading.Thread):
             elif self._connection.fileno() in _next:
                 # Lid-open interrupt
                 res = self._connection.read_until(SERIAL_ACK)
-                self._interrupt_callback({'interrupt': res})
+                self._interrupt_callback(res)
 
             elif self._send_read_file.fileno() in _next:
                 self._send_read_file.read(1)
@@ -106,7 +108,7 @@ class TCPoller(threading.Thread):
             else:
                 # Nothing else to do--update device status
                 res = self._send_command(GCODES['GET_PLATE_TEMP'])
-                self._interrupt_callback({'temp': res})
+                self._status_callback(res)
 
     def _wait_for_ack(self):
         """
@@ -156,26 +158,34 @@ class TCPoller(threading.Thread):
         self._halt_write_fd.write(b'q')
 
     def __del__(self):
-        """ Clean up thread fifo"""
+        """ Clean up thread fifos"""
         try:
             os.unlink(self._send_path)
+        except NameError:
+            pass
+        try:
+            os.unlink(self._halt_path)
         except NameError:
             pass
 
 
 class Thermocycler:
-    def __init__(self):
+    def __init__(self, interrupt_callback):
         self._poller = None
         self._update_thread = None
         self._current_temp = None
         self._target_temp = None
-        self._hold_time = None
         self._ramp_rate = None
+        self._hold_time = None
         self._lid_status = None
+        self._interrupt_cb = interrupt_callback
 
     def connect(self, port: str) -> 'Thermocycler':
         self.disconnect()
-        self._poller = TCPoller(port, self._interrupt_callback)
+        self._poller = TCPoller(
+            port, self._interrupt_callback, self._temp_status_update_callback)
+        _lid_status_res = self._write_and_wait(GCODES['GET_LID_STATUS'])
+        self._lid_status = _lid_status_res.split()[-1].lower()
         return self
 
     def disconnect(self) -> 'Thermocycler':
@@ -185,23 +195,43 @@ class Thermocycler:
         self._poller = None
         return self
 
+    def deactivate(self):
+        raise NotImplementedError
+
     def is_connected(self) -> bool:
         if not self._poller:
             return False
         return self._poller.is_alive()
 
-    def set_temperature(self, temp, hold_time, ramp_rate):
-        self._target_temp = temp
-        self._hold_time = hold_time
-        self._ramp_rate = ramp_rate
-        cmd = '{}{} {}{} {}{}'.format(
-            GCODES['SET_PLATE_TEMP'], temp,
-            GCODES['SET_LID_TEMP'], temp,
-            GCODES['SET_RAMP_RATE'], ramp_rate)
-        return self._write_and_wait(cmd)
+    def open(self):
+        # TODO: add temperature protection for >70C
+        if self.target:
+            raise ThermocyclerError(
+                'Cannot open Thermocycler while it is active')
+        self._write_and_wait(GCODES['OPEN_LID'])
+        self._lid_status = 'open'
 
-    def _interrupt_callback(self):
-        pass
+    def close(self):
+        self._write_and_wait(GCODES['CLOSE_LID'])
+        self._lid_status = 'closed'
+
+    def _temp_status_update_callback(self, temperature_response):
+        # Payload is shaped like `T:95.0 C:77.4 H:600` where T is the
+        # target temperature, C is the current temperature, and H is the
+        # hold time (remaining?)
+        val_dict = {}
+        data = [d.split(':') for d in temperature_response.split()]
+        for datum in data:
+            val_dict[datum[0]] = datum[1]
+
+        self._current_temp = val_dict['C']
+        self._target_temp = val_dict['T']
+        self._hold_time_remaining = val_dict['H']
+
+    def _interrupt_callback(self, interrupt_response):
+        # TODO sanitize response and then call the callback
+        parsed_response = interrupt_response
+        self._interrupt_cb(parsed_response)
 
     @property
     def temperature(self):
@@ -234,6 +264,13 @@ class Thermocycler:
         if not self._poller:
             return None
         return self._poller.port
+
+    @property
+    def lid_status(self):
+        return self._lid_status
+
+    def get_device_info(self):
+        raise NotImplementedError
 
     def _write_and_wait(self, command):
         ret = None

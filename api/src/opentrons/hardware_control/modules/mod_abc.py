@@ -7,7 +7,10 @@ class AbstractModule(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def build(cls, port: str, simulating: bool = False) -> 'AbstractModule':
+    def build(cls,
+              port: str,
+              interrupt_callback,
+              simulating: bool = False) -> 'AbstractModule':
         """ Modules should always be created using this factory.
 
         This lets the (perhaps blocking) work of connecting to and initializing
@@ -61,6 +64,11 @@ class AbstractModule(abc.ABC):
 
         :returns str: The port we're running on.
         """
+        pass
+
+    @property
+    @abc.abstractmethod
+    def interrupt_callback(self):
         pass
 
     @classmethod

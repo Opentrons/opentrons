@@ -1,40 +1,32 @@
-import asyncio
 from . import mod_abc
+from opentrons.drivers.thermocycler.driver import (
+    Thermocycler as ThermocyclerDriver, ThermocyclerError)
 
 
 class SimulatingDriver:
     def __init__(self):
         self._target_temp = None
         self._ramp_rate = None
-        self._hold_time = None
         self._active = False
         self._port = None
+        self._lid_status = 'open'
 
-    def set_temperature(self, temp, hold_time, ramp_rate):
-        self._target_temp = temp
-        self._hold_time = hold_time
-        self._ramp_rate = ramp_rate
-        self._active = True
+    def open(self):
+        if self._active:
+            raise ThermocyclerError(
+                'Cannot open Thermocycler while it is active')
+        self._lid_status = 'open'
 
-    @property
-    def ramp_rate(self):
-        return self._ramp_rate
-
-    @property
-    def hold_time(self):
-        return self._hold_time
-
-    @property
-    def temperature(self):
-        return self._target_temp
-
-    @property
-    def target(self):
-        return self._target_temp
+    def close(self):
+        self._lid_status = 'closed'
 
     @property
     def status(self):
         return 'holding at target' if self._active else 'idle'
+
+    @property
+    def lid_status(self):
+        return self._lid_status
 
     def connect(self, port):
         self._port = port
@@ -45,7 +37,6 @@ class SimulatingDriver:
     def deactivate(self):
         self._target_temp = None
         self._ramp_rate = None
-        self._hold_time = None
         self._active = None
 
     def get_device_info(self):
@@ -59,10 +50,10 @@ class Thermocycler(mod_abc.AbstractModule):
     Under development. API subject to change without a version bump
     """
     @classmethod
-    def build(cls, port, simulating=False):
+    def build(cls, port, interrupt_callback, simulating=False):
         """Build and connect to a Thermocycler
         """
-        mod = cls(port, simulating)
+        mod = cls(port, interrupt_callback, simulating)
         mod._connect()
         return mod
 
@@ -74,31 +65,30 @@ class Thermocycler(mod_abc.AbstractModule):
     def display_name(cls):
         return 'Thermocycler'
 
-    def __init__(self, port, simulating):
+    def __init__(self, port, interrupt_callback, simulating):
+        self._interrupt_cb = interrupt_callback
         if simulating:
             self._driver = SimulatingDriver()
         else:
-            # self._driver = ThermocyclerDriver()
-            self._driver = None
+            self._driver = ThermocyclerDriver(interrupt_callback)
         self._port = port
         self._device_info = None
         self._poller = None
 
-    def set_temperature(self, temp, hold_time, ramp_rate):
-        self._driver.set_temperature(
-            temp=temp, hold_time=hold_time, ramp_rate=ramp_rate)
-
     def deactivate(self):
         self._driver.deactivate()
 
-    async def wait_for_temp(self):
-        """
-        This method exits only if set temperature has been reached.
+    def open(self):
+        if self._driver.lid_status == 'closed':
+            self._driver.open()
 
-        Subject to change without a version bump.
-        """
-        while self.status != 'holding at target':
-            await asyncio.sleep(0.1)
+    def close(self):
+        if self._driver.lid_status == 'open':
+            self._driver.close()
+
+    @property
+    def lid_status(self):
+        return self._driver.lid_status
 
     @property
     def status(self):
@@ -113,32 +103,17 @@ class Thermocycler(mod_abc.AbstractModule):
         return {
             'status': self.status,
             'data': {
-                'currentTemp': self.temperature,
-                'targetTemp': self.target,
-                'holdTime': self.hold_time,
-                'rampRate': self.ramp_rate
+                'lid': self._driver.lid_status
             }
         }
 
     @property
-    def temperature(self):
-        return self._driver.temperature
-
-    @property
-    def target(self):
-        return self._driver.target
-
-    @property
-    def hold_time(self):
-        return self._driver.hold_time
-
-    @property
-    def ramp_rate(self):
-        return self._driver.ramp_rate
-
-    @property
     def is_simulated(self):
         return isinstance(self._driver, SimulatingDriver)
+
+    @property
+    def interrupt_callback(self):
+        return self._interrupt_cb
 
     def _connect(self):
         self._driver.connect(self._port)
