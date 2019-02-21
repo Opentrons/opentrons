@@ -51,7 +51,7 @@ As always, please reach out to our team with any questions.
 ### New features
 
 - Python protocols can now be simulated from your own computer **without needing to clone our entire repository**
-    - See the [Opentrons package on PyPI](https://pypi.org/project/opentrons/) for more details
+    - See our [support documentation][simulation] for more details
 
     ```
     pip install opentrons
@@ -59,6 +59,8 @@ As always, please reach out to our team with any questions.
     ```
 
 - Made some underlying architectural improvements for future user-facing features
+
+[simulation]: http://support.opentrons.com/ot-2/simulating-ot-2-protocols-on-your-computer
 
 ### Known issues
 
