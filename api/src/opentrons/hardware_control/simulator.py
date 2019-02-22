@@ -5,7 +5,7 @@ from threading import Event
 from typing import Dict, Optional, List, Tuple
 from contextlib import contextmanager
 from opentrons import types
-from opentrons.config.pipette_config import configs
+from opentrons.config.pipette_config import config_models
 from . import modules
 
 
@@ -14,7 +14,7 @@ MODULE_LOG = logging.getLogger(__name__)
 
 def find_config(prefix: str) -> str:
     """ Find the most recent config matching `prefix` """
-    matches = [conf for conf in configs if conf.startswith(prefix)]
+    matches = [conf for conf in config_models if conf.startswith(prefix)]
     if not matches:
         raise KeyError('No match found for prefix {}'.format(prefix))
     if prefix in matches:
