@@ -80,7 +80,6 @@ class SessionManager:
         self.points = {k: None for k in expected_points().keys()}
         self.z_value = None
         self.cp = None
-        self.pipette_id = None
         self.adapter = hardware
 
         if feature_flags.use_protocol_api_v2():
@@ -131,9 +130,9 @@ def get_pipettes(hardware):
         right_pipette = None
         left = attached_pipettes.get('left')
         right = attached_pipettes.get('right')
-        if left['model'] in pipette_config.config_models:
+        if left['model'] in pipette_config.configs:
             left_pipette = instruments.pipette_by_name('left', left['model'])
-        if right['model'] in pipette_config.config_models:
+        if right['model'] in pipette_config.configs:
             right_pipette = instruments.pipette_by_name(
                 'right', right['model'])
     else:
@@ -184,26 +183,19 @@ def set_current_mount(hardware, session):
         pipette = left_pipette
         session.cp = CriticalPoint.FRONT_NOZZLE
 
-    model, id = _get_model_name(pipette, hardware)
-    session.pipette_id = id
+    model = _get_model_name(pipette)
+
     return {'pipette': pipette, 'model': model}
 
 
-def _get_model_name(pipette, hardware):
+def _get_model_name(pipette):
     model = None
-    id = None
     if pipette:
         if not feature_flags.use_protocol_api_v2():
             model = pipette.name
-            pip_info = hardware.get_attached_pipettes()[pipette.mount]
-            id = pip_info['id']
         else:
             model = pipette.get('name')
-            mount = Mount.LEFT if pipette['mount'] == 'left' else Mount.RIGHT
-            pip_info = hardware.attached_instruments[mount]
-            id = pip_info['pipette_id']
-
-    return model, id
+    return model
 
 
 async def attach_tip(data):
@@ -456,7 +448,7 @@ async def save_z(data):
             actual_z = position(
                 mount, session.adapter)[-1]
             length_offset = pipette_config.load(
-                session.current_model, session.pipette_id).model_offset[-1]
+                session.current_model).model_offset[-1]
             session.z_value = actual_z - session.tip_length + length_offset
         else:
             session.z_value = position(

@@ -369,7 +369,7 @@ class API(HardwareAPILike):
         if instr:
             await self.home([Axis.of_plunger(mount)])
             await self._move_plunger(mount,
-                                     instr.config.bottom)
+                                     instr.config.plunger_positions['bottom'])
 
     @_log_call
     async def home(self, axes: List[Axis] = None):
@@ -868,7 +868,7 @@ class API(HardwareAPILike):
     def _plunger_position(self, instr: Pipette, ul: float,
                           action: str) -> float:
         mm = ul / instr.ul_per_mm(ul, action)
-        position = mm + instr.config.bottom
+        position = mm + instr.config.plunger_positions['bottom']
         return round(position, 6)
 
     @_log_call
@@ -886,7 +886,7 @@ class API(HardwareAPILike):
                                          this_pipette.config.plunger_current)
         try:
             await self._move_plunger(
-                mount, this_pipette.config.blow_out)
+                mount, this_pipette.config.plunger_positions['blow_out'])
         except Exception:
             self._log.exception('Blow out failed')
             raise
@@ -912,7 +912,7 @@ class API(HardwareAPILike):
         self._backend.set_active_current(plunger_ax,
                                          instr.config.plunger_current)
         await self._move_plunger(
-            mount, instr.config.bottom)
+            mount, instr.config.plunger_positions['bottom'])
 
         # Press the nozzle into the tip <presses> number of times,
         # moving further by <increment> mm after each press
@@ -955,8 +955,8 @@ class API(HardwareAPILike):
         assert instr.has_tip, 'Cannot drop tip without a tip attached'
         self._log.info("Dropping tip off from {}".format(instr.name))
         plunger_ax = Axis.of_plunger(mount)
-        droptip = instr.config.drop_tip
-        bottom = instr.config.bottom
+        droptip = instr.config.plunger_positions['drop_tip']
+        bottom = instr.config.plunger_positions['bottom']
         self._backend.set_active_current(plunger_ax,
                                          instr.config.plunger_current)
         await self._move_plunger(mount, bottom)
@@ -1016,11 +1016,7 @@ class API(HardwareAPILike):
             raise top_types.PipetteNotAttachedError(
                 "No pipette attached to {} mount".format(mount.name))
 
-        pos_dict: Dict = {
-            'top': instr.config.top,
-            'bottom': instr.config.bottom,
-            'blow_out': instr.config.blow_out,
-            'drop_tip': instr.config.drop_tip}
+        pos_dict: Dict = instr.config.plunger_positions
         if top is not None:
             pos_dict['top'] = top
         if bottom is not None:
@@ -1029,8 +1025,7 @@ class API(HardwareAPILike):
             pos_dict['blow_out'] = blow_out
         if bottom is not None:
             pos_dict['drop_tip'] = drop_tip
-        for key in pos_dict.keys():
-            instr.update_config_item(key, pos_dict[key])
+        instr.update_config_item('plunger_positions', pos_dict)
 
     @_log_call
     def set_flow_rate(self, mount, aspirate=None, dispense=None):

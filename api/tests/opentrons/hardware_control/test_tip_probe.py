@@ -35,7 +35,7 @@ async def test_input_checks(hardware_api, monkeypatch):
 
 
 @pytest.mark.parametrize('mount', [Mount.RIGHT, Mount.LEFT])
-@pytest.mark.parametrize('pipette_model', pipette_config.config_models)
+@pytest.mark.parametrize('pipette_model', pipette_config.configs)
 async def test_moves_to_hotspot(hardware_api, monkeypatch,
                                 mount, pipette_model):
     move_calls = []
@@ -103,7 +103,7 @@ async def test_moves_to_hotspot(hardware_api, monkeypatch,
 
 
 @pytest.mark.parametrize('mount', [Mount.RIGHT, Mount.LEFT])
-@pytest.mark.parametrize('pipette_model', pipette_config.config_models)
+@pytest.mark.parametrize('pipette_model', pipette_config.configs)
 async def test_update_instrument_offset(hardware_api, mount, pipette_model):
     await hardware_api.cache_instruments({mount: pipette_model})
     p = Point(1, 2, 3)

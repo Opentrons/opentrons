@@ -6,7 +6,6 @@ from aiohttp import web
 from opentrons.config import (advanced_settings as advs,
                               robot_configs as rc,
                               feature_flags as ff,
-                              pipette_config as pc,
                               IS_ROBOT)
 from opentrons.data_storage import database as db
 from opentrons.protocol_api import labware
@@ -133,69 +132,3 @@ async def available_resets(request: web.Request) -> web.Response:
     """ Indicate what parts of the user configuration are available for reset.
     """
     return web.json_response({'options': _settings_reset_options}, status=200)
-
-
-async def pipette_settings(request: web.Request) -> web.Response:
-    res = {}
-    for id in pc.known_pipettes():
-        whole_config = pc.load_config_dict(id)
-        res[id] = {
-            'info': {
-                'name': whole_config.get('name'),
-                'model': whole_config.get('model')
-            },
-            'fields': pc.list_mutable_configs(pipette_id=id)
-        }
-    return web.json_response(res, status=200)
-
-
-async def pipette_settings_id(request: web.Request) -> web.Response:
-    pipette_id = request.match_info['id']
-    if pipette_id not in pc.known_pipettes():
-        return web.json_response(
-            {'message': '{} is not a valid pipette id'.format(pipette_id)},
-            status=404)
-    whole_config = pc.load_config_dict(pipette_id)
-    res = {
-        'info': {
-            'name': whole_config.get('name'),
-            'model': whole_config.get('model')
-        },
-        'fields': pc.list_mutable_configs(pipette_id)
-        }
-    return web.json_response(res, status=200)
-
-
-async def modify_pipette_settings(request: web.Request) -> web.Response:
-    """
-    Expects a dictionary with mutable configs in a flattened shape such as:
-    {
-    'info': {
-        'name': ..,
-        'model': ..
-    }
-    'fields': {
-            'pickUpCurrent': {'value': some_value},
-            'dropTipSpeed': {'value': some_value}
-    }
-    If a value needs to be reset, simply type in the body formatted as above:
-        'configKey': null
-
-    }
-    """
-    pipette_id = request.match_info['id']
-    config_match = pc.list_mutable_configs(pipette_id)
-    data = await request.json()
-    if not data.get('fields') or not data.get('info'):
-        return web.json_response(status=400)
-
-    for key, value in data['fields'].items():
-        if value:
-            config = value['value']
-            default = config_match[key]
-            if config < default['min'] or config > default['max']:
-                return web.json_response(
-                    {'message': '{} out of range with {}'.format(key, value)},
-                    status=412)
-    pc.save_overrides(pipette_id, data['fields'], data['info']['model'])
-    return web.json_response(status=204)

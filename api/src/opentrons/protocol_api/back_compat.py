@@ -8,7 +8,7 @@ import importlib.util
 from typing import Any, List
 
 import opentrons.hardware_control as hc
-from opentrons.config.pipette_config import config_models
+from opentrons.config.pipette_config import configs
 from opentrons.types import Mount
 from .labware import Labware
 from .contexts import ProtocolContext, InstrumentContext
@@ -140,7 +140,7 @@ class AddInstrumentCtors(type):
     def __new__(cls, name, bases, namespace, **kwds):
         """ Add the pipette initializer functions to the class. """
         res = type.__new__(cls, name, bases, namespace)
-        for config in config_models:
+        for config in configs:
             # Split the long name with the version
             comps = config.split('_')
             # To get the name without the version

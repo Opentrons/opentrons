@@ -12,7 +12,7 @@ defs = json.loads(
 
 
 @pytest.mark.parametrize('pipette_model',
-                         [c for c in pipette_config.config_models if not
+                         [c for c in pipette_config.configs if not
                           (c.startswith('p1000')
                            or c.startswith('p300_multi'))])
 def test_versioned_aspiration(pipette_model, monkeypatch):
@@ -42,7 +42,7 @@ def test_versioned_aspiration(pipette_model, monkeypatch):
 
 # TODO: make sure the mm of movement for max volume aspirate and max volume
 # TODO: dispense agree
-@pytest.mark.parametrize('pipette_model', pipette_config.config_models)
+@pytest.mark.parametrize('pipette_model', pipette_config.configs)
 def test_ul_per_mm_continuous(pipette_model):
     """
     For each model of pipette, for each boundary between pieces of the
@@ -85,6 +85,9 @@ def test_override_load():
     new_id = '0djaisoa921jas'
     new_pconf = pipette_config.load('p300_multi_v1.4', new_id)
 
+    # We shouldn’t write a new file for a nonexistent id
+    assert not (cdir/f'{new_id}.json').is_file()
+
     assert new_pconf != pconf
 
     unspecced = pipette_config.load('p300_multi_v1.4')
@@ -95,42 +98,17 @@ def test_override_save():
     cdir = CONFIG['pipette_config_overrides_dir']
 
     overrides = {
-        'pickUpCurrent': {
-            "value": 1231.213},
-        'dropTipSpeed': {
-            "value": 121}
+        'pickUpCurrent': {"value": 1231.213},
+        'dropTipSpeed': {"value": 121}
     }
 
     new_id = 'aoa2109j09cj2a'
-    model = 'p300_multi_v1'
 
-    pipette_config.save_overrides(new_id, overrides, model)
+    pipette_config.save_overrides(new_id, overrides)
 
     assert (cdir/f'{new_id}.json').is_file()
 
     loaded = pipette_config.load_overrides(new_id)
 
-    assert loaded['pickUpCurrent']['value'] == \
-        overrides['pickUpCurrent']['value']
-    assert loaded['dropTipSpeed']['value'] == \
-        overrides['dropTipSpeed']['value']
-
-
-def test_mutable_configs_only(monkeypatch):
-    # Test that only set mutable configs are populated in this dictionary
-
-    monkeypatch.setattr(
-        pipette_config, 'mutable_configs', ['tipLength', 'plungerCurrent'])
-
-    new_id = 'aoa2109j09cj2a'
-    model = 'p300_multi_v1'
-
-    pipette_config.save_overrides(new_id, {}, model)
-
-    config = pipette_config.list_mutable_configs(new_id)
-    # instead of dealing with unordered lists, convert to set and check whether
-    # these lists have a difference between them
-    difference = set(list(config.keys())) - \
-        set(pipette_config.mutable_configs)
-    # ensure empty
-    assert bool(difference) is False
+    assert loaded['pickUpCurrent'] == overrides['pickUpCurrent']
+    assert loaded['dropTipSpeed'] == overrides['dropTipSpeed']

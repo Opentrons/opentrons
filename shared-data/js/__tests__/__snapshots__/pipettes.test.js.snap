@@ -2,51 +2,22 @@
 
 exports[`pipette data accessors getPipetteModelSpecs model p10_multi_v1 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": -1,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 2,
-  },
   "channels": 8,
   "defaultAspirateFlowRate": Object {
-    "max": 50,
-    "min": 0.001,
     "value": 5,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 50,
-    "min": 0.001,
     "value": 10,
   },
   "displayName": "P10 8-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -4,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 10,
@@ -60,36 +31,43 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.4,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 10,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": -1,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 2,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -4,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [],
   "tipLength": Object {
-    "type": "float",
-    "units": "mm",
     "value": 33,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -165,51 +143,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p10_multi_v1.3 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": -2.5,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 0.5,
-  },
   "channels": 8,
   "defaultAspirateFlowRate": Object {
-    "max": 50,
-    "min": 0.001,
     "value": 5,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 50,
-    "min": 0.001,
     "value": 10,
   },
   "displayName": "P10 8-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -5.5,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 10,
@@ -223,34 +172,43 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.4,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 10,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": -2.5,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 0.5,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -5.5,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [],
   "tipLength": Object {
     "value": 33,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -326,51 +284,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p10_multi_v1.4 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": -1,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 2,
-  },
   "channels": 8,
   "defaultAspirateFlowRate": Object {
-    "max": 50,
-    "min": 0.001,
     "value": 5,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 50,
-    "min": 0.001,
     "value": 10,
   },
   "displayName": "P10 8-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -4.5,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 10,
@@ -384,36 +313,43 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.4,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 10,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": -1,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 2,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -4.5,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [],
   "tipLength": Object {
-    "type": "float",
-    "units": "mm",
     "value": 33,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -489,51 +425,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p10_single_v1 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": -1,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 2,
-  },
   "channels": 1,
   "defaultAspirateFlowRate": Object {
-    "max": 50,
-    "min": 0.001,
     "value": 5,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 50,
-    "min": 0.001,
     "value": 10,
   },
   "displayName": "P10 Single-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -4.5,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 10,
@@ -547,36 +454,43 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.1,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 10,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.3,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": -1,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 2,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -4.5,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [],
   "tipLength": Object {
-    "type": "float",
-    "units": "mm",
     "value": 33,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -657,51 +571,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p10_single_v1.3 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": -2.5,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 0.5,
-  },
   "channels": 1,
   "defaultAspirateFlowRate": Object {
-    "max": 50,
-    "min": 0.001,
     "value": 5,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 50,
-    "min": 0.001,
     "value": 10,
   },
   "displayName": "P10 Single-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -6,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 10,
@@ -715,36 +600,43 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.1,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 10,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.3,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": -2.5,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 0.5,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -6,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [],
   "tipLength": Object {
-    "type": "float",
-    "units": "mm",
     "value": 33,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -825,51 +717,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p10_single_v1.4 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": -0.5,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 2.5,
-  },
   "channels": 1,
   "defaultAspirateFlowRate": Object {
-    "max": 50,
-    "min": 0.001,
     "value": 5,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 50,
-    "min": 0.001,
     "value": 10,
   },
   "displayName": "P10 Single-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -5.2,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 10,
@@ -883,36 +746,43 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.4,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 10,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.3,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": -0.5,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 2.5,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -5.2,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [],
   "tipLength": Object {
-    "type": "float",
-    "units": "mm",
     "value": 33,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -993,51 +863,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p50_multi_v1 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": 2,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 2.5,
-  },
   "channels": 8,
   "defaultAspirateFlowRate": Object {
-    "max": 100,
-    "min": 0.001,
     "value": 25,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 100,
-    "min": 0.001,
     "value": 50,
   },
   "displayName": "P50 8-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -3.5,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 50,
@@ -1051,34 +892,43 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.6,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 10,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": 2,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 2.5,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -3.5,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [],
   "tipLength": Object {
     "value": 51.7,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -1144,51 +994,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p50_multi_v1.3 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": 0.5,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 2,
-  },
   "channels": 8,
   "defaultAspirateFlowRate": Object {
-    "max": 100,
-    "min": 0.001,
     "value": 25,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 100,
-    "min": 0.001,
     "value": 50,
   },
   "displayName": "P50 8-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -5,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 50,
@@ -1202,36 +1023,43 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.6,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 10,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": 0.5,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 2,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -5,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [],
   "tipLength": Object {
-    "type": "float",
-    "units": "mm",
     "value": 51.7,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -1297,51 +1125,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p50_multi_v1.4 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": 0.5,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 2,
-  },
   "channels": 8,
   "defaultAspirateFlowRate": Object {
-    "max": 100,
-    "min": 0.001,
     "value": 25,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 100,
-    "min": 0.001,
     "value": 50,
   },
   "displayName": "P50 8-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -4,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 50,
@@ -1355,36 +1154,43 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.6,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 10,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": 0.5,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 2,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -4,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [],
   "tipLength": Object {
-    "type": "float",
-    "units": "mm",
     "value": 51.7,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -1450,51 +1256,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p50_single_v1 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": 2,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 2.01,
-  },
   "channels": 1,
   "defaultAspirateFlowRate": Object {
-    "max": 100,
-    "min": 0.001,
     "value": 25,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 100,
-    "min": 0.001,
     "value": 50,
   },
   "displayName": "P50 Single-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -4.5,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 50,
@@ -1508,34 +1285,43 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.1,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 10,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.3,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": 2,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 2.01,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -4.5,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [],
   "tipLength": Object {
     "value": 51.7,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -1601,51 +1387,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p50_single_v1.3 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": 0.5,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 2,
-  },
   "channels": 1,
   "defaultAspirateFlowRate": Object {
-    "max": 100,
-    "min": 0.001,
     "value": 25,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 100,
-    "min": 0.001,
     "value": 50,
   },
   "displayName": "P50 Single-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -6,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 50,
@@ -1659,36 +1416,43 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.1,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 10,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.3,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": 0.5,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 2,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -6,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [],
   "tipLength": Object {
-    "type": "float",
-    "units": "mm",
     "value": 51.7,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -1754,51 +1518,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p50_single_v1.4 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": 0.5,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 2,
-  },
   "channels": 1,
   "defaultAspirateFlowRate": Object {
-    "max": 100,
-    "min": 0.001,
     "value": 25,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 100,
-    "min": 0.001,
     "value": 50,
   },
   "displayName": "P50 Single-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -5,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 50,
@@ -1812,36 +1547,43 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.1,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 10,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.3,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": 0.5,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 2,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -5,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [],
   "tipLength": Object {
-    "type": "float",
-    "units": "mm",
     "value": 51.7,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -1907,51 +1649,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p300_multi_v1 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": 3,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 3.5,
-  },
   "channels": 8,
   "defaultAspirateFlowRate": Object {
-    "max": 600,
-    "min": 0.001,
     "value": 150,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 600,
-    "min": 0.001,
     "value": 300,
   },
   "displayName": "P300 8-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -2,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 300,
@@ -1965,36 +1678,43 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.6,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 10,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": 3,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 3.5,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -2,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [],
   "tipLength": Object {
-    "type": "float",
-    "units": "mm",
     "value": 51.7,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -2024,51 +1744,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p300_multi_v1.3 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": 1.5,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 3.5,
-  },
   "channels": 8,
   "defaultAspirateFlowRate": Object {
-    "max": 600,
-    "min": 0.001,
     "value": 150,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 600,
-    "min": 0.001,
     "value": 300,
   },
   "displayName": "P300 8-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -3.5,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 300,
@@ -2082,36 +1773,43 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.6,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 10,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": 1.5,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 3.5,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -3.5,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [],
   "tipLength": Object {
-    "type": "float",
-    "units": "mm",
     "value": 51.7,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -2141,51 +1839,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p300_multi_v1.4 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": 1.5,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 3.5,
-  },
   "channels": 8,
   "defaultAspirateFlowRate": Object {
-    "max": 600,
-    "min": 0.001,
     "value": 150,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 600,
-    "min": 0.001,
     "value": 300,
   },
   "displayName": "P300 8-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -3.5,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm",
     "value": 5,
   },
   "maxVolume": 300,
@@ -2199,36 +1868,43 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.6,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 10,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": 1.5,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 3.5,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -3.5,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [],
   "tipLength": Object {
-    "type": "float",
-    "units": "mm",
     "value": 51.7,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -2258,51 +1934,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p300_single_v1 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": 0,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 1.5,
-  },
   "channels": 1,
   "defaultAspirateFlowRate": Object {
-    "max": 600,
-    "min": 0.001,
     "value": 150,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 600,
-    "min": 0.001,
     "value": 300,
   },
   "displayName": "P300 Single-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -4,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 300,
@@ -2316,36 +1963,43 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.1,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 10,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.3,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": 0,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 1.5,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -4,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [],
   "tipLength": Object {
-    "type": "float",
-    "units": "mm",
     "value": 51.7,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -2431,51 +2085,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p300_single_v1.3 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": -1.5,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 1.5,
-  },
   "channels": 1,
   "defaultAspirateFlowRate": Object {
-    "max": 600,
-    "min": 0.001,
     "value": 150,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 600,
-    "min": 0.001,
     "value": 300,
   },
   "displayName": "P300 Single-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -5.5,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 300,
@@ -2489,36 +2114,43 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.1,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 10,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.3,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": -1.5,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 1.5,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -5.5,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [],
   "tipLength": Object {
-    "type": "float",
-    "units": "mm",
     "value": 51.7,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -2604,51 +2236,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p300_single_v1.4 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": 0,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 3,
-  },
   "channels": 1,
   "defaultAspirateFlowRate": Object {
-    "max": 600,
-    "min": 0.001,
     "value": 150,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 600,
-    "min": 0.001,
     "value": 300,
   },
   "displayName": "P300 Single-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -4.5,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 300,
@@ -2662,36 +2265,43 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.1,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 10,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.3,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": 0,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 3,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -4.5,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [],
   "tipLength": Object {
-    "type": "float",
-    "units": "mm",
     "value": 51.7,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -2777,51 +2387,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p1000_single_v1 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": 1,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 3,
-  },
   "channels": 1,
   "defaultAspirateFlowRate": Object {
-    "max": 2000,
-    "min": 50,
     "value": 500,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 2000,
-    "min": 50,
     "value": 1000,
   },
   "displayName": "P1000 Single-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -2.2,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 1000,
@@ -2835,38 +2416,45 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.1,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 15,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": 1,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 3,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -2.2,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [
     "needs-pickup-shake",
   ],
   "tipLength": Object {
-    "type": "float",
-    "units": "mm",
     "value": 76.7,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -2916,51 +2504,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p1000_single_v1.3 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": 0.5,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 2.5,
-  },
   "channels": 1,
   "defaultAspirateFlowRate": Object {
-    "max": 2000,
-    "min": 50,
     "value": 500,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 2000,
-    "min": 50,
     "value": 1000,
   },
   "displayName": "P1000 Single-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -4,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.7,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 1000,
@@ -2974,38 +2533,45 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.1,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 15,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": 0.5,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 2.5,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -4,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [
     "needs-pickup-shake",
   ],
   "tipLength": Object {
-    "type": "float",
-    "units": "mm",
     "value": 76.7,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -3055,51 +2621,22 @@ Object {
 
 exports[`pipette data accessors getPipetteModelSpecs model p1000_single_v1.4 snapshot 1`] = `
 Object {
-  "blowout": Object {
-    "max": 10,
-    "min": -4,
-    "type": "float",
-    "units": "mm",
-    "value": 0.5,
-  },
-  "bottom": Object {
-    "max": 19,
-    "min": -2,
-    "type": "float",
-    "units": "mm",
-    "value": 2.5,
-  },
   "channels": 1,
   "defaultAspirateFlowRate": Object {
-    "max": 2000,
-    "min": 50,
     "value": 500,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 2000,
-    "min": 50,
     "value": 1000,
   },
   "displayName": "P1000 Single-Channel",
-  "dropTip": Object {
-    "max": 2,
-    "min": -6,
-    "type": "float",
-    "units": "mm",
-    "value": -4,
-  },
   "dropTipCurrent": Object {
     "max": 0.8,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.7,
   },
   "dropTipSpeed": Object {
     "max": 30,
     "min": 0.001,
-    "type": "float",
-    "units": "mm/sec",
     "value": 5,
   },
   "maxVolume": 1000,
@@ -3113,38 +2650,45 @@ Object {
   "pickUpCurrent": Object {
     "max": 1.2,
     "min": 0.05,
-    "type": "float",
-    "units": "amps",
     "value": 0.1,
   },
   "pickUpDistance": Object {
     "max": 30,
     "min": 1,
-    "type": "float",
-    "units": "mm",
     "value": 15,
   },
   "plungerCurrent": Object {
     "max": 0.5,
     "min": 0.1,
-    "type": "float",
-    "units": "amps",
     "value": 0.5,
+  },
+  "plungerPositions": Object {
+    "blowOut": Object {
+      "max": 10,
+      "min": -4,
+      "value": 0.5,
+    },
+    "bottom": Object {
+      "max": 19,
+      "min": -2,
+      "value": 2.5,
+    },
+    "dropTip": Object {
+      "max": 2,
+      "min": -6,
+      "value": -4,
+    },
+    "top": Object {
+      "max": 19.5,
+      "min": 5,
+      "value": 19.5,
+    },
   },
   "quirks": Array [
     "needs-pickup-shake",
   ],
   "tipLength": Object {
-    "type": "float",
-    "units": "mm",
     "value": 76.7,
-  },
-  "top": Object {
-    "max": 19.5,
-    "min": 5,
-    "type": "float",
-    "units": "mm",
-    "value": 19.5,
   },
   "ulPerMm": Array [
     Object {
@@ -3196,13 +2740,9 @@ exports[`pipette data accessors getPipetteNameSpecs name p10_multi snapshot 1`] 
 Object {
   "channels": 8,
   "defaultAspirateFlowRate": Object {
-    "max": 50,
-    "min": 0.001,
     "value": 5,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 50,
-    "min": 0.001,
     "value": 10,
   },
   "displayName": "P10 8-Channel",
@@ -3216,13 +2756,9 @@ exports[`pipette data accessors getPipetteNameSpecs name p10_single snapshot 1`]
 Object {
   "channels": 1,
   "defaultAspirateFlowRate": Object {
-    "max": 50,
-    "min": 0.001,
     "value": 5,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 50,
-    "min": 0.001,
     "value": 10,
   },
   "displayName": "P10 Single-Channel",
@@ -3236,13 +2772,9 @@ exports[`pipette data accessors getPipetteNameSpecs name p50_multi snapshot 1`] 
 Object {
   "channels": 8,
   "defaultAspirateFlowRate": Object {
-    "max": 100,
-    "min": 0.001,
     "value": 25,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 100,
-    "min": 0.001,
     "value": 50,
   },
   "displayName": "P50 8-Channel",
@@ -3256,13 +2788,9 @@ exports[`pipette data accessors getPipetteNameSpecs name p50_single snapshot 1`]
 Object {
   "channels": 1,
   "defaultAspirateFlowRate": Object {
-    "max": 100,
-    "min": 0.001,
     "value": 25,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 100,
-    "min": 0.001,
     "value": 50,
   },
   "displayName": "P50 Single-Channel",
@@ -3276,13 +2804,9 @@ exports[`pipette data accessors getPipetteNameSpecs name p300_multi snapshot 1`]
 Object {
   "channels": 8,
   "defaultAspirateFlowRate": Object {
-    "max": 600,
-    "min": 0.001,
     "value": 150,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 600,
-    "min": 0.001,
     "value": 300,
   },
   "displayName": "P300 8-Channel",
@@ -3296,13 +2820,9 @@ exports[`pipette data accessors getPipetteNameSpecs name p300_single snapshot 1`
 Object {
   "channels": 1,
   "defaultAspirateFlowRate": Object {
-    "max": 600,
-    "min": 0.001,
     "value": 150,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 600,
-    "min": 0.001,
     "value": 300,
   },
   "displayName": "P300 Single-Channel",
@@ -3316,13 +2836,9 @@ exports[`pipette data accessors getPipetteNameSpecs name p1000_single snapshot 1
 Object {
   "channels": 1,
   "defaultAspirateFlowRate": Object {
-    "max": 2000,
-    "min": 50,
     "value": 500,
   },
   "defaultDispenseFlowRate": Object {
-    "max": 2000,
-    "min": 50,
     "value": 1000,
   },
   "displayName": "P1000 Single-Channel",
