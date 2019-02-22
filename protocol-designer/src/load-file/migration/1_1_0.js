@@ -9,8 +9,6 @@ import type {PipetteEntities} from '../../step-forms'
 import type {FormPatch} from '../../steplist/actions'
 import type {ProtocolFile, FileLabware, FilePipette} from '../../file-types'
 
-const MIGRATION_VERSION = '1.1.0'
-
 // NOTE: these constants are copied here because
 // the default-values key did not exist for most protocols
 // pre 1.1.0 in later migration files many of these values
