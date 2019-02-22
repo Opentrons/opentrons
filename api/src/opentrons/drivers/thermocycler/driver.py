@@ -2,7 +2,10 @@ import logging
 import os
 import threading
 from queue import Queue
-from select import poll, POLLIN
+try:
+    import select
+except ModuleNotFoundError:
+    select = None  # type: ignore
 from time import sleep
 from typing import Optional
 from serial.serialutil import SerialException
@@ -74,10 +77,10 @@ class TCPoller(threading.Thread):
         self._halt_read_file = os.fdopen(halt_read_fd, 'rb')
         self._halt_write_fd = open(self._send_path, 'wb', buffering=0)
 
-        self._poller = poll()
-        self._poller.register(self._send_read_file, eventmask=POLLIN)
-        self._poller.register(self._halt_read_file, eventmask=POLLIN)
-        self._poller.register(self._connection, eventmask=POLLIN)
+        self._poller = select.poll()
+        self._poller.register(self._send_read_file, eventmask=select.POLLIN)
+        self._poller.register(self._halt_read_file, eventmask=select.POLLIN)
+        self._poller.register(self._connection, eventmask=select.POLLIN)
 
         super().__init__(target=self._serial_poller, name='tc_serial_poller')
         super().start()
