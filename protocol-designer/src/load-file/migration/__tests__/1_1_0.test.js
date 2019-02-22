@@ -10,8 +10,7 @@ import {
   TCD_DEPRECATED_FIELD_NAMES,
   MIX_DEPRECATED_FIELD_NAMES,
   replaceTCDStepsWithMoveLiquidStep,
-  updateMigrationVersion,
-} from '../migrationV1.js'
+} from '../1_1_0.js'
 
 describe('renameOrderedSteps', () => {
   const migratedFile = renameOrderedSteps(oldProtocol)
@@ -283,12 +282,5 @@ describe('replaceTCDStepsWithMoveLiquidStep', () => {
         expect(migratedFile['designer-application'].data.savedStepForms[stepId].path).toMatch(/multiDispense|single/)
       })
     }
-  })
-})
-
-describe('updateMigrationVersion', () => {
-  const migratedFile = updateMigrationVersion(oldProtocol)
-  test('update migrationVersion', () => {
-    expect(migratedFile['designer-application'].migrationVersion).toEqual(1)
   })
 })

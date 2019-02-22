@@ -1,26 +1,35 @@
 // @flow
 import flow from 'lodash/flow'
-import max from 'lodash/max'
-import sortBy from 'lodash/sortBy'
-import findIndex from 'lodash/findIndex'
+import takeRightWhile from 'lodash/takeRightWhile'
+import semver from 'semver'
 import type {ProtocolFile} from '../../file-types'
-import {default as migrationV1} from './migrationV1'
+import migrateTo_1_1_0 from './1_1_0'
 
-const allMigrations = [
-  migrationV1,
-]
+const OLDEST_MIGRATEABLE_VERSION = '1.0.0'
 
-export const LATEST_MIGRATION_VERSION = max(allMigrations.map(m => m.version))
+type Version = string
+type Migration = (ProtocolFile) => ProtocolFile
+type MigrationsByVersion = {[Version]: Migration}
+
+const allMigrationsByVersion: MigrationsByVersion = {
+  '1.1.0': migrateTo_1_1_0,
+}
+
+// get all versions to migrate newer than the file's applicationVersion
+export const getMigrationVersionsToRunFromVersion = (migrationsByVersion: {}, version: Version): Array<Version> => {
+  const allSortedVersions = Object.keys(migrationsByVersion).sort(semver.compare)
+  return takeRightWhile(allSortedVersions, v => semver.gt(v, version))
+}
 
 const masterMigration = (file: any): ProtocolFile => {
-  const sortedMigrations = sortBy(allMigrations, m => m.version)
-
   const designerApplication = file.designerApplication || file['designer-application']
 
-  const {migrationVersion} = designerApplication
-  const migrationsToRun = sortedMigrations.slice(findIndex(sortedMigrations, m => m.version === migrationVersion) + 1)
+  // NOTE: default exists because any protocol that doesn't include the applicationVersion
+  // key will be treated as the oldest migrateable version ('1.0.0')
+  const {applicationVersion = OLDEST_MIGRATEABLE_VERSION} = designerApplication
 
-  return flow(migrationsToRun.map(migration => migration.migrateFile))(file)
+  const migrationVersionsToRun = getMigrationVersionsToRunFromVersion(allMigrationsByVersion, applicationVersion)
+  return flow(migrationVersionsToRun.map(version => allMigrationsByVersion[version]))(file)
 }
 
 export default masterMigration

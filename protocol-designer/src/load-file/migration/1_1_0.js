@@ -10,11 +10,9 @@ import type {FormPatch} from '../../steplist/actions'
 import type {ProtocolFile, FileLabware, FilePipette} from '../../file-types'
 import type {FormData} from '../../form-types'
 
-const MIGRATION_VERSION = 1
-
 // NOTE: these constants are copied here because
 // the default-values key did not exist for most protocols
-// pre migrationV1 in later migration files many of these values
+// pre 1.1.0 in later migration files many of these values
 // should be taken from the default-values key
 export const INITIAL_DECK_SETUP_STEP_ID: '__INITIAL_DECK_SETUP_STEP__' = '__INITIAL_DECK_SETUP_STEP__'
 export const initialDeckSetupStepForm = {
@@ -238,12 +236,11 @@ export function replaceTCDStepsWithMoveLiquidStep (fileData: ProtocolFile): Prot
   }
 }
 
-export function updateMigrationVersion (fileData: ProtocolFile): ProtocolFile {
+export function updateVersion (fileData: ProtocolFile): ProtocolFile {
   return {
     ...fileData,
     'designer-application': {
       ...fileData['designer-application'],
-      migrationVersion: MIGRATION_VERSION,
     },
   }
 }
@@ -253,10 +250,7 @@ const migrateFile = (fileData: ProtocolFile) => flow([
   addInitialDeckSetupStep,
   updateStepFormKeys,
   replaceTCDStepsWithMoveLiquidStep,
-  updateMigrationVersion,
+  updateVersion,
 ])(fileData)
 
-export default {
-  version: MIGRATION_VERSION,
-  migrateFile,
-}
+export default migrateFile

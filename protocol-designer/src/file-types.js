@@ -69,8 +69,8 @@ export type ProtocolFile = {
 
   'designer-application': {
     'application-name': 'opentrons/protocol-designer',
-    'application-version': VersionString,
-    migrationVersion?: number,
+    'application-version': ?string,
+    applicationVersion: ?string,
     data: PDMetadata,
   },
 
