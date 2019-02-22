@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import get from 'lodash/get'
 import {FormGroup, InputField} from '@opentrons/components'
 
 import styles from './styles.css'
@@ -16,7 +15,7 @@ export function FormColumn (props: FormColProps) {
   return <div className={styles.form_column}>{props.children}</div>
 }
 
-type FormValues = {[string]: ?(string | {[string]: string})}
+type FormValues = {[string]: ?string}
 
 type FormGroupProps = {
   groupLabel: string,
@@ -27,7 +26,7 @@ type FormGroupProps = {
 }
 
 function getFieldValue (name: string, values: FormValues): ?string {
-  return get(values, name)
+  return values[name]
 }
 
 export default function ConfigFormGroup (props: FormGroupProps) {
