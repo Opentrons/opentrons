@@ -123,10 +123,16 @@ CONFIG_ELEMENTS = (
                   ' an absolute path, it will be used directly. If it is a '
                   'relative path it will be relative to log_dir'
                   'The location of the file to save serial logs to'),
+    # Unlike other config elements, the wifi keys dir is still in
+    # /data/user_storage/opentrons_data because these paths are fed directly to
+    # NetworkManager and stored in connections files there. To change this
+    # directory, we would have to modify those connections files, presumably on
+    # boot, which is a level of complexity that makes it worth having an
+    # annoying path.
     ConfigElement('wifi_keys_dir',
                   'Wifi Keys Dir',
-                  Path('network_keys'),
-                  ConfigElementType.FILE,
+                  Path('user_storage/opentrons_data/network_keys'),
+                  ConfigElementType.DIR,
                   'The directory in which to save any key material for wifi'
                   ' auth. Not relevant outside of a robot.'),
     ConfigElement('hardware_controller_lockfile',
