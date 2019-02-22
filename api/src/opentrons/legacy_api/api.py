@@ -195,11 +195,7 @@ class InstrumentsWrapper(object):
             config = config._replace(min_volume=min_volume)
         if max_volume is not None:
             config = config._replace(max_volume=max_volume)
-        plunger_positions = {
-            'top': config.top,
-            'bottom': config.bottom,
-            'blow_out': config.blow_out,
-            'drop_tip': config.drop_tip}
+
         p = self.Pipette(
             model_offset=config.model_offset,
             mount=mount,
@@ -214,7 +210,7 @@ class InstrumentsWrapper(object):
             plunger_current=config.plunger_current,
             drop_tip_current=config.drop_tip_current,
             drop_tip_speed=config.drop_tip_speed,
-            plunger_positions=plunger_positions,
+            plunger_positions=config.plunger_positions.copy(),
             ul_per_mm=config.ul_per_mm,
             pick_up_current=config.pick_up_current,
             pick_up_distance=config.pick_up_distance,

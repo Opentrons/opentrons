@@ -8,7 +8,7 @@ from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, adapters
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
-from opentrons.config.pipette_config import config_models
+from opentrons.config.pipette_config import configs
 from opentrons.protocol_api import transfers as tf
 
 import pytest
@@ -27,7 +27,7 @@ def load_my_labware(monkeypatch):
 
 def test_load_instrument(loop):
     ctx = papi.ProtocolContext(loop=loop)
-    for config in config_models:
+    for config in configs:
         loaded = ctx.load_instrument(config, Mount.LEFT, replace=True)
         assert loaded.name == config
         prefix = config.split('_v')[0]
