@@ -42,26 +42,45 @@ As always, please reach out to our team with any questions.
 ### Bug fixes
 
 - Updated pipette aspiration functions for increased accuracy
-- Boot reliability improvements
+- Fixed the height of the `96-flat` labware definition
+    - You will need to reset your robot's labware calibration data to pick up this change
+    - This will erase all existing calibrations as well as all custom labware, so only do it if your existing `96-flat` calibration isn't working or if you don't mind re-calibrating your other labware
+    - To reset labware calibration, go to "Robots" > your robot > "Advanced Settings" > "Factory Reset", check "Labware Calibration", and then click "Reset"
+- Made some general boot reliability improvements
 
 ### New features
 
-- Python protocols can now be simulated from your own computer **without needing to clone our entire code repository**
-    - See the [Opentrons package on PyPI](https://pypi.org/project/opentrons/) for more details
+- Python protocols can now be simulated from your own computer **without needing to clone our entire repository**
+    - See our [support documentation][simulation] for more details
+
     ```
     pip install opentrons
     opentrons_simulate /path/to/protocol.py
     ```
-- Underlying architectural improvements for future user-facing features
+
+- Made some underlying architectural improvements for future user-facing features
+
+[simulation]: http://support.opentrons.com/ot-2/simulating-ot-2-protocols-on-your-computer
 
 ### Known issues
 
+- Skipping optional parameters in certain protocol methods (e.g. `pipette.dispense`) in can cause labware to be missing from the calibration list and the run log to display incorrect messages ([#3105][3105])
+    - The protocol will still execute properly
+    - To work around, always specify all properties, even if you need to enter `None` manually
+
+    ```
+    # don't do this
+    pipette.dispense(trough)
+
+    # do this
+    pipette.dispense(None, trough)
+    # or even better, use named parameters for clarity
+    pipette.dispense(volume=None, location=trough)
+    ```
+
 - While the underlying definition is correct, there is a known API bug that is causing the robot to think a "50ml" tube in a "15/50ml" tuberack is the same height as the "15ml" tube
-- The definition of "96-well-plate" has an incorrect height. When calibrating for the first time after a factory reset:
-    1. Begin labware calibration with the "96-well-plate" **off the deck**
-    2. Jog the pipette up until there is enough room to insert the plate
-    3. Insert plate and calibrate normally
-        - After the plate has been calibrated once, the issue will not reoccur
 - Extremely long aspirations and dispenses can incorrectly trigger a serial timeout issue. If you see such an issue, make sure your protocol’s combination of aspirate/dispense speeds and aspirate/dispense volumes does not include a command that will take more than 30 seconds.
+
+[3105]: https://github.com/Opentrons/opentrons/issues/3105
 
 <!-- end:@opentrons/api -->

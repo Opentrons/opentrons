@@ -112,13 +112,16 @@ describe('disposal volume should update...', () => {
 
   describe('when volume is raised so that disposal vol must be exactly zero, clear/zero disposal volume fields', () => {
     const volume = '5' // 5 + 5 = 10 which is P10 capacity ==> max disposal volume is zero
-    test('when form is newly changed to multiDispense: clear the fields', () => {
+    test('when form is newly changed to multiDispense: clear the disposal vol + dispense_mix_* fields', () => {
       const patch = {path: 'multiDispense'}
       const result = handleFormHelper(patch, {...form, path: 'single', volume})
       expect(result).toEqual({
         ...patch,
         disposalVolume_volume: null,
         disposalVolume_checkbox: false,
+        dispense_mix_checkbox: false,
+        dispense_mix_times: null,
+        dispense_mix_volume: null,
       })
     })
 
@@ -146,5 +149,29 @@ describe('disposal volume should update...', () => {
   test('when disposal volume is a negative number, set to zero', () => {
     const result = handleFormHelper({disposalVolume_volume: '-2'}, form)
     expect(result).toEqual({disposalVolume_volume: '0'})
+  })
+
+  describe('mix fields should clear...', () => {
+    // NOTE: path --> multiDispense handled in "when form is newly changed to multiDispense" test above
+
+    test('when path is changed to multiAspirate, clear aspirate mix fields', () => {
+      const form = {
+        path: 'single',
+        aspirate_wells: ['A1', 'A2'],
+        dispense_wells: ['B1'],
+        volume: 3,
+        pipette: 'pipetteId',
+        aspirate_mix_checkbox: true,
+        aspirate_mix_times: 2,
+        aspirate_mix_volume: 1,
+      }
+      const result = handleFormHelper({path: 'multiAspirate'}, form)
+      expect(result).toEqual({
+        path: 'multiAspirate',
+        aspirate_mix_checkbox: false,
+        aspirate_mix_times: null,
+        aspirate_mix_volume: null,
+      })
+    })
   })
 })

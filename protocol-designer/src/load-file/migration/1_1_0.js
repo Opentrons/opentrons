@@ -8,6 +8,7 @@ import {getPipetteCapacity} from '../../pipettes/pipetteData'
 import type {PipetteEntities} from '../../step-forms'
 import type {FormPatch} from '../../steplist/actions'
 import type {ProtocolFile, FileLabware, FilePipette} from '../../file-types'
+import type {FormData} from '../../form-types'
 
 // NOTE: these constants are copied here because
 // the default-values key did not exist for most protocols
@@ -29,8 +30,12 @@ export const initialDeckSetupStepForm = {
 function _updatePatchPathField (patch: FormPatch, rawForm: FormData, pipetteEntities: PipetteEntities) {
   const appliedPatch = {...rawForm, ...patch}
   const {path, changeTip} = appliedPatch
-  // pass-thru: incomplete form
-  if (!path) return patch
+
+  if (!path) {
+    console.warn(`No path for form: ${String(rawForm.id)}. Falling back to "single" path`)
+    // sanity check - fall back to 'single' if no path specified
+    return {...patch, path: 'single'}
+  }
 
   const numericVolume = Number(appliedPatch.volume) || 0
   const pipetteCapacity = getPipetteCapacity(pipetteEntities[appliedPatch.pipette])
