@@ -1,6 +1,7 @@
 // @flow
 import assert from 'assert'
 import clamp from 'lodash/clamp'
+import pick from 'lodash/pick'
 import round from 'lodash/round'
 import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import makeConditionalPatchUpdater from './makeConditionalPatchUpdater'
@@ -12,10 +13,29 @@ import {
   volumeInCapacityForMulti,
   DISPOSAL_VOL_DIGITS,
 } from './utils'
+import getDefaultsForStepType from '../getDefaultsForStepType'
 import {getWellRatio} from '../../utils'
-import type {FormData} from '../../../form-types'
+import {
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+  DEST_WELL_BLOWOUT_DESTINATION,
+} from '../../../step-generation/utils'
+import type {FormData, StepFieldName} from '../../../form-types'
 import type {FormPatch} from '../../actions/types'
 import type {LabwareEntities, PipetteEntities} from '../../../step-forms/types'
+
+function _fieldHasChanged (
+  rawForm: FormData,
+  patch: FormPatch,
+  fieldName: StepFieldName
+): boolean {
+  return Boolean(
+    patch[fieldName] !== undefined &&
+    patch[fieldName] !== rawForm[fieldName])
+}
+
+// TODO: Ian 2019-02-21 import this from a more central place - see #2926
+const getDefaultFields = (...fields: Array<StepFieldName>): FormPatch =>
+  pick(getDefaultsForStepType('moveLiquid'), fields)
 
 const wellRatioUpdatesMap = [
   {
@@ -104,17 +124,17 @@ const updatePatchOnLabwareChange = (patch: FormPatch, rawForm: FormData): FormPa
 
   return {
     ...(sourceLabwareChanged
-      ? {
-        'aspirate_wells': null,
-        'aspirate_mmFromBottom': null,
-        'aspirate_touchTipMmFromBottom': null,
-      } : {}),
+      ? getDefaultFields(
+        'aspirate_wells',
+        'aspirate_mmFromBottom',
+        'aspirate_touchTipMmFromBottom')
+      : {}),
     ...(destLabwareChanged
-      ? {
-        'dispense_wells': null,
-        'dispense_mmFromBottom': null,
-        'dispense_touchTipMmFromBottom': null,
-      } : {}),
+      ? getDefaultFields(
+        'dispense_wells',
+        'dispense_mmFromBottom',
+        'dispense_touchTipMmFromBottom')
+      : {}),
   }
 }
 
@@ -125,24 +145,26 @@ const updatePatchOnPipetteChange = (
 ) => {
   // when pipette ID is changed (to another ID, or to null),
   // set any flow rates, mix volumes, air gaps, or disposal volumes to null
-  if (patch.pipette !== undefined && rawForm.pipette !== patch.pipette) {
+  if (_fieldHasChanged(rawForm, patch, 'pipette')) {
     return {
       ...patch,
-      aspirate_flowRate: null,
-      dispense_flowRate: null,
-      aspirate_mix_volume: null,
-      dispense_mix_volume: null,
-      disposalVolume_volume: null,
+      ...getDefaultFields(
+        'aspirate_flowRate',
+        'dispense_flowRate',
+        'aspirate_mix_volume',
+        'dispense_mix_volume',
+        'disposalVolume_volume',
+      ),
     }
   }
 
   return patch
 }
 
-const clearedDisposalVolumeFields = {
-  disposalVolume_volume: null,
-  disposalVolume_checkbox: false,
-}
+const clearedDisposalVolumeFields = getDefaultFields(
+  'disposalVolume_volume',
+  'disposalVolume_checkbox',
+)
 
 const updatePatchDisposalVolumeFields = (
   patch: FormPatch,
@@ -249,7 +271,7 @@ const updatePatchOnPipetteChannelChange = (
 
   if (patch.pipette === null || singleToMulti) {
     // clear all well selection
-    update = {aspirate_wells: null, dispense_wells: null}
+    update = getDefaultFields('aspirate_wells', 'dispense_wells')
   } else if (multiToSingle) {
     // multi-channel to single-channel: convert primary wells to all wells
     const sourceLabwareId = rawForm.aspirate_labware
@@ -295,17 +317,40 @@ function updatePatchMixFields (patch: FormPatch, rawForm: FormData): FormPatch {
     if (patch.path === 'multiAspirate') {
       return {
         ...patch,
-        aspirate_mix_checkbox: false,
-        aspirate_mix_times: null,
-        aspirate_mix_volume: null,
+        ...getDefaultFields(
+          'aspirate_mix_checkbox',
+          'aspirate_mix_times',
+          'aspirate_mix_volume'),
       }
     }
     if (patch.path === 'multiDispense') {
       return {
         ...patch,
-        dispense_mix_checkbox: false,
-        dispense_mix_times: null,
-        dispense_mix_volume: null,
+        ...getDefaultFields(
+          'dispense_mix_checkbox',
+          'dispense_mix_times',
+          'dispense_mix_volume'),
+      }
+    }
+  }
+  return patch
+}
+
+export function updatePatchBlowoutFields (patch: FormPatch, rawForm: FormData): FormPatch {
+  const appliedPatch = {...rawForm, ...patch}
+
+  if (_fieldHasChanged(rawForm, patch, 'path')) {
+    const {path, blowout_location} = appliedPatch
+    // reset blowout_location when path changes to avoid invalid location for path
+    // or reset whenever checkbox is toggled
+    const shouldResetBlowoutLocation = (
+      (path === 'multiAspirate' && blowout_location === SOURCE_WELL_BLOWOUT_DESTINATION) ||
+      (path === 'multiDispense' && blowout_location === DEST_WELL_BLOWOUT_DESTINATION)
+    )
+    if (shouldResetBlowoutLocation) {
+      return {
+        ...patch,
+        ...getDefaultFields('blowout_location'),
       }
     }
   }
@@ -328,5 +373,6 @@ export default function dependentFieldsUpdateMoveLiquid (
     chainPatch => updatePatchDisposalVolumeFields(chainPatch, rawForm, pipetteEntities),
     chainPatch => clampDisposalVolume(chainPatch, rawForm, pipetteEntities),
     chainPatch => updatePatchMixFields(chainPatch, rawForm),
+    chainPatch => updatePatchBlowoutFields(chainPatch, rawForm),
   ])
 }

@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import {
   FormGroup,
   DropdownField,
-  type DropdownOption,
+  type Options,
 } from '@opentrons/components'
 import {selectors as stepFormSelectors} from '../../../step-forms'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
@@ -13,8 +13,6 @@ import type {StepType} from '../../../form-types'
 import styles from '../StepEditForm.css'
 import type {FocusHandlers} from '../types'
 import StepField from './FieldConnector'
-
-type Options = Array<DropdownOption>
 
 type PipetteFieldOP = {name: StepFieldName, stepType?: StepType} & FocusHandlers
 type PipetteFieldSP = {pipetteOptions: Options}

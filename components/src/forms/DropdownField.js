@@ -11,6 +11,8 @@ export type DropdownOption = {
   disabled?: boolean,
 }
 
+export type Options = Array<DropdownOption>
+
 // TODO(mc, 2018-02-22): disabled prop
 type Props = {
   /** change handler */
@@ -26,7 +28,7 @@ type Props = {
   /** name of field in form */
   name?: string,
   /** Array of {name, value} data */
-  options: Array<DropdownOption>,
+  options: Options,
   /** classes to apply */
   className?: string,
   /** optional caption. hidden when `error` is given */

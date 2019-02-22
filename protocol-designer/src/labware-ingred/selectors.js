@@ -5,6 +5,7 @@ import mapValues from 'lodash/mapValues'
 import max from 'lodash/max'
 import reduce from 'lodash/reduce'
 
+import type {Options} from '@opentrons/components'
 import type {
   RootState,
   DrillDownLabwareId,
@@ -17,7 +18,7 @@ import type {
   LiquidGroup,
   OrderedLiquids,
 } from './types'
-import type {BaseState, Options, Selector} from './../types'
+import type {BaseState, Selector} from './../types'
 
 // TODO: Ian 2019-02-15 no RootSlice, use BaseState
 type RootSlice = {labwareIngred: RootState}

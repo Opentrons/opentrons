@@ -37,6 +37,9 @@ export default function getDefaultsForStepType (stepType: StepType): {[StepField
         aspirate_wells: [],
         aspirate_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
         aspirate_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
+        aspirate_mix_checkbox: false,
+        aspirate_mix_times: null,
+        aspirate_mix_volume: null,
         aspirate_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
         aspirate_touchTip_checkbox: false,
 
@@ -44,8 +47,14 @@ export default function getDefaultsForStepType (stepType: StepType): {[StepField
         dispense_wells: [],
         dispense_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
         dispense_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
+        dispense_mix_checkbox: false,
+        dispense_mix_times: null,
+        dispense_mix_volume: null,
         dispense_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
         dispense_touchTip_checkbox: false,
+
+        disposalVolume_checkbox: false,
+        disposalVolume_volume: null,
 
         blowout_checkbox: false,
         blowout_location: FIXED_TRASH_ID,
