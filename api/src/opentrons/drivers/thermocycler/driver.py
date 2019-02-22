@@ -90,6 +90,20 @@ class TCPoller(threading.Thread):
         return self._port
 
     def _serial_poller(self):
+        """ Priority-sorted list of checks
+
+        Highest priority is the 'halt' channel, which is used to kill the
+        thread and the serial communication channel and allow everything to be
+        cleaned up.
+
+        Second is the lid-open interrupt, which should trigger a callback
+        (typically to halt the robot).
+
+        Third is an enqueued command to send to the Thermocycler.
+
+        Fourth (if no other work is available) is to query the Thermocycler for
+        its current temp, target temp, and time remaining in its current cycle.
+        """
         while True:
             _next = dict(self._poller.poll(POLLING_FREQUENCY_MS))
             if self._halt_read_file.fileno() in _next:
@@ -187,6 +201,8 @@ class Thermocycler:
         self.disconnect()
         self._poller = TCPoller(
             port, self._interrupt_callback, self._temp_status_update_callback)
+
+        # Check initial device lid state
         _lid_status_res = self._write_and_wait(GCODES['GET_LID_STATUS'])
         self._lid_status = _lid_status_res.split()[-1].lower()
         return self
@@ -207,10 +223,6 @@ class Thermocycler:
         return self._poller.is_alive()
 
     def open(self):
-        # TODO: add temperature protection for >70C
-        if self.target:
-            raise ThermocyclerError(
-                'Cannot open Thermocycler while it is active')
         self._write_and_wait(GCODES['OPEN_LID'])
         self._lid_status = 'open'
 

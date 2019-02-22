@@ -1656,6 +1656,7 @@ class ThermocyclerContext(ModuleContext):
 
     @property
     def lid_status(self):
+        """ Lid open/close status string"""
         return self._module.lid_status
 
     @property
@@ -1664,10 +1665,12 @@ class ThermocyclerContext(ModuleContext):
 
     @cmds.publish.both(command=cmds.thermocycler_open)
     def open(self):
+        """ Opens the lid"""
         return self._module.open()
 
     @cmds.publish.both(command=cmds.thermocycler_close)
     def close(self):
+        """ Closes the lid"""
         return self._module.close()
 
     @cmds.publish.both(command=cmds.thermocycler_deactivate)

@@ -79,10 +79,13 @@ class Thermocycler(mod_abc.AbstractModule):
         self._driver.deactivate()
 
     def open(self):
+        """ Open the lid if it is closed"""
+        # TODO add temperature protection if over 70 C
         if self._driver.lid_status == 'closed':
             self._driver.open()
 
     def close(self):
+        """ Close the lid if it is open"""
         if self._driver.lid_status == 'open':
             self._driver.close()
 
@@ -113,6 +116,11 @@ class Thermocycler(mod_abc.AbstractModule):
 
     @property
     def interrupt_callback(self):
+        """ Fetch the current interrupt callback
+
+        Exposes the interrupt callback used with the TCPoller, so it can be re-
+        hooked in the new module instance after a firmware update.
+        """
         return self._interrupt_cb
 
     def _connect(self):
