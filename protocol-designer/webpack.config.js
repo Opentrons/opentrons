@@ -5,15 +5,20 @@ const webpack = require('webpack')
 const webpackMerge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
-const {gitDescribeSync} = require('git-describe')
+// const {gitDescribeSync} = require('git-describe')
 
 const {DEV_MODE, baseConfig} = require('@opentrons/webpack-config')
 const {productName: title, description, author} = require('./package.json')
 
 const PROTOCOL_DESIGNER_ENV_VAR_PREFIX = 'OT_PD_'
 
-const gitInfo = gitDescribeSync()
-const OT_PD_VERSION = gitInfo && gitInfo.raw
+// TODO: BC: 2018-02-21 remove hardcoded semver version and replace
+// with string from package.json version inserted at build time
+// Also remove all OT_PD_VERSION env vars, the version should always
+// be gleaned from the package.json
+
+// const gitInfo = gitDescribeSync()
+const OT_PD_VERSION = '1.1.0' // gitInfo && gitInfo.raw
 const OT_PD_BUILD_DATE = new Date().toUTCString()
 
 const JS_ENTRY = path.join(__dirname, 'src/index.js')
@@ -30,9 +35,7 @@ const envVars = passThruEnvVars.reduce(
   {...envVarsWithDefaults}
 )
 
-console.log(
-  `PD version: ${process.env.OT_PD_VERSION || OT_PD_VERSION || 'UNKNOWN!'}`
-)
+console.log(`PD version: ${OT_PD_VERSION || 'UNKNOWN!'}`)
 
 module.exports = webpackMerge(baseConfig, {
   entry: [JS_ENTRY],

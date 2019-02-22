@@ -238,7 +238,6 @@ export function updateVersion (fileData: ProtocolFile): ProtocolFile {
     ...fileData,
     'designer-application': {
       ...fileData['designer-application'],
-      applicationVersion: MIGRATION_VERSION,
     },
   }
 }
@@ -251,7 +250,4 @@ const migrateFile = (fileData: ProtocolFile) => flow([
   updateVersion,
 ])(fileData)
 
-export default {
-  version: MIGRATION_VERSION,
-  migrateFile,
-}
+export default migrateFile
