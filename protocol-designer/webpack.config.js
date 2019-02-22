@@ -5,7 +5,6 @@ const webpack = require('webpack')
 const webpackMerge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
-// const {gitDescribeSync} = require('git-describe')
 
 const {DEV_MODE, baseConfig} = require('@opentrons/webpack-config')
 const {productName: title, description, author} = require('./package.json')
