@@ -1,5 +1,6 @@
 // @flow
 import {createSelector} from 'reselect'
+import assert from 'assert'
 import mapValues from 'lodash/mapValues'
 import isEmpty from 'lodash/isEmpty'
 import {getFlowRateDefaultsAllPipettes} from '@opentrons/shared-data'
