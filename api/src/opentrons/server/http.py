@@ -78,3 +78,11 @@ class HTTPServer(object):
             '/settings/reset', settings.reset)
         self.app.router.add_get(
             '/settings/reset/options', settings.available_resets)
+        self.app.router.add_get(
+            '/settings/pipettes', settings.pipette_settings
+        )
+        self.app.router.add_get(
+            '/settings/pipettes/{id}', settings.pipette_settings_id)
+        self.app.router.add_patch(
+            '/settings/pipettes/{id}/fields', settings.modify_pipette_settings
+        )

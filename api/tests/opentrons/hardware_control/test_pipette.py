@@ -24,7 +24,7 @@ def test_tip_tracking():
 
 
 def test_critical_points():
-    for config in pipette_config.configs:
+    for config in pipette_config.config_models:
         loaded = pipette_config.load(config)
         pip = pipette.Pipette(config,
                               {'single': [0, 0, 0], 'multi': [0, 0, 0]},
@@ -47,7 +47,7 @@ def test_critical_points():
 
 
 def test_volume_tracking():
-    for config in pipette_config.configs:
+    for config in pipette_config.config_models:
         loaded = pipette_config.load(config)
         pip = pipette.Pipette(config,
                               {'single': [0, 0, 0], 'multi': [0, 0, 0]},
@@ -73,25 +73,10 @@ def test_volume_tracking():
 
 
 def test_config_update():
-    for config in pipette_config.configs:
+    for config in pipette_config.config_models:
         pip = pipette.Pipette(config,
                               {'single': [0, 0, 0], 'multi': [0, 0, 0]},
                               'testID')
-        sample_plunger_pos = {'top': {"value": 19.5,
-                                      "edit": True,
-                                      "min": 0,
-                                      "max": 5},
-                              'bottom': {"value": 2,
-                                         "edit": True,
-                                         "min": 0,
-                                         "max": 5},
-                              'blowOut': {"value": -1,
-                                          "edit": True,
-                                          "min": -6,
-                                          "max": 5},
-                              'dropTip': {"value": -4.5,
-                                          "edit": True,
-                                          "min": -6,
-                                          "max": 5}}
-        pip.update_config_item('plunger_positions', sample_plunger_pos)
-        assert pip.config.plunger_positions == sample_plunger_pos
+        sample_plunger_pos = {'top': 19.5}
+        pip.update_config_item('top', sample_plunger_pos.get('top'))
+        assert pip.config.top == sample_plunger_pos.get('top')
