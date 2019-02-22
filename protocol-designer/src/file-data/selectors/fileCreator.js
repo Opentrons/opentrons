@@ -23,7 +23,7 @@ const protocolSchemaVersion = '1.0.0'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
-if (!isEmpty(process.env.OT_PD_VERSION)) console.warn('Could not find application version!')
+if (isEmpty(process.env.OT_PD_VERSION)) console.warn('Could not find application version!')
 const applicationVersion = process.env.OT_PD_VERSION
 
 // Internal release date: this should never be read programatically,
