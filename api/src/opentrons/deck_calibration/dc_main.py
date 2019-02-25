@@ -120,8 +120,10 @@ class CLITool:
             '\\': lambda: self.home(),
             ' ': lambda: self.save_transform(),
             'esc': lambda: self.exit(),
-            'q': lambda: self._jog('z', +1, self.current_step()),
-            'a': lambda: self._jog('z', -1, self.current_step()),
+            'q': lambda: self._jog(
+                self._current_mount, +1, self.current_step()),
+            'a': lambda: self._jog(
+                self._current_mount, -1, self.current_step()),
             'up': lambda: self._jog('Y', +1, self.current_step()),
             'down': lambda: self._jog('Y', -1, self.current_step()),
             'left': lambda: self._jog('X', -1, self.current_step()),
@@ -403,7 +405,8 @@ def probe(tip_length: float, hardware) -> str:
         log.debug("Setting probe center to {}".format(probe_center))
     else:
         probe_center = hardware.locate_tip_probe_center(tip_length)
-    hardware.update_config(probe_center=probe_center)
+    hardware.update_config(
+        tip_probe=hardware.config.tip_probe._replace(center=probe_center))
     return 'Tip probe'
 
 
