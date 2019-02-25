@@ -1,5 +1,5 @@
 // @flow
-
+import assert from 'assert'
 import { getLabware } from '@opentrons/shared-data'
 import intersection from 'lodash/intersection'
 import type { FormData } from '../../../form-types'
@@ -39,8 +39,9 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
   const aspirateOffsetFromBottomMm = hydratedFormData['mix_mmFromBottom']
   const dispenseOffsetFromBottomMm = hydratedFormData['mix_mmFromBottom']
 
-  // It's radiobutton, so one should always be selected.
-  const changeTip = hydratedFormData['aspirate_changeTip'] || DEFAULT_CHANGE_TIP_OPTION
+  // One changeTip option should always be selected.
+  assert(hydratedFormData['changeTip'], 'mixFormToArgs expected non-falsey changeTip option')
+  const changeTip = hydratedFormData['changeTip'] || DEFAULT_CHANGE_TIP_OPTION
 
   const blowoutLocation = hydratedFormData['blowout_checkbox'] ? hydratedFormData['blowout_location'] : null
 
