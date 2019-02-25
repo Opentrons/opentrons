@@ -96,7 +96,9 @@ describe('updateStepFormKeys', () => {
               'aspirate_changeTip': 'always',
               'aspirate_preWetTip': true,
               'aspirate_touchTip': true,
+              'aspirate_touchTipMmFromBottom': 20,
               'dispense_touchTip': true,
+              'dispense_touchTipMmFromBottom': 22,
               'dispense_blowout_checkbox': true,
               'dispense_blowout_labware': 'trashId',
               'dispense_blowout_location': 'trashId',
@@ -118,7 +120,9 @@ describe('updateStepFormKeys', () => {
               'aspirate_changeTip': 'always',
               'aspirate_preWetTip': true,
               'aspirate_touchTip': true,
+              'aspirate_touchTipMmFromBottom': 20,
               'dispense_touchTip': true,
+              'dispense_touchTipMmFromBottom': 22,
               'dispense_blowout_checkbox': true,
               'dispense_blowout_labware': 'trashId',
               'dispense_blowout_location': 'trashId',
@@ -140,7 +144,9 @@ describe('updateStepFormKeys', () => {
               'aspirate_changeTip': 'always',
               'aspirate_preWetTip': true,
               'aspirate_touchTip': true,
+              'aspirate_touchTipMmFromBottom': 20,
               'dispense_touchTip': true,
+              'dispense_touchTipMmFromBottom': 22,
               'dispense_blowout_checkbox': true,
               'dispense_blowout_labware': 'trashId',
               'dispense_blowout_location': 'trashId',
@@ -171,10 +177,12 @@ describe('updateStepFormKeys', () => {
       const oldFields = stubbedTCDStepsFile['designer-application'].data.savedStepForms['1']
       const addedFields = {
         aspirate_touchTip_checkbox: oldFields['aspirate_touchTip'],
+        aspirate_touchTip_mmFromBottom: oldFields['aspirate_touchTipMmFromBottom'],
         blowout_checkbox: oldFields['dispense_blowout_checkbox'],
         blowout_location: oldFields['dispense_blowout_location'],
         changeTip: oldFields['aspirate_changeTip'],
         dispense_touchTip_checkbox: oldFields['dispense_touchTip'],
+        dispense_touchTip_mmFromBottom: oldFields['dispense_touchTipMmFromBottom'],
         disposalVolume_checkbox: oldFields['aspirate_disposalVol_checkbox'],
         disposalVolume_volume: oldFields['aspirate_disposalVol_volume'],
         preWetTip: oldFields['aspirate_preWetTip'],
@@ -186,6 +194,7 @@ describe('updateStepFormKeys', () => {
           expect(stepForm[fieldName]).toEqual(undefined)
         })
         each(migratedFile['designer-application'].data.savedStepForms, stepForm => {
+          console.log({fieldName, addedFields, stepForm})
           expect(stepForm[fieldName]).toEqual(addedFields[fieldName])
         })
       })
@@ -215,6 +224,7 @@ describe('updateStepFormKeys', () => {
               'aspirate_wellOrder_first': 'l2r',
               'aspirate_wellOrder_second': 't2b',
               'touchTip': true,
+              'mix_touchTipMmFromBottom': 24,
             },
           },
         },
@@ -241,6 +251,7 @@ describe('updateStepFormKeys', () => {
         mix_wellOrder_first: oldFields['aspirate_wellOrder_first'],
         mix_wellOrder_second: oldFields['aspirate_wellOrder_second'],
         mix_touchTip_checkbox: oldFields['touchTip'],
+        mix_touchTip_mmFromBottom: oldFields['mix_touchTipMmFromBottom'],
         blowout_checkbox: oldFields['dispense_blowout_checkbox'],
         blowout_location: oldFields['dispense_blowout_location'],
       }
