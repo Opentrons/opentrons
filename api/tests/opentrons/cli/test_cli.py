@@ -3,7 +3,10 @@ from opentrons.config import (CONFIG,
                               robot_configs,
                               advanced_settings as advs)
 
-
+# TODO (Laura 02252019): CLI tool is extremely frail. Need to add tests for
+# the different funcs called on it that are not shared with
+# deck calibration endpoints.
+# List -> validate func, check calibration matrix, check mount offset func etc
 @pytest.fixture
 def mock_config():
     test_config = robot_configs.load()

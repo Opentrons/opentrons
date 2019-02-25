@@ -80,13 +80,18 @@ def position(axis, hardware, cp=None):
 def jog(axis, direction, step, hardware, mount, cp=None):
     if not ff.use_protocol_api_v2():
         if axis == 'z':
-            axis = 'Z' if mount == 'left' else 'A'
+            if mount == 'left':
+                axis = 'Z'
+            elif mount == 'right':
+                axis = 'A'
 
         hardware._driver.move(
             {axis.upper():
                 hardware._driver.position[axis.upper()] + direction * step})
         return position(axis.upper(), hardware)
     else:
+        if axis == mount:
+            axis = 'z'
         pt = types.Point(**{axis.lower(): direction*step})
         hardware.move_rel(mount, pt)
         return position(mount, hardware, cp)

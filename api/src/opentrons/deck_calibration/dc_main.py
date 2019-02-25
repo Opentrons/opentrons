@@ -120,8 +120,10 @@ class CLITool:
             '\\': lambda: self.home(),
             ' ': lambda: self.save_transform(),
             'esc': lambda: self.exit(),
-            'q': lambda: self._jog('z', +1, self.current_step()),
-            'a': lambda: self._jog('z', -1, self.current_step()),
+            'q': lambda: self._jog(
+                self._current_mount, +1, self.current_step()),
+            'a': lambda: self._jog(
+                self._current_mount, -1, self.current_step()),
             'up': lambda: self._jog('Y', +1, self.current_step()),
             'down': lambda: self._jog('Y', -1, self.current_step()),
             'left': lambda: self._jog('X', -1, self.current_step()),
@@ -303,11 +305,18 @@ class CLITool:
     def validate_mount_offset(self):
         # move the RIGHT pipette to expected point, then immediately after
         # move the LEFT pipette to that same point
-        self.validate(self._expected_points[1], 1, self._current_mount)
+        if not feature_flags.use_protocol_api_v2():
+            r_pipette = right
+            l_pipette = left
+        else:
+            r_pipette = types.Mount.RIGHT
+            l_pipette = types.Mount.LEFT
+        self.validate(self._expected_points[1], 1, r_pipette)
+
         self.validate(
             apply_mount_offset(self._expected_points[1], self.hardware),
             0,
-            self._current_mount)
+            l_pipette)
 
     def validate(
             self,
@@ -335,27 +344,17 @@ class CLITool:
         tx, ty, tz = self._deck_to_driver_coords(point)
         if not feature_flags.use_protocol_api_v2():
             self.hardware._driver.move({'X': tx, 'Y': ty})
-            z_axis = self._get_z_axis(self._current_mount)
-            self.hardware._driver.move({z_axis: tz})
+            self.hardware._driver.move({self._current_mount: tz})
         else:
             pt = types.Point(x=tx, y=ty, z=tz)
             self.hardware.move_to(self._current_mount, pt)
         return 'moved to point {}'.format(point)
 
-    def _get_z_axis(self, mount):
-        z_axis = None
-        if mount == 'left':
-            z_axis = 'Z'
-        elif mount == 'right':
-            z_axis = 'A'
-        return z_axis
-
     def move_to_safe_height(self):
         cx, cy, _ = self._driver_to_deck_coords(self._position())
         _, _, sz = self._deck_to_driver_coords((cx, cy, SAFE_HEIGHT))
         if not feature_flags.use_protocol_api_v2():
-            z_axis = self._get_z_axis(self._current_mount)
-            self.hardware._driver.move({z_axis: sz})
+            self.hardware._driver.move({self._current_mount: sz})
         else:
             pt = types.Point(x=cx, y=cy, z=sz)
             self.hardware.move_to(self._current_mount, pt)
@@ -406,7 +405,8 @@ def probe(tip_length: float, hardware) -> str:
         log.debug("Setting probe center to {}".format(probe_center))
     else:
         probe_center = hardware.locate_tip_probe_center(tip_length)
-    hardware.update_config(probe_center=probe_center)
+    hardware.update_config(
+        tip_probe=hardware.config.tip_probe._replace(center=probe_center))
     return 'Tip probe'
 
 
