@@ -7,6 +7,7 @@ import uniqBy from 'lodash/uniqBy'
 
 import {
   apiRequest,
+  apiSuccess,
   apiFailure,
   buildRequestMaker,
   clearApiResponse,
@@ -161,16 +162,24 @@ export function addWifiKey (
     const request = new FormData()
     request.append('key', file)
 
-    return client(robot, 'POST', KEYS, request)
+    const result = client(robot, 'POST', KEYS, request)
+
+    return result
       .then(
-        // TODO(mc, 2019-10-23): re-getting the whole list after this POST
-        // (which properly returns an individual item) is an inelgant solution
-        // to maintain the full list of ID'd resources in state. It's probably
-        // time to pull in a redux API library to maintain this state instead
-        () => fetchWifiKeys(robot),
-        error => apiFailure(robot, KEYS, error)
+        response => {
+          // TODO(mc, 2019-10-23): re-getting the whole list after this POST
+          // (which properly returns an individual item) is an inelgant solution
+          // to maintain the full list of ID'd resources in state. It's probably
+          // time to pull in a redux API library to maintain this state instead
+          dispatch(fetchWifiKeys(robot))
+          // HACK(mc, 2018-02-22): return a fake API success _only for the
+          // action caller_ so that is knows the ID of the key it just uploaded
+          // See todo above about this state management not scaling
+          // $FlowFixMe: see above
+          return apiSuccess(robot, KEYS, response)
+        },
+        error => dispatch(apiFailure(robot, KEYS, error))
       )
-      .then(dispatch)
   }
 }
 

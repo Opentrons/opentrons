@@ -156,8 +156,7 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
               />
             </ConnectModal>
           )}
-          {configRequest &&
-            !!(configError || configResponse) && (
+          {configRequest && !!(configError || configResponse) && (
             <WifiConnectModal
               error={configError}
               request={configRequest}

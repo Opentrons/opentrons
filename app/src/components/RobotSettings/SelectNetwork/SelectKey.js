@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import find from 'lodash/find'
 import map from 'lodash/map'
 
 import {SelectOptionField} from './fields'
@@ -15,25 +14,20 @@ type Props = {
   error: ?string,
   required: boolean,
   keys: ?WifiKeysList,
-  addKey: File => mixed,
+  addKey: (file: File) => mixed,
   onValueChange: (name: string, value: ?string) => mixed,
   onLoseFocus: (name: string) => mixed,
-}
-
-type State = {
-  nextKeyName: ?string,
 }
 
 const UPLOAD_KEY_VALUE = '__uploadWifiKey__'
 const UPLOAD_KEY_LABEL = 'Add new...'
 
-export default class SelectKey extends React.Component<Props, State> {
+export default class SelectKey extends React.Component<Props> {
   fileInput: ?HTMLInputElement
 
   constructor (props: Props) {
     super(props)
     this.fileInput = null
-    this.state = {nextKeyName: null}
   }
 
   setFileInputRef = ($el: ?HTMLInputElement) => (this.fileInput = $el)
@@ -44,31 +38,17 @@ export default class SelectKey extends React.Component<Props, State> {
     if (event.target.files && event.target.files.length) {
       const file: File = event.target.files[0]
       event.target.value = ''
-      this.props.addKey(file)
-      this.props.onValueChange(this.props.name, null)
-      this.setState({nextKeyName: file.name})
+      // $FlowFixMe: see TODO and HACK in app/src/http-api-client/networking.js
+      this.props.addKey(file).then(success => {
+        // $FlowFixMe: ditto
+        this.props.onValueChange(this.props.name, success.payload.response.id)
+      })
     }
   }
 
   handleValueChange = (name: string, value: ?string) => {
     if (value !== UPLOAD_KEY_VALUE) {
       this.props.onValueChange(name, value)
-    }
-  }
-
-  componentDidUpdate (prevProps: Props) {
-    const {name, keys, value} = this.props
-    const {nextKeyName} = this.state
-
-    if (!value && nextKeyName && keys !== prevProps.keys) {
-      // TODO(mc, 2018-10-24): this will select an arbitrary key file if the
-      // user uploads multiple keys with the same filename; see TODO in
-      // api/src/opentrons/server/endpoints/networking.py::list_keys
-      const nextKey = find(keys, {name: nextKeyName})
-      if (nextKey) {
-        this.handleValueChange(name, nextKey.id)
-        this.setState({nextKeyName: null})
-      }
     }
   }
 
