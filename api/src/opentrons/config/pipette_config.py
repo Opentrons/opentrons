@@ -3,7 +3,7 @@ import logging
 import json
 import re
 from collections import namedtuple
-from typing import Any, Dict, List, Union, Tuple, Sequence
+from typing import Any, Dict, List, Union, Tuple, Sequence, Optional
 import pkgutil
 
 from opentrons.config import feature_flags as ff, CONFIG
@@ -197,7 +197,8 @@ def piecewise_volume_conversion(
     return i[1]*ul + i[2]
 
 
-def save_overrides(pipette_id: str, overrides: Dict[str, Any], model: str):
+def save_overrides(
+        pipette_id: str, overrides: Dict[str, Any], model: Optional[str]):
     override_dir = CONFIG['pipette_config_overrides_dir']
     try:
         existing = load_overrides(pipette_id)

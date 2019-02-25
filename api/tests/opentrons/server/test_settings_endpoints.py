@@ -297,20 +297,11 @@ async def test_incorrect_modify_pipette_settings(
 
     bad_changes1 = {
         'info': {
-            'model': test_model,
-            'id': test_id},
-        }
-
-    bad_changes2 = {
-        'fields': {
             'pickUpCurrent': {'value': 1}
             }
         }
 
     out_of_range = {
-            'info': {
-                'model': test_model,
-                'id': test_id},
             'fields': {
                 'pickUpCurrent': {'value': 1000}
                 }
@@ -330,12 +321,6 @@ async def test_incorrect_modify_pipette_settings(
     resp = await async_client.patch(
         '/settings/pipettes/{}/fields'.format(test_id),
         json=bad_changes1)
-    assert resp.status == 400
-
-    # check no info fails
-    resp = await async_client.patch(
-        '/settings/pipettes/{}/fields'.format(test_id),
-        json=bad_changes2)
     assert resp.status == 400
 
     # check over max fails

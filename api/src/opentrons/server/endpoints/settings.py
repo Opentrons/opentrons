@@ -170,10 +170,6 @@ async def modify_pipette_settings(request: web.Request) -> web.Response:
     """
     Expects a dictionary with mutable configs in a flattened shape such as:
     {
-    'info': {
-        'name': ..,
-        'model': ..
-    }
     'fields': {
             'pickUpCurrent': {'value': some_value},
             'dropTipSpeed': {'value': some_value}
@@ -184,9 +180,10 @@ async def modify_pipette_settings(request: web.Request) -> web.Response:
     }
     """
     pipette_id = request.match_info['id']
+    whole_config = pc.load_config_dict(pipette_id)
     config_match = pc.list_mutable_configs(pipette_id)
     data = await request.json()
-    if not data.get('fields') or not data.get('info'):
+    if not data.get('fields'):
         return web.json_response(status=400)
 
     for key, value in data['fields'].items():
@@ -197,5 +194,5 @@ async def modify_pipette_settings(request: web.Request) -> web.Response:
                 return web.json_response(
                     {'message': '{} out of range with {}'.format(key, value)},
                     status=412)
-    pc.save_overrides(pipette_id, data['fields'], data['info']['model'])
+    pc.save_overrides(pipette_id, data['fields'], whole_config.get('model'))
     return web.json_response(status=204)
