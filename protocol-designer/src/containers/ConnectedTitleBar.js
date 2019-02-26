@@ -43,6 +43,15 @@ function TitleWithIcon (props: TitleWithIconProps) {
   )
 }
 
+type TitleWithBetaTagProps = {text?: ?string}
+
+const TitleWithBetaTag = (props: TitleWithBetaTagProps) => (
+  <div className={styles.title_wrapper}>
+    <div className={styles.icon_inline_text}>{props.text}</div>
+    <div className={styles.beta_tag}>{i18n.t('application.beta')}</div>
+  </div>
+)
+
 function mapStateToProps (state: BaseState): SP {
   const selectedLabwareId = labwareIngredSelectors.getSelectedLabwareId(state)
   const _page = selectors.getCurrentPage(state)
@@ -59,13 +68,18 @@ function mapStateToProps (state: BaseState): SP {
 
   switch (_page) {
     case 'liquids':
-    case 'file-splash':
     case 'file-detail':
+      return {
+        _page,
+        title: i18n.t([`nav.title.${_page}`, fileName]),
+        subtitle: i18n.t([`nav.subtitle.${_page}`, '']),
+      }
+    case 'file-splash':
     case 'settings-features':
     case 'settings-app':
       return {
         _page,
-        title: i18n.t([`nav.title.${_page}`, fileName]),
+        title: <TitleWithBetaTag text={i18n.t([`nav.title.${_page}`, fileName])} />,
         subtitle: i18n.t([`nav.subtitle.${_page}`, '']),
       }
     case 'steplist':

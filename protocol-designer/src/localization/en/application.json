@@ -3,5 +3,6 @@
     "mix": "mix",
     "moveLiquid": "transfer",
     "pause": "pause"
-  }
+  },
+  "beta": "beta"
 }
