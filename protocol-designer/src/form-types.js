@@ -15,7 +15,7 @@ export type StepFieldName = any
 // | 'aspirate_mix_times'
 // | 'aspirate_mix_volume'
 // | 'aspirate_touchTip_checkbox'
-// | 'aspirate_touchTipMmFromBottom'
+// | 'aspirate_touchTip_mmFromBottom'
 // | 'aspirate_mmFromBottom'
 // | 'aspirate_wellOrder_first'
 // | 'aspirate_wellOrder_second'
@@ -30,7 +30,7 @@ export type StepFieldName = any
 // | 'dispense_mix_checkbox'
 // | 'dispense_mix_times'
 // | 'dispense_mix_volume'
-// | 'dispense_touchTipMmFromBottom'
+// | 'dispense_touchTip_mmFromBottom'
 // | 'dispense_mmFromBottom'
 // | 'dispense_wellOrder_first'
 // | 'dispense_wellOrder_second'
@@ -40,7 +40,7 @@ export type StepFieldName = any
 // | 'labware'
 // | 'labwareLocationUpdate'
 // | 'mix_mmFromBottom'
-// | 'mix_touchTipMmFromBottom'
+// | 'mix_touchTip_mmFromBottom'
 // | 'path'
 // | 'pauseForAmountOfTime'
 // | 'pauseHour'
@@ -197,18 +197,19 @@ export type HydratedMoveLiquidFormDataLegacy = {
 }
 
 // fields used in TipPositionInput
-export type TipOffsetFields = 'aspirate_mmFromBottom'
+export type TipOffsetFields =
+  | 'aspirate_mmFromBottom'
   | 'dispense_mmFromBottom'
   | 'mix_mmFromBottom'
-  | 'aspirate_touchTipMmFromBottom'
-  | 'dispense_touchTipMmFromBottom'
-  | 'mix_touchTipMmFromBottom'
+  | 'aspirate_touchTip_mmFromBottom'
+  | 'dispense_touchTip_mmFromBottom'
+  | 'mix_touchTip_mmFromBottom'
 
 export function getIsTouchTipField (fieldName: string): boolean {
   const touchTipFields = [
-    'aspirate_touchTipMmFromBottom',
-    'dispense_touchTipMmFromBottom',
-    'mix_touchTipMmFromBottom',
+    'aspirate_touchTip_mmFromBottom',
+    'dispense_touchTip_mmFromBottom',
+    'mix_touchTip_mmFromBottom',
   ]
   return touchTipFields.includes(fieldName)
 }

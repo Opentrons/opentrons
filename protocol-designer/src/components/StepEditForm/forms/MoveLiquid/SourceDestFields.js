@@ -77,7 +77,7 @@ class SourceDestFields extends React.Component<Props, State> {
                   </React.Fragment>
                 }
                 <CheckboxRowField name={addFieldNamePrefix('touchTip_checkbox')} label="Touch tip">
-                  <TipPositionField fieldName={addFieldNamePrefix('touchTipMmFromBottom')} />
+                  <TipPositionField fieldName={addFieldNamePrefix('touchTip_mmFromBottom')} />
                 </CheckboxRowField>
                 <CheckboxRowField name={addFieldNamePrefix('mix_checkbox')} label='Mix'>
                   <TextField

@@ -127,13 +127,13 @@ const updatePatchOnLabwareChange = (patch: FormPatch, rawForm: FormData): FormPa
       ? getDefaultFields(
         'aspirate_wells',
         'aspirate_mmFromBottom',
-        'aspirate_touchTipMmFromBottom')
+        'aspirate_touchTip_mmFromBottom')
       : {}),
     ...(destLabwareChanged
       ? getDefaultFields(
         'dispense_wells',
         'dispense_mmFromBottom',
-        'dispense_touchTipMmFromBottom')
+        'dispense_touchTip_mmFromBottom')
       : {}),
   }
 }

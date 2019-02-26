@@ -130,6 +130,8 @@ export const TCD_DEPRECATED_FIELD_NAMES = [
   'offsetFromBottomMm',
   'dispense_touchTip',
   'aspirate_touchTip',
+  'aspirate_touchTipMmFromBottom',
+  'dispense_touchTipMmFromBottom',
 ]
 export const MIX_DEPRECATED_FIELD_NAMES = [
   'step-name',
@@ -142,6 +144,7 @@ export const MIX_DEPRECATED_FIELD_NAMES = [
   'dispense_blowout_labware',
   'dispense_blowout_location',
   'touchTip',
+  'mix_touchTipMmFromBottom',
 ]
 export function updateStepFormKeys (fileData: ProtocolFile): ProtocolFile {
   const savedStepForms = fileData['designer-application'].data.savedStepForms
@@ -161,6 +164,8 @@ export function updateStepFormKeys (fileData: ProtocolFile): ProtocolFile {
         disposalVolume_checkbox: formData['aspirate_disposalVol_checkbox'],
         disposalVolume_volume: formData['aspirate_disposalVol_volume'],
         preWetTip: formData['aspirate_preWetTip'],
+        aspirate_touchTip_mmFromBottom: formData['aspirate_touchTipMmFromBottom'],
+        dispense_touchTip_mmFromBottom: formData['dispense_touchTipMmFromBottom'],
       }
 
       return {
@@ -178,6 +183,7 @@ export function updateStepFormKeys (fileData: ProtocolFile): ProtocolFile {
         mix_touchTip_checkbox: formData['touchTip'],
         blowout_checkbox: formData['dispense_blowout_checkbox'],
         blowout_location: formData['dispense_blowout_location'] || formData['dispense_blowout_labware'],
+        mix_touchTip_mmFromBottom: formData['mix_touchTipMmFromBottom'],
       }
       return {
         ...omitBy(updatedFields, isUndefined),

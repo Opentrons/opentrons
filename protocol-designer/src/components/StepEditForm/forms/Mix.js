@@ -88,7 +88,7 @@ class MixForm extends React.Component<Props, State> {
               {this.state.collapsed !== true &&
                 <FormGroup label="Dispense Options">
                   <CheckboxRowField name={'mix_touchTip_checkbox'} label="Touch tip">
-                    <TipPositionField className={cx(styles.small_field, styles.orphan_field)} fieldName={'mix_touchTipMmFromBottom'} />
+                    <TipPositionField className={cx(styles.small_field, styles.orphan_field)} fieldName={'mix_touchTip_mmFromBottom'} />
                   </CheckboxRowField>
 
                   <CheckboxRowField name='blowout_checkbox' label='Blow out'>
