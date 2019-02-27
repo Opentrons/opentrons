@@ -67,7 +67,7 @@ def test_all_pipette_models_can_transfer():
 
 def test_pipette_models_reach_max_volume():
 
-    for model in pipette_config.configs:
+    for model in pipette_config.config_models:
         config = pipette_config.load(model)
         robot.reset()
         pipette = instruments._create_pipette_from_config(

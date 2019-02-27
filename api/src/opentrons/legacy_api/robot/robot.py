@@ -849,8 +849,10 @@ class Robot(CommandPublisher):
                 'id': self.model_by_mount['left']['id']
             }
         left_model = left_data.get('model')
+
         if left_model:
-            tip_length = pipette_config.load(left_model).tip_length
+            tip_length = pipette_config.load(
+                left_model, left_data['id']).tip_length
             left_data.update({'tip_length': tip_length})
 
         right_data = {
@@ -861,7 +863,8 @@ class Robot(CommandPublisher):
             }
         right_model = right_data.get('model')
         if right_model:
-            tip_length = pipette_config.load(right_model).tip_length
+            tip_length = pipette_config.load(
+                right_model, right_data['id']).tip_length
             right_data.update({'tip_length': tip_length})
         return {
             'left': left_data,

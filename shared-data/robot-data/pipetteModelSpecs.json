@@ -2,53 +2,70 @@
   "config": {
     "p10_single_v1": {
       "name": "p10_single",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 2,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": -1,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -4.5,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 2,
+        "min": -2,
+        "max": 19.0,
+        "type": "float",
+        "units": "mm"
+      },
+      "blowout": {
+        "value": -1,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -4.5,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 10,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 0.0, -13],
       "plungerCurrent": {
         "value": 0.3,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30},
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
+      },
       "ulPerMm": [{
         "aspirate": [
           [1.8263, -0.0958, 1.088],
@@ -75,41 +92,57 @@
         }
       ],
       "quirks": [],
-      "tipLength": {"value": 33}
+      "tipLength": {
+        "value": 33,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p10_single_v1.3": {
       "name": "p10_single",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 0.5,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": -2.5,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -6,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 0.5,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": -2.5,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -6,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 10,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 0.0, -13],
       "ulPerMm": [
@@ -141,55 +174,77 @@
       "plungerCurrent": {
         "value": 0.3,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
 
       "quirks": [],
-      "tipLength": {"value": 33}
+      "tipLength": {
+        "value": 33,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p10_single_v1.4": {
       "name": "p10_single",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 2.5,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": -0.5,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -5.2,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 2.5,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": -0.5,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -5.2,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.4,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 10,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 0.0, -13],
       "ulPerMm": [
@@ -221,54 +276,76 @@
       "plungerCurrent": {
         "value": 0.3,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
       "quirks": [],
-      "tipLength": {"value": 33}
+      "tipLength": {
+        "value": 33,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p10_multi_v1": {
       "name": "p10_multi",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 2,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": -1,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -4,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 2,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": -1,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -4,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.4,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 10,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
       "ulPerMm": [
@@ -299,54 +376,76 @@
       "plungerCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
       "quirks": [],
-      "tipLength": {"value": 33}
+      "tipLength": {
+        "value": 33,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p10_multi_v1.3": {
       "name": "p10_multi",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 0.5,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": -2.5,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -5.5,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 0.5,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": -2.5,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -5.5,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.4,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 10,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
       "ulPerMm": [
@@ -377,54 +476,76 @@
       "plungerCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
       "quirks": [],
-      "tipLength": {"value": 33}
+      "tipLength": {
+        "value": 33,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p10_multi_v1.4": {
       "name": "p10_multi",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 2,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": -1,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -4.5,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 2,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": -1,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -4.5,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.4,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 10,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
       "ulPerMm": [
@@ -455,54 +576,76 @@
       "plungerCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
       "quirks": [],
-      "tipLength": {"value": 33}
+      "tipLength": {
+        "value": 33,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p50_single_v1": {
       "name": "p50_single",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 2.01,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": 2,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -4.5,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 2.01,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": 2,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -4.5,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 10,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 0.0, 0.0],
       "ulPerMm": [
@@ -531,70 +674,98 @@
       "plungerCurrent": {
         "value": 0.3,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
       "quirks": [],
-      "tipLength": {"value": 51.7}
+      "tipLength": {
+        "value": 51.7,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p50_single_v1.3": {
       "name": "p50_single",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 2,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": 0.5,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -6,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 2,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": 0.5,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -6,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 10,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 0.0, 0.0],
       "plungerCurrent": {
         "value": 0.3,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
       "ulPerMm": [
         {
@@ -620,41 +791,57 @@
         }
       ],
       "quirks": [],
-      "tipLength": {"value": 51.7}
+      "tipLength": {
+        "value": 51.7,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p50_single_v1.4": {
       "name": "p50_single",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 2,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": 0.5,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -5,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 2,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": 0.5,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -5,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 10,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 0.0, 0.0],
       "ulPerMm": [
@@ -683,54 +870,76 @@
       "plungerCurrent": {
         "value": 0.3,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
       "quirks": [],
-      "tipLength": {"value": 51.7}
+      "tipLength": {
+        "value": 51.7,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p50_multi_v1": {
       "name": "p50_multi",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 2.5,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": 2,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -3.5,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 2.5,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": 2,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -3.5,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.6,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 10,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
       "ulPerMm": [
@@ -759,54 +968,76 @@
       "plungerCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
       "quirks": [],
-      "tipLength": {"value": 51.7}
+      "tipLength": {
+        "value": 51.7,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p50_multi_v1.3": {
       "name": "p50_multi",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 2,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": 0.5,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -5,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 2,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": 0.5,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -5,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.6,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 10,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
       "ulPerMm": [
@@ -835,54 +1066,76 @@
       "plungerCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
       "quirks": [],
-      "tipLength": {"value": 51.7}
+      "tipLength": {
+        "value": 51.7,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p50_multi_v1.4": {
       "name": "p50_multi",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 2,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": 0.5,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -4,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 2,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": 0.5,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -4,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.6,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 10,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
       "ulPerMm": [
@@ -911,54 +1164,76 @@
       "plungerCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
       "quirks": [],
-      "tipLength": {"value": 51.7}
+      "tipLength": {
+        "value": 51.7,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p300_single_v1": {
       "name": "p300_single",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 1.5,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": 0,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -4,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 1.5,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": 0,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -4,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 10,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 0.0, 0.0],
       "ulPerMm": [
@@ -991,54 +1266,76 @@
       "plungerCurrent": {
         "value": 0.3,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
       "quirks": [],
-      "tipLength": {"value": 51.7}
+      "tipLength": {
+        "value": 51.7,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p300_single_v1.3": {
       "name": "p300_single",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 1.5,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": -1.5,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -5.5,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 1.5,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": -1.5,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -5.5,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 10,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 0.0, 0.0],
       "ulPerMm": [
@@ -1071,54 +1368,76 @@
       "plungerCurrent": {
         "value": 0.3,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
       "quirks": [],
-      "tipLength": {"value": 51.7}
+      "tipLength": {
+        "value": 51.7,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p300_single_v1.4": {
       "name": "p300_single",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 3,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": 0,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -4.5,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 3,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": 0,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -4.5,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 10,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 0.0, 0.0],
       "ulPerMm": [
@@ -1151,54 +1470,76 @@
       "plungerCurrent": {
         "value": 0.3,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
       "quirks": [],
-      "tipLength": {"value": 51.7}
+      "tipLength": {
+        "value": 51.7,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p300_multi_v1": {
       "name": "p300_multi",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 3.5,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": 3,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -2,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 3.5,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": 3,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -2,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.6,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 10,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
       "ulPerMm": [
@@ -1215,54 +1556,76 @@
       "plungerCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
       "quirks": [],
-      "tipLength": {"value": 51.7}
+      "tipLength": {
+        "value": 51.7,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p300_multi_v1.3": {
       "name": "p300_multi",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 3.5,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": 1.5,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -3.5,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 3.5,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": 1.5,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -3.5,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.6,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 10,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
       "ulPerMm": [
@@ -1279,54 +1642,76 @@
       "plungerCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
       "quirks": [],
-      "tipLength": {"value": 51.7}
+      "tipLength": {
+        "value": 51.7,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p300_multi_v1.4": {
       "name": "p300_multi",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 3.5,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": 1.5,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -3.5,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 3.5,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": 1.5,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -3.5,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.6,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 10,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
       "ulPerMm": [
@@ -1343,54 +1728,76 @@
       "plungerCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "quirks": [],
-      "tipLength": {"value": 51.7}
+      "tipLength": {
+        "value": 51.7,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p1000_single_v1": {
       "name": "p1000_single",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 3,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": 1,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -2.2,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 3,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": 1,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -2.2,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 15,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 0.0, 20.0],
       "ulPerMm": [
@@ -1411,54 +1818,76 @@
       "plungerCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
       "quirks": ["needs-pickup-shake"],
-      "tipLength": {"value": 76.7}
+      "tipLength": {
+        "value": 76.7,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p1000_single_v1.3": {
       "name": "p1000_single",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 2.5,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": 0.5,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -4,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 2.5,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": 0.5,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -4,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 15,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 0.0, 20.0],
       "ulPerMm": [
@@ -1479,54 +1908,76 @@
       "plungerCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.7,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
       "quirks": ["needs-pickup-shake"],
-      "tipLength": {"value": 76.7}
+      "tipLength": {
+        "value": 76.7,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p1000_single_v1.4": {
       "name": "p1000_single",
-      "plungerPositions": {
-        "top": {
-          "value": 19.5,
-          "min": 5,
-          "max": 19.5
-        },
-        "bottom": {
-          "value": 2.5,
-          "min": -2,
-          "max": 19.0
-        },
-        "blowOut": {
-          "value": 0.5,
-          "min": -4,
-          "max": 10
-        },
-        "dropTip": {
-          "value": -4,
-          "min": -6,
-          "max": 2
-        }
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 2.5,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": 0.5,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -4,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
       },
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2
+        "max": 1.2,
+        "units": "amps",
+        "type": "float"
       },
       "pickUpDistance": {
         "value": 15,
         "min": 1,
-        "max": 30
+        "max": 30,
+        "units": "mm",
+        "type": "float"
       },
       "modelOffset": [0.0, 0.0, 20.0],
       "ulPerMm": [
@@ -1547,22 +1998,34 @@
       "plungerCurrent": {
         "value": 0.5,
         "min": 0.1,
-        "max": 0.5
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipCurrent": {
         "value": 0.7,
         "min": 0.1,
-        "max": 0.8
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
       },
       "dropTipSpeed": {
         "value": 5,
         "min": 0.001,
-        "max": 30
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
       },
       "quirks": ["needs-pickup-shake"],
-      "tipLength": {"value": 76.7}
+      "tipLength": {
+        "value": 76.7,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     }
   },
-  "mutableConfigs": ["top", "bottom", "blowOut", "dropTip", "pickUpCurrent", "pickUpDistance", "plungerCurrent", "dropTipCurrent", "dropTipSpeed", "tipLength", "defaultAspirateFlowRate", "defaultDispenseFlowRate"]
+  "mutableConfigs": ["top", "bottom", "blowout", "dropTip", "pickUpCurrent", "pickUpDistance", "plungerCurrent", "dropTipCurrent", "dropTipSpeed", "tipLength", "defaultAspirateFlowRate", "defaultDispenseFlowRate"]
 
 }
