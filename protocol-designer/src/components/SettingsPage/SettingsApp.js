@@ -2,7 +2,7 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import i18n from '../../localization'
-import {Card, OutlineButton, ToggleButton} from '@opentrons/components'
+import {Card, OutlineButton, ToggleButton, LabeledValue} from '@opentrons/components'
 import styles from './SettingsPage.css'
 import {
   actions as analyticsActions,
@@ -13,6 +13,7 @@ import {
   selectors as tutorialSelectors,
 } from '../../tutorial'
 import type {BaseState} from '../../types'
+import {OLDEST_MIGRATEABLE_VERSION} from '../../load-file/migration'
 
 type Props = {
   canClearHintDismissals: boolean,
@@ -30,22 +31,24 @@ function SettingsApp (props: Props) {
   const {canClearHintDismissals, hasOptedIn, restoreHints, toggleOptedIn} = props
   return (
     <div className={styles.card_wrapper}>
+      <Card title={i18n.t('card.title.information')}>
+        <div className={styles.setting_row}>
+          <LabeledValue
+            label={i18n.t('application.version')}
+            value={process.env.OT_PD_VERSION || OLDEST_MIGRATEABLE_VERSION} />
+          {/* TODO: BC 2019-02-26 add release notes link here, when there are release notes */}
+        </div>
+      </Card>
       <Card title={i18n.t('card.title.hints')}>
-        <div className={styles.body_wrapper}>
-          <div className={styles.card_body}>
-            {i18n.t('card.body.restore_hints')}
-            <OutlineButton
-              className={styles.button}
-              disabled={!canClearHintDismissals}
-              onClick={restoreHints}
-            >
-              {canClearHintDismissals ? i18n.t('button.restore') : i18n.t('button.restored') }
-            </OutlineButton>
-          </div>
+        <div className={styles.setting_row}>
+          {i18n.t('card.body.restore_hints')}
+          <OutlineButton className={styles.button} disabled={!canClearHintDismissals} onClick={restoreHints}>
+            {canClearHintDismissals ? i18n.t('button.restore') : i18n.t('button.restored') }
+          </OutlineButton>
         </div>
       </Card>
       <Card title={i18n.t('card.title.privacy')}>
-        <div className={styles.toggle_row}>
+        <div className={styles.setting_row}>
           <p className={styles.toggle_label}>{i18n.t('card.toggle.share_session')}</p>
           <ToggleButton
             className={styles.toggle_button}

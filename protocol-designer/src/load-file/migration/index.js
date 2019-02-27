@@ -5,7 +5,7 @@ import semver from 'semver'
 import type {ProtocolFile} from '../../file-types'
 import migrateTo_1_1_0 from './1_1_0'
 
-const OLDEST_MIGRATEABLE_VERSION = '1.0.0'
+export const OLDEST_MIGRATEABLE_VERSION = '1.0.0'
 
 type Version = string
 type Migration = (ProtocolFile) => ProtocolFile
