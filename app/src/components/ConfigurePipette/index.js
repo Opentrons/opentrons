@@ -6,8 +6,9 @@ import {makeGetRobotPipettes} from '../../http-api-client'
 
 import {getPipetteModelSpecs} from '@opentrons/shared-data'
 
-import {AlertModal} from '@opentrons/components'
+import {ScrollableAlertModal} from '../modals'
 import ConfigMessage from './ConfigMessage'
+import ConfigForm from './ConfigForm'
 
 import type {State} from '../../types'
 import type {Mount} from '../../robot'
@@ -32,20 +33,22 @@ function ConfigurePipette (props: Props) {
   const {parentUrl, mount, pipettes} = props
   // TODO (ka 2019-2-12): This logic is used to get display name in slightly
   // different ways in several different files.
-  const pipetteModel = pipettes && pipettes[mount].model
+  const pipette = pipettes && pipettes[mount]
+  const pipetteModel = pipette && pipette.model
   const pipetteConfig = pipetteModel && getPipetteModelSpecs(pipetteModel)
   const displayName = pipetteConfig ? pipetteConfig.displayName : ''
 
   const TITLE = `Pipette Settings: ${displayName}`
 
   return (
-    <AlertModal
+    <ScrollableAlertModal
       heading={TITLE}
       alertOverlay
       buttons={[{children: 'cancel', Component: Link, to: parentUrl}]}
     >
       <ConfigMessage />
-    </AlertModal>
+      {pipette && <ConfigForm pipette={pipette} />}
+    </ScrollableAlertModal>
   )
 }
 
