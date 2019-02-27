@@ -95,7 +95,9 @@
       "tipLength": {
         "value": 33,
         "units": "mm",
-        "type": "float"
+        "type": "float",
+        "min": 0,
+        "max": 100
       }
     },
     "p10_single_v1.3": {
@@ -195,7 +197,9 @@
       "tipLength": {
         "value": 33,
         "units": "mm",
-        "type": "float"
+        "type": "float",
+        "min": 0,
+        "max": 100
       }
     },
     "p10_single_v1.4": {
@@ -294,7 +298,10 @@
       "tipLength": {
         "value": 33,
         "units": "mm",
-        "type": "float"}
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p10_multi_v1": {
       "name": "p10_multi",
@@ -391,7 +398,9 @@
       "tipLength": {
         "value": 33,
         "units": "mm",
-        "type": "float"
+        "type": "float",
+        "min": 0,
+        "max": 100
       }
     },
     "p10_multi_v1.3": {
@@ -486,7 +495,13 @@
         "type": "float"
       },
       "quirks": [],
-      "tipLength": {"value": 33}
+      "tipLength": {
+        "value": 33,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p10_multi_v1.4": {
       "name": "p10_multi",
@@ -583,7 +598,9 @@
       "tipLength": {
         "value": 33,
         "units": "mm",
-        "type": "float"
+        "type": "float",
+        "min": 0,
+        "max": 100
       }
     },
     "p50_single_v1": {
@@ -676,7 +693,13 @@
         "type": "float"
       },
       "quirks": [],
-      "tipLength": {"value": 51.7}
+      "tipLength": {
+        "value": 51.7,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p50_single_v1.3": {
       "name": "p50_single",
@@ -771,7 +794,9 @@
       "tipLength": {
         "value": 51.7,
         "units": "mm",
-        "type": "float"
+        "type": "float",
+        "min": 0,
+        "max": 100
       }
     },
     "p50_single_v1.4": {
@@ -867,7 +892,9 @@
       "tipLength": {
         "value": 51.7,
         "units": "mm",
-        "type": "float"
+        "type": "float",
+        "min": 0,
+        "max": 100
       }
     },
     "p50_multi_v1": {
@@ -960,7 +987,13 @@
         "type": "float"
       },
       "quirks": [],
-      "tipLength": {"value": 51.7}
+      "tipLength": {
+        "value": 51.7,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
     },
     "p50_multi_v1.3": {
       "name": "p50_multi",
@@ -1055,7 +1088,9 @@
       "tipLength": {
         "value": 51.7,
         "units": "mm",
-        "type": "float"
+        "type": "float",
+        "min": 0,
+        "max": 100
       }
     },
     "p50_multi_v1.4": {
@@ -1151,7 +1186,9 @@
       "tipLength": {
         "value": 51.7,
         "units": "mm",
-        "type": "float"
+        "type": "float",
+        "min": 0,
+        "max": 100
       }
     },
     "p300_single_v1": {
@@ -1251,7 +1288,9 @@
       "tipLength": {
         "value": 51.7,
         "units": "mm",
-        "type": "float"
+        "type": "float",
+        "min": 0,
+        "max": 100
       }
     },
     "p300_single_v1.3": {
@@ -1351,7 +1390,9 @@
       "tipLength": {
         "value": 51.7,
         "units": "mm",
-        "type": "float"
+        "type": "float",
+        "min": 0,
+        "max": 100
       }
     },
     "p300_single_v1.4": {
@@ -1451,7 +1492,9 @@
       "tipLength": {
         "value": 51.7,
         "units": "mm",
-        "type": "float"
+        "type": "float",
+        "min": 0,
+        "max": 100
       }
     },
     "p300_multi_v1": {
@@ -1535,7 +1578,9 @@
       "tipLength": {
         "value": 51.7,
         "units": "mm",
-        "type": "float"
+        "type": "float",
+        "min": 0,
+        "max": 100
       }
     },
     "p300_multi_v1.3": {
@@ -1619,7 +1664,9 @@
       "tipLength": {
         "value": 51.7,
         "units": "mm",
-        "type": "float"
+        "type": "float",
+        "min": 0,
+        "max": 100
       }
     },
     "p300_multi_v1.4": {
@@ -1703,7 +1750,9 @@
       "tipLength": {
         "value": 51.7,
         "units": "mm",
-        "type": "float"
+        "type": "float",
+        "min": 0,
+        "max": 100
       }
     },
     "p1000_single_v1": {
@@ -1791,7 +1840,9 @@
       "tipLength": {
         "value": 76.7,
         "units": "mm",
-        "type": "float"
+        "type": "float",
+        "min": 0,
+        "max": 100
       }
     },
     "p1000_single_v1.3": {
@@ -1879,7 +1930,9 @@
       "tipLength": {
         "value": 76.7,
         "units": "mm",
-        "type": "float"
+        "type": "float",
+        "min": 0,
+        "max": 100
       }
     },
     "p1000_single_v1.4": {
@@ -1967,7 +2020,9 @@
       "tipLength": {
         "value": 76.7,
         "units": "mm",
-        "type": "float"
+        "type": "float",
+        "min": 0,
+        "max": 100
       }
     }
   },

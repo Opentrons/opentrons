@@ -80,6 +80,8 @@ Object {
   },
   "quirks": Array [],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
     "type": "float",
     "units": "mm",
     "value": 33,
@@ -243,6 +245,10 @@ Object {
   },
   "quirks": Array [],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
     "value": 33,
   },
   "top": Object {
@@ -404,6 +410,8 @@ Object {
   },
   "quirks": Array [],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
     "type": "float",
     "units": "mm",
     "value": 33,
@@ -567,6 +575,8 @@ Object {
   },
   "quirks": Array [],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
     "type": "float",
     "units": "mm",
     "value": 33,
@@ -735,6 +745,8 @@ Object {
   },
   "quirks": Array [],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
     "type": "float",
     "units": "mm",
     "value": 33,
@@ -903,6 +915,8 @@ Object {
   },
   "quirks": Array [],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
     "type": "float",
     "units": "mm",
     "value": 33,
@@ -1071,6 +1085,10 @@ Object {
   },
   "quirks": Array [],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
     "value": 51.7,
   },
   "top": Object {
@@ -1222,6 +1240,8 @@ Object {
   },
   "quirks": Array [],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
     "type": "float",
     "units": "mm",
     "value": 51.7,
@@ -1375,6 +1395,8 @@ Object {
   },
   "quirks": Array [],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
     "type": "float",
     "units": "mm",
     "value": 51.7,
@@ -1528,6 +1550,10 @@ Object {
   },
   "quirks": Array [],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
     "value": 51.7,
   },
   "top": Object {
@@ -1679,6 +1705,8 @@ Object {
   },
   "quirks": Array [],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
     "type": "float",
     "units": "mm",
     "value": 51.7,
@@ -1832,6 +1860,8 @@ Object {
   },
   "quirks": Array [],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
     "type": "float",
     "units": "mm",
     "value": 51.7,
@@ -1985,6 +2015,8 @@ Object {
   },
   "quirks": Array [],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
     "type": "float",
     "units": "mm",
     "value": 51.7,
@@ -2102,6 +2134,8 @@ Object {
   },
   "quirks": Array [],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
     "type": "float",
     "units": "mm",
     "value": 51.7,
@@ -2219,6 +2253,8 @@ Object {
   },
   "quirks": Array [],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
     "type": "float",
     "units": "mm",
     "value": 51.7,
@@ -2336,6 +2372,8 @@ Object {
   },
   "quirks": Array [],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
     "type": "float",
     "units": "mm",
     "value": 51.7,
@@ -2509,6 +2547,8 @@ Object {
   },
   "quirks": Array [],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
     "type": "float",
     "units": "mm",
     "value": 51.7,
@@ -2682,6 +2722,8 @@ Object {
   },
   "quirks": Array [],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
     "type": "float",
     "units": "mm",
     "value": 51.7,
@@ -2857,6 +2899,8 @@ Object {
     "needs-pickup-shake",
   ],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
     "type": "float",
     "units": "mm",
     "value": 76.7,
@@ -2996,6 +3040,8 @@ Object {
     "needs-pickup-shake",
   ],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
     "type": "float",
     "units": "mm",
     "value": 76.7,
@@ -3135,6 +3181,8 @@ Object {
     "needs-pickup-shake",
   ],
   "tipLength": Object {
+    "max": 100,
+    "min": 0,
     "type": "float",
     "units": "mm",
     "value": 76.7,

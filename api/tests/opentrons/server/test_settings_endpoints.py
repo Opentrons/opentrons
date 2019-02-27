@@ -231,9 +231,12 @@ async def test_modify_pipette_settings(async_server, loop, async_client):
     test_id2 = 'abcd123'
 
     changes = {
-        'info': {
-            'model': test_model,
-            'id': test_id},
+        'fields': {
+            'pickUpCurrent': {'value': 1}
+        }
+    }
+
+    no_changes = {
         'fields': {
             'pickUpCurrent': {'value': 1}
             }
@@ -259,33 +262,38 @@ async def test_modify_pipette_settings(async_server, loop, async_client):
 
     # Check that data is changed and matches the changes specified
     resp = await async_client.patch(
-        '/settings/pipettes/{}/fields'.format(test_id),
+        '/settings/pipettes/{}'.format(test_id),
         json=changes)
-    assert resp.status == 204
+    patch_body = await resp.json()
+    assert resp.status == 200
     check = await async_client.get('/settings/pipettes/{}'.format(test_id))
     body = await check.json()
-    assert body['fields']['pickUpCurrent']['value'] == \
-        changes['fields']['pickUpCurrent']['value']
+    print(patch_body)
+    assert body['fields'] == patch_body['fields']
 
     # Check that None reverts a setting to default
     changes2 = {
-        'info': {
-            'model': test_model,
-            'id': test_id
-            },
         'fields': {
             'pickUpCurrent': None
             }
-            }
+        }
     resp = await async_client.patch(
-        '/settings/pipettes/{}/fields'.format(test_id),
+        '/settings/pipettes/{}'.format(test_id),
         json=changes2)
-    assert resp.status == 204
+    assert resp.status == 200
     check = await async_client.get('/settings/pipettes/{}'.format(test_id))
     body = await check.json()
     assert body['fields']['pickUpCurrent']['value'] == \
         pipette_config.list_mutable_configs(
             pipette_id=test_id)['pickUpCurrent']['default']
+
+    # check no fields returns no changes
+    resp = await async_client.patch(
+        '/settings/pipettes/{}'.format(test_id),
+        json=no_changes)
+    body = await resp.json()
+    assert body['fields'] == pipette_config.list_mutable_configs(test_id)
+    assert resp.status == 200
 
 
 async def test_incorrect_modify_pipette_settings(
@@ -294,12 +302,6 @@ async def test_incorrect_modify_pipette_settings(
     test_model = 'p300_multi_v1'
     test_id = 'abc123'
     test_id2 = 'abcd123'
-
-    bad_changes1 = {
-        'info': {
-            'pickUpCurrent': {'value': 1}
-            }
-        }
 
     out_of_range = {
             'fields': {
@@ -317,14 +319,8 @@ async def test_incorrect_modify_pipette_settings(
             types.Mount.LEFT: {'model': test_model, 'id': test_id2}}
         await hw.cache_instruments()
 
-    # check no fields fails
-    resp = await async_client.patch(
-        '/settings/pipettes/{}/fields'.format(test_id),
-        json=bad_changes1)
-    assert resp.status == 400
-
     # check over max fails
     resp = await async_client.patch(
-        '/settings/pipettes/{}/fields'.format(test_id),
+        '/settings/pipettes/{}'.format(test_id),
         json=out_of_range)
     assert resp.status == 412

@@ -168,11 +168,14 @@ async def pipette_settings_id(request: web.Request) -> web.Response:
 
 async def modify_pipette_settings(request: web.Request) -> web.Response:
     """
-    Expects a dictionary with mutable configs in a flattened shape such as:
+    Expects a dictionary with mutable configs
+    wrapped in a `fields` key such as:
     {
-    'fields': {
+        'fields': {
             'pickUpCurrent': {'value': some_value},
             'dropTipSpeed': {'value': some_value}
+        }
+
     }
     If a value needs to be reset, simply type in the body formatted as above:
         'configKey': null
@@ -184,7 +187,7 @@ async def modify_pipette_settings(request: web.Request) -> web.Response:
     config_match = pc.list_mutable_configs(pipette_id)
     data = await request.json()
     if not data.get('fields'):
-        return web.json_response(status=400)
+        return web.json_response(config_match, status=200)
 
     for key, value in data['fields'].items():
         if value:
@@ -192,7 +195,8 @@ async def modify_pipette_settings(request: web.Request) -> web.Response:
             default = config_match[key]
             if config < default['min'] or config > default['max']:
                 return web.json_response(
-                    {'message': '{} out of range with {}'.format(key, value)},
+                    {'message': '{} out of range with {}'.format(key, config)},
                     status=412)
     pc.save_overrides(pipette_id, data['fields'], whole_config.get('model'))
-    return web.json_response(status=204)
+    updated_configs = {'fields': pc.list_mutable_configs(pipette_id)}
+    return web.json_response(updated_configs, status=200)
