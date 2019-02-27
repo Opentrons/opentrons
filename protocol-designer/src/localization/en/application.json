@@ -3,5 +3,6 @@
     "mix": "mix",
     "moveLiquid": "transfer",
     "pause": "pause"
-  }
+  },
+  "version": "Protocol Designer Version"
 }

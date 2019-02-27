@@ -8,7 +8,8 @@
   },
   "title": {
     "privacy": "Privacy",
-    "hints": "Hints"
+    "hints": "Hints",
+    "information": "Information"
   },
   "toggle": {
     "share_session": "Share sessions with the Opentrons Product Team"
