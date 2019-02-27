@@ -1,5 +1,5 @@
 import abc
-from typing import Dict
+from typing import Dict, Callable
 
 
 class AbstractModule(abc.ABC):
@@ -68,7 +68,7 @@ class AbstractModule(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def interrupt_callback(self):
+    def interrupt_callback(self) -> Callable[[str], None]:
         pass
 
     @classmethod

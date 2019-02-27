@@ -77,7 +77,7 @@ class TempDeck(mod_abc.AbstractModule):
     @classmethod
     def build(cls, port, interrupt_callback, simulating=False):
         """ Build and connect to a TempDeck"""
-        # MagDeck does not currently use interrupts, so the callback is not
+        # TempDeck does not currently use interrupts, so the callback is not
         # passed on
         mod = cls(port, simulating)
         mod._connect()

@@ -53,6 +53,8 @@ class ParseError(Exception):
 
 class TCPoller(threading.Thread):
     def __init__(self, port, interrupt_callback, status_callback):
+        if not select:
+            raise RuntimeError("Cannot connect to a Thermocycler from Windows")
         self._port = port
         self._connection = self._connect_to_port()
         self._interrupt_callback = interrupt_callback
@@ -73,16 +75,18 @@ class TCPoller(threading.Thread):
         self._halt_path = '/var/run/tc_halt_fifo_{}'.format(hash(self))
         os.mkfifo(self._halt_path)
         halt_read_fd = os.open(
-            self._send_path, flags=os.O_RDONLY | os.O_NONBLOCK)
+            self._halt_path, flags=os.O_RDONLY | os.O_NONBLOCK)
         self._halt_read_file = os.fdopen(halt_read_fd, 'rb')
-        self._halt_write_fd = open(self._send_path, 'wb', buffering=0)
+        self._halt_write_fd = open(self._halt_path, 'wb', buffering=0)
 
         self._poller = select.poll()
         self._poller.register(self._send_read_file, eventmask=select.POLLIN)
         self._poller.register(self._halt_read_file, eventmask=select.POLLIN)
         self._poller.register(self._connection, eventmask=select.POLLIN)
 
-        super().__init__(target=self._serial_poller, name='tc_serial_poller')
+        serial_thread_name = 'tc_serial_poller_{}'.format(hash(self))
+        super().__init__(target=self._serial_poller, name=serial_thread_name)
+        log.info("Starting TC thread {}".format(serial_thread_name))
         super().start()
 
     @property
@@ -107,6 +111,7 @@ class TCPoller(threading.Thread):
         while True:
             _next = dict(self._poller.poll(POLLING_FREQUENCY_MS))
             if self._halt_read_file.fileno() in _next:
+                log.debug("Poller [{}]: halt".format(hash(self)))
                 self._halt_read_file.read()
                 # Note: this is discarded because we send a set message to halt
                 # the thread--don't currently need to parse it
@@ -114,18 +119,22 @@ class TCPoller(threading.Thread):
 
             elif self._connection.fileno() in _next:
                 # Lid-open interrupt
+                log.debug("Poller [{}]: interrupt".format(hash(self)))
                 res = self._connection.read_until(SERIAL_ACK)
                 self._interrupt_callback(res)
 
             elif self._send_read_file.fileno() in _next:
                 self._send_read_file.read(1)
                 command, callback = self._command_queue.get()
+                log.debug("Poller [{}]: send {}".format(hash(self), command))
                 res = self._send_command(command)
                 callback(res)
             else:
                 # Nothing else to do--update device status
+                log.debug("Poller [{}]: updating temp".format(hash(self)))
                 res = self._send_command(GCODES['GET_PLATE_TEMP'])
                 self._status_callback(res)
+        log.info("Exiting TC poller loop [{}]".format(hash(self)))
 
     def _wait_for_ack(self):
         """
@@ -164,7 +173,8 @@ class TCPoller(threading.Thread):
             return serial_communication.connect(port=self._port,
                                                 baudrate=TC_BAUDRATE)
         except SerialException:
-            raise SerialException("Thermocycler device not found")
+            raise SerialException(
+                "Thermocycler device not found on {}".format(self._port))
 
     def send(self, command, callback):
         with self._lock:
