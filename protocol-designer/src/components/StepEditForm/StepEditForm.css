@@ -157,9 +157,17 @@
   padding: 0.5rem;
 }
 
+.path_tooltip_image.disabled {
+  opacity: 0.5;
+}
+
 .path_tooltip_title {
   font-size: var(--fs-header);
   text-align: center;
+}
+
+.path_tooltip_title.disabled {
+  opacity: 0.5;
 }
 
 .path_tooltip_subtitle {

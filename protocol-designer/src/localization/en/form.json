@@ -69,7 +69,11 @@
           "multiAspirate": "Speed: faster",
           "multiDispense": "Speed: faster"
         },
-        "not_compatible": "Not compatible with current step settings"
+        "only_1_to_many": "Only compatible with 1-to-Many well ratios",
+        "only_many_to_1": "Only compatible with Many-to-1 well ratios",
+        "volume_too_high": "Transfer Volume too high",
+        "incompatible_with_per_dest": "Incompatible with \"Per Destination\" Change Tip setting",
+        "incompatible_with_per_source": "Incompatible with \"Per Source\" Change Tip setting"
       }
     },
     "section": {

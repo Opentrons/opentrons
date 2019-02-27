@@ -1,6 +1,7 @@
 // @flow
 import {connect} from 'react-redux'
 import Path from './Path'
+import i18n from '../../../../localization'
 import {selectors as stepFormSelectors} from '../../../../step-forms'
 import {getWellRatio} from '../../../../steplist/utils'
 import {volumeInCapacityForMulti} from '../../../../steplist/formLevel/handleFormChange/utils'
@@ -10,32 +11,58 @@ import type {FormData, PathOption} from '../../../../form-types'
 import type {BaseState} from '../../../../types'
 
 type Props = ElementProps<typeof Path>
-type SP = {disabledPaths: $PropertyType<Props, 'disabledPaths'>}
+type SP = {disabledPathMap: $PropertyType<Props, 'disabledPathMap'>}
 
-function getDisabledPaths (
+function getDisabledPathMap (
   rawForm: ?FormData,
   pipetteEntities: PipetteEntities
-): ?Set<PathOption> {
+): ?{[PathOption]: string} {
   if (!rawForm || !rawForm.pipette) return null
 
   const withinCapacityForMultiPath = volumeInCapacityForMulti(rawForm, pipetteEntities)
   const wellRatio = getWellRatio(rawForm.aspirate_wells, rawForm.dispense_wells)
+  const changeTip = rawForm.changeTip
 
-  if (withinCapacityForMultiPath) {
-    if (wellRatio === '1:many') return new Set(['multiAspirate'])
-    if (wellRatio === 'many:1') return new Set(['multiDispense'])
+  let disabledPathMap = {}
+
+  // changeTip is lowest priority disable reasoning
+  if (changeTip === 'perDest') {
+    disabledPathMap = {...disabledPathMap, multiDispense: i18n.t('form.step_edit_form.field.path.incompatible_with_per_dest')}
+  } else if (changeTip === 'perSource') {
+    disabledPathMap = {...disabledPathMap, multiAspirate: i18n.t('form.step_edit_form.field.path.incompatible_with_per_source')}
   }
 
-  // no valid well ratio, or n:n, or any ratio when exceeding capacity
-  return new Set(['multiAspirate', 'multiDispense'])
+  // transfer volume overwrites change tip disable reasoning
+  if (!withinCapacityForMultiPath) {
+    disabledPathMap = {
+      ...disabledPathMap,
+      multiAspirate: i18n.t('form.step_edit_form.field.path.volume_too_high'),
+      multiDispense: i18n.t('form.step_edit_form.field.path.volume_too_high'),
+    }
+  }
+
+  // wellRatio overwrites all other disable reasoning
+  if (wellRatio === '1:many') {
+    disabledPathMap = {...disabledPathMap, multiAspirate: i18n.t('form.step_edit_form.field.path.only_many_to_1')}
+  } else if (wellRatio === 'many:1') {
+    disabledPathMap = {...disabledPathMap, multiDispense: i18n.t('form.step_edit_form.field.path.only_1_to_many')}
+  } else {
+    disabledPathMap = {
+      ...disabledPathMap,
+      multiAspirate: i18n.t('form.step_edit_form.field.path.only_many_to_1'),
+      multiDispense: i18n.t('form.step_edit_form.field.path.only_1_to_many'),
+    }
+  }
+
+  return disabledPathMap
 }
 
 function mapSTP (state: BaseState): SP {
   const rawForm = stepFormSelectors.getUnsavedForm(state)
   const pipetteEntities = stepFormSelectors.getPipetteEntities(state)
-  const disabledPaths = getDisabledPaths(rawForm, pipetteEntities)
+  const disabledPathMap = getDisabledPathMap(rawForm, pipetteEntities)
   return {
-    disabledPaths,
+    disabledPathMap,
   }
 }
 
