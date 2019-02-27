@@ -69,3 +69,7 @@
   line-height: 1.5;
   padding: 2rem 1rem;
 }
+
+.labeled_value {
+  font-size: var(--fs-body-2);
+}

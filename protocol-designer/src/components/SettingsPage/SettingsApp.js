@@ -34,6 +34,7 @@ function SettingsApp (props: Props) {
       <Card title={i18n.t('card.title.information')}>
         <div className={styles.setting_row}>
           <LabeledValue
+            className={styles.labeled_value}
             label={i18n.t('application.version')}
             value={process.env.OT_PD_VERSION || OLDEST_MIGRATEABLE_VERSION} />
           {/* TODO: BC 2019-02-26 add release notes link here, when there are release notes */}
