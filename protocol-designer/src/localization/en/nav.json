@@ -16,9 +16,9 @@
     "__end__": "Final Deck State"
   },
   "title": {
-    "settings-features": "Opentrons Beta",
-    "settings-app": "Opentrons Beta",
-    "file-splash": "Opentrons Beta"
+    "settings-features": "Protocol Designer",
+    "settings-app": "Protocol Designer",
+    "file-splash": "Protocol Designer"
   },
   "subtitle": {
     "file-detail": "File Details",
