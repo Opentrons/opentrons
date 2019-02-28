@@ -27,30 +27,30 @@ function getDisabledPathMap (
 
   // changeTip is lowest priority disable reasoning
   if (changeTip === 'perDest') {
-    disabledPathMap = {...disabledPathMap, multiDispense: i18n.t('form.step_edit_form.field.path.incompatible_with_per_dest')}
+    disabledPathMap = {...disabledPathMap, multiDispense: i18n.t('form.step_edit_form.field.path.subtitle.incompatible_with_per_dest')}
   } else if (changeTip === 'perSource') {
-    disabledPathMap = {...disabledPathMap, multiAspirate: i18n.t('form.step_edit_form.field.path.incompatible_with_per_source')}
+    disabledPathMap = {...disabledPathMap, multiAspirate: i18n.t('form.step_edit_form.field.path.subtitle.incompatible_with_per_source')}
   }
 
   // transfer volume overwrites change tip disable reasoning
   if (!withinCapacityForMultiPath) {
     disabledPathMap = {
       ...disabledPathMap,
-      multiAspirate: i18n.t('form.step_edit_form.field.path.volume_too_high'),
-      multiDispense: i18n.t('form.step_edit_form.field.path.volume_too_high'),
+      multiAspirate: i18n.t('form.step_edit_form.field.path.subtitle.volume_too_high'),
+      multiDispense: i18n.t('form.step_edit_form.field.path.subtitle.volume_too_high'),
     }
   }
 
   // wellRatio overwrites all other disable reasoning
   if (wellRatio === '1:many') {
-    disabledPathMap = {...disabledPathMap, multiAspirate: i18n.t('form.step_edit_form.field.path.only_many_to_1')}
+    disabledPathMap = {...disabledPathMap, multiAspirate: i18n.t('form.step_edit_form.field.path.subtitle.only_many_to_1')}
   } else if (wellRatio === 'many:1') {
-    disabledPathMap = {...disabledPathMap, multiDispense: i18n.t('form.step_edit_form.field.path.only_1_to_many')}
+    disabledPathMap = {...disabledPathMap, multiDispense: i18n.t('form.step_edit_form.field.path.subtitle.only_1_to_many')}
   } else {
     disabledPathMap = {
       ...disabledPathMap,
-      multiAspirate: i18n.t('form.step_edit_form.field.path.only_many_to_1'),
-      multiDispense: i18n.t('form.step_edit_form.field.path.only_1_to_many'),
+      multiAspirate: i18n.t('form.step_edit_form.field.path.subtitle.only_many_to_1'),
+      multiDispense: i18n.t('form.step_edit_form.field.path.subtitle.only_1_to_many'),
     }
   }
 

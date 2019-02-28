@@ -78,7 +78,7 @@ const PathButton = (buttonProps: ButtonProps) => {
 
 const getSubtitle = (path: PathOption, disabledPathMap: ?{[PathOption]: string}) => {
   const reasonForDisabled = disabledPathMap && disabledPathMap[path]
-  return reasonForDisabled || i18n.t(`form.step_edit_form.field.path.subtitle.${path}`)
+  return reasonForDisabled || ''
 }
 const PathField = (props: PathFieldProps) => {
   return (
