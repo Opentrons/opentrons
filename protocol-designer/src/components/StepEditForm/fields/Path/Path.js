@@ -34,30 +34,28 @@ const ALL_PATH_OPTIONS = [
 
 type PathFieldProps = {
   focusHandlers: FocusHandlers,
-  disabledPaths: ?Set<PathOption>,
+  disabledPathMap: ?{[PathOption]: string},
 }
 
 type ButtonProps = {
   children?: React.Node,
   disabled?: ?boolean,
   selected?: boolean,
+  subtitle: string,
   onClick?: (e: SyntheticMouseEvent<*>) => mixed,
   path: PathOption,
 }
 
 const PathButton = (buttonProps: ButtonProps) => {
-  const {disabled, children, path, selected, onClick} = buttonProps
+  const {disabled, children, path, selected, onClick, subtitle} = buttonProps
 
   const tooltip = (
     <div>
-      <div className={styles.path_tooltip_title}>
+      <div className={cx(styles.path_tooltip_title, {[styles.disabled]: disabled})}>
         {i18n.t(`form.step_edit_form.field.path.title.${path}`)}
       </div>
-      <img className={styles.path_tooltip_image} src={PATH_ANIMATION_IMAGES[path]} />
-      <div className={styles.path_tooltip_subtitle}>{i18n.t(disabled
-        ? `form.step_edit_form.field.path.not_compatible`
-        : `form.step_edit_form.field.path.subtitle.${path}`)}
-      </div>
+      <img className={cx(styles.path_tooltip_image, {[styles.disabled]: disabled})} src={PATH_ANIMATION_IMAGES[path]} />
+      <div className={styles.path_tooltip_subtitle}>{subtitle}</div>
     </div>
   )
 
@@ -78,25 +76,32 @@ const PathButton = (buttonProps: ButtonProps) => {
   )
 }
 
-const PathField = (props: PathFieldProps) => (
-  <FormGroup label='Path:'>
-    <StepField
-      name="path"
-      render={({value, updateValue}) => (
-        <ul className={styles.path_options}>
-          {ALL_PATH_OPTIONS.map(option => (
-            <PathButton
-              key={option.name}
-              selected={option.name === value}
-              path={option.name}
-              disabled={props.disabledPaths && props.disabledPaths.has(option.name)}
-              onClick={() => updateValue(option.name)}>
-              <img src={option.image} className={styles.path_image} />
-            </PathButton>
-          ))}
-        </ul>
-      )} />
-  </FormGroup>
-)
+const getSubtitle = (path: PathOption, disabledPathMap: ?{[PathOption]: string}) => {
+  const reasonForDisabled = disabledPathMap && disabledPathMap[path]
+  return reasonForDisabled || ''
+}
+const PathField = (props: PathFieldProps) => {
+  return (
+    <FormGroup label='Path:'>
+      <StepField
+        name="path"
+        render={({value, updateValue}) => (
+          <ul className={styles.path_options}>
+            {ALL_PATH_OPTIONS.map(option => (
+              <PathButton
+                key={option.name}
+                selected={option.name === value}
+                path={option.name}
+                disabled={props.disabledPathMap && props.disabledPathMap.hasOwnProperty(option.name)}
+                subtitle={getSubtitle(option.name, props.disabledPathMap)}
+                onClick={() => updateValue(option.name)}>
+                <img src={option.image} className={styles.path_image} />
+              </PathButton>
+            ))}
+          </ul>
+        )} />
+    </FormGroup>
+  )
+}
 
 export default PathField
