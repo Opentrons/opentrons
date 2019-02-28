@@ -1,29 +1,29 @@
 // @flow
 import * as React from 'react'
-import FileUploadErrorModal from './FileUploadErrorModal'
+import FileUploadMessageModal from './FileUploadMessageModal'
 import {connect} from 'react-redux'
 import {selectors as loadFileSelectors, actions as loadFileActions} from '../../../load-file'
 import type {Dispatch} from 'redux'
 import type {BaseState} from '../../../types'
 
-type Props = React.ElementProps<typeof FileUploadErrorModal>
+type Props = React.ElementProps<typeof FileUploadMessageModal>
 
 type SP = {
-  error: $PropertyType<Props, 'error'>,
+  message: $PropertyType<Props, 'message'>,
 }
 
 type DP = $Diff<Props, SP>
 
 function mapStateToProps (state: BaseState): SP {
   return {
-    error: loadFileSelectors.getFileLoadErrors(state),
+    message: loadFileSelectors.getFileUploadMessages(state),
   }
 }
 
 function mapDispatchToProps (dispatch: Dispatch<*>): DP {
   return {
-    dismissModal: () => dispatch(loadFileActions.fileErrors(null)),
+    dismissModal: () => dispatch(loadFileActions.dismissFileUploadMessage()),
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(FileUploadErrorModal)
+export default connect(mapStateToProps, mapDispatchToProps)(FileUploadMessageModal)

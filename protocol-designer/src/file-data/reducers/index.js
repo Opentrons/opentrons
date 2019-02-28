@@ -16,8 +16,8 @@ const updateMetadataFields = (
   state: FileMetadataFields,
   action: LoadFileAction
 ): FileMetadataFields => {
-  const {metadata} = action.payload
-  return metadata
+  const {file} = action.payload
+  return file.metadata
 }
 
 // track if a protocol has been created or loaded

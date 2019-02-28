@@ -3,18 +3,27 @@ import migrateFile from './migration'
 import type {ProtocolFile} from '../file-types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../types'
 import type {
-  FileError,
+  FileUploadErrorType,
+  FileUploadMessage,
   LoadFileAction,
   NewProtocolFields,
 } from './types'
 
-export const fileErrors = (payload: FileError) => ({
-  type: 'FILE_ERRORS',
+export type FileUploadMessageAction = {
+  type: 'FILE_UPLOAD_MESSAGE',
+  payload: FileUploadMessage,
+}
+
+export const fileUploadMessage = (payload: FileUploadMessage): FileUploadMessageAction => ({
+  type: 'FILE_UPLOAD_MESSAGE',
   payload,
 })
 
+export const dismissFileUploadMessage = () => ({
+  type: 'DISMISS_FILE_UPLOAD_MESSAGE',
+})
+
 // expects valid, parsed JSON protocol.
-// TODO: IMMEDIATELY pass boolean `didMigrate` in payload, to effect unsavedChanges reducer
 export const loadFileAction = (payload: ProtocolFile): LoadFileAction => ({
   type: 'LOAD_FILE',
   payload: migrateFile(payload),
@@ -23,7 +32,8 @@ export const loadFileAction = (payload: ProtocolFile): LoadFileAction => ({
 // load file thunk, handles file loading errors
 export const loadProtocolFile = (event: SyntheticInputEvent<HTMLInputElement>): ThunkAction<*> =>
   (dispatch: ThunkDispatch<*>, getState: GetState) => {
-    const fileError = error => dispatch(fileErrors(error))
+    const fileError = (errorType: FileUploadErrorType, errorMessage?: string) =>
+      dispatch(fileUploadMessage({isError: true, errorType, errorMessage}))
 
     const file = event.currentTarget.files[0]
     const reader = new FileReader()
@@ -32,9 +42,7 @@ export const loadProtocolFile = (event: SyntheticInputEvent<HTMLInputElement>): 
     event.currentTarget.value = ''
 
     if (!file.name.endsWith('.json')) {
-      fileError({
-        errorType: 'INVALID_FILE_TYPE',
-      })
+      fileError('INVALID_FILE_TYPE')
     } else {
       reader.onload = readEvent => {
         const result = readEvent.currentTarget.result
@@ -43,14 +51,11 @@ export const loadProtocolFile = (event: SyntheticInputEvent<HTMLInputElement>): 
         try {
           parsedProtocol = JSON.parse(result)
           // TODO LATER Ian 2018-05-18 validate file with JSON Schema here
+          dispatch(loadFileAction(parsedProtocol))
         } catch (error) {
-          fileError({
-            errorType: 'INVALID_JSON_FILE',
-            message: error.message,
-          })
+          console.error(error)
+          fileError('INVALID_JSON_FILE', error.message)
         }
-
-        if (parsedProtocol) dispatch(loadFileAction(parsedProtocol))
       }
       reader.readAsText(file)
     }

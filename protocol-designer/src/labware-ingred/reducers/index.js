@@ -109,7 +109,7 @@ export const containers = handleActions({
     }
   },
   LOAD_FILE: (state: ContainersState, action: LoadFileAction): ContainersState => {
-    const file = action.payload
+    const {file} = action.payload
     const allFileLabware = file.labware
     const sortedLabwareIds: Array<string> = Object.keys(allFileLabware).sort((a, b) =>
       Number(allFileLabware[a].slot) - Number(allFileLabware[b].slot))
@@ -146,7 +146,7 @@ export const savedLabware = handleActions({
     [action.payload.duplicateLabwareId]: true,
   }),
   LOAD_FILE: (state: SavedLabwareState, action: LoadFileAction): SavedLabwareState => (
-    mapValues(action.payload.labware, () => true)
+    mapValues(action.payload.file.labware, () => true)
   ),
 }, {})
 
@@ -164,7 +164,7 @@ export const ingredients = handleActions({
     return omit(state, liquidGroupId)
   },
   LOAD_FILE: (state: IngredientsState, action: LoadFileAction): IngredientsState =>
-    getPDMetadata(action.payload).ingredients,
+    getPDMetadata(action.payload.file).ingredients,
 }, {})
 
 type LocationsState = LabwareLiquidState
@@ -216,7 +216,7 @@ export const ingredLocations = handleActions({
   ): LocationsState =>
     omit(state, action.payload.labwareId),
   LOAD_FILE: (state: LocationsState, action: LoadFileAction): LocationsState =>
-    getPDMetadata(action.payload).ingredLocations,
+    getPDMetadata(action.payload.file).ingredLocations,
 }, {})
 
 export type RootState = {|

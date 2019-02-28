@@ -21,7 +21,7 @@ export const getMigrationVersionsToRunFromVersion = (migrationsByVersion: {}, ve
   return takeRightWhile(allSortedVersions, v => semver.gt(v, version))
 }
 
-const masterMigration = (file: any): ProtocolFile => {
+const masterMigration = (file: any): {file: ProtocolFile, didMigrate: boolean} => {
   const designerApplication = file.designerApplication || file['designer-application']
 
   // NOTE: default exists because any protocol that doesn't include the applicationVersion
@@ -29,7 +29,12 @@ const masterMigration = (file: any): ProtocolFile => {
   const {applicationVersion = OLDEST_MIGRATEABLE_VERSION} = designerApplication
 
   const migrationVersionsToRun = getMigrationVersionsToRunFromVersion(allMigrationsByVersion, applicationVersion)
-  return flow(migrationVersionsToRun.map(version => allMigrationsByVersion[version]))(file)
+  const migratedFile = flow(migrationVersionsToRun.map(version =>
+    allMigrationsByVersion[version]))(file)
+  return {
+    file: migratedFile,
+    didMigrate: migrationVersionsToRun.length > 0,
+  }
 }
 
 export default masterMigration
