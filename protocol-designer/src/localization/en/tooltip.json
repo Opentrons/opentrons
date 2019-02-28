@@ -3,12 +3,9 @@
   "advanced_settings": "Advanced Settings",
 
   "step_description": {
-    "transfer": "Move liquid from wells to an equal number of wells",
-    "distribute": "One well to multiple wells",
-    "consolidate": "Multiple wells to one well",
     "mix": "Mix content of wells",
     "pause": "OT-2 will pause before proceeding",
-    "moveLiquid": "Move liquid! TODO IMMEDIATELY real copy here"
+    "moveLiquid": "Move liquid"
   },
 
   "step_fields": {
