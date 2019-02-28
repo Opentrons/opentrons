@@ -92,7 +92,7 @@ const PathField = (props: PathFieldProps) => {
                 key={option.name}
                 selected={option.name === value}
                 path={option.name}
-                disabled={props.disabledPathMap && Object.keys(props.disabledPathMap).includes(option.name)}
+                disabled={props.disabledPathMap && props.disabledPathMap.hasOwnProperty(option.name)}
                 subtitle={getSubtitle(option.name, props.disabledPathMap)}
                 onClick={() => updateValue(option.name)}>
                 <img src={option.image} className={styles.path_image} />
