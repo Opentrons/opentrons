@@ -8,7 +8,11 @@ import {
   makeGetRobotPipettes,
   fetchPipettes,
   clearMoveResponse,
+  fetchPipetteConfigs,
+  makeGetRobotPipetteConfigs,
 } from '../../http-api-client'
+import {chainActions} from '../../util'
+
 import InstrumentInfo from './InstrumentInfo'
 import {CardContentFlex} from '../layout'
 import {RefreshCard} from '@opentrons/components'
@@ -17,12 +21,14 @@ import type {State} from '../../types'
 import type {Robot} from '../../discovery'
 import type {Pipette} from '../../http-api-client'
 import {getConfig} from '../../config'
+
 type OP = Robot
 
 type SP = {
   inProgress: boolean,
   left: ?Pipette,
   right: ?Pipette,
+  showSettings: boolean,
   __featureEnabled: boolean,
 }
 
@@ -56,6 +62,7 @@ function AttachedPipettesCard (props: Props) {
           name={props.name}
           {...props.left}
           onChangeClick={props.clearMove}
+          showSettings={props.showSettings}
           __enableConfig={props.__featureEnabled}
         />
         <InstrumentInfo
@@ -63,6 +70,7 @@ function AttachedPipettesCard (props: Props) {
           name={props.name}
           {...props.right}
           onChangeClick={props.clearMove}
+          showSettings={props.showSettings}
           __enableConfig={props.__featureEnabled}
         />
       </CardContentFlex>
@@ -72,15 +80,17 @@ function AttachedPipettesCard (props: Props) {
 
 function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   const getRobotPipettes = makeGetRobotPipettes()
+  const getRobotPipetteConfigs = makeGetRobotPipetteConfigs()
 
   return (state, ownProps) => {
     const {inProgress, response} = getRobotPipettes(state, ownProps)
     const {left, right} = response || {left: null, right: null}
-
+    const configCall = getRobotPipetteConfigs(state, ownProps)
     return {
       inProgress,
       left,
       right,
+      showSettings: !!configCall.response,
       __featureEnabled: !!getIn(getConfig(state), __FEATURE_FLAG),
     }
   }
@@ -88,7 +98,10 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
 
 function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
   return {
-    fetchPipettes: () => dispatch(fetchPipettes(ownProps)),
+    fetchPipettes: () =>
+      dispatch(
+        chainActions(fetchPipettes(ownProps), fetchPipetteConfigs(ownProps))
+      ),
     clearMove: () => dispatch(clearMoveResponse(ownProps)),
   }
 }

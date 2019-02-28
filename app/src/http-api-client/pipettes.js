@@ -19,6 +19,7 @@ export type Pipette = {
   model: ?string,
   mount_axis: MotorAxis,
   plunger_axis: MotorAxis,
+  id: string,
 }
 
 export type PipettesResponse = {

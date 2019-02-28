@@ -24,6 +24,25 @@ export type Setting = {
   value: Value,
 }
 
+export type Field = {
+  value: ?number,
+  default: number,
+  min?: number,
+  max?: number,
+  units?: string,
+  type?: string,
+}
+
+export type PipetteConfigFields = {[string]: Field}
+
+export type PipetteConfigResponse = {
+  info: {
+    name: ?string,
+    model: ?string,
+  },
+  fields: PipetteConfigFields,
+}
+
 type SettingsRequest = ?{id: Id, value: Value}
 
 type SettingsResponse = {settings: Array<Setting>}
@@ -32,10 +51,17 @@ export type SettingsAction = ApiAction<'settings',
   SettingsRequest,
   SettingsResponse>
 
+// TODO type this based on SetConfigRequest when implemented
+type PipetteConfigRequest = ?{id: string}
+
 export type RobotSettingsCall = ApiCall<SettingsRequest, SettingsResponse>
+
+export type PipetteConfigCall = ApiCall<PipetteConfigRequest,
+  PipetteConfigResponse>
 
 export type SettingsState = {|
   settings?: RobotSettingsCall,
+  'settings/pipettes'?: PipetteConfigCall,
 |}
 
 const SETTINGS: 'settings' = 'settings'
@@ -50,6 +76,15 @@ export const fetchSettings: SettingsRequestMaker = buildRequestMaker(
 export const setSettings: SettingsRequestMaker = buildRequestMaker(
   'POST',
   SETTINGS
+)
+
+const PIPETTE_SETTINGS: 'settings/pipettes' = 'settings/pipettes'
+
+type PipetteConfigRequestMaker = RequestMaker<PipetteConfigRequest>
+
+export const fetchPipetteConfigs: PipetteConfigRequestMaker = buildRequestMaker(
+  'GET',
+  PIPETTE_SETTINGS
 )
 
 export function makeGetRobotSettings () {
@@ -72,4 +107,22 @@ export function getSettingsRequest (state: RobotApiState): RobotSettingsCall {
   }
 
   return requestState
+}
+
+export function makeGetRobotPipetteConfigs () {
+  const selector: OutputSelector<State,
+    BaseRobot,
+    PipetteConfigCall> = createSelector(
+      getRobotApiState,
+      getRobotPipetteConfigs
+    )
+
+  return selector
+}
+
+export function getRobotPipetteConfigs (
+  state: RobotApiState,
+  id: string
+): PipetteConfigCall {
+  return state[PIPETTE_SETTINGS] || {inProgress: false}
 }
