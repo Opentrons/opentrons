@@ -34,7 +34,7 @@ const FORM_WARNINGS: {[FormWarningType]: FormWarning} = {
     body: (
       <React.Fragment>
         For accuracy in multi-dispense actions we recommend you use a disposal volume of at least the pipette&apos;s minimum.
-        Read more <KnowledgeBaseLink to='distribute'>here</KnowledgeBaseLink>.
+        Read more <KnowledgeBaseLink to='multiDispense'>here</KnowledgeBaseLink>.
       </React.Fragment>
     ),
     dependentFields: ['disposalVolume_volume', 'pipette', 'path'],

@@ -44,7 +44,8 @@ async def test_module_update_logic(monkeypatch):
     old = mods[0]
 
     async def new_update_module(mod, ff, loop=None):
-        return hardware_control.modules.build('weird-port', mod.name(), True)
+        return hardware_control.modules.build(
+            'weird-port', mod.name(), True, lambda x: None)
 
     monkeypatch.setattr(api._backend, 'update_module', new_update_module)
     ok, msg = await api.update_module(mods[0], 'some_file')
@@ -66,8 +67,8 @@ async def test_module_update_integration(monkeypatch, loop,
 
     monkeypatch.setattr(api._backend, 'get_attached_modules', mock_get_modules)
 
-    def mock_build_module(port, model):
-        return hardware_control.modules.build(port, model, True)
+    def mock_build_module(port, model, callback):
+        return hardware_control.modules.build(port, model, True, callback)
 
     monkeypatch.setattr(api._backend, 'build_module', mock_build_module)
 

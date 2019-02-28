@@ -4,5 +4,6 @@
     "moveLiquid": "transfer",
     "pause": "pause"
   },
-  "version": "Protocol Designer Version"
+  "version": "Protocol Designer Version",
+  "beta": "beta"
 }

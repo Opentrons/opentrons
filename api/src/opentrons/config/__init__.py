@@ -41,6 +41,7 @@ IS_WIN = sys.platform.startswith('win')
 IS_OSX = sys.platform == 'darwin'
 IS_LINUX = sys.platform.startswith('linux')
 IS_ROBOT = IS_LINUX and os.environ.get('RUNNING_ON_PI')
+IS_VIRTUAL = os.environ.get('ENABLE_VIRTUAL_SMOOTHIE')
 #: This is the correct thing to check to see if we’re running on a robot
 
 

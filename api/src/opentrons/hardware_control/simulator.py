@@ -5,7 +5,7 @@ from threading import Event
 from typing import Dict, Optional, List, Tuple
 from contextlib import contextmanager
 from opentrons import types
-from opentrons.config.pipette_config import configs
+from opentrons.config.pipette_config import config_models
 from . import modules
 
 
@@ -14,7 +14,7 @@ MODULE_LOG = logging.getLogger(__name__)
 
 def find_config(prefix: str) -> str:
     """ Find the most recent config matching `prefix` """
-    matches = [conf for conf in configs if conf.startswith(prefix)]
+    matches = [conf for conf in config_models if conf.startswith(prefix)]
     if not matches:
         raise KeyError('No match found for prefix {}'.format(prefix))
     if prefix in matches:
@@ -178,8 +178,15 @@ class Simulator:
     def save_current(self):
         yield
 
-    def build_module(self, port: str, model: str) -> modules.AbstractModule:
-        return modules.build(port, model, True)
+    def build_module(self,
+                     port: str,
+                     model: str,
+                     interrupt_callback) -> modules.AbstractModule:
+        return modules.build(
+            port=port,
+            which=model,
+            simulating=True,
+            interrupt_callback=interrupt_callback)
 
     async def update_module(
             self, module: modules.AbstractModule,

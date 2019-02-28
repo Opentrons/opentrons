@@ -159,8 +159,15 @@ class Controller:
     def get_attached_modules(self) -> List[Tuple[str, str]]:
         return modules.discover()
 
-    def build_module(self, port: str, model: str) -> modules.AbstractModule:
-        return modules.build(port, model, False)
+    def build_module(self,
+                     port: str,
+                     model: str,
+                     interrupt_callback) -> modules.AbstractModule:
+        return modules.build(
+            port=port,
+            which=model,
+            simulating=False,
+            interrupt_callback=interrupt_callback)
 
     async def update_module(
             self,
