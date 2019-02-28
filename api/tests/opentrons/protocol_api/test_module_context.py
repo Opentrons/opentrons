@@ -58,51 +58,34 @@ def test_magdeck(loop):
         [cmd.lower() for cmd in ctx.commands()])
 
 
-def test_thermocycler(loop):
+def test_thermocycler_lid(loop):
     ctx = papi.ProtocolContext(loop)
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'thermocycler')]
     mod = ctx.load_module('Thermocycler', 1)
     assert ctx.deck[1] == mod._geometry
-    # TODO: expand test with method calls and statuses
-    assert mod.target is None
 
-    # Test default ramp rate
-    mod.set_temperature(20, hold_time=5.0)
-    assert 'setting thermocycler temperature' in ','.join(
-        [cmd.lower() for cmd in ctx.commands()])
-    mod.wait_for_temp()
-    assert mod.target == 20
-    assert mod.temperature == 20
-    assert mod.hold_time == 5.0
-    assert mod.ramp_rate is None
+    assert mod.lid_status == 'open'
 
-    # Test specified ramp rate
-    mod.set_temperature(41.3, hold_time=25.5, ramp_rate=2.0)
-    assert 'setting thermocycler temperature' in ','.join(
+    # Open should work if the lid is open (no status change)
+    mod.open()
+    assert mod.lid_status == 'open'
+    assert 'opening thermocycler lid' in ','.join(
         [cmd.lower() for cmd in ctx.commands()])
-    mod.wait_for_temp()
-    assert mod.target == 41.3
-    assert mod.temperature == 41.3
-    assert mod.hold_time == 25.5
-    assert mod.ramp_rate == 2.0
 
-    # Test infinite hold
-    mod.set_temperature(13.2)
-    assert 'setting thermocycler temperature' in ','.join(
+    # Close should work if the lid is open
+    mod.close()
+    assert mod.lid_status == 'closed'
+    assert 'closing thermocycler lid' in ','.join(
         [cmd.lower() for cmd in ctx.commands()])
-    mod.wait_for_temp()
-    assert mod.target == 13.2
-    assert mod.temperature == 13.2
-    assert mod.hold_time is None
-    assert mod.ramp_rate is None
 
-    mod.deactivate()
-    assert 'deactivating thermocycler' in ','.join(
-        [cmd.lower() for cmd in ctx.commands()])
-    assert mod.target is None
-    mod.set_temperature(0)
-    assert mod.target == 0
+    # Close should work if the lid is closed (no status change)
+    mod.close()
+    assert mod.lid_status == 'closed'
+
+    # Open should work if the lid is closed
+    mod.open()
+    assert mod.lid_status == 'open'
 
 
 def test_module_load_labware(loop):
