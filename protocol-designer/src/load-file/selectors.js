@@ -5,9 +5,9 @@ import type {RootState} from './reducers'
 
 export const rootSelector = (state: BaseState): RootState => state.loadFile
 
-export const getFileLoadErrors: Selector<$PropertyType<RootState, 'fileErrors'>> = createSelector(
+export const getFileUploadMessages: Selector<$PropertyType<RootState, 'fileUploadMessage'>> = createSelector(
   rootSelector,
-  s => s.fileErrors
+  s => s.fileUploadMessage
 )
 
 export const getHasUnsavedChanges: Selector<$PropertyType<RootState, 'unsavedChanges'>> = createSelector(

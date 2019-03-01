@@ -1,18 +1,27 @@
 // @flow
 import {combineReducers} from 'redux'
 import {handleActions} from 'redux-actions'
-import type {FileError} from './types'
+import type {FileUploadMessage, LoadFileAction} from './types'
+import type {FileUploadMessageAction} from './actions'
 
-// Keep track of file upload errors
-const fileErrors = handleActions({
-  FILE_ERRORS: (state, action: {payload: FileError}) => action.payload,
+// Keep track of file upload errors / messages
+type FileUploadMessageState = ?FileUploadMessage
+const fileUploadMessage = handleActions({
+  FILE_UPLOAD_MESSAGE: (state, action: FileUploadMessageAction): FileUploadMessageState =>
+    action.payload,
+  LOAD_FILE: (state, action: LoadFileAction): FileUploadMessageState => action.payload.didMigrate
+    ? {isError: false, messageKey: 'didMigrate'}
+    : state,
+  DISMISS_FILE_UPLOAD_MESSAGE: (): FileUploadMessageState => null,
 }, null)
 
 // NOTE: whenever we add or change any of the action types that indicate
 // "changes to the protocol", those action types need to be updated here.
-const unsavedChanges = (state: boolean = false, action: {type: string}): boolean => {
+const unsavedChanges = (state: boolean = false, action: {type: string, payload: any}): boolean => {
   switch (action.type) {
-    case 'LOAD_FILE': // TODO: BC 2019-2-1 send a boolean in LOAD_FILE payload `didMigrate`? if so, then set unsavedChanges to true
+    case 'LOAD_FILE': {
+      return action.payload.didMigrate // no unsaved changes unless migration happened
+    }
     case 'SAVE_PROTOCOL_FILE':
       return false
     case 'CREATE_NEW_PROTOCOL':
@@ -39,12 +48,12 @@ const unsavedChanges = (state: boolean = false, action: {type: string}): boolean
 }
 
 export const _allReducers = {
-  fileErrors,
+  fileUploadMessage,
   unsavedChanges,
 }
 
 export type RootState = {
-  fileErrors: FileError,
+  fileUploadMessage: FileUploadMessageState,
   unsavedChanges: boolean,
 }
 

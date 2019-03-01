@@ -3,19 +3,19 @@ import * as React from 'react'
 import {AlertModal} from '@opentrons/components'
 import modalStyles from '../modal.css'
 import getModalContents from './modalContents'
-import type {FileError} from '../../../load-file'
+import type {FileUploadMessage} from '../../../load-file'
 
 type Props = {
-  error: ?FileError,
+  message: ?FileUploadMessage,
   dismissModal: (SyntheticEvent<*>) => mixed,
 }
 
-export default function FileUploadErrorModal (props: Props) {
-  const {error, dismissModal} = props
+export default function FileUploadMessageModal (props: Props) {
+  const {message, dismissModal} = props
 
-  if (!error) return null
+  if (!message) return null
 
-  const {title, body} = getModalContents(error.errorType, error.message)
+  const {title, body} = getModalContents(message)
   return (
     <AlertModal
       heading={title}

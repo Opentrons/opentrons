@@ -8,7 +8,7 @@ import ConnectedSidebar from '../containers/ConnectedSidebar'
 import ConnectedTitleBar from '../containers/ConnectedTitleBar'
 import ConnectedMainPanel from '../containers/ConnectedMainPanel'
 import NewFileModal from './modals/NewFileModal'
-import FileUploadErrorModal from './modals/FileUploadErrorModal'
+import FileUploadMessageModal from './modals/FileUploadMessageModal'
 import AnalyticsModal from './modals/AnalyticsModal'
 import {PortalRoot as MainPageModalPortalRoot} from '../components/portals/MainPageModalPortal'
 import {PortalRoot as TopPortalRoot} from './portals/TopPortal'
@@ -33,7 +33,7 @@ function ProtocolEditor () {
           <div className={styles.main_page_content}>
             <AnalyticsModal />
             <NewFileModal useProtocolFields />
-            <FileUploadErrorModal />
+            <FileUploadMessageModal />
             {/* TODO: Ian 2018-06-28 All main page modals will go here */}
             <MainPageModalPortalRoot />
 

@@ -161,8 +161,8 @@ export const savedStepForms = (
       return omit(savedStepForms, action.payload)
     }
     case 'LOAD_FILE': {
-      const fileData = action.payload
-      const stepFormsFromFile = getPDMetadata(fileData).savedStepForms
+      const {file} = action.payload
+      const stepFormsFromFile = getPDMetadata(file).savedStepForms
 
       return mapValues(stepFormsFromFile, stepForm => ({
         ...getDefaultsForStepType(stepForm.stepType),
@@ -367,7 +367,7 @@ export const labwareInvariantProperties = handleActions({
     return omit(state, action.payload.labwareId)
   },
   LOAD_FILE: (state: LabwareEntities, action: LoadFileAction): LabwareEntities => {
-    const file = action.payload
+    const {file} = action.payload
     return mapValues(file.labware, (fileLabware: FileLabware, id: string) => ({
       type: fileLabware.model,
     }))
@@ -378,8 +378,9 @@ const initialPipetteState = {}
 export type PipetteInvariantState = {[pipetteId: string]: $Diff<PipetteEntity, {'spec': *}>}
 export const pipetteInvariantProperties = handleActions({
   LOAD_FILE: (state: PipetteInvariantState, action: LoadFileAction): PipetteInvariantState => {
-    const metadata = getPDMetadata(action.payload)
-    return mapValues(action.payload.pipettes, (filePipette: FilePipette, pipetteId: string): $Values<PipetteInvariantState> => {
+    const {file} = action.payload
+    const metadata = getPDMetadata(file)
+    return mapValues(file.pipettes, (filePipette: FilePipette, pipetteId: string): $Values<PipetteInvariantState> => {
       const tiprackModel = metadata.pipetteTiprackAssignments[pipetteId]
       assert(tiprackModel, `expected tiprackModel in file metadata for pipette ${pipetteId}`)
       return {
@@ -407,7 +408,7 @@ export const orderedStepIds = handleActions({
   DELETE_STEP: (state: OrderedStepIdsState, action: DeleteStepAction) =>
     state.filter(stepId => stepId !== action.payload),
   LOAD_FILE: (state: OrderedStepIdsState, action: LoadFileAction): OrderedStepIdsState =>
-    getPDMetadata(action.payload).orderedStepIds,
+    getPDMetadata(action.payload.file).orderedStepIds,
   REORDER_SELECTED_STEP: (state: OrderedStepIdsState, action: ReorderSelectedStepAction): OrderedStepIdsState => {
     // TODO: BC 2018-11-27 make util function for reordering and use it everywhere
     const {delta, stepId} = action.payload
@@ -449,7 +450,7 @@ export const legacySteps = handleActions({
   }),
   DELETE_STEP: (state, action: DeleteStepAction) => omit(state, action.payload.toString()),
   LOAD_FILE: (state: LegacyStepsState, action: LoadFileAction): LegacyStepsState => {
-    const {savedStepForms, orderedStepIds} = getPDMetadata(action.payload)
+    const {savedStepForms, orderedStepIds} = getPDMetadata(action.payload.file)
     return orderedStepIds.reduce((acc: LegacyStepsState, stepId) => {
       const stepForm = savedStepForms[stepId]
       if (!stepForm) {

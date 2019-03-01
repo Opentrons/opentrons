@@ -70,7 +70,7 @@ const dismissedWarnings = handleActions({
     }
   },
   LOAD_FILE: (state: DismissedWarningState, action: LoadFileAction): DismissedWarningState =>
-    getPDMetadata(action.payload).dismissedWarnings,
+    getPDMetadata(action.payload.file).dismissedWarnings,
 }, {form: {}, timeline: {}})
 
 export const _allReducers = {
