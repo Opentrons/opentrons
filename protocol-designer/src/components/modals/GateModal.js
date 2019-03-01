@@ -3,6 +3,7 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import cx from 'classnames'
 import queryString from 'query-string'
+import isEmpty from 'lodash/isEmpty'
 import { AlertModal } from '@opentrons/components'
 import i18n from '../../localization'
 import modalStyles from './modal.css'
@@ -31,9 +32,30 @@ function GateModal (props: Props) {
   const {hasOptedIn, optIn, optOut} = props
   let stage: GateStage = 'identify'
 
-  console.log(global.location)
-  const parsed = (queryString.parse(global.location))
-  console.log(parsed)
+  const parsedQueryStringParams = (queryString.parse(global.location.search))
+  const {token} = parsedQueryStringParams
+
+  const OPENTRONS_API_BASE_URL = 'https://staging.web-api.opentrons.com'
+  const VERIFY_EMAIL_ENDPOINT = '/users/verify-email'
+
+  if (token) {
+    fetch(
+      'https://staging.web-api.opentrons.com/users/verify-email',
+      {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYnJpYW4iLCJlbWFpbCI6ImJyaWFuQG9wZW50cm9ucy5jb20iLCJpYXQiOjE1NTE0NTgyMjgsImV4cCI6MTU1MTQ2MTgyOCwiaXNzIjoid2ViLWFwaS5vcGVudHJvbnMuY29tIn0.8t97irZcKIWuLt-sGE4z9XYLJnwi20m8uaaAuXWNDSA'
+        }),
+      }
+    ).then(res => res.json()).then(response => (
+      console.log('Success:', JSON.stringify(response))
+    )).catch(error => console.error('Error:', error))
+  }
 
   if (hasOptedIn !== null) return null
 
