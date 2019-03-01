@@ -1673,6 +1673,51 @@ class ThermocyclerContext(ModuleContext):
         """ Closes the lid"""
         return self._module.close()
 
+    @cmds.publish.both(command=cmds.thermocycler_set_temp)
+    def set_temperature(self,
+                        temp: float,
+                        hold_time: float = None,
+                        ramp_rate: float = None):
+        """ Set the target temperature, in C.
+
+        Valid operational range yet to be determined.
+        :param temp: The target temperature, in degrees C.
+        :param hold_time: The time to hold after reaching temperature. If
+                          ``hold_time`` is not specified, the Thermocycler will
+                          hold this temperature indefinitely (requiring manual
+                          intervention to end the cycle).
+        :param ramp_rate: The target rate of temperature change, in degC/sec.
+                          If ``ramp_rate`` is not specified, it will default to
+                          the maximum ramp rate as defined in the device
+                          configuration.
+        """
+        return self._module.set_temperature(
+            temp=temp, hold_time=hold_time, ramp_rate=ramp_rate)
+
+    def wait_for_temp(self):
+        """ Block until the module reaches its setpoint"""
+        self._loop.run_until_complete(self._module.wait_for_temp())
+
+    @property
+    def temperature(self):
+        """ Current temperature in degrees C"""
+        return self._module.temperature
+
+    @property
+    def target(self):
+        """ Target temperature in degrees C"""
+        return self._module.target
+
+    @property
+    def ramp_rate(self):
+        """ Current ramp rate in degrees C/sec"""
+        return self._module.ramp_rate
+
+    @property
+    def hold_time(self):
+        """ Remaining hold time in sec"""
+        return self._module.hold_time
+
     @cmds.publish.both(command=cmds.thermocycler_deactivate)
     def deactivate(self):
         return self._module.deactivate()

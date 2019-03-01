@@ -371,6 +371,13 @@ def thermocycler_open():
     )
 
 
+def thermocycler_set_temp():
+    text = "Setting thermocycler temperature"
+    return make_command(
+        name=command_types.THERMOCYCLER_SET_TEMP,
+        payload={'text': text})
+
+
 def thermocycler_close():
     text = "Closing thermocycler lid"
     return make_command(

@@ -22,13 +22,24 @@ GCODES = {
     'SET_LID_TEMP': 'M140',
     'DEACTIVATE_LID_HEATING': 'M108',
     'EDIT_PID_PARAMS': 'M301',
-    'SET_PLATE_TEMP': 'M104 S',
+    'SET_PLATE_TEMP': 'M104',
     'GET_PLATE_TEMP': 'M105',
     'SET_RAMP_RATE': 'M566',
-    'SET_HOLD_TIME': 'H',
     'PAUSE': '',
     'DEACTIVATE': 'M18'
 }
+
+
+def _build_temp_code(temp, hold_time=None):
+    if temp < 0:
+        temp = 0
+    if temp > 99:
+        temp = 99
+    cmd = '{} S{}'.format(GCODES['SET_PLATE_TEMP'], temp)
+    if hold_time:
+        cmd += ' H{}'.format(hold_time)
+    return cmd
+
 
 TC_BAUDRATE = 115200
 
@@ -240,6 +251,13 @@ class Thermocycler:
         self._write_and_wait(GCODES['CLOSE_LID'])
         self._lid_status = 'closed'
 
+    def set_temperature(self, temp, hold_time=None, ramp_rate=None):
+        if ramp_rate:
+            ramp_cmd = '{} S{}'.format(GCODES['SET_RAMP_RATE'], ramp_rate)
+            self._write_and_wait(ramp_cmd)
+        temp_cmd = _build_temp_code(temp, hold_time)
+        self._write_and_wait(temp_cmd)
+
     def _temp_status_update_callback(self, temperature_response):
         # Payload is shaped like `T:95.0 C:77.4 H:600` where T is the
         # target temperature, C is the current temperature, and H is the
@@ -251,7 +269,7 @@ class Thermocycler:
 
         self._current_temp = val_dict['C']
         self._target_temp = val_dict['T']
-        self._hold_time_remaining = val_dict['H']
+        self._hold_time = val_dict['H']
 
     def _interrupt_callback(self, interrupt_response):
         # TODO sanitize response and then call the callback

@@ -88,6 +88,44 @@ def test_thermocycler_lid(loop):
     assert mod.lid_status == 'open'
 
 
+def test_thermocycler_temp(loop):
+    ctx = papi.ProtocolContext(loop)
+    ctx._hw_manager.hardware._backend._attached_modules = [
+        ('mod0', 'thermocycler')]
+    mod = ctx.load_module('Thermocycler', 1)
+
+    assert mod.target is None
+
+    # Test default ramp rate
+    mod.set_temperature(20, hold_time=5.0)
+    assert 'setting thermocycler temperature' in ','.join(
+        [cmd.lower() for cmd in ctx.commands()])
+    mod.wait_for_temp()
+    assert mod.target == 20
+    assert mod.temperature == 20
+    assert mod.hold_time is not None
+    assert mod.ramp_rate is None
+
+    # Test specified ramp rate
+    mod.set_temperature(41.3, hold_time=25.5, ramp_rate=2.0)
+    assert 'setting thermocycler temperature' in ','.join(
+        [cmd.lower() for cmd in ctx.commands()])
+    mod.wait_for_temp()
+    assert mod.target == 41.3
+    assert mod.temperature == 41.3
+    assert mod.ramp_rate == 2.0
+
+    # Test infinite hold
+    mod.set_temperature(13.2)
+    assert 'setting thermocycler temperature' in ','.join(
+        [cmd.lower() for cmd in ctx.commands()])
+    mod.wait_for_temp()
+    assert mod.target == 13.2
+    assert mod.temperature == 13.2
+    assert mod.hold_time == 0
+    assert mod.ramp_rate is None
+
+
 def test_module_load_labware(loop):
     ctx = papi.ProtocolContext(loop)
     labware_name = 'generic_96_wellPlate_380_uL'
