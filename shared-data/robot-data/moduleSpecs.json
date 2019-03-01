@@ -35,7 +35,25 @@
         "loadName": "tempdeck",
         "quirks": []
     },
-    "thermocycler": {
+    "fullThermocycler": {
+        "labwareOffset": {
+            "x": -0.5,
+            "y": -8.81,
+            "z": 103.44
+        },
+        "dimensions": {
+            "bareOverallHeight": 108.5,
+            "overLabwareHeight": 0
+        },
+        "calibrationPoint": {
+            "x": 0.0,
+            "y": 0.0
+        },
+        "displayName": "Thermocycler Module",
+        "loadName": "thermocycler",
+        "quirks": []
+    },
+    "halfThermocycler": {
         "labwareOffset": {
             "x": -0.5,
             "y": -8.81,
