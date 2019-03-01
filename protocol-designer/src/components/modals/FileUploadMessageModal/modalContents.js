@@ -32,8 +32,8 @@ const didMigrateModal: ModalContents = {
   body: <React.Fragment>
     <p>Your protocol will be automatically updated to the latest version.
       Please note that the updated file will be incompatible with older versions
-      of the Protocol Designer. We recommend saving a separate copy of your current
-      protocol before continuing.</p>
+      of the Protocol Designer. We recommend making a separate copy of the file that
+      you just imported before continuing.</p>
     <p>Updating the file may make changes to liquid handling actions. Please review your file in the Protocol Designer as well as with a water run on the robot.</p>
     <p>As always, please contact us with any questions or feedback.</p>
   </React.Fragment>,
