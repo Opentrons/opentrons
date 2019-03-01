@@ -2,6 +2,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import cx from 'classnames'
+import queryString from 'query-string'
 import { AlertModal } from '@opentrons/components'
 import i18n from '../../localization'
 import modalStyles from './modal.css'
@@ -30,7 +31,9 @@ function GateModal (props: Props) {
   const {hasOptedIn, optIn, optOut} = props
   let stage: GateStage = 'identify'
 
-  global.alert(global.location)
+  console.log(global.location)
+  const parsed = (queryString.parse(global.location))
+  console.log(parsed)
 
   if (hasOptedIn !== null) return null
 
