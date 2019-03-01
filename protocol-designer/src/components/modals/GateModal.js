@@ -12,6 +12,8 @@ import {
 } from '../../analytics'
 import type {BaseState} from '../../types'
 
+type GateStage = 'identify' | 'analytics'
+
 type Props = {
   hasOptedIn: boolean | null,
   optIn: () => mixed,
@@ -24,22 +26,27 @@ type SP = {
 
 type DP = $Diff<Props, SP>
 
-function AnalyticsModal (props: Props) {
+function GateModal (props: Props) {
   const {hasOptedIn, optIn, optOut} = props
+  let stage: GateStage = 'identify'
+
+  global.alert(global.location)
+
   if (hasOptedIn !== null) return null
+
+  const getButtons = () => {
+    if (stage === 'analytics') {
+      return [
+        {onClick: optOut, children: i18n.t('button.no')},
+        {onClick: optIn, children: i18n.t('button.yes')},
+      ]
+    }
+  }
+
   return (
     <AlertModal
-      className={cx(modalStyles.modal)}
-      buttons={[
-        {
-          onClick: optOut,
-          children: i18n.t('button.no'),
-        },
-        {
-          onClick: optIn,
-          children: i18n.t('button.yes'),
-        },
-      ]}>
+      className={cx(modalStyles.modal, modalStyles.blocking)}
+      buttons={getButtons()} >
       <h3>{i18n.t('card.toggle.share_session')}</h3>
       <div className={settingsStyles.body_wrapper}>
         <p className={settingsStyles.card_body}>{i18n.t('card.body.reason_for_collecting_data')}</p>
@@ -64,4 +71,4 @@ function mapDispatchToProps (dispatch: Dispatch<*>): DP {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AnalyticsModal)
+export default connect(mapStateToProps, mapDispatchToProps)(GateModal)
