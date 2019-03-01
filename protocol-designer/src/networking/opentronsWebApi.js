@@ -2,7 +2,7 @@
 
 import queryString from 'query-string'
 
-export type GateStage = 'loading' | 'identify' | 'failedVerification' | 'analytics'
+export type GateStage = 'loading' | 'identify' | 'checkEmail' | 'failedVerification' | 'analytics'
 
 const OPENTRONS_API_BASE_URL = 'https://staging.web-api.opentrons.com'
 const VERIFY_EMAIL_PATH = '/users/verify-email'
@@ -24,8 +24,10 @@ export const getGateStage = (): Promise<GateStage> => {
         return 'failedVerification'
       }
     }).catch(error => {
-      console.error('Error:', error)
-      return 'identify'
+      console.log('Error:', error)
+      return 'failedVerification'
     }))
+  } else {
+    return Promise.resolve('identify')
   }
 }
