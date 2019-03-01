@@ -1,3 +1,4 @@
+import asyncio
 from . import mod_abc
 from opentrons.drivers.thermocycler.driver import (
     Thermocycler as ThermocyclerDriver, ThermocyclerError)
@@ -7,6 +8,7 @@ class SimulatingDriver:
     def __init__(self):
         self._target_temp = None
         self._ramp_rate = None
+        self._hold_time = None
         self._active = False
         self._port = None
         self._lid_status = 'open'
@@ -28,15 +30,39 @@ class SimulatingDriver:
     def lid_status(self):
         return self._lid_status
 
+    @property
+    def ramp_rate(self):
+        return self._ramp_rate
+
+    @property
+    def hold_time(self):
+        # Simulating driver acts as if cycles end immediately
+        return 0
+
+    @property
+    def temperature(self):
+        return self._target_temp
+
+    @property
+    def target(self):
+        return self._target_temp
+
     def connect(self, port):
         self._port = port
 
     def disconnect(self):
         self._port = None
 
+    def set_temperature(self, temp, hold_time, ramp_rate):
+        self._target_temp = temp
+        self._hold_time = hold_time
+        self._ramp_rate = ramp_rate
+        self._active = True
+
     def deactivate(self):
         self._target_temp = None
         self._ramp_rate = None
+        self._hold_time = None
         self._active = None
 
     def get_device_info(self):
@@ -87,9 +113,39 @@ class Thermocycler(mod_abc.AbstractModule):
         """ Close the lid if it is open"""
         self._driver.close()
 
+    def set_temperature(self, temp, hold_time=None, ramp_rate=None):
+        self._driver.set_temperature(
+            temp=temp, hold_time=hold_time, ramp_rate=ramp_rate)
+
+    async def wait_for_temp(self):
+        """
+        This method only exists if set temperature has been reached.
+
+        Subject to change without a version bump.
+        """
+        while self.status != 'holding at target':
+            await asyncio.sleep(0.1)
+
     @property
     def lid_status(self):
         return self._driver.lid_status
+
+    @property
+    def ramp_rate(self):
+        return self._driver.ramp_rate
+
+    @property
+    def hold_time(self):
+        # Simulating driver acts as if cycles end immediately
+        return 0
+
+    @property
+    def temperature(self):
+        return self._driver.temperature
+
+    @property
+    def target(self):
+        return self._driver.target
 
     @property
     def status(self):
@@ -104,7 +160,11 @@ class Thermocycler(mod_abc.AbstractModule):
         return {
             'status': self.status,
             'data': {
-                'lid': self._driver.lid_status
+                'lid': self._driver.lid_status,
+                'currentTemp': self.temperature,
+                'targetTemp': self.target,
+                'holdTime': self.hold_time,
+                'rampRate': self.ramp_rate
             }
         }
 
