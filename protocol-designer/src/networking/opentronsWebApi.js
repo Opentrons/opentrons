@@ -1,14 +1,32 @@
 // @flow
 
+import cookie from 'cookie'
 import queryString from 'query-string'
 
-export type GateStage = 'loading' | 'identify' | 'checkEmail' | 'failedVerification' | 'analytics'
+export type GateStage = 'loading' |
+  'promptVerifyIdentity' |
+  'promptCheckEmail' |
+  'failedIdentityVerification' |
+  'promptOptForAnalytics' |
+  'openGate'
 
 const OPENTRONS_API_BASE_URL = 'https://staging.web-api.opentrons.com'
 const VERIFY_EMAIL_PATH = '/users/verify-email'
 const headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
 
-export const getGateStage = (): Promise<GateStage> => {
+const writeIdentityCookie = (payload) => {
+  global.document.cookie = cookie.serialize('name', payload.name)
+  global.document.cookie = cookie.serialize('email', payload.email)
+}
+
+const getHasIdentityCookie = () => {
+  const cookies = cookie.parse(global.document.cookie)
+  console.log('found biscuits: ', cookies)
+  const {email, name} = cookies
+  return Boolean(email && name)
+}
+
+export const getGateStage = (hasOptedIntoAnalytics: boolean): Promise<GateStage> => {
   const parsedQueryStringParams = (queryString.parse(global.location.search))
   const {token} = parsedQueryStringParams
 
@@ -18,16 +36,23 @@ export const getGateStage = (): Promise<GateStage> => {
       {method: 'POST', headers, body: JSON.stringify({token})},
     ).then(response => response.json().then(body => {
       if (response.ok) {
-        console.log('Success:', JSON.stringify(body))
-        return 'analytics'
+        writeIdentityCookie(body)
+        if (getHasIdentityCookie()) {
+          return hasOptedIntoAnalytics ? 'openGate' : 'promptOptForAnalytics'
+        } else {
+          console.info('failed to find identity cookie')
+          return 'failedIdentityVerification'
+        }
       } else {
-        return 'failedVerification'
+        getHasIdentityCookie()
+        return 'failedIdentityVerification'
       }
     }).catch(error => {
-      console.log('Error:', error)
-      return 'failedVerification'
+      getHasIdentityCookie()
+      return 'failedIdentityVerification'
     }))
   } else {
-    return Promise.resolve('identify')
+    const hasCookie = getHasIdentityCookie()
+    return hasCookie ? Promise.resolve('promptOptForAnalytics') : Promise.resolve('promptVerifyIdentity')
   }
 }

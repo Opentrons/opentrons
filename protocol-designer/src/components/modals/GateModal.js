@@ -27,24 +27,31 @@ type DP = $Diff<Props, SP>
 
 type State = {gateStage: GateStage}
 class GateModal extends React.Component<Props, State> {
-  constructor () {
+  constructor (props) {
     super()
     this.state = {gateStage: 'loading'}
 
-    opentronsWebApi.getGateStage().then(gateStage => {
+    opentronsWebApi.getGateStage(props.hasOptedIn).then(gateStage => {
       console.log('async state is: ', gateStage)
       this.setState({gateStage})
     })
   }
 
+  static getDerivedStateFromProps (nextProps: Props, prevState: State) {
+    if (nextProps.hasOptedIn !== null && prevState.gateStage === 'promptOptForAnalytics') {
+      return ({gateStage: 'openGate'})
+    } else {
+      return prevState
+    }
+  }
+
   render () {
-    const {hasOptedIn, optIn, optOut} = this.props
+    const {optIn, optOut} = this.props
 
     console.log('RENDERED STAGE IS: ', this.state.gateStage)
-    if (hasOptedIn !== null) return null
 
     switch (this.state.gateStage) {
-      case 'identify':
+      case 'promptVerifyIdentity':
         return (
           <AlertModal className={cx(modalStyles.modal, modalStyles.blocking)}>
             <h3>Sign Up For Opentrons Protocol Designer Beta</h3>
@@ -56,7 +63,7 @@ class GateModal extends React.Component<Props, State> {
             </div>
           </AlertModal>
         )
-      case 'analytics':
+      case 'promptOptForAnalytics':
         return (
           <AlertModal
             className={cx(modalStyles.modal, modalStyles.blocking)}
@@ -75,7 +82,7 @@ class GateModal extends React.Component<Props, State> {
             </div>
           </AlertModal>
         )
-      case 'failedVerification':
+      case 'failedIdentityVerification':
         return (
           <AlertModal className={cx(modalStyles.modal, modalStyles.blocking)}>
             <h3>FAILED VERIFICATION</h3>
@@ -88,6 +95,8 @@ class GateModal extends React.Component<Props, State> {
             </div>
           </AlertModal>
         )
+      case 'openGate':
+        return null
       case 'loading':
       default:
         return (
