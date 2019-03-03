@@ -5,13 +5,14 @@ import cx from 'classnames'
 import {AlertModal, Icon} from '@opentrons/components'
 import {opentronsWebApi, type GateStage} from '../../../networking'
 import i18n from '../../../localization'
-import modalStyles from './modal.css'
-import settingsStyles from '../SettingsPage/SettingsPage.css'
 import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
 } from '../../../analytics'
 import type {BaseState} from '../../../types'
+import settingsStyles from '../../SettingsPage/SettingsPage.css'
+import modalStyles from '../modal.css'
+import SignUpForm from './SignUpForm'
 
 type Props = {
   hasOptedIn: boolean | null,
@@ -57,9 +58,7 @@ class GateModal extends React.Component<Props, State> {
             <h3>Sign Up For Opentrons Protocol Designer Beta</h3>
             <div className={settingsStyles.body_wrapper}>
               <p className={settingsStyles.card_body}>{i18n.t('modal.gate.sign_up_below')}</p>
-              <div>
-                TODO: IMMEDIATELY: put typeform here
-              </div>
+              <SignUpForm />
             </div>
           </AlertModal>
         )
@@ -90,9 +89,7 @@ class GateModal extends React.Component<Props, State> {
               <p className={settingsStyles.card_body}>
                 {this.state.errorMessage}
               </p>
-              <div>
-                TODO: IMMEDIATELY: put typeform here
-              </div>
+              <SignUpForm />
             </div>
           </AlertModal>
         )
