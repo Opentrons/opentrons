@@ -54,5 +54,9 @@
         "next_pipette_smaller": "Number of tips used may increase"
       }
     }
+  },
+  "gate": {
+    "sign_up_below": "Sign Up For Opentrons Protocol Designer Beta",
+    "failed_verification": "Something Went Wrong"
   }
 }

@@ -55,9 +55,8 @@ class GateModal extends React.Component<Props, State> {
       case 'promptVerifyIdentity':
         return (
           <AlertModal className={cx(modalStyles.modal, modalStyles.blocking)}>
-            <h3>Sign Up For Opentrons Protocol Designer Beta</h3>
+            <h3>{i18n.t('modal.gate.sign_up_below')}</h3>
             <div className={settingsStyles.body_wrapper}>
-              <p className={settingsStyles.card_body}>{i18n.t('modal.gate.sign_up_below')}</p>
               <SignUpForm />
             </div>
           </AlertModal>
@@ -84,7 +83,7 @@ class GateModal extends React.Component<Props, State> {
       case 'failedIdentityVerification':
         return (
           <AlertModal className={cx(modalStyles.modal, modalStyles.blocking)}>
-            <h3>FAILED VERIFICATION</h3>
+            <h3>{i18n.t('modal.gate.failed_verification')}</h3>
             <div className={settingsStyles.body_wrapper}>
               <p className={settingsStyles.card_body}>
                 {this.state.errorMessage}

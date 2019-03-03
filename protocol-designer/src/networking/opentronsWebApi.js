@@ -30,7 +30,7 @@ const getStageFromIdentityCookie = (token: ?string, hasOptedIntoAnalytics: boole
   if (hasIdentityCookie) {
     return hasOptedIntoAnalytics ? 'openGate' : 'promptOptForAnalytics'
   } else {
-    return token ? 'promptVerifyIdentity' : 'failedIdentityVerification'
+    return token ? 'failedIdentityVerification' : 'promptVerifyIdentity'
   }
 }
 
