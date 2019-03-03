@@ -3,15 +3,15 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import cx from 'classnames'
 import {AlertModal, Icon} from '@opentrons/components'
-import {opentronsWebApi, type GateStage} from '../../networking'
-import i18n from '../../localization'
+import {opentronsWebApi, type GateStage} from '../../../networking'
+import i18n from '../../../localization'
 import modalStyles from './modal.css'
 import settingsStyles from '../SettingsPage/SettingsPage.css'
 import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
-} from '../../analytics'
-import type {BaseState} from '../../types'
+} from '../../../analytics'
+import type {BaseState} from '../../../types'
 
 type Props = {
   hasOptedIn: boolean | null,
@@ -27,22 +27,6 @@ type DP = $Diff<Props, SP>
 
 type State = {gateStage: GateStage, errorMessage: ?string}
 
-// not a real Error or Response so it can be copied across worker boundries
-function ResponseError (
-  response: Response,
-  body: ?{message: ?string}
-): ApiRequestError {
-  const {status, statusText, url} = response
-  const message = (body && body.message) || `${status} ${statusText}`
-
-  return {
-    name: 'ResponseError',
-    message,
-    status,
-    statusText,
-    url,
-  }
-}
 class GateModal extends React.Component<Props, State> {
   constructor (props) {
     super()

@@ -2,7 +2,6 @@
 
 import cookie from 'cookie'
 import queryString from 'query-string'
-import isEmpty from 'lodash/isEmpty'
 import i18n from '../localization'
 
 export type GateStage = 'loading' |
