@@ -25,15 +25,31 @@ type SP = {
 
 type DP = $Diff<Props, SP>
 
-type State = {gateStage: GateStage}
+type State = {gateStage: GateStage, errorMessage: ?string}
+
+// not a real Error or Response so it can be copied across worker boundries
+function ResponseError (
+  response: Response,
+  body: ?{message: ?string}
+): ApiRequestError {
+  const {status, statusText, url} = response
+  const message = (body && body.message) || `${status} ${statusText}`
+
+  return {
+    name: 'ResponseError',
+    message,
+    status,
+    statusText,
+    url,
+  }
+}
 class GateModal extends React.Component<Props, State> {
   constructor (props) {
     super()
-    this.state = {gateStage: 'loading'}
+    this.state = {gateStage: 'loading', errorMessage: ''}
 
-    opentronsWebApi.getGateStage(props.hasOptedIn).then(gateStage => {
-      console.log('async state is: ', gateStage)
-      this.setState({gateStage})
+    opentronsWebApi.getGateStage(props.hasOptedIn).then(({gateStage, errorMessage}) => {
+      this.setState({gateStage, errorMessage})
     })
   }
 
@@ -87,8 +103,9 @@ class GateModal extends React.Component<Props, State> {
           <AlertModal className={cx(modalStyles.modal, modalStyles.blocking)}>
             <h3>FAILED VERIFICATION</h3>
             <div className={settingsStyles.body_wrapper}>
-              <p className={settingsStyles.card_body}>{i18n.t('modal.gate.verification_failed')}</p>
-              <p>{i18n.t('modal.gate.expired_token')}</p>
+              <p className={settingsStyles.card_body}>
+                {this.state.errorMessage}
+              </p>
               <div>
                 TODO: IMMEDIATELY: put typeform here
               </div>
