@@ -44,7 +44,7 @@ def simulate(protocol_file):
         if isinstance(proto, dict):
             opentrons.protocols.execute_protocol(proto)
         else:
-            exec(proto)
+            exec(proto, {})
 
 
 # Note - this script is also set up as a setuptools entrypoint and thus does
