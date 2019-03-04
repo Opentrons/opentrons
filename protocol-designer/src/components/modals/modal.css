@@ -21,6 +21,18 @@
   margin-bottom: 3rem;
 }
 
+.success_icon {
+  width: 5rem;
+  height: 5rem;
+  margin: 2rem;
+}
+
+.centered_icon_wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .sign_up_form_wrapper {
   width: 100%;
   height: 20rem;

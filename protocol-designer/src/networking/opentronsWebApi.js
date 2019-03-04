@@ -82,6 +82,7 @@ export const getGateStage = (hasOptedIntoAnalytics: boolean): Promise<GateState>
       if (response.ok) { // valid identity token
         gateStage = 'promptCheckEmail'
       } else {
+        console.log('Failed to confirm identity and send user email.')
         errorMessage = i18n.t('application.networking.generic_verification_failure')
         gateStage = 'failedIdentityVerification'
       }

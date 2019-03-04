@@ -57,6 +57,8 @@
   },
   "gate": {
     "sign_up_below": "Sign Up For Opentrons Protocol Designer Beta",
-    "failed_verification": "Something Went Wrong"
+    "failed_verification": "Something Went Wrong",
+    "sign_up_success": "Success, Check Your Email!",
+    "check_email": "We have received your information and sent you an email. Please open it and verify your email to continue."
   }
 }

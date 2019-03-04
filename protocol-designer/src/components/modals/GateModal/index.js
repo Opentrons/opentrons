@@ -92,6 +92,20 @@ class GateModal extends React.Component<Props, State> {
             </div>
           </AlertModal>
         )
+      case 'promptCheckEmail':
+        return (
+          <AlertModal className={cx(modalStyles.modal, modalStyles.blocking)}>
+            <h3>{i18n.t('modal.gate.sign_up_success')}</h3>
+            <div className={modalStyles.centered_icon_wrapper}>
+              <Icon name="check" className={modalStyles.success_icon}/>
+            </div>
+            <div className={settingsStyles.body_wrapper}>
+              <p className={settingsStyles.card_body}>
+                {i18n.t('modal.gate.check_email')}
+              </p>
+            </div>
+          </AlertModal>
+        )
       case 'openGate':
         return null
       case 'loading':
@@ -99,7 +113,9 @@ class GateModal extends React.Component<Props, State> {
         return (
           <AlertModal className={cx(modalStyles.modal, modalStyles.blocking)}>
             <div className={settingsStyles.body_wrapper}>
-              <Icon name="ot-spinner" className={modalStyles.spinner_modal_icon} spin />
+              <div className={modalStyles.centered_icon_wrapper}>
+                <Icon name="ot-spinner" className={modalStyles.spinner_modal_icon} spin />
+              </div>
             </div>
           </AlertModal>
         )
