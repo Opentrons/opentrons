@@ -77,7 +77,7 @@ export const getGateStage = (hasOptedIntoAnalytics: boolean): Promise<GateState>
     }
     return fetch(
       `${OPENTRONS_API_BASE_URL}${CONFIRM_EMAIL_PATH}`,
-      {method: 'POST', headers, body: JSON.stringify({confirmEmailBody})},
+      {method: 'POST', headers, body: JSON.stringify({...confirmEmailBody})},
     ).then(response => response.json().then(body => {
       if (response.ok) { // valid identity token
         gateStage = 'promptCheckEmail'
