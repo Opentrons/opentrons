@@ -15,7 +15,7 @@ import {chainActions} from '../../util'
 
 import InstrumentInfo from './InstrumentInfo'
 import {CardContentFlex} from '../layout'
-import {RefreshCard} from '@opentrons/components'
+import {Card, IntervalWrapper} from '@opentrons/components'
 
 import type {State} from '../../types'
 import type {Robot} from '../../discovery'
@@ -50,31 +50,28 @@ export default connect(
 
 function AttachedPipettesCard (props: Props) {
   return (
-    <RefreshCard
-      title={TITLE}
-      watch={props.name}
-      refresh={props.fetchPipettes}
-      refreshing={props.inProgress}
-    >
-      <CardContentFlex>
-        <InstrumentInfo
-          mount="left"
-          name={props.name}
-          {...props.left}
-          onChangeClick={props.clearMove}
-          showSettings={props.showSettings}
-          __enableConfig={props.__featureEnabled}
-        />
-        <InstrumentInfo
-          mount="right"
-          name={props.name}
-          {...props.right}
-          onChangeClick={props.clearMove}
-          showSettings={props.showSettings}
-          __enableConfig={props.__featureEnabled}
-        />
-      </CardContentFlex>
-    </RefreshCard>
+    <IntervalWrapper interval={5000} refresh={props.fetchPipettes}>
+      <Card title={TITLE}>
+        <CardContentFlex>
+          <InstrumentInfo
+            mount="left"
+            name={props.name}
+            {...props.left}
+            onChangeClick={props.clearMove}
+            showSettings={props.showSettings}
+            __enableConfig={props.__featureEnabled}
+          />
+          <InstrumentInfo
+            mount="right"
+            name={props.name}
+            {...props.right}
+            onChangeClick={props.clearMove}
+            showSettings={props.showSettings}
+            __enableConfig={props.__featureEnabled}
+          />
+        </CardContentFlex>
+      </Card>
+    </IntervalWrapper>
   )
 }
 

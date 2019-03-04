@@ -24,7 +24,7 @@ export type Setting = {
   value: Value,
 }
 
-export type Field = {
+export type PipetteSettingsField = {
   value: ?number,
   default: number,
   min?: number,
@@ -33,7 +33,7 @@ export type Field = {
   type?: string,
 }
 
-export type PipetteConfigFields = {[string]: Field}
+export type PipetteConfigFields = {[string]: PipetteSettingsField}
 
 export type PipetteConfigResponse = {
   info: {
