@@ -85,7 +85,7 @@ You must make sure that you install the `opentrons` package for whichever kernel
 .. code-block:: python
 
    import sys
-   !{sys.executable} -m pip install numpy
+   !{sys.executable} -m pip install opentrons
 
 
 Simulating
