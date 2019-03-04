@@ -6,7 +6,11 @@ import {Formik} from 'formik'
 import startCase from 'lodash/startCase'
 import mapValues from 'lodash/mapValues'
 
-import {makeGetRobotPipetteConfigs} from '../../http-api-client'
+import {
+  makeGetRobotPipetteConfigs,
+  fetchPipetteConfigs,
+} from '../../http-api-client'
+import {IntervalWrapper} from '@opentrons/components'
 import {BottomButtonBar} from '../modals'
 import ConfigFormGroup, {FormColumn} from './ConfigFormGroup'
 
@@ -34,7 +38,11 @@ type SP = {
   pipetteConfig: ?PipetteConfigResponse,
 }
 
-type Props = SP & OP
+type DP = {
+  fetchPipetteConfigs: () => mixed,
+}
+
+type Props = SP & OP & DP
 
 const PLUNGER_KEYS = ['top', 'bottom', 'blowout', 'dropTip']
 const POWER_KEYS = ['plungerCurrent', 'pickUpCurrent', 'dropTipCurrent']
@@ -58,7 +66,7 @@ class ConfigForm extends React.Component<Props> {
   }
 
   render () {
-    const {pipetteConfig, parentUrl} = this.props
+    const {pipetteConfig, parentUrl, fetchPipetteConfigs} = this.props
 
     if (!pipetteConfig) {
       return null
@@ -70,48 +78,51 @@ class ConfigForm extends React.Component<Props> {
       const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
       const powerFields = this.getFieldsByKey(POWER_KEYS, fields)
       const tipFields = this.getFieldsByKey(TIP_KEYS, fields)
-      return (
-        <Formik
-          initialValues={initialValues}
-          render={formProps => {
-            const {values, handleChange} = formProps
-            return (
-              <form>
-                <FormColumn>
-                  <ConfigFormGroup
-                    groupLabel="Plunger Positions"
-                    values={values}
-                    formFields={plungerFields}
-                    onChange={handleChange}
-                    error={null}
-                  />
 
-                  <ConfigFormGroup
-                    groupLabel="Power / Force"
-                    values={values}
-                    formFields={powerFields}
-                    onChange={handleChange}
-                    error={null}
+      return (
+        <IntervalWrapper interval={5000} refresh={fetchPipetteConfigs}>
+          <Formik
+            initialValues={initialValues}
+            render={formProps => {
+              const {values, handleChange} = formProps
+              return (
+                <form>
+                  <FormColumn>
+                    <ConfigFormGroup
+                      groupLabel="Plunger Positions"
+                      values={values}
+                      formFields={plungerFields}
+                      onChange={handleChange}
+                      error={null}
+                    />
+
+                    <ConfigFormGroup
+                      groupLabel="Power / Force"
+                      values={values}
+                      formFields={powerFields}
+                      onChange={handleChange}
+                      error={null}
+                    />
+                  </FormColumn>
+                  <FormColumn>
+                    <ConfigFormGroup
+                      groupLabel="Tip Pickup / Drop "
+                      values={values}
+                      formFields={tipFields}
+                      onChange={handleChange}
+                      error={null}
+                    />
+                  </FormColumn>
+                  <BottomButtonBar
+                    buttons={[
+                      {children: 'cancel', Component: Link, to: parentUrl},
+                    ]}
                   />
-                </FormColumn>
-                <FormColumn>
-                  <ConfigFormGroup
-                    groupLabel="Tip Pickup / Drop "
-                    values={values}
-                    formFields={tipFields}
-                    onChange={handleChange}
-                    error={null}
-                  />
-                </FormColumn>
-                <BottomButtonBar
-                  buttons={[
-                    {children: 'cancel', Component: Link, to: parentUrl},
-                  ]}
-                />
-              </form>
-            )
-          }}
-        />
+                </form>
+              )
+            }}
+          />
+        </IntervalWrapper>
       )
     }
   }
@@ -119,7 +130,7 @@ class ConfigForm extends React.Component<Props> {
 
 export default connect(
   makeMapStateToProps,
-  null
+  mapDispatchToProps
 )(ConfigForm)
 
 function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
@@ -136,5 +147,11 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
     return {
       pipetteConfig: pipetteConfig,
     }
+  }
+}
+
+function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
+  return {
+    fetchPipetteConfigs: () => dispatch(fetchPipetteConfigs(ownProps.robot)),
   }
 }
