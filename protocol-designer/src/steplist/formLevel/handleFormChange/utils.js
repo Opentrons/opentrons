@@ -2,12 +2,13 @@
 import assert from 'assert'
 import round from 'lodash/round'
 import uniq from 'lodash/uniq'
+import {canPipetteUseLabware, getLabware} from '@opentrons/shared-data'
 import {getPipetteCapacity} from '../../../pipettes/pipetteData'
 import {getWellSetForMultichannel} from '../../../well-selection/utils'
 import type {PipetteChannels} from '@opentrons/shared-data'
 import type {FormPatch} from '../../actions/types'
 import type {FormData} from '../../../form-types'
-import type {PipetteEntities} from '../../../step-forms'
+import type {LabwareEntities, PipetteEntities} from '../../../step-forms'
 
 export function chainPatchUpdaters (initialPatch: FormPatch, fns: Array<(FormPatch => FormPatch)>): FormPatch {
   return fns.reduce((patchAcc: FormPatch, fn) => {
@@ -77,4 +78,39 @@ export function volumeInCapacityForMulti (
     pipetteCapacity > 0 &&
     volume * 2 <= pipetteCapacity
   )
+}
+
+// TODO IMMEDIATELY: use in Mix form
+type GetDefaultWellsArgs = {
+  labwareId: ?string,
+  pipetteId: ?string,
+  labwareEntities: LabwareEntities,
+  pipetteEntities: PipetteEntities,
+}
+export function getDefaultWells (args: GetDefaultWellsArgs): Array<string> {
+  const {labwareId, pipetteId, labwareEntities, pipetteEntities} = args
+  if (
+    !labwareId || !labwareEntities[labwareId] ||
+    !pipetteId || !pipetteEntities[pipetteId]
+  ) return []
+
+  const labwareType = labwareEntities[labwareId].type
+  const pipetteCanUseLabware = canPipetteUseLabware(
+    pipetteEntities[pipetteId].name, labwareType)
+  if (!pipetteCanUseLabware) return []
+
+  const labwareSpec = getLabware(labwareType)
+  assert(labwareSpec, `expected labwareSpec at this point in _getDefaultWells. labware id: ${labwareId}`)
+
+  const isSingleWellLabware = labwareSpec &&
+    labwareSpec.ordering.length === 1 &&
+    labwareSpec.ordering[0].length === 1
+
+  if (labwareSpec && isSingleWellLabware) {
+    const well = labwareSpec.ordering[0][0]
+    assert(well === 'A1', `sanity check: expected single-well labware ${labwareId} to have only the well 'A1'`)
+    return [well]
+  }
+
+  return []
 }
