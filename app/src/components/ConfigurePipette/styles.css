@@ -43,3 +43,16 @@
 .form_label {
   @apply --font-body-1-dark;
 }
+
+.form_button {
+  min-width: 7rem;
+
+  &:first-child {
+    float: left;
+    min-width: 8rem;
+  }
+}
+
+.reset_message {
+  @apply --font-body-1-dark;
+}

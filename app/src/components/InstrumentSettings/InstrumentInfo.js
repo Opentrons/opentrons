@@ -17,6 +17,7 @@ type Props = {
   model: ?string,
   name: string,
   onChangeClick: () => mixed,
+  showSettings: boolean,
   __enableConfig: boolean,
 }
 
@@ -29,17 +30,17 @@ const LABEL_BY_MOUNT = {
 }
 
 export default function PipetteInfo (props: Props) {
-  const {mount, model, name, onChangeClick} = props
+  const {mount, model, name, onChangeClick, showSettings} = props
   const label = LABEL_BY_MOUNT[mount]
   const channelsMatch = model && model.match(RE_CHANNELS)
   const channels = channelsMatch && channelsMatch[1]
-  const direction = props.model ? 'change' : 'attach'
+  const direction = model ? 'change' : 'attach'
 
   const changeUrl = `/robots/${name}/instruments/pipettes/change/${mount}`
   const configUrl = `/robots/${name}/instruments/pipettes/config/${mount}`
 
   const className = cx(styles.pipette_card, {
-    [styles.right]: props.mount === 'right',
+    [styles.right]: mount === 'right',
   })
 
   return (
@@ -53,7 +54,7 @@ export default function PipetteInfo (props: Props) {
         <OutlineButton Component={Link} to={changeUrl} onClick={onChangeClick}>
           {direction}
         </OutlineButton>
-        {props.__enableConfig && model && (
+        {props.__enableConfig && model && showSettings && (
           <OutlineButton Component={Link} to={configUrl}>
             settings
           </OutlineButton>

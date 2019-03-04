@@ -3,7 +3,13 @@ import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
 import client from '../client'
-import {fetchSettings, setSettings, makeGetRobotSettings} from '..'
+import {
+  fetchSettings,
+  setSettings,
+  makeGetRobotSettings,
+  fetchPipetteConfigs,
+  makeGetRobotPipetteConfigs,
+} from '..'
 
 jest.mock('../client')
 
@@ -34,9 +40,11 @@ describe('/settings', () => {
     test('calls GET /settings', () => {
       client.__setMockResponse(response)
 
-      return store.dispatch(fetchSettings(robot))
+      return store
+        .dispatch(fetchSettings(robot))
         .then(() =>
-          expect(client).toHaveBeenCalledWith(robot, 'GET', 'settings', null))
+          expect(client).toHaveBeenCalledWith(robot, 'GET', 'settings', null)
+        )
     })
 
     test('dispatches api:REQUEST and api:SUCCESS', () => {
@@ -48,7 +56,8 @@ describe('/settings', () => {
 
       client.__setMockResponse(response)
 
-      return store.dispatch(fetchSettings(robot))
+      return store
+        .dispatch(fetchSettings(robot))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
 
@@ -62,7 +71,8 @@ describe('/settings', () => {
 
       client.__setMockError(error)
 
-      return store.dispatch(fetchSettings(robot))
+      return store
+        .dispatch(fetchSettings(robot))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
   })
@@ -78,9 +88,16 @@ describe('/settings', () => {
 
       client.__setMockResponse(response)
 
-      return store.dispatch(setSettings(robot, request))
+      return store
+        .dispatch(setSettings(robot, request))
         .then(() =>
-          expect(client).toHaveBeenCalledWith(robot, 'POST', 'settings', request))
+          expect(client).toHaveBeenCalledWith(
+            robot,
+            'POST',
+            'settings',
+            request
+          )
+        )
     })
 
     test('dispatches api:REQUEST and api:SUCCESS', () => {
@@ -92,7 +109,8 @@ describe('/settings', () => {
 
       client.__setMockResponse(response)
 
-      return store.dispatch(setSettings(robot, request))
+      return store
+        .dispatch(setSettings(robot, request))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
 
@@ -106,7 +124,74 @@ describe('/settings', () => {
 
       client.__setMockError(error)
 
-      return store.dispatch(setSettings(robot, request))
+      return store
+        .dispatch(setSettings(robot, request))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+  })
+
+  describe('fetchPipetteConfig action creator', () => {
+    const path = 'settings/pipettes'
+    const response = {
+      P300S20180206A02: {
+        info: {
+          name: 'p300_single',
+          model: 'p300_single_v1',
+        },
+        fields: {
+          top: {
+            value: 19,
+            min: 5,
+            max: 19.5,
+            units: 'mm',
+            type: 'float',
+            default: 19.5,
+          },
+        },
+      },
+    }
+
+    test('calls GET /settings/pipettes', () => {
+      client.__setMockResponse(response)
+
+      return store
+        .dispatch(fetchPipetteConfigs(robot))
+        .then(() =>
+          expect(client).toHaveBeenCalledWith(
+            robot,
+            'GET',
+            'settings/pipettes',
+            null
+          )
+        )
+    })
+
+    test('dispatches api:REQUEST and api:SUCCESS', () => {
+      const request = null
+      const expectedActions = [
+        {type: 'api:REQUEST', payload: {robot, request, path}},
+        {type: 'api:SUCCESS', payload: {robot, response, path}},
+      ]
+
+      client.__setMockResponse(response)
+
+      return store
+        .dispatch(fetchPipetteConfigs(robot))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+
+    test('dispatches api:REQUEST and api:FAILURE', () => {
+      const request = null
+      const error = {name: 'ResponseError', status: 500, message: ''}
+      const expectedActions = [
+        {type: 'api:REQUEST', payload: {robot, request, path}},
+        {type: 'api:FAILURE', payload: {robot, error, path}},
+      ]
+
+      client.__setMockError(error)
+
+      return store
+        .dispatch(fetchPipetteConfigs(robot))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
   })
@@ -115,14 +200,14 @@ describe('/settings', () => {
     beforeEach(() => {
       state.api.api[NAME] = {
         settings: {inProgress: true},
+        'settings/pipettes': {inProgress: true},
       }
     })
 
     test('makeGetRobotSettings', () => {
       const getSettings = makeGetRobotSettings()
 
-      expect(getSettings(state, robot))
-        .toEqual(state.api.api[NAME].settings)
+      expect(getSettings(state, robot)).toEqual(state.api.api[NAME].settings)
 
       expect(getSettings(state, {name: 'foo'})).toEqual({inProgress: false})
     })
@@ -135,6 +220,18 @@ describe('/settings', () => {
       expect(getSettings(state, robot)).toEqual({
         ...state.api.api[NAME].settings,
         response: {settings: []},
+      })
+    })
+
+    test('makeGetRobotPipetteConfigs', () => {
+      const getRobotPipetteConfigs = makeGetRobotPipetteConfigs()
+
+      expect(getRobotPipetteConfigs(state, robot)).toEqual(
+        state.api.api[NAME]['settings/pipettes']
+      )
+
+      expect(getRobotPipetteConfigs(state, {name: 'foo'})).toEqual({
+        inProgress: false,
       })
     })
   })
