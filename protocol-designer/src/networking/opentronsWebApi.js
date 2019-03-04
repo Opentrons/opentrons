@@ -13,8 +13,12 @@ export type GateStage = 'loading' |
 
 type GateState = {gateStage: GateStage, errorMessage: ?string}
 
+// TODO: IMMEDIATELY these constants should be switched on env vars
 const OPENTRONS_API_BASE_URL = 'https://staging.web-api.opentrons.com'
 const VERIFY_EMAIL_PATH = '/users/verify-email'
+const CONFIRM_EMAIL_PATH = '/users/confirm-email'
+const PROTOCOL_DESIGNER_URL = 'https://https://s3-us-west-2.amazonaws.com/opentrons-protocol-designer/pd_gate-identification-flow/index.html#/'
+
 const headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
 
 const writeIdentityCookie = (payload) => {
@@ -36,7 +40,7 @@ const getStageFromIdentityCookie = (token: ?string, hasOptedIntoAnalytics: boole
 
 export const getGateStage = (hasOptedIntoAnalytics: boolean): Promise<GateState> => {
   const parsedQueryStringParams = (queryString.parse(global.location.search))
-  const {token} = parsedQueryStringParams
+  const {token, name, email} = parsedQueryStringParams
   let gateStage = 'loading'
   let errorMessage = null
 
@@ -60,6 +64,29 @@ export const getGateStage = (hasOptedIntoAnalytics: boolean): Promise<GateState>
       return {gateStage, errorMessage}
     }).catch(error => {
       gateStage = getStageFromIdentityCookie(token, hasOptedIntoAnalytics)
+      errorMessage = error || i18n.t('application.networking.generic_verification_failure')
+      return {gateStage, errorMessage}
+    }))
+  } else if (email && name) { // if name and email qs present, ignore cookie and hit confirmEmail
+    const confirmEmailBody = {
+      name,
+      email,
+      verifyUrl: PROTOCOL_DESIGNER_URL,
+      templateName: 'verify-email-pd',
+    }
+    return fetch(
+      `${OPENTRONS_API_BASE_URL}${CONFIRM_EMAIL_PATH}`,
+      {method: 'POST', headers, body: JSON.stringify({confirmEmailBody})},
+    ).then(response => response.json().then(body => {
+      if (response.ok) { // valid identity token
+        gateStage = 'promptCheckEmail'
+      } else {
+        errorMessage = i18n.t('application.networking.generic_verification_failure')
+        gateStage = 'failedIdentityVerification'
+      }
+      return {gateStage, errorMessage}
+    }).catch(error => {
+      gateStage = 'failedIdentityVerification'
       errorMessage = error || i18n.t('application.networking.generic_verification_failure')
       return {gateStage, errorMessage}
     }))
