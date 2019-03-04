@@ -2,9 +2,9 @@
 Opentrons API
 ===============
 
-The Opentrons API is a simple framework designed to make writing automated biology lab protocols easy.
+The Opentrons API is a simple Python framework designed to make writing automated biology lab protocols easy.
 
-We’ve designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook.
+We’ve designed it in a way we hope is accessible to anyone with basic Python and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook.
 
 
 **********************
