@@ -53,6 +53,7 @@ export const getGateStage = (hasOptedIntoAnalytics: boolean): Promise<GateState>
       if (response.ok) { // valid identity token, write new cookie
         writeIdentityCookie(body)
         gateStage = getStageFromIdentityCookie(token, hasOptedIntoAnalytics)
+        global.location.replace(PROTOCOL_DESIGNER_URL)
       } else {
         const {status, statusText} = response
         errorMessage = i18n.t('application.networking.unauthorized_verification_failure')
