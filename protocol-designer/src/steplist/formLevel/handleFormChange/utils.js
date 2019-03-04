@@ -7,7 +7,7 @@ import {getPipetteCapacity} from '../../../pipettes/pipetteData'
 import {getWellSetForMultichannel} from '../../../well-selection/utils'
 import type {PipetteChannels} from '@opentrons/shared-data'
 import type {FormPatch} from '../../actions/types'
-import type {FormData} from '../../../form-types'
+import type {FormData, StepFieldName} from '../../../form-types'
 import type {LabwareEntities, PipetteEntities} from '../../../step-forms'
 
 export function chainPatchUpdaters (initialPatch: FormPatch, fns: Array<(FormPatch => FormPatch)>): FormPatch {
@@ -113,4 +113,14 @@ export function getDefaultWells (args: GetDefaultWellsArgs): Array<string> {
   }
 
   return []
+}
+
+export function fieldHasChanged (
+  rawForm: FormData,
+  patch: FormPatch,
+  fieldName: StepFieldName
+): boolean {
+  return Boolean(
+    patch[fieldName] !== undefined &&
+    patch[fieldName] !== rawForm[fieldName])
 }

@@ -7,6 +7,7 @@ import {getPipetteNameSpecs} from '@opentrons/shared-data'
 import makeConditionalPatchUpdater from './makeConditionalPatchUpdater'
 import {
   chainPatchUpdaters,
+  fieldHasChanged,
   getChannels,
   getDefaultWells,
   getAllWellsFromPrimaryWells,
@@ -23,16 +24,6 @@ import {
 import type {FormData, StepFieldName} from '../../../form-types'
 import type {FormPatch} from '../../actions/types'
 import type {LabwareEntities, PipetteEntities} from '../../../step-forms/types'
-
-function _fieldHasChanged (
-  rawForm: FormData,
-  patch: FormPatch,
-  fieldName: StepFieldName
-): boolean {
-  return Boolean(
-    patch[fieldName] !== undefined &&
-    patch[fieldName] !== rawForm[fieldName])
-}
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
 const getDefaultFields = (...fields: Array<StepFieldName>): FormPatch =>
@@ -121,8 +112,8 @@ const updatePatchOnLabwareChange = (
   labwareEntities: LabwareEntities,
   pipetteEntities: PipetteEntities
 ): FormPatch => {
-  const sourceLabwareChanged = _fieldHasChanged(rawForm, patch, 'aspirate_labware')
-  const destLabwareChanged = _fieldHasChanged(rawForm, patch, 'dispense_labware')
+  const sourceLabwareChanged = fieldHasChanged(rawForm, patch, 'aspirate_labware')
+  const destLabwareChanged = fieldHasChanged(rawForm, patch, 'dispense_labware')
 
   if (!sourceLabwareChanged && !destLabwareChanged) return patch
 
@@ -162,7 +153,7 @@ const updatePatchOnPipetteChange = (
 ) => {
   // when pipette ID is changed (to another ID, or to null),
   // set any flow rates, mix volumes, air gaps, or disposal volumes to null
-  if (_fieldHasChanged(rawForm, patch, 'pipette')) {
+  if (fieldHasChanged(rawForm, patch, 'pipette')) {
     return {
       ...patch,
       ...getDefaultFields(
@@ -363,7 +354,7 @@ function updatePatchMixFields (patch: FormPatch, rawForm: FormData): FormPatch {
 export function updatePatchBlowoutFields (patch: FormPatch, rawForm: FormData): FormPatch {
   const appliedPatch = {...rawForm, ...patch}
 
-  if (_fieldHasChanged(rawForm, patch, 'path')) {
+  if (fieldHasChanged(rawForm, patch, 'path')) {
     const {path, blowout_location} = appliedPatch
     // reset blowout_location when path changes to avoid invalid location for path
     // or reset whenever checkbox is toggled
