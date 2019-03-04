@@ -17,7 +17,7 @@ type GateState = {gateStage: GateStage, errorMessage: ?string}
 const OPENTRONS_API_BASE_URL = 'https://staging.web-api.opentrons.com'
 const VERIFY_EMAIL_PATH = '/users/verify-email'
 const CONFIRM_EMAIL_PATH = '/users/confirm-email'
-const PROTOCOL_DESIGNER_URL = 'https://https://s3-us-west-2.amazonaws.com/opentrons-protocol-designer/pd_gate-identification-flow/index.html#/'
+const PROTOCOL_DESIGNER_URL = 'https://staging.designer.opentrons.com'
 
 const headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
 
@@ -41,6 +41,7 @@ const getStageFromIdentityCookie = (token: ?string, hasOptedIntoAnalytics: boole
 export const getGateStage = (hasOptedIntoAnalytics: boolean): Promise<GateState> => {
   const parsedQueryStringParams = (queryString.parse(global.location.search))
   const {token, name, email} = parsedQueryStringParams
+  console.table({token, name, email})
   let gateStage = 'loading'
   let errorMessage = null
 
@@ -49,7 +50,7 @@ export const getGateStage = (hasOptedIntoAnalytics: boolean): Promise<GateState>
       `${OPENTRONS_API_BASE_URL}${VERIFY_EMAIL_PATH}`,
       {method: 'POST', headers, body: JSON.stringify({token})},
     ).then(response => response.json().then(body => {
-      if (response.ok) { // valid identity token
+      if (response.ok) { // valid identity token, write new cookie
         writeIdentityCookie(body)
         gateStage = getStageFromIdentityCookie(token, hasOptedIntoAnalytics)
       } else {

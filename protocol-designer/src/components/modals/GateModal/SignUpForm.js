@@ -20,10 +20,6 @@ class SignUpForm extends React.Component<{}> {
       SIGNUP_TYPEFORM_URL,
       {
         hideScrollbars: true,
-        onSubmit: (data) => {
-          console.log('PARAMS for ya: ', data)
-          // confirmEmail(data)
-        },
       }
     )
   }
