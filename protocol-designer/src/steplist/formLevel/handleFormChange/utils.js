@@ -80,7 +80,6 @@ export function volumeInCapacityForMulti (
   )
 }
 
-// TODO IMMEDIATELY: use in Mix form
 type GetDefaultWellsArgs = {
   labwareId: ?string,
   pipetteId: ?string,
