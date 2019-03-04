@@ -19,10 +19,13 @@ export type FormValues = {[string]: ?string}
 
 type FormGroupProps = {
   groupLabel: string,
+  groupError?: ?string,
   values: FormValues,
   formFields: Array<DisplayFieldProps>,
   onChange: (event: *) => mixed,
-  error: ?string,
+  errors: {[string]: ?string},
+  touched: {[string]: ?string},
+  onBlur: (event: *) => mixed,
 }
 
 function getFieldValue (name: string, values: FormValues): ?string {
@@ -30,19 +33,40 @@ function getFieldValue (name: string, values: FormValues): ?string {
 }
 
 export default function ConfigFormGroup (props: FormGroupProps) {
-  const {groupLabel, values, formFields, onChange, error} = props
+  const {
+    groupLabel,
+    groupError,
+    values,
+    formFields,
+    touched,
+    onChange,
+    onBlur,
+    errors,
+  } = props
+  const formattedError =
+    groupError &&
+    groupError.split('\n').map(function (item, key) {
+      return (
+        <span key={key}>
+          {item}
+          <br />
+        </span>
+      )
+    })
   return (
     <FormGroup label={groupLabel} className={styles.form_group}>
+      {groupError && <p className={styles.group_error}>{formattedError}</p>}
       {formFields.map(f => {
         const value = getFieldValue(f.name, values)
         const _default = f.default.toString()
         const {name, displayName, units, min, max} = f
+        const error = touched[name] ? errors[name] : null
         return (
           <ConfigInput
             key={name}
             label={displayName}
             placeholder={_default}
-            {...{name, units, value, min, max, onChange, error}}
+            {...{name, units, value, min, max, onChange, onBlur, error}}
           />
         )
       })}
@@ -80,6 +104,7 @@ type ConfigInputProps = {
   placeholder: string,
   units: string,
   onChange: (event: *) => mixed,
+  onBlur: (event: *) => mixed,
 }
 
 export function ConfigInput (props: ConfigInputProps) {
@@ -92,6 +117,7 @@ export function ConfigInput (props: ConfigInputProps) {
     error,
     className,
     onChange,
+    onBlur,
   } = props
   const id = makeId(name)
   return (
@@ -106,6 +132,7 @@ export function ConfigInput (props: ConfigInputProps) {
           error,
           className,
           onChange,
+          onBlur,
         }}
       />
     </ConfigFormRow>

@@ -1,10 +1,13 @@
 // @flow
 import * as React from 'react'
 import {Link} from 'react-router-dom'
-import {Formik} from 'formik'
+import {Formik, Form} from 'formik'
 import startCase from 'lodash/startCase'
 import mapValues from 'lodash/mapValues'
 import pick from 'lodash/pick'
+import set from 'lodash/set'
+import forOwn from 'lodash/forOwn'
+import isEmpty from 'lodash/isEmpty'
 
 import FormButtonBar from './FormButtonBar'
 import ConfigFormGroup, {FormColumn} from './ConfigFormGroup'
@@ -73,6 +76,46 @@ export default class ConfigForm extends React.Component<Props> {
     this.props.updateConfig(this.props.pipette.id, {fields: {...params}})
   }
 
+  getFieldValue (
+    key: string,
+    fields: Array<DisplayFieldProps>,
+    values: FormValues
+  ): number {
+    const field = fields.find(f => f.name === key)
+    const _default = field && field.default
+    const value = values[key] || _default
+    return Number(value)
+  }
+
+  validate = (values: FormValues) => {
+    let errors = {}
+    const fields = this.getVisibleFields()
+    const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
+
+    // validate all visible fields with min and max
+    forOwn(fields, (field, name) => {
+      const {min, max} = field
+      const value = Number(values[name])
+      const valueEntered = value || value !== 0
+
+      if (valueEntered && min && max && (value < min || value > max)) {
+        set(errors, name, `Min ${min} / Max ${max}`)
+      }
+    })
+
+    const plungerGroupError =
+      'Please ensure the following: \n top > bottom > blowout > droptip'
+    const top = this.getFieldValue('top', plungerFields, values)
+    const bottom = this.getFieldValue('bottom', plungerFields, values)
+    const blowout = this.getFieldValue('blowout', plungerFields, values)
+    const dropTip = this.getFieldValue('dropTip', plungerFields, values)
+    if (top <= bottom || bottom <= blowout || blowout <= dropTip) {
+      set(errors, 'plungerError', plungerGroupError)
+    }
+
+    return errors
+  }
+
   render () {
     const {parentUrl} = this.props
     const fields = this.getVisibleFields()
@@ -87,25 +130,39 @@ export default class ConfigForm extends React.Component<Props> {
       <Formik
         onSubmit={this.handleSubmit}
         initialValues={initialValues}
+        validate={this.validate}
+        validateOnChange={false}
         render={formProps => {
-          const {values, handleChange, handleReset, handleSubmit} = formProps
+          const {
+            values,
+            handleChange,
+            handleBlur,
+            handleReset,
+            errors,
+            touched,
+          } = formProps
+          const disableSubmit = !isEmpty(errors)
           return (
-            <form onSubmit={handleSubmit}>
+            <Form>
               <FormColumn>
                 <ConfigFormGroup
                   groupLabel="Plunger Positions"
+                  groupError={errors.plungerError}
                   values={values}
                   formFields={plungerFields}
                   onChange={handleChange}
-                  error={null}
+                  errors={errors}
+                  onBlur={handleBlur}
+                  touched={touched}
                 />
-
                 <ConfigFormGroup
                   groupLabel="Power / Force"
                   values={values}
                   formFields={powerFields}
                   onChange={handleChange}
-                  error={null}
+                  errors={errors}
+                  onBlur={handleBlur}
+                  touched={touched}
                 />
               </FormColumn>
               <FormColumn>
@@ -114,17 +171,19 @@ export default class ConfigForm extends React.Component<Props> {
                   values={values}
                   formFields={tipFields}
                   onChange={handleChange}
-                  error={null}
+                  errors={errors}
+                  onBlur={handleBlur}
+                  touched={touched}
                 />
               </FormColumn>
               <FormButtonBar
                 buttons={[
                   {children: 'reset all', onClick: handleReset},
                   {children: 'cancel', Component: Link, to: parentUrl},
-                  {children: 'save', type: 'submit'},
+                  {children: 'save', type: 'submit', disabled: disableSubmit},
                 ]}
               />
-            </form>
+            </Form>
           )
         }}
       />

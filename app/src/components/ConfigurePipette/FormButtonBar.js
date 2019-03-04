@@ -19,13 +19,14 @@ export default function FormButtonBar (props: Props) {
       className,
     }
   })
-
+  const resetMessage = (
+    <p className={styles.reset_message}>
+      * To reset an individual setting, simply clear the field.
+    </p>
+  )
   return (
     <React.Fragment>
-      <p className={styles.reset_message}>
-        * To reset an individual setting, simply clear the field.
-      </p>
-      <BottomButtonBar buttons={buttons} />
+      <BottomButtonBar buttons={buttons} description={resetMessage} />
     </React.Fragment>
   )
 }
