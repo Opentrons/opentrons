@@ -897,7 +897,7 @@ Object {
     "min": 0.05,
     "type": "float",
     "units": "amps",
-    "value": 0.4,
+    "value": 0.1,
   },
   "pickUpDistance": Object {
     "max": 30,
