@@ -29,15 +29,14 @@ const updatePatchOnLabwareChange = (
   const appliedPatch = {...rawForm, ...patch}
   const pipetteId = appliedPatch.pipette
 
-  return labwareChanged
-    ? {
-      ...getDefaultFields(
-        'mix_mmFromBottom',
-        'mix_touchTip_mmFromBottom'),
-      wells: getDefaultWells({
-        labwareId: appliedPatch.labware, pipetteId, labwareEntities, pipetteEntities}),
-    }
-    : {}
+  return {
+    ...patch,
+    ...getDefaultFields(
+      'mix_mmFromBottom',
+      'mix_touchTip_mmFromBottom'),
+    wells: getDefaultWells({
+      labwareId: appliedPatch.labware, pipetteId, labwareEntities, pipetteEntities}),
+  }
 }
 
 // NOTE: this is similar to fn in moveLiquid dependentFieldsUpdate,
