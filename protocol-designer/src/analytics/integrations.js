@@ -1,8 +1,16 @@
 /* eslint-disable */
+import cookie from 'cookie'
 
 export const shutdownAnalytics = () => {
   if (window[window['_fs_namespace']]) { window[window['_fs_namespace']].shutdown() }
   delete window[window['_fs_namespace']]
+}
+
+export const setAnalyticsTags = () => {
+  const cookies = cookie.parse(global.document.cookie)
+  const {ot_email: email, ot_name: displayName} = cookies
+
+  window[window['_fs_namespace']].setUserVars({displayName, email})
 }
 
 // NOTE: this code snippet is distributed by FullStory and formatting has been maintained
