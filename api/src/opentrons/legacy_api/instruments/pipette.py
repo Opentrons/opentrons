@@ -500,11 +500,12 @@ class Pipette:
         # if volume is specified as 0uL, then do nothing
         if volume == 0:
             return self
-
         self._position_for_dispense(location)
-
+        #print('position for dispense: ', self._position_for_dispense(location))
+        print('Dispensing volume: ', volume)
         mm_position = self._dispense_plunger_position(
             self.current_volume - volume)
+        print('current volume after dispense: ', self.current_volume - volume)
         speed = self.speeds['dispense'] * rate
 
         self.instrument_actuator.push_speed()
@@ -514,9 +515,9 @@ class Pipette:
             self.robot.poses,
             x=mm_position
         )
+        print('current position: ', mm_position)
         self.instrument_actuator.pop_speed()
         self.current_volume -= volume  # update after actual dispense
-
         return self
 
     def _position_for_aspirate(self, location=None, clearance=1.0):
@@ -1417,6 +1418,7 @@ class Pipette:
         """
         millimeters = ul / self._ul_per_mm(ul, 'dispense')
         destination_mm = self._get_plunger_position('bottom') + millimeters
+        print('destination mm: ', destination_mm)
         return round(destination_mm, 6)
 
     def _ul_per_mm(self, ul: float, func: str) -> float:
@@ -1426,6 +1428,7 @@ class Pipette:
         :return: microliters/mm as a float
         """
         sequence = self.ul_per_mm[func]
+        print('api ul/mm: ', sequence)
         return pipette_config.piecewise_volume_conversion(ul, sequence)
 
     def _volume_percentage(self, volume):
