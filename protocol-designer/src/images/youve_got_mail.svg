@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="143px" height="112px" viewBox="0 0 143 112" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>new email in pd colors</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="(old)-doodles-Labware-library" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard-2-Copy" transform="translate(-266.000000, -86.000000)">
+            <g id="new-email-in-pd-colors" transform="translate(266.000000, 86.000000)">
+                <rect id="Rectangle-8" fill="#F0F3FF" fill-rule="nonzero" x="12" y="25" width="99" height="74"></rect>
+                <path d="M12.5,12 L112.5,12 C119.403559,12 125,17.5964406 125,24.5 L125,99.5 C125,106.403559 119.403559,112 112.5,112 L12.5,112 C5.5625,112 0,106.375 0,99.5 L0,24.5 C0,17.5625 5.5625,12 12.5,12 Z M62.5,55.75 L112.5,24.5 L12.5,24.5 L62.5,55.75 Z M12.5,99.5 L112.5,99.5 L112.5,39.3125 L62.5,70.5 L12.5,39.3125 L12.5,99.5 Z" id="Shape" fill="#00C3E6" fill-rule="nonzero"></path>
+                <circle id="Oval-2" fill="#6D04DF" fill-rule="nonzero" cx="118" cy="25" r="25"></circle>
+                <path d="M121.710938,38 L117.580078,38 L117.580078,21.40625 C117.580078,19.4257713 117.626953,17.8554746 117.720703,16.6953125 C117.451171,16.9765639 117.120119,17.2871077 116.727539,17.6269531 C116.334959,17.9667986 115.019542,19.0449128 112.78125,20.8613281 L110.707031,18.2421875 L118.265625,12.3007812 L121.710938,12.3007812 L121.710938,38 Z" id="1" fill="#FFFFFF"></path>
+            </g>
+        </g>
+    </g>
+</svg>

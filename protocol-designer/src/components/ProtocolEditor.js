@@ -9,7 +9,7 @@ import ConnectedTitleBar from '../containers/ConnectedTitleBar'
 import ConnectedMainPanel from '../containers/ConnectedMainPanel'
 import NewFileModal from './modals/NewFileModal'
 import FileUploadMessageModal from './modals/FileUploadMessageModal'
-import AnalyticsModal from './modals/AnalyticsModal'
+import GateModal from './modals/GateModal'
 import {PortalRoot as MainPageModalPortalRoot} from '../components/portals/MainPageModalPortal'
 import {PortalRoot as TopPortalRoot} from './portals/TopPortal'
 import {SCROLL_ON_SELECT_STEP_CLASSNAME} from '../steplist/actions'
@@ -24,6 +24,7 @@ function ProtocolEditor () {
     <div>
       <SelectorDebugger />
       <TopPortalRoot />
+      <GateModal />
       <div className={styles.wrapper}>
         <ConnectedNav />
         <ConnectedSidebar />
@@ -31,7 +32,6 @@ function ProtocolEditor () {
           <ConnectedTitleBar />
 
           <div className={styles.main_page_content}>
-            <AnalyticsModal />
             <NewFileModal useProtocolFields />
             <FileUploadMessageModal />
             {/* TODO: Ian 2018-06-28 All main page modals will go here */}

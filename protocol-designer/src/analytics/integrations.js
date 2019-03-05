@@ -1,8 +1,18 @@
 /* eslint-disable */
+import cookie from 'cookie'
 
 export const shutdownAnalytics = () => {
   if (window[window['_fs_namespace']]) { window[window['_fs_namespace']].shutdown() }
   delete window[window['_fs_namespace']]
+}
+
+const _setAnalyticsTags = () => {
+  const cookies = cookie.parse(global.document.cookie)
+  const {ot_email: email, ot_name: displayName} = cookies
+
+  if (window[window['_fs_namespace']]) {
+    window[window['_fs_namespace']].setUserVars({displayName, email})
+  }
 }
 
 // NOTE: this code snippet is distributed by FullStory and formatting has been maintained
@@ -23,4 +33,6 @@ export const initializeAnalytics = () => {
       g.identifyAccount=function(i,v){o='account';v=v||{};v.acctId=i;g(o,v)};
       g.clearUserCookie=function(){};
   })(window,document,window['_fs_namespace'],'script','user');
+  _setAnalyticsTags()
 }
+

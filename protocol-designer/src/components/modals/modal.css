@@ -3,6 +3,10 @@
   align-items: flex-start;
 }
 
+.modal.blocking {
+  z-index: 1000;
+}
+
 .modal_contents {
   /* Aligns modal to top instead of centering vertically */
   margin: 0 auto;
@@ -10,4 +14,27 @@
 
 .transparent_content {
   background-color: transparent;
+}
+
+.spinner_modal_icon {
+  width: 7.5rem;
+  margin-bottom: 3rem;
+}
+
+.success_icon {
+  width: 12rem;
+  height: 12rem;
+  margin: 2rem;
+}
+
+.centered_icon_wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sign_up_form_wrapper {
+  width: 100%;
+  height: 26rem;
+  margin-bottom: 1rem;
 }

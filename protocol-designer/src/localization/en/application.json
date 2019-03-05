@@ -5,5 +5,9 @@
     "pause": "pause"
   },
   "version": "Protocol Designer Version",
-  "beta": "beta"
+  "beta": "beta",
+  "networking": {
+    "generic_verification_failure": "Something went wrong with your unique link. Fill out the form below to have a new one sent to your email. Please contact the Opentrons Support team if you require further help.",
+    "unauthorized_verification_failure": "This unique link has expired and is no longer valid, to have a new link sent to your email, fill out the form below."
+  }
 }
