@@ -4,6 +4,7 @@ import * as React from 'react'
 import {makeWidget} from '@typeform/embed'
 import styles from '../modal.css'
 
+// TODO: this should be an env var fallback to staging after the initial prod deploy
 const SIGNUP_TYPEFORM_URL = 'https://opentrons-ux.typeform.com/to/kr4Bdf'
 
 class SignUpForm extends React.Component<{}> {

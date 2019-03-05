@@ -29,7 +29,7 @@ type DP = $Diff<Props, SP>
 type State = {gateStage: GateStage, errorMessage: ?string}
 
 class GateModal extends React.Component<Props, State> {
-  constructor (props) {
+  constructor (props: Props) {
     super()
     this.state = {gateStage: 'loading', errorMessage: ''}
 
@@ -48,8 +48,6 @@ class GateModal extends React.Component<Props, State> {
 
   render () {
     const {optIn, optOut} = this.props
-
-    console.log('RENDERED STAGE IS: ', this.state.gateStage)
 
     switch (this.state.gateStage) {
       case 'promptVerifyIdentity':

@@ -13,22 +13,28 @@ export type GateStage = 'loading' |
 
 type GateState = {gateStage: GateStage, errorMessage: ?string}
 
-// TODO: IMMEDIATELY these constants should be switched on env vars
-const OPENTRONS_API_BASE_URL = 'https://staging.web-api.opentrons.com'
+const OPENTRONS_API_BASE_URL = process.env.OT_WEB_API_BASE_URL || 'https://staging.web-api.opentrons.com'
+const PROTOCOL_DESIGNER_URL = process.env.OT_PD_BASE_URL || 'https://staging.designer.opentrons.com'
+
 const VERIFY_EMAIL_PATH = '/users/verify-email'
 const CONFIRM_EMAIL_PATH = '/users/confirm-email'
-const PROTOCOL_DESIGNER_URL = 'https://staging.designer.opentrons.com'
 
 const headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
 
 const writeIdentityCookie = (payload) => {
-  global.document.cookie = cookie.serialize('name', payload.name)
-  global.document.cookie = cookie.serialize('email', payload.email)
+  const domain = process.env.NODE_ENV === 'production' ? 'opentrons.com' : undefined
+  global.document.cookie = cookie.serialize('ot_name', payload.name, {
+    domain,
+    maxAge: 10 * 365 * 24 * 60 * 60, // 10 years
+  })
+  global.document.cookie = cookie.serialize('ot_email', payload.email, {
+
+  })
 }
 
-const getStageFromIdentityCookie = (token: ?string, hasOptedIntoAnalytics: boolean) => {
+const getStageFromIdentityCookie = (token: ?string, hasOptedIntoAnalytics: boolean | null) => {
   const cookies = cookie.parse(global.document.cookie)
-  const {email, name} = cookies
+  const {ot_email: email, ot_name: name} = cookies
   const hasIdentityCookie = Boolean(email && name)
 
   if (hasIdentityCookie) {
@@ -38,10 +44,11 @@ const getStageFromIdentityCookie = (token: ?string, hasOptedIntoAnalytics: boole
   }
 }
 
-export const getGateStage = (hasOptedIntoAnalytics: boolean): Promise<GateState> => {
+// TODO: BC: 2019-03-05 refactor this and pull the common networking fetch calls out into a helper
+
+export const getGateStage = (hasOptedIntoAnalytics: boolean | null): Promise<GateState> => {
   const parsedQueryStringParams = (queryString.parse(global.location.search))
   const {token, name, email} = parsedQueryStringParams
-  console.table({token, name, email})
   let gateStage = 'loading'
   let errorMessage = null
 
@@ -83,7 +90,7 @@ export const getGateStage = (hasOptedIntoAnalytics: boolean): Promise<GateState>
       if (response.ok) { // valid identity token
         gateStage = 'promptCheckEmail'
       } else {
-        console.log('Failed to confirm identity and send user email.')
+        console.error('Failed to confirm identity and send user email.')
         errorMessage = i18n.t('application.networking.generic_verification_failure')
         gateStage = 'failedIdentityVerification'
       }
