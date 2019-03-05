@@ -5,6 +5,7 @@ import cx from 'classnames'
 import {AlertModal, Icon} from '@opentrons/components'
 import {opentronsWebApi, type GateStage} from '../../../networking'
 import i18n from '../../../localization'
+import CHECK_EMAIL_IMAGE from '../../../images/youve_got_mail.svg'
 import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
@@ -95,7 +96,7 @@ class GateModal extends React.Component<Props, State> {
           <AlertModal className={cx(modalStyles.modal, modalStyles.blocking)}>
             <h3>{i18n.t('modal.gate.sign_up_success')}</h3>
             <div className={modalStyles.centered_icon_wrapper}>
-              <Icon name="check" className={modalStyles.success_icon}/>
+              <img src={CHECK_EMAIL_IMAGE} className={modalStyles.success_icon} />
             </div>
             <div className={settingsStyles.body_wrapper}>
               <p className={settingsStyles.card_body}>
