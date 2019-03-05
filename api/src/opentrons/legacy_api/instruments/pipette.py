@@ -432,7 +432,7 @@ class Pipette(CommandPublisher):
             self.current_volume += volume  # update after actual aspirate
 
         do_publish(self.broker, commands.aspirate, self.aspirate, 'after',
-                   self, None, self, volume, location, rate)
+                   self, None, self, volume, display_location, rate)
 
         return self
 
@@ -528,7 +528,7 @@ class Pipette(CommandPublisher):
             self.current_volume -= volume  # update after actual dispense
 
         do_publish(self.broker, commands.dispense, self.dispense, 'after',
-                   self, None, self, volume, location, rate)
+                   self, None, self, volume, display_location, rate)
 
         return self
 
