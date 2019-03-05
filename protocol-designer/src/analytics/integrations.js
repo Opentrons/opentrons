@@ -10,7 +10,9 @@ const _setAnalyticsTags = () => {
   const cookies = cookie.parse(global.document.cookie)
   const {ot_email: email, ot_name: displayName} = cookies
 
-  window[window['_fs_namespace']].setUserVars({displayName, email})
+  if (window[window['_fs_namespace']]) {
+    window[window['_fs_namespace']].setUserVars({displayName, email})
+  }
 }
 
 // NOTE: this code snippet is distributed by FullStory and formatting has been maintained
