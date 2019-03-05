@@ -98,7 +98,7 @@ const updatePatchOnPipetteChange = (
   return patch
 }
 
-export default function dependentFieldsUpdateMoveLiquid (
+export default function dependentFieldsUpdateMix (
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
   pipetteEntities: PipetteEntities,
