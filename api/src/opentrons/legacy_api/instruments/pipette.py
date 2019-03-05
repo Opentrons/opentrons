@@ -401,8 +401,10 @@ class Pipette(CommandPublisher):
                 location = volume
             volume = self.max_volume - self.current_volume
 
+        display_location = location if location else self.previous_placeable
+
         do_publish(self.broker, commands.aspirate, self.aspirate, 'before',
-                   None, None, self, volume, location, rate)
+                   None, None, self, volume, display_location, rate)
 
         # if volume is specified as 0uL, then do nothing
         if volume != 0:
@@ -502,8 +504,10 @@ class Pipette(CommandPublisher):
         # Ensure we don't dispense more than the current volume
         volume = min(self.current_volume, volume)
 
+        display_location = location if location else self.previous_placeable
+
         do_publish(self.broker, commands.dispense, self.dispense, 'before',
-                   None, None, self, volume, location, rate)
+                   None, None, self, volume, display_location, rate)
 
         # if volume is specified as 0uL, then do nothing
         if volume != 0:
