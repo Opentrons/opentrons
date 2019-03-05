@@ -28,7 +28,8 @@ const writeIdentityCookie = (payload) => {
     maxAge: 10 * 365 * 24 * 60 * 60, // 10 years
   })
   global.document.cookie = cookie.serialize('ot_email', payload.email, {
-
+    domain,
+    maxAge: 10 * 365 * 24 * 60 * 60, // 10 years
   })
 }
 
