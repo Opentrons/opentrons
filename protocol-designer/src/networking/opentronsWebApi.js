@@ -15,8 +15,8 @@ type GateState = {gateStage: GateStage, errorMessage: ?string}
 
 export const isProduction = global.location.host === 'designer.opentrons.com'
 
-let OPENTRONS_API_BASE_URL = isProduction ? 'https://web-api.opentrons.com' : 'https://staging.web-api.opentrons.com'
-let PROTOCOL_DESIGNER_URL = global.location.href
+const OPENTRONS_API_BASE_URL = isProduction ? 'https://web-api.opentrons.com' : 'https://staging.web-api.opentrons.com'
+const PROTOCOL_DESIGNER_URL = global.location.href
 
 const VERIFY_EMAIL_PATH = '/users/verify-email'
 const CONFIRM_EMAIL_PATH = '/users/confirm-email'
