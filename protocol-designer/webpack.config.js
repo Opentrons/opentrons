@@ -4,6 +4,7 @@ const path = require('path')
 const webpack = require('webpack')
 const merge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
 
 const {DEV_MODE, baseConfig, rules} = require('@opentrons/webpack-config')
@@ -60,13 +61,14 @@ module.exports = merge.strategy({'module.rules': 'replace'})(baseConfig, {
 
   plugins: [
     new webpack.EnvironmentPlugin(envVars),
-    new HtmlWebpackPlugin({
-      title,
-      description,
-      author,
-      template: HTML_ENTRY,
-      favicon: './src/images/favicon.ico',
+    new FaviconsWebpackPlugin({
+      // TODO: Ian 2019-03-06 use higher-res logo PNG instead of ico
+      logo: './src/images/favicon.ico',
+      prefix: 'icons-[hash]/',
+      inject: true,
     }),
+    new HtmlWebpackPlugin({
+      title, description, author, template: HTML_ENTRY}),
     new ScriptExtHtmlWebpackPlugin({defaultAttribute: 'defer'}),
   ],
 })
