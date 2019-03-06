@@ -8,7 +8,6 @@ const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
 
 const {DEV_MODE, baseConfig} = require('@opentrons/webpack-config')
 const {productName: title, description, author} = require('./package.json')
-
 const PROTOCOL_DESIGNER_ENV_VAR_PREFIX = 'OT_PD_'
 
 // TODO: BC: 2018-02-21 remove hardcoded semver version and replace
@@ -46,7 +45,8 @@ module.exports = webpackMerge(baseConfig, {
 
   plugins: [
     new webpack.EnvironmentPlugin(envVars),
-    new HtmlWebpackPlugin({title, description, author, template: HTML_ENTRY}),
+    new HtmlWebpackPlugin({
+      title, description, author, template: HTML_ENTRY, favicon: './src/images/favicon.ico'}),
     new ScriptExtHtmlWebpackPlugin({defaultAttribute: 'defer'}),
   ],
 })
