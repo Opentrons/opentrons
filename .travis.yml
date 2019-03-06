@@ -104,10 +104,9 @@ jobs:
       deploy:
         - # deploy protocol designer to S3
           <<: *deploy_s3
-          # TODO(mc, 2018-03-26): why is this region not default?
-          region: us-west-2
+          dot_match: true
           local-dir: protocol-designer/dist
-          bucket: opentrons-protocol-designer
+          bucket: opentrons-protocol-designer-builds
           upload-dir: $TRAVIS_BRANCH
         - # deploy components library to S3
           <<: *deploy_s3
