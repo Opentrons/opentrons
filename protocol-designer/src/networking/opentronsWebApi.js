@@ -83,6 +83,7 @@ export const getGateStage = (hasOptedIntoAnalytics: boolean | null): Promise<Gat
       email,
       verifyUrl: PROTOCOL_DESIGNER_URL,
       templateName: 'verify-email-pd',
+      emailListName: 'pd-users',
     }
     return fetch(
       `${OPENTRONS_API_BASE_URL}${CONFIRM_EMAIL_PATH}`,
