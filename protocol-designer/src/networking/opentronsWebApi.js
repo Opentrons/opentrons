@@ -16,7 +16,7 @@ type GateState = {gateStage: GateStage, errorMessage: ?string}
 export const isProduction = global.location.host === 'designer.opentrons.com'
 
 let OPENTRONS_API_BASE_URL = isProduction ? 'https://web-api.opentrons.com' : 'https://staging.web-api.opentrons.com'
-let PROTOCOL_DESIGNER_URL = isProduction ? 'https://designer.opentrons.com' : 'https://staging.designer.opentrons.com'
+let PROTOCOL_DESIGNER_URL = global.location.href
 
 const VERIFY_EMAIL_PATH = '/users/verify-email'
 const CONFIRM_EMAIL_PATH = '/users/confirm-email'
@@ -63,7 +63,7 @@ export const getGateStage = (hasOptedIntoAnalytics: boolean | null): Promise<Gat
       if (response.ok) { // valid identity token, write new cookie
         writeIdentityCookie(body)
         gateStage = getStageFromIdentityCookie(token, hasOptedIntoAnalytics)
-        global.location.replace(PROTOCOL_DESIGNER_URL)
+        global.location.replace(PROTOCOL_DESIGNER_URL) // redirect to clean token qs param from url
       } else {
         const {status, statusText} = response
         errorMessage = i18n.t('application.networking.unauthorized_verification_failure')
