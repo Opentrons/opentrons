@@ -7,7 +7,7 @@ import {getRobotApiState} from './reducer'
 
 import type {OutputSelector} from 'reselect'
 import type {State} from '../types'
-import type {BaseRobot} from '../robot'
+import type {BaseRobot, RobotService} from '../robot'
 import type {ApiCall} from './types'
 import type {ApiAction, RequestMaker} from './actions'
 import type {RobotApiState} from './reducer'
@@ -51,8 +51,7 @@ export type SettingsAction = ApiAction<'settings',
   SettingsRequest,
   SettingsResponse>
 
-// TODO type this based on SetConfigRequest when implemented
-type PipetteConfigRequest = ?{id: string}
+export type PipetteConfigRequest = {fields: {[string]: ?{value: number}}}
 
 export type RobotSettingsCall = ApiCall<SettingsRequest, SettingsResponse>
 
@@ -80,12 +79,21 @@ export const setSettings: SettingsRequestMaker = buildRequestMaker(
 
 const PIPETTE_SETTINGS: 'settings/pipettes' = 'settings/pipettes'
 
-type PipetteConfigRequestMaker = RequestMaker<PipetteConfigRequest>
+type PipetteConfigRequestMaker = RequestMaker<?PipetteConfigRequest>
 
 export const fetchPipetteConfigs: PipetteConfigRequestMaker = buildRequestMaker(
   'GET',
   PIPETTE_SETTINGS
 )
+
+export function setPipetteConfigs (
+  robot: RobotService,
+  id: string,
+  params: PipetteConfigRequest
+) {
+  const path = `${PIPETTE_SETTINGS}/${id}`
+  return buildRequestMaker('PATCH', path)(robot, params)
+}
 
 export function makeGetRobotSettings () {
   const selector: OutputSelector<State,
@@ -121,8 +129,21 @@ export function makeGetRobotPipetteConfigs () {
 }
 
 export function getRobotPipetteConfigs (
-  state: RobotApiState,
-  id: string
+  state: RobotApiState
 ): PipetteConfigCall {
   return state[PIPETTE_SETTINGS] || {inProgress: false}
+}
+
+export function makeGetPipetteRequestById () {
+  const selector: OutputSelector<State,
+    BaseRobot,
+    PipetteConfigCall> = createSelector(
+      (state, robot, _id) => getRobotApiState(state, robot),
+      (_state, _robot, id) => id,
+      (state, id) => {
+        const path = `${PIPETTE_SETTINGS}/${id}`
+        return state[path] || {inProgress: false}
+      }
+    )
+  return selector
 }

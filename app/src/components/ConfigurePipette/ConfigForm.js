@@ -4,6 +4,8 @@ import {Link} from 'react-router-dom'
 import {Formik} from 'formik'
 import startCase from 'lodash/startCase'
 import mapValues from 'lodash/mapValues'
+import pick from 'lodash/pick'
+
 import FormButtonBar from './FormButtonBar'
 import ConfigFormGroup, {FormColumn} from './ConfigFormGroup'
 
@@ -12,7 +14,10 @@ import type {
   PipetteSettingsField,
   PipetteConfigResponse,
   PipetteConfigFields,
+  PipetteConfigRequest,
 } from '../../http-api-client'
+
+import type {FormValues} from './ConfigFormGroup'
 
 export type DisplayFieldProps = PipetteSettingsField & {
   name: string,
@@ -23,6 +28,7 @@ type Props = {
   parentUrl: string,
   pipette: Pipette,
   pipetteConfig: PipetteConfigResponse,
+  updateConfig: (id: string, PipetteConfigRequest) => mixed,
 }
 
 const PLUNGER_KEYS = ['top', 'bottom', 'blowout', 'dropTip']
@@ -46,9 +52,30 @@ export default class ConfigForm extends React.Component<Props> {
     })
   }
 
+  getVisibleFields = () => {
+    return pick(this.props.pipetteConfig.fields, [
+      ...PLUNGER_KEYS,
+      ...POWER_KEYS,
+      ...TIP_KEYS,
+    ])
+  }
+
+  handleSubmit = (values: FormValues) => {
+    const params = mapValues(values, v => {
+      let param
+      if (!v) {
+        param = null
+      } else {
+        param = {value: Number(v)}
+      }
+      return param
+    })
+    this.props.updateConfig(this.props.pipette.id, {fields: {...params}})
+  }
+
   render () {
-    const {pipetteConfig, parentUrl} = this.props
-    const {fields} = pipetteConfig
+    const {parentUrl} = this.props
+    const fields = this.getVisibleFields()
     const initialValues = mapValues(fields, f => {
       return f.value !== f.default ? f.value.toString() : null
     })
@@ -58,11 +85,12 @@ export default class ConfigForm extends React.Component<Props> {
 
     return (
       <Formik
+        onSubmit={this.handleSubmit}
         initialValues={initialValues}
         render={formProps => {
-          const {values, handleChange, handleReset} = formProps
+          const {values, handleChange, handleReset, handleSubmit} = formProps
           return (
-            <form>
+            <form onSubmit={handleSubmit}>
               <FormColumn>
                 <ConfigFormGroup
                   groupLabel="Plunger Positions"

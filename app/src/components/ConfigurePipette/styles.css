@@ -56,3 +56,10 @@
 .reset_message {
   @apply --font-body-1-dark;
 }
+
+.config_submit_error {
+  font-size: var(--fs-body-1);
+  color: var(--c-warning-dark);
+  font-style: italic;
+  margin-bottom: 0.5rem;
+}
