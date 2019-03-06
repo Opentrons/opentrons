@@ -13,8 +13,10 @@ export type GateStage = 'loading' |
 
 type GateState = {gateStage: GateStage, errorMessage: ?string}
 
-const OPENTRONS_API_BASE_URL = process.env.OT_WEB_API_BASE_URL || 'https://staging.web-api.opentrons.com'
-const PROTOCOL_DESIGNER_URL = process.env.OT_PD_BASE_URL || 'https://staging.designer.opentrons.com'
+export const isProduction = global.location.host === 'designer.opentrons.com'
+
+let OPENTRONS_API_BASE_URL = isProduction ? 'https://web-api.opentrons.com' : 'https://staging.web-api.opentrons.com'
+let PROTOCOL_DESIGNER_URL = isProduction ? 'https://designer.opentrons.com' : 'https://staging.designer.opentrons.com'
 
 const VERIFY_EMAIL_PATH = '/users/verify-email'
 const CONFIRM_EMAIL_PATH = '/users/confirm-email'
