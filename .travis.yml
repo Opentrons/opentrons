@@ -158,6 +158,7 @@ env:
     - OT_BUILD: $TRAVIS_BUILD_NUMBER
     - OT_BRANCH: $TRAVIS_BRANCH
     - OT_TAG: $TRAVIS_TAG
+    - OT_PD_COMMIT_HASH: $TRAVIS_COMMIT
 
     - OT_CI_TEMP_S3_PATH: s3://opentrons-ci/temp/$OT_BUILD
 
