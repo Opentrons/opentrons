@@ -29,23 +29,24 @@ import type {
   ApiRequestError,
 } from '../../http-api-client'
 
-type OP = {
+type OP = {|
   robot: Robot,
   mount: Mount,
   parentUrl: string,
-}
+|}
 
-type SP = {
+type SP = {|
   pipette: ?Pipette,
   pipetteConfig: ?PipetteConfigResponse,
   configError: ?ApiRequestError,
-}
+|}
 
-type DP = {
+type DP = {|
   updateConfig: (id: string, PipetteConfigRequest) => mixed,
-}
+|}
 
-type Props = SP & OP & DP
+// type Props = SP & OP & DP
+type Props = {...$Exact<OP>, ...$Exact<SP>, ...$Exact<DP>}
 
 export default connect(
   makeMapStateToProps,
