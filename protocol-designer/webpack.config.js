@@ -62,10 +62,20 @@ module.exports = merge.strategy({'module.rules': 'replace'})(baseConfig, {
   plugins: [
     new webpack.EnvironmentPlugin(envVars),
     new FaviconsWebpackPlugin({
-      // TODO: Ian 2019-03-06 use higher-res logo PNG instead of ico
-      logo: './src/images/favicon.ico',
+      logo: './src/images/favicon-logo.png',
       prefix: 'icons-[hash]/',
       inject: true,
+      background: '#fff',
+      icons: {
+        android: false,
+        appleIcon: false,
+        appleStartup: false,
+        coast: false,
+        favicons: true,
+        firefox: false,
+        windows: false,
+        yandex: false,
+      },
     }),
     new HtmlWebpackPlugin({
       title, description, author, template: HTML_ENTRY}),
