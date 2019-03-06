@@ -9,9 +9,21 @@ export const shutdownAnalytics = () => {
 const _setAnalyticsTags = () => {
   const cookies = cookie.parse(global.document.cookie)
   const {ot_email: email, ot_name: displayName} = cookies
+  const commit_str = process.env.OT_PD_COMMIT_HASH
+  const version_str = process.env.OT_PD_VERSION
+  const buildDate_date = new Date(Date.parse(process.env.OT_PD_BUILD_DATE))
 
+  // NOTE: fullstory expects the keys 'displayName' and 'email' verbatim
+  // though all other key names must be fit the schema described here
+  // https://help.fullstory.com/develop-js/137380
   if (window[window['_fs_namespace']]) {
-    window[window['_fs_namespace']].setUserVars({displayName, email})
+    window[window['_fs_namespace']].setUserVars({
+      displayName,
+      email,
+      commit_str,
+      version_str,
+      buildDate_date,
+    })
   }
 }
 
