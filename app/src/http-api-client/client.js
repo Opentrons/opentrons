@@ -5,7 +5,7 @@ import type {Error} from '../types'
 import type {RobotService} from '../robot'
 import type {ApiRequestError} from './types'
 
-export type Method = 'GET' | 'POST'
+export type Method = 'GET' | 'POST' | 'PATCH'
 
 // TODO(mc, 2018-04-30): deprecate importing this type from client
 export type {ApiRequestError}
@@ -59,11 +59,15 @@ export default function client<T, U> (
 }
 
 function jsonFromResponse<T> (response: Response): Promise<T> {
-  return response.json()
+  return response
+    .json()
     .then(
-      (body) => response.ok
-        ? (body: T)
-        : Promise.reject(ResponseError(response, (body: ?{message: ?string}))),
+      body =>
+        response.ok
+          ? (body: T)
+          : Promise.reject(
+            ResponseError(response, (body: ?{message: ?string}))
+          ),
       fetchErrorFromError
     )
 }

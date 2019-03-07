@@ -9,6 +9,8 @@ import {
   makeGetRobotSettings,
   fetchPipetteConfigs,
   makeGetRobotPipetteConfigs,
+  setPipetteConfigs,
+  makeGetPipetteRequestById,
 } from '..'
 
 jest.mock('../client')
@@ -130,7 +132,7 @@ describe('/settings', () => {
     })
   })
 
-  describe('fetchPipetteConfig action creator', () => {
+  describe('setPipetteConfig action creator', () => {
     const path = 'settings/pipettes'
     const response = {
       P300S20180206A02: {
@@ -196,11 +198,60 @@ describe('/settings', () => {
     })
   })
 
+  //
+  describe('setPipetteConfigs action creator', () => {
+    const path = 'settings/pipettes/foo'
+    const response = {fields: {top: null, bottom: {value: 6}}}
+
+    test('calls PATCH /settings/pipettes/{id}', () => {
+      const request = {fields: {top: null, bottom: {value: 6}}}
+
+      client.__setMockResponse(response)
+
+      return store
+        .dispatch(setPipetteConfigs(robot, 'foo', request))
+        .then(() =>
+          expect(client).toHaveBeenCalledWith(robot, 'PATCH', path, request)
+        )
+    })
+
+    test('dispatches api:REQUEST and api:SUCCESS', () => {
+      const request = {fields: {top: null, bottom: {value: 6}}}
+      const expectedActions = [
+        {type: 'api:REQUEST', payload: {robot, request, path}},
+        {type: 'api:SUCCESS', payload: {robot, response, path}},
+      ]
+
+      client.__setMockResponse(response)
+
+      return store
+        .dispatch(setPipetteConfigs(robot, 'foo', request))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+
+    test('dispatches api:REQUEST and api:FAILURE', () => {
+      const request = {fields: {top: null, bottom: {value: 6}}}
+      const error = {name: 'ResponseError', status: 500, message: ''}
+      const expectedActions = [
+        {type: 'api:REQUEST', payload: {robot, request, path}},
+        {type: 'api:FAILURE', payload: {robot, error, path}},
+      ]
+
+      client.__setMockError(error)
+
+      return store
+        .dispatch(setPipetteConfigs(robot, 'foo', request))
+        .then(() => expect(store.getActions()).toEqual(expectedActions))
+    })
+  })
+  //
+
   describe('selectors', () => {
     beforeEach(() => {
       state.api.api[NAME] = {
         settings: {inProgress: true},
         'settings/pipettes': {inProgress: true},
+        'settings/pipettes/foo': {inProgress: true},
       }
     })
 
@@ -233,6 +284,14 @@ describe('/settings', () => {
       expect(getRobotPipetteConfigs(state, {name: 'foo'})).toEqual({
         inProgress: false,
       })
+    })
+
+    test('makeGetPipetteRequestById', () => {
+      const getPipetteRequestById = makeGetPipetteRequestById()
+
+      expect(getPipetteRequestById(state, robot, 'foo')).toEqual(
+        state.api.api[NAME]['settings/pipettes/foo']
+      )
     })
   })
 })
