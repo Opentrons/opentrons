@@ -232,9 +232,9 @@ class Pipette(CommandPublisher):
         """
         Returns True of this :any:`Pipette` was instantiated with tip_racks
         """
-        return (self.tip_racks is not None and
-                isinstance(self.tip_racks, list) and
-                len(self.tip_racks) > 0)
+        return (self.tip_racks is not None
+                and isinstance(self.tip_racks, list)
+                and len(self.tip_racks) > 0)
 
     def reset_tip_tracking(self):
         """
@@ -339,7 +339,6 @@ class Pipette(CommandPublisher):
 
         return self
 
-    @commands.publish.both(command=commands.aspirate)
     def aspirate(self, volume=None, location=None, rate=1.0):
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
@@ -402,36 +401,41 @@ class Pipette(CommandPublisher):
                 location = volume
             volume = self.max_volume - self.current_volume
 
+        display_location = location if location else self.previous_placeable
+
+        do_publish(self.broker, commands.aspirate, self.aspirate, 'before',
+                   None, None, self, volume, display_location, rate)
+
         # if volume is specified as 0uL, then do nothing
-        if volume == 0:
-            return self
+        if volume != 0:
+            if self.current_volume + volume > self.max_volume:
+                raise RuntimeWarning(
+                    'Pipette with max volume of {0} cannot hold volume {1}'
+                    .format(
+                        self.max_volume,
+                        self.current_volume + volume)
+                )
 
-        if self.current_volume + volume > self.max_volume:
-            raise RuntimeWarning(
-                'Pipette with max volume of {0} cannot hold volume {1}'
-                .format(
-                    self.max_volume,
-                    self.current_volume + volume)
+            self._position_for_aspirate(location)
+
+            mm_position = self._aspirate_plunger_position(
+                self.current_volume + volume)
+            speed = self.speeds['aspirate'] * rate
+            self.instrument_actuator.push_speed()
+            self.instrument_actuator.set_speed(speed)
+            self.instrument_actuator.set_active_current(self._plunger_current)
+            self.robot.poses = self.instrument_actuator.move(
+                self.robot.poses,
+                x=mm_position
             )
+            self.instrument_actuator.pop_speed()
+            self.current_volume += volume  # update after actual aspirate
 
-        self._position_for_aspirate(location)
-
-        mm_position = self._aspirate_plunger_position(
-            self.current_volume + volume)
-        speed = self.speeds['aspirate'] * rate
-        self.instrument_actuator.push_speed()
-        self.instrument_actuator.set_speed(speed)
-        self.instrument_actuator.set_active_current(self._plunger_current)
-        self.robot.poses = self.instrument_actuator.move(
-            self.robot.poses,
-            x=mm_position
-        )
-        self.instrument_actuator.pop_speed()
-        self.current_volume += volume  # update after actual aspirate
+        do_publish(self.broker, commands.aspirate, self.aspirate, 'after',
+                   self, None, self, volume, display_location, rate)
 
         return self
 
-    @commands.publish.both(command=commands.dispense)
     def dispense(self,
                  volume=None,
                  location=None,
@@ -500,25 +504,31 @@ class Pipette(CommandPublisher):
         # Ensure we don't dispense more than the current volume
         volume = min(self.current_volume, volume)
 
+        display_location = location if location else self.previous_placeable
+
+        do_publish(self.broker, commands.dispense, self.dispense, 'before',
+                   None, None, self, volume, display_location, rate)
+
         # if volume is specified as 0uL, then do nothing
-        if volume == 0:
-            return self
+        if volume != 0:
+            self._position_for_dispense(location)
 
-        self._position_for_dispense(location)
+            mm_position = self._dispense_plunger_position(
+                self.current_volume - volume)
+            speed = self.speeds['dispense'] * rate
 
-        mm_position = self._dispense_plunger_position(
-            self.current_volume - volume)
-        speed = self.speeds['dispense'] * rate
+            self.instrument_actuator.push_speed()
+            self.instrument_actuator.set_speed(speed)
+            self.instrument_actuator.set_active_current(self._plunger_current)
+            self.robot.poses = self.instrument_actuator.move(
+                self.robot.poses,
+                x=mm_position
+            )
+            self.instrument_actuator.pop_speed()
+            self.current_volume -= volume  # update after actual dispense
 
-        self.instrument_actuator.push_speed()
-        self.instrument_actuator.set_speed(speed)
-        self.instrument_actuator.set_active_current(self._plunger_current)
-        self.robot.poses = self.instrument_actuator.move(
-            self.robot.poses,
-            x=mm_position
-        )
-        self.instrument_actuator.pop_speed()
-        self.current_volume -= volume  # update after actual dispense
+        do_publish(self.broker, commands.dispense, self.dispense, 'after',
+                   self, None, self, volume, display_location, rate)
 
         return self
 
@@ -583,7 +593,6 @@ class Pipette(CommandPublisher):
             self.robot.poses, safety_margin)
         return self
 
-    @commands.publish.both(command=commands.mix)
     def mix(self,
             repetitions=1,
             volume=None,
@@ -642,11 +651,17 @@ class Pipette(CommandPublisher):
         if not location and self.previous_placeable:
             location = self.previous_placeable
 
+        do_publish(self.broker, commands.mix, self.mix, 'before',
+                   self, None, None, repetitions, volume, location, rate)
+
         self.aspirate(location=location, volume=volume, rate=rate)
         for i in range(repetitions - 1):
             self.dispense(volume, rate=rate)
             self.aspirate(volume, rate=rate)
         self.dispense(volume, rate=rate)
+
+        do_publish(self.broker, commands.mix, self.mix, 'after',
+                   self, None, self, repetitions, volume, location, rate)
 
         return self
 
@@ -694,7 +709,6 @@ class Pipette(CommandPublisher):
 
         return self
 
-    @commands.publish.both(command=commands.touch_tip)
     def touch_tip(self, location=None, radius=1.0, v_offset=-1.0, speed=60.0):
         """
         Touch the :any:`Pipette` tip to the sides of a well,
@@ -759,10 +773,15 @@ class Pipette(CommandPublisher):
 
         # if no location specified, use the previously
         # associated placeable to get Well dimensions
-        if location:
-            self.move_to(location)
-        else:
+        if location is None:
             location = self.previous_placeable
+
+        do_publish(self.broker, commands.touch_tip, self.touch_tip, 'before',
+                   None, None, self, location, radius, v_offset, speed)
+
+        # move to location if we're not already there
+        if location != self.previous_placeable:
+            self.move_to(location)
 
         v_offset = (0, 0, v_offset)
 
@@ -781,9 +800,11 @@ class Pipette(CommandPublisher):
         [self.move_to((location, e), strategy='direct') for e in well_edges]
         self.robot.gantry.pop_speed()
 
+        do_publish(self.broker, commands.touch_tip, self.touch_tip, 'after',
+                   self, None, self, location, radius, v_offset, speed)
+
         return self
 
-    @commands.publish.both(command=commands.air_gap)
     def air_gap(self, volume=None, height=None):
         """
         Pull air into the :any:`Pipette` current tip
@@ -821,18 +842,23 @@ class Pipette(CommandPublisher):
         if not self.tip_attached:
             log.warning("Cannot perform air_gap without a tip attached.")
 
-        # if volumes is specified as 0uL, do nothing
-        if volume == 0:
-            return self
-
         if height is None:
             height = 5
 
-        location = self.previous_placeable.top(height)
-        # "move_to" separate from aspirate command
-        # so "_position_for_aspirate" isn't executed
-        self.move_to(location)
-        self.aspirate(volume)
+        do_publish(self.broker, commands.air_gap, self.air_gap, 'before',
+                   self, None, self, volume, height)
+
+        # if volumes is specified as 0uL, do nothing
+        if volume != 0:
+            location = self.previous_placeable.top(height)
+            # "move_to" separate from aspirate command
+            # so "_position_for_aspirate" isn't executed
+            self.move_to(location)
+            self.aspirate(volume)
+
+        do_publish(self.broker, commands.air_gap, self.air_gap, 'after',
+                   self, None, self, volume, height)
+
         return self
 
     @commands.publish.both(command=commands.return_tip)
