@@ -15,8 +15,7 @@ const PROTOCOL_DESIGNER_ENV_VAR_PREFIX = 'OT_PD_'
 // Also remove all OT_PD_VERSION env vars, the version should always
 // be gleaned from the package.json
 
-// const gitInfo = gitDescribeSync()
-const OT_PD_VERSION = '1.1.0' // gitInfo && gitInfo.raw
+const OT_PD_VERSION = '1.1.0'
 const OT_PD_BUILD_DATE = new Date().toUTCString()
 
 const JS_ENTRY = path.join(__dirname, 'src/index.js')
@@ -26,7 +25,10 @@ const passThruEnvVars = Object.keys(process.env)
   .filter(v => v.startsWith(PROTOCOL_DESIGNER_ENV_VAR_PREFIX))
   .concat(['NODE_ENV'])
 
-const envVarsWithDefaults = {OT_PD_VERSION, OT_PD_BUILD_DATE}
+const envVarsWithDefaults = {
+  OT_PD_VERSION,
+  OT_PD_BUILD_DATE,
+}
 
 const envVars = passThruEnvVars.reduce(
   (acc, envVar) => ({[envVar]: '', ...acc}),
