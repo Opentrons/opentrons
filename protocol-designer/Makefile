@@ -25,7 +25,7 @@ clean:
 .PHONY: build
 build: export NODE_ENV := production
 build:
-	webpack --profile && \
+	webpack --profile
 	git rev-parse HEAD > dist/.commit
 
 # development
