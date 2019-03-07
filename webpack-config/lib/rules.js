@@ -92,6 +92,8 @@ module.exports = {
   },
 
   // common image formats (url loader)
+  // TODO(mc, 2019-03-06): add a sensible limit or replace with file-loader
+  //  (which means no image inlining) if we can get the app to behave
   images: {
     test: /\.(?:ico|gif|png|jpg|jpeg|webp|svg)$/,
     use: 'url-loader',
