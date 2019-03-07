@@ -42,6 +42,7 @@
     "yup": "^0.26.6"
   },
   "devDependencies": {
+    "favicons-webpack-plugin": "^0.0.9",
     "flow-bin": "^0.82.0",
     "flow-typed": "^2.5.1"
   }
