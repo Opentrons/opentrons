@@ -75,9 +75,8 @@ jobs:
           script: make -C api deploy pypi_username=${PYPI_USER} pypi_password=${PYPI_PASSWORD}
           on:
             all_branches: true
-            tags: true
+            condition: $TRAVIS_TAG =~ ^v
             repo: Opentrons/opentrons
-            branch: edge
 
         # push to test pypi on pr
         - provider: script
@@ -131,23 +130,24 @@ jobs:
       name: 'Build/deploy Opentrons App for POSIX (unsigned dev builds)'
       os: linux
       script: make -C app-shell dist-posix
-      if: tag IS blank AND NOT branch =~ ^(edge|release_.+)$
+      # TODO(mc, 2019-03-07): app-shell makefile still looks for presense of
+      # tag rather than correct tag format. For now, skip app builds entirely if
+      # tag is present but does not match ^v
+      if: tag IS blank AND (NOT branch =~ ^(edge|release_.+)$)
 
     - # build the Opentrons App for Linux (tagged / edge / RC builds)
       <<: *app_stage_build
       name: 'Build/deploy Opentrons App for Linux'
       os: linux
       script: make -C app-shell dist-linux
-      if: tag IS present OR branch =~ ^(edge|release_.+)$
+      if: tag =~ ^v OR branch =~ ^(edge|release_.+)$
 
     - # build the Opentrons App for macOS (tagged / edge / RC builds)
       <<: *app_stage_build
       name: 'Build/deploy Opentrons App for macOS'
       os: osx
       script: make -C app-shell dist-osx
-      if: tag IS present OR branch =~ ^(edge|release_.+)$
-
-
+      if: tag =~ ^v OR branch =~ ^(edge|release_.+)$
 
 env:
   global:
