@@ -13,8 +13,10 @@ export type GateStage = 'loading' |
 
 type GateState = {gateStage: GateStage, errorMessage: ?string}
 
-const OPENTRONS_API_BASE_URL = process.env.OT_WEB_API_BASE_URL || 'https://staging.web-api.opentrons.com'
-const PROTOCOL_DESIGNER_URL = process.env.OT_PD_BASE_URL || 'https://staging.designer.opentrons.com'
+export const isProduction = global.location.host === 'designer.opentrons.com'
+
+const OPENTRONS_API_BASE_URL = isProduction ? 'https://web-api.opentrons.com' : 'https://staging.web-api.opentrons.com'
+const PROTOCOL_DESIGNER_VERIFY_URL = isProduction ? global.location.origin : 'https://staging.designer.opentrons.com'
 
 const VERIFY_EMAIL_PATH = '/users/verify-email'
 const CONFIRM_EMAIL_PATH = '/users/confirm-email'
@@ -61,7 +63,7 @@ export const getGateStage = (hasOptedIntoAnalytics: boolean | null): Promise<Gat
       if (response.ok) { // valid identity token, write new cookie
         writeIdentityCookie(body)
         gateStage = getStageFromIdentityCookie(token, hasOptedIntoAnalytics)
-        global.location.replace(PROTOCOL_DESIGNER_URL)
+        global.location.replace(global.location.origin) // redirect to clean token qs param from url
       } else {
         const {status, statusText} = response
         errorMessage = i18n.t('application.networking.unauthorized_verification_failure')
@@ -81,7 +83,7 @@ export const getGateStage = (hasOptedIntoAnalytics: boolean | null): Promise<Gat
     const confirmEmailBody = {
       name,
       email,
-      verifyUrl: PROTOCOL_DESIGNER_URL,
+      verifyUrl: PROTOCOL_DESIGNER_VERIFY_URL,
       templateName: 'verify-email-pd',
       emailListName: 'pd-users',
     }
@@ -93,13 +95,17 @@ export const getGateStage = (hasOptedIntoAnalytics: boolean | null): Promise<Gat
         gateStage = 'promptCheckEmail'
       } else {
         console.error('Failed to confirm identity and send user email.')
-        errorMessage = i18n.t('application.networking.generic_verification_failure')
+        errorMessage = i18n.t('application.networking.validation_server_failure')
         gateStage = 'failedIdentityVerification'
+
+        const {status, statusText} = response
+        const specificAddendum = (body && body.message) || `${status} ${statusText}`
+        errorMessage = `${errorMessage}  (Error Message: ${specificAddendum})`
       }
       return {gateStage, errorMessage}
     }).catch(error => {
       gateStage = 'failedIdentityVerification'
-      errorMessage = error || i18n.t('application.networking.generic_verification_failure')
+      errorMessage = error || i18n.t('application.networking.validation_server_failure')
       return {gateStage, errorMessage}
     }))
   } else { // No identity token
