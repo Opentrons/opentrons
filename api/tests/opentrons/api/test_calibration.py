@@ -179,7 +179,7 @@ async def test_move_to_front_api1(main_router, model):
         await main_router.wait_until(state('ready'))
 
 
-async def test_pick_up_tip_api1(main_router, model):
+async def test_pick_up_tip(main_router, model):
     with mock.patch.object(
             model.instrument._instrument, 'pick_up_tip') as pick_up_tip:
         main_router.calibration_manager.pick_up_tip(
@@ -234,6 +234,20 @@ async def test_home_api1(main_router, model):
             model.instrument)
 
         home.assert_called_with()
+
+        await main_router.wait_until(state('moving'))
+        await main_router.wait_until(state('ready'))
+
+
+@pytest.mark.api1_only
+@pytest.mark.parametrize('labware', ['trough-1row-25ml'])
+async def test_move_to_top_api1_1well(main_router, model, labware):
+    with mock.patch.object(model.instrument._instrument, 'move_to') as move_to:
+        main_router.calibration_manager.move_to(
+            model.instrument,
+            model.container)
+        target = model.container._container.wells(0).top()
+        move_to.assert_called_with(target)
 
         await main_router.wait_until(state('moving'))
         await main_router.wait_until(state('ready'))

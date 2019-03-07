@@ -394,9 +394,17 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
 
 
 @pytest.fixture
-def model(robot, hardware, loop):
+def model(robot, hardware, loop, request):
+    # Use with pytest.mark.parametrize(’labware’, [some-labware-name])
+    # to have a different labware loaded as .container. If not passed,
+    # defaults to the version-appropriate way to do 96 flat
     from opentrons.legacy_api.containers import load
     from opentrons.legacy_api.instruments.pipette import Pipette
+
+    try:
+        lw_name = request.getfixturevalue('labware')
+    except Exception:
+        lw_name = None
 
     if isinstance(hardware, hc.HardwareAPILike):
         ctx = ProtocolContext(loop=loop, hardware=hardware)
@@ -404,14 +412,15 @@ def model(robot, hardware, loop):
         loop.run_until_complete(hardware.cache_instruments(
             {Mount.RIGHT: 'p300_single'}))
         instrument = models.Instrument(pip, context=ctx)
-        plate = ctx.load_labware_by_name('generic_96_wellPlate_380_uL', 1)
+        plate = ctx.load_labware_by_name(
+            lw_name or 'generic_96_wellPlate_380_uL', 1)
         rob = hardware
         container = models.Container(plate, context=ctx)
     else:
         print("hardware is {}".format(hardware))
         pipette = Pipette(robot,
                           ul_per_mm=18.5, max_volume=300, mount='right')
-        plate = load(robot, '96-flat', '1')
+        plate = load(robot, lw_name or '96-flat', '1')
         rob = robot
         instrument = models.Instrument(pipette)
         container = models.Container(plate)

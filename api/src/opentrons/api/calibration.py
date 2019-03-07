@@ -15,6 +15,16 @@ log = logging.getLogger(__name__)
 VALID_STATES = {'probing', 'moving', 'ready'}
 
 
+# This hack is because if you have an old container that uses Placeable with
+# just one well, Placeable.wells() returns the Well rather than [Well].
+# Passing the well as an argument, though, will always return the well.
+def _well0(cont):
+    if isinstance(cont, labware.Labware):
+        return cont.wells()[0]
+    else:
+        return cont.wells(0)
+
+
 class CalibrationManager:
     """
     Serves endpoints that are primarily used in
@@ -82,9 +92,9 @@ class CalibrationManager:
         if ff.use_protocol_api_v2():
             with instrument._context.temp_connect(self._hardware):
                 instrument._context.location_cache = None
-                inst.pick_up_tip(container._container.wells()[0])
+                inst.pick_up_tip(_well0(container._container))
         else:
-            inst.pick_up_tip(container._container.wells()[0])
+            inst.pick_up_tip(_well0(container._container))
         self._set_state('ready')
 
     def drop_tip(self, instrument, container):
@@ -100,9 +110,9 @@ class CalibrationManager:
         if ff.use_protocol_api_v2():
             with instrument._context.temp_connect(self._hardware):
                 instrument._context.location_cache = None
-                inst.drop_tip(container._container.wells()[0])
+                inst.drop_tip(_well0(container._container))
         else:
-            inst.drop_tip(container._container.wells()[0])
+            inst.drop_tip(_well0(container._container))
         self._set_state('ready')
 
     def return_tip(self, instrument):
@@ -148,8 +158,7 @@ class CalibrationManager:
 
         inst = instrument._instrument
         cont = container._container
-
-        target = cont.wells()[0].top()
+        target = _well0(cont).top()
 
         log.info('Moving {} to {} in {}'.format(
             instrument.name, container.name, container.slot))
@@ -206,9 +215,9 @@ class CalibrationManager:
             # relative to the old calibration
             container._container.set_calibration(Point(0, 0, 0))
             if ff.calibrate_to_bottom():
-                orig = container._container.wells()[0].bottom().point
+                orig = _well0(container._container).bottom().point
             else:
-                orig = container._container.wells()[0].top().point
+                orig = _well0(container._container).top().point
             delta = here - orig
             labware.save_calibration(container._container, delta)
         else:
