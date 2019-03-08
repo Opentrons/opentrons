@@ -1,10 +1,11 @@
+// @flow
 import {createStore, combineReducers, applyMiddleware, compose} from 'redux'
 import thunk from 'redux-thunk'
 import {makePersistSubscriber, rehydratePersistedAction} from './persist'
-import {fileErrors} from './load-file/actions'
+import {fileUploadMessage} from './load-file/actions'
 
 function getRootReducer () {
-  const rootReducer = combineReducers({
+  const rootReducer: any = combineReducers({
     analytics: require('./analytics').rootReducer,
     dismiss: require('./dismiss').rootReducer,
     fileData: require('./file-data').rootReducer,
@@ -17,25 +18,25 @@ function getRootReducer () {
     wellSelection: require('./well-selection/reducers').default,
   })
 
-  return (state, action) => {
+  return (state: any, action) => {
     if (action.type === 'LOAD_FILE' || action.type === 'CREATE_NEW_PROTOCOL') {
-      const hydratedState = rootReducer(undefined, rehydratePersistedAction())
+      // reset entire state, rehydrate from localStorage
+      const resetState = rootReducer(undefined, rehydratePersistedAction())
 
-      // reset entire state, rehydrate from localStorage, then pass the action
       if (action.type === 'LOAD_FILE') {
         try {
-          return rootReducer(hydratedState, action)
+          return rootReducer(resetState, action)
         } catch (e) {
           console.error(e)
           // something in the reducers went wrong, show it to the user for bug report
-          return rootReducer(hydratedState, fileErrors({
+          return rootReducer(state, fileUploadMessage({
             isError: true,
             errorType: 'INVALID_JSON_FILE',
-            message: e.message,
+            errorMessage: e.message,
           }))
         }
       }
-      return rootReducer(hydratedState, action)
+      return rootReducer(resetState, action)
     }
     // pass-thru
     return rootReducer(state, action)
@@ -45,7 +46,7 @@ function getRootReducer () {
 export default function configureStore () {
   const reducer = getRootReducer()
 
-  const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+  const composeEnhancers: any = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
   const store = createStore(
     reducer,
     /* preloadedState, */
@@ -60,9 +61,10 @@ export default function configureStore () {
     const nextRootReducer = getRootReducer()
     store.replaceReducer(nextRootReducer)
   }
-
+  // $FlowFixMe no module.hot
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers
+    // $FlowFixMe no module.hot
     module.hot.accept([
       './analytics/reducers',
       './dismiss/reducers',
