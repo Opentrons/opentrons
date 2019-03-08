@@ -1,7 +1,8 @@
 from collections import OrderedDict
+import itertools
 import logging
-
 from opentrons.data_storage import database
+from opentrons.util.vector import Vector
 from .placeable import (
     Deck,
     Slot,
@@ -13,6 +14,8 @@ from .placeable import (
     get_container
 )
 from opentrons.helpers import helpers
+
+from opentrons.protocol_api import labware as new_labware
 
 __all__ = [
     'Deck',
@@ -144,3 +147,37 @@ def save_custom_container(data):
     raise RuntimeError(
         "This method is deprecated and should not be used. To save a custom"
         "labware, please use opentrons.containers.create()")
+
+
+def _load_new_well(well_data):
+    props = {
+        'depth': well_data['depth'],
+        'total-liquid-volume': well_data['totalLiquidVolume'],
+    }
+    if well_data['shape'] == 'circular':
+        props['diameter'] = well_data['diameter']
+    elif well_data['shape'] == 'rectangular':
+        props['length'] = well_data['length']
+        props['width'] = well_data['width']
+    else:
+        raise ValueError(
+            f"Bad definition for well shape: {well_data['shape']}")
+    well = Well(properties=props)
+    return (well, (well_data['x'] - well.x_size()/2,
+                   well_data['y'] - well.y_size()/2,
+                   well_data['z']))
+
+
+def load_new_labware(container_name):
+    """ Load a labware in the new schema into a placeable.
+
+    :raises KeyError: If the labware name is not found
+    """
+    defn = new_labware.load_definition_by_name(container_name)
+    container = Container()
+    container.properties['type'] = container_name
+    container._coordinates = Vector(defn['cornerOffsetFromSlot'])
+    for well_name in itertools.chain(*defn['ordering']):
+        well_obj, well_pos = _load_new_well(defn['wells'][well_name])
+        container.add(well_obj, well_name, well_pos)
+    return container
