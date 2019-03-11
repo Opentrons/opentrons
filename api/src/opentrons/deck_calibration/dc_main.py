@@ -318,6 +318,8 @@ class CLITool:
             0,
             l_pipette)
 
+        self._current_mount = r_pipette
+
     def validate(
             self,
             point: Tuple[float, float, float],
@@ -451,15 +453,14 @@ def main():
     A CLI application for performing factory calibration of an Opentrons robot
 
     Instructions:
-        - Robot must be set up with a 300ul single-channel pipette installed on
-          the right-hand mount.
+        - Robot must be set up with two 300ul or 50ul single-channel pipettes
+          installed on the right-hand and left-hand mount.
         - Put a GEB 300ul tip onto the pipette.
-        - Use the arrow keys to jog the robot over an open area of the deck
-          (the base deck surface, not over a ridge or numeral engraving). You
-          can use the '-' and '=' keys to decrease or increase the amount of
-          distance moved with each jog action.
+        - Use the arrow keys to jog the robot over slot 5 in an open space that
+          is not an engraving or a hole.
         - Use the 'q' and 'a' keys to jog the pipette up and down respectively
-          until the tip is just touching the deck surface, then press 'z'.
+          until the tip is just touching the deck surface, then press 'z'. This
+          will save the 'Z' height.
         - Press '1' to automatically go to the expected location of the first
           calibration point. Jog the robot until the tip is actually at
           the point, then press 'enter'.
@@ -467,7 +468,8 @@ def main():
         - After calibrating all three points, press the space bar to save the
           configuration.
         - Optionally, press 4,5,6 or 7 to validate the new configuration.
-        - Press 'p' to perform tip probe.
+        - Press 'p' to perform tip probe. Press the space bar to save again.
+        - Press 'm' to perform mount calibration.
         - Press 'esc' to exit the program.
     """
     prompt = input(

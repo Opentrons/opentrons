@@ -2,6 +2,7 @@ import pytest
 from opentrons.config import (CONFIG,
                               robot_configs,
                               advanced_settings as advs)
+from opentrons.deck_calibration import dc_main
 
 # TODO (Laura 02252019): CLI tool is extremely frail. Need to add tests for
 # the different funcs called on it that are not shared with
@@ -77,3 +78,17 @@ async def test_new_deck_points():
     assert expected_points2['1'] == (12.13, 9.0)
     assert expected_points2['2'] == (380.87, 9.0)
     assert expected_points2['3'] == (12.13, 258.0)
+
+def test_tip_probe(mock_config, async_server):
+    hardware = async_server['com.opentrons.hardware']
+    tip_length = 51.7  # p300/p50 tip length
+    output = dc_main.probe(tip_length, hardware)
+    assert output == 'Tip probe'
+
+
+def test_validate_points():
+    return None
+
+
+def test_mount_offset():
+    return None
