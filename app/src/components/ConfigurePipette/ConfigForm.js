@@ -2,6 +2,7 @@
 import * as React from 'react'
 import {Link} from 'react-router-dom'
 import {Formik, Form} from 'formik'
+
 import startCase from 'lodash/startCase'
 import mapValues from 'lodash/mapValues'
 import pick from 'lodash/pick'
@@ -65,13 +66,7 @@ export default class ConfigForm extends React.Component<Props> {
 
   handleSubmit = (values: FormValues) => {
     const params = mapValues(values, v => {
-      let param
-      if (v === '') {
-        param = null
-      } else {
-        param = {value: Number(v)}
-      }
-      return param
+      return v === '' ? null : {value: Number(v)}
     })
     this.props.updateConfig(this.props.pipette.id, {fields: {...params}})
   }
@@ -88,7 +83,7 @@ export default class ConfigForm extends React.Component<Props> {
   }
 
   validate = (values: FormValues) => {
-    let errors = {}
+    const errors = {}
     const fields = this.getVisibleFields()
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
 
@@ -137,8 +132,10 @@ export default class ConfigForm extends React.Component<Props> {
         validate={this.validate}
         validateOnChange={false}
         render={formProps => {
-          const {handleReset, errors} = formProps
+          const {errors, values} = formProps
           const disableSubmit = !isEmpty(errors)
+          const handleReset = () =>
+            formProps.resetForm(mapValues(values, () => ''))
           return (
             <Form>
               <FormColumn>
@@ -160,7 +157,10 @@ export default class ConfigForm extends React.Component<Props> {
               </FormColumn>
               <FormButtonBar
                 buttons={[
-                  {children: 'reset all', type: 'reset', onClick: handleReset},
+                  {
+                    children: 'reset all',
+                    onClick: handleReset,
+                  },
                   {children: 'cancel', Component: Link, to: parentUrl},
                   {children: 'save', type: 'submit', disabled: disableSubmit},
                 ]}
