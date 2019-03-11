@@ -21,6 +21,7 @@ const OT_PD_BUILD_DATE = new Date().toUTCString()
 
 const JS_ENTRY = path.join(__dirname, 'src/index.js')
 const HTML_ENTRY = path.join(__dirname, 'src/index.hbs')
+const ERROR_HTML = path.join(__dirname, 'src/error.html')
 
 const passThruEnvVars = Object.keys(process.env)
   .filter(v => v.startsWith(PROTOCOL_DESIGNER_ENV_VAR_PREFIX))
@@ -79,6 +80,7 @@ module.exports = merge.strategy({'module.rules': 'replace'})(baseConfig, {
     }),
     new HtmlWebpackPlugin({
       title, description, author, template: HTML_ENTRY}),
+    new HtmlWebpackPlugin({filename: 'error.html', inject: false, template: ERROR_HTML}),
     new ScriptExtHtmlWebpackPlugin({defaultAttribute: 'defer'}),
   ],
 })

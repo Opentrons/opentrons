@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <title>404 Redirect</title>
+  <meta charset='utf-8'>
+</head>
+
+<body>
+  <script>
+    var location = window.location
+    var protocol = location.protocol
+    var host = location.host
+
+    window.location.replace(protocol + '//' + host)
+  </script>
+  <noscript>
+    Page not found. If you believe this is an error, please contact Opentrons support.
+  </noscript>
+</body>
+</html>
