@@ -21,18 +21,11 @@ export type FormValues = {[string]: ?string}
 type FormGroupProps = {
   groupLabel: string,
   groupError?: ?string,
-  values: FormValues,
   formFields: Array<DisplayFieldProps>,
-  errors: {[string]: ?string},
-  touched: {[string]: ?string},
-}
-
-function getFieldValue (name: string, values: FormValues): ?string {
-  return values[name]
 }
 
 export default function ConfigFormGroup (props: FormGroupProps) {
-  const {groupLabel, groupError, values, formFields, touched, errors} = props
+  const {groupLabel, groupError, formFields} = props
   const formattedError =
     groupError &&
     groupError.split('\n').map(function (item, key) {
@@ -47,16 +40,14 @@ export default function ConfigFormGroup (props: FormGroupProps) {
     <FormGroup label={groupLabel} className={styles.form_group}>
       {groupError && <p className={styles.group_error}>{formattedError}</p>}
       {formFields.map(f => {
-        const value = getFieldValue(f.name, values)
         const _default = f.default.toString()
         const {name, displayName, units} = f
-        const error = touched[name] ? errors[name] : null
         return (
           <ConfigInput
             key={name}
             label={displayName}
             placeholder={_default}
-            {...{name, units, value, error}}
+            {...{name, units}}
           />
         )
       })}
@@ -88,8 +79,6 @@ export function ConfigFormRow (props: FormRowProps) {
 type ConfigInputProps = {
   name: string,
   label: string,
-  value: ?string,
-  error: ?string,
   className?: string,
   placeholder: string,
   units: string,

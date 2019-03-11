@@ -66,7 +66,7 @@ export default class ConfigForm extends React.Component<Props> {
   handleSubmit = (values: FormValues) => {
     const params = mapValues(values, v => {
       let param
-      if (!v) {
+      if (v === '') {
         param = null
       } else {
         param = {value: Number(v)}
@@ -94,12 +94,16 @@ export default class ConfigForm extends React.Component<Props> {
 
     // validate all visible fields with min and max
     forOwn(fields, (field, name) => {
+      const value = values[name]
       const {min, max} = field
-      const value = Number(values[name])
-      const valueEntered = value || value !== 0
 
-      if (valueEntered && min && max && (value < min || value > max)) {
-        set(errors, name, `Min ${min} / Max ${max}`)
+      if (value !== '') {
+        const parsed = Number(value)
+        if (Number.isNaN(parsed)) {
+          set(errors, name, `number required`)
+        } else if (min && max && (parsed < min || value > max)) {
+          set(errors, name, `Min ${min} / Max ${max}`)
+        }
       }
     })
 
@@ -120,7 +124,7 @@ export default class ConfigForm extends React.Component<Props> {
     const {parentUrl} = this.props
     const fields = this.getVisibleFields()
     const initialValues = mapValues(fields, f => {
-      return f.value !== f.default ? f.value.toString() : null
+      return f.value !== f.default ? f.value.toString() : ''
     })
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
     const powerFields = this.getFieldsByKey(POWER_KEYS, fields)
@@ -133,14 +137,7 @@ export default class ConfigForm extends React.Component<Props> {
         validate={this.validate}
         validateOnChange={false}
         render={formProps => {
-          const {
-            values,
-            handleChange,
-            handleBlur,
-            handleReset,
-            errors,
-            touched,
-          } = formProps
+          const {handleReset, errors} = formProps
           const disableSubmit = !isEmpty(errors)
           return (
             <Form>
@@ -148,37 +145,22 @@ export default class ConfigForm extends React.Component<Props> {
                 <ConfigFormGroup
                   groupLabel="Plunger Positions"
                   groupError={errors.plungerError}
-                  values={values}
                   formFields={plungerFields}
-                  onChange={handleChange}
-                  errors={errors}
-                  onBlur={handleBlur}
-                  touched={touched}
                 />
                 <ConfigFormGroup
                   groupLabel="Power / Force"
-                  values={values}
                   formFields={powerFields}
-                  onChange={handleChange}
-                  errors={errors}
-                  onBlur={handleBlur}
-                  touched={touched}
                 />
               </FormColumn>
               <FormColumn>
                 <ConfigFormGroup
                   groupLabel="Tip Pickup / Drop "
-                  values={values}
                   formFields={tipFields}
-                  onChange={handleChange}
-                  errors={errors}
-                  onBlur={handleBlur}
-                  touched={touched}
                 />
               </FormColumn>
               <FormButtonBar
                 buttons={[
-                  {children: 'reset all', onClick: handleReset},
+                  {children: 'reset all', type: 'reset', onClick: handleReset},
                   {children: 'cancel', Component: Link, to: parentUrl},
                   {children: 'save', type: 'submit', disabled: disableSubmit},
                 ]}
