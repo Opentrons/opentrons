@@ -39,17 +39,8 @@ export default function ConfigFormGroup (props: FormGroupProps) {
   return (
     <FormGroup label={groupLabel} className={styles.form_group}>
       {groupError && <p className={styles.group_error}>{formattedError}</p>}
-      {formFields.map(f => {
-        const _default = f.default.toString()
-        const {name, displayName, units} = f
-        return (
-          <ConfigInput
-            key={name}
-            label={displayName}
-            placeholder={_default}
-            {...{name, units}}
-          />
-        )
+      {formFields.map((field, index) => {
+        return <ConfigInput field={field} key={index} />
       })}
     </FormGroup>
   )
@@ -77,24 +68,23 @@ export function ConfigFormRow (props: FormRowProps) {
 }
 
 type ConfigInputProps = {
-  name: string,
-  label: string,
+  field: DisplayFieldProps,
   className?: string,
-  placeholder: string,
-  units: string,
 }
 
 export function ConfigInput (props: ConfigInputProps) {
-  const {name, label, placeholder, units, className} = props
-  const id = makeId(name)
+  const {field, className} = props
+  const {name, units, displayName} = field
+  const id = makeId(field.name)
+  const _default = field.default.toString()
   return (
-    <ConfigFormRow label={label} labelFor={id}>
+    <ConfigFormRow label={displayName} labelFor={id}>
       <Field name={name}>
         {fieldProps => (
           <InputField
+            placeholder={_default}
             {...{
               ...fieldProps.field,
-              placeholder,
               units,
               className,
               error: fieldProps.form.errors[name],
