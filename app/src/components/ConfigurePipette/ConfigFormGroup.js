@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import {Field} from 'formik'
 import {FormGroup, InputField} from '@opentrons/components'
 
 import styles from './styles.css'
@@ -19,32 +20,27 @@ export type FormValues = {[string]: ?string}
 
 type FormGroupProps = {
   groupLabel: string,
-  values: FormValues,
+  groupError?: ?string,
   formFields: Array<DisplayFieldProps>,
-  onChange: (event: *) => mixed,
-  error: ?string,
-}
-
-function getFieldValue (name: string, values: FormValues): ?string {
-  return values[name]
 }
 
 export default function ConfigFormGroup (props: FormGroupProps) {
-  const {groupLabel, values, formFields, onChange, error} = props
+  const {groupLabel, groupError, formFields} = props
+  const formattedError =
+    groupError &&
+    groupError.split('\n').map(function (item, key) {
+      return (
+        <span key={key}>
+          {item}
+          <br />
+        </span>
+      )
+    })
   return (
     <FormGroup label={groupLabel} className={styles.form_group}>
-      {formFields.map(f => {
-        const value = getFieldValue(f.name, values)
-        const _default = f.default.toString()
-        const {name, displayName, units, min, max} = f
-        return (
-          <ConfigInput
-            key={name}
-            label={displayName}
-            placeholder={_default}
-            {...{name, units, value, min, max, onChange, error}}
-          />
-        )
+      {groupError && <p className={styles.group_error}>{formattedError}</p>}
+      {formFields.map((field, index) => {
+        return <ConfigInput field={field} key={index} />
       })}
     </FormGroup>
   )
@@ -72,42 +68,31 @@ export function ConfigFormRow (props: FormRowProps) {
 }
 
 type ConfigInputProps = {
-  name: string,
-  label: string,
-  value: ?string,
-  error: ?string,
+  field: DisplayFieldProps,
   className?: string,
-  placeholder: string,
-  units: string,
-  onChange: (event: *) => mixed,
 }
 
 export function ConfigInput (props: ConfigInputProps) {
-  const {
-    name,
-    label,
-    value,
-    placeholder,
-    units,
-    error,
-    className,
-    onChange,
-  } = props
-  const id = makeId(name)
+  const {field, className} = props
+  const {name, units, displayName} = field
+  const id = makeId(field.name)
+  const _default = field.default.toString()
   return (
-    <ConfigFormRow label={label} labelFor={id}>
-      <InputField
-        {...{
-          id,
-          name,
-          value,
-          placeholder,
-          units,
-          error,
-          className,
-          onChange,
-        }}
-      />
+    <ConfigFormRow label={displayName} labelFor={id}>
+      <Field name={name}>
+        {fieldProps => (
+          <InputField
+            placeholder={_default}
+            {...{
+              ...fieldProps.field,
+              units,
+              className,
+              error: fieldProps.form.errors[name],
+              touched: fieldProps.form.touched[name],
+            }}
+          />
+        )}
+      </Field>
     </ConfigFormRow>
   )
 }

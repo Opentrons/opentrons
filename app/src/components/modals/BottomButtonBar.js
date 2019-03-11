@@ -12,6 +12,7 @@ import type {ButtonProps} from '@opentrons/components'
 type Props = {
   buttons: Array<?ButtonProps>,
   className?: string,
+  description?: React.Node,
 }
 
 export default function BottomButtonBar (props: Props) {
@@ -20,13 +21,16 @@ export default function BottomButtonBar (props: Props) {
 
   return (
     <div className={className}>
-      {buttons.map((button, index) => (
-        <OutlineButton
-          {...button}
-          key={index}
-          className={cx(styles.bottom_button, button.className)}
-        />
-      ))}
+      {props.description}
+      <div>
+        {buttons.map((button, index) => (
+          <OutlineButton
+            {...button}
+            key={index}
+            className={cx(styles.bottom_button, button.className)}
+          />
+        ))}
+      </div>
     </div>
   )
 }

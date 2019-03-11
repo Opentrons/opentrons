@@ -1,10 +1,14 @@
 // @flow
 import * as React from 'react'
 import {Link} from 'react-router-dom'
-import {Formik} from 'formik'
+import {Formik, Form} from 'formik'
+
 import startCase from 'lodash/startCase'
 import mapValues from 'lodash/mapValues'
 import pick from 'lodash/pick'
+import set from 'lodash/set'
+import forOwn from 'lodash/forOwn'
+import isEmpty from 'lodash/isEmpty'
 
 import FormButtonBar from './FormButtonBar'
 import ConfigFormGroup, {FormColumn} from './ConfigFormGroup'
@@ -62,22 +66,60 @@ export default class ConfigForm extends React.Component<Props> {
 
   handleSubmit = (values: FormValues) => {
     const params = mapValues(values, v => {
-      let param
-      if (!v) {
-        param = null
-      } else {
-        param = {value: Number(v)}
-      }
-      return param
+      return v === '' ? null : {value: Number(v)}
     })
     this.props.updateConfig(this.props.pipette.id, {fields: {...params}})
+  }
+
+  getFieldValue (
+    key: string,
+    fields: Array<DisplayFieldProps>,
+    values: FormValues
+  ): number {
+    const field = fields.find(f => f.name === key)
+    const _default = field && field.default
+    const value = values[key] || _default
+    return Number(value)
+  }
+
+  validate = (values: FormValues) => {
+    const errors = {}
+    const fields = this.getVisibleFields()
+    const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
+
+    // validate all visible fields with min and max
+    forOwn(fields, (field, name) => {
+      const value = values[name]
+      const {min, max} = field
+
+      if (value !== '') {
+        const parsed = Number(value)
+        if (Number.isNaN(parsed)) {
+          set(errors, name, `number required`)
+        } else if (min && max && (parsed < min || value > max)) {
+          set(errors, name, `Min ${min} / Max ${max}`)
+        }
+      }
+    })
+
+    const plungerGroupError =
+      'Please ensure the following: \n top > bottom > blowout > droptip'
+    const top = this.getFieldValue('top', plungerFields, values)
+    const bottom = this.getFieldValue('bottom', plungerFields, values)
+    const blowout = this.getFieldValue('blowout', plungerFields, values)
+    const dropTip = this.getFieldValue('dropTip', plungerFields, values)
+    if (top <= bottom || bottom <= blowout || blowout <= dropTip) {
+      set(errors, 'plungerError', plungerGroupError)
+    }
+
+    return errors
   }
 
   render () {
     const {parentUrl} = this.props
     const fields = this.getVisibleFields()
     const initialValues = mapValues(fields, f => {
-      return f.value !== f.default ? f.value.toString() : null
+      return f.value !== f.default ? f.value.toString() : ''
     })
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
     const powerFields = this.getFieldsByKey(POWER_KEYS, fields)
@@ -87,44 +129,43 @@ export default class ConfigForm extends React.Component<Props> {
       <Formik
         onSubmit={this.handleSubmit}
         initialValues={initialValues}
+        validate={this.validate}
+        validateOnChange={false}
         render={formProps => {
-          const {values, handleChange, handleReset, handleSubmit} = formProps
+          const {errors, values} = formProps
+          const disableSubmit = !isEmpty(errors)
+          const handleReset = () =>
+            formProps.resetForm(mapValues(values, () => ''))
           return (
-            <form onSubmit={handleSubmit}>
+            <Form>
               <FormColumn>
                 <ConfigFormGroup
                   groupLabel="Plunger Positions"
-                  values={values}
+                  groupError={errors.plungerError}
                   formFields={plungerFields}
-                  onChange={handleChange}
-                  error={null}
                 />
-
                 <ConfigFormGroup
                   groupLabel="Power / Force"
-                  values={values}
                   formFields={powerFields}
-                  onChange={handleChange}
-                  error={null}
                 />
               </FormColumn>
               <FormColumn>
                 <ConfigFormGroup
                   groupLabel="Tip Pickup / Drop "
-                  values={values}
                   formFields={tipFields}
-                  onChange={handleChange}
-                  error={null}
                 />
               </FormColumn>
               <FormButtonBar
                 buttons={[
-                  {children: 'reset all', onClick: handleReset},
+                  {
+                    children: 'reset all',
+                    onClick: handleReset,
+                  },
                   {children: 'cancel', Component: Link, to: parentUrl},
-                  {children: 'save', type: 'submit'},
+                  {children: 'save', type: 'submit', disabled: disableSubmit},
                 ]}
               />
-            </form>
+            </Form>
           )
         }}
       />
