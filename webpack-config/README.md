@@ -114,15 +114,15 @@ module.exports = merge.strategy({'module.rules': 'replace'})(baseConfig, {
 })
 ```
 
-| key        | loaders                                    | matches          |
-| ---------- | ------------------------------------------ | ---------------- |
-| js         | babel-loader                               | \*.js            |
-| worker     | worker-loader                              | \*.worker.js     |
-| globalCss  | css-loader, postcss-loader                 | \*.global.css    |
-| localCss   | css-loader (modules: true), postcss-loader | !(global).css    |
-| handlebars | handlebars-loader                          | \*.hbs           |
-| fonts      | url-loader                                 | WOFF extensions  |
-| images     | url-loader                                 | Image extensions |
+| key        | loaders                                    | matches             |
+| ---------- | ------------------------------------------ | ------------------- |
+| js         | babel-loader                               | \*.js               |
+| worker     | worker-loader                              | \*.worker.js        |
+| globalCss  | css-loader, postcss-loader                 | \*.global.css       |
+| localCss   | css-loader (modules: true), postcss-loader | !(global).css       |
+| handlebars | handlebars-loader                          | \*.hbs              |
+| fonts      | file-loader                                | TTF/WOFF extensions |
+| images     | file-loader                                | Image extensions    |
 
 **Please note**
 

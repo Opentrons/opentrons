@@ -85,17 +85,25 @@ module.exports = {
   },
 
   // fonts
-  // TODO(mc, 2017-09-12): Add other font-types to the regex if we need them
   fonts: {
     test: /\.(?:ttf|woff2?(?:\?v=\d+\.\d+\.\d+)?)$/,
-    use: 'url-loader',
+    use: {
+      loader: 'file-loader',
+      options: {
+        // [hash] is file-loader specific contenthash
+        name: DEV_MODE ? '[name].[ext]' : '[name].[hash].[ext]',
+      },
+    },
   },
 
-  // common image formats (url loader)
-  // TODO(mc, 2019-03-06): add a sensible limit or replace with file-loader
-  //  (which means no image inlining) if we can get the app to behave
+  // common image formats
   images: {
     test: /\.(?:ico|gif|png|jpg|jpeg|webp|svg)$/,
-    use: 'url-loader',
+    use: {
+      loader: 'file-loader',
+      options: {
+        name: DEV_MODE ? '[name].[ext]' : '[name].[hash].[ext]',
+      },
+    },
   },
 }

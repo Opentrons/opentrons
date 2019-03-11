@@ -7,7 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
 
-const {DEV_MODE, baseConfig, rules} = require('@opentrons/webpack-config')
+const {DEV_MODE, baseConfig} = require('@opentrons/webpack-config')
 const {productName: title, description, author} = require('./package.json')
 const PROTOCOL_DESIGNER_ENV_VAR_PREFIX = 'OT_PD_'
 
@@ -39,25 +39,12 @@ const envVars = passThruEnvVars.reduce(
 
 console.log(`PD version: ${OT_PD_VERSION || 'UNKNOWN!'}`)
 
-module.exports = merge.strategy({'module.rules': 'replace'})(baseConfig, {
+module.exports = merge(baseConfig, {
   entry: [JS_ENTRY],
 
   output: {
     path: path.join(__dirname, 'dist'),
     publicPath: DEV_MODE ? '' : './',
-  },
-
-  module: {
-    rules: [
-      rules.js,
-      rules.localCss,
-      rules.handlebars,
-      // TODO(mc, 2019-03-06): remove this override once baseConfig rule is
-      //   sane (see TODO in webpack-config/lib/rules.js)
-      Object.assign({}, rules.images, {
-        use: {loader: 'url-loader', options: {limit: 1024}},
-      }),
-    ],
   },
 
   plugins: [
@@ -79,8 +66,16 @@ module.exports = merge.strategy({'module.rules': 'replace'})(baseConfig, {
       },
     }),
     new HtmlWebpackPlugin({
-      title, description, author, template: HTML_ENTRY}),
-    new HtmlWebpackPlugin({filename: 'error.html', inject: false, template: ERROR_HTML}),
+      title,
+      description,
+      author,
+      template: HTML_ENTRY,
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'error.html',
+      inject: false,
+      template: ERROR_HTML,
+    }),
     new ScriptExtHtmlWebpackPlugin({defaultAttribute: 'defer'}),
   ],
 })
