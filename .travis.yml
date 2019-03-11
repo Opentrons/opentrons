@@ -106,7 +106,7 @@ jobs:
           region: us-east-2
           dot_match: true
           local-dir: protocol-designer/dist
-          bucket: opentrons-protocol-designer-builds
+          bucket: $OT_PD_DEPLOY_BUCKET
           upload-dir: $TRAVIS_BRANCH
         - # deploy components library to S3
           <<: *deploy_s3
