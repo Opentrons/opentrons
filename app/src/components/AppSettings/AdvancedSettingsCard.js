@@ -100,14 +100,11 @@ function AdvancedSettingsCard (props: Props) {
 
 function mapStateToProps (state: State): SP {
   const config = getConfig(state)
-  const __ffShowManualIp = config.devInternal
-    ? !!config.devInternal.manualIp
-    : false
 
   return {
     devToolsOn: config.devtools,
     channel: config.update.channel,
-    __ffShowManualIp: __ffShowManualIp,
+    __ffShowManualIp: Boolean(config.devInternal?.manualIp),
   }
 }
 
