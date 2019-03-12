@@ -91,9 +91,9 @@ class TCPoller(threading.Thread):
         self._halt_write_fd = open(self._halt_path, 'wb', buffering=0)
 
         self._poller = select.poll()
-        self._poller.register(self._send_read_file, eventmask=select.POLLIN)
-        self._poller.register(self._halt_read_file, eventmask=select.POLLIN)
-        self._poller.register(self._connection, eventmask=select.POLLIN)
+        self._poller.register(self._send_read_file, select.POLLIN)
+        self._poller.register(self._halt_read_file, select.POLLIN)
+        self._poller.register(self._connection, select.POLLIN)
 
         serial_thread_name = 'tc_serial_poller_{}'.format(hash(self))
         super().__init__(target=self._serial_poller, name=serial_thread_name)
