@@ -35,3 +35,8 @@ build:
 dev: export NODE_ENV := development
 dev:
 	webpack-dev-server --hot
+
+# production assets server
+.PHONY: serve
+serve: all
+	node ../scripts/serve-static dist

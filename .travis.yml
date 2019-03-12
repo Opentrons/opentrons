@@ -15,6 +15,7 @@ _deploy_s3: &deploy_s3
   skip_cleanup: true
   access_key_id: $AWS_ACCESS_KEY_ID
   secret_access_key: $AWS_SECRET_ACCESS_KEY
+  region: us-east-2
   acl: public_read
   on:
     repo: Opentrons/opentrons
@@ -33,6 +34,7 @@ _app_stage_build: &app_stage_build
   deploy:
     - # deploy Opentrons App to S3
       <<: *deploy_s3
+      region: us-east-1
       local-dir: app-shell/dist/publish
       bucket: $OT_APP_DEPLOY_BUCKET
       upload-dir: $OT_APP_DEPLOY_FOLDER
@@ -88,7 +90,7 @@ jobs:
 
     # test, build, and upload for JavaScript projects
     - stage: test
-      name: 'JS unit tests; build/deploy Protocol Designer, Components Library'
+      name: 'JS unit tests; build Protocol Designer, Labware Library, Components Library'
       # node version pulled from .nvmrc
       language: node_js
       install:
@@ -98,19 +100,25 @@ jobs:
         - make lint-js lint-css
         - make -C components
         - make -C protocol-designer
+        - make -C labware-library
       after_success:
         - make coverage
       deploy:
-        - # deploy protocol designer to S3
+        - # upload protocol designer artifacts to S3
           <<: *deploy_s3
-          region: us-east-2
           dot_match: true
           local-dir: protocol-designer/dist
           bucket: $OT_PD_DEPLOY_BUCKET
           upload-dir: $TRAVIS_BRANCH
-        - # deploy components library to S3
+
+        - # upload labware library artifacts to S3
           <<: *deploy_s3
-          # TODO(mc, 2018-03-26): why is this region not default?
+          local-dir: labware-library/dist
+          bucket: $OT_LL_DEPLOY_BUCKET
+          upload-dir: $TRAVIS_BRANCH
+
+        - # upload components library artifacts to S3
+          <<: *deploy_s3
           region: us-west-2
           local-dir: components/dist
           bucket: opentrons-components
@@ -160,19 +168,25 @@ env:
     - OT_TAG: $TRAVIS_TAG
     - OT_PD_COMMIT_HASH: $TRAVIS_COMMIT
 
+    # TODO(mc, 2019-03-13): move to Travis settings
     - OT_CI_TEMP_S3_PATH: s3://opentrons-ci/temp/$OT_BUILD
 
+    # TODO(mc, 2019-03-13): move to Travis settings
     - OT_APP_DEPLOY_BUCKET: opentrons-app
     - OT_APP_DEPLOY_FOLDER: builds
 
     # GITHUB_TOKEN
+    # TODO(mc, 2019-03-13): move to Travis settings
     - secure: f/W7kN4gOvVpIanTQh9QtCwiXOk5UrRnUPo2ZU1Qk8zaFVbNj2za2A1xGKMqSyfZKw7guqIwTjWgc/aF9lxRtfU+5fkedJQdxDi5r7jZFxpqmpZOlhyXVY8WAWNqavEkefQInPlpHVAL8M2eV+Pi1cO9FsMhdyy/Wk7qA2nOiA8//9pFRB+0jgSbe1yqIF5DPyL0kbibd3EwmQvuQtnn25qqJXjneenhL6spflLCrnUjq1N/iOlcGd94eBUtk8RaBtMEjOb2D0Mb0DWKMsppoXg4/mZDus6s/PlmBwUJKNCuRtDiEUn5brE14q3OQh/FkDoXMRl69VND2mYp1LOeh5fgLSu6P+YToyHrh4lhXaRAul6l3JmXuoDC3k8hOAr8rPbtiwH7wGY2eRNv59vUejdXof4KHbAN6FTIH934tTe4uvBH79hRMoFY51pHRe6UiC39e/3hwl0pVKLjkV/40wfdEeYA7xhTZQVux+FAfk2krmggokxGEhbAQhWoyRX/wlH2XfEgassGskJ9SbuumNPNOLmEV9OOISFaXoYqVn+SPXy8mN1Pl2sLfaPFtnmmiY20t6yWsHsmfwi+41lv8n0vwCOGq521suDeNyiFhOH2AqG7xm6nHbIv+CiWt2ntKXgV233J17usvfr1zSK07PMDMlV2lvJx3CXj3hA4Yb4=
 
     # OT_APP_MIXPANEL_ID
-    - secure: "T0h/KyXFRS4jsaor2sRLlKaUFxVmIH5LXArVLYi6I3Wz45SXvQuiH+gUic775rBLdpI8d+TgxCWyUPm1AJTCvCdaMr5PW/xyHeTT4qz0MKT1nThrO2Vi5cKWAUbZV6P8d8m9EBsJlvhgp7egLymS4K5zaotV07v6OK0qVJWiFo+Zj/ufQhQikIUaKOdNafKAqN4bSO/yqD6i9av/EOzkOJwIk2hnEMlCphZ/X2T81IXjw7toV0jjGL60tkL6lcULwDosrvJkb5+dr4AcUjwpb6tzexde2OfA7EyMN4BdIHXsAzKcqcxP0LVXoRqC2C2OyNITVHPci/r/kbqJOka9iGPn7BmUddjbhHb97nBygNDBZIS+U/W5nalO4ZLWe4RzgN85y5lFOdY9X0n8ZwkNwGKBxqueAdfmbPtkpYd5n0g9GMohRWO2wAb4ttY8Uw3x+OG75tmru37i6qO5Gl5VCo8ERIH8bAdEtzTB2Nna413Hm1ld4NmZFMGHfBL7scgyugAKoxgBebEIrTgtKQ6hBuVXWznS0E1bCoas9anR72UsXQol7MWxAmngv+We0ywBOG2qHRnKWwgUEp91R3OEIkH0ain9coPvX0e1mchvhuxiRvMlDZ9DU/narUpMol+/CslyHAMlRr8scNk2MAgNfRIhgEsrbbOrszVbgHtoFPE="
+    # TODO(mc, 2019-03-13): move to Travis settings
+    - secure: 'T0h/KyXFRS4jsaor2sRLlKaUFxVmIH5LXArVLYi6I3Wz45SXvQuiH+gUic775rBLdpI8d+TgxCWyUPm1AJTCvCdaMr5PW/xyHeTT4qz0MKT1nThrO2Vi5cKWAUbZV6P8d8m9EBsJlvhgp7egLymS4K5zaotV07v6OK0qVJWiFo+Zj/ufQhQikIUaKOdNafKAqN4bSO/yqD6i9av/EOzkOJwIk2hnEMlCphZ/X2T81IXjw7toV0jjGL60tkL6lcULwDosrvJkb5+dr4AcUjwpb6tzexde2OfA7EyMN4BdIHXsAzKcqcxP0LVXoRqC2C2OyNITVHPci/r/kbqJOka9iGPn7BmUddjbhHb97nBygNDBZIS+U/W5nalO4ZLWe4RzgN85y5lFOdY9X0n8ZwkNwGKBxqueAdfmbPtkpYd5n0g9GMohRWO2wAb4ttY8Uw3x+OG75tmru37i6qO5Gl5VCo8ERIH8bAdEtzTB2Nna413Hm1ld4NmZFMGHfBL7scgyugAKoxgBebEIrTgtKQ6hBuVXWznS0E1bCoas9anR72UsXQol7MWxAmngv+We0ywBOG2qHRnKWwgUEp91R3OEIkH0ain9coPvX0e1mchvhuxiRvMlDZ9DU/narUpMol+/CslyHAMlRr8scNk2MAgNfRIhgEsrbbOrszVbgHtoFPE='
 
     # OT_APP_INTERCOM_ID
-    - secure: "B+OLp0ZNWX6T9BFFGdNYA6vmXYJH0KXFGdyrEKHh0bFC4BnbPbbhN1SFp50Au+uMY1lzIhnihrkLpabie89N8HfHVuvTf27KDGP2vUrs7Vnnf+goSb2PrtcFcRNDjOM5bKQAWNfrjDVUBYkDWWL+zkS9ms6+mF+E8keCDGeMacPSus6NNK1v8+i9yK1/lJHYHxA353BkU73iP2SdrZ3IFuysEG8DVj9wBl7fXYOHrP2Dzw/ZQYzQOiagPYGAPoyMDcbr0Pnq1wu9sPADbPAA+UFOq0LfNTLDd8iP6EZuahwVIhldKBFOuT15YmbHG2c00Hepjl9V72d2FwnkXWcbKf/tgOrgCO+mDgYXtwE7rVfBQdhCZGgfxY7w8MTmNNm/WRrFhLBVvLpRGmVprIrA0fTJVUUo5O+YUHXuSAWwE2OPM3MfXj4Qdy656mTg6A/FWRuE1IZffhr/YhfcHiW6VG/W5t5wF5dzR1so4QILcL+aU2wfoHaFQ+c25ejoo7aPaY4D1bbQl0AtpQMJLtMSUH8X7xJGkVgc3mbwFdpvHNAhh2rhtOJtftwhTXSZ0WLfcJLl4Hj2F/6IqZj/DvTO5xMjuqdTigFVJzUSFdG6C61Af5C49v+ag9hqTHyQ59kOIFoKeyW4SPmqQIm7ZSVs1h3wCkmtZVOHWSV+n41JJ/I="
+    # TODO(mc, 2019-03-13): move to Travis settings
+    - secure: 'B+OLp0ZNWX6T9BFFGdNYA6vmXYJH0KXFGdyrEKHh0bFC4BnbPbbhN1SFp50Au+uMY1lzIhnihrkLpabie89N8HfHVuvTf27KDGP2vUrs7Vnnf+goSb2PrtcFcRNDjOM5bKQAWNfrjDVUBYkDWWL+zkS9ms6+mF+E8keCDGeMacPSus6NNK1v8+i9yK1/lJHYHxA353BkU73iP2SdrZ3IFuysEG8DVj9wBl7fXYOHrP2Dzw/ZQYzQOiagPYGAPoyMDcbr0Pnq1wu9sPADbPAA+UFOq0LfNTLDd8iP6EZuahwVIhldKBFOuT15YmbHG2c00Hepjl9V72d2FwnkXWcbKf/tgOrgCO+mDgYXtwE7rVfBQdhCZGgfxY7w8MTmNNm/WRrFhLBVvLpRGmVprIrA0fTJVUUo5O+YUHXuSAWwE2OPM3MfXj4Qdy656mTg6A/FWRuE1IZffhr/YhfcHiW6VG/W5t5wF5dzR1so4QILcL+aU2wfoHaFQ+c25ejoo7aPaY4D1bbQl0AtpQMJLtMSUH8X7xJGkVgc3mbwFdpvHNAhh2rhtOJtftwhTXSZ0WLfcJLl4Hj2F/6IqZj/DvTO5xMjuqdTigFVJzUSFdG6C61Af5C49v+ag9hqTHyQ59kOIFoKeyW4SPmqQIm7ZSVs1h3wCkmtZVOHWSV+n41JJ/I='
 
     # OT_PD_FULLSTORY_ORG
-    - secure: "N/WWTWYdEPF7UfWIefSnOIKYVj9/q8ti7kCiB9DNfeKIsjJwsmg6S5yrwn6N4B/9ZMSp0yswo442n09CvH4jMG99BodXdYxg3JhuJ5dxWReAUTWO0PTiyihWeFhd2sbQ3VZa+o85OoFWFHO8UCXqcG//iUZ4l05t9DY5CGUBsPnyJTptsjPCb+CFUc+xkckv9RBfhLeyGBDWodJVfjU4xb124f5MBVF67OlHJ20HmbuH/kRNLDXSiRW4BD9UIXyWrIaPZHW612dX6inETz0vhUOJbUftgn8kdpjjBqa1394TjnjW5fey1n73KH4KpaDPZeGJ5GnYRpk9Wvw7uQkWH7xjkXbFq6cqd0vIWWS5uYmdsMsNDjUtTyELqG01rj813jbmcItuzK2tAcuQ5kBPwikLsHYeQY/68GKlws9POd444YQXXiTYgCoHgYq8O3nxaLoMZBgabFq6Rtz0xJb3Hu99PkU6flI4hgT82RZGf32PgYSKznaGps9DGf2as8FU+wui/So89eQwkDyhirzGvC31OlRHdZitjWYvI27nGgiPWheuZR5zAtf6tJeZaZ1N/PZGBwJW6ykfjG+vyRep/IIW5r0ujnBcmgxT7USVpW0E45QolZBS75t29kkTxP0/EHLMavv7QqP3LNpDJpptPrMQ8mLINxlB7FCQ2AQLbDY="
+    # TODO(mc, 2019-03-13): move to Travis settings
+    - secure: 'N/WWTWYdEPF7UfWIefSnOIKYVj9/q8ti7kCiB9DNfeKIsjJwsmg6S5yrwn6N4B/9ZMSp0yswo442n09CvH4jMG99BodXdYxg3JhuJ5dxWReAUTWO0PTiyihWeFhd2sbQ3VZa+o85OoFWFHO8UCXqcG//iUZ4l05t9DY5CGUBsPnyJTptsjPCb+CFUc+xkckv9RBfhLeyGBDWodJVfjU4xb124f5MBVF67OlHJ20HmbuH/kRNLDXSiRW4BD9UIXyWrIaPZHW612dX6inETz0vhUOJbUftgn8kdpjjBqa1394TjnjW5fey1n73KH4KpaDPZeGJ5GnYRpk9Wvw7uQkWH7xjkXbFq6cqd0vIWWS5uYmdsMsNDjUtTyELqG01rj813jbmcItuzK2tAcuQ5kBPwikLsHYeQY/68GKlws9POd444YQXXiTYgCoHgYq8O3nxaLoMZBgabFq6Rtz0xJb3Hu99PkU6flI4hgT82RZGf32PgYSKznaGps9DGf2as8FU+wui/So89eQwkDyhirzGvC31OlRHdZitjWYvI27nGgiPWheuZR5zAtf6tJeZaZ1N/PZGBwJW6ykfjG+vyRep/IIW5r0ujnBcmgxT7USVpW0E45QolZBS75t29kkTxP0/EHLMavv7QqP3LNpDJpptPrMQ8mLINxlB7FCQ2AQLbDY='

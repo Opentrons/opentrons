@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`App component renders 1`] = `
+<h1
+  className="title"
+>
+  Opentrons Labware Library
+</h1>
+`;

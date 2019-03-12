@@ -14,6 +14,7 @@ const {DEV_MODE, ENABLE_ANALYZER} = require('./env')
 module.exports = {
   target: 'web',
 
+  // TODO(mc, 2019-03-12): react-hot-loader@4 no longer needs this entry
   entry: DEV_MODE ? ['react-hot-loader/patch'] : [],
 
   output: {
