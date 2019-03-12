@@ -18,6 +18,7 @@ module.exports = {
   plugins: [
     '@babel/plugin-proposal-object-rest-spread',
     '@babel/plugin-proposal-class-properties',
+    '@babel/plugin-proposal-optional-chaining',
   ],
   presets: ['@babel/preset-flow', '@babel/preset-react', PRESET_ENV_NO_MODULES],
   overrides: [
