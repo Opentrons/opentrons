@@ -2,13 +2,13 @@
 import flow from 'lodash/flow'
 import takeRightWhile from 'lodash/takeRightWhile'
 import semver from 'semver'
-import type {ProtocolFile} from '../../file-types'
+import type {PDProtocolFile} from '../../file-types'
 import migrateTo_1_1_0 from './1_1_0'
 
 export const OLDEST_MIGRATEABLE_VERSION = '1.0.0'
 
 type Version = string
-type Migration = (ProtocolFile) => ProtocolFile
+type Migration = (PDProtocolFile) => PDProtocolFile
 type MigrationsByVersion = {[Version]: Migration}
 
 const allMigrationsByVersion: MigrationsByVersion = {
@@ -21,7 +21,7 @@ export const getMigrationVersionsToRunFromVersion = (migrationsByVersion: {}, ve
   return takeRightWhile(allSortedVersions, v => semver.gt(v, version))
 }
 
-const masterMigration = (file: any): {file: ProtocolFile, didMigrate: boolean} => {
+const masterMigration = (file: any): {file: PDProtocolFile, didMigrate: boolean} => {
   const designerApplication = file.designerApplication || file['designer-application']
 
   // NOTE: default exists because any protocol that doesn't include the applicationVersion

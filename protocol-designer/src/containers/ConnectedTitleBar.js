@@ -125,7 +125,7 @@ function mapStateToProps (state: BaseState): SP {
           subtitle = selectedStep.title
         }
       }
-      return { _page: 'steplist', title: title || fileName, subtitle, backButtonLabel }
+      return { _page: 'steplist', title: title || fileName || '', subtitle, backButtonLabel }
     }
   }
 }

@@ -2,8 +2,7 @@
 // protocol type defs
 
 // TODO(mc, 2018-09-05): swap out with type ProtocolFile in
-//   protocol-designer/src/file-types.js when it is aligned with schema in
-//   shared-data/protocol-json-schema/protocol-schema.json
+//   protocol-designer/src/file-types.js when it is moved to shared-data
 export type ProtocolData = {
   metadata: {
     'protocol-name'?: string,
