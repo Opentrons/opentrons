@@ -91,7 +91,7 @@ module.exports = {
       loader: 'file-loader',
       options: {
         // [hash] is file-loader specific contenthash
-        name: DEV_MODE ? '[name].[ext]' : '[name].[hash].[ext]',
+        name: DEV_MODE ? '[path][name].[ext]' : 'fonts/[name].[hash].[ext]',
       },
     },
   },
@@ -102,7 +102,7 @@ module.exports = {
     use: {
       loader: 'file-loader',
       options: {
-        name: DEV_MODE ? '[name].[ext]' : '[name].[hash].[ext]',
+        name: DEV_MODE ? '[path][name].[ext]' : 'images/[name].[hash].[ext]',
       },
     },
   },
