@@ -46,7 +46,8 @@ ot_py_sources := $(filter %.py,$(shell $(SHX) find src/opentrons/))
 ot_shared_data_sources := $(filter %.json,$(shell $(SHX) find ../shared-data/))
 # And the arbitrary stuff in resources
 ot_resources := $(filter %,$(shell $(SHX) find src/opentrons/resources))
-ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources)
+modules_configs := $(filter %.rules,$(shell $(SHX) find src/opentrons/config/modules))
+ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources) $(modules_configs)
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
