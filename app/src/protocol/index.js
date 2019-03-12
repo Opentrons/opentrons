@@ -30,7 +30,7 @@ type OpenProtocolAction = {|
 
 type UploadProtocolAction = {|
   type: 'protocol:UPLOAD',
-  payload: {|contents: string, data: ?ProtocolData|},
+  payload: {|contents: string, data: $PropertyType<ProtocolState, 'data'>|},
   meta: {|robot: true|},
 |}
 
