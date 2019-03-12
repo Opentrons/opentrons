@@ -47,12 +47,13 @@ export type CommandV1 = {|
 // File Subtypes
 
 type VersionString = string // eg '1.0.0'
-type PipetteModel = string // TODO Ian 2018-05-11 use shared-data model types enum. Eg 'p10_single_v1.3'
-type PipetteName = string // TODO Ian 2018-11-06 use shared-data pipette names types enum. Eg 'p10_single'.
+
+// NOTE: these are an enum type in the spec, but it's inconvenient to flow-type them.
+type PipetteModel = string
+type PipetteName = string
 
 export type FilePipetteV1 = {
   mount: Mount,
-  // TODO: Ian 2018-11-05 drop 'model' and just use 'name'. Breaking change for JSON protocol files, see JSON schema TODO.
   model: PipetteModel,
   name?: PipetteName,
 }
@@ -87,7 +88,7 @@ export type ProtocolFileV1<DesignerApplicationData> = {
     'dispense-flow-rate': FlowRateForPipettes,
     'aspirate-mm-from-bottom': number,
     'dispense-mm-from-bottom': number,
-    'touch-tip-mm-from-top'?: number, // TODO: Ian 2019-02-12 make required in protocol schema breaking change
+    'touch-tip-mm-from-top'?: number,
   },
 
   'designer-application': {
@@ -97,7 +98,7 @@ export type ProtocolFileV1<DesignerApplicationData> = {
   },
 
   robot: {
-    model: 'OT-2 Standard', // TODO LATER support additional models
+    model: 'OT-2 Standard',
   },
 
   pipettes: {
