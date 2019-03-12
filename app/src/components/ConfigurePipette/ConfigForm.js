@@ -5,9 +5,11 @@ import {Formik, Form} from 'formik'
 
 import startCase from 'lodash/startCase'
 import mapValues from 'lodash/mapValues'
-import pick from 'lodash/pick'
-import set from 'lodash/set'
 import forOwn from 'lodash/forOwn'
+import keys from 'lodash/keys'
+import pick from 'lodash/pick'
+import omit from 'lodash/omit'
+import set from 'lodash/set'
 import isEmpty from 'lodash/isEmpty'
 
 import FormButtonBar from './FormButtonBar'
@@ -33,6 +35,7 @@ type Props = {
   pipette: Pipette,
   pipetteConfig: PipetteConfigResponse,
   updateConfig: (id: string, PipetteConfigRequest) => mixed,
+  showHiddenFields: boolean,
 }
 
 const PLUNGER_KEYS = ['top', 'bottom', 'blowout', 'dropTip']
@@ -64,6 +67,14 @@ export default class ConfigForm extends React.Component<Props> {
     ])
   }
 
+  getHiddenFields = () => {
+    return omit(this.props.pipetteConfig.fields, [
+      ...PLUNGER_KEYS,
+      ...POWER_KEYS,
+      ...TIP_KEYS,
+    ])
+  }
+
   handleSubmit = (values: FormValues) => {
     const params = mapValues(values, v => {
       return v === '' ? null : {value: Number(v)}
@@ -84,7 +95,9 @@ export default class ConfigForm extends React.Component<Props> {
 
   validate = (values: FormValues) => {
     const errors = {}
-    const fields = this.getVisibleFields()
+    const fields = this.props.showHiddenFields
+      ? this.props.pipetteConfig.fields
+      : this.getVisibleFields()
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
 
     // validate all visible fields with min and max
@@ -118,12 +131,18 @@ export default class ConfigForm extends React.Component<Props> {
   render () {
     const {parentUrl} = this.props
     const fields = this.getVisibleFields()
-    const initialValues = mapValues(fields, f => {
+    const hiddenFields = this.getHiddenFields()
+    const HIDDEN_KEYS = keys(hiddenFields)
+    const visibleFields = this.props.showHiddenFields
+      ? this.props.pipetteConfig.fields
+      : fields
+    const initialValues = mapValues(visibleFields, f => {
       return f.value !== f.default ? f.value.toString() : ''
     })
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
     const powerFields = this.getFieldsByKey(POWER_KEYS, fields)
     const tipFields = this.getFieldsByKey(TIP_KEYS, fields)
+    const devFields = this.getFieldsByKey(HIDDEN_KEYS, hiddenFields)
 
     return (
       <Formik
@@ -154,6 +173,12 @@ export default class ConfigForm extends React.Component<Props> {
                   groupLabel="Tip Pickup / Drop "
                   formFields={tipFields}
                 />
+                {this.props.showHiddenFields && (
+                  <ConfigFormGroup
+                    groupLabel="For Dev Use Only"
+                    formFields={devFields}
+                  />
+                )}
               </FormColumn>
               <FormButtonBar
                 buttons={[

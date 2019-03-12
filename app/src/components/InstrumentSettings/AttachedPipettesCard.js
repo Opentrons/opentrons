@@ -2,7 +2,6 @@
 // attached pipettes container card
 import * as React from 'react'
 import {connect} from 'react-redux'
-import {getIn} from '@thi.ng/paths'
 
 import {
   makeGetRobotPipettes,
@@ -20,7 +19,6 @@ import {Card, IntervalWrapper} from '@opentrons/components'
 import type {State} from '../../types'
 import type {Robot} from '../../discovery'
 import type {Pipette} from '../../http-api-client'
-import {getConfig} from '../../config'
 
 type OP = Robot
 
@@ -29,7 +27,6 @@ type SP = {
   left: ?Pipette,
   right: ?Pipette,
   showSettings: boolean,
-  __featureEnabled: boolean,
 }
 
 type DP = {
@@ -38,8 +35,6 @@ type DP = {
 }
 
 type Props = OP & SP & DP
-
-const __FEATURE_FLAG = 'devInternal.newPipetteConfig'
 
 const TITLE = 'Pipettes'
 
@@ -59,7 +54,6 @@ function AttachedPipettesCard (props: Props) {
             {...props.left}
             onChangeClick={props.clearMove}
             showSettings={props.showSettings}
-            __enableConfig={props.__featureEnabled}
           />
           <InstrumentInfo
             mount="right"
@@ -67,7 +61,6 @@ function AttachedPipettesCard (props: Props) {
             {...props.right}
             onChangeClick={props.clearMove}
             showSettings={props.showSettings}
-            __enableConfig={props.__featureEnabled}
           />
         </CardContentFlex>
       </Card>
@@ -88,7 +81,6 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
       left,
       right,
       showSettings: !!configCall.response,
-      __featureEnabled: !!getIn(getConfig(state), __FEATURE_FLAG),
     }
   }
 }

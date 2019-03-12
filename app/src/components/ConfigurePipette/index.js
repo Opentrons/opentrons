@@ -2,7 +2,6 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
-
 import {
   makeGetRobotPipettes,
   makeGetRobotPipetteConfigs,
@@ -11,6 +10,7 @@ import {
   makeGetPipetteRequestById,
 } from '../../http-api-client'
 import {chainActions} from '../../util'
+import {getConfig} from '../../config'
 
 import {getPipetteModelSpecs} from '@opentrons/shared-data'
 
@@ -39,6 +39,7 @@ type SP = {|
   pipette: ?Pipette,
   pipetteConfig: ?PipetteConfigResponse,
   configError: ?ApiRequestError,
+  __featureEnabled: boolean,
 |}
 
 type DP = {|
@@ -72,6 +73,7 @@ function ConfigurePipette (props: Props) {
           pipetteConfig={pipetteConfig}
           parentUrl={parentUrl}
           updateConfig={updateConfig}
+          showHiddenFields={props.__featureEnabled}
         />
       )}
     </ScrollableAlertModal>
@@ -93,10 +95,12 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
       pipette && configResponse && configResponse[pipette.id]
     const configSetConfigCall =
       pipette && getPipetteRequestById(state, ownProps.robot, pipette.id)
+    const devInternal = getConfig(state).devInternal
     return {
       pipette,
       pipetteConfig,
       configError: configSetConfigCall && configSetConfigCall.error,
+      __featureEnabled: !!devInternal && !!devInternal.allPipetteConfig,
     }
   }
 }

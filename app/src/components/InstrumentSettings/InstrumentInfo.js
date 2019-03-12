@@ -18,7 +18,6 @@ type Props = {
   name: string,
   onChangeClick: () => mixed,
   showSettings: boolean,
-  __enableConfig: boolean,
 }
 
 // TODO(mc, 2018-03-30): volume and channels should come from the API
@@ -54,7 +53,7 @@ export default function PipetteInfo (props: Props) {
         <OutlineButton Component={Link} to={changeUrl} onClick={onChangeClick}>
           {direction}
         </OutlineButton>
-        {props.__enableConfig && model && showSettings && (
+        {model && showSettings && (
           <OutlineButton Component={Link} to={configUrl}>
             settings
           </OutlineButton>
