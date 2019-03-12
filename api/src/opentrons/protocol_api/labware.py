@@ -607,6 +607,35 @@ class ModuleGeometry:
         return self._display_name
 
 
+class ThermocyclerGeometry(ModuleGeometry):
+    def __init__(self, definition: dict, parent: Location) -> None:
+        super().__init__(definition, parent)
+        self._lid_height = definition["dimensions"]["lidHeight"]
+        self._lid_status = False
+
+    @property
+    def highest_z(self) -> float:
+        if self.lid_status:
+            return super().highest_z + self._lid_height
+        else:
+            return super().highest_z
+
+    @property
+    def lid_status(self) -> bool:
+        return self._lid_status
+
+    @lid_status.setter
+    def lid_status(self, status) -> None:
+        self._lid_status = status
+
+    def labware_accessor(self, definition: Labware) -> Labware:
+        # Block first three columns from being accessed
+        definition._ordering = definition._ordering[3::]
+        definition._build_wells()
+        return definition
+
+
+
 def save_calibration(labware: Labware, delta: Point):
     """
     Function to be used whenever an updated delta is found for the first well

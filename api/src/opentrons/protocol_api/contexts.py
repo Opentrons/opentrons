@@ -234,11 +234,14 @@ class ProtocolContext(CommandPublisher):
                 'magnetic module': 'magdeck',
                 'tempdeck': 'tempdeck',
                 'temperature module': 'tempdeck',
-                'thermocycler': 'thermocycler'}[module_name.lower()]
+                'thermocycler': 'thermocycler',
+                'semithermocycler': 'semithermocycler'}[module_name.lower()]
             if mod.name() == hc_mod_name:
-                mod_class = {'magdeck': MagneticModuleContext,
-                             'tempdeck': TemperatureModuleContext,
-                             'thermocycler': ThermocyclerContext}[hc_mod_name]
+                mod_class = {
+                    'magdeck': MagneticModuleContext,
+                    'tempdeck': TemperatureModuleContext,
+                    'thermocycler': ThermocyclerContext,
+                    'semithermocycler': ThermocyclerContext}[hc_mod_name]
                 break
         else:
             raise KeyError(module_name)
@@ -1648,7 +1651,7 @@ class ThermocyclerContext(ModuleContext):
     def __init__(self,
                  ctx: ProtocolContext,
                  hw_module: modules.thermocycler.Thermocycler,
-                 geometry: ModuleGeometry,
+                 geometry: ThermocyclerGeometry,
                  loop: asyncio.AbstractEventLoop) -> None:
         self._module = hw_module
         self._loop = loop

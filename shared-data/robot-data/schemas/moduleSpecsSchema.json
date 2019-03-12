@@ -22,7 +22,7 @@
       "required": [
         "labwareOffset",
         "dimensions",
-        "calibrationPoint",
+        "calibrationPoints",
         "displayName",
         "loadName",
         "quirks"
@@ -37,7 +37,7 @@
             "overLabwareHeight": {"type": "number"}
           }
         },
-        "calibrationPoint": {"$ref": "#/definitions/coordinates"},
+        "calibrationPoints": {"$ref": "#/definitions/coordinates"},
         "displayName": {"type": "string"},
         "loadName": {"type": "string"},
         "quirks": {
