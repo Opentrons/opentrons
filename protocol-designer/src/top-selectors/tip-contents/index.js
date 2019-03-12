@@ -12,10 +12,11 @@ import {selectors as stepsSelectors} from '../../ui/steps'
 import {selectors as fileDataSelectors} from '../../file-data'
 import {getWellSetForMultichannel} from '../../well-selection/utils'
 
+import {typeof Labware} from '@opentrons/components'
+import type {CommandV1 as Command} from '@opentrons/shared-data'
 import type {OutputSelector} from 'reselect'
 import type {BaseState} from '../../types'
 import type {ElementProps} from 'react'
-import {typeof Labware} from '@opentrons/components'
 
 type GetTipProps = $PropertyType<ElementProps<Labware>, 'getTipProps'>
 type GetTipSelector = OutputSelector<BaseState, {labwareId: string}, GetTipProps>
@@ -30,7 +31,7 @@ function getTipHighlighted (
   commandsAndRobotState: StepGeneration.CommandsAndRobotState
 ): boolean {
   const {commands, robotState} = commandsAndRobotState
-  const commandUsesTip = (c: StepGeneration.Command) => {
+  const commandUsesTip = (c: Command) => {
     if (c.command === 'pick-up-tip' && c.params.labware === labwareId) {
       const commandWellName = c.params.well
       const pipetteId = c.params.pipette

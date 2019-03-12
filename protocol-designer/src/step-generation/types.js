@@ -1,5 +1,9 @@
 // @flow
 import type {DeckSlot, Mount} from '@opentrons/components'
+import type {
+  CommandV1 as Command,
+  PipetteLabwareFieldsV1 as PipetteLabwareFields,
+} from '@opentrons/shared-data'
 
 // ===== MIX-IN TYPES =====
 
@@ -206,50 +210,9 @@ export type RobotState = {|
   },
 |}
 
-export type PipetteLabwareFields = {|
-  pipette: string,
-  labware: string,
-  well: string,
-|}
-
 export type TouchTipArgs = {|
   ...PipetteLabwareFields,
   offsetFromBottomMm?: ?number,
-|}
-
-export type AspirateDispenseArgs = {|
-  ...PipetteLabwareFields,
-  volume: number,
-  offsetFromBottomMm?: ?number,
-  'flow-rate'?: ?number,
-|}
-
-export type Command = {|
-  command: 'aspirate' | 'dispense',
-  params: AspirateDispenseArgs,
-|} | {|
-  command: 'pick-up-tip' | 'drop-tip' | 'blowout',
-  params: PipetteLabwareFields,
-|} | {|
-  command: 'touch-tip',
-  params: {|
-    ...PipetteLabwareFields,
-    offsetFromBottomMm?: ?number,
-  |},
-|} | {|
-  command: 'delay',
-  /** number of seconds to delay (fractional values OK),
-    or `true` for delay until user input */
-  params: {|
-    wait: number | true,
-    message: ?string,
-  |},
-|} | {|
-  command: 'air-gap',
-  params: {|
-    pipette: string,
-    volume: number,
-  |},
 |}
 
 export type ErrorType =

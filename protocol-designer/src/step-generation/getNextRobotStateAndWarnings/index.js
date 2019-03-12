@@ -1,11 +1,11 @@
 // @flow
 import assert from 'assert'
+import forAspirateDispense from './forAspirateDispense'
+import type {CommandV1 as Command} from '@opentrons/shared-data'
 import type {
   RobotState,
-  Command,
   RobotStateAndWarnings,
 } from '../types'
-import forAspirateDispense from './forAspirateDispense'
 
 export default function getNextRobotStateAndWarnings (command: Command, prevRobotState: RobotState): RobotStateAndWarnings {
   assert(command, 'undefined command passed to getNextRobotStateAndWarning')

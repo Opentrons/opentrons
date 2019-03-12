@@ -1,7 +1,8 @@
 // @flow
 import * as errorCreators from '../../errorCreators'
 import updateLiquidState from '../../dispenseUpdateLiquidState'
-import type {RobotState, CommandCreator, CommandCreatorError, AspirateDispenseArgs} from '../../types'
+import type {AspirateDispenseArgsV1 as AspirateDispenseArgs} from '@opentrons/shared-data'
+import type {RobotState, CommandCreator, CommandCreatorError} from '../../types'
 
 /** Dispense with given args. Requires tip. */
 const dispense = (args: AspirateDispenseArgs): CommandCreator => (prevRobotState: RobotState) => {

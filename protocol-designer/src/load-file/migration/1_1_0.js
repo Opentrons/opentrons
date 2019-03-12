@@ -5,9 +5,13 @@ import omit from 'lodash/omit'
 import omitBy from 'lodash/omitBy'
 import flow from 'lodash/flow'
 import {getPipetteCapacity} from '../../pipettes/pipetteData'
+import type {
+  FileLabwareV1 as FileLabware,
+  FilePipetteV1 as FilePipette,
+} from '@opentrons/shared-data'
 import type {PipetteEntities} from '../../step-forms'
 import type {FormPatch} from '../../steplist/actions'
-import type {PDProtocolFile, FileLabware, FilePipette} from '../../file-types'
+import type {PDProtocolFile} from '../../file-types'
 import type {FormData} from '../../form-types'
 
 // NOTE: these constants are copied here because

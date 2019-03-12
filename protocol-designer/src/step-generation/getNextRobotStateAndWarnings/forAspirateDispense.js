@@ -4,11 +4,11 @@ import isEmpty from 'lodash/isEmpty'
 import {mergeLiquid, splitLiquid, getWellsForTips, totalVolume} from '../utils'
 import {getPipetteSpecFromId} from '../robotStateSelectors'
 import * as warningCreators from '../warningCreators'
+import type {AspirateDispenseArgsV1 as AspirateDispenseArgs} from '@opentrons/shared-data'
 import type {
   RobotState,
   SingleLabwareLiquidState,
   CommandCreatorWarning,
-  AspirateDispenseArgs,
   RobotStateAndWarnings,
 } from '../types'
 

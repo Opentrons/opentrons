@@ -6,13 +6,14 @@ import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import last from 'lodash/last'
 import {computeWellAccess} from '@opentrons/shared-data'
+
+import type {PipetteLabwareFieldsV1 as PipetteLabwareFields} from '@opentrons/shared-data'
 import type {
   CommandCreator,
   LocationLiquidState,
   RobotState,
   SourceAndDest,
   Timeline,
-  PipetteLabwareFields,
 } from './types'
 import blowout from './commandCreators/atomic/blowout'
 

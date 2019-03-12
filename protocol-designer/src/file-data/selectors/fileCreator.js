@@ -14,8 +14,12 @@ import {
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../constants'
+import type {
+  FilePipetteV1 as FilePipette,
+  FileLabwareV1 as FileLabware,
+} from '@opentrons/shared-data'
 import type {BaseState} from '../../types'
-import type {PDProtocolFile, FilePipette, FileLabware} from '../../file-types'
+import type {PDProtocolFile} from '../../file-types'
 import type {LabwareData, PipetteData} from '../../step-generation'
 
 // TODO LATER Ian 2018-02-28 deal with versioning

@@ -32,7 +32,10 @@ import type {
   SwapSlotContentsAction,
 } from '../../labware-ingred/actions'
 import type {FormData, StepIdType} from '../../form-types'
-import type {FileLabware, FilePipette} from '../../file-types'
+import type {
+  FileLabwareV1 as FileLabware,
+  FilePipetteV1 as FilePipette,
+} from '@opentrons/shared-data'
 
 import type {
   AddStepAction,
