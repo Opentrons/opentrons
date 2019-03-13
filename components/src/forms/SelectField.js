@@ -110,7 +110,7 @@ export default class SelectField extends React.Component<SelectProps> {
   }
 }
 
-function Control (props) {
+function Control (props: *) {
   return (
     <components.Control
       {...props}
@@ -123,7 +123,7 @@ function Control (props) {
   )
 }
 
-function DropdownIndicator (props) {
+function DropdownIndicator (props: *) {
   const iconWrapperCx = cx(styles.dropdown_icon_wrapper, {
     [styles.flipped]: props.selectProps.menuIsOpen,
   })
@@ -139,7 +139,7 @@ function DropdownIndicator (props) {
   )
 }
 // custom Menu (options dropdown) component
-function Menu (props) {
+function Menu (props: *) {
   return (
     <components.Menu {...props}>
       <div className={styles.select_menu}>{props.children}</div>
@@ -148,7 +148,7 @@ function Menu (props) {
 }
 
 // custom option group wrapper component
-function Group (props) {
+function Group (props: *) {
   return (
     <components.Group
       {...props}

@@ -31,7 +31,8 @@ export type DP = {|
 
 export type CalibrateDeckProps = {...$Exact<OP>, ...SP, ...DP}
 
-export type CalibrateDeckStartedProps = CalibrateDeckProps & {
+export type CalibrateDeckStartedProps = {
+  ...$Exact<CalibrateDeckProps>,
   exitUrl: string,
   mount: Mount,
   pipette: PipetteModelSpecs,

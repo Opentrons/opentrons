@@ -24,19 +24,19 @@ import type {ShellUpdateState} from '../../shell'
 
 type OP = ContextRouter
 
-type SP = {
+type SP = {|
   update: ShellUpdateState,
   availableVersion: ?string,
-}
+|}
 
-type DP = {
+type DP = {|
   checkUpdate: () => mixed,
   downloadUpdate: () => mixed,
   applyUpdate: () => mixed,
   closeModal: () => mixed,
-}
+|}
 
-type Props = OP & SP & DP
+type Props = {...OP, ...SP, ...DP}
 
 export default connect(
   mapStateToProps,

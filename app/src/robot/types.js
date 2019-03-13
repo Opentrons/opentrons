@@ -104,7 +104,7 @@ export type Pipette = StatePipette & {
 }
 
 // labware as stored in redux state
-export type StateLabware = {
+export type StateLabware = {|
   // resource ID
   _id: number,
   // slot labware is installed in
@@ -117,9 +117,10 @@ export type StateLabware = {
   isTiprack: boolean,
   // intrument mount to use as the calibrator if isTiprack is true
   calibratorMount: ?Mount,
-}
+|}
 
-export type Labware = StateLabware & {
+export type Labware = {
+  ...StateLabware,
   calibration: LabwareCalibrationStatus,
   confirmed: boolean,
   isMoving: boolean,
