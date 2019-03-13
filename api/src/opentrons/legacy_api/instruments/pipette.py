@@ -1428,7 +1428,7 @@ class Pipette:
         :return: microliters/mm as a float
         """
         sequence = self.ul_per_mm[func]
-        print('api ul/mm: ', sequence)
+        # print('api ul/mm: ', sequence)
         return pipette_config.piecewise_volume_conversion(ul, sequence)
 
     def _volume_percentage(self, volume):
