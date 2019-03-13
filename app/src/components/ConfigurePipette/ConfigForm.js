@@ -60,6 +60,7 @@ export default class ConfigForm extends React.Component<Props> {
   }
 
   getVisibleFields = () => {
+    if (this.props.showHiddenFields) return this.props.pipetteConfig.fields
     return pick(this.props.pipetteConfig.fields, [
       ...PLUNGER_KEYS,
       ...POWER_KEYS,
@@ -67,12 +68,14 @@ export default class ConfigForm extends React.Component<Props> {
     ])
   }
 
-  getHiddenFields = () => {
-    return omit(this.props.pipetteConfig.fields, [
-      ...PLUNGER_KEYS,
-      ...POWER_KEYS,
-      ...TIP_KEYS,
-    ])
+  getUnknownKeys = () => {
+    return keys(
+      omit(this.props.pipetteConfig.fields, [
+        ...PLUNGER_KEYS,
+        ...POWER_KEYS,
+        ...TIP_KEYS,
+      ])
+    )
   }
 
   handleSubmit = (values: FormValues) => {
@@ -102,14 +105,17 @@ export default class ConfigForm extends React.Component<Props> {
 
     // validate all visible fields with min and max
     forOwn(fields, (field, name) => {
-      const value = values[name]
+      const value = values[name].trim()
       const {min, max} = field
-
       if (value !== '') {
         const parsed = Number(value)
         if (Number.isNaN(parsed)) {
           set(errors, name, `number required`)
-        } else if (min && max && (parsed < min || value > max)) {
+        } else if (
+          typeof min === 'number' &&
+          max &&
+          (parsed < min || value > max)
+        ) {
           set(errors, name, `Min ${min} / Max ${max}`)
         }
       }
@@ -131,18 +137,14 @@ export default class ConfigForm extends React.Component<Props> {
   render () {
     const {parentUrl} = this.props
     const fields = this.getVisibleFields()
-    const hiddenFields = this.getHiddenFields()
-    const HIDDEN_KEYS = keys(hiddenFields)
-    const visibleFields = this.props.showHiddenFields
-      ? this.props.pipetteConfig.fields
-      : fields
-    const initialValues = mapValues(visibleFields, f => {
+    const HIDDEN_KEYS = this.getUnknownKeys()
+    const initialValues = mapValues(fields, f => {
       return f.value !== f.default ? f.value.toString() : ''
     })
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
     const powerFields = this.getFieldsByKey(POWER_KEYS, fields)
     const tipFields = this.getFieldsByKey(TIP_KEYS, fields)
-    const devFields = this.getFieldsByKey(HIDDEN_KEYS, hiddenFields)
+    const devFields = this.getFieldsByKey(HIDDEN_KEYS, fields)
 
     return (
       <Formik
