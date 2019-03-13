@@ -123,6 +123,7 @@ async def check_modules_response(async_client):
                    'displayName', 'status', 'data'])
     resp = await async_client.get('/modules')
     body = await resp.json()
+    print(body)
     assert resp.status == 200
     assert 'modules' in body
     assert len(body['modules']) == 1

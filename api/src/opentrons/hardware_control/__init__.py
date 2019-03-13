@@ -1072,10 +1072,23 @@ class API(HardwareAPILike):
         for mod in gone:
             self._attached_modules.pop(mod)
         for mod in new:
-            self._attached_modules[mod]\
-                = self._backend.build_module(discovered[mod][0],
-                                             discovered[mod][1],
-                                             self.pause_with_message)
+            print("MODULES INFO HARDWARE")
+            print(discovered[mod])
+            if 'thermocycler' in discovered[mod][1]:
+                self._attached_modules[mod] = {
+                    'name': discovered[mod][1],
+                    'displayName': discovered[mod][1],
+                    'port': discovered[mod][0],
+                    'serial': 'TCFAKE',
+                    'model': 'thermocycler_v1',
+                    'fwVersion': 'v1',
+                    'status': 'connected',
+                    'data': {}}
+            else:
+                self._attached_modules[mod]\
+                    = self._backend.build_module(discovered[mod][0],
+                                                 discovered[mod][1],
+                                                 self.pause_with_message)
         return list(self._attached_modules.values())
 
     @_log_call

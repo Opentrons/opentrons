@@ -107,6 +107,7 @@ async def get_attached_modules(request):
     hw = hw_from_req(request)
     if ff.use_protocol_api_v2():
         hw_mods = await hw.discover_modules()
+        print(hw_mods)
         module_data = [
             {
                 'name': mod.name(),
@@ -117,8 +118,9 @@ async def get_attached_modules(request):
                 'fwVersion': mod.device_info.get('version'),
                 **mod.live_data
             }
-            for mod in hw_mods
+            if not isinstance(mod, dict) else mod for mod in hw_mods
         ]
+        print(module_data)
     else:
         hw.discover_modules()
         hw_mods = hw.modules
