@@ -113,7 +113,7 @@ export default class ConfigForm extends React.Component<Props> {
           set(errors, name, `number required`)
         } else if (
           typeof min === 'number' &&
-          max &&
+          typeof max === 'number' &&
           (parsed < min || value > max)
         ) {
           set(errors, name, `Min ${min} / Max ${max}`)
