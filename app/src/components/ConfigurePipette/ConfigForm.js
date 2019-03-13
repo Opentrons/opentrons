@@ -5,9 +5,11 @@ import {Formik, Form} from 'formik'
 
 import startCase from 'lodash/startCase'
 import mapValues from 'lodash/mapValues'
-import pick from 'lodash/pick'
-import set from 'lodash/set'
 import forOwn from 'lodash/forOwn'
+import keys from 'lodash/keys'
+import pick from 'lodash/pick'
+import omit from 'lodash/omit'
+import set from 'lodash/set'
 import isEmpty from 'lodash/isEmpty'
 
 import FormButtonBar from './FormButtonBar'
@@ -33,6 +35,7 @@ type Props = {
   pipette: Pipette,
   pipetteConfig: PipetteConfigResponse,
   updateConfig: (id: string, PipetteConfigRequest) => mixed,
+  showHiddenFields: boolean,
 }
 
 const PLUNGER_KEYS = ['top', 'bottom', 'blowout', 'dropTip']
@@ -57,11 +60,22 @@ export default class ConfigForm extends React.Component<Props> {
   }
 
   getVisibleFields = () => {
+    if (this.props.showHiddenFields) return this.props.pipetteConfig.fields
     return pick(this.props.pipetteConfig.fields, [
       ...PLUNGER_KEYS,
       ...POWER_KEYS,
       ...TIP_KEYS,
     ])
+  }
+
+  getUnknownKeys = () => {
+    return keys(
+      omit(this.props.pipetteConfig.fields, [
+        ...PLUNGER_KEYS,
+        ...POWER_KEYS,
+        ...TIP_KEYS,
+      ])
+    )
   }
 
   handleSubmit = (values: FormValues) => {
@@ -89,14 +103,17 @@ export default class ConfigForm extends React.Component<Props> {
 
     // validate all visible fields with min and max
     forOwn(fields, (field, name) => {
-      const value = values[name]
+      const value = values[name].trim()
       const {min, max} = field
-
       if (value !== '') {
         const parsed = Number(value)
         if (Number.isNaN(parsed)) {
           set(errors, name, `number required`)
-        } else if (min && max && (parsed < min || value > max)) {
+        } else if (
+          typeof min === 'number' &&
+          typeof max === 'number' &&
+          (parsed < min || value > max)
+        ) {
           set(errors, name, `Min ${min} / Max ${max}`)
         }
       }
@@ -118,12 +135,14 @@ export default class ConfigForm extends React.Component<Props> {
   render () {
     const {parentUrl} = this.props
     const fields = this.getVisibleFields()
+    const UNKNOWN_KEYS = this.getUnknownKeys()
     const initialValues = mapValues(fields, f => {
       return f.value !== f.default ? f.value.toString() : ''
     })
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
     const powerFields = this.getFieldsByKey(POWER_KEYS, fields)
     const tipFields = this.getFieldsByKey(TIP_KEYS, fields)
+    const devFields = this.getFieldsByKey(UNKNOWN_KEYS, fields)
 
     return (
       <Formik
@@ -154,6 +173,12 @@ export default class ConfigForm extends React.Component<Props> {
                   groupLabel="Tip Pickup / Drop "
                   formFields={tipFields}
                 />
+                {this.props.showHiddenFields && (
+                  <ConfigFormGroup
+                    groupLabel="For Dev Use Only"
+                    formFields={devFields}
+                  />
+                )}
               </FormColumn>
               <FormButtonBar
                 buttons={[

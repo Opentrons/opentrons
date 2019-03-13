@@ -64,7 +64,7 @@ export type Config = {
 
   // internal development flags
   devInternal?: {
-    newPipetteConfig?: boolean,
+    allPipetteConfig?: boolean,
     manualIp?: boolean,
   },
 }
