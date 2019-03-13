@@ -9,7 +9,7 @@ const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 
 const rules = require('./rules')
-const {DEV_MODE, ENABLE_ANALYZER} = require('./env')
+const {DEV_MODE, ENABLE_ANALYZER, DEFAULT_PORT} = require('./env')
 
 module.exports = {
   target: 'web',
@@ -72,5 +72,6 @@ module.exports = {
 
   devServer: {
     historyApiFallback: true,
+    port: DEFAULT_PORT,
   },
 }
