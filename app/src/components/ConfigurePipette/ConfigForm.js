@@ -137,14 +137,14 @@ export default class ConfigForm extends React.Component<Props> {
   render () {
     const {parentUrl} = this.props
     const fields = this.getVisibleFields()
-    const HIDDEN_KEYS = this.getUnknownKeys()
+    const UNKNOWN_KEYS = this.getUnknownKeys()
     const initialValues = mapValues(fields, f => {
       return f.value !== f.default ? f.value.toString() : ''
     })
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
     const powerFields = this.getFieldsByKey(POWER_KEYS, fields)
     const tipFields = this.getFieldsByKey(TIP_KEYS, fields)
-    const devFields = this.getFieldsByKey(HIDDEN_KEYS, fields)
+    const devFields = this.getFieldsByKey(UNKNOWN_KEYS, fields)
 
     return (
       <Formik
