@@ -98,9 +98,7 @@ export default class ConfigForm extends React.Component<Props> {
 
   validate = (values: FormValues) => {
     const errors = {}
-    const fields = this.props.showHiddenFields
-      ? this.props.pipetteConfig.fields
-      : this.getVisibleFields()
+    const fields = this.getVisibleFields()
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
 
     // validate all visible fields with min and max
