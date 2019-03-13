@@ -4,13 +4,13 @@
 
 > Library of standard labware for use with your OT-2
 
-The Labware Library is an app for OT-2 users to discover and learn about the labware the OT-2 supports.
+The Labware Library is an app for OT-2 users to discover, learn about, and use the labware the OT-2 supports.
 
 ## development setup
 
 ### setup
 
-Follow the top level [contributing guide][contributing] to set your clone of the repository up for development.
+Follow the top-level [contributing guide][contributing] to set your repository up for development.
 
 ```shell
 cd opentrons
@@ -25,7 +25,7 @@ Unit tests, linting, and typechecking are all run from the repository level Make
 # run unit-tests, lints, and typechecks
 make test-js lint-js check-js
 
-# run unit-test in watch mode
+# run unit-tests in watch mode
 make test-js watch=true
 ```
 
@@ -61,7 +61,7 @@ This project (along with our other front-end projects) uses [webpack][] to gener
 - Entry point is [`labware-library/src/index.js`][entry]
 - [Handlebars][] HTML template is [`labware-library/src/index.hbs`][template]
   - At template build time, JS entry is run via [prerender-loader][]
-  - DOM output from JS is inserted into HTML output at build time
+  - DOM output from JS is then inserted into HTML output
 - Global CSS is [`labware-library/src/global.css`][global-style]
   - All other CSS is used via [CSS Modules][]
 - All artifacts will be output to `labware-library/dist`
