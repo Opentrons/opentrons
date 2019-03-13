@@ -242,21 +242,11 @@ export function replaceTCDStepsWithMoveLiquidStep (fileData: ProtocolFile): Prot
   }
 }
 
-export function updateVersion (fileData: ProtocolFile): ProtocolFile {
-  return {
-    ...fileData,
-    'designer-application': {
-      ...fileData['designer-application'],
-    },
-  }
-}
-
 const migrateFile = (fileData: ProtocolFile) => flow([
   renameOrderedSteps,
   addInitialDeckSetupStep,
   updateStepFormKeys,
   replaceTCDStepsWithMoveLiquidStep,
-  updateVersion,
 ])(fileData)
 
 export default migrateFile
