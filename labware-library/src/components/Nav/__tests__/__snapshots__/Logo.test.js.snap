@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Logo component renders 1`] = `
+<img
+  className="logo"
+  src="ot-logo-full.png"
+/>
+`;

@@ -35,28 +35,28 @@ export type IconProps = {
  * ```
  */
 export default function Icon (props: IconProps) {
-  const {x, y, height, width, style} = props
+  const {name, x, y, height, width, style} = props
 
-  if (!(props.name in ICON_DATA_BY_NAME)) {
-    console.error(`"${props.name}" is not a valid Icon name`)
+  if (!(name in ICON_DATA_BY_NAME)) {
+    console.error(`"${name}" is not a valid Icon name`)
     return null
   }
 
-  const {viewBox, path} = ICON_DATA_BY_NAME[props.name]
+  const {viewBox, path} = ICON_DATA_BY_NAME[name]
   const className = classnames(props.className, {
     [styles.spin]: props.spin,
   })
 
   return (
     <svg
-      version='1.1'
-      aria-hidden='true'
+      version="1.1"
+      aria-hidden="true"
       viewBox={viewBox}
       className={className}
-      fill='currentColor'
+      fill="currentColor"
       {...{x, y, height, width, style}}
     >
-      <path fillRule='evenodd' d={path} />
+      <path fillRule="evenodd" d={path} />
       {props.children}
     </svg>
   )
