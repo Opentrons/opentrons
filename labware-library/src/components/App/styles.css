@@ -1,0 +1,6 @@
+/* app styles */
+@import '@opentrons/components';
+
+.title {
+  @apply --font-huge-dark;
+}

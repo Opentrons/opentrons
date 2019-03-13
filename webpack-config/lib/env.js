@@ -13,4 +13,5 @@ const parseEnvVariable = name => {
 module.exports = {
   DEV_MODE: parseEnvVariable('NODE_ENV') !== 'production',
   ENABLE_ANALYZER: !!parseEnvVariable('ANALYZER'),
+  DEFAULT_PORT: parseEnvVariable('PORT'),
 }

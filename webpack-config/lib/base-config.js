@@ -9,11 +9,12 @@ const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 
 const rules = require('./rules')
-const {DEV_MODE, ENABLE_ANALYZER} = require('./env')
+const {DEV_MODE, ENABLE_ANALYZER, DEFAULT_PORT} = require('./env')
 
 module.exports = {
   target: 'web',
 
+  // TODO(mc, 2019-03-12): react-hot-loader@4 no longer needs this entry
   entry: DEV_MODE ? ['react-hot-loader/patch'] : [],
 
   output: {
@@ -71,5 +72,6 @@ module.exports = {
 
   devServer: {
     historyApiFallback: true,
+    port: DEFAULT_PORT,
   },
 }
