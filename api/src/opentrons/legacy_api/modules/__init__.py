@@ -102,12 +102,6 @@ def discover() -> List[Tuple[str, Any]]:
             discovered_modules.append((port, name))
     log.info('Discovered modules: {}'.format(discovered_modules))
 
-    # for module in discovered_modules:
-    #     try:
-    #         module.connect()
-    #     except AttributeError:
-    #         log.exception('Failed to connect module')
-
     return discovered_modules
 
 
