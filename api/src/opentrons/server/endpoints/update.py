@@ -66,7 +66,7 @@ async def _upload_to_module(hw, serialnum, fw_filename, loop):
         hw.connect()
 
     hw.discover_modules()
-    hw_mods = hw.modules.values()
+    hw_mods = hw.attached_modules.values()
 
     res = {}
     for module in hw_mods:

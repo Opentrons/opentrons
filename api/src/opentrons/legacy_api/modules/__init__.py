@@ -60,9 +60,10 @@ def load(name, slot):
             # support for multiple instances of one module type this
             # accessor would then load the correct disambiguated module
             # instance via the module's serial
+            module_instances = _mod_robot.attached_modules.values()
             matching_modules = [
-                module for module in _mod_robot.modules if isinstance(
-                    module, SUPPORTED_MODULES.get(name)
+                mod for mod in module_instances if isinstance(
+                    mod, SUPPORTED_MODULES.get(name)
                 )
             ]
             if matching_modules:

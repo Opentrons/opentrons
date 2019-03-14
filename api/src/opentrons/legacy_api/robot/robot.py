@@ -1032,6 +1032,10 @@ class Robot(CommandPublisher):
     async def disengage_axes(self, axes):
         self._driver.disengage_axis(''.join(axes))
 
+    @property
+    def attached_modules(self):
+        return self._attached_modules
+
     def discover_modules(self):
         discovered = {port + model: (port, model)
                       for port, model in modules.discover()}
