@@ -2,6 +2,7 @@ import os
 import logging
 import re
 import asyncio
+from typing import List, Tuple, Any
 from .magdeck import MagDeck
 from .tempdeck import TempDeck
 from opentrons import HERE as package_root, config
@@ -80,7 +81,7 @@ def load(name, slot):
 
 # Note: this function should be called outside the robot class, because
 # of the circular dependency that it would create if imported into robot.py
-def discover_and_connect():
+def discover() -> List[Tuple[str, Any]]:
     if config.IS_ROBOT and os.path.isdir('/dev/modules'):
         devices = os.listdir('/dev/modules')
     else:
@@ -92,17 +93,20 @@ def discover_and_connect():
     for port in devices:
         match = module_port_regex.search(port)
         if match:
-            module_class = SUPPORTED_MODULES.get(match.group().lower())
+            name = match.group().lower()
+            if name not in SUPPORTED_MODULES:
+                log.warning("Unexpected module connected: {} on {}"
+                            .format(name, port))
+                continue
             absolute_port = '/dev/modules/{}'.format(port)
-            discovered_modules.append(
-                module_class(port=absolute_port, broker=_mod_robot.broker))
+            discovered_modules.append((absolute_port, name))
+    log.info('Discovered modules: {}'.format(discovered_modules))
 
-    log.debug('Discovered modules: {}'.format(discovered_modules))
-    for module in discovered_modules:
-        try:
-            module.connect()
-        except AttributeError:
-            log.exception('Failed to connect module')
+    # for module in discovered_modules:
+    #     try:
+    #         module.connect()
+    #     except AttributeError:
+    #         log.exception('Failed to connect module')
 
     return discovered_modules
 

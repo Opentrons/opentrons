@@ -64,11 +64,12 @@ async def _upload_to_module(hw, serialnum, fw_filename, loop):
     # ensure there is a reference to the port
     if not hw.is_connected():
         hw.connect()
-    for module in hw.modules:
-        module.disconnect()
-    hw.modules = modules.discover_and_connect()
+
+    hw.discover_modules()
+    hw_mods = hw.modules.values()
+
     res = {}
-    for module in hw.modules:
+    for module in hw_mods:
         if module.device_info.get('serial') == serialnum:
             log.info("Module with serial {} found".format(serialnum))
             bootloader_port = await modules.enter_bootloader(module)

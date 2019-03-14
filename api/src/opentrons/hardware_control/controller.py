@@ -83,7 +83,6 @@ class Controller:
         self.config = config or opentrons.config.robot_configs.load()
         self._smoothie_driver = driver_3_0.SmoothieDriver_3_0_0(
             config=self.config)
-        self._attached_modules = {}
         self._cached_fw_version: Optional[str] = None
 
     def move(self, target_position: Dict[str, float],

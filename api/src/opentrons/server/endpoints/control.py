@@ -121,7 +121,7 @@ async def get_attached_modules(request):
         ]
     else:
         hw.discover_modules()
-        hw_mods = hw.modules
+        hw_mods = hw.modules.values()
         module_data = [
             {
                 'name': mod.name(),
@@ -150,7 +150,7 @@ async def get_module_data(request):
     if ff.use_protocol_api_v2():
         hw_mods = await hw.discover_modules()
     else:
-        hw_mods = hw.modules
+        hw_mods = hw.modules.values()
 
     for module in hw_mods:
         is_serial_match = module.device_info.get('serial') == requested_serial
