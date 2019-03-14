@@ -1046,7 +1046,7 @@ class Robot(CommandPublisher):
         for mod in gone:
             self._attached_modules.pop(mod)
         for mod in new:
-            module_class = modules.SUPPORTED_MODULES.get(discovered[mod][1])
+            module_class = modules.SUPPORTED_MODULES[discovered[mod][1]]
             absolute_port = '/dev/modules/{}'.format(discovered[mod][0])
             self._attached_modules[mod]\
                 = module_class(port=absolute_port, broker=self.broker)
