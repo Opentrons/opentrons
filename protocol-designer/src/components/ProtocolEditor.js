@@ -19,12 +19,14 @@ const SelectorDebugger = process.env.NODE_ENV === 'development'
   ? require('../containers/SelectorDebugger').default
   : () => null
 
+const showGateModal = process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
+
 function ProtocolEditor () {
   return (
     <div>
       <SelectorDebugger />
       <TopPortalRoot />
-      <GateModal />
+      {showGateModal ? <GateModal /> : null}
       <div className={styles.wrapper}>
         <ConnectedNav />
         <ConnectedSidebar />
