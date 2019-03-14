@@ -69,7 +69,7 @@ type FlowRateForPipettes = {
 }
 
 // A v1 JSON protocol file
-export type ProtocolFileV1<DesignerApplicationData> = {
+export type SchemaV1ProtocolFile<DesignerApplicationData> = {
   'protocol-schema': VersionString,
 
   metadata: {
