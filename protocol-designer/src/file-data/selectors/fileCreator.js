@@ -14,8 +14,12 @@ import {
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../constants'
+import type {
+  FilePipetteV1 as FilePipette,
+  FileLabwareV1 as FileLabware,
+} from '@opentrons/shared-data'
 import type {BaseState} from '../../types'
-import type {ProtocolFile, FilePipette, FileLabware} from '../../file-types'
+import type {PDProtocolFile} from '../../file-types'
 import type {LabwareData, PipetteData} from '../../step-generation'
 
 // TODO LATER Ian 2018-02-28 deal with versioning
@@ -31,7 +35,7 @@ const applicationVersion = process.env.OT_PD_VERSION
 // when we look at saved protocols (without requiring us to trace thru git logs)
 const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
 
-const executionDefaults: $PropertyType<ProtocolFile, 'default-values'> = {
+const executionDefaults: $PropertyType<PDProtocolFile, 'default-values'> = {
   'aspirate-flow-rate': getFlowRateDefaultsAllPipettes('defaultAspirateFlowRate'),
   'dispense-flow-rate': getFlowRateDefaultsAllPipettes('defaultDispenseFlowRate'),
   'aspirate-mm-from-bottom': DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
@@ -39,7 +43,7 @@ const executionDefaults: $PropertyType<ProtocolFile, 'default-values'> = {
   'touch-tip-mm-from-top': DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 }
 
-export const createFile: BaseState => ProtocolFile = createSelector(
+export const createFile: BaseState => PDProtocolFile = createSelector(
   getFileMetadata,
   getInitialRobotState,
   getRobotStateTimeline,

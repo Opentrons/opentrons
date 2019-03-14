@@ -5,9 +5,13 @@ import omit from 'lodash/omit'
 import omitBy from 'lodash/omitBy'
 import flow from 'lodash/flow'
 import {getPipetteCapacity} from '../../pipettes/pipetteData'
+import type {
+  FileLabwareV1 as FileLabware,
+  FilePipetteV1 as FilePipette,
+} from '@opentrons/shared-data'
 import type {PipetteEntities} from '../../step-forms'
 import type {FormPatch} from '../../steplist/actions'
-import type {ProtocolFile, FileLabware, FilePipette} from '../../file-types'
+import type {PDProtocolFile} from '../../file-types'
 import type {FormData} from '../../form-types'
 
 // NOTE: these constants are copied here because
@@ -65,7 +69,7 @@ function _updatePatchPathField (patch: FormPatch, rawForm: FormData, pipetteEnti
   return patch
 }
 
-export function renameOrderedSteps (fileData: ProtocolFile): ProtocolFile {
+export function renameOrderedSteps (fileData: PDProtocolFile): PDProtocolFile {
   const {data} = fileData['designer-application']
   return {
     ...fileData,
@@ -81,7 +85,7 @@ export function renameOrderedSteps (fileData: ProtocolFile): ProtocolFile {
 }
 
 // builds the initial deck setup step for older protocols that didn't have one.
-export function addInitialDeckSetupStep (fileData: ProtocolFile): ProtocolFile {
+export function addInitialDeckSetupStep (fileData: PDProtocolFile): PDProtocolFile {
   const savedStepForms = fileData['designer-application'].data.savedStepForms
 
   // already has deck setup step, pass thru
@@ -146,7 +150,7 @@ export const MIX_DEPRECATED_FIELD_NAMES = [
   'touchTip',
   'mix_touchTipMmFromBottom',
 ]
-export function updateStepFormKeys (fileData: ProtocolFile): ProtocolFile {
+export function updateStepFormKeys (fileData: PDProtocolFile): PDProtocolFile {
   const savedStepForms = fileData['designer-application'].data.savedStepForms
   // NOTE: on LOAD_FILE, savedStepForms reducer will spread the form values
   // on top of over getDefaultsForStepType, so the defaults do not need to be
@@ -211,7 +215,7 @@ export function updateStepFormKeys (fileData: ProtocolFile): ProtocolFile {
   }
 }
 
-export function replaceTCDStepsWithMoveLiquidStep (fileData: ProtocolFile): ProtocolFile {
+export function replaceTCDStepsWithMoveLiquidStep (fileData: PDProtocolFile): PDProtocolFile {
   const savedStepForms = fileData['designer-application'].data.savedStepForms
   const migratedStepForms = mapValues(savedStepForms, (formData) => {
     const {stepType} = formData
@@ -242,7 +246,16 @@ export function replaceTCDStepsWithMoveLiquidStep (fileData: ProtocolFile): Prot
   }
 }
 
-const migrateFile = (fileData: ProtocolFile) => flow([
+export function updateVersion (fileData: PDProtocolFile): PDProtocolFile {
+  return {
+    ...fileData,
+    'designer-application': {
+      ...fileData['designer-application'],
+    },
+  }
+}
+
+const migrateFile = (fileData: PDProtocolFile): PDProtocolFile => flow([
   renameOrderedSteps,
   addInitialDeckSetupStep,
   updateStepFormKeys,

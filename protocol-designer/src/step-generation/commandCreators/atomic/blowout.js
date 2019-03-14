@@ -1,6 +1,7 @@
 // @flow
 import * as errorCreators from '../../errorCreators'
-import type {RobotState, CommandCreator, CommandCreatorError, PipetteLabwareFields} from '../../types'
+import type {PipetteLabwareFieldsV1 as PipetteLabwareFields} from '@opentrons/shared-data'
+import type {RobotState, CommandCreator, CommandCreatorError} from '../../types'
 
 import updateLiquidState from '../../dispenseUpdateLiquidState'
 

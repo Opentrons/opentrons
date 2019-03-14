@@ -1,6 +1,6 @@
 // @flow
 import migrateFile from './migration'
-import type {ProtocolFile} from '../file-types'
+import type {PDProtocolFile} from '../file-types'
 import type {GetState, ThunkAction, ThunkDispatch} from '../types'
 import type {
   FileUploadErrorType,
@@ -24,7 +24,7 @@ export const dismissFileUploadMessage = () => ({
 })
 
 // expects valid, parsed JSON protocol.
-export const loadFileAction = (payload: ProtocolFile): LoadFileAction => ({
+export const loadFileAction = (payload: PDProtocolFile): LoadFileAction => ({
   type: 'LOAD_FILE',
   payload: migrateFile(payload),
 })
@@ -46,7 +46,7 @@ export const loadProtocolFile = (event: SyntheticInputEvent<HTMLInputElement>): 
     } else {
       reader.onload = readEvent => {
         const result = readEvent.currentTarget.result
-        let parsedProtocol: ?ProtocolFile
+        let parsedProtocol: ?PDProtocolFile
 
         try {
           parsedProtocol = JSON.parse(result)

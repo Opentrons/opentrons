@@ -1,6 +1,9 @@
 // @flow
 import {tiprackWellNamesFlat} from '../../data'
-import type {AspirateDispenseArgs, Command} from '../../types'
+import type {
+  AspirateDispenseArgsV1 as AspirateDispenseArgs,
+  CommandV1 as Command,
+} from '@opentrons/shared-data'
 
 export const replaceTipCommands = (tip: number | string): Array<Command> => [
   dropTip('A1'),

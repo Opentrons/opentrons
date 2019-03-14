@@ -1,5 +1,5 @@
 // @flow
-import type {ProtocolFile} from '../file-types'
+import type {PDProtocolFile} from '../file-types'
 
 export type FileUploadErrorType =
   | 'INVALID_FILE_TYPE'
@@ -24,7 +24,7 @@ export type NewProtocolFields = {|
 export type LoadFileAction = {
   type: 'LOAD_FILE',
   payload: {
-    file: ProtocolFile,
+    file: PDProtocolFile,
     didMigrate: boolean,
   },
 }

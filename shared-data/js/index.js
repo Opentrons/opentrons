@@ -13,6 +13,7 @@ export * from './pipettes'
 export * from './types'
 export * from './labwareTools'
 export * from './modules'
+export * from '../protocol-json-schema/jsonProtocolTypeV1'
 
 export {
   getLabware,
