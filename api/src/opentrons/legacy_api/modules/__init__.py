@@ -99,8 +99,7 @@ def discover() -> List[Tuple[str, Any]]:
                 log.warning("Unexpected module connected: {} on {}"
                             .format(name, port))
                 continue
-            absolute_port = '/dev/modules/{}'.format(port)
-            discovered_modules.append((absolute_port, name))
+            discovered_modules.append((port, name))
     log.info('Discovered modules: {}'.format(discovered_modules))
 
     # for module in discovered_modules:
