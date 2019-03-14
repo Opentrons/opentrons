@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-
+import i18n from '../../../../localization'
 import type {StepType, HydratedMoveLiquidFormDataLegacy} from '../../../../form-types'
 import {
   VolumeField,
@@ -14,45 +14,76 @@ import styles from '../../StepEditForm.css'
 import type {FocusHandlers} from '../../types'
 import SourceDestFields from './SourceDestFields'
 
-type MoveLiquidFormProps = {
+type Props = {
   focusHandlers: FocusHandlers,
   stepType: StepType,
   formData: HydratedMoveLiquidFormDataLegacy,
+}
+
+type State = {
+  collapsed: boolean,
 }
 
 // TODO: BC 2019-01-25 i18n all across step form and fields
 // TODO: BC 2019-01-25 instead of passing path from here, put it in connect fields where needed
 // or question if it even needs path
 
-const MoveLiquidForm = (props: MoveLiquidFormProps) => {
-  const {focusHandlers, stepType} = props
-  const {path} = props.formData
-  return (
-    <React.Fragment>
-      <div className={cx(styles.form_row, styles.start_group)}>
-        <PipetteField name="pipette" stepType={stepType} {...focusHandlers} />
-        <VolumeField label="Transfer Vol:" focusHandlers={focusHandlers} stepType={stepType} />
-      </div>
-      <div className={styles.section_divider}></div>
+class MoveLiquidForm extends React.Component<Props, State> {
+  constructor (props: Props) {
+    super(props)
+    this.state = {collapsed: true}
+  }
 
-      <SourceDestFields focusHandlers={focusHandlers} prefix="aspirate" />
-      <div className={styles.section_divider}></div>
+  toggleCollapsed = () => this.setState({collapsed: !this.state.collapsed})
 
-      <SourceDestFields focusHandlers={focusHandlers} prefix="dispense" />
-      <div className={styles.section_divider}></div>
+  render () {
+    const {focusHandlers, stepType} = this.props
+    const {collapsed} = this.state
+    const {path} = this.props.formData
 
-      <div className={styles.form_row}>
-        <div className={styles.start_group}>
-          <ChangeTipField stepType={stepType} name="changeTip" />
-          <PathField focusHandlers={focusHandlers} />
+    return (
+      <div className={styles.form_wrapper}>
+        <div className={styles.section_header}>
+          <span className={styles.section_header_text}>
+            {i18n.t('application.stepType.moveLiquid')}
+          </span>
         </div>
-        <div className={cx(styles.end_group, styles.disposal_vol_wrapper)}>
-          {path === 'multiDispense' && <DisposalVolumeField focusHandlers={focusHandlers} />}
+        <div className={cx(styles.form_row, styles.start_group)}>
+          <PipetteField name="pipette" stepType={stepType} {...focusHandlers} />
+          <VolumeField label="Volume:" focusHandlers={focusHandlers} stepType={stepType} />
         </div>
-        <div className={styles.hidden_fields}></div>
+
+        <div className={styles.section_wrapper}>
+          <SourceDestFields
+            className={styles.section_left}
+            focusHandlers={focusHandlers}
+            collapsed={collapsed}
+            toggleCollapsed={this.toggleCollapsed}
+            prefix="aspirate" />
+          <SourceDestFields
+            className={styles.section_right}
+            focusHandlers={focusHandlers}
+            collapsed={collapsed}
+            toggleCollapsed={this.toggleCollapsed}
+            prefix="dispense" />
+        </div>
+
+        <div className={styles.section_header}>
+          <span className={styles.section_header_text}>sterility & motion</span>
+        </div>
+        <div className={styles.form_row}>
+          <div className={styles.start_group}>
+            <ChangeTipField stepType={stepType} name="changeTip" />
+            <PathField focusHandlers={focusHandlers} />
+          </div>
+          <div className={cx(styles.end_group, styles.disposal_vol_wrapper)}>
+            {path === 'multiDispense' && <DisposalVolumeField focusHandlers={focusHandlers} />}
+          </div>
+          <div className={styles.hidden_fields}></div>
+        </div>
       </div>
-    </React.Fragment>
-  )
+    )
+  }
 }
 
 export default MoveLiquidForm

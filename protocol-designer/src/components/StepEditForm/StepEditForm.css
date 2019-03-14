@@ -1,23 +1,18 @@
 @import '@opentrons/components';
 
+.form_wrapper {
+  max-width: 55rem; /* 'breakpoint' for gutter */
+}
+
+.form_row,
+.checkbox_column {
+  margin: 1rem 0;
+}
+
 .form_row {
-  margin-top: 1.5rem;
   min-height: 2.25rem;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-}
-
-.start_group {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-}
-
-.end_group {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
 }
 
 .wrap_group {
@@ -26,22 +21,23 @@
   justify-content: flex-start;
 }
 
+/* TODO: Ian 2019-03-14 delete probably (just used for Mix) */
 .fixed_width {
   width: 17rem;
 }
 
 .large_field {
-  width: 14rem;
+  width: 12rem;
   margin-right: 0.5rem;
 }
 
 .medium_field {
-  width: 12em;
+  width: 8rem;
   margin-right: 0.5rem;
 }
 
 .small_field {
-  width: 5rem;
+  width: 5.75rem;
   margin-right: 0.5rem;
 }
 
@@ -54,7 +50,6 @@
   height: 1.5rem;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
 }
 
 .checkbox_field {
@@ -65,11 +60,7 @@
   margin-bottom: 1rem;
 }
 
-.hidden_fields {
-  margin: 0 1rem 0 2.5rem;
-  min-width: 14.5rem;
-}
-
+/* TODO Ian 2019-03-14: probably delete this */
 .mix_hidden_fields {
   margin: 0 0 0 1rem;
   min-width: 0;
@@ -104,20 +95,45 @@
 }
 
 .advanced_settings_button_wrapper {
+  float: right;
   height: 2.25rem;
   width: 2.25rem;
-  margin-top: 0.375rem;
 }
 
 .advanced_settings_button {
   padding: 0.375rem;
 }
 
-.section_divider {
-  height: 1px;
+.section_wrapper {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+
+  & > {
+    flex: 1;
+  }
+}
+
+.section_right {
+  border-left: 1rem solid transparent; /* fake gutter */
+}
+
+.section_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  min-height: 1.25rem; /* Same height with and without gear icon */
+  border-bottom: 1px solid var(--c-light-gray);
   width: 100%;
-  background-color: var(--c-light-gray);
-  margin: 1em 0;
+}
+
+.section_header_text {
+  /* TODO IMMEDIATELY: typography.css entry for the below? */
+  color: #666; /* TODO IMMEDIATELY: name in colors.css?? */
+  letter-spacing: 1px;
+  font-size: var(--fs-body-2);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
 }
 
 .path_option {
