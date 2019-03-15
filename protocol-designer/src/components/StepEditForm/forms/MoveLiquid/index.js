@@ -48,7 +48,7 @@ class MoveLiquidForm extends React.Component<Props, State> {
             {i18n.t('application.stepType.moveLiquid')}
           </span>
         </div>
-        <div className={cx(styles.form_row, styles.start_group)}>
+        <div className={styles.form_row}>
           <PipetteField name="pipette" stepType={stepType} {...focusHandlers} />
           <VolumeField label="Volume:" focusHandlers={focusHandlers} stepType={stepType} />
         </div>
@@ -71,15 +71,14 @@ class MoveLiquidForm extends React.Component<Props, State> {
         <div className={styles.section_header}>
           <span className={styles.section_header_text}>sterility & motion</span>
         </div>
-        <div className={styles.form_row}>
-          <div className={styles.start_group}>
+        <div className={styles.section_wrapper}>
+          <div className={cx(styles.form_row, styles.section_left)}>
             <ChangeTipField stepType={stepType} name="changeTip" />
             <PathField focusHandlers={focusHandlers} />
           </div>
-          <div className={cx(styles.end_group, styles.disposal_vol_wrapper)}>
+          <div className={cx(styles.section_right, styles.disposal_vol_wrapper)}>
             {path === 'multiDispense' && <DisposalVolumeField focusHandlers={focusHandlers} />}
           </div>
-          <div className={styles.hidden_fields}></div>
         </div>
       </div>
     )

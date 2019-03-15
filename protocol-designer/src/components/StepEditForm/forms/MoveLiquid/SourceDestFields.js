@@ -68,9 +68,7 @@ function SourceDestFields (props: Props) {
                 pipetteFieldName="pipette"
                 flowRateType={prefix} />
               <TipPositionField fieldName={addFieldNamePrefix('mmFromBottom')} />
-              <FormGroup label='Well order:'>
-                <WellOrderField prefix={prefix} />
-              </FormGroup>
+              <WellOrderField prefix={prefix} label='Well order:' />
             </div>
 
             <div className={styles.checkbox_column}>

@@ -4,6 +4,7 @@
   max-width: 55rem; /* 'breakpoint' for gutter */
 }
 
+.disposal_vol_wrapper,
 .form_row,
 .checkbox_column {
   margin: 1rem 0;
@@ -12,7 +13,6 @@
 .form_row {
   min-height: 2.25rem;
   display: flex;
-  flex-direction: row;
 }
 
 .wrap_group {
@@ -108,14 +108,16 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 0.5rem;
+}
 
-  & > {
-    flex: 1;
-  }
+.section_left,
+.section_right {
+  flex: 1;
+  max-width: 20rem;
 }
 
 .section_right {
-  border-left: 1rem solid transparent; /* fake gutter */
+  border-left: 1rem solid transparent; /* minimum gutter space */
 }
 
 .section_header {
@@ -193,7 +195,8 @@
 }
 
 .multi_dispense_options {
-  min-width: 14.25rem;
+  /* TOD IMMEDIATELY: remove */
+  /* min-width: 14.25rem; */
 }
 
 @media screen and (max-width: 1279px) {
