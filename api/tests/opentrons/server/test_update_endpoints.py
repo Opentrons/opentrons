@@ -112,7 +112,11 @@ def dummy_attached_modules():
 
 
 async def test_update_module_firmware(
-        dummy_attached_modules, virtual_smoothie_env, loop, test_client, monkeypatch):
+        dummy_attached_modules,
+        virtual_smoothie_env,
+        loop,
+        test_client,
+        monkeypatch):
 
     app = init(loop)
     client = await loop.create_task(test_client(app))
@@ -156,7 +160,11 @@ async def test_update_module_firmware(
 
 
 async def test_fail_update_module_firmware(
-        dummy_attached_modules, virtual_smoothie_env, loop, test_client, monkeypatch):
+        dummy_attached_modules,
+        virtual_smoothie_env,
+        loop,
+        test_client,
+        monkeypatch):
     app = init(loop)
     client = await loop.create_task(test_client(app))
     serial_num = 'mdYYYYMMDD123'
