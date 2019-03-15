@@ -53,7 +53,7 @@ const DisposalVolumeField = (props: Props) => (
               <CheckboxField
                 label="Disposal Volume"
                 value={Boolean(value)}
-                className={styles.checkbox_field}
+                className={cx(styles.checkbox_field, styles.large_field)}
                 onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)} />
               {
                 value
@@ -70,9 +70,9 @@ const DisposalVolumeField = (props: Props) => (
                     dirtyFields={props.focusHandlers.dirtyFields}
                     render={({value, updateValue, hoverTooltipHandlers}) => (
                       <div {...hoverTooltipHandlers} className={styles.checkbox_row} >
-                        <div className={styles.sub_select_label}>Blowout</div>
+                        <div className={styles.sub_label_no_checkbox}>Blowout</div>
                         <DropdownField
-                          className={cx(styles.medium_field, styles.orphan_field)}
+                          className={styles.large_field}
                           options={props.disposalDestinationOptions}
                           onBlur={() => { props.focusHandlers.onFieldBlur('blowout_location') }}
                           onFocus={() => { props.focusHandlers.onFieldFocus('blowout_location') }}

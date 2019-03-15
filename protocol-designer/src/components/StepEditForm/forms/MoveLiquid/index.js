@@ -55,13 +55,13 @@ class MoveLiquidForm extends React.Component<Props, State> {
 
         <div className={styles.section_wrapper}>
           <SourceDestFields
-            className={styles.section_left}
+            className={styles.section_column}
             focusHandlers={focusHandlers}
             collapsed={collapsed}
             toggleCollapsed={this.toggleCollapsed}
             prefix="aspirate" />
           <SourceDestFields
-            className={styles.section_right}
+            className={styles.section_column}
             focusHandlers={focusHandlers}
             collapsed={collapsed}
             toggleCollapsed={this.toggleCollapsed}
@@ -72,11 +72,11 @@ class MoveLiquidForm extends React.Component<Props, State> {
           <span className={styles.section_header_text}>sterility & motion</span>
         </div>
         <div className={styles.section_wrapper}>
-          <div className={cx(styles.form_row, styles.section_left)}>
+          <div className={cx(styles.form_row, styles.section_column)}>
             <ChangeTipField stepType={stepType} name="changeTip" />
             <PathField focusHandlers={focusHandlers} />
           </div>
-          <div className={cx(styles.section_right, styles.disposal_vol_wrapper)}>
+          <div className={cx(styles.section_column, styles.disposal_vol_wrapper)}>
             {path === 'multiDispense' && <DisposalVolumeField focusHandlers={focusHandlers} />}
           </div>
         </div>

@@ -26,19 +26,24 @@
   width: 17rem;
 }
 
+.field,
+.small_field,
+.medium_field,
 .large_field {
-  width: 12rem;
   margin-right: 0.5rem;
 }
 
+.large_field {
+  width: 12rem;
+}
+
+/* TODO Ian 2019-03-15: needed in mix form before update. When you do mix form, delete this if it's not needed */
 .medium_field {
   width: 8rem;
-  margin-right: 0.5rem;
 }
 
 .small_field {
   width: 5.75rem;
-  margin-right: 0.5rem;
 }
 
 .orphan_field {
@@ -79,15 +84,16 @@
   margin-right: 0.625rem;
 }
 
-.sub_select_label {
+.sub_label_no_checkbox {
   @apply --font-body-1-dark;
 
+  width: 5rem;
   display: flex;
   align-items: center;
   line-height: 1;
   flex: 0 0 auto;
   padding: 0 0.5rem;
-  margin: 0.5em 0 0.5em 20px;
+  margin: 0.5rem 0 0.5rem 1.4rem;
 }
 
 .advanced_settings_button_wrapper {
@@ -106,14 +112,9 @@
   margin-bottom: 0.5rem;
 }
 
-.section_left,
-.section_right {
+.section_column {
   flex: 1;
   max-width: 20rem;
-}
-
-.section_right {
-  border-left: 1rem solid transparent; /* minimum gutter space */
 }
 
 .section_header {
@@ -194,10 +195,6 @@
 @media screen and (max-width: 1000px) {
   .section_wrapper {
     flex-direction: column;
-  }
-
-  .section_right {
-    border-left: none;
   }
 }
 

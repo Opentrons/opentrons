@@ -76,16 +76,33 @@ function SourceDestFields (props: Props) {
             <div className={styles.checkbox_column}>
               {prefix === 'aspirate' &&
                 <React.Fragment>
-                  <CheckboxRowField name="preWetTip" label="Pre-wet tip" />
-                  <CheckboxRowField disabled tooltipComponent={i18n.t('tooltip.not_in_beta')} name="aspirate_airGap_checkbox" label="Air Gap">
+                  <CheckboxRowField
+                    name="preWetTip"
+                    label="Pre-wet tip"
+                    className={styles.small_field}
+                  />
+                  <CheckboxRowField
+                    disabled
+                    tooltipComponent={i18n.t('tooltip.not_in_beta')}
+                    name="aspirate_airGap_checkbox"
+                    label="Air Gap"
+                    className={styles.small_field}
+                  >
                     <TextField disabled name="aspirate_airGap_volume" units="μL" {...focusHandlers} />
                   </CheckboxRowField>
                 </React.Fragment>
               }
-              <CheckboxRowField name={addFieldNamePrefix('touchTip_checkbox')} label="Touch tip">
+              <CheckboxRowField
+                name={addFieldNamePrefix('touchTip_checkbox')}
+                label="Touch tip"
+                className={styles.small_field}
+              >
                 <TipPositionField fieldName={addFieldNamePrefix('touchTip_mmFromBottom')} />
               </CheckboxRowField>
-              <CheckboxRowField name={addFieldNamePrefix('mix_checkbox')} label='Mix'>
+              <CheckboxRowField
+                name={addFieldNamePrefix('mix_checkbox')}
+                label='Mix'
+                className={styles.small_field}>
                 <TextField
                   name={addFieldNamePrefix('mix_volume')}
                   units="μL"
@@ -98,7 +115,7 @@ function SourceDestFields (props: Props) {
                   {...focusHandlers} />
               </CheckboxRowField>
               {prefix === 'dispense' &&
-                <CheckboxRowField name='blowout_checkbox' label='Blowout'>
+                <CheckboxRowField name='blowout_checkbox' label='Blowout' className={styles.small_field}>
                   <BlowoutLocationField
                     name="blowout_location"
                     className={styles.full_width}
