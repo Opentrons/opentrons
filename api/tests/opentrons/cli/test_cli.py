@@ -1,5 +1,5 @@
 import pytest
-import copy
+import sys
 import numpy as np
 
 from opentrons.config import (CONFIG,
@@ -13,11 +13,10 @@ from opentrons.deck_calibration.endpoints import expected_points
 @pytest.fixture
 def mock_config():
     test_config = robot_configs.load()
-    old_config = copy.deepcopy(test_config)
     new_config = test_config._replace(name='new-value1')
     robot_configs.save_robot_settings(new_config)
     yield new_config
-    robot_configs.save_robot_settings(old_config)
+    robot_configs.save_robot_settings(test_config)
 
 
 @pytest.mark.api1_only
@@ -82,6 +81,8 @@ async def test_new_deck_points():
     assert expected_points2['3'] == (12.13, 258.0)
 
 
+@pytest.mark.skipif(
+    sys.platform.startswith("win"), reason="Incompatible with Windows")
 @pytest.mark.api1_only
 def test_move_output(mock_config, loop, async_server, monkeypatch):
     # Check that the robot moves to the correct locations
@@ -112,6 +113,8 @@ def test_tip_probe(mock_config, async_server):
     assert output == 'Tip probe'
 
 
+@pytest.mark.skipif(
+    sys.platform.startswith("win"), reason="Incompatible with Windows")
 @pytest.mark.api1_only
 def test_mount_offset(mock_config, loop, monkeypatch, async_server):
     # Check that mount offset gives the expected output when position is
@@ -140,6 +143,8 @@ def test_mount_offset(mock_config, loop, monkeypatch, async_server):
     hardware.reset()
 
 
+@pytest.mark.skipif(
+    sys.platform.startswith("win"), reason="Incompatible with Windows")
 @pytest.mark.api1_only
 def test_gantry_matrix_output(mock_config, loop, async_server, monkeypatch):
     # Check that the robot moves to the correct locations
