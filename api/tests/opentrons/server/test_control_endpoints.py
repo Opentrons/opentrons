@@ -108,13 +108,11 @@ async def test_get_modules_v2(
 @pytest.mark.api1_only
 async def test_get_modules_v1(
         virtual_smoothie_env, loop, async_client, monkeypatch):
-    test_module = legacy_modules.MagDeck(port="/dev/modules/tty1_magdeck")
 
-    def stub_discover_modules():
-        return [test_module]
+    def stub_discover():
+        return [('tty1_magdeck', 'magdeck')]
 
-    monkeypatch.setattr(legacy_modules,
-                        "discover_and_connect", stub_discover_modules)
+    monkeypatch.setattr(legacy_modules, "discover", stub_discover)
     await check_modules_response(async_client)
 
 

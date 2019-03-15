@@ -96,16 +96,23 @@ async def test_ignore_updates(
 
 
 @pytest.fixture
-def dummy_modules():
+def dummy_attached_modules():
     temp_module = modules.TempDeck()
-    temp_module._device_info = {'serial': 'tdYYYYMMDD987'}
+    temp_port = 'tty1_tempdeck'
+    temp_serial = 'tdYYYYMMDD987'
+    temp_module._device_info = {'serial': temp_serial}
     mag_module = modules.MagDeck()
-    mag_module._device_info = {'serial': 'mdYYYYMMDD123'}
-    return [temp_module, mag_module]
+    mag_port = 'tty1_magdeck'
+    mag_serial = 'mdYYYYMMDD123'
+    mag_module._device_info = {'serial': mag_serial}
+    return {
+        temp_port + 'tempdeck': temp_module,
+        mag_port + 'magdeck': mag_module
+    }
 
 
 async def test_update_module_firmware(
-        dummy_modules, virtual_smoothie_env, loop, test_client, monkeypatch):
+        dummy_attached_modules, virtual_smoothie_env, loop, test_client, monkeypatch):
 
     app = init(loop)
     client = await loop.create_task(test_client(app))
@@ -116,14 +123,14 @@ async def test_update_module_firmware(
     with open(os.path.join(tmpdir, fw_filename), 'wb') as fd:
         fd.write(bytes(0x1234))
 
-    def mock_discover_and_connect():
-        return dummy_modules
+    def dummy_discover_modules():
+        return
 
     async def mock_enter_bootloader(module):
         return '/dev/modules/tty0_bootloader'
 
-    monkeypatch.setattr(modules,
-                        'discover_and_connect', mock_discover_and_connect)
+    monkeypatch.setattr(robot, 'discover_modules', dummy_discover_modules)
+    monkeypatch.setattr(robot, '_attached_modules', dummy_attached_modules)
     monkeypatch.setattr(modules, 'enter_bootloader', mock_enter_bootloader)
 
     # ========= Happy path ==========
@@ -149,7 +156,7 @@ async def test_update_module_firmware(
 
 
 async def test_fail_update_module_firmware(
-        dummy_modules, virtual_smoothie_env, loop, test_client, monkeypatch):
+        dummy_attached_modules, virtual_smoothie_env, loop, test_client, monkeypatch):
     app = init(loop)
     client = await loop.create_task(test_client(app))
     serial_num = 'mdYYYYMMDD123'
@@ -159,14 +166,14 @@ async def test_fail_update_module_firmware(
     with open(os.path.join(tmpdir, fw_filename), 'wb') as fd:
         fd.write(bytes(0x1234))
 
-    def mock_discover_and_connect():
-        return dummy_modules
+    def dummy_discover_modules():
+        return
 
     async def mock_enter_bootloader(module):
         return '/dev/modules/tty0_bootloader'
 
-    monkeypatch.setattr(modules,
-                        'discover_and_connect', mock_discover_and_connect)
+    monkeypatch.setattr(robot, 'discover_modules', dummy_discover_modules)
+    monkeypatch.setattr(robot, '_attached_modules', dummy_attached_modules)
     monkeypatch.setattr(modules, 'enter_bootloader', mock_enter_bootloader)
 
     # ========= Case 1: Port not accessible =========
