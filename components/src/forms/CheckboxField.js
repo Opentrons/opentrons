@@ -17,6 +17,8 @@ type Props = {
   name?: string,
   /** label text for checkbox */
   label?: string,
+  /** opt out of label capitalization */
+  noCapitalize?: ?boolean,
   /** if is included, checkbox will use error style. The content of the string is ignored. */
   error?: ?string,
   /** checkbox is disabled if value is true */
@@ -52,7 +54,7 @@ export default function CheckboxField (props: Props) {
         disabled={props.disabled}
         onChange={props.onChange}
       />
-      <div {...props.hoverTooltipHandlers} className={styles.label_text}>
+      <div {...props.hoverTooltipHandlers} className={cx(styles.label_text, {[styles.capitalize]: !props.noCapitalize})}>
         {props.label}
       </div>
     </label>

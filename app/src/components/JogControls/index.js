@@ -111,6 +111,7 @@ export default class JogControls extends React.Component<Props, State> {
         ))}
         <span className={styles.increment_group}>
           <RadioGroup
+            noCapitalize
             className={styles.increment_item}
             value={`${step}`}
             options={STEP_OPTIONS}

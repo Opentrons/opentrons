@@ -33,8 +33,11 @@
   line-height: 1;
 }
 
-.label_text {
+.capitalize {
   text-transform: capitalize;
+}
+
+.label_text {
   flex: 0 0 auto;
   padding: 0 0.5rem;
 

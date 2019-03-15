@@ -23,6 +23,7 @@ export default function LabeledCheckbox (props: Props) {
       label={label}
       control={(
         <CheckboxField
+          noCapitalize
           className={checkboxClass}
           name={name}
           value={value}

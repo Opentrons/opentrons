@@ -15,6 +15,8 @@ type Props = {
   className?: string,
   /** inline label text. DEPRECATED */
   label?: string,
+  /** opt out of label capitalization */
+  noCapitalize?: ?boolean,
   /** name of field in form */
   name?: string,
   /** optional ID of <input> element */
@@ -64,7 +66,7 @@ export default function InputField (props: Props) {
 
   return (
     <label className={labelClass}>
-      <div className={styles.label_text}>
+      <div className={cx(styles.label_text, {[styles.capitalize]: !props.noCapitalize})}>
         {props.label &&
           error && (
           <div className={styles.error_icon}>

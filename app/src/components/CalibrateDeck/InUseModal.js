@@ -41,16 +41,19 @@ export default class InUseModal extends React.Component<
         <p>Are you sure you want to interrupt this robot?</p>
         <div>
           <CheckboxField
+            noCapitalize
             label="It can’t be undone"
             onChange={() => this.setState({checkOne: !this.state.checkOne})}
             value={this.state.checkOne}
           />
           <CheckboxField
+            noCapitalize
             label="Any work the robot is doing will be stopped"
             onChange={() => this.setState({checkTwo: !this.state.checkTwo})}
             value={this.state.checkTwo}
           />
           <CheckboxField
+            noCapitalize
             label="This is a good idea"
             onChange={() => this.setState({checkThree: !this.state.checkThree})}
             value={this.state.checkThree}

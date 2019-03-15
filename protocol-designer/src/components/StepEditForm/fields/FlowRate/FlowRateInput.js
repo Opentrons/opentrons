@@ -179,6 +179,7 @@ export default class FlowRateInput extends React.Component<Props, State> {
 
           <RadioGroup
             inline
+            noCapitalize
             value={(modalUseDefault)
               ? 'default'
               : 'custom'
