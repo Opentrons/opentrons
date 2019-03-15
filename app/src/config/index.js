@@ -66,6 +66,7 @@ export type Config = {
   devInternal?: {
     allPipetteConfig?: boolean,
     manualIp?: boolean,
+    enableThermocycler?: boolean,
   },
 }
 

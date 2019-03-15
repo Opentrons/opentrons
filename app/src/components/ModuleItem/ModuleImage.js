@@ -11,7 +11,7 @@ export default function ModuleImage (props: Props) {
   const imgSrc = getModuleImg(props.name)
   return (
     <div className={styles.module_image_wrapper}>
-      <img src={imgSrc} className={styles.module_image}/>
+      <img src={imgSrc} className={styles.module_image} />
     </div>
   )
 }
@@ -23,4 +23,5 @@ function getModuleImg (name: string) {
 const MODULE_IMGS = {
   tempdeck: require('./images/module-temp@3x.png'),
   magdeck: require('./images/module-mag@3x.png'),
+  thermocycler: require('./images/module-thermo@3x.png'),
 }
