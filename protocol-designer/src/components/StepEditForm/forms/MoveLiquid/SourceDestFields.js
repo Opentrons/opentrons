@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import {FormGroup, IconButton, HoverTooltip} from '@opentrons/components'
 
 import type {StepFieldName} from '../../../../steplist/fieldLevel'
 import i18n from '../../../../localization'
@@ -8,13 +7,11 @@ import i18n from '../../../../localization'
 import type {FocusHandlers} from '../../types'
 
 import {
-  LabwareField,
   TextField,
   CheckboxRowField,
   BlowoutLocationField,
   TipPositionField,
   FlowRateField,
-  WellSelectionField,
   WellOrderField,
 } from '../../fields'
 
@@ -22,8 +19,6 @@ import styles from '../../StepEditForm.css'
 
 type Props = {
   className?: ?string,
-  collapsed?: ?boolean,
-  toggleCollapsed: () => mixed,
   focusHandlers: FocusHandlers,
   prefix: 'aspirate' | 'dispense',
 }
@@ -31,107 +26,76 @@ type Props = {
 const makeAddFieldNamePrefix = (prefix: string) => (fieldName: string): StepFieldName => `${prefix}_${fieldName}`
 
 function SourceDestFields (props: Props) {
-  const {className, collapsed, toggleCollapsed, focusHandlers, prefix} = props
+  const {className, focusHandlers, prefix} = props
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
-  const labwareLabel = i18n.t(`form.step_edit_form.labwareLabel.${prefix}`)
 
   return (
     <div className={className}>
-      <div className={styles.section_header}>
-        <span className={styles.section_header_text}>{prefix}</span>
-        <HoverTooltip
-          key={collapsed ? 'collapsed' : 'expanded'} // NOTE: without this key, the IconButton will not re-render unless clicked
-          tooltipComponent={i18n.t('tooltip.advanced_settings')}>
-          {(hoverTooltipHandlers) => (
-            <div {...hoverTooltipHandlers} onClick={toggleCollapsed} className={styles.advanced_settings_button_wrapper}>
-              <IconButton className={styles.advanced_settings_button} name="settings" hover={!collapsed} />
-            </div>
-          )}
-        </HoverTooltip>
-      </div>
       <div className={styles.form_row}>
-        <FormGroup label={labwareLabel}>
-          <LabwareField name={addFieldNamePrefix('labware')} {...focusHandlers} />
-        </FormGroup>
-        <WellSelectionField
-          name={addFieldNamePrefix('wells')}
-          labwareFieldName={addFieldNamePrefix('labware')}
+        <FlowRateField
+          name={addFieldNamePrefix('flowRate')}
           pipetteFieldName="pipette"
-          {...focusHandlers} />
-        {collapsed && <WellOrderField prefix={prefix} />}
+          flowRateType={prefix} />
+        <TipPositionField fieldName={addFieldNamePrefix('mmFromBottom')} />
+        <WellOrderField prefix={prefix} label={i18n.t('form.step_edit_form.field.well_order.label')} />
       </div>
 
-      <div>
-        {!collapsed &&
+      <div className={styles.checkbox_column}>
+        {prefix === 'aspirate' &&
           <React.Fragment>
-            <div className={styles.form_row}>
-              <FlowRateField
-                name={addFieldNamePrefix('flowRate')}
-                pipetteFieldName="pipette"
-                flowRateType={prefix} />
-              <TipPositionField fieldName={addFieldNamePrefix('mmFromBottom')} />
-              <WellOrderField prefix={prefix} label={i18n.t('form.step_edit_form.field.well_order.label')} />
-            </div>
-
-            <div className={styles.checkbox_column}>
-              {prefix === 'aspirate' &&
-                <React.Fragment>
-                  <CheckboxRowField
-                    name="preWetTip"
-                    label={i18n.t('form.step_edit_form.field.preWetTip.label')}
-                    className={styles.small_field}
-                  />
-                  <CheckboxRowField
-                    disabled
-                    tooltipComponent={i18n.t('tooltip.not_in_beta')}
-                    name="aspirate_airGap_checkbox"
-                    label={i18n.t('form.step_edit_form.field.airGap.label')}
-                    className={styles.small_field}
-                  >
-                    <TextField
-                      disabled
-                      name="aspirate_airGap_volume"
-                      units={i18n.t('application.units.microliter')}
-                      {...focusHandlers}
-                    />
-                  </CheckboxRowField>
-                </React.Fragment>
-              }
-              <CheckboxRowField
-                name={addFieldNamePrefix('touchTip_checkbox')}
-                label={i18n.t('form.step_edit_form.field.touchTip.label')}
-                className={styles.small_field}
-              >
-                <TipPositionField fieldName={addFieldNamePrefix('touchTip_mmFromBottom')} />
-              </CheckboxRowField>
-              <CheckboxRowField
-                name={addFieldNamePrefix('mix_checkbox')}
-                label={i18n.t('form.step_edit_form.field.mix.label')}
-                className={styles.small_field}>
-                <TextField
-                  name={addFieldNamePrefix('mix_volume')}
-                  units={i18n.t('application.units.microliter')}
-                  className={styles.small_field}
-                  {...focusHandlers} />
-                <TextField
-                  name={addFieldNamePrefix('mix_times')}
-                  units={i18n.t('application.units.times')}
-                  className={styles.small_field}
-                  {...focusHandlers} />
-              </CheckboxRowField>
-              {prefix === 'dispense' &&
-                <CheckboxRowField
-                  name='blowout_checkbox'
-                  label={i18n.t('form.step_edit_form.field.blowout.label')}
-                  className={styles.small_field}>
-                  <BlowoutLocationField
-                    name="blowout_location"
-                    className={styles.full_width}
-                    {...focusHandlers} />
-                </CheckboxRowField>
-              }
-            </div>
+            <CheckboxRowField
+              name="preWetTip"
+              label={i18n.t('form.step_edit_form.field.preWetTip.label')}
+              className={styles.small_field}
+            />
+            <CheckboxRowField
+              disabled
+              tooltipComponent={i18n.t('tooltip.not_in_beta')}
+              name="aspirate_airGap_checkbox"
+              label={i18n.t('form.step_edit_form.field.airGap.label')}
+              className={styles.small_field}
+            >
+              <TextField
+                disabled
+                name="aspirate_airGap_volume"
+                units={i18n.t('application.units.microliter')}
+                {...focusHandlers}
+              />
+            </CheckboxRowField>
           </React.Fragment>
+        }
+        <CheckboxRowField
+          name={addFieldNamePrefix('touchTip_checkbox')}
+          label={i18n.t('form.step_edit_form.field.touchTip.label')}
+          className={styles.small_field}
+        >
+          <TipPositionField fieldName={addFieldNamePrefix('touchTip_mmFromBottom')} />
+        </CheckboxRowField>
+        <CheckboxRowField
+          name={addFieldNamePrefix('mix_checkbox')}
+          label={i18n.t('form.step_edit_form.field.mix.label')}
+          className={styles.small_field}>
+          <TextField
+            name={addFieldNamePrefix('mix_volume')}
+            units={i18n.t('application.units.microliter')}
+            className={styles.small_field}
+            {...focusHandlers} />
+          <TextField
+            name={addFieldNamePrefix('mix_times')}
+            units={i18n.t('application.units.times')}
+            className={styles.small_field}
+            {...focusHandlers} />
+        </CheckboxRowField>
+        {prefix === 'dispense' &&
+          <CheckboxRowField
+            name='blowout_checkbox'
+            label={i18n.t('form.step_edit_form.field.blowout.label')}
+            className={styles.small_field}>
+            <BlowoutLocationField
+              name="blowout_location"
+              className={styles.full_width}
+              {...focusHandlers} />
+          </CheckboxRowField>
         }
       </div>
     </div>

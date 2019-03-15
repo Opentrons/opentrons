@@ -13,6 +13,7 @@ import {
 import styles from '../../StepEditForm.css'
 import type {FocusHandlers} from '../../types'
 import SourceDestFields from './SourceDestFields'
+import SourceDestHeaders from './SourceDestHeaders'
 
 type Props = {
   focusHandlers: FocusHandlers,
@@ -53,6 +54,21 @@ class MoveLiquidForm extends React.Component<Props, State> {
         </div>
 
         <div className={styles.section_wrapper}>
+          <SourceDestHeaders
+            className={styles.section_column}
+            focusHandlers={focusHandlers}
+            collapsed={collapsed}
+            toggleCollapsed={this.toggleCollapsed}
+            prefix="aspirate" />
+          <SourceDestHeaders
+            className={styles.section_column}
+            focusHandlers={focusHandlers}
+            collapsed={collapsed}
+            toggleCollapsed={this.toggleCollapsed}
+            prefix="dispense" />
+        </div>
+
+        {!collapsed && <div className={cx(styles.section_wrapper, styles.advanced_settings_panel)}>
           <SourceDestFields
             className={styles.section_column}
             focusHandlers={focusHandlers}
@@ -65,7 +81,7 @@ class MoveLiquidForm extends React.Component<Props, State> {
             collapsed={collapsed}
             toggleCollapsed={this.toggleCollapsed}
             prefix="dispense" />
-        </div>
+        </div>}
 
         <div className={styles.section_header}>
           <span className={styles.section_header_text}>{i18n.t('form.step_edit_form.section.sterility&motion')}</span>

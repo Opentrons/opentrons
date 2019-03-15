@@ -1,5 +1,11 @@
 @import '@opentrons/components';
 
+.advanced_settings_panel {
+  background-color: #f6f6f6; /* TODO Ian 2019-03-15 add to colors.css? */
+  margin: -0.5rem -0.75rem 0 -0.75rem;
+  padding: 0 0.75rem 0 0.75rem;
+}
+
 .form_wrapper {
   max-width: 55rem; /* 'breakpoint' for gutter */
 }
@@ -124,6 +130,7 @@
   min-height: 1.25rem; /* Same height with and without gear icon */
   border-bottom: 1px solid var(--c-light-gray);
   width: 100%;
+  padding-top: 0.25rem;
 }
 
 .section_header_text {
@@ -201,5 +208,4 @@
 .button_row {
   display: flex;
   justify-content: space-between;
-  margin: 1rem 0 0.5rem 0;
 }
