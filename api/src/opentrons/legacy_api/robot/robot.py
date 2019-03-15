@@ -2,6 +2,7 @@ import asyncio
 import os
 import logging
 from functools import lru_cache
+from typing import Dict, Any
 
 from numpy import add, subtract
 
@@ -105,7 +106,7 @@ class Robot(CommandPublisher):
         super().__init__(broker)
         self.config = config or load()
         self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
-        self.modules = []
+        self._attached_modules: Dict[str, Any] = {}  # key is port + model
         self.fw_version = self._driver.get_fw_version()
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
@@ -1031,7 +1032,26 @@ class Robot(CommandPublisher):
     async def disengage_axes(self, axes):
         self._driver.disengage_axis(''.join(axes))
 
+    @property
+    def attached_modules(self):
+        return self._attached_modules
+
     def discover_modules(self):
-        for module in self.modules:
-            module.disconnect()
-        self.modules = modules.discover_and_connect()
+        discovered = {port + model: (port, model)
+                      for port, model in modules.discover()}
+        these = set(discovered.keys())
+        known = set(self._attached_modules.keys())
+        new = these - known
+        gone = known - these
+        for mod in gone:
+            self._attached_modules.pop(mod)
+        for mod in new:
+            module_class = modules.SUPPORTED_MODULES[discovered[mod][1]]
+            absolute_port = '/dev/modules/{}'.format(discovered[mod][0])
+            self._attached_modules[mod]\
+                = module_class(port=absolute_port, broker=self.broker)
+
+            try:
+                self._attached_modules[mod].connect()
+            except AttributeError:
+                log.exception('Failed to connect module')

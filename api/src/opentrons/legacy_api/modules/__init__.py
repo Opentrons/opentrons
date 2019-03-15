@@ -2,6 +2,7 @@ import os
 import logging
 import re
 import asyncio
+from typing import List, Tuple, Any
 from .magdeck import MagDeck
 from .tempdeck import TempDeck
 from opentrons import HERE as package_root, config
@@ -59,9 +60,10 @@ def load(name, slot):
             # support for multiple instances of one module type this
             # accessor would then load the correct disambiguated module
             # instance via the module's serial
+            module_instances = _mod_robot.attached_modules.values()
             matching_modules = [
-                module for module in _mod_robot.modules if isinstance(
-                    module, SUPPORTED_MODULES.get(name)
+                mod for mod in module_instances if isinstance(
+                    mod, SUPPORTED_MODULES.get(name)
                 )
             ]
             if matching_modules:
@@ -80,7 +82,7 @@ def load(name, slot):
 
 # Note: this function should be called outside the robot class, because
 # of the circular dependency that it would create if imported into robot.py
-def discover_and_connect():
+def discover() -> List[Tuple[str, Any]]:
     if config.IS_ROBOT and os.path.isdir('/dev/modules'):
         devices = os.listdir('/dev/modules')
     else:
@@ -92,17 +94,13 @@ def discover_and_connect():
     for port in devices:
         match = module_port_regex.search(port)
         if match:
-            module_class = SUPPORTED_MODULES.get(match.group().lower())
-            absolute_port = '/dev/modules/{}'.format(port)
-            discovered_modules.append(
-                module_class(port=absolute_port, broker=_mod_robot.broker))
-
-    log.debug('Discovered modules: {}'.format(discovered_modules))
-    for module in discovered_modules:
-        try:
-            module.connect()
-        except AttributeError:
-            log.exception('Failed to connect module')
+            name = match.group().lower()
+            if name not in SUPPORTED_MODULES:
+                log.warning("Unexpected module connected: {} on {}"
+                            .format(name, port))
+                continue
+            discovered_modules.append((port, name))
+    log.info('Discovered modules: {}'.format(discovered_modules))
 
     return discovered_modules
 
