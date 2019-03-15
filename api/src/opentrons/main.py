@@ -178,7 +178,11 @@ def run(**kwargs):
                 loop.run_until_complete(hardware.home_z())
             else:
                 hardware.home_z()
-        udev.setup_rules_file()
+        try:
+            udev.setup_rules_file()
+        except Exception:
+            log.exception(
+                "Could not setup udev rules, modules may not be detected")
     # Explicitly unlock resin updates in case a prior server left them locked
     resin.unlock_updates()
 

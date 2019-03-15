@@ -6,6 +6,7 @@ After=nginx.service
 [Service]
 Type=exec
 ExecStart=python -m opentrons.main -U /run/aiohttp.sock
+Environment=OT_SMOOTHIE_ID=AMA
 
 [Install]
 WantedBy=opentrons.target
