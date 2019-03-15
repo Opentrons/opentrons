@@ -103,7 +103,7 @@ class CLITool:
         self._expected_points = {
             key: (vX, vY, tip_length)
             for key, (vX, vY) in point_set.items()}
-        self._actual_points = {
+        self.actual_points = {
             1: (0, 0),
             2: (0, 0),
             3: (0, 0)}
@@ -245,11 +245,11 @@ class CLITool:
             msg = self.save_mount_offset()
         else:
             pos = self._position()[:-1]
-            self._actual_points[self._current_point] = pos
+            self.actual_points[self._current_point] = pos
             log.debug("Saving {} for point {}".format(
                 pos, self._current_point))
             msg = 'saved #{}: {}'.format(
-                self._current_point, self._actual_points[self._current_point])
+                self._current_point, self.actual_points[self._current_point])
         return msg
 
     def save_mount_offset(self) -> str:
@@ -281,7 +281,7 @@ class CLITool:
         """
         expected = [self._expected_points[p][:2] for p in [1, 2, 3]]
         log.debug("save_transform expected: {}".format(expected))
-        actual = [self._actual_points[p][:2] for p in [1, 2, 3]]
+        actual = [self.actual_points[p][:2] for p in [1, 2, 3]]
         log.debug("save_transform actual: {}".format(actual))
         # Generate a 2 dimensional transform matrix from the two matricies
         flat_matrix = solve(expected, actual)
@@ -289,6 +289,7 @@ class CLITool:
         current_z = self.calibration_matrix[2][3]
         # Add the z component to form the 3 dimensional transform
         self.calibration_matrix = add_z(flat_matrix, current_z)
+
         gantry_calibration = list(
                 map(lambda i: list(i), self.calibration_matrix))
         log.debug("save_transform calibration_matrix: {}".format(
@@ -386,7 +387,7 @@ class CLITool:
 
     def _update_text_box(self, msg):
         expected = [self._expected_points[p] for p in [1, 2, 3]]
-        actual = [self._actual_points[p] for p in [1, 2, 3]]
+        actual = [self.actual_points[p] for p in [1, 2, 3]]
         points = '\n'.join([
             # Highlight point being calibrated
             # Display actual and expected coordinates

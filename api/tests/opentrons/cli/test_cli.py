@@ -1,4 +1,5 @@
 import pytest
+import copy
 import numpy as np
 
 from opentrons.config import (CONFIG,
@@ -12,10 +13,11 @@ from opentrons.deck_calibration.endpoints import expected_points
 @pytest.fixture
 def mock_config():
     test_config = robot_configs.load()
-    test_config = test_config._replace(name='new-value1')
-    robot_configs.save_robot_settings(test_config)
-
-    return robot_configs
+    old_config = copy.deepcopy(test_config)
+    new_config = test_config._replace(name='new-value1')
+    robot_configs.save_robot_settings(new_config)
+    yield new_config
+    robot_configs.save_robot_settings(old_config)
 
 
 @pytest.mark.api1_only
@@ -111,7 +113,7 @@ def test_tip_probe(mock_config, async_server):
 
 
 @pytest.mark.api1_only
-def test_mount_offset(loop, monkeypatch, async_server):
+def test_mount_offset(mock_config, loop, monkeypatch, async_server):
     # Check that mount offset gives the expected output when position is
     # slightly changed
     hardware = async_server['com.opentrons.hardware']
@@ -122,6 +124,8 @@ def test_mount_offset(loop, monkeypatch, async_server):
     monkeypatch.setattr(
         dc_main.CLITool, 'hardware', hardware)
 
+    monkeypatch.setattr(
+        hardware, 'config', mock_config)
     tip_length = 51.7
     tool = dc_main.CLITool(
         point_set=get_calibration_points(), tip_length=tip_length, loop=loop)
@@ -133,6 +137,8 @@ def test_mount_offset(loop, monkeypatch, async_server):
     tool.save_mount_offset()
     assert expected_offset == tool.hardware.config.mount_offset
 
+    hardware.reset()
+
 
 @pytest.mark.api1_only
 def test_gantry_matrix_output(mock_config, loop, async_server, monkeypatch):
@@ -142,15 +148,18 @@ def test_gantry_matrix_output(mock_config, loop, async_server, monkeypatch):
 
     monkeypatch.setattr(
         dc_main.CLITool, 'hardware', hardware)
+
+    monkeypatch.setattr(
+        hardware, 'config', mock_config)
     tip_length = 51.7
     tool = dc_main.CLITool(
         point_set=get_calibration_points(), tip_length=tip_length, loop=loop)
 
-    expected = np.array([
-        [1.00, 0.00, 0.00,  -4.00],
-        [0.00, 1.00, 0.00,  0.50],
-        [0.00, 0.00, 1.00,  -25.65],
-        [0.00, 0.00, 0.00,  1.00]])
+    expected = [
+        [1.00, 0.00, 0.00,  0.00],
+        [0.00, 0.99852725, 0.00,  0.5132547],
+        [0.00, 0.00, 1.00,  0.00],
+        [0.00, 0.00, 0.00,  1.00]]
 
     actual_points = {
         1: (12.13, 9.5),
@@ -159,6 +168,9 @@ def test_gantry_matrix_output(mock_config, loop, async_server, monkeypatch):
     monkeypatch.setattr(
         dc_main.CLITool, 'actual_points', actual_points)
 
-    tool.save_z_value()
+    assert tool.actual_points == actual_points
+
     tool.save_transform()
-    assert np.isclose(expected, tool.hardware.config.gantry_calibration).all()
+    assert np.allclose(expected, tool.calibration_matrix)
+
+    hardware.reset()
