@@ -27,7 +27,7 @@ exports[`CheckboxField renders correctly when checked 1`] = `
     type="checkbox"
   />
   <div
-    className="label_text"
+    className="label_text capitalize"
   >
     Check Box 1
   </div>
@@ -61,7 +61,7 @@ exports[`CheckboxField renders correctly when unchecked 1`] = `
     type="checkbox"
   />
   <div
-    className="label_text"
+    className="label_text capitalize"
   >
     Check Box 1
   </div>
@@ -209,7 +209,7 @@ exports[`InputField renders correctly 1`] = `
   className="form_field"
 >
   <div
-    className="label_text"
+    className="label_text capitalize"
   >
     Input field
   </div>
@@ -273,7 +273,7 @@ exports[`RadioGroup renders correctly inline 1`] = `
       value="hazelnut"
     />
     <div
-      className="label_text"
+      className="label_text capitalize"
     >
       Hazelnut
     </div>
@@ -305,7 +305,7 @@ exports[`RadioGroup renders correctly inline 1`] = `
       value="chocolate"
     />
     <div
-      className="label_text"
+      className="label_text capitalize"
     >
       Chocolate
     </div>
@@ -337,7 +337,7 @@ exports[`RadioGroup renders correctly inline 1`] = `
       value="ginger"
     />
     <div
-      className="label_text"
+      className="label_text capitalize"
     >
       Ginger
     </div>
@@ -376,7 +376,7 @@ exports[`RadioGroup renders correctly with checked value 1`] = `
       value="hazelnut"
     />
     <div
-      className="label_text"
+      className="label_text capitalize"
     >
       Hazelnut
     </div>
@@ -408,7 +408,7 @@ exports[`RadioGroup renders correctly with checked value 1`] = `
       value="chocolate"
     />
     <div
-      className="label_text"
+      className="label_text capitalize"
     >
       Chocolate
     </div>
@@ -440,7 +440,7 @@ exports[`RadioGroup renders correctly with checked value 1`] = `
       value="ginger"
     />
     <div
-      className="label_text"
+      className="label_text capitalize"
     >
       Ginger
     </div>
@@ -479,7 +479,7 @@ exports[`RadioGroup renders correctly with no checked value 1`] = `
       value="hazelnut"
     />
     <div
-      className="label_text"
+      className="label_text capitalize"
     >
       Hazelnut
     </div>
@@ -511,7 +511,7 @@ exports[`RadioGroup renders correctly with no checked value 1`] = `
       value="chocolate"
     />
     <div
-      className="label_text"
+      className="label_text capitalize"
     >
       Chocolate
     </div>
@@ -543,7 +543,7 @@ exports[`RadioGroup renders correctly with no checked value 1`] = `
       value="ginger"
     />
     <div
-      className="label_text"
+      className="label_text capitalize"
     >
       Ginger
     </div>
