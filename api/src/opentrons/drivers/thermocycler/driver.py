@@ -9,7 +9,7 @@ except ModuleNotFoundError:
 from time import sleep
 from typing import Optional
 from serial.serialutil import SerialException
-from opentrons.drivers import serial_communication
+from opentrons.drivers import serial_communication, utils
 from opentrons.drivers.serial_communication import SerialNoResponse
 
 
@@ -41,29 +41,6 @@ def _build_temp_code(temp, hold_time=None):
         cmd += ' H{}'.format(hold_time)
     return cmd
 
-def _parse_device_information(device_info_string) -> dict:
-    '''
-        Parse the thermocycler's device information response.
-
-        Example response from temp-deck: "serial:aa11 model:bb22 version:cc33"
-    '''
-    error_msg = 'Unexpected argument to _parse_device_information: {}'.format(
-        device_info_string)
-    if not device_info_string or \
-            not isinstance(device_info_string, str):
-        raise ParseError(error_msg)
-    parsed_values = device_info_string.strip().split(' ')
-    if len(parsed_values) < 3:
-        log.error(error_msg)
-        raise ParseError(error_msg)
-    res = {
-        _parse_key_from_substring(s): _parse_string_value_from_substring(s)
-        for s in parsed_values[:3]
-    }
-    for key in ['model', 'version', 'serial']:
-        if key not in res:
-            raise ParseError(error_msg)
-    return res
 
 TC_BAUDRATE = 115200
 
@@ -79,10 +56,6 @@ TEMP_THRESHOLD = 0.5
 
 
 class ThermocyclerError(Exception):
-    pass
-
-
-class ParseError(Exception):
     pass
 
 
@@ -338,7 +311,7 @@ class Thermocycler:
 
     def get_device_info(self):
         _device_info_res = self._write_and_wait(GCODES['DEVICE_INFO'])
-        return _parse_device_information(_device_info_res)
+        return utils.parse_device_information(_device_info_res)
 
     def _write_and_wait(self, command):
         ret = None

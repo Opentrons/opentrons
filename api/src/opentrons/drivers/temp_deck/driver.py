@@ -5,7 +5,7 @@ from time import sleep
 from typing import Optional
 from serial.serialutil import SerialException
 
-from opentrons.drivers import serial_communication
+from opentrons.drivers import serial_communication, utils
 from opentrons.drivers.serial_communication import SerialNoResponse
 
 '''
@@ -40,118 +40,9 @@ TEMP_DECK_BAUDRATE = 115200
 TEMP_DECK_COMMAND_TERMINATOR = '\r\n\r\n'
 TEMP_DECK_ACK = 'ok\r\nok\r\n'
 
-# Number of digits after the decimal point for temperatures being sent
-# to/from Temp-Deck
-GCODE_ROUNDING_PRECISION = 0
-
 
 class TempDeckError(Exception):
     pass
-
-
-class ParseError(Exception):
-    pass
-
-
-def _parse_string_value_from_substring(substring) -> str:
-    '''
-    Returns the ascii value in the expected string "N:aa11bb22", where "N" is
-    the key, and "aa11bb22" is string value to be returned
-    '''
-    try:
-        value = substring.split(':')[1]
-        return str(value)
-    except (ValueError, IndexError, TypeError, AttributeError):
-        log.exception('Unexpected arg to _parse_string_value_from_substring:')
-        raise ParseError(
-            'Unexpected arg to _parse_string_value_from_substring: {}'.format(
-                substring))
-
-
-def _parse_number_from_substring(substring) -> Optional[float]:
-    '''
-    Returns the number in the expected string "N:12.3", where "N" is the
-    key, and "12.3" is a floating point value
-
-    For the temp-deck's temperature response, one expected input is something
-    like "T:none", where "none" should return a None value
-    '''
-    try:
-        value = substring.split(':')[1]
-        if value.strip().lower() == 'none':
-            return None
-        return round(float(value), GCODE_ROUNDING_PRECISION)
-    except (ValueError, IndexError, TypeError, AttributeError):
-        log.exception('Unexpected argument to _parse_number_from_substring:')
-        raise ParseError(
-            'Unexpected argument to _parse_number_from_substring: {}'.format(
-                substring))
-
-
-def _parse_key_from_substring(substring) -> str:
-    '''
-    Returns the axis in the expected string "N:12.3", where "N" is the
-    key, and "12.3" is a floating point value
-    '''
-    try:
-        return substring.split(':')[0]
-    except (ValueError, IndexError, TypeError, AttributeError):
-        log.exception('Unexpected argument to _parse_key_from_substring:')
-        raise ParseError(
-            'Unexpected argument to _parse_key_from_substring: {}'.format(
-                substring))
-
-
-def _parse_temperature_response(temperature_string) -> dict:
-    '''
-    Example input: "T:none C:25"
-    '''
-    err_msg = 'Unexpected argument to _parse_temperature_response: {}'.format(
-        temperature_string)
-    if not temperature_string or \
-            not isinstance(temperature_string, str):
-        raise ParseError(err_msg)
-    parsed_values = temperature_string.strip().split(' ')
-    if len(parsed_values) < 2:
-        log.error(err_msg)
-        raise ParseError(err_msg)
-
-    data = {
-        _parse_key_from_substring(s): _parse_number_from_substring(s)
-        for s in parsed_values[:2]
-    }
-    if 'C' not in data or 'T' not in data:
-        raise ParseError(err_msg)
-    data = {
-        'current': data['C'],
-        'target': data['T']
-    }
-    return data
-
-
-def _parse_device_information(device_info_string) -> dict:
-    '''
-        Parse the temp-deck's device information response.
-
-        Example response from temp-deck: "serial:aa11 model:bb22 version:cc33"
-    '''
-    error_msg = 'Unexpected argument to _parse_device_information: {}'.format(
-        device_info_string)
-    if not device_info_string or \
-            not isinstance(device_info_string, str):
-        raise ParseError(error_msg)
-    parsed_values = device_info_string.strip().split(' ')
-    if len(parsed_values) < 3:
-        log.error(error_msg)
-        raise ParseError(error_msg)
-    res = {
-        _parse_key_from_substring(s): _parse_string_value_from_substring(s)
-        for s in parsed_values[:3]
-    }
-    for key in ['model', 'version', 'serial']:
-        if key not in res:
-            raise ParseError(error_msg)
-    return res
 
 
 class TempDeck:
@@ -204,7 +95,7 @@ class TempDeck:
     def set_temperature(self, celsius) -> str:
         self.run_flag.wait()
         try:
-            celsius = round(float(celsius), GCODE_ROUNDING_PRECISION)
+            celsius = round(float(celsius), utils.GCODE_ROUNDING_PRECISION)
             self._send_command(
                 '{0} S{1}'.format(GCODES['SET_TEMP'], celsius))
         except (TempDeckError, SerialException, SerialNoResponse) as e:
@@ -348,10 +239,10 @@ class TempDeck:
     def _recursive_update_temperature(self, retries) -> Optional[dict]:
         try:
             res = self._send_command(GCODES['GET_TEMP'])
-            res = _parse_temperature_response(res)
+            res = utils.parse_temperature_response(res)
             self._temperature.update(res)
             return None
-        except ParseError as e:
+        except utils.ParseError as e:
             retries -= 1
             if retries <= 0:
                 raise TempDeckError(e)
@@ -361,8 +252,8 @@ class TempDeck:
     def _recursive_get_info(self, retries) -> dict:
         try:
             device_info = self._send_command(GCODES['DEVICE_INFO'])
-            return _parse_device_information(device_info)
-        except ParseError as e:
+            return utils.parse_device_information(device_info)
+        except utils.ParseError as e:
             retries -= 1
             if retries <= 0:
                 raise TempDeckError(e)
