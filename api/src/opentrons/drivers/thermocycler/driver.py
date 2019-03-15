@@ -222,7 +222,8 @@ class Thermocycler:
 
         # Check initial device lid state
         _lid_status_res = self._write_and_wait(GCODES['GET_LID_STATUS'])
-        self._lid_status = _lid_status_res.split()[-1].lower()
+        if _lid_status_res:
+            self._lid_status = _lid_status_res.split()[-1].lower()
         return self
 
     def disconnect(self) -> 'Thermocycler':
@@ -311,7 +312,10 @@ class Thermocycler:
 
     def get_device_info(self):
         _device_info_res = self._write_and_wait(GCODES['DEVICE_INFO'])
-        return utils.parse_device_information(_device_info_res)
+        if _device_info_res:
+            return utils.parse_device_information(_device_info_res)
+        else:
+            return None
 
     def _write_and_wait(self, command):
         ret = None
