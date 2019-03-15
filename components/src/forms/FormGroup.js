@@ -32,14 +32,14 @@ export default function FormGroup (props: Props) {
 
   return (
     <div className={className}>
-      <div {...props.hoverTooltipHandlers} className={styles.form_group_label}>
+      {props.label && <div {...props.hoverTooltipHandlers} className={styles.form_group_label}>
         {error &&
           <div className={styles.error_icon}>
             <Icon name='alert' />
           </div>
         }
         {props.label}
-      </div>
+      </div>}
       {props.children}
     </div>
   )

@@ -33,7 +33,7 @@ const makeAddFieldNamePrefix = (prefix: string) => (fieldName: string): StepFiel
 function SourceDestFields (props: Props) {
   const {className, collapsed, toggleCollapsed, focusHandlers, prefix} = props
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
-  const labwareLabel = prefix === 'aspirate' ? 'Source:' : 'Destination:'
+  const labwareLabel = i18n.t(`form.step_edit_form.labwareLabel.${prefix}`)
 
   return (
     <div className={className}>
@@ -70,7 +70,7 @@ function SourceDestFields (props: Props) {
                 pipetteFieldName="pipette"
                 flowRateType={prefix} />
               <TipPositionField fieldName={addFieldNamePrefix('mmFromBottom')} />
-              <WellOrderField prefix={prefix} label='Well order:' />
+              <WellOrderField prefix={prefix} label={i18n.t('form.step_edit_form.field.well_order.label')} />
             </div>
 
             <div className={styles.checkbox_column}>
@@ -78,44 +78,52 @@ function SourceDestFields (props: Props) {
                 <React.Fragment>
                   <CheckboxRowField
                     name="preWetTip"
-                    label="Pre-wet tip"
+                    label={i18n.t('form.step_edit_form.field.preWetTip.label')}
                     className={styles.small_field}
                   />
                   <CheckboxRowField
                     disabled
                     tooltipComponent={i18n.t('tooltip.not_in_beta')}
                     name="aspirate_airGap_checkbox"
-                    label="Air Gap"
+                    label={i18n.t('form.step_edit_form.field.airGap.label')}
                     className={styles.small_field}
                   >
-                    <TextField disabled name="aspirate_airGap_volume" units="μL" {...focusHandlers} />
+                    <TextField
+                      disabled
+                      name="aspirate_airGap_volume"
+                      units={i18n.t('application.units.microliter')}
+                      {...focusHandlers}
+                    />
                   </CheckboxRowField>
                 </React.Fragment>
               }
               <CheckboxRowField
                 name={addFieldNamePrefix('touchTip_checkbox')}
-                label="Touch tip"
+                label={i18n.t('form.step_edit_form.field.touchTip.label')}
                 className={styles.small_field}
               >
                 <TipPositionField fieldName={addFieldNamePrefix('touchTip_mmFromBottom')} />
               </CheckboxRowField>
               <CheckboxRowField
                 name={addFieldNamePrefix('mix_checkbox')}
-                label='Mix'
+                label={i18n.t('form.step_edit_form.field.mix.label')}
                 className={styles.small_field}>
                 <TextField
                   name={addFieldNamePrefix('mix_volume')}
-                  units="μL"
+                  units={i18n.t('application.units.microliter')}
                   className={styles.small_field}
                   {...focusHandlers} />
                 <TextField
                   name={addFieldNamePrefix('mix_times')}
-                  units="Times"
+                  units={i18n.t('application.units.times')}
                   className={styles.small_field}
                   {...focusHandlers} />
               </CheckboxRowField>
               {prefix === 'dispense' &&
-                <CheckboxRowField name='blowout_checkbox' label='Blowout' className={styles.small_field}>
+                <CheckboxRowField
+                  name='blowout_checkbox'
+                  label={i18n.t('form.step_edit_form.field.blowout.label')}
+                  className={styles.small_field}>
                   <BlowoutLocationField
                     name="blowout_location"
                     className={styles.full_width}

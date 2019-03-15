@@ -4,6 +4,7 @@ import {FormGroup, CheckboxField, DropdownField, type Options} from '@opentrons/
 import {connect} from 'react-redux'
 import cx from 'classnames'
 
+import i18n from '../../../localization'
 import {getMaxDisposalVolumeForMultidispense} from '../../../steplist/formLevel/handleFormChange/utils'
 import {selectors as stepFormSelectors} from '../../../step-forms'
 import {selectors as uiLabwareSelectors} from '../../../ui/labware'
@@ -24,20 +25,20 @@ type SP = {
 type Props = SP & {focusHandlers: FocusHandlers}
 
 const DisposalVolumeField = (props: Props) => (
-  <FormGroup label='Multi-Dispense Options:'>
+  <FormGroup label={i18n.t('form.step_edit_form.multiDispenseOptionsLabel')}>
     <FieldConnector
       name="disposalVolume_checkbox"
       render={({value, updateValue, hoverTooltipHandlers}) => {
         const {maxDisposalVolume} = props
         const volumeBoundsCaption = maxDisposalVolume != null
-          ? `max ${maxDisposalVolume} μL`
+          ? `max ${maxDisposalVolume} ${i18n.t('application.units.microliter')}`
           : null
 
         const volumeField = (
           <div>
             <TextField
               name="disposalVolume_volume"
-              units="μL"
+              units={i18n.t('application.units.microliter')}
               caption={volumeBoundsCaption}
               className={cx(styles.small_field, styles.orphan_field)}
               {...props.focusHandlers} />

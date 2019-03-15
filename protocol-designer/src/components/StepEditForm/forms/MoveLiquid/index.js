@@ -24,7 +24,6 @@ type State = {
   collapsed: boolean,
 }
 
-// TODO: BC 2019-01-25 i18n all across step form and fields
 // TODO: BC 2019-01-25 instead of passing path from here, put it in connect fields where needed
 // or question if it even needs path
 
@@ -50,7 +49,7 @@ class MoveLiquidForm extends React.Component<Props, State> {
         </div>
         <div className={styles.form_row}>
           <PipetteField name="pipette" stepType={stepType} {...focusHandlers} />
-          <VolumeField label="Volume:" focusHandlers={focusHandlers} stepType={stepType} />
+          <VolumeField label={i18n.t('form.step_edit_form.field.volume.label')} focusHandlers={focusHandlers} stepType={stepType} />
         </div>
 
         <div className={styles.section_wrapper}>
@@ -69,7 +68,7 @@ class MoveLiquidForm extends React.Component<Props, State> {
         </div>
 
         <div className={styles.section_header}>
-          <span className={styles.section_header_text}>sterility & motion</span>
+          <span className={styles.section_header_text}>{i18n.t('form.step_edit_form.section.sterility&motion')}</span>
         </div>
         <div className={styles.section_wrapper}>
           <div className={cx(styles.form_row, styles.section_column)}>

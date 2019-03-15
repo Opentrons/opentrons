@@ -113,7 +113,7 @@ export default class LiquidPlacementForm extends React.Component <Props> {
                 >
                   <InputField
                     name='volume'
-                    units='μL'
+                    units={i18n.t('application.units.microliter')}
                     error={touched.volume && errors.volume}
                     value={values.volume}
                     onChange={this.handleChangeVolume(setFieldValue)}

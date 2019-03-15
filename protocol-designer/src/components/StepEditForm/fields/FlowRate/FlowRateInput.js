@@ -7,6 +7,7 @@ import {
   RadioGroup,
   InputField,
 } from '@opentrons/components'
+import i18n from '../../../../localization'
 import {Portal} from '../../../portals/MainPageModalPortal'
 import modalStyles from '../../../modals/modal.css'
 import stepFormStyles from '../../StepEditForm.css'
@@ -142,7 +143,7 @@ export default class FlowRateInput extends React.Component<Props, State> {
     const FlowRateInput = (
       <InputField
         value={`${this.state.modalFlowRate || ''}`}
-        units='μL/s'
+        units={i18n.t('application.units.microliterPerSec')}
         caption={rangeDescription}
         error={errorMessage}
         onChange={this.handleChangeNumber}
@@ -173,7 +174,7 @@ export default class FlowRateInput extends React.Component<Props, State> {
           </div>
 
           <div className={styles.flow_rate_type_label}>
-            {`${flowRateType} speed:`}
+            {`${flowRateType} speed`}
           </div>
 
           <RadioGroup
@@ -184,7 +185,7 @@ export default class FlowRateInput extends React.Component<Props, State> {
             }
             onChange={this.handleChangeRadio}
             options={[
-              {name: `${defaultFlowRate || '?'} μL/s (default)`, value: 'default'},
+              {name: `${defaultFlowRate || '?'} ${i18n.t('application.units.microliterPerSec')} (default)`, value: 'default'},
               {name: 'Custom', value: 'custom', 'children': FlowRateInput},
             ]}
           />
@@ -194,7 +195,7 @@ export default class FlowRateInput extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <FormGroup label={`${label || DEFAULT_LABEL}:`} disabled={disabled}>
+        <FormGroup label={label || DEFAULT_LABEL} disabled={disabled}>
           <InputField
             units='μL/s'
             readOnly
