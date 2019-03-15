@@ -1,13 +1,14 @@
 import pytest
+import numpy as np
+
 from opentrons.config import (CONFIG,
                               robot_configs,
                               advanced_settings as advs)
 from opentrons.deck_calibration import dc_main
+from opentrons.deck_calibration.dc_main import get_calibration_points
+from opentrons.deck_calibration.endpoints import expected_points
 
-# TODO (Laura 02252019): CLI tool is extremely frail. Need to add tests for
-# the different funcs called on it that are not shared with
-# deck calibration endpoints.
-# List -> validate func, check calibration matrix, check mount offset func etc
+
 @pytest.fixture
 def mock_config():
     test_config = robot_configs.load()
@@ -53,8 +54,7 @@ def test_save_and_clear_config(mock_config, async_server):
 async def test_new_deck_points():
     # Checks that the correct deck calibration points are being used
     # if feature_flag is set (or not)
-    from opentrons.deck_calibration.dc_main import get_calibration_points
-    from opentrons.deck_calibration.endpoints import expected_points
+
     advs.set_adv_setting('deckCalibrationDots', True)
     calibration_points = get_calibration_points()
     expected_points1 = expected_points()
@@ -79,16 +79,86 @@ async def test_new_deck_points():
     assert expected_points2['2'] == (380.87, 9.0)
     assert expected_points2['3'] == (12.13, 258.0)
 
+
+@pytest.mark.api1_only
+def test_move_output(mock_config, loop, async_server, monkeypatch):
+    # Check that the robot moves to the correct locations
+    # TODO: Make tests for both APIs
+    hardware = async_server['com.opentrons.hardware']
+
+    monkeypatch.setattr(
+        dc_main.CLITool, 'hardware', hardware)
+    tip_length = 51.7
+    tool = dc_main.CLITool(
+        point_set=get_calibration_points(), tip_length=tip_length, loop=loop)
+
+    assert tool.hardware is hardware
+    # Move to all three calibration points
+    expected_pts = tool._expected_points
+    for pt in range(3):
+        point = pt + 1
+        tool.validate(expected_pts[point], point, tool._current_mount)
+        assert np.isclose(
+            tool._position(), expected_pts[point]).all()
+
+
 def test_tip_probe(mock_config, async_server):
+    # Test that tip probe returns successfully
     hardware = async_server['com.opentrons.hardware']
     tip_length = 51.7  # p300/p50 tip length
     output = dc_main.probe(tip_length, hardware)
     assert output == 'Tip probe'
 
 
-def test_validate_points():
-    return None
+@pytest.mark.api1_only
+def test_mount_offset(loop, monkeypatch, async_server):
+    # Check that mount offset gives the expected output when position is
+    # slightly changed
+    hardware = async_server['com.opentrons.hardware']
+
+    def fake_position(something):
+        return [11.13, 8, 51.7]
+
+    monkeypatch.setattr(
+        dc_main.CLITool, 'hardware', hardware)
+
+    tip_length = 51.7
+    tool = dc_main.CLITool(
+        point_set=get_calibration_points(), tip_length=tip_length, loop=loop)
+
+    monkeypatch.setattr(
+        dc_main.CLITool, '_position', fake_position)
+    expected_offset = (1.0, 1.0, 0.0)
+
+    tool.save_mount_offset()
+    assert expected_offset == tool.hardware.config.mount_offset
 
 
-def test_mount_offset():
-    return None
+@pytest.mark.api1_only
+def test_gantry_matrix_output(mock_config, loop, async_server, monkeypatch):
+    # Check that the robot moves to the correct locations
+    # TODO: Make tests for both APIs
+    hardware = async_server['com.opentrons.hardware']
+
+    monkeypatch.setattr(
+        dc_main.CLITool, 'hardware', hardware)
+    tip_length = 51.7
+    tool = dc_main.CLITool(
+        point_set=get_calibration_points(), tip_length=tip_length, loop=loop)
+
+    expected = np.array([
+        [1.00, 0.00, 0.00,  -4.00],
+        [0.00, 1.00, 0.00,  0.50],
+        [0.00, 0.00, 1.00,  -25.65],
+        [0.00, 0.00, 0.00,  1.00]])
+
+    actual_points = {
+        1: (12.13, 9.5),
+        2: (380.87, 9.5),
+        3: (12.13, 348.5)}
+    monkeypatch.setattr(
+        dc_main.CLITool, 'actual_points', actual_points)
+
+    tool.save_z_value()
+    tool.save_transform()
+    assert np.isclose(expected, tool.hardware.config.gantry_calibration).all()

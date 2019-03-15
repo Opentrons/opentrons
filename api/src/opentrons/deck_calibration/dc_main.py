@@ -54,8 +54,10 @@ class CLITool:
     def __init__(self, point_set, tip_length, loop=None):
         # URWID user interface objects
         if not loop:
-            loop = urwid.main_loop.AsyncioEventLoop(
-                loop=asyncio.get_event_loop())
+            loop = asyncio.get_event_loop()
+        loop = urwid.main_loop.AsyncioEventLoop(
+            loop=loop)
+
         controls = '\n'.join([
             'arrow keys: move the gantry',
             'q/a:        move the pipette up/down',
@@ -160,6 +162,14 @@ class CLITool:
     @calibration_matrix.setter
     def calibration_matrix(self, calibration):
         self._calibration_matrix = calibration
+
+    @property
+    def actual_points(self):
+        return self._actual_points
+
+    @actual_points.setter
+    def actual_points(self, points):
+        self._actual_points = points
 
     def current_step(self):
         return self._steps[self._steps_index]
@@ -400,7 +410,6 @@ class CLITool:
 def probe(tip_length: float, hardware) -> str:
     if not feature_flags.use_protocol_api_v2():
         hardware.reset()
-
         pipette = instruments.P300_Single(mount='right')   # type: ignore
         probe_center = tuple(probe_instrument(
             pipette, robot, tip_length=tip_length))
