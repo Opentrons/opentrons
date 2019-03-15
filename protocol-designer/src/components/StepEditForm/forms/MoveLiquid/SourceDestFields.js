@@ -39,7 +39,9 @@ function SourceDestFields (props: Props) {
     <div className={className}>
       <div className={styles.section_header}>
         <span className={styles.section_header_text}>{prefix}</span>
-        <HoverTooltip tooltipComponent={i18n.t('tooltip.advanced_settings')}>
+        <HoverTooltip
+          key={collapsed ? 'collapsed' : 'expanded'} // NOTE: without this key, the IconButton will not re-render unless clicked
+          tooltipComponent={i18n.t('tooltip.advanced_settings')}>
           {(hoverTooltipHandlers) => (
             <div {...hoverTooltipHandlers} onClick={toggleCollapsed} className={styles.advanced_settings_button_wrapper}>
               <IconButton className={styles.advanced_settings_button} name="settings" hover={!collapsed} />

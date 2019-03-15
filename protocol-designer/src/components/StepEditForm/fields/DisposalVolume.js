@@ -48,7 +48,6 @@ const DisposalVolumeField = (props: Props) => (
           <React.Fragment>
             <div {...hoverTooltipHandlers} className={cx(
               styles.checkbox_row,
-              styles.multi_dispense_options,
               {[styles.captioned_field]: volumeBoundsCaption}
             )}>
               <CheckboxField
