@@ -203,12 +203,13 @@ class TempDeck:
 
     def set_temperature(self, celsius) -> str:
         self.run_flag.wait()
+        celsius = round(float(celsius), GCODE_ROUNDING_PRECISION)
         try:
-            celsius = round(float(celsius), GCODE_ROUNDING_PRECISION)
             self._send_command(
                 '{0} S{1}'.format(GCODES['SET_TEMP'], celsius))
         except (TempDeckError, SerialException, SerialNoResponse) as e:
             return str(e)
+        self._temperature.update({'target': celsius})
         return ''
 
     def update_temperature(self, default=None) -> str:
