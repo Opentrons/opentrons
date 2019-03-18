@@ -209,14 +209,7 @@ class TempDeck:
                 '{0} S{1}'.format(GCODES['SET_TEMP'], celsius))
         except (TempDeckError, SerialException, SerialNoResponse) as e:
             return str(e)
-        # Wait until new target temperature is registered by the module
-        retries = 3
-        while self.target != celsius:
-            sleep(0.25)
-            retries -= 1
-            if retries < 0:
-                log.warning('Target temperature could not be verified')
-                break
+        self._temperature.update({'target': celsius})
         return ''
 
     def update_temperature(self, default=None) -> str:
