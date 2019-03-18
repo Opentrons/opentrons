@@ -66,7 +66,8 @@ class CLITool:
             'enter:      confirm current calibration point position',
             'space:      save data (after confirming all 3 points)',
             'p:          perform tip probe (after saving calibration data)',
-            'esc:        exit calibration tool'
+            'esc:        exit calibration tool',
+            '?:          Full Instructions'
         ])
         self._tip_text_box = urwid.Text(controls)
         self._status_text_box = urwid.Text('')
@@ -144,7 +145,8 @@ class CLITool:
             '6': lambda: self.validate(
                 self._test_points['corner8'], 6, self._current_mount),
             '7': lambda: self.validate(
-                self._test_points['corner9'], 7, self._current_mount)
+                self._test_points['corner9'], 7, self._current_mount),
+            '?': lambda: self.print_instructions()
         }
 
     @property
@@ -173,6 +175,35 @@ class CLITool:
 
     def current_step(self):
         return self._steps[self._steps_index]
+
+    def print_instructions(self):
+        return """
+        A CLI application for performing factory calibration \n
+        of an Opentrons robot \n
+        Instructions: \n
+            - Robot must be set up with two 300ul or 50ul single-channel \n
+              pipettes installed on the right-hand and left-hand mount. \n
+            - Put a GEB 300ul tip onto the pipette. \n
+            - Use the arrow keys to jog the robot over slot 5 in an \n
+              open space that is not an engraving or a hole. \n
+            - Use the 'q' and 'a' keys to jog the pipette up \n
+              and down respectively until the tip is just touching \n
+              the deck surface, then press 'z'. This \n
+              will save the 'Z' height. \n
+            - Press '1' to the expected location of the first \n
+              calibration point. Jog the robot until the tip is actually at \n
+              the point, then press 'enter'. Repeat with '2' and '3'. \n
+            - After calibrating all three points, press the space bar \n
+              to save the configuration. \n
+            - Optionally, press 4,5,6 or 7 to
+              validate the new configuration. \n
+            - Press 'p' to perform tip probe. \n
+              Press the space bar to save again. \n
+            - Press 'm' to perform mount calibration. \n
+              Press enter and then space bar to save again. \n
+            - Use "\" to home both pipettes and \n
+              optionally press 4,5,6,7 again. \n
+            - Press 'esc' to exit the program. \n"""
 
     # Methods for backing key-press
     def increase_step(self) -> str:
@@ -241,8 +272,10 @@ class CLITool:
         """
         if self._current_mount is left:
             msg = self.save_mount_offset()
+            self._current_mount = right
         elif self._current_mount is types.Mount.LEFT:
             msg = self.save_mount_offset()
+            self._current_mount = types.Mount.RIGHT
         else:
             pos = self._position()[:-1]
             self.actual_points[self._current_point] = pos
@@ -328,8 +361,6 @@ class CLITool:
             apply_mount_offset(self._expected_points[1], self.hardware),
             0,
             l_pipette)
-
-        self._current_mount = r_pipette
 
     def validate(
             self,
@@ -480,6 +511,7 @@ def main():
         - Optionally, press 4,5,6 or 7 to validate the new configuration.
         - Press 'p' to perform tip probe. Press the space bar to save again.
         - Press 'm' to perform mount calibration.
+          Press enter and then space bar to save again.
         - Press 'esc' to exit the program.
     """
     prompt = input(
