@@ -312,6 +312,34 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
             well = _get_well(labware, params)
             offset = default_values.get('touch-tip-mm-from-top', -1)
             pipette.touch_tip(location, v_offset=offset)  # type: ignore
+
+        elif command_type == 'move-to-well':
+            well_obj = _get_well(labware, params)
+
+            offset = params.get('offset', {})
+            offsetPoint = Point(
+                offset.get('x', 0),
+                offset.get('y', 0),
+                offset.get('z', 0))
+
+            strategy = params.get('strategy')
+            if strategy not in ['arc', 'direct']:
+                raise ValueError('Invalid "strategy" for "move-to-well": "{}"'
+                                 .format(strategy))
+
+            relative_position = params.get('relativePosition')
+            relative_well = None
+            if relative_position == 'top':
+                relative_well = well_obj.top()
+            elif relative_position == 'bottom':
+                relative_well = well_obj.bottom()
+            else:
+                raise ValueError(
+                    'Invalid relativePosition for "move-to-well": {}'
+                    .format(relative_position))
+            pipette.move_to(
+                relative_well._replace(point=well_obj.point + offsetPoint),
+                strategy=strategy)
         else:
             MODULE_LOG.warning("Bad command type {}".format(command_type))
 
