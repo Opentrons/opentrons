@@ -199,12 +199,6 @@
   margin-bottom: 1rem;
 }
 
-@media screen and (max-width: 1000px) {
-  .section_wrapper {
-    flex-direction: column;
-  }
-}
-
 .button_row {
   display: flex;
   justify-content: space-between;
