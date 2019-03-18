@@ -25,7 +25,7 @@ If you are interested in using your own labware that is not included in the API,
 
 .. note::
 
-    We are in the process of revising the labware definitions used on the OT2. Documentation for previously existing definitions is left over from OT1, and is incomplete. `Check out this webpage`__ to see a visualization of all the API's legacy built-in labware definitions. For JSON protocols and APIv4 protocols, see the visualizations and descriptions under `Opentrons Labware`_.
+    We are in the process of revising the labware definitions used on the OT2. Documentation for previously existing definitions is left over from OT1, and is incomplete. `Check out this webpage`__ to see a visualization of all the API's legacy built-in labware definitions. For JSON protocols see the visualizations and descriptions under `Opentrons Labware`_.
 
 __ https://andysigler.github.io/ot-api-containerviz/
 

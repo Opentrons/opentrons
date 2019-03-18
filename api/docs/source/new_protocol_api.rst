@@ -91,7 +91,7 @@ The fields above ("protocolName", "author", "description", and "source") are the
 Run Function
 ^^^^^^^^^^^^
 
-Opentrons API version 4 protocols are structured around a function called ``run(ctx)``. This function must be named exactly ``run`` and must take exactly one mandatory argument (its name doesn’t matter). When the robot runs a protocol, it will call this function, and pass it an object that does two things:
+Opentrons API version 2 protocols are structured around a function called ``run(ctx)``. This function must be named exactly ``run`` and must take exactly one mandatory argument (its name doesn’t matter). When the robot runs a protocol, it will call this function, and pass it an object that does two things:
 
 1) Remember, track, and check the robot’s state
 2) Expose the functions that make the robot act
@@ -125,7 +125,7 @@ More complete documentation on labware methods (such as the ``.wells()`` method)
 This table lists the names of valid labwares that can be loaded with :py:meth:`.ProtocolContext.load_labware_by_name`, along with the name of the legacy labware definition each is equivalent to (if any).
 
 +-------------------------------------------+----------------------------------------+
-| API 4.0 Labware Name                      | API 3.x Labware Name                   |
+| API 2 Labware Name                        | API 1 Labware Name                     |
 +===========================================+========================================+
 | biorad_96_wellPlate_pcr_200_uL            | 96-pcr-flat                            |
 +-------------------------------------------+----------------------------------------+
