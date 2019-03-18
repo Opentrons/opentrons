@@ -9,7 +9,7 @@ For more details, please see the full [technical change log][changelog]
 
 ### New features
 
-- You can now modify pipette configuration for attached pipettes directly from the Opentrons App. For more information see [].
+- You can now modify pipette configuration for attached pipettes directly from the Opentrons App. For more information see [our documentation][intercom-pipette-config].
 
 ### Known issues
 
@@ -21,6 +21,7 @@ executing, but it does not ([#2020][2020])
 [2047]: https://github.com/Opentrons/opentrons/issues/2047
 [2020]: https://github.com/Opentrons/opentrons/issues/2020
 [1828]: https://github.com/Opentrons/opentrons/issues/1828
+[intercom-pipette-config]: https://app.intercom.io/a/apps/bsgvg3q7/articles/articles/2822002/show
 
 <!-- end:@opentrons/app -->
 
