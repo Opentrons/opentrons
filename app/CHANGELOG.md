@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.8.0-alpha.1"></a>
+# [3.8.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.7.0...v3.8.0-alpha.1) (2019-03-18)
+
+
+### Features
+
+* **app:** Enable pipette config modal and form ([#3202](https://github.com/Opentrons/opentrons/issues/3202)) ([49c1fe9](https://github.com/Opentrons/opentrons/commit/49c1fe9)), closes [#3112](https://github.com/Opentrons/opentrons/issues/3112)
+
+
+
+
+
 <a name="3.8.0-alpha.0"></a>
 # [3.8.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.7.0...v3.8.0-alpha.0) (2019-03-18)
 

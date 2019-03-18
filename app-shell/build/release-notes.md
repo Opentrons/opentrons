@@ -36,6 +36,7 @@ executing, but it does not ([#2020][2020])
 - Fixed an issue with simulating protocols that had nested functions on the command line
 - Fixed an issue with the CLI deck calibration tool that would crash in certain command sequences
 - Fixed an issue with the run log where some commands might have incorrect or non-displayed values for positions and volumes (This was [#3105][3105])
+- Fixed an issue with Temperature Modules where `wait_for_temp` would sometimes return immediately
 
 
 ### Known issues
