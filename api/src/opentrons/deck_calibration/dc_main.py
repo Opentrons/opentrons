@@ -54,8 +54,10 @@ class CLITool:
     def __init__(self, point_set, tip_length, loop=None):
         # URWID user interface objects
         if not loop:
-            loop = urwid.main_loop.AsyncioEventLoop(
-                loop=asyncio.get_event_loop())
+            loop = asyncio.get_event_loop()
+        loop = urwid.main_loop.AsyncioEventLoop(
+            loop=loop)
+
         controls = '\n'.join([
             'arrow keys: move the gantry',
             'q/a:        move the pipette up/down',
@@ -101,7 +103,7 @@ class CLITool:
         self._expected_points = {
             key: (vX, vY, tip_length)
             for key, (vX, vY) in point_set.items()}
-        self._actual_points = {
+        self.actual_points = {
             1: (0, 0),
             2: (0, 0),
             3: (0, 0)}
@@ -160,6 +162,14 @@ class CLITool:
     @calibration_matrix.setter
     def calibration_matrix(self, calibration):
         self._calibration_matrix = calibration
+
+    @property
+    def actual_points(self):
+        return self._actual_points
+
+    @actual_points.setter
+    def actual_points(self, points):
+        self._actual_points = points
 
     def current_step(self):
         return self._steps[self._steps_index]
@@ -235,11 +245,11 @@ class CLITool:
             msg = self.save_mount_offset()
         else:
             pos = self._position()[:-1]
-            self._actual_points[self._current_point] = pos
+            self.actual_points[self._current_point] = pos
             log.debug("Saving {} for point {}".format(
                 pos, self._current_point))
             msg = 'saved #{}: {}'.format(
-                self._current_point, self._actual_points[self._current_point])
+                self._current_point, self.actual_points[self._current_point])
         return msg
 
     def save_mount_offset(self) -> str:
@@ -271,7 +281,7 @@ class CLITool:
         """
         expected = [self._expected_points[p][:2] for p in [1, 2, 3]]
         log.debug("save_transform expected: {}".format(expected))
-        actual = [self._actual_points[p][:2] for p in [1, 2, 3]]
+        actual = [self.actual_points[p][:2] for p in [1, 2, 3]]
         log.debug("save_transform actual: {}".format(actual))
         # Generate a 2 dimensional transform matrix from the two matricies
         flat_matrix = solve(expected, actual)
@@ -279,6 +289,7 @@ class CLITool:
         current_z = self.calibration_matrix[2][3]
         # Add the z component to form the 3 dimensional transform
         self.calibration_matrix = add_z(flat_matrix, current_z)
+
         gantry_calibration = list(
                 map(lambda i: list(i), self.calibration_matrix))
         log.debug("save_transform calibration_matrix: {}".format(
@@ -317,6 +328,8 @@ class CLITool:
             apply_mount_offset(self._expected_points[1], self.hardware),
             0,
             l_pipette)
+
+        self._current_mount = r_pipette
 
     def validate(
             self,
@@ -374,7 +387,7 @@ class CLITool:
 
     def _update_text_box(self, msg):
         expected = [self._expected_points[p] for p in [1, 2, 3]]
-        actual = [self._actual_points[p] for p in [1, 2, 3]]
+        actual = [self.actual_points[p] for p in [1, 2, 3]]
         points = '\n'.join([
             # Highlight point being calibrated
             # Display actual and expected coordinates
@@ -398,7 +411,6 @@ class CLITool:
 def probe(tip_length: float, hardware) -> str:
     if not feature_flags.use_protocol_api_v2():
         hardware.reset()
-
         pipette = instruments.P300_Single(mount='right')   # type: ignore
         probe_center = tuple(probe_instrument(
             pipette, robot, tip_length=tip_length))
@@ -451,15 +463,14 @@ def main():
     A CLI application for performing factory calibration of an Opentrons robot
 
     Instructions:
-        - Robot must be set up with a 300ul single-channel pipette installed on
-          the right-hand mount.
+        - Robot must be set up with two 300ul or 50ul single-channel pipettes
+          installed on the right-hand and left-hand mount.
         - Put a GEB 300ul tip onto the pipette.
-        - Use the arrow keys to jog the robot over an open area of the deck
-          (the base deck surface, not over a ridge or numeral engraving). You
-          can use the '-' and '=' keys to decrease or increase the amount of
-          distance moved with each jog action.
+        - Use the arrow keys to jog the robot over slot 5 in an open space that
+          is not an engraving or a hole.
         - Use the 'q' and 'a' keys to jog the pipette up and down respectively
-          until the tip is just touching the deck surface, then press 'z'.
+          until the tip is just touching the deck surface, then press 'z'. This
+          will save the 'Z' height.
         - Press '1' to automatically go to the expected location of the first
           calibration point. Jog the robot until the tip is actually at
           the point, then press 'enter'.
@@ -467,7 +478,8 @@ def main():
         - After calibrating all three points, press the space bar to save the
           configuration.
         - Optionally, press 4,5,6 or 7 to validate the new configuration.
-        - Press 'p' to perform tip probe.
+        - Press 'p' to perform tip probe. Press the space bar to save again.
+        - Press 'm' to perform mount calibration.
         - Press 'esc' to exit the program.
     """
     prompt = input(
