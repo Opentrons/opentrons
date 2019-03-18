@@ -177,33 +177,33 @@ class CLITool:
         return self._steps[self._steps_index]
 
     def print_instructions(self):
-        return """
-        A CLI application for performing factory calibration \n
-        of an Opentrons robot \n
-        Instructions: \n
-            - Robot must be set up with two 300ul or 50ul single-channel \n
-              pipettes installed on the right-hand and left-hand mount. \n
-            - Put a GEB 300ul tip onto the pipette. \n
-            - Use the arrow keys to jog the robot over slot 5 in an \n
-              open space that is not an engraving or a hole. \n
-            - Use the 'q' and 'a' keys to jog the pipette up \n
-              and down respectively until the tip is just touching \n
-              the deck surface, then press 'z'. This \n
-              will save the 'Z' height. \n
-            - Press '1' to the expected location of the first \n
-              calibration point. Jog the robot until the tip is actually at \n
-              the point, then press 'enter'. Repeat with '2' and '3'. \n
-            - After calibrating all three points, press the space bar \n
-              to save the configuration. \n
-            - Optionally, press 4,5,6 or 7 to
-              validate the new configuration. \n
-            - Press 'p' to perform tip probe. \n
-              Press the space bar to save again. \n
-            - Press 'm' to perform mount calibration. \n
-              Press enter and then space bar to save again. \n
-            - Use "\" to home both pipettes and \n
-              optionally press 4,5,6,7 again. \n
-            - Press 'esc' to exit the program. \n"""
+        return '\n'.join([
+            'A CLI application for performing factory calibration',
+            'of an Opentrons robot',
+            'Instructions:',
+            '- Robot must be set up with two 300ul or 50ul single-channel',
+            'pipettes installed on the right-hand and left-hand mount.',
+            '- Put a GEB 300ul tip onto the pipette.',
+            '- Use the arrow keys to jog the robot over slot 5 in an',
+            'open space that is not an engraving or a hole.',
+            '- Use the "q" and "a" keys to jog the pipette up',
+            'and down respectively until the tip is just touching',
+            'the deck surface, then press "z". This',
+            'will save the "Z" height.',
+            '- Press "1" to the expected location of the first',
+            'calibration point. Jog the robot until the tip is actually at',
+            'the point, then press "enter". Repeat with "2" and "3".',
+            '- After calibrating all three points, press the space bar',
+            'to save the configuration.',
+            'Optionally, press 4,5,6 or 7 to',
+            'validate the new configuration.',
+            '- Press "p" to perform tip probe.',
+            'Press the space bar to save again.',
+            '- Press "m" to perform mount calibration.',
+            'Press enter and then space bar to save again.',
+            '- Use backslash to home both pipettes and',
+            'optionally press 4,5,6,7 again.',
+            '- Press "esc" to exit the program.'])
 
     # Methods for backing key-press
     def increase_step(self) -> str:
