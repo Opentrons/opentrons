@@ -16,5 +16,3 @@ export default function Sidebar () {
     </nav>
   )
 }
-
-export {LabwareGuide, FilterManufacturer}
