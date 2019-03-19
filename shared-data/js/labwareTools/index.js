@@ -33,25 +33,29 @@ type GridStart = {
   colStride: number,
 }
 
+type InputParams = $Rest<Params, {|loadName: string|}>
+
+type InputWell = $Rest<Well, {|x: number, y: number, z: number|}>
+
 export type RegularLabwareProps = {
   metadata: Metadata,
-  parameters: Params,
+  parameters: InputParams,
   offset: Offset,
   dimensions: Dimensions,
   grid: Cell,
   spacing: Cell,
-  well: Well,
+  well: InputWell,
   brand?: Brand,
 }
 
 export type IrregularLabwareProps = {
   metadata: Metadata,
-  parameters: Params,
+  parameters: $Diff<Params, {loadName: string}>,
   offset: Array<Offset>,
   dimensions: Dimensions,
   grid: Array<Cell>,
   spacing: Array<Cell>,
-  well: Array<Well>,
+  well: Array<InputWell>,
   gridStart: Array<GridStart>,
   brand?: Brand,
 }
@@ -86,7 +90,7 @@ export function _calculateWellCoord (
   colIdx: number,
   spacing: Cell,
   offset: Offset,
-  well: Well
+  well: InputWell
 ): Well {
   return {
     ...well,
@@ -96,12 +100,12 @@ export function _calculateWellCoord (
   }
 }
 
-function determineLayout (
+function determineIrregularLayout (
   grids: Array<Cell>,
   spacing: Array<Cell>,
   offset: Array<Offset>,
   gridStart: Array<GridStart>,
-  wells: Array<Well>
+  wells: Array<InputWell>
 ): {[wellName: string]: Well} {
   return grids.reduce((wellMap, gridObj, gridIdx) => {
     const reverseRowIdx = range(gridObj.row - 1, -1)
@@ -125,7 +129,7 @@ function determineLayout (
 
 export function _generateIrregularLoadName (args: {
   grid: Array<Cell>,
-  well: Array<Well>,
+  well: Array<InputWell>,
   units: string,
   brand: string,
   displayCategory: string,
@@ -165,7 +169,7 @@ export function determineIrregularOrdering (
 // Private helper functione to calculate the XYZ coordinates of a give well
 // Will return a nested object of all well objects for a labware
 function calculateCoordinates (
-  well: Well,
+  well: InputWell,
   ordering: Array<Array<string>>,
   spacing: Cell,
   offset: Offset
@@ -238,7 +242,7 @@ export function createIrregularLabware (
   args: IrregularLabwareProps
 ): Definition {
   const {metadata, offset, dimensions, grid, spacing, well, gridStart} = args
-  const wells = determineLayout(grid, spacing, offset, gridStart, well)
+  const wells = determineIrregularLayout(grid, spacing, offset, gridStart, well)
   const brand = ensureBrand(args.brand)
   const loadName = _generateIrregularLoadName({
     grid,
