@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.8.0"></a>
+# [3.8.0](https://github.com/Opentrons/opentrons/compare/v3.7.0...v3.8.0) (2019-03-19)
+
+
+### Bug Fixes
+
+* **protocol-designer:** fix drop tip offset bug ([#3126](https://github.com/Opentrons/opentrons/issues/3126)) ([6db63f4](https://github.com/Opentrons/opentrons/commit/6db63f4)), closes [#3122](https://github.com/Opentrons/opentrons/issues/3122) [#3123](https://github.com/Opentrons/opentrons/issues/3123)
+* **protocol-designer:** fix mistake with load file error reporting ([#3190](https://github.com/Opentrons/opentrons/issues/3190)) ([3f648ad](https://github.com/Opentrons/opentrons/commit/3f648ad)), closes [#3172](https://github.com/Opentrons/opentrons/issues/3172)
+* **protocol-designer:** fix mix disabled fields ([#3192](https://github.com/Opentrons/opentrons/issues/3192)) ([51846d5](https://github.com/Opentrons/opentrons/commit/51846d5)), closes [#3049](https://github.com/Opentrons/opentrons/issues/3049)
+* **protocol-designer:** fix move liquid tooltip; remove old unused tooltips ([#3147](https://github.com/Opentrons/opentrons/issues/3147)) ([c1cc891](https://github.com/Opentrons/opentrons/commit/c1cc891))
+* **protocol-designer:** update disposal volume knowledge base link ([#3132](https://github.com/Opentrons/opentrons/issues/3132)) ([1431cbd](https://github.com/Opentrons/opentrons/commit/1431cbd)), closes [#3130](https://github.com/Opentrons/opentrons/issues/3130)
+
+
+### Features
+
+* **protocol-designer:** add 404 redirect page ([#3193](https://github.com/Opentrons/opentrons/issues/3193)) ([10658b8](https://github.com/Opentrons/opentrons/commit/10658b8)), closes [#3167](https://github.com/Opentrons/opentrons/issues/3167)
+* **protocol-designer:** add change tip and reasons for disabled path ([#3139](https://github.com/Opentrons/opentrons/issues/3139)) ([6c3f0f0](https://github.com/Opentrons/opentrons/commit/6c3f0f0)), closes [#3137](https://github.com/Opentrons/opentrons/issues/3137)
+* **protocol-designer:** add emailListName param to confirmEmail call ([#3174](https://github.com/Opentrons/opentrons/issues/3174)) ([af40d4b](https://github.com/Opentrons/opentrons/commit/af40d4b)), closes [#3166](https://github.com/Opentrons/opentrons/issues/3166)
+* **protocol-designer:** add favicon ([#3176](https://github.com/Opentrons/opentrons/issues/3176)) ([0410731](https://github.com/Opentrons/opentrons/commit/0410731)), closes [#3171](https://github.com/Opentrons/opentrons/issues/3171)
+* **protocol-designer:** auto-select well of single well labware ([#3157](https://github.com/Opentrons/opentrons/issues/3157)) ([8424c15](https://github.com/Opentrons/opentrons/commit/8424c15)), closes [#3146](https://github.com/Opentrons/opentrons/issues/3146)
+* **protocol-designer:** expose current version in settings page ([#3135](https://github.com/Opentrons/opentrons/issues/3135)) ([ce30ab6](https://github.com/Opentrons/opentrons/commit/ce30ab6)), closes [#3114](https://github.com/Opentrons/opentrons/issues/3114)
+* **protocol-designer:** gate entry by user identity ([#3153](https://github.com/Opentrons/opentrons/issues/3153)) ([1a257b2](https://github.com/Opentrons/opentrons/commit/1a257b2)), closes [#3149](https://github.com/Opentrons/opentrons/issues/3149) [#3150](https://github.com/Opentrons/opentrons/issues/3150)
+* **protocol-designer:** hash favicon ([#3184](https://github.com/Opentrons/opentrons/issues/3184)) ([153c596](https://github.com/Opentrons/opentrons/commit/153c596))
+* **protocol-designer:** hide GateModal in dev by default ([#3210](https://github.com/Opentrons/opentrons/issues/3210)) ([3b01ee8](https://github.com/Opentrons/opentrons/commit/3b01ee8)), closes [#3189](https://github.com/Opentrons/opentrons/issues/3189)
+* **protocol-designer:** pd version metadata in code and analytics  ([#3178](https://github.com/Opentrons/opentrons/issues/3178)) ([9319198](https://github.com/Opentrons/opentrons/commit/9319198))
+* **protocol-designer:** point to staging or prod resources accordingly ([#3181](https://github.com/Opentrons/opentrons/issues/3181)) ([8a2befc](https://github.com/Opentrons/opentrons/commit/8a2befc)), closes [#3180](https://github.com/Opentrons/opentrons/issues/3180)
+* **protocol-designer:** show info modal when file has been migrated ([#3148](https://github.com/Opentrons/opentrons/issues/3148)) ([1150068](https://github.com/Opentrons/opentrons/commit/1150068)), closes [#3057](https://github.com/Opentrons/opentrons/issues/3057)
+* **protocol-designer:** update title and add beta tag ([#3131](https://github.com/Opentrons/opentrons/issues/3131)) ([09322d7](https://github.com/Opentrons/opentrons/commit/09322d7)), closes [#3127](https://github.com/Opentrons/opentrons/issues/3127)
+
+
+
+
+
 <a name="3.8.0-alpha.1"></a>
 # [3.8.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.7.0...v3.8.0-alpha.1) (2019-03-18)
 

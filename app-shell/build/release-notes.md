@@ -34,7 +34,7 @@ executing, but it does not ([#2020][2020])
 - Fixed an issue where labware calibration would get stuck if a labware with only a single well was on the deck
 - Fixed an issue where the robot would become unresponsive if the user went to the robot modules page in the Opentrons App while using a Temperature Module in a protocol
 - Fixed an issue with simulating protocols that had nested functions on the command line
-- Fixed an issue with the CLI deck calibration tool that would crash in certain command sequences
+- Fixed an issue with the CLI deck calibration tool that would crash in certain command sequences and added more help information to it
 - Fixed an issue with the run log where some commands might have incorrect or non-displayed values for positions and volumes (This was [#3105][3105])
 - Fixed an issue with Temperature Modules where `wait_for_temp` would sometimes return immediately
 

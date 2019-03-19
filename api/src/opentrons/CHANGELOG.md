@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.8.0"></a>
+# [3.8.0](https://github.com/Opentrons/opentrons/compare/v3.7.0...v3.8.0) (2019-03-19)
+
+
+### Bug Fixes
+
+* **api:** Access wells in calibration so 1-well containers are ok ([#3187](https://github.com/Opentrons/opentrons/issues/3187)) ([05ad4b1](https://github.com/Opentrons/opentrons/commit/05ad4b1))
+* **api:** force update tempdeck target temp cache ([#3223](https://github.com/Opentrons/opentrons/issues/3223)) ([175461b](https://github.com/Opentrons/opentrons/commit/175461b)), closes [#3218](https://github.com/Opentrons/opentrons/issues/3218)
+* **api:** cache modules in singleton for apiV1 protocols ([#3219](https://github.com/Opentrons/opentrons/issues/3219)) ([058319f](https://github.com/Opentrons/opentrons/commit/058319f)), closes [#3205](https://github.com/Opentrons/opentrons/issues/3205)
+* **api:** Clear globals in simulate script thing ([#3156](https://github.com/Opentrons/opentrons/issues/3156)) ([58ddfb6](https://github.com/Opentrons/opentrons/commit/58ddfb6))
+* **api:** cli deck cal pipette control and tests ([#3222](https://github.com/Opentrons/opentrons/issues/3222)) ([0e95e08](https://github.com/Opentrons/opentrons/commit/0e95e08))
+* **api:** Fix the mount calibration pipette control ([#3228](https://github.com/Opentrons/opentrons/issues/3228)) ([962b0a7](https://github.com/Opentrons/opentrons/commit/962b0a7))
+* **api:** Manually publish to broker in param-mangling commands ([#3159](https://github.com/Opentrons/opentrons/issues/3159)) ([17e86bf](https://github.com/Opentrons/opentrons/commit/17e86bf)), closes [#3105](https://github.com/Opentrons/opentrons/issues/3105)
+
+
+### Features
+
+* **api:** Add interruptable poller to Thermocycler driver & API with lid open/close ([#3118](https://github.com/Opentrons/opentrons/issues/3118)) ([b04add2](https://github.com/Opentrons/opentrons/commit/b04add2))
+* **api:** add pipette config endpoint ([#3128](https://github.com/Opentrons/opentrons/issues/3128)) ([b6b958b](https://github.com/Opentrons/opentrons/commit/b6b958b))
+* **api:** Add set_temperature command to API and driver ([#3152](https://github.com/Opentrons/opentrons/issues/3152)) ([bde3b1c](https://github.com/Opentrons/opentrons/commit/bde3b1c)), closes [#2979](https://github.com/Opentrons/opentrons/issues/2979)
+* **api:** add udev rule for thermocycler board, include rule file in makefile ([#3203](https://github.com/Opentrons/opentrons/issues/3203)) ([d47fee0](https://github.com/Opentrons/opentrons/commit/d47fee0)), closes [#3144](https://github.com/Opentrons/opentrons/issues/3144)
+
+
+
+
+
 <a name="3.8.0-alpha.1"></a>
 # [3.8.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.7.0...v3.8.0-alpha.1) (2019-03-18)
 
