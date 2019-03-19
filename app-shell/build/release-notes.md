@@ -21,7 +21,7 @@ executing, but it does not ([#2020][2020])
 [2047]: https://github.com/Opentrons/opentrons/issues/2047
 [2020]: https://github.com/Opentrons/opentrons/issues/2020
 [1828]: https://github.com/Opentrons/opentrons/issues/1828
-[intercom-pipette-config]: https://app.intercom.io/a/apps/bsgvg3q7/articles/articles/2822002/show
+[intercom-pipette-config]: http://support.opentrons.com/ot-2/changing-pipette-settings
 
 <!-- end:@opentrons/app -->
 
