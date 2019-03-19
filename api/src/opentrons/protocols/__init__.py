@@ -1,3 +1,4 @@
+from numpy import add
 import time
 from itertools import chain
 from opentrons import instruments, labware, robot
@@ -219,12 +220,21 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
             x_offset = params.get('offset', {}).get('x', 0)
             y_offset = params.get('offset', {}).get('y', 0)
             z_offset = params.get('offset', {}).get('z', 0)
-            slot_location = (robot.deck[slot], (x_offset, y_offset, z_offset))
+            slot_placeable = robot.deck[slot]
+            slot_offset = (x_offset, y_offset, z_offset)
             strategy = params['strategy']
             if strategy not in ['arc', 'direct']:
                 raise ValueError('Invalid "strategy" for "move-to-slot": "{}"'
                                  .format(strategy))
-            pipette.move_to(slot_location, strategy=strategy)
+            # NOTE: Robot.move_to subtracts the offset from Slot.top()[1],
+            # so in order not to translate our desired offset,
+            # we have to compensate by adding it here :/
+            print('slot_offset', slot_offset)
+            print('top', tuple(slot_placeable.top()[1]))
+            pipette.move_to(
+                (slot_placeable,
+                 add(slot_offset, tuple(slot_placeable.top()[1]))),
+                strategy=strategy)
 
 
 def execute_protocol(protocol):
