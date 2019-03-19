@@ -15,10 +15,14 @@ import exampleLabware1 from '../../__tests__/fixtures/irregularLabwareExample1.j
 jest.mock('../assignId', () => jest.fn(() => 'mock-id'))
 
 describe('test helper functions', () => {
-  test('cornerOffsetFromSLot outputs correctly', () => {
+  test('cornerOffsetFromSlot outputs correctly', () => {
     // If smaller than slot, positive values
     // If larger than slot, negative values
-    const smallerDims = {overallLength: 100, overallWidth: 80, overallHeight: 10}
+    const smallerDims = {
+      overallLength: 100,
+      overallWidth: 80,
+      overallHeight: 10,
+    }
     const largerDims = {overallLength: 200, overallWidth: 90, overallHeight: 10}
     const offset = _calculateCornerOffset(smallerDims)
     const offset2 = _calculateCornerOffset(largerDims)
@@ -28,9 +32,13 @@ describe('test helper functions', () => {
     expect(offset2.x).toBeLessThan(0)
     expect(offset2.y).toBeLessThan(0)
   })
+
   test('Well name generated correctly', () => {
     const grid = {row: 2, column: 2}
-    const gridStart = [{rowStart: 'A', colStart: '1', rowStride: 1, colStride: 2}, {rowStart: 'B', colStart: '1', rowStride: 3, colStride: 1}]
+    const gridStart = [
+      {rowStart: 'A', colStart: '1', rowStride: 1, colStride: 2},
+      {rowStart: 'B', colStart: '1', rowStride: 3, colStride: 1},
+    ]
     const expected1 = ['A1', 'B1', 'A3', 'B3']
     const expected2 = ['B1', 'E1', 'B2', 'E2']
     let idx = 0
@@ -49,19 +57,35 @@ describe('test helper functions', () => {
     const grid = {row: 1, column: 5}
     const offset = {x: 1, y: 0.5, z: 55.5}
     const spacing = [{row: 10, column: 10}, {row: 5, column: 14}]
-    const well = [omit(exampleLabware1.wells.A1, ['x', 'y', 'z']), omit(exampleLabware1.wells.B1, ['x', 'y', 'z'])]
+    const well = [
+      omit(exampleLabware1.wells.A1, ['x', 'y', 'z']),
+      omit(exampleLabware1.wells.B1, ['x', 'y', 'z']),
+    ]
     const expectedX1 = [1, 11, 21, 31, 41]
     const expectedY1 = [0.5]
-    const expectedX2 = [ 1, 15, 29, 43, 57 ]
+    const expectedX2 = [1, 15, 29, 43, 57]
     const expectedY2 = [0.5]
 
     range(grid.column).forEach(colIdx => {
       range(grid.row).forEach(rowIdx => {
-        const well1 = _calculateWellCoord(rowIdx, colIdx, spacing[0], offset, well[0])
+        const well1 = _calculateWellCoord(
+          rowIdx,
+          colIdx,
+          spacing[0],
+          offset,
+          well[0]
+        )
         expect(well1.x).toBeCloseTo(expectedX1[colIdx], 2)
         expect(well1.y).toBeCloseTo(expectedY1[rowIdx], 2)
         expect(well1.z).toBeCloseTo(offset.z - well[0].depth, 2)
-        const well2 = _calculateWellCoord(rowIdx, colIdx, spacing[1], offset, well[1])
+
+        const well2 = _calculateWellCoord(
+          rowIdx,
+          colIdx,
+          spacing[1],
+          offset,
+          well[1]
+        )
         expect(well2.x).toBeCloseTo(expectedX2[colIdx], 2)
         expect(well2.y).toBeCloseTo(expectedY2[rowIdx], 2)
         expect(well2.z).toBeCloseTo(offset.z - well[1].depth, 2)
@@ -77,13 +101,10 @@ describe('test createIrregularLabware function', () => {
     labware1 = createIrregularLabware({
       metadata: {
         displayName: 'Fake Irregular Container',
-        displayCategory: 'irregular',
+        displayCategory: 'tubeRack',
         displayVolumeUnits: 'mL',
         displayLengthUnits: 'mm',
-        tags: [
-          'fake',
-          'opentrons',
-        ],
+        tags: ['fake', 'opentrons'],
       },
       parameters: {
         format: 'irregular',
@@ -109,18 +130,9 @@ describe('test createIrregularLabware function', () => {
           totalLiquidVolume: 10,
         },
       ],
-      offset: [
-        {x: 10, y: 10, z: 69.48},
-        {x: 15, y: 15, z: 69.48},
-      ],
-      grid: [
-        {row: 5, column: 10},
-        {row: 1, column: 5},
-      ],
-      spacing: [
-        {row: 5, column: 10},
-        {row: 5, column: 10},
-      ],
+      offset: [{x: 10, y: 10, z: 69.48}, {x: 15, y: 15, z: 69.48}],
+      grid: [{row: 5, column: 10}, {row: 1, column: 5}],
+      spacing: [{row: 5, column: 10}, {row: 5, column: 10}],
       gridStart: [
         {rowStart: 'A', colStart: '1', rowStride: 2, colStride: 1},
         {rowStart: 'B', colStart: '1', rowStride: 1, colStride: 1},
@@ -140,10 +152,7 @@ describe('test createIrregularLabware function', () => {
 
   test('labware loadName generated correctly for multi-grid labware', () => {
     const loadName = _generateIrregularLoadName({
-      grid: [
-        {row: 3, column: 2},
-        {row: 1, column: 4},
-      ],
+      grid: [{row: 3, column: 2}, {row: 1, column: 4}],
       well: [
         {
           depth: 20,
@@ -158,11 +167,10 @@ describe('test createIrregularLabware function', () => {
       ],
       // TODO Ian 2018-11-08: add test with mL, expect displayVol = vol/1000 (would fail right now)
       units: 'uL',
-      displayCategory: 'exampleDisplayCat',
+      displayCategory: 'wellPlate',
       brand: 'some brand',
     })
 
-    expect(loadName).toEqual(
-      'some_brand_6x400_uL_4x2000_uL_exampleDisplayCat')
+    expect(loadName).toEqual('some_brand_6x400_ul_4x2000_ul_wellplate')
   })
 })

@@ -31,7 +31,8 @@
         },
         "displayCategory": {
           "description": "Label used in UI to categorize labware",
-          "type": "string"
+          "type": "string",
+          "enum": ["tipRack", "tubeRack", "trough", "trash", "wellPlate"]
         },
         "displayLengthUnits": {
           "type": "string"
@@ -98,7 +99,8 @@
         },
         "loadName": {
           "description": "Generated unique name of container",
-          "type": "string"
+          "type": "string",
+          "pattern": "^[a-z0-9._]+$"
         },
         "isMagneticModuleCompatible": {
           "description": "Flag marking whether a labware is compatible by default with the Magnetic Module",
