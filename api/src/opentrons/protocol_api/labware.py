@@ -611,22 +611,22 @@ class ThermocyclerGeometry(ModuleGeometry):
     def __init__(self, definition: dict, parent: Location) -> None:
         super().__init__(definition, parent)
         self._lid_height = definition["dimensions"]["lidHeight"]
-        self._lid_status = False
+        self._lid_closed = False
 
     @property
     def highest_z(self) -> float:
-        if self.lid_status:
+        if self.lid_closed:
             return super().highest_z + self._lid_height
         else:
             return super().highest_z
 
     @property
-    def lid_status(self) -> bool:
-        return self._lid_status
+    def lid_closed(self) -> bool:
+        return self._lid_closed
 
-    @lid_status.setter
-    def lid_status(self, status) -> None:
-        self._lid_status = status
+    @lid_closed.setter
+    def lid_closed(self, status) -> None:
+        self._lid_closed = status
 
     def labware_accessor(self, definition: Labware) -> Labware:
         # Block first three columns from being accessed
@@ -634,6 +634,11 @@ class ThermocyclerGeometry(ModuleGeometry):
         definition._build_wells()
         return definition
 
+    def add_labware(self, labware: Labware):
+        assert not self._labware,\
+            '{} is already on this module'.format(self._labware)
+        assert not self.lid_closed, 'Cannot place labware in closed module'
+        self._labware = labware
 
 
 def save_calibration(labware: Labware, delta: Point):
@@ -806,7 +811,11 @@ def load_module_from_definition(
                    the front and left most point of the outside of the module
                    is (often the front-left corner of a slot on the deck).
     """
-    mod = ModuleGeometry(definition, parent)
+    mod_name = definition['loadName']
+    if mod_name == 'thermocycler' or mod_name == 'semithermocycler':
+        mod = ThermocyclerGeometry(definition, parent)
+    else:
+        mod = ModuleGeometry(definition, parent)
     # TODO: calibration
     return mod
 

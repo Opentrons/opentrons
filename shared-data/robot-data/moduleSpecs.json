@@ -35,7 +35,7 @@
         "loadName": "tempdeck",
         "quirks": []
     },
-    "fullThermocycler": {
+    "thermocycler": {
         "labwareOffset": {
             "x": 14.4,
             "y": 20.55,

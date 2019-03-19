@@ -62,7 +62,7 @@ def test_thermocycler_lid(loop):
     ctx = papi.ProtocolContext(loop)
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'thermocycler')]
-    mod = ctx.load_module('Thermocycler', 1)
+    mod = ctx.load_module('thermocycler', 1)
     assert ctx.deck[1] == mod._geometry
 
     assert mod.lid_status == 'open'

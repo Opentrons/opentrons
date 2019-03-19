@@ -3,7 +3,7 @@ import contextlib
 import logging
 import time
 from .labware import (Well, Labware, load, load_module, ModuleGeometry,
-                      quirks_from_any_parent)
+                      quirks_from_any_parent, ThermocyclerGeometry)
 from typing import Any, Dict, List, Optional, Union, Tuple, Sequence
 from opentrons import types, hardware_control as hc, commands as cmds
 from opentrons.commands import CommandPublisher
@@ -236,7 +236,7 @@ class ProtocolContext(CommandPublisher):
                 'temperature module': 'tempdeck',
                 'thermocycler': 'thermocycler',
                 'semithermocycler': 'semithermocycler'}[module_name.lower()]
-            if mod.name() == hc_mod_name:
+            if mod.name() == hc_mod_name or hc_mod_name == 'semithermocycler':
                 mod_class = {
                     'magdeck': MagneticModuleContext,
                     'tempdeck': TemperatureModuleContext,
@@ -1669,11 +1669,13 @@ class ThermocyclerContext(ModuleContext):
     @cmds.publish.both(command=cmds.thermocycler_open)
     def open(self):
         """ Opens the lid"""
+        self._geometry.lid_status = False
         return self._module.open()
 
     @cmds.publish.both(command=cmds.thermocycler_close)
     def close(self):
         """ Closes the lid"""
+        self._geometry.lid_status = True
         return self._module.close()
 
     @cmds.publish.both(command=cmds.thermocycler_set_temp)
