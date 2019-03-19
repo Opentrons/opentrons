@@ -1,0 +1,112 @@
+/* scoped styles for Sidebar */
+@import '@opentrons/components';
+@import '../../styles/breakpoints.css';
+@import '../../styles/spacing.css';
+
+.sidebar {
+  width: 100%;
+  padding: var(--spacing-6) var(--spacing-3);
+}
+
+.labware_guide {
+  border-bottom: 1px solid var(--c-charcoal);
+  padding-bottom: var(--spacing-6);
+}
+
+.labware_guide_container {
+  border: 1px solid var(--c-charcoal);
+  border-radius: 3px;
+  padding: var(--spacing-4) var(--spacing-6);
+}
+
+.labware_guide_title {
+  @apply --font-body-2-dark;
+
+  display: flex;
+  align-items: center;
+  font-weight: var(--fw-semibold);
+}
+
+.labware_guide_icon {
+  flex: none;
+  width: var(--size-1);
+  margin-right: var(--spacing-5);
+}
+
+.labware_guide_link {
+  display: block;
+  line-height: var(--lh-title);
+  font-size: var(--fs-body-1);
+  margin-top: var(--spacing-3);
+  color: var(--c-blue);
+}
+
+.filter_manufacturer {
+  display: block;
+  margin: var(--spacing-6) 0;
+}
+
+.filter_manufacturer_label {
+  text-transform: uppercase;
+  padding: 0 0 var(--spacing-3) var(--spacing-3);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--c-dark-gray);
+}
+
+.filter_manufacturer_select {
+  @apply --font-body-1-dark;
+
+  /* react-select adds background: white on its <input> for some reason */
+  & input {
+    background-color: inherit;
+  }
+}
+
+.filter_category {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 var(--spacing-3);
+}
+
+.filter_category_item {
+  @apply --font-default-dark;
+  @apply --transition-color;
+  @apply --clickable;
+
+  width: var(--size-third);
+  line-height: var(--lh-title);
+  margin-bottom: var(--spacing-6);
+  font-weight: var(--fw-semibold);
+
+  &:hover {
+    color: var(--c-highlight);
+  }
+}
+
+@media (--medium) {
+  .sidebar {
+    flex: none;
+    width: var(--size-3);
+    height: 100%;
+    padding-left: var(--spacing-5);
+    padding-right: var(--spacing-5);
+    overflow-y: auto;
+  }
+
+  .filter_category {
+    display: block;
+    padding: 0;
+  }
+
+  .filter_category_item {
+    display: block;
+    width: 100%;
+  }
+}
+
+@media (--large) {
+  .sidebar {
+    width: var(--size-4);
+  }
+}

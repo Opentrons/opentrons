@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FilterCategory component renders 1`] = `
+<ul
+  className="filter_category"
+>
+  <li
+    className="filter_category_item"
+  >
+    All
+  </li>
+  <li
+    className="filter_category_item"
+  >
+    Tip Rack
+  </li>
+  <li
+    className="filter_category_item"
+  >
+    Tube Rack
+  </li>
+  <li
+    className="filter_category_item"
+  >
+    Trough
+  </li>
+  <li
+    className="filter_category_item"
+  >
+    Trash
+  </li>
+  <li
+    className="filter_category_item"
+  >
+    Well Plate
+  </li>
+</ul>
+`;

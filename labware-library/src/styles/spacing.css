@@ -1,0 +1,25 @@
+/* spacing variables */
+
+:root {
+  /*
+   * padding and margin spacing scale
+   *
+   * TODO(mc, 2019-03-14): this list is pretty hard to maintain at this early
+   * stage, but the future benefits of codifying a spacing scale outweight the
+   * pain from churn right now
+   */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.625rem;
+  --spacing-4: 0.75rem;
+  --spacing-5: 1rem;
+  --spacing-6: 1.5rem;
+
+  /* width and height sizes (same TODO as above) */
+  --size-1: 1.25rem;
+  --size-2: 3rem;
+  --size-3: 12rem;
+  --size-4: 15rem;
+  --size-5: 32rem;
+  --size-third: calc(100% / 3);
+}

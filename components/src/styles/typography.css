@@ -4,6 +4,7 @@
   --c-font-disabled: #9c9c9c;
   --fs-huge: 3rem;
   --fs-header: 1.125rem;
+  --fs-default: 1rem;
   --fs-body-2: 0.875rem;
   --fs-body-1: 0.75rem;
   --fs-caption: 0.625rem;
@@ -13,6 +14,9 @@
   --fw-semibold: 600;
   --fw-regular: 400;
   --fw-light: 300;
+  --lh-solid: 1;
+  --lh-title: 1.25;
+  --lh-copy: 1.5;
 
   --font-huge-dark: {
     font-size: var(--fs-huge);
@@ -35,6 +39,18 @@
   --font-header-light: {
     font-size: var(--fs-header);
     font-weight: var(--fw-semibold);
+    color: var(--c-font-light);
+  };
+
+  --font-default-dark: {
+    font-size: var(--fs-default);
+    font-weight: var(--fw-regular);
+    color: var(--c-font-dark);
+  };
+
+  --font-default-light: {
+    font-size: var(--fs-default);
+    font-weight: var(--fw-regular);
     color: var(--c-font-light);
   };
 

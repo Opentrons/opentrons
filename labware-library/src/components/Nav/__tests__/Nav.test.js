@@ -1,13 +1,13 @@
 // @flow
-// app tests
+// tests for top navbar
 import * as React from 'react'
 import Renderer from 'react-test-renderer'
 
-import {App} from '..'
+import Nav from '..'
 
-describe('App', () => {
+describe('Nav', () => {
   test('component renders', () => {
-    const tree = Renderer.create(<App />).toJSON()
+    const tree = Renderer.create(<Nav />).toJSON()
 
     expect(tree).toMatchSnapshot()
   })

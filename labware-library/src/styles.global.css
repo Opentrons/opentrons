@@ -4,3 +4,9 @@
 
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,800');
 @import './styles/reset.css';
+
+html,
+body,
+#root {
+  height: 100%;
+}

@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Nav component renders 1`] = `
+<nav
+  className="nav"
+>
+  <div
+    className="nav_contents"
+  >
+    <img
+      className="logo"
+      src="ot-logo-full.png"
+    />
+  </div>
+</nav>
+`;
