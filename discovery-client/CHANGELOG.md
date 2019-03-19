@@ -12,24 +12,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-<a name="3.8.0-alpha.1"></a>
-# [3.8.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.7.0...v3.8.0-alpha.1) (2019-03-18)
-
-**Note:** Version bump only for package @opentrons/discovery-client
-
-
-
-
-
-<a name="3.8.0-alpha.0"></a>
-# [3.8.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.7.0...v3.8.0-alpha.0) (2019-03-18)
-
-**Note:** Version bump only for package @opentrons/discovery-client
-
-
-
-
-
 <a name="3.7.0"></a>
 # [3.7.0](https://github.com/Opentrons/opentrons/compare/v3.6.5...v3.7.0) (2019-02-19)
 
