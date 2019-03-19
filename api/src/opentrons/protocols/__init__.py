@@ -34,6 +34,7 @@ def load_labware(protocol_data):
     loaded_labware = {}
     for labware_id, props in data.items():
         slot = props.get('slot')
+        # TODO: Ian 2019-03-19 throw error if slot is number, only allow string
         model = props.get('model')
         display_name = props.get('display-name')
 
@@ -70,28 +71,6 @@ def _get_location(loaded_labware, command_type, params, default_values):
         raise ValueError(
             'Command tried to use labware "{}", but that ID does not exist ' +
             'in protocol\'s "labware" section'.format(labwareId))
-
-    if command_type == 'move-to-well':
-        # the 'move-to-well' command uses different offset params
-        relative_position = params.get('relativePosition')
-        x_offset = params.get('offset', {}).get('x', 0)
-        y_offset = params.get('offset', {}).get('y', 0)
-        z_offset = params.get('offset', {}).get('z', 0)
-        well_obj = labware.wells(well)
-        half_height = well_obj.properties['depth'] / 2
-        if relative_position == 'top':
-            return (well_obj, well_obj.from_center(
-              x=x_offset,
-              y=y_offset,
-              z=z_offset + half_height
-            ))
-        if relative_position == 'bottom':
-            return (well_obj, well_obj.from_center(
-              x=x_offset,
-              y=y_offset,
-              z=z_offset - half_height
-            ))
-        raise ValueError('"move-to-well" command requires relativePosition')
 
     # default offset from bottom for aspirate/dispense commands
     offset_default = default_values.get(
@@ -232,12 +211,20 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
 
             pipette.touch_tip(well_object, v_offset=offset_from_top)
 
-        elif command_type == 'move-to-well':
+        elif command_type == 'move-to-slot':
+            slot = params.get('slot')
+            if slot not in [str(s+1) for s in range(12)]:
+                raise ValueError('"move-to-slot" requires a valid slot, got {}'
+                                 .format(slot))
+            x_offset = params.get('offset', {}).get('x', 0)
+            y_offset = params.get('offset', {}).get('y', 0)
+            z_offset = params.get('offset', {}).get('z', 0)
+            slot_location = (robot.deck[slot], (x_offset, y_offset, z_offset))
             strategy = params['strategy']
             if strategy not in ['arc', 'direct']:
-                raise ValueError('Invalid "strategy" for "move-to-well": "{}"'
+                raise ValueError('Invalid "strategy" for "move-to-slot": "{}"'
                                  .format(strategy))
-            pipette.move_to(location, strategy=strategy)
+            pipette.move_to(slot_location, strategy=strategy)
 
 
 def execute_protocol(protocol):

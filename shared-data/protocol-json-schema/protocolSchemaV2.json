@@ -90,6 +90,12 @@
       "volume": {
         "type": "number"
       }
+    },
+
+    "slot": {
+      "description": "Slot on the deck of an OT-2 robot",
+      "type": "string",
+      "enum": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
     }
   },
 
@@ -238,11 +244,7 @@
           "type": "object",
           "required": ["slot", "model"],
           "properties": {
-            "slot": {
-              "description": "Which slot on the deck of an OT-2 robot the labware is placed into",
-              "type": "string",
-              "enum": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
-            },
+            "slot": {"$ref": "#/definitions/slot"},
             "model": {
               "description": "Labware type, eg \"96-flat\". See http://docs.opentrons.com/containers.html for a full list of supported labware. TODO support custom labware in JSON",
               "type": "string"
@@ -339,42 +341,33 @@
                 },
 
                 {
-                  "description": "Move to well command",
+                  "description": "Move to slot command",
                   "type": "object",
                   "required": ["command", "params"],
                   "additionalProperties": false,
                   "properties": {
-                    "command": {
-                      "enum": ["move-to-well"]
-                    },
+                    "command": {"enum": ["move-to-slot"]},
                     "params": {
-                        "allOf": [
-                          {"$ref": "#/definitions/pipette-access-params"},
-                          {
-                            "type": "object",
-                            "required": ["relativePosition", "strategy"],
-                            "properties": {
-                              "offset": {
-                                "description": "optional offsets from well in mm",
-                                "type": "object",
-                                "required": ["x", "y", "z"],
-                                "properties": {
-                                  "x": {"type": "number"},
-                                  "y": {"type": "number"},
-                                  "z": {"type": "number"}
-                                }
-                              },
-                              "relativePosition": {
-                                "description": "position in selected well to apply the offset to",
-                                "enum": ["bottom", "top"]
-                              },
-                              "strategy": {
-                                "description": "movement strategy",
-                                "enum": ["arc", "direct"]
-                              }
-                            }
+                      "type": "object",
+                      "required": ["pipette", "slot", "strategy"],
+                      "properties": {
+                        "pipette": {"type": "string"},
+                        "slot": {"$ref": "#/definitions/slot"},
+                        "offset": {
+                          "description": "optional offset from slot bottom left corner, in mm",
+                          "type": "object",
+                          "required": ["x", "y", "z"],
+                          "properties": {
+                            "x": {"type": "number"},
+                            "y": {"type": "number"},
+                            "z": {"type": "number"}
                           }
-                        ]
+                        },
+                        "strategy": {
+                          "description": "movement strategy",
+                          "enum": ["arc", "direct"]
+                        }
+                      }
                     }
                   }
                 },

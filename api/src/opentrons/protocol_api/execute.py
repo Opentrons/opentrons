@@ -313,8 +313,12 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
             offset = default_values.get('touch-tip-mm-from-top', -1)
             pipette.touch_tip(location, v_offset=offset)  # type: ignore
 
-        elif command_type == 'move-to-well':
-            well_obj = _get_well(labware, params)
+        elif command_type == 'move-to-slot':
+            slot = params.get('slot')
+            if slot not in [str(s+1) for s in range(12)]:
+                raise ValueError('Invalid "slot" for "move-to-slot": {}'
+                                 .format(slot))
+            slot_obj = context.deck.position_for(slot)
 
             offset = params.get('offset', {})
             offsetPoint = Point(
@@ -324,21 +328,11 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
 
             strategy = params.get('strategy')
             if strategy not in ['arc', 'direct']:
-                raise ValueError('Invalid "strategy" for "move-to-well": "{}"'
+                raise ValueError('Invalid "strategy" for "move-to-slot": "{}"'
                                  .format(strategy))
 
-            relative_position = params.get('relativePosition')
-            relative_well = None
-            if relative_position == 'top':
-                relative_well = well_obj.top()
-            elif relative_position == 'bottom':
-                relative_well = well_obj.bottom()
-            else:
-                raise ValueError(
-                    'Invalid relativePosition for "move-to-well": {}'
-                    .format(relative_position))
             pipette.move_to(
-                relative_well._replace(point=well_obj.point + offsetPoint),
+                (slot_obj, offsetPoint),
                 strategy=strategy)
         else:
             MODULE_LOG.warning("Bad command type {}".format(command_type))
