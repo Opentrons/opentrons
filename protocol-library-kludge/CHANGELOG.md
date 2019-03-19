@@ -3,17 +3,8 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-<a name="3.8.0-alpha.1"></a>
-# [3.8.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.7.0...v3.8.0-alpha.1) (2019-03-18)
-
-**Note:** Version bump only for package protocol-library-kludge
-
-
-
-
-
-<a name="3.8.0-alpha.0"></a>
-# [3.8.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.7.0...v3.8.0-alpha.0) (2019-03-18)
+<a name="3.8.0"></a>
+# [3.8.0](https://github.com/Opentrons/opentrons/compare/v3.7.0...v3.8.0) (2019-03-19)
 
 **Note:** Version bump only for package protocol-library-kludge
 
