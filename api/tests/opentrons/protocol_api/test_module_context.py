@@ -128,7 +128,7 @@ def test_thermocycler_temp(loop):
 
 def test_module_load_labware(loop):
     ctx = papi.ProtocolContext(loop)
-    labware_name = 'generic_96_wellPlate_380_uL'
+    labware_name = 'generic_96_wellplate_380_ul'
     labware_def = json.loads(
         pkgutil.get_data('opentrons',
                          'shared_data/definitions2/{}.json'.format(

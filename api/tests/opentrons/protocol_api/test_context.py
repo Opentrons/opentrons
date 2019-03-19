@@ -217,12 +217,12 @@ def test_instrument_trash(loop, load_my_labware):
     mount = Mount.LEFT
     instr = ctx.load_instrument('p300_single', mount)
 
-    assert instr.trash_container.name == 'opentrons_1_trash_1.1_L'
+    assert instr.trash_container.name == 'opentrons_1_trash_1.1_l'
 
     new_trash = ctx.load_labware_by_name('usa_scientific_12_trough_22_mL', 2)
     instr.trash_container = new_trash
 
-    assert instr.trash_container.name == 'usa_scientific_12_trough_22_mL'
+    assert instr.trash_container.name == 'usa_scientific_12_trough_22_ml'
 
 
 def test_aspirate(loop, load_my_labware, monkeypatch):

@@ -192,7 +192,7 @@ def test_load_labware(loop):
     assert 'Source (Buffer)' in str(loaded_labware['sourcePlateId'])
     assert loaded_labware['destPlateId'] == ctx.loaded_labwares[11]
     assert 'Destination Plate' in str(loaded_labware['destPlateId'])
-    assert loaded_labware['oldPlateId'].name == 'generic_96_wellPlate_380_uL'
+    assert loaded_labware['oldPlateId'].name == 'generic_96_wellplate_380_ul'
     assert 'Test Plate' in str(loaded_labware['oldPlateId'])
 
 
