@@ -6,10 +6,19 @@
       "minimum": 0
     }
   },
-
   "type": "object",
   "additionalProperties": false,
-  "required": ["otId","deprecated","metadata","parameters","cornerOffsetFromSlot","ordering","dimensions","wells"],
+  "required": [
+    "otId",
+    "deprecated",
+    "metadata",
+    "brand",
+    "parameters",
+    "cornerOffsetFromSlot",
+    "ordering",
+    "dimensions",
+    "wells"
+  ],
   "properties": {
     "otId": {
       "description": "Unique internal ID generated using UUID",
@@ -32,7 +41,14 @@
         "displayCategory": {
           "description": "Label used in UI to categorize labware",
           "type": "string",
-          "enum": ["tipRack", "tubeRack", "trough", "trash", "wellPlate"]
+          "enum": [
+            "tipRack",
+            "tubeRack",
+            "trough",
+            "trash",
+            "wellPlate",
+            "other"
+          ]
         },
         "displayLengthUnits": {
           "type": "string"
@@ -53,6 +69,7 @@
       "type": "object",
       "description": "Also for searchability, so that users know exactly which labware this was modeled off",
       "additionalProperties": false,
+      "required": ["brand"],
       "properties": {
         "brandId": {
           "type": "array",
@@ -65,13 +82,17 @@
           "type": "string"
         }
       }
-
     },
     "parameters": {
       "type": "object",
       "description": "Internal describers used to determine pipette movement to labware",
       "additionalProperties": false,
-      "required": ["format", "isTiprack", "loadName", "isMagneticModuleCompatible"],
+      "required": [
+        "format",
+        "isTiprack",
+        "loadName",
+        "isMagneticModuleCompatible"
+      ],
       "properties": {
         "format": {
           "description": "Property to determine compatibility with multichannel pipette",
@@ -111,7 +132,6 @@
           "$ref": "#/definitions/positiveNumber"
         }
       }
-
     },
     "ordering": {
       "type": "array",
@@ -133,7 +153,6 @@
         "y": {"type": "number"},
         "z": {"type": "number"}
       }
-
     },
     "dimensions": {
       "type": "object",
@@ -152,7 +171,6 @@
         }
       }
     },
-
     "wells": {
       "type": "object",
       "description": "Unordered object of well objects with position and dimensional information",
@@ -165,15 +183,18 @@
             {"required": ["width", "length"]},
             {"required": ["diameter"]}
           ],
-          "not": {"anyOf": [
-                    {"required": ["diameter", "width"]},
-                    {"required": ["diameter", "length"]}
-          ]},
+          "not": {
+            "anyOf": [
+              {"required": ["diameter", "width"]},
+              {"required": ["diameter", "length"]}
+            ]
+          },
           "properties": {
             "depth": {"$ref": "#/definitions/positiveNumber"},
             "x": {
               "description": "XYZ calculated from bottom-left corner of slot to top-center of the well",
-              "$ref": "#/definitions/positiveNumber"},
+              "$ref": "#/definitions/positiveNumber"
+            },
             "y": {"$ref": "#/definitions/positiveNumber"},
             "z": {"$ref": "#/definitions/positiveNumber"},
             "totalLiquidVolume": {"$ref": "#/definitions/positiveNumber"},
@@ -185,13 +206,9 @@
               "type": "string",
               "enum": ["rectangular", "circular"]
             }
-
           }
         }
       }
-
     }
-
   }
-
 }

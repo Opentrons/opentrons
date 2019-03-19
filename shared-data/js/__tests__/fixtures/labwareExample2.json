@@ -7,6 +7,9 @@
     "displayVolumeUnits": "uL",
     "displayLengthUnits": "mm"
   },
+  "brand": {
+    "brand": "generic"
+  },
   "parameters": {
     "format": "irregular",
     "isTiprack": false,

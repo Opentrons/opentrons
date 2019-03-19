@@ -1,60 +1,26 @@
 // @flow
 import Ajv from 'ajv'
 import range from 'lodash/range'
+import round from 'lodash/round'
 
 import assignId from './assignId'
 import {toWellName, sortWells, splitWellsOnColumn} from '../helpers/index'
 import labwareSchema from '../../labware-json-schema/labware-schema.json'
 import {SLOT_WIDTH_MM, SLOT_LENGTH_MM} from '../constants'
 
-type Metadata = {
-  displayName: string,
-  displayCategory: string,
-  displayVolumeUnits: string,
-  displayLengthUnits?: string,
-  tags?: Array<string>,
-}
-
-type Dimensions = {
-  overallLength: number,
-  overallWidth: number,
-  overallHeight: number,
-}
-
-type Brand = {
-  brandId?: Array<string>,
-  brand: string,
-}
-
-// 1. Valid pipette type for a container (i.e. is there multi channel access?)
-// 2. Is the container a tiprack?
-type Params = {
-  format: string,
-  isTiprack: boolean,
-  tipLength?: number,
-  loadName?: string,
-  isMagneticModuleCompatible: boolean,
-  magneticModuleEngageHeight?: number,
-}
-
-type Well = {
-  depth: number,
-  shape: string,
-  diameter?: number,
-  length?: number,
-  width?: number,
-  totalLiquidVolume: number,
-}
+import type {
+  LabwareDefinition2 as Definition,
+  LabwareMetadata as Metadata,
+  LabwareDimensions as Dimensions,
+  LabwareBrand as Brand,
+  LabwareParameters as Params,
+  LabwareWell as Well,
+  LabwareOffset as Offset,
+} from '../types'
 
 type Cell = {
   row: number,
   column: number,
-}
-
-type Offset = {
-  x: number,
-  y: number,
-  z: number,
 }
 
 // This represents creating a "range" of well names with step intervals included
@@ -75,7 +41,7 @@ export type RegularLabwareProps = {
   grid: Cell,
   spacing: Cell,
   well: Well,
-  brand: Brand,
+  brand?: Brand,
 }
 
 export type IrregularLabwareProps = {
@@ -86,30 +52,22 @@ export type IrregularLabwareProps = {
   grid: Array<Cell>,
   spacing: Array<Cell>,
   well: Array<Well>,
-  brand: Brand,
   gridStart: Array<GridStart>,
-}
-
-export type Schema = {
-  otId: string,
-  deprecated: boolean,
-  metadata: Metadata,
-  dimensions: Dimensions,
-  cornerOffsetFromSlot: Offset,
-  parameters: Params,
   brand?: Brand,
-  ordering: Array<Array<string>>,
-  wells: {[wellName: string]: Well},
 }
 
-const ajv = new Ajv({
-  allErrors: true,
-  jsonPointers: true,
-})
+const ajv = new Ajv({allErrors: true, jsonPointers: true})
 const validate = ajv.compile(labwareSchema)
 
-function round (value, decimals) {
-  return Number(Math.round(Number(value + 'e' + decimals)) + 'e-' + decimals)
+function validateDefinition (definition: Definition) {
+  const valid = validate(definition)
+
+  if (!valid) {
+    console.error(validate.errors)
+    throw new Error('Produced invalid labware definition; check inputs')
+  }
+
+  return definition
 }
 
 export function _irregularWellName (
@@ -202,6 +160,7 @@ export function determineIrregularOrdering (
 
   return ordering
 }
+
 // Private helper functione to calculate the XYZ coordinates of a give well
 // Will return a nested object of all well objects for a labware
 function calculateCoordinates (
@@ -235,33 +194,35 @@ export function _calculateCornerOffset (dimensions: Dimensions): Offset {
     z: 0,
   }
 }
+
+function ensureBrand (brand?: Brand): Brand {
+  return brand || {brand: 'generic'}
+}
+
 // Generator function for labware definitions within a regular grid format
 // e.g. well plates, regular tuberacks (NOT 15_50ml) etc.
 // For further info on these parameters look at labware examples in __tests__
 // or the labware definition schema in labware-json-schema
-export function createRegularLabware (args: RegularLabwareProps): Schema {
-  const {grid, metadata, dimensions, parameters, well, spacing, offset} = args
+export function createRegularLabware (args: RegularLabwareProps): Definition {
+  const {metadata, parameters, offset, dimensions, grid, spacing, well} = args
   const ordering = determineOrdering(grid)
   const numWells = grid.row * grid.column
-  const definition: Schema = {
+  const brand = ensureBrand(args.brand)
+
+  const definition: Definition = {
     ordering,
+    brand,
+    metadata,
+    dimensions,
+    parameters,
     otId: assignId(),
     deprecated: false,
-    metadata: metadata,
     cornerOffsetFromSlot: _calculateCornerOffset(dimensions),
-    dimensions: dimensions,
-    parameters: parameters,
     wells: calculateCoordinates(well, ordering, spacing, offset),
   }
 
-  let brand = 'generic'
-  if (args.brand) {
-    definition.brand = args.brand
-    brand = args.brand.brand
-  }
-
   definition.parameters.loadName = [
-    brand,
+    brand.brand,
     numWells,
     metadata.displayCategory,
     well.totalLiquidVolume,
@@ -270,60 +231,40 @@ export function createRegularLabware (args: RegularLabwareProps): Schema {
     .join('_')
     .toLowerCase()
 
-  const valid = validate(definition)
-
-  if (valid !== true) {
-    console.error(validate.errors)
-    throw new Error('1 or more required arguments missing from input.')
-  }
-
-  return definition
+  return validateDefinition(definition)
 }
 
 // Generator function for labware definitions within an irregular grid format
 // e.g. crystalization plates, 15_50ml tuberacks and anything with multiple "grids"
-export function createIrregularLabware (args: IrregularLabwareProps): Schema {
-  const wellsArray = determineLayout(
-    args.grid,
-    args.spacing,
-    args.offset,
-    args.gridStart,
-    args.well
-  )
+export function createIrregularLabware (
+  args: IrregularLabwareProps
+): Definition {
+  const {metadata, offset, dimensions, grid, spacing, well, gridStart} = args
+  const wells = determineLayout(grid, spacing, offset, gridStart, well)
+  const ordering = determineIrregularOrdering(Object.keys(wells))
+  const brand = ensureBrand(args.brand)
+  const parameters = {...args.parameters, format: 'irregular'}
 
-  const ordering = determineIrregularOrdering(Object.keys(wellsArray))
-
-  const definition: Schema = {
+  const definition: Definition = {
+    wells,
     ordering,
+    brand,
+    metadata,
+    dimensions,
+    parameters,
     otId: assignId(),
     deprecated: false,
-    metadata: args.metadata,
-    cornerOffsetFromSlot: _calculateCornerOffset(args.dimensions),
-    dimensions: args.dimensions,
-    parameters: {
-      ...args.parameters,
-      format: 'irregular',
-    },
-    wells: wellsArray,
+    cornerOffsetFromSlot: _calculateCornerOffset(dimensions),
   }
-
-  // TODO: Handle spaces in brand name
-  const brand = (args.brand && args.brand.brand) || 'generic'
-  if (args.brand) definition.brand = args.brand
 
   // generate loadName based on numwells per grid type
   definition.parameters.loadName = _generateIrregularLoadName({
-    grid: args.grid,
-    well: args.well,
-    units: args.metadata.displayVolumeUnits,
-    displayCategory: args.metadata.displayCategory,
-    brand,
+    grid,
+    well,
+    units: metadata.displayVolumeUnits,
+    displayCategory: metadata.displayCategory,
+    brand: brand.brand,
   })
 
-  const valid = validate(definition)
-  if (valid !== true) {
-    console.error(validate.errors)
-    throw new Error('1 or more required arguments missing from input.')
-  }
-  return definition
+  return validateDefinition(definition)
 }
