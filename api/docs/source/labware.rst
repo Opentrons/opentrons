@@ -453,7 +453,7 @@ Unique names are useful in a few scenarios. First, they allow the labware to hav
 
     Calibration data refers to the saved positions for each labware on deck, and is a part of the `Opentrons App calibration procedure`__.
 
-__ https://support.opentrons.com/ot-2/getting-started-software-setup/running-your-first-ot-2-protocol
+__ https://support.opentrons.com/guide-for-getting-started-with-the-ot-2/6-calibrate-the-ot-2/b-pipette-and-labware-calibration
 
 Create
 ======
