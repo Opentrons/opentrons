@@ -31,7 +31,7 @@
     "metadata": {
         "displayLengthUnits": "mm",
         "displayVolumeUnits": "mL",
-        "displayCategory": "tuberack",
+        "displayCategory": "tubeRack",
         "displayName": "Opentrons 15 mL tuberack",
         "tags": [
             "15",

@@ -43,7 +43,7 @@
         "displayName": "Aluminum 2mL block",
         "displayVolumeUnits": "mL",
         "displayLengthUnits": "mm",
-        "displayCategory": "tuberack"
+        "displayCategory": "tubeRack"
     },
     "cornerOffsetFromSlot": {
         "x": -0.01,

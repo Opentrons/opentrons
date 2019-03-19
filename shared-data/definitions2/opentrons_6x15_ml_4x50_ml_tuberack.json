@@ -23,7 +23,7 @@
     "deprecated": false,
     "metadata": {
         "displayName": "Opentrons 15x50mL tuberack",
-        "displayCategory": "tuberack",
+        "displayCategory": "tubeRack",
         "displayVolumeUnits": "mL",
         "displayLengthUnits": "mm",
         "tags": [

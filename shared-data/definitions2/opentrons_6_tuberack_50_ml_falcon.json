@@ -18,7 +18,7 @@
     "metadata": {
         "displayLengthUnits": "mm",
         "displayVolumeUnits": "mL",
-        "displayCategory": "tuberack",
+        "displayCategory": "tubeRack",
         "displayName": "Opentrons 50 mL tuberack",
         "tags": [
             "50",

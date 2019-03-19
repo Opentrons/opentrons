@@ -127,7 +127,7 @@
         "displayName": "Aluminum PCR block 200uL",
         "displayVolumeUnits": "uL",
         "displayLengthUnits": "mm",
-        "displayCategory": "tuberack"
+        "displayCategory": "tubeRack"
     },
     "cornerOffsetFromSlot": {
         "x": -0.01,

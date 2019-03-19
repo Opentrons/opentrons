@@ -127,7 +127,7 @@
         "displayName": "Opentrons GEB 10uL Tiprack",
         "displayVolumeUnits": "uL",
         "displayLengthUnits": "mm",
-        "displayCategory": "tiprack",
+        "displayCategory": "tipRack",
         "tags": [
             "GEB",
             "tiprack",

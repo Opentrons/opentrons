@@ -127,7 +127,7 @@
         "displayName": "epT.I.P.S. 0.1-10 uL tiprack",
         "displayVolumeUnits": "uL",
         "displayLengthUnits": "mm",
-        "displayCategory": "tiprack",
+        "displayCategory": "tipRack",
         "tags": [
             "SBS",
             "tips",

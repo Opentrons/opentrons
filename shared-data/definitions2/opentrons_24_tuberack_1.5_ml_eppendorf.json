@@ -50,7 +50,7 @@
         "displayName": "Opentrons snapcap 1.5mL tuberack",
         "displayVolumeUnits": "mL",
         "displayLengthUnits": "mm",
-        "displayCategory": "tuberack"
+        "displayCategory": "tubeRack"
     },
     "cornerOffsetFromSlot": {
         "x": 0.01,
