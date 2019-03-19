@@ -29,12 +29,12 @@ MODULE_TYPES = {cls.name(): cls
                 for cls in AbstractModule.__subclasses__()}  # type: ignore
 
 
-def build(
+async def build(
         port: str,
         which: str,
         simulating: bool,
         interrupt_callback) -> AbstractModule:
-    return MODULE_TYPES[which].build(
+    return await MODULE_TYPES[which].build(
         port, interrupt_callback=interrupt_callback, simulating=simulating)
 
 

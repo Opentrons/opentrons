@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 import threading
@@ -215,13 +216,13 @@ class Thermocycler:
         self._lid_status = None
         self._interrupt_cb = interrupt_callback
 
-    def connect(self, port: str) -> 'Thermocycler':
+    async def connect(self, port: str) -> 'Thermocycler':
         self.disconnect()
         self._poller = TCPoller(
             port, self._interrupt_callback, self._temp_status_update_callback)
 
         # Check initial device lid state
-        _lid_status_res = self._write_and_wait(GCODES['GET_LID_STATUS'])
+        _lid_status_res = await self._write_and_wait(GCODES['GET_LID_STATUS'])
         if _lid_status_res:
             self._lid_status = _lid_status_res.split()[-1].lower()
         return self
@@ -241,20 +242,20 @@ class Thermocycler:
             return False
         return self._poller.is_alive()
 
-    def open(self):
-        self._write_and_wait(GCODES['OPEN_LID'])
+    async def open(self):
+        await self._write_and_wait(GCODES['OPEN_LID'])
         self._lid_status = 'open'
 
-    def close(self):
-        self._write_and_wait(GCODES['CLOSE_LID'])
+    async def close(self):
+        await self._write_and_wait(GCODES['CLOSE_LID'])
         self._lid_status = 'closed'
 
-    def set_temperature(self, temp, hold_time=None, ramp_rate=None):
+    async def set_temperature(self, temp, hold_time=None, ramp_rate=None):
         if ramp_rate:
             ramp_cmd = '{} S{}'.format(GCODES['SET_RAMP_RATE'], ramp_rate)
-            self._write_and_wait(ramp_cmd)
+            await self._write_and_wait(ramp_cmd)
         temp_cmd = _build_temp_code(temp, hold_time)
-        self._write_and_wait(temp_cmd)
+        await self._write_and_wait(temp_cmd)
 
     def _temp_status_update_callback(self, temperature_response):
         # Payload is shaped like `T:95.0 C:77.4 H:600` where T is the
@@ -310,14 +311,14 @@ class Thermocycler:
     def lid_status(self):
         return self._lid_status
 
-    def get_device_info(self):
-        _device_info_res = self._write_and_wait(GCODES['DEVICE_INFO'])
+    async def get_device_info(self):
+        _device_info_res = await self._write_and_wait(GCODES['DEVICE_INFO'])
         if _device_info_res:
             return utils.parse_device_information(_device_info_res)
         else:
             return None
 
-    def _write_and_wait(self, command):
+    async def _write_and_wait(self, command):
         ret = None
 
         def cb(cmd):
@@ -327,6 +328,7 @@ class Thermocycler:
         self._poller.send(command, cb)
 
         while None is ret:
+            await asyncio.sleep(0.05)
             pass
         return ret
 
