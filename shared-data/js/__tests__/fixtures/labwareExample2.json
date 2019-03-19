@@ -13,7 +13,7 @@
   "parameters": {
     "format": "irregular",
     "isTiprack": false,
-    "loadName": "6_wellplate_100_ul",
+    "loadName": "generic_6_wellplate_100_ul",
     "isMagneticModuleCompatible": false
   },
   "cornerOffsetFromSlot": {

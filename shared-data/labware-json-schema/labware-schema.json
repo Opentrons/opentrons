@@ -178,7 +178,7 @@
         "['A' - 'Z'][*]": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["depth", "x", "y", "z", "shape"],
+          "required": ["depth", "shape", "totalLiquidVolume", "x", "y", "z"],
           "oneOf": [
             {"required": ["width", "length"]},
             {"required": ["diameter"]}

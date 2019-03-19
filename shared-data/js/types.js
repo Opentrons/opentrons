@@ -64,10 +64,10 @@ export type LabwareOffset = {|
 // 1. Valid pipette type for a container (i.e. is there multi channel access?)
 // 2. Is the container a tiprack?
 export type LabwareParameters = {|
+  loadName: string,
   format: string,
   isTiprack: boolean,
   tipLength?: number,
-  loadName?: string,
   isMagneticModuleCompatible: boolean,
   magneticModuleEngageHeight?: number,
 |}
@@ -80,10 +80,13 @@ export type LabwareBrand = {|
 export type LabwareWell = {|
   depth: number,
   shape: string,
+  totalLiquidVolume: number,
+  x: number,
+  y: number,
+  z: number,
   diameter?: number,
   length?: number,
   width?: number,
-  totalLiquidVolume: number,
 |}
 
 // TODO(mc, 2019-03-18): this should eventually replace LabwareDefinition
