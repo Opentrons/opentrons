@@ -132,7 +132,7 @@ def test_module_load_labware(loop):
     labware_def = json.loads(
         pkgutil.get_data('opentrons',
                          'shared_data/definitions2/{}.json'.format(
-                             labware_name)))
+                             labware_name.lower())))
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'tempdeck')]
     mod = ctx.load_module('Temperature Module', 1)
@@ -156,7 +156,7 @@ def test_magdeck_labware_props(loop):
     labware_def = json.loads(
         pkgutil.get_data('opentrons',
                          'shared_data/definitions2/{}.json'.format(
-                             labware_name)))
+                             labware_name.lower())))
     ctx._hw_manager.hardware._backend._attached_modules = [('mod0', 'magdeck')]
     mod = ctx.load_module('magdeck', 1)
     assert mod.labware is None

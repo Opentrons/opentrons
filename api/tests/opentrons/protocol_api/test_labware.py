@@ -189,10 +189,7 @@ def test_tip_tracking_init():
         assert well.has_tip
 
     labware_name = 'generic_96_wellPlate_380_uL'
-    labware_def = json.loads(
-        pkgutil.get_data('opentrons',
-                         'shared_data/definitions2/{}.json'.format(
-                             labware_name)))
+    labware_def = labware.load_definition_by_name(labware_name)
     lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
     assert not lw.is_tiprack
     for well in lw.wells():
