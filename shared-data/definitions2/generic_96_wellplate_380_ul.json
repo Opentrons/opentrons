@@ -149,7 +149,7 @@
     "parameters": {
         "format": "96Standard",
         "isTiprack": false,
-        "loadName": "generic_96_wellPlate_380_uL",
+        "loadName": "generic_96_wellplate_380_ul",
         "isMagneticModuleCompatible": false
     },
     "wells": {

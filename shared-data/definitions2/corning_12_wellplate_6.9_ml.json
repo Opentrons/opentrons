@@ -50,7 +50,7 @@
         "format": "irregular",
         "isTiprack": false,
         "isMagneticModuleCompatible": false,
-        "loadName": "corning_12_wellPlate_6.9_mL"
+        "loadName": "corning_12_wellplate_6.9_ml"
     },
     "wells": {
         "C1": {

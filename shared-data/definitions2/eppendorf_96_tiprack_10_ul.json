@@ -151,7 +151,7 @@
         "isMagneticModuleCompatible": false,
         "tipLength": 34,
         "tipOverlap": 1,
-        "loadName": "eppendorf_96_tiprack_10_uL"
+        "loadName": "eppendorf_96_tiprack_10_ul"
     },
     "wells": {
         "H1": {

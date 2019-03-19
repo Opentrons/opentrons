@@ -66,7 +66,7 @@
         "format": "irregular",
         "isTiprack": false,
         "isMagneticModuleCompatible": false,
-        "loadName": "opentrons_24_tuberack_1.5_mL_eppendorf"
+        "loadName": "opentrons_24_tuberack_1.5_ml_eppendorf"
     },
     "wells": {
         "D1": {

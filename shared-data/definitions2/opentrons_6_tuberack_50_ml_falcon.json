@@ -41,7 +41,7 @@
     "parameters": {
         "format": "irregular",
         "isTiprack": false,
-        "loadName": "opentrons_6_tuberack_50_mL_falcon",
+        "loadName": "opentrons_6_tuberack_50_ml_falcon",
         "isMagneticModuleCompatible": false
     },
     "wells": {

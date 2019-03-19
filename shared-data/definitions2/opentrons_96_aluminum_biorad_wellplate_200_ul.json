@@ -143,7 +143,7 @@
         "format": "96Standard",
         "isTiprack": false,
         "isMagneticModuleCompatible": false,
-        "loadName": "opentrons_96_aluminum_biorad_plate_200_uL"
+        "loadName": "opentrons_96_aluminum_biorad_wellplate_200_ul"
     },
     "wells": {
         "H1": {
