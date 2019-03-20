@@ -229,7 +229,9 @@ Array [
     >
       <div
         className="content_container"
-      />
+      >
+        LabwareList
+      </div>
     </section>
   </div>,
 ]

@@ -9,12 +9,12 @@
 }
 
 .labware_guide {
-  border-bottom: 1px solid var(--c-charcoal);
+  border-bottom: var(--bd-light);
   padding-bottom: var(--spacing-6);
 }
 
 .labware_guide_container {
-  border: 1px solid var(--c-charcoal);
+  border: var(--bd-light);
   border-radius: 3px;
   padding: var(--spacing-4) var(--spacing-6);
 }

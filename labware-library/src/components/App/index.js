@@ -5,6 +5,7 @@ import {hot} from 'react-hot-loader/root'
 
 import Nav from '../Nav'
 import Sidebar from '../Sidebar'
+import LabwareList from '../LabwareList'
 import styles from './styles.css'
 
 export function App () {
@@ -14,7 +15,9 @@ export function App () {
       <div className={styles.page}>
         <Sidebar />
         <section className={styles.content}>
-          <div className={styles.content_container} />
+          <div className={styles.content_container}>
+            <LabwareList />
+          </div>
         </section>
       </div>
     </React.Fragment>

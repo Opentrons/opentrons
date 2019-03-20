@@ -22,7 +22,10 @@ module.exports = {
       plugins: ['react-hot-loader/babel'],
     },
     test: {
-      plugins: ['@babel/plugin-transform-modules-commonjs'],
+      plugins: [
+        '@babel/plugin-transform-modules-commonjs',
+        ['babel-plugin-dynamic-import-node', {noInterop: true}],
+      ],
     },
   },
   plugins: [
