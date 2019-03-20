@@ -60,6 +60,7 @@ def _write_to_device_and_return(cmd, ack, device_connection):
     - return parsed response'''
     log.debug('Write -> {}'.format(cmd.encode()))
     device_connection.write(cmd.encode())
+    log.debug(f"After write -> cmd encoded: {cmd.encode()}, connection: {device_connection}, ack: {ack}")
     response = device_connection.read_until(ack.encode())
     log.debug('Read <- {}'.format(response))
     if ack.encode() not in response:
