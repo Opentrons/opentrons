@@ -4,7 +4,6 @@
   "description": "React components library for Opentrons' projects",
   "main": "src/index.js",
   "style": "src/index.css",
-  "sideEffects": false,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Opentrons/opentrons.git"
