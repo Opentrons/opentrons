@@ -44,6 +44,27 @@
         "units": "mm",
         "type": "float"
       },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
+        "type": "float"
+      },
       "modelOffset": [0.0, 0.0, -13],
       "plungerCurrent": {
         "value": 0.3,
@@ -142,6 +163,27 @@
         "min": 1,
         "max": 30,
         "units": "mm",
+        "type": "float"
+      },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, -13],
@@ -246,6 +288,27 @@
         "units": "mm",
         "type": "float"
       },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
+        "type": "float"
+      },
       "modelOffset": [0.0, 0.0, -13],
       "ulPerMm": [
         {
@@ -345,6 +408,27 @@
         "min": 1,
         "max": 30,
         "units": "mm",
+        "type": "float"
+      },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
@@ -447,6 +531,27 @@
         "units": "mm",
         "type": "float"
       },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
+        "type": "float"
+      },
       "modelOffset": [0.0, 31.5, -25.8],
       "ulPerMm": [
         {
@@ -545,6 +650,27 @@
         "min": 1,
         "max": 30,
         "units": "mm",
+        "type": "float"
+      },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
@@ -647,6 +773,27 @@
         "units": "mm",
         "type": "float"
       },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
+        "type": "float"
+      },
       "modelOffset": [0.0, 0.0, 0.0],
       "ulPerMm": [
         {
@@ -743,6 +890,27 @@
         "min": 1,
         "max": 30,
         "units": "mm",
+        "type": "float"
+      },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 0.0],
@@ -843,6 +1011,27 @@
         "units": "mm",
         "type": "float"
       },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
+        "type": "float"
+      },
       "modelOffset": [0.0, 0.0, 0.0],
       "ulPerMm": [
         {
@@ -939,6 +1128,27 @@
         "min": 1,
         "max": 30,
         "units": "mm",
+        "type": "float"
+      },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
@@ -1039,6 +1249,27 @@
         "units": "mm",
         "type": "float"
       },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
+        "type": "float"
+      },
       "modelOffset": [0.0, 31.5, -25.8],
       "ulPerMm": [
         {
@@ -1137,6 +1368,27 @@
         "units": "mm",
         "type": "float"
       },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
+        "type": "float"
+      },
       "modelOffset": [0.0, 31.5, -25.8],
       "ulPerMm": [
         {
@@ -1233,6 +1485,27 @@
         "min": 1,
         "max": 30,
         "units": "mm",
+        "type": "float"
+      },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 0.0],
@@ -1337,6 +1610,27 @@
         "units": "mm",
         "type": "float"
       },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
+        "type": "float"
+      },
       "modelOffset": [0.0, 0.0, 0.0],
       "ulPerMm": [
         {
@@ -1437,6 +1731,27 @@
         "min": 1,
         "max": 30,
         "units": "mm",
+        "type": "float"
+      },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 0.0],
@@ -1541,6 +1856,27 @@
         "units": "mm",
         "type": "float"
       },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
+        "type": "float"
+      },
       "modelOffset": [0.0, 31.5, -25.8],
       "ulPerMm": [
         {
@@ -1625,6 +1961,27 @@
         "min": 1,
         "max": 30,
         "units": "mm",
+        "type": "float"
+      },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
         "type": "float"
       },
       "modelOffset": [0.0, 31.5, -25.8],
@@ -1713,6 +2070,27 @@
         "units": "mm",
         "type": "float"
       },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
+        "type": "float"
+      },
       "modelOffset": [0.0, 31.5, -25.8],
       "ulPerMm": [
         {
@@ -1797,6 +2175,27 @@
         "min": 1,
         "max": 30,
         "units": "mm",
+        "type": "float"
+      },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
         "type": "float"
       },
       "modelOffset": [0.0, 0.0, 20.0],
@@ -1889,6 +2288,27 @@
         "units": "mm",
         "type": "float"
       },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
+        "type": "float"
+      },
       "modelOffset": [0.0, 0.0, 20.0],
       "ulPerMm": [
         {
@@ -1979,6 +2399,27 @@
         "units": "mm",
         "type": "float"
       },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 50,
+        "units": "mm/s",
+        "type": "float"
+      },
       "modelOffset": [0.0, 0.0, 20.0],
       "ulPerMm": [
         {
@@ -2026,6 +2467,6 @@
       }
     }
   },
-  "mutableConfigs": ["top", "bottom", "blowout", "dropTip", "pickUpCurrent", "pickUpDistance", "plungerCurrent", "dropTipCurrent", "dropTipSpeed", "tipLength", "defaultAspirateFlowRate", "defaultDispenseFlowRate"]
+  "mutableConfigs": ["top", "bottom", "blowout", "dropTip", "pickUpCurrent", "pickUpDistance", "pickUpIncrement", "pickUpPresses", "pickUpSpeed", "plungerCurrent", "dropTipCurrent", "dropTipSpeed", "tipLength", "defaultAspirateFlowRate", "defaultDispenseFlowRate"]
 
 }

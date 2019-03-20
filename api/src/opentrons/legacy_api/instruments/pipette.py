@@ -30,8 +30,13 @@ DEFAULT_DROP_TIP_SPEED = 5
 DEFAULT_ASPIRATE_SPEED = 5
 DEFAULT_DISPENSE_SPEED = 10
 
+DEFAULT_TIP_PRESS_INCREMENT = 1
+DEFAULT_TIP_PRESS_COUNT = 3
+
 DEFAULT_TIP_PRESS_MM = 10
 DEFAULT_PLUNGE_CURRENT = 0.1
+
+DEFAULT_TIP_PICK_UP_SPEED = 30
 
 SHAKE_OFF_TIPS_SPEED = 50
 SHAKE_OFF_TIPS_DISTANCE = 2.25
@@ -128,6 +133,9 @@ class Pipette(CommandPublisher):
             plunger_positions=PLUNGER_POSITIONS,
             pick_up_current=DEFAULT_PLUNGE_CURRENT,
             pick_up_distance=DEFAULT_TIP_PRESS_MM,
+            pick_up_increment=DEFAULT_TIP_PRESS_INCREMENT,
+            pick_up_presses=DEFAULT_TIP_PRESS_COUNT,
+            pick_up_speed=DEFAULT_TIP_PICK_UP_SPEED,
             quirks=[],
             fallback_tip_length=51.7):  # TODO (andy): move to tip-rack
 
@@ -200,6 +208,9 @@ class Pipette(CommandPublisher):
         self.set_pick_up_current(DEFAULT_PLUNGE_CURRENT)
         self._pick_up_distance = pick_up_distance
         self._pick_up_current = pick_up_current
+        self._pick_up_increment = pick_up_increment
+        self._pick_up_presses = pick_up_presses
+        self._pick_up_speed = pick_up_speed
 
         self._plunger_current = plunger_current
         self._drop_tip_current = drop_tip_current
@@ -899,7 +910,7 @@ class Pipette(CommandPublisher):
         self.drop_tip(self.current_tip(), home_after=home_after)
         return self
 
-    def pick_up_tip(self, location=None, presses=3, increment=1):
+    def pick_up_tip(self, location=None, presses=None, increment=None):
         """
         Pick up a tip for the Pipette to run liquid-handling commands with
 
@@ -919,11 +930,12 @@ class Pipette(CommandPublisher):
             The number of times to lower and then raise the pipette when
             picking up a tip, to ensure a good seal (0 [zero] will result in
             the pipette hovering over the tip but not picking it up--generally
-            not desireable, but could be used for dry-run)
+            not desireable, but could be used for dry-run). Default: 3 presses
         increment: :int
             The additional distance to travel on each successive press (e.g.:
             if presses=3 and increment=1, then the first press will travel down
-            into the tip by 3.5mm, the second by 4.5mm, and the third by 5.5mm
+            into the tip by 3.5mm, the second by 4.5mm, and the third by 5.5mm.
+            Default: 1mm
 
         Returns
         -------
@@ -954,7 +966,12 @@ class Pipette(CommandPublisher):
             placeable, _ = unpack_location(location)
             self.current_tip(placeable)
 
-        presses = (1 if not helpers.is_number(presses) else presses)
+        presses = (self._pick_up_presses
+                   if not helpers.is_number(presses)
+                   else presses)
+        increment = (self._pick_up_increment
+                     if not helpers.is_number(increment)
+                     else increment)
 
         def _pick_up_tip(
                 self, location, presses, increment):
@@ -972,7 +989,7 @@ class Pipette(CommandPublisher):
 
                 self.instrument_mover.push_active_current()
                 self.instrument_mover.set_active_current(self._pick_up_current)
-                self.instrument_mover.set_speed(30)
+                self.instrument_mover.set_speed(self._pick_up_speed)
                 dist = (-1 * self._pick_up_distance) + (-1 * increment * i)
                 self.move_to(
                     self.current_tip().top(dist),
