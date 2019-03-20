@@ -1,5 +1,6 @@
 // @flow
 import Ajv from 'ajv'
+import flatten from 'lodash/flatten'
 import range from 'lodash/range'
 import round from 'lodash/round'
 
@@ -141,10 +142,7 @@ export function _generateIrregularLoadName (args: {
     return `${numWells}x${well[gridIdx].totalLiquidVolume}_${units}`
   })
 
-  return [brand, wellComboArray.join('_'), displayCategory]
-    .join('_')
-    .replace(' ', '_')
-    .toLowerCase()
+  return createName([brand, wellComboArray, displayCategory])
 }
 
 // Decide order of wells for single grid containers
@@ -204,6 +202,17 @@ function ensureBrand (brand?: Brand): Brand {
   return brand || {brand: 'generic'}
 }
 
+// joins the input array with _ to create a name, making sure to lowercase the
+// result and remove all invalid characters (allowed characters: [a-z0-9_.])
+function createName (
+  fragments: Array<string | number | Array<string | number>>
+): string {
+  return flatten(fragments)
+    .join('_')
+    .toLowerCase()
+    .replace(/[^a-z0-9_.]/g, '')
+}
+
 // Generator function for labware definitions within a regular grid format
 // e.g. well plates, regular tuberacks (NOT 15_50ml) etc.
 // For further info on these parameters look at labware examples in __tests__
@@ -213,15 +222,13 @@ export function createRegularLabware (args: RegularLabwareProps): Definition {
   const ordering = determineOrdering(grid)
   const numWells = grid.row * grid.column
   const brand = ensureBrand(args.brand)
-  const loadName = [
+  const loadName = createName([
     brand.brand,
     numWells,
     metadata.displayCategory,
     well.totalLiquidVolume,
     metadata.displayVolumeUnits,
-  ]
-    .join('_')
-    .toLowerCase()
+  ])
 
   return validateDefinition({
     ordering,

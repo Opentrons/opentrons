@@ -171,6 +171,6 @@ describe('test createIrregularLabware function', () => {
       brand: 'some brand',
     })
 
-    expect(loadName).toEqual('some_brand_6x400_ul_4x2000_ul_wellplate')
+    expect(loadName).toEqual('somebrand_6x400_ul_4x2000_ul_wellplate')
   })
 })
