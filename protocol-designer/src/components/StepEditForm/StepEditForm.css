@@ -31,19 +31,16 @@
 }
 
 .large_field {
-  font-size: var(--fs-body-1);
   width: 14rem;
   margin-right: 0.5rem;
 }
 
 .medium_field {
-  font-size: var(--fs-body-1);
   width: 12em;
   margin-right: 0.5rem;
 }
 
 .small_field {
-  font-size: var(--fs-body-1);
   width: 5rem;
   margin-right: 0.5rem;
 }
