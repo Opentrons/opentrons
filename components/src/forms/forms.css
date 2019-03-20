@@ -47,6 +47,11 @@
 
   font-weight: var(--fw-semibold);
   margin-bottom: 0.15rem;
+  text-transform: capitalize;
+
+  &::after {
+    content: ":";
+  }
 }
 
 .checkbox_icon {

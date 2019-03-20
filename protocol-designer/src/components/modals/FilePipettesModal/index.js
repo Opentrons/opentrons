@@ -46,6 +46,7 @@ const initialState = {
   },
 }
 
+// TODO: Ian 2019-03-15 use i18n for labels
 export default class FilePipettesModal extends React.Component<Props, State> {
   constructor (props: Props) {
     super(props)
@@ -140,7 +141,7 @@ export default class FilePipettesModal extends React.Component<Props, State> {
             </h2>
 
             {useProtocolFields && (
-              <FormGroup className={formStyles.stacked_row} label='Name:'>
+              <FormGroup className={formStyles.stacked_row} label='Name'>
                 <InputField
                   autoFocus
                   tabIndex={1}

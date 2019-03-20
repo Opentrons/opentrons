@@ -4,6 +4,7 @@ import React from 'react'
 
 import {IconButton, SidePanel, swatchColors} from '@opentrons/components'
 import {sortWells} from '@opentrons/shared-data'
+import i18n from '../../localization'
 import {PDTitledList, PDListItem} from '../lists'
 import StepDescription from '../StepDescription'
 import LabwareDetailsCard from './LabwareDetailsCard'
@@ -71,7 +72,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
       >
         <PDListItem className={styles.ingredient_row_header}>
           <span>Well</span>
-          <span>μL</span>
+          <span>{i18n.t('application.units.microliter')}</span>
           <span>Name</span>
           <span />
         </PDListItem>

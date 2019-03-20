@@ -30,7 +30,3 @@
 .row_wrapper {
   lost-utility: clearfix;
 }
-
-.dropdown_field {
-  font-size: var(--fs-body-1);
-}

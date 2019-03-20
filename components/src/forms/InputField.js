@@ -11,10 +11,12 @@ type Props = {
   disabled?: boolean,
   /** change handler */
   onChange?: (event: SyntheticInputEvent<*>) => mixed,
-  /** classes to apply */
+  /** classes to apply to outer element */
   className?: string,
   /** inline label text. DEPRECATED */
   label?: string,
+  /** classes to apply to inner label text div */
+  labelTextClassName?: ?string,
   /** name of field in form */
   name?: string,
   /** optional ID of <input> element */
@@ -64,7 +66,7 @@ export default function InputField (props: Props) {
 
   return (
     <label className={labelClass}>
-      <div className={styles.label_text}>
+      <div className={cx(props.labelTextClassName, styles.label_text)}>
         {props.label &&
           error && (
           <div className={styles.error_icon}>

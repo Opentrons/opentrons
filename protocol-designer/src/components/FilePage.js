@@ -31,6 +31,7 @@ type State = { isEditPipetteModalOpen: boolean }
 const DATE_ONLY_FORMAT = 'MMM DD, YYYY'
 const DATETIME_FORMAT = 'MMM DD, YYYY | h:mm A'
 
+// TODO: Ian 2019-03-15 use i18n for labels
 class FilePage extends React.Component<Props, State> {
   state = {isEditPipetteModalOpen: false}
 
@@ -56,17 +57,17 @@ class FilePage extends React.Component<Props, State> {
             render={({handleBlur, handleChange, handleSubmit, dirty, errors, setFieldValue, touched, values}) => (
               <form onSubmit={handleSubmit} className={styles.card_content}>
                 <div className={cx(formStyles.row_wrapper, formStyles.stacked_row)}>
-                  <FormGroup label='Date Created:' className={formStyles.column_1_2}>
+                  <FormGroup label='Date Created' className={formStyles.column_1_2}>
                     {values.created && moment(values.created).format(DATE_ONLY_FORMAT)}
                   </FormGroup>
 
-                  <FormGroup label='Last Exported:' className={formStyles.column_1_2}>
+                  <FormGroup label='Last Exported' className={formStyles.column_1_2}>
                     {values['last-modified'] && moment(values['last-modified']).format(DATETIME_FORMAT)}
                   </FormGroup>
                 </div>
 
                 <div className={cx(formStyles.row_wrapper, formStyles.stacked_row)}>
-                  <FormGroup label='Protocol Name:' className={formStyles.column_1_2}>
+                  <FormGroup label='Protocol Name' className={formStyles.column_1_2}>
                     <InputField
                       placeholder='Untitled'
                       name='protocol-name'
@@ -75,7 +76,7 @@ class FilePage extends React.Component<Props, State> {
                     />
                   </FormGroup>
 
-                  <FormGroup label='Organization/Author:' className={formStyles.column_1_2}>
+                  <FormGroup label='Organization/Author' className={formStyles.column_1_2}>
                     <InputField
                       name='author'
                       onChange={handleChange}
@@ -83,7 +84,7 @@ class FilePage extends React.Component<Props, State> {
                   </FormGroup>
                 </div>
 
-                <FormGroup label='Description:' className={formStyles.stacked_row}>
+                <FormGroup label='Description' className={formStyles.stacked_row}>
                   <InputField
                     name='description'
                     value={values.description}
