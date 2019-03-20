@@ -222,7 +222,9 @@ class Thermocycler:
             port, self._interrupt_callback, self._temp_status_update_callback)
 
         # Check initial device lid state
+        log.debug(f"Connected before get lid status write: {self._poller}")
         _lid_status_res = await self._write_and_wait(GCODES['GET_LID_STATUS'])
+        log.debug(f"Connected AFTER get lid status write: {_lid_status_res}")
         if _lid_status_res:
             self._lid_status = _lid_status_res.split()[-1].lower()
         return self
