@@ -129,7 +129,7 @@ class TCPoller(threading.Thread):
             elif self._connection.fileno() in _next:
                 # Lid-open interrupt
                 log.debug("Poller [{}]: interrupt".format(hash(self)))
-                res = self._connection.read_until(TC_ACK)
+                res = self._connection.read_until(SERIAL_ACK)
                 self._interrupt_callback(res)
 
             elif self._send_read_file.fileno() in _next:

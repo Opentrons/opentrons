@@ -92,6 +92,10 @@ def log_init():
                 'handlers': ['serial'],
                 'level': logging.DEBUG
             },
+            'opentrons.drivers.thermocycler.driver': {
+                'handlers': ['serial'],
+                'level': logging.DEBUG
+            },
             'opentrons.protocol_api': {
                 'handlers': ['api', 'debug'],
                 'level': level_value
