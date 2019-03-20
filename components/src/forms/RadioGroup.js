@@ -10,8 +10,6 @@ type Props = {
   onChange: (event: SyntheticInputEvent<*>) => mixed,
   /** value that is checked */
   value?: string,
-  /** opt out of label capitalization */
-  noCapitalize?: ?boolean,
   /** Array of {name, value} data with optional children */
   options?: Array<{
     name: string,
@@ -20,8 +18,10 @@ type Props = {
   }>,
   /** Show radio buttons inline instead of stacked */
   inline?: boolean,
-  /** classes to apply */
+  /** classes to apply to outer div */
   className?: string,
+  /** classes to apply to inner label text div */
+  labelTextClassName?: ?string,
   /** if is included, RadioGroup will use error style. The content of the string is ignored. */
   error?: ?string,
 }
@@ -58,7 +58,7 @@ export default function RadioGroup (props: Props) {
             checked={radio.value === props.value}
             onChange={props.onChange}
           />
-          <div className={cx(styles.label_text, {[styles.capitalize]: !props.noCapitalize})}>
+          <div className={cx(props.labelTextClassName, styles.label_text)}>
             {radio.name}</div>
           {radio.children}
         </label>

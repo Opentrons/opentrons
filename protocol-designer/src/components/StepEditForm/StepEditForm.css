@@ -64,7 +64,7 @@
 }
 
 .checkbox_field {
-  font-size: var(--fs-body-1);
+  text-transform: capitalize;
 }
 
 .captioned_field {
@@ -134,8 +134,9 @@
 }
 
 .section_header_text {
-  /* TODO IMMEDIATELY: typography.css entry for the below? */
-  color: #666; /* TODO IMMEDIATELY: name in colors.css?? */
+  /* TODO: Ian 2019-03-20: if it's reused, do typography.css entry for the below?
+  And add this color to colors.css? */
+  color: #666;
   letter-spacing: 1px;
   font-size: var(--fs-body-2);
   font-weight: var(--fw-semibold);

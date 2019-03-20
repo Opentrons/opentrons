@@ -13,12 +13,12 @@ type Props = {
   value?: boolean,
   /** classes to apply */
   className?: string,
+  /** classes to apply to inner label text div */
+  labelTextClassName?: ?string,
   /** name of field in form */
   name?: string,
   /** label text for checkbox */
   label?: string,
-  /** opt out of label capitalization */
-  noCapitalize?: ?boolean,
   /** if is included, checkbox will use error style. The content of the string is ignored. */
   error?: ?string,
   /** checkbox is disabled if value is true */
@@ -29,12 +29,12 @@ type Props = {
 
 export default function CheckboxField (props: Props) {
   const error = props.error != null
-  const labelClassName = cx(
+  const outerClassName = cx(
     styles.form_field,
     props.className,
     {[styles.checkbox_disabled]: props.disabled})
 
-  const innerClassName = cx(
+  const innerDivClassName = cx(
     styles.checkbox_icon,
     {
       [styles.error]: error,
@@ -42,8 +42,8 @@ export default function CheckboxField (props: Props) {
     })
 
   return (
-    <label className={labelClassName}>
-      <div className={innerClassName}>
+    <label className={outerClassName}>
+      <div className={innerDivClassName}>
         <Icon name={props.value ? 'checkbox-marked' : 'checkbox-blank-outline'} width='100%' />
       </div>
       <input
@@ -54,7 +54,7 @@ export default function CheckboxField (props: Props) {
         disabled={props.disabled}
         onChange={props.onChange}
       />
-      <div {...props.hoverTooltipHandlers} className={cx(styles.label_text, {[styles.capitalize]: !props.noCapitalize})}>
+      <div {...props.hoverTooltipHandlers} className={cx(props.labelTextClassName, styles.label_text)}>
         {props.label}
       </div>
     </label>
