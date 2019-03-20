@@ -1231,11 +1231,17 @@ class InstrumentContext(CommandPublisher):
     def delay(self):
         return self._ctx.delay()
 
-    def move_to(self, location: types.Location) -> 'InstrumentContext':
+    def move_to(self, location: types.Location, z_safety: float = None) -> 'InstrumentContext':
         """ Move the instrument.
 
         :param location: The location to move to.
         :type location: :py:class:`.types.Location`
+        :param z_safety: An optional height to retract the pipette to before
+                         moving. If not specified, it will be generated based
+                         on the labware from which and to which the pipette is
+                         moving; if it is 0, the pipette will move directly;
+                         and if it is non-zero, the pipette will rise to the
+                         z_safety point before moving in x and y.
         """
         if self._ctx.location_cache:
             from_lw = self._ctx.location_cache.labware
@@ -1249,7 +1255,9 @@ class InstrumentContext(CommandPublisher):
             self._hw_manager.hardware.gantry_position(
                 self._mount, critical_point=cp_override),
             from_lw)
-        moves = geometry.plan_moves(from_loc, location, self._ctx.deck)
+
+        moves = geometry.plan_moves(from_loc, location, self._ctx.deck,
+                                    z_margin_override=z_safety)
         self._log.debug("move_to: {}->{} via:\n\t{}"
                         .format(from_loc, location, moves))
         try:
