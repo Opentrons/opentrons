@@ -19,11 +19,11 @@ import ConfirmPosition from './ConfirmPosition'
 
 type OP = CalibrateDeckStartedProps
 
-type DP = {
+type DP = {|
   proceed: () => mixed,
-}
+|}
 
-type Props = OP & DP
+type Props = {...$Exact<OP>, ...DP}
 
 const TITLE = 'Deck Calibration'
 

@@ -9,14 +9,11 @@ module.exports = {
     'plugin:flowtype/recommended',
   ],
 
-  plugins: [
-    'flowtype',
-    'react',
-    'json',
-  ],
+  plugins: ['flowtype', 'react', 'json'],
 
   rules: {
-    'camelcase': 'off',
+    camelcase: 'off',
+    'object-curly-spacing': 'off',
     'comma-dangle': ['error', 'always-multiline'],
     'flowtype/delimiter-dangle': ['error', 'always-multiline'],
   },
@@ -30,7 +27,7 @@ module.exports = {
 
   settings: {
     react: {
-      version: '16.2',
+      version: '16.6',
     },
   },
 
