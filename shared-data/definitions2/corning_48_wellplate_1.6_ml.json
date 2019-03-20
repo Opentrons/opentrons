@@ -94,7 +94,7 @@
         "format": "irregular",
         "isTiprack": false,
         "isMagneticModuleCompatible": false,
-        "loadName": "corning_48_wellPlate_1.6_mL"
+        "loadName": "corning_48_wellplate_1.6_ml"
     },
     "wells": {
         "F1": {

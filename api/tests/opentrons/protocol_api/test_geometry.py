@@ -5,8 +5,8 @@ from opentrons.protocol_api.geometry import Deck, plan_moves
 from opentrons.protocol_api import labware
 from opentrons.hardware_control.types import CriticalPoint
 
-labware_name = 'generic_96_wellPlate_380_uL'
-trough_name = 'usa_scientific_12_trough_22_mL'
+labware_name = 'generic_96_wellplate_380_ul'
+trough_name = 'usa_scientific_12_trough_22_ml'
 
 
 def test_slot_names():

@@ -22,8 +22,8 @@
     "otId": "f65f2960-0f76-11e9-8659-e18ed15996f5",
     "deprecated": false,
     "metadata": {
-        "displayName": "Opentrons 15x50mL tuberack",
-        "displayCategory": "tuberack",
+        "displayName": "Opentrons 15x50mL tube rack",
+        "displayCategory": "tubeRack",
         "displayVolumeUnits": "mL",
         "displayLengthUnits": "mm",
         "tags": [
@@ -49,7 +49,7 @@
         "format": "irregular",
         "isTiprack": false,
         "isMagneticModuleCompatible": false,
-        "loadName": "opentrons_6x15_mL_4x50_mL_tuberack"
+        "loadName": "opentrons_6x15_ml_4x50_ml_tuberack"
     },
     "wells": {
           "A1": {

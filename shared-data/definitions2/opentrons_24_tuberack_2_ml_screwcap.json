@@ -37,20 +37,21 @@
             "D6"
         ]
     ],
-    "otId": "9467f4b0-fa3d-11e8-b76d-25864338afc4",
+    "otId": "e8c55910-e8f1-11e8-b93b-5f6727dde048",
     "deprecated": false,
     "metadata": {
-        "tags": [
-            "1.5",
-            "mL",
-            "eppendorf",
-            "snapcap",
-            "tuberack"
-        ],
-        "displayName": "Opentrons snapcap 1.5mL tuberack",
-        "displayVolumeUnits": "mL",
         "displayLengthUnits": "mm",
-        "displayCategory": "tuberack"
+        "displayVolumeUnits": "mL",
+        "displayCategory": "tubeRack",
+        "displayName": "Opentrons screwcap 2mL tuberack",
+        "tags": [
+            "2",
+            "mL",
+            "screwcap",
+            "tuberack",
+            "Opentrons",
+            "E&K Scientific"
+        ]
     },
     "cornerOffsetFromSlot": {
         "x": 0.01,
@@ -60,241 +61,236 @@
     "dimensions": {
         "overallLength": 127.75,
         "overallWidth": 85.5,
-        "overallHeight": 79.85
+        "overallHeight": 84.0
     },
     "parameters": {
         "format": "irregular",
         "isTiprack": false,
-        "isMagneticModuleCompatible": false,
-        "loadName": "opentrons_24_tuberack_1.5_mL_eppendorf"
+        "loadName": "opentrons_24_tuberack_2_ml_screwcap",
+        "isMagneticModuleCompatible": false
     },
     "wells": {
         "D1": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 18.21,
             "y": 17.59,
-            "z": 42.05
+            "z": 42
         },
         "C1": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 18.21,
             "y": 36.87,
-            "z": 42.05
+            "z": 42
         },
         "B1": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 18.21,
             "y": 56.15,
-            "z": 42.05
+            "z": 42
         },
         "A1": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 18.21,
             "y": 75.43,
-            "z": 42.05
+            "z": 42
         },
         "D2": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 38.1,
             "y": 17.59,
-            "z": 42.05
+            "z": 42
         },
         "C2": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 38.1,
             "y": 36.87,
-            "z": 42.05
+            "z": 42
         },
         "B2": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 38.1,
             "y": 56.15,
-            "z": 42.05
+            "z": 42
         },
         "A2": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 38.1,
             "y": 75.43,
-            "z": 42.05
+            "z": 42
         },
         "D3": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 57.99,
             "y": 17.59,
-            "z": 42.05
+            "z": 42
         },
         "C3": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 57.99,
             "y": 36.87,
-            "z": 42.05
+            "z": 42
         },
         "B3": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 57.99,
             "y": 56.15,
-            "z": 42.05
+            "z": 42
         },
         "A3": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 57.99,
             "y": 75.43,
-            "z": 42.05
+            "z": 42
         },
         "D4": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 77.88,
             "y": 17.59,
-            "z": 42.05
+            "z": 42
         },
         "C4": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 77.88,
             "y": 36.87,
-            "z": 42.05
+            "z": 42
         },
         "B4": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 77.88,
             "y": 56.15,
-            "z": 42.05
+            "z": 42
         },
         "A4": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 77.88,
             "y": 75.43,
-            "z": 42.05
+            "z": 42
         },
         "D5": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 97.77,
             "y": 17.59,
-            "z": 42.05
+            "z": 42
         },
         "C5": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 97.77,
             "y": 36.87,
-            "z": 42.05
+            "z": 42
         },
         "B5": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 97.77,
             "y": 56.15,
-            "z": 42.05
+            "z": 42
         },
         "A5": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 97.77,
             "y": 75.43,
-            "z": 42.05
+            "z": 42
         },
         "D6": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 117.66,
             "y": 17.59,
-            "z": 42.05
+            "z": 42
         },
         "C6": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 117.66,
             "y": 36.87,
-            "z": 42.05
+            "z": 42
         },
         "B6": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 117.66,
             "y": 56.15,
-            "z": 42.05
+            "z": 42
         },
         "A6": {
-            "depth": 37.8,
-            "diameter": 8.7,
+            "depth": 42,
+            "diameter": 8.5,
             "shape": "circular",
-            "totalLiquidVolume": 1.5,
+            "totalLiquidVolume": 2,
             "x": 117.66,
             "y": 75.43,
-            "z": 42.05
+            "z": 42
         }
     },
     "brand": {
         "brand": "Opentrons",
         "brandId": [
-            "022363221",
-            "022363247",
-            "022363263",
-            "022363280",
-            "022363301",
-            "022363328"
+            "649020"
         ]
     }
 }

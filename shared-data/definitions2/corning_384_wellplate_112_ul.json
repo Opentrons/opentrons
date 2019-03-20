@@ -462,7 +462,7 @@
         "format": "384Standard",
         "isTiprack": false,
         "isMagneticModuleCompatible": false,
-        "loadName": "corning_384_wellPlate_112_uL"
+        "loadName": "corning_384_wellplate_112_ul"
     },
     "wells": {
         "P1": {

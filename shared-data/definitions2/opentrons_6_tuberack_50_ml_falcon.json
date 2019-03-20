@@ -18,7 +18,7 @@
     "metadata": {
         "displayLengthUnits": "mm",
         "displayVolumeUnits": "mL",
-        "displayCategory": "tuberack",
+        "displayCategory": "tubeRack",
         "displayName": "Opentrons 50 mL tuberack",
         "tags": [
             "50",
@@ -41,7 +41,7 @@
     "parameters": {
         "format": "irregular",
         "isTiprack": false,
-        "loadName": "opentrons_6_tuberack_50_mL_falcon",
+        "loadName": "opentrons_6_tuberack_50_ml_falcon",
         "isMagneticModuleCompatible": false
     },
     "wells": {

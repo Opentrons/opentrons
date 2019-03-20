@@ -153,7 +153,7 @@
   "parameters": {
     "format": "96Standard",
     "isTiprack": false,
-    "loadName": "biorad_96_wellPlate_pcr_200_uL",
+    "loadName": "biorad_96_wellplate_pcr_200_ul",
     "isMagneticModuleCompatible": true,
     "magneticModuleEngageHeight": 18
   },

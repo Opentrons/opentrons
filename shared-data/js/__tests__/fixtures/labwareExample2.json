@@ -7,10 +7,13 @@
     "displayVolumeUnits": "uL",
     "displayLengthUnits": "mm"
   },
+  "brand": {
+    "brand": "generic"
+  },
   "parameters": {
     "format": "irregular",
     "isTiprack": false,
-    "loadName": "6_wellPlate_100_uL",
+    "loadName": "generic_6_wellplate_100_ul",
     "isMagneticModuleCompatible": false
   },
   "cornerOffsetFromSlot": {
