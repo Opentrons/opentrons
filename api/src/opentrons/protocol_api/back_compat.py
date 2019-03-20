@@ -207,27 +207,27 @@ class BCLabware:
     """ Labwares that are no longer supported in this version """
 
     LW_TRANSLATION = {
-        '12-well-plate': 'corning_12_wellPlate_6.9_mL',
-        '24-well-plate': 'corning_24_wellPlate_3.4_mL',
-        '384-plate': 'corning_384_wellPlate_112_uL',
-        '48-well-plate': 'corning_48_wellPlate_1.6_mL',
-        '6-well-plate': 'corning_6_wellPlate_16.8_mL',
-        '96-PCR-flat': 'biorad_96_wellPlate_pcr_200_uL',
-        '96-flat': 'generic_96_wellPlate_380_uL',
-        'biorad-hardshell-96-PCR': 'biorad_96_wellPlate_pcr_200_uL',
-        'opentrons-aluminum-block-2ml-eppendorf': 'opentrons_24_aluminum_tuberack_2_mL',       # noqa(E501)
-        'opentrons-aluminum-block-2ml-screwcap': 'opentrons_24_aluminum_tuberack_2_mL',        # noqa(E501)
-        'opentrons-aluminum-block-96-PCR-plate': 'opentrons_96_aluminum_biorad_plate_200_uL',  # noqa(E501)
-        'opentrons-tiprack-300ul': 'opentrons_96_tiprack_300_uL',
-        'opentrons-tuberack-1.5ml-eppendorf': 'opentrons_24_tuberack_1.5_mL_eppendorf',        # noqa(E501)
-        'opentrons-tuberack-15_50ml': 'opentrons_6x15_mL_4x50_mL_tuberack',
-        'opentrons-tuberack-15ml': 'opentrons_15_tuberack_15_mL_falcon',
-        'opentrons-tuberack-2ml-eppendorf': 'opentrons_24_tuberack_2_mL_eppendorf',            # noqa(E501)
-        'opentrons-tuberack-2ml-screwcap': 'opentrons_24_tuberack_2_mL_screwcap',              # noqa(E501)
-        'opentrons-tuberack-50ml': 'opentrons_6_tuberack_50_mL_falcon',
-        'tiprack-1000ul': 'opentrons_96_tiprack_1000_uL',
-        'tiprack-10ul': 'opentrons_96_tiprack_10_uL',
-        'trough-12row': 'usa_scientific_12_trough_22_mL'
+        '12-well-plate': 'corning_12_wellplate_6.9_ml',
+        '24-well-plate': 'corning_24_wellplate_3.4_ml',
+        '384-plate': 'corning_384_wellplate_112_ul',
+        '48-well-plate': 'corning_48_wellplate_1.6_ml',
+        '6-well-plate': 'corning_6_wellplate_16.8_ml',
+        '96-PCR-flat': 'biorad_96_wellplate_pcr_200_ul',
+        '96-flat': 'generic_96_wellplate_380_ul',
+        'biorad-hardshell-96-PCR': 'biorad_96_wellplate_pcr_200_ul',
+        'opentrons-aluminum-block-2ml-eppendorf': 'opentrons_24_aluminum_tuberack_2_ml',       # noqa(E501)
+        'opentrons-aluminum-block-2ml-screwcap': 'opentrons_24_aluminum_tuberack_2_ml',        # noqa(E501)
+        'opentrons-aluminum-block-96-PCR-plate': 'opentrons_96_aluminum_biorad_plate_200_ul',  # noqa(E501)
+        'opentrons-tiprack-300ul': 'opentrons_96_tiprack_300_ul',
+        'opentrons-tuberack-1.5ml-eppendorf': 'opentrons_24_tuberack_1.5_ml_eppendorf',        # noqa(E501)
+        'opentrons-tuberack-15_50ml': 'opentrons_6x15_ml_4x50_ml_tuberack',
+        'opentrons-tuberack-15ml': 'opentrons_15_tuberack_15_ml_falcon',
+        'opentrons-tuberack-2ml-eppendorf': 'opentrons_24_tuberack_2_ml_eppendorf',            # noqa(E501)
+        'opentrons-tuberack-2ml-screwcap': 'opentrons_24_tuberack_2_ml_screwcap',              # noqa(E501)
+        'opentrons-tuberack-50ml': 'opentrons_6_tuberack_50_ml_falcon',
+        'tiprack-1000ul': 'opentrons_96_tiprack_1000_ul',
+        'tiprack-10ul': 'opentrons_96_tiprack_10_ul',
+        'trough-12row': 'usa_scientific_12_trough_22_ml'
     }
     """ A table mapping old labware names to new labware names"""
 

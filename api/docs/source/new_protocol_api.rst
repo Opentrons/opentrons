@@ -57,8 +57,8 @@ If we were to rewrite this with the Opentrons API, it would look like the follow
     def run(protocol_context):
 
         # labware
-        plate = protocol_context.load_labware_by_name('generic_96_wellPlate_380_uL', '2')
-        tiprack = protocol_context.load_labware_by_name('opentrons_96_tiprack_300_uL', '1')
+        plate = protocol_context.load_labware_by_name('generic_96_wellplate_380_ul', '2')
+        tiprack = protocol_context.load_labware_by_name('opentrons_96_tiprack_300_ul', '1')
 
         # pipettes
         pipette = protocol_context.load_instrument('p300_single', 'left', tip_racks=[tiprack])
@@ -106,14 +106,14 @@ Labware
 
 The labware section informs the protocol context what labware is present on the robot’s deck. In this section, you define the tip racks, well plates, troughs, tubes, or anything else you’ve put on the deck.
 
-Each labware is given a name (ex: ``'generic_96_wellPlate_380_uL'``), and the slot on the robot it will be placed (ex: ``'2'``). A list of valid labware can be found in :ref:`protocol-api-valid-labware`. In this example, we’ll use ``'generic_96_wellPlate_380_uL'`` (an ANSI standard 96-well plate) and ``'opentrons_96_tiprack_300_uL'``, the Opentrons standard 300 uL tiprack.
+Each labware is given a name (ex: ``'generic_96_wellplate_380_ul'``), and the slot on the robot it will be placed (ex: ``'2'``). A list of valid labware can be found in :ref:`protocol-api-valid-labware`. In this example, we’ll use ``'generic_96_wellplate_380_ul'`` (an ANSI standard 96-well plate) and ``'opentrons_96_tiprack_300_ul'``, the Opentrons standard 300 uL tiprack.
 
 From the example above, the "labware" section looked like:
 
 .. code-block:: python
 
-    plate = protocol_context.load_labware_by_name('generic_96_wellPlate_380_uL', '2')
-    tiprack = protocol_context.load_labware_by_name('opentrons_96_tiprack_300_uL', '1')
+    plate = protocol_context.load_labware_by_name('generic_96_wellplate_380_ul', '2')
+    tiprack = protocol_context.load_labware_by_name('opentrons_96_tiprack_300_ul', '1')
 
 
 and informed the protocol context that the deck contains a 300 uL tiprack in slot 1 and a 96 well plate in slot 2.
@@ -127,49 +127,49 @@ This table lists the names of valid labwares that can be loaded with :py:meth:`.
 +-------------------------------------------+----------------------------------------+
 | API 2 Labware Name                        | API 1 Labware Name                     |
 +===========================================+========================================+
-| biorad_96_wellPlate_pcr_200_uL            | 96-pcr-flat                            |
+| biorad_96_wellplate_pcr_200_ul            | 96-pcr-flat                            |
 +-------------------------------------------+----------------------------------------+
-| corning_12_wellPlate_6.9_mL               | 12-well-plate                          |
+| corning_12_wellplate_6.9_ml               | 12-well-plate                          |
 +-------------------------------------------+----------------------------------------+
-| corning_24_wellPlate_3.4_mL               | 24-well-plate                          |
+| corning_24_wellplate_3.4_ml               | 24-well-plate                          |
 +-------------------------------------------+----------------------------------------+
-| corning_384_wellPlate_112_uL              | 384-plate                              |
+| corning_384_wellplate_112_ul              | 384-plate                              |
 +-------------------------------------------+----------------------------------------+
-| corning_48_wellPlate_1.6_mL               | 48-well-plate                          |
+| corning_48_wellplate_1.6_ml               | 48-well-plate                          |
 +-------------------------------------------+----------------------------------------+
-| corning_6_wellPlate_16.8_mL               | 6-well-plate                           |
+| corning_6_wellplate_16.8_ml               | 6-well-plate                           |
 +-------------------------------------------+----------------------------------------+
-| eppendorf_96_tiprack_1000_uL              | --                                     |
+| eppendorf_96_tiprack_1000_ul              | --                                     |
 +-------------------------------------------+----------------------------------------+
-| eppendorf_96_tiprack_10_uL                | --                                     |
+| eppendorf_96_tiprack_10_ul                | --                                     |
 +-------------------------------------------+----------------------------------------+
-| generic_96_wellPlate_380_uL               | 96-flat                                |
+| generic_96_wellplate_380_ul               | 96-flat                                |
 +-------------------------------------------+----------------------------------------+
-| opentrons_15_tuberack_15_mL_falcon        | opentrons-tubrack-15ml                 |
+| opentrons_15_tuberack_15_ml_falcon        | opentrons-tuberack-15ml                 |
 +-------------------------------------------+----------------------------------------+
-| opentrons_24_aluminum_tuberack_2_mL       | opentrons-aluminum-block-2ml-eppendorf |
+| opentrons_24_aluminum_tuberack_2_ml       | opentrons-aluminum-block-2ml-eppendorf |
 +-------------------------------------------+----------------------------------------+
-| opentrons_24_tuberack_1.5_mL_eppendorf    | opentrons-tuberack-1.5ml-eppendorf     |
+| opentrons_24_tuberack_1.5_ml_eppendorf    | opentrons-tuberack-1.5ml-eppendorf     |
 +-------------------------------------------+----------------------------------------+
-| opentrons_24_tuberack_2_mL_eppendorf      | opentrons-tuberack-2ml-eppendorf       |
+| opentrons_24_tuberack_2_ml_eppendorf      | opentrons-tuberack-2ml-eppendorf       |
 +-------------------------------------------+----------------------------------------+
-| opentrons_24_tuberack_2_mL_screwcap       | opentrons-tuberack-2ml-screwcap        |
+| opentrons_24_tuberack_2_ml_screwcap       | opentrons-tuberack-2ml-screwcap        |
 +-------------------------------------------+----------------------------------------+
-| opentrons_6_tuberack_50_mL_falcon         | opentrons-tuberack-50ml                |
+| opentrons_6_tuberack_50_ml_falcon         | opentrons-tuberack-50ml                |
 +-------------------------------------------+----------------------------------------+
-| opentrons_6x15_mL_4x50_mL_tuberack        | opentrons-tuberack-15_50ml             |
+| opentrons_6x15_ml_4x50_ml_tuberack        | opentrons-tuberack-15_50ml             |
 +-------------------------------------------+----------------------------------------+
-| opentrons_96_aluminum_biorad_plate_200_uL | opentrons-aluminum-block-96-PCR-plate  |
+| opentrons_96_aluminum_biorad_plate_200_ul | opentrons-aluminum-block-96-PCR-plate  |
 +-------------------------------------------+----------------------------------------+
-| opentrons_96_aluminum_tuberack_200_uL     | --                                     |
+| opentrons_96_aluminum_tuberack_200_ul     | --                                     |
 +-------------------------------------------+----------------------------------------+
-| opentrons_96_tiprack_1000_uL              | tiprack-1000ul                         |
+| opentrons_96_tiprack_1000_ul              | tiprack-1000ul                         |
 +-------------------------------------------+----------------------------------------+
-| opentrons_96_tiprack_10_uL                | tiprack-10ul                           |
+| opentrons_96_tiprack_10_ul                | tiprack-10ul                           |
 +-------------------------------------------+----------------------------------------+
-| opentrons_96_tiprack_300_uL               | opentrons-tiprack-300ul                |
+| opentrons_96_tiprack_300_ul               | opentrons-tiprack-300ul                |
 +-------------------------------------------+----------------------------------------+
-| usa_scientific_12_trough_22_mL            | usa_scientific_12_trough_22_mL         |
+| usa_scientific_12_trough_22_ml            | usa_scientific_12_trough_22_ml         |
 +-------------------------------------------+----------------------------------------+
 
 
@@ -213,9 +213,9 @@ A Temperature Module, for example, can be loaded and used in a protocol like thi
 
     def run(protocol_context):
         temp_mod = protocol_context.load_module('Temperature Module', '10')
-        temp_plate = temp_mod.load_labware('biorad_96_wellPlate_pcr_200_uL')
+        temp_plate = temp_mod.load_labware('biorad_96_wellplate_pcr_200_ul')
 
-        master_mix = labware.load('opentrons_6_tuberack_50_mL_falcon')
+        master_mix = labware.load('opentrons_6_tuberack_50_ml_falcon')
 
         for target_well in temp_plate.wells():
             pipette.transfer(50, master_mix.wells_by_index()['A1'], target_well)

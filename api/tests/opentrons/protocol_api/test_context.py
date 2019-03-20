@@ -345,8 +345,8 @@ def test_hw_manager(loop):
 def test_mix(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_mL_eppendorf', 1)
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 3)
+    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_ml_eppendorf', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 3)
     instr = ctx.load_instrument('p300_single', Mount.RIGHT,
                                 tip_racks=[tiprack])
 
@@ -386,8 +386,8 @@ def test_mix(loop, monkeypatch):
 def test_touch_tip_default_args(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_mL_eppendorf', 1)
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 3)
+    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_ml_eppendorf', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 3)
     instr = ctx.load_instrument('p300_single', Mount.RIGHT,
                                 tip_racks=[tiprack])
 
@@ -415,8 +415,8 @@ def test_touch_tip_default_args(loop, monkeypatch):
 def test_blow_out(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_mL_eppendorf', 1)
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 3)
+    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_ml_eppendorf', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 3)
     instr = ctx.load_instrument('p300_single', Mount.RIGHT,
                                 tip_racks=[tiprack])
 
@@ -435,9 +435,9 @@ def test_blow_out(loop, monkeypatch):
 
 def test_transfer_options(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
-    lw1 = ctx.load_labware_by_name('biorad_96_wellPlate_pcr_200_uL', 1)
-    lw2 = ctx.load_labware_by_name('generic_96_wellPlate_380_uL', 2)
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 3)
+    lw1 = ctx.load_labware_by_name('biorad_96_wellplate_pcr_200_ul', 1)
+    lw2 = ctx.load_labware_by_name('generic_96_wellplate_380_ul', 2)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 3)
     instr = ctx.load_instrument('p300_single', Mount.RIGHT,
                                 tip_racks=[tiprack])
 
