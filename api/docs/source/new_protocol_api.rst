@@ -145,7 +145,7 @@ This table lists the names of valid labwares that can be loaded with :py:meth:`.
 +-------------------------------------------+----------------------------------------+
 | generic_96_wellplate_380_ul               | 96-flat                                |
 +-------------------------------------------+----------------------------------------+
-| opentrons_15_tuberack_15_ml_falcon        | opentrons-tuberack-15ml                 |
+| opentrons_15_tuberack_15_ml_falcon        | opentrons-tuberack-15ml                |
 +-------------------------------------------+----------------------------------------+
 | opentrons_24_aluminum_tuberack_2_ml       | opentrons-aluminum-block-2ml-eppendorf |
 +-------------------------------------------+----------------------------------------+
@@ -169,7 +169,7 @@ This table lists the names of valid labwares that can be loaded with :py:meth:`.
 +-------------------------------------------+----------------------------------------+
 | opentrons_96_tiprack_300_ul               | opentrons-tiprack-300ul                |
 +-------------------------------------------+----------------------------------------+
-| usa_scientific_12_trough_22_ml            | usa_scientific_12_trough_22_ml         |
+| usa_scientific_12_trough_22_ml            | trough-12row                           |
 +-------------------------------------------+----------------------------------------+
 
 
