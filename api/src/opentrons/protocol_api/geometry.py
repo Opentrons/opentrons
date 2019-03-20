@@ -92,7 +92,7 @@ def plan_moves(
                         from_point.z,
                         deck.highest_z + lw_z_margin)
 
-    if z_margin_override is not None:
+    if z_margin_override is not None and z_margin_override >= 0.0:
         safe = z_margin_override
     # We should use the origin’s cp for the first move since it should
     # move only in z and the destination’s cp subsequently

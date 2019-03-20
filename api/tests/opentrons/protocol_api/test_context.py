@@ -63,7 +63,8 @@ def test_location_cache(loop, monkeypatch, load_my_labware):
 
     def fake_plan_move(from_loc, to_loc, deck,
                        well_z_margin=None,
-                       lw_z_margin=None):
+                       lw_z_margin=None,
+                       z_margin_override=None):
         nonlocal test_args
         test_args = (from_loc, to_loc, deck, well_z_margin, lw_z_margin)
         return [(Point(0, 1, 10), None),

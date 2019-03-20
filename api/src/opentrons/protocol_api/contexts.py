@@ -1231,7 +1231,8 @@ class InstrumentContext(CommandPublisher):
     def delay(self):
         return self._ctx.delay()
 
-    def move_to(self, location: types.Location, z_safety: float = None) -> 'InstrumentContext':
+    def move_to(self, location: types.Location, z_safety: float = None
+                ) -> 'InstrumentContext':
         """ Move the instrument.
 
         :param location: The location to move to.
