@@ -236,7 +236,7 @@ class TempDeck:
             return self._recursive_write_and_return(
                 cmd, timeout, retries)
 
-    def _recursive_update_temperature(self, retries) -> Optional[dict]:
+    def _recursive_update_temperature(self, retries):
         try:
             res = self._send_command(GCODES['GET_TEMP'])
             res = utils.parse_temperature_response(res)

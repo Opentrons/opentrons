@@ -1,6 +1,6 @@
 
 import logging
-from typing import Optional
+from typing import Optional, Mapping
 
 log = logging.getLogger(__name__)
 
@@ -62,7 +62,8 @@ def parse_key_from_substring(substring) -> str:
                 substring))
 
 
-def parse_temperature_response(temperature_string) -> dict:
+def parse_temperature_response(
+        temperature_string: str) -> Mapping[str, Optional[float]]:
     '''
     Example input: "T:none C:25"
     '''
@@ -89,7 +90,8 @@ def parse_temperature_response(temperature_string) -> dict:
     return data
 
 
-def parse_device_information(device_info_string) -> dict:
+def parse_device_information(
+        device_info_string: str) -> Mapping[str, str]:
     '''
         Parse the modules's device information response.
 

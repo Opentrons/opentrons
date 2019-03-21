@@ -14,7 +14,6 @@ class SimulatingDriver:
         self._lid_status = 'open'
 
     async def open(self):
-        print(f"FROM OPEN INSIDE SIMULATING DRIVER active: {self._active}, lid_status: {self._lid_status}")
         if self._active:
             raise ThermocyclerError(
                 'Cannot open Thermocycler while it is active')
@@ -54,7 +53,10 @@ class SimulatingDriver:
     def disconnect(self):
         self._port = None
 
-    async def set_temperature(self, temp, hold_time, ramp_rate):
+    async def set_temperature(self,
+                              temp: float,
+                              hold_time: float,
+                              ramp_rate: float) -> None:
         self._target_temp = temp
         self._hold_time = hold_time
         self._ramp_rate = ramp_rate

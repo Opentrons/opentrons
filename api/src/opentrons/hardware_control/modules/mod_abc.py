@@ -7,7 +7,7 @@ class AbstractModule(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def build(cls,
+    async def build(cls,
               port: str,
               interrupt_callback,
               simulating: bool = False) -> 'AbstractModule':

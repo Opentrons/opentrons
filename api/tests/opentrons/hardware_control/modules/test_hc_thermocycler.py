@@ -13,16 +13,16 @@ async def test_lid():
 
     assert therm.lid_status == 'open'
 
-    therm.open()
+    await therm.open()
     assert therm.lid_status == 'open'
 
-    therm.close()
+    await therm.close()
     assert therm.lid_status == 'closed'
 
-    therm.close()
+    await therm.close()
     assert therm.lid_status == 'closed'
 
-    therm.open()
+    await therm.open()
     assert therm.lid_status == 'open'
 
 

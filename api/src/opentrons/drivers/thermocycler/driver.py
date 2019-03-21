@@ -153,7 +153,7 @@ class TCPoller(threading.Thread):
         self._send_command(SERIAL_ACK, timeout=DEFAULT_TC_TIMEOUT)
 
     def _send_command(self, command, timeout=DEFAULT_TC_TIMEOUT):
-        command_line = command + ' ' + SERIAL_ACK  # TC_COMMAND_TERMINATOR
+        command_line = command + ' ' + TC_COMMAND_TERMINATOR
         ret_code = self._recursive_write_and_return(
             command_line, timeout, DEFAULT_COMMAND_RETRIES)
         if ERROR_KEYWORD in ret_code.lower():
@@ -222,9 +222,7 @@ class Thermocycler:
             port, self._interrupt_callback, self._temp_status_update_callback)
 
         # Check initial device lid state
-        log.debug(f"Connected before get lid status write: {self._poller}")
         _lid_status_res = await self._write_and_wait(GCODES['GET_LID_STATUS'])
-        log.debug(f"Connected AFTER get lid status write: {_lid_status_res}")
         if _lid_status_res:
             self._lid_status = _lid_status_res.split()[-1].lower()
         return self
@@ -252,7 +250,10 @@ class Thermocycler:
         await self._write_and_wait(GCODES['CLOSE_LID'])
         self._lid_status = 'closed'
 
-    async def set_temperature(self, temp, hold_time=None, ramp_rate=None):
+    async def set_temperature(self,
+                              temp: float,
+                              hold_time: float = None,
+                              ramp_rate: float = None) -> None:
         if ramp_rate:
             ramp_cmd = '{} S{}'.format(GCODES['SET_RAMP_RATE'], ramp_rate)
             await self._write_and_wait(ramp_cmd)
@@ -321,7 +322,7 @@ class Thermocycler:
         if _device_info_res:
             return utils.parse_device_information(_device_info_res)
         else:
-            return None
+            raise ThermocyclerError("Thermocycler did not return device info")
 
     async def _write_and_wait(self, command):
         ret = None

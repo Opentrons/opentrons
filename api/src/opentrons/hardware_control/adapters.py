@@ -62,6 +62,7 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
         self._loop = checked_loop
         self._api = api
         self._call_lock = threading.Lock()
+        self._cached_sync_mods = {}
         super().__init__(
             target=self._event_loop_in_thread,
             name='SynchAdapter thread for {}'.format(repr(api)))
@@ -90,9 +91,21 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
     def discover_modules(self):
         loop = object.__getattribute__(self, '_loop')
         api = object.__getattribute__(self, '_api')
-        mod_objs = self.call_coroutine_sync(loop, api.discover_modules)
-        self._mods = mod_objs
-        return [SynchronousAdapter(mod) for mod in self._mods]
+        discovered_mods = self.call_coroutine_sync(loop, api.discover_modules)
+        async_mods = {mod.port: mod for mod in discovered_mods}
+
+        these = set(async_mods.keys())
+        known = set(self._cached_sync_mods.keys())
+        new = these - known
+        gone = known - these
+
+        for mod_port in gone:
+            self._cached_sync_mods.pop(mod_port)
+        for mod_port in new:
+            self._cached_sync_mods[mod_port] \
+                = SynchronousAdapter(async_mods[mod_port])
+
+        return list(self._cached_sync_mods.values())
 
     @staticmethod
     def call_coroutine_sync(loop, to_call, *args, **kwargs):
