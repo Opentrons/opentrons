@@ -75,12 +75,17 @@ class TempDeck(mod_abc.AbstractModule):
     Under development. API subject to change without a version bump
     """
     @classmethod
-    def build(cls, port, interrupt_callback, simulating=False):
+    async def build(cls,
+              port,
+              interrupt_callback,
+              simulating=False,
+              loop: asyncio.AbstractEventLoop = None):
+
         """ Build and connect to a TempDeck"""
         # TempDeck does not currently use interrupts, so the callback is not
         # passed on
-        mod = cls(port, simulating)
-        mod._connect()
+        mod = cls(port, simulating, loop)
+        await mod._connect()
         return mod
 
     @classmethod
@@ -91,11 +96,20 @@ class TempDeck(mod_abc.AbstractModule):
     def display_name(cls) -> str:
         return 'Temperature Deck'
 
-    def __init__(self, port, simulating):
+    def __init__(self,
+                 port,
+                 simulating,
+                 loop: asyncio.AbstractEventLoop = None) -> None:
         if simulating:
             self._driver = SimulatingDriver()
         else:
             self._driver = TempDeckDriver()
+
+        if None is loop:
+            self._loop = asyncio.get_event_loop()
+        else:
+            self._loop = loop
+
         self._port = port
         self._device_info = None
         self._poller = None
@@ -159,7 +173,7 @@ class TempDeck(mod_abc.AbstractModule):
     def interrupt_callback(self):
         return lambda x: None
 
-    def _connect(self):
+    async def _connect(self):
         """
         Connect to the 'TempDeck' port
         Planned change- will connect to the correct port in case of multiple

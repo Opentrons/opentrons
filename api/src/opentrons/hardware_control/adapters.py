@@ -87,6 +87,14 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
             if thread_loop.is_running():
                 thread_loop.call_soon_threadsafe(lambda: thread_loop.stop())
 
+    def discover_modules(self):
+        loop = object.__getattribute__(self, '_loop')
+        api = object.__getattribute__(self, '_api')
+        mod_objs = self.call_coroutine_sync(loop, api.discover_modules)
+
+        self._mods = mod_objs
+        return [SynchronousAdapter(mod) for mod in self._mods]
+
     @staticmethod
     def call_coroutine_sync(loop, to_call, *args, **kwargs):
         fut = asyncio.run_coroutine_threadsafe(to_call(*args, **kwargs), loop)

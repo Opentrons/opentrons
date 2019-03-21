@@ -1063,19 +1063,22 @@ class API(HardwareAPILike):
 
     @_log_call
     async def discover_modules(self):
+        self._log.debug("GOT TO DISCOVER_MODULES")
         discovered = {port + model: (port, model)
                       for port, model in self._backend.get_attached_modules()}
         these = set(discovered.keys())
         known = set(self._attached_modules.keys())
         new = these - known
         gone = known - these
+        self._log.debug("discovered: {}, these: {}, known: {}, new: {}, gone: {}".format(discovered, these, known, new, gone))
         for mod in gone:
             self._attached_modules.pop(mod)
         for mod in new:
             self._attached_modules[mod]\
-                = self._backend.build_module(discovered[mod][0],
-                                             discovered[mod][1],
-                                             self.pause_with_message)
+                = await self._backend.build_module(discovered[mod][0],
+                                                   discovered[mod][1],
+                                                   self.pause_with_message)
+        self._log.debug("attached: {}".format(self._attached_modules.values()))
         return list(self._attached_modules.values())
 
     @_log_call
