@@ -94,6 +94,7 @@ class MagDeck(commands.CommandPublisher):
             **self.live_data()
         }
 
+    @property
     def live_data(self):
         return {
             'status': self.status,
