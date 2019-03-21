@@ -68,7 +68,7 @@ class TempDeck(commands.CommandPublisher):
             'model': self.device_info and self.device_info.get('model'),
             'fwVersion': self.device_info and self.device_info.get('version'),
             'displayName': self.display_name(),
-            **self.live_data()
+            **self.live_data
         }
 
     @property

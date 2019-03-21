@@ -143,6 +143,14 @@ class MagDeck(mod_abc.AbstractModule):
     def interrupt_callback(self):
         return lambda x: None
 
+    @property
+    def loop(self):
+        return self._loop
+
+    @loop.setter
+    def loop(self, newLoop):
+        self._loop = newLoop
+
     # Internal Methods
 
     async def _connect(self):

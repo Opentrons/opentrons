@@ -13,13 +13,14 @@ class SimulatingDriver:
         self._port = None
         self._lid_status = 'open'
 
-    def open(self):
+    async def open(self):
+        print(f"FROM OPEN INSIDE SIMULATING DRIVER active: {self._active}, lid_status: {self._lid_status}")
         if self._active:
             raise ThermocyclerError(
                 'Cannot open Thermocycler while it is active')
         self._lid_status = 'open'
 
-    def close(self):
+    async def close(self):
         self._lid_status = 'closed'
 
     @property
@@ -53,7 +54,7 @@ class SimulatingDriver:
     def disconnect(self):
         self._port = None
 
-    def set_temperature(self, temp, hold_time, ramp_rate):
+    async def set_temperature(self, temp, hold_time, ramp_rate):
         self._target_temp = temp
         self._hold_time = hold_time
         self._ramp_rate = ramp_rate
@@ -119,14 +120,14 @@ class Thermocycler(mod_abc.AbstractModule):
     def deactivate(self):
         self._driver.deactivate()
 
-    def open(self):
+    async def open(self):
         """ Open the lid if it is closed"""
         # TODO add temperature protection if over 70 C
-        self._driver.open()
+        await self._driver.open()
 
-    def close(self):
+    async def close(self):
         """ Close the lid if it is open"""
-        self._driver.close()
+        await self._driver.close()
 
     async def set_temperature(self, temp, hold_time=None, ramp_rate=None):
         await self._driver.set_temperature(
@@ -195,6 +196,14 @@ class Thermocycler(mod_abc.AbstractModule):
         hooked in the new module instance after a firmware update.
         """
         return self._interrupt_cb
+
+    @property
+    def loop(self):
+        return self._loop
+
+    @loop.setter
+    def loop(self, newLoop):
+        self._loop = newLoop
 
     async def _connect(self):
         await self._driver.connect(self._port)

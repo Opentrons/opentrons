@@ -240,8 +240,8 @@ class ProtocolContext(CommandPublisher):
                              'tempdeck': TemperatureModuleContext,
                              'thermocycler': ThermocyclerContext}[hc_mod_name]
                 break
-        else:
-            raise KeyError(module_name)
+            else:
+                raise KeyError(module_name)
         geometry = load_module(
             hc_mod_name, self._deck_layout.position_for(location))
         mod_ctx = mod_class(self,
@@ -1541,7 +1541,7 @@ class TemperatureModuleContext(ModuleContext):
     def wait_for_temp(self):
         """ Block until the module reaches its setpoint.
         """
-        self._loop.run_until_complete(self._module.wait_for_temp())
+        self._module.wait_for_temp()
 
     @property
     def temperature(self):
@@ -1696,7 +1696,7 @@ class ThermocyclerContext(ModuleContext):
 
     def wait_for_temp(self):
         """ Block until the module reaches its setpoint"""
-        self._loop.run_until_complete(self._module.wait_for_temp())
+        self._module.wait_for_temp()
 
     @property
     def temperature(self):

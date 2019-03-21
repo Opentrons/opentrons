@@ -173,6 +173,15 @@ class TempDeck(mod_abc.AbstractModule):
     def interrupt_callback(self):
         return lambda x: None
 
+    @property
+    def loop(self):
+        return self._loop
+
+    @loop.setter
+    def loop(self, newLoop):
+        self._loop = newLoop
+
+
     async def _connect(self):
         """
         Connect to the 'TempDeck' port

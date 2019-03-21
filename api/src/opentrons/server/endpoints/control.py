@@ -131,7 +131,7 @@ async def get_attached_modules(request):
                 'model': mod.device_info and mod.device_info.get('model'),
                 'fwVersion': mod.device_info
                 and mod.device_info.get('version'),
-                **mod.live_data()
+                **mod.live_data
             }
             for mod in hw_mods
         ]
