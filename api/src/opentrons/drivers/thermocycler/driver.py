@@ -266,7 +266,10 @@ class Thermocycler:
         val_dict = {}
         data = [d.split(':') for d in temperature_response.split()]
         for datum in data:
-            val_dict[datum[0]] = datum[1]
+            cleanValue = datum[1]
+            if cleanValue == 'none':
+                cleanValue = None
+            val_dict[datum[0]] = cleanValue
 
         self._current_temp = val_dict['C']
         self._target_temp = val_dict['T']
