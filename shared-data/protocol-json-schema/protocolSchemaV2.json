@@ -350,6 +350,7 @@
                     "params": {
                       "type": "object",
                       "required": ["pipette", "slot"],
+                      "additionalProperties": false,
                       "properties": {
                         "pipette": {"type": "string"},
                         "slot": {"$ref": "#/definitions/slot"},
@@ -363,9 +364,14 @@
                             "z": {"type": "number"}
                           }
                         },
-                        "z-margin": {
-                          "description": "Optional explicit z-margin in mm. The pipette will move up to this height before moving in x/y. If omitted, will use default API behavior. If set to 0, no. This is only fully supported in API v2 - API v1 will translate 0 to strategy='direct', and >0 to strategy='arc', but API v1 will ignore the number itself",
-                          "type": "number"
+                        "z-safety": {
+                          "description": "Optional Z safety margin in mm. If this is larger than the API's default safe Z margin, it will make the arc higher. If it's smaller, it will have no effect. Specifying this for movements that would not arc (moving within the same well in the same labware) will cause an arc movement instead. This param only supported in API v2, API v1 will ignore it.",
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "force-direct": {
+                          "description": "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'z-safety' param to be ignored",
+                          "type": "boolean"
                         }
                       }
                     }

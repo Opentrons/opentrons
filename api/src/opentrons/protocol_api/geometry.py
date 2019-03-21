@@ -21,6 +21,7 @@ def plan_moves(
         deck: 'Deck',
         well_z_margin: float = 5.0,
         lw_z_margin: float = 20.0,
+        force_direct: bool = False,
         z_margin_override: float = None)\
         -> List[Tuple[types.Point,
                       Optional[CriticalPoint]]]:
@@ -40,10 +41,15 @@ def plan_moves(
     :param float lw_z_margin: How much extra Z margin to raise the cp by over
                               the bare minimum to clear different pieces of
                               labware. Default: 20mm
+    :param force_direct: If True, ignore any Z margins force a direct move
+    :param z_margin_override: When specified, this Z margin is able to raise
+                              (but never lower) the mid-arc height.
 
     :returns: A list of tuples of :py:class:`.Point` and critical point
               overrides to move through.
     """
+
+    assert z_margin_override is None or z_margin_override >= 0.0
 
     def _split_loc_labware(
             loc: types.Location) -> Tuple[Optional[Labware], Optional[Well]]:
@@ -65,14 +71,10 @@ def plan_moves(
     dest_cp_override = CriticalPoint.XY_CENTER if to_center else None
     origin_cp_override = CriticalPoint.XY_CENTER if from_center else None
 
-    if z_margin_override is not None:
-        assert z_margin_override >= 0.0
-
-    #                                       We can generate a direct move if:
-    if (z_margin_override == 0.0                    # - Overriding z margin
-        or ((to_lw and to_lw == from_lw)            # or
-            and (to_well and to_well == from_well)  # - inside the same well
-            and z_margin_override is None)):        # - Not overriding z margin
+    is_same_location = ((to_lw and to_lw == from_lw)
+                        and (to_well and to_well == from_well))
+    if (force_direct or (is_same_location and not
+                         (z_margin_override or 0) > 0)):
         # If we’re going direct, we can assume we’re already in the correct
         # cp so we can use the override without prep
         return [(to_point, dest_cp_override)]
@@ -97,20 +99,12 @@ def plan_moves(
         to_safety = deck.highest_z + lw_z_margin
         from_safety = 0.0  # (ignore since it’s in a max())
 
-    if z_margin_override:
-        # Ignore what we just calculated because the user put in an override
-        safe = max_many(
-            to_point.z,
-            from_point.z,
-            z_margin_override
-        )
-    else:
-        # Actually use what we calculated
-        safe = max_many(
-            to_point.z,
-            from_point.z,
-            to_safety,
-            from_safety)
+    safe = max_many(
+        to_point.z,
+        from_point.z,
+        to_safety,
+        from_safety,
+        z_margin_override or 0)
 
     # We should use the origin’s cp for the first move since it should
     # move only in z and the destination’s cp subsequently

@@ -223,20 +223,11 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
             slot_placeable = robot.deck[slot]
             slot_offset = (x_offset, y_offset, z_offset)
 
-            # API v1 move_to fn has 'strategy', no explicit Z-margin.
-            # Match them up the best we can...
-            z_margin = params['z-margin']
-            strategy = None
-            if z_margin == 0.0:
-                strategy = 'direct'
-            if z_margin > 0.0:
-                strategy = 'arc'
+            strategy = 'direct' if params.get('force-direct') else None
 
             # NOTE: Robot.move_to subtracts the offset from Slot.top()[1],
             # so in order not to translate our desired offset,
             # we have to compensate by adding it here :/
-            print('slot_offset', slot_offset)
-            print('top', tuple(slot_placeable.top()[1]))
             pipette.move_to(
                 (slot_placeable,
                  add(slot_offset, tuple(slot_placeable.top()[1]))),

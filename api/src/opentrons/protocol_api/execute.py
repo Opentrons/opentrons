@@ -328,7 +328,8 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
 
             pipette.move_to(
                 slot_obj.move(offsetPoint),
-                z_safety=params.get('z-margin'))
+                force_direct=params.get('force-direct'),
+                z_safety=params.get('z-safety'))
         else:
             MODULE_LOG.warning("Bad command type {}".format(command_type))
 
