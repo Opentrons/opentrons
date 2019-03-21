@@ -1,0 +1,63 @@
+@import '@opentrons/components';
+
+:root {
+  --ip-group: {
+    display: flex;
+    justify-content: flex-start;
+    border: 1px solid var(--c-med-gray);
+    height: 2rem;
+
+    &:focus-within {
+      background-color: var(--c-white);
+      box-shadow: 0 0.125rem 0.25rem 0 color(var(--c-black) alpha(0.5));
+    }
+
+    &:not(:last-child) {
+      border-bottom-width: 0;
+    }
+  }
+
+  --ip-item: {
+    flex: 1 1 calc(100% - 2rem);
+    padding: 0 1rem;
+    border: 0;
+    border-radius: 0;
+    outline: 0;
+    line-height: 2rem;
+  }
+}
+
+.ip_field_group {
+  display: flex;
+  justify-content: flex-start;
+  border: 1px solid var(--c-med-gray);
+  height: 2rem;
+
+  &:focus-within {
+    background-color: var(--c-white);
+    box-shadow: 0 0.125rem 0.25rem 0 color(var(--c-black) alpha(0.5));
+  }
+}
+
+.ip_field {
+  @apply --ip-item;
+}
+
+.ip_button {
+  padding: 0;
+  flex: 0 0 2rem;
+  border-radius: 0;
+  border-left: 1px solid var(--c-med-gray);
+}
+
+.ip_item_group {
+  @apply --ip-group;
+}
+
+.ip_item {
+  @apply --ip-item;
+
+  &:hover {
+    background-color: var(--c-highlight);
+  }
+}

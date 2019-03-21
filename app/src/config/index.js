@@ -1,6 +1,8 @@
 // @flow
 // config redux module
 import {setIn} from '@thi.ng/paths'
+import remove from 'lodash/remove'
+
 import {getShellConfig} from '../shell'
 
 import type {State, Action, ThunkAction} from '../types'
@@ -9,6 +11,8 @@ import type {LogLevel} from '../logger'
 type UrlProtocol = 'file:' | 'http:'
 
 export type UpdateChannel = 'latest' | 'beta' | 'alpha'
+
+export type DiscoveryCandidates = string | Array<string>
 
 // TODO(mc, 2018-05-17): put this type somewhere common to app and app-shell
 export type Config = {
@@ -59,7 +63,7 @@ export type Config = {
   },
 
   discovery: {
-    candidates: string | Array<string>,
+    candidates: DiscoveryCandidates,
   },
 
   // internal development flags
@@ -117,5 +121,25 @@ export function toggleDevTools (): ThunkAction {
   return (dispatch, getState) => {
     const devToolsOn = getConfig(getState()).devtools
     return dispatch(updateConfig('devtools', !devToolsOn))
+  }
+}
+
+export function addManualIp (ip: string): ThunkAction {
+  return (dispatch, getState) => {
+    const candidates = getConfig(getState()).discovery.candidates
+    const previous: ?string = [].concat(candidates).find(i => i === ip)
+    let nextCandidatesList = candidates
+    if (!previous) nextCandidatesList = nextCandidatesList.concat(ip)
+    return dispatch(updateConfig('discovery.candidates', nextCandidatesList))
+  }
+}
+
+export function removeManualIp (ip: string): ThunkAction {
+  return (dispatch, getState) => {
+    const candidates = [].concat(getConfig(getState()).discovery.candidates)
+    remove(candidates, c => {
+      return c === ip
+    })
+    return dispatch(updateConfig('discovery.candidates', candidates))
   }
 }

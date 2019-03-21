@@ -4,6 +4,8 @@ import {Link} from 'react-router-dom'
 
 import {AlertModal} from '@opentrons/components'
 import {Portal} from '../../portal'
+import ManualIpForm from './manualIpForm'
+import IpList from './IpList'
 
 export type AddManualIpProps = {
   backUrl: string,
@@ -24,6 +26,8 @@ export default function AddManualIp (props: AddManualIpProps) {
           your network administrator) should assign a static IP address to your
           robot.
         </p>
+        <ManualIpForm />
+        <IpList />
       </AlertModal>
     </Portal>
   )
