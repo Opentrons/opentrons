@@ -167,23 +167,23 @@ def test_arc_tall_point():
     check_arc_basic(from_tall_lw, no_well, lw1.wells()[4].bottom())
 
 
-def test_arc_lower_z_margin_override():
+def test_arc_lower_minimum_z_height():
     deck = Deck()
     lw1 = labware.load(labware_name, deck.position_for(1))
     tall_z = 100
-    z_margin_override = 42
+    minimum_z_height = 42
     old_top = lw1.wells()[0].top()
     tall_point = old_top.point._replace(z=tall_z)
     tall_top = old_top._replace(point=tall_point)
     to_tall = plan_moves(
         lw1.wells()[2].top(), tall_top, deck, 7.0, 15.0, False,
-        z_margin_override=z_margin_override)
+        minimum_z_height=minimum_z_height)
     check_arc_basic(to_tall, lw1.wells()[2].top(), tall_top)
     assert to_tall[0][0].z == tall_z
 
     from_tall = plan_moves(
         tall_top, lw1.wells()[3].top(), deck, 7.0, 15.0,
-        z_margin_override=z_margin_override)
+        minimum_z_height=minimum_z_height)
     check_arc_basic(from_tall, tall_top, lw1.wells()[3].top())
     assert from_tall[0][0].z == tall_z
 
@@ -193,7 +193,7 @@ def test_arc_lower_z_margin_override():
     check_arc_basic(from_tall_lw, no_well, lw1.wells()[4].bottom())
 
 
-def test_direct_z_margin_override():
+def test_direct_minimum_z_height():
     deck = Deck()
     lw1 = labware.load(labware_name, deck.position_for(1))
     from_loc = lw1.wells()[0].bottom().move(Point(x=-2))
@@ -201,7 +201,7 @@ def test_direct_z_margin_override():
     zmo = 150
     # This would normally be a direct move since it’s inside the same well,
     # but we want to check that we override it into an arc
-    moves = plan_moves(from_loc, to_loc, deck, z_margin_override=zmo)
+    moves = plan_moves(from_loc, to_loc, deck, minimum_z_height=zmo)
     assert len(moves) == 3
     assert moves[0][0].z == zmo  # equals zmo b/c 150 is max of all safe z's
     check_arc_basic(moves, from_loc, to_loc)

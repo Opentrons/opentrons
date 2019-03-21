@@ -341,7 +341,7 @@
                 },
 
                 {
-                  "description": "Move to slot command",
+                  "description": "Move to slot command. NOTE: this is an EXPERIMENTAL command, its behavior is subject to change in future releases.",
                   "type": "object",
                   "required": ["command", "params"],
                   "additionalProperties": false,
@@ -364,13 +364,13 @@
                             "z": {"type": "number"}
                           }
                         },
-                        "z-safety": {
-                          "description": "Optional Z safety margin in mm. If this is larger than the API's default safe Z margin, it will make the arc higher. If it's smaller, it will have no effect. Specifying this for movements that would not arc (moving within the same well in the same labware) will cause an arc movement instead. This param only supported in API v2, API v1 will ignore it.",
+                        "minimum-z-height": {
+                          "description": "Optional minimal Z margin in mm. If this is larger than the API's default safe Z margin, it will make the arc higher. If it's smaller, it will have no effect. Specifying this for movements that would not arc (moving within the same well in the same labware) will cause an arc movement instead. This param only supported in API v2, API v1 will ignore it.",
                           "type": "number",
                           "minimum": 0
                         },
                         "force-direct": {
-                          "description": "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'z-safety' param to be ignored",
+                          "description": "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'minimum-z-height' param to be ignored. In APIv1, this will use strategy='direct', which moves first in X/Y plane and then in Z. In API v2, a 'direct' movement is in X/Y/Z simultaneously",
                           "type": "boolean"
                         }
                       }

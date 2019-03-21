@@ -65,7 +65,7 @@ def test_location_cache(loop, monkeypatch, load_my_labware):
                        well_z_margin=None,
                        lw_z_margin=None,
                        force_direct=False,
-                       z_margin_override=None):
+                       minimum_z_height=None):
         nonlocal test_args
         test_args = (from_loc, to_loc, deck, well_z_margin, lw_z_margin)
         return [(Point(0, 1, 10), None),

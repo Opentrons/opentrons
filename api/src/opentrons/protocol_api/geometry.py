@@ -22,7 +22,7 @@ def plan_moves(
         well_z_margin: float = 5.0,
         lw_z_margin: float = 20.0,
         force_direct: bool = False,
-        z_margin_override: float = None)\
+        minimum_z_height: float = None)\
         -> List[Tuple[types.Point,
                       Optional[CriticalPoint]]]:
     """ Plan moves between one :py:class:`.Location` and another.
@@ -42,14 +42,14 @@ def plan_moves(
                               the bare minimum to clear different pieces of
                               labware. Default: 20mm
     :param force_direct: If True, ignore any Z margins force a direct move
-    :param z_margin_override: When specified, this Z margin is able to raise
+    :param minimum_z_height: When specified, this Z margin is able to raise
                               (but never lower) the mid-arc height.
 
     :returns: A list of tuples of :py:class:`.Point` and critical point
               overrides to move through.
     """
 
-    assert z_margin_override is None or z_margin_override >= 0.0
+    assert minimum_z_height is None or minimum_z_height >= 0.0
 
     def _split_loc_labware(
             loc: types.Location) -> Tuple[Optional[Labware], Optional[Well]]:
@@ -74,7 +74,7 @@ def plan_moves(
     is_same_location = ((to_lw and to_lw == from_lw)
                         and (to_well and to_well == from_well))
     if (force_direct or (is_same_location and not
-                         (z_margin_override or 0) > 0)):
+                         (minimum_z_height or 0) > 0)):
         # If we’re going direct, we can assume we’re already in the correct
         # cp so we can use the override without prep
         return [(to_point, dest_cp_override)]
@@ -104,7 +104,7 @@ def plan_moves(
         from_point.z,
         to_safety,
         from_safety,
-        z_margin_override or 0)
+        minimum_z_height or 0)
 
     # We should use the origin’s cp for the first move since it should
     # move only in z and the destination’s cp subsequently

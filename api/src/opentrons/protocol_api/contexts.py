@@ -1232,7 +1232,7 @@ class InstrumentContext(CommandPublisher):
         return self._ctx.delay()
 
     def move_to(self, location: types.Location, force_direct: bool = False,
-                z_margin_override: float = None
+                minimum_z_height: float = None
                 ) -> 'InstrumentContext':
         """ Move the instrument.
 
@@ -1240,12 +1240,12 @@ class InstrumentContext(CommandPublisher):
         :type location: :py:class:`.types.Location`
         :param force_direct: If set to true, move directly to destination
                         without arc motion.
-        :param z_margin_override: An optional height to retract the pipette to
+        :param minimum_z_height: An optional height to retract the pipette to
                          before moving. If not specified, it will be generated
                          based on the labware from which and to which the
                          pipette is moving; if it is 0, the pipette will move
                          directly; and if it is non-zero, the pipette will rise
-                         to the z_margin_override point before moving in x & y.
+                         to the minimum_z_height point before moving in x & y.
         """
         if self._ctx.location_cache:
             from_lw = self._ctx.location_cache.labware
@@ -1262,7 +1262,7 @@ class InstrumentContext(CommandPublisher):
 
         moves = geometry.plan_moves(from_loc, location, self._ctx.deck,
                                     force_direct=force_direct,
-                                    z_margin_override=z_margin_override)
+                                    minimum_z_height=minimum_z_height)
         self._log.debug("move_to: {}->{} via:\n\t{}"
                         .format(from_loc, location, moves))
         try:
