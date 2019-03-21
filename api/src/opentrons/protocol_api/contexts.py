@@ -228,20 +228,20 @@ class ProtocolContext(CommandPublisher):
     def load_module(
             self, module_name: str,
             location: types.DeckLocation) -> ModuleTypes:
+        hc_mod_name = {
+            'magdeck': 'magdeck',
+            'magnetic module': 'magdeck',
+            'tempdeck': 'tempdeck',
+            'temperature module': 'tempdeck',
+            'thermocycler': 'thermocycler'}[module_name.lower()]
         for mod in self._hw_manager.hardware.discover_modules():
-            hc_mod_name = {
-                'magdeck': 'magdeck',
-                'magnetic module': 'magdeck',
-                'tempdeck': 'tempdeck',
-                'temperature module': 'tempdeck',
-                'thermocycler': 'thermocycler'}[module_name.lower()]
             if mod.name() == hc_mod_name:
                 mod_class = {'magdeck': MagneticModuleContext,
                              'tempdeck': TemperatureModuleContext,
                              'thermocycler': ThermocyclerContext}[hc_mod_name]
                 break
-            else:
-                raise KeyError(module_name)
+        else:
+            raise KeyError(module_name)
         geometry = load_module(
             hc_mod_name, self._deck_layout.position_for(location))
         mod_ctx = mod_class(self,
