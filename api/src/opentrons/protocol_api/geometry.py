@@ -65,35 +65,53 @@ def plan_moves(
     dest_cp_override = CriticalPoint.XY_CENTER if to_center else None
     origin_cp_override = CriticalPoint.XY_CENTER if from_center else None
 
+    if z_margin_override is not None:
+        assert z_margin_override >= 0.0
+
+    #                                       We can generate a direct move if:
+    if (z_margin_override == 0.0                    # - Overriding z margin
+        or ((to_lw and to_lw == from_lw)            # or
+            and (to_well and to_well == from_well)  # - inside the same well
+            and z_margin_override is None)):        # - Not overriding z margin
+        # If we’re going direct, we can assume we’re already in the correct
+        # cp so we can use the override without prep
+        return [(to_point, dest_cp_override)]
+
+    # Generate arc moves
+
+    # Find the safe z heights based on the destination and origin labware/well
     if to_lw and to_lw == from_lw:
-        # Two valid labwares. We’ll either raise to clear a well or go direct
-        if z_margin_override == 0.0 or (to_well and to_well == from_well):
-            # If we’re going direct, we can assume we’re already in the correct
-            # cp so we can use the override without prep
-            return [(to_point, dest_cp_override)]
+        # If we know the labwares we’re moving from and to, we can calculate
+        # a safe z based on their heights
+        if to_well:
+            to_safety = to_well.top().point.z + well_z_margin
         else:
-            if to_well:
-                to_safety = to_well.top().point.z + well_z_margin
-            else:
-                to_safety = to_lw.highest_z + well_z_margin
-            if from_well:
-                from_safety = from_well.top().point.z + well_z_margin
-            else:
-                from_safety = from_lw.highest_z + well_z_margin
-
-            safe = max_many(
-                to_point.z,
-                from_point.z,
-                to_safety,
-                from_safety)
+            to_safety = to_lw.highest_z + well_z_margin
+        if from_well:
+            from_safety = from_well.top().point.z + well_z_margin
+        else:
+            from_safety = from_lw.highest_z + well_z_margin
     else:
-        # For now, the only fallback is to clear all known labware
-        safe = max_many(to_point.z,
-                        from_point.z,
-                        deck.highest_z + lw_z_margin)
+        # One of our labwares is invalid so we have to just go above
+        # deck.highest_z since we don’t know where we are
+        to_safety = deck.highest_z + lw_z_margin
+        from_safety = 0.0  # (ignore since it’s in a max())
 
-    if z_margin_override is not None and z_margin_override >= 0.0:
-        safe = z_margin_override
+    if z_margin_override:
+        # Ignore what we just calculated because the user put in an override
+        safe = max_many(
+            to_point.z,
+            from_point.z,
+            z_margin_override
+        )
+    else:
+        # Actually use what we calculated
+        safe = max_many(
+            to_point.z,
+            from_point.z,
+            to_safety,
+            from_safety)
+
     # We should use the origin’s cp for the first move since it should
     # move only in z and the destination’s cp subsequently
     return [(from_point._replace(z=safe), origin_cp_override),

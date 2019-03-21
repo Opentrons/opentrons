@@ -160,12 +160,12 @@ def test_arc_lower_z_margin_override():
     to_tall = plan_moves(
         lw1.wells()[2].top(), tall_top, deck, 7.0, 15.0, z_margin_override)
     check_arc_basic(to_tall, lw1.wells()[2].top(), tall_top, True)
-    assert to_tall[0][0].z == z_margin_override
+    assert to_tall[0][0].z == tall_z
 
     from_tall = plan_moves(
         tall_top, lw1.wells()[3].top(), deck, 7.0, 15.0, z_margin_override)
     check_arc_basic(from_tall, tall_top, lw1.wells()[3].top(), True)
-    assert from_tall[0][0].z == z_margin_override
+    assert from_tall[0][0].z == tall_z
 
     no_well = tall_top._replace(labware=lw1)
     from_tall_lw = plan_moves(no_well, lw1.wells()[4].bottom(), deck,
@@ -195,6 +195,20 @@ def test_arc_zero_z_margin_override():
     assert from_tall_lw == [(lw1.wells()[4].bottom().point, None)]
 
 
+def test_direct_z_margin_override():
+    deck = Deck()
+    lw1 = labware.load(labware_name, deck.position_for(1))
+    from_loc = lw1.wells()[0].bottom().move(Point(x=-2))
+    to_loc = lw1.wells()[0].bottom().move(Point(x=2))
+    zmo = 10
+    # This would normally be a direct move since it’s inside the same well,
+    # but we want to check that we override it into an arc
+    moves = plan_moves(from_loc, to_loc, deck, z_margin_override=zmo)
+    assert len(moves) == 3
+    assert moves[0][0].z == zmo
+    check_arc_basic(moves, from_loc, to_loc, True)
+
+
 def test_direct_cp():
     deck = Deck()
     trough = labware.load(trough_name, deck.position_for(1))
@@ -204,7 +218,6 @@ def test_direct_cp():
     from_nothing = plan_moves(Location(Point(50, 50, 50), None),
                               trough.wells()[0].top(),
                               deck)
-    # import pdb; pdb.set_trace()
     check_arc_basic(from_nothing, Location(Point(50, 50, 50), None),
                     trough.wells()[0].top())
     assert from_nothing[0][1] is None
