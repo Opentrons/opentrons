@@ -349,12 +349,12 @@
                     "command": {"enum": ["move-to-slot"]},
                     "params": {
                       "type": "object",
-                      "required": ["pipette", "slot", "strategy"],
+                      "required": ["pipette", "slot"],
                       "properties": {
                         "pipette": {"type": "string"},
                         "slot": {"$ref": "#/definitions/slot"},
                         "offset": {
-                          "description": "optional offset from slot bottom left corner, in mm",
+                          "description": "Optional offset from slot bottom left corner, in mm",
                           "type": "object",
                           "required": ["x", "y", "z"],
                           "properties": {
@@ -363,9 +363,9 @@
                             "z": {"type": "number"}
                           }
                         },
-                        "strategy": {
-                          "description": "movement strategy",
-                          "enum": ["arc", "direct"]
+                        "z-margin": {
+                          "description": "Optional explicit z-margin in mm. The pipette will move up to this height before moving in x/y. If omitted, will use default API behavior. If set to 0, no. This is only fully supported in API v2 - API v1 will translate 0 to strategy='direct', and >0 to strategy='arc', but API v1 will ignore the number itself",
+                          "type": "number"
                         }
                       }
                     }

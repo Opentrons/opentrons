@@ -326,14 +326,9 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
                 offset.get('y', 0),
                 offset.get('z', 0))
 
-            strategy = params.get('strategy')
-            if strategy not in ['arc', 'direct']:
-                raise ValueError('Invalid "strategy" for "move-to-slot": "{}"'
-                                 .format(strategy))
-
             pipette.move_to(
-                (slot_obj, offsetPoint),
-                strategy=strategy)
+                slot_obj.move(offsetPoint),
+                z_safety=params.get('z-margin'))
         else:
             MODULE_LOG.warning("Bad command type {}".format(command_type))
 
