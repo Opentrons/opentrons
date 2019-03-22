@@ -122,11 +122,11 @@ class Thermocycler(mod_abc.AbstractModule):
     def open(self):
         """ Open the lid if it is closed"""
         # TODO add temperature protection if over 70 C
-        self._driver.open()
+        return self._driver.open()
 
     def close(self):
         """ Close the lid if it is open"""
-        self._driver.close()
+        return self._driver.close()
 
     async def set_temperature(self, temp, hold_time=None, ramp_rate=None):
         await self._driver.set_temperature(

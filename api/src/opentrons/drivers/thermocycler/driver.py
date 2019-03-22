@@ -247,10 +247,12 @@ class Thermocycler:
     async def open(self):
         await self._write_and_wait(GCODES['OPEN_LID'])
         self._lid_status = 'open'
+        return self._lid_status
 
     async def close(self):
         await self._write_and_wait(GCODES['CLOSE_LID'])
         self._lid_status = 'closed'
+        return self._lid_status
 
     async def set_temperature(self, temp, hold_time=None, ramp_rate=None):
         if ramp_rate:

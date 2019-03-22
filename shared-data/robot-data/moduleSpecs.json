@@ -37,8 +37,8 @@
     },
     "thermocycler": {
         "labwareOffset": {
-            "x": 14.4,
-            "y": 20.55,
+            "x": -0.02,
+            "y": -9.3,
             "z": 103.44
         },
         "dimensions": {
@@ -48,7 +48,7 @@
         },
         "calibrationPoints": {
             "x": 14.4,
-            "y": 20.55
+            "y": 64.93
         },
         "displayName": "Full Plate Thermocycler Module",
         "loadName": "thermocycler",
@@ -56,8 +56,8 @@
     },
     "semithermocycler": {
         "labwareOffset": {
-            "x": 20.78,
-            "y": 20.55,
+            "x": -0.02,
+            "y": -9.3,
             "z": 103.44
         },
         "dimensions": {
