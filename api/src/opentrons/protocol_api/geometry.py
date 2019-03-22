@@ -20,8 +20,10 @@ def plan_moves(
         to_loc: types.Location,
         deck: 'Deck',
         well_z_margin: float = 5.0,
-        lw_z_margin: float = 20.0) -> List[Tuple[types.Point,
-                                                 Optional[CriticalPoint]]]:
+        lw_z_margin: float = 20.0,
+        z_margin_override: float = None)\
+        -> List[Tuple[types.Point,
+                      Optional[CriticalPoint]]]:
     """ Plan moves between one :py:class:`.Location` and another.
 
     Each :py:class:`.Location` instance might or might not have a specific
@@ -65,7 +67,7 @@ def plan_moves(
 
     if to_lw and to_lw == from_lw:
         # Two valid labwares. We’ll either raise to clear a well or go direct
-        if to_well and to_well == from_well:
+        if z_margin_override == 0.0 or (to_well and to_well == from_well):
             # If we’re going direct, we can assume we’re already in the correct
             # cp so we can use the override without prep
             return [(to_point, dest_cp_override)]
@@ -78,6 +80,7 @@ def plan_moves(
                 from_safety = from_well.top().point.z + well_z_margin
             else:
                 from_safety = from_lw.highest_z + well_z_margin
+
             safe = max_many(
                 to_point.z,
                 from_point.z,
@@ -89,6 +92,8 @@ def plan_moves(
                         from_point.z,
                         deck.highest_z + lw_z_margin)
 
+    if z_margin_override is not None and z_margin_override >= 0.0:
+        safe = z_margin_override
     # We should use the origin’s cp for the first move since it should
     # move only in z and the destination’s cp subsequently
     return [(from_point._replace(z=safe), origin_cp_override),

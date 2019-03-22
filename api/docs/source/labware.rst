@@ -25,7 +25,7 @@ If you are interested in using your own labware that is not included in the API,
 
 .. note::
 
-    We are in the process of revising the labware definitions used on the OT2. Documentation for previously existing definitions is left over from OT1, and is incomplete. `Check out this webpage`__ to see a visualization of all the API's legacy built-in labware definitions. For JSON protocols and APIv4 protocols, see the visualizations and descriptions under `Opentrons Labware`_.
+    We are in the process of revising the labware definitions used on the OT2. Documentation for previously existing definitions is left over from OT1, and is incomplete. `Check out this webpage`__ to see a visualization of all the API's legacy built-in labware definitions. For JSON protocols see the visualizations and descriptions under `Opentrons Labware`_.
 
 __ https://andysigler.github.io/ot-api-containerviz/
 
@@ -453,7 +453,7 @@ Unique names are useful in a few scenarios. First, they allow the labware to hav
 
     Calibration data refers to the saved positions for each labware on deck, and is a part of the `Opentrons App calibration procedure`__.
 
-__ https://support.opentrons.com/ot-2/getting-started-software-setup/running-your-first-ot-2-protocol
+__ https://support.opentrons.com/guide-for-getting-started-with-the-ot-2/6-calibrate-the-ot-2/b-pipette-and-labware-calibration
 
 Create
 ======

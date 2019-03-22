@@ -60,7 +60,7 @@ export default function LiquidEditForm (props: Props) {
               <div className={formStyles.header}>{i18n.t('form.liquid_edit.details')}</div>
               <div className={formStyles.row_wrapper}>
                 <FormGroup
-                  label={`${i18n.t('form.liquid_edit.name')}:`}
+                  label={i18n.t('form.liquid_edit.name')}
                   className={formStyles.column_1_2}>
                   <InputField
                     name='name'
@@ -71,7 +71,7 @@ export default function LiquidEditForm (props: Props) {
                   />
                 </FormGroup>
                 <FormGroup
-                  label={`${i18n.t('form.liquid_edit.description')}:`}
+                  label={i18n.t('form.liquid_edit.description')}
                   className={formStyles.column_1_2}>
                   <InputField
                     name='description'

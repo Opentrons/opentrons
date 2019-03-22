@@ -1,0 +1,10 @@
+/* mobile-first custom media queries */
+
+:root {
+  --screen-width-medium: 768px;
+  --screen-width-large: 1280px;
+}
+
+/* keep these values aligned; cannot use vars in custom-media defintions */
+@custom-media --medium (width >= 768px);
+@custom-media --large (width >= 1280px);

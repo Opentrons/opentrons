@@ -11,7 +11,25 @@ import RunTimer from './RunTimer'
 import RunControls from './RunControls'
 import TempDeckStatusCard from '../TempDeckStatusCard'
 
-const mapStateToProps = (state) => ({
+type SP = {|
+  isRunning: boolean,
+  isPaused: boolean,
+  startTime: number,
+  isReadyToRun: boolean,
+  runTime: string,
+  disabled: boolean,
+|}
+
+type DP = {|
+  onRunClick: () => mixed,
+  onPauseClick: () => mixed,
+  onResumeClick: () => mixed,
+  onResetClick: () => mixed,
+|}
+
+type Props = {...SP, ...DP}
+
+const mapStateToProps = (state): SP => ({
   isRunning: robotSelectors.getIsRunning(state),
   isPaused: robotSelectors.getIsPaused(state),
   startTime: robotSelectors.getStartTime(state),
@@ -24,14 +42,14 @@ const mapStateToProps = (state) => ({
   ),
 })
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch): DP => ({
   onRunClick: () => dispatch(robotActions.run()),
   onPauseClick: () => dispatch(robotActions.pause()),
   onResumeClick: () => dispatch(robotActions.resume()),
   onResetClick: () => dispatch(robotActions.refreshSession()),
 })
 
-function RunPanel (props) {
+function RunPanel (props: Props) {
   return (
     <SidePanel title='Execute Run'>
       <SidePanelGroup>

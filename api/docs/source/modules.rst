@@ -47,9 +47,7 @@ be done like the following:
     from opentrons import modules, robot
 
     robot.connect()
-    for module in robot.modules:
-            module.disconnect()
-    robot.modules = modules.discover_and_connect()
+    robot.discover_modules()
 
     module = modules.load('Module Name', slot)
     ... etc

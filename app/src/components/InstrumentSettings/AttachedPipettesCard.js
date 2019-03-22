@@ -22,19 +22,19 @@ import type {Pipette} from '../../http-api-client'
 
 type OP = Robot
 
-type SP = {
+type SP = {|
   inProgress: boolean,
   left: ?Pipette,
   right: ?Pipette,
   showSettings: boolean,
-}
+|}
 
-type DP = {
+type DP = {|
   fetchPipettes: () => mixed,
   clearMove: () => mixed,
-}
+|}
 
-type Props = OP & SP & DP
+type Props = {...$Exact<OP>, ...SP, ...DP}
 
 const TITLE = 'Pipettes'
 

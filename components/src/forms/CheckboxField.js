@@ -13,6 +13,8 @@ type Props = {
   value?: boolean,
   /** classes to apply */
   className?: string,
+  /** classes to apply to inner label text div */
+  labelTextClassName?: ?string,
   /** name of field in form */
   name?: string,
   /** label text for checkbox */
@@ -27,12 +29,12 @@ type Props = {
 
 export default function CheckboxField (props: Props) {
   const error = props.error != null
-  const labelClassName = cx(
+  const outerClassName = cx(
     styles.form_field,
     props.className,
     {[styles.checkbox_disabled]: props.disabled})
 
-  const innerClassName = cx(
+  const innerDivClassName = cx(
     styles.checkbox_icon,
     {
       [styles.error]: error,
@@ -40,8 +42,8 @@ export default function CheckboxField (props: Props) {
     })
 
   return (
-    <label className={labelClassName}>
-      <div className={innerClassName}>
+    <label className={outerClassName}>
+      <div className={innerDivClassName}>
         <Icon name={props.value ? 'checkbox-marked' : 'checkbox-blank-outline'} width='100%' />
       </div>
       <input
@@ -52,7 +54,7 @@ export default function CheckboxField (props: Props) {
         disabled={props.disabled}
         onChange={props.onChange}
       />
-      <div {...props.hoverTooltipHandlers} className={styles.label_text}>
+      <div {...props.hoverTooltipHandlers} className={cx(props.labelTextClassName, styles.label_text)}>
         {props.label}
       </div>
     </label>

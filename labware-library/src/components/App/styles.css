@@ -1,6 +1,42 @@
 /* app styles */
 @import '@opentrons/components';
+@import '../../styles/breakpoints.css';
+@import '../../styles/spacing.css';
 
-.title {
-  @apply --font-huge-dark;
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  /* Nav height */
+  padding-top: var(--size-2);
+}
+
+.content {
+  width: 100%;
+  padding: var(--spacing-6) var(--spacing-3);
+}
+
+@media (--medium) {
+  .page {
+    flex-direction: row;
+    overflow: hidden;
+  }
+
+  .content {
+    max-height: 100%;
+    overflow-y: auto;
+  }
+
+  .content_container {
+    margin: 0 auto;
+    max-width: var(--size-5);
+  }
+}
+
+@media (--large) {
+  .page {
+    margin: auto;
+    width: var(--screen-width-large);
+  }
 }

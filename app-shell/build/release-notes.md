@@ -1,4 +1,4 @@
-# Changes from 3.6.5 to 3.7.0
+# Changes from 3.7.0 to 3.8.0
 
 For more details, please see the full [technical change log][changelog]
 
@@ -7,13 +7,9 @@ For more details, please see the full [technical change log][changelog]
 <!-- start:@opentrons/app -->
 ## Opentrons App
 
-### Bug fixes
-
-- Added a warning message to the app update flow to remind you that you need to update your robot _after_ you update your app
-
 ### New features
 
-- The app now sends more detailed robot configuration information automatically to support chat so our Support Team can more efficiently diagnose any issues
+- You can now modify pipette configuration for attached pipettes directly from the Opentrons App. For more information see [our documentation][intercom-pipette-config].
 
 ### Known issues
 
@@ -25,59 +21,25 @@ executing, but it does not ([#2020][2020])
 [2047]: https://github.com/Opentrons/opentrons/issues/2047
 [2020]: https://github.com/Opentrons/opentrons/issues/2020
 [1828]: https://github.com/Opentrons/opentrons/issues/1828
+[intercom-pipette-config]: http://support.opentrons.com/ot-2/changing-pipette-settings
 
 <!-- end:@opentrons/app -->
 
 <!-- start:@opentrons/api -->
 ## OT2 and Protocol API
 
-This release includes updated calibrations for the **P10S**, **P10M**, **P50S**, **P50M**, and **P300S** pipettes.
-
-This update is an incremental refinement to aspiration volume accuracy, reflecting extensive additional test data. **After updating, your robot will be configured to use these new calibrations**.
-
-Please note this change may result in materially different aspiration volumes. If you do not wish to use the updated calibrations immediately (for example, if you are in the middle of an experimental run, or if you are already using a custom aspiration method), you can revert these changes by enabling _"Use older pipette calibrations"_ in your robot's _"Advanced Settings"_ menu.
-
-As always, please reach out to our team with any questions.
 
 ### Bug fixes
 
-- Updated pipette aspiration functions for increased accuracy
-- Fixed the height of the `96-flat` labware definition
-    - You will need to reset your robot's labware calibration data to pick up this change
-    - This will erase all existing calibrations as well as all custom labware, so only do it if your existing `96-flat` calibration isn't working or if you don't mind re-calibrating your other labware
-    - To reset labware calibration, go to "Robots" > your robot > "Advanced Settings" > "Factory Reset", check "Labware Calibration", and then click "Reset"
-- Made some general boot reliability improvements
+- Fixed an issue where labware calibration would get stuck if a labware with only a single well was on the deck
+- Fixed an issue where the robot would become unresponsive if the user went to the robot modules page in the Opentrons App while using a Temperature Module in a protocol
+- Fixed an issue with simulating protocols that had nested functions on the command line
+- Fixed an issue with the CLI deck calibration tool that would crash in certain command sequences and added more help information to it
+- Fixed an issue with the run log where some commands might have incorrect or non-displayed values for positions and volumes (This was [#3105][3105])
+- Fixed an issue with Temperature Modules where `wait_for_temp` would sometimes return immediately
 
-### New features
-
-- Python protocols can now be simulated from your own computer **without needing to clone our entire repository**
-    - See our [support documentation][simulation] for more details
-
-    ```
-    pip install opentrons
-    opentrons_simulate /path/to/protocol.py
-    ```
-
-- Made some underlying architectural improvements for future user-facing features
-
-[simulation]: http://support.opentrons.com/ot-2/simulating-ot-2-protocols-on-your-computer
 
 ### Known issues
-
-- Skipping optional parameters in certain protocol methods (e.g. `pipette.dispense`) in can cause labware to be missing from the calibration list and the run log to display incorrect messages ([#3105][3105])
-    - The protocol will still execute properly
-    - To work around, always specify all properties, even if you need to enter `None` manually
-
-    ```
-    # don't do this
-    pipette.dispense(trough)
-
-    # do this
-    pipette.dispense(None, trough)
-    # or even better, use named parameters for clarity
-    pipette.dispense(volume=None, location=trough)
-    ```
-
 - While the underlying definition is correct, there is a known API bug that is causing the robot to think a "50ml" tube in a "15/50ml" tuberack is the same height as the "15ml" tube
 - Extremely long aspirations and dispenses can incorrectly trigger a serial timeout issue. If you see such an issue, make sure your protocol’s combination of aspirate/dispense speeds and aspirate/dispense volumes does not include a command that will take more than 30 seconds.
 

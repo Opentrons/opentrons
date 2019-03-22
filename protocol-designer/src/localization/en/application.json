@@ -4,6 +4,11 @@
     "moveLiquid": "transfer",
     "pause": "pause"
   },
+  "units": {
+    "microliter": "μL",
+    "microliterPerSec": "μL/s",
+    "times": "times"
+  },
   "version": "Protocol Designer Version",
   "beta": "beta",
   "networking": {

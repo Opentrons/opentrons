@@ -412,7 +412,7 @@ def model(robot, hardware, loop, request):
             {Mount.RIGHT: 'p300_single'}))
         instrument = models.Instrument(pip, context=ctx)
         plate = ctx.load_labware_by_name(
-            lw_name or 'generic_96_wellPlate_380_uL', 1)
+            lw_name or 'generic_96_wellplate_380_ul', 1)
         rob = hardware
         container = models.Container(plate, context=ctx)
     else:

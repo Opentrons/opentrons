@@ -23,12 +23,12 @@ type Props = OP & SP & DP
 const ButtonRow = (props: Props) => {
   const {canSave, onDelete, onSave, onCancel, onClickMoreOptions} = props
   return (
-    <div className={cx(styles.form_row, styles.form_footer)}>
-      <div className={styles.start_group}>
+    <div className={cx(styles.button_row, styles.form_wrapper, styles.form_footer)}>
+      <div>
         <OutlineButton className={styles.form_button} onClick={onDelete}>DELETE</OutlineButton>
         <OutlineButton className={styles.form_button} onClick={onClickMoreOptions}>NOTES</OutlineButton>
       </div>
-      <div className={styles.end_group}>
+      <div>
         <PrimaryButton className={styles.form_button} onClick={onCancel}>CLOSE</PrimaryButton>
         <PrimaryButton className={styles.form_button} disabled={!canSave} onClick={onSave}>SAVE</PrimaryButton>
       </div>

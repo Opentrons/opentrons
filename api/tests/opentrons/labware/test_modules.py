@@ -70,7 +70,7 @@ def test_run_magdeck_connected(
     monkeypatch.setattr(serial_communication, 'write_and_return', mock_write)
     magdeck = modules.MagDeck(port='/dev/modules/tty1_magdeck')
     magdeck.connect()
-    robot.modules = [magdeck]
+    robot._attached_modules = {'tty1_magdeckmagdeck': magdeck}
     modules.load('magdeck', '4')
     assert connected
 
@@ -94,7 +94,7 @@ def test_run_tempdeck_connected(
     monkeypatch.setattr(serial_communication, 'write_and_return', mock_write)
     tempdeck = modules.TempDeck(port='/dev/modules/tty1_tempdeck')
     tempdeck.connect()
-    robot.modules = [tempdeck]
+    robot._attached_modules = {'tty1_tempdecktempdeck': tempdeck}
     modules.load('tempdeck', '5')
     assert connected
     tempdeck.disconnect()  # Necessary to kill the thread started by connect()

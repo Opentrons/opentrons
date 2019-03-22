@@ -705,7 +705,7 @@ def load_definition_by_name(name: str) -> dict:
         saved to disc. The definition file must have been saved in a known
         location with the filename '${name}.json'
     """
-    def_path = 'shared_data/definitions2/{}.json'.format(name)
+    def_path = 'shared_data/definitions2/{}.json'.format(name.lower())
     labware_def = json.loads(pkgutil.get_data('opentrons', def_path))  # type: ignore # NOQA
     return labware_def
 

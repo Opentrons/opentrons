@@ -36,4 +36,8 @@
   --c-green: #7ed321;
   --c-red: #f00000;
   --c-orange: #f5a623;
+
+  --transition-color: {
+    transition: color 0.15s ease-in-out;
+  }
 }

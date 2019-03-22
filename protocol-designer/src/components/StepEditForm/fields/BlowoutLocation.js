@@ -35,7 +35,7 @@ export const BlowoutLocationDropdown = connect(BlowoutLocationDropdownSTP)((prop
       dirtyFields={dirtyFields}
       render={({value, updateValue, disabled}) => (
         <DropdownField
-          className={cx(styles.medium_field, styles.orphan_field, className)}
+          className={cx(styles.large_field, className)}
           options={options}
           disabled={disabled}
           onBlur={() => { onFieldBlur(name) }}

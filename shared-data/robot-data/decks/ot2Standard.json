@@ -1,5 +1,5 @@
 {
-	"otId": "b57c32f0-1a8c-11e9-a2de-d3e23d313b0f",
+  "otId": "b57c32f0-1a8c-11e9-a2de-d3e23d313b0f",
   "metadata": {
     "displayName": "OT-2 Standard Deck",
     "tags": ["ot2", "12 slots", "standard"]
@@ -70,7 +70,7 @@
         "displayName": "Slot 6"
       },
       {
-      "id": "7",
+        "id": "7",
         "position": [0.0, 181.0, 0.0],
         "boundingBox": {
           "xDimension": 128.0,
@@ -196,7 +196,7 @@
       {
         "id": "fixedTrash",
         "slot": "12",
-        "labware": "opentrons_1_trash_1.1_L",
+        "labware": "opentrons_1_trash_1.1_l",
         "displayName": "Fixed Trash"
       }
     ]
