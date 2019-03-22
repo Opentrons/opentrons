@@ -7,7 +7,7 @@
   "units": {
     "microliter": "μL",
     "microliterPerSec": "μL/s",
-    "times": "times"
+    "times": "x"
   },
   "version": "Protocol Designer Version",
   "beta": "beta",
