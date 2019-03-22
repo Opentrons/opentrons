@@ -14,6 +14,7 @@ import {
 import i18n from '../../localization'
 import styles from './LiquidPlacementForm.css'
 import formStyles from '../forms/forms.css'
+import stepEditFormStyles from '../StepEditForm/StepEditForm.css'
 import type {Options} from '@opentrons/components'
 
 export type ValidFormValues = {
@@ -100,6 +101,7 @@ export default class LiquidPlacementForm extends React.Component <Props> {
                   className={styles.liquid_field}>
                   <DropdownField
                     name='selectedLiquidId'
+                    className={stepEditFormStyles.large_field}
                     options={liquidSelectionOptions}
                     error={touched.selectedLiquidId && errors.selectedLiquidId}
                     value={values.selectedLiquidId}
@@ -113,7 +115,7 @@ export default class LiquidPlacementForm extends React.Component <Props> {
                 >
                   <InputField
                     name='volume'
-                    units='μL'
+                    units={i18n.t('application.units.microliter')}
                     error={touched.volume && errors.volume}
                     value={values.volume}
                     onChange={this.handleChangeVolume(setFieldValue)}

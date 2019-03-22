@@ -25,6 +25,7 @@ export type BaseState = {
 export type GetState = () => BaseState
 export type Selector<T> = (BaseState) => T
 
+// eslint-disable-next-line no-use-before-define
 export type ThunkDispatch<A> = (action: A | ThunkAction<A>) => A
 export type ThunkAction<A> = (dispatch: ThunkDispatch<A>, getState: GetState) => A
 

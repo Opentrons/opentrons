@@ -124,7 +124,6 @@ def labware_test_data(config_tempdir):
         json.dump(dummy_lw_defn, usr_def)
     with (offset_dir/filename).open('w') as offs:
         json.dump(dummy_lw_offset, offs)
-    print("labware test data put in: {}".format(os.listdir(user_def_dir)))
     yield
     shutil.rmtree(os.path.dirname(user_def_dir), ignore_errors=True)
     shutil.rmtree(os.path.dirname(offset_dir), ignore_errors=True)
@@ -413,7 +412,7 @@ def model(robot, hardware, loop, request):
             {Mount.RIGHT: 'p300_single'}))
         instrument = models.Instrument(pip, context=ctx)
         plate = ctx.load_labware_by_name(
-            lw_name or 'generic_96_wellPlate_380_uL', 1)
+            lw_name or 'generic_96_wellplate_380_ul', 1)
         rob = hardware
         container = models.Container(plate, context=ctx)
     else:

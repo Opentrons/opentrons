@@ -2,7 +2,7 @@ from os import environ
 import logging
 from threading import Event, Thread
 from time import sleep
-from typing import Optional
+from typing import Optional, Mapping
 from serial.serialutil import SerialException
 
 from opentrons.drivers import serial_communication, utils
@@ -94,7 +94,7 @@ class TempDeck:
 
     def set_temperature(self, celsius) -> str:
         self.run_flag.wait()
-        celsius = round(float(celsius), GCODE_ROUNDING_PRECISION)
+        celsius = round(float(celsius), utils.GCODE_ROUNDING_PRECISION)
         try:
             celsius = round(float(celsius), utils.GCODE_ROUNDING_PRECISION)
             self._send_command(
@@ -143,7 +143,7 @@ class TempDeck:
         else:
             return 'idle'
 
-    def get_device_info(self) -> dict:
+    def get_device_info(self) -> Mapping[str, str]:
         '''
         Queries Temp-Deck for it's build version, model, and serial number
 
@@ -238,7 +238,7 @@ class TempDeck:
             return self._recursive_write_and_return(
                 cmd, timeout, retries)
 
-    def _recursive_update_temperature(self, retries) -> Optional[dict]:
+    def _recursive_update_temperature(self, retries):
         try:
             res = self._send_command(GCODES['GET_TEMP'])
             res = utils.parse_temperature_response(res)
@@ -251,7 +251,7 @@ class TempDeck:
             sleep(DEFAULT_STABILIZE_DELAY)
             return self._recursive_update_temperature(retries)
 
-    def _recursive_get_info(self, retries) -> dict:
+    def _recursive_get_info(self, retries) -> Mapping[str, str]:
         try:
             device_info = self._send_command(GCODES['DEVICE_INFO'])
             return utils.parse_device_information(device_info)

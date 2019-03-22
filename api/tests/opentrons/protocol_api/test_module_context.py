@@ -27,6 +27,7 @@ def test_tempdeck(loop):
     assert 'setting temperature' in ','.join([cmd.lower()
                                               for cmd in ctx.commands()])
     mod.wait_for_temp()
+
     assert mod.target == 20
     assert mod.temperature == 20
     mod.deactivate()
@@ -128,7 +129,7 @@ def test_thermocycler_temp(loop):
 
 def test_module_load_labware(loop):
     ctx = papi.ProtocolContext(loop)
-    labware_name = 'generic_96_wellPlate_380_uL'
+    labware_name = 'generic_96_wellplate_380_ul'
     labware_def = json.loads(
         pkgutil.get_data('opentrons',
                          'shared_data/definitions2/{}.json'.format(
@@ -152,7 +153,7 @@ def test_module_load_labware(loop):
 
 def test_magdeck_labware_props(loop):
     ctx = papi.ProtocolContext(loop)
-    labware_name = 'biorad_96_wellPlate_pcr_200_uL'
+    labware_name = 'biorad_96_wellplate_pcr_200_ul'
     labware_def = json.loads(
         pkgutil.get_data('opentrons',
                          'shared_data/definitions2/{}.json'.format(
@@ -171,7 +172,7 @@ def test_magdeck_labware_props(loop):
     mod.engage(height=3)
     assert mod._module._driver.plate_height == 3
     mod._geometry.reset_labware()
-    labware_name = 'generic_96_wellPlate_380_uL'
+    labware_name = 'generic_96_wellplate_380_ul'
     mod.load_labware_by_name(labware_name)
     with pytest.raises(ValueError):
         mod.engage()

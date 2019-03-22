@@ -1,5 +1,6 @@
 import asyncio
 from threading import Thread, Event
+from typing import Union
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from . import update, mod_abc
 
@@ -76,10 +77,10 @@ class TempDeck(mod_abc.AbstractModule):
     """
     @classmethod
     async def build(cls,
-              port,
-              interrupt_callback,
-              simulating=False,
-              loop: asyncio.AbstractEventLoop = None):
+                    port,
+                    interrupt_callback,
+                    simulating=False,
+                    loop: asyncio.AbstractEventLoop = None):
 
         """ Build and connect to a TempDeck"""
         # TempDeck does not currently use interrupts, so the callback is not
@@ -101,9 +102,11 @@ class TempDeck(mod_abc.AbstractModule):
                  simulating,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         if simulating:
-            self._driver = SimulatingDriver()
+            self._driver: Union['SimulatingDriver', 'TempDeckDriver'] \
+                = SimulatingDriver()
         else:
-            self._driver = TempDeckDriver()
+            self._driver: Union['SimulatingDriver', 'TempDeckDriver'] \
+                = TempDeckDriver()
 
         if None is loop:
             self._loop = asyncio.get_event_loop()
@@ -173,6 +176,14 @@ class TempDeck(mod_abc.AbstractModule):
     def interrupt_callback(self):
         return lambda x: None
 
+    @property
+    def loop(self):
+        return self._loop
+
+    @loop.setter
+    def loop(self, newLoop):
+        self._loop = newLoop
+
     async def _connect(self):
         """
         Connect to the 'TempDeck' port
@@ -191,7 +202,8 @@ class TempDeck(mod_abc.AbstractModule):
             self._poller.join()
 
     async def prep_for_update(self) -> str:
-        self._poller.join()
+        if self._poller:
+            self._poller.join()
         del self._poller
         self._poller = None
         new_port = await update.enter_bootloader(self._driver,

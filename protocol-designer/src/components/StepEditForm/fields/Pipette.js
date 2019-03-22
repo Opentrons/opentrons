@@ -6,6 +6,7 @@ import {
   DropdownField,
   type Options,
 } from '@opentrons/components'
+import i18n from '../../../localization'
 import {selectors as stepFormSelectors} from '../../../step-forms'
 import type {StepFieldName} from '../../../steplist/fieldLevel'
 import type {BaseState} from '../../../types'
@@ -26,7 +27,7 @@ const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldProps) => (
     focusedField={props.focusedField}
     dirtyFields={props.dirtyFields}
     render={({value, updateValue, hoverTooltipHandlers}) => (
-      <FormGroup label='Pipette:' className={styles.large_field} hoverTooltipHandlers={hoverTooltipHandlers}>
+      <FormGroup label={i18n.t('form.step_edit_form.field.pipette.label')} className={styles.large_field} hoverTooltipHandlers={hoverTooltipHandlers}>
         <DropdownField
           options={props.pipetteOptions}
           value={value ? String(value) : null}

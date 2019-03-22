@@ -5,8 +5,8 @@ from opentrons.protocol_api.geometry import Deck, plan_moves
 from opentrons.protocol_api import labware
 from opentrons.hardware_control.types import CriticalPoint
 
-labware_name = 'generic_96_wellPlate_380_uL'
-trough_name = 'usa_scientific_12_trough_22_mL'
+labware_name = 'generic_96_wellplate_380_ul'
+trough_name = 'usa_scientific_12_trough_22_ml'
 
 
 def test_slot_names():
@@ -49,18 +49,19 @@ def test_highest_z():
     assert deck.highest_z == mod.highest_z
 
 
-def check_arc_basic(arc, from_loc, to_loc):
+def check_arc_basic(arc, from_loc, to_loc, use_z_margin_override=False):
     """ Check the tests that should always be true for different-well moves
     - we should always go only up, then only xy, then only down
     - we should have three moves
     """
     assert len(arc) == 3
     assert arc[0][0]._replace(z=0) == from_loc.point._replace(z=0)
-    assert arc[0][0].z >= from_loc.point.z
     assert arc[0][0].z == arc[1][0].z
     assert arc[1][0]._replace(z=0) == to_loc.point._replace(z=0)
-    assert arc[1][0].z >= to_loc.point.z
     assert arc[2][0] == to_loc.point
+    if not use_z_margin_override:
+        assert arc[0][0].z >= from_loc.point.z
+        assert arc[1][0].z >= to_loc.point.z
 
 
 def test_direct_movs():
@@ -146,6 +147,52 @@ def test_arc_tall_point():
     from_tall_lw = plan_moves(no_well, lw1.wells()[4].bottom(), deck,
                               7.0, 15.0)
     check_arc_basic(from_tall_lw, no_well, lw1.wells()[4].bottom())
+
+
+def test_arc_lower_z_margin_override():
+    deck = Deck()
+    lw1 = labware.load(labware_name, deck.position_for(1))
+    tall_z = 100
+    z_margin_override = 42
+    old_top = lw1.wells()[0].top()
+    tall_point = old_top.point._replace(z=tall_z)
+    tall_top = old_top._replace(point=tall_point)
+    to_tall = plan_moves(
+        lw1.wells()[2].top(), tall_top, deck, 7.0, 15.0, z_margin_override)
+    check_arc_basic(to_tall, lw1.wells()[2].top(), tall_top, True)
+    assert to_tall[0][0].z == z_margin_override
+
+    from_tall = plan_moves(
+        tall_top, lw1.wells()[3].top(), deck, 7.0, 15.0, z_margin_override)
+    check_arc_basic(from_tall, tall_top, lw1.wells()[3].top(), True)
+    assert from_tall[0][0].z == z_margin_override
+
+    no_well = tall_top._replace(labware=lw1)
+    from_tall_lw = plan_moves(no_well, lw1.wells()[4].bottom(), deck,
+                              7.0, 15.0)
+    check_arc_basic(from_tall_lw, no_well, lw1.wells()[4].bottom(), True)
+
+
+def test_arc_zero_z_margin_override():
+    deck = Deck()
+    lw1 = labware.load(labware_name, deck.position_for(1))
+    tall_z = 100
+    z_margin_override = 0
+    old_top = lw1.wells()[0].top()
+    tall_point = old_top.point._replace(z=tall_z)
+    tall_top = old_top._replace(point=tall_point)
+    to_tall = plan_moves(
+        lw1.wells()[2].top(), tall_top, deck, 7.0, 15.0, z_margin_override)
+    assert to_tall == [(tall_top.point, None)]
+
+    from_tall = plan_moves(
+        tall_top, lw1.wells()[3].top(), deck, 7.0, 15.0, z_margin_override)
+    assert from_tall == [(lw1.wells()[3].top().point, None)]
+
+    no_well = tall_top._replace(labware=lw1)
+    from_tall_lw = plan_moves(no_well, lw1.wells()[4].bottom(), deck,
+                              7.0, 15.0, z_margin_override)
+    assert from_tall_lw == [(lw1.wells()[4].bottom().point, None)]
 
 
 def test_direct_cp():

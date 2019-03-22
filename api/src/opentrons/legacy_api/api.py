@@ -218,6 +218,9 @@ class InstrumentsWrapper(object):
             ul_per_mm=config.ul_per_mm,
             pick_up_current=config.pick_up_current,
             pick_up_distance=config.pick_up_distance,
+            pick_up_increment=config.pick_up_increment,
+            pick_up_presses=config.pick_up_presses,
+            pick_up_speed=config.pick_up_speed,
             quirks=config.quirks,
             fallback_tip_length=config.tip_length)  # TODO move to labware
 

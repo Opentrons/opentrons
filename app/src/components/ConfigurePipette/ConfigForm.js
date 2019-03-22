@@ -170,7 +170,7 @@ export default class ConfigForm extends React.Component<Props> {
               </FormColumn>
               <FormColumn>
                 <ConfigFormGroup
-                  groupLabel="Tip Pickup / Drop "
+                  groupLabel="Tip Pickup / Drop"
                   formFields={tipFields}
                 />
                 {this.props.showHiddenFields && (

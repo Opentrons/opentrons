@@ -31,7 +31,6 @@ from .types import Axis, HardwareAPILike, CriticalPoint
 
 
 mod_log = logging.getLogger(__name__)
-PICK_UP_SPEED = 30
 
 
 def _log_call(func):
@@ -915,10 +914,13 @@ class API(HardwareAPILike):
     async def pick_up_tip(self,
                           mount,
                           tip_length: float,
-                          presses: int = 3,
-                          increment: float = 1):
+                          presses: int = None,
+                          increment: float = None):
         """
-        Pick up tip from current location
+        Pick up tip from current location.
+
+        If ``presses`` or ``increment`` is not specified (or is ``None``),
+        their value is taken from the pipette configuration
         """
         instr = self._attached_instruments[mount]
         assert instr
@@ -932,16 +934,28 @@ class API(HardwareAPILike):
         await self._move_plunger(
             mount, instr.config.bottom)
 
+        if not presses or presses < 0:
+            checked_presses = instr.config.pick_up_presses
+        else:
+            checked_presses = presses
+
+        if not increment or increment < 0:
+            checked_increment = instr.config.pick_up_increment
+        else:
+            checked_increment = increment
+
         # Press the nozzle into the tip <presses> number of times,
         # moving further by <increment> mm after each press
-        for i in range(presses):
+        for i in range(checked_presses):
             # move nozzle down into the tip
             with self._backend.save_current():
                 self._backend.set_active_current(instr_ax,
                                                  instr.config.pick_up_current)
-                dist = -1 * instr.config.pick_up_distance + -1 * increment * i
+                dist = -1.0 * instr.config.pick_up_distance\
+                    + -1.0 * checked_increment * i
                 target_pos = top_types.Point(0, 0, dist)
-                await self.move_rel(mount, target_pos, PICK_UP_SPEED)
+                await self.move_rel(
+                    mount, target_pos, instr.config.pick_up_speed)
             # move nozzle back up
             backup_pos = top_types.Point(0, 0, -dist)
             await self.move_rel(mount, backup_pos)
@@ -1078,7 +1092,6 @@ class API(HardwareAPILike):
                 = await self._backend.build_module(discovered[mod][0],
                                                    discovered[mod][1],
                                                    self.pause_with_message)
-        self._log.debug("attached: {}".format(self._attached_modules.values()))
         return list(self._attached_modules.values())
 
     @_log_call

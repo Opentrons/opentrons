@@ -8,7 +8,7 @@ try:
 except ModuleNotFoundError:
     select = None  # type: ignore
 from time import sleep
-from typing import Optional
+from typing import Optional, Mapping
 from serial.serialutil import SerialException
 from opentrons.drivers import serial_communication, utils
 from opentrons.drivers.serial_communication import SerialNoResponse
@@ -222,9 +222,7 @@ class Thermocycler:
             port, self._interrupt_callback, self._temp_status_update_callback)
 
         # Check initial device lid state
-        log.debug(f"Connected before get lid status write: {self._poller}")
         _lid_status_res = await self._write_and_wait(GCODES['GET_LID_STATUS'])
-        log.debug(f"Connected AFTER get lid status write: {_lid_status_res}")
         if _lid_status_res:
             self._lid_status = _lid_status_res.split()[-1].lower()
         return self
@@ -254,7 +252,10 @@ class Thermocycler:
         self._lid_status = 'closed'
         return self._lid_status
 
-    async def set_temperature(self, temp, hold_time=None, ramp_rate=None):
+    async def set_temperature(self,
+                              temp: float,
+                              hold_time: float = None,
+                              ramp_rate: float = None) -> None:
         if ramp_rate:
             ramp_cmd = '{} S{}'.format(GCODES['SET_RAMP_RATE'], ramp_rate)
             await self._write_and_wait(ramp_cmd)
@@ -268,7 +269,10 @@ class Thermocycler:
         val_dict = {}
         data = [d.split(':') for d in temperature_response.split()]
         for datum in data:
-            val_dict[datum[0]] = datum[1]
+            cleanValue = datum[1]
+            if cleanValue == 'none':
+                cleanValue = None
+            val_dict[datum[0]] = cleanValue
 
         self._current_temp = val_dict['C']
         self._target_temp = val_dict['T']
@@ -315,12 +319,12 @@ class Thermocycler:
     def lid_status(self):
         return self._lid_status
 
-    async def get_device_info(self):
+    async def get_device_info(self) -> Mapping[str, str]:
         _device_info_res = await self._write_and_wait(GCODES['DEVICE_INFO'])
         if _device_info_res:
             return utils.parse_device_information(_device_info_res)
         else:
-            return None
+            raise ThermocyclerError("Thermocycler did not return device info")
 
     async def _write_and_wait(self, command):
         ret = None

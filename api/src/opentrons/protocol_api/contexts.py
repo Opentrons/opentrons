@@ -111,9 +111,9 @@ class ProtocolContext(CommandPublisher):
         self.clear_commands()
 
         if fflags.short_fixed_trash():
-            trash_name = 'opentrons_1_trash_0.85_L'
+            trash_name = 'opentrons_1_trash_0.85_l'
         else:
-            trash_name = 'opentrons_1_trash_1.1_L'
+            trash_name = 'opentrons_1_trash_1.1_l'
 
         self.load_labware_by_name(
             trash_name, '12')
@@ -228,27 +228,42 @@ class ProtocolContext(CommandPublisher):
     def load_module(
             self, module_name: str,
             location: types.DeckLocation) -> ModuleTypes:
+        mod_map = {
+            'magdeck': {
+                'hc_name': 'magdeck',
+                'geo_name': 'magdeck'},
+            'magnetic module': {
+                'hc_name': 'magdeck',
+                'geo_name': 'magdeck'},
+            'tempdeck': {
+                'hc_name': 'tempdeck',
+                'geo_name': 'tempdeck'},
+            'temperature module': {
+                'hc_name': 'tempdeck',
+                'geo_name': 'tempdeck'},
+            'thermocycler': {
+                'hc_name': 'thermocycler',
+                'geo_name': 'thermocycler'},
+            'semithermocycler': {
+                'hc_name': 'thermocycler',
+                'geo_name': 'semithermocycler'}
+            }
+
+        hc_mod_name = mod_map[module_name.lower()]['hc_name']
+        geo_mod_name = mod_map[module_name.lower()]['geo_name']
         for mod in self._hw_manager.hardware.discover_modules():
-            hc_mod_name = {
-                'magdeck': 'magdeck',
-                'magnetic module': 'magdeck',
-                'tempdeck': 'tempdeck',
-                'temperature module': 'tempdeck',
-                'thermocycler': 'thermocycler',
-                'semithermocycler': 'semithermocycler'}[module_name.lower()]
-            if mod.name() == hc_mod_name or hc_mod_name == 'semithermocycler':
+            if mod.name() == hc_mod_name:
                 mod_class = {
                     'magdeck': MagneticModuleContext,
                     'tempdeck': TemperatureModuleContext,
-                    'thermocycler': ThermocyclerContext,
-                    'semithermocycler': ThermocyclerContext}[hc_mod_name]
+                    'thermocycler': ThermocyclerContext}[hc_mod_name]
                 break
         else:
             raise KeyError(module_name)
         geometry = load_module(
-            hc_mod_name, self._deck_layout.position_for(location))
+            geo_mod_name, self._deck_layout.position_for(location))
         mod_ctx = mod_class(self,
-                            mod,
+                            hc_mod_name,
                             geometry,
                             self._loop)
         self._deck_layout[location] = geometry
@@ -1234,11 +1249,18 @@ class InstrumentContext(CommandPublisher):
     def delay(self):
         return self._ctx.delay()
 
-    def move_to(self, location: types.Location) -> 'InstrumentContext':
+    def move_to(self, location: types.Location, z_safety: float = None
+                ) -> 'InstrumentContext':
         """ Move the instrument.
 
         :param location: The location to move to.
         :type location: :py:class:`.types.Location`
+        :param z_safety: An optional height to retract the pipette to before
+                         moving. If not specified, it will be generated based
+                         on the labware from which and to which the pipette is
+                         moving; if it is 0, the pipette will move directly;
+                         and if it is non-zero, the pipette will rise to the
+                         z_safety point before moving in x and y.
         """
         if self._ctx.location_cache:
             from_lw = self._ctx.location_cache.labware
@@ -1252,7 +1274,9 @@ class InstrumentContext(CommandPublisher):
             self._hw_manager.hardware.gantry_position(
                 self._mount, critical_point=cp_override),
             from_lw)
-        moves = geometry.plan_moves(from_loc, location, self._ctx.deck)
+
+        moves = geometry.plan_moves(from_loc, location, self._ctx.deck,
+                                    z_margin_override=z_safety)
         self._log.debug("move_to: {}->{} via:\n\t{}"
                         .format(from_loc, location, moves))
         try:
@@ -1503,7 +1527,7 @@ class TemperatureModuleContext(ModuleContext):
             slot_number = 10
             temp_mod = ctx.load_module('Temperature Module', slot_number)
             temp_plate = temp_mod.load_labware(
-                'biorad_96_wellPlate_pcr_200_uL')
+                'biorad_96_wellplate_pcr_200_ul')
 
             temp_mod.set_temperature(45.5)
             temp_mod.wait_for_temp()
@@ -1544,7 +1568,7 @@ class TemperatureModuleContext(ModuleContext):
     def wait_for_temp(self):
         """ Block until the module reaches its setpoint.
         """
-        self._loop.run_until_complete(self._module.wait_for_temp())
+        self._module.wait_for_temp()
 
     @property
     def temperature(self):
@@ -1699,7 +1723,7 @@ class ThermocyclerContext(ModuleContext):
 
     def wait_for_temp(self):
         """ Block until the module reaches its setpoint"""
-        self._loop.run_until_complete(self._module.wait_for_temp())
+        self._module.wait_for_temp()
 
     @property
     def temperature(self):

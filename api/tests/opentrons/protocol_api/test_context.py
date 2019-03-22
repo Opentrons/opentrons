@@ -56,14 +56,15 @@ def test_location_cache(loop, monkeypatch, load_my_labware):
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
     right = ctx.load_instrument('p10_single', Mount.RIGHT)
-    lw = ctx.load_labware_by_name('generic_96_wellPlate_380_uL', 1)
+    lw = ctx.load_labware_by_name('generic_96_wellplate_380_ul', 1)
     ctx.home()
 
     test_args = None
 
     def fake_plan_move(from_loc, to_loc, deck,
                        well_z_margin=None,
-                       lw_z_margin=None):
+                       lw_z_margin=None,
+                       z_margin_override=None):
         nonlocal test_args
         test_args = (from_loc, to_loc, deck, well_z_margin, lw_z_margin)
         return [(Point(0, 1, 10), None),
@@ -91,7 +92,7 @@ def test_move_uses_arc(loop, monkeypatch, load_my_labware):
     ctx.connect(hardware)
     ctx.home()
     right = ctx.load_instrument('p10_single', Mount.RIGHT)
-    lw = ctx.load_labware_by_name('generic_96_wellPlate_380_uL', 1)
+    lw = ctx.load_labware_by_name('generic_96_wellplate_380_ul', 1)
     ctx.home()
 
     targets = []
@@ -122,7 +123,7 @@ def test_pipette_info(loop):
 def test_pick_up_and_drop_tip(loop, load_my_labware):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 1)
     tip_length = tiprack.tip_length
     mount = Mount.LEFT
 
@@ -146,7 +147,7 @@ def test_pick_up_and_drop_tip(loop, load_my_labware):
 def test_return_tip(loop, load_my_labware):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 1)
     mount = Mount.LEFT
 
     instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
@@ -170,10 +171,10 @@ def test_pick_up_tip_no_location(loop, load_my_labware):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
 
-    tiprack1 = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 1)
+    tiprack1 = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 1)
     tip_length1 = tiprack1.tip_length
 
-    tiprack2 = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 2)
+    tiprack2 = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 2)
     tip_length2 = tip_length1 + 1.0
     tiprack2.tip_length = tip_length2
 
@@ -217,18 +218,18 @@ def test_instrument_trash(loop, load_my_labware):
     mount = Mount.LEFT
     instr = ctx.load_instrument('p300_single', mount)
 
-    assert instr.trash_container.name == 'opentrons_1_trash_1.1_L'
+    assert instr.trash_container.name == 'opentrons_1_trash_1.1_l'
 
-    new_trash = ctx.load_labware_by_name('usa_scientific_12_trough_22_mL', 2)
+    new_trash = ctx.load_labware_by_name('usa_scientific_12_trough_22_ml', 2)
     instr.trash_container = new_trash
 
-    assert instr.trash_container.name == 'usa_scientific_12_trough_22_mL'
+    assert instr.trash_container.name == 'usa_scientific_12_trough_22_ml'
 
 
 def test_aspirate(loop, load_my_labware, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    lw = ctx.load_labware_by_name('generic_96_wellPlate_380_uL', 1)
+    lw = ctx.load_labware_by_name('generic_96_wellplate_380_ul', 1)
     instr = ctx.load_instrument('p10_single', Mount.RIGHT)
 
     asp_called_with = None
@@ -269,7 +270,7 @@ def test_aspirate(loop, load_my_labware, monkeypatch):
 def test_dispense(loop, load_my_labware, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    lw = ctx.load_labware_by_name('generic_96_wellPlate_380_uL', 1)
+    lw = ctx.load_labware_by_name('generic_96_wellplate_380_ul', 1)
     instr = ctx.load_instrument('p10_single', Mount.RIGHT)
 
     disp_called_with = None
@@ -345,8 +346,8 @@ def test_hw_manager(loop):
 def test_mix(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_mL_eppendorf', 1)
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 3)
+    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_ml_eppendorf', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 3)
     instr = ctx.load_instrument('p300_single', Mount.RIGHT,
                                 tip_racks=[tiprack])
 
@@ -386,8 +387,8 @@ def test_mix(loop, monkeypatch):
 def test_touch_tip_default_args(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_mL_eppendorf', 1)
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 3)
+    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_ml_eppendorf', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 3)
     instr = ctx.load_instrument('p300_single', Mount.RIGHT,
                                 tip_racks=[tiprack])
 
@@ -415,8 +416,8 @@ def test_touch_tip_default_args(loop, monkeypatch):
 def test_blow_out(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_mL_eppendorf', 1)
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 3)
+    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_ml_eppendorf', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 3)
     instr = ctx.load_instrument('p300_single', Mount.RIGHT,
                                 tip_racks=[tiprack])
 
@@ -435,9 +436,9 @@ def test_blow_out(loop, monkeypatch):
 
 def test_transfer_options(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
-    lw1 = ctx.load_labware_by_name('biorad_96_wellPlate_pcr_200_uL', 1)
-    lw2 = ctx.load_labware_by_name('generic_96_wellPlate_380_uL', 2)
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_uL', 3)
+    lw1 = ctx.load_labware_by_name('biorad_96_wellplate_pcr_200_ul', 1)
+    lw2 = ctx.load_labware_by_name('generic_96_wellplate_380_ul', 2)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 3)
     instr = ctx.load_instrument('p300_single', Mount.RIGHT,
                                 tip_racks=[tiprack])
 

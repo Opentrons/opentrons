@@ -1,5 +1,6 @@
 import asyncio
 from . import mod_abc
+from typing import Union
 from opentrons.drivers.thermocycler.driver import (
     Thermocycler as ThermocyclerDriver, ThermocyclerError)
 
@@ -13,13 +14,13 @@ class SimulatingDriver:
         self._port = None
         self._lid_status = 'open'
 
-    def open(self):
+    async def open(self):
         if self._active:
             raise ThermocyclerError(
                 'Cannot open Thermocycler while it is active')
         self._lid_status = 'open'
 
-    def close(self):
+    async def close(self):
         self._lid_status = 'closed'
 
     @property
@@ -53,7 +54,10 @@ class SimulatingDriver:
     def disconnect(self):
         self._port = None
 
-    def set_temperature(self, temp, hold_time, ramp_rate):
+    async def set_temperature(self,
+                              temp: float,
+                              hold_time: float,
+                              ramp_rate: float) -> None:
         self._target_temp = temp
         self._hold_time = hold_time
         self._ramp_rate = ramp_rate
@@ -103,9 +107,11 @@ class Thermocycler(mod_abc.AbstractModule):
                  loop: asyncio.AbstractEventLoop = None) -> None:
         self._interrupt_cb = interrupt_callback
         if simulating:
-            self._driver = SimulatingDriver()
+            self._driver: Union['SimulatingDriver', 'ThermocyclerDriver'] \
+                = SimulatingDriver()
         else:
-            self._driver = ThermocyclerDriver(interrupt_callback)
+            self._driver: Union['SimulatingDriver', 'ThermocyclerDriver'] \
+                = ThermocyclerDriver(interrupt_callback)
 
         if None is loop:
             self._loop = asyncio.get_event_loop()
@@ -119,14 +125,14 @@ class Thermocycler(mod_abc.AbstractModule):
     def deactivate(self):
         self._driver.deactivate()
 
-    def open(self):
+    async def open(self):
         """ Open the lid if it is closed"""
         # TODO add temperature protection if over 70 C
-        return self._driver.open()
+        return await self._driver.open()
 
-    def close(self):
+    async def close(self):
         """ Close the lid if it is open"""
-        return self._driver.close()
+        return await self._driver.close()
 
     async def set_temperature(self, temp, hold_time=None, ramp_rate=None):
         await self._driver.set_temperature(
@@ -195,6 +201,14 @@ class Thermocycler(mod_abc.AbstractModule):
         hooked in the new module instance after a firmware update.
         """
         return self._interrupt_cb
+
+    @property
+    def loop(self):
+        return self._loop
+
+    @loop.setter
+    def loop(self, newLoop):
+        self._loop = newLoop
 
     async def _connect(self):
         await self._driver.connect(self._port)

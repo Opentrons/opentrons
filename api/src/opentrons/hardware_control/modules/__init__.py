@@ -92,7 +92,7 @@ async def update_firmware(
     new_port = after_port or old_port
     if not results[0]:
         raise UpdateError(results[1])
-    return cls.build(
+    return await cls.build(
         port=new_port,
         interrupt_callback=callback,
         simulating=simulating)

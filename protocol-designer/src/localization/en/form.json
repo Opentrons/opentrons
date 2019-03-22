@@ -22,9 +22,23 @@
     "volume_exceeded": "Warning: exceeded max volume per well: {{volume}}µL"
   },
   "step_edit_form": {
+    "section": {
+      "sterility&motion": "sterility & motion"
+    },
+    "labwareLabel": {
+      "aspirate": "source",
+      "dispense": "destination"
+    },
+    "multiDispenseOptionsLabel": "multi-dispense options",
+    "wellSelectionLabel": {
+      "columns": "columns",
+      "wells": "wells"
+    },
     "field": {
+      "airGap": {"label": "air gap"},
+      "blowout": {"label": "blowout"},
       "change_tip": {
-        "label": "Change Tip",
+        "label": "change tip",
         "option": {
           "always": "Always",
           "once": "Once",
@@ -40,9 +54,8 @@
           "never": "Use same tip as last step"
         }
       },
-      "tip_position": {
-        "label": "Tip Position"
-      },
+      "tip_position": {"label": "tip position"},
+      "volume": {"label": "volume"},
       "well_order": {
         "label": "Well Order",
         "option": {
@@ -52,12 +65,9 @@
           "b2t": "Bottom to top"
         }
       },
-      "step_name": {
-        "label": "Step Name"
-      },
-      "step_notes": {
-        "label": "Step Notes"
-      },
+      "step_name": {"label": "Step Name"},
+      "step_notes": {"label": "Step Notes"},
+      "mix": {"label": "mix"},
       "path": {
         "title": {
           "single": "Single Transfers",
@@ -71,11 +81,10 @@
           "incompatible_with_per_dest": "Incompatible with \"Per Destination Well\" Change Tip setting",
           "incompatible_with_per_source": "Incompatible with \"Per Source Well\" Change Tip setting"
         }
-      }
-    },
-    "section": {
-      "aspirate": "aspirate",
-      "dispense": "dispense"
+      },
+      "pipette": {"label": "pipette"},
+      "preWetTip": {"label": "pre-wet tip"},
+      "touchTip": {"label": "touch tip"}
     }
   }
 }

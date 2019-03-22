@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import {FormGroup, IconButton, HoverTooltip} from '@opentrons/components'
 
 import type {StepFieldName} from '../../../../steplist/fieldLevel'
 import i18n from '../../../../localization'
@@ -8,104 +7,99 @@ import i18n from '../../../../localization'
 import type {FocusHandlers} from '../../types'
 
 import {
-  LabwareField,
   TextField,
   CheckboxRowField,
   BlowoutLocationField,
   TipPositionField,
   FlowRateField,
-  WellSelectionField,
   WellOrderField,
 } from '../../fields'
 
 import styles from '../../StepEditForm.css'
 
 type Props = {
+  className?: ?string,
   focusHandlers: FocusHandlers,
   prefix: 'aspirate' | 'dispense',
 }
-type State = {collapsed?: boolean}
 
 const makeAddFieldNamePrefix = (prefix: string) => (fieldName: string): StepFieldName => `${prefix}_${fieldName}`
 
-class SourceDestFields extends React.Component<Props, State> {
-  state = {collapsed: true}
+function SourceDestFields (props: Props) {
+  const {className, focusHandlers, prefix} = props
+  const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
 
-  handleClick = (e: SyntheticEvent<>) => {
-    this.setState({collapsed: !this.state.collapsed})
-  }
-  render () {
-    const {focusHandlers} = this.props
-    const addFieldNamePrefix = makeAddFieldNamePrefix(this.props.prefix)
-    const labwareLabel = this.props.prefix === 'aspirate' ? 'Source:' : 'Destination:'
-    const hiddenFieldsLabel = this.props.prefix === 'aspirate' ? 'Aspirate Options:' : 'Dispense Options:'
-    return (
+  return (
+    <div className={className}>
       <div className={styles.form_row}>
-        <div className={styles.start_group}>
-          <FormGroup label={labwareLabel}>
-            <LabwareField name={addFieldNamePrefix('labware')} {...focusHandlers} />
-          </FormGroup>
-          <WellSelectionField
-            name={addFieldNamePrefix('wells')}
-            labwareFieldName={addFieldNamePrefix('labware')}
-            pipetteFieldName="pipette"
-            {...focusHandlers} />
-          <WellOrderField prefix={this.props.prefix} />
-        </div>
-        <div className={styles.start_group}>
-          <FlowRateField
-            name={addFieldNamePrefix('flowRate')}
-            pipetteFieldName="pipette"
-            flowRateType={this.props.prefix} />
-          <TipPositionField fieldName={addFieldNamePrefix('mmFromBottom')} />
-          <HoverTooltip tooltipComponent={i18n.t('tooltip.advanced_settings')}>
-            {(hoverTooltipHandlers) => (
-              <div {...hoverTooltipHandlers} onClick={this.handleClick} className={styles.advanced_settings_button_wrapper}>
-                <IconButton className={styles.advanced_settings_button} name="settings" hover={!this.state.collapsed} />
-              </div>
-            )}
-          </HoverTooltip>
-          <div className={styles.hidden_fields}>
-            {this.state.collapsed !== true &&
-              <FormGroup label={hiddenFieldsLabel}>
-                {this.props.prefix === 'aspirate' &&
-                  <React.Fragment>
-                    <CheckboxRowField name="preWetTip" label="Pre-wet tip" />
-                    <CheckboxRowField disabled tooltipComponent={i18n.t('tooltip.not_in_beta')} name="aspirate_airGap_checkbox" label="Air Gap">
-                      <TextField disabled name="aspirate_airGap_volume" units="μL" {...focusHandlers} />
-                    </CheckboxRowField>
-                  </React.Fragment>
-                }
-                <CheckboxRowField name={addFieldNamePrefix('touchTip_checkbox')} label="Touch tip">
-                  <TipPositionField fieldName={addFieldNamePrefix('touchTip_mmFromBottom')} />
-                </CheckboxRowField>
-                <CheckboxRowField name={addFieldNamePrefix('mix_checkbox')} label='Mix'>
-                  <TextField
-                    name={addFieldNamePrefix('mix_volume')}
-                    units="μL"
-                    className={styles.small_field}
-                    {...focusHandlers} />
-                  <TextField
-                    name={addFieldNamePrefix('mix_times')}
-                    units="Times"
-                    className={styles.small_field}
-                    {...focusHandlers} />
-                </CheckboxRowField>
-                {this.props.prefix === 'dispense' &&
-                  <CheckboxRowField name='blowout_checkbox' label='Blowout'>
-                    <BlowoutLocationField
-                      name="blowout_location"
-                      className={styles.full_width}
-                      {...focusHandlers} />
-                  </CheckboxRowField>
-                }
-              </FormGroup>
-            }
-          </div>
-        </div>
+        <FlowRateField
+          name={addFieldNamePrefix('flowRate')}
+          pipetteFieldName="pipette"
+          flowRateType={prefix} />
+        <TipPositionField fieldName={addFieldNamePrefix('mmFromBottom')} />
+        <WellOrderField prefix={prefix} label={i18n.t('form.step_edit_form.field.well_order.label')} />
       </div>
-    )
-  }
+
+      <div className={styles.checkbox_column}>
+        {prefix === 'aspirate' &&
+          <React.Fragment>
+            <CheckboxRowField
+              name="preWetTip"
+              label={i18n.t('form.step_edit_form.field.preWetTip.label')}
+              className={styles.small_field}
+            />
+            <CheckboxRowField
+              disabled
+              tooltipComponent={i18n.t('tooltip.not_in_beta')}
+              name="aspirate_airGap_checkbox"
+              label={i18n.t('form.step_edit_form.field.airGap.label')}
+              className={styles.small_field}
+            >
+              <TextField
+                disabled
+                name="aspirate_airGap_volume"
+                units={i18n.t('application.units.microliter')}
+                {...focusHandlers}
+              />
+            </CheckboxRowField>
+          </React.Fragment>
+        }
+        <CheckboxRowField
+          name={addFieldNamePrefix('touchTip_checkbox')}
+          label={i18n.t('form.step_edit_form.field.touchTip.label')}
+          className={styles.small_field}
+        >
+          <TipPositionField fieldName={addFieldNamePrefix('touchTip_mmFromBottom')} />
+        </CheckboxRowField>
+        <CheckboxRowField
+          name={addFieldNamePrefix('mix_checkbox')}
+          label={i18n.t('form.step_edit_form.field.mix.label')}
+          className={styles.small_field}>
+          <TextField
+            name={addFieldNamePrefix('mix_volume')}
+            units={i18n.t('application.units.microliter')}
+            className={styles.small_field}
+            {...focusHandlers} />
+          <TextField
+            name={addFieldNamePrefix('mix_times')}
+            units={i18n.t('application.units.times')}
+            className={styles.small_field}
+            {...focusHandlers} />
+        </CheckboxRowField>
+        {prefix === 'dispense' &&
+          <CheckboxRowField
+            name='blowout_checkbox'
+            label={i18n.t('form.step_edit_form.field.blowout.label')}
+            className={styles.small_field}>
+            <BlowoutLocationField
+              name="blowout_location"
+              className={styles.full_width}
+              {...focusHandlers} />
+          </CheckboxRowField>
+        }
+      </div>
+    </div>
+  )
 }
 
 export default SourceDestFields

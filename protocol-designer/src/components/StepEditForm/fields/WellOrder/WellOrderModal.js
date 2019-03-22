@@ -109,7 +109,7 @@ class WellOrderModal extends React.Component<Props, State> {
               <div className={styles.field_row}>
                 <DropdownField
                   value={firstValue}
-                  className={cx(stepEditStyles.medium_field, styles.well_order_dropdown)}
+                  className={cx(stepEditStyles.field, styles.well_order_dropdown)}
                   onChange={this.makeOnChange('first')}
                   options={
                     WELL_ORDER_VALUES.map((value) => ({
@@ -120,7 +120,7 @@ class WellOrderModal extends React.Component<Props, State> {
                 <span className={styles.field_spacer}>{i18n.t('modal.well_order.then')}</span>
                 <DropdownField
                   value={secondValue}
-                  className={cx(stepEditStyles.medium_field, styles.well_order_dropdown)}
+                  className={cx(stepEditStyles.field, styles.well_order_dropdown)}
                   onChange={this.makeOnChange('second')}
                   options={
                     WELL_ORDER_VALUES.map((value) => ({

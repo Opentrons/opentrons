@@ -82,7 +82,7 @@ const getSubtitle = (path: PathOption, disabledPathMap: ?{[PathOption]: string})
 }
 const PathField = (props: PathFieldProps) => {
   return (
-    <FormGroup label='Path:'>
+    <FormGroup label='Path'>
       <StepField
         name="path"
         render={({value, updateValue}) => (

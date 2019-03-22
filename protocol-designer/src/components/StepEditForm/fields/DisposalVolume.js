@@ -4,6 +4,7 @@ import {FormGroup, CheckboxField, DropdownField, type Options} from '@opentrons/
 import {connect} from 'react-redux'
 import cx from 'classnames'
 
+import i18n from '../../../localization'
 import {getMaxDisposalVolumeForMultidispense} from '../../../steplist/formLevel/handleFormChange/utils'
 import {selectors as stepFormSelectors} from '../../../step-forms'
 import {selectors as uiLabwareSelectors} from '../../../ui/labware'
@@ -24,20 +25,20 @@ type SP = {
 type Props = SP & {focusHandlers: FocusHandlers}
 
 const DisposalVolumeField = (props: Props) => (
-  <FormGroup label='Multi-Dispense Options:'>
+  <FormGroup label={i18n.t('form.step_edit_form.multiDispenseOptionsLabel')}>
     <FieldConnector
       name="disposalVolume_checkbox"
       render={({value, updateValue, hoverTooltipHandlers}) => {
         const {maxDisposalVolume} = props
         const volumeBoundsCaption = maxDisposalVolume != null
-          ? `max ${maxDisposalVolume} μL`
+          ? `max ${maxDisposalVolume} ${i18n.t('application.units.microliter')}`
           : null
 
         const volumeField = (
           <div>
             <TextField
               name="disposalVolume_volume"
-              units="μL"
+              units={i18n.t('application.units.microliter')}
               caption={volumeBoundsCaption}
               className={cx(styles.small_field, styles.orphan_field)}
               {...props.focusHandlers} />
@@ -48,13 +49,12 @@ const DisposalVolumeField = (props: Props) => (
           <React.Fragment>
             <div {...hoverTooltipHandlers} className={cx(
               styles.checkbox_row,
-              styles.multi_dispense_options,
               {[styles.captioned_field]: volumeBoundsCaption}
             )}>
               <CheckboxField
                 label="Disposal Volume"
                 value={Boolean(value)}
-                className={styles.checkbox_field}
+                className={cx(styles.checkbox_field, styles.large_field)}
                 onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)} />
               {
                 value
@@ -71,9 +71,9 @@ const DisposalVolumeField = (props: Props) => (
                     dirtyFields={props.focusHandlers.dirtyFields}
                     render={({value, updateValue, hoverTooltipHandlers}) => (
                       <div {...hoverTooltipHandlers} className={styles.checkbox_row} >
-                        <div className={styles.sub_select_label}>Blowout</div>
+                        <div className={styles.sub_label_no_checkbox}>Blowout</div>
                         <DropdownField
-                          className={cx(styles.medium_field, styles.orphan_field)}
+                          className={styles.large_field}
                           options={props.disposalDestinationOptions}
                           onBlur={() => { props.focusHandlers.onFieldBlur('blowout_location') }}
                           onFocus={() => { props.focusHandlers.onFieldFocus('blowout_location') }}

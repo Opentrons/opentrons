@@ -159,9 +159,9 @@ class Controller:
         return modules.discover()
 
     async def build_module(self,
-                     port: str,
-                     model: str,
-                     interrupt_callback) -> modules.AbstractModule:
+                           port: str,
+                           model: str,
+                           interrupt_callback) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             which=model,

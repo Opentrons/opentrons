@@ -13,13 +13,13 @@ import ConfirmPositionContents from './ConfirmPositionContents'
 import ConfirmPickupContents from './ConfirmPickupContents'
 import InProgressContents from './InProgressContents'
 
-type OwnProps = Labware
+type OP = Labware
 
-type StateProps = {
+type SP = {|
   calibrator: ?Pipette,
-}
+|}
 
-type Props = OwnProps & StateProps
+type Props = {...$Exact<OP>, ...SP}
 
 export default connect(mapStateToProps)(ConfirmModalContents)
 
@@ -46,7 +46,7 @@ function ConfirmModalContents (props: Props) {
   }
 }
 
-function mapStateToProps (state, ownProps: OwnProps): StateProps {
+function mapStateToProps (state, ownProps: OP): SP {
   const calibratorMount = ownProps.calibratorMount
   const pipettes = robotSelectors.getPipettes(state)
   const calibrator = (

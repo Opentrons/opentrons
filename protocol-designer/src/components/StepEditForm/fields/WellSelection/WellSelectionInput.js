@@ -2,6 +2,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {FormGroup, InputField} from '@opentrons/components'
+import i18n from '../../../../localization'
 import WellSelectionModal from './WellSelectionModal'
 import {Portal} from '../../../portals/MainPageModalPortal'
 import {actions as stepsActions, selectors as stepsSelectors} from '../../../../ui/steps'
@@ -55,9 +56,12 @@ class WellSelectionInput extends React.Component<Props> {
   }
   render () {
     const modalKey = this.getModalKey()
+    const label = this.props.isMulti
+      ? i18n.t('form.step_edit_form.wellSelectionLabel.columns')
+      : i18n.t('form.step_edit_form.wellSelectionLabel.wells')
     return (
       <FormGroup
-        label={this.props.isMulti ? 'Columns:' : 'Wells:'}
+        label={label}
         disabled={this.props.disabled}
         className={styles.small_field}>
         <InputField

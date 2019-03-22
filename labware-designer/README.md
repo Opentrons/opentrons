@@ -1,4 +1,4 @@
-# Overview
+# Labware Creator
 
 This is a simple browser tool which can be used to generate labware definitions for _regular_ labware (labware that is
 laid out on a grid, and where all wells have consistent dimensions), or _irregular_ labware.
@@ -22,74 +22,173 @@ Any labware that does not meet the criteria of 'regular'. A labware is irregular
 
 ## Launching the Tool
 
-First you should make sure that you run `make install` within the `/opentrons` top level folder.
+First you should make sure that you run `make install` within the `opentrons` top level folder.
 If you are up-to-date on all other directories you can simply run `yarn` instead.
 Next you have two options:
+
 1. From the top level folder type: `make -C labware-designer dev`
 2. Open your browser and type in: `localhost:8080`
 
 OR
 
-1. Type `make` within the `opentrons/labware-designer` folder
+1. From the top level folder type: `make -C labware-designer`
 2. Open `labware-designer/dist/index.html` in your browser
 
 - In the browser window, open the console (in Chrome, right click in the middle of the page, select "Inspect" and then select the "Console" tab--other browsers vary but are similar).
 - In the console, you can use the global variable `sharedData` and use any public functions which are exported in that project.
 
-## What function do I need to use?
+## Usage
 
-The generator functions are called `createRegularLabware` and `createIrregularLabware`. You can use it in the browser
-by typing `sharedData.createRegularLabware(input)` or `sharedData.createIrregularLabware(input)`
+The generator has the following functions:
 
-### What data is needed?
-To build a *regular* labware, the `input` object should have the following shape:
+- `sharedData.createRegularLabware` - Generate regular labware definition
+- `sharedData.createIrregularLabware` - Generate irrgular labware definition
 
-```
-input = {
-  "metadata": metadata,
-  "parameters": parameters,
-  "offset": offset,
-  "dimensinos": dimensions,
-  "grid": grid,
-  "spacing": spacing,
-  "well": well,
-  "brand": brand,
+### createRegularLabware(options: RegularLabwareProps): LabwareDefinition2
+
+To build a _regular_ labware, the `options` object should have the following shape:
+
+| field        | type                      | required | description                                     |
+| ------------ | ------------------------- | -------- | ----------------------------------------------- |
+| `metadata`   | [Metadata](#Metadata)     | yes      | Information about the labware                   |
+| `parameters` | [Parameters](#Parameters) | yes      | Parameters that affect labware functionality    |
+| `dimensions` | [Dimensions](#Dimensions) | yes      | Overall dimensions of the labware               |
+| `offset`     | [Offset](#Offset)         | yes      | Distance from slot's top-left corner to well A1 |
+| `grid`       | [Grid](#Grid)             | yes      | Number of rows and columns of wells             |
+| `spacing`    | [Spacing](#Spacing)       | yes      | Distance between rows and columns               |
+| `well`       | [Well](#Well)             | yes      | Well parameters                                 |
+| `brand`      | [Brand](#Brand)           | no       | Labware manufacturer ("generic" if omitted)     |
+
+This example generates [generic_96_wellplate_380_ul.json][]:
+
+```js
+const options = {
+  metadata: {
+    displayName: 'ANSI 96 Standard Microplate',
+    displayCategory: 'wellPlate',
+    displayVolumeUnits: 'uL',
+    displayLengthUnits: 'mm',
+    tags: ['flat', 'microplate', 'SBS', 'ANSI', 'generic'],
+  },
+  parameters: {
+    format: '96Standard',
+    isTiprack: false,
+    isMagneticModuleCompatible: false,
+  },
+  offset: {x: 14.38, y: 11.24, z: 14.35},
+  dimensions: {
+    overallLength: 127.76,
+    overallWidth: 85.48,
+    overallHeight: 14.35,
+  },
+  grid: {row: 8, column: 12},
+  spacing: {row: 9, column: 9},
+  well: {
+    depth: 10.54,
+    shape: 'circular',
+    diameter: 6.4,
+    totalLiquidVolume: 380,
+  },
+  brand: {brand: 'generic'},
 }
+
+const labware = sharedData.createRegularLabware(options)
 ```
 
-The above inputs are all required except for `brand`. Each individual input has the following shape(s).
+[generic_96_wellplate_380_ul.json]: ../shared-data/definitions2/generic_96_wellplate_380_ul.json
+
+### createIrregularLabware(options: IrregularLabwareProps): LabwareDefinition2
+
+To build an _irregular_ labware, the `options` object should have the following shape:
+
+| field        | type                           | required | description                                                      |
+| ------------ | ------------------------------ | -------- | ---------------------------------------------------------------- |
+| `metadata`   | [Metadata](#Metadata)          | yes      | Information about the labware                                    |
+| `parameters` | [Parameters](#Parameters)      | yes      | Parameters that affect labware functionality                     |
+| `dimensions` | [Dimensions](#Dimensions)      | yes      | Overall dimensions of the labware                                |
+| `offset`     | Array<[Offset](#Offset) >      | yes      | Distances from slot's top-left corner to first well of each grid |
+| `grid`       | Array<[Grid](#Grid)>           | yes      | Number of rows and columns per grid                              |
+| `spacing`    | Array<[Spacing](#Spacing)>     | yes      | Distance between rows and columns per grid                       |
+| `well`       | Array<[Well](#Well)>           | yes      | Well parameters per grid                                         |
+| `gridStart`  | Array<[GridStart](#GridStart)> | yes      | Well naming scheme per grid                                      |
+| `brand`      | [Brand](#Brand)                | no       | Labware manufacturer ("generic" if omitted)                      |
+
+This example generates [opentrons_6x15_ml_4x50_ml_tuberack.json][]
+
+```js
+const options = {
+  metadata: {
+    displayName: 'Opentrons 15x50mL tube rack',
+    displayCategory: 'tubeRack',
+    displayVolumeUnits: 'mL',
+    displayLengthUnits: 'mm',
+    tags: ['opentrons', 'modular', 'tuberack', '15', 'mL', '50'],
+  },
+  parameters: {
+    format: 'irregular',
+    isTiprack: false,
+    isMagneticModuleCompatible: false,
+  },
+  dimensions: {
+    overallLength: 127.75,
+    overallWidth: 85.5,
+    overallHeight: 123.76,
+  },
+  offset: [{x: 13.88, y: 17.75, z: 123.76}, {x: 71.38, y: 25.25, z: 119.8}],
+  grid: [{row: 3, column: 2}, {row: 2, column: 2}],
+  spacing: [{row: 25, column: 25}, {row: 35, column: 35}],
+  well: [
+    {totalLiquidVolume: 15, diameter: 14.5, shape: 'circular', depth: 117.98},
+    {totalLiquidVolume: 50, diameter: 26.45, shape: 'circular', depth: 113.85},
+  ],
+  gridStart: [
+    {rowStart: 'A', colStart: 1, rowStride: 1, colStride: 1},
+    {rowStart: 'A', colStart: 3, rowStride: 1, colStride: 1},
+  ],
+  brand: {brand: 'Opentrons', brandId: ['352096', '352070']},
+}
+
+const labware = sharedData.createIrregularLabware(options)
+```
+
+[opentrons_6x15_ml_4x50_ml_tuberack.json]: ../shared-data/definitions2/opentrons_6x15_ml_4x50_ml_tuberack.json
+
+### Types
 
 #### Metadata
 
-```
-metadata = {
-  "displayName": string,
-  "displayCategory": string,
-  "displayVolumeUnits": optional string,
-  "displayLengthUnits": optional string,
-  "tags": optional array of strings,
+```js
+type Metadata = {
+  displayName: string,
+  displayCategory: string,
+  displayVolumeUnits?: string,
+  displayLengthUnits?: string,
+  tags?: Array<string>,
 }
 ```
 
-"displayName" is the name of the labware in the Opentrons Run App, Protocol Designer, and other client apps (i.e.: "Opentrons 96 PCR plate" or similar)
+"displayName" is the name of the labware in the Opentrons App, Protocol Designer, and other client apps (i.e.: "Opentrons 96 PCR plate" or similar)
 
-"displayCategory" is what category the container type falls into. There are currently five options:
+"displayCategory" is what category the container type falls into. It must be one of:
 
 - "wellPlate"
-- "tuberack"
-- "tiprack"
+- "tubeRack"
+- "tipRack"
 - "trough"
 - "trash"
+- "other"
 
 "tags" is a list of generic words that describe this labware such as shape of bottom, color or other important factors
 
 #### Parameters
 
-```
-parameters = {
-  "format": string,
-  "isTiprack": boolean,
-  "tipLength": optional number (required if "isTiprack" is true),
+```js
+type Parameters = {
+  format: string,
+  isTiprack: boolean,
+  tipLength?: number, // required if "isTiprack" is true
+  isMagneticModuleCompatible: boolean,
+  magneticModuleEngageHeight?: number, // required if "isMagneticModuleCompatible" is true
 }
 ```
 
@@ -102,18 +201,22 @@ There are currently four categories:
 - 384Standard (any container in a 96 format: well plate or tiprack)
 - trough
 
-Note: The parameters schema include a `"loadName"` field, but this should not be set by the user. It is generated by the program as: [brand]_[num.wells]_[displayCategory]_[totalVol]_[displayVolumeUnits]
+Note: The parameters schema includes a `loadName` field, but this should not be set by the user. It is generated by the program as:
+
+```js
+loadName = `${brand}_${numWells}_${displayCategory}_${totalVol}_${displayVolumeUnits}`.toLowerCase()
+```
 
 #### Well
 
-```
-well = {
-  "depth": number,
-  "shape": string,
-  "diameter": optional number,
-  "length": optional number,
-  "width": optional number,
-  "totalLiquidVolume": optional number,
+```js
+type Well = {
+  depth: number,
+  shape: string,
+  diameter?: number,
+  length?: number,
+  width?: number,
+  totalLiquidVolume: number,
 }
 ```
 
@@ -129,12 +232,14 @@ well = {
 "totalLiquidVolume" is the actual working volume of the well, in the units specified in "displayLiquidVolume" (default
 is uL)
 
+Note: The well schema includes `x`, `y`, and `z` fields, but they should not be set by the user. The generator functions will calculate well positions.
+
 #### Grid
 
-```
-grid = {
-  "row": number,
-  "column": number,
+```js
+type Grid = {
+  row: number,
+  column: number,
 }
 ```
 
@@ -142,10 +247,10 @@ Grid is the number of rows and columns in a given labware
 
 #### Spacing
 
-```
-spacing = {
-  "row": number,
-  "column": number,
+```js
+type Spacing = {
+  row: number,
+  column: number,
 }
 ```
 
@@ -153,11 +258,11 @@ Spacing is the center to center distance of wells between rows and columns
 
 #### Offset
 
-```
-offset = {
-  "x": number,
-  "y": number,
-  "z": number,
+```js
+type Offset = {
+  x: number,
+  y: number,
+  z: number,
 }
 ```
 
@@ -165,11 +270,11 @@ Offset is taken from the **upper left corner of the labware, flush with the deck
 
 #### Dimensions
 
-```
-dimensions = {
-  "overallLength": number,
-  "overallWidth": number,
-  "overallHeight": number,
+```js
+type Dimensions = {
+  overallLength: number,
+  overallWidth: number,
+  overallHeight: number,
 }
 ```
 
@@ -179,12 +284,25 @@ dimensions = {
 
 "overallHeight" is the outer dimension of the labware in the Z axis in mm--usually the same as the top the well, but can be higher in case of some kind of veritcal protrusion.
 
+#### GridStart
+
+```js
+type GridStart = {
+  rowStart: string,
+  colStart: string,
+  rowStride: number,
+  colStride: number,
+}
+```
+
+GridStart is used to generate well names for irregular labware. The object represents creating a "range" of well names with step intervals included. For example, starting at well "A1" with a column stride of 2 would result in the grid names being ordered as: "A1", "B1", ...; "A3", "B3", ...; etc.
+
 #### Brand
 
-```
-brand = {
-  "brand": string,
-  "brandId": optional string,
+```js
+type Brand = {
+  brand: string,
+  brandId?: string,
 }
 ```
 
@@ -192,328 +310,10 @@ brand = {
 
 "brandId" is used when a definition accurately reflects several products
 
+If `brand` is omitted from the input, the resulting definition will have: `"brand": {"brand": "generic"}`.
+
 ## Explanation of Numerical inputs
+
 See diagram below:
 
 ![Labware Dimension Diagram](https://user-images.githubusercontent.com/31892318/48797647-c35ffa80-ecd0-11e8-823a-e40f903a90c8.png)
-
-## Example Input-Output
-
-Given this sequence of commands in the console:
-
-```
-const arguments = {
-  metadata: {
-    displayName: "Opentrons 1.5mL tuberack",
-    displayCategory: "tuberack",
-    displayVolumeUnits: "mL"
-  },
-  parameters: {format: "irregular", isTiprack: false},
-  offset: {x: 18.213, y: 10.075, z: 79.85},
-  dimensions: {
-    overallLength: 127.76,
-    overallWidth: 85.48,
-    overallHeight: 79.85
-  },
-  grid: {row: 4, column: 6},
-  spacing: {row: 19.278, column: 19.892},
-  well: {
-    depth: 38.58,
-    shape: "circular",
-    diameter: 9.9,
-    totalLiquidVolume: 1.5
-  },
-  brand: {brand: "Opentrons"},
-}
-
-const data = sharedData.createRegularLabware(arguments)
-JSON.stringify(data, null, 4)
-```
-
-The output should look like this:
-
-```
-{
-    "ordering": [
-        [
-            "A1",
-            "B1",
-            "C1",
-            "D1"
-        ],
-        [
-            "A2",
-            "B2",
-            "C2",
-            "D2"
-        ],
-        [
-            "A3",
-            "B3",
-            "C3",
-            "D3"
-        ],
-        [
-            "A4",
-            "B4",
-            "C4",
-            "D4"
-        ],
-        [
-            "A5",
-            "B5",
-            "C5",
-            "D5"
-        ],
-        [
-            "A6",
-            "B6",
-            "C6",
-            "D6"
-        ]
-    ],
-    "otId": "b7df6160-e775-11e8-b0a9-079879741b02",
-    "deprecated": false,
-    "metadata": {
-        "displayName": "Opentrons 1.5mL tuberack",
-        "displayCategory": "tuberack",
-        "displayVolumeUnits": "mL"
-    },
-    "cornerOffsetFromSlot": {
-        "x": 0,
-        "y": 0,
-        "z": 0
-    },
-    "dimensions": {
-        "overallLength": 127.76,
-        "overallWidth": 85.48,
-        "overallHeight": 79.85
-    },
-    "parameters": {
-        "format": "irregular",
-        "isTiprack": false,
-        "loadName": "Opentrons_24_tuberack_1.5_mL_Eppendorf"
-    },
-    "wells": {
-        "D1": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 18.21,
-            "y": 10.08,
-            "z": 41.27
-        },
-        "C1": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 18.21,
-            "y": 29.35,
-            "z": 41.27
-        },
-        "B1": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 18.21,
-            "y": 48.63,
-            "z": 41.27
-        },
-        "A1": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 18.21,
-            "y": 67.91,
-            "z": 41.27
-        },
-        "D2": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 38.11,
-            "y": 10.08,
-            "z": 41.27
-        },
-        "C2": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 38.11,
-            "y": 29.35,
-            "z": 41.27
-        },
-        "B2": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 38.11,
-            "y": 48.63,
-            "z": 41.27
-        },
-        "A2": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 38.11,
-            "y": 67.91,
-            "z": 41.27
-        },
-        "D3": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 58,
-            "y": 10.08,
-            "z": 41.27
-        },
-        "C3": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 58,
-            "y": 29.35,
-            "z": 41.27
-        },
-        "B3": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 58,
-            "y": 48.63,
-            "z": 41.27
-        },
-        "A3": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 58,
-            "y": 67.91,
-            "z": 41.27
-        },
-        "D4": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 77.89,
-            "y": 10.08,
-            "z": 41.27
-        },
-        "C4": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 77.89,
-            "y": 29.35,
-            "z": 41.27
-        },
-        "B4": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 77.89,
-            "y": 48.63,
-            "z": 41.27
-        },
-        "A4": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 77.89,
-            "y": 67.91,
-            "z": 41.27
-        },
-        "D5": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 97.78,
-            "y": 10.08,
-            "z": 41.27
-        },
-        "C5": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 97.78,
-            "y": 29.35,
-            "z": 41.27
-        },
-        "B5": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 97.78,
-            "y": 48.63,
-            "z": 41.27
-        },
-        "A5": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 97.78,
-            "y": 67.91,
-            "z": 41.27
-        },
-        "D6": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 117.67,
-            "y": 10.08,
-            "z": 41.27
-        },
-        "C6": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 117.67,
-            "y": 29.35,
-            "z": 41.27
-        },
-        "B6": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 117.67,
-            "y": 48.63,
-            "z": 41.27
-        },
-        "A6": {
-            "depth": 38.58,
-            "shape": "circular",
-            "diameter": 9.9,
-            "totalLiquidVolume": 1.5,
-            "x": 117.67,
-            "y": 67.91,
-            "z": 41.27
-        }
-    },
-    "brand": {
-        "brand": "Opentrons"
-    }
-}
-```

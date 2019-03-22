@@ -10,7 +10,11 @@ import WellOrderModal from './WellOrderModal'
 import ZIG_ZAG_IMAGE from '../../../../images/zig_zag_icon.svg'
 import type {BaseState} from '../../../../types'
 
-type OP = {prefix: 'aspirate' | 'dispense' | 'mix'}
+type OP = {
+  className?: ?string,
+  label?: string,
+  prefix: 'aspirate' | 'dispense' | 'mix',
+}
 type SP = {iconClassNames: Array<string>}
 
 type WellOrderInputState = {isModalOpen: boolean}
@@ -21,8 +25,12 @@ class WellOrderInput extends React.Component<OP & SP, WellOrderInputState> {
   handleClose = () => { this.setState({isModalOpen: false}) }
 
   render () {
+    const className = cx(this.props.className, {
+      [styles.small_field]: !this.props.label,
+      [stepEditStyles.no_label]: !this.props.label,
+    })
     return (
-      <FormGroup className={cx(styles.small_field, stepEditStyles.no_label)}>
+      <FormGroup label={this.props.label} className={className}>
         <WellOrderModal
           prefix={this.props.prefix}
           closeModal={this.handleClose}
@@ -30,7 +38,11 @@ class WellOrderInput extends React.Component<OP & SP, WellOrderInputState> {
         <img
           onClick={this.handleOpen}
           src={ZIG_ZAG_IMAGE}
-          className={cx(styles.well_order_icon, ...this.props.iconClassNames)} />
+          className={cx(
+            styles.well_order_icon,
+            {[styles.icon_with_label]: this.props.label},
+            ...this.props.iconClassNames,
+          )} />
       </FormGroup>
     )
   }

@@ -2,7 +2,7 @@ import pytest
 from opentrons import protocol_api as papi, types
 
 
-labware_name = 'generic_96_wellPlate_380_uL'
+labware_name = 'generic_96_wellplate_380_ul'
 
 
 def test_load_to_slot(loop):
@@ -22,6 +22,11 @@ def test_loaded(loop):
 def test_load_incorrect_definition_by_name():
     with pytest.raises(FileNotFoundError):
         papi.labware.load_definition_by_name('fake_labware')
+
+
+def test_load_mixed_case():
+    dfn = papi.labware.load_definition_by_name('GeNeRiC_96_WeLlPlAtE_380_ul')
+    assert dfn['parameters']['loadName'] == labware_name
 
 
 def test_load_label(loop):
