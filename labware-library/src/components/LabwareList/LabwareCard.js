@@ -83,12 +83,12 @@ function Title (props: LabwareCardProps) {
   const {displayName} = props.definition.metadata
 
   return (
-    <h2 className={styles.title}>
-      <a className={styles.title_link} href="#">
+    <a href="#">
+      <h2 className={styles.title}>
         {displayName}
         <Icon className={styles.title_icon} name="chevron-right" />
-      </a>
-    </h2>
+      </h2>
+    </a>
   )
 }
 
@@ -221,6 +221,7 @@ function LoadName (props: LabwareCardProps) {
         type="text"
         value={loadName}
         onFocus={e => e.currentTarget.select()}
+        readOnly
       />
     </label>
   )

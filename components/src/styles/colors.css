@@ -40,4 +40,8 @@
   --transition-color: {
     transition: color 0.15s ease-in-out;
   }
+
+  --transition-background-color: {
+    transition: background-color 0.15s ease-in-out;
+  }
 }

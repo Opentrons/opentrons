@@ -21,18 +21,21 @@
 }
 
 .title {
-  margin-top: var(--spacing-2);
-  margin-left: var(--spacing-5);
-  margin-bottom: var(--spacing-5);
+  @apply --transition-background-color;
+
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-5);
   line-height: var(--lh-title);
   font-size: var(--fs-default);
   font-weight: var(--fw-semibold);
-}
-
-.title_link {
-  display: flex;
-  align-items: center;
   color: var(--c-blue);
+  background-color: var(--c-white);
+
+  &:hover {
+    background-color: var(--c-light-gray);
+  }
 }
 
 .title_icon {
