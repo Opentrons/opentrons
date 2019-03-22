@@ -4,7 +4,7 @@ import asyncio
 import copy
 import functools
 import threading
-from typing import List
+from typing import List, Mapping
 
 from . import API
 from .types import Axis, HardwareAPILike
@@ -62,7 +62,7 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
         self._loop = checked_loop
         self._api = api
         self._call_lock = threading.Lock()
-        self._cached_sync_mods = {}
+        self._cached_sync_mods: Mapping[str, SynchronousAdapter] = {}
         super().__init__(
             target=self._event_loop_in_thread,
             name='SynchAdapter thread for {}'.format(repr(api)))

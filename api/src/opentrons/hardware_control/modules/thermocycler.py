@@ -1,5 +1,6 @@
 import asyncio
 from . import mod_abc
+from typing import Union
 from opentrons.drivers.thermocycler.driver import (
     Thermocycler as ThermocyclerDriver, ThermocyclerError)
 
@@ -106,9 +107,11 @@ class Thermocycler(mod_abc.AbstractModule):
                  loop: asyncio.AbstractEventLoop = None) -> None:
         self._interrupt_cb = interrupt_callback
         if simulating:
-            self._driver = SimulatingDriver()
+            self._driver: Union['SimulatingDriver', 'ThermocyclerDriver'] \
+                = SimulatingDriver()
         else:
-            self._driver = ThermocyclerDriver(interrupt_callback)
+            self._driver: Union['SimulatingDriver', 'ThermocyclerDriver'] \
+                = ThermocyclerDriver(interrupt_callback)
 
         if None is loop:
             self._loop = asyncio.get_event_loop()

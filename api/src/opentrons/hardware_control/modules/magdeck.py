@@ -1,4 +1,5 @@
 import asyncio
+from typing import Union
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from . import update, mod_abc
 
@@ -49,10 +50,10 @@ class MagDeck(mod_abc.AbstractModule):
     """
     @classmethod
     async def build(cls,
-              port,
-              interrupt_callback,
-              simulating=False,
-              loop: asyncio.AbstractEventLoop = None):
+                    port,
+                    interrupt_callback,
+                    simulating=False,
+                    loop: asyncio.AbstractEventLoop = None):
         # MagDeck does not currently use interrupts, so the callback is not
         # passed on
         mod = cls(port, simulating, loop)
@@ -74,9 +75,11 @@ class MagDeck(mod_abc.AbstractModule):
         self._engaged = False
         self._port = port
         if simulating:
-            self._driver = SimulatingDriver()
+            self._driver: Union['SimulatingDriver', 'MagDeckDriver'] \
+                = SimulatingDriver()
         else:
-            self._driver = MagDeckDriver()
+            self._driver: Union['SimulatingDriver', 'MagDeckDriver'] \
+                = MagDeckDriver()
 
         if None is loop:
             self._loop = asyncio.get_event_loop()
