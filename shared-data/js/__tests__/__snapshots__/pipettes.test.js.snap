@@ -58,7 +58,7 @@ Object {
   ],
   "name": "p10_multi",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -86,7 +86,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -244,7 +244,7 @@ Object {
   ],
   "name": "p10_multi",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -272,7 +272,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -430,7 +430,7 @@ Object {
   ],
   "name": "p10_multi",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -458,7 +458,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -616,7 +616,7 @@ Object {
   ],
   "name": "p10_single",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -644,7 +644,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -807,7 +807,7 @@ Object {
   ],
   "name": "p10_single",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -835,7 +835,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -998,7 +998,7 @@ Object {
   ],
   "name": "p10_single",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -1026,7 +1026,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -1189,7 +1189,7 @@ Object {
   ],
   "name": "p50_multi",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -1217,7 +1217,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -1365,7 +1365,7 @@ Object {
   ],
   "name": "p50_multi",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -1393,7 +1393,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -1541,7 +1541,7 @@ Object {
   ],
   "name": "p50_multi",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -1569,7 +1569,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -1717,7 +1717,7 @@ Object {
   ],
   "name": "p50_single",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -1745,7 +1745,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -1893,7 +1893,7 @@ Object {
   ],
   "name": "p50_single",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -1921,7 +1921,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -2069,7 +2069,7 @@ Object {
   ],
   "name": "p50_single",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -2097,7 +2097,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -2245,7 +2245,7 @@ Object {
   ],
   "name": "p300_multi",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -2273,7 +2273,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -2385,7 +2385,7 @@ Object {
   ],
   "name": "p300_multi",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -2413,7 +2413,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -2525,7 +2525,7 @@ Object {
   ],
   "name": "p300_multi",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -2553,7 +2553,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -2665,7 +2665,7 @@ Object {
   ],
   "name": "p300_single",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -2693,7 +2693,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -2861,7 +2861,7 @@ Object {
   ],
   "name": "p300_single",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -2889,7 +2889,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -3057,7 +3057,7 @@ Object {
   ],
   "name": "p300_single",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -3085,7 +3085,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -3253,7 +3253,7 @@ Object {
   ],
   "name": "p1000_single",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -3281,7 +3281,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -3415,7 +3415,7 @@ Object {
   ],
   "name": "p1000_single",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -3443,7 +3443,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",
@@ -3577,7 +3577,7 @@ Object {
   ],
   "name": "p1000_single",
   "pickUpCurrent": Object {
-    "max": 1.2,
+    "max": 2,
     "min": 0.05,
     "type": "float",
     "units": "amps",
@@ -3605,7 +3605,7 @@ Object {
     "value": 3,
   },
   "pickUpSpeed": Object {
-    "max": 50,
+    "max": 100,
     "min": 1,
     "type": "float",
     "units": "mm/s",

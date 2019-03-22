@@ -33,7 +33,7 @@
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -61,7 +61,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -154,7 +154,7 @@
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -182,7 +182,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -277,7 +277,7 @@
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -305,7 +305,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -399,7 +399,7 @@
       "pickUpCurrent": {
         "value": 0.4,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -427,7 +427,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -520,7 +520,7 @@
       "pickUpCurrent": {
         "value": 0.4,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -548,7 +548,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -641,7 +641,7 @@
       "pickUpCurrent": {
         "value": 0.4,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -669,7 +669,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -762,7 +762,7 @@
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -790,7 +790,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -881,7 +881,7 @@
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -909,7 +909,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -1000,7 +1000,7 @@
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -1028,7 +1028,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -1119,7 +1119,7 @@
       "pickUpCurrent": {
         "value": 0.6,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -1147,7 +1147,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -1238,7 +1238,7 @@
       "pickUpCurrent": {
         "value": 0.6,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -1266,7 +1266,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -1357,7 +1357,7 @@
       "pickUpCurrent": {
         "value": 0.6,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -1385,7 +1385,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -1476,7 +1476,7 @@
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -1504,7 +1504,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -1599,7 +1599,7 @@
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -1627,7 +1627,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -1722,7 +1722,7 @@
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -1750,7 +1750,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -1845,7 +1845,7 @@
       "pickUpCurrent": {
         "value": 0.6,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -1873,7 +1873,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -1952,7 +1952,7 @@
       "pickUpCurrent": {
         "value": 0.6,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -1980,7 +1980,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -2059,7 +2059,7 @@
       "pickUpCurrent": {
         "value": 0.6,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -2087,7 +2087,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -2166,7 +2166,7 @@
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -2194,7 +2194,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -2277,7 +2277,7 @@
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -2305,7 +2305,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
@@ -2388,7 +2388,7 @@
       "pickUpCurrent": {
         "value": 0.1,
         "min": 0.05,
-        "max": 1.2,
+        "max": 2.0,
         "units": "amps",
         "type": "float"
       },
@@ -2416,7 +2416,7 @@
       "pickUpSpeed": {
         "value": 30,
         "min": 1,
-        "max": 50,
+        "max": 100,
         "units": "mm/s",
         "type": "float"
       },
