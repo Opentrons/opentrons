@@ -216,6 +216,16 @@ def _build_z_clearance(z_clearance: dict) -> tip_probe_z_clearance:
     )
 
 
+def _tip_probe_settings_with_migration(full_settings):
+    new_tp = full_settings.get('tip_probe', {})
+    old_tp = full_settings.get('probe_center', {})
+    if old_tp:
+        new_tp['center'] = old_tp
+    elif 'center' not in new_tp:
+        new_tp['center'] = _default_probe_center()
+    return new_tp
+
+
 def _build_tip_probe(tip_probe_settings: dict) -> tip_probe_config:
     return tip_probe_config(
         bounce_distance=tip_probe_settings.get('bounce_distance',
@@ -226,7 +236,7 @@ def _build_tip_probe(tip_probe_settings: dict) -> tip_probe_config:
                                                 TIP_PROBE_SWITCH_CLEARANCE),
         z_clearance=_build_z_clearance(tip_probe_settings.get('z_clearance',
                                                               {})),
-        center=_default_probe_center(),
+        center=tip_probe_settings.get('center', _default_probe_center()),
         dimensions=tip_probe_settings.get('dimensions',
                                           _default_probe_dimensions())
     )
@@ -257,7 +267,8 @@ def _build_config(deck_cal: List[List[float]],
         default_max_speed=robot_settings.get(
             'default_max_speed', DEFAULT_MAX_SPEEDS),
         log_level=robot_settings.get('log_level', DEFAULT_LOG_LEVEL),
-        tip_probe=_build_tip_probe(robot_settings.get('tip_probe', {}))
+        tip_probe=_build_tip_probe(
+            _tip_probe_settings_with_migration(robot_settings))
     )
     return cfg
 
