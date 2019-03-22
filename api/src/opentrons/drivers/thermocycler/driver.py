@@ -8,7 +8,7 @@ try:
 except ModuleNotFoundError:
     select = None  # type: ignore
 from time import sleep
-from typing import Optional
+from typing import Optional, Mapping
 from serial.serialutil import SerialException
 from opentrons.drivers import serial_communication, utils
 from opentrons.drivers.serial_communication import SerialNoResponse
@@ -317,7 +317,7 @@ class Thermocycler:
     def lid_status(self):
         return self._lid_status
 
-    async def get_device_info(self):
+    async def get_device_info(self) -> Mapping[str, str]:
         _device_info_res = await self._write_and_wait(GCODES['DEVICE_INFO'])
         if _device_info_res:
             return utils.parse_device_information(_device_info_res)
