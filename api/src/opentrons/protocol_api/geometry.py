@@ -43,7 +43,7 @@ def plan_moves(
                               labware. Default: 20mm
     :param force_direct: If True, ignore any Z margins force a direct move
     :param minimum_z_height: When specified, this Z margin is able to raise
-                              (but never lower) the mid-arc height.
+                             (but never lower) the mid-arc height.
 
     :returns: A list of tuples of :py:class:`.Point` and critical point
               overrides to move through.

@@ -1240,12 +1240,8 @@ class InstrumentContext(CommandPublisher):
         :type location: :py:class:`.types.Location`
         :param force_direct: If set to true, move directly to destination
                         without arc motion.
-        :param minimum_z_height: An optional height to retract the pipette to
-                         before moving. If not specified, it will be generated
-                         based on the labware from which and to which the
-                         pipette is moving; if it is 0, the pipette will move
-                         directly; and if it is non-zero, the pipette will rise
-                         to the minimum_z_height point before moving in x & y.
+        :param minimum_z_height: When specified, this Z margin is able to raise
+                                 (but never lower) the mid-arc height.
         """
         if self._ctx.location_cache:
             from_lw = self._ctx.location_cache.labware
