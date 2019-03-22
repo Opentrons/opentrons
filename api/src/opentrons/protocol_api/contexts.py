@@ -251,21 +251,27 @@ class ProtocolContext(CommandPublisher):
 
         hc_mod_name = mod_map[module_name.lower()]['hc_name']
         geo_mod_name = mod_map[module_name.lower()]['geo_name']
+        hc_mod_instance = None
         for mod in self._hw_manager.hardware.discover_modules():
             if mod.name() == hc_mod_name:
                 mod_class = {
                     'magdeck': MagneticModuleContext,
                     'tempdeck': TemperatureModuleContext,
                     'thermocycler': ThermocyclerContext}[hc_mod_name]
+                hc_mod_instance = mod
                 break
         else:
             raise KeyError(module_name)
         geometry = load_module(
             geo_mod_name, self._deck_layout.position_for(location))
-        mod_ctx = mod_class(self,
-                            hc_mod_name,
-                            geometry,
-                            self._loop)
+        if hc_mod_instance:
+            mod_ctx = mod_class(self,
+                                hc_mod_instance,
+                                geometry,
+                                self._loop)
+        else:
+            raise RuntimeError(
+                f'Could not find specified module: {module_name}')
         self._deck_layout[location] = geometry
         return mod_ctx
 
@@ -1694,11 +1700,13 @@ class ThermocyclerContext(ModuleContext):
     def open(self):
         """ Opens the lid"""
         self._geometry.lid_closed = self._module.open()
+        self._ctx.deck.recalculate_high_z()
 
     @cmds.publish.both(command=cmds.thermocycler_close)
     def close(self):
         """ Closes the lid"""
         self._geometry.lid_closed = self._module.close()
+        self._ctx.deck.recalculate_high_z()
 
     @cmds.publish.both(command=cmds.thermocycler_set_temp)
     def set_temperature(self,
