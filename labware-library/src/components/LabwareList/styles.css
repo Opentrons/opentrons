@@ -5,6 +5,7 @@
 @import '../../styles/spacing.css';
 
 .card {
+  display: block;
   width: 100%;
   margin: var(--spacing-6) auto;
   box-shadow: var(--shadow-1);

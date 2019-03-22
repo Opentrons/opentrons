@@ -7,7 +7,6 @@ import isEqual from 'lodash/isEqual'
 import uniqWith from 'lodash/uniqWith'
 
 import {Icon} from '@opentrons/components'
-import {getCategoryLabel} from '../../definitions'
 import styles from './styles.css'
 
 import type {
@@ -31,28 +30,38 @@ const EN_TAGS = 'tags'
 const EN_API_NAME = 'api name'
 
 const EN_NUM_WELLS_BY_CATEGORY = {
+  tubeRack: 'no. of tubes',
+  tipRack: 'no. of tips',
   wellPlate: 'no. of wells',
   trough: 'no. of wells',
   trash: 'no. of wells',
   other: 'no. of wells',
-  tubeRack: 'no. of tubes',
-  tipRack: 'no. of tips',
 }
 
 const EN_WELL_DIMS_BY_CATEGORY = {
+  tubeRack: 'tube dimensions',
+  tipRack: 'tip dimensions',
   wellPlate: 'well dimensions',
   trough: 'well dimensions',
   trash: 'well dimensions',
   other: 'well dimensions',
-  tubeRack: 'tube dimensions',
-  tipRack: 'tip dimensions',
+}
+
+// TODO(mc, 2019-03-18): i18n
+const EN_CATEGORY_LABELS = {
+  tubeRack: 'Tube Rack',
+  tipRack: 'Tip Rack',
+  wellPlate: 'Well Plate',
+  trough: 'Trough',
+  trash: 'Trash',
+  other: 'Other',
 }
 
 export type LabwareCardProps = {definition: LabwareDefinition}
 
 export default function LabwareCard (props: LabwareCardProps) {
   return (
-    <div className={styles.card}>
+    <li className={styles.card}>
       <TopBar {...props} />
       <Title {...props} />
       <Gallery />
@@ -63,7 +72,7 @@ export default function LabwareCard (props: LabwareCardProps) {
       </div>
       <Tags {...props} />
       <LoadName {...props} />
-    </div>
+    </li>
   )
 }
 
@@ -74,7 +83,7 @@ function TopBar (props: LabwareCardProps) {
     <p className={styles.top_bar}>
       <span>{brand.brand}</span>
       {' | '}
-      <span>{getCategoryLabel(metadata.displayCategory)}</span>
+      <span>{EN_CATEGORY_LABELS[metadata.displayCategory]}</span>
     </p>
   )
 }

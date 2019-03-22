@@ -9,7 +9,7 @@ import {App} from '..'
 jest.mock('../../LabwareList', () => () => 'LabwareList')
 
 describe('App', () => {
-  test('component renders', async () => {
+  test('component renders', () => {
     const tree = Renderer.create(<App />).toJSON()
 
     expect(tree).toMatchSnapshot()
