@@ -178,11 +178,11 @@ class Simulator:
     def save_current(self):
         yield
 
-    def build_module(self,
-                     port: str,
-                     model: str,
-                     interrupt_callback) -> modules.AbstractModule:
-        return modules.build(
+    async def build_module(self,
+                           port: str,
+                           model: str,
+                           interrupt_callback) -> modules.AbstractModule:
+        return await modules.build(
             port=port,
             which=model,
             simulating=True,

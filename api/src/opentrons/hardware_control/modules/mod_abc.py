@@ -7,10 +7,10 @@ class AbstractModule(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def build(cls,
-              port: str,
-              interrupt_callback,
-              simulating: bool = False) -> 'AbstractModule':
+    async def build(cls,
+                    port: str,
+                    interrupt_callback,
+                    simulating: bool = False) -> 'AbstractModule':
         """ Modules should always be created using this factory.
 
         This lets the (perhaps blocking) work of connecting to and initializing

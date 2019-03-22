@@ -228,13 +228,13 @@ class ProtocolContext(CommandPublisher):
     def load_module(
             self, module_name: str,
             location: types.DeckLocation) -> ModuleTypes:
+        hc_mod_name = {
+            'magdeck': 'magdeck',
+            'magnetic module': 'magdeck',
+            'tempdeck': 'tempdeck',
+            'temperature module': 'tempdeck',
+            'thermocycler': 'thermocycler'}[module_name.lower()]
         for mod in self._hw_manager.hardware.discover_modules():
-            hc_mod_name = {
-                'magdeck': 'magdeck',
-                'magnetic module': 'magdeck',
-                'tempdeck': 'tempdeck',
-                'temperature module': 'tempdeck',
-                'thermocycler': 'thermocycler'}[module_name.lower()]
             if mod.name() == hc_mod_name:
                 mod_class = {'magdeck': MagneticModuleContext,
                              'tempdeck': TemperatureModuleContext,
@@ -1550,7 +1550,7 @@ class TemperatureModuleContext(ModuleContext):
     def wait_for_temp(self):
         """ Block until the module reaches its setpoint.
         """
-        self._loop.run_until_complete(self._module.wait_for_temp())
+        self._module.wait_for_temp()
 
     @property
     def temperature(self):
@@ -1705,7 +1705,7 @@ class ThermocyclerContext(ModuleContext):
 
     def wait_for_temp(self):
         """ Block until the module reaches its setpoint"""
-        self._loop.run_until_complete(self._module.wait_for_temp())
+        self._module.wait_for_temp()
 
     @property
     def temperature(self):

@@ -131,7 +131,7 @@ async def get_attached_modules(request):
                 'model': mod.device_info and mod.device_info.get('model'),
                 'fwVersion': mod.device_info
                 and mod.device_info.get('version'),
-                **mod.live_data()
+                **mod.live_data
             }
             for mod in hw_mods
         ]
@@ -155,7 +155,7 @@ async def get_module_data(request):
     for module in hw_mods:
         is_serial_match = module.device_info.get('serial') == requested_serial
         if is_serial_match and hasattr(module, 'live_data'):
-            res = module.live_data()
+            res = module.live_data
 
     if res:
         return web.json_response(res, status=200)

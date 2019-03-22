@@ -1,5 +1,6 @@
 import asyncio
 from . import mod_abc
+from typing import Union
 from opentrons.drivers.thermocycler.driver import (
     Thermocycler as ThermocyclerDriver, ThermocyclerError)
 
@@ -13,13 +14,13 @@ class SimulatingDriver:
         self._port = None
         self._lid_status = 'open'
 
-    def open(self):
+    async def open(self):
         if self._active:
             raise ThermocyclerError(
                 'Cannot open Thermocycler while it is active')
         self._lid_status = 'open'
 
-    def close(self):
+    async def close(self):
         self._lid_status = 'closed'
 
     @property
@@ -47,13 +48,16 @@ class SimulatingDriver:
     def target(self):
         return self._target_temp
 
-    def connect(self, port):
+    async def connect(self, port):
         self._port = port
 
     def disconnect(self):
         self._port = None
 
-    def set_temperature(self, temp, hold_time, ramp_rate):
+    async def set_temperature(self,
+                              temp: float,
+                              hold_time: float,
+                              ramp_rate: float) -> None:
         self._target_temp = temp
         self._hold_time = hold_time
         self._ramp_rate = ramp_rate
@@ -65,7 +69,7 @@ class SimulatingDriver:
         self._hold_time = None
         self._active = None
 
-    def get_device_info(self):
+    async def get_device_info(self):
         return {'serial': 'dummySerial',
                 'model': 'dummyModel',
                 'version': 'dummyVersion'}
@@ -76,11 +80,16 @@ class Thermocycler(mod_abc.AbstractModule):
     Under development. API subject to change without a version bump
     """
     @classmethod
-    def build(cls, port, interrupt_callback, simulating=False):
+    async def build(cls,
+                    port,
+                    interrupt_callback,
+                    simulating=False,
+                    loop: asyncio.AbstractEventLoop = None):
         """Build and connect to a Thermocycler
         """
-        mod = cls(port, interrupt_callback, simulating)
-        mod._connect()
+
+        mod = cls(port, interrupt_callback, simulating, loop)
+        await mod._connect()
         return mod
 
     @classmethod
@@ -91,12 +100,24 @@ class Thermocycler(mod_abc.AbstractModule):
     def display_name(cls):
         return 'Thermocycler'
 
-    def __init__(self, port, interrupt_callback, simulating):
+    def __init__(self,
+                 port,
+                 interrupt_callback,
+                 simulating,
+                 loop: asyncio.AbstractEventLoop = None) -> None:
         self._interrupt_cb = interrupt_callback
         if simulating:
-            self._driver = SimulatingDriver()
+            self._driver: Union['SimulatingDriver', 'ThermocyclerDriver'] \
+                = SimulatingDriver()
         else:
-            self._driver = ThermocyclerDriver(interrupt_callback)
+            self._driver: Union['SimulatingDriver', 'ThermocyclerDriver'] \
+                = ThermocyclerDriver(interrupt_callback)
+
+        if None is loop:
+            self._loop = asyncio.get_event_loop()
+        else:
+            self._loop = loop
+
         self._port = port
         self._device_info = None
         self._poller = None
@@ -104,17 +125,17 @@ class Thermocycler(mod_abc.AbstractModule):
     def deactivate(self):
         self._driver.deactivate()
 
-    def open(self):
+    async def open(self):
         """ Open the lid if it is closed"""
         # TODO add temperature protection if over 70 C
-        self._driver.open()
+        await self._driver.open()
 
-    def close(self):
+    async def close(self):
         """ Close the lid if it is open"""
-        self._driver.close()
+        await self._driver.close()
 
-    def set_temperature(self, temp, hold_time=None, ramp_rate=None):
-        self._driver.set_temperature(
+    async def set_temperature(self, temp, hold_time=None, ramp_rate=None):
+        await self._driver.set_temperature(
             temp=temp, hold_time=hold_time, ramp_rate=ramp_rate)
 
     async def wait_for_temp(self):
@@ -181,9 +202,17 @@ class Thermocycler(mod_abc.AbstractModule):
         """
         return self._interrupt_cb
 
-    def _connect(self):
-        self._driver.connect(self._port)
-        self._device_info = self._driver.get_device_info()
+    @property
+    def loop(self):
+        return self._loop
+
+    @loop.setter
+    def loop(self, newLoop):
+        self._loop = newLoop
+
+    async def _connect(self):
+        await self._driver.connect(self._port)
+        self._device_info = await self._driver.get_device_info()
 
     @property
     def port(self):

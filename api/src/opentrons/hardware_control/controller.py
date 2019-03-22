@@ -158,11 +158,11 @@ class Controller:
     def get_attached_modules(self) -> List[Tuple[str, str]]:
         return modules.discover()
 
-    def build_module(self,
-                     port: str,
-                     model: str,
-                     interrupt_callback) -> modules.AbstractModule:
-        return modules.build(
+    async def build_module(self,
+                           port: str,
+                           model: str,
+                           interrupt_callback) -> modules.AbstractModule:
+        return await modules.build(
             port=port,
             which=model,
             simulating=False,

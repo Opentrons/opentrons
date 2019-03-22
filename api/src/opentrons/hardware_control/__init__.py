@@ -1087,9 +1087,9 @@ class API(HardwareAPILike):
             self._attached_modules.pop(mod)
         for mod in new:
             self._attached_modules[mod]\
-                = self._backend.build_module(discovered[mod][0],
-                                             discovered[mod][1],
-                                             self.pause_with_message)
+                = await self._backend.build_module(discovered[mod][0],
+                                                   discovered[mod][1],
+                                                   self.pause_with_message)
         return list(self._attached_modules.values())
 
     @_log_call

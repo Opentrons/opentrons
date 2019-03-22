@@ -124,7 +124,6 @@ def labware_test_data(config_tempdir):
         json.dump(dummy_lw_defn, usr_def)
     with (offset_dir/filename).open('w') as offs:
         json.dump(dummy_lw_offset, offs)
-    print("labware test data put in: {}".format(os.listdir(user_def_dir)))
     yield
     shutil.rmtree(os.path.dirname(user_def_dir), ignore_errors=True)
     shutil.rmtree(os.path.dirname(offset_dir), ignore_errors=True)

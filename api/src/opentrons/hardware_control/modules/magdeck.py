@@ -1,3 +1,5 @@
+import asyncio
+from typing import Union
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from . import update, mod_abc
 
@@ -47,11 +49,15 @@ class MagDeck(mod_abc.AbstractModule):
     Under development. API subject to change
     """
     @classmethod
-    def build(cls, port, interrupt_callback, simulating=False):
+    async def build(cls,
+                    port,
+                    interrupt_callback,
+                    simulating=False,
+                    loop: asyncio.AbstractEventLoop = None):
         # MagDeck does not currently use interrupts, so the callback is not
         # passed on
-        mod = cls(port, simulating)
-        mod._connect()
+        mod = cls(port, simulating, loop)
+        await mod._connect()
         return mod
 
     @classmethod
@@ -62,13 +68,24 @@ class MagDeck(mod_abc.AbstractModule):
     def display_name(cls) -> str:
         return 'Magnetic Deck'
 
-    def __init__(self, port, simulating):
+    def __init__(self,
+                 port,
+                 simulating,
+                 loop: asyncio.AbstractEventLoop = None):
         self._engaged = False
         self._port = port
         if simulating:
-            self._driver = SimulatingDriver()
+            self._driver: Union['SimulatingDriver', 'MagDeckDriver'] \
+                = SimulatingDriver()
         else:
-            self._driver = MagDeckDriver()
+            self._driver: Union['SimulatingDriver', 'MagDeckDriver'] \
+                = MagDeckDriver()
+
+        if None is loop:
+            self._loop = asyncio.get_event_loop()
+        else:
+            self._loop = loop
+
         self._device_info = None
 
     def calibrate(self):
@@ -129,9 +146,17 @@ class MagDeck(mod_abc.AbstractModule):
     def interrupt_callback(self):
         return lambda x: None
 
+    @property
+    def loop(self):
+        return self._loop
+
+    @loop.setter
+    def loop(self, newLoop):
+        self._loop = newLoop
+
     # Internal Methods
 
-    def _connect(self):
+    async def _connect(self):
         """
         Connect to the serial port
         """
