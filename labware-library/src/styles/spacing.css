@@ -17,11 +17,11 @@
   --spacing-7: 2rem; /* 32px */
 
   /* width and height sizes (same TODO as above) */
-  --size-1: 1.25rem;
-  --size-2: 3rem;
-  --size-3: 12rem;
-  --size-4: 15rem;
-  --size-5: 32rem;
+  --size-1: 1.25rem; /* 20px */
+  --size-2: 3rem; /* 48px */
+  --size-3: 12rem; /* 48px */
+  --size-4: 15rem; /* 240px */
+  --size-5: 32rem; /* 512px */
   --size-40p: 40%;
   --size-50p: 50%;
   --size-60p: 60%;
