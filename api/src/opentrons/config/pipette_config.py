@@ -20,6 +20,9 @@ pipette_config = namedtuple(
         'drop_tip',
         'pick_up_current',
         'pick_up_distance',
+        'pick_up_increment',
+        'pick_up_presses',
+        'pick_up_speed',
         'aspirate_flow_rate',
         'dispense_flow_rate',
         'channels',
@@ -118,7 +121,6 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
     # Load the model config and update with the name config
     cfg = copy.deepcopy(configs[pipette_model])
     cfg.update(copy.deepcopy(name_config()[cfg['name']]))
-    # import pdb; pdb.set_trace()
     # Load overrides if we have a pipette id
     if pipette_id:
         try:
@@ -156,6 +158,10 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
             cfg, 'dropTip', mutable_configs),
         pick_up_current=ensure_value(cfg, 'pickUpCurrent', mutable_configs),
         pick_up_distance=ensure_value(cfg, 'pickUpDistance', mutable_configs),
+        pick_up_increment=ensure_value(
+            cfg, 'pickUpIncrement', mutable_configs),
+        pick_up_presses=ensure_value(cfg, 'pickUpPresses', mutable_configs),
+        pick_up_speed=ensure_value(cfg, 'pickUpSpeed', mutable_configs),
         aspirate_flow_rate=ensure_value(
             cfg, 'defaultAspirateFlowRate', mutable_configs),
         dispense_flow_rate=ensure_value(
