@@ -285,10 +285,10 @@ def _config_to_save(
 
 def load(deck_cal_file=None):
     deck_cal_file = deck_cal_file or CONFIG['deck_calibration_file']
-    log.info("Loading deck calibration from {}".format(deck_cal_file))
+    log.debug("Loading deck calibration from {}".format(deck_cal_file))
     deck_cal = _load_json(deck_cal_file).get('gantry_calibration', {})
     settings_file = CONFIG['robot_settings_file']
-    log.info("Loading robot settings from {}".format(settings_file))
+    log.debug("Loading robot settings from {}".format(settings_file))
     robot_settings = _load_json(settings_file) or {}
     return _build_config(deck_cal, robot_settings)
 
