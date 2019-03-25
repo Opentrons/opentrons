@@ -43,7 +43,7 @@ class MixForm extends React.Component<Props, State> {
           </span>
         </div>
         <div className={styles.form_row}>
-          <PipetteField name="pipette" {...focusHandlers} />
+          <PipetteField className={styles.large_field} name="pipette" {...focusHandlers} />
           <VolumeField
             label={i18n.t('form.step_edit_form.mixVolumeLabel')}
             focusHandlers={focusHandlers} stepType="mix" />
@@ -54,7 +54,7 @@ class MixForm extends React.Component<Props, State> {
           </FormGroup>
         </div>
         <div className={styles.form_row}>
-          <FormGroup label={i18n.t('form.step_edit_form.labwareLabel.mixLabware')}>
+          <FormGroup label={i18n.t('form.step_edit_form.labwareLabel.mixLabware')} className={styles.large_field} >
             <LabwareField name="labware" {...focusHandlers} />
           </FormGroup>
           <WellSelectionField name="wells" labwareFieldName="labware" pipetteFieldName="pipette" {...focusHandlers} />
