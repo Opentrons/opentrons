@@ -110,6 +110,7 @@ export type DuplicateLabwareAction = {
     templateLabwareId: string,
     duplicateLabwareId: string,
     duplicateDisambiguationNumber: number,
+    slot: DeckSlot,
   },
 }
 

@@ -9,6 +9,8 @@ import type {
   DuplicateLabwareAction,
 } from './actions'
 import type {BaseState, GetState, ThunkDispatch} from '../../types'
+import {INITIAL_DECK_SETUP_STEP_ID} from '../../constants'
+import {getNextAvailableSlot} from '../utils'
 
 function getNextDisambiguationNumber (state: BaseState, newLabwareType: string): number {
   const labwareTypesById = stepFormSelectors.getLabwareTypesById(state)
@@ -44,13 +46,21 @@ export const duplicateLabware = (templateLabwareId: string) =>
     const state = getState()
     const templateLabwareType = stepFormSelectors.getLabwareTypesById(state)[templateLabwareId]
     assert(templateLabwareType, `no type for labware ${templateLabwareId}, cannot run duplicateLabware thunk`)
-    if (templateLabwareType) {
+
+    const initialSetupStep = stepFormSelectors.getSavedStepForms(state)[INITIAL_DECK_SETUP_STEP_ID]
+    const labwareLocations = (initialSetupStep && initialSetupStep.labwareLocationUpdate) || {}
+    const duplicateSlot = getNextAvailableSlot(labwareLocations)
+
+    if (!duplicateSlot) console.warn('no slots available, cannot duplicate labware')
+
+    if (templateLabwareType && duplicateSlot) {
       dispatch({
         type: 'DUPLICATE_LABWARE',
         payload: {
           duplicateDisambiguationNumber: getNextDisambiguationNumber(state, templateLabwareType),
           templateLabwareId,
           duplicateLabwareId: uuid(),
+          slot: duplicateSlot,
         },
       })
     }
