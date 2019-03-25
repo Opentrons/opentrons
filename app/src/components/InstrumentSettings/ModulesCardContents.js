@@ -5,15 +5,17 @@ import ModuleItem, {NoModulesMessage} from '../ModuleItem'
 
 type Props = {
   modules: ?Array<Module>,
+  showThermo: boolean,
 }
 
 export default function ModulesCardContents (props: Props) {
-  if (!props.modules || !props.modules[0]) return (<NoModulesMessage />)
+  const {modules, showThermo} = props
+  if (!modules || !modules[0] || !showThermo) return <NoModulesMessage />
 
   return (
     <React.Fragment>
-      {props.modules.map((mod, index) => (
-        <ModuleItem module={mod} key={index}/>
+      {modules.map((mod, index) => (
+        <ModuleItem module={mod} key={index} />
       ))}
     </React.Fragment>
   )
