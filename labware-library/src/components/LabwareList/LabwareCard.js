@@ -4,6 +4,7 @@
 //   many of which will be common to LabwareCard and LabwarePage
 import * as React from 'react'
 import isEqual from 'lodash/isEqual'
+import round from 'lodash/round'
 import uniqWith from 'lodash/uniqWith'
 
 import {Icon} from '@opentrons/components'
@@ -143,7 +144,7 @@ function PlateDimensions (props: LabwareCardProps) {
         {dimensions.map((d, i) => (
           <p key={i} className={styles.stats_item}>
             <span className={styles.left_label}>{d.label}</span>
-            <span className={styles.value}>{d.value.toFixed(2)}</span>
+            <span className={styles.value}>{round(d.value, 2)}</span>
           </p>
         ))}
       </div>
@@ -191,7 +192,7 @@ function WellProperties (props: LabwareCardProps) {
               {dims.map((d, j) => (
                 <div key={j} className={styles.stats_bar}>
                   <p className={styles.left_label}>{d.label}</p>
-                  <p className={styles.value}>{d.value.toFixed(2)}</p>
+                  <p className={styles.value}>{round(d.value, 2)}</p>
                 </div>
               ))}
             </div>
