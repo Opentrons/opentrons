@@ -103,7 +103,7 @@ or, on OS X or linux,
 
    opentrons_simulate my_protocol.py
 
-If the simulation was successful, the simulator will print ``Simulation successful!``. If there was an error, it will print the error.
+The simulator will print out a log of the actions the protocol will cause, similar to the Opentrons app; it will also print out any log messages caused by a given command next to that list of actions. If there is a problem with the protocol, the simulation will stop and the error will be printed.
 
 The simulation script can also be invoked through python with ``python -m opentrons.simulate /path/to/protocol``.
 
@@ -113,10 +113,10 @@ This also provides an entrypoint to use the Opentrons simulation package from ot
 
    import opentrons.simulate
    protocol_file = open('/path/to/protocol.py')
-   opentrons.simulate.simulate(protocol_file)
+   runlog = opentrons.simulate.simulate(protocol_file)
+   print(format_runlog(runlog))
 
-
-The function will either run and return or raise an  exception if there is a problem with the protocol.
+The :py:meth:`opentrons.simulate.simulate` method does the work of simulating the protocol and returns the run log, which is a list of structured dictionaries. :py:meth:`opentrons.simulate.format_runlog` turns that list of dictionaries into a human readable string, which is then printed out. For more information on the protocol simulator, see :ref:`simulating-ref`.
 
 
 Configuration and Local Storage
