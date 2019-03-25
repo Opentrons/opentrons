@@ -40,7 +40,7 @@ const FORM_ERRORS: {[FormErrorKey]: FormError} = {
   },
   TIME_PARAM_REQUIRED: {
     title: 'Must include hours, minutes, or seconds',
-    dependentFields: ['pauseForAmountOfTime'],
+    dependentFields: ['pauseForAmountOfTime', 'pauseHour', 'pauseMinute', 'pauseSecond'],
   },
   WELL_RATIO_MOVE_LIQUID: {
     title: 'Well selection must be 1 to many, many to 1, or N to N',

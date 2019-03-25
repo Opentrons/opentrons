@@ -12,6 +12,14 @@ import type {FocusHandlers} from '../types'
 type PauseFormProps = {focusHandlers: FocusHandlers}
 function PauseForm (props: PauseFormProps): React.Element<'div'> {
   const {focusHandlers} = props
+
+  // time fields blur together
+  const blurAllTimeUnitFields = () => {
+    ['pauseHour', 'pauseMinute', 'pauseSecond'].forEach(timeUnitFieldName =>
+      props.focusHandlers.onFieldBlur(timeUnitFieldName)
+    )
+  }
+
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
@@ -25,23 +33,27 @@ function PauseForm (props: PauseFormProps): React.Element<'div'> {
           <div className={styles.checkbox_row}>
             <RadioGroupField
               name="pauseForAmountOfTime"
-              options={[{name: 'Pause until told to resume', value: 'false'}]}
+              options={[{
+                name: i18n.t('form.step_edit_form.field.pauseForAmountOfTime.options.false'),
+                value: 'false'}]}
               {...focusHandlers} />
           </div>
           <div className={styles.checkbox_row}>
             <RadioGroupField
               name="pauseForAmountOfTime"
-              options={[{name: 'Delay for an amount of time', value: 'true'}]}
+              options={[{
+                name: i18n.t('form.step_edit_form.field.pauseForAmountOfTime.options.true'),
+                value: 'true'}]}
               {...focusHandlers} />
           </div>
           <ConditionalOnField name={'pauseForAmountOfTime'} condition={(val) => val === 'true'}>
             <div className={styles.form_row}>
-              <TextField {...focusHandlers} className={styles.small_field}
-                units="hr" name="pauseHour" />
-              <TextField {...focusHandlers} className={styles.small_field}
-                units="m" name="pauseMinute" />
-              <TextField {...focusHandlers} className={styles.small_field}
-                units="s" name="pauseSecond" />
+              <TextField {...focusHandlers} onFieldBlur={blurAllTimeUnitFields} className={styles.small_field}
+                units={i18n.t('application.units.hours')} name="pauseHour" />
+              <TextField {...focusHandlers} onFieldBlur={blurAllTimeUnitFields} className={styles.small_field}
+                units={i18n.t('application.units.minutes')} name="pauseMinute" />
+              <TextField {...focusHandlers} onFieldBlur={blurAllTimeUnitFields} className={styles.small_field}
+                units={i18n.t('application.units.seconds')} name="pauseSecond" />
             </div>
           </ConditionalOnField>
         </div>
@@ -49,7 +61,9 @@ function PauseForm (props: PauseFormProps): React.Element<'div'> {
           <div className={styles.form_row}>
             {/* TODO: Ian 2019-03-25 consider making this a component eg `TextAreaField.js` if used anywhere else */}
             <StepField {...focusHandlers} name='pauseMessage' render={({value, updateValue}) => (
-              <FormGroup label='Message to display' className={styles.full_width_field}>
+              <FormGroup
+                className={styles.full_width_field}
+                label={i18n.t('form.step_edit_form.field.pauseMessage.label')}>
                 <textarea
                   className={styles.textarea_field}
                   value={value}
