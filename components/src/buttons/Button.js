@@ -55,34 +55,43 @@ const STRIP_PROPS = [
  * ```
  */
 export default function Button (props: ButtonProps) {
-  const {title, disabled, hover, tabIndex} = props
+  const {title, disabled, hover, tabIndex, Component} = props
   const className = cx(props.className, {[styles.hover]: hover})
   const onClick = !disabled ? props.onClick : undefined
-  const Component = props.Component || 'button'
   const type = props.type || 'button'
   const ref = props.buttonRef
-
-  // pass all props if using a custom component
-  const buttonProps = !props.Component
-    ? {
-      type,
-      title,
-      disabled,
-      onClick,
-      className,
-      tabIndex,
-      ref,
-    }
-    : {
-      ...omit(props, STRIP_PROPS),
-      className: cx(className, {[styles.disabled]: disabled}),
-      onClick,
-    }
-
-  return (
-    <Component {...props.hoverTooltipHandlers} {...buttonProps}>
+  const children = (
+    <React.Fragment>
       {props.iconName && <Icon name={props.iconName} className={styles.icon} />}
       {props.children}
+    </React.Fragment>
+  )
+
+  return Component ? (
+    <Component
+      {...{
+        ...props.hoverTooltipHandlers,
+        ...omit(props, STRIP_PROPS),
+        className: cx(className, {[styles.disabled]: disabled}),
+        onClick,
+      }}
+    >
+      {children}
     </Component>
+  ) : (
+    <button
+      {...{
+        ...props.hoverTooltipHandlers,
+        type,
+        title,
+        disabled,
+        onClick,
+        className,
+        tabIndex,
+      }}
+      ref={ref}
+    >
+      {children}
+    </button>
   )
 }

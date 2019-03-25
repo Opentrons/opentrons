@@ -11,10 +11,6 @@
       background-color: var(--c-white);
       box-shadow: 0 0.125rem 0.25rem 0 color(var(--c-black) alpha(0.5));
     }
-
-    &:not(:last-child) {
-      border-bottom-width: 0;
-    }
   }
 
   --ip-item: {
@@ -43,14 +39,17 @@
 }
 
 .ip_button {
-  padding: 0;
+  padding: 0.25rem;
   flex: 0 0 2rem;
   border-radius: 0;
-  border-left: 1px solid var(--c-med-gray);
 }
 
 .ip_item_group {
-  @apply --ip-group;
+  display: flex;
+  justify-content: flex-start;
+  border: 1px solid var(--c-med-gray);
+  height: 2rem;
+  border-top-width: 0;
 }
 
 .ip_item {

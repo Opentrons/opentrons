@@ -10,7 +10,7 @@ export default class IpItem extends React.Component<Props> {
   remove = () => this.props.removeIp(this.props.candidate)
   render () {
     return (
-      <div className={styles.ip_field_group}>
+      <div className={styles.ip_item_group}>
         <div className={styles.ip_item}>{this.props.candidate}</div>
         <IconButton
           className={styles.ip_button}

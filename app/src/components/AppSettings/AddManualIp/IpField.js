@@ -12,7 +12,7 @@ type Props = {
 export default function IpField (props: Props) {
   const {
     field,
-    form: {errors},
+    form: {errors, submitForm},
     inputRef,
     buttonRef,
   } = props
@@ -20,6 +20,7 @@ export default function IpField (props: Props) {
     <div className={styles.ip_field_group}>
       <input
         {...field}
+        onBlur={submitForm}
         className={styles.ip_field}
         type="text"
         ref={inputRef}
