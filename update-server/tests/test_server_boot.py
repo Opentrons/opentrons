@@ -32,7 +32,8 @@ async def test_server_boot(loop, test_client):
         'name': 'opentrons-dev',
         'updateServerVersion': update_server_version,
         'apiServerVersion': 'not available',
-        'smoothieVersion': 'not available'
+        'smoothieVersion': 'not available',
+        'systemVersion': 'unknown'
     }
 
     resp = await cli.get('/server/update/health')
