@@ -32,10 +32,18 @@ export type ButtonProps = {
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
   /** html tabindex property */
   tabIndex?: number,
+  /** options ref to pass to <button> */
+  buttonRef?: ?HTMLButtonElement,
 }
 
 // props to strip if using a custom component
-const STRIP_PROPS = ['inverted', 'iconName', 'children', 'Component']
+const STRIP_PROPS = [
+  'inverted',
+  'iconName',
+  'children',
+  'Component',
+  'buttonRef',
+]
 
 /**
  * Basic, unstyled button. You probably want to use a styled button
@@ -52,10 +60,19 @@ export default function Button (props: ButtonProps) {
   const onClick = !disabled ? props.onClick : undefined
   const Component = props.Component || 'button'
   const type = props.type || 'button'
+  const ref = props.buttonRef
 
   // pass all props if using a custom component
   const buttonProps = !props.Component
-    ? {type, title, disabled, onClick, className, tabIndex}
+    ? {
+      type,
+      title,
+      disabled,
+      onClick,
+      className,
+      tabIndex,
+      ref,
+    }
     : {
       ...omit(props, STRIP_PROPS),
       className: cx(className, {[styles.disabled]: disabled}),
@@ -64,9 +81,7 @@ export default function Button (props: ButtonProps) {
 
   return (
     <Component {...props.hoverTooltipHandlers} {...buttonProps}>
-      {props.iconName && (
-        <Icon name={props.iconName} className={styles.icon} />
-      )}
+      {props.iconName && <Icon name={props.iconName} className={styles.icon} />}
       {props.children}
     </Component>
   )

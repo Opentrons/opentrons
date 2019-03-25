@@ -13,6 +13,8 @@ export default function IpField (props: Props) {
   const {
     field,
     form: {errors},
+    inputRef,
+    buttonRef,
   } = props
   return (
     <div className={styles.ip_field_group}>
@@ -20,14 +22,14 @@ export default function IpField (props: Props) {
         {...field}
         className={styles.ip_field}
         type="text"
-        ref={props.inputRef}
+        ref={inputRef}
       />
       <IconButton
         className={styles.ip_button}
         name="plus"
         type="submit"
         disabled={errors.ip}
-        ref={props.buttonRef}
+        buttonRef={buttonRef}
       />
     </div>
   )

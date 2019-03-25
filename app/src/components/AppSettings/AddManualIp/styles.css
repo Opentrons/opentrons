@@ -34,7 +34,6 @@
   height: 2rem;
 
   &:focus-within {
-    background-color: var(--c-white);
     box-shadow: 0 0.125rem 0.25rem 0 color(var(--c-black) alpha(0.5));
   }
 }
@@ -56,8 +55,4 @@
 
 .ip_item {
   @apply --ip-item;
-
-  &:hover {
-    background-color: var(--c-highlight);
-  }
 }
