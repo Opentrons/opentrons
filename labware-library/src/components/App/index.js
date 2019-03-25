@@ -10,17 +10,19 @@ import styles from './styles.css'
 
 export function App () {
   return (
-    <React.Fragment>
+    <div className={styles.app}>
       <Nav />
-      <div className={styles.page}>
-        <Sidebar />
-        <section className={styles.content}>
-          <div className={styles.content_container}>
-            <LabwareList />
-          </div>
-        </section>
+      <div className={styles.page_scroller}>
+        <div className={styles.page}>
+          <Sidebar />
+          <section className={styles.content}>
+            <div className={styles.content_container}>
+              <LabwareList />
+            </div>
+          </section>
+        </div>
       </div>
-    </React.Fragment>
+    </div>
   )
 }
 

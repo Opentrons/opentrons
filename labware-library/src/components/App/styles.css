@@ -3,11 +3,21 @@
 @import '../../styles/breakpoints.css';
 @import '../../styles/spacing.css';
 
-.page {
+.app {
   height: 100%;
 
   /* Nav height */
   padding-top: var(--size-2);
+}
+
+.page_scroller {
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.page {
+  margin: auto;
+  max-width: var(--screen-width-xlarge);
 }
 
 .content {
@@ -17,17 +27,12 @@
 }
 
 @media (--medium) {
-  .page {
-    display: flex;
-    overflow: hidden;
-  }
-
   .content {
-    padding-top: var(--spacing-6);
-    padding-left: 0;
-    padding-right: 0;
-    max-height: 100%;
-    overflow-y: auto;
+    padding-top: var(--spacing-7);
+    padding-right: var(--spacing-7);
+
+    /* spacing + sidebar width */
+    padding-left: calc(var(--size-3) + var(--spacing-5));
   }
 
   .content_container {
@@ -37,13 +42,9 @@
 }
 
 @media (--large) {
-  .page {
-    margin: auto;
-    width: var(--screen-width-large);
-  }
-
   .content {
-    padding-left: var(--spacing-4);
+    /* spacing + sidebar width */
+    padding-left: calc(var(--size-4) + var(--spacing-7));
   }
 
   .content_container {

@@ -6,6 +6,9 @@
 
 .nav {
   position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   width: 100%;
   height: var(--size-2);
   z-index: 999;
@@ -23,9 +26,15 @@
   height: 100%;
 }
 
+@media (--medium) {
+  .nav_contents {
+    padding-left: var(--spacing-7);
+  }
+}
+
 @media (--large) {
   .nav_contents {
     margin: auto;
-    width: var(--screen-width-large);
+    max-width: var(--screen-width-xlarge);
   }
 }

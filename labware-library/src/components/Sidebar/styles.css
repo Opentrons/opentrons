@@ -5,12 +5,12 @@
 
 .sidebar {
   width: 100%;
-  padding: var(--spacing-6) var(--spacing-3) 0 var(--spacing-3);
+  padding: var(--spacing-7) var(--spacing-3) 0 var(--spacing-3);
 }
 
 .labware_guide {
   border-bottom: var(--bd-light);
-  padding-bottom: var(--spacing-6);
+  padding-bottom: var(--spacing-7);
 }
 
 .labware_guide_container {
@@ -43,7 +43,7 @@
 
 .filter_manufacturer {
   display: block;
-  margin: var(--spacing-6) 0;
+  margin: var(--spacing-7) 0;
 }
 
 .filter_manufacturer_label {
@@ -86,10 +86,10 @@
 
 @media (--medium) {
   .sidebar {
-    flex: none;
+    position: fixed;
     width: var(--size-3);
     height: 100%;
-    padding-left: var(--spacing-5);
+    padding-left: var(--spacing-7);
     padding-right: var(--spacing-5);
     overflow-y: auto;
   }
@@ -108,5 +108,6 @@
 @media (--large) {
   .sidebar {
     width: var(--size-4);
+    padding-left: var(--spacing-7);
   }
 }

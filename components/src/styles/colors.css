@@ -4,16 +4,21 @@
   --c-blue: #006fff;
   --c-light-blue: color(var(--c-blue) lightness(85%));
 
-  /* grays */
-  --c-dark-gray: #4a4a4a;
-  --c-med-gray: #9b9b9b;
-
-  /* TODO(mc, 2018-10-25): light gray should be e6e6e6 */
-  --c-light-gray: #e5e2e2;
+  /*
+   * grays
+   * TODO(mc, 2019-03-22): align with style guide
+   */
+  --c-near-black: #a4a4a4; /* style guide: n/a */
+  --c-dark-gray: #4a4a4a; /* style guide: near-black */
   --c-charcoal: #979797;
-  --c-near-black: #a4a4a4;
+  --c-med-gray: #9b9b9b; /* style guide: n/a */
+  --c-light-gray: #e5e2e2; /* style guide: smoke, should be e6e6e6 */
+  --c-lightest-gray: #ededed; /* style guide: n/a */
 
-  /* background colors */
+  /*
+   * background colors
+   * TODO(mc, 2019-03-22): combine with colors
+   */
   --c-bg-dark: #4a4a4a;
   --c-bg-light: #fafafa;
   --c-bg-selected: #f0f3ff;
