@@ -41,6 +41,28 @@
   width: 5.75rem;
 }
 
+.full_width_field {
+  width: 100%;
+}
+
+/* TODO: Ian 2019-03-25 make this a component library input? */
+.textarea_field {
+  background-color: var(--c-light-gray);
+  border-radius: var(--bd-radius-form-field);
+  padding: 0.25rem 0.25rem 0.25rem 0.5rem;
+  height: 100%;
+  width: 100%;
+
+  /* resets */
+  border: none;
+  overflow: auto;
+  outline: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  resize: none;
+}
+
 .orphan_field {
   margin: 0;
 }
