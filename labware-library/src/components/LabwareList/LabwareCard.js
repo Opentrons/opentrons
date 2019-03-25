@@ -58,6 +58,9 @@ const EN_CATEGORY_LABELS = {
   other: 'Other',
 }
 
+// safe toFixed
+const toFixed = (n: number, d: number): string => round(n, d).toFixed(d)
+
 export type LabwareCardProps = {definition: LabwareDefinition}
 
 export default function LabwareCard (props: LabwareCardProps) {
@@ -144,7 +147,7 @@ function PlateDimensions (props: LabwareCardProps) {
         {dimensions.map((d, i) => (
           <p key={i} className={styles.stats_item}>
             <span className={styles.left_label}>{d.label}</span>
-            <span className={styles.value}>{round(d.value, 2)}</span>
+            <span className={styles.value}>{toFixed(d.value, 2)}</span>
           </p>
         ))}
       </div>
@@ -192,7 +195,7 @@ function WellProperties (props: LabwareCardProps) {
               {dims.map((d, j) => (
                 <div key={j} className={styles.stats_bar}>
                   <p className={styles.left_label}>{d.label}</p>
-                  <p className={styles.value}>{round(d.value, 2)}</p>
+                  <p className={styles.value}>{toFixed(d.value, 2)}</p>
                 </div>
               ))}
             </div>
