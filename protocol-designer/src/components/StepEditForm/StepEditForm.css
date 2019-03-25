@@ -47,6 +47,7 @@
 
 /* TODO: Ian 2019-03-25 make this a component library input? */
 .textarea_field {
+  font-size: var(--fs-body-1);
   background-color: var(--c-light-gray);
   border-radius: var(--bd-radius-form-field);
   padding: 0.25rem 0.25rem 0.25rem 0.5rem;
