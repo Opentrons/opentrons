@@ -23,12 +23,16 @@
   },
   "step_edit_form": {
     "section": {
+      "sterility": "sterility",
       "sterility&motion": "sterility & motion"
     },
     "labwareLabel": {
       "aspirate": "source",
-      "dispense": "destination"
+      "dispense": "destination",
+      "mixLabware": "labware"
     },
+    "mixVolumeLabel": "mix volume",
+    "mixRepetitions": "repetitions",
     "multiDispenseOptionsLabel": "multi-dispense options",
     "wellSelectionLabel": {
       "columns": "columns",

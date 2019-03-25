@@ -160,6 +160,10 @@
   background-color: var(--c-warning-light);
 }
 
+.dropdown {
+  background-color: var(--c-light-gray);
+}
+
 .dropdown_field {
   position: relative;
 
@@ -211,7 +215,8 @@
   }
 
   /* stylelint-disable no-descending-specificity */
-  & input {
+  & input,
+  & .suffix {
     color: var(--c-med-gray);
   }
 }
