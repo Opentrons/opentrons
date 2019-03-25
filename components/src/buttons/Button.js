@@ -32,8 +32,8 @@ export type ButtonProps = {
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
   /** html tabindex property */
   tabIndex?: number,
-  /** options ref to pass to <button> */
-  buttonRef?: ?HTMLButtonElement,
+  /** optional ref to pass to <button> */
+  buttonRef?: {current: null | HTMLButtonElement},
 }
 
 // props to strip if using a custom component
