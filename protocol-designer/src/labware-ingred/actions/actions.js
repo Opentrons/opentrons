@@ -48,7 +48,7 @@ export const drillUpFromLabware = createAction(
 // ==== Create/delete/modify labware =====
 
 export type CreateContainerArgs = {|
-  slot?: DeckSlot,
+  slot?: DeckSlot, // NOTE: if slot is omitted, next available slot will be used.
   containerType: string,
 |}
 

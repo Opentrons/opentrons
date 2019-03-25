@@ -29,16 +29,25 @@ function getNextDisambiguationNumber (state: BaseState, newLabwareType: string):
 
 export const createContainer = (args: CreateContainerArgs) =>
   (dispatch: ThunkDispatch<CreateContainerAction>, getState: GetState) => {
-    const disambiguationNumber = getNextDisambiguationNumber(getState(), args.containerType)
+    const state = getState()
+    const disambiguationNumber = getNextDisambiguationNumber(state, args.containerType)
+    const initialSetupStep = stepFormSelectors.getSavedStepForms(state)[INITIAL_DECK_SETUP_STEP_ID]
+    const labwareLocations = (initialSetupStep && initialSetupStep.labwareLocationUpdate) || {}
 
-    dispatch({
-      type: 'CREATE_CONTAINER',
-      payload: {
-        ...args,
-        id: `${uuid()}:${args.containerType}`,
-        disambiguationNumber,
-      },
-    })
+    const slot = args.slot || getNextAvailableSlot(labwareLocations)
+    if (slot) {
+      dispatch({
+        type: 'CREATE_CONTAINER',
+        payload: {
+          ...args,
+          id: `${uuid()}:${args.containerType}`,
+          disambiguationNumber,
+          slot,
+        },
+      })
+    } else {
+      console.warn('no slots available, cannot create labware')
+    }
   }
 
 export const duplicateLabware = (templateLabwareId: string) =>
