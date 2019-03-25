@@ -23,3 +23,14 @@ Pipette
 
 .. autoclass:: opentrons.legacy_api.instruments.Pipette
    :members: aspirate, dispense, mix, delay, drop_tip, blow_out, touch_tip, pick_up_tip, return_tip, transfer, distribute, consolidate, move_to, home, set_flow_rate
+
+
+.. _simulating-ref:
+
+Simulation
+----------
+
+.. automodule:: opentrons.simulate
+   :exclude-members: CommandScraper, AccumulatingHandler, main
+   :members:
+
