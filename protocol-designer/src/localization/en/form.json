@@ -72,6 +72,13 @@
       "step_name": {"label": "Step Name"},
       "step_notes": {"label": "Step Notes"},
       "mix": {"label": "mix"},
+      "pauseForAmountOfTime": {
+        "options": {
+          "false": "Pause until told to resume",
+          "true": "Delay for an amount of time"
+        }
+      },
+      "pauseMessage": {"label": "message to display"},
       "path": {
         "title": {
           "single": "Single Transfers",
