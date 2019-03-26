@@ -11,15 +11,12 @@ import styles from './FileSidebar.css'
 type Props = {
   loadFile: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
   createNewFile?: () => mixed,
-  downloadData: ?{
-    fileContents: string,
-    fileName: string,
-  },
+  canDownload: boolean,
   onDownload: (event: SyntheticEvent<*>) => mixed,
 }
 
 export default function FileSidebar (props: Props) {
-  const {downloadData, loadFile, createNewFile, onDownload} = props
+  const {canDownload, loadFile, createNewFile, onDownload} = props
   return (
     <SidePanel title='Protocol File'>
       <div className={styles.file_sidebar}>
@@ -33,13 +30,9 @@ export default function FileSidebar (props: Props) {
         </OutlineButton>
 
         <div className={styles.button}>
-          <PrimaryButton
-            Component='a'
-            download={downloadData && downloadData.fileName}
-            onClick={onDownload}
-            disabled={!downloadData}
-            href={downloadData && 'data:application/json;charset=utf-8,' + encodeURIComponent(downloadData.fileContents)}
-          >Export</PrimaryButton>
+          <PrimaryButton onClick={onDownload} disabled={!canDownload}>
+            Export
+          </PrimaryButton>
         </div>
       </div>
     </SidePanel>
