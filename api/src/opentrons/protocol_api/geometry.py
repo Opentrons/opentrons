@@ -102,7 +102,7 @@ def plan_moves(
             (to_point, dest_cp_override)]
 
 
-DeckItem = Union[Labware, ModuleGeometry]
+DeckItem = Union[Labware, ModuleGeometry, ThermocyclerGeometry]
 
 
 class Deck(UserDict):

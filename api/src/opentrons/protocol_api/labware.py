@@ -611,22 +611,22 @@ class ThermocyclerGeometry(ModuleGeometry):
     def __init__(self, definition: dict, parent: Location) -> None:
         super().__init__(definition, parent)
         self._lid_height = definition["dimensions"]["lidHeight"]
-        self._lid_status = False
+        self._lid_closed = ''
 
     @property
     def highest_z(self) -> float:
-        if self.lid_status == 'closed':
+        if self.lid_closed == 'closed':
             return super().highest_z + self._lid_height
         else:
             return super().highest_z
 
     @property
-    def lid_status(self) -> str:
-        return self._lid_status
+    def lid_closed(self) -> str:
+        return self._lid_closed
 
-    @lid_status.setter
-    def lid_status(self, status) -> None:
-        self._lid_status = status
+    @lid_closed.setter
+    def lid_closed(self, closed) -> None:
+        self._lid_closed = closed
 
     def labware_accessor(self, definition: Labware) -> Labware:
         # Block first three columns from being accessed
@@ -637,7 +637,7 @@ class ThermocyclerGeometry(ModuleGeometry):
     def add_labware(self, labware: Labware):
         assert not self._labware,\
             '{} is already on this module'.format(self._labware)
-        assert self.lid_status != 'closed', \
+        assert self.lid_closed != 'closed', \
             'Cannot place labware in closed module'
         if self.load_name == 'semithermocycler':
             labware = self.labware_accessor(labware)
@@ -804,7 +804,8 @@ def clear_calibrations():
 
 
 def load_module_from_definition(
-        definition: dict, parent: Location) -> ModuleGeometry:
+        definition: dict, parent: Location) -> \
+            Union[ModuleGeometry, ThermocyclerGeometry]:
     """
     Return a :py:class:`ModuleGeometry` object from a specified definition
 
@@ -816,7 +817,8 @@ def load_module_from_definition(
     """
     mod_name = definition['loadName']
     if mod_name == 'thermocycler' or mod_name == 'semithermocycler':
-        mod = ThermocyclerGeometry(definition, parent)
+        mod: Union[ModuleGeometry, ThermocyclerGeometry] = \
+                ThermocyclerGeometry(definition, parent)
     else:
         mod = ModuleGeometry(definition, parent)
     # TODO: calibration
