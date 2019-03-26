@@ -185,8 +185,6 @@ async def execute_module_command(request):
 
         if matching_mod:
             if hasattr(matching_mod, command_type):
-                log.debug(f'matchingMod: {matching_mod}, command type: {command_type}, args: {args}')
-
                 clean_args = args or []
                 method = getattr(matching_mod, command_type)
                 if asyncio.iscoroutinefunction(method):
@@ -194,11 +192,11 @@ async def execute_module_command(request):
                 else:
                     val = method(*clean_args)
 
-                log.debug(f'val: {val}')
                 return web.json_response(val, status=200)
             else:
                 return web.json_response(
-                    {'message': f'Module does not have command: {command_type}'},
+                    {'message':
+                        f'Module does not have command: {command_type}'},
                     status=400)
         else:
             return web.json_response({"message": "Specified module not found"},

@@ -63,7 +63,7 @@ class SimulatingDriver:
         self._ramp_rate = ramp_rate
         self._active = True
 
-    def deactivate(self):
+    async def deactivate(self):
         self._target_temp = None
         self._ramp_rate = None
         self._hold_time = None
@@ -122,8 +122,8 @@ class Thermocycler(mod_abc.AbstractModule):
         self._device_info = None
         self._poller = None
 
-    def deactivate(self):
-        self._driver.deactivate()
+    async def deactivate(self):
+        await self._driver.deactivate()
 
     async def open(self):
         """ Open the lid if it is closed"""

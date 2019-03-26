@@ -26,7 +26,6 @@ GCODES = {
     'SET_PLATE_TEMP': 'M104',
     'GET_PLATE_TEMP': 'M105',
     'SET_RAMP_RATE': 'M566',
-    'PAUSE': '',
     'DEACTIVATE': 'M18',
     'DEVICE_INFO': 'M115'
 }
@@ -153,7 +152,7 @@ class TCPoller(threading.Thread):
         self._send_command(SERIAL_ACK, timeout=DEFAULT_TC_TIMEOUT)
 
     def _send_command(self, command, timeout=DEFAULT_TC_TIMEOUT):
-        command_line = command + ' ' + SERIAL_ACK # TC_COMMAND_TERMINATOR
+        command_line = command + ' ' + SERIAL_ACK
         ret_code = self._recursive_write_and_return(
             command_line, timeout, DEFAULT_COMMAND_RETRIES)
         if ERROR_KEYWORD in ret_code.lower():
@@ -235,8 +234,8 @@ class Thermocycler:
         self._poller = None
         return self
 
-    def deactivate(self):
-        raise NotImplementedError
+    async def deactivate(self):
+        await self._write_and_wait(GCODES['DEACTIVATE'])
 
     def is_connected(self) -> bool:
         if not self._poller:
