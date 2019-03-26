@@ -16,6 +16,9 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@opentrons/components": "3.8.0",
+    "lodash": "^4.17.4",
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3",
     "react-hot-loader": "^4.8.0"
   }
 }

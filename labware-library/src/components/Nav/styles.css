@@ -1,14 +1,19 @@
 /* top navbar styles */
 @import '@opentrons/components';
 @import '../../styles/breakpoints.css';
+@import '../../styles/shadows.css';
 @import '../../styles/spacing.css';
 
 .nav {
   position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   width: 100%;
   height: var(--size-2);
+  z-index: 999;
   background-color: var(--c-white);
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-1);
 }
 
 .nav_contents {
@@ -21,9 +26,15 @@
   height: 100%;
 }
 
+@media (--medium) {
+  .nav_contents {
+    padding-left: var(--spacing-7);
+  }
+}
+
 @media (--large) {
   .nav_contents {
     margin: auto;
-    width: var(--screen-width-large);
+    max-width: var(--screen-width-xlarge);
   }
 }
