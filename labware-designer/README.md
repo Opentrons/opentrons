@@ -138,8 +138,18 @@ const options = {
   grid: [{row: 3, column: 2}, {row: 2, column: 2}],
   spacing: [{row: 25, column: 25}, {row: 35, column: 35}],
   well: [
-    {totalLiquidVolume: 15, diameter: 14.5, shape: 'circular', depth: 117.98},
-    {totalLiquidVolume: 50, diameter: 26.45, shape: 'circular', depth: 113.85},
+    {
+      totalLiquidVolume: 15000,
+      diameter: 14.5,
+      shape: 'circular',
+      depth: 117.98,
+    },
+    {
+      totalLiquidVolume: 50000,
+      diameter: 26.45,
+      shape: 'circular',
+      depth: 113.85,
+    },
   ],
   gridStart: [
     {rowStart: 'A', colStart: '1', rowStride: 1, colStride: 1},
@@ -255,6 +265,8 @@ Fields:
 | diameter          | number | no       | Diameter of the well in **mm**; required if `shape: 'circular'`           |
 | length            | number | no       | Length (x-axis) of the well in **mm**; required if `shape: 'rectangular'` |
 | width             | number | no       | Width (y-axis) of the well in **mm**; required if `shape: 'rectangular'`  |
+
+**`totalLiquidVolume` must be specified in µL**. The generator will convert the value in µL to `metadata.displayVolumeUnits` for the `loadName`.
 
 Note: The full well schema includes `x`, `y`, and `z` fields, but they should not be set by the user. The generator functions will calculate well positions.
 
