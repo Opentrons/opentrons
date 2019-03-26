@@ -66,8 +66,7 @@ const options = {
   metadata: {
     displayName: 'ANSI 96 Standard Microplate',
     displayCategory: 'wellPlate',
-    displayVolumeUnits: 'uL',
-    displayLengthUnits: 'mm',
+    displayVolumeUnits: 'µL',
     tags: ['flat', 'microplate', 'SBS', 'ANSI', 'generic'],
   },
   parameters: {
@@ -121,7 +120,6 @@ const options = {
     displayName: 'Opentrons 6x15mL 4x50mL tube rack',
     displayCategory: 'tubeRack',
     displayVolumeUnits: 'mL',
-    displayLengthUnits: 'mm',
     tags: ['opentrons', 'modular', 'tuberack', '15', 'mL', '50'],
   },
   parameters: {
@@ -197,7 +195,10 @@ Fields:
   - `trough`
   - `trash`
   - `other`
-- `displayVolumeUnits` is the units scale to use in the labware load name and app display rather than the default of `µL`
+- `displayVolumeUnits` is the units scale to use in the labware load name and app display; defaults to `µL` and must be one of:
+  - `µL`
+  - `mL`
+  - `L`
 - `tags` is a list of generic words that a user may search for to find the labware
 
 #### Parameters
