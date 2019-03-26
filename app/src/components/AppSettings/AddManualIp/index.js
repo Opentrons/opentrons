@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom'
 
 import {AlertModal} from '@opentrons/components'
 import {Portal} from '../../portal'
-import ManualIpForm from './manualIpForm'
+import ManualIpForm from './ManualIpForm'
 import IpList from './IpList'
 
 export type AddManualIpProps = {
