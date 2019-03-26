@@ -7,6 +7,7 @@ import isEqual from 'lodash/isEqual'
 import round from 'lodash/round'
 import uniqWith from 'lodash/uniqWith'
 
+import {getDisplayVolume} from '@opentrons/shared-data'
 import {Icon} from '@opentrons/components'
 import styles from './styles.css'
 
@@ -202,7 +203,8 @@ function WellProperties (props: LabwareCardProps) {
             <div className={styles.well_volume}>
               <p className={styles.top_label}>{EN_MAX_VOLUME}</p>
               <p className={styles.value}>
-                {w.totalLiquidVolume} {displayVolumeUnits}
+                {getDisplayVolume(w.totalLiquidVolume, displayVolumeUnits, 2)}{' '}
+                {displayVolumeUnits}
               </p>
             </div>
           </div>

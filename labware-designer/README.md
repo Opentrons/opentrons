@@ -118,7 +118,7 @@ This example generates [opentrons_6x15_ml_4x50_ml_tuberack.json][]
 ```js
 const options = {
   metadata: {
-    displayName: 'Opentrons 15x50mL tube rack',
+    displayName: 'Opentrons 6x15mL 4x50mL tube rack',
     displayCategory: 'tubeRack',
     displayVolumeUnits: 'mL',
     displayLengthUnits: 'mm',
@@ -142,8 +142,8 @@ const options = {
     {totalLiquidVolume: 50, diameter: 26.45, shape: 'circular', depth: 113.85},
   ],
   gridStart: [
-    {rowStart: 'A', colStart: 1, rowStride: 1, colStride: 1},
-    {rowStart: 'A', colStart: 3, rowStride: 1, colStride: 1},
+    {rowStart: 'A', colStart: '1', rowStride: 1, colStride: 1},
+    {rowStart: 'A', colStart: '3', rowStride: 1, colStride: 1},
   ],
   brand: {brand: 'Opentrons', brandId: ['352096', '352070']},
 }
@@ -157,51 +157,74 @@ const labware = sharedData.createIrregularLabware(options)
 
 #### Metadata
 
+Metadata that affects how the labware is displayed to the user but does not affect labware functionality.
+
+Example:
+
 ```js
-type Metadata = {
-  displayName: string,
-  displayCategory: string,
-  displayVolumeUnits?: string,
-  displayLengthUnits?: string,
-  tags?: Array<string>,
+const metadata = {
+  displayName: 'ANSI 96 Standard Microplate',
+  displayCategory: 'wellPlate',
+  displayVolumeUnits: 'uL', // u will be converted to µ
+  tags: ['flat', 'microplate', 'SBS', 'ANSI', 'generic'],
 }
 ```
 
-"displayName" is the name of the labware in the Opentrons App, Protocol Designer, and other client apps (i.e.: "Opentrons 96 PCR plate" or similar)
+Fields:
 
-"displayCategory" is what category the container type falls into. It must be one of:
+| field              | type           | required | description                                  |
+| ------------------ | -------------- | -------- | -------------------------------------------- |
+| displayName        | string         | yes      | Human-readable labware name                  |
+| displayCategory    | enum           | yes      | Labware category in the library (see below)  |
+| displayVolumeUnits | enum           | no       | Volume units to use for display (default µL) |
+| tags               | Array<string\> | no       | List of strings to use as search tags        |
 
-- "wellPlate"
-- "tubeRack"
-- "tipRack"
-- "trough"
-- "trash"
-- "other"
-
-"tags" is a list of generic words that describe this labware such as shape of bottom, color or other important factors
+- `displayName` is the name of the labware in the Opentrons App, Protocol Designer, and other client apps
+- `displayCategory` must be one of:
+  - `wellPlate`
+  - `tubeRack`
+  - `tipRack`
+  - `trough`
+  - `trash`
+  - `other`
+- `displayVolumeUnits` is the units scale to use in the labware load name and app display rather than the default of `µL`
+- `tags` is a list of generic words that a user may search for to find the labware
 
 #### Parameters
 
+Parameters that affect how the labware is operated on by the robot
+
+Example:
+
 ```js
-type Parameters = {
-  format: string,
-  isTiprack: boolean,
-  tipLength?: number, // required if "isTiprack" is true
-  isMagneticModuleCompatible: boolean,
-  magneticModuleEngageHeight?: number, // required if "isMagneticModuleCompatible" is true
+const parameters = {
+  format: '96Standard',
+  isTiprack: false,
+  isMagneticModuleCompatible: false,
 }
 ```
 
-Format is used to determine how a multichannel pipette may (or may not) interact with this labware.
+Fields:
 
-There are currently four categories:
+| field                      | type    | required | description                                                                               |
+| -------------------------- | ------- | -------- | ----------------------------------------------------------------------------------------- |
+| format                     | enum    | yes      | Labware format for pipette access (see below)                                             |
+| isTiprack                  | boolean | yes      | Whether or not labware is a tiprack                                                       |
+| tipLength                  | number  | no       | Length of tips in rack; required if `isTiprack: true`                                     |
+| isMagneticModuleCompatible | boolean | yes      | Whether labware can be with the Magnetic Module                                           |
+| magneticModuleEngageHeight | number  | no       | Engagement height for Magnetic Module use; required if `isMagneticModuleCompatible: true` |
 
-- irregular (any type of container a multichannel cannot access -- most tuberacks, irregular labware etc)
-- 96Standard (any container in a 96 format: well plate or tiprack)
-- 384Standard (any container in a 96 format: well plate or tiprack)
-- trough
+- `format` is determines how a multichannel pipette may interact with the labware
+  - `irregular` - any type of container a multichannel cannot access; e.g. most tuberacks, irregular labware, etc
+  - `96Standard` - any labware with an 8x12 grid, well plate or tiprack
+  - `384Standard` - any labware with a 16x24 grid, well plate or tiprack
+  - `trough` - labware where all tips of a multichannel access a single well simultaneously
+- `isTiprack` specifies that the labware is a tiprack and all wells are tips
+- `tipLength` specifies the length of the tips if `isTiprack` is `true`
+- `isMagneticModuleCompatible` specifies that the labware can be used on the Magnetic Module
+- `magneticModuleEngageHeight` specifies the height at which the Magnetic Module should engage if `isMagneticModuleCompatible` is `true`
 
-Note: The parameters schema includes a `loadName` field, but this should not be set by the user. It is generated by the program as:
+Note: the full schema for `labwareDefinition.parameters` also inlcudes `parameters.loadName`. This field should not be set by the user; the program will generate it automatically and insert it into the definition:
 
 ```js
 loadName = `${brand}_${numWells}_${displayCategory}_${totalVol}_${displayVolumeUnits}`.toLowerCase()
@@ -209,108 +232,173 @@ loadName = `${brand}_${numWells}_${displayCategory}_${totalVol}_${displayVolumeU
 
 #### Well
 
+Properties to apply to every well in a given grid.
+
+Example:
+
 ```js
-type Well = {
-  depth: number,
-  shape: string,
-  diameter?: number,
-  length?: number,
-  width?: number,
-  totalLiquidVolume: number,
+const well = {
+  depth: 10.54,
+  shape: 'circular',
+  diameter: 6.4,
+  totalLiquidVolume: 380,
 }
 ```
 
-"depth" is how deep a given well is.
+Fields:
 
-"shape" is what type of well you are dealing with. Currently there are two options:
+| field             | type   | required | description                                                               |
+| ----------------- | ------ | -------- | ------------------------------------------------------------------------- |
+| depth             | number | yes      | Depth of the well in **mm**                                               |
+| shape             | enum   | yes      | `rectangular` or `circular`                                               |
+| totalLiquidVolume | number | yes      | Volume of the well in **µL**                                              |
+| diameter          | number | no       | Diameter of the well in **mm**; required if `shape: 'circular'`           |
+| length            | number | no       | Length (x-axis) of the well in **mm**; required if `shape: 'rectangular'` |
+| width             | number | no       | Width (y-axis) of the well in **mm**; required if `shape: 'rectangular'`  |
 
-- "circular" (if of this shape, diameter is required)
-- "rectangular" (if of this shape, width and length is required)
-
-"width" corresponds to the Y axis on the deck of the OT2, and "length" corresponds to the X axis
-
-"totalLiquidVolume" is the actual working volume of the well, in the units specified in "displayLiquidVolume" (default
-is uL)
-
-Note: The well schema includes `x`, `y`, and `z` fields, but they should not be set by the user. The generator functions will calculate well positions.
+Note: The full well schema includes `x`, `y`, and `z` fields, but they should not be set by the user. The generator functions will calculate well positions.
 
 #### Grid
 
+The number of rows and columns in a regular labware or irregular labware grid
+
+Example:
+
 ```js
-type Grid = {
-  row: number,
-  column: number,
+const grid = {
+  row: 8,
+  column: 12,
 }
 ```
 
-Grid is the number of rows and columns in a given labware
+Fields:
+
+| field  | type   | required | description                                 |
+| ------ | ------ | -------- | ------------------------------------------- |
+| row    | number | yes      | Number of rows (running down the y-axis)    |
+| column | number | yes      | Number of columns (running down the x-axis) |
 
 #### Spacing
 
+Center-to-center distance in **mm** between rows and columns in a regular labware or irregular labware grid
+
+Example:
+
 ```js
-type Spacing = {
-  row: number,
-  column: number,
+const spacing = {
+  row: 9,
+  column: 9,
 }
 ```
 
-Spacing is the center to center distance of wells between rows and columns
+Fields:
+
+| field  | type   | required | description                                         |
+| ------ | ------ | -------- | --------------------------------------------------- |
+| row    | number | yes      | Center-to-center distance in **mm** between rows    |
+| column | number | yes      | Center-to-center distance in **mm** between columns |
 
 #### Offset
 
+The distance in **mm** from the **upper left corner of the labware, flush with the deck** to the **top-center of well `A1`** (or the first well in an irregular labware grid).
+
+Example:
+
 ```js
-type Offset = {
-  x: number,
-  y: number,
-  z: number,
+const offset = {
+  x: 14.38,
+  y: 11.24,
+  z: 14.35,
 }
 ```
 
-Offset is taken from the **upper left corner of the labware, flush with the deck** to the top-center of well `A1`.
+Fields:
+
+| field | type   | required | description               |
+| ----- | ------ | -------- | ------------------------- |
+| x     | number | yes      | X-axis distance in **mm** |
+| y     | number | yes      | Y-axis distance in **mm** |
+| z     | number | yes      | Z-axis distance in **mm** |
 
 #### Dimensions
 
+Overall dimensions in **mm** of the labware
+
+Example:
+
 ```js
-type Dimensions = {
-  overallLength: number,
-  overallWidth: number,
-  overallHeight: number,
+const dimensions = {
+  overallLength: 127.76,
+  overallWidth: 85.48,
+  overallHeight: 14.35,
 }
 ```
 
-"overallLength" is the outer dimension of the labware in the X axis in mm--usually equal to the length of the slot: 127.76 mm.
+Fields:
 
-"overallWidth" is the outer dimension of the labware in the Y axis in mm--usually equal to the width of the slot: 85.48 mm.
+| field         | type   | required | description                  |
+| ------------- | ------ | -------- | ---------------------------- |
+| overallLength | number | yes      | X-axis measurement in **mm** |
+| overallWidth  | number | yes      | Y-axis measurement in **mm** |
+| overallHeight | number | yes      | Z-axis measurement in **mm** |
 
-"overallHeight" is the outer dimension of the labware in the Z axis in mm--usually the same as the top the well, but can be higher in case of some kind of veritcal protrusion.
+- `overallLength` is the outer dimension of the labware in the X-axis
+  - Usually equal to the length of the slot (127.76 mm)
+- `overallWidth` is the outer dimension of the labware in the Y-axis
+  - Usually equal to the width of the slot (85.48 mm)
+- `overallHeight` is the outer dimension of the labware in the Z-axis
+  - Usually the same as the top the well
+  - Can be higher in case of some kind of vertical protrusion.
 
 #### GridStart
 
+Used to generate well names for irregular labware. The object represents creating a "range" of well names with step intervals included. For example, starting at well "A1" with a column stride of 2 would result in the grid names being ordered as: "A1", "B1", ...; "A3", "B3", ...; etc.
+
+Example:
+
 ```js
-type GridStart = {
-  rowStart: string,
-  colStart: string,
-  rowStride: number,
-  colStride: number,
+// if grid has 3 rows and 3 columns, will produce the following well names:
+//   B2  B4  B6
+//   C2  C4  C6
+//   D2  D4  D6
+const gridStart = {
+  rowStart: 'B',
+  colStart: '2',
+  rowStride: 1,
+  colStride: 2,
 }
 ```
 
-GridStart is used to generate well names for irregular labware. The object represents creating a "range" of well names with step intervals included. For example, starting at well "A1" with a column stride of 2 would result in the grid names being ordered as: "A1", "B1", ...; "A3", "B3", ...; etc.
+Fields:
+
+| field     | type   | required | description                                           |
+| --------- | ------ | -------- | ----------------------------------------------------- |
+| rowStart  | string | yes      | Row name to start the grid at                         |
+| colStart  | string | yes      | Column name to start the grid at                      |
+| rowStride | number | yes      | How much to increment the row name when it rolls over |
+| colStride | number | yes      | How much to increment the column when it rolls over   |
 
 #### Brand
 
+Brand information for the labware
+
+Example:
+
 ```js
-type Brand = {
-  brand: string,
-  brandId?: string,
+const brand = {
+  brand: 'Opentrons',
+  brandId: ['352096', '352070'],
 }
 ```
 
-"brand" is the name of the manufacturer
+Fields:
 
-"brandId" is used when a definition accurately reflects several products
+| field   | type           | required | description             |
+| ------- | -------------- | -------- | ----------------------- |
+| brand   | string         | yes      | Manufacturer/brand name |
+| brandId | Array<string/> | no       | Matching product IDs    |
 
-If `brand` is omitted from the input, the resulting definition will have: `"brand": {"brand": "generic"}`.
+If a `brand` object not input, the resulting definition will have: `"brand": {"brand": "generic"}`.
 
 ## Explanation of Numerical inputs
 

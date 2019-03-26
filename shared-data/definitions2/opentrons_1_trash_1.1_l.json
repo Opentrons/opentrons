@@ -9,7 +9,6 @@
     "metadata": {
         "displayCategory": "trash",
         "displayVolumeUnits": "L",
-        "displayLengthUnits": "mm",
         "displayName": "Tall Fixed Trash",
         "tags": [
             "trash",
@@ -39,7 +38,7 @@
             "shape": "rectangular",
             "length": 165.67,
             "width": 107.11,
-            "totalLiquidVolume": 1.1,
+            "totalLiquidVolume": 1100000,
             "depth": 77,
             "x": 82.84,
             "y": 53.56,

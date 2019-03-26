@@ -32,7 +32,7 @@
       "type": "object",
       "description": "Properties used for search and display",
       "additionalProperties": false,
-      "required": ["displayName", "displayCategory"],
+      "required": ["displayName", "displayCategory", "displayVolumeUnits"],
       "properties": {
         "displayName": {
           "description": "Easy to remember name of labware",
@@ -50,11 +50,10 @@
             "other"
           ]
         },
-        "displayLengthUnits": {
-          "type": "string"
-        },
         "displayVolumeUnits": {
-          "type": "string"
+          "description": "Volume units for display",
+          "type": "string",
+          "enum": ["µL", "mL", "L"]
         },
         "tags": {
           "type": "array",

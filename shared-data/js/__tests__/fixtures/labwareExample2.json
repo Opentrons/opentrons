@@ -4,8 +4,7 @@
   "metadata": {
     "displayName": "fake labware 2",
     "displayCategory": "wellPlate",
-    "displayVolumeUnits": "uL",
-    "displayLengthUnits": "mm"
+    "displayVolumeUnits": "mL"
   },
   "brand": {
     "brand": "generic"
@@ -13,7 +12,7 @@
   "parameters": {
     "format": "irregular",
     "isTiprack": false,
-    "loadName": "generic_6_wellplate_100_ul",
+    "loadName": "generic_6_wellplate_1_ml",
     "isMagneticModuleCompatible": false
   },
   "cornerOffsetFromSlot": {
@@ -30,7 +29,7 @@
   "wells": {
     "A1": {
       "depth": 40,
-      "totalLiquidVolume": 100,
+      "totalLiquidVolume": 1000,
       "diameter": 30,
       "x": 10,
       "y": 28,
@@ -39,7 +38,7 @@
     },
     "B1": {
       "depth": 40,
-      "totalLiquidVolume": 100,
+      "totalLiquidVolume": 1000,
       "diameter": 30,
       "x": 10,
       "y": 19,
@@ -48,7 +47,7 @@
     },
     "C1": {
       "depth": 40,
-      "totalLiquidVolume": 100,
+      "totalLiquidVolume": 1000,
       "diameter": 30,
       "x": 10,
       "y": 10,
@@ -57,7 +56,7 @@
     },
     "A2": {
       "depth": 40,
-      "totalLiquidVolume": 100,
+      "totalLiquidVolume": 1000,
       "diameter": 30,
       "x": 19,
       "y": 28,
@@ -66,7 +65,7 @@
     },
     "B2": {
       "depth": 40,
-      "totalLiquidVolume": 100,
+      "totalLiquidVolume": 1000,
       "diameter": 30,
       "x": 19,
       "y": 19,
@@ -75,7 +74,7 @@
     },
     "C2": {
       "depth": 40,
-      "totalLiquidVolume": 100,
+      "totalLiquidVolume": 1000,
       "diameter": 30,
       "x": 19,
       "y": 10,

@@ -4,8 +4,7 @@
   "metadata": {
     "displayName": "fake labware",
     "displayCategory": "wellPlate",
-    "displayVolumeUnits": "uL",
-    "displayLengthUnits": "mm"
+    "displayVolumeUnits": "µL"
   },
   "brand": {
     "brandId": ["t40u9sernisofsea"],

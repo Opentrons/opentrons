@@ -41,11 +41,14 @@ export type LabwareDisplayCategory =
   | 'wellPlate'
   | 'other'
 
+export type LabwareWellShape = 'rectangular' | 'circular'
+
+export type LabwareVolumeUnits = 'µL' | 'mL' | 'L'
+
 export type LabwareMetadata = {|
   displayName: string,
   displayCategory: LabwareDisplayCategory,
-  displayVolumeUnits: string,
-  displayLengthUnits?: string,
+  displayVolumeUnits: LabwareVolumeUnits,
   tags?: Array<string>,
 |}
 
@@ -79,7 +82,7 @@ export type LabwareBrand = {|
 
 export type LabwareWellProperties = {|
   depth: number,
-  shape: string,
+  shape: LabwareWellShape,
   totalLiquidVolume: number,
   diameter?: number,
   length?: number,

@@ -25,7 +25,6 @@
         "displayName": "Opentrons 6x15mL 4x50mL tube rack",
         "displayCategory": "tubeRack",
         "displayVolumeUnits": "mL",
-        "displayLengthUnits": "mm",
         "tags": [
             "opentrons",
             "modular",
@@ -53,7 +52,7 @@
     },
     "wells": {
           "A1": {
-              "totalLiquidVolume": 15,
+              "totalLiquidVolume": 15000,
               "diameter": 14.5,
               "shape": "circular",
               "depth": 117.98,
@@ -62,7 +61,7 @@
               "z": 5.78
           },
           "B1": {
-              "totalLiquidVolume": 15,
+              "totalLiquidVolume": 15000,
               "diameter": 14.5,
               "shape": "circular",
               "depth": 117.98,
@@ -71,7 +70,7 @@
               "z": 5.78
           },
           "C1": {
-              "totalLiquidVolume": 15,
+              "totalLiquidVolume": 15000,
               "diameter": 14.5,
               "shape": "circular",
               "depth": 117.98,
@@ -80,7 +79,7 @@
               "z": 5.78
           },
           "A2": {
-              "totalLiquidVolume": 15,
+              "totalLiquidVolume": 15000,
               "diameter": 14.5,
               "shape": "circular",
               "depth": 117.98,
@@ -89,7 +88,7 @@
               "z": 5.78
           },
           "B2": {
-              "totalLiquidVolume": 15,
+              "totalLiquidVolume": 15000,
               "diameter": 14.5,
               "shape": "circular",
               "depth": 117.98,
@@ -98,7 +97,7 @@
               "z": 5.78
           },
           "C2": {
-              "totalLiquidVolume": 15,
+              "totalLiquidVolume": 15000,
               "diameter": 14.5,
               "shape": "circular",
               "depth": 117.98,
@@ -107,7 +106,7 @@
               "z": 5.78
           },
           "A3": {
-              "totalLiquidVolume": 50,
+              "totalLiquidVolume": 50000,
               "diameter": 26.45,
               "shape": "circular",
               "depth": 113.85,
@@ -116,7 +115,7 @@
               "z": 5.95
           },
           "B3": {
-              "totalLiquidVolume": 50,
+              "totalLiquidVolume": 50000,
               "diameter": 26.45,
               "shape": "circular",
               "depth": 113.85,
@@ -125,7 +124,7 @@
               "z": 5.95
           },
           "A4": {
-              "totalLiquidVolume": 50,
+              "totalLiquidVolume": 50000,
               "diameter": 26.45,
               "shape": "circular",
               "depth": 113.85,
@@ -134,7 +133,7 @@
               "z": 5.95
           },
           "B4": {
-              "totalLiquidVolume": 50,
+              "totalLiquidVolume": 50000,
               "diameter": 26.45,
               "shape": "circular",
               "depth": 113.85,
