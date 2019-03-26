@@ -44,24 +44,24 @@
       "change_tip": {
         "label": "change tip",
         "option": {
-          "always": "Always",
-          "once": "Once",
-          "perSource": "Per Source Well",
-          "perDest": "Per Destination Well",
+          "always": "Before every aspirate",
+          "once": "Once at the start of step",
+          "perSource": "Per source well",
+          "perDest": "Per destination well",
           "never": "Never"
         },
         "option_tooltip": {
-          "always": "Avoid contaminating both source & destination wells",
-          "once": "Only at start of step",
-          "perSource": "Avoid cross-contaminating source wells",
-          "perDest": "Avoid cross-contaminating destination wells",
-          "never": "Use same tip as last step"
+          "always": "Always aspirate with a fresh tip.",
+          "once": "Get one new tip to use for the whole step.",
+          "perSource": "Get a new tip when aspirating from a new source well. Keep tip for repeat aspirations from the same source well.",
+          "perDest": "Get a new tip when dispensing into a new destination well. Keep tip for repeat dispenses into the same destination well.",
+          "never": "Use same tip as the previous step."
         }
       },
       "tip_position": {"label": "tip position"},
       "volume": {"label": "volume"},
       "well_order": {
-        "label": "Well Order",
+        "label": "Well order",
         "option": {
           "l2r": "Left to right",
           "r2l": "Right to left",
