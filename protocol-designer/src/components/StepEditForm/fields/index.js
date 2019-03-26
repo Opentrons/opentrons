@@ -8,6 +8,7 @@ export {default as TextField} from './Text'
 
 /* Specialized Fields */
 
+export {default as ConditionalOnField} from './ConditionalOnField'
 export {default as WellSelectionField} from './WellSelection'
 export {default as WellOrderField} from './WellOrder'
 export {default as TipPositionField} from './TipPosition'

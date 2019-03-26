@@ -8,10 +8,15 @@ export default function getDisabledFieldsMixForm (
 ): Set<string> {
   const disabled = new Set()
 
-  if (!rawForm.pipette || !rawForm['labware']) {
+  if (!rawForm.pipette || !rawForm.labware) {
     disabled.add('mix_touchTip_checkbox')
     disabled.add('mix_mmFromBottom')
     disabled.add('wells')
+  }
+
+  if (!rawForm.pipette) {
+    disabled.add('aspirate_flowRate')
+    disabled.add('dispense_flowRate')
   }
 
   return disabled

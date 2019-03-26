@@ -152,6 +152,18 @@ export class DiscoveryClient extends EventEmitter {
     return this
   }
 
+  setCandidates (candidates: Array<string | Candidate>): DiscoveryClient {
+    this.candidates = candidates.map(c => {
+      if (typeof c === 'string') {
+        return makeCandidate(c)
+      } else {
+        return c
+      }
+    })
+    this._poll(true)
+    return this
+  }
+
   setPollInterval (interval: number): DiscoveryClient {
     this._pollInterval = interval || DEFAULT_POLL_INTERVAL
     this._poll(true)

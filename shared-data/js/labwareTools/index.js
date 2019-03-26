@@ -16,6 +16,8 @@ import type {
   LabwareBrand as Brand,
   LabwareParameters as Params,
   LabwareWell as Well,
+  LabwareWellProperties as InputWell,
+  LabwareWellMap as WellMap,
   LabwareOffset as Offset,
 } from '../types'
 
@@ -35,8 +37,6 @@ type GridStart = {
 }
 
 type InputParams = $Rest<Params, {|loadName: string|}>
-
-type InputWell = $Rest<Well, {|x: number, y: number, z: number|}>
 
 export type RegularLabwareProps = {
   metadata: Metadata,
@@ -107,7 +107,7 @@ function determineIrregularLayout (
   offset: Array<Offset>,
   gridStart: Array<GridStart>,
   wells: Array<InputWell>
-): {[wellName: string]: Well} {
+): WellMap {
   return grids.reduce((wellMap, gridObj, gridIdx) => {
     const reverseRowIdx = range(gridObj.row - 1, -1)
 
@@ -171,7 +171,7 @@ function calculateCoordinates (
   ordering: Array<Array<string>>,
   spacing: Cell,
   offset: Offset
-): {[wellName: string]: Well} {
+): WellMap {
   // Note, reverse() on its own mutates ordering. Use slice() as a workaround
   // to prevent mutation
   return ordering.reduce((wells, column, cIndex) => {

@@ -1,3 +1,4 @@
+from numpy import add
 import time
 from itertools import chain
 from opentrons import instruments, labware, robot
@@ -34,6 +35,7 @@ def load_labware(protocol_data):
     loaded_labware = {}
     for labware_id, props in data.items():
         slot = props.get('slot')
+        # TODO: Ian 2019-03-19 throw error if slot is number, only allow string
         model = props.get('model')
         display_name = props.get('display-name')
 
@@ -209,6 +211,27 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
                 well_object.properties['depth'] - z_from_bottom) * -1
 
             pipette.touch_tip(well_object, v_offset=offset_from_top)
+
+        elif command_type == 'move-to-slot':
+            slot = params.get('slot')
+            if slot not in [str(s+1) for s in range(12)]:
+                raise ValueError('"move-to-slot" requires a valid slot, got {}'
+                                 .format(slot))
+            x_offset = params.get('offset', {}).get('x', 0)
+            y_offset = params.get('offset', {}).get('y', 0)
+            z_offset = params.get('offset', {}).get('z', 0)
+            slot_placeable = robot.deck[slot]
+            slot_offset = (x_offset, y_offset, z_offset)
+
+            strategy = 'direct' if params.get('force-direct') else None
+
+            # NOTE: Robot.move_to subtracts the offset from Slot.top()[1],
+            # so in order not to translate our desired offset,
+            # we have to compensate by adding it here :/
+            pipette.move_to(
+                (slot_placeable,
+                 add(slot_offset, tuple(slot_placeable.top()[1]))),
+                strategy=strategy)
 
 
 def execute_protocol(protocol):

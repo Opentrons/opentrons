@@ -312,6 +312,24 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
             well = _get_well(labware, params)
             offset = default_values.get('touch-tip-mm-from-top', -1)
             pipette.touch_tip(location, v_offset=offset)  # type: ignore
+
+        elif command_type == 'move-to-slot':
+            slot = params.get('slot')
+            if slot not in [str(s+1) for s in range(12)]:
+                raise ValueError('Invalid "slot" for "move-to-slot": {}'
+                                 .format(slot))
+            slot_obj = context.deck.position_for(slot)
+
+            offset = params.get('offset', {})
+            offsetPoint = Point(
+                offset.get('x', 0),
+                offset.get('y', 0),
+                offset.get('z', 0))
+
+            pipette.move_to(  # type: ignore
+                slot_obj.move(offsetPoint),
+                force_direct=params.get('force-direct'),
+                minimum_z_height=params.get('minimum-z-height'))
         else:
             MODULE_LOG.warning("Bad command type {}".format(command_type))
 

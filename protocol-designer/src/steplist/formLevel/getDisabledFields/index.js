@@ -8,6 +8,7 @@ function _getDisabledFields (rawForm: FormData): Set<string> {
   switch (rawForm.stepType) {
     case 'moveLiquid': return getDisabledFieldsMoveLiquidForm(rawForm)
     case 'mix': return getDisabledFieldsMixForm(rawForm)
+    case 'pause': return new Set() // nothing to disable
     default: {
       console.warn(`disabled fields for step type ${rawForm.stepType} not yet implemented!`)
       return new Set()

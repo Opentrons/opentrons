@@ -127,3 +127,10 @@ export function getConfig (path?: string) {
 
   return result
 }
+
+export function handleConfigChange (
+  path: string,
+  changeHandler: (newValue: any, oldValue: any) => mixed
+) {
+  store().onDidChange(path, changeHandler)
+}

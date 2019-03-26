@@ -64,9 +64,7 @@ export default function Button (props: ButtonProps) {
 
   return (
     <Component {...props.hoverTooltipHandlers} {...buttonProps}>
-      {props.iconName && (
-        <Icon name={props.iconName} className={styles.icon} />
-      )}
+      {props.iconName && <Icon name={props.iconName} className={styles.icon} />}
       {props.children}
     </Component>
   )

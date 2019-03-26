@@ -8,13 +8,6 @@ import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 
-import {sortedSlotnames, type DeckSlot} from '@opentrons/components'
-import {
-  addSpecsToPipetteInvariantProps,
-  getIdsInRange,
-  getLabwareIdInSlot,
-  pipetteModelToName,
-} from '../utils'
 import {
   INITIAL_DECK_SETUP_STEP_ID,
   FIXED_TRASH_ID,
@@ -23,7 +16,6 @@ import {getPDMetadata} from '../../file-types'
 import {getDefaultsForStepType, handleFormChange} from '../../steplist/formLevel'
 import {cancelStepForm} from '../../steplist/actions'
 
-import type {PipetteEntity, LabwareEntities} from '../types'
 import type {LoadFileAction} from '../../load-file'
 import type {
   CreateContainerAction,
@@ -49,11 +41,18 @@ import type {
   SaveStepFormAction,
 } from '../../steplist/actions'
 import type {StepItemData} from '../../steplist/types'
+import type {PipetteEntity, LabwareEntities} from '../types'
 import type {
   CreatePipettesAction,
   DeletePipettesAction,
   SubstituteStepFormPipettesAction,
 } from '../actions'
+import {
+  addSpecsToPipetteInvariantProps,
+  getIdsInRange,
+  getLabwareIdInSlot,
+  pipetteModelToName,
+} from '../utils'
 
 type FormState = FormData | null
 
@@ -127,11 +126,6 @@ export const initialDeckSetupStepForm: FormData = {
   pipetteLocationUpdate: {},
 }
 
-function _getNextAvailableSlot (labwareLocations: {[labwareId: string]: DeckSlot}): ?DeckSlot {
-  const filledLocations = Object.values(labwareLocations)
-  return sortedSlotnames.find(slot => !filledLocations.some(filledSlot => filledSlot === slot))
-}
-
 const initialSavedStepFormsState: SavedStepFormState = {
   [INITIAL_DECK_SETUP_STEP_ID]: initialDeckSetupStepForm,
 }
@@ -178,7 +172,7 @@ export const savedStepForms = (
       const prevInitialDeckSetupStep = savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
       const labwareId = action.type === 'CREATE_CONTAINER' ? action.payload.id : action.payload.duplicateLabwareId
       assert(prevInitialDeckSetupStep, 'expected initial deck setup step to exist, could not handle CREATE_CONTAINER')
-      const slot = action.payload.slot || _getNextAvailableSlot(prevInitialDeckSetupStep.labwareLocationUpdate)
+      const slot = action.payload.slot
       if (!slot) {
         console.warn('no slots available, ignoring action:', action)
         return savedStepForms

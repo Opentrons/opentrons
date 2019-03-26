@@ -1,0 +1,202 @@
+/* LabwareList styles */
+@import '@opentrons/components';
+@import '../../styles/breakpoints.css';
+@import '../../styles/shadows.css';
+@import '../../styles/spacing.css';
+
+.card {
+  display: block;
+  width: 100%;
+  margin: var(--spacing-7) auto;
+  box-shadow: var(--shadow-1);
+}
+
+.top_bar {
+  @apply --font-body-2-dark;
+
+  padding: var(--spacing-2);
+  line-height: var(--lh-copy);
+  text-align: right;
+  background-color: var(--c-lightest-gray);
+}
+
+.title {
+  @apply --transition-background-color;
+
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-5);
+  line-height: var(--lh-title);
+  font-size: var(--fs-default);
+  font-weight: var(--fw-semibold);
+  color: var(--c-blue);
+  background-color: var(--c-white);
+
+  &:hover {
+    background-color: var(--c-light-gray);
+  }
+}
+
+.title_icon {
+  flex: none;
+  height: 1.5rem;
+}
+
+.gallery,
+.stats,
+.well_dimensions,
+.well_volume {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.gallery {
+  width: var(--size-40p);
+  padding-top: var(--spacing-1);
+  padding-left: var(--spacing-5);
+  padding-right: var(--spacing-6);
+}
+
+.stats {
+  width: var(--size-60p);
+  padding-right: var(--spacing-4);
+}
+
+.gallery_main {
+  @apply --aspect-4-3;
+
+  background-color: var(--c-blue);
+}
+
+.thumbnail_row {
+  width: 100%;
+  margin-top: var(--spacing-5);
+}
+
+.thumbnail_container {
+  display: inline-block;
+  width: calc(var(--size-third) - var(--spacing-5) * 2 / 3);
+  margin-right: var(--spacing-5);
+}
+
+.thumbnail_container:last-of-type {
+  margin-right: 0;
+}
+
+.thumbnail {
+  @apply --aspect-1-1;
+
+  background-color: var(--c-blue);
+}
+
+.dimensions {
+  padding-bottom: var(--spacing-4);
+  border-bottom: var(--bd-light);
+}
+
+.wells {
+  margin-top: var(--spacing-4);
+}
+
+.well_group {
+  margin-top: var(--spacing-4);
+}
+
+.well_dimensions {
+  width: var(--size-two-thirds);
+  padding-right: var(--spacing-6);
+}
+
+.well_volume {
+  width: var(--size-third);
+}
+
+.stats_bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-2);
+  background-color: var(--c-lightest-gray);
+}
+
+.stats_item {
+  display: flex;
+  align-items: baseline;
+}
+
+.top_label,
+.left_label {
+  flex: none;
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-title);
+  text-transform: uppercase;
+  color: var(--c-font-icon);
+}
+
+.left_label {
+  margin-right: var(--spacing-3);
+}
+
+.top_label {
+  margin-bottom: var(--spacing-2);
+}
+
+.units {
+  text-transform: none;
+}
+
+.value {
+  @apply --font-body-2-dark;
+
+  line-height: var(--lh-title);
+}
+
+.tags {
+  display: flex;
+  align-items: center;
+  margin-top: var(--spacing-6);
+  padding: var(--spacing-2) var(--spacing-5);
+  background-color: var(--c-bg-light);
+
+  & .value {
+    font-size: var(--fs-body-1);
+  }
+}
+
+.load_name {
+  display: block;
+  padding: var(--spacing-2) var(--spacing-5);
+  background-color: var(--c-lightest-gray);
+}
+
+.load_name_input {
+  font-size: var(--fs-body-1);
+  line-height: var(--lh-title);
+  width: calc(100% + 2 * var(--spacing-2));
+  margin-left: -var(--spacing-2);
+  padding: var(--spacing-1) var(--spacing-2);
+  border: var(--bd-light);
+  color: var(--c-font-dark);
+}
+
+@media (--medium) {
+  .card {
+    margin-top: 0;
+  }
+}
+
+@media (--large) {
+  .card {
+    display: inline-block;
+    vertical-align: top;
+    width: calc(50% - 0.5 * var(--spacing-8));
+    margin-right: var(--spacing-8);
+    margin-bottom: var(--spacing-8);
+
+    &:nth-child(even) {
+      margin-right: 0;
+    }
+  }
+}

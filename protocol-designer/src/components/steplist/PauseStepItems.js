@@ -9,20 +9,22 @@ type Props = {
 
 export default function PauseStepItems (props: Props) {
   const {pauseArgs} = props
-  if (pauseArgs.wait === true) {
-    // Show message if waiting indefinitely
-    return <PDListItem>{pauseArgs.message}</PDListItem>
-  }
   if (!pauseArgs.meta) {
     // No message or time, show nothing
     return null
   }
+  const {message, wait} = pauseArgs
   const {hours, minutes, seconds} = pauseArgs.meta
-  return <PDListItem>
-    <span>{hours} hr</span>
-    <span>{minutes} m</span>
-    <span>{seconds} s</span>
-    <span/>
-    <span/>
-  </PDListItem>
+  return (
+    <React.Fragment>
+      {message && <PDListItem>{message}</PDListItem>}
+      {wait !== true && <PDListItem>
+        <span>{hours} hr</span>
+        <span>{minutes} m</span>
+        <span>{seconds} s</span>
+        <span/>
+        <span/>
+      </PDListItem>}
+    </React.Fragment>
+  )
 }

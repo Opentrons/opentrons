@@ -29,6 +29,24 @@ function SourceDestFields (props: Props) {
   const {className, focusHandlers, prefix} = props
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
 
+  const mixFields = (
+    <CheckboxRowField
+      name={addFieldNamePrefix('mix_checkbox')}
+      label={i18n.t('form.step_edit_form.field.mix.label')}
+      className={styles.small_field}>
+      <TextField
+        name={addFieldNamePrefix('mix_volume')}
+        units={i18n.t('application.units.microliter')}
+        className={styles.small_field}
+        {...focusHandlers} />
+      <TextField
+        name={addFieldNamePrefix('mix_times')}
+        units={i18n.t('application.units.times')}
+        className={styles.small_field}
+        {...focusHandlers} />
+    </CheckboxRowField>
+  )
+
   return (
     <div className={className}>
       <div className={styles.form_row}>
@@ -48,6 +66,7 @@ function SourceDestFields (props: Props) {
               label={i18n.t('form.step_edit_form.field.preWetTip.label')}
               className={styles.small_field}
             />
+            {mixFields}
             <CheckboxRowField
               disabled
               tooltipComponent={i18n.t('tooltip.not_in_beta')}
@@ -64,28 +83,18 @@ function SourceDestFields (props: Props) {
             </CheckboxRowField>
           </React.Fragment>
         }
+
+        {prefix === 'dispense' && mixFields}
+
         <CheckboxRowField
           name={addFieldNamePrefix('touchTip_checkbox')}
+          tooltipComponent={i18n.t(`tooltip.step_fields.defaults.${addFieldNamePrefix('touchTip_checkbox')}`)}
           label={i18n.t('form.step_edit_form.field.touchTip.label')}
           className={styles.small_field}
         >
           <TipPositionField fieldName={addFieldNamePrefix('touchTip_mmFromBottom')} />
         </CheckboxRowField>
-        <CheckboxRowField
-          name={addFieldNamePrefix('mix_checkbox')}
-          label={i18n.t('form.step_edit_form.field.mix.label')}
-          className={styles.small_field}>
-          <TextField
-            name={addFieldNamePrefix('mix_volume')}
-            units={i18n.t('application.units.microliter')}
-            className={styles.small_field}
-            {...focusHandlers} />
-          <TextField
-            name={addFieldNamePrefix('mix_times')}
-            units={i18n.t('application.units.times')}
-            className={styles.small_field}
-            {...focusHandlers} />
-        </CheckboxRowField>
+
         {prefix === 'dispense' &&
           <CheckboxRowField
             name='blowout_checkbox'
