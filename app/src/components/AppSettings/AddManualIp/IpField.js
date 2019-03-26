@@ -7,14 +7,12 @@ type Props = {
   field: any,
   form: any,
   inputRef: {current: null | HTMLInputElement},
-  buttonRef: {current: null | HTMLButtonElement},
 }
 export default function IpField (props: Props) {
   const {
     field,
-    form: {errors, submitForm},
+    form: {submitForm, dirty},
     inputRef,
-    buttonRef,
   } = props
   return (
     <div className={styles.ip_field_group}>
@@ -29,8 +27,7 @@ export default function IpField (props: Props) {
         className={styles.ip_button}
         name="plus"
         type="submit"
-        disabled={errors.ip}
-        buttonRef={buttonRef}
+        disabled={!dirty}
       />
     </div>
   )

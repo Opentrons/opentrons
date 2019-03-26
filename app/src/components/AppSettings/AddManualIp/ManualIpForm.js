@@ -19,33 +19,19 @@ type DP = {|
 
 type Props = {...SP, ...DP}
 
-type FormValues = {[string]: ?string}
-
 class IpForm extends React.Component<Props> {
-  buttonRef: {current: null | HTMLButtonElement}
   inputRef: {current: null | HTMLInputElement}
   constructor (props) {
     super(props)
-    this.buttonRef = React.createRef()
     this.inputRef = React.createRef()
-  }
-  validate = (values: FormValues) => {
-    const errors = {}
-    if (!values['ip']) {
-      errors.ip = 'Empty Address'
-    }
-    return errors
   }
   render () {
     return (
       <Formik
         initialValues={{ip: ''}}
-        validate={this.validate}
         onSubmit={(values, actions) => {
           this.props.addManualIp(values.ip)
 
-          const $button = this.buttonRef.current
-          if ($button) $button.blur()
           const $input = this.inputRef.current
           if ($input) $input.blur()
 
@@ -54,12 +40,7 @@ class IpForm extends React.Component<Props> {
         render={formProps => {
           return (
             <Form>
-              <Field
-                name="ip"
-                component={IpField}
-                buttonRef={this.buttonRef}
-                inputRef={this.inputRef}
-              />
+              <Field name="ip" component={IpField} inputRef={this.inputRef} />
             </Form>
           )
         }}

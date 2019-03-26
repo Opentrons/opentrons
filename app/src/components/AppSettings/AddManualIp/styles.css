@@ -14,7 +14,7 @@
   }
 
   --ip-item: {
-    flex: 1 1 calc(100% - 2rem);
+    flex: 1 0 100%;
     padding: 0 1rem;
     border: 0;
     border-radius: 0;
@@ -28,20 +28,32 @@
   justify-content: flex-start;
   border: 1px solid var(--c-med-gray);
   height: 2rem;
-
-  &:focus-within {
-    box-shadow: 0 0.125rem 0.25rem 0 color(var(--c-black) alpha(0.5));
-  }
 }
 
 .ip_field {
   @apply --ip-item;
+
+  width: 100%;
+
+  &:focus {
+    box-shadow: 0 0.125rem 0.25rem 0 color(var(--c-black) alpha(0.5));
+  }
 }
 
 .ip_button {
   padding: 0.25rem;
   flex: 0 0 2rem;
   border-radius: 0;
+  margin-left: -2rem;
+
+  &:hover,
+  &:active {
+    background-color: color(var(--c-bg-light) shade(10%));
+  }
+
+  &:focus {
+    background-color: transparent;
+  }
 }
 
 .ip_item_group {
