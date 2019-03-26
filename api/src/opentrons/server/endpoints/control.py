@@ -192,7 +192,10 @@ async def execute_module_command(request):
                 else:
                     val = method(*clean_args)
 
-                return web.json_response(val, status=200)
+                return web.json_response({
+                    'message': 'Success',
+                    'returnValue': val
+                }, status=200)
             else:
                 return web.json_response(
                     {'message':
