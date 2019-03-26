@@ -66,6 +66,7 @@ function SourceDestFields (props: Props) {
         }
         <CheckboxRowField
           name={addFieldNamePrefix('touchTip_checkbox')}
+          tooltipComponent={i18n.t(`tooltip.step_fields.${addFieldNamePrefix('touchTip_checkbox')}`)}
           label={i18n.t('form.step_edit_form.field.touchTip.label')}
           className={styles.small_field}
         >

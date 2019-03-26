@@ -61,7 +61,7 @@
       "tip_position": {"label": "tip position"},
       "volume": {"label": "volume"},
       "well_order": {
-        "label": "Well Order",
+        "label": "Well order",
         "option": {
           "l2r": "Left to right",
           "r2l": "Right to left",

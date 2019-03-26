@@ -49,7 +49,7 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
     const isTouchTipField = getIsTouchTipField(this.props.fieldName)
 
     const Wrapper = ({children, hoverTooltipHandlers}) => isTouchTipField
-      ? <React.Fragment>{children}</React.Fragment>
+      ? <div {...hoverTooltipHandlers}>{children}</div>
       : <FormGroup
         label={i18n.t('form.step_edit_form.field.tip_position.label')}
         disabled={disabled}
@@ -82,7 +82,7 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
               readOnly
               onClick={this.handleOpen}
               value={String(value)}
-              units="mm" />
+              units={i18n.t('application.units.millimeter')} />
           </Wrapper>
         )}
       </HoverTooltip>

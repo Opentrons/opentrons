@@ -97,6 +97,7 @@ class MixForm extends React.Component<Props, State> {
               <CheckboxRowField
                 className={styles.small_field}
                 label={i18n.t('form.step_edit_form.field.touchTip.label')}
+                tooltipComponent={i18n.t('tooltip.step_fields.defaults.mix_touchTip_checkbox')}
                 name={'mix_touchTip_checkbox'}
               >
                 <TipPositionField fieldName={'mix_touchTip_mmFromBottom'} />

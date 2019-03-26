@@ -5,6 +5,7 @@
     "pause": "pause"
   },
   "units": {
+    "millimeter": "mm",
     "microliter": "μL",
     "microliterPerSec": "μL/s",
     "times": "x",
