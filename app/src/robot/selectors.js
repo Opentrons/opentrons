@@ -3,12 +3,8 @@
 import padStart from 'lodash/padStart'
 import some from 'lodash/some'
 import {createSelector} from 'reselect'
-
-import {
-  type ConnectionStatus,
-  PIPETTE_MOUNTS,
-  DECK_SLOTS,
-} from './constants'
+import omitBy from 'lodash/omitBy'
+import {type ConnectionStatus, PIPETTE_MOUNTS, DECK_SLOTS} from './constants'
 
 import type {ContextRouter} from 'react-router'
 import type {OutputSelector} from 'reselect'
@@ -29,7 +25,6 @@ const connection = (state: State) => state.robot.connection
 const session = (state: State) => state.robot.session
 const sessionRequest = (state: State) => session(state).sessionRequest
 const cancelRequest = (state: State) => session(state).cancelRequest
-
 export function isMount (target: ?string): boolean {
   return PIPETTE_MOUNTS.indexOf(target) > -1
 }
@@ -39,9 +34,7 @@ export function isSlot (target: ?string): boolean {
 }
 
 export function labwareType (labware: Labware): LabwareType {
-  return labware.isTiprack
-    ? 'tiprack'
-    : 'labware'
+  return labware.isTiprack ? 'tiprack' : 'labware'
 }
 
 export function getConnectRequest (state: State) {
@@ -52,8 +45,9 @@ export function getConnectedRobotName (state: State): ?string {
   return connection(state).connectedTo
 }
 
-export const getConnectionStatus: OutputSelector<State, void, ConnectionStatus> =
-  createSelector(
+export const getConnectionStatus: OutputSelector<State,
+  void,
+  ConnectionStatus> = createSelector(
     getConnectedRobotName,
     state => getConnectRequest(state).inProgress,
     state => connection(state).disconnectRequest.inProgress,
@@ -120,11 +114,10 @@ function traverseCommands (commandsById, parentIsCurrent) {
   return function mapIdToCommand (id, index, commands) {
     const {description, handledAt, children} = commandsById[id]
     const next = commandsById[commands[index + 1]]
-    const isCurrent = (
+    const isCurrent =
       parentIsCurrent &&
       handledAt != null &&
       (next == null || next.handledAt == null)
-    )
     const isLast = isCurrent && !children.length
 
     return {
@@ -149,7 +142,7 @@ export const getRunProgress = createSelector(
   (commands): number => {
     const leaves = commands.reduce(countLeaves, {handled: 0, total: 0})
 
-    return leaves.total && ((leaves.handled / leaves.total) * 100)
+    return leaves.total && (leaves.handled / leaves.total) * 100
 
     function countLeaves (result, command) {
       let {handled, total} = result
@@ -210,9 +203,8 @@ export const getPipettes = createSelector(
     tipOnByMount,
     calibrationRequest
   ): Array<Pipette> => {
-    return PIPETTE_MOUNTS
-      .filter((mount) => pipettesByMount[mount] != null)
-      .map((mount) => {
+    return PIPETTE_MOUNTS.filter(mount => pipettesByMount[mount] != null).map(
+      mount => {
         const pipette = pipettesByMount[mount]
 
         const probed = probedByMount[mount] || false
@@ -243,14 +235,15 @@ export const getPipettes = createSelector(
           probed,
           tipOn,
         }
-      })
+      }
+    )
   }
 )
 
 export const getNextPipette = createSelector(
   getPipettes,
   (pipettes): ?Pipette => {
-    const nextPipette = pipettes.find((i) => !i.probed)
+    const nextPipette = pipettes.find(i => !i.probed)
 
     return nextPipette || pipettes[0]
   }
@@ -274,23 +267,35 @@ export function getCalibratorMount (state: State): ?Mount {
 
 export const getPipettesCalibrated = createSelector(
   getPipettes,
-  (pipettes): boolean => (
-    pipettes.length !== 0 &&
-    pipettes.every((i) => i.probed)
-  )
+  (pipettes): boolean => pipettes.length !== 0 && pipettes.every(i => i.probed)
 )
 
 export function getModulesBySlot (state: State): {[string]: ?SessionModule} {
   return session(state).modulesBySlot
 }
 
-export const getModules: OutputSelector<State, void, Array<SessionModule>> =
-  createSelector(
+export const getModules: OutputSelector<State,
+  void,
+  Array<SessionModule>> = createSelector(
     getModulesBySlot,
-    modulesBySlot => Object
-      .keys(modulesBySlot)
-      .map(slot => modulesBySlot[slot])
-      .filter(Boolean)
+    // TODO (ka 2019-3-26): can't import getConfig due to circular dependency
+    state => state.config,
+    (modulesBySlot, config) => {
+      const tcEnabled = !!config.devInternal?.enableThermocycler
+      let modules = modulesBySlot
+      console.log(config.devInternal)
+      if (!tcEnabled) {
+        console.log('tcDisabled')
+        modules = omitBy(modulesBySlot, m => {
+          console.log(m)
+          return m.name === 'thermocycler'
+        })
+      }
+      console.log(modules)
+      return Object.keys(modules)
+        .map(slot => modules[slot])
+        .filter(Boolean)
+    }
   )
 
 export function getLabwareBySlot (state: State) {
@@ -305,17 +310,19 @@ export const getLabware = createSelector(
   (instByMount, lwBySlot, confirmedBySlot, calibrationRequest): Labware[] => {
     return Object.keys(lwBySlot)
       .filter(isSlot)
-      .map((slot) => {
+      .map(slot => {
         const labware = lwBySlot[slot]
         const {type, isTiprack} = labware
 
         // labware is confirmed if:
         //   - tiprack: labware in slot is confirmed
         //   - non-tiprack: labware in slot or any of same type is confirmed
-        const confirmed = some(confirmedBySlot, (value, key) => (
-          value === true &&
-          (key === slot || (!isTiprack && type === lwBySlot[key].type))
-        ))
+        const confirmed = some(
+          confirmedBySlot,
+          (value, key) =>
+            value === true &&
+            (key === slot || (!isTiprack && type === lwBySlot[key].type))
+        )
 
         let calibration: LabwareCalibrationStatus = 'unconfirmed'
         let isMoving = false
@@ -328,25 +335,15 @@ export const getLabware = createSelector(
           isMoving = inProgress && type !== 'JOG'
 
           if (type === 'MOVE_TO') {
-            calibration = inProgress
-              ? 'moving-to-slot'
-              : 'over-slot'
+            calibration = inProgress ? 'moving-to-slot' : 'over-slot'
           } else if (type === 'JOG') {
-            calibration = inProgress
-              ? 'jogging'
-              : 'over-slot'
+            calibration = inProgress ? 'jogging' : 'over-slot'
           } else if (type === 'DROP_TIP_AND_HOME') {
-            calibration = inProgress
-              ? 'dropping-tip'
-              : 'over-slot'
+            calibration = inProgress ? 'dropping-tip' : 'over-slot'
           } else if (type === 'PICKUP_AND_HOME') {
-            calibration = inProgress
-              ? 'picking-up'
-              : 'picked-up'
+            calibration = inProgress ? 'picking-up' : 'picked-up'
           } else if (type === 'CONFIRM_TIPRACK' || type === 'UPDATE_OFFSET') {
-            calibration = inProgress
-              ? 'confirming'
-              : 'confirmed'
+            calibration = inProgress ? 'confirming' : 'confirmed'
           }
         }
 
@@ -375,22 +372,22 @@ export function getDeckPopulated (state: State) {
 
 export const getUnconfirmedLabware = createSelector(
   getLabware,
-  (labware) => labware.filter((lw) => lw.type && !lw.confirmed)
+  labware => labware.filter(lw => lw.type && !lw.confirmed)
 )
 
 export const getTipracks = createSelector(
   getLabware,
-  (labware) => labware.filter((lw) => lw.type && lw.isTiprack)
+  labware => labware.filter(lw => lw.type && lw.isTiprack)
 )
 
 export const getNotTipracks = createSelector(
   getLabware,
-  (labware) => labware.filter((lw) => lw.type && !lw.isTiprack)
+  labware => labware.filter(lw => lw.type && !lw.isTiprack)
 )
 
 export const getUnconfirmedTipracks = createSelector(
   getUnconfirmedLabware,
-  (labware) => labware.filter((lw) => lw.type && lw.isTiprack)
+  labware => labware.filter(lw => lw.type && lw.isTiprack)
 )
 
 export const getNextLabware = createSelector(
@@ -423,8 +420,9 @@ export function getOffsetUpdateInProgress (state: State): boolean {
 
 // get current pipette selector factory
 // to be used by a react-router Route component
-export const makeGetCurrentPipette = () => createSelector(
-  (_, props: ContextRouter) => props.match.params.mount,
-  getPipettes,
-  (mount, pipettes) => pipettes.find((i) => i.mount === mount)
-)
+export const makeGetCurrentPipette = () =>
+  createSelector(
+    (_, props: ContextRouter) => props.match.params.mount,
+    getPipettes,
+    (mount, pipettes) => pipettes.find(i => i.mount === mount)
+  )
