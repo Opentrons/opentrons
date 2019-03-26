@@ -18,12 +18,20 @@ const ChangeTipField = (props: Props) => {
   const {name, disabledOptions} = props
 
   const options = props.options.map((value) => {
-    const tooltip = <div className={styles.tooltip}>
-      {i18n.t(`form.step_edit_form.field.change_tip.option_tooltip.${value}`)}</div>
+    const tooltip = (
+      <div className={styles.tooltip}>
+        {i18n.t(`form.step_edit_form.field.change_tip.option_tooltip.${value}`)}
+      </div>
+    )
+
     const option = i18n.t(`form.step_edit_form.field.change_tip.option.${value}`)
     const label = (
-      <HoverTooltip tooltipComponent={tooltip} positionFixed placement='top'>
-        {(hoverTooltipHandlers) => <div {...hoverTooltipHandlers}>{option}</div>}
+      <HoverTooltip
+        positionFixed
+        tooltipComponent={tooltip}
+        placement='bottom'
+        modifiers={{offset: {offset: `0, 18`}, preventOverflow: {boundariesElement: 'window'}}}
+      >{(hoverTooltipHandlers) => <div {...hoverTooltipHandlers}>{option}</div>}
       </HoverTooltip>
     )
     return {
