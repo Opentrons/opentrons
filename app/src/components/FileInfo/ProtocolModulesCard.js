@@ -2,6 +2,7 @@
 // setup modules component
 import * as React from 'react'
 import {connect} from 'react-redux'
+import remove from 'lodash/remove'
 
 import {getModuleDisplayName} from '@opentrons/shared-data'
 import {selectors as robotSelectors} from '../../robot'
@@ -10,6 +11,7 @@ import {
   fetchModules,
   type FetchModulesResponse,
 } from '../../http-api-client'
+import {getConfig} from '../../config'
 
 import {RefreshWrapper} from '../Page'
 import InfoSection from './InfoSection'
@@ -86,9 +88,15 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   return (state, ownProps) => {
     const {robot} = ownProps
     const modulesCall = getActualModules(state, robot)
-
+    const __featureEnabled = getConfig(state).devInternal?.enableThermocycler
+    const allModules = robotSelectors.getModules(state)
+    const modules = __featureEnabled
+      ? allModules
+      : remove(allModules, m => {
+        return m.name === 'thermocycler'
+      })
     return {
-      modules: robotSelectors.getModules(state),
+      modules,
       actualModules: modulesCall && modulesCall.response,
       // TODO(mc, 2018-10-10): pass this prop down from page
       attachModulesUrl: `/robots/${robot.name}/instruments`,
