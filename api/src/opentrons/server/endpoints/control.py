@@ -171,7 +171,7 @@ async def execute_module_command(request):
     requested_serial = request.match_info['serial']
     data = await request.json()
     command_type = data.get('command_type')
-    payload = data.get('payload')
+    args = data.get('args')
 
     if ff.use_protocol_api_v2():
         hw_mods = await hw.discover_modules()
@@ -179,18 +179,20 @@ async def execute_module_command(request):
         hw_mods = hw.attached_modules.values()
 
     if len(hw_mods) > 0:
-        matching_mod = next(mod for mod in hw_mods if
-                            mod.device_info.get('serial'))
+        matching_mod = next((mod for mod in hw_mods if
+                            mod.device_info.get('serial') == requested_serial),
+                            None)
 
         if matching_mod:
             if hasattr(matching_mod, command_type):
-                log.debug(f'matchingMod: {matching_mod}, command type: {command_type}, payload: {payload}')
+                log.debug(f'matchingMod: {matching_mod}, command type: {command_type}, args: {args}')
 
+                clean_args = args or []
                 method = getattr(matching_mod, command_type)
                 if asyncio.iscoroutinefunction(method):
-                    val = await method(payload)
+                    val = await method(*clean_args)
                 else:
-                    val = method(payload)
+                    val = method(*clean_args)
 
                 log.debug(f'val: {val}')
                 return web.json_response(val, status=200)
