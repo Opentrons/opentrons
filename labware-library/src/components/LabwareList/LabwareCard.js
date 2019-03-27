@@ -9,6 +9,7 @@ import uniqWith from 'lodash/uniqWith'
 
 import {getDisplayVolume} from '@opentrons/shared-data'
 import {Icon} from '@opentrons/components'
+import Gallery from './LabwareGallery'
 import styles from './styles.css'
 
 import type {
@@ -71,7 +72,7 @@ export default function LabwareCard (props: LabwareCardProps) {
     <li className={styles.card}>
       <TopBar {...props} />
       <Title {...props} />
-      <Gallery />
+      <Gallery {...props} />
       <div className={styles.stats}>
         <PlateDimensions {...props} />
         <Wells {...props} />
@@ -105,26 +106,6 @@ function Title (props: LabwareCardProps) {
         <Icon className={styles.title_icon} name="chevron-right" />
       </h2>
     </a>
-  )
-}
-
-// TODO(mc, 2019-03-22): unsemantic placeholder; fix up and move to own file
-function Gallery () {
-  return (
-    <div className={styles.gallery}>
-      <div className={styles.gallery_main} />
-      <div className={styles.thumbnail_row}>
-        <div className={styles.thumbnail_container}>
-          <div className={styles.thumbnail} />
-        </div>
-        <div className={styles.thumbnail_container}>
-          <div className={styles.thumbnail} />
-        </div>
-        <div className={styles.thumbnail_container}>
-          <div className={styles.thumbnail} />
-        </div>
-      </div>
-    </div>
   )
 }
 
