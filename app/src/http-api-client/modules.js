@@ -1,7 +1,7 @@
 // @flow
 // API client for modules (the robot kind)
 import {createSelector} from 'reselect'
-
+import remove from 'lodash/remove'
 import type {OutputSelector} from 'reselect'
 import type {State, ThunkPromiseAction} from '../types'
 import type {BaseRobot, RobotService} from '../robot'
@@ -57,8 +57,7 @@ type FetchModulesCall = ApiCall<null, FetchModulesResponse>
 
 type FetchModuleDataCall = ApiCall<null, FetchModuleDataResponse>
 
-export type ModulesAction =
-  | ApiAction<'modules', null, FetchModulesResponse>
+export type ModulesAction = ApiAction<'modules', null, FetchModulesResponse>
 
 export type ModulesState = {|
   modules?: FetchModulesCall,
@@ -67,7 +66,7 @@ export type ModulesState = {|
 const MODULES: 'modules' = 'modules'
 
 export function fetchModules (robot: RobotService): ThunkPromiseAction {
-  return (dispatch) => {
+  return dispatch => {
     dispatch(apiRequest(robot, MODULES, null))
 
     return client(robot, 'GET', MODULES)
@@ -81,14 +80,18 @@ export function fetchModules (robot: RobotService): ThunkPromiseAction {
 
 const DATA: 'data' = 'data'
 
-export function fetchModuleData (robot: RobotService, serial: string): ThunkPromiseAction {
-  return (dispatch) => {
+export function fetchModuleData (
+  robot: RobotService,
+  serial: string
+): ThunkPromiseAction {
+  return dispatch => {
     const fetchDataPath = `${MODULES}/${serial}/${DATA}`
     dispatch(apiRequest(robot, fetchDataPath, null))
 
     return client(robot, 'GET', fetchDataPath)
       .then(
-        (resp: FetchModuleDataResponse) => apiSuccess(robot, fetchDataPath, resp),
+        (resp: FetchModuleDataResponse) =>
+          apiSuccess(robot, fetchDataPath, resp),
         (err: ApiRequestError) => apiFailure(robot, fetchDataPath, err)
       )
       .then(dispatch)
@@ -96,23 +99,39 @@ export function fetchModuleData (robot: RobotService, serial: string): ThunkProm
 }
 
 export function makeGetRobotModules () {
-  const selector: OutputSelector<State, BaseRobot, FetchModulesCall> = createSelector(
-    getRobotApiState,
-    (state) => state[MODULES] || {inProgress: false}
-  )
+  const selector: OutputSelector<State,
+    BaseRobot,
+    FetchModulesCall> = createSelector(
+      getRobotApiState,
+      state => state.config,
+      (state, config) => {
+        const tcEnabled = !!config.devInternal?.enableThermocycler
+        const modulesCall = state[MODULES]
+
+        if (!tcEnabled && modulesCall && modulesCall.response) {
+          const response = modulesCall.response
+          modulesCall.response = remove(response, m => {
+            return m.name === 'thermocycler'
+          })
+        }
+        return modulesCall || {inProgress: false}
+      }
+    )
 
   return selector
 }
 
 export function makeGetRobotModuleData () {
-  const selector: OutputSelector<State, BaseRobot, FetchModuleDataCall> = createSelector(
-    (state, robot, _serial) => (getRobotApiState(state, robot)),
-    (_state, _robot, serial) => serial,
-    (state, serial) => {
-      const fetchDataPath = `${MODULES}/${serial}/${DATA}`
-      return state[fetchDataPath] || {inProgress: false}
-    }
-  )
+  const selector: OutputSelector<State,
+    BaseRobot,
+    FetchModuleDataCall> = createSelector(
+      (state, robot, _serial) => getRobotApiState(state, robot),
+      (_state, _robot, serial) => serial,
+      (state, serial) => {
+        const fetchDataPath = `${MODULES}/${serial}/${DATA}`
+        return state[fetchDataPath] || {inProgress: false}
+      }
+    )
 
   return selector
 }

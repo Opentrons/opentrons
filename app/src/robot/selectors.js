@@ -283,15 +283,11 @@ export const getModules: OutputSelector<State,
     (modulesBySlot, config) => {
       const tcEnabled = !!config.devInternal?.enableThermocycler
       let modules = modulesBySlot
-      console.log(config.devInternal)
       if (!tcEnabled) {
-        console.log('tcDisabled')
         modules = omitBy(modulesBySlot, m => {
-          console.log(m)
           return m.name === 'thermocycler'
         })
       }
-      console.log(modules)
       return Object.keys(modules)
         .map(slot => modules[slot])
         .filter(Boolean)
