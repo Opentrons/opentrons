@@ -58,7 +58,7 @@ class Module:
         self.id = id(module)
         if isinstance(module, labware.ModuleGeometry):
             self.name = module.load_name
-            self.slow = module.parent
+            self.slot = module.parent
         else:
             self.name = module.get_name()
             self.slot = module.parent.get_name()

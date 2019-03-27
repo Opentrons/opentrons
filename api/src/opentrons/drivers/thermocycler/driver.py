@@ -44,12 +44,14 @@ def _build_temp_code(temp, hold_time=None):
 
 
 TC_BAUDRATE = 115200
-
+# TODO (Laura 20190327) increased the thermocycler command timeout
+# temporarily until we can change the firmware to asynchronously handle
+# the lid being open and closed
 SERIAL_ACK = '\r\n'
 TC_COMMAND_TERMINATOR = SERIAL_ACK + SERIAL_ACK
 TC_ACK = 'ok' + SERIAL_ACK + 'ok' + SERIAL_ACK
 ERROR_KEYWORD = 'error'
-DEFAULT_TC_TIMEOUT = 1
+DEFAULT_TC_TIMEOUT = 5
 DEFAULT_COMMAND_RETRIES = 3
 DEFAULT_STABILIZE_DELAY = 0.1
 POLLING_FREQUENCY_MS = 1000
