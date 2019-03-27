@@ -281,7 +281,7 @@ export const getModules: OutputSelector<State,
     // TODO (ka 2019-3-26): can't import getConfig due to circular dependency
     state => state.config,
     (modulesBySlot, config) => {
-      const tcEnabled = !!config.devInternal?.enableThermocycler
+      const tcEnabled = !!config?.devInternal?.enableThermocycler
       let modules = modulesBySlot
       if (!tcEnabled) {
         modules = omitBy(modulesBySlot, m => {
