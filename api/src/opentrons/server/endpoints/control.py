@@ -178,35 +178,32 @@ async def execute_module_command(request):
     else:
         hw_mods = hw.attached_modules.values()
 
-    if len(hw_mods) > 0:
-        matching_mod = next((mod for mod in hw_mods if
-                            mod.device_info.get('serial') == requested_serial),
-                            None)
+    if len(hw_mods) == 0:
+        return web.json_response({"message": "No connected modules"})
 
-        if matching_mod:
-            if hasattr(matching_mod, command_type):
-                clean_args = args or []
-                method = getattr(matching_mod, command_type)
-                if asyncio.iscoroutinefunction(method):
-                    val = await method(*clean_args)
-                else:
-                    val = method(*clean_args)
+    matching_mod = next((mod for mod in hw_mods if
+                        mod.device_info.get('serial') == requested_serial),
+                        None)
 
-                return web.json_response({
-                    'message': 'Success',
-                    'returnValue': val
-                }, status=200)
-            else:
-                return web.json_response(
-                    {'message':
-                        f'Module does not have command: {command_type}'},
-                    status=400)
-        else:
-            return web.json_response({"message": "Specified module not found"},
-                                     status=404)
-    else:
-        return web.json_response({"message": "No connected modules"},
+    if not matching_mod:
+        return web.json_response({"message": "Specified module not found"},
                                  status=404)
+
+    if hasattr(matching_mod, command_type):
+        clean_args = args or []
+        method = getattr(matching_mod, command_type)
+        if asyncio.iscoroutinefunction(method):
+            val = await method(*clean_args)
+        else:
+            val = method(*clean_args)
+
+        return web.json_response(
+            {'message': 'Success', 'returnValue': val},
+            status=200)
+    else:
+        return web.json_response(
+            {'message': f'Module does not have command: {command_type}'},
+            status=400)
 
 
 async def get_engaged_axes(request):
