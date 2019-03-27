@@ -4,7 +4,7 @@ import logging
 import asyncio
 
 from aiohttp import web
-from otupdate import get_app
+from . import get_app
 
 
 def main():

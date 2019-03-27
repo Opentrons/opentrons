@@ -1,3 +1,3 @@
-from .balena import __main__
+from .balena import __main__ as balena_main
 
-__main__.main()
+balena_main.main()

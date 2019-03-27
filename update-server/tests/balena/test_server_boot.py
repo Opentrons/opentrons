@@ -9,7 +9,7 @@ import json
 import tempfile
 import subprocess
 import otupdate
-from otupdate import bootstrap, control
+from otupdate.balena import bootstrap, control
 # Tests should closely reflect the tasks in selftest.py
 
 
@@ -20,7 +20,7 @@ async def test_server_boot(loop, test_client):
         pkg_data = json.load(pkg)
         update_server_version = pkg_data.get('version')
 
-    app = otupdate.get_app(
+    app = otupdate.balena.get_app(
         api_package=None,
         update_package=update_package,
         smoothie_version='not available',
@@ -95,7 +95,7 @@ print('intentionally malformed'
     update_package = os.path.join(os.path.abspath(
         os.path.dirname(otupdate.__file__)), 'package.json')
 
-    app = otupdate.get_app(
+    app = otupdate.balena.get_app(
         api_package=None,
         update_package=update_package,
         smoothie_version='not available',
@@ -123,7 +123,7 @@ async def test_restart(loop, test_client, monkeypatch):
     update_package = os.path.join(
         os.path.abspath(os.path.dirname(otupdate.__file__)), 'package.json')
 
-    app = otupdate.get_app(
+    app = otupdate.balena.get_app(
         api_package=None,
         update_package=update_package,
         smoothie_version='not available',

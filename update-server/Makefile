@@ -7,6 +7,9 @@ python := pipenv run python
 pipenv_opts := --dev
 pipenv_opts += $(and $(CI),--keep-outdated)
 port ?= 34000
+tests ?= tests
+test_opts ?= -s -vv
+
 
 # make bootstrap wheel file (= rather than := to expand at every use)
 wheel = $(wildcard dist/*.whl)
@@ -37,7 +40,7 @@ test:
 		--cov=otupdate \
 		--cov-report term-missing:skip-covered \
 		--cov-report xml:coverage.xml \
-		tests -s -vv
+		$(test_opts) $(tests)
 
 .PHONY: lint
 lint:

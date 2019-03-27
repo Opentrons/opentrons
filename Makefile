@@ -67,6 +67,13 @@ push-api:
 	$(MAKE) -C $(API_DIR) push
 	$(MAKE) -C $(API_DIR) restart
 
+.PHONY: push-api-buildroot
+push-api-buildroot: export host = $(usb_host)
+push-api-buildroot:
+	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
+	$(MAKE) -C $(API_DIR) push-buildroot
+	$(MAKE) -C $(API_DIR) restart
+
 .PHONY: api-local-container
 api-local-container:
 	docker build . \
@@ -88,6 +95,7 @@ test: test-py test-js
 .PHONY: test-py
 test-py:
 	$(MAKE) -C api test
+	$(MAKE) -C update-server test tests=tests/buildroot/
 
 .PHONY: test-js
 test-js:

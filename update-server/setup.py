@@ -66,7 +66,6 @@ if __name__ == "__main__":
         zip_safe=False,
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
-        setup_requires=['pytest-runner'],
         tests_require=['pytest'],
         include_package_data=True
     )
