@@ -51,7 +51,8 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const argsAndErrorsByStepId = stepFormSelectors.getArgsAndErrorsByStepId(state)
   const formAndFieldErrors = argsAndErrorsByStepId[stepId] && argsAndErrorsByStepId[stepId].errors
   const hasError = fileDataSelectors.getErrorStepId(state) === stepId || !isEmpty(formAndFieldErrors)
-  const hasWarnings = dismissSelectors.getHasTimelineWarningsPerStep(state)[stepId]
+  const hasWarnings = dismissSelectors.getHasTimelineWarningsPerStep(state)[stepId] ||
+    dismissSelectors.getHasFormLevelWarningsPerStep(state)[stepId]
 
   const step = allSteps[stepId]
 

@@ -1,5 +1,6 @@
 // @flow
 import {createSelector} from 'reselect'
+import mapValues from 'lodash/mapValues'
 // TODO: Ian 2018-07-02 split apart file-data concerns to avoid circular dependencies
 // Eg, right now if you import {selectors as fileDataSelectors} from '../file-data',
 // PD won't start, b/c of circular dependency when fileData/selectors/fileCreator
@@ -19,7 +20,7 @@ export const getAllDismissedWarnings: Selector<*> = createSelector(
   s => s.dismissedWarnings
 )
 
-export const getDismissedFormWarningTypes: Selector<DismissedWarningsAllSteps> = createSelector(
+export const getDismissedFormWarningTypesPerStep: Selector<DismissedWarningsAllSteps> = createSelector(
   getAllDismissedWarnings,
   all => all.form
 )
@@ -63,7 +64,7 @@ export const getTimelineWarningsForSelectedStep: Selector<Array<CommandCreatorWa
 )
 
 export const getDismissedFormWarningTypesForSelectedStep: Selector<Array<WarningType>> = createSelector(
-  getDismissedFormWarningTypes,
+  getDismissedFormWarningTypesPerStep,
   stepsSelectors.getSelectedStepId,
   (dismissedWarnings, stepId) =>
     (stepId != null && dismissedWarnings[stepId]) || []
@@ -78,4 +79,14 @@ export const getFormWarningsForSelectedStep: Selector<Array<FormWarning>> = crea
     const formWarnings = warnings.filter(w => !dismissedTypesForStep.includes(w.type))
     return formWarnings
   }
+)
+
+export const getHasFormLevelWarningsPerStep: Selector<{[stepId: string]: boolean}> = createSelector(
+  stepFormSelectors.getFormLevelWarningsPerStep,
+  getDismissedFormWarningTypesPerStep,
+  (warningsPerStep, dismissedPerStep) =>
+    mapValues(warningsPerStep, (warnings: FormWarning, stepId: string) =>
+      (warningsPerStep[stepId] || []).filter(w =>
+        !(dismissedPerStep[stepId] || []).includes(w.type)).length > 0
+    )
 )
