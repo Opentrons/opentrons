@@ -15,6 +15,7 @@ const PIPETTE_MODELS = [
   'p10_single_v1',
   'p10_single_v1.3',
   'p10_single_v1.4',
+  'p10_single_v1.5',
   'p10_multi_v1',
   'p10_multi_v1.3',
   'p10_multi_v1.4',
@@ -24,15 +25,18 @@ const PIPETTE_MODELS = [
   'p50_multi_v1',
   'p50_multi_v1.3',
   'p50_multi_v1.4',
+  'p50_multi_v1.5',
   'p300_single_v1',
   'p300_single_v1.3',
   'p300_single_v1.4',
   'p300_multi_v1',
   'p300_multi_v1.3',
   'p300_multi_v1.4',
+  'p300_multi_v1.5',
   'p1000_single_v1',
   'p1000_single_v1.3',
   'p1000_single_v1.4',
+  'p1000_single_v1.5',
 ]
 
 describe('pipette data accessors', () => {
