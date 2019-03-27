@@ -4,10 +4,17 @@ import flatten from 'lodash/flatten'
 import range from 'lodash/range'
 import round from 'lodash/round'
 
-import assignId from './assignId'
-import {toWellName, sortWells, splitWellsOnColumn} from '../helpers/index'
 import labwareSchema from '../../labware-json-schema/labware-schema.json'
 import {SLOT_WIDTH_MM, SLOT_LENGTH_MM} from '../constants'
+import assignId from './assignId'
+import {
+  toWellName,
+  sortWells,
+  splitWellsOnColumn,
+  getDisplayVolume,
+  getAsciiVolumeUnits,
+  ensureVolumeUnits,
+} from '../helpers/index'
 
 import type {
   LabwareDefinition2 as Definition,
@@ -19,6 +26,7 @@ import type {
   LabwareWellProperties as InputWell,
   LabwareWellMap as WellMap,
   LabwareOffset as Offset,
+  LabwareVolumeUnits as VolumeUnits,
 } from '../types'
 
 type Cell = {
@@ -131,15 +139,17 @@ function determineIrregularLayout (
 export function _generateIrregularLoadName (args: {
   grid: Array<Cell>,
   well: Array<InputWell>,
-  units: string,
+  units: VolumeUnits,
   brand: string,
   displayCategory: string,
 }): string {
   const {grid, well, units, brand, displayCategory} = args
+  const loadNameUnits = getAsciiVolumeUnits(units)
   const wellComboArray = grid.map((gridObj, gridIdx) => {
     const numWells = gridObj.row * gridObj.column
-    // TODO Ian 2018-11-08: use units to convert volume
-    return `${numWells}x${well[gridIdx].totalLiquidVolume}_${units}`
+    const wellVolume = getDisplayVolume(well[gridIdx].totalLiquidVolume, units)
+
+    return `${numWells}x${wellVolume}_${loadNameUnits}`
   })
 
   return createName([brand, wellComboArray, displayCategory])
@@ -218,16 +228,21 @@ function createName (
 // For further info on these parameters look at labware examples in __tests__
 // or the labware definition schema in labware-json-schema
 export function createRegularLabware (args: RegularLabwareProps): Definition {
-  const {metadata, offset, dimensions, grid, spacing, well} = args
+  const {offset, dimensions, grid, spacing, well} = args
   const ordering = determineOrdering(grid)
   const numWells = grid.row * grid.column
   const brand = ensureBrand(args.brand)
+  const metadata = {
+    ...args.metadata,
+    displayVolumeUnits: ensureVolumeUnits(args.metadata.displayVolumeUnits),
+  }
+
   const loadName = createName([
     brand.brand,
     numWells,
     metadata.displayCategory,
-    well.totalLiquidVolume,
-    metadata.displayVolumeUnits,
+    getDisplayVolume(well.totalLiquidVolume, metadata.displayVolumeUnits),
+    getAsciiVolumeUnits(metadata.displayVolumeUnits),
   ])
 
   return validateDefinition({
@@ -248,9 +263,14 @@ export function createRegularLabware (args: RegularLabwareProps): Definition {
 export function createIrregularLabware (
   args: IrregularLabwareProps
 ): Definition {
-  const {metadata, offset, dimensions, grid, spacing, well, gridStart} = args
+  const {offset, dimensions, grid, spacing, well, gridStart} = args
   const wells = determineIrregularLayout(grid, spacing, offset, gridStart, well)
   const brand = ensureBrand(args.brand)
+  const metadata = {
+    ...args.metadata,
+    displayVolumeUnits: ensureVolumeUnits(args.metadata.displayVolumeUnits),
+  }
+
   const loadName = _generateIrregularLoadName({
     grid,
     well,

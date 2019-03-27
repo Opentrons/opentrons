@@ -18,7 +18,6 @@
     "metadata": {
         "displayName": "Corning 6 Well Plate",
         "displayVolumeUnits": "mL",
-        "displayLengthUnits": "mm",
         "displayCategory": "wellPlate",
         "tags": [
             "SBS",
@@ -49,7 +48,7 @@
             "shape": "circular",
             "depth": 17.4,
             "diameter": 35.43,
-            "totalLiquidVolume": 16.8,
+            "totalLiquidVolume": 16800,
             "x": 24.76,
             "y": 23.16,
             "z": 2.87
@@ -58,7 +57,7 @@
             "shape": "circular",
             "depth": 17.4,
             "diameter": 35.43,
-            "totalLiquidVolume": 16.8,
+            "totalLiquidVolume": 16800,
             "x": 24.76,
             "y": 62.28,
             "z": 2.87
@@ -67,7 +66,7 @@
             "shape": "circular",
             "depth": 17.4,
             "diameter": 35.43,
-            "totalLiquidVolume": 16.8,
+            "totalLiquidVolume": 16800,
             "x": 63.88,
             "y": 23.16,
             "z": 2.87
@@ -76,7 +75,7 @@
             "shape": "circular",
             "depth": 17.4,
             "diameter": 35.43,
-            "totalLiquidVolume": 16.8,
+            "totalLiquidVolume": 16800,
             "x": 63.88,
             "y": 62.28,
             "z": 2.87
@@ -85,7 +84,7 @@
             "shape": "circular",
             "depth": 17.4,
             "diameter": 35.43,
-            "totalLiquidVolume": 16.8,
+            "totalLiquidVolume": 16800,
             "x": 103,
             "y": 23.16,
             "z": 2.87
@@ -94,7 +93,7 @@
             "shape": "circular",
             "depth": 17.4,
             "diameter": 35.43,
-            "totalLiquidVolume": 16.8,
+            "totalLiquidVolume": 16800,
             "x": 103,
             "y": 62.28,
             "z": 2.87

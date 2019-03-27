@@ -126,8 +126,7 @@
   "metadata": {
     "displayName": "Bio-Rad HardShell 96-Well PCR Plate",
     "displayCategory": "wellPlate",
-    "displayVolumeUnits": "uL",
-    "displayLengthUnits": "mm",
+    "displayVolumeUnits": "µL",
     "tags": [
       "flat",
       "plate",

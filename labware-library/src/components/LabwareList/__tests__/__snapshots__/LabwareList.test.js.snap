@@ -215,7 +215,7 @@ exports[`LabwareList component renders 1`] = `
             >
               380
                
-              uL
+              µL
             </p>
           </div>
         </div>
@@ -463,7 +463,7 @@ exports[`LabwareList component renders 1`] = `
             >
               300
                
-              uL
+              µL
             </p>
           </div>
         </div>

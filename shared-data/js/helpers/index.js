@@ -1,9 +1,10 @@
 // @flow
 
-import canPipetteUseLabware from './canPipetteUseLabware'
-import computeWellAccess from './computeWellAccess'
-import getWellTotalVolume from './getWellTotalVolume'
-import wellIsRect from './wellIsRect'
+export {default as canPipetteUseLabware} from './canPipetteUseLabware'
+export {default as computeWellAccess} from './computeWellAccess'
+export {default as getWellTotalVolume} from './getWellTotalVolume'
+export {default as wellIsRect} from './wellIsRect'
+export * from './volume'
 
 export const intToAlphabetLetter = (i: number, lowerCase: boolean = false) =>
   String.fromCharCode((lowerCase ? 96 : 65) + i)
@@ -59,11 +60,4 @@ export function splitWellsOnColumn (sortedArray: Array<string>): Array<Array<str
       return [...acc.slice(0, -1), [...lastColumn[0], curr]]
     }
   }, [])
-}
-
-export {
-  canPipetteUseLabware,
-  computeWellAccess,
-  getWellTotalVolume,
-  wellIsRect,
 }

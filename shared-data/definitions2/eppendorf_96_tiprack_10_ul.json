@@ -125,8 +125,7 @@
     "deprecated": false,
     "metadata": {
         "displayName": "epT.I.P.S. 0.1-10 uL tiprack",
-        "displayVolumeUnits": "uL",
-        "displayLengthUnits": "mm",
+        "displayVolumeUnits": "µL",
         "displayCategory": "tipRack",
         "tags": [
             "SBS",

@@ -29,7 +29,6 @@
     "otId": "01b7cd80-e8f3-11e8-b93b-5f6727dde048",
     "deprecated": false,
     "metadata": {
-        "displayLengthUnits": "mm",
         "displayVolumeUnits": "mL",
         "displayCategory": "tubeRack",
         "displayName": "Opentrons 15 mL tuberack",
@@ -62,7 +61,7 @@
             "depth": 117.98,
             "diameter": 14.5,
             "shape": "circular",
-            "totalLiquidVolume": 15,
+            "totalLiquidVolume": 15000,
             "x": 10.5,
             "y": 14.38,
             "z": 5.78
@@ -71,7 +70,7 @@
             "depth": 117.98,
             "diameter": 14.5,
             "shape": "circular",
-            "totalLiquidVolume": 15,
+            "totalLiquidVolume": 15000,
             "x": 10.5,
             "y": 39.38,
             "z": 5.78
@@ -80,7 +79,7 @@
             "depth": 117.98,
             "diameter": 14.5,
             "shape": "circular",
-            "totalLiquidVolume": 15,
+            "totalLiquidVolume": 15000,
             "x": 10.5,
             "y": 64.38,
             "z": 5.78
@@ -89,7 +88,7 @@
             "depth": 117.98,
             "diameter": 14.5,
             "shape": "circular",
-            "totalLiquidVolume": 15,
+            "totalLiquidVolume": 15000,
             "x": 35.5,
             "y": 14.38,
             "z": 5.78
@@ -98,7 +97,7 @@
             "depth": 117.98,
             "diameter": 14.5,
             "shape": "circular",
-            "totalLiquidVolume": 15,
+            "totalLiquidVolume": 15000,
             "x": 35.5,
             "y": 39.38,
             "z": 5.78
@@ -107,7 +106,7 @@
             "depth": 117.98,
             "diameter": 14.5,
             "shape": "circular",
-            "totalLiquidVolume": 15,
+            "totalLiquidVolume": 15000,
             "x": 35.5,
             "y": 64.38,
             "z": 5.78
@@ -116,7 +115,7 @@
             "depth": 117.98,
             "diameter": 14.5,
             "shape": "circular",
-            "totalLiquidVolume": 15,
+            "totalLiquidVolume": 15000,
             "x": 60.5,
             "y": 14.38,
             "z": 5.78
@@ -125,7 +124,7 @@
             "depth": 117.98,
             "diameter": 14.5,
             "shape": "circular",
-            "totalLiquidVolume": 15,
+            "totalLiquidVolume": 15000,
             "x": 60.5,
             "y": 39.38,
             "z": 5.78
@@ -134,7 +133,7 @@
             "depth": 117.98,
             "diameter": 14.5,
             "shape": "circular",
-            "totalLiquidVolume": 15,
+            "totalLiquidVolume": 15000,
             "x": 60.5,
             "y": 64.38,
             "z": 5.78
@@ -143,7 +142,7 @@
             "depth": 117.98,
             "diameter": 14.5,
             "shape": "circular",
-            "totalLiquidVolume": 15,
+            "totalLiquidVolume": 15000,
             "x": 85.5,
             "y": 14.38,
             "z": 5.78
@@ -152,7 +151,7 @@
             "depth": 117.98,
             "diameter": 14.5,
             "shape": "circular",
-            "totalLiquidVolume": 15,
+            "totalLiquidVolume": 15000,
             "x": 85.5,
             "y": 39.38,
             "z": 5.78
@@ -161,7 +160,7 @@
             "depth": 117.98,
             "diameter": 14.5,
             "shape": "circular",
-            "totalLiquidVolume": 15,
+            "totalLiquidVolume": 15000,
             "x": 85.5,
             "y": 64.38,
             "z": 5.78
@@ -170,7 +169,7 @@
             "depth": 117.98,
             "diameter": 14.5,
             "shape": "circular",
-            "totalLiquidVolume": 15,
+            "totalLiquidVolume": 15000,
             "x": 110.5,
             "y": 14.38,
             "z": 5.78
@@ -179,7 +178,7 @@
             "depth": 117.98,
             "diameter": 14.5,
             "shape": "circular",
-            "totalLiquidVolume": 15,
+            "totalLiquidVolume": 15000,
             "x": 110.5,
             "y": 39.38,
             "z": 5.78
@@ -188,7 +187,7 @@
             "depth": 117.98,
             "diameter": 14.5,
             "shape": "circular",
-            "totalLiquidVolume": 15,
+            "totalLiquidVolume": 15000,
             "x": 110.5,
             "y": 64.38,
             "z": 5.78

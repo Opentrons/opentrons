@@ -126,8 +126,7 @@
     "metadata": {
         "displayName": "ANSI 96 Standard Microplate",
         "displayCategory": "wellPlate",
-        "displayVolumeUnits": "uL",
-        "displayLengthUnits": "mm",
+        "displayVolumeUnits": "µL",
         "tags": [
             "flat",
             "microplate",

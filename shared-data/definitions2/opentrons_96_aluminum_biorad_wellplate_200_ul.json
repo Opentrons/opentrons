@@ -125,8 +125,7 @@
     "deprecated": false,
     "metadata": {
         "displayName": "Aluminum Bio-Rad PCR plate 200uL",
-        "displayVolumeUnits": "uL",
-        "displayLengthUnits": "mm",
+        "displayVolumeUnits": "µL",
         "displayCategory": "wellPlate"
     },
     "cornerOffsetFromSlot": {
