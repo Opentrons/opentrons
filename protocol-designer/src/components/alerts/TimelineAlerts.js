@@ -1,6 +1,10 @@
 // @flow
+import * as React from 'react'
 import type {Dispatch} from 'redux'
 import {connect} from 'react-redux'
+import i18n from '../../localization'
+import ErrorContents from './ErrorContents'
+import WarningContents from './WarningContents'
 import {
   actions as dismissActions,
   selectors as dismissSelectors,
@@ -9,24 +13,14 @@ import {selectors as stepsSelectors} from '../../ui/steps'
 import {selectors as fileDataSelectors} from '../../file-data'
 import type {BaseState} from '../../types'
 import type {StepIdType} from '../../form-types'
-import type {
-  CommandCreatorError,
-  CommandCreatorWarning,
-} from '../../step-generation'
 import Alerts from './Alerts'
-import type {AlertLevel} from './types'
+
+type Props = React.ElementProps<typeof Alerts>
 
 type SP = {
-  errors: Array<CommandCreatorError>,
-  warnings: Array<CommandCreatorWarning>,
+  errors: $PropertyType<Props, 'errors'>,
+  warnings: $PropertyType<Props, 'warnings'>,
   _stepId: ?StepIdType,
-}
-
-type MP = {
-  errors: Array<CommandCreatorError>,
-  warnings: Array<CommandCreatorWarning>,
-  dismissWarning: (CommandCreatorWarning) => mixed,
-  level: AlertLevel,
 }
 
 /** Errors and Warnings from step-generation are written for developers
@@ -40,8 +34,15 @@ type MP = {
 
 function mapStateToProps (state: BaseState): SP {
   const timeline = fileDataSelectors.getRobotStateTimeline(state)
-  const errors = timeline.errors || []
-  const warnings = dismissSelectors.getTimelineWarningsForSelectedStep(state)
+  const errors = (timeline.errors || []).map(error => ({
+    title: i18n.t(`alert.timeline.error.${error.type}.title`),
+    description: <ErrorContents level='timeline' errorType={error.type} />,
+  }))
+  const warnings = dismissSelectors.getTimelineWarningsForSelectedStep(state).map(warning => ({
+    title: i18n.t(`alert.timeline.warning.${warning.type}.title`),
+    description: <WarningContents level='timeline' warningType={warning.type} />,
+    dismissId: warning.type,
+  }))
   const _stepId = stepsSelectors.getSelectedStepId(state)
 
   return {
@@ -51,13 +52,12 @@ function mapStateToProps (state: BaseState): SP {
   }
 }
 
-function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): MP {
+function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Props {
   const {dispatch} = dispatchProps
   return {
     ...stateProps,
-    level: 'timeline',
-    dismissWarning: (warning: CommandCreatorWarning) => {
-      dispatch(dismissActions.dismissTimelineWarning({warning, stepId: stateProps._stepId}))
+    dismissWarning: (dismissId: string) => {
+      dispatch(dismissActions.dismissTimelineWarning({type: dismissId, stepId: stateProps._stepId}))
     },
   }
 }

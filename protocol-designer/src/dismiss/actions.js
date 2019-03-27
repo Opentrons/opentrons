@@ -1,18 +1,16 @@
 // @flow
-import type {CommandCreatorWarning} from '../step-generation'
-import type {FormWarning} from '../steplist'
 import type {StepIdType} from '../form-types'
 
-export type DismissAction<ActionType, WarningType> = {
+export type DismissAction<ActionType> = {
   type: ActionType,
   payload: {
-    warning: WarningType,
+    type: string,
     stepId: ?StepIdType,
   },
 }
 
-export type DismissFormWarning = DismissAction<'DISMISS_FORM_WARNING', FormWarning>
-export type DismissTimelineWarning = DismissAction<'DISMISS_TIMELINE_WARNING', CommandCreatorWarning>
+export type DismissFormWarning = DismissAction<'DISMISS_FORM_WARNING'>
+export type DismissTimelineWarning = DismissAction<'DISMISS_TIMELINE_WARNING'>
 
 export const dismissFormWarning = (
   payload: $PropertyType<DismissFormWarning, 'payload'>

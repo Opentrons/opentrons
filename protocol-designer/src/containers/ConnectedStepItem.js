@@ -29,6 +29,7 @@ type SP = {|
   substeps: $PropertyType<Props, 'substeps'>,
   collapsed: $PropertyType<Props, 'collapsed'>,
   error: $PropertyType<Props, 'error'>,
+  warning: $PropertyType<Props, 'warning'>,
   selected: $PropertyType<Props, 'selected'>,
   hovered: $PropertyType<Props, 'hovered'>,
   hoveredSubstep: $PropertyType<Props, 'hoveredSubstep'>,
@@ -50,10 +51,8 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const argsAndErrorsByStepId = stepFormSelectors.getArgsAndErrorsByStepId(state)
   const formAndFieldErrors = argsAndErrorsByStepId[stepId] && argsAndErrorsByStepId[stepId].errors
   const hasError = fileDataSelectors.getErrorStepId(state) === stepId || !isEmpty(formAndFieldErrors)
-  const warnings = dismissSelectors.getTimelineWarningsPerStep(state)[stepId]
-  const hasWarnings = warnings && warnings.length > 0
+  const hasWarnings = dismissSelectors.getHasTimelineWarningsPerStep(state)[stepId]
 
-  const showErrorState = hasError || hasWarnings
   const step = allSteps[stepId]
 
   return {
@@ -65,7 +64,8 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     hoveredSubstep,
     collapsed,
     selected,
-    error: showErrorState,
+    error: hasError,
+    warning: hasWarnings,
 
     // no double-highlighting: whole step is only "hovered" when
     // user is not hovering on substep.

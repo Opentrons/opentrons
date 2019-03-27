@@ -7,7 +7,7 @@ import styles from './alerts.css'
 
 export type AlertProps = {
   /** name constant of the icon to display */
-  type: 'success' | 'warning' | 'info',
+  type: 'success' | 'warning' | 'error' | 'info',
   /** title/main message of colored alert bar */
   title: string | React.Node,
   /** Alert message body contents */
@@ -29,6 +29,10 @@ const ALERT_PROPS_BY_TYPE = {
   success: {
     icon: {name: 'check-circle'},
     className: styles.success,
+  },
+  error: {
+    icon: {name: 'alert-circle'},
+    className: styles.error,
   },
   warning: {
     icon: {name: 'alert-circle'},

@@ -10,7 +10,7 @@ import {selectors as stepsSelectors} from '../ui/steps'
 import type {FormWarning} from '../steplist'
 import type {CommandCreatorWarning} from '../step-generation'
 import type {BaseState, Selector} from '../types'
-import type {RootState, DismissedWarningsAllSteps} from './reducers'
+import type {RootState, DismissedWarningsAllSteps, WarningType} from './reducers'
 
 export const rootSelector = (state: BaseState): RootState => state.dismiss
 
@@ -19,51 +19,51 @@ export const getAllDismissedWarnings: Selector<*> = createSelector(
   s => s.dismissedWarnings
 )
 
-export const getDismissedFormWarnings: Selector<DismissedWarningsAllSteps<FormWarning>> = createSelector(
+export const getDismissedFormWarningTypes: Selector<DismissedWarningsAllSteps> = createSelector(
   getAllDismissedWarnings,
   all => all.form
 )
 
-export const getDismissedTimelineWarnings: Selector<DismissedWarningsAllSteps<CommandCreatorWarning>> = createSelector(
+export const getDismissedTimelineWarningTypes: Selector<DismissedWarningsAllSteps> = createSelector(
   getAllDismissedWarnings,
   all => all.timeline
 )
 
-export const getTimelineWarningsPerStep: Selector<DismissedWarningsAllSteps<CommandCreatorWarning>> = createSelector(
-  getDismissedTimelineWarnings,
+type HasWarningsPerStep = {[stepId: string]: boolean}
+export const getHasTimelineWarningsPerStep: Selector<HasWarningsPerStep> = createSelector(
+  getDismissedTimelineWarningTypes,
   timelineWarningsPerStep,
   stepFormSelectors.getOrderedStepIds,
-  (dismissedWarnings, warningsPerStep, orderedStepIds) => {
+  (dismissedWarningTypes, warningsPerStep, orderedStepIds) => {
     return orderedStepIds.reduce(
-      (stepAcc: DismissedWarningsAllSteps<CommandCreatorWarning>, stepId) => {
-        const warningsForCurrentStep = warningsPerStep[stepId]
-        const dismissedWarningsForStep = dismissedWarnings[stepId] || []
+      (stepAcc: HasWarningsPerStep, stepId) => {
+        const warningTypesForStep = (warningsPerStep[stepId] || []).map(w => w.type)
+        const dismissedWarningTypesForStep = new Set(dismissedWarningTypes[stepId] || [])
 
-        if (!warningsForCurrentStep) return stepAcc
-
-        // warnings match when their `type` is the same.
-        // their `message` doesn't matter.
-        const visibleWarnings = warningsForCurrentStep.filter(warning =>
-          dismissedWarningsForStep.every(d => d.type !== warning.type)
-        )
+        const hasUndismissedWarnings = warningTypesForStep.filter(warningType =>
+          !dismissedWarningTypesForStep.has(warningType)).length > 0
 
         return {
           ...stepAcc,
-          [stepId]: visibleWarnings,
+          [stepId]: hasUndismissedWarnings,
         }
       }, {})
   }
 )
 
 export const getTimelineWarningsForSelectedStep: Selector<Array<CommandCreatorWarning>> = createSelector(
-  getTimelineWarningsPerStep,
+  getDismissedTimelineWarningTypes,
+  timelineWarningsPerStep,
   stepsSelectors.getSelectedStepId,
-  (warningsPerStep, stepId) =>
-    (stepId != null && warningsPerStep[stepId]) || []
+  (dismissedWarningTypes, warningsPerStep, stepId) => {
+    if (stepId == null) return []
+    return (warningsPerStep[stepId] || []).filter(warning =>
+      !(dismissedWarningTypes[stepId] || []).includes(warning.type))
+  }
 )
 
-export const getDismissedFormWarningsForSelectedStep: Selector<Array<FormWarning>> = createSelector(
-  getDismissedFormWarnings,
+export const getDismissedFormWarningTypesForSelectedStep: Selector<Array<WarningType>> = createSelector(
+  getDismissedFormWarningTypes,
   stepsSelectors.getSelectedStepId,
   (dismissedWarnings, stepId) =>
     (stepId != null && dismissedWarnings[stepId]) || []
@@ -72,9 +72,9 @@ export const getDismissedFormWarningsForSelectedStep: Selector<Array<FormWarning
 /** Non-dismissed form-level warnings for selected step */
 export const getFormWarningsForSelectedStep: Selector<Array<FormWarning>> = createSelector(
   stepFormSelectors.getFormLevelWarningsForUnsavedForm,
-  getDismissedFormWarningsForSelectedStep,
+  getDismissedFormWarningTypesForSelectedStep,
   (warnings, dismissedWarnings) => {
-    const dismissedTypesForStep = dismissedWarnings.map(dw => dw.type)
+    const dismissedTypesForStep = dismissedWarnings
     const formWarnings = warnings.filter(w => !dismissedTypesForStep.includes(w.type))
     return formWarnings
   }

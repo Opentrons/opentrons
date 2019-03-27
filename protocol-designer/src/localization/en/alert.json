@@ -1,4 +1,9 @@
 {
+  "type": {
+    "error": "error",
+    "warning": "warning"
+  },
+  "dismiss": "dismiss",
   "field": {},
   "form": {},
   "hint": {
