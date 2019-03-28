@@ -3,7 +3,7 @@ WRITE_FAIL_MESSAGE = 'Data not saved, HOLD BUTTON'
 
 # must iterate through v1.4 and v1.3 first, because v1 barcodes did not
 # have characters to specify the version number
-VERSIONS = ['v1.4', 'v1.3', 'v1']
+VERSIONS = ['v1.5', 'v1.4', 'v1.3', 'v1']
 
 MODELS = {
     'v1': {
@@ -32,6 +32,15 @@ MODELS = {
         'P3HSV14': 'p300_single_v1.4',
         'P3HMV14': 'p300_multi_v1.4',
         'P1KSV14': 'p1000_single_v1.4'
+    },
+    'v1.5': {
+        'P10SV15': 'p10_single_v1.5',
+        'P10MV15': 'p10_multi_v1.5',
+        'P50SV15': 'p50_single_v1.5',
+        'P50MV15': 'p50_multi_v1.5',
+        'P3HSV15': 'p300_single_v1.5',
+        'P3HMV15': 'p300_multi_v1.5',
+        'P1KSV15': 'p1000_single_v1.5'
     }
 }
 
