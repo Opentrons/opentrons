@@ -4,6 +4,7 @@
 //   app and protocol-designer
 import * as React from 'react'
 import flatMap from 'lodash/flatMap'
+import cx from 'classnames'
 
 import {SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT} from '@opentrons/shared-data'
 import {LabwareOutline} from '@opentrons/components'
@@ -28,6 +29,7 @@ export type LabwareWellRenderProps = {
 
 export default function LabwareRender (props: LabwareRenderProps) {
   const {parameters, ordering, cornerOffsetFromSlot, wells} = props.definition
+  const {isTiprack} = parameters
 
   // SVG coordinate system is flipped in Y from our definitions
   const transform = `translate(0,${SLOT_RENDER_HEIGHT}) scale(1,-1)`
@@ -35,14 +37,11 @@ export default function LabwareRender (props: LabwareRenderProps) {
 
   return (
     <svg className={styles.labware_render} viewBox={viewBox}>
-      <g
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1px"
-        transform={transform}
-      >
-        <LabwareOutline />
-        {parameters.isTiprack && <TipRackOutline />}
+      <g className={styles.labware_detail_group}>
+        <LabwareOutline className={cx({[styles.tiprack_outline]: isTiprack})} />
+        {isTiprack && <TipRackOutline />}
+      </g>
+      <g className={styles.well_group} transform={transform}>
         {flatMap(
           ordering,
           // all arguments typed to stop Flow from complaining
@@ -65,16 +64,16 @@ export default function LabwareRender (props: LabwareRenderProps) {
 }
 
 // TODO(mc, 2019-03-28): Need UX guidance on this component
-const TR_OUTLINE_X_OFFSET = 8
-const TR_OUTLINE_Y_OFFSET = 5
+const TIPRACK_OUTLINE_X_OFFSET = 8
+const TIPRACK_OUTLINE_Y_OFFSET = 5
 
 function TipRackOutline () {
   return (
     <rect
-      x={TR_OUTLINE_X_OFFSET}
-      y={TR_OUTLINE_Y_OFFSET}
-      width={SLOT_RENDER_WIDTH - 2 * TR_OUTLINE_X_OFFSET}
-      height={SLOT_RENDER_HEIGHT - 2 * TR_OUTLINE_Y_OFFSET}
+      x={TIPRACK_OUTLINE_X_OFFSET}
+      y={TIPRACK_OUTLINE_Y_OFFSET}
+      width={SLOT_RENDER_WIDTH - 2 * TIPRACK_OUTLINE_X_OFFSET}
+      height={SLOT_RENDER_HEIGHT - 2 * TIPRACK_OUTLINE_Y_OFFSET}
       rx="4px"
       ry="4px"
     />

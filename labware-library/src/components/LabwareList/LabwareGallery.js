@@ -20,8 +20,6 @@ type ThumbnailProps = {
 }
 
 class Gallery extends React.Component<GalleryProps, GalleryState> {
-  state: GalleryState
-
   constructor (props: GalleryProps) {
     super(props)
     this.state = {currentImage: 1}
