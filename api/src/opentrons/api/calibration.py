@@ -51,7 +51,6 @@ class CalibrationManager:
         self._set_state('probing')
 
         if ff.use_protocol_api_v2():
-            log.debug(f"Calibration Manager Hardware {self._hardware}")
             mount = Mount[instrument._instrument.mount.upper()]
             assert instrument.tip_racks,\
                 'No known tipracks for {}'.format(instrument)

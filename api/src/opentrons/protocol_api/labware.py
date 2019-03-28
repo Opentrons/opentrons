@@ -569,10 +569,11 @@ class ModuleGeometry:
             point=self._offset + self._parent.point,
             labware=self)
 
-    def add_labware(self, labware: Labware):
+    def add_labware(self, labware: Labware) -> Labware:
         assert not self._labware,\
             '{} is already on this module'.format(self._labware)
         self._labware = labware
+        return self._labware
 
     def reset_labware(self):
         self._labware = None
@@ -628,13 +629,13 @@ class ThermocyclerGeometry(ModuleGeometry):
     def lid_closed(self, closed) -> None:
         self._lid_closed = closed
 
-    def labware_accessor(self, definition: Labware) -> Labware:
+    def labware_accessor(self, labware: Labware) -> Labware:
         # Block first three columns from being accessed
-        definition._ordering = definition._ordering[3::]
-        definition._build_wells()
-        return definition
+        definition = labware._definition
+        definition['ordering'] = definition['ordering'][3::]
+        return Labware(definition, super().location)
 
-    def add_labware(self, labware: Labware):
+    def add_labware(self, labware: Labware) -> Labware:
         assert not self._labware,\
             '{} is already on this module'.format(self._labware)
         assert self.lid_closed != 'closed', \
@@ -642,6 +643,7 @@ class ThermocyclerGeometry(ModuleGeometry):
         if self.load_name == 'semithermocycler':
             labware = self.labware_accessor(labware)
         self._labware = labware
+        return self._labware
 
 
 def save_calibration(labware: Labware, delta: Point):

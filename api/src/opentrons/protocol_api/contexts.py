@@ -1494,9 +1494,9 @@ class ModuleContext(CommandPublisher):
                         :py:meth:`load_labware_by_name`.
         :returns: The properly-linked labware object
         """
-        self._geometry.add_labware(labware)
+        mod_labware = self._geometry.add_labware(labware)
         self._ctx.deck.recalculate_high_z()
-        return labware
+        return mod_labware
 
     def load_labware_by_name(self, name: str) -> Labware:
         """ Specify the presence of a piece of labware on the module.

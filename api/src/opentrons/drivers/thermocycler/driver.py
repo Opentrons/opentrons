@@ -155,7 +155,7 @@ class TCPoller(threading.Thread):
         self._send_command(SERIAL_ACK, timeout=DEFAULT_TC_TIMEOUT)
 
     def _send_command(self, command, timeout=DEFAULT_TC_TIMEOUT):
-        command_line = command + ' ' + SERIAL_ACK  # TC_COMMAND_TERMINATOR
+        command_line = command + ' ' + TC_COMMAND_TERMINATOR
         ret_code = self._recursive_write_and_return(
             command_line, timeout, DEFAULT_COMMAND_RETRIES)
         if ERROR_KEYWORD in ret_code.lower():
@@ -226,7 +226,7 @@ class Thermocycler:
         # Check initial device lid state
         _lid_status_res = await self._write_and_wait(GCODES['GET_LID_STATUS'])
         if _lid_status_res:
-            self._lid_status = _lid_status_res.split()[-1].lower()
+            self.lid_status = _lid_status_res.split()[-1].lower()
         return self
 
     def disconnect(self) -> 'Thermocycler':
@@ -246,13 +246,13 @@ class Thermocycler:
 
     async def open(self):
         await self._write_and_wait(GCODES['OPEN_LID'])
-        self._lid_status = 'open'
-        return self._lid_status
+        self.lid_status = 'open'
+        return self.lid_status
 
     async def close(self):
         await self._write_and_wait(GCODES['CLOSE_LID'])
-        self._lid_status = 'closed'
-        return self._lid_status
+        self.lid_status = 'closed'
+        return self.lid_status
 
     async def set_temperature(self,
                               temp: float,
@@ -320,6 +320,10 @@ class Thermocycler:
     @property
     def lid_status(self):
         return self._lid_status
+
+    @lid_status.setter
+    def lid_status(self, status):
+        self._lid_status = status
 
     async def get_device_info(self) -> Mapping[str, str]:
         _device_info_res = await self._write_and_wait(GCODES['DEVICE_INFO'])
