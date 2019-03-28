@@ -19,9 +19,11 @@ class SimulatingDriver:
             raise ThermocyclerError(
                 'Cannot open Thermocycler while it is active')
         self._lid_status = 'open'
+        return self._lid_status
 
     async def close(self):
         self._lid_status = 'closed'
+        return self._lid_status
 
     @property
     def status(self):

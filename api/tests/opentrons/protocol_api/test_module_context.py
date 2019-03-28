@@ -83,14 +83,15 @@ def test_thermocycler_lid(loop):
     # Close should work if the lid is closed (no status change)
     mod.close()
     assert mod.lid_status == 'closed'
-    print(type(mod._geometry))
     assert mod._geometry.lid_closed == 'closed'
     assert mod._geometry.highest_z == (98.0 + 37.7)
 
     # Open should work if the lid is closed
     mod.open()
     assert mod.lid_status == 'open'
+    assert mod._geometry.lid_closed == 'open'
     assert mod._geometry.highest_z == 98.0
+
 
 def test_thermocycler_temp(loop):
     ctx = papi.ProtocolContext(loop)
@@ -129,6 +130,7 @@ def test_thermocycler_temp(loop):
     assert mod.hold_time == 0
     assert mod.ramp_rate is None
 
+
 def test_semithermocycler_labware_accessor(loop):
     # Check that you can only access 9 columns of the 96 well plate loaded
     ctx = papi.ProtocolContext(loop)
@@ -141,6 +143,7 @@ def test_semithermocycler_labware_accessor(loop):
 
     assert len(mod.labware.columns()) == 9
     assert mod.labware.wells().__repr__()[1:3] == 'A4'
+
 
 def test_module_load_labware(loop):
     ctx = papi.ProtocolContext(loop)
