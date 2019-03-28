@@ -27,10 +27,6 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
     this.state = {currentImage: 1}
   }
 
-  handleSelectImage = (currentImage: number) => {
-    this.setState({currentImage})
-  }
-
   render () {
     const {definition} = this.props
     const {currentImage} = this.state

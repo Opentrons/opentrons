@@ -64,13 +64,17 @@ export default function LabwareRender (props: LabwareRenderProps) {
   )
 }
 
+// TODO(mc, 2019-03-28): Need UX guidance on this component
+const TR_OUTLINE_X_OFFSET = 8
+const TR_OUTLINE_Y_OFFSET = 5
+
 function TipRackOutline () {
   return (
     <rect
-      x={8}
-      y={5}
-      width={SLOT_RENDER_WIDTH - 16}
-      height={SLOT_RENDER_HEIGHT - 10}
+      x={TR_OUTLINE_X_OFFSET}
+      y={TR_OUTLINE_Y_OFFSET}
+      width={SLOT_RENDER_WIDTH - 2 * TR_OUTLINE_X_OFFSET}
+      height={SLOT_RENDER_HEIGHT - 2 * TR_OUTLINE_Y_OFFSET}
       rx="4px"
       ry="4px"
     />
@@ -78,12 +82,9 @@ function TipRackOutline () {
 }
 
 function Well (props: LabwareWellRenderProps) {
-  const {well, parameters, cornerOffsetFromSlot} = props
-  const {shape, diameter, width, length} = well
+  const {well, parameters} = props
+  const {x, y, shape, diameter, width, length} = well
   const {isTiprack} = parameters
-
-  const x = well.x + cornerOffsetFromSlot.x
-  const y = well.y + cornerOffsetFromSlot.y
 
   if (shape === 'circular' && diameter) {
     // TODO(mc, 2019-03-27): figure out tip rendering; see:
