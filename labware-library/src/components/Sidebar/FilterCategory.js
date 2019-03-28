@@ -1,25 +1,46 @@
 // @flow
 // filter labware by category
 import * as React from 'react'
+import {Link} from 'react-router-dom'
+import cx from 'classnames'
 
+import {getAllCategories, buildFiltersUrl} from '../../filters'
 import styles from './styles.css'
 
-// TODO(mc, 2019-03-13): do not hardcode categories; pull from imports
-const CATEGORIES = [
-  {label: 'All', value: 'all'},
-  {label: 'Tip Rack', value: 'tiprack'},
-  {label: 'Tube Rack', value: 'tuberack'},
-  {label: 'Trough', value: 'trough'},
-  {label: 'Trash', value: 'trash'},
-  {label: 'Well Plate', value: 'wellPlate'},
-]
+import type {FilterParams} from '../../types'
 
-export default function FilterCategory () {
+// TODO(mc, 2019-03-18): i18n, duplicated in
+//   labware-library/src/components/LabwareList/LabwareCard.js
+const EN_CATEGORY_LABELS = {
+  all: 'All',
+  tubeRack: 'Tube Rack',
+  tipRack: 'Tip Rack',
+  wellPlate: 'Well Plate',
+  trough: 'Trough',
+  trash: 'Trash',
+  other: 'Other',
+}
+
+export type FilterCategoryProps = {
+  filters: FilterParams,
+}
+
+export default function FilterCategory (props: FilterCategoryProps) {
+  const {filters} = props
+  const categories = getAllCategories()
+
   return (
     <ul className={styles.filter_category}>
-      {CATEGORIES.map(c => (
-        <li key={c.value} className={styles.filter_category_item}>
-          {c.label}
+      {categories.map(c => (
+        <li key={c}>
+          <Link
+            to={buildFiltersUrl({...filters, category: c})}
+            className={cx(styles.filter_category_item, {
+              [styles.selected]: c === filters.category,
+            })}
+          >
+            {EN_CATEGORY_LABELS[c]}
+          </Link>
         </li>
       ))}
     </ul>

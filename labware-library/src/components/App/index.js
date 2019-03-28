@@ -4,24 +4,16 @@ import * as React from 'react'
 import {hot} from 'react-hot-loader/root'
 
 import Nav from '../Nav'
-import Sidebar from '../Sidebar'
-import LabwareList from '../LabwareList'
+import LazyPage from './LazyPage'
 import styles from './styles.css'
 
-export function App () {
+import type {ContextRouter} from 'react-router-dom'
+
+export function App (props: ContextRouter) {
   return (
     <div className={styles.app}>
       <Nav />
-      <div className={styles.page_scroller}>
-        <div className={styles.page}>
-          <Sidebar />
-          <section className={styles.content}>
-            <div className={styles.content_container}>
-              <LabwareList />
-            </div>
-          </section>
-        </div>
-      </div>
+      <LazyPage location={props.location} />
     </div>
   )
 }

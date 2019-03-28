@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Page component renders 1`] = `
+<div
+  className="page_scroller"
+>
+  <div
+    className="page"
+  >
+    Sidebar({"filters":{"category":"all","manufacturer":"all"}})
+    <section
+      className="content"
+    >
+      <div
+        className="content_container"
+      >
+        <ul
+          className="list"
+        />
+      </div>
+    </section>
+  </div>
+</div>
+`;
