@@ -6,6 +6,7 @@ import pytest
 from opentrons import robot, types
 from opentrons.legacy_api import modules as legacy_modules
 
+from opentrons.hardware_control import modules
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 from opentrons import instruments
 from opentrons.config import pipette_config
@@ -126,6 +127,68 @@ async def check_modules_response(async_client):
     assert len(body['modules']) == 1
     assert sorted(body['modules'][0].keys()) == keys
     assert 'engaged' in body['modules'][0]['data']
+
+
+@pytest.fixture
+async def dummy_discover_modules():
+    mag_module = await modules.build('', 'magdeck', True, lambda x: None)
+
+    async def stub():
+        return [mag_module]
+    return stub
+
+
+@pytest.fixture
+def dummy_attached_leg_modules():
+    mag_module = legacy_modules.MagDeck()
+    mag_port = 'tty1_magdeck'
+    mag_serial = 'mdYYYYMMDD123'
+    mag_module._device_info = {'serial': mag_serial}
+    return {
+        mag_port + 'magdeck': mag_module
+    }
+
+
+@pytest.mark.api2_only
+async def test_execute_module_command_v2(
+          dummy_discover_modules,
+          virtual_smoothie_env,
+          loop,
+          async_server,
+          async_client,
+          monkeypatch):
+    hw = async_server['com.opentrons.hardware']
+
+    def dummy_get_attached_modules():
+        return []
+
+    monkeypatch.setattr(hw, 'discover_modules', dummy_discover_modules)
+
+    resp = await async_client.post('/modules/dummySerial',
+                                   json={'command_type': 'deactivate'})
+    body = await resp.json()
+    assert resp.status == 200
+    assert 'message' in body
+    assert body['message'] == 'Success'
+
+
+@pytest.mark.api1_only
+async def test_execute_module_command_v1(
+          dummy_attached_leg_modules,
+          virtual_smoothie_env,
+          loop,
+          async_server,
+          async_client,
+          monkeypatch):
+    hw = async_server['com.opentrons.hardware']
+    monkeypatch.setattr(hw, '_attached_modules', dummy_attached_leg_modules)
+
+    resp = await async_client.post('/modules/mdYYYYMMDD123',
+                                   json={'command_type': 'disengage'})
+    body = await resp.json()
+    assert resp.status == 200
+    assert 'message' in body
+    assert body['message'] == 'Success'
 
 
 async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
