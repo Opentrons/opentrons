@@ -6,7 +6,7 @@ import glob from 'glob'
 import type {LabwareList} from '../types'
 
 const allLabware = glob
-  .sync(path.join(__dirname, '../../shared-data/definitions2/*.json'))
+  .sync(path.join(__dirname, '../../../shared-data/definitions2/*.json'))
   .map(require)
   .filter(d => d.metadata.displayCategory !== 'trash')
 

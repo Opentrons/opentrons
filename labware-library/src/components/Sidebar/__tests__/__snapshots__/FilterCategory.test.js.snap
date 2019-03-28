@@ -7,5 +7,17 @@ exports[`FilterCategory component renders 1`] = `
   <li>
     Link({"to":"/?","className":"filter_category_item selected","children":"All"})
   </li>
+  <li>
+    Link({"to":"/?category=wellPlate","className":"filter_category_item","children":"Well Plate"})
+  </li>
+  <li>
+    Link({"to":"/?category=tipRack","className":"filter_category_item","children":"Tip Rack"})
+  </li>
+  <li>
+    Link({"to":"/?category=tubeRack","className":"filter_category_item","children":"Tube Rack"})
+  </li>
+  <li>
+    Link({"to":"/?category=trough","className":"filter_category_item","children":"Trough"})
+  </li>
 </ul>
 `;
