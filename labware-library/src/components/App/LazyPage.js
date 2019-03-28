@@ -2,7 +2,7 @@
 // default export is lazy-loaded so main bundle doesn't need labware defs
 import * as React from 'react'
 
-import type {PageProps} from './page'
+import type {PageProps} from './Page'
 
 // $FlowFixMe: need to upgrade Flow for React.lazy
 export const Page = React.lazy(() => import('./Page'))
