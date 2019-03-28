@@ -53,9 +53,11 @@ class CommandScraper:
         self._logger = logger
         self._broker = broker
         self._queue = queue.Queue()  # type: ignore
+        level = getattr(logging, level.upper(), logging.WARNING)
+        self._logger.setLevel(level)
         logger.addHandler(
             AccumulatingHandler(
-                getattr(logging, level.upper(), logging.WARNING),
+                level,
                 self._queue))
         self._depth = 0
         self._commands: List[Mapping[str, Mapping[str, Any]]] = []
