@@ -152,7 +152,7 @@ class TCPoller(threading.Thread):
         self._send_command(SERIAL_ACK, timeout=DEFAULT_TC_TIMEOUT)
 
     def _send_command(self, command, timeout=DEFAULT_TC_TIMEOUT):
-        command_line = command + ' ' + SERIAL_ACK
+        command_line = command + ' ' + TC_COMMAND_TERMINATOR
         ret_code = self._recursive_write_and_return(
             command_line, timeout, DEFAULT_COMMAND_RETRIES)
         if ERROR_KEYWORD in ret_code.lower():
