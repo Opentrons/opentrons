@@ -22,7 +22,7 @@ type Props = {
   positionFixed?: $PropertyType<PopperProps, 'positionFixed'>,
   modifiers?: $PropertyType<PopperProps, 'modifiers'>,
   children: (?HoverTooltipHandlers) => React.Node,
-  forceOpen?: boolean, // NOTE: mostly for debugging/positioning
+  forceOpen?: boolean, // turns component controlled
 }
 type State = {isOpen: boolean}
 class HoverTooltip extends React.Component<Props, State> {
@@ -52,14 +52,16 @@ class HoverTooltip extends React.Component<Props, State> {
 
   render () {
     if (!this.props.tooltipComponent) return this.props.children()
+    const open = this.props.forceOpen == null
+      ? this.state.isOpen
+      : this.props.forceOpen
 
     return (
       <Manager>
         <Reference>
           {({ref}) => this.props.children({ref, onMouseEnter: this.delayedOpen, onMouseLeave: this.delayedClose})}
         </Reference>
-        {
-          (this.props.forceOpen || this.state.isOpen) &&
+        {open &&
           <Popper
             placement={this.props.placement}
             modifiers={{

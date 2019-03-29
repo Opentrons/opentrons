@@ -173,7 +173,12 @@
 }
 
 .load_name {
+  display: flex;
+}
+
+.load_name_label {
   display: block;
+  width: 100%;
   padding: var(--spacing-2) var(--spacing-5);
   background-color: var(--c-lightest-gray);
 }
@@ -186,6 +191,24 @@
   padding: var(--spacing-1) var(--spacing-2);
   border: var(--bd-light);
   color: var(--c-font-dark);
+}
+
+.load_name_button {
+  flex: none;
+  width: var(--size-2);
+  padding-left: var(--spacing-5);
+  padding-right: var(--spacing-4);
+  border-radius: 0;
+  background-color: var(--c-dark-gray);
+
+  & svg {
+    stroke: none;
+  }
+}
+
+.copy_tooltip {
+  display: block;
+  text-align: center;
 }
 
 @media (--medium) {

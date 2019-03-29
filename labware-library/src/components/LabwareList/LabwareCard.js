@@ -10,6 +10,7 @@ import uniqWith from 'lodash/uniqWith'
 import {getDisplayVolume} from '@opentrons/shared-data'
 import {Icon} from '@opentrons/components'
 import Gallery from './LabwareGallery'
+import LoadName from './LoadName'
 import styles from './styles.css'
 
 import type {
@@ -30,7 +31,6 @@ const EN_DIAMETER = 'diameter'
 const EN_DEPTH = 'depth'
 const EN_MAX_VOLUME = 'max volume'
 const EN_TAGS = 'tags'
-const EN_API_NAME = 'api name'
 
 // TODO(mc, 2019-03-18): i18n
 const EN_NUM_WELLS_BY_CATEGORY = {
@@ -68,6 +68,8 @@ const toFixed = (n: number, d: number): string => round(n, d).toFixed(d)
 export type LabwareCardProps = {definition: LabwareDefinition}
 
 export default function LabwareCard (props: LabwareCardProps) {
+  const {definition} = props
+
   return (
     <li className={styles.card}>
       <TopBar {...props} />
@@ -79,7 +81,7 @@ export default function LabwareCard (props: LabwareCardProps) {
         <WellProperties {...props} />
       </div>
       <Tags {...props} />
-      <LoadName {...props} />
+      <LoadName loadName={definition.parameters.loadName} />
     </li>
   )
 }
@@ -205,23 +207,6 @@ function Tags (props: LabwareCardProps) {
       <p className={styles.left_label}>{EN_TAGS}</p>
       <p className={styles.value}>{tags.join(', ')}</p>
     </div>
-  )
-}
-
-function LoadName (props: LabwareCardProps) {
-  const {loadName} = props.definition.parameters
-
-  return (
-    <label className={styles.load_name}>
-      <p className={styles.top_label}>{EN_API_NAME}</p>
-      <input
-        className={styles.load_name_input}
-        type="text"
-        value={loadName}
-        onFocus={e => e.currentTarget.select()}
-        readOnly
-      />
-    </label>
   )
 }
 

@@ -163,6 +163,8 @@
   &.inverted {
     color: white;
     fill: white;
+
+    /* TODO(mc, 2019-03-29): Is this correct? Our icons use only fill */
     stroke: white;
 
     &:disabled,
