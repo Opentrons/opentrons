@@ -17,7 +17,7 @@
 
 .alert_description {
   font-weight: var(--fw-regular);
-  line-height: 1.25rem;
+  line-height: var(--lh-copy);
   padding-top: 0.5rem;
 
   &:empty {

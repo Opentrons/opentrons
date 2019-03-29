@@ -67,8 +67,11 @@ class StepItem extends React.PureComponent<StepItemProps> {
 
     const iconName = stepIconsByType[stepType]
     let iconClassName = ''
-    if (error) iconClassName = styles.error_icon
-    else if (warning) iconClassName = styles.warning_icon
+    if (error) {
+      iconClassName = styles.error_icon
+    } else if (warning) {
+      iconClassName = styles.warning_icon
+    }
     const Description = <StepDescription description={description} />
 
     return (
