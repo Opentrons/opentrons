@@ -29,6 +29,7 @@ const PIPETTE_MODELS = [
   'p300_single_v1',
   'p300_single_v1.3',
   'p300_single_v1.4',
+  'p300_single_v1.5',
   'p300_multi_v1',
   'p300_multi_v1.3',
   'p300_multi_v1.4',

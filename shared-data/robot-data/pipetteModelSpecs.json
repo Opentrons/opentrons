@@ -2032,6 +2032,117 @@
         "max": 100
       }
     },
+    "p300_single_v1.5": {
+      "name": "p300_single",
+      "top": {
+        "value": 19.5,
+        "min": 5,
+        "max": 19.5,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 3,
+        "min": -2,
+        "max": 19.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "blowout": {
+        "value": 0,
+        "min": -4,
+        "max": 10,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": -4.5,
+        "min": -6,
+        "max": 2,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpCurrent": {
+        "value": 0.1,
+        "min": 0.05,
+        "max": 2.0,
+        "units": "amps",
+        "type": "float"
+      },
+      "pickUpDistance": {
+        "value": 10,
+        "min": 1,
+        "max": 30,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpIncrement": {
+        "value": 1.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 3,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 30,
+        "min": 1,
+        "max": 100,
+        "units": "mm/s",
+        "type": "float"
+      },
+      "modelOffset": [0.0, 0.0, 0.0],
+      "ulPerMm": [
+        {
+          "aspirate": [
+            [35.11266179, 0.03721315938,  16.2497],
+            [44.37338506, 0.02084320206,  16.8245],
+            [63.12001468, 0.01519931266,  17.0749],
+            [148.3020792, 0.005910516464, 17.6612],
+            [224.5387262, 0.00227975152,  18.1997],
+            [301.049323,  0.001359578667, 18.4063]
+          ],
+          "dispense": [
+            [302.3895337, 0, 18.83156277]
+          ]
+        }
+      ],
+      "plungerCurrent": {
+        "value": 0.3,
+        "min": 0.1,
+        "max": 0.5,
+        "units": "amps",
+        "type": "float"
+      },
+      "dropTipCurrent": {
+        "value": 0.5,
+        "min": 0.1,
+        "max": 0.8,
+        "units": "amps",
+        "type": "float"
+      },
+      "dropTipSpeed": {
+        "value": 5,
+        "min": 0.001,
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
+      },
+      "quirks": [],
+      "tipLength": {
+        "value": 51.7,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      }
+    },
     "p300_multi_v1": {
       "name": "p300_multi",
       "top": {
