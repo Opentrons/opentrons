@@ -35,6 +35,8 @@ class HTTPServer(object):
         self.app.router.add_get(
             '/modules/{serial}/data', control.get_module_data)
         self.app.router.add_post(
+            '/modules/{serial}', control.execute_module_command)
+        self.app.router.add_post(
             '/camera/picture', control.take_picture)
         self.app.router.add_post(
             '/server/update', endpoints.update_api)

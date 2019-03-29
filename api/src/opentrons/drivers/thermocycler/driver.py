@@ -26,7 +26,6 @@ GCODES = {
     'SET_PLATE_TEMP': 'M104',
     'GET_PLATE_TEMP': 'M105',
     'SET_RAMP_RATE': 'M566',
-    'PAUSE': '',
     'DEACTIVATE': 'M18',
     'DEVICE_INFO': 'M115'
 }
@@ -224,7 +223,8 @@ class Thermocycler:
         # Check initial device lid state
         _lid_status_res = await self._write_and_wait(GCODES['GET_LID_STATUS'])
         if _lid_status_res:
-            self._lid_status = _lid_status_res.split()[-1].lower()
+            self._lid_status = utils.parse_string_value_from_substring(
+                                    _lid_status_res.split()[-1])
         return self
 
     def disconnect(self) -> 'Thermocycler':
@@ -234,8 +234,8 @@ class Thermocycler:
         self._poller = None
         return self
 
-    def deactivate(self):
-        raise NotImplementedError
+    async def deactivate(self):
+        await self._write_and_wait(GCODES['DEACTIVATE'])
 
     def is_connected(self) -> bool:
         if not self._poller:
@@ -263,14 +263,14 @@ class Thermocycler:
     def _temp_status_update_callback(self, temperature_response):
         # Payload is shaped like `T:95.0 C:77.4 H:600` where T is the
         # target temperature, C is the current temperature, and H is the
-        # hold time (remaining?)
+        # hold time remaining
         val_dict = {}
-        data = [d.split(':') for d in temperature_response.split()]
-        for datum in data:
-            cleanValue = datum[1]
-            if cleanValue == 'none':
-                cleanValue = None
-            val_dict[datum[0]] = cleanValue
+        data_substrs = [d for d in temperature_response.split()]
+
+        for substr in data_substrs:
+            key = utils.parse_key_from_substring(substr)
+            value = utils.parse_number_from_substring(substr)
+            val_dict[key] = value
 
         self._current_temp = val_dict['C']
         self._target_temp = val_dict['T']
@@ -301,7 +301,8 @@ class Thermocycler:
     def status(self):
         if self.target is None:
             _status = 'idle'
-        elif abs(self.target - self.temperature) < TEMP_THRESHOLD:
+        elif self.temperature and (abs(self.target - self.temperature) <
+                                   TEMP_THRESHOLD):
             _status = 'holding at target'
         else:
             _status = 'ramping'
