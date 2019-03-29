@@ -9,8 +9,8 @@ type Props = {
 }
 
 export default function ModulesCardContents (props: Props) {
-  const {modules, showThermo} = props
-  if (!modules || !modules[0] || !showThermo) return <NoModulesMessage />
+  const {modules} = props
+  if (!modules || !modules[0]) return <NoModulesMessage />
 
   return (
     <React.Fragment>
