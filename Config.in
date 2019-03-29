@@ -1,0 +1,3 @@
+# Configuration for Buildroot integration
+source "$BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH/api/Config.in"
+# source "$BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH/update-server/Config.in"

@@ -1,16 +1,15 @@
 // @flow
 import * as React from 'react'
-import {FormGroup, IconButton, HoverTooltip} from '@opentrons/components'
-
-import type {StepFieldName} from '../../../../steplist/fieldLevel'
+import {FormGroup} from '@opentrons/components'
 import i18n from '../../../../localization'
-
-import type {FocusHandlers} from '../../types'
-
 import {
   LabwareField,
   WellSelectionField,
 } from '../../fields'
+import AspDispSection from '../AspDispSection'
+
+import type {StepFieldName} from '../../../../steplist/fieldLevel'
+import type {FocusHandlers} from '../../types'
 
 import styles from '../../StepEditForm.css'
 
@@ -30,19 +29,7 @@ function SourceDestHeaders (props: Props) {
   const labwareLabel = i18n.t(`form.step_edit_form.labwareLabel.${prefix}`)
 
   return (
-    <div className={className}>
-      <div className={styles.section_header}>
-        <span className={styles.section_header_text}>{prefix}</span>
-        <HoverTooltip
-          key={collapsed ? 'collapsed' : 'expanded'} // NOTE: without this key, the IconButton will not re-render unless clicked
-          tooltipComponent={i18n.t('tooltip.advanced_settings')}>
-          {(hoverTooltipHandlers) => (
-            <div {...hoverTooltipHandlers} onClick={toggleCollapsed} className={styles.advanced_settings_button_wrapper}>
-              <IconButton className={styles.advanced_settings_button} name="settings" hover={!collapsed} />
-            </div>
-          )}
-        </HoverTooltip>
-      </div>
+    <AspDispSection {...{className, collapsed, toggleCollapsed, prefix}}>
       <div className={styles.form_row}>
         <FormGroup label={labwareLabel}>
           <LabwareField name={addFieldNamePrefix('labware')} {...focusHandlers} />
@@ -53,7 +40,7 @@ function SourceDestHeaders (props: Props) {
           pipetteFieldName="pipette"
           {...focusHandlers} />
       </div>
-    </div>
+    </AspDispSection>
   )
 }
 

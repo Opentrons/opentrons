@@ -21,6 +21,13 @@ initialState = {alert: 'warning'}
 ```
 
 ```js
+<div style={{width:'50%', height:'4rem', padding:'0.1rem', position:'relative'}}>
+  <AlertItem type='error' title={'some sort of error...'} />
+</div>
+```
+
+
+```js
 initialState = {alert: 'info'}
 ;
 <div style={{width:'50%', height:'4rem', padding:'0.1rem', position:'relative'}}>

@@ -125,8 +125,7 @@
     "deprecated": false,
     "metadata": {
         "displayName": "Opentrons GEB 1000uL Tiprack",
-        "displayVolumeUnits": "uL",
-        "displayLengthUnits": "mm",
+        "displayVolumeUnits": "µL",
         "displayCategory": "tipRack",
         "tags": [
             "GEB",

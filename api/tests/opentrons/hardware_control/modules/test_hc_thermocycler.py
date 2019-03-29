@@ -49,7 +49,7 @@ async def test_sim_update():
     assert therm.target == 10
     assert therm.status == 'holding at target'
     await asyncio.wait_for(therm.wait_for_temp(), timeout=0.2)
-    therm.deactivate()
+    await therm.deactivate()
     assert therm.temperature is None
     assert therm.target is None
     assert therm.status == 'idle'

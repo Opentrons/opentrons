@@ -37,7 +37,7 @@ const FORM_WARNINGS: {[FormWarningType]: FormWarning} = {
         Read more <KnowledgeBaseLink to='multiDispense'>here</KnowledgeBaseLink>.
       </React.Fragment>
     ),
-    dependentFields: ['disposalVolume_volume', 'pipette', 'path'],
+    dependentFields: ['disposalVolume_volume', 'pipette'],
   },
 }
 export type WarningChecker = (mixed) => ?FormWarning

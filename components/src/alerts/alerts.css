@@ -61,6 +61,19 @@
   }
 }
 
+.error {
+  border: 1px solid var(--c-error);
+
+  & > .title_bar {
+    background-color: var(--c-error-light);
+    color: var(--c-error-dark);
+
+    & svg {
+      fill: var(--c-error);
+    }
+  }
+}
+
 .message {
   padding: 1rem 3rem;
   background-color: white;

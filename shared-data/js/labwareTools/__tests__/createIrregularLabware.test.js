@@ -103,7 +103,6 @@ describe('test createIrregularLabware function', () => {
         displayName: 'Fake Irregular Container',
         displayCategory: 'tubeRack',
         displayVolumeUnits: 'mL',
-        displayLengthUnits: 'mm',
         tags: ['fake', 'opentrons'],
       },
       parameters: {
@@ -121,13 +120,13 @@ describe('test createIrregularLabware function', () => {
           depth: 10.54,
           shape: 'circular',
           diameter: 10,
-          totalLiquidVolume: 3,
+          totalLiquidVolume: 3000,
         },
         {
           depth: 20.54,
           shape: 'circular',
           diameter: 15,
-          totalLiquidVolume: 10,
+          totalLiquidVolume: 10000,
         },
       ],
       offset: [{x: 10, y: 10, z: 69.48}, {x: 15, y: 15, z: 69.48}],
@@ -165,12 +164,23 @@ describe('test createIrregularLabware function', () => {
           totalLiquidVolume: 2000,
         },
       ],
-      // TODO Ian 2018-11-08: add test with mL, expect displayVol = vol/1000 (would fail right now)
-      units: 'uL',
+      units: 'µL',
       displayCategory: 'wellPlate',
       brand: 'some brand',
     })
 
     expect(loadName).toEqual('somebrand_6x400_ul_4x2000_ul_wellplate')
+  })
+
+  test('labware loadName generated correctly for multi-grid labware in other units', () => {
+    const loadName = _generateIrregularLoadName({
+      grid: [{row: 3, column: 2}],
+      well: [{depth: 20, shape: 'circular', totalLiquidVolume: 4000}],
+      units: 'mL',
+      displayCategory: 'wellPlate',
+      brand: 'some brand',
+    })
+
+    expect(loadName).toEqual('somebrand_6x4_ml_wellplate')
   })
 })

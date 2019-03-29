@@ -27,14 +27,8 @@
   justify-content: flex-start;
 }
 
-/* TODO: Ian 2019-03-14 delete probably (just used for Mix) */
-.fixed_width {
-  width: 17rem;
-}
-
 .field,
 .small_field,
-.medium_field,
 .large_field {
   margin-right: 0.5rem;
 }
@@ -43,13 +37,29 @@
   width: 12rem;
 }
 
-/* TODO Ian 2019-03-15: needed in mix form before update. When you do mix form, delete this if it's not needed */
-.medium_field {
-  width: 8rem;
-}
-
 .small_field {
   width: 5.75rem;
+}
+
+.full_width_field {
+  width: 100%;
+}
+
+/* TODO: Ian 2019-03-25 make this a component library input? */
+.textarea_field {
+  font-size: var(--fs-body-1);
+  background-color: var(--c-light-gray);
+  border-radius: var(--bd-radius-form-field);
+  padding: 0.25rem 0.25rem 0.25rem 0.5rem;
+  height: 100%;
+  width: 100%;
+
+  /* resets */
+  border: none;
+  overflow: auto;
+  outline: none;
+  box-shadow: none;
+  resize: none;
 }
 
 .orphan_field {
@@ -69,13 +79,6 @@
 
 .captioned_field {
   margin-bottom: 1rem;
-}
-
-/* TODO Ian 2019-03-14: probably delete this */
-.mix_hidden_fields {
-  margin: 0 0 0 1rem;
-  min-width: 0;
-  width: 14rem;
 }
 
 .no_label {
@@ -116,6 +119,7 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 0.5rem;
+  min-height: 4rem;
 }
 
 .section_column {

@@ -71,11 +71,9 @@ export function getTooltipForField (stepType: ?string, name: string): ?React.Nod
     : name
 
   // specificity cascade for names.
-  // first level: try getting from step_fields.moveLiquid, fallback to step_fields.default
+  // first level: "disabled" wins out if disabled arg is true
   // second level: prefix. "aspirate_foo" wins over "foo"
   const text: string = i18n.t([
-    `tooltip.step_fields.${stepType}.${name}`,
-    `tooltip.step_fields.${stepType}.${nameWithoutPrefix}`,
     `tooltip.step_fields.defaults.${name}`,
     `tooltip.step_fields.defaults.${nameWithoutPrefix}`,
     '',

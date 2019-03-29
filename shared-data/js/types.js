@@ -41,11 +41,14 @@ export type LabwareDisplayCategory =
   | 'wellPlate'
   | 'other'
 
+export type LabwareWellShape = 'rectangular' | 'circular'
+
+export type LabwareVolumeUnits = 'µL' | 'mL' | 'L'
+
 export type LabwareMetadata = {|
   displayName: string,
   displayCategory: LabwareDisplayCategory,
-  displayVolumeUnits: string,
-  displayLengthUnits?: string,
+  displayVolumeUnits: LabwareVolumeUnits,
   tags?: Array<string>,
 |}
 
@@ -77,17 +80,27 @@ export type LabwareBrand = {|
   brand: string,
 |}
 
-export type LabwareWell = {|
+export type LabwareWellProperties = {|
   depth: number,
-  shape: string,
+  shape: LabwareWellShape,
   totalLiquidVolume: number,
-  x: number,
-  y: number,
-  z: number,
   diameter?: number,
   length?: number,
   width?: number,
 |}
+
+export type LabwareWell = {|
+  ...LabwareWellProperties,
+  x: number,
+  y: number,
+  z: number,
+|}
+
+// TODO(mc, 2019-03-21): exact object is tough to use with the initial value in
+// reduce, so leaving this inexact (e.g. `const a: {||} = {}` errors)
+export type LabwareWellMap = {
+  [wellName: string]: LabwareWell,
+}
 
 // TODO(mc, 2019-03-18): this should eventually replace LabwareDefinition
 // NOTE: must be synced with shared-data/labware-json-schema/labware-schema.json
@@ -100,5 +113,5 @@ export type LabwareDefinition2 = {|
   parameters: LabwareParameters,
   brand: LabwareBrand,
   ordering: Array<Array<string>>,
-  wells: {[wellName: string]: LabwareWell},
+  wells: LabwareWellMap,
 |}

@@ -9,22 +9,22 @@ import type {
 import {getPDMetadata} from '../file-types'
 import type {BaseState} from '../types'
 import type {LoadFileAction} from '../load-file'
-import type {CommandCreatorWarning} from '../step-generation'
-import type {FormWarning} from '../steplist'
 import type {DeleteStepAction} from '../steplist/actions'
 import type {StepIdType} from '../form-types'
 
-export type DismissedWarningsAllSteps<WarningType> = {[stepId: StepIdType]: ?Array<WarningType>}
+export type WarningType = string
+
+export type DismissedWarningsAllSteps = {[stepId: StepIdType]: ?Array<WarningType>}
 export type DismissedWarningState = {
-  form: DismissedWarningsAllSteps<FormWarning>,
-  timeline: DismissedWarningsAllSteps<CommandCreatorWarning>,
+  form: DismissedWarningsAllSteps,
+  timeline: DismissedWarningsAllSteps,
 }
 const dismissedWarnings = handleActions({
   DISMISS_FORM_WARNING: (
     state: DismissedWarningState,
     action: DismissFormWarning
   ): DismissedWarningState => {
-    const {stepId, warning} = action.payload
+    const {stepId, type} = action.payload
     if (stepId == null) {
       console.warn('Tried to dismiss form warning with no stepId')
       return state
@@ -36,7 +36,7 @@ const dismissedWarnings = handleActions({
         ...state.form,
         [stepId]: [
           ...(state.form[stepId] || []),
-          warning,
+          type,
         ],
       },
     }
@@ -45,7 +45,7 @@ const dismissedWarnings = handleActions({
     state: DismissedWarningState,
     action: DismissTimelineWarning
   ): DismissedWarningState => {
-    const {stepId, warning} = action.payload
+    const {stepId, type} = action.payload
     if (stepId == null) {
       console.warn('Tried to dismiss timeline warning with no stepId')
       return state
@@ -56,7 +56,7 @@ const dismissedWarnings = handleActions({
         ...state.timeline,
         [stepId]: [
           ...(state.timeline[stepId] || []),
-          warning,
+          type,
         ],
       },
     }

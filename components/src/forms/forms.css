@@ -83,7 +83,7 @@
   display: flex;
   flex: 1 1;
   background-color: var(--c-light-gray);
-  border-radius: 3px;
+  border-radius: var(--bd-radius-form-field);
   padding: 0.25rem 0.25rem 0.25rem 0.5rem;
 
   & input {
@@ -160,6 +160,10 @@
   background-color: var(--c-warning-light);
 }
 
+.dropdown {
+  background-color: var(--c-light-gray);
+}
+
 .dropdown_field {
   position: relative;
 
@@ -170,7 +174,7 @@
     padding: 0.25rem 0.5rem;
     outline: none;
     height: 1.5rem;
-    border-radius: 3px;
+    border-radius: var(--bd-radius-form-field);
     font-family: inherit;
     width: 100%;
     appearance: none;
@@ -211,7 +215,8 @@
   }
 
   /* stylelint-disable no-descending-specificity */
-  & input {
+  & input,
+  & .suffix {
     color: var(--c-med-gray);
   }
 }

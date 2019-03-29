@@ -27,6 +27,7 @@ type StepItemProps = {
 
   collapsed?: boolean,
   error?: ?boolean,
+  warning?: ?boolean,
   selected?: boolean,
   hovered?: boolean,
   hoveredSubstep: ?SubstepIdentifier,
@@ -53,6 +54,7 @@ class StepItem extends React.PureComponent<StepItemProps> {
 
       collapsed,
       error,
+      warning,
       selected,
       hovered,
 
@@ -64,13 +66,19 @@ class StepItem extends React.PureComponent<StepItemProps> {
     } = this.props
 
     const iconName = stepIconsByType[stepType]
+    let iconClassName = ''
+    if (error) {
+      iconClassName = styles.error_icon
+    } else if (warning) {
+      iconClassName = styles.warning_icon
+    }
     const Description = <StepDescription description={description} />
 
     return (
       <PDTitledList
         description={Description}
-        iconName={error ? 'alert-circle' : iconName}
-        iconProps={{className: error ? styles.error_icon : ''}}
+        iconName={(error || warning) ? 'alert-circle' : iconName}
+        iconProps={{className: iconClassName}}
         title={title ? `${stepNumber}. ${title}` : ''}
         onClick={() => selectStep(stepId)}
         onContextMenu={onStepContextMenu}

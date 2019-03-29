@@ -27,6 +27,7 @@ import os
 import json
 import logging
 from pathlib import Path
+import re
 import shutil
 import sys
 from typing import Dict, NamedTuple, Optional, Union
@@ -297,12 +298,50 @@ def _erase_old_indices():
             index.unlink()
 
 
+def _find_most_recent_backup(normal_path: Optional[str]) -> Optional[str]:
+    """ Find the most recent old settings to migrate.
+
+    The input is the path to an unqualified settings file - e.g.
+    /mnt/usbdrive/config/robotSettings.json
+
+    This will return
+    - None if the input is None (to support chaining from dict.get())
+    - The input if it exists, or
+    - The file named normal_path-TIMESTAMP.json with the highest timestamp
+      if one can be found, or
+    - None
+    """
+    if normal_path is None:
+        return None
+
+    if os.path.exists(normal_path):
+        return normal_path
+
+    dirname, basename = os.path.split(normal_path)
+    root, ext = os.path.splitext(basename)
+    backups = [fi for fi in os.listdir(dirname)
+               if fi.startswith(root) and fi.endswith(ext)]
+    ts_re = re.compile(r'.*-([0-9]+)' + ext + '$')
+
+    def ts_compare(filename):
+        match = ts_re.match(filename)
+        if not match:
+            return -1
+        else:
+            return int(match.group(1))
+
+    backups_sorted = sorted(backups, key=ts_compare)
+    if not backups_sorted:
+        return None
+    return os.path.join(dirname, backups_sorted[-1])
+
+
 def _do_migrate(index: Dict[str, str]):
     base = infer_config_base_dir()
     new_index = generate_config_index(_get_environ_overrides(), base)
     moves = (('/data/user_storage/opentrons_data/opentrons.db',
               new_index['labware_database_file']),
-             (index.get('robotSettingsFile'),
+             (_find_most_recent_backup(index.get('robotSettingsFile')),
               new_index['robot_settings_file']),
              (index.get('deckCalibrationFile'),
               new_index['deck_calibration_file']),

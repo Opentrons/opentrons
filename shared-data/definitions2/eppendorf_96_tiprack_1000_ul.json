@@ -125,8 +125,7 @@
     "deprecated": false,
     "metadata": {
         "displayName": "epT.I.P.S. 50-1000 uL tiprack",
-        "displayVolumeUnits": "uL",
-        "displayLengthUnits": "mm",
+        "displayVolumeUnits": "µL",
         "displayCategory": "tipRack",
         "tags": [
             "SBS",
@@ -1020,7 +1019,7 @@
         }
     },
     "brand": {
-        "brand": "eppendorf",
+        "brand": "Eppendorf",
         "brandId": [
             "022491105"
         ]

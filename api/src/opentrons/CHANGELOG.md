@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.8.1"></a>
+## [3.8.1](https://github.com/Opentrons/opentrons/compare/v3.8.0...v3.8.1) (2019-03-29)
+
+
+### Bug Fixes
+
+* **api:** Correctly migrate probe center settings ([#3246](https://github.com/Opentrons/opentrons/issues/3246)) ([84d3b00](https://github.com/Opentrons/opentrons/commit/84d3b00))
+* **api:** simulate needs to set loglevel ([#3268](https://github.com/Opentrons/opentrons/issues/3268)) ([37c00fb](https://github.com/Opentrons/opentrons/commit/37c00fb))
+* **api,shared-data:** Lowercase labware names and camelCase categories ([#3234](https://github.com/Opentrons/opentrons/issues/3234)) ([55e332e](https://github.com/Opentrons/opentrons/commit/55e332e)), closes [#3231](https://github.com/Opentrons/opentrons/issues/3231)
+* **app:** Fix modules not populating the modules card ([#3278](https://github.com/Opentrons/opentrons/issues/3278)) ([1fd936d](https://github.com/Opentrons/opentrons/commit/1fd936d))
+
+
+### Features
+
+* **api:** Add more pick up tip config elements to pipette config ([#3237](https://github.com/Opentrons/opentrons/issues/3237)) ([f69da42](https://github.com/Opentrons/opentrons/commit/f69da42))
+* **api:** Add support for (p300m,p50m,p10s,p1000s)v1.5 ([#3265](https://github.com/Opentrons/opentrons/issues/3265)) ([9dfc127](https://github.com/Opentrons/opentrons/commit/9dfc127))
+* **api:** add z margin override ([#3235](https://github.com/Opentrons/opentrons/issues/3235)) ([341385c](https://github.com/Opentrons/opentrons/commit/341385c))
+* **api:** allow robot to discover thermocycler and return live data ([#3239](https://github.com/Opentrons/opentrons/issues/3239)) ([34af269](https://github.com/Opentrons/opentrons/commit/34af269)), closes [#2958](https://github.com/Opentrons/opentrons/issues/2958)
+* **api:** move-to-slot JSON protocol command ([#3242](https://github.com/Opentrons/opentrons/issues/3242)) ([cef5123](https://github.com/Opentrons/opentrons/commit/cef5123))
+* **api:** Print out the runlog in the simulate script ([#3251](https://github.com/Opentrons/opentrons/issues/3251)) ([73d755f](https://github.com/Opentrons/opentrons/commit/73d755f))
+
+
+
+
+
 <a name="3.8.0"></a>
 # [3.8.0](https://github.com/Opentrons/opentrons/compare/v3.7.0...v3.8.0) (2019-03-19)
 

@@ -26,7 +26,6 @@
     "metadata": {
         "displayName": "Corning 12 Well Plate",
         "displayVolumeUnits": "mL",
-        "displayLengthUnits": "mm",
         "displayCategory": "wellPlate",
         "tags": [
             "SBS",
@@ -57,7 +56,7 @@
             "shape": "circular",
             "depth": 17.53,
             "diameter": 22.73,
-            "totalLiquidVolume": 6.9,
+            "totalLiquidVolume": 6900,
             "x": 24.94,
             "y": 16.79,
             "z": 2.49
@@ -66,7 +65,7 @@
             "shape": "circular",
             "depth": 17.53,
             "diameter": 22.73,
-            "totalLiquidVolume": 6.9,
+            "totalLiquidVolume": 6900,
             "x": 24.94,
             "y": 42.8,
             "z": 2.49
@@ -75,7 +74,7 @@
             "shape": "circular",
             "depth": 17.53,
             "diameter": 22.73,
-            "totalLiquidVolume": 6.9,
+            "totalLiquidVolume": 6900,
             "x": 24.94,
             "y": 68.81,
             "z": 2.49
@@ -84,7 +83,7 @@
             "shape": "circular",
             "depth": 17.53,
             "diameter": 22.73,
-            "totalLiquidVolume": 6.9,
+            "totalLiquidVolume": 6900,
             "x": 60.95,
             "y": 16.79,
             "z": 2.49
@@ -93,7 +92,7 @@
             "shape": "circular",
             "depth": 17.53,
             "diameter": 22.73,
-            "totalLiquidVolume": 6.9,
+            "totalLiquidVolume": 6900,
             "x": 60.95,
             "y": 42.8,
             "z": 2.49
@@ -102,7 +101,7 @@
             "shape": "circular",
             "depth": 17.53,
             "diameter": 22.73,
-            "totalLiquidVolume": 6.9,
+            "totalLiquidVolume": 6900,
             "x": 60.95,
             "y": 68.81,
             "z": 2.49
@@ -111,7 +110,7 @@
             "shape": "circular",
             "depth": 17.53,
             "diameter": 22.73,
-            "totalLiquidVolume": 6.9,
+            "totalLiquidVolume": 6900,
             "x": 96.96,
             "y": 16.79,
             "z": 2.49
@@ -120,7 +119,7 @@
             "shape": "circular",
             "depth": 17.53,
             "diameter": 22.73,
-            "totalLiquidVolume": 6.9,
+            "totalLiquidVolume": 6900,
             "x": 96.96,
             "y": 42.8,
             "z": 2.49
@@ -129,7 +128,7 @@
             "shape": "circular",
             "depth": 17.53,
             "diameter": 22.73,
-            "totalLiquidVolume": 6.9,
+            "totalLiquidVolume": 6900,
             "x": 96.96,
             "y": 68.81,
             "z": 2.49
@@ -138,7 +137,7 @@
             "shape": "circular",
             "depth": 17.53,
             "diameter": 22.73,
-            "totalLiquidVolume": 6.9,
+            "totalLiquidVolume": 6900,
             "x": 132.97,
             "y": 16.79,
             "z": 2.49
@@ -147,7 +146,7 @@
             "shape": "circular",
             "depth": 17.53,
             "diameter": 22.73,
-            "totalLiquidVolume": 6.9,
+            "totalLiquidVolume": 6900,
             "x": 132.97,
             "y": 42.8,
             "z": 2.49
@@ -156,14 +155,14 @@
             "shape": "circular",
             "depth": 17.53,
             "diameter": 22.73,
-            "totalLiquidVolume": 6.9,
+            "totalLiquidVolume": 6900,
             "x": 132.97,
             "y": 68.81,
             "z": 2.49
         }
     },
     "brand": {
-        "brand": "corning",
+        "brand": "Corning",
         "brandId": [
             "3336",
             "3512",

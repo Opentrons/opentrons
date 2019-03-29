@@ -163,6 +163,50 @@ async def get_module_data(request):
         return web.json_response({"message": "Module not found"}, status=404)
 
 
+async def execute_module_command(request):
+    """
+    Execute a command on a given module by its serial number
+    """
+    hw = hw_from_req(request)
+    requested_serial = request.match_info['serial']
+    data = await request.json()
+    command_type = data.get('command_type')
+    args = data.get('args')
+
+    if ff.use_protocol_api_v2():
+        hw_mods = await hw.discover_modules()
+    else:
+        hw_mods = hw.attached_modules.values()
+
+    if len(hw_mods) == 0:
+        return web.json_response({"message": "No connected modules"},
+                                 status=404)
+
+    matching_mod = next((mod for mod in hw_mods if
+                        mod.device_info.get('serial') == requested_serial),
+                        None)
+
+    if not matching_mod:
+        return web.json_response({"message": "Specified module not found"},
+                                 status=404)
+
+    if hasattr(matching_mod, command_type):
+        clean_args = args or []
+        method = getattr(matching_mod, command_type)
+        if asyncio.iscoroutinefunction(method):
+            val = await method(*clean_args)
+        else:
+            val = method(*clean_args)
+
+        return web.json_response(
+            {'message': 'Success', 'returnValue': val},
+            status=200)
+    else:
+        return web.json_response(
+            {'message': f'Module does not have command: {command_type}'},
+            status=400)
+
+
 async def get_engaged_axes(request):
     """
     Query driver for engaged state by axis. Response keys will be axes XYZABC

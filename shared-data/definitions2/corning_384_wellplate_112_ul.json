@@ -437,8 +437,7 @@
     "deprecated": false,
     "metadata": {
         "displayName": "Corning 384 Well Plate",
-        "displayVolumeUnits": "uL",
-        "displayLengthUnits": "mm",
+        "displayVolumeUnits": "µL",
         "displayCategory": "wellPlate",
         "tags": [
             "SBS",
@@ -3923,7 +3922,7 @@
         }
     },
     "brand": {
-        "brand": "corning",
+        "brand": "Corning",
         "brandId": [
             "3640",
             "3662",

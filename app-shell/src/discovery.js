@@ -8,7 +8,7 @@ import DiscoveryClient, {
   SERVICE_REMOVED_EVENT,
 } from '@opentrons/discovery-client'
 
-import {getConfig, getOverrides} from './config'
+import {getConfig, getOverrides, handleConfigChange} from './config'
 import createLogger from './log'
 
 import type {Service} from '@opentrons/discovery-client'
@@ -45,6 +45,10 @@ export function registerDiscovery (dispatch: Action => void) {
     .on(SERVICE_REMOVED_EVENT, onServiceUpdate)
     .on('error', error => log.error('discovery error', {error}))
     .start()
+
+  handleConfigChange('discovery.candidates', value =>
+    client.setCandidates(['[fd00:0:cafe:fefe::1]'].concat(value))
+  )
 
   return function handleIncomingAction (action: Action) {
     log.debug('handling action in discovery', {action})

@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
+import assert from 'assert'
+import {saveAs} from 'file-saver'
 import i18n from '../../localization'
 import {actions, selectors} from '../../navigation'
 import {selectors as fileDataSelectors} from '../../file-data'
@@ -11,7 +13,11 @@ import type {BaseState, ThunkDispatch} from '../../types'
 type Props = React.ElementProps<typeof FileSidebar>
 
 type SP = {
-  downloadData: $PropertyType<Props, 'downloadData'>,
+  canDownload: boolean,
+  downloadData: ?{
+    fileData: Object,
+    fileName: string,
+  },
 }
 
 type MP = {
@@ -27,9 +33,10 @@ function mapStateToProps (state: BaseState): SP & MP {
   const canDownload = selectors.getCurrentPage(state) !== 'file-splash'
 
   return {
+    canDownload,
     downloadData: (canDownload)
       ? {
-        fileContents: JSON.stringify(fileData, null, 4),
+        fileData,
         fileName: protocolName + '.json',
       }
       : null,
@@ -40,16 +47,27 @@ function mapStateToProps (state: BaseState): SP & MP {
 }
 
 function mergeProps (stateProps: SP & MP, dispatchProps: {dispatch: ThunkDispatch<*>}): Props {
-  const {_canCreateNew, _hasUnsavedChanges, downloadData} = stateProps
+  const {_canCreateNew, _hasUnsavedChanges, canDownload, downloadData} = stateProps
   const {dispatch} = dispatchProps
   return {
-    downloadData,
     loadFile: (fileChangeEvent) => {
       if (!_hasUnsavedChanges || window.confirm(i18n.t('alert.window.confirm_import'))) {
         dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
       }
     },
+    canDownload,
     createNewFile: _canCreateNew ? () => dispatch(actions.toggleNewProtocolModal(true)) : undefined,
-    onDownload: () => dispatch(loadFileActions.saveProtocolFile()),
+    onDownload: () => {
+      if (!downloadData) {
+        assert(downloadData, 'no download data, could not download file')
+        return
+      }
+      const blob = new Blob(
+        [JSON.stringify(downloadData.fileData, null, 4)],
+        {type: 'application/json'}
+      )
+      saveAs(blob, downloadData.fileName)
+      dispatch(loadFileActions.saveProtocolFile())
+    },
   }
 }

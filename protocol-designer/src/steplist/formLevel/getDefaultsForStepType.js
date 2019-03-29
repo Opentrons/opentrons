@@ -60,6 +60,14 @@ export default function getDefaultsForStepType (stepType: StepType): {[StepField
         blowout_location: FIXED_TRASH_ID,
         preWetTip: false,
       }
+    case 'pause':
+      return {
+        pauseForAmountOfTime: null,
+        pauseHour: null,
+        pauseMinute: null,
+        pauseSecond: null,
+        pauseMessage: '',
+      }
     default:
       return {}
   }

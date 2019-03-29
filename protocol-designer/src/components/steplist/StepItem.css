@@ -70,6 +70,10 @@
 }
 
 .error_icon {
+  fill: var(--c-error);
+}
+
+.warning_icon {
   fill: var(--c-warning);
 }
 

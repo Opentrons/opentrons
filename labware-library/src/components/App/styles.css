@@ -3,29 +3,36 @@
 @import '../../styles/breakpoints.css';
 @import '../../styles/spacing.css';
 
-.page {
-  display: flex;
-  flex-direction: column;
+.app {
   height: 100%;
 
   /* Nav height */
   padding-top: var(--size-2);
 }
 
+.page_scroller {
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.page {
+  margin: auto;
+  max-width: var(--screen-width-xlarge);
+}
+
 .content {
   width: 100%;
-  padding: var(--spacing-6) var(--spacing-3);
+  padding: 0 var(--spacing-3);
+  margin: 0 auto;
 }
 
 @media (--medium) {
-  .page {
-    flex-direction: row;
-    overflow: hidden;
-  }
-
   .content {
-    max-height: 100%;
-    overflow-y: auto;
+    padding-top: var(--spacing-7);
+    padding-right: var(--spacing-7);
+
+    /* spacing + sidebar width */
+    padding-left: calc(var(--size-3) + var(--spacing-5));
   }
 
   .content_container {
@@ -35,8 +42,12 @@
 }
 
 @media (--large) {
-  .page {
-    margin: auto;
-    width: var(--screen-width-large);
+  .content {
+    /* spacing + sidebar width */
+    padding-left: calc(var(--size-4) + var(--spacing-7));
+  }
+
+  .content_container {
+    max-width: 100%;
   }
 }

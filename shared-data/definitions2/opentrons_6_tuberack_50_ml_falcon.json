@@ -16,7 +16,6 @@
     "otId": "14807fb0-e8f4-11e8-b93b-5f6727dde048",
     "deprecated": false,
     "metadata": {
-        "displayLengthUnits": "mm",
         "displayVolumeUnits": "mL",
         "displayCategory": "tubeRack",
         "displayName": "Opentrons 50 mL tuberack",
@@ -49,7 +48,7 @@
             "depth": 113.85,
             "diameter": 26.45,
             "shape": "circular",
-            "totalLiquidVolume": 50,
+            "totalLiquidVolume": 50000,
             "x": 33,
             "y": 21.88,
             "z": 6.04
@@ -58,7 +57,7 @@
             "depth": 113.85,
             "diameter": 26.45,
             "shape": "circular",
-            "totalLiquidVolume": 50,
+            "totalLiquidVolume": 50000,
             "x": 33,
             "y": 56.88,
             "z": 6.04
@@ -67,7 +66,7 @@
             "depth": 113.85,
             "diameter": 26.45,
             "shape": "circular",
-            "totalLiquidVolume": 50,
+            "totalLiquidVolume": 50000,
             "x": 68,
             "y": 21.88,
             "z": 6.04
@@ -76,7 +75,7 @@
             "depth": 113.85,
             "diameter": 26.45,
             "shape": "circular",
-            "totalLiquidVolume": 50,
+            "totalLiquidVolume": 50000,
             "x": 68,
             "y": 56.88,
             "z": 6.04
@@ -85,7 +84,7 @@
             "depth": 113.85,
             "diameter": 26.45,
             "shape": "circular",
-            "totalLiquidVolume": 50,
+            "totalLiquidVolume": 50000,
             "x": 103,
             "y": 21.88,
             "z": 6.04
@@ -94,7 +93,7 @@
             "depth": 113.85,
             "diameter": 26.45,
             "shape": "circular",
-            "totalLiquidVolume": 50,
+            "totalLiquidVolume": 50000,
             "x": 103,
             "y": 56.88,
             "z": 6.04

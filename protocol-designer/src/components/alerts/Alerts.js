@@ -1,49 +1,78 @@
 // @flow
 import * as React from 'react'
-import {AlertItem} from '@opentrons/components'
+import assert from 'assert'
+import {AlertItem, OutlineButton} from '@opentrons/components'
 import i18n from '../../localization'
-import type {CommandCreatorError, CommandCreatorWarning} from '../../step-generation'
-import ErrorContents from './ErrorContents'
-import WarningContents from './WarningContents'
+// TODO: Ian 2019-03-27 the use of Component Library `Alert` is being
+// stretched beyond its intentions here, we should reconcile PD + Run App uses of Alert later
+import styles from './alerts.css'
+import type {AlertData} from './types'
 
 /* TODO:  BC 2018-09-13 this component is an abstraction that is meant to be shared for timeline
 * and form level alerts. Currently it is being used in TimelineAlerts, but it should be used in
 * FormAlerts as well. This change will also include adding form level alert copy to i18n
 * see #1814 for reference
 */
+
 type Props = {
-  level: 'timeline' | 'form',
-  errors: Array<CommandCreatorError>,
-  warnings: Array<CommandCreatorWarning>,
-  dismissWarning: (CommandCreatorWarning) => mixed,
+  errors: Array<AlertData>,
+  warnings: Array<AlertData>,
+  dismissWarning: (string) => mixed,
 }
 
+type MakeAlert = (
+  alertType: 'error' | 'warning',
+  data: AlertData,
+  key: number | string,
+) => React.Node
+
 class Alerts extends React.Component<Props> {
-  makeHandleCloseWarning = (warning: CommandCreatorWarning) => () => {
-    this.props.dismissWarning(warning)
+  makeHandleCloseWarning = (dismissId: ?string) => () => {
+    assert(dismissId, 'expected dismissId, Alert cannot dismiss warning')
+    if (dismissId) {
+      this.props.dismissWarning(dismissId)
+    }
+  }
+
+  makeAlert: MakeAlert = (alertType, data, key) => {
+    return (
+      <AlertItem
+        type={alertType}
+        key={`${alertType}:${key}`}
+        title={<div className={styles.alert_inner_wrapper}>
+          <div className={styles.icon_label}>{i18n.t(`alert.type.${alertType}`)}</div>
+          <div className={styles.alert_body}>
+            <div className={styles.alert_title}>
+              {data.title}
+              {/* i18n.t(`alert.${level}.${alertType}.${data.type}.title`) */}
+            </div>
+            <div className={styles.alert_description}>
+              {data.description}
+            </div>
+          </div>
+          {alertType === 'warning' &&
+            <OutlineButton
+              className={styles.dismiss_button}
+              onClick={this.makeHandleCloseWarning(data.dismissId)}
+            >
+              {i18n.t('alert.dismiss')}
+            </OutlineButton>
+          }
+        </div>}
+        onCloseClick={undefined}>
+      </AlertItem>
+    )
   }
 
   render () {
     return (
       <React.Fragment>
-        {this.props.errors.map((error, key) => (
-          <AlertItem
-            type='warning'
-            key={`error:${key}`}
-            title={i18n.t(`alert.${this.props.level}.error.${error.type}.title`, error.message)}
-            onCloseClick={undefined}>
-            <ErrorContents level={this.props.level} errorType={error.type} />
-          </AlertItem>
-        ))}
-        {this.props.warnings.map((warning, key) => (
-          <AlertItem
-            type='warning'
-            key={`warning:${key}`}
-            title={i18n.t(`alert.${this.props.level}.warning.${warning.type}.title`, warning.message)}
-            onCloseClick={this.makeHandleCloseWarning(warning)}>
-            <WarningContents level={this.props.level} warningType={warning.type} />
-          </AlertItem>
-        ))}
+        {this.props.errors.map((error, key) =>
+          this.makeAlert('error', error, key)
+        )}
+        {this.props.warnings.map((warning, key) =>
+          this.makeAlert('warning', warning, key)
+        )}
       </React.Fragment>
     )
   }
