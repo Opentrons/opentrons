@@ -1,7 +1,6 @@
 // @flow
 // API client for modules (the robot kind)
 import {createSelector} from 'reselect'
-import remove from 'lodash/remove'
 import type {OutputSelector} from 'reselect'
 import type {State, ThunkPromiseAction} from '../types'
 import type {BaseRobot, RobotService} from '../robot'
@@ -108,12 +107,18 @@ export function makeGetRobotModules () {
         const tcEnabled = !!config.devInternal?.enableThermocycler
         const modulesCall = state[MODULES]
 
-        if (!tcEnabled && modulesCall && modulesCall.response) {
-          const response = modulesCall.response
-          modulesCall.response = remove(response, m => {
-            return m.name === 'thermocycler'
-          })
+        // TODO: remove this block when feature flag removed
+        if (modulesCall?.response) {
+          return {
+            ...modulesCall,
+            response: {
+              modules: modulesCall.response.modules.filter(mod => {
+                return tcEnabled || mod.name === 'thermocycler'
+              }),
+            },
+          }
         }
+
         return modulesCall || {inProgress: false}
       }
     )
