@@ -55,6 +55,10 @@ export default function getNextRobotStateAndWarningsForAspDisp (
     }
   }
 
+  assert(uniq(wellsForTips).length === allWellsShared
+    ? 1
+    : (wellsForTips.length),
+  `expected all wells to be shared, or no wells to be shared. Got: ${JSON.stringify(wellsForTips)}`)
   if (pipetteSpec.channels > 1 && allWellsShared) {
     // special case: trough-like "shared" well with multi-channel pipette
     const commonWell = wellsForTips[0]
@@ -111,7 +115,6 @@ export default function getNextRobotStateAndWarningsForAspDisp (
   }
 
   // general case (no common well shared across all tips)
-  assert(uniq(wellsForTips).length === wellsForTips.length)
   const {pipetteLiquidState, warnings} = range(pipetteSpec.channels).reduce(
     (acc: PipetteLiquidStateAcc, tipIndex) => {
       const prevTipLiquidState = prevLiquidState.pipettes[pipetteId][tipIndex.toString()]
@@ -143,18 +146,13 @@ export default function getNextRobotStateAndWarningsForAspDisp (
 
   // Remove liquid from source well(s)
   const labwareLiquidState: SingleLabwareLiquidState = {
-    ...prevLiquidState.labware[labwareId],
     ...wellsForTips.reduce((acc: SingleLabwareLiquidState, well) => ({
       ...acc,
       [well]: splitLiquid(
         volume,
-        // NOTE: In weird cases where more than one tip aspirates from the same well
-        // with in a multichannel pipette, but that well is NOT common to all the tips,
-        // that volume will be sequentially removed, tip by tip.
-        // (when some but not all wells are shared; NOT trough case where all tips share one well)
-        acc[well] || prevLiquidState.labware[labwareId][well]
+        acc[well]
       ).source,
-    }), {}),
+    }), {...prevLiquidState.labware[labwareId]}),
   }
 
   return formatReturn({labwareLiquidState, pipetteLiquidState, warnings})
