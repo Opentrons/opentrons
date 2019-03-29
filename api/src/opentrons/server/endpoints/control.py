@@ -179,7 +179,8 @@ async def execute_module_command(request):
         hw_mods = hw.attached_modules.values()
 
     if len(hw_mods) == 0:
-        return web.json_response({"message": "No connected modules"})
+        return web.json_response({"message": "No connected modules"},
+                                 status=404)
 
     matching_mod = next((mod for mod in hw_mods if
                         mod.device_info.get('serial') == requested_serial),
