@@ -9,7 +9,7 @@
             "bareOverallHeight": 110.152,
             "overLabwareHeight": 4.052
         },
-        "calibrationPoints": {
+        "calibrationPoint": {
             "x": 124.875,
             "y": 2.75
         },
@@ -27,7 +27,7 @@
             "bareOverallHeight": 84,
             "overLabwareHeight": 0
         },
-        "calibrationPoints": {
+        "calibrationPoint": {
             "x": 12.0,
             "y":8.75
         },
@@ -46,7 +46,7 @@
             "overLabwareHeight": 0.0,
             "lidHeight": 37.7
         },
-        "calibrationPoints": {
+        "calibrationPoint": {
             "x": 14.4,
             "y": 64.93
         },
@@ -65,7 +65,7 @@
             "overLabwareHeight": 0.0,
             "lidHeight": 37.7
         },
-        "calibrationPoints": {
+        "calibrationPoint": {
           "x": 20.78,
           "y": 20.55
         },

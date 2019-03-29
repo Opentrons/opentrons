@@ -13,7 +13,7 @@
       }
     }
   },
-  "description": "Module specifications. ",
+  "description": "Module specifications",
   "type": "object",
   "$comment": "Example key: 'magdeck'",
   "patternProperties": {
@@ -22,7 +22,7 @@
       "required": [
         "labwareOffset",
         "dimensions",
-        "calibrationPoints",
+        "calibrationPoint",
         "displayName",
         "loadName",
         "quirks"
@@ -32,12 +32,14 @@
         "labwareOffset": {"$ref": "#/definitions/coordinates"},
         "dimensions": {
           "type": "object",
+          "required": ["bareOverallHeight", "overLabwareHeight"],
           "properties": {
             "bareOverallHeight": {"type": "number"},
-            "overLabwareHeight": {"type": "number"}
+            "overLabwareHeight": {"type": "number"},
+            "lidHeight": {"type": "number"}
           }
         },
-        "calibrationPoints": {"$ref": "#/definitions/coordinates"},
+        "calibrationPoint": {"$ref": "#/definitions/coordinates"},
         "displayName": {"type": "string"},
         "loadName": {"type": "string"},
         "quirks": {
