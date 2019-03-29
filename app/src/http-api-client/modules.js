@@ -113,7 +113,7 @@ export function makeGetRobotModules () {
             ...modulesCall,
             response: {
               modules: modulesCall.response.modules.filter(mod => {
-                return tcEnabled || mod.name === 'thermocycler'
+                return tcEnabled || mod.name !== 'thermocycler'
               }),
             },
           }
