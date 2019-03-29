@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-<a name="3.8.1-alpha.1"></a>
-## [3.8.1-alpha.1](https://github.com/opentrons/opentrons/compare/v3.8.0...v3.8.1-alpha.1) (2019-03-29)
+<a name="3.8.1"></a>
+## [3.8.1](https://github.com/opentrons/opentrons/compare/v3.8.0...v3.8.1) (2019-03-29)
 
 
 ### Bug Fixes
@@ -12,6 +12,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **api:** Correctly migrate probe center settings ([#3246](https://github.com/opentrons/opentrons/issues/3246)) ([84d3b00](https://github.com/opentrons/opentrons/commit/84d3b00))
 * **api:** simulate needs to set loglevel ([#3268](https://github.com/opentrons/opentrons/issues/3268)) ([37c00fb](https://github.com/opentrons/opentrons/commit/37c00fb))
 * **api,shared-data:** Lowercase labware names and camelCase categories ([#3234](https://github.com/opentrons/opentrons/issues/3234)) ([55e332e](https://github.com/opentrons/opentrons/commit/55e332e)), closes [#3231](https://github.com/opentrons/opentrons/issues/3231)
+* **app:** Fix modules not populating the modules card ([#3278](https://github.com/opentrons/opentrons/issues/3278)) ([1fd936d](https://github.com/opentrons/opentrons/commit/1fd936d))
 * **components:** Revert addition of "sideEffects": false ([#3236](https://github.com/opentrons/opentrons/issues/3236)) ([4616504](https://github.com/opentrons/opentrons/commit/4616504))
 * **protocol-designer:** do not create labware ids if can't create labware ([#3255](https://github.com/opentrons/opentrons/issues/3255)) ([916a10c](https://github.com/opentrons/opentrons/commit/916a10c)), closes [#3254](https://github.com/opentrons/opentrons/issues/3254)
 * **shared-data:** Ensure all volumes are µL; remove displayLengthUnits ([#3262](https://github.com/opentrons/opentrons/issues/3262)) ([031f2b9](https://github.com/opentrons/opentrons/commit/031f2b9)), closes [#3240](https://github.com/opentrons/opentrons/issues/3240)
@@ -22,6 +23,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 * **api:** Add more pick up tip config elements to pipette config ([#3237](https://github.com/opentrons/opentrons/issues/3237)) ([f69da42](https://github.com/opentrons/opentrons/commit/f69da42))
 * **api:** Add support for (p300m,p50m,p10s,p1000s)v1.5 ([#3265](https://github.com/opentrons/opentrons/issues/3265)) ([9dfc127](https://github.com/opentrons/opentrons/commit/9dfc127))
+* **api:** Add support for p300s v1.5 ([#3276](https://github.com/opentrons/opentrons/issues/3276)) ([e4ca4ff](https://github.com/opentrons/opentrons/commit/e4ca4ff))
 * **api:** add z margin override ([#3235](https://github.com/opentrons/opentrons/issues/3235)) ([341385c](https://github.com/opentrons/opentrons/commit/341385c))
 * **api:** allow robot to discover thermocycler and return live data ([#3239](https://github.com/opentrons/opentrons/issues/3239)) ([34af269](https://github.com/opentrons/opentrons/commit/34af269)), closes [#2958](https://github.com/opentrons/opentrons/issues/2958)
 * **api:** move-to-slot JSON protocol command ([#3242](https://github.com/opentrons/opentrons/issues/3242)) ([cef5123](https://github.com/opentrons/opentrons/commit/cef5123))
@@ -31,6 +33,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **protocol-designer:** update pause form design ([#3257](https://github.com/opentrons/opentrons/issues/3257)) ([9bf5cad](https://github.com/opentrons/opentrons/commit/9bf5cad)), closes [#3142](https://github.com/opentrons/opentrons/issues/3142) [#3255](https://github.com/opentrons/opentrons/issues/3255)
 * **protocol-designer:** update transfer form design ([#3221](https://github.com/opentrons/opentrons/issues/3221)) ([775ec4b](https://github.com/opentrons/opentrons/commit/775ec4b))
 * **protocol-designer:** use file-saver to save protocols ([#3263](https://github.com/opentrons/opentrons/issues/3263)) ([56d4788](https://github.com/opentrons/opentrons/commit/56d4788))
+* **protocol-designer:** warning/error redesign ([#3270](https://github.com/opentrons/opentrons/issues/3270)) ([51a6cc3](https://github.com/opentrons/opentrons/commit/51a6cc3))
 
 
 

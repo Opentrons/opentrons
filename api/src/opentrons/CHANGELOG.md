@@ -3,9 +3,8 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-<a name="3.8.1-alpha.1"></a>
-## [3.8.1-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.8.0...v3.8.1-alpha.1) (2019-03-29)
-
+<a name="3.8.1"></a>
+## [3.8.1](https://github.com/Opentrons/opentrons/compare/v3.8.0...v3.8.1) (2019-03-29)
 
 
 ### Bug Fixes
@@ -13,6 +12,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **api:** Correctly migrate probe center settings ([#3246](https://github.com/Opentrons/opentrons/issues/3246)) ([84d3b00](https://github.com/Opentrons/opentrons/commit/84d3b00))
 * **api:** simulate needs to set loglevel ([#3268](https://github.com/Opentrons/opentrons/issues/3268)) ([37c00fb](https://github.com/Opentrons/opentrons/commit/37c00fb))
 * **api,shared-data:** Lowercase labware names and camelCase categories ([#3234](https://github.com/Opentrons/opentrons/issues/3234)) ([55e332e](https://github.com/Opentrons/opentrons/commit/55e332e)), closes [#3231](https://github.com/Opentrons/opentrons/issues/3231)
+* **app:** Fix modules not populating the modules card ([#3278](https://github.com/Opentrons/opentrons/issues/3278)) ([1fd936d](https://github.com/Opentrons/opentrons/commit/1fd936d))
 
 
 ### Features

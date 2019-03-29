@@ -3,9 +3,8 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-<a name="3.8.1-alpha.1"></a>
-## [3.8.1-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.8.0...v3.8.1-alpha.1) (2019-03-29)
-
+<a name="3.8.1"></a>
+## [3.8.1](https://github.com/Opentrons/opentrons/compare/v3.8.0...v3.8.1) (2019-03-29)
 
 
 ### Bug Fixes
@@ -18,6 +17,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **protocol-designer:** update mix form design ([#3247](https://github.com/Opentrons/opentrons/issues/3247)) ([57ee363](https://github.com/Opentrons/opentrons/commit/57ee363)), closes [#3141](https://github.com/Opentrons/opentrons/issues/3141)
 * **protocol-designer:** update pause form design ([#3257](https://github.com/Opentrons/opentrons/issues/3257)) ([9bf5cad](https://github.com/Opentrons/opentrons/commit/9bf5cad)), closes [#3142](https://github.com/Opentrons/opentrons/issues/3142) [#3255](https://github.com/Opentrons/opentrons/issues/3255)
 * **protocol-designer:** update transfer form design ([#3221](https://github.com/Opentrons/opentrons/issues/3221)) ([775ec4b](https://github.com/Opentrons/opentrons/commit/775ec4b))
+* **protocol-designer:** warning/error redesign ([#3270](https://github.com/Opentrons/opentrons/issues/3270)) ([51a6cc3](https://github.com/Opentrons/opentrons/commit/51a6cc3))
 
 
 

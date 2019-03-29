@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-<a name="3.8.1-alpha.1"></a>
-## [3.8.1-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.8.0...v3.8.1-alpha.1) (2019-03-29)
+<a name="3.8.1"></a>
+## [3.8.1](https://github.com/Opentrons/opentrons/compare/v3.8.0...v3.8.1) (2019-03-29)
 
 
 ### Bug Fixes
@@ -18,6 +18,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 * **api:** Add more pick up tip config elements to pipette config ([#3237](https://github.com/Opentrons/opentrons/issues/3237)) ([f69da42](https://github.com/Opentrons/opentrons/commit/f69da42))
 * **api:** Add support for (p300m,p50m,p10s,p1000s)v1.5 ([#3265](https://github.com/Opentrons/opentrons/issues/3265)) ([9dfc127](https://github.com/Opentrons/opentrons/commit/9dfc127))
+* **api:** Add support for p300s v1.5 ([#3276](https://github.com/Opentrons/opentrons/issues/3276)) ([e4ca4ff](https://github.com/Opentrons/opentrons/commit/e4ca4ff))
 * **api:** move-to-slot JSON protocol command ([#3242](https://github.com/Opentrons/opentrons/issues/3242)) ([cef5123](https://github.com/Opentrons/opentrons/commit/cef5123))
 
 
