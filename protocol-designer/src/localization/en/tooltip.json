@@ -30,6 +30,12 @@
       "mix_touchTip_checkbox": "Touch tip to each side of the well after mixing",
 
       "volume": "Volume to dispense in each well"
+    },
+    "moveLiquid": {
+      "disabled": {
+        "$generic": "Incompatible with current path",
+        "blowout_checkbox": "Redundant with disposal volume"
+      }
     }
   }
 }

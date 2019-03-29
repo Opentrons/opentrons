@@ -43,7 +43,7 @@ const FieldConnector = (props: StepFieldProps) => {
   const errors = getFieldErrors(name, value)
   const errorToShow = (showErrors && errors.length > 0) ? errors.join(', ') : null
 
-  const tooltipComponent = props.tooltipComponent || getTooltipForField(stepType, name)
+  const tooltipComponent = props.tooltipComponent || getTooltipForField(stepType, name, disabled)
 
   if (!tooltipComponent) return render({value, updateValue, errorToShow, disabled})
 
