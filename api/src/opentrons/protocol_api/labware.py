@@ -612,22 +612,22 @@ class ThermocyclerGeometry(ModuleGeometry):
     def __init__(self, definition: dict, parent: Location) -> None:
         super().__init__(definition, parent)
         self._lid_height = definition["dimensions"]["lidHeight"]
-        self._lid_closed = 'closed'
+        self._lid_status = 'closed'
 
     @property
     def highest_z(self) -> float:
-        if self.lid_closed == 'closed':
+        if self.lid_status == 'closed':
             return super().highest_z + self._lid_height
         else:
             return super().highest_z
 
     @property
-    def lid_closed(self) -> str:
-        return self._lid_closed
+    def lid_status(self) -> str:
+        return self._lid_status
 
-    @lid_closed.setter
-    def lid_closed(self, closed) -> None:
-        self._lid_closed = closed
+    @lid_status.setter
+    def lid_status(self, status) -> None:
+        self._lid_status = status
 
     def labware_accessor(self, labware: Labware) -> Labware:
         # Block first three columns from being accessed
@@ -638,7 +638,7 @@ class ThermocyclerGeometry(ModuleGeometry):
     def add_labware(self, labware: Labware) -> Labware:
         assert not self._labware,\
             '{} is already on this module'.format(self._labware)
-        assert self.lid_closed != 'closed', \
+        assert self.lid_status != 'closed', \
             'Cannot place labware in closed module'
         if self.load_name == 'semithermocycler':
             labware = self.labware_accessor(labware)

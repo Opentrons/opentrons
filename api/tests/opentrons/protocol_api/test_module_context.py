@@ -83,13 +83,13 @@ def test_thermocycler_lid(loop):
     # Close should work if the lid is closed (no status change)
     mod.close()
     assert mod.lid_status == 'closed'
-    assert mod._geometry.lid_closed == 'closed'
+    assert mod._geometry.lid_status == 'closed'
     assert mod._geometry.highest_z == (98.0 + 37.7)
 
     # Open should work if the lid is closed
     mod.open()
     assert mod.lid_status == 'open'
-    assert mod._geometry.lid_closed == 'open'
+    assert mod._geometry.lid_status == 'open'
     assert mod._geometry.highest_z == 98.0
 
 

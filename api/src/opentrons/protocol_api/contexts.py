@@ -1699,16 +1699,16 @@ class ThermocyclerContext(ModuleContext):
     @cmds.publish.both(command=cmds.thermocycler_open)
     def open(self):
         """ Opens the lid"""
-        self._geometry.lid_closed = self._module.open()
+        self._geometry.lid_status = self._module.open()
         self._ctx.deck.recalculate_high_z()
-        return self._geometry.lid_closed
+        return self._geometry.lid_status
 
     @cmds.publish.both(command=cmds.thermocycler_close)
     def close(self):
         """ Closes the lid"""
-        self._geometry.lid_closed = self._module.close()
+        self._geometry.lid_status = self._module.close()
         self._ctx.deck.recalculate_high_z()
-        return self._geometry.lid_closed
+        return self._geometry.lid_status
 
     @cmds.publish.both(command=cmds.thermocycler_set_temp)
     def set_temperature(self,
