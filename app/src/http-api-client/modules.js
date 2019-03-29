@@ -105,7 +105,7 @@ export function makeGetRobotModules () {
       getRobotApiState,
       state => state.config,
       (state, config) => {
-        const tcEnabled = !!config?.devInternal?.enableThermocycler
+        const tcEnabled = !!config.devInternal?.enableThermocycler
         const modulesCall = state[MODULES]
 
         if (!tcEnabled && modulesCall && modulesCall.response) {

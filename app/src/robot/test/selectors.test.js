@@ -2,7 +2,7 @@
 import {setIn} from '@thi.ng/paths'
 import {NAME, selectors, constants} from '../'
 
-const makeState = (state) => ({[NAME]: state})
+const makeState = state => ({[NAME]: state})
 
 const {
   getConnectedRobotName,
@@ -111,7 +111,7 @@ describe('robot selectors', () => {
       paused: false,
     }
 
-    Object.keys(expectedStates).forEach((sessionState) => {
+    Object.keys(expectedStates).forEach(sessionState => {
       const state = makeState({session: {state: sessionState}})
       const expected = expectedStates[sessionState]
 
@@ -129,7 +129,7 @@ describe('robot selectors', () => {
       paused: true,
     }
 
-    Object.keys(expectedStates).forEach((sessionState) => {
+    Object.keys(expectedStates).forEach(sessionState => {
       const state = makeState({session: {state: sessionState}})
       const expected = expectedStates[sessionState]
       expect(getIsRunning(state)).toBe(expected)
@@ -146,7 +146,7 @@ describe('robot selectors', () => {
       paused: true,
     }
 
-    Object.keys(expectedStates).forEach((sessionState) => {
+    Object.keys(expectedStates).forEach(sessionState => {
       const state = makeState({session: {state: sessionState}})
       const expected = expectedStates[sessionState]
       expect(getIsPaused(state)).toBe(expected)
@@ -163,7 +163,7 @@ describe('robot selectors', () => {
       paused: false,
     }
 
-    Object.keys(expectedStates).forEach((sessionState) => {
+    Object.keys(expectedStates).forEach(sessionState => {
       const state = makeState({session: {state: sessionState}})
       const expected = expectedStates[sessionState]
       expect(getIsDone(state)).toBe(expected)
@@ -194,7 +194,7 @@ describe('robot selectors', () => {
         [NAME]: {
           session: {
             startTime: 42,
-            runTime: 42 + (1000 * seconds),
+            runTime: 42 + 1000 * seconds,
           },
         },
       }
@@ -253,7 +253,7 @@ describe('robot selectors', () => {
 
     test('getRunProgress', () => {
       // leaves: 2, 3, 4; processed: 2
-      expect(getRunProgress(state)).toEqual(1 / 3 * 100)
+      expect(getRunProgress(state)).toEqual((1 / 3) * 100)
     })
 
     test('getRunProgress with no commands', () => {
@@ -502,6 +502,7 @@ describe('robot selectors', () => {
     })
 
     test('get modules', () => {
+      state = setIn(state, 'config.devInternal.enableThermocycler', 'true')
       expect(getModules(state)).toEqual([
         {
           _id: 1,
