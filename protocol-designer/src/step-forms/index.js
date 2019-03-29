@@ -1,4 +1,5 @@
 // @flow
+import {registerSelectors} from 'reselect-tools'
 import rootReducer from './reducers'
 import type {RootState} from './reducers'
 import * as selectors from './selectors'
@@ -9,6 +10,9 @@ export * from './types'
 export type {
   RootState,
 }
+
+registerSelectors(selectors)
+
 export {
   rootReducer,
   actions,

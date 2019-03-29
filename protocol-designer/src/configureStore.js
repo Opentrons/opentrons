@@ -4,6 +4,8 @@ import thunk from 'redux-thunk'
 import {makePersistSubscriber, rehydratePersistedAction} from './persist'
 import {fileUploadMessage} from './load-file/actions'
 
+const ReselectTools = process.env.NODE_ENV === 'development' ? require('reselect-tools') : undefined
+
 function getRootReducer () {
   const rootReducer: any = combineReducers({
     analytics: require('./analytics').rootReducer,
@@ -52,6 +54,9 @@ export default function configureStore () {
     /* preloadedState, */
     composeEnhancers(applyMiddleware(thunk))
   )
+
+  // give reselect tools access to state if in dev env
+  if (ReselectTools) ReselectTools.getStateWith(() => store.getState())
 
   // initial rehydration, and persistence subscriber
   store.dispatch(rehydratePersistedAction())
