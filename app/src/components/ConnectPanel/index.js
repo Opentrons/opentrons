@@ -3,8 +3,6 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import orderBy from 'lodash/orderBy'
 
-import type {State, Dispatch} from '../../types'
-
 import {
   startDiscovery,
   getScanning,
@@ -12,6 +10,8 @@ import {
   getReachableRobots,
   getUnreachableRobots,
 } from '../../discovery'
+
+import type {State, Dispatch} from '../../types'
 
 import {SidePanel} from '@opentrons/components'
 import RobotList from './RobotList'
@@ -48,7 +48,9 @@ function ConnectPanel (props: Props) {
     <SidePanel title="Robots">
       <ScanStatus {...props} />
       <RobotList>
-        {props.robots.map(robot => <RobotItem key={robot.name} {...robot} />)}
+        {props.robots.map(robot => (
+          <RobotItem key={robot.name} {...robot} />
+        ))}
         {props.reachableRobots.map(robot => (
           <RobotItem key={robot.name} {...robot} />
         ))}

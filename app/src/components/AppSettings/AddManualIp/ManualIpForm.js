@@ -2,6 +2,7 @@
 import * as React from 'react'
 import {connect} from 'react-redux'
 import {getConfig, addManualIp} from '../../../config'
+import {startDiscovery} from '../../../discovery'
 
 import {Formik, Form, Field} from 'formik'
 import IpField from './IpField'
@@ -62,6 +63,9 @@ function STP (state: State): SP {
 
 function DTP (dispatch: Dispatch): DP {
   return {
-    addManualIp: ip => dispatch(addManualIp(ip)),
+    addManualIp: ip => {
+      dispatch(addManualIp(ip))
+      dispatch(startDiscovery())
+    },
   }
 }

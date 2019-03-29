@@ -24,7 +24,7 @@ export default function IpField (props: Props) {
         ref={inputRef}
       />
       <IconButton
-        className={styles.ip_button}
+        className={styles.add_ip_button}
         name="plus"
         type="submit"
         disabled={!dirty}

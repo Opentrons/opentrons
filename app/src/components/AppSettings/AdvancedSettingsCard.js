@@ -21,7 +21,6 @@ type OP = {
 type SP = {|
   devToolsOn: boolean,
   channel: UpdateChannel,
-  __ffShowManualIp: boolean,
 |}
 
 type DP = {|
@@ -74,21 +73,19 @@ function AdvancedSettingsCard (props: Props) {
             logging.
           </p>
         </LabeledToggle>
-        {props.__ffShowManualIp && (
-          <LabeledButton
-            label="Manually Add Robot Network Addresses"
-            buttonProps={{
-              Component: Link,
-              children: 'manage',
-              to: `${props.match.url}/add-ip`,
-            }}
-          >
-            <p>
-              If your app is unable to automatically discover your robot, you
-              can manually add its IP address or hostname here
-            </p>
-          </LabeledButton>
-        )}
+        <LabeledButton
+          label="Manually Add Robot Network Addresses"
+          buttonProps={{
+            Component: Link,
+            children: 'manage',
+            to: `${props.match.url}/add-ip`,
+          }}
+        >
+          <p>
+            If your app is unable to automatically discover your robot, you can
+            manually add its IP address or hostname here
+          </p>
+        </LabeledButton>
       </Card>
       <Route
         path={`${props.match.path}/add-ip`}
@@ -104,7 +101,6 @@ function mapStateToProps (state: State): SP {
   return {
     devToolsOn: config.devtools,
     channel: config.update.channel,
-    __ffShowManualIp: Boolean(config.devInternal?.manualIp),
   }
 }
 
