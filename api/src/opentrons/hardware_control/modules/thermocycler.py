@@ -104,8 +104,8 @@ class Thermocycler(mod_abc.AbstractModule):
 
     def __init__(self,
                  port,
-                 interrupt_callback = None,
-                 simulating = False,
+                 interrupt_callback=None,
+                 simulating=False,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         self._interrupt_cb = interrupt_callback
         if simulating:
