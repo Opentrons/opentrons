@@ -3,7 +3,7 @@ import contextlib
 import logging
 import time
 from .labware import (Well, Labware, load, load_module, ModuleGeometry,
-                      quirks_from_any_parent)
+                      quirks_from_any_parent, ThermocyclerGeometry)
 from typing import Any, Dict, List, Optional, Union, Tuple, Sequence
 from opentrons import types, hardware_control as hc, commands as cmds
 from opentrons.commands import CommandPublisher
@@ -228,26 +228,50 @@ class ProtocolContext(CommandPublisher):
     def load_module(
             self, module_name: str,
             location: types.DeckLocation) -> ModuleTypes:
-        hc_mod_name = {
-            'magdeck': 'magdeck',
-            'magnetic module': 'magdeck',
-            'tempdeck': 'tempdeck',
-            'temperature module': 'tempdeck',
-            'thermocycler': 'thermocycler'}[module_name.lower()]
+        mod_map = {
+            'magdeck': {
+                'hc_name': 'magdeck',
+                'geo_name': 'magdeck'},
+            'magnetic module': {
+                'hc_name': 'magdeck',
+                'geo_name': 'magdeck'},
+            'tempdeck': {
+                'hc_name': 'tempdeck',
+                'geo_name': 'tempdeck'},
+            'temperature module': {
+                'hc_name': 'tempdeck',
+                'geo_name': 'tempdeck'},
+            'thermocycler': {
+                'hc_name': 'thermocycler',
+                'geo_name': 'thermocycler'},
+            'semithermocycler': {
+                'hc_name': 'thermocycler',
+                'geo_name': 'semithermocycler'}
+            }
+
+        hc_mod_name = mod_map[module_name.lower()]['hc_name']
+        geo_mod_name = mod_map[module_name.lower()]['geo_name']
+        hc_mod_instance = None
         for mod in self._hw_manager.hardware.discover_modules():
             if mod.name() == hc_mod_name:
-                mod_class = {'magdeck': MagneticModuleContext,
-                             'tempdeck': TemperatureModuleContext,
-                             'thermocycler': ThermocyclerContext}[hc_mod_name]
+                mod_class = {
+                    'magdeck': MagneticModuleContext,
+                    'tempdeck': TemperatureModuleContext,
+                    'thermocycler': ThermocyclerContext}[hc_mod_name]
+                hc_mod_instance = mod
                 break
         else:
             raise KeyError(module_name)
         geometry = load_module(
-            hc_mod_name, self._deck_layout.position_for(location))
-        mod_ctx = mod_class(self,
-                            mod,
-                            geometry,
-                            self._loop)
+            geo_mod_name, self._deck_layout.position_for(location))
+        if hc_mod_instance:
+            mod_ctx = mod_class(self,
+                                hc_mod_instance,
+                                geometry,
+                                self._loop)
+        else:
+            raise RuntimeError(
+                f'Could not find specified module: {module_name}')
         self._deck_layout[location] = geometry
         return mod_ctx
 
@@ -1470,9 +1494,9 @@ class ModuleContext(CommandPublisher):
                         :py:meth:`load_labware_by_name`.
         :returns: The properly-linked labware object
         """
-        self._geometry.add_labware(labware)
+        mod_labware = self._geometry.add_labware(labware)
         self._ctx.deck.recalculate_high_z()
-        return labware
+        return mod_labware
 
     def load_labware_by_name(self, name: str) -> Labware:
         """ Specify the presence of a piece of labware on the module.
@@ -1657,7 +1681,7 @@ class ThermocyclerContext(ModuleContext):
     def __init__(self,
                  ctx: ProtocolContext,
                  hw_module: modules.thermocycler.Thermocycler,
-                 geometry: ModuleGeometry,
+                 geometry: ThermocyclerGeometry,
                  loop: asyncio.AbstractEventLoop) -> None:
         self._module = hw_module
         self._loop = loop
@@ -1675,12 +1699,16 @@ class ThermocyclerContext(ModuleContext):
     @cmds.publish.both(command=cmds.thermocycler_open)
     def open(self):
         """ Opens the lid"""
-        return self._module.open()
+        self._geometry.lid_status = self._module.open()
+        self._ctx.deck.recalculate_high_z()
+        return self._geometry.lid_status
 
     @cmds.publish.both(command=cmds.thermocycler_close)
     def close(self):
         """ Closes the lid"""
-        return self._module.close()
+        self._geometry.lid_status = self._module.close()
+        self._ctx.deck.recalculate_high_z()
+        return self._geometry.lid_status
 
     @cmds.publish.both(command=cmds.thermocycler_set_temp)
     def set_temperature(self,

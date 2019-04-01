@@ -43,12 +43,14 @@ def _build_temp_code(temp, hold_time=None):
 
 
 TC_BAUDRATE = 115200
-
+# TODO (Laura 20190327) increased the thermocycler command timeout
+# temporarily until we can change the firmware to asynchronously handle
+# the lid being open and closed
 SERIAL_ACK = '\r\n'
 TC_COMMAND_TERMINATOR = SERIAL_ACK + SERIAL_ACK
 TC_ACK = 'ok' + SERIAL_ACK + 'ok' + SERIAL_ACK
 ERROR_KEYWORD = 'error'
-DEFAULT_TC_TIMEOUT = 1
+DEFAULT_TC_TIMEOUT = 5
 DEFAULT_COMMAND_RETRIES = 3
 DEFAULT_STABILIZE_DELAY = 0.1
 POLLING_FREQUENCY_MS = 1000
@@ -244,11 +246,13 @@ class Thermocycler:
 
     async def open(self):
         await self._write_and_wait(GCODES['OPEN_LID'])
-        self._lid_status = 'open'
+        self.lid_status = 'open'
+        return self.lid_status
 
     async def close(self):
         await self._write_and_wait(GCODES['CLOSE_LID'])
-        self._lid_status = 'closed'
+        self.lid_status = 'closed'
+        return self.lid_status
 
     async def set_temperature(self,
                               temp: float,
@@ -317,6 +321,10 @@ class Thermocycler:
     @property
     def lid_status(self):
         return self._lid_status
+
+    @lid_status.setter
+    def lid_status(self, status):
+        self._lid_status = status
 
     async def get_device_info(self) -> Mapping[str, str]:
         _device_info_res = await self._write_and_wait(GCODES['DEVICE_INFO'])

@@ -4,7 +4,8 @@ import logging
 from typing import List, Optional, Tuple, Union
 
 from opentrons import types
-from .labware import Labware, Well, ModuleGeometry, quirks_from_any_parent
+from .labware import (Labware, Well, ModuleGeometry,
+                      quirks_from_any_parent, ThermocyclerGeometry)
 from opentrons.hardware_control.types import CriticalPoint
 
 
@@ -113,7 +114,7 @@ def plan_moves(
             (to_point, dest_cp_override)]
 
 
-DeckItem = Union[Labware, ModuleGeometry]
+DeckItem = Union[Labware, ModuleGeometry, ThermocyclerGeometry]
 
 
 class Deck(UserDict):

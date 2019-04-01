@@ -569,10 +569,11 @@ class ModuleGeometry:
             point=self._offset + self._parent.point,
             labware=self)
 
-    def add_labware(self, labware: Labware):
+    def add_labware(self, labware: Labware) -> Labware:
         assert not self._labware,\
             '{} is already on this module'.format(self._labware)
         self._labware = labware
+        return self._labware
 
     def reset_labware(self):
         self._labware = None
@@ -605,6 +606,44 @@ class ModuleGeometry:
 
     def __repr__(self):
         return self._display_name
+
+
+class ThermocyclerGeometry(ModuleGeometry):
+    def __init__(self, definition: dict, parent: Location) -> None:
+        super().__init__(definition, parent)
+        self._lid_height = definition["dimensions"]["lidHeight"]
+        self._lid_status = 'closed'
+
+    @property
+    def highest_z(self) -> float:
+        if self.lid_status == 'closed':
+            return super().highest_z + self._lid_height
+        else:
+            return super().highest_z
+
+    @property
+    def lid_status(self) -> str:
+        return self._lid_status
+
+    @lid_status.setter
+    def lid_status(self, status) -> None:
+        self._lid_status = status
+
+    def labware_accessor(self, labware: Labware) -> Labware:
+        # Block first three columns from being accessed
+        definition = labware._definition
+        definition['ordering'] = definition['ordering'][3::]
+        return Labware(definition, super().location)
+
+    def add_labware(self, labware: Labware) -> Labware:
+        assert not self._labware,\
+            '{} is already on this module'.format(self._labware)
+        assert self.lid_status != 'closed', \
+            'Cannot place labware in closed module'
+        if self.load_name == 'semithermocycler':
+            labware = self.labware_accessor(labware)
+        self._labware = labware
+        return self._labware
 
 
 def save_calibration(labware: Labware, delta: Point):
@@ -767,7 +806,8 @@ def clear_calibrations():
 
 
 def load_module_from_definition(
-        definition: dict, parent: Location) -> ModuleGeometry:
+        definition: dict, parent: Location) -> \
+            Union[ModuleGeometry, ThermocyclerGeometry]:
     """
     Return a :py:class:`ModuleGeometry` object from a specified definition
 
@@ -777,7 +817,12 @@ def load_module_from_definition(
                    the front and left most point of the outside of the module
                    is (often the front-left corner of a slot on the deck).
     """
-    mod = ModuleGeometry(definition, parent)
+    mod_name = definition['loadName']
+    if mod_name == 'thermocycler' or mod_name == 'semithermocycler':
+        mod: Union[ModuleGeometry, ThermocyclerGeometry] = \
+                ThermocyclerGeometry(definition, parent)
+    else:
+        mod = ModuleGeometry(definition, parent)
     # TODO: calibration
     return mod
 

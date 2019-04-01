@@ -19,9 +19,11 @@ class SimulatingDriver:
             raise ThermocyclerError(
                 'Cannot open Thermocycler while it is active')
         self._lid_status = 'open'
+        return self._lid_status
 
     async def close(self):
         self._lid_status = 'closed'
+        return self._lid_status
 
     @property
     def status(self):
@@ -125,14 +127,14 @@ class Thermocycler(mod_abc.AbstractModule):
     async def deactivate(self):
         await self._driver.deactivate()
 
-    async def open(self):
+    async def open(self) -> str:
         """ Open the lid if it is closed"""
         # TODO add temperature protection if over 70 C
-        await self._driver.open()
+        return await self._driver.open()
 
-    async def close(self):
+    async def close(self) -> str:
         """ Close the lid if it is open"""
-        await self._driver.close()
+        return await self._driver.close()
 
     async def set_temperature(self, temp, hold_time=None, ramp_rate=None):
         await self._driver.set_temperature(
