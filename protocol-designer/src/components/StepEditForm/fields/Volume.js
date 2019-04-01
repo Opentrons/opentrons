@@ -12,7 +12,7 @@ import styles from '../StepEditForm.css'
 type Props = {stepType: StepType, focusHandlers: FocusHandlers, label: string}
 const Volume = (props: Props) => (
   <HoverTooltip
-    tooltipComponent={getTooltipForField(props.stepType, 'volume')}
+    tooltipComponent={getTooltipForField(props.stepType, 'volume', false)}
     placement='top-start'>
     {(hoverTooltipHandlers) =>
       <FormGroup

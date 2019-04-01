@@ -59,7 +59,10 @@ export function getVisibleAlerts<Field, Alert: {dependentFields: Array<Field>}> 
   )
 }
 
-export function getTooltipForField (stepType: ?string, name: string): ?React.Node {
+// NOTE: some field components get their tooltips directly from i18n, and do not use `getTooltipForField`.
+// TODO: Ian 2019-03-29 implement tooltip-content-getting in a more organized way
+// once we have more comprehensive requirements about tooltips
+export function getTooltipForField (stepType: ?string, name: string, disabled: boolean): ?React.Node {
   if (!stepType) {
     console.error(`expected stepType for form, cannot getTooltipText for ${name}`)
     return null
@@ -70,10 +73,22 @@ export function getTooltipForField (stepType: ?string, name: string): ?React.Nod
     ? name.split('_').slice(1).join('_')
     : name
 
+  // NOTE: this is a temporary solution until we want to be able to choose from
+  // multiple tooltips for the same field depending on form state.
+  // As-is, this will only let us show two tooltips for any given field per step type:
+  // non-disabled tooltip copy, and disabled tooltip copy.
+  const disabledKeys = disabled
+    ? [
+      `tooltip.step_fields.${stepType}.disabled.${name}`,
+      `tooltip.step_fields.${stepType}.disabled.$generic`,
+    ]
+    : []
+
   // specificity cascade for names.
   // first level: "disabled" wins out if disabled arg is true
   // second level: prefix. "aspirate_foo" wins over "foo"
   const text: string = i18n.t([
+    ...disabledKeys,
     `tooltip.step_fields.defaults.${name}`,
     `tooltip.step_fields.defaults.${nameWithoutPrefix}`,
     '',
