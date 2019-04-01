@@ -60,16 +60,19 @@ export const getLabwareTypesById: Selector<LabwareTypeById> = createSelector(
 )
 
 export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
-  rootSelector,
-  (state) => addSpecsToPipetteInvariantProps(state.pipetteInvariantProperties)
+  state => rootSelector(state).pipetteInvariantProperties,
+  (pipetteInvariantProperties) =>
+    addSpecsToPipetteInvariantProps(pipetteInvariantProperties)
 )
 
+export const getInitialDeckSetupStepForm = (state: BaseState) =>
+  rootSelector(state).savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+
 export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
-  rootSelector,
+  getInitialDeckSetupStepForm,
   getLabwareEntities,
   getPipetteEntities,
-  (state, labwareInvariantProperties, pipetteInvariantProperties) => {
-    const initialSetupStep = state.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+  (initialSetupStep, labwareInvariantProperties, pipetteInvariantProperties) => {
     assert(
       initialSetupStep && initialSetupStep.stepType === 'manualIntervention',
       'expected initial deck setup step to be "manualIntervention" step')
