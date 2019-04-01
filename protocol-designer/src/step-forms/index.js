@@ -1,5 +1,5 @@
 // @flow
-import {registerSelectors} from 'reselect-tools'
+import {registerSelectors} from '../utils'
 import rootReducer from './reducers'
 import type {RootState} from './reducers'
 import * as selectors from './selectors'
