@@ -3,7 +3,7 @@ import uuidv1 from 'uuid/v1'
 import type {BoundingRect, GenericRect} from '../collision-types'
 import type {Wells} from '../labware-ingred/types'
 
-export const registerSelectors = (process.env.NODE_ENV === 'development') ? require('reselect-tools').registerSelectors : (a) => {}
+export const registerSelectors = (process.env.NODE_ENV === 'development') ? require('reselect-tools').registerSelectors : (a: any) => {}
 
 export type FormConnector<F> = (accessor: $Keys<F>) =>
   // $FlowFixMe: Missing type annotation for `$Values`
