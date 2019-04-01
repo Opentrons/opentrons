@@ -10,6 +10,7 @@ from opentrons.commands import CommandPublisher
 import opentrons.config.robot_configs as rc
 from opentrons.config import feature_flags as fflags
 from opentrons.hardware_control import adapters, modules
+from opentrons.hardware_control.simulator import Simulator
 from opentrons.hardware_control.types import CriticalPoint
 
 from . import geometry
@@ -248,22 +249,32 @@ class ProtocolContext(CommandPublisher):
                 'hc_name': 'thermocycler',
                 'geo_name': 'semithermocycler'}
             }
+        try:
+            hc_mod_name = mod_map[module_name.lower()]['hc_name']
+            geo_mod_name = mod_map[module_name.lower()]['geo_name']
 
-        hc_mod_name = mod_map[module_name.lower()]['hc_name']
-        geo_mod_name = mod_map[module_name.lower()]['geo_name']
+            geometry = load_module(
+                geo_mod_name, self._deck_layout.position_for(location))
+        except KeyError:
+            print(f'Unsupported Module: {module_name}')
         hc_mod_instance = None
+        hw = self._hw_manager.hardware._api._backend
+        mod_class = {
+            'magdeck': MagneticModuleContext,
+            'tempdeck': TemperatureModuleContext,
+            'thermocycler': ThermocyclerContext}[hc_mod_name]
         for mod in self._hw_manager.hardware.discover_modules():
             if mod.name() == hc_mod_name:
-                mod_class = {
-                    'magdeck': MagneticModuleContext,
-                    'tempdeck': TemperatureModuleContext,
-                    'thermocycler': ThermocyclerContext}[hc_mod_name]
                 hc_mod_instance = mod
                 break
-        else:
-            raise KeyError(module_name)
-        geometry = load_module(
-            geo_mod_name, self._deck_layout.position_for(location))
+
+        if isinstance(hw, Simulator) and hc_mod_instance is None:
+            mod_type = {
+                'magdeck': modules.magdeck.MagDeck,
+                'tempdeck': modules.tempdeck.TempDeck,
+                'thermocycler': modules.thermocycler.Thermocycler}[hc_mod_name]
+            hc_mod_instance = mod_type(
+                port='', simulating=True, loop=self._loop)
         if hc_mod_instance:
             mod_ctx = mod_class(self,
                                 hc_mod_instance,
