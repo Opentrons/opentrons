@@ -64,7 +64,7 @@ def extracted_update_file(request, tmpdir):
         try:
             shasum_out = subprocess.check_output(
                 ['shasum', '-a', '256', rootfs_path])
-        except subprocess.CalledProcessError:
+        except (subprocess.CalledProcessError, FileNotFoundError):
             pytest.skip("no shasum invokeable on command line")
         hashval = re.match(b'^([a-z0-9]+) ', shasum_out).group(1)
     with open(hash_path, 'wb') as rfsh:
@@ -72,7 +72,7 @@ def extracted_update_file(request, tmpdir):
     if not request.node.get_marker('bad_sig'):
         try:
             subprocess.check_output(['openssl', 'version'])
-        except subprocess.CalledProcessError:
+        except (subprocess.CalledProcessError, FileNotFoundError):
             pytest.skip('requires openssl binary to be installed')
         subprocess.check_call(
             ['openssl', 'dgst', '-sha256', '-sign',
