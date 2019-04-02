@@ -61,8 +61,11 @@ def extracted_update_file(request, tmpdir):
     if request.node.get_marker('bad_hash'):
         hashval = b'0oas0ajcs0asd0asjc0ans0d9ajsd0ian0s9djas'
     else:
-        shasum_out = subprocess.check_output(
-            ['shasum', '-a', '256', rootfs_path])
+        try:
+            shasum_out = subprocess.check_output(
+                ['shasum', '-a', '256', rootfs_path])
+        except subprocess.CalledProcessError:
+            pytest.skip("no shasum invokeable on command line")
         hashval = re.match(b'^([a-z0-9]+) ', shasum_out).group(1)
     with open(hash_path, 'wb') as rfsh:
         rfsh.write(hashval)
