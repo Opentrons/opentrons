@@ -39,7 +39,6 @@ export default function LabwareRender (props: LabwareRenderProps) {
     <svg className={styles.labware_render} viewBox={viewBox}>
       <g className={styles.labware_detail_group}>
         <LabwareOutline className={cx({[styles.tiprack_outline]: isTiprack})} />
-        {isTiprack && <TipRackOutline />}
       </g>
       <g className={styles.well_group} transform={transform}>
         {flatMap(
@@ -63,36 +62,20 @@ export default function LabwareRender (props: LabwareRenderProps) {
   )
 }
 
-// TODO(mc, 2019-03-28): Need UX guidance on this component
-const TIPRACK_OUTLINE_X_OFFSET = 8
-const TIPRACK_OUTLINE_Y_OFFSET = 5
-
-function TipRackOutline () {
-  return (
-    <rect
-      x={TIPRACK_OUTLINE_X_OFFSET}
-      y={TIPRACK_OUTLINE_Y_OFFSET}
-      width={SLOT_RENDER_WIDTH - 2 * TIPRACK_OUTLINE_X_OFFSET}
-      height={SLOT_RENDER_HEIGHT - 2 * TIPRACK_OUTLINE_Y_OFFSET}
-      rx="4px"
-      ry="4px"
-    />
-  )
-}
-
 function Well (props: LabwareWellRenderProps) {
   const {well, parameters} = props
   const {x, y, shape, diameter, width, length} = well
   const {isTiprack} = parameters
 
   if (shape === 'circular' && diameter) {
+    const radius = diameter / 2
     // TODO(mc, 2019-03-27): figure out tip rendering; see:
     //   components/src/deck/Well.js
     //   components/src/deck/Tip.js
     return (
       <>
-        <circle cx={x} cy={y} r={diameter / 2} />
-        {isTiprack && <circle cx={x} cy={y} r={(diameter - 2.5) / 2} />}
+        <circle cx={x} cy={y} r={radius} />
+        {isTiprack && <circle cx={x} cy={y} r={radius - 1} />}
       </>
     )
   }
