@@ -38,12 +38,13 @@
     "redux": "^3.7.2",
     "redux-actions": "^2.2.1",
     "redux-thunk": "^2.2.0",
-    "reselect": "^3.0.1",
+    "reselect": "4.0.0",
     "uuid": "^3.3.2",
     "yup": "^0.26.6"
   },
   "devDependencies": {
     "flow-bin": "^0.82.0",
-    "flow-typed": "^2.5.1"
+    "flow-typed": "^2.5.1",
+    "reselect-tools": "^0.0.7"
   }
 }
