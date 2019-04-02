@@ -16,6 +16,15 @@ def test_load_module(loop):
     assert isinstance(mod, papi.TemperatureModuleContext)
 
 
+def test_incorrect_module_error(loop):
+    ctx = papi.ProtocolContext(loop)
+    ctx._hw_manager.hardware._backend._attached_modules = [
+        ('mod0', 'tempdeck')]
+    ctx.home()
+    with pytest.raises(ValueError):
+        assert ctx.load_module('the cool module', 1)
+
+
 def test_load_simulating_module(loop):
     # Check that a known module will not throw an error if
     # in simulation mode

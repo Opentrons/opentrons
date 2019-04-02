@@ -256,7 +256,8 @@ class ProtocolContext(CommandPublisher):
             geometry = load_module(
                 geo_mod_name, self._deck_layout.position_for(location))
         except KeyError:
-            print(f'Unsupported Module: {module_name}')
+            self._log.error(f'Unsupported Module: {module_name}')
+            raise ValueError(f'Unsupported Module: {module_name}')
         hc_mod_instance = None
         hw = self._hw_manager.hardware._api._backend
         mod_class = {
