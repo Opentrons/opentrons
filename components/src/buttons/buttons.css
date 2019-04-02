@@ -44,7 +44,7 @@
     &:focus,
     &:hover,
     &.hover {
-      background-color: color(var(--c-bg-light) shade(5%));
+      background-color: color(var(--c-med-gray) alpha(25%));
     }
     /* stylelint-enable */
   }
