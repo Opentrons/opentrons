@@ -51,6 +51,7 @@ export const getLabwareEntities: Selector<LabwareEntities> = createSelector(
   (state) => state.labwareInvariantProperties
 )
 
+
 export const getLabwareTypesById: Selector<LabwareTypeById> = createSelector(
   getLabwareEntities,
   (labwareEntities) => mapValues(
@@ -237,6 +238,23 @@ export const getUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSel
     return errors
   }
 )
+
+const getStepForm = (state: State, stepId: string) => {
+  return state.stepForms.savedStepForms[stepId]
+}
+
+export const makeGetArgsAndErrors = () => {
+  return createSelector(
+    getStepForm,
+    getHydrationContext,
+    (stepForm, contextualState) => {
+      console.log('DOING THE WORK', stepForm && stepForm.id)
+      const hydratedForm = _getHydratedForm(stepForm, contextualState)
+      const errors = _getFormAndFieldErrorsFromHydratedForm(hydratedForm)
+      return isEmpty(errors) ? {stepArgs: stepFormToArgs(hydratedForm)} : {errors, stepArgs: null}
+    }
+  )
+}
 
 export const getArgsAndErrorsByStepId: Selector<{[StepIdType]: StepArgsAndErrors}> = createSelector(
   getOrderedSavedForms,

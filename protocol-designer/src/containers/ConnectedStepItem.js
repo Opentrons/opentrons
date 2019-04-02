@@ -40,41 +40,45 @@ type SP = {|
 
 type DP = $Diff<$Diff<Props, SP>, OP>
 
-function mapStateToProps (state: BaseState, ownProps: OP): SP {
-  const {stepId} = ownProps
-  const allSteps = stepFormSelectors.getAllSteps(state)
+const makeMapStateToProps = () => {
+  const getArgsAndErrors = stepFormSelectors.makeGetArgsAndErrors()
 
-  const hoveredSubstep = stepsSelectors.getHoveredSubstep(state)
-  const hoveredStep = stepsSelectors.getHoveredStepId(state)
-  const selected = stepsSelectors.getSelectedStepId(state) === stepId
-  const collapsed = stepsSelectors.getCollapsedSteps(state)[stepId]
-  const argsAndErrorsByStepId = stepFormSelectors.getArgsAndErrorsByStepId(state)
-  const formAndFieldErrors = argsAndErrorsByStepId[stepId] && argsAndErrorsByStepId[stepId].errors
-  const hasError = fileDataSelectors.getErrorStepId(state) === stepId || !isEmpty(formAndFieldErrors)
-  const hasWarnings = dismissSelectors.getHasTimelineWarningsPerStep(state)[stepId] ||
-    dismissSelectors.getHasFormLevelWarningsPerStep(state)[stepId]
+  return (state: BaseState, ownProps: OP): SP => {
+    const {stepId} = ownProps
+    const allSteps = stepFormSelectors.getAllSteps(state)
 
-  const step = allSteps[stepId]
+    const hoveredSubstep = stepsSelectors.getHoveredSubstep(state)
+    const hoveredStep = stepsSelectors.getHoveredStepId(state)
+    const selected = stepsSelectors.getSelectedStepId(state) === stepId
+    const collapsed = stepsSelectors.getCollapsedSteps(state)[stepId]
+    const argsAndErrorsByStepId = getArgsAndErrors(state, stepId)
+    const formAndFieldErrors = argsAndErrorsByStepId[stepId] && argsAndErrorsByStepId[stepId].errors
+    const hasError = fileDataSelectors.getErrorStepId(state) === stepId || !isEmpty(formAndFieldErrors)
+    const hasWarnings = dismissSelectors.getHasTimelineWarningsPerStep(state)[stepId] ||
+      dismissSelectors.getHasFormLevelWarningsPerStep(state)[stepId]
 
-  return {
-    stepType: step.stepType,
-    title: step.title,
-    description: step.description,
-    rawForm: step.formData,
-    substeps: substepSelectors.allSubsteps(state)[stepId],
-    hoveredSubstep,
-    collapsed,
-    selected,
-    error: hasError,
-    warning: hasWarnings,
+    const step = allSteps[stepId]
 
-    // no double-highlighting: whole step is only "hovered" when
-    // user is not hovering on substep.
-    hovered: (hoveredStep === stepId) && !hoveredSubstep,
+    return {
+      stepType: step.stepType,
+      title: step.title,
+      description: step.description,
+      rawForm: step.formData,
+      substeps: substepSelectors.allSubsteps(state)[stepId],
+      hoveredSubstep,
+      collapsed,
+      selected,
+      error: hasError,
+      warning: hasWarnings,
 
-    labwareNicknamesById: uiLabwareSelectors.getLabwareNicknamesById(state),
-    labwareTypesById: stepFormSelectors.getLabwareTypesById(state),
-    ingredNames: labwareIngredSelectors.getLiquidNamesById(state),
+      // no double-highlighting: whole step is only "hovered" when
+      // user is not hovering on substep.
+      hovered: (hoveredStep === stepId) && !hoveredSubstep,
+
+      labwareNicknamesById: uiLabwareSelectors.getLabwareNicknamesById(state),
+      labwareTypesById: stepFormSelectors.getLabwareTypesById(state),
+      ingredNames: labwareIngredSelectors.getLiquidNamesById(state),
+    }
   }
 }
 
@@ -88,4 +92,4 @@ function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(StepItem)
+export default connect(makeMapStateToProps, mapDispatchToProps)(StepItem)
