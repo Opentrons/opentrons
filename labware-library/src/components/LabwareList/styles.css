@@ -193,7 +193,11 @@
   color: var(--c-font-dark);
 }
 
-.load_name_button {
+/*
+ * TODO(mc, 2019-04-02): production bundle breaks CSS order, so for now make
+ * this rule more specific
+ */
+button.load_name_button {
   flex: none;
   width: var(--size-2);
   padding-left: var(--spacing-5);
