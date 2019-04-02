@@ -1,30 +1,36 @@
 // @flow
 
 import * as React from 'react'
-import { Manager, Reference, Popper } from 'react-popper'
-import cx from 'classnames'
-import styles from './tooltips.css'
+
+import Tooltip from './Tooltip'
+
+import type {TooltipChildProps, TooltipProps} from './Tooltip'
 
 const OPEN_DELAY_MS = 300
 const CLOSE_DELAY_MS = 0
-const DISTANCE_FROM_REFERENCE = 8
 
-export type HoverTooltipHandlers = {
-  ref: React.Ref<*>,
+export type HoverTooltipHandlers = TooltipChildProps<{
   onMouseEnter: (SyntheticMouseEvent<*>) => void,
   onMouseLeave: (SyntheticMouseEvent<*>) => void,
-}
-type PopperProps = React.ElementProps<typeof Popper>
-type Props = {
-  tooltipComponent?: React.Node,
-  portal?: React.ComponentType<*>,
-  placement?: $PropertyType<PopperProps, 'placement'>,
-  positionFixed?: $PropertyType<PopperProps, 'positionFixed'>,
-  modifiers?: $PropertyType<PopperProps, 'modifiers'>,
-  children: (?HoverTooltipHandlers) => React.Node,
-  forceOpen?: boolean, // turns component controlled
-}
+}>
+
+type Props = TooltipProps<HoverTooltipHandlers>
+
 type State = {isOpen: boolean}
+
+/**
+ * Tooltip component that triggers on `MouseEnter` and `MouseLeave`. See
+ * `Tooltip` for full props list.
+ *
+ * `props.children` is a function that receives the following props object:
+ * ```js
+ * type HoverTooltipHandlers = {|
+ *   ref: React.Ref<*>,
+ *   onMouseEnter: (SyntheticMouseEvent<*>) => void,
+ *   onMouseLeave: (SyntheticMouseEvent<*>) => void,
+ * |}
+ * ```
+ */
 class HoverTooltip extends React.Component<Props, State> {
   openTimeout: ?TimeoutID
   closeTimeout: ?TimeoutID
@@ -43,53 +49,29 @@ class HoverTooltip extends React.Component<Props, State> {
 
   delayedOpen = () => {
     if (this.closeTimeout) clearTimeout(this.closeTimeout)
-    this.openTimeout = setTimeout(() => this.setState({isOpen: true}), OPEN_DELAY_MS)
+    this.openTimeout = setTimeout(
+      () => this.setState({isOpen: true}),
+      OPEN_DELAY_MS
+    )
   }
   delayedClose = () => {
     if (this.openTimeout) clearTimeout(this.openTimeout)
-    this.closeTimeout = setTimeout(() => this.setState({isOpen: false}), CLOSE_DELAY_MS)
+    this.closeTimeout = setTimeout(
+      () => this.setState({isOpen: false}),
+      CLOSE_DELAY_MS
+    )
   }
 
   render () {
-    if (!this.props.tooltipComponent) return this.props.children()
-    const open = this.props.forceOpen == null
-      ? this.state.isOpen
-      : this.props.forceOpen
-
     return (
-      <Manager>
-        <Reference>
-          {({ref}) => this.props.children({ref, onMouseEnter: this.delayedOpen, onMouseLeave: this.delayedClose})}
-        </Reference>
-        {open &&
-          <Popper
-            placement={this.props.placement}
-            modifiers={{
-              offset: {offset: `0, ${DISTANCE_FROM_REFERENCE}`},
-              ...this.props.modifiers,
-            }}
-            positionFixed={this.props.positionFixed}
-          >
-            {({ref, style, placement, arrowProps}) => {
-              let {style: arrowStyle} = arrowProps
-              if (placement === 'left' || placement === 'right') {
-                arrowStyle = {top: '0.6em'}
-              }
-              const tooltipContents = (
-                <div ref={ref} className={styles.tooltip_box} style={style} data-placement={placement}>
-                  {this.props.tooltipComponent}
-                  <div className={cx(styles.arrow, styles[placement])} ref={arrowProps.ref} style={arrowStyle} />
-                </div>
-              )
-              if (this.props.portal) {
-                const PortalClass = this.props.portal
-                return <PortalClass>{tooltipContents}</PortalClass>
-              }
-              return tooltipContents
-            }}
-          </Popper>
-        }
-      </Manager>
+      <Tooltip
+        open={this.state.isOpen}
+        childProps={{
+          onMouseEnter: this.delayedOpen,
+          onMouseLeave: this.delayedClose,
+        }}
+        {...this.props}
+      />
     )
   }
 }

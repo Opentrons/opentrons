@@ -2,7 +2,7 @@
 // labware load name with copy button
 import * as React from 'react'
 
-import {IconButton, HoverTooltip} from '@opentrons/components'
+import {IconButton, Tooltip} from '@opentrons/components'
 import styles from './styles.css'
 
 // TODO(mc, 2019-03-29): i18n
@@ -75,20 +75,17 @@ class LoadName extends React.Component<LoadNameProps, LoadNameState> {
             readOnly
           />
         </label>
-        <HoverTooltip
-          tooltipComponent={EN_COPY_SUCCESS_MESSAGE}
-          forceOpen={success}
-        >
-          {handlers => (
+        <Tooltip open={success} tooltipComponent={EN_COPY_SUCCESS_MESSAGE}>
+          {tooltipProps => (
             <IconButton
               onClick={this.handleCopyButtonClick}
-              hoverTooltipHandlers={handlers}
+              hoverTooltipHandlers={tooltipProps}
               className={styles.load_name_button}
               name={COPY_ICON}
               inverted
             />
           )}
-        </HoverTooltip>
+        </Tooltip>
       </div>
     )
   }
