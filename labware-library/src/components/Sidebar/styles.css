@@ -57,6 +57,8 @@
 .filter_manufacturer_select {
   @apply --font-body-1-dark;
 
+  line-height: var(--lh-title);
+
   /* react-select adds background: white on its <input> for some reason */
   & input {
     background-color: inherit;
@@ -79,7 +81,8 @@
   margin-bottom: var(--spacing-6);
   font-weight: var(--fw-semibold);
 
-  &:hover {
+  &:hover,
+  &.selected {
     color: var(--c-highlight);
   }
 }

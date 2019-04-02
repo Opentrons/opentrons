@@ -7,10 +7,7 @@ exports[`Nav component renders 1`] = `
   <div
     className="nav_contents"
   >
-    <img
-      className="logo"
-      src="ot-logo-full.png"
-    />
+    <Logo />
   </div>
 </nav>
 `;

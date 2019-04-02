@@ -31,6 +31,7 @@ const EN_MAX_VOLUME = 'max volume'
 const EN_TAGS = 'tags'
 const EN_API_NAME = 'api name'
 
+// TODO(mc, 2019-03-18): i18n
 const EN_NUM_WELLS_BY_CATEGORY = {
   tubeRack: 'no. of tubes',
   tipRack: 'no. of tips',
@@ -40,6 +41,7 @@ const EN_NUM_WELLS_BY_CATEGORY = {
   other: 'no. of wells',
 }
 
+// TODO(mc, 2019-03-18): i18n
 const EN_WELL_DIMS_BY_CATEGORY = {
   tubeRack: 'tube dimensions',
   tipRack: 'tip dimensions',

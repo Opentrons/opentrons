@@ -1,16 +1,35 @@
 // @flow
-// default export is lazy-loaded LabwareList so initial bundle doesn't need
-// labware defs
+// main LabwareList component
 import * as React from 'react'
 
-// $FlowFixMe: need to upgrade Flow for React.lazy
-export const LabwareList = React.lazy(() => import('./LabwareList'))
+import styles from './styles.css'
 
-export default function LazyLabwareList () {
+import {getAllDefinitions} from '../../definitions'
+import {FILTER_OFF} from '../../filters'
+import LabwareCard from './LabwareCard'
+
+import type {FilterParams} from '../../types'
+
+const filterMatches = (filter: ?string, value: string): boolean =>
+  !filter || filter === FILTER_OFF || filter === value
+
+export type LabwareListProps = {
+  filters: FilterParams,
+}
+
+export default function LabwareList (props: LabwareListProps) {
+  const {category, manufacturer} = props.filters
+  const definitions = getAllDefinitions().filter(
+    d =>
+      filterMatches(category, d.metadata.displayCategory) &&
+      filterMatches(manufacturer, d.brand.brand)
+  )
+
   return (
-    // $FlowFixMe: need to upgrade Flow for React.Suspense
-    <React.Suspense fallback={null}>
-      <LabwareList />
-    </React.Suspense>
+    <ul className={styles.list}>
+      {definitions.map(d => (
+        <LabwareCard key={d.otId} definition={d} />
+      ))}
+    </ul>
   )
 }

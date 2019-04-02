@@ -1,7 +1,10 @@
 'use strict'
 
 module.exports = {
-  setupFiles: ['<rootDir>/__mocks__/setup-mock-globals.js'],
+  setupFiles: [
+    '<rootDir>/__mocks__/setup-mock-globals.js',
+    '<rootDir>/scripts/setup-enzyme.js',
+  ],
   moduleNameMapper: {
     '\\.(css)$': 'identity-obj-proxy',
   },
@@ -32,4 +35,5 @@ module.exports = {
     '!**/flow-typed/**',
   ],
   coverageReporters: ['lcov', 'text'],
+  snapshotSerializers: ['enzyme-to-json/serializer'],
 }

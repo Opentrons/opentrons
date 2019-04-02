@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Page component renders 1`] = `
+<div
+  className="page_scroller"
+>
+  <div
+    className="page"
+  >
+    <Sidebar
+      filters={
+        Object {
+          "category": "all",
+          "manufacturer": "all",
+        }
+      }
+    />
+    <section
+      className="content"
+    >
+      <div
+        className="content_container"
+      >
+        <LabwareList
+          filters={
+            Object {
+              "category": "all",
+              "manufacturer": "all",
+            }
+          }
+        />
+      </div>
+    </section>
+  </div>
+</div>
+`;

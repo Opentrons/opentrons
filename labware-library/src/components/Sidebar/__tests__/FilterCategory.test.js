@@ -1,16 +1,17 @@
 // @flow
 // FilterCategory component tests
 import * as React from 'react'
-import Renderer from 'react-test-renderer'
+import {shallow} from 'enzyme'
 
 import FilterCategory from '../FilterCategory'
 
+jest.mock('../../../definitions')
+
 describe('FilterCategory', () => {
   test('component renders', () => {
-    const tree = Renderer.create(<FilterCategory />).toJSON()
+    const filters = {category: 'all', manufacturer: 'all'}
+    const tree = shallow(<FilterCategory filters={filters} />)
 
     expect(tree).toMatchSnapshot()
   })
-
-  // TODO(mc, 2019-03-14): test category list population
 })

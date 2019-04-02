@@ -1,16 +1,19 @@
 // @flow
 // app tests
 import * as React from 'react'
-import Renderer from 'react-test-renderer'
+import {shallow} from 'enzyme'
 
 import {App} from '..'
 
-// unable to test render React.lazy; not sure why
-jest.mock('../../LabwareList', () => () => 'LabwareList')
-
 describe('App', () => {
   test('component renders', () => {
-    const tree = Renderer.create(<App />).toJSON()
+    const tree = shallow(
+      <App
+        location={({search: ''}: any)}
+        history={({}: any)}
+        match={({}: any)}
+      />
+    )
 
     expect(tree).toMatchSnapshot()
   })

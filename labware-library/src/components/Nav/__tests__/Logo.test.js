@@ -1,20 +1,20 @@
 // @flow
 // tests for Logo image component
 import * as React from 'react'
-import Renderer from 'react-test-renderer'
+import {shallow} from 'enzyme'
 
 import Logo from '../Logo'
 
 describe('Logo', () => {
   test('component renders', () => {
-    const tree = Renderer.create(<Logo />).toJSON()
+    const tree = shallow(<Logo />)
 
     expect(tree).toMatchSnapshot()
   })
 
   test('renders an <img>', () => {
-    const tree = Renderer.create(<Logo />)
-    // throws if can't find 'img'
-    tree.root.findByType('img')
+    const tree = shallow(<Logo />)
+
+    expect(tree.find('img')).toHaveLength(1)
   })
 })
