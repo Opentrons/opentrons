@@ -42,25 +42,25 @@ type DP = $Diff<$Diff<Props, SP>, OP>
 
 const makeMapStateToProps = () => {
   const getArgsAndErrors = stepFormSelectors.makeGetArgsAndErrors()
+  const getStep = stepFormSelectors.makeGetStep()
 
   return (state: BaseState, ownProps: OP): SP => {
     const {stepId} = ownProps
 
     const argsAndErrors = getArgsAndErrors(state, stepId)
+    const step = getStep(state, stepId)
 
-    const allSteps = stepFormSelectors.getAllSteps(state)
+    const formAndFieldErrors = argsAndErrors[stepId] && argsAndErrors[stepId].errors
+    const hasError = fileDataSelectors.getErrorStepId(state) === stepId || !isEmpty(formAndFieldErrors)
+
+    const hasWarnings = dismissSelectors.getHasTimelineWarningsPerStep(state)[stepId] ||
+      dismissSelectors.getHasFormLevelWarningsPerStep(state)[stepId]
+
+    const collapsed = stepsSelectors.getCollapsedSteps(state)[stepId]
 
     const hoveredSubstep = stepsSelectors.getHoveredSubstep(state)
     const hoveredStep = stepsSelectors.getHoveredStepId(state)
     const selected = stepsSelectors.getSelectedStepId(state) === stepId
-    const collapsed = stepsSelectors.getCollapsedSteps(state)[stepId]
-
-    const formAndFieldErrors = argsAndErrors[stepId] && argsAndErrors[stepId].errors
-    const hasError = fileDataSelectors.getErrorStepId(state) === stepId || !isEmpty(formAndFieldErrors)
-    const hasWarnings = dismissSelectors.getHasTimelineWarningsPerStep(state)[stepId] ||
-      dismissSelectors.getHasFormLevelWarningsPerStep(state)[stepId]
-
-    const step = allSteps[stepId]
 
     return {
       stepType: step.stepType,

@@ -51,7 +51,6 @@ export const getLabwareEntities: Selector<LabwareEntities> = createSelector(
   (state) => state.labwareInvariantProperties
 )
 
-
 export const getLabwareTypesById: Selector<LabwareTypeById> = createSelector(
   getLabwareEntities,
   (labwareEntities) => mapValues(
@@ -239,7 +238,12 @@ export const getUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSel
   }
 )
 
-const getStepForm = (state: State, stepId: string) => {
+// TODO: Brian&Ian 2019-04-02 this is TEMPORARY, should be removed once legacySteps reducer is removed
+const getLegacyStep = (state: BaseState, stepId: StepIdType) => {
+  return state.stepForms.legacySteps[stepId]
+}
+
+const getStepForm = (state: BaseState, stepId: StepIdType) => {
   return state.stepForms.savedStepForms[stepId]
 }
 
@@ -248,10 +252,28 @@ export const makeGetArgsAndErrors = () => {
     getStepForm,
     getHydrationContext,
     (stepForm, contextualState) => {
-      console.log('DOING THE WORK', stepForm && stepForm.id)
+      console.log('DOING THE WORK args and errors', stepForm && stepForm.id)
       const hydratedForm = _getHydratedForm(stepForm, contextualState)
       const errors = _getFormAndFieldErrorsFromHydratedForm(hydratedForm)
       return isEmpty(errors) ? {stepArgs: stepFormToArgs(hydratedForm)} : {errors, stepArgs: null}
+    }
+  )
+}
+
+// TODO: Brian&Ian 2019-04-02 this is TEMPORARY, should be removed once legacySteps reducer is removed
+// only need it because stepType should exist evergreen outside of legacySteps but doesn't yet
+export const makeGetStep = () => {
+  return createSelector(
+    getStepForm,
+    getLegacyStep,
+    (stepForm, legacyStep) => {
+      console.log('DOING THE GET STEP ', stepForm && stepForm.id)
+      return ({
+        ...legacyStep,
+        formData: stepForm,
+        title: stepForm ? stepForm.stepName : i18n.t(`application.stepType.${legacyStep.stepType}`),
+        description: stepForm ? stepForm.stepDetails : null,
+      })
     }
   )
 }
@@ -275,6 +297,8 @@ export const getArgsAndErrorsByStepId: Selector<{[StepIdType]: StepArgsAndErrors
   }
 )
 
+// TODO: BC&IL 2019-04-02 this is being recomputed every time any field in unsaved forms is changed
+// this should only be computed once when a form is opened
 export const getIsNewStepForm = createSelector(
   getUnsavedForm,
   getSavedStepForms,
