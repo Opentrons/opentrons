@@ -31,6 +31,7 @@ main {
 /* make images responsive */
 img {
   max-width: 100%;
+  max-height: 100%;
   border-style: none;
 }
 
@@ -43,7 +44,8 @@ h5,
 h6,
 p,
 ul,
-ol {
+ol,
+button {
   margin: 0;
   padding: 0;
 }
@@ -57,4 +59,10 @@ ol {
 /* no underline on links by default */
 a {
   text-decoration: none;
+}
+
+/* no styles on buttons by default */
+button {
+  border: none;
+  background-color: transparent;
 }
