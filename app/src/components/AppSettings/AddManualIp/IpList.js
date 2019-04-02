@@ -1,9 +1,8 @@
 // @flow
 import * as React from 'react'
 import {connect} from 'react-redux'
-import find from 'lodash/find'
 import {getConfig, removeManualIp} from '../../../config'
-import {getConnectableRobots, getReachableRobots} from '../../../discovery'
+import {getLiveRobots} from '../../../discovery'
 
 import type {State, Dispatch} from '../../../types'
 import type {DiscoveryCandidates} from '../../../config'
@@ -12,8 +11,7 @@ import type {Robot, ReachableRobot} from '../../../discovery'
 import IpItem from './IpItem'
 
 type SP = {|
-  connectableRobots: Array<Robot>,
-  reachableRobots: Array<ReachableRobot>,
+  robots: Array<Robot | ReachableRobot>,
   candidates: DiscoveryCandidates,
 |}
 
@@ -24,14 +22,14 @@ type DP = {|
 type Props = {...SP, ...DP}
 
 function IpList (props: Props) {
-  const {candidates, removeManualIp, connectableRobots, reachableRobots} = props
+  const {candidates, removeManualIp, robots} = props
   const candidateList = [].concat(candidates)
-  const robots = connectableRobots.concat(reachableRobots)
-  console.log(robots)
+
   return (
     <div>
       {candidateList.map((c, index) => {
-        const discovered = !!find(robots, r => r.ip === c)
+        const discovered = robots.some(r => r.ip === c)
+
         return (
           <IpItem
             candidate={c}
@@ -45,21 +43,20 @@ function IpList (props: Props) {
   )
 }
 
-export default connect(
-  STP,
-  DTP
-)(IpList)
-
-function STP (state: State): SP {
+function mapStateToProps (state: State): SP {
   return {
-    connectableRobots: getConnectableRobots(state),
-    reachableRobots: getReachableRobots(state),
+    robots: getLiveRobots(state),
     candidates: getConfig(state).discovery.candidates,
   }
 }
 
-function DTP (dispatch: Dispatch): DP {
+function mapDispatchToProps (dispatch: Dispatch): DP {
   return {
     removeManualIp: ip => dispatch(removeManualIp(ip)),
   }
 }
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(IpList)
