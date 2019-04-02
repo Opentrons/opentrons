@@ -4,20 +4,35 @@ exports[`FilterCategory component renders 1`] = `
 <ul
   className="filter_category"
 >
-  <li>
-    Link({"to":"/?","className":"filter_category_item selected","children":"All"})
+  <li
+    key="all"
+  >
+    <Link
+      className="filter_category_item selected"
+      to="/?"
+    >
+      All
+    </Link>
   </li>
-  <li>
-    Link({"to":"/?category=wellPlate","className":"filter_category_item","children":"Well Plate"})
+  <li
+    key="tubeRack"
+  >
+    <Link
+      className="filter_category_item"
+      to="/?category=tubeRack"
+    >
+      Tube Rack
+    </Link>
   </li>
-  <li>
-    Link({"to":"/?category=tipRack","className":"filter_category_item","children":"Tip Rack"})
-  </li>
-  <li>
-    Link({"to":"/?category=tubeRack","className":"filter_category_item","children":"Tube Rack"})
-  </li>
-  <li>
-    Link({"to":"/?category=trough","className":"filter_category_item","children":"Trough"})
+  <li
+    key="wellPlate"
+  >
+    <Link
+      className="filter_category_item"
+      to="/?category=wellPlate"
+    >
+      Well Plate
+    </Link>
   </li>
 </ul>
 `;

@@ -1,13 +1,13 @@
 // @flow
 // tests for top navbar
 import * as React from 'react'
-import Renderer from 'react-test-renderer'
+import {shallow} from 'enzyme'
 
 import Nav from '..'
 
 describe('Nav', () => {
   test('component renders', () => {
-    const tree = Renderer.create(<Nav />).toJSON()
+    const tree = shallow(<Nav />)
 
     expect(tree).toMatchSnapshot()
   })

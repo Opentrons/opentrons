@@ -4,18 +4,13 @@ exports[`App component renders 1`] = `
 <div
   className="app"
 >
-  <nav
-    className="nav"
-  >
-    <div
-      className="nav_contents"
-    >
-      <img
-        className="logo"
-        src="ot-logo-full.png"
-      />
-    </div>
-  </nav>
-  LazyPage({"location":{"search":""}})
+  <Nav />
+  <LazyLabwareList
+    location={
+      Object {
+        "search": "",
+      }
+    }
+  />
 </div>
 `;

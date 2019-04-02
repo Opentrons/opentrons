@@ -4,5540 +4,781 @@ exports[`LabwareList component renders 1`] = `
 <ul
   className="list"
 >
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Bio-Rad
-      </span>
-       | 
-      <span>
-        Well Plate
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        Bio-Rad HardShell 96-Well PCR Plate
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.76
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.48
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              16.06
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of wells
-        </p>
-        <p
-          className="value"
-        >
-          96
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              well dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                14.81
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                5.46
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              200
-               
-              µL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        flat, plate, pcr, magdeck, biorad, low_profile, hardshell, thin_wall, 96_well
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="biorad_96_wellplate_pcr_200_ul"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Corning
-      </span>
-       | 
-      <span>
-        Well Plate
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        Corning 12 Well Plate
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.89
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.60
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              20.02
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of wells
-        </p>
-        <p
-          className="value"
-        >
-          12
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              well dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                17.53
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                22.73
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              6.9
-               
-              mL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        SBS, microplate, 6.9, mL, 12 wells
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="corning_12_wellplate_6.9_ml"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Corning
-      </span>
-       | 
-      <span>
-        Well Plate
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        Corning 24 Well Plate
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.76
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.47
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              20.27
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of wells
-        </p>
-        <p
-          className="value"
-        >
-          24
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              well dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                17.40
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                16.26
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              3.4
-               
-              mL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        SBS, microplate, 3.4, mL, 24 wells
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="corning_24_wellplate_3.4_ml"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Corning
-      </span>
-       | 
-      <span>
-        Well Plate
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        Corning 384 Well Plate
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.76
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.47
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              14.22
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of wells
-        </p>
-        <p
-          className="value"
-        >
-          384
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              well dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                11.43
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                3.63
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              112
-               
-              µL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        SBS, microplate, 112, uL, 384 wells
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="corning_384_wellplate_112_ul"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Corning
-      </span>
-       | 
-      <span>
-        Well Plate
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        Corning 48 Well Plate
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.76
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.47
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              20.02
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of wells
-        </p>
-        <p
-          className="value"
-        >
-          48
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              well dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                17.40
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                11.56
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              1.6
-               
-              mL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        SBS, microplate, 1.6, mL, 48 wells
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="corning_48_wellplate_1.6_ml"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Corning
-      </span>
-       | 
-      <span>
-        Well Plate
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        Corning 6 Well Plate
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.76
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.47
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              20.27
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of wells
-        </p>
-        <p
-          className="value"
-        >
-          6
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              well dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                17.40
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                35.43
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              16.8
-               
-              mL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        SBS, microplate, 16.8, mL, 6 wells
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="corning_6_wellplate_16.8_ml"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Eppendorf
-      </span>
-       | 
-      <span>
-        Tip Rack
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        epT.I.P.S. 0.1-10 uL tiprack
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.76
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.48
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              65.40
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of tips
-        </p>
-        <p
-          className="value"
-        >
-          96
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              tip dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                30.00
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                6.00
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              10
-               
-              µL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        SBS, tips, 10, uL
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="eppendorf_96_tiprack_10_ul"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Eppendorf
-      </span>
-       | 
-      <span>
-        Tip Rack
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        epT.I.P.S. 50-1000 uL tiprack
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.76
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.48
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              121.90
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of tips
-        </p>
-        <p
-          className="value"
-        >
-          96
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              tip dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                65.00
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                8.80
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              1000
-               
-              µL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        SBS, tips, 1000, uL
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="eppendorf_96_tiprack_1000_ul"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        generic
-      </span>
-       | 
-      <span>
-        Well Plate
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        ANSI 96 Standard Microplate
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.76
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.48
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              14.35
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of wells
-        </p>
-        <p
-          className="value"
-        >
-          96
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              well dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                10.54
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                6.40
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              380
-               
-              µL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        flat, microplate, SBS, ANSI, generic
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="generic_96_wellplate_380_ul"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Opentrons
-      </span>
-       | 
-      <span>
-        Tube Rack
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        Opentrons 15 mL tuberack
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              121.00
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              78.75
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              123.76
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of tubes
-        </p>
-        <p
-          className="value"
-        >
-          15
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              tube dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                117.98
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                14.50
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              15
-               
-              mL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        15, mL, Opentrons, falcon, tuberack
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="opentrons_15_tuberack_15_ml_falcon"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Opentrons
-      </span>
-       | 
-      <span>
-        Tube Rack
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        Aluminum 2mL block
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.75
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.50
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              42.00
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of tubes
-        </p>
-        <p
-          className="value"
-        >
-          24
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              tube dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                42.00
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                8.50
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              2
-               
-              mL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="opentrons_24_aluminum_tuberack_2_ml"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Opentrons
-      </span>
-       | 
-      <span>
-        Tube Rack
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        Opentrons snapcap 1.5mL tuberack
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.75
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.50
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              79.85
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of tubes
-        </p>
-        <p
-          className="value"
-        >
-          24
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              tube dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                37.80
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                8.70
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              1.5
-               
-              mL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        1.5, mL, eppendorf, snapcap, tuberack
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="opentrons_24_tuberack_1.5_ml_eppendorf"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Opentrons
-      </span>
-       | 
-      <span>
-        Tube Rack
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        Opentrons snapcap 2mL tuberack
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.75
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.50
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              79.85
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of tubes
-        </p>
-        <p
-          className="value"
-        >
-          24
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              tube dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                38.58
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                9.90
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              2
-               
-              mL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        2, mL, snapcap, tuberack, Eppendorf, Opentrons
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="opentrons_24_tuberack_2_ml_eppendorf"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Opentrons
-      </span>
-       | 
-      <span>
-        Tube Rack
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        Opentrons screwcap 2mL tuberack
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.75
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.50
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              84.00
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of tubes
-        </p>
-        <p
-          className="value"
-        >
-          24
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              tube dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                42.00
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                8.50
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              2
-               
-              mL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        2, mL, screwcap, tuberack, Opentrons, E&K Scientific
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="opentrons_24_tuberack_2_ml_screwcap"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Opentrons
-      </span>
-       | 
-      <span>
-        Tube Rack
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        Opentrons 50 mL tuberack
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              121.00
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              78.75
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              123.76
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of tubes
-        </p>
-        <p
-          className="value"
-        >
-          6
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              tube dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                113.85
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                26.45
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              50
-               
-              mL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        50, mL, falcon, tuberack, Opentrons
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="opentrons_6_tuberack_50_ml_falcon"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Opentrons
-      </span>
-       | 
-      <span>
-        Tube Rack
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        Opentrons 6x15mL 4x50mL tube rack
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.75
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.50
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              123.76
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of tubes
-        </p>
-        <p
-          className="value"
-        >
-          10
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              tube dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                117.98
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                14.50
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              15
-               
-              mL
-            </p>
-          </div>
-        </div>
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              tube dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                113.85
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                26.45
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              50
-               
-              mL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        opentrons, modular, tuberack, 15, mL, 50
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="opentrons_6x15_ml_4x50_ml_tuberack"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Opentrons
-      </span>
-       | 
-      <span>
-        Well Plate
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        Aluminum Bio-Rad PCR plate 200uL
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.76
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.48
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              18.81
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of wells
-        </p>
-        <p
-          className="value"
-        >
-          96
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              well dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                14.81
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                5.46
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              200
-               
-              µL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="opentrons_96_aluminum_biorad_wellplate_200_ul"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Opentrons
-      </span>
-       | 
-      <span>
-        Tube Rack
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        Aluminum PCR block 200uL
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.75
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.50
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              19.50
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of tubes
-        </p>
-        <p
-          className="value"
-        >
-          96
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              tube dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                20.30
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                5.46
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              200
-               
-              µL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="opentrons_96_aluminum_tuberack_200_ul"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Opentrons
-      </span>
-       | 
-      <span>
-        Tip Rack
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        Opentrons GEB 10uL Tiprack
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.75
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.50
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              52.25
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of tips
-        </p>
-        <p
-          className="value"
-        >
-          96
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              tip dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                34.00
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                3.46
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              10
-               
-              µL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        GEB, tiprack, 10uL, Opentrons
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="opentrons_96_tiprack_10_ul"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Opentrons
-      </span>
-       | 
-      <span>
-        Tip Rack
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        Opentrons GEB 1000uL Tiprack
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.75
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.50
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              100.25
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of tips
-        </p>
-        <p
-          className="value"
-        >
-          96
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              tip dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                82.00
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                7.46
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              1000
-               
-              µL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        GEB, tiprack, 1000uL, Opentrons
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="opentrons_96_tiprack_1000_ul"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        Opentrons
-      </span>
-       | 
-      <span>
-        Tip Rack
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        Opentrons GEB 300uL Tiprack
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.76
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.48
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              64.48
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of tips
-        </p>
-        <p
-          className="value"
-        >
-          96
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              tip dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                54.00
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                diameter
-              </p>
-              <p
-                className="value"
-              >
-                5.00
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              300
-               
-              µL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        GEB, tiprack, 300uL, Opentrons, p300, p50
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="opentrons_96_tiprack_300_ul"
-      />
-    </label>
-  </li>
-  <li
-    className="card"
-  >
-    <p
-      className="top_bar"
-    >
-      <span>
-        USA Scientific
-      </span>
-       | 
-      <span>
-        Trough
-      </span>
-    </p>
-    <a
-      href="#"
-    >
-      <h2
-        className="title"
-      >
-        12 Channel Trough
-        <svg
-          aria-hidden="true"
-          className="title_icon"
-          fill="currentColor"
-          version="1.1"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8.571 7.839l4.242 4.59-4.242 4.59 1.312 1.41 5.545-6-5.545-6z"
-            fillRule="evenodd"
-          />
-        </svg>
-      </h2>
-    </a>
-    <div
-      className="gallery"
-    >
-      <div
-        className="gallery_main"
-      />
-      <div
-        className="thumbnail_row"
-      >
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-        <div
-          className="thumbnail_container"
-        >
-          <div
-            className="thumbnail"
-          />
-        </div>
-      </div>
-    </div>
-    <div
-      className="stats"
-    >
-      <div
-        className="dimensions"
-      >
-        <p
-          className="top_label"
-        >
-          plate dimensions
-           
-          <span
-            className="units"
-          >
-            (
-            mm
-            )
-          </span>
-        </p>
-        <div
-          className="stats_bar"
-        >
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              l
-            </span>
-            <span
-              className="value"
-            >
-              127.76
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              w
-            </span>
-            <span
-              className="value"
-            >
-              85.80
-            </span>
-          </p>
-          <p
-            className="stats_item"
-          >
-            <span
-              className="left_label"
-            >
-              h
-            </span>
-            <span
-              className="value"
-            >
-              44.45
-            </span>
-          </p>
-        </div>
-      </div>
-      <div
-        className="wells"
-      >
-        <p
-          className="top_label"
-        >
-          no. of wells
-        </p>
-        <p
-          className="value"
-        >
-          12
-        </p>
-      </div>
-      <div
-        className="wells"
-      >
-        <div
-          className="well_group"
-        >
-          <div
-            className="well_dimensions"
-          >
-            <p
-              className="top_label"
-            >
-              well dimensions
-               
-              <span
-                className="units"
-              >
-                (
-                mm
-                )
-              </span>
-            </p>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                depth
-              </p>
-              <p
-                className="value"
-              >
-                42.16
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                length
-              </p>
-              <p
-                className="value"
-              >
-                8.33
-              </p>
-            </div>
-            <div
-              className="stats_bar"
-            >
-              <p
-                className="left_label"
-              >
-                width
-              </p>
-              <p
-                className="value"
-              >
-                71.88
-              </p>
-            </div>
-          </div>
-          <div
-            className="well_volume"
-          >
-            <p
-              className="top_label"
-            >
-              max volume
-            </p>
-            <p
-              className="value"
-            >
-              22
-               
-              mL
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="tags"
-    >
-      <p
-        className="left_label"
-      >
-        tags
-      </p>
-      <p
-        className="value"
-      >
-        
-      </p>
-    </div>
-    <label
-      className="load_name"
-    >
-      <p
-        className="top_label"
-      >
-        api name
-      </p>
-      <input
-        className="load_name_input"
-        onFocus={[Function]}
-        readOnly={true}
-        type="text"
-        value="usa_scientific_12_trough_22_ml"
-      />
-    </label>
-  </li>
+  <LabwareCard
+    definition={
+      Object {
+        "brand": Object {
+          "brand": "generic",
+        },
+        "cornerOffsetFromSlot": Object {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+        },
+        "deprecated": false,
+        "dimensions": Object {
+          "overallHeight": 64.48,
+          "overallLength": 127.76,
+          "overallWidth": 85.48,
+        },
+        "metadata": Object {
+          "displayCategory": "tubeRack",
+          "displayName": "Fake Irregular Container",
+          "displayVolumeUnits": "mL",
+          "tags": Array [
+            "fake",
+            "opentrons",
+          ],
+        },
+        "ordering": Array [
+          Array [
+            "A1",
+            "B1",
+            "C1",
+            "E1",
+            "G1",
+            "I1",
+          ],
+          Array [
+            "A2",
+            "B2",
+            "C2",
+            "E2",
+            "G2",
+            "I2",
+          ],
+          Array [
+            "A3",
+            "B3",
+            "C3",
+            "E3",
+            "G3",
+            "I3",
+          ],
+          Array [
+            "A4",
+            "B4",
+            "C4",
+            "E4",
+            "G4",
+            "I4",
+          ],
+          Array [
+            "A5",
+            "B5",
+            "C5",
+            "E5",
+            "G5",
+            "I5",
+          ],
+          Array [
+            "A6",
+            "C6",
+            "E6",
+            "G6",
+            "I6",
+          ],
+          Array [
+            "A7",
+            "C7",
+            "E7",
+            "G7",
+            "I7",
+          ],
+          Array [
+            "A8",
+            "C8",
+            "E8",
+            "G8",
+            "I8",
+          ],
+          Array [
+            "A9",
+            "C9",
+            "E9",
+            "G9",
+            "I9",
+          ],
+          Array [
+            "A10",
+            "C10",
+            "E10",
+            "G10",
+            "I10",
+          ],
+        ],
+        "otId": "mock-id",
+        "parameters": Object {
+          "format": "irregular",
+          "isMagneticModuleCompatible": false,
+          "isTiprack": false,
+          "loadName": "generic_50x3_ml_5x10_ml_tuberack",
+        },
+        "wells": Object {
+          "A1": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 10,
+            "y": 30,
+            "z": 58.94,
+          },
+          "A10": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 100,
+            "y": 30,
+            "z": 58.94,
+          },
+          "A2": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 20,
+            "y": 30,
+            "z": 58.94,
+          },
+          "A3": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 30,
+            "y": 30,
+            "z": 58.94,
+          },
+          "A4": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 40,
+            "y": 30,
+            "z": 58.94,
+          },
+          "A5": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 50,
+            "y": 30,
+            "z": 58.94,
+          },
+          "A6": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 60,
+            "y": 30,
+            "z": 58.94,
+          },
+          "A7": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 70,
+            "y": 30,
+            "z": 58.94,
+          },
+          "A8": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 80,
+            "y": 30,
+            "z": 58.94,
+          },
+          "A9": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 90,
+            "y": 30,
+            "z": 58.94,
+          },
+          "B1": Object {
+            "depth": 20.54,
+            "diameter": 15,
+            "shape": "circular",
+            "totalLiquidVolume": 10000,
+            "x": 15,
+            "y": 15,
+            "z": 48.94,
+          },
+          "B2": Object {
+            "depth": 20.54,
+            "diameter": 15,
+            "shape": "circular",
+            "totalLiquidVolume": 10000,
+            "x": 25,
+            "y": 15,
+            "z": 48.94,
+          },
+          "B3": Object {
+            "depth": 20.54,
+            "diameter": 15,
+            "shape": "circular",
+            "totalLiquidVolume": 10000,
+            "x": 35,
+            "y": 15,
+            "z": 48.94,
+          },
+          "B4": Object {
+            "depth": 20.54,
+            "diameter": 15,
+            "shape": "circular",
+            "totalLiquidVolume": 10000,
+            "x": 45,
+            "y": 15,
+            "z": 48.94,
+          },
+          "B5": Object {
+            "depth": 20.54,
+            "diameter": 15,
+            "shape": "circular",
+            "totalLiquidVolume": 10000,
+            "x": 55,
+            "y": 15,
+            "z": 48.94,
+          },
+          "C1": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 10,
+            "y": 25,
+            "z": 58.94,
+          },
+          "C10": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 100,
+            "y": 25,
+            "z": 58.94,
+          },
+          "C2": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 20,
+            "y": 25,
+            "z": 58.94,
+          },
+          "C3": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 30,
+            "y": 25,
+            "z": 58.94,
+          },
+          "C4": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 40,
+            "y": 25,
+            "z": 58.94,
+          },
+          "C5": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 50,
+            "y": 25,
+            "z": 58.94,
+          },
+          "C6": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 60,
+            "y": 25,
+            "z": 58.94,
+          },
+          "C7": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 70,
+            "y": 25,
+            "z": 58.94,
+          },
+          "C8": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 80,
+            "y": 25,
+            "z": 58.94,
+          },
+          "C9": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 90,
+            "y": 25,
+            "z": 58.94,
+          },
+          "E1": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 10,
+            "y": 20,
+            "z": 58.94,
+          },
+          "E10": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 100,
+            "y": 20,
+            "z": 58.94,
+          },
+          "E2": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 20,
+            "y": 20,
+            "z": 58.94,
+          },
+          "E3": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 30,
+            "y": 20,
+            "z": 58.94,
+          },
+          "E4": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 40,
+            "y": 20,
+            "z": 58.94,
+          },
+          "E5": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 50,
+            "y": 20,
+            "z": 58.94,
+          },
+          "E6": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 60,
+            "y": 20,
+            "z": 58.94,
+          },
+          "E7": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 70,
+            "y": 20,
+            "z": 58.94,
+          },
+          "E8": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 80,
+            "y": 20,
+            "z": 58.94,
+          },
+          "E9": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 90,
+            "y": 20,
+            "z": 58.94,
+          },
+          "G1": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 10,
+            "y": 15,
+            "z": 58.94,
+          },
+          "G10": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 100,
+            "y": 15,
+            "z": 58.94,
+          },
+          "G2": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 20,
+            "y": 15,
+            "z": 58.94,
+          },
+          "G3": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 30,
+            "y": 15,
+            "z": 58.94,
+          },
+          "G4": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 40,
+            "y": 15,
+            "z": 58.94,
+          },
+          "G5": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 50,
+            "y": 15,
+            "z": 58.94,
+          },
+          "G6": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 60,
+            "y": 15,
+            "z": 58.94,
+          },
+          "G7": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 70,
+            "y": 15,
+            "z": 58.94,
+          },
+          "G8": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 80,
+            "y": 15,
+            "z": 58.94,
+          },
+          "G9": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 90,
+            "y": 15,
+            "z": 58.94,
+          },
+          "I1": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 10,
+            "y": 10,
+            "z": 58.94,
+          },
+          "I10": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 100,
+            "y": 10,
+            "z": 58.94,
+          },
+          "I2": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 20,
+            "y": 10,
+            "z": 58.94,
+          },
+          "I3": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 30,
+            "y": 10,
+            "z": 58.94,
+          },
+          "I4": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 40,
+            "y": 10,
+            "z": 58.94,
+          },
+          "I5": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 50,
+            "y": 10,
+            "z": 58.94,
+          },
+          "I6": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 60,
+            "y": 10,
+            "z": 58.94,
+          },
+          "I7": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 70,
+            "y": 10,
+            "z": 58.94,
+          },
+          "I8": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 80,
+            "y": 10,
+            "z": 58.94,
+          },
+          "I9": Object {
+            "depth": 10.54,
+            "diameter": 10,
+            "shape": "circular",
+            "totalLiquidVolume": 3000,
+            "x": 90,
+            "y": 10,
+            "z": 58.94,
+          },
+        },
+      }
+    }
+    key="mock-id"
+  />
+  <LabwareCard
+    definition={
+      Object {
+        "brand": Object {
+          "brand": "opentrons",
+          "brandId": Array [
+            "t40u9sernisofsea",
+          ],
+        },
+        "cornerOffsetFromSlot": Object {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+        },
+        "deprecated": false,
+        "dimensions": Object {
+          "overallHeight": 50,
+          "overallLength": 127.76,
+          "overallWidth": 85.48,
+        },
+        "metadata": Object {
+          "displayCategory": "wellPlate",
+          "displayName": "fake labware",
+          "displayVolumeUnits": "µL",
+        },
+        "ordering": Array [
+          Array [
+            "A1",
+          ],
+          Array [
+            "A2",
+          ],
+        ],
+        "otId": "mock-id",
+        "parameters": Object {
+          "format": "96Standard",
+          "isMagneticModuleCompatible": false,
+          "isTiprack": false,
+          "loadName": "opentrons_2_wellplate_100_ul",
+        },
+        "wells": Object {
+          "A1": Object {
+            "depth": 40,
+            "diameter": 30,
+            "shape": "circular",
+            "totalLiquidVolume": 100,
+            "x": 10,
+            "y": 10,
+            "z": 15,
+          },
+          "A2": Object {
+            "depth": 40,
+            "diameter": 30,
+            "shape": "circular",
+            "totalLiquidVolume": 100,
+            "x": 20,
+            "y": 10,
+            "z": 15,
+          },
+        },
+      }
+    }
+    key="mock-id"
+  />
+  <LabwareCard
+    definition={
+      Object {
+        "brand": Object {
+          "brand": "generic",
+        },
+        "cornerOffsetFromSlot": Object {
+          "x": 77.76,
+          "y": 35.48,
+          "z": 0,
+        },
+        "deprecated": false,
+        "dimensions": Object {
+          "overallHeight": 50,
+          "overallLength": 50,
+          "overallWidth": 50,
+        },
+        "metadata": Object {
+          "displayCategory": "wellPlate",
+          "displayName": "fake labware 2",
+          "displayVolumeUnits": "mL",
+        },
+        "ordering": Array [
+          Array [
+            "A1",
+            "B1",
+            "C1",
+          ],
+          Array [
+            "A2",
+            "B2",
+            "C2",
+          ],
+        ],
+        "otId": "mock-id",
+        "parameters": Object {
+          "format": "irregular",
+          "isMagneticModuleCompatible": false,
+          "isTiprack": false,
+          "loadName": "generic_6_wellplate_1_ml",
+        },
+        "wells": Object {
+          "A1": Object {
+            "depth": 40,
+            "diameter": 30,
+            "shape": "circular",
+            "totalLiquidVolume": 1000,
+            "x": 10,
+            "y": 28,
+            "z": 10,
+          },
+          "A2": Object {
+            "depth": 40,
+            "diameter": 30,
+            "shape": "circular",
+            "totalLiquidVolume": 1000,
+            "x": 19,
+            "y": 28,
+            "z": 10,
+          },
+          "B1": Object {
+            "depth": 40,
+            "diameter": 30,
+            "shape": "circular",
+            "totalLiquidVolume": 1000,
+            "x": 10,
+            "y": 19,
+            "z": 10,
+          },
+          "B2": Object {
+            "depth": 40,
+            "diameter": 30,
+            "shape": "circular",
+            "totalLiquidVolume": 1000,
+            "x": 19,
+            "y": 19,
+            "z": 10,
+          },
+          "C1": Object {
+            "depth": 40,
+            "diameter": 30,
+            "shape": "circular",
+            "totalLiquidVolume": 1000,
+            "x": 10,
+            "y": 10,
+            "z": 10,
+          },
+          "C2": Object {
+            "depth": 40,
+            "diameter": 30,
+            "shape": "circular",
+            "totalLiquidVolume": 1000,
+            "x": 19,
+            "y": 10,
+            "z": 10,
+          },
+        },
+      }
+    }
+    key="mock-id"
+  />
 </ul>
 `;

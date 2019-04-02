@@ -1,9 +1,10 @@
 // @flow
 // LabwareList tests
 import * as React from 'react'
-import Renderer from 'react-test-renderer'
+import {shallow} from 'enzyme'
 
 import LabwareList from '..'
+import LabwareCard from '../LabwareCard'
 import {getAllDefinitions} from '../../../definitions'
 
 jest.mock('../../../definitions')
@@ -12,22 +13,20 @@ const filtersOff = {category: 'all', manufacturer: 'all'}
 
 describe('LabwareList', () => {
   test('component renders', () => {
-    const tree = Renderer.create(<LabwareList filters={filtersOff} />).toJSON()
+    const tree = shallow(<LabwareList filters={filtersOff} />)
 
     expect(tree).toMatchSnapshot()
   })
 
   test('renders a <ul>', () => {
-    const tree = Renderer.create(<LabwareList filters={filtersOff} />)
+    const tree = shallow(<LabwareList filters={filtersOff} />)
 
-    const items = tree.root.findAllByType('ul')
-    expect(items).toHaveLength(1)
+    expect(tree.find('ul')).toHaveLength(1)
   })
 
-  test('renders a <li> per labware definition', () => {
-    const tree = Renderer.create(<LabwareList filters={filtersOff} />)
+  test('renders a LabwareCard per labware definition', () => {
+    const tree = shallow(<LabwareList filters={filtersOff} />)
 
-    const items = tree.root.findAllByType('li')
-    expect(items).toHaveLength(getAllDefinitions().length)
+    expect(tree.find(LabwareCard)).toHaveLength(getAllDefinitions().length)
   })
 })
