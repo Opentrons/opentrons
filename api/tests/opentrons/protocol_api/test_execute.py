@@ -211,12 +211,6 @@ def test_load_labware_trash(loop):
     assert result['someTrashId'] == ctx.fixed_trash
 
 
-def test_blank_protocol(loop):
-    # Check that this doesn’t throw an exception
-    ctx = ProtocolContext(loop=loop)
-    execute.run_protocol(protocol_json={}, context=ctx)
-
-
 protocol_data = {
     "default-values": {
         "aspirate-flow-rate": {
@@ -312,3 +306,23 @@ def test_dispatch_commands(monkeypatch, loop):
         (123, 102),
         (101, 102)
     ]
+
+
+def test_get_protocol_schema_version():
+    get_protocol_schema_version = execute.get_protocol_schema_version
+
+    assert get_protocol_schema_version({'protocol-schema': '1.0.0'}) == 1
+    assert get_protocol_schema_version({'protocol-schema': '2.0.0'}) == 2
+    assert get_protocol_schema_version({'schemaVersion': 123}) == 123
+
+    # schemaVersion has precedence over legacy 'protocol-schema'
+    assert get_protocol_schema_version({
+        'protocol-schema': '2.0.0',
+        'schemaVersion': 123}) == 123
+
+    with pytest.raises(RuntimeError):
+        get_protocol_schema_version({'schemaVersion': None})
+    with pytest.raises(RuntimeError):
+        get_protocol_schema_version({})
+    with pytest.raises(RuntimeError):
+        get_protocol_schema_version({'protocol-schema': '1.2.3'})

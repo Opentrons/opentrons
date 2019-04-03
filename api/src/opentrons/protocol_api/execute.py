@@ -1,6 +1,9 @@
 import inspect
 import itertools
+import json
+from jsonschema import validate
 import logging
+import pkgutil
 import traceback
 import sys
 from typing import Any, Callable, Dict, Optional
@@ -273,6 +276,7 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
         if command_type == 'delay':
             wait = params.get('wait')
             if wait is None:
+                # Should be disallowed by schema validation, but just in case:
                 raise ValueError('Delay cannot be null')
             elif wait is True:
                 message = params.get('message', 'Pausing until user resumes')
@@ -315,9 +319,6 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
 
         elif command_type == 'move-to-slot':
             slot = params.get('slot')
-            if slot not in [str(s+1) for s in range(12)]:
-                raise ValueError('Invalid "slot" for "move-to-slot": {}'
-                                 .format(slot))
             slot_obj = context.deck.position_for(slot)
 
             offset = params.get('offset', {})
@@ -331,7 +332,53 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
                 force_direct=params.get('force-direct'),
                 minimum_z_height=params.get('minimum-z-height'))
         else:
-            MODULE_LOG.warning("Bad command type {}".format(command_type))
+            # should always be prevented by schema validation
+            raise RuntimeError('Unhandled command: "{}"'.format(command_type))
+
+
+def get_protocol_schema_version(protocol_json: Dict[Any, Any]) -> int:
+    # v3 and above uses `schemaVersion: integer`
+    version = protocol_json.get('schemaVersion')
+    if None is not version:
+        return version
+    # v1 uses 1.x.x and v2 uses 2.x.x
+    legacyKebabVersion = protocol_json.get('protocol-schema')
+    # No minor/patch schemas ever were released,
+    # do not permit protocols with nonexistent schema versions to load
+    if (legacyKebabVersion == '1.0.0'):
+        return 1
+    if (legacyKebabVersion == '2.0.0'):
+        return 2
+    if (legacyKebabVersion is not None):
+        raise RuntimeError(('No such schema version: "{}". Did you mean ' +
+                           '"1.0.0" or "2.0.0"?').format(legacyKebabVersion))
+    raise RuntimeError(
+        'Could not determine schema version for protcol. ' +
+        'Make sure there is a version number under "schemaVersion"')
+
+
+def get_schema_for_protocol(protocol_json: Dict[Any, Any]):
+    version_num = get_protocol_schema_version(protocol_json)
+    try:
+        schema = pkgutil.get_data(
+            'opentrons',
+            'shared_data/protocol-json-schema/protocolSchemaV{}.json'
+            .format(version_num))
+    except FileNotFoundError:
+        schema = None
+    if not schema:
+        raise RuntimeError('JSON Protocol schema "{}" does not exist'
+                           .format(version_num))
+    return json.loads(schema)
+
+
+def validate_json_protocol(protocol_json: Dict[Any, Any]) -> None:
+    """
+    Throws a human-readable error if the JSON Protocol does not
+    conform to its corresponding protocol schema
+    """
+    validate(instance=protocol_json,
+             schema=get_schema_for_protocol(protocol_json))
 
 
 def run_protocol(protocol_code: Any = None,
@@ -364,6 +411,7 @@ def run_protocol(protocol_code: Any = None,
     if None is not protocol_code:
         _run_python(protocol_code, true_context)
     elif None is not protocol_json:
+        validate_json_protocol(protocol_json)
         lw = load_labware_from_json(true_context, protocol_json)
         ins = load_pipettes_from_json(true_context, protocol_json)
         dispatch_json(true_context, protocol_json, ins, lw)
