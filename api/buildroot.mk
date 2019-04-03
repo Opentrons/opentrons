@@ -18,12 +18,12 @@ PYTHON_OPENTRONS_API_SITE = $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)
 PYTHON_OPENTRONS_API_SUBDIR = api
 PYTHON_OPENTRONS_API_POST_INSTALL_TARGET_HOOKS = PYTHON_OPENTRONS_API_INSTALL_VERSION
 
-define DUMP_BR_VERSION
-$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/python_build_utils.py api dump_br_version)
+define OTAPI_DUMP_BR_VERSION
+	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/python_build_utils.py api dump_br_version)
 endef
 
 define PYTHON_OPENTRONS_API_INSTALL_VERSION
-	echo '$(call DUMP_BR_VERSION)' > $(BINARIES_DIR)/opentrons-api-version.json
+	echo '$(call OTAPI_DUMP_BR_VERSION)' > $(BINARIES_DIR)/opentrons-api-version.json
 endef
 
 ot_api_name := python-opentrons-api
