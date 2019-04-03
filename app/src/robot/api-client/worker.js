@@ -40,7 +40,11 @@ function dispatchFromWorker (action) {
 }
 
 function errorToPlainObject (error) {
-  return Object.assign({
-    name: error.name, message: error.message,
-  }, error)
+  return Object.assign(
+    {
+      name: error.name,
+      message: error.message,
+    },
+    error
+  )
 }

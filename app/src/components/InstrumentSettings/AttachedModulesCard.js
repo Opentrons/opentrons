@@ -6,7 +6,6 @@ import {connect} from 'react-redux'
 import {RefreshCard} from '@opentrons/components'
 import {fetchModules, makeGetRobotModules} from '../../http-api-client'
 import ModulesCardContents from './ModulesCardContents'
-import {getConfig} from '../../config'
 
 import type {State, Dispatch} from '../../types'
 import type {Module} from '../../http-api-client'
@@ -17,7 +16,6 @@ type OP = Robot
 type SP = {|
   modules: ?Array<Module>,
   refreshing: boolean,
-  __featureEnabled: boolean,
 |}
 
 type DP = {|refresh: () => mixed|}
@@ -40,10 +38,7 @@ function AttachedModulesCard (props: Props) {
       refresh={props.refresh}
       column
     >
-      <ModulesCardContents
-        modules={props.modules}
-        showThermo={props.__featureEnabled}
-      />
+      <ModulesCardContents modules={props.modules} />
     </RefreshCard>
   )
 }
@@ -58,7 +53,6 @@ function makeSTP (): (state: State, ownProps: OP) => SP {
     return {
       modules: modules,
       refreshing: modulesCall.inProgress,
-      __featureEnabled: !!getConfig(state).devInternal?.enableThermocycler,
     }
   }
 }

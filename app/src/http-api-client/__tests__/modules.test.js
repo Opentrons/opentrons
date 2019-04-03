@@ -31,7 +31,7 @@ describe('/modules', () => {
     client.__clearMock()
 
     robot = {name: NAME, ip: '1.2.3.4', port: '1234'}
-    state = {api: {api: {}}}
+    state = {api: {api: {}}, config: {devInternal: {enableThermocycler: true}}}
     store = mockStore(state)
   })
 
@@ -42,9 +42,9 @@ describe('/modules', () => {
     test('calls GET /modules', () => {
       client.__setMockResponse(response)
 
-      return store.dispatch(fetchModules(robot))
-        .then(() =>
-          expect(client).toHaveBeenCalledWith(robot, 'GET', path))
+      return store
+        .dispatch(fetchModules(robot))
+        .then(() => expect(client).toHaveBeenCalledWith(robot, 'GET', path))
     })
 
     test('dispatches api:REQUEST and api:SUCCESS', () => {
@@ -56,7 +56,8 @@ describe('/modules', () => {
 
       client.__setMockResponse(response)
 
-      return store.dispatch(fetchModules(robot))
+      return store
+        .dispatch(fetchModules(robot))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
 
@@ -70,7 +71,8 @@ describe('/modules', () => {
 
       client.__setMockError(error)
 
-      return store.dispatch(fetchModules(robot))
+      return store
+        .dispatch(fetchModules(robot))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
   })
