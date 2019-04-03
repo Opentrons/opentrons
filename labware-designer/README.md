@@ -48,16 +48,16 @@ The generator has the following functions:
 
 To build a _regular_ labware, the `options` object should have the following shape:
 
-| field        | type                      | required | description                                     |
-| ------------ | ------------------------- | -------- | ----------------------------------------------- |
-| `metadata`   | [Metadata](#Metadata)     | yes      | Information about the labware                   |
-| `parameters` | [Parameters](#Parameters) | yes      | Parameters that affect labware functionality    |
-| `dimensions` | [Dimensions](#Dimensions) | yes      | Overall dimensions of the labware               |
-| `offset`     | [Offset](#Offset)         | yes      | Distance from slot's top-left corner to well A1 |
-| `grid`       | [Grid](#Grid)             | yes      | Number of rows and columns of wells             |
-| `spacing`    | [Spacing](#Spacing)       | yes      | Distance between rows and columns               |
-| `well`       | [Well](#Well)             | yes      | Well parameters                                 |
-| `brand`      | [Brand](#Brand)           | no       | Labware manufacturer ("generic" if omitted)     |
+| field        | type                      | required | description                                        |
+| ------------ | ------------------------- | -------- | -------------------------------------------------- |
+| `metadata`   | [Metadata](#Metadata)     | yes      | Information about the labware                      |
+| `parameters` | [Parameters](#Parameters) | yes      | Parameters that affect labware functionality       |
+| `dimensions` | [Dimensions](#Dimensions) | yes      | Overall dimensions of the labware                  |
+| `offset`     | [Offset](#Offset)         | yes      | Distance from labware's top-left corner to well A1 |
+| `grid`       | [Grid](#Grid)             | yes      | Number of rows and columns of wells                |
+| `spacing`    | [Spacing](#Spacing)       | yes      | Distance between rows and columns                  |
+| `well`       | [Well](#Well)             | yes      | Well parameters                                    |
+| `brand`      | [Brand](#Brand)           | no       | Labware manufacturer ("generic" if omitted)        |
 
 This example generates [generic_96_wellplate_380_ul.json][]:
 
@@ -100,17 +100,17 @@ const labware = sharedData.createRegularLabware(options)
 
 To build an _irregular_ labware, the `options` object should have the following shape:
 
-| field        | type                           | required | description                                                      |
-| ------------ | ------------------------------ | -------- | ---------------------------------------------------------------- |
-| `metadata`   | [Metadata](#Metadata)          | yes      | Information about the labware                                    |
-| `parameters` | [Parameters](#Parameters)      | yes      | Parameters that affect labware functionality                     |
-| `dimensions` | [Dimensions](#Dimensions)      | yes      | Overall dimensions of the labware                                |
-| `offset`     | Array<[Offset](#Offset) >      | yes      | Distances from slot's top-left corner to first well of each grid |
-| `grid`       | Array<[Grid](#Grid)>           | yes      | Number of rows and columns per grid                              |
-| `spacing`    | Array<[Spacing](#Spacing)>     | yes      | Distance between rows and columns per grid                       |
-| `well`       | Array<[Well](#Well)>           | yes      | Well parameters per grid                                         |
-| `gridStart`  | Array<[GridStart](#GridStart)> | yes      | Well naming scheme per grid                                      |
-| `brand`      | [Brand](#Brand)                | no       | Labware manufacturer ("generic" if omitted)                      |
+| field        | type                           | required | description                                                         |
+| ------------ | ------------------------------ | -------- | ------------------------------------------------------------------- |
+| `metadata`   | [Metadata](#Metadata)          | yes      | Information about the labware                                       |
+| `parameters` | [Parameters](#Parameters)      | yes      | Parameters that affect labware functionality                        |
+| `dimensions` | [Dimensions](#Dimensions)      | yes      | Overall dimensions of the labware                                   |
+| `offset`     | Array<[Offset](#Offset) >      | yes      | Distances from labware's top-left corner to first well of each grid |
+| `grid`       | Array<[Grid](#Grid)>           | yes      | Number of rows and columns per grid                                 |
+| `spacing`    | Array<[Spacing](#Spacing)>     | yes      | Distance between rows and columns per grid                          |
+| `well`       | Array<[Well](#Well)>           | yes      | Well parameters per grid                                            |
+| `gridStart`  | Array<[GridStart](#GridStart)> | yes      | Well naming scheme per grid                                         |
+| `brand`      | [Brand](#Brand)                | no       | Labware manufacturer ("generic" if omitted)                         |
 
 This example generates [opentrons_6x15_ml_4x50_ml_tuberack.json][]
 

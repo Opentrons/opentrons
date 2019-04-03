@@ -145,7 +145,7 @@
     "cornerOffsetFromSlot": {
       "type": "object",
       "additionalProperties": false,
-      "description": "XYZ values from top left corner of slot to well A1",
+      "description": "Distance from bottom-left corner of slot to bottom-left corner of labware",
       "required": ["x", "y", "z"],
       "properties": {
         "x": {"type": "number"},
@@ -191,12 +191,21 @@
           "properties": {
             "depth": {"$ref": "#/definitions/positiveNumber"},
             "x": {
-              "description": "XYZ calculated from bottom-left corner of slot to top-center of the well",
+              "description": "X location of well in reference to bottom-left of labware",
               "$ref": "#/definitions/positiveNumber"
             },
-            "y": {"$ref": "#/definitions/positiveNumber"},
-            "z": {"$ref": "#/definitions/positiveNumber"},
-            "totalLiquidVolume": {"$ref": "#/definitions/positiveNumber"},
+            "y": {
+              "description": "Y location of well in reference to bottom-left of labware",
+              "$ref": "#/definitions/positiveNumber"
+            },
+            "z": {
+              "description": "Z location of well in reference to bottom-left of labware",
+              "$ref": "#/definitions/positiveNumber"
+            },
+            "totalLiquidVolume": {
+              "description": "Total well, tube, or tip volume in microliters",
+              "$ref": "#/definitions/positiveNumber"
+            },
             "width": {"$ref": "#/definitions/positiveNumber"},
             "length": {"$ref": "#/definitions/positiveNumber"},
             "diameter": {"$ref": "#/definitions/positiveNumber"},
