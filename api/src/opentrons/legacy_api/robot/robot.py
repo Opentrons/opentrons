@@ -16,7 +16,8 @@ from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as fflags
 from opentrons.config.robot_configs import load
 from opentrons.legacy_api import containers, modules
-from opentrons.legacy_api.containers import Container, load_new_labware
+from opentrons.legacy_api.containers import Container, load_new_labware,\
+    save_new_offsets
 
 from .mover import Mover
 from opentrons.config import pipette_config
@@ -52,6 +53,8 @@ def _setup_container(container_name):
             f"Trying to load container {container_name} via {meth.__name__}")
         try:
             container = meth(container_name)
+            if meth.__name__ == '_load_weird_container':
+                container.properties['type'] = container_name
             log.info(f"Loaded {container_name} from {meth.__name__}")
             break
         except (ValueError, KeyError):
@@ -59,13 +62,12 @@ def _setup_container(container_name):
     else:
         raise KeyError(f"Unknown labware {container_name}")
 
-    container.properties['type'] = container_name
+
     container_x, container_y, container_z = container._coordinates
 
-    if not fflags.split_labware_definitions():
-        # infer z from height
-        if container_z == 0 and 'height' in container[0].properties:
-            container_z = container[0].properties['height']
+    # infer z from height
+    if container_z == 0 and 'height' in container[0].properties:
+        container_z = container[0].properties['height']
 
     from opentrons.util.vector import Vector
     container._coordinates = Vector(
@@ -810,8 +812,7 @@ class Robot(CommandPublisher):
         for well in container:
             center_x, center_y, center_z = well.top()[1]
             offset_x, offset_y, offset_z = well._coordinates
-            if not fflags.split_labware_definitions():
-                center_z = 0
+            center_z = 0
             self.poses = pose_tracker.add(
                 self.poses,
                 well,
@@ -981,14 +982,11 @@ class Robot(CommandPublisher):
             dst=container.parent) + delta
 
         pose_tree = pose_tracker.update(pose_tree, container, new_coordinates)
+        container._coordinates = container._coordinates + delta
 
-        if fflags.split_labware_definitions():
-            for well in container.wells():
-                well._coordinates = well._coordinates + delta
-        else:
-            container._coordinates = container._coordinates + delta
-
-        if save and new_container_name:
+        if save and container.properties.get('otId'):
+            save_new_offsets(container.properties['otId'], delta)
+        elif save and new_container_name:
             database.save_new_container(container, new_container_name)
         elif save:
             database.overwrite_container(container)

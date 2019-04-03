@@ -2,6 +2,28 @@ import numbers
 
 from opentrons.util.vector import Vector
 
+LABWARE_MAP = {
+    'biorad_96_wellplate_pcr_200_ul': 'biorad-hardshell-96-PCR',
+    'corning_12_wellplate_6.9_ml': '12-well-plate',
+    'corning_24_wellplate_3.4_ml': '24-well-plate',
+    'corning_384_wellplate_112_ul':	'384-plate',
+    'corning_48_wellplate_1.6_ml': '48-well-plate',
+    'corning_6_wellplate_16.8_ml': '6-well-plate',
+    'generic_96_wellplate_380_ul': '96-flat',
+    'opentrons_15_tuberack_15_ml_falcon': 'opentrons-tuberack-15ml',
+    'opentrons_24_aluminum_tuberack_2_ml': 'opentrons-aluminum-block-2ml-eppendorf',
+    'opentrons_24_tuberack_1.5_ml_eppendorf': 'opentrons-tuberack-1.5ml-eppendorf',
+    'opentrons_24_tuberack_2_ml_eppendorf':	'opentrons-tuberack-2ml-eppendorf',
+    'opentrons_24_tuberack_2_ml_screwcap':	'opentrons-tuberack-2ml-screwcap',
+    'opentrons_6_tuberack_50_ml_falcon': 'opentrons-tuberack-50ml',
+    'opentrons_6x15_ml_4x50_ml_tuberack': 'opentrons-tuberack-15_50ml',
+    'opentrons_96_aluminum_biorad_plate_200_ul': 'opentrons-aluminum-block-96-PCR-plate',
+    'opentrons_96_aluminum_tuberack_200_ul': 'opentrons-aluminum-block-PCR-strips-200ul',
+    'opentrons_96_tiprack_1000_ul':	'tiprack-1000ul',
+    'opentrons_96_tiprack_10_ul': 'tiprack-10ul',
+    'opentrons_96_tiprack_300_ul': 'opentrons-tiprack-300ul',
+    'usa_scientific_12_trough_22_ml': 'trough-12row'
+}
 
 def is_number(obj):
     return isinstance(obj, numbers.Number)

@@ -1,8 +1,11 @@
 from collections import OrderedDict
 import itertools
 import logging
+import json
+from opentrons.config import CONFIG
 from opentrons.data_storage import database
 from opentrons.util.vector import Vector
+from opentrons.types import Point
 from .placeable import (
     Deck,
     Slot,
@@ -149,7 +152,7 @@ def save_custom_container(data):
         "labware, please use opentrons.containers.create()")
 
 
-def _load_new_well(well_data):
+def _load_new_well(well_data, saved_offset):
     props = {
         'depth': well_data['depth'],
         'total-liquid-volume': well_data['totalLiquidVolume'],
@@ -163,9 +166,30 @@ def _load_new_well(well_data):
         raise ValueError(
             f"Bad definition for well shape: {well_data['shape']}")
     well = Well(properties=props)
-    return (well, (well_data['x'] - well.x_size()/2,
-                   well_data['y'] - well.y_size()/2,
-                   well_data['z']))
+    return (well, (well_data['x'] - well.x_size()/2 + saved_offset.x,
+                   well_data['y'] - well.y_size()/2 + saved_offset.y,
+                   well_data['z'] + saved_offset.z))
+
+def _look_up_offsets(otId):
+    calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
+    labware_offset_path = calibration_path/'{}.json'.format(otId)
+    if labware_offset_path.exists():
+        calibration_data = _read_file(str(labware_offset_path))
+        offset_array = calibration_data['default']['offset']
+        offset = Point(x=offset_array[0], y=offset_array[1], z=offset_array[2])
+    else:
+        return Point(x=0, y=0, z=0)
+
+
+def save_new_offsets(otId, delta):
+    calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
+    if not calibration_path.exists():
+        calibration_path.mkdir(parents=True, exist_ok=True)
+    labware_offset_path = calibration_path/'{}.json'.format(otId)
+    calibration_data = new_labware._helper_offset_data_format(
+        str(labware_offset_path), delta)
+    with labware_offset_path.open('w') as f:
+        json.dump(calibration_data, f)
 
 
 def load_new_labware(container_name):
@@ -174,10 +198,16 @@ def load_new_labware(container_name):
     :raises KeyError: If the labware name is not found
     """
     defn = new_labware.load_definition_by_name(container_name)
+    id = defn['otId']
+    _look_up_offsets(id)
     container = Container()
-    container.properties['type'] = container_name
+    try:
+        container.properties['type'] = helpers.LABWARE_MAP[container_name]
+        container.properties['otId'] = id
+    except KeyError:
+        container.properties['type'] = container_name
     container._coordinates = Vector(defn['cornerOffsetFromSlot'])
     for well_name in itertools.chain(*defn['ordering']):
-        well_obj, well_pos = _load_new_well(defn['wells'][well_name])
+        well_obj, well_pos = _load_new_well(defn['wells'][well_name], saved_offset)
         container.add(well_obj, well_name, well_pos)
     return container
