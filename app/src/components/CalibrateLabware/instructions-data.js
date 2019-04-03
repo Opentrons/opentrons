@@ -244,7 +244,7 @@ function getTypeKey (props: LabwareCalibrationProps) {
     typeKey = 'tiprack'
   } else if (type.includes('trough')) {
     typeKey = 'trough'
-  } else if (type.includes('tube-rack')) {
+  } else if (type.includes('tube') || type.includes('vial')) {
     typeKey = 'tuberack'
   } else if (type.includes('384')) {
     typeKey = 'plate384'
