@@ -239,20 +239,19 @@ export const getUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSel
 )
 
 // TODO: Brian&Ian 2019-04-02 this is TEMPORARY, should be removed once legacySteps reducer is removed
-const getLegacyStep = (state: BaseState, stepId: StepIdType) => {
-  return state.stepForms.legacySteps[stepId]
+const getLegacyStepWithId = (state: BaseState, props: {stepId: StepIdType}) => {
+  return state.stepForms.legacySteps[props.stepId]
 }
 
-const getStepForm = (state: BaseState, stepId: StepIdType) => {
-  return state.stepForms.savedStepForms[stepId]
+const getStepFormWithId = (state: BaseState, props: {stepId: StepIdType}) => {
+  return state.stepForms.savedStepForms[props.stepId]
 }
 
-export const makeGetArgsAndErrors = () => {
+export const makeGetArgsAndErrorsWithId = () => {
   return createSelector(
-    getStepForm,
+    getStepFormWithId,
     getHydrationContext,
     (stepForm, contextualState) => {
-      console.log('DOING THE WORK args and errors', stepForm && stepForm.id)
       const hydratedForm = _getHydratedForm(stepForm, contextualState)
       const errors = _getFormAndFieldErrorsFromHydratedForm(hydratedForm)
       return isEmpty(errors) ? {stepArgs: stepFormToArgs(hydratedForm)} : {errors, stepArgs: null}
@@ -262,12 +261,11 @@ export const makeGetArgsAndErrors = () => {
 
 // TODO: Brian&Ian 2019-04-02 this is TEMPORARY, should be removed once legacySteps reducer is removed
 // only need it because stepType should exist evergreen outside of legacySteps but doesn't yet
-export const makeGetStep = () => {
+export const makeGetStepWithId = () => {
   return createSelector(
-    getStepForm,
-    getLegacyStep,
+    getStepFormWithId,
+    getLegacyStepWithId,
     (stepForm, legacyStep) => {
-      console.log('DOING THE GET STEP ', stepForm && stepForm.id)
       return ({
         ...legacyStep,
         formData: stepForm,

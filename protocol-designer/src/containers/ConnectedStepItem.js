@@ -41,14 +41,14 @@ type SP = {|
 type DP = $Diff<$Diff<Props, SP>, OP>
 
 const makeMapStateToProps = () => {
-  const getArgsAndErrors = stepFormSelectors.makeGetArgsAndErrors()
-  const getStep = stepFormSelectors.makeGetStep()
+  const getArgsAndErrors = stepFormSelectors.makeGetArgsAndErrorsWithId()
+  const getStep = stepFormSelectors.makeGetStepWithId()
 
   return (state: BaseState, ownProps: OP): SP => {
     const {stepId} = ownProps
 
-    const argsAndErrors = getArgsAndErrors(state, stepId)
-    const step = getStep(state, stepId)
+    const argsAndErrors = getArgsAndErrors(state, {stepId})
+    const step = getStep(state, {stepId})
 
     const formAndFieldErrors = argsAndErrors[stepId] && argsAndErrors[stepId].errors
     const hasError = fileDataSelectors.getErrorStepId(state) === stepId || !isEmpty(formAndFieldErrors)
