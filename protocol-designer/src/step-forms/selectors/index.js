@@ -238,6 +238,44 @@ export const getUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSel
   }
 )
 
+// TODO: Brian&Ian 2019-04-02 this is TEMPORARY, should be removed once legacySteps reducer is removed
+const getLegacyStepWithId = (state: BaseState, props: {stepId: StepIdType}) => {
+  return state.stepForms.legacySteps[props.stepId]
+}
+
+const getStepFormWithId = (state: BaseState, props: {stepId: StepIdType}) => {
+  return state.stepForms.savedStepForms[props.stepId]
+}
+
+export const makeGetArgsAndErrorsWithId = () => {
+  return createSelector(
+    getStepFormWithId,
+    getHydrationContext,
+    (stepForm, contextualState) => {
+      const hydratedForm = _getHydratedForm(stepForm, contextualState)
+      const errors = _getFormAndFieldErrorsFromHydratedForm(hydratedForm)
+      return isEmpty(errors) ? {stepArgs: stepFormToArgs(hydratedForm)} : {errors, stepArgs: null}
+    }
+  )
+}
+
+// TODO: Brian&Ian 2019-04-02 this is TEMPORARY, should be removed once legacySteps reducer is removed
+// only need it because stepType should exist evergreen outside of legacySteps but doesn't yet
+export const makeGetStepWithId = () => {
+  return createSelector(
+    getStepFormWithId,
+    getLegacyStepWithId,
+    (stepForm, legacyStep) => {
+      return ({
+        ...legacyStep,
+        formData: stepForm,
+        title: stepForm ? stepForm.stepName : i18n.t(`application.stepType.${legacyStep.stepType}`),
+        description: stepForm ? stepForm.stepDetails : null,
+      })
+    }
+  )
+}
+
 export const getArgsAndErrorsByStepId: Selector<{[StepIdType]: StepArgsAndErrors}> = createSelector(
   getOrderedSavedForms,
   getHydrationContext,
@@ -257,6 +295,8 @@ export const getArgsAndErrorsByStepId: Selector<{[StepIdType]: StepArgsAndErrors
   }
 )
 
+// TODO: BC&IL 2019-04-02 this is being recomputed every time any field in unsaved forms is changed
+// this should only be computed once when a form is opened
 export const getIsNewStepForm = createSelector(
   getUnsavedForm,
   getSavedStepForms,
