@@ -14,17 +14,21 @@ export default function IpField (props: Props) {
     form: {submitForm, dirty},
     inputRef,
   } = props
+
   return (
     <div className={styles.ip_field_group}>
       <input
         {...field}
-        onBlur={submitForm}
+        onBlur={event => {
+          field.onBlur(event)
+          if (field.value) submitForm()
+        }}
         className={styles.ip_field}
         type="text"
         ref={inputRef}
       />
       <IconButton
-        className={styles.ip_button}
+        className={styles.add_ip_button}
         name="plus"
         type="submit"
         disabled={!dirty}

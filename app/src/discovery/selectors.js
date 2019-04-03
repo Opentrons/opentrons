@@ -42,6 +42,7 @@ type GetConnectableRobots = Selector<State, void, Array<Robot>>
 type GetReachableRobots = Selector<State, void, Array<ReachableRobot>>
 type GetUnreachableRobots = Selector<State, void, Array<UnreachableRobot>>
 type GetAllRobots = Selector<State, void, Array<AnyRobot>>
+type GetLiveRobots = Selector<State, void, Array<Robot | ReachableRobot>>
 type GetConnectedRobot = Selector<State, void, ?Robot>
 
 export const CONNECTABLE: ConnectableStatus = 'connectable'
@@ -125,6 +126,12 @@ export const getAllRobots: GetAllRobots = createSelector(
   getConnectableRobots,
   getReachableRobots,
   getUnreachableRobots,
+  concat
+)
+
+export const getLiveRobots: GetLiveRobots = createSelector(
+  getConnectableRobots,
+  getReachableRobots,
   concat
 )
 
