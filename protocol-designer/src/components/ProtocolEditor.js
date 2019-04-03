@@ -15,16 +15,11 @@ import {PortalRoot as TopPortalRoot} from './portals/TopPortal'
 import {SCROLL_ON_SELECT_STEP_CLASSNAME} from '../steplist/actions'
 import styles from './ProtocolEditor.css'
 
-const SelectorDebugger = process.env.NODE_ENV === 'development'
-  ? require('../containers/SelectorDebugger').default
-  : () => null
-
 const showGateModal = process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
 
 function ProtocolEditor () {
   return (
     <div>
-      <SelectorDebugger />
       <TopPortalRoot />
       {showGateModal ? <GateModal /> : null}
       <div className={styles.wrapper}>

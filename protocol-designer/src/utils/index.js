@@ -5,25 +5,6 @@ import type {Wells} from '../labware-ingred/types'
 
 export const registerSelectors = (process.env.NODE_ENV === 'development') ? require('reselect-tools').registerSelectors : (a: any) => {}
 
-export type FormConnector<F> = (accessor: $Keys<F>) =>
-  // $FlowFixMe: Missing type annotation for `$Values`
-  {onChange: (e: SyntheticInputEvent<*>) => mixed, value: $Values<F>}
-
-export type FormConnectorFactory<F> = (
-  handleChange: (accessor: F) => (e: SyntheticInputEvent<*>) => mixed,
-  formData: F
-) => FormConnector<F>
-
-export const formConnectorFactory = (
-  handleChange: (accessor: string) => (e: SyntheticInputEvent<*>) => mixed,
-  formData: Object
-): FormConnector<*> => (accessor: string) => ({
-  // Uses single accessor string to pass onChange & value into form fields
-  // TODO Ian 2018-02-07 type error when accessor not valid ('string' is too general)
-  onChange: handleChange(accessor),
-  value: formData[accessor] || '',
-})
-
 export const uuid: () => string = uuidv1
 
 // Collision detection for SelectionRect / SelectableLabware
