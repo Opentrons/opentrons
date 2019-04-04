@@ -33,7 +33,13 @@ async def test_server_boot(loop, test_client):
         'updateServerVersion': update_server_version,
         'apiServerVersion': 'not available',
         'smoothieVersion': 'not available',
-        'systemVersion': 'unknown'
+        'systemVersion': 'unknown',
+        'capabilities': {
+            'buildroot-migration': '/server/update/migration/begin',
+            'bootstrap': '/server/update/bootstrap',
+            'balena-update': '/server/update',
+            'restart': '/server/update/restart'
+        }
     }
 
     resp = await cli.get('/server/update/health')

@@ -7,6 +7,8 @@ from functools import partial
 from . import control, install
 from . import endpoints as bootstrap_endp
 
+import otupdate.migration
+
 log = logging.getLogger(__name__)
 
 
@@ -69,4 +71,5 @@ def get_app(
         web.post('/server/update/bootstrap', bootstrap_fn),
         web.post('/server/restart', control.restart)
     ])
+    app = otupdate.migration.add_endpoints(app, device_name)
     return app

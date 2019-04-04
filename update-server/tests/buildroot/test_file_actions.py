@@ -15,7 +15,9 @@ from otupdate.buildroot import file_actions
 
 def test_unzip(downloaded_update_file):
     cb = mock.Mock()
-    paths, sizes = file_actions.unzip_update(downloaded_update_file, cb, True)
+    paths, sizes = file_actions.unzip_update(downloaded_update_file, cb,
+                                             file_actions.UPDATE_FILES,
+                                             file_actions.UPDATE_FILES)
     assert sorted(list(paths.keys())) == sorted(file_actions.UPDATE_FILES)
     for filename, path in paths.items():
         assert os.path.dirname(path) == os.path.dirname(downloaded_update_file)
@@ -38,27 +40,36 @@ def test_unzip(downloaded_update_file):
 def test_unzip_requires_rootfs(downloaded_update_file):
     cb = mock.Mock()
     with pytest.raises(file_actions.FileMissing):
-        file_actions.unzip_update(downloaded_update_file, cb, True)
+        file_actions.unzip_update(downloaded_update_file, cb,
+                                  file_actions.UPDATE_FILES,
+                                  file_actions.UPDATE_FILES)
 
 
 @pytest.mark.exclude_rootfs_ext4_hash
 def test_unzip_requires_hash(downloaded_update_file):
     cb = mock.Mock()
     with pytest.raises(file_actions.FileMissing):
-        file_actions.unzip_update(downloaded_update_file, cb, True)
+        file_actions.unzip_update(downloaded_update_file, cb,
+                                  file_actions.UPDATE_FILES,
+                                  file_actions.UPDATE_FILES)
 
 
 @pytest.mark.exclude_rootfs_ext4_hash_sig
 def test_unzip_does_not_require_sig(downloaded_update_file):
     cb = mock.Mock()
-    file_actions.unzip_update(downloaded_update_file, cb, False)
+    file_actions.unzip_update(downloaded_update_file, cb,
+                              file_actions.UPDATE_FILES,
+                              [file_actions.ROOTFS_NAME,
+                               file_actions.ROOTFS_HASH_NAME])
 
 
 @pytest.mark.exclude_rootfs_ext4_hash_sig
 def test_unzip_requires_sig(downloaded_update_file):
     cb = mock.Mock()
     with pytest.raises(file_actions.FileMissing):
-        file_actions.unzip_update(downloaded_update_file, cb, True)
+        file_actions.unzip_update(downloaded_update_file, cb,
+                                  file_actions.UPDATE_FILES,
+                                  file_actions.UPDATE_FILES)
 
 
 def test_hash(extracted_update_file):

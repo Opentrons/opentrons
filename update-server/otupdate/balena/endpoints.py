@@ -18,7 +18,11 @@ def build_health_endpoint(
                 'updateServerVersion': update_server_version,
                 'apiServerVersion': api_server_version,
                 'smoothieVersion': smoothie_version,
-                'systemVersion': system_version
+                'systemVersion': system_version,
+                'capabilities': {'buildroot-migration': '/server/update/migration/begin',
+                                 'bootstrap': '/server/update/bootstrap',
+                                 'balena-update': '/server/update',
+                                 'restart': '/server/update/restart'}
             },
             headers={'Access-Control-Allow-Origin': '*'}
         )

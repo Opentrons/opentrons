@@ -28,6 +28,7 @@ async def log_error_middleware(request, handler):
 
 
 def get_version(version_file: str) -> Mapping[str, str]:
+    LOG.debug(f"Loading version file {version_file}")
     return json.load(open(version_file, 'r'))
 
 
@@ -40,8 +41,7 @@ def get_app(system_version_file: str = None,
     The params can be overloaded for testing.
     """
     if not system_version_file:
-        system_version_file = constants.BR_BUILTIN_VERSION_FILE
-    LOG.debug(f"Using version file {system_version_file}")
+        system_version_file = BR_BUILTIN_VERSION_FILE
 
     version = get_version(system_version_file)
     device_name = name_override or gethostname()

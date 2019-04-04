@@ -96,6 +96,7 @@ test: test-py test-js
 test-py:
 	$(MAKE) -C api test
 	$(MAKE) -C update-server test tests=tests/buildroot/
+	$(MAKE) -C update-server test tests=tests/migration/
 
 .PHONY: test-js
 test-js:
