@@ -73,10 +73,6 @@ class FileMissing(ValueError):
         return self.message
 
 
-def gpg_prefix():
-    return ['gpg', '--batch']
-
-
 def unzip_update(filepath: str,
                  progress_callback: Callable[[float], None],
                  require_sig: bool = True,

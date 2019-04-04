@@ -21,7 +21,7 @@ pipenv_opts += $(and $(CI),--keep-outdated --clear)
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/opentrons-$(shell $(python) ../python_build_utils.py api normalize_version)-py2.py3-none-any.whl
+wheel_file = dist/opentrons-$(shell $(python) ../scripts/python_build_utils.py api normalize_version)-py2.py3-none-any.whl
 wheel_pattern := dist/opentrons-%-py2.py3-none-any.whl
 
 # These variables can be overriden when make is invoked to customize the

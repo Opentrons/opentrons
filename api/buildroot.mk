@@ -19,7 +19,7 @@ PYTHON_OPENTRONS_API_SUBDIR = api
 PYTHON_OPENTRONS_API_POST_INSTALL_TARGET_HOOKS = PYTHON_OPENTRONS_API_INSTALL_VERSION
 
 define OTAPI_DUMP_BR_VERSION
-	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/python_build_utils.py api dump_br_version)
+	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py api dump_br_version)
 endef
 
 define PYTHON_OPENTRONS_API_INSTALL_VERSION

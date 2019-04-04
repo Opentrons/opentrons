@@ -12,9 +12,9 @@ HERE = os.path.dirname(__file__)
 
 pkg_jsons = {
     'api': os.path.join(
-        HERE, 'api', 'src', 'opentrons', 'package.json'),
+        HERE, '..', 'api', 'src', 'opentrons', 'package.json'),
     'update-server': os.path.join(
-        HERE, 'update-server', 'otupdate', 'package.json')
+        HERE, '..', 'update-server', 'otupdate', 'package.json')
 }
 
 
