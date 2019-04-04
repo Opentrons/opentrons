@@ -145,7 +145,7 @@
     "cornerOffsetFromSlot": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Distance from bottom-left corner of slot to bottom-left corner of labware",
+      "description": "Distance from left-front-bottom corner of slot to left-front-bottom corner of labware",
       "required": ["x", "y", "z"],
       "properties": {
         "x": {"type": "number"},
@@ -191,15 +191,15 @@
           "properties": {
             "depth": {"$ref": "#/definitions/positiveNumber"},
             "x": {
-              "description": "X location of well in reference to bottom-left of labware",
+              "description": "X location of center-top of well in reference to left-front-bottom of labware",
               "$ref": "#/definitions/positiveNumber"
             },
             "y": {
-              "description": "Y location of well in reference to bottom-left of labware",
+              "description": "Y location of center-top of well in reference to left-front-bottom of labware",
               "$ref": "#/definitions/positiveNumber"
             },
             "z": {
-              "description": "Z location of well in reference to bottom-left of labware",
+              "description": "Z location of center-top of well in reference to left-front-bottom of labware",
               "$ref": "#/definitions/positiveNumber"
             },
             "totalLiquidVolume": {
