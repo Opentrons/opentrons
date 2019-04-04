@@ -63,9 +63,15 @@ export default function LabwareRender (props: LabwareRenderProps) {
 }
 
 function Well (props: LabwareWellRenderProps) {
-  const {well, parameters} = props
-  const {x, y, shape, diameter, width, length} = well
+  const {well, parameters, cornerOffsetFromSlot} = props
+  const {shape, diameter, width, length} = well
   const {isTiprack} = parameters
+
+  // TODO(mc, 2019-04-04): cornerOffsetFromSlot is added to x and y because
+  //   labware render is currently in slot coordinate system; revisit this
+  //   decision when deck component refactor is in progress
+  const x = well.x + cornerOffsetFromSlot.x
+  const y = well.y + cornerOffsetFromSlot.y
 
   if (shape === 'circular' && diameter) {
     const radius = diameter / 2
