@@ -54,7 +54,7 @@ class LoadName extends React.Component<LoadNameProps, LoadNameState> {
     if (this.successTimeout) clearTimeout(this.successTimeout)
   }
 
-  onComponentWillUnmount () {
+  componentWillUnmount () {
     this.cleanupSuccessTimeout()
   }
 
