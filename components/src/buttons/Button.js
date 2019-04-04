@@ -62,6 +62,9 @@ export default function Button (props: ButtonProps) {
       onClick,
     }
 
+  // TODO(mc, 2019-04-02): hoverTooltipHandlers should probably be named more
+  // generically, and the Button component should probably be configured as a
+  // ref forwarder
   return (
     <Component {...props.hoverTooltipHandlers} {...buttonProps}>
       {props.iconName && <Icon name={props.iconName} className={styles.icon} />}
