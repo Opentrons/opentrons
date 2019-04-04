@@ -15,11 +15,6 @@ def short_fixed_trash():
     return get_setting_with_env_overload('shortFixedTrash')
 
 
-@lru_cache()
-def split_labware_definitions():
-    return get_setting_with_env_overload('splitLabwareDefinitions')
-
-
 def calibrate_to_bottom():
     return get_setting_with_env_overload('calibrateToBottom')
 
