@@ -15,6 +15,6 @@ const allLabware = glob
   .map(require)
   .filter(d => d.metadata.displayCategory !== 'trash')
 
-export function getAllDefinitions (): LabwareList {
-  return allLabware
-}
+export const getAllDefinitions = jest.fn<Array<void>, LabwareList>(
+  () => allLabware
+)

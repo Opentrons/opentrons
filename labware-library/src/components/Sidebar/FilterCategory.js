@@ -32,10 +32,10 @@ export default function FilterCategory (props: FilterCategoryProps) {
   return (
     <ul className={styles.filter_category}>
       {categories.map(c => (
-        <li key={c}>
+        <li key={c} className={styles.filter_category_item}>
           <Link
             to={buildFiltersUrl({...filters, category: c})}
-            className={cx(styles.filter_category_item, {
+            className={cx(styles.filter_category_link, {
               [styles.selected]: c === filters.category,
             })}
           >

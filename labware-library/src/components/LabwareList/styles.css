@@ -215,9 +215,21 @@ button.load_name_button {
   text-align: center;
 }
 
+.no_results {
+  @apply --font-header-dark;
+
+  margin-top: var(--spacing-8);
+  text-align: center;
+}
+
 @media (--medium) {
   .card {
     margin-top: 0;
+  }
+
+  .no_results {
+    /* shift left for perceived centering */
+    transform: translateX(calc(-1 * var(--spacing-7)));
   }
 }
 
@@ -232,5 +244,10 @@ button.load_name_button {
     &:nth-child(even) {
       margin-right: 0;
     }
+  }
+
+  .no_results {
+    /* increase shift on large for better perceived centering */
+    transform: translateX(calc(-2 * var(--spacing-7)));
   }
 }

@@ -7,6 +7,7 @@ import styles from './styles.css'
 import {getAllDefinitions} from '../../definitions'
 import {FILTER_OFF} from '../../filters'
 import LabwareCard from './LabwareCard'
+import NoResults from './NoResults'
 
 import type {FilterParams} from '../../types'
 
@@ -25,7 +26,9 @@ export default function LabwareList (props: LabwareListProps) {
       filterMatches(manufacturer, d.brand.brand)
   )
 
-  return (
+  return definitions.length === 0 ? (
+    <NoResults />
+  ) : (
     <ul className={styles.list}>
       {definitions.map(d => (
         <LabwareCard key={d.otId} definition={d} />
