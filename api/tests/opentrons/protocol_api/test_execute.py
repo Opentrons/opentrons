@@ -271,7 +271,7 @@ def test_dispatch_commands(monkeypatch, loop):
     cmd = []
     flow_rates = []
 
-    def mock_sleep(minutes=0, seconds=0):
+    def mock_sleep(minutes=0, seconds=0, msg=None):
         cmd.append(("sleep", seconds))
 
     def mock_aspirate(volume, location):
