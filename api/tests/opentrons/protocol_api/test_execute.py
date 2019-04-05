@@ -1,5 +1,5 @@
 import pytest
-
+import json
 from opentrons.types import Point
 from opentrons.protocol_api import execute, ProtocolContext
 
@@ -119,7 +119,7 @@ async def test_load_pipettes(loop, protocol_data):
 
 
 @pytest.mark.parametrize('command_type', ['aspirate', 'dispense'])
-def test_get_location_with_offset(loop, command_type):
+def test_get_location_with_offset_v1(loop, command_type):
     ctx = ProtocolContext(loop=loop)
     plate = ctx.load_labware_by_name("generic_96_wellplate_380_ul", 1)
     well = "B2"
@@ -140,10 +140,10 @@ def test_get_location_with_offset(loop, command_type):
             "well": well,
             "offsetFromBottomMm": offset
         }
-        offs = execute._get_bottom_offset(
+        offs = execute._get_bottom_offset_v1(
             command_type, command_params, default_values)
         assert offs == offset
-        result = execute._get_location_with_offset(
+        result = execute._get_location_with_offset_v1(
             loaded_labware, command_type, command_params, default_values)
         assert result.labware == plate.wells_by_index()[well]
         assert result.point\
@@ -155,16 +155,16 @@ def test_get_location_with_offset(loop, command_type):
     }
 
     # no command-specific offset, use default
-    result = execute._get_location_with_offset(
+    result = execute._get_location_with_offset_v1(
         loaded_labware, command_type, command_params, default_values)
     default = default_values['{}-mm-from-bottom'.format(command_type)]
-    assert execute._get_bottom_offset(
+    assert execute._get_bottom_offset_v1(
         command_type, command_params, default_values) == default
     assert result.point\
         == plate.wells_by_index()[well].bottom().point + Point(z=default)
 
 
-def test_load_labware(loop):
+def test_load_labware_v1(loop):
     ctx = ProtocolContext(loop=loop)
     data = {
         "labware": {
@@ -185,7 +185,7 @@ def test_load_labware(loop):
             },
         }
     }
-    loaded_labware = execute.load_labware_from_json(ctx, data)
+    loaded_labware = execute.load_labware_from_json_loadnames(ctx, data)
 
     # objects in loaded_labware should be same objs as labware objs in the deck
     assert loaded_labware['sourcePlateId'] == ctx.loaded_labwares[10]
@@ -196,7 +196,37 @@ def test_load_labware(loop):
     assert 'Test Plate' in str(loaded_labware['oldPlateId'])
 
 
-def test_load_labware_trash(loop):
+def test_load_labware_v2(loop):
+    ctx = ProtocolContext(loop=loop)
+    # trough def with arbitrary ID
+    data = {
+        "labwareDefinitions": {
+            "someTroughDef": json.loads("""{"ordering":[["A1"],["A2"],["A3"],["A4"],["A5"],["A6"],["A7"],["A8"],["A9"],["A10"],["A11"],["A12"]],"otId":"THIS IS A CUSTOM ID","deprecated":false,"metadata":{"displayName":"CUSTOM 12 Channel Trough","displayVolumeUnits":"mL","displayCategory":"trough"},"cornerOffsetFromSlot":{"x":0,"y":0.32,"z":0},"dimensions":{"overallLength":127.76,"overallWidth":85.8,"overallHeight":44.45},"parameters":{"format":"trough","isTiprack":false,"isMagneticModuleCompatible":false,"loadName":"usa_scientific_12_trough_22_ml","quirks":["centerMultichannelOnWells"]},"wells":{"A1":{"shape":"rectangular","depth":42.16,"length":8.33,"width":71.88,"totalLiquidVolume":22000,"x":13.94,"y":42.9,"z":2.29},"A2":{"shape":"rectangular","depth":42.16,"length":8.33,"width":71.88,"totalLiquidVolume":22000,"x":23.03,"y":42.9,"z":2.29},"A3":{"shape":"rectangular","depth":42.16,"length":8.33,"width":71.88,"totalLiquidVolume":22000,"x":32.12,"y":42.9,"z":2.29},"A4":{"shape":"rectangular","depth":42.16,"length":8.33,"width":71.88,"totalLiquidVolume":22000,"x":41.21,"y":42.9,"z":2.29},"A5":{"shape":"rectangular","depth":42.16,"length":8.33,"width":71.88,"totalLiquidVolume":22000,"x":50.3,"y":42.9,"z":2.29},"A6":{"shape":"rectangular","depth":42.16,"length":8.33,"width":71.88,"totalLiquidVolume":22000,"x":59.39,"y":42.9,"z":2.29},"A7":{"shape":"rectangular","depth":42.16,"length":8.33,"width":71.88,"totalLiquidVolume":22000,"x":68.48,"y":42.9,"z":2.29},"A8":{"shape":"rectangular","depth":42.16,"length":8.33,"width":71.88,"totalLiquidVolume":22000,"x":77.57,"y":42.9,"z":2.29},"A9":{"shape":"rectangular","depth":42.16,"length":8.33,"width":71.88,"totalLiquidVolume":22000,"x":86.66,"y":42.9,"z":2.29},"A10":{"shape":"rectangular","depth":42.16,"length":8.33,"width":71.88,"totalLiquidVolume":22000,"x":95.75,"y":42.9,"z":2.29},"A11":{"shape":"rectangular","depth":42.16,"length":8.33,"width":71.88,"totalLiquidVolume":22000,"x":104.84,"y":42.9,"z":2.29},"A12":{"shape":"rectangular","depth":42.16,"length":8.33,"width":71.88,"totalLiquidVolume":22000,"x":113.93,"y":42.9,"z":2.29}},"brand":{"brand":"USA Scientific","brandId":["1061-8150"]}}""")  # noqa
+        },
+        "labware": {
+            "sourcePlateId": {
+              "slot": "10",
+              "definitionId": "someTroughDef",
+              "displayName": "Source (Buffer)"
+            },
+            "destPlateId": {
+              "slot": "11",
+              "definitionId": "someTroughDef"
+            },
+        }
+    }
+    loaded_labware = execute.load_labware_from_json_defs(ctx, data)
+
+    # objects in loaded_labware should be same objs as labware objs in the deck
+    assert loaded_labware['sourcePlateId'] == ctx.loaded_labwares[10]
+    # use the displayName from protocol's labware.labwareId.displayName
+    assert 'Source (Buffer)' in str(loaded_labware['sourcePlateId'])
+    assert loaded_labware['destPlateId'] == ctx.loaded_labwares[11]
+    # use the metadata.displayName from embedded def
+    assert 'CUSTOM 12 Channel Trough' in str(loaded_labware['destPlateId'])
+
+
+def test_load_labware_trash_v1(loop):
     ctx = ProtocolContext(loop=loop)
     data = {
         "labware": {
@@ -206,18 +236,13 @@ def test_load_labware_trash(loop):
             }
         }
     }
-    result = execute.load_labware_from_json(ctx, data)
+    result = execute.load_labware_from_json_loadnames(ctx, data)
 
     assert result['someTrashId'] == ctx.fixed_trash
 
 
-def test_blank_protocol(loop):
-    # Check that this doesn’t throw an exception
-    ctx = ProtocolContext(loop=loop)
-    execute.run_protocol(protocol_json={}, context=ctx)
-
-
-protocol_data = {
+protocol_v1_data = {
+    "protocol-schema": "1.0.0",
     "default-values": {
         "aspirate-flow-rate": {
             "p300_single_v1": 101
@@ -266,7 +291,7 @@ protocol_data = {
 }
 
 
-def test_dispatch_commands(monkeypatch, loop):
+def test_dispatch_commands_v1(monkeypatch, loop):
     ctx = ProtocolContext(loop=loop)
     cmd = []
     flow_rates = []
@@ -283,7 +308,7 @@ def test_dispatch_commands(monkeypatch, loop):
     def mock_set_flow_rate(mount, aspirate=None, dispense=None):
         flow_rates.append((aspirate, dispense))
 
-    insts = execute.load_pipettes_from_json(ctx, protocol_data)
+    insts = execute.load_pipettes_from_json(ctx, protocol_v1_data)
 
     source_plate = ctx.load_labware_by_name('generic_96_wellplate_380_ul', '1')
     dest_plate = ctx.load_labware_by_name('generic_96_wellplate_380_ul', '2')
@@ -299,8 +324,8 @@ def test_dispatch_commands(monkeypatch, loop):
                         mock_set_flow_rate)
     monkeypatch.setattr(ctx, 'delay', mock_sleep)
 
-    execute.dispatch_json(
-        ctx, protocol_data, insts, loaded_labware)
+    execute.dispatch_json_v1(
+        ctx, protocol_v1_data, insts, loaded_labware)
 
     assert cmd == [
         ("aspirate", 5, source_plate.wells_by_index()['A1'].bottom()),

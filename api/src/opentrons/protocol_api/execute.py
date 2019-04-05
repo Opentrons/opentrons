@@ -120,9 +120,7 @@ def load_pipettes_from_json(
         model = props.get('model')
         mount = props.get('mount')
 
-        # TODO: Ian 2018-11-06 remove this fallback to 'model' when
-        # backwards-compatability for JSON protocols with versioned
-        # pipettes is dropped (next JSON protocol schema major bump)
+        # NOTE: 'name' is only used by v1 and v2 JSON protocols
         name = props.get('name')
         if not name:
             name = model.split('_v')[0]
@@ -134,9 +132,31 @@ def load_pipettes_from_json(
     return pipettes_by_id
 
 
-def load_labware_from_json(
+def load_labware_from_json_defs(
         ctx: ProtocolContext,
         protocol: Dict[Any, Any]) -> Dict[str, labware.Labware]:
+    protocol_labware = protocol.get('labware', {})
+    definitions = protocol.get('labwareDefinitions', {})
+    loaded_labware = {}
+
+    for labware_id, props in protocol_labware.items():
+        slot = props.get('slot')
+        definition = definitions.get(props.get('definitionId'))
+        loaded_labware[labware_id] = ctx.load_labware(
+            labware.Labware(
+                definition,
+                ctx.deck.position_for(slot),
+                props.get('displayName')
+            ),
+            slot)
+
+    return loaded_labware
+
+
+def load_labware_from_json_loadnames(
+        ctx: ProtocolContext,
+        protocol: Dict[Any, Any]) -> Dict[str, labware.Labware]:
+    # NOTE: this is only used by v1 and v2 JSON protocols
     data = protocol.get('labware', {})
     loaded_labware = {}
     bc = BCLabware(ctx)
@@ -171,9 +191,9 @@ def _get_well(loaded_labware: Dict[str, labware.Labware],
     return plate.wells_by_index()[well]
 
 
-def _get_bottom_offset(command_type: str,
-                       params: Dict[str, Any],
-                       default_values: Dict[str, float]) -> Optional[float]:
+def _get_bottom_offset_v1(command_type: str,
+                          params: Dict[str, Any],
+                          default_values: Dict[str, float]) -> Optional[float]:
     # default offset from bottom for aspirate/dispense commands
     offset_default = default_values.get(
         '{}-mm-from-bottom'.format(command_type))
@@ -185,17 +205,17 @@ def _get_bottom_offset(command_type: str,
     return offset_from_bottom
 
 
-def _get_location_with_offset(loaded_labware: Dict[str, labware.Labware],
-                              command_type: str,
-                              params: Dict[str, Any],
-                              default_values: Dict[str, float]) -> Location:
+def _get_location_with_offset_v1(loaded_labware: Dict[str, labware.Labware],
+                                 command_type: str,
+                                 params: Dict[str, Any],
+                                 default_values: Dict[str, float]) -> Location:
     well = _get_well(loaded_labware, params)
 
     # Never move to the bottom of the fixed trash
     if 'fixedTrash' in labware.quirks_from_any_parent(well):
         return well.top()
 
-    offset_from_bottom = _get_bottom_offset(
+    offset_from_bottom = _get_bottom_offset_v1(
         command_type, params, default_values)
 
     bot = well.bottom()
@@ -208,9 +228,27 @@ def _get_location_with_offset(loaded_labware: Dict[str, labware.Labware],
     return with_offs
 
 
+def _get_location_with_offset_v3(loaded_labware: Dict[str, labware.Labware],
+                                 command_type: str,
+                                 params: Dict[str, Any]) -> Location:
+    well = _get_well(loaded_labware, params)
+
+    # Never move to the bottom of the fixed trash
+    if 'fixedTrash' in labware.quirks_from_any_parent(well):
+        return well.top()
+
+    offset_from_bottom = params.get('offsetFromBottomMm')
+    if None is offset_from_bottom:
+        raise RuntimeError('"offsetFromBottomMm" is required for {}'
+                           .format(command_type))
+
+    bottom = well.bottom()
+    return bottom.move(Point(z=offset_from_bottom))
+
+
 # TODO (Ian 2018-08-22) once Pipette has more sensible way of managing
 # flow rate value (eg as an argument in aspirate/dispense fns), remove this
-def _set_flow_rate(
+def _set_flow_rate_v1(
         pipette_name, pipette, command_type, params, default_values):
     """
     Set flow rate in uL/mm, to value obtained from command's params,
@@ -244,10 +282,47 @@ def _set_flow_rate(
     }
 
 
-def dispatch_json(context: ProtocolContext,  # noqa(C901)
-                  protocol_data: Dict[Any, Any],
-                  instruments: Dict[str, InstrumentContext],
-                  labware: Dict[str, labware.Labware]):
+# TODO (Ian 2019-04-05) once Pipette commands allow flow rate as an
+# absolute value (not % value) as an argument in
+# aspirate/dispense/blowout/air_gap fns, remove this
+def _set_flow_rate_v3(
+        pipette_name, pipette, command_type, params):
+    """
+    Set flow rate in uL/mm, to value obtained from command's params.
+    """
+    flow_rate_param = params.get('flowRate')
+
+    pipette.flow_rate = {
+        'aspirate': flow_rate_param,
+        'dispense': flow_rate_param
+    }
+
+
+def get_protocol_schema_version(protocol_json: Dict[Any, Any]) -> int:
+    # v3 and above uses `schemaVersion: integer`
+    version = protocol_json.get('schemaVersion')
+    if None is not version:
+        return version
+    # v1 uses 1.x.x and v2 uses 2.x.x
+    legacyKebabVersion = protocol_json.get('protocol-schema')
+    # No minor/patch schemas ever were released,
+    # do not permit protocols with nonexistent schema versions to load
+    if (legacyKebabVersion == '1.0.0'):
+        return 1
+    if (legacyKebabVersion == '2.0.0'):
+        return 2
+    if (legacyKebabVersion is not None):
+        raise RuntimeError(('No such schema version: "{}". Did you mean ' +
+                           '"1.0.0" or "2.0.0"?').format(legacyKebabVersion))
+    raise RuntimeError(
+        'Could not determine schema version for protcol. ' +
+        'Make sure there is a version number under "schemaVersion"')
+
+
+def dispatch_json_v1(context: ProtocolContext,  # noqa(C901)
+                     protocol_data: Dict[Any, Any],
+                     instruments: Dict[str, InstrumentContext],
+                     loaded_labware: Dict[str, labware.Labware]):
     subprocedures = [
         p.get('subprocedure', [])
         for p in protocol_data.get('procedure', [])]
@@ -281,42 +356,42 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
                 context.delay(seconds=wait)
 
         elif command_type == 'blowout':
-            well = _get_well(labware, params)
+            well = _get_well(loaded_labware, params)
             pipette.blow_out(well)  # type: ignore
 
         elif command_type == 'pick-up-tip':
-            well = _get_well(labware, params)
+            well = _get_well(loaded_labware, params)
             pipette.pick_up_tip(well)  # type: ignore
 
         elif command_type == 'drop-tip':
-            well = _get_well(labware, params)
+            well = _get_well(loaded_labware, params)
             pipette.drop_tip(well)  # type: ignore
 
         elif command_type == 'aspirate':
-            location = _get_location_with_offset(
-                labware, 'aspirate', params, default_values)
+            location = _get_location_with_offset_v1(
+                loaded_labware, 'aspirate', params, default_values)
             volume = params['volume']
-            _set_flow_rate(
+            _set_flow_rate_v1(
                 pipette_name, pipette, command_type, params, default_values)
             pipette.aspirate(volume, location)  # type: ignore
 
         elif command_type == 'dispense':
-            location = _get_location_with_offset(
-                labware, 'dispense', params, default_values)
+            location = _get_location_with_offset_v1(
+                loaded_labware, 'dispense', params, default_values)
             volume = params['volume']
-            _set_flow_rate(
+            _set_flow_rate_v1(
                 pipette_name, pipette, command_type, params, default_values)
             pipette.dispense(volume, location)  # type: ignore
 
         elif command_type == 'touch-tip':
-            well = _get_well(labware, params)
-            offset = default_values.get('touch-tip-mm-from-top', -1)
-            pipette.touch_tip(location, v_offset=offset)  # type: ignore
+            well = _get_well(loaded_labware, params)
+            offset = default_values.get('touchTipMmFromTop', -1)
+            pipette.touch_tip(well, v_offset=offset)  # type: ignore
 
         elif command_type == 'move-to-slot':
             slot = params.get('slot')
             if slot not in [str(s+1) for s in range(12)]:
-                raise ValueError('Invalid "slot" for "move-to-slot": {}'
+                raise ValueError('Invalid "slot" for "moveToSlot": {}'
                                  .format(slot))
             slot_obj = context.deck.position_for(slot)
 
@@ -328,10 +403,102 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
 
             pipette.move_to(  # type: ignore
                 slot_obj.move(offsetPoint),
-                force_direct=params.get('force-direct'),
-                minimum_z_height=params.get('minimum-z-height'))
+                force_direct=params.get('forceDirect'),
+                minimum_z_height=params.get('minimumZHeight'))
         else:
-            MODULE_LOG.warning("Bad command type {}".format(command_type))
+            raise RuntimeError(
+                "Unsupported command type {}".format(command_type))
+
+
+def dispatch_json_v3(context: ProtocolContext,  # noqa(C901)
+                     protocol_data: Dict[Any, Any],
+                     instruments: Dict[str, InstrumentContext],
+                     loaded_labware: Dict[str, labware.Labware]):
+    commands = protocol_data.get('commands', [])
+
+    for command_item in commands:
+        command_type = command_item.get('command')
+        params = command_item.get('params', {})
+        pipette = instruments.get(params.get('pipette'))
+        protocol_pipette_data = protocol_data\
+            .get('pipettes', {})\
+            .get(params.get('pipette'), {})
+        pipette_name = protocol_pipette_data.get('name')
+
+        if (not pipette_name):
+            # TODO: Ian 2018-11-06 remove this fallback to 'model' when
+            # backwards-compatability for JSON protocols with versioned
+            # pipettes is dropped (next JSON protocol schema major bump)
+            pipette_name = protocol_pipette_data.get('model')
+
+        if command_type == 'delay':
+            wait = params.get('wait')
+            if wait is None:
+                raise ValueError('Delay cannot be null')
+            elif wait is True:
+                message = params.get('message', 'Pausing until user resumes')
+                context.pause(msg=message)
+            else:
+                context.delay(seconds=wait)
+
+        elif command_type == 'blowout':
+            well = _get_well(loaded_labware, params)
+            _set_flow_rate_v3(
+                pipette_name, pipette, command_type, params)
+            pipette.blow_out(well)  # type: ignore
+
+        elif command_type == 'pickUpTip':
+            well = _get_well(loaded_labware, params)
+            pipette.pick_up_tip(well)  # type: ignore
+
+        elif command_type == 'dropTip':
+            well = _get_well(loaded_labware, params)
+            pipette.drop_tip(well)  # type: ignore
+
+        elif command_type == 'aspirate':
+            location = _get_location_with_offset_v3(
+                loaded_labware, 'aspirate', params)
+            volume = params['volume']
+            _set_flow_rate_v3(
+                pipette_name, pipette, command_type, params)
+            pipette.aspirate(volume, location)  # type: ignore
+
+        elif command_type == 'dispense':
+            location = _get_location_with_offset_v3(
+                loaded_labware, 'dispense', params)
+            volume = params['volume']
+            _set_flow_rate_v3(
+                pipette_name, pipette, command_type, params)
+            pipette.dispense(volume, location)  # type: ignore
+
+        elif command_type == 'touchTip':
+            location = _get_location_with_offset_v3(
+                loaded_labware, 'dispense', params)
+            well = _get_well(loaded_labware, params)
+            # convert mmFromBottom to v_offset
+            v_offset = location.point.z - well.top().point.z
+            pipette.touch_tip(well, v_offset=v_offset)  # type: ignore
+
+        elif command_type == 'moveToSlot':
+            slot = params.get('slot')
+            if slot not in [str(s+1) for s in range(12)]:
+                raise ValueError('Invalid "slot" for "moveToSlot": {}'
+                                 .format(slot))
+            slot_obj = context.deck.position_for(slot)
+
+            offset = params.get('offset', {})
+            offsetPoint = Point(
+                offset.get('x', 0),
+                offset.get('y', 0),
+                offset.get('z', 0))
+
+            pipette.move_to(  # type: ignore
+                slot_obj.move(offsetPoint),
+                force_direct=params.get('forceDirect'),
+                minimum_z_height=params.get('minimumZHeight'))
+        else:
+            raise RuntimeError(
+                "Unsupported command type {}".format(command_type))
 
 
 def run_protocol(protocol_code: Any = None,
@@ -364,8 +531,18 @@ def run_protocol(protocol_code: Any = None,
     if None is not protocol_code:
         _run_python(protocol_code, true_context)
     elif None is not protocol_json:
-        lw = load_labware_from_json(true_context, protocol_json)
+        protocol_version = get_protocol_schema_version(protocol_json)
+        if (protocol_version) > 3:
+            raise RuntimeError('JSON Protocol version {} is not yet supported \
+                in this version of the API'.format(protocol_version))
+
         ins = load_pipettes_from_json(true_context, protocol_json)
-        dispatch_json(true_context, protocol_json, ins, lw)
+
+        if (protocol_version >= 3):
+            lw = load_labware_from_json_defs(true_context, protocol_json)
+            dispatch_json_v3(true_context, protocol_json, ins, lw)
+        else:
+            lw = load_labware_from_json_loadnames(true_context, protocol_json)
+            dispatch_json_v1(true_context, protocol_json, ins, lw)
     else:
         raise RuntimeError("run_protocol must have either code or json")
