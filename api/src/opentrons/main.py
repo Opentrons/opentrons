@@ -103,6 +103,10 @@ def log_init():
             'opentrons.hardware_control': {
                 'handlers': ['api', 'debug'],
                 'level': level_value
+            },
+            'opentrons.legacy_api.containers': {
+                'handlers': ['api'],
+                'level': level_value
             }
         }
     )

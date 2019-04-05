@@ -5,10 +5,8 @@ import re
 import functools
 from typing import List
 from collections import OrderedDict
-from itertools import chain
 
 from opentrons.util.vector import Vector
-from opentrons.config import feature_flags as ff
 
 
 SUPPORTED_MODULES = ['magdeck', 'tempdeck']
@@ -185,13 +183,6 @@ class Placeable(object):
         Returns an iterable built from this Placeable's children list
         """
         return iter(self.get_children_list())
-
-    def chain(self, *args):
-        """
-        Returns an itertools.chain built from this Placeable's children list
-        and appending any passed lists with *args
-        """
-        return itertools.chain(self.get_children_list(), *args)
 
     def cycle(self):
         """

@@ -6,9 +6,7 @@ from opentrons.legacy_api.containers.placeable\
     import Container, Well, Module, Placeable
 from opentrons.data_storage import database_queries as db_queries
 from opentrons.util.vector import Vector
-from opentrons.data_storage import labware_definitions as ldef
-from opentrons.data_storage import serializers
-from opentrons.config import feature_flags as fflags, CONFIG
+from opentrons.config import CONFIG
 import logging
 import os
 
@@ -144,24 +142,6 @@ def _get_db_version(db):
     version = db_queries.get_user_version(db)[0]
     return version
 
-
-def _calculate_offset(labware: Container) -> dict:
-    new_definition = serializers.labware_to_json(labware)
-    base_definition = ldef.load_json(
-        new_definition['metadata']['name'], with_offset=False)
-    first_well = list(base_definition['wells'].keys())[0]
-    base_well = base_definition['wells'][first_well]
-    new_well = new_definition['wells'][first_well]
-
-    slot_coords = labware.parent.coordinates()
-
-    x, y, z = [
-        new_well[axis] - base_well[axis] - slot_coords[axis]
-        for axis in 'xyz'
-    ]
-    log.debug("Calculated offset for {} in {}: {}".format(
-        labware.get_name(), labware.get_parent(), (x, y, z)))
-    return {'x': x, 'y': y, 'z': z}
 # ======================== END Private Functions ======================== #
 
 
@@ -173,20 +153,10 @@ def save_new_container(container: Container, container_name: str) -> bool:
     return res
 
 
-def save_labware(labware: Container, labware_name: str) -> bool:
-    definition = serializers.container_to_json(labware, labware_name)
-    return ldef.save_user_definition(definition)
-
-
 def load_container(container_name: str) -> Container:
     db_conn = sqlite3.connect(database_path)
     res = _load_container_object_from_db(db_conn, container_name)
     return res
-
-
-def load_labware(labware_name: str) -> Container:
-    jdef = ldef.load_json(labware_name)
-    return serializers.json_to_labware(jdef)
 
 
 def overwrite_container(container: Container) -> bool:
@@ -196,16 +166,6 @@ def overwrite_container(container: Container) -> bool:
     _update_container_object_in_db(db_conn, container)
     res = True  # old overwrite fn does not return anything
     return res
-
-
-def save_labware_offset(labware: Container, labware_name: str=None) -> bool:
-    if labware_name is None:
-        name = labware.get_name()
-    else:
-        name = labware_name
-    offset = _calculate_offset(labware)
-    log.debug("Saving offset {} for {}".format(offset, name))
-    return ldef.save_labware_offset(name, offset)
 
 
 def delete_container(container_name) -> bool:
@@ -219,10 +179,6 @@ def list_all_containers() -> List[str]:
     db_conn = sqlite3.connect(database_path)
     res = _list_all_containers_by_name(db_conn)
     return res
-
-
-def list_all_labware() -> List[str]:
-    return ldef.list_all_labware()
 
 
 def load_module(module_name: str) -> Container:

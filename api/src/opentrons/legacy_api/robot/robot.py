@@ -62,7 +62,6 @@ def _setup_container(container_name):
     else:
         raise KeyError(f"Unknown labware {container_name}")
 
-
     container_x, container_y, container_z = container._coordinates
 
     # infer z from height

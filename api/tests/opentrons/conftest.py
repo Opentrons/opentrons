@@ -9,7 +9,6 @@ import pathlib
 import re
 import shutil
 import tempfile
-import json
 from collections import namedtuple
 from functools import partial
 from uuid import uuid4 as uuid
@@ -25,7 +24,6 @@ from opentrons.deck_calibration import endpoints
 from opentrons import hardware_control as hc
 from opentrons.protocol_api import ProtocolContext
 from opentrons.types import Mount
-from opentrons.data_storage import labware_definitions as ldef
 
 
 Session = namedtuple(

@@ -1,4 +1,3 @@
-from functools import lru_cache
 import os
 from opentrons.config import advanced_settings as advs
 

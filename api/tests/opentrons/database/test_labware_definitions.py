@@ -2,8 +2,7 @@
 # TODO: Test `labware.create` against new schemas
 # TODO: Modify calibration file shape to fit new design
 import os
-import json
-import tempfile
+
 from opentrons.data_storage import database
 
 file_dir = os.path.abspath(os.path.dirname(__file__))

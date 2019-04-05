@@ -152,7 +152,7 @@ def save_custom_container(data):
         "labware, please use opentrons.containers.create()")
 
 
-def _load_new_well(well_data, saved_offset):
+def _load_new_well(well_data, saved_offset, format):
     props = {
         'depth': well_data['depth'],
         'total-liquid-volume': well_data['totalLiquidVolume'],
@@ -160,23 +160,32 @@ def _load_new_well(well_data, saved_offset):
     if well_data['shape'] == 'circular':
         props['diameter'] = well_data['diameter']
     elif well_data['shape'] == 'rectangular':
-        props['length'] = well_data['length']
-        props['width'] = well_data['width']
+        pass
     else:
         raise ValueError(
             f"Bad definition for well shape: {well_data['shape']}")
     well = Well(properties=props)
-    return (well, (well_data['x'] - well.x_size()/2 + saved_offset.x,
-                   well_data['y'] - well.y_size()/2 + saved_offset.y,
-                   well_data['z'] + saved_offset.z))
+
+    if format == 'trough':
+        well_tuple = (
+            well_data['x'] - well_data['length']/2 + saved_offset.x,
+            well_data['y'] + well_data['width']/2 + saved_offset.y,
+            well_data['z'] + saved_offset.z)
+    else:
+        well_tuple = (
+            well_data['x'] - well.x_size()/2 + saved_offset.x,
+            well_data['y'] - well.y_size()/2 + saved_offset.y,
+            well_data['z'] + saved_offset.z)
+    return (well, well_tuple)
+
 
 def _look_up_offsets(otId):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
     labware_offset_path = calibration_path/'{}.json'.format(otId)
     if labware_offset_path.exists():
-        calibration_data = _read_file(str(labware_offset_path))
+        calibration_data = new_labware._read_file(str(labware_offset_path))
         offset_array = calibration_data['default']['offset']
-        offset = Point(x=offset_array[0], y=offset_array[1], z=offset_array[2])
+        return Point(x=offset_array[0], y=offset_array[1], z=offset_array[2])
     else:
         return Point(x=0, y=0, z=0)
 
@@ -199,15 +208,16 @@ def load_new_labware(container_name):
     """
     defn = new_labware.load_definition_by_name(container_name)
     id = defn['otId']
-    _look_up_offsets(id)
+    saved_offset = _look_up_offsets(id)
     container = Container()
-    try:
-        container.properties['type'] = helpers.LABWARE_MAP[container_name]
-        container.properties['otId'] = id
-    except KeyError:
-        container.properties['type'] = container_name
+    log.info(f"Container name {container_name}")
+    container.properties['type'] = container_name
+    container.properties['otId'] = id
+    format = defn['parameters']['format']
+
     container._coordinates = Vector(defn['cornerOffsetFromSlot'])
     for well_name in itertools.chain(*defn['ordering']):
-        well_obj, well_pos = _load_new_well(defn['wells'][well_name], saved_offset)
+        well_obj, well_pos = _load_new_well(
+            defn['wells'][well_name], saved_offset, format)
         container.add(well_obj, well_name, well_pos)
     return container
