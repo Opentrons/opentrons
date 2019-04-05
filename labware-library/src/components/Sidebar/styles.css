@@ -72,13 +72,16 @@
 }
 
 .filter_category_item {
+  width: var(--size-third);
+  margin-bottom: var(--spacing-6);
+}
+
+.filter_category_link {
   @apply --font-default-dark;
   @apply --transition-color;
   @apply --clickable;
 
-  width: var(--size-third);
   line-height: var(--lh-title);
-  margin-bottom: var(--spacing-6);
   font-weight: var(--fw-semibold);
 
   &:hover,
