@@ -411,7 +411,7 @@ class ProtocolContext(CommandPublisher):
         pass
 
     @cmds.publish.both(command=cmds.delay)
-    def delay(self, seconds=0, minutes=0):
+    def delay(self, seconds=0, minutes=0, msg=None):
         """ Delay protocol execution for a specific amount of time.
 
         :param float seconds: A time to delay in seconds

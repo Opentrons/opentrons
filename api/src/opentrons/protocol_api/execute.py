@@ -272,13 +272,14 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
 
         if command_type == 'delay':
             wait = params.get('wait')
+            message = params.get('message')
             if wait is None:
                 raise ValueError('Delay cannot be null')
             elif wait is True:
-                message = params.get('message', 'Pausing until user resumes')
+                message = message or 'Pausing until user resumes'
                 context.pause(msg=message)
             else:
-                context.delay(seconds=wait)
+                context.delay(seconds=wait, msg=message)
 
         elif command_type == 'blowout':
             well = _get_well(labware, params)
