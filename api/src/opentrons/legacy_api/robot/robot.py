@@ -53,7 +53,7 @@ def _setup_container(container_name):
             f"Trying to load container {container_name} via {meth.__name__}")
         try:
             container = meth(container_name)
-            if meth.__name__ == '_load_weird_container':
+            if meth == _load_weird_container:
                 container.properties['type'] = container_name
             log.info(f"Loaded {container_name} from {meth.__name__}")
             break

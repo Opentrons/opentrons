@@ -207,12 +207,12 @@ def load_new_labware(container_name):
     :raises KeyError: If the labware name is not found
     """
     defn = new_labware.load_definition_by_name(container_name)
-    id = defn['otId']
-    saved_offset = _look_up_offsets(id)
+    labware_id = defn['otId']
+    saved_offset = _look_up_offsets(labware_id)
     container = Container()
     log.info(f"Container name {container_name}")
     container.properties['type'] = container_name
-    container.properties['otId'] = id
+    container.properties['otId'] = labware_id
     format = defn['parameters']['format']
 
     container._coordinates = Vector(defn['cornerOffsetFromSlot'])
