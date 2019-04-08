@@ -125,7 +125,7 @@ def get_protocol_schema_version(protocol_json: Dict[Any, Any]) -> int:
         raise RuntimeError(('No such schema version: "{}". Did you mean ' +
                            '"1.0.0" or "2.0.0"?').format(legacyKebabVersion))
     raise RuntimeError(
-        'Could not determine schema version for protcol. ' +
+        'Could not determine schema version for protocol. ' +
         'Make sure there is a version number under "schemaVersion"')
 
 
