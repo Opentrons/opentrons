@@ -33,7 +33,7 @@ def _get_well(loaded_labware: Dict[str, labware.Labware],
 # TODO (Ian 2019-04-05) once Pipette commands allow flow rate as an
 # absolute value (not % value) as an argument in
 # aspirate/dispense/blowout/air_gap fns, remove this
-def _set_flow_rate(pipette, command_type, params) -> None:
+def _set_flow_rate(pipette, params) -> None:
     """
     Set flow rate in uL/mm, to value obtained from command's params.
     """
@@ -70,7 +70,6 @@ def load_labware_from_json_defs(
 
 
 def _get_location_with_offset(loaded_labware: Dict[str, labware.Labware],
-                              command_type: str,
                               params: Dict[str, Any]) -> Location:
     well = _get_well(loaded_labware, params)
 
@@ -83,83 +82,117 @@ def _get_location_with_offset(loaded_labware: Dict[str, labware.Labware],
     return bottom.move(Point(z=offset_from_bottom))
 
 
-def dispatch_json(context: ProtocolContext,  # noqa(C901)
+def _delay(
+        context, protocol_data, instruments, loaded_labware, params) -> None:
+    wait = params['wait']
+    if wait is None or wait is False:
+        raise ValueError('Delay must be true, or a number')
+    elif wait is True:
+        message = params.get('message', 'Pausing until user resumes')
+        context.pause(msg=message)
+    else:
+        context.delay(seconds=wait)
+
+
+def _blowout(
+        context, protocol_data, instruments, loaded_labware, params) -> None:
+    pipette_id = params['pipette']
+    pipette = instruments[pipette_id]
+    well = _get_well(loaded_labware, params)
+    _set_flow_rate(pipette, params)
+    pipette.blow_out(well)
+
+
+def _pick_up_tip(
+        context, protocol_data, instruments, loaded_labware, params) -> None:
+    pipette_id = params['pipette']
+    pipette = instruments[pipette_id]
+    well = _get_well(loaded_labware, params)
+    pipette.pick_up_tip(well)
+
+
+def _drop_tip(
+        context, protocol_data, instruments, loaded_labware, params) -> None:
+    pipette_id = params['pipette']
+    pipette = instruments[pipette_id]
+    well = _get_well(loaded_labware, params)
+    pipette.drop_tip(well)
+
+
+def _aspirate(
+        context, protocol_data, instruments, loaded_labware, params) -> None:
+    pipette_id = params['pipette']
+    pipette = instruments[pipette_id]
+    location = _get_location_with_offset(loaded_labware, params)
+    volume = params['volume']
+    _set_flow_rate(pipette, params)
+    pipette.aspirate(volume, location)
+
+
+def _dispense(
+        context, protocol_data, instruments, loaded_labware, params) -> None:
+    pipette_id = params['pipette']
+    pipette = instruments[pipette_id]
+    location = _get_location_with_offset(loaded_labware, params)
+    volume = params['volume']
+    _set_flow_rate(pipette, params)
+    pipette.dispense(volume, location)
+
+
+def _touch_tip(
+        context, protocol_data, instruments, loaded_labware, params) -> None:
+    pipette_id = params['pipette']
+    pipette = instruments[pipette_id]
+    location = _get_location_with_offset(loaded_labware, params)
+    well = _get_well(loaded_labware, params)
+    # convert mmFromBottom to v_offset
+    v_offset = location.point.z - well.top().point.z
+    pipette.touch_tip(well, v_offset=v_offset)
+
+
+def _move_to_slot(
+        context, protocol_data, instruments, loaded_labware, params) -> None:
+    pipette_id = params['pipette']
+    pipette = instruments[pipette_id]
+    slot = params['slot']
+    if slot not in [str(s+1) for s in range(12)]:
+        raise ValueError('Invalid "slot" for "moveToSlot": {}'
+                         .format(slot))
+    slot_obj = context.deck.position_for(slot)
+
+    offset = params.get('offset', {})
+    offsetPoint = Point(
+        offset.get('x', 0),
+        offset.get('y', 0),
+        offset.get('z', 0))
+
+    pipette.move_to(
+        slot_obj.move(offsetPoint),
+        force_direct=params.get('forceDirect'),
+        minimum_z_height=params.get('minimumZHeight'))
+
+
+def dispatch_json(context: ProtocolContext,
                   protocol_data: Dict[Any, Any],
                   instruments: Dict[str, InstrumentContext],
                   loaded_labware: Dict[str, labware.Labware]) -> None:
     commands = protocol_data['commands']
-
+    dispatcher_map = {
+        "delay": _delay,
+        "blowout": _blowout,
+        "pickUpTip": _pick_up_tip,
+        "dropTip": _drop_tip,
+        "aspirate": _aspirate,
+        "dispense": _dispense,
+        "touchTip": _touch_tip,
+        "moveToSlot": _move_to_slot
+    }
     for command_item in commands:
         command_type = command_item['command']
         params = command_item['params']
 
-        # all commands but 'delay' have 'pipette' param
-        if command_type != 'delay':
-            pipette_id = params['pipette']
-            pipette = instruments[pipette_id]
-
-        if command_type == 'delay':
-            wait = params['wait']
-            if wait is None:
-                raise ValueError('Delay cannot be null')
-            elif wait is True:
-                message = params.get('message', 'Pausing until user resumes')
-                context.pause(msg=message)
-            else:
-                context.delay(seconds=wait)
-
-        elif command_type == 'blowout':
-            well = _get_well(loaded_labware, params)
-            _set_flow_rate(pipette, command_type, params)
-            pipette.blow_out(well)
-
-        elif command_type == 'pickUpTip':
-            well = _get_well(loaded_labware, params)
-            pipette.pick_up_tip(well)
-
-        elif command_type == 'dropTip':
-            well = _get_well(loaded_labware, params)
-            pipette.drop_tip(well)
-
-        elif command_type == 'aspirate':
-            location = _get_location_with_offset(
-                loaded_labware, 'aspirate', params)
-            volume = params['volume']
-            _set_flow_rate(pipette, command_type, params)
-            pipette.aspirate(volume, location)
-
-        elif command_type == 'dispense':
-            location = _get_location_with_offset(
-                loaded_labware, 'dispense', params)
-            volume = params['volume']
-            _set_flow_rate(pipette, command_type, params)
-            pipette.dispense(volume, location)
-
-        elif command_type == 'touchTip':
-            location = _get_location_with_offset(
-                loaded_labware, 'dispense', params)
-            well = _get_well(loaded_labware, params)
-            # convert mmFromBottom to v_offset
-            v_offset = location.point.z - well.top().point.z
-            pipette.touch_tip(well, v_offset=v_offset)
-
-        elif command_type == 'moveToSlot':
-            slot = params['slot']
-            if slot not in [str(s+1) for s in range(12)]:
-                raise ValueError('Invalid "slot" for "moveToSlot": {}'
-                                 .format(slot))
-            slot_obj = context.deck.position_for(slot)
-
-            offset = params.get('offset', {})
-            offsetPoint = Point(
-                offset.get('x', 0),
-                offset.get('y', 0),
-                offset.get('z', 0))
-
-            pipette.move_to(
-                slot_obj.move(offsetPoint),
-                force_direct=params.get('forceDirect'),
-                minimum_z_height=params.get('minimumZHeight'))
-        else:
+        dispatcher = dispatcher_map[command_type]
+        if not dispatcher:
             raise RuntimeError(
                 "Unsupported command type {}".format(command_type))
+        dispatcher(context, protocol_data, instruments, loaded_labware, params)
