@@ -27,7 +27,7 @@ export default function InstrumentSettingsPage(props: Props) {
   return (
     <React.Fragment>
       <Page titleBarProps={titleBarProps}>
-        <InstrumentSettings {...robot} />
+        <InstrumentSettings robot={robot} />
       </Page>
       <Switch>
         <Route

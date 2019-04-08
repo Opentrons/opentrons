@@ -20,7 +20,9 @@ import type { State } from '../../types'
 import type { Robot } from '../../discovery'
 import type { Pipette } from '../../http-api-client'
 
-type OP = Robot
+type OP = {
+  robot: Robot,
+}
 
 type SP = {|
   inProgress: boolean,
@@ -50,14 +52,14 @@ function AttachedPipettesCard(props: Props) {
         <CardContentFlex>
           <InstrumentInfo
             mount="left"
-            name={props.name}
+            name={props.robot.name}
             {...props.left}
             onChangeClick={props.clearMove}
             showSettings={props.showSettings}
           />
           <InstrumentInfo
             mount="right"
-            name={props.name}
+            name={props.robot.name}
             {...props.right}
             onChangeClick={props.clearMove}
             showSettings={props.showSettings}
@@ -73,9 +75,9 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
   const getRobotPipetteConfigs = makeGetRobotPipetteConfigs()
 
   return (state, ownProps) => {
-    const { inProgress, response } = getRobotPipettes(state, ownProps)
+    const { inProgress, response } = getRobotPipettes(state, ownProps.robot)
     const { left, right } = response || { left: null, right: null }
-    const configCall = getRobotPipetteConfigs(state, ownProps)
+    const configCall = getRobotPipetteConfigs(state, ownProps.robot)
     return {
       inProgress,
       left,
@@ -89,8 +91,11 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   return {
     fetchPipettes: () =>
       dispatch(
-        chainActions(fetchPipettes(ownProps), fetchPipetteConfigs(ownProps))
+        chainActions(
+          fetchPipettes(ownProps.robot),
+          fetchPipetteConfigs(ownProps.robot)
+        )
       ),
-    clearMove: () => dispatch(clearMoveResponse(ownProps)),
+    clearMove: () => dispatch(clearMoveResponse(ownProps.robot)),
   }
 }

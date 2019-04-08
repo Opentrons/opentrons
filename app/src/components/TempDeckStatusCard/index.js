@@ -19,7 +19,7 @@ import StatusItem from './StatusItem'
 import type { State } from '../../types'
 import type {
   TempDeckModule,
-  FetchModuleDataResponse,
+  FetchTemperatureDataResponse,
 } from '../../http-api-client'
 import type { Robot } from '../../discovery'
 
@@ -28,7 +28,7 @@ const POLL_TEMPDECK_INTERVAL_MS = 1000
 type SP = {
   _robot: ?Robot,
   tempdeck: ?TempDeckModule,
-  tempdeckData: ?FetchModuleDataResponse,
+  tempdeckData: ?FetchTemperatureDataResponse,
 }
 
 type DP = {
@@ -38,7 +38,7 @@ type DP = {
 
 type Props = {
   tempdeck: ?TempDeckModule,
-  tempdeckData: ?FetchModuleDataResponse,
+  tempdeckData: ?FetchTemperatureDataResponse,
   fetchModules: () => mixed,
   fetchModuleData: () => mixed,
 }
