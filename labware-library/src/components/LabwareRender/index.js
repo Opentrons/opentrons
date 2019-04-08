@@ -11,11 +11,11 @@ import {LabwareOutline} from '@opentrons/components'
 import styles from './styles.css'
 
 import type {
-  LabwareDefinition2 as LabwareDefinition,
+  LabwareDefinition,
   LabwareParameters,
   LabwareOffset,
   LabwareWell,
-} from '@opentrons/shared-data'
+} from '../../types'
 
 export type LabwareRenderProps = {
   definition: LabwareDefinition,
