@@ -11,11 +11,11 @@ MODULE_LOG = logging.getLogger(__name__)
 def load_pipettes_from_json(
         ctx: ProtocolContext,
         protocol: Dict[Any, Any]) -> Dict[str, InstrumentContext]:
-    pipette_data = protocol.get('pipettes', {})
+    pipette_data = protocol['pipettes']
     pipettes_by_id = {}
     for pipette_id, props in pipette_data.items():
-        mount = props.get('mount')
-        name = props.get('name')
+        mount = props['mount']
+        name = props['name']
         instr = ctx.load_instrument(name, mount)
         pipettes_by_id[pipette_id] = instr
 
@@ -26,23 +26,18 @@ def _get_well(loaded_labware: Dict[str, labware.Labware],
               params: Dict[str, Any]):
     labwareId = params['labware']
     well = params['well']
-    plate = loaded_labware.get(labwareId)
-    if not plate:
-        raise ValueError(
-            'Command tried to use labware "{}", but that ID does not exist '
-            'in protocol\'s "labware" section'.format(labwareId))
+    plate = loaded_labware[labwareId]
     return plate.wells_by_index()[well]
 
 
 # TODO (Ian 2019-04-05) once Pipette commands allow flow rate as an
 # absolute value (not % value) as an argument in
 # aspirate/dispense/blowout/air_gap fns, remove this
-def _set_flow_rate(
-        pipette_name, pipette, command_type, params):
+def _set_flow_rate(pipette, command_type, params):
     """
     Set flow rate in uL/mm, to value obtained from command's params.
     """
-    flow_rate_param = params.get('flowRate')
+    flow_rate_param = params['flowRate']
 
     pipette.flow_rate = {
         'aspirate': flow_rate_param,
@@ -53,13 +48,13 @@ def _set_flow_rate(
 def load_labware_from_json_defs(
         ctx: ProtocolContext,
         protocol: Dict[Any, Any]) -> Dict[str, labware.Labware]:
-    protocol_labware = protocol.get('labware', {})
-    definitions = protocol.get('labwareDefinitions', {})
+    protocol_labware = protocol['labware']
+    definitions = protocol['labwareDefinitions']
     loaded_labware = {}
 
     for labware_id, props in protocol_labware.items():
-        slot = props.get('slot')
-        definition = definitions.get(props.get('definitionId'))
+        slot = props['slot']
+        definition = definitions[props['definitionId']]
         loaded_labware[labware_id] = ctx.load_labware(
             labware.Labware(
                 definition,
@@ -80,38 +75,28 @@ def _get_location_with_offset(loaded_labware: Dict[str, labware.Labware],
     if 'fixedTrash' in labware.quirks_from_any_parent(well):
         return well.top()
 
-    offset_from_bottom = params.get('offsetFromBottomMm')
-    if None is offset_from_bottom:
-        raise RuntimeError('"offsetFromBottomMm" is required for {}'
-                           .format(command_type))
-
+    offset_from_bottom = params['offsetFromBottomMm']
     bottom = well.bottom()
     return bottom.move(Point(z=offset_from_bottom))
 
 
 def dispatch_json(context: ProtocolContext,  # noqa(C901)
-                     protocol_data: Dict[Any, Any],
-                     instruments: Dict[str, InstrumentContext],
-                     loaded_labware: Dict[str, labware.Labware]):
-    commands = protocol_data.get('commands', [])
+                  protocol_data: Dict[Any, Any],
+                  instruments: Dict[str, InstrumentContext],
+                  loaded_labware: Dict[str, labware.Labware]):
+    commands = protocol_data['commands']
 
     for command_item in commands:
-        command_type = command_item.get('command')
-        params = command_item.get('params', {})
-        pipette = instruments.get(params.get('pipette'))
-        protocol_pipette_data = protocol_data\
-            .get('pipettes', {})\
-            .get(params.get('pipette'), {})
-        pipette_name = protocol_pipette_data.get('name')
+        command_type = command_item['command']
+        params = command_item['params']
 
-        if (not pipette_name):
-            # TODO: Ian 2018-11-06 remove this fallback to 'model' when
-            # backwards-compatability for JSON protocols with versioned
-            # pipettes is dropped (next JSON protocol schema major bump)
-            pipette_name = protocol_pipette_data.get('model')
+        # all commands but 'delay' have 'pipette' param
+        if command_type != 'delay':
+            pipette_id = params['pipette']
+            pipette = instruments[pipette_id]
 
         if command_type == 'delay':
-            wait = params.get('wait')
+            wait = params['wait']
             if wait is None:
                 raise ValueError('Delay cannot be null')
             elif wait is True:
@@ -122,33 +107,30 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
 
         elif command_type == 'blowout':
             well = _get_well(loaded_labware, params)
-            _set_flow_rate(
-                pipette_name, pipette, command_type, params)
-            pipette.blow_out(well)  # type: ignore
+            _set_flow_rate(pipette, command_type, params)
+            pipette.blow_out(well)
 
         elif command_type == 'pickUpTip':
             well = _get_well(loaded_labware, params)
-            pipette.pick_up_tip(well)  # type: ignore
+            pipette.pick_up_tip(well)
 
         elif command_type == 'dropTip':
             well = _get_well(loaded_labware, params)
-            pipette.drop_tip(well)  # type: ignore
+            pipette.drop_tip(well)
 
         elif command_type == 'aspirate':
             location = _get_location_with_offset(
                 loaded_labware, 'aspirate', params)
             volume = params['volume']
-            _set_flow_rate(
-                pipette_name, pipette, command_type, params)
-            pipette.aspirate(volume, location)  # type: ignore
+            _set_flow_rate(pipette, command_type, params)
+            pipette.aspirate(volume, location)
 
         elif command_type == 'dispense':
             location = _get_location_with_offset(
                 loaded_labware, 'dispense', params)
             volume = params['volume']
-            _set_flow_rate(
-                pipette_name, pipette, command_type, params)
-            pipette.dispense(volume, location)  # type: ignore
+            _set_flow_rate(pipette, command_type, params)
+            pipette.dispense(volume, location)
 
         elif command_type == 'touchTip':
             location = _get_location_with_offset(
@@ -156,10 +138,10 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
             well = _get_well(loaded_labware, params)
             # convert mmFromBottom to v_offset
             v_offset = location.point.z - well.top().point.z
-            pipette.touch_tip(well, v_offset=v_offset)  # type: ignore
+            pipette.touch_tip(well, v_offset=v_offset)
 
         elif command_type == 'moveToSlot':
-            slot = params.get('slot')
+            slot = params['slot']
             if slot not in [str(s+1) for s in range(12)]:
                 raise ValueError('Invalid "slot" for "moveToSlot": {}'
                                  .format(slot))
@@ -171,7 +153,7 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
                 offset.get('y', 0),
                 offset.get('z', 0))
 
-            pipette.move_to(  # type: ignore
+            pipette.move_to(
                 slot_obj.move(offsetPoint),
                 force_direct=params.get('forceDirect'),
                 minimum_z_height=params.get('minimumZHeight'))

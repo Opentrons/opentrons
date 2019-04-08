@@ -1,0 +1,48 @@
+{
+    "protocol-schema": "1.0.0",
+    "default-values": {
+        "aspirate-flow-rate": {
+            "p300_single_v1": 101
+        },
+        "dispense-flow-rate": {
+            "p300_single_v1": 102
+        }
+    },
+    "pipettes": {
+        "pipetteId": {
+            "mount": "left",
+            "model": "p300_single_v1"
+        }
+    },
+    "procedure": [
+        {
+            "subprocedure": [
+                {
+                    "command": "aspirate",
+                    "params": {
+                        "pipette": "pipetteId",
+                        "labware": "sourcePlateId",
+                        "well": "A1",
+                        "volume": 5,
+                        "flow-rate": 123
+                    }
+                },
+                {
+                    "command": "delay",
+                    "params": {
+                        "wait": 42
+                    }
+                },
+                {
+                    "command": "dispense",
+                    "params": {
+                        "pipette": "pipetteId",
+                        "labware": "destPlateId",
+                        "well": "B1",
+                        "volume": 4.5
+                    }
+                }
+            ]
+        }
+    ]
+}

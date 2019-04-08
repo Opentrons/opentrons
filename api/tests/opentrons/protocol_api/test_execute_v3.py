@@ -1,3 +1,4 @@
+import os
 import json
 from opentrons.types import Point
 from opentrons.protocol_api import execute_v3, ProtocolContext
@@ -59,86 +60,9 @@ class MockPipette(object):
 
 
 def test_dispatch_commands(monkeypatch, loop):
-    protocol_data = {
-        "schemaVersion": "3",
-        "commands": [
-            {
-                "command": "pickUpTip",
-                "params": {
-                    "pipette": "pipetteId",
-                    "labware": "tiprackId",
-                    "well": "B1"
-                }
-            },
-            {
-                "command": "aspirate",
-                "params": {
-                    "pipette": "pipetteId",
-                    "labware": "sourcePlateId",
-                    "well": "A1",
-                    "volume": 5,
-                    "flowRate": 3,
-                    "offsetFromBottomMm": 2
-                }
-            },
-            {
-                "command": "delay",
-                "params": {
-                    "wait": 42
-                }
-            },
-            {
-                "command": "dispense",
-                "params": {
-                    "pipette": "pipetteId",
-                    "labware": "destPlateId",
-                    "well": "B1",
-                    "volume": 4.5,
-                    "flowRate": 2.5,
-                    "offsetFromBottomMm": 1
-                }
-            },
-            {
-                "command": "touchTip",
-                "params": {
-                    "pipette": "pipetteId",
-                    "labware": "destPlateId",
-                    "well": "B1",
-                    "offsetFromBottomMm": 11
-                }
-            },
-            {
-                "command": "blowout",
-                "params": {
-                    "pipette": "pipetteId",
-                    "labware": "destPlateId",
-                    "well": "B1",
-                    "flowRate": 2,
-                    "offsetFromBottomMm": 12
-                }
-            },
-            {
-                "command": "moveToSlot",
-                "params": {
-                    "pipette": "pipetteId",
-                    "slot": "5",
-                    "offset": {
-                        "x": 1,
-                        "y": 2,
-                        "z": 3
-                    }
-                }
-            },
-            {
-                "command": "dropTip",
-                "params": {
-                    "pipette": "pipetteId",
-                    "labware": "trashId",
-                    "well": "A1"
-                }
-            }
-        ]
-    }
+    with open(os.path.join(os.path.dirname(__file__), 'data',
+              'v3_json_dispatch.json'), 'r') as f:
+        protocol_data = json.load(f)
 
     command_log = []
     mock_pipette = MockPipette(command_log)

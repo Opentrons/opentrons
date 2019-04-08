@@ -1,3 +1,5 @@
+import os
+import json
 import pytest
 from opentrons.types import Point
 from opentrons.protocol_api import execute_v1, ProtocolContext
@@ -6,7 +8,7 @@ from opentrons.protocol_api import execute_v1, ProtocolContext
 # TODO Ian 2018-11-07 when `model` is dropped, delete its test case
 @pytest.mark.parametrize('protocol_data',
                          [
-                             # deprecated case
+                             # no name, use model
                              {
                                  "pipettes": {
                                      "leftPipetteHere": {
@@ -15,11 +17,12 @@ from opentrons.protocol_api import execute_v1, ProtocolContext
                                      }
                                  }
                              },
-                             # future case
+                             # name over model
                              {
                                  "pipettes": {
                                      "leftPipetteHere": {
                                          "mount": "left",
+                                         "model": "ignore this!!!",
                                          "name": "p10_single"
                                      }
                                  }
@@ -130,57 +133,10 @@ def test_load_labware_trash(loop):
     assert result['someTrashId'] == ctx.fixed_trash
 
 
-protocol_data = {
-    "protocol-schema": "1.0.0",
-    "default-values": {
-        "aspirate-flow-rate": {
-            "p300_single_v1": 101
-        },
-        "dispense-flow-rate": {
-            "p300_single_v1": 102
-        }
-    },
-    "pipettes": {
-        "pipetteId": {
-            "mount": "left",
-            "model": "p300_single_v1"
-        }
-    },
-    "procedure": [
-        {
-            "subprocedure": [
-                {
-                    "command": "aspirate",
-                    "params": {
-                        "pipette": "pipetteId",
-                        "labware": "sourcePlateId",
-                        "well": "A1",
-                        "volume": 5,
-                        "flow-rate": 123
-                    }
-                },
-                {
-                    "command": "delay",
-                    "params": {
-                        "wait": 42
-                    }
-                },
-                {
-                    "command": "dispense",
-                    "params": {
-                        "pipette": "pipetteId",
-                        "labware": "destPlateId",
-                        "well": "B1",
-                        "volume": 4.5
-                    }
-                },
-            ]
-        }
-    ]
-}
-
-
 def test_dispatch_commands(monkeypatch, loop):
+    with open(os.path.join(os.path.dirname(__file__), 'data',
+              'v1_json_dispatch.json'), 'r') as f:
+        protocol_data = json.load(f)
     ctx = ProtocolContext(loop=loop)
     cmd = []
     flow_rates = []

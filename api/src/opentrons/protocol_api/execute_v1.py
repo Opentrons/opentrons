@@ -14,11 +14,11 @@ MODULE_LOG = logging.getLogger(__name__)
 def load_pipettes_from_json(
         ctx: ProtocolContext,
         protocol: Dict[Any, Any]) -> Dict[str, InstrumentContext]:
-    pipette_data = protocol.get('pipettes', {})
+    pipette_data = protocol['pipettes']
     pipettes_by_id = {}
     for pipette_id, props in pipette_data.items():
-        model = props.get('model')
-        mount = props.get('mount')
+        model = props['model']
+        mount = props['mount']
 
         # NOTE: 'name' is only used by v1 and v2 JSON protocols
         name = props.get('name')
@@ -148,19 +148,18 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
                      instruments: Dict[str, InstrumentContext],
                      loaded_labware: Dict[str, labware.Labware]):
     subprocedures = [
-        p.get('subprocedure', [])
-        for p in protocol_data.get('procedure', [])]
+        p['subprocedure']
+        for p in protocol_data['procedure']]
 
-    default_values = protocol_data.get('default-values', {})
+    default_values = protocol_data['default-values']
     flat_subs = itertools.chain.from_iterable(subprocedures)
 
     for command_item in flat_subs:
-        command_type = command_item.get('command')
-        params = command_item.get('params', {})
+        command_type = command_item['command']
+        params = command_item['params']
         pipette = instruments.get(params.get('pipette'))
-        protocol_pipette_data = protocol_data\
-            .get('pipettes', {})\
-            .get(params.get('pipette'), {})
+        protocol_pipette_data = protocol_data['pipettes'].get(
+            params.get('pipette'), {})
         pipette_name = protocol_pipette_data.get('name')
 
         if (not pipette_name):
@@ -170,7 +169,7 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
             pipette_name = protocol_pipette_data.get('model')
 
         if command_type == 'delay':
-            wait = params.get('wait')
+            wait = params['wait']
             if wait is None:
                 raise ValueError('Delay cannot be null')
             elif wait is True:
