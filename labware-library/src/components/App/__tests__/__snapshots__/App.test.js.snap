@@ -5,7 +5,7 @@ exports[`App component renders 1`] = `
   className="app"
 >
   <Nav />
-  <LazyLabwareList
+  <Page
     location={
       Object {
         "search": "",

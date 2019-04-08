@@ -36,3 +36,5 @@ export default function LabwareList (props: LabwareListProps) {
     </ul>
   )
 }
+
+export {NoResults}

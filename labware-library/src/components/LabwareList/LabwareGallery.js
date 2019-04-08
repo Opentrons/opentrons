@@ -4,7 +4,7 @@ import * as React from 'react'
 import LabwareRender from '../LabwareRender'
 import styles from './styles.css'
 
-import type {LabwareDefinition2 as LabwareDefinition} from '@opentrons/shared-data'
+import type {LabwareDefinition} from '../../types'
 
 export type GalleryProps = {
   definition: LabwareDefinition,

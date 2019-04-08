@@ -5,6 +5,8 @@ import {shallow} from 'enzyme'
 
 import {App} from '..'
 
+jest.mock('../../../definitions')
+
 describe('App', () => {
   test('component renders', () => {
     const tree = shallow(

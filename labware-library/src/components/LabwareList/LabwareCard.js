@@ -3,21 +3,23 @@
 // TODO(mc, 2019-03-21): split this file out into multiple component files,
 //   many of which will be common to LabwareCard and LabwarePage
 import * as React from 'react'
+import {Link} from 'react-router-dom'
 import isEqual from 'lodash/isEqual'
 import round from 'lodash/round'
 import uniqWith from 'lodash/uniqWith'
 
 import {getDisplayVolume} from '@opentrons/shared-data'
+import {getPublicPath} from '../../public-path'
 import {Icon} from '@opentrons/components'
 import Gallery from './LabwareGallery'
 import LoadName from './LoadName'
 import styles from './styles.css'
 
 import type {
-  LabwareDefinition2 as LabwareDefinition,
+  LabwareDefinition,
   LabwareWellProperties,
   LabwareWellMap,
-} from '@opentrons/shared-data'
+} from '../../types'
 
 // TODO(mc, 2019-03-18): i18n
 const EN_PLATE_DIMS = 'plate dimensions'
@@ -99,15 +101,16 @@ function TopBar (props: LabwareCardProps) {
 }
 
 function Title (props: LabwareCardProps) {
+  const {loadName} = props.definition.parameters
   const {displayName} = props.definition.metadata
 
   return (
-    <a href="#">
+    <Link to={`${getPublicPath()}${loadName}`}>
       <h2 className={styles.title}>
         {displayName}
         <Icon className={styles.title_icon} name="chevron-right" />
       </h2>
-    </a>
+    </Link>
   )
 }
 
