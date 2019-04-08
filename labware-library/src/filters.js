@@ -5,6 +5,7 @@ import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
 
 import {getAllDefinitions} from './definitions'
+import {getPublicPath} from './public-path'
 
 import type {Location} from 'react-router-dom'
 import type {FilterParams} from './types'
@@ -34,5 +35,5 @@ export function getFilters (location: Location): FilterParams {
 export function buildFiltersUrl (filters: FilterParams): string {
   const params = pickBy(filters, v => v !== FILTER_OFF)
 
-  return `/?${queryString.stringify(params)}`
+  return `${getPublicPath()}?${queryString.stringify(params)}`
 }

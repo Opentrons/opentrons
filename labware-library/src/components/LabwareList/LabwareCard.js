@@ -9,6 +9,7 @@ import round from 'lodash/round'
 import uniqWith from 'lodash/uniqWith'
 
 import {getDisplayVolume} from '@opentrons/shared-data'
+import {getPublicPath} from '../../public-path'
 import {Icon} from '@opentrons/components'
 import Gallery from './LabwareGallery'
 import LoadName from './LoadName'
@@ -104,7 +105,7 @@ function Title (props: LabwareCardProps) {
   const {displayName} = props.definition.metadata
 
   return (
-    <Link to={`/${loadName}`}>
+    <Link to={`${getPublicPath()}${loadName}`}>
       <h2 className={styles.title}>
         {displayName}
         <Icon className={styles.title_icon} name="chevron-right" />

@@ -4,6 +4,7 @@ import {Switch, Route} from 'react-router-dom'
 
 import {getDefinition} from '../../definitions'
 import {getFilters} from '../../filters'
+import {getPublicPath} from '../../public-path'
 import Sidebar from '../Sidebar'
 import LabwareList, {NoResults} from '../LabwareList'
 import LabwareDetails from '../LabwareDetails'
@@ -26,7 +27,7 @@ export default function Page (props: PageProps) {
           <div className={styles.content_container}>
             <Switch>
               <Route
-                path="/:loadName"
+                path={`${getPublicPath()}:loadName`}
                 render={routeProps => {
                   const {loadName} = routeProps.match.params
                   const definition = getDefinition(loadName)

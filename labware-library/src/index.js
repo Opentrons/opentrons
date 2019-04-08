@@ -4,6 +4,7 @@ import * as React from 'react'
 import ReactDom from 'react-dom'
 import {BrowserRouter, Route} from 'react-router-dom'
 
+import './public-path'
 import './styles.global.css'
 
 // $FlowFixMe: upgrade Flow for React.lazy
