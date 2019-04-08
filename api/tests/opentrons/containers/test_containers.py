@@ -4,6 +4,7 @@ import unittest
 from opentrons.legacy_api.containers import (
     load as containers_load,
     list as containers_list,
+    load_new_labware as new_load
 )
 from opentrons.legacy_api.robot import Robot
 from opentrons.legacy_api.containers.placeable import (
@@ -87,6 +88,25 @@ class ContainerTestCase(unittest.TestCase):
             test_slot_name(slots_old[i], slots_new[i])
 
         warnings.filterwarnings('default')
+
+    def test_new_slot_names(self):
+        trough = 'usa_scientific_12_trough_22_ml'
+        plate = 'generic_96_wellplate_380_ul'
+        tuberack = 'opentrons_6_tuberack_falcon_50_ml'
+
+        cont = new_load(trough)
+        self.assertTrue(isinstance(cont, Container))
+        cont = new_load(plate)
+        self.assertTrue(isinstance(cont, Container))
+        cont = new_load(tuberack)
+        self.assertTrue(isinstance(cont, Container))
+
+    def test_load_new_trough(self):
+        trough = 'usa_scientific_12_trough_22_ml'
+        cont = new_load(trough)
+        self.assertEqual(cont.size(), (0, 0, 0))
+        self.assertEqual(
+            cont.wells('A1')._coordinates, (13.94 - 4.165, 42.9 + 35.94, 2.29))
 
     def test_containers_list(self):
         res = containers_list()

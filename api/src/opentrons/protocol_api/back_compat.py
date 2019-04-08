@@ -224,7 +224,7 @@ class BCLabware:
         'opentrons-tuberack-15ml': 'opentrons_15_tuberack_15_ml_falcon',
         'opentrons-tuberack-2ml-eppendorf': 'opentrons_24_tuberack_2_ml_eppendorf',            # noqa(E501)
         'opentrons-tuberack-2ml-screwcap': 'opentrons_24_tuberack_2_ml_screwcap',              # noqa(E501)
-        'opentrons-tuberack-50ml': 'opentrons_6_tuberack_50_ml_falcon',
+        'opentrons-tuberack-50ml': 'opentrons_6_tuberack_falcon_50_ml',
         'tiprack-1000ul': 'opentrons_96_tiprack_1000_ul',
         'tiprack-10ul': 'opentrons_96_tiprack_10_ul',
         'trough-12row': 'usa_scientific_12_trough_22_ml'

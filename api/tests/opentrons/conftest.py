@@ -9,7 +9,6 @@ import pathlib
 import re
 import shutil
 import tempfile
-import json
 from collections import namedtuple
 from functools import partial
 from uuid import uuid4 as uuid
@@ -25,7 +24,6 @@ from opentrons.deck_calibration import endpoints
 from opentrons import hardware_control as hc
 from opentrons.protocol_api import ProtocolContext
 from opentrons.types import Mount
-from opentrons.data_storage import labware_definitions as ldef
 
 
 Session = namedtuple(
@@ -99,36 +97,6 @@ def wifi_keys_tempdir(config_tempdir):
         config.CONFIG['wifi_keys_dir'] = old_wifi_keys
 
 
-@pytest.fixture(autouse=True)
-def labware_test_data(config_tempdir):
-    user_def_dir = config.CONFIG['labware_user_definitions_dir_v3']
-    assert user_def_dir == ldef.user_defn_dir()
-    offset_dir = config.CONFIG['labware_calibration_offsets_dir_v3']
-    dummy_lw_name = '4-well-plate'
-    filename = '{}.json'.format(dummy_lw_name)
-    dummy_lw_defn = {
-      "metadata": {"name": dummy_lw_name},
-      "wells": {
-        "A1": {"x": 40, "y": 40, "z": 30,
-               "depth": 26, "diameter": 10, "total-liquid-volume": 78.6},
-        "A2": {"x": 40, "y": 80, "z": 30,
-               "depth": 26, "diameter": 10, "total-liquid-volume": 78.6},
-        "B1": {"x": 80, "y": 40, "z": 30,
-               "depth": 26, "diameter": 10, "total-liquid-volume": 78.6},
-        "B2": {"x": 80, "y": 80, "z": 30,
-               "depth": 26, "diameter": 10, "total-liquid-volume": 78.6}},
-      "ordering": [["A1", "B1"],
-                   ["A2", "B2"]]}
-    dummy_lw_offset = {"x": 10, "y": -10, "z": 100}
-    with (user_def_dir/filename).open('w') as usr_def:
-        json.dump(dummy_lw_defn, usr_def)
-    with (offset_dir/filename).open('w') as offs:
-        json.dump(dummy_lw_offset, offs)
-    yield
-    shutil.rmtree(os.path.dirname(user_def_dir), ignore_errors=True)
-    shutil.rmtree(os.path.dirname(offset_dir), ignore_errors=True)
-
-
 # Builds a temp db to allow mutations during testing
 @pytest.fixture(autouse=True)
 def dummy_db(config_tempdir, tmpdir):
@@ -153,13 +121,6 @@ def short_trash_flag():
     config.advanced_settings.set_adv_setting('shortFixedTrash', True)
     yield
     config.advanced_settings.set_adv_setting('shortFixedTrash', False)
-
-
-@pytest.fixture
-def split_labware_def():
-    config.advanced_settings.set_adv_setting('splitLabwareDefinitions', True)
-    yield
-    config.advanced_settings.set_adv_setting('splitLabwareDefinitions', False)
 
 
 @pytest.fixture

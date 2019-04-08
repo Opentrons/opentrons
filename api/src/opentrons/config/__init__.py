@@ -66,19 +66,6 @@ CONFIG_ELEMENTS = (
                   ConfigElementType.FILE,
                   'The SQLite database where labware definitions and offsets'
                   ' are stored'),
-    ConfigElement('labware_user_definitions_dir_v3',
-                  'API V3/Split Definitions Custom Labware Directory',
-                  Path('labware')/'v3'/'definitions',
-                  ConfigElementType.DIR,
-                  'The location where APIV3 custom labware definition files'
-                  ' are stored (if the split labware definitions feature flag)'
-                  ' is set'),
-    ConfigElement('labware_calibration_offsets_dir_v3',
-                  'API V3/Split Definitions Labware Calibration Directory',
-                  Path('labware')/'v3'/'offsets',
-                  ConfigElementType.DIR,
-                  'The location where APIV3 labware calibration is stored'
-                  ' (if the split labware definitions feature flag is set'),
     ConfigElement('labware_calibration_offsets_dir_v4',
                   'API V4 Custom Labware Directory',
                   Path('labware')/'v4'/'offsets',
@@ -346,12 +333,7 @@ def _do_migrate(index: Dict[str, str]):
              (index.get('deckCalibrationFile'),
               new_index['deck_calibration_file']),
              (index.get('featureFlagFile'),
-              new_index['feature_flags_file']),
-             (index.get('labware', {})  # type: ignore
-              .get('userDefinitionDir'),
-              new_index['labware_user_definitions_dir_v3']),
-             (index.get('labware', {}).get('offsetDir'),  # type: ignore
-              new_index['labware_calibration_offsets_dir_v3']))
+              new_index['feature_flags_file']))
     sys.stdout.write(f"config migration: new base {base}\n")
     for old, new in moves:
         if not old:
