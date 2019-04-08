@@ -21,14 +21,15 @@ exports[`Page component renders 1`] = `
       <div
         className="content_container"
       >
-        <LabwareList
-          filters={
-            Object {
-              "category": "all",
-              "manufacturer": "all",
-            }
-          }
-        />
+        <Switch>
+          <Route
+            path="/:loadName"
+            render={[Function]}
+          />
+          <Route
+            render={[Function]}
+          />
+        </Switch>
       </div>
     </section>
   </div>
