@@ -92,7 +92,7 @@ class ContainerTestCase(unittest.TestCase):
     def test_new_slot_names(self):
         trough = 'usa_scientific_12_trough_22_ml'
         plate = 'generic_96_wellplate_380_ul'
-        tuberack = 'opentrons_6_tuberack_50_ml_falcon'
+        tuberack = 'opentrons_6_tuberack_falcon_50_ml'
 
         cont = new_load(trough)
         self.assertTrue(isinstance(cont, Container))

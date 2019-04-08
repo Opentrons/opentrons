@@ -155,7 +155,7 @@ This table lists the names of valid labwares that can be loaded with :py:meth:`.
 +-------------------------------------------+----------------------------------------+
 | opentrons_24_tuberack_2_ml_screwcap       | opentrons-tuberack-2ml-screwcap        |
 +-------------------------------------------+----------------------------------------+
-| opentrons_6_tuberack_50_ml_falcon         | opentrons-tuberack-50ml                |
+| opentrons_6_tuberack_falcon_50_ml         | opentrons-tuberack-50ml                |
 +-------------------------------------------+----------------------------------------+
 | opentrons_6x15_ml_4x50_ml_tuberack        | opentrons-tuberack-15_50ml             |
 +-------------------------------------------+----------------------------------------+
@@ -215,7 +215,7 @@ A Temperature Module, for example, can be loaded and used in a protocol like thi
         temp_mod = protocol_context.load_module('Temperature Module', '10')
         temp_plate = temp_mod.load_labware('biorad_96_wellplate_pcr_200_ul')
 
-        master_mix = labware.load('opentrons_6_tuberack_50_ml_falcon')
+        master_mix = labware.load('opentrons_6_tuberack_falcon_50_ml')
 
         for target_well in temp_plate.wells():
             pipette.transfer(50, master_mix.wells_by_index()['A1'], target_well)
