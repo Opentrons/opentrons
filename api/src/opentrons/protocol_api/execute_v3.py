@@ -23,7 +23,7 @@ def load_pipettes_from_json(
 
 
 def _get_well(loaded_labware: Dict[str, labware.Labware],
-              params: Dict[str, Any]):
+              params: Dict[str, Any]) -> labware.Well:
     labwareId = params['labware']
     well = params['well']
     plate = loaded_labware[labwareId]
@@ -33,11 +33,14 @@ def _get_well(loaded_labware: Dict[str, labware.Labware],
 # TODO (Ian 2019-04-05) once Pipette commands allow flow rate as an
 # absolute value (not % value) as an argument in
 # aspirate/dispense/blowout/air_gap fns, remove this
-def _set_flow_rate(pipette, command_type, params):
+def _set_flow_rate(pipette, command_type, params) -> None:
     """
     Set flow rate in uL/mm, to value obtained from command's params.
     """
     flow_rate_param = params['flowRate']
+
+    if not (flow_rate_param > 0):
+        raise RuntimeError('Positive flowRate param required')
 
     pipette.flow_rate = {
         'aspirate': flow_rate_param,
@@ -83,7 +86,7 @@ def _get_location_with_offset(loaded_labware: Dict[str, labware.Labware],
 def dispatch_json(context: ProtocolContext,  # noqa(C901)
                   protocol_data: Dict[Any, Any],
                   instruments: Dict[str, InstrumentContext],
-                  loaded_labware: Dict[str, labware.Labware]):
+                  loaded_labware: Dict[str, labware.Labware]) -> None:
     commands = protocol_data['commands']
 
     for command_item in commands:
