@@ -16,7 +16,9 @@ if (!$root) {
 }
 
 import('./components/App').then(({default: App}) => {
-  ReactDom.hydrate(
+  // TODO(mc, 2019-04-08): switch to hydrate after figuring out reconcilliation
+  // when filters are active
+  ReactDom.render(
     <BrowserRouter>
       <Route component={App} />
     </BrowserRouter>,
