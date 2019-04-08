@@ -162,7 +162,7 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
             params.get('pipette'), {})
         pipette_name = protocol_pipette_data.get('name')
 
-        if (not pipette_name):
+        if not pipette_name:
             # TODO: Ian 2018-11-06 remove this fallback to 'model' when
             # backwards-compatability for JSON protocols with versioned
             # pipettes is dropped (next JSON protocol schema major bump)

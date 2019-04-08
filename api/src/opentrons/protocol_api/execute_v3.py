@@ -191,8 +191,8 @@ def dispatch_json(context: ProtocolContext,
         command_type = command_item['command']
         params = command_item['params']
 
-        dispatcher = dispatcher_map[command_type]
-        if not dispatcher:
+        if command_type not in dispatcher_map:
             raise RuntimeError(
                 "Unsupported command type {}".format(command_type))
-        dispatcher(context, protocol_data, instruments, loaded_labware, params)
+        dispatcher_map[command_type](
+            context, protocol_data, instruments, loaded_labware, params)

@@ -111,19 +111,21 @@ def _run_python(proto: Any, context: ProtocolContext):
 def get_protocol_schema_version(protocol_json: Dict[Any, Any]) -> int:
     # v3 and above uses `schemaVersion: integer`
     version = protocol_json.get('schemaVersion')
-    if None is not version:
+    if version:
         return version
     # v1 uses 1.x.x and v2 uses 2.x.x
     legacyKebabVersion = protocol_json.get('protocol-schema')
     # No minor/patch schemas ever were released,
     # do not permit protocols with nonexistent schema versions to load
-    if (legacyKebabVersion == '1.0.0'):
+    if legacyKebabVersion == '1.0.0':
         return 1
-    if (legacyKebabVersion == '2.0.0'):
+    elif legacyKebabVersion == '2.0.0':
         return 2
-    if (legacyKebabVersion is not None):
-        raise RuntimeError(('No such schema version: "{}". Did you mean ' +
-                           '"1.0.0" or "2.0.0"?').format(legacyKebabVersion))
+    elif legacyKebabVersion:
+        raise RuntimeError(
+            f'No such schema version: "{legacyKebabVersion}". Did you mean ' +
+            '"1.0.0" or "2.0.0"?')
+    # no truthy value for schemaVersion or protocol-schema
     raise RuntimeError(
         'Could not determine schema version for protocol. ' +
         'Make sure there is a version number under "schemaVersion"')
@@ -160,11 +162,12 @@ def run_protocol(protocol_code: Any = None,
         _run_python(protocol_code, true_context)
     elif None is not protocol_json:
         protocol_version = get_protocol_schema_version(protocol_json)
-        if (protocol_version) > 3:
-            raise RuntimeError('JSON Protocol version {} is not yet supported \
-                in this version of the API'.format(protocol_version))
+        if protocol_version > 3:
+            raise RuntimeError(
+                f'JSON Protocol version {protocol_version } is not yet ' +
+                'supported in this version of the API')
 
-        if (protocol_version >= 3):
+        if protocol_version >= 3:
             ins = execute_v3.load_pipettes_from_json(
                 true_context, protocol_json)
             lw = execute_v3.load_labware_from_json_defs(
