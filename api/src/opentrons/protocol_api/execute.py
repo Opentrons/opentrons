@@ -143,7 +143,7 @@ def get_protocol_schema_version(protocol_json: Dict[Any, Any]) -> int:
         'Make sure there is a version number under "schemaVersion"')
 
 
-def get_schema_for_protocol(protocol_json: Dict[Any, Any]):
+def get_schema_for_protocol(protocol_json: Dict[Any, Any]) -> Dict[Any, Any]:
     version_num = get_protocol_schema_version(protocol_json)
     try:
         schema = pkgutil.get_data(
@@ -167,7 +167,7 @@ def validate_protocol(protocol_json: Dict[Any, Any]):
     protocol_schema = get_schema_for_protocol(protocol_json)
 
     # instruct schema how to resolve all $ref's used in protocol schemas
-    labware_schema_v2 = json.loads(
+    labware_schema_v2 = json.loads(  # type: ignore
         pkgutil.get_data(
             'opentrons',
             'shared_data/labware-json-schema/labwareSchemaV2.json'))
