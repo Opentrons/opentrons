@@ -5,7 +5,7 @@
 
 .sidebar {
   width: 100%;
-  padding: var(--spacing-7) var(--spacing-3) 0 var(--spacing-3);
+  height: 100%;
 }
 
 .labware_guide {
@@ -84,22 +84,16 @@
   line-height: var(--lh-title);
   font-weight: var(--fw-semibold);
 
-  &:hover,
-  &.selected {
+  &:hover {
     color: var(--c-highlight);
+  }
+
+  &.selected {
+    color: var(--c-selected-dark);
   }
 }
 
 @media (--medium) {
-  .sidebar {
-    position: fixed;
-    width: var(--size-3);
-    height: 100%;
-    padding-left: var(--spacing-7);
-    padding-right: var(--spacing-5);
-    overflow-y: auto;
-  }
-
   .filter_category {
     display: block;
     padding: 0;
@@ -108,12 +102,5 @@
   .filter_category_item {
     display: block;
     width: 100%;
-  }
-}
-
-@media (--large) {
-  .sidebar {
-    width: var(--size-4);
-    padding-left: var(--spacing-7);
   }
 }

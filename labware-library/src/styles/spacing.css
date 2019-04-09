@@ -20,9 +20,10 @@
   /* width and height sizes (same TODO as above) */
   --size-1: 1.25rem; /* 20px */
   --size-2: 3rem; /* 48px */
-  --size-3: 12rem; /* 48px */
+  --size-3: 12rem; /* 192px */
   --size-4: 16rem; /* 256px */
   --size-5: 32rem; /* 512px */
+  --size-25p: 25%;
   --size-40p: 40%;
   --size-50p: 50%;
   --size-60p: 60%;

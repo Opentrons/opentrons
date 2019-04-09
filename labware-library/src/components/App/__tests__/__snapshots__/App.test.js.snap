@@ -1,16 +1,61 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`App component renders 1`] = `
+exports[`App component renders with definition 1`] = `
+<div
+  className="app breadcrumbs_visible"
+>
+  <Nav />
+  <Breadcrumbs
+    definition={Object {}}
+  />
+  <Page
+    content={
+      <LabwareDetails
+        definition={Object {}}
+      />
+    }
+    sidebar={
+      <Sidebar
+        filters={
+          Object {
+            "category": "all",
+            "manufacturer": "all",
+          }
+        }
+      />
+    }
+    sidebarLargeOnly={true}
+  />
+</div>
+`;
+
+exports[`App component renders without definition 1`] = `
 <div
   className="app"
 >
   <Nav />
   <Page
-    location={
-      Object {
-        "search": "",
-      }
+    content={
+      <LabwareList
+        filters={
+          Object {
+            "category": "all",
+            "manufacturer": "all",
+          }
+        }
+      />
     }
+    sidebar={
+      <Sidebar
+        filters={
+          Object {
+            "category": "all",
+            "manufacturer": "all",
+          }
+        }
+      />
+    }
+    sidebarLargeOnly={false}
   />
 </div>
 `;

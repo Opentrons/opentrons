@@ -5,6 +5,8 @@ import * as React from 'react'
 import Logo from './Logo'
 import styles from './styles.css'
 
+export { default as Breadcrumbs } from './Breadcrumbs'
+
 export default function Nav() {
   return (
     <nav className={styles.nav}>

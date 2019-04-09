@@ -2,7 +2,7 @@
 // labware library entry
 import * as React from 'react'
 import ReactDom from 'react-dom'
-import { BrowserRouter, Route } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
 
 import './public-path'
 import './styles.global.css'
@@ -20,7 +20,7 @@ import('./components/App').then(({ default: App }) => {
   // when filters are active
   ReactDom.render(
     <BrowserRouter>
-      <Route component={App} />
+      <App />
     </BrowserRouter>,
     $root
   )

@@ -12,7 +12,7 @@ export type PrerenderProps = {
   location: string,
 }
 
-export default function prerender(props: PrerenderProps) {
+export default function prerender(props: PrerenderProps): string {
   return `<div id="root">${ReactDomServer.renderToString(
     <StaticRouter location={props.location} context={{}}>
       <Route component={App} />
