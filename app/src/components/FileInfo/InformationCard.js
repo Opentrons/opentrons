@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import moment from 'moment'
 
 import {
@@ -10,11 +10,11 @@ import {
   getProtocolMethod,
   getProtocolDescription,
 } from '../../protocol'
-import {LabeledValue} from '@opentrons/components'
+import { LabeledValue } from '@opentrons/components'
 import InfoSection from './InfoSection'
-import {SectionContentHalf, CardRow} from '../layout'
+import { SectionContentHalf, CardRow } from '../layout'
 
-import type {State} from '../../types'
+import type { State } from '../../types'
 
 type Props = {
   name: ?string,
@@ -30,8 +30,8 @@ const DATE_FORMAT = 'DD MMM Y, hh:mmA'
 
 export default connect(mapStateToProps)(InformationCard)
 
-function InformationCard (props: Props) {
-  const {name, author, method, description} = props
+function InformationCard(props: Props) {
+  const { name, author, method, description } = props
   const lastUpdated = props.lastUpdated
     ? moment(props.lastUpdated).format(DATE_FORMAT)
     : '-'
@@ -63,7 +63,7 @@ function InformationCard (props: Props) {
   )
 }
 
-function mapStateToProps (state: State): Props {
+function mapStateToProps(state: State): Props {
   return {
     name: getProtocolName(state),
     author: getProtocolAuthor(state),

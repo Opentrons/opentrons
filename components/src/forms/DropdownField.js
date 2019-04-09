@@ -2,7 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import {Icon} from '..'
+import { Icon } from '..'
 import styles from './forms.css'
 
 export type DropdownOption = {
@@ -43,14 +43,18 @@ type Props = {
   autoFocus?: boolean,
 }
 
-export default function DropdownField (props: Props) {
+export default function DropdownField(props: Props) {
   // add in "blank" option if there is no `value`, unless `options` already has a blank option
-  const options = (props.value || props.options.some(opt => opt.value === ''))
-    ? props.options
-    : [{name: '', value: ''}, ...props.options]
+  const options =
+    props.value || props.options.some(opt => opt.value === '')
+      ? props.options
+      : [{ name: '', value: '' }, ...props.options]
 
   const error = props.error != null
-  const className = cx(props.className, {[styles.error]: error, [styles.dropdown_disabled]: props.disabled})
+  const className = cx(props.className, {
+    [styles.error]: error,
+    [styles.dropdown_disabled]: props.disabled,
+  })
 
   return (
     <div className={className}>
@@ -65,16 +69,17 @@ export default function DropdownField (props: Props) {
           disabled={props.disabled}
           className={styles.dropdown}
           tabIndex={props.tabIndex}
-          autoFocus={props.autoFocus}>
-          {options.map(opt =>
+          autoFocus={props.autoFocus}
+        >
+          {options.map(opt => (
             <option key={opt.value} value={opt.value} disabled={!!opt.disabled}>
               {opt.name}
             </option>
-          )}
+          ))}
         </select>
 
         <div className={styles.dropdown_icon}>
-          <Icon name='menu-down' width='100%' />
+          <Icon name="menu-down" width="100%" />
         </div>
       </div>
       <div className={styles.input_caption}>

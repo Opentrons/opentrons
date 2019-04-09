@@ -2,7 +2,7 @@
 'use strict'
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const {DEV_MODE} = require('./env')
+const { DEV_MODE } = require('./env')
 
 const CSS_LOADER = {
   loader: 'css-loader',
@@ -24,7 +24,7 @@ const POSTCSS_LOADER = {
   options: {
     ident: 'postcss',
     plugins: loader => [
-      require('postcss-import')({root: loader.resourcePath}),
+      require('postcss-import')({ root: loader.resourcePath }),
       require('postcss-cssnext')(),
       require('lost'),
     ],

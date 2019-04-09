@@ -1,3 +1,3 @@
 ```js
-<InfoItem title='Science' value='Rules' />
+<InfoItem title="Science" value="Rules" />
 ```

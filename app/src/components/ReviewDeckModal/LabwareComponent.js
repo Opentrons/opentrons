@@ -1,15 +1,15 @@
 // @flow
 // LabwareComponent for Deck in ReviewDeckModal
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {selectors as robotSelectors, type SessionModule} from '../../robot'
-import {Module as ModuleItem} from '@opentrons/components'
-import {LabwareItem} from '../DeckMap'
+import { selectors as robotSelectors, type SessionModule } from '../../robot'
+import { Module as ModuleItem } from '@opentrons/components'
+import { LabwareItem } from '../DeckMap'
 
-import type {State} from '../../types'
-import type {LabwareComponentProps} from '@opentrons/components'
-import type {LabwareItemProps} from '../DeckMap'
+import type { State } from '../../types'
+import type { LabwareComponentProps } from '@opentrons/components'
+import type { LabwareItemProps } from '../DeckMap'
 
 type OP = LabwareComponentProps
 
@@ -18,12 +18,12 @@ type SP = {|
   module: ?SessionModule,
 |}
 
-type Props = {...$Exact<LabwareComponentProps>, ...SP}
+type Props = { ...$Exact<LabwareComponentProps>, ...SP }
 
 export default connect(mapStateToProps)(LabwareComponent)
 
-function LabwareComponent (props: Props) {
-  const {labware, module} = props
+function LabwareComponent(props: Props) {
+  const { labware, module } = props
 
   return (
     <React.Fragment>
@@ -41,8 +41,8 @@ function LabwareComponent (props: Props) {
   )
 }
 
-function mapStateToProps (state: State, ownProps: OP): SP {
-  const {slot} = ownProps
+function mapStateToProps(state: State, ownProps: OP): SP {
+  const { slot } = ownProps
   const allLabware = robotSelectors.getLabware(state)
 
   return {

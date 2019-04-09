@@ -1,7 +1,7 @@
 'use strict'
 
 const path = require('path')
-const {baseConfig} = require('@opentrons/webpack-config')
+const { baseConfig } = require('@opentrons/webpack-config')
 
 module.exports = {
   styleguideDir: 'dist',
@@ -65,7 +65,7 @@ module.exports = {
       components: 'src/tooltips/[A-Z]*.js',
     },
   ],
-  getComponentPathLine (componentPath) {
+  getComponentPathLine(componentPath) {
     const name = path.basename(componentPath, '.js')
 
     return `import {${name}} from '@opentrons/components'`

@@ -1,9 +1,9 @@
 // @flow
 // info panel for labware calibration page
 import * as React from 'react'
-import type {Dispatch} from 'redux'
-import {connect} from 'react-redux'
-import {push} from 'react-router-redux'
+import type { Dispatch } from 'redux'
+import { connect } from 'react-redux'
+import { push } from 'react-router-redux'
 import capitalize from 'lodash/capitalize'
 
 import {
@@ -14,7 +14,7 @@ import {
   type LabwareType,
 } from '../../robot'
 
-import {PrimaryButton} from '@opentrons/components'
+import { PrimaryButton } from '@opentrons/components'
 import CalibrationInfoBox from '../CalibrationInfoBox'
 import CalibrationInfoContent from '../CalibrationInfoContent'
 
@@ -44,10 +44,14 @@ type Props = OwnProps & {
   },
 }
 
-export default connect(mapStateToProps, null, mergeProps)(InfoBox)
+export default connect(
+  mapStateToProps,
+  null,
+  mergeProps
+)(InfoBox)
 
-function InfoBox (props: Props) {
-  const {labware, button} = props
+function InfoBox(props: Props) {
+  const { labware, button } = props
   let title = 'No labware selected'
   let confirmed = false
   let description = 'Please select labware to continue'
@@ -78,28 +82,24 @@ function InfoBox (props: Props) {
   return (
     <CalibrationInfoBox confirmed={confirmed} title={title}>
       <CalibrationInfoContent
-        leftChildren={(
-          <p>
-            {description}
-          </p>
-        )}
-        rightChildren={(
-          button && showButton && (
-            <PrimaryButton onClick={button.onClick}>
-              {buttonText}
-            </PrimaryButton>
+        leftChildren={<p>{description}</p>}
+        rightChildren={
+          button &&
+          showButton && (
+            <PrimaryButton onClick={button.onClick}>{buttonText}</PrimaryButton>
           )
-        )}
+        }
       />
     </CalibrationInfoBox>
   )
 }
 
-function mapStateToProps (state, ownProps: OwnProps): StateProps {
-  const {labware} = ownProps
-  const _nextLabware = !labware || labware.calibration === 'confirmed'
-    ? robotSelectors.getNextLabware(state)
-    : null
+function mapStateToProps(state, ownProps: OwnProps): StateProps {
+  const { labware } = ownProps
+  const _nextLabware =
+    !labware || labware.calibration === 'confirmed'
+      ? robotSelectors.getNextLabware(state)
+      : null
 
   const _buttonTarget = _nextLabware || labware
   let _calibratorMount = robotSelectors.getCalibratorMount(state)
@@ -111,20 +111,18 @@ function mapStateToProps (state, ownProps: OwnProps): StateProps {
   return {
     _calibratorMount,
     _buttonTarget,
-    _buttonTargetIsNext: (
-      _buttonTarget != null &&
-      _buttonTarget === _nextLabware
-    ),
+    _buttonTargetIsNext:
+      _buttonTarget != null && _buttonTarget === _nextLabware,
   }
 }
 
-function mergeProps (
+function mergeProps(
   stateProps: StateProps,
   dispatchProps: DispatchProps,
   ownProps: OwnProps
 ): Props {
-  const {_buttonTarget, _buttonTargetIsNext, _calibratorMount} = stateProps
-  const {dispatch} = dispatchProps
+  const { _buttonTarget, _buttonTargetIsNext, _calibratorMount } = stateProps
+  const { dispatch } = dispatchProps
   const targetConfirmed = _buttonTarget && _buttonTarget.confirmed
 
   let button = null
@@ -146,5 +144,5 @@ function mergeProps (
     }
   }
 
-  return {...ownProps, button}
+  return { ...ownProps, button }
 }

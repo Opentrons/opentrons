@@ -7,13 +7,13 @@ import {
   compoundCommandCreatorHasErrors,
   commandFixtures as cmd,
 } from './fixtures'
-import type {DistributeArgs} from '../types'
+import type { DistributeArgs } from '../types'
 const distribute = compoundCommandCreatorNoErrors(_distribute)
 const distributeWithErrors = compoundCommandCreatorHasErrors(_distribute)
 
 // shorthand
 const dispense = (well, volume) =>
-  cmd.dispense(well, volume, {labware: 'destPlateId'})
+  cmd.dispense(well, volume, { labware: 'destPlateId' })
 
 let mixinArgs
 let robotInitialState
@@ -58,7 +58,7 @@ beforeEach(() => {
   })
 
   blowoutSingleToTrash = cmd.blowout('trashId')
-  blowoutSingleToSourceA1 = cmd.blowout('sourcePlateId', {well: 'A1'})
+  blowoutSingleToSourceA1 = cmd.blowout('sourcePlateId', { well: 'A1' })
 })
 
 describe('distribute: minimal example', () => {
@@ -172,7 +172,9 @@ describe('tip handling for multiple distribute chunks', () => {
       volume: 150,
     }
 
-    const result = distributeWithErrors(distributeArgs)(robotInitialStatePipettesLackTips)
+    const result = distributeWithErrors(distributeArgs)(
+      robotInitialStatePipettesLackTips
+    )
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
@@ -198,7 +200,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
       disposalWell: 'A1',
     }
     const result = distribute(distributeArgs)(robotInitialState)
-    const aspirateVol = (120 * 2) + 12
+    const aspirateVol = 120 * 2 + 12
 
     expect(result.commands).toEqual([
       cmd.aspirate('A1', aspirateVol),
@@ -334,8 +336,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
     }
     const result = distribute(distributeArgs)(robotInitialState)
 
-    function touchTip (well: string) {
-      return cmd.touchTip(well, {labware: 'destPlateId'})
+    function touchTip(well: string) {
+      return cmd.touchTip(well, { labware: 'destPlateId' })
     }
 
     expect(result.commands).toEqual([
@@ -360,7 +362,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
     const disposalVolume = 20
     const disposalLabware = 'sourcePlateId'
     const disposalWell = 'A1'
-    const aspirateVol = (volume * 2) + disposalVolume
+    const aspirateVol = volume * 2 + disposalVolume
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',

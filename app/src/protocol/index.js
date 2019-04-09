@@ -2,8 +2,8 @@
 // protocol state and loading actions
 import path from 'path'
 import startCase from 'lodash/startCase'
-import {createSelector} from 'reselect'
-import {getter} from '@thi.ng/paths'
+import { createSelector } from 'reselect'
+import { getter } from '@thi.ng/paths'
 import {
   fileToProtocolFile,
   parseProtocolData,
@@ -12,8 +12,8 @@ import {
   filenameToMimeType,
 } from './protocol-data'
 
-import type {OutputSelector} from 'reselect'
-import type {State, Action, ThunkAction} from '../types'
+import type { OutputSelector } from 'reselect'
+import type { State, Action, ThunkAction } from '../types'
 import type {
   ProtocolState,
   ProtocolFile,
@@ -25,24 +25,24 @@ export * from './types'
 
 type OpenProtocolAction = {|
   type: 'protocol:OPEN',
-  payload: {|file: ProtocolFile|},
+  payload: {| file: ProtocolFile |},
 |}
 
 type UploadProtocolAction = {|
   type: 'protocol:UPLOAD',
-  payload: {|contents: string, data: $PropertyType<ProtocolState, 'data'>|},
-  meta: {|robot: true|},
+  payload: {| contents: string, data: $PropertyType<ProtocolState, 'data'> |},
+  meta: {| robot: true |},
 |}
 
 export type ProtocolAction = OpenProtocolAction | UploadProtocolAction
 
-export function openProtocol (file: File): ThunkAction {
+export function openProtocol(file: File): ThunkAction {
   return dispatch => {
     const reader = new FileReader()
     const protocolFile = fileToProtocolFile(file)
     const openAction: OpenProtocolAction = {
       type: 'protocol:OPEN',
-      payload: {file: protocolFile},
+      payload: { file: protocolFile },
     }
 
     reader.onload = () => {
@@ -50,8 +50,8 @@ export function openProtocol (file: File): ThunkAction {
       const contents: string = (reader.result: any)
       const uploadAction: UploadProtocolAction = {
         type: 'protocol:UPLOAD',
-        payload: {contents, data: parseProtocolData(protocolFile, contents)},
-        meta: {robot: true},
+        payload: { contents, data: parseProtocolData(protocolFile, contents) },
+        meta: { robot: true },
       }
 
       dispatch(uploadAction)
@@ -62,31 +62,31 @@ export function openProtocol (file: File): ThunkAction {
   }
 }
 
-const INITIAL_STATE = {file: null, contents: null, data: null}
+const INITIAL_STATE = { file: null, contents: null, data: null }
 
-export function protocolReducer (
+export function protocolReducer(
   state: ProtocolState = INITIAL_STATE,
   action: Action
 ): ProtocolState {
   switch (action.type) {
     case 'protocol:OPEN':
-      return {...INITIAL_STATE, ...action.payload}
+      return { ...INITIAL_STATE, ...action.payload }
 
     case 'protocol:UPLOAD':
-      return {...state, ...action.payload}
+      return { ...state, ...action.payload }
 
     case 'robot:SESSION_RESPONSE': {
-      const {name, metadata, protocolText: contents} = action.payload
+      const { name, metadata, protocolText: contents } = action.payload
       const file =
         !state.file || name !== state.file.name
-          ? {name, type: filenameToMimeType(name), lastModified: null}
+          ? { name, type: filenameToMimeType(name), lastModified: null }
           : state.file
       const data =
         !state.data || contents !== state.contents
           ? parseProtocolData(file, contents, metadata)
           : state.data
 
-      return {file, contents, data}
+      return { file, contents, data }
     }
 
     case 'robot:DISCONNECT_RESPONSE':
@@ -101,9 +101,11 @@ type NumberGetter = (?ProtocolData) => ?number
 type StringSelector = OutputSelector<State, void, ?string>
 type NumberSelector = OutputSelector<State, void, ?number>
 type ProtocolTypeSelector = OutputSelector<State, void, ProtocolType | null>
-type CreatorAppSelector = OutputSelector<State,
+type CreatorAppSelector = OutputSelector<
+  State,
   void,
-  {name: ?string, version: ?string}>
+  { name: ?string, version: ?string }
+>
 
 const getName: StringGetter = getter('metadata.protocol-name')
 const getAuthor: StringGetter = getter('metadata.author')
@@ -166,7 +168,7 @@ export const getProtocolType: ProtocolTypeSelector = createSelector(
 
 export const getProtocolCreatorApp: CreatorAppSelector = createSelector(
   getProtocolData,
-  data => ({name: getAppName(data), version: getAppVersion(data)})
+  data => ({ name: getAppName(data), version: getAppVersion(data) })
 )
 
 const METHOD_OT_API = 'Opentrons API'

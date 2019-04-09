@@ -2,7 +2,7 @@
 import React from 'react'
 import Renderer from 'react-test-renderer'
 
-import {AlertItem} from '..'
+import { AlertItem } from '..'
 
 describe('alerts', () => {
   const onCloseClick = () => {}
@@ -24,10 +24,7 @@ describe('alerts', () => {
 
   test('success alert renders correctly', () => {
     const tree = Renderer.create(
-      <AlertItem
-        type={'success'}
-        title={'good job!'}
-      />
+      <AlertItem type={'success'} title={'good job!'} />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -35,10 +32,7 @@ describe('alerts', () => {
 
   test('warning alert renders correctly', () => {
     const tree = Renderer.create(
-      <AlertItem
-        type={'warning'}
-        title={'warning'}
-      />
+      <AlertItem type={'warning'} title={'warning'} />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -58,11 +52,7 @@ describe('alerts', () => {
 
   test('warning alert with message body renders correctly', () => {
     const tree = Renderer.create(
-      <AlertItem
-        type={'warning'}
-        title={'warning'}
-        onCloseClick={onCloseClick}
-      >
+      <AlertItem type={'warning'} title={'warning'} onCloseClick={onCloseClick}>
         <h3>Title</h3>
       </AlertItem>
     ).toJSON()

@@ -8,21 +8,27 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../../step-generation/utils'
 import styles from './StepEditForm.css'
-import type {Options} from '@opentrons/components'
-import type {FormData} from '../../form-types'
+import type { Options } from '@opentrons/components'
+import type { FormData } from '../../form-types'
 
-export function getBlowoutLocationOptionsForForm (
+export function getBlowoutLocationOptionsForForm(
   disposalLabwareOptions: Options,
-  rawForm: ?FormData,
+  rawForm: ?FormData
 ): Options {
   if (!rawForm) {
     assert(rawForm, `getBlowoutLocationOptionsForForm expected a form`)
     return disposalLabwareOptions
   }
-  const {stepType} = rawForm
+  const { stepType } = rawForm
   // TODO: Ian 2019-02-21 use i18n for names
-  const destOption = {name: 'Destination Well', value: DEST_WELL_BLOWOUT_DESTINATION}
-  const sourceOption = {name: 'Source Well', value: SOURCE_WELL_BLOWOUT_DESTINATION}
+  const destOption = {
+    name: 'Destination Well',
+    value: DEST_WELL_BLOWOUT_DESTINATION,
+  }
+  const sourceOption = {
+    name: 'Source Well',
+    value: SOURCE_WELL_BLOWOUT_DESTINATION,
+  }
 
   if (stepType === 'mix') {
     return [...disposalLabwareOptions, destOption]
@@ -33,13 +39,24 @@ export function getBlowoutLocationOptionsForForm (
         return [...disposalLabwareOptions, sourceOption, destOption]
       }
       case 'multiDispense': {
-        return [...disposalLabwareOptions, sourceOption, {...destOption, disabled: true}]
+        return [
+          ...disposalLabwareOptions,
+          sourceOption,
+          { ...destOption, disabled: true },
+        ]
       }
       case 'multiAspirate': {
-        return [...disposalLabwareOptions, {...sourceOption, disabled: true}, destOption]
+        return [
+          ...disposalLabwareOptions,
+          { ...sourceOption, disabled: true },
+          destOption,
+        ]
       }
       default: {
-        assert(false, `getBlowoutLocationOptionsForForm got unexpected path for moveLiquid step: ${path}`)
+        assert(
+          false,
+          `getBlowoutLocationOptionsForForm got unexpected path for moveLiquid step: ${path}`
+        )
         return disposalLabwareOptions
       }
     }
@@ -47,30 +64,43 @@ export function getBlowoutLocationOptionsForForm (
   return disposalLabwareOptions
 }
 
-export function getVisibleAlerts<Field, Alert: {dependentFields: Array<Field>}> (args: {
+export function getVisibleAlerts<
+  Field,
+  Alert: { dependentFields: Array<Field> }
+>(args: {
   focusedField: ?Field,
   dirtyFields: Array<Field>,
   alerts: Array<Alert>,
 }): Array<Alert> {
-  const {focusedField, dirtyFields, alerts} = args
-  return alerts.filter(alert => (
-    !alert.dependentFields.includes(focusedField) &&
-    difference(alert.dependentFields, dirtyFields).length === 0)
+  const { focusedField, dirtyFields, alerts } = args
+  return alerts.filter(
+    alert =>
+      !alert.dependentFields.includes(focusedField) &&
+      difference(alert.dependentFields, dirtyFields).length === 0
   )
 }
 
 // NOTE: some field components get their tooltips directly from i18n, and do not use `getTooltipForField`.
 // TODO: Ian 2019-03-29 implement tooltip-content-getting in a more organized way
 // once we have more comprehensive requirements about tooltips
-export function getTooltipForField (stepType: ?string, name: string, disabled: boolean): ?React.Node {
+export function getTooltipForField(
+  stepType: ?string,
+  name: string,
+  disabled: boolean
+): ?React.Node {
   if (!stepType) {
-    console.error(`expected stepType for form, cannot getTooltipText for ${name}`)
+    console.error(
+      `expected stepType for form, cannot getTooltipText for ${name}`
+    )
     return null
   }
 
   const prefixes = ['aspirate_', 'dispense_']
   const nameWithoutPrefix = prefixes.some(prefix => name.startsWith(prefix))
-    ? name.split('_').slice(1).join('_')
+    ? name
+        .split('_')
+        .slice(1)
+        .join('_')
     : name
 
   // NOTE: this is a temporary solution until we want to be able to choose from
@@ -79,9 +109,9 @@ export function getTooltipForField (stepType: ?string, name: string, disabled: b
   // non-disabled tooltip copy, and disabled tooltip copy.
   const disabledKeys = disabled
     ? [
-      `tooltip.step_fields.${stepType}.disabled.${name}`,
-      `tooltip.step_fields.${stepType}.disabled.$generic`,
-    ]
+        `tooltip.step_fields.${stepType}.disabled.${name}`,
+        `tooltip.step_fields.${stepType}.disabled.$generic`,
+      ]
     : []
 
   // specificity cascade for names.
@@ -94,5 +124,5 @@ export function getTooltipForField (stepType: ?string, name: string, disabled: b
     '',
   ])
 
-  return text ? (<div className={styles.tooltip}>{text}</div>) : null
+  return text ? <div className={styles.tooltip}>{text}</div> : null
 }

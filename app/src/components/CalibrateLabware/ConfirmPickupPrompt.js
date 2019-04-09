@@ -2,9 +2,9 @@
 // pickup confirmation prompt component for ConfirmPickupContents
 import * as React from 'react'
 
-import type {Labware, Pipette} from '../../robot'
+import type { Labware, Pipette } from '../../robot'
 
-import {PrimaryButton} from '@opentrons/components'
+import { PrimaryButton } from '@opentrons/components'
 import styles from './styles.css'
 
 type Props = Labware & {
@@ -13,8 +13,12 @@ type Props = Labware & {
   onYesClick: () => void,
 }
 
-export default function ConfirmPickedUpPrompt (props: Props) {
-  const {onNoClick, onYesClick, calibrator: {mount, channels}} = props
+export default function ConfirmPickedUpPrompt(props: Props) {
+  const {
+    onNoClick,
+    onYesClick,
+    calibrator: { mount, channels },
+  } = props
   const multi = channels === 8
   const maybePluralTip = `${multi ? '' : 'a '}tip${multi ? 's' : ''}`
 

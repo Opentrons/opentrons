@@ -1,14 +1,14 @@
 // @flow
 // API client for modules (the robot kind)
-import {createSelector} from 'reselect'
-import type {OutputSelector} from 'reselect'
-import type {State, ThunkPromiseAction} from '../types'
-import type {BaseRobot, RobotService} from '../robot'
-import type {ApiCall, ApiRequestError} from './types'
-import type {ApiAction} from './actions'
+import { createSelector } from 'reselect'
+import type { OutputSelector } from 'reselect'
+import type { State, ThunkPromiseAction } from '../types'
+import type { BaseRobot, RobotService } from '../robot'
+import type { ApiCall, ApiRequestError } from './types'
+import type { ApiAction } from './actions'
 
-import {apiRequest, apiSuccess, apiFailure} from './actions'
-import {getRobotApiState} from './reducer'
+import { apiRequest, apiSuccess, apiFailure } from './actions'
+import { getRobotApiState } from './reducer'
 import client from './client'
 
 export type BaseModule = {|
@@ -64,7 +64,7 @@ export type ModulesState = {|
 
 const MODULES: 'modules' = 'modules'
 
-export function fetchModules (robot: RobotService): ThunkPromiseAction {
+export function fetchModules(robot: RobotService): ThunkPromiseAction {
   return dispatch => {
     dispatch(apiRequest(robot, MODULES, null))
 
@@ -79,7 +79,7 @@ export function fetchModules (robot: RobotService): ThunkPromiseAction {
 
 const DATA: 'data' = 'data'
 
-export function fetchModuleData (
+export function fetchModuleData(
   robot: RobotService,
   serial: string
 ): ThunkPromiseAction {
@@ -97,46 +97,50 @@ export function fetchModuleData (
   }
 }
 
-export function makeGetRobotModules () {
-  const selector: OutputSelector<State,
+export function makeGetRobotModules() {
+  const selector: OutputSelector<
+    State,
     BaseRobot,
-    FetchModulesCall> = createSelector(
-      getRobotApiState,
-      state => state.config,
-      (state, config) => {
-        const tcEnabled = !!config.devInternal?.enableThermocycler
-        const modulesCall = state[MODULES]
+    FetchModulesCall
+  > = createSelector(
+    getRobotApiState,
+    state => state.config,
+    (state, config) => {
+      const tcEnabled = !!config.devInternal?.enableThermocycler
+      const modulesCall = state[MODULES]
 
-        // TODO: remove this block when feature flag removed
-        if (modulesCall?.response) {
-          return {
-            ...modulesCall,
-            response: {
-              modules: modulesCall.response.modules.filter(mod => {
-                return tcEnabled || mod.name !== 'thermocycler'
-              }),
-            },
-          }
+      // TODO: remove this block when feature flag removed
+      if (modulesCall?.response) {
+        return {
+          ...modulesCall,
+          response: {
+            modules: modulesCall.response.modules.filter(mod => {
+              return tcEnabled || mod.name !== 'thermocycler'
+            }),
+          },
         }
-
-        return modulesCall || {inProgress: false}
       }
-    )
+
+      return modulesCall || { inProgress: false }
+    }
+  )
 
   return selector
 }
 
-export function makeGetRobotModuleData () {
-  const selector: OutputSelector<State,
+export function makeGetRobotModuleData() {
+  const selector: OutputSelector<
+    State,
     BaseRobot,
-    FetchModuleDataCall> = createSelector(
-      (state, robot, _serial) => getRobotApiState(state, robot),
-      (_state, _robot, serial) => serial,
-      (state, serial) => {
-        const fetchDataPath = `${MODULES}/${serial}/${DATA}`
-        return state[fetchDataPath] || {inProgress: false}
-      }
-    )
+    FetchModuleDataCall
+  > = createSelector(
+    (state, robot, _serial) => getRobotApiState(state, robot),
+    (_state, _robot, serial) => serial,
+    (state, serial) => {
+      const fetchDataPath = `${MODULES}/${serial}/${DATA}`
+      return state[fetchDataPath] || { inProgress: false }
+    }
+  )
 
   return selector
 }

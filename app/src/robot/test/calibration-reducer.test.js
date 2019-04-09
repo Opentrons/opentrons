@@ -1,5 +1,5 @@
 // calibration reducer tests
-import {reducer, actionTypes} from '../'
+import { reducer, actionTypes } from '../'
 
 const EXPECTED_INITIAL_STATE = {
   deckPopulated: null,
@@ -14,7 +14,7 @@ const EXPECTED_INITIAL_STATE = {
   confirmedBySlot: {},
 
   // TODO(mc, 2018-01-22): make this state a sub-reducer
-  calibrationRequest: {type: '', inProgress: false, error: null},
+  calibrationRequest: { type: '', inProgress: false, error: null },
 }
 
 describe('robot reducer - calibration', () => {
@@ -25,22 +25,25 @@ describe('robot reducer - calibration', () => {
   })
 
   test('handles robot:REFRESH_SESSION', () => {
-    const state = reducer({calibration: {}}, {type: 'robot:REFRESH_SESSION'})
+    const state = reducer(
+      { calibration: {} },
+      { type: 'robot:REFRESH_SESSION' }
+    )
 
     expect(state.calibration).toEqual(EXPECTED_INITIAL_STATE)
   })
 
   test('handles DISCONNECT_RESPONSE success', () => {
     const expected = reducer(undefined, {}).calibration
-    const state = {calibration: {dummy: 'state'}}
-    const action = {type: 'robot:DISCONNECT_RESPONSE', payload: {}}
+    const state = { calibration: { dummy: 'state' } }
+    const action = { type: 'robot:DISCONNECT_RESPONSE', payload: {} }
 
     expect(reducer(state, action).calibration).toEqual(expected)
   })
 
   test('handles protocol:UPLOAD', () => {
     const expected = reducer(undefined, {}).calibration
-    const state = {calibration: {dummy: 'state'}}
+    const state = { calibration: { dummy: 'state' } }
     const action = {
       type: 'protocol:UPLOAD',
       payload: {},
@@ -50,30 +53,30 @@ describe('robot reducer - calibration', () => {
   })
 
   test('handles SET_MODULES_REVIEWED action', () => {
-    const setToTrue = {type: 'robot:SET_MODULES_REVIEWED', payload: true}
-    const setToFalse = {type: 'robot:SET_MODULES_REVIEWED', payload: false}
+    const setToTrue = { type: 'robot:SET_MODULES_REVIEWED', payload: true }
+    const setToFalse = { type: 'robot:SET_MODULES_REVIEWED', payload: false }
 
-    let state = {calibration: {modulesReviewed: false}}
+    let state = { calibration: { modulesReviewed: false } }
     expect(reducer(state, setToTrue).calibration).toEqual({
       modulesReviewed: true,
     })
 
-    state = {calibration: {modulesReviewed: true}}
+    state = { calibration: { modulesReviewed: true } }
     expect(reducer(state, setToFalse).calibration).toEqual({
       modulesReviewed: false,
     })
   })
 
   test('handles SET_DECK_POPULATED action', () => {
-    const setToTrue = {type: actionTypes.SET_DECK_POPULATED, payload: true}
-    const setToFalse = {type: actionTypes.SET_DECK_POPULATED, payload: false}
+    const setToTrue = { type: actionTypes.SET_DECK_POPULATED, payload: true }
+    const setToFalse = { type: actionTypes.SET_DECK_POPULATED, payload: false }
 
-    let state = {calibration: {deckPopulated: false}}
+    let state = { calibration: { deckPopulated: false } }
     expect(reducer(state, setToTrue).calibration).toEqual({
       deckPopulated: true,
     })
 
-    state = {calibration: {deckPopulated: true}}
+    state = { calibration: { deckPopulated: true } }
     expect(reducer(state, setToFalse).calibration).toEqual({
       deckPopulated: false,
     })
@@ -94,7 +97,7 @@ describe('robot reducer - calibration', () => {
 
     const action = {
       type: 'robot:PICKUP_AND_HOME',
-      payload: {mount: 'left', slot: '5'},
+      payload: { mount: 'left', slot: '5' },
     }
     expect(reducer(state, action).calibration).toEqual({
       deckPopulated: true,
@@ -119,7 +122,7 @@ describe('robot reducer - calibration', () => {
           inProgress: true,
           error: null,
         },
-        tipOnByMount: {right: false},
+        tipOnByMount: { right: false },
       },
     }
 
@@ -142,7 +145,7 @@ describe('robot reducer - calibration', () => {
         inProgress: false,
         error: null,
       },
-      tipOnByMount: {left: true, right: false},
+      tipOnByMount: { left: true, right: false },
     })
 
     expect(reducer(state, failure).calibration).toEqual({
@@ -153,7 +156,7 @@ describe('robot reducer - calibration', () => {
         inProgress: false,
         error: new Error('AH'),
       },
-      tipOnByMount: {right: false},
+      tipOnByMount: { right: false },
     })
   })
 
@@ -169,7 +172,7 @@ describe('robot reducer - calibration', () => {
     }
     const action = {
       type: 'robot:DROP_TIP_AND_HOME',
-      payload: {mount: 'right', slot: '5'},
+      payload: { mount: 'right', slot: '5' },
     }
 
     expect(reducer(state, action).calibration).toEqual({
@@ -193,7 +196,7 @@ describe('robot reducer - calibration', () => {
           inProgress: true,
           error: null,
         },
-        tipOnByMount: {left: false, right: true},
+        tipOnByMount: { left: false, right: true },
       },
     }
 
@@ -216,7 +219,7 @@ describe('robot reducer - calibration', () => {
         inProgress: false,
         error: null,
       },
-      tipOnByMount: {left: false, right: false},
+      tipOnByMount: { left: false, right: false },
     })
 
     expect(reducer(state, failure).calibration).toEqual({
@@ -227,7 +230,7 @@ describe('robot reducer - calibration', () => {
         inProgress: false,
         error: new Error('AH'),
       },
-      tipOnByMount: {left: false, right: true},
+      tipOnByMount: { left: false, right: true },
     })
   })
 
@@ -245,7 +248,7 @@ describe('robot reducer - calibration', () => {
     }
     const action = {
       type: 'robot:CONFIRM_TIPRACK',
-      payload: {mount: 'right', slot: '5'},
+      payload: { mount: 'right', slot: '5' },
     }
 
     expect(reducer(state, action).calibration).toEqual({
@@ -269,14 +272,14 @@ describe('robot reducer - calibration', () => {
           mount: 'right',
           slot: '5',
         },
-        tipOnByMount: {right: true},
-        confirmedBySlot: {5: false},
+        tipOnByMount: { right: true },
+        confirmedBySlot: { 5: false },
       },
     }
 
     const success = {
       type: 'robot:CONFIRM_TIPRACK_SUCCESS',
-      payload: {tipOn: false},
+      payload: { tipOn: false },
     }
 
     const failure = {
@@ -293,8 +296,8 @@ describe('robot reducer - calibration', () => {
         mount: 'right',
         slot: '5',
       },
-      tipOnByMount: {right: false},
-      confirmedBySlot: {5: true},
+      tipOnByMount: { right: false },
+      confirmedBySlot: { 5: true },
     })
 
     expect(reducer(state, failure).calibration).toEqual({
@@ -305,8 +308,8 @@ describe('robot reducer - calibration', () => {
         mount: 'right',
         slot: '5',
       },
-      tipOnByMount: {right: true},
-      confirmedBySlot: {5: false},
+      tipOnByMount: { right: true },
+      confirmedBySlot: { 5: false },
     })
   })
 
@@ -325,7 +328,7 @@ describe('robot reducer - calibration', () => {
     }
     const action = {
       type: actionTypes.MOVE_TO_FRONT,
-      payload: {mount: 'left'},
+      payload: { mount: 'left' },
     }
 
     expect(reducer(state, action).calibration).toEqual({
@@ -352,7 +355,7 @@ describe('robot reducer - calibration', () => {
       },
     }
 
-    const success = {type: actionTypes.MOVE_TO_FRONT_RESPONSE, error: false}
+    const success = { type: actionTypes.MOVE_TO_FRONT_RESPONSE, error: false }
     const failure = {
       type: actionTypes.MOVE_TO_FRONT_RESPONSE,
       error: true,
@@ -387,12 +390,12 @@ describe('robot reducer - calibration', () => {
           inProgress: false,
           error: new Error('AH'),
         },
-        probedByMount: {left: true, right: true},
+        probedByMount: { left: true, right: true },
       },
     }
     const action = {
       type: actionTypes.PROBE_TIP,
-      payload: {mount: 'left'},
+      payload: { mount: 'left' },
     }
 
     expect(reducer(state, action).calibration).toEqual({
@@ -402,7 +405,7 @@ describe('robot reducer - calibration', () => {
         inProgress: true,
         error: null,
       },
-      probedByMount: {left: false, right: true},
+      probedByMount: { left: false, right: true },
     })
   })
 
@@ -417,7 +420,7 @@ describe('robot reducer - calibration', () => {
         },
       },
     }
-    const success = {type: actionTypes.PROBE_TIP_RESPONSE, error: false}
+    const success = { type: actionTypes.PROBE_TIP_RESPONSE, error: false }
     const failure = {
       type: actionTypes.PROBE_TIP_RESPONSE,
       error: true,
@@ -447,7 +450,7 @@ describe('robot reducer - calibration', () => {
   test('handles CONFIRM_PROBED', () => {
     const state = {
       calibration: {
-        probedByMount: {left: false, right: true},
+        probedByMount: { left: false, right: true },
       },
     }
     const action = {
@@ -456,7 +459,7 @@ describe('robot reducer - calibration', () => {
     }
 
     expect(reducer(state, action).calibration).toEqual({
-      probedByMount: {left: true, right: true},
+      probedByMount: { left: true, right: true },
     })
   })
 
@@ -474,7 +477,7 @@ describe('robot reducer - calibration', () => {
     }
     const action = {
       type: 'robot:MOVE_TO',
-      payload: {mount: 'left', slot: '3'},
+      payload: { mount: 'left', slot: '3' },
     }
 
     expect(reducer(state, action).calibration).toEqual({
@@ -503,7 +506,7 @@ describe('robot reducer - calibration', () => {
       },
     }
 
-    const success = {type: 'robot:MOVE_TO_SUCCESS', payload: {}}
+    const success = { type: 'robot:MOVE_TO_SUCCESS', payload: {} }
     const failure = {
       type: 'robot:MOVE_TO_FAILURE',
       error: true,
@@ -540,7 +543,7 @@ describe('robot reducer - calibration', () => {
         },
       },
     }
-    const action = {type: 'robot:JOG', payload: {mount: 'right'}}
+    const action = { type: 'robot:JOG', payload: { mount: 'right' } }
 
     expect(reducer(state, action).calibration).toEqual({
       calibrationRequest: {
@@ -603,7 +606,7 @@ describe('robot reducer - calibration', () => {
     }
     const action = {
       type: 'robot:UPDATE_OFFSET',
-      payload: {mount: 'right', slot: '5'},
+      payload: { mount: 'right', slot: '5' },
     }
 
     expect(reducer(state, action).calibration).toEqual({
@@ -649,7 +652,7 @@ describe('robot reducer - calibration', () => {
         mount: 'right',
         slot: '5',
       },
-      confirmedBySlot: {5: true},
+      confirmedBySlot: { 5: true },
     })
     expect(reducer(state, failure).calibration).toEqual({
       calibrationRequest: {
@@ -669,10 +672,13 @@ describe('robot reducer - calibration', () => {
         confirmedBySlot: {},
       },
     }
-    const action = {type: actionTypes.CONFIRM_LABWARE, payload: {labware: '5'}}
+    const action = {
+      type: actionTypes.CONFIRM_LABWARE,
+      payload: { labware: '5' },
+    }
 
     expect(reducer(state, action).calibration).toEqual({
-      confirmedBySlot: {5: true},
+      confirmedBySlot: { 5: true },
     })
   })
 })

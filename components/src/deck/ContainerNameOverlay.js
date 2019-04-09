@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import {SLOT_RENDER_HEIGHT} from '@opentrons/shared-data'
+import { SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
 import styles from './LabwareContainer.css'
 
 type Props = {
@@ -8,8 +8,8 @@ type Props = {
   subtitle?: ?string,
 }
 
-export function ContainerNameOverlay (props: Props) {
-  const {title, subtitle} = props
+export function ContainerNameOverlay(props: Props) {
+  const { title, subtitle } = props
 
   let paddingLeft = 4
   let paddingTop = 0
@@ -23,7 +23,7 @@ export function ContainerNameOverlay (props: Props) {
   return (
     <g className={styles.name_overlay}>
       <g transform={`translate(0 ${SLOT_RENDER_HEIGHT - boxHeight})`}>
-        <rect x='0' y='0' height={boxHeight} width='100%' />
+        <rect x="0" y="0" height={boxHeight} width="100%" />
         <text
           x={paddingLeft}
           y={0.4 * boxHeight + paddingTop}

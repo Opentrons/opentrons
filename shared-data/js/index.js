@@ -1,5 +1,5 @@
 // @flow
-import getLabware, {getWellDefsForSVG, getIsTiprack} from './getLabware'
+import getLabware, { getWellDefsForSVG, getIsTiprack } from './getLabware'
 
 // Requires `make build` to have run to create this .json
 import labwareDefinitions from '../build/labware.json'
@@ -15,9 +15,4 @@ export * from './labwareTools'
 export * from './modules'
 export * from '../protocol-json-schema/jsonProtocolTypeV1'
 
-export {
-  getLabware,
-  getWellDefsForSVG,
-  getIsTiprack,
-  labwareList,
-}
+export { getLabware, getWellDefsForSVG, getIsTiprack, labwareList }

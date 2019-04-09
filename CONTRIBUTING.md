@@ -2,24 +2,24 @@
 
 Thanks for your interest in contributing to the Opentrons platform! This Contributing Guide is intended to ensure best practices for both internal Opentrons contributors as well as any external contributors. We want to make sure you’re set up to contribute effectively, no matter if you’re helping us out with bug reports, code, documentation, feature suggestions, or anything else. This guide covers:
 
-*   [Opening Issues](#opening-issues)
-*   [Opening Pull Requests](#opening-pull-requests)
-*   [Commit Guidelines](#commit-guidelines)
-*   [Project and Repository Structure](#project-and-repository-structure)
-*   [Development Setup](#development-setup)
-*   [Prior Art](#prior-art)
+- [Opening Issues](#opening-issues)
+- [Opening Pull Requests](#opening-pull-requests)
+- [Commit Guidelines](#commit-guidelines)
+- [Project and Repository Structure](#project-and-repository-structure)
+- [Development Setup](#development-setup)
+- [Prior Art](#prior-art)
 
 ## Opening Issues
 
 Filing an issue is a great way to contribute to the project! Bug reports and feature requests are really useful for us as we plan our work. If you’d like to open an issue, please consider the following questions before opening:
 
-*   Is this issue for a bug, a feature request, or something else?
-    *   Please make this is clear in your description so it’s easier to address
-*   Has this issue already been opened?
-    *   Duplicate tickets slow things down, so make sure to search before you open!
-    *   If there’s already a ticket, please comment on the existing thread!
-*   Is this a support request?
-    *   If yes, you're better off checking out our [support page][support] rather than opening a GitHub issue
+- Is this issue for a bug, a feature request, or something else?
+  - Please make this is clear in your description so it’s easier to address
+- Has this issue already been opened?
+  - Duplicate tickets slow things down, so make sure to search before you open!
+  - If there’s already a ticket, please comment on the existing thread!
+- Is this a support request?
+  - If yes, you're better off checking out our [support page][support] rather than opening a GitHub issue
 
 To ensure your issue can be addressed quickly, please fill out the sections in the existing issue template to the best of your ability!
 
@@ -31,25 +31,25 @@ Please note that by contributing to the Opentrons platform, you agree to share t
 
 Before opening any PR, please run through the following questions:
 
-*   Does this PR address an already open issue?
-    *   If not, please consider opening an issue first
-    *   This is to ensure you don't end up duplicating work or wasting time on a PR that won't be accepted
-*   Does this PR incorporate many different changes?
-    *   If yes, would the PR work better as a series of smaller PR's?
-    *   Our team is more than happy to help you figure out an incremental plan
-*   Does this PR include code changes without test and/or documentation updates?
-    *   If yes, your PR may not be ready to open
-    *   Tests and documentation are a vital part of any code contribution
-*   Are there a reasonable number of commits and are they properly informative?
-    *   The best kind of PR is a tiny PR with a single commit
-    *   To avoid introducing problems into our Git history, we may have to ask you to squash or otherwise amend your commit(s)
-    *   See [Commit Guidelines](#commit-guidelines) below for tips on keeping a good Git history
+- Does this PR address an already open issue?
+  - If not, please consider opening an issue first
+  - This is to ensure you don't end up duplicating work or wasting time on a PR that won't be accepted
+- Does this PR incorporate many different changes?
+  - If yes, would the PR work better as a series of smaller PR's?
+  - Our team is more than happy to help you figure out an incremental plan
+- Does this PR include code changes without test and/or documentation updates?
+  - If yes, your PR may not be ready to open
+  - Tests and documentation are a vital part of any code contribution
+- Are there a reasonable number of commits and are they properly informative?
+  - The best kind of PR is a tiny PR with a single commit
+  - To avoid introducing problems into our Git history, we may have to ask you to squash or otherwise amend your commit(s)
+  - See [Commit Guidelines](#commit-guidelines) below for tips on keeping a good Git history
 
 To ensure your code is reviewed quickly and thoroughly, please fill out the sections in the existing pull request template best of your ability! If you’d like some recommended reading for writing good pull requests, check out:
 
-*   [How to write the perfect pull request][how-to-write-pr]
-*   [The (written) unwritten guide to pull requests][unwritten-guide-to-pr]
-*   [The Art of a Pull Request][art-of-pr]
+- [How to write the perfect pull request][how-to-write-pr]
+- [The (written) unwritten guide to pull requests][unwritten-guide-to-pr]
+- [The Art of a Pull Request][art-of-pr]
 
 After your Pull Request is merged (or otherwise closed), you’ll want to make sure to delete the branch in GitHub. You probably want to delete your local branch, too, depending on your own personal organizational strategies / general paranoia.
 
@@ -102,14 +102,14 @@ This will launch the commitizen wizard, which will ask you to:
     9.  `ci` - Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
     10. `chore` - Other changes that don't modify src or test files
 2.  Select a scope
-    * For `feat`, `fix`, `refactor`, and `perf`, this should a top-level project, e.g. `app` or `api`
-    * For other commit types, use your best judgement or omit
+    - For `feat`, `fix`, `refactor`, and `perf`, this should a top-level project, e.g. `app` or `api`
+    - For other commit types, use your best judgement or omit
 3.  Write a short commit title
-    * Written according to the guidelines above
+    - Written according to the guidelines above
 4.  Write a longer description if necessary
-    * Also written according to the guidelines above
+    - Also written according to the guidelines above
 5.  Mention any tickets addressed by the commit
-    * e.g. `Closes #xyz`
+    - e.g. `Closes #xyz`
 
 ![commitizen](https://user-images.githubusercontent.com/2963448/40452320-776de7e0-5eaf-11e8-9aa7-ad706713b197.gif)
 
@@ -119,13 +119,13 @@ Most of Opentrons’ projects live in the [Opentrons/opentrons][repo] repository
 
 Generally, the directory / file structure of our monorepo looks something like this:
 
-*   \[Project]
-*   \[Another Project]
-*   etc.
-*   `scripts` - Repository level scripts (mostly for CI)
-*   `Makefile` - Top level makefile for CI
-*   Various repository level dotfiles (CI and git config)
-*   `README.md`, `CONTRIBUTING.md`, `LICENSE`, etc.
+- \[Project]
+- \[Another Project]
+- etc.
+- `scripts` - Repository level scripts (mostly for CI)
+- `Makefile` - Top level makefile for CI
+- Various repository level dotfiles (CI and git config)
+- `README.md`, `CONTRIBUTING.md`, `LICENSE`, etc.
 
 Our projects use a mix of languages, but mostly Python (backend + robotics) and JavaScript (frontend). Each project has its own `README` + `Makefile` + dependency management.
 
@@ -139,31 +139,31 @@ Individual projects may have additional instructions, so be sure to check out th
 
 Your computer will need the following tools installed to be able to develop with the Opentrons platform:
 
-*   macOS 10.11+, Linux, or Windows 10
-    * On Windows, please configure Git’s `core.autocrlf` setting (see the [Git config docs](https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration)) to `input` so that shell scripts required for the robot’s boot process in `api/opentrons/resources` do not have carriage returns inserted.
-*   Python 3.6 ([pyenv](https://github.com/pyenv/pyenv) is optional, but recommended for macOS / Linux. If `pyenv` is not available for your system or you do not want to use it, you can set the environment variable `OT_PYTHON` to the full path to the Python 3.6 executable)
+- macOS 10.11+, Linux, or Windows 10
+  - On Windows, please configure Git’s `core.autocrlf` setting (see the [Git config docs](https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration)) to `input` so that shell scripts required for the robot’s boot process in `api/opentrons/resources` do not have carriage returns inserted.
+- Python 3.6 ([pyenv](https://github.com/pyenv/pyenv) is optional, but recommended for macOS / Linux. If `pyenv` is not available for your system or you do not want to use it, you can set the environment variable `OT_PYTHON` to the full path to the Python 3.6 executable)
 
-    ```shell
-    pyenv install 3.6.4
-    ```
+  ```shell
+  pyenv install 3.6.4
+  ```
 
-*   Node v8 LTS (Carbon) - [nvm][] is optional, but recommended
+- Node v8 LTS (Carbon) - [nvm][] is optional, but recommended
 
-    ```shell
-    nvm install lts/carbon
-    ```
+  ```shell
+  nvm install lts/carbon
+  ```
 
-*   [yarn][yarn-install] - JavaScript package manager
+- [yarn][yarn-install] - JavaScript package manager
 
-*   [commitizen][] - Commit message formatter
+- [commitizen][] - Commit message formatter
 
-    ```shell
-    yarn global add commitizen
-    ```
+  ```shell
+  yarn global add commitizen
+  ```
 
-*   GNU Make - we use [Makefiles][] to manage our builds
+- GNU Make - we use [Makefiles][] to manage our builds
 
-*   cURL - used to push development updates to robots
+- cURL - used to push development updates to robots
 
 Once you're set up, clone the repository and install all project dependencies:
 
@@ -313,7 +313,7 @@ Our release process is still a work-in-progress. All projects are currently vers
 1.  `make bump` (see details below)
 2.  Inspect version bumps and changelogs
 3.  Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes
-4. `git checkout -b release_${version}` (The branch name _must_ match `release_*` to trigger signed builds that can be used as RCs)
+4.  `git checkout -b release_${version}` (The branch name _must_ match `release_*` to trigger signed builds that can be used as RCs)
 5.  `git add --all`
 6.  `git cz`
     - Type: `chore`
@@ -322,8 +322,8 @@ Our release process is still a work-in-progress. All projects are currently vers
 7.  Open a PR into `edge`
 8.  Squash merge the PR once approved
 9.  Verify that CI is green on `edge` and test the build artifacts
-10.  Pull latest `edge` to your machine
-11.  `git tag -a v${version} -m 'chore(release): ${version}'`
+10. Pull latest `edge` to your machine
+11. `git tag -a v${version} -m 'chore(release): ${version}'`
 12. `git push --tags`
 
 #### `make bump` usage
@@ -331,12 +331,12 @@ Our release process is still a work-in-progress. All projects are currently vers
 `make bump` runs `lerna publish` (with npm and git push disabled) to bump all required files. You can pass options to lerna with the `opts` environment variable. See the [lerna publish docs][lerna-publish] for available options. The most important options are:
 
 - `--preid` - Used to specify the pre-release identifier
-    - Default: `alpha`
-    - Valid: `alpha`, `beta`
+  - Default: `alpha`
+  - Valid: `alpha`, `beta`
 - `--cd-version` - Used to specify a semantic version bump
-    - Default: `prerelease`
-    - Valid: `major`, `minor`, `patch`, `premajor`, `preminor`, `prepatch`, `prerelease`
-    - See [semver.inc][semver-inc] for keyword meanings
+  - Default: `prerelease`
+  - Valid: `major`, `minor`, `patch`, `premajor`, `preminor`, `prepatch`, `prerelease`
+  - See [semver.inc][semver-inc] for keyword meanings
 - `--repo-version` - Used to specify an explicit version
 
 ```shell
@@ -375,9 +375,9 @@ yarn run lerna [opts]
 
 This Contributing Guide was influenced by a lot of work done on existing Contributing Guides. They're great reads if you have the time!
 
-*   [React.js Contributing Guide][react-contributing]
-*   [Node.js Contributing Guide][node-contributing]
-*   [Kibana Contributing Guide][kibana-contributing]
+- [React.js Contributing Guide][react-contributing]
+- [Node.js Contributing Guide][node-contributing]
+- [Kibana Contributing Guide][kibana-contributing]
 
 ## Developer "Gotchas"
 

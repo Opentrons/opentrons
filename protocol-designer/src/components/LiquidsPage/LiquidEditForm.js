@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import {Formik} from 'formik'
+import { Formik } from 'formik'
 import * as Yup from 'yup'
 import i18n from '../../localization'
 import {
@@ -13,14 +13,14 @@ import {
 } from '@opentrons/components'
 import styles from './LiquidEditForm.css'
 import formStyles from '../forms/forms.css'
-import type {LiquidGroup} from '../../labware-ingred/types'
+import type { LiquidGroup } from '../../labware-ingred/types'
 
 type Props = {
   ...$Exact<LiquidGroup>,
   canDelete: boolean,
   deleteLiquidGroup: () => mixed,
   cancelForm: () => mixed,
-  saveForm: (LiquidGroup) => mixed,
+  saveForm: LiquidGroup => mixed,
 }
 
 type LiquidEditFormValues = {
@@ -30,13 +30,16 @@ type LiquidEditFormValues = {
 }
 export const liquidEditFormSchema = Yup.object().shape({
   name: Yup.string().required(
-    i18n.t('form.generic.error.required', {name: i18n.t('form.liquid_edit.name')})),
+    i18n.t('form.generic.error.required', {
+      name: i18n.t('form.liquid_edit.name'),
+    })
+  ),
   description: Yup.string(),
   serialize: Yup.boolean(),
 })
 
-export default function LiquidEditForm (props: Props) {
-  const {deleteLiquidGroup, cancelForm, canDelete, saveForm} = props
+export default function LiquidEditForm(props: Props) {
+  const { deleteLiquidGroup, cancelForm, canDelete, saveForm } = props
 
   const initialValues = {
     name: props.name,
@@ -48,22 +51,36 @@ export default function LiquidEditForm (props: Props) {
     <Formik
       initialValues={initialValues}
       validationSchema={liquidEditFormSchema}
-      onSubmit={(values: LiquidEditFormValues) => saveForm({
-        name: values.name,
-        description: values.description || null,
-        serialize: values.serialize || false,
-      })}
-      render={({handleChange, handleBlur, handleSubmit, dirty, errors, isValid, touched, values}) => (
+      onSubmit={(values: LiquidEditFormValues) =>
+        saveForm({
+          name: values.name,
+          description: values.description || null,
+          serialize: values.serialize || false,
+        })
+      }
+      render={({
+        handleChange,
+        handleBlur,
+        handleSubmit,
+        dirty,
+        errors,
+        isValid,
+        touched,
+        values,
+      }) => (
         <Card className={styles.form_card}>
           <form onSubmit={handleSubmit}>
             <section className={styles.section}>
-              <div className={formStyles.header}>{i18n.t('form.liquid_edit.details')}</div>
+              <div className={formStyles.header}>
+                {i18n.t('form.liquid_edit.details')}
+              </div>
               <div className={formStyles.row_wrapper}>
                 <FormGroup
                   label={i18n.t('form.liquid_edit.name')}
-                  className={formStyles.column_1_2}>
+                  className={formStyles.column_1_2}
+                >
                   <InputField
-                    name='name'
+                    name="name"
                     error={touched.name && errors.name}
                     value={values.name}
                     onChange={handleChange}
@@ -72,36 +89,40 @@ export default function LiquidEditForm (props: Props) {
                 </FormGroup>
                 <FormGroup
                   label={i18n.t('form.liquid_edit.description')}
-                  className={formStyles.column_1_2}>
+                  className={formStyles.column_1_2}
+                >
                   <InputField
-                    name='description'
+                    name="description"
                     value={values.description}
-                    onChange={handleChange} />
+                    onChange={handleChange}
+                  />
                 </FormGroup>
               </div>
             </section>
 
             <section className={styles.section}>
-              <div className={formStyles.header}>{i18n.t('form.liquid_edit.serialize_title')}</div>
+              <div className={formStyles.header}>
+                {i18n.t('form.liquid_edit.serialize_title')}
+              </div>
               <p className={styles.info_text}>
-                {i18n.t('form.liquid_edit.serialize_explanation')}</p>
+                {i18n.t('form.liquid_edit.serialize_explanation')}
+              </p>
               <CheckboxField
-                name='serialize'
+                name="serialize"
                 label={i18n.t('form.liquid_edit.serialize')}
                 value={values.serialize}
-                onChange={handleChange} />
+                onChange={handleChange}
+              />
             </section>
 
             <div className={styles.button_row}>
-              <OutlineButton
-                onClick={deleteLiquidGroup}
-                disabled={!canDelete}>
+              <OutlineButton onClick={deleteLiquidGroup} disabled={!canDelete}>
                 {i18n.t('button.delete')}
               </OutlineButton>
-              <PrimaryButton onClick={cancelForm}>{i18n.t('button.cancel')}</PrimaryButton>
-              <PrimaryButton
-                disabled={!dirty}
-                type='submit' >
+              <PrimaryButton onClick={cancelForm}>
+                {i18n.t('button.cancel')}
+              </PrimaryButton>
+              <PrimaryButton disabled={!dirty} type="submit">
                 {i18n.t('button.save')}
               </PrimaryButton>
             </div>

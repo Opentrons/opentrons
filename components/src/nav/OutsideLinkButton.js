@@ -3,8 +3,8 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import styles from './navbar.css'
-import {Button} from '../buttons'
-import {NotificationIcon, type IconName} from '../icons'
+import { Button } from '../buttons'
+import { NotificationIcon, type IconName } from '../icons'
 
 type Props = {
   /** optional click event for nav button */
@@ -28,26 +28,21 @@ type Props = {
 }
 
 /** Very much like NavButton, but used for opening external links in a new tab/window */
-export default function OutsideLinkButton (props: Props) {
-  const className = cx(
-    props.className,
-    styles.button,
-    styles.no_link,
-    {
-      [styles.disabled]: props.disabled,
-      [styles.bottom]: props.isBottom,
-      [styles.active]: props.selected,
-    }
-  )
+export default function OutsideLinkButton(props: Props) {
+  const className = cx(props.className, styles.button, styles.no_link, {
+    [styles.disabled]: props.disabled,
+    [styles.bottom]: props.isBottom,
+    [styles.active]: props.selected,
+  })
   return (
     <Button
       className={className}
       disabled={props.disabled}
       onClick={props.onClick}
-      Component='a'
+      Component="a"
       href={props.disabled ? '' : props.to}
-      target='_blank'
-      rel='noopener noreferrer'
+      target="_blank"
+      rel="noopener noreferrer"
     >
       <NotificationIcon
         name={props.iconName}
@@ -55,11 +50,7 @@ export default function OutsideLinkButton (props: Props) {
         className={styles.icon}
         childClassName={styles.notification}
       />
-      {props.title && (
-        <span className={styles.title}>
-          {props.title}
-        </span>
-      )}
+      {props.title && <span className={styles.title}>{props.title}</span>}
     </Button>
   )
 }

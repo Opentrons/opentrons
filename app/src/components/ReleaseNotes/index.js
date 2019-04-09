@@ -17,8 +17,8 @@ const renderer = remark().use(reactRenderer, {
 
 const DEFAULT_RELEASE_NOTES = 'We recommend upgrading to the latest version.'
 
-export default function ReleaseNotes (props: Props) {
-  const {source} = props
+export default function ReleaseNotes(props: Props) {
+  const { source } = props
 
   return (
     <div className={styles.release_notes}>
@@ -31,6 +31,6 @@ export default function ReleaseNotes (props: Props) {
   )
 }
 
-function ExternalLink (props) {
+function ExternalLink(props) {
   return <a {...props} target="_blank" rel="noopener noreferrer" />
 }

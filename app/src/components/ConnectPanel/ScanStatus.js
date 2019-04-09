@@ -11,8 +11,8 @@ type Props = {
   found: boolean,
 }
 
-export default function ScanStatus (props: Props) {
-  const {found, isScanning} = props
+export default function ScanStatus(props: Props) {
+  const { found, isScanning } = props
 
   const notFoundMessage = !isScanning && !found && (
     <div>

@@ -4,10 +4,10 @@
 [![AppVeyor][appveyor-badge]][appveyor]
 [![Codecov][codecov-badge]][codecov]
 
-*   [Overview](#overview)
-*   [Opentrons API](#opentrons-api)
-*   [Opentrons App](#opentrons-app)
-*   [Contributing/Building](#contributing)
+- [Overview](#overview)
+- [Opentrons API](#opentrons-api)
+- [Opentrons App](#opentrons-app)
+- [Contributing/Building](#contributing)
 
 ## Overview
 
@@ -29,15 +29,15 @@ pipette.aspirate(tube_1).dispense(tube_2)
 
 That is how you tell the Opentrons robot to pipette its max volume from one tube to another. Learn more here:
 
-*   [Documentation](http://docs.opentrons.com)
-*   [Source code](./api)
+- [Documentation](http://docs.opentrons.com)
+- [Source code](./api)
 
 ## Opentrons App
 
 Easily upload a protocol, calibrate positions, and run your experiment from your computer.
 
-*   [Documentation](https://support.opentrons.com/)
-*   [Source code](./app)
+- [Documentation](https://support.opentrons.com/)
+- [Source code](./app)
 
 ![ot-app](https://s3.amazonaws.com/opentrons-images/standalone/ot-2-app.png)
 

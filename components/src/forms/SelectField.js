@@ -4,14 +4,18 @@ import cx from 'classnames'
 import find from 'lodash/find'
 import flatMap from 'lodash/flatMap'
 
-import Select, {components} from 'react-select'
-import {Icon} from '../icons'
+import Select, { components } from 'react-select'
+import { Icon } from '../icons'
 import styles from './SelectField.css'
 
 // TODO(mc, 2018-10-23): we use "name", react-select uses "label"; align usage
 export type ValueType = ?string
-export type OptionType = {|value: ValueType, label: React.Node, isDisabled?: boolean |}
-export type GroupType = {|options: Array<OptionType>, label: React.Node|}
+export type OptionType = {|
+  value: ValueType,
+  label: React.Node,
+  isDisabled?: boolean,
+|}
+export type GroupType = {| options: Array<OptionType>, label: React.Node |}
 export type SelectOption = OptionType | GroupType
 
 export type MenuPosition = 'absolute' | 'fixed'
@@ -46,8 +50,8 @@ type SelectProps = {
 }
 
 const SELECT_STYLES = {
-  input: () => ({padding: 0}),
-  groupHeading: () => ({margin: 0}),
+  input: () => ({ padding: 0 }),
+  groupHeading: () => ({ margin: 0 }),
 }
 
 const clearStyles = () => null
@@ -56,16 +60,16 @@ const getOpts = (og: OptionType | GroupType): OptionList => og.options || [og]
 
 export default class SelectField extends React.Component<SelectProps> {
   handleChange = (option: OptionType) => {
-    const {name, onValueChange} = this.props
+    const { name, onValueChange } = this.props
     onValueChange(name, option.value)
   }
 
   handleBlur = () => {
-    const {name, onLoseFocus} = this.props
+    const { name, onLoseFocus } = this.props
     if (onLoseFocus) onLoseFocus(name)
   }
 
-  render () {
+  render() {
     const {
       id,
       name,
@@ -77,9 +81,9 @@ export default class SelectField extends React.Component<SelectProps> {
       menuPosition,
     } = this.props
     const allOptions = flatMap(options, getOpts)
-    const value = find(allOptions, {value: this.props.value}) || null
+    const value = find(allOptions, { value: this.props.value }) || null
     const caption = error || this.props.caption
-    const captionCx = cx(styles.select_caption, {[styles.error_color]: error})
+    const captionCx = cx(styles.select_caption, { [styles.error_color]: error })
 
     return (
       <div>
@@ -110,7 +114,7 @@ export default class SelectField extends React.Component<SelectProps> {
   }
 }
 
-function Control (props: *) {
+function Control(props: *) {
   return (
     <components.Control
       {...props}
@@ -123,7 +127,7 @@ function Control (props: *) {
   )
 }
 
-function DropdownIndicator (props: *) {
+function DropdownIndicator(props: *) {
   const iconWrapperCx = cx(styles.dropdown_icon_wrapper, {
     [styles.flipped]: props.selectProps.menuIsOpen,
   })
@@ -139,7 +143,7 @@ function DropdownIndicator (props: *) {
   )
 }
 // custom Menu (options dropdown) component
-function Menu (props: *) {
+function Menu(props: *) {
   return (
     <components.Menu {...props}>
       <div className={styles.select_menu}>{props.children}</div>
@@ -148,7 +152,7 @@ function Menu (props: *) {
 }
 
 // custom option group wrapper component
-function Group (props: *) {
+function Group(props: *) {
   return (
     <components.Group
       {...props}

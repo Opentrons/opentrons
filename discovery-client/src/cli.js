@@ -1,6 +1,6 @@
 // @flow
 import DiscoveryClient from '.'
-import {version} from '../package.json'
+import { version } from '../package.json'
 
 const LOG_LVLS = ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly']
 const noop = (...args: Array<*>) => {}
@@ -70,7 +70,7 @@ require('yargs')
   .help()
   .parse()
 
-function browse (argv) {
+function browse(argv) {
   DiscoveryClient(argv)
     .on('service', s => argv.logger.info('services added or updated:', s))
     .on('serviceRemoved', s => argv.logger.info('services removed:', s))
@@ -80,7 +80,7 @@ function browse (argv) {
   argv.logger.warn('Browsing for services')
 }
 
-function find (argv) {
+function find(argv) {
   setTimeout(
     () => argv.handleError('Timed out waiting for robot'),
     argv.timeout
@@ -102,12 +102,12 @@ function find (argv) {
 }
 
 // remove brackets from IPv6
-function normalizeIp (ip: string): string {
+function normalizeIp(ip: string): string {
   const match = ip.match(NORMALIZE_IP_RE)
   return (match && match[1]) || ''
 }
 
-function addLogger (argv) {
+function addLogger(argv) {
   const level = LOG_LVLS.indexOf(argv.logLevel)
 
   argv.logger = {
@@ -121,14 +121,14 @@ function addLogger (argv) {
   }
 }
 
-function addHandleError (argv) {
+function addHandleError(argv) {
   argv.handleError = error => {
     argv.logger.error(error)
     process.exit(1)
   }
 }
 
-function logArgv (argv) {
+function logArgv(argv) {
   argv.logger.debug(`Calling ${argv.$0} with argv:`, argv)
   return argv
 }

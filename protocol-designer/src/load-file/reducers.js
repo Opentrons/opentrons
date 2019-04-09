@@ -1,23 +1,32 @@
 // @flow
-import {combineReducers} from 'redux'
-import {handleActions} from 'redux-actions'
-import type {FileUploadMessage, LoadFileAction} from './types'
-import type {FileUploadMessageAction} from './actions'
+import { combineReducers } from 'redux'
+import { handleActions } from 'redux-actions'
+import type { FileUploadMessage, LoadFileAction } from './types'
+import type { FileUploadMessageAction } from './actions'
 
 // Keep track of file upload errors / messages
 type FileUploadMessageState = ?FileUploadMessage
-const fileUploadMessage = handleActions({
-  FILE_UPLOAD_MESSAGE: (state, action: FileUploadMessageAction): FileUploadMessageState =>
-    action.payload,
-  LOAD_FILE: (state, action: LoadFileAction): FileUploadMessageState => action.payload.didMigrate
-    ? {isError: false, messageKey: 'didMigrate'}
-    : state,
-  DISMISS_FILE_UPLOAD_MESSAGE: (): FileUploadMessageState => null,
-}, null)
+const fileUploadMessage = handleActions(
+  {
+    FILE_UPLOAD_MESSAGE: (
+      state,
+      action: FileUploadMessageAction
+    ): FileUploadMessageState => action.payload,
+    LOAD_FILE: (state, action: LoadFileAction): FileUploadMessageState =>
+      action.payload.didMigrate
+        ? { isError: false, messageKey: 'didMigrate' }
+        : state,
+    DISMISS_FILE_UPLOAD_MESSAGE: (): FileUploadMessageState => null,
+  },
+  null
+)
 
 // NOTE: whenever we add or change any of the action types that indicate
 // "changes to the protocol", those action types need to be updated here.
-const unsavedChanges = (state: boolean = false, action: {type: string, payload: any}): boolean => {
+const unsavedChanges = (
+  state: boolean = false,
+  action: { type: string, payload: any }
+): boolean => {
   switch (action.type) {
     case 'LOAD_FILE': {
       return action.payload.didMigrate // no unsaved changes unless migration happened

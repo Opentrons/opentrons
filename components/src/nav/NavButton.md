@@ -1,20 +1,18 @@
 Basic Usage:
 
 ```js
-<div style={{width: '5rem'}}>
-  <NavButton
-    onClick={() => alert('you clicked me')}
-    iconName='ot-connect'
-  />
+<div style={{ width: '5rem' }}>
+  <NavButton onClick={() => alert('you clicked me')} iconName="ot-connect" />
 </div>
 ```
+
 Disabled:
 
 ```js
-<div style={{width: '5rem'}}>
+<div style={{ width: '5rem' }}>
   <NavButton
     onClick={() => alert('you clicked me')}
-    iconName='ot-connect'
+    iconName="ot-connect"
     disabled
   />
 </div>
@@ -23,10 +21,10 @@ Disabled:
 Currently Selected:
 
 ```js
-<div style={{width: '5rem'}}>
+<div style={{ width: '5rem' }}>
   <NavButton
     onClick={() => alert('you clicked me')}
-    iconName='ot-connect'
+    iconName="ot-connect"
     selected
   />
 </div>
@@ -35,12 +33,12 @@ Currently Selected:
 Optional Title:
 
 ```js
-<div style={{width: '5rem'}}>
+<div style={{ width: '5rem' }}>
   <NavButton
     onClick={() => alert('you clicked me')}
-    title='connect'
-    iconName='ot-connect'
-    title='connect'
+    title="connect"
+    iconName="ot-connect"
+    title="connect"
   />
 </div>
 ```

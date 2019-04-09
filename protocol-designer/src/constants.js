@@ -1,8 +1,8 @@
 // @flow
 import reduce from 'lodash/reduce'
 import * as componentLib from '@opentrons/components'
-import {getLabware} from '@opentrons/shared-data'
-import type {JsonWellData, WellVolumes} from './types'
+import { getLabware } from '@opentrons/shared-data'
+import type { JsonWellData, WellVolumes } from './types'
 // TODO Ian 2018-11-27: import these from components lib, not from this contants file
 export const {
   // OT2 DECK CONSTANTS
@@ -28,15 +28,19 @@ export const getMaxVolumes = (labwareType: string): WellVolumes => {
       {}
     )
   }
-  console.warn(`Container type ${labwareType} not in labware definitions, couldn't get max volume`)
+  console.warn(
+    `Container type ${labwareType} not in labware definitions, couldn't get max volume`
+  )
   return {}
 }
 
 /** All wells for labware, in arbitrary order. */
-export function getAllWellsForLabware (labwareType: string): Array<string> {
+export function getAllWellsForLabware(labwareType: string): Array<string> {
   const labware = getLabware(labwareType)
   if (!labware) {
-    console.error(`getAllWellsForLabware: invalid labware type "${labwareType}"`)
+    console.error(
+      `getAllWellsForLabware: invalid labware type "${labwareType}"`
+    )
     return []
   }
   return Object.keys(labware.wells)

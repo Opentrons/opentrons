@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import {Formik} from 'formik'
+import { Formik } from 'formik'
 import get from 'lodash/get'
 import find from 'lodash/find'
 import set from 'lodash/set'
@@ -16,8 +16,8 @@ import {
   EAP_TYPE_FIELD,
 } from '../../../http-api-client'
 
-import {BottomButtonBar} from '../../modals'
-import {StringField, PasswordField, SelectOptionField} from './fields'
+import { BottomButtonBar } from '../../modals'
+import { StringField, PasswordField, SelectOptionField } from './fields'
 import SelectKey from './SelectKey'
 import FormTable from './FormTable'
 
@@ -30,7 +30,7 @@ import type {
   WifiConfigureRequest,
 } from '../../../http-api-client'
 
-import type {SelectOption} from '@opentrons/components'
+import type { SelectOption } from '@opentrons/components'
 
 type Props = {
   ssid: ?string,
@@ -43,7 +43,7 @@ type Props = {
 }
 
 type State = {|
-  showPassword: {[name: string]: boolean},
+  showPassword: { [name: string]: boolean },
 |}
 
 type FieldProps = {
@@ -53,7 +53,7 @@ type FieldProps = {
   required: boolean,
 }
 
-export type FormValues = {[string]: ?(string | {[string]: string})}
+export type FormValues = { [string]: ?(string | { [string]: string }) }
 
 const PSK_MIN_LENGTH = 8
 
@@ -89,11 +89,11 @@ const SECURITY_TYPE_FIELD_PROPS: FieldProps = {
 const UNKNOWN_SECURITY_OPTIONS: Array<SelectOption> = [
   {
     label: null,
-    options: [{value: NO_SECURITY, label: NO_SECURITY_LABEL}],
+    options: [{ value: NO_SECURITY, label: NO_SECURITY_LABEL }],
   },
   {
     label: null,
-    options: [{value: WPA_PSK_SECURITY, label: PSK_SECURITY_LABEL}],
+    options: [{ value: WPA_PSK_SECURITY, label: PSK_SECURITY_LABEL }],
   },
 ]
 
@@ -115,24 +115,24 @@ const getEapFields = (
   eapOptions: ?WifiEapOptionsList,
   name: ?string
 ): Array<FieldProps> => {
-  const method = find(eapOptions, {name})
+  const method = find(eapOptions, { name })
   const options = method ? method.options : []
   return options.map(makeEapField)
 }
 
 export default class ConnectForm extends React.Component<Props, State> {
-  constructor (props: Props) {
+  constructor(props: Props) {
     super(props)
-    this.state = {showPassword: {}}
+    this.state = { showPassword: {} }
   }
 
   handleSubmit = (values: FormValues) => {
-    const {ssid: knownSsid, configure, close} = this.props
+    const { ssid: knownSsid, configure, close } = this.props
     const ssid = this.getSsid(values)
     const securityType = this.getSecurityType(values)
     const hidden = !knownSsid
 
-    configure({...values, ssid, securityType, hidden})
+    configure({ ...values, ssid, securityType, hidden })
     close()
   }
 
@@ -147,10 +147,10 @@ export default class ConnectForm extends React.Component<Props, State> {
   }
 
   validate = (values: FormValues) => {
-    const {securityType: knownSecurityType} = this.props
+    const { securityType: knownSecurityType } = this.props
 
     return this.getFields(values).reduce((errors, field) => {
-      const {name, label, required} = field
+      const { name, label, required } = field
       let missingEap = false
       let value: string
 
@@ -174,25 +174,25 @@ export default class ConnectForm extends React.Component<Props, State> {
     }, {})
   }
 
-  getSsid (values: FormValues): ?string {
+  getSsid(values: FormValues): ?string {
     return this.props.ssid || get(values, SSID_FIELD)
   }
 
-  getSecurityType (values: FormValues): ?WifiSecurityType {
+  getSecurityType(values: FormValues): ?WifiSecurityType {
     return this.props.securityType || get(values, SECURITY_TYPE_FIELD)
   }
 
-  getSecurityOptions (): Array<SelectOption> {
-    const {eapOptions, securityType: knownSecurityType} = this.props
+  getSecurityOptions(): Array<SelectOption> {
+    const { eapOptions, securityType: knownSecurityType } = this.props
     const opts = !knownSecurityType ? UNKNOWN_SECURITY_OPTIONS : []
 
     return eapOptions && eapOptions.length
-      ? opts.concat({label: null, options: eapOptions.map(makeEapOpt)})
+      ? opts.concat({ label: null, options: eapOptions.map(makeEapOpt) })
       : opts
   }
 
-  getFields (values: FormValues): Array<FieldProps> {
-    const {ssid: knownSsid, securityType: knownSecurityType} = this.props
+  getFields(values: FormValues): Array<FieldProps> {
+    const { ssid: knownSsid, securityType: knownSecurityType } = this.props
     const securityType = this.getSecurityType(values)
     const fields = []
 
@@ -211,7 +211,7 @@ export default class ConnectForm extends React.Component<Props, State> {
     return fields
   }
 
-  getFieldValue (name: string, values: FormValues): ?string {
+  getFieldValue(name: string, values: FormValues): ?string {
     if (name === SECURITY_TYPE_FIELD) {
       return getEapType(values) || this.getSecurityType(values)
     }
@@ -219,15 +219,15 @@ export default class ConnectForm extends React.Component<Props, State> {
     return get(values, name)
   }
 
-  handleSecurityChange (
+  handleSecurityChange(
     name: string,
     value: ?string,
     ssid: ?string,
     setValues: FormValues => mixed
   ): mixed {
-    const {eapOptions, securityType: knownSecurityType} = this.props
-    const nextValues = ssid ? {ssid} : {}
-    const eapType = find(eapOptions, {name: value})
+    const { eapOptions, securityType: knownSecurityType } = this.props
+    const nextValues = ssid ? { ssid } : {}
+    const eapType = find(eapOptions, { name: value })
     const securityValue = eapType ? WPA_EAP_SECURITY : value
 
     if (!knownSecurityType) set(nextValues, name, securityValue)
@@ -235,9 +235,9 @@ export default class ConnectForm extends React.Component<Props, State> {
     setValues(nextValues)
   }
 
-  render () {
-    const {showPassword} = this.state
-    const {keys, addKey, close} = this.props
+  render() {
+    const { showPassword } = this.state
+    const { keys, addKey, close } = this.props
 
     return (
       <Formik
@@ -262,7 +262,7 @@ export default class ConnectForm extends React.Component<Props, State> {
             <form onSubmit={handleSubmit}>
               <FormTable>
                 {this.getFields(values).map(field => {
-                  const {type, name, label, required} = field
+                  const { type, name, label, required } = field
                   const value = this.getFieldValue(field.name, values)
                   const error = get(touched, name) ? get(errors, name) : null
 
@@ -270,7 +270,7 @@ export default class ConnectForm extends React.Component<Props, State> {
                     return (
                       <StringField
                         key={name}
-                        {...{name, label, value, error, required}}
+                        {...{ name, label, value, error, required }}
                         onChange={handleChange}
                         onBlur={handleBlur}
                       />
@@ -280,7 +280,7 @@ export default class ConnectForm extends React.Component<Props, State> {
                     return (
                       <PasswordField
                         key={name}
-                        {...{name, label, value, error, required}}
+                        {...{ name, label, value, error, required }}
                         onChange={handleChange}
                         onBlur={handleBlur}
                         showPassword={showPassword[name]}
@@ -292,7 +292,7 @@ export default class ConnectForm extends React.Component<Props, State> {
                     return (
                       <SelectOptionField
                         key={name}
-                        {...{name, label, value, error, required}}
+                        {...{ name, label, value, error, required }}
                         options={this.getSecurityOptions()}
                         placeholder={SECURITY_TYPE_PLACEHOLDER}
                         onLoseFocus={setFieldTouched}
@@ -314,7 +314,15 @@ export default class ConnectForm extends React.Component<Props, State> {
                     return (
                       <SelectKey
                         key={name}
-                        {...{name, label, value, error, required, keys, addKey}}
+                        {...{
+                          name,
+                          label,
+                          value,
+                          error,
+                          required,
+                          keys,
+                          addKey,
+                        }}
                         onValueChange={setFieldValue}
                         onLoseFocus={setFieldTouched}
                       />
@@ -326,8 +334,8 @@ export default class ConnectForm extends React.Component<Props, State> {
               </FormTable>
               <BottomButtonBar
                 buttons={[
-                  {children: 'Cancel', onClick: close},
-                  {children: 'Join', type: 'submit', disabled: !isValid},
+                  { children: 'Cancel', onClick: close },
+                  { children: 'Join', type: 'submit', disabled: !isValid },
                 ]}
               />
             </form>

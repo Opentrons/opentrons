@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react'
-import {Icon} from '@opentrons/components'
+import { Icon } from '@opentrons/components'
 import styles from './LiquidsPageInfo.css'
 
-export default function LiquidsPageInfo () {
+export default function LiquidsPageInfo() {
   return (
     <div className={styles.info_wrapper}>
       <h2 className={styles.header}>Define your liquids</h2>
@@ -15,10 +15,9 @@ export default function LiquidsPageInfo () {
 
       <div className={styles.instruction}>
         {"After you've added your liquids, continue to the"}
-        <Icon name='ot-design' className={styles.inline_icon}/>
+        <Icon name="ot-design" className={styles.inline_icon} />
         tab where you can specify where labware and liquids start on your deck.
       </div>
-
     </div>
   )
 }

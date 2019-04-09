@@ -1,31 +1,11 @@
 {
-  "ordering": [
-    [
-      "A1",
-      "B1"
-    ],
-    [
-      "A2",
-      "B2"
-    ],
-    [
-      "A3",
-      "B3"
-    ]
-  ],
+  "ordering": [["A1", "B1"], ["A2", "B2"], ["A3", "B3"]],
   "brand": {
     "brand": "Opentrons",
-    "brandId": [
-      "352070"
-    ]
+    "brandId": ["352070"]
   },
   "metadata": {
-    "tags": [
-      "50",
-      "mL",
-      "falcon",
-      "tuberack"
-    ],
+    "tags": ["50", "mL", "falcon", "tuberack"],
     "displayName": "Opentrons 6 Tube Rack With Falcon 50 mL Conical",
     "displayCategory": "tubeRack",
     "displayVolumeUnits": "mL"

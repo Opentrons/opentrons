@@ -1,16 +1,16 @@
 // @flow
 // redux action types to analytics events map
 import createLogger from '../logger'
-import {selectors as robotSelectors} from '../robot'
-import {getConnectedRobot} from '../discovery'
-import {getProtocolAnalyticsData, getRobotAnalyticsData} from './selectors'
+import { selectors as robotSelectors } from '../robot'
+import { getConnectedRobot } from '../discovery'
+import { getProtocolAnalyticsData, getRobotAnalyticsData } from './selectors'
 
-import type {State, Action} from '../types'
-import type {AnalyticsEvent} from './types'
+import type { State, Action } from '../types'
+import type { AnalyticsEvent } from './types'
 
 const log = createLogger(__filename)
 
-export default function makeEvent (
+export default function makeEvent(
   action: Action,
   nextState: State,
   prevState: State
@@ -49,7 +49,7 @@ export default function makeEvent (
       // only fire event if we had a protocol upload in flight; we don't want
       // to fire if user connects to robot with protocol already loaded
       if (!prevState.robot.session.sessionRequest.inProgress) return null
-      const {type: actionType, payload: actionPayload} = action
+      const { type: actionType, payload: actionPayload } = action
 
       return getProtocolAnalyticsData(nextState).then(data => ({
         name: 'protocolUploadResponse',
@@ -100,7 +100,7 @@ export default function makeEvent (
 
       return getProtocolAnalyticsData(nextState).then(data => ({
         name: 'runPause',
-        properties: {...data, runTime},
+        properties: { ...data, runTime },
       }))
     }
 
@@ -110,7 +110,7 @@ export default function makeEvent (
 
       return getProtocolAnalyticsData(nextState).then(data => ({
         name: 'runResume',
-        properties: {...data, runTime},
+        properties: { ...data, runTime },
       }))
     }
 
@@ -120,7 +120,7 @@ export default function makeEvent (
 
       return getProtocolAnalyticsData(nextState).then(data => ({
         name: 'runCancel',
-        properties: {...data, runTime},
+        properties: { ...data, runTime },
       }))
   }
 

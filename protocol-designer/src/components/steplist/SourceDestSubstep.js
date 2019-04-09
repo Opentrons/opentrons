@@ -23,40 +23,41 @@ type SourceDestSubstepProps = {|
   hoveredSubstep: ?SubstepIdentifier,
 |}
 
-export default function SourceDestSubstep (props: SourceDestSubstepProps) {
-  const {substeps, selectSubstep, hoveredSubstep} = props
+export default function SourceDestSubstep(props: SourceDestSubstepProps) {
+  const { substeps, selectSubstep, hoveredSubstep } = props
   if (substeps.multichannel) {
     // multi-channel row item (collapsible)
-    return <li>
-      {substeps.multiRows.map((rowGroup, groupKey) =>
-        <MultiChannelSubstep
-          key={groupKey}
-          rowGroup={rowGroup}
-          stepId={substeps.parentStepId}
-          substepIndex={groupKey}
-          selectSubstep={selectSubstep}
-          ingredNames={props.ingredNames}
-          highlighted={!!hoveredSubstep &&
-            hoveredSubstep.stepId === substeps.parentStepId &&
-            hoveredSubstep.substepIndex === groupKey
-          }
-        />
-      )}
-    </li>
+    return (
+      <li>
+        {substeps.multiRows.map((rowGroup, groupKey) => (
+          <MultiChannelSubstep
+            key={groupKey}
+            rowGroup={rowGroup}
+            stepId={substeps.parentStepId}
+            substepIndex={groupKey}
+            selectSubstep={selectSubstep}
+            ingredNames={props.ingredNames}
+            highlighted={
+              !!hoveredSubstep &&
+              hoveredSubstep.stepId === substeps.parentStepId &&
+              hoveredSubstep.substepIndex === groupKey
+            }
+          />
+        ))}
+      </li>
+    )
   }
 
   // single-channel row item
-  return substeps.rows.map((row, substepIndex) =>
+  return substeps.rows.map((row, substepIndex) => (
     <SubstepRow
       key={substepIndex}
-      className={cx(
-        styles.step_subitem,
-        {[styles.highlighted]:
+      className={cx(styles.step_subitem, {
+        [styles.highlighted]:
           !!hoveredSubstep &&
           hoveredSubstep.stepId === substeps.parentStepId &&
           substepIndex === hoveredSubstep.substepIndex,
-        }
-      )}
+      })}
       selectSubstep={selectSubstep}
       stepId={substeps.parentStepId}
       substepIndex={substepIndex}
@@ -65,5 +66,5 @@ export default function SourceDestSubstep (props: SourceDestSubstepProps) {
       source={row.source}
       dest={row.dest}
     />
-  )
+  ))
 }

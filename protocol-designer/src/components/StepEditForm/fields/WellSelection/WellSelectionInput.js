@@ -1,16 +1,19 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {FormGroup, InputField} from '@opentrons/components'
+import { connect } from 'react-redux'
+import { FormGroup, InputField } from '@opentrons/components'
 import i18n from '../../../../localization'
 import WellSelectionModal from './WellSelectionModal'
-import {Portal} from '../../../portals/MainPageModalPortal'
-import {actions as stepsActions, selectors as stepsSelectors} from '../../../../ui/steps'
+import { Portal } from '../../../portals/MainPageModalPortal'
+import {
+  actions as stepsActions,
+  selectors as stepsSelectors,
+} from '../../../../ui/steps'
 import styles from '../../StepEditForm.css'
 
-import type {Dispatch} from 'redux'
-import type {StepIdType, StepFieldName} from '../../../../form-types'
-import type {BaseState} from '../../../../types'
+import type { Dispatch } from 'redux'
+import type { StepIdType, StepFieldName } from '../../../../form-types'
+import type { BaseState } from '../../../../types'
 import type { FocusHandlers } from '../../types'
 
 type SP = {
@@ -18,7 +21,7 @@ type SP = {
   wellSelectionLabwareKey: ?string,
 }
 type DP = {
-  onOpen: (string) => mixed,
+  onOpen: string => mixed,
   onClose: () => mixed,
 }
 
@@ -38,23 +41,24 @@ type Props = OP & SP & DP
 
 class WellSelectionInput extends React.Component<Props> {
   handleOpen = () => {
-    const {labwareId, pipetteId, name} = this.props
+    const { labwareId, pipetteId, name } = this.props
     this.props.onFieldFocus(name)
     if (labwareId && pipetteId) {
       this.props.onOpen(this.getModalKey())
     }
   }
 
-  handleClose= () => {
+  handleClose = () => {
     this.props.onFieldBlur(this.props.name)
     this.props.onClose()
   }
 
   getModalKey = () => {
-    const {name, pipetteId, labwareId, stepId} = this.props
-    return `${String(stepId)}${name}${pipetteId || 'noPipette'}${labwareId || 'noLabware'}`
+    const { name, pipetteId, labwareId, stepId } = this.props
+    return `${String(stepId)}${name}${pipetteId || 'noPipette'}${labwareId ||
+      'noLabware'}`
   }
-  render () {
+  render() {
     const modalKey = this.getModalKey()
     const label = this.props.isMulti
       ? i18n.t('form.step_edit_form.wellSelectionLabel.columns')
@@ -63,13 +67,19 @@ class WellSelectionInput extends React.Component<Props> {
       <FormGroup
         label={label}
         disabled={this.props.disabled}
-        className={styles.small_field}>
+        className={styles.small_field}
+      >
         <InputField
           readOnly
           name={this.props.name}
-          value={this.props.primaryWellCount ? String(this.props.primaryWellCount) : null}
+          value={
+            this.props.primaryWellCount
+              ? String(this.props.primaryWellCount)
+              : null
+          }
           onClick={this.handleOpen}
-          error={this.props.errorToShow} />
+          error={this.props.errorToShow}
+        />
         <Portal>
           <WellSelectionModal
             key={modalKey}
@@ -77,7 +87,8 @@ class WellSelectionInput extends React.Component<Props> {
             labwareId={this.props.labwareId}
             isOpen={this.props.wellSelectionLabwareKey === modalKey}
             onCloseClick={this.handleClose}
-            name={this.props.name} />
+            name={this.props.name}
+          />
         </Portal>
       </FormGroup>
     )
@@ -93,4 +104,7 @@ const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
   onClose: () => dispatch(stepsActions.clearWellSelectionLabwareKey()),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(WellSelectionInput)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WellSelectionInput)

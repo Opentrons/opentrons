@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
 
-import {AlertModal} from '@opentrons/components'
-import {Portal} from '../portal'
+import { AlertModal } from '@opentrons/components'
+import { Portal } from '../portal'
 
 type Props = {
   back: () => mixed,
@@ -13,16 +13,16 @@ const HEADING = 'Are you sure you want to go back?'
 const CANCEL_TEXT = 'cancel'
 const EXIT_TEXT = 'exit'
 
-export default function ExitAlertModal (props: Props) {
-  const {back, exit} = props
+export default function ExitAlertModal(props: Props) {
+  const { back, exit } = props
 
   return (
     <Portal>
       <AlertModal
         heading={HEADING}
         buttons={[
-          {children: CANCEL_TEXT, onClick: back},
-          {children: EXIT_TEXT, onClick: exit},
+          { children: CANCEL_TEXT, onClick: back },
+          { children: EXIT_TEXT, onClick: exit },
         ]}
         alertOverlay
       >

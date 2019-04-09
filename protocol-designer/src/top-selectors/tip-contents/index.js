@@ -1,45 +1,51 @@
 // @flow
-import {createSelector} from 'reselect'
+import { createSelector } from 'reselect'
 import noop from 'lodash/noop'
 import * as StepGeneration from '../../step-generation'
-import {allSubsteps as getAllSubsteps} from '../substeps'
-import {
-  START_TERMINAL_ITEM_ID,
-  END_TERMINAL_ITEM_ID,
-} from '../../steplist'
-import {selectors as stepFormSelectors} from '../../step-forms'
-import {selectors as stepsSelectors} from '../../ui/steps'
-import {selectors as fileDataSelectors} from '../../file-data'
-import {getWellSetForMultichannel} from '../../well-selection/utils'
+import { allSubsteps as getAllSubsteps } from '../substeps'
+import { START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID } from '../../steplist'
+import { selectors as stepFormSelectors } from '../../step-forms'
+import { selectors as stepsSelectors } from '../../ui/steps'
+import { selectors as fileDataSelectors } from '../../file-data'
+import { getWellSetForMultichannel } from '../../well-selection/utils'
 
-import {typeof Labware} from '@opentrons/components'
-import type {CommandV1 as Command} from '@opentrons/shared-data'
-import type {OutputSelector} from 'reselect'
-import type {BaseState} from '../../types'
-import type {ElementProps} from 'react'
+import { typeof Labware } from '@opentrons/components'
+import type { CommandV1 as Command } from '@opentrons/shared-data'
+import type { OutputSelector } from 'reselect'
+import type { BaseState } from '../../types'
+import type { ElementProps } from 'react'
 
 type GetTipProps = $PropertyType<ElementProps<Labware>, 'getTipProps'>
-type GetTipSelector = OutputSelector<BaseState, {labwareId: string}, GetTipProps>
+type GetTipSelector = OutputSelector<
+  BaseState,
+  { labwareId: string },
+  GetTipProps
+>
 
-function getLabwareIdProp (state, props: {labwareId: string}) {
+function getLabwareIdProp(state, props: { labwareId: string }) {
   return props.labwareId
 }
 
-function getTipHighlighted (
+function getTipHighlighted(
   labwareId: string,
   wellName: string,
   commandsAndRobotState: StepGeneration.CommandsAndRobotState
 ): boolean {
-  const {commands, robotState} = commandsAndRobotState
+  const { commands, robotState } = commandsAndRobotState
   const commandUsesTip = (c: Command) => {
     if (c.command === 'pick-up-tip' && c.params.labware === labwareId) {
       const commandWellName = c.params.well
       const pipetteId = c.params.pipette
       const labwareType = StepGeneration.getLabwareType(labwareId, robotState)
-      const pipetteSpec = StepGeneration.getPipetteSpecFromId(pipetteId, robotState)
+      const pipetteSpec = StepGeneration.getPipetteSpecFromId(
+        pipetteId,
+        robotState
+      )
 
       if (!labwareType) {
-        console.error(`Labware ${labwareId} missing labwareType. Could not get tip highlight state`)
+        console.error(
+          `Labware ${labwareId} missing labwareType. Could not get tip highlight state`
+        )
         return false
       } else if (pipetteSpec.channels === 1) {
         return commandWellName === wellName
@@ -47,7 +53,10 @@ function getTipHighlighted (
         const wellSet = getWellSetForMultichannel(labwareType, commandWellName)
         return Boolean(wellSet && wellSet.includes(wellName))
       } else {
-        console.error(`Unexpected number of channels: ${pipetteSpec.channels || '?'}. Could not get tip highlight state`)
+        console.error(
+          `Unexpected number of channels: ${pipetteSpec.channels ||
+            '?'}. Could not get tip highlight state`
+        )
         return false
       }
     }
@@ -57,7 +66,7 @@ function getTipHighlighted (
   return commands.some(commandUsesTip)
 }
 
-function getTipEmpty (
+function getTipEmpty(
   wellName: string,
   labwareId: string,
   robotState: StepGeneration.RobotState
@@ -71,21 +80,19 @@ function getTipEmpty (
 const getInitialTips: GetTipSelector = createSelector(
   fileDataSelectors.getInitialRobotState,
   getLabwareIdProp,
-  (initialRobotState, labwareId) =>
-    (wellName: string) => ({
-      empty: getTipEmpty(wellName, labwareId, initialRobotState),
-      highlighted: false,
-    })
+  (initialRobotState, labwareId) => (wellName: string) => ({
+    empty: getTipEmpty(wellName, labwareId, initialRobotState),
+    highlighted: false,
+  })
 )
 
 const getLastValidTips: GetTipSelector = createSelector(
   fileDataSelectors.lastValidRobotState,
   getLabwareIdProp,
-  (lastValidRobotState, labwareId) =>
-    (wellName: string) => ({
-      empty: getTipEmpty(wellName, labwareId, lastValidRobotState),
-      highlighted: false,
-    })
+  (lastValidRobotState, labwareId) => (wellName: string) => ({
+    empty: getTipEmpty(wellName, labwareId, lastValidRobotState),
+    highlighted: false,
+  })
 )
 
 export const getTipsForCurrentStep: GetTipSelector = createSelector(
@@ -98,7 +105,17 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
   getLabwareIdProp,
   stepsSelectors.getHoveredSubstep,
   getAllSubsteps,
-  (orderedStepIds, robotStateTimeline, hoveredStepId, activeItem, initialTips, lastValidTips, labwareId, hoveredSubstepIdentifier, allSubsteps) => {
+  (
+    orderedStepIds,
+    robotStateTimeline,
+    hoveredStepId,
+    activeItem,
+    initialTips,
+    lastValidTips,
+    labwareId,
+    hoveredSubstepIdentifier,
+    allSubsteps
+  ) => {
     if (!activeItem.isStep) {
       const terminalId = activeItem.id
       if (terminalId === START_TERMINAL_ITEM_ID) {
@@ -106,7 +123,9 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
       } else if (terminalId === END_TERMINAL_ITEM_ID) {
         return lastValidTips
       } else {
-        console.error(`Invalid terminalId ${terminalId}, could not getTipsForCurrentStep`)
+        console.error(
+          `Invalid terminalId ${terminalId}, could not getTipsForCurrentStep`
+        )
         return noop
       }
     }
@@ -128,39 +147,52 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
 
     return (wellName: string) => {
       // show empty/present tip state at end of previous frame
-      const empty = (prevFrame)
+      const empty = prevFrame
         ? getTipEmpty(wellName, labwareId, prevFrame.robotState)
         : false
 
       // show highlights of tips used by current frame, if user is hovering
       let highlighted = false
       if (hoveredSubstepIdentifier && currentFrame) {
-        const {substepIndex} = hoveredSubstepIdentifier
+        const { substepIndex } = hoveredSubstepIdentifier
         const substepsForStep = allSubsteps[hoveredSubstepIdentifier.stepId]
 
-        if (substepsForStep && substepsForStep.commandCreatorFnName !== 'delay') {
+        if (
+          substepsForStep &&
+          substepsForStep.commandCreatorFnName !== 'delay'
+        ) {
           if (substepsForStep.multichannel) {
-            const hoveredSubstepData = substepsForStep.multiRows[substepIndex][0] // just use first multi row
+            const hoveredSubstepData =
+              substepsForStep.multiRows[substepIndex][0] // just use first multi row
 
-            const labwareType = StepGeneration.getLabwareType(labwareId, currentFrame.robotState)
-            const wellSet = (labwareType && hoveredSubstepData.activeTips)
-              ? getWellSetForMultichannel(labwareType, hoveredSubstepData.activeTips.well)
-              : []
+            const labwareType = StepGeneration.getLabwareType(
+              labwareId,
+              currentFrame.robotState
+            )
+            const wellSet =
+              labwareType && hoveredSubstepData.activeTips
+                ? getWellSetForMultichannel(
+                    labwareType,
+                    hoveredSubstepData.activeTips.well
+                  )
+                : []
 
-            highlighted = (hoveredSubstepData &&
-              hoveredSubstepData.activeTips &&
-              hoveredSubstepData.activeTips.labware === labwareId &&
-              Boolean(wellSet && wellSet.includes(wellName))
-            ) || false
+            highlighted =
+              (hoveredSubstepData &&
+                hoveredSubstepData.activeTips &&
+                hoveredSubstepData.activeTips.labware === labwareId &&
+                Boolean(wellSet && wellSet.includes(wellName))) ||
+              false
           } else {
             // single-channel
             const hoveredSubstepData = substepsForStep.rows[substepIndex]
 
-            highlighted = (hoveredSubstepData &&
-              hoveredSubstepData.activeTips &&
-              hoveredSubstepData.activeTips.labware === labwareId &&
-              hoveredSubstepData.activeTips.well === wellName
-            ) || false
+            highlighted =
+              (hoveredSubstepData &&
+                hoveredSubstepData.activeTips &&
+                hoveredSubstepData.activeTips.labware === labwareId &&
+                hoveredSubstepData.activeTips.well === wellName) ||
+              false
           }
         }
       } else if (hovered && currentFrame) {

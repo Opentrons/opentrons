@@ -1,14 +1,14 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {HoverTooltip, type HoverTooltipHandlers} from '@opentrons/components'
-import {actions} from '../../../steplist'
-import {selectors as stepFormSelectors} from '../../../step-forms'
-import {getFieldErrors, maskField} from '../../../steplist/fieldLevel'
-import {getDisabledFields} from '../../../steplist/formLevel'
-import type {BaseState, ThunkDispatch} from '../../../types'
-import type {StepFieldName} from '../../../form-types'
-import {getTooltipForField} from '../utils'
+import { connect } from 'react-redux'
+import { HoverTooltip, type HoverTooltipHandlers } from '@opentrons/components'
+import { actions } from '../../../steplist'
+import { selectors as stepFormSelectors } from '../../../step-forms'
+import { getFieldErrors, maskField } from '../../../steplist/fieldLevel'
+import { getDisabledFields } from '../../../steplist/formLevel'
+import type { BaseState, ThunkDispatch } from '../../../types'
+import type { StepFieldName } from '../../../form-types'
+import { getTooltipForField } from '../utils'
 
 type FieldRenderProps = {
   value: ?mixed,
@@ -19,13 +19,13 @@ type FieldRenderProps = {
 }
 type OP = {
   name: StepFieldName,
-  render: (FieldRenderProps) => React.Node, // TODO: type StepField
+  render: FieldRenderProps => React.Node, // TODO: type StepField
   dirtyFields?: Array<StepFieldName>,
   focusedField?: StepFieldName,
   tooltipComponent?: React.Node,
 }
-type SP = {value?: ?mixed, stepType: ?string, disabled: boolean}
-type DP = {updateValue: (?mixed) => void}
+type SP = { value?: ?mixed, stepType: ?string, disabled: boolean }
+type DP = { updateValue: (?mixed) => void }
 type StepFieldProps = OP & SP & DP
 
 const FieldConnector = (props: StepFieldProps) => {
@@ -39,26 +39,42 @@ const FieldConnector = (props: StepFieldProps) => {
     dirtyFields,
     disabled,
   } = props
-  const showErrors = showFieldErrors({name, focusedField, dirtyFields})
+  const showErrors = showFieldErrors({ name, focusedField, dirtyFields })
   const errors = getFieldErrors(name, value)
-  const errorToShow = (showErrors && errors.length > 0) ? errors.join(', ') : null
+  const errorToShow = showErrors && errors.length > 0 ? errors.join(', ') : null
 
-  const tooltipComponent = props.tooltipComponent || getTooltipForField(stepType, name, disabled)
+  const tooltipComponent =
+    props.tooltipComponent || getTooltipForField(stepType, name, disabled)
 
-  if (!tooltipComponent) return render({value, updateValue, errorToShow, disabled})
+  if (!tooltipComponent)
+    return render({ value, updateValue, errorToShow, disabled })
 
   return (
-    <HoverTooltip tooltipComponent={tooltipComponent} placement='top'>
-      {(hoverTooltipHandlers) =>
-        render({value, updateValue, errorToShow, hoverTooltipHandlers, disabled})}
+    <HoverTooltip tooltipComponent={tooltipComponent} placement="top">
+      {hoverTooltipHandlers =>
+        render({
+          value,
+          updateValue,
+          errorToShow,
+          hoverTooltipHandlers,
+          disabled,
+        })
+      }
     </HoverTooltip>
   )
 }
 
-type ShowFieldErrorParams = {name: StepFieldName, focusedField?: StepFieldName, dirtyFields?: Array<StepFieldName>}
-export const showFieldErrors = ({name, focusedField, dirtyFields}: ShowFieldErrorParams) => (
+type ShowFieldErrorParams = {
+  name: StepFieldName,
+  focusedField?: StepFieldName,
+  dirtyFields?: Array<StepFieldName>,
+}
+export const showFieldErrors = ({
+  name,
+  focusedField,
+  dirtyFields,
+}: ShowFieldErrorParams) =>
   !(name === focusedField) && dirtyFields && dirtyFields.includes(name)
-)
 
 const STP = (state: BaseState, ownProps: OP): SP => {
   const formData = stepFormSelectors.getUnsavedForm(state)
@@ -72,10 +88,15 @@ const STP = (state: BaseState, ownProps: OP): SP => {
 const DTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   updateValue: (value: mixed) => {
     const maskedValue = maskField(ownProps.name, value)
-    dispatch(actions.changeFormInput({update: {[ownProps.name]: maskedValue}}))
+    dispatch(
+      actions.changeFormInput({ update: { [ownProps.name]: maskedValue } })
+    )
   },
 })
 
-const ConnectedFieldConnector = connect(STP, DTP)(FieldConnector)
+const ConnectedFieldConnector = connect(
+  STP,
+  DTP
+)(FieldConnector)
 
 export default ConnectedFieldConnector

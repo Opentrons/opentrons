@@ -5,11 +5,7 @@
     "displayCategory": "trash",
     "isValidSource": false
   },
-  "ordering": [
-    [
-      "A1"
-    ]
-  ],
+  "ordering": [["A1"]],
   "wells": {
     "A1": {
       "depth": 40,

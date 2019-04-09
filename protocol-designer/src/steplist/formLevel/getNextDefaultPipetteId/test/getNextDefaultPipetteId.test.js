@@ -7,19 +7,19 @@ describe('getNextDefaultPipetteId', () => {
       {
         testMsg: 'both pipettes present: use left pipette',
         equippedPipettesById: {
-          'leftId': {id: 'leftId', mount: 'left'},
-          'rightId': {id: 'rightId', mount: 'right'},
+          leftId: { id: 'leftId', mount: 'left' },
+          rightId: { id: 'rightId', mount: 'right' },
         },
         expected: 'leftId',
       },
       {
         testMsg: 'right only: use right',
-        equippedPipettesById: {'rightId': {id: 'rightId', mount: 'right'}},
+        equippedPipettesById: { rightId: { id: 'rightId', mount: 'right' } },
         expected: 'rightId',
       },
     ]
 
-    testCases.forEach(({testMsg, equippedPipettesById, expected}) => {
+    testCases.forEach(({ testMsg, equippedPipettesById, expected }) => {
       test(testMsg, () => {
         const savedForms = {}
         const orderedStepIds = []
@@ -27,7 +27,8 @@ describe('getNextDefaultPipetteId', () => {
         const result = getNextDefaultPipetteId(
           savedForms,
           orderedStepIds,
-          equippedPipettesById)
+          equippedPipettesById
+        )
 
         expect(result).toBe(expected)
       })
@@ -63,20 +64,23 @@ describe('getNextDefaultPipetteId', () => {
       },
     ]
 
-    testCases.forEach(({testMsg, orderedStepIds, expected}) => {
+    testCases.forEach(({ testMsg, orderedStepIds, expected }) => {
       test(testMsg, () => {
         const savedForms = {
-          a: {pipette: 'pipetteId_A'},
-          b: {pipette: 'pipetteId_B'},
+          a: { pipette: 'pipetteId_A' },
+          b: { pipette: 'pipetteId_B' },
           x: {}, // no 'pipette' key, eg a Pause step
         }
 
-        const equippedPipettesById = {'defaultId': {id: 'defaultId', mount: 'left'}}
+        const equippedPipettesById = {
+          defaultId: { id: 'defaultId', mount: 'left' },
+        }
 
         const result = getNextDefaultPipetteId(
           savedForms,
           orderedStepIds,
-          equippedPipettesById)
+          equippedPipettesById
+        )
 
         expect(result).toBe(expected)
       })

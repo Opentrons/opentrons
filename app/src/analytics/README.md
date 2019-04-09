@@ -7,12 +7,12 @@ Utilities and middleware to send redux actions to mixpanel and Intercom.
 The following should be present in the application entry point:
 
 ```js
-import {analyticsMiddleware} from './path/to/analytics'
+import { analyticsMiddleware } from './path/to/analytics'
 
 // add the middleware to the store
 const middleware = applyMiddleware(
   // ...
-  analyticsMiddleware,
+  analyticsMiddleware
   // ...
 )
 
@@ -33,7 +33,7 @@ export default function makeEvent(
   switch (action.type) {
     // ...
     case 'some-action-type':
-      return {name: 'some-event-name', properties: {foo: 'bar'}}
+      return { name: 'some-event-name', properties: { foo: 'bar' } }
     // ...
   }
 

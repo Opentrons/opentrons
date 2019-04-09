@@ -2,7 +2,7 @@
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
-import {startDiscovery} from '..'
+import { startDiscovery } from '..'
 
 const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
@@ -12,7 +12,7 @@ describe('discovery actions', () => {
 
   beforeEach(() => {
     jest.useFakeTimers()
-    store = mockStore({config: {discovery: {enabled: true}}})
+    store = mockStore({ config: { discovery: { enabled: true } } })
   })
 
   afterEach(() => {
@@ -22,8 +22,8 @@ describe('discovery actions', () => {
 
   test('startDiscovery', () => {
     const expectedTimeout = 30000
-    const expectedStart = {type: 'discovery:START', meta: {shell: true}}
-    const expectedFinish = {type: 'discovery:FINISH', meta: {shell: true}}
+    const expectedStart = { type: 'discovery:START', meta: { shell: true } }
+    const expectedFinish = { type: 'discovery:FINISH', meta: { shell: true } }
 
     store.dispatch(startDiscovery())
     expect(store.getActions()).toEqual([expectedStart])
@@ -33,8 +33,8 @@ describe('discovery actions', () => {
 
   test('startDiscovery with timeout', () => {
     const expectedTimeout = 60000
-    const expectedStart = {type: 'discovery:START', meta: {shell: true}}
-    const expectedFinish = {type: 'discovery:FINISH', meta: {shell: true}}
+    const expectedStart = { type: 'discovery:START', meta: { shell: true } }
+    const expectedFinish = { type: 'discovery:FINISH', meta: { shell: true } }
 
     store.dispatch(startDiscovery(60000))
     expect(store.getActions()).toEqual([expectedStart])

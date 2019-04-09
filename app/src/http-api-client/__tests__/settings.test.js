@@ -28,15 +28,15 @@ describe('/settings', () => {
   beforeEach(() => {
     client.__clearMock()
 
-    robot = {name: NAME, ip: '1.2.3.4', port: '1234'}
-    state = {api: {api: {}}}
+    robot = { name: NAME, ip: '1.2.3.4', port: '1234' }
+    state = { api: { api: {} } }
     store = mockStore(state)
   })
 
   describe('fetchSettings action creator', () => {
     const path = 'settings'
     const response = {
-      settings: [{id: 'i', title: 't', description: 'd', value: true}],
+      settings: [{ id: 'i', title: 't', description: 'd', value: true }],
     }
 
     test('calls GET /settings', () => {
@@ -52,8 +52,8 @@ describe('/settings', () => {
     test('dispatches api:REQUEST and api:SUCCESS', () => {
       const request = null
       const expectedActions = [
-        {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:SUCCESS', payload: {robot, response, path}},
+        { type: 'api:REQUEST', payload: { robot, request, path } },
+        { type: 'api:SUCCESS', payload: { robot, response, path } },
       ]
 
       client.__setMockResponse(response)
@@ -65,10 +65,10 @@ describe('/settings', () => {
 
     test('dispatches api:REQUEST and api:FAILURE', () => {
       const request = null
-      const error = {name: 'ResponseError', status: 500, message: ''}
+      const error = { name: 'ResponseError', status: 500, message: '' }
       const expectedActions = [
-        {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:FAILURE', payload: {robot, error, path}},
+        { type: 'api:REQUEST', payload: { robot, request, path } },
+        { type: 'api:FAILURE', payload: { robot, error, path } },
       ]
 
       client.__setMockError(error)
@@ -82,11 +82,11 @@ describe('/settings', () => {
   describe('setSettings action creator', () => {
     const path = 'settings'
     const response = {
-      settings: [{id: 'i', title: 't', description: 'd', value: true}],
+      settings: [{ id: 'i', title: 't', description: 'd', value: true }],
     }
 
     test('calls GET /settings', () => {
-      const request = {id: 'i', value: true}
+      const request = { id: 'i', value: true }
 
       client.__setMockResponse(response)
 
@@ -103,10 +103,10 @@ describe('/settings', () => {
     })
 
     test('dispatches api:REQUEST and api:SUCCESS', () => {
-      const request = {id: 'i', value: true}
+      const request = { id: 'i', value: true }
       const expectedActions = [
-        {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:SUCCESS', payload: {robot, response, path}},
+        { type: 'api:REQUEST', payload: { robot, request, path } },
+        { type: 'api:SUCCESS', payload: { robot, response, path } },
       ]
 
       client.__setMockResponse(response)
@@ -117,11 +117,11 @@ describe('/settings', () => {
     })
 
     test('dispatches api:REQUEST and api:FAILURE', () => {
-      const request = {id: 'i', value: true}
-      const error = {name: 'ResponseError', status: 500, message: ''}
+      const request = { id: 'i', value: true }
+      const error = { name: 'ResponseError', status: 500, message: '' }
       const expectedActions = [
-        {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:FAILURE', payload: {robot, error, path}},
+        { type: 'api:REQUEST', payload: { robot, request, path } },
+        { type: 'api:FAILURE', payload: { robot, error, path } },
       ]
 
       client.__setMockError(error)
@@ -171,8 +171,8 @@ describe('/settings', () => {
     test('dispatches api:REQUEST and api:SUCCESS', () => {
       const request = null
       const expectedActions = [
-        {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:SUCCESS', payload: {robot, response, path}},
+        { type: 'api:REQUEST', payload: { robot, request, path } },
+        { type: 'api:SUCCESS', payload: { robot, response, path } },
       ]
 
       client.__setMockResponse(response)
@@ -184,10 +184,10 @@ describe('/settings', () => {
 
     test('dispatches api:REQUEST and api:FAILURE', () => {
       const request = null
-      const error = {name: 'ResponseError', status: 500, message: ''}
+      const error = { name: 'ResponseError', status: 500, message: '' }
       const expectedActions = [
-        {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:FAILURE', payload: {robot, error, path}},
+        { type: 'api:REQUEST', payload: { robot, request, path } },
+        { type: 'api:FAILURE', payload: { robot, error, path } },
       ]
 
       client.__setMockError(error)
@@ -201,10 +201,10 @@ describe('/settings', () => {
   //
   describe('setPipetteConfigs action creator', () => {
     const path = 'settings/pipettes/foo'
-    const response = {fields: {top: null, bottom: {value: 6}}}
+    const response = { fields: { top: null, bottom: { value: 6 } } }
 
     test('calls PATCH /settings/pipettes/{id}', () => {
-      const request = {fields: {top: null, bottom: {value: 6}}}
+      const request = { fields: { top: null, bottom: { value: 6 } } }
 
       client.__setMockResponse(response)
 
@@ -216,10 +216,10 @@ describe('/settings', () => {
     })
 
     test('dispatches api:REQUEST and api:SUCCESS', () => {
-      const request = {fields: {top: null, bottom: {value: 6}}}
+      const request = { fields: { top: null, bottom: { value: 6 } } }
       const expectedActions = [
-        {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:SUCCESS', payload: {robot, response, path}},
+        { type: 'api:REQUEST', payload: { robot, request, path } },
+        { type: 'api:SUCCESS', payload: { robot, response, path } },
       ]
 
       client.__setMockResponse(response)
@@ -230,11 +230,11 @@ describe('/settings', () => {
     })
 
     test('dispatches api:REQUEST and api:FAILURE', () => {
-      const request = {fields: {top: null, bottom: {value: 6}}}
-      const error = {name: 'ResponseError', status: 500, message: ''}
+      const request = { fields: { top: null, bottom: { value: 6 } } }
+      const error = { name: 'ResponseError', status: 500, message: '' }
       const expectedActions = [
-        {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:FAILURE', payload: {robot, error, path}},
+        { type: 'api:REQUEST', payload: { robot, request, path } },
+        { type: 'api:FAILURE', payload: { robot, error, path } },
       ]
 
       client.__setMockError(error)
@@ -249,9 +249,9 @@ describe('/settings', () => {
   describe('selectors', () => {
     beforeEach(() => {
       state.api.api[NAME] = {
-        settings: {inProgress: true},
-        'settings/pipettes': {inProgress: true},
-        'settings/pipettes/foo': {inProgress: true},
+        settings: { inProgress: true },
+        'settings/pipettes': { inProgress: true },
+        'settings/pipettes/foo': { inProgress: true },
       }
     })
 
@@ -260,17 +260,17 @@ describe('/settings', () => {
 
       expect(getSettings(state, robot)).toEqual(state.api.api[NAME].settings)
 
-      expect(getSettings(state, {name: 'foo'})).toEqual({inProgress: false})
+      expect(getSettings(state, { name: 'foo' })).toEqual({ inProgress: false })
     })
 
     test('makeGetRobotSettings with bad response', () => {
       const getSettings = makeGetRobotSettings()
 
-      state.api.api[NAME].settings.response = {foo: 'bar'}
+      state.api.api[NAME].settings.response = { foo: 'bar' }
 
       expect(getSettings(state, robot)).toEqual({
         ...state.api.api[NAME].settings,
-        response: {settings: []},
+        response: { settings: [] },
       })
     })
 
@@ -281,7 +281,7 @@ describe('/settings', () => {
         state.api.api[NAME]['settings/pipettes']
       )
 
-      expect(getRobotPipetteConfigs(state, {name: 'foo'})).toEqual({
+      expect(getRobotPipetteConfigs(state, { name: 'foo' })).toEqual({
         inProgress: false,
       })
     })

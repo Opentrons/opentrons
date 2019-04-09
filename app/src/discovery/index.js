@@ -3,18 +3,18 @@
 import groupBy from 'lodash/groupBy'
 import mapValues from 'lodash/mapValues'
 import some from 'lodash/some'
-import {getShellRobots} from '../shell'
+import { getShellRobots } from '../shell'
 
-import type {Service} from '@opentrons/discovery-client'
-import type {Action, ThunkAction, Middleware} from '../types'
-import type {RestartStatus} from './types'
+import type { Service } from '@opentrons/discovery-client'
+import type { Action, ThunkAction, Middleware } from '../types'
+import type { RestartStatus } from './types'
 
 export * from './types'
 export * from './selectors'
 
-type RobotsMap = {[name: string]: Array<Service>}
+type RobotsMap = { [name: string]: Array<Service> }
 
-type RestartsMap = {[name: string]: ?RestartStatus}
+type RestartsMap = { [name: string]: ?RestartStatus }
 
 type DiscoveryState = {
   scanning: boolean,
@@ -24,17 +24,17 @@ type DiscoveryState = {
 
 type StartAction = {|
   type: 'discovery:START',
-  meta: {|shell: true|},
+  meta: {| shell: true |},
 |}
 
 type FinishAction = {|
   type: 'discovery:FINISH',
-  meta: {|shell: true|},
+  meta: {| shell: true |},
 |}
 
 type UpdateListAction = {|
   type: 'discovery:UPDATE_LIST',
-  payload: {|robots: Array<Service>|},
+  payload: {| robots: Array<Service> |},
 |}
 
 export type DiscoveryAction = StartAction | FinishAction | UpdateListAction
@@ -45,9 +45,12 @@ const RESTART_DISCOVERY_TIMEOUT_MS = 60000
 export const RESTART_PENDING: RestartStatus = 'pending'
 export const RESTART_DOWN: RestartStatus = 'down'
 
-export function startDiscovery (timeout = DISCOVERY_TIMEOUT_MS): ThunkAction {
-  const start: StartAction = {type: 'discovery:START', meta: {shell: true}}
-  const finish: FinishAction = {type: 'discovery:FINISH', meta: {shell: true}}
+export function startDiscovery(timeout = DISCOVERY_TIMEOUT_MS): ThunkAction {
+  const start: StartAction = { type: 'discovery:START', meta: { shell: true } }
+  const finish: FinishAction = {
+    type: 'discovery:FINISH',
+    meta: { shell: true },
+  }
 
   return dispatch => {
     setTimeout(() => dispatch(finish), timeout)
@@ -70,16 +73,16 @@ const initialState: DiscoveryState = {
   restartsByName: {},
 }
 
-export function discoveryReducer (
+export function discoveryReducer(
   state: DiscoveryState = initialState,
   action: Action
 ): DiscoveryState {
   switch (action.type) {
     case 'discovery:START':
-      return {...state, scanning: true}
+      return { ...state, scanning: true }
 
     case 'discovery:FINISH':
-      return {...state, scanning: false}
+      return { ...state, scanning: false }
 
     case 'discovery:UPDATE_LIST': {
       const robotsByName = normalizeRobots(action.payload.robots)
@@ -95,11 +98,11 @@ export function discoveryReducer (
         return status
       })
 
-      return {...state, robotsByName, restartsByName}
+      return { ...state, robotsByName, restartsByName }
     }
 
     case 'api:SERVER_SUCCESS': {
-      const {path, robot} = action.payload
+      const { path, robot } = action.payload
       if (path !== 'restart') return state
       return {
         ...state,
@@ -125,6 +128,6 @@ export const discoveryMiddleware: Middleware = store => next => action => {
   return next(action)
 }
 
-export function normalizeRobots (robots: Array<Service> = []): RobotsMap {
+export function normalizeRobots(robots: Array<Service> = []): RobotsMap {
   return groupBy(robots, 'name')
 }

@@ -1,12 +1,12 @@
 // @flow
 // server endpoints http api module
-import {createSelector} from 'reselect'
+import { createSelector } from 'reselect'
 import semver from 'semver'
 
-import {chainActions} from '../util'
-import client, {FetchError} from './client'
-import {fetchHealth} from './health'
-import {getRobotApiVersion, getConnectedRobot} from '../discovery'
+import { chainActions } from '../util'
+import client, { FetchError } from './client'
+import { fetchHealth } from './health'
+import { getRobotApiVersion, getConnectedRobot } from '../discovery'
 
 import {
   getApiUpdateVersion,
@@ -14,11 +14,11 @@ import {
   getApiUpdateContents,
 } from '../shell'
 
-import type {OutputSelector} from 'reselect'
-import type {State, ThunkPromiseAction, Action} from '../types'
-import type {AnyRobot} from '../discovery'
-import type {RobotService} from '../robot'
-import type {ApiCall, ApiRequestError} from './types'
+import type { OutputSelector } from 'reselect'
+import type { State, ThunkPromiseAction, Action } from '../types'
+import type { AnyRobot } from '../discovery'
+import type { RobotService } from '../robot'
+import type { ApiCall, ApiRequestError } from './types'
 
 type RequestPath = 'update' | 'restart' | 'update/ignore'
 
@@ -55,7 +55,7 @@ export type ServerSuccessAction = {|
     path: RequestPath,
     response: ServerResponse,
   |},
-  meta: {|robot: true|},
+  meta: {| robot: true |},
 |}
 
 export type ServerFailureAction = {|
@@ -100,7 +100,7 @@ const UPDATE: RequestPath = 'update'
 const RESTART: RequestPath = 'restart'
 const IGNORE: RequestPath = 'update/ignore'
 
-export function updateRobotServer (robot: RobotService): ThunkPromiseAction {
+export function updateRobotServer(robot: RobotService): ThunkPromiseAction {
   return (dispatch, getState) => {
     dispatch(serverRequest(robot, UPDATE))
 
@@ -115,11 +115,11 @@ export function updateRobotServer (robot: RobotService): ThunkPromiseAction {
   }
 }
 
-export function clearUpdateResponse (robot: RobotService): * {
+export function clearUpdateResponse(robot: RobotService): * {
   return clearServerResponse(robot, UPDATE)
 }
 
-export function restartRobotServer (robot: RobotService): ThunkPromiseAction {
+export function restartRobotServer(robot: RobotService): ThunkPromiseAction {
   return dispatch => {
     dispatch(serverRequest(robot, RESTART))
 
@@ -131,15 +131,15 @@ export function restartRobotServer (robot: RobotService): ThunkPromiseAction {
   }
 }
 
-export function clearRestartResponse (robot: RobotService): * {
+export function clearRestartResponse(robot: RobotService): * {
   return clearServerResponse(robot, RESTART)
 }
 
-export function fetchHealthAndIgnored (robot: RobotService): * {
+export function fetchHealthAndIgnored(robot: RobotService): * {
   return chainActions(fetchHealth(robot), fetchIgnoredUpdate(robot))
 }
 
-export function fetchIgnoredUpdate (robot: RobotService): ThunkPromiseAction {
+export function fetchIgnoredUpdate(robot: RobotService): ThunkPromiseAction {
   return dispatch => {
     dispatch(serverRequest(robot, IGNORE))
 
@@ -151,12 +151,12 @@ export function fetchIgnoredUpdate (robot: RobotService): ThunkPromiseAction {
   }
 }
 
-export function setIgnoredUpdate (
+export function setIgnoredUpdate(
   robot: RobotService,
   version: ?string
 ): ThunkPromiseAction {
   return dispatch => {
-    const body = {version}
+    const body = { version }
     dispatch(serverRequest(robot, IGNORE))
 
     return client(robot, 'POST', 'update/ignore', body).then(
@@ -167,7 +167,7 @@ export function setIgnoredUpdate (
   }
 }
 
-export function serverReducer (
+export function serverReducer(
   state: ?ServerState,
   action: Action
 ): ServerState {
@@ -179,21 +179,21 @@ export function serverReducer (
     case 'api:SERVER_REQUEST':
       ;({
         path,
-        robot: {name},
+        robot: { name },
       } = action.payload)
 
       return {
         ...state,
         [name]: {
           ...state[name],
-          [path]: {inProgress: true, response: null, error: null},
+          [path]: { inProgress: true, response: null, error: null },
         },
       }
 
     case 'api:SERVER_SUCCESS':
       ;({
         path,
-        robot: {name},
+        robot: { name },
       } = action.payload)
 
       return {
@@ -211,7 +211,7 @@ export function serverReducer (
     case 'api:SERVER_FAILURE':
       ;({
         path,
-        robot: {name},
+        robot: { name },
       } = action.payload)
 
       return {
@@ -229,7 +229,7 @@ export function serverReducer (
     case 'api:CLEAR_SERVER_RESPONSE':
       ;({
         path,
-        robot: {name},
+        robot: { name },
       } = action.payload)
       return {
         ...state,
@@ -249,7 +249,7 @@ export function serverReducer (
 
 export type RobotUpdateType = 'upgrade' | 'downgrade' | null
 
-export type RobotUpdateInfo = {version: string, type: RobotUpdateType}
+export type RobotUpdateInfo = { version: string, type: RobotUpdateType }
 
 const compareCurrentVersionToUpdate = (
   currentVersion: ?string,
@@ -264,77 +264,87 @@ const compareCurrentVersionToUpdate = (
     type = 'downgrade'
   }
 
-  return {version: updateVersion, type: type}
+  return { version: updateVersion, type: type }
 }
 
 export const makeGetRobotUpdateInfo = () => {
-  const selector: OutputSelector<State,
+  const selector: OutputSelector<
+    State,
     AnyRobot,
-    RobotUpdateInfo> = createSelector(
-      (_, robot) => getRobotApiVersion(robot),
-      getApiUpdateVersion,
-      compareCurrentVersionToUpdate
-    )
+    RobotUpdateInfo
+  > = createSelector(
+    (_, robot) => getRobotApiVersion(robot),
+    getApiUpdateVersion,
+    compareCurrentVersionToUpdate
+  )
 
   return selector
 }
 
-export const getConnectedRobotUpgradeAvailable: OutputSelector<State,
+export const getConnectedRobotUpgradeAvailable: OutputSelector<
+  State,
   void,
-  boolean> = createSelector(
-    getConnectedRobot,
-    getApiUpdateVersion,
-    (robot, updateVersion) => {
-      const currentVersion = robot && getRobotApiVersion(robot)
-      const info = compareCurrentVersionToUpdate(currentVersion, updateVersion)
-      return info.type === 'upgrade'
-    }
-  )
+  boolean
+> = createSelector(
+  getConnectedRobot,
+  getApiUpdateVersion,
+  (robot, updateVersion) => {
+    const currentVersion = robot && getRobotApiVersion(robot)
+    const info = compareCurrentVersionToUpdate(currentVersion, updateVersion)
+    return info.type === 'upgrade'
+  }
+)
 
 // TODO(mc, 2018-09-25): this is broken until some planned discovery work is
 // done for https://github.com/Opentrons/opentrons/milestone/68
 export const makeGetRobotUpdateRequest = () => {
-  const selector: OutputSelector<State,
+  const selector: OutputSelector<
+    State,
     RobotService,
-    RobotServerUpdate> = createSelector(
-      selectRobotServerState,
-      state => (state && state.update) || {inProgress: false}
-    )
+    RobotServerUpdate
+  > = createSelector(
+    selectRobotServerState,
+    state => (state && state.update) || { inProgress: false }
+  )
 
   return selector
 }
 
 export const makeGetRobotRestartRequest = () => {
-  const selector: OutputSelector<State,
+  const selector: OutputSelector<
+    State,
     RobotService,
-    RobotServerRestart> = createSelector(
-      selectRobotServerState,
-      state => (state && state.restart) || {inProgress: false}
-    )
+    RobotServerRestart
+  > = createSelector(
+    selectRobotServerState,
+    state => (state && state.restart) || { inProgress: false }
+  )
 
   return selector
 }
 
 export const makeGetRobotIgnoredUpdateRequest = () => {
-  const selector: OutputSelector<State,
+  const selector: OutputSelector<
+    State,
     RobotService,
-    RobotServerUpdateIgnore> = createSelector(
-      selectRobotServerState,
-      state => (state && state['update/ignore']) || {inProgress: false}
-    )
+    RobotServerUpdateIgnore
+  > = createSelector(
+    selectRobotServerState,
+    state => (state && state['update/ignore']) || { inProgress: false }
+  )
 
   return selector
 }
 
-function selectServerState (state: State) {
+function selectServerState(state: State) {
   return state.api.server
 }
 
-function selectRobotServerState (state: State, props: RobotService) {
+function selectRobotServerState(state: State, props: RobotService) {
   return selectServerState(state)[props.name]
 }
 
-function getUpdateRequestBody (state: State) {
+function getUpdateRequestBody(state: State) {
   const filename = getApiUpdateFilename(state)
 
   return getApiUpdateContents()
@@ -346,36 +356,36 @@ function getUpdateRequestBody (state: State) {
     .catch(error => Promise.reject(FetchError(error)))
 }
 
-function serverRequest (
+function serverRequest(
   robot: RobotService,
   path: RequestPath
 ): ServerRequestAction {
-  return {type: 'api:SERVER_REQUEST', payload: {robot, path}}
+  return { type: 'api:SERVER_REQUEST', payload: { robot, path } }
 }
 
-function serverSuccess (
+function serverSuccess(
   robot: RobotService,
   path: RequestPath,
   response: ServerResponse
 ): ServerSuccessAction {
   return {
     type: 'api:SERVER_SUCCESS',
-    payload: {robot, path, response},
-    meta: {robot: true},
+    payload: { robot, path, response },
+    meta: { robot: true },
   }
 }
 
-function serverFailure (
+function serverFailure(
   robot: RobotService,
   path: RequestPath,
   error: ApiRequestError
 ): ServerFailureAction {
-  return {type: 'api:SERVER_FAILURE', payload: {robot, path, error}}
+  return { type: 'api:SERVER_FAILURE', payload: { robot, path, error } }
 }
 
-function clearServerResponse (
+function clearServerResponse(
   robot: RobotService,
   path: RequestPath
 ): ClearServerAction {
-  return {type: 'api:CLEAR_SERVER_RESPONSE', payload: {robot, path}}
+  return { type: 'api:CLEAR_SERVER_RESPONSE', payload: { robot, path } }
 }

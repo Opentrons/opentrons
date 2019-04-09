@@ -1,5 +1,5 @@
 // @flow
-import type {LabwareDefinition2 as LabwareDefinition} from '@opentrons/shared-data'
+import type { LabwareDefinition2 as LabwareDefinition } from '@opentrons/shared-data'
 
 export type {
   LabwareDefinition2 as LabwareDefinition,

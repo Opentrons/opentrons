@@ -1,6 +1,6 @@
 // @flow
 import _delay from '../commandCreators/atomic/delay'
-import {commandCreatorNoErrors} from './fixtures'
+import { commandCreatorNoErrors } from './fixtures'
 
 const delay = commandCreatorNoErrors(_delay)
 

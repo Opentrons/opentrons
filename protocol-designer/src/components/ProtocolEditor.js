@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {DragDropContext} from 'react-dnd'
+import { DragDropContext } from 'react-dnd'
 import MouseBackEnd from 'react-dnd-mouse-backend'
 import ConnectedNav from '../containers/ConnectedNav'
 import ConnectedSidebar from '../containers/ConnectedSidebar'
@@ -10,14 +10,15 @@ import ConnectedMainPanel from '../containers/ConnectedMainPanel'
 import NewFileModal from './modals/NewFileModal'
 import FileUploadMessageModal from './modals/FileUploadMessageModal'
 import GateModal from './modals/GateModal'
-import {PortalRoot as MainPageModalPortalRoot} from '../components/portals/MainPageModalPortal'
-import {PortalRoot as TopPortalRoot} from './portals/TopPortal'
-import {SCROLL_ON_SELECT_STEP_CLASSNAME} from '../steplist/actions'
+import { PortalRoot as MainPageModalPortalRoot } from '../components/portals/MainPageModalPortal'
+import { PortalRoot as TopPortalRoot } from './portals/TopPortal'
+import { SCROLL_ON_SELECT_STEP_CLASSNAME } from '../steplist/actions'
 import styles from './ProtocolEditor.css'
 
-const showGateModal = process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
+const showGateModal =
+  process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
 
-function ProtocolEditor () {
+function ProtocolEditor() {
   return (
     <div>
       <TopPortalRoot />
@@ -25,7 +26,12 @@ function ProtocolEditor () {
       <div className={styles.wrapper}>
         <ConnectedNav />
         <ConnectedSidebar />
-        <div className={cx(styles.main_page_wrapper, SCROLL_ON_SELECT_STEP_CLASSNAME)}>
+        <div
+          className={cx(
+            styles.main_page_wrapper,
+            SCROLL_ON_SELECT_STEP_CLASSNAME
+          )}
+        >
           <ConnectedTitleBar />
 
           <div className={styles.main_page_content}>

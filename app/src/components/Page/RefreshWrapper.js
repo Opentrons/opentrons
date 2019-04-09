@@ -6,16 +6,12 @@ type Props = {
   children: React.Node,
 }
 export default class RefreshWrapper extends React.Component<Props> {
-  render () {
-    const {children} = this.props
+  render() {
+    const { children } = this.props
 
-    return (
-      <React.Fragment>
-        {children}
-      </React.Fragment>
-    )
+    return <React.Fragment>{children}</React.Fragment>
   }
-  componentDidMount () {
+  componentDidMount() {
     this.props.refresh()
   }
 }

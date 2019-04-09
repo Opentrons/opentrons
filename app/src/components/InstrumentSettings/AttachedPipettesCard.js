@@ -1,7 +1,7 @@
 // @flow
 // attached pipettes container card
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import {
   makeGetRobotPipettes,
@@ -10,15 +10,15 @@ import {
   fetchPipetteConfigs,
   makeGetRobotPipetteConfigs,
 } from '../../http-api-client'
-import {chainActions} from '../../util'
+import { chainActions } from '../../util'
 
 import InstrumentInfo from './InstrumentInfo'
-import {CardContentFlex} from '../layout'
-import {Card, IntervalWrapper} from '@opentrons/components'
+import { CardContentFlex } from '../layout'
+import { Card, IntervalWrapper } from '@opentrons/components'
 
-import type {State} from '../../types'
-import type {Robot} from '../../discovery'
-import type {Pipette} from '../../http-api-client'
+import type { State } from '../../types'
+import type { Robot } from '../../discovery'
+import type { Pipette } from '../../http-api-client'
 
 type OP = Robot
 
@@ -34,7 +34,7 @@ type DP = {|
   clearMove: () => mixed,
 |}
 
-type Props = {...$Exact<OP>, ...SP, ...DP}
+type Props = { ...$Exact<OP>, ...SP, ...DP }
 
 const TITLE = 'Pipettes'
 
@@ -43,7 +43,7 @@ export default connect(
   mapDispatchToProps
 )(AttachedPipettesCard)
 
-function AttachedPipettesCard (props: Props) {
+function AttachedPipettesCard(props: Props) {
   return (
     <IntervalWrapper interval={5000} refresh={props.fetchPipettes}>
       <Card title={TITLE}>
@@ -68,13 +68,13 @@ function AttachedPipettesCard (props: Props) {
   )
 }
 
-function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
+function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
   const getRobotPipettes = makeGetRobotPipettes()
   const getRobotPipetteConfigs = makeGetRobotPipetteConfigs()
 
   return (state, ownProps) => {
-    const {inProgress, response} = getRobotPipettes(state, ownProps)
-    const {left, right} = response || {left: null, right: null}
+    const { inProgress, response } = getRobotPipettes(state, ownProps)
+    const { left, right } = response || { left: null, right: null }
     const configCall = getRobotPipetteConfigs(state, ownProps)
     return {
       inProgress,
@@ -85,7 +85,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   return {
     fetchPipettes: () =>
       dispatch(

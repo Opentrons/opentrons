@@ -1,6 +1,6 @@
 // events map tests
 import makeEvent from '../make-event'
-import {actions as robotActions} from '../../robot'
+import { actions as robotActions } from '../../robot'
 import * as selectors from '../selectors'
 
 jest.mock('../selectors')
@@ -52,27 +52,27 @@ describe('analytics events map', () => {
 
     expect(makeEvent(success, state('wired'))).toEqual({
       name: 'robotConnect',
-      properties: {method: 'usb', success: true, error: ''},
+      properties: { method: 'usb', success: true, error: '' },
     })
 
     expect(makeEvent(failure, state('wired'))).toEqual({
       name: 'robotConnect',
-      properties: {method: 'usb', success: false, error: 'AH'},
+      properties: { method: 'usb', success: false, error: 'AH' },
     })
 
     expect(makeEvent(success, state('wireless'))).toEqual({
       name: 'robotConnect',
-      properties: {method: 'wifi', success: true, error: ''},
+      properties: { method: 'wifi', success: true, error: '' },
     })
 
     expect(makeEvent(failure, state('wireless'))).toEqual({
       name: 'robotConnect',
-      properties: {method: 'wifi', success: false, error: 'AH'},
+      properties: { method: 'wifi', success: false, error: 'AH' },
     })
   })
 
   describe('events with protocol data', () => {
-    var protocolData = {foo: 'bar'}
+    var protocolData = { foo: 'bar' }
 
     beforeEach(() => {
       selectors.getProtocolAnalyticsData.mockResolvedValue(protocolData)
@@ -81,7 +81,7 @@ describe('analytics events map', () => {
     test('robot:PROTOCOL_UPLOAD > protocolUploadRequest', () => {
       const prevState = {}
       const nextState = {}
-      const success = {type: 'protocol:UPLOAD', payload: {}}
+      const success = { type: 'protocol:UPLOAD', payload: {} }
 
       return expect(makeEvent(success, nextState, prevState)).resolves.toEqual({
         name: 'protocolUploadRequest',
@@ -90,39 +90,43 @@ describe('analytics events map', () => {
     })
 
     test('robot:SESSION_RESPONSE with upload in flight', () => {
-      const prevState = {robot: {session: {sessionRequest: {inProgress: true}}}}
+      const prevState = {
+        robot: { session: { sessionRequest: { inProgress: true } } },
+      }
       const nextState = {}
-      const success = {type: 'robot:SESSION_RESPONSE', payload: {}}
+      const success = { type: 'robot:SESSION_RESPONSE', payload: {} }
 
       return expect(makeEvent(success, nextState, prevState)).resolves.toEqual({
         name: 'protocolUploadResponse',
-        properties: {success: true, error: '', ...protocolData},
+        properties: { success: true, error: '', ...protocolData },
       })
     })
 
     test('robot:SESSION_ERROR with upload in flight', () => {
-      const prevState = {robot: {session: {sessionRequest: {inProgress: true}}}}
+      const prevState = {
+        robot: { session: { sessionRequest: { inProgress: true } } },
+      }
       const nextState = {}
       const failure = {
         type: 'robot:SESSION_ERROR',
-        payload: {error: new Error('AH')},
+        payload: { error: new Error('AH') },
       }
 
       return expect(makeEvent(failure, nextState, prevState)).resolves.toEqual({
         name: 'protocolUploadResponse',
-        properties: {success: false, error: 'AH', ...protocolData},
+        properties: { success: false, error: 'AH', ...protocolData },
       })
     })
 
     test('robot:SESSION_RESPONSE/ERROR with no upload in flight', () => {
       const prevState = {
-        robot: {session: {sessionRequest: {inProgress: false}}},
+        robot: { session: { sessionRequest: { inProgress: false } } },
       }
       const nextState = {}
-      const success = {type: 'robot:SESSION_RESPONSE', payload: {}}
+      const success = { type: 'robot:SESSION_RESPONSE', payload: {} }
       const failure = {
         type: 'robot:SESSION_ERROR',
-        payload: {error: new Error('AH')},
+        payload: { error: new Error('AH') },
       }
 
       expect(makeEvent(success, nextState, prevState)).toBeNull()
@@ -131,7 +135,7 @@ describe('analytics events map', () => {
 
     test('robot:RUN -> runStart event', () => {
       const state = {}
-      const action = {type: 'robot:RUN'}
+      const action = { type: 'robot:RUN' }
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'runStart',
@@ -148,11 +152,11 @@ describe('analytics events map', () => {
           },
         },
       }
-      const action = {type: 'robot:RUN_RESPONSE', error: false}
+      const action = { type: 'robot:RUN_RESPONSE', error: false }
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'runFinish',
-        properties: {...protocolData, runTime: 4, success: true, error: ''},
+        properties: { ...protocolData, runTime: 4, success: true, error: '' },
       })
     })
 
@@ -173,7 +177,12 @@ describe('analytics events map', () => {
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'runFinish',
-        properties: {...protocolData, runTime: 4, success: false, error: 'AH'},
+        properties: {
+          ...protocolData,
+          runTime: 4,
+          success: false,
+          error: 'AH',
+        },
       })
     })
 
@@ -186,7 +195,7 @@ describe('analytics events map', () => {
           },
         },
       }
-      const action = {type: 'robot:PAUSE'}
+      const action = { type: 'robot:PAUSE' }
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'runPause',
@@ -206,7 +215,7 @@ describe('analytics events map', () => {
           },
         },
       }
-      const action = {type: 'robot:RESUME'}
+      const action = { type: 'robot:RESUME' }
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'runResume',
@@ -226,7 +235,7 @@ describe('analytics events map', () => {
           },
         },
       }
-      const action = {type: 'robot:CANCEL'}
+      const action = { type: 'robot:CANCEL' }
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'runCancel',

@@ -2,14 +2,18 @@
 // exactly the same, given everything else in the protocol file
 import path from 'path'
 import configureStore from '../../configureStore'
-import {selectors as fileDataSelectors} from '../../file-data'
-import {actions as loadFileActions} from '../index'
+import { selectors as fileDataSelectors } from '../../file-data'
+import { actions as loadFileActions } from '../index'
 
-function makeTestCaseFromFixture (fileName) {
-  const fullFile = require(path.join(__dirname, './fixtures/throughMigrationV0', fileName))
-  const inputFile = {...fullFile, procedure: []}
+function makeTestCaseFromFixture(fileName) {
+  const fullFile = require(path.join(
+    __dirname,
+    './fixtures/throughMigrationV0',
+    fileName
+  ))
+  const inputFile = { ...fullFile, procedure: [] }
   const expectedProcedure = fullFile.procedure
-  return {inputFile, expectedProcedure}
+  return { inputFile, expectedProcedure }
 }
 
 const fixtures = [
@@ -23,14 +27,15 @@ const fixtures = [
     ...makeTestCaseFromFixture('minimalProtocolOldTransfer.json'),
   },
   {
-    testName: 'pre-flexible-step grandfathered do-it-all QA protocol (saved off 2b331961cb3629192d804224d8c10490d69838bd 2019-01-24)',
+    testName:
+      'pre-flexible-step grandfathered do-it-all QA protocol (saved off 2b331961cb3629192d804224d8c10490d69838bd 2019-01-24)',
     ...makeTestCaseFromFixture('preFlexGrandfatheredProtocol.json'),
   },
 ]
 
 // TODO #2917: restore these tests
 describe.skip('snapshot integration test: JSON protocol fixture to procedures', () => {
-  fixtures.forEach(({testName, inputFile, expectedProcedure}) => {
+  fixtures.forEach(({ testName, inputFile, expectedProcedure }) => {
     test(testName, () => {
       const store = configureStore()
       store.dispatch(loadFileActions.loadFileAction(inputFile))

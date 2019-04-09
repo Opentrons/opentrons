@@ -18,10 +18,8 @@ type Props = {
   children?: React.Node,
 }
 
-const matchHandler = e => h => (
-  h.key === e.key &&
-  (h.shiftKey == null || h.shiftKey === e.shiftKey)
-)
+const matchHandler = e => h =>
+  h.key === e.key && (h.shiftKey == null || h.shiftKey === e.shiftKey)
 
 /**
  * Keypress handler wrapper component. Takes an array of keypress handlers
@@ -31,9 +29,7 @@ const matchHandler = e => h => (
  */
 export default class HandleKeypress extends React.Component<Props> {
   handlePressIfKey = (event: KeypressEvent) => {
-    this.props.handlers
-      .filter(matchHandler(event))
-      .forEach(h => h.onPress())
+    this.props.handlers.filter(matchHandler(event)).forEach(h => h.onPress())
   }
 
   preventDefaultIfKey = (event: KeypressEvent) => {
@@ -44,23 +40,19 @@ export default class HandleKeypress extends React.Component<Props> {
     if (pressHandled) event.preventDefault()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     window.addEventListener('keyup', this.handlePressIfKey)
     window.addEventListener('keyup', this.preventDefaultIfKey)
     window.addEventListener('keydown', this.preventDefaultIfKey)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('keyup', this.handlePressIfKey)
     window.removeEventListener('keyup', this.preventDefaultIfKey)
     window.removeEventListener('keydown', this.preventDefaultIfKey)
   }
 
-  render () {
-    return (
-      <React.Fragment>
-        {this.props.children}
-      </React.Fragment>
-    )
+  render() {
+    return <React.Fragment>{this.props.children}</React.Fragment>
   }
 }

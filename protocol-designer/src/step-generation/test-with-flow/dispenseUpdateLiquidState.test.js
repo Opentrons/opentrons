@@ -10,7 +10,7 @@ import {
 
 import _updateLiquidState from '../dispenseUpdateLiquidState'
 
-function getBlankLiquidState (sourcePlateType: ?string) {
+function getBlankLiquidState(sourcePlateType: ?string) {
   return createEmptyLiquidState({
     // leave sourcePlateType undefined for tests that don't care
     // TODO: should this `pipettes` arg be createEmptyLiquidState default?
@@ -37,19 +37,15 @@ beforeEach(() => {
 
 describe('...single-channel pipette', () => {
   test('fully dispense single ingredient into empty well, with explicit volume', () => {
-    const initialLiquidState = merge(
-      {},
-      getBlankLiquidState(),
-      {
-        pipettes: {
-          p300SingleId: {
-            '0': {
-              ingred1: {volume: 150},
-            },
+    const initialLiquidState = merge({}, getBlankLiquidState(), {
+      pipettes: {
+        p300SingleId: {
+          '0': {
+            ingred1: { volume: 150 },
           },
         },
-      }
-    )
+      },
+    })
 
     const result = _updateLiquidState(
       dispenseSingleCh150ToA1Args,
@@ -60,13 +56,13 @@ describe('...single-channel pipette', () => {
       pipettes: {
         p300SingleId: {
           '0': {
-            ingred1: {volume: 0},
+            ingred1: { volume: 0 },
           },
         },
       },
       labware: {
         sourcePlateId: {
-          A1: {ingred1: {volume: 150}},
+          A1: { ingred1: { volume: 150 } },
           A2: {},
           B1: {},
         },
@@ -75,19 +71,15 @@ describe('...single-channel pipette', () => {
   })
 
   test('fully dispense single ingredient into empty well, with useFullVolume', () => {
-    const initialLiquidState = merge(
-      {},
-      getBlankLiquidState(),
-      {
-        pipettes: {
-          p300SingleId: {
-            '0': {
-              ingred1: {volume: 150},
-            },
+    const initialLiquidState = merge({}, getBlankLiquidState(), {
+      pipettes: {
+        p300SingleId: {
+          '0': {
+            ingred1: { volume: 150 },
           },
         },
-      }
-    )
+      },
+    })
 
     const result = _updateLiquidState(
       {
@@ -101,13 +93,13 @@ describe('...single-channel pipette', () => {
       pipettes: {
         p300SingleId: {
           '0': {
-            ingred1: {volume: 0},
+            ingred1: { volume: 0 },
           },
         },
       },
       labware: {
         sourcePlateId: {
-          A1: {ingred1: {volume: 150}},
+          A1: { ingred1: { volume: 150 } },
           A2: {},
           B1: {},
         },
@@ -116,27 +108,23 @@ describe('...single-channel pipette', () => {
   })
 
   test('dispense ingred 1 into well containing ingreds 1 & 2', () => {
-    const initialLiquidState = merge(
-      {},
-      getBlankLiquidState(),
-      {
-        pipettes: {
-          p300SingleId: {
-            '0': {
-              ingred1: {volume: 150},
-            },
+    const initialLiquidState = merge({}, getBlankLiquidState(), {
+      pipettes: {
+        p300SingleId: {
+          '0': {
+            ingred1: { volume: 150 },
           },
         },
-        labware: {
-          sourcePlateId: {
-            A1: {
-              ingred1: {volume: 30},
-              ingred2: {volume: 50},
-            },
+      },
+      labware: {
+        sourcePlateId: {
+          A1: {
+            ingred1: { volume: 30 },
+            ingred2: { volume: 50 },
           },
         },
-      }
-    )
+      },
+    })
 
     const result = _updateLiquidState(
       dispenseSingleCh150ToA1Args,
@@ -147,15 +135,15 @@ describe('...single-channel pipette', () => {
       pipettes: {
         p300SingleId: {
           '0': {
-            ingred1: {volume: 0},
+            ingred1: { volume: 0 },
           },
         },
       },
       labware: {
         sourcePlateId: {
           A1: {
-            ingred1: {volume: 150 + 30},
-            ingred2: {volume: 50},
+            ingred1: { volume: 150 + 30 },
+            ingred2: { volume: 50 },
           },
           A2: {},
           B1: {},
@@ -165,28 +153,24 @@ describe('...single-channel pipette', () => {
   })
 
   test('dispense ingred 1 & 2 into well containing 2 & 3', () => {
-    const initialLiquidState = merge(
-      {},
-      getBlankLiquidState(),
-      {
-        pipettes: {
-          p300SingleId: {
-            '0': {
-              ingred1: {volume: 50},
-              ingred2: {volume: 100},
-            },
+    const initialLiquidState = merge({}, getBlankLiquidState(), {
+      pipettes: {
+        p300SingleId: {
+          '0': {
+            ingred1: { volume: 50 },
+            ingred2: { volume: 100 },
           },
         },
-        labware: {
-          sourcePlateId: {
-            A1: {
-              ingred2: {volume: 25},
-              ingred3: {volume: 20},
-            },
+      },
+      labware: {
+        sourcePlateId: {
+          A1: {
+            ingred2: { volume: 25 },
+            ingred3: { volume: 20 },
           },
         },
-      }
-    )
+      },
+    })
 
     const result = _updateLiquidState(
       dispenseSingleCh150ToA1Args,
@@ -197,17 +181,17 @@ describe('...single-channel pipette', () => {
       pipettes: {
         p300SingleId: {
           '0': {
-            ingred1: {volume: 0},
-            ingred2: {volume: 0},
+            ingred1: { volume: 0 },
+            ingred2: { volume: 0 },
           },
         },
       },
       labware: {
         sourcePlateId: {
           A1: {
-            ingred1: {volume: 50},
-            ingred2: {volume: 100 + 25},
-            ingred3: {volume: 20},
+            ingred1: { volume: 50 },
+            ingred2: { volume: 100 + 25 },
+            ingred3: { volume: 20 },
           },
           A2: {},
           B1: {},
@@ -217,28 +201,24 @@ describe('...single-channel pipette', () => {
   })
 
   test('partially dispense ingred 1 & 2 into well containing 2 & 3', () => {
-    const initialLiquidState = merge(
-      {},
-      getBlankLiquidState(),
-      {
-        pipettes: {
-          p300SingleId: {
-            '0': {
-              ingred1: {volume: 50},
-              ingred2: {volume: 200},
-            },
+    const initialLiquidState = merge({}, getBlankLiquidState(), {
+      pipettes: {
+        p300SingleId: {
+          '0': {
+            ingred1: { volume: 50 },
+            ingred2: { volume: 200 },
           },
         },
-        labware: {
-          sourcePlateId: {
-            A1: {
-              ingred2: {volume: 25},
-              ingred3: {volume: 20},
-            },
+      },
+      labware: {
+        sourcePlateId: {
+          A1: {
+            ingred2: { volume: 25 },
+            ingred3: { volume: 20 },
           },
         },
-      }
-    )
+      },
+    })
 
     const result = _updateLiquidState(
       dispenseSingleCh150ToA1Args,
@@ -249,17 +229,17 @@ describe('...single-channel pipette', () => {
       pipettes: {
         p300SingleId: {
           '0': {
-            ingred1: {volume: 20},
-            ingred2: {volume: 80},
+            ingred1: { volume: 20 },
+            ingred2: { volume: 80 },
           },
         },
       },
       labware: {
         sourcePlateId: {
           A1: {
-            ingred1: {volume: 0 + (50 - 20)},
-            ingred2: {volume: 25 + (200 - 80)},
-            ingred3: {volume: 0 + 20},
+            ingred1: { volume: 0 + (50 - 20) },
+            ingred2: { volume: 25 + (200 - 80) },
+            ingred3: { volume: 0 + 20 },
           },
           A2: {},
           B1: {},
@@ -281,16 +261,16 @@ describe('...8-channel pipette', () => {
         expectedLabwareMatch: {
           sourcePlateId: {
             A1: {
-              ingred2: {volume: 25 + 150},
-              ingred3: {volume: 20},
+              ingred2: { volume: 25 + 150 },
+              ingred3: { volume: 20 },
             },
             B1: {},
-            C1: {ingred1: {volume: 150}},
-            D1: {ingred1: {volume: 150}},
-            E1: {ingred1: {volume: 150}},
-            F1: {ingred1: {volume: 150}},
-            G1: {ingred1: {volume: 150}},
-            H1: {ingred1: {volume: 150}},
+            C1: { ingred1: { volume: 150 } },
+            D1: { ingred1: { volume: 150 } },
+            E1: { ingred1: { volume: 150 } },
+            F1: { ingred1: { volume: 150 } },
+            G1: { ingred1: { volume: 150 } },
+            H1: { ingred1: { volume: 150 } },
           },
         },
       },
@@ -299,9 +279,9 @@ describe('...8-channel pipette', () => {
         expectedLabwareMatch: {
           sourcePlateId: {
             A1: {
-              ingred1: {volume: 6 * 150},
-              ingred2: {volume: 25 + 150},
-              ingred3: {volume: 20},
+              ingred1: { volume: 6 * 150 },
+              ingred2: { volume: 25 + 150 },
+              ingred3: { volume: 20 },
             },
             A2: {},
           },
@@ -312,16 +292,16 @@ describe('...8-channel pipette', () => {
         expectedLabwareMatch: {
           sourcePlateId: {
             A1: {
-              ingred2: {volume: 25 + 150},
-              ingred3: {volume: 20},
+              ingred2: { volume: 25 + 150 },
+              ingred3: { volume: 20 },
             },
             C1: {},
-            E1: {ingred1: {volume: 150}},
-            G1: {ingred1: {volume: 150}},
-            I1: {ingred1: {volume: 150}},
-            K1: {ingred1: {volume: 150}},
-            M1: {ingred1: {volume: 150}},
-            O1: {ingred1: {volume: 150}},
+            E1: { ingred1: { volume: 150 } },
+            G1: { ingred1: { volume: 150 } },
+            I1: { ingred1: { volume: 150 } },
+            K1: { ingred1: { volume: 150 } },
+            M1: { ingred1: { volume: 150 } },
+            O1: { ingred1: { volume: 150 } },
 
             // odd rows out
             B1: {},
@@ -337,17 +317,15 @@ describe('...8-channel pipette', () => {
       },
     ]
 
-    tests.forEach(({labwareType, expectedLabwareMatch}) => test(labwareType, () => {
-      const initialLiquidState = merge(
-        {},
-        getBlankLiquidState(labwareType),
-        {
+    tests.forEach(({ labwareType, expectedLabwareMatch }) =>
+      test(labwareType, () => {
+        const initialLiquidState = merge({}, getBlankLiquidState(labwareType), {
           pipettes: {
             p300MultiId: {
               // all tips have 150uL of ingred1, except tips 0 and 1
-              ...createTipLiquidState(8, {ingred1: {volume: 150}}),
+              ...createTipLiquidState(8, { ingred1: { volume: 150 } }),
               '0': {
-                ingred2: {volume: 200},
+                ingred2: { volume: 200 },
               },
               '1': {},
             },
@@ -355,38 +333,38 @@ describe('...8-channel pipette', () => {
           labware: {
             sourcePlateId: {
               A1: {
-                ingred2: {volume: 25},
-                ingred3: {volume: 20},
+                ingred2: { volume: 25 },
+                ingred3: { volume: 20 },
               },
             },
           },
-        }
-      )
+        })
 
-      const result = _updateLiquidState(
-        {
-          pipetteId: 'p300MultiId',
-          pipetteData: p300Multi,
-          volume: 150,
-          labwareId: 'sourcePlateId',
-          labwareType,
-          well: 'A1',
-        },
-        initialLiquidState
-      )
-
-      expect(result).toMatchObject({
-        pipettes: {
-          p300MultiId: {
-            ...createTipLiquidState(8, {ingred1: {volume: 0}}),
-            '0': {
-              ingred2: {volume: 50},
-            },
-            '1': {},
+        const result = _updateLiquidState(
+          {
+            pipetteId: 'p300MultiId',
+            pipetteData: p300Multi,
+            volume: 150,
+            labwareId: 'sourcePlateId',
+            labwareType,
+            well: 'A1',
           },
-        },
-        labware: expectedLabwareMatch,
+          initialLiquidState
+        )
+
+        expect(result).toMatchObject({
+          pipettes: {
+            p300MultiId: {
+              ...createTipLiquidState(8, { ingred1: { volume: 0 } }),
+              '0': {
+                ingred2: { volume: 50 },
+              },
+              '1': {},
+            },
+          },
+          labware: expectedLabwareMatch,
+        })
       })
-    }))
+    )
   })
 })

@@ -1,23 +1,31 @@
 // @flow
 import * as React from 'react'
-import type {Dispatch} from 'redux'
-import {connect} from 'react-redux'
+import type { Dispatch } from 'redux'
+import { connect } from 'react-redux'
 
-import {TitleBar, Icon, humanizeLabwareType, type IconName} from '@opentrons/components'
+import {
+  TitleBar,
+  Icon,
+  humanizeLabwareType,
+  type IconName,
+} from '@opentrons/components'
 import styles from './TitleBar.css'
 import i18n from '../localization'
-import {START_TERMINAL_TITLE, END_TERMINAL_TITLE} from '../constants'
-import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
-import {selectors as uiLabwareSelectors} from '../ui/labware'
-import {selectors as stepFormSelectors} from '../step-forms'
-import {selectors as stepsSelectors, actions as stepsActions} from '../ui/steps'
-import {END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID} from '../steplist'
-import {selectors as fileDataSelectors} from '../file-data'
-import {closeIngredientSelector} from '../labware-ingred/actions'
-import {stepIconsByType} from '../form-types'
-import {selectors, type Page} from '../navigation'
+import { START_TERMINAL_TITLE, END_TERMINAL_TITLE } from '../constants'
+import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
+import { selectors as uiLabwareSelectors } from '../ui/labware'
+import { selectors as stepFormSelectors } from '../step-forms'
+import {
+  selectors as stepsSelectors,
+  actions as stepsActions,
+} from '../ui/steps'
+import { END_TERMINAL_ITEM_ID, START_TERMINAL_ITEM_ID } from '../steplist'
+import { selectors as fileDataSelectors } from '../file-data'
+import { closeIngredientSelector } from '../labware-ingred/actions'
+import { stepIconsByType } from '../form-types'
+import { selectors, type Page } from '../navigation'
 
-import type {BaseState} from '../types'
+import type { BaseState } from '../types'
 
 type Props = React.ElementProps<typeof TitleBar>
 type DP = { onBackClick: $PropertyType<Props, 'onBackClick'> }
@@ -32,18 +40,17 @@ type TitleWithIconProps = {
   text?: ?string,
 }
 
-function TitleWithIcon (props: TitleWithIconProps) {
-  const {iconName, text} = props
+function TitleWithIcon(props: TitleWithIconProps) {
+  const { iconName, text } = props
   return (
     <div>
-      {iconName &&
-        <Icon className={styles.icon} name={iconName} />}
+      {iconName && <Icon className={styles.icon} name={iconName} />}
       <div className={styles.icon_inline_text}>{text}</div>
     </div>
   )
 }
 
-type TitleWithBetaTagProps = {text?: ?string}
+type TitleWithBetaTagProps = { text?: ?string }
 
 const TitleWithBetaTag = (props: TitleWithBetaTagProps) => (
   <div className={styles.title_wrapper}>
@@ -52,18 +59,26 @@ const TitleWithBetaTag = (props: TitleWithBetaTagProps) => (
   </div>
 )
 
-function mapStateToProps (state: BaseState): SP {
+function mapStateToProps(state: BaseState): SP {
   const selectedLabwareId = labwareIngredSelectors.getSelectedLabwareId(state)
   const _page = selectors.getCurrentPage(state)
   const fileName = fileDataSelectors.protocolName(state)
   const selectedStep = stepsSelectors.getSelectedStep(state)
   const selectedTerminalId = stepsSelectors.getSelectedTerminalItemId(state)
   const labwareNames = uiLabwareSelectors.getLabwareNicknamesById(state)
-  const drilledDownLabwareId = labwareIngredSelectors.getDrillDownLabwareId(state)
-  const wellSelectionLabwareKey = stepsSelectors.getWellSelectionLabwareKey(state)
+  const drilledDownLabwareId = labwareIngredSelectors.getDrillDownLabwareId(
+    state
+  )
+  const wellSelectionLabwareKey = stepsSelectors.getWellSelectionLabwareKey(
+    state
+  )
 
-  const labwareNickname = selectedLabwareId != null ? labwareNames[selectedLabwareId] : null
-  const labwareType = selectedLabwareId != null ? stepFormSelectors.getLabwareTypesById(state)[selectedLabwareId] : null
+  const labwareNickname =
+    selectedLabwareId != null ? labwareNames[selectedLabwareId] : null
+  const labwareType =
+    selectedLabwareId != null
+      ? stepFormSelectors.getLabwareTypesById(state)[selectedLabwareId]
+      : null
   const liquidPlacementMode = selectedLabwareId != null
 
   switch (_page) {
@@ -79,13 +94,18 @@ function mapStateToProps (state: BaseState): SP {
     case 'settings-app':
       return {
         _page,
-        title: <TitleWithBetaTag text={i18n.t([`nav.title.${_page}`, fileName])} />,
+        title: (
+          <TitleWithBetaTag text={i18n.t([`nav.title.${_page}`, fileName])} />
+        ),
         subtitle: i18n.t([`nav.subtitle.${_page}`, '']),
       }
     case 'steplist':
     default: {
       // NOTE: this default case error should never be reached, it's just a sanity check
-      if (_page !== 'steplist') console.error('ConnectedTitleBar got an unsupported page, returning steplist instead')
+      if (_page !== 'steplist')
+        console.error(
+          'ConnectedTitleBar got an unsupported page, returning steplist instead'
+        )
       if (liquidPlacementMode) {
         return {
           _page,
@@ -104,20 +124,29 @@ function mapStateToProps (state: BaseState): SP {
         subtitle = END_TERMINAL_TITLE
         if (drilledDownLabwareId) {
           backButtonLabel = 'Deck'
-          const labwareType = stepFormSelectors.getLabwareTypesById(state)[drilledDownLabwareId]
-          const nickname = uiLabwareSelectors.getLabwareNicknamesById(state)[drilledDownLabwareId]
+          const labwareType = stepFormSelectors.getLabwareTypesById(state)[
+            drilledDownLabwareId
+          ]
+          const nickname = uiLabwareSelectors.getLabwareNicknamesById(state)[
+            drilledDownLabwareId
+          ]
           title = nickname
           subtitle = labwareType && humanizeLabwareType(labwareType)
         }
       } else if (selectedStep) {
-        if (wellSelectionLabwareKey) { // well selection modal
+        if (wellSelectionLabwareKey) {
+          // well selection modal
           return {
             _page,
             _wellSelectionMode: true,
-            title: <TitleWithIcon
-              iconName={selectedStep && stepIconsByType[selectedStep.stepType]}
-              text={selectedStep && selectedStep.title}
-            />,
+            title: (
+              <TitleWithIcon
+                iconName={
+                  selectedStep && stepIconsByType[selectedStep.stepType]
+                }
+                text={selectedStep && selectedStep.title}
+              />
+            ),
             subtitle: labwareNames[wellSelectionLabwareKey],
             backButtonLabel: 'Back',
           }
@@ -125,14 +154,27 @@ function mapStateToProps (state: BaseState): SP {
           subtitle = selectedStep.title
         }
       }
-      return { _page: 'steplist', title: title || fileName || '', subtitle, backButtonLabel }
+      return {
+        _page: 'steplist',
+        title: title || fileName || '',
+        subtitle,
+        backButtonLabel,
+      }
     }
   }
 }
 
-function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Props {
-  const {_page, _liquidPlacementMode, _wellSelectionMode, ...props} = stateProps
-  const {dispatch} = dispatchProps
+function mergeProps(
+  stateProps: SP,
+  dispatchProps: { dispatch: Dispatch<*> }
+): Props {
+  const {
+    _page,
+    _liquidPlacementMode,
+    _wellSelectionMode,
+    ...props
+  } = stateProps
+  const { dispatch } = dispatchProps
 
   let onBackClick
 
@@ -152,8 +194,12 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Pr
   }
 }
 
-const StickyTitleBar = (props) => (
+const StickyTitleBar = props => (
   <TitleBar {...props} className={styles.sticky_bar} />
 )
 
-export default connect(mapStateToProps, null, mergeProps)(StickyTitleBar)
+export default connect(
+  mapStateToProps,
+  null,
+  mergeProps
+)(StickyTitleBar)

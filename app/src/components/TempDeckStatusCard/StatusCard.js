@@ -13,7 +13,7 @@ type Props = {
 }
 
 // TODO (ka 2018-7-24): This component should be replaced with refactored refresh card
-export default function StatusCard (props: Props) {
+export default function StatusCard(props: Props) {
   return (
     <div className={styles.status_card}>
       <h3 className={styles.card_title}>{props.title}</h3>

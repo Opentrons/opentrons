@@ -9,13 +9,14 @@ type Props = {
 const SKIP_APP_MESSAGE =
   'If you wish to skip this app update and only sync your robot server with your current app version, please '
 
-export default function SkipAppUpdateMessage (props: Props) {
+export default function SkipAppUpdateMessage(props: Props) {
   return (
     <p className={styles.sync_message}>
       {SKIP_APP_MESSAGE}
       <a className={styles.sync_link} onClick={props.onClick}>
         click here
-      </a>.
+      </a>
+      .
     </p>
   )
 }

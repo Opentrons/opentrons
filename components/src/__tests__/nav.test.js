@@ -2,17 +2,13 @@
 import React from 'react'
 import Renderer from 'react-test-renderer'
 
-import {
-  VerticalNavBar,
-  NavButton,
-  SidePanel,
-} from '..'
+import { VerticalNavBar, NavButton, SidePanel } from '..'
 
 describe('VerticalNavBar', () => {
   test('renders correctly', () => {
     const onClick = () => {}
     const tree = Renderer.create(
-      <VerticalNavBar onClick={onClick} className='c'>
+      <VerticalNavBar onClick={onClick} className="c">
         children
       </VerticalNavBar>
     ).toJSON()
@@ -25,11 +21,7 @@ describe('NavButton', () => {
   test('creates a button with props', () => {
     const onClick = jest.fn()
     const button = Renderer.create(
-      <NavButton
-        onClick={onClick}
-        disabled={false}
-        iconName='ot-file'
-      />
+      <NavButton onClick={onClick} disabled={false} iconName="ot-file" />
     ).root.findByType('button')
 
     button.props.onClick()
@@ -40,7 +32,7 @@ describe('NavButton', () => {
 
   test('adds svg icon to button by name', () => {
     const icon = Renderer.create(
-      <NavButton iconName='ot-file' />
+      <NavButton iconName="ot-file" />
     ).root.findByType('svg')
 
     expect(icon).toBeDefined()
@@ -48,7 +40,7 @@ describe('NavButton', () => {
 
   test('renders nav button with icon correctly', () => {
     const tree = Renderer.create(
-      <NavButton iconName='ot-file' disabled='false' />
+      <NavButton iconName="ot-file" disabled="false" />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -78,7 +70,7 @@ describe('SidePanel', () => {
   test('renders closed panel when onClick present and isOpen is false', () => {
     const onClick = jest.fn()
     const panel = Renderer.create(
-      <SidePanel title={'title'} isClosed='true' onCloseClick={onClick} />
+      <SidePanel title={'title'} isClosed="true" onCloseClick={onClick} />
     ).root.findByType('div')
 
     expect(panel.props.className).toEqual('panel closed')
@@ -87,7 +79,7 @@ describe('SidePanel', () => {
   test('renders SidePanel correctly', () => {
     const onClick = jest.fn()
     const tree = Renderer.create(
-      <SidePanel title={'title'} onCloseClick={onClick} isClosed='true'>
+      <SidePanel title={'title'} onCloseClick={onClick} isClosed="true">
         children
       </SidePanel>
     ).toJSON()

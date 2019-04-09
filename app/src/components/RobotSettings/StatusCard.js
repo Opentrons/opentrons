@@ -1,19 +1,22 @@
 // @flow
 // RobotSettings card for robot status
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import capitalize from 'lodash/capitalize'
 
-import {selectors as robotSelectors, actions as robotActions} from '../../robot'
+import {
+  selectors as robotSelectors,
+  actions as robotActions,
+} from '../../robot'
 
-import {Card, LabeledValue, OutlineButton} from '@opentrons/components'
-import {CONNECTABLE} from '../../discovery'
-import {CardContentHalf} from '../layout'
+import { Card, LabeledValue, OutlineButton } from '@opentrons/components'
+import { CONNECTABLE } from '../../discovery'
+import { CardContentHalf } from '../layout'
 
-import type {State, Dispatch} from '../../types'
-import type {ViewableRobot} from '../../discovery'
+import type { State, Dispatch } from '../../types'
+import type { ViewableRobot } from '../../discovery'
 
-type OwnProps = {robot: ViewableRobot}
+type OwnProps = { robot: ViewableRobot }
 
 type StateProps = {|
   status: string,
@@ -24,7 +27,7 @@ type DispatchProps = {|
   onClick: () => mixed,
 |}
 
-type Props = {...$Exact<OwnProps>, ...StateProps, ...DispatchProps}
+type Props = { ...$Exact<OwnProps>, ...StateProps, ...DispatchProps }
 
 const TITLE = 'Status'
 const STATUS_LABEL = 'This robot is currently'
@@ -36,8 +39,8 @@ export default connect(
   mapDispatchToProps
 )(StatusCard)
 
-function StatusCard (props: Props) {
-  const {robot, status, connectButtonText, onClick} = props
+function StatusCard(props: Props) {
+  const { robot, status, connectButtonText, onClick } = props
   const disabled = robot.status !== CONNECTABLE
 
   return (
@@ -54,8 +57,8 @@ function StatusCard (props: Props) {
   )
 }
 
-function mapStateToProps (state: State, ownProps: OwnProps): StateProps {
-  const {robot} = ownProps
+function mapStateToProps(state: State, ownProps: OwnProps): StateProps {
+  const { robot } = ownProps
   const connected = robot.connected != null && robot.connected === true
   const sessionStatus = robotSelectors.getSessionStatus(state)
   const status = connected
@@ -64,14 +67,14 @@ function mapStateToProps (state: State, ownProps: OwnProps): StateProps {
 
   const connectButtonText = connected ? 'disconnect' : 'connect'
 
-  return {status, connectButtonText}
+  return { status, connectButtonText }
 }
 
-function mapDispatchToProps (
+function mapDispatchToProps(
   dispatch: Dispatch,
   ownProps: OwnProps
 ): DispatchProps {
-  const {robot} = ownProps
+  const { robot } = ownProps
   const onClickAction =
     robot.connected === true
       ? robotActions.disconnect()

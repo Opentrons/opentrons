@@ -1,10 +1,7 @@
 // @flow
 import getNextRobotStateAndWarnings from '../getNextRobotStateAndWarnings'
 import forAspirateDispense from '../getNextRobotStateAndWarnings/forAspirateDispense'
-import {
-  createRobotState,
-  commandCreatorNoErrors,
-} from './fixtures'
+import { createRobotState, commandCreatorNoErrors } from './fixtures'
 
 import _aspirate from '../commandCreators/atomic/aspirate'
 
@@ -30,6 +27,9 @@ describe('Aspirate Command', () => {
     const command = aspirate(args)(prevRobotState).commands[0]
     getNextRobotStateAndWarnings(command, prevRobotState)
 
-    expect(forAspirateDispense).toHaveBeenCalledWith(command.params, prevRobotState)
+    expect(forAspirateDispense).toHaveBeenCalledWith(
+      command.params,
+      prevRobotState
+    )
   })
 })

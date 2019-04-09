@@ -1,18 +1,16 @@
 // @flow
 import mergeWhen from './mergeWhen'
-import {orderWells, getOrderedWells} from './orderWells'
+import { orderWells, getOrderedWells } from './orderWells'
 
-export {
-  mergeWhen,
-  orderWells,
-  getOrderedWells,
-}
+export { mergeWhen, orderWells, getOrderedWells }
 
 export type WellRatio = 'n:n' | '1:many' | 'many:1'
-export function getWellRatio (sourceWells: mixed, destWells: mixed): ?WellRatio {
+export function getWellRatio(sourceWells: mixed, destWells: mixed): ?WellRatio {
   if (
-    !Array.isArray(sourceWells) || sourceWells.length === 0 ||
-    !Array.isArray(destWells) || destWells.length === 0
+    !Array.isArray(sourceWells) ||
+    sourceWells.length === 0 ||
+    !Array.isArray(destWells) ||
+    destWells.length === 0
   ) {
     return null
   }

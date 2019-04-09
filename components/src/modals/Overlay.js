@@ -15,8 +15,8 @@ type OverlayProps = {
  * to make a custom modal component, use `<Overlay>`, otherwise you might
  * just want to use `<Modal>`
  */
-export default function Overlay (props: OverlayProps) {
-  const {alertOverlay, onClick} = props
+export default function Overlay(props: OverlayProps) {
+  const { alertOverlay, onClick } = props
 
   const className = cx(styles.overlay, {
     [styles.clickable]: onClick,

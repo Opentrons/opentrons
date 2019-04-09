@@ -1,19 +1,22 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import Alerts from '../alerts/Alerts'
-import {actions as dismissActions, selectors as dismissSelectors} from '../../dismiss'
-import {getVisibleAlerts} from './utils'
-import {selectors as stepsSelectors} from '../../ui/steps'
-import {selectors as stepFormSelectors} from '../../step-forms'
-import type {Dispatch} from 'redux'
-import type {StepIdType} from '../../form-types'
-import type {StepFieldName} from '../../steplist/fieldLevel'
-import type {BaseState} from '../../types'
+import {
+  actions as dismissActions,
+  selectors as dismissSelectors,
+} from '../../dismiss'
+import { getVisibleAlerts } from './utils'
+import { selectors as stepsSelectors } from '../../ui/steps'
+import { selectors as stepFormSelectors } from '../../step-forms'
+import type { Dispatch } from 'redux'
+import type { StepIdType } from '../../form-types'
+import type { StepFieldName } from '../../steplist/fieldLevel'
+import type { BaseState } from '../../types'
 
 /* TODO:  BC 2018-09-13 move to src/components/alerts and adapt and use src/components/alerts/Alerts
-* see #1814 for reference
-*/
+ * see #1814 for reference
+ */
 
 type Props = React.ElementProps<typeof Alerts>
 
@@ -29,7 +32,7 @@ type OP = {
 }
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
-  const {focusedField, dirtyFields} = ownProps
+  const { focusedField, dirtyFields } = ownProps
   const visibleWarnings = getVisibleAlerts({
     focusedField,
     dirtyFields,
@@ -58,15 +61,22 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-const mergeProps = (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Props => {
-  const {stepId} = stateProps
-  const {dispatch} = dispatchProps
+const mergeProps = (
+  stateProps: SP,
+  dispatchProps: { dispatch: Dispatch<*> }
+): Props => {
+  const { stepId } = stateProps
+  const { dispatch } = dispatchProps
   return {
     ...stateProps,
     dismissWarning: (dismissId: string) => {
-      dispatch(dismissActions.dismissFormWarning({type: dismissId, stepId}))
+      dispatch(dismissActions.dismissFormWarning({ type: dismissId, stepId }))
     },
   }
 }
 
-export default connect(mapStateToProps, null, mergeProps)(Alerts)
+export default connect(
+  mapStateToProps,
+  null,
+  mergeProps
+)(Alerts)

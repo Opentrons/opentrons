@@ -1,7 +1,7 @@
 // @flow
 // utilities for working with volumes in µL
 import round from 'lodash/round'
-import type {LabwareVolumeUnits} from '../types'
+import type { LabwareVolumeUnits } from '../types'
 
 const SCALE_BY_UNITS = {
   µL: 1,
@@ -9,7 +9,7 @@ const SCALE_BY_UNITS = {
   L: 1000000,
 }
 
-export function getDisplayVolume (
+export function getDisplayVolume(
   volumeInMicroliters: number,
   displayUnits?: LabwareVolumeUnits = 'µL',
   digits?: number
@@ -19,12 +19,12 @@ export function getDisplayVolume (
   return `${typeof digits === 'number' ? round(volume, digits) : volume}`
 }
 
-export function getAsciiVolumeUnits (displayUnits: LabwareVolumeUnits) {
+export function getAsciiVolumeUnits(displayUnits: LabwareVolumeUnits) {
   if (displayUnits === 'µL') return 'uL'
   return displayUnits
 }
 
-export function ensureVolumeUnits (maybeUnits: ?string): LabwareVolumeUnits {
+export function ensureVolumeUnits(maybeUnits: ?string): LabwareVolumeUnits {
   if (maybeUnits === 'mL' || maybeUnits === 'ml') return 'mL'
   if (maybeUnits === 'L' || maybeUnits === 'l') return 'L'
   return 'µL'

@@ -1,9 +1,9 @@
 // @flow
 // view info about the app and update
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {Route, Switch, Redirect, type ContextRouter} from 'react-router'
-import {push} from 'react-router-redux'
+import { connect } from 'react-redux'
+import { Route, Switch, Redirect, type ContextRouter } from 'react-router'
+import { push } from 'react-router-redux'
 
 import {
   getShellUpdateState,
@@ -17,10 +17,10 @@ import {
 import Page from '../../components/Page'
 import AppSettings from '../../components/AppSettings'
 import UpdateApp from '../../components/AppSettings/UpdateApp'
-import {ErrorModal} from '../../components/modals'
+import { ErrorModal } from '../../components/modals'
 
-import type {State} from '../../types'
-import type {ShellUpdateState} from '../../shell'
+import type { State } from '../../types'
+import type { ShellUpdateState } from '../../shell'
 
 type OP = ContextRouter
 
@@ -36,25 +36,25 @@ type DP = {|
   closeModal: () => mixed,
 |}
 
-type Props = {...OP, ...SP, ...DP}
+type Props = { ...OP, ...SP, ...DP }
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(AppSettingsPage)
 
-function AppSettingsPage (props: Props) {
+function AppSettingsPage(props: Props) {
   const {
     availableVersion,
     checkUpdate,
     closeModal,
-    update: {available, seen, error},
-    match: {path},
+    update: { available, seen, error },
+    match: { path },
   } = props
 
   return (
     <React.Fragment>
-      <Page titleBarProps={{title: 'App'}}>
+      <Page titleBarProps={{ title: 'App' }}>
         <AppSettings
           availableVersion={availableVersion}
           checkUpdate={checkUpdate}
@@ -86,14 +86,14 @@ function AppSettingsPage (props: Props) {
   )
 }
 
-function mapStateToProps (state: State): SP {
+function mapStateToProps(state: State): SP {
   return {
     update: getShellUpdateState(state),
     availableVersion: getAvailableShellUpdate(state),
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch): DP {
+function mapDispatchToProps(dispatch: Dispatch): DP {
   return {
     checkUpdate: () => dispatch(checkShellUpdate()),
     downloadUpdate: () => dispatch(downloadShellUpdate()),

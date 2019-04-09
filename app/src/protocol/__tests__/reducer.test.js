@@ -1,6 +1,6 @@
 // protocol state reducer tests
 
-import {protocolReducer} from '..'
+import { protocolReducer } from '..'
 
 describe('protocolReducer', () => {
   test('initial state', () => {
@@ -14,25 +14,31 @@ describe('protocolReducer', () => {
   const SPECS = [
     {
       name: 'handles protocol:OPEN',
-      action: {type: 'protocol:OPEN', payload: {file: {name: 'proto.py'}}},
-      initialState: {file: {}, contents: 'foobar', data: {}},
-      expectedState: {file: {name: 'proto.py'}, contents: null, data: null},
+      action: {
+        type: 'protocol:OPEN',
+        payload: { file: { name: 'proto.py' } },
+      },
+      initialState: { file: {}, contents: 'foobar', data: {} },
+      expectedState: { file: { name: 'proto.py' }, contents: null, data: null },
     },
     {
       name: 'handles protocol:UPLOAD',
-      action: {type: 'protocol:UPLOAD', payload: {contents: 'foo', data: {}}},
-      initialState: {file: {name: 'proto.py'}, contents: null, data: null},
-      expectedState: {file: {name: 'proto.py'}, contents: 'foo', data: {}},
+      action: {
+        type: 'protocol:UPLOAD',
+        payload: { contents: 'foo', data: {} },
+      },
+      initialState: { file: { name: 'proto.py' }, contents: null, data: null },
+      expectedState: { file: { name: 'proto.py' }, contents: 'foo', data: {} },
     },
     {
       name: 'handles robot:SESSION_RESPONSE with non-JSON protocol',
       action: {
         type: 'robot:SESSION_RESPONSE',
-        payload: {name: 'foo', protocolText: 'bar'},
+        payload: { name: 'foo', protocolText: 'bar' },
       },
-      initialState: {file: null, contents: null, data: null},
+      initialState: { file: null, contents: null, data: null },
       expectedState: {
-        file: {name: 'foo', type: null, lastModified: null},
+        file: { name: 'foo', type: null, lastModified: null },
         contents: 'bar',
         data: null,
       },
@@ -41,13 +47,17 @@ describe('protocolReducer', () => {
       name: 'handles robot:SESSION_RESPONSE with JSON protocol',
       action: {
         type: 'robot:SESSION_RESPONSE',
-        payload: {name: 'foo.json', protocolText: '{"metadata": {}}'},
+        payload: { name: 'foo.json', protocolText: '{"metadata": {}}' },
       },
-      initialState: {file: null, contents: null, data: null},
+      initialState: { file: null, contents: null, data: null },
       expectedState: {
-        file: {name: 'foo.json', type: 'application/json', lastModified: null},
+        file: {
+          name: 'foo.json',
+          type: 'application/json',
+          lastModified: null,
+        },
         contents: '{"metadata": {}}',
-        data: {metadata: {}},
+        data: { metadata: {} },
       },
     },
     {
@@ -57,10 +67,10 @@ describe('protocolReducer', () => {
         payload: {
           name: 'foo.py',
           protocolText: '# foo.py',
-          metadata: {'protocol-name': 'foo'},
+          metadata: { 'protocol-name': 'foo' },
         },
       },
-      initialState: {file: null, contents: null, data: null},
+      initialState: { file: null, contents: null, data: null },
       expectedState: {
         file: {
           name: 'foo.py',
@@ -68,19 +78,19 @@ describe('protocolReducer', () => {
           lastModified: null,
         },
         contents: '# foo.py',
-        data: {metadata: {'protocol-name': 'foo'}},
+        data: { metadata: { 'protocol-name': 'foo' } },
       },
     },
     {
       name: 'handles robot:DISCONNECT by clearing state',
-      action: {type: 'robot:DISCONNECT_RESPONSE'},
-      initialState: {file: {name: 'proto.py'}, contents: 'foo', data: {}},
-      expectedState: {file: null, contents: null, data: null},
+      action: { type: 'robot:DISCONNECT_RESPONSE' },
+      initialState: { file: { name: 'proto.py' }, contents: 'foo', data: {} },
+      expectedState: { file: null, contents: null, data: null },
     },
   ]
 
   SPECS.forEach(spec => {
-    const {name, action, initialState, expectedState} = spec
+    const { name, action, initialState, expectedState } = spec
 
     test(name, () => {
       expect(protocolReducer(initialState, action)).toEqual(expectedState)

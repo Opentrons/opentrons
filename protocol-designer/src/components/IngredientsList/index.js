@@ -2,17 +2,20 @@
 // TODO: Ian 2018-10-09 figure out what belongs in LiquidsSidebar vs IngredientsList after #2427
 import React from 'react'
 
-import {IconButton, SidePanel, swatchColors} from '@opentrons/components'
-import {sortWells} from '@opentrons/shared-data'
+import { IconButton, SidePanel, swatchColors } from '@opentrons/components'
+import { sortWells } from '@opentrons/shared-data'
 import i18n from '../../localization'
-import {PDTitledList, PDListItem} from '../lists'
+import { PDTitledList, PDListItem } from '../lists'
 import StepDescription from '../StepDescription'
 import LabwareDetailsCard from './LabwareDetailsCard'
 import styles from './IngredientsList.css'
-import type {LiquidGroupsById, LiquidGroup} from '../../labware-ingred/types'
-import type {SingleLabwareLiquidState} from '../../step-generation'
+import type { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
+import type { SingleLabwareLiquidState } from '../../step-generation'
 
-type RemoveWellsContents = (args: {|liquidGroupId: string, wells: Array<string>|}) => mixed
+type RemoveWellsContents = (args: {|
+  liquidGroupId: string,
+  wells: Array<string>,
+|}) => mixed
 
 // Props used by both IngredientsList and IngredGroupCard
 type CommonProps = {|
@@ -32,14 +35,14 @@ type CardState = {|
 |}
 
 class IngredGroupCard extends React.Component<CardProps, CardState> {
-  constructor (props: CardProps) {
+  constructor(props: CardProps) {
     super(props)
-    this.state = {isExpanded: true} // TODO: rename to 'collapsed'
+    this.state = { isExpanded: true } // TODO: rename to 'collapsed'
   }
 
-  toggleAccordion = () => this.setState({isExpanded: !this.state.isExpanded})
+  toggleAccordion = () => this.setState({ isExpanded: !this.state.isExpanded })
 
-  render () {
+  render() {
     const {
       ingredGroup,
       removeWellsContents,
@@ -47,8 +50,8 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
       groupId,
       labwareWellContents,
     } = this.props
-    const {serialize, description, name} = ingredGroup
-    const {isExpanded} = this.state
+    const { serialize, description, name } = ingredGroup
+    const { isExpanded } = this.state
 
     const wellsWithIngred = Object.keys(labwareWellContents)
       .sort(sortWells)
@@ -62,13 +65,17 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
     return (
       <PDTitledList
         title={name || 'Unnamed Ingredient'}
-        iconProps={{style: {fill: swatchColors(Number(groupId))}}}
-        iconName='circle'
+        iconProps={{ style: { fill: swatchColors(Number(groupId)) } }}
+        iconName="circle"
         onCollapseToggle={() => this.toggleAccordion()}
         collapsed={!isExpanded}
         selected={selected}
-        onClick={() => console.log('TODO: do something with ', {groupId, wellName: null})} // TODO: Ian 2018-10-19
-        description={<StepDescription description={description} header='Description:' />}
+        onClick={() =>
+          console.log('TODO: do something with ', { groupId, wellName: null })
+        } // TODO: Ian 2018-10-19
+        description={
+          <StepDescription description={description} header="Description:" />
+        }
       >
         <PDListItem className={styles.ingredient_row_header}>
           <span>Well</span>
@@ -83,21 +90,23 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
 
           if (volume == null) {
             // TODO: Ian 2018-06-07 use assert
-            console.warn(`Got null-ish volume for well: ${well}, ingred: ${groupId}`)
+            console.warn(
+              `Got null-ish volume for well: ${well}, ingred: ${groupId}`
+            )
             return null
           }
 
-          return <IngredIndividual key={well}
-            name={serialize
-              ? `${ingredGroup.name || ''} ${i + 1}`
-              : ''
-            }
-            wellName={well}
-            canDelete
-            volume={volume}
-            groupId={groupId}
-            removeWellsContents={removeWellsContents}
-          />
+          return (
+            <IngredIndividual
+              key={well}
+              name={serialize ? `${ingredGroup.name || ''} ${i + 1}` : ''}
+              wellName={well}
+              canDelete
+              volume={volume}
+              groupId={groupId}
+              removeWellsContents={removeWellsContents}
+            />
+          )
         })}
       </PDTitledList>
     )
@@ -114,7 +123,7 @@ type IndividProps = {|
   removeWellsContents: RemoveWellsContents,
 |}
 
-function IngredIndividual (props: IndividProps) {
+function IngredIndividual(props: IndividProps) {
   const {
     name,
     wellName,
@@ -130,13 +139,18 @@ function IngredIndividual (props: IndividProps) {
       <span>{wellName}</span>
       <span>{volume ? volume + ' μL' : '-'}</span>
       <span>{name}</span>
-      {canDelete && <IconButton
-        className={styles.close_icon}
-        name='close'
-        onClick={
-          () => window.confirm(`Are you sure you want to delete well ${wellName} ?`) &&
-          removeWellsContents({liquidGroupId: groupId, wells: [wellName]})
-        } />}
+      {canDelete && (
+        <IconButton
+          className={styles.close_icon}
+          name="close"
+          onClick={() =>
+            window.confirm(
+              `Are you sure you want to delete well ${wellName} ?`
+            ) &&
+            removeWellsContents({ liquidGroupId: groupId, wells: [wellName] })
+          }
+        />
+      )}
     </PDListItem>
   )
 }
@@ -148,7 +162,7 @@ type Props = {
   selectedIngredientGroupId: ?string,
 }
 
-export default function IngredientsList (props: Props) {
+export default function IngredientsList(props: Props) {
   const {
     labwareWellContents,
     liquidGroupsById,
@@ -157,18 +171,19 @@ export default function IngredientsList (props: Props) {
   } = props
 
   return (
-    <SidePanel title='Name & Liquids'>
+    <SidePanel title="Name & Liquids">
       <LabwareDetailsCard />
 
-      {Object.keys(liquidGroupsById).map((groupIdForCard) =>
-        <IngredGroupCard key={groupIdForCard}
+      {Object.keys(liquidGroupsById).map(groupIdForCard => (
+        <IngredGroupCard
+          key={groupIdForCard}
           removeWellsContents={removeWellsContents}
           labwareWellContents={labwareWellContents}
           ingredGroup={liquidGroupsById[groupIdForCard]}
           groupId={groupIdForCard}
           selected={selectedIngredientGroupId === groupIdForCard}
-        />)
-      }
+        />
+      ))}
     </SidePanel>
   )
 }

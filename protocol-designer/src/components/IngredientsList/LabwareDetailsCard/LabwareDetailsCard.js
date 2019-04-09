@@ -2,7 +2,7 @@
 import React from 'react'
 import cx from 'classnames'
 import i18n from '../../../localization'
-import {PDTitledList, PDListItem} from '../../lists'
+import { PDTitledList, PDListItem } from '../../lists'
 import EditableTextField from '../../EditableTextField'
 import styles from './labwareDetailsCard.css'
 
@@ -12,12 +12,9 @@ type Props = {
   renameLabware: (name: string) => mixed,
 }
 
-export default function LabwareDetailsCard (props: Props) {
+export default function LabwareDetailsCard(props: Props) {
   return (
-    <PDTitledList
-      title='labware details'
-      iconName='flask-outline'
-    >
+    <PDTitledList title="labware details" iconName="flask-outline">
       <PDListItem>
         <div className={styles.row}>
           <span className={cx(styles.label, styles.column_1_3)}>

@@ -24,18 +24,18 @@ describe('getWellContentsAllLabware', () => {
     }
 
     ingredsByLabwareXXSingleIngred = {
-      'container1Id': {
+      container1Id: {
         '0': {
           ...baseIngredFields,
           wells: {
-            A1: {volume: 100},
-            B1: {volume: 150},
+            A1: { volume: 100 },
+            B1: { volume: 150 },
           },
         },
       },
-      'container2Id': {},
-      'container3Id': {},
-      'FIXED_TRASH_ID': {},
+      container2Id: {},
+      container3Id: {},
+      FIXED_TRASH_ID: {},
     }
 
     defaultWellContents = {
@@ -47,8 +47,8 @@ describe('getWellContentsAllLabware', () => {
       labwareTypesById, // all labware types
       ingredsByLabwareXXSingleIngred,
       'container1Id', // selected labware id
-      {A1: 'A1', B1: 'B1'}, // selected
-      {A3: 'A3'} // highlighted
+      { A1: 'A1', B1: 'B1' }, // selected
+      { A3: 'A3' } // highlighted
     )
   })
 
@@ -58,10 +58,8 @@ describe('getWellContentsAllLabware', () => {
   })
 
   test('selects well contents of all labware (for Plate props)', () => {
-    expect(
-      singleIngredResult
-    ).toMatchObject({
-      'FIXED_TRASH_ID': {
+    expect(singleIngredResult).toMatchObject({
+      FIXED_TRASH_ID: {
         A1: defaultWellContents,
       },
       container2Id: {
@@ -99,8 +97,8 @@ describe('getWellContentsAllLabware', () => {
       labwareTypesById, // all labware types
       ingredsByLabwareXXSingleIngred,
       null, // selected labware id
-      {A1: 'A1', B1: 'B1'}, // selected
-      {A3: 'A3'} // highlighted
+      { A1: 'A1', B1: 'B1' }, // selected
+      { A3: 'A3' } // highlighted
     )
     expect(result.container1Id.A1.selected).toBe(false)
   })

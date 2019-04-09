@@ -1,4 +1,4 @@
-import {getLabwareLiquidState} from '../selectors'
+import { getLabwareLiquidState } from '../selectors'
 
 let labwareTypesById
 let ingredLocs
@@ -12,19 +12,19 @@ beforeEach(() => {
 
   ingredLocs = {
     wellPlateId: {
-      A1: {'0': {volume: 100}},
-      B1: {'0': {volume: 150}},
+      A1: { '0': { volume: 100 } },
+      B1: { '0': { volume: 150 } },
     },
     troughId: {
-      A1: {'0': {volume: 105}},
-      A2: {'0': {volume: 155}},
-      A3: {'1': {volume: 115}},
-      A6: {'1': {volume: 111}},
+      A1: { '0': { volume: 105 } },
+      A2: { '0': { volume: 155 } },
+      A3: { '1': { volume: 115 } },
+      A6: { '1': { volume: 111 } },
     },
   }
 })
 
-function hasAllWellKeys (result) {
+function hasAllWellKeys(result) {
   // make sure each labware has keys for all wells added in
   expect(Object.keys(result.wellPlateId).length).toBe(96)
   expect(Object.keys(result.troughId).length).toBe(12)
@@ -33,17 +33,11 @@ function hasAllWellKeys (result) {
 
 describe('getLabwareLiquidState', () => {
   test('no labware + no ingreds', () => {
-    expect(getLabwareLiquidState.resultFunc(
-      {},
-      {}
-    )).toEqual({})
+    expect(getLabwareLiquidState.resultFunc({}, {})).toEqual({})
   })
 
   test('labware + no ingreds: generate empty well keys', () => {
-    const result = getLabwareLiquidState.resultFunc(
-      {},
-      labwareTypesById
-    )
+    const result = getLabwareLiquidState.resultFunc({}, labwareTypesById)
 
     hasAllWellKeys(result)
   })

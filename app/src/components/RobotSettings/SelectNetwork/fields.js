@@ -1,8 +1,13 @@
 // @flow
 import * as React from 'react'
 
-import {InputField, CheckboxField, SelectField, type SelectOption} from '@opentrons/components'
-import {FormTableRow} from './FormTable'
+import {
+  InputField,
+  CheckboxField,
+  SelectField,
+  type SelectOption,
+} from '@opentrons/components'
+import { FormTableRow } from './FormTable'
 import styles from './styles.css'
 
 type BaseFieldProps = {|
@@ -39,8 +44,8 @@ const FIELD_ID_PREFIX = '__ConnectForm__'
 const makeId = (name: *): string => `${FIELD_ID_PREFIX}.${name}`
 const makeLabel = (lab: *, req: *): string => (req ? `* ${lab}:` : `${lab}:`)
 
-export function StringField (props: StringFieldProps) {
-  const {name, value, error, className, onChange, onBlur} = props
+export function StringField(props: StringFieldProps) {
+  const { name, value, error, className, onChange, onBlur } = props
   const id = makeId(name)
   const label = makeLabel(props.label, props.required)
   const type = 'text'
@@ -48,14 +53,14 @@ export function StringField (props: StringFieldProps) {
   return (
     <FormTableRow label={label} labelFor={id}>
       <InputField
-        {...{id, name, type, value, error, className, onChange, onBlur}}
+        {...{ id, name, type, value, error, className, onChange, onBlur }}
       />
     </FormTableRow>
   )
 }
 
-export function PasswordField (props: PasswordFieldProps) {
-  const {name, value, error, className, onChange, onBlur} = props
+export function PasswordField(props: PasswordFieldProps) {
+  const { name, value, error, className, onChange, onBlur } = props
   const id = makeId(name)
   const label = makeLabel(props.label, props.required)
   const showPassword = !!props.showPassword
@@ -66,7 +71,7 @@ export function PasswordField (props: PasswordFieldProps) {
     <React.Fragment>
       <FormTableRow label={label} labelFor={id}>
         <InputField
-          {...{id, name, type, value, error, className, onChange, onBlur}}
+          {...{ id, name, type, value, error, className, onChange, onBlur }}
         />
       </FormTableRow>
       <FormTableRow>
@@ -80,8 +85,8 @@ export function PasswordField (props: PasswordFieldProps) {
   )
 }
 
-export function SelectOptionField (props: SelectOptionFieldProps) {
-  const {name} = props
+export function SelectOptionField(props: SelectOptionFieldProps) {
+  const { name } = props
   const id = makeId(name)
   const label = makeLabel(props.label, props.required)
 

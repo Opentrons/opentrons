@@ -24,17 +24,26 @@ type ModalProps = {
  * Base modal component that fills its nearest `display:relative` ancestor
  * with a dark overlay and displays `children` as its contents in a white box
  */
-export default function Modal (props: ModalProps) {
-  const {contentsClassName, alertOverlay, onCloseClick, heading, innerRef} = props
+export default function Modal(props: ModalProps) {
+  const {
+    contentsClassName,
+    alertOverlay,
+    onCloseClick,
+    heading,
+    innerRef,
+  } = props
   return (
-    <div className={cx(styles.modal, props.className, {[styles.alert_modal]: alertOverlay})} >
-      <Overlay onClick={onCloseClick} alertOverlay={alertOverlay}/>
+    <div
+      className={cx(styles.modal, props.className, {
+        [styles.alert_modal]: alertOverlay,
+      })}
+    >
+      <Overlay onClick={onCloseClick} alertOverlay={alertOverlay} />
       <div
         ref={innerRef}
-        className={cx(styles.modal_contents, contentsClassName)}>
-        {heading && (
-          <h3 className={styles.modal_heading}>{heading}</h3>
-        )}
+        className={cx(styles.modal_contents, contentsClassName)}
+      >
+        {heading && <h3 className={styles.modal_heading}>{heading}</h3>}
         {props.children}
       </div>
     </div>

@@ -7,27 +7,27 @@ type Props = {
     select: (?string) => mixed,
   }) => React.Node,
 }
-type State = {selected: ?string}
+type State = { selected: ?string }
 
 /** Keeps track of one selected string identifier in state */
 export default class SelectedWrapper extends React.Component<Props, State> {
-  constructor (props: Props) {
+  constructor(props: Props) {
     super(props)
-    this.state = {selected: null}
+    this.state = { selected: null }
   }
 
   select = (selected: ?string) => {
     if (this.state.selected === selected) {
       // "selecting" what is already selected deselects it
-      this.setState({selected: null})
+      this.setState({ selected: null })
     } else {
-      this.setState({selected})
+      this.setState({ selected })
     }
   }
 
-  render () {
-    const {render} = this.props
-    const {selected} = this.state
-    return render({selected, select: this.select})
+  render() {
+    const { render } = this.props
+    const { selected } = this.state
+    return render({ selected, select: this.select })
   }
 }

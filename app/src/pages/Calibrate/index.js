@@ -1,13 +1,13 @@
 // @flow
 // calibrate page routes
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {Switch, Route, Redirect, type Match} from 'react-router'
+import { connect } from 'react-redux'
+import { Switch, Route, Redirect, type Match } from 'react-router'
 
-import type {State} from '../../types'
-import type {Pipette, Labware} from '../../robot'
+import type { State } from '../../types'
+import type { Pipette, Labware } from '../../robot'
 
-import {selectors as robotSelectors} from '../../robot'
+import { selectors as robotSelectors } from '../../robot'
 import CalibratePipettes from './Pipettes'
 import CalibrateLabware from './Labware'
 
@@ -24,25 +24,21 @@ type Props = SP & {
 
 export default connect(mapStateToProps)(Calibrate)
 
-function Calibrate (props: Props) {
-  const {match: {path}} = props
+function Calibrate(props: Props) {
+  const {
+    match: { path },
+  } = props
 
   return (
     <Switch>
       <Redirect exact from={path} to={getRedirectUrl(props)} />
-      <Route
-        path={`${path}/pipettes/:mount?`}
-        component={CalibratePipettes}
-      />
-      <Route
-        path={`${path}/labware/:slot`}
-        component={CalibrateLabware}
-      />
+      <Route path={`${path}/pipettes/:mount?`} component={CalibratePipettes} />
+      <Route path={`${path}/labware/:slot`} component={CalibrateLabware} />
     </Switch>
   )
 }
 
-function mapStateToProps (state: State): SP {
+function mapStateToProps(state: State): SP {
   return {
     nextPipette: robotSelectors.getNextPipette(state),
     labware: robotSelectors.getNotTipracks(state),
@@ -51,13 +47,8 @@ function mapStateToProps (state: State): SP {
   }
 }
 
-function getRedirectUrl (props: Props) {
-  const {
-    nextPipette,
-    labware,
-    nextLabware,
-    isTipsProbed,
-  } = props
+function getRedirectUrl(props: Props) {
+  const { nextPipette, labware, nextLabware, isTipsProbed } = props
 
   if (!isTipsProbed && nextPipette) {
     return `/calibrate/pipettes/${nextPipette.mount}`

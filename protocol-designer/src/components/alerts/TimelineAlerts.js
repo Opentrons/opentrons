@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
-import type {Dispatch} from 'redux'
-import {connect} from 'react-redux'
+import type { Dispatch } from 'redux'
+import { connect } from 'react-redux'
 import i18n from '../../localization'
 import ErrorContents from './ErrorContents'
 import WarningContents from './WarningContents'
@@ -9,10 +9,10 @@ import {
   actions as dismissActions,
   selectors as dismissSelectors,
 } from '../../dismiss'
-import {selectors as stepsSelectors} from '../../ui/steps'
-import {selectors as fileDataSelectors} from '../../file-data'
-import type {BaseState} from '../../types'
-import type {StepIdType} from '../../form-types'
+import { selectors as stepsSelectors } from '../../ui/steps'
+import { selectors as fileDataSelectors } from '../../file-data'
+import type { BaseState } from '../../types'
+import type { StepIdType } from '../../form-types'
 import Alerts from './Alerts'
 
 type Props = React.ElementProps<typeof Alerts>
@@ -24,25 +24,29 @@ type SP = {
 }
 
 /** Errors and Warnings from step-generation are written for developers
-  * who are using step-generation as an API for writing Opentrons protocols.
-  * These 'overrides' replace the content of some of those errors/warnings
-  * in order to make things clearer to the PD user.
-  *
-  * When an override is not specified in /localization/en/alert/ , the default
-  * behavior is that the warning/error `message` gets put into the `title` of the Alert
-  */
+ * who are using step-generation as an API for writing Opentrons protocols.
+ * These 'overrides' replace the content of some of those errors/warnings
+ * in order to make things clearer to the PD user.
+ *
+ * When an override is not specified in /localization/en/alert/ , the default
+ * behavior is that the warning/error `message` gets put into the `title` of the Alert
+ */
 
-function mapStateToProps (state: BaseState): SP {
+function mapStateToProps(state: BaseState): SP {
   const timeline = fileDataSelectors.getRobotStateTimeline(state)
   const errors = (timeline.errors || []).map(error => ({
     title: i18n.t(`alert.timeline.error.${error.type}.title`),
-    description: <ErrorContents level='timeline' errorType={error.type} />,
+    description: <ErrorContents level="timeline" errorType={error.type} />,
   }))
-  const warnings = dismissSelectors.getTimelineWarningsForSelectedStep(state).map(warning => ({
-    title: i18n.t(`alert.timeline.warning.${warning.type}.title`),
-    description: <WarningContents level='timeline' warningType={warning.type} />,
-    dismissId: warning.type,
-  }))
+  const warnings = dismissSelectors
+    .getTimelineWarningsForSelectedStep(state)
+    .map(warning => ({
+      title: i18n.t(`alert.timeline.warning.${warning.type}.title`),
+      description: (
+        <WarningContents level="timeline" warningType={warning.type} />
+      ),
+      dismissId: warning.type,
+    }))
   const _stepId = stepsSelectors.getSelectedStepId(state)
 
   return {
@@ -52,14 +56,26 @@ function mapStateToProps (state: BaseState): SP {
   }
 }
 
-function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}): Props {
-  const {dispatch} = dispatchProps
+function mergeProps(
+  stateProps: SP,
+  dispatchProps: { dispatch: Dispatch<*> }
+): Props {
+  const { dispatch } = dispatchProps
   return {
     ...stateProps,
     dismissWarning: (dismissId: string) => {
-      dispatch(dismissActions.dismissTimelineWarning({type: dismissId, stepId: stateProps._stepId}))
+      dispatch(
+        dismissActions.dismissTimelineWarning({
+          type: dismissId,
+          stepId: stateProps._stepId,
+        })
+      )
     },
   }
 }
 
-export default connect(mapStateToProps, null, mergeProps)(Alerts)
+export default connect(
+  mapStateToProps,
+  null,
+  mergeProps
+)(Alerts)

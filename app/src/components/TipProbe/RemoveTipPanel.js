@@ -1,15 +1,15 @@
 // @flow
 import * as React from 'react'
-import type {Dispatch} from 'redux'
-import {connect} from 'react-redux'
+import type { Dispatch } from 'redux'
+import { connect } from 'react-redux'
 
-import {PrimaryButton} from '@opentrons/components'
+import { PrimaryButton } from '@opentrons/components'
 import CalibrationInfoContent from '../CalibrationInfoContent'
 
 import removeSingle from '../../img/remove_tip_single.png'
 import removeMulti from '../../img/remove_tip_multi.png'
 
-import {actions as robotActions, type Channels, type Mount} from '../../robot'
+import { actions as robotActions, type Channels, type Mount } from '../../robot'
 
 type OwnProps = {
   mount: Mount,
@@ -30,8 +30,8 @@ export default connect(
   mapDispatchToProps
 )(RemoveTipPanel)
 
-function RemoveTipPanel (props: RemoveTipProps) {
-  const {channels, onConfirmClick} = props
+function RemoveTipPanel(props: RemoveTipProps) {
+  const { channels, onConfirmClick } = props
 
   const imgSrc = channels === 1 ? removeSingle : removeMulti
 
@@ -50,11 +50,11 @@ function RemoveTipPanel (props: RemoveTipProps) {
   )
 }
 
-function mapDispatchToProps (
+function mapDispatchToProps(
   dispatch: Dispatch<*>,
   ownProps: OwnProps
 ): DispatchProps {
-  const {mount} = ownProps
+  const { mount } = ownProps
 
   return {
     onConfirmClick: () => {

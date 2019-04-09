@@ -2,14 +2,14 @@
 // UI components for displaying connection info
 import * as React from 'react'
 import cx from 'classnames'
-import {CardContentHalf} from '../layout'
+import { CardContentHalf } from '../layout'
 import styles from './styles.css'
 
-import type {InternetStatus, NetworkInterface} from '../../http-api-client'
+import type { InternetStatus, NetworkInterface } from '../../http-api-client'
 
-type ConnectionStatusProps = {type: string, status: ?InternetStatus}
+type ConnectionStatusProps = { type: string, status: ?InternetStatus }
 
-function shortStatusToDescription (status: ?InternetStatus) {
+function shortStatusToDescription(status: ?InternetStatus) {
   switch (status) {
     case 'full':
       return 'The robot is connected to a network and has full access to the Internet.'
@@ -24,8 +24,8 @@ function shortStatusToDescription (status: ?InternetStatus) {
   return 'Unknown'
 }
 
-export function ConnectionStatusMessage (props: ConnectionStatusProps) {
-  const {type, status} = props
+export function ConnectionStatusMessage(props: ConnectionStatusProps) {
+  const { type, status } = props
 
   return (
     <div className={styles.connection_status}>
@@ -46,8 +46,8 @@ type ConnectionInfoProps = {
   disabled: ?boolean,
 }
 
-export function ConnectionInfo (props: ConnectionInfoProps) {
-  const {connection, title, wired, children, disabled} = props
+export function ConnectionInfo(props: ConnectionInfoProps) {
+  const { connection, title, wired, children, disabled } = props
   const labelStyles = cx(styles.connection_label, {
     [styles.disabled]: disabled,
   })
@@ -75,7 +75,7 @@ type NetworkAddressProps = {
   disabled: ?boolean,
 }
 
-function NetworkAddresses (props: NetworkAddressProps) {
+function NetworkAddresses(props: NetworkAddressProps) {
   const type = props.wired ? 'Wired' : 'Wireless'
   const ip = (props.connection && props.connection.ipAddress) || 'Unknown'
   const mac = (props.connection && props.connection.macAddress) || 'Unknown'

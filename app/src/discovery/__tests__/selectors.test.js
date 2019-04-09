@@ -104,13 +104,13 @@ describe('discovery selectors', () => {
     {
       name: 'getScanning when true',
       selector: discovery.getScanning,
-      state: {discovery: {scanning: true}},
+      state: { discovery: { scanning: true } },
       expected: true,
     },
     {
       name: 'getScanning when false',
       selector: discovery.getScanning,
-      state: {discovery: {scanning: false}},
+      state: { discovery: { scanning: false } },
       expected: false,
     },
     {
@@ -123,7 +123,7 @@ describe('discovery selectors', () => {
             bar: [makeFullyUp('bar', '10.0.0.2')],
           },
         },
-        robot: {connection: {connectedTo: 'bar'}},
+        robot: { connection: { connectedTo: 'bar' } },
       },
       expected: [
         makeConnectable('foo', '10.0.0.1', 'connectable', false, 'foo'),
@@ -144,7 +144,7 @@ describe('discovery selectors', () => {
             ],
           },
         },
-        robot: {connection: {connectedTo: 'foo'}},
+        robot: { connection: { connectedTo: 'foo' } },
       },
       expected: [
         makeConnectable('foo', '10.0.0.1', 'connectable', true, 'foo'),
@@ -154,10 +154,10 @@ describe('discovery selectors', () => {
       name: 'getConnectableRobots adds restartStatus if it exists',
       state: {
         discovery: {
-          robotsByName: {foo: [makeFullyUp('foo', '10.0.0.2')]},
-          restartsByName: {foo: 'pending'},
+          robotsByName: { foo: [makeFullyUp('foo', '10.0.0.2')] },
+          restartsByName: { foo: 'pending' },
         },
-        robot: {connection: {connectedTo: 'foo'}},
+        robot: { connection: { connectedTo: 'foo' } },
       },
       selector: discovery.getConnectableRobots,
       expected: [
@@ -224,8 +224,8 @@ describe('discovery selectors', () => {
       name: 'getReachableRobots adds restartStatus if it exists',
       state: {
         discovery: {
-          robotsByName: {foo: [makeServerUp('foo', '10.0.0.1', false)]},
-          restartsByName: {foo: 'down'},
+          robotsByName: { foo: [makeServerUp('foo', '10.0.0.1', false)] },
+          restartsByName: { foo: 'down' },
         },
       },
       selector: discovery.getReachableRobots,
@@ -238,7 +238,7 @@ describe('discovery selectors', () => {
       selector: discovery.getUnreachableRobots,
       state: {
         discovery: {
-          robotsByName: {foo: [{name: 'foo', ip: null}]},
+          robotsByName: { foo: [{ name: 'foo', ip: null }] },
         },
       },
       expected: [
@@ -294,8 +294,8 @@ describe('discovery selectors', () => {
       name: 'getUnreachableRobots adds restartStatus if it exists',
       state: {
         discovery: {
-          robotsByName: {foo: [makeUnreachable('foo', '10.0.0.1')]},
-          restartsByName: {foo: 'down'},
+          robotsByName: { foo: [makeUnreachable('foo', '10.0.0.1')] },
+          restartsByName: { foo: 'down' },
         },
       },
       selector: discovery.getUnreachableRobots,
@@ -313,7 +313,7 @@ describe('discovery selectors', () => {
             'opentrons-bar': [makeFullyUp('opentrons-bar', '10.0.0.2')],
           },
         },
-        robot: {connection: {connectedTo: 'opentrons-bar'}},
+        robot: { connection: { connectedTo: 'opentrons-bar' } },
       },
       expected: [
         makeConnectable(
@@ -358,7 +358,7 @@ describe('discovery selectors', () => {
       name: 'getAllRobots returns all robots',
       selector: discovery.getAllRobots,
       state: {
-        robot: {connection: {connectedTo: 'qux'}},
+        robot: { connection: { connectedTo: 'qux' } },
         discovery: {
           robotsByName: {
             foo: [
@@ -394,7 +394,7 @@ describe('discovery selectors', () => {
             bar: [makeFullyUp('bar', '10.0.0.2')],
           },
         },
-        robot: {connection: {connectedTo: 'bar'}},
+        robot: { connection: { connectedTo: 'bar' } },
       },
       expected: makeFullyUp('bar', '10.0.0.2', 'connectable', true, 'bar'),
     },
@@ -402,8 +402,8 @@ describe('discovery selectors', () => {
       name: 'getRobotApiVersion returns serverHealth.apiServerVersion',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: {
-        serverHealth: {apiServerVersion: '1.2.3'},
-        health: {api_version: '4.5.6'},
+        serverHealth: { apiServerVersion: '1.2.3' },
+        health: { api_version: '4.5.6' },
       },
       selector: discovery.getRobotApiVersion,
       expected: '1.2.3',
@@ -411,14 +411,14 @@ describe('discovery selectors', () => {
     {
       name: 'getRobotApiVersion returns health.api_version if no serverHealth',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
-      state: {serverHealth: null, health: {api_version: '4.5.6'}},
+      state: { serverHealth: null, health: { api_version: '4.5.6' } },
       selector: discovery.getRobotApiVersion,
       expected: '4.5.6',
     },
     {
       name: 'getRobotApiVersion returns null if no healths',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
-      state: {serverHealth: null, health: null},
+      state: { serverHealth: null, health: null },
       selector: discovery.getRobotApiVersion,
       expected: null,
     },
@@ -426,8 +426,8 @@ describe('discovery selectors', () => {
       name: 'getRobotApiVersion returns API health if serverHealth invalid',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: {
-        serverHealth: {apiServerVersion: 'not available'},
-        health: {api_version: '4.5.6'},
+        serverHealth: { apiServerVersion: 'not available' },
+        health: { api_version: '4.5.6' },
       },
       selector: discovery.getRobotApiVersion,
       expected: '4.5.6',
@@ -436,8 +436,8 @@ describe('discovery selectors', () => {
       name: 'getRobotApiVersion returns null if all healths invalid',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: {
-        serverHealth: {apiServerVersion: 'not available'},
-        health: {api_version: 'also not available'},
+        serverHealth: { apiServerVersion: 'not available' },
+        health: { api_version: 'also not available' },
       },
       selector: discovery.getRobotApiVersion,
       expected: null,
@@ -446,8 +446,8 @@ describe('discovery selectors', () => {
       name: 'getRobotFirmwareVersion returns serverHealth.smoothieVersion',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: {
-        serverHealth: {smoothieVersion: '1.2.3'},
-        health: {fw_version: '4.5.6'},
+        serverHealth: { smoothieVersion: '1.2.3' },
+        health: { fw_version: '4.5.6' },
       },
       selector: discovery.getRobotFirmwareVersion,
       expected: '1.2.3',
@@ -456,21 +456,21 @@ describe('discovery selectors', () => {
       name:
         'getRobotFirmwareVersion returns health.fw_version if no serverHealth',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
-      state: {serverHealth: null, health: {fw_version: '4.5.6'}},
+      state: { serverHealth: null, health: { fw_version: '4.5.6' } },
       selector: discovery.getRobotFirmwareVersion,
       expected: '4.5.6',
     },
     {
       name: 'getRobotFirmwareVersion returns null if no healths',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
-      state: {serverHealth: null, health: null},
+      state: { serverHealth: null, health: null },
       selector: discovery.getRobotFirmwareVersion,
       expected: null,
     },
   ]
 
   SPECS.forEach(spec => {
-    const {name, selector, state, expected} = spec
+    const { name, selector, state, expected } = spec
     test(name, () => expect(selector(state)).toEqual(expected))
   })
 })

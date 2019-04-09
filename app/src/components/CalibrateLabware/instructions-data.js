@@ -1,12 +1,12 @@
 // @flow
 import * as React from 'react'
-import {type LabwareCalibrationProps} from './ConfirmPositionDiagram'
+import { type LabwareCalibrationProps } from './ConfirmPositionDiagram'
 
 type Step = 'one' | 'two'
 type Channels = 'single' | 'multi'
 type TypeKey = 'tiprack' | 'trough' | 'tuberack' | 'plate384' | 'plate96'
 
-const DIAGRAMS: {[TypeKey]: {[Channels]: {[Step]: string}}} = {
+const DIAGRAMS: { [TypeKey]: { [Channels]: { [Step]: string } } } = {
   tiprack: {
     single: {
       one: require('./images/step-1-tiprack-single@3x.png'),
@@ -59,7 +59,7 @@ const DIAGRAMS: {[TypeKey]: {[Channels]: {[Step]: string}}} = {
   },
 }
 
-const DIAGRAMS_BOTTOM: {[TypeKey]: {[Channels]: {[Step]: string}}} = {
+const DIAGRAMS_BOTTOM: { [TypeKey]: { [Channels]: { [Step]: string } } } = {
   tiprack: {
     single: {
       one: require('./images/step-1-tiprack-single@3x.png'),
@@ -112,31 +112,53 @@ const DIAGRAMS_BOTTOM: {[TypeKey]: {[Channels]: {[Step]: string}}} = {
   },
 }
 
-const INSTRUCTIONS: {[TypeKey]: {[Channels]: {[Step]: string | React.Node}}} = {
+const INSTRUCTIONS: {
+  [TypeKey]: { [Channels]: { [Step]: string | React.Node } },
+} = {
   tiprack: {
     single: {
       one: 'Jog pipette until it is centered above tip A1.',
-      two: (<p>Jog pipette until it is <strong>flush</strong> with the top of the tip.</p>),
+      two: (
+        <p>
+          Jog pipette until it is <strong>flush</strong> with the top of the
+          tip.
+        </p>
+      ),
     },
     multi: {
       one: 'Jog pipette until it is centered above tips in column 1.',
-      two: (<p>Jog pipette until it is flush with the top of the tips.</p>),
+      two: <p>Jog pipette until it is flush with the top of the tips.</p>,
     },
   },
   trough: {
     single: {
       one: 'Jog pipette until tip is centered by the back of trough A1.',
-      two: (<p>Jog pipette tip until it is <strong>flush</strong> with the top of the trough.</p>),
+      two: (
+        <p>
+          Jog pipette tip until it is <strong>flush</strong> with the top of the
+          trough.
+        </p>
+      ),
     },
     multi: {
       one: 'Jog pipette until tips are centered above trough A1.',
-      two: (<p>Jog pipette tips until they are <strong>flush</strong> with the top of the trough.</p>),
+      two: (
+        <p>
+          Jog pipette tips until they are <strong>flush</strong> with the top of
+          the trough.
+        </p>
+      ),
     },
   },
   tuberack: {
     single: {
       one: 'Jog pipette until tip is centered above tube A1.',
-      two: (<p>Jog pipette tip until it is <strong>flush</strong> with the top of the tube.</p>),
+      two: (
+        <p>
+          Jog pipette tip until it is <strong>flush</strong> with the top of the
+          tube.
+        </p>
+      ),
     },
     multi: {
       one: 'warning: you can not use a multichannel pipette with a tube rack',
@@ -146,50 +168,93 @@ const INSTRUCTIONS: {[TypeKey]: {[Channels]: {[Step]: string | React.Node}}} = {
   plate96: {
     single: {
       one: 'Jog pipette until tip is centered above well A1.',
-      two: (<p>Jog pipette tip until it is <strong>flush</strong> with the top of the well.</p>),
+      two: (
+        <p>
+          Jog pipette tip until it is <strong>flush</strong> with the top of the
+          well.
+        </p>
+      ),
     },
     multi: {
       one: 'Jog pipette until tips are centered above the wells in column 1.',
-      two: (<p>Jog pipette tips until they are <strong>flush</strong> with the top of the wells.</p>),
+      two: (
+        <p>
+          Jog pipette tips until they are <strong>flush</strong> with the top of
+          the wells.
+        </p>
+      ),
     },
   },
   plate384: {
     single: {
       one: 'Jog pipette until tip is centered above well A1.',
-      two: (<p>Jog pipette tip until it is <strong>flush</strong> with the top of the well.</p>),
+      two: (
+        <p>
+          Jog pipette tip until it is <strong>flush</strong> with the top of the
+          well.
+        </p>
+      ),
     },
     multi: {
-      one: 'Jog pipette until tips are centered above the wells indicated in column 1.',
-      two: (<p>Jog pipette tips until they are <strong>flush</strong> with the top of the wells.</p>),
+      one:
+        'Jog pipette until tips are centered above the wells indicated in column 1.',
+      two: (
+        <p>
+          Jog pipette tips until they are <strong>flush</strong> with the top of
+          the wells.
+        </p>
+      ),
     },
   },
 }
 
-const INSTRUCTIONS_BOTTOM: {[TypeKey]: {[Channels]: {[Step]: string | React.Node}}} = {
+const INSTRUCTIONS_BOTTOM: {
+  [TypeKey]: { [Channels]: { [Step]: string | React.Node } },
+} = {
   tiprack: {
     single: {
       one: 'Jog pipette until it is centered above tip A1.',
-      two: (<p>Jog pipette until it is <strong>flush</strong> with the top of the tip.</p>),
+      two: (
+        <p>
+          Jog pipette until it is <strong>flush</strong> with the top of the
+          tip.
+        </p>
+      ),
     },
     multi: {
       one: 'Jog pipette until it is centered above tips in column 1.',
-      two: (<p>Jog pipette until it is flush with the top of the tips.</p>),
+      two: <p>Jog pipette until it is flush with the top of the tips.</p>,
     },
   },
   trough: {
     single: {
       one: 'Jog pipette until tip is centered by the back of trough A1.',
-      two: (<p>Jog pipette until the tip is <strong>just barely</strong> touching the bottom.</p>),
+      two: (
+        <p>
+          Jog pipette until the tip is <strong>just barely</strong> touching the
+          bottom.
+        </p>
+      ),
     },
     multi: {
       one: 'Jog pipette until tips are centered above trough A1.',
-      two: (<p>Jog pipette until tips are <strong>just barely</strong> touching the bottom.</p>),
+      two: (
+        <p>
+          Jog pipette until tips are <strong>just barely</strong> touching the
+          bottom.
+        </p>
+      ),
     },
   },
   tuberack: {
     single: {
       one: 'Jog pipette until tip is centered above tube A1.',
-      two: (<p>Jog pipette until the tip is <strong>just barely</strong> touching the bottom.</p>),
+      two: (
+        <p>
+          Jog pipette until the tip is <strong>just barely</strong> touching the
+          bottom.
+        </p>
+      ),
     },
     multi: {
       one: 'warning: you can not use a multichannel pipette with a tube rack',
@@ -199,26 +264,47 @@ const INSTRUCTIONS_BOTTOM: {[TypeKey]: {[Channels]: {[Step]: string | React.Node
   plate96: {
     single: {
       one: 'Jog pipette until tip is centered above well A1.',
-      two: (<p>Jog pipette until the tip is <strong>just barely</strong> touching the bottom.</p>),
+      two: (
+        <p>
+          Jog pipette until the tip is <strong>just barely</strong> touching the
+          bottom.
+        </p>
+      ),
     },
     multi: {
       one: 'Jog pipette until tips are centered above the wells in column 1.',
-      two: (<p>Jog pipette until tips are <strong>just barely</strong> touching the bottom.</p>),
+      two: (
+        <p>
+          Jog pipette until tips are <strong>just barely</strong> touching the
+          bottom.
+        </p>
+      ),
     },
   },
   plate384: {
     single: {
       one: 'Jog pipette until tip is centered above well A1.',
-      two: (<p>Jog pipette until the tip is <strong>just barely</strong> touching the bottom.</p>),
+      two: (
+        <p>
+          Jog pipette until the tip is <strong>just barely</strong> touching the
+          bottom.
+        </p>
+      ),
     },
     multi: {
-      one: 'Jog pipette until tips are centered above the wells indicated in column 1.',
-      two: (<p>Jog pipette until tips are <strong>just barely</strong> touching the bottom.</p>),
+      one:
+        'Jog pipette until tips are centered above the wells indicated in column 1.',
+      two: (
+        <p>
+          Jog pipette until tips are <strong>just barely</strong> touching the
+          bottom.
+        </p>
+      ),
     },
   },
 }
 
-export function getDiagramSrc (props: LabwareCalibrationProps) {
+export function getDiagramSrc(props: LabwareCalibrationProps) {
   const typeKey = getTypeKey(props)
   const channelsKey = getChannelsKey(props)
   if (props.calibrateToBottom) {
@@ -227,7 +313,7 @@ export function getDiagramSrc (props: LabwareCalibrationProps) {
   return DIAGRAMS[typeKey][channelsKey]
 }
 
-export function getInstructionsByType (props: LabwareCalibrationProps) {
+export function getInstructionsByType(props: LabwareCalibrationProps) {
   const typeKey = getTypeKey(props)
   const channelsKey = getChannelsKey(props)
 
@@ -237,8 +323,8 @@ export function getInstructionsByType (props: LabwareCalibrationProps) {
   return INSTRUCTIONS[typeKey][channelsKey]
 }
 
-function getTypeKey (props: LabwareCalibrationProps) {
-  const {type, isTiprack} = props
+function getTypeKey(props: LabwareCalibrationProps) {
+  const { type, isTiprack } = props
   let typeKey
   if (isTiprack) {
     typeKey = 'tiprack'
@@ -254,10 +340,10 @@ function getTypeKey (props: LabwareCalibrationProps) {
   return typeKey
 }
 
-function getChannelsKey (props: LabwareCalibrationProps) {
-  const {calibrator: {channels}} = props
-  const channelsKey = channels === 8
-    ? 'multi'
-    : 'single'
+function getChannelsKey(props: LabwareCalibrationProps) {
+  const {
+    calibrator: { channels },
+  } = props
+  const channelsKey = channels === 8 ? 'multi' : 'single'
   return channelsKey
 }

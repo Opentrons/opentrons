@@ -21,7 +21,8 @@ export type BoundingRect = {
   height: number,
 }
 
-export type ClientRect = { // from flow's dom.js
+export type ClientRect = {
+  // from flow's dom.js
   left: number,
   width: number,
   right: number,

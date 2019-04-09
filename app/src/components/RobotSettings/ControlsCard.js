@@ -1,8 +1,8 @@
 // @flow
 // "Robot Controls" card
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {push} from 'react-router-redux'
+import { connect } from 'react-redux'
+import { push } from 'react-router-redux'
 
 import {
   home,
@@ -12,13 +12,13 @@ import {
   startDeckCalibration,
 } from '../../http-api-client'
 
-import {selectors as robotSelectors} from '../../robot'
-import {CONNECTABLE} from '../../discovery'
-import {RefreshCard} from '@opentrons/components'
-import {LabeledToggle, LabeledButton} from '../controls'
+import { selectors as robotSelectors } from '../../robot'
+import { CONNECTABLE } from '../../discovery'
+import { RefreshCard } from '@opentrons/components'
+import { LabeledToggle, LabeledButton } from '../controls'
 
-import type {State, Dispatch} from '../../types'
-import type {ViewableRobot} from '../../discovery'
+import type { State, Dispatch } from '../../types'
+import type { ViewableRobot } from '../../discovery'
 
 type OP = {
   robot: ViewableRobot,
@@ -54,7 +54,7 @@ export default connect(
 const CALIBRATE_DECK_DESCRIPTION =
   "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots."
 
-function ControlsCard (props: Props) {
+function ControlsCard(props: Props) {
   const {
     lightsOn,
     fetchLights,
@@ -63,7 +63,7 @@ function ControlsCard (props: Props) {
     homeEnabled,
     start,
   } = props
-  const {name, status} = props.robot
+  const { name, status } = props.robot
   const disabled = status !== CONNECTABLE
 
   return (
@@ -101,11 +101,11 @@ function ControlsCard (props: Props) {
   )
 }
 
-function makeMakeStateToProps (): (state: State, ownProps: OP) => SP {
+function makeMakeStateToProps(): (state: State, ownProps: OP) => SP {
   const getRobotLights = makeGetRobotLights()
 
   return (state, ownProps) => {
-    const {robot} = ownProps
+    const { robot } = ownProps
     const lights = getRobotLights(state, robot)
     const isRunning = robotSelectors.getIsRunning(state)
 
@@ -116,10 +116,10 @@ function makeMakeStateToProps (): (state: State, ownProps: OP) => SP {
   }
 }
 
-function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
-  const {robot, calibrateDeckUrl} = ownProps
-  const {lightsOn} = stateProps
-  const {dispatch} = dispatchProps
+function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
+  const { robot, calibrateDeckUrl } = ownProps
+  const { lightsOn } = stateProps
+  const { dispatch } = dispatchProps
 
   return {
     ...ownProps,

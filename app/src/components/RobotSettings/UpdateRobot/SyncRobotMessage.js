@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import styles from './styles.css'
-import type {RobotUpdateInfo} from '../../../http-api-client'
+import type { RobotUpdateInfo } from '../../../http-api-client'
 type Props = {
   updateInfo: RobotUpdateInfo,
 }
@@ -12,9 +12,9 @@ const notSyncedMessage = (
   </strong>
 )
 
-export default function SyncRobotMessage (props: Props) {
+export default function SyncRobotMessage(props: Props) {
   const {
-    updateInfo: {type, version},
+    updateInfo: { type, version },
   } = props
 
   if (type === 'upgrade') {

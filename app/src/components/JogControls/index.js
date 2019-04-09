@@ -3,7 +3,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import type {JogAxis, JogDirection, JogStep} from '../../http-api-client'
+import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 
 import {
   PrimaryButton,
@@ -15,7 +15,11 @@ import {
 
 import styles from './styles.css'
 
-export type Jog = (axis: JogAxis, direction: JogDirection, step: JogStep) => mixed
+export type Jog = (
+  axis: JogAxis,
+  direction: JogDirection,
+  step: JogStep
+) => mixed
 
 type JogButtonProps = {
   name: string,
@@ -23,9 +27,9 @@ type JogButtonProps = {
   onClick: () => mixed,
 }
 
-type Props = {jog: Jog}
+type Props = { jog: Jog }
 
-type State = {step: JogStep}
+type State = { step: JogStep }
 
 const JOG_BUTTON_NAMES = ['left', 'right', 'back', 'forward', 'up', 'down']
 
@@ -48,57 +52,60 @@ const JOG_PARAMS_BY_NAME = {
 }
 
 const STEPS: Array<JogStep> = [0.1, 1, 10]
-const STEP_OPTIONS = STEPS.map(s => ({name: `${s} mm`, value: `${s}`}))
+const STEP_OPTIONS = STEPS.map(s => ({ name: `${s} mm`, value: `${s}` }))
 
 export default class JogControls extends React.Component<Props, State> {
-  constructor (props: Props) {
+  constructor(props: Props) {
     super(props)
-    this.state = {step: STEPS[0]}
+    this.state = { step: STEPS[0] }
   }
 
   increaseStepSize = () => {
     const i = STEPS.indexOf(this.state.step)
-    if (i < STEPS.length - 1) this.setState({step: STEPS[i + 1]})
+    if (i < STEPS.length - 1) this.setState({ step: STEPS[i + 1] })
   }
 
   decreaseStepSize = () => {
     const i = STEPS.indexOf(this.state.step)
-    if (i > 0) this.setState({step: STEPS[i - 1]})
+    if (i > 0) this.setState({ step: STEPS[i - 1] })
   }
 
   handleStepSelect = (event: SyntheticInputEvent<*>) => {
-    this.setState({step: Number(event.target.value)})
+    this.setState({ step: Number(event.target.value) })
     event.target.blur()
   }
 
-  getJogHandlers () {
-    const {jog} = this.props
-    const {step} = this.state
+  getJogHandlers() {
+    const { jog } = this.props
+    const { step } = this.state
 
-    return JOG_BUTTON_NAMES.reduce((result, name) => ({
-      ...result,
-      [name]: jog.bind(null, ...JOG_PARAMS_BY_NAME[name], step),
-    }), {})
+    return JOG_BUTTON_NAMES.reduce(
+      (result, name) => ({
+        ...result,
+        [name]: jog.bind(null, ...JOG_PARAMS_BY_NAME[name], step),
+      }),
+      {}
+    )
   }
 
-  renderJogControls () {
-    const {step} = this.state
+  renderJogControls() {
+    const { step } = this.state
     const jogHandlers = this.getJogHandlers()
 
     return (
       <HandleKeypress
         preventDefault
         handlers={[
-          {key: 'ArrowLeft', shiftKey: false, onPress: jogHandlers.left},
-          {key: 'ArrowRight', shiftKey: false, onPress: jogHandlers.right},
-          {key: 'ArrowUp', shiftKey: false, onPress: jogHandlers.back},
-          {key: 'ArrowDown', shiftKey: false, onPress: jogHandlers.forward},
-          {key: 'ArrowUp', shiftKey: true, onPress: jogHandlers.up},
-          {key: 'ArrowDown', shiftKey: true, onPress: jogHandlers.down},
-          {key: '-', onPress: this.decreaseStepSize},
-          {key: '_', onPress: this.decreaseStepSize},
-          {key: '=', onPress: this.increaseStepSize},
-          {key: '+', onPress: this.increaseStepSize},
+          { key: 'ArrowLeft', shiftKey: false, onPress: jogHandlers.left },
+          { key: 'ArrowRight', shiftKey: false, onPress: jogHandlers.right },
+          { key: 'ArrowUp', shiftKey: false, onPress: jogHandlers.back },
+          { key: 'ArrowDown', shiftKey: false, onPress: jogHandlers.forward },
+          { key: 'ArrowUp', shiftKey: true, onPress: jogHandlers.up },
+          { key: 'ArrowDown', shiftKey: true, onPress: jogHandlers.down },
+          { key: '-', onPress: this.decreaseStepSize },
+          { key: '_', onPress: this.decreaseStepSize },
+          { key: '=', onPress: this.increaseStepSize },
+          { key: '+', onPress: this.increaseStepSize },
         ]}
       >
         {JOG_BUTTON_NAMES.map(name => (
@@ -122,27 +129,21 @@ export default class JogControls extends React.Component<Props, State> {
     )
   }
 
-  render () {
+  render() {
     return (
       <div className={styles.jog_container}>
         <div className={styles.jog_controls}>
           <span className={styles.jog_increment}>
             Jump Size
-            <span className={styles.jog_label_keys}>
-              Change with + and -
-            </span>
+            <span className={styles.jog_label_keys}>Change with + and -</span>
           </span>
           <span className={styles.jog_label_xy}>
             Across Deck
-            <span className={styles.jog_label_keys}>
-              Arrow keys
-            </span>
+            <span className={styles.jog_label_keys}>Arrow keys</span>
           </span>
           <span className={styles.jog_label_z}>
             Up & Down
-            <span className={styles.jog_label_keys}>
-              Arrow keys + SHIFT
-            </span>
+            <span className={styles.jog_label_keys}>Arrow keys + SHIFT</span>
           </span>
           {this.renderJogControls()}
         </div>
@@ -151,16 +152,12 @@ export default class JogControls extends React.Component<Props, State> {
   }
 }
 
-function JogButton (props: JogButtonProps) {
-  const {name, icon, onClick} = props
+function JogButton(props: JogButtonProps) {
+  const { name, icon, onClick } = props
   const className = cx(styles.jog_button, styles[name])
 
   return (
-    <PrimaryButton
-      className={className}
-      title={name}
-      onClick={onClick}
-    >
+    <PrimaryButton className={className} title={name} onClick={onClick}>
       <Icon name={icon} />
     </PrimaryButton>
   )

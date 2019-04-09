@@ -6,10 +6,8 @@ type Props = {
   children: React.Node,
   className?: string,
 }
-export default function CardContentRow (props: Props) {
+export default function CardContentRow(props: Props) {
   return (
-    <div className={cx(styles.card_row, props.className)}>
-      {props.children}
-    </div>
+    <div className={cx(styles.card_row, props.className)}>{props.children}</div>
   )
 }

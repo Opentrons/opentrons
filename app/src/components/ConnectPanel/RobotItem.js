@@ -1,13 +1,13 @@
 // @flow
 // item in a RobotList
-import {connect} from 'react-redux'
-import {withRouter, type ContextRouter} from 'react-router'
+import { connect } from 'react-redux'
+import { withRouter, type ContextRouter } from 'react-router'
 
-import type {State, Dispatch} from '../../types'
-import type {ViewableRobot} from '../../discovery'
-import {actions as robotActions} from '../../robot'
-import {makeGetRobotUpdateInfo} from '../../http-api-client'
-import {RobotListItem} from './RobotListItem.js'
+import type { State, Dispatch } from '../../types'
+import type { ViewableRobot } from '../../discovery'
+import { actions as robotActions } from '../../robot'
+import { makeGetRobotUpdateInfo } from '../../http-api-client'
+import { RobotListItem } from './RobotListItem.js'
 
 type OP = {|
   ...$Exact<ViewableRobot>,
@@ -37,7 +37,7 @@ export default withRouter(
   )(RobotListItem)
 )
 
-function makeMapStateToProps () {
+function makeMapStateToProps() {
   const getUpdateInfo = makeGetRobotUpdateInfo()
 
   return (state: State, ownProps: OP): SP => ({
@@ -46,7 +46,7 @@ function makeMapStateToProps () {
   })
 }
 
-function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   return {
     connect: () => dispatch(robotActions.connect(ownProps.name)),
     disconnect: () => dispatch(robotActions.disconnect()),

@@ -1,45 +1,19 @@
 {
   "ordering": [
-    [
-      "A1",
-      "B1",
-      "C1"
-    ],
-    [
-      "A2",
-      "B2",
-      "C2"
-    ],
-    [
-      "A3",
-      "B3",
-      "C3"
-    ],
-    [
-      "A4",
-      "B4",
-      "C4"
-    ]
+    ["A1", "B1", "C1"],
+    ["A2", "B2", "C2"],
+    ["A3", "B3", "C3"],
+    ["A4", "B4", "C4"]
   ],
   "brand": {
     "brand": "Corning",
-    "brandId": [
-      "3336",
-      "3512",
-      "3513"
-    ]
+    "brandId": ["3336", "3512", "3513"]
   },
   "metadata": {
     "displayName": "Corning 12 Well Plate 6.9 ml Flat",
     "displayVolumeUnits": "mL",
     "displayCategory": "wellPlate",
-    "tags": [
-      "SBS",
-      "microplate",
-      "6.9",
-      "mL",
-      "12 wells"
-    ]
+    "tags": ["SBS", "microplate", "6.9", "mL", "12 wells"]
   },
   "dimensions": {
     "overallLength": 127.89,

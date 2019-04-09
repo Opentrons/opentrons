@@ -1,21 +1,23 @@
 // @flow
 // LabwareList tests
 import * as React from 'react'
-import {shallow} from 'enzyme'
+import { shallow } from 'enzyme'
 
 import LabwareList from '..'
 import LabwareCard from '../LabwareCard'
 import NoResults from '../NoResults'
 import * as definitions from '../../../definitions'
 
-import type {LabwareList as LabwareListType} from '../../../types'
+import type { LabwareList as LabwareListType } from '../../../types'
 
 jest.mock('../../../definitions')
 
-const getAllDefinitions: JestMockFn<Array<void>,
-  LabwareListType> = (definitions.getAllDefinitions: any)
+const getAllDefinitions: JestMockFn<
+  Array<void>,
+  LabwareListType
+> = (definitions.getAllDefinitions: any)
 
-const filtersOff = {category: 'all', manufacturer: 'all'}
+const filtersOff = { category: 'all', manufacturer: 'all' }
 
 describe('LabwareList', () => {
   afterEach(() => {

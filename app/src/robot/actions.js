@@ -1,15 +1,15 @@
 // @flow
 // robot actions and action types
-import {_NAME as NAME} from './constants'
+import { _NAME as NAME } from './constants'
 
-import type {ProtocolData} from '../protocol'
-import type {Mount, Slot, Axis, Direction, SessionUpdate} from './types'
+import type { ProtocolData } from '../protocol'
+import type { Mount, Slot, Axis, Direction, SessionUpdate } from './types'
 
 // TODO(mc, 2017-11-22): rename this function to actionType
 const makeRobotActionName = action => `${NAME}:${action}`
-const tagForRobotApi = action => ({...action, meta: {robotCommand: true}})
+const tagForRobotApi = action => ({ ...action, meta: { robotCommand: true } })
 
-type Error = {message: string}
+type Error = { message: string }
 
 export type ConnectAction = {|
   type: 'robot:CONNECT',
@@ -24,7 +24,7 @@ export type ConnectAction = {|
 export type ConnectResponseAction = {|
   type: 'robot:CONNECT_RESPONSE',
   payload: {|
-    error: ?{message: string},
+    error: ?{ message: string },
     pollHealth: ?boolean,
   |},
 |}
@@ -32,7 +32,7 @@ export type ConnectResponseAction = {|
 export type ReturnTipResponseAction = {|
   type: 'robot:RETURN_TIP_RESPONSE',
   payload: {|
-    error: ?{message: string},
+    error: ?{ message: string },
   |},
 |}
 
@@ -83,7 +83,8 @@ export type SetJogDistanceAction = {|
 |}
 
 export type LabwareCalibrationAction = {|
-  type: | 'robot:MOVE_TO'
+  type:
+    | 'robot:MOVE_TO'
     | 'robot:PICKUP_AND_HOME'
     | 'robot:DROP_TIP_AND_HOME'
     | 'robot:CONFIRM_TIPRACK'
@@ -99,7 +100,8 @@ export type LabwareCalibrationAction = {|
 |}
 
 export type CalibrationSuccessAction = {
-  type: | 'robot:MOVE_TO_SUCCESS'
+  type:
+    | 'robot:MOVE_TO_SUCCESS'
     | 'robot:JOG_SUCCESS'
     | 'robot:PICKUP_AND_HOME_SUCCESS'
     | 'robot:DROP_TIP_AND_HOME_SUCCESS'
@@ -113,7 +115,8 @@ export type CalibrationSuccessAction = {
 }
 
 export type CalibrationFailureAction = {|
-  type: | 'robot:MOVE_TO_FAILURE'
+  type:
+    | 'robot:MOVE_TO_FAILURE'
     | 'robot:JOG_FAILURE'
     | 'robot:PICKUP_AND_HOME_FAILURE'
     | 'robot:DROP_TIP_AND_HOME_FAILURE'
@@ -136,7 +139,7 @@ export type SessionResponseAction = {|
 
 export type SessionErrorAction = {|
   type: 'robot:SESSION_ERROR',
-  payload: {|error: Error|},
+  payload: {| error: Error |},
 |}
 
 export type SessionUpdateAction = {|
@@ -210,76 +213,76 @@ export type Action =
   | SetModulesReviewedAction
 
 export const actions = {
-  connect (name: string): ConnectAction {
+  connect(name: string): ConnectAction {
     return {
       type: 'robot:CONNECT',
-      payload: {name},
-      meta: {robotCommand: true},
+      payload: { name },
+      meta: { robotCommand: true },
     }
   },
 
-  connectResponse (error: ?Error, pollHealth: ?boolean): ConnectResponseAction {
+  connectResponse(error: ?Error, pollHealth: ?boolean): ConnectResponseAction {
     return {
       type: 'robot:CONNECT_RESPONSE',
-      payload: {error, pollHealth},
+      payload: { error, pollHealth },
     }
   },
 
-  clearConnectResponse (): ClearConnectResponseAction {
-    return {type: 'robot:CLEAR_CONNECT_RESPONSE'}
+  clearConnectResponse(): ClearConnectResponseAction {
+    return { type: 'robot:CLEAR_CONNECT_RESPONSE' }
   },
 
-  disconnect (): DisconnectAction {
-    return {type: 'robot:DISCONNECT', meta: {robotCommand: true}}
+  disconnect(): DisconnectAction {
+    return { type: 'robot:DISCONNECT', meta: { robotCommand: true } }
   },
 
-  disconnectResponse (): DisconnectResponseAction {
+  disconnectResponse(): DisconnectResponseAction {
     return {
       type: 'robot:DISCONNECT_RESPONSE',
       payload: {},
     }
   },
 
-  unexpectedDisconnect (): UnexpectedDisconnectAction {
-    return {type: 'robot:UNEXPECTED_DISCONNECT'}
+  unexpectedDisconnect(): UnexpectedDisconnectAction {
+    return { type: 'robot:UNEXPECTED_DISCONNECT' }
   },
 
-  sessionResponse (
+  sessionResponse(
     error: ?Error,
     // TODO(mc, 2018-01-23): type Session (see reducers/session.js)
     session: any
   ): SessionResponseAction | SessionErrorAction {
-    if (error) return {type: 'robot:SESSION_ERROR', payload: {error}}
+    if (error) return { type: 'robot:SESSION_ERROR', payload: { error } }
 
-    return {type: 'robot:SESSION_RESPONSE', payload: session}
+    return { type: 'robot:SESSION_RESPONSE', payload: session }
   },
 
-  sessionUpdate (update: SessionUpdate): SessionUpdateAction {
+  sessionUpdate(update: SessionUpdate): SessionUpdateAction {
     return {
       type: 'robot:SESSION_UPDATE',
       payload: update,
     }
   },
 
-  setModulesReviewed (payload: boolean) {
-    return {type: 'robot:SET_MODULES_REVIEWED', payload}
+  setModulesReviewed(payload: boolean) {
+    return { type: 'robot:SET_MODULES_REVIEWED', payload }
   },
 
-  setDeckPopulated (payload: boolean) {
-    return {type: actionTypes.SET_DECK_POPULATED, payload}
+  setDeckPopulated(payload: boolean) {
+    return { type: actionTypes.SET_DECK_POPULATED, payload }
   },
 
   // pick up a tip with intrument on `mount` from tiprack in `slot`
-  pickupAndHome (mount: Mount, slot: Slot): LabwareCalibrationAction {
+  pickupAndHome(mount: Mount, slot: Slot): LabwareCalibrationAction {
     return {
       type: 'robot:PICKUP_AND_HOME',
-      payload: {mount, slot},
-      meta: {robotCommand: true},
+      payload: { mount, slot },
+      meta: { robotCommand: true },
     }
   },
 
   // response for pickup and home
-  pickupAndHomeResponse (error: ?Error = null): CalibrationResponseAction {
+  pickupAndHomeResponse(error: ?Error = null): CalibrationResponseAction {
     if (error) {
       return {
         type: 'robot:PICKUP_AND_HOME_FAILURE',
@@ -295,16 +298,16 @@ export const actions = {
   },
 
   // drop the tip on pipette on `mount` into the tiprack in `slot`
-  dropTipAndHome (mount: Mount, slot: Slot): LabwareCalibrationAction {
+  dropTipAndHome(mount: Mount, slot: Slot): LabwareCalibrationAction {
     return {
       type: 'robot:DROP_TIP_AND_HOME',
-      payload: {mount, slot},
-      meta: {robotCommand: true},
+      payload: { mount, slot },
+      meta: { robotCommand: true },
     }
   },
 
   // response for drop tip and home
-  dropTipAndHomeResponse (error: ?Error = null): CalibrationResponseAction {
+  dropTipAndHomeResponse(error: ?Error = null): CalibrationResponseAction {
     if (error) {
       return {
         type: 'robot:DROP_TIP_AND_HOME_FAILURE',
@@ -320,17 +323,17 @@ export const actions = {
   },
 
   // set tiprack to calibrated and conditionally drop the tip
-  confirmTiprack (mount: Mount, slot: Slot): LabwareCalibrationAction {
+  confirmTiprack(mount: Mount, slot: Slot): LabwareCalibrationAction {
     return {
       type: 'robot:CONFIRM_TIPRACK',
-      payload: {mount, slot},
-      meta: {robotCommand: true},
+      payload: { mount, slot },
+      meta: { robotCommand: true },
     }
   },
 
   // response for pickup and home
   // payload.tipOn is a flag for whether a tip remains on the pipette
-  confirmTiprackResponse (
+  confirmTiprackResponse(
     error: ?Error = null,
     tipOn: boolean = false
   ): CalibrationResponseAction {
@@ -344,19 +347,19 @@ export const actions = {
 
     return {
       type: 'robot:CONFIRM_TIPRACK_SUCCESS',
-      payload: {tipOn},
+      payload: { tipOn },
     }
   },
 
-  moveToFront (mount: Mount) {
+  moveToFront(mount: Mount) {
     return tagForRobotApi({
       type: actionTypes.MOVE_TO_FRONT,
-      payload: {mount},
+      payload: { mount },
     })
   },
 
-  moveToFrontResponse (error: ?Error = null) {
-    const action: {type: string, error: boolean, payload?: Error} = {
+  moveToFrontResponse(error: ?Error = null) {
+    const action: { type: string, error: boolean, payload?: Error } = {
       type: actionTypes.MOVE_TO_FRONT_RESPONSE,
       error: error != null,
     }
@@ -365,12 +368,12 @@ export const actions = {
     return action
   },
 
-  probeTip (mount: Mount) {
-    return tagForRobotApi({type: actionTypes.PROBE_TIP, payload: {mount}})
+  probeTip(mount: Mount) {
+    return tagForRobotApi({ type: actionTypes.PROBE_TIP, payload: { mount } })
   },
 
-  probeTipResponse (error: ?Error = null) {
-    const action: {type: string, error: boolean, payload?: Error} = {
+  probeTipResponse(error: ?Error = null) {
+    const action: { type: string, error: boolean, payload?: Error } = {
       type: actionTypes.PROBE_TIP_RESPONSE,
       error: error != null,
     }
@@ -380,20 +383,20 @@ export const actions = {
   },
 
   // confirm tip removed + tip probed then home pipette on `mount`
-  confirmProbed (mount: Mount): ConfirmProbedAction {
+  confirmProbed(mount: Mount): ConfirmProbedAction {
     return {
       type: 'robot:CONFIRM_PROBED',
       payload: mount,
-      meta: {robotCommand: true},
+      meta: { robotCommand: true },
     }
   },
 
-  returnTip (mount: Mount) {
-    return tagForRobotApi({type: actionTypes.RETURN_TIP, payload: {mount}})
+  returnTip(mount: Mount) {
+    return tagForRobotApi({ type: actionTypes.RETURN_TIP, payload: { mount } })
   },
 
-  returnTipResponse (error: ?Error = null) {
-    const action: {type: string, error: boolean, payload?: Error} = {
+  returnTipResponse(error: ?Error = null) {
+    const action: { type: string, error: boolean, payload?: Error } = {
       type: actionTypes.RETURN_TIP_RESPONSE,
       error: error != null,
     }
@@ -402,15 +405,15 @@ export const actions = {
     return action
   },
 
-  moveTo (mount: Mount, slot: Slot): LabwareCalibrationAction {
+  moveTo(mount: Mount, slot: Slot): LabwareCalibrationAction {
     return {
       type: 'robot:MOVE_TO',
-      payload: {mount, slot},
-      meta: {robotCommand: true},
+      payload: { mount, slot },
+      meta: { robotCommand: true },
     }
   },
 
-  moveToResponse (error: ?Error = null): CalibrationResponseAction {
+  moveToResponse(error: ?Error = null): CalibrationResponseAction {
     if (error) {
       return {
         type: 'robot:MOVE_TO_FAILURE',
@@ -419,14 +422,14 @@ export const actions = {
       }
     }
 
-    return {type: 'robot:MOVE_TO_SUCCESS', payload: {}}
+    return { type: 'robot:MOVE_TO_SUCCESS', payload: {} }
   },
 
-  setJogDistance (step: number): SetJogDistanceAction {
-    return {type: 'robot:SET_JOG_DISTANCE', payload: step}
+  setJogDistance(step: number): SetJogDistanceAction {
+    return { type: 'robot:SET_JOG_DISTANCE', payload: step }
   },
 
-  jog (
+  jog(
     mount: Mount,
     axis: Axis,
     direction: Direction,
@@ -434,12 +437,12 @@ export const actions = {
   ): PipetteCalibrationAction {
     return {
       type: 'robot:JOG',
-      payload: {mount, axis, direction, step},
-      meta: {robotCommand: true},
+      payload: { mount, axis, direction, step },
+      meta: { robotCommand: true },
     }
   },
 
-  jogResponse (error: ?Error = null): CalibrationResponseAction {
+  jogResponse(error: ?Error = null): CalibrationResponseAction {
     if (error) {
       return {
         type: 'robot:JOG_FAILURE',
@@ -448,20 +451,20 @@ export const actions = {
       }
     }
 
-    return {type: 'robot:JOG_SUCCESS', payload: {}}
+    return { type: 'robot:JOG_SUCCESS', payload: {} }
   },
 
   // update the offset of labware in slot using position of pipette on mount
-  updateOffset (mount: Mount, slot: Slot): LabwareCalibrationAction {
+  updateOffset(mount: Mount, slot: Slot): LabwareCalibrationAction {
     return {
       type: 'robot:UPDATE_OFFSET',
-      payload: {mount, slot},
-      meta: {robotCommand: true},
+      payload: { mount, slot },
+      meta: { robotCommand: true },
     }
   },
 
   // response for updateOffset
-  updateOffsetResponse (error: ?Error = null): CalibrationResponseAction {
+  updateOffsetResponse(error: ?Error = null): CalibrationResponseAction {
     if (error) {
       return {
         type: 'robot:UPDATE_OFFSET_FAILURE',
@@ -476,16 +479,16 @@ export const actions = {
     }
   },
 
-  confirmLabware (labware: Slot) {
-    return {type: actionTypes.CONFIRM_LABWARE, payload: {labware}}
+  confirmLabware(labware: Slot) {
+    return { type: actionTypes.CONFIRM_LABWARE, payload: { labware } }
   },
 
-  run () {
-    return tagForRobotApi({type: actionTypes.RUN})
+  run() {
+    return tagForRobotApi({ type: actionTypes.RUN })
   },
 
-  runResponse (error: ?Error = null) {
-    const action: {type: string, error: boolean, payload?: Error} = {
+  runResponse(error: ?Error = null) {
+    const action: { type: string, error: boolean, payload?: Error } = {
       type: actionTypes.RUN_RESPONSE,
       error: error != null,
     }
@@ -494,12 +497,12 @@ export const actions = {
     return action
   },
 
-  pause () {
-    return tagForRobotApi({type: actionTypes.PAUSE})
+  pause() {
+    return tagForRobotApi({ type: actionTypes.PAUSE })
   },
 
-  pauseResponse (error: ?Error = null) {
-    const action: {type: string, error: boolean, payload?: Error} = {
+  pauseResponse(error: ?Error = null) {
+    const action: { type: string, error: boolean, payload?: Error } = {
       type: actionTypes.PAUSE_RESPONSE,
       error: error != null,
     }
@@ -508,12 +511,12 @@ export const actions = {
     return action
   },
 
-  resume () {
-    return tagForRobotApi({type: actionTypes.RESUME})
+  resume() {
+    return tagForRobotApi({ type: actionTypes.RESUME })
   },
 
-  resumeResponse (error: ?Error = null) {
-    const action: {type: string, error: boolean, payload?: Error} = {
+  resumeResponse(error: ?Error = null) {
+    const action: { type: string, error: boolean, payload?: Error } = {
       type: actionTypes.RESUME_RESPONSE,
       error: error != null,
     }
@@ -522,12 +525,12 @@ export const actions = {
     return action
   },
 
-  cancel () {
-    return tagForRobotApi({type: actionTypes.CANCEL})
+  cancel() {
+    return tagForRobotApi({ type: actionTypes.CANCEL })
   },
 
-  cancelResponse (error: ?Error = null) {
-    const action: {type: string, error: boolean, payload?: Error} = {
+  cancelResponse(error: ?Error = null) {
+    const action: { type: string, error: boolean, payload?: Error } = {
       type: actionTypes.CANCEL_RESPONSE,
       error: error != null,
     }
@@ -536,11 +539,11 @@ export const actions = {
     return action
   },
 
-  refreshSession (): RefreshSessionAction {
-    return {type: 'robot:REFRESH_SESSION', meta: {robotCommand: true}}
+  refreshSession(): RefreshSessionAction {
+    return { type: 'robot:REFRESH_SESSION', meta: { robotCommand: true } }
   },
 
-  tickRunTime () {
-    return {type: actionTypes.TICK_RUN_TIME}
+  tickRunTime() {
+    return { type: actionTypes.TICK_RUN_TIME }
   },
 }

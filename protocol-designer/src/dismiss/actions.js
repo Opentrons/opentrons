@@ -1,5 +1,5 @@
 // @flow
-import type {StepIdType} from '../form-types'
+import type { StepIdType } from '../form-types'
 
 export type DismissAction<ActionType> = {
   type: ActionType,

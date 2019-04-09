@@ -6,18 +6,18 @@ const {
   mockRejectedValueOnce,
 } = require('../../../__util__/mock-promise')
 
-const client = module.exports = jest.fn()
+const client = (module.exports = jest.fn())
 
-client.__setMockResponse = function setMockResponse (...responses) {
+client.__setMockResponse = function setMockResponse(...responses) {
   client.mockReset()
-  responses.forEach((r) => mockResolvedValueOnce(client, r))
+  responses.forEach(r => mockResolvedValueOnce(client, r))
 }
 
-client.__setMockError = function setMockError (...errors) {
+client.__setMockError = function setMockError(...errors) {
   client.mockReset()
-  errors.forEach((e) => mockRejectedValueOnce(client, e))
+  errors.forEach(e => mockRejectedValueOnce(client, e))
 }
 
-client.__clearMock = function clearMockResponses () {
+client.__clearMock = function clearMockResponses() {
   client.mockReset()
 }

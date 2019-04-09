@@ -1,16 +1,16 @@
 // @flow
 import * as React from 'react'
 
-import {SidePanel} from '@opentrons/components'
+import { SidePanel } from '@opentrons/components'
 import PipetteList from './PipetteList'
 import LabwareGroup from './LabwareGroup'
 import TipRackList from './TipRackList'
 import LabwareList from './LabwareList'
 import styles from './styles.css'
 
-export default function CalibratePanel () {
+export default function CalibratePanel() {
   return (
-    <SidePanel title='Prepare for Run'>
+    <SidePanel title="Prepare for Run">
       <div className={styles.setup_panel}>
         <PipetteList />
         <LabwareGroup>

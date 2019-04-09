@@ -1,11 +1,9 @@
 // @flow
 import * as React from 'react'
-import {
-  CheckboxField,
-} from '@opentrons/components'
+import { CheckboxField } from '@opentrons/components'
 import cx from 'classnames'
 
-import type {StepFieldName} from '../../../steplist/fieldLevel'
+import type { StepFieldName } from '../../../steplist/fieldLevel'
 import styles from '../StepEditForm.css'
 import StepField from './FieldConnector'
 
@@ -21,7 +19,7 @@ export const CheckboxRow = (props: CheckboxRowProps) => (
   <StepField
     name={props.name}
     tooltipComponent={props.tooltipComponent}
-    render={({value, updateValue, hoverTooltipHandlers, disabled}) => (
+    render={({ value, updateValue, hoverTooltipHandlers, disabled }) => (
       <div className={styles.checkbox_row}>
         <CheckboxField
           label={props.label}
@@ -29,10 +27,12 @@ export const CheckboxRow = (props: CheckboxRowProps) => (
           disabled={disabled || props.disabled}
           className={cx(styles.checkbox_field, props.className)}
           value={!!value}
-          onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)} />
-        {(value && !disabled) ? props.children : null}
+          onChange={(e: SyntheticInputEvent<*>) => updateValue(!value)}
+        />
+        {value && !disabled ? props.children : null}
       </div>
-    )} />
+    )}
+  />
 )
 
 export default CheckboxRow

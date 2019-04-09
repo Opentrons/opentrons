@@ -5,7 +5,7 @@ import range from 'lodash/range'
 import round from 'lodash/round'
 
 import labwareSchema from '../../labware-json-schema/labware-schema.json'
-import {SLOT_WIDTH_MM, SLOT_LENGTH_MM} from '../constants'
+import { SLOT_WIDTH_MM, SLOT_LENGTH_MM } from '../constants'
 import assignId from './assignId'
 import {
   toWellName,
@@ -44,7 +44,7 @@ type GridStart = {
   colStride: number,
 }
 
-type InputParams = $Rest<Params, {|loadName: string|}>
+type InputParams = $Rest<Params, {| loadName: string |}>
 
 export type RegularLabwareProps = {
   metadata: Metadata,
@@ -59,7 +59,7 @@ export type RegularLabwareProps = {
 
 export type IrregularLabwareProps = {
   metadata: Metadata,
-  parameters: $Diff<Params, {loadName: string}>,
+  parameters: $Diff<Params, { loadName: string }>,
   offset: Array<Offset>,
   dimensions: Dimensions,
   grid: Array<Cell>,
@@ -69,10 +69,10 @@ export type IrregularLabwareProps = {
   brand?: Brand,
 }
 
-const ajv = new Ajv({allErrors: true, jsonPointers: true})
+const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 const validate = ajv.compile(labwareSchema)
 
-function validateDefinition (definition: Definition): Definition {
+function validateDefinition(definition: Definition): Definition {
   const valid = validate(definition)
 
   if (!valid) {
@@ -83,7 +83,7 @@ function validateDefinition (definition: Definition): Definition {
   return definition
 }
 
-export function _irregularWellName (
+export function _irregularWellName(
   rowIdx: number,
   colIdx: number,
   gridStart: GridStart
@@ -91,10 +91,10 @@ export function _irregularWellName (
   const rowNum =
     rowIdx * gridStart.rowStride + gridStart.rowStart.charCodeAt(0) - 65
   const colNum = colIdx * gridStart.colStride + parseInt(gridStart.colStart) - 1
-  return toWellName({rowNum, colNum})
+  return toWellName({ rowNum, colNum })
 }
 
-export function _calculateWellCoord (
+export function _calculateWellCoord(
   rowIdx: number,
   colIdx: number,
   spacing: Cell,
@@ -109,7 +109,7 @@ export function _calculateWellCoord (
   }
 }
 
-function determineIrregularLayout (
+function determineIrregularLayout(
   grids: Array<Cell>,
   spacing: Array<Cell>,
   offset: Array<Offset>,
@@ -136,14 +136,14 @@ function determineIrregularLayout (
   }, {})
 }
 
-export function _generateIrregularLoadName (args: {
+export function _generateIrregularLoadName(args: {
   grid: Array<Cell>,
   well: Array<InputWell>,
   units: VolumeUnits,
   brand: string,
   displayCategory: string,
 }): string {
-  const {grid, well, units, brand, displayCategory} = args
+  const { grid, well, units, brand, displayCategory } = args
   const loadNameUnits = getAsciiVolumeUnits(units)
   const wellComboArray = grid.map((gridObj, gridIdx) => {
     const numWells = gridObj.row * gridObj.column
@@ -156,16 +156,16 @@ export function _generateIrregularLoadName (args: {
 }
 
 // Decide order of wells for single grid containers
-function determineOrdering (grid: Cell): Array<Array<string>> {
+function determineOrdering(grid: Cell): Array<Array<string>> {
   const ordering = range(grid.column).map(colNum =>
-    range(grid.row).map(rowNum => toWellName({rowNum, colNum}))
+    range(grid.row).map(rowNum => toWellName({ rowNum, colNum }))
   )
 
   return ordering
 }
 
 // Decide order of wells for multi-grid containers
-export function determineIrregularOrdering (
+export function determineIrregularOrdering(
   wellsArray: Array<string>
 ): Array<Array<string>> {
   const sortedArray = wellsArray.sort(sortWells)
@@ -176,7 +176,7 @@ export function determineIrregularOrdering (
 
 // Private helper functione to calculate the XYZ coordinates of a give well
 // Will return a nested object of all well objects for a labware
-function calculateCoordinates (
+function calculateCoordinates(
   well: InputWell,
   ordering: Array<Array<string>>,
   spacing: Cell,
@@ -200,7 +200,7 @@ function calculateCoordinates (
   }, {})
 }
 
-export function _calculateCornerOffset (dimensions: Dimensions): Offset {
+export function _calculateCornerOffset(dimensions: Dimensions): Offset {
   return {
     x: round(SLOT_LENGTH_MM - dimensions.overallLength, 2),
     y: round(SLOT_WIDTH_MM - dimensions.overallWidth, 2),
@@ -208,13 +208,13 @@ export function _calculateCornerOffset (dimensions: Dimensions): Offset {
   }
 }
 
-function ensureBrand (brand?: Brand): Brand {
-  return brand || {brand: 'generic'}
+function ensureBrand(brand?: Brand): Brand {
+  return brand || { brand: 'generic' }
 }
 
 // joins the input array with _ to create a name, making sure to lowercase the
 // result and remove all invalid characters (allowed characters: [a-z0-9_.])
-function createName (
+function createName(
   fragments: Array<string | number | Array<string | number>>
 ): string {
   return flatten(fragments)
@@ -227,8 +227,8 @@ function createName (
 // e.g. well plates, regular tuberacks (NOT 15_50ml) etc.
 // For further info on these parameters look at labware examples in __tests__
 // or the labware definition schema in labware-json-schema
-export function createRegularLabware (args: RegularLabwareProps): Definition {
-  const {offset, dimensions, grid, spacing, well} = args
+export function createRegularLabware(args: RegularLabwareProps): Definition {
+  const { offset, dimensions, grid, spacing, well } = args
   const ordering = determineOrdering(grid)
   const numWells = grid.row * grid.column
   const brand = ensureBrand(args.brand)
@@ -254,16 +254,16 @@ export function createRegularLabware (args: RegularLabwareProps): Definition {
     deprecated: false,
     cornerOffsetFromSlot: _calculateCornerOffset(dimensions),
     wells: calculateCoordinates(well, ordering, spacing, offset),
-    parameters: {...args.parameters, loadName},
+    parameters: { ...args.parameters, loadName },
   })
 }
 
 // Generator function for labware definitions within an irregular grid format
 // e.g. crystalization plates, 15_50ml tuberacks and anything with multiple "grids"
-export function createIrregularLabware (
+export function createIrregularLabware(
   args: IrregularLabwareProps
 ): Definition {
-  const {offset, dimensions, grid, spacing, well, gridStart} = args
+  const { offset, dimensions, grid, spacing, well, gridStart } = args
   const wells = determineIrregularLayout(grid, spacing, offset, gridStart, well)
   const brand = ensureBrand(args.brand)
   const metadata = {
@@ -287,7 +287,7 @@ export function createIrregularLabware (
     otId: assignId(),
     deprecated: false,
     cornerOffsetFromSlot: _calculateCornerOffset(dimensions),
-    parameters: {...args.parameters, loadName, format: 'irregular'},
+    parameters: { ...args.parameters, loadName, format: 'irregular' },
     ordering: determineIrregularOrdering(Object.keys(wells)),
   })
 }

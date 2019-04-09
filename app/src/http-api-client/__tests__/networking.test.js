@@ -21,12 +21,14 @@ describe('networking', () => {
         state: {
           api: {
             api: {
-              someName: {'networking/status': {response: {status: 'full'}}},
+              someName: {
+                'networking/status': { response: { status: 'full' } },
+              },
             },
           },
         },
-        props: {name: 'someName'},
-        expected: {response: {status: 'full'}},
+        props: { name: 'someName' },
+        expected: { response: { status: 'full' } },
       },
       {
         name: 'makeGetRobotWifiList',
@@ -39,11 +41,11 @@ describe('networking', () => {
                   inProgress: false,
                   response: {
                     list: [
-                      {ssid: 'foo', active: false, signal: 100},
-                      {ssid: 'foo', active: true, signal: 42},
-                      {ssid: 'baz', active: false, signal: 50},
-                      {ssid: 'baz', active: false, signal: 65},
-                      {ssid: 'bar', active: false, signal: 42},
+                      { ssid: 'foo', active: false, signal: 100 },
+                      { ssid: 'foo', active: true, signal: 42 },
+                      { ssid: 'baz', active: false, signal: 50 },
+                      { ssid: 'baz', active: false, signal: 65 },
+                      { ssid: 'bar', active: false, signal: 42 },
                     ],
                   },
                 },
@@ -51,14 +53,14 @@ describe('networking', () => {
             },
           },
         },
-        props: {name: 'someName'},
+        props: { name: 'someName' },
         expected: {
           inProgress: false,
           response: {
             list: [
-              {ssid: 'foo', active: true, signal: 42},
-              {ssid: 'bar', active: false, signal: 42},
-              {ssid: 'baz', active: false, signal: 65},
+              { ssid: 'foo', active: true, signal: 42 },
+              { ssid: 'bar', active: false, signal: 42 },
+              { ssid: 'baz', active: false, signal: 65 },
             ],
           },
         },
@@ -69,30 +71,34 @@ describe('networking', () => {
         state: {
           api: {
             api: {
-              someName: {'wifi/configure': {response: {ssid: 'some-ssid'}}},
+              someName: {
+                'wifi/configure': { response: { ssid: 'some-ssid' } },
+              },
             },
           },
         },
-        props: {name: 'someName'},
-        expected: {response: {ssid: 'some-ssid'}},
+        props: { name: 'someName' },
+        expected: { response: { ssid: 'some-ssid' } },
       },
     ]
 
     SPECS.forEach(spec => {
-      const {name, selector, state, props, expected} = spec
+      const { name, selector, state, props, expected } = spec
 
       test(`${name} with known robot`, () =>
         expect(selector()(state, props)).toEqual(expected))
 
       test(`${name} with unknown robot`, () =>
-        expect(selector()(state, {name: 'foo'})).toEqual({inProgress: false}))
+        expect(selector()(state, { name: 'foo' })).toEqual({
+          inProgress: false,
+        }))
     })
   })
 
   test('clearConfigureWifiResponse action creator', () => {
-    expect(networking.clearConfigureWifiResponse({name: 'foo'})).toEqual({
+    expect(networking.clearConfigureWifiResponse({ name: 'foo' })).toEqual({
       type: 'api:CLEAR_RESPONSE',
-      payload: {robot: {name: 'foo'}, path: 'wifi/configure'},
+      payload: { robot: { name: 'foo' }, path: 'wifi/configure' },
     })
   })
 
@@ -102,7 +108,7 @@ describe('networking', () => {
 
     beforeEach(() => {
       store = mockStore({})
-      robot = {name: 'opentrons', ip: '1.2.3.4', port: '1234'}
+      robot = { name: 'opentrons', ip: '1.2.3.4', port: '1234' }
     })
 
     const SPECS = [
@@ -112,8 +118,8 @@ describe('networking', () => {
         method: 'GET',
         path: 'networking/status',
         request: null,
-        success: {status: 'full', interfaces: {}},
-        failure: {name: 'ResponseError', status: '400', message: 'oh no'},
+        success: { status: 'full', interfaces: {} },
+        failure: { name: 'ResponseError', status: '400', message: 'oh no' },
       },
       {
         name: 'fetchWifiList',
@@ -121,22 +127,22 @@ describe('networking', () => {
         method: 'GET',
         path: 'wifi/list',
         request: null,
-        success: {list: []},
-        failure: {name: 'ResponseError', status: '400', message: 'oh no'},
+        success: { list: [] },
+        failure: { name: 'ResponseError', status: '400', message: 'oh no' },
       },
       {
         name: 'configureWifi',
         action: networking.configureWifi,
         method: 'POST',
         path: 'wifi/configure',
-        request: {ssid: 'some-ssid', psk: 'some-psk'},
-        success: {ssid: 'some-ssid', message: 'success!'},
-        failure: {name: 'ResponseError', status: '400', message: 'oh no'},
+        request: { ssid: 'some-ssid', psk: 'some-psk' },
+        success: { ssid: 'some-ssid', message: 'success!' },
+        failure: { name: 'ResponseError', status: '400', message: 'oh no' },
       },
     ]
 
     SPECS.forEach(spec => {
-      const {name, action, method, path, request, success, failure} = spec
+      const { name, action, method, path, request, success, failure } = spec
 
       test(`${name} makes HTTP call`, () => {
         client.__setMockResponse(success)
@@ -149,8 +155,8 @@ describe('networking', () => {
 
       test(`${name} handles success`, () => {
         const expectedActions = [
-          {type: 'api:REQUEST', payload: {robot, path, request}},
-          {type: 'api:SUCCESS', payload: {robot, path, response: success}},
+          { type: 'api:REQUEST', payload: { robot, path, request } },
+          { type: 'api:SUCCESS', payload: { robot, path, response: success } },
         ]
 
         client.__setMockResponse(success)
@@ -162,8 +168,8 @@ describe('networking', () => {
 
       test(`${name} handles failure`, () => {
         const expectedActions = [
-          {type: 'api:REQUEST', payload: {robot, path, request}},
-          {type: 'api:FAILURE', payload: {robot, path, error: failure}},
+          { type: 'api:REQUEST', payload: { robot, path, request } },
+          { type: 'api:FAILURE', payload: { robot, path, error: failure } },
         ]
 
         client.__setMockError(failure)

@@ -17,34 +17,42 @@ import {
 
 jest.mock('../remote-object')
 
-const {SUCCESS, FAILURE} = statuses
+const { SUCCESS, FAILURE } = statuses
 
-const MOCK_REMOTE = {foo: 'bar', be_a_robot: jest.fn(), be_a_person: jest.fn()}
-const REMOTE = {i: 4, t: 5, v: {foo: 'bar'}}
-const REMOTE_TYPE = {i: 5, t: 3, v: {be_a_robot: {}, be_a_person: {}}}
+const MOCK_REMOTE = {
+  foo: 'bar',
+  be_a_robot: jest.fn(),
+  be_a_person: jest.fn(),
+}
+const REMOTE = { i: 4, t: 5, v: { foo: 'bar' } }
+const REMOTE_TYPE = { i: 5, t: 3, v: { be_a_robot: {}, be_a_person: {} } }
 const CONTROL = {
-  $: {type: CONTROL_MESSAGE},
+  $: { type: CONTROL_MESSAGE },
   root: REMOTE,
   type: REMOTE_TYPE,
 }
 
-const makeAckResponse = (token) => ({$: {type: ACK, token}})
-const makeNackResponse = (token, reason) => ({$: {type: NACK, token}, reason})
+const makeAckResponse = token => ({ $: { type: ACK, token } })
+const makeNackResponse = (token, reason) => ({
+  $: { type: NACK, token },
+  reason,
+})
 const makeCallResponse = (token, status, data) => ({
-  $: {type: RESULT, token, status},
+  $: { type: RESULT, token, status },
   data,
 })
 
-const waitAndTry = (delay, handler) => util.promisify((done) => {
-  setTimeout(() => {
-    try {
-      handler()
-      done()
-    } catch (e) {
-      done(e)
-    }
-  }, delay)
-})
+const waitAndTry = (delay, handler) =>
+  util.promisify(done => {
+    setTimeout(() => {
+      try {
+        handler()
+        done()
+      } catch (e) {
+        done(e)
+      }
+    }, delay)
+  })
 
 describe('rpc client', () => {
   let url
@@ -52,43 +60,45 @@ describe('rpc client', () => {
   let ws
   let listeners
 
-  function addListener (target, event, handler) {
-    listeners.push({target, event, handler})
+  function addListener(target, event, handler) {
+    listeners.push({ target, event, handler })
     target.on(event, handler)
   }
 
-  function removeListener (listener) {
+  function removeListener(listener) {
     listener.target.removeListener(listener.event, listener.handler)
   }
 
   class JsonWs extends EventEmitter {
-    constructor (ws) {
+    constructor(ws) {
       super()
       this._ws = ws
 
-      addListener(ws, 'message', (m) => this.emit('message', JSON.parse(m)))
+      addListener(ws, 'message', m => this.emit('message', JSON.parse(m)))
       addListener(ws, 'close', () => this.emit('close'))
     }
 
-    send (message) {
+    send(message) {
       this._ws.send(JSON.stringify(message))
     }
 
-    get readyState () {
+    get readyState() {
       return this._ws.readyState
     }
   }
 
-  beforeAll((done) => portfinder.getPort((error, port) => {
-    if (error) return done(error)
-    if (!global.WebSocket) global.WebSocket = WS
+  beforeAll(done =>
+    portfinder.getPort((error, port) => {
+      if (error) return done(error)
+      if (!global.WebSocket) global.WebSocket = WS
 
-    url = `ws://127.0.0.1:${port}`
-    wss = new WS.Server({port})
-    wss.once('listening', done)
-  }))
+      url = `ws://127.0.0.1:${port}`
+      wss = new WS.Server({ port })
+      wss.once('listening', done)
+    })
+  )
 
-  afterAll((done) => {
+  afterAll(done => {
     if (global.WebSocket === WS) delete global.WebSocket
     wss.close(done)
   })
@@ -103,8 +113,8 @@ describe('rpc client', () => {
     jest.clearAllTimers()
   })
 
-  function sendControlAndResolveRemote (handleMessage) {
-    addListener(wss, 'connection', (socket) => {
+  function sendControlAndResolveRemote(handleMessage) {
+    addListener(wss, 'connection', socket => {
       ws = new JsonWs(socket)
 
       if (handleMessage) addListener(ws, 'message', handleMessage)
@@ -131,11 +141,10 @@ describe('rpc client', () => {
   test('connects to ws server and resolves when control is received', () => {
     sendControlAndResolveRemote()
 
-    return Client(url)
-      .then((client) => {
-        expect(client.remote).toBe(MOCK_REMOTE)
-        expect(RemoteObject).toHaveBeenCalledWith(client, REMOTE)
-      })
+    return Client(url).then(client => {
+      expect(client.remote).toBe(MOCK_REMOTE)
+      expect(RemoteObject).toHaveBeenCalledWith(client, REMOTE)
+    })
   })
 
   describe('callRemote', () => {
@@ -144,13 +153,18 @@ describe('rpc client', () => {
     const args = [1, 2, 3]
 
     test('calls remote methods and wraps result in RemoteObject', () => {
-      const mockRemote = {i: 42, t: 43, v: {}}
-      const mockResult = {foo: 'bar'}
-      const expectedMessage = {$: {token: expect.anything()}, id, name, args}
+      const mockRemote = { i: 42, t: 43, v: {} }
+      const mockResult = { foo: 'bar' }
+      const expectedMessage = {
+        $: { token: expect.anything() },
+        id,
+        name,
+        args,
+      }
       let client
       let callMessage
 
-      sendControlAndResolveRemote((message) => {
+      sendControlAndResolveRemote(message => {
         const token = message.$.token
 
         callMessage = message
@@ -161,12 +175,12 @@ describe('rpc client', () => {
       })
 
       return Client(url)
-        .then((c) => {
+        .then(c => {
           client = c
           RemoteObject.mockReturnValueOnce(Promise.resolve(mockResult))
           return client.callRemote(id, name, args)
         })
-        .then((result) => {
+        .then(result => {
           expect(callMessage).toEqual(expectedMessage)
           expect(RemoteObject).toHaveBeenCalledWith(client, mockRemote)
           expect(result).toEqual(mockResult)
@@ -174,13 +188,12 @@ describe('rpc client', () => {
     })
 
     test('rejects if call nacks', () => {
-      sendControlAndResolveRemote((message) => {
+      sendControlAndResolveRemote(message => {
         const token = message.$.token
         setTimeout(() => ws.send(makeNackResponse(token, 'You done messed up')))
       })
 
-      const call = Client(url)
-        .then((client) => client.callRemote(id, name, args))
+      const call = Client(url).then(client => client.callRemote(id, name, args))
 
       return expect(call).rejects.toMatchObject({
         message: expect.stringMatching(/NACK.+You done messed up/),
@@ -188,18 +201,17 @@ describe('rpc client', () => {
     })
 
     test('rejects if client errors during call', () => {
-      sendControlAndResolveRemote((message) => {
+      sendControlAndResolveRemote(message => {
         const token = message.$.token
         const nack = makeNackResponse(token, 'You done messed up')
         setTimeout(() => ws.send(nack), 1)
       })
 
-      const call = Client(url)
-        .then((client) => {
-          const result = client.callRemote(id, name, args)
-          setTimeout(() => client.emit('error', new Error('OH NO')), 1)
-          return result
-        })
+      const call = Client(url).then(client => {
+        const result = client.callRemote(id, name, args)
+        setTimeout(() => client.emit('error', new Error('OH NO')), 1)
+        return result
+      })
 
       return expect(call).rejects.toMatchObject({
         message: expect.stringMatching(/OH NO/),
@@ -207,7 +219,7 @@ describe('rpc client', () => {
     })
 
     test('rejects if call is unsuccessful (string response)', () => {
-      sendControlAndResolveRemote((message) => {
+      sendControlAndResolveRemote(message => {
         const token = message.$.token
         const ack = makeAckResponse(token)
         const result = makeCallResponse(token, FAILURE, 'ahhh')
@@ -215,8 +227,7 @@ describe('rpc client', () => {
         setTimeout(() => ws.send(result), 5)
       })
 
-      const call = Client(url)
-        .then((client) => client.callRemote(id, name, args))
+      const call = Client(url).then(client => client.callRemote(id, name, args))
 
       return expect(call).rejects.toMatchObject({
         message: expect.stringMatching(/ahhh/),
@@ -224,16 +235,15 @@ describe('rpc client', () => {
     })
 
     test('rejects if call is unsuccessful (object response)', () => {
-      sendControlAndResolveRemote((message) => {
+      sendControlAndResolveRemote(message => {
         const token = message.$.token
         const ack = makeAckResponse(token)
-        const result = makeCallResponse(token, FAILURE, {message: 'ahhh'})
+        const result = makeCallResponse(token, FAILURE, { message: 'ahhh' })
         setTimeout(() => ws.send(ack), 1)
         setTimeout(() => ws.send(result), 5)
       })
 
-      const call = Client(url)
-        .then((client) => client.callRemote(id, name, args))
+      const call = Client(url).then(client => client.callRemote(id, name, args))
 
       return expect(call).rejects.toMatchObject({
         message: expect.stringMatching(/ahhh/),
@@ -246,23 +256,23 @@ describe('rpc client', () => {
       sendControlAndResolveRemote()
 
       return Client(url)
-        .then((client) => client.resolveTypeValues(REMOTE))
-        .then((values) => expect(values).toEqual(REMOTE_TYPE.v))
+        .then(client => client.resolveTypeValues(REMOTE))
+        .then(values => expect(values).toEqual(REMOTE_TYPE.v))
     })
 
     test('resolves empty object for type types', () => {
       sendControlAndResolveRemote()
 
       return Client(url)
-        .then((client) => client.resolveTypeValues(REMOTE_TYPE))
-        .then((values) => expect(values).toEqual({}))
+        .then(client => client.resolveTypeValues(REMOTE_TYPE))
+        .then(values => expect(values).toEqual({}))
     })
 
     test('calls get object by id for unknown type objects', () => {
-      const instance = {i: 42, t: 101, v: {bar: 'baz'}}
-      const type = {i: 101, t: 3, v: {baz: {}}}
+      const instance = { i: 42, t: 101, v: { bar: 'baz' } }
+      const type = { i: 101, t: 3, v: { baz: {} } }
       const expectedMessage = {
-        $: {token: expect.anything()},
+        $: { token: expect.anything() },
         id: null,
         name: 'get_object_by_id',
         args: [type.i],
@@ -271,7 +281,7 @@ describe('rpc client', () => {
       let client
       let getObjectByIdCall
 
-      sendControlAndResolveRemote((message) => {
+      sendControlAndResolveRemote(message => {
         const token = message.$.token
 
         getObjectByIdCall = message
@@ -280,12 +290,12 @@ describe('rpc client', () => {
       })
 
       return Client(url)
-        .then((c) => {
+        .then(c => {
           client = c
           RemoteObject.mockReturnValueOnce(Promise.resolve(type.v))
           return client.resolveTypeValues(instance)
         })
-        .then((typeValues) => {
+        .then(typeValues => {
           expect(getObjectByIdCall).toEqual(expectedMessage)
           expect(RemoteObject).toHaveBeenCalledWith(client, type)
           expect(typeValues).toEqual(type.v)
@@ -293,12 +303,12 @@ describe('rpc client', () => {
     })
 
     test('will not ask for a type object more than once', () => {
-      const instance = {i: 42, t: 101, v: {bar: 'baz'}}
-      const type = {i: 101, t: 3, v: {baz: {}}}
+      const instance = { i: 42, t: 101, v: { bar: 'baz' } }
+      const type = { i: 101, t: 3, v: { baz: {} } }
       let remoteCalls = 0
       let client
 
-      sendControlAndResolveRemote((message) => {
+      sendControlAndResolveRemote(message => {
         const token = message.$.token
 
         remoteCalls++
@@ -307,7 +317,7 @@ describe('rpc client', () => {
       })
 
       return Client(url)
-        .then((c) => {
+        .then(c => {
           client = c
           RemoteObject.mockReturnValue(Promise.resolve(type.v))
           return client.resolveTypeValues(instance)
@@ -317,35 +327,39 @@ describe('rpc client', () => {
     })
   })
 
-  test('emits notification data wrapped in RemoteObjects', (done) => {
-    const INSTANCE = {i: 32, t: 30, v: {foo: 'bar', baz: 'qux'}}
-    const notification = {$: {type: NOTIFICATION}, data: INSTANCE}
-    const mockRemote = {foo: 'bar', baz: 'qux'}
+  test('emits notification data wrapped in RemoteObjects', done => {
+    const INSTANCE = { i: 32, t: 30, v: { foo: 'bar', baz: 'qux' } }
+    const notification = { $: { type: NOTIFICATION }, data: INSTANCE }
+    const mockRemote = { foo: 'bar', baz: 'qux' }
 
     sendControlAndResolveRemote()
     RemoteObject.mockReturnValue(Promise.resolve(mockRemote))
 
-    Client(url)
-      .then((client) => {
-        addListener(client, 'notification', (message) => {
-          expect(RemoteObject)
-            .toHaveBeenCalledWith(client, INSTANCE, {methods: false})
-          expect(message).toEqual(mockRemote)
-          done()
+    Client(url).then(client => {
+      addListener(client, 'notification', message => {
+        expect(RemoteObject).toHaveBeenCalledWith(client, INSTANCE, {
+          methods: false,
         })
-
-        setTimeout(() => ws.send(notification), 10)
+        expect(message).toEqual(mockRemote)
+        done()
       })
+
+      setTimeout(() => ws.send(notification), 10)
+    })
   })
 
   test('closes the socket', () => {
     sendControlAndResolveRemote()
 
     return Client(url)
-      .then((client) => client.close())
-      .then(() => waitAndTry(100, () => expect(
-        ws.readyState === global.WebSocket.CLOSING ||
-        ws.readyState === global.WebSocket.CLOSED
-      ).toBe(true)))
+      .then(client => client.close())
+      .then(() =>
+        waitAndTry(100, () =>
+          expect(
+            ws.readyState === global.WebSocket.CLOSING ||
+              ws.readyState === global.WebSocket.CLOSED
+          ).toBe(true)
+        )
+      )
   })
 })

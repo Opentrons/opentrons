@@ -2,7 +2,13 @@
 import React from 'react'
 import Renderer from 'react-test-renderer'
 
-import {Button, FlatButton, PrimaryButton, OutlineButton, IconButton} from '..'
+import {
+  Button,
+  FlatButton,
+  PrimaryButton,
+  OutlineButton,
+  IconButton,
+} from '..'
 
 describe('buttons', () => {
   const onClick = () => {}
@@ -10,9 +16,10 @@ describe('buttons', () => {
   test('creates a button with props', () => {
     const onClick = jest.fn()
     const button = Renderer.create(
-      <Button onClick={onClick}
-        className='class'
-        title='title'
+      <Button
+        onClick={onClick}
+        className="class"
+        title="title"
         disabled={false}
       >
         children
@@ -38,7 +45,7 @@ describe('buttons', () => {
 
   test('Button renders correctly', () => {
     const tree = Renderer.create(
-      <Button onClick={onClick} title='t' className='c'>
+      <Button onClick={onClick} title="t" className="c">
         children
       </Button>
     ).toJSON()
@@ -48,7 +55,12 @@ describe('buttons', () => {
 
   test('Button with iconName renders correctly', () => {
     const tree = Renderer.create(
-      <Button onClick={onClick} title='t' className='c' iconName='flask-outline'>
+      <Button
+        onClick={onClick}
+        title="t"
+        className="c"
+        iconName="flask-outline"
+      >
         children
       </Button>
     ).toJSON()
@@ -58,7 +70,7 @@ describe('buttons', () => {
 
   test('PrimaryButton renders correctly', () => {
     const tree = Renderer.create(
-      <PrimaryButton onClick={onClick} title='t' className='c'>
+      <PrimaryButton onClick={onClick} title="t" className="c">
         children
       </PrimaryButton>
     ).toJSON()
@@ -68,7 +80,12 @@ describe('buttons', () => {
 
   test('PrimaryButton with iconName renders correctly', () => {
     const tree = Renderer.create(
-      <PrimaryButton onClick={onClick} title='t' className='c' iconName='flask-outline'>
+      <PrimaryButton
+        onClick={onClick}
+        title="t"
+        className="c"
+        iconName="flask-outline"
+      >
         children
       </PrimaryButton>
     ).toJSON()
@@ -78,7 +95,7 @@ describe('buttons', () => {
 
   test('FlatButton renders correctly', () => {
     const tree = Renderer.create(
-      <FlatButton onClick={onClick} title='t' className='c'>
+      <FlatButton onClick={onClick} title="t" className="c">
         children
       </FlatButton>
     ).toJSON()
@@ -88,7 +105,12 @@ describe('buttons', () => {
 
   test('FlatButton with iconName renders correctly', () => {
     const tree = Renderer.create(
-      <FlatButton onClick={onClick} title='t' className='c' iconName='flask-outline'>
+      <FlatButton
+        onClick={onClick}
+        title="t"
+        className="c"
+        iconName="flask-outline"
+      >
         children
       </FlatButton>
     ).toJSON()
@@ -98,7 +120,7 @@ describe('buttons', () => {
 
   test('OutlineButton renders correctly', () => {
     const tree = Renderer.create(
-      <OutlineButton onClick={onClick} title='t' className='c'>
+      <OutlineButton onClick={onClick} title="t" className="c">
         children
       </OutlineButton>
     ).toJSON()
@@ -108,7 +130,7 @@ describe('buttons', () => {
 
   test('Inverted OutlineButton renders correctly', () => {
     const tree = Renderer.create(
-      <OutlineButton onClick={onClick} title='t' className='c' inverted>
+      <OutlineButton onClick={onClick} title="t" className="c" inverted>
         children
       </OutlineButton>
     ).toJSON()
@@ -118,7 +140,12 @@ describe('buttons', () => {
 
   test('OutlineButton with iconName renders correctly', () => {
     const tree = Renderer.create(
-      <OutlineButton onClick={onClick} title='t' className='c' iconName='flask-outline'>
+      <OutlineButton
+        onClick={onClick}
+        title="t"
+        className="c"
+        iconName="flask-outline"
+      >
         children
       </OutlineButton>
     ).toJSON()
@@ -130,9 +157,9 @@ describe('buttons', () => {
     const tree = Renderer.create(
       <IconButton
         onClick={onClick}
-        title='t'
-        className='c'
-        name='close'
+        title="t"
+        className="c"
+        name="close"
         spin
         disabled
       />

@@ -8,8 +8,8 @@ import toRegex from 'to-regex'
 import differenceBy from 'lodash/differenceBy'
 import xorBy from 'lodash/xorBy'
 
-import MdnsBrowser, {getKnownIps} from './mdns-browser'
-import {poll, stop, type PollRequest} from './poller'
+import MdnsBrowser, { getKnownIps } from './mdns-browser'
+import { poll, stop, type PollRequest } from './poller'
 import {
   createServiceList,
   upsertServiceList,
@@ -25,7 +25,7 @@ import {
   toCandidate,
 } from './service'
 
-import type {Browser, BrowserService} from 'mdns-js'
+import type { Browser, BrowserService } from 'mdns-js'
 
 import type {
   Candidate,
@@ -57,7 +57,7 @@ const santizeRe = (patterns: ?Array<string | RegExp>) => {
   return patterns.map(p => (typeof p === 'string' ? escape(p) : p))
 }
 
-export default function DiscoveryClientFactory (options?: Options) {
+export default function DiscoveryClientFactory(options?: Options) {
   return new DiscoveryClient(options || {})
 }
 
@@ -65,9 +65,9 @@ export const SERVICE_EVENT: 'service' = 'service'
 export const SERVICE_REMOVED_EVENT: 'serviceRemoved' = 'serviceRemoved'
 export const DEFAULT_POLL_INTERVAL = 5000
 export const DEFAULT_DISCOVERY_INTERVAL = 90000
-export {DEFAULT_PORT}
+export { DEFAULT_PORT }
 
-const TO_REGEX_OPTS = {contains: true, nocase: true, safe: true}
+const TO_REGEX_OPTS = { contains: true, nocase: true, safe: true }
 
 export class DiscoveryClient extends EventEmitter {
   services: ServiceList
@@ -82,7 +82,7 @@ export class DiscoveryClient extends EventEmitter {
   _portFilter: Array<number>
   _logger: ?Logger
 
-  constructor (options: Options) {
+  constructor(options: Options) {
     super()
 
     // null out ok flag for pre-populated services
@@ -105,7 +105,7 @@ export class DiscoveryClient extends EventEmitter {
     log(this._logger, 'silly', 'Created', this)
   }
 
-  start (): DiscoveryClient {
+  start(): DiscoveryClient {
     log(this._logger, 'debug', 'starting discovery client', {})
     this._startBrowser()
     this._poll()
@@ -117,7 +117,7 @@ export class DiscoveryClient extends EventEmitter {
     return this
   }
 
-  stop (): DiscoveryClient {
+  stop(): DiscoveryClient {
     log(this._logger, 'debug', 'stopping discovery client', {})
     this._stopBrowser()
     this._stopPoll()
@@ -126,10 +126,10 @@ export class DiscoveryClient extends EventEmitter {
     return this
   }
 
-  add (ip: string, port?: number): DiscoveryClient {
+  add(ip: string, port?: number): DiscoveryClient {
     if (!this.candidates.some(c => c.ip === ip)) {
       const candidate = makeCandidate(ip, port)
-      log(this._logger, 'debug', 'adding new unique candidate', {candidate})
+      log(this._logger, 'debug', 'adding new unique candidate', { candidate })
       this.candidates = this.candidates.concat(candidate)
       this._poll()
     }
@@ -137,7 +137,7 @@ export class DiscoveryClient extends EventEmitter {
     return this
   }
 
-  remove (name: string): DiscoveryClient {
+  remove(name: string): DiscoveryClient {
     const removals = this.services.filter(s => s.name === name)
 
     this.services = this.services.filter(s => s.name !== name)
@@ -145,14 +145,14 @@ export class DiscoveryClient extends EventEmitter {
       removals.every(s => s.ip !== c.ip)
     )
 
-    log(this._logger, 'debug', 'removed services from discovery', {removals})
+    log(this._logger, 'debug', 'removed services from discovery', { removals })
     this._poll()
     this.emit(SERVICE_REMOVED_EVENT, removals)
 
     return this
   }
 
-  setCandidates (candidates: Array<string | Candidate>): DiscoveryClient {
+  setCandidates(candidates: Array<string | Candidate>): DiscoveryClient {
     this.candidates = candidates.map(c => {
       if (typeof c === 'string') {
         return makeCandidate(c)
@@ -164,14 +164,14 @@ export class DiscoveryClient extends EventEmitter {
     return this
   }
 
-  setPollInterval (interval: number): DiscoveryClient {
+  setPollInterval(interval: number): DiscoveryClient {
     this._pollInterval = interval || DEFAULT_POLL_INTERVAL
     this._poll(true)
 
     return this
   }
 
-  _poll (forceRestart?: boolean): void {
+  _poll(forceRestart?: boolean): void {
     const nextPollList = this.services
       .map(toCandidate)
       .filter(Boolean)
@@ -192,12 +192,12 @@ export class DiscoveryClient extends EventEmitter {
     }
   }
 
-  _stopPoll (): void {
+  _stopPoll(): void {
     stop(this._pollRequest, this._logger)
     this._pollRequest = null
   }
 
-  _startBrowser (): void {
+  _startBrowser(): void {
     this._stopBrowser()
 
     const browser = MdnsBrowser()
@@ -208,7 +208,7 @@ export class DiscoveryClient extends EventEmitter {
     this._browser = browser
   }
 
-  _stopBrowser (): void {
+  _stopBrowser(): void {
     if (this._browser) {
       this._browser
         .removeAllListeners('ready')
@@ -220,9 +220,9 @@ export class DiscoveryClient extends EventEmitter {
     }
   }
 
-  _rediscover (): void {
+  _rediscover(): void {
     const knownIps = getKnownIps(this._browser)
-    log(this._logger, 'debug', 'refreshing advertising flags', {knownIps})
+    log(this._logger, 'debug', 'refreshing advertising flags', { knownIps })
 
     const nextServices = this.services.map(s =>
       updateService(s, {
@@ -235,14 +235,14 @@ export class DiscoveryClient extends EventEmitter {
     this._startBrowser()
   }
 
-  _handleUp (browserService: BrowserService): void {
-    log(this._logger, 'debug', 'mdns service detected', {browserService})
+  _handleUp(browserService: BrowserService): void {
+    log(this._logger, 'debug', 'mdns service detected', { browserService })
     const service = fromMdnsBrowser(browserService)
 
     if (service) this._handleService(service)
   }
 
-  _handleHealth (
+  _handleHealth(
     candidate: Candidate,
     apiResponse: ?HealthResponse,
     serverResponse: ?ServerHealthResponse
@@ -260,7 +260,7 @@ export class DiscoveryClient extends EventEmitter {
     )
   }
 
-  _handleService (service: Service): mixed {
+  _handleService(service: Service): mixed {
     if (
       !this._nameFilter.test(service.name) ||
       !this._ipFilter.test(service.ip || '') ||
@@ -274,7 +274,7 @@ export class DiscoveryClient extends EventEmitter {
   }
 
   // update this.services, emit if necessary, re-poll if necessary
-  _updateLists (nextServices: ServiceList): void {
+  _updateLists(nextServices: ServiceList): void {
     const updated = differenceBy(nextServices, this.services)
 
     if (updated.length) {
@@ -283,7 +283,7 @@ export class DiscoveryClient extends EventEmitter {
       this.services = nextServices
       this._poll()
 
-      log(this._logger, 'debug', 'updated services', {updated})
+      log(this._logger, 'debug', 'updated services', { updated })
       this.emit(SERVICE_EVENT, updated)
     }
   }

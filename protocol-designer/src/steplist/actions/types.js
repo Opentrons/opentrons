@@ -1,5 +1,5 @@
 // @flow
-import type {StepFieldName} from '../fieldLevel'
+import type { StepFieldName } from '../fieldLevel'
 
 export type FormPatch = {
   [StepFieldName]: ?mixed, // string | boolean | Array<string> | null,

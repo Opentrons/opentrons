@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import orderBy from 'lodash/orderBy'
 
 import {
@@ -11,15 +11,15 @@ import {
   getUnreachableRobots,
 } from '../../discovery'
 
-import type {State, Dispatch} from '../../types'
+import type { State, Dispatch } from '../../types'
 
-import {SidePanel} from '@opentrons/components'
+import { SidePanel } from '@opentrons/components'
 import RobotList from './RobotList'
 import RobotItem from './RobotItem'
 import ScanStatus from './ScanStatus'
 import UnreachableRobotItem from './UnreachableRobotItem'
 
-import type {Robot, ReachableRobot, UnreachableRobot} from '../../discovery'
+import type { Robot, ReachableRobot, UnreachableRobot } from '../../discovery'
 
 type StateProps = {|
   robots: Array<Robot>,
@@ -43,7 +43,7 @@ export default connect(
   mapDispatchToProps
 )(ConnectPanel)
 
-function ConnectPanel (props: Props) {
+function ConnectPanel(props: Props) {
   return (
     <SidePanel title="Robots">
       <ScanStatus {...props} />
@@ -66,7 +66,7 @@ const robotOrder = [['connected', 'local', 'name'], ['desc', 'desc', 'asc']]
 const reachableOrder = [['local', 'name'], ['desc', 'asc']]
 const unreachableOrder = [['name'], ['asc']]
 
-function mapStateToProps (state: State): StateProps {
+function mapStateToProps(state: State): StateProps {
   const robots = getConnectableRobots(state)
   const reachableRobots = getReachableRobots(state)
   const unreachableRobots = getUnreachableRobots(state)
@@ -80,7 +80,7 @@ function mapStateToProps (state: State): StateProps {
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch): DispatchProps {
+function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
   return {
     onScanClick: () => dispatch(startDiscovery()),
   }

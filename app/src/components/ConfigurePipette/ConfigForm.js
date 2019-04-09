@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
-import {Link} from 'react-router-dom'
-import {Formik, Form} from 'formik'
+import { Link } from 'react-router-dom'
+import { Formik, Form } from 'formik'
 
 import startCase from 'lodash/startCase'
 import mapValues from 'lodash/mapValues'
@@ -13,7 +13,7 @@ import set from 'lodash/set'
 import isEmpty from 'lodash/isEmpty'
 
 import FormButtonBar from './FormButtonBar'
-import ConfigFormGroup, {FormColumn} from './ConfigFormGroup'
+import ConfigFormGroup, { FormColumn } from './ConfigFormGroup'
 
 import type {
   Pipette,
@@ -23,7 +23,7 @@ import type {
   PipetteConfigRequest,
 } from '../../http-api-client'
 
-import type {FormValues} from './ConfigFormGroup'
+import type { FormValues } from './ConfigFormGroup'
 
 export type DisplayFieldProps = PipetteSettingsField & {
   name: string,
@@ -43,7 +43,7 @@ const POWER_KEYS = ['plungerCurrent', 'pickUpCurrent', 'dropTipCurrent']
 const TIP_KEYS = ['dropTipSpeed', 'pickUpDistance']
 
 export default class ConfigForm extends React.Component<Props> {
-  getFieldsByKey (
+  getFieldsByKey(
     keys: Array<string>,
     fields: PipetteConfigFields
   ): Array<DisplayFieldProps> {
@@ -80,12 +80,12 @@ export default class ConfigForm extends React.Component<Props> {
 
   handleSubmit = (values: FormValues) => {
     const params = mapValues(values, v => {
-      return v === '' ? null : {value: Number(v)}
+      return v === '' ? null : { value: Number(v) }
     })
-    this.props.updateConfig(this.props.pipette.id, {fields: {...params}})
+    this.props.updateConfig(this.props.pipette.id, { fields: { ...params } })
   }
 
-  getFieldValue (
+  getFieldValue(
     key: string,
     fields: Array<DisplayFieldProps>,
     values: FormValues
@@ -104,7 +104,7 @@ export default class ConfigForm extends React.Component<Props> {
     // validate all visible fields with min and max
     forOwn(fields, (field, name) => {
       const value = values[name].trim()
-      const {min, max} = field
+      const { min, max } = field
       if (value !== '') {
         const parsed = Number(value)
         if (Number.isNaN(parsed)) {
@@ -132,8 +132,8 @@ export default class ConfigForm extends React.Component<Props> {
     return errors
   }
 
-  render () {
-    const {parentUrl} = this.props
+  render() {
+    const { parentUrl } = this.props
     const fields = this.getVisibleFields()
     const UNKNOWN_KEYS = this.getUnknownKeys()
     const initialValues = mapValues(fields, f => {
@@ -151,7 +151,7 @@ export default class ConfigForm extends React.Component<Props> {
         validate={this.validate}
         validateOnChange={false}
         render={formProps => {
-          const {errors, values} = formProps
+          const { errors, values } = formProps
           const disableSubmit = !isEmpty(errors)
           const handleReset = () =>
             formProps.resetForm(mapValues(values, () => ''))
@@ -186,8 +186,8 @@ export default class ConfigForm extends React.Component<Props> {
                     children: 'reset all',
                     onClick: handleReset,
                   },
-                  {children: 'cancel', Component: Link, to: parentUrl},
-                  {children: 'save', type: 'submit', disabled: disableSubmit},
+                  { children: 'cancel', Component: Link, to: parentUrl },
+                  { children: 'save', type: 'submit', disabled: disableSubmit },
                 ]}
               />
             </Form>

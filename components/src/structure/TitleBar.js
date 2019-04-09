@@ -4,7 +4,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import {FlatButton, type ButtonProps} from '../buttons'
+import { FlatButton, type ButtonProps } from '../buttons'
 import styles from './structure.css'
 
 export type TitleBarProps = {
@@ -19,7 +19,7 @@ export type TitleBarProps = {
   backButtonLabel?: string,
 }
 
-export default function TitleBar (props: TitleBarProps) {
+export default function TitleBar(props: TitleBarProps) {
   const {
     title,
     subtitle,
@@ -28,19 +28,11 @@ export default function TitleBar (props: TitleBarProps) {
     backClickDisabled,
     backButtonLabel,
   } = props
-  let {back} = props
+  let { back } = props
 
-  const separator = subtitle && (
-    <span className={styles.separator}>
-      |
-    </span>
-  )
+  const separator = subtitle && <span className={styles.separator}>|</span>
 
-  const subheading = subtitle && (
-    <h2 className={styles.subtitle}>
-      {subtitle}
-    </h2>
-  )
+  const subheading = subtitle && <h2 className={styles.subtitle}>{subtitle}</h2>
 
   // TODO(mc, 2018-04-13): deprecate these props
   if (!back && onBackClick) {
@@ -59,17 +51,9 @@ export default function TitleBar (props: TitleBarProps) {
 
   return (
     <header className={cx(styles.title_bar, className)}>
-      {back && (
-        <FlatButton
-          inverted
-          iconName={'chevron-left'}
-          {...back}
-        />
-      )}
+      {back && <FlatButton inverted iconName={'chevron-left'} {...back} />}
       <div className={styles.title_wrapper}>
-        <h1 className={styles.title}>
-          {title}
-        </h1>
+        <h1 className={styles.title}>{title}</h1>
         {separator}
         {subheading}
       </div>

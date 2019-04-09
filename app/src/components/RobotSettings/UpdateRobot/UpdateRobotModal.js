@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {push} from 'react-router-redux'
+import { push } from 'react-router-redux'
 
 import {
   updateRobotServer,
@@ -10,20 +10,20 @@ import {
   setIgnoredUpdate,
 } from '../../../http-api-client'
 
-import {getRobotApiVersion} from '../../../discovery'
+import { getRobotApiVersion } from '../../../discovery'
 
-import {CURRENT_VERSION} from '../../../shell'
+import { CURRENT_VERSION } from '../../../shell'
 
 import UpdateAppModal from './UpdateAppModal'
 import SyncRobotModal from './SyncRobotModal'
 import ReinstallModal from './ReinstallModal'
 
-import type {State, Dispatch} from '../../../types'
-import type {ShellUpdateState} from '../../../shell'
-import type {ViewableRobot} from '../../../discovery'
-import type {RobotUpdateInfo} from '../../../http-api-client'
+import type { State, Dispatch } from '../../../types'
+import type { ShellUpdateState } from '../../../shell'
+import type { ViewableRobot } from '../../../discovery'
+import type { RobotUpdateInfo } from '../../../http-api-client'
 
-type OP = {robot: ViewableRobot, appUpdate: ShellUpdateState}
+type OP = { robot: ViewableRobot, appUpdate: ShellUpdateState }
 
 type SP = {|
   appVersion: string,
@@ -31,7 +31,7 @@ type SP = {|
   robotUpdateInfo: RobotUpdateInfo,
 |}
 
-type DP = {dispatch: Dispatch}
+type DP = { dispatch: Dispatch }
 
 type Props = {
   ...$Exact<OP>,
@@ -46,28 +46,28 @@ type UpdateRobotState = {
 }
 
 class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
-  constructor (props) {
+  constructor(props) {
     super(props)
-    this.state = {ignoreAppUpdate: false}
+    this.state = { ignoreAppUpdate: false }
   }
 
   setIgnoreAppUpdate = () => {
-    this.setState({ignoreAppUpdate: true})
+    this.setState({ ignoreAppUpdate: true })
   }
 
-  render () {
+  render() {
     const {
       parentUrl,
       appVersion,
       robotVersion,
       robotUpdateInfo,
-      appUpdate: {available: appUpdateAvailable, info: appUpdateInfo},
+      appUpdate: { available: appUpdateAvailable, info: appUpdateInfo },
     } = this.props
-    const {ignoreAppUpdate} = this.state
+    const { ignoreAppUpdate } = this.state
     const appUpdateVersion = appUpdateInfo && appUpdateInfo.version
     const robotUpdateVersion = robotUpdateInfo.version
     const availableUpdate = appUpdateVersion || robotUpdateVersion
-    const versionProps = {appVersion, robotVersion, availableUpdate}
+    const versionProps = { appVersion, robotVersion, availableUpdate }
     const isUpgrade = robotUpdateInfo.type === 'upgrade'
     const onClick = isUpgrade ? this.setIgnoreAppUpdate : this.props.update
 
@@ -98,7 +98,7 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
   }
 }
 
-function makeMapStateToProps (): (State, OP) => SP {
+function makeMapStateToProps(): (State, OP) => SP {
   const getRobotUpdateInfo = makeGetRobotUpdateInfo()
 
   return (state, ownProps) => ({
@@ -108,15 +108,15 @@ function makeMapStateToProps (): (State, OP) => SP {
   })
 }
 
-function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
-  const {robot} = ownProps
-  const {robotUpdateInfo} = stateProps
-  const {dispatch} = dispatchProps
+function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
+  const { robot } = ownProps
+  const { robotUpdateInfo } = stateProps
+  const { dispatch } = dispatchProps
   const parentUrl = `/robots/${robot.name}`
   const close = () => dispatch(push(parentUrl))
   let ignoreUpdate = robotUpdateInfo.type
     ? () =>
-      dispatch(setIgnoredUpdate(robot, robotUpdateInfo.version)).then(close)
+        dispatch(setIgnoredUpdate(robot, robotUpdateInfo.version)).then(close)
     : close
 
   return {

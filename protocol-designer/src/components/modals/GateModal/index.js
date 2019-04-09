@@ -1,16 +1,16 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import cx from 'classnames'
-import {AlertModal, Icon} from '@opentrons/components'
-import {opentronsWebApi, type GateStage} from '../../../networking'
+import { AlertModal, Icon } from '@opentrons/components'
+import { opentronsWebApi, type GateStage } from '../../../networking'
 import i18n from '../../../localization'
 import CHECK_EMAIL_IMAGE from '../../../images/youve_got_mail.svg'
 import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
 } from '../../../analytics'
-import type {BaseState} from '../../../types'
+import type { BaseState } from '../../../types'
 import settingsStyles from '../../SettingsPage/SettingsPage.css'
 import modalStyles from '../modal.css'
 import SignUpForm from './SignUpForm'
@@ -27,28 +27,33 @@ type SP = {
 
 type DP = $Diff<Props, SP>
 
-type State = {gateStage: GateStage, errorMessage: ?string}
+type State = { gateStage: GateStage, errorMessage: ?string }
 
 class GateModal extends React.Component<Props, State> {
-  constructor (props: Props) {
+  constructor(props: Props) {
     super()
-    this.state = {gateStage: 'loading', errorMessage: ''}
+    this.state = { gateStage: 'loading', errorMessage: '' }
 
-    opentronsWebApi.getGateStage(props.hasOptedIn).then(({gateStage, errorMessage}) => {
-      this.setState({gateStage, errorMessage})
-    })
+    opentronsWebApi
+      .getGateStage(props.hasOptedIn)
+      .then(({ gateStage, errorMessage }) => {
+        this.setState({ gateStage, errorMessage })
+      })
   }
 
-  static getDerivedStateFromProps (nextProps: Props, prevState: State) {
-    if (nextProps.hasOptedIn !== null && prevState.gateStage === 'promptOptForAnalytics') {
-      return ({gateStage: 'openGate'})
+  static getDerivedStateFromProps(nextProps: Props, prevState: State) {
+    if (
+      nextProps.hasOptedIn !== null &&
+      prevState.gateStage === 'promptOptForAnalytics'
+    ) {
+      return { gateStage: 'openGate' }
     } else {
       return prevState
     }
   }
 
-  render () {
-    const {optIn, optOut} = this.props
+  render() {
+    const { optIn, optOut } = this.props
 
     switch (this.state.gateStage) {
       case 'promptVerifyIdentity':
@@ -65,12 +70,15 @@ class GateModal extends React.Component<Props, State> {
           <AlertModal
             className={cx(modalStyles.modal, modalStyles.blocking)}
             buttons={[
-              {onClick: optOut, children: i18n.t('button.no')},
-              {onClick: optIn, children: i18n.t('button.yes')},
-            ]} >
+              { onClick: optOut, children: i18n.t('button.no') },
+              { onClick: optIn, children: i18n.t('button.yes') },
+            ]}
+          >
             <h3>{i18n.t('card.toggle.share_session')}</h3>
             <div className={settingsStyles.body_wrapper}>
-              <p className={settingsStyles.card_body}>{i18n.t('card.body.reason_for_collecting_data')}</p>
+              <p className={settingsStyles.card_body}>
+                {i18n.t('card.body.reason_for_collecting_data')}
+              </p>
               <ul className={settingsStyles.card_point_list}>
                 <li>{i18n.t('card.body.data_collected_is_internal')}</li>
                 {/* TODO: BC 2018-09-26 uncomment when only using fullstory <li>{i18n.t('card.body.data_only_from_pd')}</li> */}
@@ -96,7 +104,10 @@ class GateModal extends React.Component<Props, State> {
           <AlertModal className={cx(modalStyles.modal, modalStyles.blocking)}>
             <h3>{i18n.t('modal.gate.sign_up_success')}</h3>
             <div className={modalStyles.centered_icon_wrapper}>
-              <img src={CHECK_EMAIL_IMAGE} className={modalStyles.success_icon} />
+              <img
+                src={CHECK_EMAIL_IMAGE}
+                className={modalStyles.success_icon}
+              />
             </div>
             <div className={settingsStyles.body_wrapper}>
               <p className={settingsStyles.card_body}>
@@ -113,7 +124,11 @@ class GateModal extends React.Component<Props, State> {
           <AlertModal className={cx(modalStyles.modal, modalStyles.blocking)}>
             <div className={settingsStyles.body_wrapper}>
               <div className={modalStyles.centered_icon_wrapper}>
-                <Icon name="ot-spinner" className={modalStyles.spinner_modal_icon} spin />
+                <Icon
+                  name="ot-spinner"
+                  className={modalStyles.spinner_modal_icon}
+                  spin
+                />
               </div>
             </div>
           </AlertModal>
@@ -122,15 +137,18 @@ class GateModal extends React.Component<Props, State> {
   }
 }
 
-function mapStateToProps (state: BaseState): SP {
-  return {hasOptedIn: analyticsSelectors.getHasOptedIn(state)}
+function mapStateToProps(state: BaseState): SP {
+  return { hasOptedIn: analyticsSelectors.getHasOptedIn(state) }
 }
 
-function mapDispatchToProps (dispatch: Dispatch<*>): DP {
+function mapDispatchToProps(dispatch: Dispatch<*>): DP {
   return {
     optIn: () => dispatch(analyticsActions.optIn()),
     optOut: () => dispatch(analyticsActions.optOut()),
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(GateModal)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(GateModal)

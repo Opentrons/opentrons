@@ -2,12 +2,9 @@
 import React from 'react'
 import capitalize from 'lodash/capitalize'
 
-import {
-  ListItem,
-  type IconName,
-} from '@opentrons/components'
+import { ListItem, type IconName } from '@opentrons/components'
 
-import type {Mount, Pipette} from '../../robot'
+import type { Mount, Pipette } from '../../robot'
 import styles from './styles.css'
 
 type Props = {
@@ -16,13 +13,11 @@ type Props = {
   pipette: ?Pipette,
 }
 
-export default function PipetteListItem (props: Props) {
-  const {isRunning, mount, pipette} = props
+export default function PipetteListItem(props: Props) {
+  const { isRunning, mount, pipette } = props
   const confirmed = pipette && pipette.probed
   const isDisabled = !pipette || isRunning
-  const url = !isDisabled
-    ? `/calibrate/pipettes/${mount}`
-    : '#'
+  const url = !isDisabled ? `/calibrate/pipettes/${mount}` : '#'
 
   const iconName: IconName = confirmed
     ? 'check-circle'
@@ -32,9 +27,7 @@ export default function PipetteListItem (props: Props) {
     ? `${capitalize(pipette.channels === 8 ? 'multi' : 'single')}-channel`
     : 'N/A'
 
-  const name = pipette
-    ? pipette.name
-    : 'N/A'
+  const name = pipette ? pipette.name : 'N/A'
 
   return (
     <ListItem

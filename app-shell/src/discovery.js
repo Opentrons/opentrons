@@ -8,13 +8,13 @@ import DiscoveryClient, {
   SERVICE_REMOVED_EVENT,
 } from '@opentrons/discovery-client'
 
-import {getConfig, getOverrides, handleConfigChange} from './config'
+import { getConfig, getOverrides, handleConfigChange } from './config'
 import createLogger from './log'
 
-import type {Service} from '@opentrons/discovery-client'
+import type { Service } from '@opentrons/discovery-client'
 
 // TODO(mc, 2018-08-08): figure out type exports from app
-import type {Action} from '@opentrons/app/src/types'
+import type { Action } from '@opentrons/app/src/types'
 
 const log = createLogger(__filename)
 
@@ -27,11 +27,11 @@ let config
 let store
 let client
 
-export function registerDiscovery (dispatch: Action => void) {
+export function registerDiscovery(dispatch: Action => void) {
   const onServiceUpdate = throttle(handleServices, UPDATE_THROTTLE_MS)
 
   config = getConfig('discovery')
-  store = new Store({name: 'discovery', defaults: {services: []}})
+  store = new Store({ name: 'discovery', defaults: { services: [] } })
 
   client = DiscoveryClient({
     pollInterval: SLOW_POLL_INTERVAL_MS,
@@ -43,15 +43,15 @@ export function registerDiscovery (dispatch: Action => void) {
   client
     .on(SERVICE_EVENT, onServiceUpdate)
     .on(SERVICE_REMOVED_EVENT, onServiceUpdate)
-    .on('error', error => log.error('discovery error', {error}))
+    .on('error', error => log.error('discovery error', { error }))
     .start()
 
   handleConfigChange('discovery.candidates', value =>
     client.setCandidates(['[fd00:0:cafe:fefe::1]'].concat(value))
   )
 
-  return function handleIncomingAction (action: Action) {
-    log.debug('handling action in discovery', {action})
+  return function handleIncomingAction(action: Action) {
+    log.debug('handling action in discovery', { action })
 
     switch (action.type) {
       case 'discovery:START':
@@ -62,22 +62,22 @@ export function registerDiscovery (dispatch: Action => void) {
     }
   }
 
-  function handleServices () {
+  function handleServices() {
     store.set('services', filterServicesToPersist(client.services))
     dispatch({
       type: 'discovery:UPDATE_LIST',
-      payload: {robots: client.services},
+      payload: { robots: client.services },
     })
   }
 }
 
-export function getRobots () {
+export function getRobots() {
   if (!client) return []
 
   return client.services
 }
 
-function filterServicesToPersist (services: Array<Service>) {
+function filterServicesToPersist(services: Array<Service>) {
   const candidateOverrides = getOverrides('discovery.candidates')
   if (!candidateOverrides) return client.services
 

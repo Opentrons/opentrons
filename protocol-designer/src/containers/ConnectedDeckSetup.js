@@ -1,14 +1,14 @@
 // @flow
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {Deck, ClickOutside} from '@opentrons/components'
+import { Deck, ClickOutside } from '@opentrons/components'
 import styles from './Deck.css'
 import i18n from '../localization'
 
-import {Portal} from '../components/portals/MainPageModalPortal'
+import { Portal } from '../components/portals/MainPageModalPortal'
 import BrowseLabwareModal from '../components/labware/BrowseLabwareModal'
-import {DragPreviewLayer} from '../components/labware/LabwareOnDeck'
+import { DragPreviewLayer } from '../components/labware/LabwareOnDeck'
 import Hints from '../components/Hints'
 import LiquidPlacementModal from '../components/LiquidPlacementModal.js'
 import LabwareContainer from '../containers/LabwareContainer.js'
@@ -16,12 +16,12 @@ import LabwareSelectionModal from '../components/LabwareSelectionModal'
 import StepEditForm from '../components/StepEditForm'
 import TimelineAlerts from '../components/alerts/TimelineAlerts'
 
-import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
+import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import * as labwareIngredActions from '../labware-ingred/actions'
-import {START_TERMINAL_ITEM_ID, type TerminalItemId} from '../steplist'
-import {selectors as stepsSelectors} from '../ui/steps'
+import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../steplist'
+import { selectors as stepsSelectors } from '../ui/steps'
 
-import type {BaseState, ThunkDispatch} from '../types'
+import type { BaseState, ThunkDispatch } from '../types'
 
 type StateProps = {
   selectedTerminalItemId: ?TerminalItemId,
@@ -40,7 +40,8 @@ type Props = {
 
 const mapStateToProps = (state: BaseState): StateProps => ({
   selectedTerminalItemId: stepsSelectors.getSelectedTerminalItemId(state),
-  ingredSelectionMode: labwareIngredSelectors.getSelectedLabwareId(state) != null,
+  ingredSelectionMode:
+    labwareIngredSelectors.getSelectedLabwareId(state) != null,
   drilledDown: labwareIngredSelectors.getDrillDownLabwareId(state) != null,
 })
 
@@ -48,7 +49,10 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DispatchProps => ({
   drillUpFromLabware: () => dispatch(labwareIngredActions.drillUpFromLabware()),
 })
 
-const mergeProps = (stateProps: StateProps, dispatchProps: DispatchProps): Props => ({
+const mergeProps = (
+  stateProps: StateProps,
+  dispatchProps: DispatchProps
+): Props => ({
   selectedTerminalItemId: stateProps.selectedTerminalItemId,
   ingredSelectionMode: stateProps.ingredSelectionMode,
   drilledDown: stateProps.drilledDown,
@@ -60,24 +64,29 @@ const mergeProps = (stateProps: StateProps, dispatchProps: DispatchProps): Props
 // TODO Ian 2018-02-16 this will be broken apart and incorporated into ProtocolEditor
 class DeckSetup extends React.Component<Props> {
   renderDeck = () => {
-    const {selectedTerminalItemId} = this.props
+    const { selectedTerminalItemId } = this.props
     return (
       <React.Fragment>
         <div className={styles.deck_header}>
-          {
-            selectedTerminalItemId
-              ? i18n.t(`deck.header.${selectedTerminalItemId === START_TERMINAL_ITEM_ID ? 'start' : 'end'}`)
-              : null
-          }
+          {selectedTerminalItemId
+            ? i18n.t(
+                `deck.header.${
+                  selectedTerminalItemId === START_TERMINAL_ITEM_ID
+                    ? 'start'
+                    : 'end'
+                }`
+              )
+            : null}
         </div>
         <div className={styles.deck_row}>
           {this.props.drilledDown && <BrowseLabwareModal />}
           <ClickOutside onClickOutside={this.props.handleClickOutside}>
-            {({ref}) => (
+            {({ ref }) => (
               <div ref={ref} className={styles.deck_wrapper}>
                 <Deck
                   DragPreviewLayer={DragPreviewLayer}
-                  LabwareComponent={LabwareContainer} />
+                  LabwareComponent={LabwareContainer}
+                />
               </div>
             )}
           </ClickOutside>
@@ -86,8 +95,9 @@ class DeckSetup extends React.Component<Props> {
     )
   }
 
-  render () {
-    const startTerminalItemSelected = this.props.selectedTerminalItemId === START_TERMINAL_ITEM_ID
+  render() {
+    const startTerminalItemSelected =
+      this.props.selectedTerminalItemId === START_TERMINAL_ITEM_ID
 
     // NOTE: besides `Deck`, these are all modal-like components that show up
     // only when user is on deck setup / ingred selection "page".
@@ -100,7 +110,9 @@ class DeckSetup extends React.Component<Props> {
           <Hints />
           {startTerminalItemSelected && <LabwareSelectionModal />}
           {!startTerminalItemSelected && <StepEditForm />}
-          {startTerminalItemSelected && this.props.ingredSelectionMode && <LiquidPlacementModal />}
+          {startTerminalItemSelected && this.props.ingredSelectionMode && (
+            <LiquidPlacementModal />
+          )}
         </Portal>
         {this.renderDeck()}
       </React.Fragment>
@@ -108,4 +120,8 @@ class DeckSetup extends React.Component<Props> {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(DeckSetup)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+  mergeProps
+)(DeckSetup)

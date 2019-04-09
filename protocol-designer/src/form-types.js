@@ -1,7 +1,10 @@
 // @flow
-import type {IconName} from '@opentrons/components'
-import type {LabwareDefinition, PipetteNameSpecs} from '@opentrons/shared-data'
-import type {ChangeTipOptions} from './step-generation'
+import type { IconName } from '@opentrons/components'
+import type {
+  LabwareDefinition,
+  PipetteNameSpecs,
+} from '@opentrons/shared-data'
+import type { ChangeTipOptions } from './step-generation'
 
 export type StepIdType = string
 
@@ -68,11 +71,11 @@ export type StepFieldName = any
 // | 'aspirate_disposalVol_volume'
 
 // TODO Ian 2019-01-16 factor out to some constants.js ? See #2926
-export const stepIconsByType: {[string]: IconName} = {
-  'moveLiquid': 'ot-transfer',
-  'mix': 'ot-mix',
-  'pause': 'pause',
-  'manualIntervention': 'pause', // TODO Ian 2018-12-13 pause icon for this is a placeholder
+export const stepIconsByType: { [string]: IconName } = {
+  moveLiquid: 'ot-transfer',
+  mix: 'ot-mix',
+  pause: 'pause',
+  manualIntervention: 'pause', // TODO Ian 2018-12-13 pause icon for this is a placeholder
 }
 
 export type StepType = $Keys<typeof stepIconsByType>
@@ -80,17 +83,17 @@ export type StepType = $Keys<typeof stepIconsByType>
 // ===== Unprocessed form types =====
 
 export type AnnotationFields = {|
-  'stepName': string,
-  'stepDetails': string,
+  stepName: string,
+  stepDetails: string,
 |}
 
 export type BlowoutFields = {|
-  'blowout_checkbox'?: boolean,
-  'blowout_location'?: string,
+  blowout_checkbox?: boolean,
+  blowout_location?: string,
 |}
 
 export type ChangeTipFields = {|
-  'changeTip'?: ChangeTipOptions,
+  changeTip?: ChangeTipOptions,
 |}
 
 export type MixForm = {|
@@ -100,11 +103,11 @@ export type MixForm = {|
   stepType: 'mix',
   id: StepIdType,
 
-  'labware'?: string,
-  'pipette'?: string,
-  'times'?: string,
-  'volume'?: string,
-  'wells'?: Array<string>,
+  labware?: string,
+  pipette?: string,
+  times?: string,
+  volume?: string,
+  wells?: Array<string>,
   'touch-tip'?: boolean,
 |}
 
@@ -113,11 +116,11 @@ export type PauseForm = {|
   stepType: 'pause',
   id: StepIdType,
 
-  'pauseForAmountOfTime'?: 'true' | 'false',
-  'pauseHour'?: string,
-  'pauseMinute'?: string,
-  'pauseSecond'?: string,
-  'pauseMessage'?: string,
+  pauseForAmountOfTime?: 'true' | 'false',
+  pauseHour?: string,
+  pauseMinute?: string,
+  pauseSecond?: string,
+  pauseMessage?: string,
 |}
 
 // TODO: separate field values from from metadata
@@ -138,8 +141,8 @@ export type BlankForm = {
 }
 
 // TODO: Ian 2019-01-15 these HydratedLabware / HydratedPipette types are a placeholder. Should be used in form hydration.
-type HydratedLabware = {id: string, type: string, def: LabwareDefinition}
-type HydratedPipette = {id: string, model: string, spec: PipetteNameSpecs}
+type HydratedLabware = { id: string, type: string, def: LabwareDefinition }
+type HydratedPipette = { id: string, model: string, spec: PipetteNameSpecs }
 // TODO: this is the type we are aiming for
 
 export type HydratedMoveLiquidFormData = {
@@ -205,7 +208,7 @@ export type TipOffsetFields =
   | 'dispense_touchTip_mmFromBottom'
   | 'mix_touchTip_mmFromBottom'
 
-export function getIsTouchTipField (fieldName: string): boolean {
+export function getIsTouchTipField(fieldName: string): boolean {
   const touchTipFields = [
     'aspirate_touchTip_mmFromBottom',
     'dispense_touchTip_mmFromBottom',

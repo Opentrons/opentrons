@@ -1,16 +1,16 @@
 // @flow
 // robot settings endpoints
-import {createSelector} from 'reselect'
+import { createSelector } from 'reselect'
 
-import {buildRequestMaker} from './actions'
-import {getRobotApiState} from './reducer'
+import { buildRequestMaker } from './actions'
+import { getRobotApiState } from './reducer'
 
-import type {OutputSelector} from 'reselect'
-import type {State} from '../types'
-import type {BaseRobot, RobotService} from '../robot'
-import type {ApiCall} from './types'
-import type {ApiAction, RequestMaker} from './actions'
-import type {RobotApiState} from './reducer'
+import type { OutputSelector } from 'reselect'
+import type { State } from '../types'
+import type { BaseRobot, RobotService } from '../robot'
+import type { ApiCall } from './types'
+import type { ApiAction, RequestMaker } from './actions'
+import type { RobotApiState } from './reducer'
 
 type Id = string
 
@@ -33,7 +33,7 @@ export type PipetteSettingsField = {
   type?: string,
 }
 
-export type PipetteConfigFields = {[string]: PipetteSettingsField}
+export type PipetteConfigFields = { [string]: PipetteSettingsField }
 
 export type PipetteConfigResponse = {
   info: {
@@ -43,20 +43,24 @@ export type PipetteConfigResponse = {
   fields: PipetteConfigFields,
 }
 
-type SettingsRequest = ?{id: Id, value: Value}
+type SettingsRequest = ?{ id: Id, value: Value }
 
-type SettingsResponse = {settings: Array<Setting>}
+type SettingsResponse = { settings: Array<Setting> }
 
-export type SettingsAction = ApiAction<'settings',
+export type SettingsAction = ApiAction<
+  'settings',
   SettingsRequest,
-  SettingsResponse>
+  SettingsResponse
+>
 
-export type PipetteConfigRequest = {fields: {[string]: ?{value: number}}}
+export type PipetteConfigRequest = { fields: { [string]: ?{ value: number } } }
 
 export type RobotSettingsCall = ApiCall<SettingsRequest, SettingsResponse>
 
-export type PipetteConfigCall = ApiCall<PipetteConfigRequest,
-  PipetteConfigResponse>
+export type PipetteConfigCall = ApiCall<
+  PipetteConfigRequest,
+  PipetteConfigResponse
+>
 
 export type SettingsState = {|
   settings?: RobotSettingsCall,
@@ -86,7 +90,7 @@ export const fetchPipetteConfigs: PipetteConfigRequestMaker = buildRequestMaker(
   PIPETTE_SETTINGS
 )
 
-export function setPipetteConfigs (
+export function setPipetteConfigs(
   robot: RobotService,
   id: string,
   params: PipetteConfigRequest
@@ -95,55 +99,61 @@ export function setPipetteConfigs (
   return buildRequestMaker('PATCH', path)(robot, params)
 }
 
-export function makeGetRobotSettings () {
-  const selector: OutputSelector<State,
+export function makeGetRobotSettings() {
+  const selector: OutputSelector<
+    State,
     BaseRobot,
-    RobotSettingsCall> = createSelector(
-      getRobotApiState,
-      getSettingsRequest
-    )
+    RobotSettingsCall
+  > = createSelector(
+    getRobotApiState,
+    getSettingsRequest
+  )
 
   return selector
 }
 
-export function getSettingsRequest (state: RobotApiState): RobotSettingsCall {
-  let requestState = state[SETTINGS] || {inProgress: false}
+export function getSettingsRequest(state: RobotApiState): RobotSettingsCall {
+  let requestState = state[SETTINGS] || { inProgress: false }
 
   // guard against an older version of GET /settings
   if (requestState.response && !('settings' in requestState.response)) {
-    requestState = {...requestState, response: {settings: []}}
+    requestState = { ...requestState, response: { settings: [] } }
   }
 
   return requestState
 }
 
-export function makeGetRobotPipetteConfigs () {
-  const selector: OutputSelector<State,
+export function makeGetRobotPipetteConfigs() {
+  const selector: OutputSelector<
+    State,
     BaseRobot,
-    PipetteConfigCall> = createSelector(
-      getRobotApiState,
-      getRobotPipetteConfigs
-    )
+    PipetteConfigCall
+  > = createSelector(
+    getRobotApiState,
+    getRobotPipetteConfigs
+  )
 
   return selector
 }
 
-export function getRobotPipetteConfigs (
+export function getRobotPipetteConfigs(
   state: RobotApiState
 ): PipetteConfigCall {
-  return state[PIPETTE_SETTINGS] || {inProgress: false}
+  return state[PIPETTE_SETTINGS] || { inProgress: false }
 }
 
-export function makeGetPipetteRequestById () {
-  const selector: OutputSelector<State,
+export function makeGetPipetteRequestById() {
+  const selector: OutputSelector<
+    State,
     BaseRobot,
-    PipetteConfigCall> = createSelector(
-      (state, robot, _id) => getRobotApiState(state, robot),
-      (_state, _robot, id) => id,
-      (state, id) => {
-        const path = `${PIPETTE_SETTINGS}/${id}`
-        return state[path] || {inProgress: false}
-      }
-    )
+    PipetteConfigCall
+  > = createSelector(
+    (state, robot, _id) => getRobotApiState(state, robot),
+    (_state, _robot, id) => id,
+    (state, id) => {
+      const path = `${PIPETTE_SETTINGS}/${id}`
+      return state[path] || { inProgress: false }
+    }
+  )
   return selector
 }

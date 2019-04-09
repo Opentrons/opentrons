@@ -1,22 +1,22 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {Splash} from '@opentrons/components'
+import { connect } from 'react-redux'
+import { Splash } from '@opentrons/components'
 
 import ConnectedDeckSetup from '../containers/ConnectedDeckSetup'
 import ConnectedFilePage from '../containers/ConnectedFilePage'
 import SettingsPage from '../components/SettingsPage'
 import LiquidsPage from '../components/LiquidsPage'
 
-import type {BaseState} from '../types'
-import {selectors, type Page} from '../navigation'
+import type { BaseState } from '../types'
+import { selectors, type Page } from '../navigation'
 
 export default connect(mapStateToProps)(MainPanel)
 
-type Props = {page: Page}
+type Props = { page: Page }
 
-function MainPanel (props: Props) {
-  const {page} = props
+function MainPanel(props: Props) {
+  const { page } = props
   switch (page) {
     case 'file-splash':
       return <Splash />
@@ -31,7 +31,7 @@ function MainPanel (props: Props) {
   }
 }
 
-function mapStateToProps (state: BaseState): Props {
+function mapStateToProps(state: BaseState): Props {
   return {
     page: selectors.getCurrentPage(state),
   }

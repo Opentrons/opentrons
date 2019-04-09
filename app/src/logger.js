@@ -1,6 +1,6 @@
 // @flow
 // logger
-const {ipcRenderer} = global.APP_SHELL
+const { ipcRenderer } = global.APP_SHELL
 
 // TODO(mc, 2018-05-17): put this type somewhere common to app and app-shell
 export type LogLevel =
@@ -12,7 +12,7 @@ export type LogLevel =
   | 'debug'
   | 'silly'
 
-type Logger = {[level: LogLevel]: (message: string, meta?: {}) => void}
+type Logger = { [level: LogLevel]: (message: string, meta?: {}) => void }
 
 const LEVELS: Array<LogLevel> = [
   'error',
@@ -24,16 +24,19 @@ const LEVELS: Array<LogLevel> = [
   'silly',
 ]
 
-export default function createLogger (filename: string): Logger {
+export default function createLogger(filename: string): Logger {
   const label = `app/${filename}`
 
-  return LEVELS.reduce((result, level) => ({
-    ...result,
-    [level]: (message, meta) => log(level, message, label, meta),
-  }), {})
+  return LEVELS.reduce(
+    (result, level) => ({
+      ...result,
+      [level]: (message, meta) => log(level, message, label, meta),
+    }),
+    {}
+  )
 }
 
-function log (level: LogLevel, message: string, label: string, meta?: {}) {
+function log(level: LogLevel, message: string, label: string, meta?: {}) {
   const print = `[${label}] ${level}: ${message}`
 
   // log to web console, too
@@ -52,5 +55,5 @@ function log (level: LogLevel, message: string, label: string, meta?: {}) {
   }
 
   // send to main process for logfile collection
-  ipcRenderer.send('log', {level, message, label, ...meta})
+  ipcRenderer.send('log', { level, message, label, ...meta })
 }

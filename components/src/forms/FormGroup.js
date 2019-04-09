@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {Icon} from '../icons'
+import { Icon } from '../icons'
 import styles from './forms.css'
-import type {HoverTooltipHandlers} from '../tooltips'
+import type { HoverTooltipHandlers } from '../tooltips'
 
 type Props = {
   /** text label */
@@ -20,26 +20,28 @@ type Props = {
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
 }
 
-export default function FormGroup (props: Props) {
+export default function FormGroup(props: Props) {
   const error = props.error != null
-  const className = cx(
-    props.className,
-    {
-      [styles.error]: error,
-      [styles.disabled]: !error && props.disabled,
-    }
-  )
+  const className = cx(props.className, {
+    [styles.error]: error,
+    [styles.disabled]: !error && props.disabled,
+  })
 
   return (
     <div className={className}>
-      {props.label && <div {...props.hoverTooltipHandlers} className={styles.form_group_label}>
-        {error &&
-          <div className={styles.error_icon}>
-            <Icon name='alert' />
-          </div>
-        }
-        {props.label}
-      </div>}
+      {props.label && (
+        <div
+          {...props.hoverTooltipHandlers}
+          className={styles.form_group_label}
+        >
+          {error && (
+            <div className={styles.error_icon}>
+              <Icon name="alert" />
+            </div>
+          )}
+          {props.label}
+        </div>
+      )}
       {props.children}
     </div>
   )

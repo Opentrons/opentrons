@@ -2,7 +2,7 @@
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
-import {openProtocol} from '..'
+import { openProtocol } from '..'
 
 const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
@@ -14,7 +14,7 @@ describe('protocol actions', () => {
 
   beforeEach(() => {
     _FileReader = global.FileReader
-    mockReader = {readAsText: jest.fn()}
+    mockReader = { readAsText: jest.fn() }
 
     store = mockStore({})
     global.FileReader = jest.fn(() => mockReader)
@@ -42,7 +42,7 @@ describe('protocol actions', () => {
       const result = store.dispatch(openProtocol(pythonFile))
       const expected = {
         type: 'protocol:OPEN',
-        payload: {file: pythonFile},
+        payload: { file: pythonFile },
       }
 
       expect(result).toEqual(expected)
@@ -64,13 +64,13 @@ describe('protocol actions', () => {
       expect(actions).toHaveLength(2)
       expect(actions[1]).toEqual({
         type: 'protocol:UPLOAD',
-        meta: {robot: true},
-        payload: {contents: 'file contents', data: null},
+        meta: { robot: true },
+        payload: { contents: 'file contents', data: null },
       })
     })
 
     test('dispatches protocol:UPLOAD on JSON read completion', () => {
-      const protocol = {metadata: {}}
+      const protocol = { metadata: {} }
 
       store.dispatch(openProtocol(jsonFile))
       mockReader.result = JSON.stringify(protocol)
@@ -78,7 +78,7 @@ describe('protocol actions', () => {
 
       expect(store.getActions()[1]).toEqual({
         type: 'protocol:UPLOAD',
-        meta: {robot: true},
+        meta: { robot: true },
         payload: {
           contents: mockReader.result,
           data: protocol,

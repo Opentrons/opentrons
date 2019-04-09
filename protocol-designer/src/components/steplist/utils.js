@@ -3,7 +3,10 @@ import round from 'lodash/round'
 
 const VOLUME_SIG_DIGITS_DEFAULT = 2
 
-export function formatVolume (inputVolume: ?string | ?number, sigDigits?: number = VOLUME_SIG_DIGITS_DEFAULT): string {
+export function formatVolume(
+  inputVolume: ?string | ?number,
+  sigDigits?: number = VOLUME_SIG_DIGITS_DEFAULT
+): string {
   if (typeof inputVolume === 'number') {
     // don't add digits to numbers with nothing to the right of the decimal
     const digits = inputVolume.toString().split('.')[1] ? sigDigits : 0

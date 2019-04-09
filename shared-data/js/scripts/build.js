@@ -9,14 +9,16 @@ const glob = require('glob')
 const buildDir = process.argv[2]
 
 if (!buildDir) {
-  throw new Error('build.js requires a build directory given as an argument. eg `node js/scripts/build.js path/to/build/`')
+  throw new Error(
+    'build.js requires a build directory given as an argument. eg `node js/scripts/build.js path/to/build/`'
+  )
 }
 
 let output = {}
 
 const files = glob.sync(path.join(__dirname, '../../definitions/*.json'))
 
-files.forEach((filename) => {
+files.forEach(filename => {
   const contents = require(filename)
   const labwareName = path.parse(filename).name
 
@@ -25,7 +27,4 @@ files.forEach((filename) => {
 
 const jsonOutput = JSON.stringify(output)
 
-fs.writeFileSync(
-  path.join(buildDir, 'labware.json'),
-  jsonOutput
-)
+fs.writeFileSync(path.join(buildDir, 'labware.json'), jsonOutput)

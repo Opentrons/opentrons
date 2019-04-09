@@ -1,15 +1,15 @@
 // @flow
 // attached modules container card
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {RefreshCard} from '@opentrons/components'
-import {fetchModules, makeGetRobotModules} from '../../http-api-client'
+import { RefreshCard } from '@opentrons/components'
+import { fetchModules, makeGetRobotModules } from '../../http-api-client'
 import ModulesCardContents from './ModulesCardContents'
 
-import type {State, Dispatch} from '../../types'
-import type {Module} from '../../http-api-client'
-import type {Robot} from '../../discovery'
+import type { State, Dispatch } from '../../types'
+import type { Module } from '../../http-api-client'
+import type { Robot } from '../../discovery'
 
 type OP = Robot
 
@@ -18,9 +18,9 @@ type SP = {|
   refreshing: boolean,
 |}
 
-type DP = {|refresh: () => mixed|}
+type DP = {| refresh: () => mixed |}
 
-type Props = {...$Exact<OP>, ...SP, ...DP}
+type Props = { ...$Exact<OP>, ...SP, ...DP }
 
 const TITLE = 'Modules'
 
@@ -29,7 +29,7 @@ export default connect(
   DTP
 )(AttachedModulesCard)
 
-function AttachedModulesCard (props: Props) {
+function AttachedModulesCard(props: Props) {
   return (
     <RefreshCard
       title={TITLE}
@@ -43,7 +43,7 @@ function AttachedModulesCard (props: Props) {
   )
 }
 
-function makeSTP (): (state: State, ownProps: OP) => SP {
+function makeSTP(): (state: State, ownProps: OP) => SP {
   const getRobotModules = makeGetRobotModules()
 
   return (state, ownProps) => {
@@ -57,7 +57,7 @@ function makeSTP (): (state: State, ownProps: OP) => SP {
   }
 }
 
-function DTP (dispatch: Dispatch, ownProps: OP): DP {
+function DTP(dispatch: Dispatch, ownProps: OP): DP {
   return {
     refresh: () => dispatch(fetchModules(ownProps)),
   }

@@ -12,11 +12,15 @@ import Tip from './Tip'
 import Well from './Well'
 import styles from './Labware.css'
 
-type WellProps = $Diff<React.ElementProps<typeof Well>,
-  {wellDef: *, svgOffset: *}>
+type WellProps = $Diff<
+  React.ElementProps<typeof Well>,
+  { wellDef: *, svgOffset: * }
+>
 
-type TipProps = $Diff<React.ElementProps<typeof Tip>,
-  {wellDef: *, tipVolume: *}>
+type TipProps = $Diff<
+  React.ElementProps<typeof Tip>,
+  { wellDef: *, tipVolume: * }
+>
 
 export type Props = {
   /** labware type, to get definition from shared-data */
@@ -28,31 +32,36 @@ export type Props = {
 }
 
 // TODO: Ian 2018-06-27 this fn is called a zillion times, optimize it later
-function getLabwareMetadata (labwareType: string) {
+function getLabwareMetadata(labwareType: string) {
   const labwareDefinition = getLabware(labwareType)
 
   if (!labwareDefinition) {
-    console.warn(`No labware type "${labwareType}" in labware definitions, cannot render labware`)
+    console.warn(
+      `No labware type "${labwareType}" in labware definitions, cannot render labware`
+    )
     return {}
   }
 
-  const tipVolume = labwareDefinition.metadata && labwareDefinition.metadata.tipVolume
-  return {tipVolume}
+  const tipVolume =
+    labwareDefinition.metadata && labwareDefinition.metadata.tipVolume
+  return { tipVolume }
 }
 
-function createWell (
+function createWell(
   wellName: string,
   labwareType: string,
   getTipProps?: $PropertyType<Props, 'getTipProps'>,
   getWellProps?: $PropertyType<Props, 'getWellProps'>
 ): React.Node {
-  const {tipVolume} = getLabwareMetadata(labwareType)
+  const { tipVolume } = getLabwareMetadata(labwareType)
   const isTiprack = getIsTiprack(labwareType)
   const allWells = getWellDefsForSVG(labwareType)
   const wellDef = allWells && allWells[wellName]
 
   if (!wellDef) {
-    console.warn(`No well definition for labware ${labwareType}, well ${wellName}`)
+    console.warn(
+      `No well definition for labware ${labwareType}, well ${wellName}`
+    )
     return null
   }
 
@@ -76,33 +85,39 @@ function createWell (
   }
 
   const wellProps = (getWellProps && getWellProps(wellName)) || {}
-  return <Well
-    key={wellName}
-    wellName={wellName}
-    {...wellProps}
-    {...{
-      wellDef,
-      svgOffset,
-    }}
-  />
+  return (
+    <Well
+      key={wellName}
+      wellName={wellName}
+      {...wellProps}
+      {...{
+        wellDef,
+        svgOffset,
+      }}
+    />
+  )
 }
 
 // TODO: BC 2018-10-10 this is a class component because it should probably have a sCU for performance reasons
 class Labware extends React.Component<Props> {
-  render () {
-    const {labwareType, getTipProps, getWellProps} = this.props
+  render() {
+    const { labwareType, getTipProps, getWellProps } = this.props
 
-    if (!(getLabware(labwareType))) {
+    if (!getLabware(labwareType)) {
       return <FallbackLabware />
     }
 
     const allWellNames = Object.keys(getWellDefsForSVG(labwareType))
     const isTiprack = getIsTiprack(labwareType)
-    const wells = allWellNames.map(wellName => createWell(wellName, labwareType, getTipProps, getWellProps))
+    const wells = allWellNames.map(wellName =>
+      createWell(wellName, labwareType, getTipProps, getWellProps)
+    )
 
     return (
       <g>
-        <LabwareOutline className={isTiprack ? styles.tiprack_plate_outline : null}/>
+        <LabwareOutline
+          className={isTiprack ? styles.tiprack_plate_outline : null}
+        />
         {wells}
       </g>
     )

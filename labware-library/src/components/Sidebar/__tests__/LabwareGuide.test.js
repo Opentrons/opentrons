@@ -1,7 +1,7 @@
 // @flow
 // LabwareGuide component tests
 import * as React from 'react'
-import {shallow} from 'enzyme'
+import { shallow } from 'enzyme'
 
 import LabwareGuide from '../LabwareGuide'
 

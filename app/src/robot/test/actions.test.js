@@ -1,12 +1,12 @@
 // robot actions tests
-import {actions, actionTypes} from '../'
+import { actions, actionTypes } from '../'
 
 describe('robot actions', () => {
   test('CONNECT action', () => {
     const expected = {
       type: 'robot:CONNECT',
-      payload: {name: 'ot'},
-      meta: {robotCommand: true},
+      payload: { name: 'ot' },
+      meta: { robotCommand: true },
     }
 
     expect(actions.connect('ot')).toEqual(expected)
@@ -19,7 +19,7 @@ describe('robot actions', () => {
     }
     const failure = {
       type: 'robot:CONNECT_RESPONSE',
-      payload: {error: new Error('AH')},
+      payload: { error: new Error('AH') },
     }
 
     expect(actions.connectResponse()).toEqual(success)
@@ -27,7 +27,7 @@ describe('robot actions', () => {
   })
 
   test('CLEAR_CONNECT_RESPONSE action', () => {
-    const expected = {type: 'robot:CLEAR_CONNECT_RESPONSE'}
+    const expected = { type: 'robot:CLEAR_CONNECT_RESPONSE' }
 
     expect(actions.clearConnectResponse()).toEqual(expected)
   })
@@ -35,7 +35,7 @@ describe('robot actions', () => {
   test('DISCONNECT action', () => {
     const expected = {
       type: 'robot:DISCONNECT',
-      meta: {robotCommand: true},
+      meta: { robotCommand: true },
     }
 
     expect(actions.disconnect()).toEqual(expected)
@@ -51,7 +51,7 @@ describe('robot actions', () => {
   })
 
   test('session response', () => {
-    const session = {state: 'READY'}
+    const session = { state: 'READY' }
     const error = new Error('AH')
 
     const success = {
@@ -60,7 +60,7 @@ describe('robot actions', () => {
     }
     const failure = {
       type: 'robot:SESSION_ERROR',
-      payload: {error},
+      payload: { error },
     }
 
     expect(actions.sessionResponse(null, session)).toEqual(success)
@@ -68,8 +68,8 @@ describe('robot actions', () => {
   })
 
   test('SESSION_UPDATE action', () => {
-    const update = {state: 'running', startTime: 1}
-    const expected = {type: 'robot:SESSION_UPDATE', payload: update}
+    const update = { state: 'running', startTime: 1 }
+    const expected = { type: 'robot:SESSION_UPDATE', payload: update }
 
     expect(actions.sessionUpdate(update)).toEqual(expected)
   })
@@ -101,8 +101,8 @@ describe('robot actions', () => {
   test('move tip to front action', () => {
     const expected = {
       type: actionTypes.MOVE_TO_FRONT,
-      payload: {mount: 'right'},
-      meta: {robotCommand: true},
+      payload: { mount: 'right' },
+      meta: { robotCommand: true },
     }
 
     expect(actions.moveToFront('right')).toEqual(expected)
@@ -126,8 +126,8 @@ describe('robot actions', () => {
   test('PICKUP_AND_HOME action', () => {
     const action = {
       type: 'robot:PICKUP_AND_HOME',
-      payload: {mount: 'left', slot: '5'},
-      meta: {robotCommand: true},
+      payload: { mount: 'left', slot: '5' },
+      meta: { robotCommand: true },
     }
 
     expect(actions.pickupAndHome('left', '5')).toEqual(action)
@@ -151,8 +151,8 @@ describe('robot actions', () => {
   test('DROP_TIP_AND_HOME action', () => {
     const action = {
       type: 'robot:DROP_TIP_AND_HOME',
-      payload: {mount: 'right', slot: '5'},
-      meta: {robotCommand: true},
+      payload: { mount: 'right', slot: '5' },
+      meta: { robotCommand: true },
     }
 
     expect(actions.dropTipAndHome('right', '5')).toEqual(action)
@@ -177,8 +177,8 @@ describe('robot actions', () => {
   test('CONFIRM_TIPRACK action', () => {
     const action = {
       type: 'robot:CONFIRM_TIPRACK',
-      payload: {mount: 'left', slot: '9'},
-      meta: {robotCommand: true},
+      payload: { mount: 'left', slot: '9' },
+      meta: { robotCommand: true },
     }
 
     expect(actions.confirmTiprack('left', '9')).toEqual(action)
@@ -187,7 +187,7 @@ describe('robot actions', () => {
   test('CONFIRM_TIPRACK response actions', () => {
     const success = {
       type: 'robot:CONFIRM_TIPRACK_SUCCESS',
-      payload: {tipOn: true},
+      payload: { tipOn: true },
     }
 
     const failure = {
@@ -203,8 +203,8 @@ describe('robot actions', () => {
   test('probe tip action', () => {
     const expected = {
       type: actionTypes.PROBE_TIP,
-      payload: {mount: 'left'},
-      meta: {robotCommand: true},
+      payload: { mount: 'left' },
+      meta: { robotCommand: true },
     }
 
     expect(actions.probeTip('left')).toEqual(expected)
@@ -229,7 +229,7 @@ describe('robot actions', () => {
     const expected = {
       type: 'robot:CONFIRM_PROBED',
       payload: 'left',
-      meta: {robotCommand: true},
+      meta: { robotCommand: true },
     }
 
     expect(actions.confirmProbed('left')).toEqual(expected)
@@ -238,8 +238,8 @@ describe('robot actions', () => {
   test('MOVE_TO action', () => {
     const expected = {
       type: 'robot:MOVE_TO',
-      payload: {mount: 'left', slot: '3'},
-      meta: {robotCommand: true},
+      payload: { mount: 'left', slot: '3' },
+      meta: { robotCommand: true },
     }
 
     expect(actions.moveTo('left', '3')).toEqual(expected)
@@ -263,8 +263,8 @@ describe('robot actions', () => {
   test('JOG action', () => {
     const expected = {
       type: 'robot:JOG',
-      payload: {mount: 'left', axis: 'x', direction: -1, step: 10},
-      meta: {robotCommand: true},
+      payload: { mount: 'left', axis: 'x', direction: -1, step: 10 },
+      meta: { robotCommand: true },
     }
 
     expect(actions.jog('left', 'x', -1, 10)).toEqual(expected)
@@ -288,8 +288,8 @@ describe('robot actions', () => {
   test('UPDATE_OFFSET action', () => {
     const expected = {
       type: 'robot:UPDATE_OFFSET',
-      payload: {mount: 'left', slot: '2'},
-      meta: {robotCommand: true},
+      payload: { mount: 'left', slot: '2' },
+      meta: { robotCommand: true },
     }
 
     expect(actions.updateOffset('left', '2')).toEqual(expected)
@@ -313,7 +313,7 @@ describe('robot actions', () => {
   test('confirm labware action', () => {
     const expected = {
       type: actionTypes.CONFIRM_LABWARE,
-      payload: {labware: '2'},
+      payload: { labware: '2' },
     }
 
     expect(actions.confirmLabware('2')).toEqual(expected)
@@ -322,14 +322,14 @@ describe('robot actions', () => {
   test('run action', () => {
     const expected = {
       type: actionTypes.RUN,
-      meta: {robotCommand: true},
+      meta: { robotCommand: true },
     }
 
     expect(actions.run()).toEqual(expected)
   })
 
   test('run response action', () => {
-    const success = {type: actionTypes.RUN_RESPONSE, error: false}
+    const success = { type: actionTypes.RUN_RESPONSE, error: false }
     const failure = {
       type: actionTypes.RUN_RESPONSE,
       payload: new Error('AH'),
@@ -343,14 +343,14 @@ describe('robot actions', () => {
   test('pause action', () => {
     const expected = {
       type: actionTypes.PAUSE,
-      meta: {robotCommand: true},
+      meta: { robotCommand: true },
     }
 
     expect(actions.pause()).toEqual(expected)
   })
 
   test('pause response action', () => {
-    const success = {type: actionTypes.PAUSE_RESPONSE, error: false}
+    const success = { type: actionTypes.PAUSE_RESPONSE, error: false }
     const failure = {
       type: actionTypes.PAUSE_RESPONSE,
       payload: new Error('AH'),
@@ -364,14 +364,14 @@ describe('robot actions', () => {
   test('resume action', () => {
     const expected = {
       type: actionTypes.RESUME,
-      meta: {robotCommand: true},
+      meta: { robotCommand: true },
     }
 
     expect(actions.resume()).toEqual(expected)
   })
 
   test('resume response action', () => {
-    const success = {type: actionTypes.RESUME_RESPONSE, error: false}
+    const success = { type: actionTypes.RESUME_RESPONSE, error: false }
     const failure = {
       type: actionTypes.RESUME_RESPONSE,
       payload: new Error('AHHH'),
@@ -385,14 +385,14 @@ describe('robot actions', () => {
   test('cancel action', () => {
     const expected = {
       type: actionTypes.CANCEL,
-      meta: {robotCommand: true},
+      meta: { robotCommand: true },
     }
 
     expect(actions.cancel()).toEqual(expected)
   })
 
   test('cancel response action', () => {
-    const success = {type: actionTypes.CANCEL_RESPONSE, error: false}
+    const success = { type: actionTypes.CANCEL_RESPONSE, error: false }
     const failure = {
       type: actionTypes.CANCEL_RESPONSE,
       payload: new Error('AHHH'),
@@ -406,12 +406,12 @@ describe('robot actions', () => {
   test('robot:REFRESH_SESSION action', () => {
     expect(actions.refreshSession()).toEqual({
       type: 'robot:REFRESH_SESSION',
-      meta: {robotCommand: true},
+      meta: { robotCommand: true },
     })
   })
 
   test('tick run time action', () => {
-    const expected = {type: actionTypes.TICK_RUN_TIME}
+    const expected = { type: actionTypes.TICK_RUN_TIME }
 
     expect(actions.tickRunTime()).toEqual(expected)
   })

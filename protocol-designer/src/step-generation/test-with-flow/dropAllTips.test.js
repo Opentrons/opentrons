@@ -1,6 +1,6 @@
 // @flow
-import type {RobotState} from '../types'
-import {createRobotState, commandCreatorNoErrors} from './fixtures'
+import type { RobotState } from '../types'
+import { createRobotState, commandCreatorNoErrors } from './fixtures'
 import _dropAllTips from '../commandCreators/atomic/dropAllTips'
 
 const dropAllTips = commandCreatorNoErrors(_dropAllTips)
@@ -20,7 +20,7 @@ beforeEach(() => {
   })
 })
 
-function expectNoTipsRemaining (robotState: RobotState) {
+function expectNoTipsRemaining(robotState: RobotState) {
   const pipetteIds = Object.keys(robotState.tipState.pipettes)
   pipetteIds.forEach(pipetteId => {
     expect(robotState.tipState.pipettes[pipetteId]).toBe(false)
@@ -51,7 +51,7 @@ describe('drop all tips', () => {
 
     const result = dropAllTips()(initialRobotState)
     expect(result.commands).toHaveLength(1)
-    expect(result.commands[0].params).toMatchObject({pipette: p300SingleId})
+    expect(result.commands[0].params).toMatchObject({ pipette: p300SingleId })
 
     expectNoTipsRemaining(result.robotState)
   })

@@ -1,14 +1,14 @@
 // @flow
-import {createSelector} from 'reselect'
+import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
 import isEmpty from 'lodash/isEmpty'
-import {getFlowRateDefaultsAllPipettes} from '@opentrons/shared-data'
-import {getFileMetadata} from './fileFields'
-import {getInitialRobotState, getRobotStateTimeline} from './commands'
-import {selectors as dismissSelectors} from '../../dismiss'
-import {selectors as ingredSelectors} from '../../labware-ingred/selectors'
-import {selectors as stepFormSelectors} from '../../step-forms'
-import {selectors as uiLabwareSelectors} from '../../ui/labware'
+import { getFlowRateDefaultsAllPipettes } from '@opentrons/shared-data'
+import { getFileMetadata } from './fileFields'
+import { getInitialRobotState, getRobotStateTimeline } from './commands'
+import { selectors as dismissSelectors } from '../../dismiss'
+import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
+import { selectors as stepFormSelectors } from '../../step-forms'
+import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
@@ -18,16 +18,17 @@ import type {
   FilePipetteV1 as FilePipette,
   FileLabwareV1 as FileLabware,
 } from '@opentrons/shared-data'
-import type {BaseState} from '../../types'
-import type {PDProtocolFile} from '../../file-types'
-import type {LabwareData, PipetteData} from '../../step-generation'
+import type { BaseState } from '../../types'
+import type { PDProtocolFile } from '../../file-types'
+import type { LabwareData, PipetteData } from '../../step-generation'
 
 // TODO LATER Ian 2018-02-28 deal with versioning
 const protocolSchemaVersion = '1.0.0'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
-if (isEmpty(process.env.OT_PD_VERSION)) console.warn('Could not find application version!')
+if (isEmpty(process.env.OT_PD_VERSION))
+  console.warn('Could not find application version!')
 const applicationVersion = process.env.OT_PD_VERSION
 
 // Internal release date: this should never be read programatically,
@@ -36,8 +37,12 @@ const applicationVersion = process.env.OT_PD_VERSION
 const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
 
 const executionDefaults: $PropertyType<PDProtocolFile, 'default-values'> = {
-  'aspirate-flow-rate': getFlowRateDefaultsAllPipettes('defaultAspirateFlowRate'),
-  'dispense-flow-rate': getFlowRateDefaultsAllPipettes('defaultDispenseFlowRate'),
+  'aspirate-flow-rate': getFlowRateDefaultsAllPipettes(
+    'defaultAspirateFlowRate'
+  ),
+  'dispense-flow-rate': getFlowRateDefaultsAllPipettes(
+    'defaultDispenseFlowRate'
+  ),
   'aspirate-mm-from-bottom': DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   'dispense-mm-from-bottom': DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   'touch-tip-mm-from-top': DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
@@ -64,9 +69,9 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
     savedStepForms,
     orderedStepIds,
     pipetteInvariantProperties,
-    labwareNamesById,
+    labwareNamesById
   ) => {
-    const {author, description, created} = fileMetadata
+    const { author, description, created } = fileMetadata
     const name = fileMetadata['protocol-name'] || 'untitled'
     const lastModified = fileMetadata['last-modified']
 
@@ -94,7 +99,9 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
     // TODO: Ian 2018-07-10 allow user to save steps in JSON file, even if those
     // step never have saved forms.
     // (We could just export the `steps` reducer, but we've sunset it)
-    const savedOrderedStepIds = orderedStepIds.filter(stepId => savedStepForms[stepId])
+    const savedOrderedStepIds = orderedStepIds.filter(
+      stepId => savedStepForms[stepId]
+    )
 
     return {
       'protocol-schema': protocolSchemaVersion,
@@ -122,7 +129,8 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
         data: {
           pipetteTiprackAssignments: mapValues(
             pipetteInvariantProperties,
-            (p: $Values<typeof pipetteInvariantProperties>): ?string => p.tiprackModel
+            (p: $Values<typeof pipetteInvariantProperties>): ?string =>
+              p.tiprackModel
           ),
           dismissedWarnings,
           ingredients,

@@ -1,15 +1,18 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {withRouter} from 'react-router'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router'
 
-import {TitledList} from '@opentrons/components'
+import { TitledList } from '@opentrons/components'
 import LabwareListItem from './LabwareListItem'
 
-import {selectors as robotSelectors, actions as robotActions} from '../../robot'
+import {
+  selectors as robotSelectors,
+  actions as robotActions,
+} from '../../robot'
 
-import type {State, Dispatch} from '../../types'
-import type {Labware, Mount} from '../../robot'
+import type { State, Dispatch } from '../../types'
+import type { Labware, Mount } from '../../robot'
 
 type SP = {|
   disabled: boolean,
@@ -18,7 +21,7 @@ type SP = {|
   _deckPopulated: boolean,
 |}
 
-type DP = {|dispatch: Dispatch|}
+type DP = {| dispatch: Dispatch |}
 
 type Props = {
   labware: Array<Labware>,
@@ -34,8 +37,8 @@ export default withRouter(
   )(LabwareList)
 )
 
-function LabwareList (props: Props) {
-  const {labware, disabled, setLabware} = props
+function LabwareList(props: Props) {
+  const { labware, disabled, setLabware } = props
 
   return (
     <TitledList title="labware" disabled={disabled}>
@@ -52,7 +55,7 @@ function LabwareList (props: Props) {
   )
 }
 
-function mapStateToProps (state: State): SP {
+function mapStateToProps(state: State): SP {
   return {
     labware: robotSelectors.getNotTipracks(state),
     disabled: !robotSelectors.getTipracksConfirmed(state),
@@ -61,9 +64,9 @@ function mapStateToProps (state: State): SP {
   }
 }
 
-function mergeProps (stateProps: SP, dispatchProps: DP): Props {
-  const {labware, disabled, _calibrator, _deckPopulated} = stateProps
-  const {dispatch} = dispatchProps
+function mergeProps(stateProps: SP, dispatchProps: DP): Props {
+  const { labware, disabled, _calibrator, _deckPopulated } = stateProps
+  const { dispatch } = dispatchProps
 
   return {
     labware,

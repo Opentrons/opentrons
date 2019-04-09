@@ -1,14 +1,18 @@
 // @flow
 // http api client module for /calibration/**
-import {createSelector} from 'reselect'
+import { createSelector } from 'reselect'
 
-import type {OutputSelector} from 'reselect'
-import type {State, Action, ThunkPromiseAction} from '../types'
-import type {BaseRobot, RobotService, Mount} from '../robot'
-import type {ApiCall, ApiRequestError} from './types'
-import type {ApiRequestAction, ApiSuccessAction, ApiFailureAction} from './actions'
+import type { OutputSelector } from 'reselect'
+import type { State, Action, ThunkPromiseAction } from '../types'
+import type { BaseRobot, RobotService, Mount } from '../robot'
+import type { ApiCall, ApiRequestError } from './types'
+import type {
+  ApiRequestAction,
+  ApiSuccessAction,
+  ApiFailureAction,
+} from './actions'
 
-import {apiRequest, apiSuccess, apiFailure, clearApiResponse} from './actions'
+import { apiRequest, apiSuccess, apiFailure, clearApiResponse } from './actions'
 import client from './client'
 
 export type JogAxis = 'x' | 'y' | 'z'
@@ -47,9 +51,7 @@ type DeckCalResponse = {
   message: string,
 }
 
-type CalPath =
-  | 'calibration/deck/start'
-  | 'calibration/deck'
+type CalPath = 'calibration/deck/start' | 'calibration/deck'
 
 type CalRequest = DeckStartRequest | DeckCalRequest
 
@@ -79,19 +81,19 @@ const DECK_START: 'calibration/deck/start' = 'calibration/deck/start'
 // TODO(mc, 2018-07-05): flow helper until we have one reducer, since
 // p === 'constant' checks but p === CONSTANT does not, even if
 // CONSTANT is defined as `const CONSTANT: 'constant' = 'constant'`
-function getCalPath (p: string): ?CalPath {
+function getCalPath(p: string): ?CalPath {
   if (p === 'calibration/deck/start' || p === 'calibration/deck') return p
 
   return null
 }
 
-export function startDeckCalibration (
+export function startDeckCalibration(
   robot: RobotService,
   force: boolean = false
 ): ThunkPromiseAction {
-  const request = {force}
+  const request = { force }
 
-  return (dispatch) => {
+  return dispatch => {
     dispatch(apiRequest(robot, DECK_START, request))
 
     return client(robot, 'POST', DECK_START, request)
@@ -103,7 +105,7 @@ export function startDeckCalibration (
   }
 }
 
-export function deckCalibrationCommand (
+export function deckCalibrationCommand(
   robot: RobotService,
   request: DeckCalRequest
 ): ThunkPromiseAction {
@@ -118,7 +120,7 @@ export function deckCalibrationCommand (
 
     dispatch(apiRequest(robot, DECK, request))
 
-    return client(robot, 'POST', DECK, {...request, token})
+    return client(robot, 'POST', DECK, { ...request, token })
       .then(
         (res: DeckCalResponse) => apiSuccess(robot, DECK, res),
         (err: ApiRequestError) => apiFailure(robot, DECK, err)
@@ -127,24 +129,26 @@ export function deckCalibrationCommand (
   }
 }
 
-export function calibrationReducer (
-  state: ?CalState,
-  action: Action
-): CalState {
+export function calibrationReducer(state: ?CalState, action: Action): CalState {
   if (!state) return {}
 
   switch (action.type) {
     case 'api:REQUEST': {
       const path = getCalPath(action.payload.path)
       if (!path) return state
-      const {payload: {request, robot: {name}}} = action
+      const {
+        payload: {
+          request,
+          robot: { name },
+        },
+      } = action
       const stateByName = state[name] || {}
 
       return {
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {request, inProgress: true, response: null, error: null},
+          [path]: { request, inProgress: true, response: null, error: null },
         },
       }
     }
@@ -152,7 +156,12 @@ export function calibrationReducer (
     case 'api:SUCCESS': {
       const path = getCalPath(action.payload.path)
       if (!path) return state
-      const {payload: {response, robot: {name}}} = action
+      const {
+        payload: {
+          response,
+          robot: { name },
+        },
+      } = action
       const stateByName = state[name] || {}
       const stateByPath = stateByName[path] || {}
 
@@ -160,7 +169,7 @@ export function calibrationReducer (
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, response, inProgress: false, error: null},
+          [path]: { ...stateByPath, response, inProgress: false, error: null },
         },
       }
     }
@@ -168,7 +177,12 @@ export function calibrationReducer (
     case 'api:FAILURE': {
       const path = getCalPath(action.payload.path)
       if (!path) return state
-      const {payload: {error, robot: {name}}} = action
+      const {
+        payload: {
+          error,
+          robot: { name },
+        },
+      } = action
       const stateByName = state[name] || {}
       const stateByPath = stateByName[path] || {}
 
@@ -176,7 +190,7 @@ export function calibrationReducer (
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, error, inProgress: false},
+          [path]: { ...stateByPath, error, inProgress: false },
         },
       }
     }
@@ -184,7 +198,11 @@ export function calibrationReducer (
     case 'api:CLEAR_RESPONSE': {
       const path = getCalPath(action.payload.path)
       if (!path) return state
-      const {payload: {robot: {name}}} = action
+      const {
+        payload: {
+          robot: { name },
+        },
+      } = action
       const stateByName = state[name] || {}
       const stateByPath = stateByName[path] || {}
 
@@ -192,7 +210,7 @@ export function calibrationReducer (
         ...state,
         [name]: {
           ...stateByName,
-          [path]: {...stateByPath, error: null, response: null},
+          [path]: { ...stateByPath, error: null, response: null },
         },
       }
     }
@@ -201,8 +219,12 @@ export function calibrationReducer (
   return state
 }
 
-export function makeGetDeckCalibrationStartState () {
-  const sel: OutputSelector<State, BaseRobot, DeckCalStartState> = createSelector(
+export function makeGetDeckCalibrationStartState() {
+  const sel: OutputSelector<
+    State,
+    BaseRobot,
+    DeckCalStartState
+  > = createSelector(
     getRobotCalState,
     getStartStateFromCalState
   )
@@ -210,8 +232,12 @@ export function makeGetDeckCalibrationStartState () {
   return sel
 }
 
-export function makeGetDeckCalibrationCommandState () {
-  const sel: OutputSelector<State, BaseRobot, DeckCalCommandState> = createSelector(
+export function makeGetDeckCalibrationCommandState() {
+  const sel: OutputSelector<
+    State,
+    BaseRobot,
+    DeckCalCommandState
+  > = createSelector(
     getRobotCalState,
     getDeckStateFromCalState
   )
@@ -219,14 +245,14 @@ export function makeGetDeckCalibrationCommandState () {
   return sel
 }
 
-function getRobotCalState (state: State, props: BaseRobot): RobotCalState {
+function getRobotCalState(state: State, props: BaseRobot): RobotCalState {
   return state.api.calibration[props.name] || {}
 }
 
-function getStartStateFromCalState (state: RobotCalState): DeckCalStartState {
-  return state[DECK_START] || {inProgress: false}
+function getStartStateFromCalState(state: RobotCalState): DeckCalStartState {
+  return state[DECK_START] || { inProgress: false }
 }
 
-function getDeckStateFromCalState (state: RobotCalState): DeckCalCommandState {
-  return state[DECK] || {inProgress: false}
+function getDeckStateFromCalState(state: RobotCalState): DeckCalCommandState {
+  return state[DECK] || { inProgress: false }
 }

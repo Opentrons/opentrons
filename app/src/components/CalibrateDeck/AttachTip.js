@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
-import type {PipetteModelSpecs} from '@opentrons/shared-data'
-import type {CalibrateDeckStartedProps, CalibrationStep} from './types'
-import {PrimaryButton} from '@opentrons/components'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type { CalibrateDeckStartedProps, CalibrationStep } from './types'
+import { PrimaryButton } from '@opentrons/components'
 
 import styles from './styles.css'
 
@@ -17,7 +17,7 @@ type DiagramProps = {
 
 type Channels = 'single' | 'multi'
 
-const DIAGRAMS: {[step: CalibrationStep]: {[Channels]: string}} = {
+const DIAGRAMS: { [step: CalibrationStep]: { [Channels]: string } } = {
   '1': {
     single: require('./images/attach-tip-single@3x.png'),
     multi: require('./images/attach-tip-multi@3x.png'),
@@ -28,11 +28,9 @@ const DIAGRAMS: {[step: CalibrationStep]: {[Channels]: string}} = {
   },
 }
 
-export default function AttachTipModal (props: Props) {
+export default function AttachTipModal(props: Props) {
   const multi = props.pipette.channels === 8
-  const tipLocation = multi
-    ? 'very first channel at front of'
-    : ''
+  const tipLocation = multi ? 'very first channel at front of' : ''
 
   const diagramSrc = getDiagramSrc(props)
 
@@ -49,8 +47,11 @@ export default function AttachTipModal (props: Props) {
     instructions = (
       <span>
         <p>Remove the GEB tip from the pipette. </p>
-        <p>You must restart your robot to finish the initial robot calibration process
-        and have the new settings take effect. It may take several minutes for your robot to restart.</p>
+        <p>
+          You must restart your robot to finish the initial robot calibration
+          process and have the new settings take effect. It may take several
+          minutes for your robot to restart.
+        </p>
       </span>
     )
     buttonText = 'finish and restart robot'
@@ -60,10 +61,7 @@ export default function AttachTipModal (props: Props) {
     <div className={styles.attach_tip_contents}>
       <div className={styles.attach_tip_instructions}>
         {instructions}
-        <PrimaryButton
-          title={buttonText}
-          onClick={props.proceed}
-        >
+        <PrimaryButton title={buttonText} onClick={props.proceed}>
           {buttonText}
         </PrimaryButton>
       </div>
@@ -74,11 +72,9 @@ export default function AttachTipModal (props: Props) {
   )
 }
 
-function getDiagramSrc (props: DiagramProps): string {
-  const {calibrationStep, pipette} = props
-  const channelsKey = pipette.channels === 8
-    ? 'multi'
-    : 'single'
+function getDiagramSrc(props: DiagramProps): string {
+  const { calibrationStep, pipette } = props
+  const channelsKey = pipette.channels === 8 ? 'multi' : 'single'
 
   return DIAGRAMS[calibrationStep][channelsKey]
 }

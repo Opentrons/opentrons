@@ -1,12 +1,12 @@
 // @flow
 import * as React from 'react'
 import FlowRateInput from './FlowRateInput'
-import {connect} from 'react-redux'
-import {actions as steplistActions} from '../../../../steplist'
-import {selectors as stepFormSelectors} from '../../../../step-forms'
-import {getDisabledFields} from '../../../../steplist/formLevel'
-import type {StepFieldName} from '../../../../steplist/fieldLevel'
-import type {BaseState, ThunkDispatch} from '../../../../types'
+import { connect } from 'react-redux'
+import { actions as steplistActions } from '../../../../steplist'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { getDisabledFields } from '../../../../steplist/formLevel'
+import type { StepFieldName } from '../../../../steplist/fieldLevel'
+import type { BaseState, ThunkDispatch } from '../../../../types'
 
 type Props = React.ElementProps<typeof FlowRateInput> & {
   innerKey: string,
@@ -24,23 +24,24 @@ type DP = {
   updateValue: $PropertyType<Props, 'updateValue'>,
 }
 
-type SP = $Diff<Props, {...DP, ...OP}>
+type SP = $Diff<Props, { ...DP, ...OP }>
 
 // Add a key to force re-constructing component when values change
-function FlowRateInputWithKey (props: Props) {
-  const {innerKey, ...otherProps} = props
+function FlowRateInputWithKey(props: Props) {
+  const { innerKey, ...otherProps } = props
   return <FlowRateInput key={innerKey} {...otherProps} />
 }
 
-function mapStateToProps (state: BaseState, ownProps: OP): SP {
-  const {flowRateType, pipetteFieldName, name} = ownProps
+function mapStateToProps(state: BaseState, ownProps: OP): SP {
+  const { flowRateType, pipetteFieldName, name } = ownProps
 
   const formData = stepFormSelectors.getUnsavedForm(state)
 
   const pipetteId = formData ? formData[pipetteFieldName] : null
-  const pipette = (pipetteId != null)
-    ? stepFormSelectors.getPipetteEntities(state)[pipetteId]
-    : null
+  const pipette =
+    pipetteId != null
+      ? stepFormSelectors.getPipetteEntities(state)[pipetteId]
+      : null
   const pipetteDisplayName = pipette ? pipette.spec.displayName : 'pipette'
 
   let defaultFlowRate
@@ -71,16 +72,20 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   }
 }
 
-function mapDispatchToProps (dispatch: ThunkDispatch<*>, ownProps: OP): DP {
+function mapDispatchToProps(dispatch: ThunkDispatch<*>, ownProps: OP): DP {
   return {
-    updateValue: (flowRate: ?number) => dispatch(
-      steplistActions.changeFormInput({
-        update: {
-          [ownProps.name]: flowRate,
-        },
-      })
-    ),
+    updateValue: (flowRate: ?number) =>
+      dispatch(
+        steplistActions.changeFormInput({
+          update: {
+            [ownProps.name]: flowRate,
+          },
+        })
+      ),
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(FlowRateInputWithKey)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(FlowRateInputWithKey)

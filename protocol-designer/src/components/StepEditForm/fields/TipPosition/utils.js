@@ -6,15 +6,18 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../../constants'
 
-import {getIsTouchTipField, type TipOffsetFields} from '../../../../form-types'
+import {
+  getIsTouchTipField,
+  type TipOffsetFields,
+} from '../../../../form-types'
 
 // TODO: Ian + Brian 2019-02-13 this should switch on stepType, not use field
 // name to infer step type!
-export function getDefaultMmFromBottom (args: {
+export function getDefaultMmFromBottom(args: {
   fieldName: TipOffsetFields,
   wellHeightMM: number,
 }): number {
-  const {fieldName, wellHeightMM} = args
+  const { fieldName, wellHeightMM } = args
   switch (fieldName) {
     case 'aspirate_mmFromBottom':
       return DEFAULT_MM_FROM_BOTTOM_ASPIRATE
@@ -27,7 +30,8 @@ export function getDefaultMmFromBottom (args: {
       // touch tip fields
       assert(
         getIsTouchTipField(fieldName),
-        `getDefaultMmFromBottom fn does not know what to do with field ${fieldName}`)
+        `getDefaultMmFromBottom fn does not know what to do with field ${fieldName}`
+      )
       return DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP + wellHeightMM
   }
 }

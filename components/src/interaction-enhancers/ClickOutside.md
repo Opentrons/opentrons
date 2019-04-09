@@ -3,17 +3,24 @@
 The `ref` parameter in the `children` function must be passed into the wrapped child component.
 
 ```js
-initialState = {timesClickedOutside: 0}
+initialState = { timesClickedOutside: 0 }
 
-function handleClickOutside () {
-  setState({timesClickedOutside: state.timesClickedOutside + 1})
+function handleClickOutside() {
+  setState({ timesClickedOutside: state.timesClickedOutside + 1 })
 }
 
-<ClickOutside onClickOutside={handleClickOutside}>
-  {({ref}) =>
-    <div ref={ref} style={{padding: '1em', backgroundColor: '#dadada', border: '2px solid blue'}}>
+;<ClickOutside onClickOutside={handleClickOutside}>
+  {({ ref }) => (
+    <div
+      ref={ref}
+      style={{
+        padding: '1em',
+        backgroundColor: '#dadada',
+        border: '2px solid blue',
+      }}
+    >
       You clicked outside this box {state.timesClickedOutside} times
     </div>
-  }
+  )}
 </ClickOutside>
 ```

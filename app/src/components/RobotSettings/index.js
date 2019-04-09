@@ -2,7 +2,7 @@
 // robot status panel with connect button
 import * as React from 'react'
 
-import {CardContainer, CardRow} from '../layout'
+import { CardContainer, CardRow } from '../layout'
 import StatusCard from './StatusCard'
 import InformationCard from './InformationCard'
 import ControlsCard from './ControlsCard'
@@ -10,7 +10,7 @@ import ConnectionCard from './ConnectionCard'
 import AdvancedSettingsCard from './AdvancedSettingsCard'
 import ConnectAlertModal from './ConnectAlertModal'
 
-import type {ViewableRobot} from '../../discovery'
+import type { ViewableRobot } from '../../discovery'
 
 type Props = {
   robot: ViewableRobot,
@@ -19,8 +19,8 @@ type Props = {
   resetUrl: string,
 }
 
-export default function RobotSettings (props: Props) {
-  const {robot, updateUrl, calibrateDeckUrl, resetUrl} = props
+export default function RobotSettings(props: Props) {
+  const { robot, updateUrl, calibrateDeckUrl, resetUrl } = props
 
   return (
     <CardContainer>
@@ -43,4 +43,4 @@ export default function RobotSettings (props: Props) {
   )
 }
 
-export {ConnectAlertModal}
+export { ConnectAlertModal }

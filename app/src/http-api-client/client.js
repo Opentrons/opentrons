@@ -1,21 +1,21 @@
 // @flow
 // robot HTTP API client
 
-import type {Error} from '../types'
-import type {RobotService} from '../robot'
-import type {ApiRequestError} from './types'
+import type { Error } from '../types'
+import type { RobotService } from '../robot'
+import type { ApiRequestError } from './types'
 
 export type Method = 'GET' | 'POST' | 'PATCH'
 
 // TODO(mc, 2018-04-30): deprecate importing this type from client
-export type {ApiRequestError}
+export type { ApiRequestError }
 
 // not a real Error or Response so it can be copied across worker boundries
-function ResponseError (
+function ResponseError(
   response: Response,
-  body: ?{message: ?string}
+  body: ?{ message: ?string }
 ): ApiRequestError {
-  const {status, statusText, url} = response
+  const { status, statusText, url } = response
   const message = (body && body.message) || `${status} ${statusText}`
 
   return {
@@ -28,13 +28,13 @@ function ResponseError (
 }
 
 // not a real Error so it can be copied across worker boundries
-export function FetchError (error: Error): ApiRequestError {
-  return {name: error.name, message: error.message}
+export function FetchError(error: Error): ApiRequestError {
+  return { name: error.name, message: error.message }
 }
 
 const JSON_CONTENT_TYPE = 'application/json'
 
-export default function client<T, U> (
+export default function client<T, U>(
   robot: RobotService,
   method: Method,
   path: string,
@@ -58,7 +58,7 @@ export default function client<T, U> (
   return fetch(url, options).then(jsonFromResponse, fetchErrorFromError)
 }
 
-function jsonFromResponse<T> (response: Response): Promise<T> {
+function jsonFromResponse<T>(response: Response): Promise<T> {
   return response
     .json()
     .then(
@@ -66,12 +66,12 @@ function jsonFromResponse<T> (response: Response): Promise<T> {
         response.ok
           ? (body: T)
           : Promise.reject(
-            ResponseError(response, (body: ?{message: ?string}))
-          ),
+              ResponseError(response, (body: ?{ message: ?string }))
+            ),
       fetchErrorFromError
     )
 }
 
-function fetchErrorFromError (error: Error): Promise<*> {
+function fetchErrorFromError(error: Error): Promise<*> {
   return Promise.reject(FetchError(error))
 }

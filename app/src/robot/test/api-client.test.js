@@ -1,13 +1,16 @@
 // tests for the api client
 import functions from 'lodash/functions'
 import omit from 'lodash/omit'
-import {push} from 'react-router-redux'
+import { push } from 'react-router-redux'
 
-import {mockResolvedValue, mockRejectedValue} from '../../../__util__/mock-promise'
-import {delay} from '../../util'
+import {
+  mockResolvedValue,
+  mockRejectedValue,
+} from '../../../__util__/mock-promise'
+import { delay } from '../../util'
 import client from '../api-client/client'
 import RpcClient from '../../rpc/client'
-import {NAME, actions, constants} from '../'
+import { NAME, actions, constants } from '../'
 
 import MockSession from './__mocks__/session'
 import MockCalibrationMangager from './__mocks__/calibration-manager'
@@ -24,14 +27,14 @@ describe('api client', () => {
 
   let _global = {}
   beforeAll(() => {
-    _global = {setInterval, clearInterval}
+    _global = { setInterval, clearInterval }
 
     global.setInterval = jest.fn()
     global.clearInterval = jest.fn()
   })
 
   afterAll(() => {
-    Object.keys(_global).forEach((method) => (global[method] = _global[method]))
+    Object.keys(_global).forEach(method => (global[method] = _global[method]))
   })
 
   beforeEach(() => {
@@ -42,7 +45,7 @@ describe('api client', () => {
     calibrationManager = MockCalibrationMangager()
 
     // mock rpc client
-    sessionManager = {session}
+    sessionManager = { session }
     rpcClient = {
       // TODO(mc, 2017-09-22): these jest promise mocks are causing promise
       // rejection warnings. These warnings are Jest's fault for nextTick stuff
@@ -102,15 +105,17 @@ describe('api client', () => {
   const sendDisconnect = () => sendToClient(STATE, actions.disconnect())
 
   const sendNotification = (topic, payload) => {
-    expect(rpcClient.on)
-      .toHaveBeenCalledWith('notification', expect.any(Function))
+    expect(rpcClient.on).toHaveBeenCalledWith(
+      'notification',
+      expect.any(Function)
+    )
 
-    const handler = rpcClient.on.mock.calls.find((args) => {
+    const handler = rpcClient.on.mock.calls.find(args => {
       return args[0] === 'notification'
     })[1]
 
     // only send properties, not methods
-    handler({topic, payload: omit(payload, functions(payload))})
+    handler({ topic, payload: omit(payload, functions(payload)) })
   }
 
   describe('connect and disconnect', () => {
@@ -119,11 +124,10 @@ describe('api client', () => {
 
       expect(RpcClient).toHaveBeenCalledTimes(0)
 
-      return sendConnect()
-        .then(() => {
-          expect(RpcClient).toHaveBeenCalledWith(`ws://${ROBOT_IP}:31950`)
-          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
-        })
+      return sendConnect().then(() => {
+        expect(RpcClient).toHaveBeenCalledWith(`ws://${ROBOT_IP}:31950`)
+        expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+      })
     })
 
     test('dispatch CONNECT_RESPONSE error if connection fails', () => {
@@ -132,8 +136,9 @@ describe('api client', () => {
 
       mockRejectedValue(RpcClient, error)
 
-      return sendConnect()
-        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
+      return sendConnect().then(() =>
+        expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+      )
     })
 
     test('send CONNECT_RESPONSE w pollHealth: false if RPC.monitoring', () => {
@@ -141,18 +146,18 @@ describe('api client', () => {
 
       rpcClient.monitoring = true
 
-      return sendConnect()
-        .then(() => {
-          expect(RpcClient).toHaveBeenCalledWith(`ws://${ROBOT_IP}:31950`)
-          expect(dispatch).toHaveBeenCalledWith(expectedResponse)
-        })
+      return sendConnect().then(() => {
+        expect(RpcClient).toHaveBeenCalledWith(`ws://${ROBOT_IP}:31950`)
+        expect(dispatch).toHaveBeenCalledWith(expectedResponse)
+      })
     })
 
     test('dispatch DISCONNECT_RESPONSE if already disconnected', () => {
       const expected = actions.disconnectResponse()
 
-      return sendDisconnect()
-        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+      return sendDisconnect().then(() =>
+        expect(dispatch).toHaveBeenCalledWith(expected)
+      )
     })
 
     test('disconnects RPC client on DISCONNECT message', () => {
@@ -169,16 +174,18 @@ describe('api client', () => {
       const expected = push('/run')
       session.state = constants.RUNNING
 
-      return sendConnect()
-        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+      return sendConnect().then(() =>
+        expect(dispatch).toHaveBeenCalledWith(expected)
+      )
     })
 
     test('dispatch push to /run if connect to paused session', () => {
       const expected = push('/run')
       session.state = constants.PAUSED
 
-      return sendConnect()
-        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+      return sendConnect().then(() =>
+        expect(dispatch).toHaveBeenCalledWith(expected)
+      )
     })
   })
 
@@ -312,8 +319,9 @@ describe('api client', () => {
     })
 
     test('dispatches sessionResponse on connect', () => {
-      return sendConnect()
-        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedInitial))
+      return sendConnect().then(() =>
+        expect(dispatch).toHaveBeenCalledWith(expectedInitial)
+      )
     })
 
     test('dispatches sessionResponse on full session notification', () => {
@@ -330,21 +338,25 @@ describe('api client', () => {
 
       sessionManager.session = null
 
-      return sendConnect()
-        .then(() => expect(dispatch).not.toHaveBeenCalledWith(notExpected))
+      return sendConnect().then(() =>
+        expect(dispatch).not.toHaveBeenCalledWith(notExpected)
+      )
     })
 
     test('maps api session commands and command log to commands', () => {
-      const expected = actions.sessionResponse(null, expect.objectContaining({
-        protocolCommands: [0, 4],
-        protocolCommandsById: {
-          0: {id: 0, description: 'a', handledAt: 0, children: [1]},
-          1: {id: 1, description: 'b', handledAt: 1, children: [2, 3]},
-          2: {id: 2, description: 'c', handledAt: 2, children: []},
-          3: {id: 3, description: 'd', handledAt: null, children: []},
-          4: {id: 4, description: 'e', handledAt: null, children: []},
-        },
-      }))
+      const expected = actions.sessionResponse(
+        null,
+        expect.objectContaining({
+          protocolCommands: [0, 4],
+          protocolCommandsById: {
+            0: { id: 0, description: 'a', handledAt: 0, children: [1] },
+            1: { id: 1, description: 'b', handledAt: 1, children: [2, 3] },
+            2: { id: 2, description: 'c', handledAt: 2, children: [] },
+            3: { id: 3, description: 'd', handledAt: null, children: [] },
+            4: { id: 4, description: 'e', handledAt: null, children: [] },
+          },
+        })
+      )
 
       session.commands = [
         {
@@ -355,13 +367,13 @@ describe('api client', () => {
               id: 1,
               description: 'b',
               children: [
-                {id: 2, description: 'c', children: []},
-                {id: 3, description: 'd', children: []},
+                { id: 2, description: 'c', children: [] },
+                { id: 3, description: 'd', children: [] },
               ],
             },
           ],
         },
-        {id: 4, description: 'e', children: []},
+        { id: 4, description: 'e', children: [] },
       ]
       session.command_log = {
         0: 0,
@@ -369,42 +381,62 @@ describe('api client', () => {
         2: 2,
       }
 
-      return sendConnect()
-        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+      return sendConnect().then(() =>
+        expect(dispatch).toHaveBeenCalledWith(expected)
+      )
     })
 
     test('maps api instruments and intruments by mount', () => {
-      const expected = actions.sessionResponse(null, expect.objectContaining({
-        pipettesByMount: {
-          left: {_id: 2, mount: 'left', name: 'p200', channels: 1, volume: 200},
-          right: {_id: 1, mount: 'right', name: 'p50', channels: 8, volume: 50},
-        },
-      }))
+      const expected = actions.sessionResponse(
+        null,
+        expect.objectContaining({
+          pipettesByMount: {
+            left: {
+              _id: 2,
+              mount: 'left',
+              name: 'p200',
+              channels: 1,
+              volume: 200,
+            },
+            right: {
+              _id: 1,
+              mount: 'right',
+              name: 'p50',
+              channels: 8,
+              volume: 50,
+            },
+          },
+        })
+      )
 
       session.instruments = [
-        {_id: 1, mount: 'right', name: 'p50', channels: 8},
-        {_id: 2, mount: 'left', name: 'p200', channels: 1},
+        { _id: 1, mount: 'right', name: 'p50', channels: 8 },
+        { _id: 2, mount: 'left', name: 'p200', channels: 1 },
       ]
 
-      return sendConnect()
-        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+      return sendConnect().then(() =>
+        expect(dispatch).toHaveBeenCalledWith(expected)
+      )
     })
 
     test('maps api containers to labware by slot', () => {
-      const expected = actions.sessionResponse(null, expect.objectContaining({
-        labwareBySlot: {
-          1: {
-            _id: 1,
-            slot: '1',
-            name: 'a',
-            type: 'tiprack',
-            isTiprack: true,
-            calibratorMount: 'right',
+      const expected = actions.sessionResponse(
+        null,
+        expect.objectContaining({
+          labwareBySlot: {
+            1: {
+              _id: 1,
+              slot: '1',
+              name: 'a',
+              type: 'tiprack',
+              isTiprack: true,
+              calibratorMount: 'right',
+            },
+            5: { _id: 2, slot: '5', name: 'b', type: 'B', isTiprack: false },
+            9: { _id: 3, slot: '9', name: 'c', type: 'C', isTiprack: false },
           },
-          5: {_id: 2, slot: '5', name: 'b', type: 'B', isTiprack: false},
-          9: {_id: 3, slot: '9', name: 'c', type: 'C', isTiprack: false},
-        },
-      }))
+        })
+      )
 
       session.containers = [
         {
@@ -413,33 +445,37 @@ describe('api client', () => {
           name: 'a',
           type: 'tiprack',
           instruments: [
-            {mount: 'left', channels: 8},
-            {mount: 'right', channels: 1},
+            { mount: 'left', channels: 8 },
+            { mount: 'right', channels: 1 },
           ],
         },
-        {_id: 2, slot: '5', name: 'b', type: 'B'},
-        {_id: 3, slot: '9', name: 'c', type: 'C'},
+        { _id: 2, slot: '5', name: 'b', type: 'B' },
+        { _id: 3, slot: '9', name: 'c', type: 'C' },
       ]
 
-      return sendConnect()
-        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+      return sendConnect().then(() =>
+        expect(dispatch).toHaveBeenCalledWith(expected)
+      )
     })
 
     test('maps api modules to modules by slot', () => {
-      const expected = actions.sessionResponse(null, expect.objectContaining({
-        modulesBySlot: {
-          1: {
-            _id: 1,
-            slot: '1',
-            name: 'tempdeck',
+      const expected = actions.sessionResponse(
+        null,
+        expect.objectContaining({
+          modulesBySlot: {
+            1: {
+              _id: 1,
+              slot: '1',
+              name: 'tempdeck',
+            },
+            9: {
+              _id: 9,
+              slot: '9',
+              name: 'magdeck',
+            },
           },
-          9: {
-            _id: 9,
-            slot: '9',
-            name: 'magdeck',
-          },
-        },
-      }))
+        })
+      )
 
       session.modules = [
         {
@@ -454,19 +490,23 @@ describe('api client', () => {
         },
       ]
 
-      return sendConnect()
-        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+      return sendConnect().then(() =>
+        expect(dispatch).toHaveBeenCalledWith(expected)
+      )
     })
 
     test('maps api metadata to session metadata', () => {
-      const expected = actions.sessionResponse(null, expect.objectContaining({
-        metadata: {
-          'protocol-name': 'foo',
-          description: 'bar',
-          author: 'baz',
-          source: 'qux',
-        },
-      }))
+      const expected = actions.sessionResponse(
+        null,
+        expect.objectContaining({
+          metadata: {
+            'protocol-name': 'foo',
+            description: 'bar',
+            author: 'baz',
+            source: 'qux',
+          },
+        })
+      )
 
       session.metadata = {
         _id: 1234,
@@ -479,21 +519,24 @@ describe('api client', () => {
         source: 'qux',
       }
 
-      return sendConnect().then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+      return sendConnect().then(() =>
+        expect(dispatch).toHaveBeenCalledWith(expected)
+      )
     })
 
     test('sends error if received malformed session from API', () => {
       const expected = actions.sessionResponse(expect.anything())
 
-      session.commands = [{foo: 'bar'}]
+      session.commands = [{ foo: 'bar' }]
       session.command_log = null
 
-      return sendConnect()
-        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+      return sendConnect().then(() =>
+        expect(dispatch).toHaveBeenCalledWith(expected)
+      )
     })
 
     test('sends SESSION_UPDATE if session notification has lastCommand', () => {
-      const update = {state: 'running', startTime: 1, lastCommand: null}
+      const update = { state: 'running', startTime: 1, lastCommand: null }
       const expected = actions.sessionUpdate(update)
 
       return sendConnect()
@@ -514,11 +557,11 @@ describe('api client', () => {
           },
           session: {
             pipettesByMount: {
-              left: {_id: 'inst-2'},
-              right: {_id: 'inst-1'},
+              left: { _id: 'inst-2' },
+              right: { _id: 'inst-1' },
             },
             labwareBySlot: {
-              1: {_id: 'lab-1', type: '96-flat'},
+              1: { _id: 'lab-1', type: '96-flat' },
               5: {
                 _id: 'lab-2',
                 type: 'tiprack-200ul',
@@ -546,8 +589,9 @@ describe('api client', () => {
       return sendConnect()
         .then(() => sendToClient(state, action))
         .then(() => {
-          expect(calibrationManager.move_to_front)
-            .toHaveBeenCalledWith({_id: 'inst-2'})
+          expect(calibrationManager.move_to_front).toHaveBeenCalledWith({
+            _id: 'inst-2',
+          })
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
     })
@@ -572,8 +616,9 @@ describe('api client', () => {
       return sendConnect()
         .then(() => sendToClient(state, action))
         .then(() => {
-          expect(calibrationManager.tip_probe)
-            .toHaveBeenCalledWith({_id: 'inst-1'})
+          expect(calibrationManager.tip_probe).toHaveBeenCalledWith({
+            _id: 'inst-1',
+          })
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
     })
@@ -598,8 +643,10 @@ describe('api client', () => {
       return sendConnect()
         .then(() => sendToClient(state, action))
         .then(() => {
-          expect(calibrationManager.move_to)
-            .toHaveBeenCalledWith({_id: 'inst-2'}, {_id: 'lab-2'})
+          expect(calibrationManager.move_to).toHaveBeenCalledWith(
+            { _id: 'inst-2' },
+            { _id: 'lab-2' }
+          )
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
     })
@@ -626,8 +673,10 @@ describe('api client', () => {
       return sendConnect()
         .then(() => sendToClient(state, action))
         .then(() => {
-          expect(calibrationManager.pick_up_tip)
-            .toHaveBeenCalledWith({_id: 'inst-2'}, {_id: 'lab-2'})
+          expect(calibrationManager.pick_up_tip).toHaveBeenCalledWith(
+            { _id: 'inst-2' },
+            { _id: 'lab-2' }
+          )
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
     })
@@ -669,11 +718,17 @@ describe('api client', () => {
       return sendConnect()
         .then(() => sendToClient(state, action))
         .then(() => {
-          expect(calibrationManager.drop_tip)
-            .toHaveBeenCalledWith({_id: 'inst-1'}, {_id: 'lab-3'})
-          expect(calibrationManager.home).toHaveBeenCalledWith({_id: 'inst-1'})
-          expect(calibrationManager.move_to)
-            .toHaveBeenCalledWith({_id: 'inst-1'}, {_id: 'lab-3'})
+          expect(calibrationManager.drop_tip).toHaveBeenCalledWith(
+            { _id: 'inst-1' },
+            { _id: 'lab-3' }
+          )
+          expect(calibrationManager.home).toHaveBeenCalledWith({
+            _id: 'inst-1',
+          })
+          expect(calibrationManager.move_to).toHaveBeenCalledWith(
+            { _id: 'inst-1' },
+            { _id: 'lab-3' }
+          )
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
     })
@@ -723,8 +778,10 @@ describe('api client', () => {
       return sendConnect()
         .then(() => sendToClient(state, action))
         .then(() => {
-          expect(calibrationManager.drop_tip)
-            .toHaveBeenCalledWith({_id: 'inst-2'}, {_id: 'lab-3'})
+          expect(calibrationManager.drop_tip).toHaveBeenCalledWith(
+            { _id: 'inst-2' },
+            { _id: 'lab-3' }
+          )
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
     })
@@ -766,7 +823,7 @@ describe('api client', () => {
         .then(() => sendToClient(state, action))
         .then(() => {
           expect(calibrationManager.jog).toHaveBeenCalledWith(
-            {_id: 'inst-2'},
+            { _id: 'inst-2' },
             -10,
             'y'
           )
@@ -794,8 +851,9 @@ describe('api client', () => {
       return sendConnect()
         .then(() => sendToClient(state, action))
         .then(() => {
-          expect(calibrationManager.update_container_offset)
-            .toHaveBeenCalledWith({_id: 'lab-1'}, {_id: 'inst-2'})
+          expect(
+            calibrationManager.update_container_offset
+          ).toHaveBeenCalledWith({ _id: 'lab-1' }, { _id: 'inst-2' })
           expect(dispatch).toHaveBeenCalledWith(expectedResponse)
         })
     })

@@ -1,23 +1,23 @@
 // @flow
 // setup pipettes component
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {selectors as robotSelectors} from '../../robot'
-import {makeGetRobotPipettes, fetchPipettes} from '../../http-api-client'
-import {getPipetteModelSpecs} from '@opentrons/shared-data'
+import { selectors as robotSelectors } from '../../robot'
+import { makeGetRobotPipettes, fetchPipettes } from '../../http-api-client'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import InstrumentItem from './InstrumentItem'
-import {RefreshWrapper} from '../Page'
-import {SectionContentHalf} from '../layout'
+import { RefreshWrapper } from '../Page'
+import { SectionContentHalf } from '../layout'
 import InfoSection from './InfoSection'
 import InstrumentWarning from './InstrumentWarning'
 
-import type {State} from '../../types'
-import type {Pipette} from '../../robot'
-import type {PipettesResponse} from '../../http-api-client'
-import type {Robot} from '../../discovery'
+import type { State } from '../../types'
+import type { Pipette } from '../../robot'
+import type { PipettesResponse } from '../../http-api-client'
+import type { Robot } from '../../discovery'
 
-type OP = {robot: Robot}
+type OP = { robot: Robot }
 
 type SP = {|
   pipettes: Array<Pipette>,
@@ -29,7 +29,7 @@ type DP = {|
   changePipetteUrl: string,
 |}
 
-type Props = {...$Exact<OP>, ...SP, ...DP}
+type Props = { ...$Exact<OP>, ...SP, ...DP }
 
 const TITLE = 'Required Pipettes'
 
@@ -38,8 +38,8 @@ export default connect(
   mapDispatchToProps
 )(ProtocolPipettes)
 
-function ProtocolPipettes (props: Props) {
-  const {pipettes, actualPipettes, fetchPipettes, changePipetteUrl} = props
+function ProtocolPipettes(props: Props) {
+  const { pipettes, actualPipettes, fetchPipettes, changePipetteUrl } = props
 
   if (pipettes.length === 0) return null
 
@@ -85,7 +85,7 @@ function ProtocolPipettes (props: Props) {
   )
 }
 
-function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
+function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
   const getAttachedPipettes = makeGetRobotPipettes()
 
   return (state, ownProps) => {
@@ -98,8 +98,8 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  const {robot} = ownProps
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
+  const { robot } = ownProps
   // TODO(mc, 2018-10-10): pass this prop down from page
   const changePipetteUrl = `/robots/${robot.name}/instruments`
 

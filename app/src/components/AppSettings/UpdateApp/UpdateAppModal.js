@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react'
 
-import {Portal} from '../../portal'
-import {ScrollableAlertModal} from '../../modals'
+import { Portal } from '../../portal'
+import { ScrollableAlertModal } from '../../modals'
 import UpdateAppMessage from './UpdateAppMessage'
 import ReleaseNotes from '../../ReleaseNotes'
 
-import type {ShellUpdateState} from '../../../shell'
-import type {ButtonProps} from '@opentrons/components'
+import type { ShellUpdateState } from '../../../shell'
+import type { ButtonProps } from '@opentrons/components'
 
 type Props = {
   update: ShellUpdateState,
@@ -25,23 +25,23 @@ export default class UpdateAppModal extends React.Component<
   Props,
   UpdateAppState
 > {
-  constructor (props: Props) {
+  constructor(props: Props) {
     super(props)
-    this.state = {showReleaseNotes: false}
+    this.state = { showReleaseNotes: false }
   }
 
   setShowReleaseNotes = () => {
-    this.setState({showReleaseNotes: true})
+    this.setState({ showReleaseNotes: true })
   }
 
-  render () {
+  render() {
     const {
       downloadUpdate,
       closeModal,
       availableVersion,
-      update: {info},
+      update: { info },
     } = this.props
-    const {showReleaseNotes} = this.state
+    const { showReleaseNotes } = this.state
 
     let children: ?React.Node
     let button: ?ButtonProps
@@ -64,7 +64,7 @@ export default class UpdateAppModal extends React.Component<
       <Portal>
         <ScrollableAlertModal
           heading={`App Version ${availableVersion || ''} Available`}
-          buttons={[{onClick: closeModal, children: 'not now'}, button]}
+          buttons={[{ onClick: closeModal, children: 'not now' }, button]}
         >
           {children}
         </ScrollableAlertModal>

@@ -1,77 +1,79 @@
 // @flow
-import {combineReducers} from 'redux'
-import {handleActions} from 'redux-actions'
+import { combineReducers } from 'redux'
+import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
-import type {
-  DismissFormWarning,
-  DismissTimelineWarning,
-} from './actions'
-import {getPDMetadata} from '../file-types'
-import type {BaseState} from '../types'
-import type {LoadFileAction} from '../load-file'
-import type {DeleteStepAction} from '../steplist/actions'
-import type {StepIdType} from '../form-types'
+import type { DismissFormWarning, DismissTimelineWarning } from './actions'
+import { getPDMetadata } from '../file-types'
+import type { BaseState } from '../types'
+import type { LoadFileAction } from '../load-file'
+import type { DeleteStepAction } from '../steplist/actions'
+import type { StepIdType } from '../form-types'
 
 export type WarningType = string
 
-export type DismissedWarningsAllSteps = {[stepId: StepIdType]: ?Array<WarningType>}
+export type DismissedWarningsAllSteps = {
+  [stepId: StepIdType]: ?Array<WarningType>,
+}
 export type DismissedWarningState = {
   form: DismissedWarningsAllSteps,
   timeline: DismissedWarningsAllSteps,
 }
-const dismissedWarnings = handleActions({
-  DISMISS_FORM_WARNING: (
-    state: DismissedWarningState,
-    action: DismissFormWarning
-  ): DismissedWarningState => {
-    const {stepId, type} = action.payload
-    if (stepId == null) {
-      console.warn('Tried to dismiss form warning with no stepId')
-      return state
-    }
+const dismissedWarnings = handleActions(
+  {
+    DISMISS_FORM_WARNING: (
+      state: DismissedWarningState,
+      action: DismissFormWarning
+    ): DismissedWarningState => {
+      const { stepId, type } = action.payload
+      if (stepId == null) {
+        console.warn('Tried to dismiss form warning with no stepId')
+        return state
+      }
 
-    return {
-      ...state,
-      form: {
-        ...state.form,
-        [stepId]: [
-          ...(state.form[stepId] || []),
-          type,
-        ],
-      },
-    }
+      return {
+        ...state,
+        form: {
+          ...state.form,
+          [stepId]: [...(state.form[stepId] || []), type],
+        },
+      }
+    },
+    DISMISS_TIMELINE_WARNING: (
+      state: DismissedWarningState,
+      action: DismissTimelineWarning
+    ): DismissedWarningState => {
+      const { stepId, type } = action.payload
+      if (stepId == null) {
+        console.warn('Tried to dismiss timeline warning with no stepId')
+        return state
+      }
+      return {
+        ...state,
+        timeline: {
+          ...state.timeline,
+          [stepId]: [...(state.timeline[stepId] || []), type],
+        },
+      }
+    },
+    DELETE_STEP: (
+      state: DismissedWarningState,
+      action: DeleteStepAction
+    ): DismissedWarningState => {
+      // remove key for deleted step
+      const stepId = action.payload
+      return {
+        form: omit(state.form, stepId),
+        timeline: omit(state.timeline, stepId),
+      }
+    },
+    LOAD_FILE: (
+      state: DismissedWarningState,
+      action: LoadFileAction
+    ): DismissedWarningState =>
+      getPDMetadata(action.payload.file).dismissedWarnings,
   },
-  DISMISS_TIMELINE_WARNING: (
-    state: DismissedWarningState,
-    action: DismissTimelineWarning
-  ): DismissedWarningState => {
-    const {stepId, type} = action.payload
-    if (stepId == null) {
-      console.warn('Tried to dismiss timeline warning with no stepId')
-      return state
-    }
-    return {
-      ...state,
-      timeline: {
-        ...state.timeline,
-        [stepId]: [
-          ...(state.timeline[stepId] || []),
-          type,
-        ],
-      },
-    }
-  },
-  DELETE_STEP: (state: DismissedWarningState, action: DeleteStepAction): DismissedWarningState => {
-    // remove key for deleted step
-    const stepId = action.payload
-    return {
-      form: omit(state.form, stepId),
-      timeline: omit(state.timeline, stepId),
-    }
-  },
-  LOAD_FILE: (state: DismissedWarningState, action: LoadFileAction): DismissedWarningState =>
-    getPDMetadata(action.payload.file).dismissedWarnings,
-}, {form: {}, timeline: {}})
+  { form: {}, timeline: {} }
+)
 
 export const _allReducers = {
   dismissedWarnings,

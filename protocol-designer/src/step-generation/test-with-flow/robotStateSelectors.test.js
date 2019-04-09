@@ -1,6 +1,12 @@
 // @flow
-import {p300Single, p300Multi, createEmptyLiquidState, getTiprackTipstate, getTipColumn} from './fixtures'
-import {sortLabwareBySlot, getNextTiprack, _getNextTip} from '../'
+import {
+  p300Single,
+  p300Multi,
+  createEmptyLiquidState,
+  getTiprackTipstate,
+  getTipColumn,
+} from './fixtures'
+import { sortLabwareBySlot, getNextTiprack, _getNextTip } from '../'
 
 // just a blank liquidState to appease flow
 const basicLiquidState = {
@@ -53,7 +59,12 @@ describe('sortLabwareBySlot', () => {
         pipettes: _pipettesState,
       }),
     }
-    expect(sortLabwareBySlot(robotState)).toEqual(['one', 'two', 'six', 'eleven'])
+    expect(sortLabwareBySlot(robotState)).toEqual([
+      'one',
+      'two',
+      'six',
+      'eleven',
+    ])
   })
 
   test('with no labware, return empty array', () => {
@@ -79,17 +90,21 @@ describe('sortLabwareBySlot', () => {
 
 describe('_getNextTip', () => {
   test('full tiprack should start at A1', () => {
-    const result = _getNextTip(1, {...getTiprackTipstate(true)})
+    const result = _getNextTip(1, { ...getTiprackTipstate(true) })
     expect(result).toEqual('A1')
   })
 
   test('missing A1, go to B1', () => {
-    const result = _getNextTip(1, {...getTiprackTipstate(true), A1: false})
+    const result = _getNextTip(1, { ...getTiprackTipstate(true), A1: false })
     expect(result).toEqual('B1')
   })
 
   test('missing A1 and B1, go to C1', () => {
-    const result = _getNextTip(1, {...getTiprackTipstate(true), A1: false, B1: false})
+    const result = _getNextTip(1, {
+      ...getTiprackTipstate(true),
+      A1: false,
+      B1: false,
+    })
     expect(result).toEqual('C1')
   })
 
@@ -174,7 +189,7 @@ describe('getNextTiprack - single-channel', () => {
         },
       },
       tipState: {
-        tipracks: {...getTiprackTipstate(false)},
+        tipracks: { ...getTiprackTipstate(false) },
         pipettes: {
           p300SingleId: false,
         },
@@ -358,7 +373,7 @@ describe('getNextTiprack - 8-channel', () => {
       },
       tipState: {
         tipracks: {
-          tiprack2Id: {...getTiprackTipstate(true)},
+          tiprack2Id: { ...getTiprackTipstate(true) },
         },
         pipettes: {
           p300SingleId: false,
@@ -435,7 +450,7 @@ describe('getNextTiprack - 8-channel', () => {
         },
       },
       tipState: {
-        tipracks: {...getTiprackTipstate(false)},
+        tipracks: { ...getTiprackTipstate(false) },
         pipettes: {
           p300SingleId: false,
         },
