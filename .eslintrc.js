@@ -17,9 +17,6 @@ module.exports = {
 
   rules: {
     camelcase: 'off',
-    'object-curly-spacing': 'off',
-    'comma-dangle': ['error', 'always-multiline'],
-    'flowtype/delimiter-dangle': ['error', 'always-multiline'],
   },
 
   globals: {},
