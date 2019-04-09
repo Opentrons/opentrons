@@ -1,5 +1,7 @@
 import inspect
+import json
 import logging
+import pkgutil
 import traceback
 import sys
 from typing import Any, Callable, Dict
@@ -7,6 +9,14 @@ from typing import Any, Callable, Dict
 from .contexts import ProtocolContext
 from . import execute_v1, execute_v3
 from opentrons import config
+
+# TODO: Ian 2019-04-09 once we are able to add new python dependencies,
+# add jsonschema. Until then, this will only work for developers and all
+# uses of jsonschema must be skipped when the module isn't available for import
+try:
+    import jsonschema
+except ModuleNotFoundError:
+    jsonschema = None
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -131,6 +141,45 @@ def get_protocol_schema_version(protocol_json: Dict[Any, Any]) -> int:
         'Make sure there is a version number under "schemaVersion"')
 
 
+def get_schema_for_protocol(protocol_json: Dict[Any, Any]):
+    version_num = get_protocol_schema_version(protocol_json)
+    try:
+        schema = pkgutil.get_data(
+            'opentrons',
+            'shared_data/protocol-json-schema/protocolSchemaV{}.json'
+            .format(version_num))
+    except FileNotFoundError:
+        schema = None
+    if not schema:
+        raise RuntimeError('JSON Protocol schema "{}" does not exist'
+                           .format(version_num))
+    return json.loads(schema)
+
+
+def validate_protocol(protocol_json: Dict[Any, Any]):
+    if not jsonschema:
+        MODULE_LOG.debug('jsonschema not able to be imported, skipping ' +
+                         'schema validation')
+        return
+
+    protocol_schema = get_schema_for_protocol(protocol_json)
+
+    # instruct schema how to resolve all $ref's used in protocol schemas
+    labware_schema_v2 = json.loads(
+        pkgutil.get_data(
+            'opentrons',
+            'shared_data/labware-json-schema/labwareSchemaV2.json'))
+
+    resolver = jsonschema.RefResolver(
+        protocol_schema.get('$id', ''),
+        protocol_schema,
+        store={
+            "opentronsLabwareSchemaV2": labware_schema_v2
+        })
+    # do the validation
+    jsonschema.validate(protocol_json, protocol_schema, resolver=resolver)
+
+
 def run_protocol(protocol_code: Any = None,
                  protocol_json: Dict[Any, Any] = None,
                  simulate: bool = False,
@@ -166,6 +215,8 @@ def run_protocol(protocol_code: Any = None,
             raise RuntimeError(
                 f'JSON Protocol version {protocol_version} is not yet ' +
                 'supported in this version of the API')
+
+        validate_protocol(protocol_json)
 
         if protocol_version >= 3:
             ins = execute_v3.load_pipettes_from_json(

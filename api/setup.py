@@ -107,7 +107,9 @@ INSTALL_REQUIRES = [
     'pyserial==3.2.1',
     'aiohttp==2.3.8',
     'numpy>=1.12.1',
-    'urwid==1.3.1']
+    'urwid==1.3.1',
+    'jsonschema==3.0.1',
+]
 
 
 def read(*parts):
