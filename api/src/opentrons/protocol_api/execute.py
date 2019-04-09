@@ -164,7 +164,7 @@ def run_protocol(protocol_code: Any = None,
         protocol_version = get_protocol_schema_version(protocol_json)
         if protocol_version > 3:
             raise RuntimeError(
-                f'JSON Protocol version {protocol_version } is not yet ' +
+                f'JSON Protocol version {protocol_version} is not yet ' +
                 'supported in this version of the API')
 
         if protocol_version >= 3:
