@@ -108,7 +108,7 @@ INSTALL_REQUIRES = [
     'aiohttp==2.3.8',
     'numpy>=1.12.1',
     'urwid==1.3.1',
-    'jsonschema==3.0.1',
+    'jsonschema==*',
 ]
 
 

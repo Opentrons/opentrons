@@ -13,6 +13,8 @@ from opentrons import config
 # TODO: Ian 2019-04-09 once we are able to add new python dependencies,
 # add jsonschema. Until then, this will only work for developers and all
 # uses of jsonschema must be skipped when the module isn't available for import
+# NOTE: jsonschema is currently installed only as dependency of jupyter's
+# `nbnotebook`, not directly by our Pipfile
 try:
     import jsonschema
 except ModuleNotFoundError:
