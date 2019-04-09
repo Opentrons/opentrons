@@ -1,4 +1,5 @@
 {
+  "$id": "opentronsLabwareSchemaV2",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
     "positiveNumber": {
