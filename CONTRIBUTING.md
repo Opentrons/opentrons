@@ -227,7 +227,7 @@ make check-js
 
 ### Code quality
 
-To help maintain code quality and maintainability, we use a collection of tools that can be roughly sorted into the following categories (with some overlaps):
+To help with code quality and maintainability, we use a collection of tools that can be roughly sorted into the following categories (with some overlaps):
 
 - [Linters][lint]
   - Analyze the code for various potential bugs and errors
@@ -262,17 +262,6 @@ make check-js
 make format
 ```
 
-#### Editor setup
-
-Most, if not all, of the tools above have plugins available for your code editor that will run quality checks and formatting as you write and/or save. We **highly recommend** setting up your editor to format and check your code automatically.
-
-- Pylama - Search your editor's package manager
-- ESLint - <https://eslint.org/docs/user-guide/integrations#editors>
-- stylelint - <https://stylelint.io/user-guide/complementary-tools/#editor-plugins>
-- mypy - Search your editor's package manager
-- Flow - <https://flow.org/en/docs/editors/>
-- Prettier - <https://prettier.io/docs/en/editors.html>
-
 [lint]: https://en.wikipedia.org/wiki/Lint_(software)
 [type-check]: https://en.wikipedia.org/wiki/Type_system#Type_checking
 [type-safe]: https://en.wikipedia.org/wiki/Type_safety
@@ -283,6 +272,17 @@ Most, if not all, of the tools above have plugins available for your code editor
 [flow]: https://flow.org/
 [mypy]: http://mypy-lang.org/
 [prettier]: https://prettier.io/
+
+#### Editor setup
+
+Most, if not all, of the tools above have plugins available for your code editor that will run quality checks and formatting as you write and/or save. We **highly recommend** setting up your editor to format and check your code automatically.
+
+- Pylama - Search your editor's package manager
+- ESLint - <https://eslint.org/docs/user-guide/integrations#editors>
+- stylelint - <https://stylelint.io/user-guide/complementary-tools/#editor-plugins>
+- mypy - Search your editor's package manager
+- Flow - <https://flow.org/en/docs/editors/>
+- Prettier - <https://prettier.io/docs/en/editors.html>
 
 ### Opentrons API
 

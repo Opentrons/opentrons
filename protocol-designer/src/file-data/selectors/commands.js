@@ -178,8 +178,12 @@ function compoundCommandCreatorFromStepArgs(
     case 'consolidate':
       return StepGeneration.consolidate(stepArgs)
     case 'delay': {
-      // $FlowFixMe TODO: Ian 2019-01-29 homogenize compound vs non-compound command creator type, maybe flow will get un-confused here
+      // TODO(Ian 2019-01-29): homogenize compound vs non-compound command
+      // creator type, maybe flow will get un-confused here
+      // TODO(mc, 2019-04-09): these typedefs should probably be exact objects
+      // (like redux actions) to have this switch block behave
       return prevRobotState => [
+        // $FlowFixMe: TODOs above ^^^
         prevRobotState => StepGeneration.delay(stepArgs)(prevRobotState),
       ]
     }

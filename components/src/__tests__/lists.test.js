@@ -40,10 +40,10 @@ describe('TitledList', () => {
   })
 
   test('renders TitledList with onMouseEnter & onMouseLeave correctly', () => {
-    function someFn() {}
+    const noop = () => {}
 
     const tree = Renderer.create(
-      <TitledList title="foo" onMouseEnter={someFn} onMouseLeave={someFn} />
+      <TitledList title="foo" onMouseEnter={noop} onMouseLeave={noop} />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -132,7 +132,7 @@ describe('ListItem', () => {
 
 describe('ListAlert', () => {
   test('list alert renders correctly', () => {
-    const tree = Renderer.create(<ListAlert> alert alert</ListAlert>).toJSON()
+    const tree = Renderer.create(<ListAlert>alert alert</ListAlert>).toJSON()
 
     expect(tree).toMatchSnapshot()
   })
@@ -142,8 +142,7 @@ describe('ListItem', () => {
   test('Side Panel Group renders correctly', () => {
     const tree = Renderer.create(
       <SidePanelGroup title="title" iconName="flask-outline">
-        {' '}
-        children{' '}
+        children
       </SidePanelGroup>
     ).toJSON()
 
@@ -153,8 +152,7 @@ describe('ListItem', () => {
   test('Disabled Side Panel Group renders correctly', () => {
     const tree = Renderer.create(
       <SidePanelGroup title="title" iconName="flask-outline" disabled>
-        {' '}
-        children{' '}
+        children
       </SidePanelGroup>
     ).toJSON()
 
