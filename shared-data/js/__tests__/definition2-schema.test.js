@@ -30,7 +30,7 @@ describe('test the schema against a minimalist fixture', () => {
 
   test('fail on bad labware', () => {
     const badDef = {
-      metadata: {name: 'bad'},
+      metadata: { name: 'bad' },
       ordering: ['A1'], // array of strings not array of arrays
       wells: {},
     }

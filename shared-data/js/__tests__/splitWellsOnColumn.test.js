@@ -1,4 +1,4 @@
-import {splitWellsOnColumn} from '../helpers'
+import { splitWellsOnColumn } from '../helpers'
 
 describe('test splitWellsOnColumn', () => {
   test('empty array', () => {
@@ -10,6 +10,12 @@ describe('test splitWellsOnColumn', () => {
   })
 
   test('sort multi-digit wels', () => {
-    expect(splitWellsOnColumn(['A1', 'B2', 'C2', 'D3', 'X10', 'X11'])).toEqual([['A1'], ['B2', 'C2'], ['D3'], ['X10'], ['X11']])
+    expect(splitWellsOnColumn(['A1', 'B2', 'C2', 'D3', 'X10', 'X11'])).toEqual([
+      ['A1'],
+      ['B2', 'C2'],
+      ['D3'],
+      ['X10'],
+      ['X11'],
+    ])
   })
 })

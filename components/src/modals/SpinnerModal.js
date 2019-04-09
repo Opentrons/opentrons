@@ -2,8 +2,8 @@
 // titled modal page component
 import * as React from 'react'
 import cx from 'classnames'
-import {Overlay} from './'
-import {Icon} from '../icons'
+import { Overlay } from './'
+import { Icon } from '../icons'
 
 import styles from './modals.css'
 
@@ -19,7 +19,7 @@ type Props = {
 /**
  * Spinner Modal with no background and optional message
  */
-export default function SpinnerModal (props: Props) {
+export default function SpinnerModal(props: Props) {
   return (
     <div className={styles.modal}>
       <Overlay alertOverlay={props.alertOverlay} />

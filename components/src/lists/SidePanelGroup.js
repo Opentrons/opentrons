@@ -4,7 +4,7 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import styles from './lists.css'
-import {type IconName, Icon} from '../icons'
+import { type IconName, Icon } from '../icons'
 
 type GroupProps = {
   /** text of title */
@@ -22,8 +22,8 @@ type GroupProps = {
 /**
  * A component for grouping and titling multiple lists
  */
-export default function SidePanelGroup (props: GroupProps) {
-  const {iconName, disabled} = props
+export default function SidePanelGroup(props: GroupProps) {
+  const { iconName, disabled } = props
 
   const className = cx(styles.panel_group, props.className, {
     [styles.disabled]: disabled,
@@ -36,9 +36,7 @@ export default function SidePanelGroup (props: GroupProps) {
           {iconName && (
             <Icon className={styles.title_bar_icon} name={iconName} />
           )}
-          <h2 className={styles.title}>
-            {props.title}
-          </h2>
+          <h2 className={styles.title}>{props.title}</h2>
         </div>
       )}
       {props.children}

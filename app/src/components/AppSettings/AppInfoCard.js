@@ -1,11 +1,11 @@
 // @flow
 // app info card with version and updated
 import * as React from 'react'
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
-import {CURRENT_VERSION} from '../../shell'
-import {RefreshCard, LabeledValue, OutlineButton} from '@opentrons/components'
-import {CardContentHalf} from '../layout'
+import { CURRENT_VERSION } from '../../shell'
+import { RefreshCard, LabeledValue, OutlineButton } from '@opentrons/components'
+import { CardContentHalf } from '../layout'
 
 import styles from './styles.css'
 
@@ -20,8 +20,8 @@ const VERSION_LABEL = 'Software Version'
 const UPDATE_AVAILABLE = 'view available update'
 const UPDATE_NOT_AVAILABLE = 'up to date'
 
-export default function AppInfoCard (props: Props) {
-  const {checkUpdate, availableVersion} = props
+export default function AppInfoCard(props: Props) {
+  const { checkUpdate, availableVersion } = props
 
   return (
     <RefreshCard refresh={checkUpdate} title={TITLE}>

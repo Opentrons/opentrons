@@ -1,7 +1,7 @@
 // @flow
 // contents container for ConfirmModal
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import {
   selectors as robotSelectors,
@@ -19,40 +19,39 @@ type SP = {|
   calibrator: ?Pipette,
 |}
 
-type Props = {...$Exact<OP>, ...SP}
+type Props = { ...$Exact<OP>, ...SP }
 
 export default connect(mapStateToProps)(ConfirmModalContents)
 
-function ConfirmModalContents (props: Props) {
+function ConfirmModalContents(props: Props) {
   if (!props.calibrator) return null
 
   switch (props.calibration) {
     case 'unconfirmed':
     case 'over-slot':
     case 'jogging':
-      return (<ConfirmPositionContents {...props} />)
+      return <ConfirmPositionContents {...props} />
 
     case 'picked-up':
-      return (<ConfirmPickupContents {...props} />)
+      return <ConfirmPickupContents {...props} />
 
     case 'moving-to-slot':
     case 'picking-up':
     case 'dropping-tip':
     case 'confirming':
-      return (<InProgressContents {...props} />)
+      return <InProgressContents {...props} />
 
     default:
       return null
   }
 }
 
-function mapStateToProps (state, ownProps: OP): SP {
+function mapStateToProps(state, ownProps: OP): SP {
   const calibratorMount = ownProps.calibratorMount
   const pipettes = robotSelectors.getPipettes(state)
-  const calibrator = (
-    pipettes.find((i) => i.mount === calibratorMount) ||
+  const calibrator =
+    pipettes.find(i => i.mount === calibratorMount) ||
     robotSelectors.getCalibrator(state)
-  )
 
-  return {calibrator}
+  return { calibrator }
 }

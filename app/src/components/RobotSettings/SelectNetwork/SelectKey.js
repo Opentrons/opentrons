@@ -2,10 +2,10 @@
 import * as React from 'react'
 import map from 'lodash/map'
 
-import {SelectOptionField} from './fields'
+import { SelectOptionField } from './fields'
 import styles from './styles.css'
 
-import type {WifiKeysList} from '../../../http-api-client'
+import type { WifiKeysList } from '../../../http-api-client'
 
 type Props = {
   name: string,
@@ -25,7 +25,7 @@ const UPLOAD_KEY_LABEL = 'Add new...'
 export default class SelectKey extends React.Component<Props> {
   fileInput: ?HTMLInputElement
 
-  constructor (props: Props) {
+  constructor(props: Props) {
     super(props)
     this.fileInput = null
   }
@@ -52,9 +52,17 @@ export default class SelectKey extends React.Component<Props> {
     }
   }
 
-  render () {
-    const {name, label, value, error, required, keys, onLoseFocus} = this.props
-    const keyOptions = map(keys, k => ({value: k.id, label: k.name}))
+  render() {
+    const {
+      name,
+      label,
+      value,
+      error,
+      required,
+      keys,
+      onLoseFocus,
+    } = this.props
+    const keyOptions = map(keys, k => ({ value: k.id, label: k.name }))
     const addNewGroup = {
       label: null,
       options: [
@@ -72,7 +80,7 @@ export default class SelectKey extends React.Component<Props> {
     return (
       <React.Fragment>
         <SelectOptionField
-          {...{name, label, value, error, required, onLoseFocus}}
+          {...{ name, label, value, error, required, onLoseFocus }}
           options={keyOptions.concat(addNewGroup)}
           onValueChange={this.handleValueChange}
         />

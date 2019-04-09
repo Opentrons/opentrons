@@ -3,11 +3,7 @@
     "name": "T25-flask",
     "format": "irregular"
   },
-  "ordering": [
-    [
-      "A1"
-    ]
-  ],
+  "ordering": [["A1"]],
   "wells": {
     "A1": {
       "depth": 99,

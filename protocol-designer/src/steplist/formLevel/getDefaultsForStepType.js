@@ -7,10 +7,12 @@ import {
   DEFAULT_WELL_ORDER_SECOND_OPTION,
   FIXED_TRASH_ID,
 } from '../../constants'
-import type {StepType, StepFieldName} from '../../form-types'
+import type { StepType, StepFieldName } from '../../form-types'
 
 // TODO: Ian 2019-01-17 move this somewhere more central - see #2926
-export default function getDefaultsForStepType (stepType: StepType): {[StepFieldName]: any} {
+export default function getDefaultsForStepType(
+  stepType: StepType
+): { [StepFieldName]: any } {
   switch (stepType) {
     case 'mix':
       return {

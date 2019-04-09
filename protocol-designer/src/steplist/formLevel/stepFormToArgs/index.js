@@ -1,11 +1,11 @@
 // @flow
 import mapValues from 'lodash/mapValues'
-import {castField} from '../../../steplist'
+import { castField } from '../../../steplist'
 import mixFormToArgs from './mixFormToArgs'
 import pauseFormToArgs from './pauseFormToArgs'
 import moveLiquidFormToArgs from './moveLiquidFormToArgs'
-import type {FormData} from '../../../form-types'
-import type {CommandCreatorArgs} from '../../../step-generation'
+import type { FormData } from '../../../form-types'
+import type { CommandCreatorArgs } from '../../../step-generation'
 
 // NOTE: this acts as an adapter for the PD defined data shape of the step forms
 // to create arguments that the step generation service is expecting
@@ -16,11 +16,13 @@ type StepArgs = CommandCreatorArgs | null
 // TODO: Ian 2019-01-29 use hydrated form type
 const stepFormToArgs = (hydratedForm: FormData): StepArgs => {
   // cast all fields that have 'fieldCaster' in stepFieldHelperMap
-  const castForm = mapValues(hydratedForm, (value, name) => castField(name, value))
+  const castForm = mapValues(hydratedForm, (value, name) =>
+    castField(name, value)
+  )
 
   switch (castForm.stepType) {
     case 'moveLiquid':
-      return moveLiquidFormToArgs({...castForm, fields: castForm}) // TODO: Ian 2019-01-29 nest all fields under `fields` (in #2917 ?)
+      return moveLiquidFormToArgs({ ...castForm, fields: castForm }) // TODO: Ian 2019-01-29 nest all fields under `fields` (in #2917 ?)
     case 'pause':
       return pauseFormToArgs(castForm)
     case 'mix':

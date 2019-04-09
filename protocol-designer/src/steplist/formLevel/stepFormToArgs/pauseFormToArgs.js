@@ -17,7 +17,7 @@ const pauseFormToArgs = (formData: FormData): PauseStepArgs => {
     commandCreatorFnName: 'delay',
     name: `Pause ${formData.id}`, // TODO real name for steps
     description: 'description would be here 2018-03-01', // TODO get from form
-    wait: (formData['pauseForAmountOfTime'] === 'false') ? true : totalSeconds,
+    wait: formData['pauseForAmountOfTime'] === 'false' ? true : totalSeconds,
     message,
     meta: {
       hours,

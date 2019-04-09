@@ -1,6 +1,6 @@
 // @flow
 // robot connection state and reducer
-import type {Action} from '../../types'
+import type { Action } from '../../types'
 
 import type {
   ConnectAction,
@@ -14,24 +14,24 @@ type State = {
   connectedTo: ?string,
   connectRequest: {
     inProgress: boolean,
-    error: ?{message: string},
+    error: ?{ message: string },
     name: string,
   },
   disconnectRequest: {
     inProgress: boolean,
-    error: ?{message: string},
+    error: ?{ message: string },
   },
   unexpectedDisconnect: boolean,
 }
 
 const INITIAL_STATE: State = {
   connectedTo: null,
-  connectRequest: {inProgress: false, error: null, name: ''},
-  disconnectRequest: {inProgress: false, error: null},
+  connectRequest: { inProgress: false, error: null, name: '' },
+  disconnectRequest: { inProgress: false, error: null },
   unexpectedDisconnect: false,
 }
 
-export default function connectionReducer (
+export default function connectionReducer(
   state?: State,
   action: Action
 ): State {
@@ -54,19 +54,21 @@ export default function connectionReducer (
       return handleDisconnectResponse(state, action)
 
     case 'robot:UNEXPECTED_DISCONNECT':
-      return {...state, unexpectedDisconnect: true}
+      return { ...state, unexpectedDisconnect: true }
   }
 
   return state
 }
 
-function handleConnect (state: State, action: ConnectAction): State {
-  const {payload: {name}} = action
+function handleConnect(state: State, action: ConnectAction): State {
+  const {
+    payload: { name },
+  } = action
 
-  return {...state, connectRequest: {inProgress: true, error: null, name}}
+  return { ...state, connectRequest: { inProgress: true, error: null, name } }
 }
 
-function handleConnectResponse (
+function handleConnectResponse(
   state: State,
   action: ConnectResponseAction
 ): State {
@@ -82,29 +84,29 @@ function handleConnectResponse (
   return {
     ...state,
     connectedTo,
-    connectRequest: {error, inProgress: false, name: requestName},
+    connectRequest: { error, inProgress: false, name: requestName },
   }
 }
 
-function handleDisconnect (state: State, action: DisconnectAction): State {
-  return {...state, disconnectRequest: {inProgress: true, error: null}}
+function handleDisconnect(state: State, action: DisconnectAction): State {
+  return { ...state, disconnectRequest: { inProgress: true, error: null } }
 }
 
-function handleDisconnectResponse (
+function handleDisconnectResponse(
   state: State,
   action: DisconnectResponseAction
 ): State {
   return {
     ...state,
     connectedTo: null,
-    disconnectRequest: {error: null, inProgress: false},
+    disconnectRequest: { error: null, inProgress: false },
     unexpectedDisconnect: false,
   }
 }
 
-function handleClearConnectResponse (
+function handleClearConnectResponse(
   state: State,
   action: ClearConnectResponseAction
 ): State {
-  return {...state, connectRequest: INITIAL_STATE.connectRequest}
+  return { ...state, connectRequest: INITIAL_STATE.connectRequest }
 }

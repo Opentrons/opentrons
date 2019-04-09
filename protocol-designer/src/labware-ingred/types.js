@@ -1,5 +1,5 @@
 // @flow
-import type {LocationLiquidState} from '../step-generation'
+import type { LocationLiquidState } from '../step-generation'
 // TODO Ian 2018-02-19 make these shared in component library, standardize with Run App
 
 //  ===== LABWARE ===========
@@ -9,7 +9,7 @@ export type DisplayLabware = {|
   disambiguationNumber: number,
 |}
 
-export type LabwareTypeById = {[labwareId: string]: ?string}
+export type LabwareTypeById = { [labwareId: string]: ?string }
 
 // ==== WELLS ==========
 
@@ -17,7 +17,8 @@ export type Wells = {
   [wellName: string]: string, // eg A1: 'A1'.
 }
 
-export type WellContents = {| // non-ingredient well state, for SelectableLabware
+export type WellContents = {|
+  // non-ingredient well state, for SelectableLabware
   highlighted: boolean,
   selected: boolean,
   error: boolean,

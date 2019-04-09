@@ -1,17 +1,17 @@
 // @flow
 // robot HTTP API client module
-import {combineReducers} from 'redux'
+import { combineReducers } from 'redux'
 import apiReducer from './reducer'
-import {calibrationReducer, type CalibrationAction} from './calibration'
-import type {HealthAction} from './health'
-import type {PipettesAction} from './pipettes'
-import type {ModulesAction} from './modules'
-import type {MotorsAction} from './motors'
-import type {ResetAction} from './reset'
-import {robotReducer, type RobotAction} from './robot'
-import {serverReducer, type ServerAction} from './server'
-import type {SettingsAction} from './settings'
-import type {NetworkingAction} from './networking'
+import { calibrationReducer, type CalibrationAction } from './calibration'
+import type { HealthAction } from './health'
+import type { PipettesAction } from './pipettes'
+import type { ModulesAction } from './modules'
+import type { MotorsAction } from './motors'
+import type { ResetAction } from './reset'
+import { robotReducer, type RobotAction } from './robot'
+import { serverReducer, type ServerAction } from './server'
+import type { SettingsAction } from './settings'
+import type { NetworkingAction } from './networking'
 
 export const reducer = combineReducers({
   calibration: calibrationReducer,
@@ -39,7 +39,7 @@ export type {
   DeckCalPoint,
 } from './calibration'
 
-export type {RobotMove, RobotHome, RobotLights} from './robot'
+export type { RobotMove, RobotHome, RobotLights } from './robot'
 
 export type State = $Call<typeof reducer>
 
@@ -55,7 +55,7 @@ export type Action =
   | ServerAction
   | SettingsAction
 
-export {getRobotApiState} from './reducer'
+export { getRobotApiState } from './reducer'
 
 export {
   startDeckCalibration,

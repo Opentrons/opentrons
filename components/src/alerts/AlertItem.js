@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {Icon, type IconProps} from '../icons'
-import {IconButton} from '../buttons'
+import { Icon, type IconProps } from '../icons'
+import { IconButton } from '../buttons'
 import styles from './alerts.css'
 
 export type AlertProps = {
@@ -27,35 +27,29 @@ export type AlertProps = {
 
 const ALERT_PROPS_BY_TYPE = {
   success: {
-    icon: {name: 'check-circle'},
+    icon: { name: 'check-circle' },
     className: styles.success,
   },
   error: {
-    icon: {name: 'alert-circle'},
+    icon: { name: 'alert-circle' },
     className: styles.error,
   },
   warning: {
-    icon: {name: 'alert-circle'},
+    icon: { name: 'alert-circle' },
     className: styles.warning,
   },
   info: {
-    icon: {name: 'information'},
+    icon: { name: 'information' },
     className: styles.info,
   },
 }
 
 export type AlertType = $Keys<typeof ALERT_PROPS_BY_TYPE>
 
-export default function AlertItem (props: AlertProps) {
+export default function AlertItem(props: AlertProps) {
   const alertProps = ALERT_PROPS_BY_TYPE[props.type]
-  const icon = props.icon
-    ? props.icon
-    : alertProps.icon
-  const className = cx(
-    styles.alert,
-    alertProps.className,
-    props.className
-  )
+  const icon = props.icon ? props.icon : alertProps.icon
+  const className = cx(styles.alert, alertProps.className, props.className)
 
   const iconProps = {
     ...icon,
@@ -66,18 +60,16 @@ export default function AlertItem (props: AlertProps) {
     <div className={className}>
       <div className={styles.title_bar}>
         <Icon {...iconProps} />
-        <span className={styles.title}>
-          {props.title}
-        </span>
+        <span className={styles.title}>{props.title}</span>
         {props.onCloseClick && (
-          <IconButton name='close' onClick={props.onCloseClick} className={styles.close}/>
+          <IconButton
+            name="close"
+            onClick={props.onCloseClick}
+            className={styles.close}
+          />
         )}
       </div>
-      {props.children && (
-        <div className = {styles.message}>
-          {props.children}
-        </div>
-      )}
+      {props.children && <div className={styles.message}>{props.children}</div>}
     </div>
   )
 }

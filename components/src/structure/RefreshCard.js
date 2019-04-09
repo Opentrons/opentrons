@@ -2,7 +2,7 @@
 // refreshable card component
 import * as React from 'react'
 
-import {IconButton} from '../buttons'
+import { IconButton } from '../buttons'
 import Card from './Card'
 import styles from './structure.css'
 
@@ -21,8 +21,8 @@ type Props = React.ElementProps<typeof Card> & {
  * the refresh button. Takes all `Card` props as well as the ones listed here.
  */
 export default class RefreshCard extends React.Component<Props> {
-  render () {
-    const {refresh, refreshing, children} = this.props
+  render() {
+    const { refresh, refreshing, children } = this.props
 
     return (
       <Card {...this.props}>
@@ -40,11 +40,11 @@ export default class RefreshCard extends React.Component<Props> {
     )
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.refresh()
   }
 
-  componentDidUpdate (prevProps: Props) {
+  componentDidUpdate(prevProps: Props) {
     if (prevProps.watch !== this.props.watch) {
       this.props.refresh()
     }

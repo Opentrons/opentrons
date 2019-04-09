@@ -6,7 +6,7 @@ import {
   compoundCommandCreatorHasErrors,
   commandFixtures as cmd,
 } from './fixtures'
-import type {MixArgs} from '../types'
+import type { MixArgs } from '../types'
 const mix = compoundCommandCreatorNoErrors(_mix)
 const mixWithErrors = compoundCommandCreatorHasErrors(_mix)
 
@@ -159,11 +159,11 @@ describe('mix: advanced options', () => {
     const result = mix(args)(robotInitialState)
     expect(result.commands).toEqual([
       ...cmd.replaceTipCommands(0),
-      {...cmd.aspirate('A1', volume, aspirateParams)},
-      {...cmd.dispense('A1', volume, dispenseParams)},
+      { ...cmd.aspirate('A1', volume, aspirateParams) },
+      { ...cmd.dispense('A1', volume, dispenseParams) },
 
-      {...cmd.aspirate('A1', volume, aspirateParams)},
-      {...cmd.dispense('A1', volume, dispenseParams)},
+      { ...cmd.aspirate('A1', volume, aspirateParams) },
+      { ...cmd.dispense('A1', volume, dispenseParams) },
     ])
   })
 

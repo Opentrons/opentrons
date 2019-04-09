@@ -1,16 +1,16 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import countBy from 'lodash/countBy'
 
-import {makeGetRobotModules} from '../../http-api-client'
-import {getConnectedRobot} from '../../discovery'
-import {selectors as robotSelectors} from '../../robot'
-import {Module as ModuleItem} from '@opentrons/components'
+import { makeGetRobotModules } from '../../http-api-client'
+import { getConnectedRobot } from '../../discovery'
+import { selectors as robotSelectors } from '../../robot'
+import { Module as ModuleItem } from '@opentrons/components'
 
-import type {LabwareComponentProps} from '@opentrons/components'
-import type {State} from '../../types'
-import type {SessionModule} from '../../robot'
+import type { LabwareComponentProps } from '@opentrons/components'
+import type { State } from '../../types'
+import type { SessionModule } from '../../robot'
 
 type OP = LabwareComponentProps
 
@@ -21,7 +21,7 @@ type Props = {
 
 export default connect(makeMapStateToProps)(ReviewModuleItem)
 
-function ReviewModuleItem (props: Props) {
+function ReviewModuleItem(props: Props) {
   if (!props.module) return null
 
   return (
@@ -32,7 +32,7 @@ function ReviewModuleItem (props: Props) {
   )
 }
 
-function makeMapStateToProps (): (state: State, ownProps: OP) => Props {
+function makeMapStateToProps(): (state: State, ownProps: OP) => Props {
   // TODO(mc, 2018-07-23): this logic is duplicated because can only get props
   // into Deck.props.LabwareComponent via redux
   const getRobotModules = makeGetRobotModules()
@@ -52,6 +52,6 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => Props {
     const present =
       !module || requiredNames[module.name] === actualNames[module.name]
 
-    return {present, module}
+    return { present, module }
   }
 }

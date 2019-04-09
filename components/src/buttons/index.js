@@ -8,4 +8,4 @@ import IconButton from './IconButton'
 import OutlineButton from './OutlineButton'
 
 export * from './Button'
-export {Button, FlatButton, PrimaryButton, IconButton, OutlineButton}
+export { Button, FlatButton, PrimaryButton, IconButton, OutlineButton }

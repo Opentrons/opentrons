@@ -13,6 +13,6 @@ if (typeof global.__webpack_public_path__ === 'undefined') {
   }
 }
 
-export function getPublicPath () {
+export function getPublicPath() {
   return global.__webpack_public_path__
 }

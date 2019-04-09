@@ -5,7 +5,7 @@
 ## usage
 
 ```js
-const {DEV_MODE, baseConfig, rules} = require('@opentrons/webpack-config')
+const { DEV_MODE, baseConfig, rules } = require('@opentrons/webpack-config')
 ```
 
 ### DEV_MODE
@@ -17,7 +17,7 @@ If `NODE_ENV === 'development'` then `true`, else `false`
 ```js
 // webpack.config.js
 const path = require('path')
-const {DEV_MODE} = require('@opentrons/webpack-config')
+const { DEV_MODE } = require('@opentrons/webpack-config')
 
 const JS_ENTRY = path.join(__dirname, 'src/index.js')
 const OUTPUT_PATH = path.join(__dirname, 'dist')
@@ -63,7 +63,7 @@ To use in a project, add to your `webpack.config.js`:
 // webpack.config.js
 const path = require('path')
 const merge = require('webpack-merge')
-const {baseConfig} = require('@opentrons/webpack-config')
+const { baseConfig } = require('@opentrons/webpack-config')
 
 const JS_ENTRY = path.join(__dirname, 'src/index.js')
 const OUTPUT_PATH = path.join(__dirname, 'dist')
@@ -105,9 +105,9 @@ If you just need some rules, you can import them directly.
 ```js
 // webpack.config.js
 const merge = require('webpack-merge')
-const {baseConfig, rules} = require('@opentrons/webpack-config')
+const { baseConfig, rules } = require('@opentrons/webpack-config')
 
-module.exports = merge.strategy({'module.rules': 'replace'})(baseConfig, {
+module.exports = merge.strategy({ 'module.rules': 'replace' })(baseConfig, {
   module: {
     rules: [rules.js, rules.localCss],
   },

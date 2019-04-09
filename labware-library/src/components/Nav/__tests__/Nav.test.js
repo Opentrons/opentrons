@@ -1,7 +1,7 @@
 // @flow
 // tests for top navbar
 import * as React from 'react'
-import {shallow} from 'enzyme'
+import { shallow } from 'enzyme'
 
 import Nav from '..'
 

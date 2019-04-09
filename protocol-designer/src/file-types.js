@@ -1,12 +1,12 @@
 // @flow
-import type {RootState as IngredRoot} from './labware-ingred/reducers'
-import type {RootState as StepformRoot} from './step-forms'
-import type {RootState as DismissRoot} from './dismiss'
-import type {SchemaV1ProtocolFile} from '@opentrons/shared-data'
+import type { RootState as IngredRoot } from './labware-ingred/reducers'
+import type { RootState as StepformRoot } from './step-forms'
+import type { RootState as DismissRoot } from './dismiss'
+import type { SchemaV1ProtocolFile } from '@opentrons/shared-data'
 
 export type PDMetadata = {
   // pipetteId to tiprackModel
-  pipetteTiprackAssignments: {[pipetteId: string]: string},
+  pipetteTiprackAssignments: { [pipetteId: string]: string },
 
   dismissedWarnings: $PropertyType<DismissRoot, 'dismissedWarnings'>,
 
@@ -19,6 +19,6 @@ export type PDMetadata = {
 
 export type PDProtocolFile = SchemaV1ProtocolFile<PDMetadata>
 
-export function getPDMetadata (file: PDProtocolFile): PDMetadata {
+export function getPDMetadata(file: PDProtocolFile): PDMetadata {
   return file['designer-application'].data
 }

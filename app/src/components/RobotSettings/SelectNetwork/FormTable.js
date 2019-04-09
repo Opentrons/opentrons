@@ -13,11 +13,11 @@ type FormRowProps = {
   children: React.Node,
 }
 
-export default function FormTable (props: FormTableProps) {
+export default function FormTable(props: FormTableProps) {
   return <div className={styles.form_table}>{props.children}</div>
 }
 
-export function FormTableRow (props: FormRowProps) {
+export function FormTableRow(props: FormRowProps) {
   const label = props.label ? (
     <label htmlFor={props.labelFor} className={styles.form_table_label}>
       {props.label}

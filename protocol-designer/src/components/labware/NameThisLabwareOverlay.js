@@ -5,7 +5,7 @@ import OverlayPanel from './OverlayPanel'
 import styles from './labware.css'
 import ForeignDiv from '../../components/ForeignDiv'
 import i18n from '../../localization'
-import {ClickOutside} from '@opentrons/components'
+import { ClickOutside } from '@opentrons/components'
 
 type Props = {
   setLabwareName: (name: ?string) => mixed,
@@ -18,8 +18,11 @@ type State = {
   inputValue: string,
 }
 
-export default class NameThisLabwareOverlay extends React.Component<Props, State> {
-  constructor (props: Props) {
+export default class NameThisLabwareOverlay extends React.Component<
+  Props,
+  State
+> {
+  constructor(props: Props) {
     super(props)
     this.state = {
       pristine: true,
@@ -50,28 +53,38 @@ export default class NameThisLabwareOverlay extends React.Component<Props, State
     this.props.editLiquids()
   }
 
-  render () {
+  render() {
     return (
       <ClickOutside onClickOutside={this.onSubmit}>
-        {({ref}) => (
+        {({ ref }) => (
           <g className={styles.slot_overlay} ref={ref}>
             <OverlayPanel />
-            <g transform='translate(5, 0)'>
-              <ForeignDiv x='0' y='15%' width='92%'>
+            <g transform="translate(5, 0)">
+              <ForeignDiv x="0" y="15%" width="92%">
                 <input
                   className={styles.name_input}
                   onChange={this.handleChange}
                   onKeyUp={this.handleKeyUp}
-                  placeholder={i18n.t('deck.overlay.name_labware.nickname_placeholder')}
+                  placeholder={i18n.t(
+                    'deck.overlay.name_labware.nickname_placeholder'
+                  )}
                   value={this.state.inputValue}
                 />
               </ForeignDiv>
 
-              <ClickableText onClick={this.onAddLiquids}
-                iconName='water' y='50%' text={i18n.t('deck.overlay.name_labware.add_liquids')} />
+              <ClickableText
+                onClick={this.onAddLiquids}
+                iconName="water"
+                y="50%"
+                text={i18n.t('deck.overlay.name_labware.add_liquids')}
+              />
 
-              <ClickableText onClick={this.onSubmit}
-                iconName='ot-water-outline' y='75%' text={i18n.t('deck.overlay.name_labware.leave_empty')} />
+              <ClickableText
+                onClick={this.onSubmit}
+                iconName="ot-water-outline"
+                y="75%"
+                text={i18n.t('deck.overlay.name_labware.leave_empty')}
+              />
             </g>
           </g>
         )}

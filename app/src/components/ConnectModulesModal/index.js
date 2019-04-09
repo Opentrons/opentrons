@@ -1,20 +1,23 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import countBy from 'lodash/countBy'
 
-import {makeGetRobotModules, fetchModules} from '../../http-api-client'
-import {selectors as robotSelectors, actions as robotActions} from '../../robot'
+import { makeGetRobotModules, fetchModules } from '../../http-api-client'
+import {
+  selectors as robotSelectors,
+  actions as robotActions,
+} from '../../robot'
 
-import {Deck} from '@opentrons/components'
-import {RefreshWrapper} from '../Page'
-import {Modal} from '../modals'
+import { Deck } from '@opentrons/components'
+import { RefreshWrapper } from '../Page'
+import { Modal } from '../modals'
 import Prompt from './Prompt'
 import ReviewModuleItem from './ReviewModuleItem'
 
-import type {State} from '../../types'
-import type {RobotService, SessionModule} from '../../robot'
-import type {Module} from '../../http-api-client'
+import type { State } from '../../types'
+import type { RobotService, SessionModule } from '../../robot'
+import type { Module } from '../../http-api-client'
 
 type OP = {
   robot: RobotService,
@@ -37,10 +40,10 @@ export default connect(
   mapDispatchToProps
 )(ConnectModulesModal)
 
-function ConnectModulesModal (props: Props) {
+function ConnectModulesModal(props: Props) {
   if (!props.modulesRequired) return null
 
-  const {modulesMissing, setReviewed, fetchModules} = props
+  const { modulesMissing, setReviewed, fetchModules } = props
   const onPromptClick = modulesMissing ? fetchModules : setReviewed
 
   return (
@@ -53,7 +56,7 @@ function ConnectModulesModal (props: Props) {
   )
 }
 
-function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
+function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
   const getRobotModules = makeGetRobotModules()
 
   return (state, ownProps) => {
@@ -69,14 +72,14 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   return {
     setReviewed: () => dispatch(robotActions.setModulesReviewed(true)),
     fetchModules: () => dispatch(fetchModules(ownProps.robot)),
   }
 }
 
-function checkModulesMissing (
+function checkModulesMissing(
   required: Array<SessionModule>,
   actual: ?Array<Module>
 ): boolean {

@@ -4,7 +4,7 @@ import net from 'net'
 import defaultTo from 'lodash/defaultTo'
 import isEqual from 'lodash/isEqual'
 
-import type {BrowserService, ServiceType} from 'mdns-js'
+import type { BrowserService, ServiceType } from 'mdns-js'
 import type {
   Service,
   ServiceUpdate,
@@ -27,7 +27,7 @@ const isLocal = (ip: ?string) => {
 }
 export const DEFAULT_PORT = 31950
 
-export function makeService (
+export function makeService(
   name: string,
   ip: ?string,
   port: ?number,
@@ -52,7 +52,7 @@ export function makeService (
 
 // apply known value updates (not null or undefined) to a service, returning
 // original service reference if nothing to update
-export function updateService (
+export function updateService(
   service: Service,
   update: ServiceUpdate
 ): Service {
@@ -63,26 +63,26 @@ export function updateService (
     const nextVal = defaultTo(next[key], prevVal)
     // use isEqual to deep compare response objects
     // $FlowFixMe: flow can't type [key]: nextVal but we know this is correct
-    return isEqual(nextVal, prevVal) ? result : {...result, [key]: nextVal}
+    return isEqual(nextVal, prevVal) ? result : { ...result, [key]: nextVal }
   }, service)
 }
 
 // null out conflicting fields
-export function clearServiceIfConflict (
+export function clearServiceIfConflict(
   service: Service,
   update: ?ServiceUpdate
 ): Service {
   return update && service.ip === update.ip
-    ? {...service, ip: null, local: null, ok: null, serverOk: null}
+    ? { ...service, ip: null, local: null, ok: null, serverOk: null }
     : service
 }
 
-export function makeCandidate (ip: string, port: ?number): Candidate {
-  return {ip, port: port || DEFAULT_PORT}
+export function makeCandidate(ip: string, port: ?number): Candidate {
+  return { ip, port: port || DEFAULT_PORT }
 }
 
-export function fromMdnsBrowser (browserService: BrowserService): ?Service {
-  const {addresses, type, port, fullname} = browserService
+export function fromMdnsBrowser(browserService: BrowserService): ?Service {
+  const { addresses, type, port, fullname } = browserService
 
   if (!type || !fullname) return null
 
@@ -98,7 +98,7 @@ export function fromMdnsBrowser (browserService: BrowserService): ?Service {
   return makeService(name, ip, port, null, null, true)
 }
 
-export function fromResponse (
+export function fromResponse(
   candidate: Candidate,
   healthResponse: ?HealthResponse,
   serverHealthResponse: ?ServerHealthResponse
@@ -127,7 +127,7 @@ export function fromResponse (
   )
 }
 
-export function toCandidate (service: Service): ?Candidate {
+export function toCandidate(service: Service): ?Candidate {
   if (!service.ip) return null
 
   return makeCandidate(service.ip, service.port)

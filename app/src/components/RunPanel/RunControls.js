@@ -1,8 +1,8 @@
 // @flow
 // play pause run buttons for sidepanel
 import * as React from 'react'
-import {Link} from 'react-router-dom'
-import {OutlineButton} from '@opentrons/components'
+import { Link } from 'react-router-dom'
+import { OutlineButton } from '@opentrons/components'
 
 import styles from './styles.css'
 
@@ -16,7 +16,7 @@ type RunProps = {
   onResumeClick: () => mixed,
   onResetClick: () => mixed,
 }
-export default function RunControls (props: RunProps) {
+export default function RunControls(props: RunProps) {
   const {
     disabled,
     isReadyToRun,
@@ -28,13 +28,9 @@ export default function RunControls (props: RunProps) {
     onResetClick,
   } = props
 
-  const onPauseResumeClick = isPaused
-    ? onResumeClick
-    : onPauseClick
+  const onPauseResumeClick = isPaused ? onResumeClick : onPauseClick
 
-  const pauseResumeText = isPaused
-    ? 'Resume'
-    : 'Pause'
+  const pauseResumeText = isPaused ? 'Resume' : 'Pause'
 
   let runButton
   let pauseResumeButton

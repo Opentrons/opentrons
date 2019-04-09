@@ -4,12 +4,12 @@ import * as React from 'react'
 
 import styles from './styles.css'
 
-import {getAllDefinitions} from '../../definitions'
-import {FILTER_OFF} from '../../filters'
+import { getAllDefinitions } from '../../definitions'
+import { FILTER_OFF } from '../../filters'
 import LabwareCard from './LabwareCard'
 import NoResults from './NoResults'
 
-import type {FilterParams} from '../../types'
+import type { FilterParams } from '../../types'
 
 const filterMatches = (filter: ?string, value: string): boolean =>
   !filter || filter === FILTER_OFF || filter === value
@@ -18,8 +18,8 @@ export type LabwareListProps = {
   filters: FilterParams,
 }
 
-export default function LabwareList (props: LabwareListProps) {
-  const {category, manufacturer} = props.filters
+export default function LabwareList(props: LabwareListProps) {
+  const { category, manufacturer } = props.filters
   const definitions = getAllDefinitions().filter(
     d =>
       filterMatches(category, d.metadata.displayCategory) &&
@@ -37,4 +37,4 @@ export default function LabwareList (props: LabwareListProps) {
   )
 }
 
-export {NoResults}
+export { NoResults }

@@ -1,5 +1,5 @@
 // @flow
-import {createSelector} from 'reselect'
+import { createSelector } from 'reselect'
 
 import mapValues from 'lodash/mapValues'
 import min from 'lodash/min'
@@ -8,13 +8,13 @@ import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
 
 import * as StepGeneration from '../../step-generation'
-import {selectors as fileDataSelectors} from '../../file-data'
-import {selectors as labwareIngredSelectors} from '../../labware-ingred/selectors'
-import {selectors as stepFormSelectors} from '../../step-forms'
+import { selectors as fileDataSelectors } from '../../file-data'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import wellSelectionSelectors from '../../well-selection/selectors'
-import {getAllWellsForLabware, getMaxVolumes} from '../../constants'
+import { getAllWellsForLabware, getMaxVolumes } from '../../constants'
 
-import type {Selector} from '../../types'
+import type { Selector } from '../../types'
 import type {
   WellContents,
   WellContentsByLabware,
@@ -24,17 +24,17 @@ import type {
 // TODO Ian 2018-04-19: factor out all these selectors to their own files,
 // and make this index.js just imports and exports.
 import getWellContentsAllLabware from './getWellContentsAllLabware'
-export {getWellContentsAllLabware}
-export type {WellContentsByLabware}
+export { getWellContentsAllLabware }
+export type { WellContentsByLabware }
 
-function _wellContentsForWell (
+function _wellContentsForWell(
   liquidVolState: StepGeneration.LocationLiquidState,
   well: string
 ): WellContents {
   // TODO IMMEDIATELY Ian 2018-03-23 why is liquidVolState missing sometimes (eg first call with trashId)? Thus the liquidVolState || {}
-  const ingredGroupIdsWithContent = Object.keys(liquidVolState || {}).filter(groupId => (
-    liquidVolState[groupId] && liquidVolState[groupId].volume > 0
-  ))
+  const ingredGroupIdsWithContent = Object.keys(liquidVolState || {}).filter(
+    groupId => liquidVolState[groupId] && liquidVolState[groupId].volume > 0
+  )
 
   return {
     highlighted: false,
@@ -43,11 +43,14 @@ function _wellContentsForWell (
     maxVolume: Infinity, // TODO Ian 2018-03-23 refactor so all these fields aren't needed
     wellName: well,
     groupIds: ingredGroupIdsWithContent, // TODO: BC 2018-09-21 remove in favor of volumeByGroupId
-    ingreds: omitBy(liquidVolState, (ingredData) => !ingredData || ingredData.volume <= 0),
+    ingreds: omitBy(
+      liquidVolState,
+      ingredData => !ingredData || ingredData.volume <= 0
+    ),
   }
 }
 
-export function _wellContentsForLabware (
+export function _wellContentsForLabware(
   labwareLiquids: StepGeneration.SingleLabwareLiquidState,
   labwareId: string,
   labwareType: string
@@ -56,7 +59,7 @@ export function _wellContentsForLabware (
 
   return reduce(
     allWellsForContainer,
-    (wellAcc, well: string): {[well: string]: WellContents} => {
+    (wellAcc, well: string): { [well: string]: WellContents } => {
       const wellHasContents = labwareLiquids && labwareLiquids[well]
       return {
         ...wellAcc,
@@ -69,25 +72,29 @@ export function _wellContentsForLabware (
   )
 }
 
-export const getAllWellContentsForSteps: Selector<Array<WellContentsByLabware>> = createSelector(
+export const getAllWellContentsForSteps: Selector<
+  Array<WellContentsByLabware>
+> = createSelector(
   fileDataSelectors.getInitialRobotState,
   fileDataSelectors.getRobotStateTimeline,
   (initialRobotState, robotStateTimeline) => {
-    const timeline = [{robotState: initialRobotState}, ...robotStateTimeline.timeline]
+    const timeline = [
+      { robotState: initialRobotState },
+      ...robotStateTimeline.timeline,
+    ]
 
     return timeline.map((timelineStep, timelineIndex) => {
       const liquidState = timelineStep.robotState.liquidState.labware
       return mapValues(
         liquidState,
-        (labwareLiquids: StepGeneration.SingleLabwareLiquidState, labwareId: string) => {
+        (
+          labwareLiquids: StepGeneration.SingleLabwareLiquidState,
+          labwareId: string
+        ) => {
           const robotState = timeline[timelineIndex].robotState
           const labwareType = robotState.labware[labwareId].type
 
-          return _wellContentsForLabware(
-            labwareLiquids,
-            labwareId,
-            labwareType
-          )
+          return _wellContentsForLabware(labwareLiquids, labwareId, labwareType)
         }
       )
     })
@@ -96,10 +103,13 @@ export const getAllWellContentsForSteps: Selector<Array<WellContentsByLabware>> 
 
 export const getLastValidWellContents: Selector<WellContentsByLabware> = createSelector(
   fileDataSelectors.lastValidRobotState,
-  (robotState) => {
+  robotState => {
     return mapValues(
       robotState.labware,
-      (labwareLiquids: StepGeneration.SingleLabwareLiquidState, labwareId: string) => {
+      (
+        labwareLiquids: StepGeneration.SingleLabwareLiquidState,
+        labwareId: string
+      ) => {
         return _wellContentsForLabware(
           robotState.liquidState.labware[labwareId],
           labwareId,
@@ -116,23 +126,25 @@ export const getSelectedWellsMaxVolume: Selector<number> = createSelector(
   stepFormSelectors.getLabwareTypesById,
   (selectedWells, selectedLabwareId, labwareTypes) => {
     const selectedWellNames = Object.keys(selectedWells)
-    const selectedLabwareType = selectedLabwareId && labwareTypes[selectedLabwareId]
+    const selectedLabwareType =
+      selectedLabwareId && labwareTypes[selectedLabwareId]
     if (!selectedLabwareType) {
       console.warn('No container type selected, cannot get max volume')
       return Infinity
     }
     const maxVolumesByWell = getMaxVolumes(selectedLabwareType)
-    const maxVolumesList = (selectedWellNames.length > 0)
-      // when wells are selected, only look at vols of selected wells
-      ? Object.values(pick(maxVolumesByWell, selectedWellNames))
-      // when no wells selected (eg editing ingred group), look at all volumes.
-      // TODO LATER: look at filled wells, not all wells.
-      : Object.values(maxVolumesByWell)
+    const maxVolumesList =
+      selectedWellNames.length > 0
+        ? // when wells are selected, only look at vols of selected wells
+          Object.values(pick(maxVolumesByWell, selectedWellNames))
+        : // when no wells selected (eg editing ingred group), look at all volumes.
+          // TODO LATER: look at filled wells, not all wells.
+          Object.values(maxVolumesByWell)
     return min(maxVolumesList.map(n => parseInt(n)))
   }
 )
 
-type CommonWellValues = {ingredientId: ?string, volume: ?number}
+type CommonWellValues = { ingredientId: ?string, volume: ?number }
 /** Returns the common single ingredient group of selected wells,
  * or null if there is not a single common ingredient group */
 export const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSelector(
@@ -140,13 +152,16 @@ export const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSe
   labwareIngredSelectors.getSelectedLabwareId,
   labwareIngredSelectors.getLiquidsByLabwareId,
   (selectedWellsObj, labwareId, allIngreds) => {
-    if (!labwareId) return {ingredientId: null, volume: null}
+    if (!labwareId) return { ingredientId: null, volume: null }
     const ingredsInLabware = allIngreds[labwareId]
     const selectedWells: Array<string> = Object.keys(selectedWellsObj)
-    if (!ingredsInLabware || selectedWells.length < 1) return {ingredientId: null, volume: null}
+    if (!ingredsInLabware || selectedWells.length < 1)
+      return { ingredientId: null, volume: null }
 
-    const initialWellContents: ?StepGeneration.LocationLiquidState = ingredsInLabware[selectedWells[0]]
-    const initialIngredId: ?string = initialWellContents && Object.keys(initialWellContents)[0]
+    const initialWellContents: ?StepGeneration.LocationLiquidState =
+      ingredsInLabware[selectedWells[0]]
+    const initialIngredId: ?string =
+      initialWellContents && Object.keys(initialWellContents)[0]
 
     const hasCommonIngred = selectedWells.every(well => {
       if (!ingredsInLabware[well]) return null
@@ -155,24 +170,27 @@ export const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSe
     })
 
     if (!hasCommonIngred || !initialIngredId || !initialWellContents) {
-      return {ingredientId: null, volume: null}
+      return { ingredientId: null, volume: null }
     } else {
       const initialVolume: ?number = initialWellContents[initialIngredId].volume
       const hasCommonVolume = selectedWells.every(well => {
         if (!ingredsInLabware[well] || !initialIngredId) return null
         return ingredsInLabware[well][initialIngredId].volume === initialVolume
       })
-      return {ingredientId: initialIngredId, volume: hasCommonVolume ? initialVolume : null}
+      return {
+        ingredientId: initialIngredId,
+        volume: hasCommonVolume ? initialVolume : null,
+      }
     }
   }
 )
 
 export const getSelectedWellsCommonIngredId: Selector<?string> = createSelector(
   getSelectedWellsCommonValues,
-  (commonValues) => commonValues.ingredientId || null
+  commonValues => commonValues.ingredientId || null
 )
 
 export const getSelectedWellsCommonVolume: Selector<?number> = createSelector(
   getSelectedWellsCommonValues,
-  (commonValues) => commonValues.volume || null
+  commonValues => commonValues.volume || null
 )

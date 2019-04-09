@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
-import {RadioGroup} from '@opentrons/components'
-import type {StepFieldName} from '../../../steplist/fieldLevel'
-import type {FocusHandlers} from '../types'
+import { RadioGroup } from '@opentrons/components'
+import type { StepFieldName } from '../../../steplist/fieldLevel'
+import type { FocusHandlers } from '../types'
 import StepField from './FieldConnector'
 
 type RadioGroupFieldProps = {
@@ -10,13 +10,20 @@ type RadioGroupFieldProps = {
   options: $PropertyType<React.ElementProps<typeof RadioGroup>, 'options'>,
 } & FocusHandlers
 const RadioGroupField = (props: RadioGroupFieldProps) => {
-  const {name, onFieldFocus, onFieldBlur, focusedField, dirtyFields, ...radioGroupProps} = props
+  const {
+    name,
+    onFieldFocus,
+    onFieldBlur,
+    focusedField,
+    dirtyFields,
+    ...radioGroupProps
+  } = props
   return (
     <StepField
       name={name}
       focusedField={focusedField}
       dirtyFields={dirtyFields}
-      render={({value, updateValue, errorToShow}) => (
+      render={({ value, updateValue, errorToShow }) => (
         <RadioGroup
           {...radioGroupProps}
           value={value ? String(value) : ''}
@@ -24,8 +31,10 @@ const RadioGroupField = (props: RadioGroupFieldProps) => {
           onChange={(e: SyntheticEvent<*>) => {
             updateValue(e.currentTarget.value)
             onFieldBlur(name)
-          }} />
-      )} />
+          }}
+        />
+      )}
+    />
   )
 }
 

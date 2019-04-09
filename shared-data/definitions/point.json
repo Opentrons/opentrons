@@ -3,11 +3,7 @@
     "name": "point",
     "format": "irregular"
   },
-  "ordering": [
-    [
-      "A1"
-    ]
-  ],
+  "ordering": [["A1"]],
   "wells": {
     "A1": {
       "height": 0,

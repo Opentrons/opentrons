@@ -17,7 +17,7 @@ describe('serviceList', () => {
             name: 'foo',
             ok: true,
             serverOk: false,
-            health: {api_version: '1.0.0'},
+            health: { api_version: '1.0.0' },
             serverHealth: null,
           },
           {
@@ -26,22 +26,22 @@ describe('serviceList', () => {
             ok: false,
             serverOk: true,
             health: null,
-            serverHealth: {apiServerVersion: '1.0.0'},
+            serverHealth: { apiServerVersion: '1.0.0' },
           },
           {
             ...MOCK_SERVICE,
             name: 'baz',
             ok: true,
             serverOk: true,
-            health: {api_version: '1.0.0'},
-            serverHealth: {apiServerVersion: '1.0.0'},
+            health: { api_version: '1.0.0' },
+            serverHealth: { apiServerVersion: '1.0.0' },
           },
         ],
         expected: [
           {
             ...MOCK_SERVICE,
             name: 'foo',
-            health: {api_version: '1.0.0'},
+            health: { api_version: '1.0.0' },
             serverHealth: null,
           },
           {
@@ -50,40 +50,40 @@ describe('serviceList', () => {
             ip: null,
             local: null,
             health: null,
-            serverHealth: {apiServerVersion: '1.0.0'},
+            serverHealth: { apiServerVersion: '1.0.0' },
           },
           {
             ...MOCK_SERVICE,
             name: 'baz',
             ip: null,
             local: null,
-            health: {api_version: '1.0.0'},
-            serverHealth: {apiServerVersion: '1.0.0'},
+            health: { api_version: '1.0.0' },
+            serverHealth: { apiServerVersion: '1.0.0' },
           },
         ],
       },
       {
         name: 'removes unknown IP entries if known IP entry exists',
-        input: [MOCK_SERVICE, {...MOCK_SERVICE, ip: null}],
+        input: [MOCK_SERVICE, { ...MOCK_SERVICE, ip: null }],
         expected: [MOCK_SERVICE],
       },
       {
         name: 'collapses multiple IP unknown duplicates into one',
         input: [
-          {...MOCK_SERVICE, ip: null, local: null},
+          { ...MOCK_SERVICE, ip: null, local: null },
           MOCK_SERVICE,
-          {...MOCK_SERVICE, name: 'bar', ip: null, local: null},
-          {...MOCK_SERVICE, name: 'bar', ip: null, local: null},
+          { ...MOCK_SERVICE, name: 'bar', ip: null, local: null },
+          { ...MOCK_SERVICE, name: 'bar', ip: null, local: null },
         ],
         expected: [
           MOCK_SERVICE,
-          {...MOCK_SERVICE, name: 'bar', ip: null, local: null},
+          { ...MOCK_SERVICE, name: 'bar', ip: null, local: null },
         ],
       },
     ]
 
     SPECS.forEach(spec => {
-      const {name, input, expected} = spec
+      const { name, input, expected } = spec
       const result = serviceList.createServiceList.call(null, input)
       test(name, () => expect(result).toEqual(expected))
     })
@@ -106,20 +106,20 @@ describe('serviceList', () => {
       {
         name: 'updates existing service',
         list: [MOCK_SERVICE],
-        upsert: {...MOCK_SERVICE, ok: true, serverOk: false},
-        expected: [{...MOCK_SERVICE, ok: true, serverOk: false}],
+        upsert: { ...MOCK_SERVICE, ok: true, serverOk: false },
+        expected: [{ ...MOCK_SERVICE, ok: true, serverOk: false }],
       },
       {
         name: 'does not null out ok flags of existing service',
-        list: [{...MOCK_SERVICE, ok: true, serverOk: false}],
+        list: [{ ...MOCK_SERVICE, ok: true, serverOk: false }],
         upsert: MOCK_SERVICE,
-        expected: [{...MOCK_SERVICE, ok: true, serverOk: false}],
+        expected: [{ ...MOCK_SERVICE, ok: true, serverOk: false }],
       },
       {
         name: 'nulls out IP duplicates',
         list: [
-          {...MOCK_SERVICE, name: 'bar', ok: false, serverOk: true},
-          {...MOCK_SERVICE, name: 'baz', ok: false, serverOk: true},
+          { ...MOCK_SERVICE, name: 'bar', ok: false, serverOk: true },
+          { ...MOCK_SERVICE, name: 'baz', ok: false, serverOk: true },
         ],
         upsert: MOCK_SERVICE,
         expected: [
@@ -145,7 +145,7 @@ describe('serviceList', () => {
     ]
 
     SPECS.forEach(spec => {
-      const {name, list, upsert, expected} = spec
+      const { name, list, upsert, expected } = spec
       const result = serviceList.upsertServiceList.call(null, list, upsert)
       test(name, () => expect(result).toEqual(expected))
     })

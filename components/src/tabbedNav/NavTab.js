@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react'
-import {NavLink} from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import classnames from 'classnames'
 
 import styles from './navbar.css'
-import {Button} from '../buttons'
-import {NotificationIcon, type IconName} from '../icons'
+import { Button } from '../buttons'
+import { NotificationIcon, type IconName } from '../icons'
 
-type NavTabProps= {
+type NavTabProps = {
   /** optional click event for nav button */
   onClick?: (event: SyntheticEvent<>) => void,
   /** optional url for nav button route */
@@ -28,17 +28,13 @@ type NavTabProps= {
   selected?: boolean,
 }
 
-export default function NavTab (props: NavTabProps) {
-  const {url} = props
-  const className = classnames(
-    props.className,
-    styles.tab,
-    {
-      [styles.disabled]: props.disabled,
-      [styles.bottom]: props.isBottom,
-      [styles.selected]: props.selected,
-    }
-  )
+export default function NavTab(props: NavTabProps) {
+  const { url } = props
+  const className = classnames(props.className, styles.tab, {
+    [styles.disabled]: props.disabled,
+    [styles.bottom]: props.isBottom,
+    [styles.selected]: props.selected,
+  })
 
   let buttonProps = {
     className: className,
@@ -63,11 +59,7 @@ export default function NavTab (props: NavTabProps) {
         className={styles.icon}
         childClassName={styles.notification}
       />
-      {props.title && (
-        <span className={styles.title}>
-          {props.title}
-        </span>
-      )}
+      {props.title && <span className={styles.title}>{props.title}</span>}
     </Button>
   )
 }

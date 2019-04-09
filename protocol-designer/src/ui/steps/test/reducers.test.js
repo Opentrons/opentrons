@@ -1,14 +1,14 @@
 // @flow
-import {_allReducers} from '../reducers.js'
+import { _allReducers } from '../reducers.js'
 
-const {collapsedSteps, selectedItem} = _allReducers
+const { collapsedSteps, selectedItem } = _allReducers
 
 describe('collapsedSteps reducer', () => {
   test('add step', () => {
     const state = {}
     const action = {
       type: 'ADD_STEP',
-      payload: {id: '1', stepType: 'moveLiquid'},
+      payload: { id: '1', stepType: 'moveLiquid' },
     }
     expect(collapsedSteps(state, action)).toEqual({
       '1': false, // default is false: not collapsed

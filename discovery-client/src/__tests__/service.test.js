@@ -1,5 +1,5 @@
 // tests for service and candidate creation utils
-import {setIn} from '@thi.ng/paths'
+import { setIn } from '@thi.ng/paths'
 
 import * as service from '../service'
 import MOCK_BROWSER_SERVICE from '../__fixtures__/mdns-browser-service'
@@ -16,8 +16,8 @@ describe('service utils', () => {
           false,
           false,
           false,
-          {name: 'name'},
-          {name: 'name'},
+          { name: 'name' },
+          { name: 'name' },
         ],
         expected: {
           name: 'name',
@@ -27,8 +27,8 @@ describe('service utils', () => {
           ok: false,
           serverOk: false,
           advertising: false,
-          health: {name: 'name'},
-          serverHealth: {name: 'name'},
+          health: { name: 'name' },
+          serverHealth: { name: 'name' },
         },
       },
       {
@@ -49,12 +49,12 @@ describe('service utils', () => {
       {
         name: 'link-local IPv4',
         args: ['name', '169.254.1.2'],
-        expected: expect.objectContaining({local: true}),
+        expected: expect.objectContaining({ local: true }),
       },
     ]
 
     SPECS.forEach(spec => {
-      const {name, args, expected} = spec
+      const { name, args, expected } = spec
       test(name, () =>
         expect(service.makeService.apply(null, args)).toEqual(expected)
       )
@@ -66,17 +66,17 @@ describe('service utils', () => {
       {
         name: 'all info specified',
         args: ['ip', 1234],
-        expected: {ip: 'ip', port: 1234},
+        expected: { ip: 'ip', port: 1234 },
       },
       {
         name: 'defaults',
         args: ['ip'],
-        expected: {ip: 'ip', port: 31950},
+        expected: { ip: 'ip', port: 31950 },
       },
     ]
 
     SPECS.forEach(spec => {
-      const {name, args, expected} = spec
+      const { name, args, expected } = spec
       test(name, () =>
         expect(service.makeCandidate.apply(null, args)).toEqual(expected)
       )
@@ -147,7 +147,7 @@ describe('service utils', () => {
     ]
 
     SPECS.forEach(spec => {
-      const {name, args, expected} = spec
+      const { name, args, expected } = spec
       test(name, () =>
         expect(service.fromMdnsBrowser.apply(null, args)).toEqual(expected)
       )
@@ -155,7 +155,7 @@ describe('service utils', () => {
   })
 
   describe('fromResponse', () => {
-    const MOCK_CANDIDATE = {ip: '192.168.1.42', port: 31950}
+    const MOCK_CANDIDATE = { ip: '192.168.1.42', port: 31950 }
     const SPECS = [
       {
         name: 'returns null if no responses',
@@ -166,8 +166,8 @@ describe('service utils', () => {
         name: 'gets ip from candidate and name from responses',
         args: [
           MOCK_CANDIDATE,
-          {name: 'opentrons-dev', api_version: '1.0.0'},
-          {name: 'opentrons-dev', apiServerVersion: '1.0.0'},
+          { name: 'opentrons-dev', api_version: '1.0.0' },
+          { name: 'opentrons-dev', apiServerVersion: '1.0.0' },
         ],
         expected: {
           name: 'opentrons-dev',
@@ -177,8 +177,8 @@ describe('service utils', () => {
           ok: true,
           serverOk: true,
           advertising: null,
-          health: {name: 'opentrons-dev', api_version: '1.0.0'},
-          serverHealth: {name: 'opentrons-dev', apiServerVersion: '1.0.0'},
+          health: { name: 'opentrons-dev', api_version: '1.0.0' },
+          serverHealth: { name: 'opentrons-dev', apiServerVersion: '1.0.0' },
         },
       },
       {
@@ -186,7 +186,7 @@ describe('service utils', () => {
         args: [
           MOCK_CANDIDATE,
           null,
-          {name: 'opentrons-dev', apiServerVersion: '1.0.0'},
+          { name: 'opentrons-dev', apiServerVersion: '1.0.0' },
         ],
         expected: {
           name: 'opentrons-dev',
@@ -197,14 +197,14 @@ describe('service utils', () => {
           serverOk: true,
           advertising: null,
           health: null,
-          serverHealth: {name: 'opentrons-dev', apiServerVersion: '1.0.0'},
+          serverHealth: { name: 'opentrons-dev', apiServerVersion: '1.0.0' },
         },
       },
       {
         name: 'flags serverOk false if no /server/update/health response',
         args: [
           MOCK_CANDIDATE,
-          {name: 'opentrons-dev', api_version: '1.0.0'},
+          { name: 'opentrons-dev', api_version: '1.0.0' },
           null,
         ],
         expected: {
@@ -215,7 +215,7 @@ describe('service utils', () => {
           ok: true,
           serverOk: false,
           advertising: null,
-          health: {name: 'opentrons-dev', api_version: '1.0.0'},
+          health: { name: 'opentrons-dev', api_version: '1.0.0' },
           serverHealth: null,
         },
       },
@@ -223,8 +223,8 @@ describe('service utils', () => {
         name: 'flags ok false if name mismatch in responses',
         args: [
           MOCK_CANDIDATE,
-          {name: 'opentrons-wrong', api_version: '1.0.0'},
-          {name: 'opentrons-dev', apiServerVersion: '1.0.0'},
+          { name: 'opentrons-wrong', api_version: '1.0.0' },
+          { name: 'opentrons-dev', apiServerVersion: '1.0.0' },
         ],
         expected: {
           name: 'opentrons-dev',
@@ -234,14 +234,14 @@ describe('service utils', () => {
           ok: false,
           serverOk: true,
           advertising: null,
-          health: {name: 'opentrons-wrong', api_version: '1.0.0'},
-          serverHealth: {name: 'opentrons-dev', apiServerVersion: '1.0.0'},
+          health: { name: 'opentrons-wrong', api_version: '1.0.0' },
+          serverHealth: { name: 'opentrons-dev', apiServerVersion: '1.0.0' },
         },
       },
     ]
 
     SPECS.forEach(spec => {
-      const {name, args, expected} = spec
+      const { name, args, expected } = spec
       test(name, () =>
         expect(service.fromResponse.apply(null, args)).toEqual(expected)
       )

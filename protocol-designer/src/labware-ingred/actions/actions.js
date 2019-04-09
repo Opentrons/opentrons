@@ -1,11 +1,11 @@
 // @flow
-import {createAction} from 'redux-actions'
-import type {Dispatch} from 'redux'
+import { createAction } from 'redux-actions'
+import type { Dispatch } from 'redux'
 
-import {selectors} from '../selectors'
-import type {DeckSlot} from '@opentrons/components'
-import type {GetState} from '../../types'
-import type {IngredInputs} from '../types'
+import { selectors } from '../selectors'
+import type { DeckSlot } from '@opentrons/components'
+import type { GetState } from '../../types'
+import type { IngredInputs } from '../types'
 
 type IngredInputsExact = $Exact<IngredInputs>
 
@@ -13,7 +13,7 @@ type IngredInputsExact = $Exact<IngredInputs>
 
 export const openAddLabwareModal = createAction(
   'OPEN_ADD_LABWARE_MODAL',
-  (args: {slot: DeckSlot}) => args
+  (args: { slot: DeckSlot }) => args
 )
 
 export const closeLabwareSelector = createAction(
@@ -99,9 +99,12 @@ export type SwapSlotContentsAction = {
 
 // TODO: Ian 2019-01-24 later, this should work on stepId or a range of steps.
 // We could follow the pattern of SubstituteStepFormPipettesAction.
-export const swapSlotContents = (sourceSlot: DeckSlot, destSlot: DeckSlot): SwapSlotContentsAction => ({
+export const swapSlotContents = (
+  sourceSlot: DeckSlot,
+  destSlot: DeckSlot
+): SwapSlotContentsAction => ({
   type: 'SWAP_SLOT_CONTENTS',
-  payload: {sourceSlot, destSlot},
+  payload: { sourceSlot, destSlot },
 })
 
 export type DuplicateLabwareAction = {
@@ -134,22 +137,26 @@ export type DeleteLiquidGroup = {
   payload: string, // liquid group id
 }
 
-export const deleteLiquidGroup = (liquidGroupId: string) =>
-  (dispatch: Dispatch<DeleteLiquidGroup>, getState: GetState) => {
-    const allLiquidGroupsOnDeck = selectors.getLiquidGroupsOnDeck(getState())
-    const liquidIsOnDeck = allLiquidGroupsOnDeck.includes(liquidGroupId)
-    // TODO: Ian 2018-10-22 we will eventually want to replace
-    // this window.confirm with a modal
-    const okToDelete = liquidIsOnDeck
-      ? global.confirm('This liquid has been placed on the deck, are you sure you want to delete it?')
-      : true
-    if (okToDelete) {
-      return dispatch({
-        type: 'DELETE_LIQUID_GROUP',
-        payload: liquidGroupId,
-      })
-    }
+export const deleteLiquidGroup = (liquidGroupId: string) => (
+  dispatch: Dispatch<DeleteLiquidGroup>,
+  getState: GetState
+) => {
+  const allLiquidGroupsOnDeck = selectors.getLiquidGroupsOnDeck(getState())
+  const liquidIsOnDeck = allLiquidGroupsOnDeck.includes(liquidGroupId)
+  // TODO: Ian 2018-10-22 we will eventually want to replace
+  // this window.confirm with a modal
+  const okToDelete = liquidIsOnDeck
+    ? global.confirm(
+        'This liquid has been placed on the deck, are you sure you want to delete it?'
+      )
+    : true
+  if (okToDelete) {
+    return dispatch({
+      type: 'DELETE_LIQUID_GROUP',
+      payload: liquidGroupId,
+    })
   }
+}
 
 // NOTE: assumes you want to set a uniform volume of the same liquid in one labware
 export type SetWellContentsPayload = {
@@ -164,7 +171,9 @@ export type SetWellContentsAction = {
   payload: SetWellContentsPayload,
 }
 
-export const setWellContents = (payload: SetWellContentsPayload): SetWellContentsAction => ({
+export const setWellContents = (
+  payload: SetWellContentsPayload
+): SetWellContentsAction => ({
   type: 'SET_WELL_CONTENTS',
   payload,
 })
@@ -174,19 +183,19 @@ export type SelectLiquidAction = {
   payload: string,
 }
 
-export function selectLiquidGroup (liquidGroupId: string): SelectLiquidAction {
+export function selectLiquidGroup(liquidGroupId: string): SelectLiquidAction {
   return {
     type: 'SELECT_LIQUID_GROUP',
     payload: liquidGroupId,
   }
 }
 
-export function deselectLiquidGroup () {
-  return {type: 'DESELECT_LIQUID_GROUP'}
+export function deselectLiquidGroup() {
+  return { type: 'DESELECT_LIQUID_GROUP' }
 }
 
-export function createNewLiquidGroup () {
-  return {type: 'CREATE_NEW_LIQUID_GROUP_FORM'}
+export function createNewLiquidGroup() {
+  return { type: 'CREATE_NEW_LIQUID_GROUP_FORM' }
 }
 
 export type EditLiquidGroupAction = {|
@@ -198,16 +207,17 @@ export type EditLiquidGroupAction = {|
 |}
 
 // NOTE: with no ID, a new one is assigned
-export const editLiquidGroup = (
-  args: {liquidGroupId: ?string, ...IngredInputsExact}
-) => (dispatch: Dispatch<EditLiquidGroupAction>, getState: GetState
-) => {
-  const {liquidGroupId, ...payloadArgs} = args // NOTE: separate liquidGroupId for flow to understand unpacking :/
+export const editLiquidGroup = (args: {
+  liquidGroupId: ?string,
+  ...IngredInputsExact,
+}) => (dispatch: Dispatch<EditLiquidGroupAction>, getState: GetState) => {
+  const { liquidGroupId, ...payloadArgs } = args // NOTE: separate liquidGroupId for flow to understand unpacking :/
   dispatch({
     type: 'EDIT_LIQUID_GROUP',
     payload: {
       ...payloadArgs,
-      liquidGroupId: args.liquidGroupId || selectors.getNextLiquidGroupId(getState()),
+      liquidGroupId:
+        args.liquidGroupId || selectors.getNextLiquidGroupId(getState()),
     },
   })
 }

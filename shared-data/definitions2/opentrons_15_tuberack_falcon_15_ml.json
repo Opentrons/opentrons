@@ -1,44 +1,17 @@
 {
   "ordering": [
-    [
-      "A1",
-      "B1",
-      "C1"
-    ],
-    [
-      "A2",
-      "B2",
-      "C2"
-    ],
-    [
-      "A3",
-      "B3",
-      "C3"
-    ],
-    [
-      "A4",
-      "B4",
-      "C4"
-    ],
-    [
-      "A5",
-      "B5",
-      "C5"
-    ]
+    ["A1", "B1", "C1"],
+    ["A2", "B2", "C2"],
+    ["A3", "B3", "C3"],
+    ["A4", "B4", "C4"],
+    ["A5", "B5", "C5"]
   ],
   "brand": {
     "brand": "Opentrons",
-    "brandId": [
-      "352096"
-    ]
+    "brandId": ["352096"]
   },
   "metadata": {
-    "tags": [
-      "15",
-      "mL",
-      "falcon",
-      "tuberack"
-    ],
+    "tags": ["15", "mL", "falcon", "tuberack"],
     "displayName": "Opentrons 12 Tube Rack With Falcon 15 mL Conical",
     "displayCategory": "tubeRack",
     "displayVolumeUnits": "mL"

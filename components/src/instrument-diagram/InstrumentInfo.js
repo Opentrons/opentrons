@@ -2,7 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import type {Mount} from '../robot-types'
+import type { Mount } from '../robot-types'
 import InfoItem from './InfoItem.js'
 import InstrumentDiagram from './InstrumentDiagram'
 
@@ -31,7 +31,7 @@ export type InstrumentInfoProps = {
   children?: React.Node,
 }
 
-export default function InstrumentInfo (props: InstrumentInfoProps) {
+export default function InstrumentInfo(props: InstrumentInfoProps) {
   const className = cx(
     styles.pipette,
     styles[props.mount],
@@ -46,15 +46,20 @@ export default function InstrumentInfo (props: InstrumentInfoProps) {
           title={props.showMountLabel ? `${props.mount} pipette` : 'pipette'}
           value={props.description}
         />
-        {props.tipType && <InfoItem title={'suggested tip type'} value={props.tipType} />}
-        {props.tiprackModel && <InfoItem title={'tip rack'} value={props.tiprackModel} />}
+        {props.tipType && (
+          <InfoItem title={'suggested tip type'} value={props.tipType} />
+        )}
+        {props.tiprackModel && (
+          <InfoItem title={'tip rack'} value={props.tiprackModel} />
+        )}
         {props.children}
       </div>
-      {props.channels &&
+      {props.channels && (
         <InstrumentDiagram
           channels={props.channels}
-          className={styles.pipette_icon} />
-      }
+          className={styles.pipette_icon}
+        />
+      )}
     </div>
   )
 }

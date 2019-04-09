@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react'
 
-import {SpinnerModal} from '@opentrons/components'
+import { SpinnerModal } from '@opentrons/components'
 import UpdateAppModal from './UpdateAppModal'
 import RestartAppModal from './RestartAppModal'
 
-import type {ShellUpdateState} from '../../../shell'
+import type { ShellUpdateState } from '../../../shell'
 
 type Props = {
   update: ShellUpdateState,
@@ -15,8 +15,8 @@ type Props = {
   applyUpdate: () => mixed,
   closeModal: () => mixed,
 }
-export default function UpdateApp (props: Props) {
-  const {downloaded, downloading} = props.update
+export default function UpdateApp(props: Props) {
+  const { downloaded, downloading } = props.update
 
   if (downloaded) {
     return <RestartAppModal {...props} />

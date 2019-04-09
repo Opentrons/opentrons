@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
-import {Icon, PrimaryButton, ModalPage} from '@opentrons/components'
-import {getPipetteChannelsByDisplayName} from '@opentrons/shared-data'
+import { Icon, PrimaryButton, ModalPage } from '@opentrons/components'
+import { getPipetteChannelsByDisplayName } from '@opentrons/shared-data'
 
-import type {ChangePipetteProps} from './types'
-import {getDiagramSrc} from './InstructionStep'
+import type { ChangePipetteProps } from './types'
+import { getDiagramSrc } from './InstructionStep'
 import styles from './styles.css'
 
 const EXIT_BUTTON_MESSAGE = 'exit pipette setup'
@@ -15,8 +15,8 @@ const EXIT_BUTTON_MESSAGE_WRONG = 'keep pipette and exit setup'
 
 // note: direction prop is not valid inside this component
 // display messages based on presence of wantedPipetteName and actualPipette
-export default function ConfirmPipette (props: ChangePipetteProps) {
-  const {success, attachedWrong, actualPipette} = props
+export default function ConfirmPipette(props: ChangePipetteProps) {
+  const { success, attachedWrong, actualPipette } = props
 
   return (
     <ModalPage
@@ -31,19 +31,15 @@ export default function ConfirmPipette (props: ChangePipetteProps) {
     >
       <Status {...props} />
       <StatusDetails {...props} />
-      {!success && (
-        <TryAgainButton {...props} />
-      )}
-      {success && !actualPipette && (
-        <AttachAnotherButton {...props} />
-      )}
+      {!success && <TryAgainButton {...props} />}
+      {success && !actualPipette && <AttachAnotherButton {...props} />}
       <ExitButton {...props} />
     </ModalPage>
   )
 }
 
-function Status (props: ChangePipetteProps) {
-  const {displayName, wantedPipetteName, attachedWrong, success} = props
+function Status(props: ChangePipetteProps) {
+  const { displayName, wantedPipetteName, attachedWrong, success } = props
   const iconName = success ? 'check-circle' : 'close-circle'
   const iconClass = cx(styles.confirm_icon, {
     [styles.success]: success,
@@ -59,9 +55,7 @@ function Status (props: ChangePipetteProps) {
       ? `Incorrect pipette attached (${displayName})`
       : `Unable to detect ${wantedPipetteName || ''}.`
   } else {
-    message = success
-      ? 'Pipette is detached'
-      : 'Pipette is not detached'
+    message = success ? 'Pipette is detached' : 'Pipette is not detached'
   }
 
   return (
@@ -72,14 +66,15 @@ function Status (props: ChangePipetteProps) {
   )
 }
 
-function StatusDetails (props: ChangePipetteProps) {
-  const {success, attachedWrong, wantedPipetteName, actualPipette} = props
+function StatusDetails(props: ChangePipetteProps) {
+  const { success, attachedWrong, wantedPipetteName, actualPipette } = props
 
   if (!success) {
     if (wantedPipetteName && attachedWrong) {
       return (
         <p className={styles.confirm_failure_instructions}>
-          The attached pipette does not match the {wantedPipetteName} pipette you had originally selected.
+          The attached pipette does not match the {wantedPipetteName} pipette
+          you had originally selected.
         </p>
       )
     }
@@ -97,7 +92,8 @@ function StatusDetails (props: ChangePipetteProps) {
             })}
           />
           <p className={styles.confirm_failure_instructions}>
-            Check again to ensure that white connector tab is plugged into pipette.
+            Check again to ensure that white connector tab is plugged into
+            pipette.
           </p>
         </div>
       )
@@ -106,7 +102,8 @@ function StatusDetails (props: ChangePipetteProps) {
     if (actualPipette) {
       return (
         <p className={styles.confirm_failure_instructions}>
-          Check again to ensure that pipette is unplugged and entirely detached from robot.
+          Check again to ensure that pipette is unplugged and entirely detached
+          from robot.
         </p>
       )
     }
@@ -115,7 +112,7 @@ function StatusDetails (props: ChangePipetteProps) {
   return null
 }
 
-function AttachAnotherButton (props: ChangePipetteProps) {
+function AttachAnotherButton(props: ChangePipetteProps) {
   return (
     <PrimaryButton
       className={styles.confirm_button}
@@ -127,7 +124,7 @@ function AttachAnotherButton (props: ChangePipetteProps) {
   )
 }
 
-function TryAgainButton (props: ChangePipetteProps) {
+function TryAgainButton(props: ChangePipetteProps) {
   const {
     baseUrl,
     checkPipette,
@@ -156,23 +153,18 @@ function TryAgainButton (props: ChangePipetteProps) {
     }
   }
 
-  return (
-    <PrimaryButton {...buttonProps} className={styles.confirm_button} />
-  )
+  return <PrimaryButton {...buttonProps} className={styles.confirm_button} />
 }
 
-function ExitButton (props: ChangePipetteProps) {
-  const {exit, attachedWrong} = props
+function ExitButton(props: ChangePipetteProps) {
+  const { exit, attachedWrong } = props
   const children = attachedWrong
     ? EXIT_BUTTON_MESSAGE_WRONG
     : EXIT_BUTTON_MESSAGE
 
   return (
-    <PrimaryButton
-      className={styles.confirm_button}
-      onClick={exit}
-    >
+    <PrimaryButton className={styles.confirm_button} onClick={exit}>
       {children}
-    </PrimaryButton >
+    </PrimaryButton>
   )
 }

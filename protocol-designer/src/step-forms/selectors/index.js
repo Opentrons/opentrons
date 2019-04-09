@@ -1,28 +1,29 @@
 // @flow
-import type {ElementProps} from 'react'
-import type {
-  DeckSlot,
-  DropdownOption,
-  Mount,
-} from '@opentrons/components'
-import {typeof InstrumentGroup as InstrumentGroupProps} from '@opentrons/components'
+import type { ElementProps } from 'react'
+import type { DeckSlot, DropdownOption, Mount } from '@opentrons/components'
+import { typeof InstrumentGroup as InstrumentGroupProps } from '@opentrons/components'
 import assert from 'assert'
 import forEach from 'lodash/forEach'
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import {createSelector} from 'reselect'
-import {getPipetteNameSpecs, getLabware} from '@opentrons/shared-data'
+import { createSelector } from 'reselect'
+import { getPipetteNameSpecs, getLabware } from '@opentrons/shared-data'
 import i18n from '../../localization'
-import {INITIAL_DECK_SETUP_STEP_ID} from '../../constants'
-import {generateNewForm, getFormWarnings, getFormErrors, stepFormToArgs} from '../../steplist/formLevel'
-import {hydrateField, getFieldErrors} from '../../steplist/fieldLevel'
-import {addSpecsToPipetteInvariantProps} from '../utils'
+import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import {
+  generateNewForm,
+  getFormWarnings,
+  getFormErrors,
+  stepFormToArgs,
+} from '../../steplist/formLevel'
+import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
+import { addSpecsToPipetteInvariantProps } from '../utils'
 
-import type {FormWarning} from '../../steplist/formLevel'
-import type {BaseState, Selector} from '../../types'
-import type {FormData, StepIdType, StepType} from '../../form-types'
-import type {LabwareTypeById} from '../../labware-ingred/types'
+import type { FormWarning } from '../../steplist/formLevel'
+import type { BaseState, Selector } from '../../types'
+import type { FormData, StepIdType, StepType } from '../../form-types'
+import type { LabwareTypeById } from '../../labware-ingred/types'
 import type {
   StepArgsAndErrors,
   StepFormAndFieldErrors,
@@ -38,7 +39,7 @@ import type {
   PipetteOnDeck,
   FormPipettesByMount,
 } from '../types'
-import type {RootState} from '../reducers'
+import type { RootState } from '../reducers'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 
@@ -48,20 +49,18 @@ const rootSelector = (state: BaseState): RootState => state.stepForms
 // (which currently contains only `type`, but may expand)
 export const getLabwareEntities: Selector<LabwareEntities> = createSelector(
   rootSelector,
-  (state) => state.labwareInvariantProperties
+  state => state.labwareInvariantProperties
 )
 
 export const getLabwareTypesById: Selector<LabwareTypeById> = createSelector(
   getLabwareEntities,
-  (labwareEntities) => mapValues(
-    labwareEntities,
-    (labware: LabwareEntity) => labware.type
-  )
+  labwareEntities =>
+    mapValues(labwareEntities, (labware: LabwareEntity) => labware.type)
 )
 
 export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
   state => rootSelector(state).pipetteInvariantProperties,
-  (pipetteInvariantProperties) =>
+  pipetteInvariantProperties =>
     addSpecsToPipetteInvariantProps(pipetteInvariantProperties)
 )
 
@@ -72,34 +71,49 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   getInitialDeckSetupStepForm,
   getLabwareEntities,
   getPipetteEntities,
-  (initialSetupStep, labwareInvariantProperties, pipetteInvariantProperties) => {
+  (
+    initialSetupStep,
+    labwareInvariantProperties,
+    pipetteInvariantProperties
+  ) => {
     assert(
       initialSetupStep && initialSetupStep.stepType === 'manualIntervention',
-      'expected initial deck setup step to be "manualIntervention" step')
-    const labwareLocations = (initialSetupStep && initialSetupStep.labwareLocationUpdate) || {}
-    const pipetteLocations = (initialSetupStep && initialSetupStep.pipetteLocationUpdate) || {}
+      'expected initial deck setup step to be "manualIntervention" step'
+    )
+    const labwareLocations =
+      (initialSetupStep && initialSetupStep.labwareLocationUpdate) || {}
+    const pipetteLocations =
+      (initialSetupStep && initialSetupStep.pipetteLocationUpdate) || {}
     return {
-      labware: mapValues(labwareLocations, (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
-        return {slot, ...labwareInvariantProperties[labwareId]}
-      }),
-      pipettes: mapValues(pipetteLocations, (mount: Mount, pipetteId: string): PipetteOnDeck => {
-        return {mount, ...pipetteInvariantProperties[pipetteId]}
-      }),
+      labware: mapValues(
+        labwareLocations,
+        (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
+          return { slot, ...labwareInvariantProperties[labwareId] }
+        }
+      ),
+      pipettes: mapValues(
+        pipetteLocations,
+        (mount: Mount, pipetteId: string): PipetteOnDeck => {
+          return { mount, ...pipetteInvariantProperties[pipetteId] }
+        }
+      ),
     }
   }
 )
 
 export const getPermittedTipracks: Selector<Array<string>> = createSelector(
   getInitialDeckSetup,
-  (initialDeckSetup) =>
-    reduce(initialDeckSetup.pipettes, (acc: Array<string>, pipette: PipetteOnDeck) => {
-      return (pipette.tiprackModel)
-        ? [...acc, pipette.tiprackModel]
-        : acc
-    }, [])
+  initialDeckSetup =>
+    reduce(
+      initialDeckSetup.pipettes,
+      (acc: Array<string>, pipette: PipetteOnDeck) => {
+        return pipette.tiprackModel ? [...acc, pipette.tiprackModel] : acc
+      },
+      []
+    )
 )
 
-function _getPipetteDisplayName (name: string): string {
+function _getPipetteDisplayName(name: string): string {
   const pipetteSpecs = getPipetteNameSpecs(name)
   if (!pipetteSpecs) return 'Unknown Pipette'
   return pipetteSpecs.displayName
@@ -108,75 +122,104 @@ function _getPipetteDisplayName (name: string): string {
 // TODO: Ian 2018-12-20 EVENTUALLY make this `getEquippedPipetteOptionsForStepId`, so it tells you
 // equipped pipettes per step id instead of always using initial deck setup
 // (for when we support multiple deck setup steps)
-export const getEquippedPipetteOptions: Selector<Array<DropdownOption>> = createSelector(
+export const getEquippedPipetteOptions: Selector<
+  Array<DropdownOption>
+> = createSelector(
   getInitialDeckSetup,
-  (initialDeckSetup) =>
-    reduce(initialDeckSetup.pipettes, (acc: Array<DropdownOption>, pipette: PipetteOnDeck, id: string) => {
-      const nextOption = {
-        name: _getPipetteDisplayName(pipette.name),
-        value: id,
-      }
-      return [...acc, nextOption]
-    }, [])
+  initialDeckSetup =>
+    reduce(
+      initialDeckSetup.pipettes,
+      (acc: Array<DropdownOption>, pipette: PipetteOnDeck, id: string) => {
+        const nextOption = {
+          name: _getPipetteDisplayName(pipette.name),
+          value: id,
+        }
+        return [...acc, nextOption]
+      },
+      []
+    )
 )
 
 // Formats pipette data specifically for file page InstrumentGroup component
 type PipettesForInstrumentGroup = ElementProps<InstrumentGroupProps>
 export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup> = createSelector(
   getInitialDeckSetup,
-  (initialDeckSetup) => reduce(initialDeckSetup.pipettes, (acc: PipettesForInstrumentGroup, pipetteOnDeck: PipetteOnDeck, pipetteId) => {
-    const pipetteSpec = getPipetteNameSpecs(pipetteOnDeck.name)
-    const tiprackSpec = getLabware(pipetteOnDeck.tiprackModel)
+  initialDeckSetup =>
+    reduce(
+      initialDeckSetup.pipettes,
+      (
+        acc: PipettesForInstrumentGroup,
+        pipetteOnDeck: PipetteOnDeck,
+        pipetteId
+      ) => {
+        const pipetteSpec = getPipetteNameSpecs(pipetteOnDeck.name)
+        const tiprackSpec = getLabware(pipetteOnDeck.tiprackModel)
 
-    const pipetteForInstrumentGroup = {
-      mount: pipetteOnDeck.mount,
-      channels: pipetteSpec ? pipetteSpec.channels : undefined,
-      description: _getPipetteDisplayName(pipetteOnDeck.name),
-      isDisabled: false,
-      tiprackModel: tiprackSpec ? `${tiprackSpec.metadata.tipVolume || '?'} uL` : undefined,
-      tiprack: {model: pipetteOnDeck.tiprackModel},
-    }
+        const pipetteForInstrumentGroup = {
+          mount: pipetteOnDeck.mount,
+          channels: pipetteSpec ? pipetteSpec.channels : undefined,
+          description: _getPipetteDisplayName(pipetteOnDeck.name),
+          isDisabled: false,
+          tiprackModel: tiprackSpec
+            ? `${tiprackSpec.metadata.tipVolume || '?'} uL`
+            : undefined,
+          tiprack: { model: pipetteOnDeck.tiprackModel },
+        }
 
-    return {
-      ...acc,
-      [pipetteOnDeck.mount]: pipetteForInstrumentGroup,
-    }
-  }, {})
+        return {
+          ...acc,
+          [pipetteOnDeck.mount]: pipetteForInstrumentGroup,
+        }
+      },
+      {}
+    )
 )
 
 export const getPipettesForEditPipetteForm: Selector<FormPipettesByMount> = createSelector(
   getInitialDeckSetup,
-  (initialDeckSetup) => reduce(initialDeckSetup.pipettes, (acc: FormPipettesByMount, pipetteOnDeck: PipetteOnDeck, id): FormPipettesByMount => {
-    const pipetteSpec = getPipetteNameSpecs(pipetteOnDeck.name)
-    const tiprackSpec = getLabware(pipetteOnDeck.tiprackModel)
+  initialDeckSetup =>
+    reduce(
+      initialDeckSetup.pipettes,
+      (
+        acc: FormPipettesByMount,
+        pipetteOnDeck: PipetteOnDeck,
+        id
+      ): FormPipettesByMount => {
+        const pipetteSpec = getPipetteNameSpecs(pipetteOnDeck.name)
+        const tiprackSpec = getLabware(pipetteOnDeck.tiprackModel)
 
-    if (!pipetteSpec || !tiprackSpec) return acc
+        if (!pipetteSpec || !tiprackSpec) return acc
 
-    const pipetteForInstrumentGroup = {
-      pipetteName: pipetteOnDeck.name,
-      tiprackModel: tiprackSpec.metadata.name,
-    }
+        const pipetteForInstrumentGroup = {
+          pipetteName: pipetteOnDeck.name,
+          tiprackModel: tiprackSpec.metadata.name,
+        }
 
-    return {
-      ...acc,
-      [pipetteOnDeck.mount]: pipetteForInstrumentGroup,
-    }
-  }, {left: {pipetteName: null, tiprackModel: null}, right: {pipetteName: null, tiprackModel: null}})
+        return {
+          ...acc,
+          [pipetteOnDeck.mount]: pipetteForInstrumentGroup,
+        }
+      },
+      {
+        left: { pipetteName: null, tiprackModel: null },
+        right: { pipetteName: null, tiprackModel: null },
+      }
+    )
 )
 
 export const getUnsavedForm: Selector<?FormData> = createSelector(
   rootSelector,
-  (state) => state.unsavedForm
+  state => state.unsavedForm
 )
 
 export const getOrderedStepIds: Selector<Array<StepIdType>> = createSelector(
   rootSelector,
-  (state) => state.orderedStepIds
+  state => state.orderedStepIds
 )
 
 export const getSavedStepForms: Selector<*> = createSelector(
   rootSelector,
-  (state) => state.savedStepForms
+  state => state.savedStepForms
 )
 
 const getOrderedSavedForms: Selector<Array<FormData>> = createSelector(
@@ -190,15 +233,20 @@ const getOrderedSavedForms: Selector<Array<FormData>> = createSelector(
 )
 
 // TODO: Ian 2019-01-25 type with hydrated form type
-function _getHydratedForm (rawForm: FormData, contextualState: StepFormContextualState) {
-  const hydratedForm = mapValues(rawForm, (value, name) => (
+function _getHydratedForm(
+  rawForm: FormData,
+  contextualState: StepFormContextualState
+) {
+  const hydratedForm = mapValues(rawForm, (value, name) =>
     hydrateField(contextualState, name, value)
-  ))
+  )
   return hydratedForm
 }
 
 // TODO type with hydrated form type
-const _getFormAndFieldErrorsFromHydratedForm = (hydratedForm: FormData): StepFormAndFieldErrors => {
+const _getFormAndFieldErrorsFromHydratedForm = (
+  hydratedForm: FormData
+): StepFormAndFieldErrors => {
   let errors: StepFormAndFieldErrors = {}
 
   forEach(hydratedForm, (value, fieldName) => {
@@ -215,7 +263,7 @@ const _getFormAndFieldErrorsFromHydratedForm = (hydratedForm: FormData): StepFor
   })
   const formErrors = getFormErrors(hydratedForm.stepType, hydratedForm)
   if (formErrors && formErrors.length > 0) {
-    errors = {...errors, form: formErrors}
+    errors = { ...errors, form: formErrors }
   }
 
   return errors
@@ -224,7 +272,7 @@ const _getFormAndFieldErrorsFromHydratedForm = (hydratedForm: FormData): StepFor
 export const getHydrationContext: Selector<StepFormContextualState> = createSelector(
   getLabwareEntities,
   getPipetteEntities,
-  (labware, pipettes) => ({labware, pipettes})
+  (labware, pipettes) => ({ labware, pipettes })
 )
 
 export const getUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSelector(
@@ -239,11 +287,14 @@ export const getUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSel
 )
 
 // TODO: Brian&Ian 2019-04-02 this is TEMPORARY, should be removed once legacySteps reducer is removed
-const getLegacyStepWithId = (state: BaseState, props: {stepId: StepIdType}) => {
+const getLegacyStepWithId = (
+  state: BaseState,
+  props: { stepId: StepIdType }
+) => {
   return state.stepForms.legacySteps[props.stepId]
 }
 
-const getStepFormWithId = (state: BaseState, props: {stepId: StepIdType}) => {
+const getStepFormWithId = (state: BaseState, props: { stepId: StepIdType }) => {
   return state.stepForms.savedStepForms[props.stepId]
 }
 
@@ -254,7 +305,9 @@ export const makeGetArgsAndErrorsWithId = () => {
     (stepForm, contextualState) => {
       const hydratedForm = _getHydratedForm(stepForm, contextualState)
       const errors = _getFormAndFieldErrorsFromHydratedForm(hydratedForm)
-      return isEmpty(errors) ? {stepArgs: stepFormToArgs(hydratedForm)} : {errors, stepArgs: null}
+      return isEmpty(errors)
+        ? { stepArgs: stepFormToArgs(hydratedForm) }
+        : { errors, stepArgs: null }
     }
   )
 }
@@ -266,32 +319,40 @@ export const makeGetStepWithId = () => {
     getStepFormWithId,
     getLegacyStepWithId,
     (stepForm, legacyStep) => {
-      return ({
+      return {
         ...legacyStep,
         formData: stepForm,
-        title: stepForm ? stepForm.stepName : i18n.t(`application.stepType.${legacyStep.stepType}`),
+        title: stepForm
+          ? stepForm.stepName
+          : i18n.t(`application.stepType.${legacyStep.stepType}`),
         description: stepForm ? stepForm.stepDetails : null,
-      })
+      }
     }
   )
 }
 
-export const getArgsAndErrorsByStepId: Selector<{[StepIdType]: StepArgsAndErrors}> = createSelector(
+export const getArgsAndErrorsByStepId: Selector<{
+  [StepIdType]: StepArgsAndErrors,
+}> = createSelector(
   getOrderedSavedForms,
   getHydrationContext,
   (stepForms, contextualState) => {
-    return reduce(stepForms, (acc, stepForm) => {
-      const hydratedForm = _getHydratedForm(stepForm, contextualState)
-      const errors = _getFormAndFieldErrorsFromHydratedForm(hydratedForm)
-      const nextStepData = isEmpty(errors)
-        ? {stepArgs: stepFormToArgs(hydratedForm)}
-        : {errors, stepArgs: null}
+    return reduce(
+      stepForms,
+      (acc, stepForm) => {
+        const hydratedForm = _getHydratedForm(stepForm, contextualState)
+        const errors = _getFormAndFieldErrorsFromHydratedForm(hydratedForm)
+        const nextStepData = isEmpty(errors)
+          ? { stepArgs: stepFormToArgs(hydratedForm) }
+          : { errors, stepArgs: null }
 
-      return {
-        ...acc,
-        [stepForm.id]: nextStepData,
-      }
-    }, {})
+        return {
+          ...acc,
+          [stepForm.id]: nextStepData,
+        }
+      },
+      {}
+    )
   }
 )
 
@@ -301,12 +362,12 @@ export const getIsNewStepForm = createSelector(
   getUnsavedForm,
   getSavedStepForms,
   (formData, savedForms) =>
-    (formData && formData.id != null)
-      ? !savedForms[formData.id]
-      : true
+    formData && formData.id != null ? !savedForms[formData.id] : true
 )
 
-export const getFormLevelWarningsForUnsavedForm: Selector<Array<FormWarning>> = createSelector(
+export const getFormLevelWarningsForUnsavedForm: Selector<
+  Array<FormWarning>
+> = createSelector(
   getUnsavedForm,
   getHydrationContext,
   (unsavedForm, contextualState) => {
@@ -316,7 +377,9 @@ export const getFormLevelWarningsForUnsavedForm: Selector<Array<FormWarning>> = 
   }
 )
 
-export const getFormLevelWarningsPerStep: Selector<{[stepId: string]: Array<FormWarning>}> = createSelector(
+export const getFormLevelWarningsPerStep: Selector<{
+  [stepId: string]: Array<FormWarning>,
+}> = createSelector(
   getSavedStepForms,
   getHydrationContext,
   (forms, contextualState) =>
@@ -329,7 +392,11 @@ export const getFormLevelWarningsPerStep: Selector<{[stepId: string]: Array<Form
 
 // TODO: Ian 2018-12-19 this is DEPRECATED, should be removed once legacySteps reducer is removed
 const getSteps = (state: BaseState) => rootSelector(state).legacySteps
-export function _getStepFormData (state: BaseState, stepId: StepIdType, newStepType?: StepType): ?FormData {
+export function _getStepFormData(
+  state: BaseState,
+  stepId: StepIdType,
+  newStepType?: StepType
+): ?FormData {
   const existingStep = getSavedStepForms(state)[stepId]
 
   if (existingStep) {
@@ -341,7 +408,9 @@ export function _getStepFormData (state: BaseState, stepId: StepIdType, newStepT
   const stepType = newStepType || stepTypeFromStepReducer
 
   if (!stepType) {
-    console.error(`New step with id "${stepId}" was added with no stepType, could not generate form`)
+    console.error(
+      `New step with id "${stepId}" was added with no stepType, could not generate form`
+    )
     return null
   }
 
@@ -352,7 +421,9 @@ export function _getStepFormData (state: BaseState, stepId: StepIdType, newStepT
 }
 
 // TODO: Ian 2018-12-19 this is DEPRECATED, should be removed once legacySteps reducer is removed
-export const getAllSteps: Selector<{[stepId: StepIdType]: StepItemData}> = createSelector(
+export const getAllSteps: Selector<{
+  [stepId: StepIdType]: StepItemData,
+}> = createSelector(
   getSteps,
   getSavedStepForms,
   (steps, savedForms) => {
@@ -363,7 +434,9 @@ export const getAllSteps: Selector<{[stepId: StepIdType]: StepItemData}> = creat
         return {
           ...steps[id],
           formData: savedForm,
-          title: savedForm ? savedForm.stepName : i18n.t(`application.stepType.${step.stepType}`),
+          title: savedForm
+            ? savedForm.stepName
+            : i18n.t(`application.stepType.${step.stepType}`),
           description: savedForm ? savedForm.stepDetails : null,
         }
       }

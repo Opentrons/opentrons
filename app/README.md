@@ -41,25 +41,25 @@ At this point, the Electron app will be running with [HMR][] and various Chrome 
 
 The UI stack is built using:
 
-* [React][]
-* [Redux][]
-* [CSS modules][css-modules]
-* [Babel][]
-* [Webpack][]
+- [React][]
+- [Redux][]
+- [CSS modules][css-modules]
+- [Babel][]
+- [Webpack][]
 
 Some important directories:
 
-* `app/src` — Client-side React app run in Electron's [renderer process][electron-renderer]
-* API clients (see [`api/opentrons/server`][api-server-source])
-  * `app/src/rpc` - RPC API client
-  * `app/src/http-api-client` - HTTP API client
-* `app/webpack` - Webpack configuration helpers
+- `app/src` — Client-side React app run in Electron's [renderer process][electron-renderer]
+- API clients (see [`api/opentrons/server`][api-server-source])
+  - `app/src/rpc` - RPC API client
+  - `app/src/http-api-client` - HTTP API client
+- `app/webpack` - Webpack configuration helpers
 
 ## testing
 
 To run tests:
 
-* `make test` - Run all tests
+- `make test` - Run all tests
 
 Test tasks can also be run with the following arguments:
 

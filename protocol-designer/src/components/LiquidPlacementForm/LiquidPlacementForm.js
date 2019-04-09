@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import {Formik} from 'formik'
+import { Formik } from 'formik'
 import * as Yup from 'yup'
 // TODO: Ian 2018-10-19 move the processors out of steplist (chore)
 import * as fieldProcessors from '../../steplist/fieldLevel/processing'
@@ -15,7 +15,7 @@ import i18n from '../../localization'
 import styles from './LiquidPlacementForm.css'
 import formStyles from '../forms/forms.css'
 import stepEditFormStyles from '../StepEditForm/StepEditForm.css'
-import type {Options} from '@opentrons/components'
+import type { Options } from '@opentrons/components'
 
 export type ValidFormValues = {
   selectedLiquidId: string,
@@ -31,12 +31,12 @@ type Props = {
 
   cancelForm: () => mixed,
   clearWells: ?() => mixed,
-  saveForm: (ValidFormValues) => mixed,
+  saveForm: ValidFormValues => mixed,
 }
 
-export default class LiquidPlacementForm extends React.Component <Props> {
+export default class LiquidPlacementForm extends React.Component<Props> {
   getInitialValues = () => {
-    const {commonSelectedLiquidId, commonSelectedVolume} = this.props
+    const { commonSelectedLiquidId, commonSelectedVolume } = this.props
     return {
       selectedLiquidId: commonSelectedLiquidId || '',
       volume: commonSelectedVolume,
@@ -44,21 +44,27 @@ export default class LiquidPlacementForm extends React.Component <Props> {
   }
 
   getValidationSchema = () => {
-    const {selectedWellsMaxVolume} = this.props
+    const { selectedWellsMaxVolume } = this.props
     return Yup.object().shape({
-      selectedLiquidId: Yup
-        .string()
-        .required(
-          i18n.t('form.generic.error.required',
-            {name: i18n.t('form.liquid_placement.liquid')})),
+      selectedLiquidId: Yup.string().required(
+        i18n.t('form.generic.error.required', {
+          name: i18n.t('form.liquid_placement.liquid'),
+        })
+      ),
       volume: Yup.number()
         .nullable()
-        .required(i18n.t('form.generic.error.required',
-          {name: i18n.t('form.liquid_placement.volume')}))
+        .required(
+          i18n.t('form.generic.error.required', {
+            name: i18n.t('form.liquid_placement.volume'),
+          })
+        )
         .moreThan(0, i18n.t('form.generic.error.more_than_zero'))
         .max(
           selectedWellsMaxVolume,
-          i18n.t('form.liquid_placement.volume_exceeded', {volume: selectedWellsMaxVolume})),
+          i18n.t('form.liquid_placement.volume_exceeded', {
+            volume: selectedWellsMaxVolume,
+          })
+        ),
     })
   }
 
@@ -74,7 +80,7 @@ export default class LiquidPlacementForm extends React.Component <Props> {
     const value: ?string = e.currentTarget.value
     const masked = fieldProcessors.composeMaskers(
       fieldProcessors.maskToFloat,
-      fieldProcessors.onlyPositiveNumbers,
+      fieldProcessors.onlyPositiveNumbers
     )(value)
     setFieldValue('volume', masked)
   }
@@ -83,8 +89,8 @@ export default class LiquidPlacementForm extends React.Component <Props> {
     this.props.saveForm(values)
   }
 
-  render () {
-    const {liquidSelectionOptions, showForm} = this.props
+  render() {
+    const { liquidSelectionOptions, showForm } = this.props
     if (!showForm) return null
     return (
       <div className={formStyles.form}>
@@ -93,14 +99,23 @@ export default class LiquidPlacementForm extends React.Component <Props> {
           initialValues={this.getInitialValues()}
           onSubmit={this.handleSubmit}
           validationSchema={this.getValidationSchema}
-          render={({handleBlur, handleChange, handleSubmit, errors, setFieldValue, touched, values}) => (
+          render={({
+            handleBlur,
+            handleChange,
+            handleSubmit,
+            errors,
+            setFieldValue,
+            touched,
+            values,
+          }) => (
             <form onSubmit={handleSubmit}>
               <div className={styles.field_row}>
                 <FormGroup
                   label={i18n.t('form.liquid_placement.liquid')}
-                  className={styles.liquid_field}>
+                  className={styles.liquid_field}
+                >
                   <DropdownField
-                    name='selectedLiquidId'
+                    name="selectedLiquidId"
                     className={stepEditFormStyles.large_field}
                     options={liquidSelectionOptions}
                     error={touched.selectedLiquidId && errors.selectedLiquidId}
@@ -114,7 +129,7 @@ export default class LiquidPlacementForm extends React.Component <Props> {
                   className={styles.volume_field}
                 >
                   <InputField
-                    name='volume'
+                    name="volume"
                     units={i18n.t('application.units.microliter')}
                     error={touched.volume && errors.volume}
                     value={values.volume}
@@ -127,18 +142,20 @@ export default class LiquidPlacementForm extends React.Component <Props> {
               <div className={styles.button_row}>
                 <OutlineButton
                   disabled={!this.props.clearWells}
-                  onClick={this.handleClearWells}>
+                  onClick={this.handleClearWells}
+                >
                   {i18n.t('button.clear_wells')}
                 </OutlineButton>
                 <OutlineButton onClick={this.handleCancelForm}>
                   {i18n.t('button.cancel')}
                 </OutlineButton>
-                <PrimaryButton type='submit'>
+                <PrimaryButton type="submit">
                   {i18n.t('button.save')}
                 </PrimaryButton>
               </div>
             </form>
-          )} />
+          )}
+        />
       </div>
     )
   }

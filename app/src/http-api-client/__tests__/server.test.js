@@ -2,7 +2,7 @@
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import electron from 'electron'
-import {setter} from '@thi.ng/paths'
+import { setter } from '@thi.ng/paths'
 
 import client from '../client'
 import {
@@ -21,8 +21,8 @@ jest.mock('electron')
 jest.mock('../client')
 
 const REQUESTS_TO_TEST = [
-  {path: 'update', response: {message: 'foo', filename: 'bar'}},
-  {path: 'restart', response: {message: 'restarting'}},
+  { path: 'update', response: { message: 'foo', filename: 'bar' } },
+  { path: 'restart', response: { message: 'restarting' } },
   // {path: 'update/ignore', response: {version: '42.0.0'}},
 ]
 
@@ -57,9 +57,13 @@ describe('server API client', () => {
         api: {
           server: {
             [robot.name]: {
-              update: {inProgress: true, error: null, response: null},
-              restart: {inProgress: true, error: null, response: null},
-              'update/ignore': {inProgress: true, error: null, response: null},
+              update: { inProgress: true, error: null, response: null },
+              restart: { inProgress: true, error: null, response: null },
+              'update/ignore': {
+                inProgress: true,
+                error: null,
+                response: null,
+              },
             },
           },
         },
@@ -73,7 +77,7 @@ describe('server API client', () => {
             [robot.name]: [robot],
           },
         },
-        robot: {connection: {connectedTo: robot.name}},
+        robot: { connection: { connectedTo: robot.name } },
       }
     })
 
@@ -97,14 +101,14 @@ describe('server API client', () => {
 
       // test no upgrade
       robot = setCurrent(robot, '4.0.0')
-      expect(getRobotUpdateInfo(state, robot)).toEqual({version, type: null})
+      expect(getRobotUpdateInfo(state, robot)).toEqual({ version, type: null })
 
       // test bad version string
       robot = setCurrent(robot, 'not available')
-      expect(getRobotUpdateInfo(state, robot)).toEqual({version, type: null})
+      expect(getRobotUpdateInfo(state, robot)).toEqual({ version, type: null })
 
       // test unknown robot
-      expect(getRobotUpdateInfo(state, {name: 'foo'})).toEqual({
+      expect(getRobotUpdateInfo(state, { name: 'foo' })).toEqual({
         version,
         type: null,
       })
@@ -136,7 +140,7 @@ describe('server API client', () => {
       expect(getUpdateRequest(state, robot)).toBe(
         state.api.server[robot.name].update
       )
-      expect(getUpdateRequest(state, {name: 'foo'})).toEqual({
+      expect(getUpdateRequest(state, { name: 'foo' })).toEqual({
         inProgress: false,
       })
     })
@@ -147,7 +151,7 @@ describe('server API client', () => {
       expect(getRestartRequest(state, robot)).toBe(
         state.api.server[robot.name].restart
       )
-      expect(getRestartRequest(state, {name: 'foo'})).toEqual({
+      expect(getRestartRequest(state, { name: 'foo' })).toEqual({
         inProgress: false,
       })
     })
@@ -158,7 +162,7 @@ describe('server API client', () => {
       expect(getIngoredUpdate(state, robot)).toEqual(
         state.api.server[robot.name]['update/ignore']
       )
-      expect(getIngoredUpdate(state, {name: 'foo'})).toEqual({
+      expect(getIngoredUpdate(state, { name: 'foo' })).toEqual({
         inProgress: false,
       })
     })
@@ -170,7 +174,7 @@ describe('server API client', () => {
 
   describe('restartRobotServer action creator', () => {
     test('calls POST /server/restart', () => {
-      client.__setMockResponse({message: 'restarting'})
+      client.__setMockResponse({ message: 'restarting' })
 
       return restartRobotServer(robot)(() => {}).then(() =>
         expect(client).toHaveBeenCalledWith(robot, 'POST', 'server/restart')
@@ -178,14 +182,14 @@ describe('server API client', () => {
     })
 
     test('dispatches SERVER_REQUEST and SERVER_SUCCESS', () => {
-      const response = {message: 'restarting'}
+      const response = { message: 'restarting' }
       const store = mockStore({})
       const expectedActions = [
-        {type: 'api:SERVER_REQUEST', payload: {robot, path: 'restart'}},
+        { type: 'api:SERVER_REQUEST', payload: { robot, path: 'restart' } },
         {
           type: 'api:SERVER_SUCCESS',
-          payload: {robot, response, path: 'restart'},
-          meta: {robot: true},
+          payload: { robot, response, path: 'restart' },
+          meta: { robot: true },
         },
       ]
 
@@ -197,13 +201,13 @@ describe('server API client', () => {
     })
 
     test('dispatches SERVER_REQUEST and SERVER_FAILURE', () => {
-      const error = {name: 'ResponseError', status: '400'}
+      const error = { name: 'ResponseError', status: '400' }
       const store = mockStore({})
       const expectedActions = [
-        {type: 'api:SERVER_REQUEST', payload: {robot, path: 'restart'}},
+        { type: 'api:SERVER_REQUEST', payload: { robot, path: 'restart' } },
         {
           type: 'api:SERVER_FAILURE',
-          payload: {robot, error, path: 'restart'},
+          payload: { robot, error, path: 'restart' },
         },
       ]
 
@@ -220,7 +224,7 @@ describe('server API client', () => {
       client.__setMockResponse({
         inProgress: true,
         error: null,
-        response: {version: '42.0.0'},
+        response: { version: '42.0.0' },
       })
 
       return fetchIgnoredUpdate(robot)(() => {}).then(() =>
@@ -229,14 +233,17 @@ describe('server API client', () => {
     })
 
     test('dispatches SERVER_REQUEST and SERVER_SUCCESS', () => {
-      const response = {version: '42.0.0'}
+      const response = { version: '42.0.0' }
       const store = mockStore({})
       const expectedActions = [
-        {type: 'api:SERVER_REQUEST', payload: {robot, path: 'update/ignore'}},
+        {
+          type: 'api:SERVER_REQUEST',
+          payload: { robot, path: 'update/ignore' },
+        },
         {
           type: 'api:SERVER_SUCCESS',
-          payload: {robot, response, path: 'update/ignore'},
-          meta: {robot: true},
+          payload: { robot, response, path: 'update/ignore' },
+          meta: { robot: true },
         },
       ]
 
@@ -248,13 +255,16 @@ describe('server API client', () => {
     })
 
     test('dispatches SERVER_REQUEST and SERVER_FAILURE', () => {
-      const error = {name: 'ResponseError', status: '400'}
+      const error = { name: 'ResponseError', status: '400' }
       const store = mockStore({})
       const expectedActions = [
-        {type: 'api:SERVER_REQUEST', payload: {robot, path: 'update/ignore'}},
+        {
+          type: 'api:SERVER_REQUEST',
+          payload: { robot, path: 'update/ignore' },
+        },
         {
           type: 'api:SERVER_FAILURE',
-          payload: {robot, error, path: 'update/ignore'},
+          payload: { robot, error, path: 'update/ignore' },
         },
       ]
 
@@ -271,7 +281,7 @@ describe('server API client', () => {
       client.__setMockResponse({
         inProgress: true,
         error: null,
-        response: {version: '42.0.0'},
+        response: { version: '42.0.0' },
       })
 
       return setIgnoredUpdate(robot, availableUpdate)(() => {}).then(() =>
@@ -282,14 +292,17 @@ describe('server API client', () => {
     })
 
     test('dispatches SERVER_REQUEST and SERVER_SUCCESS', () => {
-      const response = {version: '42.0.0'}
+      const response = { version: '42.0.0' }
       const store = mockStore({})
       const expectedActions = [
-        {type: 'api:SERVER_REQUEST', payload: {robot, path: 'update/ignore'}},
+        {
+          type: 'api:SERVER_REQUEST',
+          payload: { robot, path: 'update/ignore' },
+        },
         {
           type: 'api:SERVER_SUCCESS',
-          payload: {robot, response, path: 'update/ignore'},
-          meta: {robot: true},
+          payload: { robot, response, path: 'update/ignore' },
+          meta: { robot: true },
         },
       ]
 
@@ -301,13 +314,16 @@ describe('server API client', () => {
     })
 
     test('dispatches SERVER_REQUEST and SERVER_FAILURE', () => {
-      const error = {name: 'ResponseError', status: '400'}
+      const error = { name: 'ResponseError', status: '400' }
       const store = mockStore({})
       const expectedActions = [
-        {type: 'api:SERVER_REQUEST', payload: {robot, path: 'update/ignore'}},
+        {
+          type: 'api:SERVER_REQUEST',
+          payload: { robot, path: 'update/ignore' },
+        },
         {
           type: 'api:SERVER_FAILURE',
-          payload: {robot, error, path: 'update/ignore'},
+          payload: { robot, error, path: 'update/ignore' },
         },
       ]
 
@@ -332,14 +348,14 @@ describe('server API client', () => {
     )
 
     REQUESTS_TO_TEST.forEach(request => {
-      const {path, response} = request
+      const { path, response } = request
 
       test(`handles SERVER_REQUEST for /server/${path}`, () => {
-        const action = {type: 'api:SERVER_REQUEST', payload: {robot, path}}
+        const action = { type: 'api:SERVER_REQUEST', payload: { robot, path } }
 
         expect(reducer(state, action).server).toEqual({
           [robot.name]: {
-            [path]: {inProgress: true, error: null, response: null},
+            [path]: { inProgress: true, error: null, response: null },
           },
         })
       })
@@ -347,7 +363,7 @@ describe('server API client', () => {
       test(`handles SERVER_SUCCESS for /server/${path}`, () => {
         const action = {
           type: 'api:SERVER_SUCCESS',
-          payload: {robot, path, response},
+          payload: { robot, path, response },
         }
 
         state.server[robot.name][path] = {
@@ -358,16 +374,16 @@ describe('server API client', () => {
 
         expect(reducer(state, action).server).toEqual({
           [robot.name]: {
-            [path]: {response, inProgress: false, error: null},
+            [path]: { response, inProgress: false, error: null },
           },
         })
       })
 
       test(`handles SERVER_FAILURE for /server/${path}`, () => {
-        const error = {message: 'ahhhh'}
+        const error = { message: 'ahhhh' }
         const action = {
           type: 'api:SERVER_FAILURE',
-          payload: {robot, path, error},
+          payload: { robot, path, error },
         }
 
         state.server[robot.name][path] = {
@@ -378,7 +394,7 @@ describe('server API client', () => {
 
         expect(reducer(state, action).server).toEqual({
           [robot.name]: {
-            [path]: {error, inProgress: false, response: null},
+            [path]: { error, inProgress: false, response: null },
           },
         })
       })

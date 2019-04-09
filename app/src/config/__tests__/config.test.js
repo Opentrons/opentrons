@@ -1,13 +1,9 @@
 // config tests
-import {
-  updateConfig,
-  configReducer,
-  getConfig,
-} from '..'
+import { updateConfig, configReducer, getConfig } from '..'
 
 import * as mockShell from '../../shell'
 
-jest.mock('../../shell', () => ({getShellConfig: jest.fn()}))
+jest.mock('../../shell', () => ({ getShellConfig: jest.fn() }))
 
 describe('config', () => {
   let state
@@ -17,7 +13,7 @@ describe('config', () => {
 
     state = {
       config: {
-        foo: {bar: 'baz'},
+        foo: { bar: 'baz' },
         qux: 'fizzbuzz',
       },
     }
@@ -28,8 +24,8 @@ describe('config', () => {
     test('config:UPDATE', () => {
       expect(updateConfig('foo.bar', false)).toEqual({
         type: 'config:UPDATE',
-        payload: {path: 'foo.bar', value: false},
-        meta: {shell: true},
+        payload: { path: 'foo.bar', value: false },
+        meta: { shell: true },
       })
     })
   })
@@ -40,19 +36,19 @@ describe('config', () => {
     })
 
     test('gets store and overrides from remote for initial state', () => {
-      mockShell.getShellConfig.mockReturnValue({isConfig: true})
+      mockShell.getShellConfig.mockReturnValue({ isConfig: true })
 
-      expect(configReducer(null, {})).toEqual({isConfig: true})
+      expect(configReducer(null, {})).toEqual({ isConfig: true })
     })
 
     test('handles config:SET', () => {
       const action = {
         type: 'config:SET',
-        payload: {path: 'foo.bar', value: 'xyz'},
+        payload: { path: 'foo.bar', value: 'xyz' },
       }
 
       expect(configReducer(state, action)).toEqual({
-        foo: {bar: 'xyz'},
+        foo: { bar: 'xyz' },
         qux: 'fizzbuzz',
       })
     })

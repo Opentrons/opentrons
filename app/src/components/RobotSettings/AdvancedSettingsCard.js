@@ -1,8 +1,8 @@
 // @flow
 // app info card with version and updated
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {Link} from 'react-router-dom'
+import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import reduce from 'lodash/reduce'
 
 import {
@@ -11,16 +11,16 @@ import {
   makeGetRobotSettings,
 } from '../../http-api-client'
 
-import {CONNECTABLE} from '../../discovery'
-import {downloadLogs} from '../../shell'
-import {RefreshCard} from '@opentrons/components'
-import {LabeledButton, LabeledToggle} from '../controls'
+import { CONNECTABLE } from '../../discovery'
+import { downloadLogs } from '../../shell'
+import { RefreshCard } from '@opentrons/components'
+import { LabeledButton, LabeledToggle } from '../controls'
 import PipetteUpdateWarningModal from './PipetteUpdateWarningModal'
 
-import type {State, Dispatch} from '../../types'
-import type {ViewableRobot} from '../../discovery'
-import type {Setting} from '../../http-api-client'
-import type {ToggleRef} from './PipetteUpdateWarningModal'
+import type { State, Dispatch } from '../../types'
+import type { ViewableRobot } from '../../discovery'
+import type { Setting } from '../../http-api-client'
+import type { ToggleRef } from './PipetteUpdateWarningModal'
 
 type OP = {
   robot: ViewableRobot,
@@ -38,7 +38,7 @@ type DP = {|
   download: () => mixed,
 |}
 
-type Props = {...$Exact<OP>, ...SP, ...DP}
+type Props = { ...$Exact<OP>, ...SP, ...DP }
 
 type BooleanSettingProps = {
   id: string,
@@ -55,7 +55,7 @@ const PIPETTE_UPDATE_OPT_OUT_ID = 'useOldAspirationFunctions'
 class BooleanSettingToggle extends React.Component<BooleanSettingProps> {
   toggle = value => this.props.set(this.props.id, !this.props.value)
 
-  render () {
+  render() {
     return (
       <LabeledToggle
         label={this.props.title}
@@ -71,12 +71,12 @@ class BooleanSettingToggle extends React.Component<BooleanSettingProps> {
 class AdvancedSettingsCard extends React.Component<Props> {
   pipetteUpdateOptOutRef: ToggleRef
 
-  constructor (props: Props) {
+  constructor(props: Props) {
     super(props)
     this.pipetteUpdateOptOutRef = React.createRef()
   }
 
-  render () {
+  render() {
     const {
       robot,
       settings,
@@ -86,7 +86,7 @@ class AdvancedSettingsCard extends React.Component<Props> {
       resetUrl,
       showPipetteUpdateWarning,
     } = this.props
-    const {name, health, status} = robot
+    const { name, health, status } = robot
     const disabled = status !== CONNECTABLE
     const logsAvailable = health && health.logs
 
@@ -143,11 +143,11 @@ class AdvancedSettingsCard extends React.Component<Props> {
   }
 }
 
-function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
+function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
   const getRobotSettings = makeGetRobotSettings()
 
   return (state, ownProps) => {
-    const {robot} = ownProps
+    const { robot } = ownProps
     const settingsRequest = getRobotSettings(state, robot)
     const settings =
       settingsRequest &&
@@ -170,12 +170,12 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  const {robot} = ownProps
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
+  const { robot } = ownProps
 
   return {
     fetch: () => dispatch(fetchSettings(robot)),
-    set: (id, value) => dispatch(setSettings(robot, {id, value})),
+    set: (id, value) => dispatch(setSettings(robot, { id, value })),
     download: () => dispatch(downloadLogs(robot)),
   }
 }

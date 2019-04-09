@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {push} from 'react-router-redux'
+import { connect } from 'react-redux'
+import { push } from 'react-router-redux'
 import {
   makeGetRobotPipettes,
   makeGetRobotPipetteConfigs,
@@ -9,19 +9,19 @@ import {
   setPipetteConfigs,
   makeGetPipetteRequestById,
 } from '../../http-api-client'
-import {chainActions} from '../../util'
-import {getConfig} from '../../config'
+import { chainActions } from '../../util'
+import { getConfig } from '../../config'
 
-import {getPipetteModelSpecs} from '@opentrons/shared-data'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import {ScrollableAlertModal} from '../modals'
+import { ScrollableAlertModal } from '../modals'
 import ConfigMessage from './ConfigMessage'
 import ConfigForm from './ConfigForm'
 import ConfigErrorBanner from './ConfigErrorBanner'
 
-import type {State} from '../../types'
-import type {Mount} from '../../robot'
-import type {Robot} from '../../discovery'
+import type { State } from '../../types'
+import type { Mount } from '../../robot'
+import type { Robot } from '../../discovery'
 import type {
   Pipette,
   PipetteConfigRequest,
@@ -47,15 +47,15 @@ type DP = {|
 |}
 
 // type Props = SP & OP & DP
-type Props = {...$Exact<OP>, ...$Exact<SP>, ...$Exact<DP>}
+type Props = { ...$Exact<OP>, ...$Exact<SP>, ...$Exact<DP> }
 
 export default connect(
   makeMapStateToProps,
   mapDispatchToProps
 )(ConfigurePipette)
 
-function ConfigurePipette (props: Props) {
-  const {parentUrl, pipette, pipetteConfig, updateConfig, configError} = props
+function ConfigurePipette(props: Props) {
+  const { parentUrl, pipette, pipetteConfig, updateConfig, configError } = props
   // TODO (ka 2019-2-12): This logic is used to get display name in slightly
   // different ways in several different files.
   const pipetteModel = pipette && pipette.model
@@ -80,7 +80,7 @@ function ConfigurePipette (props: Props) {
   )
 }
 
-function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
+function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
   const getRobotPipettes = makeGetRobotPipettes()
   const getRobotPipetteConfigs = makeGetRobotPipetteConfigs()
   const getPipetteRequestById = makeGetPipetteRequestById()
@@ -105,8 +105,8 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  const {robot, parentUrl} = ownProps
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
+  const { robot, parentUrl } = ownProps
   return {
     updateConfig: (id, params) =>
       dispatch(

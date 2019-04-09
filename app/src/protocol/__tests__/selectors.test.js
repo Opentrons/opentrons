@@ -6,13 +6,13 @@ const SPECS = [
   {
     name: 'getProtocolFile',
     selector: protocol.getProtocolFile,
-    state: {protocol: {file: {name: 'proto.json'}}},
-    expected: {name: 'proto.json'},
+    state: { protocol: { file: { name: 'proto.json' } } },
+    expected: { name: 'proto.json' },
   },
   {
     name: 'getProtocolContents',
     selector: protocol.getProtocolContents,
-    state: {protocol: {file: {name: 'proto.json'}, contents: 'fizzbuzz'}},
+    state: { protocol: { file: { name: 'proto.json' }, contents: 'fizzbuzz' } },
     expected: 'fizzbuzz',
   },
   {
@@ -20,36 +20,36 @@ const SPECS = [
     selector: protocol.getProtocolData,
     state: {
       protocol: {
-        file: {name: 'proto.json'},
+        file: { name: 'proto.json' },
         contents: 'fizzbuzz',
-        data: {metadata: {}},
+        data: { metadata: {} },
       },
     },
-    expected: {metadata: {}},
+    expected: { metadata: {} },
   },
   {
     name: 'getProtocolFilename with no file',
     selector: protocol.getProtocolFilename,
-    state: {protocol: {file: null}},
+    state: { protocol: { file: null } },
     expected: null,
   },
   {
     name: 'getProtocolFilename',
     selector: protocol.getProtocolFilename,
-    state: {protocol: {file: {name: 'proto.json'}}},
+    state: { protocol: { file: { name: 'proto.json' } } },
     expected: 'proto.json',
   },
   {
     name: 'getProtocolName with nothing loaded',
     selector: protocol.getProtocolName,
-    state: {protocol: {file: null, contents: null, data: null}},
+    state: { protocol: { file: null, contents: null, data: null } },
     expected: null,
   },
   {
     name: 'getProtocolName from filename if no data',
     selector: protocol.getProtocolName,
     state: {
-      protocol: {file: {name: 'proto.json'}, contents: null, data: null},
+      protocol: { file: { name: 'proto.json' }, contents: null, data: null },
     },
     expected: 'proto',
   },
@@ -58,9 +58,9 @@ const SPECS = [
     selector: protocol.getProtocolName,
     state: {
       protocol: {
-        file: {name: 'proto.json'},
+        file: { name: 'proto.json' },
         contents: 'fizzbuzz',
-        data: {metadata: {}},
+        data: { metadata: {} },
       },
     },
     expected: 'proto',
@@ -70,9 +70,9 @@ const SPECS = [
     selector: protocol.getProtocolName,
     state: {
       protocol: {
-        file: {name: 'proto.json'},
+        file: { name: 'proto.json' },
         contents: 'fizzbuzz',
-        data: {metadata: {'protocol-name': 'A Protocol'}},
+        data: { metadata: { 'protocol-name': 'A Protocol' } },
       },
     },
     expected: 'A Protocol',
@@ -80,67 +80,71 @@ const SPECS = [
   {
     name: 'getProtocolAuthor if no data',
     selector: protocol.getProtocolAuthor,
-    state: {protocol: {data: null}},
+    state: { protocol: { data: null } },
     expected: undefined,
   },
   {
     name: 'getProtocolAuthor if author not in metadata',
     selector: protocol.getProtocolAuthor,
-    state: {protocol: {data: {metadata: {}}}},
+    state: { protocol: { data: { metadata: {} } } },
     expected: undefined,
   },
   {
     name: 'getProtocolAuthor if author in metadata',
     selector: protocol.getProtocolAuthor,
-    state: {protocol: {data: {metadata: {author: 'Fizz Buzz'}}}},
+    state: { protocol: { data: { metadata: { author: 'Fizz Buzz' } } } },
     expected: 'Fizz Buzz',
   },
   {
     name: 'getProtocolDescription if no data',
     selector: protocol.getProtocolDescription,
-    state: {protocol: {data: null}},
+    state: { protocol: { data: null } },
     expected: undefined,
   },
   {
     name: 'getProtocolDescription if description not in metadata',
     selector: protocol.getProtocolDescription,
-    state: {protocol: {data: {metadata: {}}}},
+    state: { protocol: { data: { metadata: {} } } },
     expected: undefined,
   },
   {
     name: 'getProtocolDescription if description in metadata',
     selector: protocol.getProtocolDescription,
-    state: {protocol: {data: {metadata: {description: 'Fizzes buzzes'}}}},
+    state: {
+      protocol: { data: { metadata: { description: 'Fizzes buzzes' } } },
+    },
     expected: 'Fizzes buzzes',
   },
   {
     name: 'getProtocolLastUpdated falls back to file if no data',
     selector: protocol.getProtocolDescription,
-    state: {protocol: {file: {lastModifieddata: null}}},
+    state: { protocol: { file: { lastModifieddata: null } } },
     expected: undefined,
   },
   {
     name: 'getProtocolDescription if description not in metadata',
     selector: protocol.getProtocolDescription,
-    state: {protocol: {data: {metadata: {}}}},
+    state: { protocol: { data: { metadata: {} } } },
     expected: undefined,
   },
   {
     name: 'getProtocolDescription if description in metadata',
     selector: protocol.getProtocolDescription,
-    state: {protocol: {data: {metadata: {description: 'Fizzes buzzes'}}}},
+    state: {
+      protocol: { data: { metadata: { description: 'Fizzes buzzes' } } },
+    },
     expected: 'Fizzes buzzes',
   },
   {
     name: 'getProtocolLastUpdated if nothing loaded',
     selector: protocol.getProtocolLastUpdated,
-    state: {protocol: {file: null, contents: null, data: null}},
+    state: { protocol: { file: null, contents: null, data: null } },
     expected: null,
   },
   {
     name: 'getProtocolLastUpdated from file.lastModified',
     selector: protocol.getProtocolLastUpdated,
-    state: {protocol: {file: {lastModified: 1}}},
+    state: { protocol: { file: { lastModified: 1 } } },
     expected: 1,
   },
   {
@@ -148,8 +152,8 @@ const SPECS = [
     selector: protocol.getProtocolLastUpdated,
     state: {
       protocol: {
-        file: {lastModified: 1},
-        data: {metadata: {created: 2}},
+        file: { lastModified: 1 },
+        data: { metadata: { created: 2 } },
       },
     },
     expected: 2,
@@ -159,8 +163,8 @@ const SPECS = [
     selector: protocol.getProtocolLastUpdated,
     state: {
       protocol: {
-        file: {lastModified: 1},
-        data: {metadata: {created: 2, 'last-modified': 3}},
+        file: { lastModified: 1 },
+        data: { metadata: { created: 2, 'last-modified': 3 } },
       },
     },
     expected: 3,
@@ -168,13 +172,15 @@ const SPECS = [
   {
     name: 'getProtocolMethod if nothing loaded',
     selector: protocol.getProtocolMethod,
-    state: {protocol: {file: null, contents: null, data: null}},
+    state: { protocol: { file: null, contents: null, data: null } },
     expected: null,
   },
   {
     name: 'getProtocolMethod if file not yet read',
     selector: protocol.getProtocolMethod,
-    state: {protocol: {file: {name: 'proto.py'}, contents: null, data: null}},
+    state: {
+      protocol: { file: { name: 'proto.py' }, contents: null, data: null },
+    },
     expected: null,
   },
   {
@@ -182,7 +188,7 @@ const SPECS = [
     selector: protocol.getProtocolMethod,
     state: {
       protocol: {
-        file: {name: 'proto.py'},
+        file: { name: 'proto.py' },
         contents: 'fizzbuzz',
         data: null,
       },
@@ -194,7 +200,7 @@ const SPECS = [
     selector: protocol.getProtocolMethod,
     state: {
       protocol: {
-        file: {name: 'proto.json', type: 'application/json'},
+        file: { name: 'proto.json', type: 'application/json' },
         contents: 'fizzbuzz',
         data: null,
       },
@@ -206,9 +212,9 @@ const SPECS = [
     selector: protocol.getProtocolMethod,
     state: {
       protocol: {
-        file: {name: 'proto.py', type: 'application/json'},
+        file: { name: 'proto.py', type: 'application/json' },
         contents: 'fizzbuzz',
-        data: {metadata: {}},
+        data: { metadata: {} },
       },
     },
     expected: 'Unknown Application',
@@ -218,7 +224,7 @@ const SPECS = [
     selector: protocol.getProtocolMethod,
     state: {
       protocol: {
-        file: {name: 'proto.py', type: 'application/json'},
+        file: { name: 'proto.py', type: 'application/json' },
         contents: 'fizzbuzz',
         data: {
           metadata: {},
@@ -235,7 +241,7 @@ const SPECS = [
     selector: protocol.getProtocolMethod,
     state: {
       protocol: {
-        file: {name: 'proto.py', type: 'application/json'},
+        file: { name: 'proto.py', type: 'application/json' },
         contents: 'fizzbuzz',
         data: {
           metadata: {},
@@ -252,7 +258,7 @@ const SPECS = [
 
 describe('protocol selectors', () => {
   SPECS.forEach(spec => {
-    const {name, selector, state, expected} = spec
+    const { name, selector, state, expected } = spec
     test(name, () => expect(selector(state)).toEqual(expected))
   })
 })

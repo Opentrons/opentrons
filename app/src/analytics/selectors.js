@@ -1,5 +1,5 @@
 // @flow
-import {createSelector} from 'reselect'
+import { createSelector } from 'reselect'
 
 import {
   getProtocolType,
@@ -24,9 +24,9 @@ import {
 
 import hash from './hash'
 
-import type {OutputSelector} from 'reselect'
-import type {State} from '../types'
-import type {ProtocolAnalyticsData, RobotAnalyticsData} from './types'
+import type { OutputSelector } from 'reselect'
+import type { State } from '../types'
+import type { ProtocolAnalyticsData, RobotAnalyticsData } from './types'
 
 type ProtocolDataSelector = OutputSelector<State, void, ProtocolAnalyticsData>
 
@@ -52,7 +52,7 @@ const _getUnhashedProtocolAnalyticsData: ProtocolDataSelector = createSelector(
 
 // TODO(mc, 2019-01-22): it would be good to have some way of caching these
 // hashes; reselect isn't geared towards async, so perhaps RxJS / observables?
-export function getProtocolAnalyticsData (
+export function getProtocolAnalyticsData(
   state: State
 ): Promise<ProtocolAnalyticsData> {
   const data = _getUnhashedProtocolAnalyticsData(state)
@@ -61,11 +61,11 @@ export function getProtocolAnalyticsData (
   return Promise.all(hashTasks).then(result => {
     const [protocolAuthor, protocolText] = result
 
-    return {...data, protocolAuthor, protocolText}
+    return { ...data, protocolAuthor, protocolText }
   })
 }
 
-export function getRobotAnalyticsData (state: State): RobotAnalyticsData | null {
+export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
   const robot = getConnectedRobot(state)
 
   if (robot) {
@@ -78,10 +78,10 @@ export function getRobotAnalyticsData (state: State): RobotAnalyticsData | null 
 
     const pipettes = pipettesRequest.response
       ? {
-        left: pipettesRequest.response.left.model,
-        right: pipettesRequest.response.right.model,
-      }
-      : {left: null, right: null}
+          left: pipettesRequest.response.left.model,
+          right: pipettesRequest.response.right.model,
+        }
+      : { left: null, right: null }
 
     return settings.reduce(
       (result, setting) => ({

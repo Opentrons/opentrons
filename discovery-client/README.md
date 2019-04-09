@@ -24,7 +24,7 @@ const options = {
   nameFilter: ['opentrons'],
   portFilter: [31950],
   pollInterval: 5000,
-  candidates: [{ip: '[fd00:0:cafe:fefe::1]', port: 31950}, 'localhost'],
+  candidates: [{ ip: '[fd00:0:cafe:fefe::1]', port: 31950 }, 'localhost'],
 }
 
 const client = DiscoveryClientFactory(options)
@@ -187,7 +187,7 @@ type Options = {
 If you need access to the `DiscoveryClient` class itself for some reason:
 
 ```js
-import {DiscoveryClient} from '@opentrons/discovery-client'
+import { DiscoveryClient } from '@opentrons/discovery-client'
 
 const client = new DiscoveryClient({})
 ```

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {Icon} from '../icons'
+import { Icon } from '../icons'
 
 import styles from './forms.css'
 
@@ -26,7 +26,7 @@ type Props = {
   error?: ?string,
 }
 
-export default function RadioGroup (props: Props) {
+export default function RadioGroup(props: Props) {
   const error = props.error != null
 
   const outerClassName = cx({
@@ -34,35 +34,39 @@ export default function RadioGroup (props: Props) {
     [styles.error]: error,
   })
 
-  const itemClassName = cx(
-    styles.form_field,
-    props.className,
-    {[styles.inline_item]: props.inline}
-  )
+  const itemClassName = cx(styles.form_field, props.className, {
+    [styles.inline_item]: props.inline,
+  })
 
   return (
     <div className={outerClassName}>
-      {props.options && props.options.map(radio =>
-        <label key={radio.value} className={itemClassName}>
-          <div className={styles.checkbox_icon}>
-            <Icon
-              name={radio.value === props.value ? 'radiobox-marked' : 'radiobox-blank'}
-              width='100%'
-            />
-          </div>
+      {props.options &&
+        props.options.map(radio => (
+          <label key={radio.value} className={itemClassName}>
+            <div className={styles.checkbox_icon}>
+              <Icon
+                name={
+                  radio.value === props.value
+                    ? 'radiobox-marked'
+                    : 'radiobox-blank'
+                }
+                width="100%"
+              />
+            </div>
 
-          <input
-            className={cx(styles.input_field, styles.accessibly_hidden)}
-            type='radio'
-            value={radio.value}
-            checked={radio.value === props.value}
-            onChange={props.onChange}
-          />
-          <div className={cx(props.labelTextClassName, styles.label_text)}>
-            {radio.name}</div>
-          {radio.children}
-        </label>
-      )}
+            <input
+              className={cx(styles.input_field, styles.accessibly_hidden)}
+              type="radio"
+              value={radio.value}
+              checked={radio.value === props.value}
+              onChange={props.onChange}
+            />
+            <div className={cx(props.labelTextClassName, styles.label_text)}>
+              {radio.name}
+            </div>
+            {radio.children}
+          </label>
+        ))}
     </div>
   )
 }

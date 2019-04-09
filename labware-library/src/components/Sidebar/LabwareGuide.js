@@ -2,7 +2,7 @@
 // labware filters
 import * as React from 'react'
 
-import {Icon} from '@opentrons/components'
+import { Icon } from '@opentrons/components'
 import styles from './styles.css'
 
 // TODO(mc, 2019-03-14): i18n
@@ -11,11 +11,11 @@ const EN_HOW_TO_CHOOSE_LABWARE = 'How to choose labware'
 const EN_MAKING_CUSTOM_DEFINITIONS = 'Making custom definitions'
 
 const LINKS = [
-  {label: EN_HOW_TO_CHOOSE_LABWARE, href: '#'},
-  {label: EN_MAKING_CUSTOM_DEFINITIONS, href: '#'},
+  { label: EN_HOW_TO_CHOOSE_LABWARE, href: '#' },
+  { label: EN_MAKING_CUSTOM_DEFINITIONS, href: '#' },
 ]
 
-export default function LabwareGuide () {
+export default function LabwareGuide() {
   return (
     <section className={styles.labware_guide}>
       <div className={styles.labware_guide_container}>

@@ -74,21 +74,21 @@ const options = {
     isTiprack: false,
     isMagneticModuleCompatible: false,
   },
-  offset: {x: 14.38, y: 11.24, z: 14.35},
+  offset: { x: 14.38, y: 11.24, z: 14.35 },
   dimensions: {
     overallLength: 127.76,
     overallWidth: 85.48,
     overallHeight: 14.35,
   },
-  grid: {row: 8, column: 12},
-  spacing: {row: 9, column: 9},
+  grid: { row: 8, column: 12 },
+  spacing: { row: 9, column: 9 },
   well: {
     depth: 10.54,
     shape: 'circular',
     diameter: 6.4,
     totalLiquidVolume: 380,
   },
-  brand: {brand: 'generic'},
+  brand: { brand: 'generic' },
 }
 
 const labware = sharedData.createRegularLabware(options)
@@ -132,9 +132,9 @@ const options = {
     overallWidth: 85.5,
     overallHeight: 123.76,
   },
-  offset: [{x: 13.88, y: 17.75, z: 123.76}, {x: 71.38, y: 25.25, z: 119.8}],
-  grid: [{row: 3, column: 2}, {row: 2, column: 2}],
-  spacing: [{row: 25, column: 25}, {row: 35, column: 35}],
+  offset: [{ x: 13.88, y: 17.75, z: 123.76 }, { x: 71.38, y: 25.25, z: 119.8 }],
+  grid: [{ row: 3, column: 2 }, { row: 2, column: 2 }],
+  spacing: [{ row: 25, column: 25 }, { row: 35, column: 35 }],
   well: [
     {
       totalLiquidVolume: 15000,
@@ -150,10 +150,10 @@ const options = {
     },
   ],
   gridStart: [
-    {rowStart: 'A', colStart: '1', rowStride: 1, colStride: 1},
-    {rowStart: 'A', colStart: '3', rowStride: 1, colStride: 1},
+    { rowStart: 'A', colStart: '1', rowStride: 1, colStride: 1 },
+    { rowStart: 'A', colStart: '3', rowStride: 1, colStride: 1 },
   ],
-  brand: {brand: 'Opentrons', brandId: ['352096', '352070']},
+  brand: { brand: 'Opentrons', brandId: ['352096', '352070'] },
 }
 
 const labware = sharedData.createIrregularLabware(options)

@@ -23,26 +23,26 @@ export type PollRequest = {
 const MIN_SUBINTERVAL_MS = 100
 const MIN_TIMEOUT_MS = 30000
 
-export function poll (
+export function poll(
   candidates: Array<Candidate>,
   interval: number,
   onHealth: HealthHandler,
   log: ?Logger
 ): PollRequest {
-  if (!candidates.length) return {id: null}
+  if (!candidates.length) return { id: null }
 
-  log && log.debug('poller start', {interval, candidates: candidates.length})
+  log && log.debug('poller start', { interval, candidates: candidates.length })
 
   const subInterval = Math.max(interval / candidates.length, MIN_SUBINTERVAL_MS)
   const timeout = Math.max(subInterval * candidates.length, MIN_TIMEOUT_MS)
 
   const id = setInterval(pollIp, subInterval)
-  const request = {id}
+  const request = { id }
   let current = -1
 
   return request
 
-  function pollIp () {
+  function pollIp() {
     const next = getNextCandidate()
 
     fetchHealth(next, timeout, log).then(([apiRes, serverRes]) =>
@@ -50,7 +50,7 @@ export function poll (
     )
   }
 
-  function getNextCandidate () {
+  function getNextCandidate() {
     current += 1
 
     if (current > candidates.length - 1) {
@@ -61,16 +61,16 @@ export function poll (
   }
 }
 
-export function stop (request: ?PollRequest, log: ?Logger) {
+export function stop(request: ?PollRequest, log: ?Logger) {
   const id = request && request.id
 
   if (id) {
     clearInterval(id)
-    log && log.debug('poller stop', {id})
+    log && log.debug('poller stop', { id })
   }
 }
 
-function fetchHealth (cand: Candidate, timeout: number, log: ?Logger) {
+function fetchHealth(cand: Candidate, timeout: number, log: ?Logger) {
   const apiHealthUrl = `http://${cand.ip}:${cand.port}/health`
   const serverHealthUrl = `http://${cand.ip}:${cand.port}/server/update/health`
 
@@ -80,16 +80,16 @@ function fetchHealth (cand: Candidate, timeout: number, log: ?Logger) {
   ])
 }
 
-function fetchAndParseBody (url, timeout, log: ?Logger) {
-  return fetch(url, {timeout})
+function fetchAndParseBody(url, timeout, log: ?Logger) {
+  return fetch(url, { timeout })
     .then(response => (response.ok ? response.json() : null))
     .then(body => {
-      log && log.silly('GET', {url, body})
+      log && log.silly('GET', { url, body })
       return body
     })
     .catch(error => {
-      const {message, type, code} = error
-      log && log.silly('GET failed', {url, message, type, code})
+      const { message, type, code } = error
+      log && log.silly('GET failed', { url, message, type, code })
       return null
     })
 }

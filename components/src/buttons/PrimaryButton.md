@@ -1,14 +1,15 @@
 Basic usage:
 
 ```js
-<div style={{width: '16rem'}}>
+<div style={{ width: '16rem' }}>
   <PrimaryButton onClick={() => alert('you clicked me')}>
     {'Click for alert'}
   </PrimaryButton>
 </div>
 ```
+
 ```js
-<div style={{width: '16rem'}}>
+<div style={{ width: '16rem' }}>
   <PrimaryButton onClick={() => alert('you clicked me')} inverted>
     {'Click for alert'}
   </PrimaryButton>
@@ -18,7 +19,7 @@ Basic usage:
 Disabled:
 
 ```js
-<div style={{width: '16rem'}}>
+<div style={{ width: '16rem' }}>
   <PrimaryButton onClick={() => alert("can't click me")} disabled>
     {"Can't click"}
   </PrimaryButton>
@@ -28,8 +29,11 @@ Disabled:
 With icon:
 
 ```js
-<div style={{width: '16rem'}}>
-  <PrimaryButton onClick={() => alert('you clicked me')} iconName='flask-outline'>
+<div style={{ width: '16rem' }}>
+  <PrimaryButton
+    onClick={() => alert('you clicked me')}
+    iconName="flask-outline"
+  >
     {'Click for alert'}
   </PrimaryButton>
 </div>
@@ -40,11 +44,11 @@ Sometimes you need `<PrimaryButton>` that isn't a native `<button>`. To do this,
 Use the inspector on this example to see that the "button" is a `<div>` with the `role` attribute set.
 
 ```js
-<div style={{width: '16rem'}}>
+<div style={{ width: '16rem' }}>
   <PrimaryButton
-    Component='div'
-    role='button'
-    iconName='flask-outline'
+    Component="div"
+    role="button"
+    iconName="flask-outline"
     onClick={() => alert('click!')}
   >
     {"I'm a div!"}

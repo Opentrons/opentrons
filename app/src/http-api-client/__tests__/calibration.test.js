@@ -26,8 +26,8 @@ describe('/calibration/**', () => {
   beforeEach(() => {
     client.__clearMock()
 
-    robot = {name: NAME, ip: '1.2.3.4', port: '1234'}
-    state = {api: {calibration: {}}}
+    robot = { name: NAME, ip: '1.2.3.4', port: '1234' }
+    state = { api: { calibration: {} } }
     store = mockStore(state)
   })
 
@@ -35,61 +35,69 @@ describe('/calibration/**', () => {
     const path = 'calibration/deck/start'
     const response = {
       token: 'token',
-      pipette: {mount: 'left', model: 'p300_single_v1'},
+      pipette: { mount: 'left', model: 'p300_single_v1' },
     }
 
     test('calls POST /calibration/deck/start', () => {
-      const expected = {force: false}
+      const expected = { force: false }
 
       client.__setMockResponse(response)
 
-      return store.dispatch(startDeckCalibration(robot))
-        .then(() => expect(client).toHaveBeenCalledWith(
-          robot,
-          'POST',
-          'calibration/deck/start',
-          expected
-        ))
+      return store
+        .dispatch(startDeckCalibration(robot))
+        .then(() =>
+          expect(client).toHaveBeenCalledWith(
+            robot,
+            'POST',
+            'calibration/deck/start',
+            expected
+          )
+        )
     })
 
     test('calls POST /calibration/deck/start with force: true', () => {
-      const expected = {force: true}
+      const expected = { force: true }
 
       client.__setMockResponse(response)
 
-      return store.dispatch(startDeckCalibration(robot, true))
-        .then(() => expect(client).toHaveBeenCalledWith(
-          robot,
-          'POST',
-          'calibration/deck/start',
-          expected
-        ))
+      return store
+        .dispatch(startDeckCalibration(robot, true))
+        .then(() =>
+          expect(client).toHaveBeenCalledWith(
+            robot,
+            'POST',
+            'calibration/deck/start',
+            expected
+          )
+        )
     })
 
     test('dispatches api:REQUEST and api:SUCCESS', () => {
-      const request = {force: false}
+      const request = { force: false }
       const expectedActions = [
-        {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:SUCCESS', payload: {robot, response, path}},
+        { type: 'api:REQUEST', payload: { robot, request, path } },
+        { type: 'api:SUCCESS', payload: { robot, response, path } },
       ]
 
       client.__setMockResponse(response)
 
-      return store.dispatch(startDeckCalibration(robot))
+      return store
+        .dispatch(startDeckCalibration(robot))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
 
     test('dispatches api:REQUEST and api:FAILURE', () => {
-      const request = {force: false}
-      const error = {name: 'ResponseError', status: 409, message: ''}
+      const request = { force: false }
+      const error = { name: 'ResponseError', status: 409, message: '' }
       const expectedActions = [
-        {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:FAILURE', payload: {robot, error, path}},
+        { type: 'api:REQUEST', payload: { robot, request, path } },
+        { type: 'api:FAILURE', payload: { robot, error, path } },
       ]
 
       client.__setMockError(error)
 
-      return store.dispatch(startDeckCalibration(robot))
+      return store
+        .dispatch(startDeckCalibration(robot))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
   })
@@ -97,66 +105,72 @@ describe('/calibration/**', () => {
   describe('deckCalibrationCommand action creator', () => {
     const path = 'calibration/deck'
     const token = 'mock-token'
-    const request = {command: 'save z'}
-    const response = {message: 'mock-response'}
+    const request = { command: 'save z' }
+    const response = { message: 'mock-response' }
 
     beforeEach(() => {
       state.api.calibration[NAME] = {
-        'calibration/deck/start': {response: {token}},
+        'calibration/deck/start': { response: { token } },
       }
     })
 
     test('calls POST /calibration/deck and adds token to request', () => {
       client.__setMockResponse(response)
 
-      return store.dispatch(deckCalibrationCommand(robot, request))
-        .then(() => expect(client).toHaveBeenCalledWith(
-          robot,
-          'POST',
-          'calibration/deck',
-          {...request, token}
-        ))
+      return store
+        .dispatch(deckCalibrationCommand(robot, request))
+        .then(() =>
+          expect(client).toHaveBeenCalledWith(
+            robot,
+            'POST',
+            'calibration/deck',
+            { ...request, token }
+          )
+        )
     })
 
     test('dispatches api:REQUEST and api:SUCCESS', () => {
       const expectedActions = [
-        {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:SUCCESS', payload: {robot, response, path}},
+        { type: 'api:REQUEST', payload: { robot, request, path } },
+        { type: 'api:SUCCESS', payload: { robot, response, path } },
       ]
 
       client.__setMockResponse(response)
 
-      return store.dispatch(deckCalibrationCommand(robot, request))
+      return store
+        .dispatch(deckCalibrationCommand(robot, request))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
 
     test('dispatches api:REQUEST and api:FAILURE', () => {
-      const error = {name: 'ResponseError', message: 'AH'}
+      const error = { name: 'ResponseError', message: 'AH' }
       const expectedActions = [
-        {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:FAILURE', payload: {robot, error, path}},
+        { type: 'api:REQUEST', payload: { robot, request, path } },
+        { type: 'api:FAILURE', payload: { robot, error, path } },
       ]
 
       client.__setMockError(error)
 
-      return store.dispatch(deckCalibrationCommand(robot, request))
+      return store
+        .dispatch(deckCalibrationCommand(robot, request))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
 
     test('dispatchs api:CLEAR_RESPONSE if command is "release"', () => {
-      const request = {command: 'release'}
+      const request = { command: 'release' }
       const expectedActions = [
         {
           type: 'api:CLEAR_RESPONSE',
-          payload: {robot, path: 'calibration/deck/start'},
+          payload: { robot, path: 'calibration/deck/start' },
         },
-        {type: 'api:REQUEST', payload: {robot, request, path}},
-        {type: 'api:SUCCESS', payload: {robot, response, path}},
+        { type: 'api:REQUEST', payload: { robot, request, path } },
+        { type: 'api:SUCCESS', payload: { robot, response, path } },
       ]
 
       client.__setMockResponse(response)
 
-      return store.dispatch(deckCalibrationCommand(robot, request))
+      return store
+        .dispatch(deckCalibrationCommand(robot, request))
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
   })
@@ -172,24 +186,24 @@ describe('/calibration/**', () => {
         request: {},
         response: {
           token: 'token',
-          pipette: {mount: 'left', model: 'p300_single_v1'},
+          pipette: { mount: 'left', model: 'p300_single_v1' },
         },
       },
       {
         path: 'calibration/deck',
-        request: {command: 'save transform'},
-        response: {message: 'saved'},
+        request: { command: 'save transform' },
+        response: { message: 'saved' },
       },
     ]
 
-    REDUCER_REQUEST_RESPONSE_TESTS.forEach((spec) => {
-      const {path, request, response} = spec
+    REDUCER_REQUEST_RESPONSE_TESTS.forEach(spec => {
+      const { path, request, response } = spec
 
       describe(`reducer with /calibration/${path}`, () => {
         test('handles api:REQUEST', () => {
           const action = {
             type: 'api:REQUEST',
-            payload: {path, robot, request},
+            payload: { path, robot, request },
           }
 
           expect(reducer(state, action).calibration).toEqual({
@@ -207,7 +221,7 @@ describe('/calibration/**', () => {
         test('handles api:SUCCESS', () => {
           const action = {
             type: 'api:SUCCESS',
-            payload: {path, robot, response},
+            payload: { path, robot, response },
           }
 
           state.calibration[NAME] = {
@@ -232,10 +246,10 @@ describe('/calibration/**', () => {
         })
 
         test('handles api:FAILURE', () => {
-          const error = {message: 'we did not do it!'}
+          const error = { message: 'we did not do it!' }
           const action = {
             type: 'api:FAILURE',
-            payload: {path, robot, error},
+            payload: { path, robot, error },
           }
 
           state.calibration[NAME] = {
@@ -266,7 +280,7 @@ describe('/calibration/**', () => {
     state = state.api
 
     const path = 'calibration/deck/start'
-    const action = {type: 'api:CLEAR_RESPONSE', payload: {robot, path}}
+    const action = { type: 'api:CLEAR_RESPONSE', payload: { robot, path } }
 
     state.calibration[NAME] = {
       [path]: {
@@ -288,18 +302,19 @@ describe('/calibration/**', () => {
   describe('selectors', () => {
     beforeEach(() => {
       state.api.calibration[NAME] = {
-        'calibration/deck': {inProgress: true},
-        'calibration/deck/start': {inProgress: true},
+        'calibration/deck': { inProgress: true },
+        'calibration/deck/start': { inProgress: true },
       }
     })
 
     test('makeGetDeckCalibrationStartState', () => {
       const getStartState = makeGetDeckCalibrationStartState()
 
-      expect(getStartState(state, robot))
-        .toEqual(state.api.calibration[NAME]['calibration/deck/start'])
+      expect(getStartState(state, robot)).toEqual(
+        state.api.calibration[NAME]['calibration/deck/start']
+      )
 
-      expect(getStartState(state, {name: 'foo'})).toEqual({
+      expect(getStartState(state, { name: 'foo' })).toEqual({
         inProgress: false,
       })
     })
@@ -307,10 +322,11 @@ describe('/calibration/**', () => {
     test('makeGetDeckCalibrationCommandState', () => {
       const getCommandState = makeGetDeckCalibrationCommandState()
 
-      expect(getCommandState(state, robot))
-        .toEqual(state.api.calibration[NAME]['calibration/deck'])
+      expect(getCommandState(state, robot)).toEqual(
+        state.api.calibration[NAME]['calibration/deck']
+      )
 
-      expect(getCommandState(state, {name: 'foo'})).toEqual({
+      expect(getCommandState(state, { name: 'foo' })).toEqual({
         inProgress: false,
       })
     })

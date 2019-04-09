@@ -1,10 +1,10 @@
 // @flow
 import * as React from 'react'
 
-import type {StepFieldName} from '../../../../steplist/fieldLevel'
+import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import i18n from '../../../../localization'
 
-import type {FocusHandlers} from '../../types'
+import type { FocusHandlers } from '../../types'
 
 import {
   TextField,
@@ -23,27 +23,32 @@ type Props = {
   prefix: 'aspirate' | 'dispense',
 }
 
-const makeAddFieldNamePrefix = (prefix: string) => (fieldName: string): StepFieldName => `${prefix}_${fieldName}`
+const makeAddFieldNamePrefix = (prefix: string) => (
+  fieldName: string
+): StepFieldName => `${prefix}_${fieldName}`
 
-function SourceDestFields (props: Props) {
-  const {className, focusHandlers, prefix} = props
+function SourceDestFields(props: Props) {
+  const { className, focusHandlers, prefix } = props
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
 
   const mixFields = (
     <CheckboxRowField
       name={addFieldNamePrefix('mix_checkbox')}
       label={i18n.t('form.step_edit_form.field.mix.label')}
-      className={styles.small_field}>
+      className={styles.small_field}
+    >
       <TextField
         name={addFieldNamePrefix('mix_volume')}
         units={i18n.t('application.units.microliter')}
         className={styles.small_field}
-        {...focusHandlers} />
+        {...focusHandlers}
+      />
       <TextField
         name={addFieldNamePrefix('mix_times')}
         units={i18n.t('application.units.times')}
         className={styles.small_field}
-        {...focusHandlers} />
+        {...focusHandlers}
+      />
     </CheckboxRowField>
   )
 
@@ -53,13 +58,17 @@ function SourceDestFields (props: Props) {
         <FlowRateField
           name={addFieldNamePrefix('flowRate')}
           pipetteFieldName="pipette"
-          flowRateType={prefix} />
+          flowRateType={prefix}
+        />
         <TipPositionField fieldName={addFieldNamePrefix('mmFromBottom')} />
-        <WellOrderField prefix={prefix} label={i18n.t('form.step_edit_form.field.well_order.label')} />
+        <WellOrderField
+          prefix={prefix}
+          label={i18n.t('form.step_edit_form.field.well_order.label')}
+        />
       </div>
 
       <div className={styles.checkbox_column}>
-        {prefix === 'aspirate' &&
+        {prefix === 'aspirate' && (
           <React.Fragment>
             <CheckboxRowField
               name="preWetTip"
@@ -82,30 +91,38 @@ function SourceDestFields (props: Props) {
               />
             </CheckboxRowField>
           </React.Fragment>
-        }
+        )}
 
         {prefix === 'dispense' && mixFields}
 
         <CheckboxRowField
           name={addFieldNamePrefix('touchTip_checkbox')}
-          tooltipComponent={i18n.t(`tooltip.step_fields.defaults.${addFieldNamePrefix('touchTip_checkbox')}`)}
+          tooltipComponent={i18n.t(
+            `tooltip.step_fields.defaults.${addFieldNamePrefix(
+              'touchTip_checkbox'
+            )}`
+          )}
           label={i18n.t('form.step_edit_form.field.touchTip.label')}
           className={styles.small_field}
         >
-          <TipPositionField fieldName={addFieldNamePrefix('touchTip_mmFromBottom')} />
+          <TipPositionField
+            fieldName={addFieldNamePrefix('touchTip_mmFromBottom')}
+          />
         </CheckboxRowField>
 
-        {prefix === 'dispense' &&
+        {prefix === 'dispense' && (
           <CheckboxRowField
-            name='blowout_checkbox'
+            name="blowout_checkbox"
             label={i18n.t('form.step_edit_form.field.blowout.label')}
-            className={styles.small_field}>
+            className={styles.small_field}
+          >
             <BlowoutLocationField
               name="blowout_location"
               className={styles.full_width}
-              {...focusHandlers} />
+              {...focusHandlers}
+            />
           </CheckboxRowField>
-        }
+        )}
       </div>
     </div>
   )

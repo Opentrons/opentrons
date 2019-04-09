@@ -1,9 +1,12 @@
 // @flow
-import type {Match} from 'react-router'
-import type {PipetteModelSpecs} from '@opentrons/shared-data'
-import type {RobotService, Mount} from '../../robot'
-import type {DeckCalCommandState, DeckCalStartState} from '../../http-api-client'
-import type {Jog} from '../JogControls'
+import type { Match } from 'react-router'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type { RobotService, Mount } from '../../robot'
+import type {
+  DeckCalCommandState,
+  DeckCalStartState,
+} from '../../http-api-client'
+import type { Jog } from '../JogControls'
 
 export type CalibrationStep = '1' | '2' | '3' | '4' | '5' | '6'
 
@@ -29,7 +32,7 @@ export type DP = {|
   back: () => mixed,
 |}
 
-export type CalibrateDeckProps = {...$Exact<OP>, ...SP, ...DP}
+export type CalibrateDeckProps = { ...$Exact<OP>, ...SP, ...DP }
 
 export type CalibrateDeckStartedProps = {
   ...$Exact<CalibrateDeckProps>,

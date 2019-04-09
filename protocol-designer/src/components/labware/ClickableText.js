@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import {Icon, type IconName} from '@opentrons/components'
+import { Icon, type IconName } from '@opentrons/components'
 import styles from './labware.css'
 
 type Props = {
@@ -13,22 +13,22 @@ type Props = {
 
 const DEFAULT_HEIGHT = 15
 
-export default function ClickableText (props: Props) {
-  const height = (props.height == null) ? DEFAULT_HEIGHT : props.height
+export default function ClickableText(props: Props) {
+  const height = props.height == null ? DEFAULT_HEIGHT : props.height
   return (
     <g onClick={props.onClick}>
       {/* Invisible clickable area (otherwise line-drawing icons are hard
         to get 'cursor: pointer' on!) */}
       <rect
-        x='0'
+        x="0"
         y={props.y}
-        width='100%'
+        width="100%"
         height={height}
         className={styles.clickable_area}
       />
 
       <g className={styles.clickable_text}>
-        <text x='0' y={props.y} className={styles.clickable_text_text}>
+        <text x="0" y={props.y} className={styles.clickable_text_text}>
           {props.text}
         </text>
         {props.iconName && (

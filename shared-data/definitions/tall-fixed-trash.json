@@ -4,11 +4,7 @@
     "format": "trough",
     "isValidSource": false
   },
-  "ordering": [
-    [
-      "A1"
-    ]
-  ],
+  "ordering": [["A1"]],
   "wells": {
     "A1": {
       "depth": 80,

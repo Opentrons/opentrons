@@ -14,9 +14,7 @@ type ListAlertProps = {
 /**
  * A List item to be used for alerts
  */
-export default function ListAlert (props: ListAlertProps) {
+export default function ListAlert(props: ListAlertProps) {
   const className = classnames(styles.list_alert, props.className)
-  return (
-    <li className={className}>{props.children}</li>
-  )
+  return <li className={className}>{props.children}</li>
 }

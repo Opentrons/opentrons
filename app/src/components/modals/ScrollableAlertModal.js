@@ -3,13 +3,13 @@
 import * as React from 'react'
 import omit from 'lodash/omit'
 
-import {AlertModal} from '@opentrons/components'
-import {BottomButtonBar} from './'
+import { AlertModal } from '@opentrons/components'
+import { BottomButtonBar } from './'
 import styles from './styles.css'
 
 type Props = React.ElementProps<typeof AlertModal>
 
-export default function ScrollableAlertModal (props: Props) {
+export default function ScrollableAlertModal(props: Props) {
   return (
     <AlertModal
       {...omit(props, 'buttons', 'children')}

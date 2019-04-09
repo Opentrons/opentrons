@@ -1,15 +1,15 @@
 // @flow
 import * as React from 'react'
 
-import {PDTitledList} from '../lists'
+import { PDTitledList } from '../lists'
 import SourceDestSubstep from './SourceDestSubstep'
 import styles from './StepItem.css'
 import AspirateDispenseHeader from './AspirateDispenseHeader'
 import MixHeader from './MixHeader'
 import PauseStepItems from './PauseStepItems'
 import StepDescription from '../StepDescription'
-import {stepIconsByType} from '../../form-types'
-import type {FormData, StepIdType, StepType} from '../../form-types'
+import { stepIconsByType } from '../../form-types'
+import type { FormData, StepIdType, StepType } from '../../form-types'
 import type {
   SubstepIdentifier,
   SubstepItemData,
@@ -33,8 +33,8 @@ type StepItemProps = {
   hoveredSubstep: ?SubstepIdentifier,
   ingredNames: WellIngredientNames,
 
-  labwareNicknamesById: {[labwareId: string]: string},
-  labwareTypesById: {[labwareId: string]: ?string},
+  labwareNicknamesById: { [labwareId: string]: string },
+  labwareTypesById: { [labwareId: string]: ?string },
   highlightSubstep: SubstepIdentifier => mixed,
   selectStep: (stepId: StepIdType) => mixed,
   onStepContextMenu?: (event?: SyntheticEvent<>) => mixed,
@@ -44,7 +44,7 @@ type StepItemProps = {
 }
 
 class StepItem extends React.PureComponent<StepItemProps> {
-  render () {
+  render() {
     const {
       stepType,
       title,
@@ -77,15 +77,15 @@ class StepItem extends React.PureComponent<StepItemProps> {
     return (
       <PDTitledList
         description={Description}
-        iconName={(error || warning) ? 'alert-circle' : iconName}
-        iconProps={{className: iconClassName}}
+        iconName={error || warning ? 'alert-circle' : iconName}
+        iconProps={{ className: iconClassName }}
         title={title ? `${stepNumber}. ${title}` : ''}
         onClick={() => selectStep(stepId)}
         onContextMenu={onStepContextMenu}
         onMouseEnter={() => highlightStep(stepId)}
         onMouseLeave={unhighlightStep}
         onCollapseToggle={() => toggleStepCollapsed(stepId)}
-        {...{selected, collapsed, hovered}}
+        {...{ selected, collapsed, hovered }}
       >
         {getStepItemContents(this.props)}
       </PDTitledList>
@@ -93,7 +93,7 @@ class StepItem extends React.PureComponent<StepItemProps> {
   }
 }
 
-function getStepItemContents (stepItemProps: StepItemProps) {
+function getStepItemContents(stepItemProps: StepItemProps) {
   const {
     rawForm,
     stepType,
@@ -121,19 +121,22 @@ function getStepItemContents (stepItemProps: StepItemProps) {
     const sourceLabwareId = rawForm['aspirate_labware']
     const destLabwareId = rawForm['dispense_labware']
 
-    result.push(<AspirateDispenseHeader
-      key='moveLiquid-header'
-      sourceLabwareNickname={labwareNicknamesById[sourceLabwareId]}
-      sourceLabwareType={labwareTypesById[sourceLabwareId]}
-      destLabwareNickname={labwareNicknamesById[destLabwareId]}
-      destLabwareType={labwareTypesById[destLabwareId]}
-    />)
+    result.push(
+      <AspirateDispenseHeader
+        key="moveLiquid-header"
+        sourceLabwareNickname={labwareNicknamesById[sourceLabwareId]}
+        sourceLabwareType={labwareTypesById[sourceLabwareId]}
+        destLabwareNickname={labwareNicknamesById[destLabwareId]}
+        destLabwareType={labwareTypesById[destLabwareId]}
+      />
+    )
   }
 
   if (stepType === 'mix') {
     const mixLabwareId = rawForm['labware']
     result.push(
-      <MixHeader key='mix-header'
+      <MixHeader
+        key="mix-header"
         volume={rawForm.volume}
         times={rawForm.times}
         labwareNickname={labwareNicknamesById[mixLabwareId]}
@@ -144,16 +147,15 @@ function getStepItemContents (stepItemProps: StepItemProps) {
 
   // non-header substeps
   if (
-    substeps && (
-      substeps.commandCreatorFnName === 'transfer' ||
+    substeps &&
+    (substeps.commandCreatorFnName === 'transfer' ||
       substeps.commandCreatorFnName === 'consolidate' ||
       substeps.commandCreatorFnName === 'distribute' ||
-      substeps.commandCreatorFnName === 'mix'
-    )
+      substeps.commandCreatorFnName === 'mix')
   ) {
     result.push(
       <SourceDestSubstep
-        key='substeps'
+        key="substeps"
         ingredNames={ingredNames}
         substeps={substeps}
         hoveredSubstep={hoveredSubstep}

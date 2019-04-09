@@ -2,7 +2,7 @@
 /** A full-page icon in a muted color */
 import * as React from 'react'
 import cx from 'classnames'
-import {Icon, type IconName} from '../icons'
+import { Icon, type IconName } from '../icons'
 
 import styles from './Splash.css'
 
@@ -13,7 +13,7 @@ type Props = {
   className?: string,
 }
 
-export default function Splash (props: Props) {
+export default function Splash(props: Props) {
   return (
     <div className={cx(styles.splash, props.className)}>
       <Icon name={props.iconName || 'ot-logo'} />

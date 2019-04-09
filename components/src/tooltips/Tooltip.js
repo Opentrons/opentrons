@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react'
-import {Manager, Reference, Popper} from 'react-popper'
+import { Manager, Reference, Popper } from 'react-popper'
 import cx from 'classnames'
 import styles from './tooltips.css'
 
@@ -45,7 +45,7 @@ export type TooltipProps<ChildProps: {}> = {
  *
  * `props.childProps` can be used to add extra fields to the child props object
  */
-export default function Tooltip<ChildProps: {}> (
+export default function Tooltip<ChildProps: {}>(
   props: TooltipProps<ChildProps>
 ) {
   if (!props.tooltipComponent) return props.children()
@@ -53,21 +53,21 @@ export default function Tooltip<ChildProps: {}> (
   return (
     <Manager>
       <Reference>
-        {({ref}) => props.children({...props.childProps, ref})}
+        {({ ref }) => props.children({ ...props.childProps, ref })}
       </Reference>
       {props.open && (
         <Popper
           placement={props.placement}
           modifiers={{
-            offset: {offset: `0, ${DISTANCE_FROM_REFERENCE}`},
+            offset: { offset: `0, ${DISTANCE_FROM_REFERENCE}` },
             ...props.modifiers,
           }}
           positionFixed={props.positionFixed}
         >
-          {({ref, style, placement, arrowProps}) => {
-            let {style: arrowStyle} = arrowProps
+          {({ ref, style, placement, arrowProps }) => {
+            let { style: arrowStyle } = arrowProps
             if (placement === 'left' || placement === 'right') {
-              arrowStyle = {top: '0.6em'}
+              arrowStyle = { top: '0.6em' }
             }
             const tooltipContents = (
               <div

@@ -1,10 +1,7 @@
 Basic usage:
 
 ```js
-<TitledList
-  title='Titled List With Icon'
-  iconName='flask-outline'
->
+<TitledList title="Titled List With Icon" iconName="flask-outline">
   <ListItem>Something 1</ListItem>
   <ListItem>Something 2</ListItem>
 </TitledList>
@@ -13,11 +10,10 @@ Basic usage:
 Using the onClick and selected props:
 
 ```js
-initialState = {selected: false}
-
+initialState = { selected: false }
 ;<TitledList
-  title='Selectable Titled List'
-  onClick={() => setState({selected: !state.selected})}
+  title="Selectable Titled List"
+  onClick={() => setState({ selected: !state.selected })}
   selected={state.selected}
 >
   <ListItem>Something 1</ListItem>
@@ -28,12 +24,11 @@ initialState = {selected: false}
 If `onCollapseToggle` prop is given a function, the TitledList will be collapsible, dictated by the `collapsed` prop. `onCollapseToggle` will only fire on caret clicks, not title clicks:
 
 ```js
-initialState = {selected: false, collapsed: false}
-
+initialState = { selected: false, collapsed: false }
 ;<TitledList
-  title='Collapsible Titled List'
-  onClick={() => setState({selected: !state.selected})}
-  onCollapseToggle={() => setState({collapsed: !state.collapsed})}
+  title="Collapsible Titled List"
+  onClick={() => setState({ selected: !state.selected })}
+  onCollapseToggle={() => setState({ collapsed: !state.collapsed })}
   selected={state.selected}
   collapsed={state.collapsed}
 >
@@ -46,7 +41,7 @@ The entire TitledList may be disabled with the `disabled` prop. The `selected` p
 
 ```js
 <TitledList
-  title='Disabled Titled List'
+  title="Disabled Titled List"
   onClick={() => alert("this won't happen")}
   onCollapseToggle={() => alert("this won't happen")}
   selected

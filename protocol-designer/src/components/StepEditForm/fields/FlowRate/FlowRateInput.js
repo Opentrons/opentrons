@@ -8,7 +8,7 @@ import {
   InputField,
 } from '@opentrons/components'
 import i18n from '../../../../localization'
-import {Portal} from '../../../portals/MainPageModalPortal'
+import { Portal } from '../../../portals/MainPageModalPortal'
 import modalStyles from '../../../modals/modal.css'
 import stepFormStyles from '../../StepEditForm.css'
 import styles from './FlowRateInput.css'
@@ -38,13 +38,13 @@ type State = {
 }
 
 export default class FlowRateInput extends React.Component<Props, State> {
-  constructor (props: Props) {
+  constructor(props: Props) {
     super(props)
     this.state = this.getStateFromProps(props)
   }
 
   getStateFromProps = (props: Props): State => {
-    const {formFlowRate} = props
+    const { formFlowRate } = props
     return {
       showModal: false,
       modalFlowRate: formFlowRate ? formFlowRate.toString() : null,
@@ -58,22 +58,20 @@ export default class FlowRateInput extends React.Component<Props, State> {
   }
 
   openModal = () => {
-    this.setState({showModal: true})
+    this.setState({ showModal: true })
   }
 
   makeSaveModal = (allowSave: boolean) => () => {
-    const {modalUseDefault, modalFlowRate} = this.state
+    const { modalUseDefault, modalFlowRate } = this.state
 
-    const newFlowRate = modalUseDefault
-      ? null
-      : Number(modalFlowRate)
+    const newFlowRate = modalUseDefault ? null : Number(modalFlowRate)
 
     if (!allowSave) {
-      this.setState({pristine: false})
+      this.setState({ pristine: false })
       return
     }
 
-    this.setState({showModal: false, pristine: false})
+    this.setState({ showModal: false, pristine: false })
     this.props.updateValue(newFlowRate)
   }
 
@@ -85,11 +83,7 @@ export default class FlowRateInput extends React.Component<Props, State> {
 
   handleChangeNumber = (e: SyntheticInputEvent<*>) => {
     const value = e.target.value
-    if (
-      value === '' ||
-      value === '.' ||
-      !Number.isNaN(Number(value))
-    ) {
+    if (value === '' || value === '.' || !Number.isNaN(Number(value))) {
       this.setState({
         modalFlowRate: value,
         modalUseDefault: false,
@@ -97,12 +91,8 @@ export default class FlowRateInput extends React.Component<Props, State> {
     }
   }
 
-  render () {
-    const {
-      showModal,
-      modalUseDefault,
-      pristine,
-    } = this.state
+  render() {
+    const { showModal, modalUseDefault, pristine } = this.state
 
     const {
       defaultFlowRate,
@@ -120,12 +110,12 @@ export default class FlowRateInput extends React.Component<Props, State> {
     // show 0.1 not 0 as minimum, since bottom of range is non-inclusive
     const displayMinFlowRate = minFlowRate || Math.pow(10, -DECIMALS_ALLOWED)
     const rangeDescription = `between ${displayMinFlowRate} and ${maxFlowRate}`
-    const outOfBounds = (
+    const outOfBounds =
       modalFlowRateNum === 0 ||
       minFlowRate > modalFlowRateNum ||
       modalFlowRateNum > maxFlowRate
-    )
-    const correctDecimals = round(modalFlowRateNum, DECIMALS_ALLOWED) === modalFlowRateNum
+    const correctDecimals =
+      round(modalFlowRateNum, DECIMALS_ALLOWED) === modalFlowRateNum
     const allowSave = modalUseDefault || (!outOfBounds && correctDecimals)
 
     let errorMessage = null
@@ -134,7 +124,8 @@ export default class FlowRateInput extends React.Component<Props, State> {
     if (!modalUseDefault) {
       if (!Number.isNaN(modalFlowRateNum) && !correctDecimals) {
         errorMessage = `a max of ${DECIMALS_ALLOWED} decimal place${
-          DECIMALS_ALLOWED > 1 ? 's' : ''} is allowed`
+          DECIMALS_ALLOWED > 1 ? 's' : ''
+        } is allowed`
       } else if (!pristine && outOfBounds) {
         errorMessage = `accepted range is ${displayMinFlowRate} to ${maxFlowRate}`
       }
@@ -179,14 +170,16 @@ export default class FlowRateInput extends React.Component<Props, State> {
 
           <RadioGroup
             inline
-            value={(modalUseDefault)
-              ? 'default'
-              : 'custom'
-            }
+            value={modalUseDefault ? 'default' : 'custom'}
             onChange={this.handleChangeRadio}
             options={[
-              {name: `${defaultFlowRate || '?'} ${i18n.t('application.units.microliterPerSec')} (default)`, value: 'default'},
-              {name: 'Custom', value: 'custom', 'children': FlowRateInput},
+              {
+                name: `${defaultFlowRate || '?'} ${i18n.t(
+                  'application.units.microliterPerSec'
+                )} (default)`,
+                value: 'default',
+              },
+              { name: 'Custom', value: 'custom', children: FlowRateInput },
             ]}
           />
         </AlertModal>
@@ -197,7 +190,7 @@ export default class FlowRateInput extends React.Component<Props, State> {
       <React.Fragment>
         <FormGroup label={label || DEFAULT_LABEL} disabled={disabled}>
           <InputField
-            units='μL/s'
+            units="μL/s"
             readOnly
             disabled={disabled}
             onClick={this.openModal}

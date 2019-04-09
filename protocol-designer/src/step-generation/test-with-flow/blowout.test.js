@@ -1,7 +1,11 @@
 // @flow
-import {expectTimelineError} from './testMatchers'
+import { expectTimelineError } from './testMatchers'
 import _blowout from '../commandCreators/atomic/blowout'
-import {createRobotState, commandCreatorNoErrors, commandCreatorHasErrors} from './fixtures'
+import {
+  createRobotState,
+  commandCreatorNoErrors,
+  commandCreatorHasErrors,
+} from './fixtures'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
 
@@ -47,14 +51,16 @@ describe('blowout', () => {
       well: 'A1',
     })(robotStateWithTip)
 
-    expect(result.commands).toEqual([{
-      command: 'blowout',
-      params: {
-        pipette: 'p300SingleId',
-        labware: 'sourcePlateId',
-        well: 'A1',
+    expect(result.commands).toEqual([
+      {
+        command: 'blowout',
+        params: {
+          pipette: 'p300SingleId',
+          labware: 'sourcePlateId',
+          well: 'A1',
+        },
       },
-    }])
+    ])
 
     expect(result.robotState).toEqual(robotStateWithTip)
   })
@@ -109,14 +115,17 @@ describe('blowout', () => {
         well: 'A1',
       })(robotStateWithTip)
 
-      expect(updateLiquidState).toHaveBeenCalledWith({
-        pipetteId: 'p300SingleId',
-        labwareId: 'sourcePlateId',
-        useFullVolume: true,
-        well: 'A1',
-        labwareType: 'trough-12row',
-        pipetteData: robotStateWithTip.pipettes.p300SingleId,
-      }, robotStateWithTip.liquidState)
+      expect(updateLiquidState).toHaveBeenCalledWith(
+        {
+          pipetteId: 'p300SingleId',
+          labwareId: 'sourcePlateId',
+          useFullVolume: true,
+          well: 'A1',
+          labwareType: 'trough-12row',
+          pipetteData: robotStateWithTip.pipettes.p300SingleId,
+        },
+        robotStateWithTip.liquidState
+      )
 
       expect(result.robotState.liquidState).toBe(mockLiquidReturnValue)
     })

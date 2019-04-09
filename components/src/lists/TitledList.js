@@ -4,7 +4,7 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import styles from './lists.css'
-import {type IconName, Icon} from '../icons'
+import { type IconName, Icon } from '../icons'
 
 type ListProps = {
   /** text of title */
@@ -12,7 +12,7 @@ type ListProps = {
   /** optional icon left of the title */
   iconName?: ?IconName,
   /** props passed down to icon (`className` and `name` are ignored) */
-  iconProps?: $Diff<React.ElementProps<typeof Icon>, {name: *}>,
+  iconProps?: $Diff<React.ElementProps<typeof Icon>, { name: * }>,
   // TODO(mc, 2018-01-25): enforce <li> children requirement with flow
   /** children must all be `<li>` */
   children?: React.Node,
@@ -43,13 +43,19 @@ type ListProps = {
 /**
  * An ordered list with optional title, icon, and description.
  */
-export default function TitledList (props: ListProps) {
-  const {iconName, disabled, onCollapseToggle, iconProps, onMouseEnter, onMouseLeave, onContextMenu} = props
+export default function TitledList(props: ListProps) {
+  const {
+    iconName,
+    disabled,
+    onCollapseToggle,
+    iconProps,
+    onMouseEnter,
+    onMouseLeave,
+    onContextMenu,
+  } = props
   const collapsible = onCollapseToggle != null
 
-  const onClick = !disabled
-    ? props.onClick
-    : undefined
+  const onClick = !disabled ? props.onClick : undefined
 
   // clicking on the carat will not call props.onClick,
   // so prevent bubbling up if there is an onCollapseToggle fn
@@ -60,8 +66,9 @@ export default function TitledList (props: ListProps) {
     }
   }
 
-  const hasValidChildren = React.Children.toArray(props.children)
-    .some(child => child)
+  const hasValidChildren = React.Children.toArray(props.children).some(
+    child => child
+  )
 
   const className = cx(styles.titled_list, props.className, {
     [styles.disabled]: disabled,
@@ -73,17 +80,22 @@ export default function TitledList (props: ListProps) {
     [styles.clickable]: props.onClick,
   })
 
-  const iconClass = cx(styles.title_bar_icon, styles.icon_left_of_title, iconProps && iconProps.className)
+  const iconClass = cx(
+    styles.title_bar_icon,
+    styles.icon_left_of_title,
+    iconProps && iconProps.className
+  )
 
   return (
-    <div className={className} {...{onMouseEnter, onMouseLeave, onContextMenu}}>
+    <div
+      className={className}
+      {...{ onMouseEnter, onMouseLeave, onContextMenu }}
+    >
       <div onClick={onClick} className={titleBarClass}>
         {iconName && (
           <Icon {...iconProps} className={iconClass} name={iconName} />
         )}
-        <h3 className={styles.title}>
-          {props.title}
-        </h3>
+        <h3 className={styles.title}>{props.title}</h3>
         {collapsible && (
           <div
             onClick={handleCollapseToggle}
@@ -91,18 +103,20 @@ export default function TitledList (props: ListProps) {
           >
             <Icon
               className={styles.title_bar_icon}
-              name={props.selected
-                ? 'chevron-right'
-                : (props.collapsed ? 'chevron-down' : 'chevron-up')}
+              name={
+                props.selected
+                  ? 'chevron-right'
+                  : props.collapsed
+                  ? 'chevron-down'
+                  : 'chevron-up'
+              }
             />
           </div>
         )}
       </div>
       {!props.collapsed && props.description}
       {!props.collapsed && hasValidChildren && (
-        <ol className={styles.list}>
-          {props.children}
-        </ol>
+        <ol className={styles.list}>{props.children}</ol>
       )}
     </div>
   )

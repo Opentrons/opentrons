@@ -8,16 +8,16 @@ import head from 'lodash/head'
 import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
-import {createSelector} from 'reselect'
+import { createSelector } from 'reselect'
 import semver from 'semver'
 
 // TODO(mc, 2018-10-10): fix circular dependency with RPC API client
 // that requires us to bypass the robot entry point here
-import {getConnectedRobotName} from '../robot/selectors'
+import { getConnectedRobotName } from '../robot/selectors'
 
-import type {OutputSelector as Selector} from 'reselect'
-import type {Service} from '@opentrons/discovery-client'
-import type {State} from '../types'
+import type { OutputSelector as Selector } from 'reselect'
+import type { Service } from '@opentrons/discovery-client'
+import type { State } from '../types'
 import type {
   ResolvedRobot,
   Robot,
@@ -80,17 +80,18 @@ const getGroupedRobotsMap: GetGroupedRobotsMap = createSelector(
         }
 
         if (resolved) {
-          if (isConnectable(resolved)) return {...service, status: CONNECTABLE}
-          if (isReachable(resolved)) return {...service, status: REACHABLE}
+          if (isConnectable(resolved))
+            return { ...service, status: CONNECTABLE }
+          if (isReachable(resolved)) return { ...service, status: REACHABLE }
         }
-        return {...service, status: UNREACHABLE}
+        return { ...service, status: UNREACHABLE }
       })
 
       return groupBy(servicesWithStatus, 'status')
     })
 )
 
-export function getScanning (state: State) {
+export function getScanning(state: State) {
   return state.discovery.scanning
 }
 
@@ -100,7 +101,7 @@ export const getConnectableRobots: GetConnectableRobots = createSelector(
   (robotsMap, connectedName) =>
     map(robotsMap, g => head(g.connectable))
       .filter(Boolean)
-      .map(r => ({...r, connected: r.name === connectedName}))
+      .map(r => ({ ...r, connected: r.name === connectedName }))
 )
 
 export const getReachableRobots: GetReachableRobots = createSelector(

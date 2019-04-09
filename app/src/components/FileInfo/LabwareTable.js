@@ -6,7 +6,7 @@ type Props = {
   children: React.Node,
 }
 
-export default function LabwareTable (props: Props) {
+export default function LabwareTable(props: Props) {
   return (
     <table className={styles.labware_table}>
       <tbody>

@@ -2,7 +2,7 @@
 import * as React from 'react'
 import semver from 'semver'
 import styles from './styles.css'
-import type {VersionProps} from './types.js'
+import type { VersionProps } from './types.js'
 
 const NEWER_VERSION = (
   <strong>A newer version of the robot server is available.</strong>
@@ -20,8 +20,8 @@ const UPDATE_APP = (
   </React.Fragment>
 )
 
-export default function UpdateAppMessage (props: VersionProps) {
-  const {appVersion, robotVersion} = props
+export default function UpdateAppMessage(props: VersionProps) {
+  const { appVersion, robotVersion } = props
   const versionsMatch = semver.eq(appVersion, robotVersion)
 
   return (

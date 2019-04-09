@@ -1,11 +1,14 @@
 // @flow
 // connect and configure robots page
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {withRouter, Route, Switch, Redirect, type Match} from 'react-router'
+import { connect } from 'react-redux'
+import { withRouter, Route, Switch, Redirect, type Match } from 'react-router'
 
-import {selectors as robotSelectors, actions as robotActions} from '../../robot'
-import {CONNECTABLE, REACHABLE} from '../../discovery'
+import {
+  selectors as robotSelectors,
+  actions as robotActions,
+} from '../../robot'
+import { CONNECTABLE, REACHABLE } from '../../discovery'
 import {
   makeGetRobotHome,
   clearHomeResponse,
@@ -14,19 +17,21 @@ import {
   makeGetRobotUpdateInfo,
 } from '../../http-api-client'
 
-import {SpinnerModalPage} from '@opentrons/components'
-import {ErrorModal} from '../../components/modals'
+import { SpinnerModalPage } from '@opentrons/components'
+import { ErrorModal } from '../../components/modals'
 import Page from '../../components/Page'
-import RobotSettings, {ConnectAlertModal} from '../../components/RobotSettings'
+import RobotSettings, {
+  ConnectAlertModal,
+} from '../../components/RobotSettings'
 import UpdateRobot from '../../components/RobotSettings/UpdateRobot'
 import CalibrateDeck from '../../components/CalibrateDeck'
 import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
 import ReachableRobotBanner from '../../components/RobotSettings/ReachableRobotBanner'
 import ResetRobotModal from '../../components/RobotSettings/ResetRobotModal'
 
-import type {State, Dispatch, Error} from '../../types'
-import type {ViewableRobot} from '../../discovery'
-import type {ShellUpdateState} from '../../shell'
+import type { State, Dispatch, Error } from '../../types'
+import type { ViewableRobot } from '../../discovery'
+import type { ShellUpdateState } from '../../shell'
 
 type OP = {
   robot: ViewableRobot,
@@ -41,7 +46,7 @@ type SP = {|
   homeError: ?Error,
 |}
 
-type DP = {|dispatch: Dispatch|}
+type DP = {| dispatch: Dispatch |}
 
 type Props = {
   ...$Exact<OP>,
@@ -62,7 +67,7 @@ const UPDATE_FRAGMENT = 'update'
 const CALIBRATE_DECK_FRAGMENT = 'calibrate-deck'
 const RESET_FRAGMENT = 'reset'
 
-function RobotSettingsPage (props: Props) {
+function RobotSettingsPage(props: Props) {
   const {
     robot,
     appUpdate,
@@ -72,10 +77,10 @@ function RobotSettingsPage (props: Props) {
     showConnectAlert,
     closeConnectAlert,
     showUpdateModal,
-    match: {path, url},
+    match: { path, url },
   } = props
 
-  const titleBarProps = {title: robot.displayName}
+  const titleBarProps = { title: robot.displayName }
   const updateUrl = `${url}/${UPDATE_FRAGMENT}`
   const calibrateDeckUrl = `${url}/${CALIBRATE_DECK_FRAGMENT}`
   const resetUrl = `${url}/${RESET_FRAGMENT}`
@@ -156,14 +161,14 @@ function RobotSettingsPage (props: Props) {
   )
 }
 
-function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
+function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
   const getHomeRequest = makeGetRobotHome()
   const getUpdateIgnoredRequest = makeGetRobotIgnoredUpdateRequest()
   const getRestartRequest = makeGetRobotRestartRequest()
   const getRobotUpdateInfo = makeGetRobotUpdateInfo()
 
   return (state, ownProps) => {
-    const {robot} = ownProps
+    const { robot } = ownProps
     const connectRequest = robotSelectors.getConnectRequest(state)
     const homeRequest = getHomeRequest(state, robot)
     const ignoredRequest = getUpdateIgnoredRequest(state, robot)
@@ -191,9 +196,9 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   }
 }
 
-function mergeProps (stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
-  const {robot} = ownProps
-  const {dispatch} = dispatchProps
+function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
+  const { robot } = ownProps
+  const { dispatch } = dispatchProps
   const props = {
     ...stateProps,
     ...ownProps,

@@ -4,9 +4,9 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../../../step-generation/utils'
-import {getOrderedWells} from '../../utils'
+import { getOrderedWells } from '../../utils'
 
-import type {HydratedMoveLiquidFormData} from '../../../form-types'
+import type { HydratedMoveLiquidFormData } from '../../../form-types'
 import type {
   ConsolidateArgs,
   DistributeArgs,
@@ -14,7 +14,7 @@ import type {
   InnerMixArgs,
 } from '../../../step-generation'
 
-export function getMixData (
+export function getMixData(
   hydratedFormData: *,
   checkboxField: *,
   volumeField: *,
@@ -29,17 +29,22 @@ export function getMixData (
     (typeof volume === 'number' && volume > 0) &&
     (typeof times === 'number' && times > 0)
   ) {
-    return {volume, times}
+    return { volume, times }
   }
   return null
 }
 
 type MoveLiquidStepArgs = ConsolidateArgs | DistributeArgs | TransferArgs | null
 
-const moveLiquidFormToArgs = (hydratedFormData: HydratedMoveLiquidFormData): MoveLiquidStepArgs => {
+const moveLiquidFormToArgs = (
+  hydratedFormData: HydratedMoveLiquidFormData
+): MoveLiquidStepArgs => {
   assert(
     hydratedFormData.stepType === 'moveLiquid',
-    `moveLiquidFormToArgs called with stepType ${hydratedFormData.stepType}, expected "moveLiquid"`)
+    `moveLiquidFormToArgs called with stepType ${
+      hydratedFormData.stepType
+    }, expected "moveLiquid"`
+  )
 
   const fields = hydratedFormData.fields
 
@@ -77,8 +82,8 @@ const moveLiquidFormToArgs = (hydratedFormData: HydratedMoveLiquidFormData): Mov
     'dispense_mix_times'
   )
 
-  const blowoutLocation = (
-    fields.blowout_checkbox && fields.blowout_location) || null
+  const blowoutLocation =
+    (fields.blowout_checkbox && fields.blowout_location) || null
 
   const commonFields = {
     pipette: pipetteId,
@@ -104,25 +109,33 @@ const moveLiquidFormToArgs = (hydratedFormData: HydratedMoveLiquidFormData): Mov
     name: hydratedFormData.stepName,
   }
 
-  assert(sourceWellsUnordered.length > 0, 'expected sourceWells to have length > 0')
+  assert(
+    sourceWellsUnordered.length > 0,
+    'expected sourceWells to have length > 0'
+  )
   assert(destWellsUnordered.length > 0, 'expected destWells to have length > 0')
   assert(
     sourceWellsUnordered.length === 1 ||
-    destWellsUnordered.length === 1 ||
-    sourceWellsUnordered.length === destWellsUnordered.length,
-    `cannot do moveLiquidFormToArgs. Mismatched wells (not 1:N, N:1, or N:N!) for path="single". Neither source (${sourceWellsUnordered.length}) nor dest (${destWellsUnordered.length}) equal 1`)
+      destWellsUnordered.length === 1 ||
+      sourceWellsUnordered.length === destWellsUnordered.length,
+    `cannot do moveLiquidFormToArgs. Mismatched wells (not 1:N, N:1, or N:N!) for path="single". Neither source (${
+      sourceWellsUnordered.length
+    }) nor dest (${destWellsUnordered.length}) equal 1`
+  )
 
   let sourceWells = getOrderedWells(
     fields.aspirate_wells,
     sourceLabware.type,
     fields.aspirate_wellOrder_first,
-    fields.aspirate_wellOrder_second)
+    fields.aspirate_wellOrder_second
+  )
 
   let destWells = getOrderedWells(
     fields.dispense_wells,
     destLabware.type,
     fields.dispense_wellOrder_first,
-    fields.dispense_wellOrder_second)
+    fields.dispense_wellOrder_second
+  )
 
   // 1:many with single path: spread well array of length 1 to match other well array
   if (path === 'single' && sourceWells.length !== destWells.length) {
@@ -197,7 +210,10 @@ const moveLiquidFormToArgs = (hydratedFormData: HydratedMoveLiquidFormData): Mov
       return distributeStepArguments
     }
     default: {
-      assert(false, `moveLiquidFormToArgs got unexpected "path" field value: ${path}`)
+      assert(
+        false,
+        `moveLiquidFormToArgs got unexpected "path" field value: ${path}`
+      )
       return null
     }
   }

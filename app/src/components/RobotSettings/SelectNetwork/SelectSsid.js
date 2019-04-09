@@ -3,11 +3,11 @@ import * as React from 'react'
 import find from 'lodash/find'
 import map from 'lodash/map'
 
-import {Icon, SelectField} from '@opentrons/components'
+import { Icon, SelectField } from '@opentrons/components'
 import styles from './styles.css'
 
-import type {GroupType, IconName, OptionType} from '@opentrons/components'
-import type {WifiNetwork, WifiNetworkList} from '../../../http-api-client'
+import type { GroupType, IconName, OptionType } from '@opentrons/components'
+import type { WifiNetwork, WifiNetworkList } from '../../../http-api-client'
 
 type Props = {
   list: ?WifiNetworkList,
@@ -25,8 +25,8 @@ const JOIN_OTHER_GROUP: GroupType = {
   ],
 }
 
-export default function SelectSsid (props: Props) {
-  const {list, disabled, onValueChange} = props
+export default function SelectSsid(props: Props) {
+  const { list, disabled, onValueChange } = props
   const connected = find(list, 'active')
   const value = connected && connected.ssid
 
@@ -43,7 +43,7 @@ export default function SelectSsid (props: Props) {
   )
 }
 
-function makeNetworkOption (nw: WifiNetwork): OptionType {
+function makeNetworkOption(nw: WifiNetwork): OptionType {
   const value = nw.ssid
   const connectedIcon = nw.active ? (
     <Icon name="check" className={styles.wifi_option_icon} />
@@ -81,5 +81,5 @@ function makeNetworkOption (nw: WifiNetwork): OptionType {
     </div>
   )
 
-  return {value, label}
+  return { value, label }
 }

@@ -9,8 +9,8 @@ import {
   Labware,
   Module,
 } from '@opentrons/components'
-import type {DeckSlot, LabwareComponentProps} from '@opentrons/components'
-import type {ModuleType} from '@opentrons/shared-data'
+import type { DeckSlot, LabwareComponentProps } from '@opentrons/components'
+import type { ModuleType } from '@opentrons/shared-data'
 
 // URI-encoded JSON expected as URL param "data" (eg `?data=...`)
 type UrlData = {
@@ -25,7 +25,7 @@ type UrlData = {
   },
 }
 
-function getDataFromUrl (): ?UrlData {
+function getDataFromUrl(): ?UrlData {
   try {
     const urlData = new URLSearchParams(window.location.search).get('data')
 
@@ -44,14 +44,14 @@ function getDataFromUrl (): ?UrlData {
 export default class URLDeck extends React.Component<{}> {
   urlData: ?UrlData
 
-  constructor () {
+  constructor() {
     super()
     this.urlData = getDataFromUrl()
   }
 
   getLabwareComponent = (args: LabwareComponentProps) => {
-    const {slot} = args
-    const {urlData} = this
+    const { slot } = args
+    const { urlData } = this
     if (!urlData) return null
 
     const labwareData = urlData.labware && urlData.labware[slot]
@@ -60,7 +60,7 @@ export default class URLDeck extends React.Component<{}> {
     let module = null
 
     if (labwareData) {
-      const {name, labwareType} = labwareData
+      const { name, labwareType } = labwareData
       const displayLabwareType = startCase(labwareType)
       labware = (
         <React.Fragment>
@@ -85,7 +85,7 @@ export default class URLDeck extends React.Component<{}> {
     )
   }
 
-  render () {
+  render() {
     return (
       <Deck
         className={styles.url_deck}

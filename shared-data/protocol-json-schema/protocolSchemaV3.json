@@ -26,8 +26,8 @@
     "flowRateForPipettes": {
       "description": "Flow rate in mm/sec for each pipette used in the protocol, by pipette name",
       "type": "object",
-      "propertyNames": {"$ref": "#/definitions/pipetteName"},
-      "patternProperties": {".*": {"type": "number", "minimum": 0}},
+      "propertyNames": { "$ref": "#/definitions/pipetteName" },
+      "patternProperties": { ".*": { "type": "number", "minimum": 0 } },
       "additionalProperties": false
     },
 
@@ -35,7 +35,7 @@
       "description": "Offset from bottom of well in millimeters",
       "required": ["offsetFromBottomMm"],
       "properties": {
-        "offsetFromBottomMm": {"$ref": "#/definitions/mmOffset"}
+        "offsetFromBottomMm": { "$ref": "#/definitions/mmOffset" }
       }
     },
 
@@ -211,7 +211,7 @@
           "required": ["slot", "definitionId"],
           "additionalProperties": false,
           "properties": {
-            "slot": {"$ref": "#/definitions/slot"},
+            "slot": { "$ref": "#/definitions/slot" },
             "definitionId": {
               "description": "reference to this labware's ID in \"labwareDefinitions\"",
               "type": "string"
@@ -241,10 +241,10 @@
               },
               "params": {
                 "allOf": [
-                  {"$ref": "#/definitions/flowRate"},
-                  {"$ref": "#/definitions/pipetteAccessParams"},
-                  {"$ref": "#/definitions/volumeParams"},
-                  {"$ref": "#/definitions/offsetFromBottomMm"}
+                  { "$ref": "#/definitions/flowRate" },
+                  { "$ref": "#/definitions/pipetteAccessParams" },
+                  { "$ref": "#/definitions/volumeParams" },
+                  { "$ref": "#/definitions/offsetFromBottomMm" }
                 ]
               }
             }
@@ -261,9 +261,9 @@
               },
               "params": {
                 "allOf": [
-                  {"$ref": "#/definitions/flowRate"},
-                  {"$ref": "#/definitions/pipetteAccessParams"},
-                  {"$ref": "#/definitions/offsetFromBottomMm"}
+                  { "$ref": "#/definitions/flowRate" },
+                  { "$ref": "#/definitions/pipetteAccessParams" },
+                  { "$ref": "#/definitions/offsetFromBottomMm" }
                 ]
               }
             }
@@ -280,13 +280,12 @@
               },
               "params": {
                 "allOf": [
-                  {"$ref": "#/definitions/pipetteAccessParams"},
-                  {"$ref": "#/definitions/offsetFromBottomMm"}
+                  { "$ref": "#/definitions/pipetteAccessParams" },
+                  { "$ref": "#/definitions/offsetFromBottomMm" }
                 ]
               }
             }
           },
-
 
           {
             "description": "Pick up tip / drop tip commands",
@@ -298,9 +297,7 @@
                 "enum": ["pickUpTip", "dropTip"]
               },
               "params": {
-                "allOf": [
-                  {"$ref": "#/definitions/pipetteAccessParams"}
-                ]
+                "allOf": [{ "$ref": "#/definitions/pipetteAccessParams" }]
               }
             }
           },
@@ -311,22 +308,22 @@
             "required": ["command", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": {"enum": ["moveToSlot"]},
+              "command": { "enum": ["moveToSlot"] },
               "params": {
                 "type": "object",
                 "required": ["pipette", "slot"],
                 "additionalProperties": false,
                 "properties": {
-                  "pipette": {"type": "string"},
-                  "slot": {"$ref": "#/definitions/slot"},
+                  "pipette": { "type": "string" },
+                  "slot": { "$ref": "#/definitions/slot" },
                   "offset": {
                     "description": "Optional offset from slot bottom left corner, in mm",
                     "type": "object",
                     "required": ["x", "y", "z"],
                     "properties": {
-                      "x": {"type": "number"},
-                      "y": {"type": "number"},
-                      "z": {"type": "number"}
+                      "x": { "type": "number" },
+                      "y": { "type": "number" },
+                      "z": { "type": "number" }
                     }
                   },
                   "minimumZHeight": {
@@ -359,10 +356,7 @@
                 "properties": {
                   "wait": {
                     "description": "either a number of seconds to wait (fractional values OK), or `true` to wait indefinitely until the user manually resumes the protocol",
-                    "anyOf": [
-                      {"type": "number"},
-                      {"enum": [true]}
-                    ]
+                    "anyOf": [{ "type": "number" }, { "enum": [true] }]
                   },
                   "message": {
                     "description": "optional message describing the delay"

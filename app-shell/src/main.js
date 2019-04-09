@@ -1,14 +1,14 @@
 // electron main entry point
-import {app, dialog, ipcMain, Menu} from 'electron'
+import { app, dialog, ipcMain, Menu } from 'electron'
 
 import createUi from './ui'
 import initializeMenu from './menu'
 import createLogger from './log'
-import {getConfig, getStore, getOverrides, registerConfig} from './config'
-import {registerApiUpdate} from './api-update'
-import {registerDiscovery} from './discovery'
-import {registerRobotLogs} from './robot-logs'
-import {registerUpdate} from './update'
+import { getConfig, getStore, getOverrides, registerConfig } from './config'
+import { registerApiUpdate } from './api-update'
+import { registerDiscovery } from './discovery'
+import { registerRobotLogs } from './robot-logs'
+import { registerUpdate } from './update'
 
 const config = getConfig()
 const log = createLogger(__filename)
@@ -20,7 +20,7 @@ log.debug('App config', {
 })
 
 if (config.devtools) {
-  require('electron-debug')({enabled: true, showDevTools: true})
+  require('electron-debug')({ enabled: true, showDevTools: true })
 }
 
 // hold on to references so they don't get garbage collected
@@ -29,9 +29,9 @@ let rendererLogger
 
 app.on('ready', startUp)
 
-function startUp () {
+function startUp() {
   log.info('Starting App')
-  process.on('uncaughtException', error => log.error('Uncaught: ', {error}))
+  process.on('uncaughtException', error => log.error('Uncaught: ', { error }))
 
   mainWindow = createUi()
   rendererLogger = createRendererLogger()
@@ -40,7 +40,7 @@ function startUp () {
 
   // wire modules to UI dispatches
   const dispatch = action => {
-    log.debug('Sending action via IPC to renderer', {action})
+    log.debug('Sending action via IPC to renderer', { action })
     mainWindow.webContents.send('dispatch', action)
   }
 
@@ -51,7 +51,7 @@ function startUp () {
   const updateHandler = registerUpdate(dispatch)
 
   ipcMain.on('dispatch', (_, action) => {
-    log.debug('Received action via IPC from renderer', {action})
+    log.debug('Received action via IPC from renderer', { action })
     apiUpdateHandler(action)
     configHandler(action)
     discoveryHandler(action)
@@ -65,10 +65,10 @@ function startUp () {
     )
   }
 
-  log.silly('Global references', {mainWindow, rendererLogger})
+  log.silly('Global references', { mainWindow, rendererLogger })
 }
 
-function createRendererLogger () {
+function createRendererLogger() {
   log.info('Creating renderer logger')
 
   const logger = createLogger()
@@ -77,7 +77,7 @@ function createRendererLogger () {
   return logger
 }
 
-function installAndOpenExtensions () {
+function installAndOpenExtensions() {
   const devtools = require('electron-devtools-installer')
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS
   const install = devtools.default
@@ -87,7 +87,7 @@ function installAndOpenExtensions () {
     extensions.map(name => install(devtools[name], forceDownload))
   ).then(() =>
     mainWindow.webContents.on('context-menu', (_, props) => {
-      const {x, y} = props
+      const { x, y } = props
 
       Menu.buildFromTemplate([
         {

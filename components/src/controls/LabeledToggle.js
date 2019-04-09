@@ -12,19 +12,19 @@ type Props = {
   onClick: () => mixed,
 }
 
-export default function LabeledToggle (props: Props) {
-  const {label, toggledOn, onClick} = props
+export default function LabeledToggle(props: Props) {
+  const { label, toggledOn, onClick } = props
 
   return (
     <LabeledControl
       label={label}
-      control={(
+      control={
         <ToggleButton
           className={styles.labeled_toggle_button}
           toggledOn={toggledOn}
           onClick={onClick}
         />
-      )}
+      }
     >
       {props.children}
     </LabeledControl>

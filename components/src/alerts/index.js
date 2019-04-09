@@ -4,4 +4,4 @@
 import AlertItem from './AlertItem'
 
 export * from './AlertItem'
-export {AlertItem}
+export { AlertItem }

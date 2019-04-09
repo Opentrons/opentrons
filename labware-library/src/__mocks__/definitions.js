@@ -3,7 +3,7 @@
 import path from 'path'
 import glob from 'glob'
 
-import type {LabwareList} from '../types'
+import type { LabwareList } from '../types'
 
 const LABWARE_FIXTURE_PATTERN = path.join(
   __dirname,

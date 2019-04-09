@@ -5,8 +5,8 @@ const webpackMerge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
 
-const {DEV_MODE, baseConfig} = require('@opentrons/webpack-config')
-const {productName: title, description, author} = require('./package.json')
+const { DEV_MODE, baseConfig } = require('@opentrons/webpack-config')
+const { productName: title, description, author } = require('./package.json')
 
 const JS_BUNDLE_ENTRY = path.join(__dirname, 'src/index.js')
 const HTML_ENTRY = path.join(__dirname, 'src/index.hbs')
@@ -21,7 +21,7 @@ module.exports = webpackMerge(baseConfig, {
   },
 
   plugins: [
-    new HtmlWebpackPlugin({title, description, author, template: HTML_ENTRY}),
-    new ScriptExtHtmlWebpackPlugin({defaultAttribute: 'defer'}),
+    new HtmlWebpackPlugin({ title, description, author, template: HTML_ENTRY }),
+    new ScriptExtHtmlWebpackPlugin({ defaultAttribute: 'defer' }),
   ],
 })

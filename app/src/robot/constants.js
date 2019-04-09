@@ -1,6 +1,6 @@
 // @flow
 // robot redux module constants
-import type {Mount, Slot} from './types'
+import type { Mount, Slot } from './types'
 
 export const _NAME = 'robot'
 

@@ -1,15 +1,17 @@
 // nav bar component
 import React from 'react'
 
-import {VerticalNavBar} from '@opentrons/components'
+import { VerticalNavBar } from '@opentrons/components'
 import NavButton from './NavButton'
 
-import {PANELS} from '../../interface'
+import { PANELS } from '../../interface'
 
-export default function NavBar (props) {
+export default function NavBar(props) {
   return (
     <VerticalNavBar>
-      {PANELS.map((panel) => <NavButton key={panel.name} {...panel} />)}
+      {PANELS.map(panel => (
+        <NavButton key={panel.name} {...panel} />
+      ))}
     </VerticalNavBar>
   )
 }

@@ -13,11 +13,17 @@ let labwareEntities
 let handleFormHelper
 
 beforeEach(() => {
-  pipetteEntities = {pipetteId: {name: 'p10_single', tiprackModel: 'tiprack-10ul'}}
+  pipetteEntities = {
+    pipetteId: { name: 'p10_single', tiprackModel: 'tiprack-10ul' },
+  }
   labwareEntities = {}
-  handleFormHelper = (patch, baseForm) => dependentFieldsUpdateMoveLiquid(
-    patch, baseForm, pipetteEntities, labwareEntities
-  )
+  handleFormHelper = (patch, baseForm) =>
+    dependentFieldsUpdateMoveLiquid(
+      patch,
+      baseForm,
+      pipetteEntities,
+      labwareEntities
+    )
 })
 
 describe('no-op cases should pass through the patch unchanged', () => {
@@ -34,7 +40,7 @@ describe('no-op cases should pass through the patch unchanged', () => {
     expect(handleFormHelper(patch, minimalBaseForm)).toBe(patch)
   })
   test('patch with unhandled field', () => {
-    const patch = {fooField: 123}
+    const patch = { fooField: 123 }
     expect(handleFormHelper(patch, minimalBaseForm)).toBe(patch)
   })
 })
@@ -42,7 +48,9 @@ describe('no-op cases should pass through the patch unchanged', () => {
 describe('path should update...', () => {
   test('if there is no path in base form', () => {
     const patch = {}
-    expect(handleFormHelper(patch, {blah: 'blaaah'})).toEqual({path: 'single'})
+    expect(handleFormHelper(patch, { blah: 'blaaah' })).toEqual({
+      path: 'single',
+    })
   })
   describe('if path is multi and volume*2 exceeds pipette/tip capacity', () => {
     const multiPaths = ['multiAspirate', 'multiDispense']
@@ -51,28 +59,26 @@ describe('path should update...', () => {
         // volume is updated, existing path was multi
         // NOTE: 6 exceeds multi-well capacity of P10 (cannot fit 2 wells)
         const result2 = handleFormHelper(
-          {volume: '6'},
+          { volume: '6' },
           {
             path,
             volume: '1',
             pipette: 'pipetteId',
-          })
-        expect(result2).toMatchObject({path: 'single', volume: '6'})
+          }
+        )
+        expect(result2).toMatchObject({ path: 'single', volume: '6' })
       })
     })
   })
 
   describe('if new changeTip option is incompatible...', () => {
     // cases are: [changeTip, pathThatIsIncompatibleWithChangeTip]
-    const cases = [
-      ['perSource', 'multiAspirate'],
-      ['perDest', 'multiDispense'],
-    ]
+    const cases = [['perSource', 'multiAspirate'], ['perDest', 'multiDispense']]
 
     cases.forEach(([changeTip, badPath]) => {
       test(`"${changeTip}" selected: path → single`, () => {
-        const patch = {changeTip}
-        const result = handleFormHelper({...patch, path: badPath}, {})
+        const patch = { changeTip }
+        const result = handleFormHelper({ ...patch, path: badPath }, {})
         expect(result.path).toEqual('single')
       })
     })
@@ -97,22 +103,23 @@ describe('disposal volume should update...', () => {
     const testCases = ['.', '0.', '.1', '1.', '']
     testCases.forEach(disposalVolume_volume => {
       test(`input is ${disposalVolume_volume}`, () => {
-        const result = handleFormHelper({disposalVolume_volume}, form)
+        const result = handleFormHelper({ disposalVolume_volume }, form)
         expect(result.disposalVolume_volume).toBe(disposalVolume_volume)
       })
     })
   })
 
   test('when path is changed: multiDispense → single', () => {
-    const result = handleFormHelper({path: 'single'}, form)
+    const result = handleFormHelper({ path: 'single' }, form)
     expect(result).toEqual({
       path: 'single',
       disposalVolume_checkbox: false,
-      disposalVolume_volume: null})
+      disposalVolume_volume: null,
+    })
   })
 
   test('when volume is raised but disposal vol is still in capacity, do not change (noop case)', () => {
-    const patch = {volume: '2.5'}
+    const patch = { volume: '2.5' }
     const result = handleFormHelper(patch, form)
     expect(result).toEqual(patch)
   })
@@ -120,8 +127,12 @@ describe('disposal volume should update...', () => {
   describe('when volume is raised so that disposal vol must be exactly zero, clear/zero disposal volume fields', () => {
     const volume = '5' // 5 + 5 = 10 which is P10 capacity ==> max disposal volume is zero
     test('when form is newly changed to multiDispense: clear the disposal vol + dispense_mix_* fields', () => {
-      const patch = {path: 'multiDispense'}
-      const result = handleFormHelper(patch, {...form, path: 'single', volume})
+      const patch = { path: 'multiDispense' }
+      const result = handleFormHelper(patch, {
+        ...form,
+        path: 'single',
+        volume,
+      })
       expect(result).toEqual({
         ...patch,
         disposalVolume_volume: null,
@@ -133,7 +144,7 @@ describe('disposal volume should update...', () => {
     })
 
     test('when form was multiDispense already: set to zero', () => {
-      const patch = {volume}
+      const patch = { volume }
       const result = handleFormHelper(patch, form)
       expect(result).toEqual({
         ...patch,
@@ -143,19 +154,21 @@ describe('disposal volume should update...', () => {
   })
 
   test('when volume is raised past disposal volume, lower disposal volume', () => {
-    const result = handleFormHelper({volume: '4.6'}, form)
+    const result = handleFormHelper({ volume: '4.6' }, form)
     expect(result).toEqual({
-      volume: '4.6', disposalVolume_volume: '0.8'})
+      volume: '4.6',
+      disposalVolume_volume: '0.8',
+    })
   })
 
   test('clamp excessive disposal volume to max', () => {
-    const result = handleFormHelper({disposalVolume_volume: '9999'}, form)
-    expect(result).toEqual({disposalVolume_volume: '6'})
+    const result = handleFormHelper({ disposalVolume_volume: '9999' }, form)
+    expect(result).toEqual({ disposalVolume_volume: '6' })
   })
 
   test('when disposal volume is a negative number, set to zero', () => {
-    const result = handleFormHelper({disposalVolume_volume: '-2'}, form)
-    expect(result).toEqual({disposalVolume_volume: '0'})
+    const result = handleFormHelper({ disposalVolume_volume: '-2' }, form)
+    expect(result).toEqual({ disposalVolume_volume: '0' })
   })
 
   describe('mix fields should clear...', () => {
@@ -172,7 +185,7 @@ describe('disposal volume should update...', () => {
         aspirate_mix_times: 2,
         aspirate_mix_volume: 1,
       }
-      const result = handleFormHelper({path: 'multiAspirate'}, form)
+      const result = handleFormHelper({ path: 'multiAspirate' }, form)
       expect(result).toEqual({
         path: 'multiAspirate',
         aspirate_mix_checkbox: false,
@@ -188,12 +201,20 @@ describe('disposal volume should update...', () => {
     }
 
     const testCases = [
-      {prevPath: 'single', nextPath: 'multiAspirate', incompatible: SOURCE_WELL_BLOWOUT_DESTINATION},
-      {prevPath: 'single', nextPath: 'multiDispense', incompatible: DEST_WELL_BLOWOUT_DESTINATION},
+      {
+        prevPath: 'single',
+        nextPath: 'multiAspirate',
+        incompatible: SOURCE_WELL_BLOWOUT_DESTINATION,
+      },
+      {
+        prevPath: 'single',
+        nextPath: 'multiDispense',
+        incompatible: DEST_WELL_BLOWOUT_DESTINATION,
+      },
     ]
 
-    testCases.forEach(({prevPath, nextPath, incompatible}) => {
-      const patch = {path: nextPath}
+    testCases.forEach(({ prevPath, nextPath, incompatible }) => {
+      const patch = { path: nextPath }
       test(`when changing path ${prevPath} → ${nextPath}, arbitrary labware still allowed`, () => {
         const result = updatePatchBlowoutFields(patch, {
           path: prevPath,
@@ -207,7 +228,7 @@ describe('disposal volume should update...', () => {
           path: prevPath,
           blowout_location: incompatible,
         })
-        expect(result).toEqual({...patch, ...resetBlowoutLocation})
+        expect(result).toEqual({ ...patch, ...resetBlowoutLocation })
       })
     })
   })

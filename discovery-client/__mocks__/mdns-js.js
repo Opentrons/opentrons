@@ -10,7 +10,7 @@ const __mockBrowser = Object.assign(new EventEmitter(), {
 
 const createBrowser = jest.fn()
 
-const tcp = name => ({name, protocol: 'tcp', subtypes: [], description: ''})
+const tcp = name => ({ name, protocol: 'tcp', subtypes: [], description: '' })
 
 const __mockReset = () => {
   createBrowser.mockReset()
@@ -20,6 +20,6 @@ const __mockReset = () => {
   createBrowser.mockReturnValue(__mockBrowser)
 }
 
-const ServiceType = function () {}
+const ServiceType = function() {}
 
-module.exports = {tcp, createBrowser, ServiceType, __mockBrowser, __mockReset}
+module.exports = { tcp, createBrowser, ServiceType, __mockBrowser, __mockReset }

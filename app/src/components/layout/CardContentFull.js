@@ -7,7 +7,7 @@ type Props = {
   children: React.Node,
   className?: string,
 }
-export default function CardContentFull (props: Props) {
+export default function CardContentFull(props: Props) {
   return (
     <div className={cx(styles.card_content_full, props.className)}>
       {props.children}

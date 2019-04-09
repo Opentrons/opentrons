@@ -10,9 +10,9 @@ import {
   matchService,
 } from './service'
 
-import type {Service, ServiceList, ServiceUpdate} from './types'
+import type { Service, ServiceList, ServiceUpdate } from './types'
 
-export function createServiceList (list: ServiceList = []): ServiceList {
+export function createServiceList(list: ServiceList = []): ServiceList {
   // strip health flags from input list
   const nextList = list.map(s =>
     makeService(
@@ -30,7 +30,7 @@ export function createServiceList (list: ServiceList = []): ServiceList {
   return dedupeServices(nextList)
 }
 
-export function upsertServiceList (
+export function upsertServiceList(
   list: ServiceList,
   upsert: Service
 ): ServiceList {
@@ -50,13 +50,13 @@ export function upsertServiceList (
   return dedupeServices(nextList)
 }
 
-export function updateServiceListByIp (
+export function updateServiceListByIp(
   list: ServiceList,
   ip: string,
   update: ServiceUpdate
 ): ServiceList {
-  const nextList = list.map(
-    service => (service.ip === ip ? updateService(service, update) : service)
+  const nextList = list.map(service =>
+    service.ip === ip ? updateService(service, update) : service
   )
 
   return dedupeServices(nextList)
@@ -64,14 +64,14 @@ export function updateServiceListByIp (
 
 // ensure there aren't multiple entries with the same IP and there aren't
 // multiple entries with the same name and ip: null
-function dedupeServices (list: ServiceList) {
+function dedupeServices(list: ServiceList) {
   const [listWithIp, listWithoutIp] = partition(list, 'ip')
   const sanitizedWithIp = listWithIp.reduce(
     (result, service) => {
       // we know IP exists here thanks to our partition above
       const ip: string = (service.ip: any)
       const cleanedService = result.seenIps[ip]
-        ? clearServiceIfConflict(service, {ip})
+        ? clearServiceIfConflict(service, { ip })
         : service
 
       result.seenIps[ip] = true
@@ -79,7 +79,7 @@ function dedupeServices (list: ServiceList) {
 
       return result
     },
-    {unique: [], seenIps: {}}
+    { unique: [], seenIps: {} }
   ).unique
 
   const dedupedWithoutIp = differenceBy(
@@ -97,7 +97,7 @@ function dedupeServices (list: ServiceList) {
 //   3. API healthy
 //   4. link-local address
 //   5. advertising
-function compareServices (a: Service, b: Service) {
+function compareServices(a: Service, b: Service) {
   if (a.ip && !b.ip) return -1
   if (!a.ip && b.ip) return 1
   if (a.serverOk && !b.serverOk) return -1

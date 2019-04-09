@@ -1,15 +1,15 @@
 // @flow
 import mapValues from 'lodash/mapValues'
 import definitions from '../build/labware.json'
-import {SLOT_RENDER_HEIGHT, FIXED_TRASH_RENDER_HEIGHT} from './constants'
-import type {LabwareDefinition, WellDefinition} from './types'
+import { SLOT_RENDER_HEIGHT, FIXED_TRASH_RENDER_HEIGHT } from './constants'
+import type { LabwareDefinition, WellDefinition } from './types'
 
-export default function getLabware (labwareName: string): ?LabwareDefinition {
+export default function getLabware(labwareName: string): ?LabwareDefinition {
   const labware: ?LabwareDefinition = definitions[labwareName]
   return labware
 }
 
-export function getIsTiprack (labwareName: string): boolean {
+export function getIsTiprack(labwareName: string): boolean {
   const labware = getLabware(labwareName)
   return Boolean(labware && labware.metadata && labware.metadata.isTiprack)
 }
@@ -25,12 +25,15 @@ export function getIsTiprack (labwareName: string): boolean {
 // TODO: BC 2019-02-28 The height constants used here should be replaced with the heights
 // in the dimensions field of the corresponding labware in definitions2
 const _getSvgYValueForWell = (labwareName: string, wellDef: WellDefinition) => {
-  const renderHeight = labwareName === 'fixed-trash' ? FIXED_TRASH_RENDER_HEIGHT : SLOT_RENDER_HEIGHT
+  const renderHeight =
+    labwareName === 'fixed-trash'
+      ? FIXED_TRASH_RENDER_HEIGHT
+      : SLOT_RENDER_HEIGHT
   return renderHeight - wellDef.y
 }
 
 /** For display. Flips Y axis to match SVG, applies offset to wells */
-export function getWellDefsForSVG (labwareName: string) {
+export function getWellDefsForSVG(labwareName: string) {
   const labware = getLabware(labwareName)
   const wellDefs = labware && labware.wells
 

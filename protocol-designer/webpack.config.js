@@ -7,8 +7,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
 
-const {DEV_MODE, baseConfig} = require('@opentrons/webpack-config')
-const {productName: title, description, author} = require('./package.json')
+const { DEV_MODE, baseConfig } = require('@opentrons/webpack-config')
+const { productName: title, description, author } = require('./package.json')
 const PROTOCOL_DESIGNER_ENV_VAR_PREFIX = 'OT_PD_'
 
 // TODO: BC: 2018-02-21 remove hardcoded semver version and replace
@@ -33,8 +33,8 @@ const envVarsWithDefaults = {
 }
 
 const envVars = passThruEnvVars.reduce(
-  (acc, envVar) => ({[envVar]: '', ...acc}),
-  {...envVarsWithDefaults}
+  (acc, envVar) => ({ [envVar]: '', ...acc }),
+  { ...envVarsWithDefaults }
 )
 
 console.log(`PD version: ${OT_PD_VERSION || 'UNKNOWN!'}`)
@@ -76,6 +76,6 @@ module.exports = merge(baseConfig, {
       inject: false,
       template: ERROR_HTML,
     }),
-    new ScriptExtHtmlWebpackPlugin({defaultAttribute: 'defer'}),
+    new ScriptExtHtmlWebpackPlugin({ defaultAttribute: 'defer' }),
   ],
 })

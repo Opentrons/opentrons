@@ -1,32 +1,36 @@
 Refreshable info Card with RefreshCard:
 
 ```js
-initialState = {name: 'foo', when: Date.now(), refreshing: false}
+initialState = { name: 'foo', when: Date.now(), refreshing: false }
 
-function refresh () {
-  setState({...state, refreshing: true})
-  setTimeout(() => setState({
-    ...state,
-    when: Date.now(),
-    refreshing: false
-  }), 2000)
+function refresh() {
+  setState({ ...state, refreshing: true })
+  setTimeout(
+    () =>
+      setState({
+        ...state,
+        when: Date.now(),
+        refreshing: false,
+      }),
+    2000
+  )
 }
 
-;<div style={{width: '32rem'}}>
+;<div style={{ width: '32rem' }}>
   <RefreshCard
     title={`Name: ${state.name}`}
     watch={state.name}
     refreshing={state.refreshing}
     refresh={refresh}
   >
-    <div style={{padding:'1rem'}}>
+    <div style={{ padding: '1rem' }}>
       <LabeledValue label={'Refreshed at'} value={state.when} />
     </div>
-    <div style={{padding:'1rem', textAlign:'right'}}>
-      <OutlineButton onClick={() => setState({...state, name: 'foo'})}>
+    <div style={{ padding: '1rem', textAlign: 'right' }}>
+      <OutlineButton onClick={() => setState({ ...state, name: 'foo' })}>
         Name -> "foo"
       </OutlineButton>
-      <OutlineButton onClick={() => setState({...state, name: 'bar'})}>
+      <OutlineButton onClick={() => setState({ ...state, name: 'bar' })}>
         Name -> "bar"
       </OutlineButton>
     </div>

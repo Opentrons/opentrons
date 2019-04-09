@@ -1,9 +1,9 @@
 // @flow
-import type {HintKey} from './index'
+import type { HintKey } from './index'
 
 export type AddHintAction = {
   type: 'ADD_HINT',
-  payload: {hintKey: HintKey},
+  payload: { hintKey: HintKey },
 }
 export type RemoveHintAction = {
   type: 'REMOVE_HINT',
@@ -16,12 +16,15 @@ export type RemoveHintAction = {
 
 export const addHint = (hintKey: HintKey): AddHintAction => ({
   type: 'ADD_HINT',
-  payload: {hintKey},
+  payload: { hintKey },
 })
 
-export const removeHint = (hintKey: HintKey, rememberDismissal: boolean): RemoveHintAction => ({
+export const removeHint = (
+  hintKey: HintKey,
+  rememberDismissal: boolean
+): RemoveHintAction => ({
   type: 'REMOVE_HINT',
-  payload: {hintKey, rememberDismissal},
+  payload: { hintKey, rememberDismissal },
 })
 
 export const clearAllHintDismissals = () => ({

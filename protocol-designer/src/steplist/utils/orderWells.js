@@ -5,8 +5,8 @@ import zipWith from 'lodash/zipWith'
 import uniq from 'lodash/uniq'
 import compact from 'lodash/compact'
 import flatten from 'lodash/flatten'
-import {getLabware} from '@opentrons/shared-data'
-import type {WellOrderOption} from '../../form-types'
+import { getLabware } from '@opentrons/shared-data'
+import type { WellOrderOption } from '../../form-types'
 
 // labware definitions in shared-data have an ordering
 // attribute which is an Array of Arrays of wells. Each inner
@@ -21,10 +21,11 @@ import type {WellOrderOption} from '../../form-types'
 // ]                      /       ]
 //
 
-export const _orderingColsToRows = (ordering: Array<Array<string>>): Array<Array<string>> => (
+export const _orderingColsToRows = (
+  ordering: Array<Array<string>>
+): Array<Array<string>> =>
   // $FlowFixMe(BC, 2018-08-27): flow-typed for lodash zipWith only supports <4 inner arrays
-  zipWith(...ordering, (...col) => (compact(uniq(col))))
-)
+  zipWith(...ordering, (...col) => compact(uniq(col)))
 
 // given a default "ordering" 2d array from labware definitions
 // where each inner array represents a physical column of wells
@@ -47,25 +48,35 @@ export const orderWells = (
     if (second === 'l2r') {
       orderedWells = defaultOrdering.map(col => col.slice().reverse())
     } else if (second === 'r2l') {
-      orderedWells = defaultOrdering.slice().reverse().map(col => col.slice().reverse())
+      orderedWells = defaultOrdering
+        .slice()
+        .reverse()
+        .map(col => col.slice().reverse())
     }
   } else if (first === 'l2r') {
     if (second === 't2b') {
       orderedWells = _orderingColsToRows(defaultOrdering)
     } else if (second === 'b2t') {
-      orderedWells = _orderingColsToRows(defaultOrdering).slice().reverse()
+      orderedWells = _orderingColsToRows(defaultOrdering)
+        .slice()
+        .reverse()
     }
   } else if (first === 'r2l') {
     if (second === 't2b') {
-      orderedWells = _orderingColsToRows(defaultOrdering).map(col => col.slice().reverse())
+      orderedWells = _orderingColsToRows(defaultOrdering).map(col =>
+        col.slice().reverse()
+      )
     } else if (second === 'b2t') {
-      orderedWells = _orderingColsToRows(defaultOrdering).slice().reverse().map(col => col.slice().reverse())
+      orderedWells = _orderingColsToRows(defaultOrdering)
+        .slice()
+        .reverse()
+        .map(col => col.slice().reverse())
     }
   }
   return flatten(orderedWells)
 }
 
-export function getOrderedWells (
+export function getOrderedWells(
   unorderedWells: Array<string>,
   labwareType: string,
   wellOrderFirst: WellOrderOption,
@@ -76,7 +87,8 @@ export function getOrderedWells (
     const allWellsOrdered = orderWells(
       def.ordering,
       wellOrderFirst,
-      wellOrderSecond)
+      wellOrderSecond
+    )
     return intersection(allWellsOrdered, unorderedWells)
   } else {
     assert(false, `getOrderedWells: no def for labware type ${labwareType}`)

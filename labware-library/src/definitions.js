@@ -1,7 +1,7 @@
 // @flow
 // labware definition helpers
 // TODO(mc, 2019-03-18): move to shared-data?
-import type {LabwareList, LabwareDefinition} from './types'
+import type { LabwareList, LabwareDefinition } from './types'
 
 // require all definitions in the definitions2 directory
 // $FlowFixMe: require.context is webpack-specific method
@@ -14,7 +14,7 @@ const definitionsContext = require.context(
 
 let definitions = null
 
-export function getAllDefinitions (): LabwareList {
+export function getAllDefinitions(): LabwareList {
   // TODO(mc, 2019-03-28): revisit decision to hide trash labware
   if (!definitions) {
     definitions = definitionsContext
@@ -26,7 +26,7 @@ export function getAllDefinitions (): LabwareList {
   return definitions
 }
 
-export function getDefinition (loadName: ?string): LabwareDefinition | null {
+export function getDefinition(loadName: ?string): LabwareDefinition | null {
   const def = getAllDefinitions().find(d => d.parameters.loadName === loadName)
   return def || null
 }

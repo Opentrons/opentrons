@@ -1,9 +1,9 @@
 // @flow
 // robot session (protocol) state and reducer
 import omit from 'lodash/omit'
-import {actionTypes} from '../actions'
+import { actionTypes } from '../actions'
 
-import type {Action} from '../../types'
+import type { Action } from '../../types'
 import type {
   Command,
   StatePipette,
@@ -14,11 +14,11 @@ import type {
   SessionStatus,
 } from '../types'
 
-import type {SessionUpdateAction} from '../actions'
+import type { SessionUpdateAction } from '../actions'
 
 type Request = {
   inProgress: boolean,
-  error: ?{message: string},
+  error: ?{ message: string },
 }
 
 export type State = {
@@ -62,7 +62,7 @@ const {
 
 const INITIAL_STATE: State = {
   // loading a protocol
-  sessionRequest: {inProgress: false, error: null},
+  sessionRequest: { inProgress: false, error: null },
   state: '',
   errors: [],
   protocolCommands: [],
@@ -74,15 +74,15 @@ const INITIAL_STATE: State = {
   modulesBySlot: {},
 
   // running a protocol
-  runRequest: {inProgress: false, error: null},
-  pauseRequest: {inProgress: false, error: null},
-  resumeRequest: {inProgress: false, error: null},
-  cancelRequest: {inProgress: false, error: null},
+  runRequest: { inProgress: false, error: null },
+  pauseRequest: { inProgress: false, error: null },
+  resumeRequest: { inProgress: false, error: null },
+  cancelRequest: { inProgress: false, error: null },
   startTime: null,
   runTime: 0,
 }
 
-export default function sessionReducer (
+export default function sessionReducer(
   state: State = INITIAL_STATE,
   action: Action
 ): State {
@@ -126,11 +126,11 @@ export default function sessionReducer (
   return state
 }
 
-function handleSessionUpdate (state: State, action: SessionUpdateAction): State {
+function handleSessionUpdate(state: State, action: SessionUpdateAction): State {
   const {
-    payload: {state: sessionState, startTime, lastCommand},
+    payload: { state: sessionState, startTime, lastCommand },
   } = action
-  let {protocolCommandsById} = state
+  let { protocolCommandsById } = state
 
   if (lastCommand) {
     const command = {
@@ -144,25 +144,25 @@ function handleSessionUpdate (state: State, action: SessionUpdateAction): State 
     }
   }
 
-  return {...state, state: sessionState, startTime, protocolCommandsById}
+  return { ...state, state: sessionState, startTime, protocolCommandsById }
 }
 
-function handleSessionInProgress (state: State): State {
+function handleSessionInProgress(state: State): State {
   return {
     ...state,
     runTime: 0,
     startTime: null,
-    sessionRequest: {inProgress: true, error: null},
+    sessionRequest: { inProgress: true, error: null },
   }
 }
 
-function handleSessionResponse (state: State, action: any): State {
-  const {payload} = action
+function handleSessionResponse(state: State, action: any): State {
+  const { payload } = action
 
   if (payload.error) {
     return {
       ...state,
-      sessionRequest: {inProgress: false, error: payload.error},
+      sessionRequest: { inProgress: false, error: payload.error },
     }
   }
 
@@ -170,64 +170,65 @@ function handleSessionResponse (state: State, action: any): State {
 
   return {
     ...state,
-    sessionRequest: {inProgress: false, error: null},
+    sessionRequest: { inProgress: false, error: null },
     ...session,
   }
 }
 
-function handleRun (state: State, action: any): State {
-  return {...state, runTime: 0, runRequest: {inProgress: true, error: null}}
+function handleRun(state: State, action: any): State {
+  return { ...state, runTime: 0, runRequest: { inProgress: true, error: null } }
 }
 
-function handleRunResponse (state: State, action: any): State {
-  const {error, payload} = action
+function handleRunResponse(state: State, action: any): State {
+  const { error, payload } = action
 
-  if (error) return {...state, runRequest: {inProgress: false, error: payload}}
+  if (error)
+    return { ...state, runRequest: { inProgress: false, error: payload } }
 
-  return {...state, runRequest: {inProgress: false, error: null}}
+  return { ...state, runRequest: { inProgress: false, error: null } }
 }
 
-function handleTickRunTime (state: State, action: any): State {
-  return {...state, runTime: Date.now()}
+function handleTickRunTime(state: State, action: any): State {
+  return { ...state, runTime: Date.now() }
 }
 
-function handlePause (state: State, action: any): State {
-  return {...state, pauseRequest: {inProgress: true, error: null}}
+function handlePause(state: State, action: any): State {
+  return { ...state, pauseRequest: { inProgress: true, error: null } }
 }
 
-function handlePauseResponse (state: State, action: any): State {
-  const {error, payload} = action
+function handlePauseResponse(state: State, action: any): State {
+  const { error, payload } = action
 
   if (error) {
-    return {...state, pauseRequest: {inProgress: false, error: payload}}
+    return { ...state, pauseRequest: { inProgress: false, error: payload } }
   }
 
-  return {...state, pauseRequest: {inProgress: false, error: null}}
+  return { ...state, pauseRequest: { inProgress: false, error: null } }
 }
 
-function handleResume (state: State, action: any): State {
-  return {...state, resumeRequest: {inProgress: true, error: null}}
+function handleResume(state: State, action: any): State {
+  return { ...state, resumeRequest: { inProgress: true, error: null } }
 }
 
-function handleResumeResponse (state: State, action: any): State {
-  const {error, payload} = action
+function handleResumeResponse(state: State, action: any): State {
+  const { error, payload } = action
 
   if (error) {
-    return {...state, resumeRequest: {inProgress: false, error: payload}}
+    return { ...state, resumeRequest: { inProgress: false, error: payload } }
   }
 
-  return {...state, resumeRequest: {inProgress: false, error: null}}
+  return { ...state, resumeRequest: { inProgress: false, error: null } }
 }
 
-function handleCancel (state: State, action: any): State {
-  return {...state, cancelRequest: {inProgress: true, error: null}}
+function handleCancel(state: State, action: any): State {
+  return { ...state, cancelRequest: { inProgress: true, error: null } }
 }
 
-function handleCancelResponse (state: State, action: any): State {
-  const {error, payload} = action
+function handleCancelResponse(state: State, action: any): State {
+  const { error, payload } = action
   if (error) {
-    return {...state, cancelRequest: {inProgress: false, error: payload}}
+    return { ...state, cancelRequest: { inProgress: false, error: payload } }
   }
 
-  return {...state, cancelRequest: {inProgress: false, error: null}}
+  return { ...state, cancelRequest: { inProgress: false, error: null } }
 }

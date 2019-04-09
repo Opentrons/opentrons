@@ -1,14 +1,14 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {getAnalyticsSeen, setAnalyticsSeen} from '../../analytics'
+import { getAnalyticsSeen, setAnalyticsSeen } from '../../analytics'
 
-import {Modal} from '@opentrons/components'
+import { Modal } from '@opentrons/components'
 import ModalButton from './ModalButton'
 import AnalyticsToggle from './AnalyticsToggle'
-import {Portal} from '../portal'
-import type {State, Dispatch} from '../../types'
+import { Portal } from '../portal'
+import type { State, Dispatch } from '../../types'
 
 type SP = {
   seen: boolean,
@@ -28,30 +28,28 @@ export default connect(
   mapDispatchToProps
 )(AnalyticsSettingsModal)
 
-function AnalyticsSettingsModal (props: Props) {
+function AnalyticsSettingsModal(props: Props) {
   if (props.seen) return null
 
-  const {setSeen} = props
+  const { setSeen } = props
 
   return (
     <Portal>
       <Modal onCloseClick={setSeen} heading={TITLE} alertOverlay>
         <AnalyticsToggle />
-        <ModalButton onClick={setSeen}>
-          {CONTINUE}
-        </ModalButton>
+        <ModalButton onClick={setSeen}>{CONTINUE}</ModalButton>
       </Modal>
     </Portal>
   )
 }
 
-function mapStateToProps (state: State): SP {
+function mapStateToProps(state: State): SP {
   return {
     seen: getAnalyticsSeen(state),
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch): DP {
+function mapDispatchToProps(dispatch: Dispatch): DP {
   return {
     setSeen: () => dispatch(setAnalyticsSeen()),
   }

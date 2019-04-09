@@ -101,6 +101,10 @@ test-js:
 .PHONY: lint
 lint: lint-py lint-js lint-json lint-css check-js
 
+.PHONY: format
+format:
+	prettier --ignore-path .eslintignore --write ".*.@(js|yml)" "**/*.@(js|json|md|yml)"
+
 .PHONY: lint-py
 lint-py:
 	$(MAKE) -C $(API_DIR) lint

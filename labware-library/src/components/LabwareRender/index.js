@@ -6,8 +6,8 @@ import * as React from 'react'
 import flatMap from 'lodash/flatMap'
 import cx from 'classnames'
 
-import {SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT} from '@opentrons/shared-data'
-import {LabwareOutline} from '@opentrons/components'
+import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
+import { LabwareOutline } from '@opentrons/components'
 import styles from './styles.css'
 
 import type {
@@ -27,9 +27,9 @@ export type LabwareWellRenderProps = {
   cornerOffsetFromSlot: LabwareOffset,
 }
 
-export default function LabwareRender (props: LabwareRenderProps) {
-  const {parameters, ordering, cornerOffsetFromSlot, wells} = props.definition
-  const {isTiprack} = parameters
+export default function LabwareRender(props: LabwareRenderProps) {
+  const { parameters, ordering, cornerOffsetFromSlot, wells } = props.definition
+  const { isTiprack } = parameters
 
   // SVG coordinate system is flipped in Y from our definitions
   const transform = `translate(0,${SLOT_RENDER_HEIGHT}) scale(1,-1)`
@@ -38,7 +38,9 @@ export default function LabwareRender (props: LabwareRenderProps) {
   return (
     <svg className={styles.labware_render} viewBox={viewBox}>
       <g className={styles.labware_detail_group}>
-        <LabwareOutline className={cx({[styles.tiprack_outline]: isTiprack})} />
+        <LabwareOutline
+          className={cx({ [styles.tiprack_outline]: isTiprack })}
+        />
       </g>
       <g className={styles.well_group} transform={transform}>
         {flatMap(
@@ -62,10 +64,10 @@ export default function LabwareRender (props: LabwareRenderProps) {
   )
 }
 
-function Well (props: LabwareWellRenderProps) {
-  const {well, parameters, cornerOffsetFromSlot} = props
-  const {shape, diameter, width, length} = well
-  const {isTiprack} = parameters
+function Well(props: LabwareWellRenderProps) {
+  const { well, parameters, cornerOffsetFromSlot } = props
+  const { shape, diameter, width, length } = well
+  const { isTiprack } = parameters
 
   // TODO(mc, 2019-04-04): cornerOffsetFromSlot is added to x and y because
   //   labware render is currently in slot coordinate system; revisit this

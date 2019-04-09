@@ -7,16 +7,16 @@ type LabwareTooltipContentsProps = {
   labwareType: ?string,
 }
 const LabwareTooltipContents = (props: LabwareTooltipContentsProps) => {
-  const {labwareNickname, labwareType} = props
+  const { labwareNickname, labwareType } = props
   return (
     <div className={styles.labware_tooltip_contents}>
       <p className={styles.labware_name}>{labwareNickname}</p>
-      {labwareNickname &&
+      {labwareNickname && (
         <React.Fragment>
           <div className={styles.labware_spacer} />
           <p>{labwareType}</p>
         </React.Fragment>
-      }
+      )}
     </div>
   )
 }

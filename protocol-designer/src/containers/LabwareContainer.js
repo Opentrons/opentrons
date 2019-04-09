@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import noop from 'lodash/noop'
-import {getLabware, getIsTiprack} from '@opentrons/shared-data'
-import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
-import {selectors as uiLabwareSelectors} from '../ui/labware'
-import {selectors as stepFormSelectors} from '../step-forms'
+import { getLabware, getIsTiprack } from '@opentrons/shared-data'
+import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
+import { selectors as uiLabwareSelectors } from '../ui/labware'
+import { selectors as stepFormSelectors } from '../step-forms'
 import {
   openIngredientSelector,
   deleteContainer,
@@ -16,13 +16,13 @@ import {
   duplicateLabware,
   swapSlotContents,
 } from '../labware-ingred/actions'
-import {START_TERMINAL_ITEM_ID} from '../steplist'
-import {selectors as stepsSelectors} from '../ui/steps'
+import { START_TERMINAL_ITEM_ID } from '../steplist'
+import { selectors as stepsSelectors } from '../ui/steps'
 
-import {LabwareOnDeck} from '../components/labware'
-import type {StepIdType} from '../form-types'
-import type {BaseState} from '../types'
-import type {DeckSlot} from '@opentrons/components'
+import { LabwareOnDeck } from '../components/labware'
+import type { StepIdType } from '../form-types'
+import type { BaseState } from '../types'
+import type { DeckSlot } from '@opentrons/components'
 
 type OP = {
   slot: DeckSlot,
@@ -34,7 +34,7 @@ type DP = {
   addLabware: () => mixed,
   editLiquids: () => mixed,
   deleteLabware: () => mixed,
-  duplicateLabware: (StepIdType) => mixed,
+  duplicateLabware: StepIdType => mixed,
   swapSlotContents: (DeckSlot, DeckSlot) => void,
   setLabwareName: (name: ?string) => mixed,
   setDefaultLabwareName: () => mixed,
@@ -45,10 +45,10 @@ type MP = {
   drillUp: () => mixed,
 }
 
-type SP = $Diff<Props, {...DP, ...MP}>
+type SP = $Diff<Props, { ...DP, ...MP }>
 
-function mapStateToProps (state: BaseState, ownProps: OP): SP {
-  const {slot} = ownProps
+function mapStateToProps(state: BaseState, ownProps: OP): SP {
+  const { slot } = ownProps
   // TODO: Ian 2019-02-14 to enable multiple deck setup steps, this needs to be timeline aware.
   // For multiple deck setup support, pick by slot without using timeline frame index is a HACK.
   const labwareNames = uiLabwareSelectors.getLabwareNicknamesById(state)
@@ -57,7 +57,9 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const selectedTerminalItem = stepsSelectors.getSelectedTerminalItemId(state)
   const addLabwareMode = labwareIngredSelectors.getLabwareSelectionMode(state)
 
-  const labwareId = Object.keys(initialLabware).find(id => initialLabware[id].slot === slot)
+  const labwareId = Object.keys(initialLabware).find(
+    id => initialLabware[id].slot === slot
+  )
 
   if (labwareId == null) {
     // TODO: Ian 2019-02-14 this should be easier to null out, since
@@ -83,12 +85,13 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   const isTiprack = labwareType ? getIsTiprack(labwareType) : false
 
   const containerName = labwareNames[labwareId]
-  const labwareHasName = labwareIngredSelectors.getSavedLabware(state)[labwareId]
+  const labwareHasName = labwareIngredSelectors.getSavedLabware(state)[
+    labwareId
+  ]
   const showNameOverlay = !isTiprack && !labwareHasName
 
-  const setDefaultLabwareName = labwareId != null
-    ? () => renameLabware({labwareId, name: null})
-    : noop
+  const setDefaultLabwareName =
+    labwareId != null ? () => renameLabware({ labwareId, name: null }) : noop
 
   // labware definition's metadata.isValidSource defaults to true,
   // only use it when it is defined as false
@@ -107,12 +110,14 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     labwareInfo,
 
     showNameOverlay,
-    highlighted: selectedTerminalItem === START_TERMINAL_ITEM_ID
-    // in deckSetupMode, labware is highlighted when selected (currently editing ingredients)
-    // or when targeted by an open "Add Labware" modal
-      ? (isSelectedSlot || labwareIngredSelectors.selectedAddLabwareSlot(state) === slot)
-    // outside of deckSetupMode, labware is highlighted when step/substep is hovered
-      : stepsSelectors.getHoveredStepLabware(state).includes(labwareId),
+    highlighted:
+      selectedTerminalItem === START_TERMINAL_ITEM_ID
+        ? // in deckSetupMode, labware is highlighted when selected (currently editing ingredients)
+          // or when targeted by an open "Add Labware" modal
+          isSelectedSlot ||
+          labwareIngredSelectors.selectedAddLabwareSlot(state) === slot
+        : // outside of deckSetupMode, labware is highlighted when step/substep is hovered
+          stepsSelectors.getHoveredStepLabware(state).includes(labwareId),
     selectedTerminalItem,
 
     slot,
@@ -123,32 +128,44 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   }
 }
 
-function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}, ownProps: OP): Props {
-  const {slot} = ownProps
-  const {dispatch} = dispatchProps
-  const {containerId, containerName, containerType} = stateProps
+function mergeProps(
+  stateProps: SP,
+  dispatchProps: { dispatch: Dispatch<*> },
+  ownProps: OP
+): Props {
+  const { slot } = ownProps
+  const { dispatch } = dispatchProps
+  const { containerId, containerName, containerType } = stateProps
   const labwareId = containerId // TODO Ian 2019-02-14 rename the prop
 
   const actions = {
-    addLabware: () => dispatch(openAddLabwareModal({slot})),
+    addLabware: () => dispatch(openAddLabwareModal({ slot })),
     editLiquids: () => dispatch(openIngredientSelector(labwareId)),
-    deleteLabware: () => (
-      window.confirm(`Are you sure you want to permanently delete ${containerName || containerType} in slot ${slot}?`) &&
-      dispatch(deleteContainer({labwareId}))
-    ),
+    deleteLabware: () =>
+      window.confirm(
+        `Are you sure you want to permanently delete ${containerName ||
+          containerType} in slot ${slot}?`
+      ) && dispatch(deleteContainer({ labwareId })),
     drillDown: () => dispatch(drillDownOnLabware(labwareId)),
     drillUp: () => dispatch(drillUpFromLabware()),
-    duplicateLabware: (id) => dispatch(duplicateLabware(id)),
-    swapSlotContents: (sourceSlot, destSlot) => dispatch(swapSlotContents(sourceSlot, destSlot)),
+    duplicateLabware: id => dispatch(duplicateLabware(id)),
+    swapSlotContents: (sourceSlot, destSlot) =>
+      dispatch(swapSlotContents(sourceSlot, destSlot)),
 
-    setLabwareName: (name: ?string) => dispatch(renameLabware({
-      labwareId,
-      name,
-    })),
-    setDefaultLabwareName: () => dispatch(renameLabware({
-      labwareId,
-      name: null,
-    })),
+    setLabwareName: (name: ?string) =>
+      dispatch(
+        renameLabware({
+          labwareId,
+          name,
+        })
+      ),
+    setDefaultLabwareName: () =>
+      dispatch(
+        renameLabware({
+          labwareId,
+          name: null,
+        })
+      ),
   }
 
   return {
@@ -157,4 +174,8 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: Dispatch<*>}, own
   }
 }
 
-export default connect(mapStateToProps, null, mergeProps)(LabwareOnDeck)
+export default connect(
+  mapStateToProps,
+  null,
+  mergeProps
+)(LabwareOnDeck)

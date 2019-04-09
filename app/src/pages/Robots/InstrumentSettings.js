@@ -1,14 +1,14 @@
 // @flow
 import * as React from 'react'
-import {Switch, Route} from 'react-router'
+import { Switch, Route } from 'react-router'
 
 import InstrumentSettings from '../../components/InstrumentSettings'
 import ChangePipette from '../../components/ChangePipette'
 import ConfigurePipette from '../../components/ConfigurePipette'
 import Page from '../../components/Page'
 
-import type {Match} from 'react-router'
-import type {Robot} from '../../discovery'
+import type { Match } from 'react-router'
+import type { Robot } from '../../discovery'
 
 type Props = {
   robot: Robot,
@@ -18,12 +18,12 @@ type Props = {
 // used to guarantee mount param in route is left or right
 const RE_MOUNT = '(left|right)'
 
-export default function InstrumentSettingsPage (props: Props) {
+export default function InstrumentSettingsPage(props: Props) {
   const {
     robot,
-    match: {path, url},
+    match: { path, url },
   } = props
-  const titleBarProps = {title: robot.displayName}
+  const titleBarProps = { title: robot.displayName }
   return (
     <React.Fragment>
       <Page titleBarProps={titleBarProps}>

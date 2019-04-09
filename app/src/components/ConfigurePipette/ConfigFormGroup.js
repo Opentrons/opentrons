@@ -1,22 +1,22 @@
 // @flow
 import * as React from 'react'
-import {Field} from 'formik'
-import {FormGroup, InputField} from '@opentrons/components'
+import { Field } from 'formik'
+import { FormGroup, InputField } from '@opentrons/components'
 
 import styles from './styles.css'
 
-import type {DisplayFieldProps} from './ConfigForm'
+import type { DisplayFieldProps } from './ConfigForm'
 
 type FormColProps = {
   children: React.Node,
   className?: string,
 }
 
-export function FormColumn (props: FormColProps) {
+export function FormColumn(props: FormColProps) {
   return <div className={styles.form_column}>{props.children}</div>
 }
 
-export type FormValues = {[string]: ?string}
+export type FormValues = { [string]: ?string }
 
 type FormGroupProps = {
   groupLabel: string,
@@ -24,11 +24,11 @@ type FormGroupProps = {
   formFields: Array<DisplayFieldProps>,
 }
 
-export default function ConfigFormGroup (props: FormGroupProps) {
-  const {groupLabel, groupError, formFields} = props
+export default function ConfigFormGroup(props: FormGroupProps) {
+  const { groupLabel, groupError, formFields } = props
   const formattedError =
     groupError &&
-    groupError.split('\n').map(function (item, key) {
+    groupError.split('\n').map(function(item, key) {
       return (
         <span key={key}>
           {item}
@@ -55,8 +55,8 @@ type FormRowProps = {
 const FIELD_ID_PREFIX = '__PipetteConfig__'
 const makeId = (name: *): string => `${FIELD_ID_PREFIX}.${name}`
 
-export function ConfigFormRow (props: FormRowProps) {
-  const {labelFor, label} = props
+export function ConfigFormRow(props: FormRowProps) {
+  const { labelFor, label } = props
   return (
     <div className={styles.form_row}>
       <label label={label} htmlFor={labelFor} className={styles.form_label}>
@@ -72,9 +72,9 @@ type ConfigInputProps = {
   className?: string,
 }
 
-export function ConfigInput (props: ConfigInputProps) {
-  const {field, className} = props
-  const {name, units, displayName} = field
+export function ConfigInput(props: ConfigInputProps) {
+  const { field, className } = props
+  const { name, units, displayName } = field
   const id = makeId(field.name)
   const _default = field.default.toString()
   return (

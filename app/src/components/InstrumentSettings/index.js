@@ -4,13 +4,13 @@ import * as React from 'react'
 
 import AttachedPipettesCard from './AttachedPipettesCard'
 import AttachedModulesCard from './AttachedModulesCard'
-import {CardContainer, CardRow} from '../layout'
+import { CardContainer, CardRow } from '../layout'
 
-import type {Robot} from '../../discovery'
+import type { Robot } from '../../discovery'
 
 type Props = Robot
 
-export default function InstrumentSettings (props: Props) {
+export default function InstrumentSettings(props: Props) {
   return (
     <CardContainer>
       <CardRow>

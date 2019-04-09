@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
-import {AlertItem} from '@opentrons/components'
-import type {SessionStatus} from '../../robot'
+import { AlertItem } from '@opentrons/components'
+import type { SessionStatus } from '../../robot'
 
 type Props = {
   sessionStatus: SessionStatus,
@@ -9,18 +9,28 @@ type Props = {
   onResetClick: () => mixed,
 }
 
-export default function SessionAlert (props: Props) {
-  const {sessionStatus, className, onResetClick} = props
+export default function SessionAlert(props: Props) {
+  const { sessionStatus, className, onResetClick } = props
 
-  const completeMessage = (<p>Run  complete! <a onClick={onResetClick}>Reset run</a> to run protocol again.</p>)
+  const completeMessage = (
+    <p>
+      Run complete! <a onClick={onResetClick}>Reset run</a> to run protocol
+      again.
+    </p>
+  )
   const pauseMessage = 'Run paused'
-  const cancelMessage = (<p>Run  canceled. <a onClick={onResetClick}>Reset run</a> to run protocol again.</p>)
+  const cancelMessage = (
+    <p>
+      Run canceled. <a onClick={onResetClick}>Reset run</a> to run protocol
+      again.
+    </p>
+  )
 
   switch (sessionStatus) {
     case 'finished':
       return (
         <AlertItem
-          type='success'
+          type="success"
           title={completeMessage}
           className={className}
         />
@@ -28,19 +38,16 @@ export default function SessionAlert (props: Props) {
     case 'paused':
       return (
         <AlertItem
-          type='info'
+          type="info"
           title={pauseMessage}
           className={className}
-          icon={{name: 'pause-circle'}}
+          icon={{ name: 'pause-circle' }}
         />
       )
     case 'stopped':
       return (
-        <AlertItem
-          type='warning'
-          title={cancelMessage}
-          className={className}
-        />)
+        <AlertItem type="warning" title={cancelMessage} className={className} />
+      )
     default:
       return null
   }

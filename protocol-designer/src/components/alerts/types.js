@@ -1,5 +1,5 @@
 // @flow
-import type {Node} from 'react'
+import type { Node } from 'react'
 export type AlertLevel = 'timeline' | 'form' // TODO IMMEDIATELY
 
 // generic alert (warning or error) formatted for rendering

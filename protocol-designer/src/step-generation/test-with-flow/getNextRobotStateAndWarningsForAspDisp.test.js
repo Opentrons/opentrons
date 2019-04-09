@@ -1,5 +1,5 @@
 // @flow
-import {AIR} from '../utils'
+import { AIR } from '../utils'
 import {
   createRobotState,
   createEmptyLiquidState,
@@ -11,7 +11,7 @@ import {
 import forAspirateDispense from '../getNextRobotStateAndWarnings/forAspirateDispense'
 import * as warningCreators from '../warningCreators'
 
-function getBlankLiquidState (sourcePlateType: ?string) {
+function getBlankLiquidState(sourcePlateType: ?string) {
   return createEmptyLiquidState({
     // leave sourcePlateType undefined for tests that don't care
     // TODO Ian 2018-03-22: should this `pipettes` arg be createEmptyLiquidState default?
@@ -54,21 +54,21 @@ describe('...single-channel pipette', () => {
         },
       }
 
-      const result = forAspirateDispense(
-        aspirateSingleCh50FromA1Args,
-        {...initialRobotState, liquidState: initialLiquidState},
-      )
+      const result = forAspirateDispense(aspirateSingleCh50FromA1Args, {
+        ...initialRobotState,
+        liquidState: initialLiquidState,
+      })
 
       expect(result.warnings).toEqual([])
       expect(result.robotState.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
-            '0': {ingred1: {volume: 50}},
+            '0': { ingred1: { volume: 50 } },
           },
         },
         labware: {
           sourcePlateId: {
-            A1: {ingred1: {volume: 150}},
+            A1: { ingred1: { volume: 150 } },
             A2: {},
             B1: {},
           },
@@ -90,21 +90,23 @@ describe('...single-channel pipette', () => {
         volume: 300,
       }
 
-      const result = forAspirateDispense(
-        args,
-        {...initialRobotState, liquidState: initialLiquidState},
-      )
+      const result = forAspirateDispense(args, {
+        ...initialRobotState,
+        liquidState: initialLiquidState,
+      })
 
-      expect(result.warnings).toEqual([warningCreators.aspirateMoreThanWellContents()])
+      expect(result.warnings).toEqual([
+        warningCreators.aspirateMoreThanWellContents(),
+      ])
       expect(result.robotState.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
-            '0': {ingred1: {volume: 200}, [AIR]: {volume: 100}},
+            '0': { ingred1: { volume: 200 }, [AIR]: { volume: 100 } },
           },
         },
         labware: {
           sourcePlateId: {
-            A1: {ingred1: {volume: 0}},
+            A1: { ingred1: { volume: 0 } },
             A2: {},
             B1: {},
           },
@@ -115,8 +117,8 @@ describe('...single-channel pipette', () => {
     test('aspirate from two-ingredient well', () => {
       let initialLiquidState = getBlankLiquidState('96-flat')
       initialLiquidState.labware.sourcePlateId.A1 = {
-        ingred1: {volume: 200},
-        ingred2: {volume: 100},
+        ingred1: { volume: 200 },
+        ingred2: { volume: 100 },
       }
 
       const args = {
@@ -124,21 +126,24 @@ describe('...single-channel pipette', () => {
         volume: 60,
       }
 
-      const result = forAspirateDispense(
-        args,
-        {...initialRobotState, liquidState: initialLiquidState},
-      )
+      const result = forAspirateDispense(args, {
+        ...initialRobotState,
+        liquidState: initialLiquidState,
+      })
 
       expect(result.warnings).toEqual([])
       expect(result.robotState.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
-            '0': {ingred1: {volume: 40}, ingred2: {volume: 20}},
+            '0': { ingred1: { volume: 40 }, ingred2: { volume: 20 } },
           },
         },
         labware: {
           sourcePlateId: {
-            A1: {ingred1: {volume: 200 - 40}, ingred2: {volume: 100 - 20}},
+            A1: {
+              ingred1: { volume: 200 - 40 },
+              ingred2: { volume: 100 - 20 },
+            },
           },
         },
       })
@@ -147,8 +152,8 @@ describe('...single-channel pipette', () => {
     test('aspirate everything + air from two-ingredient well', () => {
       let initialLiquidState = getBlankLiquidState('96-flat')
       initialLiquidState.labware.sourcePlateId.A1 = {
-        ingred1: {volume: 60},
-        ingred2: {volume: 70},
+        ingred1: { volume: 60 },
+        ingred2: { volume: 70 },
       }
 
       const args = {
@@ -156,21 +161,27 @@ describe('...single-channel pipette', () => {
         volume: 150,
       }
 
-      const result = forAspirateDispense(
-        args,
-        {...initialRobotState, liquidState: initialLiquidState},
-      )
+      const result = forAspirateDispense(args, {
+        ...initialRobotState,
+        liquidState: initialLiquidState,
+      })
 
-      expect(result.warnings).toEqual([warningCreators.aspirateMoreThanWellContents()])
+      expect(result.warnings).toEqual([
+        warningCreators.aspirateMoreThanWellContents(),
+      ])
       expect(result.robotState.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
-            '0': {ingred1: {volume: 60}, ingred2: {volume: 70}, [AIR]: {volume: 20}},
+            '0': {
+              ingred1: { volume: 60 },
+              ingred2: { volume: 70 },
+              [AIR]: { volume: 20 },
+            },
           },
         },
         labware: {
           sourcePlateId: {
-            A1: {ingred1: {volume: 0}, ingred2: {volume: 0}},
+            A1: { ingred1: { volume: 0 }, ingred2: { volume: 0 } },
           },
         },
       })
@@ -181,27 +192,27 @@ describe('...single-channel pipette', () => {
     test('aspirate from single-ingredient well', () => {
       let initialLiquidState = getBlankLiquidState('96-flat')
       initialLiquidState.labware.sourcePlateId.A1 = {
-        ingred1: {volume: 200},
+        ingred1: { volume: 200 },
       }
       initialLiquidState.pipettes.p300SingleId['0'] = {
-        ingred1: {volume: 30},
+        ingred1: { volume: 30 },
       }
 
-      const result = forAspirateDispense(
-        aspirateSingleCh50FromA1Args,
-        {...initialRobotState, liquidState: initialLiquidState},
-      )
+      const result = forAspirateDispense(aspirateSingleCh50FromA1Args, {
+        ...initialRobotState,
+        liquidState: initialLiquidState,
+      })
 
       expect(result.warnings).toEqual([])
       expect(result.robotState.liquidState).toMatchObject({
         pipettes: {
           p300SingleId: {
-            '0': {ingred1: {volume: 30 + 50}},
+            '0': { ingred1: { volume: 30 + 50 } },
           },
         },
         labware: {
           sourcePlateId: {
-            A1: {ingred1: {volume: 150}},
+            A1: { ingred1: { volume: 150 } },
           },
         },
       })
@@ -232,36 +243,39 @@ describe('...8-channel pipette', () => {
     // A1 and B1 have 1 ingred of different volumes, rest of column 1 is empty
     initialLiquidState.labware.sourcePlateId = {
       ...initialLiquidState.labware.sourcePlateId,
-      A1: {ingred1: {volume: 200}},
-      B1: {ingred1: {volume: 150}},
+      A1: { ingred1: { volume: 200 } },
+      B1: { ingred1: { volume: 150 } },
     }
     // all pipette tips start with 30 of ingred 1
-    initialLiquidState.pipettes.p300MultiId = createTipLiquidState(
-      8,
-      {ingred1: {volume: 30}}
-    )
+    initialLiquidState.pipettes.p300MultiId = createTipLiquidState(8, {
+      ingred1: { volume: 30 },
+    })
 
-    const result = forAspirateDispense(
-      aspirate8Ch50FromA1Args,
-      {...initialRobotState, liquidState: initialLiquidState},
-    )
+    const result = forAspirateDispense(aspirate8Ch50FromA1Args, {
+      ...initialRobotState,
+      liquidState: initialLiquidState,
+    })
 
     // 6 warnings for 6 empty wells
     expect(result.warnings).toEqual(
-      Array(6).fill(warningCreators.aspirateFromPristineWell()))
+      Array(6).fill(warningCreators.aspirateFromPristineWell())
+    )
 
     expect(result.robotState.liquidState).toMatchObject({
       pipettes: {
         p300MultiId: {
-          ...createTipLiquidState(8, {[AIR]: {volume: 50}, ingred1: {volume: 30}}),
-          '0': {ingred1: {volume: 50 + 30}},
-          '1': {ingred1: {volume: 50 + 30}},
+          ...createTipLiquidState(8, {
+            [AIR]: { volume: 50 },
+            ingred1: { volume: 30 },
+          }),
+          '0': { ingred1: { volume: 50 + 30 } },
+          '1': { ingred1: { volume: 50 + 30 } },
         },
       },
       labware: {
         sourcePlateId: {
-          A1: {ingred1: {volume: 200 - 50}},
-          B1: {ingred1: {volume: 150 - 50}},
+          A1: { ingred1: { volume: 200 - 50 } },
+          B1: { ingred1: { volume: 150 - 50 } },
         },
       },
     })
@@ -273,8 +287,8 @@ describe('...8-channel pipette', () => {
     // A1 and B1 have 1 ingred of different volumes, rest of column 1 is empty
     initialLiquidState.labware.sourcePlateId = {
       ...initialLiquidState.labware.sourcePlateId,
-      A1: {ingred1: {volume: 200}},
-      B1: {ingred1: {volume: 150}},
+      A1: { ingred1: { volume: 200 } },
+      B1: { ingred1: { volume: 150 } },
     }
 
     const args = {
@@ -282,10 +296,10 @@ describe('...8-channel pipette', () => {
       volume: 250,
     }
 
-    const result = forAspirateDispense(
-      args,
-      {...initialRobotState, liquidState: initialLiquidState},
-    )
+    const result = forAspirateDispense(args, {
+      ...initialRobotState,
+      liquidState: initialLiquidState,
+    })
 
     // A1 and B1 over-aspirated, remaining 6 pristine
     expect(result.warnings).toEqual([
@@ -295,15 +309,15 @@ describe('...8-channel pipette', () => {
     expect(result.robotState.liquidState).toMatchObject({
       pipettes: {
         p300MultiId: {
-          ...createTipLiquidState(8, {[AIR]: {volume: 250}}),
-          '0': {ingred1: {volume: 200}, [AIR]: {volume: 50}},
-          '1': {ingred1: {volume: 150}, [AIR]: {volume: 100}},
+          ...createTipLiquidState(8, { [AIR]: { volume: 250 } }),
+          '0': { ingred1: { volume: 200 }, [AIR]: { volume: 50 } },
+          '1': { ingred1: { volume: 150 }, [AIR]: { volume: 100 } },
         },
       },
       labware: {
         sourcePlateId: {
-          A1: {ingred1: {volume: 0}},
-          B1: {ingred1: {volume: 0}},
+          A1: { ingred1: { volume: 0 } },
+          B1: { ingred1: { volume: 0 } },
         },
       },
     })
@@ -312,19 +326,22 @@ describe('...8-channel pipette', () => {
   const troughCases = [
     {
       testName: '20uLx8 from 300uL trough well',
-      initialWellContents: {ingred1: {volume: 300}},
+      initialWellContents: { ingred1: { volume: 300 } },
       aspirateVolume: 20,
       expectedWarnings: [],
-      expectedWellContents: {ingred1: {volume: 300 - 20 * 8}},
-      expectedTipContents: {ingred1: {volume: 20}},
+      expectedWellContents: { ingred1: { volume: 300 - 20 * 8 } },
+      expectedTipContents: { ingred1: { volume: 20 } },
     },
     {
       testName: 'over-aspirate 50uLx8 from 300uL trough well',
-      initialWellContents: {ingred1: {volume: 300}},
+      initialWellContents: { ingred1: { volume: 300 } },
       aspirateVolume: 50,
       expectedWarnings: [warningCreators.aspirateMoreThanWellContents()],
-      expectedWellContents: {ingred1: {volume: 0}},
-      expectedTipContents: {[AIR]: {volume: 50 - 300 / 8}, ingred1: {volume: 300 / 8}},
+      expectedWellContents: { ingred1: { volume: 0 } },
+      expectedTipContents: {
+        [AIR]: { volume: 50 - 300 / 8 },
+        ingred1: { volume: 300 / 8 },
+      },
     },
     {
       testName: 'pristine trough',
@@ -332,55 +349,56 @@ describe('...8-channel pipette', () => {
       aspirateVolume: 20,
       expectedWarnings: [warningCreators.aspirateFromPristineWell()],
       expectedWellContents: {},
-      expectedTipContents: {[AIR]: {volume: 20}},
+      expectedTipContents: { [AIR]: { volume: 20 } },
     },
   ]
-  troughCases.forEach(({
-    testName,
-    initialWellContents,
-    aspirateVolume,
-    expectedTipContents,
-    expectedWarnings,
-    expectedWellContents,
-  }) =>
-    test(`aspirate from single-ingredient common well (trough-12row): ${testName}`, () => {
-      let initialLiquidState = getBlankLiquidState('trough-12row')
+  troughCases.forEach(
+    ({
+      testName,
+      initialWellContents,
+      aspirateVolume,
+      expectedTipContents,
+      expectedWarnings,
+      expectedWellContents,
+    }) =>
+      test(`aspirate from single-ingredient common well (trough-12row): ${testName}`, () => {
+        let initialLiquidState = getBlankLiquidState('trough-12row')
 
-      const initialTroughRobotState = createRobotState({
-        sourcePlateType: 'trough-12row',
-        tipracks: [300, 300],
-      })
+        const initialTroughRobotState = createRobotState({
+          sourcePlateType: 'trough-12row',
+          tipracks: [300, 300],
+        })
 
-      initialLiquidState.labware.sourcePlateId = {
-        ...initialLiquidState.labware.sourcePlateId,
-        A1: initialWellContents,
-      }
+        initialLiquidState.labware.sourcePlateId = {
+          ...initialLiquidState.labware.sourcePlateId,
+          A1: initialWellContents,
+        }
 
-      const args = {
-        ...aspirate8Ch50FromA1Args,
-        volume: aspirateVolume,
-      }
+        const args = {
+          ...aspirate8Ch50FromA1Args,
+          volume: aspirateVolume,
+        }
 
-      const result = forAspirateDispense(
-        args,
-        {...initialTroughRobotState, liquidState: initialLiquidState},
-      )
+        const result = forAspirateDispense(args, {
+          ...initialTroughRobotState,
+          liquidState: initialLiquidState,
+        })
 
-      expect(result.warnings).toEqual(expectedWarnings)
-      expect(result.robotState.liquidState).toMatchObject({
-        pipettes: {
-          p300MultiId: {
-            // aspirate volume divided among the 8 tips
-            ...createTipLiquidState(8, expectedTipContents),
+        expect(result.warnings).toEqual(expectedWarnings)
+        expect(result.robotState.liquidState).toMatchObject({
+          pipettes: {
+            p300MultiId: {
+              // aspirate volume divided among the 8 tips
+              ...createTipLiquidState(8, expectedTipContents),
+            },
           },
-        },
-        labware: {
-          sourcePlateId: {
-            A1: expectedWellContents,
+          labware: {
+            sourcePlateId: {
+              A1: expectedWellContents,
+            },
           },
-        },
+        })
       })
-    })
   )
 
   test.skip('aspirate from 384 plate starting from B row', () => {}) // TODO

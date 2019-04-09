@@ -13,8 +13,8 @@ type Props = {
  * Used by `InstrumentInfo` for its titled values.
  * But if you're using this, you probably want `LabeledValue` instead.
  */
-export default function InfoItem (props: Props) {
-  const {title, value, className} = props
+export default function InfoItem(props: Props) {
+  const { title, value, className } = props
   return (
     <div className={className}>
       <h2 className={styles.title}>{title}</h2>

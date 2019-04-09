@@ -2,7 +2,7 @@
 // labware load name with copy button
 import * as React from 'react'
 
-import {IconButton, Tooltip} from '@opentrons/components'
+import { IconButton, Tooltip } from '@opentrons/components'
 import styles from './styles.css'
 
 // TODO(mc, 2019-03-29): i18n
@@ -21,24 +21,24 @@ export type LoadNameState = {
 }
 
 class LoadName extends React.Component<LoadNameProps, LoadNameState> {
-  inputRef: {current: HTMLInputElement | null}
+  inputRef: { current: HTMLInputElement | null }
   successTimeout: TimeoutID | null
 
-  constructor (props: LoadNameProps) {
+  constructor(props: LoadNameProps) {
     super(props)
     this.inputRef = React.createRef()
     this.successTimeout = null
-    this.state = {success: false}
+    this.state = { success: false }
   }
 
   // note: we could choose to always copy the entire loadName string here,
   // regardless of what the user selects, but the benefit of catching missed
   // characters doesn't seem to outweigh the annoyance of removing user control
   handleCopy = () => {
-    this.setState({success: true})
+    this.setState({ success: true })
     this.cleanupSuccessTimeout()
     this.successTimeout = setTimeout(
-      () => this.setState({success: false}),
+      () => this.setState({ success: false }),
       SUCCESS_TIMEOUT_MS
     )
   }
@@ -50,17 +50,17 @@ class LoadName extends React.Component<LoadNameProps, LoadNameState> {
     }
   }
 
-  cleanupSuccessTimeout () {
+  cleanupSuccessTimeout() {
     if (this.successTimeout) clearTimeout(this.successTimeout)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.cleanupSuccessTimeout()
   }
 
-  render () {
-    const {loadName} = this.props
-    const {success} = this.state
+  render() {
+    const { loadName } = this.props
+    const { success } = this.state
 
     return (
       <div className={styles.load_name}>

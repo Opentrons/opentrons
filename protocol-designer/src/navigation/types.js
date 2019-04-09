@@ -1,8 +1,8 @@
 // @flow
 export type Page =
-  'file-splash' |
-  'file-detail' |
-  'liquids' |
-  'steplist' |
-  'settings-app' |
-  'settings-features'
+  | 'file-splash'
+  | 'file-detail'
+  | 'liquids'
+  | 'steplist'
+  | 'settings-app'
+  | 'settings-features'

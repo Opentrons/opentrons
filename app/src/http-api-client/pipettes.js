@@ -1,18 +1,18 @@
 // @flow
 // pipette state from api
-import {createSelector} from 'reselect'
+import { createSelector } from 'reselect'
 
-import {apiRequest, apiSuccess, apiFailure} from './actions'
-import {getRobotApiState} from './reducer'
+import { apiRequest, apiSuccess, apiFailure } from './actions'
+import { getRobotApiState } from './reducer'
 import client from './client'
 
-import type {OutputSelector} from 'reselect'
-import type {State, ThunkPromiseAction} from '../types'
-import type {BaseRobot, RobotService} from '../robot'
-import type {ApiCall, ApiRequestError} from './types'
-import type {RobotApiState} from './reducer'
-import type {ApiAction} from './actions'
-import type {MotorAxis} from './motors'
+import type { OutputSelector } from 'reselect'
+import type { State, ThunkPromiseAction } from '../types'
+import type { BaseRobot, RobotService } from '../robot'
+import type { ApiCall, ApiRequestError } from './types'
+import type { RobotApiState } from './reducer'
+import type { ApiAction } from './actions'
+import type { MotorAxis } from './motors'
 
 // TODO(mc, 2018-03-30): mount, volume, and channels should come from the API
 export type Pipette = {
@@ -39,7 +39,7 @@ export type PipettesState = {|
 
 const PIPETTES: 'pipettes' = 'pipettes'
 
-export function fetchPipettes (
+export function fetchPipettes(
   robot: RobotService,
   refresh: boolean = false
 ): ThunkPromiseAction {
@@ -59,16 +59,18 @@ export function fetchPipettes (
 }
 
 export const makeGetRobotPipettes = () => {
-  const selector: OutputSelector<State,
+  const selector: OutputSelector<
+    State,
     BaseRobot,
-    RobotPipettes> = createSelector(
-      getRobotApiState,
-      getPipettesRequest
-    )
+    RobotPipettes
+  > = createSelector(
+    getRobotApiState,
+    getPipettesRequest
+  )
 
   return selector
 }
 
-export function getPipettesRequest (state: RobotApiState): RobotPipettes {
-  return state[PIPETTES] || {inProgress: false}
+export function getPipettesRequest(state: RobotApiState): RobotPipettes {
+  return state[PIPETTES] || { inProgress: false }
 }

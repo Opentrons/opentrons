@@ -1,10 +1,10 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
-import type {Labware, SessionModule} from '../../robot'
-import type {LabwareComponentProps} from '@opentrons/components'
+import type { Labware, SessionModule } from '../../robot'
+import type { LabwareComponentProps } from '@opentrons/components'
 
 import {
   ContainerNameOverlay,
@@ -28,8 +28,8 @@ export type LabwareItemProps = LabwareComponentProps & {
   module: ?SessionModule,
 }
 
-export default function LabwareItem (props: LabwareItemProps) {
-  const {width, height, labware, module} = props
+export default function LabwareItem(props: LabwareItemProps) {
+  const { width, height, labware, module } = props
 
   const {
     name,
@@ -41,7 +41,7 @@ export default function LabwareItem (props: LabwareItemProps) {
     url,
   } = labware
 
-  const labwareClass = cx({[styles.disabled]: disabled})
+  const labwareClass = cx({ [styles.disabled]: disabled })
 
   const item = (
     <LabwareContainer width={width} height={height} highlighted={highlighted}>
@@ -55,13 +55,9 @@ export default function LabwareItem (props: LabwareItemProps) {
           />
         )}
 
-        {!showSpinner && module && (
-          <ModuleNameOverlay name={module.name} />
-        )}
+        {!showSpinner && module && <ModuleNameOverlay name={module.name} />}
 
-        {showSpinner && (
-          <LabwareSpinner />
-        )}
+        {showSpinner && <LabwareSpinner />}
       </g>
     </LabwareContainer>
   )

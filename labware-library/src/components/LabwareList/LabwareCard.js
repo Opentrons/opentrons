@@ -3,14 +3,14 @@
 // TODO(mc, 2019-03-21): split this file out into multiple component files,
 //   many of which will be common to LabwareCard and LabwarePage
 import * as React from 'react'
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import isEqual from 'lodash/isEqual'
 import round from 'lodash/round'
 import uniqWith from 'lodash/uniqWith'
 
-import {getDisplayVolume} from '@opentrons/shared-data'
-import {getPublicPath} from '../../public-path'
-import {Icon} from '@opentrons/components'
+import { getDisplayVolume } from '@opentrons/shared-data'
+import { getPublicPath } from '../../public-path'
+import { Icon } from '@opentrons/components'
 import Gallery from './LabwareGallery'
 import LoadName from './LoadName'
 import styles from './styles.css'
@@ -67,10 +67,10 @@ const EN_CATEGORY_LABELS = {
 // safe toFixed
 const toFixed = (n: number, d: number): string => round(n, d).toFixed(d)
 
-export type LabwareCardProps = {definition: LabwareDefinition}
+export type LabwareCardProps = { definition: LabwareDefinition }
 
-export default function LabwareCard (props: LabwareCardProps) {
-  const {definition} = props
+export default function LabwareCard(props: LabwareCardProps) {
+  const { definition } = props
 
   return (
     <li className={styles.card}>
@@ -88,8 +88,8 @@ export default function LabwareCard (props: LabwareCardProps) {
   )
 }
 
-function TopBar (props: LabwareCardProps) {
-  const {metadata, brand} = props.definition
+function TopBar(props: LabwareCardProps) {
+  const { metadata, brand } = props.definition
 
   return (
     <p className={styles.top_bar}>
@@ -100,9 +100,9 @@ function TopBar (props: LabwareCardProps) {
   )
 }
 
-function Title (props: LabwareCardProps) {
-  const {loadName} = props.definition.parameters
-  const {displayName} = props.definition.metadata
+function Title(props: LabwareCardProps) {
+  const { loadName } = props.definition.parameters
+  const { displayName } = props.definition.metadata
 
   return (
     <Link to={`${getPublicPath()}${loadName}`}>
@@ -114,7 +114,7 @@ function Title (props: LabwareCardProps) {
   )
 }
 
-function PlateDimensions (props: LabwareCardProps) {
+function PlateDimensions(props: LabwareCardProps) {
   const {
     overallLength,
     overallWidth,
@@ -122,9 +122,9 @@ function PlateDimensions (props: LabwareCardProps) {
   } = props.definition.dimensions
 
   const dimensions = [
-    {label: EN_SHORT_LENGTH, value: overallLength},
-    {label: EN_SHORT_WIDTH, value: overallWidth},
-    {label: EN_SHORT_HEIGHT, value: overallHeight},
+    { label: EN_SHORT_LENGTH, value: overallLength },
+    { label: EN_SHORT_WIDTH, value: overallWidth },
+    { label: EN_SHORT_HEIGHT, value: overallHeight },
   ]
 
   return (
@@ -144,9 +144,9 @@ function PlateDimensions (props: LabwareCardProps) {
   )
 }
 
-function Wells (props: LabwareCardProps) {
-  const {wells, metadata} = props.definition
-  const {displayCategory} = metadata
+function Wells(props: LabwareCardProps) {
+  const { wells, metadata } = props.definition
+  const { displayCategory } = metadata
 
   return (
     <div className={styles.wells}>
@@ -158,20 +158,20 @@ function Wells (props: LabwareCardProps) {
   )
 }
 
-function WellProperties (props: LabwareCardProps) {
-  const {wells, metadata} = props.definition
+function WellProperties(props: LabwareCardProps) {
+  const { wells, metadata } = props.definition
   // TODO(mc, 2019-03-21): https://github.com/Opentrons/opentrons/issues/3240
-  const {displayCategory, displayVolumeUnits} = metadata
+  const { displayCategory, displayVolumeUnits } = metadata
   const wellProps = getUniqueWellProperties(wells)
 
   return (
     <div className={styles.wells}>
       {wellProps.map((w, i) => {
         const dims = [
-          {label: EN_DEPTH, value: w.depth},
-          w.diameter != null ? {label: EN_DIAMETER, value: w.diameter} : null,
-          w.length != null ? {label: EN_LENGTH, value: w.length} : null,
-          w.width != null ? {label: EN_WIDTH, value: w.width} : null,
+          { label: EN_DEPTH, value: w.depth },
+          w.diameter != null ? { label: EN_DIAMETER, value: w.diameter } : null,
+          w.length != null ? { label: EN_LENGTH, value: w.length } : null,
+          w.width != null ? { label: EN_WIDTH, value: w.width } : null,
         ].filter(Boolean)
 
         return (
@@ -202,7 +202,7 @@ function WellProperties (props: LabwareCardProps) {
   )
 }
 
-function Tags (props: LabwareCardProps) {
+function Tags(props: LabwareCardProps) {
   const tags = props.definition.metadata.tags || []
 
   return (
@@ -214,11 +214,11 @@ function Tags (props: LabwareCardProps) {
 }
 
 // TODO(mc, 2019-03-21): move to shared data
-function getUniqueWellProperties (
+function getUniqueWellProperties(
   wells: LabwareWellMap
 ): Array<LabwareWellProperties> {
   const wellProps = Object.keys(wells).map(k => {
-    const {x, y, z, ...props} = wells[k]
+    const { x, y, z, ...props } = wells[k]
     return props
   })
 

@@ -13,10 +13,13 @@ import type {
 
 type LiquidState = $PropertyType<RobotState, 'liquidState'>
 
-type LiquidStateAndWarnings = {liquidState: LiquidState, warnings: Array<CommandCreatorWarning>}
+type LiquidStateAndWarnings = {
+  liquidState: LiquidState,
+  warnings: Array<CommandCreatorWarning>,
+}
 
 // TODO IMMEDIATELY: replace 'forAspirateDispense' with this fn
-export default function updateLiquidState (
+export default function updateLiquidState(
   args: {
     pipetteId: string,
     pipetteData: PipetteData,

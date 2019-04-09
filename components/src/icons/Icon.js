@@ -2,7 +2,7 @@
 import * as React from 'react'
 import classnames from 'classnames'
 
-import ICON_DATA_BY_NAME, {type IconName} from './icon-data'
+import ICON_DATA_BY_NAME, { type IconName } from './icon-data'
 import styles from './icons.css'
 
 export type IconProps = {
@@ -21,7 +21,7 @@ export type IconProps = {
   /** height as a number or string (for nesting inside another SVG) */
   width?: number | string,
   /** inline style passed into the icon svg */
-  style?: {[string]: string},
+  style?: { [string]: string },
   /** optional children */
   children?: React.Node,
 }
@@ -34,15 +34,15 @@ export type IconProps = {
  * import {type IconName} from '@opentrons/components'
  * ```
  */
-export default function Icon (props: IconProps) {
-  const {name, x, y, height, width, style} = props
+export default function Icon(props: IconProps) {
+  const { name, x, y, height, width, style } = props
 
   if (!(name in ICON_DATA_BY_NAME)) {
     console.error(`"${name}" is not a valid Icon name`)
     return null
   }
 
-  const {viewBox, path} = ICON_DATA_BY_NAME[name]
+  const { viewBox, path } = ICON_DATA_BY_NAME[name]
   const className = classnames(props.className, {
     [styles.spin]: props.spin,
   })
@@ -54,7 +54,7 @@ export default function Icon (props: IconProps) {
       viewBox={viewBox}
       className={className}
       fill="currentColor"
-      {...{x, y, height, width, style}}
+      {...{ x, y, height, width, style }}
     >
       <path fillRule="evenodd" d={path} />
       {props.children}

@@ -1,7 +1,7 @@
 // connection reducer tests
-import {reducer} from '../'
+import { reducer } from '../'
 
-const getState = (state) => state.connection
+const getState = state => state.connection
 
 describe('robot reducer - connection', () => {
   test('initial state', () => {
@@ -9,8 +9,8 @@ describe('robot reducer - connection', () => {
 
     expect(getState(state)).toEqual({
       connectedTo: null,
-      connectRequest: {inProgress: false, error: null, name: ''},
-      disconnectRequest: {inProgress: false, error: null},
+      connectRequest: { inProgress: false, error: null, name: '' },
+      disconnectRequest: { inProgress: false, error: null },
       unexpectedDisconnect: false,
     })
   })
@@ -28,12 +28,12 @@ describe('robot reducer - connection', () => {
     }
     const action = {
       type: 'robot:CONNECT',
-      payload: {name: 'ot'},
+      payload: { name: 'ot' },
     }
 
     expect(getState(reducer(state, action))).toEqual({
       connectedTo: null,
-      connectRequest: {inProgress: true, error: null, name: 'ot'},
+      connectRequest: { inProgress: true, error: null, name: 'ot' },
     })
   })
 
@@ -48,11 +48,11 @@ describe('robot reducer - connection', () => {
         },
       },
     }
-    const action = {type: 'robot:CONNECT_RESPONSE', payload: {}}
+    const action = { type: 'robot:CONNECT_RESPONSE', payload: {} }
 
     expect(getState(reducer(state, action))).toEqual({
       connectedTo: 'ot',
-      connectRequest: {inProgress: false, error: null, name: ''},
+      connectRequest: { inProgress: false, error: null, name: '' },
     })
   })
 
@@ -69,7 +69,7 @@ describe('robot reducer - connection', () => {
     }
     const action = {
       type: 'robot:CONNECT_RESPONSE',
-      payload: {error: new Error('AH')},
+      payload: { error: new Error('AH') },
     }
 
     expect(getState(reducer(state, action))).toEqual({
@@ -94,11 +94,11 @@ describe('robot reducer - connection', () => {
       },
     }
 
-    const action = {type: 'robot:CLEAR_CONNECT_RESPONSE', error: false}
+    const action = { type: 'robot:CLEAR_CONNECT_RESPONSE', error: false }
 
     expect(getState(reducer(state, action))).toEqual({
       connectedTo: null,
-      connectRequest: {inProgress: false, error: null, name: ''},
+      connectRequest: { inProgress: false, error: null, name: '' },
     })
   })
 
@@ -113,11 +113,11 @@ describe('robot reducer - connection', () => {
         },
       },
     }
-    const action = {type: 'robot:DISCONNECT'}
+    const action = { type: 'robot:DISCONNECT' }
 
     expect(getState(reducer(state, action))).toEqual({
       connectedTo: 'ot',
-      disconnectRequest: {inProgress: true, error: null},
+      disconnectRequest: { inProgress: true, error: null },
     })
   })
 
@@ -125,15 +125,15 @@ describe('robot reducer - connection', () => {
     const state = {
       connection: {
         connectedTo: 'ot',
-        disconnectRequest: {inProgress: true, error: null},
+        disconnectRequest: { inProgress: true, error: null },
         unexpectedDisconnect: true,
       },
     }
-    const action = {type: 'robot:DISCONNECT_RESPONSE', payload: {}}
+    const action = { type: 'robot:DISCONNECT_RESPONSE', payload: {} }
 
     expect(getState(reducer(state, action))).toEqual({
       connectedTo: null,
-      disconnectRequest: {inProgress: false, error: null},
+      disconnectRequest: { inProgress: false, error: null },
       unexpectedDisconnect: false,
     })
   })

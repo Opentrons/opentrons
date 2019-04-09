@@ -1,13 +1,13 @@
 // @flow
 import React from 'react'
 
-import {Deck} from '@opentrons/components'
+import { Deck } from '@opentrons/components'
 import ConnectedSlotItem from './ConnectedSlotItem'
 import LabwareItem from './LabwareItem'
 
 import styles from './styles.css'
 
-export default function DeckMap () {
+export default function DeckMap() {
   return (
     <Deck
       // $FlowFixMe: I think ReactRouter type is causing problems here?
@@ -17,5 +17,5 @@ export default function DeckMap () {
   )
 }
 
-export {LabwareItem}
-export type {LabwareItemProps} from './LabwareItem'
+export { LabwareItem }
+export type { LabwareItemProps } from './LabwareItem'

@@ -1,22 +1,22 @@
 // @flow
 import * as React from 'react'
-import {Switch, Route} from 'react-router-dom'
+import { Switch, Route } from 'react-router-dom'
 
-import {getDefinition} from '../../definitions'
-import {getFilters} from '../../filters'
-import {getPublicPath} from '../../public-path'
+import { getDefinition } from '../../definitions'
+import { getFilters } from '../../filters'
+import { getPublicPath } from '../../public-path'
 import Sidebar from '../Sidebar'
-import LabwareList, {NoResults} from '../LabwareList'
+import LabwareList, { NoResults } from '../LabwareList'
 import LabwareDetails from '../LabwareDetails'
 import styles from './styles.css'
 
-import type {Location} from 'react-router-dom'
+import type { Location } from 'react-router-dom'
 
 export type PageProps = {
   location: Location,
 }
 
-export default function Page (props: PageProps) {
+export default function Page(props: PageProps) {
   const filters = getFilters(props.location)
 
   return (
@@ -29,7 +29,7 @@ export default function Page (props: PageProps) {
               <Route
                 path={`${getPublicPath()}:loadName`}
                 render={routeProps => {
-                  const {loadName} = routeProps.match.params
+                  const { loadName } = routeProps.match.params
                   const definition = getDefinition(loadName)
 
                   return definition ? (

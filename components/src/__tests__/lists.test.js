@@ -1,14 +1,14 @@
 // list and list item components tests
 import React from 'react'
-import {MemoryRouter} from 'react-router'
+import { MemoryRouter } from 'react-router'
 import Renderer from 'react-test-renderer'
 
-import {SidePanelGroup, TitledList, ListItem, ListAlert} from '..'
+import { SidePanelGroup, TitledList, ListItem, ListAlert } from '..'
 
 describe('TitledList', () => {
   test('adds an h3 with the title', () => {
     const heading = Renderer.create(
-      <TitledList title='hello' />
+      <TitledList title="hello" />
     ).root.findByType('h3')
 
     expect(heading).toBeDefined()
@@ -17,33 +17,33 @@ describe('TitledList', () => {
 
   test('adds an optional svg icon to title', () => {
     const icon = Renderer.create(
-      <TitledList title='hello' iconName='flask-outline' />
+      <TitledList title="hello" iconName="flask-outline" />
     ).root.findByType('svg')
 
     expect(icon).toBeDefined()
   })
 
   test('renders TitledList without icon correctly', () => {
-    const tree = Renderer.create(
-      <TitledList title='foo' />
-    ).toJSON()
+    const tree = Renderer.create(<TitledList title="foo" />).toJSON()
 
     expect(tree).toMatchSnapshot()
   })
 
   test('renders TitledList with children correctly', () => {
     const tree = Renderer.create(
-      <TitledList title='foo'><li>Woop</li></TitledList>
+      <TitledList title="foo">
+        <li>Woop</li>
+      </TitledList>
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
   })
 
   test('renders TitledList with onMouseEnter & onMouseLeave correctly', () => {
-    function someFn () {}
+    const noop = () => {}
 
     const tree = Renderer.create(
-      <TitledList title='foo' onMouseEnter={someFn} onMouseLeave={someFn}/>
+      <TitledList title="foo" onMouseEnter={noop} onMouseLeave={noop} />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -51,7 +51,7 @@ describe('TitledList', () => {
 
   test('renders TitledList with optional icon correctly', () => {
     const tree = Renderer.create(
-      <TitledList title='foo' icon='flask-outline' />
+      <TitledList title="foo" icon="flask-outline" />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -59,7 +59,10 @@ describe('TitledList', () => {
 
   test('renders expanded TitledList correctly', () => {
     const tree = Renderer.create(
-      <TitledList onCollapseToggle={e => {}} description={<span>Description</span>} >
+      <TitledList
+        onCollapseToggle={e => {}}
+        description={<span>Description</span>}
+      >
         <li>1</li>
         <li>2</li>
       </TitledList>
@@ -70,7 +73,11 @@ describe('TitledList', () => {
 
   test('renders collapsed TitledList correctly', () => {
     const tree = Renderer.create(
-      <TitledList onCollapseToggle={e => {}} description={<span>Description</span>} collapsed>
+      <TitledList
+        onCollapseToggle={e => {}}
+        description={<span>Description</span>}
+        collapsed
+      >
         <li>1</li>
         <li>2</li>
       </TitledList>
@@ -89,9 +96,7 @@ describe('ListItem', () => {
 
     const root = Renderer.create(
       <MemoryRouter>
-        <ListItem {...linkItemProps}>
-          foo
-        </ListItem>
+        <ListItem {...linkItemProps}>foo</ListItem>
       </MemoryRouter>
     ).root
 
@@ -102,7 +107,7 @@ describe('ListItem', () => {
 
   test('adds an optional svg icon as child', () => {
     const icon = Renderer.create(
-      <ListItem iconName='check-circle' />
+      <ListItem iconName="check-circle" />
     ).root.findByType('svg')
 
     expect(icon).toBeDefined()
@@ -110,7 +115,7 @@ describe('ListItem', () => {
 
   test('renders ListItem with icon correctly', () => {
     const tree = Renderer.create(
-      <ListItem to='/hello' iconName='check-circle' isDisabled='false' />
+      <ListItem to="/hello" iconName="check-circle" isDisabled="false" />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -118,7 +123,7 @@ describe('ListItem', () => {
 
   test('renders ListItem without icon correctly', () => {
     const tree = Renderer.create(
-      <ListItem to='/hello' isDisabled='false' />
+      <ListItem to="/hello" isDisabled="false" />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -127,9 +132,7 @@ describe('ListItem', () => {
 
 describe('ListAlert', () => {
   test('list alert renders correctly', () => {
-    const tree = Renderer.create(
-      <ListAlert> alert alert</ListAlert>
-    ).toJSON()
+    const tree = Renderer.create(<ListAlert>alert alert</ListAlert>).toJSON()
 
     expect(tree).toMatchSnapshot()
   })
@@ -138,7 +141,9 @@ describe('ListAlert', () => {
 describe('ListItem', () => {
   test('Side Panel Group renders correctly', () => {
     const tree = Renderer.create(
-      <SidePanelGroup title='title' iconName='flask-outline'> children </SidePanelGroup>
+      <SidePanelGroup title="title" iconName="flask-outline">
+        children
+      </SidePanelGroup>
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -146,7 +151,9 @@ describe('ListItem', () => {
 
   test('Disabled Side Panel Group renders correctly', () => {
     const tree = Renderer.create(
-      <SidePanelGroup title='title' iconName='flask-outline' disabled> children </SidePanelGroup>
+      <SidePanelGroup title="title" iconName="flask-outline" disabled>
+        children
+      </SidePanelGroup>
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

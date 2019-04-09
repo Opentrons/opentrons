@@ -1,18 +1,14 @@
 // @flow
 import * as React from 'react'
-import {type Dispatch} from 'redux'
-import {connect} from 'react-redux'
+import { type Dispatch } from 'redux'
+import { connect } from 'react-redux'
 import CalibrationInfoContent from '../CalibrationInfoContent'
-import {PrimaryButton} from '@opentrons/components'
+import { PrimaryButton } from '@opentrons/components'
 
 import attachSingle from '../../img/attach_tip_single.png'
 import attachMulti from '../../img/attach_tip_multi.png'
 
-import {
-  actions as robotActions,
-  type Mount,
-  type Channels,
-} from '../../robot'
+import { actions as robotActions, type Mount, type Channels } from '../../robot'
 
 type OwnProps = {
   mount: Mount,
@@ -24,10 +20,13 @@ type DispatchProps = {
   onProbeTipClick: () => void,
 }
 
-export default connect(null, mapDispatchToProps)(AttachTipPanel)
+export default connect(
+  null,
+  mapDispatchToProps
+)(AttachTipPanel)
 
-function AttachTipPanel (props: OwnProps & DispatchProps) {
-  const {volume, channels, onProbeTipClick} = props
+function AttachTipPanel(props: OwnProps & DispatchProps) {
+  const { volume, channels, onProbeTipClick } = props
 
   const leftChildren = (
     <div>
@@ -42,11 +41,9 @@ function AttachTipPanel (props: OwnProps & DispatchProps) {
     </div>
   )
 
-  const imgSrc = channels === 1
-    ? attachSingle
-    : attachMulti
+  const imgSrc = channels === 1 ? attachSingle : attachMulti
 
-  const rightChildren = <img src={imgSrc} alt='attach tip' />
+  const rightChildren = <img src={imgSrc} alt="attach tip" />
 
   return (
     <CalibrationInfoContent
@@ -56,13 +53,15 @@ function AttachTipPanel (props: OwnProps & DispatchProps) {
   )
 }
 
-function mapDispatchToProps (
+function mapDispatchToProps(
   dispatch: Dispatch<*>,
   ownProps: OwnProps
 ): DispatchProps {
   const mount = ownProps.mount
 
   return {
-    onProbeTipClick: () => { dispatch(robotActions.probeTip(mount)) },
+    onProbeTipClick: () => {
+      dispatch(robotActions.probeTip(mount))
+    },
   }
 }

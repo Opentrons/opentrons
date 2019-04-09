@@ -1,16 +1,12 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
-import type {BaseState, ThunkDispatch} from '../types'
-import type {StepIdType} from '../form-types'
+import { connect } from 'react-redux'
+import type { BaseState, ThunkDispatch } from '../types'
+import type { StepIdType } from '../form-types'
 
-import {
-  actions as steplistActions,
-} from '../steplist'
-import {
-  selectors as stepFormSelectors,
-} from '../step-forms'
-import {StepList} from '../components/steplist'
+import { actions as steplistActions } from '../steplist'
+import { selectors as stepFormSelectors } from '../step-forms'
+import { StepList } from '../components/steplist'
 
 type Props = React.ElementProps<typeof StepList>
 
@@ -20,13 +16,13 @@ type SP = {
 
 type DP = $Diff<Props, SP>
 
-function mapStateToProps (state: BaseState): SP {
+function mapStateToProps(state: BaseState): SP {
   return {
     orderedStepIds: stepFormSelectors.getOrderedStepIds(state),
   }
 }
 
-function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
+function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   return {
     reorderSelectedStep: (delta: number) => {
       dispatch(steplistActions.reorderSelectedStep(delta))
@@ -37,4 +33,7 @@ function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(StepList)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(StepList)

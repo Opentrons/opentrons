@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {Icon} from '../icons'
+import { Icon } from '../icons'
 import styles from './forms.css'
 
 // TODO: Ian 2018-09-14 remove 'label' prop when IngredientPropertiesForm gets updated
@@ -49,7 +49,7 @@ type Props = {
   autoFocus?: boolean,
 }
 
-export default function InputField (props: Props) {
+export default function InputField(props: Props) {
   const error = props.error != null
   const labelClass = cx(styles.form_field, props.className, {
     [styles.error]: error,
@@ -67,8 +67,7 @@ export default function InputField (props: Props) {
   return (
     <label className={labelClass}>
       <div className={cx(props.labelTextClassName, styles.label_text)}>
-        {props.label &&
-          error && (
+        {props.label && error && (
           <div className={styles.error_icon}>
             <Icon name="alert" />
           </div>
@@ -81,7 +80,7 @@ export default function InputField (props: Props) {
 }
 
 // TODO(mc, 2018-02-21): maybe simplify further and split out?
-function Input (props: Props) {
+function Input(props: Props) {
   const error = props.error != null
 
   return (

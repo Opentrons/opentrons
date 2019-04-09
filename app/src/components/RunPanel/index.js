@@ -1,12 +1,12 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
 import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../robot'
-import {SidePanel, SidePanelGroup} from '@opentrons/components'
+import { SidePanel, SidePanelGroup } from '@opentrons/components'
 import RunTimer from './RunTimer'
 import RunControls from './RunControls'
 import TempDeckStatusCard from '../TempDeckStatusCard'
@@ -27,7 +27,7 @@ type DP = {|
   onResetClick: () => mixed,
 |}
 
-type Props = {...SP, ...DP}
+type Props = { ...SP, ...DP }
 
 const mapStateToProps = (state): SP => ({
   isRunning: robotSelectors.getIsRunning(state),
@@ -35,11 +35,10 @@ const mapStateToProps = (state): SP => ({
   startTime: robotSelectors.getStartTime(state),
   isReadyToRun: robotSelectors.getIsReadyToRun(state),
   runTime: robotSelectors.getRunTime(state),
-  disabled: (
+  disabled:
     !robotSelectors.getSessionIsLoaded(state) ||
     robotSelectors.getCancelInProgress(state) ||
-    robotSelectors.getSessionLoadInProgress(state)
-  ),
+    robotSelectors.getSessionLoadInProgress(state),
 })
 
 const mapDispatchToProps = (dispatch): DP => ({
@@ -49,9 +48,9 @@ const mapDispatchToProps = (dispatch): DP => ({
   onResetClick: () => dispatch(robotActions.refreshSession()),
 })
 
-function RunPanel (props: Props) {
+function RunPanel(props: Props) {
   return (
-    <SidePanel title='Execute Run'>
+    <SidePanel title="Execute Run">
       <SidePanelGroup>
         <RunTimer startTime={props.startTime} runTime={props.runTime} />
         <RunControls {...props} />
@@ -61,4 +60,7 @@ function RunPanel (props: Props) {
   )
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(RunPanel)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(RunPanel)

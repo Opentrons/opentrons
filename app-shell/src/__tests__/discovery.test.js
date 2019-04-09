@@ -2,8 +2,8 @@
 import EventEmitter from 'events'
 import Store from 'electron-store'
 import DiscoveryClient from '@opentrons/discovery-client'
-import {registerDiscovery} from '../discovery'
-import {getConfig, getOverrides} from '../config'
+import { registerDiscovery } from '../discovery'
+import { getConfig, getOverrides } from '../config'
 
 jest.mock('electron-store')
 jest.mock('@opentrons/discovery-client')
@@ -25,7 +25,7 @@ describe('app-shell/discovery', () => {
       setPollInterval: jest.fn().mockReturnThis(),
     })
 
-    getConfig.mockReturnValue({enabled: true, candidates: []})
+    getConfig.mockReturnValue({ enabled: true, candidates: [] })
     getOverrides.mockReturnValue({})
 
     dispatch = jest.fn()
@@ -60,18 +60,18 @@ describe('app-shell/discovery', () => {
   })
 
   test('calls client.start on "discovery:START"', () => {
-    registerDiscovery(dispatch)({type: 'discovery:START'})
+    registerDiscovery(dispatch)({ type: 'discovery:START' })
     expect(mockClient.start).toHaveBeenCalledTimes(2)
   })
 
   test('sets poll speed on "discovery:START" and "discovery:FINISH"', () => {
     const handleAction = registerDiscovery(dispatch)
 
-    handleAction({type: 'discovery:START'})
+    handleAction({ type: 'discovery:START' })
     expect(mockClient.setPollInterval).toHaveBeenLastCalledWith(
       expect.any(Number)
     )
-    handleAction({type: 'discovery:FINISH'})
+    handleAction({ type: 'discovery:FINISH' })
     expect(mockClient.setPollInterval).toHaveBeenLastCalledWith(
       expect.any(Number)
     )
@@ -84,14 +84,14 @@ describe('app-shell/discovery', () => {
 
   test('always sends "discovery:UPDATE_LIST" on "discovery:START"', () => {
     const expected = [
-      {name: 'opentrons-dev', ip: '192.168.1.42', port: 31950, ok: true},
+      { name: 'opentrons-dev', ip: '192.168.1.42', port: 31950, ok: true },
     ]
 
     mockClient.services = expected
-    registerDiscovery(dispatch)({type: 'discovery:START'})
+    registerDiscovery(dispatch)({ type: 'discovery:START' })
     expect(dispatch).toHaveBeenCalledWith({
       type: 'discovery:UPDATE_LIST',
-      payload: {robots: expected},
+      payload: { robots: expected },
     })
   })
 
@@ -102,7 +102,7 @@ describe('app-shell/discovery', () => {
       {
         name: 'dispatches discovery:UPDATE_LIST on "service" event',
         services: [
-          {name: 'opentrons-dev', ip: '192.168.1.42', port: 31950, ok: true},
+          { name: 'opentrons-dev', ip: '192.168.1.42', port: 31950, ok: true },
         ],
       },
     ]
@@ -114,7 +114,7 @@ describe('app-shell/discovery', () => {
         mockClient.emit('service')
         expect(dispatch).toHaveBeenCalledWith({
           type: 'discovery:UPDATE_LIST',
-          payload: {robots: spec.services},
+          payload: { robots: spec.services },
         })
       })
     )
@@ -124,43 +124,43 @@ describe('app-shell/discovery', () => {
     registerDiscovery(dispatch)
     expect(Store).toHaveBeenCalledWith({
       name: 'discovery',
-      defaults: {services: []},
+      defaults: { services: [] },
     })
 
-    mockClient.services = [{name: 'foo'}, {name: 'bar'}]
+    mockClient.services = [{ name: 'foo' }, { name: 'bar' }]
     mockClient.emit('service')
     expect(Store.__store.set).toHaveBeenLastCalledWith('services', [
-      {name: 'foo'},
-      {name: 'bar'},
+      { name: 'foo' },
+      { name: 'bar' },
     ])
   })
 
   test('stores services to file on serviceRemoved events', () => {
     registerDiscovery(dispatch)
 
-    mockClient.services = [{name: 'foo'}]
+    mockClient.services = [{ name: 'foo' }]
     mockClient.emit('serviceRemoved')
     expect(Store.__store.set).toHaveBeenLastCalledWith('services', [
-      {name: 'foo'},
+      { name: 'foo' },
     ])
   })
 
   test('loads services from file on client initialization', () => {
     Store.__store.get.mockImplementation(key => {
-      if (key === 'services') return [{name: 'foo'}]
+      if (key === 'services') return [{ name: 'foo' }]
       return null
     })
 
     registerDiscovery(dispatch)
     expect(DiscoveryClient).toHaveBeenCalledWith(
       expect.objectContaining({
-        services: [{name: 'foo'}],
+        services: [{ name: 'foo' }],
       })
     )
   })
 
   test('loads candidates from config on client initialization', () => {
-    getConfig.mockReturnValue({enabled: true, candidates: ['1.2.3.4']})
+    getConfig.mockReturnValue({ enabled: true, candidates: ['1.2.3.4'] })
     registerDiscovery(dispatch)
 
     expect(DiscoveryClient).toHaveBeenCalledWith(
@@ -172,7 +172,7 @@ describe('app-shell/discovery', () => {
 
   // ensures config override works with only one candidate specified
   test('canidates in config can be single value', () => {
-    getConfig.mockReturnValue({enabled: true, candidates: '1.2.3.4'})
+    getConfig.mockReturnValue({ enabled: true, candidates: '1.2.3.4' })
     registerDiscovery(dispatch)
 
     expect(DiscoveryClient).toHaveBeenCalledWith(
@@ -183,7 +183,7 @@ describe('app-shell/discovery', () => {
   })
 
   test('services from overridden canidates are not persisted', () => {
-    getConfig.mockReturnValue({enabled: true, candidates: 'localhost'})
+    getConfig.mockReturnValue({ enabled: true, candidates: 'localhost' })
     getOverrides.mockImplementation(key => {
       if (key === 'discovery.candidates') return ['1.2.3.4', '5.6.7.8']
       return null
@@ -191,13 +191,15 @@ describe('app-shell/discovery', () => {
 
     registerDiscovery(dispatch)
 
-    mockClient.services = [{name: 'foo', ip: '5.6.7.8'}, {name: 'bar'}]
+    mockClient.services = [{ name: 'foo', ip: '5.6.7.8' }, { name: 'bar' }]
     mockClient.emit('service')
-    expect(Store.__store.set).toHaveBeenCalledWith('services', [{name: 'bar'}])
+    expect(Store.__store.set).toHaveBeenCalledWith('services', [
+      { name: 'bar' },
+    ])
   })
 
   test('service from overridden single candidate is not persisted', () => {
-    getConfig.mockReturnValue({enabled: true, candidates: 'localhost'})
+    getConfig.mockReturnValue({ enabled: true, candidates: 'localhost' })
     getOverrides.mockImplementation(key => {
       if (key === 'discovery.candidates') return '1.2.3.4'
       return null
@@ -205,8 +207,10 @@ describe('app-shell/discovery', () => {
 
     registerDiscovery(dispatch)
 
-    mockClient.services = [{name: 'foo', ip: '1.2.3.4'}, {name: 'bar'}]
+    mockClient.services = [{ name: 'foo', ip: '1.2.3.4' }, { name: 'bar' }]
     mockClient.emit('service')
-    expect(Store.__store.set).toHaveBeenCalledWith('services', [{name: 'bar'}])
+    expect(Store.__store.set).toHaveBeenCalledWith('services', [
+      { name: 'bar' },
+    ])
   })
 })

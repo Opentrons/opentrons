@@ -1,7 +1,7 @@
 // @flow
 // TODO: Ian 2018-10-30 if we like this, add it to components library
 import * as React from 'react'
-import {ClickOutside, Icon, InputField} from '@opentrons/components'
+import { ClickOutside, Icon, InputField } from '@opentrons/components'
 import styles from './editableTextField.css'
 
 type Props = {
@@ -16,7 +16,7 @@ type State = {
 }
 
 export default class EditableTextField extends React.Component<Props, State> {
-  constructor (props: Props) {
+  constructor(props: Props) {
     super(props)
     this.state = {
       editing: false,
@@ -24,8 +24,7 @@ export default class EditableTextField extends React.Component<Props, State> {
     }
   }
 
-  enterEditMode = () =>
-    this.setState({editing: true})
+  enterEditMode = () => this.setState({ editing: true })
 
   handleCancel = () => {
     this.setState({
@@ -46,21 +45,21 @@ export default class EditableTextField extends React.Component<Props, State> {
   }
 
   handleSubmit = () => {
-    this.setState({editing: false}, () =>
+    this.setState({ editing: false }, () =>
       this.props.saveEdit(this.state.transientValue || '')
     )
   }
 
   updateValue = (e: SyntheticInputEvent<*>) => {
-    this.setState({transientValue: e.currentTarget.value})
+    this.setState({ transientValue: e.currentTarget.value })
   }
 
-  render () {
-    const {className, value} = this.props
+  render() {
+    const { className, value } = this.props
     if (this.state.editing) {
       return (
-        <ClickOutside onClickOutside={this.handleSubmit}>{
-          ({ref}) =>
+        <ClickOutside onClickOutside={this.handleSubmit}>
+          {({ ref }) => (
             <form
               className={className}
               onKeyUp={this.handleKeyUp}
@@ -71,17 +70,18 @@ export default class EditableTextField extends React.Component<Props, State> {
                 autoFocus
                 value={this.state.transientValue}
                 onChange={this.updateValue}
-                units={<Icon name='pencil' className={styles.edit_icon} />}
+                units={<Icon name="pencil" className={styles.edit_icon} />}
               />
             </form>
-        }</ClickOutside>
+          )}
+        </ClickOutside>
       )
     }
 
     return (
       <div onClick={this.enterEditMode} className={className}>
         {value}
-        <Icon name='pencil' className={styles.edit_icon_right} />
+        <Icon name="pencil" className={styles.edit_icon_right} />
       </div>
     )
   }

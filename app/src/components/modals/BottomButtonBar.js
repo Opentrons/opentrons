@@ -4,10 +4,10 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import {OutlineButton} from '@opentrons/components'
+import { OutlineButton } from '@opentrons/components'
 import styles from './styles.css'
 
-import type {ButtonProps} from '@opentrons/components'
+import type { ButtonProps } from '@opentrons/components'
 
 type Props = {
   buttons: Array<?ButtonProps>,
@@ -15,7 +15,7 @@ type Props = {
   description?: React.Node,
 }
 
-export default function BottomButtonBar (props: Props) {
+export default function BottomButtonBar(props: Props) {
   const buttons = props.buttons.filter(Boolean)
   const className = cx(styles.bottom_button_bar, props.className)
 

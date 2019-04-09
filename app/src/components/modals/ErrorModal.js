@@ -1,10 +1,10 @@
 // @flow
 import * as React from 'react'
-import {Link} from 'react-router-dom'
-import {AlertModal} from '@opentrons/components'
-import {Portal} from '../portal'
+import { Link } from 'react-router-dom'
+import { AlertModal } from '@opentrons/components'
+import { Portal } from '../portal'
 
-import type {Error} from '../../types'
+import type { Error } from '../../types'
 
 import styles from './styles.css'
 
@@ -18,10 +18,10 @@ type Props = {
 
 const DEFAULT_HEADING = 'Unexpected Error'
 
-export default function ErrorModal (props: Props) {
-  const {description, error} = props
+export default function ErrorModal(props: Props) {
+  const { description, error } = props
   const heading = props.heading || DEFAULT_HEADING
-  let closeButtonProps = {children: 'close', onClick: props.close}
+  let closeButtonProps = { children: 'close', onClick: props.close }
 
   if (props.closeUrl) {
     closeButtonProps = {

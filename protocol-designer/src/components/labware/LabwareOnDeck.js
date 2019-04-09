@@ -9,39 +9,44 @@ import {
   humanizeLabwareType,
   type DeckSlot,
 } from '@opentrons/components'
-import {
-  SLOT_RENDER_WIDTH,
-  SLOT_RENDER_HEIGHT,
-} from '@opentrons/shared-data'
+import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
 import styles from './labware.css'
 
-import type {StepIdType} from '../../form-types'
+import type { StepIdType } from '../../form-types'
 import HighlightableLabware from '../../containers/HighlightableLabware'
 import ClickableText from './ClickableText'
 import NameThisLabwareOverlay from './NameThisLabwareOverlay'
 import OverlayPanel from './OverlayPanel'
 import DisabledSelectSlotOverlay from './DisabledSelectSlotOverlay'
 import BrowseLabwareOverlay from './BrowseLabwareOverlay'
-import {type TerminalItemId, START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID} from '../../steplist'
+import {
+  type TerminalItemId,
+  START_TERMINAL_ITEM_ID,
+  END_TERMINAL_ITEM_ID,
+} from '../../steplist'
 
 // TODO: BC 2019-01-03 consolidate with DraggableStepItems DND_TYPES
-const DND_TYPES: {LABWARE: "LABWARE"} = {
+const DND_TYPES: { LABWARE: 'LABWARE' } = {
   LABWARE: 'LABWARE',
 }
 
 type DragPreviewProps = {
-  getXY: (rawX: number, rawY: number) => {scaledX?: number, scaledY?: number},
+  getXY: (rawX: number, rawY: number) => { scaledX?: number, scaledY?: number },
   isDragging: boolean,
-  currentOffset?: {x: number, y: number},
-  item: {slot: DeckSlot, labwareOrSlot: React.Node, containerId: string},
+  currentOffset?: { x: number, y: number },
+  item: { slot: DeckSlot, labwareOrSlot: React.Node, containerId: string },
   itemType: string,
   containerType: string,
   children: React.Node,
 }
 const DragPreview = (props: DragPreviewProps) => {
-  const {item, itemType, isDragging, currentOffset, getXY} = props
-  if (itemType !== DND_TYPES.LABWARE || !isDragging || !currentOffset) return null
-  const {scaledX, scaledY} = getXY(currentOffset && currentOffset.x, currentOffset && currentOffset.y)
+  const { item, itemType, isDragging, currentOffset, getXY } = props
+  if (itemType !== DND_TYPES.LABWARE || !isDragging || !currentOffset)
+    return null
+  const { scaledX, scaledY } = getXY(
+    currentOffset && currentOffset.x,
+    currentOffset && currentOffset.y
+  )
   const containerId = item && item.containerId
   return (
     <g>
@@ -62,7 +67,7 @@ export const DragPreviewLayer = DragLayer(monitor => ({
 type DragDropLabwareProps = React.ElementProps<typeof LabwareContainer> & {
   connectDragSource: mixed => React.Element<any>,
   connectDropTarget: mixed => React.Element<any>,
-  draggedItem?: {slot: DeckSlot},
+  draggedItem?: { slot: DeckSlot },
   isOver: boolean,
   slot: DeckSlot,
   overlay?: React.Node,
@@ -81,40 +86,45 @@ class DragSourceLabware extends React.Component<DragDropLabwareProps> {
       return this.props.overlay
     }
   }
-  render () {
-    return (
-      this.props.connectDragSource(
-        this.props.connectDropTarget(
-          <g>
-            <LabwareContainer slot={this.props.slot} highlighted={this.props.highlighted}>
-              {this.props.labwareOrSlot}
-              {this.renderOverlay()}
-            </LabwareContainer>
-          </g>
-        )
+  render() {
+    return this.props.connectDragSource(
+      this.props.connectDropTarget(
+        <g>
+          <LabwareContainer
+            slot={this.props.slot}
+            highlighted={this.props.highlighted}
+          >
+            {this.props.labwareOrSlot}
+            {this.renderOverlay()}
+          </LabwareContainer>
+        </g>
       )
     )
   }
 }
 
 const labwareSource = {
-  beginDrag: (props) => ({
+  beginDrag: props => ({
     slot: props.slot,
     containerId: props.containerId,
   }),
-  canDrag: (props) => !!props.containerId && props.isManualInterventionStep,
+  canDrag: props => !!props.containerId && props.isManualInterventionStep,
 }
 const collectLabwareSource = (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging(),
   draggedItem: monitor.getItem(),
 })
-const DraggableLabware = DragSource(DND_TYPES.LABWARE, labwareSource, collectLabwareSource)(DragSourceLabware)
+const DraggableLabware = DragSource(
+  DND_TYPES.LABWARE,
+  labwareSource,
+  collectLabwareSource
+)(DragSourceLabware)
 
 const labwareTarget = {
   canDrop: (props, monitor) => {
     const draggedItem = monitor.getItem()
-    return draggedItem && (draggedItem.slot !== props.slot)
+    return draggedItem && draggedItem.slot !== props.slot
   },
   drop: (props, monitor) => {
     const draggedItem = monitor.getItem()
@@ -127,9 +137,13 @@ const collectLabwareTarget = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
 })
-const DragDropLabware = DropTarget(DND_TYPES.LABWARE, labwareTarget, collectLabwareTarget)(DraggableLabware)
+const DragDropLabware = DropTarget(
+  DND_TYPES.LABWARE,
+  labwareTarget,
+  collectLabwareTarget
+)(DraggableLabware)
 
-function LabwareDeckSlotOverlay ({
+function LabwareDeckSlotOverlay({
   canAddIngreds,
   deleteLabware,
   editLiquids,
@@ -143,17 +157,26 @@ function LabwareDeckSlotOverlay ({
   return (
     <g className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
       <OverlayPanel />
-      {canAddIngreds &&
+      {canAddIngreds && (
         <ClickableText
           onClick={editLiquids}
-          iconName='pencil' y='15%' text='Name & Liquids' />
-      }
+          iconName="pencil"
+          y="15%"
+          text="Name & Liquids"
+        />
+      )}
       <ClickableText
         onClick={duplicateLabware}
-        iconName='content-copy' y='40%' text='Duplicate' />
+        iconName="content-copy"
+        y="40%"
+        text="Duplicate"
+      />
       <ClickableText
         onClick={deleteLabware}
-        iconName='close' y='65%' text='Delete' />
+        iconName="close"
+        y="65%"
+        text="Delete"
+      />
     </g>
   )
 }
@@ -170,19 +193,23 @@ type SlotWithLabwareProps = {
   containerId: string,
 }
 
-function SlotWithLabware (props: SlotWithLabwareProps) {
-  const {containerType, displayName, containerId} = props
+function SlotWithLabware(props: SlotWithLabwareProps) {
+  const { containerType, displayName, containerId } = props
 
   return (
     <g>
-      {labwareImages[containerType]
-        ? <image
+      {labwareImages[containerType] ? (
+        <image
           href={labwareImages[containerType]}
-          width={SLOT_RENDER_WIDTH} height={SLOT_RENDER_HEIGHT}
+          width={SLOT_RENDER_WIDTH}
+          height={SLOT_RENDER_HEIGHT}
         />
-        : <HighlightableLabware containerId={containerId} />
-      }
-      <ContainerNameOverlay title={displayName || humanizeLabwareType(containerType)} />
+      ) : (
+        <HighlightableLabware containerId={containerId} />
+      )}
+      <ContainerNameOverlay
+        title={displayName || humanizeLabwareType(containerType)}
+      />
     </g>
   )
 }
@@ -191,7 +218,9 @@ const EmptyDestinationSlotOverlay = () => (
   <g className={cx(styles.slot_overlay)}>
     <OverlayPanel />
     <g className={styles.clickable_text}>
-      <text x='0' y='40%'>Place Here</text>
+      <text x="0" y="40%">
+        Place Here
+      </text>
     </g>
   </g>
 )
@@ -199,13 +228,23 @@ const EmptyDestinationSlotOverlay = () => (
 type EmptyDeckSlotOverlayProps = {
   addLabware: (e: SyntheticEvent<*>) => mixed,
 }
-function EmptyDeckSlotOverlay (props: EmptyDeckSlotOverlayProps) {
-  const {addLabware} = props
+function EmptyDeckSlotOverlay(props: EmptyDeckSlotOverlayProps) {
+  const { addLabware } = props
   return (
-    <g className={cx(styles.slot_overlay, styles.appear_on_mouseover, styles.add_labware)}>
+    <g
+      className={cx(
+        styles.slot_overlay,
+        styles.appear_on_mouseover,
+        styles.add_labware
+      )}
+    >
       <OverlayPanel />
-      <ClickableText onClick={addLabware}
-        iconName='plus' y='40%' text='Add Labware' />
+      <ClickableText
+        onClick={addLabware}
+        iconName="plus"
+        y="40%"
+        text="Add Labware"
+      />
     </g>
   )
 }
@@ -231,7 +270,7 @@ type LabwareOnDeckProps = {
   drillUp: () => mixed,
 
   deleteLabware: () => mixed,
-  duplicateLabware: (StepIdType) => mixed,
+  duplicateLabware: StepIdType => mixed,
   swapSlotContents: (DeckSlot, DeckSlot) => void,
 
   setLabwareName: (name: ?string) => mixed,
@@ -252,7 +291,7 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
   //   if (shouldAlwaysUpdate || labwarePresenceChange || nameOverlayChange) return true
   //   return this.props.highlighted !== nextProps.highlighted
   // }
-  render () {
+  render() {
     const {
       slot,
       containerId,
@@ -288,31 +327,50 @@ class LabwareOnDeck extends React.Component<LabwareOnDeckProps> {
       if (showNameOverlay) {
         overlay = (
           <NameThisLabwareOverlay
-            {...{setLabwareName, editLiquids}}
-            onClickOutside={setDefaultLabwareName} />
+            {...{ setLabwareName, editLiquids }}
+            onClickOutside={setDefaultLabwareName}
+          />
         )
       } else {
-        overlay = (slotHasLabware)
-          ? (
-            <LabwareDeckSlotOverlay
-              duplicateLabware={() => duplicateLabware(containerId)}
-              {...{canAddIngreds, deleteLabware, editLiquids}} />
-          ) : <EmptyDeckSlotOverlay {...{addLabware}} />
+        overlay = slotHasLabware ? (
+          <LabwareDeckSlotOverlay
+            duplicateLabware={() => duplicateLabware(containerId)}
+            {...{ canAddIngreds, deleteLabware, editLiquids }}
+          />
+        ) : (
+          <EmptyDeckSlotOverlay {...{ addLabware }} />
+        )
       }
-    } else if (selectedTerminalItem === END_TERMINAL_ITEM_ID && slotHasLabware && !isTiprack) {
+    } else if (
+      selectedTerminalItem === END_TERMINAL_ITEM_ID &&
+      slotHasLabware &&
+      !isTiprack
+    ) {
       overlay = <BrowseLabwareOverlay drillDown={drillDown} drillUp={drillUp} />
     }
 
-    const labwareOrSlot = (slotHasLabware)
-      ? <SlotWithLabware
+    const labwareOrSlot = slotHasLabware ? (
+      <SlotWithLabware
         key={`${containerType}`}
-        {...{containerType, containerId}}
+        {...{ containerType, containerId }}
         displayName={containerName || containerType}
       />
-      : <EmptyDeckSlot slot={slot} />
+    ) : (
+      <EmptyDeckSlot slot={slot} />
+    )
 
     return (
-      <DragDropLabware {...{slot, highlighted, labwareOrSlot, overlay, containerId, swapSlotContents, isManualInterventionStep}} />
+      <DragDropLabware
+        {...{
+          slot,
+          highlighted,
+          labwareOrSlot,
+          overlay,
+          containerId,
+          swapSlotContents,
+          isManualInterventionStep,
+        }}
+      />
     )
   }
 }

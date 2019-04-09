@@ -2,11 +2,8 @@
 import * as React from 'react'
 import cx from 'classnames'
 import flatMap from 'lodash/flatMap'
-import type {DeckSlot} from '../robot-types'
-import {
-  SLOT_RENDER_WIDTH,
-  SLOT_RENDER_HEIGHT,
-} from '@opentrons/shared-data'
+import type { DeckSlot } from '../robot-types'
+import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
 import {
   SLOTNAME_MATRIX,
   SLOT_SPACING_MM,
@@ -14,7 +11,7 @@ import {
   TRASH_SLOTNAME,
 } from './constants'
 import DeckOutline from './DeckOutline'
-import {EmptyDeckSlot} from './EmptyDeckSlot'
+import { EmptyDeckSlot } from './EmptyDeckSlot'
 
 import styles from './Deck.css'
 
@@ -40,18 +37,27 @@ export default class Deck extends React.Component<Props> {
 
   getXY = (rawX: number, rawY: number) => {
     if (!this.parentRef) return {}
-    const clientRect: {width: number, height: number, left: number, top: number} = this.parentRef.getBoundingClientRect()
+    const clientRect: {
+      width: number,
+      height: number,
+      left: number,
+      top: number,
+    } = this.parentRef.getBoundingClientRect()
 
-    const widthCoefficient = (VIEW_BOX_WIDTH - (SLOT_OFFSET_MM * 2) - (SLOT_SPACING_MM * 2)) / clientRect.width
-    const heightCoefficient = (VIEW_BOX_HEIGHT - (SLOT_OFFSET_MM * 2) - (SLOT_SPACING_MM * 3)) / clientRect.height
+    const widthCoefficient =
+      (VIEW_BOX_WIDTH - SLOT_OFFSET_MM * 2 - SLOT_SPACING_MM * 2) /
+      clientRect.width
+    const heightCoefficient =
+      (VIEW_BOX_HEIGHT - SLOT_OFFSET_MM * 2 - SLOT_SPACING_MM * 3) /
+      clientRect.height
     const scaledXOffset = (SLOT_OFFSET_MM / VIEW_BOX_WIDTH) * clientRect.width
     const scaledYOffset = (SLOT_OFFSET_MM / VIEW_BOX_HEIGHT) * clientRect.height
-    const scaledX = ((rawX - clientRect.left) * widthCoefficient) + scaledXOffset
-    const scaledY = ((rawY - clientRect.top) * heightCoefficient) + scaledYOffset
-    return {scaledX, scaledY}
+    const scaledX = (rawX - clientRect.left) * widthCoefficient + scaledXOffset
+    const scaledY = (rawY - clientRect.top) * heightCoefficient + scaledYOffset
+    return { scaledX, scaledY }
   }
-  render () {
-    const {className, LabwareComponent, DragPreviewLayer} = this.props
+  render() {
+    const { className, LabwareComponent, DragPreviewLayer } = this.props
 
     return (
       // TODO(mc, 2018-07-16): is this viewBox in mm?
@@ -59,8 +65,11 @@ export default class Deck extends React.Component<Props> {
         <DeckOutline />
         {/* All containers */}
         <g
-          ref={ref => { this.parentRef = ref }}
-          transform={`translate(${SLOT_OFFSET_MM} ${SLOT_OFFSET_MM})`}>
+          ref={ref => {
+            this.parentRef = ref
+          }}
+          transform={`translate(${SLOT_OFFSET_MM} ${SLOT_OFFSET_MM})`}
+        >
           {renderLabware(LabwareComponent)}
         </g>
         {DragPreviewLayer && <DragPreviewLayer getXY={this.getXY} />}
@@ -69,14 +78,18 @@ export default class Deck extends React.Component<Props> {
   }
 }
 
-function renderLabware (LabwareComponent): React.Node[] {
+function renderLabware(LabwareComponent): React.Node[] {
   return flatMap(
     SLOTNAME_MATRIX,
     (columns: Array<DeckSlot>, row: number): React.Node[] => {
       return columns.map((slot: DeckSlot, col: number) => {
         if (slot === TRASH_SLOTNAME) return null
 
-        const props = {slot, width: SLOT_RENDER_WIDTH, height: SLOT_RENDER_HEIGHT}
+        const props = {
+          slot,
+          width: SLOT_RENDER_WIDTH,
+          height: SLOT_RENDER_HEIGHT,
+        }
         const transform = `translate(${[
           SLOT_RENDER_WIDTH * col + SLOT_SPACING_MM * (col + 1),
           SLOT_RENDER_HEIGHT * row + SLOT_SPACING_MM * (row + 1),
@@ -85,11 +98,10 @@ function renderLabware (LabwareComponent): React.Node[] {
         return (
           <g key={slot} transform={transform}>
             <EmptyDeckSlot {...props} />
-            {LabwareComponent && (
-              <LabwareComponent {...props} />
-            )}
+            {LabwareComponent && <LabwareComponent {...props} />}
           </g>
         )
       })
-    })
+    }
+  )
 }

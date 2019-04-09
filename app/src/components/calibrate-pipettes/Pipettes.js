@@ -1,14 +1,14 @@
 // @flow
 import * as React from 'react'
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import cx from 'classnames'
 
-import type {PipettesResponse} from '../../http-api-client'
-import type {Pipette} from '../../robot'
-import {constants as robotConstants} from '../../robot'
+import type { PipettesResponse } from '../../http-api-client'
+import type { Pipette } from '../../robot'
+import { constants as robotConstants } from '../../robot'
 
-import {getPipetteModelSpecs} from '@opentrons/shared-data'
-import {InstrumentGroup, AlertItem} from '@opentrons/components'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import { InstrumentGroup, AlertItem } from '@opentrons/components'
 import styles from './styles.css'
 
 type Props = {
@@ -18,29 +18,27 @@ type Props = {
   changePipetteUrl: string,
 }
 
-const {PIPETTE_MOUNTS} = robotConstants
+const { PIPETTE_MOUNTS } = robotConstants
 const ATTACH_ALERT = 'Pipette missing'
 const CHANGE_ALERT = 'Incorrect pipette attached'
 
-export default function Pipettes (props: Props) {
-  const {currentPipette, pipettes, actualPipettes, changePipetteUrl} = props
+export default function Pipettes(props: Props) {
+  const { currentPipette, pipettes, actualPipettes, changePipetteUrl } = props
   const currentMount = currentPipette && currentPipette.mount
 
   const infoByMount = PIPETTE_MOUNTS.reduce((result, mount) => {
-    const pipette = pipettes.find((p) => p.mount === mount)
+    const pipette = pipettes.find(p => p.mount === mount)
     // TODO(mc, 2018-04-25)
-    const pipetteConfig = pipette
-      ? getPipetteModelSpecs(pipette.name)
-      : null
+    const pipetteConfig = pipette ? getPipetteModelSpecs(pipette.name) : null
 
     const isDisabled = !pipette || mount !== currentMount
     const details = !pipetteConfig
-      ? {description: 'N/A', tipType: 'N/A'}
+      ? { description: 'N/A', tipType: 'N/A' }
       : {
-        description: pipetteConfig.displayName,
-        tipType: `${pipetteConfig.maxVolume} ul`,
-        channels: pipetteConfig.channels,
-      }
+          description: pipetteConfig.displayName,
+          tipType: `${pipetteConfig.maxVolume} ul`,
+          channels: pipetteConfig.channels,
+        }
 
     const actualModel = actualPipettes && actualPipettes[mount].model
     let showAlert = false
@@ -51,7 +49,7 @@ export default function Pipettes (props: Props) {
       if (actualModel == null) {
         showAlert = true
         alertType = 'attach'
-      } else if (pipette && (pipette.name !== actualModel)) {
+      } else if (pipette && pipette.name !== actualModel) {
         showAlert = true
         alertType = 'change'
       }
@@ -60,15 +58,13 @@ export default function Pipettes (props: Props) {
     const children = showAlert && (
       <div>
         <AlertItem
-          type='warning'
+          type="warning"
           className={styles.alert}
           title={alertType === 'attach' ? ATTACH_ALERT : CHANGE_ALERT}
         />
         <p className={styles.wrong_pipette_message}>
           {'Go to the '}
-          <Link to={changePipetteUrl}>
-            robot settings
-          </Link>
+          <Link to={changePipetteUrl}>robot settings</Link>
           {` panel to ${alertType} pipette.`}
         </p>
       </div>
@@ -87,7 +83,5 @@ export default function Pipettes (props: Props) {
     }
   }, {})
 
-  return (
-    <InstrumentGroup {...infoByMount} />
-  )
+  return <InstrumentGroup {...infoByMount} />
 }

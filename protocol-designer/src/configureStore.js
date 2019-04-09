@@ -1,12 +1,13 @@
 // @flow
-import {createStore, combineReducers, applyMiddleware, compose} from 'redux'
+import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
-import {makePersistSubscriber, rehydratePersistedAction} from './persist'
-import {fileUploadMessage} from './load-file/actions'
+import { makePersistSubscriber, rehydratePersistedAction } from './persist'
+import { fileUploadMessage } from './load-file/actions'
 
-const ReselectTools = process.env.NODE_ENV === 'development' ? require('reselect-tools') : undefined
+const ReselectTools =
+  process.env.NODE_ENV === 'development' ? require('reselect-tools') : undefined
 
-function getRootReducer () {
+function getRootReducer() {
   const rootReducer: any = combineReducers({
     analytics: require('./analytics').rootReducer,
     dismiss: require('./dismiss').rootReducer,
@@ -31,11 +32,14 @@ function getRootReducer () {
         } catch (e) {
           console.error(e)
           // something in the reducers went wrong, show it to the user for bug report
-          return rootReducer(state, fileUploadMessage({
-            isError: true,
-            errorType: 'INVALID_JSON_FILE',
-            errorMessage: e.message,
-          }))
+          return rootReducer(
+            state,
+            fileUploadMessage({
+              isError: true,
+              errorType: 'INVALID_JSON_FILE',
+              errorMessage: e.message,
+            })
+          )
         }
       }
       return rootReducer(resetState, action)
@@ -45,10 +49,11 @@ function getRootReducer () {
   }
 }
 
-export default function configureStore () {
+export default function configureStore() {
   const reducer = getRootReducer()
 
-  const composeEnhancers: any = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+  const composeEnhancers: any =
+    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
   const store = createStore(
     reducer,
     /* preloadedState, */
@@ -62,7 +67,7 @@ export default function configureStore () {
   store.dispatch(rehydratePersistedAction())
   store.subscribe(makePersistSubscriber(store))
 
-  function replaceReducers () {
+  function replaceReducers() {
     const nextRootReducer = getRootReducer()
     store.replaceReducer(nextRootReducer)
   }
@@ -70,18 +75,21 @@ export default function configureStore () {
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers
     // $FlowFixMe no module.hot
-    module.hot.accept([
-      './analytics/reducers',
-      './dismiss/reducers',
-      './file-data/reducers',
-      './labware-ingred/reducers',
-      './load-file/reducers',
-      './navigation/reducers',
-      './step-forms/reducers',
-      './tutorial/reducers',
-      './ui/steps/reducers',
-      './well-selection/reducers',
-    ], replaceReducers)
+    module.hot.accept(
+      [
+        './analytics/reducers',
+        './dismiss/reducers',
+        './file-data/reducers',
+        './labware-ingred/reducers',
+        './load-file/reducers',
+        './navigation/reducers',
+        './step-forms/reducers',
+        './tutorial/reducers',
+        './ui/steps/reducers',
+        './well-selection/reducers',
+      ],
+      replaceReducers
+    )
   }
 
   return store
