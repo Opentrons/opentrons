@@ -4,7 +4,7 @@ import flatten from 'lodash/flatten'
 import range from 'lodash/range'
 import round from 'lodash/round'
 
-import labwareSchema from '../../labware-json-schema/labware-schema.json'
+import labwareSchema from '../../labware-json-schema/labwareSchemaV2.json'
 import { SLOT_WIDTH_MM, SLOT_LENGTH_MM } from '../constants'
 import assignId from './assignId'
 import {
