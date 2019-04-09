@@ -59,6 +59,20 @@ If you're looking for something to work on, especially for a first contribution,
 
 ## Commit Guidelines
 
+### Before you commit
+
+Before you're ready to make a commit, you should do you best to make sure that:
+
+- All tests are passing
+  - `make test`
+  - See [Testing](#Testing) section for more details
+- All code quality checks are passing
+  - `make format lint`
+  - See [Code quality](#Code-quality) section for more details
+  - Especially consider [setting up your code editor](#Editor-setup) to run formatting and quality checks automatically as you code
+
+### Making your commit
+
 Good commit messages are essential to keeping an organized and readable Git history. A readable Git history makes our lives easier when doing necessary work like writing changelogs or tracking down regressions. Please read [How to Write a Git Commit Message][commit-message-how-to] by Chris Beams and then come back here. These selected guidelines (copied and pasted from that article) are a very good starting point to think about when writing your commit message:
 
 1.  Separate subject from body with a blank line
@@ -161,20 +175,37 @@ make install
 
 In addition, if (and only if) you want to build a PDF version of the Opentrons API documentation, you must install a latex distribution that includes a callable pdflatex. If that is installed, you can do `make -C api docs-pdf`.
 
-### Testing and Linting
+### Testing
 
-You can test with:
+We use:
+
+- [pytest][] to test Python
+- [Jest][jest] to test JavaScript
+  - To run tests in watch mode, you should also install [watchman][]
+
+You can tests with:
 
 ```shell
 # run all tests
 make test
 
-# run a specific project's tests
-make -C api test
-make -C update-server test
-make -C components test
-make -C protocol-designer test
-make -C app test
+# run tests per language
+make test-py
+make test-js
+```
+
+You can pass some options to the JavaScript tests:
+
+```shell
+# run JavaScript tests in watch mode
+make test-js watch=true
+
+# disable test coverage
+make test-js cover=false
+
+# update snapshot tests
+# https://jestjs.io/docs/en/snapshot-testing
+make test-js updateSnapshot=true
 ```
 
 And you can run code linting / typechecking with:
@@ -189,6 +220,69 @@ make lint-js
 make lint-css
 make check-js
 ```
+
+[pytest]: https://docs.pytest.org/en/latest/
+[jest]: https://jestjs.io/
+[watchman]: https://facebook.github.io/watchman/
+
+### Code quality
+
+To help maintain code quality and maintainability, we use a collection of tools that can be roughly sorted into the following categories (with some overlaps):
+
+- [Linters][lint]
+  - Analyze the code for various potential bugs and errors
+  - [Pylama][pylama] - Python code audit tool
+  - [ESLint][eslint] - JavsScript/JSON linter
+  - [stylelint][] - CSS linter
+- [Typecheckers][type-check]
+  - Verify that the code is [type safe][type-safe]
+  - [mypy][] - Static type checker for Python
+  - [Flow][flow] - Static type checker for JavaScript
+- Formatters
+  - (Re)format source code to adhere to a consistent [style][code-style]
+  - [Prettier][prettier] - Code formatter for JavaScript, JSON, Markdown, and YAML
+
+These tools can be run with the following commands:
+
+```shell
+# lint all code and run all typechecks
+make lint
+
+# lint by language
+# note: Python linting also includes typechecking
+make lint-py
+make lint-js
+make lint-json
+make lint-css
+
+# typecheck JavaScript code
+make check-js
+
+# format JavaScript, JSON, Markdown, and YAML
+make format
+```
+
+#### Editor setup
+
+Most, if not all, of the tools above have plugins available for your code editor that will run quality checks and formatting as you write and/or save. We **highly recommend** setting up your editor to format and check your code automatically.
+
+- Pylama - Search your editor's package manager
+- ESLint - <https://eslint.org/docs/user-guide/integrations#editors>
+- stylelint - <https://stylelint.io/user-guide/complementary-tools/#editor-plugins>
+- mypy - Search your editor's package manager
+- Flow - <https://flow.org/en/docs/editors/>
+- Prettier - <https://prettier.io/docs/en/editors.html>
+
+[lint]: https://en.wikipedia.org/wiki/Lint_(software)
+[type-check]: https://en.wikipedia.org/wiki/Type_system#Type_checking
+[type-safe]: https://en.wikipedia.org/wiki/Type_safety
+[code-style]: https://en.wikipedia.org/wiki/Programming_style
+[eslint]: https://eslint.org/
+[pylama]: https://github.com/klen/pylama
+[stylelint]: https://stylelint.io/
+[flow]: https://flow.org/
+[mypy]: http://mypy-lang.org/
+[prettier]: https://prettier.io/
 
 ### Opentrons API
 
