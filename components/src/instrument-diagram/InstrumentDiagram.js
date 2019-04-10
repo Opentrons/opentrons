@@ -9,11 +9,9 @@ type Props = {
   className?: string,
 }
 
-export default function InstrumentDiagram (props: Props) {
-  const {channels} = props
-  const imgSrc = channels === 1
-    ? singleSrc
-    : multiSrc
+export default function InstrumentDiagram(props: Props) {
+  const { channels } = props
+  const imgSrc = channels === 1 ? singleSrc : multiSrc
 
   return (
     <div className={props.className}>

@@ -2,11 +2,11 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import {getModuleDisplayName, type ModuleType} from '@opentrons/shared-data'
+import { getModuleDisplayName, type ModuleType } from '@opentrons/shared-data'
 
-import {Icon} from '../icons'
+import { Icon } from '../icons'
 import LabwareContainer from './LabwareContainer'
-import {CenteredTextSvg} from '../CenteredTextSvg'
+import { CenteredTextSvg } from '../CenteredTextSvg'
 import styles from './Module.css'
 
 export type Props = {
@@ -23,7 +23,7 @@ const DIMENSIONS = {
   height: 90.5,
 }
 
-export default function Module (props: Props) {
+export default function Module(props: Props) {
   return (
     <LabwareContainer {...DIMENSIONS}>
       <rect
@@ -39,9 +39,9 @@ export default function Module (props: Props) {
   )
 }
 
-function ModuleItemContents (props: Props) {
+function ModuleItemContents(props: Props) {
   // TODO(mc, 2018-07-23): displayName?
-  const {mode, name} = props
+  const { mode, name } = props
   const displayName = getModuleDisplayName(name)
 
   if (!mode || mode === 'default') {

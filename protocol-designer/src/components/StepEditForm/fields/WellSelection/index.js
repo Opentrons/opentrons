@@ -1,14 +1,14 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import WellSelectionInput from './WellSelectionInput'
-import {selectors as stepFormSelectors} from '../../../../step-forms'
-import {getFieldErrors} from '../../../../steplist/fieldLevel'
-import {getDisabledFields} from '../../../../steplist/formLevel'
-import type {BaseState, ThunkDispatch} from '../../../../types'
-import type {StepFieldName} from '../../../../form-types'
-import type {FocusHandlers} from '../../types'
-import {showFieldErrors} from '../FieldConnector'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { getFieldErrors } from '../../../../steplist/fieldLevel'
+import { getDisabledFields } from '../../../../steplist/formLevel'
+import type { BaseState, ThunkDispatch } from '../../../../types'
+import type { StepFieldName } from '../../../../form-types'
+import type { FocusHandlers } from '../../types'
+import { showFieldErrors } from '../FieldConnector'
 
 type Props = React.ElementProps<typeof WellSelectionInput>
 
@@ -35,10 +35,13 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const formData = stepFormSelectors.getUnsavedForm(state)
   const pipetteId = formData && formData[ownProps.pipetteFieldName]
   const selectedWells = formData ? formData[ownProps.name] : []
-  const disabled = formData ? getDisabledFields(formData).has(ownProps.name) : false
+  const disabled = formData
+    ? getDisabledFields(formData).has(ownProps.name)
+    : false
 
-  const pipette = pipetteId && stepFormSelectors.getPipetteEntities(state)[pipetteId]
-  const isMulti = pipette ? (pipette.spec.channels > 1) : false
+  const pipette =
+    pipetteId && stepFormSelectors.getPipetteEntities(state)[pipetteId]
+  const isMulti = pipette ? pipette.spec.channels > 1 : false
 
   return {
     disabled,
@@ -50,14 +53,20 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-function mergeProps (
+function mergeProps(
   stateProps: SP,
-  dispatchProps: {dispatch: ThunkDispatch<*>},
+  dispatchProps: { dispatch: ThunkDispatch<*> },
   ownProps: OP
 ): Props {
-  const {_pipetteId, _selectedLabwareId, _wellFieldErrors} = stateProps
-  const {name, focusedField, dirtyFields, onFieldBlur, onFieldFocus} = ownProps
-  const showErrors = showFieldErrors({name, focusedField, dirtyFields})
+  const { _pipetteId, _selectedLabwareId, _wellFieldErrors } = stateProps
+  const {
+    name,
+    focusedField,
+    dirtyFields,
+    onFieldBlur,
+    onFieldFocus,
+  } = ownProps
+  const showErrors = showFieldErrors({ name, focusedField, dirtyFields })
 
   return {
     name,
@@ -72,4 +81,8 @@ function mergeProps (
   }
 }
 
-export default connect(mapStateToProps, null, mergeProps)(WellSelectionInput)
+export default connect(
+  mapStateToProps,
+  null,
+  mergeProps
+)(WellSelectionInput)

@@ -2,12 +2,19 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import * as errorCreators from '../../errorCreators'
-import {getPipetteWithTipMaxVol} from '../../robotStateSelectors'
-import type {DistributeArgs, RobotState, CommandCreator, CompoundCommandCreator} from '../../types'
-import {aspirate, dispense, blowout, replaceTip, touchTip} from '../atomic'
-import {mixUtil} from './mix'
+import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
+import type {
+  DistributeArgs,
+  RobotState,
+  CommandCreator,
+  CompoundCommandCreator,
+} from '../../types'
+import { aspirate, dispense, blowout, replaceTip, touchTip } from '../atomic'
+import { mixUtil } from './mix'
 
-const distribute = (args: DistributeArgs): CompoundCommandCreator => (prevRobotState: RobotState) => {
+const distribute = (args: DistributeArgs): CompoundCommandCreator => (
+  prevRobotState: RobotState
+) => {
   /**
     Distribute will aspirate from a single source well into multiple destination wells.
 
@@ -30,9 +37,16 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (prevRobotS
   const pipetteData = prevRobotState.pipettes[args.pipette]
   if (!pipetteData) {
     // bail out before doing anything else
-    return [(_robotState) => ({
-      errors: [errorCreators.pipetteDoesNotExist({actionName, pipette: args.pipette})],
-    })]
+    return [
+      _robotState => ({
+        errors: [
+          errorCreators.pipetteDoesNotExist({
+            actionName,
+            pipette: args.pipette,
+          }),
+        ],
+      }),
+    ]
   }
 
   const {
@@ -43,39 +57,51 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (prevRobotS
   } = args
 
   // TODO error on negative args.disposalVolume?
-  const disposalVolume = (args.disposalVolume && args.disposalVolume > 0)
-    ? args.disposalVolume
-    : 0
+  const disposalVolume =
+    args.disposalVolume && args.disposalVolume > 0 ? args.disposalVolume : 0
 
   const maxVolume = getPipetteWithTipMaxVol(args.pipette, prevRobotState)
   const maxWellsPerChunk = Math.floor(
     (maxVolume - disposalVolume) / args.volume
   )
 
-  const {pipette} = args
+  const { pipette } = args
 
   if (maxWellsPerChunk === 0) {
     // distribute vol exceeds pipette vol
-    return [(_robotState) => ({
-      errors: [errorCreators.pipetteVolumeExceeded({actionName, volume: args.volume, maxVolume, disposalVolume})],
-    })]
+    return [
+      _robotState => ({
+        errors: [
+          errorCreators.pipetteVolumeExceeded({
+            actionName,
+            volume: args.volume,
+            maxVolume,
+            disposalVolume,
+          }),
+        ],
+      }),
+    ]
   }
 
   const commandCreators = flatMap(
     chunk(args.destWells, maxWellsPerChunk),
-    (destWellChunk: Array<string>, chunkIndex: number): Array<CommandCreator> => {
+    (
+      destWellChunk: Array<string>,
+      chunkIndex: number
+    ): Array<CommandCreator> => {
       const dispenseCommands = flatMap(
         destWellChunk,
         (destWell: string, wellIndex: number): Array<CommandCreator> => {
           const touchTipAfterDispenseCommand = args.touchTipAfterDispense
             ? [
-              touchTip({
-                pipette,
-                labware: args.destLabware,
-                well: destWell,
-                offsetFromBottomMm: args.touchTipAfterDispenseOffsetMmFromBottom,
-              }),
-            ]
+                touchTip({
+                  pipette,
+                  labware: args.destLabware,
+                  well: destWell,
+                  offsetFromBottomMm:
+                    args.touchTipAfterDispenseOffsetMmFromBottom,
+                }),
+              ]
             : []
 
           return [
@@ -89,7 +115,8 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (prevRobotS
             }),
             ...touchTipAfterDispenseCommand,
           ]
-        })
+        }
+      )
 
       // NOTE: identical to consolidate
       let tipCommands: Array<CommandCreator> = []
@@ -104,36 +131,38 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (prevRobotS
       // TODO: BC 2018-11-29 instead of disposalLabware and disposalWell use blowoutLocation
       let blowoutCommands = []
       if (args.disposalVolume && args.disposalLabware && args.disposalWell) {
-        blowoutCommands = [blowout({
-          pipette: args.pipette,
-          labware: args.disposalLabware,
-          well: args.disposalWell,
-        })]
+        blowoutCommands = [
+          blowout({
+            pipette: args.pipette,
+            labware: args.disposalLabware,
+            well: args.disposalWell,
+          }),
+        ]
       }
 
       const touchTipAfterAspirateCommand = args.touchTipAfterAspirate
         ? [
-          touchTip({
+            touchTip({
+              pipette: args.pipette,
+              labware: args.sourceLabware,
+              well: args.sourceWell,
+              offsetFromBottomMm: args.touchTipAfterAspirateOffsetMmFromBottom,
+            }),
+          ]
+        : []
+
+      const mixBeforeAspirateCommands = args.mixBeforeAspirate
+        ? mixUtil({
             pipette: args.pipette,
             labware: args.sourceLabware,
             well: args.sourceWell,
-            offsetFromBottomMm: args.touchTipAfterAspirateOffsetMmFromBottom,
-          }),
-        ]
-        : []
-
-      const mixBeforeAspirateCommands = (args.mixBeforeAspirate)
-        ? mixUtil({
-          pipette: args.pipette,
-          labware: args.sourceLabware,
-          well: args.sourceWell,
-          volume: args.mixBeforeAspirate.volume,
-          times: args.mixBeforeAspirate.times,
-          aspirateOffsetFromBottomMm,
-          dispenseOffsetFromBottomMm,
-          aspirateFlowRateUlSec,
-          dispenseFlowRateUlSec,
-        })
+            volume: args.mixBeforeAspirate.volume,
+            times: args.mixBeforeAspirate.times,
+            aspirateOffsetFromBottomMm,
+            dispenseOffsetFromBottomMm,
+            aspirateFlowRateUlSec,
+            dispenseFlowRateUlSec,
+          })
         : []
 
       return [

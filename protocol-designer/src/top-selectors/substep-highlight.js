@@ -1,37 +1,39 @@
 // @flow
-import {createSelector} from 'reselect'
-import {computeWellAccess} from '@opentrons/shared-data'
+import { createSelector } from 'reselect'
+import { computeWellAccess } from '@opentrons/shared-data'
 
 import mapValues from 'lodash/mapValues'
 
-import {allSubsteps} from './substeps'
+import { allSubsteps } from './substeps'
 import * as StepGeneration from '../step-generation'
-import {selectors as stepFormSelectors} from '../step-forms'
-import {selectors as fileDataSelectors} from '../file-data'
-import {selectors as stepsSelectors} from '../ui/steps'
+import { selectors as stepFormSelectors } from '../step-forms'
+import { selectors as fileDataSelectors } from '../file-data'
+import { selectors as stepsSelectors } from '../ui/steps'
 
-import type {Selector} from '../types'
-import type {SubstepItemData} from '../steplist/types'
+import type { Selector } from '../types'
+import type { SubstepItemData } from '../steplist/types'
 
-type AllWellHighlights = {[wellName: string]: true} // NOTE: all keys are true. There's a TODO in HighlightableLabware.js about making this a Set of well strings
-type AllWellHighlightsAllLabware = {[labwareId: string]: AllWellHighlights}
+type AllWellHighlights = { [wellName: string]: true } // NOTE: all keys are true. There's a TODO in HighlightableLabware.js about making this a Set of well strings
+type AllWellHighlightsAllLabware = { [labwareId: string]: AllWellHighlights }
 
-function _wellsForPipette (pipetteChannels: 1 | 8, labwareType: string, wells: Array<string>): Array<string> {
+function _wellsForPipette(
+  pipetteChannels: 1 | 8,
+  labwareType: string,
+  wells: Array<string>
+): Array<string> {
   // `wells` is all the wells that pipette's channel 1 interacts with.
   if (pipetteChannels === 8) {
     return wells.reduce((acc, well) => {
       const setOfWellsForMulti = computeWellAccess(labwareType, well)
 
-      return setOfWellsForMulti
-        ? [...acc, ...setOfWellsForMulti]
-        : acc // setOfWellsForMulti is null
+      return setOfWellsForMulti ? [...acc, ...setOfWellsForMulti] : acc // setOfWellsForMulti is null
     }, [])
   }
   // single-channel
   return wells
 }
 
-function _getSelectedWellsForStep (
+function _getSelectedWellsForStep(
   stepArgs: StepGeneration.CommandCreatorArgs,
   labwareId: string,
   robotState: StepGeneration.RobotState
@@ -86,7 +88,7 @@ function _getSelectedWellsForStep (
 }
 
 /** Scan through given substep rows to get a list of source/dest wells for the given labware */
-function _getSelectedWellsForSubstep (
+function _getSelectedWellsForSubstep(
   stepArgs: StepGeneration.CommandCreatorArgs,
   labwareId: string,
   substeps: ?SubstepItemData,
@@ -97,7 +99,7 @@ function _getSelectedWellsForSubstep (
   }
 
   // TODO: Ian 2018-10-01 proper type for wellField enum
-  function getWells (wellField: 'source' | 'dest'): Array<string> {
+  function getWells(wellField: 'source' | 'dest'): Array<string> {
     // ignore substeps with no well fields
     // TODO: Ian 2019-01-29 be more explicit about commandCreatorFnName,
     // don't rely so heavily on the fact that their well fields are the same now
@@ -105,14 +107,14 @@ function _getSelectedWellsForSubstep (
     if (substeps.rows && substeps.rows[substepIndex]) {
       // single-channel
       const wellData = substeps.rows[substepIndex][wellField]
-      return (wellData && wellData.well) ? [wellData.well] : []
+      return wellData && wellData.well ? [wellData.well] : []
     }
 
     if (substeps.multiRows && substeps.multiRows[substepIndex]) {
       // multi-channel
       return substeps.multiRows[substepIndex].reduce((acc, multiRow) => {
         const wellData = multiRow[wellField]
-        return (wellData && wellData.well) ? [...acc, wellData.well] : acc
+        return wellData && wellData.well ? [...acc, wellData.well] : acc
       }, [])
     }
     return []
@@ -121,7 +123,11 @@ function _getSelectedWellsForSubstep (
   let wells: Array<string> = []
 
   // single-labware steps
-  if (stepArgs.commandCreatorFnName === 'mix' && stepArgs.labware && stepArgs.labware === labwareId) {
+  if (
+    stepArgs.commandCreatorFnName === 'mix' &&
+    stepArgs.labware &&
+    stepArgs.labware === labwareId
+  ) {
     return getWells('source')
   }
 
@@ -145,13 +151,23 @@ export const wellHighlightsByLabwareId: Selector<AllWellHighlightsAllLabware> = 
   stepsSelectors.getHoveredSubstep,
   allSubsteps,
   stepFormSelectors.getOrderedStepIds,
-  (robotStateTimeline, allStepArgsAndErrors, hoveredStepId, hoveredSubstep, allSubsteps, orderedStepIds) => {
+  (
+    robotStateTimeline,
+    allStepArgsAndErrors,
+    hoveredStepId,
+    hoveredSubstep,
+    allSubsteps,
+    orderedStepIds
+  ) => {
     const timeline = robotStateTimeline.timeline
     const stepId = hoveredStepId
     const timelineIndex = orderedStepIds.findIndex(i => i === stepId)
     const frame = timeline[timelineIndex]
     const robotState = frame && frame.robotState
-    const stepArgs = stepId != null && allStepArgsAndErrors[stepId] && allStepArgsAndErrors[stepId].stepArgs
+    const stepArgs =
+      stepId != null &&
+      allStepArgsAndErrors[stepId] &&
+      allStepArgsAndErrors[stepId].stepArgs
 
     if (!robotState || stepId == null || !stepArgs) {
       // nothing hovered, or no stepArgs for step
@@ -161,7 +177,10 @@ export const wellHighlightsByLabwareId: Selector<AllWellHighlightsAllLabware> = 
     // replace value of each labware with highlighted wells info
     return mapValues(
       robotState.liquidState.labware,
-      (labwareLiquids: StepGeneration.SingleLabwareLiquidState, labwareId: string): AllWellHighlights => {
+      (
+        labwareLiquids: StepGeneration.SingleLabwareLiquidState,
+        labwareId: string
+      ): AllWellHighlights => {
         let selectedWells: Array<string> = []
         if (hoveredSubstep != null) {
           // wells for hovered substep
@@ -173,12 +192,18 @@ export const wellHighlightsByLabwareId: Selector<AllWellHighlightsAllLabware> = 
           )
         } else {
           // wells for step overall
-          selectedWells = _getSelectedWellsForStep(stepArgs, labwareId, robotState)
+          selectedWells = _getSelectedWellsForStep(
+            stepArgs,
+            labwareId,
+            robotState
+          )
         }
 
         // return selected wells eg {A1: true, B4: true}
-        return selectedWells.reduce((acc: AllWellHighlights, well) =>
-          ({...acc, [well]: true}), {})
+        return selectedWells.reduce(
+          (acc: AllWellHighlights, well) => ({ ...acc, [well]: true }),
+          {}
+        )
       }
     )
   }

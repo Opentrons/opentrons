@@ -1,76 +1,76 @@
 {
-    "magdeck": {
-        "labwareOffset": {
-            "x": 0.125,
-            "y": -0.125,
-            "z": 82.25
-        },
-        "dimensions": {
-            "bareOverallHeight": 110.152,
-            "overLabwareHeight": 4.052
-        },
-        "calibrationPoint": {
-            "x": 124.875,
-            "y": 2.75
-        },
-        "displayName": "Magnetic Module",
-        "loadName": "magdeck",
-        "quirks": []
+  "magdeck": {
+    "labwareOffset": {
+      "x": 0.125,
+      "y": -0.125,
+      "z": 82.25
     },
-    "tempdeck": {
-        "labwareOffset": {
-            "x": -0.15,
-            "y": -0.15,
-            "z": 80.09
-        },
-        "dimensions": {
-            "bareOverallHeight": 84,
-            "overLabwareHeight": 0
-        },
-        "calibrationPoint": {
-            "x": 12.0,
-            "y":8.75
-        },
-        "displayName": "Temperature Module",
-        "loadName": "tempdeck",
-        "quirks": []
+    "dimensions": {
+      "bareOverallHeight": 110.152,
+      "overLabwareHeight": 4.052
     },
-    "thermocycler": {
-        "labwareOffset": {
-            "x": -0.02,
-            "y": -9.3,
-            "z": 103.44
-        },
-        "dimensions": {
-            "bareOverallHeight": 98.0,
-            "overLabwareHeight": 0.0,
-            "lidHeight": 37.7
-        },
-        "calibrationPoint": {
-            "x": 14.4,
-            "y": 64.93
-        },
-        "displayName": "Full Plate Thermocycler Module",
-        "loadName": "thermocycler",
-        "quirks": []
+    "calibrationPoint": {
+      "x": 124.875,
+      "y": 2.75
     },
-    "semithermocycler": {
-        "labwareOffset": {
-            "x": -0.02,
-            "y": -4.47,
-            "z": 103.44
-        },
-        "dimensions": {
-            "bareOverallHeight": 98.0,
-            "overLabwareHeight": 0.0,
-            "lidHeight": 37.7
-        },
-        "calibrationPoint": {
-          "x": 20.78,
-          "y": 20.55
-        },
-        "displayName": "Semi-Plate Thermocycler Module",
-        "loadName": "semithermocycler",
-        "quirks": []
-    }
+    "displayName": "Magnetic Module",
+    "loadName": "magdeck",
+    "quirks": []
+  },
+  "tempdeck": {
+    "labwareOffset": {
+      "x": -0.15,
+      "y": -0.15,
+      "z": 80.09
+    },
+    "dimensions": {
+      "bareOverallHeight": 84,
+      "overLabwareHeight": 0
+    },
+    "calibrationPoint": {
+      "x": 12.0,
+      "y": 8.75
+    },
+    "displayName": "Temperature Module",
+    "loadName": "tempdeck",
+    "quirks": []
+  },
+  "thermocycler": {
+    "labwareOffset": {
+      "x": -0.02,
+      "y": -9.3,
+      "z": 103.44
+    },
+    "dimensions": {
+      "bareOverallHeight": 98.0,
+      "overLabwareHeight": 0.0,
+      "lidHeight": 37.7
+    },
+    "calibrationPoint": {
+      "x": 14.4,
+      "y": 64.93
+    },
+    "displayName": "Full Plate Thermocycler Module",
+    "loadName": "thermocycler",
+    "quirks": []
+  },
+  "semithermocycler": {
+    "labwareOffset": {
+      "x": -0.02,
+      "y": -4.47,
+      "z": 103.44
+    },
+    "dimensions": {
+      "bareOverallHeight": 98.0,
+      "overLabwareHeight": 0.0,
+      "lidHeight": 37.7
+    },
+    "calibrationPoint": {
+      "x": 20.78,
+      "y": 20.55
+    },
+    "displayName": "Semi-Plate Thermocycler Module",
+    "loadName": "semithermocycler",
+    "quirks": []
+  }
 }

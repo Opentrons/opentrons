@@ -1,7 +1,7 @@
 // @flow
 import mapValues from 'lodash/mapValues'
 import pick from 'lodash/pick'
-import type {StepIdType} from '../../form-types'
+import type { StepIdType } from '../../form-types'
 
 export type CreatePipettesAction = {
   type: 'CREATE_PIPETTES',
@@ -13,9 +13,13 @@ export type CreatePipettesAction = {
   },
 }
 
-export const createPipettes = (arg: $PropertyType<CreatePipettesAction, 'payload'>): CreatePipettesAction => {
+export const createPipettes = (
+  arg: $PropertyType<CreatePipettesAction, 'payload'>
+): CreatePipettesAction => {
   // for convenience of caller, strip out 'mount' etc
-  const payload = mapValues(arg, (pipette) => pick(pipette, ['name', 'tiprackModel']))
+  const payload = mapValues(arg, pipette =>
+    pick(pipette, ['name', 'tiprackModel'])
+  )
   return {
     type: 'CREATE_PIPETTES',
     payload,
@@ -27,7 +31,9 @@ export type DeletePipettesAction = {
   payload: Array<string>, // pipette ids to delete, order doesn't matter
 }
 
-export const deletePipettes = (payload: $PropertyType<DeletePipettesAction, 'payload'>): DeletePipettesAction => ({
+export const deletePipettes = (
+  payload: $PropertyType<DeletePipettesAction, 'payload'>
+): DeletePipettesAction => ({
   type: 'DELETE_PIPETTES',
   payload,
 })
@@ -40,7 +46,7 @@ export type SubstituteStepFormPipettesAction = {
     endStepId: StepIdType,
 
     // old pipette id -> new id
-    substitutionMap: {[oldPipetteId: string]: string},
+    substitutionMap: { [oldPipetteId: string]: string },
   },
 }
 

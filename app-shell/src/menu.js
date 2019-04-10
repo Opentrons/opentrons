@@ -1,17 +1,15 @@
 // application menu
-import {app, Menu} from 'electron'
+import { app, Menu } from 'electron'
 
 import pkg from '../package.json'
-import {getConfig} from './config'
+import { getConfig } from './config'
 
 const config = getConfig()
 
 // file or application menu
 const firstMenu = {
   label: 'File',
-  submenu: [
-    {role: 'quit'},
-  ],
+  submenu: [{ role: 'quit' }],
 }
 
 if (process.platform === 'darwin') {
@@ -19,14 +17,14 @@ if (process.platform === 'darwin') {
   Object.assign(firstMenu, {
     label: app.getName(),
     submenu: [
-      {role: 'about'},
-      {type: 'separator'},
-      {role: 'services', submenu: []},
-      {type: 'separator'},
-      {role: 'hide'},
-      {role: 'hideothers'},
-      {role: 'unhide'},
-      {type: 'separator'},
+      { role: 'about' },
+      { type: 'separator' },
+      { role: 'services', submenu: [] },
+      { type: 'separator' },
+      { role: 'hide' },
+      { role: 'hideothers' },
+      { role: 'unhide' },
+      { type: 'separator' },
       ...firstMenu.submenu,
     ],
   })
@@ -35,26 +33,24 @@ if (process.platform === 'darwin') {
 const editMenu = {
   label: 'Edit',
   submenu: [
-    {role: 'cut'},
-    {role: 'copy'},
-    {role: 'paste'},
-    {role: 'selectall'},
+    { role: 'cut' },
+    { role: 'copy' },
+    { role: 'paste' },
+    { role: 'selectall' },
   ],
 }
 
 const viewMenu = {
   label: 'View',
-  submenu: [
-    {role: 'togglefullscreen'},
-  ],
+  submenu: [{ role: 'togglefullscreen' }],
 }
 
 if (config.devtools) {
   Object.assign(viewMenu, {
     submenu: [
-      {role: 'reload'},
-      {role: 'forcereload'},
-      {type: 'separator'},
+      { role: 'reload' },
+      { role: 'forcereload' },
+      { type: 'separator' },
       ...viewMenu.submenu,
     ],
   })
@@ -62,11 +58,7 @@ if (config.devtools) {
 
 const windowMenu = {
   role: 'window',
-  submenu: [
-    {role: 'minimize'},
-    {type: 'separator'},
-    {role: 'front'},
-  ],
+  submenu: [{ role: 'minimize' }, { type: 'separator' }, { role: 'front' }],
 }
 
 const helpMenu = {
@@ -89,6 +81,6 @@ const helpMenu = {
 
 const template = [firstMenu, editMenu, viewMenu, windowMenu, helpMenu]
 
-export default function initializeMenu () {
+export default function initializeMenu() {
   Menu.setApplicationMenu(Menu.buildFromTemplate(template))
 }

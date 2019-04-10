@@ -1,17 +1,17 @@
 // @flow
 import * as React from 'react'
-import {IconButton} from '@opentrons/components'
+import { IconButton } from '@opentrons/components'
 import styles from './styles.css'
 
 type Props = {
   field: any,
   form: any,
-  inputRef: {current: null | HTMLInputElement},
+  inputRef: { current: null | HTMLInputElement },
 }
-export default function IpField (props: Props) {
+export default function IpField(props: Props) {
   const {
     field,
-    form: {submitForm, dirty},
+    form: { submitForm, dirty },
     inputRef,
   } = props
 

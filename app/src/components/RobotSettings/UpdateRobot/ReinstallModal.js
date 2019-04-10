@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react'
-import {Link} from 'react-router-dom'
-import {AlertModal} from '@opentrons/components'
+import { Link } from 'react-router-dom'
+import { AlertModal } from '@opentrons/components'
 import VersionList from './VersionList'
-import type {VersionProps} from './types'
+import type { VersionProps } from './types'
 import styles from './styles.css'
 
 type Props = {
@@ -16,14 +16,14 @@ const HEADING = 'Robot Server is up to date'
 const REINSTALL_MESSAGE =
   "It looks like your robot is already up to date, but if you're experiencing issues you can re-apply the latest update."
 
-export default function ReinstallModal (props: Props) {
-  const {parentUrl, update, versionProps} = props
+export default function ReinstallModal(props: Props) {
+  const { parentUrl, update, versionProps } = props
   return (
     <AlertModal
       heading={HEADING}
       buttons={[
-        {Component: Link, to: parentUrl, children: 'not now'},
-        {onClick: update, children: 'Reinstall'},
+        { Component: Link, to: parentUrl, children: 'not now' },
+        { onClick: update, children: 'Reinstall' },
       ]}
       alertOverlay
     >

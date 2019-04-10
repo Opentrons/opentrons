@@ -1,5 +1,5 @@
 // @flow
-import {expectTimelineError} from './testMatchers'
+import { expectTimelineError } from './testMatchers'
 import _aspirate from '../commandCreators/atomic/aspirate'
 import {
   createRobotState,
@@ -21,7 +21,9 @@ const mockRobotStateAndWarningsReturnValue = {
 
 beforeEach(() => {
   // $FlowFixMe
-  getNextRobotStateAndWarnings.mockReturnValue(mockRobotStateAndWarningsReturnValue)
+  getNextRobotStateAndWarnings.mockReturnValue(
+    mockRobotStateAndWarningsReturnValue
+  )
 })
 
 describe('aspirate', () => {
@@ -80,16 +82,18 @@ describe('aspirate', () => {
           ...testCase.args,
         })(robotStateWithTip)
 
-        expect(result.commands).toEqual([{
-          command: 'aspirate',
-          params: {
-            pipette: 'p300SingleId',
-            volume: 50,
-            labware: 'sourcePlateId',
-            well: 'A1',
-            ...(testCase.expectInParams ? testCase.args : {}),
+        expect(result.commands).toEqual([
+          {
+            command: 'aspirate',
+            params: {
+              pipette: 'p300SingleId',
+              volume: 50,
+              labware: 'sourcePlateId',
+              well: 'A1',
+              ...(testCase.expectInParams ? testCase.args : {}),
+            },
           },
-        }])
+        ])
       })
     })
   })
@@ -174,9 +178,16 @@ describe('aspirate', () => {
       }
       const result = aspirate(args)(robotStateWithTip)
 
-      expect(getNextRobotStateAndWarnings).toHaveBeenCalledWith(result.commands[0], robotStateWithTip)
-      expect(result.robotState).toBe(mockRobotStateAndWarningsReturnValue.robotState)
-      expect(result.warnings).toBe(mockRobotStateAndWarningsReturnValue.warnings)
+      expect(getNextRobotStateAndWarnings).toHaveBeenCalledWith(
+        result.commands[0],
+        robotStateWithTip
+      )
+      expect(result.robotState).toBe(
+        mockRobotStateAndWarningsReturnValue.robotState
+      )
+      expect(result.warnings).toBe(
+        mockRobotStateAndWarningsReturnValue.warnings
+      )
     })
   })
 })

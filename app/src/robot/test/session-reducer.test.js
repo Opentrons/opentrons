@@ -1,5 +1,5 @@
 // session reducer tests
-import {reducer, actionTypes} from '../'
+import { reducer, actionTypes } from '../'
 
 describe('robot reducer - session', () => {
   const now = Date.now()
@@ -14,7 +14,7 @@ describe('robot reducer - session', () => {
 
     expect(state.session).toEqual({
       // loading a protocol
-      sessionRequest: {inProgress: false, error: null},
+      sessionRequest: { inProgress: false, error: null },
       state: '',
       errors: [],
       protocolCommands: [],
@@ -26,10 +26,10 @@ describe('robot reducer - session', () => {
       modulesBySlot: {},
 
       // running a protocol
-      runRequest: {inProgress: false, error: null},
-      pauseRequest: {inProgress: false, error: null},
-      resumeRequest: {inProgress: false, error: null},
-      cancelRequest: {inProgress: false, error: null},
+      runRequest: { inProgress: false, error: null },
+      pauseRequest: { inProgress: false, error: null },
+      resumeRequest: { inProgress: false, error: null },
+      cancelRequest: { inProgress: false, error: null },
       startTime: null,
       runTime: 0,
     })
@@ -37,8 +37,8 @@ describe('robot reducer - session', () => {
 
   test('handles DISCONNECT_RESPONSE success', () => {
     const expected = reducer(undefined, {}).session
-    const state = {session: {dummy: 'state'}}
-    const action = {type: 'robot:DISCONNECT_RESPONSE', payload: {}}
+    const state = { session: { dummy: 'state' } }
+    const action = { type: 'robot:DISCONNECT_RESPONSE', payload: {} }
 
     expect(reducer(state, action).session).toEqual(expected)
   })
@@ -47,7 +47,7 @@ describe('robot reducer - session', () => {
     const initialState = reducer(undefined, {}).session
     const state = {
       session: {
-        sessionRequest: {inProgress: false, error: new Error('AH')},
+        sessionRequest: { inProgress: false, error: new Error('AH') },
         startTime: 40,
         runTime: 42,
       },
@@ -59,22 +59,22 @@ describe('robot reducer - session', () => {
 
     expect(reducer(state, action).session).toEqual({
       ...initialState,
-      sessionRequest: {inProgress: true, error: null},
+      sessionRequest: { inProgress: true, error: null },
     })
   })
 
   test('handles robot:REFRESH_SESSION action', () => {
     const state = {
       session: {
-        sessionRequest: {inProgress: false, error: null},
+        sessionRequest: { inProgress: false, error: null },
         startTime: 40,
         runTime: 42,
       },
     }
-    const action = {type: 'robot:REFRESH_SESSION'}
+    const action = { type: 'robot:REFRESH_SESSION' }
 
     expect(reducer(state, action).session).toEqual({
-      sessionRequest: {inProgress: true, error: null},
+      sessionRequest: { inProgress: true, error: null },
       startTime: null,
       runTime: 0,
     })
@@ -83,7 +83,7 @@ describe('robot reducer - session', () => {
   test('handles SESSION_RESPONSE', () => {
     const state = {
       session: {
-        sessionRequest: {inProgress: true, error: null},
+        sessionRequest: { inProgress: true, error: null },
       },
     }
     const action = {
@@ -99,7 +99,7 @@ describe('robot reducer - session', () => {
     }
 
     expect(reducer(state, action).session).toEqual({
-      sessionRequest: {inProgress: false, error: null},
+      sessionRequest: { inProgress: false, error: null },
       state: 'running',
       errors: [],
       protocolCommands: [],
@@ -110,16 +110,16 @@ describe('robot reducer - session', () => {
   test('handles SESSION_ERROR', () => {
     const state = {
       session: {
-        sessionRequest: {inProgress: true, error: null},
+        sessionRequest: { inProgress: true, error: null },
       },
     }
     const action = {
       type: 'robot:SESSION_ERROR',
-      payload: {error: new Error('AH')},
+      payload: { error: new Error('AH') },
     }
 
     expect(reducer(state, action).session).toEqual({
-      sessionRequest: {inProgress: false, error: new Error('AH')},
+      sessionRequest: { inProgress: false, error: new Error('AH') },
     })
   })
 
@@ -130,7 +130,7 @@ describe('robot reducer - session', () => {
         startTime: null,
         protocolCommands: [0, 1, 2],
         protocolCommandsById: {
-          0: {id: 0, handledAt: 2},
+          0: { id: 0, handledAt: 2 },
         },
       },
     }
@@ -139,7 +139,7 @@ describe('robot reducer - session', () => {
       payload: {
         state: 'running',
         startTime: 1,
-        lastCommand: {id: 1, handledAt: 3},
+        lastCommand: { id: 1, handledAt: 3 },
       },
     }
 
@@ -148,8 +148,8 @@ describe('robot reducer - session', () => {
       startTime: 1,
       protocolCommands: [0, 1, 2],
       protocolCommandsById: {
-        0: {id: 0, handledAt: 2},
-        1: {id: 1, handledAt: 3},
+        0: { id: 0, handledAt: 2 },
+        1: { id: 1, handledAt: 3 },
       },
     })
   })
@@ -158,28 +158,28 @@ describe('robot reducer - session', () => {
     const state = {
       session: {
         runTime: now,
-        runRequest: {inProgress: false, error: new Error('AH')},
+        runRequest: { inProgress: false, error: new Error('AH') },
       },
     }
-    const action = {type: actionTypes.RUN}
+    const action = { type: actionTypes.RUN }
 
     expect(reducer(state, action).session).toEqual({
-      runRequest: {inProgress: true, error: null},
+      runRequest: { inProgress: true, error: null },
       runTime: 0,
     })
   })
 
   test('handles RUN_RESPONSE success', () => {
-    const state = {session: {runRequest: {inProgress: true, error: null}}}
-    const action = {type: actionTypes.RUN_RESPONSE, error: false}
+    const state = { session: { runRequest: { inProgress: true, error: null } } }
+    const action = { type: actionTypes.RUN_RESPONSE, error: false }
 
     expect(reducer(state, action).session).toEqual({
-      runRequest: {inProgress: false, error: null},
+      runRequest: { inProgress: false, error: null },
     })
   })
 
   test('handles RUN_RESPONSE failure', () => {
-    const state = {session: {runRequest: {inProgress: true, error: null}}}
+    const state = { session: { runRequest: { inProgress: true, error: null } } }
     const action = {
       type: actionTypes.RUN_RESPONSE,
       error: true,
@@ -187,41 +187,45 @@ describe('robot reducer - session', () => {
     }
 
     expect(reducer(state, action).session).toEqual({
-      runRequest: {inProgress: false, error: new Error('AH')},
+      runRequest: { inProgress: false, error: new Error('AH') },
     })
   })
 
   test('handles TICK_RUN_TIME', () => {
-    const state = {session: {runTime: 0}}
-    const action = {type: actionTypes.TICK_RUN_TIME}
+    const state = { session: { runTime: 0 } }
+    const action = { type: actionTypes.TICK_RUN_TIME }
 
-    expect(reducer(state, action).session).toEqual({runTime: now})
+    expect(reducer(state, action).session).toEqual({ runTime: now })
   })
 
   test('handles PAUSE action', () => {
     const state = {
       session: {
-        pauseRequest: {inProgress: false, error: new Error('AH')},
+        pauseRequest: { inProgress: false, error: new Error('AH') },
       },
     }
-    const action = {type: actionTypes.PAUSE}
+    const action = { type: actionTypes.PAUSE }
 
     expect(reducer(state, action).session).toEqual({
-      pauseRequest: {inProgress: true, error: null},
+      pauseRequest: { inProgress: true, error: null },
     })
   })
 
   test('handles PAUSE_RESPONSE success', () => {
-    const state = {session: {pauseRequest: {inProgress: true, error: null}}}
-    const action = {type: actionTypes.PAUSE_RESPONSE, error: false}
+    const state = {
+      session: { pauseRequest: { inProgress: true, error: null } },
+    }
+    const action = { type: actionTypes.PAUSE_RESPONSE, error: false }
 
     expect(reducer(state, action).session).toEqual({
-      pauseRequest: {inProgress: false, error: null},
+      pauseRequest: { inProgress: false, error: null },
     })
   })
 
   test('handles PAUSE_RESPONSE failure', () => {
-    const state = {session: {pauseRequest: {inProgress: true, error: null}}}
+    const state = {
+      session: { pauseRequest: { inProgress: true, error: null } },
+    }
     const action = {
       type: actionTypes.PAUSE_RESPONSE,
       payload: new Error('AH'),
@@ -229,34 +233,38 @@ describe('robot reducer - session', () => {
     }
 
     expect(reducer(state, action).session).toEqual({
-      pauseRequest: {inProgress: false, error: new Error('AH')},
+      pauseRequest: { inProgress: false, error: new Error('AH') },
     })
   })
 
   test('handles RESUME action', () => {
     const state = {
       session: {
-        resumeRequest: {inProgress: false, error: new Error('AH')},
+        resumeRequest: { inProgress: false, error: new Error('AH') },
       },
     }
-    const action = {type: actionTypes.RESUME}
+    const action = { type: actionTypes.RESUME }
 
     expect(reducer(state, action).session).toEqual({
-      resumeRequest: {inProgress: true, error: null},
+      resumeRequest: { inProgress: true, error: null },
     })
   })
 
   test('handles RESUME_RESPONSE success', () => {
-    const state = {session: {resumeRequest: {inProgress: true, error: null}}}
-    const action = {type: actionTypes.RESUME_RESPONSE, error: false}
+    const state = {
+      session: { resumeRequest: { inProgress: true, error: null } },
+    }
+    const action = { type: actionTypes.RESUME_RESPONSE, error: false }
 
     expect(reducer(state, action).session).toEqual({
-      resumeRequest: {inProgress: false, error: null},
+      resumeRequest: { inProgress: false, error: null },
     })
   })
 
   test('handles RESUME_RESPONSE failure', () => {
-    const state = {session: {resumeRequest: {inProgress: true, error: null}}}
+    const state = {
+      session: { resumeRequest: { inProgress: true, error: null } },
+    }
     const action = {
       type: actionTypes.RESUME_RESPONSE,
       payload: new Error('AH'),
@@ -264,34 +272,38 @@ describe('robot reducer - session', () => {
     }
 
     expect(reducer(state, action).session).toEqual({
-      resumeRequest: {inProgress: false, error: new Error('AH')},
+      resumeRequest: { inProgress: false, error: new Error('AH') },
     })
   })
 
   test('handles CANCEL action', () => {
     const state = {
       session: {
-        cancelRequest: {inProgress: false, error: new Error('AH')},
+        cancelRequest: { inProgress: false, error: new Error('AH') },
       },
     }
-    const action = {type: actionTypes.CANCEL}
+    const action = { type: actionTypes.CANCEL }
 
     expect(reducer(state, action).session).toEqual({
-      cancelRequest: {inProgress: true, error: null},
+      cancelRequest: { inProgress: true, error: null },
     })
   })
 
   test('handles CANCEL_RESPONSE success', () => {
-    const state = {session: {cancelRequest: {inProgress: true, error: null}}}
-    const action = {type: actionTypes.CANCEL_RESPONSE, error: false}
+    const state = {
+      session: { cancelRequest: { inProgress: true, error: null } },
+    }
+    const action = { type: actionTypes.CANCEL_RESPONSE, error: false }
 
     expect(reducer(state, action).session).toEqual({
-      cancelRequest: {inProgress: false, error: null},
+      cancelRequest: { inProgress: false, error: null },
     })
   })
 
   test('handles CANCEL_RESPONSE failure', () => {
-    const state = {session: {cancelRequest: {inProgress: true, error: null}}}
+    const state = {
+      session: { cancelRequest: { inProgress: true, error: null } },
+    }
     const action = {
       type: actionTypes.CANCEL_RESPONSE,
       payload: new Error('AH'),
@@ -299,7 +311,7 @@ describe('robot reducer - session', () => {
     }
 
     expect(reducer(state, action).session).toEqual({
-      cancelRequest: {inProgress: false, error: new Error('AH')},
+      cancelRequest: { inProgress: false, error: new Error('AH') },
     })
   })
 })

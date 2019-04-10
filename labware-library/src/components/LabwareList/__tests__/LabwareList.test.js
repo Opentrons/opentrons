@@ -1,17 +1,29 @@
 // @flow
 // LabwareList tests
 import * as React from 'react'
-import {shallow} from 'enzyme'
+import { shallow } from 'enzyme'
 
 import LabwareList from '..'
 import LabwareCard from '../LabwareCard'
-import {getAllDefinitions} from '../../../definitions'
+import NoResults from '../NoResults'
+import * as definitions from '../../../definitions'
+
+import type { LabwareList as LabwareListType } from '../../../types'
 
 jest.mock('../../../definitions')
 
-const filtersOff = {category: 'all', manufacturer: 'all'}
+const getAllDefinitions: JestMockFn<
+  Array<void>,
+  LabwareListType
+> = (definitions.getAllDefinitions: any)
+
+const filtersOff = { category: 'all', manufacturer: 'all' }
 
 describe('LabwareList', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   test('component renders', () => {
     const tree = shallow(<LabwareList filters={filtersOff} />)
 
@@ -28,5 +40,14 @@ describe('LabwareList', () => {
     const tree = shallow(<LabwareList filters={filtersOff} />)
 
     expect(tree.find(LabwareCard)).toHaveLength(getAllDefinitions().length)
+  })
+
+  test('renders <NoResults> without <ul> if everything filtered out', () => {
+    getAllDefinitions.mockReturnValueOnce([])
+
+    const tree = shallow(<LabwareList filters={filtersOff} />)
+
+    expect(tree.find('ul')).toHaveLength(0)
+    expect(tree.find(NoResults)).toHaveLength(1)
   })
 })

@@ -4,7 +4,7 @@ import range from 'lodash/range'
 import mapValues from 'lodash/mapValues'
 import isEmpty from 'lodash/isEmpty'
 
-import {getPipetteNameSpecs} from '@opentrons/shared-data'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import substepTimeline from './substepTimeline'
 import {
   utils as steplistUtils,
@@ -19,15 +19,10 @@ import type {
   StepItemSourceDestRow,
 } from './types'
 
-import {
-  consolidate,
-  distribute,
-  transfer,
-  mix,
-} from '../step-generation'
+import { consolidate, distribute, transfer, mix } from '../step-generation'
 
-import type {StepIdType} from '../form-types'
-import type {RobotState} from '../step-generation'
+import type { StepIdType } from '../form-types'
+import type { RobotState } from '../step-generation'
 
 import type {
   ConsolidateArgs,
@@ -36,37 +31,39 @@ import type {
   DelayArgs,
   TransferArgs,
 } from '../step-generation/types'
-import type {PipetteOnDeck} from '../step-forms'
-type AllPipetteData = {[pipetteId: string]: PipetteOnDeck}
+import type { PipetteOnDeck } from '../step-forms'
+type AllPipetteData = { [pipetteId: string]: PipetteOnDeck }
 
 export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 type GetLabwareType = (labwareId: string) => ?string
 
-function transferLikeSubsteps (args: {
+function transferLikeSubsteps(args: {
   stepArgs: ConsolidateArgs | DistributeArgs | TransferArgs | MixArgs,
   allPipetteData: AllPipetteData,
   getLabwareType: GetLabwareType,
   robotState: RobotState,
   stepId: StepIdType,
 }): ?SourceDestSubstepItem {
-  const {
-    stepArgs,
-    allPipetteData,
-    getLabwareType,
-    stepId,
-  } = args
+  const { stepArgs, allPipetteData, getLabwareType, stepId } = args
 
   // Add tips to pipettes, since this is just a "simulation"
   // TODO: Ian 2018-07-31 develop more elegant way to bypass tip handling for simulation/test
   const robotState = cloneDeep(args.robotState)
-  robotState.tipState.pipettes = mapValues(robotState.tipState.pipettes, () => true)
-  const {pipette: pipetteId} = stepArgs
+  robotState.tipState.pipettes = mapValues(
+    robotState.tipState.pipettes,
+    () => true
+  )
+  const { pipette: pipetteId } = stepArgs
 
-  const pipette = allPipetteData[pipetteId] && getPipetteNameSpecs(allPipetteData[pipetteId].name)
+  const pipette =
+    allPipetteData[pipetteId] &&
+    getPipetteNameSpecs(allPipetteData[pipetteId].name)
 
   // TODO Ian 2018-04-06 use assert here
   if (!pipette) {
-    console.warn(`Pipette "${pipetteId}" does not exist, step ${stepId} can't determine channels`)
+    console.warn(
+      `Pipette "${pipetteId}" does not exist, step ${stepId} can't determine channels`
+    )
     return null
   }
 
@@ -107,7 +104,11 @@ function transferLikeSubsteps (args: {
     substepCommandCreators = mix(stepArgs)(robotState)
   } else {
     // TODO Ian 2018-05-21 Use assert here. Should be unreachable
-    console.warn(`transferLikeSubsteps got unsupported stepType "${stepArgs.commandCreatorFnName}"`)
+    console.warn(
+      `transferLikeSubsteps got unsupported stepType "${
+        stepArgs.commandCreatorFnName
+      }"`
+    )
     return null
   }
 
@@ -115,56 +116,83 @@ function transferLikeSubsteps (args: {
   if (pipette.channels > 1) {
     const substepRows: Array<SubstepTimelineFrame> = substepTimeline(
       substepCommandCreators,
-      {channels: pipette.channels, getLabwareType},
+      { channels: pipette.channels, getLabwareType }
     )(robotState)
-    const mergedMultiRows: Array<Array<StepItemSourceDestRow>> = steplistUtils.mergeWhen(
+    const mergedMultiRows: Array<
+      Array<StepItemSourceDestRow>
+    > = steplistUtils.mergeWhen(
       substepRows,
-      (currentMultiRow: SubstepTimelineFrame, nextMultiRow: SubstepTimelineFrame) => {
+      (
+        currentMultiRow: SubstepTimelineFrame,
+        nextMultiRow: SubstepTimelineFrame
+      ) => {
         // aspirate then dispense multirows adjacent
         // (inferring from first channel row in each multirow)
-        return currentMultiRow && currentMultiRow.source &&
-        nextMultiRow && nextMultiRow.dest
+        return (
+          currentMultiRow &&
+          currentMultiRow.source &&
+          nextMultiRow &&
+          nextMultiRow.dest
+        )
       },
       // Merge each channel row together when predicate true
       (currentMultiRow, nextMultiRow) => {
         return range(pipette.channels).map(channelIndex => {
-          const sourceChannelWell = currentMultiRow.source && currentMultiRow.source.wells[channelIndex]
-          const destChannelWell = nextMultiRow.dest && nextMultiRow.dest.wells[channelIndex]
-          const source = currentMultiRow.source && sourceChannelWell && {
-            well: sourceChannelWell,
-            preIngreds: currentMultiRow.source.preIngreds[sourceChannelWell],
-            postIngreds: currentMultiRow.source.postIngreds[sourceChannelWell],
-          }
-          const dest = nextMultiRow.dest && destChannelWell && {
-            well: destChannelWell,
-            preIngreds: nextMultiRow.dest.preIngreds[destChannelWell],
-            postIngreds: nextMultiRow.dest.postIngreds[destChannelWell],
-          }
+          const sourceChannelWell =
+            currentMultiRow.source && currentMultiRow.source.wells[channelIndex]
+          const destChannelWell =
+            nextMultiRow.dest && nextMultiRow.dest.wells[channelIndex]
+          const source = currentMultiRow.source &&
+            sourceChannelWell && {
+              well: sourceChannelWell,
+              preIngreds: currentMultiRow.source.preIngreds[sourceChannelWell],
+              postIngreds:
+                currentMultiRow.source.postIngreds[sourceChannelWell],
+            }
+          const dest = nextMultiRow.dest &&
+            destChannelWell && {
+              well: destChannelWell,
+              preIngreds: nextMultiRow.dest.preIngreds[destChannelWell],
+              postIngreds: nextMultiRow.dest.postIngreds[destChannelWell],
+            }
           const activeTips = currentMultiRow.activeTips
           return {
             activeTips,
             source,
             dest: stepArgs.commandCreatorFnName === 'mix' ? source : dest, // NOTE: since source and dest are same for mix, we're showing source on both sides. Otherwise dest would show the intermediate volume state
-            volume: showDispenseVol ? nextMultiRow.volume : currentMultiRow.volume,
+            volume: showDispenseVol
+              ? nextMultiRow.volume
+              : currentMultiRow.volume,
           }
         })
       },
-      (currentMultiRow) => (
+      currentMultiRow =>
         range(pipette.channels).map(channelIndex => {
           const source = currentMultiRow.source && {
             well: currentMultiRow.source.wells[channelIndex],
-            preIngreds: currentMultiRow.source.preIngreds[currentMultiRow.source.wells[channelIndex]],
-            postIngreds: currentMultiRow.source.postIngreds[currentMultiRow.source.wells[channelIndex]],
+            preIngreds:
+              currentMultiRow.source.preIngreds[
+                currentMultiRow.source.wells[channelIndex]
+              ],
+            postIngreds:
+              currentMultiRow.source.postIngreds[
+                currentMultiRow.source.wells[channelIndex]
+              ],
           }
           const dest = currentMultiRow.dest && {
             well: currentMultiRow.dest.wells[channelIndex],
-            preIngreds: currentMultiRow.dest.preIngreds[currentMultiRow.dest.wells[channelIndex]],
-            postIngreds: currentMultiRow.dest.postIngreds[currentMultiRow.dest.wells[channelIndex]],
+            preIngreds:
+              currentMultiRow.dest.preIngreds[
+                currentMultiRow.dest.wells[channelIndex]
+              ],
+            postIngreds:
+              currentMultiRow.dest.postIngreds[
+                currentMultiRow.dest.wells[channelIndex]
+              ],
           }
           const activeTips = currentMultiRow.activeTips
-          return {activeTips, source, dest, volume: currentMultiRow.volume}
+          return { activeTips, source, dest, volume: currentMultiRow.volume }
         })
-      )
     )
     return {
       multichannel: true,
@@ -172,7 +200,8 @@ function transferLikeSubsteps (args: {
       parentStepId: stepId,
       multiRows: mergedMultiRows,
     }
-  } else { // single channel
+  } else {
+    // single channel
     const substepRows = substepTimeline(substepCommandCreators)(robotState)
 
     const mergedRows: Array<StepItemSourceDestRow> = steplistUtils.mergeWhen(
@@ -193,11 +222,9 @@ function transferLikeSubsteps (args: {
           preIngreds: nextRow.dest && nextRow.dest.preIngreds,
           postIngreds: nextRow.dest && nextRow.dest.postIngreds,
         },
-        volume: showDispenseVol
-          ? nextRow.volume
-          : currentRow.volume,
+        volume: showDispenseVol ? nextRow.volume : currentRow.volume,
       }),
-      (currentRow) => {
+      currentRow => {
         const source = currentRow.source && {
           well: currentRow.source.wells[0],
           preIngreds: currentRow.source.preIngreds,
@@ -227,7 +254,7 @@ function transferLikeSubsteps (args: {
 }
 
 // NOTE: This is the fn used by the `allSubsteps` selector
-export function generateSubsteps (
+export function generateSubsteps(
   stepArgsAndErrors: ?StepArgsAndErrors,
   allPipetteData: AllPipetteData,
   getLabwareType: GetLabwareType,
@@ -235,18 +262,24 @@ export function generateSubsteps (
   stepId: string
 ): ?SubstepItemData {
   if (!robotState) {
-    console.info(`No robot state, could not generate substeps for step ${stepId}.` +
-      `There was probably an upstream error.`)
+    console.info(
+      `No robot state, could not generate substeps for step ${stepId}.` +
+        `There was probably an upstream error.`
+    )
     return null
   }
 
   // TODO: BC: 2018-08-21 replace old error check with new logic in field, form, and timeline level
   // Don't try to render with form errors. TODO LATER: presentational error state of substeps?
-  if (!stepArgsAndErrors || !stepArgsAndErrors.stepArgs || !isEmpty(stepArgsAndErrors.errors)) {
+  if (
+    !stepArgsAndErrors ||
+    !stepArgsAndErrors.stepArgs ||
+    !isEmpty(stepArgsAndErrors.errors)
+  ) {
     return null
   }
 
-  const {stepArgs} = stepArgsAndErrors
+  const { stepArgs } = stepArgsAndErrors
 
   if (stepArgs.commandCreatorFnName === 'delay') {
     // just returns formData
@@ -269,6 +302,10 @@ export function generateSubsteps (
     })
   }
 
-  console.warn('allSubsteps doesn\'t support commandCreatorFnName: ', stepArgs.commandCreatorFnName, stepId)
+  console.warn(
+    "allSubsteps doesn't support commandCreatorFnName: ",
+    stepArgs.commandCreatorFnName,
+    stepId
+  )
   return null
 }

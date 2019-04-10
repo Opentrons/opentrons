@@ -1,6 +1,6 @@
 // @flow
 
-import type {Service} from '@opentrons/discovery-client'
+import type { Service } from '@opentrons/discovery-client'
 
 export type ConnectableStatus = 'connectable'
 export type ReachableStatus = 'reachable'

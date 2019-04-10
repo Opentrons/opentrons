@@ -1,12 +1,14 @@
 // @flow
 import cloneDeep from 'lodash/cloneDeep'
-import {getNextTiprack, getPipetteSpecFromId} from '../../robotStateSelectors'
-import {tiprackWellNamesByCol} from '../../data'
-import {insufficientTips} from '../../errorCreators'
-import type {RobotState, CommandCreator} from '../../types'
+import { getNextTiprack, getPipetteSpecFromId } from '../../robotStateSelectors'
+import { tiprackWellNamesByCol } from '../../data'
+import { insufficientTips } from '../../errorCreators'
+import type { RobotState, CommandCreator } from '../../types'
 import dropTip from './dropTip'
 
-const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: RobotState) => {
+const replaceTip = (pipetteId: string): CommandCreator => (
+  prevRobotState: RobotState
+) => {
   /**
     Pick up next available tip. Works differently for an 8-channel which needs a full row of tips.
     Expects 96-well format tip naming system on the tiprack.
@@ -49,15 +51,19 @@ const replaceTip = (pipetteId: string): CommandCreator => (prevRobotState: Robot
 
   // remove tips from tiprack
   if (pipetteSpec.channels === 1 && nextTiprack.well) {
-    robotState.tipState.tipracks[nextTiprack.tiprackId][nextTiprack.well] = false
+    robotState.tipState.tipracks[nextTiprack.tiprackId][
+      nextTiprack.well
+    ] = false
   }
   if (pipetteSpec.channels === 8) {
-    const allWells = tiprackWellNamesByCol.find(col => col[0] === nextTiprack.well)
+    const allWells = tiprackWellNamesByCol.find(
+      col => col[0] === nextTiprack.well
+    )
     if (!allWells) {
       // TODO Ian 2018-04-30 return {errors}, don't throw
       throw new Error('Invalid well: ' + nextTiprack.well) // TODO: test
     }
-    allWells.forEach(function (well) {
+    allWells.forEach(function(well) {
       robotState.tipState.tipracks[nextTiprack.tiprackId][well] = false
     })
   }

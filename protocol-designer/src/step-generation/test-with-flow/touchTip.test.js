@@ -1,5 +1,5 @@
 // @flow
-import {expectTimelineError} from './testMatchers'
+import { expectTimelineError } from './testMatchers'
 import _touchTip from '../commandCreators/atomic/touchTip'
 import {
   createRobotState,
@@ -19,7 +19,10 @@ describe('touchTip', () => {
     tipracks: [300, 300],
   }
   const initialRobotState = createRobotState(_robotFixtureArgs)
-  const robotStateWithTip = createRobotState({..._robotFixtureArgs, fillPipetteTips: true})
+  const robotStateWithTip = createRobotState({
+    ..._robotFixtureArgs,
+    fillPipetteTips: true,
+  })
 
   test('touchTip with tip', () => {
     const result = touchTip({
@@ -28,14 +31,16 @@ describe('touchTip', () => {
       well: 'A1',
     })(robotStateWithTip)
 
-    expect(result.commands).toEqual([{
-      command: 'touch-tip',
-      params: {
-        pipette: 'p300SingleId',
-        labware: 'sourcePlateId',
-        well: 'A1',
+    expect(result.commands).toEqual([
+      {
+        command: 'touch-tip',
+        params: {
+          pipette: 'p300SingleId',
+          labware: 'sourcePlateId',
+          well: 'A1',
+        },
       },
-    }])
+    ])
 
     expect(result.robotState).toEqual(robotStateWithTip)
   })
@@ -48,15 +53,17 @@ describe('touchTip', () => {
       offsetFromBottomMm: 10,
     })(robotStateWithTip)
 
-    expect(result.commands).toEqual([{
-      command: 'touch-tip',
-      params: {
-        pipette: 'p300SingleId',
-        labware: 'sourcePlateId',
-        well: 'A1',
-        offsetFromBottomMm: 10,
+    expect(result.commands).toEqual([
+      {
+        command: 'touch-tip',
+        params: {
+          pipette: 'p300SingleId',
+          labware: 'sourcePlateId',
+          well: 'A1',
+          offsetFromBottomMm: 10,
+        },
       },
-    }])
+    ])
 
     expect(result.robotState).toEqual(robotStateWithTip)
   })
@@ -78,9 +85,12 @@ describe('touchTip', () => {
       well: 'A1',
     })(initialRobotState)
 
-    expect(result.errors).toEqual([{
-      message: 'Attempted to touchTip with no tip on pipette: p300SingleId from sourcePlateId\'s well A1',
-      type: 'NO_TIP_ON_PIPETTE',
-    }])
+    expect(result.errors).toEqual([
+      {
+        message:
+          "Attempted to touchTip with no tip on pipette: p300SingleId from sourcePlateId's well A1",
+        type: 'NO_TIP_ON_PIPETTE',
+      },
+    ])
   })
 })

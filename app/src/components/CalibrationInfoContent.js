@@ -7,17 +7,13 @@ type Props = {
   rightChildren?: React.Node,
 }
 
-export default function CalibrationInfoContent (props: Props) {
-  const {leftChildren, rightChildren} = props
+export default function CalibrationInfoContent(props: Props) {
+  const { leftChildren, rightChildren } = props
 
   return (
     <div className={styles.info_wrapper}>
-      <div className={styles.info_left}>
-        {leftChildren}
-      </div>
-      <div className={styles.info_right}>
-        {rightChildren}
-      </div>
+      <div className={styles.info_left}>{leftChildren}</div>
+      <div className={styles.info_right}>{rightChildren}</div>
     </div>
   )
 }

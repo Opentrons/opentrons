@@ -12,17 +12,17 @@ module.exports.__mockReset = __mockReset
 
 __mockReset()
 
-function __setMockResponse (value) {
+function __setMockResponse(value) {
   _mockResponse = value
   _mockError = null
 }
 
-function __setMockError (error) {
+function __setMockError(error) {
   _mockResponse = null
   _mockError = error
 }
 
-function __mockReset () {
+function __mockReset() {
   _mockResponse = null
   _mockError = null
   _mockFetch.mockReset()

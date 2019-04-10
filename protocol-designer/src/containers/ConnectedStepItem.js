@@ -1,17 +1,20 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import isEmpty from 'lodash/isEmpty'
-import type {BaseState, ThunkDispatch} from '../types'
+import type { BaseState, ThunkDispatch } from '../types'
 
-import type {SubstepIdentifier} from '../steplist/types'
+import type { SubstepIdentifier } from '../steplist/types'
 import * as substepSelectors from '../top-selectors/substeps'
-import {selectors as dismissSelectors} from '../dismiss'
-import {selectors as stepFormSelectors} from '../step-forms'
-import {selectors as stepsSelectors, actions as stepsActions} from '../ui/steps'
-import {selectors as fileDataSelectors} from '../file-data'
-import {selectors as labwareIngredSelectors} from '../labware-ingred/selectors'
-import {selectors as uiLabwareSelectors} from '../ui/labware'
+import { selectors as dismissSelectors } from '../dismiss'
+import { selectors as stepFormSelectors } from '../step-forms'
+import {
+  selectors as stepsSelectors,
+  actions as stepsActions,
+} from '../ui/steps'
+import { selectors as fileDataSelectors } from '../file-data'
+import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
+import { selectors as uiLabwareSelectors } from '../ui/labware'
 import StepItem from '../components/steplist/StepItem' // TODO Ian 2018-05-10 why is importing StepItem from index.js not working?
 
 type Props = React.ElementProps<typeof StepItem>
@@ -45,15 +48,19 @@ const makeMapStateToProps = () => {
   const getStep = stepFormSelectors.makeGetStepWithId()
 
   return (state: BaseState, ownProps: OP): SP => {
-    const {stepId} = ownProps
+    const { stepId } = ownProps
 
-    const argsAndErrors = getArgsAndErrors(state, {stepId})
-    const step = getStep(state, {stepId})
+    const argsAndErrors = getArgsAndErrors(state, { stepId })
+    const step = getStep(state, { stepId })
 
-    const formAndFieldErrors = argsAndErrors[stepId] && argsAndErrors[stepId].errors
-    const hasError = fileDataSelectors.getErrorStepId(state) === stepId || !isEmpty(formAndFieldErrors)
+    const formAndFieldErrors =
+      argsAndErrors[stepId] && argsAndErrors[stepId].errors
+    const hasError =
+      fileDataSelectors.getErrorStepId(state) === stepId ||
+      !isEmpty(formAndFieldErrors)
 
-    const hasWarnings = dismissSelectors.getHasTimelineWarningsPerStep(state)[stepId] ||
+    const hasWarnings =
+      dismissSelectors.getHasTimelineWarningsPerStep(state)[stepId] ||
       dismissSelectors.getHasFormLevelWarningsPerStep(state)[stepId]
 
     const collapsed = stepsSelectors.getCollapsedSteps(state)[stepId]
@@ -76,7 +83,7 @@ const makeMapStateToProps = () => {
 
       // no double-highlighting: whole step is only "hovered" when
       // user is not hovering on substep.
-      hovered: (hoveredStep === stepId) && !hoveredSubstep,
+      hovered: hoveredStep === stepId && !hoveredSubstep,
 
       labwareNicknamesById: uiLabwareSelectors.getLabwareNicknamesById(state),
       labwareTypesById: stepFormSelectors.getLabwareTypesById(state),
@@ -85,14 +92,19 @@ const makeMapStateToProps = () => {
   }
 }
 
-function mapDispatchToProps (dispatch: ThunkDispatch<*>): DP {
+function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   return {
-    highlightSubstep: (payload: SubstepIdentifier) => dispatch(stepsActions.hoverOnSubstep(payload)),
-    selectStep: (stepId) => dispatch(stepsActions.selectStep(stepId)),
-    toggleStepCollapsed: (stepId) => dispatch(stepsActions.toggleStepCollapsed(stepId)),
-    highlightStep: (stepId) => dispatch(stepsActions.hoverOnStep(stepId)),
-    unhighlightStep: (stepId) => dispatch(stepsActions.hoverOnStep(null)),
+    highlightSubstep: (payload: SubstepIdentifier) =>
+      dispatch(stepsActions.hoverOnSubstep(payload)),
+    selectStep: stepId => dispatch(stepsActions.selectStep(stepId)),
+    toggleStepCollapsed: stepId =>
+      dispatch(stepsActions.toggleStepCollapsed(stepId)),
+    highlightStep: stepId => dispatch(stepsActions.hoverOnStep(stepId)),
+    unhighlightStep: stepId => dispatch(stepsActions.hoverOnStep(null)),
   }
 }
 
-export default connect(makeMapStateToProps, mapDispatchToProps)(StepItem)
+export default connect(
+  makeMapStateToProps,
+  mapDispatchToProps
+)(StepItem)

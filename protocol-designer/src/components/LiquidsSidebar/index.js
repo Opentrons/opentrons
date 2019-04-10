@@ -1,19 +1,15 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import i18n from '../../localization'
-import {
-  PrimaryButton,
-  SidePanel,
-  swatchColors,
-} from '@opentrons/components'
-import {PDTitledList} from '../lists'
+import { PrimaryButton, SidePanel, swatchColors } from '@opentrons/components'
+import { PDTitledList } from '../lists'
 import listButtonStyles from '../listButtons.css'
 
-import {selectors as labwareIngredSelectors} from '../../labware-ingred/selectors'
-import type {OrderedLiquids} from '../../labware-ingred/types'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+import type { OrderedLiquids } from '../../labware-ingred/types'
 import * as labwareIngredActions from '../../labware-ingred/actions'
-import type {BaseState} from '../../types'
+import type { BaseState } from '../../types'
 
 type Props = {
   liquids: OrderedLiquids,
@@ -29,24 +25,22 @@ type SP = {
 
 type DP = $Diff<Props, SP>
 
-function LiquidsSidebar (props: Props) {
-  const {liquids, selectedLiquid, createNewLiquid, selectLiquid} = props
+function LiquidsSidebar(props: Props) {
+  const { liquids, selectedLiquid, createNewLiquid, selectLiquid } = props
   return (
-    <SidePanel title='Liquids'>
-      {liquids.map(({ingredientId, name}) => (
+    <SidePanel title="Liquids">
+      {liquids.map(({ ingredientId, name }) => (
         <PDTitledList
           key={ingredientId}
           selected={selectedLiquid === ingredientId}
           onClick={() => selectLiquid(ingredientId)}
-          iconName='circle'
-          iconProps={{style: {fill: swatchColors(Number(ingredientId))}}}
+          iconName="circle"
+          iconProps={{ style: { fill: swatchColors(Number(ingredientId)) } }}
           title={name || `Unnamed Ingredient ${ingredientId}`} // fallback, should not happen
         />
       ))}
       <div className={listButtonStyles.list_item_button}>
-        <PrimaryButton
-          iconName='water'
-          onClick={createNewLiquid}>
+        <PrimaryButton iconName="water" onClick={createNewLiquid}>
           {i18n.t('button.new_liquid')}
         </PrimaryButton>
       </div>
@@ -54,20 +48,26 @@ function LiquidsSidebar (props: Props) {
   )
 }
 
-function mapStateToProps (state: BaseState): SP {
-  const selectedLiquidGroup = labwareIngredSelectors.getSelectedLiquidGroupState(state)
+function mapStateToProps(state: BaseState): SP {
+  const selectedLiquidGroup = labwareIngredSelectors.getSelectedLiquidGroupState(
+    state
+  )
   return {
     liquids: labwareIngredSelectors.allIngredientNamesIds(state),
     selectedLiquid: selectedLiquidGroup && selectedLiquidGroup.liquidGroupId,
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch<*>): DP {
+function mapDispatchToProps(dispatch: Dispatch<*>): DP {
   return {
-    selectLiquid: (liquidGroupId) =>
+    selectLiquid: liquidGroupId =>
       dispatch(labwareIngredActions.selectLiquidGroup(liquidGroupId)),
-    createNewLiquid: () => dispatch(labwareIngredActions.createNewLiquidGroup()),
+    createNewLiquid: () =>
+      dispatch(labwareIngredActions.createNewLiquidGroup()),
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LiquidsSidebar)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(LiquidsSidebar)

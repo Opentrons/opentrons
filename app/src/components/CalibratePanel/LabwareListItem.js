@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react'
 
-import type {Labware} from '../../robot'
+import type { Labware } from '../../robot'
 
-import {ListItem} from '@opentrons/components'
+import { ListItem } from '@opentrons/components'
 import styles from './styles.css'
 
 type LabwareItemProps = {
@@ -13,7 +13,7 @@ type LabwareItemProps = {
 
 type Props = Labware & LabwareItemProps
 
-export default function LabwareListItem (props: Props) {
+export default function LabwareListItem(props: Props) {
   const {
     type,
     slot,
@@ -25,9 +25,7 @@ export default function LabwareListItem (props: Props) {
   } = props
 
   const url = `/calibrate/labware/${slot}`
-  const iconName = confirmed
-    ? 'check-circle'
-    : 'checkbox-blank-circle-outline'
+  const iconName = confirmed ? 'check-circle' : 'checkbox-blank-circle-outline'
 
   return (
     <ListItem
@@ -47,9 +45,7 @@ export default function LabwareListItem (props: Props) {
             Tiprack
           </span>
         )}
-        <span>
-          {type}
-        </span>
+        <span>{type}</span>
       </div>
     </ListItem>
   )

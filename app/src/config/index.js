@@ -1,12 +1,12 @@
 // @flow
 // config redux module
-import {setIn} from '@thi.ng/paths'
+import { setIn } from '@thi.ng/paths'
 import remove from 'lodash/remove'
 
-import {getShellConfig} from '../shell'
+import { getShellConfig } from '../shell'
 
-import type {State, Action, ThunkAction} from '../types'
-import type {LogLevel} from '../logger'
+import type { State, Action, ThunkAction } from '../types'
+import type { LogLevel } from '../logger'
 
 type UrlProtocol = 'file:' | 'http:'
 
@@ -96,12 +96,16 @@ type SetConfigAction = {|
 export type ConfigAction = UpdateConfigAction | SetConfigAction
 
 // trigger a config value update to the app-shell via shell middleware
-export function updateConfig (path: string, value: any): UpdateConfigAction {
-  return {type: 'config:UPDATE', payload: {path, value}, meta: {shell: true}}
+export function updateConfig(path: string, value: any): UpdateConfigAction {
+  return {
+    type: 'config:UPDATE',
+    payload: { path, value },
+    meta: { shell: true },
+  }
 }
 
 // config reducer
-export function configReducer (state: ?Config, action: Action): Config {
+export function configReducer(state: ?Config, action: Action): Config {
   // initial state
   // getShellConfig makes a sync RPC call, so use sparingly
   if (!state) return getShellConfig()
@@ -114,18 +118,18 @@ export function configReducer (state: ?Config, action: Action): Config {
   return state
 }
 
-export function getConfig (state: State): Config {
+export function getConfig(state: State): Config {
   return state.config
 }
 
-export function toggleDevTools (): ThunkAction {
+export function toggleDevTools(): ThunkAction {
   return (dispatch, getState) => {
     const devToolsOn = getConfig(getState()).devtools
     return dispatch(updateConfig('devtools', !devToolsOn))
   }
 }
 
-export function addManualIp (ip: string): ThunkAction {
+export function addManualIp(ip: string): ThunkAction {
   return (dispatch, getState) => {
     const candidates = getConfig(getState()).discovery.candidates
     const previous: ?string = [].concat(candidates).find(i => i === ip)
@@ -135,7 +139,7 @@ export function addManualIp (ip: string): ThunkAction {
   }
 }
 
-export function removeManualIp (ip: string): ThunkAction {
+export function removeManualIp(ip: string): ThunkAction {
   return (dispatch, getState) => {
     const candidates = [].concat(getConfig(getState()).discovery.candidates)
     remove(candidates, c => {

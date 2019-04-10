@@ -1,25 +1,22 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import mapValues from 'lodash/mapValues'
 import noop from 'lodash/noop'
 
 import HighlightableLabware from '../components/HighlightableLabware'
 
-import {selectors} from '../labware-ingred/selectors'
-import {
-  START_TERMINAL_ITEM_ID,
-  END_TERMINAL_ITEM_ID,
-} from '../steplist'
-import {selectors as stepFormSelectors} from '../step-forms'
-import {selectors as stepsSelectors} from '../ui/steps'
+import { selectors } from '../labware-ingred/selectors'
+import { START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID } from '../steplist'
+import { selectors as stepFormSelectors } from '../step-forms'
+import { selectors as stepsSelectors } from '../ui/steps'
 import * as highlightSelectors from '../top-selectors/substep-highlight'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
 import * as tipContentsSelectors from '../top-selectors/tip-contents'
 import wellSelectionSelectors from '../well-selection/selectors'
 
-import type {WellContents, ContentsByWell} from '../labware-ingred/types'
-import type {BaseState} from '../types'
+import type { WellContents, ContentsByWell } from '../labware-ingred/types'
+import type { BaseState } from '../types'
 
 type Props = React.ElementProps<typeof HighlightableLabware>
 
@@ -29,12 +26,14 @@ type OP = {
 
 type SP = $Diff<Props, OP>
 
-function mapStateToProps (state: BaseState, ownProps: OP): SP {
+function mapStateToProps(state: BaseState, ownProps: OP): SP {
   const selectedContainerId = selectors.getSelectedLabwareId(state)
   const containerId = ownProps.containerId || selectedContainerId
 
   if (containerId == null) {
-    console.error('HighlightableLabware: No container is selected, and no containerId was given to Connected HighlightableLabware')
+    console.error(
+      'HighlightableLabware: No container is selected, and no containerId was given to Connected HighlightableLabware'
+    )
     return {
       containerId: '',
       wellContents: {},
@@ -43,23 +42,27 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
   }
 
   const labwareType = stepFormSelectors.getLabwareTypesById(state)[containerId]
-  const allWellContentsForSteps = wellContentsSelectors.getAllWellContentsForSteps(state)
+  const allWellContentsForSteps = wellContentsSelectors.getAllWellContentsForSteps(
+    state
+  )
   const wellSelectionModeForLabware = selectedContainerId === containerId
   let wellContents: ContentsByWell = {}
 
   const activeItem = stepsSelectors.getActiveItem(state)
-  if (
-    !activeItem.isStep && activeItem.id === START_TERMINAL_ITEM_ID
-  ) {
+  if (!activeItem.isStep && activeItem.id === START_TERMINAL_ITEM_ID) {
     // selection for deck setup: shows initial state of liquids
-    wellContents = wellContentsSelectors.getWellContentsAllLabware(state)[containerId]
-  } else if (
-    !activeItem.isStep && activeItem.id === END_TERMINAL_ITEM_ID
-  ) {
+    wellContents = wellContentsSelectors.getWellContentsAllLabware(state)[
+      containerId
+    ]
+  } else if (!activeItem.isStep && activeItem.id === END_TERMINAL_ITEM_ID) {
     // "end" terminal
-    wellContents = wellContentsSelectors.getLastValidWellContents(state)[containerId]
+    wellContents = wellContentsSelectors.getLastValidWellContents(state)[
+      containerId
+    ]
   } else if (!activeItem.isStep) {
-    console.warn(`HighlightableLabware got unhandled terminal id: "${activeItem.id}"`)
+    console.warn(
+      `HighlightableLabware got unhandled terminal id: "${activeItem.id}"`
+    )
   } else {
     const stepId = activeItem.id
     // TODO: Ian 2018-07-31 replace with util function, "findIndexOrNull"?
@@ -73,12 +76,12 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     let wellContentsWithoutHighlight = null
     let highlightedWells
 
-    if ((timelineIdx != null)) {
-      wellContentsWithoutHighlight = (allWellContentsForSteps[timelineIdx])
-        // Valid non-end step
-        ? allWellContentsForSteps[timelineIdx][containerId]
-        // Erroring step: show last valid well contents in timeline
-        : wellContentsSelectors.getLastValidWellContents(state)[containerId]
+    if (timelineIdx != null) {
+      wellContentsWithoutHighlight = allWellContentsForSteps[timelineIdx]
+        ? // Valid non-end step
+          allWellContentsForSteps[timelineIdx][containerId]
+        : // Erroring step: show last valid well contents in timeline
+          wellContentsSelectors.getLastValidWellContents(state)[containerId]
     }
 
     if (wellSelectionModeForLabware) {
@@ -90,7 +93,9 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
       // TODO Ian 2018-05-02: Should wellHighlightsForSteps return well highlights
       // even when prev step isn't processed (due to encountering an upstream error
       // in the timeline reduce op)
-      const highlightedWellsByLabware = highlightSelectors.wellHighlightsByLabwareId(state)
+      const highlightedWellsByLabware = highlightSelectors.wellHighlightsByLabwareId(
+        state
+      )
       highlightedWells = highlightedWellsByLabware[containerId] || {}
     }
 
@@ -108,7 +113,9 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
     ): ContentsByWell)
   }
 
-  const getTipProps = tipContentsSelectors.getTipsForCurrentStep(state, {labwareId: containerId})
+  const getTipProps = tipContentsSelectors.getTipsForCurrentStep(state, {
+    labwareId: containerId,
+  })
 
   return {
     wellContents,

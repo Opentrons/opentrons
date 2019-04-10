@@ -1,10 +1,8 @@
 // @flow
-import {connect} from 'react-redux'
-import {SidePanelGroup} from '@opentrons/components'
+import { connect } from 'react-redux'
+import { SidePanelGroup } from '@opentrons/components'
 
-import {
-  selectors as robotSelectors,
-} from '../../robot'
+import { selectors as robotSelectors } from '../../robot'
 
 const TITLE = 'Labware Calibration'
 
@@ -15,7 +13,7 @@ type StateProps = {
 
 export default connect(mapStateToProps)(SidePanelGroup)
 
-function mapStateToProps (state): StateProps {
+function mapStateToProps(state): StateProps {
   const isRunning = robotSelectors.getIsRunning(state)
   const disabled = isRunning
 

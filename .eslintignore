@@ -1,4 +1,5 @@
 api/**
+update-server/**
 **/node_modules/**
 **/coverage/**
 **/dist/**
@@ -12,3 +13,7 @@ api/**
 # compiled
 app-shell/lib/**
 discovery-client/lib/**
+
+# prettier
+**/package.json
+**/CHANGELOG.md

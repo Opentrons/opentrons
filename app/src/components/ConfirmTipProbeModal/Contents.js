@@ -5,19 +5,13 @@ import * as React from 'react'
 import removeTrashSrc from './img/trash@3x.png'
 import styles from './Contents.css'
 
-export default function Contents () {
+export default function Contents() {
   return (
     <div>
-      <p className={styles.attention}>
-        Before continuing remove from deck:
-      </p>
+      <p className={styles.attention}>Before continuing remove from deck:</p>
       <ol className={styles.list}>
-        <li>
-          All labware
-        </li>
-        <li>
-          Trash bin
-        </li>
+        <li>All labware</li>
+        <li>Trash bin</li>
       </ol>
       <img className={styles.diagram} src={removeTrashSrc} />
     </div>

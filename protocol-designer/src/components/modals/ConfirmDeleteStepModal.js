@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react'
-import {ContinueModal} from '@opentrons/components'
+import { ContinueModal } from '@opentrons/components'
 import i18n from '../../localization'
-import {Portal} from '../portals/MainPageModalPortal'
+import { Portal } from '../portals/MainPageModalPortal'
 import modalStyles from './modal.css'
 
-type Props = $Diff<React.ElementProps<typeof ContinueModal>, {children: *}>
+type Props = $Diff<React.ElementProps<typeof ContinueModal>, { children: * }>
 
-function ConfirmDeleteStepModal (props: Props) {
+function ConfirmDeleteStepModal(props: Props) {
   return (
     <Portal>
       <ContinueModal className={modalStyles.modal} {...props}>

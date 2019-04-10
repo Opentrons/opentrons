@@ -1,14 +1,14 @@
 // @flow
 // filter labware by manufacturer
 import * as React from 'react'
-import {withRouter} from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 
-import {SelectField} from '@opentrons/components'
-import {getAllManufacturers, buildFiltersUrl} from '../../filters'
+import { SelectField } from '@opentrons/components'
+import { getAllManufacturers, buildFiltersUrl } from '../../filters'
 import styles from './styles.css'
 
-import type {ContextRouter} from 'react-router-dom'
-import type {FilterParams} from '../../types'
+import type { ContextRouter } from 'react-router-dom'
+import type { FilterParams } from '../../types'
 
 // TODO(mc, 2019-03-13): i18n
 const EN_MANUFACTURER = 'manufacturer'
@@ -24,8 +24,8 @@ export type FilterManufacturerProps = {
   filters: FilterParams,
 }
 
-export function FilterManufacturer (props: FilterManufacturerProps) {
-  const {history, filters} = props
+export function FilterManufacturer(props: FilterManufacturerProps) {
+  const { history, filters } = props
   const manufacturers = getAllManufacturers()
   const options = manufacturers.map(value => ({
     value,
@@ -42,7 +42,7 @@ export function FilterManufacturer (props: FilterManufacturerProps) {
         options={options}
         onValueChange={(_, value) => {
           if (value) {
-            history.push(buildFiltersUrl({...filters, manufacturer: value}))
+            history.push(buildFiltersUrl({ ...filters, manufacturer: value }))
           }
         }}
       />

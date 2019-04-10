@@ -27,19 +27,20 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "channels": {"$ref": "#/definitions/channels"},
+        "channels": { "$ref": "#/definitions/channels" },
         "defaultAspirateFlowRate": {
-          "value": {"$ref": "#/definitions/positiveNumber"},
-          "min": {"$ref": "#/definitions/positiveNumber"},
-          "max": {"$ref": "#/definitions/positiveNumber"}},
-        "defaultDispenseFlowRate": {
-          "value": {"$ref": "#/definitions/positiveNumber"},
-          "min": {"$ref": "#/definitions/positiveNumber"},
-          "max": {"$ref": "#/definitions/positiveNumber"}
+          "value": { "$ref": "#/definitions/positiveNumber" },
+          "min": { "$ref": "#/definitions/positiveNumber" },
+          "max": { "$ref": "#/definitions/positiveNumber" }
         },
-        "displayName": {"type": "string"},
-        "maxVolume": {"$ref": "#/definitions/positiveNumber"},
-        "minVolume": {"$ref": "#/definitions/positiveNumber"}
+        "defaultDispenseFlowRate": {
+          "value": { "$ref": "#/definitions/positiveNumber" },
+          "min": { "$ref": "#/definitions/positiveNumber" },
+          "max": { "$ref": "#/definitions/positiveNumber" }
+        },
+        "displayName": { "type": "string" },
+        "maxVolume": { "$ref": "#/definitions/positiveNumber" },
+        "minVolume": { "$ref": "#/definitions/positiveNumber" }
       }
     }
   }

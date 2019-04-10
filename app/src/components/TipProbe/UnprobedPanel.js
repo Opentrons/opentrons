@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react'
-import type {Dispatch} from 'redux'
-import {connect} from 'react-redux'
-import {push} from 'react-router-redux'
+import type { Dispatch } from 'redux'
+import { connect } from 'react-redux'
+import { push } from 'react-router-redux'
 
 import CalibrationInfoContent from '../CalibrationInfoContent'
-import {PrimaryButton} from '@opentrons/components'
+import { PrimaryButton } from '@opentrons/components'
 
 import {
   actions as robotActions,
@@ -32,36 +32,32 @@ type Props = {
   onPrepareClick: () => void,
 }
 
-export default connect(mapStateToProps, null, mergeProps)(UnprobedPanel)
+export default connect(
+  mapStateToProps,
+  null,
+  mergeProps
+)(UnprobedPanel)
 
-function UnprobedPanel (props: Props) {
-  const {probed, onPrepareClick} = props
+function UnprobedPanel(props: Props) {
+  const { probed, onPrepareClick } = props
 
   const message = !probed
     ? 'Pipette tip is not calibrated'
     : 'Pipette tip is calibrated'
 
-  const buttonText = !probed
-    ? 'Calibrate Tip'
-    : 'Recalibrate Tip'
+  const buttonText = !probed ? 'Calibrate Tip' : 'Recalibrate Tip'
 
   const leftChildren = (
     <div>
-      <p>
-        {message}
-      </p>
-      <PrimaryButton onClick={onPrepareClick}>
-        {buttonText}
-      </PrimaryButton>
+      <p>{message}</p>
+      <PrimaryButton onClick={onPrepareClick}>{buttonText}</PrimaryButton>
     </div>
   )
 
-  return (
-    <CalibrationInfoContent leftChildren={leftChildren} />
-  )
+  return <CalibrationInfoContent leftChildren={leftChildren} />
 }
 
-function mapStateToProps (state, ownProps: OwnProps): StateProps {
+function mapStateToProps(state, ownProps: OwnProps): StateProps {
   const deckPopulated = robotSelectors.getDeckPopulated(state)
 
   return {
@@ -69,18 +65,22 @@ function mapStateToProps (state, ownProps: OwnProps): StateProps {
   }
 }
 
-function mergeProps (
+function mergeProps(
   stateProps: StateProps,
   dispatchProps: DispatchProps,
   ownProps: OwnProps
 ): Props {
-  const {_showContinueModal} = stateProps
-  const {dispatch} = dispatchProps
-  const {mount, confirmTipProbeUrl} = ownProps
+  const { _showContinueModal } = stateProps
+  const { dispatch } = dispatchProps
+  const { mount, confirmTipProbeUrl } = ownProps
 
   const onPrepareClick = _showContinueModal
-    ? () => { dispatch(push(confirmTipProbeUrl)) }
-    : () => { dispatch(robotActions.moveToFront(mount)) }
+    ? () => {
+        dispatch(push(confirmTipProbeUrl))
+      }
+    : () => {
+        dispatch(robotActions.moveToFront(mount))
+      }
 
   return {
     ...ownProps,

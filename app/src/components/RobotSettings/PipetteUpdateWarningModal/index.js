@@ -1,10 +1,10 @@
 // @flow
 import * as React from 'react'
-import {AlertModal, OutlineButton, PrimaryButton} from '@opentrons/components'
-import {Portal} from '../../portal'
+import { AlertModal, OutlineButton, PrimaryButton } from '@opentrons/components'
+import { Portal } from '../../portal'
 import styles from './styles.css'
 
-export type ToggleRef = {current: null | HTMLParagraphElement}
+export type ToggleRef = { current: null | HTMLParagraphElement }
 
 type Props = {
   id: string,
@@ -24,7 +24,7 @@ export default class PipetteUpdateWarningModal extends React.Component<Props> {
     if ($toggle) $toggle.scrollIntoView()
   }
 
-  render () {
+  render() {
     return (
       <Portal>
         <AlertModal

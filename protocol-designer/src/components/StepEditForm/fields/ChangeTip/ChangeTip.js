@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react'
-import {FormGroup, HoverTooltip, SelectField} from '@opentrons/components'
+import { FormGroup, HoverTooltip, SelectField } from '@opentrons/components'
 import i18n from '../../../../localization'
 import StepField from '../FieldConnector'
 import styles from '../../StepEditForm.css'
-import type {StepFieldName} from '../../../../steplist/fieldLevel'
-import type {ChangeTipOptions} from '../../../../step-generation/types'
+import type { StepFieldName } from '../../../../steplist/fieldLevel'
+import type { ChangeTipOptions } from '../../../../step-generation/types'
 
 // NOTE: ChangeTipField not validated as of 6/27/18 so no focusHandlers needed
 type Props = {
@@ -15,23 +15,29 @@ type Props = {
 }
 
 const ChangeTipField = (props: Props) => {
-  const {name, disabledOptions} = props
+  const { name, disabledOptions } = props
 
-  const options = props.options.map((value) => {
+  const options = props.options.map(value => {
     const tooltip = (
       <div className={styles.tooltip}>
         {i18n.t(`form.step_edit_form.field.change_tip.option_tooltip.${value}`)}
       </div>
     )
 
-    const option = i18n.t(`form.step_edit_form.field.change_tip.option.${value}`)
+    const option = i18n.t(
+      `form.step_edit_form.field.change_tip.option.${value}`
+    )
     const label = (
       <HoverTooltip
         positionFixed
         tooltipComponent={tooltip}
-        placement='bottom'
-        modifiers={{offset: {offset: `0, 18`}, preventOverflow: {boundariesElement: 'window'}}}
-      >{(hoverTooltipHandlers) => <div {...hoverTooltipHandlers}>{option}</div>}
+        placement="bottom"
+        modifiers={{
+          offset: { offset: `0, 18` },
+          preventOverflow: { boundariesElement: 'window' },
+        }}
+      >
+        {hoverTooltipHandlers => <div {...hoverTooltipHandlers}>{option}</div>}
       </HoverTooltip>
     )
     return {
@@ -43,18 +49,21 @@ const ChangeTipField = (props: Props) => {
   return (
     <StepField
       name={name}
-      render={({value, updateValue, hoverTooltipHandlers}) => (
+      render={({ value, updateValue, hoverTooltipHandlers }) => (
         <FormGroup
           label={i18n.t('form.step_edit_form.field.change_tip.label')}
           className={styles.large_field}
-          hoverTooltipHandlers={hoverTooltipHandlers}>
+          hoverTooltipHandlers={hoverTooltipHandlers}
+        >
           <SelectField
             name={name}
             options={options}
             value={value ? String(value) : null}
-            onValueChange={(name, value) => updateValue(value)} />
+            onValueChange={(name, value) => updateValue(value)}
+          />
         </FormGroup>
-      )} />
+      )}
+    />
   )
 }
 

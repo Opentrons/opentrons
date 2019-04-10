@@ -1,6 +1,6 @@
 // @flow
 import merge from 'lodash/merge'
-import {createRobotState, commandCreatorNoErrors} from './fixtures'
+import { createRobotState, commandCreatorNoErrors } from './fixtures'
 import _dropTip from '../commandCreators/atomic/dropTip'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
@@ -39,7 +39,10 @@ describe('dropTip', () => {
     updateLiquidState.mockReturnValue(initialRobotState.liquidState)
   })
 
-  function makeRobotState (args: {singleHasTips: boolean, multiHasTips: boolean}) {
+  function makeRobotState(args: {
+    singleHasTips: boolean,
+    multiHasTips: boolean,
+  }) {
     return merge(
       {},
       createRobotState({
@@ -62,24 +65,30 @@ describe('dropTip', () => {
 
   describe('replaceTip: single channel', () => {
     test('drop tip if there is a tip', () => {
-      const result = dropTip('p300SingleId')(makeRobotState({singleHasTips: true, multiHasTips: true})
+      const result = dropTip('p300SingleId')(
+        makeRobotState({ singleHasTips: true, multiHasTips: true })
       )
 
-      expect(result.commands).toEqual([{
-        command: 'drop-tip',
-        params: {
-          pipette: 'p300SingleId',
-          labware: 'trashId',
-          well: 'A1',
+      expect(result.commands).toEqual([
+        {
+          command: 'drop-tip',
+          params: {
+            pipette: 'p300SingleId',
+            labware: 'trashId',
+            well: 'A1',
+          },
         },
-      }])
+      ])
       expect(result.robotState).toEqual(
-        makeRobotState({singleHasTips: false, multiHasTips: true})
+        makeRobotState({ singleHasTips: false, multiHasTips: true })
       )
     })
 
     test('no tip on pipette, ignore dropTip', () => {
-      const initialRobotState = makeRobotState({singleHasTips: false, multiHasTips: true})
+      const initialRobotState = makeRobotState({
+        singleHasTips: false,
+        multiHasTips: true,
+      })
       const result = dropTip('p300SingleId')(initialRobotState)
       expect(result.commands).toEqual([])
       expect(result.robotState).toEqual(initialRobotState)
@@ -88,22 +97,29 @@ describe('dropTip', () => {
 
   describe('Multi-channel dropTip', () => {
     test('drop tip if there is a tip', () => {
-      const result = dropTip('p300MultiId')(makeRobotState({singleHasTips: true, multiHasTips: true}))
-      expect(result.commands).toEqual([{
-        command: 'drop-tip',
-        params: {
-          pipette: 'p300MultiId',
-          labware: 'trashId',
-          well: 'A1',
+      const result = dropTip('p300MultiId')(
+        makeRobotState({ singleHasTips: true, multiHasTips: true })
+      )
+      expect(result.commands).toEqual([
+        {
+          command: 'drop-tip',
+          params: {
+            pipette: 'p300MultiId',
+            labware: 'trashId',
+            well: 'A1',
+          },
         },
-      }])
+      ])
       expect(result.robotState).toEqual(
-        makeRobotState({singleHasTips: true, multiHasTips: false})
+        makeRobotState({ singleHasTips: true, multiHasTips: false })
       )
     })
 
     test('no tip on pipette, ignore dropTip', () => {
-      const initialRobotState = makeRobotState({singleHasTips: true, multiHasTips: false})
+      const initialRobotState = makeRobotState({
+        singleHasTips: true,
+        multiHasTips: false,
+      })
       const result = dropTip('p300MultiId')(initialRobotState)
       expect(result.commands).toEqual([])
       expect(result.robotState).toEqual(initialRobotState)
@@ -118,7 +134,10 @@ describe('dropTip', () => {
     })
 
     test('dropTip calls dispenseUpdateLiquidState with useFullVolume: true', () => {
-      const initialRobotState = makeRobotState({singleHasTips: true, multiHasTips: true})
+      const initialRobotState = makeRobotState({
+        singleHasTips: true,
+        multiHasTips: true,
+      })
 
       const result = dropTip('p300MultiId')(initialRobotState)
 

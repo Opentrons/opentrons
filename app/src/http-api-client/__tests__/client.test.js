@@ -1,13 +1,21 @@
 // http api client tests
 import client from '../client'
 
-const mockResolve = (value) => jest.fn(() => new Promise((resolve) => {
-  process.nextTick(() => resolve(value))
-}))
+const mockResolve = value =>
+  jest.fn(
+    () =>
+      new Promise(resolve => {
+        process.nextTick(() => resolve(value))
+      })
+  )
 
-const mockReject = (error) => jest.fn(() => new Promise((resolve, reject) => {
-  process.nextTick(() => reject(error))
-}))
+const mockReject = error =>
+  jest.fn(
+    () =>
+      new Promise((resolve, reject) => {
+        process.nextTick(() => reject(error))
+      })
+  )
 
 describe('http api client', () => {
   let _oldFetch
@@ -15,7 +23,7 @@ describe('http api client', () => {
   beforeAll(() => {
     // mock fetch
     _oldFetch = global.fetch
-    global.fetch = mockResolve({ok: false})
+    global.fetch = mockResolve({ ok: false })
   })
 
   afterAll(() => {
@@ -34,19 +42,18 @@ describe('http api client', () => {
 
     global.fetch = mockResolve({
       ok: true,
-      json: () => Promise.resolve({foo: 'bar'}),
+      json: () => Promise.resolve({ foo: 'bar' }),
     })
 
-    return expect(client(robot, 'GET', 'foo')).resolves
-      .toEqual({foo: 'bar'})
-      .then(() => expect(global.fetch).toHaveBeenCalledWith(
-        'http://1.2.3.4:8080/foo',
-        {
+    return expect(client(robot, 'GET', 'foo'))
+      .resolves.toEqual({ foo: 'bar' })
+      .then(() =>
+        expect(global.fetch).toHaveBeenCalledWith('http://1.2.3.4:8080/foo', {
           method: 'GET',
           headers: {},
           body: undefined,
-        }
-      ))
+        })
+      )
   })
 
   test('GET request failure', () => {
@@ -59,15 +66,16 @@ describe('http api client', () => {
       ok: false,
       status: 400,
       statusText: 'Bad Request',
-      json: () => Promise.resolve({message: 'You tried'}),
+      json: () => Promise.resolve({ message: 'You tried' }),
     })
 
-    return expect(client(robot, 'GET', 'foo')).rejects
-      .toEqual(expect.objectContaining({
+    return expect(client(robot, 'GET', 'foo')).rejects.toEqual(
+      expect.objectContaining({
         status: 400,
         statusText: 'Bad Request',
         message: 'You tried',
-      }))
+      })
+    )
   })
 
   test('GET request error', () => {
@@ -78,10 +86,11 @@ describe('http api client', () => {
 
     global.fetch = mockReject(new Error('AH'))
 
-    return expect(client(robot, 'GET', 'foo')).rejects
-      .toEqual(expect.objectContaining({
+    return expect(client(robot, 'GET', 'foo')).rejects.toEqual(
+      expect.objectContaining({
         message: 'AH',
-      }))
+      })
+    )
   })
 
   test('POST request', () => {
@@ -92,19 +101,18 @@ describe('http api client', () => {
 
     global.fetch = mockResolve({
       ok: true,
-      json: () => Promise.resolve({foo: 'bar'}),
+      json: () => Promise.resolve({ foo: 'bar' }),
     })
 
-    return expect(client(robot, 'POST', 'foo', {bar: 'baz'})).resolves
-      .toEqual({foo: 'bar'})
-      .then(() => expect(global.fetch).toHaveBeenCalledWith(
-        'http://1.2.3.4:8080/foo',
-        {
+    return expect(client(robot, 'POST', 'foo', { bar: 'baz' }))
+      .resolves.toEqual({ foo: 'bar' })
+      .then(() =>
+        expect(global.fetch).toHaveBeenCalledWith('http://1.2.3.4:8080/foo', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({bar: 'baz'}),
-        }
-      ))
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bar: 'baz' }),
+        })
+      )
   })
 
   test('POST request failure', () => {
@@ -117,15 +125,16 @@ describe('http api client', () => {
       ok: false,
       status: 400,
       statusText: 'Bad Request',
-      json: () => Promise.resolve({message: 'You tried'}),
+      json: () => Promise.resolve({ message: 'You tried' }),
     })
 
-    return expect(client(robot, 'POST', 'foo', {bar: 'baz'})).rejects
-      .toEqual(expect.objectContaining({
+    return expect(client(robot, 'POST', 'foo', { bar: 'baz' })).rejects.toEqual(
+      expect.objectContaining({
         status: 400,
         statusText: 'Bad Request',
         message: 'You tried',
-      }))
+      })
+    )
   })
 
   test('POST request error', () => {
@@ -136,9 +145,10 @@ describe('http api client', () => {
 
     global.fetch = mockReject(new Error('AH'))
 
-    return expect(client(robot, 'POST', 'foo', {bar: 'baz'})).rejects
-      .toEqual(expect.objectContaining({
+    return expect(client(robot, 'POST', 'foo', { bar: 'baz' })).rejects.toEqual(
+      expect.objectContaining({
         message: 'AH',
-      }))
+      })
+    )
   })
 })

@@ -2,24 +2,24 @@
 
 Thanks for your interest in contributing to the Opentrons platform! This Contributing Guide is intended to ensure best practices for both internal Opentrons contributors as well as any external contributors. We want to make sure you’re set up to contribute effectively, no matter if you’re helping us out with bug reports, code, documentation, feature suggestions, or anything else. This guide covers:
 
-*   [Opening Issues](#opening-issues)
-*   [Opening Pull Requests](#opening-pull-requests)
-*   [Commit Guidelines](#commit-guidelines)
-*   [Project and Repository Structure](#project-and-repository-structure)
-*   [Development Setup](#development-setup)
-*   [Prior Art](#prior-art)
+- [Opening Issues](#opening-issues)
+- [Opening Pull Requests](#opening-pull-requests)
+- [Commit Guidelines](#commit-guidelines)
+- [Project and Repository Structure](#project-and-repository-structure)
+- [Development Setup](#development-setup)
+- [Prior Art](#prior-art)
 
 ## Opening Issues
 
 Filing an issue is a great way to contribute to the project! Bug reports and feature requests are really useful for us as we plan our work. If you’d like to open an issue, please consider the following questions before opening:
 
-*   Is this issue for a bug, a feature request, or something else?
-    *   Please make this is clear in your description so it’s easier to address
-*   Has this issue already been opened?
-    *   Duplicate tickets slow things down, so make sure to search before you open!
-    *   If there’s already a ticket, please comment on the existing thread!
-*   Is this a support request?
-    *   If yes, you're better off checking out our [support page][support] rather than opening a GitHub issue
+- Is this issue for a bug, a feature request, or something else?
+  - Please make this is clear in your description so it’s easier to address
+- Has this issue already been opened?
+  - Duplicate tickets slow things down, so make sure to search before you open!
+  - If there’s already a ticket, please comment on the existing thread!
+- Is this a support request?
+  - If yes, you're better off checking out our [support page][support] rather than opening a GitHub issue
 
 To ensure your issue can be addressed quickly, please fill out the sections in the existing issue template to the best of your ability!
 
@@ -31,25 +31,25 @@ Please note that by contributing to the Opentrons platform, you agree to share t
 
 Before opening any PR, please run through the following questions:
 
-*   Does this PR address an already open issue?
-    *   If not, please consider opening an issue first
-    *   This is to ensure you don't end up duplicating work or wasting time on a PR that won't be accepted
-*   Does this PR incorporate many different changes?
-    *   If yes, would the PR work better as a series of smaller PR's?
-    *   Our team is more than happy to help you figure out an incremental plan
-*   Does this PR include code changes without test and/or documentation updates?
-    *   If yes, your PR may not be ready to open
-    *   Tests and documentation are a vital part of any code contribution
-*   Are there a reasonable number of commits and are they properly informative?
-    *   The best kind of PR is a tiny PR with a single commit
-    *   To avoid introducing problems into our Git history, we may have to ask you to squash or otherwise amend your commit(s)
-    *   See [Commit Guidelines](#commit-guidelines) below for tips on keeping a good Git history
+- Does this PR address an already open issue?
+  - If not, please consider opening an issue first
+  - This is to ensure you don't end up duplicating work or wasting time on a PR that won't be accepted
+- Does this PR incorporate many different changes?
+  - If yes, would the PR work better as a series of smaller PR's?
+  - Our team is more than happy to help you figure out an incremental plan
+- Does this PR include code changes without test and/or documentation updates?
+  - If yes, your PR may not be ready to open
+  - Tests and documentation are a vital part of any code contribution
+- Are there a reasonable number of commits and are they properly informative?
+  - The best kind of PR is a tiny PR with a single commit
+  - To avoid introducing problems into our Git history, we may have to ask you to squash or otherwise amend your commit(s)
+  - See [Commit Guidelines](#commit-guidelines) below for tips on keeping a good Git history
 
 To ensure your code is reviewed quickly and thoroughly, please fill out the sections in the existing pull request template best of your ability! If you’d like some recommended reading for writing good pull requests, check out:
 
-*   [How to write the perfect pull request][how-to-write-pr]
-*   [The (written) unwritten guide to pull requests][unwritten-guide-to-pr]
-*   [The Art of a Pull Request][art-of-pr]
+- [How to write the perfect pull request][how-to-write-pr]
+- [The (written) unwritten guide to pull requests][unwritten-guide-to-pr]
+- [The Art of a Pull Request][art-of-pr]
 
 After your Pull Request is merged (or otherwise closed), you’ll want to make sure to delete the branch in GitHub. You probably want to delete your local branch, too, depending on your own personal organizational strategies / general paranoia.
 
@@ -58,6 +58,20 @@ After your Pull Request is merged (or otherwise closed), you’ll want to make s
 If you're looking for something to work on, especially for a first contribution, check out [our list of easy issues][easyfix]. Be sure to drop a comment in the thread before starting work to make sure nobody else has picked it up. Also, to understand a bit more of the plans developed by the Opentrons software engineering team, see the [documentation on software architecture and plans](https://github.com/Opentrons/opentrons/tree/edge/architecture-and-planning).
 
 ## Commit Guidelines
+
+### Before you commit
+
+Before you're ready to make a commit, you should do you best to make sure that:
+
+- All tests are passing
+  - `make test`
+  - See [Testing](#Testing) section for more details
+- All code quality checks are passing
+  - `make format lint`
+  - See [Code quality](#Code-quality) section for more details
+  - Especially consider [setting up your code editor](#Editor-setup) to run formatting and quality checks automatically as you code
+
+### Making your commit
 
 Good commit messages are essential to keeping an organized and readable Git history. A readable Git history makes our lives easier when doing necessary work like writing changelogs or tracking down regressions. Please read [How to Write a Git Commit Message][commit-message-how-to] by Chris Beams and then come back here. These selected guidelines (copied and pasted from that article) are a very good starting point to think about when writing your commit message:
 
@@ -88,14 +102,14 @@ This will launch the commitizen wizard, which will ask you to:
     9.  `ci` - Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
     10. `chore` - Other changes that don't modify src or test files
 2.  Select a scope
-    * For `feat`, `fix`, `refactor`, and `perf`, this should a top-level project, e.g. `app` or `api`
-    * For other commit types, use your best judgement or omit
+    - For `feat`, `fix`, `refactor`, and `perf`, this should a top-level project, e.g. `app` or `api`
+    - For other commit types, use your best judgement or omit
 3.  Write a short commit title
-    * Written according to the guidelines above
+    - Written according to the guidelines above
 4.  Write a longer description if necessary
-    * Also written according to the guidelines above
+    - Also written according to the guidelines above
 5.  Mention any tickets addressed by the commit
-    * e.g. `Closes #xyz`
+    - e.g. `Closes #xyz`
 
 ![commitizen](https://user-images.githubusercontent.com/2963448/40452320-776de7e0-5eaf-11e8-9aa7-ad706713b197.gif)
 
@@ -105,13 +119,13 @@ Most of Opentrons’ projects live in the [Opentrons/opentrons][repo] repository
 
 Generally, the directory / file structure of our monorepo looks something like this:
 
-*   \[Project]
-*   \[Another Project]
-*   etc.
-*   `scripts` - Repository level scripts (mostly for CI)
-*   `Makefile` - Top level makefile for CI
-*   Various repository level dotfiles (CI and git config)
-*   `README.md`, `CONTRIBUTING.md`, `LICENSE`, etc.
+- \[Project]
+- \[Another Project]
+- etc.
+- `scripts` - Repository level scripts (mostly for CI)
+- `Makefile` - Top level makefile for CI
+- Various repository level dotfiles (CI and git config)
+- `README.md`, `CONTRIBUTING.md`, `LICENSE`, etc.
 
 Our projects use a mix of languages, but mostly Python (backend + robotics) and JavaScript (frontend). Each project has its own `README` + `Makefile` + dependency management.
 
@@ -125,31 +139,31 @@ Individual projects may have additional instructions, so be sure to check out th
 
 Your computer will need the following tools installed to be able to develop with the Opentrons platform:
 
-*   macOS 10.11+, Linux, or Windows 10
-    * On Windows, please configure Git’s `core.autocrlf` setting (see the [Git config docs](https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration)) to `input` so that shell scripts required for the robot’s boot process in `api/opentrons/resources` do not have carriage returns inserted.
-*   Python 3.6 ([pyenv](https://github.com/pyenv/pyenv) is optional, but recommended for macOS / Linux. If `pyenv` is not available for your system or you do not want to use it, you can set the environment variable `OT_PYTHON` to the full path to the Python 3.6 executable)
+- macOS 10.11+, Linux, or Windows 10
+  - On Windows, please configure Git’s `core.autocrlf` setting (see the [Git config docs](https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration)) to `input` so that shell scripts required for the robot’s boot process in `api/opentrons/resources` do not have carriage returns inserted.
+- Python 3.6 ([pyenv](https://github.com/pyenv/pyenv) is optional, but recommended for macOS / Linux. If `pyenv` is not available for your system or you do not want to use it, you can set the environment variable `OT_PYTHON` to the full path to the Python 3.6 executable)
 
-    ```shell
-    pyenv install 3.6.4
-    ```
+  ```shell
+  pyenv install 3.6.4
+  ```
 
-*   Node v8 LTS (Carbon) - [nvm][] is optional, but recommended
+- Node v8 LTS (Carbon) - [nvm][] is optional, but recommended
 
-    ```shell
-    nvm install lts/carbon
-    ```
+  ```shell
+  nvm install lts/carbon
+  ```
 
-*   [yarn][yarn-install] - JavaScript package manager
+- [yarn][yarn-install] - JavaScript package manager
 
-*   [commitizen][] - Commit message formatter
+- [commitizen][] - Commit message formatter
 
-    ```shell
-    yarn global add commitizen
-    ```
+  ```shell
+  yarn global add commitizen
+  ```
 
-*   GNU Make - we use [Makefiles][] to manage our builds
+- GNU Make - we use [Makefiles][] to manage our builds
 
-*   cURL - used to push development updates to robots
+- cURL - used to push development updates to robots
 
 Once you're set up, clone the repository and install all project dependencies:
 
@@ -161,20 +175,37 @@ make install
 
 In addition, if (and only if) you want to build a PDF version of the Opentrons API documentation, you must install a latex distribution that includes a callable pdflatex. If that is installed, you can do `make -C api docs-pdf`.
 
-### Testing and Linting
+### Testing
 
-You can test with:
+We use:
+
+- [pytest][] to test Python
+- [Jest][jest] to test JavaScript
+  - To run tests in watch mode, you should also install [watchman][]
+
+You can tests with:
 
 ```shell
 # run all tests
 make test
 
-# run a specific project's tests
-make -C api test
-make -C update-server test
-make -C components test
-make -C protocol-designer test
-make -C app test
+# run tests per language
+make test-py
+make test-js
+```
+
+You can pass some options to the JavaScript tests:
+
+```shell
+# run JavaScript tests in watch mode
+make test-js watch=true
+
+# disable test coverage
+make test-js cover=false
+
+# update snapshot tests
+# https://jestjs.io/docs/en/snapshot-testing
+make test-js updateSnapshot=true
 ```
 
 And you can run code linting / typechecking with:
@@ -189,6 +220,69 @@ make lint-js
 make lint-css
 make check-js
 ```
+
+[pytest]: https://docs.pytest.org/en/latest/
+[jest]: https://jestjs.io/
+[watchman]: https://facebook.github.io/watchman/
+
+### Code quality
+
+To help with code quality and maintainability, we use a collection of tools that can be roughly sorted into the following categories (with some overlaps):
+
+- [Linters][lint]
+  - Analyze the code for various potential bugs and errors
+  - [Pylama][pylama] - Python code audit tool
+  - [ESLint][eslint] - JavsScript/JSON linter
+  - [stylelint][] - CSS linter
+- [Typecheckers][type-check]
+  - Verify that the code is [type safe][type-safe]
+  - [mypy][] - Static type checker for Python
+  - [Flow][flow] - Static type checker for JavaScript
+- Formatters
+  - (Re)format source code to adhere to a consistent [style][code-style]
+  - [Prettier][prettier] - Code formatter for JavaScript, JSON, Markdown, and YAML
+
+These tools can be run with the following commands:
+
+```shell
+# lint all code and run all typechecks
+make lint
+
+# lint by language
+# note: Python linting also includes typechecking
+make lint-py
+make lint-js
+make lint-json
+make lint-css
+
+# typecheck JavaScript code
+make check-js
+
+# format JavaScript, JSON, Markdown, and YAML
+make format
+```
+
+[lint]: https://en.wikipedia.org/wiki/Lint_(software)
+[type-check]: https://en.wikipedia.org/wiki/Type_system#Type_checking
+[type-safe]: https://en.wikipedia.org/wiki/Type_safety
+[code-style]: https://en.wikipedia.org/wiki/Programming_style
+[eslint]: https://eslint.org/
+[pylama]: https://github.com/klen/pylama
+[stylelint]: https://stylelint.io/
+[flow]: https://flow.org/
+[mypy]: http://mypy-lang.org/
+[prettier]: https://prettier.io/
+
+#### Editor setup
+
+Most, if not all, of the tools above have plugins available for your code editor that will run quality checks and formatting as you write and/or save. We **highly recommend** setting up your editor to format and check your code automatically.
+
+- Pylama - Search your editor's package manager
+- ESLint - <https://eslint.org/docs/user-guide/integrations#editors>
+- stylelint - <https://stylelint.io/user-guide/complementary-tools/#editor-plugins>
+- mypy - Search your editor's package manager
+- Flow - <https://flow.org/en/docs/editors/>
+- Prettier - <https://prettier.io/docs/en/editors.html>
 
 ### Opentrons API
 
@@ -219,7 +313,7 @@ Our release process is still a work-in-progress. All projects are currently vers
 1.  `make bump` (see details below)
 2.  Inspect version bumps and changelogs
 3.  Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes
-4. `git checkout -b release_${version}` (The branch name _must_ match `release_*` to trigger signed builds that can be used as RCs)
+4.  `git checkout -b release_${version}` (The branch name _must_ match `release_*` to trigger signed builds that can be used as RCs)
 5.  `git add --all`
 6.  `git cz`
     - Type: `chore`
@@ -228,8 +322,8 @@ Our release process is still a work-in-progress. All projects are currently vers
 7.  Open a PR into `edge`
 8.  Squash merge the PR once approved
 9.  Verify that CI is green on `edge` and test the build artifacts
-10.  Pull latest `edge` to your machine
-11.  `git tag -a v${version} -m 'chore(release): ${version}'`
+10. Pull latest `edge` to your machine
+11. `git tag -a v${version} -m 'chore(release): ${version}'`
 12. `git push --tags`
 
 #### `make bump` usage
@@ -237,12 +331,12 @@ Our release process is still a work-in-progress. All projects are currently vers
 `make bump` runs `lerna publish` (with npm and git push disabled) to bump all required files. You can pass options to lerna with the `opts` environment variable. See the [lerna publish docs][lerna-publish] for available options. The most important options are:
 
 - `--preid` - Used to specify the pre-release identifier
-    - Default: `alpha`
-    - Valid: `alpha`, `beta`
+  - Default: `alpha`
+  - Valid: `alpha`, `beta`
 - `--cd-version` - Used to specify a semantic version bump
-    - Default: `prerelease`
-    - Valid: `major`, `minor`, `patch`, `premajor`, `preminor`, `prepatch`, `prerelease`
-    - See [semver.inc][semver-inc] for keyword meanings
+  - Default: `prerelease`
+  - Valid: `major`, `minor`, `patch`, `premajor`, `preminor`, `prepatch`, `prerelease`
+  - See [semver.inc][semver-inc] for keyword meanings
 - `--repo-version` - Used to specify an explicit version
 
 ```shell
@@ -281,9 +375,9 @@ yarn run lerna [opts]
 
 This Contributing Guide was influenced by a lot of work done on existing Contributing Guides. They're great reads if you have the time!
 
-*   [React.js Contributing Guide][react-contributing]
-*   [Node.js Contributing Guide][node-contributing]
-*   [Kibana Contributing Guide][kibana-contributing]
+- [React.js Contributing Guide][react-contributing]
+- [Node.js Contributing Guide][node-contributing]
+- [Kibana Contributing Guide][kibana-contributing]
 
 ## Developer "Gotchas"
 

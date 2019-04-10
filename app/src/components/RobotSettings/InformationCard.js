@@ -1,21 +1,21 @@
 // @flow
 // RobotSettings card for robot status
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {Link} from 'react-router-dom'
+import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 import {
   fetchHealthAndIgnored,
   makeGetRobotUpdateInfo,
 } from '../../http-api-client'
-import {getRobotApiVersion, getRobotFirmwareVersion} from '../../discovery'
-import {checkShellUpdate} from '../../shell'
-import {RefreshCard, LabeledValue, OutlineButton} from '@opentrons/components'
-import {CardContentQuarter} from '../layout'
+import { getRobotApiVersion, getRobotFirmwareVersion } from '../../discovery'
+import { checkShellUpdate } from '../../shell'
+import { RefreshCard, LabeledValue, OutlineButton } from '@opentrons/components'
+import { CardContentQuarter } from '../layout'
 
-import type {State, Dispatch} from '../../types'
-import type {RobotUpdateInfo} from '../../http-api-client'
-import type {ViewableRobot} from '../../discovery'
+import type { State, Dispatch } from '../../types'
+import type { RobotUpdateInfo } from '../../http-api-client'
+import type { ViewableRobot } from '../../discovery'
 
 type OwnProps = {
   robot: ViewableRobot,
@@ -31,7 +31,7 @@ type DispatchProps = {|
   checkAppUpdate: () => mixed,
 |}
 
-type Props = {...$Exact<OwnProps>, ...StateProps, ...DispatchProps}
+type Props = { ...$Exact<OwnProps>, ...StateProps, ...DispatchProps }
 
 const TITLE = 'Information'
 const NAME_LABEL = 'Robot name'
@@ -43,9 +43,9 @@ export default connect(
   mapDispatchToProps
 )(InformationCard)
 
-function InformationCard (props: Props) {
-  const {robot, updateInfo, fetchHealth, updateUrl, checkAppUpdate} = props
-  const {name, displayName, serverOk} = robot
+function InformationCard(props: Props) {
+  const { robot, updateInfo, fetchHealth, updateUrl, checkAppUpdate } = props
+  const { name, displayName, serverOk } = robot
   const version = getRobotApiVersion(robot) || 'Unknown'
   const firmwareVersion = getRobotFirmwareVersion(robot) || 'Unknown'
   const updateText = updateInfo.type || 'Reinstall'
@@ -75,7 +75,7 @@ function InformationCard (props: Props) {
   )
 }
 
-function makeMapStateToProps () {
+function makeMapStateToProps() {
   const getUpdateInfo = makeGetRobotUpdateInfo()
 
   return (state: State, ownProps: OwnProps): StateProps => ({
@@ -83,7 +83,7 @@ function makeMapStateToProps () {
   })
 }
 
-function mapDispatchToProps (
+function mapDispatchToProps(
   dispatch: Dispatch,
   ownProps: OwnProps
 ): DispatchProps {

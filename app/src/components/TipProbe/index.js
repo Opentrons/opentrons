@@ -2,7 +2,7 @@
 // TipProbe controls
 import * as React from 'react'
 
-import type {Pipette, PipetteCalibrationStatus} from '../../robot'
+import type { Pipette, PipetteCalibrationStatus } from '../../robot'
 
 import CalibrationInfoBox from '../CalibrationInfoBox'
 import UnprobedPanel from './UnprobedPanel'
@@ -18,16 +18,16 @@ type Props = Pipette & {
 const PANEL_BY_CALIBRATION: {
   [PipetteCalibrationStatus]: React.ComponentType<Props>,
 } = {
-  'unprobed': UnprobedPanel,
+  unprobed: UnprobedPanel,
   'preparing-to-probe': InstrumentMovingPanel,
   'ready-to-probe': AttachTipPanel,
-  'probing': InstrumentMovingPanel,
+  probing: InstrumentMovingPanel,
   'probed-tip-on': RemoveTipPanel,
-  'probed': ContinuePanel,
+  probed: ContinuePanel,
 }
 
-export default function TipProbe (props: Props) {
-  const {mount, probed, calibration} = props
+export default function TipProbe(props: Props) {
+  const { mount, probed, calibration } = props
   const title = `${mount} pipette calibration`
 
   const Panel = PANEL_BY_CALIBRATION[calibration]

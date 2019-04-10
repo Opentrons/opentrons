@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import {Icon, PrimaryButton} from '@opentrons/components'
+import { Icon, PrimaryButton } from '@opentrons/components'
 
 import styles from './styles.css'
 
@@ -10,23 +10,16 @@ type Props = {
   found: boolean,
 }
 
-export default function ScanButton (props: Props) {
-  const {isScanning, onScanClick, found} = props
-  const buttonText = found
-    ? 'Refresh List'
-    : 'Try Again'
+export default function ScanButton(props: Props) {
+  const { isScanning, onScanClick, found } = props
+  const buttonText = found ? 'Refresh List' : 'Try Again'
 
   if (isScanning) {
-    return (
-      <Icon name='ot-spinner' className={styles.scan_progress} spin />
-    )
+    return <Icon name="ot-spinner" className={styles.scan_progress} spin />
   }
 
   return (
-    <PrimaryButton
-      onClick={onScanClick}
-      className={styles.scan_button}
-    >
+    <PrimaryButton onClick={onScanClick} className={styles.scan_button}>
       {buttonText}
     </PrimaryButton>
   )

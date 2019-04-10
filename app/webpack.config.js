@@ -7,9 +7,9 @@ const webpackMerge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
 
-const {DEV_MODE, baseConfig} = require('@opentrons/webpack-config')
-const {productName: title} = require('@opentrons/app-shell/package.json')
-const {description, author} = require('./package.json')
+const { DEV_MODE, baseConfig } = require('@opentrons/webpack-config')
+const { productName: title } = require('@opentrons/app-shell/package.json')
+const { description, author } = require('./package.json')
 
 const JS_ENTRY = path.join(__dirname, 'src/index.js')
 const HTML_ENTRY = path.join(__dirname, 'src/index.hbs')
@@ -29,7 +29,7 @@ module.exports = webpackMerge(baseConfig, {
     },
     // workaround for worker-loader HMR
     // see https://github.com/webpack/webpack/issues/6642
-    DEV_MODE ? {globalObject: 'this'} : {}
+    DEV_MODE ? { globalObject: 'this' } : {}
   ),
 
   plugins: [
@@ -47,7 +47,7 @@ module.exports = webpackMerge(baseConfig, {
       intercomId: process.env.OT_APP_INTERCOM_ID,
     }),
 
-    new ScriptExtHtmlWebpackPlugin({defaultAttribute: 'defer'}),
+    new ScriptExtHtmlWebpackPlugin({ defaultAttribute: 'defer' }),
   ],
 
   node: {

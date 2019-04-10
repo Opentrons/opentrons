@@ -1,9 +1,9 @@
 // @flow
 // Robot and Instrument links specific to RobotListItem
 import * as React from 'react'
-import {NavLink} from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 
-import type {HoverTooltipHandlers} from '@opentrons/components'
+import type { HoverTooltipHandlers } from '@opentrons/components'
 import cx from 'classnames'
 import styles from './styles.css'
 
@@ -16,8 +16,8 @@ type LinkProps = {
   disabled?: boolean,
 }
 
-export default function RobotLink (props: LinkProps) {
-  const {url} = props
+export default function RobotLink(props: LinkProps) {
+  const { url } = props
   const className = cx(styles.robot_link, props.className, {
     [styles.disabled]: props.disabled,
   })

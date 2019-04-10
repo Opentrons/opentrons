@@ -1,17 +1,17 @@
 // @flow
 // user support module
-import {version} from './../package.json'
-import {FF_PREFIX, getRobotAnalyticsData} from './analytics'
-import {getConnectedRobot} from './discovery'
+import { version } from './../package.json'
+import { FF_PREFIX, getRobotAnalyticsData } from './analytics'
+import { getConnectedRobot } from './discovery'
 import createLogger from './logger'
 
-import type {Action, ThunkAction, Middleware} from './types'
-import type {BaseRobot} from './robot'
-import type {Config} from './config'
+import type { Action, ThunkAction, Middleware } from './types'
+import type { BaseRobot } from './robot'
+import type { Config } from './config'
 
 type SupportConfig = $PropertyType<Config, 'support'>
 
-type IntercomUpdate = {[string]: string | boolean | number}
+type IntercomUpdate = { [string]: string | boolean | number }
 
 const log = createLogger(__filename)
 
@@ -24,7 +24,7 @@ let userId
 // intercom handler (default noop)
 const intercom = (...args) => {
   if (INTERCOM_ID && global.Intercom) {
-    log.debug('Sending to Intercom', {args})
+    log.debug('Sending to Intercom', { args })
     global.Intercom(...args)
   }
 }
@@ -42,11 +42,11 @@ const PIPETTE_MODEL_LEFT = 'Pipette Model Left'
 const PIPETTE_MODEL_RIGHT = 'Pipette Model Right'
 const FEATURE_FLAG = 'Robot FF'
 
-export function initializeSupport (): ThunkAction {
+export function initializeSupport(): ThunkAction {
   return (_, getState) => {
     const config = getState().config.support
 
-    log.debug('Support config', {config})
+    log.debug('Support config', { config })
     initializeIntercom(config)
   }
 }
@@ -74,14 +74,14 @@ export const supportMiddleware: Middleware = store => next => action => {
       .map(key => [key.slice(FF_PREFIX.length), robotData[key]])
       .forEach(([key, value]) => (update[`${FEATURE_FLAG} ${key}`] = value))
 
-    log.debug('Intercom update', {action, update})
+    log.debug('Intercom update', { action, update })
     intercom(UPDATE, update)
   }
 
   return result
 }
 
-function initializeIntercom (config: SupportConfig) {
+function initializeIntercom(config: SupportConfig) {
   if (INTERCOM_ID) {
     userId = config.userId
 
@@ -95,13 +95,13 @@ function initializeIntercom (config: SupportConfig) {
   }
 }
 
-function shouldUpdateIntercom (action: Action, robot: BaseRobot): boolean {
+function shouldUpdateIntercom(action: Action, robot: BaseRobot): boolean {
   // update intercom on new robot connect
   if (action.type === 'robot:CONNECT_RESPONSE') return true
 
   // also update if the robot has potentially new pipettes or advanced settings
   if (action.type === 'api:SUCCESS') {
-    const {robot: reqRobot, path} = action.payload
+    const { robot: reqRobot, path } = action.payload
     return (
       reqRobot.name === robot.name &&
       (path === 'pipettes' || path === 'settings')

@@ -1,27 +1,27 @@
 // @flow
 // setup modules component
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {getModuleDisplayName} from '@opentrons/shared-data'
-import {selectors as robotSelectors} from '../../robot'
+import { getModuleDisplayName } from '@opentrons/shared-data'
+import { selectors as robotSelectors } from '../../robot'
 import {
   makeGetRobotModules,
   fetchModules,
   type FetchModulesResponse,
 } from '../../http-api-client'
 
-import {RefreshWrapper} from '../Page'
+import { RefreshWrapper } from '../Page'
 import InfoSection from './InfoSection'
-import {SectionContentHalf} from '../layout'
+import { SectionContentHalf } from '../layout'
 import InstrumentItem from './InstrumentItem'
 import InstrumentWarning from './InstrumentWarning'
 
-import type {State} from '../../types'
-import type {SessionModule} from '../../robot'
-import type {Robot} from '../../discovery'
+import type { State } from '../../types'
+import type { SessionModule } from '../../robot'
+import type { Robot } from '../../discovery'
 
-type OP = {robot: Robot}
+type OP = { robot: Robot }
 
 type SP = {|
   modules: Array<SessionModule>,
@@ -29,9 +29,9 @@ type SP = {|
   attachModulesUrl: string,
 |}
 
-type DP = {|fetchModules: () => mixed|}
+type DP = {| fetchModules: () => mixed |}
 
-type Props = {...$Exact<OP>, ...SP, ...DP}
+type Props = { ...$Exact<OP>, ...SP, ...DP }
 
 const TITLE = 'Required Modules'
 
@@ -40,8 +40,8 @@ export default connect(
   mapDispatchToProps
 )(ProtocolModulesCard)
 
-function ProtocolModulesCard (props: Props) {
-  const {modules, actualModules, fetchModules, attachModulesUrl} = props
+function ProtocolModulesCard(props: Props) {
+  const { modules, actualModules, fetchModules, attachModulesUrl } = props
 
   if (modules.length < 1) return null
 
@@ -80,11 +80,11 @@ function ProtocolModulesCard (props: Props) {
   )
 }
 
-function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
+function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
   const getActualModules = makeGetRobotModules()
 
   return (state, ownProps) => {
-    const {robot} = ownProps
+    const { robot } = ownProps
     const modulesCall = getActualModules(state, robot)
 
     return {
@@ -96,7 +96,7 @@ function makeMapStateToProps (): (state: State, ownProps: OP) => SP {
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   return {
     fetchModules: () => dispatch(fetchModules(ownProps.robot)),
   }

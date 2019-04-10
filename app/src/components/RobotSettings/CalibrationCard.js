@@ -1,15 +1,15 @@
 // @flow
 // Card for displaying/initiating factory calibration
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {push} from 'react-router-redux'
+import { connect } from 'react-redux'
+import { push } from 'react-router-redux'
 
-import {CONNECTABLE} from '../../discovery'
-import {startDeckCalibration} from '../../http-api-client'
-import {Card, OutlineButton} from '@opentrons/components'
-import {CardContentFlex, CardContentFull} from '../layout'
+import { CONNECTABLE } from '../../discovery'
+import { startDeckCalibration } from '../../http-api-client'
+import { Card, OutlineButton } from '@opentrons/components'
+import { CardContentFlex, CardContentFull } from '../layout'
 
-import type {ViewableRobot} from '../../discovery'
+import type { ViewableRobot } from '../../discovery'
 
 type OP = {
   robot: ViewableRobot,
@@ -21,7 +21,7 @@ type DP = {|
   start: () => mixed,
 |}
 
-type Props = {...$Exact<OP>, ...DP}
+type Props = { ...$Exact<OP>, ...DP }
 
 const TITLE = 'Deck Calibration'
 // const LAST_RUN_LABEL = 'Last Run'
@@ -33,8 +33,8 @@ export default connect(
   mapDispatchToProps
 )(CalibrationCard)
 
-function CalibrationCard (props: Props) {
-  const {start, robot} = props
+function CalibrationCard(props: Props) {
+  const { start, robot } = props
   const disabled = robot.status !== CONNECTABLE
 
   return (
@@ -59,8 +59,8 @@ function CalibrationCard (props: Props) {
   )
 }
 
-function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  const {robot, calibrateDeckUrl} = ownProps
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
+  const { robot, calibrateDeckUrl } = ownProps
 
   return {
     start: () =>

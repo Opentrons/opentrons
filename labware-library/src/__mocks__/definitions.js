@@ -3,7 +3,7 @@
 import path from 'path'
 import glob from 'glob'
 
-import type {LabwareList} from '../types'
+import type { LabwareList } from '../types'
 
 const LABWARE_FIXTURE_PATTERN = path.join(
   __dirname,
@@ -15,6 +15,6 @@ const allLabware = glob
   .map(require)
   .filter(d => d.metadata.displayCategory !== 'trash')
 
-export function getAllDefinitions (): LabwareList {
-  return allLabware
-}
+export const getAllDefinitions = jest.fn<Array<void>, LabwareList>(
+  () => allLabware
+)

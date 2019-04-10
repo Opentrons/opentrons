@@ -1,5 +1,5 @@
 // @flow
-import type {Service} from '../types'
+import type { Service } from '../types'
 
 const MOCK_SERVICE: Service = {
   name: 'opentrons-dev',

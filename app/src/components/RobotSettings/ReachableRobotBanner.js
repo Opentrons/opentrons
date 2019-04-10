@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react'
-import {AlertItem} from '@opentrons/components'
+import { AlertItem } from '@opentrons/components'
 import styles from './styles.css'
 
-import type {ReachableRobot} from '../../discovery'
+import type { ReachableRobot } from '../../discovery'
 
-type State = {dismissed: boolean}
+type State = { dismissed: boolean }
 
 const UNRESPONSIVE_TITLE = 'Unable to establish connection with robot'
 const RESTARTING_TITLE = 'Robot restarting'
@@ -60,13 +60,13 @@ export default class ReachableRobotBanner extends React.Component<
   ReachableRobot,
   State
 > {
-  constructor (props: ReachableRobot) {
+  constructor(props: ReachableRobot) {
     super(props)
-    this.state = {dismissed: false}
+    this.state = { dismissed: false }
   }
 
-  render () {
-    const {serverOk, restartStatus} = this.props
+  render() {
+    const { serverOk, restartStatus } = this.props
     const isVisible = !this.state.dismissed
     let title = ''
     let message = ''
@@ -83,7 +83,7 @@ export default class ReachableRobotBanner extends React.Component<
     return (
       <AlertItem
         type="warning"
-        onCloseClick={() => this.setState({dismissed: true})}
+        onCloseClick={() => this.setState({ dismissed: true })}
         title={title}
       >
         {message}

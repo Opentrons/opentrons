@@ -77,16 +77,18 @@ describe('dispense', () => {
             ...testCase.args,
           })(robotStateWithTip)
 
-          expect(result.commands).toEqual([{
-            command: 'dispense',
-            params: {
-              pipette: 'p300SingleId',
-              volume: 50,
-              labware: 'sourcePlateId',
-              well: 'A1',
-              ...(testCase.expectInParams ? testCase.args : {}),
+          expect(result.commands).toEqual([
+            {
+              command: 'dispense',
+              params: {
+                pipette: 'p300SingleId',
+                volume: 50,
+                labware: 'sourcePlateId',
+                well: 'A1',
+                ...(testCase.expectInParams ? testCase.args : {}),
+              },
             },
-          }])
+          ])
         })
       })
     })
@@ -103,10 +105,12 @@ describe('dispense', () => {
 
       const result = dispense(args)(robotStateWithTip)
 
-      expect(result.commands).toEqual([{
-        command: 'dispense',
-        params: args,
-      }])
+      expect(result.commands).toEqual([
+        {
+          command: 'dispense',
+          params: args,
+        },
+      ])
     })
 
     test('dispensing without tip should throw error', () => {

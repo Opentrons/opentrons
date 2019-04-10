@@ -6,9 +6,9 @@ import * as selectors from './selectors'
 import * as constants from './constants'
 import apiClientMiddleware from './api-client'
 
-export type {Action} from './actions'
+export type { Action } from './actions'
 
 export * from './types'
-export {_NAME as NAME} from './constants'
-export {actions, actionTypes} from './actions'
-export {constants, reducer, selectors, apiClientMiddleware}
+export { _NAME as NAME } from './constants'
+export { actions, actionTypes } from './actions'
+export { constants, reducer, selectors, apiClientMiddleware }

@@ -39,8 +39,8 @@
       "wells": "wells"
     },
     "field": {
-      "airGap": {"label": "air gap"},
-      "blowout": {"label": "blowout"},
+      "airGap": { "label": "air gap" },
+      "blowout": { "label": "blowout" },
       "change_tip": {
         "label": "change tip",
         "option": {
@@ -58,8 +58,8 @@
           "never": "Use same tip as the previous step."
         }
       },
-      "tip_position": {"label": "tip position"},
-      "volume": {"label": "volume"},
+      "tip_position": { "label": "tip position" },
+      "volume": { "label": "volume" },
       "well_order": {
         "label": "Well order",
         "option": {
@@ -69,16 +69,16 @@
           "b2t": "Bottom to top"
         }
       },
-      "step_name": {"label": "Step Name"},
-      "step_notes": {"label": "Step Notes"},
-      "mix": {"label": "mix"},
+      "step_name": { "label": "Step Name" },
+      "step_notes": { "label": "Step Notes" },
+      "mix": { "label": "mix" },
       "pauseForAmountOfTime": {
         "options": {
           "false": "Pause until told to resume",
           "true": "Delay for an amount of time"
         }
       },
-      "pauseMessage": {"label": "message to display"},
+      "pauseMessage": { "label": "message to display" },
       "path": {
         "title": {
           "single": "Single Transfers",
@@ -93,9 +93,9 @@
           "incompatible_with_per_source": "Incompatible with \"Per Source Well\" Change Tip setting"
         }
       },
-      "pipette": {"label": "pipette"},
-      "preWetTip": {"label": "pre-wet tip"},
-      "touchTip": {"label": "touch tip"}
+      "pipette": { "label": "pipette" },
+      "preWetTip": { "label": "pre-wet tip" },
+      "touchTip": { "label": "touch tip" }
     }
   }
 }

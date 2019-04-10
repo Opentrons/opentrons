@@ -1,10 +1,10 @@
 // discovery reducer test
-import {discoveryReducer} from '..'
+import { discoveryReducer } from '..'
 
 jest.mock('../../shell', () => ({
   getShellRobots: () => [
-    {name: 'foo', ip: '192.168.1.1', port: 31950},
-    {name: 'bar', ip: '192.168.1.2', port: 31950},
+    { name: 'foo', ip: '192.168.1.1', port: 31950 },
+    { name: 'bar', ip: '192.168.1.2', port: 31950 },
   ],
 }))
 
@@ -22,22 +22,22 @@ describe('discoveryReducer', () => {
         scanning: false,
         restartsByName: {},
         robotsByName: {
-          foo: [{name: 'foo', ip: '192.168.1.1', port: 31950}],
-          bar: [{name: 'bar', ip: '192.168.1.2', port: 31950}],
+          foo: [{ name: 'foo', ip: '192.168.1.1', port: 31950 }],
+          bar: [{ name: 'bar', ip: '192.168.1.2', port: 31950 }],
         },
       },
     },
     {
       name: 'discovery:START sets scanning: true',
-      action: {type: 'discovery:START'},
-      initialState: {scanning: false},
-      expectedState: {scanning: true},
+      action: { type: 'discovery:START' },
+      initialState: { scanning: false },
+      expectedState: { scanning: true },
     },
     {
       name: 'discovery:FINISH sets scanning: false',
-      action: {type: 'discovery:FINISH'},
-      initialState: {scanning: true},
-      expectedState: {scanning: false},
+      action: { type: 'discovery:FINISH' },
+      initialState: { scanning: true },
+      expectedState: { scanning: false },
     },
     {
       name: 'discovery:UPDATE_LIST resets discovered list',
@@ -45,16 +45,16 @@ describe('discoveryReducer', () => {
         type: 'discovery:UPDATE_LIST',
         payload: {
           robots: [
-            {name: 'foo', ip: '192.168.1.1', port: 31950},
-            {name: 'bar', ip: '192.168.1.2', port: 31950},
+            { name: 'foo', ip: '192.168.1.1', port: 31950 },
+            { name: 'bar', ip: '192.168.1.2', port: 31950 },
           ],
         },
       },
-      initialState: {robotsByName: {}, restartsByName: {}},
+      initialState: { robotsByName: {}, restartsByName: {} },
       expectedState: {
         robotsByName: {
-          foo: [{name: 'foo', ip: '192.168.1.1', port: 31950}],
-          bar: [{name: 'bar', ip: '192.168.1.2', port: 31950}],
+          foo: [{ name: 'foo', ip: '192.168.1.1', port: 31950 }],
+          bar: [{ name: 'bar', ip: '192.168.1.2', port: 31950 }],
         },
         restartsByName: {},
       },
@@ -63,25 +63,25 @@ describe('discoveryReducer', () => {
       name: 'api:SERVER_SUCCESS sets restart pending',
       action: {
         type: 'api:SERVER_SUCCESS',
-        payload: {path: 'restart', robot: {name: 'name'}},
+        payload: { path: 'restart', robot: { name: 'name' } },
       },
-      initialState: {restartsByName: {}},
-      expectedState: {restartsByName: {name: 'pending'}},
+      initialState: { restartsByName: {} },
+      expectedState: { restartsByName: { name: 'pending' } },
     },
     {
       name: 'discovery:UPDATE_LIST sets restart down if pending robot not ok',
       action: {
         type: 'discovery:UPDATE_LIST',
         payload: {
-          robots: [{name: 'name', ip: '192.168.1.1', port: 31950, ok: false}],
+          robots: [{ name: 'name', ip: '192.168.1.1', port: 31950, ok: false }],
         },
       },
-      initialState: {restartsByName: {name: 'pending'}},
+      initialState: { restartsByName: { name: 'pending' } },
       expectedState: {
         robotsByName: {
-          name: [{name: 'name', ip: '192.168.1.1', port: 31950, ok: false}],
+          name: [{ name: 'name', ip: '192.168.1.1', port: 31950, ok: false }],
         },
-        restartsByName: {name: 'down'},
+        restartsByName: { name: 'down' },
       },
     },
     {
@@ -89,21 +89,21 @@ describe('discoveryReducer', () => {
       action: {
         type: 'discovery:UPDATE_LIST',
         payload: {
-          robots: [{name: 'name', ip: '192.168.1.1', port: 31950, ok: true}],
+          robots: [{ name: 'name', ip: '192.168.1.1', port: 31950, ok: true }],
         },
       },
-      initialState: {restartsByName: {name: 'down'}},
+      initialState: { restartsByName: { name: 'down' } },
       expectedState: {
         robotsByName: {
-          name: [{name: 'name', ip: '192.168.1.1', port: 31950, ok: true}],
+          name: [{ name: 'name', ip: '192.168.1.1', port: 31950, ok: true }],
         },
-        restartsByName: {name: null},
+        restartsByName: { name: null },
       },
     },
   ]
 
   SPECS.forEach(spec => {
-    const {name, action, initialState, expectedState} = spec
+    const { name, action, initialState, expectedState } = spec
     test(name, () =>
       expect(discoveryReducer(initialState, action)).toEqual(expectedState)
     )

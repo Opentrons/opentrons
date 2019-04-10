@@ -34,7 +34,7 @@ describe('blowoutUtil', () => {
     blowoutUtil(
       ...blowoutArgs,
 
-      SOURCE_WELL_BLOWOUT_DESTINATION,
+      SOURCE_WELL_BLOWOUT_DESTINATION
     )
 
     expect(_blowout).toHaveBeenCalledWith({
@@ -45,10 +45,7 @@ describe('blowoutUtil', () => {
   })
 
   test('blowoutUtil calls blowout with dest plate params', () => {
-    blowoutUtil(
-      ...blowoutArgs,
-      DEST_WELL_BLOWOUT_DESTINATION,
-    )
+    blowoutUtil(...blowoutArgs, DEST_WELL_BLOWOUT_DESTINATION)
 
     expect(_blowout).toHaveBeenCalledWith({
       pipette: pipetteId,

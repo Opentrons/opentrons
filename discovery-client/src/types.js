@@ -54,4 +54,4 @@ export type LogLevel =
   | 'debug'
   | 'silly'
 
-export type Logger = {[level: LogLevel]: (message: string, meta?: {}) => void}
+export type Logger = { [level: LogLevel]: (message: string, meta?: {}) => void }

@@ -5,10 +5,10 @@
 // in each API client submodule
 import client from './client'
 
-import type {ThunkPromiseAction} from '../types'
-import type {BaseRobot, RobotService} from '../robot'
-import type {ApiRequestError} from './types'
-import type {Method} from './client'
+import type { ThunkPromiseAction } from '../types'
+import type { BaseRobot, RobotService } from '../robot'
+import type { ApiRequestError } from './types'
+import type { Method } from './client'
 
 export type ApiRequestAction<Path: string, Body: ?{}> = {|
   type: 'api:REQUEST',
@@ -51,16 +51,18 @@ export type ApiAction<Path: string, Request: ?{}, Response: {}> =
   | ApiFailureAction<Path>
   | ClearApiResponseAction<Path>
 
-export type RequestMaker<Request: ?{} = void> =
-  (robot: RobotService, request: Request) => ThunkPromiseAction
+export type RequestMaker<Request: ?{} = void> = (
+  robot: RobotService,
+  request: Request
+) => ThunkPromiseAction
 
 // thunk action creator creator (sorry) for making API calls
 // e.g. export const fetchHealth = buildRequestMaker('GET', 'health')
-export function buildRequestMaker<Request: ?{}> (
+export function buildRequestMaker<Request: ?{}>(
   method: Method,
   path: string
 ): RequestMaker<Request> {
-  return (robot, request = null) => (dispatch) => {
+  return (robot, request = null) => dispatch => {
     dispatch(apiRequest(robot, path, request))
 
     return client(robot, method, path, request)
@@ -72,33 +74,33 @@ export function buildRequestMaker<Request: ?{}> (
   }
 }
 
-export function apiRequest<Path: string, Body: ?{}> (
+export function apiRequest<Path: string, Body: ?{}>(
   robot: BaseRobot,
   path: Path,
   request: Body
 ): ApiRequestAction<Path, Body> {
-  return {type: 'api:REQUEST', payload: {robot, path, request}}
+  return { type: 'api:REQUEST', payload: { robot, path, request } }
 }
 
-export function apiSuccess<Path: string, Body: {}> (
+export function apiSuccess<Path: string, Body: {}>(
   robot: BaseRobot,
   path: Path,
   response: Body
 ): ApiSuccessAction<Path, Body> {
-  return {type: 'api:SUCCESS', payload: {robot, path, response}}
+  return { type: 'api:SUCCESS', payload: { robot, path, response } }
 }
 
-export function apiFailure<Path: string> (
+export function apiFailure<Path: string>(
   robot: BaseRobot,
   path: Path,
   error: ApiRequestError
 ): ApiFailureAction<Path> {
-  return {type: 'api:FAILURE', payload: {robot, path, error}}
+  return { type: 'api:FAILURE', payload: { robot, path, error } }
 }
 
-export function clearApiResponse<Path: string> (
+export function clearApiResponse<Path: string>(
   robot: BaseRobot,
   path: Path
 ): ClearApiResponseAction<Path> {
-  return {type: 'api:CLEAR_RESPONSE', payload: {robot, path}}
+  return { type: 'api:CLEAR_RESPONSE', payload: { robot, path } }
 }

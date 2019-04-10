@@ -1,15 +1,15 @@
 // @flow
 // API client for getting reset options and resetting robot config files
-import {createSelector} from 'reselect'
+import { createSelector } from 'reselect'
 
-import type {OutputSelector} from 'reselect'
-import type {State, ThunkPromiseAction} from '../types'
-import type {BaseRobot, RobotService} from '../robot'
-import type {ApiCall, ApiRequestError} from './types'
-import type {ApiAction} from './actions'
+import type { OutputSelector } from 'reselect'
+import type { State, ThunkPromiseAction } from '../types'
+import type { BaseRobot, RobotService } from '../robot'
+import type { ApiCall, ApiRequestError } from './types'
+import type { ApiAction } from './actions'
 
-import {apiRequest, apiSuccess, apiFailure, clearApiResponse} from './actions'
-import {getRobotApiState} from './reducer'
+import { apiRequest, apiSuccess, apiFailure, clearApiResponse } from './actions'
+import { getRobotApiState } from './reducer'
 import client from './client'
 
 type OptionId = string
@@ -45,22 +45,26 @@ export type ResetState = {|
   'settings/reset'?: ResetRobotCall,
 |}
 
-export function fetchResetOptions (robot: RobotService): ThunkPromiseAction {
-  return (dispatch) => {
+export function fetchResetOptions(robot: RobotService): ThunkPromiseAction {
+  return dispatch => {
     dispatch(apiRequest(robot, OPTIONS_PATH, null))
 
     return client(robot, 'GET', OPTIONS_PATH)
       .then(
-        (resp: FetchResetOptionsResponse) => apiSuccess(robot, OPTIONS_PATH, resp),
+        (resp: FetchResetOptionsResponse) =>
+          apiSuccess(robot, OPTIONS_PATH, resp),
         (err: ApiRequestError) => apiFailure(robot, OPTIONS_PATH, err)
       )
       .then(dispatch)
   }
 }
 
-export function resetRobotData (robot: RobotService, options: ResetRobotRequest): ThunkPromiseAction {
+export function resetRobotData(
+  robot: RobotService,
+  options: ResetRobotRequest
+): ThunkPromiseAction {
   const request: ResetRobotRequest = options
-  return (dispatch) => {
+  return dispatch => {
     dispatch(apiRequest(robot, RESET_PATH, request))
 
     return client(robot, 'POST', RESET_PATH, request)
@@ -72,23 +76,31 @@ export function resetRobotData (robot: RobotService, options: ResetRobotRequest)
   }
 }
 
-export function makeGetRobotResetOptions () {
-  const selector: OutputSelector<State, BaseRobot, FetchResetOptionsCall> = createSelector(
+export function makeGetRobotResetOptions() {
+  const selector: OutputSelector<
+    State,
+    BaseRobot,
+    FetchResetOptionsCall
+  > = createSelector(
     getRobotApiState,
-    (state) => state[OPTIONS_PATH] || {inProgress: false}
+    state => state[OPTIONS_PATH] || { inProgress: false }
   )
 
   return selector
 }
 
-export function makeGetRobotResetRequest () {
-  const selector: OutputSelector<State, BaseRobot, ResetRobotRequest> = createSelector(
+export function makeGetRobotResetRequest() {
+  const selector: OutputSelector<
+    State,
+    BaseRobot,
+    ResetRobotRequest
+  > = createSelector(
     getRobotApiState,
-    (state) => state[RESET_PATH] || {inProgress: false}
+    state => state[RESET_PATH] || { inProgress: false }
   )
   return selector
 }
 
-export function clearResetResponse (robot: RobotService): ResetAction {
+export function clearResetResponse(robot: RobotService): ResetAction {
   return clearApiResponse(robot, RESET_PATH)
 }

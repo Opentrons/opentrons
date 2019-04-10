@@ -2,17 +2,17 @@
 // app status panel with connect button
 import * as React from 'react'
 
-import {AnalyticsSettingsCard} from '../analytics-settings'
+import { AnalyticsSettingsCard } from '../analytics-settings'
 import AdvancedSettingsCard from './AdvancedSettingsCard'
 import AppInfoCard from './AppInfoCard'
-import {CardContainer, CardRow} from '../layout'
+import { CardContainer, CardRow } from '../layout'
 
 type Props = {
   availableVersion: ?string,
   checkUpdate: () => mixed,
 }
 
-export default function AppSettings (props: Props) {
+export default function AppSettings(props: Props) {
   return (
     <CardContainer>
       <CardRow>

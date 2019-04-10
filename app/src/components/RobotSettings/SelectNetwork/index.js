@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import find from 'lodash/find'
 
 import {
@@ -19,18 +19,18 @@ import {
   clearConfigureWifiResponse,
 } from '../../../http-api-client'
 
-import {startDiscovery} from '../../../discovery'
-import {chainActions} from '../../../util'
+import { startDiscovery } from '../../../discovery'
+import { chainActions } from '../../../util'
 
-import {IntervalWrapper, SpinnerModal} from '@opentrons/components'
-import {Portal} from '../../portal'
+import { IntervalWrapper, SpinnerModal } from '@opentrons/components'
+import { Portal } from '../../portal'
 import ConnectModal from './ConnectModal'
 import ConnectForm from './ConnectForm'
 import SelectSsid from './SelectSsid'
 import WifiConnectModal from './WifiConnectModal'
 
-import type {State, Dispatch} from '../../../types'
-import type {ViewableRobot} from '../../../discovery'
+import type { State, Dispatch } from '../../../types'
+import type { ViewableRobot } from '../../../discovery'
 import type {
   WifiNetworkList,
   WifiSecurityType,
@@ -41,7 +41,7 @@ import type {
   ApiRequestError,
 } from '../../../http-api-client'
 
-type OP = {robot: ViewableRobot}
+type OP = { robot: ViewableRobot }
 
 type SP = {|
   list: ?WifiNetworkList,
@@ -62,7 +62,7 @@ type DP = {|
   clearConfigure: () => mixed,
 |}
 
-type Props = {...$Exact<OP>, ...SP, ...DP}
+type Props = { ...$Exact<OP>, ...SP, ...DP }
 
 type SelectNetworkState = {
   ssid: ?string,
@@ -73,7 +73,7 @@ type SelectNetworkState = {
 const LIST_REFRESH_MS = 15000
 
 class SelectNetwork extends React.Component<Props, SelectNetworkState> {
-  constructor (props) {
+  constructor(props) {
     super(props)
     // prepopulate selected SSID with currently connected network, if any
     this.state = {
@@ -84,7 +84,7 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
   }
 
   setCurrentSsid = (_: string, ssid: ?string) => {
-    const network = find(this.props.list, {ssid})
+    const network = find(this.props.list, { ssid })
     const securityType = network && network.securityType
     const nextState = {
       ssid,
@@ -93,7 +93,7 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
     }
 
     if (ssid && !nextState.modalOpen) {
-      this.props.configure({ssid})
+      this.props.configure({ ssid })
     } else if (securityType === WPA_EAP_SECURITY || !securityType) {
       this.props.fetchEapOptions()
       this.props.fetchKeys()
@@ -102,14 +102,15 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
     this.setState(nextState)
   }
 
-  closeConnectForm = () => this.setState({securityType: null, modalOpen: false})
+  closeConnectForm = () =>
+    this.setState({ securityType: null, modalOpen: false })
 
-  getActiveSsid (): ?string {
+  getActiveSsid(): ?string {
     const activeNetwork = find(this.props.list, 'active')
     return activeNetwork && activeNetwork.ssid
   }
 
-  render () {
+  render() {
     const {
       list,
       connectingTo,
@@ -123,7 +124,7 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
       configError,
       clearConfigure,
     } = this.props
-    const {ssid, securityType, modalOpen} = this.state
+    const { ssid, securityType, modalOpen } = this.state
 
     return (
       <IntervalWrapper refresh={refresh} interval={LIST_REFRESH_MS}>
@@ -170,17 +171,17 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
   }
 }
 
-function makeMapStateToProps (): (State, OP) => SP {
+function makeMapStateToProps(): (State, OP) => SP {
   const getListCall = makeGetRobotWifiList()
   const getEapCall = makeGetRobotWifiEapOptions()
   const getKeysCall = makeGetRobotWifiKeys()
   const getConfigureCall = makeGetRobotWifiConfigure()
 
   return (state, ownProps) => {
-    const {robot} = ownProps
-    const {response: listResponse} = getListCall(state, robot)
-    const {response: eapResponse} = getEapCall(state, robot)
-    const {response: keysResponse} = getKeysCall(state, robot)
+    const { robot } = ownProps
+    const { response: listResponse } = getListCall(state, robot)
+    const { response: eapResponse } = getEapCall(state, robot)
+    const { response: keysResponse } = getKeysCall(state, robot)
     const {
       request: cfgRequest,
       inProgress: cfgInProgress,
@@ -201,8 +202,8 @@ function makeMapStateToProps (): (State, OP) => SP {
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch, ownProps: OP): DP {
-  const {robot} = ownProps
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
+  const { robot } = ownProps
   const refreshActions = [fetchWifiList(robot), fetchNetworkingStatus(robot)]
   const configure = params =>
     dispatch(

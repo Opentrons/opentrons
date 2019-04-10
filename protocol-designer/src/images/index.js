@@ -1,2 +1,2 @@
 // @flow
-export {getLabwareDiagramURL} from './labware'
+export { getLabwareDiagramURL } from './labware'

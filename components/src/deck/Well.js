@@ -2,9 +2,9 @@
 import React from 'react'
 import cx from 'classnames'
 
-import {wellIsRect, type WellDefinition} from '@opentrons/shared-data'
+import { wellIsRect, type WellDefinition } from '@opentrons/shared-data'
 import styles from './Well.css'
-import {SELECTABLE_WELL_CLASS} from '../constants.js'
+import { SELECTABLE_WELL_CLASS } from '../constants.js'
 
 export type SingleWell = {|
   wellName: string,
@@ -25,12 +25,14 @@ type Props = {
 }
 
 class Well extends React.Component<Props> {
-  shouldComponentUpdate (nextProps: Props) {
-    return this.props.highlighted !== nextProps.highlighted ||
+  shouldComponentUpdate(nextProps: Props) {
+    return (
+      this.props.highlighted !== nextProps.highlighted ||
       this.props.selected !== nextProps.selected ||
       this.props.fillColor !== nextProps.fillColor
+    )
   }
-  render () {
+  render() {
     const {
       wellName,
       selectable,
@@ -45,16 +47,13 @@ class Well extends React.Component<Props> {
 
     const fillColor = this.props.fillColor || 'transparent'
 
-    const wellOverlayClassname = cx(
-      styles.well_border,
-      {
-        [SELECTABLE_WELL_CLASS]: selectable,
-        [styles.selected]: selected,
-        [styles.selected_overlay]: selected,
-        [styles.highlighted]: highlighted,
-        [styles.error]: error,
-      }
-    )
+    const wellOverlayClassname = cx(styles.well_border, {
+      [SELECTABLE_WELL_CLASS]: selectable,
+      [styles.selected]: selected,
+      [styles.selected_overlay]: selected,
+      [styles.highlighted]: highlighted,
+      [styles.error]: error,
+    })
 
     const selectionProps = {
       'data-wellname': wellName,
@@ -74,20 +73,18 @@ class Well extends React.Component<Props> {
         height: wellDef.y,
       }
 
-      return <g>
-        {/* Fill contents */}
-        <rect
-          {...rectProps}
-          className={styles.well_fill}
-          color={fillColor}
-        />
-        {/* Border + overlay */}
-        <rect
-          {...selectionProps}
-          {...rectProps}
-          className={wellOverlayClassname}
-        />
-      </g>
+      return (
+        <g>
+          {/* Fill contents */}
+          <rect {...rectProps} className={styles.well_fill} color={fillColor} />
+          {/* Border + overlay */}
+          <rect
+            {...selectionProps}
+            {...rectProps}
+            className={wellOverlayClassname}
+          />
+        </g>
+      )
     }
 
     if (isCircle) {
@@ -97,23 +94,27 @@ class Well extends React.Component<Props> {
         r: (wellDef.diameter || 0) / 2,
       }
 
-      return <g>
-        {/* Fill contents */}
-        <circle
-          {...circleProps}
-          className={styles.well_fill}
-          color={fillColor}
-        />
-        {/* Border + overlay */}
-        <circle
-          {...selectionProps}
-          {...circleProps}
-          className={wellOverlayClassname}
-        />
-      </g>
+      return (
+        <g>
+          {/* Fill contents */}
+          <circle
+            {...circleProps}
+            className={styles.well_fill}
+            color={fillColor}
+          />
+          {/* Border + overlay */}
+          <circle
+            {...selectionProps}
+            {...circleProps}
+            className={wellOverlayClassname}
+          />
+        </g>
+      )
     }
 
-    console.warn('Invalid well: neither rectangle or circle: ' + JSON.stringify(wellDef))
+    console.warn(
+      'Invalid well: neither rectangle or circle: ' + JSON.stringify(wellDef)
+    )
     return null
   }
 }

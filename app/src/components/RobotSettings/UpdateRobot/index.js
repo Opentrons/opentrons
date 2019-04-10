@@ -1,19 +1,19 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import {makeGetRobotUpdateRequest} from '../../../http-api-client'
+import { makeGetRobotUpdateRequest } from '../../../http-api-client'
 
-import {SpinnerModal} from '@opentrons/components'
+import { SpinnerModal } from '@opentrons/components'
 import UpdateRobotModal from './UpdateRobotModal'
 import RestartRobotModal from './RestartRobotModal'
 
-import type {State} from '../../../types'
-import type {ViewableRobot} from '../../../discovery'
-import type {ShellUpdateState} from '../../../shell'
-import type {RobotServerUpdate} from '../../../http-api-client'
+import type { State } from '../../../types'
+import type { ViewableRobot } from '../../../discovery'
+import type { ShellUpdateState } from '../../../shell'
+import type { RobotServerUpdate } from '../../../http-api-client'
 
-type OP = {robot: ViewableRobot, appUpdate: ShellUpdateState}
+type OP = { robot: ViewableRobot, appUpdate: ShellUpdateState }
 
 type SP = {|
   updateRequest: RobotServerUpdate,
@@ -29,8 +29,8 @@ export default connect(
   null
 )(UpdateRobot)
 
-function UpdateRobot (props: Props) {
-  const {updateRequest, robot, appUpdate} = props
+function UpdateRobot(props: Props) {
+  const { updateRequest, robot, appUpdate } = props
   if (updateRequest.response) {
     return <RestartRobotModal robot={robot} />
   }
@@ -41,7 +41,7 @@ function UpdateRobot (props: Props) {
   }
 }
 
-function makeMapStateToProps (): (State, OP) => Props {
+function makeMapStateToProps(): (State, OP) => Props {
   const getRobotUpdateRequest = makeGetRobotUpdateRequest()
 
   return (state, ownProps) => {

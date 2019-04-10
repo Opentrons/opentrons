@@ -2,8 +2,8 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import {OutlineButton, type ButtonProps} from '../buttons'
-import {Icon, type IconName} from '../icons'
+import { OutlineButton, type ButtonProps } from '../buttons'
+import { Icon, type IconName } from '../icons'
 import Modal from './Modal'
 import styles from './modals.css'
 
@@ -29,8 +29,8 @@ type Props = {
 /**
  * Generic alert modal with a heading and a set of buttons at the bottom
  */
-export default function AlertModal (props: Props) {
-  const {heading, buttons, className, onCloseClick, alertOverlay} = props
+export default function AlertModal(props: Props) {
+  const { heading, buttons, className, onCloseClick, alertOverlay } = props
   const iconName = props.iconName || 'alert'
   const wrapperStyle = cx(
     styles.alert_modal_wrapper,
@@ -56,15 +56,13 @@ export default function AlertModal (props: Props) {
       <div className={styles.alert_modal_contents}>{props.children}</div>
       {buttons && (
         <div className={styles.alert_modal_buttons}>
-          {buttons
-            .filter(Boolean)
-            .map((button, index) => (
-              <OutlineButton
-                key={index}
-                {...button}
-                className={cx(styles.alert_button, button.className)}
-              />
-            ))}
+          {buttons.filter(Boolean).map((button, index) => (
+            <OutlineButton
+              key={index}
+              {...button}
+              className={cx(styles.alert_button, button.className)}
+            />
+          ))}
         </div>
       )}
     </Modal>

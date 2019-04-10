@@ -9,7 +9,7 @@ const PRESET_ENV_NO_MODULES = [
   },
 ]
 
-const PRESET_ENV_CJS_MODULES = ['@babel/preset-env', {modules: 'commonjs'}]
+const PRESET_ENV_CJS_MODULES = ['@babel/preset-env', { modules: 'commonjs' }]
 
 module.exports = {
   env: {

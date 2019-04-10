@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react'
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import cx from 'classnames'
 
-import type {Mount} from '../../robot'
+import type { Mount } from '../../robot'
 
 import {
   LabeledValue,
@@ -28,8 +28,8 @@ const LABEL_BY_MOUNT = {
   right: 'Right pipette',
 }
 
-export default function PipetteInfo (props: Props) {
-  const {mount, model, name, onChangeClick, showSettings} = props
+export default function PipetteInfo(props: Props) {
+  const { mount, model, name, onChangeClick, showSettings } = props
   const label = LABEL_BY_MOUNT[mount]
   const channelsMatch = model && model.match(RE_CHANNELS)
   const channels = channelsMatch && channelsMatch[1]

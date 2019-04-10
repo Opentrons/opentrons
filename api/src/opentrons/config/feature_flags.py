@@ -1,4 +1,3 @@
-from functools import lru_cache
 import os
 from opentrons.config import advanced_settings as advs
 
@@ -13,11 +12,6 @@ def get_setting_with_env_overload(setting_name):
 
 def short_fixed_trash():
     return get_setting_with_env_overload('shortFixedTrash')
-
-
-@lru_cache()
-def split_labware_definitions():
-    return get_setting_with_env_overload('splitLabwareDefinitions')
 
 
 def calibrate_to_bottom():

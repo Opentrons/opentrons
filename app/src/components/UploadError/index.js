@@ -1,18 +1,18 @@
 // @flow
 // upload summary component
 import * as React from 'react'
-import {Icon} from '@opentrons/components'
+import { Icon } from '@opentrons/components'
 
 import styles from './styles.css'
 
 const UPLOAD_ERROR_MESSAGE = 'Your protocol could not be opened.'
 
 type Props = {
-  uploadError: {message: string},
+  uploadError: { message: string },
 }
 
-export default function UploadError (props: Props) {
-  const {uploadError} = props
+export default function UploadError(props: Props) {
+  const { uploadError } = props
 
   return (
     <section className={styles.results}>

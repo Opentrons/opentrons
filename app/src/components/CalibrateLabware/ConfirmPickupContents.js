@@ -1,7 +1,7 @@
 // @flow
 // pickup confirmation contents container for ConfirmModal
-import type {Dispatch} from 'redux'
-import {connect} from 'react-redux'
+import type { Dispatch } from 'redux'
+import { connect } from 'react-redux'
 
 import {
   actions as robotActions,
@@ -20,13 +20,19 @@ type DispatchProps = {
   onYesClick: () => void,
 }
 
-export default connect(null, mapDispatchToProps)(ConfirmPickupPrompt)
+export default connect(
+  null,
+  mapDispatchToProps
+)(ConfirmPickupPrompt)
 
-function mapDispatchToProps (
+function mapDispatchToProps(
   dispatch: Dispatch<*>,
   ownProps: OwnProps
 ): DispatchProps {
-  const {slot, calibrator: {mount}} = ownProps
+  const {
+    slot,
+    calibrator: { mount },
+  } = ownProps
 
   return {
     onNoClick: () => {

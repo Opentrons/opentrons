@@ -1,17 +1,17 @@
 // @flow
 import * as React from 'react'
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import SyncRobotMessage from './SyncRobotMessage'
 import VersionList from './VersionList'
-import {ScrollableAlertModal} from '../../modals'
+import { ScrollableAlertModal } from '../../modals'
 import ReleaseNotes from '../../ReleaseNotes'
 
-import {API_RELEASE_NOTES} from '../../../shell'
+import { API_RELEASE_NOTES } from '../../../shell'
 
-import type {RobotUpdateInfo} from '../../../http-api-client'
-import type {VersionProps} from './types'
-import type {ButtonProps} from '@opentrons/components'
+import type { RobotUpdateInfo } from '../../../http-api-client'
+import type { VersionProps } from './types'
+import type { ButtonProps } from '@opentrons/components'
 
 type Props = {
   updateInfo: RobotUpdateInfo,
@@ -30,16 +30,16 @@ export default class SyncRobotModal extends React.Component<
   Props,
   SyncRobotState
 > {
-  constructor (props: Props) {
+  constructor(props: Props) {
     super(props)
-    this.state = {showReleaseNotes: this.props.showReleaseNotes}
+    this.state = { showReleaseNotes: this.props.showReleaseNotes }
   }
 
   setShowReleaseNotes = () => {
-    this.setState({showReleaseNotes: true})
+    this.setState({ showReleaseNotes: true })
   }
 
-  render () {
+  render() {
     const {
       updateInfo,
       versionProps,
@@ -48,15 +48,15 @@ export default class SyncRobotModal extends React.Component<
       parentUrl,
     } = this.props
 
-    const {version} = updateInfo
-    const {showReleaseNotes} = this.state
+    const { version } = updateInfo
+    const { showReleaseNotes } = this.state
 
     const heading = `Robot Server Version ${version} Available`
     let buttons: Array<?ButtonProps>
 
     if (showReleaseNotes) {
       buttons = [
-        {onClick: ignoreUpdate, children: 'not now'},
+        { onClick: ignoreUpdate, children: 'not now' },
         {
           children: 'Update Robot Server',
           onClick: update,
@@ -64,7 +64,7 @@ export default class SyncRobotModal extends React.Component<
       ]
     } else if (updateInfo.type === 'upgrade') {
       buttons = [
-        {onClick: ignoreUpdate, children: 'not now'},
+        { onClick: ignoreUpdate, children: 'not now' },
         {
           children: 'View Robot Server Update',
           onClick: this.setShowReleaseNotes,
@@ -72,7 +72,7 @@ export default class SyncRobotModal extends React.Component<
       ]
     } else if (updateInfo.type === 'downgrade') {
       buttons = [
-        {Component: Link, to: parentUrl, children: 'not now'},
+        { Component: Link, to: parentUrl, children: 'not now' },
         {
           children: 'Downgrade Robot',
           onClick: update,

@@ -1,17 +1,17 @@
 // @flow
 // app info card with version and updated
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {withRouter, Route, Link} from 'react-router-dom'
+import { connect } from 'react-redux'
+import { withRouter, Route, Link } from 'react-router-dom'
 
-import {getConfig, updateConfig, toggleDevTools} from '../../config'
-import {Card} from '@opentrons/components'
-import {LabeledToggle, LabeledSelect, LabeledButton} from '../controls'
+import { getConfig, updateConfig, toggleDevTools } from '../../config'
+import { Card } from '@opentrons/components'
+import { LabeledToggle, LabeledSelect, LabeledButton } from '../controls'
 import AddManualIp from './AddManualIp'
 
-import type {ContextRouter} from 'react-router'
-import type {State, Dispatch} from '../../types'
-import type {UpdateChannel} from '../../config'
+import type { ContextRouter } from 'react-router'
+import type { State, Dispatch } from '../../types'
+import type { UpdateChannel } from '../../config'
 
 type OP = {
   ...ContextRouter,
@@ -28,14 +28,14 @@ type DP = {|
   handleChannel: (event: SyntheticInputEvent<HTMLSelectElement>) => mixed,
 |}
 
-type Props = {...$Exact<OP>, ...SP, ...DP}
+type Props = { ...$Exact<OP>, ...SP, ...DP }
 
 const TITLE = 'Advanced Settings'
 
 // TODO(mc, 2018-08-03): enable "alpha" option
 const CHANNEL_OPTIONS = [
-  {name: 'Stable', value: (('latest': UpdateChannel): string)},
-  {name: 'Beta', value: (('beta': UpdateChannel): string)},
+  { name: 'Stable', value: (('latest': UpdateChannel): string) },
+  { name: 'Beta', value: (('beta': UpdateChannel): string) },
 ]
 
 export default withRouter(
@@ -45,7 +45,7 @@ export default withRouter(
   )(AdvancedSettingsCard)
 )
 
-function AdvancedSettingsCard (props: Props) {
+function AdvancedSettingsCard(props: Props) {
   return (
     <React.Fragment>
       <Card title={TITLE}>
@@ -95,7 +95,7 @@ function AdvancedSettingsCard (props: Props) {
   )
 }
 
-function mapStateToProps (state: State): SP {
+function mapStateToProps(state: State): SP {
   const config = getConfig(state)
 
   return {
@@ -104,7 +104,7 @@ function mapStateToProps (state: State): SP {
   }
 }
 
-function mapDispatchToProps (dispatch: Dispatch, ownProps: OP) {
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP) {
   return {
     toggleDevTools: () => dispatch(toggleDevTools()),
     handleChannel: event => {

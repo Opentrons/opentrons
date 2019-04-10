@@ -2,15 +2,18 @@
 
 import get from 'lodash/get'
 import getLabware from '../getLabware'
-import {getPipetteNameSpecs} from '../pipettes'
+import { getPipetteNameSpecs } from '../pipettes'
 
 const FORMAT_METADATA = {
-  '96-standard': {multichannelAccess: true},
-  '384-standard': {multichannelAccess: true},
-  'trough': {multichannelAccess: true},
-  'irregular': {multichannelAccess: false},
+  '96-standard': { multichannelAccess: true },
+  '384-standard': { multichannelAccess: true },
+  trough: { multichannelAccess: true },
+  irregular: { multichannelAccess: false },
 }
-const canPipetteUseLabware = (pipetteName: string, labwareModel: string): ?boolean => {
+const canPipetteUseLabware = (
+  pipetteName: string,
+  labwareModel: string
+): ?boolean => {
   const labware = getLabware(labwareModel)
   const pipette = getPipetteNameSpecs(pipetteName)
   if (!labware) {

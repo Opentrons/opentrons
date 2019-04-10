@@ -1,8 +1,8 @@
 // @flow
 // titled modal page component
 import * as React from 'react'
-import {SpinnerModal} from './'
-import {TitleBar, type TitleBarProps} from '../structure'
+import { SpinnerModal } from './'
+import { TitleBar, type TitleBarProps } from '../structure'
 
 import styles from './modals.css'
 
@@ -19,8 +19,8 @@ type Props = {
 /**
  * Spinner Modal variant with TitleBar
  */
-export default function SpinnerModalPage (props: Props) {
-  const {titleBar} = props
+export default function SpinnerModalPage(props: Props) {
+  const { titleBar } = props
 
   return (
     <div className={styles.modal}>

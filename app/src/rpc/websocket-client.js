@@ -6,7 +6,7 @@ import EventEmitter from 'events'
 
 // TODO(mc): find out if buffering incomplete messages if needed
 // ws frame size is pretty big, though, so it's probably unnecesary
-function parseMessage (data) {
+function parseMessage(data) {
   let message
 
   try {
@@ -19,13 +19,13 @@ function parseMessage (data) {
 }
 
 export default class WebSocketClient extends EventEmitter {
-  constructor (url) {
+  constructor(url) {
     super()
     this._ws = new WebSocket(url)
     this._ws.onopen = () => this.emit('open')
-    this._ws.onmessage = (e) => this.emit('message', parseMessage(e.data))
-    this._ws.onclose = (e) => this.emit('close', e.code, e.reason, e.wasClean)
-    this._ws.onerror = (error) => this.emit('error', error)
+    this._ws.onmessage = e => this.emit('message', parseMessage(e.data))
+    this._ws.onclose = e => this.emit('close', e.code, e.reason, e.wasClean)
+    this._ws.onerror = error => this.emit('error', error)
 
     // also export websocket readyState constants
     this.CONNECTING = WebSocket.CONNECTING
@@ -34,19 +34,19 @@ export default class WebSocketClient extends EventEmitter {
     this.CLOSED = WebSocket.CLOSED
   }
 
-  get readyState () {
+  get readyState() {
     return this._ws.readyState
   }
 
-  get url () {
+  get url() {
     return this._ws.url
   }
 
-  close (code, reason) {
+  close(code, reason) {
     this._ws.close(code, reason)
   }
 
-  send (data) {
+  send(data) {
     this._ws.send(JSON.stringify(data))
   }
 }

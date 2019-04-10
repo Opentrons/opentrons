@@ -2,7 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import type {WellDefinition} from '@opentrons/shared-data'
+import type { WellDefinition } from '@opentrons/shared-data'
 import styles from './Well.css'
 
 type Props = {
@@ -12,8 +12,8 @@ type Props = {
   highlighted?: ?boolean,
 }
 
-export default function Tip (props: Props) {
-  const {wellDef, empty, highlighted, tipVolume} = props
+export default function Tip(props: Props) {
+  const { wellDef, empty, highlighted, tipVolume } = props
   const circleProps = {
     cx: wellDef.x,
     cy: wellDef.y,
@@ -29,25 +29,23 @@ export default function Tip (props: Props) {
   }
 
   if (empty) {
-    return <circle
-      {...circleProps}
-      r={outerRadius}
-      className={cx(styles.empty_tip, styles.tip_border)}
-    />
+    return (
+      <circle
+        {...circleProps}
+        r={outerRadius}
+        className={cx(styles.empty_tip, styles.tip_border)}
+      />
+    )
   }
 
-  const outerCircleClassName = (highlighted)
+  const outerCircleClassName = highlighted
     ? styles.highlighted
     : styles.tip_border
 
   return (
     <g>
       {/* Fill contents */}
-      <circle
-        {...circleProps}
-        r={outerRadius}
-        className={styles.tip_fill}
-      />
+      <circle {...circleProps} r={outerRadius} className={styles.tip_fill} />
       {/* Outer circle */}
       <circle
         {...circleProps}
@@ -55,11 +53,7 @@ export default function Tip (props: Props) {
         className={outerCircleClassName}
       />
       {/* Inner circle */}
-      <circle
-        {...circleProps}
-        r={innerRadius}
-        className={styles.tip_border}
-      />
+      <circle {...circleProps} r={innerRadius} className={styles.tip_border} />
     </g>
   )
 }

@@ -2,25 +2,27 @@
 import * as React from 'react'
 
 type Props = {
-  onClickOutside: ?(MouseEvent => mixed),
-  children: ({ref: React.Ref<*>}) => React.Element<*>,
+  onClickOutside: ?(MouseEvent) => mixed,
+  children: ({ ref: React.Ref<*> }) => React.Element<*>,
 }
 
 export default class ClickOutside extends React.Component<Props> {
   wrapperRef: ?Element
 
-  constructor (props: Props) {
+  constructor(props: Props) {
     super(props)
     this.wrapperRef = null
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.addEventListener('mousedown', this.handleClickOutside)
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     document.removeEventListener('mousedown', this.handleClickOutside)
   }
-  setWrapperRef = (el: ?Element) => { this.wrapperRef = el }
+  setWrapperRef = (el: ?Element) => {
+    this.wrapperRef = el
+  }
 
   handleClickOutside = (event: MouseEvent) => {
     const clickedElem = event.target
@@ -28,7 +30,9 @@ export default class ClickOutside extends React.Component<Props> {
     if (!(clickedElem instanceof Node)) {
       // NOTE: this is some flow type checking funkiness
       // TODO Ian 2018-05-24 use assert.
-      console.warn('expected clicked element to be Node - something went wrong in ClickOutside')
+      console.warn(
+        'expected clicked element to be Node - something went wrong in ClickOutside'
+      )
       return
     }
 
@@ -41,7 +45,7 @@ export default class ClickOutside extends React.Component<Props> {
     }
   }
 
-  render () {
-    return this.props.children({ref: this.setWrapperRef})
+  render() {
+    return this.props.children({ ref: this.setWrapperRef })
   }
 }

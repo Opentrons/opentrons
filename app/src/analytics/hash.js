@@ -4,7 +4,7 @@
 // considered secure nor should they ever be released publicly
 const ALGORITHM = 'SHA-256'
 
-export default function hash (source: string): Promise<string> {
+export default function hash(source: string): Promise<string> {
   const encoder = new TextEncoder()
   const data = encoder.encode(source)
 
@@ -15,7 +15,7 @@ export default function hash (source: string): Promise<string> {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest#Converting_a_digest_to_a_hex_string
-function arrayBufferToHex (source: ArrayBuffer): string {
+function arrayBufferToHex(source: ArrayBuffer): string {
   const bytes = new Uint8Array(source)
 
   return [...bytes].map(b => b.toString(16).padStart(2, '0')).join('')

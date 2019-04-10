@@ -2,12 +2,12 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import {SpinnerModal} from '@opentrons/components'
+import { SpinnerModal } from '@opentrons/components'
 import SessionAlert from './SessionAlert'
-import {Portal} from '../portal'
+import { Portal } from '../portal'
 import styles from './styles.css'
 
-import type {SessionStatus} from '../../robot'
+import type { SessionStatus } from '../../robot'
 
 type Props = {
   commands: Array<any>,
@@ -17,15 +17,22 @@ type Props = {
 }
 
 export default class CommandList extends React.Component<Props> {
-  componentDidUpdate () {
+  componentDidUpdate() {
     // TODO(mc, 2018-07-24): use new refs
     if (this.refs.ensureVisible) this.refs.ensureVisible.scrollIntoView(true) // eslint-disable-line react/no-string-refs
   }
 
-  render () {
-    const {commands, sessionStatus, showSpinner, onResetClick} = this.props
+  render() {
+    const { commands, sessionStatus, showSpinner, onResetClick } = this.props
     const makeCommandToTemplateMapper = depth => command => {
-      const {id, isCurrent, isLast, description, children, handledAt} = command
+      const {
+        id,
+        isCurrent,
+        isLast,
+        description,
+        children,
+        handledAt,
+      } = command
       const style = [styles[`indent-${depth}`]]
       let nestedList = null
 
@@ -37,7 +44,7 @@ export default class CommandList extends React.Component<Props> {
         )
       }
 
-      const liProps: {key: string, className: string, ref?: string} = {
+      const liProps: { key: string, className: string, ref?: string } = {
         key: id,
         className: cx(style, {
           [styles.executed]: handledAt,

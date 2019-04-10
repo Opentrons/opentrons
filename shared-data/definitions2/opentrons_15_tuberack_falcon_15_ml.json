@@ -1,0 +1,174 @@
+{
+  "ordering": [
+    ["A1", "B1", "C1"],
+    ["A2", "B2", "C2"],
+    ["A3", "B3", "C3"],
+    ["A4", "B4", "C4"],
+    ["A5", "B5", "C5"]
+  ],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": ["352096"]
+  },
+  "metadata": {
+    "tags": ["15", "mL", "falcon", "tuberack"],
+    "displayName": "Opentrons 12 Tube Rack With Falcon 15 mL Conical",
+    "displayCategory": "tubeRack",
+    "displayVolumeUnits": "mL"
+  },
+  "dimensions": {
+    "overallLength": 127.76,
+    "overallWidth": 85.48,
+    "overallHeight": 125.76
+  },
+  "otId": "e57a7130-54c8-11e9-a8d4-c1917c1bf74f",
+  "deprecated": false,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "wells": {
+    "C1": {
+      "depth": 117.98,
+      "diameter": 14.5,
+      "shape": "circular",
+      "totalLiquidVolume": 15000,
+      "x": 13.88,
+      "y": 17.74,
+      "z": 7.78
+    },
+    "B1": {
+      "depth": 117.98,
+      "diameter": 14.5,
+      "shape": "circular",
+      "totalLiquidVolume": 15000,
+      "x": 13.88,
+      "y": 42.74,
+      "z": 7.78
+    },
+    "A1": {
+      "depth": 117.98,
+      "diameter": 14.5,
+      "shape": "circular",
+      "totalLiquidVolume": 15000,
+      "x": 13.88,
+      "y": 67.74,
+      "z": 7.78
+    },
+    "C2": {
+      "depth": 117.98,
+      "diameter": 14.5,
+      "shape": "circular",
+      "totalLiquidVolume": 15000,
+      "x": 38.88,
+      "y": 17.74,
+      "z": 7.78
+    },
+    "B2": {
+      "depth": 117.98,
+      "diameter": 14.5,
+      "shape": "circular",
+      "totalLiquidVolume": 15000,
+      "x": 38.88,
+      "y": 42.74,
+      "z": 7.78
+    },
+    "A2": {
+      "depth": 117.98,
+      "diameter": 14.5,
+      "shape": "circular",
+      "totalLiquidVolume": 15000,
+      "x": 38.88,
+      "y": 67.74,
+      "z": 7.78
+    },
+    "C3": {
+      "depth": 117.98,
+      "diameter": 14.5,
+      "shape": "circular",
+      "totalLiquidVolume": 15000,
+      "x": 63.88,
+      "y": 17.74,
+      "z": 7.78
+    },
+    "B3": {
+      "depth": 117.98,
+      "diameter": 14.5,
+      "shape": "circular",
+      "totalLiquidVolume": 15000,
+      "x": 63.88,
+      "y": 42.74,
+      "z": 7.78
+    },
+    "A3": {
+      "depth": 117.98,
+      "diameter": 14.5,
+      "shape": "circular",
+      "totalLiquidVolume": 15000,
+      "x": 63.88,
+      "y": 67.74,
+      "z": 7.78
+    },
+    "C4": {
+      "depth": 117.98,
+      "diameter": 14.5,
+      "shape": "circular",
+      "totalLiquidVolume": 15000,
+      "x": 88.88,
+      "y": 17.74,
+      "z": 7.78
+    },
+    "B4": {
+      "depth": 117.98,
+      "diameter": 14.5,
+      "shape": "circular",
+      "totalLiquidVolume": 15000,
+      "x": 88.88,
+      "y": 42.74,
+      "z": 7.78
+    },
+    "A4": {
+      "depth": 117.98,
+      "diameter": 14.5,
+      "shape": "circular",
+      "totalLiquidVolume": 15000,
+      "x": 88.88,
+      "y": 67.74,
+      "z": 7.78
+    },
+    "C5": {
+      "depth": 117.98,
+      "diameter": 14.5,
+      "shape": "circular",
+      "totalLiquidVolume": 15000,
+      "x": 113.88,
+      "y": 17.74,
+      "z": 7.78
+    },
+    "B5": {
+      "depth": 117.98,
+      "diameter": 14.5,
+      "shape": "circular",
+      "totalLiquidVolume": 15000,
+      "x": 113.88,
+      "y": 42.74,
+      "z": 7.78
+    },
+    "A5": {
+      "depth": 117.98,
+      "diameter": 14.5,
+      "shape": "circular",
+      "totalLiquidVolume": 15000,
+      "x": 113.88,
+      "y": 67.74,
+      "z": 7.78
+    }
+  },
+  "parameters": {
+    "format": "irregular",
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "opentrons_15_tuberack_falcon_15_ml"
+  }
+}

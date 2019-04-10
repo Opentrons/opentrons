@@ -8,9 +8,12 @@ import {
   getAllWellsFromPrimaryWells,
 } from './utils'
 import getDefaultsForStepType from '../getDefaultsForStepType'
-import type {FormData, StepFieldName} from '../../../form-types'
-import type {FormPatch} from '../../actions/types'
-import type {LabwareEntities, PipetteEntities} from '../../../step-forms/types'
+import type { FormData, StepFieldName } from '../../../form-types'
+import type { FormPatch } from '../../actions/types'
+import type {
+  LabwareEntities,
+  PipetteEntities,
+} from '../../../step-forms/types'
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
 const getDefaultFields = (...fields: Array<StepFieldName>): FormPatch =>
@@ -26,16 +29,18 @@ const updatePatchOnLabwareChange = (
 
   if (!labwareChanged) return patch
 
-  const appliedPatch = {...rawForm, ...patch}
+  const appliedPatch = { ...rawForm, ...patch }
   const pipetteId = appliedPatch.pipette
 
   return {
     ...patch,
-    ...getDefaultFields(
-      'mix_mmFromBottom',
-      'mix_touchTip_mmFromBottom'),
+    ...getDefaultFields('mix_mmFromBottom', 'mix_touchTip_mmFromBottom'),
     wells: getDefaultWells({
-      labwareId: appliedPatch.labware, pipetteId, labwareEntities, pipetteEntities}),
+      labwareId: appliedPatch.labware,
+      pipetteId,
+      labwareEntities,
+      pipetteEntities,
+    }),
   }
 }
 
@@ -51,11 +56,12 @@ const updatePatchOnPipetteChannelChange = (
   let update = {}
 
   const prevChannels = getChannels(rawForm.pipette, pipetteEntities)
-  const nextChannels = typeof patch.pipette === 'string'
-    ? getChannels(patch.pipette, pipetteEntities)
-    : null
+  const nextChannels =
+    typeof patch.pipette === 'string'
+      ? getChannels(patch.pipette, pipetteEntities)
+      : null
 
-  const appliedPatch = {...rawForm, ...patch}
+  const appliedPatch = { ...rawForm, ...patch }
   const singleToMulti = prevChannels === 1 && nextChannels === 8
   const multiToSingle = prevChannels === 8 && nextChannels === 1
 
@@ -64,18 +70,23 @@ const updatePatchOnPipetteChannelChange = (
     const pipetteId = appliedPatch.pipette
     update = {
       wells: getDefaultWells({
-        labwareId: appliedPatch.labware, pipetteId, labwareEntities, pipetteEntities}),
+        labwareId: appliedPatch.labware,
+        pipetteId,
+        labwareEntities,
+        pipetteEntities,
+      }),
     }
   } else if (multiToSingle) {
     // multi-channel to single-channel: convert primary wells to all wells
     const labwareId = appliedPatch.labware
-    const labwareType = labwareId && labwareEntities[labwareId] && labwareEntities[labwareId].type
+    const labwareType =
+      labwareId && labwareEntities[labwareId] && labwareEntities[labwareId].type
 
     update = {
       wells: getAllWellsFromPrimaryWells(appliedPatch.wells, labwareType),
     }
   }
-  return {...patch, ...update}
+  return { ...patch, ...update }
 }
 
 const updatePatchOnPipetteChange = (
@@ -88,17 +99,14 @@ const updatePatchOnPipetteChange = (
   if (fieldHasChanged(rawForm, patch, 'pipette')) {
     return {
       ...patch,
-      ...getDefaultFields(
-        'aspirate_flowRate',
-        'dispense_flowRate',
-      ),
+      ...getDefaultFields('aspirate_flowRate', 'dispense_flowRate'),
     }
   }
 
   return patch
 }
 
-export default function dependentFieldsUpdateMix (
+export default function dependentFieldsUpdateMix(
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
   pipetteEntities: PipetteEntities,
@@ -106,8 +114,21 @@ export default function dependentFieldsUpdateMix (
 ): FormPatch {
   // sequentially modify parts of the patch until it's fully updated
   return chainPatchUpdaters(originalPatch, [
-    chainPatch => updatePatchOnLabwareChange(chainPatch, rawForm, labwareEntities, pipetteEntities),
-    chainPatch => updatePatchOnPipetteChannelChange(chainPatch, rawForm, labwareEntities, pipetteEntities),
-    chainPatch => updatePatchOnPipetteChange(chainPatch, rawForm, pipetteEntities),
+    chainPatch =>
+      updatePatchOnLabwareChange(
+        chainPatch,
+        rawForm,
+        labwareEntities,
+        pipetteEntities
+      ),
+    chainPatch =>
+      updatePatchOnPipetteChannelChange(
+        chainPatch,
+        rawForm,
+        labwareEntities,
+        pipetteEntities
+      ),
+    chainPatch =>
+      updatePatchOnPipetteChange(chainPatch, rawForm, pipetteEntities),
   ])
 }

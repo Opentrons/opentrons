@@ -11,7 +11,7 @@ type MixStepArgs = MixArgs
 
 // TODO: BC 2018-10-30 move getting labwareDef into hydration layer upstream
 const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
-  const {labware, pipette} = hydratedFormData
+  const { labware, pipette } = hydratedFormData
   const touchTip = Boolean(hydratedFormData['mix_touchTip_checkbox'])
   const touchTipMmFromBottom = hydratedFormData['mix_touchTip_mmFromBottom']
 
@@ -22,7 +22,11 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
   // TODO: Ian 2019-01-15 use getOrderedWells instead of orderWells to avoid this duplicated code
   const labwareDef = labware && getLabware(labware.type)
   if (labwareDef) {
-    const allWellsOrdered = orderWells(labwareDef.ordering, orderFirst, orderSecond)
+    const allWellsOrdered = orderWells(
+      labwareDef.ordering,
+      orderFirst,
+      orderSecond
+    )
     wells = intersection(allWellsOrdered, wells)
   } else {
     console.warn('the specified labware definition could not be located')
@@ -41,10 +45,15 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
 
   // It's radiobutton, so one should always be selected.
   // One changeTip option should always be selected.
-  assert(hydratedFormData['changeTip'], 'mixFormToArgs expected non-falsey changeTip option')
+  assert(
+    hydratedFormData['changeTip'],
+    'mixFormToArgs expected non-falsey changeTip option'
+  )
   const changeTip = hydratedFormData['changeTip'] || DEFAULT_CHANGE_TIP_OPTION
 
-  const blowoutLocation = hydratedFormData['blowout_checkbox'] ? hydratedFormData['blowout_location'] : null
+  const blowoutLocation = hydratedFormData['blowout_checkbox']
+    ? hydratedFormData['blowout_location']
+    : null
 
   return {
     commandCreatorFnName: 'mix',

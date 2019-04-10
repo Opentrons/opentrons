@@ -66,9 +66,7 @@ describe('pick up tip if no tip on pipette', () => {
 
       const result = transfer(transferArgs)(robotInitialState)
 
-      expect(result.commands[0]).toEqual(
-        cmd.pickUpTip('A1')
-      )
+      expect(result.commands[0]).toEqual(cmd.pickUpTip('A1'))
     })
   })
 
@@ -96,27 +94,27 @@ test('single transfer: 1 source & 1 dest', () => {
     volume: 30,
   }
 
-  robotInitialState.liquidState.labware.sourcePlateId.A1 = {'0': {volume: 200}}
+  robotInitialState.liquidState.labware.sourcePlateId.A1 = {
+    '0': { volume: 200 },
+  }
 
   const result = transfer(transferArgs)(robotInitialState)
   expect(result.commands).toEqual([
     cmd.aspirate('A1', 30),
-    cmd.dispense('B2', 30, {labware: 'destPlateId'}),
+    cmd.dispense('B2', 30, { labware: 'destPlateId' }),
   ])
 
-  expect(result.robotState.liquidState).toEqual(merge(
-    {},
-    robotInitialState.liquidState,
-    {
+  expect(result.robotState.liquidState).toEqual(
+    merge({}, robotInitialState.liquidState, {
       labware: {
-        sourcePlateId: {A1: {'0': {volume: 200 - 30}}},
-        destPlateId: {B2: {'0': {volume: 30}}},
+        sourcePlateId: { A1: { '0': { volume: 200 - 30 } } },
+        destPlateId: { B2: { '0': { volume: 30 } } },
       },
       pipettes: {
-        p300SingleId: {'0': {'0': {volume: 0}}}, // pipette's Tip 0 has 0uL of Ingred 0 (contamination)
+        p300SingleId: { '0': { '0': { volume: 0 } } }, // pipette's Tip 0 has 0uL of Ingred 0 (contamination)
       },
-    }
-  ))
+    })
+  )
 })
 
 test('transfer with multiple sets of wells', () => {
@@ -130,10 +128,10 @@ test('transfer with multiple sets of wells', () => {
   const result = transfer(transferArgs)(robotInitialState)
   expect(result.commands).toEqual([
     cmd.aspirate('A1', 30),
-    cmd.dispense('B2', 30, {labware: 'destPlateId'}),
+    cmd.dispense('B2', 30, { labware: 'destPlateId' }),
 
     cmd.aspirate('A2', 30),
-    cmd.dispense('C2', 30, {labware: 'destPlateId'}),
+    cmd.dispense('C2', 30, { labware: 'destPlateId' }),
   ])
 
   // TODO Ian 2018-04-02 robotState, liquidState checks
@@ -170,26 +168,30 @@ describe('single transfer exceeding pipette max', () => {
     robotInitialState.tipState.tipracks.tiprack1Id.A1 = true
     robotInitialState.tipState.pipettes.p300SingleId = false
     // liquid setup
-    robotInitialState.liquidState.labware.sourcePlateId.A1 = {'0': {volume: 400}}
-    robotInitialState.liquidState.labware.sourcePlateId.B1 = {'1': {volume: 400}}
+    robotInitialState.liquidState.labware.sourcePlateId.A1 = {
+      '0': { volume: 400 },
+    }
+    robotInitialState.liquidState.labware.sourcePlateId.B1 = {
+      '1': { volume: 400 },
+    }
 
     expectedFinalLiquidState = {
       labware: {
         sourcePlateId: {
-          A1: {'0': {volume: 400 - 350}},
-          B1: {'1': {volume: 400 - 350}},
+          A1: { '0': { volume: 400 - 350 } },
+          B1: { '1': { volume: 400 - 350 } },
         },
         destPlateId: {
-          A3: {'0': {volume: 350}},
-          B3: {'0': {volume: 0}, '1': {volume: 350}},
+          A3: { '0': { volume: 350 } },
+          B3: { '0': { volume: 0 }, '1': { volume: 350 } },
         },
       },
       pipettes: {
         p300SingleId: {
           '0': {
             // pipette's Tip 0 has 0uL of Ingred 0 and 1 (contamination)
-            '0': {volume: 0},
-            '1': {volume: 0},
+            '0': { volume: 0 },
+            '1': { volume: 0 },
           },
         },
       },
@@ -206,20 +208,18 @@ describe('single transfer exceeding pipette max', () => {
     expect(result.commands).toEqual([
       cmd.pickUpTip('A1'),
       cmd.aspirate('A1', 300),
-      cmd.dispense('A3', 300, {labware: 'destPlateId'}),
+      cmd.dispense('A3', 300, { labware: 'destPlateId' }),
       cmd.aspirate('A1', 50),
-      cmd.dispense('A3', 50, {labware: 'destPlateId'}),
+      cmd.dispense('A3', 50, { labware: 'destPlateId' }),
       cmd.aspirate('B1', 300),
-      cmd.dispense('B3', 300, {labware: 'destPlateId'}),
+      cmd.dispense('B3', 300, { labware: 'destPlateId' }),
       cmd.aspirate('B1', 50),
-      cmd.dispense('B3', 50, {labware: 'destPlateId'}),
+      cmd.dispense('B3', 50, { labware: 'destPlateId' }),
     ])
 
-    expect(result.robotState.liquidState).toEqual(merge(
-      {},
-      robotInitialState.liquidState,
-      expectedFinalLiquidState
-    ))
+    expect(result.robotState.liquidState).toEqual(
+      merge({}, robotInitialState.liquidState, expectedFinalLiquidState)
+    )
   })
 
   test('changeTip="always"', () => {
@@ -233,44 +233,42 @@ describe('single transfer exceeding pipette max', () => {
       cmd.pickUpTip('A1'),
 
       cmd.aspirate('A1', 300),
-      cmd.dispense('A3', 300, {labware: 'destPlateId'}),
+      cmd.dispense('A3', 300, { labware: 'destPlateId' }),
 
       // replace tip before next asp-disp chunk
       cmd.dropTip('A1'),
       cmd.pickUpTip('B1'),
 
       cmd.aspirate('A1', 50),
-      cmd.dispense('A3', 50, {labware: 'destPlateId'}),
+      cmd.dispense('A3', 50, { labware: 'destPlateId' }),
 
       // replace tip before next source-dest well pair
       cmd.dropTip('A1'),
       cmd.pickUpTip('C1'),
 
       cmd.aspirate('B1', 300),
-      cmd.dispense('B3', 300, {labware: 'destPlateId'}),
+      cmd.dispense('B3', 300, { labware: 'destPlateId' }),
 
       // replace tip before next asp-disp chunk
       cmd.dropTip('A1'),
       cmd.pickUpTip('D1'),
 
       cmd.aspirate('B1', 50),
-      cmd.dispense('B3', 50, {labware: 'destPlateId'}),
+      cmd.dispense('B3', 50, { labware: 'destPlateId' }),
     ])
 
     // unlike the other test cases here, we have a new tip when aspirating from B1.
     // so there's only ingred 1, and no ingred 0
     // $FlowFixMe flow doesn't like assigning to these objects
-    expectedFinalLiquidState.pipettes.p300SingleId['0'] = {'1': {volume: 0}}
+    expectedFinalLiquidState.pipettes.p300SingleId['0'] = { '1': { volume: 0 } }
 
     // likewise, there's no residue of ingred 0 in B3 from a dirty tip.
     // $FlowFixMe flow doesn't like assigning to these objects
-    expectedFinalLiquidState.labware.destPlateId.B3 = {'1': {volume: 350}}
+    expectedFinalLiquidState.labware.destPlateId.B3 = { '1': { volume: 350 } }
 
-    expect(result.robotState.liquidState).toEqual(merge(
-      {},
-      robotInitialState.liquidState,
-      expectedFinalLiquidState
-    ))
+    expect(result.robotState.liquidState).toEqual(
+      merge({}, robotInitialState.liquidState, expectedFinalLiquidState)
+    )
   })
 
   test('changeTip="perSource"', () => {
@@ -286,27 +284,27 @@ describe('single transfer exceeding pipette max', () => {
       cmd.pickUpTip('A1'),
 
       cmd.aspirate('A1', 300),
-      cmd.dispense('B1', 300, {labware: 'destPlateId'}),
+      cmd.dispense('B1', 300, { labware: 'destPlateId' }),
 
       cmd.aspirate('A1', 50),
-      cmd.dispense('B1', 50, {labware: 'destPlateId'}),
+      cmd.dispense('B1', 50, { labware: 'destPlateId' }),
 
       // same source, different dest: no change
       cmd.aspirate('A1', 300),
-      cmd.dispense('B2', 300, {labware: 'destPlateId'}),
+      cmd.dispense('B2', 300, { labware: 'destPlateId' }),
 
       cmd.aspirate('A1', 50),
-      cmd.dispense('B2', 50, {labware: 'destPlateId'}),
+      cmd.dispense('B2', 50, { labware: 'destPlateId' }),
 
       // new source, different dest: change tip
       cmd.dropTip('A1'),
       cmd.pickUpTip('B1'),
 
       cmd.aspirate('A2', 300),
-      cmd.dispense('B2', 300, {labware: 'destPlateId'}),
+      cmd.dispense('B2', 300, { labware: 'destPlateId' }),
 
       cmd.aspirate('A2', 50),
-      cmd.dispense('B2', 50, {labware: 'destPlateId'}),
+      cmd.dispense('B2', 50, { labware: 'destPlateId' }),
     ])
   })
 
@@ -324,28 +322,28 @@ describe('single transfer exceeding pipette max', () => {
       cmd.pickUpTip('A1'),
 
       cmd.aspirate('A1', 300),
-      cmd.dispense('B1', 300, {labware: 'destPlateId'}),
+      cmd.dispense('B1', 300, { labware: 'destPlateId' }),
 
       cmd.aspirate('A1', 50),
-      cmd.dispense('B1', 50, {labware: 'destPlateId'}),
+      cmd.dispense('B1', 50, { labware: 'destPlateId' }),
 
       // same source, different dest: change tip
       cmd.dropTip('A1'),
       cmd.pickUpTip('B1'),
 
       cmd.aspirate('A1', 300),
-      cmd.dispense('B2', 300, {labware: 'destPlateId'}),
+      cmd.dispense('B2', 300, { labware: 'destPlateId' }),
 
       cmd.aspirate('A1', 50),
-      cmd.dispense('B2', 50, {labware: 'destPlateId'}),
+      cmd.dispense('B2', 50, { labware: 'destPlateId' }),
 
       // different source, same dest: no change
 
       cmd.aspirate('A2', 300),
-      cmd.dispense('B2', 300, {labware: 'destPlateId'}),
+      cmd.dispense('B2', 300, { labware: 'destPlateId' }),
 
       cmd.aspirate('A2', 50),
-      cmd.dispense('B2', 50, {labware: 'destPlateId'}),
+      cmd.dispense('B2', 50, { labware: 'destPlateId' }),
     ])
   })
 
@@ -361,23 +359,21 @@ describe('single transfer exceeding pipette max', () => {
     expect(result.commands).toEqual([
       // no pick up tip
       cmd.aspirate('A1', 300),
-      cmd.dispense('A3', 300, {labware: 'destPlateId'}),
+      cmd.dispense('A3', 300, { labware: 'destPlateId' }),
 
       cmd.aspirate('A1', 50),
-      cmd.dispense('A3', 50, {labware: 'destPlateId'}),
+      cmd.dispense('A3', 50, { labware: 'destPlateId' }),
 
       cmd.aspirate('B1', 300),
-      cmd.dispense('B3', 300, {labware: 'destPlateId'}),
+      cmd.dispense('B3', 300, { labware: 'destPlateId' }),
 
       cmd.aspirate('B1', 50),
-      cmd.dispense('B3', 50, {labware: 'destPlateId'}),
+      cmd.dispense('B3', 50, { labware: 'destPlateId' }),
     ])
 
-    expect(result.robotState.liquidState).toEqual(merge(
-      {},
-      robotInitialState.liquidState,
-      expectedFinalLiquidState
-    ))
+    expect(result.robotState.liquidState).toEqual(
+      merge({}, robotInitialState.liquidState, expectedFinalLiquidState)
+    )
   })
 
   test('split up volume without going below pipette min', () => {
@@ -396,20 +392,20 @@ describe('single transfer exceeding pipette max', () => {
     const result = transfer(transferArgs)(robotInitialState)
     expect(result.commands).toEqual([
       cmd.aspirate('A1', 300),
-      cmd.dispense('A3', 300, {labware: 'destPlateId'}),
+      cmd.dispense('A3', 300, { labware: 'destPlateId' }),
       // last 2 chunks split evenly
       cmd.aspirate('A1', 164.5),
-      cmd.dispense('A3', 164.5, {labware: 'destPlateId'}),
+      cmd.dispense('A3', 164.5, { labware: 'destPlateId' }),
       cmd.aspirate('A1', 164.5),
-      cmd.dispense('A3', 164.5, {labware: 'destPlateId'}),
+      cmd.dispense('A3', 164.5, { labware: 'destPlateId' }),
 
       cmd.aspirate('B1', 300),
-      cmd.dispense('B3', 300, {labware: 'destPlateId'}),
+      cmd.dispense('B3', 300, { labware: 'destPlateId' }),
       // last 2 chunks split evenly
       cmd.aspirate('B1', 164.5),
-      cmd.dispense('B3', 164.5, {labware: 'destPlateId'}),
+      cmd.dispense('B3', 164.5, { labware: 'destPlateId' }),
       cmd.aspirate('B1', 164.5),
-      cmd.dispense('B3', 164.5, {labware: 'destPlateId'}),
+      cmd.dispense('B3', 164.5, { labware: 'destPlateId' }),
     ])
   })
 })
@@ -439,10 +435,10 @@ describe('advanced options', () => {
 
         // "real" aspirate/dispenses
         cmd.aspirate('A1', 300),
-        cmd.dispense('B1', 300, {labware: 'destPlateId'}),
+        cmd.dispense('B1', 300, { labware: 'destPlateId' }),
 
         cmd.aspirate('A1', 50),
-        cmd.dispense('B1', 50, {labware: 'destPlateId'}),
+        cmd.dispense('B1', 50, { labware: 'destPlateId' }),
       ])
     })
 
@@ -457,11 +453,11 @@ describe('advanced options', () => {
       expect(result.commands).toEqual([
         cmd.aspirate('A1', 300),
         cmd.touchTip('A1'),
-        cmd.dispense('B1', 300, {labware: 'destPlateId'}),
+        cmd.dispense('B1', 300, { labware: 'destPlateId' }),
 
         cmd.aspirate('A1', 50),
         cmd.touchTip('A1'),
-        cmd.dispense('B1', 50, {labware: 'destPlateId'}),
+        cmd.dispense('B1', 50, { labware: 'destPlateId' }),
       ])
     })
 
@@ -475,12 +471,12 @@ describe('advanced options', () => {
       const result = transfer(transferArgs)(robotInitialState)
       expect(result.commands).toEqual([
         cmd.aspirate('A1', 300),
-        cmd.dispense('B1', 300, {labware: 'destPlateId'}),
-        cmd.touchTip('B1', {labware: 'destPlateId'}),
+        cmd.dispense('B1', 300, { labware: 'destPlateId' }),
+        cmd.touchTip('B1', { labware: 'destPlateId' }),
 
         cmd.aspirate('A1', 50),
-        cmd.dispense('B1', 50, {labware: 'destPlateId'}),
-        cmd.touchTip('B1', {labware: 'destPlateId'}),
+        cmd.dispense('B1', 50, { labware: 'destPlateId' }),
+        cmd.touchTip('B1', { labware: 'destPlateId' }),
       ])
     })
 
@@ -508,11 +504,11 @@ describe('advanced options', () => {
       expect(result.commands).toEqual([
         ...mixCommands,
         cmd.aspirate('A1', 300),
-        cmd.dispense('B1', 300, {labware: 'destPlateId'}),
+        cmd.dispense('B1', 300, { labware: 'destPlateId' }),
 
         ...mixCommands,
         cmd.aspirate('A1', 50),
-        cmd.dispense('B1', 50, {labware: 'destPlateId'}),
+        cmd.dispense('B1', 50, { labware: 'destPlateId' }),
       ])
     })
 
@@ -533,21 +529,21 @@ describe('advanced options', () => {
       // written here for less verbose `commands` below
       const mixCommands = [
         // mix 1
-        cmd.aspirate('B1', 250, {labware: 'destPlateId'}),
-        cmd.dispense('B1', 250, {labware: 'destPlateId'}),
+        cmd.aspirate('B1', 250, { labware: 'destPlateId' }),
+        cmd.dispense('B1', 250, { labware: 'destPlateId' }),
         // mix 2
-        cmd.aspirate('B1', 250, {labware: 'destPlateId'}),
-        cmd.dispense('B1', 250, {labware: 'destPlateId'}),
+        cmd.aspirate('B1', 250, { labware: 'destPlateId' }),
+        cmd.dispense('B1', 250, { labware: 'destPlateId' }),
       ]
 
       const result = transfer(transferArgs)(robotInitialState)
       expect(result.commands).toEqual([
         cmd.aspirate('A1', 300),
-        cmd.dispense('B1', 300, {labware: 'destPlateId'}),
+        cmd.dispense('B1', 300, { labware: 'destPlateId' }),
         ...mixCommands,
 
         cmd.aspirate('A1', 50),
-        cmd.dispense('B1', 50, {labware: 'destPlateId'}),
+        cmd.dispense('B1', 50, { labware: 'destPlateId' }),
         ...mixCommands,
       ])
     })

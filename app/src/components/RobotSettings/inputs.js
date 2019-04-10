@@ -20,7 +20,7 @@ export type InputProps<T> = {
   name: T,
   value: ?string,
   disabled?: boolean,
-  onChange: ({[name: T]: string}) => *,
+  onChange: ({ [name: T]: string }) => *,
   className?: string,
 }
 
@@ -38,10 +38,8 @@ export class Form extends React.Component<FormProps> {
     event.preventDefault()
   }
 
-  render () {
-    const onSubmit = !this.props.disabled
-      ? this.onSubmit
-      : undefined
+  render() {
+    const onSubmit = !this.props.disabled ? this.onSubmit : undefined
 
     return (
       <form onSubmit={onSubmit} className={this.props.className}>
@@ -60,8 +58,8 @@ export class Select<T: string> extends React.Component<SelectProps<T>> {
     }
   }
 
-  render () {
-    const {value, options, disabled, className} = this.props
+  render() {
+    const { value, options, disabled, className } = this.props
 
     return (
       <DropdownField
@@ -84,8 +82,8 @@ export class TextInput<T: string> extends React.Component<TextInputProps<T>> {
     }
   }
 
-  render () {
-    const {type, value, disabled, className} = this.props
+  render() {
+    const { type, value, disabled, className } = this.props
 
     return (
       <InputField

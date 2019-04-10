@@ -20,15 +20,19 @@ const CONTINUE = 'Continue'
 /**
  * AlertModal variant to prompt user to "Cancel" or "Continue" a given action
  */
-export default function ContinueModal (props: ContinueModalProps) {
-  const {className, onCancelClick, onContinueClick} = props
+export default function ContinueModal(props: ContinueModalProps) {
+  const { className, onCancelClick, onContinueClick } = props
   const buttons = [
-    {title: CANCEL, children: CANCEL, onClick: onCancelClick},
-    {title: CONTINUE, children: CONTINUE, onClick: onContinueClick},
+    { title: CANCEL, children: CANCEL, onClick: onCancelClick },
+    { title: CONTINUE, children: CONTINUE, onClick: onContinueClick },
   ]
 
   return (
-    <AlertModal className={className} buttons={buttons} onCloseClick={onCancelClick}>
+    <AlertModal
+      className={className}
+      buttons={buttons}
+      onCloseClick={onCancelClick}
+    >
       {props.children}
     </AlertModal>
   )

@@ -13,10 +13,10 @@ jest.mock(
 const __mockRemotes = {}
 
 const __clearMock = () => {
-  Object.keys(__mockRemotes).forEach((remoteName) => {
+  Object.keys(__mockRemotes).forEach(remoteName => {
     const remote = __mockRemotes[remoteName]
 
-    Object.keys(remote).forEach((property) => {
+    Object.keys(remote).forEach(property => {
       const value = remote[property]
       value && value.mockClear && value.mockClear()
     })
@@ -28,7 +28,7 @@ module.exports = {
   __clearMock,
   // return jest mocked versions of remote modules
   remote: {
-    require: jest.fn((name) => {
+    require: jest.fn(name => {
       if (__mockRemotes[name]) return __mockRemotes[name]
 
       const remote = jest.genMockFromModule(

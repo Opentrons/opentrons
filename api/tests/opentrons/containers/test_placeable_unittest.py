@@ -64,18 +64,6 @@ class PlaceableTestCase(unittest.TestCase):
         for i in range(4):
             self.assertEqual(next(cycle_iter), c[i])
 
-    def test_chain_method(self):
-        a = generate_plate(4, 2, (5, 5), (0, 0), 5)
-        b = generate_plate(4, 2, (5, 5), (0, 0), 5)
-        c = generate_plate(4, 2, (5, 5), (0, 0), 5)
-        cycle_iter = a.chain(b, c)
-        for i in range(4):
-            self.assertEqual(next(cycle_iter), a[i])
-        for i in range(4):
-            self.assertEqual(next(cycle_iter), b[i])
-        for i in range(4):
-            self.assertEqual(next(cycle_iter), c[i])
-
     def test_int_index(self):
         c = generate_plate(4, 2, (5, 5), (0, 0), 5)
 

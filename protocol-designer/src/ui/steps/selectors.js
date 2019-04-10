@@ -1,13 +1,17 @@
 // @flow
-import {createSelector} from 'reselect'
+import { createSelector } from 'reselect'
 import last from 'lodash/last'
 import isEmpty from 'lodash/isEmpty'
 
 import * as stepFormSelectors from '../../step-forms/selectors' // TODO Ian 2018-12-20: fix circular dependency so this direct import isn't required
-import type {StepIdType} from '../../form-types'
-import type {BaseState, Selector} from '../../types'
-import {initialSelectedItemState, type SelectableItem, type StepsState} from './reducers'
-import type {SubstepIdentifier, TerminalItemId} from '../../steplist/types'
+import type { StepIdType } from '../../form-types'
+import type { BaseState, Selector } from '../../types'
+import {
+  initialSelectedItemState,
+  type SelectableItem,
+  type StepsState,
+} from './reducers'
+import type { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
 
 const rootSelector = (state: BaseState): StepsState => state.ui.steps
 
@@ -19,19 +23,20 @@ const getNonNullSelectedItem: Selector<SelectableItem> = createSelector(
   stepFormSelectors.getOrderedStepIds,
   (state, orderedStepIds) => {
     if (state.selectedItem != null) return state.selectedItem
-    if (orderedStepIds.length > 0) return {isStep: true, id: last(orderedStepIds)}
+    if (orderedStepIds.length > 0)
+      return { isStep: true, id: last(orderedStepIds) }
     return initialSelectedItemState
   }
 )
 
 const getSelectedStepId: Selector<?StepIdType> = createSelector(
   getNonNullSelectedItem,
-  (item) => item.isStep ? item.id : null
+  item => (item.isStep ? item.id : null)
 )
 
 const getSelectedTerminalItemId: Selector<?TerminalItemId> = createSelector(
   getNonNullSelectedItem,
-  (item) => !item.isStep ? item.id : null
+  item => (!item.isStep ? item.id : null)
 )
 
 const getHoveredItem: Selector<?SelectableItem> = createSelector(
@@ -41,7 +46,7 @@ const getHoveredItem: Selector<?SelectableItem> = createSelector(
 
 const getHoveredStepId: Selector<?StepIdType> = createSelector(
   getHoveredItem,
-  (item) => (item && item.isStep) ? item.id : null
+  item => (item && item.isStep ? item.id : null)
 )
 
 /** Array of labware (labwareId's) involved in hovered Step, or [] */
@@ -80,7 +85,11 @@ const getHoveredStepLabware: Selector<Array<string>> = createSelector(
     // step types that have no labware that gets highlighted
     if (!(stepArgs.commandCreatorFnName === 'delay')) {
       // TODO Ian 2018-05-08 use assert here
-      console.warn(`getHoveredStepLabware does not support step type "${stepArgs.commandCreatorFnName}"`)
+      console.warn(
+        `getHoveredStepLabware does not support step type "${
+          stepArgs.commandCreatorFnName
+        }"`
+      )
     }
 
     return blank
@@ -89,7 +98,7 @@ const getHoveredStepLabware: Selector<Array<string>> = createSelector(
 
 const getHoveredTerminalItemId: Selector<?TerminalItemId> = createSelector(
   getHoveredItem,
-  (item) => (item && !item.isStep) ? item.id : null
+  item => (item && !item.isStep ? item.id : null)
 )
 
 const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
@@ -102,9 +111,7 @@ const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
 const getActiveItem: Selector<SelectableItem> = createSelector(
   getNonNullSelectedItem,
   getHoveredItem,
-  (selected, hovered) => hovered != null
-    ? hovered
-    : selected
+  (selected, hovered) => (hovered != null ? hovered : selected)
 )
 
 // TODO: BC 2018-12-17 refactor as react state
@@ -130,7 +137,7 @@ const getSelectedStep = createSelector(
 // TODO: BC: 2018-10-26 remove this when we decide to not block save
 export const getCurrentFormCanBeSaved: Selector<boolean> = createSelector(
   stepFormSelectors.getUnsavedFormErrors,
-  (formErrors) => {
+  formErrors => {
     return Boolean(formErrors && isEmpty(formErrors))
   }
 )

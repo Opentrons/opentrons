@@ -7,7 +7,7 @@ type Props = {
   name: string,
 }
 
-export default function ModuleImage (props: Props) {
+export default function ModuleImage(props: Props) {
   const imgSrc = getModuleImg(props.name)
   return (
     <div className={styles.module_image_wrapper}>
@@ -16,7 +16,7 @@ export default function ModuleImage (props: Props) {
   )
 }
 
-function getModuleImg (name: string) {
+function getModuleImg(name: string) {
   return MODULE_IMGS[name]
 }
 

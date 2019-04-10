@@ -1,14 +1,14 @@
 // @flow
 import * as React from 'react'
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
-import {AlertModal} from '@opentrons/components'
+import { AlertModal } from '@opentrons/components'
 import UpdateAppMessage from './UpdateAppMessage'
 import VersionList from './VersionList'
 import SkipAppUpdateMessage from './SkipAppUpdateMessage'
 
-import type {RobotUpdateInfo} from '../../../http-api-client'
-import type {VersionProps} from './types'
+import type { RobotUpdateInfo } from '../../../http-api-client'
+import type { VersionProps } from './types'
 
 type Props = {
   updateInfo: RobotUpdateInfo,
@@ -18,8 +18,8 @@ type Props = {
   onClick: () => mixed,
 }
 
-export default function UpdateAppModal (props: Props) {
-  const {updateInfo, parentUrl, versionProps, onClick, ignoreUpdate} = props
+export default function UpdateAppModal(props: Props) {
+  const { updateInfo, parentUrl, versionProps, onClick, ignoreUpdate } = props
   const HEADING = `Robot Server Version ${
     versionProps.availableUpdate
   } Available`
@@ -31,7 +31,7 @@ export default function UpdateAppModal (props: Props) {
       children: 'not now',
     }
   } else {
-    notNowButton = {Component: Link, to: parentUrl, children: 'not now'}
+    notNowButton = { Component: Link, to: parentUrl, children: 'not now' }
   }
   return (
     <AlertModal

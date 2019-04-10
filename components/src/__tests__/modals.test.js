@@ -2,18 +2,23 @@
 import React from 'react'
 import Renderer from 'react-test-renderer'
 
-import {Modal, AlertModal, ContinueModal, ModalPage, SpinnerModalPage, Overlay} from '..'
+import {
+  Modal,
+  AlertModal,
+  ContinueModal,
+  ModalPage,
+  SpinnerModalPage,
+  Overlay,
+} from '..'
 
 describe('modals', () => {
   test('Modal has a clickable overlay', () => {
     const onCloseClick = jest.fn()
     const root = Renderer.create(
-      <Modal onCloseClick={onCloseClick}>
-        children
-      </Modal>
+      <Modal onCloseClick={onCloseClick}>children</Modal>
     ).root
 
-    const overlay = root.findByProps({className: 'overlay clickable'})
+    const overlay = root.findByProps({ className: 'overlay clickable' })
     overlay.props.onClick()
 
     expect(onCloseClick).toHaveBeenCalled()
@@ -31,8 +36,8 @@ describe('modals', () => {
       </ContinueModal>
     ).root
 
-    const cancelButton = root.findByProps({title: 'Cancel'})
-    const continueButton = root.findByProps({title: 'Continue'})
+    const cancelButton = root.findByProps({ title: 'Cancel' })
+    const continueButton = root.findByProps({ title: 'Continue' })
 
     cancelButton.props.onClick()
     expect(onCancelClick).toHaveBeenCalled()
@@ -53,7 +58,7 @@ describe('modals', () => {
       </ContinueModal>
     ).root
 
-    const overlay = root.findByProps({className: 'overlay clickable'})
+    const overlay = root.findByProps({ className: 'overlay clickable' })
 
     overlay.props.onClick()
     expect(onCancelClick).toHaveBeenCalled()
@@ -61,7 +66,7 @@ describe('modals', () => {
 
   test('Modal renders correctly', () => {
     const tree = Renderer.create(
-      <Modal onCloseClick={() => {}} className='foo'>
+      <Modal onCloseClick={() => {}} className="foo">
         children
       </Modal>
     ).toJSON()
@@ -71,7 +76,11 @@ describe('modals', () => {
 
   test('Modal renders correctly with optional heading', () => {
     const tree = Renderer.create(
-      <Modal onCloseClick={() => {}} className='foo' heading={'Heading Visible'}>
+      <Modal
+        onCloseClick={() => {}}
+        className="foo"
+        heading={'Heading Visible'}
+      >
         children
       </Modal>
     ).toJSON()
@@ -86,8 +95,8 @@ describe('modals', () => {
         className={'style'}
         onCloseClick={() => {}}
         buttons={[
-          {onClick: () => {}, children: 'a'},
-          {onClick: () => {}, children: 'b'},
+          { onClick: () => {}, children: 'a' },
+          { onClick: () => {}, children: 'b' },
         ]}
       >
         children
@@ -99,10 +108,7 @@ describe('modals', () => {
 
   test('ContinueModal renders correctly', () => {
     const tree = Renderer.create(
-      <ContinueModal
-        onCancelClick={() => {}}
-        onContinueClick={() => {}}
-      >
+      <ContinueModal onCancelClick={() => {}} onContinueClick={() => {}}>
         children
       </ContinueModal>
     ).toJSON()
@@ -111,9 +117,7 @@ describe('modals', () => {
   })
 
   test('Overlay renders correctly', () => {
-    const tree = Renderer.create(
-      <Overlay onClick={() => {}} />
-    ).toJSON()
+    const tree = Renderer.create(<Overlay onClick={() => {}} />).toJSON()
 
     expect(tree).toMatchSnapshot()
   })

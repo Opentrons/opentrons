@@ -2,29 +2,26 @@
 
 Redux state, selectors, reducer, actions, and middleware for dealing with robot state in the app
 
-``` js
+```js
 import {
   NAME,
   constants,
   selectors,
   actions,
   reducer,
-  apiClientMiddleware
+  apiClientMiddleware,
 } from './robot'
 ```
 
 To use this module, add the interface reducer to the root reducer:
 
-``` js
-import {combineReducers} from 'redux'
-import {
-  NAME as ROBOT_NAME,
-  reducer as robotReducer
-} from './robot'
+```js
+import { combineReducers } from 'redux'
+import { NAME as ROBOT_NAME, reducer as robotReducer } from './robot'
 
 const rootReducer = combineReducers({
   // ...
-  [ROBOT_NAME]: robotReducer
+  [ROBOT_NAME]: robotReducer,
   // ...
 })
 ```
@@ -35,7 +32,7 @@ The name of the robot module is `robot`, which is used to prefix all action name
 
 The following contants are available (see [constants.js](./constants.js) for values):
 
-``` js
+```js
 import constants from './robot'
 
 const {
@@ -59,7 +56,7 @@ const {
 
   // pipette channels names
   SINGLE_CHANNEL,
-  MULTI_CHANNEL
+  MULTI_CHANNEL,
 } = constants
 ```
 

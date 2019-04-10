@@ -1,5 +1,5 @@
 // @flow
-import {tiprackWellNamesFlat} from '../../data'
+import { tiprackWellNamesFlat } from '../../data'
 import type {
   AspirateDispenseArgsV1 as AspirateDispenseArgs,
   CommandV1 as Command,
@@ -18,7 +18,7 @@ export const dropTip = (
   params: {
     pipette: 'p300SingleId',
     labware: 'trashId',
-    well: (typeof well === 'string') ? well : tiprackWellNamesFlat[well],
+    well: typeof well === 'string' ? well : tiprackWellNamesFlat[well],
     ...params,
   },
 })
@@ -32,7 +32,7 @@ export const pickUpTip = (
     pipette: 'p300SingleId',
     labware: 'tiprack1Id',
     ...params,
-    well: (typeof tip === 'string') ? tip : tiprackWellNamesFlat[tip],
+    well: typeof tip === 'string' ? tip : tiprackWellNamesFlat[tip],
   },
 })
 

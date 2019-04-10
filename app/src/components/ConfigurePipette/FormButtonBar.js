@@ -1,17 +1,17 @@
 // @flow
 import * as React from 'react'
 
-import {BottomButtonBar} from '../modals'
+import { BottomButtonBar } from '../modals'
 
 import styles from './styles.css'
 
-import type {ButtonProps} from '@opentrons/components'
+import type { ButtonProps } from '@opentrons/components'
 
 type Props = {
   buttons: Array<?ButtonProps>,
 }
 
-export default function FormButtonBar (props: Props) {
+export default function FormButtonBar(props: Props) {
   const className = styles.form_button
   const buttons = props.buttons.map(button => {
     return {

@@ -1,0 +1,87 @@
+{
+  "ordering": [["A1", "B1"], ["A2", "B2"], ["A3", "B3"]],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": ["352070"]
+  },
+  "metadata": {
+    "tags": ["50", "mL", "falcon", "tuberack"],
+    "displayName": "Opentrons 6 Tube Rack With Falcon 50 mL Conical",
+    "displayCategory": "tubeRack",
+    "displayVolumeUnits": "mL"
+  },
+  "dimensions": {
+    "overallLength": 127.76,
+    "overallWidth": 85.48,
+    "overallHeight": 122
+  },
+  "otId": "23784a80-5563-11e9-bf87-f7b718396190",
+  "deprecated": false,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "wells": {
+    "B1": {
+      "depth": 113.78,
+      "diameter": 26.45,
+      "shape": "circular",
+      "totalLiquidVolume": 50000,
+      "x": 35.5,
+      "y": 25.24,
+      "z": 8.22
+    },
+    "A1": {
+      "depth": 113.78,
+      "diameter": 26.45,
+      "shape": "circular",
+      "totalLiquidVolume": 50000,
+      "x": 35.5,
+      "y": 60.24,
+      "z": 8.22
+    },
+    "B2": {
+      "depth": 113.78,
+      "diameter": 26.45,
+      "shape": "circular",
+      "totalLiquidVolume": 50000,
+      "x": 70.5,
+      "y": 25.24,
+      "z": 8.22
+    },
+    "A2": {
+      "depth": 113.78,
+      "diameter": 26.45,
+      "shape": "circular",
+      "totalLiquidVolume": 50000,
+      "x": 70.5,
+      "y": 60.24,
+      "z": 8.22
+    },
+    "B3": {
+      "depth": 113.78,
+      "diameter": 26.45,
+      "shape": "circular",
+      "totalLiquidVolume": 50000,
+      "x": 105.5,
+      "y": 25.24,
+      "z": 8.22
+    },
+    "A3": {
+      "depth": 113.78,
+      "diameter": 26.45,
+      "shape": "circular",
+      "totalLiquidVolume": 50000,
+      "x": 105.5,
+      "y": 60.24,
+      "z": 8.22
+    }
+  },
+  "parameters": {
+    "format": "irregular",
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "opentrons_6_tuberack_falcon_50_ml"
+  }
+}

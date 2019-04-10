@@ -1,7 +1,10 @@
 // @flow
-import type {DelayArgs} from '../../step-generation'
-import type {StepIdType} from '../../form-types'
-import type {WellIngredientVolumeData, TipLocation} from '../../steplist/types'
+import type { DelayArgs } from '../../step-generation'
+import type { StepIdType } from '../../form-types'
+import type {
+  WellIngredientVolumeData,
+  TipLocation,
+} from '../../steplist/types'
 
 export type SourceDestData = {
   wells: Array<string>,
@@ -49,10 +52,10 @@ export type SourceDestSubstepItemMultiChannel = {|
   // NOTE: "Row" means a tabular row on the steplist, NOT a "row" of wells on the deck
 |}
 
-export type SourceDestSubstepItem = SourceDestSubstepItemSingleChannel | SourceDestSubstepItemMultiChannel
+export type SourceDestSubstepItem =
+  | SourceDestSubstepItemSingleChannel
+  | SourceDestSubstepItemMultiChannel
 
-export type SubstepItemData =
-  | SourceDestSubstepItem
-  | DelayArgs // Pause substep uses same data as processed form
+export type SubstepItemData = SourceDestSubstepItem | DelayArgs // Pause substep uses same data as processed form
 
-export type SubSteps = {[StepIdType]: ?SubstepItemData}
+export type SubSteps = { [StepIdType]: ?SubstepItemData }

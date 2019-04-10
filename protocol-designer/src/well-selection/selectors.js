@@ -1,8 +1,8 @@
 // @flow
-import {createSelector} from 'reselect'
-import {sortWells} from '@opentrons/shared-data'
-import type {BaseState, Selector} from '../types'
-import type {Wells} from '../labware-ingred/types'
+import { createSelector } from 'reselect'
+import { sortWells } from '@opentrons/shared-data'
+import type { BaseState, Selector } from '../types'
+import type { Wells } from '../labware-ingred/types'
 
 const rootSelector = (state: BaseState) => state.wellSelection
 

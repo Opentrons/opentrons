@@ -1,12 +1,15 @@
 // @flow
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import * as React from 'react'
-import type {BaseState, ThunkDispatch} from '../../../types'
+import type { BaseState, ThunkDispatch } from '../../../types'
 
-import type {TerminalItemId} from '../../../steplist'
-import {selectors as stepsSelectors, actions as stepsActions} from '../../../ui/steps'
-import {PDTitledList} from '../../lists'
-export {default as TerminalItemLink} from './TerminalItemLink'
+import type { TerminalItemId } from '../../../steplist'
+import {
+  selectors as stepsSelectors,
+  actions as stepsActions,
+} from '../../../ui/steps'
+import { PDTitledList } from '../../lists'
+export { default as TerminalItemLink } from './TerminalItemLink'
 
 type Props = React.ElementProps<typeof PDTitledList>
 
@@ -21,8 +24,8 @@ type SP = {
   selected: $ElementType<Props, 'selected'>,
 }
 
-function mapStateToProps (state: BaseState, ownProps: OP): SP {
-  const {id} = ownProps
+function mapStateToProps(state: BaseState, ownProps: OP): SP {
+  const { id } = ownProps
   const hovered = stepsSelectors.getHoveredTerminalItemId(state) === id
   const selected = stepsSelectors.getSelectedTerminalItemId(state) === id
   return {
@@ -32,9 +35,13 @@ function mapStateToProps (state: BaseState, ownProps: OP): SP {
 }
 
 // TODO Ian: 2018-07-31 annotate type of mergeProps correctly. Related to https://github.com/flow-typed/flow-typed/issues/1269 ?
-function mergeProps (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>}, ownProps: OP): * {
-  const {id, title, children} = ownProps
-  const {dispatch} = dispatchProps
+function mergeProps(
+  stateProps: SP,
+  dispatchProps: { dispatch: ThunkDispatch<*> },
+  ownProps: OP
+): * {
+  const { id, title, children } = ownProps
+  const { dispatch } = dispatchProps
   return {
     ...stateProps,
     title,
@@ -45,4 +52,8 @@ function mergeProps (stateProps: SP, dispatchProps: {dispatch: ThunkDispatch<*>}
   }
 }
 
-export default connect(mapStateToProps, null, mergeProps)(PDTitledList)
+export default connect(
+  mapStateToProps,
+  null,
+  mergeProps
+)(PDTitledList)

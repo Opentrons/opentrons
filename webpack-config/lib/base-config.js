@@ -2,14 +2,14 @@
 'use strict'
 
 const path = require('path')
-const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer')
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const CircularDependencyPlugin = require('circular-dependency-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 
 const rules = require('./rules')
-const {DEV_MODE, ENABLE_ANALYZER, DEFAULT_PORT} = require('./env')
+const { DEV_MODE, ENABLE_ANALYZER, DEFAULT_PORT } = require('./env')
 
 module.exports = {
   target: 'web',
@@ -43,7 +43,7 @@ module.exports = {
       chunkFilename: DEV_MODE ? '[id].css' : '[id].[contenthash].css',
     }),
     ENABLE_ANALYZER &&
-      new BundleAnalyzerPlugin({analyzerMode: 'server', openAnalyzer: true}),
+      new BundleAnalyzerPlugin({ analyzerMode: 'server', openAnalyzer: true }),
     ENABLE_ANALYZER &&
       new CircularDependencyPlugin({
         exclude: /node_modules/,
@@ -53,7 +53,7 @@ module.exports = {
 
   optimization: {
     minimizer: [
-      new TerserPlugin({cache: true, parallel: true, sourceMap: true}),
+      new TerserPlugin({ cache: true, parallel: true, sourceMap: true }),
       new OptimizeCSSAssetsPlugin({}),
     ],
 

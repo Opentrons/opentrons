@@ -15,27 +15,27 @@ type State = {
 }
 
 export default class IntervalWrapper extends React.Component<Props, State> {
-  constructor (props: Props) {
+  constructor(props: Props) {
     super(props)
     this.state = {
       intervalId: null,
     }
   }
 
-  render () {
-    const {children} = this.props
+  render() {
+    const { children } = this.props
 
     return <React.Fragment>{children}</React.Fragment>
   }
 
-  componentDidMount () {
-    const {refresh, interval} = this.props
+  componentDidMount() {
+    const { refresh, interval } = this.props
     const intervalId = setInterval(refresh, interval)
-    this.setState({intervalId: intervalId})
+    this.setState({ intervalId: intervalId })
     refresh()
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     if (this.state.intervalId) {
       clearInterval(this.state.intervalId)
     }

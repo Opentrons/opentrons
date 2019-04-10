@@ -6,7 +6,6 @@ from opentrons import config  # noqa(E402)
 from opentrons.data_storage import database_migration  # noqa(E402)
 
 if os.environ.get('OT_UPDATE_SERVER') != 'true'\
-   and not config.feature_flags.split_labware_definitions()\
    and not config.feature_flags.use_protocol_api_v2():
     database_migration.check_version_and_perform_necessary_migrations()
 

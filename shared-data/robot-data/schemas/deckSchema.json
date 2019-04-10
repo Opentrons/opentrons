@@ -9,7 +9,7 @@
     "xyzArray": {
       "type": "array",
       "description": "Array of 3 numbers, [x, y, z]",
-      "items": {"type": "number"},
+      "items": { "type": "number" },
       "minItems": 3,
       "maxItems": 3
     },
@@ -18,9 +18,9 @@
       "description": "The active area (both pipettes can reach) of a fixture on the deck",
       "required": ["xDimension", "yDimension", "zDimension"],
       "properties": {
-        "xDimension": {"$ref": "#/definitions/positiveNumber"},
-        "yDimension": {"$ref": "#/definitions/positiveNumber"},
-        "zDimension": {"$ref": "#/definitions/positiveNumber"}
+        "xDimension": { "$ref": "#/definitions/positiveNumber" },
+        "yDimension": { "$ref": "#/definitions/positiveNumber" },
+        "zDimension": { "$ref": "#/definitions/positiveNumber" }
       }
     }
   },
@@ -28,12 +28,7 @@
   "description": "Deck specifications, where x,y,z (0,0,0) is at front the bottom left corner.",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "otId",
-    "metadata",
-    "robot",
-    "locations"
-  ],
+  "required": ["otId", "metadata", "robot", "locations"],
   "properties": {
     "otId": {
       "description": "Unique internal ID generated using UUID",
@@ -87,8 +82,8 @@
                 "description": "Unique identifier for slot",
                 "type": "string"
               },
-              "position": {"$ref": "#/definitions/xyzArray"},
-              "boundingBox": {"$ref": "#/definitions/boundingBox"},
+              "position": { "$ref": "#/definitions/xyzArray" },
+              "boundingBox": { "$ref": "#/definitions/boundingBox" },
               "displayName": {
                 "description": "An optional human-readable nickname for this slot Eg \"Slot 1\" or \"Fixed Trash\"",
                 "type": "string"
@@ -108,7 +103,7 @@
                 "description": "Unique identifier for calibration point",
                 "type": "string"
               },
-              "position": {"$ref": "#/definitions/xyzArray"},
+              "position": { "$ref": "#/definitions/xyzArray" },
               "displayName": {
                 "description": "An optional human-readable nickname for this point Eg \"Slot 3 Cross\" or \"Slot 1 Dot\"",
                 "type": "string"
@@ -132,12 +127,12 @@
                 "description": "Valid labware loadName for fixed object",
                 "type": "string"
               },
-              "boundingBox": {"$ref": "#/definitions/boundingBox"},
+              "boundingBox": { "$ref": "#/definitions/boundingBox" },
               "slot": {
                 "description": "Slot location of the fixed object",
                 "type": "string"
               },
-              "position": {"$ref": "#/definitions/xyzArray"},
+              "position": { "$ref": "#/definitions/xyzArray" },
               "displayName": {
                 "description": "An optional human-readable nickname for this fixture Eg \"Tall Fixed Trash\" or \"Short Fixed Trash\"",
                 "type": "string"

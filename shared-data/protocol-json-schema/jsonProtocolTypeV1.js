@@ -1,5 +1,5 @@
 // @flow
-import type {DeckSlot, Mount} from '@opentrons/components'
+import type { DeckSlot, Mount } from '@opentrons/components'
 
 // COMMANDS
 
@@ -16,33 +16,38 @@ export type AspirateDispenseArgsV1 = {|
   'flow-rate'?: ?number,
 |}
 
-export type CommandV1 = {|
-  command: 'aspirate' | 'dispense',
-  params: AspirateDispenseArgsV1,
-|} | {|
-  command: 'pick-up-tip' | 'drop-tip' | 'blowout',
-  params: PipetteLabwareFieldsV1,
-|} | {|
-  command: 'touch-tip',
-  params: {|
-    ...PipetteLabwareFieldsV1,
-    offsetFromBottomMm?: ?number,
-  |},
-|} | {|
-  command: 'delay',
-  /** number of seconds to delay (fractional values OK),
+export type CommandV1 =
+  | {|
+      command: 'aspirate' | 'dispense',
+      params: AspirateDispenseArgsV1,
+    |}
+  | {|
+      command: 'pick-up-tip' | 'drop-tip' | 'blowout',
+      params: PipetteLabwareFieldsV1,
+    |}
+  | {|
+      command: 'touch-tip',
+      params: {|
+        ...PipetteLabwareFieldsV1,
+        offsetFromBottomMm?: ?number,
+      |},
+    |}
+  | {|
+      command: 'delay',
+      /** number of seconds to delay (fractional values OK),
     or `true` for delay until user input */
-  params: {|
-    wait: number | true,
-    message: ?string,
-  |},
-|} | {|
-  command: 'air-gap',
-  params: {|
-    pipette: string,
-    volume: number,
-  |},
-|}
+      params: {|
+        wait: number | true,
+        message: ?string,
+      |},
+    |}
+  | {|
+      command: 'air-gap',
+      params: {|
+        pipette: string,
+        volume: number,
+      |},
+    |}
 
 // File Subtypes
 

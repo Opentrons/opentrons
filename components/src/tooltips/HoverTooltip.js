@@ -4,7 +4,7 @@ import * as React from 'react'
 
 import Tooltip from './Tooltip'
 
-import type {TooltipChildProps, TooltipProps} from './Tooltip'
+import type { TooltipChildProps, TooltipProps } from './Tooltip'
 
 const OPEN_DELAY_MS = 300
 const CLOSE_DELAY_MS = 0
@@ -16,7 +16,7 @@ export type HoverTooltipHandlers = TooltipChildProps<{
 
 type Props = TooltipProps<HoverTooltipHandlers>
 
-type State = {isOpen: boolean}
+type State = { isOpen: boolean }
 
 /**
  * Tooltip component that triggers on `MouseEnter` and `MouseLeave`. See
@@ -35,14 +35,14 @@ class HoverTooltip extends React.Component<Props, State> {
   openTimeout: ?TimeoutID
   closeTimeout: ?TimeoutID
 
-  constructor (props: Props) {
+  constructor(props: Props) {
     super(props)
     this.openTimeout = null
     this.closeTimeout = null
-    this.state = {isOpen: false}
+    this.state = { isOpen: false }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     if (this.closeTimeout) clearTimeout(this.closeTimeout)
     if (this.openTimeout) clearTimeout(this.openTimeout)
   }
@@ -50,19 +50,19 @@ class HoverTooltip extends React.Component<Props, State> {
   delayedOpen = () => {
     if (this.closeTimeout) clearTimeout(this.closeTimeout)
     this.openTimeout = setTimeout(
-      () => this.setState({isOpen: true}),
+      () => this.setState({ isOpen: true }),
       OPEN_DELAY_MS
     )
   }
   delayedClose = () => {
     if (this.openTimeout) clearTimeout(this.openTimeout)
     this.closeTimeout = setTimeout(
-      () => this.setState({isOpen: false}),
+      () => this.setState({ isOpen: false }),
       CLOSE_DELAY_MS
     )
   }
 
-  render () {
+  render() {
     return (
       <Tooltip
         open={this.state.isOpen}

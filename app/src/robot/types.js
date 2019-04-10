@@ -1,13 +1,13 @@
 // @flow
 // common robot types
-import type {PipetteChannels, ModuleType} from '@opentrons/shared-data'
-import type {Mount} from '@opentrons/components'
+import type { PipetteChannels, ModuleType } from '@opentrons/shared-data'
+import type { Mount } from '@opentrons/components'
 import typeof reducer from './reducer'
 
 export type State = $Call<reducer>
 
 // TODO Ian 2018-02-27 files that import from here should just import from @opentrons/components directly
-export type {Mount}
+export type { Mount }
 
 export type Channels = PipetteChannels
 

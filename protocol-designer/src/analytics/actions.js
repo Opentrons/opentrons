@@ -1,5 +1,5 @@
 // @flow
-import {initializeAnalytics, shutdownAnalytics} from './integrations'
+import { initializeAnalytics, shutdownAnalytics } from './integrations'
 
 export type SetOptIn = {
   type: 'SET_OPT_IN',

@@ -1,12 +1,10 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {push} from 'react-router-redux'
-import {AlertModal} from '@opentrons/components'
+import { connect } from 'react-redux'
+import { push } from 'react-router-redux'
+import { AlertModal } from '@opentrons/components'
 
-import {
-  actions as robotActions,
-} from '../../robot'
+import { actions as robotActions } from '../../robot'
 
 type Props = {
   back: () => mixed,
@@ -17,7 +15,7 @@ const HEADING = 'Are you sure you want to cancel this run?'
 const CANCEL_TEXT = 'cancel run'
 const BACK_TEXT = 'go back'
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = dispatch => ({
   back: () => {
     dispatch(robotActions.resume())
     dispatch(push('/run'))
@@ -28,15 +26,15 @@ const mapDispatchToProps = (dispatch) => ({
   },
 })
 
-function ExitAlertModal (props: Props) {
-  const {back, cancel} = props
+function ExitAlertModal(props: Props) {
+  const { back, cancel } = props
 
   return (
     <AlertModal
       heading={HEADING}
       buttons={[
-        {children: BACK_TEXT, onClick: back},
-        {children: CANCEL_TEXT, onClick: cancel},
+        { children: BACK_TEXT, onClick: back },
+        { children: CANCEL_TEXT, onClick: cancel },
       ]}
       alertOverlay
     >
@@ -45,4 +43,7 @@ function ExitAlertModal (props: Props) {
   )
 }
 
-export default connect(null, mapDispatchToProps)(ExitAlertModal)
+export default connect(
+  null,
+  mapDispatchToProps
+)(ExitAlertModal)

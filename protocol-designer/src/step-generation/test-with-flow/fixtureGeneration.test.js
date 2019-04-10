@@ -1,5 +1,9 @@
 // @flow
-import {createRobotState, createEmptyLiquidState, getTiprackTipstate} from './fixtures'
+import {
+  createRobotState,
+  createEmptyLiquidState,
+  getTiprackTipstate,
+} from './fixtures'
 
 describe('createEmptyLiquidState fixture generator', () => {
   test('labware', () => {
@@ -34,7 +38,7 @@ describe('createEmptyLiquidState fixture generator', () => {
       A12: {},
     })
 
-    expect(result.labware.trashId).toEqual({A1: {}})
+    expect(result.labware.trashId).toEqual({ A1: {} })
   })
 })
 

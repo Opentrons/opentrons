@@ -5,9 +5,4 @@ import NavButton from './NavButton'
 import OutsideLinkButton from './OutsideLinkButton'
 import SidePanel from './SidePanel'
 
-export {
-  VerticalNavBar,
-  NavButton,
-  OutsideLinkButton,
-  SidePanel,
-}
+export { VerticalNavBar, NavButton, OutsideLinkButton, SidePanel }

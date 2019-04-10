@@ -49,8 +49,8 @@
     "flow-rate-for-pipettes": {
       "description": "Flow rate in mm/sec for each pipette model used in the protocol",
       "type": "object",
-      "propertyNames": {"$ref": "#/definitions/pipetteName"},
-      "patternProperties": {".*": {"type": "number"}},
+      "propertyNames": { "$ref": "#/definitions/pipetteName" },
+      "patternProperties": { ".*": { "type": "number" } },
       "additionalProperties": false
     },
 
@@ -66,7 +66,7 @@
     "offsetFromBottomMm": {
       "description": "Offset from bottom of well in millimeters",
       "properties": {
-        "offsetFromBottomMm": {"$ref": "#/definitions/mm-offset"}
+        "offsetFromBottomMm": { "$ref": "#/definitions/mm-offset" }
       }
     },
 
@@ -172,11 +172,15 @@
         "dispense-mm-from-bottom"
       ],
       "properties": {
-        "aspirate-flow-rate": {"$ref": "#/definitions/flow-rate-for-pipettes"},
-        "dispense-flow-rate": {"$ref": "#/definitions/flow-rate-for-pipettes"},
-        "aspirate-mm-from-bottom": {"$ref": "#/definitions/mm-offset"},
-        "dispense-mm-from-bottom": {"$ref": "#/definitions/mm-offset"},
-        "touch-tip-mm-from-top": {"$ref": "#/definitions/mm-offset"}
+        "aspirate-flow-rate": {
+          "$ref": "#/definitions/flow-rate-for-pipettes"
+        },
+        "dispense-flow-rate": {
+          "$ref": "#/definitions/flow-rate-for-pipettes"
+        },
+        "aspirate-mm-from-bottom": { "$ref": "#/definitions/mm-offset" },
+        "dispense-mm-from-bottom": { "$ref": "#/definitions/mm-offset" },
+        "touch-tip-mm-from-top": { "$ref": "#/definitions/mm-offset" }
       }
     },
 
@@ -244,7 +248,7 @@
           "type": "object",
           "required": ["slot", "model"],
           "properties": {
-            "slot": {"$ref": "#/definitions/slot"},
+            "slot": { "$ref": "#/definitions/slot" },
             "model": {
               "description": "Labware type, eg \"96-flat\". See http://docs.opentrons.com/containers.html for a full list of supported labware. TODO support custom labware in JSON",
               "type": "string"
@@ -295,10 +299,10 @@
                     },
                     "params": {
                       "allOf": [
-                        {"$ref": "#/definitions/flow-rate-params"},
-                        {"$ref": "#/definitions/pipette-access-params"},
-                        {"$ref": "#/definitions/volume-params"},
-                        {"$ref": "#/definitions/offsetFromBottomMm"}
+                        { "$ref": "#/definitions/flow-rate-params" },
+                        { "$ref": "#/definitions/pipette-access-params" },
+                        { "$ref": "#/definitions/volume-params" },
+                        { "$ref": "#/definitions/offsetFromBottomMm" }
                       ]
                     }
                   }
@@ -315,13 +319,12 @@
                     },
                     "params": {
                       "allOf": [
-                        {"$ref": "#/definitions/pipette-access-params"},
-                        {"$ref": "#/definitions/offsetFromBottomMm"}
+                        { "$ref": "#/definitions/pipette-access-params" },
+                        { "$ref": "#/definitions/offsetFromBottomMm" }
                       ]
                     }
                   }
                 },
-
 
                 {
                   "description": "Pick up tip / drop tip / blowout commands",
@@ -334,7 +337,7 @@
                     },
                     "params": {
                       "allOf": [
-                        {"$ref": "#/definitions/pipette-access-params"}
+                        { "$ref": "#/definitions/pipette-access-params" }
                       ]
                     }
                   }
@@ -346,22 +349,22 @@
                   "required": ["command", "params"],
                   "additionalProperties": false,
                   "properties": {
-                    "command": {"enum": ["move-to-slot"]},
+                    "command": { "enum": ["move-to-slot"] },
                     "params": {
                       "type": "object",
                       "required": ["pipette", "slot"],
                       "additionalProperties": false,
                       "properties": {
-                        "pipette": {"type": "string"},
-                        "slot": {"$ref": "#/definitions/slot"},
+                        "pipette": { "type": "string" },
+                        "slot": { "$ref": "#/definitions/slot" },
                         "offset": {
                           "description": "Optional offset from slot bottom left corner, in mm",
                           "type": "object",
                           "required": ["x", "y", "z"],
                           "properties": {
-                            "x": {"type": "number"},
-                            "y": {"type": "number"},
-                            "z": {"type": "number"}
+                            "x": { "type": "number" },
+                            "y": { "type": "number" },
+                            "z": { "type": "number" }
                           }
                         },
                         "minimum-z-height": {
@@ -394,10 +397,7 @@
                       "properties": {
                         "wait": {
                           "description": "either a number of seconds to wait (fractional values OK), or `true` to wait indefinitely until the user manually resumes the protocol",
-                          "anyOf": [
-                            {"type": "number"},
-                            {"enum": [true]}
-                          ]
+                          "anyOf": [{ "type": "number" }, { "enum": [true] }]
                         },
                         "message": {
                           "description": "optional message describing the delay"

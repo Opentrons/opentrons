@@ -10,16 +10,16 @@ import Continue from './Continue'
 import UploadError from '../UploadError'
 import styles from './styles.css'
 
-import type {Robot} from '../../discovery'
+import type { Robot } from '../../discovery'
 
 type Props = {
   robot: Robot,
   sessionLoaded: ?boolean,
-  uploadError: ?{message: string},
+  uploadError: ?{ message: string },
 }
 
-export default function FileInfo (props: Props) {
-  const {robot, sessionLoaded, uploadError} = props
+export default function FileInfo(props: Props) {
+  const { robot, sessionLoaded, uploadError } = props
 
   return (
     <div className={styles.file_info_container}>

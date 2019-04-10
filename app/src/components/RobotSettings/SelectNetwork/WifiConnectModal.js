@@ -8,8 +8,8 @@ import type {
   ApiRequestError,
 } from '../../../http-api-client'
 
-import {AlertModal} from '@opentrons/components'
-import {ErrorModal} from '../../modals'
+import { AlertModal } from '@opentrons/components'
+import { ErrorModal } from '../../modals'
 
 type Props = {
   close: () => mixed,
@@ -29,9 +29,9 @@ const failure = ssid =>
 
 const ERROR_MESSAGE_RE = /Error: (.*)$/
 
-export default function WifiConnectModal (props: Props) {
-  const {request, response, error, close} = props
-  const {ssid} = request
+export default function WifiConnectModal(props: Props) {
+  const { request, response, error, close } = props
+  const { ssid } = request
 
   if (error || !response) {
     let errorMessage = 'An unknown error occurred'
@@ -62,7 +62,7 @@ export default function WifiConnectModal (props: Props) {
       iconName="wifi"
       heading={SUCCESS_TITLE}
       onCloseClick={close}
-      buttons={[{onClick: close, children: 'close'}]}
+      buttons={[{ onClick: close, children: 'close' }]}
       alertOverlay
     >
       {success(ssid)}

@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {Icon, HoverTooltip} from '@opentrons/components'
-import {PDListItem} from '../lists'
+import { Icon, HoverTooltip } from '@opentrons/components'
+import { PDListItem } from '../lists'
 import styles from './StepItem.css'
 import LabwareTooltipContents from './LabwareTooltipContents'
-import {Portal} from './TooltipPortal'
+import { Portal } from './TooltipPortal'
 
 type AspirateDispenseHeaderProps = {
   sourceLabwareNickname: ?string,
@@ -14,7 +14,7 @@ type AspirateDispenseHeaderProps = {
   destLabwareType: ?string,
 }
 
-function AspirateDispenseHeader (props: AspirateDispenseHeaderProps) {
+function AspirateDispenseHeader(props: AspirateDispenseHeaderProps) {
   const {
     sourceLabwareNickname,
     sourceLabwareType,
@@ -26,35 +26,50 @@ function AspirateDispenseHeader (props: AspirateDispenseHeaderProps) {
     <React.Fragment>
       <li className={styles.aspirate_dispense}>
         <span>ASPIRATE</span>
-        <span className={styles.spacer}/>
+        <span className={styles.spacer} />
         <span>DISPENSE</span>
       </li>
 
-      <PDListItem className={cx(styles.step_subitem_column_header, styles.emphasized_cell)}>
+      <PDListItem
+        className={cx(
+          styles.step_subitem_column_header,
+          styles.emphasized_cell
+        )}
+      >
         <HoverTooltip
           portal={Portal}
-          tooltipComponent={(
+          tooltipComponent={
             <LabwareTooltipContents
               labwareNickname={sourceLabwareNickname}
-              labwareType={sourceLabwareType} />
-          )}>
-          {(hoverTooltipHandlers) => (
-            <span {...hoverTooltipHandlers} className={styles.labware_display_name}>
+              labwareType={sourceLabwareType}
+            />
+          }
+        >
+          {hoverTooltipHandlers => (
+            <span
+              {...hoverTooltipHandlers}
+              className={styles.labware_display_name}
+            >
               {sourceLabwareNickname}
             </span>
           )}
         </HoverTooltip>
         {/* This is always a "transfer icon" (arrow pointing right) for any step: */}
-        <Icon name='ot-transfer' />
+        <Icon name="ot-transfer" />
         <HoverTooltip
           portal={Portal}
-          tooltipComponent={(
+          tooltipComponent={
             <LabwareTooltipContents
               labwareNickname={destLabwareNickname}
-              labwareType={destLabwareType} />
-          )}>
-          {(hoverTooltipHandlers) => (
-            <span {...hoverTooltipHandlers} className={styles.labware_display_name}>
+              labwareType={destLabwareType}
+            />
+          }
+        >
+          {hoverTooltipHandlers => (
+            <span
+              {...hoverTooltipHandlers}
+              className={styles.labware_display_name}
+            >
               {destLabwareNickname}
             </span>
           )}

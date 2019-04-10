@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react'
 import styles from './styles.css'
-import type {VersionProps} from './types.js'
+import type { VersionProps } from './types.js'
 
 type Props = {
   ...$Exact<VersionProps>,
   ignoreAppUpdate?: boolean,
 }
-export default function VersionList (props: Props) {
+export default function VersionList(props: Props) {
   return (
     <ol className={styles.version_list}>
       <li>Your current app version: {props.appVersion}</li>

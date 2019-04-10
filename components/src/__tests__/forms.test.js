@@ -13,10 +13,7 @@ import {
 describe('CheckboxField', () => {
   test('renders correctly when unchecked', () => {
     const tree = Renderer.create(
-      <CheckboxField
-        label='Check Box 1'
-        className='foo'
-      />
+      <CheckboxField label="Check Box 1" className="foo" />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -24,11 +21,7 @@ describe('CheckboxField', () => {
 
   test('renders correctly when checked', () => {
     const tree = Renderer.create(
-      <CheckboxField
-        label='Check Box 1'
-        className='foo'
-        value
-      />
+      <CheckboxField label="Check Box 1" className="foo" value />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -39,12 +32,12 @@ describe('DropdownField', () => {
   test('renders correctly with a value', () => {
     const tree = Renderer.create(
       <DropdownField
-        className='foo'
+        className="foo"
         value={'rna'}
         options={[
-          {name: 'DNA', value: 'dna'},
-          {name: 'RNA', value: 'rna'},
-          {name: 'Protein', value: 'protein'},
+          { name: 'DNA', value: 'dna' },
+          { name: 'RNA', value: 'rna' },
+          { name: 'Protein', value: 'protein' },
         ]}
       />
     ).toJSON()
@@ -55,12 +48,12 @@ describe('DropdownField', () => {
   test('renders correctly with a falsey value', () => {
     const tree = Renderer.create(
       <DropdownField
-        className='foo'
+        className="foo"
         value={false}
         options={[
-          {name: 'DNA', value: 'dna'},
-          {name: 'RNA', value: 'rna'},
-          {name: 'Protein', value: 'protein'},
+          { name: 'DNA', value: 'dna' },
+          { name: 'RNA', value: 'rna' },
+          { name: 'Protein', value: 'protein' },
         ]}
       />
     ).toJSON()
@@ -72,10 +65,7 @@ describe('DropdownField', () => {
 describe('FormGroup', () => {
   test('renders correctly', () => {
     const tree = Renderer.create(
-      <FormGroup
-        className='foo'
-        label='This is the label'
-      >
+      <FormGroup className="foo" label="This is the label">
         <div>Hey test here</div>
         <div>More test here</div>
       </FormGroup>
@@ -89,10 +79,10 @@ describe('InputField', () => {
   test('renders correctly', () => {
     const tree = Renderer.create(
       <InputField
-        label='Input field'
-        placeholder='Placeholder Text'
+        label="Input field"
+        placeholder="Placeholder Text"
         value={null}
-        units='μL'
+        units="μL"
       />
     ).toJSON()
 
@@ -105,9 +95,9 @@ describe('RadioGroup', () => {
     const tree = Renderer.create(
       <RadioGroup
         options={[
-          {name: 'Hazelnut', value: 'hazelnut'},
-          {name: 'Chocolate', value: 'chocolate'},
-          {name: 'Ginger', value: 'ginger'},
+          { name: 'Hazelnut', value: 'hazelnut' },
+          { name: 'Chocolate', value: 'chocolate' },
+          { name: 'Ginger', value: 'ginger' },
         ]}
       />
     ).toJSON()
@@ -118,11 +108,11 @@ describe('RadioGroup', () => {
   test('renders correctly with checked value', () => {
     const tree = Renderer.create(
       <RadioGroup
-        value='chocolate'
+        value="chocolate"
         options={[
-          {name: 'Hazelnut', value: 'hazelnut'},
-          {name: 'Chocolate', value: 'chocolate'},
-          {name: 'Ginger', value: 'ginger'},
+          { name: 'Hazelnut', value: 'hazelnut' },
+          { name: 'Chocolate', value: 'chocolate' },
+          { name: 'Ginger', value: 'ginger' },
         ]}
       />
     ).toJSON()
@@ -135,9 +125,9 @@ describe('RadioGroup', () => {
       <RadioGroup
         value={'chocolate'}
         options={[
-          {name: 'Hazelnut', value: 'hazelnut'},
-          {name: 'Chocolate', value: 'chocolate'},
-          {name: 'Ginger', value: 'ginger'},
+          { name: 'Hazelnut', value: 'hazelnut' },
+          { name: 'Chocolate', value: 'chocolate' },
+          { name: 'Ginger', value: 'ginger' },
         ]}
       />
     ).toJSON()

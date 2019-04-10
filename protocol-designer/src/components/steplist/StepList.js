@@ -1,15 +1,15 @@
 // @flow
 import * as React from 'react'
-import {SidePanel} from '@opentrons/components'
+import { SidePanel } from '@opentrons/components'
 
 import StartingDeckStateTerminalItem from './StartingDeckStateTerminalItem'
 import TerminalItem from './TerminalItem'
-import {END_TERMINAL_TITLE} from '../../constants'
-import {END_TERMINAL_ITEM_ID} from '../../steplist'
+import { END_TERMINAL_TITLE } from '../../constants'
+import { END_TERMINAL_ITEM_ID } from '../../steplist'
 
 import StepCreationButton from '../StepCreationButton'
-import type {StepIdType} from '../../form-types'
-import {PortalRoot} from './TooltipPortal'
+import type { StepIdType } from '../../form-types'
+import { PortalRoot } from './TooltipPortal'
 import DraggableStepItems from './DraggableStepItems'
 
 type Props = {
@@ -20,7 +20,7 @@ type Props = {
 
 export default class StepList extends React.Component<Props> {
   handleKeyDown = (e: SyntheticKeyboardEvent<*>) => {
-    const {reorderSelectedStep} = this.props
+    const { reorderSelectedStep } = this.props
     const key = e.key
     const altIsPressed = e.getModifierState('Alt')
 
@@ -36,23 +36,23 @@ export default class StepList extends React.Component<Props> {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     global.addEventListener('keydown', this.handleKeyDown, false)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     global.removeEventListener('keydown', this.handleKeyDown, false)
   }
 
-  render () {
+  render() {
     return (
       <React.Fragment>
-        <SidePanel
-          title='Protocol Timeline'>
+        <SidePanel title="Protocol Timeline">
           <StartingDeckStateTerminalItem />
           <DraggableStepItems
             orderedStepIds={this.props.orderedStepIds.slice()}
-            reorderSteps={this.props.reorderSteps} />
+            reorderSteps={this.props.reorderSteps}
+          />
           <StepCreationButton />
           <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />
         </SidePanel>

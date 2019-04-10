@@ -2,7 +2,7 @@
 // preload script for renderer process
 // defines subset of Electron API that renderer process is allowed to access
 // for security reasons
-import {ipcRenderer, remote} from 'electron'
+import { ipcRenderer, remote } from 'electron'
 
 global.APP_SHELL = {
   ipcRenderer,

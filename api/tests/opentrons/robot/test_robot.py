@@ -224,28 +224,3 @@ def test_calibrate_labware(virtual_smoothie_env, monkeypatch):
     new_pose = pose_tracker.absolute(robot.poses, plate[0])
 
     assert isclose(new_pose, (old_x + 1, old_y + 2, old_z - 3)).all()
-
-
-@pytest.mark.xfail
-def test_calibrate_labware_new(
-        virtual_smoothie_env, split_labware_def):
-    robot.reset()
-
-    plate = labware.load('96-flat', '5')
-    pip = instruments.P300_Single(mount='right')
-
-    old_x, old_y, old_z = pose_tracker.absolute(robot.poses, plate[0])
-
-    pip.move_to(plate[0])
-    robot.poses = pip._jog(robot.poses, 'x', 1)
-    robot.poses = pip._jog(robot.poses, 'y', 2)
-    robot.poses = pip._jog(robot.poses, 'z', -3)
-    robot.calibrate_container_with_instrument(plate, pip, save=True)
-    new_pose = pose_tracker.absolute(robot.poses, plate[0])
-
-    assert isclose(new_pose, (old_x + 1, old_y + 2, old_z - 3)).all()
-
-    # Ensure that slot offset is removed and new offset file is picked up
-    plate2 = labware.load('96-flat', '1')
-    new_pose2 = pose_tracker.absolute(robot.poses, plate2[0])
-    assert isclose(new_pose2, (15.34, 76.24, 7.5)).all()

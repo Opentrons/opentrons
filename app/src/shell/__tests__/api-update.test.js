@@ -1,14 +1,14 @@
-import {mockResolvedValue} from '../../../__util__/mock-promise'
+import { mockResolvedValue } from '../../../__util__/mock-promise'
 import * as apiUpdate from '../api-update'
 
-const {apiUpdate: mockApiUpdate} = global.APP_SHELL
+const { apiUpdate: mockApiUpdate } = global.APP_SHELL
 
 describe('shell/api-update', () => {
   let _Blob
 
   beforeEach(() => {
     _Blob = global.Blob
-    global.Blob = jest.fn(input => ({blob: input}))
+    global.Blob = jest.fn(input => ({ blob: input }))
   })
 
   afterEach(() => {
@@ -43,19 +43,21 @@ describe('shell/api-update', () => {
       {
         name: 'getApiUpdateVersion',
         selector: apiUpdate.getApiUpdateVersion,
-        state: {shell: {apiUpdate: {version: '1.0.0'}}},
+        state: { shell: { apiUpdate: { version: '1.0.0' } } },
         expected: '1.0.0',
       },
       {
         name: 'getApiUpdateFilename',
         selector: apiUpdate.getApiUpdateFilename,
-        state: {shell: {apiUpdate: {filename: 'foobar.whl', version: '1.0.0'}}},
+        state: {
+          shell: { apiUpdate: { filename: 'foobar.whl', version: '1.0.0' } },
+        },
         expected: 'foobar.whl',
       },
     ]
 
     SPECS.forEach(spec => {
-      const {name, selector, state, expected} = spec
+      const { name, selector, state, expected } = spec
       test(name, () => expect(selector(state)).toEqual(expected))
     })
   })

@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react'
 
-import {WPA_PSK_SECURITY, WPA_EAP_SECURITY} from '../../../http-api-client'
-import {ScrollableAlertModal} from '../../modals'
+import { WPA_PSK_SECURITY, WPA_EAP_SECURITY } from '../../../http-api-client'
+import { ScrollableAlertModal } from '../../modals'
 import styles from './styles.css'
 
-import type {WifiSecurityType} from '../../../http-api-client'
+import type { WifiSecurityType } from '../../../http-api-client'
 
 type Props = {
   ssid: ?string,
@@ -14,8 +14,8 @@ type Props = {
   children: React.Node,
 }
 
-export default function ConnectModal (props: Props) {
-  const {ssid, securityType, close, children} = props
+export default function ConnectModal(props: Props) {
+  const { ssid, securityType, close, children } = props
   const heading = ssid ? `Connect to ${ssid}` : 'Find and join a Wi-Fi network'
   let body = ''
 

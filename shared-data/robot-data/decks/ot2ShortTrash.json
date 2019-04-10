@@ -1,5 +1,5 @@
 {
-	"otId": "a4446480-1a8c-11e9-a2de-d3e23d313b0f",
+  "otId": "a4446480-1a8c-11e9-a2de-d3e23d313b0f",
   "metadata": {
     "displayName": "OT-2 Short-Trash Deck",
     "tags": ["ot2", "12 slots", "short trash"]
@@ -70,7 +70,7 @@
         "displayName": "Slot 6"
       },
       {
-      "id": "7",
+        "id": "7",
         "position": [0.0, 181.0, 0.0],
         "boundingBox": {
           "xDimension": 128.0,

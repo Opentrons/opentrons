@@ -1,8 +1,8 @@
 // robot selectors test
-import {setIn} from '@thi.ng/paths'
-import {NAME, selectors, constants} from '../'
+import { setIn } from '@thi.ng/paths'
+import { NAME, selectors, constants } from '../'
 
-const makeState = state => ({[NAME]: state})
+const makeState = state => ({ [NAME]: state })
 
 const {
   getConnectedRobotName,
@@ -36,7 +36,7 @@ describe('robot selectors', () => {
 
     beforeEach(() => {
       state = {
-        robot: {connection: {connectedTo: 'bar'}},
+        robot: { connection: { connectedTo: 'bar' } },
       }
     })
 
@@ -49,55 +49,57 @@ describe('robot selectors', () => {
     test('getConnectionStatus', () => {
       state = setIn(state, 'robot.connection', {
         connectedTo: '',
-        connectRequest: {inProgress: false},
-        disconnectRequest: {inProgress: false},
+        connectRequest: { inProgress: false },
+        disconnectRequest: { inProgress: false },
       })
       expect(getConnectionStatus(state)).toBe(constants.DISCONNECTED)
 
       state = setIn(state, 'robot.connection', {
         connectedTo: '',
-        connectRequest: {inProgress: true},
-        disconnectRequest: {inProgress: false},
+        connectRequest: { inProgress: true },
+        disconnectRequest: { inProgress: false },
       })
       expect(getConnectionStatus(state)).toBe(constants.CONNECTING)
 
       state = setIn(state, 'robot.connection', {
         connectedTo: 'foo',
-        connectRequest: {inProgress: false},
-        disconnectRequest: {inProgress: false},
+        connectRequest: { inProgress: false },
+        disconnectRequest: { inProgress: false },
       })
       expect(getConnectionStatus(state)).toBe(constants.CONNECTED)
 
       state = setIn(state, 'robot.connection', {
         connectedTo: 'foo',
-        connectRequest: {inProgress: false},
-        disconnectRequest: {inProgress: true},
+        connectRequest: { inProgress: false },
+        disconnectRequest: { inProgress: true },
       })
       expect(getConnectionStatus(state)).toBe(constants.DISCONNECTING)
     })
   })
 
   test('getSessionLoadInProgress', () => {
-    let state = makeState({session: {sessionRequest: {inProgress: true}}})
+    let state = makeState({ session: { sessionRequest: { inProgress: true } } })
     expect(getSessionLoadInProgress(state)).toBe(true)
 
-    state = makeState({session: {sessionRequest: {inProgress: false}}})
+    state = makeState({ session: { sessionRequest: { inProgress: false } } })
     expect(getSessionLoadInProgress(state)).toBe(false)
   })
 
   test('getUploadError', () => {
-    let state = makeState({session: {sessionRequest: {error: null}}})
+    let state = makeState({ session: { sessionRequest: { error: null } } })
     expect(getUploadError(state)).toBe(null)
 
-    state = makeState({session: {sessionRequest: {error: new Error('AH')}}})
+    state = makeState({
+      session: { sessionRequest: { error: new Error('AH') } },
+    })
     expect(getUploadError(state)).toEqual(new Error('AH'))
   })
 
   test('getSessionIsLoaded', () => {
-    let state = makeState({session: {state: constants.LOADED}})
+    let state = makeState({ session: { state: constants.LOADED } })
     expect(getSessionIsLoaded(state)).toBe(true)
 
-    state = makeState({session: {state: ''}})
+    state = makeState({ session: { state: '' } })
     expect(getSessionIsLoaded(state)).toBe(false)
   })
 
@@ -112,7 +114,7 @@ describe('robot selectors', () => {
     }
 
     Object.keys(expectedStates).forEach(sessionState => {
-      const state = makeState({session: {state: sessionState}})
+      const state = makeState({ session: { state: sessionState } })
       const expected = expectedStates[sessionState]
 
       expect(getIsReadyToRun(state)).toBe(expected)
@@ -130,7 +132,7 @@ describe('robot selectors', () => {
     }
 
     Object.keys(expectedStates).forEach(sessionState => {
-      const state = makeState({session: {state: sessionState}})
+      const state = makeState({ session: { state: sessionState } })
       const expected = expectedStates[sessionState]
       expect(getIsRunning(state)).toBe(expected)
     })
@@ -147,7 +149,7 @@ describe('robot selectors', () => {
     }
 
     Object.keys(expectedStates).forEach(sessionState => {
-      const state = makeState({session: {state: sessionState}})
+      const state = makeState({ session: { state: sessionState } })
       const expected = expectedStates[sessionState]
       expect(getIsPaused(state)).toBe(expected)
     })
@@ -164,14 +166,14 @@ describe('robot selectors', () => {
     }
 
     Object.keys(expectedStates).forEach(sessionState => {
-      const state = makeState({session: {state: sessionState}})
+      const state = makeState({ session: { state: sessionState } })
       const expected = expectedStates[sessionState]
       expect(getIsDone(state)).toBe(expected)
     })
   })
 
   test('getStartTime', () => {
-    const state = makeState({session: {startTime: 42}})
+    const state = makeState({ session: { startTime: 42 } })
     expect(getStartTime(state)).toBe(42)
   })
 
@@ -258,7 +260,7 @@ describe('robot selectors', () => {
 
     test('getRunProgress with no commands', () => {
       const state = makeState({
-        session: {protocolCommands: [], protocolCommandsById: {}},
+        session: { protocolCommands: [], protocolCommandsById: {} },
       })
 
       expect(getRunProgress(state)).toEqual(0)
@@ -319,8 +321,8 @@ describe('robot selectors', () => {
       state = makeState({
         session: {
           pipettesByMount: {
-            left: {mount: 'left', name: 'p200m', channels: 8, volume: 200},
-            right: {mount: 'right', name: 'p50s', channels: 1, volume: 50},
+            left: { mount: 'left', name: 'p200m', channels: 8, volume: 200 },
+            right: { mount: 'right', name: 'p50s', channels: 1, volume: 50 },
           },
         },
         calibration: {
@@ -366,7 +368,7 @@ describe('robot selectors', () => {
 
     test('make get current instrument from props', () => {
       const getCurrentPipette = makeGetCurrentPipette()
-      let props = {match: {params: {mount: 'left'}}}
+      let props = { match: { params: { mount: 'left' } } }
 
       expect(getCurrentPipette(state, props)).toEqual({
         mount: 'left',
@@ -378,7 +380,7 @@ describe('robot selectors', () => {
         tipOn: false,
       })
 
-      props = {match: {params: {mount: 'right'}}}
+      props = { match: { params: { mount: 'right' } } }
       expect(getCurrentPipette(state, props)).toEqual({
         mount: 'right',
         name: 'p50s',
@@ -389,7 +391,7 @@ describe('robot selectors', () => {
         tipOn: true,
       })
 
-      props = {match: {params: {}}}
+      props = { match: { params: {} } }
       expect(getCurrentPipette(state, props)).toBeFalsy()
     })
   })
@@ -398,28 +400,28 @@ describe('robot selectors', () => {
     const leftState = makeState({
       session: {
         pipettesByMount: {
-          left: {mount: 'left', name: 'p200m', channels: 8, volume: 200},
-          right: {mount: 'right', name: 'p50s', channels: 1, volume: 50},
+          left: { mount: 'left', name: 'p200m', channels: 8, volume: 200 },
+          right: { mount: 'right', name: 'p50s', channels: 1, volume: 50 },
         },
       },
       calibration: {
         calibrationRequest: {},
         probedByMount: {},
-        tipOnByMount: {left: true},
+        tipOnByMount: { left: true },
       },
     })
 
     const rightState = makeState({
       session: {
         pipettesByMount: {
-          left: {mount: 'left', name: 'p200m', channels: 8, volume: 200},
-          right: {mount: 'right', name: 'p50s', channels: 1, volume: 50},
+          left: { mount: 'left', name: 'p200m', channels: 8, volume: 200 },
+          right: { mount: 'right', name: 'p50s', channels: 1, volume: 50 },
         },
       },
       calibration: {
         calibrationRequest: {},
         probedByMount: {},
-        tipOnByMount: {right: true},
+        tipOnByMount: { right: true },
       },
     })
 
@@ -431,13 +433,13 @@ describe('robot selectors', () => {
     const twoPipettesCalibrated = makeState({
       session: {
         pipettesByMount: {
-          left: {name: 'p200', mount: 'left', channels: 8, volume: 200},
-          right: {name: 'p50', mount: 'right', channels: 1, volume: 50},
+          left: { name: 'p200', mount: 'left', channels: 8, volume: 200 },
+          right: { name: 'p50', mount: 'right', channels: 1, volume: 50 },
         },
       },
       calibration: {
         calibrationRequest: {},
-        probedByMount: {left: true, right: true},
+        probedByMount: { left: true, right: true },
         tipOnByMount: {},
       },
     })
@@ -445,13 +447,13 @@ describe('robot selectors', () => {
     const twoPipettesNotCalibrated = makeState({
       session: {
         pipettesByMount: {
-          left: {name: 'p200', mount: 'left', channels: 8, volume: 200},
-          right: {name: 'p50', mount: 'right', channels: 1, volume: 50},
+          left: { name: 'p200', mount: 'left', channels: 8, volume: 200 },
+          right: { name: 'p50', mount: 'right', channels: 1, volume: 50 },
         },
       },
       calibration: {
         calibrationRequest: {},
-        probedByMount: {left: false, right: false},
+        probedByMount: { left: false, right: false },
         tipOnByMount: {},
       },
     })
@@ -459,12 +461,12 @@ describe('robot selectors', () => {
     const onePipetteCalibrated = makeState({
       session: {
         pipettesByMount: {
-          right: {name: 'p50', mount: 'right', channels: 1, volume: 50},
+          right: { name: 'p50', mount: 'right', channels: 1, volume: 50 },
         },
       },
       calibration: {
         calibrationRequest: {},
-        probedByMount: {right: true},
+        probedByMount: { right: true },
         tipOnByMount: {},
       },
     })
@@ -532,13 +534,13 @@ describe('robot selectors', () => {
               isTiprack: true,
               calibratorMount: 'left',
             },
-            5: {slot: '5', type: 'a', isTiprack: false},
-            7: {slot: '7', type: 'a', isTiprack: false},
-            9: {slot: '9', type: 'b', isTiprack: false},
+            5: { slot: '5', type: 'a', isTiprack: false },
+            7: { slot: '7', type: 'a', isTiprack: false },
+            9: { slot: '9', type: 'b', isTiprack: false },
           },
           pipettesByMount: {
-            left: {name: 'p200', mount: 'left', channels: 8, volume: 200},
-            right: {name: 'p50', mount: 'right', channels: 1, volume: 50},
+            left: { name: 'p200', mount: 'left', channels: 8, volume: 200 },
+            right: { name: 'p50', mount: 'right', channels: 1, volume: 50 },
           },
         },
         calibration: {
@@ -557,7 +559,7 @@ describe('robot selectors', () => {
             mount: 'left',
           },
           probedByMount: {},
-          tipOnByMount: {right: true},
+          tipOnByMount: { right: true },
         },
       })
     })

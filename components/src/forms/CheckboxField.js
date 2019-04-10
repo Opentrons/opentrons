@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import {Icon} from '../icons'
-import type {HoverTooltipHandlers} from '../tooltips'
+import { Icon } from '../icons'
+import type { HoverTooltipHandlers } from '../tooltips'
 
 import styles from './forms.css'
 
@@ -27,34 +27,37 @@ type Props = {
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
 }
 
-export default function CheckboxField (props: Props) {
+export default function CheckboxField(props: Props) {
   const error = props.error != null
-  const outerClassName = cx(
-    styles.form_field,
-    props.className,
-    {[styles.checkbox_disabled]: props.disabled})
+  const outerClassName = cx(styles.form_field, props.className, {
+    [styles.checkbox_disabled]: props.disabled,
+  })
 
-  const innerDivClassName = cx(
-    styles.checkbox_icon,
-    {
-      [styles.error]: error,
-      [styles.checkbox_disabled]: props.disabled,
-    })
+  const innerDivClassName = cx(styles.checkbox_icon, {
+    [styles.error]: error,
+    [styles.checkbox_disabled]: props.disabled,
+  })
 
   return (
     <label className={outerClassName}>
       <div className={innerDivClassName}>
-        <Icon name={props.value ? 'checkbox-marked' : 'checkbox-blank-outline'} width='100%' />
+        <Icon
+          name={props.value ? 'checkbox-marked' : 'checkbox-blank-outline'}
+          width="100%"
+        />
       </div>
       <input
         className={cx(styles.input_field, styles.accessibly_hidden)}
-        type='checkbox'
+        type="checkbox"
         name={props.name}
         checked={props.value || false}
         disabled={props.disabled}
         onChange={props.onChange}
       />
-      <div {...props.hoverTooltipHandlers} className={cx(props.labelTextClassName, styles.label_text)}>
+      <div
+        {...props.hoverTooltipHandlers}
+        className={cx(props.labelTextClassName, styles.label_text)}
+      >
         {props.label}
       </div>
     </label>

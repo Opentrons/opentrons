@@ -1,24 +1,21 @@
 // @flow
 import get from 'lodash/get'
 import assert from 'assert'
-import type {Store} from 'redux'
-import {dismissedHintsPersist} from './tutorial/reducers'
+import type { Store } from 'redux'
+import { dismissedHintsPersist } from './tutorial/reducers'
 
-export function rehydratePersistedAction (): {type: 'REHYDRATE_PERSISTED'} {
-  return {type: 'REHYDRATE_PERSISTED'}
+export function rehydratePersistedAction(): { type: 'REHYDRATE_PERSISTED' } {
+  return { type: 'REHYDRATE_PERSISTED' }
 }
 
-function _addStoragePrefix (path: string): string {
+function _addStoragePrefix(path: string): string {
   return `root.${path}`
 }
 
 // paths from Redux root to all persisted reducers
-const PERSISTED_PATHS = [
-  'analytics.hasOptedIn',
-  'tutorial.dismissedHints',
-]
+const PERSISTED_PATHS = ['analytics.hasOptedIn', 'tutorial.dismissedHints']
 
-function transformBeforePersist (path: string, reducerState: any) {
+function transformBeforePersist(path: string, reducerState: any) {
   switch (path) {
     case 'tutorial.dismissedHints':
       return dismissedHintsPersist(reducerState)
@@ -29,7 +26,9 @@ function transformBeforePersist (path: string, reducerState: any) {
 
 /** Subscribe this fn to the Redux store to persist selected substates */
 type PersistSubscriber = () => void
-export const makePersistSubscriber = (store: Store<*, *>): PersistSubscriber => {
+export const makePersistSubscriber = (
+  store: Store<*, *>
+): PersistSubscriber => {
   const prevReducerStates = {}
   return () => {
     const state = store.getState()
@@ -51,11 +50,11 @@ export const makePersistSubscriber = (store: Store<*, *>): PersistSubscriber => 
 }
 
 /** Use inside a reducer to pull out persisted state,
-  * eg in response to REHYDRATE_PERSISTED action.
-  * If there's no persisted state, defaults to the given `initialState`.
-  * The `path` should match where the reducer lives in the Redux state tree
-  */
-export function rehydrate<S> (path: string, initialState: S): S {
+ * eg in response to REHYDRATE_PERSISTED action.
+ * If there's no persisted state, defaults to the given `initialState`.
+ * The `path` should match where the reducer lives in the Redux state tree
+ */
+export function rehydrate<S>(path: string, initialState: S): S {
   assert(
     PERSISTED_PATHS.includes(path),
     `Path "${path}" is missing from PERSISTED_PATHS! The changes to this reducer will not be persisted.`

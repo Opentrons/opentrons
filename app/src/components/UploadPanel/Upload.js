@@ -15,7 +15,7 @@ type State = {
 }
 
 export default class Upload extends React.Component<Props, State> {
-  constructor (props: Props) {
+  constructor(props: Props) {
     super(props)
     this.state = { uploadedFile: null }
   }
@@ -41,7 +41,7 @@ export default class Upload extends React.Component<Props, State> {
   }
 
   confirmUpload = () => {
-    const {uploadedFile} = this.state
+    const { uploadedFile } = this.state
 
     if (uploadedFile) {
       this.props.createSession(uploadedFile)
@@ -53,9 +53,9 @@ export default class Upload extends React.Component<Props, State> {
     this.setState({ uploadedFile: null })
   }
 
-  render () {
-    const {uploadedFile} = this.state
-    const {filename} = this.props
+  render() {
+    const { uploadedFile } = this.state
+    const { filename } = this.props
 
     return (
       <React.Fragment>

@@ -1,10 +1,10 @@
 // @flow
-import type {PipetteModelSpecs} from '@opentrons/shared-data'
-import type {Mount} from '../../robot'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type { Mount } from '../../robot'
 
-import type {RobotMove, RobotHome} from '../../http-api-client'
+import type { RobotMove, RobotHome } from '../../http-api-client'
 
-import type {PipetteSelectionProps} from './PipetteSelection'
+import type { PipetteSelectionProps } from './PipetteSelection'
 
 export type Direction = 'attach' | 'detach'
 

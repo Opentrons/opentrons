@@ -1,22 +1,26 @@
 // @flow
-import type {DelayArgs, CommandCreatorArgs} from '../step-generation'
+import type { DelayArgs, CommandCreatorArgs } from '../step-generation'
 import type {
   FormData,
   StepIdType,
   StepFieldName,
   StepType,
 } from '../form-types'
-import type {LabwareEntities, PipetteEntities} from '../step-forms'
-import type {FormError} from './formLevel/errors'
+import type { LabwareEntities, PipetteEntities } from '../step-forms'
+import type { FormError } from './formLevel/errors'
 
 // timeline start and end
 export const START_TERMINAL_ITEM_ID: '__initial_setup__' = '__initial_setup__'
 export const END_TERMINAL_ITEM_ID: '__end__' = '__end__'
-export type TerminalItemId = typeof START_TERMINAL_ITEM_ID | typeof END_TERMINAL_ITEM_ID
+export type TerminalItemId =
+  | typeof START_TERMINAL_ITEM_ID
+  | typeof END_TERMINAL_ITEM_ID
 
-export type WellIngredientNames = {[ingredId: string]: string}
-export type WellIngredientVolumeData = {[ingredId: string]: {volume: number}}
-export type TipLocation = {labware: string, well: string}
+export type WellIngredientNames = { [ingredId: string]: string }
+export type WellIngredientVolumeData = {
+  [ingredId: string]: { volume: number },
+}
+export type TipLocation = { labware: string, well: string }
 
 export type SubstepIdentifier = {|
   stepId: StepIdType,
@@ -82,11 +86,11 @@ export type SourceDestSubstepItemMultiChannel = {|
   // NOTE: "Row" means a tabular row on the steplist, NOT a "row" of wells on the deck
 |}
 
-export type SourceDestSubstepItem = SourceDestSubstepItemSingleChannel | SourceDestSubstepItemMultiChannel
+export type SourceDestSubstepItem =
+  | SourceDestSubstepItemSingleChannel
+  | SourceDestSubstepItemMultiChannel
 
-export type SubstepItemData =
-  | SourceDestSubstepItem
-  | DelayArgs // Pause substep uses same data as delay args
+export type SubstepItemData = SourceDestSubstepItem | DelayArgs // Pause substep uses same data as delay args
 
 export type StepItemData = {
   id: StepIdType,
@@ -96,10 +100,10 @@ export type StepItemData = {
   formData: ?FormData,
 }
 
-export type SubSteps = {[StepIdType]: ?SubstepItemData}
+export type SubSteps = { [StepIdType]: ?SubstepItemData }
 
 export type StepFormAndFieldErrors = {
-  field?: {[StepFieldName]: Array<string>},
+  field?: { [StepFieldName]: Array<string> },
   form?: Array<FormError>,
 }
 

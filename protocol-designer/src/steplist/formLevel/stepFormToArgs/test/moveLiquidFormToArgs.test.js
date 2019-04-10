@@ -7,7 +7,7 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../../../../step-generation/utils'
-import {getOrderedWells} from '../../../utils'
+import { getOrderedWells } from '../../../utils'
 jest.mock('../../../utils')
 
 describe('move liquid step form -> command creator args', () => {
@@ -18,7 +18,7 @@ describe('move liquid step form -> command creator args', () => {
     // $FlowFixMe: mock methods
     getOrderedWells.mockClear()
     // $FlowFixMe: mock methods
-    getOrderedWells.mockImplementation((wells) => wells)
+    getOrderedWells.mockImplementation(wells => wells)
 
     // the "base case" is a 1 to 1 transfer, single path
     hydratedForm = {
@@ -27,11 +27,11 @@ describe('move liquid step form -> command creator args', () => {
       description: null,
 
       fields: {
-        pipette: {id: 'pipetteId'},
+        pipette: { id: 'pipetteId' },
         volume: 10,
         path: 'single',
         changeTip: 'always',
-        aspirate_labware: {id: 'sourceLabwareId', type: sourceLabwareType},
+        aspirate_labware: { id: 'sourceLabwareId', type: sourceLabwareType },
         aspirate_wells: ['B1'],
         aspirate_wellOrder_first: 'l2r',
         aspirate_wellOrder_second: 't2b',
@@ -43,7 +43,7 @@ describe('move liquid step form -> command creator args', () => {
         aspirate_mix_volume: null,
         aspirate_mix_times: null,
 
-        dispense_labware: {id: 'destLabwareId', type: destLabwareType},
+        dispense_labware: { id: 'destLabwareId', type: destLabwareType },
         dispense_wells: ['B2'],
         dispense_wellOrder_first: 'r2l',
         dispense_wellOrder_second: 'b2t',
@@ -71,9 +71,17 @@ describe('move liquid step form -> command creator args', () => {
 
     expect(getOrderedWells).toHaveBeenCalledTimes(2)
     expect(getOrderedWells).toHaveBeenCalledWith(
-      ['B1'], sourceLabwareType, 'l2r', 't2b')
+      ['B1'],
+      sourceLabwareType,
+      'l2r',
+      't2b'
+    )
     expect(getOrderedWells).toHaveBeenCalledWith(
-      ['B2'], destLabwareType, 'r2l', 'b2t')
+      ['B2'],
+      destLabwareType,
+      'r2l',
+      'b2t'
+    )
   })
 
   test('moveLiquid form with 1:1 single transfer translated to args', () => {
@@ -99,7 +107,7 @@ describe('move liquid step form -> command creator args', () => {
   const checkboxFieldCases = [
     {
       checkboxField: 'aspirate_touchTip_checkbox',
-      formFields: {aspirate_touchTip_mmFromBottom: 42},
+      formFields: { aspirate_touchTip_mmFromBottom: 42 },
       expectedArgsUnchecked: {
         touchTipAfterAspirate: false,
         touchTipAfterAspirateOffsetMmFromBottom: null,
@@ -112,7 +120,7 @@ describe('move liquid step form -> command creator args', () => {
 
     {
       checkboxField: 'dispense_touchTip_checkbox',
-      formFields: {dispense_touchTip_mmFromBottom: 42},
+      formFields: { dispense_touchTip_mmFromBottom: 42 },
       expectedArgsUnchecked: {
         touchTipAfterDispense: false,
         touchTipAfterDispenseOffsetMmFromBottom: null,
@@ -124,27 +132,38 @@ describe('move liquid step form -> command creator args', () => {
     },
   ]
 
-  checkboxFieldCases.forEach(({checkboxField, formFields, expectedArgsChecked, expectedArgsUnchecked}) => {
-    test(`${checkboxField} toggles dependent fields`, () => {
-      expect(moveLiquidFormToArgs({
-        ...hydratedForm,
-        fields: {
-          ...hydratedForm.fields,
-          [checkboxField]: false,
-          ...formFields,
-        },
-      })).toMatchObject(expectedArgsUnchecked)
+  checkboxFieldCases.forEach(
+    ({
+      checkboxField,
+      formFields,
+      expectedArgsChecked,
+      expectedArgsUnchecked,
+    }) => {
+      test(`${checkboxField} toggles dependent fields`, () => {
+        expect(
+          moveLiquidFormToArgs({
+            ...hydratedForm,
+            fields: {
+              ...hydratedForm.fields,
+              [checkboxField]: false,
+              ...formFields,
+            },
+          })
+        ).toMatchObject(expectedArgsUnchecked)
 
-      expect(moveLiquidFormToArgs({
-        ...hydratedForm,
-        fields: {
-          ...hydratedForm.fields,
-          [checkboxField]: true,
-          ...formFields,
-        },
-      })).toMatchObject(expectedArgsChecked)
-    })
-  })
+        expect(
+          moveLiquidFormToArgs({
+            ...hydratedForm,
+            fields: {
+              ...hydratedForm.fields,
+              [checkboxField]: true,
+              ...formFields,
+            },
+          })
+        ).toMatchObject(expectedArgsChecked)
+      })
+    }
+  )
 
   describe('distribute: disposal volume / blowout behaviors', () => {
     const blowoutLabwareId = 'blowoutLabwareId'
@@ -266,10 +285,14 @@ describe('move liquid step form -> command creator args', () => {
 
 describe('getMixData', () => {
   test('return null if checkbox field is false', () => {
-    expect(getMixData(
-      {checkboxField: false, volumeField: 30, timesField: 2},
-      'checkboxField', 'volumeField', 'timesField'
-    )).toBe(null)
+    expect(
+      getMixData(
+        { checkboxField: false, volumeField: 30, timesField: 2 },
+        'checkboxField',
+        'volumeField',
+        'timesField'
+      )
+    ).toBe(null)
   })
 
   test('return null if either number fields <= 0 / null', () => {
@@ -277,17 +300,29 @@ describe('getMixData', () => {
 
     cases.forEach(testCase => {
       const [volumeValue, timesValue] = testCase
-      expect(getMixData(
-        {checkboxField: true, volumeField: volumeValue, timesField: timesValue},
-        'checkboxField', 'volumeField', 'timesField'
-      )).toBe(null)
+      expect(
+        getMixData(
+          {
+            checkboxField: true,
+            volumeField: volumeValue,
+            timesField: timesValue,
+          },
+          'checkboxField',
+          'volumeField',
+          'timesField'
+        )
+      ).toBe(null)
     })
   })
 
   test('return volume & times if checkbox is checked', () => {
-    expect(getMixData(
-      {checkboxField: true, volumeField: 30, timesField: 2},
-      'checkboxField', 'volumeField', 'timesField'
-    )).toEqual({volume: 30, times: 2})
+    expect(
+      getMixData(
+        { checkboxField: true, volumeField: 30, timesField: 2 },
+        'checkboxField',
+        'volumeField',
+        'timesField'
+      )
+    ).toEqual({ volume: 30, times: 2 })
   })
 })

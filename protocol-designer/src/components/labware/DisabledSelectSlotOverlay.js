@@ -8,7 +8,9 @@ const DisabledSelectSlotOverlay = () => (
   <g className={cx(styles.slot_overlay, styles.disabled)}>
     <OverlayPanel />
     <g className={styles.clickable_text}>
-      <text x="-7%" y="40%">Drag to New Slot</text>
+      <text x="-7%" y="40%">
+        Drag to New Slot
+      </text>
     </g>
   </g>
 )

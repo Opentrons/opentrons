@@ -1,14 +1,14 @@
 // @flow //
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {getConfig, addManualIp} from '../../../config'
-import {startDiscovery} from '../../../discovery'
+import { connect } from 'react-redux'
+import { getConfig, addManualIp } from '../../../config'
+import { startDiscovery } from '../../../discovery'
 
-import {Formik, Form, Field} from 'formik'
+import { Formik, Form, Field } from 'formik'
 import IpField from './IpField'
 
-import type {State, Dispatch} from '../../../types'
-import type {DiscoveryCandidates} from '../../../config'
+import type { State, Dispatch } from '../../../types'
+import type { DiscoveryCandidates } from '../../../config'
 
 type SP = {|
   candidates: DiscoveryCandidates,
@@ -18,18 +18,18 @@ type DP = {|
   addManualIp: (ip: string) => mixed,
 |}
 
-type Props = {...SP, ...DP}
+type Props = { ...SP, ...DP }
 
 class IpForm extends React.Component<Props> {
-  inputRef: {current: null | HTMLInputElement}
-  constructor (props) {
+  inputRef: { current: null | HTMLInputElement }
+  constructor(props) {
     super(props)
     this.inputRef = React.createRef()
   }
-  render () {
+  render() {
     return (
       <Formik
-        initialValues={{ip: ''}}
+        initialValues={{ ip: '' }}
         onSubmit={(values, actions) => {
           this.props.addManualIp(values.ip)
 
@@ -55,13 +55,13 @@ export default connect(
   DTP
 )(IpForm)
 
-function STP (state: State): SP {
+function STP(state: State): SP {
   return {
     candidates: getConfig(state).discovery.candidates,
   }
 }
 
-function DTP (dispatch: Dispatch): DP {
+function DTP(dispatch: Dispatch): DP {
   return {
     addManualIp: ip => {
       dispatch(addManualIp(ip))

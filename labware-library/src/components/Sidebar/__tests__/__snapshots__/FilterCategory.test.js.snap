@@ -5,30 +5,33 @@ exports[`FilterCategory component renders 1`] = `
   className="filter_category"
 >
   <li
+    className="filter_category_item"
     key="all"
   >
     <Link
-      className="filter_category_item selected"
+      className="filter_category_link selected"
       to="/?"
     >
       All
     </Link>
   </li>
   <li
+    className="filter_category_item"
     key="tubeRack"
   >
     <Link
-      className="filter_category_item"
+      className="filter_category_link"
       to="/?category=tubeRack"
     >
       Tube Rack
     </Link>
   </li>
   <li
+    className="filter_category_item"
     key="wellPlate"
   >
     <Link
-      className="filter_category_item"
+      className="filter_category_link"
       to="/?category=wellPlate"
     >
       Well Plate

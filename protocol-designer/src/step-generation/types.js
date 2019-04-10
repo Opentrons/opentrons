@@ -1,5 +1,5 @@
 // @flow
-import type {DeckSlot, Mount} from '@opentrons/components'
+import type { DeckSlot, Mount } from '@opentrons/components'
 import type {
   CommandV1 as Command,
   PipetteLabwareFieldsV1 as PipetteLabwareFields,
@@ -7,7 +7,12 @@ import type {
 
 // ===== MIX-IN TYPES =====
 
-export type ChangeTipOptions = 'always' | 'once' | 'never' | 'perDest' | 'perSource'
+export type ChangeTipOptions =
+  | 'always'
+  | 'once'
+  | 'never'
+  | 'perDest'
+  | 'perSource'
 
 export type InnerMixArgs = {|
   volume: number,
@@ -166,17 +171,22 @@ export type LabwareData = {|
 |}
 
 /** tips are numbered 0-7. 0 is the furthest to the back of the robot.
-  * For an 8-channel, on a 96-flat, Tip 0 is in row A, Tip 7 is in row H.
-  */
+ * For an 8-channel, on a 96-flat, Tip 0 is in row A, Tip 7 is in row H.
+ */
 type TipId = string
 
-export type LocationLiquidState = {[ingredGroup: string]: {volume: number}}
+export type LocationLiquidState = { [ingredGroup: string]: { volume: number } }
 
-export type SingleLabwareLiquidState = {[well: string]: LocationLiquidState}
+export type SingleLabwareLiquidState = { [well: string]: LocationLiquidState }
 
-export type LabwareLiquidState = {[labwareId: string]: SingleLabwareLiquidState}
+export type LabwareLiquidState = {
+  [labwareId: string]: SingleLabwareLiquidState,
+}
 
-export type SourceAndDest = {|source: LocationLiquidState, dest: LocationLiquidState|}
+export type SourceAndDest = {|
+  source: LocationLiquidState,
+  dest: LocationLiquidState,
+|}
 
 // TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": `TimelineFrame`?
 export type RobotState = {|
@@ -234,8 +244,8 @@ export type WarningType =
   | 'ASPIRATE_FROM_PRISTINE_WELL'
 
 export type CommandCreatorWarning = {|
-    message: string,
-    type: WarningType,
+  message: string,
+  type: WarningType,
 |}
 
 export type CommandsAndRobotState = {|
@@ -249,8 +259,12 @@ export type CommandCreatorErrorResponse = {
   warnings?: Array<CommandCreatorWarning>,
 }
 
-export type CommandCreator = (prevRobotState: RobotState) => CommandsAndRobotState | CommandCreatorErrorResponse
-export type CompoundCommandCreator = (prevRobotState: RobotState) => Array<CommandCreator>
+export type CommandCreator = (
+  prevRobotState: RobotState
+) => CommandsAndRobotState | CommandCreatorErrorResponse
+export type CompoundCommandCreator = (
+  prevRobotState: RobotState
+) => Array<CommandCreator>
 
 export type Timeline = {|
   timeline: Array<CommandsAndRobotState>, // TODO: Ian 2018-06-14 avoid timeline.timeline shape, better names

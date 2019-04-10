@@ -1,8 +1,8 @@
 // @flow
 // connect and configure robots page
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {withRouter, Route, Switch, Redirect, type Match} from 'react-router'
+import { connect } from 'react-redux'
+import { withRouter, Route, Switch, Redirect, type Match } from 'react-router'
 import find from 'lodash/find'
 
 import createLogger from '../../logger'
@@ -14,16 +14,16 @@ import {
   getReachableRobots,
 } from '../../discovery'
 
-import {getShellUpdateState} from '../../shell'
+import { getShellUpdateState } from '../../shell'
 
-import {Splash} from '@opentrons/components'
+import { Splash } from '@opentrons/components'
 import Page from '../../components/Page'
 import RobotSettings from './RobotSettings'
 import InstrumentSettings from './InstrumentSettings'
 
-import type {State} from '../../types'
-import type {ViewableRobot} from '../../discovery'
-import type {ShellUpdateState} from '../../shell'
+import type { State } from '../../types'
+import type { ViewableRobot } from '../../discovery'
+import type { ShellUpdateState } from '../../shell'
 
 type SP = {
   robot: ?ViewableRobot,
@@ -31,7 +31,7 @@ type SP = {
   appUpdate: ShellUpdateState,
 }
 
-type OP = {match: Match}
+type OP = { match: Match }
 
 type Props = SP & OP
 
@@ -44,7 +44,7 @@ export default withRouter(
   )(Robots)
 )
 
-function Robots (props: Props) {
+function Robots(props: Props) {
   const {
     robot,
     connectedName,
@@ -52,7 +52,7 @@ function Robots (props: Props) {
     match: {
       path,
       url,
-      params: {name},
+      params: { name },
     },
   } = props
 
@@ -63,11 +63,11 @@ function Robots (props: Props) {
 
   if (name && !robot) {
     const redirectUrl = url.replace(`/${name}`, '')
-    log.warn(`Robot ${name} does not exist; redirecting`, {redirectUrl})
+    log.warn(`Robot ${name} does not exist; redirecting`, { redirectUrl })
     return <Redirect to={redirectUrl} />
   } else if (!name && connectedName) {
     const redirectUrl = `${url}/${connectedName}`
-    log.debug(`Connected to ${connectedName}; redirecting`, {redirectUrl})
+    log.debug(`Connected to ${connectedName}; redirecting`, { redirectUrl })
     return <Redirect to={redirectUrl} />
   }
 
@@ -95,10 +95,10 @@ function Robots (props: Props) {
   )
 }
 
-function mapStateToProps (state: State, ownProps: OP): SP {
+function mapStateToProps(state: State, ownProps: OP): SP {
   const {
     match: {
-      params: {name},
+      params: { name },
     },
   } = ownProps
   const robots: Array<ViewableRobot> = getConnectableRobots(state).concat(
@@ -106,7 +106,7 @@ function mapStateToProps (state: State, ownProps: OP): SP {
   )
   const connectedRobot = getConnectedRobot(state)
   const connectedName = connectedRobot && connectedRobot.name
-  const robot: ?ViewableRobot = find(robots, {name})
+  const robot: ?ViewableRobot = find(robots, { name })
 
   return {
     robot,

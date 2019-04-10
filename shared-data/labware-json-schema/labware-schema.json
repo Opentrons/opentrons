@@ -1,4 +1,5 @@
 {
+  "$id": "opentronsLabwareSchemaV2",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
     "positiveNumber": {
@@ -148,9 +149,9 @@
       "description": "Distance from left-front-bottom corner of slot to left-front-bottom corner of labware",
       "required": ["x", "y", "z"],
       "properties": {
-        "x": {"type": "number"},
-        "y": {"type": "number"},
-        "z": {"type": "number"}
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number" }
       }
     },
     "dimensions": {
@@ -179,17 +180,17 @@
           "additionalProperties": false,
           "required": ["depth", "shape", "totalLiquidVolume", "x", "y", "z"],
           "oneOf": [
-            {"required": ["width", "length"]},
-            {"required": ["diameter"]}
+            { "required": ["width", "length"] },
+            { "required": ["diameter"] }
           ],
           "not": {
             "anyOf": [
-              {"required": ["diameter", "width"]},
-              {"required": ["diameter", "length"]}
+              { "required": ["diameter", "width"] },
+              { "required": ["diameter", "length"] }
             ]
           },
           "properties": {
-            "depth": {"$ref": "#/definitions/positiveNumber"},
+            "depth": { "$ref": "#/definitions/positiveNumber" },
             "x": {
               "description": "X location of center-top of well in reference to left-front-bottom of labware",
               "$ref": "#/definitions/positiveNumber"
@@ -206,9 +207,9 @@
               "description": "Total well, tube, or tip volume in microliters",
               "$ref": "#/definitions/positiveNumber"
             },
-            "width": {"$ref": "#/definitions/positiveNumber"},
-            "length": {"$ref": "#/definitions/positiveNumber"},
-            "diameter": {"$ref": "#/definitions/positiveNumber"},
+            "width": { "$ref": "#/definitions/positiveNumber" },
+            "length": { "$ref": "#/definitions/positiveNumber" },
+            "diameter": { "$ref": "#/definitions/positiveNumber" },
             "shape": {
               "description": "If rectangular, use length and width; otherwise use diameter",
               "type": "string",

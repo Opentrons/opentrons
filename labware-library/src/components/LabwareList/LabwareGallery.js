@@ -4,7 +4,7 @@ import * as React from 'react'
 import LabwareRender from '../LabwareRender'
 import styles from './styles.css'
 
-import type {LabwareDefinition2 as LabwareDefinition} from '@opentrons/shared-data'
+import type { LabwareDefinition } from '../../types'
 
 export type GalleryProps = {
   definition: LabwareDefinition,
@@ -20,14 +20,14 @@ type ThumbnailProps = {
 }
 
 class Gallery extends React.Component<GalleryProps, GalleryState> {
-  constructor (props: GalleryProps) {
+  constructor(props: GalleryProps) {
     super(props)
-    this.state = {currentImage: 1}
+    this.state = { currentImage: 1 }
   }
 
-  render () {
-    const {definition} = this.props
-    const {currentImage} = this.state
+  render() {
+    const { definition } = this.props
+    const { currentImage } = this.state
 
     // TODO(mc, 2019-03-27): use actual images
     const images = [
@@ -46,7 +46,7 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
             <Thumbnail
               key={index}
               imageId={index}
-              onClick={() => this.setState({currentImage: index})}
+              onClick={() => this.setState({ currentImage: index })}
             >
               {img}
             </Thumbnail>
@@ -57,8 +57,8 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
   }
 }
 
-function Thumbnail (props: ThumbnailProps) {
-  const {onClick, children} = props
+function Thumbnail(props: ThumbnailProps) {
+  const { onClick, children } = props
 
   return (
     <button className={styles.thumbnail_container} onClick={onClick}>
