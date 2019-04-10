@@ -1,5 +1,8 @@
 SHELL := /bin/bash
 
+PATH := $(shell cd .. && yarn bin):$(PATH)
+SHX := npx shx
+
 # add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
@@ -9,10 +12,17 @@ pipenv_opts += $(and $(CI),--keep-outdated)
 port ?= 34000
 tests ?= tests
 test_opts ?= -s -vv
+wheel_file = dist/*.whl
+# Host key location for buildroot robot
+br_ssh_key ?= ~/.ssh/robot_key
+# Other SSH args for buildroot robots
+br_ssh_opts ?= -o stricthostkeychecking=no
+# Host key for push-key uploading
+pubkey ?= br_ssh_key
 
 
 # make bootstrap wheel file (= rather than := to expand at every use)
-wheel = $(wildcard dist/*.whl)
+wheel_file = $(wildcard dist/otupdate-*.whl)
 
 .PHONY: install
 install:
@@ -62,3 +72,18 @@ bootstrap: wheel
 .PHONY: restart
 restart:
 	curl -X POST http://$(host):31950/server/restart
+
+.PHONY: push-buildroot
+push-buildroot: wheel
+	scp -i $(br_ssh_key) $(br_ssh_opts) $(wheel_file) root@$(host):/data/
+	ssh -i $(br_ssh_key) $(br_ssh_opts) root@$(host) \
+"function cleanup () rm -f /data/$(wheel_file) && mount -o remount,ro / && systemctl start opentrons-update-server;\
+systemctl stop opentrons-update-server;\
+mount -o remount,rw /;\
+cd /usr/lib/python3.7/site-packages;\
+unzip -o /data/otupdate-*.whl || cleanup && cleanup "
+
+
+.PHONY: push-key
+push-key:
+	curl -X POST -H "Content-Type: application/json" --data-raw "{\"key\": \"$(shell $(SHX) cat $(pubkey))\"}" $(host):31950/server/ssh_keys
