@@ -169,7 +169,7 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
             pipette_name = protocol_pipette_data.get('model')
 
         if command_type == 'delay':
-            wait = params.get('wait')
+            wait = params['wait']
             message = params.get('message')
             if wait is None:
                 raise ValueError('Delay cannot be null')

@@ -186,6 +186,7 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
                 text = f'Delaying for {datetime.timedelta(seconds=wait)}'
                 if message:
                     text = f"{text}. {message}"
+                robot.comment(text)
                 _sleep(wait)
 
         elif command_type == 'blowout':
