@@ -1,20 +1,20 @@
 // @flow
 import * as React from 'react'
-import {Formik, Form, Field} from 'formik'
-import {OutlineButton} from '@opentrons/components'
+import { Formik, Form, Field } from 'formik'
+import { OutlineButton } from '@opentrons/components'
 import TempField from './TempField'
 
 import styles from './styles.css'
 
-import type {SetTemperatureRequest} from '../../http-api-client'
+import type { SetTemperatureRequest } from '../../http-api-client'
 
 type Props = {
   setTemp: (request: SetTemperatureRequest) => mixed,
 }
 
 export default class TemperatureControls extends React.Component<Props> {
-  inputRef: {current: null | HTMLInputElement}
-  constructor (props: Props) {
+  inputRef: { current: null | HTMLInputElement }
+  constructor(props: Props) {
     super(props)
     this.inputRef = React.createRef()
   }
@@ -25,10 +25,10 @@ export default class TemperatureControls extends React.Component<Props> {
     }
     this.props.setTemp(request)
   }
-  render () {
+  render() {
     return (
       <Formik
-        initialValues={{target: ''}}
+        initialValues={{ target: '' }}
         onSubmit={(values, actions) => {
           const target = values.target === '' ? null : Number(values.target)
           if (!target) {

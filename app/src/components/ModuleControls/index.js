@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
-import {connect} from 'react-redux'
-import {IntervalWrapper} from '@opentrons/components'
+import { connect } from 'react-redux'
+import { IntervalWrapper } from '@opentrons/components'
 import ModuleData from './ModuleData'
 import TemperatureControls from './TemperatureControls'
 
@@ -10,14 +10,14 @@ import {
   fetchModuleData,
   setTargetTemp,
 } from '../../http-api-client'
-import type {State, Dispatch} from '../../types'
+import type { State, Dispatch } from '../../types'
 
 import type {
   Module,
   FetchTemperatureDataResponse,
   SetTemperatureRequest,
 } from '../../http-api-client'
-import type {Robot} from '../../discovery'
+import type { Robot } from '../../discovery'
 
 const POLL_MODULE_INTERVAL_MS = 2000
 
@@ -35,15 +35,15 @@ type DP = {|
   setTargetTemp: (request: SetTemperatureRequest) => mixed,
 |}
 
-type Props = {...$Exact<OP>, ...SP, ...DP}
+type Props = { ...OP, ...SP, ...DP }
 
 export default connect(
   makeSTP,
   mapDTP
 )(ModuleControls)
 
-function ModuleControls (props: Props) {
-  const {moduleData, fetchModuleData} = props
+function ModuleControls(props: Props) {
+  const { moduleData, fetchModuleData } = props
 
   const currentTemp =
     moduleData && moduleData.data && moduleData.data.currentTemp
@@ -61,7 +61,7 @@ function ModuleControls (props: Props) {
   )
 }
 
-function makeSTP (): (state: State, ownProps: OP) => SP {
+function makeSTP(): (state: State, ownProps: OP) => SP {
   const getRobotModuleData = makeGetRobotModuleData()
   return (state, ownProps) => {
     const _serial = ownProps.module.serial
@@ -74,8 +74,8 @@ function makeSTP (): (state: State, ownProps: OP) => SP {
   }
 }
 
-function mapDTP (dispatch: Dispatch, ownProps: OP): DP {
-  const {robot} = ownProps
+function mapDTP(dispatch: Dispatch, ownProps: OP): DP {
+  const { robot } = ownProps
   const serial = ownProps.module.serial
   return {
     fetchModuleData: () => dispatch(fetchModuleData(robot, serial)),

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import {LabeledValue} from '@opentrons/components'
+import { LabeledValue } from '@opentrons/components'
 import styles from './styles.css'
 
 type Props = {
@@ -8,8 +8,8 @@ type Props = {
   targetTemp: ?number,
 }
 
-export default function ModuleData (props: Props) {
-  const {currentTemp, targetTemp} = props
+export default function ModuleData(props: Props) {
+  const { currentTemp, targetTemp } = props
   return (
     <div className={styles.module_data}>
       <LabeledValue
