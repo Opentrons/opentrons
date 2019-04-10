@@ -52,6 +52,20 @@ print("all ok")'
         '{}-{}-py3-none-any.whl'.format(package_name, version))
 
 
+async def test_migration_unavailable(loop, monkeypatch, test_client):
+    update_package = os.path.join(os.path.abspath(
+        os.path.dirname(otupdate.__file__)), 'package.json')
+    app = otupdate.balena.get_app(
+        api_package=None,
+        update_package=update_package,
+        smoothie_version='not available',
+        loop=loop,
+        test=False)
+    cli = await loop.create_task(test_client(app))
+    resp = await cli.get('/server/update/migration/begin')
+    assert resp.status == 404
+
+
 async def test_provision_version_gate(loop, monkeypatch, test_client):
 
     async def mock_install_py(executable, data, loop):

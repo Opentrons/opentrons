@@ -50,7 +50,8 @@ async def otupdate_test_client(test_client, loop, monkeypatch, resin_data_dir,
     app = otupdate.balena.get_app(api_package=None,
                                   update_package=None,
                                   smoothie_version='not available',
-                                  loop=loop, test=False)
+                                  loop=loop, test=False,
+                                  with_migration=True)
     return await loop.create_task(test_client(app))
 
 

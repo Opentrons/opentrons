@@ -40,6 +40,7 @@ def get_app(
         update_package,
         smoothie_version,
         test,
+        with_migration=False,
         loop=None) -> web.Application:
     # Health endpoint built here in order to keep from having state initialized
     # on import of sub-modules
@@ -71,5 +72,6 @@ def get_app(
         web.post('/server/update/bootstrap', bootstrap_fn),
         web.post('/server/restart', control.restart)
     ])
-    app = otupdate.migration.add_endpoints(app, device_name)
+    if with_migration:
+        app = otupdate.migration.add_endpoints(app, device_name)
     return app
