@@ -300,4 +300,3 @@ def migrate_hostname(dest_data: str, name: str):
         mi.write(f'PRETTY_HOSTNAME={name}\nDEPLOYMENT=production\n')
     with open(os.path.join(dest_data, 'serial'), 'w') as ser:
         ser.write(name)
-
