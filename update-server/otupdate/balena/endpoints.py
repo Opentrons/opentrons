@@ -2,7 +2,7 @@ import os
 import logging
 import tempfile
 from aiohttp import web
-from otupdate import bootstrap
+from . import bootstrap
 from time import time
 
 log = logging.getLogger(__name__)

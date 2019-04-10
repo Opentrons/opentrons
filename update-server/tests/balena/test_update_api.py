@@ -6,7 +6,7 @@ import sys
 import tempfile
 
 import otupdate
-from otupdate import install
+from otupdate.balena import install
 
 
 def build_pkg(package_name, version, in_dir=None):
@@ -71,7 +71,7 @@ async def test_provision_version_gate(loop, monkeypatch, test_client):
 
     update_package = os.path.join(os.path.abspath(
         os.path.dirname(otupdate.__file__)), 'package.json')
-    app = otupdate.get_app(
+    app = otupdate.balena.get_app(
         api_package=None,
         update_package=update_package,
         smoothie_version='not available',

@@ -12,8 +12,8 @@ import tempfile
 import asyncio
 import aiohttp
 import subprocess as sp
-from otupdate import selftest
-from otupdate.install import _install, VENV_NAME
+from . import selftest
+from .install import _install, VENV_NAME
 
 log = logging.getLogger(__name__)
 

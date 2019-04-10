@@ -1,6 +1,7 @@
-import sys
-import pytest
 import asyncio
+import sys
+
+import pytest
 
 
 @pytest.fixture

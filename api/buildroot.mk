@@ -18,12 +18,12 @@ PYTHON_OPENTRONS_API_SITE = $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)
 PYTHON_OPENTRONS_API_SUBDIR = api
 PYTHON_OPENTRONS_API_POST_INSTALL_TARGET_HOOKS = PYTHON_OPENTRONS_API_INSTALL_VERSION
 
-define DUMP_BR_VERSION
-$(shell python 2>&1 $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/api/build_tools.py dump_br_version)
+define OTAPI_DUMP_BR_VERSION
+	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py api dump_br_version)
 endef
 
 define PYTHON_OPENTRONS_API_INSTALL_VERSION
-	echo '$(call DUMP_BR_VERSION)' > $(BINARIES_DIR)/opentrons-api-version.json
+	echo '$(call OTAPI_DUMP_BR_VERSION)' > $(BINARIES_DIR)/opentrons-api-version.json
 endef
 
 ot_api_name := python-opentrons-api
@@ -41,5 +41,5 @@ endef
 # Calling inner-python-package directly instead of using python-package macro
 # because our directory layout doesn’t conform to buildroot’s expectation of
 # having the directory name be the package name
-$(eval $(call inner-python-package,python-opentrons-api,$(call UPPERCASE,$(ot_api_name)),$(call UPPERCASE,$(ot_api_name)),target))
+$(eval $(call inner-python-package,$(ot_api_name),$(call UPPERCASE,$(ot_api_name)),$(call UPPERCASE,$(ot_api_name)),target))
 

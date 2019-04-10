@@ -4,7 +4,7 @@ import logging
 import tempfile
 import subprocess
 from collections import namedtuple
-from otupdate import bootstrap
+from otupdate.balena import bootstrap
 
 logging.basicConfig(level='DEBUG')
 

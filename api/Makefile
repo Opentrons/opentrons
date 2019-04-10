@@ -21,7 +21,7 @@ pipenv_opts += $(and $(CI),--keep-outdated --clear)
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/opentrons-$(shell $(python) build_tools.py normalize_version)-py2.py3-none-any.whl
+wheel_file = dist/opentrons-$(shell $(python) ../scripts/python_build_utils.py api normalize_version)-py2.py3-none-any.whl
 wheel_pattern := dist/opentrons-%-py2.py3-none-any.whl
 
 # These variables can be overriden when make is invoked to customize the
@@ -35,6 +35,11 @@ test_opts ?=
 # to set the auth details for pypi
 pypi_username ?=
 pypi_password ?=
+
+# Host key location for buildroot robot
+br_ssh_key ?= ~/.ssh/robot_key
+# Other SSH args for buildroot robots
+br_ssh_opts ?= -o stricthostkeychecking=no
 
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 
@@ -141,6 +146,16 @@ push: wheel
 		-H "Content-Type: multipart/form-data" \
 		-F "whl=@$(wildcard dist/opentrons-*.whl)" \
 		http://$(host):31950/server/update
+
+.PHONY: push-buildroot
+push-buildroot: wheel
+	scp -i $(br_ssh_key) $(br_ssh_opts) $(wheel_file) root@$(host):/data/
+	ssh -i $(br_ssh_key) $(br_ssh_opts) root@$(host) \
+"function cleanup () rm -f /data/$(wheel_file) && mount -o remount,ro / && systemctl start opentrons-api-server;\
+systemctl stop opentrons-api-server;\
+mount -o remount,rw /;\
+cd /usr/lib/python3.7/site-packages;\
+unzip -o /data/opentrons-*.whl || cleanup && cleanup "
 
 .PHONY: flash
 flash:
