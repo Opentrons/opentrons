@@ -47,10 +47,24 @@ export type FetchModulesResponse = {
   modules: Array<Module>,
 }
 
-export type FetchModuleDataResponse = {
+export type FetchTemperatureDataResponse = {
   status: string,
-  data: TempDeckData | MagDeckData,
+  data: TempDeckData,
 }
+
+export type SetTemperatureRequest = {
+  command_type: 'set_temperature' | 'deactivate',
+  args?: Array<number>,
+}
+
+export type SetTemperatureResponse = {
+  message: string,
+  returnValue: ?string,
+}
+
+// TODO (ka 2019-4-8): Getting MagDeck data is possible but not in use
+// keeping data response as TD and TC for polling for now
+export type FetchModuleDataResponse = FetchTemperatureDataResponse
 
 type FetchModulesCall = ApiCall<null, FetchModulesResponse>
 
@@ -92,6 +106,24 @@ export function fetchModuleData(
         (resp: FetchModuleDataResponse) =>
           apiSuccess(robot, fetchDataPath, resp),
         (err: ApiRequestError) => apiFailure(robot, fetchDataPath, err)
+      )
+      .then(dispatch)
+  }
+}
+
+export function setTargetTemp(
+  robot: RobotService,
+  serial: string,
+  command: SetTemperatureRequest
+): ThunkPromiseAction {
+  return dispatch => {
+    const setTempPath = `${MODULES}/${serial}`
+    dispatch(apiRequest(robot, setTempPath, command))
+
+    return client(robot, 'POST', setTempPath, command)
+      .then(
+        (resp: SetTemperatureResponse) => apiSuccess(robot, setTempPath, resp),
+        (err: ApiRequestError) => apiFailure(robot, setTempPath, err)
       )
       .then(dispatch)
   }

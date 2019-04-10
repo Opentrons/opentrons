@@ -9,8 +9,7 @@ export default function NoModulesMessage() {
       <p className={styles.modules_description}>No modules detected.</p>
 
       <p className={styles.modules_description}>
-        Connect a module to your robot via USB, then power it on. Press the
-        refresh icon to the top to detect your module.
+        Connect a module to your robot via USB, then power it on.
       </p>
     </CardContentFull>
   )

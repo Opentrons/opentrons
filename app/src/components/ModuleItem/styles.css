@@ -8,14 +8,17 @@
 }
 
 .module_item {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
   padding: 1.5rem 1rem 0;
 
   &:not(:last-child) {
     border-bottom: 1px solid var(--c-light-gray);
   }
+}
+
+.module_content {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
 
 .module_image_wrapper {

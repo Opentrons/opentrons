@@ -1,0 +1,63 @@
+@import '@opentrons/components';
+
+/* TODO (ka 2019-4-9): Revist temporary styling once UX has given input */
+.module_data {
+  display: flex;
+  padding-left: 25%;
+  padding-right: 20%;
+  margin-bottom: 1rem;
+}
+
+.span_50 {
+  width: 50%;
+  margin: 0 1.125rem 0 0;
+}
+
+.temperature_form {
+  display: flex;
+  padding-left: 25%;
+  justify-content: space-between;
+  padding-bottom: 2rem;
+  align-items: flex-end;
+}
+
+.target_field {
+  width: 8rem;
+}
+
+.target_label {
+  @apply --font-body-1-dark;
+
+  font-weight: var(--fw-semibold);
+}
+
+.target_input {
+  @apply --font-form-default;
+
+  width: 8rem;
+  height: 2.3rem;
+  background-color: var(--c-light-gray);
+  border-radius: var(--bd-radius-form-field);
+  border-width: 0;
+  padding: 0.25rem 0.25rem 0.25rem 0.5rem;
+  margin-top: 0.5rem;
+
+  &:focus {
+    outline: none;
+    background-color: var(--c-white);
+    box-shadow: 0 0.125rem 0.25rem 0 color(var(--c-black) alpha(0.5));
+  }
+}
+
+.set_button {
+  width: 8rem;
+
+  &:active,
+  &:focus {
+    background-color: transparent;
+  }
+
+  &:hover {
+    background-color: color(var(--c-bg-light) shade(10%));
+  }
+}

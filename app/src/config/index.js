@@ -69,7 +69,7 @@ export type Config = {
   // internal development flags
   devInternal?: {
     allPipetteConfig?: boolean,
-    manualIp?: boolean,
+    tempdeckControls?: boolean,
     enableThermocycler?: boolean,
   },
 }

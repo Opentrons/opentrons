@@ -8,16 +8,18 @@ import { CardContainer, CardRow } from '../layout'
 
 import type { Robot } from '../../discovery'
 
-type Props = Robot
+type Props = {
+  robot: Robot,
+}
 
 export default function InstrumentSettings(props: Props) {
   return (
     <CardContainer>
       <CardRow>
-        <AttachedPipettesCard {...props} />
+        <AttachedPipettesCard robot={props.robot} />
       </CardRow>
       <CardRow>
-        <AttachedModulesCard {...props} />
+        <AttachedModulesCard robot={props.robot} />
       </CardRow>
     </CardContainer>
   )
