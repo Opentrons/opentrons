@@ -1,48 +1,37 @@
 // @flow
 import * as React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import cx from 'classnames'
 
-import { getDefinition } from '../../definitions'
-import { getFilters } from '../../filters'
-import { getPublicPath } from '../../public-path'
-import Sidebar from '../Sidebar'
-import LabwareList, { NoResults } from '../LabwareList'
-import LabwareDetails from '../LabwareDetails'
 import styles from './styles.css'
 
-import type { Location } from 'react-router-dom'
-
 export type PageProps = {
-  location: Location,
+  sidebarLargeOnly: boolean,
+  sidebar: React.Node,
+  content: React.Node,
 }
 
 export default function Page(props: PageProps) {
-  const filters = getFilters(props.location)
+  const { sidebarLargeOnly, sidebar, content } = props
 
   return (
-    <div className={styles.page_scroller}>
-      <div className={styles.page}>
-        <Sidebar filters={filters} />
-        <section className={styles.content}>
-          <div className={styles.content_container}>
-            <Switch>
-              <Route
-                path={`${getPublicPath()}:loadName`}
-                render={routeProps => {
-                  const { loadName } = routeProps.match.params
-                  const definition = getDefinition(loadName)
-
-                  return definition ? (
-                    <LabwareDetails definition={definition} />
-                  ) : (
-                    <NoResults />
-                  )
-                }}
-              />
-              <Route render={() => <LabwareList filters={filters} />} />
-            </Switch>
+    <div className={styles.page}>
+      <div className={styles.content_scroller}>
+        <div className={styles.content_width_limiter}>
+          <div
+            className={cx(styles.sidebar_container, {
+              [styles.sidebar_large_only]: sidebarLargeOnly,
+            })}
+          >
+            {sidebar}
           </div>
-        </section>
+          <section
+            className={cx(styles.content_container, {
+              [styles.sidebar_large_only]: sidebarLargeOnly,
+            })}
+          >
+            {content}
+          </section>
+        </div>
       </div>
     </div>
   )

@@ -1,37 +1,51 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Page component renders 1`] = `
+exports[`Page component renders sidebar and content 1`] = `
 <div
-  className="page_scroller"
+  className="page"
 >
   <div
-    className="page"
+    className="content_scroller"
   >
-    <Sidebar
-      filters={
-        Object {
-          "category": "all",
-          "manufacturer": "all",
-        }
-      }
-    />
-    <section
-      className="content"
+    <div
+      className="content_width_limiter"
     >
       <div
+        className="sidebar_container"
+      >
+        foo
+      </div>
+      <section
         className="content_container"
       >
-        <Switch>
-          <Route
-            path="/:loadName"
-            render={[Function]}
-          />
-          <Route
-            render={[Function]}
-          />
-        </Switch>
+        bar
+      </section>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Page component renders with sidebarLargeOnly CSS 1`] = `
+<div
+  className="page"
+>
+  <div
+    className="content_scroller"
+  >
+    <div
+      className="content_width_limiter"
+    >
+      <div
+        className="sidebar_container sidebar_large_only"
+      >
+        foo
       </div>
-    </section>
+      <section
+        className="content_container sidebar_large_only"
+      >
+        bar
+      </section>
+    </div>
   </div>
 </div>
 `;

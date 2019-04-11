@@ -7,7 +7,7 @@
 .card {
   display: block;
   width: 100%;
-  margin: var(--spacing-7) auto;
+  margin: 0 auto var(--spacing-7) auto;
   box-shadow: var(--shadow-1);
 }
 
@@ -43,7 +43,7 @@
   height: 1.5rem;
 }
 
-.gallery,
+.gallery_container,
 .stats,
 .well_dimensions,
 .well_volume {
@@ -51,11 +51,15 @@
   vertical-align: top;
 }
 
-.gallery {
+.gallery_container {
   width: var(--size-40p);
   padding-top: var(--spacing-1);
   padding-left: var(--spacing-5);
   padding-right: var(--spacing-6);
+}
+
+.gallery {
+  width: 100%;
 }
 
 .stats {
@@ -160,12 +164,15 @@
   line-height: var(--lh-title);
 }
 
+.tags_container {
+  margin-top: var(--spacing-6);
+  background-color: var(--c-bg-light);
+}
+
 .tags {
   display: flex;
   align-items: center;
-  margin-top: var(--spacing-6);
-  padding: var(--spacing-2) var(--spacing-5);
-  background-color: var(--c-bg-light);
+  padding: var(--spacing-3) var(--spacing-5);
 
   & .value {
     font-size: var(--fs-body-1);
@@ -223,6 +230,11 @@ button.load_name_button {
 }
 
 @media (--medium) {
+  .list {
+    margin: 0 auto;
+    max-width: var(--size-6);
+  }
+
   .card {
     margin-top: 0;
   }
@@ -234,6 +246,10 @@ button.load_name_button {
 }
 
 @media (--large) {
+  .list {
+    max-width: 100%;
+  }
+
   .card {
     display: inline-block;
     vertical-align: top;

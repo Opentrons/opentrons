@@ -13,6 +13,7 @@ import { getPublicPath } from '../../public-path'
 import { Icon } from '@opentrons/components'
 import Gallery from './LabwareGallery'
 import LoadName from './LoadName'
+import Tags from './Tags'
 import styles from './styles.css'
 
 import type {
@@ -32,7 +33,6 @@ const EN_WIDTH = 'width'
 const EN_DIAMETER = 'diameter'
 const EN_DEPTH = 'depth'
 const EN_MAX_VOLUME = 'max volume'
-const EN_TAGS = 'tags'
 
 // TODO(mc, 2019-03-18): i18n
 const EN_NUM_WELLS_BY_CATEGORY = {
@@ -76,13 +76,17 @@ export default function LabwareCard(props: LabwareCardProps) {
     <li className={styles.card}>
       <TopBar {...props} />
       <Title {...props} />
-      <Gallery {...props} />
+      <div className={styles.gallery_container}>
+        <Gallery {...props} />
+      </div>
       <div className={styles.stats}>
         <PlateDimensions {...props} />
         <Wells {...props} />
         <WellProperties {...props} />
       </div>
-      <Tags {...props} />
+      <div className={styles.tags_container}>
+        <Tags {...props} />
+      </div>
       <LoadName loadName={definition.parameters.loadName} />
     </li>
   )
@@ -198,17 +202,6 @@ function WellProperties(props: LabwareCardProps) {
           </div>
         )
       })}
-    </div>
-  )
-}
-
-function Tags(props: LabwareCardProps) {
-  const tags = props.definition.metadata.tags || []
-
-  return (
-    <div className={styles.tags}>
-      <p className={styles.left_label}>{EN_TAGS}</p>
-      <p className={styles.value}>{tags.join(', ')}</p>
     </div>
   )
 }
