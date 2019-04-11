@@ -239,6 +239,13 @@ class API(HardwareAPILike):
         self.set_lights(button=True)
 
     @_log_call
+    async def delay(self, duration_s: int):
+        """ Delay execution by pausing and sleeping.
+        """
+        await self._backend.delay(duration_s)
+
+
+    @_log_call
     async def cache_instruments(self,
                                 require: Dict[top_types.Mount, str] = None):
         """

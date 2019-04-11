@@ -419,10 +419,8 @@ class ProtocolContext(CommandPublisher):
 
         If both `seconds` and `minutes` are specified, they will be added.
         """
-        delay_time = seconds + minutes*60
-        self.pause()
-        time.sleep(delay_time)
-        self.resume()
+        delay_time = seconds + minutes * 60
+        self._hw_manager.hardware.delay(delay_time)
 
     @property
     def config(self) -> rc.robot_config:
