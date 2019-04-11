@@ -175,5 +175,8 @@ async def remove(request: web.Request) -> web.Response:
         ak.write('\n'.join(new_keys) + '\n')
 
     return web.json_response(
-        data={'message': f'Key {requested_hash} deleted'},
+        data={
+            'message': f'Key {requested_hash} deleted. '
+            'Restart robot to take effect',
+            'restart_url': '/server/update/restart'},
         status=200)
