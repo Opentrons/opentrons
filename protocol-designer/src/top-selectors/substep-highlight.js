@@ -1,6 +1,6 @@
 // @flow
 import { createSelector } from 'reselect'
-import { computeWellAccess } from '@opentrons/shared-data'
+import { computeWellAccessDeprecated } from '@opentrons/shared-data'
 
 import mapValues from 'lodash/mapValues'
 
@@ -24,7 +24,7 @@ function _wellsForPipette(
   // `wells` is all the wells that pipette's channel 1 interacts with.
   if (pipetteChannels === 8) {
     return wells.reduce((acc, well) => {
-      const setOfWellsForMulti = computeWellAccess(labwareType, well)
+      const setOfWellsForMulti = computeWellAccessDeprecated(labwareType, well)
 
       return setOfWellsForMulti ? [...acc, ...setOfWellsForMulti] : acc // setOfWellsForMulti is null
     }, [])

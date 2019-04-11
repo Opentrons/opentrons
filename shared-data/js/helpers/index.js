@@ -1,10 +1,21 @@
 // @flow
-
+import type { LabwareDefinition2 } from '../types'
 export { default as canPipetteUseLabware } from './canPipetteUseLabware'
-export { default as computeWellAccess } from './computeWellAccess'
+export {
+  default as computeWellAccessDeprecated,
+  computeWellAccess,
+} from './computeWellAccess'
 export { default as getWellTotalVolume } from './getWellTotalVolume'
 export { default as wellIsRect } from './wellIsRect'
 export * from './volume'
+
+export function getLabwareHasQuirk(
+  labwareDef: LabwareDefinition2,
+  quirk: string
+): boolean {
+  const quirks = labwareDef.parameters.quirks
+  return quirks ? quirks.includes(quirk) : false
+}
 
 export const intToAlphabetLetter = (i: number, lowerCase: boolean = false) =>
   String.fromCharCode((lowerCase ? 96 : 65) + i)

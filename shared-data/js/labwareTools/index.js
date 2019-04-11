@@ -101,11 +101,15 @@ export function _calculateWellCoord(
   offset: Offset,
   well: InputWell
 ): Well {
-  return {
-    ...well,
+  const coords = {
     x: round(colIdx * spacing.column + offset.x, 2),
     y: round(rowIdx * spacing.row + offset.y, 2),
     z: round(offset.z - well.depth, 2),
+  }
+  if (well.shape === 'circular') return { ...well, ...coords }
+  return {
+    ...well,
+    ...coords,
   }
 }
 

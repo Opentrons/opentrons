@@ -1,5 +1,7 @@
 import getWellContentsAllLabware from '../getWellContentsAllLabware'
 
+jest.mock('../../../labware-defs/utils')
+
 describe('getWellContentsAllLabware', () => {
   const container1MaxVolume = 400
   let baseIngredFields

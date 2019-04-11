@@ -1,4 +1,5 @@
 import { ingredients, ingredLocations } from '../reducers'
+jest.mock('../../labware-defs/utils')
 
 // TODO: BC 2018-7-24 test SWAP_SLOT_CONTENTS && DUPLICATE_LABWARE instead
 describe.skip('COPY_LABWARE action', () => {

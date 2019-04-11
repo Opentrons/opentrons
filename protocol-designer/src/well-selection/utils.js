@@ -1,7 +1,7 @@
 // @flow
 import flatten from 'lodash/flatten'
 import memoize from 'lodash/memoize'
-import { computeWellAccess, getLabware } from '@opentrons/shared-data'
+import { computeWellAccessDeprecated, getLabware } from '@opentrons/shared-data'
 import type { Wells } from '../labware-ingred/types'
 
 type WellSetByWell = Array<Array<string>>
@@ -21,7 +21,7 @@ function _getAllWellSetsForLabware(labwareName: string): ?WellSetByWell {
   const allWells = flatten(labware.ordering)
   const allWellSets: WellSetByWell = allWells.reduce(
     (acc: WellSetByWell, well: string) => {
-      const wellSet = computeWellAccess(labwareName, well)
+      const wellSet = computeWellAccessDeprecated(labwareName, well)
 
       return wellSet === null ? acc : [...acc, wellSet]
     },

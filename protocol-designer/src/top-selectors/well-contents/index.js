@@ -14,6 +14,7 @@ import { selectors as stepFormSelectors } from '../../step-forms'
 import wellSelectionSelectors from '../../well-selection/selectors'
 import { getAllWellsForLabware, getMaxVolumes } from '../../constants'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { Selector } from '../../types'
 import type {
   WellContents,
@@ -53,9 +54,9 @@ function _wellContentsForWell(
 export function _wellContentsForLabware(
   labwareLiquids: StepGeneration.SingleLabwareLiquidState,
   labwareId: string,
-  labwareType: string
+  labwareDef: LabwareDefinition2
 ): ContentsByWell {
-  const allWellsForContainer = getAllWellsForLabware(labwareType)
+  const allWellsForContainer = getAllWellsForLabware(labwareDef)
 
   return reduce(
     allWellsForContainer,
@@ -77,7 +78,8 @@ export const getAllWellContentsForSteps: Selector<
 > = createSelector(
   fileDataSelectors.getInitialRobotState,
   fileDataSelectors.getRobotStateTimeline,
-  (initialRobotState, robotStateTimeline) => {
+  stepFormSelectors.getLabwareDefByLabwareId,
+  (initialRobotState, robotStateTimeline, defs) => {
     const timeline = [
       { robotState: initialRobotState },
       ...robotStateTimeline.timeline,
@@ -91,10 +93,9 @@ export const getAllWellContentsForSteps: Selector<
           labwareLiquids: StepGeneration.SingleLabwareLiquidState,
           labwareId: string
         ) => {
-          const robotState = timeline[timelineIndex].robotState
-          const labwareType = robotState.labware[labwareId].type
+          const labwareDef = defs[labwareId]
 
-          return _wellContentsForLabware(labwareLiquids, labwareId, labwareType)
+          return _wellContentsForLabware(labwareLiquids, labwareId, labwareDef)
         }
       )
     })
@@ -103,7 +104,8 @@ export const getAllWellContentsForSteps: Selector<
 
 export const getLastValidWellContents: Selector<WellContentsByLabware> = createSelector(
   fileDataSelectors.lastValidRobotState,
-  robotState => {
+  stepFormSelectors.getLabwareDefByLabwareId,
+  (robotState, defs) => {
     return mapValues(
       robotState.labware,
       (
@@ -113,7 +115,7 @@ export const getLastValidWellContents: Selector<WellContentsByLabware> = createS
         return _wellContentsForLabware(
           robotState.liquidState.labware[labwareId],
           labwareId,
-          robotState.labware[labwareId].type
+          defs[labwareId]
         )
       }
     )

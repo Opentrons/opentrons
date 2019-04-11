@@ -12,6 +12,7 @@ import type {
 
 import { getWellsForTips } from '../step-generation/utils'
 import type { SubstepTimelineFrame, TipLocation } from './types'
+import type { LabwareDefById } from '../labware-defs'
 
 function _conditionallyUpdateActiveTips(
   acc: SubstepTimelineAcc,
@@ -112,7 +113,7 @@ const substepTimelineSingle = (commandCreators: Array<CommandCreator>) => (
 
 type SubstepContext = {
   channels?: Channels,
-  getLabwareType?: (labwareId: string) => ?string,
+  labwareDefsById?: LabwareDefById, // TODO IMMEDIATELY rename to DefsByLabwareId
 }
 const substepTimeline = (
   commandCreators: Array<CommandCreator>,
@@ -151,12 +152,13 @@ const substepTimeline = (
             )
 
             const { well, volume, labware } = firstCommand.params
-            const labwareType =
-              context.getLabwareType && context.getLabwareType(labware)
+            const labwareDef = context.labwareDefsById
+              ? context.labwareDefsById[labware]
+              : null
             const wellsForTips =
               context.channels &&
-              labwareType &&
-              getWellsForTips(context.channels, labwareType, well).wellsForTips
+              labwareDef &&
+              getWellsForTips(context.channels, labwareDef, well).wellsForTips
             const wellInfo = {
               labware,
               wells: wellsForTips || [],

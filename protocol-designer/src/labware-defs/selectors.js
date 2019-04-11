@@ -1,6 +1,7 @@
 // @flow
-import { _getSharedLabware, getAllDefinitions } from './utils'
+import { createSelector } from 'reselect'
 import { getLabware } from '@opentrons/shared-data'
+import { _getSharedLabware, getAllDefinitions } from './utils'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BaseState, Selector } from '../types'
 import type { LabwareDefById } from './types'
@@ -9,14 +10,14 @@ import type { RootState } from './reducers'
 export const rootSelector = (state: BaseState): RootState => state.labwareDefs
 
 const _getLabwareDef = (
-  state: BaseState,
+  customDefs: LabwareDefById,
   otId: string
 ): any | LabwareDefinition2 => {
-  const customDef = rootSelector(state).customDefs[otId]
+  const customDef = customDefs[otId]
   if (customDef) return customDef
   const sharedDataDef = _getSharedLabware(otId)
   if (sharedDataDef) return sharedDataDef
-  // TODO: Ian 2019-04-10 this is a short-term shim, remove soon
+  // TODO: Ian 2019-04-10 SHIM REMOVAL #3335
   const legacyV1Labware = getLabware(otId)
   if (legacyV1Labware) return legacyV1Labware
   // TODO IMMEDIATELY would it be super painful to make this return null here instead,
@@ -31,17 +32,18 @@ const sharedDefsById = getAllDefinitions().reduce(
   {}
 )
 
-export const getLabwareDefsById: Selector<LabwareDefById> = (
-  state: BaseState
-) => {
-  const allCustomIds = Object.keys(rootSelector(state).customDefs)
-  const customDefsById = allCustomIds.reduce(
-    (acc, id) => ({
-      ...acc,
-      [id]: _getLabwareDef(state, id),
-    }),
-    {}
-  )
+export const getLabwareDefsById: Selector<LabwareDefById> = createSelector(
+  state => rootSelector(state).customDefs,
+  customDefs => {
+    const allCustomIds = Object.keys(customDefs)
+    const customDefsById = allCustomIds.reduce(
+      (acc, id) => ({
+        ...acc,
+        [id]: _getLabwareDef(customDefs, id),
+      }),
+      {}
+    )
 
-  return { ...sharedDefsById, ...customDefsById }
-}
+    return { ...sharedDefsById, ...customDefsById }
+  }
+)

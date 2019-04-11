@@ -62,7 +62,7 @@ export const getLabwareTypesById: Selector<LabwareTypeById> = createSelector(
     mapValues(labwareEntities, (labware: LabwareEntity) => labware.type)
 )
 
-// WARNING: this might not be accurate, should be reviewed before using in migration
+// NOTE: this mapping should be reviewed before using it in migration later
 const V1_NAME_TO_V2_OTID = {
   '12-well-plate': 'a4961650-54c9-11e9-989a-e90aec2c3723',
   '24-well-plate': '4373e820-54c9-11e9-9364-556fc2c8a783',
@@ -90,6 +90,7 @@ const V1_NAME_TO_V2_OTID = {
   'trough-12row': 'a41d9ef0-f4b6-11e8-90c2-7106f0eae5a7',
 }
 
+// TODO: Ian 2019-04-10 SHIM REMOVAL #3335
 export const getLabwareDefByLabwareId: Selector<LabwareDefById> = createSelector(
   labwareDefSelectors.getLabwareDefsById,
   getLabwareEntities,

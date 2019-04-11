@@ -1,6 +1,8 @@
 // @flow
 import { legacySteps as steps, orderedStepIds } from '../reducers'
 
+jest.mock('../../labware-defs/utils')
+
 describe('steps reducer', () => {
   test('initial add step', () => {
     const state = {}

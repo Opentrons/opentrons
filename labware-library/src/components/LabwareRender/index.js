@@ -66,7 +66,6 @@ export default function LabwareRender(props: LabwareRenderProps) {
 
 function Well(props: LabwareWellRenderProps) {
   const { well, parameters, cornerOffsetFromSlot } = props
-  const { shape, diameter, width, length } = well
   const { isTiprack } = parameters
 
   // TODO(mc, 2019-04-04): cornerOffsetFromSlot is added to x and y because
@@ -75,7 +74,8 @@ function Well(props: LabwareWellRenderProps) {
   const x = well.x + cornerOffsetFromSlot.x
   const y = well.y + cornerOffsetFromSlot.y
 
-  if (shape === 'circular' && diameter) {
+  if (well.shape === 'circular') {
+    const { diameter } = well
     const radius = diameter / 2
     // TODO(mc, 2019-03-27): figure out tip rendering; see:
     //   components/src/deck/Well.js
@@ -88,7 +88,8 @@ function Well(props: LabwareWellRenderProps) {
     )
   }
 
-  if (shape === 'rectangular' && length && width) {
+  if (well.shape === 'rectangular') {
+    const { length, width } = well
     return (
       <rect
         x={x - length / 2}

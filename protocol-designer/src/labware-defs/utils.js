@@ -1,8 +1,8 @@
 // @flow
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-// TODO IMMEDIATELY: getAllDefinitions is copied from labware-library,
-// move to shared-data (here, and in labware-library/src/definitions.js !)
+// TODO: Ian 2019-04-11 getAllDefinitions is duplicated from from labware-library,
+// should move to shared-data (here, and in labware-library/src/definitions.js !)
 
 // require all definitions in the definitions2 directory
 // $FlowFixMe: require.context is webpack-specific method
@@ -16,7 +16,7 @@ const definitionsContext = require.context(
 let definitions = null
 
 export function getAllDefinitions(): Array<LabwareDefinition2> {
-  // TODO IMMEDIATELY: unlike labware-library, no filter here
+  // TODO Ian 2019-04-11: unlike labware-library, no filter here
   if (!definitions) {
     definitions = definitionsContext
       .keys()

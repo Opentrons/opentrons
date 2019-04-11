@@ -1,7 +1,6 @@
 // @flow
 import mapValues from 'lodash/mapValues'
 import * as componentLib from '@opentrons/components'
-import { getLabware } from '@opentrons/shared-data'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { WellVolumes } from './types'
 // TODO Ian 2018-11-27: import these from components lib, not from this contants file
@@ -21,15 +20,8 @@ export const getMaxVolumes = (def: LabwareDefinition2): WellVolumes =>
   mapValues(def.wells, well => well.totalLiquidVolume)
 
 /** All wells for labware, in arbitrary order. */
-export function getAllWellsForLabware(labwareType: string): Array<string> {
-  const labware = getLabware(labwareType)
-  if (!labware) {
-    console.error(
-      `getAllWellsForLabware: invalid labware type "${labwareType}"`
-    )
-    return []
-  }
-  return Object.keys(labware.wells)
+export function getAllWellsForLabware(def: LabwareDefinition2): Array<string> {
+  return Object.keys(def.wells)
 }
 
 // Labware types that are allowed to act as disposal labware

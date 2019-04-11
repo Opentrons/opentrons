@@ -1,6 +1,8 @@
 // @flow
 import { _allReducers } from '../reducers.js'
 
+jest.mock('../../../labware-defs/utils')
+
 const { collapsedSteps, selectedItem } = _allReducers
 
 describe('collapsedSteps reducer', () => {
