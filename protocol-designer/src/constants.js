@@ -1,10 +1,9 @@
 // @flow
-import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
 import * as componentLib from '@opentrons/components'
 import { getLabware } from '@opentrons/shared-data'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { JsonWellData, WellVolumes } from './types'
+import type { WellVolumes } from './types'
 // TODO Ian 2018-11-27: import these from components lib, not from this contants file
 export const {
   // OT2 DECK CONSTANTS
@@ -17,25 +16,6 @@ export const {
   // SPECIAL SELECTORS
   SELECTABLE_WELL_CLASS,
 } = componentLib
-
-// TODO DEPRECATED
-export const getMaxVolumesDeprecated = (labwareType: string): WellVolumes => {
-  const labware = getLabware(labwareType)
-  if (labware) {
-    return reduce(
-      labware.wells,
-      (acc, wellData: JsonWellData, wellName): WellVolumes => ({
-        ...acc,
-        [wellName]: wellData['total-liquid-volume'],
-      }),
-      {}
-    )
-  }
-  console.warn(
-    `Container type ${labwareType} not in labware definitions, couldn't get max volume`
-  )
-  return {}
-}
 
 export const getMaxVolumes = (def: LabwareDefinition2): WellVolumes =>
   mapValues(def.wells, well => well.totalLiquidVolume)

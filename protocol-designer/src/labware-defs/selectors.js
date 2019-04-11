@@ -1,13 +1,14 @@
 // @flow
-import { _getSharedLabware } from './utils'
+import { _getSharedLabware, getAllDefinitions } from './utils'
 import { getLabware } from '@opentrons/shared-data'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { BaseState } from '../types'
+import type { BaseState, Selector } from '../types'
+import type { LabwareDefById } from './types'
 import type { RootState } from './reducers'
 
 export const rootSelector = (state: BaseState): RootState => state.labwareDefs
 
-export const getLabwareDef = (
+const _getLabwareDef = (
   state: BaseState,
   otId: string
 ): any | LabwareDefinition2 => {
@@ -23,4 +24,24 @@ export const getLabwareDef = (
   throw Error(
     `No labware definition in PD session's custom labware or builtin shared-data defs for otId "{otId}"`
   )
+}
+
+const sharedDefsById = getAllDefinitions().reduce(
+  (acc, d) => ({ ...acc, [d.otId]: d }),
+  {}
+)
+
+export const getLabwareDefsById: Selector<LabwareDefById> = (
+  state: BaseState
+) => {
+  const allCustomIds = Object.keys(rootSelector(state).customDefs)
+  const customDefsById = allCustomIds.reduce(
+    (acc, id) => ({
+      ...acc,
+      [id]: _getLabwareDef(state, id),
+    }),
+    {}
+  )
+
+  return { ...sharedDefsById, ...customDefsById }
 }
