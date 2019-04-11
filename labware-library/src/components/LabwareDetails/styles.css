@@ -29,7 +29,7 @@
     display: inline-block;
     vertical-align: top;
     width: var(--size-third);
-    max-width: var(--size-third);
+    max-width: var(--size-5);
   }
 
   .details_container {

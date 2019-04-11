@@ -232,7 +232,7 @@ button.load_name_button {
 @media (--medium) {
   .list {
     margin: 0 auto;
-    max-width: var(--size-5);
+    max-width: var(--size-6);
   }
 
   .card {
