@@ -6,6 +6,7 @@ import pytest
 
 import otupdate.buildroot
 
+
 @pytest.fixture
 def dummy_authorized_keys(tmpdir, monkeypatch):
     path = os.path.join(tmpdir, 'authorized_keys')

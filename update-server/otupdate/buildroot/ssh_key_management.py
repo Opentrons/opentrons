@@ -157,7 +157,7 @@ async def remove(request: web.Request) -> web.Response:
     -> 404 Not Found otherwise
     """
     requested_hash = request.match_info['key_md5']
-    new_keys: List[str]= []
+    new_keys: List[str] = []
     found = False
     for keyhash, key in get_keys():
         if keyhash == requested_hash:

@@ -15,6 +15,7 @@ from .constants import RESTART_LOCK_NAME
 
 LOG = logging.getLogger(__name__)
 
+
 def _do_restart():
     subprocess.check_call(['reboot'])
 
