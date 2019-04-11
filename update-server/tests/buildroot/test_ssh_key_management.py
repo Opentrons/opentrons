@@ -65,7 +65,7 @@ async def test_add_key(test_cli, dummy_authorized_keys):
     resp = await test_cli.post('/server/ssh_keys',
                                json={'key': dummy_key},
                                headers={'X-Host-IP': '169.254.1.1'})
-    assert resp.status == 200
+    assert resp.status == 201
     body = await resp.json()
     assert 'message' in body
     assert body['key_md5'] == hashlib.new(
@@ -77,7 +77,7 @@ async def test_add_key(test_cli, dummy_authorized_keys):
     resp = await test_cli.post('/server/ssh_keys',
                                json={'key': dummy_key},
                                headers={'X-Host-IP': '169.254.1.1'})
-    assert resp.status == 200
+    assert resp.status == 201
     body = await resp.json()
     assert 'message' in body
     assert body['key_md5'] == hashlib.new(
@@ -108,7 +108,7 @@ async def test_delete_key(test_cli, dummy_authorized_keys):
     resp = await test_cli.post('/server/ssh_keys',
                                json={'key': dummy_key},
                                headers={'X-Host-IP': '169.254.1.1'})
-    assert resp.status == 200
+    assert resp.status == 201
 
     hashval = hashlib.new(
         'md5', dummy_key.encode()).hexdigest()
