@@ -394,8 +394,10 @@ def thermocycler_deactivate():
     )
 
 
-def delay(seconds, minutes):
+def delay(seconds, minutes, msg=None):
     text = "Delaying for {minutes}m {seconds}s"
+    if msg:
+        text = f"{text}. {msg}"
     return make_command(
         name=command_types.DELAY,
         payload={

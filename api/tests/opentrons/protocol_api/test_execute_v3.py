@@ -74,7 +74,7 @@ def test_dispatch_commands(monkeypatch, loop):
 
     ctx = ProtocolContext(loop=loop)
 
-    def mock_delay(seconds=0, minutes=0):
+    def mock_delay(seconds=0, minutes=0, msg=None):
         command_log.append(("delay", seconds + minutes * 60))
 
     monkeypatch.setattr(ctx, 'delay', mock_delay)

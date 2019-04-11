@@ -85,13 +85,14 @@ def _get_location_with_offset(loaded_labware: Dict[str, labware.Labware],
 def _delay(
         context, protocol_data, instruments, loaded_labware, params) -> None:
     wait = params['wait']
+    message = params.get('message')
     if wait is None or wait is False:
         raise ValueError('Delay must be true, or a number')
     elif wait is True:
-        message = params.get('message', 'Pausing until user resumes')
+        message = message or 'Pausing until user resumes'
         context.pause(msg=message)
     else:
-        context.delay(seconds=wait)
+        context.delay(seconds=wait, msg=message)
 
 
 def _blowout(

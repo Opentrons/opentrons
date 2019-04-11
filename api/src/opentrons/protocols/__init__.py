@@ -1,5 +1,6 @@
 from numpy import add
 import time
+import datetime
 from itertools import chain
 from opentrons import instruments, labware, robot
 
@@ -175,12 +176,17 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
 
         if command_type == 'delay':
             wait = params.get('wait')
+            message = params.get('message')
             if wait is None:
                 raise ValueError('Delay cannot be null')
             elif wait is True:
-                message = params.get('message', 'Pausing until user resumes')
+                message = message or 'Pausing until user resumes'
                 robot.pause(msg=message)
             else:
+                text = f'Delaying for {datetime.timedelta(seconds=wait)}'
+                if message:
+                    text = f"{text}. {message}"
+                robot.comment(text)
                 _sleep(wait)
 
         elif command_type == 'blowout':
