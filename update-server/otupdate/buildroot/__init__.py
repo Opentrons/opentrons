@@ -8,7 +8,7 @@ from aiohttp import web
 
 from . import constants
 
-from . import config, control, update
+from . import config, control, update, ssh_key_management
 
 
 BR_BUILTIN_VERSION_FILE = '/etc/VERSION.json'
@@ -79,5 +79,8 @@ def get_app(system_version_file: str = None,
         web.post('/server/update/{session}/file', update.file_upload),
         web.post('/server/update/{session}/commit', update.commit),
         web.post('/server/update/restart', control.restart),
+        web.get('/server/ssh_keys', ssh_key_management.list_keys),
+        web.post('/server/ssh_keys', ssh_key_management.add),
+        web.delete('/server/ssh_keys/{key_md5}', ssh_key_management.remove),
     ])
     return app

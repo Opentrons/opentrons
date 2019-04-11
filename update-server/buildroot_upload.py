@@ -72,7 +72,7 @@ async def do_update(update_file, host):
                 sys.exit(-1)
 
             print("Restarting...")
-            resp = await session.post(host+'/server/update/restart')
+            resp = await session.post(host+'/server/restart')
 
         print("Done!")
 

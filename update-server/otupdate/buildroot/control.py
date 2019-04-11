@@ -4,13 +4,16 @@ otupdate.buildroot.control: non-update-specific endpoints for otupdate
 This has endpoints like /restart that aren't specific to update tasks.
 """
 import asyncio
+import logging
 import subprocess
-
 from typing import Callable, Coroutine, Mapping
 
 from aiohttp import web
 
 from .constants import RESTART_LOCK_NAME
+
+
+LOG = logging.getLogger(__name__)
 
 
 def _do_restart():
