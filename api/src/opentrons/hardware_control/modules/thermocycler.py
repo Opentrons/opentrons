@@ -1,6 +1,6 @@
 import asyncio
 from . import mod_abc
-from typing import Union
+from typing import Union, Optional
 from opentrons.drivers.thermocycler.driver import (
     Thermocycler as ThermocyclerDriver, ThermocyclerError)
 
@@ -13,6 +13,8 @@ class SimulatingDriver:
         self._active = False
         self._port = None
         self._lid_status = 'open'
+        self._lid_target = None
+        self._lid_heating_active = False
 
     async def open(self):
         if self._active:
@@ -50,6 +52,18 @@ class SimulatingDriver:
     def target(self):
         return self._target_temp
 
+    @property
+    def lid_target(self):
+        return self._lid_target
+
+    @property
+    def lid_temp_status(self):
+        return 'holding at target' if self._lid_heating_active else 'idle'
+
+    @property
+    def lid_temp(self):
+        return self._lid_target
+
     async def connect(self, port):
         self._port = port
 
@@ -65,11 +79,22 @@ class SimulatingDriver:
         self._ramp_rate = ramp_rate
         self._active = True
 
+    async def set_lid_temperature(self, temp: Optional[float]):
+        """ Set the lid temperature in deg Celsius """
+        self._lid_heating_active = True
+        self._lid_target = temp
+
+    async def stop_lid_heating(self):
+        self._lid_heating_active = False
+        self._lid_target = None
+
     async def deactivate(self):
         self._target_temp = None
         self._ramp_rate = None
         self._hold_time = None
         self._active = None
+        self._lid_heating_active = False
+        self._lid_target = None
 
     async def get_device_info(self):
         return {'serial': 'dummySerial',
@@ -140,14 +165,45 @@ class Thermocycler(mod_abc.AbstractModule):
         await self._driver.set_temperature(
             temp=temp, hold_time=hold_time, ramp_rate=ramp_rate)
 
+    async def set_lid_temperature(self, temp: Optional[float]):
+        """ Set the lid temperature in deg Celsius """
+        await self._driver.set_lid_temperature(temp=temp)
+
+    async def stop_lid_heating(self):
+        return await self._driver.stop_lid_heating()
+
+    async def wait_for_lid_temp(self):
+        """
+        This method only exits if lid target temperature has been reached.
+
+        Subject to change without a version bump.
+        """
+        while self._driver.lid_temp_status != 'holding at target':
+            await asyncio.sleep(0.1)
+
     async def wait_for_temp(self):
         """
-        This method only exists if set temperature has been reached.
+        This method only exits if set temperature has been reached.
 
         Subject to change without a version bump.
         """
         while self.status != 'holding at target':
             await asyncio.sleep(0.1)
+
+    async def wait_for_hold(self):
+        """
+        This method returns only when hold time has elapsed
+        """
+        while self.hold_time != 0:
+            await asyncio.sleep(0.1)
+
+    @property
+    def lid_target(self):
+        return self._driver.lid_target
+
+    @property
+    def lid_temp(self):
+        return self._driver.lid_temp
 
     @property
     def lid_status(self):
@@ -159,8 +215,7 @@ class Thermocycler(mod_abc.AbstractModule):
 
     @property
     def hold_time(self):
-        # Simulating driver acts as if cycles end immediately
-        return 0
+        return self._driver.hold_time
 
     @property
     def temperature(self):

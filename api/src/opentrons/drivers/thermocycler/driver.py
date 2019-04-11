@@ -21,6 +21,7 @@ GCODES = {
     'CLOSE_LID': 'M127',
     'GET_LID_STATUS': 'M119',
     'SET_LID_TEMP': 'M140',
+    'GET_LID_TEMP': 'M141',
     'DEACTIVATE_LID_HEATING': 'M108',
     'EDIT_PID_PARAMS': 'M301',
     'SET_PLATE_TEMP': 'M104',
@@ -29,6 +30,7 @@ GCODES = {
     'DEACTIVATE': 'M18',
     'DEVICE_INFO': 'M115'
 }
+DEFAULT_LID_TARGET = 105    # Degree celsius
 
 
 def _build_temp_code(temp, hold_time=None):
@@ -47,7 +49,7 @@ TC_BAUDRATE = 115200
 # temporarily until we can change the firmware to asynchronously handle
 # the lid being open and closed
 SERIAL_ACK = '\r\n'
-TC_COMMAND_TERMINATOR = SERIAL_ACK + SERIAL_ACK
+TC_COMMAND_TERMINATOR = SERIAL_ACK
 TC_ACK = 'ok' + SERIAL_ACK + 'ok' + SERIAL_ACK
 ERROR_KEYWORD = 'error'
 DEFAULT_TC_TIMEOUT = 5
@@ -62,13 +64,16 @@ class ThermocyclerError(Exception):
 
 
 class TCPoller(threading.Thread):
-    def __init__(self, port, interrupt_callback, status_callback):
+    def __init__(self, port, interrupt_callback, temp_status_callback,
+                 lid_status_callback, lid_temp_status_callback):
         if not select:
             raise RuntimeError("Cannot connect to a Thermocycler from Windows")
         self._port = port
         self._connection = self._connect_to_port()
         self._interrupt_callback = interrupt_callback
-        self._status_callback = status_callback
+        self._temp_status_callback = temp_status_callback
+        self._lid_status_callback = lid_status_callback
+        self._lid_temp_status_callback = lid_temp_status_callback
         self._lock = threading.Lock()
         self._command_queue = Queue()
 
@@ -143,7 +148,11 @@ class TCPoller(threading.Thread):
                 # Nothing else to do--update device status
                 log.debug("Poller [{}]: updating temp".format(hash(self)))
                 res = self._send_command(GCODES['GET_PLATE_TEMP'])
-                self._status_callback(res)
+                self._temp_status_callback(res)
+                res = self._send_command(GCODES['GET_LID_STATUS'])
+                self._lid_status_callback(res)
+                res = self._send_command(GCODES['GET_LID_TEMP'])
+                self._lid_temp_status_callback(res)
         log.info("Exiting TC poller loop [{}]".format(hash(self)))
 
     def _wait_for_ack(self):
@@ -216,11 +225,15 @@ class Thermocycler:
         self._hold_time = None
         self._lid_status = None
         self._interrupt_cb = interrupt_callback
+        self._lid_target = None
+        self._lid_temp = None
 
     async def connect(self, port: str) -> 'Thermocycler':
         self.disconnect()
         self._poller = TCPoller(
-            port, self._interrupt_callback, self._temp_status_update_callback)
+            port, self._interrupt_callback,
+            self._temp_status_update_callback, self._lid_status_update_callback,
+            self._lid_temp_status_callback)
 
         # Check initial device lid state
         _lid_status_res = await self._write_and_wait(GCODES['GET_LID_STATUS'])
@@ -263,6 +276,30 @@ class Thermocycler:
             await self._write_and_wait(ramp_cmd)
         temp_cmd = _build_temp_code(temp, hold_time)
         await self._write_and_wait(temp_cmd)
+        await asyncio.sleep(1.1)    # Wait for the poller to update
+
+    async def set_lid_temperature(self, temp: Optional[float]) -> None:
+        if temp is None:
+            self._lid_target = DEFAULT_LID_TARGET
+        else:
+            if temp < 20:
+                self._lid_target = 20
+            elif temp > 105:
+                self._lid_target = 105
+            else:
+                self._lid_target = temp
+
+        lid_temp_cmd = '{} S{}'.format(GCODES['SET_LID_TEMP'], self._lid_target)
+        await self._write_and_wait(lid_temp_cmd)
+
+    async def stop_lid_heating(self) -> None:
+        lid_temp_cmd = '{}'.format(GCODES['DEACTIVATE_LID_HEATING'])
+        await self._write_and_wait(lid_temp_cmd)
+
+    def _lid_status_update_callback(self, lid_response):
+        if lid_response:
+            self._lid_status = utils.parse_string_value_from_substring(
+                lid_response.split()[-1])
 
     def _temp_status_update_callback(self, temperature_response):
         # Payload is shaped like `T:95.0 C:77.4 H:600` where T is the
@@ -279,6 +316,19 @@ class Thermocycler:
         self._current_temp = val_dict['C']
         self._target_temp = val_dict['T']
         self._hold_time = val_dict['H']
+
+    def _lid_temp_status_callback(self, lid_temp_res):
+        # Payload is shaped like `T:95.0 C:77.4` where T is the
+        # target temperature, C is the current temperature
+        val_dict = {}
+        data_substrs = [d for d in lid_temp_res.split()]
+
+        for substr in data_substrs:
+            key = utils.parse_key_from_substring(substr)
+            value = utils.parse_number_from_substring(substr)
+            val_dict[key] = value
+        self._lid_temp = val_dict['C']
+        self._lid_target = val_dict['T']
 
     def _interrupt_callback(self, interrupt_response):
         # TODO sanitize response and then call the callback
@@ -300,6 +350,17 @@ class Thermocycler:
     @property
     def ramp_rate(self):
         return self._ramp_rate
+
+    @property
+    def lid_temp_status(self):
+        if self.lid_target is None:
+            _status = 'idle'
+        elif self.lid_temp and (abs(self.lid_target - self.lid_temp) <
+                                   TEMP_THRESHOLD):
+            _status = 'holding at target'
+        else:
+            _status = 'ramping'
+        return _status
 
     @property
     def status(self):
@@ -325,6 +386,14 @@ class Thermocycler:
     @lid_status.setter
     def lid_status(self, status):
         self._lid_status = status
+
+    @property
+    def lid_temp(self):
+        return self._lid_temp
+
+    @property
+    def lid_target(self):
+        return self._lid_target
 
     async def get_device_info(self) -> Mapping[str, str]:
         _device_info_res = await self._write_and_wait(GCODES['DEVICE_INFO'])

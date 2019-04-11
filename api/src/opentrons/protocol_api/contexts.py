@@ -1697,6 +1697,7 @@ class ThermocyclerContext(ModuleContext):
                  loop: asyncio.AbstractEventLoop) -> None:
         self._module = hw_module
         self._loop = loop
+        self._protocol_lid_target = None
         super().__init__(ctx, geometry)
 
     @property
@@ -1743,9 +1744,41 @@ class ThermocyclerContext(ModuleContext):
         return self._module.set_temperature(
             temp=temp, hold_time=hold_time, ramp_rate=ramp_rate)
 
+    @property
+    def current_lid_target(self):
+        return self._module.lid_target
+
+    @property
+    def lid_target(self):
+        return self._protcol_lid_target
+
+    @lid_target.setter
+    def lid_target(self, temp):
+        """ Update lid target temperature"""
+        self._protocol_lid_target = temp
+
+    def heat_lid(self):
+        """ Start heating thermocycler Lid to ``_protocol_lid_target``
+            degree celsius. If ``_protocol_lid_target`` is None, the lid
+            will be heated to the driver default value.
+        """
+        self._module.set_lid_temperature(self._protocol_lid_target)
+
+    def stop_lid_heating(self):
+        """ Turn off the lid heatpad """
+        self._module.stop_lid_heating()
+
+    def wait_for_lid_temp(self):
+        """ Block until the lid heatpad reaches its target temperature"""
+        self._module.wait_for_lid_temp()
+
     def wait_for_temp(self):
         """ Block until the module reaches its setpoint"""
         self._module.wait_for_temp()
+
+    def wait_for_hold(self):
+        """ Block until hold time has elapsed"""
+        self._module.wait_for_hold()
 
     @property
     def temperature(self):
