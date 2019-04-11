@@ -244,7 +244,6 @@ class API(HardwareAPILike):
         """
         await self._backend.delay(duration_s)
 
-
     @_log_call
     async def cache_instruments(self,
                                 require: Dict[top_types.Mount, str] = None):

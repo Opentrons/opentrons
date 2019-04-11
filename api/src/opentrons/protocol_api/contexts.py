@@ -1,7 +1,6 @@
 import asyncio
 import contextlib
 import logging
-import time
 from .labware import (Well, Labware, load, load_module, ModuleGeometry,
                       quirks_from_any_parent, ThermocyclerGeometry)
 from typing import Any, Dict, List, Optional, Union, Tuple, Sequence
