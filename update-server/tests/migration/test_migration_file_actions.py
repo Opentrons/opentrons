@@ -142,9 +142,9 @@ def test_migrate_connections_state(state_partition, tmpdir, monkeypatch):
     file_actions.migrate_connections(dest)
     # if these files exist, test_migrate_system_connections means they should
     # be correct
-    assert os.listdir(os.path.join(
-        dest, 'lib', 'NetworkManager', 'system-connections'))\
-        == ['Opentrons', 'linksys-open']
+    assert sorted(os.listdir(os.path.join(
+        dest, 'lib', 'NetworkManager', 'system-connections')))\
+        == sorted(['Opentrons', 'linksys-open'])
 
 
 def test_migrate_connections_boot(boot_partition, tmpdir, monkeypatch):
