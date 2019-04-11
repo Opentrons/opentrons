@@ -10,8 +10,6 @@ The examples below will use the following set-up:
 
     from opentrons import robot, labware, instruments
 
-    robot.clear_commands()
-
     plate = labware.load('96-flat', '1')
 
     tiprack = labware.load('opentrons-tiprack-300ul', '2')
@@ -19,6 +17,8 @@ The examples below will use the following set-up:
     pipette = instruments.P300_Single(
         mount='left',
         tip_racks=[tiprack])
+
+You could simulate the protocol using our protocol simulator, which can be installed by following the instructions [here](https://github.com/Opentrons/opentrons/tree/edge/api#simulating-protocols).
 
 **********************
 
@@ -48,10 +48,7 @@ Volumes larger than the pipette's ``max_volume`` will automatically divide into 
 
     pipette.transfer(700, plate.wells('A2'), plate.wells('B2'))
 
-    for c in robot.commands():
-        print(c)
-
-will print out...
+will have the steps...
 
 .. code-block:: python
 
@@ -74,10 +71,7 @@ Transfer commands are most useful when moving liquid between multiple wells.
 
     pipette.transfer(100, plate.cols('1'), plate.cols('2'))
 
-    for c in robot.commands():
-        print(c)
-
-will print out...
+will have the steps...
 
 .. code-block:: python
 
@@ -110,10 +104,8 @@ You can transfer from a single source to multiple destinations, and the other wa
 
     pipette.transfer(100, plate.wells('A1'), plate.cols('2'))
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
@@ -149,10 +141,7 @@ What happens if, for example, you tell your pipette to transfer from 2 source we
         plate.wells('A1', 'A2'),
         plate.wells('B1', 'B2', 'B3', 'B4'))
 
-    for c in robot.commands():
-        print(c)
-
-will print out...
+will have the steps...
 
 .. code-block:: python
 
@@ -180,10 +169,8 @@ Instead of applying a single volume amount to all source/destination wells, you 
         plate.wells('A1'),
         plate.wells('B1', 'B2', 'B3'))
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
@@ -209,10 +196,8 @@ Create a linear gradient between a start and ending volume (uL). The start and e
         plate.wells('A1'),
         plate.cols('2'))
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
@@ -252,10 +237,7 @@ Volumes going to the same destination well are combined within the same tip, so 
 
     pipette.consolidate(30, plate.cols('2'), plate.wells('A1'))
 
-    for c in robot.commands():
-        print(c)
-
-will print out...
+will have the steps...
 
 .. code-block:: python
 
@@ -279,10 +261,8 @@ If there are multiple destination wells, the pipette will never combine their vo
 
     pipette.consolidate(30, plate.cols('1'), plate.wells('A1', 'A2'))
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
@@ -310,10 +290,8 @@ Volumes from the same source well are combined within the same tip, so that one 
 
     pipette.distribute(55, plate.wells('A1'), plate.rows('A'))
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
@@ -347,10 +325,7 @@ If there are multiple source wells, the pipette will never combine their volumes
 
     pipette.distribute(30, plate.wells('A1', 'A2'), plate.rows('A'))
 
-    for c in robot.commands():
-        print(c)
-
-will print out...
+will have the steps...
 
 .. code-block:: python
 
@@ -388,10 +363,8 @@ When dispensing multiple times from the same tip, it is recommended to aspirate 
         plate.cols('2'),
         disposal_vol=10)   # include extra liquid to make dispenses more accurate
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
@@ -434,10 +407,8 @@ The pipette can optionally get a new tip at the beginning of each aspirate, to h
         plate.wells('B1', 'B2', 'B3'),
         new_tip='always')    # always pick up a new tip
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
@@ -472,10 +443,8 @@ For scenarios where you instead are calling ``pick_up_tip()`` and ``drop_tip()``
     ...
     pipette.drop_tip()
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
@@ -504,10 +473,8 @@ By default, the transfer command will drop the pipette's tips in the trash conta
         plate.wells('B1'),
         trash=False)       # do not trash tip
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
@@ -531,10 +498,8 @@ A touch-tip can be performed after every aspirate and dispense by setting ``touc
         plate.wells('A2'),
         touch_tip=True)     # touch tip to each well's edge
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
@@ -559,10 +524,8 @@ A blow-out can be performed after every dispense that leaves the tip empty by se
         plate.wells('A2'),
         blow_out=True)      # blow out droplets when tip is empty
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
@@ -587,10 +550,8 @@ A mix can be performed before every aspirate by setting ``mix_before=``. The val
         mix_before=(2, 50), # mix 2 times with 50uL before aspirating
         mix_after=(3, 75))  # mix 3 times with 75uL after dispensing
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
@@ -625,10 +586,8 @@ An air gap can be performed after every aspirate by setting ``air_gap=int``, whe
         plate.wells('A2'),
         air_gap=20)         # add 20uL of air after each aspirate
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
