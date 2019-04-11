@@ -1,7 +1,9 @@
 // @flow
 import reduce from 'lodash/reduce'
+import mapValues from 'lodash/mapValues'
 import * as componentLib from '@opentrons/components'
 import { getLabware } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { JsonWellData, WellVolumes } from './types'
 // TODO Ian 2018-11-27: import these from components lib, not from this contants file
 export const {
@@ -16,7 +18,8 @@ export const {
   SELECTABLE_WELL_CLASS,
 } = componentLib
 
-export const getMaxVolumes = (labwareType: string): WellVolumes => {
+// TODO DEPRECATED
+export const getMaxVolumesDeprecated = (labwareType: string): WellVolumes => {
   const labware = getLabware(labwareType)
   if (labware) {
     return reduce(
@@ -33,6 +36,9 @@ export const getMaxVolumes = (labwareType: string): WellVolumes => {
   )
   return {}
 }
+
+export const getMaxVolumes = (def: LabwareDefinition2): WellVolumes =>
+  mapValues(def.wells, well => well.totalLiquidVolume)
 
 /** All wells for labware, in arbitrary order. */
 export function getAllWellsForLabware(labwareType: string): Array<string> {

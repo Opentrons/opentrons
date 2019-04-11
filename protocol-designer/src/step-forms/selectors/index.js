@@ -58,6 +58,15 @@ export const getLabwareTypesById: Selector<LabwareTypeById> = createSelector(
     mapValues(labwareEntities, (labware: LabwareEntity) => labware.type)
 )
 
+export const getLabwareDefsWithId = createSelector(
+  getLabwareDefWithId,
+  getLabwareEntitiesWithId,
+  (labwareDef, labwareEntity) =>
+    mapValues(labwareEntities, (labware: LabwareEntity) =>
+      getLabwareDef(labware.type)
+    )
+)
+
 export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
   state => rootSelector(state).pipetteInvariantProperties,
   pipetteInvariantProperties =>

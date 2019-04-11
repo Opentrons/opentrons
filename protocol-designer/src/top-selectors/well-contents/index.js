@@ -9,6 +9,7 @@ import omitBy from 'lodash/omitBy'
 
 import * as StepGeneration from '../../step-generation'
 import { selectors as fileDataSelectors } from '../../file-data'
+import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import wellSelectionSelectors from '../../well-selection/selectors'
@@ -124,15 +125,13 @@ export const getSelectedWellsMaxVolume: Selector<number> = createSelector(
   wellSelectionSelectors.getSelectedWells,
   labwareIngredSelectors.getSelectedLabwareId,
   stepFormSelectors.getLabwareTypesById,
-  (selectedWells, selectedLabwareId, labwareTypes) => {
+  (selectedWells, selectedLabwareDef, labwareTypes) => {
     const selectedWellNames = Object.keys(selectedWells)
-    const selectedLabwareType =
-      selectedLabwareId && labwareTypes[selectedLabwareId]
-    if (!selectedLabwareType) {
+    if (!selectedLabwareDef) {
       console.warn('No container type selected, cannot get max volume')
       return Infinity
     }
-    const maxVolumesByWell = getMaxVolumes(selectedLabwareType)
+    const maxVolumesByWell = getMaxVolumes(selectedLabwareDef)
     const maxVolumesList =
       selectedWellNames.length > 0
         ? // when wells are selected, only look at vols of selected wells
