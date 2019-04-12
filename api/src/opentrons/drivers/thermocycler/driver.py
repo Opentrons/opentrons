@@ -232,7 +232,8 @@ class Thermocycler:
         self.disconnect()
         self._poller = TCPoller(
             port, self._interrupt_callback,
-            self._temp_status_update_callback, self._lid_status_update_callback,
+            self._temp_status_update_callback,
+            self._lid_status_update_callback,
             self._lid_temp_status_callback)
 
         # Check initial device lid state
@@ -289,7 +290,8 @@ class Thermocycler:
             else:
                 self._lid_target = temp
 
-        lid_temp_cmd = '{} S{}'.format(GCODES['SET_LID_TEMP'], self._lid_target)
+        lid_temp_cmd = '{} S{}'.format(GCODES['SET_LID_TEMP'],
+                                       self._lid_target)
         await self._write_and_wait(lid_temp_cmd)
 
     async def stop_lid_heating(self) -> None:
@@ -356,7 +358,7 @@ class Thermocycler:
         if self.lid_target is None:
             _status = 'idle'
         elif self.lid_temp and (abs(self.lid_target - self.lid_temp) <
-                                   TEMP_THRESHOLD):
+                                TEMP_THRESHOLD):
             _status = 'holding at target'
         else:
             _status = 'ramping'

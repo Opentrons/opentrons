@@ -238,7 +238,9 @@ class Thermocycler(mod_abc.AbstractModule):
         return {
             'status': self.status,
             'data': {
-                'lid': self._driver.lid_status,
+                'lid': self.lid_status,
+                'lidTarget': self.lid_target,
+                'lidTemp': self.lid_temp,
                 'currentTemp': self.temperature,
                 'targetTemp': self.target,
                 'holdTime': self.hold_time,
