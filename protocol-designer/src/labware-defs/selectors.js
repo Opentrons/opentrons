@@ -4,13 +4,13 @@ import { getLabware } from '@opentrons/shared-data'
 import { _getSharedLabware, getAllDefinitions } from './utils'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BaseState, Selector } from '../types'
-import type { LabwareDefById } from './types'
+import type { DefsByLabwareId } from './types'
 import type { RootState } from './reducers'
 
 export const rootSelector = (state: BaseState): RootState => state.labwareDefs
 
 const _getLabwareDef = (
-  customDefs: LabwareDefById,
+  customDefs: DefsByLabwareId,
   otId: string
 ): any | LabwareDefinition2 => {
   const customDef = customDefs[otId]
@@ -25,7 +25,7 @@ const _getLabwareDef = (
   )
 }
 
-export const getLabwareDefsById: Selector<LabwareDefById> = createSelector(
+export const getLabwareDefsById: Selector<DefsByLabwareId> = createSelector(
   state => rootSelector(state).customDefs,
   customDefs => {
     const allCustomIds = Object.keys(customDefs)

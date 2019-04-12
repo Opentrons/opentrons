@@ -22,7 +22,7 @@ import type {
 import { consolidate, distribute, transfer, mix } from '../step-generation'
 
 import type { StepIdType } from '../form-types'
-import type { LabwareDefById } from '../labware-defs'
+import type { DefsByLabwareId } from '../labware-defs'
 import type { RobotState } from '../step-generation'
 
 import type {
@@ -40,7 +40,7 @@ export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 function transferLikeSubsteps(args: {
   stepArgs: ConsolidateArgs | DistributeArgs | TransferArgs | MixArgs,
   allPipetteData: AllPipetteData,
-  labwareDefsById: LabwareDefById,
+  labwareDefsById: DefsByLabwareId,
   robotState: RobotState,
   stepId: StepIdType,
 }): ?SourceDestSubstepItem {
@@ -257,7 +257,7 @@ function transferLikeSubsteps(args: {
 export function generateSubsteps(
   stepArgsAndErrors: ?StepArgsAndErrors,
   allPipetteData: AllPipetteData,
-  labwareDefsById: LabwareDefById,
+  labwareDefsById: DefsByLabwareId,
   robotState: ?RobotState,
   stepId: string
 ): ?SubstepItemData {

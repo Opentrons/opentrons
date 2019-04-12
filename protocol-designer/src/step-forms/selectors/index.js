@@ -21,7 +21,7 @@ import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
 import { addSpecsToPipetteInvariantProps } from '../utils'
 import {
   selectors as labwareDefSelectors,
-  type LabwareDefById,
+  type DefsByLabwareId,
 } from '../../labware-defs'
 
 import type { FormWarning } from '../../steplist/formLevel'
@@ -91,7 +91,7 @@ const V1_NAME_TO_V2_OTID = {
 }
 
 // TODO: Ian 2019-04-10 SHIM REMOVAL #3335
-export const getLabwareDefByLabwareId: Selector<LabwareDefById> = createSelector(
+export const getLabwareDefByLabwareId: Selector<DefsByLabwareId> = createSelector(
   labwareDefSelectors.getLabwareDefsById,
   getLabwareEntities,
   (defs, labwareEntities) =>
