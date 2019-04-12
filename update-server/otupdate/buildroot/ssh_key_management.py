@@ -70,7 +70,7 @@ def remove_by_hash(hashval: str):
     """
     key_details = get_keys()
     with authorized_keys('w') as ak:
-        for keyhash, key in key_details():
+        for keyhash, key in key_details:
             if keyhash != hashval:
                 ak.write(f'{key}\n')
                 break
