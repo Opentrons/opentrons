@@ -1,12 +1,11 @@
 import { getLabwareLiquidState } from '../selectors'
-
 jest.mock('../../labware-defs/utils')
 
 let labwareDefsByLabwareId
 let ingredLocs
 
 beforeEach(() => {
-  // TODO IMMEDIATELY: use fixtures, not real defs
+  // TODO Ian 2019-04-12: create representative fixtures, don't use real defs
   labwareDefsByLabwareId = {
     FIXED_TRASH_ID: require('@opentrons/shared-data/definitions2/opentrons_1_trash_1.1_l.json'),
     wellPlateId: require('@opentrons/shared-data/definitions2/generic_96_wellplate_380_ul.json'),

@@ -1,8 +1,8 @@
 // @flow
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-
-// TODO: Ian 2019-04-11 getAllDefinitions is duplicated from from labware-library,
-// should move to shared-data (here, and in labware-library/src/definitions.js !)
+import type { LabwareDefById } from './types'
+// TODO: Ian 2019-04-11 getAllDefinitions also exists (differently) in labware-library,
+// should reconcile differences & make a general util fn imported from shared-data
 
 // require all definitions in the definitions2 directory
 // $FlowFixMe: require.context is webpack-specific method
@@ -15,20 +15,21 @@ const definitionsContext = require.context(
 
 let definitions = null
 
-export function getAllDefinitions(): Array<LabwareDefinition2> {
-  // TODO Ian 2019-04-11: unlike labware-library, no filter here
+export function getAllDefinitions(): LabwareDefById {
+  // NOTE: unlike labware-library, no filtering out trashes here (we need 'em)
+  // also, more convenient & performant to make a map {otId: def} not an array
   if (!definitions) {
-    definitions = definitionsContext
-      .keys()
-      .map(name => definitionsContext(name))
+    definitions = definitionsContext.keys().reduce((acc, filename) => {
+      const def = definitionsContext(filename)
+      return { ...acc, [def.otId]: def }
+    }, {})
   }
 
   return definitions
 }
 
-// TODO IMMEDIATELY / NOTE: this is different than labware library,
-// we wanna get by otId not loadName... right?
+// NOTE: this is different than labware library,
+// in PD we wanna get always by otId never by loadName
 export function _getSharedLabware(otId: string): ?LabwareDefinition2 {
-  const def = getAllDefinitions().find(d => d.otId === otId)
-  return def || null
+  return getAllDefinitions()[otId] || null
 }

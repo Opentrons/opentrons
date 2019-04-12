@@ -20,17 +20,10 @@ const _getLabwareDef = (
   // TODO: Ian 2019-04-10 SHIM REMOVAL #3335
   const legacyV1Labware = getLabware(otId)
   if (legacyV1Labware) return legacyV1Labware
-  // TODO IMMEDIATELY would it be super painful to make this return null here instead,
-  // and have this fn return a Maybe?
   throw Error(
     `No labware definition in PD session's custom labware or builtin shared-data defs for otId "{otId}"`
   )
 }
-
-const sharedDefsById = getAllDefinitions().reduce(
-  (acc, d) => ({ ...acc, [d.otId]: d }),
-  {}
-)
 
 export const getLabwareDefsById: Selector<LabwareDefById> = createSelector(
   state => rootSelector(state).customDefs,
@@ -44,6 +37,6 @@ export const getLabwareDefsById: Selector<LabwareDefById> = createSelector(
       {}
     )
 
-    return { ...sharedDefsById, ...customDefsById }
+    return { ...getAllDefinitions(), ...customDefsById }
   }
 )

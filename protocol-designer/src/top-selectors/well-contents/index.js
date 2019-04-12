@@ -92,11 +92,7 @@ export const getAllWellContentsForSteps: Selector<
         (
           labwareLiquids: StepGeneration.SingleLabwareLiquidState,
           labwareId: string
-        ) => {
-          const labwareDef = defs[labwareId]
-
-          return _wellContentsForLabware(labwareLiquids, labwareId, labwareDef)
-        }
+        ) => _wellContentsForLabware(labwareLiquids, labwareId, defs[labwareId])
       )
     })
   }
