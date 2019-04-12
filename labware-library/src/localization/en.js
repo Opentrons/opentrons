@@ -1,0 +1,78 @@
+// @flow
+// english localizations
+
+export const CATEGORY_LABELS_BY_CATEGORY = {
+  all: 'All',
+  tubeRack: 'Tube Racks',
+  tipRack: 'Tip Racks',
+  wellPlate: 'Well Plates',
+  trough: 'Troughs',
+  trash: 'Trashes',
+  other: 'Other',
+}
+
+export const NUM_WELLS_LONG_BY_CATEGORY = {
+  tubeRack: 'number of tubes',
+  tipRack: 'number of tips',
+  wellPlate: 'number of wells',
+  trough: 'number of wells',
+  trash: 'number of wells',
+  other: 'number of wells',
+}
+
+export const NUM_WELLS_SHORT_BY_CATEGORY = {
+  tubeRack: 'no. of tubes',
+  tipRack: 'no. of tips',
+  wellPlate: 'no. of wells',
+  trough: 'no. of wells',
+  trash: 'no. of wells',
+  other: 'no. of wells',
+}
+
+export const WELL_TYPE_BY_CATEGORY = {
+  tubeRack: 'tubes',
+  tipRack: 'tips',
+  wellPlate: 'wells',
+  trough: 'wells',
+  trash: 'wells',
+  other: 'wells',
+}
+
+// TODO(mc, 2019-03-18): i18n
+export const LABWARE_DIMS_BY_CATEGORY = {
+  tubeRack: 'rack dimensions',
+  tipRack: 'rack dimensions',
+  wellPlate: 'plate dimensions',
+  trough: 'trough dimensions',
+  trash: 'trash dimensions',
+  other: 'labware dimensions',
+}
+
+// TODO(mc, 2019-03-18): i18n
+export const WELL_DIMS_BY_CATEGORY = {
+  tubeRack: 'tube dimensions',
+  tipRack: 'tip dimensions',
+  wellPlate: 'well dimensions',
+  trough: 'well dimensions',
+  trash: 'well dimensions',
+  other: 'well dimensions',
+}
+
+export const MANUFACTURER_LABELS_BY_MANUFACTURER = {
+  all: 'All',
+  generic: 'Generic',
+}
+
+export const MANUFACTURER = 'manufacturer'
+export const CATEGORY = 'category'
+export const LABWARE = 'labware'
+export const SPACING = 'spacing'
+export const MM = 'mm'
+export const SHORT_X_DIM = 'l'
+export const SHORT_Y_DIM = 'w'
+export const SHORT_Z_DIM = 'h'
+export const X_DIM = 'length'
+export const Y_DIM = 'width'
+export const DIAMETER = 'diameter'
+export const DEPTH = 'depth'
+export const MAX_VOLUME = 'max volume'

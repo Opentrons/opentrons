@@ -1,0 +1,50 @@
+@import '@opentrons/components';
+@import '../../styles/spacing.css';
+
+.label_text {
+  flex: none;
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-title);
+  text-transform: uppercase;
+  color: var(--c-font-icon);
+
+  &.top {
+    margin-bottom: var(--spacing-2);
+  }
+
+  &.left {
+    margin-right: var(--spacing-3);
+  }
+}
+
+.value {
+  @apply --font-body-2-dark;
+
+  line-height: var(--lh-title);
+}
+
+.table_entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: var(--spacing-2) 0;
+  width: 100%;
+}
+
+.table {
+  width: 100%;
+  padding: 0 var(--spacing-2);
+  background-color: var(--c-lightest-gray);
+
+  &.row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    & > .table_entry {
+      width: auto;
+    }
+  }
+}

@@ -7,19 +7,9 @@ import cx from 'classnames'
 import { getAllCategories, buildFiltersUrl } from '../../filters'
 import styles from './styles.css'
 
-import type { FilterParams } from '../../types'
+import { CATEGORY_LABELS_BY_CATEGORY } from '../../localization'
 
-// TODO(mc, 2019-03-18): i18n, duplicated in
-//   labware-library/src/components/LabwareList/LabwareCard.js
-const EN_CATEGORY_LABELS = {
-  all: 'All',
-  tubeRack: 'Tube Rack',
-  tipRack: 'Tip Rack',
-  wellPlate: 'Well Plate',
-  trough: 'Trough',
-  trash: 'Trash',
-  other: 'Other',
-}
+import type { FilterParams } from '../../types'
 
 export type FilterCategoryProps = {
   filters: FilterParams,
@@ -39,7 +29,7 @@ export default function FilterCategory(props: FilterCategoryProps) {
               [styles.selected]: c === filters.category,
             })}
           >
-            {EN_CATEGORY_LABELS[c]}
+            {CATEGORY_LABELS_BY_CATEGORY[c]}
           </Link>
         </li>
       ))}
