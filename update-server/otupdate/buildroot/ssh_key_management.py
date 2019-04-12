@@ -6,6 +6,7 @@ import functools
 import hashlib
 import ipaddress
 import logging
+import os
 from typing import List, Tuple
 
 from aiohttp import web
@@ -50,7 +51,11 @@ def authorized_keys(mode='r'):
 
     :param mode: As :py:meth:`open`
     """
-    with open('/var/home/.ssh/authorized_keys', mode) as ak:
+    path = '/var/home/.ssh/authorized_keys'
+    if not os.path.exists(path):
+        os.makedirs(os.path.dirname(path))
+        open(path, 'w').close()
+    with open(path, mode) as ak:
         yield ak
 
 
