@@ -73,14 +73,34 @@ export const getWellSetForMultichannelDeprecated = memoize(
  * eg ['A1', 'C1', 'D1', 'E1', 'G1', 'I1', 'K1', 'M1'] is a well set in a 384 plate.
  **/
 // TODO IMMEDIATELY - break out and memoize
-const _getAllWellSetsForLabwareMemoized = (
+function _getAllWellSetsForLabware(
   labwareDef: LabwareDefinition2
-): WellSetByWell => {
+): WellSetByWell {
   const allWells: Array<string> = Object.keys(labwareDef.wells)
   return allWells.reduce((acc: WellSetByWell, well: string): WellSetByWell => {
     const wellSet = computeWellAccess(labwareDef, well)
     return wellSet === null ? acc : [...acc, wellSet]
   }, [])
+}
+
+let cache: {
+  [otId: string]: ?{
+    labwareDef: LabwareDefinition2,
+    wellSetByWell: WellSetByWell,
+  },
+} = {}
+const _getAllWellSetsForLabwareMemoized = (
+  labwareDef: LabwareDefinition2
+): WellSetByWell => {
+  const c = cache[labwareDef.otId]
+  // use cached version only if labwareDef is shallowly equal, in case
+  // custom labware defs are changed without giving them a new otId
+  if (c && c.labwareDef === labwareDef) {
+    return c.wellSetByWell
+  }
+  const wellSetByWell = _getAllWellSetsForLabware(labwareDef)
+  cache[labwareDef.otId] = { labwareDef, wellSetByWell }
+  return wellSetByWell
 }
 
 export function getWellSetForMultichannel(
