@@ -11,8 +11,8 @@ import getDefaultsForStepType from '../getDefaultsForStepType'
 import type { FormData, StepFieldName } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
 import type {
-  LabwareEntities,
-  PipetteEntities,
+  HydratedLabwareEntities,
+  HydratedPipetteEntities,
 } from '../../../step-forms/types'
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
@@ -22,8 +22,8 @@ const getDefaultFields = (...fields: Array<StepFieldName>): FormPatch =>
 const updatePatchOnLabwareChange = (
   patch: FormPatch,
   rawForm: FormData,
-  labwareEntities: LabwareEntities,
-  pipetteEntities: PipetteEntities
+  labwareEntities: HydratedLabwareEntities,
+  pipetteEntities: HydratedPipetteEntities
 ): FormPatch => {
   const labwareChanged = fieldHasChanged(rawForm, patch, 'labware')
 
@@ -49,8 +49,8 @@ const updatePatchOnLabwareChange = (
 const updatePatchOnPipetteChannelChange = (
   patch: FormPatch,
   rawForm: FormData,
-  labwareEntities: LabwareEntities,
-  pipetteEntities: PipetteEntities
+  labwareEntities: HydratedLabwareEntities,
+  pipetteEntities: HydratedPipetteEntities
 ) => {
   if (patch.pipette === undefined) return patch
   let update = {}
@@ -79,11 +79,10 @@ const updatePatchOnPipetteChannelChange = (
   } else if (multiToSingle) {
     // multi-channel to single-channel: convert primary wells to all wells
     const labwareId = appliedPatch.labware
-    const labwareType =
-      labwareId && labwareEntities[labwareId] && labwareEntities[labwareId].type
+    const labwareDef = labwareEntities[labwareId].def
 
     update = {
-      wells: getAllWellsFromPrimaryWells(appliedPatch.wells, labwareType),
+      wells: getAllWellsFromPrimaryWells(appliedPatch.wells, labwareDef),
     }
   }
   return { ...patch, ...update }
@@ -92,7 +91,7 @@ const updatePatchOnPipetteChannelChange = (
 const updatePatchOnPipetteChange = (
   patch: FormPatch,
   rawForm: FormData,
-  pipetteEntities: PipetteEntities
+  pipetteEntities: HydratedPipetteEntities
 ) => {
   // when pipette ID is changed (to another ID, or to null),
   // set any flow rates to null
@@ -109,8 +108,8 @@ const updatePatchOnPipetteChange = (
 export default function dependentFieldsUpdateMix(
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
-  pipetteEntities: PipetteEntities,
-  labwareEntities: LabwareEntities
+  pipetteEntities: HydratedPipetteEntities,
+  labwareEntities: HydratedLabwareEntities
 ): FormPatch {
   // sequentially modify parts of the patch until it's fully updated
   return chainPatchUpdaters(originalPatch, [

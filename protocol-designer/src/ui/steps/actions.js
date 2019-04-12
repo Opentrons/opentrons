@@ -127,8 +127,8 @@ export const selectStep = (
     const updatedFields = handleFormChange(
       { pipette: defaultPipetteId },
       formData,
-      stepFormSelectors.getPipetteEntities(state),
-      stepFormSelectors.getLabwareEntities(state)
+      stepFormSelectors.getHydratedPipetteEntities(state),
+      stepFormSelectors.getHydratedLabwareEntities(state)
     )
 
     formData = {

@@ -111,7 +111,7 @@ const mapSTP = (state: BaseState): SP => {
   return {
     maxDisposalVolume: getMaxDisposalVolumeForMultidispense(
       rawForm,
-      stepFormSelectors.getPipetteEntities(state)
+      stepFormSelectors.getHydratedPipetteEntities(state)
     ),
     disposalDestinationOptions: getBlowoutLocationOptionsForForm(
       uiLabwareSelectors.getDisposalLabwareOptions(state),

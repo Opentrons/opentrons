@@ -6,7 +6,7 @@ import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getWellRatio } from '../../../../steplist/utils'
 import { volumeInCapacityForMulti } from '../../../../steplist/formLevel/handleFormChange/utils'
 import type { ElementProps } from 'react'
-import type { PipetteEntities } from '../../../../step-forms'
+import type { HydratedPipetteEntities } from '../../../../step-forms'
 import type { FormData, PathOption } from '../../../../form-types'
 import type { BaseState } from '../../../../types'
 
@@ -15,7 +15,7 @@ type SP = { disabledPathMap: $PropertyType<Props, 'disabledPathMap'> }
 
 function getDisabledPathMap(
   rawForm: ?FormData,
-  pipetteEntities: PipetteEntities
+  pipetteEntities: HydratedPipetteEntities
 ): ?{ [PathOption]: string } {
   if (!rawForm || !rawForm.pipette) return null
 
@@ -90,7 +90,7 @@ function getDisabledPathMap(
 
 function mapSTP(state: BaseState): SP {
   const rawForm = stepFormSelectors.getUnsavedForm(state)
-  const pipetteEntities = stepFormSelectors.getPipetteEntities(state)
+  const pipetteEntities = stepFormSelectors.getHydratedPipetteEntities(state)
   const disabledPathMap = getDisabledPathMap(rawForm, pipetteEntities)
   return {
     disabledPathMap,

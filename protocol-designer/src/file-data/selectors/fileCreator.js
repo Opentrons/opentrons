@@ -57,7 +57,7 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
   ingredSelectors.getLiquidsByLabwareId,
   stepFormSelectors.getSavedStepForms,
   stepFormSelectors.getOrderedStepIds,
-  stepFormSelectors.getPipetteEntities,
+  stepFormSelectors.getHydratedPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
   (
     fileMetadata,

@@ -1,5 +1,4 @@
 // @flow
-import { getLabware } from '@opentrons/shared-data'
 import {
   requiredField,
   minimumWellCount,
@@ -21,25 +20,14 @@ import type { StepFormContextualState } from '../types'
 
 export type { StepFieldName }
 
+// TODO IMMEDIATELY rename getLabwareFromId or something
 const hydrateLabware = (state: StepFormContextualState, id: string) => {
-  const labware = state.labware[id]
-  return (
-    labware && {
-      ...getLabware(labware.type),
-      ...labware,
-      id,
-    }
-  )
+  return state.labware[id]
 }
+
+// TODO IMMEDIATELY rename getPipetteFromId or something
 const hydratePipette = (state: StepFormContextualState, id: string) => {
-  const pipette = state.pipettes[id]
-  return (
-    pipette && {
-      ...pipette.spec, // TODO: Ian 2018-12-20 don't spread this
-      ...pipette,
-      id,
-    }
-  )
+  return state.pipettes[id]
 }
 
 type StepFieldHelpers = {|

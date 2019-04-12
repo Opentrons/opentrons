@@ -6,7 +6,10 @@ import type {
   StepFieldName,
   StepType,
 } from '../form-types'
-import type { LabwareEntities, PipetteEntities } from '../step-forms'
+import type {
+  HydratedLabwareEntities,
+  HydratedPipetteEntities,
+} from '../step-forms'
 import type { FormError } from './formLevel/errors'
 
 // timeline start and end
@@ -113,6 +116,6 @@ export type StepArgsAndErrors = {
 }
 
 export type StepFormContextualState = {
-  labware: LabwareEntities,
-  pipettes: PipetteEntities,
+  labware: HydratedLabwareEntities,
+  pipettes: HydratedPipetteEntities,
 }

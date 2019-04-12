@@ -72,7 +72,6 @@ export const getWellSetForMultichannelDeprecated = memoize(
  * A well set is array of 8 wells that an 8 channel pipettes can fit into,
  * eg ['A1', 'C1', 'D1', 'E1', 'G1', 'I1', 'K1', 'M1'] is a well set in a 384 plate.
  **/
-// TODO IMMEDIATELY - break out and memoize
 function _getAllWellSetsForLabware(
   labwareDef: LabwareDefinition2
 ): WellSetByWell {

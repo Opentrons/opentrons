@@ -1,6 +1,9 @@
 // @flow
 import type { DeckSlot, Mount } from '@opentrons/components'
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  PipetteNameSpecs,
+} from '@opentrons/shared-data'
 
 export type InitialDeckSetup = {
   labware: {
@@ -28,20 +31,43 @@ export type FormPipettesByMount = {
 }
 
 // "entities" have only properties that are time-invariant
+// when they are "hydrated" aka denormalized, definitions are baked in instead of being keyed by id
+// TODO IMMEDIATELY: call "hydrated" just entity. NormalizedPipetteEntity/NormalizedLabwareEntity is what redux store should use, all selectors should use the "full" (unqualified) ones
+// =========== PIPETTES ========
 
 export type PipetteEntities = {
   [pipetteId: string]: {|
     name: string,
-    tiprackModel: string,
-    spec: PipetteNameSpecs,
+    tiprackModel: string, // TODO: Ian 2019-04-12 change to `tiprackOtId`
   |},
 }
 export type PipetteEntity = $Values<PipetteEntities>
 
+export type HydratedPipetteEntity = {|
+  name: string,
+  tiprackModel: string, // TODO: Ian 2019-04-12 change to `tiprackOtId`
+  // TODO: Ian 2019-04-12 add `tiprackLabwareDef`
+  spec: PipetteNameSpecs,
+|}
+
+export type HydratedPipetteEntities = {
+  [pipetteId: string]: HydratedPipetteEntity,
+}
+
+// =========== LABWARE ========
+
 export type LabwareEntities = {
   [labwareId: string]: {|
-    type: string,
+    type: string, // TODO: Ian 2019-04-12 change to `otId`
   |},
 }
 
 export type LabwareEntity = $Values<LabwareEntities>
+
+export type HydratedLabwareEntity = {|
+  type: string, // TODO: Ian 2019-04-12 change to `otId`
+  def: LabwareDefinition2,
+|}
+export type HydratedLabwareEntities = {
+  [labwareId: string]: HydratedLabwareEntity,
+}

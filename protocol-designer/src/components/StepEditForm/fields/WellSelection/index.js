@@ -40,7 +40,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
     : false
 
   const pipette =
-    pipetteId && stepFormSelectors.getPipetteEntities(state)[pipetteId]
+    pipetteId && stepFormSelectors.getHydratedPipetteEntities(state)[pipetteId]
   const isMulti = pipette ? pipette.spec.channels > 1 : false
 
   return {

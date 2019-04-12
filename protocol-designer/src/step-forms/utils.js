@@ -3,8 +3,11 @@ import assert from 'assert'
 import reduce from 'lodash/reduce'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/components'
-import type { PipetteInvariantState } from './reducers'
-import type { PipetteEntity, PipetteEntities } from './types'
+import type {
+  PipetteEntity,
+  PipetteEntities,
+  HydratedPipetteEntities,
+} from './types'
 
 // for backwards compatibility, strip version suffix (_v1, _v1.3 etc)
 // from model string, if it exists
@@ -48,23 +51,22 @@ export function getLabwareIdInSlot(
   return labwareIdsForSourceSlot[0]
 }
 
-// helper to add the 'spec' key to pipette entities safely
-export function addSpecsToPipetteInvariantProps(
-  pipetteInvariantProperties: PipetteInvariantState
-): PipetteEntities {
+export function hydratePipetteEntities(
+  pipetteInvariantProperties: PipetteEntities
+): HydratedPipetteEntities {
   return reduce(
     pipetteInvariantProperties,
     (
-      acc: PipetteEntities,
+      acc: HydratedPipetteEntities,
       pipette: PipetteEntity,
       id: string
-    ): PipetteEntities => {
+    ): HydratedPipetteEntities => {
       const spec = getPipetteNameSpecs(pipette.name)
       assert(
         spec,
         `no pipette spec for pipette id "${id}", name "${pipette.name}"`
       )
-      return spec ? { ...acc, [id]: { ...pipette, spec } } : acc
+      return { ...acc, [id]: { ...pipette, spec } }
     },
     {}
   )

@@ -143,7 +143,7 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
 
   const pipette =
     pipetteId != null
-      ? stepFormSelectors.getPipetteEntities(state)[pipetteId]
+      ? stepFormSelectors.getHydratedPipetteEntities(state)[pipetteId]
       : null
 
   return {

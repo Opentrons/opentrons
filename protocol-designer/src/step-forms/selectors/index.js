@@ -18,7 +18,7 @@ import {
   stepFormToArgs,
 } from '../../steplist/formLevel'
 import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
-import { addSpecsToPipetteInvariantProps } from '../utils'
+import { hydratePipetteEntities } from '../utils'
 import {
   selectors as labwareDefSelectors,
   type DefsByLabwareId,
@@ -39,7 +39,9 @@ import type {
   LabwareEntities,
   LabwareEntity,
   LabwareOnDeck,
-  PipetteEntities,
+  HydratedLabwareEntity,
+  HydratedLabwareEntities,
+  HydratedPipetteEntities,
   PipetteOnDeck,
   FormPipettesByMount,
 } from '../types'
@@ -109,10 +111,23 @@ export const getLabwareDefByLabwareId: Selector<DefsByLabwareId> = createSelecto
     })
 )
 
-export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
+export const getHydratedLabwareEntities: Selector<HydratedLabwareEntities> = createSelector(
+  getLabwareEntities,
+  getLabwareDefByLabwareId,
+  (labwareEntities, labwareDefByLabwareId) =>
+    mapValues(
+      labwareEntities,
+      (l: LabwareEntity, labwareId): HydratedLabwareEntity => ({
+        ...l,
+        def: labwareDefByLabwareId[labwareId],
+      })
+    )
+)
+
+export const getHydratedPipetteEntities: Selector<HydratedPipetteEntities> = createSelector(
   state => rootSelector(state).pipetteInvariantProperties,
   pipetteInvariantProperties =>
-    addSpecsToPipetteInvariantProps(pipetteInvariantProperties)
+    hydratePipetteEntities(pipetteInvariantProperties)
 )
 
 export const getInitialDeckSetupStepForm = (state: BaseState) =>
@@ -121,7 +136,7 @@ export const getInitialDeckSetupStepForm = (state: BaseState) =>
 export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   getInitialDeckSetupStepForm,
   getLabwareEntities,
-  getPipetteEntities,
+  getHydratedPipetteEntities,
   (
     initialSetupStep,
     labwareInvariantProperties,
@@ -321,8 +336,8 @@ const _getFormAndFieldErrorsFromHydratedForm = (
 }
 
 export const getHydrationContext: Selector<StepFormContextualState> = createSelector(
-  getLabwareEntities,
-  getPipetteEntities,
+  getHydratedLabwareEntities,
+  getHydratedPipetteEntities,
   (labware, pipettes) => ({ labware, pipettes })
 )
 

@@ -4,11 +4,17 @@ import round from 'lodash/round'
 import uniq from 'lodash/uniq'
 import { canPipetteUseLabware, getLabware } from '@opentrons/shared-data'
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
-import { getWellSetForMultichannelDeprecated } from '../../../well-selection/utils'
-import type { PipetteChannels } from '@opentrons/shared-data'
+import { getWellSetForMultichannel } from '../../../well-selection/utils'
+import type {
+  LabwareDefinition2,
+  PipetteChannels,
+} from '@opentrons/shared-data'
 import type { FormPatch } from '../../actions/types'
 import type { FormData, StepFieldName } from '../../../form-types'
-import type { LabwareEntities, PipetteEntities } from '../../../step-forms'
+import type {
+  HydratedLabwareEntities,
+  HydratedPipetteEntities,
+} from '../../../step-forms'
 
 export function chainPatchUpdaters(
   initialPatch: FormPatch,
@@ -22,18 +28,18 @@ export function chainPatchUpdaters(
 // given an array of primary wells (for a multichannel), return all unique wells
 // included in that set. Used to convert multi to single.
 export function getAllWellsFromPrimaryWells(
-  primaryWells: ?Array<string>,
-  labwareType: ?string
+  primaryWells: Array<string>,
+  labwareDef: LabwareDefinition2
 ): Array<string> {
-  if (!labwareType || !primaryWells) {
-    return []
-  }
-
-  const _labwareType = labwareType // TODO Ian 2018-05-04 remove this weird flow workaround
-
   const allWells = primaryWells.reduce((acc: Array<string>, well: string) => {
-    const nextWellSet = getWellSetForMultichannelDeprecated(_labwareType, well)
+    const nextWellSet = getWellSetForMultichannel(labwareDef, well)
     // filter out any nulls (but you shouldn't get any)
+    if (!nextWellSet) {
+      console.warn(`got empty well set, something weird may be happening`, {
+        primaryWells,
+        labwareDef,
+      })
+    }
     return nextWellSet ? [...acc, ...nextWellSet] : acc
   }, [])
 
@@ -43,7 +49,7 @@ export function getAllWellsFromPrimaryWells(
 
 export function getChannels(
   pipetteId: string,
-  pipetteEntities: PipetteEntities
+  pipetteEntities: HydratedPipetteEntities
 ): ?PipetteChannels {
   const pipette: ?* = pipetteEntities[pipetteId]
   if (!pipette) {
@@ -56,7 +62,7 @@ export const DISPOSAL_VOL_DIGITS = 1
 
 export function getMaxDisposalVolumeForMultidispense(
   rawForm: ?FormData,
-  pipetteEntities: PipetteEntities
+  pipetteEntities: HydratedPipetteEntities
 ): ?number {
   // calculate max disposal volume for given volume & pipette. Might be negative!
   if (!rawForm) return null
@@ -77,7 +83,7 @@ export function getMaxDisposalVolumeForMultidispense(
 // is responsibility of dependentFieldsUpdateMoveLiquid's clamp fn
 export function volumeInCapacityForMulti(
   rawForm: FormData,
-  pipetteEntities: PipetteEntities
+  pipetteEntities: HydratedPipetteEntities
 ): boolean {
   const volume = Number(rawForm.volume)
   assert(
@@ -95,8 +101,8 @@ export function volumeInCapacityForMulti(
 type GetDefaultWellsArgs = {
   labwareId: ?string,
   pipetteId: ?string,
-  labwareEntities: LabwareEntities,
-  pipetteEntities: PipetteEntities,
+  labwareEntities: HydratedLabwareEntities,
+  pipetteEntities: HydratedPipetteEntities,
 }
 export function getDefaultWells(args: GetDefaultWellsArgs): Array<string> {
   const { labwareId, pipetteId, labwareEntities, pipetteEntities } = args
