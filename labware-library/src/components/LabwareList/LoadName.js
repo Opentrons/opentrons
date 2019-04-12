@@ -3,6 +3,7 @@
 import * as React from 'react'
 
 import { IconButton, Tooltip } from '@opentrons/components'
+import { LabelText, LABEL_TOP } from '../ui'
 import styles from './styles.css'
 
 // TODO(mc, 2019-03-29): i18n
@@ -65,7 +66,7 @@ class LoadName extends React.Component<LoadNameProps, LoadNameState> {
     return (
       <div className={styles.load_name}>
         <label className={styles.load_name_label} onCopy={this.handleCopy}>
-          <p className={styles.top_label}>{EN_API_NAME}</p>
+          <LabelText position={LABEL_TOP}>{EN_API_NAME}</LabelText>
           <input
             ref={this.inputRef}
             className={styles.load_name_input}

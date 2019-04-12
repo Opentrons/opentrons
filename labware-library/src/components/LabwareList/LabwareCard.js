@@ -16,53 +16,38 @@ import LoadName from './LoadName'
 import Tags from './Tags'
 import styles from './styles.css'
 
+import {
+  Table,
+  TableEntry,
+  LabelText,
+  Value,
+  TABLE_ROW,
+  TABLE_COLUMN,
+  LABEL_TOP,
+  LABEL_LEFT,
+} from '../ui'
+
+import {
+  CATEGORY_LABELS_BY_CATEGORY,
+  NUM_WELLS_SHORT_BY_CATEGORY,
+  LABWARE_DIMS_BY_CATEGORY,
+  WELL_DIMS_BY_CATEGORY,
+  MM,
+  SHORT_X_DIM,
+  SHORT_Y_DIM,
+  SHORT_Z_DIM,
+  X_DIM,
+  Y_DIM,
+  DIAMETER,
+  DEPTH,
+  MAX_VOLUME,
+} from '../../localization'
+
 import type {
   LabwareDefinition,
   LabwareWellProperties,
   LabwareWellMap,
 } from '../../types'
-
-// TODO(mc, 2019-03-18): i18n
-const EN_PLATE_DIMS = 'plate dimensions'
-const EN_MM = 'mm'
-const EN_SHORT_LENGTH = 'l'
-const EN_SHORT_WIDTH = 'w'
-const EN_SHORT_HEIGHT = 'h'
-const EN_LENGTH = 'length'
-const EN_WIDTH = 'width'
-const EN_DIAMETER = 'diameter'
-const EN_DEPTH = 'depth'
-const EN_MAX_VOLUME = 'max volume'
-
-// TODO(mc, 2019-03-18): i18n
-const EN_NUM_WELLS_BY_CATEGORY = {
-  tubeRack: 'no. of tubes',
-  tipRack: 'no. of tips',
-  wellPlate: 'no. of wells',
-  trough: 'no. of wells',
-  trash: 'no. of wells',
-  other: 'no. of wells',
-}
-
-// TODO(mc, 2019-03-18): i18n
-const EN_WELL_DIMS_BY_CATEGORY = {
-  tubeRack: 'tube dimensions',
-  tipRack: 'tip dimensions',
-  wellPlate: 'well dimensions',
-  trough: 'well dimensions',
-  trash: 'well dimensions',
-  other: 'well dimensions',
-}
-
-// TODO(mc, 2019-03-18): i18n
-const EN_CATEGORY_LABELS = {
-  tubeRack: 'Tube Rack',
-  tipRack: 'Tip Rack',
-  wellPlate: 'Well Plate',
-  trough: 'Trough',
-  trash: 'Trash',
-  other: 'Other',
-}
 
 // safe toFixed
 const toFixed = (n: number, d: number): string => round(n, d).toFixed(d)
@@ -99,7 +84,7 @@ function TopBar(props: LabwareCardProps) {
     <p className={styles.top_bar}>
       <span>{brand.brand}</span>
       {' | '}
-      <span>{EN_CATEGORY_LABELS[metadata.displayCategory]}</span>
+      <span>{CATEGORY_LABELS_BY_CATEGORY[metadata.displayCategory]}</span>
     </p>
   )
 }
@@ -119,31 +104,31 @@ function Title(props: LabwareCardProps) {
 }
 
 function PlateDimensions(props: LabwareCardProps) {
-  const {
-    overallLength,
-    overallWidth,
-    overallHeight,
-  } = props.definition.dimensions
+  const { definition } = props
+  const { displayCategory } = definition.metadata
+  const { overallLength, overallWidth, overallHeight } = definition.dimensions
 
   const dimensions = [
-    { label: EN_SHORT_LENGTH, value: overallLength },
-    { label: EN_SHORT_WIDTH, value: overallWidth },
-    { label: EN_SHORT_HEIGHT, value: overallHeight },
+    { label: SHORT_X_DIM, value: overallLength },
+    { label: SHORT_Y_DIM, value: overallWidth },
+    { label: SHORT_Z_DIM, value: overallHeight },
   ]
 
   return (
     <div className={styles.dimensions}>
-      <p className={styles.top_label}>
-        {EN_PLATE_DIMS} <span className={styles.units}>({EN_MM})</span>
-      </p>
-      <div className={styles.stats_bar}>
+      <LabelText position={LABEL_TOP}>
+        {LABWARE_DIMS_BY_CATEGORY[displayCategory] ||
+          LABWARE_DIMS_BY_CATEGORY.other}{' '}
+        <span className={styles.units}>({MM})</span>
+      </LabelText>
+      <Table direction={TABLE_ROW}>
         {dimensions.map((d, i) => (
-          <p key={i} className={styles.stats_item}>
-            <span className={styles.left_label}>{d.label}</span>
-            <span className={styles.value}>{toFixed(d.value, 2)}</span>
-          </p>
+          <TableEntry key={i}>
+            <LabelText position={LABEL_LEFT}>{d.label}</LabelText>
+            <Value>{toFixed(d.value, 2)}</Value>
+          </TableEntry>
         ))}
-      </div>
+      </Table>
     </div>
   )
 }
@@ -154,17 +139,16 @@ function Wells(props: LabwareCardProps) {
 
   return (
     <div className={styles.wells}>
-      <p className={styles.top_label}>
-        {`${EN_NUM_WELLS_BY_CATEGORY[displayCategory]}`}
-      </p>
-      <p className={styles.value}>{Object.keys(wells).length}</p>
+      <LabelText position={LABEL_TOP}>
+        {`${NUM_WELLS_SHORT_BY_CATEGORY[displayCategory]}`}
+      </LabelText>
+      <Value>{Object.keys(wells).length}</Value>
     </div>
   )
 }
 
 function WellProperties(props: LabwareCardProps) {
   const { wells, metadata } = props.definition
-  // TODO(mc, 2019-03-21): https://github.com/Opentrons/opentrons/issues/3240
   const { displayCategory, displayVolumeUnits } = metadata
   const wellProps = getUniqueWellProperties(wells)
 
@@ -172,32 +156,35 @@ function WellProperties(props: LabwareCardProps) {
     <div className={styles.wells}>
       {wellProps.map((w, i) => {
         const dims = [
-          { label: EN_DEPTH, value: w.depth },
-          w.diameter != null ? { label: EN_DIAMETER, value: w.diameter } : null,
-          w.length != null ? { label: EN_LENGTH, value: w.length } : null,
-          w.width != null ? { label: EN_WIDTH, value: w.width } : null,
+          { label: DEPTH, value: w.depth },
+          w.diameter != null ? { label: DIAMETER, value: w.diameter } : null,
+          w.length != null ? { label: X_DIM, value: w.length } : null,
+          w.width != null ? { label: Y_DIM, value: w.width } : null,
         ].filter(Boolean)
+        const vol = getDisplayVolume(w.totalLiquidVolume, displayVolumeUnits, 2)
 
         return (
           <div key={i} className={styles.well_group}>
             <div className={styles.well_dimensions}>
-              <p className={styles.top_label}>
-                {EN_WELL_DIMS_BY_CATEGORY[displayCategory]}{' '}
-                <span className={styles.units}>({EN_MM})</span>
-              </p>
-              {dims.map((d, j) => (
-                <div key={j} className={styles.stats_bar}>
-                  <p className={styles.left_label}>{d.label}</p>
-                  <p className={styles.value}>{toFixed(d.value, 2)}</p>
-                </div>
-              ))}
+              <LabelText position={LABEL_TOP}>
+                {WELL_DIMS_BY_CATEGORY[displayCategory] ||
+                  WELL_DIMS_BY_CATEGORY.other}{' '}
+                <span className={styles.units}>({MM})</span>
+              </LabelText>
+              <Table direction={TABLE_COLUMN}>
+                {dims.map((d, j) => (
+                  <TableEntry key={j}>
+                    <LabelText position={LABEL_LEFT}>{d.label}</LabelText>
+                    <Value>{toFixed(d.value, 2)}</Value>
+                  </TableEntry>
+                ))}
+              </Table>
             </div>
             <div className={styles.well_volume}>
-              <p className={styles.top_label}>{EN_MAX_VOLUME}</p>
-              <p className={styles.value}>
-                {getDisplayVolume(w.totalLiquidVolume, displayVolumeUnits, 2)}{' '}
-                {displayVolumeUnits}
-              </p>
+              <LabelText position={LABEL_TOP}>{MAX_VOLUME}</LabelText>
+              <Value>
+                {vol} {displayVolumeUnits}
+              </Value>
             </div>
           </div>
         )

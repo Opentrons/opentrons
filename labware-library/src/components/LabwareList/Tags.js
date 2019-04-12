@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 
+import { LabelText, Value, LABEL_LEFT } from '../ui'
 import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
@@ -18,8 +19,8 @@ export default function Tags(props: TagsProps) {
 
   return (
     <div className={styles.tags}>
-      <p className={styles.left_label}>{EN_TAGS}</p>
-      <p className={styles.value}>{tags.join(', ')}</p>
+      <LabelText position={LABEL_LEFT}>{EN_TAGS}</LabelText>
+      <Value>{tags.join(', ')}</Value>
     </div>
   )
 }

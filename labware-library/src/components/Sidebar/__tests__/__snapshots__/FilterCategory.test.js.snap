@@ -23,7 +23,7 @@ exports[`FilterCategory component renders 1`] = `
       className="filter_category_link"
       to="/?category=tubeRack"
     >
-      Tube Rack
+      Tube Racks
     </Link>
   </li>
   <li
@@ -34,7 +34,7 @@ exports[`FilterCategory component renders 1`] = `
       className="filter_category_link"
       to="/?category=wellPlate"
     >
-      Well Plate
+      Well Plates
     </Link>
   </li>
 </ul>

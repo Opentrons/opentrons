@@ -3,6 +3,7 @@
 import * as React from 'react'
 
 import { LabwareGallery, Tags, LoadName } from '../LabwareList'
+import Stats from './Stats'
 import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
@@ -25,12 +26,9 @@ export default function LabwareDetails(props: LabwareDetailsProps) {
         <LoadName loadName={parameters.loadName} />
       </div>
       <div className={styles.details_container}>
-        <Title>{metadata.displayName}</Title>
+        <h2 className={styles.title}>{metadata.displayName}</h2>
+        <Stats definition={definition} />
       </div>
     </>
   )
-}
-
-function Title(props: { children: React.Node }) {
-  return <h2 className={styles.title}>{props.children}</h2>
 }

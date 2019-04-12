@@ -24,6 +24,12 @@
   color: var(--c-blue);
 }
 
+.stats {
+  width: var(--size-50p);
+  min-width: var(--size-3);
+  margin: var(--spacing-5) 0;
+}
+
 @media (--medium) {
   .gallery_container {
     display: inline-block;
