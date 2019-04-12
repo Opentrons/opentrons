@@ -60,7 +60,8 @@ def get_app(
         update_server_version=update_server_version,
         api_server_version=api_server_version,
         smoothie_version=smoothie_version,
-        system_version=system_version
+        system_version=system_version,
+        with_migration=with_migration,
     )
     bootstrap_fn = partial(
         bootstrap_endp.bootstrap_update_server, test_flag=test)
