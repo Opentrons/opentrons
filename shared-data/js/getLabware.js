@@ -2,16 +2,25 @@
 import mapValues from 'lodash/mapValues'
 import definitions from '../build/labware.json'
 import { SLOT_RENDER_HEIGHT, FIXED_TRASH_RENDER_HEIGHT } from './constants'
-import type { LabwareDefinition, WellDefinition } from './types'
+import type {
+  LabwareDefinition,
+  LabwareDefinition2,
+  WellDefinition,
+} from './types'
 
-export default function getLabware(labwareName: string): ?LabwareDefinition {
+export function getLabware(labwareName: string): ?LabwareDefinition {
   const labware: ?LabwareDefinition = definitions[labwareName]
   return labware
 }
 
-export function getIsTiprack(labwareName: string): boolean {
+// TODO: Ian 2019-04-11 DEPRECATED REMOVE
+export function getIsTiprackDeprecated(labwareName: string): boolean {
   const labware = getLabware(labwareName)
   return Boolean(labware && labware.metadata && labware.metadata.isTiprack)
+}
+
+export function getIsTiprack(labwareDef: LabwareDefinition2): boolean {
+  return labwareDef.parameters.isTiprack
 }
 
 /* Render Helpers */
@@ -40,7 +49,7 @@ export function getWellDefsForSVG(labwareName: string) {
   // Most labware defs have a weird offset,
   // but tips are mostly OK.
   // This is a HACK to make the offset less "off"
-  const isTiprack = getIsTiprack(labwareName)
+  const isTiprack = getIsTiprackDeprecated(labwareName)
   let xCorrection = 0
   let yCorrection = 0
   if (!isTiprack) {

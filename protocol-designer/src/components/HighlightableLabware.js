@@ -5,7 +5,7 @@ import map from 'lodash/map'
 import {
   getWellDefsForSVG,
   getLabware,
-  getIsTiprack,
+  getIsTiprackDeprecated,
 } from '@opentrons/shared-data'
 import {
   Labware,
@@ -36,7 +36,7 @@ export default function HighlightableLabware(props: Props) {
   const { wellContents, getTipProps, containerType } = props
 
   const allWellDefsByName = getWellDefsForSVG(containerType)
-  const isTiprack = getIsTiprack(containerType)
+  const isTiprack = getIsTiprackDeprecated(containerType)
   const labwareDefinition = getLabware(containerType)
 
   const tipVolume =

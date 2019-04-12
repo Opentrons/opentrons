@@ -1,6 +1,6 @@
 // @flow
 import range from 'lodash/range'
-import getLabware from '../getLabware'
+import { getLabware } from '../getLabware'
 import { getLabwareHasQuirk } from '.'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 

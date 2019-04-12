@@ -10,6 +10,7 @@ import { labwareToDisplayName } from '../../labware-ingred/utils'
 import { DISPOSAL_LABWARE_TYPES } from '../../constants'
 
 import type { Options } from '@opentrons/components'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { Selector } from '../../types'
 import type { LabwareEntity } from '../../step-forms'
 
@@ -26,13 +27,13 @@ export const getLabwareNicknamesById: Selector<{
 
 /** Returns options for dropdowns, excluding tiprack labware */
 export const getLabwareOptions: Selector<Options> = createSelector(
-  stepFormSelectors.getLabwareTypesById,
+  stepFormSelectors.getLabwareDefByLabwareId,
   getLabwareNicknamesById,
-  (labwareTypesById, nicknamesById) =>
+  (labwareDefsByLabwareId, nicknamesById) =>
     reduce(
-      labwareTypesById,
-      (acc: Options, labwareType: string, labwareId): Options => {
-        return getIsTiprack(labwareType)
+      labwareDefsByLabwareId,
+      (acc: Options, def: LabwareDefinition2, labwareId): Options => {
+        return getIsTiprack(def)
           ? acc
           : [
               ...acc,
