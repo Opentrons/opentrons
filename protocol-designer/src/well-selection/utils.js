@@ -1,7 +1,12 @@
 // @flow
 import flatten from 'lodash/flatten'
 import memoize from 'lodash/memoize'
-import { computeWellAccessDeprecated, getLabware } from '@opentrons/shared-data'
+import {
+  computeWellAccess,
+  computeWellAccessDeprecated,
+  getLabware,
+} from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { Wells } from '../labware-ingred/types'
 
 type WellSetByWell = Array<Array<string>>
@@ -10,7 +15,9 @@ type WellSetByWell = Array<Array<string>>
  * A well set is array of 8 wells that an 8 channel pipettes can fit into,
  * eg ['A1', 'C1', 'D1', 'E1', 'G1', 'I1', 'K1', 'M1'] is a well set in a 384 plate.
  **/
-function _getAllWellSetsForLabware(labwareName: string): ?WellSetByWell {
+function _getAllWellSetsForLabwareDeprecated(
+  labwareName: string
+): ?WellSetByWell {
   const labware = getLabware(labwareName)
 
   if (!labware) {
@@ -36,9 +43,11 @@ function _getAllWellSetsForLabware(labwareName: string): ?WellSetByWell {
  * NOTE: This assumes labware definitions are static. Custom labware must
  * somehow invalidate this cache.
  **/
-const _getAllWellSetsForLabwareMemoized = memoize(_getAllWellSetsForLabware)
+const _getAllWellSetsForLabwareMemoizedDeprecated = memoize(
+  _getAllWellSetsForLabwareDeprecated
+)
 
-function _getWellSetForMultichannel(
+function _getWellSetForMultichannelDeprecated(
   labwareName: string,
   well: string
 ): ?Array<string> {
@@ -46,7 +55,7 @@ function _getWellSetForMultichannel(
    * for 8-channel access.
    * Ie: C2 for 96-flat => ['A2', 'B2', 'C2', ... 'H2']
    **/
-  const allWellSets = _getAllWellSetsForLabwareMemoized(labwareName)
+  const allWellSets = _getAllWellSetsForLabwareMemoizedDeprecated(labwareName)
   if (!allWellSets) {
     return null
   }
@@ -54,10 +63,37 @@ function _getWellSetForMultichannel(
   return allWellSets.find((wellSet: Array<string>) => wellSet.includes(well))
 }
 
-export const getWellSetForMultichannel = memoize(
-  _getWellSetForMultichannel,
+export const getWellSetForMultichannelDeprecated = memoize(
+  _getWellSetForMultichannelDeprecated,
   (labwareName: string, well: string) => `$LABWARE:${labwareName}--WELL:${well}`
 )
+
+/** Compute all well sets for a labware type.
+ * A well set is array of 8 wells that an 8 channel pipettes can fit into,
+ * eg ['A1', 'C1', 'D1', 'E1', 'G1', 'I1', 'K1', 'M1'] is a well set in a 384 plate.
+ **/
+// TODO IMMEDIATELY - break out and memoize
+const _getAllWellSetsForLabwareMemoized = (
+  labwareDef: LabwareDefinition2
+): WellSetByWell => {
+  const allWells: Array<string> = Object.keys(labwareDef.wells)
+  return allWells.reduce((acc: WellSetByWell, well: string): WellSetByWell => {
+    const wellSet = computeWellAccess(labwareDef, well)
+    return wellSet === null ? acc : [...acc, wellSet]
+  }, [])
+}
+
+export function getWellSetForMultichannel(
+  labwareDef: LabwareDefinition2,
+  well: string
+): ?Array<string> {
+  /** Given a well for a labware, returns the well set it belongs to (or null)
+   * for 8-channel access.
+   * Ie: C2 for 96-flat => ['A2', 'B2', 'C2', ... 'H2']
+   **/
+  const allWellSets = _getAllWellSetsForLabwareMemoized(labwareDef)
+  return allWellSets.find((wellSet: Array<string>) => wellSet.includes(well))
+}
 
 export function wellSetToWellObj(wellSet: ?Array<string>): Wells {
   return wellSet
