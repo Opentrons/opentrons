@@ -2,7 +2,7 @@
 import type { LabwareDefinition2 } from '../types'
 export { default as canPipetteUseLabware } from './canPipetteUseLabware'
 export {
-  default as computeWellAccessDeprecated,
+  computeWellAccessDeprecated,
   computeWellAccess,
 } from './computeWellAccess'
 export { default as getWellTotalVolume } from './getWellTotalVolume'

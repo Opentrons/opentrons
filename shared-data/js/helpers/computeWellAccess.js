@@ -10,7 +10,7 @@ const MULTICHANNEL_TIP_SPAN = OFFSET_8_CHANNEL * (8 - 1) // length in mm from fi
 
 // TODO: Ian 2019-04-11 DEPRECATED REMOVE
 /** Find first well at given (x, y) coordinates. Assumes ONLY ONE well at each (x, y) */
-function findWellAtDeprecated(
+function _findWellAtDeprecated(
   labwareName: string,
   x: number,
   y: number
@@ -48,7 +48,7 @@ function findWellAtDeprecated(
   })
 }
 
-function findWellAt(
+function _findWellAt(
   labwareDef: LabwareDefinition2,
   x: number,
   y: number
@@ -73,7 +73,7 @@ function findWellAt(
 
 // TODO: Ian 2019-04-11 DEPRECATED REMOVE
 // "topWell" means well at the "top" of the column we're accessing: usually A row, or B row for 384-format
-export default function computeWellAccessDeprecated(
+export function computeWellAccessDeprecated(
   labwareName: string,
   topWellName: string
 ): Array<string> | null {
@@ -100,7 +100,7 @@ export default function computeWellAccessDeprecated(
   // Return null for containers with any undefined wells
   const wellsAccessed = offsetTipPositions.reduce(
     (acc: Array<string> | null, tipPos) => {
-      const wellForTip = findWellAtDeprecated(labwareName, x, tipPos)
+      const wellForTip = _findWellAtDeprecated(labwareName, x, tipPos)
       if (acc === null || !wellForTip) {
         return null
       }
@@ -142,7 +142,7 @@ export function computeWellAccess(
   // Return null for containers with any undefined wells
   const wellsAccessed = offsetYTipPositions.reduce(
     (acc: Array<string> | null, tipPosY) => {
-      const wellForTip = findWellAt(labwareDef, x, tipPosY)
+      const wellForTip = _findWellAt(labwareDef, x, tipPosY)
       if (acc === null || !wellForTip) {
         return null
       }
