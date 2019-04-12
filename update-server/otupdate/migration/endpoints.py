@@ -1,7 +1,5 @@
-"""
-otupdate.buildroot.update: endpoints for running software updates
+""" Endpoints for the migration update
 
-This has endpoints like update session management, validation, and execution
 """
 
 import asyncio
@@ -9,16 +7,20 @@ import functools
 import logging
 import os
 
-from typing import Optional
+from typing import Callable, Optional
 
 
 from aiohttp import web, BodyPartReader
 
-from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
-from . import config, file_actions
-from .update_session import UpdateSession, Stages
+from . import constants
 
-SESSION_VARNAME = APP_VARIABLE_PREFIX + 'session'
+from otupdate.buildroot.file_actions import write_file
+from otupdate.buildroot.update_session import UpdateSession, Stages
+from .file_actions import (validate_update, find_inactive_sysroot,
+                           migrate, UPDATE_FILES, BOOT_NAME)
+from . import dbus_actions
+
+SESSION_VARNAME = constants.APP_VARIABLE_PREFIX + 'session'
 LOG = logging.getLogger(__name__)
 
 
@@ -53,8 +55,8 @@ async def begin(request: web.Request) -> web.Response:
                   'error': 'session-already-active'},
             status=409)
 
-    session = UpdateSession(
-        config.config_from_request(request).download_storage_path)
+    session = UpdateSession(os.path.join(constants.DATA_DIR_NAME,
+                                         'migration-updates'))
     request.app[SESSION_VARNAME] = session
     return web.json_response(
         data={'token': session.token},
@@ -83,14 +85,23 @@ async def _save_file(part: BodyPartReader, path: str) -> web.Response:
             write.write(decoded)
 
 
+def _write_and_migrate(rootfs_path: str,
+                       robot_name: str,
+                       progress_callback: Callable[[float], None]):
+    with dbus_actions.unmount_sysroot_inactive():
+        write_file(rootfs_path, find_inactive_sysroot(), progress_callback)
+    migrate(UPDATE_FILES, robot_name)
+
+
 def _begin_write(session: UpdateSession,
                  loop: asyncio.AbstractEventLoop,
-                 rootfs_file_path: str):
+                 rootfs_file_path: str,
+                 robot_name: str):
     """ Start the write process. """
     session.set_progress(0)
     session.set_stage(Stages.WRITING)
     write_future = asyncio.ensure_future(loop.run_in_executor(
-        None, file_actions.write_update, rootfs_file_path,
+        None, _write_and_migrate, rootfs_file_path, robot_name,
         session.set_progress))
 
     def write_done(fut):
@@ -106,19 +117,16 @@ def _begin_write(session: UpdateSession,
 
 def _begin_validation(
         session: UpdateSession,
-        config: config.Config,
         loop: asyncio.AbstractEventLoop,
-        downloaded_update_path: str)\
-        -> asyncio.futures.Future:
+        downloaded_update_path: str,
+        robot_name: str) -> asyncio.futures.Future:
     """ Start the validation process. """
     session.set_stage(Stages.VALIDATING)
-    cert_path = config.update_cert_path\
-        if config.signature_required else None
 
     validation_future \
         = asyncio.ensure_future(loop.run_in_executor(
-            None, file_actions.validate_update,
-            downloaded_update_path, session.set_progress, cert_path))
+            None, validate_update,
+            downloaded_update_path, session.set_progress))
 
     def validation_done(fut):
         exc = fut.exception()
@@ -126,10 +134,12 @@ def _begin_validation(
             session.set_error(getattr(exc, 'short', str(type(exc))),
                               str(exc))
         else:
-            rootfs_file = fut.result()
+            rootfs_file, bootfs_file = fut.result()
             loop.call_soon_threadsafe(_begin_write,
+                                      session,
                                       loop,
-                                      rootfs_file)
+                                      rootfs_file,
+                                      robot_name)
     validation_future.add_done_callback(validation_done)
     return validation_future
 
@@ -140,7 +150,7 @@ async def file_upload(
     """ Serves /update/:session/file
 
     Requires multipart (encoding doesn't matter) with a file field in the
-    body called 'ot2-system.zip'.
+    body called 'ot2-migration.zip'.
     """
     if session.stage != Stages.AWAITING_FILE:
         return web.json_response(
@@ -149,7 +159,7 @@ async def file_upload(
             status=409)
     reader = await request.multipart()
     async for part in reader:
-        if part.name != 'ot2-system.zip':
+        if part.name != 'ot2-migration.zip':
             LOG.warning(
                 f"Unknown field name {part.name} in file_upload, ignoring")
             await part.release()
@@ -158,9 +168,9 @@ async def file_upload(
 
     _begin_validation(
         session,
-        config.config_from_request(request),
         asyncio.get_event_loop(),
-        os.path.join(session.download_path, 'ot2-system.zip'))
+        os.path.join(session.download_path, 'ot2-migration.zip'),
+        request.app.get(constants.ROBOT_NAME_VARNAME, 'opentrons'))
 
     return web.json_response(data=session.state,
                              status=201)
@@ -176,10 +186,28 @@ async def commit(
                   'message': f'System is not ready to commit the update '
                   f'(currently {session.stage.value.short})'},
             status=409)
-    async with request.app[RESTART_LOCK_NAME]:
-        file_actions.commit_update()
-        session.set_stage(Stages.READY_FOR_RESTART)
+    with dbus_actions.unmount_boot():
+        write_file(os.path.join(session.download_path, BOOT_NAME),
+                   constants.BOOT_PARTITION_NAME,
+                   lambda x: None)
+
+    session.set_stage(Stages.READY_FOR_RESTART)
 
     return web.json_response(
         data=session.state,
         status=200)
+
+
+async def restart(request: web.Request) -> web.Response:
+    """ Serves /update/server/restart """
+    session = session_from_request(request)
+    if session and session.stage != Stages.READY_FOR_RESTART:
+        return web.json_response(
+            data={'error': 'not-ready',
+                  'message': 'System is not ready to restart '
+                  f'(currently {session.stage.value.short})'},
+            status=409)
+
+    asyncio.get_event_loop().call_later(1, dbus_actions.restart)
+    return web.json_response({'message': 'Restarting in 1s'},
+                             status=200)

@@ -10,16 +10,25 @@ log = logging.getLogger(__name__)
 
 def build_health_endpoint(
         name, update_server_version, api_server_version, smoothie_version,
-        system_version):
+        system_version, with_migration):
+    health_dict = {
+        'name': name,
+        'updateServerVersion': update_server_version,
+        'apiServerVersion': api_server_version,
+        'smoothieVersion': smoothie_version,
+        'systemVersion': system_version,
+        'capabilities': {
+            'bootstrap': '/server/update/bootstrap',
+            'balena-update': '/server/update',
+            'restart': '/server/update/restart'}
+    }
+    if with_migration:
+        health_dict.update({'buildroot-migration':
+                            '/server/update/migration/begin'})
+
     async def health(request: web.Request) -> web.Response:
         return web.json_response(
-            {
-                'name': name,
-                'updateServerVersion': update_server_version,
-                'apiServerVersion': api_server_version,
-                'smoothieVersion': smoothie_version,
-                'systemVersion': system_version
-            },
+            health_dict,
             headers={'Access-Control-Allow-Origin': '*'}
         )
     return health

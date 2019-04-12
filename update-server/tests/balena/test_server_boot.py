@@ -33,13 +33,35 @@ async def test_server_boot(loop, test_client):
         'updateServerVersion': update_server_version,
         'apiServerVersion': 'not available',
         'smoothieVersion': 'not available',
-        'systemVersion': 'unknown'
+        'systemVersion': 'unknown',
+        'capabilities': {
+            'bootstrap': '/server/update/bootstrap',
+            'balena-update': '/server/update',
+            'restart': '/server/update/restart'
+        }
     }
 
     resp = await cli.get('/server/update/health')
     res = await resp.json()
     assert resp.status == 200
     assert res == expected
+    resp = await cli.post('/server/update/migration/begin')
+    assert resp.status == 404
+
+    app = otupdate.balena.get_app(
+        api_package=None,
+        update_package=update_package,
+        smoothie_version='not vailable',
+        loop=loop,
+        test=True,
+        with_migration=True
+    )
+    cli = await loop.create_task(test_client(app))
+
+    resp = await cli.get('/server/update/health')
+    res = await resp.json()
+    assert resp.status == 200
+    assert res['buildroot-migration'] == '/server/update/migration/begin'
 
 
 async def test_bootstrap_fail(monkeypatch, loop, test_client):

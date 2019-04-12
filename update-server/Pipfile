@@ -23,7 +23,7 @@ twine = "==1.12.1"
 wheel = "==0.30.0"
 coverage = "==4.4.2"
 colorama = "*"
-
+mypy = "*"
 
 [requires]
 

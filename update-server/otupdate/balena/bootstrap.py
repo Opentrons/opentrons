@@ -18,7 +18,7 @@ from .install import _install, VENV_NAME
 log = logging.getLogger(__name__)
 
 
-async def create_virtual_environment(loop=None) -> (str, str):
+async def create_virtual_environment(loop=None):
     """
     Create a virtual environment, and return the path to the virtual env
     directory, which should contain a "bin" directory with the `python` and
@@ -142,7 +142,7 @@ def _stop_server(proc: sp.Popen):
     clean('/data/packages/tmp')
 
 
-async def install_sandboxed_update(filename, loop) -> (dict, str, str):
+async def install_sandboxed_update(filename, loop):
     """
     Create a virtual environment and activate it, and then install an
     update candidate (leaves virtual environment activated)
@@ -163,7 +163,7 @@ async def install_sandboxed_update(filename, loop) -> (dict, str, str):
     return res, python, venv_site_pkgs, venv_dir
 
 
-async def install_update(filename, loop) -> (dict, int):
+async def install_update(filename, loop):
     """
     Install the update into the system environment.
     """
@@ -179,7 +179,7 @@ async def install_update(filename, loop) -> (dict, int):
 
 
 async def test_update_server(
-        python, test_port, filename, venv_site_pkgs=None, cwd=None) -> dict:
+        python, test_port, filename, venv_site_pkgs=None, cwd=None):
     """
     Starts a test server using the virtual environment, and then runs tests
     against that server

@@ -33,7 +33,7 @@ def _version_less(version_a, version_b):
             return version_a[2] < version_b[2]
 
 
-async def _install(python, filename, loop) -> (str, str, int):
+async def _install(python, filename, loop):
     running_on_pi = os.environ.get('RUNNING_ON_PI') and '/tmp' in python
     python_home = python.split(VENV_NAME)[0] + VENV_NAME
 
@@ -139,7 +139,7 @@ async def _update_firmware(filename, loop):
     return res, rc
 
 
-async def install_smoothie_firmware(data, loop) -> (dict, int):
+async def install_smoothie_firmware(data, loop):
     filename = data.filename
     log.info('Flashing image "{}", this will take about 1 minute'.format(
         filename))
@@ -158,7 +158,7 @@ async def install_smoothie_firmware(data, loop) -> (dict, int):
     return {'message': msg, 'filename': filename}, returncode
 
 
-async def install_py(python, data, loop) -> (dict, int):
+async def install_py(python, data, loop):
     filename = data.filename
     log.info('Preparing to install: {}'.format(filename))
     content = data.file.read()
@@ -180,7 +180,7 @@ async def install_py(python, data, loop) -> (dict, int):
     return {'message': msg, 'filename': filename}, returncode
 
 
-async def _provision_container(python, loop) -> (str, int):
+async def _provision_container(python, loop):
     if not os.environ.get('RUNNING_ON_PI'):
         return {'message': 'Did not provision (not on pi)',
                 'filename': '<provision>'}, 0
@@ -252,8 +252,9 @@ async def update_api(request: web.Request) -> web.Response:
         else:
             status = 400
     except Exception as e:
-        res = {'message': 'Exception {} raised by update of {}: {}'.format(
-                type(e), data, traceback.format_tb(e.__traceback__))}
+        res = {'message':  # type: ignore
+               'Exception {} raised by update of {}: {}'
+               .format(type(e), data, traceback.format_tb(e.__traceback__))}
         status = 500
     return web.json_response(res, status=status)
 

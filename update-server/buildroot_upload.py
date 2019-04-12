@@ -17,22 +17,44 @@ import aiohttp
 
 
 async def poll_status(sess, token, root):
+    await asyncio.sleep(1.0)
     resp = await sess.get(root + '/' + token + '/status')
     return await resp.json()
 
 
-async def do_update(update_file, host):
+async def do_update(update_file, host, kind):
     async with aiohttp.ClientSession() as session:
-        root = host + '/server/update'
+        if kind == 'migrate':
+            root = host + '/server/update/migration'
+            filename = 'ot2-migration.zip'
+        else:
+            root = host + '/server/update'
+            filename = 'ot2-system.zip'
         print(f"Starting update of {update_file.name} to {host}")
         begin_resp = await session.post(root + '/begin')
-        assert begin_resp.status == 201,\
-            f'Error response from host: {begin_resp.status}'
+        if begin_resp.status == 409:
+            should_cancel = input(
+                'Another update is in process! Cancel [yN]? ')
+            if should_cancel.lower()[0] == 'y':
+                cancel_resp = await session.post(root + '/cancel')
+                if cancel_resp.status != 200:
+                    body = await cancel_resp.text()
+                    sys.stderr.write(
+                        f"Error response from host when canceling: "
+                        f"{cancel_resp.status}: {body}\n")
+                    sys.exit(-1)
+                begin_resp = await session.post(root + '/begin')
+
+        if begin_resp.status != 201:
+            body = await begin_resp.text()
+            sys.stderr.write(
+                f'Error response from host: {begin_resp.status}: {body}')
+            sys.exit(-1)
         begin_body = await begin_resp.json()
         token = begin_body['token']
         print(f"Uploading file...")
         file_resp = await session.post(root + '/' + token + '/file',
-                                       data={'ot2-system.zip': update_file})
+                                       data={filename: update_file})
         if file_resp.status != 201:
             body = await file_resp.text()
             try:
@@ -49,7 +71,7 @@ async def do_update(update_file, host):
             sys.stdout.write(
                 f'{status["message"]}: {status["progress"]*100:.0f}%\r')
             status = await poll_status(session, token, root)
-
+        print()
         if status['stage'] == 'error':
             print(f'Error validating: {status["error"]}: {status["message"]}')
             sys.exit(-1)
@@ -63,6 +85,7 @@ async def do_update(update_file, host):
             print(f'Error writing: {status["error"]}: {status["message"]}')
             sys.exit(-1)
 
+        print()
         if status['stage'] == 'done':
             print("Committing update...")
             resp = await session.post(root + '/' + token + '/commit')
@@ -71,8 +94,17 @@ async def do_update(update_file, host):
                       f'{status["message"]}')
                 sys.exit(-1)
 
-            print("Restarting...")
-            resp = await session.post(host+'/server/restart')
+        print("Restarting...")
+        resp = await session.post(host+'/server/update/restart')
+        if resp.status != 200:
+            try:
+                body = await resp.json()
+                print(f'Error restarting: {resp.status}: '
+                      f'{body["error"]: body["message"]}')
+            except (json.JSONDecodeError, KeyError):
+                body = await resp.text()
+                print(f'Error restarting: {resp.status}: {body}')
+            sys.exit(-1)
 
         print("Done!")
 
@@ -87,6 +119,11 @@ def assure_host(host_arg):
 
 def main():
     parser = argparse.ArgumentParser(description='update buildroot systems')
+    parser.add_argument('action', metavar='ACTION',
+                        choices=['update', 'migrate'],
+                        help='Whether to update the robot (if already on '
+                        'buildroot) or migrate the robot from buildroot to '
+                        'balena')
     parser.add_argument('update', metavar='UPDATE_FILE',
                         type=argparse.FileType('rb'),
                         help='The ot2-system.zip to upload')
@@ -95,7 +132,7 @@ def main():
                         help='The IP of the robot')
     args = parser.parse_args()
     asyncio.get_event_loop().run_until_complete(
-        do_update(args.update, assure_host(args.host)))
+        do_update(args.update, assure_host(args.host), args.action))
 
 
 if __name__ == '__main__':

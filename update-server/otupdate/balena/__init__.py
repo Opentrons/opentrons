@@ -7,6 +7,8 @@ from functools import partial
 from . import control, install
 from . import endpoints as bootstrap_endp
 
+import otupdate.migration
+
 log = logging.getLogger(__name__)
 
 
@@ -38,6 +40,7 @@ def get_app(
         update_package,
         smoothie_version,
         test,
+        with_migration=False,
         loop=None) -> web.Application:
     # Health endpoint built here in order to keep from having state initialized
     # on import of sub-modules
@@ -57,7 +60,8 @@ def get_app(
         update_server_version=update_server_version,
         api_server_version=api_server_version,
         smoothie_version=smoothie_version,
-        system_version=system_version
+        system_version=system_version,
+        with_migration=with_migration,
     )
     bootstrap_fn = partial(
         bootstrap_endp.bootstrap_update_server, test_flag=test)
@@ -69,4 +73,6 @@ def get_app(
         web.post('/server/update/bootstrap', bootstrap_fn),
         web.post('/server/restart', control.restart)
     ])
+    if with_migration:
+        app = otupdate.migration.add_endpoints(app, device_name)
     return app

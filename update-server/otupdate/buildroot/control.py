@@ -47,7 +47,10 @@ def build_health_endpoint(
                     'opentrons_api_version', 'unknown'),
                 'smoothieVersion': 'unimplemented',
                 'systemVersion': version_dict.get(
-                    'buildroot_version', 'unknown')
-            }
+                    'buildroot_version', 'unknown'),
+                'capabilities': {'buildroot-update': '/server/update/begin',
+                                 'restart': '/server/update/restart'}
+            },
+            headers={'Access-Control-Allow-Origin': '*'}
         )
     return health

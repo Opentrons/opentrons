@@ -8,6 +8,7 @@ import zipfile
 import pytest
 
 from otupdate.buildroot import update, config
+from otupdate.buildroot.update_session import UpdateSession, Stages
 
 
 def session_endpoint(token, endpoint):
@@ -59,41 +60,49 @@ async def test_commit_fails_wrong_state(test_cli, update_session):
     assert resp.status == 409
 
 
-async def test_session_future_chain(otupdate_config, downloaded_update_file):
+async def test_future_chain(otupdate_config, downloaded_update_file, loop):
     conf = config.load_from_path(otupdate_config)
-    session = update.UpdateSession(conf)
-    fut = session.begin_validation(downloaded_update_file)
-    assert session.stage == update.Stages.VALIDATING
+    session = UpdateSession(conf.download_storage_path)
+    fut = update._begin_validation(session,
+                                   conf,
+                                   loop,
+                                   downloaded_update_file)
+    assert session.stage == Stages.VALIDATING
     assert session.current_task == fut
     last_progress = 0.0
     while not fut.done():
         assert session.state['progress'] >= last_progress
         assert session.state['stage'] == 'validating'
-        assert session.stage == update.Stages.VALIDATING
+        assert session.stage == Stages.VALIDATING
         last_progress = session.state['progress']
         await asyncio.sleep(0.01)
     await fut
     yield  # This yield needs to be here to let the loop spin
-    while not session.current_task.done():
+    while session.state['stage'] == session.state['writing']:
         assert session.state['progress'] >= last_progress
-        assert session.stage == update.Stages.VALIDATING
+        assert session.stage == Stages.VALIDATING
         assert session.state['stage'] == 'writing'
         last_progress = session.state['progress']
         await asyncio.sleep(0.1)
-    assert session.state['stage'] == update.Stages.DONE
+    assert session.state['stage'] == Stages.DONE
 
 
 @pytest.mark.exclude_rootfs_ext4
 async def test_session_catches_validation_fail(otupdate_config,
-                                               downloaded_update_file):
+                                               downloaded_update_file,
+                                               loop):
     conf = config.load_from_path(otupdate_config)
-    session = update.UpdateSession(conf)
-    fut = session.begin_validation(downloaded_update_file)
+    session = UpdateSession(conf.download_storage_path)
+    fut = update._begin_validation(
+        session,
+        conf,
+        loop,
+        downloaded_update_file)
     await fut
     assert fut.exception()
     yield  # This yield needs to be here to let the loop spin
     assert session.state['stage'] == 'error'
-    assert session.stage == update.Stages.ERROR
+    assert session.stage == Stages.ERROR
     assert 'error' in session.state
     assert 'message' in session.state
     assert session.current_task is None
@@ -124,6 +133,7 @@ async def test_update_happypath(test_cli, update_session,
         assert status_body['stage'] == 'validating'
         assert status_body['progress'] >= last_progress
         last_progress = status_body['progress']
+        yield
     assert last_progress > 0.0
     # Wait through write
     then = loop.time()
@@ -139,6 +149,7 @@ async def test_update_happypath(test_cli, update_session,
         assert status_body['stage'] == 'writing'
         assert status_body['progress'] >= last_progress
         last_progress = status_body['progress']
+        yield
     assert last_progress > 0.0
     status_resp = await test_cli.get(session_endpoint(update_session,
                                                       'status'))
