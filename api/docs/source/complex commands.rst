@@ -10,15 +10,15 @@ The examples below will use the following set-up:
 
     from opentrons import robot, labware, instruments
 
-    robot.clear_commands()
-
     plate = labware.load('96-flat', '1')
 
-    tiprack = labware.load('tiprack-200ul', '2')
+    tiprack = labware.load('opentrons-tiprack-300ul', '2')
 
     pipette = instruments.P300_Single(
         mount='left',
         tip_racks=[tiprack])
+
+You could simulate the protocol using our protocol simulator, which can be installed by following the instructions [here](https://github.com/Opentrons/opentrons/tree/edge/api#simulating-protocols).
 
 **********************
 
@@ -48,24 +48,19 @@ Volumes larger than the pipette's ``max_volume`` will automatically divide into 
 
     pipette.transfer(700, plate.wells('A2'), plate.wells('B2'))
 
-    for c in robot.commands():
-        print(c)
-
-will print out...
+will have the steps...
 
 .. code-block:: python
 
-    Transferring 700 from <Well A2> to <Well B2>
-    Picking up tip <Well A1>
-    Aspirating 200.0 uL from <Well A2> at 1 speed
-    Dispensing 200.0 uL into <Well B2>
-    Aspirating 200.0 uL from <Well A2> at 1 speed
-    Dispensing 200.0 uL into <Well B2>
-    Aspirating 150.0 uL from <Well A2> at 1 speed
-    Dispensing 150.0 uL into <Well B2>
-    Aspirating 150.0 uL from <Well A2> at 1 speed
-    Dispensing 150.0 uL into <Well B2>
-    Dropping tip <Well A1>
+    Transferring 700 from well A2 in "1" to well B2 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 300.0 uL from well A2 in "1" at 1 speed
+    Dispensing 300.0 uL into well B2 in "1"
+    Aspirating 200.0 uL from well A2 in "1" at 1 speed
+    Dispensing 200.0 uL into well B2 in "1"
+    Aspirating 200.0 uL from well A2 in "1" at 1 speed
+    Dispensing 200.0 uL into well B2 in "1"
+    Dropping tip well A1 in "12"
 
 Multiple Wells
 --------------
@@ -76,40 +71,29 @@ Transfer commands are most useful when moving liquid between multiple wells.
 
     pipette.transfer(100, plate.cols('1'), plate.cols('2'))
 
-    for c in robot.commands():
-        print(c)
-
-will print out...
+will have the steps...
 
 .. code-block:: python
 
-    Transferring 100 from <WellSeries: <Well A1><Well A2><Well A3><Well A4><Well A5><Well A6><Well A7><Well A8><Well A9><Well A10><Well A11><Well A12>> to <WellSeries: <Well B1><Well B2><Well B3><Well B4><Well B5><Well B6><Well B7><Well B8><Well B9><Well B10><Well B11><Well B12>>
-    Picking up tip <Well A1>
-    Aspirating 100.0 uL from <Well A1> at 1 speed
-    Dispensing 100.0 uL into <Well B1>
-    Aspirating 100.0 uL from <Well A2> at 1 speed
-    Dispensing 100.0 uL into <Well B2>
-    Aspirating 100.0 uL from <Well A3> at 1 speed
-    Dispensing 100.0 uL into <Well B3>
-    Aspirating 100.0 uL from <Well A4> at 1 speed
-    Dispensing 100.0 uL into <Well B4>
-    Aspirating 100.0 uL from <Well A5> at 1 speed
-    Dispensing 100.0 uL into <Well B5>
-    Aspirating 100.0 uL from <Well A6> at 1 speed
-    Dispensing 100.0 uL into <Well B6>
-    Aspirating 100.0 uL from <Well A7> at 1 speed
-    Dispensing 100.0 uL into <Well B7>
-    Aspirating 100.0 uL from <Well A8> at 1 speed
-    Dispensing 100.0 uL into <Well B8>
-    Aspirating 100.0 uL from <Well A9> at 1 speed
-    Dispensing 100.0 uL into <Well B9>
-    Aspirating 100.0 uL from <Well A10> at 1 speed
-    Dispensing 100.0 uL into <Well B10>
-    Aspirating 100.0 uL from <Well A11> at 1 speed
-    Dispensing 100.0 uL into <Well B11>
-    Aspirating 100.0 uL from <Well A12> at 1 speed
-    Dispensing 100.0 uL into <Well B12>
-    Dropping tip <Well A1>
+    Transferring 100 from wells A1...H1 in "1" to wells A2...H2 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
+    Dispensing 100.0 uL into well A2 in "1"
+    Aspirating 100.0 uL from well B1 in "1" at 1 speed
+    Dispensing 100.0 uL into well B2 in "1"
+    Aspirating 100.0 uL from well C1 in "1" at 1 speed
+    Dispensing 100.0 uL into well C2 in "1"
+    Aspirating 100.0 uL from well D1 in "1" at 1 speed
+    Dispensing 100.0 uL into well D2 in "1"
+    Aspirating 100.0 uL from well E1 in "1" at 1 speed
+    Dispensing 100.0 uL into well E2 in "1"
+    Aspirating 100.0 uL from well F1 in "1" at 1 speed
+    Dispensing 100.0 uL into well F2 in "1"
+    Aspirating 100.0 uL from well G1 in "1" at 1 speed
+    Dispensing 100.0 uL into well G2 in "1"
+    Aspirating 100.0 uL from well H1 in "1" at 1 speed
+    Dispensing 100.0 uL into well H2 in "1"
+    Dropping tip well A1 in "12"
 
 One to Many
 -------------
@@ -118,65 +102,60 @@ You can transfer from a single source to multiple destinations, and the other wa
 
 .. code-block:: python
 
-    pipette.transfer(100, plate.wells('A1'), plate.rows('2'))
+    pipette.transfer(100, plate.wells('A1'), plate.cols('2'))
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
-    Transferring 100 from <Well A1> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
-    Picking up tip <Well A1>
-    Aspirating 100.0 uL from <Well A1> at 1 speed
-    Dispensing 100.0 uL into <Well A2>
-    Aspirating 100.0 uL from <Well A1> at 1 speed
-    Dispensing 100.0 uL into <Well B2>
-    Aspirating 100.0 uL from <Well A1> at 1 speed
-    Dispensing 100.0 uL into <Well C2>
-    Aspirating 100.0 uL from <Well A1> at 1 speed
-    Dispensing 100.0 uL into <Well D2>
-    Aspirating 100.0 uL from <Well A1> at 1 speed
-    Dispensing 100.0 uL into <Well E2>
-    Aspirating 100.0 uL from <Well A1> at 1 speed
-    Dispensing 100.0 uL into <Well F2>
-    Aspirating 100.0 uL from <Well A1> at 1 speed
-    Dispensing 100.0 uL into <Well G2>
-    Aspirating 100.0 uL from <Well A1> at 1 speed
-    Dispensing 100.0 uL into <Well H2>
-    Dropping tip <Well A1>
+    Transferring 100 from well A1 in "1" to wells A2...H2 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
+    Dispensing 100.0 uL into well A2 in "1"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
+    Dispensing 100.0 uL into well B2 in "1"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
+    Dispensing 100.0 uL into well C2 in "1"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
+    Dispensing 100.0 uL into well D2 in "1"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
+    Dispensing 100.0 uL into well E2 in "1"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
+    Dispensing 100.0 uL into well F2 in "1"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
+    Dispensing 100.0 uL into well G2 in "1"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
+    Dispensing 100.0 uL into well H2 in "1"
+    Dropping tip well A1 in "12"
 
 Few to Many
 -------------
 
-What happens if, for example, you tell your pipette to transfer from 4 source wells to 2 destination wells? The transfer command will attempt to divide the wells evenly, or raise an error if the number of wells aren't divisible.
+What happens if, for example, you tell your pipette to transfer from 2 source wells to 4 destination wells? The transfer command will attempt to divide the wells evenly, or raise an error if the number of wells aren't divisible.
 
 .. code-block:: python
 
     pipette.transfer(
         100,
-        plate.wells('A1', 'A2', 'A3', 'A4'),
-        plate.wells('B1', 'B2'))
+        plate.wells('A1', 'A2'),
+        plate.wells('B1', 'B2', 'B3', 'B4'))
 
-    for c in robot.commands():
-        print(c)
-
-will print out...
+will have the steps...
 
 .. code-block:: python
 
-    Transferring 100 from <WellSeries: <Well A1><Well A2><Well A3><Well A4>> to <WellSeries: <Well B1><Well B2>>
-    Picking up tip <Well A1>
-    Aspirating 100.0 uL from <Well A1> at 1 speed
-    Dispensing 100.0 uL into <Well B1>
-    Aspirating 100.0 uL from <Well A2> at 1 speed
-    Dispensing 100.0 uL into <Well B1>
-    Aspirating 100.0 uL from <Well A3> at 1 speed
-    Dispensing 100.0 uL into <Well B2>
-    Aspirating 100.0 uL from <Well A4> at 1 speed
-    Dispensing 100.0 uL into <Well B2>
-    Dropping tip <Well A1>
+    Transferring 100 from wells A1...A2 in "1" to wells B1...B4 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
+    Dispensing 100.0 uL into well B1 in "1"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
+    Dispensing 100.0 uL into well B2 in "1"
+    Aspirating 100.0 uL from well A2 in "1" at 1 speed
+    Dispensing 100.0 uL into well B3 in "1"
+    Aspirating 100.0 uL from well A2 in "1" at 1 speed
+    Dispensing 100.0 uL into well B4 in "1"
+    Dropping tip well A1 in "12"
 
 List of Volumes
 ---------------
@@ -190,22 +169,20 @@ Instead of applying a single volume amount to all source/destination wells, you 
         plate.wells('A1'),
         plate.wells('B1', 'B2', 'B3'))
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
-    Transferring [20, 40, 60] from <Well A1> to <WellSeries: <Well B1><Well B2><Well B3>>
-    Picking up tip <Well A1>
-    Aspirating 20.0 uL from <Well A1> at 1 speed
-    Dispensing 20.0 uL into <Well B1>
-    Aspirating 40.0 uL from <Well A1> at 1 speed
-    Dispensing 40.0 uL into <Well B2>
-    Aspirating 60.0 uL from <Well A1> at 1 speed
-    Dispensing 60.0 uL into <Well B3>
-    Dropping tip <Well A1>
+    Transferring [20, 40, 60] from well A1 in "1" to wells B1...B3 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 20.0 uL from well A1 in "1" at 1 speed
+    Dispensing 20.0 uL into well B1 in "1"
+    Aspirating 40.0 uL from well A1 in "1" at 1 speed
+    Dispensing 40.0 uL into well B2 in "1"
+    Aspirating 60.0 uL from well A1 in "1" at 1 speed
+    Dispensing 60.0 uL into well B3 in "1"
+    Dropping tip well A1 in "12"
 
 Volume Gradient
 ---------------
@@ -217,34 +194,32 @@ Create a linear gradient between a start and ending volume (uL). The start and e
     pipette.transfer(
         (100, 30),
         plate.wells('A1'),
-        plate.rows('2'))
+        plate.cols('2'))
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
-    Transferring (100, 30) from <Well A1> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
-    Picking up tip <Well A1>
-    Aspirating 100.0 uL from <Well A1> at 1 speed
-    Dispensing 100.0 uL into <Well A2>
-    Aspirating 90.0 uL from <Well A1> at 1 speed
-    Dispensing 90.0 uL into <Well B2>
-    Aspirating 80.0 uL from <Well A1> at 1 speed
-    Dispensing 80.0 uL into <Well C2>
-    Aspirating 70.0 uL from <Well A1> at 1 speed
-    Dispensing 70.0 uL into <Well D2>
-    Aspirating 60.0 uL from <Well A1> at 1 speed
-    Dispensing 60.0 uL into <Well E2>
-    Aspirating 50.0 uL from <Well A1> at 1 speed
-    Dispensing 50.0 uL into <Well F2>
-    Aspirating 40.0 uL from <Well A1> at 1 speed
-    Dispensing 40.0 uL into <Well G2>
-    Aspirating 30.0 uL from <Well A1> at 1 speed
-    Dispensing 30.0 uL into <Well H2>
-    Dropping tip <Well A1>
+    Transferring (100, 30) from well A1 in "1" to wells A2...H2 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
+    Dispensing 100.0 uL into well A2 in "1"
+    Aspirating 90.0 uL from well A1 in "1" at 1 speed
+    Dispensing 90.0 uL into well B2 in "1"
+    Aspirating 80.0 uL from well A1 in "1" at 1 speed
+    Dispensing 80.0 uL into well C2 in "1"
+    Aspirating 70.0 uL from well A1 in "1" at 1 speed
+    Dispensing 70.0 uL into well D2 in "1"
+    Aspirating 60.0 uL from well A1 in "1" at 1 speed
+    Dispensing 60.0 uL into well E2 in "1"
+    Aspirating 50.0 uL from well A1 in "1" at 1 speed
+    Dispensing 50.0 uL into well F2 in "1"
+    Aspirating 40.0 uL from well A1 in "1" at 1 speed
+    Dispensing 40.0 uL into well G2 in "1"
+    Aspirating 30.0 uL from well A1 in "1" at 1 speed
+    Dispensing 30.0 uL into well H2 in "1"
+    Dropping tip well A1 in "12"
 
 **********************
 
@@ -260,57 +235,51 @@ Volumes going to the same destination well are combined within the same tip, so 
 
 .. code-block:: python
 
-    pipette.consolidate(30, plate.rows('2'), plate.wells('A1'))
+    pipette.consolidate(30, plate.cols('2'), plate.wells('A1'))
 
-    for c in robot.commands():
-        print(c)
-
-will print out...
+will have the steps...
 
 .. code-block:: python
 
-    Consolidating 30 from <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>> to <Well A1>
-    Transferring 30 from <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>> to <Well A1>
-    Picking up tip <Well A1>
-    Aspirating 30.0 uL from <Well A2> at 1 speed
-    Aspirating 30.0 uL from <Well B2> at 1 speed
-    Aspirating 30.0 uL from <Well C2> at 1 speed
-    Aspirating 30.0 uL from <Well D2> at 1 speed
-    Aspirating 30.0 uL from <Well E2> at 1 speed
-    Aspirating 30.0 uL from <Well F2> at 1 speed
-    Dispensing 180.0 uL into <Well A1>
-    Aspirating 30.0 uL from <Well G2> at 1 speed
-    Aspirating 30.0 uL from <Well H2> at 1 speed
-    Dispensing 60.0 uL into <Well A1>
-    Dropping tip <Well A1>
+    Consolidating 30 from wells A2...H2 in "1" to well A1 in "1"
+    Transferring 30 from wells A2...H2 in "1" to well A1 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 30.0 uL from well A2 in "1" at 1 speed
+    Aspirating 30.0 uL from well B2 in "1" at 1 speed
+    Aspirating 30.0 uL from well C2 in "1" at 1 speed
+    Aspirating 30.0 uL from well D2 in "1" at 1 speed
+    Aspirating 30.0 uL from well E2 in "1" at 1 speed
+    Aspirating 30.0 uL from well F2 in "1" at 1 speed
+    Aspirating 30.0 uL from well G2 in "1" at 1 speed
+    Aspirating 30.0 uL from well H2 in "1" at 1 speed
+    Dispensing 240.0 uL into well A1 in "1"
+    Dropping tip well A1 in "12"
 
 If there are multiple destination wells, the pipette will never combine their volumes into the same tip.
 
 .. code-block:: python
 
-    pipette.consolidate(30, plate.rows('2'), plate.wells('A1', 'A2'))
+    pipette.consolidate(30, plate.cols('1'), plate.wells('A1', 'A2'))
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
-    Consolidating 30 from <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>> to <WellSeries: <Well A1><Well A2>>
-    Transferring 30 from <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>> to <WellSeries: <Well A1><Well A2>>
-    Picking up tip <Well A1>
-    Aspirating 30.0 uL from <Well A2> at 1 speed
-    Aspirating 30.0 uL from <Well B2> at 1 speed
-    Aspirating 30.0 uL from <Well C2> at 1 speed
-    Aspirating 30.0 uL from <Well D2> at 1 speed
-    Dispensing 120.0 uL into <Well A1>
-    Aspirating 30.0 uL from <Well E2> at 1 speed
-    Aspirating 30.0 uL from <Well F2> at 1 speed
-    Aspirating 30.0 uL from <Well G2> at 1 speed
-    Aspirating 30.0 uL from <Well H2> at 1 speed
-    Dispensing 120.0 uL into <Well A2>
-    Dropping tip <Well A1>
+    Consolidating 30 from wells A1...H1 in "1" to wells A1...A2 in "1"
+    Transferring 30 from wells A1...H1 in "1" to wells A1...A2 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 30.0 uL from well A1 in "1" at 1 speed
+    Aspirating 30.0 uL from well B1 in "1" at 1 speed
+    Aspirating 30.0 uL from well C1 in "1" at 1 speed
+    Aspirating 30.0 uL from well D1 in "1" at 1 speed
+    Dispensing 120.0 uL into well A1 in "1"
+    Aspirating 30.0 uL from well E1 in "1" at 1 speed
+    Aspirating 30.0 uL from well F1 in "1" at 1 speed
+    Aspirating 30.0 uL from well G1 in "1" at 1 speed
+    Aspirating 30.0 uL from well H1 in "1" at 1 speed
+    Dispensing 120.0 uL into well A2 in "1"
+    Dropping tip well A1 in "12"
 
 Distribute
 -----------
@@ -319,133 +288,102 @@ Volumes from the same source well are combined within the same tip, so that one 
 
 .. code-block:: python
 
-    pipette.distribute(55, plate.wells('A1'), plate.rows('2'))
+    pipette.distribute(55, plate.wells('A1'), plate.rows('A'))
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
-    Distributing 55 from <Well A1> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
-    Transferring 55 from <Well A1> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
-    Picking up tip <Well A1>
-    Aspirating 165.0 uL from <Well A1> at 1 speed
-    Dispensing 55.0 uL into <Well A2>
-    Dispensing 55.0 uL into <Well B2>
-    Dispensing 55.0 uL into <Well C2>
-    Aspirating 165.0 uL from <Well A1> at 1 speed
-    Dispensing 55.0 uL into <Well D2>
-    Dispensing 55.0 uL into <Well E2>
-    Dispensing 55.0 uL into <Well F2>
-    Aspirating 110.0 uL from <Well A1> at 1 speed
-    Dispensing 55.0 uL into <Well G2>
-    Dispensing 55.0 uL into <Well H2>
-    Dropping tip <Well A1>
+    Distributing 55 from well A1 in "1" to wells A1...A12 in "1"
+    Transferring 55 from well A1 in "1" to wells A1...A12 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 250.0 uL from well A1 in "1" at 1 speed
+    Dispensing 55.0 uL into well A1 in "1"
+    Dispensing 55.0 uL into well A2 in "1"
+    Dispensing 55.0 uL into well A3 in "1"
+    Dispensing 55.0 uL into well A4 in "1"
+    Blowing out at well A1 in "12"
+    Aspirating 250.0 uL from well A1 in "1" at 1 speed
+    Dispensing 55.0 uL into well A5 in "1"
+    Dispensing 55.0 uL into well A6 in "1"
+    Dispensing 55.0 uL into well A7 in "1"
+    Dispensing 55.0 uL into well A8 in "1"
+    Blowing out at well A1 in "12"
+    Aspirating 250.0 uL from well A1 in "1" at 1 speed
+    Dispensing 55.0 uL into well A9 in "1"
+    Dispensing 55.0 uL into well A10 in "1"
+    Dispensing 55.0 uL into well A11 in "1"
+    Dispensing 55.0 uL into well A12 in "1"
+    Blowing out at well A1 in "12"
+    Dropping tip well A1 in "12"
 
 
 If there are multiple source wells, the pipette will never combine their volumes into the same tip.
 
 .. code-block:: python
 
-    pipette.distribute(30, plate.wells('A1', 'A2'), plate.rows('2'))
+    pipette.distribute(30, plate.wells('A1', 'A2'), plate.rows('A'))
 
-    for c in robot.commands():
-        print(c)
-
-will print out...
+will have the steps...
 
 .. code-block:: python
 
-    Distributing 30 from <WellSeries: <Well A1><Well A2>> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
-    Transferring 30 from <WellSeries: <Well A1><Well A2>> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
-    Picking up tip <Well A1>
-    Aspirating 120.0 uL from <Well A1> at 1 speed
-    Dispensing 30.0 uL into <Well A2>
-    Dispensing 30.0 uL into <Well B2>
-    Dispensing 30.0 uL into <Well C2>
-    Dispensing 30.0 uL into <Well D2>
-    Aspirating 120.0 uL from <Well A2> at 1 speed
-    Dispensing 30.0 uL into <Well E2>
-    Dispensing 30.0 uL into <Well F2>
-    Dispensing 30.0 uL into <Well G2>
-    Dispensing 30.0 uL into <Well H2>
-    Dropping tip <Well A1>
+    Distributing 30 from wells A1...A2 in "1" to wells A1...A12 in "1"
+    Transferring 30 from wells A1...A2 in "1" to wells A1...A12 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 210.0 uL from well A1 in "1" at 1 speed
+    Dispensing 30.0 uL into well A1 in "1"
+    Dispensing 30.0 uL into well A2 in "1"
+    Dispensing 30.0 uL into well A3 in "1"
+    Dispensing 30.0 uL into well A4 in "1"
+    Dispensing 30.0 uL into well A5 in "1"
+    Dispensing 30.0 uL into well A6 in "1"
+    Blowing out at well A1 in "12"
+    Aspirating 210.0 uL from well A2 in "1" at 1 speed
+    Dispensing 30.0 uL into well A7 in "1"
+    Dispensing 30.0 uL into well A8 in "1"
+    Dispensing 30.0 uL into well A9 in "1"
+    Dispensing 30.0 uL into well A10 in "1"
+    Dispensing 30.0 uL into well A11 in "1"
+    Dispensing 30.0 uL into well A12 in "1"
+    Blowing out at well A1 in "12"
+    Dropping tip well A1 in "12"
 
 Disposal Volume
 ---------------
 
-When dispensing multiple times from the same tip, it is recommended to aspirate an extra amount of liquid to be disposed of after distributing. This added ``disposal_vol`` can be set as an optional argument.
+When dispensing multiple times from the same tip, it is recommended to aspirate an extra amount of liquid to be disposed of after distributing. This added ``disposal_vol`` can be set as an optional argument. There is a default disposal volume (equal to the pipette's minimum volume), which will be blown out at the trash after the dispenses.
 
 .. code-block:: python
 
     pipette.distribute(
         30,
         plate.wells('A1', 'A2'),
-        plate.rows('2'),
+        plate.cols('2'),
         disposal_vol=10)   # include extra liquid to make dispenses more accurate
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
-    Distributing 30 from <WellSeries: <Well A1><Well A2>> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
-    Transferring 30 from <WellSeries: <Well A1><Well A2>> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
-    Picking up tip <Well A1>
-    Aspirating 130.0 uL from <Well A1> at 1 speed
-    Dispensing 30.0 uL into <Well A2>
-    Dispensing 30.0 uL into <Well B2>
-    Dispensing 30.0 uL into <Well C2>
-    Dispensing 30.0 uL into <Well D2>
-    Blowing out at <Well A1>
-    Aspirating 130.0 uL from <Well A2> at 1 speed
-    Dispensing 30.0 uL into <Well E2>
-    Dispensing 30.0 uL into <Well F2>
-    Dispensing 30.0 uL into <Well G2>
-    Dispensing 30.0 uL into <Well H2>
-    Blowing out at <Well A1>
-    Dropping tip <Well A1>
-
-.. note::
-
-    If you do not specify a ``disposal_vol``, the pipette will by default use a ``disposal_vol`` equal to it's ``min_volume``. This tutorial has not given the pipette any ``min_volume``, so below is an example of allowing the pipette's ``min_volume`` to be used as a default for ``disposal_vol``.
-
-.. code-block:: python
-
-    pipette.min_volume = 20  # `min_volume` is used as default to `disposal_vol`
-
-    pipette.distribute(
-        30,
-        plate.wells('A1', 'A2'),
-        plate.rows('2'))
-
-    for c in robot.commands():
-        print(c)
-
-will print out...
-
-.. code-block:: python
-
-    Distributing 30 from <WellSeries: <Well A1><Well A2>> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
-    Transferring 30 from <WellSeries: <Well A1><Well A2>> to <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
-    Picking up tip <Well A1>
-    Aspirating 140.0 uL from <Well A1> at 1 speed
-    Dispensing 30.0 uL into <Well A2>
-    Dispensing 30.0 uL into <Well B2>
-    Dispensing 30.0 uL into <Well C2>
-    Dispensing 30.0 uL into <Well D2>
-    Blowing out at <Well A1>
-    Aspirating 140.0 uL from <Well A2> at 1 speed
-    Dispensing 30.0 uL into <Well E2>
-    Dispensing 30.0 uL into <Well F2>
-    Dispensing 30.0 uL into <Well G2>
-    Dispensing 30.0 uL into <Well H2>
-    Blowing out at <Well A1>
-    Dropping tip <Well A1>
+    Distributing 30 from wells A1...A2 in "1" to wells A2...H2 in "1"
+    Transferring 30 from wells A1...A2 in "1" to wells A2...H2 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 130.0 uL from well A1 in "1" at 1 speed
+    Dispensing 30.0 uL into well A2 in "1"
+    Dispensing 30.0 uL into well B2 in "1"
+    Dispensing 30.0 uL into well C2 in "1"
+    Dispensing 30.0 uL into well D2 in "1"
+    Blowing out at well A1 in "12"
+    Aspirating 130.0 uL from well A2 in "1" at 1 speed
+    Dispensing 30.0 uL into well E2 in "1"
+    Dispensing 30.0 uL into well F2 in "1"
+    Dispensing 30.0 uL into well G2 in "1"
+    Dispensing 30.0 uL into well H2 in "1"
+    Blowing out at well A1 in "12"
+    Dropping tip well A1 in "12"
 
 **********************
 
@@ -469,26 +407,24 @@ The pipette can optionally get a new tip at the beginning of each aspirate, to h
         plate.wells('B1', 'B2', 'B3'),
         new_tip='always')    # always pick up a new tip
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
-    Transferring 100 from <WellSeries: <Well A1><Well A2><Well A3>> to <WellSeries: <Well B1><Well B2><Well B3>>
-    Picking up tip <Well A1>
-    Aspirating 100.0 uL from <Well A1> at 1 speed
-    Dispensing 100.0 uL into <Well B1>
-    Dropping tip <Well A1>
-    Picking up tip <Well B1>
-    Aspirating 100.0 uL from <Well A2> at 1 speed
-    Dispensing 100.0 uL into <Well B2>
-    Dropping tip <Well A1>
-    Picking up tip <Well C1>
-    Aspirating 100.0 uL from <Well A3> at 1 speed
-    Dispensing 100.0 uL into <Well B3>
-    Dropping tip <Well A1>
+    Transferring 100 from wells A1...A3 in "1" to wells B1...B3 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
+    Dispensing 100.0 uL into well B1 in "1"
+    Dropping tip well A1 in "12"
+    Picking up tip well B1 in "2"
+    Aspirating 100.0 uL from well A2 in "1" at 1 speed
+    Dispensing 100.0 uL into well B2 in "1"
+    Dropping tip well A1 in "12"
+    Picking up tip well C1 in "2"
+    Aspirating 100.0 uL from well A3 in "1" at 1 speed
+    Dispensing 100.0 uL into well B3 in "1"
+    Dropping tip well A1 in "12"
 
 Never Get a New Tip
 ------------------------
@@ -497,26 +433,32 @@ For scenarios where you instead are calling ``pick_up_tip()`` and ``drop_tip()``
 
 .. code-block:: python
 
+    pipette.pick_up_tip()
+    ...
     pipette.transfer(
         100,
         plate.wells('A1', 'A2', 'A3'),
         plate.wells('B1', 'B2', 'B3'),
         new_tip='never')    # never pick up or drop a tip
+    ...
+    pipette.drop_tip()
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
-    Transferring 100 from <WellSeries: <Well A1><Well A2><Well A3>> to <WellSeries: <Well B1><Well B2><Well B3>>
-    Aspirating 100.0 uL from <Well A1> at 1 speed
-    Dispensing 100.0 uL into <Well B1>
-    Aspirating 100.0 uL from <Well A2> at 1 speed
-    Dispensing 100.0 uL into <Well B2>
-    Aspirating 100.0 uL from <Well A3> at 1 speed
-    Dispensing 100.0 uL into <Well B3>
+    Picking up tip well A1 in "2"
+    ...
+    Transferring 100 from wells A1...A3 in "1" to wells B1...B3 in "1"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
+    Dispensing 100.0 uL into well B1 in "1"
+    Aspirating 100.0 uL from well A2 in "1" at 1 speed
+    Dispensing 100.0 uL into well B2 in "1"
+    Aspirating 100.0 uL from well A3 in "1" at 1 speed
+    Dispensing 100.0 uL into well B3 in "1"
+    ...
+    Dropping tip well A1 in "12"
 
 Trash or Return Tip
 ------------------------
@@ -531,19 +473,17 @@ By default, the transfer command will drop the pipette's tips in the trash conta
         plate.wells('B1'),
         trash=False)       # do not trash tip
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
-    Transferring 100 from <Well A1> to <Well B1>
-    Picking up tip <Well A1>
-    Aspirating 100.0 uL from <Well A1> at 1 speed
-    Dispensing 100.0 uL into <Well B1>
+    Transferring 100 from well A1 in "1" to well B1 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
+    Dispensing 100.0 uL into well B1 in "1"
     Returning tip
-    Dropping tip <Well A1>
+    Dropping tip well A1 in "2"
 
 Touch Tip
 ---------
@@ -558,20 +498,18 @@ A touch-tip can be performed after every aspirate and dispense by setting ``touc
         plate.wells('A2'),
         touch_tip=True)     # touch tip to each well's edge
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
-    Transferring 100 from <Well A1> to <Well A2>
-    Picking up tip <Well A1>
-    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Transferring 100 from well A1 in "1" to well A2 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
     Touching tip
-    Dispensing 100.0 uL into <Well A2>
+    Dispensing 100.0 uL into well A2 in "1"
     Touching tip
-    Dropping tip <Well A1>
+    Dropping tip well A1 in "12"
 
 Blow Out
 --------
@@ -586,19 +524,17 @@ A blow-out can be performed after every dispense that leaves the tip empty by se
         plate.wells('A2'),
         blow_out=True)      # blow out droplets when tip is empty
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
-    Transferring 100 from <Well A1> to <Well A2>
-    Picking up tip <Well A1>
-    Aspirating 100.0 uL from <Well A1> at 1 speed
-    Dispensing 100.0 uL into <Well A2>
+    Transferring 100 from well A1 in "1" to well A2 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
+    Dispensing 100.0 uL into well A2 in "1"
     Blowing out
-    Dropping tip <Well A1>
+    Dropping tip well A1 in "12"
 
 Mix Before/After
 ----------------
@@ -614,30 +550,28 @@ A mix can be performed before every aspirate by setting ``mix_before=``. The val
         mix_before=(2, 50), # mix 2 times with 50uL before aspirating
         mix_after=(3, 75))  # mix 3 times with 75uL after dispensing
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
-    Transferring 100 from <Well A1> to <Well A2>
-    Picking up tip <Well A1>
+    Transferring 100 from well A1 in "1" to well A2 in "1"
+    Picking up tip well A1 in "2"
     Mixing 2 times with a volume of 50ul
-    Aspirating 50 uL from <Well A1> at 1.0 speed
-    Dispensing 50 uL into None
-    Aspirating 50 uL from None at 1.0 speed
-    Dispensing 50 uL into None
-    Aspirating 100.0 uL from <Well A1> at 1 speed
-    Dispensing 100.0 uL into <Well A2>
+    Aspirating 50 uL from well A1 in "1" at 1.0 speed
+    Dispensing 50 uL into well A1 in "1"
+    Aspirating 50 uL from well A1 in "1" at 1.0 speed
+    Dispensing 50 uL into well A1 in "1"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
+    Dispensing 100.0 uL into well A2 in "1"
     Mixing 3 times with a volume of 75ul
-    Aspirating 75 uL from <Well A2> at 1.0 speed
-    Dispensing 75 uL into None
-    Aspirating 75 uL from None at 1.0 speed
-    Dispensing 75 uL into None
-    Aspirating 75 uL from None at 1.0 speed
-    Dispensing 75 uL into None
-    Dropping tip <Well A1>
+    Aspirating 75 uL from well A2 in "1" at 1.0 speed
+    Dispensing 75.0 uL into well A2 in "1"
+    Aspirating 75 uL from well A2 in "1" at 1.0 speed
+    Dispensing 75.0 uL into well A2 in "1"
+    Aspirating 75 uL from well A2 in "1" at 1.0 speed
+    Dispensing 75.0 uL into well A2 in "1"
+    Dropping tip well A1 in "12"
 
 Air Gap
 -------
@@ -652,18 +586,16 @@ An air gap can be performed after every aspirate by setting ``air_gap=int``, whe
         plate.wells('A2'),
         air_gap=20)         # add 20uL of air after each aspirate
 
-    for c in robot.commands():
-        print(c)
 
-will print out...
+will have the steps...
 
 .. code-block:: python
 
-    Transferring 100 from <Well A1> to <Well A2>
-    Picking up tip <Well A1>
-    Aspirating 100.0 uL from <Well A1> at 1 speed
+    Transferring 100 from well A1 in "1" to well A2 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
     Air gap
-    Aspirating 20 uL from None at 1.0 speed
-    Dispensing 20 uL into <Well A2>
-    Dispensing 100.0 uL into <Well A2>
-    Dropping tip <Well A1>
+    Aspirating 20 uL from well A1 in "1" at 1.0 speed
+    Dispensing 20 uL into well A2 in "1"
+    Dispensing 100.0 uL into well A2 in "1"
+    Dropping tip well A1 in "12"
