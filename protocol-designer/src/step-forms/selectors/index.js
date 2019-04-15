@@ -21,9 +21,7 @@ import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
 import { hydratePipetteEntities } from '../utils'
 import {
   selectors as labwareDefSelectors,
-  getAllDefinitions,
   type LabwareDefByDefId,
-  type DefsByLabwareId,
 } from '../../labware-defs'
 
 import type { FormWarning } from '../../steplist/formLevel'
@@ -68,8 +66,7 @@ export const getLabwareTypesById: Selector<LabwareTypeById> = createSelector(
     mapValues(labwareEntities, (labware: LabwareEntity) => labware.type)
 )
 
-// TODO IMMEDIATELY move to utils
-export function _hydrateLabwareEntity(
+function _hydrateLabwareEntity(
   l: LabwareEntity,
   labwareId: string,
   defs: LabwareDefByDefId
@@ -81,7 +78,6 @@ export function _hydrateLabwareEntity(
   }
 }
 
-// TODO IMMEDIATELY this replaces getLabwareDefByLabwareId in all places?!?!
 export const getHydratedLabwareEntities: Selector<HydratedLabwareEntities> = createSelector(
   getLabwareEntities,
   labwareDefSelectors.getLabwareDefsById,
@@ -98,20 +94,6 @@ export const _getHydratedLabwareEntitiesRootState: RootState => HydratedLabwareE
     mapValues(labwareEntities, (l: LabwareEntity, id: string) =>
       _hydrateLabwareEntity(l, id, labwareDefs)
     )
-)
-
-// TODO IMMEDIATELY revisit, should we just use hydrated instead?
-export const getLabwareDefByLabwareId: Selector<DefsByLabwareId> = createSelector(
-  labwareDefSelectors.getLabwareDefsById,
-  getLabwareEntities,
-  (defs, labwareEntities) =>
-    mapValues(labwareEntities, (labware: LabwareEntity) => {
-      if (labware.type in defs) {
-        return defs[labware.type]
-      }
-      console.warn(`No def for "${labware.type}", using 96 generic for now`)
-      return getAllDefinitions()[FALLBACK_DEF]
-    })
 )
 
 export const getHydratedPipetteEntities: Selector<HydratedPipetteEntities> = createSelector(

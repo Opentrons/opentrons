@@ -25,15 +25,15 @@ function _makeTipState(
 // NOTE this just adds missing well keys to the labware-ingred 'deck setup' liquid state
 export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> = createSelector(
   labwareIngredSelectors.getLiquidsByLabwareId,
-  stepFormSelectors.getLabwareDefByLabwareId,
-  (ingredLocations, defs) => {
-    const allLabwareIds: Array<string> = Object.keys(defs)
+  stepFormSelectors.getHydratedLabwareEntities,
+  (ingredLocations, labwareEntities) => {
+    const allLabwareIds: Array<string> = Object.keys(labwareEntities)
     return allLabwareIds.reduce(
       (
         acc: StepGeneration.LabwareLiquidState,
         labwareId
       ): StepGeneration.LabwareLiquidState => {
-        const labwareDef = defs[labwareId]
+        const labwareDef = labwareEntities[labwareId].def
         const allWells = labwareDef ? getAllWellsForLabware(labwareDef) : []
         const liquidStateForLabwareAllWells = allWells.reduce(
           (innerAcc: StepGeneration.SingleLabwareLiquidState, well) => ({
@@ -59,9 +59,9 @@ type TipState = $PropertyType<StepGeneration.RobotState, 'tipState'>
 type TiprackTipState = $PropertyType<TipState, 'tipracks'>
 export const getInitialRobotState: BaseState => StepGeneration.RobotState = createSelector(
   stepFormSelectors.getInitialDeckSetup,
-  stepFormSelectors.getLabwareDefByLabwareId,
+  stepFormSelectors.getHydratedLabwareEntities,
   getLabwareLiquidState,
-  (initialDeckSetup, labwareDefsByLabwareId, labwareLiquidState) => {
+  (initialDeckSetup, labwareEntities, labwareLiquidState) => {
     const labware = mapValues(
       initialDeckSetup.labware,
       (l: LabwareOnDeck, id: string): StepGeneration.LabwareData => ({
@@ -93,7 +93,7 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
         labwareData: StepGeneration.LabwareData,
         labwareId: string
       ) => {
-        const labwareDef = labwareDefsByLabwareId[labwareId]
+        const labwareDef = labwareEntities[labwareId].def
         if (getIsTiprack(labwareDef)) {
           return {
             ...acc,

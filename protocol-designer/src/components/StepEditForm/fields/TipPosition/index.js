@@ -111,9 +111,9 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   let wellHeightMM = null
   const labwareId: ?string = rawForm && rawForm[labwareFieldName]
   if (labwareId != null) {
-    const labwareDef = stepFormSelectors.getLabwareDefByLabwareId(state)[
+    const labwareDef = stepFormSelectors.getHydratedLabwareEntities(state)[
       labwareId
-    ]
+    ].def
 
     // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
     const firstWell = labwareDef.wells['A1']

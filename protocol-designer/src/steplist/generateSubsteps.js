@@ -22,7 +22,6 @@ import type {
 import { consolidate, distribute, transfer, mix } from '../step-generation'
 
 import type { StepIdType } from '../form-types'
-import type { DefsByLabwareId } from '../labware-defs'
 import type { RobotState } from '../step-generation'
 
 import type {
@@ -32,7 +31,7 @@ import type {
   DelayArgs,
   TransferArgs,
 } from '../step-generation/types'
-import type { PipetteOnDeck } from '../step-forms'
+import type { HydratedLabwareEntities, PipetteOnDeck } from '../step-forms'
 type AllPipetteData = { [pipetteId: string]: PipetteOnDeck }
 
 export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
@@ -40,11 +39,11 @@ export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 function transferLikeSubsteps(args: {
   stepArgs: ConsolidateArgs | DistributeArgs | TransferArgs | MixArgs,
   allPipetteData: AllPipetteData,
-  labwareDefsById: DefsByLabwareId,
+  labwareEntities: HydratedLabwareEntities,
   robotState: RobotState,
   stepId: StepIdType,
 }): ?SourceDestSubstepItem {
-  const { stepArgs, allPipetteData, labwareDefsById, stepId } = args
+  const { stepArgs, allPipetteData, labwareEntities, stepId } = args
 
   // Add tips to pipettes, since this is just a "simulation"
   // TODO: Ian 2018-07-31 develop more elegant way to bypass tip handling for simulation/test
@@ -116,7 +115,7 @@ function transferLikeSubsteps(args: {
   if (pipette.channels > 1) {
     const substepRows: Array<SubstepTimelineFrame> = substepTimeline(
       substepCommandCreators,
-      { channels: pipette.channels, labwareDefsById }
+      { channels: pipette.channels, labwareEntities }
     )(robotState)
     const mergedMultiRows: Array<
       Array<StepItemSourceDestRow>
@@ -257,7 +256,7 @@ function transferLikeSubsteps(args: {
 export function generateSubsteps(
   stepArgsAndErrors: ?StepArgsAndErrors,
   allPipetteData: AllPipetteData,
-  labwareDefsById: DefsByLabwareId,
+  labwareEntities: HydratedLabwareEntities,
   robotState: ?RobotState,
   stepId: string
 ): ?SubstepItemData {
@@ -296,7 +295,7 @@ export function generateSubsteps(
     return transferLikeSubsteps({
       stepArgs,
       allPipetteData,
-      labwareDefsById,
+      labwareEntities,
       robotState,
       stepId,
     })

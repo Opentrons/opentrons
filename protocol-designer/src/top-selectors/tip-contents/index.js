@@ -95,7 +95,7 @@ const getLastValidTips: GetTipSelector = createSelector(
 
 export const getTipsForCurrentStep: GetTipSelector = createSelector(
   stepFormSelectors.getOrderedStepIds,
-  stepFormSelectors.getLabwareDefByLabwareId,
+  stepFormSelectors.getHydratedLabwareEntities,
   fileDataSelectors.getRobotStateTimeline,
   stepsSelectors.getHoveredStepId,
   stepsSelectors.getActiveItem,
@@ -106,7 +106,7 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
   getAllSubsteps,
   (
     orderedStepIds,
-    labwareDefByLabwareId,
+    labwareEntities,
     robotStateTimeline,
     hoveredStepId,
     activeItem,
@@ -116,7 +116,7 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
     hoveredSubstepIdentifier,
     allSubsteps
   ) => {
-    const labwareDef = labwareDefByLabwareId[labwareId]
+    const labwareDef = labwareEntities[labwareId].def
     if (!activeItem.isStep) {
       const terminalId = activeItem.id
       if (terminalId === START_TERMINAL_ITEM_ID) {

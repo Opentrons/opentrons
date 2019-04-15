@@ -55,20 +55,20 @@ const _getWellContents = (
 }
 
 const getWellContentsAllLabware: Selector<WellContentsByLabware> = createSelector(
-  stepFormSelectors.getLabwareDefByLabwareId,
+  stepFormSelectors.getHydratedLabwareEntities,
   labwareIngredSelectors.getLiquidsByLabwareId,
   labwareIngredSelectors.getSelectedLabwareId,
   wellSelectionSelectors.getSelectedWells,
   wellSelectionSelectors.getHighlightedWells,
   (
-    labwareDefByLabwareId,
+    labwareEntities,
     liquidsByLabware,
     selectedLabwareId,
     selectedWells,
     highlightedWells
   ) => {
     // TODO: Ian 2019-02-14 weird flow error without explicit Array<string> annotation
-    const allLabwareIds: Array<string> = Object.keys(labwareDefByLabwareId)
+    const allLabwareIds: Array<string> = Object.keys(labwareEntities)
 
     return allLabwareIds.reduce(
       (acc: WellContentsByLabware, labwareId: string) => {
@@ -76,7 +76,7 @@ const getWellContentsAllLabware: Selector<WellContentsByLabware> = createSelecto
         const isSelectedLabware = selectedLabwareId === labwareId
 
         const wellContents = _getWellContents(
-          labwareDefByLabwareId[labwareId],
+          labwareEntities[labwareId].def,
           liquidsForLabware,
           // Only give _getWellContents the selection data if it's a selected container
           isSelectedLabware ? selectedWells : null,

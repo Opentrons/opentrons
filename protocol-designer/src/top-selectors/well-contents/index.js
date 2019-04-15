@@ -78,8 +78,8 @@ export const getAllWellContentsForSteps: Selector<
 > = createSelector(
   fileDataSelectors.getInitialRobotState,
   fileDataSelectors.getRobotStateTimeline,
-  stepFormSelectors.getLabwareDefByLabwareId,
-  (initialRobotState, robotStateTimeline, defs) => {
+  stepFormSelectors.getHydratedLabwareEntities,
+  (initialRobotState, robotStateTimeline, labwareEntities) => {
     const timeline = [
       { robotState: initialRobotState },
       ...robotStateTimeline.timeline,
@@ -92,7 +92,12 @@ export const getAllWellContentsForSteps: Selector<
         (
           labwareLiquids: StepGeneration.SingleLabwareLiquidState,
           labwareId: string
-        ) => _wellContentsForLabware(labwareLiquids, labwareId, defs[labwareId])
+        ) =>
+          _wellContentsForLabware(
+            labwareLiquids,
+            labwareId,
+            labwareEntities[labwareId].def
+          )
       )
     })
   }
@@ -100,8 +105,8 @@ export const getAllWellContentsForSteps: Selector<
 
 export const getLastValidWellContents: Selector<WellContentsByLabware> = createSelector(
   fileDataSelectors.lastValidRobotState,
-  stepFormSelectors.getLabwareDefByLabwareId,
-  (robotState, defs) => {
+  stepFormSelectors.getHydratedLabwareEntities,
+  (robotState, labwareEntities) => {
     return mapValues(
       robotState.labware,
       (
@@ -111,7 +116,7 @@ export const getLastValidWellContents: Selector<WellContentsByLabware> = createS
         return _wellContentsForLabware(
           robotState.liquidState.labware[labwareId],
           labwareId,
-          defs[labwareId]
+          labwareEntities[labwareId].def
         )
       }
     )
@@ -121,10 +126,10 @@ export const getLastValidWellContents: Selector<WellContentsByLabware> = createS
 export const getSelectedWellsMaxVolume: Selector<number> = createSelector(
   wellSelectionSelectors.getSelectedWells,
   labwareIngredSelectors.getSelectedLabwareId,
-  stepFormSelectors.getLabwareDefByLabwareId,
-  (selectedWells, selectedLabwareId, defs) => {
+  stepFormSelectors.getHydratedLabwareEntities,
+  (selectedWells, selectedLabwareId, labwareEntities) => {
     const selectedWellNames = Object.keys(selectedWells)
-    const def = selectedLabwareId && defs[selectedLabwareId]
+    const def = selectedLabwareId && labwareEntities[selectedLabwareId].def
     if (!def) {
       console.warn('No container type selected, cannot get max volume')
       return Infinity

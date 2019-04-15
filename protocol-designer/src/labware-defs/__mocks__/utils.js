@@ -1,7 +1,7 @@
 // @flow
 // replace webpack-specific require.context with Node-based glob in tests
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { DefsByLabwareId } from '../types'
+import type { LabwareDefByDefId } from '../types'
 import path from 'path'
 import glob from 'glob'
 
@@ -15,7 +15,7 @@ const allLabware = glob
   .map(require)
   .filter(d => d.metadata.displayCategory !== 'trash')
 
-export const getAllDefinitions = jest.fn<Array<void>, DefsByLabwareId>(
+export const getAllDefinitions = jest.fn<Array<void>, LabwareDefByDefId>(
   () => allLabware
 )
 

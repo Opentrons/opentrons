@@ -10,30 +10,31 @@ import { labwareToDisplayName } from '../../labware-ingred/utils'
 import { DISPOSAL_LABWARE_TYPES } from '../../constants'
 
 import type { Options } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { Selector } from '../../types'
-import type { LabwareEntity } from '../../step-forms'
+import type { HydratedLabwareEntity, LabwareEntity } from '../../step-forms'
 
 export const getLabwareNicknamesById: Selector<{
   [labwareId: string]: string,
 }> = createSelector(
-  stepFormSelectors.getLabwareEntities,
+  stepFormSelectors.getHydratedLabwareEntities,
   labwareIngredSelectors.getLabwareNameInfo,
   (labwareEntities, displayLabware): { [labwareId: string]: string } =>
-    mapValues(labwareEntities, (labwareEntity: LabwareEntity, id: string) =>
-      labwareToDisplayName(displayLabware[id], labwareEntity.type)
+    mapValues(
+      labwareEntities,
+      (labwareEntity: HydratedLabwareEntity, id: string) =>
+        labwareToDisplayName(displayLabware[id], labwareEntity.type)
     )
 )
 
 /** Returns options for dropdowns, excluding tiprack labware */
 export const getLabwareOptions: Selector<Options> = createSelector(
-  stepFormSelectors.getLabwareDefByLabwareId,
+  stepFormSelectors.getHydratedLabwareEntities,
   getLabwareNicknamesById,
-  (labwareDefsByLabwareId, nicknamesById) =>
+  (labwareEntities, nicknamesById) =>
     reduce(
-      labwareDefsByLabwareId,
-      (acc: Options, def: LabwareDefinition2, labwareId: string): Options => {
-        return getIsTiprack(def)
+      labwareEntities,
+      (acc: Options, l: HydratedLabwareEntity, labwareId: string): Options => {
+        return getIsTiprack(l.def)
           ? acc
           : [
               ...acc,
