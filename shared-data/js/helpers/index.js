@@ -9,6 +9,12 @@ export { default as getWellTotalVolume } from './getWellTotalVolume'
 export { default as wellIsRect } from './wellIsRect'
 export * from './volume'
 
+export const getLabwareDisplayName = (labwareDef: LabwareDefinition2) =>
+  labwareDef.metadata.displayName
+
+export const getLabwareFormat = (labwareDef: LabwareDefinition2) =>
+  labwareDef.parameters.format
+
 export function getLabwareHasQuirk(
   labwareDef: LabwareDefinition2,
   quirk: string

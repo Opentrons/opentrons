@@ -3,15 +3,14 @@ import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 
-import { getIsTiprack } from '@opentrons/shared-data'
+import { getIsTiprack, getLabwareFormat } from '@opentrons/shared-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { labwareToDisplayName } from '../../labware-ingred/utils'
-import { DISPOSAL_LABWARE_TYPES } from '../../constants'
 
 import type { Options } from '@opentrons/components'
 import type { Selector } from '../../types'
-import type { LabwareEntity, NormalizedLabware } from '../../step-forms'
+import type { LabwareEntity } from '../../step-forms'
 
 export const getLabwareNicknamesById: Selector<{
   [labwareId: string]: string,
@@ -20,7 +19,7 @@ export const getLabwareNicknamesById: Selector<{
   labwareIngredSelectors.getLabwareNameInfo,
   (labwareEntities, displayLabware): { [labwareId: string]: string } =>
     mapValues(labwareEntities, (labwareEntity: LabwareEntity, id: string) =>
-      labwareToDisplayName(displayLabware[id], labwareEntity.type)
+      labwareToDisplayName(displayLabware[id], labwareEntity.def)
     )
 )
 
@@ -48,22 +47,22 @@ export const getLabwareOptions: Selector<Options> = createSelector(
 
 /** Returns options for disposal (e.g. fixed trash and trash box) */
 export const getDisposalLabwareOptions: Selector<Options> = createSelector(
-  stepFormSelectors.getNormalizedLabwareById,
+  stepFormSelectors.getLabwareEntities,
   getLabwareNicknamesById,
-  (labwareById, names) =>
+  (labwareEntities, names) =>
     reduce(
-      labwareById,
-      (acc: Options, labware: NormalizedLabware, labwareId): Options => {
-        if (!labware.type || !DISPOSAL_LABWARE_TYPES.includes(labware.type)) {
-          return acc
+      labwareEntities,
+      (acc: Options, labware: LabwareEntity, labwareId): Options => {
+        if (getLabwareFormat(labware.def) === 'trash') {
+          return [
+            ...acc,
+            {
+              name: names[labwareId],
+              value: labwareId,
+            },
+          ]
         }
-        return [
-          ...acc,
-          {
-            name: names[labwareId],
-            value: labwareId,
-          },
-        ]
+        return acc
       },
       []
     )

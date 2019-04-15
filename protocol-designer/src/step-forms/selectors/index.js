@@ -51,19 +51,20 @@ const FALLBACK_DEF = '54d2f430-d602-11e8-80b1-6965467d172c'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 
-// NOTE Ian 2019-02-14: in Redux containers world, you probably only care about
-// the labware type, in which case you ought to use `getLabwareTypesById` instead.
-// `getNormalizedLabwareById` is intended for uses tied to the LabwareEntities type
+// NOTE Ian 2019-04-15: outside of this file, you probably only care about
+// the labware entity in its denormalized representation, in which case you ought
+// to use `getLabwareEntities` instead.
+// `_getNormalizedLabwareById` is intended for uses tied to the LabwareEntities type
 // (which currently contains only `type`, but may expand)
-// TODO IMMEDIATELY REMOVE???
-export const getNormalizedLabwareById: Selector<NormalizedLabwareById> = createSelector(
+const _getNormalizedLabwareById: Selector<NormalizedLabwareById> = createSelector(
   rootSelector,
   state => state.labwareInvariantProperties
 )
 
-// TODO IMMEDIATELY REMOVE???
+// TODO: Ian 2019-04-15 remove this selector completely. DEPRECATED.
+// Removal blocked by: BrowseLabwareModal/HighlightableLabware/LiquidPlacementModal/WellSelectionModal (all use SelectableLabware)
 export const getLabwareTypesById: Selector<LabwareTypeById> = createSelector(
-  getNormalizedLabwareById,
+  _getNormalizedLabwareById,
   normalizedLabwareById =>
     mapValues(normalizedLabwareById, (l: NormalizedLabware) => l.type)
 )
@@ -81,7 +82,7 @@ function _hydrateLabwareEntity(
 }
 
 export const getLabwareEntities: Selector<LabwareEntities> = createSelector(
-  getNormalizedLabwareById,
+  _getNormalizedLabwareById,
   labwareDefSelectors.getLabwareDefsById,
   (normalizedLabwareById, labwareDefs) =>
     mapValues(normalizedLabwareById, (l: NormalizedLabware, id: string) =>
@@ -89,6 +90,7 @@ export const getLabwareEntities: Selector<LabwareEntities> = createSelector(
     )
 )
 
+// Special version of `getLabwareEntities` selector for use in step-forms reducers
 export const _getLabwareEntitiesRootState: RootState => LabwareEntities = createSelector(
   rs => rs.labwareInvariantProperties,
   labwareDefSelectors._getLabwareDefsByIdRootState,
@@ -109,7 +111,7 @@ export const getInitialDeckSetupStepForm = (state: BaseState) =>
 
 export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   getInitialDeckSetupStepForm,
-  getNormalizedLabwareById,
+  _getNormalizedLabwareById,
   getPipetteEntities,
   (
     initialSetupStep,
@@ -128,6 +130,7 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
       labware: mapValues(
         labwareLocations,
         (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
+          // TODO IMMEDIATELY: revisit labware in this selector
           return { slot, ...labwareInvariantProperties[labwareId] }
         }
       ),

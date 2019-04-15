@@ -1,6 +1,7 @@
 // @flow
 import { connect } from 'react-redux'
 import assert from 'assert'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import LabwareDetailsCard from './LabwareDetailsCard'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
@@ -21,22 +22,25 @@ type SP = $Diff<Props, DP> & { _labwareId?: string }
 function mapStateToProps(state: BaseState): SP {
   const labwareNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
   const labwareId = labwareIngredSelectors.getSelectedLabwareId(state)
-  const labwareType =
-    labwareId && stepFormSelectors.getLabwareTypesById(state)[labwareId]
+  const labwareDefDisplayName =
+    labwareId &&
+    getLabwareDisplayName(
+      stepFormSelectors.getLabwareEntities(state)[labwareId].def
+    )
 
   assert(
-    labwareId && labwareType,
-    'Expected labware id & type to exist in connected labware details card'
+    labwareId,
+    'Expected labware id to exist in connected labware details card'
   )
-  if (!labwareId || !labwareType) {
+  if (!labwareId || !labwareDefDisplayName) {
     return {
-      labwareType: '?',
+      labwareDefDisplayName: '?',
       nickname: '?',
     }
   }
 
   return {
-    labwareType: labwareType,
+    labwareDefDisplayName,
     nickname: labwareNicknamesById[labwareId] || 'Unnamed Labware',
     _labwareId: labwareId,
   }

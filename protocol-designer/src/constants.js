@@ -24,9 +24,6 @@ export function getAllWellsForLabware(def: LabwareDefinition2): Array<string> {
   return Object.keys(def.wells)
 }
 
-// Labware types that are allowed to act as disposal labware
-export const DISPOSAL_LABWARE_TYPES = ['trash-box', 'fixed-trash']
-
 export const FIXED_TRASH_ID: 'trashId' = 'trashId'
 
 export const START_TERMINAL_TITLE = 'STARTING DECK STATE'

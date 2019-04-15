@@ -2,12 +2,17 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import isEmpty from 'lodash/isEmpty'
+import mapValues from 'lodash/mapValues'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import type { BaseState, ThunkDispatch } from '../types'
 
 import type { SubstepIdentifier } from '../steplist/types'
 import * as substepSelectors from '../top-selectors/substeps'
 import { selectors as dismissSelectors } from '../dismiss'
-import { selectors as stepFormSelectors } from '../step-forms'
+import {
+  selectors as stepFormSelectors,
+  type LabwareEntity,
+} from '../step-forms'
 import {
   selectors as stepsSelectors,
   actions as stepsActions,
@@ -37,7 +42,10 @@ type SP = {|
   hovered: $PropertyType<Props, 'hovered'>,
   hoveredSubstep: $PropertyType<Props, 'hoveredSubstep'>,
   labwareNicknamesById: $PropertyType<Props, 'labwareNicknamesById'>,
-  labwareTypesById: $PropertyType<Props, 'labwareTypesById'>,
+  labwareDefDisplayNamesById: $PropertyType<
+    Props,
+    'labwareDefDisplayNamesById'
+  >,
   ingredNames: $PropertyType<Props, 'ingredNames'>,
 |}
 
@@ -86,7 +94,10 @@ const makeMapStateToProps = () => {
       hovered: hoveredStep === stepId && !hoveredSubstep,
 
       labwareNicknamesById: uiLabwareSelectors.getLabwareNicknamesById(state),
-      labwareTypesById: stepFormSelectors.getLabwareTypesById(state),
+      labwareDefDisplayNamesById: mapValues(
+        stepFormSelectors.getLabwareEntities(state),
+        (l: LabwareEntity) => getLabwareDisplayName(l.def)
+      ),
       ingredNames: labwareIngredSelectors.getLiquidNamesById(state),
     }
   }

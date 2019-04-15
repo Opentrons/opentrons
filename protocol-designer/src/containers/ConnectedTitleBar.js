@@ -3,12 +3,8 @@ import * as React from 'react'
 import type { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 
-import {
-  TitleBar,
-  Icon,
-  humanizeLabwareType,
-  type IconName,
-} from '@opentrons/components'
+import { TitleBar, Icon, type IconName } from '@opentrons/components'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import styles from './TitleBar.css'
 import i18n from '../localization'
 import { START_TERMINAL_TITLE, END_TERMINAL_TITLE } from '../constants'
@@ -75,9 +71,9 @@ function mapStateToProps(state: BaseState): SP {
 
   const labwareNickname =
     selectedLabwareId != null ? labwareNames[selectedLabwareId] : null
-  const labwareType =
+  const labwareEntity =
     selectedLabwareId != null
-      ? stepFormSelectors.getLabwareTypesById(state)[selectedLabwareId]
+      ? stepFormSelectors.getLabwareEntities(state)[selectedLabwareId]
       : null
   const liquidPlacementMode = selectedLabwareId != null
 
@@ -111,7 +107,7 @@ function mapStateToProps(state: BaseState): SP {
           _page,
           _liquidPlacementMode: liquidPlacementMode,
           title: labwareNickname,
-          subtitle: labwareType,
+          subtitle: labwareEntity && getLabwareDisplayName(labwareEntity.def),
           backButtonLabel: 'Deck',
         }
       }
@@ -124,14 +120,14 @@ function mapStateToProps(state: BaseState): SP {
         subtitle = END_TERMINAL_TITLE
         if (drilledDownLabwareId) {
           backButtonLabel = 'Deck'
-          const labwareType = stepFormSelectors.getLabwareTypesById(state)[
+          const labwareDef = stepFormSelectors.getLabwareEntities(state)[
             drilledDownLabwareId
-          ]
+          ].def
           const nickname = uiLabwareSelectors.getLabwareNicknamesById(state)[
             drilledDownLabwareId
           ]
           title = nickname
-          subtitle = labwareType && humanizeLabwareType(labwareType)
+          subtitle = labwareDef && getLabwareDisplayName(labwareDef)
         }
       } else if (selectedStep) {
         if (wellSelectionLabwareKey) {

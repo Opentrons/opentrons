@@ -16,11 +16,11 @@ function getNextDisambiguationNumber(
   state: BaseState,
   newLabwareType: string
 ): number {
-  const labwareTypesById = stepFormSelectors.getLabwareTypesById(state)
+  const labwareEntities = stepFormSelectors.getLabwareEntities(state)
   const labwareNamesMap = labwareIngredsSelectors.getLabwareNameInfo(state)
-  const allIds = Object.keys(labwareTypesById)
+  const allIds = Object.keys(labwareEntities)
   const sameTypeLabware = allIds.filter(
-    labwareId => labwareTypesById[labwareId] === newLabwareType
+    labwareId => labwareEntities.type === newLabwareType
   )
   const disambigNumbers = sameTypeLabware.map(
     labwareId =>
