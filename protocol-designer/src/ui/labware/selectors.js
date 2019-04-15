@@ -32,7 +32,7 @@ export const getLabwareOptions: Selector<Options> = createSelector(
   (labwareDefsByLabwareId, nicknamesById) =>
     reduce(
       labwareDefsByLabwareId,
-      (acc: Options, def: LabwareDefinition2, labwareId): Options => {
+      (acc: Options, def: LabwareDefinition2, labwareId: string): Options => {
         return getIsTiprack(def)
           ? acc
           : [

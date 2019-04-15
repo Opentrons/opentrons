@@ -21,6 +21,8 @@ import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
 import { hydratePipetteEntities } from '../utils'
 import {
   selectors as labwareDefSelectors,
+  getAllDefinitions,
+  type LabwareDefByDefId,
   type DefsByLabwareId,
 } from '../../labware-defs'
 
@@ -47,6 +49,8 @@ import type {
 } from '../types'
 import type { RootState } from '../reducers'
 
+const FALLBACK_DEF = '54d2f430-d602-11e8-80b1-6965467d172c'
+
 const rootSelector = (state: BaseState): RootState => state.stepForms
 
 // NOTE Ian 2019-02-14: in Redux containers world, you probably only care about
@@ -64,65 +68,50 @@ export const getLabwareTypesById: Selector<LabwareTypeById> = createSelector(
     mapValues(labwareEntities, (labware: LabwareEntity) => labware.type)
 )
 
-// NOTE: this mapping should be reviewed before using it in migration later
-export const V1_NAME_TO_V2_OTID = {
-  '12-well-plate': 'a4961650-54c9-11e9-989a-e90aec2c3723',
-  '24-well-plate': '4373e820-54c9-11e9-9364-556fc2c8a783',
-  '384-plate': 'cf69e110-f50e-11e8-bb2a-e7b1dd90654d',
-  '48-well-plate': '3d53c440-f50d-11e8-bb2a-e7b1dd90654d',
-  '6-well-plate': 'bd10e8d0-f4da-11e8-bb2a-e7b1dd90654d',
-  '96-PCR-flat': 'a07a3f50-ec38-11e8-a3cc-d7bd32b6c4b1',
-  '96-flat': '54d2f430-d602-11e8-80b1-6965467d172c',
-  'biorad-hardshell-96-PCR': 'a07a3f50-ec38-11e8-a3cc-d7bd32b6c4b1',
-  'opentrons-aluminum-block-2ml-eppendorf':
-    'cf9cbb20-f401-11e8-a244-69cb0fde6293',
-  'opentrons-aluminum-block-2ml-screwcap':
-    'cf9cbb20-f401-11e8-a244-69cb0fde6293',
-  'opentrons-aluminum-block-96-PCR-plate':
-    'd88a5b70-f4c9-11e8-83b8-c3ba5d2a3baa',
-  'opentrons-tiprack-300ul': '3d278f00-ffe0-11e8-abfa-95044b186e81',
-  'opentrons-tuberack-1.5ml-eppendorf': '9467f4b0-fa3d-11e8-b76d-25864338afc4',
-  'opentrons-tuberack-15_50ml': 'f65f2960-0f76-11e9-8659-e18ed15996f5',
-  'opentrons-tuberack-15ml': 'e57a7130-54c8-11e9-a8d4-c1917c1bf74f',
-  'opentrons-tuberack-2ml-eppendorf': 'b28e5eb0-e8f0-11e8-b93b-5f6727dde048',
-  'opentrons-tuberack-2ml-screwcap': 'e8c55910-e8f1-11e8-b93b-5f6727dde048',
-  'opentrons-tuberack-50ml': '23784a80-5563-11e9-bf87-f7b718396190',
-  'tiprack-1000ul': 'd4e462c0-ffde-11e8-abfa-95044b186e81',
-  'tiprack-10ul': '88154cc0-ffde-11e8-abfa-95044b186e81',
-  'trough-12row': 'a41d9ef0-f4b6-11e8-90c2-7106f0eae5a7',
+// TODO IMMEDIATELY move to utils
+export function _hydrateLabwareEntity(
+  l: LabwareEntity,
+  labwareId: string,
+  defs: LabwareDefByDefId
+): HydratedLabwareEntity {
+  return {
+    ...l,
+    id: labwareId,
+    def: defs[l.type] || defs[FALLBACK_DEF],
+  }
 }
 
-// TODO: Ian 2019-04-10 SHIM REMOVAL #3335
+// TODO IMMEDIATELY this replaces getLabwareDefByLabwareId in all places?!?!
+export const getHydratedLabwareEntities: Selector<HydratedLabwareEntities> = createSelector(
+  getLabwareEntities,
+  labwareDefSelectors.getLabwareDefsById,
+  (labwareEntities, labwareDefs) =>
+    mapValues(labwareEntities, (l: LabwareEntity, id: string) =>
+      _hydrateLabwareEntity(l, id, labwareDefs)
+    )
+)
+
+export const _getHydratedLabwareEntitiesRootState: RootState => HydratedLabwareEntities = createSelector(
+  rs => rs.labwareInvariantProperties,
+  labwareDefSelectors._getLabwareDefsByIdRootState,
+  (labwareEntities, labwareDefs) =>
+    mapValues(labwareEntities, (l: LabwareEntity, id: string) =>
+      _hydrateLabwareEntity(l, id, labwareDefs)
+    )
+)
+
+// TODO IMMEDIATELY revisit, should we just use hydrated instead?
 export const getLabwareDefByLabwareId: Selector<DefsByLabwareId> = createSelector(
   labwareDefSelectors.getLabwareDefsById,
   getLabwareEntities,
   (defs, labwareEntities) =>
     mapValues(labwareEntities, (labware: LabwareEntity) => {
-      const defId = labware.type
-      if (defId in defs) {
-        return defs[defId]
-      } else if (defId in V1_NAME_TO_V2_OTID) {
-        return defs[V1_NAME_TO_V2_OTID[defId]]
+      if (labware.type in defs) {
+        return defs[labware.type]
       }
-      console.warn(
-        `No def in V1_NAME_TO_V2_OTID for "${defId}", using 96 generic for now`
-      )
-      return defs[V1_NAME_TO_V2_OTID['96-flat']]
+      console.warn(`No def for "${labware.type}", using 96 generic for now`)
+      return getAllDefinitions()[FALLBACK_DEF]
     })
-)
-
-export const getHydratedLabwareEntities: Selector<HydratedLabwareEntities> = createSelector(
-  getLabwareEntities,
-  getLabwareDefByLabwareId,
-  (labwareEntities, labwareDefByLabwareId) =>
-    mapValues(
-      labwareEntities,
-      (l: LabwareEntity, labwareId: string): HydratedLabwareEntity => ({
-        ...l,
-        id: labwareId,
-        def: labwareDefByLabwareId[labwareId],
-      })
-    )
 )
 
 export const getHydratedPipetteEntities: Selector<HydratedPipetteEntities> = createSelector(
