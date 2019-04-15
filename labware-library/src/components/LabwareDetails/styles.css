@@ -24,6 +24,10 @@
   color: var(--c-blue);
 }
 
+.lighter {
+  opacity: 0.5;
+}
+
 .stats,
 .dimensions,
 .well_dimensions {
@@ -34,6 +38,10 @@
 .well_dimensions {
   display: inline-block;
   vertical-align: top;
+
+  &:nth-child(even) {
+    margin-right: 0;
+  }
 }
 
 .well_dimensions_row {
@@ -43,10 +51,6 @@
 
   &:first-child {
     border: none;
-  }
-
-  &:nth-child(even) {
-    margin-right: 0;
   }
 }
 

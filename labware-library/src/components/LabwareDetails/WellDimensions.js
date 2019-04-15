@@ -61,8 +61,22 @@ export default function WellDimensions(props: WellDimensionsProps) {
         const spacing = [
           { label: X_OFFSET, value: toFixed(w.xOffset) },
           { label: Y_OFFSET, value: toFixed(w.yOffset) },
-          { label: X_SPACING, value: toFixed(w.xSpacing) },
-          { label: Y_SPACING, value: toFixed(w.ySpacing) },
+          {
+            label: X_SPACING,
+            value: w.xSpacing ? (
+              toFixed(w.xSpacing)
+            ) : (
+              <span className={styles.lighter}>N/A</span>
+            ),
+          },
+          {
+            label: Y_SPACING,
+            value: w.ySpacing ? (
+              toFixed(w.ySpacing)
+            ) : (
+              <span className={styles.lighter}>N/A</span>
+            ),
+          },
         ]
 
         return (
