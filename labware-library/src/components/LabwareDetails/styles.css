@@ -35,6 +35,10 @@
   margin-right: var(--spacing-7);
 }
 
+.stats {
+  margin-bottom: var(--spacing-5);
+}
+
 .well_dimensions {
   display: inline-block;
   vertical-align: top;
