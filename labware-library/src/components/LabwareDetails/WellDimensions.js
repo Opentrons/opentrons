@@ -23,7 +23,14 @@ import { getDisplayVolume } from '@opentrons/shared-data'
 import { getUniqueWellProperties } from '../../definitions'
 import styles from './styles.css'
 
-import { LabeledValueTable, LowercaseText } from '../ui'
+import {
+  LabeledValueTable,
+  TableEntry,
+  LabelText,
+  Value,
+  LowercaseText,
+  LABEL_LEFT,
+} from '../ui'
 
 import type { LabwareDefinition } from '../../types'
 
@@ -58,7 +65,6 @@ export default function WellDimensions(props: WellDimensionsProps) {
           w.width != null ? { label: Y_DIM, value: toFixed(w.width) } : null,
           // TODO(mc, 2019-04-15): change label to icon
           { label: SHAPE, value: w.shape },
-          { label: MAX_VOLUME, value: `${vol} ${displayVolumeUnits}` },
         ].filter(Boolean)
 
         const spacing = [
@@ -78,7 +84,16 @@ export default function WellDimensions(props: WellDimensionsProps) {
                 </>
               }
               values={dimensions}
-            />
+            >
+              <div className={styles.well_volume}>
+                <TableEntry>
+                  <LabelText position={LABEL_LEFT}>{MAX_VOLUME}</LabelText>
+                  <Value>
+                    {vol} {displayVolumeUnits}
+                  </Value>
+                </TableEntry>
+              </div>
+            </LabeledValueTable>
             <LabeledValueTable
               className={styles.well_dimensions}
               label={

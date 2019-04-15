@@ -58,6 +58,10 @@
   }
 }
 
+.well_volume {
+  padding: 0 var(--spacing-2);
+}
+
 @media (--medium) {
   .gallery_container {
     display: inline-block;

@@ -17,10 +17,11 @@ export type LabledValueTableProps = {
   values: Array<ValueEntry>,
   direction?: TableDirection,
   className?: string,
+  children?: React.Node,
 }
 
 export function LabeledValueTable(props: LabledValueTableProps) {
-  const { label, values, direction, className } = props
+  const { label, values, direction, className, children } = props
 
   return (
     <div className={className}>
@@ -33,6 +34,7 @@ export function LabeledValueTable(props: LabledValueTableProps) {
           </TableEntry>
         ))}
       </Table>
+      {children}
     </div>
   )
 }
