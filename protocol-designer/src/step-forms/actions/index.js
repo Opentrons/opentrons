@@ -1,6 +1,4 @@
 // @flow
-import mapValues from 'lodash/mapValues'
-import pick from 'lodash/pick'
 import type { StepIdType } from '../../form-types'
 
 export type CreatePipettesAction = {
@@ -14,12 +12,8 @@ export type CreatePipettesAction = {
 }
 
 export const createPipettes = (
-  arg: $PropertyType<CreatePipettesAction, 'payload'>
+  payload: $PropertyType<CreatePipettesAction, 'payload'>
 ): CreatePipettesAction => {
-  // for convenience of caller, strip out 'mount' etc
-  const payload = mapValues(arg, pipette =>
-    pick(pipette, ['name', 'tiprackModel'])
-  )
   return {
     type: 'CREATE_PIPETTES',
     payload,

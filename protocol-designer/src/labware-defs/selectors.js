@@ -7,7 +7,9 @@ import type { BaseState, Selector } from '../types'
 import type { DefsByLabwareId } from './types'
 import type { RootState } from './reducers'
 
-export const rootSelector = (state: BaseState): RootState => state.labwareDefs
+// NOTE: labware-defs/ state is nested inside step-forms
+export const rootSelector = (state: BaseState): RootState =>
+  state.stepForms.labwareDefs
 
 const _getLabwareDef = (
   customDefs: DefsByLabwareId,

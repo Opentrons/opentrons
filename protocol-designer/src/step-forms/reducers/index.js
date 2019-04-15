@@ -8,6 +8,12 @@ import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 
+import {
+  rootReducer as labwareDefsRootReducer,
+  getAllDefinitions,
+  type RootState as LabwareDefsRootState,
+} from '../../labware-defs'
+
 import { INITIAL_DECK_SETUP_STEP_ID, FIXED_TRASH_ID } from '../../constants.js'
 import { getPDMetadata } from '../../file-types'
 import {
@@ -41,7 +47,13 @@ import type {
   SaveStepFormAction,
 } from '../../steplist/actions'
 import type { StepItemData } from '../../steplist/types'
-import type { PipetteEntities, LabwareEntities } from '../types'
+import type {
+  PipetteEntities,
+  LabwareEntities,
+  LabwareEntity,
+  HydratedLabwareEntity,
+  HydratedLabwareEntities,
+} from '../types'
 import type {
   CreatePipettesAction,
   DeletePipettesAction,
@@ -53,6 +65,7 @@ import {
   getLabwareIdInSlot,
   pipetteModelToName,
 } from '../utils'
+import { V1_NAME_TO_V2_OTID } from '../selectors'
 
 type FormState = FormData | null
 
@@ -77,7 +90,7 @@ export const unsavedForm = (
         action.payload.update,
         unsavedFormState,
         hydratePipetteEntities(rootState.pipetteInvariantProperties),
-        rootState.labwareInvariantProperties
+        _hydrateLabwareEntities(rootState)
       )
       return {
         ...unsavedFormState,
@@ -116,7 +129,7 @@ export const unsavedForm = (
             { pipette: substitutionMap[unsavedFormState.pipette] },
             unsavedFormState,
             hydratePipetteEntities(rootState.pipetteInvariantProperties),
-            rootState.labwareInvariantProperties
+            _hydrateLabwareEntities(rootState)
           ),
         }
       }
@@ -260,7 +273,7 @@ export const savedStepForms = (
                   { [fieldName]: null },
                   acc,
                   hydratePipetteEntities(rootState.pipetteInvariantProperties),
-                  rootState.labwareInvariantProperties
+                  _hydrateLabwareEntities(rootState)
                 ),
               }
             } else {
@@ -294,7 +307,7 @@ export const savedStepForms = (
               { pipette: null },
               form,
               hydratePipetteEntities(rootState.pipetteInvariantProperties),
-              rootState.labwareInvariantProperties
+              _hydrateLabwareEntities(rootState)
             ),
           }
         }
@@ -323,7 +336,7 @@ export const savedStepForms = (
           { pipette: substitutionMap[prevStepForm.pipette] },
           prevStepForm,
           hydratePipetteEntities(rootState.pipetteInvariantProperties),
-          rootState.labwareInvariantProperties
+          _hydrateLabwareEntities(rootState)
         )
 
         return {
@@ -363,7 +376,7 @@ export const savedStepForms = (
             action.payload.update,
             previousForm,
             hydratePipetteEntities(rootState.pipetteInvariantProperties),
-            rootState.labwareInvariantProperties
+            _hydrateLabwareEntities(rootState)
           ),
         },
       }
@@ -457,6 +470,7 @@ export const pipetteInvariantProperties = handleActions(
             `expected tiprackModel in file metadata for pipette ${pipetteId}`
           )
           return {
+            id: pipetteId,
             name: filePipette.name || pipetteModelToName(filePipette.model),
             tiprackModel,
           }
@@ -590,6 +604,7 @@ export const legacySteps = handleActions(
 
 export type RootState = {
   orderedStepIds: OrderedStepIdsState,
+  labwareDefs: LabwareDefsRootState,
   labwareInvariantProperties: LabwareEntities,
   pipetteInvariantProperties: PipetteEntities,
   legacySteps: LegacyStepsState,
@@ -612,10 +627,11 @@ const rootReducer = (state: RootState, action: any) => {
       prevStateFallback.pipetteInvariantProperties,
       action
     ),
+    labwareDefs: labwareDefsRootReducer(prevStateFallback.labwareDefs, action),
     legacySteps: legacySteps(prevStateFallback.legacySteps, action),
     // 'forms' reducers get full rootReducer state
     savedStepForms: savedStepForms(state, action),
-    unsavedForm: unsavedForm(state, action), // TODO IMMEDIATELY this needs access to //labwareDefs/customLabware
+    unsavedForm: unsavedForm(state, action),
   }
   if (
     state &&
@@ -630,3 +646,39 @@ const rootReducer = (state: RootState, action: any) => {
 }
 
 export default rootReducer
+
+// TODO IMMEDIATELY move to ./selectors -> getHydratedLabwareEntities???
+// TODO IMMEDIATELY this replaces getLabwareDefByLabwareId in all places?!?!
+function _hydrateLabwareEntities(
+  rootState: RootState
+): HydratedLabwareEntities {
+  const labwareEntities = rootState.labwareInvariantProperties
+  const labwareDefs = {
+    ...getAllDefinitions(),
+    ...rootState.labwareDefs.customDefs,
+  }
+
+  return mapValues(
+    labwareEntities,
+    (l: LabwareEntity, labwareId: string): HydratedLabwareEntity => {
+      let labwareDefId = l.type
+      if (!(l.type in labwareDefs)) {
+        if (l.type in V1_NAME_TO_V2_OTID) {
+          labwareDefId = V1_NAME_TO_V2_OTID[l.type]
+        } else {
+          console.warn(
+            `No def in V1_NAME_TO_V2_OTID for "${
+              l.type
+            }", using 96 generic for now`
+          )
+          labwareDefId = V1_NAME_TO_V2_OTID['96-flat']
+        }
+      }
+      return {
+        ...l,
+        id: labwareId,
+        def: labwareDefs[l.type] || labwareDefs[labwareDefId],
+      }
+    }
+  )
+}

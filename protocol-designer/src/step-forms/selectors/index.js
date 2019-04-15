@@ -65,7 +65,7 @@ export const getLabwareTypesById: Selector<LabwareTypeById> = createSelector(
 )
 
 // NOTE: this mapping should be reviewed before using it in migration later
-const V1_NAME_TO_V2_OTID = {
+export const V1_NAME_TO_V2_OTID = {
   '12-well-plate': 'a4961650-54c9-11e9-989a-e90aec2c3723',
   '24-well-plate': '4373e820-54c9-11e9-9364-556fc2c8a783',
   '384-plate': 'cf69e110-f50e-11e8-bb2a-e7b1dd90654d',
@@ -117,8 +117,9 @@ export const getHydratedLabwareEntities: Selector<HydratedLabwareEntities> = cre
   (labwareEntities, labwareDefByLabwareId) =>
     mapValues(
       labwareEntities,
-      (l: LabwareEntity, labwareId): HydratedLabwareEntity => ({
+      (l: LabwareEntity, labwareId: string): HydratedLabwareEntity => ({
         ...l,
+        id: labwareId,
         def: labwareDefByLabwareId[labwareId],
       })
     )

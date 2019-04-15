@@ -38,6 +38,7 @@ export type FormPipettesByMount = {
 export type PipetteEntities = {
   [pipetteId: string]: {|
     name: string,
+    id: string,
     tiprackModel: string, // TODO: Ian 2019-04-12 change to `tiprackOtId`
   |},
 }
@@ -45,6 +46,7 @@ export type PipetteEntity = $Values<PipetteEntities>
 
 export type HydratedPipetteEntity = {|
   name: string,
+  id: string,
   tiprackModel: string, // TODO: Ian 2019-04-12 change to `tiprackOtId`
   // TODO: Ian 2019-04-12 add `tiprackLabwareDef`
   spec: PipetteNameSpecs,
@@ -58,14 +60,15 @@ export type HydratedPipetteEntities = {
 
 export type LabwareEntities = {
   [labwareId: string]: {|
-    type: string, // TODO: Ian 2019-04-12 change to `otId`
+    type: string, // TODO: Ian 2019-04-12 change to `definitionOtId`
   |},
 }
 
 export type LabwareEntity = $Values<LabwareEntities>
 
 export type HydratedLabwareEntity = {|
-  type: string, // TODO: Ian 2019-04-12 change to `otId`
+  id: string,
+  type: string, // TODO: Ian 2019-04-12 change to `definitionOtId`
   def: LabwareDefinition2,
 |}
 export type HydratedLabwareEntities = {

@@ -2,6 +2,7 @@
 import type { ElementProps } from 'react'
 import { connect } from 'react-redux'
 import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { uuid } from '../../../utils'
@@ -16,7 +17,7 @@ import { actions as stepFormActions } from '../../../step-forms'
 import { actions as steplistActions } from '../../../steplist'
 import FilePipettesModal from '../FilePipettesModal'
 import type { BaseState, ThunkDispatch } from '../../../types'
-import type { PipetteOnDeck } from '../../../step-forms'
+import type { PipetteOnDeck, PipetteEntity } from '../../../step-forms'
 
 export default connect(
   mapStateToProps,
@@ -57,8 +58,14 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
       } = pipettes.reduce((acc, pipette) => ({ ...acc, [uuid()]: pipette }), {})
 
       // create new pipette entities
-      // TODO: Ian 2018-12-21 $FlowFixMe flow doesn't want 'mount' to go in `createPipettes`, though this is handled with a `pick` in createPipettes already. I tried typing the arg to createPipettes differently but couldn't get anything to work
-      dispatch(stepFormActions.createPipettes(pipettesById))
+      dispatch(
+        stepFormActions.createPipettes(
+          mapValues(
+            pipettesById,
+            (p: PipetteOnDeck): PipetteEntity => omit(p, 'mount')
+          )
+        )
+      )
 
       // update pipette locations in initial deck setup step
       dispatch(

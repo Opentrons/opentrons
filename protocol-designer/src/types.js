@@ -2,7 +2,6 @@
 import type { RootState as Analytics } from './analytics'
 import type { RootState as Dismiss } from './dismiss'
 import type { RootState as FileData } from './file-data'
-import type { RootState as LabwareDefs } from './labware-defs'
 import type { RootState as LabwareIngred } from './labware-ingred/reducers'
 import type { RootState as LoadFile } from './load-file'
 import type { RootState as Navigation } from './navigation'
@@ -14,7 +13,6 @@ export type BaseState = {
   analytics: Analytics,
   dismiss: Dismiss,
   fileData: FileData,
-  labwareDefs: LabwareDefs,
   labwareIngred: LabwareIngred,
   loadFile: LoadFile,
   navigation: Navigation,
