@@ -4,6 +4,8 @@ import * as React from 'react'
 
 import { LabwareGallery, Tags, LoadName } from '../LabwareList'
 import Stats from './Stats'
+import Dimensions from './Dimensions'
+import WellDimensions from './WellDimensions'
 import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
@@ -28,6 +30,8 @@ export default function LabwareDetails(props: LabwareDetailsProps) {
       <div className={styles.details_container}>
         <h2 className={styles.title}>{metadata.displayName}</h2>
         <Stats definition={definition} />
+        <Dimensions definition={definition} />
+        <WellDimensions definition={definition} />
       </div>
     </>
   )

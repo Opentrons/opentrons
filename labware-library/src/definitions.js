@@ -3,11 +3,17 @@
 // TODO(mc, 2019-03-18): move to shared-data?
 import * as React from 'react'
 import { Route } from 'react-router-dom'
-
+import find from 'lodash/find'
+import flatten from 'lodash/flatten'
+import round from 'lodash/round'
 import { getPublicPath } from './public-path'
 
 import type { ContextRouter } from 'react-router-dom'
-import type { LabwareList, LabwareDefinition } from './types'
+import type {
+  LabwareList,
+  LabwareWellGroupProperties,
+  LabwareDefinition,
+} from './types'
 
 // require all definitions in the definitions2 directory
 // $FlowFixMe: require.context is webpack-specific method
@@ -35,6 +41,35 @@ export function getAllDefinitions(): LabwareList {
 export function getDefinition(loadName: ?string): LabwareDefinition | null {
   const def = getAllDefinitions().find(d => d.parameters.loadName === loadName)
   return def || null
+}
+
+// TODO(mc, 2019-03-21): move to shared data
+export function getUniqueWellProperties(
+  definition: LabwareDefinition
+): Array<LabwareWellGroupProperties> {
+  const { ordering, wells } = definition
+
+  return flatten(ordering).reduce(
+    (groups: Array<LabwareWellGroupProperties>, k: string) => {
+      const { x, y, z, ...props } = wells[k]
+      let group = find(groups, props)
+
+      if (!group) {
+        group = { ...props, xOffset: x, yOffset: y, xSpacing: 0, ySpacing: 0 }
+        groups.push(group)
+      } else if (!group.xSpacing && y === group.yOffset) {
+        // we've hit the first well in ordering that matches the group's
+        // starting well's y position, so use its x position to set spacing
+        group.xSpacing = round(x - group.xOffset, 2)
+      } else if (!group.ySpacing && x === group.xOffset) {
+        // same as above, but for the y spacing
+        group.ySpacing = round(group.yOffset - y, 2)
+      }
+
+      return groups
+    },
+    []
+  )
 }
 
 export type DefinitionRouteRenderProps = {|

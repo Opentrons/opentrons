@@ -38,7 +38,6 @@ export const WELL_TYPE_BY_CATEGORY = {
   other: 'wells',
 }
 
-// TODO(mc, 2019-03-18): i18n
 export const LABWARE_DIMS_BY_CATEGORY = {
   tubeRack: 'rack dimensions',
   tipRack: 'rack dimensions',
@@ -48,7 +47,6 @@ export const LABWARE_DIMS_BY_CATEGORY = {
   other: 'labware dimensions',
 }
 
-// TODO(mc, 2019-03-18): i18n
 export const WELL_DIMS_BY_CATEGORY = {
   tubeRack: 'tube dimensions',
   tipRack: 'tip dimensions',
@@ -73,6 +71,12 @@ export const SHORT_Y_DIM = 'w'
 export const SHORT_Z_DIM = 'h'
 export const X_DIM = 'length'
 export const Y_DIM = 'width'
+export const Z_DIM = 'height'
+export const X_OFFSET = 'x-offset'
+export const Y_OFFSET = 'y-offset'
+export const X_SPACING = 'x-spacing'
+export const Y_SPACING = 'y-spacing'
 export const DIAMETER = 'diameter'
 export const DEPTH = 'depth'
 export const MAX_VOLUME = 'max volume'
+export const SHAPE = 'shape'
