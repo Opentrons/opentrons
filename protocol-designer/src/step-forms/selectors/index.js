@@ -41,7 +41,7 @@ import type {
   LabwareOnDeck,
   HydratedLabwareEntity,
   HydratedLabwareEntities,
-  HydratedPipetteEntities,
+  PipetteEntities,
   PipetteOnDeck,
   FormPipettesByMount,
 } from '../types'
@@ -96,7 +96,7 @@ export const _getHydratedLabwareEntitiesRootState: RootState => HydratedLabwareE
     )
 )
 
-export const getHydratedPipetteEntities: Selector<HydratedPipetteEntities> = createSelector(
+export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
   state => rootSelector(state).pipetteInvariantProperties,
   pipetteInvariantProperties =>
     hydratePipetteEntities(pipetteInvariantProperties)
@@ -108,7 +108,7 @@ export const getInitialDeckSetupStepForm = (state: BaseState) =>
 export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   getInitialDeckSetupStepForm,
   getLabwareEntities,
-  getHydratedPipetteEntities,
+  getPipetteEntities,
   (
     initialSetupStep,
     labwareInvariantProperties,
@@ -309,7 +309,7 @@ const _getFormAndFieldErrorsFromHydratedForm = (
 
 export const getHydrationContext: Selector<StepFormContextualState> = createSelector(
   getHydratedLabwareEntities,
-  getHydratedPipetteEntities,
+  getPipetteEntities,
   (labware, pipettes) => ({ labware, pipettes })
 )
 

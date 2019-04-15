@@ -4,9 +4,9 @@ import reduce from 'lodash/reduce'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/components'
 import type {
-  PipetteEntity,
+  NormalizedPipette,
+  NormalizedPipetteById,
   PipetteEntities,
-  HydratedPipetteEntities,
 } from './types'
 
 // for backwards compatibility, strip version suffix (_v1, _v1.3 etc)
@@ -52,15 +52,15 @@ export function getLabwareIdInSlot(
 }
 
 export function hydratePipetteEntities(
-  pipetteInvariantProperties: PipetteEntities
-): HydratedPipetteEntities {
+  pipetteInvariantProperties: NormalizedPipetteById
+): PipetteEntities {
   return reduce(
     pipetteInvariantProperties,
     (
-      acc: HydratedPipetteEntities,
-      pipette: PipetteEntity,
+      acc: PipetteEntities,
+      pipette: NormalizedPipette,
       id: string
-    ): HydratedPipetteEntities => {
+    ): PipetteEntities => {
       const spec = getPipetteNameSpecs(pipette.name)
       assert(
         spec,

@@ -25,7 +25,7 @@ import type { FormData, StepFieldName } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
 import type {
   HydratedLabwareEntities,
-  HydratedPipetteEntities,
+  PipetteEntities,
 } from '../../../step-forms/types'
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
@@ -87,7 +87,7 @@ const wellRatioUpdater = makeConditionalPatchUpdater(wellRatioUpdatesMap)
 export function updatePatchPathField(
   patch: FormPatch,
   rawForm: FormData,
-  pipetteEntities: HydratedPipetteEntities
+  pipetteEntities: PipetteEntities
 ) {
   const appliedPatch = { ...rawForm, ...patch }
   const { path, changeTip } = appliedPatch
@@ -124,7 +124,7 @@ const updatePatchOnLabwareChange = (
   patch: FormPatch,
   rawForm: FormData,
   labwareEntities: HydratedLabwareEntities,
-  pipetteEntities: HydratedPipetteEntities
+  pipetteEntities: PipetteEntities
 ): FormPatch => {
   const sourceLabwareChanged = fieldHasChanged(
     rawForm,
@@ -177,7 +177,7 @@ const updatePatchOnLabwareChange = (
 const updatePatchOnPipetteChange = (
   patch: FormPatch,
   rawForm: FormData,
-  pipetteEntities: HydratedPipetteEntities
+  pipetteEntities: PipetteEntities
 ) => {
   // when pipette ID is changed (to another ID, or to null),
   // set any flow rates, mix volumes, air gaps, or disposal volumes to null
@@ -205,7 +205,7 @@ const clearedDisposalVolumeFields = getDefaultFields(
 const updatePatchDisposalVolumeFields = (
   patch: FormPatch,
   rawForm: FormData,
-  pipetteEntities: HydratedPipetteEntities
+  pipetteEntities: PipetteEntities
 ) => {
   const appliedPatch = { ...rawForm, ...patch }
 
@@ -247,7 +247,7 @@ const updatePatchDisposalVolumeFields = (
 const clampDisposalVolume = (
   patch: FormPatch,
   rawForm: FormData,
-  pipetteEntities: HydratedPipetteEntities
+  pipetteEntities: PipetteEntities
 ) => {
   const appliedPatch = { ...rawForm, ...patch }
   const isDecimalString = appliedPatch.disposalVolume_volume === '.'
@@ -302,7 +302,7 @@ const updatePatchOnPipetteChannelChange = (
   patch: FormPatch,
   rawForm: FormData,
   labwareEntities: HydratedLabwareEntities,
-  pipetteEntities: HydratedPipetteEntities
+  pipetteEntities: PipetteEntities
 ) => {
   if (patch.pipette === undefined) return patch
   let update = {}
@@ -440,7 +440,7 @@ export function updatePatchBlowoutFields(
 export default function dependentFieldsUpdateMoveLiquid(
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
-  pipetteEntities: HydratedPipetteEntities,
+  pipetteEntities: PipetteEntities,
   labwareEntities: HydratedLabwareEntities
 ): FormPatch {
   // sequentially modify parts of the patch until it's fully updated

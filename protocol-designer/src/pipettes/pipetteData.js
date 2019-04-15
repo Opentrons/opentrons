@@ -1,7 +1,7 @@
 // @flow
 import compact from 'lodash/compact'
 import { getPipetteNameSpecs, getLabware } from '@opentrons/shared-data'
-import type { HydratedPipetteEntity } from '../step-forms/types'
+import type { PipetteEntity } from '../step-forms/types'
 
 const supportedPipetteNames = [
   'p10_single',
@@ -25,7 +25,7 @@ export const pipetteOptions = compact(
 // NOTE: this is similar to getPipetteWithTipMaxVol, the fns could potentially
 // be merged once multiple tiprack types per pipette is supported
 export function getPipetteCapacity(
-  pipetteEntity: HydratedPipetteEntity
+  pipetteEntity: PipetteEntity
 ): number {
   const specs = getPipetteNameSpecs(pipetteEntity.name)
   const tiprackDef = getLabware(pipetteEntity.tiprackModel)

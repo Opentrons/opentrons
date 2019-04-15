@@ -9,7 +9,7 @@ import type {
   FileLabwareV1 as FileLabware,
   FilePipetteV1 as FilePipette,
 } from '@opentrons/shared-data'
-import type { HydratedPipetteEntities } from '../../step-forms'
+import type { PipetteEntities } from '../../step-forms'
 import type { FormPatch } from '../../steplist/actions'
 import type { PDProtocolFile } from '../../file-types'
 import type { FormData } from '../../form-types'
@@ -35,7 +35,7 @@ export const initialDeckSetupStepForm = {
 function _updatePatchPathField(
   patch: FormPatch,
   rawForm: FormData,
-  pipetteEntities: HydratedPipetteEntities
+  pipetteEntities: PipetteEntities
 ) {
   const appliedPatch = { ...rawForm, ...patch }
   const { path, changeTip } = appliedPatch

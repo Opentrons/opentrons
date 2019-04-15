@@ -5,13 +5,13 @@ import type { FormData } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
 import type {
   HydratedLabwareEntities,
-  HydratedPipetteEntities,
+  PipetteEntities,
 } from '../../../step-forms/types'
 
 function handleFormChange(
   patch: FormPatch,
   rawForm: ?FormData,
-  pipetteEntities: HydratedPipetteEntities,
+  pipetteEntities: PipetteEntities,
   labwareEntities: HydratedLabwareEntities
 ): FormPatch {
   if (rawForm == null) {

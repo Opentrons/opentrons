@@ -17,7 +17,7 @@ import { actions as stepFormActions } from '../../../step-forms'
 import { actions as steplistActions } from '../../../steplist'
 import FilePipettesModal from '../FilePipettesModal'
 import type { BaseState, ThunkDispatch } from '../../../types'
-import type { PipetteOnDeck, PipetteEntity } from '../../../step-forms'
+import type { PipetteOnDeck, NormalizedPipette } from '../../../step-forms'
 
 export default connect(
   mapStateToProps,
@@ -62,7 +62,10 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
         stepFormActions.createPipettes(
           mapValues(
             pipettesById,
-            (p: PipetteOnDeck): PipetteEntity => omit(p, 'mount')
+            (p: PipetteOnDeck, id: string): NormalizedPipette => ({
+              id,
+              ...omit(p, 'mount'),
+            })
           )
         )
       )

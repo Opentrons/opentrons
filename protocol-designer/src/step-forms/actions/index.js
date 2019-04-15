@@ -1,14 +1,10 @@
 // @flow
+import type { NormalizedPipetteById } from '../types'
 import type { StepIdType } from '../../form-types'
 
 export type CreatePipettesAction = {
   type: 'CREATE_PIPETTES',
-  payload: {
-    [pipetteId: string]: {
-      name: string,
-      tiprackModel: string, // TODO: Ian 2018-12-17 this matches old var, but labware "model/type/name" is inconsistent and needs to be standardized
-    },
-  },
+  payload: NormalizedPipetteById,
 }
 
 export const createPipettes = (

@@ -47,7 +47,7 @@ import type {
   SaveStepFormAction,
 } from '../../steplist/actions'
 import type { StepItemData } from '../../steplist/types'
-import type { PipetteEntities, LabwareEntities } from '../types'
+import type { NormalizedPipetteById, LabwareEntities } from '../types'
 import type {
   CreatePipettesAction,
   DeletePipettesAction,
@@ -446,9 +446,9 @@ const initialPipetteState = {}
 export const pipetteInvariantProperties = handleActions(
   {
     LOAD_FILE: (
-      state: PipetteEntities,
+      state: NormalizedPipetteById,
       action: LoadFileAction
-    ): PipetteEntities => {
+    ): NormalizedPipetteById => {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
       return mapValues(
@@ -456,7 +456,7 @@ export const pipetteInvariantProperties = handleActions(
         (
           filePipette: FilePipette,
           pipetteId: string
-        ): $Values<PipetteEntities> => {
+        ): $Values<NormalizedPipetteById> => {
           const tiprackModel = metadata.pipetteTiprackAssignments[pipetteId]
           assert(
             tiprackModel,
@@ -471,18 +471,18 @@ export const pipetteInvariantProperties = handleActions(
       )
     },
     CREATE_PIPETTES: (
-      state: PipetteEntities,
+      state: NormalizedPipetteById,
       action: CreatePipettesAction
-    ): PipetteEntities => {
+    ): NormalizedPipetteById => {
       return {
         ...state,
         ...action.payload,
       }
     },
     DELETE_PIPETTES: (
-      state: PipetteEntities,
+      state: NormalizedPipetteById,
       action: DeletePipettesAction
-    ): PipetteEntities => {
+    ): NormalizedPipetteById => {
       return omit(state, action.payload)
     },
   },
@@ -599,7 +599,7 @@ export type RootState = {
   orderedStepIds: OrderedStepIdsState,
   labwareDefs: LabwareDefsRootState,
   labwareInvariantProperties: LabwareEntities,
-  pipetteInvariantProperties: PipetteEntities,
+  pipetteInvariantProperties: NormalizedPipetteById,
   legacySteps: LegacyStepsState,
   savedStepForms: SavedStepFormState,
   unsavedForm: FormState,

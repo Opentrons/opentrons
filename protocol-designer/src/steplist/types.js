@@ -8,7 +8,7 @@ import type {
 } from '../form-types'
 import type {
   HydratedLabwareEntities,
-  HydratedPipetteEntities,
+  PipetteEntities,
 } from '../step-forms'
 import type { FormError } from './formLevel/errors'
 
@@ -117,5 +117,5 @@ export type StepArgsAndErrors = {
 
 export type StepFormContextualState = {
   labware: HydratedLabwareEntities,
-  pipettes: HydratedPipetteEntities,
+  pipettes: PipetteEntities,
 }

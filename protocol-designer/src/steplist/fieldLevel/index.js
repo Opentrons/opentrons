@@ -16,10 +16,7 @@ import {
   type ValueCaster,
 } from './processing'
 import type { StepFieldName } from '../../form-types'
-import type {
-  HydratedLabwareEntity,
-  HydratedPipetteEntity,
-} from '../../step-forms'
+import type { HydratedLabwareEntity, PipetteEntity } from '../../step-forms'
 import type { StepFormContextualState } from '../types'
 
 export type { StepFieldName }
@@ -36,7 +33,7 @@ const hydrateLabware = (
 const hydratePipette = (
   state: StepFormContextualState,
   id: string
-): HydratedPipetteEntity => {
+): PipetteEntity => {
   return state.pipettes[id]
 }
 

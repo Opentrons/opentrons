@@ -35,16 +35,16 @@ export type FormPipettesByMount = {
 // TODO IMMEDIATELY: call "hydrated" just entity. NormalizedPipetteEntity/NormalizedLabwareEntity is what redux store should use, all selectors should use the "full" (unqualified) ones
 // =========== PIPETTES ========
 
-export type PipetteEntities = {
+export type NormalizedPipetteById = {
   [pipetteId: string]: {|
     name: string,
     id: string,
     tiprackModel: string, // TODO: Ian 2019-04-12 change to `tiprackOtId`
   |},
 }
-export type PipetteEntity = $Values<PipetteEntities>
+export type NormalizedPipette = $Values<NormalizedPipetteById>
 
-export type HydratedPipetteEntity = {|
+export type PipetteEntity = {|
   name: string,
   id: string,
   tiprackModel: string, // TODO: Ian 2019-04-12 change to `tiprackOtId`
@@ -52,8 +52,8 @@ export type HydratedPipetteEntity = {|
   spec: PipetteNameSpecs,
 |}
 
-export type HydratedPipetteEntities = {
-  [pipetteId: string]: HydratedPipetteEntity,
+export type PipetteEntities = {
+  [pipetteId: string]: PipetteEntity,
 }
 
 // =========== LABWARE ========

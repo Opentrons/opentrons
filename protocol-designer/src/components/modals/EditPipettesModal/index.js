@@ -14,7 +14,7 @@ import {
 } from '../../../step-forms'
 import FilePipettesModal from '../FilePipettesModal'
 import type { BaseState, ThunkDispatch } from '../../../types'
-import type { PipetteOnDeck } from '../../../step-forms'
+import type { PipetteOnDeck, NormalizedPipette } from '../../../step-forms'
 import type { StepIdType } from '../../../form-types'
 
 type Props = ElementProps<typeof FilePipettesModal>
@@ -81,10 +81,14 @@ const makeUpdatePipettes = (
 
   dispatch(
     stepFormActions.createPipettes(
-      mapValues(nextPipettes, (p: $Values<typeof nextPipettes>) => ({
-        name: p.name,
-        tiprackModel: p.tiprackModel,
-      }))
+      mapValues(
+        nextPipettes,
+        (p: $Values<typeof nextPipettes>, id: string): NormalizedPipette => ({
+          id,
+          name: p.name,
+          tiprackModel: p.tiprackModel,
+        })
+      )
     )
   )
 

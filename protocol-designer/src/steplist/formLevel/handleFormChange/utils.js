@@ -13,7 +13,7 @@ import type { FormPatch } from '../../actions/types'
 import type { FormData, StepFieldName } from '../../../form-types'
 import type {
   HydratedLabwareEntities,
-  HydratedPipetteEntities,
+  PipetteEntities,
 } from '../../../step-forms'
 
 export function chainPatchUpdaters(
@@ -49,7 +49,7 @@ export function getAllWellsFromPrimaryWells(
 
 export function getChannels(
   pipetteId: string,
-  pipetteEntities: HydratedPipetteEntities
+  pipetteEntities: PipetteEntities
 ): ?PipetteChannels {
   const pipette: ?* = pipetteEntities[pipetteId]
   if (!pipette) {
@@ -62,7 +62,7 @@ export const DISPOSAL_VOL_DIGITS = 1
 
 export function getMaxDisposalVolumeForMultidispense(
   rawForm: ?FormData,
-  pipetteEntities: HydratedPipetteEntities
+  pipetteEntities: PipetteEntities
 ): ?number {
   // calculate max disposal volume for given volume & pipette. Might be negative!
   if (!rawForm) return null
@@ -83,7 +83,7 @@ export function getMaxDisposalVolumeForMultidispense(
 // is responsibility of dependentFieldsUpdateMoveLiquid's clamp fn
 export function volumeInCapacityForMulti(
   rawForm: FormData,
-  pipetteEntities: HydratedPipetteEntities
+  pipetteEntities: PipetteEntities
 ): boolean {
   const volume = Number(rawForm.volume)
   assert(
@@ -102,7 +102,7 @@ type GetDefaultWellsArgs = {
   labwareId: ?string,
   pipetteId: ?string,
   labwareEntities: HydratedLabwareEntities,
-  pipetteEntities: HydratedPipetteEntities,
+  pipetteEntities: PipetteEntities,
 }
 export function getDefaultWells(args: GetDefaultWellsArgs): Array<string> {
   const { labwareId, pipetteId, labwareEntities, pipetteEntities } = args
