@@ -1,15 +1,21 @@
 import { getLabwareLiquidState } from '../selectors'
 jest.mock('../../labware-defs/utils')
 
-let labwareDefsByLabwareId
+let labwareEntities
 let ingredLocs
 
 beforeEach(() => {
   // TODO Ian 2019-04-12: create representative fixtures, don't use real defs
-  labwareDefsByLabwareId = {
-    FIXED_TRASH_ID: require('@opentrons/shared-data/definitions2/opentrons_1_trash_1.1_l.json'),
-    wellPlateId: require('@opentrons/shared-data/definitions2/generic_96_wellplate_380_ul.json'),
-    troughId: require('@opentrons/shared-data/definitions2/usa_scientific_12_trough_22_ml.json'),
+  labwareEntities = {
+    FIXED_TRASH_ID: {
+      def: require('@opentrons/shared-data/definitions2/opentrons_1_trash_1.1_l.json'),
+    },
+    wellPlateId: {
+      def: require('@opentrons/shared-data/definitions2/generic_96_wellplate_380_ul.json'),
+    },
+    troughId: {
+      def: require('@opentrons/shared-data/definitions2/usa_scientific_12_trough_22_ml.json'),
+    },
   }
 
   ingredLocs = {
@@ -39,16 +45,13 @@ describe('getLabwareLiquidState', () => {
   })
 
   test('labware + no ingreds: generate empty well keys', () => {
-    const result = getLabwareLiquidState.resultFunc({}, labwareDefsByLabwareId)
+    const result = getLabwareLiquidState.resultFunc({}, labwareEntities)
 
     hasAllWellKeys(result)
   })
 
   test('selects liquids with multiple ingredient groups & multiple labware: generate all well keys', () => {
-    const result = getLabwareLiquidState.resultFunc(
-      ingredLocs,
-      labwareDefsByLabwareId
-    )
+    const result = getLabwareLiquidState.resultFunc(ingredLocs, labwareEntities)
 
     expect(result).toMatchObject(ingredLocs)
 
