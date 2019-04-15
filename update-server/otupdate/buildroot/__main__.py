@@ -2,9 +2,10 @@
 Entrypoint for the buildroot update server
 """
 import argparse
+import asyncio
 import logging
 
-from . import get_app, BR_BUILTIN_VERSION_FILE, config
+from . import get_app, BR_BUILTIN_VERSION_FILE, config, control, constants
 from aiohttp import web
 
 LOG = logging.getLogger(__name__)
@@ -34,6 +35,11 @@ def main():
     })
     LOG.info(f'Building buildroot update server')
     app = get_app(args.version_file, args.config_file)
+    hostname = app[constants.DEVICE_HOSTNAME_VARNAME]
+    LOG.info(f"Setting system hostname to {hostname}")
+    asyncio.get_event_loop().run_until_complete(
+        control.update_system_for_name(hostname))
+
     LOG.info(
         f'Starting buildroot update server on http://{args.host}:{args.port}')
     web.run_app(app, host=args.host, port=args.port)

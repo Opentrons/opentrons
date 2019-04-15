@@ -2,7 +2,6 @@
 import asyncio
 import logging
 import json
-from socket import gethostname
 from typing import Mapping
 from aiohttp import web
 
@@ -44,7 +43,8 @@ def get_app(system_version_file: str = None,
         system_version_file = BR_BUILTIN_VERSION_FILE
 
     version = get_version(system_version_file)
-    device_name = name_override or gethostname()
+    device_name = name_override or control.get_hostname()
+    pretty_name = name_override or control.get_prettyname()
     config_obj = config.load(config_file_override)
 
     LOG.info("Setup: " + '\n\t'.join([
@@ -70,9 +70,11 @@ def get_app(system_version_file: str = None,
     app = web.Application(loop=loop, middlewares=[log_error_middleware])
     app[config.CONFIG_VARNAME] = config_obj
     app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
+    app[constants.DEVICE_HOSTNAME_VARNAME] = device_name
+    app[constants.DEVICE_PRETTYNAME_VARNAME] = pretty_name
     app.router.add_routes([
         web.get('/server/update/health',
-                control.build_health_endpoint(version, device_name)),
+                control.build_health_endpoint(version)),
         web.post('/server/update/begin', update.begin),
         web.post('/server/update/cancel', update.cancel),
         web.get('/server/update/{session}/status', update.status),
@@ -82,5 +84,6 @@ def get_app(system_version_file: str = None,
         web.get('/server/ssh_keys', ssh_key_management.list_keys),
         web.post('/server/ssh_keys', ssh_key_management.add),
         web.delete('/server/ssh_keys/{key_md5}', ssh_key_management.remove),
+        web.post('/server/name', control.set_name),
     ])
     return app
