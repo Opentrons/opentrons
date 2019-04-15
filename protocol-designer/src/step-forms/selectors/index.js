@@ -111,13 +111,9 @@ export const getInitialDeckSetupStepForm = (state: BaseState) =>
 
 export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   getInitialDeckSetupStepForm,
-  _getNormalizedLabwareById,
+  getLabwareEntities,
   getPipetteEntities,
-  (
-    initialSetupStep,
-    labwareInvariantProperties,
-    pipetteInvariantProperties
-  ) => {
+  (initialSetupStep, labwareEntities, pipetteEntities) => {
     assert(
       initialSetupStep && initialSetupStep.stepType === 'manualIntervention',
       'expected initial deck setup step to be "manualIntervention" step'
@@ -130,14 +126,13 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
       labware: mapValues(
         labwareLocations,
         (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
-          // TODO IMMEDIATELY: revisit labware in this selector
-          return { slot, ...labwareInvariantProperties[labwareId] }
+          return { slot, ...labwareEntities[labwareId] }
         }
       ),
       pipettes: mapValues(
         pipetteLocations,
         (mount: Mount, pipetteId: string): PipetteOnDeck => {
-          return { mount, ...pipetteInvariantProperties[pipetteId] }
+          return { mount, ...pipetteEntities[pipetteId] }
         }
       ),
     }

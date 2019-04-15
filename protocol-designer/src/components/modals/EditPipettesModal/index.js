@@ -57,7 +57,14 @@ const makeUpdatePipettes = (
 ) => ({ pipettes: newPipetteArray }) => {
   const prevPipetteIds = Object.keys(prevPipettes)
   let usedPrevPipettes: Array<string> = [] // IDs of pipettes in prevPipettes that were already put into nextPipettes
-  let nextPipettes: { [pipetteId: string]: PipetteOnDeck } = {}
+  let nextPipettes: {
+    [pipetteId: string]: {
+      mount: string,
+      name: string,
+      tiprackModel: string,
+      id: string,
+    },
+  } = {}
 
   // from array of pipettes from Edit Pipette form (with no IDs),
   // assign IDs and populate nextPipettes
@@ -68,13 +75,14 @@ const makeUpdatePipettes = (
         const alreadyUsed = usedPrevPipettes.some(usedId => usedId === id)
         return !alreadyUsed && prevPipette.name === newPipette.name
       })
-      const pipetteId: ?string = candidatePipetteIds[0]
+      let pipetteId: ?string = candidatePipetteIds[0]
       if (pipetteId) {
         // update used pipette list
         usedPrevPipettes.push(pipetteId)
-        nextPipettes[pipetteId] = newPipette
+        nextPipettes[pipetteId] = { ...newPipette, id: pipetteId }
       } else {
-        nextPipettes[uuid()] = newPipette
+        const newId = uuid()
+        nextPipettes[newId] = { ...newPipette, id: newId }
       }
     }
   })
@@ -83,8 +91,8 @@ const makeUpdatePipettes = (
     stepFormActions.createPipettes(
       mapValues(
         nextPipettes,
-        (p: $Values<typeof nextPipettes>, id: string): NormalizedPipette => ({
-          id,
+        (p: $Values<typeof nextPipettes>): NormalizedPipette => ({
+          id: p.id,
           name: p.name,
           tiprackModel: p.tiprackModel,
         })

@@ -5,25 +5,6 @@ import type {
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
 
-export type InitialDeckSetup = {
-  labware: {
-    [labwareId: string]: {
-      type: string,
-      slot: DeckSlot,
-    },
-  },
-  pipettes: {
-    [pipetteId: string]: {
-      name: string,
-      mount: Mount,
-      tiprackModel: string,
-    },
-  },
-}
-
-export type LabwareOnDeck = $Values<$PropertyType<InitialDeckSetup, 'labware'>>
-export type PipetteOnDeck = $Values<$PropertyType<InitialDeckSetup, 'pipettes'>>
-
 export type FormPipette = { pipetteName: ?string, tiprackModel: ?string }
 export type FormPipettesByMount = {
   left: FormPipette,
@@ -72,4 +53,28 @@ export type LabwareEntity = {|
 |}
 export type LabwareEntities = {
   [labwareId: string]: LabwareEntity,
+}
+
+// =========== ON DECK ========
+
+// The "on deck" types are entities with added properties (slot / mount)
+// which may change across time (eg moving a labware to another slot)
+
+export type LabwareOnDeck = {|
+  ...LabwareEntity,
+  slot: DeckSlot,
+|}
+
+export type PipetteOnDeck = {|
+  ...PipetteEntity,
+  mount: Mount,
+|}
+
+export type InitialDeckSetup = {
+  labware: {
+    [labwareId: string]: LabwareOnDeck,
+  },
+  pipettes: {
+    [pipetteId: string]: PipetteOnDeck,
+  },
 }
