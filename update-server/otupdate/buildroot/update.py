@@ -128,6 +128,7 @@ def _begin_validation(
         else:
             rootfs_file = fut.result()
             loop.call_soon_threadsafe(_begin_write,
+                                      session,
                                       loop,
                                       rootfs_file)
     validation_future.add_done_callback(validation_done)

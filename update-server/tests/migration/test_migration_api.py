@@ -112,9 +112,10 @@ async def test_commit_fails_wrong_state(otupdate_test_client, update_session):
     assert resp.status == 409
 
 
-async def test_future_chain(downloaded_update_file, loop, monkeypatch,
-                            state_partition, data_partition, resin_data_dir,
-                            unused_sysroot):
+async def test_migration_future_chain(
+        downloaded_update_file, loop, monkeypatch,
+        state_partition, data_partition, resin_data_dir,
+        unused_sysroot):
     dl_path = os.dirname(downloaded_update_file)
     session = otupdate.buildroot.update_session.UpdateSession(
         dl_path)
