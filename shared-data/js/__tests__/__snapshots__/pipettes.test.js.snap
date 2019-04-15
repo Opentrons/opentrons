@@ -2979,7 +2979,7 @@ Object {
     "min": 0.05,
     "type": "float",
     "units": "amps",
-    "value": 0.8,
+    "value": 0.9,
   },
   "pickUpDistance": Object {
     "max": 30,
