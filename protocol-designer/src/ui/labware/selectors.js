@@ -11,29 +11,27 @@ import { DISPOSAL_LABWARE_TYPES } from '../../constants'
 
 import type { Options } from '@opentrons/components'
 import type { Selector } from '../../types'
-import type { HydratedLabwareEntity, LabwareEntity } from '../../step-forms'
+import type { LabwareEntity, NormalizedLabware } from '../../step-forms'
 
 export const getLabwareNicknamesById: Selector<{
   [labwareId: string]: string,
 }> = createSelector(
-  stepFormSelectors.getHydratedLabwareEntities,
+  stepFormSelectors.getLabwareEntities,
   labwareIngredSelectors.getLabwareNameInfo,
   (labwareEntities, displayLabware): { [labwareId: string]: string } =>
-    mapValues(
-      labwareEntities,
-      (labwareEntity: HydratedLabwareEntity, id: string) =>
-        labwareToDisplayName(displayLabware[id], labwareEntity.type)
+    mapValues(labwareEntities, (labwareEntity: LabwareEntity, id: string) =>
+      labwareToDisplayName(displayLabware[id], labwareEntity.type)
     )
 )
 
 /** Returns options for dropdowns, excluding tiprack labware */
 export const getLabwareOptions: Selector<Options> = createSelector(
-  stepFormSelectors.getHydratedLabwareEntities,
+  stepFormSelectors.getLabwareEntities,
   getLabwareNicknamesById,
   (labwareEntities, nicknamesById) =>
     reduce(
       labwareEntities,
-      (acc: Options, l: HydratedLabwareEntity, labwareId: string): Options => {
+      (acc: Options, l: LabwareEntity, labwareId: string): Options => {
         return getIsTiprack(l.def)
           ? acc
           : [
@@ -50,12 +48,12 @@ export const getLabwareOptions: Selector<Options> = createSelector(
 
 /** Returns options for disposal (e.g. fixed trash and trash box) */
 export const getDisposalLabwareOptions: Selector<Options> = createSelector(
-  stepFormSelectors.getLabwareEntities,
+  stepFormSelectors.getNormalizedLabwareById,
   getLabwareNicknamesById,
   (labwareById, names) =>
     reduce(
       labwareById,
-      (acc: Options, labware: LabwareEntity, labwareId): Options => {
+      (acc: Options, labware: NormalizedLabware, labwareId): Options => {
         if (!labware.type || !DISPOSAL_LABWARE_TYPES.includes(labware.type)) {
           return acc
         }

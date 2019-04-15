@@ -24,7 +24,7 @@ import {
 import type { FormData, StepFieldName } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
 import type {
-  HydratedLabwareEntities,
+  LabwareEntities,
   PipetteEntities,
 } from '../../../step-forms/types'
 
@@ -123,7 +123,7 @@ export function updatePatchPathField(
 const updatePatchOnLabwareChange = (
   patch: FormPatch,
   rawForm: FormData,
-  labwareEntities: HydratedLabwareEntities,
+  labwareEntities: LabwareEntities,
   pipetteEntities: PipetteEntities
 ): FormPatch => {
   const sourceLabwareChanged = fieldHasChanged(
@@ -301,7 +301,7 @@ const clampDisposalVolume = (
 const updatePatchOnPipetteChannelChange = (
   patch: FormPatch,
   rawForm: FormData,
-  labwareEntities: HydratedLabwareEntities,
+  labwareEntities: LabwareEntities,
   pipetteEntities: PipetteEntities
 ) => {
   if (patch.pipette === undefined) return patch
@@ -441,7 +441,7 @@ export default function dependentFieldsUpdateMoveLiquid(
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
   pipetteEntities: PipetteEntities,
-  labwareEntities: HydratedLabwareEntities
+  labwareEntities: LabwareEntities
 ): FormPatch {
   // sequentially modify parts of the patch until it's fully updated
   return chainPatchUpdaters(originalPatch, [

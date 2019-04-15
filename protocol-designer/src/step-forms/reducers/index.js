@@ -20,7 +20,7 @@ import {
   handleFormChange,
 } from '../../steplist/formLevel'
 import { cancelStepForm } from '../../steplist/actions'
-import { _getHydratedLabwareEntitiesRootState } from '../selectors'
+import { _getLabwareEntitiesRootState } from '../selectors'
 
 import type { LoadFileAction } from '../../load-file'
 import type {
@@ -47,14 +47,14 @@ import type {
   SaveStepFormAction,
 } from '../../steplist/actions'
 import type { StepItemData } from '../../steplist/types'
-import type { NormalizedPipetteById, LabwareEntities } from '../types'
+import type { NormalizedPipetteById, NormalizedLabwareById } from '../types'
 import type {
   CreatePipettesAction,
   DeletePipettesAction,
   SubstituteStepFormPipettesAction,
 } from '../actions'
 import {
-  hydratePipetteEntities,
+  denormalizePipetteEntities,
   getIdsInRange,
   getLabwareIdInSlot,
   pipetteModelToName,
@@ -82,8 +82,8 @@ export const unsavedForm = (
       const fieldUpdate = handleFormChange(
         action.payload.update,
         unsavedFormState,
-        hydratePipetteEntities(rootState.pipetteInvariantProperties),
-        _getHydratedLabwareEntitiesRootState(rootState)
+        denormalizePipetteEntities(rootState.pipetteInvariantProperties),
+        _getLabwareEntitiesRootState(rootState)
       )
       return {
         ...unsavedFormState,
@@ -121,8 +121,8 @@ export const unsavedForm = (
           ...handleFormChange(
             { pipette: substitutionMap[unsavedFormState.pipette] },
             unsavedFormState,
-            hydratePipetteEntities(rootState.pipetteInvariantProperties),
-            _getHydratedLabwareEntitiesRootState(rootState)
+            denormalizePipetteEntities(rootState.pipetteInvariantProperties),
+            _getLabwareEntitiesRootState(rootState)
           ),
         }
       }
@@ -265,8 +265,10 @@ export const savedStepForms = (
                 ...handleFormChange(
                   { [fieldName]: null },
                   acc,
-                  hydratePipetteEntities(rootState.pipetteInvariantProperties),
-                  _getHydratedLabwareEntitiesRootState(rootState)
+                  denormalizePipetteEntities(
+                    rootState.pipetteInvariantProperties
+                  ),
+                  _getLabwareEntitiesRootState(rootState)
                 ),
               }
             } else {
@@ -299,8 +301,8 @@ export const savedStepForms = (
             ...handleFormChange(
               { pipette: null },
               form,
-              hydratePipetteEntities(rootState.pipetteInvariantProperties),
-              _getHydratedLabwareEntitiesRootState(rootState)
+              denormalizePipetteEntities(rootState.pipetteInvariantProperties),
+              _getLabwareEntitiesRootState(rootState)
             ),
           }
         }
@@ -328,8 +330,8 @@ export const savedStepForms = (
         const updatedFields = handleFormChange(
           { pipette: substitutionMap[prevStepForm.pipette] },
           prevStepForm,
-          hydratePipetteEntities(rootState.pipetteInvariantProperties),
-          _getHydratedLabwareEntitiesRootState(rootState)
+          denormalizePipetteEntities(rootState.pipetteInvariantProperties),
+          _getLabwareEntitiesRootState(rootState)
         )
 
         return {
@@ -368,8 +370,8 @@ export const savedStepForms = (
           ...handleFormChange(
             action.payload.update,
             previousForm,
-            hydratePipetteEntities(rootState.pipetteInvariantProperties),
-            _getHydratedLabwareEntitiesRootState(rootState)
+            denormalizePipetteEntities(rootState.pipetteInvariantProperties),
+            _getLabwareEntitiesRootState(rootState)
           ),
         },
       }
@@ -393,7 +395,7 @@ export const savedStepForms = (
   }
 }
 
-const initialLabwareState: LabwareEntities = {
+const initialLabwareState: NormalizedLabwareById = {
   [FIXED_TRASH_ID]: { type: 'fixed-trash' },
 }
 
@@ -401,7 +403,7 @@ const initialLabwareState: LabwareEntities = {
 export const labwareInvariantProperties = handleActions(
   {
     CREATE_CONTAINER: (
-      state: LabwareEntities,
+      state: NormalizedLabwareById,
       action: CreateContainerAction
     ) => {
       return {
@@ -410,7 +412,7 @@ export const labwareInvariantProperties = handleActions(
       }
     },
     DUPLICATE_LABWARE: (
-      state: LabwareEntities,
+      state: NormalizedLabwareById,
       action: DuplicateLabwareAction
     ) => {
       return {
@@ -421,15 +423,15 @@ export const labwareInvariantProperties = handleActions(
       }
     },
     DELETE_CONTAINER: (
-      state: LabwareEntities,
+      state: NormalizedLabwareById,
       action: DeleteContainerAction
-    ): LabwareEntities => {
+    ): NormalizedLabwareById => {
       return omit(state, action.payload.labwareId)
     },
     LOAD_FILE: (
-      state: LabwareEntities,
+      state: NormalizedLabwareById,
       action: LoadFileAction
-    ): LabwareEntities => {
+    ): NormalizedLabwareById => {
       const { file } = action.payload
       return mapValues(
         file.labware,
@@ -598,7 +600,7 @@ export const legacySteps = handleActions(
 export type RootState = {
   orderedStepIds: OrderedStepIdsState,
   labwareDefs: LabwareDefsRootState,
-  labwareInvariantProperties: LabwareEntities,
+  labwareInvariantProperties: NormalizedLabwareById,
   pipetteInvariantProperties: NormalizedPipetteById,
   legacySteps: LegacyStepsState,
   savedStepForms: SavedStepFormState,

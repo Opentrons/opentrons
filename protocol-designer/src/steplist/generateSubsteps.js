@@ -31,7 +31,7 @@ import type {
   DelayArgs,
   TransferArgs,
 } from '../step-generation/types'
-import type { HydratedLabwareEntities, PipetteOnDeck } from '../step-forms'
+import type { LabwareEntities, PipetteOnDeck } from '../step-forms'
 type AllPipetteData = { [pipetteId: string]: PipetteOnDeck }
 
 export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
@@ -39,7 +39,7 @@ export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 function transferLikeSubsteps(args: {
   stepArgs: ConsolidateArgs | DistributeArgs | TransferArgs | MixArgs,
   allPipetteData: AllPipetteData,
-  labwareEntities: HydratedLabwareEntities,
+  labwareEntities: LabwareEntities,
   robotState: RobotState,
   stepId: StepIdType,
 }): ?SourceDestSubstepItem {
@@ -256,7 +256,7 @@ function transferLikeSubsteps(args: {
 export function generateSubsteps(
   stepArgsAndErrors: ?StepArgsAndErrors,
   allPipetteData: AllPipetteData,
-  labwareEntities: HydratedLabwareEntities,
+  labwareEntities: LabwareEntities,
   robotState: ?RobotState,
   stepId: string
 ): ?SubstepItemData {

@@ -24,9 +24,7 @@ export const pipetteOptions = compact(
 
 // NOTE: this is similar to getPipetteWithTipMaxVol, the fns could potentially
 // be merged once multiple tiprack types per pipette is supported
-export function getPipetteCapacity(
-  pipetteEntity: PipetteEntity
-): number {
+export function getPipetteCapacity(pipetteEntity: PipetteEntity): number {
   const specs = getPipetteNameSpecs(pipetteEntity.name)
   const tiprackDef = getLabware(pipetteEntity.tiprackModel)
   if (specs && tiprackDef && tiprackDef.metadata.tipVolume) {

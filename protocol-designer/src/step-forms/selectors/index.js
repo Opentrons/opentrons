@@ -18,7 +18,7 @@ import {
   stepFormToArgs,
 } from '../../steplist/formLevel'
 import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
-import { hydratePipetteEntities } from '../utils'
+import { denormalizePipetteEntities } from '../utils'
 import {
   selectors as labwareDefSelectors,
   type LabwareDefByDefId,
@@ -36,11 +36,11 @@ import type {
 } from '../../steplist/types'
 import type {
   InitialDeckSetup,
-  LabwareEntities,
-  LabwareEntity,
+  NormalizedLabwareById,
+  NormalizedLabware,
   LabwareOnDeck,
-  HydratedLabwareEntity,
-  HydratedLabwareEntities,
+  LabwareEntity,
+  LabwareEntities,
   PipetteEntities,
   PipetteOnDeck,
   FormPipettesByMount,
@@ -53,24 +53,26 @@ const rootSelector = (state: BaseState): RootState => state.stepForms
 
 // NOTE Ian 2019-02-14: in Redux containers world, you probably only care about
 // the labware type, in which case you ought to use `getLabwareTypesById` instead.
-// `getLabwareEntities` is intended for uses tied to the LabwareEntities type
+// `getNormalizedLabwareById` is intended for uses tied to the LabwareEntities type
 // (which currently contains only `type`, but may expand)
-export const getLabwareEntities: Selector<LabwareEntities> = createSelector(
+// TODO IMMEDIATELY REMOVE???
+export const getNormalizedLabwareById: Selector<NormalizedLabwareById> = createSelector(
   rootSelector,
   state => state.labwareInvariantProperties
 )
 
+// TODO IMMEDIATELY REMOVE???
 export const getLabwareTypesById: Selector<LabwareTypeById> = createSelector(
-  getLabwareEntities,
-  labwareEntities =>
-    mapValues(labwareEntities, (labware: LabwareEntity) => labware.type)
+  getNormalizedLabwareById,
+  normalizedLabwareById =>
+    mapValues(normalizedLabwareById, (l: NormalizedLabware) => l.type)
 )
 
 function _hydrateLabwareEntity(
-  l: LabwareEntity,
+  l: NormalizedLabware,
   labwareId: string,
   defs: LabwareDefByDefId
-): HydratedLabwareEntity {
+): LabwareEntity {
   return {
     ...l,
     id: labwareId,
@@ -78,20 +80,20 @@ function _hydrateLabwareEntity(
   }
 }
 
-export const getHydratedLabwareEntities: Selector<HydratedLabwareEntities> = createSelector(
-  getLabwareEntities,
+export const getLabwareEntities: Selector<LabwareEntities> = createSelector(
+  getNormalizedLabwareById,
   labwareDefSelectors.getLabwareDefsById,
-  (labwareEntities, labwareDefs) =>
-    mapValues(labwareEntities, (l: LabwareEntity, id: string) =>
+  (normalizedLabwareById, labwareDefs) =>
+    mapValues(normalizedLabwareById, (l: NormalizedLabware, id: string) =>
       _hydrateLabwareEntity(l, id, labwareDefs)
     )
 )
 
-export const _getHydratedLabwareEntitiesRootState: RootState => HydratedLabwareEntities = createSelector(
+export const _getLabwareEntitiesRootState: RootState => LabwareEntities = createSelector(
   rs => rs.labwareInvariantProperties,
   labwareDefSelectors._getLabwareDefsByIdRootState,
-  (labwareEntities, labwareDefs) =>
-    mapValues(labwareEntities, (l: LabwareEntity, id: string) =>
+  (normalizedLabwareById, labwareDefs) =>
+    mapValues(normalizedLabwareById, (l: NormalizedLabware, id: string) =>
       _hydrateLabwareEntity(l, id, labwareDefs)
     )
 )
@@ -99,7 +101,7 @@ export const _getHydratedLabwareEntitiesRootState: RootState => HydratedLabwareE
 export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
   state => rootSelector(state).pipetteInvariantProperties,
   pipetteInvariantProperties =>
-    hydratePipetteEntities(pipetteInvariantProperties)
+    denormalizePipetteEntities(pipetteInvariantProperties)
 )
 
 export const getInitialDeckSetupStepForm = (state: BaseState) =>
@@ -107,7 +109,7 @@ export const getInitialDeckSetupStepForm = (state: BaseState) =>
 
 export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   getInitialDeckSetupStepForm,
-  getLabwareEntities,
+  getNormalizedLabwareById,
   getPipetteEntities,
   (
     initialSetupStep,
@@ -308,9 +310,9 @@ const _getFormAndFieldErrorsFromHydratedForm = (
 }
 
 export const getHydrationContext: Selector<StepFormContextualState> = createSelector(
-  getHydratedLabwareEntities,
+  getLabwareEntities,
   getPipetteEntities,
-  (labware, pipettes) => ({ labware, pipettes })
+  (labwareEntities, pipetteEntities) => ({ labwareEntities, pipetteEntities })
 )
 
 export const getUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSelector(

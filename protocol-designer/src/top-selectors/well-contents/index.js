@@ -78,7 +78,7 @@ export const getAllWellContentsForSteps: Selector<
 > = createSelector(
   fileDataSelectors.getInitialRobotState,
   fileDataSelectors.getRobotStateTimeline,
-  stepFormSelectors.getHydratedLabwareEntities,
+  stepFormSelectors.getLabwareEntities,
   (initialRobotState, robotStateTimeline, labwareEntities) => {
     const timeline = [
       { robotState: initialRobotState },
@@ -105,7 +105,7 @@ export const getAllWellContentsForSteps: Selector<
 
 export const getLastValidWellContents: Selector<WellContentsByLabware> = createSelector(
   fileDataSelectors.lastValidRobotState,
-  stepFormSelectors.getHydratedLabwareEntities,
+  stepFormSelectors.getLabwareEntities,
   (robotState, labwareEntities) => {
     return mapValues(
       robotState.labware,
@@ -126,7 +126,7 @@ export const getLastValidWellContents: Selector<WellContentsByLabware> = createS
 export const getSelectedWellsMaxVolume: Selector<number> = createSelector(
   wellSelectionSelectors.getSelectedWells,
   labwareIngredSelectors.getSelectedLabwareId,
-  stepFormSelectors.getHydratedLabwareEntities,
+  stepFormSelectors.getLabwareEntities,
   (selectedWells, selectedLabwareId, labwareEntities) => {
     const selectedWellNames = Object.keys(selectedWells)
     const def = selectedLabwareId && labwareEntities[selectedLabwareId].def

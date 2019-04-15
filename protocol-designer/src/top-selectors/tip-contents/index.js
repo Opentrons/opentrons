@@ -95,7 +95,7 @@ const getLastValidTips: GetTipSelector = createSelector(
 
 export const getTipsForCurrentStep: GetTipSelector = createSelector(
   stepFormSelectors.getOrderedStepIds,
-  stepFormSelectors.getHydratedLabwareEntities,
+  stepFormSelectors.getLabwareEntities,
   fileDataSelectors.getRobotStateTimeline,
   stepsSelectors.getHoveredStepId,
   stepsSelectors.getActiveItem,

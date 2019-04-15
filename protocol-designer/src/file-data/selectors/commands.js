@@ -25,7 +25,7 @@ function _makeTipState(
 // NOTE this just adds missing well keys to the labware-ingred 'deck setup' liquid state
 export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> = createSelector(
   labwareIngredSelectors.getLiquidsByLabwareId,
-  stepFormSelectors.getHydratedLabwareEntities,
+  stepFormSelectors.getLabwareEntities,
   (ingredLocations, labwareEntities) => {
     const allLabwareIds: Array<string> = Object.keys(labwareEntities)
     return allLabwareIds.reduce(
@@ -59,7 +59,7 @@ type TipState = $PropertyType<StepGeneration.RobotState, 'tipState'>
 type TiprackTipState = $PropertyType<TipState, 'tipracks'>
 export const getInitialRobotState: BaseState => StepGeneration.RobotState = createSelector(
   stepFormSelectors.getInitialDeckSetup,
-  stepFormSelectors.getHydratedLabwareEntities,
+  stepFormSelectors.getLabwareEntities,
   getLabwareLiquidState,
   (initialDeckSetup, labwareEntities, labwareLiquidState) => {
     const labware = mapValues(

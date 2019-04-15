@@ -51,7 +51,7 @@ export function getLabwareIdInSlot(
   return labwareIdsForSourceSlot[0]
 }
 
-export function hydratePipetteEntities(
+export function denormalizePipetteEntities(
   pipetteInvariantProperties: NormalizedPipetteById
 ): PipetteEntities {
   return reduce(

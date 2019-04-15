@@ -14,7 +14,7 @@ type AllSubsteps = { [StepIdType]: ?SubstepItemData }
 export const allSubsteps: Selector<AllSubsteps> = createSelector(
   stepFormSelectors.getArgsAndErrorsByStepId,
   stepFormSelectors.getInitialDeckSetup,
-  stepFormSelectors.getHydratedLabwareEntities,
+  stepFormSelectors.getLabwareEntities,
   stepFormSelectors.getOrderedStepIds,
   fileDataSelectors.getRobotStateTimeline,
   fileDataSelectors.getInitialRobotState,

@@ -11,7 +11,7 @@ import getDefaultsForStepType from '../getDefaultsForStepType'
 import type { FormData, StepFieldName } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
 import type {
-  HydratedLabwareEntities,
+  LabwareEntities,
   PipetteEntities,
 } from '../../../step-forms/types'
 
@@ -22,7 +22,7 @@ const getDefaultFields = (...fields: Array<StepFieldName>): FormPatch =>
 const updatePatchOnLabwareChange = (
   patch: FormPatch,
   rawForm: FormData,
-  labwareEntities: HydratedLabwareEntities,
+  labwareEntities: LabwareEntities,
   pipetteEntities: PipetteEntities
 ): FormPatch => {
   const labwareChanged = fieldHasChanged(rawForm, patch, 'labware')
@@ -49,7 +49,7 @@ const updatePatchOnLabwareChange = (
 const updatePatchOnPipetteChannelChange = (
   patch: FormPatch,
   rawForm: FormData,
-  labwareEntities: HydratedLabwareEntities,
+  labwareEntities: LabwareEntities,
   pipetteEntities: PipetteEntities
 ) => {
   if (patch.pipette === undefined) return patch
@@ -109,7 +109,7 @@ export default function dependentFieldsUpdateMix(
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
   pipetteEntities: PipetteEntities,
-  labwareEntities: HydratedLabwareEntities
+  labwareEntities: LabwareEntities
 ): FormPatch {
   // sequentially modify parts of the patch until it's fully updated
   return chainPatchUpdaters(originalPatch, [

@@ -11,10 +11,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { FormPatch } from '../../actions/types'
 import type { FormData, StepFieldName } from '../../../form-types'
-import type {
-  HydratedLabwareEntities,
-  PipetteEntities,
-} from '../../../step-forms'
+import type { LabwareEntities, PipetteEntities } from '../../../step-forms'
 
 export function chainPatchUpdaters(
   initialPatch: FormPatch,
@@ -101,7 +98,7 @@ export function volumeInCapacityForMulti(
 type GetDefaultWellsArgs = {
   labwareId: ?string,
   pipetteId: ?string,
-  labwareEntities: HydratedLabwareEntities,
+  labwareEntities: LabwareEntities,
   pipetteEntities: PipetteEntities,
 }
 export function getDefaultWells(args: GetDefaultWellsArgs): Array<string> {

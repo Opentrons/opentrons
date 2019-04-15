@@ -128,7 +128,7 @@ export const selectStep = (
       { pipette: defaultPipetteId },
       formData,
       stepFormSelectors.getPipetteEntities(state),
-      stepFormSelectors.getHydratedLabwareEntities(state)
+      stepFormSelectors.getLabwareEntities(state)
     )
 
     formData = {

@@ -31,8 +31,7 @@ export type FormPipettesByMount = {
 }
 
 // "entities" have only properties that are time-invariant
-// when they are "hydrated" aka denormalized, definitions are baked in instead of being keyed by id
-// TODO IMMEDIATELY: call "hydrated" just entity. NormalizedPipetteEntity/NormalizedLabwareEntity is what redux store should use, all selectors should use the "full" (unqualified) ones
+// when they are de-normalized, the definitions they reference are baked in
 // =========== PIPETTES ========
 
 export type NormalizedPipetteById = {
@@ -58,19 +57,19 @@ export type PipetteEntities = {
 
 // =========== LABWARE ========
 
-export type LabwareEntities = {
+export type NormalizedLabwareById = {
   [labwareId: string]: {|
     type: string, // TODO: Ian 2019-04-12 change to `definitionOtId`
   |},
 }
 
-export type LabwareEntity = $Values<LabwareEntities>
+export type NormalizedLabware = $Values<NormalizedLabwareById>
 
-export type HydratedLabwareEntity = {|
+export type LabwareEntity = {|
   id: string,
   type: string, // TODO: Ian 2019-04-12 change to `definitionOtId`
   def: LabwareDefinition2,
 |}
-export type HydratedLabwareEntities = {
-  [labwareId: string]: HydratedLabwareEntity,
+export type LabwareEntities = {
+  [labwareId: string]: LabwareEntity,
 }

@@ -4,7 +4,7 @@ import dependentFieldsUpdateMix from './dependentFieldsUpdateMix'
 import type { FormData } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
 import type {
-  HydratedLabwareEntities,
+  LabwareEntities,
   PipetteEntities,
 } from '../../../step-forms/types'
 
@@ -12,7 +12,7 @@ function handleFormChange(
   patch: FormPatch,
   rawForm: ?FormData,
   pipetteEntities: PipetteEntities,
-  labwareEntities: HydratedLabwareEntities
+  labwareEntities: LabwareEntities
 ): FormPatch {
   if (rawForm == null) {
     return patch

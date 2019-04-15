@@ -16,25 +16,23 @@ import {
   type ValueCaster,
 } from './processing'
 import type { StepFieldName } from '../../form-types'
-import type { HydratedLabwareEntity, PipetteEntity } from '../../step-forms'
+import type { LabwareEntity, PipetteEntity } from '../../step-forms'
 import type { StepFormContextualState } from '../types'
 
 export type { StepFieldName }
 
-// TODO IMMEDIATELY rename getLabwareFromId or something
-const hydrateLabware = (
+const getLabwareEntity = (
   state: StepFormContextualState,
   id: string
-): HydratedLabwareEntity => {
-  return state.labware[id]
+): LabwareEntity => {
+  return state.labwareEntities[id]
 }
 
-// TODO IMMEDIATELY rename getPipetteFromId or something
-const hydratePipette = (
+const getPipetteEntity = (
   state: StepFormContextualState,
   id: string
 ): PipetteEntity => {
-  return state.pipettes[id]
+  return state.pipetteEntities[id]
 }
 
 type StepFieldHelpers = {|
@@ -50,7 +48,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   },
   aspirate_labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: hydrateLabware,
+    hydrate: getLabwareEntity,
   },
   aspirate_mix_times: {
     maskValue: composeMaskers(
@@ -71,7 +69,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   },
   dispense_labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: hydrateLabware,
+    hydrate: getLabwareEntity,
   },
   dispense_mix_times: {
     maskValue: composeMaskers(
@@ -96,7 +94,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   },
   labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: hydrateLabware,
+    hydrate: getLabwareEntity,
   },
   pauseHour: {
     maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers, onlyIntegers),
@@ -109,7 +107,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   },
   pipette: {
     getErrors: composeErrors(requiredField),
-    hydrate: hydratePipette,
+    hydrate: getPipetteEntity,
   },
   times: {
     getErrors: composeErrors(requiredField),

@@ -10,7 +10,7 @@ import type {
   RobotState,
 } from '../step-generation/types'
 import { getWellsForTips } from '../step-generation/utils'
-import type { HydratedLabwareEntities } from '../step-forms'
+import type { LabwareEntities } from '../step-forms'
 import type { SubstepTimelineFrame, TipLocation } from './types'
 
 function _conditionallyUpdateActiveTips(
@@ -112,7 +112,7 @@ const substepTimelineSingle = (commandCreators: Array<CommandCreator>) => (
 
 type SubstepContext = {
   channels?: Channels,
-  labwareEntities?: HydratedLabwareEntities,
+  labwareEntities?: LabwareEntities,
 }
 const substepTimeline = (
   commandCreators: Array<CommandCreator>,
