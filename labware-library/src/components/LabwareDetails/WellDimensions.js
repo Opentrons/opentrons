@@ -30,6 +30,9 @@ import type { LabwareDefinition } from '../../types'
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 
+const spacingValue = (spacing: number) =>
+  spacing ? toFixed(spacing) : <span className={styles.lighter}>N/A</span>
+
 export type WellDimensionsProps = {
   definition: LabwareDefinition,
 }
@@ -61,22 +64,8 @@ export default function WellDimensions(props: WellDimensionsProps) {
         const spacing = [
           { label: X_OFFSET, value: toFixed(w.xOffset) },
           { label: Y_OFFSET, value: toFixed(w.yOffset) },
-          {
-            label: X_SPACING,
-            value: w.xSpacing ? (
-              toFixed(w.xSpacing)
-            ) : (
-              <span className={styles.lighter}>N/A</span>
-            ),
-          },
-          {
-            label: Y_SPACING,
-            value: w.ySpacing ? (
-              toFixed(w.ySpacing)
-            ) : (
-              <span className={styles.lighter}>N/A</span>
-            ),
-          },
+          { label: X_SPACING, value: spacingValue(w.xSpacing) },
+          { label: Y_SPACING, value: spacingValue(w.ySpacing) },
         ]
 
         return (
