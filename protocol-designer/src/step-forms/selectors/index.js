@@ -47,6 +47,7 @@ import type {
 } from '../types'
 import type { RootState } from '../reducers'
 
+// TODO: Ian 2019-04-10 SHIM REMOVAL #3335
 const FALLBACK_DEF = '54d2f430-d602-11e8-80b1-6965467d172c'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms

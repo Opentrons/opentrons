@@ -68,9 +68,9 @@ export const duplicateLabware = (templateLabwareId: string) => (
   getState: GetState
 ) => {
   const state = getState()
-  const templateLabwareType = stepFormSelectors.getLabwareTypesById(state)[
+  const templateLabwareType = stepFormSelectors.getLabwareEntities(state)[
     templateLabwareId
-  ]
+  ].type
   assert(
     templateLabwareType,
     `no type for labware ${templateLabwareId}, cannot run duplicateLabware thunk`
