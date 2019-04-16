@@ -1,19 +1,19 @@
 // @flow
+import type { LabwareDefinition2 } from '../'
 
-import { getLabware } from '../getLabware'
-
-const getWellTotalVolume = (labwareName: string, wellName: string): ?number => {
-  const labware = getLabware(labwareName)
-  if (!labware) {
-    console.warn(`No labware definition found for labware ${labwareName}`)
-    return null
-  }
-  const well = labware.wells[wellName]
+const getWellTotalVolume = (
+  labwareDef: LabwareDefinition2,
+  wellName: string
+): ?number => {
+  const well = labwareDef.wells[wellName]
   if (!well) {
-    console.warn(`No well ${wellName} found for labware ${labwareName}`)
+    console.warn(
+      `No well "${wellName}" found for labware "${labwareDef &&
+        labwareDef.otId}"`
+    )
     return null
   }
-  return well['total-liquid-volume'] || null
+  return well.totalLiquidVolume
 }
 
 export default getWellTotalVolume
