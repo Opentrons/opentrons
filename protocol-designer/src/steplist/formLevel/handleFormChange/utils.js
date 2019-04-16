@@ -2,7 +2,7 @@
 import assert from 'assert'
 import round from 'lodash/round'
 import uniq from 'lodash/uniq'
-import { canPipetteUseLabware, getLabware } from '@opentrons/shared-data'
+import { canPipetteUseLabware } from '@opentrons/shared-data'
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
 import { getWellSetForMultichannel } from '../../../well-selection/utils'
 import type {
@@ -111,26 +111,18 @@ export function getDefaultWells(args: GetDefaultWellsArgs): Array<string> {
   )
     return []
 
-  const labwareType = labwareEntities[labwareId].type
+  const labwareDef = labwareEntities[labwareId].def
   const pipetteCanUseLabware = canPipetteUseLabware(
-    pipetteEntities[pipetteId].name,
-    labwareType
+    pipetteEntities[pipetteId].spec,
+    labwareDef
   )
   if (!pipetteCanUseLabware) return []
 
-  const labwareSpec = getLabware(labwareType)
-  assert(
-    labwareSpec,
-    `expected labwareSpec at this point in _getDefaultWells. labware id: ${labwareId}`
-  )
-
   const isSingleWellLabware =
-    labwareSpec &&
-    labwareSpec.ordering.length === 1 &&
-    labwareSpec.ordering[0].length === 1
+    labwareDef.ordering.length === 1 && labwareDef.ordering[0].length === 1
 
-  if (labwareSpec && isSingleWellLabware) {
-    const well = labwareSpec.ordering[0][0]
+  if (isSingleWellLabware) {
+    const well = labwareDef.ordering[0][0]
     assert(
       well === 'A1',
       `sanity check: expected single-well labware ${labwareId} to have only the well 'A1'`

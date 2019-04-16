@@ -1,7 +1,7 @@
 // @flow
 import assert from 'assert'
 import type { LabwareDefinition2 } from '../types'
-export { default as canPipetteUseLabware } from './canPipetteUseLabware'
+export { canPipetteUseLabware } from './canPipetteUseLabware'
 export {
   computeWellAccessDeprecated,
   computeWellAccess,
