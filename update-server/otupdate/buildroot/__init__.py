@@ -48,18 +48,18 @@ def get_app(system_version_file: str = None,
     config_obj = config.load(config_file_override)
 
     LOG.info("Setup: " + '\n\t'.join([
-        f'Device name:               {device_name}',
+        f'Device name: {pretty_name}',
         f'Buildroot version:         '
         f'{version.get("buildroot_version", "unknown")}',
-        f'\t(from git sha            '
+        f'\t(from git sha      '
         f'{version.get("buildroot_sha", "unknown")}',
         f'API version:               '
         f'{version.get("opentrons_api_version", "unknown")}',
-        f'\t(from git sha            '
+        f'\t(from git sha      '
         f'{version.get("opentrons_api_sha", "unknown")}',
         f'Update server version:     '
         f'{version.get("update_server_version", "unknown")}',
-        f'\t(from git sha            '
+        f'\t(from git sha      '
         f'{version.get("update_server_sha", "unknown")}',
         f'Smoothie firmware version: TODO'
     ]))
