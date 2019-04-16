@@ -1,7 +1,6 @@
 // @flow
 import mapValues from 'lodash/mapValues'
 import { createSelector } from 'reselect'
-import { getLabware } from '@opentrons/shared-data'
 import { _getSharedLabware, getAllDefinitions } from './utils'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BaseState, Selector } from '../types'
@@ -16,14 +15,11 @@ export const rootSelector = (state: BaseState): RootState =>
 const _getLabwareDef = (
   customDefs: LabwareDefByDefId,
   otId: string
-): any | LabwareDefinition2 => {
+): LabwareDefinition2 => {
   const customDef = customDefs[otId]
   if (customDef) return customDef
   const sharedDataDef = _getSharedLabware(otId)
   if (sharedDataDef) return sharedDataDef
-  // TODO: Ian 2019-04-10 SHIM REMOVAL #3335
-  const legacyV1Labware = getLabware(otId)
-  if (legacyV1Labware) return legacyV1Labware
   throw Error(
     `No labware definition in PD session's custom labware or builtin shared-data defs for otId "{otId}"`
   )
