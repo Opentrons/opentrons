@@ -52,18 +52,27 @@ export function getUniqueWellProperties(
   return flatten(ordering).reduce(
     (groups: Array<LabwareWellGroupProperties>, k: string) => {
       const { x, y, z, ...props } = wells[k]
-      let group = find(groups, props)
+      const groupBase = { xOffset: x, yOffset: y, xSpacing: 0, ySpacing: 0 }
+      let group: ?LabwareWellGroupProperties = find(groups, props)
 
-      if (!group) {
-        group = { ...props, xOffset: x, yOffset: y, xSpacing: 0, ySpacing: 0 }
+      // these ifs are overly specific and duplicated to make flow happy
+      if (!group && props.shape === 'circular') {
+        group = { ...props, ...groupBase }
         groups.push(group)
-      } else if (!group.xSpacing && y === group.yOffset) {
-        // we've hit the first well in ordering that matches the group's
-        // starting well's y position, so use its x position to set spacing
-        group.xSpacing = round(x - group.xOffset, 2)
-      } else if (!group.ySpacing && x === group.xOffset) {
-        // same as above, but for the y spacing
-        group.ySpacing = round(group.yOffset - y, 2)
+      } else if (!group && props.shape === 'rectangular') {
+        group = { ...props, ...groupBase }
+        groups.push(group)
+      }
+
+      if (group) {
+        if (!group.xSpacing && y === group.yOffset) {
+          // we've hit the first well in ordering that matches the group's
+          // starting well's y position, so use its x position to set spacing
+          group.xSpacing = round(x - group.xOffset, 2)
+        } else if (!group.ySpacing && x === group.xOffset) {
+          // same as above, but for the y spacing
+          group.ySpacing = round(group.yOffset - y, 2)
+        }
       }
 
       return groups
