@@ -1,11 +1,10 @@
 // @flow
-import assert from 'assert'
 import intersection from 'lodash/intersection'
 import zipWith from 'lodash/zipWith'
 import uniq from 'lodash/uniq'
 import compact from 'lodash/compact'
 import flatten from 'lodash/flatten'
-import { getLabware } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { WellOrderOption } from '../../form-types'
 
 // labware definitions in shared-data have an ordering
@@ -78,20 +77,14 @@ export const orderWells = (
 
 export function getOrderedWells(
   unorderedWells: Array<string>,
-  labwareType: string,
+  labwareDef: LabwareDefinition2,
   wellOrderFirst: WellOrderOption,
   wellOrderSecond: WellOrderOption
 ): Array<string> {
-  const def = getLabware(labwareType)
-  if (def) {
-    const allWellsOrdered = orderWells(
-      def.ordering,
-      wellOrderFirst,
-      wellOrderSecond
-    )
-    return intersection(allWellsOrdered, unorderedWells)
-  } else {
-    assert(false, `getOrderedWells: no def for labware type ${labwareType}`)
-  }
-  return []
+  const allWellsOrdered = orderWells(
+    labwareDef.ordering,
+    wellOrderFirst,
+    wellOrderSecond
+  )
+  return intersection(allWellsOrdered, unorderedWells)
 }
