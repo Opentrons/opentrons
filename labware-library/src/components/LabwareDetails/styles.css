@@ -24,10 +24,42 @@
   color: var(--c-blue);
 }
 
+.lighter {
+  opacity: 0.5;
+}
+
+.stats,
+.dimensions,
+.well_dimensions {
+  width: calc(var(--size-50p) - 0.5 * var(--spacing-7));
+  margin-right: var(--spacing-7);
+}
+
 .stats {
-  width: var(--size-50p);
-  min-width: var(--size-3);
-  margin: var(--spacing-5) 0;
+  margin-bottom: var(--spacing-5);
+}
+
+.well_dimensions {
+  display: inline-block;
+  vertical-align: top;
+
+  &:nth-child(even) {
+    margin-right: 0;
+  }
+}
+
+.well_dimensions_row {
+  padding-top: var(--spacing-4);
+  margin-top: var(--spacing-5);
+  border-top: var(--bd-light);
+
+  &:first-child {
+    border: none;
+  }
+}
+
+.well_volume {
+  padding: 0 var(--spacing-2);
 }
 
 @media (--medium) {
@@ -52,5 +84,31 @@
 @media (--large) {
   .gallery_container {
     width: var(--size-25p);
+  }
+
+  .details_container {
+    width: var(--size-75p);
+  }
+
+  .dimensions,
+  .well_dimensions_container {
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  .stats,
+  .dimensions {
+    width: calc(var(--size-third) - 2 * var(--spacing-7) / 3);
+  }
+
+  .well_dimensions_container {
+    width: calc(var(--size-two-thirds) - var(--spacing-7) / 3);
+  }
+
+  .well_dimensions_row {
+    &:first-child {
+      margin-top: 0;
+      padding-top: 0;
+    }
   }
 }

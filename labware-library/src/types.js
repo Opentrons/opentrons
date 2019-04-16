@@ -1,5 +1,8 @@
 // @flow
-import type { LabwareDefinition2 as LabwareDefinition } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2 as LabwareDefinition,
+  LabwareWellProperties,
+} from '@opentrons/shared-data'
 
 export type {
   LabwareDefinition2 as LabwareDefinition,
@@ -9,6 +12,14 @@ export type {
   LabwareWellProperties,
   LabwareWellMap,
 } from '@opentrons/shared-data'
+
+export type LabwareWellGroupProperties = {|
+  ...LabwareWellProperties,
+  xOffset: number,
+  yOffset: number,
+  xSpacing: number,
+  ySpacing: number,
+|}
 
 export type LabwareList = Array<LabwareDefinition>
 

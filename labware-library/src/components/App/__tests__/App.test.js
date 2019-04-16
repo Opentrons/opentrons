@@ -27,7 +27,12 @@ describe('App', () => {
         location={({ search: '' }: any)}
         history={({}: any)}
         match={({}: any)}
-        definition={({}: any)}
+        definition={
+          ({
+            metadata: { displayCategory: 'wellPlate' },
+            brand: { brand: 'generic' },
+          }: any)
+        }
       />
     )
 

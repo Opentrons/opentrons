@@ -6,20 +6,38 @@ exports[`App component renders with definition 1`] = `
 >
   <Nav />
   <Breadcrumbs
-    definition={Object {}}
+    definition={
+      Object {
+        "brand": Object {
+          "brand": "generic",
+        },
+        "metadata": Object {
+          "displayCategory": "wellPlate",
+        },
+      }
+    }
   />
   <Page
     content={
       <LabwareDetails
-        definition={Object {}}
+        definition={
+          Object {
+            "brand": Object {
+              "brand": "generic",
+            },
+            "metadata": Object {
+              "displayCategory": "wellPlate",
+            },
+          }
+        }
       />
     }
     sidebar={
       <Sidebar
         filters={
           Object {
-            "category": "all",
-            "manufacturer": "all",
+            "category": "wellPlate",
+            "manufacturer": "generic",
           }
         }
       />

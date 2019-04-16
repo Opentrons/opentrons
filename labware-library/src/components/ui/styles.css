@@ -18,6 +18,10 @@
   }
 }
 
+.lowercase_text {
+  text-transform: lowercase;
+}
+
 .value {
   @apply --font-body-2-dark;
 
