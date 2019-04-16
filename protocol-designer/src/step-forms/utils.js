@@ -3,9 +3,11 @@ import assert from 'assert'
 import reduce from 'lodash/reduce'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/components'
+import type { LabwareDefByDefId } from '../labware-defs'
 import type {
   NormalizedPipette,
   NormalizedPipetteById,
+  PipetteEntity,
   PipetteEntities,
 } from './types'
 
@@ -52,21 +54,28 @@ export function getLabwareIdInSlot(
 }
 
 export function denormalizePipetteEntities(
-  pipetteInvariantProperties: NormalizedPipetteById
+  pipetteInvariantProperties: NormalizedPipetteById,
+  labwareDefs: LabwareDefByDefId
 ): PipetteEntities {
   return reduce(
     pipetteInvariantProperties,
-    (
-      acc: PipetteEntities,
-      pipette: NormalizedPipette,
-      id: string
-    ): PipetteEntities => {
+    (acc: PipetteEntities, pipette: NormalizedPipette): PipetteEntities => {
+      const pipetteId = pipette.id
       const spec = getPipetteNameSpecs(pipette.name)
-      assert(
+      if (!spec) {
+        throw new Error(
+          `no pipette spec for pipette id "${pipetteId}", name "${
+            pipette.name
+          }"`
+        )
+      }
+
+      const pipetteEntity: PipetteEntity = {
+        ...pipette,
         spec,
-        `no pipette spec for pipette id "${id}", name "${pipette.name}"`
-      )
-      return { ...acc, [id]: { ...pipette, spec } }
+        tiprackLabwareDef: labwareDefs[pipette.tiprackModel],
+      }
+      return { ...acc, [pipetteId]: pipetteEntity }
     },
     {}
   )

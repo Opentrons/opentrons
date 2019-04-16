@@ -20,7 +20,10 @@ import {
   handleFormChange,
 } from '../../steplist/formLevel'
 import { cancelStepForm } from '../../steplist/actions'
-import { _getLabwareEntitiesRootState } from '../selectors'
+import {
+  _getPipetteEntitiesRootState,
+  _getLabwareEntitiesRootState,
+} from '../selectors'
 
 import type { LoadFileAction } from '../../load-file'
 import type {
@@ -53,12 +56,7 @@ import type {
   DeletePipettesAction,
   SubstituteStepFormPipettesAction,
 } from '../actions'
-import {
-  denormalizePipetteEntities,
-  getIdsInRange,
-  getLabwareIdInSlot,
-  pipetteModelToName,
-} from '../utils'
+import { getIdsInRange, getLabwareIdInSlot, pipetteModelToName } from '../utils'
 
 type FormState = FormData | null
 
@@ -82,7 +80,7 @@ export const unsavedForm = (
       const fieldUpdate = handleFormChange(
         action.payload.update,
         unsavedFormState,
-        denormalizePipetteEntities(rootState.pipetteInvariantProperties),
+        _getPipetteEntitiesRootState(rootState),
         _getLabwareEntitiesRootState(rootState)
       )
       return {
@@ -121,7 +119,7 @@ export const unsavedForm = (
           ...handleFormChange(
             { pipette: substitutionMap[unsavedFormState.pipette] },
             unsavedFormState,
-            denormalizePipetteEntities(rootState.pipetteInvariantProperties),
+            _getPipetteEntitiesRootState(rootState),
             _getLabwareEntitiesRootState(rootState)
           ),
         }
@@ -265,9 +263,7 @@ export const savedStepForms = (
                 ...handleFormChange(
                   { [fieldName]: null },
                   acc,
-                  denormalizePipetteEntities(
-                    rootState.pipetteInvariantProperties
-                  ),
+                  _getPipetteEntitiesRootState(rootState),
                   _getLabwareEntitiesRootState(rootState)
                 ),
               }
@@ -301,7 +297,7 @@ export const savedStepForms = (
             ...handleFormChange(
               { pipette: null },
               form,
-              denormalizePipetteEntities(rootState.pipetteInvariantProperties),
+              _getPipetteEntitiesRootState(rootState),
               _getLabwareEntitiesRootState(rootState)
             ),
           }
@@ -330,7 +326,7 @@ export const savedStepForms = (
         const updatedFields = handleFormChange(
           { pipette: substitutionMap[prevStepForm.pipette] },
           prevStepForm,
-          denormalizePipetteEntities(rootState.pipetteInvariantProperties),
+          _getPipetteEntitiesRootState(rootState),
           _getLabwareEntitiesRootState(rootState)
         )
 
@@ -370,7 +366,7 @@ export const savedStepForms = (
           ...handleFormChange(
             action.payload.update,
             previousForm,
-            denormalizePipetteEntities(rootState.pipetteInvariantProperties),
+            _getPipetteEntitiesRootState(rootState),
             _getLabwareEntitiesRootState(rootState)
           ),
         },

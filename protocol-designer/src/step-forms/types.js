@@ -25,10 +25,8 @@ export type NormalizedPipetteById = {
 export type NormalizedPipette = $Values<NormalizedPipetteById>
 
 export type PipetteEntity = {|
-  name: string,
-  id: string,
-  tiprackModel: string, // TODO: Ian 2019-04-12 change to `tiprackOtId`
-  // TODO: Ian 2019-04-12 add `tiprackLabwareDef`
+  ...NormalizedPipette,
+  tiprackLabwareDef: LabwareDefinition2,
   spec: PipetteNameSpecs,
 |}
 

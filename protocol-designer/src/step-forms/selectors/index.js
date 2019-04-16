@@ -55,8 +55,7 @@ const rootSelector = (state: BaseState): RootState => state.stepForms
 // NOTE Ian 2019-04-15: outside of this file, you probably only care about
 // the labware entity in its denormalized representation, in which case you ought
 // to use `getLabwareEntities` instead.
-// `_getNormalizedLabwareById` is intended for uses tied to the LabwareEntities type
-// (which currently contains only `type`, but may expand)
+// `_getNormalizedLabwareById` is intended for uses tied to the NormalizedLabware type
 const _getNormalizedLabwareById: Selector<NormalizedLabwareById> = createSelector(
   rootSelector,
   state => state.labwareInvariantProperties
@@ -103,8 +102,15 @@ export const _getLabwareEntitiesRootState: RootState => LabwareEntities = create
 
 export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
   state => rootSelector(state).pipetteInvariantProperties,
-  pipetteInvariantProperties =>
-    denormalizePipetteEntities(pipetteInvariantProperties)
+  labwareDefSelectors.getLabwareDefsById,
+  denormalizePipetteEntities
+)
+
+// Special version of `getPipetteEntities` selector for use in step-forms reducers
+export const _getPipetteEntitiesRootState: RootState => PipetteEntities = createSelector(
+  rs => rs.pipetteInvariantProperties,
+  labwareDefSelectors._getLabwareDefsByIdRootState,
+  denormalizePipetteEntities
 )
 
 export const getInitialDeckSetupStepForm = (state: BaseState) =>
