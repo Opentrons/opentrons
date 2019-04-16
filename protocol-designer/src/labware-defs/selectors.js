@@ -72,9 +72,8 @@ const _makeLabwareDefsObj = (customDefs: LabwareDefByDefId) => {
   return { ...V1_FALLBACKS, ...getAllDefinitions(), ...customDefsById }
 }
 
-// $FlowFixMe TODO IMMEDIATELY why??????
 export const _getLabwareDefsByIdRootState: StepFormRootState => LabwareDefByDefId = createSelector(
-  rootState => rootState.customDefs,
+  (rootState: StepFormRootState) => rootState.labwareDefs.customDefs,
   _makeLabwareDefsObj
 )
 
