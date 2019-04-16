@@ -10,7 +10,6 @@ import socket
 import string
 import subprocess
 from typing import Callable, Coroutine, Mapping
-from xml.etree import ElementTree
 
 from aiohttp import web
 
