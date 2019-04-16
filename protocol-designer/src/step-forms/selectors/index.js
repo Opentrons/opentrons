@@ -8,7 +8,10 @@ import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
-import { getPipetteNameSpecs, getLabware } from '@opentrons/shared-data'
+import {
+  getPipetteNameSpecs,
+  getLabwareDisplayName,
+} from '@opentrons/shared-data'
 import i18n from '../../localization'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import {
@@ -197,17 +200,15 @@ export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup>
         pipetteOnDeck: PipetteOnDeck,
         pipetteId
       ) => {
-        const pipetteSpec = getPipetteNameSpecs(pipetteOnDeck.name)
-        const tiprackSpec = getLabware(pipetteOnDeck.tiprackModel)
+        const pipetteSpec = pipetteOnDeck.spec
+        const tiprackDef = pipetteOnDeck.tiprackLabwareDef
 
         const pipetteForInstrumentGroup = {
           mount: pipetteOnDeck.mount,
           channels: pipetteSpec ? pipetteSpec.channels : undefined,
           description: _getPipetteDisplayName(pipetteOnDeck.name),
           isDisabled: false,
-          tiprackModel: tiprackSpec
-            ? `${tiprackSpec.metadata.tipVolume || '?'} uL`
-            : undefined,
+          tiprackModel: getLabwareDisplayName(tiprackDef),
           tiprack: { model: pipetteOnDeck.tiprackModel },
         }
 
@@ -230,14 +231,14 @@ export const getPipettesForEditPipetteForm: Selector<FormPipettesByMount> = crea
         pipetteOnDeck: PipetteOnDeck,
         id
       ): FormPipettesByMount => {
-        const pipetteSpec = getPipetteNameSpecs(pipetteOnDeck.name)
-        const tiprackSpec = getLabware(pipetteOnDeck.tiprackModel)
+        const pipetteSpec = pipetteOnDeck.spec
+        const tiprackDef = pipetteOnDeck.tiprackLabwareDef
 
-        if (!pipetteSpec || !tiprackSpec) return acc
+        if (!pipetteSpec || !tiprackDef) return acc
 
         const pipetteForInstrumentGroup = {
           pipetteName: pipetteOnDeck.name,
-          tiprackModel: tiprackSpec.metadata.name,
+          tiprackModel: getLabwareDisplayName(tiprackDef),
         }
 
         return {

@@ -48,8 +48,10 @@ export const V1_NAME_TO_V2_OTID = {
   'opentrons-tuberack-2ml-eppendorf': 'b28e5eb0-e8f0-11e8-b93b-5f6727dde048',
   'opentrons-tuberack-2ml-screwcap': 'e8c55910-e8f1-11e8-b93b-5f6727dde048',
   'opentrons-tuberack-50ml': '23784a80-5563-11e9-bf87-f7b718396190',
-  'tiprack-1000ul': 'd4e462c0-ffde-11e8-abfa-95044b186e81',
   'tiprack-10ul': '88154cc0-ffde-11e8-abfa-95044b186e81',
+  'tiprack-200ul': '88154cc0-ffde-11e8-abfa-95044b186e81', // NOT REAL DEF, shim using 10uL tiprack
+  'tiprack-300ul': '88154cc0-ffde-11e8-abfa-95044b186e81', // NOT REAL DEF, shim using 10uL tiprack
+  'tiprack-1000ul': 'd4e462c0-ffde-11e8-abfa-95044b186e81',
   'trough-12row': 'a41d9ef0-f4b6-11e8-90c2-7106f0eae5a7',
 }
 

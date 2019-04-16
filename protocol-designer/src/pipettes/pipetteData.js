@@ -1,6 +1,7 @@
 // @flow
+import assert from 'assert'
 import compact from 'lodash/compact'
-import { getPipetteNameSpecs, getLabware } from '@opentrons/shared-data'
+import { getPipetteNameSpecs, getTiprackVolume } from '@opentrons/shared-data'
 import type { PipetteEntity } from '../step-forms/types'
 
 const supportedPipetteNames = [
@@ -25,10 +26,16 @@ export const pipetteOptions = compact(
 // NOTE: this is similar to getPipetteWithTipMaxVol, the fns could potentially
 // be merged once multiple tiprack types per pipette is supported
 export function getPipetteCapacity(pipetteEntity: PipetteEntity): number {
-  const specs = getPipetteNameSpecs(pipetteEntity.name)
-  const tiprackDef = getLabware(pipetteEntity.tiprackModel)
-  if (specs && tiprackDef && tiprackDef.metadata.tipVolume) {
-    return Math.min(specs.maxVolume, tiprackDef.metadata.tipVolume)
+  const spec = pipetteEntity.spec
+  const tiprackDef = pipetteEntity.tiprackLabwareDef
+  if (spec && tiprackDef) {
+    return Math.min(spec.maxVolume, getTiprackVolume(tiprackDef))
   }
+  assert(
+    false,
+    `Expected spec and tiprack def for pipette ${
+      pipetteEntity ? pipetteEntity.id : '???'
+    }`
+  )
   return NaN
 }

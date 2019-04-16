@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import type { LabwareDefinition2 } from '../types'
 export { default as canPipetteUseLabware } from './canPipetteUseLabware'
 export {
@@ -14,6 +15,22 @@ export const getLabwareDisplayName = (labwareDef: LabwareDefinition2) =>
 
 export const getLabwareFormat = (labwareDef: LabwareDefinition2) =>
   labwareDef.parameters.format
+
+export const getTiprackVolume = (labwareDef: LabwareDefinition2): number => {
+  assert(
+    labwareDef.parameters.isTiprack,
+    `getTiprackVolume expected a tiprack labware ${
+      labwareDef.otId
+    }, but 'isTiprack' isn't true`
+  )
+  // NOTE: Ian 2019-04-16 assuming all tips are the same volume across the rack
+  const volume = labwareDef.wells['A1'].totalLiquidVolume
+  assert(
+    volume >= 0,
+    `getTiprackVolume expected tip volume to be at least 0, got ${volume}`
+  )
+  return volume
+}
 
 export function getLabwareHasQuirk(
   labwareDef: LabwareDefinition2,
