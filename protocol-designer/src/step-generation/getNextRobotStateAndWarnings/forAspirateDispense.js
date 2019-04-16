@@ -7,7 +7,7 @@ import {
   AIR,
   mergeLiquid,
   splitLiquid,
-  getWellsForTips,
+  getWellsForTipsDeprecated,
   totalVolume,
 } from '../utils'
 import { getPipetteSpecFromId } from '../robotStateSelectors'
@@ -37,7 +37,7 @@ export default function getNextRobotStateAndWarningsForAspDisp(
   const pipetteSpec = getPipetteSpecFromId(pipetteId, prevRobotState)
   const labwareType = prevRobotState.labware[labwareId].type
 
-  const { allWellsShared, wellsForTips } = getWellsForTips(
+  const { allWellsShared, wellsForTips } = getWellsForTipsDeprecated(
     pipetteSpec.channels,
     labwareType,
     args.well

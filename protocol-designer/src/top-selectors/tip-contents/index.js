@@ -10,7 +10,10 @@ import { selectors as fileDataSelectors } from '../../file-data'
 import { getWellSetForMultichannel } from '../../well-selection/utils'
 
 import { typeof Labware } from '@opentrons/components'
-import type { CommandV1 as Command } from '@opentrons/shared-data'
+import type {
+  CommandV1 as Command,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type { OutputSelector } from 'reselect'
 import type { BaseState } from '../../types'
 import type { ElementProps } from 'react'
@@ -28,6 +31,7 @@ function getLabwareIdProp(state, props: { labwareId: string }) {
 
 function getTipHighlighted(
   labwareId: string,
+  labwareDef: LabwareDefinition2,
   wellName: string,
   commandsAndRobotState: StepGeneration.CommandsAndRobotState
 ): boolean {
@@ -36,21 +40,15 @@ function getTipHighlighted(
     if (c.command === 'pick-up-tip' && c.params.labware === labwareId) {
       const commandWellName = c.params.well
       const pipetteId = c.params.pipette
-      const labwareType = StepGeneration.getLabwareType(labwareId, robotState)
       const pipetteSpec = StepGeneration.getPipetteSpecFromId(
         pipetteId,
         robotState
       )
 
-      if (!labwareType) {
-        console.error(
-          `Labware ${labwareId} missing labwareType. Could not get tip highlight state`
-        )
-        return false
-      } else if (pipetteSpec.channels === 1) {
+      if (pipetteSpec.channels === 1) {
         return commandWellName === wellName
       } else if (pipetteSpec.channels === 8) {
-        const wellSet = getWellSetForMultichannel(labwareType, commandWellName)
+        const wellSet = getWellSetForMultichannel(labwareDef, commandWellName)
         return Boolean(wellSet && wellSet.includes(wellName))
       } else {
         console.error(
@@ -97,6 +95,7 @@ const getLastValidTips: GetTipSelector = createSelector(
 
 export const getTipsForCurrentStep: GetTipSelector = createSelector(
   stepFormSelectors.getOrderedStepIds,
+  stepFormSelectors.getLabwareDefByLabwareId,
   fileDataSelectors.getRobotStateTimeline,
   stepsSelectors.getHoveredStepId,
   stepsSelectors.getActiveItem,
@@ -107,6 +106,7 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
   getAllSubsteps,
   (
     orderedStepIds,
+    labwareDefByLabwareId,
     robotStateTimeline,
     hoveredStepId,
     activeItem,
@@ -116,6 +116,7 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
     hoveredSubstepIdentifier,
     allSubsteps
   ) => {
+    const labwareDef = labwareDefByLabwareId[labwareId]
     if (!activeItem.isStep) {
       const terminalId = activeItem.id
       if (terminalId === START_TERMINAL_ITEM_ID) {
@@ -165,17 +166,12 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
             const hoveredSubstepData =
               substepsForStep.multiRows[substepIndex][0] // just use first multi row
 
-            const labwareType = StepGeneration.getLabwareType(
-              labwareId,
-              currentFrame.robotState
-            )
-            const wellSet =
-              labwareType && hoveredSubstepData.activeTips
-                ? getWellSetForMultichannel(
-                    labwareType,
-                    hoveredSubstepData.activeTips.well
-                  )
-                : []
+            const wellSet = hoveredSubstepData.activeTips
+              ? getWellSetForMultichannel(
+                  labwareDef,
+                  hoveredSubstepData.activeTips.well
+                )
+              : []
 
             highlighted =
               (hoveredSubstepData &&
@@ -196,7 +192,12 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
           }
         }
       } else if (hovered && currentFrame) {
-        highlighted = getTipHighlighted(labwareId, wellName, currentFrame)
+        highlighted = getTipHighlighted(
+          labwareId,
+          labwareDef,
+          wellName,
+          currentFrame
+        )
       }
 
       return {

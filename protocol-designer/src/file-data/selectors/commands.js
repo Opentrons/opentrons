@@ -7,36 +7,34 @@ import reduce from 'lodash/reduce'
 import takeWhile from 'lodash/takeWhile'
 import uniqBy from 'lodash/uniqBy'
 import { getIsTiprack, getPipetteNameSpecs } from '@opentrons/shared-data'
-import type { BaseState, Selector } from '../../types'
 import { getAllWellsForLabware } from '../../constants'
 import * as StepGeneration from '../../step-generation'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { BaseState, Selector } from '../../types'
 import type { StepIdType } from '../../form-types'
 import type { LabwareOnDeck, PipetteOnDeck } from '../../step-forms'
 
-const all96Tips = reduce(
-  StepGeneration.tiprackWellNamesFlat,
-  (acc: { [string]: boolean }, wellName: string) => ({
-    ...acc,
-    [wellName]: true,
-  }),
-  {}
-)
+function _makeTipState(
+  labwareDef: LabwareDefinition2
+): { [well: string]: true } {
+  return mapValues(labwareDef.wells, well => true)
+}
 
 // NOTE this just adds missing well keys to the labware-ingred 'deck setup' liquid state
 export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> = createSelector(
   labwareIngredSelectors.getLiquidsByLabwareId,
-  stepFormSelectors.getLabwareTypesById,
-  (ingredLocations, labwareTypes) => {
-    const allLabwareIds: Array<string> = Object.keys(labwareTypes)
+  stepFormSelectors.getLabwareDefByLabwareId,
+  (ingredLocations, defs) => {
+    const allLabwareIds: Array<string> = Object.keys(defs)
     return allLabwareIds.reduce(
       (
         acc: StepGeneration.LabwareLiquidState,
         labwareId
       ): StepGeneration.LabwareLiquidState => {
-        const labwareType = labwareTypes[labwareId]
-        const allWells = labwareType ? getAllWellsForLabware(labwareType) : []
+        const labwareDef = defs[labwareId]
+        const allWells = labwareDef ? getAllWellsForLabware(labwareDef) : []
         const liquidStateForLabwareAllWells = allWells.reduce(
           (innerAcc: StepGeneration.SingleLabwareLiquidState, well) => ({
             ...innerAcc,
@@ -61,8 +59,9 @@ type TipState = $PropertyType<StepGeneration.RobotState, 'tipState'>
 type TiprackTipState = $PropertyType<TipState, 'tipracks'>
 export const getInitialRobotState: BaseState => StepGeneration.RobotState = createSelector(
   stepFormSelectors.getInitialDeckSetup,
+  stepFormSelectors.getLabwareDefByLabwareId,
   getLabwareLiquidState,
-  (initialDeckSetup, labwareLiquidState) => {
+  (initialDeckSetup, labwareDefsByLabwareId, labwareLiquidState) => {
     const labware = mapValues(
       initialDeckSetup.labware,
       (l: LabwareOnDeck, id: string): StepGeneration.LabwareData => ({
@@ -94,12 +93,11 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
         labwareData: StepGeneration.LabwareData,
         labwareId: string
       ) => {
-        const isTiprack = getIsTiprack(labwareData.type)
-        if (labwareData.type && isTiprack) {
+        const labwareDef = labwareDefsByLabwareId[labwareId]
+        if (getIsTiprack(labwareDef)) {
           return {
             ...acc,
-            // TODO LATER Ian 2018-05-18 use shared-data wells instead of assuming 96 tips?
-            [labwareId]: { ...all96Tips },
+            [labwareId]: _makeTipState(labwareDef),
           }
         }
         return acc

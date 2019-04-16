@@ -5,6 +5,8 @@ import configureStore from '../../configureStore'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { actions as loadFileActions } from '../index'
 
+jest.mock('../../labware-defs/utils')
+
 function makeTestCaseFromFixture(fileName) {
   const fullFile = require(path.join(
     __dirname,

@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import noop from 'lodash/noop'
-import { getLabware, getIsTiprack } from '@opentrons/shared-data'
+import { getLabware, getIsTiprackDeprecated } from '@opentrons/shared-data'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors as uiLabwareSelectors } from '../ui/labware'
 import { selectors as stepFormSelectors } from '../step-forms'
@@ -82,7 +82,7 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
 
   const labwareOnDeck: ?* = initialLabware[labwareId]
   const labwareType = labwareOnDeck && labwareOnDeck.type
-  const isTiprack = labwareType ? getIsTiprack(labwareType) : false
+  const isTiprack = labwareType ? getIsTiprackDeprecated(labwareType) : false
 
   const containerName = labwareNames[labwareId]
   const labwareHasName = labwareIngredSelectors.getSavedLabware(state)[

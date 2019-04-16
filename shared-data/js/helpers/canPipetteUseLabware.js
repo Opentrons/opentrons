@@ -1,7 +1,7 @@
 // @flow
 
 import get from 'lodash/get'
-import getLabware from '../getLabware'
+import { getLabware } from '../getLabware'
 import { getPipetteNameSpecs } from '../pipettes'
 
 const FORMAT_METADATA = {

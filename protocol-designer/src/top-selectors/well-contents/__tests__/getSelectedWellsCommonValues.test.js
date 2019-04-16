@@ -1,5 +1,7 @@
 import { getSelectedWellsCommonValues } from '../'
 
+jest.mock('../../../labware-defs/utils')
+
 let ingredLocations
 let selectedLabwareId
 

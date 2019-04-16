@@ -7,7 +7,7 @@ import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   splitLiquid,
   mergeLiquid,
-  getWellsForTips,
+  getWellsForTipsDeprecated,
   getLocationTotalVolume,
 } from './utils'
 import type {
@@ -58,7 +58,7 @@ export default function updateLiquidState(
     'in dispenseUpdateLiquidState, either volume or useFullVolume are required'
   )
 
-  const { wellsForTips, allWellsShared } = getWellsForTips(
+  const { wellsForTips, allWellsShared } = getWellsForTipsDeprecated(
     pipetteSpec.channels,
     labwareType,
     well

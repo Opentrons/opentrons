@@ -5,9 +5,15 @@ import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import last from 'lodash/last'
-import { computeWellAccess } from '@opentrons/shared-data'
+import {
+  computeWellAccess,
+  computeWellAccessDeprecated,
+} from '@opentrons/shared-data'
 
-import type { PipetteLabwareFieldsV1 as PipetteLabwareFields } from '@opentrons/shared-data'
+import type {
+  PipetteLabwareFieldsV1 as PipetteLabwareFields,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type {
   CommandCreator,
   LocationLiquidState,
@@ -202,14 +208,15 @@ export function mergeLiquid(
   }
 }
 
-export function getWellsForTips(
+// TODO: Ian 2019-04-11 DEPRECATED REMOVE
+export function getWellsForTipsDeprecated(
   channels: 1 | 8,
   labwareType: string,
   well: string
 ) {
   // Array of wells corresponding to the tip at each position.
   const wellsForTips =
-    channels === 1 ? [well] : computeWellAccess(labwareType, well)
+    channels === 1 ? [well] : computeWellAccessDeprecated(labwareType, well)
 
   if (!wellsForTips) {
     throw new Error(
@@ -217,6 +224,42 @@ export function getWellsForTips(
         ? `Invalid well: ${well}`
         : `Labware type ${labwareType}, well ${well} is not accessible by 8-channel's 1st tip`
     )
+  }
+
+  // allWellsShared: eg in a trough, all wells are shared by an 8-channel
+  // (for single-channel, "all wells" are always shared because there is only 1 well)
+  // NOTE Ian 2018-03-15: there is no support for a case where some but not all wells are shared.
+  // Eg, some unusual labware that allows 2 tips to a well will not work with the implementation below.
+  // Low-priority TODO.
+  const allWellsShared = wellsForTips.every(w => w && w === wellsForTips[0])
+
+  return { wellsForTips, allWellsShared }
+}
+
+type WellsForTips = {
+  wellsForTips: Array<string>,
+  allWellsShared: boolean,
+}
+
+export function getWellsForTips(
+  channels: 1 | 8,
+  labwareDef: LabwareDefinition2,
+  well: string
+): WellsForTips {
+  // Array of wells corresponding to the tip at each position.
+  const wellsForTips =
+    channels === 1 ? [well] : computeWellAccess(labwareDef, well)
+
+  if (!wellsForTips) {
+    console.warn(
+      channels === 1
+        ? `Invalid well: ${well}`
+        : `For labware def (ID ${
+            labwareDef.otId
+          }), with primary well ${well}, no wells are accessible by 8-channel's 1st tip`
+    )
+    // TODO: Ian 2019-04-11 figure out a clearer way to handle failure case
+    return { wellsForTips: [], allWellsShared: false }
   }
 
   // allWellsShared: eg in a trough, all wells are shared by an 8-channel

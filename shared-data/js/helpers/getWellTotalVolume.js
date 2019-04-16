@@ -1,6 +1,6 @@
 // @flow
 
-import getLabware from '../getLabware'
+import { getLabware } from '../getLabware'
 
 const getWellTotalVolume = (labwareName: string, wellName: string): ?number => {
   const labware = getLabware(labwareName)

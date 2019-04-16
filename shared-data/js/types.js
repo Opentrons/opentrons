@@ -41,8 +41,6 @@ export type LabwareDisplayCategory =
   | 'wellPlate'
   | 'other'
 
-export type LabwareWellShape = 'rectangular' | 'circular'
-
 export type LabwareVolumeUnits = 'µL' | 'mL' | 'L'
 
 export type LabwareMetadata = {|
@@ -73,6 +71,7 @@ export type LabwareParameters = {|
   tipLength?: number,
   isMagneticModuleCompatible: boolean,
   magneticModuleEngageHeight?: number,
+  quirks?: Array<string>,
 |}
 
 export type LabwareBrand = {|
@@ -80,13 +79,22 @@ export type LabwareBrand = {|
   brand: string,
 |}
 
+type LabwareWellShapeProperties =
+  | {|
+      shape: 'circular',
+      diameter: number,
+    |}
+  | {|
+      shape: 'rectangular',
+      length: number,
+      width: number,
+    |}
+
+// well without x,y,z
 export type LabwareWellProperties = {|
+  ...LabwareWellShapeProperties,
   depth: number,
-  shape: LabwareWellShape,
   totalLiquidVolume: number,
-  diameter?: number,
-  length?: number,
-  width?: number,
 |}
 
 export type LabwareWell = {|

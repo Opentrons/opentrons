@@ -1,9 +1,16 @@
 import getWellContentsAllLabware from '../getWellContentsAllLabware'
 
+jest.mock('../../../labware-defs/utils')
+
+// TODO Ian 2019-04-12: create representative fixtures, don't use real defs
+const fixtureFixedTrash = require('@opentrons/shared-data/definitions2/opentrons_1_trash_1.1_l.json')
+const fixtureTubeRack = require('@opentrons/shared-data/definitions2/opentrons_24_tuberack_2_ml_screwcap.json')
+const fixture96Plate = require('@opentrons/shared-data/definitions2/generic_96_wellplate_380_ul.json')
+
 describe('getWellContentsAllLabware', () => {
-  const container1MaxVolume = 400
+  const container1MaxVolume = fixture96Plate.wells.A1.totalLiquidVolume
   let baseIngredFields
-  let labwareTypesById
+  let labwareDefsByLabwareId
   let ingredsByLabwareXXSingleIngred
   let defaultWellContents
   let singleIngredResult
@@ -16,11 +23,11 @@ describe('getWellContentsAllLabware', () => {
       serialize: false,
     }
 
-    labwareTypesById = {
-      FIXED_TRASH_ID: 'trash-box',
-      container1Id: '96-flat',
-      container2Id: '96-deep-well',
-      container3Id: 'tube-rack-2ml',
+    labwareDefsByLabwareId = {
+      FIXED_TRASH_ID: fixtureFixedTrash,
+      container1Id: fixture96Plate,
+      container2Id: fixture96Plate,
+      container3Id: fixtureTubeRack,
     }
 
     ingredsByLabwareXXSingleIngred = {
@@ -44,7 +51,7 @@ describe('getWellContentsAllLabware', () => {
     }
 
     singleIngredResult = getWellContentsAllLabware.resultFunc(
-      labwareTypesById, // all labware types
+      labwareDefsByLabwareId,
       ingredsByLabwareXXSingleIngred,
       'container1Id', // selected labware id
       { A1: 'A1', B1: 'B1' }, // selected
@@ -94,7 +101,7 @@ describe('getWellContentsAllLabware', () => {
 
   test('no selected wells when labwareId is not selected', () => {
     const result = getWellContentsAllLabware.resultFunc(
-      labwareTypesById, // all labware types
+      labwareDefsByLabwareId,
       ingredsByLabwareXXSingleIngred,
       null, // selected labware id
       { A1: 'A1', B1: 'B1' }, // selected

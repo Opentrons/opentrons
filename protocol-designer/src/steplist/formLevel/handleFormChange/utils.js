@@ -4,7 +4,7 @@ import round from 'lodash/round'
 import uniq from 'lodash/uniq'
 import { canPipetteUseLabware, getLabware } from '@opentrons/shared-data'
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
-import { getWellSetForMultichannel } from '../../../well-selection/utils'
+import { getWellSetForMultichannelDeprecated } from '../../../well-selection/utils'
 import type { PipetteChannels } from '@opentrons/shared-data'
 import type { FormPatch } from '../../actions/types'
 import type { FormData, StepFieldName } from '../../../form-types'
@@ -32,7 +32,7 @@ export function getAllWellsFromPrimaryWells(
   const _labwareType = labwareType // TODO Ian 2018-05-04 remove this weird flow workaround
 
   const allWells = primaryWells.reduce((acc: Array<string>, well: string) => {
-    const nextWellSet = getWellSetForMultichannel(_labwareType, well)
+    const nextWellSet = getWellSetForMultichannelDeprecated(_labwareType, well)
     // filter out any nulls (but you shouldn't get any)
     return nextWellSet ? [...acc, ...nextWellSet] : acc
   }, [])
