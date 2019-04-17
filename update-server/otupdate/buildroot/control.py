@@ -5,7 +5,6 @@ This has endpoints like /restart that aren't specific to update tasks.
 """
 import asyncio
 import logging
-import shlex
 import socket
 import string
 import subprocess
@@ -73,7 +72,7 @@ def get_prettyname() -> str:
     try:
         with open('/etc/machine-info') as emi:
             for line in emi.read().split('\n'):
-                if line.startswith('PRETTYNAME='):
+                if line.startswith('PRETTY_HOSTNAME='):
                     return '='.join(line.split('=')[1:])
             return get_hostname()
     except OSError:
@@ -91,7 +90,7 @@ def _write_name_details(name: str, pretty_name: str):
         emi.seek(0)
         new = [line for line in current.split('\n')
                if not line.startswith('PRETTY_HOSTNAME')]
-        new += [f'PRETTY_HOSTNAME={shlex.quote(pretty_name)}']
+        new += [f'PRETTY_HOSTNAME={pretty_name}']
         LOG.debug(f"Writing {new} to /etc/machine-info")
         emi.write('\n'.join(new) + '\n')
 
