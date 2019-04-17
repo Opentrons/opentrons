@@ -1,6 +1,7 @@
 // @flow
 import {
-  createRobotState,
+  makeContext,
+  makeState,
   commandCreatorNoErrors,
   commandCreatorHasErrors,
 } from './fixtures'
@@ -9,6 +10,7 @@ import _dispense from '../commandCreators/atomic/dispense'
 import updateLiquidState from '../dispenseUpdateLiquidState'
 
 jest.mock('../dispenseUpdateLiquidState')
+jest.mock('../../labware-defs/utils') // TODO IMMEDIATELY move to somewhere more general
 
 const dispense = commandCreatorNoErrors(_dispense)
 const dispenseWithErrors = commandCreatorHasErrors(_dispense)
@@ -16,25 +18,28 @@ const dispenseWithErrors = commandCreatorHasErrors(_dispense)
 describe('dispense', () => {
   let initialRobotState
   let robotStateWithTip
-  beforeEach(() => {
-    initialRobotState = createRobotState({
-      sourcePlateType: 'trough-12row',
-      destPlateType: '96-flat',
-      fillTiprackTips: true,
-      fillPipetteTips: false,
-      tipracks: [300, 300],
-    })
+  let invariantContext
 
-    robotStateWithTip = {
-      ...initialRobotState,
-      tipState: {
-        ...initialRobotState.tipState,
-        pipettes: {
-          ...initialRobotState.tipState.pipettes,
-          p300SingleId: true,
-        },
+  beforeEach(() => {
+    // TODO IMMEDIATELY this invariantContext/initialRobotState/robotStateWithTip is repeated in aspirate.test.js -- make a fixture helper?
+    invariantContext = makeContext()
+    const makeStateArgs = {
+      invariantContext,
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      labwareLocations: {
+        tiprack1Id: { slot: '1' },
+        sourcePlateId: { slot: '2' },
       },
     }
+    initialRobotState = makeState({
+      ...makeStateArgs,
+      tiprackSetting: { tiprack1Id: true },
+    })
+    robotStateWithTip = makeState({
+      ...makeStateArgs,
+      tiprackSetting: { tiprack1Id: false },
+    })
+    robotStateWithTip.tipState.pipettes.p300SingleId = true
 
     // $FlowFixMe: mock methods
     updateLiquidState.mockClear()
@@ -75,7 +80,7 @@ describe('dispense', () => {
             labware: 'sourcePlateId',
             well: 'A1',
             ...testCase.args,
-          })(robotStateWithTip)
+          })(invariantContext, robotStateWithTip)
 
           expect(result.commands).toEqual([
             {
@@ -103,7 +108,7 @@ describe('dispense', () => {
         'flow-rate': 6,
       }
 
-      const result = dispense(args)(robotStateWithTip)
+      const result = dispense(args)(invariantContext, robotStateWithTip)
 
       expect(result.commands).toEqual([
         {
@@ -119,7 +124,7 @@ describe('dispense', () => {
         volume: 50,
         labware: 'sourcePlateId',
         well: 'A1',
-      })(initialRobotState)
+      })(invariantContext, initialRobotState)
 
       expect(result.errors).toHaveLength(1)
       expect(result.errors[0]).toMatchObject({
@@ -133,7 +138,7 @@ describe('dispense', () => {
         volume: 50,
         labware: 'someBadLabwareId',
         well: 'A1',
-      })(robotStateWithTip)
+      })(invariantContext, robotStateWithTip)
 
       expect(result.errors).toHaveLength(1)
       expect(result.errors[0]).toMatchObject({
@@ -160,16 +165,15 @@ describe('dispense', () => {
         labware: 'sourcePlateId',
         well: 'A1',
         volume: 152,
-      })(robotStateWithTip)
+      })(invariantContext, robotStateWithTip)
 
       expect(updateLiquidState).toHaveBeenCalledWith(
         {
+          invariantContext,
           pipetteId: 'p300SingleId',
           labwareId: 'sourcePlateId',
           volume: 152,
           well: 'A1',
-          labwareType: 'trough-12row',
-          pipetteData: robotStateWithTip.pipettes.p300SingleId,
         },
         robotStateWithTip.liquidState
       )

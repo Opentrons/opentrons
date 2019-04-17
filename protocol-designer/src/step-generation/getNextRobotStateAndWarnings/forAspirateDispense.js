@@ -7,13 +7,13 @@ import {
   AIR,
   mergeLiquid,
   splitLiquid,
-  getWellsForTipsDeprecated,
+  getWellsForTips,
   totalVolume,
 } from '../utils'
-import { getPipetteSpecFromId } from '../robotStateSelectors'
 import * as warningCreators from '../warningCreators'
 import type { AspirateDispenseArgsV1 as AspirateDispenseArgs } from '@opentrons/shared-data'
 import type {
+  InvariantContext,
   RobotState,
   SingleLabwareLiquidState,
   CommandCreatorWarning,
@@ -29,17 +29,18 @@ type PipetteLiquidStateAcc = {
 
 export default function getNextRobotStateAndWarningsForAspDisp(
   args: AspirateDispenseArgs,
+  invariantContext: InvariantContext,
   prevRobotState: RobotState
 ): RobotStateAndWarnings {
   const { pipette: pipetteId, volume, labware: labwareId } = args
 
   const { liquidState: prevLiquidState } = prevRobotState
-  const pipetteSpec = getPipetteSpecFromId(pipetteId, prevRobotState)
-  const labwareType = prevRobotState.labware[labwareId].type
+  const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
+  const labwareDef = invariantContext.labwareEntities[labwareId].def
 
-  const { allWellsShared, wellsForTips } = getWellsForTipsDeprecated(
+  const { allWellsShared, wellsForTips } = getWellsForTips(
     pipetteSpec.channels,
-    labwareType,
+    labwareDef,
     args.well
   )
 

@@ -2,50 +2,47 @@
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import {
+  makeContext,
   createEmptyLiquidState,
   createTipLiquidState,
-  p300Single,
-  p300Multi,
 } from './fixtures'
 
 import _updateLiquidState from '../dispenseUpdateLiquidState'
 
-function getBlankLiquidState(sourcePlateType: ?string) {
-  return createEmptyLiquidState({
-    // leave sourcePlateType undefined for tests that don't care
-    // TODO: should this `pipettes` arg be createEmptyLiquidState default?
-    sourcePlateType: sourcePlateType || '96-flat',
-    pipettes: {
-      p300SingleId: p300Single,
-      p300MultiId: p300Multi,
-    },
-  })
-}
+// TODO IMMEDIATELY use fixture defs not real defs
+const fixture12Trough = require('@opentrons/shared-data/definitions2/usa_scientific_12_trough_22_ml.json')
+const fixture96Plate = require('@opentrons/shared-data/definitions2/generic_96_wellplate_380_ul.json')
+const fixture384Plate = require('@opentrons/shared-data/definitions2/corning_384_wellplate_112_ul.json')
 
 let dispenseSingleCh150ToA1Args
+let invariantContext
 
 beforeEach(() => {
+  invariantContext = makeContext()
   dispenseSingleCh150ToA1Args = {
-    labwareId: 'sourcePlateId',
-    labwareType: '96-flat',
+    invariantContext,
     pipetteId: 'p300SingleId',
-    pipetteData: p300Single,
     volume: 150,
+    labwareId: 'sourcePlateId',
     well: 'A1',
   }
 })
 
 describe('...single-channel pipette', () => {
   test('fully dispense single ingredient into empty well, with explicit volume', () => {
-    const initialLiquidState = merge({}, getBlankLiquidState(), {
-      pipettes: {
-        p300SingleId: {
-          '0': {
-            ingred1: { volume: 150 },
+    const initialLiquidState = merge(
+      {},
+      createEmptyLiquidState(invariantContext),
+      {
+        pipettes: {
+          p300SingleId: {
+            '0': {
+              ingred1: { volume: 150 },
+            },
           },
         },
-      },
-    })
+      }
+    )
 
     const result = _updateLiquidState(
       dispenseSingleCh150ToA1Args,
@@ -71,15 +68,19 @@ describe('...single-channel pipette', () => {
   })
 
   test('fully dispense single ingredient into empty well, with useFullVolume', () => {
-    const initialLiquidState = merge({}, getBlankLiquidState(), {
-      pipettes: {
-        p300SingleId: {
-          '0': {
-            ingred1: { volume: 150 },
+    const initialLiquidState = merge(
+      {},
+      createEmptyLiquidState(invariantContext),
+      {
+        pipettes: {
+          p300SingleId: {
+            '0': {
+              ingred1: { volume: 150 },
+            },
           },
         },
-      },
-    })
+      }
+    )
 
     const result = _updateLiquidState(
       {
@@ -108,23 +109,27 @@ describe('...single-channel pipette', () => {
   })
 
   test('dispense ingred 1 into well containing ingreds 1 & 2', () => {
-    const initialLiquidState = merge({}, getBlankLiquidState(), {
-      pipettes: {
-        p300SingleId: {
-          '0': {
-            ingred1: { volume: 150 },
+    const initialLiquidState = merge(
+      {},
+      createEmptyLiquidState(invariantContext),
+      {
+        pipettes: {
+          p300SingleId: {
+            '0': {
+              ingred1: { volume: 150 },
+            },
           },
         },
-      },
-      labware: {
-        sourcePlateId: {
-          A1: {
-            ingred1: { volume: 30 },
-            ingred2: { volume: 50 },
+        labware: {
+          sourcePlateId: {
+            A1: {
+              ingred1: { volume: 30 },
+              ingred2: { volume: 50 },
+            },
           },
         },
-      },
-    })
+      }
+    )
 
     const result = _updateLiquidState(
       dispenseSingleCh150ToA1Args,
@@ -153,24 +158,28 @@ describe('...single-channel pipette', () => {
   })
 
   test('dispense ingred 1 & 2 into well containing 2 & 3', () => {
-    const initialLiquidState = merge({}, getBlankLiquidState(), {
-      pipettes: {
-        p300SingleId: {
-          '0': {
-            ingred1: { volume: 50 },
-            ingred2: { volume: 100 },
+    const initialLiquidState = merge(
+      {},
+      createEmptyLiquidState(invariantContext),
+      {
+        pipettes: {
+          p300SingleId: {
+            '0': {
+              ingred1: { volume: 50 },
+              ingred2: { volume: 100 },
+            },
           },
         },
-      },
-      labware: {
-        sourcePlateId: {
-          A1: {
-            ingred2: { volume: 25 },
-            ingred3: { volume: 20 },
+        labware: {
+          sourcePlateId: {
+            A1: {
+              ingred2: { volume: 25 },
+              ingred3: { volume: 20 },
+            },
           },
         },
-      },
-    })
+      }
+    )
 
     const result = _updateLiquidState(
       dispenseSingleCh150ToA1Args,
@@ -201,24 +210,28 @@ describe('...single-channel pipette', () => {
   })
 
   test('partially dispense ingred 1 & 2 into well containing 2 & 3', () => {
-    const initialLiquidState = merge({}, getBlankLiquidState(), {
-      pipettes: {
-        p300SingleId: {
-          '0': {
-            ingred1: { volume: 50 },
-            ingred2: { volume: 200 },
+    const initialLiquidState = merge(
+      {},
+      createEmptyLiquidState(invariantContext),
+      {
+        pipettes: {
+          p300SingleId: {
+            '0': {
+              ingred1: { volume: 50 },
+              ingred2: { volume: 200 },
+            },
           },
         },
-      },
-      labware: {
-        sourcePlateId: {
-          A1: {
-            ingred2: { volume: 25 },
-            ingred3: { volume: 20 },
+        labware: {
+          sourcePlateId: {
+            A1: {
+              ingred2: { volume: 25 },
+              ingred3: { volume: 20 },
+            },
           },
         },
-      },
-    })
+      }
+    )
 
     const result = _updateLiquidState(
       dispenseSingleCh150ToA1Args,
@@ -257,7 +270,8 @@ describe('...8-channel pipette', () => {
   describe('dispense into empty column with different ingreds in each tip:', () => {
     const tests = [
       {
-        labwareType: '96-flat',
+        labwareType: 'fixture96Plate',
+        def: fixture96Plate,
         expectedLabwareMatch: {
           sourcePlateId: {
             A1: {
@@ -275,7 +289,8 @@ describe('...8-channel pipette', () => {
         },
       },
       {
-        labwareType: 'trough-12row',
+        labwareType: 'fixture12Trough',
+        def: fixture12Trough,
         expectedLabwareMatch: {
           sourcePlateId: {
             A1: {
@@ -288,7 +303,8 @@ describe('...8-channel pipette', () => {
         },
       },
       {
-        labwareType: '384-plate',
+        labwareType: 'fixture384Plate',
+        def: fixture384Plate,
         expectedLabwareMatch: {
           sourcePlateId: {
             A1: {
@@ -317,9 +333,17 @@ describe('...8-channel pipette', () => {
       },
     ]
 
-    tests.forEach(({ labwareType, expectedLabwareMatch }) =>
+    tests.forEach(({ labwareType, def, expectedLabwareMatch }) =>
+      // make sourcePlateId a different labware type/def each time
       test(labwareType, () => {
-        const initialLiquidState = merge({}, getBlankLiquidState(labwareType), {
+        let customInvariantContext = makeContext()
+        customInvariantContext.labwareEntities.sourcePlateId = {
+          id: 'sourcePlateId',
+          type: labwareType,
+          def,
+        }
+        const blankLiquidState = createEmptyLiquidState(customInvariantContext)
+        const initialLiquidState = merge({}, blankLiquidState, {
           pipettes: {
             p300MultiId: {
               // all tips have 150uL of ingred1, except tips 0 and 1
@@ -342,11 +366,10 @@ describe('...8-channel pipette', () => {
 
         const result = _updateLiquidState(
           {
+            invariantContext,
             pipetteId: 'p300MultiId',
-            pipetteData: p300Multi,
             volume: 150,
             labwareId: 'sourcePlateId',
-            labwareType,
             well: 'A1',
           },
           initialLiquidState

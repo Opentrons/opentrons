@@ -4,22 +4,25 @@ import min from 'lodash/min'
 import sortBy from 'lodash/sortBy'
 import type { Channels } from '@opentrons/components'
 import {
-  getLabware,
+  getTiprackVolume,
   getPipetteNameSpecs,
   type PipetteNameSpecs,
 } from '@opentrons/shared-data'
 import { tiprackWellNamesByCol, tiprackWellNamesFlat } from './'
-import type { RobotState } from './'
+import type { InvariantContext, RobotState } from './'
 
 // SELECTOR UTILITIES
 
-export function sortLabwareBySlot(robotState: RobotState) {
-  return sortBy(Object.keys(robotState.labware), id =>
-    parseInt(robotState.labware[id].slot)
+export function sortLabwareBySlot(
+  labwareState: $PropertyType<RobotState, 'labware'>
+) {
+  return sortBy(Object.keys(labwareState), id =>
+    parseInt(labwareState[id].slot)
   )
 }
 
 // SELECTORS
+// TODO IMMEDIATELY audit and remove these, denormalized entities make some of these unneeded
 
 export function getPipetteSpecFromId(
   pipetteId: string,
@@ -79,6 +82,7 @@ export function _getNextTip(
 type NextTiprack = {| tiprackId: string, well: string |} | null
 export function getNextTiprack(
   pipetteId: string,
+  invariantContext: InvariantContext,
   robotState: RobotState
 ): NextTiprack {
   /** Returns the next tiprack that has tips.
@@ -86,32 +90,41 @@ export function getNextTiprack(
     For 8-channel pipette, tipracks need a full column of tips.
     If there are no available tipracks, returns null.
   */
-  const pipetteData = robotState.pipettes[pipetteId]
-  if (!pipetteData) {
-    assert(
-      false,
-      `pipette ID ${pipetteId} not in robotState, could not getNextTiprack`
+  const pipetteEntity = invariantContext.pipetteEntities[pipetteId]
+  if (!pipetteEntity) {
+    throw new Error(
+      `cannot getNextTiprack, no pipette entity for pipette "${pipetteId}"`
     )
-    return null
   }
-  const pipetteSpec = getPipetteSpecFromId(pipetteId, robotState)
 
-  const sortedTipracksIds = sortLabwareBySlot(robotState).filter(
-    labwareId =>
-      // assume if labwareId is not in tipState.tipracks, it's not a tiprack
-      robotState.tipState.tipracks[labwareId] &&
-      pipetteData.tiprackModel === robotState.labware[labwareId].type
+  // filter out unmounted or non-compatible tiprack models
+  const sortedTipracksIds = sortLabwareBySlot(robotState.labware).filter(
+    labwareId => {
+      assert(
+        invariantContext.labwareEntities[labwareId]?.type,
+        `cannot getNextTiprack, no labware entity for "${labwareId}"`
+      )
+      const isOnDeck = robotState.labware[labwareId].slot != null
+      return (
+        isOnDeck &&
+        pipetteEntity.tiprackModel ===
+          invariantContext.labwareEntities[labwareId]?.type
+      )
+    }
   )
 
   const firstAvailableTiprack = sortedTipracksIds.find(tiprackId =>
-    _getNextTip(pipetteSpec.channels, robotState.tipState.tipracks[tiprackId])
+    _getNextTip(
+      pipetteEntity.spec.channels,
+      robotState.tipState.tipracks[tiprackId]
+    )
   )
 
   // TODO Ian 2018-02-12: avoid calling _getNextTip twice
   const nextTip =
     firstAvailableTiprack &&
     _getNextTip(
-      pipetteSpec.channels,
+      pipetteEntity.spec.channels,
       robotState.tipState.tipracks[firstAvailableTiprack]
     )
 
@@ -127,24 +140,21 @@ export function getNextTiprack(
 
 export function getPipetteWithTipMaxVol(
   pipetteId: string,
-  robotState: RobotState
+  invariantContext: InvariantContext
 ): number {
   // NOTE: this fn assumes each pipette is assigned to exactly one tiprack type,
   // across the entire timeline
-  const pipetteData = robotState.pipettes[pipetteId]
-  const pipetteSpec = getPipetteSpecFromId(pipetteId, robotState)
-  const pipetteMaxVol = pipetteSpec && pipetteSpec.maxVolume
+  const pipetteEntity = invariantContext.pipetteEntities[pipetteId]
+  const pipetteMaxVol = pipetteEntity.spec.maxVolume
 
-  const tiprackData =
-    pipetteData &&
-    pipetteData.tiprackModel &&
-    getLabware(pipetteData.tiprackModel)
-  const tiprackTipVol = tiprackData && tiprackData.metadata.tipVolume
+  const tiprackDef = pipetteEntity.tiprackLabwareDef
+  const tiprackTipVol = getTiprackVolume(tiprackDef)
 
   if (!pipetteMaxVol || !tiprackTipVol) {
-    console.warn(
-      'getPipetteEffectiveMaxVol expected tiprackMaxVol and pipette maxVolume to be > 0, got',
-      { pipetteMaxVol, tiprackTipVol }
+    assert(
+      false,
+      `getPipetteEffectiveMaxVol expected tiprackMaxVol and pipette maxVolume to be > 0, got',
+      ${pipetteMaxVol}, ${tiprackTipVol}`
     )
     return NaN
   }

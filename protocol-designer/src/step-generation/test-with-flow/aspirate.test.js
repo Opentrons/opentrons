@@ -2,13 +2,18 @@
 import { expectTimelineError } from './testMatchers'
 import _aspirate from '../commandCreators/atomic/aspirate'
 import {
-  createRobotState,
+  makeContext,
+  makeState,
   commandCreatorHasErrors,
   commandCreatorNoErrors,
 } from './fixtures'
 import getNextRobotStateAndWarnings from '../getNextRobotStateAndWarnings'
 
 jest.mock('../getNextRobotStateAndWarnings')
+jest.mock('../../labware-defs/utils') // TODO IMMEDIATELY move to somewhere more general
+
+// TODO Ian 2019-04-12: create representative fixtures, don't use real defs
+const fixtureTiprack10ul = require('@opentrons/shared-data/definitions2/opentrons_96_tiprack_10_ul.json')
 
 const aspirate = commandCreatorNoErrors(_aspirate)
 const aspirateWithErrors = commandCreatorHasErrors(_aspirate)
@@ -29,22 +34,41 @@ beforeEach(() => {
 describe('aspirate', () => {
   let initialRobotState
   let robotStateWithTip
+  let invariantContext
 
   beforeEach(() => {
-    initialRobotState = createRobotState({
-      sourcePlateType: 'trough-12row',
-      destPlateType: '96-flat',
-      fillPipetteTips: false,
-      fillTiprackTips: true,
-      tipracks: [300, 300],
+    invariantContext = makeContext()
+    const makeStateArgs = {
+      invariantContext,
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      labwareLocations: {
+        tiprack1Id: { slot: '1' },
+        sourcePlateId: { slot: '2' },
+      },
+    }
+    initialRobotState = makeState({
+      ...makeStateArgs,
+      tiprackSetting: { tiprack1Id: true },
     })
-    robotStateWithTip = createRobotState({
-      sourcePlateType: 'trough-12row',
-      destPlateType: '96-flat',
-      fillPipetteTips: true,
-      fillTiprackTips: true,
-      tipracks: [300, 300],
+    robotStateWithTip = makeState({
+      ...makeStateArgs,
+      tiprackSetting: { tiprack1Id: false },
     })
+    robotStateWithTip.tipState.pipettes.p300SingleId = true
+    // initialRobotState = createRobotState({
+    //   sourcePlateType: 'trough-12row',
+    //   destPlateType: '96-flat',
+    //   fillPipetteTips: false,
+    //   fillTiprackTips: true,
+    //   tipracks: [300, 300],
+    // })
+    // robotStateWithTip = createRobotState({
+    //   sourcePlateType: 'trough-12row',
+    //   destPlateType: '96-flat',
+    //   fillPipetteTips: true,
+    //   fillTiprackTips: true,
+    //   tipracks: [300, 300],
+    // })
   })
 
   describe('aspirate normally (with tip)', () => {
@@ -80,7 +104,7 @@ describe('aspirate', () => {
           labware: 'sourcePlateId',
           well: 'A1',
           ...testCase.args,
-        })(robotStateWithTip)
+        })(invariantContext, robotStateWithTip)
 
         expect(result.commands).toEqual([
           {
@@ -99,13 +123,18 @@ describe('aspirate', () => {
   })
 
   test('aspirate with volume > tip max volume should throw error', () => {
-    robotStateWithTip.pipettes['p300SingleId'].tiprackModel = 'tiprack-200ul'
+    // TODO IMMEDIATELY cleaner way to make invariantContext??
+    invariantContext.pipetteEntities['p300SingleId'].tiprackModel =
+      fixtureTiprack10ul.otId
+    invariantContext.pipetteEntities[
+      'p300SingleId'
+    ].tiprackLabwareDef = fixtureTiprack10ul
     const result = aspirateWithErrors({
       pipette: 'p300SingleId',
       volume: 201,
       labware: 'sourcePlateId',
       well: 'A1',
-    })(robotStateWithTip)
+    })(invariantContext, robotStateWithTip)
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
@@ -121,7 +150,7 @@ describe('aspirate', () => {
       volume: 301,
       labware: 'sourcePlateId',
       well: 'A1',
-    })(robotStateWithTip)
+    })(invariantContext, robotStateWithTip)
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
@@ -135,7 +164,7 @@ describe('aspirate', () => {
       volume: 50,
       labware: 'sourcePlateId',
       well: 'A1',
-    })(robotStateWithTip)
+    })(invariantContext, robotStateWithTip)
 
     expectTimelineError(result.errors, 'PIPETTE_DOES_NOT_EXIST')
   })
@@ -146,7 +175,7 @@ describe('aspirate', () => {
       volume: 50,
       labware: 'sourcePlateId',
       well: 'A1',
-    })(initialRobotState)
+    })(invariantContext, initialRobotState)
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
@@ -160,7 +189,7 @@ describe('aspirate', () => {
       volume: 50,
       labware: 'problematicLabwareId',
       well: 'A1',
-    })(robotStateWithTip)
+    })(invariantContext, robotStateWithTip)
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
@@ -176,7 +205,7 @@ describe('aspirate', () => {
         well: 'A1',
         volume: 152,
       }
-      const result = aspirate(args)(robotStateWithTip)
+      const result = aspirate(args)(invariantContext, robotStateWithTip)
 
       expect(getNextRobotStateAndWarnings).toHaveBeenCalledWith(
         result.commands[0],

@@ -1,10 +1,10 @@
 // @flow
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import getNextRobotStateAndWarnings from '../../getNextRobotStateAndWarnings'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import type { AspirateDispenseArgsV1 as AspirateDispenseArgs } from '@opentrons/shared-data'
 import type {
+  InvariantContext,
   RobotState,
   CommandCreator,
   CommandCreatorError,
@@ -12,6 +12,7 @@ import type {
 
 /** Aspirate with given args. Requires tip. */
 const aspirate = (args: AspirateDispenseArgs): CommandCreator => (
+  invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {
   const { pipette, volume, labware, well, offsetFromBottomMm } = args
@@ -20,8 +21,7 @@ const aspirate = (args: AspirateDispenseArgs): CommandCreator => (
   const actionName = 'aspirate'
   let errors: Array<CommandCreatorError> = []
 
-  const pipetteData: ?* = prevRobotState.pipettes[pipette]
-  const pipetteSpec = pipetteData ? getPipetteNameSpecs(pipetteData.name) : null
+  const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
 
   if (!pipetteSpec) {
     errors.push(errorCreators.pipetteDoesNotExist({ actionName, pipette }))
@@ -50,7 +50,7 @@ const aspirate = (args: AspirateDispenseArgs): CommandCreator => (
   }
 
   if (errors.length === 0 && pipetteSpec) {
-    const tipMaxVolume = getPipetteWithTipMaxVol(pipette, prevRobotState)
+    const tipMaxVolume = getPipetteWithTipMaxVol(pipette, invariantContext)
     if (tipMaxVolume < volume) {
       errors.push(
         errorCreators.tipVolumeExceeded({

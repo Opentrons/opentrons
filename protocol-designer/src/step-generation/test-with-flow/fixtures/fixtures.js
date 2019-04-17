@@ -1,12 +1,18 @@
 // @flow
-import { getLabware, getPipetteNameSpecs } from '@opentrons/shared-data'
+// TODO IMMEDIATELY audit this file and use of fixtures, now that robotState is simpler and invariantContext is split out
+import { getLabware } from '@opentrons/shared-data'
 import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import { reduceCommandCreators } from '../../utils'
 import { tiprackWellNamesFlat } from '../../'
-import type { RobotState, PipetteData, LabwareData } from '../../'
+import type {
+  TemporalPipette,
+  PipetteEntity,
+  LabwareEntity,
+} from '../../../step-forms' // TODO IMMEDIATELY move temporal types somewhere more universal
+import type { InvariantContext, RobotState, LabwareData } from '../../'
 import type {
   CommandsAndRobotState,
   CommandCreatorErrorResponse,
@@ -16,9 +22,10 @@ import type {
  **  to normal response or error response
  **/
 export const commandCreatorNoErrors = (command: *) => (commandArgs: *) => (
-  state: RobotState
+  invariantContext: InvariantContext,
+  robotState: RobotState
 ): CommandsAndRobotState => {
-  const result = command(commandArgs)(state)
+  const result = command(commandArgs)(invariantContext, robotState)
   if (result.errors) {
     throw new Error('expected no errors, got ' + JSON.stringify(result.errors))
   }
@@ -26,9 +33,10 @@ export const commandCreatorNoErrors = (command: *) => (commandArgs: *) => (
 }
 
 export const commandCreatorHasErrors = (command: *) => (commandArgs: *) => (
-  state: RobotState
+  invariantContext: InvariantContext,
+  robotState: RobotState
 ): CommandCreatorErrorResponse => {
-  const result = command(commandArgs)(state)
+  const result = command(commandArgs)(invariantContext, robotState)
   if (!result.errors) {
     throw new Error('expected errors')
   }
@@ -37,8 +45,13 @@ export const commandCreatorHasErrors = (command: *) => (commandArgs: *) => (
 
 export const compoundCommandCreatorNoErrors = (command: *) => (
   commandArgs: *
-) => (state: RobotState): CommandsAndRobotState => {
-  const result = reduceCommandCreators(command(commandArgs)(state))(state)
+) => (
+  invariantContext: InvariantContext,
+  robotState: RobotState
+): CommandsAndRobotState => {
+  const result = reduceCommandCreators(
+    command(commandArgs)(invariantContext, robotState)
+  )(invariantContext, robotState)
   if (result.errors) {
     throw new Error('expected no errors, got ' + JSON.stringify(result.errors))
   }
@@ -47,8 +60,13 @@ export const compoundCommandCreatorNoErrors = (command: *) => (
 
 export const compoundCommandCreatorHasErrors = (command: *) => (
   commandArgs: *
-) => (state: RobotState): CommandCreatorErrorResponse => {
-  const result = reduceCommandCreators(command(commandArgs)(state))(state)
+) => (
+  invariantContext: InvariantContext,
+  robotState: RobotState
+): CommandCreatorErrorResponse => {
+  const result = reduceCommandCreators(
+    command(commandArgs)(invariantContext, robotState)
+  )(invariantContext, robotState)
   if (!result.errors) {
     throw new Error('expected errors')
   }
@@ -59,7 +77,7 @@ export const compoundCommandCreatorHasErrors = (command: *) => (
 type WellTipState = { [wellName: string]: boolean }
 export function getTiprackTipstate(filled: ?boolean): WellTipState {
   return tiprackWellNamesFlat.reduce(
-    (acc, wellName) => ({ ...acc, [wellName]: !!filled }),
+    (acc, wellName) => ({ ...acc, [wellName]: Boolean(filled) }),
     {}
   )
 }
@@ -103,17 +121,15 @@ export function createLabwareLiquidState<T>(
 }
 
 // TODO Ian 2018-03-14: these pipette fixtures should use file-data/pipetteData.js,
-// which should in turn be lifted out to a general pipette data project?
-export const p300Single: PipetteData = {
+// which should in turn be lifted out to a general pipette data project? // TODO IMMEDIATELY revisit this comment
+export const p300Single: TemporalPipette = {
+  // TODO IMMEDIATELY rename
   mount: 'right',
-  name: 'p300_single',
-  tiprackModel: 'opentrons-tiprack-300ul',
 }
 
-export const p300Multi: PipetteData = {
+export const p300Multi: TemporalPipette = {
+  // TODO IMMEDIATELY rename
   mount: 'left',
-  name: 'p300_multi',
-  tiprackModel: 'opentrons-tiprack-300ul',
 }
 
 export function getWellsForLabware(labwareType: string) {
@@ -127,47 +143,28 @@ export function getWellsForLabware(labwareType: string) {
   return labware.wells
 }
 
-export function createEmptyLiquidState(args: {
-  sourcePlateType?: string,
-  destPlateType?: string,
-  pipettes: $PropertyType<RobotState, 'pipettes'>,
-}) {
-  const { sourcePlateType, destPlateType, pipettes } = args
-
-  const sourceLabware = sourcePlateType
-    ? // $FlowFixMe: Missing type annotation for `T`
-      { sourcePlateId: createLabwareLiquidState(sourcePlateType, {}) }
-    : {}
-
-  const destLabware = destPlateType
-    ? // $FlowFixMe: Missing type annotation for `T`
-      { destPlateId: createLabwareLiquidState(destPlateType, {}) }
-    : {}
+export function createEmptyLiquidState(invariantContext: InvariantContext) {
+  const { labwareEntities, pipetteEntities } = invariantContext
 
   return {
     pipettes: reduce(
-      pipettes,
-      (acc, pipetteData: PipetteData, pipetteId: string) => {
-        const pipetteSpec = getPipetteNameSpecs(pipetteData.name)
-        if (!pipetteSpec) {
-          throw Error(
-            `no pipette spec for ${
-              pipetteData.name
-            }, cannot make tip liquid state for fixture`
-          )
-        }
+      pipetteEntities,
+      (acc, pipette: PipetteEntity, id: string) => {
+        const pipetteSpec = pipette.spec
         return {
           ...acc,
-          [pipetteId]: createTipLiquidState(pipetteSpec.channels, {}),
+          [id]: createTipLiquidState(pipetteSpec.channels, {}),
         }
       },
       {}
     ),
-    labware: {
-      ...sourceLabware,
-      ...destLabware,
-      trashId: { A1: {} },
-    },
+    labware: reduce(
+      labwareEntities,
+      (acc, labware: LabwareEntity, id: string) => {
+        return { ...acc, [id]: mapValues(labware.def.wells, () => ({})) }
+      },
+      {}
+    ),
   }
 }
 
@@ -183,17 +180,17 @@ type CreateRobotArgs = {
 }
 /** RobotState with empty liquid state */
 export function createRobotState(args: CreateRobotArgs): RobotState {
-  const { labware, pipettes, tipState } = createRobotStateFixture(args)
-
-  return {
-    labware,
-    pipettes,
-    tipState,
-    liquidState: createEmptyLiquidState({
-      ...args,
-      pipettes: { p300SingleId: p300Single, p300MultiId: p300Multi },
-    }),
-  }
+  // const { labware, pipettes, tipState } = createRobotStateFixture(args)
+  throw new Error('createRobotState is deprecated :(') // TODO IMMEDIATELY remove this
+  // return {
+  //   labware,
+  //   pipettes,
+  //   tipState,
+  //   liquidState: createEmptyLiquidState({
+  //     ...args,
+  //     pipettes: { p300SingleId: p300Single, p300MultiId: p300Multi },
+  //   }),
+  // }
 }
 
 function getTiprackType(volume: number): string {
@@ -238,20 +235,18 @@ export function createRobotStateFixture(
     ? {
         destPlateId: {
           slot: '11',
-          type: args.destPlateType,
         },
       }
     : {}
 
   const baseLabware = {
+    // TODO IMMEDIATELY revisit
     ...destLabware,
     sourcePlateId: {
       slot: '10',
-      type: args.sourcePlateType,
     },
     trashId: {
       slot: '12',
-      type: 'fixed-trash',
     },
   }
 
@@ -294,6 +289,138 @@ export function createRobotStateFixture(
         p300SingleId: args.fillPipetteTips,
         p300MultiId: args.fillPipetteTips,
       },
+    },
+  }
+}
+
+// standard context fixtures to use across tests
+export function makeContext(): InvariantContext {
+  // TODO IMMEDIATELY use fixture defs not real defs
+  const fixture12Trough = require('@opentrons/shared-data/definitions2/usa_scientific_12_trough_22_ml.json')
+  const fixture96Plate = require('@opentrons/shared-data/definitions2/generic_96_wellplate_380_ul.json')
+  const fixtureTipRack10ul = require('@opentrons/shared-data/definitions2/opentrons_96_tiprack_10_ul.json')
+  const fixtureTipRack300ul = require('@opentrons/shared-data/definitions2/opentrons_96_tiprack_300_ul.json')
+  const fixtureTrash = require('@opentrons/shared-data/definitions2/opentrons_1_trash_1.1_l.json')
+
+  // TODO IMMEDIATELY fixtures for pipette specs too
+  const fixtureP10Single = require('@opentrons/shared-data/robot-data/pipetteNameSpecs.json')[
+    'p10_single'
+  ]
+  const fixtureP10Multi = require('@opentrons/shared-data/robot-data/pipetteNameSpecs.json')[
+    'p10_multi'
+  ]
+  const fixtureP300Single = require('@opentrons/shared-data/robot-data/pipetteNameSpecs.json')[
+    'p300_single'
+  ]
+  const fixtureP300Multi = require('@opentrons/shared-data/robot-data/pipetteNameSpecs.json')[
+    'p300_multi'
+  ]
+
+  const labwareEntities = {
+    trashId: {
+      id: 'trashId',
+      type: 'fixtureTrash',
+      def: fixtureTrash,
+    },
+    sourcePlateId: {
+      id: 'sourcePlateId',
+      type: 'fixture96Plate',
+      def: fixture96Plate,
+    },
+    destPlateId: {
+      id: 'destPlateId',
+      type: 'fixture96Plate',
+      def: fixture96Plate,
+    },
+    troughId: {
+      id: 'troughId',
+      type: 'fixture12Trough',
+      def: fixture12Trough,
+    },
+    // TODO IMMEDIATELY rename tipRack300_1Id etc
+    tiprack1Id: {
+      id: 'tiprack1Id',
+      type: 'fixtureTipRack300ul',
+      def: fixtureTipRack300ul,
+    },
+    tiprack2Id: {
+      id: 'tiprack2Id',
+      type: 'fixtureTipRack300ul',
+      def: fixtureTipRack300ul,
+    },
+    tiprack3Id: {
+      id: 'tiprack3Id',
+      type: 'fixtureTipRack300ul',
+      def: fixtureTipRack300ul,
+    },
+  }
+
+  const pipetteEntities = {
+    p10SingleId: {
+      name: 'p10_single',
+      id: 'p10SingleId',
+      tiprackModel: 'fixtureTipRack10ul',
+      tiprackLabwareDef: fixtureTipRack10ul,
+      spec: fixtureP10Single,
+    },
+    p10MultiId: {
+      name: 'p10_multi',
+      id: 'p10MultiId',
+      tiprackModel: 'fixtureTipRack10ul',
+      tiprackLabwareDef: fixtureTipRack10ul,
+      spec: fixtureP10Multi,
+    },
+    p300SingleId: {
+      name: 'p300_single',
+      id: 'p300SingleId',
+      tiprackModel: 'fixtureTipRack300ul',
+      tiprackLabwareDef: fixtureTipRack300ul,
+      spec: fixtureP300Single,
+    },
+    p300MultiId: {
+      name: 'p300_multi',
+      id: 'p300MultiId',
+      tiprackModel: 'fixtureTipRack300ul',
+      tiprackLabwareDef: fixtureTipRack300ul,
+      spec: fixtureP300Multi,
+    },
+  }
+  return { labwareEntities, pipetteEntities }
+}
+
+type MakeStateArgs = {
+  invariantContext: InvariantContext,
+  labwareLocations: $PropertyType<RobotState, 'labware'>,
+  pipetteLocations: $PropertyType<RobotState, 'pipettes'>,
+  tiprackSetting: { [labwareId: string]: boolean },
+}
+export function makeState(args: MakeStateArgs): RobotState {
+  const {
+    invariantContext,
+    labwareLocations,
+    pipetteLocations,
+    tiprackSetting,
+    ...mistakes
+  } = args
+
+  // TODO IMMEDIATELY remove this check once flow is typing `makeState` again :(
+  if (Object.keys(mistakes).length > 0) {
+    throw new Error(`bad input to makeState: ${JSON.stringify(mistakes)}`)
+  }
+  return {
+    labware: labwareLocations,
+    pipettes: pipetteLocations,
+    liquidState: createEmptyLiquidState(invariantContext),
+    tipState: {
+      pipettes: reduce(
+        pipetteLocations,
+        (acc, temporalPipette, id) =>
+          temporalPipette.mount ? { ...acc, [id]: false } : acc,
+        {}
+      ),
+      tipracks: mapValues(tiprackSetting, setting =>
+        getTiprackTipstate(setting)
+      ),
     },
   }
 }

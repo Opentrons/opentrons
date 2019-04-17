@@ -5,10 +5,7 @@ import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import last from 'lodash/last'
-import {
-  computeWellAccess,
-  computeWellAccessDeprecated,
-} from '@opentrons/shared-data'
+import { computeWellAccess } from '@opentrons/shared-data'
 
 import type {
   PipetteLabwareFieldsV1 as PipetteLabwareFields,
@@ -17,6 +14,7 @@ import type {
 import type {
   CommandCreator,
   LocationLiquidState,
+  InvariantContext,
   RobotState,
   SourceAndDest,
   Timeline,
@@ -39,15 +37,17 @@ export function repeatArray<T>(array: Array<T>, repeats: number): Array<T> {
  */
 export const reduceCommandCreators = (
   commandCreators: Array<CommandCreator>
-): CommandCreator => (prevRobotState: RobotState) => {
+): CommandCreator => (
+  invariantContext: InvariantContext,
+  prevRobotState: RobotState
+) => {
   return commandCreators.reduce(
-    (prev: $Call<CommandCreator, *>, reducerFn: CommandCreator, stepIdx) => {
+    (prev: $Call<CommandCreator, *, *>, reducerFn: CommandCreator, stepIdx) => {
       if (prev.errors) {
         // if there are errors, short-circuit the reduce
         return prev
       }
-      const next = reducerFn(prev.robotState)
-
+      const next = reducerFn(invariantContext, prev.robotState)
       if (next.errors) {
         return {
           robotState: prev.robotState,
@@ -71,7 +71,10 @@ export const reduceCommandCreators = (
 
 export const commandCreatorsTimeline = (
   commandCreators: Array<CommandCreator>
-) => (initialRobotState: RobotState): Timeline => {
+) => (
+  invariantContext: InvariantContext,
+  initialRobotState: RobotState
+): Timeline => {
   const timeline = commandCreators.reduce(
     (acc: Timeline, commandCreator: CommandCreator, index: number) => {
       const prevRobotState =
@@ -84,7 +87,7 @@ export const commandCreatorsTimeline = (
         return acc
       }
 
-      const nextResult = commandCreator(prevRobotState)
+      const nextResult = commandCreator(invariantContext, prevRobotState)
 
       if (nextResult.errors) {
         return {
@@ -208,39 +211,12 @@ export function mergeLiquid(
   }
 }
 
-// TODO: Ian 2019-04-11 DEPRECATED REMOVE
-export function getWellsForTipsDeprecated(
-  channels: 1 | 8,
-  labwareType: string,
-  well: string
-) {
-  // Array of wells corresponding to the tip at each position.
-  const wellsForTips =
-    channels === 1 ? [well] : computeWellAccessDeprecated(labwareType, well)
-
-  if (!wellsForTips) {
-    throw new Error(
-      channels === 1
-        ? `Invalid well: ${well}`
-        : `Labware type ${labwareType}, well ${well} is not accessible by 8-channel's 1st tip`
-    )
-  }
-
-  // allWellsShared: eg in a trough, all wells are shared by an 8-channel
-  // (for single-channel, "all wells" are always shared because there is only 1 well)
-  // NOTE Ian 2018-03-15: there is no support for a case where some but not all wells are shared.
-  // Eg, some unusual labware that allows 2 tips to a well will not work with the implementation below.
-  // Low-priority TODO.
-  const allWellsShared = wellsForTips.every(w => w && w === wellsForTips[0])
-
-  return { wellsForTips, allWellsShared }
-}
-
 type WellsForTips = {
   wellsForTips: Array<string>,
   allWellsShared: boolean,
 }
 
+// TODO IMMEDIATELY: move to shared-data helpers
 export function getWellsForTips(
   channels: 1 | 8,
   labwareDef: LabwareDefinition2,

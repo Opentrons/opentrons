@@ -14,13 +14,24 @@ import { selectors as labwareIngredSelectors } from '../../labware-ingred/select
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BaseState, Selector } from '../../types'
 import type { StepIdType } from '../../form-types'
-import type { LabwareOnDeck, PipetteOnDeck } from '../../step-forms'
+import type {
+  LabwareOnDeck,
+  PipetteOnDeck,
+  TemporalLabware,
+  TemporalPipette,
+} from '../../step-forms'
 
 function _makeTipState(
   labwareDef: LabwareDefinition2
 ): { [well: string]: true } {
   return mapValues(labwareDef.wells, well => true)
 }
+
+const getInvariantContext: Selector<StepGeneration.InvariantContext> = createSelector(
+  stepFormSelectors.getLabwareEntities,
+  stepFormSelectors.getPipetteEntities,
+  (labwareEntities, pipetteEntities) => ({ labwareEntities, pipetteEntities })
+)
 
 // NOTE this just adds missing well keys to the labware-ingred 'deck setup' liquid state
 export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> = createSelector(
@@ -62,28 +73,18 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   stepFormSelectors.getLabwareEntities,
   getLabwareLiquidState,
   (initialDeckSetup, labwareEntities, labwareLiquidState) => {
-    const labware = mapValues(
+    const labware: { [labwareId: string]: TemporalLabware } = mapValues(
       initialDeckSetup.labware,
-      (l: LabwareOnDeck, id: string): StepGeneration.LabwareData => ({
-        type: l.type,
+      (l: LabwareOnDeck): TemporalLabware => ({
         slot: l.slot,
       })
     )
 
-    const pipettes = mapValues(
+    const pipettes: { [pipetteId: string]: TemporalPipette } = mapValues(
       initialDeckSetup.pipettes,
-      (p: PipetteOnDeck, id: string): StepGeneration.PipetteData => {
-        const pipetteSpecs = getPipetteNameSpecs(p.name)
-        if (!pipetteSpecs) {
-          // this should never happen this far along
-          throw new Error(`no pipette spec for ${p && p.name}`)
-        }
-        return {
-          mount: p.mount,
-          name: p.name,
-          tiprackModel: p.tiprackModel,
-        }
-      }
+      (p: PipetteOnDeck): TemporalPipette => ({
+        mount: p.mount,
+      })
     )
 
     const tipracks: TiprackTipState = reduce(
@@ -203,7 +204,13 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
   stepFormSelectors.getArgsAndErrorsByStepId,
   stepFormSelectors.getOrderedStepIds,
   getInitialRobotState,
-  (allStepArgsAndErrors, orderedStepIds, initialRobotState) => {
+  getInvariantContext,
+  (
+    allStepArgsAndErrors,
+    orderedStepIds,
+    initialRobotState,
+    invariantContext
+  ) => {
     const allStepArgs: Array<StepGeneration.CommandCreatorArgs | null> = orderedStepIds.map(
       stepId => {
         return (
@@ -272,6 +279,7 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
     )
 
     const timeline = StepGeneration.commandCreatorsTimeline(commandCreators)(
+      invariantContext,
       initialRobotState
     )
 

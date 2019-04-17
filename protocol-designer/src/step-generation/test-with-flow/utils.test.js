@@ -7,17 +7,26 @@ import {
   AIR,
   repeatArray,
 } from '../utils'
+import type { InvariantContext } from '../types'
+
+let invariantContext
 
 // NOTE: using 'any' types all over here so I don't have to write a longer test with real RobotState
 type CountState = { count: number }
-const addCreator: any = (num: number) => (prevState: CountState) => ({
+const addCreator: any = (num: number) => (
+  invariantContext: InvariantContext,
+  prevState: CountState
+) => ({
   commands: [`command: add ${num}`],
   robotState: { count: prevState.count + num },
 })
 
-const addCreatorWithWarning: any = (num: number) => (prevState: CountState) => {
+const addCreatorWithWarning: any = (num: number) => (
+  invariantContext: InvariantContext,
+  prevState: CountState
+) => {
   // adds a warning for no meaningful reason
-  const result = addCreator(num)(prevState)
+  const result = addCreator(num)(invariantContext, prevState)
   return {
     ...result,
     warnings: [
@@ -29,12 +38,18 @@ const addCreatorWithWarning: any = (num: number) => (prevState: CountState) => {
   }
 }
 
-const multiplyCreator: any = (num: number) => (prevState: CountState) => ({
+const multiplyCreator: any = (num: number) => (
+  invariantContext: InvariantContext,
+  prevState: CountState
+) => ({
   commands: [`command: multiply by ${num}`],
   robotState: { count: prevState.count * num },
 })
 
-const divideCreator: any = (num: number) => (prevState: CountState) => {
+const divideCreator: any = (num: number) => (
+  invariantContext: InvariantContext,
+  prevState: CountState
+) => {
   if (num === 0) {
     return {
       errors: [
@@ -52,13 +67,17 @@ const divideCreator: any = (num: number) => (prevState: CountState) => {
   }
 }
 
+beforeEach(() => {
+  invariantContext = { pipetteEntities: {}, labwareEntities: {} }
+})
+
 describe('reduceCommandCreators', () => {
   test('basic command creators', () => {
     const initialState: any = { count: 0 }
     const result: any = reduceCommandCreators([
       addCreator(1),
       multiplyCreator(2),
-    ])(initialState)
+    ])(invariantContext, initialState)
 
     expect(result.robotState).toEqual({ count: 2 })
 
@@ -74,7 +93,7 @@ describe('reduceCommandCreators', () => {
       addCreator(4),
       divideCreator(0),
       multiplyCreator(3),
-    ])(initialState)
+    ])(invariantContext, initialState)
 
     expect(result).toEqual({
       robotState: { count: 9 }, // last valid state before division error
@@ -96,7 +115,7 @@ describe('reduceCommandCreators', () => {
       addCreatorWithWarning(3),
       multiplyCreator(2),
       addCreatorWithWarning(1),
-    ])(initialState)
+    ])(invariantContext, initialState)
 
     expect(result).toEqual({
       robotState: { count: 17 },
@@ -116,7 +135,7 @@ describe('commandCreatorsTimeline', () => {
       addCreatorWithWarning(4),
       divideCreator(0),
       multiplyCreator(3),
-    ])(initialState)
+    ])(invariantContext, initialState)
 
     expect(result).toEqual({
       // error-creating "divide by zero" commands's index in the command creators array
@@ -147,7 +166,7 @@ describe('commandCreatorsTimeline', () => {
       addCreatorWithWarning(3),
       multiplyCreator(2),
       addCreatorWithWarning(1),
-    ])(initialState)
+    ])(invariantContext, initialState)
 
     expect(result.timeline).toEqual([
       // add 3 w/ warning

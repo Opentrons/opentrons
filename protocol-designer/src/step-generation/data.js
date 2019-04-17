@@ -1,5 +1,6 @@
 // @flow
 
+// TODO IMMEDIATELY
 // TODO LATER Ian 2018-02-09 use shared-data data instead?
 export const tiprackWellNamesByCol = [
   ['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'],
@@ -16,6 +17,7 @@ export const tiprackWellNamesByCol = [
   ['A12', 'B12', 'C12', 'D12', 'E12', 'F12', 'G12', 'H12'],
 ]
 
+// TODO IMMEDIATELY
 export const tiprackWellNamesFlat = [
   'A1',
   'B1',

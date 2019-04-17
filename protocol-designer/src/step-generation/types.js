@@ -4,6 +4,12 @@ import type {
   CommandV1 as Command,
   PipetteLabwareFieldsV1 as PipetteLabwareFields,
 } from '@opentrons/shared-data'
+import type {
+  TemporalLabware,
+  TemporalPipette,
+  LabwareEntities,
+  PipetteEntities,
+} from '../step-forms'
 
 // ===== MIX-IN TYPES =====
 
@@ -155,16 +161,14 @@ export type CommandCreatorArgs =
   | DelayArgs
   | TransferArgs
 
-// TODO: Ian 2019-01-07 with multiple deck setup steps, we might want to
-// separate 'entities' from 'locations' for pipettes/labware, and remove
-// 'entities' (pipette name / labware type) from the timeline to protect it
-// from being different btw frames
+// TODO IMMEDIATELY: remove
 export type PipetteData = {|
   name: string,
   mount: Mount,
   tiprackModel: string, // NOTE: this will go away when tiprack choice-per-step and/or tiprack sharing is implemented
 |}
 
+// TODO IMMEDIATELY: remove
 export type LabwareData = {|
   type: string, // TODO Ian 2018-04-17 keys from JSON. Also, rename 'type' to 'model' (or something??)
   slot: DeckSlot,
@@ -188,13 +192,20 @@ export type SourceAndDest = {|
   dest: LocationLiquidState,
 |}
 
+// Data that never changes across time
+// TODO IMMEDIATELY 'Maybe'-type the entities to ensure safe access???
+export type InvariantContext = {|
+  labwareEntities: LabwareEntities,
+  pipetteEntities: PipetteEntities,
+|}
+
 // TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": `TimelineFrame`?
 export type RobotState = {|
   pipettes: {
-    [instrumentId: string]: PipetteData,
+    [pipetteId: string]: TemporalPipette,
   },
   labware: {
-    [labwareId: string]: LabwareData,
+    [labwareId: string]: TemporalLabware, // TODO IMMEDIATELY: slot should allow Maybe (= labware not loaded)
   },
   tipState: {
     tipracks: {
@@ -260,6 +271,7 @@ export type CommandCreatorErrorResponse = {
 }
 
 export type CommandCreator = (
+  invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => CommandsAndRobotState | CommandCreatorErrorResponse
 export type CompoundCommandCreator = (

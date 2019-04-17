@@ -1,65 +1,35 @@
 // @flow
 import {
-  p300Single,
-  p300Multi,
-  createEmptyLiquidState,
-  getTiprackTipstate,
+  makeContext,
+  makeState,
   getTipColumn,
+  getTiprackTipstate,
 } from './fixtures'
 import { sortLabwareBySlot, getNextTiprack, _getNextTip } from '../'
 
-// just a blank liquidState to appease flow
-const basicLiquidState = {
-  pipettes: {},
-  labware: {},
-}
-
-let _pipettesState
+let invariantContext
 
 beforeEach(() => {
-  _pipettesState = {
-    p300SingleId: p300Single,
-    p300MultiId: p300Multi,
-  }
+  invariantContext = makeContext()
 })
+
 describe('sortLabwareBySlot', () => {
   test('sorts all labware by slot', () => {
-    // TODO use a fixture, standardize
-    const robotState = {
-      pipettes: _pipettesState,
-      labware: {
-        six: {
-          slot: '6',
-          type: '96-flat',
-        },
-        one: {
-          slot: '1',
-          type: 'opentrons-tiprack-300ul',
-        },
-        eleven: {
-          slot: '11',
-          type: 'opentrons-tiprack-300ul',
-        },
-        two: {
-          slot: '2',
-          type: 'trough-12row',
-        },
+    const labwareState = {
+      six: {
+        slot: '6',
       },
-      tipState: {
-        tipracks: {
-          tiprack1Id: getTiprackTipstate(true),
-        },
-        pipettes: {
-          p300SingleId: false,
-        },
+      one: {
+        slot: '1',
       },
-      liquidState: createEmptyLiquidState({
-        sourcePlateType: '96-flat',
-        destPlateType: '96-flat',
-        pipettes: _pipettesState,
-      }),
+      eleven: {
+        slot: '11',
+      },
+      two: {
+        slot: '2',
+      },
     }
-    expect(sortLabwareBySlot(robotState)).toEqual([
+    expect(sortLabwareBySlot(labwareState)).toEqual([
       'one',
       'two',
       'six',
@@ -68,27 +38,20 @@ describe('sortLabwareBySlot', () => {
   })
 
   test('with no labware, return empty array', () => {
-    const robotState = {
-      pipettes: _pipettesState,
-      labware: {},
-      tipState: {
-        tipracks: {
-          tiprack1Id: getTiprackTipstate(true),
-        },
-        pipettes: {
-          p300SingleId: false,
-        },
-      },
-      liquidState: {
-        pipettes: {},
-        labware: {},
-      },
-    }
-    expect(sortLabwareBySlot(robotState)).toEqual([])
+    const labwareState = {}
+    expect(sortLabwareBySlot(labwareState)).toEqual([])
   })
 })
 
 describe('_getNextTip', () => {
+  test('empty tiprack should return null', () => {
+    const channels = [1, 8]
+    channels.forEach(channel => {
+      const result = _getNextTip(channel, { ...getTiprackTipstate(false) })
+      expect(result).toBe(null)
+    })
+  })
+
   test('full tiprack should start at A1', () => {
     const result = _getNextTip(1, { ...getTiprackTipstate(true) })
     expect(result).toEqual('A1')
@@ -129,220 +92,82 @@ describe('_getNextTip', () => {
 
 describe('getNextTiprack - single-channel', () => {
   test('single tiprack, missing A1', () => {
-    // TODO use a fixture, standardize
-    const robotState = {
-      pipettes: _pipettesState,
-      labware: {
-        tiprack2Id: {
-          slot: '2',
-          type: 'opentrons-tiprack-300ul',
-        },
-        sourcePlateId: {
-          slot: '10',
-          type: 'trough-12row',
-        },
-        destPlateId: {
-          slot: '11',
-          type: '96-flat',
-        },
-        trashId: {
-          slot: '12',
-          type: 'fixed-trash',
-        },
+    const robotState = makeState({
+      invariantContext,
+      labwareLocations: {
+        tiprack1Id: { slot: '1' },
+        sourcePlateId: { slot: '2' },
       },
-      tipState: {
-        tipracks: {
-          tiprack2Id: {
-            ...getTiprackTipstate(true),
-            A1: false,
-          },
-        },
-        pipettes: {
-          p300SingleId: false,
-        },
-      },
-      liquidState: basicLiquidState,
-    }
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      tiprackSetting: { tiprack1Id: true },
+    })
 
-    const result = getNextTiprack('p300SingleId', robotState)
+    robotState.tipState.tipracks.tiprack1Id.A1 = false
 
-    expect(result && result.tiprackId).toEqual('tiprack2Id')
+    const result = getNextTiprack('p300SingleId', invariantContext, robotState)
+
+    expect(result && result.tiprackId).toEqual('tiprack1Id')
     expect(result && result.well).toEqual('B1')
   })
 
   test('single tiprack, empty, should return null', () => {
-    // TODO use a fixture, standardize
-    const robotState = {
-      pipettes: _pipettesState,
-      labware: {
-        sourcePlateId: {
-          slot: '10',
-          type: 'trough-12row',
-        },
-        destPlateId: {
-          slot: '1',
-          type: '96-flat',
-        },
-        trashId: {
-          slot: '12',
-          type: 'fixed-trash',
-        },
-      },
-      tipState: {
-        tipracks: { ...getTiprackTipstate(false) },
-        pipettes: {
-          p300SingleId: false,
-        },
-      },
-      liquidState: basicLiquidState,
-    }
+    const robotState = makeState({
+      invariantContext,
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      labwareLocations: { tiprack1Id: { slot: '1' } },
+      tiprackSetting: { tiprack1Id: false },
+    })
 
-    const result = getNextTiprack('p300SingleId', robotState)
-
+    const result = getNextTiprack('p300SingleId', invariantContext, robotState)
     expect(result).toEqual(null)
   })
 
   test('multiple tipracks, all full, should return the filled tiprack in the lowest slot', () => {
-    // TODO use a fixture, standardize
-    const robotState = {
-      pipettes: _pipettesState,
-      labware: {
-        tiprack2Id: {
-          slot: '2',
-          type: 'opentrons-tiprack-300ul',
-        },
-        tiprack11Id: {
-          slot: '11',
-          type: 'opentrons-tiprack-300ul',
-        },
-        sourcePlateId: {
-          slot: '10',
-          type: 'trough-12row',
-        },
-        destPlateId: {
-          slot: '1',
-          type: '96-flat',
-        },
-        trashId: {
-          slot: '12',
-          type: 'fixed-trash',
-        },
+    const robotState = makeState({
+      invariantContext,
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      labwareLocations: {
+        tiprack1Id: { slot: '1' },
+        tiprack2Id: { slot: '11' },
       },
-      tipState: {
-        tipracks: {
-          tiprack2Id: {
-            ...getTiprackTipstate(true),
-          },
-          tiprack11Id: {
-            ...getTiprackTipstate(true),
-          },
-        },
-        pipettes: {
-          p300SingleId: false,
-        },
-      },
-      liquidState: basicLiquidState,
-    }
+      tiprackSetting: { tiprack1Id: true, tiprack2Id: true },
+    })
+    const result = getNextTiprack('p300SingleId', invariantContext, robotState)
 
-    const result = getNextTiprack('p300SingleId', robotState)
-
-    expect(result && result.tiprackId).toEqual('tiprack2Id')
+    expect(result && result.tiprackId).toEqual('tiprack1Id')
     expect(result && result.well).toEqual('A1')
   })
 
   test('multiple tipracks, some partially full, should return the filled tiprack in the lowest slot', () => {
-    // TODO use a fixture, standardize
-    const robotState = {
-      pipettes: _pipettesState,
-      labware: {
-        tiprack2Id: {
-          slot: '2',
-          type: 'opentrons-tiprack-300ul',
-        },
-        tiprack11Id: {
-          slot: '11',
-          type: 'opentrons-tiprack-300ul',
-        },
-        sourcePlateId: {
-          slot: '10',
-          type: 'trough-12row',
-        },
-        destPlateId: {
-          slot: '1',
-          type: '96-flat',
-        },
-        trashId: {
-          slot: '12',
-          type: 'fixed-trash',
-        },
+    let robotState = makeState({
+      invariantContext,
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      labwareLocations: {
+        tiprack1Id: { slot: '2' },
+        tiprack2Id: { slot: '11' },
       },
-      tipState: {
-        tipracks: {
-          tiprack2Id: {
-            ...getTiprackTipstate(true),
-            A1: false,
-          },
-          tiprack11Id: {
-            ...getTiprackTipstate(true),
-            A1: false,
-          },
-        },
-        pipettes: {
-          p300SingleId: false,
-        },
-      },
-      liquidState: basicLiquidState,
-    }
+      tiprackSetting: { tiprack1Id: true, tiprack2Id: true },
+    })
+    // remove A1 tip from both racks
+    robotState.tipState.tipracks.tiprack1Id.A1 = false
+    robotState.tipState.tipracks.tiprack2Id.A1 = false
+    const result = getNextTiprack('p300SingleId', invariantContext, robotState)
 
-    const result = getNextTiprack('p300SingleId', robotState)
-
-    expect(result && result.tiprackId).toEqual('tiprack2Id')
+    expect(result && result.tiprackId).toEqual('tiprack1Id')
     expect(result && result.well).toEqual('B1')
   })
 
   test('multiple tipracks, all empty, should return null', () => {
-    // TODO use a fixture, standardize
-    const robotState = {
-      pipettes: _pipettesState,
-      labware: {
-        tiprack2Id: {
-          slot: '2',
-          type: 'opentrons-tiprack-300ul',
-        },
-        tiprack11Id: {
-          slot: '11',
-          type: 'opentrons-tiprack-300ul',
-        },
-        sourcePlateId: {
-          slot: '10',
-          type: 'trough-12row',
-        },
-        destPlateId: {
-          slot: '1',
-          type: '96-flat',
-        },
-        trashId: {
-          slot: '12',
-          type: 'fixed-trash',
-        },
+    let robotState = makeState({
+      invariantContext,
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      labwareLocations: {
+        tiprack1Id: { slot: '2' },
+        tiprack2Id: { slot: '11' },
       },
-      tipState: {
-        tipracks: {
-          tiprack2Id: {
-            ...getTiprackTipstate(false),
-          },
-          tiprack11Id: {
-            ...getTiprackTipstate(false),
-          },
-        },
-        pipettes: {
-          p300SingleId: false,
-        },
-      },
-      liquidState: basicLiquidState,
-    }
-
-    const result = getNextTiprack('p300SingleId', robotState)
+      tiprackSetting: { tiprack1Id: false, tiprack2Id: false },
+    })
+    const result = getNextTiprack('p300SingleId', invariantContext, robotState)
 
     expect(result).toBe(null)
   })
@@ -350,395 +175,174 @@ describe('getNextTiprack - single-channel', () => {
 
 describe('getNextTiprack - 8-channel', () => {
   test('single tiprack, totally full', () => {
-    // TODO use a fixture, standardize
-    const robotState = {
-      pipettes: _pipettesState,
-      labware: {
-        tiprack2Id: {
-          slot: '2',
-          type: 'opentrons-tiprack-300ul',
-        },
-        sourcePlateId: {
-          slot: '10',
-          type: 'trough-12row',
-        },
-        destPlateId: {
-          slot: '1',
-          type: '96-flat',
-        },
-        trashId: {
-          slot: '12',
-          type: 'fixed-trash',
-        },
+    let robotState = makeState({
+      invariantContext,
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      labwareLocations: {
+        tiprack1Id: { slot: '1' },
       },
-      tipState: {
-        tipracks: {
-          tiprack2Id: { ...getTiprackTipstate(true) },
-        },
-        pipettes: {
-          p300SingleId: false,
-        },
-      },
-      liquidState: basicLiquidState,
-    }
+      tiprackSetting: { tiprack1Id: true },
+    })
 
-    const result = getNextTiprack('p300MultiId', robotState)
+    const result = getNextTiprack('p300MultiId', invariantContext, robotState)
 
-    expect(result && result.tiprackId).toEqual('tiprack2Id')
+    expect(result && result.tiprackId).toEqual('tiprack1Id')
     expect(result && result.well).toEqual('A1')
   })
 
   test('single tiprack, partially full', () => {
-    // TODO use a fixture, standardize
-    const robotState = {
-      pipettes: _pipettesState,
-      labware: {
-        tiprack2Id: {
-          slot: '2',
-          type: 'opentrons-tiprack-300ul',
-        },
-        sourcePlateId: {
-          slot: '10',
-          type: 'trough-12row',
-        },
-        destPlateId: {
-          slot: '1',
-          type: '96-flat',
-        },
-        trashId: {
-          slot: '12',
-          type: 'fixed-trash',
-        },
+    let robotState = makeState({
+      invariantContext,
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      labwareLocations: {
+        tiprack1Id: { slot: '2' },
       },
-      tipState: {
-        tipracks: {
-          tiprack2Id: {
-            ...getTiprackTipstate(true),
-            A1: false,
-            A2: false,
-            A5: false,
-          },
-        },
-        pipettes: {
-          p300SingleId: false,
-        },
-      },
-      liquidState: basicLiquidState,
+      tiprackSetting: { tiprack1Id: true },
+    })
+    robotState.tipState.tipracks.tiprack1Id = {
+      ...robotState.tipState.tipracks.tiprack1Id,
+      A1: false,
+      A2: false,
+      A5: false,
     }
+    const result = getNextTiprack('p300MultiId', invariantContext, robotState)
 
-    const result = getNextTiprack('p300MultiId', robotState)
-
-    expect(result && result.tiprackId).toEqual('tiprack2Id')
+    expect(result && result.tiprackId).toEqual('tiprack1Id')
     expect(result && result.well).toEqual('A3')
   })
 
   test('single tiprack, empty, should return null', () => {
-    const robotState = {
-      pipettes: _pipettesState,
-      labware: {
-        sourcePlateId: {
-          slot: '10',
-          type: 'trough-12row',
-        },
-        destPlateId: {
-          slot: '1',
-          type: '96-flat',
-        },
-        trashId: {
-          slot: '12',
-          type: 'fixed-trash',
-        },
+    let robotState = makeState({
+      invariantContext,
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      labwareLocations: {
+        tiprack1Id: { slot: '2' },
       },
-      tipState: {
-        tipracks: { ...getTiprackTipstate(false) },
-        pipettes: {
-          p300SingleId: false,
-        },
-      },
-      liquidState: basicLiquidState,
-    }
-
-    const result = getNextTiprack('p300MultiId', robotState)
+      tiprackSetting: { tiprack1Id: false },
+    })
+    const result = getNextTiprack('p300MultiId', invariantContext, robotState)
 
     expect(result).toEqual(null)
   })
 
   test('single tiprack, a well missing from each column, should return null', () => {
-    // TODO use a fixture, standardize
-    const robotState = {
-      pipettes: _pipettesState,
-      labware: {
-        tiprack2Id: {
-          slot: '2',
-          type: 'opentrons-tiprack-300ul',
-        },
-        sourcePlateId: {
-          slot: '10',
-          type: 'trough-12row',
-        },
-        destPlateId: {
-          slot: '1',
-          type: '96-flat',
-        },
-        trashId: {
-          slot: '12',
-          type: 'fixed-trash',
-        },
+    let robotState = makeState({
+      invariantContext,
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      labwareLocations: {
+        tiprack1Id: { slot: '2' },
       },
-      tipState: {
-        tipracks: {
-          tiprack2Id: {
-            ...getTiprackTipstate(true),
-            F1: false,
-            B2: false,
-            C3: false,
-            A4: false,
-            H5: false,
-            E6: false,
-            B7: false,
-            A8: false,
-            C9: false,
-            D10: false,
-            G11: false,
-            F12: false,
-          },
-        },
-        pipettes: {
-          p300SingleId: false,
-        },
-      },
-      liquidState: basicLiquidState,
+      tiprackSetting: { tiprack1Id: true },
+    })
+    robotState.tipState.tipracks.tiprack1Id = {
+      ...robotState.tipState.tipracks.tiprack1Id,
+      F1: false,
+      B2: false,
+      C3: false,
+      A4: false,
+      H5: false,
+      E6: false,
+      B7: false,
+      A8: false,
+      C9: false,
+      D10: false,
+      G11: false,
+      F12: false,
     }
 
-    const result = getNextTiprack('p300MultiId', robotState)
+    const result = getNextTiprack('p300MultiId', invariantContext, robotState)
 
     expect(result).toEqual(null)
   })
 
   test('multiple tipracks, all full, should return the filled tiprack in the lowest slot', () => {
-    // TODO use a fixture, standardize
-    const robotState = {
-      pipettes: _pipettesState,
-      labware: {
-        tiprack2Id: {
-          slot: '2',
-          type: 'opentrons-tiprack-300ul',
-        },
-        tiprack3Id: {
-          slot: '3',
-          type: 'opentrons-tiprack-300ul',
-        },
-        tiprack10Id: {
-          slot: '10',
-          type: 'opentrons-tiprack-300ul',
-        },
-        sourcePlateId: {
-          slot: '9',
-          type: 'trough-12row',
-        },
-        destPlateId: {
-          slot: '1',
-          type: '96-flat',
-        },
-        trashId: {
-          slot: '12',
-          type: 'fixed-trash',
-        },
+    const robotState = makeState({
+      invariantContext,
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      labwareLocations: {
+        tiprack1Id: { slot: '2' },
+        tiprack2Id: { slot: '3' },
+        tiprack3Id: { slot: '10' },
       },
-      tipState: {
-        tipracks: {
-          tiprack2Id: {
-            ...getTiprackTipstate(true),
-          },
-          tiprack3Id: {
-            ...getTiprackTipstate(true),
-          },
-          tiprack10Id: {
-            ...getTiprackTipstate(true),
-          },
-        },
-        pipettes: {
-          p300SingleId: false,
-        },
-      },
-      liquidState: basicLiquidState,
-    }
+      tiprackSetting: { tiprack1Id: true, tiprack2Id: true, tiprack3Id: true },
+    })
+    const result = getNextTiprack('p300MultiId', invariantContext, robotState)
 
-    const result = getNextTiprack('p300MultiId', robotState)
-
-    expect(result && result.tiprackId).toEqual('tiprack2Id')
+    expect(result && result.tiprackId).toEqual('tiprack1Id')
     expect(result && result.well).toEqual('A1')
   })
 
   test('multiple tipracks, some partially full, should return the filled tiprack in the lowest slot', () => {
-    // TODO use a fixture, standardize
-    const robotState = {
-      pipettes: _pipettesState,
-      labware: {
-        tiprack2Id: {
-          slot: '2',
-          type: 'opentrons-tiprack-300ul',
-        },
-        tiprack3Id: {
-          slot: '3',
-          type: 'opentrons-tiprack-300ul',
-        },
-        tiprack10Id: {
-          slot: '10',
-          type: 'opentrons-tiprack-300ul',
-        },
-        sourcePlateId: {
-          slot: '9',
-          type: 'trough-12row',
-        },
-        destPlateId: {
-          slot: '1',
-          type: '96-flat',
-        },
-        trashId: {
-          slot: '12',
-          type: 'fixed-trash',
-        },
+    let robotState = makeState({
+      invariantContext,
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      labwareLocations: {
+        tiprack1Id: { slot: '1' },
+        tiprack2Id: { slot: '2' },
+        tiprack3Id: { slot: '3' },
       },
-      tipState: {
-        tipracks: {
-          tiprack2Id: {
-            ...getTiprackTipstate(true),
-            // empty diagonal, 8-channel cannot use
-            F1: false,
-            B2: false,
-            C3: false,
-            A4: false,
-            H5: false,
-            E6: false,
-            B7: false,
-            A8: false,
-            C9: false,
-            D10: false,
-            G11: false,
-            F12: false,
-          },
-          tiprack3Id: {
-            ...getTiprackTipstate(true),
-            // empty row, 8-channel cannot use
-            A1: false,
-            A2: false,
-            A3: false,
-            A4: false,
-            A5: false,
-            A6: false,
-            A7: false,
-            A8: false,
-            A9: false,
-            A10: false,
-            A11: false,
-            A12: false,
-          },
-          tiprack10Id: {
-            ...getTiprackTipstate(true),
-            A1: false,
-          },
-        },
-        pipettes: {
-          p300SingleId: false,
-        },
-      },
-      liquidState: basicLiquidState,
+      tiprackSetting: { tiprack1Id: true, tiprack2Id: true, tiprack3Id: true },
+    })
+    // remove tips from state
+    robotState.tipState.tipracks.tiprack1Id = {
+      ...robotState.tipState.tipracks.tiprack1Id,
+      // empty row, 8-channel cannot use
+      A1: false,
+      A2: false,
+      A3: false,
+      A4: false,
+      A5: false,
+      A6: false,
+      A7: false,
+      A8: false,
+      A9: false,
+      A10: false,
+      A11: false,
+      A12: false,
+    }
+    robotState.tipState.tipracks.tiprack2Id = {
+      ...robotState.tipState.tipracks.tiprack2Id,
+      // empty diagonal, 8-channel cannot use
+      F1: false,
+      B2: false,
+      C3: false,
+      A4: false,
+      H5: false,
+      E6: false,
+      B7: false,
+      A8: false,
+      C9: false,
+      D10: false,
+      G11: false,
+      F12: false,
+    }
+    robotState.tipState.tipracks.tiprack3Id = {
+      ...robotState.tipState.tipracks.tiprack3Id,
+      A1: false,
     }
 
-    const result = getNextTiprack('p300MultiId', robotState)
+    const result = getNextTiprack('p300MultiId', invariantContext, robotState)
 
-    expect(result && result.tiprackId).toEqual('tiprack10Id')
+    expect(result && result.tiprackId).toEqual('tiprack3Id')
     expect(result && result.well).toEqual('A2')
   })
 
   test('multiple tipracks, all empty, should return null', () => {
-    // TODO use a fixture, standardize
-    const robotState = {
-      pipettes: _pipettesState,
-      labware: {
-        tiprack2Id: {
-          slot: '2',
-          type: 'opentrons-tiprack-300ul',
-        },
-        tiprack3Id: {
-          slot: '3',
-          type: 'opentrons-tiprack-300ul',
-        },
-        tiprack10Id: {
-          slot: '10',
-          type: 'opentrons-tiprack-300ul',
-        },
-        sourcePlateId: {
-          slot: '9',
-          type: 'trough-12row',
-        },
-        destPlateId: {
-          slot: '1',
-          type: '96-flat',
-        },
-        trashId: {
-          slot: '12',
-          type: 'fixed-trash',
-        },
+    const robotState = makeState({
+      invariantContext,
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      labwareLocations: {
+        tiprack1Id: { slot: '1' },
+        tiprack2Id: { slot: '2' },
+        tiprack3Id: { slot: '3' },
       },
-      tipState: {
-        tipracks: {
-          tiprack2Id: {
-            ...getTiprackTipstate(true),
-            F1: false,
-            B2: false,
-            C3: false,
-            A4: false,
-            H5: false,
-            E6: false,
-            B7: false,
-            A8: false,
-            C9: false,
-            D10: false,
-            G11: false,
-            F12: false,
-          },
-          tiprack3Id: {
-            ...getTiprackTipstate(true),
-            A1: false,
-            A2: false,
-            A3: false,
-            A4: false,
-            A5: false,
-            A6: false,
-            A7: false,
-            A8: false,
-            A9: false,
-            A10: false,
-            A11: false,
-            A12: false,
-          },
-          tiprack10Id: {
-            ...getTiprackTipstate(true),
-            A1: false,
-            A2: false,
-            A3: false,
-            A4: false,
-            A5: false,
-            A6: false,
-            A7: false,
-            A8: false,
-            A9: false,
-            A10: false,
-            A11: false,
-            A12: false,
-          },
-        },
-        pipettes: {
-          p300SingleId: false,
-        },
+      tiprackSetting: {
+        tiprack1Id: false,
+        tiprack2Id: false,
+        tiprack3Id: false,
       },
-      liquidState: basicLiquidState,
-    }
-
-    const result = getNextTiprack('p300MultiId', robotState)
-
+    })
+    const result = getNextTiprack('p300MultiId', invariantContext, robotState)
     expect(result).toEqual(null)
   })
 })
