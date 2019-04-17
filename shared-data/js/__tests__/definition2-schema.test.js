@@ -1,7 +1,7 @@
 import path from 'path'
 import glob from 'glob'
 import Ajv from 'ajv'
-import schema from '../../labware-json-schema/labware-schema.json'
+import schema from '../../labware-json-schema/labwareSchemaV2.json'
 import exampleLabware1 from './fixtures/labwareExample.json'
 import exampleLabware2 from './fixtures/labwareExample2.json'
 

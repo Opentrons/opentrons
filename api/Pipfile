@@ -20,6 +20,7 @@ wheel = "==0.30.0"
 coverage = "==4.4.2"
 mypy = "*"
 colorama = "*"
+jsonschema = "*"
 
 [packages]
 numpy = "*"

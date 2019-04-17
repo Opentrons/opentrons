@@ -213,10 +213,7 @@ def dispatch_json(context: ProtocolContext,  # noqa(C901)
             pipette.touch_tip(well, v_offset=offset)  # type: ignore
 
         elif command_type == 'move-to-slot':
-            slot = params.get('slot')
-            if slot not in [str(s+1) for s in range(12)]:
-                raise ValueError('Invalid "slot" for "move-to-slot": {}'
-                                 .format(slot))
+            slot = params['slot']
             slot_obj = context.deck.position_for(slot)
 
             offset = params.get('offset', {})
