@@ -79,6 +79,7 @@ GCODES = {'HOME': 'G28.2',
           'PUSH_SPEED': 'M120',
           'POP_SPEED': 'M121',
           'SET_SPEED': 'G0F',
+          'CONFIGURE_INSTRUMENT': 'M365',
           'READ_INSTRUMENT_ID': 'M369',
           'WRITE_INSTRUMENT_ID': 'M370',
           'READ_INSTRUMENT_MODEL': 'M371',
@@ -431,6 +432,14 @@ class SmoothieDriver_3_0_0:
         self._write_to_pipette(
             GCODES['WRITE_INSTRUMENT_MODEL'], mount, data_string)
 
+    def update_pipette_config(self, mount, data):
+        '''
+        Updates the following configs for a given pipette mount based on
+        the detected pipette type:
+        - homing positions
+        -
+        '''
+        return None
     # FIXME (JG 9/28/17): Should have a more thought out
     # way of simulating vs really running
     def connect(self, port=None):
