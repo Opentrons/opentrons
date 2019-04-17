@@ -6,8 +6,8 @@
 .app {
   height: 100%;
 
-  /* Nav height */
-  padding-top: var(--size-2);
+  /* MainNav height */
+  padding-top: var(--size-main-nav);
 
   &.breadcrumbs_visible {
     padding-top: calc(2 * var(--size-2));
@@ -38,6 +38,11 @@
 }
 
 @media (--medium) {
+  .app {
+    /* SubdomainNav + MainNav height */
+    padding-top: calc(var(--size-subdomain-nav) + var(--size-main-nav));
+  }
+
   .page {
     height: 100%;
     overflow: hidden;

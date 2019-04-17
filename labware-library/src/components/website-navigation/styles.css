@@ -1,0 +1,91 @@
+/* branded website navbar styles */
+@import '@opentrons/components';
+@import '../../styles/breakpoints.css';
+@import '../../styles/shadows.css';
+@import '../../styles/spacing.css';
+
+:root {
+  --c-nav-gray: #707070;
+  --spacing-subdomain: 2.5rem;
+  --spacing-nav: 3rem;
+  --transition-fast: 500;
+}
+
+.subdomain_nav_contents {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.subdomain_link {
+  margin-left: var(--spacing-subdomain);
+  font-size: var(--fs-body-1);
+  color: var(--c-nav-gray);
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.main_nav_contents {
+  height: 100%;
+  width: 100%;
+  padding: var(--spacing-5) 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  height: 100%;
+}
+
+.nav_list {
+  display: none;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.nav_link {
+  @apply --font-body-1-dark;
+
+  margin-left: var(--spacing-nav);
+  font-weight: var(--fw-semibold);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+
+  &:hover,
+  &.active {
+    color: var(--c-black);
+  }
+}
+
+.clickable_icon {
+  cursor: pointer;
+
+  &:active,
+  &:focus {
+    outline: none;
+  }
+}
+
+.menu_button {
+  flex: 0 0 5rem;
+  color: var(--c-font-dark);
+  transition: all var(--transition-fast);
+
+  &:hover {
+    color: var(--c-black);
+  }
+}
+
+@media (--desktop) {
+  .menu_button {
+    display: none;
+  }
+
+  .nav_list {
+    display: flex;
+  }
+}

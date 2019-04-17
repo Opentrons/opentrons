@@ -5,9 +5,22 @@ exports[`Nav component renders 1`] = `
   className="nav"
 >
   <div
-    className="nav_contents"
+    className="subdomain_nav_wrapper"
   >
-    <Logo />
+    <div
+      className="nav_container"
+    >
+      <SubdomainNav />
+    </div>
+  </div>
+  <div
+    className="main_nav_wrapper"
+  >
+    <div
+      className="nav_container"
+    >
+      <MainNav />
+    </div>
   </div>
 </nav>
 `;
