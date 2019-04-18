@@ -6,7 +6,8 @@ import asyncio
 import logging
 import logging.config
 
-from . import get_app, BR_BUILTIN_VERSION_FILE, config, control, constants
+from . import (get_app, BR_BUILTIN_VERSION_FILE,
+               config, constants, name_management)
 from aiohttp import web
 
 LOG = logging.getLogger(__name__)
@@ -66,21 +67,19 @@ def main():
                         f'to {config.PATH_ENVIRONMENT_VARIABLE} env var and '
                         f'then default path {config.DEFAULT_PATH}')
     args = parser.parse_args()
+    loop = asyncio.get_event_loop()
     configure_logging(getattr(logging, args.log_level.upper()))
+
+    LOG.info("Setting hostname")
+    hostname = loop.run_until_complete(name_management.setup_hostname())
+    LOG.info(f"Set hostname to {hostname}")
+
     LOG.info(f'Building buildroot update server')
     app = get_app(args.version_file, args.config_file)
 
-    hostname = app[constants.DEVICE_HOSTNAME_VARNAME]
-    prettyname = app[constants.DEVICE_PRETTYNAME_VARNAME]
-    if control.hostname_from_pretty_name(hostname) != hostname:
-        LOG.warning(f"Preconfigured hostname {hostname} not system compatible")
-        hostname = asyncio.get_event_loop().run_until_complete(
-            control.update_name(prettyname))
-        app[constants.DEVICE_HOSTNAME_VARNAME] = hostname
-
-    LOG.info(f"Setting system hostname to {hostname}")
-    asyncio.get_event_loop().run_until_complete(
-        control.update_system_for_name(hostname))
+    name = app[constants.DEVICE_NAME_VARNAME]
+    LOG.info(f"Setting advertised name to {name}")
+    loop.run_until_complete(name_management.set_name(name))
 
     LOG.info(
         f'Starting buildroot update server on http://{args.host}:{args.port}')

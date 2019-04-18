@@ -95,7 +95,10 @@ async def do_update(update_file, host, kind):
                 sys.exit(-1)
 
         print("Restarting...")
-        resp = await session.post(host+'/server/update/restart')
+        if kind == 'migrat':
+            resp = await session.post(host+'/server/update/restart')
+        else:
+            resp = await session.post(host+'/server/restart')
         if resp.status != 200:
             try:
                 body = await resp.json()

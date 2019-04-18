@@ -5,7 +5,7 @@ import json
 from typing import Mapping
 from aiohttp import web
 
-from . import constants
+from . import constants, name_management
 
 from . import config, control, update, ssh_key_management
 
@@ -43,12 +43,11 @@ def get_app(system_version_file: str = None,
         system_version_file = BR_BUILTIN_VERSION_FILE
 
     version = get_version(system_version_file)
-    device_name = name_override or control.get_hostname()
-    pretty_name = name_override or control.get_prettyname()
+    name = name_override or name_management.get_name()
     config_obj = config.load(config_file_override)
 
     LOG.info("Setup: " + '\n\t'.join([
-        f'Device name: {pretty_name}',
+        f'Device name: {name}',
         f'Buildroot version:         '
         f'{version.get("buildroot_version", "unknown")}',
         f'\t(from git sha      '
@@ -70,8 +69,7 @@ def get_app(system_version_file: str = None,
     app = web.Application(loop=loop, middlewares=[log_error_middleware])
     app[config.CONFIG_VARNAME] = config_obj
     app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
-    app[constants.DEVICE_HOSTNAME_VARNAME] = device_name
-    app[constants.DEVICE_PRETTYNAME_VARNAME] = pretty_name
+    app[constants.DEVICE_NAME_VARNAME] = name
     app.router.add_routes([
         web.get('/server/update/health',
                 control.build_health_endpoint(version)),
@@ -80,10 +78,10 @@ def get_app(system_version_file: str = None,
         web.get('/server/update/{session}/status', update.status),
         web.post('/server/update/{session}/file', update.file_upload),
         web.post('/server/update/{session}/commit', update.commit),
-        web.post('/server/update/restart', control.restart),
+        web.post('/server/restart', control.restart),
         web.get('/server/ssh_keys', ssh_key_management.list_keys),
         web.post('/server/ssh_keys', ssh_key_management.add),
         web.delete('/server/ssh_keys/{key_md5}', ssh_key_management.remove),
-        web.post('/server/name', control.set_name),
+        web.post('/server/name', name_management.set_name_endpoint),
     ])
     return app
