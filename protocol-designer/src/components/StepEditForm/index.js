@@ -56,13 +56,14 @@ const getDirtyFields = (
   if (!isNewStep && formData) {
     dirtyFields = Object.keys(formData)
   } else if (formData && formData.stepType) {
+    const data = formData
     // new step, but may have auto-populated fields.
     // "Dirty" any fields that differ from default new form values
     const defaultFormData = getDefaultsForStepType(formData.stepType)
     dirtyFields = Object.keys(defaultFormData).reduce(
       (acc, fieldName: StepFieldName) => {
-        // $FlowFixMe formData is no longer a Maybe type b/c of the `if` above, but flow forgets
-        const currentValue = formData[fieldName]
+        // formData is no longer a Maybe type b/c of the `if` above, but flow forgets
+        const currentValue = data[fieldName]
         const initialValue = defaultFormData[fieldName]
 
         return isEqual(currentValue, initialValue) ? acc : [...acc, fieldName]

@@ -4,7 +4,8 @@ import * as React from 'react'
 import Icon, { type IconProps } from './Icon'
 import iconData, { type IconName } from './icon-data'
 
-type Props = IconProps & {
+type Props = {
+  ...$Exact<IconProps>,
   /** name constant of the optional notifcation icon to display */
   childName: ?IconName,
   /** classes to apply (e.g. for color) to notification icon */
@@ -35,7 +36,6 @@ export default function NotificationIcon(props: Props) {
   const scaledHeight = height / SCALE_FACTOR
 
   return (
-    // $FlowFixMe: doesn't type properly with upgrade to flow@0.76
     <Icon {...props}>
       {childName && (
         <Icon

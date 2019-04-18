@@ -15,7 +15,6 @@ export function fileToProtocolFile(file: File): ProtocolFile {
   return {
     name: file.name,
     type: file.type,
-    // $FlowFixMe: upgrade to flow v0.80 for fixed File typedef
     lastModified: file.lastModified,
   }
 }

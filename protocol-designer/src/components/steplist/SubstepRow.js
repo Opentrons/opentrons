@@ -151,5 +151,4 @@ function SubstepRow(props: SubstepRowProps) {
   )
 }
 
-// TODO: Ian 2019-02-04 need to update Flow defs for React.memo $FlowFixMe
-export default React.memo(SubstepRow)
+export default React.memo<SubstepRowProps>(SubstepRow)

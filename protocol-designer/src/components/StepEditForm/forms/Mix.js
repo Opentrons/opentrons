@@ -156,8 +156,7 @@ class MixForm extends React.Component<Props, State> {
         </div>
         <div className={styles.section_wrapper}>
           <div className={styles.form_row}>
-            {/* $FlowFixMe: (mc, 2019-04-18): is stepType needed? */}
-            <ChangeTipField stepType="mix" name="changeTip" />
+            <ChangeTipField name="changeTip" />
           </div>
         </div>
       </div>
