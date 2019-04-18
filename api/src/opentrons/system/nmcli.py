@@ -380,8 +380,9 @@ def _add_eap_args(eap_args: Dict[str, str]) -> List[str]:
             if ta['type'] == 'file':
                 # Keyfiles must be prepended with file:// so nm-cli
                 # knows that we’re not giving it DER-encoded blobs
-                _make_host_symlink_if_necessary()
-                path = _rewrite_key_path_to_host_path(eap_args[ta['name']])
+                if config.OT_SYSTEM_VERSION < 2:
+                    _make_host_symlink_if_necessary()
+                    path = _rewrite_key_path_to_host_path(eap_args[ta['name']])
                 val = 'file://' + path
             else:
                 val = eap_args[ta['name']]

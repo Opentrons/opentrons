@@ -29,6 +29,7 @@ import logging
 from pathlib import Path
 import re
 import shutil
+import subprocess
 import sys
 from typing import Dict, NamedTuple, Optional, Union
 
@@ -41,9 +42,35 @@ log = logging.getLogger(__file__)
 IS_WIN = sys.platform.startswith('win')
 IS_OSX = sys.platform == 'darwin'
 IS_LINUX = sys.platform.startswith('linux')
-IS_ROBOT = IS_LINUX and os.environ.get('RUNNING_ON_PI')
-IS_VIRTUAL = os.environ.get('ENABLE_VIRTUAL_SMOOTHIE')
+IS_ROBOT = bool(IS_LINUX and os.environ.get('RUNNING_ON_PI'))
+IS_VIRTUAL = bool(os.environ.get('ENABLE_VIRTUAL_SMOOTHIE'))
 #: This is the correct thing to check to see if we’re running on a robot
+
+if IS_ROBOT:
+    if 'OT_SYSTEM_VERSION' in os.environ:
+        OT_SYSTEM_VERSION = int(os.environ['OT_SYSTEM_VERSION'])
+    else:
+        if os.path.exists('/etc/VERSION.json'):
+            OT_SYSTEM_VERSION = 2
+        else:
+            log.warning("Could not find version file in /etc/VERSION.json")
+            OT_SYSTEM_VERSION = 0
+else:
+    OT_SYSTEM_VERSION = 0
+
+
+def name() -> str:
+    if IS_ROBOT and OT_SYSTEM_VERSION < 2:
+        return 'opentrons-{}'.format(
+            os.environ.get('RESIN_DEVICE_NAME_AT_INIT', 'dev'))
+    if IS_ROBOT and OT_SYSTEM_VERSION >= 2:
+        try:
+            return subprocess.check_output(
+                ['hostnamectl', '--pretty', 'status']).strip().decode()
+        except Exception:
+            log.exception(
+                "Couldn't load name from /etc/machine-info, defaulting to dev")
+    return 'opentrons-dev'
 
 
 class ConfigElementType(enum.Enum):

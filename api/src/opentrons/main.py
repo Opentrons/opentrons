@@ -7,7 +7,7 @@ from opentrons import server
 from opentrons.server.main import build_arg_parser
 from argparse import ArgumentParser
 from opentrons import hardware, __version__
-from opentrons.config import feature_flags as ff, CONFIG
+from opentrons.config import feature_flags as ff, CONFIG, name
 from logging.config import dictConfig
 from opentrons.system import udev, resin
 
@@ -163,6 +163,7 @@ def initialize_robot(loop):
                 "Could not connect to motor driver after fw update")
     else:
         log.info("FW version OK: {}".format(packed_smoothie_fw_ver))
+    log.info(f"Name: {name()}")
 
 
 def run(**kwargs):
