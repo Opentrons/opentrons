@@ -45,11 +45,15 @@ beforeEach(() => {
   invariantContext = makeContext()
   const makeStateArgs = {
     invariantContext,
-    pipetteLocations: { p300SingleId: { mount: 'left' } },
+    pipetteLocations: {
+      p300SingleId: { mount: 'left' },
+      p300MultiId: { mount: 'right' },
+    },
     labwareLocations: {
       tiprack1Id: { slot: '1' },
       sourcePlateId: { slot: '2' },
       destPlateId: { slot: '3' },
+      trashId: { slot: '12' },
     },
   }
   initialRobotState = makeState({

@@ -51,7 +51,6 @@ describe('replaceTip', () => {
 
   describe('replaceTip: single channel', () => {
     test('Single-channel: first tip', () => {
-      console.log('zzz', invariantContext.pipetteEntities)
       const result = replaceTip(p300SingleId)(
         invariantContext,
         initialRobotState

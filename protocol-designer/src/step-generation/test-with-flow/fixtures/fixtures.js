@@ -178,20 +178,6 @@ type CreateRobotArgs = {
   fillPipetteTips: boolean,
   fillTiprackTips?: boolean,
 }
-/** RobotState with empty liquid state */
-export function createRobotState(args: CreateRobotArgs): RobotState {
-  // const { labware, pipettes, tipState } = createRobotStateFixture(args)
-  throw new Error('createRobotState is deprecated :(') // TODO IMMEDIATELY remove this
-  // return {
-  //   labware,
-  //   pipettes,
-  //   tipState,
-  //   liquidState: createEmptyLiquidState({
-  //     ...args,
-  //     pipettes: { p300SingleId: p300Single, p300MultiId: p300Multi },
-  //   }),
-  // }
-}
 
 function getTiprackType(volume: number): string {
   const tiprackMap = {

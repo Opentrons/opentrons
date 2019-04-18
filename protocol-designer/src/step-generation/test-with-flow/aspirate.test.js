@@ -196,6 +196,7 @@ describe('aspirate', () => {
 
       expect(getNextRobotStateAndWarnings).toHaveBeenCalledWith(
         result.commands[0],
+        invariantContext,
         robotStateWithTip
       )
       expect(result.robotState).toBe(
