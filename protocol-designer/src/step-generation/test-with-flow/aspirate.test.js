@@ -37,6 +37,7 @@ describe('aspirate', () => {
   let invariantContext
 
   beforeEach(() => {
+    // TODO IMMEDIATELY this invariantContext/initialRobotState/robotStateWithTip is repeated in aspirate.test.js -- make a fixture helper?
     invariantContext = makeContext()
     const makeStateArgs = {
       invariantContext,
@@ -55,20 +56,6 @@ describe('aspirate', () => {
       tiprackSetting: { tiprack1Id: false },
     })
     robotStateWithTip.tipState.pipettes.p300SingleId = true
-    // initialRobotState = createRobotState({
-    //   sourcePlateType: 'trough-12row',
-    //   destPlateType: '96-flat',
-    //   fillPipetteTips: false,
-    //   fillTiprackTips: true,
-    //   tipracks: [300, 300],
-    // })
-    // robotStateWithTip = createRobotState({
-    //   sourcePlateType: 'trough-12row',
-    //   destPlateType: '96-flat',
-    //   fillPipetteTips: true,
-    //   fillTiprackTips: true,
-    //   tipracks: [300, 300],
-    // })
   })
 
   describe('aspirate normally (with tip)', () => {

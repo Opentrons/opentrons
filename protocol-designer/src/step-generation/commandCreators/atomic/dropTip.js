@@ -1,10 +1,11 @@
 // @flow
-import type { CommandCreator, RobotState } from '../../types'
+import type { CommandCreator, InvariantContext, RobotState } from '../../types'
 import { FIXED_TRASH_ID } from '../../../constants'
 import cloneDeep from 'lodash/cloneDeep'
 import updateLiquidState from '../../dispenseUpdateLiquidState'
 
 const dropTip = (pipetteId: string): CommandCreator => (
+  invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {
   // No-op if there is no tip
@@ -36,10 +37,9 @@ const dropTip = (pipetteId: string): CommandCreator => (
       ...nextRobotState,
       liquidState: updateLiquidState(
         {
+          invariantContext,
           pipetteId: pipetteId,
-          pipetteData: prevRobotState.pipettes[pipetteId],
           labwareId: FIXED_TRASH_ID,
-          labwareType: 'fixed-trash',
           useFullVolume: true,
           well: 'A1',
         },

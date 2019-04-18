@@ -19,14 +19,14 @@ import type {
 type LiquidState = $PropertyType<RobotState, 'liquidState'>
 
 export default function updateLiquidState(
-  args: {
+  args: {|
     invariantContext: InvariantContext,
     pipetteId: string,
     volume?: number,
     useFullVolume?: boolean,
     labwareId: string,
     well: string,
-  },
+  |},
   prevLiquidState: LiquidState
 ): LiquidState {
   // TODO: Ian 2018-06-14 return same shape as aspirateUpdateLiquidState fn: {liquidState, warnings}.

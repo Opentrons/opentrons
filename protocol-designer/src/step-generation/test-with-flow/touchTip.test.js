@@ -2,7 +2,8 @@
 import { expectTimelineError } from './testMatchers'
 import _touchTip from '../commandCreators/atomic/touchTip'
 import {
-  createRobotState,
+  makeContext,
+  makeState,
   commandCreatorNoErrors,
   commandCreatorHasErrors,
 } from './fixtures'
@@ -11,17 +12,30 @@ const touchTip = commandCreatorNoErrors(_touchTip)
 const touchTipWithErrors = commandCreatorHasErrors(_touchTip)
 
 describe('touchTip', () => {
-  const _robotFixtureArgs = {
-    sourcePlateType: 'trough-12row',
-    destPlateType: '96-flat',
-    fillTiprackTips: true,
-    fillPipetteTips: false,
-    tipracks: [300, 300],
-  }
-  const initialRobotState = createRobotState(_robotFixtureArgs)
-  const robotStateWithTip = createRobotState({
-    ..._robotFixtureArgs,
-    fillPipetteTips: true,
+  let invariantContext
+  let initialRobotState
+  let robotStateWithTip
+
+  beforeEach(() => {
+    // TODO IMMEDIATELY this invariantContext/initialRobotState/robotStateWithTip is repeated in aspirate.test.js -- make a fixture helper?
+    invariantContext = makeContext()
+    const makeStateArgs = {
+      invariantContext,
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      labwareLocations: {
+        tiprack1Id: { slot: '1' },
+        sourcePlateId: { slot: '2' },
+      },
+    }
+    initialRobotState = makeState({
+      ...makeStateArgs,
+      tiprackSetting: { tiprack1Id: true },
+    })
+    robotStateWithTip = makeState({
+      ...makeStateArgs,
+      tiprackSetting: { tiprack1Id: false },
+    })
+    robotStateWithTip.tipState.pipettes.p300SingleId = true
   })
 
   test('touchTip with tip', () => {
@@ -29,7 +43,7 @@ describe('touchTip', () => {
       pipette: 'p300SingleId',
       labware: 'sourcePlateId',
       well: 'A1',
-    })(robotStateWithTip)
+    })(invariantContext, robotStateWithTip)
 
     expect(result.commands).toEqual([
       {
@@ -51,7 +65,7 @@ describe('touchTip', () => {
       labware: 'sourcePlateId',
       well: 'A1',
       offsetFromBottomMm: 10,
-    })(robotStateWithTip)
+    })(invariantContext, robotStateWithTip)
 
     expect(result.commands).toEqual([
       {
@@ -73,7 +87,7 @@ describe('touchTip', () => {
       pipette: 'badPipette',
       labware: 'sourcePlateId',
       well: 'A1',
-    })(robotStateWithTip)
+    })(invariantContext, robotStateWithTip)
 
     expectTimelineError(result.errors, 'PIPETTE_DOES_NOT_EXIST')
   })
@@ -83,7 +97,7 @@ describe('touchTip', () => {
       pipette: 'p300SingleId',
       labware: 'sourcePlateId',
       well: 'A1',
-    })(initialRobotState)
+    })(invariantContext, initialRobotState)
 
     expect(result.errors).toEqual([
       {
