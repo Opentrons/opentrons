@@ -1,5 +1,5 @@
 // @flow
-import { tiprackWellNamesFlat } from '../../data'
+import { tiprackWellNamesFlat } from './data'
 import type {
   AspirateDispenseArgsV1 as AspirateDispenseArgs,
   CommandV1 as Command,

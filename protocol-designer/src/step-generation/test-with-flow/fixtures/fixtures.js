@@ -5,7 +5,7 @@ import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import { reduceCommandCreators } from '../../utils'
-import { tiprackWellNamesFlat } from '../../'
+import { tiprackWellNamesFlat } from './data'
 import type {
   TemporalPipette,
   PipetteEntity,

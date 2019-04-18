@@ -1,6 +1,4 @@
 // @flow
-
-// TODO IMMEDIATELY
 export const tiprackWellNamesFlat = [
   'A1',
   'B1',
