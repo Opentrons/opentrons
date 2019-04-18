@@ -14,6 +14,7 @@ jest.mock('../../labware-defs/utils') // TODO IMMEDIATELY move to somewhere more
 
 // TODO Ian 2019-04-12: create representative fixtures, don't use real defs
 const fixtureTiprack10ul = require('@opentrons/shared-data/definitions2/opentrons_96_tiprack_10_ul.json')
+const fixtureTiprack1000ul = require('@opentrons/shared-data/definitions2/opentrons_96_tiprack_1000_ul.json')
 
 const aspirate = commandCreatorNoErrors(_aspirate)
 const aspirateWithErrors = commandCreatorHasErrors(_aspirate)
@@ -131,7 +132,11 @@ describe('aspirate', () => {
 
   test('aspirate with volume > pipette max volume should throw error', () => {
     // NOTE: assigning p300 to a 1000uL tiprack is nonsense, just for this test
-    robotStateWithTip.pipettes['p300SingleId'].tiprackModel = 'tiprack-1000ul'
+    invariantContext.pipetteEntities['p300SingleId'].tiprackModel =
+      fixtureTiprack1000ul.otId
+    invariantContext.pipetteEntities[
+      'p300SingleId'
+    ].tiprackLabwareDef = fixtureTiprack1000ul
     const result = aspirateWithErrors({
       pipette: 'p300SingleId',
       volume: 301,

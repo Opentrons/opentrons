@@ -9,6 +9,9 @@ import { sortLabwareBySlot, getNextTiprack, _getNextTip } from '../'
 
 let invariantContext
 
+// TODO Ian 2019-04-12: create representative fixtures, don't use real defs
+const fixtureTiprack300ul = require('@opentrons/shared-data/definitions2/opentrons_96_tiprack_300_ul.json')
+
 beforeEach(() => {
   invariantContext = makeContext()
 })
@@ -44,26 +47,58 @@ describe('sortLabwareBySlot', () => {
 })
 
 describe('_getNextTip', () => {
+  const getNextTipHelper = (
+    channel: 1 | 8,
+    tiprackTipState: { [well: string]: boolean }
+  ) => {
+    const pipetteId = channel === 1 ? 'p300SingleId' : 'p300MultiId'
+    const tiprackId = 'testTiprack'
+    let _invariantContext = makeContext()
+    _invariantContext.labwareEntities[tiprackId] = {
+      id: tiprackId,
+      type: fixtureTiprack300ul.otId,
+      def: fixtureTiprack300ul,
+    }
+    let robotState = makeState({
+      invariantContext: _invariantContext,
+      labwareLocations: { [tiprackId]: { slot: '8' } },
+      pipetteLocations: {
+        p300SingleId: { mount: 'left' },
+        p300MultiId: { mount: 'right' },
+      },
+      tiprackSetting: { [tiprackId]: true },
+    })
+    robotState.tipState.tipracks[tiprackId] = tiprackTipState
+    return _getNextTip({
+      pipetteId,
+      tiprackId,
+      invariantContext: _invariantContext,
+      robotState,
+    })
+  }
   test('empty tiprack should return null', () => {
     const channels = [1, 8]
     channels.forEach(channel => {
-      const result = _getNextTip(channel, { ...getTiprackTipstate(false) })
+      const result = getNextTipHelper(channel, { ...getTiprackTipstate(false) })
       expect(result).toBe(null)
     })
   })
 
   test('full tiprack should start at A1', () => {
-    const result = _getNextTip(1, { ...getTiprackTipstate(true) })
+    const result = getNextTipHelper(1, { ...getTiprackTipstate(true) })
     expect(result).toEqual('A1')
   })
 
   test('missing A1, go to B1', () => {
-    const result = _getNextTip(1, { ...getTiprackTipstate(true), A1: false })
+    const result = getNextTipHelper(1, {
+      ...getTiprackTipstate(true),
+      A1: false,
+    })
     expect(result).toEqual('B1')
   })
 
   test('missing A1 and B1, go to C1', () => {
-    const result = _getNextTip(1, {
+    const result = getNextTipHelper(1, {
       ...getTiprackTipstate(true),
       A1: false,
       B1: false,
@@ -72,7 +107,7 @@ describe('_getNextTip', () => {
   })
 
   test('missing first column, go to A2', () => {
-    const result = _getNextTip(1, {
+    const result = getNextTipHelper(1, {
       ...getTiprackTipstate(true),
       ...getTipColumn(1, false),
     })
@@ -80,7 +115,7 @@ describe('_getNextTip', () => {
   })
 
   test('missing a few random tips, go to lowest col, then lowest row', () => {
-    const result = _getNextTip(1, {
+    const result = getNextTipHelper(1, {
       ...getTiprackTipstate(true),
       ...getTipColumn(1, false),
       ...getTipColumn(2, false),

@@ -1,8 +1,11 @@
 // @flow
 import cloneDeep from 'lodash/cloneDeep'
 import { getNextTiprack } from '../../robotStateSelectors'
-import { tiprackWellNamesByCol } from '../../data'
-import { insufficientTips, pipetteDoesNotExist } from '../../errorCreators'
+import {
+  insufficientTips,
+  labwareDoesNotExist,
+  pipetteDoesNotExist,
+} from '../../errorCreators'
 import type { CommandCreator, InvariantContext, RobotState } from '../../types'
 import dropTip from './dropTip'
 
@@ -58,6 +61,19 @@ const replaceTip = (pipetteId: string): CommandCreator => (
         pipetteDoesNotExist({ actionName: 'replaceTip', pipette: pipetteId }),
       ],
     }
+
+  const labwareDef =
+    invariantContext.labwareEntities[nextTiprack.tiprackId]?.def
+  if (!labwareDef) {
+    return {
+      errors: [
+        labwareDoesNotExist({
+          actionName: 'replaceTip',
+          labware: nextTiprack.tiprackId,
+        }),
+      ],
+    }
+  }
   // remove tips from tiprack
   if (pipetteSpec.channels === 1 && nextTiprack.well) {
     robotState.tipState.tipracks[nextTiprack.tiprackId][
@@ -65,7 +81,7 @@ const replaceTip = (pipetteId: string): CommandCreator => (
     ] = false
   }
   if (pipetteSpec.channels === 8) {
-    const allWells = tiprackWellNamesByCol.find(
+    const allWells = labwareDef.ordering.find(
       col => col[0] === nextTiprack.well
     )
     if (!allWells) {

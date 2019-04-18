@@ -1,10 +1,11 @@
 // @flow
 import assert from 'assert'
+// TODO: Ian 2019-04-18 move orderWells somewhere more general -- shared-data util?
+import { orderWells } from '../steplist/utils/orderWells.js'
 import min from 'lodash/min'
 import sortBy from 'lodash/sortBy'
-import type { Channels } from '@opentrons/components'
-import { getTiprackVolume, type PipetteNameSpecs } from '@opentrons/shared-data'
-import { tiprackWellNamesByCol, tiprackWellNamesFlat } from './'
+import { getTiprackVolume } from '@opentrons/shared-data'
+import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from './'
 
 // SELECTOR UTILITIES
@@ -54,26 +55,37 @@ export function getLabwareType(
   return labware.type
 }
 
-export function _getNextTip(
-  pipetteChannels: Channels,
-  tiprackWellsState: { [wellName: string]: boolean }
-): string | null {
-  /** Given a tiprack's wells state, return the well of the next available tip
-    NOTE: expects 96-well tiprack
-  */
-  const hasTiprack = wellName => tiprackWellsState[wellName]
+export function _getNextTip(args: {|
+  pipetteId: string,
+  tiprackId: string,
+  invariantContext: InvariantContext,
+  robotState: RobotState,
+|}): string | null {
+  // return the well name of the next available tip for a pipette (or null)
+  const { pipetteId, tiprackId, invariantContext, robotState } = args
+  const pipetteChannels =
+    invariantContext.pipetteEntities[pipetteId]?.spec?.channels
+  const tiprackWellsState = robotState.tipState.tipracks[tiprackId]
+  const tiprackDef = invariantContext.labwareEntities[tiprackId]?.def
+  const hasTip = wellName => tiprackWellsState[wellName]
+
+  const orderedWells = orderWells(tiprackDef.ordering, 't2b', 'l2r')
 
   if (pipetteChannels === 1) {
-    const well = tiprackWellNamesFlat.find(hasTiprack)
+    const well = orderedWells.find(hasTip)
     return well || null
   }
 
-  // Otherwise, pipetteChannels === 8.
-  // return first well in the column (for 96-well format, the 'A' row)
-  const fullColumn = tiprackWellNamesByCol.find(wellNamesInCol =>
-    wellNamesInCol.every(hasTiprack)
-  )
-  return fullColumn ? fullColumn[0] : null
+  if (pipetteChannels === 8) {
+    // Otherwise, pipetteChannels === 8.
+    // return first well in the column (for 96-well format, the 'A' row)
+    const tiprackColumns = tiprackDef.ordering
+    const fullColumn = tiprackColumns.find(col => col.every(hasTip))
+    return fullColumn ? fullColumn[0] : null
+  }
+
+  assert(false, `Pipette ${pipetteId} has no channels/spec, cannot _getNextTip`)
+  return null
 }
 
 type NextTiprack = {| tiprackId: string, well: string |} | null
@@ -111,19 +123,23 @@ export function getNextTiprack(
   )
 
   const firstAvailableTiprack = sortedTipracksIds.find(tiprackId =>
-    _getNextTip(
-      pipetteEntity.spec.channels,
-      robotState.tipState.tipracks[tiprackId]
-    )
+    _getNextTip({
+      pipetteId,
+      tiprackId,
+      invariantContext,
+      robotState,
+    })
   )
 
   // TODO Ian 2018-02-12: avoid calling _getNextTip twice
   const nextTip =
     firstAvailableTiprack &&
-    _getNextTip(
-      pipetteEntity.spec.channels,
-      robotState.tipState.tipracks[firstAvailableTiprack]
-    )
+    _getNextTip({
+      pipetteId,
+      tiprackId: firstAvailableTiprack,
+      invariantContext,
+      robotState,
+    })
 
   if (firstAvailableTiprack && nextTip) {
     return {

@@ -20,7 +20,7 @@ import type {
 /** Used to wrap command creators in tests, effectively casting their results
  **  to normal response or error response
  **/
-export const commandCreatorNoErrors = (command: *) => (commandArgs: *) => (
+export const commandCreatorNoErrors = (command: any) => (commandArgs: *) => (
   invariantContext: InvariantContext,
   robotState: RobotState
 ): CommandsAndRobotState => {
@@ -355,25 +355,19 @@ export function makeContext(): InvariantContext {
   return { labwareEntities, pipetteEntities }
 }
 
-type MakeStateArgs = {
+type MakeStateArgs = {|
   invariantContext: InvariantContext,
   labwareLocations: $PropertyType<RobotState, 'labware'>,
   pipetteLocations: $PropertyType<RobotState, 'pipettes'>,
   tiprackSetting: { [labwareId: string]: boolean },
-}
+|}
 export function makeState(args: MakeStateArgs): RobotState {
   const {
     invariantContext,
     labwareLocations,
     pipetteLocations,
     tiprackSetting,
-    ...mistakes
   } = args
-
-  // TODO IMMEDIATELY remove this check once flow is typing `makeState` again :(
-  if (Object.keys(mistakes).length > 0) {
-    throw new Error(`bad input to makeState: ${JSON.stringify(mistakes)}`)
-  }
   // NOTE: pipettes have no tips by default
   return {
     labware: labwareLocations,
