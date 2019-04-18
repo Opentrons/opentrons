@@ -8,9 +8,9 @@ import SettingsApp from './SettingsApp'
 
 export { default as SettingsSidebar } from './SettingsSidebar'
 
-type SP = { currentPage: Page }
+type Props = { currentPage: Page }
 
-const SettingsPage = (props: SP) => {
+const SettingsPage = (props: Props) => {
   switch (props.currentPage) {
     case 'settings-features': {
       // TODO: BC 2018-09-01 when we have feature flags put them here
@@ -22,8 +22,8 @@ const SettingsPage = (props: SP) => {
   }
 }
 
-const STP = (state: BaseState): SP => ({
+const STP = (state: BaseState): $Exact<Props> => ({
   currentPage: selectors.getCurrentPage(state),
 })
 
-export default connect(STP)(SettingsPage)
+export default connect<Props, {||}, $Exact<Props>, _, _, _>(STP)(SettingsPage)

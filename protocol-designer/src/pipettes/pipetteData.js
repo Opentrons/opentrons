@@ -1,6 +1,5 @@
 // @flow
 import assert from 'assert'
-import compact from 'lodash/compact'
 import { getPipetteNameSpecs, getTiprackVolume } from '@opentrons/shared-data'
 import type { PipetteEntity } from '../step-forms/types'
 
@@ -16,12 +15,12 @@ const supportedPipetteNames = [
 
 // TODO: should a version of pipetteOptions be moved to shared-data,
 // and used for both PD and Run App?
-export const pipetteOptions = compact(
-  supportedPipetteNames.map((name: string) => {
+export const pipetteOptions = supportedPipetteNames
+  .map((name: string) => {
     const pipette = getPipetteNameSpecs(name)
     return pipette ? { name: pipette.displayName, value: pipette.name } : null
   })
-)
+  .filter(Boolean)
 
 // NOTE: this is similar to getPipetteWithTipMaxVol, the fns could potentially
 // be merged once multiple tiprack types per pipette is supported

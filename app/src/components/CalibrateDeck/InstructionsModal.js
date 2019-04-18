@@ -5,8 +5,6 @@ import { push } from 'react-router-redux'
 import { Link } from 'react-router-dom'
 import capitalize from 'lodash/capitalize'
 
-import type { CalibrateDeckStartedProps } from './types'
-
 import {
   restartRobotServer,
   deckCalibrationCommand as dcCommand,
@@ -17,17 +15,18 @@ import { ModalPage, SpinnerModalPage } from '@opentrons/components'
 import AttachTip from './AttachTip'
 import ConfirmPosition from './ConfirmPosition'
 
-type OP = CalibrateDeckStartedProps
+import type { Dispatch } from '../../types'
+import type { CalibrateDeckStartedProps } from './types'
 
-type DP = {|
-  proceed: () => mixed,
-|}
+type OP = $Exact<CalibrateDeckStartedProps>
 
-type Props = { ...$Exact<OP>, ...DP }
+type DP = {| proceed: () => mixed |}
+
+type Props = { ...OP, ...DP }
 
 const TITLE = 'Deck Calibration'
 
-export default connect(
+export default connect<Props, OP, _, _, _, _>(
   null,
   mapDispatchToProps
 )(InstructionsModal)

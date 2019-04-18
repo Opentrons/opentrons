@@ -37,6 +37,7 @@ import type {
   StepItemData,
   StepFormContextualState,
 } from '../../steplist/types'
+import type { CommandCreatorArgs } from '../../step-generation/types'
 import type {
   InitialDeckSetup,
   NormalizedLabwareById,
@@ -345,7 +346,13 @@ const getStepFormWithId = (state: BaseState, props: { stepId: StepIdType }) => {
 }
 
 export const makeGetArgsAndErrorsWithId = () => {
-  return createSelector(
+  return createSelector<
+    BaseState,
+    { stepId: StepIdType },
+    { stepArgs: CommandCreatorArgs | null, errors?: StepFormAndFieldErrors },
+    _,
+    _
+  >(
     getStepFormWithId,
     getHydrationContext,
     (stepForm, contextualState) => {
@@ -361,6 +368,7 @@ export const makeGetArgsAndErrorsWithId = () => {
 // TODO: Brian&Ian 2019-04-02 this is TEMPORARY, should be removed once legacySteps reducer is removed
 // only need it because stepType should exist evergreen outside of legacySteps but doesn't yet
 export const makeGetStepWithId = () => {
+  // $FlowFixMe: selector is untyped. hiding error due to TODO above
   return createSelector(
     getStepFormWithId,
     getLegacyStepWithId,
@@ -404,7 +412,7 @@ export const getArgsAndErrorsByStepId: Selector<{
 
 // TODO: BC&IL 2019-04-02 this is being recomputed every time any field in unsaved forms is changed
 // this should only be computed once when a form is opened
-export const getIsNewStepForm = createSelector(
+export const getIsNewStepForm: Selector<boolean> = createSelector(
   getUnsavedForm,
   getSavedStepForms,
   (formData, savedForms) =>

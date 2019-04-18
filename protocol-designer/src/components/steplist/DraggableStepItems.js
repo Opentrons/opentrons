@@ -20,19 +20,23 @@ const DND_TYPES: { STEP_ITEM: 'STEP_ITEM' } = {
   STEP_ITEM: 'STEP_ITEM',
 }
 
-type DragDropStepItemProps = React.ElementProps<typeof StepItem> & {
+type DragDropStepItemProps = {|
+  ...$Exact<React.ElementProps<typeof StepItem>>,
   connectDragSource: mixed => React.Element<any>,
   connectDropTarget: mixed => React.Element<any>,
   stepId: StepIdType,
   stepNumber: number,
+  isDragging: boolean,
   findStepIndex: StepIdType => number,
   onDrag: () => void,
   moveStep: (StepIdType, number) => void,
-}
+|}
+
 const DragSourceStepItem = (props: DragDropStepItemProps) =>
   props.connectDragSource(
     props.connectDropTarget(
       <div style={{ opacity: props.isDragging ? 0.3 : 1 }}>
+        {/* $FlowFixMe: (mc, 2019-04-18): connected components have exact props, which makes flow complain here */}
         <StepItem {...props} />
       </div>
     )
@@ -151,14 +155,18 @@ class StepItems extends React.Component<StepItemsProps, StepItemsState> {
 
 const NAV_OFFSET = 64
 
-type StepDragPreviewSP = { stepType: ?StepType, stepName: ?string }
-type StepDragPreviewProps = {
+type StepDragPreviewSP = {| stepType: ?StepType, stepName: ?string |}
+
+type StepDragPreviewOP = {|
   currentOffset?: { y: number, x: number },
   itemType: string,
   isDragging: boolean,
   item: { stepId: StepIdType },
-}
-const StepDragPreview = (props: StepDragPreviewProps & StepDragPreviewSP) => {
+|}
+
+type StepDragPreviewProps = {| ...StepDragPreviewOP, ...StepDragPreviewSP |}
+
+const StepDragPreview = (props: StepDragPreviewProps) => {
   const { itemType, isDragging, currentOffset, stepType, stepName } = props
   if (
     itemType !== DND_TYPES.STEP_ITEM ||

@@ -63,14 +63,18 @@ export function buildRequestMaker<Request: ?{}>(
   path: string
 ): RequestMaker<Request> {
   return (robot, request = null) => dispatch => {
+    // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
     dispatch(apiRequest(robot, path, request))
 
-    return client(robot, method, path, request)
-      .then(
-        response => apiSuccess(robot, path, response),
-        error => apiFailure(robot, path, error)
-      )
-      .then(dispatch)
+    return (
+      client(robot, method, path, request)
+        .then(
+          response => apiSuccess(robot, path, response),
+          error => apiFailure(robot, path, error)
+        )
+        // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
+        .then(dispatch)
+    )
   }
 }
 

@@ -9,14 +9,14 @@ import styles from './styles.css'
 
 import type { SessionStatus } from '../../robot'
 
-type Props = {
+export type CommandListProps = {|
   commands: Array<any>,
   sessionStatus: SessionStatus,
   showSpinner: boolean,
   onResetClick: () => mixed,
-}
+|}
 
-export default class CommandList extends React.Component<Props> {
+export default class CommandList extends React.Component<CommandListProps> {
   componentDidUpdate() {
     // TODO(mc, 2018-07-24): use new refs
     if (this.refs.ensureVisible) this.refs.ensureVisible.scrollIntoView(true) // eslint-disable-line react/no-string-refs

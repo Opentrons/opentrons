@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 
@@ -19,7 +19,9 @@ type Props = {
 
 const TITLE = 'Pipette Calibration'
 
-export default withRouter(connect(mapStateToProps)(PipetteList))
+export default withRouter<{||}>(
+  connect<Props, _, _, _, _, _>(mapStateToProps)(PipetteList)
+)
 
 function PipetteList(props: Props) {
   const { pipettes, isRunning } = props
@@ -38,7 +40,7 @@ function PipetteList(props: Props) {
   )
 }
 
-function mapStateToProps(state): Props {
+function mapStateToProps(state): $Exact<Props> {
   return {
     pipettes: robotSelectors.getPipettes(state),
     isRunning: robotSelectors.getIsRunning(state),

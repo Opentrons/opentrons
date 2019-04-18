@@ -19,26 +19,27 @@ import FilePipettesModal from '../FilePipettesModal'
 import type { BaseState, ThunkDispatch } from '../../../types'
 import type { PipetteOnDeck, NormalizedPipette } from '../../../step-forms'
 
-export default connect(
+type Props = ElementProps<typeof FilePipettesModal>
+
+type OP = {|
+  useProtocolFields: $PropertyType<Props, 'useProtocolFields'>,
+|}
+
+type SP = {|
+  hideModal: $PropertyType<Props, 'hideModal'>,
+  _hasUnsavedChanges: ?boolean,
+|}
+
+type DP = {|
+  onCancel: () => mixed,
+  _createNewProtocol: $PropertyType<Props, 'onSave'>,
+|}
+
+export default connect<Props, OP, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps,
   mergeProps
 )(FilePipettesModal)
-
-type Props = ElementProps<typeof FilePipettesModal>
-
-type OP = {
-  useProtocolFields: $PropertyType<Props, 'useProtocolFields'>,
-}
-
-type SP = {
-  hideModal: $PropertyType<Props, 'hideModal'>,
-  _hasUnsavedChanges: ?boolean,
-}
-type DP = {
-  onCancel: () => mixed,
-  _createNewProtocol: $PropertyType<Props, 'onSave'>,
-}
 
 function mapStateToProps(state: BaseState): SP {
   return {

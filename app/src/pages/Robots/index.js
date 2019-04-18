@@ -2,7 +2,7 @@
 // connect and configure robots page
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, Route, Switch, Redirect, type Match } from 'react-router'
+import { withRouter, Route, Switch, Redirect } from 'react-router'
 import find from 'lodash/find'
 
 import createLogger from '../../logger'
@@ -21,27 +21,25 @@ import Page from '../../components/Page'
 import RobotSettings from './RobotSettings'
 import InstrumentSettings from './InstrumentSettings'
 
+import type { ContextRouter } from 'react-router'
 import type { State } from '../../types'
 import type { ViewableRobot } from '../../discovery'
 import type { ShellUpdateState } from '../../shell'
 
-type SP = {
+type OP = ContextRouter
+
+type SP = {|
   robot: ?ViewableRobot,
   connectedName: ?string,
   appUpdate: ShellUpdateState,
-}
+|}
 
-type OP = { match: Match }
-
-type Props = SP & OP
+type Props = { ...OP, ...SP }
 
 const log = createLogger(__filename)
 
-export default withRouter(
-  connect(
-    mapStateToProps,
-    null
-  )(Robots)
+export default withRouter<{||}>(
+  connect<Props, ContextRouter, SP, _, _, _>(mapStateToProps)(Robots)
 )
 
 function Robots(props: Props) {
@@ -96,11 +94,7 @@ function Robots(props: Props) {
 }
 
 function mapStateToProps(state: State, ownProps: OP): SP {
-  const {
-    match: {
-      params: { name },
-    },
-  } = ownProps
+  const { name } = ownProps.match.params
   const robots: Array<ViewableRobot> = getConnectableRobots(state).concat(
     getReachableRobots(state)
   )

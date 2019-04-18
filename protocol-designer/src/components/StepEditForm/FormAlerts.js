@@ -20,16 +20,16 @@ import type { BaseState } from '../../types'
 
 type Props = React.ElementProps<typeof Alerts>
 
-type SP = {
+type SP = {|
   errors: $PropertyType<Props, 'errors'>,
   warnings: $PropertyType<Props, 'warnings'>,
   stepId: ?(StepIdType | string),
-}
+|}
 
-type OP = {
+type OP = {|
   focusedField: ?StepFieldName,
   dirtyFields: Array<StepFieldName>,
-}
+|}
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const { focusedField, dirtyFields } = ownProps
@@ -75,7 +75,7 @@ const mergeProps = (
   }
 }
 
-export default connect(
+export default connect<Props, OP, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps

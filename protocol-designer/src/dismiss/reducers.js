@@ -4,7 +4,7 @@ import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
 import type { DismissFormWarning, DismissTimelineWarning } from './actions'
 import { getPDMetadata } from '../file-types'
-import type { BaseState } from '../types'
+import type { BaseState, Action } from '../types'
 import type { LoadFileAction } from '../load-file'
 import type { DeleteStepAction } from '../steplist/actions'
 import type { StepIdType } from '../form-types'
@@ -18,7 +18,7 @@ export type DismissedWarningState = {
   form: DismissedWarningsAllSteps,
   timeline: DismissedWarningsAllSteps,
 }
-const dismissedWarnings = handleActions(
+const dismissedWarnings = handleActions<DismissedWarningState, *>(
   {
     DISMISS_FORM_WARNING: (
       state: DismissedWarningState,
@@ -83,7 +83,7 @@ export type RootState = {
   dismissedWarnings: DismissedWarningState,
 }
 
-const rootReducer = combineReducers(_allReducers)
+const rootReducer = combineReducers<_, Action>(_allReducers)
 
 export default rootReducer
 

@@ -31,11 +31,12 @@ const STEP_FORM_MAP: { [StepType]: * } = {
   moveLiquid: MoveLiquidForm,
 }
 
-type SP = {
+type SP = {|
   formData?: ?FormData,
   isNewStep?: boolean,
-}
-type DP = { deleteStep: StepIdType => mixed }
+|}
+
+type DP = {| deleteStep: StepIdType => mixed |}
 
 type StepEditFormState = {
   showConfirmDeleteModal: boolean,
@@ -44,7 +45,7 @@ type StepEditFormState = {
   dirtyFields: Array<StepFieldName>,
 }
 
-type Props = SP & DP
+type Props = { ...SP, ...DP }
 
 // TODO: type fieldNames, don't use `any`
 const getDirtyFields = (
@@ -85,7 +86,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
     }
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Props) {
     // NOTE: formData is sometimes undefined between steps
     if (get(this.props, 'formData.id') !== get(prevProps, 'formData.id')) {
       const { isNewStep, formData } = this.props
@@ -149,7 +150,7 @@ class StepEditForm extends React.Component<Props, StepEditFormState> {
         )}
         {this.state.showMoreOptionsModal && (
           <MoreOptionsModal
-            formData={this.props.formData}
+            formData={formData}
             close={this.toggleMoreOptionsModal}
           />
         )}
@@ -187,7 +188,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
   deleteStep: (stepId: StepIdType) => dispatch(actions.deleteStep(stepId)),
 })
 
-export default connect(
+export default connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(StepEditForm)

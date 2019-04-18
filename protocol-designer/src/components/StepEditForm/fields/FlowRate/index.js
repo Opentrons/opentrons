@@ -8,23 +8,24 @@ import { getDisabledFields } from '../../../../steplist/formLevel'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { BaseState, ThunkDispatch } from '../../../../types'
 
-type Props = React.ElementProps<typeof FlowRateInput> & {
+type Props = {
+  ...$Exact<React.ElementProps<typeof FlowRateInput>>,
   innerKey: string,
 }
 
-type OP = {
+type OP = {|
   name: StepFieldName,
   pipetteFieldName: StepFieldName,
   flowRateType: $PropertyType<Props, 'flowRateType'>,
   label?: $PropertyType<Props, 'label'>,
   className?: string,
-}
+|}
 
-type DP = {
+type DP = {|
   updateValue: $PropertyType<Props, 'updateValue'>,
-}
+|}
 
-type SP = $Diff<Props, { ...DP, ...OP }>
+type SP = $Rest<$Exact<Props>, {| ...OP, ...DP |}>
 
 // Add a key to force re-constructing component when values change
 function FlowRateInputWithKey(props: Props) {
@@ -63,8 +64,6 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
     defaultFlowRate,
     disabled: formData ? getDisabledFields(formData).has(name) : false,
     formFlowRate,
-    flowRateType,
-    label: ownProps.label,
     minFlowRate: 0,
     // NOTE: since we only have rule-of-thumb, max is entire volume in 1 second
     maxFlowRate: pipette ? pipette.spec.maxVolume : Infinity,
@@ -85,7 +84,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>, ownProps: OP): DP {
   }
 }
 
-export default connect(
+export default connect<Props, OP, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(FlowRateInputWithKey)

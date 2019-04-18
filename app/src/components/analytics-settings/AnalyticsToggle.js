@@ -6,17 +6,15 @@ import type { State, Dispatch } from '../../types'
 import { toggleAnalyticsOptedIn, getAnalyticsOptedIn } from '../../analytics'
 import { LabeledToggle } from '../controls'
 
-type SP = {
-  optedIn: boolean,
-}
+type OP = {||}
 
-type DP = {
-  toggleOptedIn: () => mixed,
-}
+type SP = {| optedIn: boolean |}
 
-type Props = SP & DP
+type DP = {| toggleOptedIn: () => mixed |}
 
-export default connect(
+type Props = { ...SP, ...DP }
+
+export default connect<Props, OP, _, _, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(AnalyticsToggle)

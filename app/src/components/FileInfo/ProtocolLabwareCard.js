@@ -17,7 +17,9 @@ type Props = {
 
 const TITLE = 'Required Labware'
 
-export default connect(mapStateToProps)(ProtocolLabwareCard)
+export default connect<Props, {||}, _, _, _, _>(mapStateToProps)(
+  ProtocolLabwareCard
+)
 
 function ProtocolLabwareCard(props: Props) {
   const { labware } = props
@@ -38,7 +40,7 @@ function ProtocolLabwareCard(props: Props) {
     </InfoSection>
   )
 }
-function mapStateToProps(state: State): Props {
+function mapStateToProps(state: State): $Exact<Props> {
   return {
     labware: robotSelectors.getLabware(state),
   }

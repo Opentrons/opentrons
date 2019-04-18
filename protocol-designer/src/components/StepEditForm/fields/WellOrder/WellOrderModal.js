@@ -15,7 +15,7 @@ import {
 import modalStyles from '../../../modals/modal.css'
 import { actions } from '../../../../steplist'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import type { BaseState } from '../../../../types'
+import type { BaseState, ThunkDispatch } from '../../../../types'
 import type { WellOrderOption } from '../../../../form-types'
 
 import WellOrderViz from './WellOrderViz'
@@ -31,24 +31,26 @@ const WELL_ORDER_VALUES: Array<WellOrderOption> = [
   ...HORIZONTAL_VALUES,
 ]
 
-type SP = {
+type SP = {|
   initialFirstValue: ?WellOrderOption,
   initialSecondValue: ?WellOrderOption,
-}
-type DP = {
+|}
+
+type DP = {|
   updateValues: (
     firstValue: ?WellOrderOption,
     secondValue: ?WellOrderOption
   ) => mixed,
-}
+|}
 
-type OP = {
+type OP = {|
   isOpen: boolean,
   closeModal: () => mixed,
   prefix: 'aspirate' | 'dispense' | 'mix',
-}
+|}
 
-type Props = OP & SP & DP
+type Props = {| ...OP, ...SP, ...DP |}
+
 type State = {
   firstValue: ?WellOrderOption,
   secondValue: ?WellOrderOption,
@@ -208,7 +210,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-const mapDTP = (dispatch: Dispatch, ownProps: OP): DP => ({
+const mapDTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   updateValues: (firstValue, secondValue) => {
     dispatch(
       actions.changeFormInput({
@@ -221,7 +223,7 @@ const mapDTP = (dispatch: Dispatch, ownProps: OP): DP => ({
   },
 })
 
-export default connect(
+export default connect<Props, OP, SP, DP, _, _>(
   mapSTP,
   mapDTP
 )(WellOrderModal)

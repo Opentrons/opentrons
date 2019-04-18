@@ -25,4 +25,5 @@ export type RootState = {
   hasOptedIn: OptInState,
 }
 
-export const rootReducer = combineReducers(_allReducers)
+// TODO(mc, 2019-04-17): PD should have a "global" Action type
+export const rootReducer = combineReducers<_, {}>(_allReducers)

@@ -17,6 +17,7 @@ type FieldRenderProps = {
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
   disabled: boolean,
 }
+
 type OP = {
   name: StepFieldName,
   render: FieldRenderProps => React.Node, // TODO: type StepField
@@ -24,9 +25,12 @@ type OP = {
   focusedField?: StepFieldName,
   tooltipComponent?: React.Node,
 }
-type SP = { value?: ?mixed, stepType: ?string, disabled: boolean }
-type DP = { updateValue: (?mixed) => void }
-type StepFieldProps = OP & SP & DP
+
+type SP = {| value?: ?mixed, stepType: ?string, disabled: boolean |}
+
+type DP = {| updateValue: (?mixed) => void |}
+
+type StepFieldProps = { ...$Exact<OP>, ...SP, ...DP }
 
 const FieldConnector = (props: StepFieldProps) => {
   const {
@@ -94,7 +98,14 @@ const DTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   },
 })
 
-const ConnectedFieldConnector = connect(
+const ConnectedFieldConnector = connect<
+  StepFieldProps,
+  $Exact<OP>,
+  SP,
+  DP,
+  _,
+  _
+>(
   STP,
   DTP
 )(FieldConnector)

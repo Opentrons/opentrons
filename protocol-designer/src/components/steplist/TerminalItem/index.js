@@ -13,16 +13,16 @@ export { default as TerminalItemLink } from './TerminalItemLink'
 
 type Props = React.ElementProps<typeof PDTitledList>
 
-type OP = {
+type OP = {|
   id: TerminalItemId,
   title: string,
   children?: React.Node,
-}
+|}
 
-type SP = {
+type SP = {|
   hovered: $ElementType<Props, 'hovered'>,
   selected: $ElementType<Props, 'selected'>,
-}
+|}
 
 function mapStateToProps(state: BaseState, ownProps: OP): SP {
   const { id } = ownProps
@@ -52,7 +52,7 @@ function mergeProps(
   }
 }
 
-export default connect(
+export default connect<Props, OP, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps

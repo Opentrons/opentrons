@@ -1,6 +1,7 @@
 // @flow
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
+import type { Action } from '../types'
 import type { CreateCustomLabwareDef } from './actions'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 type CustomDefs = { [defId: string]: LabwareDefinition2 }
@@ -26,4 +27,4 @@ const _allReducers = {
   customDefs,
 }
 
-export const rootReducer = combineReducers(_allReducers)
+export const rootReducer = combineReducers<_, Action>(_allReducers)

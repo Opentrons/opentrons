@@ -11,9 +11,9 @@ import LiquidsPage from '../components/LiquidsPage'
 import type { BaseState } from '../types'
 import { selectors, type Page } from '../navigation'
 
-export default connect(mapStateToProps)(MainPanel)
-
 type Props = { page: Page }
+
+export default connect<Props, {||}, _, _, _, _>(mapStateToProps)(MainPanel)
 
 function MainPanel(props: Props) {
   const { page } = props
@@ -31,7 +31,7 @@ function MainPanel(props: Props) {
   }
 }
 
-function mapStateToProps(state: BaseState): Props {
+function mapStateToProps(state: BaseState): $Exact<Props> {
   return {
     page: selectors.getCurrentPage(state),
   }

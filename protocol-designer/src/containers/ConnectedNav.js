@@ -9,11 +9,14 @@ import i18n from '../localization'
 import { type Page, actions, selectors } from '../navigation'
 import { selectors as fileSelectors } from '../file-data'
 
-type Props = {
+type SP = {|
   currentPage: Page,
   currentProtocolExists: boolean,
-  handleClick: Page => (e: ?SyntheticEvent<>) => void,
-}
+|}
+
+type DP = {| handleClick: Page => (e: ?SyntheticEvent<>) => void |}
+
+type Props = {| ...SP, ...DP |}
 
 function Nav(props: Props) {
   const noCurrentProtocol = !props.currentProtocolExists
@@ -67,21 +70,22 @@ function Nav(props: Props) {
   )
 }
 
-function mapStateToProps(state: BaseState) {
+function mapStateToProps(state: BaseState): SP {
   return {
     currentPage: selectors.getCurrentPage(state),
     currentProtocolExists: fileSelectors.getCurrentProtocolExists(state),
   }
 }
 
-function mapDispatchToProps(dispatch: ThunkDispatch<*>) {
+function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   return {
-    handleClick: (pageName: Page) => () =>
-      dispatch(actions.navigateToPage(pageName)),
+    handleClick: (pageName: Page) => () => {
+      dispatch(actions.navigateToPage(pageName))
+    },
   }
 }
 
-export default connect(
+export default connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(Nav)

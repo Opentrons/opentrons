@@ -4,10 +4,10 @@ import { handleActions } from 'redux-actions'
 import type { ActionType } from 'redux-actions'
 
 import { navigateToPage, toggleNewProtocolModal } from '../actions'
-import type { BaseState } from '../../types'
+import type { BaseState, Action } from '../../types'
 import type { Page } from '../types'
 
-const page = handleActions(
+const page = handleActions<Page, *>(
   {
     LOAD_FILE: (): Page => 'file-detail',
     CREATE_NEW_PROTOCOL: (): Page => 'file-detail',
@@ -17,7 +17,7 @@ const page = handleActions(
   'file-splash'
 )
 
-const newProtocolModal = handleActions(
+const newProtocolModal = handleActions<boolean, *>(
   {
     TOGGLE_NEW_PROTOCOL_MODAL: (
       state,
@@ -38,7 +38,7 @@ export type RootState = {
   newProtocolModal: boolean,
 }
 
-const rootReducer = combineReducers(_allReducers)
+const rootReducer = combineReducers<_, Action>(_allReducers)
 
 export default rootReducer
 

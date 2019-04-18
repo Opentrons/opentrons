@@ -43,11 +43,7 @@ class MixForm extends React.Component<Props, State> {
           </span>
         </div>
         <div className={styles.form_row}>
-          <PipetteField
-            className={styles.large_field}
-            name="pipette"
-            {...focusHandlers}
-          />
+          <PipetteField name="pipette" {...focusHandlers} />
           <VolumeField
             label={i18n.t('form.step_edit_form.mixVolumeLabel')}
             focusHandlers={focusHandlers}
@@ -160,6 +156,7 @@ class MixForm extends React.Component<Props, State> {
         </div>
         <div className={styles.section_wrapper}>
           <div className={styles.form_row}>
+            {/* $FlowFixMe: (mc, 2019-04-18): is stepType needed? */}
             <ChangeTipField stepType="mix" name="changeTip" />
           </div>
         </div>

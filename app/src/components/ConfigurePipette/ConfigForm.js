@@ -59,8 +59,9 @@ export default class ConfigForm extends React.Component<Props> {
     })
   }
 
-  getVisibleFields = () => {
+  getVisibleFields = (): PipetteConfigFields => {
     if (this.props.showHiddenFields) return this.props.pipetteConfig.fields
+
     return pick(this.props.pipetteConfig.fields, [
       ...PLUNGER_KEYS,
       ...POWER_KEYS,
@@ -68,8 +69,8 @@ export default class ConfigForm extends React.Component<Props> {
     ])
   }
 
-  getUnknownKeys = () => {
-    return keys(
+  getUnknownKeys = (): Array<string> => {
+    return keys<string>(
       omit(this.props.pipetteConfig.fields, [
         ...PLUNGER_KEYS,
         ...POWER_KEYS,

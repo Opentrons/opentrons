@@ -13,17 +13,20 @@ import { getConnectedRobotUpgradeAvailable } from '../../http-api-client'
 import { getAvailableShellUpdate } from '../../shell'
 import { NavButton } from '@opentrons/components'
 
+import type { ContextRouter } from 'react-router'
 import type { State } from '../../types'
 
-type OP = {
-  name: string,
-}
+type WithRouterOP = {| name: string |}
+
+type OP = {| ...ContextRouter, ...WithRouterOP |}
 
 type Props = React.ElementProps<typeof NavButton>
 
-export default withRouter(connect(mapStateToProps)(NavButton))
+export default withRouter<WithRouterOP>(
+  connect<Props, OP, _, _, _, _>(mapStateToProps)(NavButton)
+)
 
-function mapStateToProps(state: State, ownProps: OP): Props {
+function mapStateToProps(state: State, ownProps: OP): $Exact<Props> {
   const { name } = ownProps
   const isProtocolLoaded = robotSelectors.getSessionIsLoaded(state)
   const isProtocolRunning = robotSelectors.getIsRunning(state)

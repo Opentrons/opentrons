@@ -21,7 +21,9 @@ import { discoveryReducer } from './discovery'
 // protocol state
 import { protocolReducer } from './protocol'
 
-export default combineReducers({
+import type { Action } from './types'
+
+export default combineReducers<_, Action>({
   robot: robotReducer,
   api: httpApiReducer,
   config: configReducer,

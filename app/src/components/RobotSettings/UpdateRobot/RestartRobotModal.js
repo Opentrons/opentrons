@@ -12,16 +12,13 @@ import { AlertModal } from '@opentrons/components'
 import type { Dispatch } from '../../../types'
 import type { ViewableRobot } from '../../../discovery'
 
-type OP = { robot: ViewableRobot }
+type OP = {| robot: ViewableRobot |}
 
-type DP = {|
-  restart: () => mixed,
-  close: () => mixed,
-|}
+type DP = {| restart: () => mixed, close: () => mixed |}
 
-type Props = { ...$Exact<OP>, ...DP }
+type Props = { ...OP, ...DP }
 
-export default connect(
+export default connect<Props, OP, {||}, DP, _, _>(
   null,
   mapDispatchToProps
 )(RestartRobotModal)

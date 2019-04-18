@@ -10,11 +10,9 @@ import { StepList } from '../components/steplist'
 
 type Props = React.ElementProps<typeof StepList>
 
-type SP = {
-  orderedStepIds: $PropertyType<Props, 'orderedStepIds'>,
-}
+type SP = {| orderedStepIds: $PropertyType<Props, 'orderedStepIds'> |}
 
-type DP = $Diff<Props, SP>
+type DP = $Diff<$Exact<Props>, SP>
 
 function mapStateToProps(state: BaseState): SP {
   return {
@@ -33,7 +31,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export default connect(
+export default connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(StepList)

@@ -23,23 +23,25 @@ import { selectWells, deselectWells } from '../well-selection/actions'
 import type { BaseState } from '../types'
 import type { WellIngredientNames } from '../steplist'
 
-type SP = {
+type SP = {|
   selectedWells: Wells,
   wellContents: ContentsByWell,
   containerType: string,
   liquidNamesById: WellIngredientNames,
-}
-type DP = {
+|}
+
+type DP = {|
   selectWells: Wells => mixed,
   deselectWells: Wells => mixed,
-}
-type Props = SP & DP
+|}
+
+type Props = { ...SP, ...DP }
 
 type State = { highlightedWells: Wells }
 
 class LiquidPlacementModal extends React.Component<Props, State> {
   state = { highlightedWells: {} }
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
     this.state = { highlightedWells: {} }
   }
@@ -113,7 +115,7 @@ const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
   selectWells: wells => dispatch(selectWells(wells)),
 })
 
-export default connect(
+export default connect<Props, {||}, _, _, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(LiquidPlacementModal)

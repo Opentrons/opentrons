@@ -11,7 +11,8 @@ import type { FormData, PathOption } from '../../../../form-types'
 import type { BaseState } from '../../../../types'
 
 type Props = ElementProps<typeof Path>
-type SP = { disabledPathMap: $PropertyType<Props, 'disabledPathMap'> }
+type SP = {| disabledPathMap: $PropertyType<Props, 'disabledPathMap'> |}
+type OP = $Diff<$Exact<Props>, SP>
 
 function getDisabledPathMap(
   rawForm: ?FormData,
@@ -97,4 +98,4 @@ function mapSTP(state: BaseState): SP {
   }
 }
 
-export default connect(mapSTP)(Path)
+export default connect<Props, OP, SP, _, _, _>(mapSTP)(Path)

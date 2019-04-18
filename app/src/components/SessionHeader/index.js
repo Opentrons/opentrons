@@ -9,13 +9,13 @@ import type { State } from '../../types'
 
 type Props = { sessionName: ?string }
 
-export default connect(mapStateToProps)(SessionHeader)
+export default connect<Props, {||}, _, _, _, _>(mapStateToProps)(SessionHeader)
 
 function SessionHeader(props: Props) {
   return <Link to="/upload">{props.sessionName}</Link>
 }
 
-function mapStateToProps(state: State): Props {
+function mapStateToProps(state: State): $Exact<Props> {
   return {
     sessionName: getProtocolFilename(state),
   }

@@ -112,7 +112,7 @@ const getAuthor: StringGetter = getter('metadata.author')
 const getDesc: StringGetter = getter('metadata.description')
 const getCreated: NumberGetter = getter('metadata.created')
 const getLastModified: NumberGetter = getter('metadata.last-modified')
-const getSource: NumberGetter = getter('metadata.source')
+const getSource: StringGetter = getter('metadata.source')
 const getAppName: StringGetter = getter('designer-application.application-name')
 const getAppVersion: StringGetter = getter(
   'designer-application.application-version'

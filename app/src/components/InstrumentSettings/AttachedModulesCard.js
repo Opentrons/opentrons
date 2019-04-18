@@ -12,9 +12,7 @@ import type { State, Dispatch } from '../../types'
 import type { Module } from '../../http-api-client'
 import type { Robot } from '../../discovery'
 
-type OP = {
-  robot: Robot,
-}
+type OP = {| robot: Robot |}
 
 type SP = {|
   modules: ?Array<Module>,
@@ -24,13 +22,13 @@ type SP = {|
 
 type DP = {| refresh: () => mixed |}
 
-type Props = { ...$Exact<OP>, ...SP, ...DP }
+type Props = { ...OP, ...SP, ...DP }
 
 const TITLE = 'Modules'
 
-export default connect(
-  makeSTP,
-  DTP
+export default connect<Props, OP, SP, DP, State, Dispatch>(
+  makeMapStateToProps,
+  mapDispatchToProps
 )(AttachedModulesCard)
 
 function AttachedModulesCard(props: Props) {
@@ -47,7 +45,7 @@ function AttachedModulesCard(props: Props) {
   )
 }
 
-function makeSTP(): (state: State, ownProps: OP) => SP {
+function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
   const getRobotModules = makeGetRobotModules()
 
   return (state, ownProps) => {
@@ -63,7 +61,7 @@ function makeSTP(): (state: State, ownProps: OP) => SP {
   }
 }
 
-function DTP(dispatch: Dispatch, ownProps: OP): DP {
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   return {
     refresh: () => dispatch(fetchModules(ownProps.robot)),
   }

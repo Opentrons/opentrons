@@ -16,25 +16,20 @@ import { CardContentHalf } from '../layout'
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery'
 
-type OwnProps = { robot: ViewableRobot }
+type OP = {| robot: ViewableRobot |}
 
-type StateProps = {|
-  status: string,
-  connectButtonText: string,
-|}
+type SP = {| status: string, connectButtonText: string |}
 
-type DispatchProps = {|
-  onClick: () => mixed,
-|}
+type DP = {| onClick: () => mixed |}
 
-type Props = { ...$Exact<OwnProps>, ...StateProps, ...DispatchProps }
+type Props = { ...OP, ...SP, ...DP }
 
 const TITLE = 'Status'
 const STATUS_LABEL = 'This robot is currently'
 const STATUS_VALUE_DISCONNECTED = 'Unknown - connect to view status'
 const STATUS_VALUE_DEFAULT = 'Idle'
 
-export default connect(
+export default connect<Props, OP, SP, DP, State, Dispatch>(
   mapStateToProps,
   mapDispatchToProps
 )(StatusCard)
@@ -57,7 +52,7 @@ function StatusCard(props: Props) {
   )
 }
 
-function mapStateToProps(state: State, ownProps: OwnProps): StateProps {
+function mapStateToProps(state: State, ownProps: OP): SP {
   const { robot } = ownProps
   const connected = robot.connected != null && robot.connected === true
   const sessionStatus = robotSelectors.getSessionStatus(state)
@@ -70,10 +65,7 @@ function mapStateToProps(state: State, ownProps: OwnProps): StateProps {
   return { status, connectButtonText }
 }
 
-function mapDispatchToProps(
-  dispatch: Dispatch,
-  ownProps: OwnProps
-): DispatchProps {
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   const { robot } = ownProps
   const onClickAction =
     robot.connected === true

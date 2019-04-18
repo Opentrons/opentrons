@@ -42,7 +42,7 @@ export default function ConfirmModal(props: Props) {
       heading={`Calibrate pipette to ${labware.type}`}
     >
       <ConfirmModalContents
-        {...labware}
+        labware={labware}
         calibrateToBottom={calibrateToBottom}
       />
     </ModalPage>
