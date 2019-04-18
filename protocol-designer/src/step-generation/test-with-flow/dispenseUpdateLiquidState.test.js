@@ -366,7 +366,7 @@ describe('...8-channel pipette', () => {
 
         const result = _updateLiquidState(
           {
-            invariantContext,
+            invariantContext: customInvariantContext,
             pipetteId: 'p300MultiId',
             volume: 150,
             labwareId: 'sourcePlateId',

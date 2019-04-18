@@ -77,8 +77,13 @@ export default function updateLiquidState(
       {
         [well]: reduce(
           splitLiquidStates,
-          (wellLiquidStateAcc, splitLiquidStateForTip: SourceAndDest) =>
-            mergeLiquid(wellLiquidStateAcc, splitLiquidStateForTip.dest),
+          (wellLiquidStateAcc, splitLiquidStateForTip: SourceAndDest) => {
+            const res = mergeLiquid(
+              wellLiquidStateAcc,
+              splitLiquidStateForTip.dest
+            )
+            return res
+          },
           cloneDeep(prevLiquidState.labware[labwareId][well])
         ),
       }
