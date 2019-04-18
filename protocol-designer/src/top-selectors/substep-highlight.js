@@ -36,15 +36,18 @@ function _wellsForPipette(
 function _getSelectedWellsForStep(
   stepArgs: StepGeneration.CommandCreatorArgs,
   labwareId: string,
-  robotState: StepGeneration.RobotState
+  invariantContext: StepGeneration.InvariantContext
 ): Array<string> {
   if (stepArgs.commandCreatorFnName === 'delay') {
     return []
   }
 
   const pipetteId = stepArgs.pipette
-  const pipetteSpec = StepGeneration.getPipetteSpecFromId(pipetteId, robotState)
-  const labwareType = StepGeneration.getLabwareType(labwareId, robotState)
+  const pipetteSpec = StepGeneration.getPipetteSpecFromId(
+    pipetteId,
+    invariantContext
+  )
+  const labwareType = StepGeneration.getLabwareType(labwareId, invariantContext)
 
   if (!pipetteSpec || !labwareType) {
     return []
@@ -146,6 +149,7 @@ function _getSelectedWellsForSubstep(
 
 export const wellHighlightsByLabwareId: Selector<AllWellHighlightsAllLabware> = createSelector(
   fileDataSelectors.getRobotStateTimeline,
+  stepFormSelectors.getInvariantContext,
   stepFormSelectors.getArgsAndErrorsByStepId,
   stepsSelectors.getHoveredStepId,
   stepsSelectors.getHoveredSubstep,
@@ -153,6 +157,7 @@ export const wellHighlightsByLabwareId: Selector<AllWellHighlightsAllLabware> = 
   stepFormSelectors.getOrderedStepIds,
   (
     robotStateTimeline,
+    invariantContext,
     allStepArgsAndErrors,
     hoveredStepId,
     hoveredSubstep,
@@ -195,7 +200,7 @@ export const wellHighlightsByLabwareId: Selector<AllWellHighlightsAllLabware> = 
           selectedWells = _getSelectedWellsForStep(
             stepArgs,
             labwareId,
-            robotState
+            invariantContext
           )
         }
 

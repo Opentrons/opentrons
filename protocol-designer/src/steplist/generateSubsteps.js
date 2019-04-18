@@ -22,7 +22,7 @@ import type {
 import { consolidate, distribute, transfer, mix } from '../step-generation'
 
 import type { StepIdType } from '../form-types'
-import type { RobotState } from '../step-generation'
+import type { InvariantContext, RobotState } from '../step-generation'
 
 import type {
   ConsolidateArgs,
@@ -31,19 +31,19 @@ import type {
   DelayArgs,
   TransferArgs,
 } from '../step-generation/types'
-import type { LabwareEntities, PipetteOnDeck } from '../step-forms'
+import type { PipetteOnDeck } from '../step-forms'
 type AllPipetteData = { [pipetteId: string]: PipetteOnDeck }
 
 export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 
 function transferLikeSubsteps(args: {
   stepArgs: ConsolidateArgs | DistributeArgs | TransferArgs | MixArgs,
-  allPipetteData: AllPipetteData,
-  labwareEntities: LabwareEntities,
+  allPipetteData: AllPipetteData, // TODO IMMEDIATELY: just use invariantContext
+  invariantContext: InvariantContext,
   robotState: RobotState,
   stepId: StepIdType,
 }): ?SourceDestSubstepItem {
-  const { stepArgs, allPipetteData, labwareEntities, stepId } = args
+  const { stepArgs, allPipetteData, invariantContext, stepId } = args
 
   // Add tips to pipettes, since this is just a "simulation"
   // TODO: Ian 2018-07-31 develop more elegant way to bypass tip handling for simulation/test
@@ -56,7 +56,7 @@ function transferLikeSubsteps(args: {
 
   const pipette =
     allPipetteData[pipetteId] &&
-    getPipetteNameSpecs(allPipetteData[pipetteId].name)
+    getPipetteNameSpecs(allPipetteData[pipetteId].name) // TODO IMMEDIATELY use pipette entity spec
 
   // TODO Ian 2018-04-06 use assert here
   if (!pipette) {
@@ -81,7 +81,10 @@ function transferLikeSubsteps(args: {
       preWetTip: false,
     }
 
-    substepCommandCreators = transfer(commandCallArgs)(robotState)
+    substepCommandCreators = transfer(commandCallArgs)(
+      invariantContext,
+      robotState
+    )
   } else if (stepArgs.commandCreatorFnName === 'distribute') {
     const commandCallArgs = {
       ...stepArgs,
@@ -89,7 +92,10 @@ function transferLikeSubsteps(args: {
       preWetTip: false,
     }
 
-    substepCommandCreators = distribute(commandCallArgs)(robotState)
+    substepCommandCreators = distribute(commandCallArgs)(
+      invariantContext,
+      robotState
+    )
   } else if (stepArgs.commandCreatorFnName === 'consolidate') {
     const commandCallArgs = {
       ...stepArgs,
@@ -98,9 +104,12 @@ function transferLikeSubsteps(args: {
       preWetTip: false,
     }
 
-    substepCommandCreators = consolidate(commandCallArgs)(robotState)
+    substepCommandCreators = consolidate(commandCallArgs)(
+      invariantContext,
+      robotState
+    )
   } else if (stepArgs.commandCreatorFnName === 'mix') {
-    substepCommandCreators = mix(stepArgs)(robotState)
+    substepCommandCreators = mix(stepArgs)(invariantContext, robotState)
   } else {
     // TODO Ian 2018-05-21 Use assert here. Should be unreachable
     console.warn(
@@ -115,8 +124,9 @@ function transferLikeSubsteps(args: {
   if (pipette.channels > 1) {
     const substepRows: Array<SubstepTimelineFrame> = substepTimeline(
       substepCommandCreators,
-      { channels: pipette.channels, labwareEntities }
-    )(robotState)
+      invariantContext,
+      { channels: pipette.channels }
+    )(invariantContext, robotState)
     const mergedMultiRows: Array<
       Array<StepItemSourceDestRow>
     > = steplistUtils.mergeWhen(
@@ -201,7 +211,10 @@ function transferLikeSubsteps(args: {
     }
   } else {
     // single channel
-    const substepRows = substepTimeline(substepCommandCreators)(robotState)
+    const substepRows = substepTimeline(
+      substepCommandCreators,
+      invariantContext
+    )(invariantContext, robotState)
 
     const mergedRows: Array<StepItemSourceDestRow> = steplistUtils.mergeWhen(
       substepRows,
@@ -255,8 +268,8 @@ function transferLikeSubsteps(args: {
 // NOTE: This is the fn used by the `allSubsteps` selector
 export function generateSubsteps(
   stepArgsAndErrors: ?StepArgsAndErrors,
-  allPipetteData: AllPipetteData,
-  labwareEntities: LabwareEntities,
+  allPipetteData: AllPipetteData, // TODO IMMEDIATELY remove
+  invariantContext: InvariantContext,
   robotState: ?RobotState,
   stepId: string
 ): ?SubstepItemData {
@@ -295,7 +308,7 @@ export function generateSubsteps(
     return transferLikeSubsteps({
       stepArgs,
       allPipetteData,
-      labwareEntities,
+      invariantContext,
       robotState,
       stepId,
     })

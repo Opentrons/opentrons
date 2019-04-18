@@ -6,7 +6,7 @@ import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import takeWhile from 'lodash/takeWhile'
 import uniqBy from 'lodash/uniqBy'
-import { getIsTiprack, getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getIsTiprack } from '@opentrons/shared-data'
 import { getAllWellsForLabware } from '../../constants'
 import * as StepGeneration from '../../step-generation'
 import { selectors as stepFormSelectors } from '../../step-forms'
@@ -70,9 +70,10 @@ type TipState = $PropertyType<StepGeneration.RobotState, 'tipState'>
 type TiprackTipState = $PropertyType<TipState, 'tipracks'>
 export const getInitialRobotState: BaseState => StepGeneration.RobotState = createSelector(
   stepFormSelectors.getInitialDeckSetup,
-  stepFormSelectors.getLabwareEntities,
+  stepFormSelectors.getInvariantContext,
   getLabwareLiquidState,
-  (initialDeckSetup, labwareEntities, labwareLiquidState) => {
+  (initialDeckSetup, invariantContext, labwareLiquidState) => {
+    const { pipetteEntities, labwareEntities } = invariantContext
     const labware: { [labwareId: string]: TemporalLabware } = mapValues(
       initialDeckSetup.labware,
       (l: LabwareOnDeck): TemporalLabware => ({
@@ -111,7 +112,7 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
       pipettes,
       (
         acc: PipetteTipState,
-        pipetteData: StepGeneration.PipetteData,
+        pipetteData: TemporalPipette,
         pipetteId: string
       ) => ({
         ...acc,
@@ -120,15 +121,14 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
       {}
     )
 
+    // TODO IMMEDIATELY use step-generation function!!!
     const pipetteLiquidState = reduce(
       pipettes,
-      (acc, pipetteData: StepGeneration.PipetteData, pipetteId: string) => {
-        const pipetteSpec = getPipetteNameSpecs(pipetteData.name)
+      (acc, pipetteData: TemporalPipette, pipetteId: string) => {
+        const pipetteSpec = pipetteEntities[pipetteId]?.spec
         assert(
           pipetteSpec,
-          `expected pipette spec for ${pipetteId} ${
-            pipetteData.name
-          }, could not make pipetteLiquidState for initial frame correctly`
+          `expected pipette spec for ${pipetteId} ${pipetteId}, could not make pipetteLiquidState for initial frame correctly`
         )
         const channels = pipetteSpec ? pipetteSpec.channels : 1
         assert(
@@ -182,8 +182,10 @@ function compoundCommandCreatorFromStepArgs(
       // TODO(mc, 2019-04-09): these typedefs should probably be exact objects
       // (like redux actions) to have this switch block behave
       return prevRobotState => [
-        // $FlowFixMe: TODOs above ^^^
-        prevRobotState => StepGeneration.delay(stepArgs)(prevRobotState),
+        // TODO: Ian 2019-04-18 this is a HACK the make delay work here, until compound vs non-compound cc types are merged
+        (invariantContext, prevRobotState) =>
+          // $FlowFixMe: TODOs above ^^^
+          StepGeneration.delay(stepArgs)(invariantContext, prevRobotState),
       ]
     }
     case 'distribute':
@@ -238,7 +240,7 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
         reducedCommandCreator =
           compoundCommandCreator &&
           StepGeneration.reduceCommandCreators(
-            compoundCommandCreator(initialRobotState)
+            compoundCommandCreator(invariantContext, initialRobotState)
           )
 
         if (!reducedCommandCreator) {

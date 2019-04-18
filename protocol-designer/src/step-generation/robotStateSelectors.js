@@ -3,11 +3,7 @@ import assert from 'assert'
 import min from 'lodash/min'
 import sortBy from 'lodash/sortBy'
 import type { Channels } from '@opentrons/components'
-import {
-  getTiprackVolume,
-  getPipetteNameSpecs,
-  type PipetteNameSpecs,
-} from '@opentrons/shared-data'
+import { getTiprackVolume, type PipetteNameSpecs } from '@opentrons/shared-data'
 import { tiprackWellNamesByCol, tiprackWellNamesFlat } from './'
 import type { InvariantContext, RobotState } from './'
 
@@ -24,17 +20,18 @@ export function sortLabwareBySlot(
 // SELECTORS
 // TODO IMMEDIATELY audit and remove these, denormalized entities make some of these unneeded
 
+// TODO IMMEDIATELY
 export function getPipetteSpecFromId(
   pipetteId: string,
-  robotState: RobotState
+  invariantContext: InvariantContext
 ): PipetteNameSpecs {
-  const pipette = robotState.pipettes[pipetteId]
+  const pipette = invariantContext.pipetteEntities[pipetteId]
 
   if (!pipette) {
     throw Error(`no pipette with ID ${pipetteId} found in robot state`)
   }
 
-  const pipetteSpec = getPipetteNameSpecs(pipette.name)
+  const pipetteSpec = pipette.spec
   if (!pipetteSpec) {
     throw Error(`no pipette spec for pipette with ID ${pipetteId}`)
   }
@@ -42,19 +39,19 @@ export function getPipetteSpecFromId(
   return pipetteSpec
 }
 
+// TODO IMMEDIATELY
 export function getLabwareType(
   labwareId: string,
-  robotState: RobotState
+  invariantContext: InvariantContext
 ): ?string {
-  const labware = robotState.labware[labwareId]
+  const labware = invariantContext.labwareEntities[labwareId]
 
   if (!labware) {
     assert(false, `no labware id: "${labwareId}"`)
     return null
   }
 
-  const labwareType = labware.type
-  return labwareType
+  return labware.type
 }
 
 export function _getNextTip(

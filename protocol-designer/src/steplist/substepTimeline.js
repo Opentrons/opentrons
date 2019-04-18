@@ -8,9 +8,9 @@ import type {
   CommandCreatorError,
   CommandsAndRobotState,
   RobotState,
+  InvariantContext,
 } from '../step-generation/types'
 import { getWellsForTips } from '../step-generation/utils'
-import type { LabwareEntities } from '../step-forms'
 import type { SubstepTimelineFrame, TipLocation } from './types'
 
 function _conditionallyUpdateActiveTips(
@@ -39,6 +39,7 @@ type SubstepTimelineAcc = {
 }
 
 const substepTimelineSingle = (commandCreators: Array<CommandCreator>) => (
+  invariantContext: InvariantContext,
   initialRobotState: RobotState
 ): Array<SubstepTimelineFrame> => {
   const timeline = commandCreators.reduce(
@@ -50,7 +51,7 @@ const substepTimelineSingle = (commandCreators: Array<CommandCreator>) => (
       // error short-circuit
       if (acc.errors) return acc
 
-      const nextFrame = commandCreator(acc.prevRobotState)
+      const nextFrame = commandCreator(invariantContext, acc.prevRobotState)
 
       if (nextFrame.errors) {
         return { ...acc, errors: nextFrame.errors }
@@ -112,17 +113,20 @@ const substepTimelineSingle = (commandCreators: Array<CommandCreator>) => (
 
 type SubstepContext = {
   channels?: Channels,
-  labwareEntities?: LabwareEntities,
 }
 const substepTimeline = (
   commandCreators: Array<CommandCreator>,
-  context?: SubstepContext = { channels: 1 }
+  invariantContext: InvariantContext,
+  context?: SubstepContext = { channels: 1 } // TODO IMMEDIATELY rethink this, confusing vs invariantContext
 ) => {
   if (context.channels === 1) {
     return substepTimelineSingle(commandCreators)
   } else {
     // timeline for multi-channel substep context
-    return (initialRobotState: RobotState): Array<SubstepTimelineFrame> => {
+    return (
+      invariantContext: InvariantContext, // TODO IMMEDIATELY this is weird...
+      initialRobotState: RobotState
+    ): Array<SubstepTimelineFrame> => {
       const timeline = commandCreators.reduce(
         (
           acc: SubstepTimelineAcc,
@@ -132,7 +136,7 @@ const substepTimeline = (
           // error short-circuit
           if (acc.errors) return acc
 
-          const nextFrame = commandCreator(acc.prevRobotState)
+          const nextFrame = commandCreator(invariantContext, acc.prevRobotState)
 
           if (nextFrame.errors) {
             return { ...acc, errors: nextFrame.errors }
@@ -151,8 +155,8 @@ const substepTimeline = (
             )
 
             const { well, volume, labware } = firstCommand.params
-            const labwareDef = context.labwareEntities
-              ? context.labwareEntities[labware].def
+            const labwareDef = invariantContext.labwareEntities
+              ? invariantContext.labwareEntities[labware].def
               : null
             const wellsForTips =
               context.channels &&

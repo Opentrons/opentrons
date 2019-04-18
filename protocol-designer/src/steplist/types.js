@@ -6,7 +6,6 @@ import type {
   StepFieldName,
   StepType,
 } from '../form-types'
-import type { LabwareEntities, PipetteEntities } from '../step-forms'
 import type { FormError } from './formLevel/errors'
 
 // timeline start and end
@@ -110,9 +109,4 @@ export type StepFormAndFieldErrors = {
 export type StepArgsAndErrors = {
   errors: StepFormAndFieldErrors,
   stepArgs: CommandCreatorArgs | null, // TODO: incompleteData field when this is null?
-}
-
-export type StepFormContextualState = {
-  labwareEntities: LabwareEntities,
-  pipetteEntities: PipetteEntities,
 }
