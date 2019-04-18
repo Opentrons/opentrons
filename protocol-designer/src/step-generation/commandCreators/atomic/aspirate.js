@@ -87,7 +87,11 @@ const aspirate = (args: AspirateDispenseArgs): CommandCreator => (
 
   return {
     commands,
-    ...getNextRobotStateAndWarnings(commands[0], prevRobotState),
+    ...getNextRobotStateAndWarnings(
+      commands[0],
+      invariantContext,
+      prevRobotState
+    ),
   }
 }
 

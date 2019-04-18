@@ -407,6 +407,7 @@ export function makeState(args: MakeStateArgs): RobotState {
   if (Object.keys(mistakes).length > 0) {
     throw new Error(`bad input to makeState: ${JSON.stringify(mistakes)}`)
   }
+  // NOTE: pipettes have no tips by default
   return {
     labware: labwareLocations,
     pipettes: pipetteLocations,

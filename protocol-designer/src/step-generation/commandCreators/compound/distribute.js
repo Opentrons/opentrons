@@ -6,6 +6,7 @@ import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import type {
   DistributeArgs,
   RobotState,
+  InvariantContext,
   CommandCreator,
   CompoundCommandCreator,
 } from '../../types'
@@ -13,6 +14,7 @@ import { aspirate, dispense, blowout, replaceTip, touchTip } from '../atomic'
 import { mixUtil } from './mix'
 
 const distribute = (args: DistributeArgs): CompoundCommandCreator => (
+  invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {
   /**
@@ -34,8 +36,11 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
   // TODO Ian 2018-05-03 next ~20 lines match consolidate.js
   const actionName = 'distribute'
 
-  const pipetteData = prevRobotState.pipettes[args.pipette]
-  if (!pipetteData) {
+  // TODO IMMEDIATELY: revisit these pipetteDoesNotExist errors, how to do this in once place?
+  if (
+    !prevRobotState.pipettes[args.pipette] ||
+    !invariantContext.pipetteEntities[args.pipette]
+  ) {
     // bail out before doing anything else
     return [
       _robotState => ({
@@ -60,7 +65,7 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
   const disposalVolume =
     args.disposalVolume && args.disposalVolume > 0 ? args.disposalVolume : 0
 
-  const maxVolume = getPipetteWithTipMaxVol(args.pipette, prevRobotState)
+  const maxVolume = getPipetteWithTipMaxVol(args.pipette, invariantContext)
   const maxWellsPerChunk = Math.floor(
     (maxVolume - disposalVolume) / args.volume
   )

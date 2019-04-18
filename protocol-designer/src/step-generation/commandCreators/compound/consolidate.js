@@ -5,6 +5,7 @@ import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import type {
   ConsolidateArgs,
+  InvariantContext,
   RobotState,
   CommandCreator,
   CompoundCommandCreator,
@@ -14,6 +15,7 @@ import { aspirate, dispense, replaceTip, touchTip } from '../atomic'
 import { mixUtil } from './mix'
 
 const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
+  invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {
   /**
@@ -57,7 +59,7 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
   } = args
 
   const maxWellsPerChunk = Math.floor(
-    getPipetteWithTipMaxVol(args.pipette, prevRobotState) / args.volume
+    getPipetteWithTipMaxVol(args.pipette, invariantContext) / args.volume
   )
 
   const commandCreators = flatMap(

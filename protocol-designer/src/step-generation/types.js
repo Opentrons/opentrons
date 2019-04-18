@@ -275,6 +275,7 @@ export type CommandCreator = (
   prevRobotState: RobotState
 ) => CommandsAndRobotState | CommandCreatorErrorResponse
 export type CompoundCommandCreator = (
+  invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => Array<CommandCreator>
 
