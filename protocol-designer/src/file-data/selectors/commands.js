@@ -92,7 +92,7 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
       labware,
       (
         acc: TiprackTipState,
-        labwareData: StepGeneration.LabwareData,
+        labwareData: $Values<typeof labware>,
         labwareId: string
       ) => {
         const labwareDef = labwareEntities[labwareId].def

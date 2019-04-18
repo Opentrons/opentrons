@@ -1,5 +1,4 @@
 // @flow
-import type { DeckSlot, Mount } from '@opentrons/components'
 import type {
   CommandV1 as Command,
   PipetteLabwareFieldsV1 as PipetteLabwareFields,
@@ -160,19 +159,6 @@ export type CommandCreatorArgs =
   | MixArgs
   | DelayArgs
   | TransferArgs
-
-// TODO IMMEDIATELY: remove
-export type PipetteData = {|
-  name: string,
-  mount: Mount,
-  tiprackModel: string, // NOTE: this will go away when tiprack choice-per-step and/or tiprack sharing is implemented
-|}
-
-// TODO IMMEDIATELY: remove
-export type LabwareData = {|
-  type: string, // TODO Ian 2018-04-17 keys from JSON. Also, rename 'type' to 'model' (or something??)
-  slot: DeckSlot,
-|}
 
 /** tips are numbered 0-7. 0 is the furthest to the back of the robot.
  * For an 8-channel, on a 96-flat, Tip 0 is in row A, Tip 7 is in row H.

@@ -11,7 +11,7 @@ import type {
   PipetteEntity,
   LabwareEntity,
 } from '../../../step-forms' // TODO IMMEDIATELY move temporal types somewhere more universal
-import type { InvariantContext, RobotState, LabwareData } from '../../'
+import type { InvariantContext, RobotState } from '../../'
 import type {
   CommandsAndRobotState,
   CommandCreatorErrorResponse,
@@ -219,7 +219,7 @@ export function createRobotStateFixture(
 
   const occupiedSlots = map(
     baseLabware,
-    (labwareData: LabwareData, labwareId) => labwareData.slot
+    (labwareData: $Values<typeof baseLabware>, labwareId) => labwareData.slot
   )
 
   const tiprackLabware = args.tipracks.reduce(

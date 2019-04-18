@@ -20,7 +20,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { BaseState } from '../../types'
 import type { PDProtocolFile } from '../../file-types'
-import type { LabwareData, PipetteData } from '../../step-generation'
 
 // TODO LATER Ian 2018-02-28 deal with versioning
 const protocolSchemaVersion = '1.0.0'
@@ -57,6 +56,7 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
   ingredSelectors.getLiquidsByLabwareId,
   stepFormSelectors.getSavedStepForms,
   stepFormSelectors.getOrderedStepIds,
+  stepFormSelectors.getLabwareEntities,
   stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
   (
@@ -68,7 +68,8 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
     ingredLocations,
     savedStepForms,
     orderedStepIds,
-    pipetteInvariantProperties,
+    labwareEntities,
+    pipetteEntities,
     labwareNamesById
   ) => {
     const { author, description, created } = fileMetadata
@@ -77,22 +78,28 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
 
     const pipettes = mapValues(
       initialRobotState.pipettes,
-      (pipette: PipetteData): FilePipette => ({
+      (
+        pipette: $Values<typeof initialRobotState.pipettes>,
+        pipetteId: string
+      ): FilePipette => ({
         mount: pipette.mount,
         // TODO: Ian 2018-11-06 'model' is for backwards compatibility with old API version
         // (JSON executor used to expect versioned model).
         // Drop this "model" when we do breaking change (see TODO in protocol-schema.json)
-        model: pipette.name + '_v1.3',
-        name: pipette.name,
+        model: pipetteEntities[pipetteId].name + '_v1.3',
+        name: pipetteEntities[pipetteId].name,
       })
     )
 
     const labware = mapValues(
       initialRobotState.labware,
-      (l: LabwareData, labwareId: string): FileLabware => ({
+      (
+        l: $Values<typeof initialRobotState.labware>,
+        labwareId: string
+      ): FileLabware => ({
         slot: l.slot,
         'display-name': labwareNamesById[labwareId],
-        model: l.type,
+        model: labwareEntities[labwareId].type,
       })
     )
 
@@ -128,9 +135,8 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
         _internalAppBuildDate,
         data: {
           pipetteTiprackAssignments: mapValues(
-            pipetteInvariantProperties,
-            (p: $Values<typeof pipetteInvariantProperties>): ?string =>
-              p.tiprackModel
+            pipetteEntities,
+            (p: $Values<typeof pipetteEntities>): ?string => p.tiprackModel
           ),
           dismissedWarnings,
           ingredients,
