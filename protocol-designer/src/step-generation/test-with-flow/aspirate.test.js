@@ -2,6 +2,10 @@
 import { expectTimelineError } from './testMatchers'
 import _aspirate from '../commandCreators/atomic/aspirate'
 import {
+  fixtureTipRack10Ul,
+  fixtureTipRack1000Ul,
+} from '@opentrons/shared-data/fixtures'
+import {
   makeContext,
   makeState,
   commandCreatorHasErrors,
@@ -11,10 +15,6 @@ import getNextRobotStateAndWarnings from '../getNextRobotStateAndWarnings'
 
 jest.mock('../getNextRobotStateAndWarnings')
 jest.mock('../../labware-defs/utils') // TODO IMMEDIATELY move to somewhere more general
-
-// TODO Ian 2019-04-12: create representative fixtures, don't use real defs
-const fixtureTiprack10ul = require('@opentrons/shared-data/definitions2/opentrons_96_tiprack_10_ul.json')
-const fixtureTiprack1000ul = require('@opentrons/shared-data/definitions2/opentrons_96_tiprack_1000_ul.json')
 
 const aspirate = commandCreatorNoErrors(_aspirate)
 const aspirateWithErrors = commandCreatorHasErrors(_aspirate)
@@ -113,10 +113,10 @@ describe('aspirate', () => {
   test('aspirate with volume > tip max volume should throw error', () => {
     // TODO IMMEDIATELY cleaner way to make invariantContext??
     invariantContext.pipetteEntities['p300SingleId'].tiprackModel =
-      fixtureTiprack10ul.otId
+      fixtureTipRack10Ul.otId
     invariantContext.pipetteEntities[
       'p300SingleId'
-    ].tiprackLabwareDef = fixtureTiprack10ul
+    ].tiprackLabwareDef = fixtureTipRack10Ul
     const result = aspirateWithErrors({
       pipette: 'p300SingleId',
       volume: 201,
@@ -133,10 +133,10 @@ describe('aspirate', () => {
   test('aspirate with volume > pipette max volume should throw error', () => {
     // NOTE: assigning p300 to a 1000uL tiprack is nonsense, just for this test
     invariantContext.pipetteEntities['p300SingleId'].tiprackModel =
-      fixtureTiprack1000ul.otId
+      fixtureTipRack1000Ul.otId
     invariantContext.pipetteEntities[
       'p300SingleId'
-    ].tiprackLabwareDef = fixtureTiprack1000ul
+    ].tiprackLabwareDef = fixtureTipRack1000Ul
     const result = aspirateWithErrors({
       pipette: 'p300SingleId',
       volume: 301,

@@ -1,4 +1,5 @@
 // @flow
+import { fixtureTipRack300Ul } from '@opentrons/shared-data/fixtures'
 import {
   makeContext,
   makeState,
@@ -8,9 +9,6 @@ import {
 import { sortLabwareBySlot, getNextTiprack, _getNextTip } from '../'
 
 let invariantContext
-
-// TODO Ian 2019-04-12: create representative fixtures, don't use real defs
-const fixtureTiprack300ul = require('@opentrons/shared-data/definitions2/opentrons_96_tiprack_300_ul.json')
 
 beforeEach(() => {
   invariantContext = makeContext()
@@ -56,8 +54,8 @@ describe('_getNextTip', () => {
     let _invariantContext = makeContext()
     _invariantContext.labwareEntities[tiprackId] = {
       id: tiprackId,
-      type: fixtureTiprack300ul.otId,
-      def: fixtureTiprack300ul,
+      type: fixtureTipRack300Ul.otId,
+      def: fixtureTipRack300Ul,
     }
     let robotState = makeState({
       invariantContext: _invariantContext,

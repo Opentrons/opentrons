@@ -1,4 +1,9 @@
 // @flow
+import {
+  fixture12Trough,
+  fixture96Plate,
+  fixture384Plate,
+} from '@opentrons/shared-data/fixtures'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import {
@@ -8,11 +13,6 @@ import {
 } from './fixtures'
 
 import _updateLiquidState from '../dispenseUpdateLiquidState'
-
-// TODO IMMEDIATELY use fixture defs not real defs
-const fixture12Trough = require('@opentrons/shared-data/definitions2/usa_scientific_12_trough_22_ml.json')
-const fixture96Plate = require('@opentrons/shared-data/definitions2/generic_96_wellplate_380_ul.json')
-const fixture384Plate = require('@opentrons/shared-data/definitions2/corning_384_wellplate_112_ul.json')
 
 let dispenseSingleCh150ToA1Args
 let invariantContext

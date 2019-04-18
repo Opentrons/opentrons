@@ -695,7 +695,7 @@ Object {
             "H12",
           ],
         ],
-        "otId": "54d2f430-d602-11e8-80b1-6965467d172c",
+        "otId": "fixture96Plate",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -1722,7 +1722,7 @@ Object {
             "H12",
           ],
         ],
-        "otId": "54d2f430-d602-11e8-80b1-6965467d172c",
+        "otId": "fixture96Plate",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -2750,7 +2750,7 @@ Object {
             "H12",
           ],
         ],
-        "otId": "3d278f00-ffe0-11e8-abfa-95044b186e81",
+        "otId": "fixtureTipRack300Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -3627,7 +3627,7 @@ Object {
         },
       },
       "id": "tiprack1Id",
-      "type": "fixtureTipRack300ul",
+      "type": "fixtureTipRack300Ul",
     },
     "tiprack2Id": Object {
       "def": Object {
@@ -3780,7 +3780,7 @@ Object {
             "H12",
           ],
         ],
-        "otId": "3d278f00-ffe0-11e8-abfa-95044b186e81",
+        "otId": "fixtureTipRack300Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -4657,7 +4657,7 @@ Object {
         },
       },
       "id": "tiprack2Id",
-      "type": "fixtureTipRack300ul",
+      "type": "fixtureTipRack300Ul",
     },
     "tiprack3Id": Object {
       "def": Object {
@@ -4810,7 +4810,7 @@ Object {
             "H12",
           ],
         ],
-        "otId": "3d278f00-ffe0-11e8-abfa-95044b186e81",
+        "otId": "fixtureTipRack300Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -5687,7 +5687,7 @@ Object {
         },
       },
       "id": "tiprack3Id",
-      "type": "fixtureTipRack300ul",
+      "type": "fixtureTipRack300Ul",
     },
     "trashId": Object {
       "def": Object {
@@ -5720,7 +5720,7 @@ Object {
             "A1",
           ],
         ],
-        "otId": "629d3b80-ecfe-11e8-b073-3da0bb8daec9",
+        "otId": "fixtureTrash",
         "parameters": Object {
           "format": "trash",
           "isMagneticModuleCompatible": false,
@@ -5809,7 +5809,7 @@ Object {
             "A12",
           ],
         ],
-        "otId": "a41d9ef0-f4b6-11e8-90c2-7106f0eae5a7",
+        "otId": "fixture12Trough",
         "parameters": Object {
           "format": "trough",
           "isMagneticModuleCompatible": false,
@@ -6114,7 +6114,7 @@ Object {
             "H12",
           ],
         ],
-        "otId": "88154cc0-ffde-11e8-abfa-95044b186e81",
+        "otId": "fixtureTipRack10Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -6990,7 +6990,7 @@ Object {
           },
         },
       },
-      "tiprackModel": "fixtureTipRack10ul",
+      "tiprackModel": "fixtureTipRack10Ul",
     },
     "p10SingleId": Object {
       "id": "p10SingleId",
@@ -7159,7 +7159,7 @@ Object {
             "H12",
           ],
         ],
-        "otId": "88154cc0-ffde-11e8-abfa-95044b186e81",
+        "otId": "fixtureTipRack10Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -8035,7 +8035,7 @@ Object {
           },
         },
       },
-      "tiprackModel": "fixtureTipRack10ul",
+      "tiprackModel": "fixtureTipRack10Ul",
     },
     "p300MultiId": Object {
       "id": "p300MultiId",
@@ -8206,7 +8206,7 @@ Object {
             "H12",
           ],
         ],
-        "otId": "3d278f00-ffe0-11e8-abfa-95044b186e81",
+        "otId": "fixtureTipRack300Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -9082,7 +9082,7 @@ Object {
           },
         },
       },
-      "tiprackModel": "fixtureTipRack300ul",
+      "tiprackModel": "fixtureTipRack300Ul",
     },
     "p300SingleId": Object {
       "id": "p300SingleId",
@@ -9253,7 +9253,7 @@ Object {
             "H12",
           ],
         ],
-        "otId": "3d278f00-ffe0-11e8-abfa-95044b186e81",
+        "otId": "fixtureTipRack300Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -10129,7 +10129,7 @@ Object {
           },
         },
       },
-      "tiprackModel": "fixtureTipRack300ul",
+      "tiprackModel": "fixtureTipRack300Ul",
     },
   },
 }
