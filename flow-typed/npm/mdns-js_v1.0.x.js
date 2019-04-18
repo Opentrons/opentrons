@@ -8,7 +8,7 @@ declare module 'mdns-js' {
     discover(): void;
     stop(): void;
     networking: {
-      connections: Array<{interfaceIndex: number, networkInterface: string}>,
+      connections: Array<NetworkConnection>,
     };
     connections: {
       services?: {
@@ -52,5 +52,10 @@ declare module 'mdns-js' {
     host?: string,
     interfaceIndex: number,
     networkInterface: string,
+  }
+
+  declare type NetworkConnection = {
+    interfaceIndex: number,
+    networkInterface: string
   }
 }
