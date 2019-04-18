@@ -1,6 +1,5 @@
 // @flow
 // TODO IMMEDIATELY audit this file and use of fixtures, now that robotState is simpler and invariantContext is split out
-import { getLabware } from '@opentrons/shared-data'
 import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
@@ -113,13 +112,6 @@ export function createTipLiquidState<T>(
   )
 }
 
-export function createLabwareLiquidState<T>(
-  labwareType: string,
-  contents: T
-): { [well: string]: T } {
-  return mapValues(getWellsForLabware(labwareType), () => contents)
-}
-
 // TODO Ian 2018-03-14: these pipette fixtures should use file-data/pipetteData.js,
 // which should in turn be lifted out to a general pipette data project? // TODO IMMEDIATELY revisit this comment
 export const p300Single: TemporalPipette = {
@@ -130,17 +122,6 @@ export const p300Single: TemporalPipette = {
 export const p300Multi: TemporalPipette = {
   // TODO IMMEDIATELY rename
   mount: 'left',
-}
-
-export function getWellsForLabware(labwareType: string) {
-  const labware = getLabware(labwareType)
-  if (!labware) {
-    throw new Error(`Labware "${labwareType}" not found.`)
-  }
-  if (!labware.wells) {
-    throw new Error(`Labware "${labwareType} has no wells!"`)
-  }
-  return labware.wells
 }
 
 export function createEmptyLiquidState(invariantContext: InvariantContext) {

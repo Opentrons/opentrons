@@ -75,7 +75,6 @@ export const commandCreatorsTimeline = (
   invariantContext: InvariantContext,
   initialRobotState: RobotState
 ): Timeline => {
-  console.log({ initialRobotState })
   const timeline = commandCreators.reduce(
     (acc: Timeline, commandCreator: CommandCreator, index: number) => {
       const prevRobotState =
