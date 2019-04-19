@@ -35,17 +35,12 @@ export default class NavList extends React.Component<Props, State> {
     return (
       <ul className={styles.nav_list}>
         {navLinkProps.map(subnav => (
-          <li className={styles.nav_link} key={subnav.name}>
-            <span role="button" onClick={this.toggle(subnav.name)}>
-              {subnav.name}
-            </span>
-            {this.state[subnav.name] && (
-              <NavDropdown
-                {...subnav}
-                onClickOutside={this.toggle(subnav.name)}
-              />
-            )}
-          </li>
+          <NavDropdown
+            {...subnav}
+            key={subnav.name}
+            active={this.state[subnav.name]}
+            onClick={this.toggle(subnav.name)}
+          />
         ))}
         <li className={styles.nav_link}>Protocols</li>
         <li className={styles.nav_link}>Support & Sales</li>

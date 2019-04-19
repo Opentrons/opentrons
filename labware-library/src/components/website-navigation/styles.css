@@ -7,7 +7,7 @@
 :root {
   --c-nav-gray: #707070;
   --spacing-subdomain: 2.5rem;
-  --spacing-nav: 3rem;
+  --spacing-nav: 0.5rem;
 }
 
 .subdomain_nav_contents {
@@ -46,8 +46,7 @@
   @apply --transition-color;
 
   position: relative;
-  margin-left: var(--spacing-nav);
-  padding: 2rem 0;
+  padding: 2rem var(--spacing-nav);
   font-weight: var(--fw-semibold);
   text-transform: capitalize;
   cursor: pointer;
@@ -55,6 +54,10 @@
   &:hover,
   &.active {
     color: var(--c-black);
+  }
+
+  &:last-child {
+    padding-right: 0;
   }
 }
 
@@ -69,7 +72,7 @@
 
 .dropdown_small {
   position: absolute;
-  left: -1.75rem;
+  left: -1rem;
   top: 4.25rem;
   width: 16rem;
   background-color: var(--c-white);
