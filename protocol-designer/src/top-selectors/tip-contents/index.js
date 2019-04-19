@@ -41,10 +41,8 @@ function getTipHighlighted(
     if (c.command === 'pick-up-tip' && c.params.labware === labwareId) {
       const commandWellName = c.params.well
       const pipetteId = c.params.pipette
-      const pipetteSpec = StepGeneration.getPipetteSpecFromId(
-        pipetteId,
-        invariantContext
-      )
+      const pipetteSpec =
+        invariantContext.pipetteEntities[pipetteId]?.spec || {}
 
       if (pipetteSpec.channels === 1) {
         return commandWellName === wellName

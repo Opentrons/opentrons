@@ -36,7 +36,7 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
   // TODO Ian 2018-05-03 next ~20 lines match consolidate.js
   const actionName = 'distribute'
 
-  // TODO IMMEDIATELY: revisit these pipetteDoesNotExist errors, how to do this in once place?
+  // TODO: Ian 2019-04-19 revisit these pipetteDoesNotExist errors, how to do it DRY?
   if (
     !prevRobotState.pipettes[args.pipette] ||
     !invariantContext.pipetteEntities[args.pipette]

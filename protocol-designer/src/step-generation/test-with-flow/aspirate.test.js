@@ -111,7 +111,6 @@ describe('aspirate', () => {
   })
 
   test('aspirate with volume > tip max volume should throw error', () => {
-    // TODO IMMEDIATELY cleaner way to make invariantContext??
     invariantContext.pipetteEntities['p300SingleId'].tiprackModel =
       fixtureTipRack10Ul.otId
     invariantContext.pipetteEntities[

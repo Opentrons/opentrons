@@ -111,15 +111,11 @@ const substepTimelineSingle = (commandCreators: Array<CommandCreator>) => (
   return timeline.timeline
 }
 
-type SubstepContext = {
-  channels?: Channels,
-}
 const substepTimeline = (
   commandCreators: Array<CommandCreator>,
-  invariantContext: InvariantContext,
-  context?: SubstepContext = { channels: 1 } // TODO IMMEDIATELY rethink this, confusing vs invariantContext
+  channels?: Channels
 ) => {
-  if (context.channels === 1) {
+  if (channels === 1) {
     return substepTimelineSingle(commandCreators)
   } else {
     // timeline for multi-channel substep context
@@ -159,9 +155,9 @@ const substepTimeline = (
               ? invariantContext.labwareEntities[labware].def
               : null
             const wellsForTips =
-              context.channels &&
+              channels &&
               labwareDef &&
-              getWellsForTips(context.channels, labwareDef, well).wellsForTips
+              getWellsForTips(channels, labwareDef, well).wellsForTips
             const wellInfo = {
               labware,
               wells: wellsForTips || [],

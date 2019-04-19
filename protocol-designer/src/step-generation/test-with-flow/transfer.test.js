@@ -173,6 +173,27 @@ test('invalid pipette ID should throw error', () => {
   })
 })
 
+test('invalid labware ID should throw error', () => {
+  transferArgs = {
+    ...transferArgs,
+    sourceLabware: 'no-such-labware-id-here',
+    sourceWells: ['A1'],
+    destWells: ['B1'],
+    volume: 10,
+    changeTip: 'always',
+  }
+
+  const result = transferWithErrors(transferArgs)(
+    invariantContext,
+    robotStateWithTip
+  )
+
+  expect(result.errors).toHaveLength(1)
+  expect(result.errors[0]).toMatchObject({
+    type: 'LABWARE_DOES_NOT_EXIST',
+  })
+})
+
 describe('single transfer exceeding pipette max', () => {
   let expectedFinalLiquidState
   beforeEach(() => {

@@ -5,10 +5,7 @@ import { orderWells } from '../steplist/utils/orderWells.js'
 import min from 'lodash/min'
 import sortBy from 'lodash/sortBy'
 import { getTiprackVolume } from '@opentrons/shared-data'
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from './'
-
-// SELECTOR UTILITIES
 
 export function sortLabwareBySlot(
   labwareState: $PropertyType<RobotState, 'labware'>
@@ -16,43 +13,6 @@ export function sortLabwareBySlot(
   return sortBy(Object.keys(labwareState), id =>
     parseInt(labwareState[id].slot)
   )
-}
-
-// SELECTORS
-// TODO IMMEDIATELY audit and remove these, denormalized entities make some of these unneeded
-
-// TODO IMMEDIATELY
-export function getPipetteSpecFromId(
-  pipetteId: string,
-  invariantContext: InvariantContext
-): PipetteNameSpecs {
-  const pipette = invariantContext.pipetteEntities[pipetteId]
-
-  if (!pipette) {
-    throw Error(`no pipette with ID ${pipetteId} found in robot state`)
-  }
-
-  const pipetteSpec = pipette.spec
-  if (!pipetteSpec) {
-    throw Error(`no pipette spec for pipette with ID ${pipetteId}`)
-  }
-
-  return pipetteSpec
-}
-
-// TODO IMMEDIATELY
-export function getLabwareType(
-  labwareId: string,
-  invariantContext: InvariantContext
-): ?string {
-  const labware = invariantContext.labwareEntities[labwareId]
-
-  if (!labware) {
-    assert(false, `no labware id: "${labwareId}"`)
-    return null
-  }
-
-  return labware.type
 }
 
 export function _getNextTip(args: {|

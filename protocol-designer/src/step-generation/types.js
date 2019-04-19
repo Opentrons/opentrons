@@ -179,7 +179,6 @@ export type SourceAndDest = {|
 |}
 
 // Data that never changes across time
-// TODO IMMEDIATELY 'Maybe'-type the entities to ensure safe access???
 export type InvariantContext = {|
   labwareEntities: LabwareEntities,
   pipetteEntities: PipetteEntities,

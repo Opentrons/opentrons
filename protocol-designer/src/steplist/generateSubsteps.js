@@ -4,7 +4,6 @@ import range from 'lodash/range'
 import mapValues from 'lodash/mapValues'
 import isEmpty from 'lodash/isEmpty'
 
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import substepTimeline from './substepTimeline'
 import {
   utils as steplistUtils,
@@ -31,19 +30,16 @@ import type {
   DelayArgs,
   TransferArgs,
 } from '../step-generation/types'
-import type { PipetteOnDeck } from '../step-forms'
-type AllPipetteData = { [pipetteId: string]: PipetteOnDeck }
 
 export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 
-function transferLikeSubsteps(args: {
+function transferLikeSubsteps(args: {|
   stepArgs: ConsolidateArgs | DistributeArgs | TransferArgs | MixArgs,
-  allPipetteData: AllPipetteData, // TODO IMMEDIATELY: just use invariantContext
   invariantContext: InvariantContext,
   robotState: RobotState,
   stepId: StepIdType,
-}): ?SourceDestSubstepItem {
-  const { stepArgs, allPipetteData, invariantContext, stepId } = args
+|}): ?SourceDestSubstepItem {
+  const { stepArgs, invariantContext, stepId } = args
 
   // Add tips to pipettes, since this is just a "simulation"
   // TODO: Ian 2018-07-31 develop more elegant way to bypass tip handling for simulation/test
@@ -54,12 +50,10 @@ function transferLikeSubsteps(args: {
   )
   const { pipette: pipetteId } = stepArgs
 
-  const pipette =
-    allPipetteData[pipetteId] &&
-    getPipetteNameSpecs(allPipetteData[pipetteId].name) // TODO IMMEDIATELY use pipette entity spec
+  const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
 
   // TODO Ian 2018-04-06 use assert here
-  if (!pipette) {
+  if (!pipetteSpec) {
     console.warn(
       `Pipette "${pipetteId}" does not exist, step ${stepId} can't determine channels`
     )
@@ -121,11 +115,10 @@ function transferLikeSubsteps(args: {
   }
 
   // Multichannel substeps
-  if (pipette.channels > 1) {
+  if (pipetteSpec.channels > 1) {
     const substepRows: Array<SubstepTimelineFrame> = substepTimeline(
       substepCommandCreators,
-      invariantContext,
-      { channels: pipette.channels }
+      pipetteSpec.channels
     )(invariantContext, robotState)
     const mergedMultiRows: Array<
       Array<StepItemSourceDestRow>
@@ -146,7 +139,7 @@ function transferLikeSubsteps(args: {
       },
       // Merge each channel row together when predicate true
       (currentMultiRow, nextMultiRow) => {
-        return range(pipette.channels).map(channelIndex => {
+        return range(pipetteSpec.channels).map(channelIndex => {
           const sourceChannelWell =
             currentMultiRow.source && currentMultiRow.source.wells[channelIndex]
           const destChannelWell =
@@ -176,7 +169,7 @@ function transferLikeSubsteps(args: {
         })
       },
       currentMultiRow =>
-        range(pipette.channels).map(channelIndex => {
+        range(pipetteSpec.channels).map(channelIndex => {
           const source = currentMultiRow.source && {
             well: currentMultiRow.source.wells[channelIndex],
             preIngreds:
@@ -211,10 +204,10 @@ function transferLikeSubsteps(args: {
     }
   } else {
     // single channel
-    const substepRows = substepTimeline(
-      substepCommandCreators,
-      invariantContext
-    )(invariantContext, robotState)
+    const substepRows = substepTimeline(substepCommandCreators)(
+      invariantContext,
+      robotState
+    )
 
     const mergedRows: Array<StepItemSourceDestRow> = steplistUtils.mergeWhen(
       substepRows,
@@ -268,7 +261,6 @@ function transferLikeSubsteps(args: {
 // NOTE: This is the fn used by the `allSubsteps` selector
 export function generateSubsteps(
   stepArgsAndErrors: ?StepArgsAndErrors,
-  allPipetteData: AllPipetteData, // TODO IMMEDIATELY remove
   invariantContext: InvariantContext,
   robotState: ?RobotState,
   stepId: string
@@ -307,7 +299,6 @@ export function generateSubsteps(
   ) {
     return transferLikeSubsteps({
       stepArgs,
-      allPipetteData,
       invariantContext,
       robotState,
       stepId,
