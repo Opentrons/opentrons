@@ -11,17 +11,19 @@ type Props = {
   volume: ?string,
   times: ?string,
   labwareNickname: ?string,
-  labwareType: ?string,
+  labwareDefDisplayName: ?string,
 }
 
 export default function MixHeader(props: Props) {
-  const { volume, times, labwareNickname, labwareType } = props
+  const { volume, times, labwareNickname, labwareDefDisplayName } = props
   return (
     <PDListItem className={styles.step_subitem}>
       <HoverTooltip
         portal={Portal}
         tooltipComponent={
-          <LabwareTooltipContents {...{ labwareNickname, labwareType }} />
+          <LabwareTooltipContents
+            {...{ labwareNickname, labwareDefDisplayName }}
+          />
         }
       >
         {hoverTooltipHandlers => (

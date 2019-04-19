@@ -1,9 +1,6 @@
 // @flow
 import type { IconName } from '@opentrons/components'
-import type {
-  LabwareDefinition,
-  PipetteNameSpecs,
-} from '@opentrons/shared-data'
+import type { LabwareEntity, PipetteEntity } from './step-forms'
 import type { ChangeTipOptions } from './step-generation'
 
 export type StepIdType = string
@@ -140,9 +137,7 @@ export type BlankForm = {
   id: StepIdType,
 }
 
-// TODO: Ian 2019-01-15 these HydratedLabware / HydratedPipette types are a placeholder. Should be used in form hydration.
-type HydratedLabware = { id: string, type: string, def: LabwareDefinition }
-type HydratedPipette = { id: string, model: string, spec: PipetteNameSpecs }
+// TODO: Ian 2019-01-15 these types are a placeholder. Should be used in form hydration.
 // TODO: this is the type we are aiming for
 
 export type HydratedMoveLiquidFormData = {
@@ -152,14 +147,14 @@ export type HydratedMoveLiquidFormData = {
   description: ?string,
 
   fields: {
-    pipette: HydratedPipette,
+    pipette: PipetteEntity,
     volume: number,
     path: PathOption,
     changeTip: ChangeTipOptions,
     aspirate_wells_grouped: ?boolean,
     preWetTip: ?boolean,
 
-    aspirate_labware: HydratedLabware,
+    aspirate_labware: LabwareEntity,
     aspirate_wells: Array<string>,
     aspirate_wellOrder_first: WellOrderOption,
     aspirate_wellOrder_second: WellOrderOption,
@@ -171,7 +166,7 @@ export type HydratedMoveLiquidFormData = {
     aspirate_mix_volume: ?number,
     aspirate_mix_times: ?number,
 
-    dispense_labware: HydratedLabware,
+    dispense_labware: LabwareEntity,
     dispense_wells: Array<string>,
     dispense_wellOrder_first: WellOrderOption,
     dispense_wellOrder_second: WellOrderOption,

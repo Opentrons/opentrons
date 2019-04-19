@@ -1,25 +1,15 @@
 // @flow
-import mapValues from 'lodash/mapValues'
-import pick from 'lodash/pick'
+import type { NormalizedPipetteById } from '../types'
 import type { StepIdType } from '../../form-types'
 
 export type CreatePipettesAction = {
   type: 'CREATE_PIPETTES',
-  payload: {
-    [pipetteId: string]: {
-      name: string,
-      tiprackModel: string, // TODO: Ian 2018-12-17 this matches old var, but labware "model/type/name" is inconsistent and needs to be standardized
-    },
-  },
+  payload: NormalizedPipetteById,
 }
 
 export const createPipettes = (
-  arg: $PropertyType<CreatePipettesAction, 'payload'>
+  payload: $PropertyType<CreatePipettesAction, 'payload'>
 ): CreatePipettesAction => {
-  // for convenience of caller, strip out 'mount' etc
-  const payload = mapValues(arg, pipette =>
-    pick(pipette, ['name', 'tiprackModel'])
-  )
   return {
     type: 'CREATE_PIPETTES',
     payload,

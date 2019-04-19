@@ -66,7 +66,7 @@ export const maxDispenseWellVolume = (
   const { dispense_labware, dispense_wells, volume } = fields
   if (!dispense_labware || !dispense_wells) return null
   const hasExceeded = dispense_wells.some(well => {
-    const maximum = getWellTotalVolume(dispense_labware.type, well)
+    const maximum = getWellTotalVolume(dispense_labware.def, well)
     return maximum && volume > maximum
   })
   return hasExceeded ? FORM_WARNINGS.OVER_MAX_WELL_VOLUME : null

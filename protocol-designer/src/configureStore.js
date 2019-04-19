@@ -12,7 +12,6 @@ function getRootReducer() {
     analytics: require('./analytics').rootReducer,
     dismiss: require('./dismiss').rootReducer,
     fileData: require('./file-data').rootReducer,
-    labwareDefs: require('./labware-defs').rootReducer,
     labwareIngred: require('./labware-ingred/reducers').default,
     loadFile: require('./load-file').rootReducer,
     navigation: require('./navigation').rootReducer,

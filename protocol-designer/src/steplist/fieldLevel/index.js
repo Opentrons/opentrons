@@ -1,5 +1,4 @@
 // @flow
-import { getLabware } from '@opentrons/shared-data'
 import {
   requiredField,
   minimumWellCount,
@@ -17,29 +16,23 @@ import {
   type ValueCaster,
 } from './processing'
 import type { StepFieldName } from '../../form-types'
+import type { LabwareEntity, PipetteEntity } from '../../step-forms'
 import type { StepFormContextualState } from '../types'
 
 export type { StepFieldName }
 
-const hydrateLabware = (state: StepFormContextualState, id: string) => {
-  const labware = state.labware[id]
-  return (
-    labware && {
-      ...getLabware(labware.type),
-      ...labware,
-      id,
-    }
-  )
+const getLabwareEntity = (
+  state: StepFormContextualState,
+  id: string
+): LabwareEntity => {
+  return state.labwareEntities[id]
 }
-const hydratePipette = (state: StepFormContextualState, id: string) => {
-  const pipette = state.pipettes[id]
-  return (
-    pipette && {
-      ...pipette.spec, // TODO: Ian 2018-12-20 don't spread this
-      ...pipette,
-      id,
-    }
-  )
+
+const getPipetteEntity = (
+  state: StepFormContextualState,
+  id: string
+): PipetteEntity => {
+  return state.pipetteEntities[id]
 }
 
 type StepFieldHelpers = {|
@@ -55,7 +48,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   },
   aspirate_labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: hydrateLabware,
+    hydrate: getLabwareEntity,
   },
   aspirate_mix_times: {
     maskValue: composeMaskers(
@@ -76,7 +69,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   },
   dispense_labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: hydrateLabware,
+    hydrate: getLabwareEntity,
   },
   dispense_mix_times: {
     maskValue: composeMaskers(
@@ -101,7 +94,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   },
   labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: hydrateLabware,
+    hydrate: getLabwareEntity,
   },
   pauseHour: {
     maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers, onlyIntegers),
@@ -114,7 +107,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   },
   pipette: {
     getErrors: composeErrors(requiredField),
-    hydrate: hydratePipette,
+    hydrate: getPipetteEntity,
   },
   times: {
     getErrors: composeErrors(requiredField),

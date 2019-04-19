@@ -24,6 +24,11 @@ import type {
   FormPipettesByMount,
 } from '../../../step-forms'
 
+type PipetteFieldsData = $Diff<
+  PipetteOnDeck,
+  { id: *, spec: *, tiprackLabwareDef: * }
+>
+
 type State = {
   fields: NewProtocolFields,
   pipettesByMount: FormPipettesByMount,
@@ -37,7 +42,7 @@ type Props = {
   initialPipetteValues?: $PropertyType<State, 'pipettesByMount'>,
   onSave: ({
     newProtocolFields: NewProtocolFields,
-    pipettes: Array<PipetteOnDeck>,
+    pipettes: Array<PipetteFieldsData>,
   }) => mixed,
 }
 
@@ -102,7 +107,7 @@ export default class FilePipettesModal extends React.Component<Props, State> {
     const newProtocolFields = this.state.fields
     const pipettes = reduce(
       this.state.pipettesByMount,
-      (acc, formPipette: FormPipette, mount): Array<PipetteOnDeck> => {
+      (acc, formPipette: FormPipette, mount): Array<PipetteFieldsData> => {
         assert(mount === 'left' || mount === 'right', `invalid mount: ${mount}`) // this is mostly for flow
         return formPipette &&
           formPipette.pipetteName &&

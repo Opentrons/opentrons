@@ -10,7 +10,7 @@ const fixture96Plate = require('@opentrons/shared-data/definitions2/generic_96_w
 describe('getWellContentsAllLabware', () => {
   const container1MaxVolume = fixture96Plate.wells.A1.totalLiquidVolume
   let baseIngredFields
-  let labwareDefsByLabwareId
+  let labwareEntities
   let ingredsByLabwareXXSingleIngred
   let defaultWellContents
   let singleIngredResult
@@ -23,11 +23,11 @@ describe('getWellContentsAllLabware', () => {
       serialize: false,
     }
 
-    labwareDefsByLabwareId = {
-      FIXED_TRASH_ID: fixtureFixedTrash,
-      container1Id: fixture96Plate,
-      container2Id: fixture96Plate,
-      container3Id: fixtureTubeRack,
+    labwareEntities = {
+      FIXED_TRASH_ID: { def: fixtureFixedTrash },
+      container1Id: { def: fixture96Plate },
+      container2Id: { def: fixture96Plate },
+      container3Id: { def: fixtureTubeRack },
     }
 
     ingredsByLabwareXXSingleIngred = {
@@ -51,7 +51,7 @@ describe('getWellContentsAllLabware', () => {
     }
 
     singleIngredResult = getWellContentsAllLabware.resultFunc(
-      labwareDefsByLabwareId,
+      labwareEntities,
       ingredsByLabwareXXSingleIngred,
       'container1Id', // selected labware id
       { A1: 'A1', B1: 'B1' }, // selected
@@ -101,7 +101,7 @@ describe('getWellContentsAllLabware', () => {
 
   test('no selected wells when labwareId is not selected', () => {
     const result = getWellContentsAllLabware.resultFunc(
-      labwareDefsByLabwareId,
+      labwareEntities,
       ingredsByLabwareXXSingleIngred,
       null, // selected labware id
       { A1: 'A1', B1: 'B1' }, // selected

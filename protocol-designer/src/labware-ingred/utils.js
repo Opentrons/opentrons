@@ -1,21 +1,21 @@
 // @flow
+import { sortedSlotnames, type DeckSlot } from '@opentrons/components'
 import {
-  humanizeLabwareType,
-  sortedSlotnames,
-  type DeckSlot,
-} from '@opentrons/components'
+  getLabwareDisplayName,
+  type LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type { DisplayLabware } from './types'
 
 export const labwareToDisplayName = (
   displayLabware: ?DisplayLabware,
-  labwareType: string
+  labwareDef: LabwareDefinition2
 ) => {
   const disambiguationNumber = displayLabware
     ? displayLabware.disambiguationNumber
     : ''
   return (
     (displayLabware && displayLabware.nickname) ||
-    `${humanizeLabwareType(labwareType)} (${disambiguationNumber})`
+    `${getLabwareDisplayName(labwareDef)} (${disambiguationNumber})`
   )
 }
 

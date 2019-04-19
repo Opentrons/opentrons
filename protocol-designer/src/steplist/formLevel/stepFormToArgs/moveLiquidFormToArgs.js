@@ -125,14 +125,14 @@ const moveLiquidFormToArgs = (
 
   let sourceWells = getOrderedWells(
     fields.aspirate_wells,
-    sourceLabware.type,
+    sourceLabware.def,
     fields.aspirate_wellOrder_first,
     fields.aspirate_wellOrder_second
   )
 
   let destWells = getOrderedWells(
     fields.dispense_wells,
-    destLabware.type,
+    destLabware.def,
     fields.dispense_wellOrder_first,
     fields.dispense_wellOrder_second
   )

@@ -340,18 +340,18 @@ const updatePatchOnPipetteChannelChange = (
     const destLabwareId = appliedPatch.dispense_labware
 
     const sourceLabware = sourceLabwareId && labwareEntities[sourceLabwareId]
-    const sourceLabwareType = sourceLabware && sourceLabware.type
+    const sourceLabwareDef = sourceLabware && sourceLabware.def
     const destLabware = destLabwareId && labwareEntities[destLabwareId]
-    const destLabwareType = destLabware && destLabware.type
+    const destLabwareDef = destLabware && destLabware.def
 
     update = {
       aspirate_wells: getAllWellsFromPrimaryWells(
         appliedPatch.aspirate_wells,
-        sourceLabwareType
+        sourceLabwareDef
       ),
       dispense_wells: getAllWellsFromPrimaryWells(
         appliedPatch.dispense_wells,
-        destLabwareType
+        destLabwareDef
       ),
     }
   }

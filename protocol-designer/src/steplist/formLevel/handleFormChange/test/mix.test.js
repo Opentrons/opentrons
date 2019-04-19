@@ -1,6 +1,11 @@
 // @flow
 import dependentFieldsUpdateMix from '../dependentFieldsUpdateMix'
 import { DEFAULT_MM_FROM_BOTTOM_DISPENSE } from '../../../../constants'
+
+// TODO Ian 2019-04-12: create representative fixtures, don't use real defs
+const fixture96Plate = require('@opentrons/shared-data/definitions2/generic_96_wellplate_380_ul.json')
+const fixtureTrash = require('@opentrons/shared-data/definitions2/opentrons_1_trash_1.1_l.json')
+
 let pipetteEntities
 let labwareEntities
 let handleFormHelper
@@ -19,8 +24,8 @@ beforeEach(() => {
     },
   }
   labwareEntities = {
-    trashId: { type: 'trash-box' },
-    plateId: { type: '96-flat' },
+    trashId: { type: 'trash-box', def: fixtureTrash },
+    plateId: { type: '96-flat', def: fixture96Plate },
   }
   handleFormHelper = (patch, baseForm) =>
     dependentFieldsUpdateMix(patch, baseForm, pipetteEntities, labwareEntities)
