@@ -1,9 +1,4 @@
 // @flow
-// import range from 'lodash/range'
-// import isEmpty from 'lodash/isEmpty'
-// import {getPipetteNameSpecs} from '@opentrons/shared-data'
-// import {mergeLiquid, splitLiquid, getWellsForTips, totalVolume} from './utils'
-// import * as warningCreators from './warningCreators'
 import type { RobotState, CommandCreatorWarning } from './'
 
 type LiquidState = $PropertyType<RobotState, 'liquidState'>
