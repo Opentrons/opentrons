@@ -1,4 +1,7 @@
-export const navLinkProps = [
+// @flow
+import type { Submenu } from './types'
+
+export const navLinkProps: Array<Submenu> = [
   {
     name: 'about',
     links: [

@@ -7,6 +7,7 @@ type Props = {
 }
 
 export default class ClickOutside extends React.Component<Props> {
+  // TODO(mc, 2019-04-19): switch to ref object
   wrapperRef: ?Element
 
   constructor(props: Props) {

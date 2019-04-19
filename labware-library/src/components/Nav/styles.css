@@ -10,7 +10,6 @@
   left: 0;
   right: 0;
   width: 100%;
-  height: calc(var(--size-subdomain-nav) + var(--size-main-nav));
   z-index: 999;
 }
 
@@ -37,7 +36,7 @@ are project specific  */
 
 .breadcrumbs {
   position: fixed;
-  top: var(--size-2);
+  top: var(--size-main-nav);
   left: 0;
   right: 0;
   z-index: 888;
@@ -88,6 +87,10 @@ are project specific  */
     width: 100%;
     height: var(--size-subdomain-nav);
     background-color: var(--c-lightest-gray);
+  }
+
+  .breadcrumbs {
+    top: var(--size-total-nav);
   }
 }
 
