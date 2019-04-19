@@ -43,9 +43,9 @@
 
 .nav_link {
   @apply --font-body-1-dark;
-  @apply --transition-color
-    position: relative;
+  @apply --transition-color;
 
+  position: relative;
   margin-left: var(--spacing-nav);
   padding: 2rem 0;
   font-weight: var(--fw-semibold);
@@ -124,9 +124,10 @@
 }
 
 .menu_button {
+  @apply --transition-color;
+
   flex: 0 0 5rem;
   color: var(--c-font-dark);
-  transition: all var(--transition-fast);
 
   &:hover {
     color: var(--c-black);
