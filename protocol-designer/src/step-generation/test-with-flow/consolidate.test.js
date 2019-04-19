@@ -3,8 +3,9 @@ import cloneDeep from 'lodash/cloneDeep'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import {
+  getInitialRobotStateStandard,
+  getRobotStatePickedUpTipStandard,
   makeContext,
-  makeState,
   getTipColumn,
   getTiprackTipstate,
   compoundCommandCreatorNoErrors,
@@ -40,44 +41,21 @@ let robotStatePickedUpMultiTipsNoLiquidState
 let robotStatePickedUpOneTip
 
 beforeEach(() => {
-  // TODO IMMEDIATELY this invariantContext/initialRobotState/robotStateWithTip is repeated in aspirate.test.js -- make a fixture helper?
-  // NOTE: this one is different, has "...NoLiquidState" versions, and "PickedUpOneTip" with the A1 missing from rack and added to pipette
   invariantContext = makeContext()
-  const makeStateArgs = {
-    invariantContext,
-    pipetteLocations: {
-      p300SingleId: { mount: 'left' },
-      p300MultiId: { mount: 'right' },
-    },
-    labwareLocations: {
-      tiprack1Id: { slot: '1' },
-      sourcePlateId: { slot: '2' },
-      destPlateId: { slot: '3' },
-      trashId: { slot: '12' },
-    },
-  }
-  initialRobotState = makeState({
-    ...makeStateArgs,
-    tiprackSetting: { tiprack1Id: true },
-  })
+  initialRobotState = getInitialRobotStateStandard(invariantContext)
+  robotStatePickedUpOneTip = getRobotStatePickedUpTipStandard(invariantContext)
 
   robotInitialStateNoLiquidState = omit(
     cloneDeep(initialRobotState),
     'liquidState'
   )
 
-  robotStatePickedUpOneTip = makeState({
-    ...makeStateArgs,
-    tiprackSetting: { tiprack1Id: true },
-  })
-  robotStatePickedUpOneTip.tipState.pipettes.p300SingleId = true
-  robotStatePickedUpOneTip.tipState.tipracks.tiprack1Id.A1 = false
-
   robotStatePickedUpOneTipNoLiquidState = omit(
     cloneDeep(robotStatePickedUpOneTip),
     'liquidState'
   )
 
+  // TODO Ian 2019-04-19: this is a ONE-OFF fixture
   robotStatePickedUpMultiTipsNoLiquidState = merge(
     {},
     robotInitialStateNoLiquidState,

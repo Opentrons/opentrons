@@ -1,8 +1,8 @@
 // @flow
 import _mix from '../commandCreators/compound/mix'
 import {
+  getRobotStateWithTipStandard,
   makeContext,
-  makeState,
   compoundCommandCreatorNoErrors,
   compoundCommandCreatorHasErrors,
   commandFixtures as cmd,
@@ -28,22 +28,8 @@ beforeEach(() => {
     touchTip: false,
   }
 
-  // TODO IMMEDIATELY this invariantContext/initialRobotState/robotStateWithTip is repeated in aspirate.test.js -- make a fixture helper?
   invariantContext = makeContext()
-  const makeStateArgs = {
-    invariantContext,
-    pipetteLocations: { p300SingleId: { mount: 'left' } },
-    labwareLocations: {
-      tiprack1Id: { slot: '1' },
-      sourcePlateId: { slot: '2' },
-      destPlateId: { slot: '3' },
-    },
-  }
-  robotStateWithTip = makeState({
-    ...makeStateArgs,
-    tiprackSetting: { tiprack1Id: true },
-  })
-  robotStateWithTip.tipState.pipettes.p300SingleId = true
+  robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
 })
 
 describe('mix: change tip', () => {

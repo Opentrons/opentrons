@@ -1,6 +1,10 @@
 // @flow
 import type { RobotState } from '../types'
-import { makeContext, makeState, commandCreatorNoErrors } from './fixtures'
+import {
+  makeContext,
+  getInitialRobotStateStandard,
+  commandCreatorNoErrors,
+} from './fixtures'
 import _dropAllTips from '../commandCreators/atomic/dropAllTips'
 
 const dropAllTips = commandCreatorNoErrors(_dropAllTips)
@@ -12,23 +16,8 @@ let initialRobotState
 let invariantContext
 
 beforeEach(() => {
-  // TODO IMMEDIATELY this invariantContext/initialRobotState/robotStateWithTip is repeated in aspirate.test.js -- make a fixture helper?
   invariantContext = makeContext()
-  const makeStateArgs = {
-    invariantContext,
-    pipetteLocations: {
-      p300SingleId: { mount: 'left' },
-      p300MultiId: { mount: 'right' },
-    },
-    labwareLocations: {
-      tiprack1Id: { slot: '1' },
-      sourcePlateId: { slot: '2' },
-    },
-  }
-  initialRobotState = makeState({
-    ...makeStateArgs,
-    tiprackSetting: { tiprack1Id: true },
-  })
+  initialRobotState = getInitialRobotStateStandard(invariantContext)
 })
 
 function expectNoTipsRemaining(robotState: RobotState) {

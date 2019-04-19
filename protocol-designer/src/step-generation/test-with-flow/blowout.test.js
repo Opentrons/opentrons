@@ -3,7 +3,8 @@ import { expectTimelineError } from './testMatchers'
 import _blowout from '../commandCreators/atomic/blowout'
 import {
   makeContext,
-  makeState,
+  getInitialRobotStateStandard,
+  getRobotStateWithTipStandard,
   commandCreatorNoErrors,
   commandCreatorHasErrors,
 } from './fixtures'
@@ -21,25 +22,9 @@ describe('blowout', () => {
   let robotStateWithTip
 
   beforeEach(() => {
-    // TODO IMMEDIATELY this invariantContext/initialRobotState/robotStateWithTip is repeated in aspirate.test.js -- make a fixture helper?
     invariantContext = makeContext()
-    const makeStateArgs = {
-      invariantContext,
-      pipetteLocations: { p300SingleId: { mount: 'left' } },
-      labwareLocations: {
-        tiprack1Id: { slot: '1' },
-        sourcePlateId: { slot: '2' },
-      },
-    }
-    initialRobotState = makeState({
-      ...makeStateArgs,
-      tiprackSetting: { tiprack1Id: true },
-    })
-    robotStateWithTip = makeState({
-      ...makeStateArgs,
-      tiprackSetting: { tiprack1Id: false },
-    })
-    robotStateWithTip.tipState.pipettes.p300SingleId = true
+    initialRobotState = getInitialRobotStateStandard(invariantContext)
+    robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
 
     // $FlowFixMe: mock methods
     updateLiquidState.mockClear()

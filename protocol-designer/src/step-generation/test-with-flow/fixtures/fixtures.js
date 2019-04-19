@@ -19,8 +19,6 @@ import type {
   CommandCreatorErrorResponse,
 } from '../../types'
 
-// TODO IMMEDIATELY audit this file and use of fixtures, now that robotState is simpler and invariantContext is split out
-
 /** Used to wrap command creators in tests, effectively casting their results
  **  to normal response or error response
  **/
@@ -86,6 +84,7 @@ export function getTiprackTipstate(filled: ?boolean): WellTipState {
 }
 
 // Eg A2 B2 C2 D2 E2 F2 G2 H2 keys
+// NOTE: this assumes standard 96-tiprack
 export function getTipColumn<T>(
   index: number,
   filled: T
@@ -174,7 +173,6 @@ export function makeContext(): InvariantContext {
   return { labwareEntities, pipetteEntities }
 }
 
-// TODO IMMEDIATELY: Add args so that tests don't have to mutate the result
 export const makeState = (args: {|
   invariantContext: InvariantContext,
   labwareLocations: $PropertyType<RobotState, 'labware'>,
@@ -197,4 +195,65 @@ export const makeState = (args: {|
     getTiprackTipstate(setting)
   )
   return robotState
+}
+
+// ===== "STANDARDS" for uniformity across tests =====
+export const makeStateArgsStandard = () => ({
+  pipetteLocations: {
+    p300SingleId: { mount: 'left' },
+    p300MultiId: { mount: 'right' },
+  },
+  labwareLocations: {
+    tiprack1Id: { slot: '1' },
+    tiprack2Id: { slot: '5' },
+    sourcePlateId: { slot: '2' },
+    destPlateId: { slot: '3' },
+    trashId: { slot: '12' },
+  },
+})
+export const getInitialRobotStateStandard = (
+  invariantContext: InvariantContext
+) => {
+  const initialRobotState = makeState({
+    ...makeStateArgsStandard(),
+    invariantContext,
+    tiprackSetting: { tiprack1Id: true, tiprack2Id: true },
+  })
+  return initialRobotState
+}
+
+export const getRobotStateWithTipStandard = (
+  invariantContext: InvariantContext
+) => {
+  const robotStateWithTip = makeState({
+    ...makeStateArgsStandard(),
+    invariantContext,
+    tiprackSetting: { tiprack1Id: true, tiprack2Id: true },
+  })
+  robotStateWithTip.tipState.pipettes.p300SingleId = true
+  return robotStateWithTip
+}
+
+export const getRobotStatePickedUpTipStandard = (
+  invariantContext: InvariantContext
+) => {
+  const robotStatePickedUpOneTip = makeState({
+    ...makeStateArgsStandard(),
+    invariantContext,
+    tiprackSetting: { tiprack1Id: true },
+  })
+  robotStatePickedUpOneTip.tipState.pipettes.p300SingleId = true
+  robotStatePickedUpOneTip.tipState.tipracks.tiprack1Id.A1 = false
+  return robotStatePickedUpOneTip
+}
+
+export const getRobotInitialStateNoTipsRemain = (
+  invariantContext: InvariantContext
+) => {
+  const robotInitialStateNoTipsRemain = makeState({
+    ...makeStateArgsStandard(),
+    invariantContext,
+    tiprackSetting: { tiprack1Id: false, tiprack2Id: false },
+  })
+  return robotInitialStateNoTipsRemain
 }

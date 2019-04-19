@@ -1,8 +1,8 @@
 // @flow
 import merge from 'lodash/merge'
 import {
+  getInitialRobotStateStandard,
   makeContext,
-  makeState,
   getTiprackTipstate,
   getTipColumn,
   commandCreatorNoErrors,
@@ -25,24 +25,9 @@ describe('replaceTip', () => {
   let invariantContext
   let initialRobotState
   beforeEach(() => {
-    // TODO IMMEDIATELY this invariantContext/initialRobotState/robotStateWithTip is repeated in aspirate.test.js -- make a fixture helper?
     invariantContext = makeContext()
-    const makeStateArgs = {
-      invariantContext,
-      pipetteLocations: {
-        p300SingleId: { mount: 'left' },
-        p300MultiId: { mount: 'right' },
-      },
-      labwareLocations: {
-        tiprack1Id: { slot: '1' },
-        tiprack2Id: { slot: '2' },
-        sourcePlateId: { slot: '3' },
-      },
-    }
-    initialRobotState = makeState({
-      ...makeStateArgs,
-      tiprackSetting: { tiprack1Id: true, tiprack2Id: true },
-    })
+    initialRobotState = getInitialRobotStateStandard(invariantContext)
+
     // $FlowFixMe: mock methods
     updateLiquidState.mockClear()
     // $FlowFixMe: mock methods

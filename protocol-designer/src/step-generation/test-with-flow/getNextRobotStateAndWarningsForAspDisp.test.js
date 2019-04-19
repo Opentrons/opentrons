@@ -1,6 +1,6 @@
 // @flow
 import { AIR, createTipLiquidState } from '../utils'
-import { makeContext, makeState } from './fixtures'
+import { makeContext, getInitialRobotStateStandard } from './fixtures'
 
 import forAspirateDispense from '../getNextRobotStateAndWarnings/forAspirateDispense'
 import * as warningCreators from '../warningCreators'
@@ -8,23 +8,8 @@ import * as warningCreators from '../warningCreators'
 let invariantContext
 let initialRobotState
 beforeEach(() => {
-  // TODO IMMEDIATELY this invariantContext/initialRobotState/robotStateWithTip is repeated in aspirate.test.js -- make a fixture helper?
   invariantContext = makeContext()
-  const makeStateArgs = {
-    invariantContext,
-    pipetteLocations: {
-      p300SingleId: { mount: 'left' },
-      p300MultiId: { mount: 'right' },
-    },
-    labwareLocations: {
-      tiprack1Id: { slot: '1' },
-      sourcePlateId: { slot: '2' },
-    },
-  }
-  initialRobotState = makeState({
-    ...makeStateArgs,
-    tiprackSetting: { tiprack1Id: true },
-  })
+  initialRobotState = getInitialRobotStateStandard(invariantContext)
 })
 
 describe('...single-channel pipette', () => {

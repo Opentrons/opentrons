@@ -2,8 +2,9 @@
 import _distribute from '../commandCreators/compound/distribute'
 // import merge from 'lodash/merge'
 import {
+  getRobotInitialStateNoTipsRemain,
+  getRobotStateWithTipStandard,
   makeContext,
-  makeState,
   compoundCommandCreatorNoErrors,
   compoundCommandCreatorHasErrors,
   commandFixtures as cmd,
@@ -46,29 +47,11 @@ beforeEach(() => {
   blowoutSingleToTrash = cmd.blowout('trashId')
   blowoutSingleToSourceA1 = cmd.blowout('sourcePlateId', { well: 'A1' })
 
-  // TODO IMMEDIATELY this invariantContext/initialRobotState/robotStateWithTip is repeated in aspirate.test.js -- make a fixture helper?
-  // NOTE: this one is different, no initialRobotState, always want tips
   invariantContext = makeContext()
-  const makeStateArgs = {
-    invariantContext,
-    pipetteLocations: { p300SingleId: { mount: 'left' } },
-    labwareLocations: {
-      tiprack1Id: { slot: '1' },
-      sourcePlateId: { slot: '2' },
-      destPlateId: { slot: '3' },
-      trashId: { slot: '12' },
-    },
-  }
-  robotStateWithTip = makeState({
-    ...makeStateArgs,
-    tiprackSetting: { tiprack1Id: true },
-  })
-  robotStateWithTip.tipState.pipettes.p300SingleId = true
-
-  robotInitialStateNoTipsRemain = makeState({
-    ...makeStateArgs,
-    tiprackSetting: { tiprack1Id: false },
-  })
+  robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
+  robotInitialStateNoTipsRemain = getRobotInitialStateNoTipsRemain(
+    invariantContext
+  )
 })
 
 describe('distribute: minimal example', () => {

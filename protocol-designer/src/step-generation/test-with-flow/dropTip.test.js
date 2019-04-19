@@ -1,5 +1,12 @@
 // @flow
-import { makeContext, makeState, commandCreatorNoErrors } from './fixtures'
+import {
+  getInitialRobotStateStandard,
+  getRobotStateWithTipStandard,
+  makeStateArgsStandard,
+  makeContext,
+  makeState,
+  commandCreatorNoErrors,
+} from './fixtures'
 import _dropTip from '../commandCreators/atomic/dropTip'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
@@ -12,29 +19,11 @@ describe('dropTip', () => {
   let invariantContext
   let initialRobotState
   let robotStateWithTip
-  let makeStateArgs
 
   beforeEach(() => {
-    // TODO IMMEDIATELY this invariantContext/initialRobotState/robotStateWithTip is repeated in aspirate.test.js -- make a fixture helper?
-    // NOTE: this one is a little different, b/c we use makeStateArgs as 'describe'-scoped var
     invariantContext = makeContext()
-    makeStateArgs = {
-      invariantContext,
-      pipetteLocations: { p300SingleId: { mount: 'left' } },
-      labwareLocations: {
-        tiprack1Id: { slot: '1' },
-        sourcePlateId: { slot: '2' },
-      },
-    }
-    initialRobotState = makeState({
-      ...makeStateArgs,
-      tiprackSetting: { tiprack1Id: true },
-    })
-    robotStateWithTip = makeState({
-      ...makeStateArgs,
-      tiprackSetting: { tiprack1Id: false },
-    })
-    robotStateWithTip.tipState.pipettes.p300SingleId = true
+    initialRobotState = getInitialRobotStateStandard(invariantContext)
+    robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
 
     // $FlowFixMe: mock methods
     updateLiquidState.mockClear()
@@ -42,12 +31,14 @@ describe('dropTip', () => {
     updateLiquidState.mockReturnValue(initialRobotState.liquidState)
   })
 
+  // TODO Ian 2019-04-19: this is a ONE-OFF fixture
   function makeRobotState(args: {
     singleHasTips: boolean,
     multiHasTips: boolean,
   }) {
     let _robotState = makeState({
-      ...makeStateArgs,
+      ...makeStateArgsStandard(),
+      invariantContext,
       tiprackSetting: { tiprack1Id: true },
     })
     _robotState.tipState.pipettes.p300SingleId = args.singleHasTips

@@ -1,7 +1,11 @@
 // @flow
 import getNextRobotStateAndWarnings from '../getNextRobotStateAndWarnings'
 import forAspirateDispense from '../getNextRobotStateAndWarnings/forAspirateDispense'
-import { makeContext, makeState, commandCreatorNoErrors } from './fixtures'
+import {
+  makeContext,
+  getRobotStateWithTipStandard,
+  commandCreatorNoErrors,
+} from './fixtures'
 
 import _aspirate from '../commandCreators/atomic/aspirate'
 
@@ -12,21 +16,8 @@ jest.mock('../getNextRobotStateAndWarnings/forAspirateDispense')
 let invariantContext
 let robotStateWithTip
 beforeEach(() => {
-  // TODO IMMEDIATELY this invariantContext/initialRobotState/robotStateWithTip is repeated in aspirate.test.js -- make a fixture helper?
   invariantContext = makeContext()
-  const makeStateArgs = {
-    invariantContext,
-    pipetteLocations: { p300SingleId: { mount: 'left' } },
-    labwareLocations: {
-      tiprack1Id: { slot: '1' },
-      sourcePlateId: { slot: '2' },
-    },
-  }
-  robotStateWithTip = makeState({
-    ...makeStateArgs,
-    tiprackSetting: { tiprack1Id: false },
-  })
-  robotStateWithTip.tipState.pipettes.p300SingleId = true
+  robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
 })
 
 describe('Aspirate Command', () => {
