@@ -15,10 +15,6 @@ import type { Dispatch } from 'redux'
 import type { ValidFormValues } from './LiquidPlacementForm'
 import type { BaseState } from '../../types'
 
-// type SP = {|
-//
-// |}
-
 type Props = React.ElementProps<typeof LiquidPlacementForm>
 
 type SP = $Rest<

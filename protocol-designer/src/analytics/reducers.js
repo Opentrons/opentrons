@@ -3,6 +3,7 @@ import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import { rehydrate } from '../persist'
 
+import type { Action } from '../types'
 import type { SetOptIn } from './actions'
 
 type OptInState = boolean | null
@@ -25,5 +26,4 @@ export type RootState = {
   hasOptedIn: OptInState,
 }
 
-// TODO(mc, 2019-04-17): PD should have a "global" Action type
-export const rootReducer = combineReducers<_, {}>(_allReducers)
+export const rootReducer = combineReducers<_, Action>(_allReducers)
