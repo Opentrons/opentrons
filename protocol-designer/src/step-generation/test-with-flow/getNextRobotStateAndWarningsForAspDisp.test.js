@@ -1,6 +1,6 @@
 // @flow
-import { AIR } from '../utils'
-import { makeContext, makeState, createTipLiquidState } from './fixtures'
+import { AIR, createTipLiquidState } from '../utils'
+import { makeContext, makeState } from './fixtures'
 
 import forAspirateDispense from '../getNextRobotStateAndWarnings/forAspirateDispense'
 import * as warningCreators from '../warningCreators'

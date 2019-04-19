@@ -113,14 +113,14 @@ const substepTimelineSingle = (commandCreators: Array<CommandCreator>) => (
 
 const substepTimeline = (
   commandCreators: Array<CommandCreator>,
-  channels?: Channels
+  channels: Channels
 ) => {
   if (channels === 1) {
     return substepTimelineSingle(commandCreators)
   } else {
     // timeline for multi-channel substep context
     return (
-      invariantContext: InvariantContext, // TODO IMMEDIATELY this is weird...
+      invariantContext: InvariantContext,
       initialRobotState: RobotState
     ): Array<SubstepTimelineFrame> => {
       const timeline = commandCreators.reduce(

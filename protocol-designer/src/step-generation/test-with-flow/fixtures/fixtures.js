@@ -1,8 +1,5 @@
 // @flow
-// TODO IMMEDIATELY audit this file and use of fixtures, now that robotState is simpler and invariantContext is split out
 import mapValues from 'lodash/mapValues'
-import range from 'lodash/range'
-import reduce from 'lodash/reduce'
 import {
   fixtureTrash,
   fixture96Plate,
@@ -14,15 +11,15 @@ import {
   fixtureP300Single,
   fixtureP300Multi,
 } from '@opentrons/shared-data/fixtures'
-import { reduceCommandCreators } from '../../utils'
+import { makeInitialRobotState, reduceCommandCreators } from '../../utils'
 import { tiprackWellNamesFlat } from './data'
-// TODO IMMEDIATELY move temporal types somewhere more universal
-import type { PipetteEntity, LabwareEntity } from '../../../step-forms'
 import type { InvariantContext, RobotState } from '../../'
 import type {
   CommandsAndRobotState,
   CommandCreatorErrorResponse,
 } from '../../types'
+
+// TODO IMMEDIATELY audit this file and use of fixtures, now that robotState is simpler and invariantContext is split out
 
 /** Used to wrap command creators in tests, effectively casting their results
  **  to normal response or error response
@@ -104,46 +101,6 @@ export function getTipColumn<T>(
     )
 }
 
-export const all8ChTipIds = range(8)
-
-export function createTipLiquidState<T>(
-  channels: number,
-  contents: T
-): { [tipId: string]: T } {
-  return range(channels).reduce(
-    (tipIdAcc, tipId) => ({
-      ...tipIdAcc,
-      [tipId]: contents,
-    }),
-    {}
-  )
-}
-
-export function createEmptyLiquidState(invariantContext: InvariantContext) {
-  const { labwareEntities, pipetteEntities } = invariantContext
-
-  return {
-    pipettes: reduce(
-      pipetteEntities,
-      (acc, pipette: PipetteEntity, id: string) => {
-        const pipetteSpec = pipette.spec
-        return {
-          ...acc,
-          [id]: createTipLiquidState(pipetteSpec.channels, {}),
-        }
-      },
-      {}
-    ),
-    labware: reduce(
-      labwareEntities,
-      (acc, labware: LabwareEntity, id: string) => {
-        return { ...acc, [id]: mapValues(labware.def.wells, () => ({})) }
-      },
-      {}
-    ),
-  }
-}
-
 // standard context fixtures to use across tests
 export function makeContext(): InvariantContext {
   const labwareEntities = {
@@ -167,7 +124,6 @@ export function makeContext(): InvariantContext {
       type: fixture12Trough.otId,
       def: fixture12Trough,
     },
-    // TODO IMMEDIATELY rename tipRack300_1Id etc
     tiprack1Id: {
       id: 'tiprack1Id',
       type: fixtureTipRack300Ul.otId,
@@ -218,34 +174,27 @@ export function makeContext(): InvariantContext {
   return { labwareEntities, pipetteEntities }
 }
 
-type MakeStateArgs = {|
+// TODO IMMEDIATELY: Add args so that tests don't have to mutate the result
+export const makeState = (args: {|
   invariantContext: InvariantContext,
   labwareLocations: $PropertyType<RobotState, 'labware'>,
   pipetteLocations: $PropertyType<RobotState, 'pipettes'>,
   tiprackSetting: { [labwareId: string]: boolean },
-|}
-export function makeState(args: MakeStateArgs): RobotState {
+|}) => {
   const {
     invariantContext,
     labwareLocations,
     pipetteLocations,
     tiprackSetting,
   } = args
-  // NOTE: pipettes have no tips by default
-  return {
-    labware: labwareLocations,
-    pipettes: pipetteLocations,
-    liquidState: createEmptyLiquidState(invariantContext),
-    tipState: {
-      pipettes: reduce(
-        pipetteLocations,
-        (acc, temporalPipette, id) =>
-          temporalPipette.mount ? { ...acc, [id]: false } : acc,
-        {}
-      ),
-      tipracks: mapValues(tiprackSetting, setting =>
-        getTiprackTipstate(setting)
-      ),
-    },
-  }
+  let robotState = makeInitialRobotState({
+    invariantContext,
+    labwareLocations,
+    pipetteLocations,
+  })
+  // overwrite tiprack tip state using tiprackSetting arg
+  robotState.tipState.tipracks = mapValues(tiprackSetting, setting =>
+    getTiprackTipstate(setting)
+  )
+  return robotState
 }

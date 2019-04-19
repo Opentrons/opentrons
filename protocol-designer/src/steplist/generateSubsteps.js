@@ -204,7 +204,7 @@ function transferLikeSubsteps(args: {|
     }
   } else {
     // single channel
-    const substepRows = substepTimeline(substepCommandCreators)(
+    const substepRows = substepTimeline(substepCommandCreators, 1)(
       invariantContext,
       robotState
     )

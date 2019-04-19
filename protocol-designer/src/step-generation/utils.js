@@ -5,12 +5,13 @@ import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import last from 'lodash/last'
-import { computeWellAccess } from '@opentrons/shared-data'
+import { computeWellAccess, getIsTiprack } from '@opentrons/shared-data'
 
 import type {
   PipetteLabwareFieldsV1 as PipetteLabwareFields,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import type { PipetteEntity, LabwareEntity } from '../step-forms'
 import type {
   CommandCreator,
   LocationLiquidState,
@@ -276,4 +277,72 @@ export const blowoutUtil = (
     well = destWell
   }
   return [blowout({ pipette: pipette, labware, well })]
+}
+
+export function createEmptyLiquidState(invariantContext: InvariantContext) {
+  const { labwareEntities, pipetteEntities } = invariantContext
+
+  return {
+    pipettes: reduce(
+      pipetteEntities,
+      (acc, pipette: PipetteEntity, id: string) => {
+        const pipetteSpec = pipette.spec
+        return {
+          ...acc,
+          [id]: createTipLiquidState(pipetteSpec.channels, {}),
+        }
+      },
+      {}
+    ),
+    labware: reduce(
+      labwareEntities,
+      (acc, labware: LabwareEntity, id: string) => {
+        return { ...acc, [id]: mapValues(labware.def.wells, () => ({})) }
+      },
+      {}
+    ),
+  }
+}
+
+export function createTipLiquidState<T>(
+  channels: number,
+  contents: T
+): { [tipId: string]: T } {
+  return range(channels).reduce(
+    (tipIdAcc, tipId) => ({
+      ...tipIdAcc,
+      [tipId]: contents,
+    }),
+    {}
+  )
+}
+
+// NOTE: pipettes have no tips, tiprack are full
+export function makeInitialRobotState(args: {|
+  invariantContext: InvariantContext,
+  labwareLocations: $PropertyType<RobotState, 'labware'>,
+  pipetteLocations: $PropertyType<RobotState, 'pipettes'>,
+|}): RobotState {
+  const { invariantContext, labwareLocations, pipetteLocations } = args
+  return {
+    labware: labwareLocations,
+    pipettes: pipetteLocations,
+    liquidState: createEmptyLiquidState(invariantContext),
+    tipState: {
+      pipettes: reduce(
+        pipetteLocations,
+        (acc, temporalPipette, id) =>
+          temporalPipette.mount ? { ...acc, [id]: false } : acc,
+        {}
+      ),
+      tipracks: reduce(
+        labwareLocations,
+        (acc, _, labwareId) =>
+          getIsTiprack(invariantContext.labwareEntities[labwareId].def)
+            ? { ...acc, [labwareId]: true }
+            : acc,
+        {}
+      ),
+    },
+  }
 }

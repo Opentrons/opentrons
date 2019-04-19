@@ -6,11 +6,8 @@ import {
 } from '@opentrons/shared-data/fixtures'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
-import {
-  makeContext,
-  createEmptyLiquidState,
-  createTipLiquidState,
-} from './fixtures'
+import { createEmptyLiquidState, createTipLiquidState } from '../utils'
+import { makeContext } from './fixtures'
 
 import _updateLiquidState from '../dispenseUpdateLiquidState'
 

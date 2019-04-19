@@ -190,7 +190,7 @@ export type RobotState = {|
     [pipetteId: string]: TemporalPipette,
   },
   labware: {
-    [labwareId: string]: TemporalLabware, // TODO IMMEDIATELY: slot should allow Maybe (= labware not loaded)
+    [labwareId: string]: TemporalLabware,
   },
   tipState: {
     tipracks: {

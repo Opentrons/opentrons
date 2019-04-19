@@ -1,17 +1,13 @@
 // @flow
-import assert from 'assert'
 import { createSelector } from 'reselect'
 import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
-import reduce from 'lodash/reduce'
 import takeWhile from 'lodash/takeWhile'
 import uniqBy from 'lodash/uniqBy'
-import { getIsTiprack } from '@opentrons/shared-data'
 import { getAllWellsForLabware } from '../../constants'
 import * as StepGeneration from '../../step-generation'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BaseState, Selector } from '../../types'
 import type { StepIdType } from '../../form-types'
 import type {
@@ -20,12 +16,6 @@ import type {
   TemporalLabware,
   TemporalPipette,
 } from '../../step-forms'
-
-function _makeTipState(
-  labwareDef: LabwareDefinition2
-): { [well: string]: true } {
-  return mapValues(labwareDef.wells, well => true)
-}
 
 const getInvariantContext: Selector<StepGeneration.InvariantContext> = createSelector(
   stepFormSelectors.getLabwareEntities,
@@ -66,14 +56,11 @@ export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> 
   }
 )
 
-type TipState = $PropertyType<StepGeneration.RobotState, 'tipState'>
-type TiprackTipState = $PropertyType<TipState, 'tipracks'>
 export const getInitialRobotState: BaseState => StepGeneration.RobotState = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   stepFormSelectors.getInvariantContext,
   getLabwareLiquidState,
   (initialDeckSetup, invariantContext, labwareLiquidState) => {
-    const { pipetteEntities, labwareEntities } = invariantContext
     const labware: { [labwareId: string]: TemporalLabware } = mapValues(
       initialDeckSetup.labware,
       (l: LabwareOnDeck): TemporalLabware => ({
@@ -88,85 +75,13 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
       })
     )
 
-    const tipracks: TiprackTipState = reduce(
-      labware,
-      (
-        acc: TiprackTipState,
-        labwareData: $Values<typeof labware>,
-        labwareId: string
-      ) => {
-        const labwareDef = labwareEntities[labwareId].def
-        if (getIsTiprack(labwareDef)) {
-          return {
-            ...acc,
-            [labwareId]: _makeTipState(labwareDef),
-          }
-        }
-        return acc
-      },
-      {}
-    )
-
-    type PipetteTipState = { [pipetteId: string]: boolean }
-    const pipetteTipState: PipetteTipState = reduce(
-      pipettes,
-      (
-        acc: PipetteTipState,
-        pipetteData: TemporalPipette,
-        pipetteId: string
-      ) => ({
-        ...acc,
-        [pipetteId]: false, // start with no tips
-      }),
-      {}
-    )
-
-    // TODO IMMEDIATELY use step-generation function!!!
-    const pipetteLiquidState = reduce(
-      pipettes,
-      (acc, pipetteData: TemporalPipette, pipetteId: string) => {
-        const pipetteSpec = pipetteEntities[pipetteId]?.spec
-        assert(
-          pipetteSpec,
-          `expected pipette spec for ${pipetteId} ${pipetteId}, could not make pipetteLiquidState for initial frame correctly`
-        )
-        const channels = pipetteSpec ? pipetteSpec.channels : 1
-        assert(
-          channels === 1 || channels === 8,
-          'expected pipette with 1 or 8 channels'
-        )
-        return {
-          ...acc,
-          [pipetteId]:
-            channels > 1
-              ? {
-                  '0': {},
-                  '1': {},
-                  '2': {},
-                  '3': {},
-                  '4': {},
-                  '5': {},
-                  '6': {},
-                  '7': {},
-                }
-              : { '0': {} },
-        }
-      },
-      {}
-    )
-
-    return {
-      pipettes,
-      labware,
-      tipState: {
-        tipracks,
-        pipettes: pipetteTipState,
-      },
-      liquidState: {
-        pipettes: pipetteLiquidState,
-        labware: labwareLiquidState,
-      },
-    }
+    let robotState = StepGeneration.makeInitialRobotState({
+      invariantContext,
+      labwareLocations: labware,
+      pipetteLocations: pipettes,
+    })
+    robotState.liquidState.labware = labwareLiquidState
+    return robotState
   }
 )
 
