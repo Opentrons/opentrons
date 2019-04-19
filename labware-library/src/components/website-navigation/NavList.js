@@ -32,14 +32,11 @@ export default class NavList extends React.Component<Props, State> {
   }
 
   render() {
-    // default className  = inactive if something in state is true
-    // else default className = active
-    // className = this.state.name = true
     return (
       <ul className={styles.nav_list}>
         {navLinkProps.map(subnav => (
           <li className={styles.nav_link} key={subnav.name}>
-            <span onClick={() => this.setState({ [subnav.name]: true })}>
+            <span role="button" onClick={this.toggle(subnav.name)}>
               {subnav.name}
             </span>
             {this.state[subnav.name] && (

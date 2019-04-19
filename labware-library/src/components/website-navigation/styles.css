@@ -8,16 +8,13 @@
   --c-nav-gray: #707070;
   --spacing-subdomain: 2.5rem;
   --spacing-nav: 3rem;
-  --transition-fast: 500;
 }
 
 .subdomain_nav_contents {
+  @apply --flex-end;
+
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  align-items: center;
 }
 
 .subdomain_link {
@@ -29,12 +26,11 @@
 }
 
 .main_nav_contents {
+  @apply --flex-between;
+
   height: 100%;
   width: 100%;
   padding: var(--spacing-5) 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .logo {
@@ -43,17 +39,16 @@
 
 .nav_list {
   display: none;
-  justify-content: flex-end;
-  align-items: center;
 }
 
 .nav_link {
   @apply --font-body-1-dark;
+  @apply --transition-color
+    position: relative;
 
-  position: relative;
   margin-left: var(--spacing-nav);
+  padding: 2rem 0;
   font-weight: var(--fw-semibold);
-  transition: all var(--transition-fast);
   text-transform: capitalize;
   cursor: pointer;
 
@@ -75,7 +70,7 @@
 .dropdown_small {
   position: absolute;
   left: -1.75rem;
-  top: 2.25rem;
+  top: 4.25rem;
   width: 16rem;
   background-color: var(--c-white);
   border-radius: var(--bd-radius-default);
@@ -120,8 +115,8 @@
 }
 
 .bottom_link {
-  display: flex;
-  align-items: center;
+  @apply --flex-start;
+
   height: 3rem;
   border-top: var(--bd-light);
   padding-left: 1.75rem;
@@ -144,6 +139,6 @@
   }
 
   .nav_list {
-    display: flex;
+    @apply --flex-end;
   }
 }
