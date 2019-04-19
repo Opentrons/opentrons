@@ -19,7 +19,7 @@ import ConfigMessage from './ConfigMessage'
 import ConfigForm from './ConfigForm'
 import ConfigErrorBanner from './ConfigErrorBanner'
 
-import type { State } from '../../types'
+import type { State, Dispatch } from '../../types'
 import type { Mount } from '../../robot'
 import type { Robot } from '../../discovery'
 import type {
@@ -46,10 +46,9 @@ type DP = {|
   updateConfig: (id: string, PipetteConfigRequest) => mixed,
 |}
 
-// type Props = SP & OP & DP
-type Props = { ...$Exact<OP>, ...$Exact<SP>, ...$Exact<DP> }
+type Props = { ...OP, ...SP, ...DP }
 
-export default connect(
+export default connect<Props, OP, SP, DP, State, Dispatch>(
   makeMapStateToProps,
   mapDispatchToProps
 )(ConfigurePipette)
@@ -84,6 +83,7 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
   const getRobotPipettes = makeGetRobotPipettes()
   const getRobotPipetteConfigs = makeGetRobotPipetteConfigs()
   const getPipetteRequestById = makeGetPipetteRequestById()
+
   return (state, ownProps) => {
     const pipettesCall = getRobotPipettes(state, ownProps.robot)
     const pipettes = pipettesCall && pipettesCall.response
@@ -107,6 +107,7 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
 
 function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   const { robot, parentUrl } = ownProps
+
   return {
     updateConfig: (id, params) =>
       dispatch(

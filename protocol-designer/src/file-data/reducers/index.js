@@ -3,6 +3,7 @@ import { combineReducers } from 'redux'
 import { handleActions, type ActionType } from 'redux-actions'
 
 import { saveFileMetadata } from '../actions'
+import type { Action } from '../../types'
 import type { FileMetadataFields } from '../types'
 import type { LoadFileAction, NewProtocolFields } from '../../load-file'
 
@@ -69,4 +70,4 @@ const _allReducers = {
   fileMetadata,
 }
 
-export const rootReducer = combineReducers(_allReducers)
+export const rootReducer = combineReducers<_, Action>(_allReducers)

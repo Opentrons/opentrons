@@ -15,15 +15,17 @@ import { EmptyDeckSlot } from './EmptyDeckSlot'
 
 import styles from './Deck.css'
 
-export type LabwareComponentProps = {
+export type LabwareComponentProps = {|
   slot: DeckSlot,
   width: number,
   height: number,
-}
+|}
+
+export type LabwareComponentType = React.ComponentType<LabwareComponentProps>
 
 type Props = {
   className?: string,
-  LabwareComponent?: React.ComponentType<LabwareComponentProps>,
+  LabwareComponent?: LabwareComponentType,
   DragPreviewLayer?: any, // TODO: BC 2019-01-03 flow doesn't like portals
 }
 
@@ -78,30 +80,35 @@ export default class Deck extends React.Component<Props> {
   }
 }
 
-function renderLabware(LabwareComponent): React.Node[] {
+function renderLabware(
+  LabwareComponent: ?LabwareComponentType
+): Array<React.Node> {
   return flatMap(
     SLOTNAME_MATRIX,
-    (columns: Array<DeckSlot>, row: number): React.Node[] => {
-      return columns.map((slot: DeckSlot, col: number) => {
-        if (slot === TRASH_SLOTNAME) return null
+    (columns: Array<DeckSlot>, row: number): Array<React.Node> => {
+      return columns.map(
+        (slot: DeckSlot, col: number): React.Node => {
+          if (slot === TRASH_SLOTNAME) return null
 
-        const props = {
-          slot,
-          width: SLOT_RENDER_WIDTH,
-          height: SLOT_RENDER_HEIGHT,
+          const props = {
+            slot,
+            width: SLOT_RENDER_WIDTH,
+            height: SLOT_RENDER_HEIGHT,
+          }
+          const transform = `translate(${[
+            SLOT_RENDER_WIDTH * col + SLOT_SPACING_MM * (col + 1),
+            SLOT_RENDER_HEIGHT * row + SLOT_SPACING_MM * (row + 1),
+          ].join(',')})`
+
+          return (
+            // $FlowFixMe: (mc, 2019-04-18) don't know why flow doesn't like this, don't care because this is going away
+            <g key={slot} transform={transform}>
+              <EmptyDeckSlot {...props} />
+              {LabwareComponent && <LabwareComponent {...props} />}
+            </g>
+          )
         }
-        const transform = `translate(${[
-          SLOT_RENDER_WIDTH * col + SLOT_SPACING_MM * (col + 1),
-          SLOT_RENDER_HEIGHT * row + SLOT_SPACING_MM * (row + 1),
-        ].join(',')})`
-
-        return (
-          <g key={slot} transform={transform}>
-            <EmptyDeckSlot {...props} />
-            {LabwareComponent && <LabwareComponent {...props} />}
-          </g>
-        )
-      })
+      )
     }
   )
 }

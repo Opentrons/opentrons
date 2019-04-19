@@ -19,7 +19,7 @@ import AppSettings from '../../components/AppSettings'
 import UpdateApp from '../../components/AppSettings/UpdateApp'
 import { ErrorModal } from '../../components/modals'
 
-import type { State } from '../../types'
+import type { State, Dispatch } from '../../types'
 import type { ShellUpdateState } from '../../shell'
 
 type OP = ContextRouter
@@ -38,7 +38,7 @@ type DP = {|
 
 type Props = { ...OP, ...SP, ...DP }
 
-export default connect(
+export default connect<Props, OP, SP, DP, State, Dispatch>(
   mapStateToProps,
   mapDispatchToProps
 )(AppSettingsPage)

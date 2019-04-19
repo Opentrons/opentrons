@@ -7,8 +7,6 @@ import { BrowserRouter } from 'react-router-dom'
 import './public-path'
 import './styles.global.css'
 
-// $FlowFixMe: upgrade Flow for React.lazy
-// const LazyApp = React.lazy(() => import('./components/App'))
 const $root = document.getElementById('root')
 
 if (!$root) {

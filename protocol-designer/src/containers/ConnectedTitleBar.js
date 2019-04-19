@@ -21,15 +21,19 @@ import { closeIngredientSelector } from '../labware-ingred/actions'
 import { stepIconsByType } from '../form-types'
 import { selectors, type Page } from '../navigation'
 
+import type { TitleBarProps } from '@opentrons/components'
 import type { BaseState } from '../types'
 
 type Props = React.ElementProps<typeof TitleBar>
-type DP = { onBackClick: $PropertyType<Props, 'onBackClick'> }
-type SP = $Diff<Props, DP> & {
+
+type DP = {| onBackClick: $PropertyType<Props, 'onBackClick'> |}
+
+type SP = {|
+  ...$Diff<$Exact<Props>, DP>,
   _page: Page,
   _liquidPlacementMode?: boolean,
   _wellSelectionMode?: boolean,
-}
+|}
 
 type TitleWithIconProps = {
   iconName?: ?IconName,
@@ -190,11 +194,11 @@ function mergeProps(
   }
 }
 
-const StickyTitleBar = props => (
+const StickyTitleBar = (props: TitleBarProps) => (
   <TitleBar {...props} className={styles.sticky_bar} />
 )
 
-export default connect(
+export default connect<Props, {||}, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps

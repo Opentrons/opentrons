@@ -17,11 +17,11 @@ import { SectionContentHalf } from '../layout'
 import InstrumentItem from './InstrumentItem'
 import InstrumentWarning from './InstrumentWarning'
 
-import type { State } from '../../types'
+import type { State, Dispatch } from '../../types'
 import type { SessionModule } from '../../robot'
 import type { Robot } from '../../discovery'
 
-type OP = { robot: Robot }
+type OP = {| robot: Robot |}
 
 type SP = {|
   modules: Array<SessionModule>,
@@ -31,11 +31,11 @@ type SP = {|
 
 type DP = {| fetchModules: () => mixed |}
 
-type Props = { ...$Exact<OP>, ...SP, ...DP }
+type Props = { ...OP, ...SP, ...DP }
 
 const TITLE = 'Required Modules'
 
-export default connect(
+export default connect<Props, OP, SP, DP, _, _>(
   makeMapStateToProps,
   mapDispatchToProps
 )(ProtocolModulesCard)

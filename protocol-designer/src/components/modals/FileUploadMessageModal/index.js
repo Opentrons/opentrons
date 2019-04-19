@@ -11,11 +11,11 @@ import type { BaseState } from '../../../types'
 
 type Props = React.ElementProps<typeof FileUploadMessageModal>
 
-type SP = {
+type SP = {|
   message: $PropertyType<Props, 'message'>,
-}
+|}
 
-type DP = $Diff<Props, SP>
+type DP = $Rest<$Exact<Props>, SP>
 
 function mapStateToProps(state: BaseState): SP {
   return {
@@ -29,7 +29,7 @@ function mapDispatchToProps(dispatch: Dispatch<*>): DP {
   }
 }
 
-export default connect(
+export default connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(FileUploadMessageModal)

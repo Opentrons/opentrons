@@ -6,15 +6,14 @@ import type { Labware } from '../../robot'
 import DeckMap from '../DeckMap'
 import InfoBox from './InfoBox'
 
-type Props = {
-  labware: ?Labware,
-}
-export default withRouter(CalibrateLabware)
+type Props = { labware: ?Labware }
+
+export default withRouter<$Exact<Props>>(CalibrateLabware)
 
 function CalibrateLabware(props: Props) {
   return (
     <div>
-      <InfoBox {...props} />
+      <InfoBox labware={props.labware} />
       <DeckMap />
     </div>
   )

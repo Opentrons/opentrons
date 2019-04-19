@@ -17,8 +17,10 @@ import {
 import LabwareSpinner from './LabwareSpinner'
 import styles from './styles.css'
 
-export type LabwareItemProps = LabwareComponentProps & {
-  labware: Labware & {
+export type LabwareItemProps = {
+  ...$Exact<LabwareComponentProps>,
+  labware: {
+    ...$Exact<Labware>,
     highlighted?: boolean,
     disabled?: boolean,
     showSpinner?: boolean,

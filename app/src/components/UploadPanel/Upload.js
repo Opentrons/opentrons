@@ -36,8 +36,7 @@ export default class Upload extends React.Component<Props, State> {
       this.props.createSession(files[0])
     }
 
-    // $FlowFixMe
-    event.target.value = null
+    event.currentTarget.value = ''
   }
 
   confirmUpload = () => {

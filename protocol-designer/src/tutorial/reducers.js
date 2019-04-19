@@ -4,6 +4,8 @@ import { handleActions } from 'redux-actions'
 import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
 import { rehydrate } from '../persist'
+
+import type { Action } from '../types'
 import type { HintKey } from './index'
 import type { AddHintAction, RemoveHintAction } from './actions'
 
@@ -55,4 +57,4 @@ export type RootState = {
   dismissedHints: DismissedHintReducerState,
 }
 
-export const rootReducer = combineReducers(_allReducers)
+export const rootReducer = combineReducers<_, Action>(_allReducers)

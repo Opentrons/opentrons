@@ -22,10 +22,10 @@ import type { ViewableRobot } from '../../discovery'
 import type { Setting } from '../../http-api-client'
 import type { ToggleRef } from './PipetteUpdateWarningModal'
 
-type OP = {
+type OP = {|
   robot: ViewableRobot,
   resetUrl: string,
-}
+|}
 
 type SP = {|
   settings: Array<Setting>,
@@ -38,7 +38,7 @@ type DP = {|
   download: () => mixed,
 |}
 
-type Props = { ...$Exact<OP>, ...SP, ...DP }
+type Props = { ...OP, ...SP, ...DP }
 
 type BooleanSettingProps = {
   id: string,
@@ -180,7 +180,7 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   }
 }
 
-export default connect(
+export default connect<Props, OP, SP, DP, State, Dispatch>(
   makeMapStateToProps,
   mapDispatchToProps
 )(AdvancedSettingsCard)

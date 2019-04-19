@@ -35,8 +35,8 @@ type DP = {| onBackClick: () => mixed |}
 
 type Props = { ...OP, ...SP, ...DP }
 
-export default withRouter(
-  connect(
+export default withRouter<{||}>(
+  connect<Props, OP, SP, _, _, _>(
     makeMapStateToProps,
     mapDispatchToProps
   )(SetupDeckPage)

@@ -25,19 +25,18 @@ import { AlertModal } from '@opentrons/components'
 import { Portal } from '../portal'
 import { LabeledCheckbox } from '../controls'
 
-type OP = {
-  robot: RobotService,
-}
+type OP = {| robot: RobotService |}
 
-type SP = {
+type SP = {|
   options: ?Array<ResetOption>,
   resetRequest: ResetRobotRequest,
   restartRequest: RobotServerRestart,
-}
+|}
 
-type DP = { dispatch: Dispatch }
+type DP = {| dispatch: Dispatch |}
 
-type Props = SP & {
+type Props = {
+  ...SP,
   fetchOptions: () => mixed,
   closeModal: () => mixed,
   reset: (options: ResetRobotRequest) => mixed,
@@ -53,7 +52,7 @@ class ResetRobotModal extends React.Component<Props, ResetRobotRequest> {
     this.state = {}
   }
 
-  toggle = name => {
+  toggle = (name: string) => {
     return () => this.setState({ [name]: !this.state[name] })
   }
 
@@ -116,7 +115,7 @@ class ResetRobotModal extends React.Component<Props, ResetRobotRequest> {
   }
 }
 
-export default connect(
+export default connect<Props, OP, SP, {||}, State, Dispatch>(
   makeMapStateToProps,
   null,
   mergeProps
@@ -126,6 +125,7 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
   const getResetOptions = makeGetRobotResetOptions()
   const getResetRequest = makeGetRobotResetRequest()
   const getRobotRestartRequest = makeGetRobotRestartRequest()
+
   return (state, ownProps) => {
     const { robot } = ownProps
     const optionsRequest = getResetOptions(state, robot)

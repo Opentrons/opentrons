@@ -26,22 +26,23 @@ import {
   type TipOffsetFields,
 } from '../../../../form-types'
 
+import type { ThunkDispatch } from '../../../../types'
+
 const SMALL_STEP_MM = 1
 const LARGE_STEP_MM = 10
 const DECIMALS_ALLOWED = 1
 
-type DP = { updateValue: (?number) => mixed }
-
-type OP = {
+type OP = {|
   mmFromBottom: number,
   wellHeightMM: number,
   isOpen: boolean,
   closeModal: () => mixed,
-  defaultMm: number,
   fieldName: TipOffsetFields,
-}
+|}
 
-type Props = OP & DP
+type DP = {| updateValue: (?number) => mixed |}
+
+type Props = { ...OP, ...DP }
 type State = { value: ?number }
 
 const roundValue = (value: number | string): number =>
@@ -55,7 +56,7 @@ class TipPositionModal extends React.Component<Props, State> {
       : roundValue(this.getDefaultMmFromBottom())
     this.state = { value: initialValue }
   }
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Props) {
     if (prevProps.wellHeightMM !== this.props.wellHeightMM) {
       this.setState({ value: roundValue(this.props.mmFromBottom) })
     }
@@ -245,7 +246,7 @@ class TipPositionModal extends React.Component<Props, State> {
   }
 }
 
-const mapDTP = (dispatch: Dispatch, ownProps: OP): DP => {
+const mapDTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => {
   return {
     updateValue: value => {
       dispatch(
@@ -255,7 +256,7 @@ const mapDTP = (dispatch: Dispatch, ownProps: OP): DP => {
   }
 }
 
-export default connect(
+export default connect<Props, OP, {||}, DP, _, _>(
   null,
   mapDTP
 )(TipPositionModal)

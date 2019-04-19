@@ -11,38 +11,36 @@ type IngredInputsExact = $Exact<IngredInputs>
 
 // ===== Labware selector actions =====
 
-export const openAddLabwareModal = createAction(
+export const openAddLabwareModal = createAction<
   'OPEN_ADD_LABWARE_MODAL',
-  (args: { slot: DeckSlot }) => args
-)
+  { slot: DeckSlot }
+>('OPEN_ADD_LABWARE_MODAL')
 
-export const closeLabwareSelector = createAction(
+export const closeLabwareSelector = createAction<
   'CLOSE_LABWARE_SELECTOR',
-  () => {}
-)
+  void
+>('CLOSE_LABWARE_SELECTOR')
 
 // ===== Open and close Ingredient Selector modal ====
 
-export const openIngredientSelector = createAction(
+export const openIngredientSelector = createAction<
   'OPEN_INGREDIENT_SELECTOR',
-  (containerId: string) => containerId
-)
+  string
+>('OPEN_INGREDIENT_SELECTOR')
 
-export const closeIngredientSelector = createAction(
+export const closeIngredientSelector = createAction<
   'CLOSE_INGREDIENT_SELECTOR',
-  () => {}
-)
+  void
+>('CLOSE_INGREDIENT_SELECTOR')
 
 // ===== Drill Down on Labware ====
 
-export const drillDownOnLabware = createAction(
-  'DRILL_DOWN_ON_LABWARE',
-  (labwareId: string) => labwareId
+export const drillDownOnLabware = createAction<'DRILL_DOWN_ON_LABWARE', string>(
+  'DRILL_DOWN_ON_LABWARE'
 )
 
-export const drillUpFromLabware = createAction(
-  'DRILL_UP_FROM_LABWARE',
-  () => {}
+export const drillUpFromLabware = createAction<'DRILL_UP_FROM_LABWARE', void>(
+  'DRILL_UP_FROM_LABWARE'
 )
 
 // ==== Create/delete/modify labware =====
@@ -67,10 +65,11 @@ export type DeleteContainerAction = {
     labwareId: string,
   },
 }
-export const deleteContainer = createAction(
+
+export const deleteContainer = createAction<
   'DELETE_CONTAINER',
-  (args: $PropertyType<DeleteContainerAction, 'payload'>) => args
-)
+  $PropertyType<DeleteContainerAction, 'payload'>
+>('DELETE_CONTAINER')
 
 export type RenameLabwareAction = {
   type: 'RENAME_LABWARE',

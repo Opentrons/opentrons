@@ -6,6 +6,7 @@ import omit from 'lodash/omit'
 
 import { getPDMetadata } from '../../file-types'
 
+import type { Action } from '../../types'
 import type { LoadFileAction } from '../../load-file'
 import type { StepIdType } from '../../form-types'
 import {
@@ -24,7 +25,8 @@ import {
   type SelectTerminalItemAction,
 } from './actions'
 
-type CollapsedStepsState = { [StepIdType]: boolean }
+export type CollapsedStepsState = { [StepIdType]: boolean }
+
 const collapsedSteps: Reducer<CollapsedStepsState, *> = handleActions(
   {
     ADD_STEP: (state: CollapsedStepsState, action: AddStepAction) => ({
@@ -106,7 +108,7 @@ const hoveredItem: Reducer<HoveredItemState, *> = handleActions(
   null
 )
 
-const hoveredSubstep = handleActions(
+const hoveredSubstep = handleActions<SubstepIdentifier, *>(
   {
     HOVER_ON_SUBSTEP: (
       state: SubstepIdentifier,
@@ -116,7 +118,7 @@ const hoveredSubstep = handleActions(
   null
 )
 
-const wellSelectionLabwareKey = handleActions(
+const wellSelectionLabwareKey = handleActions<string | null, *>(
   {
     SET_WELL_SELECTION_LABWARE_KEY: (state, action: { payload: string }) =>
       action.payload,
@@ -141,6 +143,6 @@ export const _allReducers = {
   wellSelectionLabwareKey,
 }
 
-const rootReducer = combineReducers(_allReducers)
+const rootReducer = combineReducers<_, Action>(_allReducers)
 
 export default rootReducer

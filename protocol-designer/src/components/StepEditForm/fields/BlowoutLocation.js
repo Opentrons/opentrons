@@ -14,11 +14,14 @@ import type { FocusHandlers } from '../types'
 
 // TODO: 2019-01-24 i18n for these options
 
-type BlowoutLocationDropdownOP = {
+type BlowoutLocationDropdownOP = {|
+  ...$Exact<FocusHandlers>,
   name: StepFieldName,
   className?: string,
-} & FocusHandlers
-type BlowoutLocationDropdownSP = { options: Options }
+|}
+
+type BlowoutLocationDropdownSP = {| options: Options |}
+
 const BlowoutLocationDropdownSTP = (
   state: BaseState,
   ownProps: BlowoutLocationDropdownOP
@@ -34,42 +37,53 @@ const BlowoutLocationDropdownSTP = (
 
   return { options }
 }
-export const BlowoutLocationDropdown = connect(BlowoutLocationDropdownSTP)(
-  (props: BlowoutLocationDropdownOP & BlowoutLocationDropdownSP) => {
-    const {
-      options,
-      name,
-      className,
-      focusedField,
-      dirtyFields,
-      onFieldBlur,
-      onFieldFocus,
-    } = props
-    return (
-      <FieldConnector
-        name={name}
-        focusedField={focusedField}
-        dirtyFields={dirtyFields}
-        render={({ value, updateValue, disabled }) => (
-          <DropdownField
-            className={cx(styles.large_field, className)}
-            options={options}
-            disabled={disabled}
-            onBlur={() => {
-              onFieldBlur(name)
-            }}
-            onFocus={() => {
-              onFieldFocus(name)
-            }}
-            value={value ? String(value) : null}
-            onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
-              updateValue(e.currentTarget.value)
-            }}
-          />
-        )}
-      />
-    )
-  }
-)
+
+type BlowoutLocationDropdownProps = {
+  ...BlowoutLocationDropdownOP,
+  ...BlowoutLocationDropdownSP,
+}
+
+export const BlowoutLocationDropdown = connect<
+  BlowoutLocationDropdownProps,
+  BlowoutLocationDropdownOP,
+  BlowoutLocationDropdownSP,
+  _,
+  _,
+  _
+>(BlowoutLocationDropdownSTP)((props: BlowoutLocationDropdownProps) => {
+  const {
+    options,
+    name,
+    className,
+    focusedField,
+    dirtyFields,
+    onFieldBlur,
+    onFieldFocus,
+  } = props
+  return (
+    <FieldConnector
+      name={name}
+      focusedField={focusedField}
+      dirtyFields={dirtyFields}
+      render={({ value, updateValue, disabled }) => (
+        <DropdownField
+          className={cx(styles.large_field, className)}
+          options={options}
+          disabled={disabled}
+          onBlur={() => {
+            onFieldBlur(name)
+          }}
+          onFocus={() => {
+            onFieldFocus(name)
+          }}
+          value={value ? String(value) : null}
+          onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
+            updateValue(e.currentTarget.value)
+          }}
+        />
+      )}
+    />
+  )
+})
 
 export default BlowoutLocationDropdown

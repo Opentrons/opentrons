@@ -13,27 +13,35 @@ import ConfirmPositionContents from './ConfirmPositionContents'
 import ConfirmPickupContents from './ConfirmPickupContents'
 import InProgressContents from './InProgressContents'
 
-type OP = Labware
+type OP = {| labware: Labware, calibrateToBottom: boolean |}
 
-type SP = {|
-  calibrator: ?Pipette,
-|}
+type SP = {| calibrator: ?Pipette |}
 
-type Props = { ...$Exact<OP>, ...SP }
+type Props = { ...OP, ...SP }
 
-export default connect(mapStateToProps)(ConfirmModalContents)
+export default connect<Props, OP, _, _, _, _>(mapStateToProps)(
+  ConfirmModalContents
+)
 
 function ConfirmModalContents(props: Props) {
-  if (!props.calibrator) return null
+  const { labware, calibrator, calibrateToBottom } = props
+  if (!calibrator) return null
 
-  switch (props.calibration) {
+  switch (labware.calibration) {
     case 'unconfirmed':
     case 'over-slot':
     case 'jogging':
-      return <ConfirmPositionContents {...props} />
+      return (
+        <ConfirmPositionContents
+          labware={labware}
+          calibrator={calibrator}
+          calibrateToBottom={calibrateToBottom}
+        />
+      )
 
-    case 'picked-up':
-      return <ConfirmPickupContents {...props} />
+    case 'picked-up': {
+      return <ConfirmPickupContents labware={labware} calibrator={calibrator} />
+    }
 
     case 'moving-to-slot':
     case 'picking-up':
@@ -47,7 +55,7 @@ function ConfirmModalContents(props: Props) {
 }
 
 function mapStateToProps(state, ownProps: OP): SP {
-  const calibratorMount = ownProps.calibratorMount
+  const { calibratorMount } = ownProps.labware
   const pipettes = robotSelectors.getPipettes(state)
   const calibrator =
     pipettes.find(i => i.mount === calibratorMount) ||

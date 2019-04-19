@@ -5,18 +5,19 @@ import { push } from 'react-router-redux'
 import { deckCalibrationCommand as dcCommand } from '../../http-api-client'
 import ClearDeckAlertModal from '../ClearDeckAlertModal'
 
+import type { Dispatch } from '../../types'
 import type { CalibrateDeckProps } from './types'
 
-type OP = CalibrateDeckProps
+type OP = $Exact<CalibrateDeckProps>
 
 type DP = {|
   onContinue: () => mixed,
   onCancel: () => mixed,
 |}
 
-type Props = { ...$Exact<OP>, ...DP }
+type Props = { ...OP, ...DP }
 
-export default connect(
+export default connect<Props, OP, _, DP, _, _>(
   null,
   mapDispatchToProps
 )(ClearDeckAlert)

@@ -3,22 +3,27 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import type { State } from '../../types'
 import { PrimaryButton } from '@opentrons/components'
 import CalibrationInfoContent from '../CalibrationInfoContent'
-
 import { selectors as robotSelectors } from '../../robot'
 
-type SP = {
+import type { State } from '../../types'
+import type { TipProbeProps } from './types'
+
+type OP = TipProbeProps
+
+type SP = {|
   done: boolean,
   buttonText: string,
-}
+|}
 
-type Props = SP
+type Props = { ...OP, ...SP }
 
-export default connect(mapStateToProps)(RemoveTipPanel)
+export default connect<Props, OP, SP, _, _, _, _>(mapStateToProps)(
+  ContinuePanel
+)
 
-function RemoveTipPanel(props: Props) {
+function ContinuePanel(props: Props) {
   const { done, buttonText } = props
 
   return (

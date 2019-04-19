@@ -13,8 +13,8 @@ import type { RobotState } from './'
 
 // SELECTOR UTILITIES
 
-export function sortLabwareBySlot(robotState: RobotState) {
-  return sortBy(Object.keys(robotState.labware), id =>
+export function sortLabwareBySlot(robotState: RobotState): Array<string> {
+  return sortBy<string>(Object.keys(robotState.labware), (id: string) =>
     parseInt(robotState.labware[id].slot)
   )
 }

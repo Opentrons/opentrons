@@ -10,20 +10,18 @@ import AnalyticsToggle from './AnalyticsToggle'
 import { Portal } from '../portal'
 import type { State, Dispatch } from '../../types'
 
-type SP = {
-  seen: boolean,
-}
+type OP = {||}
 
-type DP = {
-  setSeen: () => mixed,
-}
+type SP = {| seen: boolean |}
 
-type Props = SP & DP
+type DP = {| setSeen: () => mixed |}
+
+type Props = { ...SP, ...DP }
 
 const TITLE = 'Privacy Settings'
 const CONTINUE = 'continue'
 
-export default connect(
+export default connect<Props, OP, _, _, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(AnalyticsSettingsModal)

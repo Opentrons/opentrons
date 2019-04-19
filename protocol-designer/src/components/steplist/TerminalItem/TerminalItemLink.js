@@ -8,10 +8,11 @@ import { type TerminalItemId } from '../../../steplist'
 import i18n from '../../../localization'
 import styles from './styles.css'
 
-type OP = { terminalId: TerminalItemId }
-type DP = { selectTerminalItem: TerminalItemId => mixed }
+type OP = {| terminalId: TerminalItemId |}
+type DP = {| selectTerminalItem: TerminalItemId => mixed |}
+type Props = {| ...OP, ...DP |}
 
-class TerminalItemLink extends React.Component<OP & DP> {
+class TerminalItemLink extends React.Component<Props> {
   handleClick = () => {
     this.props.selectTerminalItem(this.props.terminalId)
   }
@@ -29,7 +30,8 @@ const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
   selectTerminalItem: terminalId =>
     dispatch(stepsActions.selectTerminalItem(terminalId)),
 })
-export default connect(
+
+export default connect<Props, OP, {||}, DP, _, _>(
   null,
   mapDTP
 )(TerminalItemLink)

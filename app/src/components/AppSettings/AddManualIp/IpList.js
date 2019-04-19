@@ -10,6 +10,8 @@ import type { Robot, ReachableRobot } from '../../../discovery'
 
 import IpItem from './IpItem'
 
+type OP = {||}
+
 type SP = {|
   robots: Array<Robot | ReachableRobot>,
   candidates: DiscoveryCandidates,
@@ -56,7 +58,7 @@ function mapDispatchToProps(dispatch: Dispatch): DP {
   }
 }
 
-export default connect(
+export default connect<Props, OP, SP, DP, State, Dispatch>(
   mapStateToProps,
   mapDispatchToProps
 )(IpList)

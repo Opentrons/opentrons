@@ -11,45 +11,49 @@ import styles from '../StepEditForm.css'
 import type { FocusHandlers } from '../types'
 import StepField from './FieldConnector'
 
-type PipetteFieldOP = {
+type OP = {|
+  ...$Exact<FocusHandlers>,
   name: StepFieldName,
   stepType?: StepType,
-} & FocusHandlers
-type PipetteFieldSP = { pipetteOptions: Options }
-type PipetteFieldProps = PipetteFieldOP & PipetteFieldSP
-const PipetteFieldSTP = (
-  state: BaseState,
-  ownProps: PipetteFieldOP
-): PipetteFieldSP => ({
+|}
+
+type SP = {| pipetteOptions: Options |}
+
+type Props = { ...OP, ...SP }
+
+const PipetteFieldSTP = (state: BaseState, ownProps: OP): SP => ({
   pipetteOptions: stepFormSelectors.getEquippedPipetteOptions(state),
 })
-const PipetteField = connect(PipetteFieldSTP)((props: PipetteFieldProps) => (
-  <StepField
-    name={props.name}
-    focusedField={props.focusedField}
-    dirtyFields={props.dirtyFields}
-    render={({ value, updateValue, hoverTooltipHandlers }) => (
-      <FormGroup
-        label={i18n.t('form.step_edit_form.field.pipette.label')}
-        className={styles.large_field}
-        hoverTooltipHandlers={hoverTooltipHandlers}
-      >
-        <DropdownField
-          options={props.pipetteOptions}
-          value={value ? String(value) : null}
-          onBlur={() => {
-            props.onFieldBlur(props.name)
-          }}
-          onFocus={() => {
-            props.onFieldFocus(props.name)
-          }}
-          onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
-            updateValue(e.currentTarget.value)
-          }}
-        />
-      </FormGroup>
-    )}
-  />
-))
+
+const PipetteField = connect<Props, OP, SP, _, _, _>(PipetteFieldSTP)(
+  (props: Props) => (
+    <StepField
+      name={props.name}
+      focusedField={props.focusedField}
+      dirtyFields={props.dirtyFields}
+      render={({ value, updateValue, hoverTooltipHandlers }) => (
+        <FormGroup
+          label={i18n.t('form.step_edit_form.field.pipette.label')}
+          className={styles.large_field}
+          hoverTooltipHandlers={hoverTooltipHandlers}
+        >
+          <DropdownField
+            options={props.pipetteOptions}
+            value={value ? String(value) : null}
+            onBlur={() => {
+              props.onFieldBlur(props.name)
+            }}
+            onFocus={() => {
+              props.onFieldFocus(props.name)
+            }}
+            onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
+              updateValue(e.currentTarget.value)
+            }}
+          />
+        </FormGroup>
+      )}
+    />
+  )
+)
 
 export default PipetteField

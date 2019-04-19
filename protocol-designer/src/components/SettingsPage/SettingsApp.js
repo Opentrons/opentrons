@@ -17,7 +17,7 @@ import {
   actions as tutorialActions,
   selectors as tutorialSelectors,
 } from '../../tutorial'
-import type { BaseState } from '../../types'
+import type { BaseState, ThunkDispatch } from '../../types'
 import { OLDEST_MIGRATEABLE_VERSION } from '../../load-file/migration'
 
 type Props = {
@@ -27,10 +27,10 @@ type Props = {
   toggleOptedIn: () => mixed,
 }
 
-type SP = {
+type SP = {|
   canClearHintDismissals: $PropertyType<Props, 'canClearHintDismissals'>,
   hasOptedIn: $PropertyType<Props, 'hasOptedIn'>,
-}
+|}
 
 function SettingsApp(props: Props) {
   const {
@@ -100,7 +100,7 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: Dispatch<*> }
+  dispatchProps: { dispatch: ThunkDispatch<*> }
 ): Props {
   const { dispatch } = dispatchProps
   const { hasOptedIn } = stateProps
@@ -115,7 +115,7 @@ function mergeProps(
   }
 }
 
-export default connect(
+export default connect<Props, {||}, SP, {||}, BaseState, _>(
   mapStateToProps,
   null,
   mergeProps

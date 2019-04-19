@@ -15,18 +15,15 @@ import { Modal } from '../modals'
 import Prompt from './Prompt'
 import ReviewDeck from './ReviewDeck'
 
-type OP = { slot: ?string }
+type OP = {| slot: ?string |}
 
-type SP = {
-  currentLabware: ?Labware,
-  _calibratorMount: ?Mount,
-}
+type SP = {| currentLabware: ?Labware, _calibratorMount: ?Mount |}
 
-type DP = { dispatch: Dispatch }
+type DP = {| dispatch: Dispatch |}
 
-type Props = SP & { onClick: () => void }
+type Props = { ...SP, onClick: () => void }
 
-export default connect(
+export default connect<Props, OP, SP, {||}, State, Dispatch>(
   mapStateToProps,
   null,
   mergeProps

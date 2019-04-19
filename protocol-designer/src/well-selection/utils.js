@@ -63,7 +63,7 @@ function _getWellSetForMultichannelDeprecated(
   return allWellSets.find((wellSet: Array<string>) => wellSet.includes(well))
 }
 
-export const getWellSetForMultichannelDeprecated = memoize(
+export const getWellSetForMultichannelDeprecated = memoize<Array<string>, _>(
   _getWellSetForMultichannelDeprecated,
   (labwareName: string, well: string) => `$LABWARE:${labwareName}--WELL:${well}`
 )

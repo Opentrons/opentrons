@@ -12,8 +12,9 @@ import { robotReducer, type RobotAction } from './robot'
 import { serverReducer, type ServerAction } from './server'
 import type { SettingsAction } from './settings'
 import type { NetworkingAction } from './networking'
+import type { Action } from '../types'
 
-export const reducer = combineReducers({
+export const reducer = combineReducers<_, Action>({
   calibration: calibrationReducer,
   robot: robotReducer,
   server: serverReducer,
@@ -43,7 +44,7 @@ export type { RobotMove, RobotHome, RobotLights } from './robot'
 
 export type State = $Call<typeof reducer>
 
-export type Action =
+export type HttpApiAction =
   | CalibrationAction
   | HealthAction
   | ModulesAction

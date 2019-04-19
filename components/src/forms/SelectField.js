@@ -90,9 +90,11 @@ export default class SelectField extends React.Component<SelectProps> {
         <Select
           id={id}
           name={name}
+          // $FlowFixMe: our types are more strict than react-select
           options={options}
           value={value}
           error={error}
+          // $FlowFixMe: our types are more strict than react-select
           onChange={this.handleChange}
           onBlur={this.handleBlur}
           isDisabled={disabled}
@@ -106,7 +108,7 @@ export default class SelectField extends React.Component<SelectProps> {
             IndicatorSeparator: null,
           }}
           className={className}
-          menuPosition={menuPosition}
+          menuPosition={menuPosition || 'absolute'}
         />
         {caption && <p className={captionCx}>{caption}</p>}
       </div>

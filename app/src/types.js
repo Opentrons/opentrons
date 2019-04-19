@@ -2,20 +2,15 @@
 // @flow
 // application types
 import type { Store as ReduxStore, Dispatch as ReduxDispatch } from 'redux'
-
 import type { RouterAction } from 'react-router-redux'
 
 import typeof reducer from './reducer'
 import type { Action as RobotAction } from './robot'
-import type { Action as HttpApiAction } from './http-api-client'
+import type { HttpApiAction } from './http-api-client'
 import type { ShellAction } from './shell'
 import type { ConfigAction } from './config'
 import type { DiscoveryAction } from './discovery'
 import type { ProtocolAction } from './protocol'
-
-export type State = $Call<reducer>
-
-export type GetState = () => State
 
 export type Action =
   | RobotAction
@@ -25,6 +20,10 @@ export type Action =
   | RouterAction
   | DiscoveryAction
   | ProtocolAction
+
+export type State = $Call<reducer, {}, Action>
+
+export type GetState = () => State
 
 export type ActionType = $PropertyType<Action, 'type'>
 

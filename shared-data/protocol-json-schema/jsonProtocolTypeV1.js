@@ -96,6 +96,7 @@ export type SchemaV1ProtocolFile<DesignerApplicationData> = {
     'touch-tip-mm-from-top'?: number,
   },
 
+  // TODO(mc, 2019-04-17): this key isn't marked required in JSON schema
   'designer-application': {
     'application-name': string,
     'application-version': ?string,

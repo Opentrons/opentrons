@@ -24,7 +24,7 @@ type OP = {
   containerId?: string,
 }
 
-type SP = $Diff<Props, OP>
+type SP = $Diff<$Exact<Props>, OP>
 
 function mapStateToProps(state: BaseState, ownProps: OP): SP {
   const selectedContainerId = selectors.getSelectedLabwareId(state)
@@ -124,4 +124,6 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
   }
 }
 
-export default connect(mapStateToProps)(HighlightableLabware)
+export default connect<Props, OP, SP, _, _, _>(mapStateToProps)(
+  HighlightableLabware
+)

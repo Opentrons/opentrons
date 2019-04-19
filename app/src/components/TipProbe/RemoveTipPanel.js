@@ -1,36 +1,29 @@
 // @flow
 import * as React from 'react'
-import type { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 
 import { PrimaryButton } from '@opentrons/components'
 import CalibrationInfoContent from '../CalibrationInfoContent'
 
+import { actions as robotActions } from '../../robot'
 import removeSingle from '../../img/remove_tip_single.png'
 import removeMulti from '../../img/remove_tip_multi.png'
 
-import { actions as robotActions, type Channels, type Mount } from '../../robot'
+import type { Dispatch } from '../../types'
+import type { TipProbeProps } from './types'
 
-type OwnProps = {
-  mount: Mount,
-  channels: Channels,
-}
+type OP = TipProbeProps
 
-type DispatchProps = {
-  onConfirmClick: () => void,
-}
+type DP = {| onConfirmClick: () => void |}
 
-type RemoveTipProps = {
-  channels: Channels,
-  onConfirmClick: () => void,
-}
+type Props = {| ...OP, ...DP |}
 
-export default connect(
+export default connect<Props, OP, {||}, DP, _, _>(
   null,
   mapDispatchToProps
 )(RemoveTipPanel)
 
-function RemoveTipPanel(props: RemoveTipProps) {
+function RemoveTipPanel(props: Props) {
   const { channels, onConfirmClick } = props
 
   const imgSrc = channels === 1 ? removeSingle : removeMulti
@@ -50,10 +43,7 @@ function RemoveTipPanel(props: RemoveTipProps) {
   )
 }
 
-function mapDispatchToProps(
-  dispatch: Dispatch<*>,
-  ownProps: OwnProps
-): DispatchProps {
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   const { mount } = ownProps
 
   return {

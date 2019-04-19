@@ -27,7 +27,7 @@ type Props = {
   maxFlowRate: number,
   updateValue: (flowRate: ?number) => mixed,
   pipetteDisplayName: ?string,
-  className: ?string,
+  className?: string,
 }
 
 type State = {

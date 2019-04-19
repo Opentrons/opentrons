@@ -47,14 +47,18 @@ export function fetchPipettes(
   if (refresh) path += '?refresh=true'
 
   return dispatch => {
+    // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
     dispatch(apiRequest(robot, path, null))
 
-    return client(robot, 'GET', path)
-      .then(
-        (resp: PipettesResponse) => apiSuccess(robot, PIPETTES, resp),
-        (err: ApiRequestError) => apiFailure(robot, PIPETTES, err)
-      )
-      .then(dispatch)
+    return (
+      client(robot, 'GET', path)
+        .then(
+          (resp: PipettesResponse) => apiSuccess(robot, PIPETTES, resp),
+          (err: ApiRequestError) => apiFailure(robot, PIPETTES, err)
+        )
+        // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
+        .then(dispatch)
+    )
   }
 }
 

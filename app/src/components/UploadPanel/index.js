@@ -10,19 +10,19 @@ import Upload from './Upload'
 
 import type { State, Dispatch } from '../../types'
 
-type SP = {
+type SP = {|
   filename: ?string,
   sessionLoaded: ?boolean,
   uploadError: ?{ message: string },
-}
+|}
 
-type DP = {
+type DP = {|
   createSession: File => mixed,
-}
+|}
 
-type Props = SP & DP
+type Props = { ...SP, ...DP }
 
-export default connect(
+export default connect<Props, {||}, _, _, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(UploadPanel)

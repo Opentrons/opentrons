@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import noop from 'lodash/noop'
 import { getLabware, getIsTiprackDeprecated } from '@opentrons/shared-data'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors as uiLabwareSelectors } from '../ui/labware'
@@ -21,7 +20,7 @@ import { selectors as stepsSelectors } from '../ui/steps'
 
 import { LabwareOnDeck } from '../components/labware'
 import type { StepIdType } from '../form-types'
-import type { BaseState } from '../types'
+import type { BaseState, ThunkDispatch } from '../types'
 import type { DeckSlot } from '@opentrons/components'
 
 type OP = {
@@ -30,22 +29,22 @@ type OP = {
 
 type Props = React.ElementProps<typeof LabwareOnDeck>
 
-type DP = {
+type DP = {|
   addLabware: () => mixed,
   editLiquids: () => mixed,
   deleteLabware: () => mixed,
   duplicateLabware: StepIdType => mixed,
-  swapSlotContents: (DeckSlot, DeckSlot) => void,
+  swapSlotContents: (DeckSlot, DeckSlot) => mixed,
   setLabwareName: (name: ?string) => mixed,
   setDefaultLabwareName: () => mixed,
-}
+|}
 
-type MP = {
+type MP = {|
   drillDown: () => mixed,
   drillUp: () => mixed,
-}
+|}
 
-type SP = $Diff<Props, { ...DP, ...MP }>
+type SP = $Diff<$Exact<Props>, { ...DP, ...MP }>
 
 function mapStateToProps(state: BaseState, ownProps: OP): SP {
   const { slot } = ownProps
@@ -90,9 +89,6 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
   ]
   const showNameOverlay = !isTiprack && !labwareHasName
 
-  const setDefaultLabwareName =
-    labwareId != null ? () => renameLabware({ labwareId, name: null }) : noop
-
   // labware definition's metadata.isValidSource defaults to true,
   // only use it when it is defined as false
   let canAddIngreds: boolean = !showNameOverlay
@@ -104,10 +100,8 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
   return {
     slotHasLabware: true,
     addLabwareMode,
-    setDefaultLabwareName,
     canAddIngreds,
     isTiprack,
-    labwareInfo,
 
     showNameOverlay,
     highlighted:
@@ -130,7 +124,7 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: Dispatch<*> },
+  dispatchProps: { dispatch: ThunkDispatch<*> },
   ownProps: OP
 ): Props {
   const { slot } = ownProps
@@ -174,7 +168,7 @@ function mergeProps(
   }
 }
 
-export default connect(
+export default connect<Props, OP, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps

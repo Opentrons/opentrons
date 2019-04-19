@@ -23,7 +23,7 @@ import type { ShellUpdateState } from '../../../shell'
 import type { ViewableRobot } from '../../../discovery'
 import type { RobotUpdateInfo } from '../../../http-api-client'
 
-type OP = { robot: ViewableRobot, appUpdate: ShellUpdateState }
+type OP = {| robot: ViewableRobot, appUpdate: ShellUpdateState |}
 
 type SP = {|
   appVersion: string,
@@ -31,10 +31,10 @@ type SP = {|
   robotUpdateInfo: RobotUpdateInfo,
 |}
 
-type DP = { dispatch: Dispatch }
+type DP = {| dispatch: Dispatch |}
 
 type Props = {
-  ...$Exact<OP>,
+  ...OP,
   ...SP,
   parentUrl: string,
   ignoreUpdate: () => mixed,
@@ -46,7 +46,7 @@ type UpdateRobotState = {
 }
 
 class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
     this.state = { ignoreAppUpdate: false }
   }
@@ -120,15 +120,15 @@ function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
     : close
 
   return {
-    ...stateProps,
     ...ownProps,
+    ...stateProps,
     parentUrl,
     ignoreUpdate,
     update: () => dispatch(updateRobotServer(robot)),
   }
 }
 
-export default connect(
+export default connect<Props, OP, SP, {||}, State, Dispatch>(
   makeMapStateToProps,
   null,
   mergeProps

@@ -17,11 +17,11 @@ import Alerts from './Alerts'
 
 type Props = React.ElementProps<typeof Alerts>
 
-type SP = {
+type SP = {|
   errors: $PropertyType<Props, 'errors'>,
   warnings: $PropertyType<Props, 'warnings'>,
   _stepId: ?StepIdType,
-}
+|}
 
 /** Errors and Warnings from step-generation are written for developers
  * who are using step-generation as an API for writing Opentrons protocols.
@@ -74,7 +74,7 @@ function mergeProps(
   }
 }
 
-export default connect(
+export default connect<Props, {||}, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps

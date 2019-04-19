@@ -20,10 +20,10 @@ import { LabeledToggle, LabeledButton } from '../controls'
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery'
 
-type OP = {
+type OP = {|
   robot: ViewableRobot,
   calibrateDeckUrl: string,
-}
+|}
 
 type SP = {|
   lightsOn: boolean,
@@ -35,7 +35,7 @@ type DP = {|
 |}
 
 type Props = {
-  ...$Exact<OP>,
+  ...OP,
   ...SP,
   homeAll: () => mixed,
   fetchLights: () => mixed,
@@ -45,7 +45,7 @@ type Props = {
 
 const TITLE = 'Robot Controls'
 
-export default connect(
+export default connect<Props, OP, SP, {||}, State, Dispatch>(
   makeMakeStateToProps,
   null,
   mergeProps

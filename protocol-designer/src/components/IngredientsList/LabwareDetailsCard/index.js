@@ -13,11 +13,10 @@ import type { BaseState } from '../../../types'
 
 type Props = ElementProps<typeof LabwareDetailsCard>
 
-type DP = {
-  renameLabware: $PropertyType<Props, 'renameLabware'>,
-}
-
-type SP = $Diff<Props, DP> & { _labwareId?: string }
+type SP = {|
+  ...$Diff<$Exact<Props>, {| renameLabware: * |}>,
+  _labwareId?: string,
+|}
 
 function mapStateToProps(state: BaseState): SP {
   const labwareNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
@@ -71,7 +70,7 @@ function mergeProps(
   }
 }
 
-export default connect(
+export default connect<Props, {||}, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps

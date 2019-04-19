@@ -16,13 +16,13 @@ import InstrumentInfo from './InstrumentInfo'
 import { CardContentFlex } from '../layout'
 import { Card, IntervalWrapper } from '@opentrons/components'
 
-import type { State } from '../../types'
+import type { State, Dispatch } from '../../types'
 import type { Robot } from '../../discovery'
 import type { Pipette } from '../../http-api-client'
 
-type OP = {
+type OP = {|
   robot: Robot,
-}
+|}
 
 type SP = {|
   inProgress: boolean,
@@ -36,11 +36,11 @@ type DP = {|
   clearMove: () => mixed,
 |}
 
-type Props = { ...$Exact<OP>, ...SP, ...DP }
+type Props = { ...OP, ...SP, ...DP }
 
 const TITLE = 'Pipettes'
 
-export default connect(
+export default connect<Props, OP, SP, _, _, _>(
   makeMapStateToProps,
   mapDispatchToProps
 )(AttachedPipettesCard)

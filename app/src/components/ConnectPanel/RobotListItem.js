@@ -12,17 +12,10 @@ import styles from './styles.css'
 import type { RobotItemProps } from './RobotItem'
 
 export function RobotListItem(props: RobotItemProps) {
-  const {
-    name,
-    displayName,
-    local,
-    status,
-    selected,
-    upgradable,
-    connect,
-    disconnect,
-  } = props
-  const connected = props.connected != null && props.connected === true
+  const { robot, selected, upgradable, connect, disconnect } = props
+  const { name, displayName, local, status } = robot
+  // unnecessary existence check to satisfy flow
+  const connected = robot.connected != null && robot.connected === true
   const connectable = status === CONNECTABLE
   const onClick = connected ? disconnect : connect
 

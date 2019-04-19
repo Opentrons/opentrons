@@ -28,7 +28,9 @@ const INFO_TITLE = 'Information'
 const DESCRIPTION_TITLE = 'Description'
 const DATE_FORMAT = 'DD MMM Y, hh:mmA'
 
-export default connect(mapStateToProps)(InformationCard)
+export default connect<Props, {||}, _, _, _, _>(mapStateToProps)(
+  InformationCard
+)
 
 function InformationCard(props: Props) {
   const { name, author, method, description } = props
@@ -63,7 +65,7 @@ function InformationCard(props: Props) {
   )
 }
 
-function mapStateToProps(state: State): Props {
+function mapStateToProps(state: State): $Exact<Props> {
   return {
     name: getProtocolName(state),
     author: getProtocolAuthor(state),

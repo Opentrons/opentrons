@@ -43,7 +43,7 @@ function ExitAlertModal(props: Props) {
   )
 }
 
-export default connect(
+export default connect<Props, {||}, {||}, _, _, _>(
   null,
   mapDispatchToProps
 )(ExitAlertModal)
