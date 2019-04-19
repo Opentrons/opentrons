@@ -81,7 +81,6 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
       pipetteLocations: pipettes,
     })
     robotState.liquidState.labware = labwareLiquidState
-    console.log({ robotState })
     return robotState
   }
 )
