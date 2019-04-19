@@ -212,17 +212,15 @@ export function mergeLiquid(
   }
 }
 
-type WellsForTips = {
-  wellsForTips: Array<string>,
-  allWellsShared: boolean,
-}
-
-// TODO IMMEDIATELY: move to shared-data helpers
+// TODO: Ian 2019-04-19 move to shared-data helpers?
 export function getWellsForTips(
   channels: 1 | 8,
   labwareDef: LabwareDefinition2,
   well: string
-): WellsForTips {
+): {|
+  wellsForTips: Array<string>,
+  allWellsShared: boolean,
+|} {
   // Array of wells corresponding to the tip at each position.
   const wellsForTips =
     channels === 1 ? [well] : computeWellAccess(labwareDef, well)
