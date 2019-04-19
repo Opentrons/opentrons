@@ -1,11 +1,20 @@
 // @flow
 import {
+  fixture96Plate,
+  fixtureTipRack10Ul,
+  fixtureTipRack300Ul,
+  fixtureTrash,
+  fixtureP10Single,
+  fixtureP300Multi,
+} from '@opentrons/shared-data/fixtures'
+import {
   reduceCommandCreators,
   commandCreatorsTimeline,
   splitLiquid,
   mergeLiquid,
   AIR,
   repeatArray,
+  makeInitialRobotState,
 } from '../utils'
 import type { InvariantContext } from '../types'
 
@@ -389,4 +398,61 @@ describe('repeatArray', () => {
       [3, 4],
     ])
   })
+})
+
+describe('makeInitialRobotState', () => {
+  expect(
+    makeInitialRobotState({
+      invariantContext: {
+        pipetteEntities: {
+          p10SingleId: {
+            id: 'p10SingleId',
+            name: 'p10_single',
+            spec: fixtureP10Single,
+            tiprackModel: fixtureTipRack10Ul.otId,
+            tiprackLabwareDef: fixtureTipRack10Ul,
+          },
+          p300MultiId: {
+            id: 'p300MultiId',
+            name: 'p300_multi',
+            spec: fixtureP300Multi,
+            tiprackModel: fixtureTipRack300Ul.otId,
+            tiprackLabwareDef: fixtureTipRack300Ul,
+          },
+        },
+        labwareEntities: {
+          somePlateId: {
+            id: 'somePlateId',
+            type: fixture96Plate.otId,
+            def: fixture96Plate,
+          },
+          tiprack10Id: {
+            id: 'tiprack10Id',
+            type: fixtureTipRack10Ul.otId,
+            def: fixtureTipRack10Ul,
+          },
+          tiprack300Id: {
+            id: 'tiprack300Id',
+            type: fixtureTipRack300Ul.otId,
+            def: fixtureTipRack300Ul,
+          },
+          trashId: {
+            id: 'trashId',
+            type: fixtureTrash.otId,
+            def: fixtureTrash,
+          },
+        },
+      },
+      labwareLocations: {
+        somePlateId: { slot: '1' },
+        tiprack10Id: { slot: '2' },
+        tiprack300Id: { slot: '3' },
+        trashId: { slot: '12' },
+      },
+      pipetteLocations: {
+        p10SingleId: { mount: 'left' },
+        p300MultiId: { mount: 'right' },
+      },
+    })
+  ).toMatchSnapshot()
 })

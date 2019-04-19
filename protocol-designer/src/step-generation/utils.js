@@ -335,10 +335,12 @@ export function makeInitialRobotState(args: {|
       ),
       tipracks: reduce(
         labwareLocations,
-        (acc, _, labwareId) =>
-          getIsTiprack(invariantContext.labwareEntities[labwareId].def)
-            ? { ...acc, [labwareId]: true }
-            : acc,
+        (acc, _, labwareId) => {
+          const def = invariantContext.labwareEntities[labwareId].def
+          if (!getIsTiprack(def)) return acc
+          const tipState = mapValues(def.wells, () => true)
+          return { ...acc, [labwareId]: tipState }
+        },
         {}
       ),
     },
