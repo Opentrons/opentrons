@@ -19,6 +19,7 @@ const PIPETTE_MODELS = [
   'p10_multi_v1',
   'p10_multi_v1.3',
   'p10_multi_v1.4',
+  'p10_multi_v1.5',
   'p50_single_v1',
   'p50_single_v1.3',
   'p50_single_v1.4',
