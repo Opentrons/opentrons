@@ -13,15 +13,19 @@ import type { BaseState } from '../../../../types'
 import stepEditStyles from '../../StepEditForm.css'
 import styles from './WellOrderInput.css'
 
-type OP = {
+type OP = {|
   className?: ?string,
   label?: string,
   prefix: 'aspirate' | 'dispense' | 'mix',
-}
-type SP = { iconClassNames: Array<string> }
+|}
+
+type SP = {| iconClassNames: Array<string> |}
+
+type Props = { ...OP, ...SP }
 
 type WellOrderInputState = { isModalOpen: boolean }
-class WellOrderInput extends React.Component<OP & SP, WellOrderInputState> {
+
+class WellOrderInput extends React.Component<Props, WellOrderInputState> {
   state: WellOrderInputState = { isModalOpen: false }
 
   handleOpen = () => {
@@ -77,4 +81,4 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   return { iconClassNames }
 }
 
-export default connect(mapSTP)(WellOrderInput)
+export default connect<Props, OP, SP, _, _, _>(mapSTP)(WellOrderInput)

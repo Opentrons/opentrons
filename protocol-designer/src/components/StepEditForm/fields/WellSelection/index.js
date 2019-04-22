@@ -12,7 +12,7 @@ import { showFieldErrors } from '../FieldConnector'
 
 type Props = React.ElementProps<typeof WellSelectionInput>
 
-type OP = {
+type OP = {|
   name: StepFieldName,
   pipetteFieldName: StepFieldName,
   labwareFieldName: StepFieldName,
@@ -20,16 +20,16 @@ type OP = {
   onFieldFocus: $PropertyType<FocusHandlers, 'onFieldFocus'>,
   focusedField: $PropertyType<FocusHandlers, 'focusedField'>,
   dirtyFields: $PropertyType<FocusHandlers, 'dirtyFields'>,
-}
+|}
 
-type SP = {
+type SP = {|
   disabled: boolean,
   isMulti: $PropertyType<Props, 'isMulti'>,
   primaryWellCount: $PropertyType<Props, 'primaryWellCount'>,
   _pipetteId: ?string,
   _selectedLabwareId: ?string,
   _wellFieldErrors: Array<string>,
-}
+|}
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const formData = stepFormSelectors.getUnsavedForm(state)
@@ -81,7 +81,7 @@ function mergeProps(
   }
 }
 
-export default connect(
+export default connect<Props, OP, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps

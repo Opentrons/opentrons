@@ -2,7 +2,7 @@
 // connect and configure robots page
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, Route, Switch, Redirect, type Match } from 'react-router'
+import { withRouter, Route, Switch, Redirect } from 'react-router'
 
 import {
   selectors as robotSelectors,
@@ -29,15 +29,20 @@ import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
 import ReachableRobotBanner from '../../components/RobotSettings/ReachableRobotBanner'
 import ResetRobotModal from '../../components/RobotSettings/ResetRobotModal'
 
+import type { ContextRouter } from 'react-router'
 import type { State, Dispatch, Error } from '../../types'
 import type { ViewableRobot } from '../../discovery'
 import type { ShellUpdateState } from '../../shell'
 
-type OP = {
+type WithRouterOP = {|
   robot: ViewableRobot,
   appUpdate: ShellUpdateState,
-  match: Match,
-}
+|}
+
+type OP = {|
+  ...ContextRouter,
+  ...WithRouterOP,
+|}
 
 type SP = {|
   showUpdateModal: boolean,
@@ -49,14 +54,14 @@ type SP = {|
 type DP = {| dispatch: Dispatch |}
 
 type Props = {
-  ...$Exact<OP>,
+  ...OP,
   ...SP,
   closeHomeAlert?: () => mixed,
   closeConnectAlert: () => mixed,
 }
 
-export default withRouter(
-  connect(
+export default withRouter<WithRouterOP>(
+  connect<Props, OP, SP, {||}, State, Dispatch>(
     makeMapStateToProps,
     null,
     mergeProps
@@ -113,9 +118,7 @@ function RobotSettingsPage(props: Props) {
 
         <Route
           path={`${path}/${CALIBRATE_DECK_FRAGMENT}`}
-          render={props => (
-            <CalibrateDeck match={props.match} robot={robot} parentUrl={url} />
-          )}
+          render={props => <CalibrateDeck robot={robot} parentUrl={url} />}
         />
 
         <Route

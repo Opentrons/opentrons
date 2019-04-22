@@ -12,10 +12,10 @@ import type { BaseState, ThunkDispatch } from '../../types'
 
 type Props = React.ElementProps<typeof LabwareSelectionModal>
 
-type SP = {
+type SP = {|
   slot: $PropertyType<Props, 'slot'>,
   permittedTipracks: $PropertyType<Props, 'permittedTipracks'>,
-}
+|}
 
 function mapStateToProps(state: BaseState): SP {
   return {
@@ -43,7 +43,7 @@ function mergeProps(
   }
 }
 
-export default connect(
+export default connect<Props, {||}, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps

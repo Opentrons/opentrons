@@ -17,28 +17,28 @@ import type { State, Dispatch } from '../../types'
 import type { RobotUpdateInfo } from '../../http-api-client'
 import type { ViewableRobot } from '../../discovery'
 
-type OwnProps = {
+type OP = {|
   robot: ViewableRobot,
   updateUrl: string,
-}
+|}
 
-type StateProps = {|
+type SP = {|
   updateInfo: RobotUpdateInfo,
 |}
 
-type DispatchProps = {|
+type DP = {|
   fetchHealth: () => mixed,
   checkAppUpdate: () => mixed,
 |}
 
-type Props = { ...$Exact<OwnProps>, ...StateProps, ...DispatchProps }
+type Props = { ...OP, ...SP, ...DP }
 
 const TITLE = 'Information'
 const NAME_LABEL = 'Robot name'
 const SERVER_VERSION_LABEL = 'Server version'
 const FIRMWARE_VERSION_LABEL = 'Firmware version'
 
-export default connect(
+export default connect<Props, OP, SP, _, _, _>(
   makeMapStateToProps,
   mapDispatchToProps
 )(InformationCard)
@@ -75,18 +75,15 @@ function InformationCard(props: Props) {
   )
 }
 
-function makeMapStateToProps() {
+function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
   const getUpdateInfo = makeGetRobotUpdateInfo()
 
-  return (state: State, ownProps: OwnProps): StateProps => ({
+  return (state, ownProps) => ({
     updateInfo: getUpdateInfo(state, ownProps.robot),
   })
 }
 
-function mapDispatchToProps(
-  dispatch: Dispatch,
-  ownProps: OwnProps
-): DispatchProps {
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   return {
     // TODO(mc, 2018-10-10): only need to fetch ignored
     fetchHealth: () => dispatch(fetchHealthAndIgnored(ownProps.robot)),

@@ -16,16 +16,17 @@ import type { StepIdType, StepFieldName } from '../../../../form-types'
 import type { BaseState } from '../../../../types'
 import type { FocusHandlers } from '../../types'
 
-type SP = {
+type SP = {|
   stepId: ?StepIdType,
   wellSelectionLabwareKey: ?string,
-}
-type DP = {
+|}
+
+type DP = {|
   onOpen: string => mixed,
   onClose: () => mixed,
-}
+|}
 
-type OP = {
+type OP = {|
   name: StepFieldName,
   primaryWellCount?: number,
   disabled: boolean,
@@ -35,9 +36,9 @@ type OP = {
   labwareId: ?string,
   onFieldBlur: $PropertyType<FocusHandlers, 'onFieldBlur'>,
   onFieldFocus: $PropertyType<FocusHandlers, 'onFieldFocus'>,
-}
+|}
 
-type Props = OP & SP & DP
+type Props = {| ...OP, ...SP, ...DP |}
 
 class WellSelectionInput extends React.Component<Props> {
   handleOpen = () => {
@@ -104,7 +105,7 @@ const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
   onClose: () => dispatch(stepsActions.clearWellSelectionLabwareKey()),
 })
 
-export default connect(
+export default connect<Props, OP, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(WellSelectionInput)

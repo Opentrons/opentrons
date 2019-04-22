@@ -2,7 +2,7 @@
 import { connect } from 'react-redux'
 import * as React from 'react'
 import mapValues from 'lodash/mapValues'
-import type { BaseState } from '../types'
+import type { BaseState, ThunkDispatch } from '../types'
 import FilePage from '../components/FilePage'
 import { actions, selectors as fileSelectors } from '../file-data'
 import { selectors as stepFormSelectors } from '../step-forms'
@@ -14,11 +14,11 @@ import { actions as navActions } from '../navigation'
 
 type Props = React.ElementProps<typeof FilePage>
 
-type SP = {
+type SP = {|
   instruments: $PropertyType<Props, 'instruments'>,
   formValues: $PropertyType<Props, 'formValues'>,
   _initialDeckSetup: InitialDeckSetup,
-}
+|}
 
 const mapStateToProps = (state: BaseState): SP => {
   return {
@@ -30,7 +30,7 @@ const mapStateToProps = (state: BaseState): SP => {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: Dispatch<*> }
+  dispatchProps: { dispatch: ThunkDispatch<*> }
 ): Props {
   const { _initialDeckSetup, ...passThruProps } = stateProps
   const { dispatch } = dispatchProps
@@ -55,7 +55,7 @@ function mergeProps(
   }
 }
 
-export default connect(
+export default connect<Props, {||}, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps

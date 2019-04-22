@@ -145,13 +145,16 @@ export const SECURITY_TYPE_FIELD = 'securityType'
 export const EAP_CONFIG_FIELD = 'eapConfig'
 export const EAP_TYPE_FIELD = `${EAP_CONFIG_FIELD}.eapType`
 
-export const fetchNetworkingStatus = buildRequestMaker('GET', STATUS)
-export const fetchWifiList = buildRequestMaker('GET', LIST)
-export const fetchWifiEapOptions = buildRequestMaker('GET', EAP_OPTIONS)
-export const fetchWifiKeys = buildRequestMaker('GET', KEYS)
-export const configureWifi = buildRequestMaker('POST', CONFIGURE)
+export const fetchNetworkingStatus = buildRequestMaker<void>('GET', STATUS)
+export const fetchWifiList = buildRequestMaker<void>('GET', LIST)
+export const fetchWifiEapOptions = buildRequestMaker<void>('GET', EAP_OPTIONS)
+export const fetchWifiKeys = buildRequestMaker<void>('GET', KEYS)
+export const configureWifi = buildRequestMaker<WifiConfigureRequest>(
+  'POST',
+  CONFIGURE
+)
 export const clearConfigureWifiResponse = (robot: BaseRobot) =>
-  clearApiResponse(robot, CONFIGURE)
+  clearApiResponse<WifiConfigurePath>(robot, CONFIGURE)
 
 // slightly custom action creator to call `POST /wifi/keys` (see TODO below)
 export function addWifiKey(
@@ -159,6 +162,7 @@ export function addWifiKey(
   file: File
 ): ThunkPromiseAction {
   return dispatch => {
+    // $FlowFixMe: (mc, 2019-04-18) http-api-client types need to be redone
     dispatch(apiRequest(robot, KEYS, { key: file.name }))
 
     const request = new FormData()
@@ -179,6 +183,7 @@ export function addWifiKey(
         // $FlowFixMe: see above
         return apiSuccess(robot, KEYS, response)
       },
+      // $FlowFixMe: (mc, 2019-04-18) http-api-client types need to be redone
       error => dispatch(apiFailure(robot, KEYS, error))
     )
   }
@@ -193,6 +198,7 @@ type GetConfigureWifiCall = Sel<State, BaseRobot, ConfigureWifiCall>
 export const makeGetRobotNetworkingStatus = (): GetNetworkingStatusCall =>
   createSelector(
     getRobotApiState,
+    // $FlowFixMe: (mc, 2019-04-18) http-api-client types need to be redone
     state => state[STATUS] || { inProgress: false }
   )
 

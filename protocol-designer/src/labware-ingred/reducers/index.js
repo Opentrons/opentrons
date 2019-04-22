@@ -9,6 +9,7 @@ import * as actions from '../actions'
 import { FIXED_TRASH_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
 import type { DeckSlot } from '@opentrons/components'
+import type { Action } from '../../types'
 import type {
   SingleLabwareLiquidState,
   LabwareLiquidState,
@@ -106,7 +107,7 @@ const initialLabwareState: ContainersState = {
   },
 }
 
-export const containers = handleActions(
+export const containers = handleActions<ContainersState, *>(
   {
     CREATE_CONTAINER: (
       state: ContainersState,
@@ -197,7 +198,7 @@ export const containers = handleActions(
 
 type SavedLabwareState = { [labwareId: string]: boolean }
 /** Keeps track of which labware have saved nicknames */
-export const savedLabware = handleActions(
+export const savedLabware = handleActions<SavedLabwareState, *>(
   {
     DELETE_CONTAINER: (
       state: SavedLabwareState,
@@ -229,7 +230,7 @@ export const savedLabware = handleActions(
 )
 
 type IngredientsState = LiquidGroupsById
-export const ingredients = handleActions(
+export const ingredients = handleActions<IngredientsState, *>(
   {
     EDIT_LIQUID_GROUP: (
       state: IngredientsState,
@@ -258,7 +259,7 @@ export const ingredients = handleActions(
 
 type LocationsState = LabwareLiquidState
 
-export const ingredLocations = handleActions(
+export const ingredLocations = handleActions<LocationsState, *>(
   {
     SET_WELL_CONTENTS: (
       state: LocationsState,
@@ -339,7 +340,7 @@ export type RootState = {|
 |}
 
 // TODO Ian 2018-01-15 factor into separate files
-const rootReducer = combineReducers({
+const rootReducer = combineReducers<_, Action>({
   modeLabwareSelection,
   selectedContainerId,
   selectedLiquidGroup,

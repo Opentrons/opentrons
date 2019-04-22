@@ -4,6 +4,8 @@ import thunk from 'redux-thunk'
 import { makePersistSubscriber, rehydratePersistedAction } from './persist'
 import { fileUploadMessage } from './load-file/actions'
 
+import type { BaseState, Action, ThunkDispatch } from './types'
+
 const ReselectTools =
   process.env.NODE_ENV === 'development' ? require('reselect-tools') : undefined
 
@@ -54,7 +56,8 @@ export default function configureStore() {
 
   const composeEnhancers: any =
     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
-  const store = createStore(
+
+  const store = createStore<BaseState, Action, ThunkDispatch<*>>(
     reducer,
     /* preloadedState, */
     composeEnhancers(applyMiddleware(thunk))

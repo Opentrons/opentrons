@@ -15,27 +15,19 @@ import { Modal } from '../modals'
 import Prompt from './Prompt'
 import ReviewModuleItem from './ReviewModuleItem'
 
-import type { State } from '../../types'
+import type { State, Dispatch } from '../../types'
 import type { RobotService, SessionModule } from '../../robot'
 import type { Module } from '../../http-api-client'
 
-type OP = {
-  robot: RobotService,
-}
+type OP = {| robot: RobotService |}
 
-type SP = {
-  modulesRequired: boolean,
-  modulesMissing: boolean,
-}
+type SP = {| modulesRequired: boolean, modulesMissing: boolean |}
 
-type DP = {
-  setReviewed: () => mixed,
-  fetchModules: () => mixed,
-}
+type DP = {| setReviewed: () => mixed, fetchModules: () => mixed |}
 
-type Props = OP & SP & DP
+type Props = { ...OP, ...SP, ...DP }
 
-export default connect(
+export default connect<Props, OP, SP, DP, State, Dispatch>(
   makeMapStateToProps,
   mapDispatchToProps
 )(ConnectModulesModal)

@@ -1,7 +1,7 @@
 // @flow
 // mdns browser wrapper
 import mdns, { ServiceType } from 'mdns-js'
-import type { Browser } from 'mdns-js'
+import type { Browser, NetworkConnection } from 'mdns-js'
 import keys from 'lodash/keys'
 import flatMap from 'lodash/flatMap'
 
@@ -15,11 +15,14 @@ export function getKnownIps(maybeBrowser: ?Browser): Array<string> {
   if (!maybeBrowser) return []
   const browser: Browser = maybeBrowser
 
-  // $FlowFixMe: https://github.com/flow-typed/flow-typed/issues/2463
-  return flatMap(browser.networking.connections, connection => {
-    const { addresses } = browser.connections[connection.networkInterface] || {}
-    return keys(addresses)
-  })
+  return flatMap<NetworkConnection, string>(
+    browser.networking.connections,
+    (connection: NetworkConnection, i: number, _: Array<NetworkConnection>) => {
+      const { addresses } =
+        browser.connections[connection.networkInterface] || {}
+      return keys(addresses)
+    }
+  )
 }
 
 function monkeyPatchThrowers() {

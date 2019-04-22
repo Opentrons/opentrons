@@ -10,7 +10,7 @@ import type { InvariantContext, RobotState } from './'
 export function sortLabwareBySlot(
   labwareState: $PropertyType<RobotState, 'labware'>
 ) {
-  return sortBy(Object.keys(labwareState), id =>
+  return sortBy<string>(Object.keys(labwareState), (id: string) =>
     parseInt(labwareState[id].slot)
   )
 }

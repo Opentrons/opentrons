@@ -271,7 +271,7 @@ type LabwareOnDeckProps = {
 
   deleteLabware: () => mixed,
   duplicateLabware: StepIdType => mixed,
-  swapSlotContents: (DeckSlot, DeckSlot) => void,
+  swapSlotContents: (DeckSlot, DeckSlot) => mixed,
 
   setLabwareName: (name: ?string) => mixed,
   setDefaultLabwareName: () => mixed,

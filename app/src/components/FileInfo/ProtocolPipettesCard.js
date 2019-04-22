@@ -12,12 +12,12 @@ import { SectionContentHalf } from '../layout'
 import InfoSection from './InfoSection'
 import InstrumentWarning from './InstrumentWarning'
 
-import type { State } from '../../types'
+import type { State, Dispatch } from '../../types'
 import type { Pipette } from '../../robot'
 import type { PipettesResponse } from '../../http-api-client'
 import type { Robot } from '../../discovery'
 
-type OP = { robot: Robot }
+type OP = {| robot: Robot |}
 
 type SP = {|
   pipettes: Array<Pipette>,
@@ -29,11 +29,11 @@ type DP = {|
   changePipetteUrl: string,
 |}
 
-type Props = { ...$Exact<OP>, ...SP, ...DP }
+type Props = { ...OP, ...SP, ...DP }
 
 const TITLE = 'Required Pipettes'
 
-export default connect(
+export default connect<Props, OP, SP, DP, State, Dispatch>(
   makeMapStateToProps,
   mapDispatchToProps
 )(ProtocolPipettes)

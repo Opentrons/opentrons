@@ -1,5 +1,5 @@
 // @flow
-import type { Match } from 'react-router'
+import type { ContextRouter } from 'react-router'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { RobotService, Mount } from '../../robot'
 import type {
@@ -10,11 +10,15 @@ import type { Jog } from '../JogControls'
 
 export type CalibrationStep = '1' | '2' | '3' | '4' | '5' | '6'
 
-export type OP = {
+export type WithRouterOP = {|
   robot: RobotService,
   parentUrl: string,
-  match: Match,
-}
+|}
+
+export type OP = {|
+  ...ContextRouter,
+  ...WithRouterOP,
+|}
 
 export type SP = {|
   startRequest: DeckCalStartState,
@@ -32,7 +36,7 @@ export type DP = {|
   back: () => mixed,
 |}
 
-export type CalibrateDeckProps = { ...$Exact<OP>, ...SP, ...DP }
+export type CalibrateDeckProps = { ...OP, ...SP, ...DP }
 
 export type CalibrateDeckStartedProps = {
   ...$Exact<CalibrateDeckProps>,

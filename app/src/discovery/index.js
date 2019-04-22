@@ -45,7 +45,9 @@ const RESTART_DISCOVERY_TIMEOUT_MS = 60000
 export const RESTART_PENDING: RestartStatus = 'pending'
 export const RESTART_DOWN: RestartStatus = 'down'
 
-export function startDiscovery(timeout = DISCOVERY_TIMEOUT_MS): ThunkAction {
+export function startDiscovery(
+  timeout: number = DISCOVERY_TIMEOUT_MS
+): ThunkAction {
   const start: StartAction = { type: 'discovery:START', meta: { shell: true } }
   const finish: FinishAction = {
     type: 'discovery:FINISH',

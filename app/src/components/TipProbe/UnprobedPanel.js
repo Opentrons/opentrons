@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import type { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 
@@ -10,29 +9,20 @@ import { PrimaryButton } from '@opentrons/components'
 import {
   actions as robotActions,
   selectors as robotSelectors,
-  type Mount,
 } from '../../robot'
 
-type OwnProps = {
-  mount: Mount,
-  probed: boolean,
-  confirmTipProbeUrl: string,
-}
+import type { State, Dispatch } from '../../types'
+import type { TipProbeProps } from './types'
 
-type StateProps = {
-  _showContinueModal: boolean,
-}
+type OP = TipProbeProps
 
-type DispatchProps = {
-  dispatch: Dispatch<*>,
-}
+type SP = {| _showContinueModal: boolean |}
 
-type Props = {
-  probed: boolean,
-  onPrepareClick: () => void,
-}
+type DP = {| dispatch: Dispatch |}
 
-export default connect(
+type Props = {| ...OP, onPrepareClick: () => void |}
+
+export default connect<Props, OP, SP, {||}, State, Dispatch>(
   mapStateToProps,
   null,
   mergeProps
@@ -57,7 +47,7 @@ function UnprobedPanel(props: Props) {
   return <CalibrationInfoContent leftChildren={leftChildren} />
 }
 
-function mapStateToProps(state, ownProps: OwnProps): StateProps {
+function mapStateToProps(state, ownProps: OP): SP {
   const deckPopulated = robotSelectors.getDeckPopulated(state)
 
   return {
@@ -65,11 +55,7 @@ function mapStateToProps(state, ownProps: OwnProps): StateProps {
   }
 }
 
-function mergeProps(
-  stateProps: StateProps,
-  dispatchProps: DispatchProps,
-  ownProps: OwnProps
-): Props {
+function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   const { _showContinueModal } = stateProps
   const { dispatch } = dispatchProps
   const { mount, confirmTipProbeUrl } = ownProps
@@ -79,6 +65,7 @@ function mergeProps(
         dispatch(push(confirmTipProbeUrl))
       }
     : () => {
+        // $FlowFixMe: robotActions.moveToFront is not typed
         dispatch(robotActions.moveToFront(mount))
       }
 

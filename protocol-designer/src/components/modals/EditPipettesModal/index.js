@@ -14,22 +14,28 @@ import {
 } from '../../../step-forms'
 import FilePipettesModal from '../FilePipettesModal'
 import type { BaseState, ThunkDispatch } from '../../../types'
-import type { PipetteOnDeck, NormalizedPipette } from '../../../step-forms'
+import type {
+  PipetteOnDeck,
+  FormPipettesByMount,
+  NormalizedPipette,
+} from '../../../step-forms'
 import type { StepIdType } from '../../../form-types'
 
 type Props = ElementProps<typeof FilePipettesModal>
 
-type SP = {
+type SP = {|
+  initialPipetteValues: FormPipettesByMount,
   _prevPipettes: { [pipetteId: string]: PipetteOnDeck },
   _orderedStepIds: Array<StepIdType>,
-}
+|}
 
-type OP = {
+type OP = {|
   closeModal: () => mixed,
-}
+|}
 
 const mapSTP = (state: BaseState): SP => {
   const initialPipettes = stepFormSelectors.getPipettesForEditPipetteForm(state)
+
   return {
     initialPipetteValues: initialPipettes,
     _prevPipettes: stepFormSelectors.getInitialDeckSetup(state).pipettes, // TODO: Ian 2019-01-02 when multi-step editing is supported, don't use initial deck state. Instead, show the pipettes available for the selected step range
@@ -172,7 +178,7 @@ const mergeProps = (
   }
 }
 
-export default connect(
+export default connect<Props, OP, SP, {||}, _, _>(
   mapSTP,
   null,
   mergeProps

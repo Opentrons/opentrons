@@ -13,41 +13,32 @@ import type { ViewableRobot } from '../../../discovery'
 import type { ShellUpdateState } from '../../../shell'
 import type { RobotServerUpdate } from '../../../http-api-client'
 
-type OP = { robot: ViewableRobot, appUpdate: ShellUpdateState }
+type OP = {| robot: ViewableRobot, appUpdate: ShellUpdateState |}
 
-type SP = {|
-  updateRequest: RobotServerUpdate,
-|}
+type SP = {| updateRequest: RobotServerUpdate |}
 
-type Props = {
-  ...$Exact<OP>,
-  ...SP,
-}
+type Props = { ...OP, ...SP }
 
-export default connect(
-  makeMapStateToProps,
-  null
-)(UpdateRobot)
+export default connect<Props, OP, SP, _, _, _>(makeMapStateToProps)(UpdateRobot)
 
 function UpdateRobot(props: Props) {
   const { updateRequest, robot, appUpdate } = props
+
   if (updateRequest.response) {
     return <RestartRobotModal robot={robot} />
   }
+
   if (updateRequest.inProgress) {
     return <SpinnerModal message="Robot is updating" alertOverlay />
-  } else {
-    return <UpdateRobotModal robot={robot} appUpdate={appUpdate} />
   }
+
+  return <UpdateRobotModal robot={robot} appUpdate={appUpdate} />
 }
 
-function makeMapStateToProps(): (State, OP) => Props {
+function makeMapStateToProps(): (State, OP) => SP {
   const getRobotUpdateRequest = makeGetRobotUpdateRequest()
 
-  return (state, ownProps) => {
-    return {
-      ...ownProps,
-      updateRequest: getRobotUpdateRequest(state, ownProps.robot),
-    }
-  }
+  return (state, ownProps) => ({
+    updateRequest: getRobotUpdateRequest(state, ownProps.robot),
+  })
 }

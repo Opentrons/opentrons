@@ -10,7 +10,7 @@ import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
 } from '../../../analytics'
-import type { BaseState } from '../../../types'
+import type { BaseState, ThunkDispatch } from '../../../types'
 import settingsStyles from '../../SettingsPage/SettingsPage.css'
 import modalStyles from '../modal.css'
 import SignUpForm from './SignUpForm'
@@ -21,11 +21,11 @@ type Props = {
   optOut: () => mixed,
 }
 
-type SP = {
+type SP = {|
   hasOptedIn: $PropertyType<Props, 'hasOptedIn'>,
-}
+|}
 
-type DP = $Diff<Props, SP>
+type DP = $Rest<$Exact<Props>, SP>
 
 type State = { gateStage: GateStage, errorMessage: ?string }
 
@@ -141,14 +141,14 @@ function mapStateToProps(state: BaseState): SP {
   return { hasOptedIn: analyticsSelectors.getHasOptedIn(state) }
 }
 
-function mapDispatchToProps(dispatch: Dispatch<*>): DP {
+function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   return {
     optIn: () => dispatch(analyticsActions.optIn()),
     optOut: () => dispatch(analyticsActions.optOut()),
   }
 }
 
-export default connect(
+export default connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(GateModal)

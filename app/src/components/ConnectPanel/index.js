@@ -21,7 +21,7 @@ import UnreachableRobotItem from './UnreachableRobotItem'
 
 import type { Robot, ReachableRobot, UnreachableRobot } from '../../discovery'
 
-type StateProps = {|
+type SP = {|
   robots: Array<Robot>,
   reachableRobots: Array<ReachableRobot>,
   unreachableRobots: Array<UnreachableRobot>,
@@ -29,16 +29,11 @@ type StateProps = {|
   isScanning: boolean,
 |}
 
-type DispatchProps = {|
-  onScanClick: () => mixed,
-|}
+type DP = {| onScanClick: () => mixed |}
 
-type Props = {
-  ...StateProps,
-  ...DispatchProps,
-}
+type Props = { ...SP, ...DP }
 
-export default connect(
+export default connect<Props, {||}, SP, DP, State, Dispatch>(
   mapStateToProps,
   mapDispatchToProps
 )(ConnectPanel)
@@ -49,10 +44,10 @@ function ConnectPanel(props: Props) {
       <ScanStatus {...props} />
       <RobotList>
         {props.robots.map(robot => (
-          <RobotItem key={robot.name} {...robot} />
+          <RobotItem key={robot.name} robot={robot} />
         ))}
         {props.reachableRobots.map(robot => (
-          <RobotItem key={robot.name} {...robot} />
+          <RobotItem key={robot.name} robot={robot} />
         ))}
         {props.unreachableRobots.map(robot => (
           <UnreachableRobotItem key={robot.name} {...robot} />
@@ -66,7 +61,7 @@ const robotOrder = [['connected', 'local', 'name'], ['desc', 'desc', 'asc']]
 const reachableOrder = [['local', 'name'], ['desc', 'asc']]
 const unreachableOrder = [['name'], ['asc']]
 
-function mapStateToProps(state: State): StateProps {
+function mapStateToProps(state: State): SP {
   const robots = getConnectableRobots(state)
   const reachableRobots = getReachableRobots(state)
   const unreachableRobots = getUnreachableRobots(state)
@@ -80,7 +75,7 @@ function mapStateToProps(state: State): StateProps {
   }
 }
 
-function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
+function mapDispatchToProps(dispatch: Dispatch): DP {
   return {
     onScanClick: () => dispatch(startDiscovery()),
   }

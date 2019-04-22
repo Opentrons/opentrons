@@ -23,36 +23,28 @@ import { selectors as stepsSelectors } from '../ui/steps'
 
 import type { BaseState, ThunkDispatch } from '../types'
 
-type StateProps = {
+type SP = {|
   selectedTerminalItemId: ?TerminalItemId,
   ingredSelectionMode: boolean,
   drilledDown: boolean,
-}
-type DispatchProps = {
-  drillUpFromLabware: () => mixed,
-}
-type Props = {
-  selectedTerminalItemId: ?TerminalItemId,
-  drilledDown: boolean,
-  ingredSelectionMode: boolean,
-  handleClickOutside: () => void,
-}
+|}
 
-const mapStateToProps = (state: BaseState): StateProps => ({
+type DP = {| drillUpFromLabware: () => mixed |}
+
+type Props = {| ...SP, handleClickOutside: () => mixed |}
+
+const mapStateToProps = (state: BaseState): SP => ({
   selectedTerminalItemId: stepsSelectors.getSelectedTerminalItemId(state),
   ingredSelectionMode:
     labwareIngredSelectors.getSelectedLabwareId(state) != null,
   drilledDown: labwareIngredSelectors.getDrillDownLabwareId(state) != null,
 })
 
-const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DispatchProps => ({
+const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
   drillUpFromLabware: () => dispatch(labwareIngredActions.drillUpFromLabware()),
 })
 
-const mergeProps = (
-  stateProps: StateProps,
-  dispatchProps: DispatchProps
-): Props => ({
+const mergeProps = (stateProps: SP, dispatchProps: DP): Props => ({
   selectedTerminalItemId: stateProps.selectedTerminalItemId,
   ingredSelectionMode: stateProps.ingredSelectionMode,
   drilledDown: stateProps.drilledDown,
@@ -120,7 +112,7 @@ class DeckSetup extends React.Component<Props> {
   }
 }
 
-export default connect(
+export default connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps,
   mergeProps

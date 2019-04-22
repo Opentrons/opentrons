@@ -41,7 +41,7 @@ import type {
   ApiRequestError,
 } from '../../../http-api-client'
 
-type OP = { robot: ViewableRobot }
+type OP = {| robot: ViewableRobot |}
 
 type SP = {|
   list: ?WifiNetworkList,
@@ -62,7 +62,7 @@ type DP = {|
   clearConfigure: () => mixed,
 |}
 
-type Props = { ...$Exact<OP>, ...SP, ...DP }
+type Props = { ...OP, ...SP, ...DP }
 
 type SelectNetworkState = {
   ssid: ?string,
@@ -73,7 +73,7 @@ type SelectNetworkState = {
 const LIST_REFRESH_MS = 15000
 
 class SelectNetwork extends React.Component<Props, SelectNetworkState> {
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
     // prepopulate selected SSID with currently connected network, if any
     this.state = {
@@ -224,7 +224,7 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   }
 }
 
-export default connect(
+export default connect<Props, OP, SP, _, _, _>(
   makeMapStateToProps,
   mapDispatchToProps
 )(SelectNetwork)

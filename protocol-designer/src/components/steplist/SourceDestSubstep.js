@@ -49,7 +49,7 @@ export default function SourceDestSubstep(props: SourceDestSubstepProps) {
   }
 
   // single-channel row item
-  return substeps.rows.map((row, substepIndex) => (
+  return substeps.rows.map<React.Node>((row, substepIndex) => (
     <SubstepRow
       key={substepIndex}
       className={cx(styles.step_subitem, {

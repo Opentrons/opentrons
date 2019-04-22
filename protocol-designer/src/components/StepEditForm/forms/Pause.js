@@ -91,7 +91,8 @@ function PauseForm(props: PauseFormProps): React.Element<'div'> {
           <div className={styles.form_row}>
             {/* TODO: Ian 2019-03-25 consider making this a component eg `TextAreaField.js` if used anywhere else */}
             <StepField
-              {...focusHandlers}
+              dirtyFields={focusHandlers.dirtyFields}
+              focusedField={focusHandlers.focusedField}
               name="pauseMessage"
               render={({ value, updateValue }) => (
                 <FormGroup

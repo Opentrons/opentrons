@@ -1,7 +1,6 @@
 // @flow
 // container to prompt the user to clear the deck before continuing tip probe
 import * as React from 'react'
-import type { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 
@@ -10,17 +9,15 @@ import { ContinueModal } from '@opentrons/components'
 import { Portal } from '../portal'
 import Contents from './Contents'
 
-type OwnProps = {
-  mount: Mount,
-  backUrl: string,
-}
+import type { Dispatch } from '../../types'
 
-type Props = {
-  onContinueClick: () => void,
-  onCancelClick: () => void,
-}
+type OP = {| mount: Mount, backUrl: string |}
 
-export default connect(
+type DP = {| onContinueClick: () => void, onCancelClick: () => void |}
+
+type Props = { ...OP, ...DP }
+
+export default connect<Props, OP, {||}, DP, _, Dispatch>(
   null,
   mapDispatchToProps
 )(ContinueTipProbeModal)
@@ -38,15 +35,17 @@ function ContinueTipProbeModal(props: Props) {
   )
 }
 
-function mapDispatchToProps(dispatch: Dispatch<*>, ownProps: OwnProps) {
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   const { mount, backUrl } = ownProps
 
   return {
     // TODO(mc, 2018-01-23): refactor to remove double dispatch
     onContinueClick: () => {
+      // $FlowFixMe: robotActions.moveToFront is not typed
       dispatch(robotActions.moveToFront(mount))
       dispatch(push(backUrl))
     },
+    // $FlowFixMe: react-router-redux action creators are not typed
     onCancelClick: () => dispatch(push(backUrl)),
   }
 }

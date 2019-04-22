@@ -7,7 +7,9 @@ import connectionReducer from './connection'
 import sessionReducer from './session'
 import calibrationReducer from './calibration'
 
-export default combineReducers({
+import type { Action } from '../../types'
+
+export default combineReducers<_, Action>({
   connection: connectionReducer,
   session: sessionReducer,
   calibration: calibrationReducer,

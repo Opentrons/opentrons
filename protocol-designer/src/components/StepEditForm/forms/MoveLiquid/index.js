@@ -108,7 +108,7 @@ class MoveLiquidForm extends React.Component<Props, State> {
         </div>
         <div className={styles.section_wrapper}>
           <div className={cx(styles.form_row, styles.section_column)}>
-            <ChangeTipField stepType={stepType} name="changeTip" />
+            <ChangeTipField name="changeTip" />
             <PathField focusHandlers={focusHandlers} />
           </div>
           <div

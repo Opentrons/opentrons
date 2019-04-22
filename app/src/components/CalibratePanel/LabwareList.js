@@ -29,8 +29,8 @@ type Props = {
   setLabware: (labware: Labware) => mixed,
 }
 
-export default withRouter(
-  connect(
+export default withRouter<{||}>(
+  connect<Props, _, SP, {||}, State, Dispatch>(
     mapStateToProps,
     null,
     mergeProps

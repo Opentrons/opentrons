@@ -17,17 +17,19 @@ import type { BaseState } from '../../types'
 
 type Props = React.ElementProps<typeof LiquidPlacementForm>
 
-type DP = {
-  cancelForm: $PropertyType<Props, 'cancelForm'>,
-  clearWells: $PropertyType<Props, 'clearWells'>,
-  saveForm: $PropertyType<Props, 'saveForm'>,
-}
-
-type SP = $Diff<Props, DP> & {
-  _labwareId: ?string,
-  _selectedWells: ?Array<string>,
-  _selectionHasLiquids: boolean,
-}
+type SP = $Rest<
+  {|
+    ...$Exact<Props>,
+    _labwareId: ?string,
+    _selectedWells: ?Array<string>,
+    _selectionHasLiquids: boolean,
+  |},
+  {|
+    cancelForm: $PropertyType<Props, 'cancelForm'>,
+    clearWells: $PropertyType<Props, 'clearWells'>,
+    saveForm: $PropertyType<Props, 'saveForm'>,
+  |}
+>
 
 function mapStateToProps(state: BaseState): SP {
   const selectedWells = Object.keys(
@@ -130,7 +132,7 @@ function mergeProps(
   }
 }
 
-export default connect(
+export default connect<Props, {||}, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps

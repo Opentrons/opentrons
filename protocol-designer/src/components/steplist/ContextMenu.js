@@ -10,17 +10,21 @@ import styles from './StepItem.css'
 
 const MENU_OFFSET_PX = 5
 
-type DP = {
-  deleteStep: StepIdType => {},
-  duplicateStep: StepIdType => {},
-}
-type Props = {
+type OP = {|
   children: ({
     makeStepOnContextMenu: StepIdType => (
       event: SyntheticMouseEvent<>
     ) => mixed,
   }) => React.Node,
-} & DP
+|}
+
+type DP = {|
+  deleteStep: StepIdType => {},
+  duplicateStep: StepIdType => {},
+|}
+
+type Props = {| ...DP, ...OP |}
+
 type State = {
   visible: boolean,
   left: ?number,
@@ -45,7 +49,9 @@ class ContextMenu extends React.Component<Props, State> {
     global.removeEventListener('click', this.handleClick)
   }
 
-  makeHandleContextMenu = (stepId: StepIdType) => event => {
+  makeHandleContextMenu = (stepId: StepIdType) => (
+    event: SyntheticMouseEvent<*>
+  ) => {
     event.preventDefault()
 
     const clickX = event.clientX
@@ -136,14 +142,14 @@ class ContextMenu extends React.Component<Props, State> {
   }
 }
 
-const mapDispatchToProps = (dispatch: ThunkDispatch<*>) => ({
+const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
   deleteStep: (stepId: StepIdType) =>
     dispatch(steplistActions.deleteStep(stepId)),
   duplicateStep: (stepId: StepIdType) =>
     dispatch(steplistActions.duplicateStep(stepId)),
 })
 
-export default connect(
+export default connect<Props, OP, {||}, DP, _, _>(
   null,
   mapDispatchToProps
 )(ContextMenu)

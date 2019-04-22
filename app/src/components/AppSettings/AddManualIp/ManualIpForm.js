@@ -10,22 +10,22 @@ import IpField from './IpField'
 import type { State, Dispatch } from '../../../types'
 import type { DiscoveryCandidates } from '../../../config'
 
-type SP = {|
-  candidates: DiscoveryCandidates,
-|}
+type OP = {||}
 
-type DP = {|
-  addManualIp: (ip: string) => mixed,
-|}
+type SP = {| candidates: DiscoveryCandidates |}
+
+type DP = {| addManualIp: (ip: string) => mixed |}
 
 type Props = { ...SP, ...DP }
 
 class IpForm extends React.Component<Props> {
   inputRef: { current: null | HTMLInputElement }
-  constructor(props) {
+
+  constructor(props: Props) {
     super(props)
     this.inputRef = React.createRef()
   }
+
   render() {
     return (
       <Formik
@@ -50,18 +50,13 @@ class IpForm extends React.Component<Props> {
   }
 }
 
-export default connect(
-  STP,
-  DTP
-)(IpForm)
-
-function STP(state: State): SP {
+function mapStateToProps(state: State): SP {
   return {
     candidates: getConfig(state).discovery.candidates,
   }
 }
 
-function DTP(dispatch: Dispatch): DP {
+function mapDispatchToProps(dispatch: Dispatch): DP {
   return {
     addManualIp: ip => {
       dispatch(addManualIp(ip))
@@ -69,3 +64,8 @@ function DTP(dispatch: Dispatch): DP {
     },
   }
 }
+
+export default connect<Props, OP, _, _, _, _>(
+  mapStateToProps,
+  mapDispatchToProps
+)(IpForm)

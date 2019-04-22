@@ -10,8 +10,13 @@ import {
   initialSelectedItemState,
   type SelectableItem,
   type StepsState,
+  type CollapsedStepsState,
 } from './reducers'
-import type { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
+import type {
+  SubstepIdentifier,
+  TerminalItemId,
+  StepItemData,
+} from '../../steplist/types'
 
 const rootSelector = (state: BaseState): StepsState => state.ui.steps
 
@@ -115,12 +120,12 @@ const getActiveItem: Selector<SelectableItem> = createSelector(
 )
 
 // TODO: BC 2018-12-17 refactor as react state
-const getCollapsedSteps = createSelector(
+const getCollapsedSteps: Selector<CollapsedStepsState> = createSelector(
   rootSelector,
   (state: StepsState) => state.collapsedSteps
 )
 
-const getSelectedStep = createSelector(
+const getSelectedStep: Selector<StepItemData | null> = createSelector(
   stepFormSelectors.getAllSteps,
   getSelectedStepId,
   (allSteps, selectedStepId) => {

@@ -29,16 +29,17 @@ import modalStyles from '../modals/modal.css'
 import styles from './labware.css'
 import WellTooltip from './WellTooltip'
 
-type SP = {
+type SP = {|
   wellContents: ContentsByWell,
   labwareType: string,
   ingredNames: WellIngredientNames,
-}
-type DP = {
-  drillUp: () => mixed,
-}
+|}
 
-type Props = SP & DP
+type DP = {|
+  drillUp: () => mixed,
+|}
+
+type Props = {| ...SP, ...DP |}
 
 class BrowseLabwareModal extends React.Component<Props> {
   handleClose = () => {
@@ -125,7 +126,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   return { drillUp: () => dispatch(labwareIngredsActions.drillUpFromLabware()) }
 }
 
-export default connect(
+export default connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(BrowseLabwareModal)

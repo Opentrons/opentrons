@@ -1,38 +1,42 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, type Match } from 'react-router'
-
-import type { State, Dispatch } from '../../types'
+import { withRouter } from 'react-router'
 
 import {
   selectors as robotSelectors,
   actions as robotActions,
-  type Mount,
-  type SessionModule,
 } from '../../robot'
 
 import { Module as ModuleItem } from '@opentrons/components'
-import type { LabwareComponentProps } from '@opentrons/components'
 import LabwareItem, { type LabwareItemProps } from './LabwareItem'
 
-type OP = LabwareComponentProps & { match: Match }
+import type { ContextRouter } from 'react-router'
+import type { LabwareComponentProps } from '@opentrons/components'
+import type { Mount, SessionModule } from '../../robot'
+import type { State, Dispatch } from '../../types'
 
-type SP = {
-  _calibrator?: ?Mount,
-  _labware?: $PropertyType<LabwareItemProps, 'labware'>,
-  module?: SessionModule,
-}
+type WithRouterOP = $Exact<LabwareComponentProps>
 
-type DP = { dispatch: Dispatch }
+type OP = {| ...ContextRouter, ...WithRouterOP |}
 
-type Props = LabwareComponentProps & {
+type SP = {|
+  _calibrator: Mount | null,
+  _labware: $PropertyType<LabwareItemProps, 'labware'> | null,
+  module: SessionModule | null,
+|}
+
+type DP = {| dispatch: Dispatch |}
+
+type Props = {
+  ...OP,
+  ...SP,
   labware?: $PropertyType<LabwareItemProps, 'labware'>,
   module?: SessionModule,
 }
 
-export default withRouter(
-  connect(
+export default withRouter<WithRouterOP>(
+  connect<Props, OP, SP, {||}, State, Dispatch>(
     mapStateToProps,
     null,
     mergeProps
@@ -71,7 +75,7 @@ function mapStateToProps(state: State, ownProps: OP): SP {
   const highlighted = slot === selectedSlot
   const module = robotSelectors.getModulesBySlot(state)[slot]
 
-  const stateProps: SP = {}
+  const stateProps: SP = { _calibrator: null, _labware: null, module: null }
 
   if (labware) {
     const { isTiprack, confirmed, calibratorMount } = labware

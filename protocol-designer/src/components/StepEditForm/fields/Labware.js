@@ -10,16 +10,22 @@ import type { FocusHandlers } from '../types'
 import styles from '../StepEditForm.css'
 import StepField from './FieldConnector'
 
-type LabwareFieldOP = {
+type OP = {|
+  ...$Exact<FocusHandlers>,
   name: StepFieldName,
   className?: string,
-} & FocusHandlers
-type LabwareFieldSP = { labwareOptions: Options }
-const LabwareFieldSTP = (state: BaseState): LabwareFieldSP => ({
+|}
+
+type SP = {| labwareOptions: Options |}
+
+type Props = { ...OP, ...SP }
+
+const LabwareFieldSTP = (state: BaseState): SP => ({
   labwareOptions: uiLabwareSelectors.getLabwareOptions(state),
 })
-const LabwareField = connect(LabwareFieldSTP)(
-  (props: LabwareFieldOP & LabwareFieldSP) => {
+
+const LabwareField = connect<Props, OP, SP, _, _, _>(LabwareFieldSTP)(
+  (props: Props) => {
     const {
       labwareOptions,
       name,

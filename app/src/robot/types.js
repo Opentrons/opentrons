@@ -97,7 +97,8 @@ export type StatePipette = {
   volume: number,
 }
 
-export type Pipette = StatePipette & {
+export type Pipette = {
+  ...$Exact<StatePipette>,
   calibration: PipetteCalibrationStatus,
   probed: boolean,
   tipOn: boolean,

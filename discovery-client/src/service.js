@@ -45,8 +45,8 @@ export function makeService(
     ok: defaultTo(ok, null),
     serverOk: defaultTo(serverOk, null),
     advertising: defaultTo(advertising, null),
-    health: defaultTo(health, null),
-    serverHealth: defaultTo(serverHealth, null),
+    health: health || null,
+    serverHealth: serverHealth || null,
   }
 }
 
@@ -58,7 +58,7 @@ export function updateService(
 ): Service {
   const next: Service | ServiceUpdate = update
 
-  return Object.keys(update).reduce((result, key) => {
+  return Object.keys(update).reduce<Service>((result: Service, key: string) => {
     const prevVal = result[key]
     const nextVal = defaultTo(next[key], prevVal)
     // use isEqual to deep compare response objects

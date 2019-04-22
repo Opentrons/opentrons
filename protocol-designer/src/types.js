@@ -32,6 +32,9 @@ export type ThunkAction<A> = (
   getState: GetState
 ) => A
 
+// TODO(mc, 2018-04-18): make actual Action union type for PD
+export type Action = { type: string, payload?: mixed, metadata?: mixed }
+
 export type WellVolumes = { [wellName: string]: number }
 // TODO LATER Ian 2018-02-19 type for containers.json
 export type JsonWellData = {

@@ -3,52 +3,42 @@
 import { connect } from 'react-redux'
 import { withRouter, type ContextRouter } from 'react-router'
 
-import type { State, Dispatch } from '../../types'
-import type { ViewableRobot } from '../../discovery'
 import { actions as robotActions } from '../../robot'
 import { makeGetRobotUpdateInfo } from '../../http-api-client'
 import { RobotListItem } from './RobotListItem.js'
 
-type OP = {|
-  ...$Exact<ViewableRobot>,
-  ...ContextRouter,
-|}
+import type { State, Dispatch } from '../../types'
+import type { ViewableRobot } from '../../discovery'
 
-type SP = {|
-  upgradable: boolean,
-  selected: boolean,
-|}
+type WithRouterOP = {| robot: ViewableRobot |}
 
-type DP = {|
-  connect: () => mixed,
-  disconnect: () => mixed,
-|}
+type OP = {| ...ContextRouter, ...WithRouterOP |}
 
-export type RobotItemProps = {
-  ...OP,
-  ...SP,
-  ...DP,
-}
+type SP = {| upgradable: boolean, selected: boolean |}
 
-export default withRouter(
-  connect(
+type DP = {| connect: () => mixed, disconnect: () => mixed |}
+
+export type RobotItemProps = { ...OP, ...SP, ...DP }
+
+export default withRouter<WithRouterOP>(
+  connect<RobotItemProps, OP, SP, DP, State, Dispatch>(
     makeMapStateToProps,
     mapDispatchToProps
   )(RobotListItem)
 )
 
-function makeMapStateToProps() {
+function makeMapStateToProps(): (State, OP) => SP {
   const getUpdateInfo = makeGetRobotUpdateInfo()
 
-  return (state: State, ownProps: OP): SP => ({
-    upgradable: getUpdateInfo(state, ownProps).type === 'upgrade',
-    selected: ownProps.match.params.name === ownProps.name,
+  return (state, ownProps) => ({
+    upgradable: getUpdateInfo(state, ownProps.robot).type === 'upgrade',
+    selected: ownProps.match.params.name === ownProps.robot.name,
   })
 }
 
 function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   return {
-    connect: () => dispatch(robotActions.connect(ownProps.name)),
+    connect: () => dispatch(robotActions.connect(ownProps.robot.name)),
     disconnect: () => dispatch(robotActions.disconnect()),
   }
 }

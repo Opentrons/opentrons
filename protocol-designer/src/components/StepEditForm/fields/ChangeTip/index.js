@@ -9,7 +9,8 @@ import type { FormData } from '../../../../form-types'
 import type { ChangeTipOptions } from '../../../../step-generation/types'
 
 type Props = ElementProps<typeof ChangeTip>
-type OP = { name: $PropertyType<Props, 'name'> }
+type OP = {| name: $PropertyType<Props, 'name'> |}
+type SP = $Diff<$Exact<Props>, OP>
 
 const ALL_CHANGE_TIP_VALUES: Array<ChangeTipOptions> = [
   'always',
@@ -53,12 +54,13 @@ function getDisabledChangeTipOptions(
   }
 }
 
-const mapSTP = (state: BaseState, ownProps: OP): $Diff<Props, OP> => {
+const mapSTP = (state: BaseState, ownProps: OP): SP => {
   const rawForm = stepFormSelectors.getUnsavedForm(state)
+
   return {
     options: ALL_CHANGE_TIP_VALUES, // TODO Ian 2019-01-28 these may vary for different step types
     disabledOptions: rawForm ? getDisabledChangeTipOptions(rawForm) : null,
   }
 }
 
-export default connect(mapSTP)(ChangeTip)
+export default connect<Props, OP, SP, _, _, _>(mapSTP)(ChangeTip)

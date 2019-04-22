@@ -28,7 +28,7 @@ export type HealthState = {|
 
 const HEALTH: 'health' = 'health'
 
-export const fetchHealth = buildRequestMaker('GET', HEALTH)
+export const fetchHealth = buildRequestMaker<void>('GET', HEALTH)
 
 export const makeGetRobotHealth = () => {
   const selector: OutputSelector<

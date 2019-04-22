@@ -8,11 +8,13 @@ import { stepIconsByType, type StepType } from '../form-types'
 import type { ThunkDispatch } from '../types'
 import styles from './listButtons.css'
 
-type DP = { makeAddStep: StepType => (SyntheticEvent<>) => mixed }
+type Props = { makeAddStep: StepType => (SyntheticEvent<>) => mixed }
 
 type State = { expanded?: boolean }
 
-class StepCreationButton extends React.Component<DP, State> {
+type DP = $Exact<Props>
+
+class StepCreationButton extends React.Component<Props, State> {
   state = { expanded: false }
 
   handleExpandClick = (e: SyntheticEvent<>) => {
@@ -65,12 +67,12 @@ class StepCreationButton extends React.Component<DP, State> {
   }
 }
 
-const mapDTP = (dispatch: ThunkDispatch<*>) => ({
+const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
   makeAddStep: (stepType: StepType) => (e: SyntheticEvent<>) =>
     dispatch(steplistActions.addStep({ stepType })),
 })
 
-export default connect(
+export default connect<Props, {||}, {||}, DP, _, _>(
   null,
   mapDTP
 )(StepCreationButton)

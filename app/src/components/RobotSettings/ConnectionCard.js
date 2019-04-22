@@ -14,7 +14,7 @@ import type { State } from '../../types'
 import type { ViewableRobot } from '../../discovery'
 import type { InternetStatus, NetworkInterface } from '../../http-api-client'
 
-type OP = { robot: ViewableRobot }
+type OP = {| robot: ViewableRobot |}
 
 type SP = {|
   internetStatus: ?InternetStatus,
@@ -22,9 +22,11 @@ type SP = {|
   ethernetNetwork: ?NetworkInterface,
 |}
 
-type Props = { ...$Exact<OP>, ...SP }
+type Props = { ...OP, ...SP }
 
-export default connect(makeMapStateToProps)(ConnectionCard)
+export default connect<Props, OP, SP, _, _, _>(makeMapStateToProps)(
+  ConnectionCard
+)
 
 const TITLE = 'Connectivity'
 function ConnectionCard(props: Props) {

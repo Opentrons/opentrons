@@ -15,7 +15,7 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
   "devDependencies": {
-    "flow-bin": "^0.82.0",
+    "flow-bin": "^0.97.0",
     "flow-typed": "^2.5.1"
   },
   "peerDependencies": {
@@ -26,6 +26,6 @@
   },
   "dependencies": {
     "react-popper": "^1.0.0",
-    "react-select": "^2.3.0"
+    "react-select": "^2.4.3"
   }
 }

@@ -11,11 +11,10 @@ import IngredientsList from '../components/IngredientsList'
 
 type Props = React.ElementProps<typeof IngredientsList>
 
-type DP = {
-  removeWellsContents: $ElementType<Props, 'removeWellsContents'>,
-}
-
-type SP = $Diff<Props, DP> & { _labwareId: ?string }
+type SP = {|
+  ...$Diff<$Exact<Props>, {| removeWellsContents: * |}>,
+  _labwareId: ?string,
+|}
 
 function mapStateToProps(state: BaseState): SP {
   const selectedLabwareId = labwareIngredSelectors.getSelectedLabwareId(state)
@@ -43,12 +42,15 @@ function mergeProps(
   const { _labwareId, ...passThruProps } = stateProps
   return {
     ...passThruProps,
-    removeWellsContents: args =>
-      dispatch(removeWellsContents({ ...args, labwareId: _labwareId })),
+    removeWellsContents: args => {
+      if (_labwareId) {
+        dispatch(removeWellsContents({ ...args, labwareId: _labwareId }))
+      }
+    },
   }
 }
 
-export default connect(
+export default connect<Props, {||}, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps
