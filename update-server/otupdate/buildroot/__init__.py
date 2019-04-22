@@ -2,11 +2,10 @@
 import asyncio
 import logging
 import json
-from socket import gethostname
 from typing import Mapping
 from aiohttp import web
 
-from . import constants
+from . import constants, name_management
 
 from . import config, control, update, ssh_key_management
 
@@ -44,22 +43,22 @@ def get_app(system_version_file: str = None,
         system_version_file = BR_BUILTIN_VERSION_FILE
 
     version = get_version(system_version_file)
-    device_name = name_override or gethostname()
+    name = name_override or name_management.get_name()
     config_obj = config.load(config_file_override)
 
     LOG.info("Setup: " + '\n\t'.join([
-        f'Device name:               {device_name}',
+        f'Device name: {name}',
         f'Buildroot version:         '
         f'{version.get("buildroot_version", "unknown")}',
-        f'\t(from git sha            '
+        f'\t(from git sha      '
         f'{version.get("buildroot_sha", "unknown")}',
         f'API version:               '
         f'{version.get("opentrons_api_version", "unknown")}',
-        f'\t(from git sha            '
+        f'\t(from git sha      '
         f'{version.get("opentrons_api_sha", "unknown")}',
         f'Update server version:     '
         f'{version.get("update_server_version", "unknown")}',
-        f'\t(from git sha            '
+        f'\t(from git sha      '
         f'{version.get("update_server_sha", "unknown")}',
         f'Smoothie firmware version: TODO'
     ]))
@@ -70,17 +69,20 @@ def get_app(system_version_file: str = None,
     app = web.Application(loop=loop, middlewares=[log_error_middleware])
     app[config.CONFIG_VARNAME] = config_obj
     app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
+    app[constants.DEVICE_NAME_VARNAME] = name
     app.router.add_routes([
         web.get('/server/update/health',
-                control.build_health_endpoint(version, device_name)),
+                control.build_health_endpoint(version)),
         web.post('/server/update/begin', update.begin),
         web.post('/server/update/cancel', update.cancel),
         web.get('/server/update/{session}/status', update.status),
         web.post('/server/update/{session}/file', update.file_upload),
         web.post('/server/update/{session}/commit', update.commit),
-        web.post('/server/update/restart', control.restart),
+        web.post('/server/restart', control.restart),
         web.get('/server/ssh_keys', ssh_key_management.list_keys),
         web.post('/server/ssh_keys', ssh_key_management.add),
         web.delete('/server/ssh_keys/{key_md5}', ssh_key_management.remove),
+        web.post('/server/name', name_management.set_name_endpoint),
+        web.get('/server/name', name_management.get_name_endpoint),
     ])
     return app

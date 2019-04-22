@@ -10,8 +10,7 @@ from typing import Callable, Coroutine, Mapping
 
 from aiohttp import web
 
-from .constants import RESTART_LOCK_NAME
-
+from .constants import (RESTART_LOCK_NAME, DEVICE_NAME_VARNAME)
 
 LOG = logging.getLogger(__name__)
 
@@ -32,25 +31,35 @@ async def restart(request: web.Request) -> web.Response:
 
 
 def build_health_endpoint(
-        version_dict: Mapping[str, str],
-        device_name: str) -> Callable[[web.Request],
-                                      Coroutine[None, None, web.Response]]:
+        version_dict: Mapping[str, str])\
+        -> Callable[[web.Request],
+                    Coroutine[None, None, web.Response]]:
     """ Build a coroutine to serve /health that captures version info
     """
     async def health(request: web.Request) -> web.Response:
         return web.json_response(
             {
-                'name': device_name,
+                'name': request.app[DEVICE_NAME_VARNAME],
                 'updateServerVersion': version_dict.get(
                     'update_server_version', 'unknown'),
+                'serialNumber': get_serial(),
                 'apiServerVersion': version_dict.get(
                     'opentrons_api_version', 'unknown'),
                 'smoothieVersion': 'unimplemented',
                 'systemVersion': version_dict.get(
                     'buildroot_version', 'unknown'),
                 'capabilities': {'buildroot-update': '/server/update/begin',
-                                 'restart': '/server/update/restart'}
+                                 'restart': '/server/restart'}
             },
             headers={'Access-Control-Allow-Origin': '*'}
         )
     return health
+
+
+def get_serial() -> str:
+    """ Get the device serial number. """
+    try:
+        with open('/var/serial') as vs:
+            return vs.read().strip()
+    except OSError:
+        return 'unknown'

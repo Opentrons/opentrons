@@ -24,7 +24,7 @@ async def test_health(test_cli):
 async def test_restart(test_cli, monkeypatch):
     restart_mock = mock.Mock()
     monkeypatch.setattr(control, '_do_restart', restart_mock)
-    resp = await test_cli.post('/server/update/restart')
+    resp = await test_cli.post('/server/restart')
     assert resp.status == 200
     assert not restart_mock.called
     await asyncio.sleep(1.01)
