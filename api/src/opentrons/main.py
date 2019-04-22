@@ -7,110 +7,11 @@ from opentrons import server
 from opentrons.server.main import build_arg_parser
 from argparse import ArgumentParser
 from opentrons import hardware, __version__
-from opentrons.config import feature_flags as ff, CONFIG, name
-from logging.config import dictConfig
+from opentrons.config import feature_flags as ff, name
 from opentrons.system import udev, resin
+from opentrons.util import logging_config
 
 log = logging.getLogger(__name__)
-
-
-def log_init():
-    """
-    Function that sets log levels and format strings. Checks for the
-    OT_API_LOG_LEVEL environment variable otherwise defaults to DEBUG.
-    """
-    fallback_log_level = 'INFO'
-    ot_log_level = hardware.config.log_level
-    if ot_log_level not in logging._nameToLevel:
-        log.info("OT Log Level {} not found. Defaulting to {}".format(
-            ot_log_level, fallback_log_level))
-        ot_log_level = fallback_log_level
-
-    level_value = logging._nameToLevel[ot_log_level]
-
-    serial_log_filename = CONFIG['serial_log_file']
-    api_log_filename = CONFIG['api_log_file']
-
-    logging_config = dict(
-        version=1,
-        formatters={
-            'basic': {
-                'format':
-                '%(asctime)s %(name)s %(levelname)s [Line %(lineno)s] %(message)s'  # noqa: E501
-            }
-        },
-        handlers={
-            'debug': {
-                'class': 'logging.StreamHandler',
-                'formatter': 'basic',
-                'level': level_value
-            },
-            'serial': {
-                'class': 'logging.handlers.RotatingFileHandler',
-                'formatter': 'basic',
-                'filename': serial_log_filename,
-                'maxBytes': 5000000,
-                'level': logging.DEBUG,
-                'backupCount': 3
-            },
-            'api': {
-                'class': 'logging.handlers.RotatingFileHandler',
-                'formatter': 'basic',
-                'filename': api_log_filename,
-                'maxBytes': 1000000,
-                'level': logging.DEBUG,
-                'backupCount': 5
-            }
-
-        },
-        loggers={
-            '__main__': {
-                'handlers': ['debug', 'api'],
-                'level': logging.INFO
-            },
-            'opentrons.server': {
-                'handlers': ['debug', 'api'],
-                'level': level_value
-            },
-            'opentrons.api': {
-                'handlers': ['debug', 'api'],
-                'level': level_value
-            },
-            'opentrons.instruments': {
-                'handlers': ['debug', 'api'],
-                'level': level_value
-            },
-            'opentrons.config': {
-                'handlers': ['debug', 'api'],
-                'level': level_value
-            },
-            'opentrons.drivers.smoothie_drivers.driver_3_0': {
-                'handlers': ['debug', 'api'],
-                'level': level_value
-            },
-            'opentrons.drivers.serial_communication': {
-                'handlers': ['serial'],
-                'level': logging.DEBUG
-            },
-            'opentrons.drivers.thermocycler.driver': {
-                'handlers': ['serial'],
-                'level': logging.DEBUG
-            },
-            'opentrons.protocol_api': {
-                'handlers': ['api', 'debug'],
-                'level': level_value
-            },
-            'opentrons.hardware_control': {
-                'handlers': ['api', 'debug'],
-                'level': level_value
-            },
-            'opentrons.legacy_api.containers': {
-                'handlers': ['api'],
-                'level': level_value
-            }
-        }
-    )
-    dictConfig(logging_config)
 
 
 def _find_smoothie_file():
@@ -174,7 +75,7 @@ def run(**kwargs):
     an additional argument of 'patch_old_init'. kwargs are hence used to allow
     the use of different length args
     """
-    log_init()
+    logging_config.log_init(hardware.config.log_level)
     loop = asyncio.get_event_loop()
     log.info("API server version:  {}".format(__version__))
     if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
