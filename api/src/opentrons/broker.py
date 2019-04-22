@@ -1,7 +1,10 @@
 import asyncio
+import logging
 
 from asyncio import Queue
 from contextlib import contextmanager
+
+MODULE_LOG = logging.getLogger(__name__)
 
 
 class Notifications(object):
@@ -36,6 +39,7 @@ class Broker:
 
     def __init__(self):
         self.subscriptions = {}
+        self.logger = MODULE_LOG
 
     def subscribe(self, topic, handler):
         if handler in self.subscriptions.setdefault(topic, []):
@@ -49,3 +53,6 @@ class Broker:
 
     def publish(self, topic, message):
         [handler(message) for handler in self.subscriptions.get(topic, [])]
+
+    def set_logger(self, logger):
+        self.logger = logger

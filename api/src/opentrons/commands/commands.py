@@ -3,6 +3,7 @@ from opentrons.broker import Broker
 
 import functools
 import inspect
+import logging
 from typing import Union, Sequence, List, Any
 
 from opentrons.legacy_api.containers import (Well as OldWell,
@@ -11,6 +12,8 @@ from opentrons.legacy_api.containers import (Well as OldWell,
                                              location_to_list)
 from opentrons.protocol_api.labware import Well, Labware, ModuleGeometry
 from opentrons.types import Location
+
+MODULE_LOG = logging.getLogger(__name__)
 
 
 def is_new_loc(location: Union[Location, Well, None,
@@ -435,6 +438,7 @@ def do_publish(broker, cmd, f, when, res, meta, *args, **kwargs):
         broker.publish,
         topic=command_types.COMMAND)
     call_args = _get_args(f, args, kwargs)
+    broker.logger.info("{}: {}".format(f, call_args))
     command_args = dict(
         zip(
             reversed(inspect.getfullargspec(cmd).args),

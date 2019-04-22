@@ -1,5 +1,6 @@
 import pytest  # noqa
 
+from opentrons import config
 from opentrons.system import nmcli
 
 
@@ -54,6 +55,8 @@ wifi-wlan0:802-11-wireless:yes:no:wlan0:--
 
 
 async def test_available_ssids(monkeypatch):
+    monkeypatch.setattr(config, 'IS_ROBOT', True)
+
     mock_nmcli_output = '''mock_wpa2:90:no:WPA2
 mock_no_security:80:no:
 mock_enterprise:70:no:WPA1 WPA2 802.1X

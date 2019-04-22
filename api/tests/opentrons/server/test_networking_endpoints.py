@@ -3,6 +3,7 @@ import os
 import random
 import tempfile
 import pytest
+from opentrons import config
 from opentrons.system import nmcli
 from opentrons.server import init
 from opentrons.server.endpoints import networking
@@ -38,6 +39,7 @@ GENERAL.STATE:100 (connected)'''
         return res, ''
 
     monkeypatch.setattr(nmcli, '_call', mock_call)
+    monkeypatch.setattr(config, 'IS_ROBOT', True)
 
     expected = json.dumps({
         'status': 'full',
