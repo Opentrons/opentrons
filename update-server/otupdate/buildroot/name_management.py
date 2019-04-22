@@ -238,3 +238,16 @@ async def set_name_endpoint(request: web.Request) -> web.Response:
 
     return web.json_response(data={'name': new_name},
                              status=200)
+
+
+async def get_name_endpoint(request: web.Request) -> web.Response:
+    """ Get the name of the robot.
+
+    This information is also accessible in /server/update/health, but this
+    endpoint provides symmetry with POST /server/name.
+
+    GET /server/name -> 200 OK, {'name': robot name}
+    """
+    return web.json_response(
+        data={'name': request.app[DEVICE_NAME_VARNAME]},
+        status=200)

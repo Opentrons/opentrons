@@ -83,5 +83,6 @@ def get_app(system_version_file: str = None,
         web.post('/server/ssh_keys', ssh_key_management.add),
         web.delete('/server/ssh_keys/{key_md5}', ssh_key_management.remove),
         web.post('/server/name', name_management.set_name_endpoint),
+        web.get('/server/name', name_management.get_name_endpoint),
     ])
     return app
