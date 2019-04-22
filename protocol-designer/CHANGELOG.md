@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.8.2-alpha.0"></a>
+## [3.8.2-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.8.1...v3.8.2-alpha.0) (2019-04-22)
+
+
+### Bug Fixes
+
+* **protocol-designer:** fix trough over-aspirate bug ([#3280](https://github.com/Opentrons/opentrons/issues/3280)) ([c0b0333](https://github.com/Opentrons/opentrons/commit/c0b0333))
+
+
+### Features
+
+* **protocol-designer:** show tooltips on disabled fields in Transfer form ([#3286](https://github.com/Opentrons/opentrons/issues/3286)) ([a9cc612](https://github.com/Opentrons/opentrons/commit/a9cc612)), closes [#3259](https://github.com/Opentrons/opentrons/issues/3259)
+
+
+### Performance Improvements
+
+* **protocol-designer:** avoid selector recomputation in step forms ([#3292](https://github.com/Opentrons/opentrons/issues/3292)) ([41c40c5](https://github.com/Opentrons/opentrons/commit/41c40c5))
+* **protocol-designer:** fix selectors used by allSubsteps ([#3287](https://github.com/Opentrons/opentrons/issues/3287)) ([54dfa53](https://github.com/Opentrons/opentrons/commit/54dfa53))
+
+
+
+
+
 <a name="3.8.1"></a>
 ## [3.8.1](https://github.com/Opentrons/opentrons/compare/v3.8.0...v3.8.1) (2019-03-29)
 

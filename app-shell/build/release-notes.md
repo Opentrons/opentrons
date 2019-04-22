@@ -1,4 +1,4 @@
-# Changes from 3.8.0 to 3.8.1
+# Changes from 3.8.1 to 3.8.2
 
 For more details, please see the full [technical change log][changelog]
 
@@ -9,7 +9,13 @@ For more details, please see the full [technical change log][changelog]
 
 ### New features
 
-- Added support for upcoming pipette hardware revisions
+- You can now manually add robots by IP address from the settings page
+- Pause and delay command reasons, if any, will now appear in the run log
+- Added support for more upcoming pipette hardware revisions
+
+### Bug fixes
+
+- Render the correct image for vial and tube racks for certain labwares
 
 ### Known issues
 
@@ -17,6 +23,7 @@ For more details, please see the full [technical change log][changelog]
 - The app should prevent you from starting a pipette swap while a protocol is
 executing, but it does not ([#2020][2020])
 - If a protocol run encounters an error, the app will suppress the error message instead of displaying it ([#1828][1828])
+
 
 [2047]: https://github.com/Opentrons/opentrons/issues/2047
 [2020]: https://github.com/Opentrons/opentrons/issues/2020
@@ -28,13 +35,10 @@ executing, but it does not ([#2020][2020])
 ## OT2 and Protocol API
 
 ### New Features
-- The robot now supports a move-to-slot JSON protocol command
-- The simulator now prints the run log when a protocol is being simulated
-- Added support for upcoming pipette hardware revisions
 
-### Bug fixes
-
-- Fixed an issue where the pipette mount offset and other factory calibration data was not loaded, causing tip probe failures. If this update does not resolve the problem, downgrade to 3.6.5 and then upgrade back to this version.
+- Validate json protocols before executing them based on our json schema
+- Define and execute V3 json protocols
+- Added support for more upcoming pipette hardware revisions
 
 
 ### Known issues
