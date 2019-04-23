@@ -1,5 +1,5 @@
 // @flow
-import type { Submenu } from './types'
+import type { Submenu, LinksByName } from './types'
 
 export const navLinkProps: Array<Submenu> = [
   {
@@ -62,3 +62,32 @@ export const navLinkProps: Array<Submenu> = [
     ],
   },
 ]
+
+export const protocolLinkProps: LinksByName = {
+  options: {
+    name: 'Protocol Options',
+    url: 'https://opentrons.com/protocols',
+    description: 'Gain an overview of our protocol creation options',
+  },
+  designer: {
+    name: 'Protocol Designer',
+    url: 'https://opentrons.com/protocols/designer',
+    description: 'Use our graphical user interface to design protocols',
+  },
+  library: {
+    name: 'Protocol Library',
+    url: 'https://protocols.opentrons.com',
+    description: 'Explore our open source database of protocols',
+  },
+  api: {
+    name: 'Python API',
+    url: 'https://docs.opentrons.com/',
+    description:
+      'Maximum customization for anyone with python and basic wetlab skills',
+  },
+  github: {
+    name: 'Github',
+    url: 'https://github.com/Opentrons',
+    description: 'Contribute to open source protocol repository',
+  },
+}

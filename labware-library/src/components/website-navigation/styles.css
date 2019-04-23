@@ -7,7 +7,14 @@
 :root {
   --c-nav-gray: #707070;
   --spacing-subdomain: 2.5rem;
-  --spacing-nav: 0.5rem;
+  --spacing-nav: 1.75rem;
+
+  --bottom-link: {
+    height: 3rem;
+    border-top: var(--bd-light);
+    color: var(--c-blue);
+    font-weight: var(--fw-semibold);
+  }
 }
 
 .subdomain_nav_contents {
@@ -42,7 +49,7 @@
 }
 
 .nav_link {
-  @apply --font-body-1-dark;
+  @apply --font-body-2-dark;
   @apply --transition-color;
 
   position: relative;
@@ -71,8 +78,10 @@
 }
 
 .dropdown_small {
+  @apply --font-body-1-dark;
+
   position: absolute;
-  left: -1rem;
+  left: 0;
   top: 4.25rem;
   width: 16rem;
   background-color: var(--c-white);
@@ -102,6 +111,40 @@
   }
 }
 
+.dropdown_medium {
+  @apply --font-body-1-dark;
+
+  position: absolute;
+  left: -11rem;
+  top: 4.25rem;
+  width: 27rem;
+  background-color: var(--c-white);
+  border-radius: var(--bd-radius-default);
+  border: var(--bd-light);
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 47.75%;
+    border-width: 11px;
+    border-style: solid;
+    border-color: transparent transparent var(--c-lightest-gray) transparent;
+    z-index: 10;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 48%;
+    border-width: 9px;
+    border-style: solid;
+    border-color: transparent transparent var(--c-white) transparent;
+    z-index: 1000;
+  }
+}
+
 .dropdown_content {
   padding: 0.75rem 1.75rem;
 }
@@ -113,17 +156,52 @@
 }
 
 .dropdown_link {
+  font-weight: var(--fw-semibold);
   color: var(--c-black);
   text-transform: capitalize;
+
+  &:hover {
+    color: var(--c-blue);
+  }
 }
 
 .bottom_link {
   @apply --flex-start;
+  @apply --bottom-link;
 
-  height: 3rem;
-  border-top: var(--bd-light);
   padding-left: 1.75rem;
-  color: var(--c-blue);
+}
+
+.dropdown_group {
+  display: flex;
+  padding: 1.75rem;
+  padding-bottom: 0;
+}
+
+.dropdown_col {
+  flex: 1 1 50%;
+}
+
+.link_group {
+  line-height: 1.25rem;
+  margin-right: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.link_title {
+  font-weight: var(--fw-semibold);
+  color: var(--c-black);
+  text-transform: capitalize;
+  font-size: var(--fs-body-2);
+}
+
+.link_description {
+  text-transform: none;
+}
+
+.bottom_link-center {
+  @apply --bottom-link;
+  @apply --center-children;
 }
 
 .menu_button {

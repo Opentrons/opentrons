@@ -4,6 +4,7 @@ import { ClickOutside } from '@opentrons/components'
 
 import { navLinkProps } from './nav-data'
 import NavMenu from './NavMenu'
+import ProtocolMenu from './ProtocolMenu'
 import styles from './styles.css'
 
 import type { MenuName } from './types'
@@ -40,7 +41,13 @@ export default class NavList extends React.Component<Props, State> {
                 <NavMenu {...subnav} active={menu === subnav.name} />
               </li>
             ))}
-            <li className={styles.nav_link}>Protocols</li>
+            <li
+              className={styles.nav_link}
+              role="button"
+              onClick={() => this.toggle('protocols')}
+            >
+              <ProtocolMenu active={menu === 'protocols'} />
+            </li>
             <li className={styles.nav_link}>Support & Sales</li>
           </ul>
         )}
