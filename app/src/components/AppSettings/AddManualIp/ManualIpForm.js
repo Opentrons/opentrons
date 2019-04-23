@@ -31,7 +31,12 @@ class IpForm extends React.Component<Props> {
       <Formik
         initialValues={{ ip: '' }}
         onSubmit={(values, actions) => {
-          this.props.addManualIp(values.ip)
+          // trim whitespace and carriage returns
+          const ip = values.ip.trim()
+          // guard against double submit on enter keypress
+          if (!ip) return
+
+          this.props.addManualIp(ip)
 
           const $input = this.inputRef.current
           if ($input) $input.blur()
