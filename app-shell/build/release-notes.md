@@ -15,6 +15,7 @@ For more details, please see the full [technical change log][changelog]
 ### Bug fixes
 
 - Render the correct image for certain vial and tube racks
+- Fix an issue where an error in deck calibration could leave the robot unable to do deck calibration again until the app was restarted
 
 ### Known issues
 
@@ -33,7 +34,6 @@ executing, but it does not ([#2020][2020])
 ## OT2 and Protocol API
 
 ### New Features
-- The robot now supports V3 JSON protocols; the schema is ([on our GitHub][schema-v3])
 - The messages given to the `pause` and `delay` commands in protocols are now published in the run log
 - Added support for more upcoming pipette hardware revisions
 
