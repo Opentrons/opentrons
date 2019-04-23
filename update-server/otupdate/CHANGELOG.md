@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.8.2-alpha.1"></a>
+## [3.8.2-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.8.1...v3.8.2-alpha.1) (2019-04-23)
+
+
+### Bug Fixes
+
+* **update-server:** Create ~/.ssh/authorized_keys if needed ([#3351](https://github.com/Opentrons/opentrons/issues/3351)) ([c2836bb](https://github.com/Opentrons/opentrons/commit/c2836bb))
+* **update-server:** Fix some issues with br update, test, fast flow ([#3352](https://github.com/Opentrons/opentrons/issues/3352)) ([6e4d2f6](https://github.com/Opentrons/opentrons/commit/6e4d2f6))
+
+
+### Features
+
+* **update-server:** add buildroot migration ([#3321](https://github.com/Opentrons/opentrons/issues/3321)) ([76d6b28](https://github.com/Opentrons/opentrons/commit/76d6b28)), closes [#2880](https://github.com/Opentrons/opentrons/issues/2880) [#2881](https://github.com/Opentrons/opentrons/issues/2881)
+* **update-server:** Add SSH public key management for buildroot ([#3339](https://github.com/Opentrons/opentrons/issues/3339)) ([ef02433](https://github.com/Opentrons/opentrons/commit/ef02433)), closes [#3320](https://github.com/Opentrons/opentrons/issues/3320)
+* **update-server:** Set buildroot hostname ([#3356](https://github.com/Opentrons/opentrons/issues/3356)) ([1addcf7](https://github.com/Opentrons/opentrons/commit/1addcf7))
+
+
+
+
+
 <a name="3.8.2-alpha.0"></a>
 ## [3.8.2-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.8.1...v3.8.2-alpha.0) (2019-04-23)
 

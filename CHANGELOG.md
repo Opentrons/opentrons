@@ -3,14 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-<a name="3.8.2-alpha.0"></a>
-## [3.8.2-alpha.0](https://github.com/opentrons/opentrons/compare/v3.8.1...v3.8.2-alpha.0) (2019-04-23)
+<a name="3.8.2-alpha.1"></a>
+## [3.8.2-alpha.1](https://github.com/opentrons/opentrons/compare/v3.8.1...v3.8.2-alpha.1) (2019-04-23)
 
 
 ### Bug Fixes
 
+* **api:** Correctly specify jsonschema in setup.py install_requires ([#3377](https://github.com/opentrons/opentrons/issues/3377)) ([a79d7ab](https://github.com/opentrons/opentrons/commit/a79d7ab))
 * **api:** Do not sleep in simulated delays ([#3347](https://github.com/opentrons/opentrons/issues/3347)) ([e12e200](https://github.com/opentrons/opentrons/commit/e12e200)), closes [#3346](https://github.com/opentrons/opentrons/issues/3346)
 * **api:** Remove module load regression in V2 ([#3288](https://github.com/opentrons/opentrons/issues/3288)) ([7fe143a](https://github.com/opentrons/opentrons/commit/7fe143a))
+* **app:** Clear deck cal request states on wizard exit ([#3378](https://github.com/opentrons/opentrons/issues/3378)) ([408b8aa](https://github.com/opentrons/opentrons/commit/408b8aa))
+* **app:** Disable manual ip double submit on enter keypress ([#3376](https://github.com/opentrons/opentrons/issues/3376)) ([81291ca](https://github.com/opentrons/opentrons/commit/81291ca))
 * **app:** render correct image for vial and tube racks ([#3298](https://github.com/opentrons/opentrons/issues/3298)) ([b9e1ebb](https://github.com/opentrons/opentrons/commit/b9e1ebb)), closes [#3294](https://github.com/opentrons/opentrons/issues/3294)
 * **labware-library:** Take cornerOffsetFromSlot into account with render ([#3297](https://github.com/opentrons/opentrons/issues/3297)) ([04a1ab8](https://github.com/opentrons/opentrons/commit/04a1ab8))
 * **protocol-designer:** fix trough over-aspirate bug ([#3280](https://github.com/opentrons/opentrons/issues/3280)) ([c0b0333](https://github.com/opentrons/opentrons/commit/c0b0333))
