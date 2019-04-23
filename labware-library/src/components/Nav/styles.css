@@ -10,25 +10,33 @@
   left: 0;
   right: 0;
   width: 100%;
-  height: var(--size-2);
   z-index: 999;
+}
+
+/* TODO (ka 20194-16): Keeping wrapper and containers separate
+from individual navigation components so that responsive margins and padding
+are project specific  */
+
+.subdomain_nav_wrapper {
+  display: none;
+}
+
+.main_nav_wrapper {
+  width: 100%;
+  height: var(--size-main-nav);
   background-color: var(--c-white);
   box-shadow: var(--shadow-1);
 }
 
-.nav_contents {
+.nav_container {
   width: 100%;
   height: 100%;
   padding: var(--spacing-1) var(--spacing-2);
 }
 
-.logo {
-  height: 100%;
-}
-
 .breadcrumbs {
   position: fixed;
-  top: var(--size-2);
+  top: var(--size-main-nav);
   left: 0;
   right: 0;
   z-index: 888;
@@ -66,15 +74,28 @@
 }
 
 @media (--medium) {
-  .nav_contents,
+  .nav_container,
   .breadcrumbs_contents {
     padding-left: var(--spacing-7);
     padding-right: var(--spacing-7);
   }
 }
 
+@media (--desktop) {
+  .subdomain_nav_wrapper {
+    display: block;
+    width: 100%;
+    height: var(--size-subdomain-nav);
+    background-color: var(--c-lightest-gray);
+  }
+
+  .breadcrumbs {
+    top: var(--size-total-nav);
+  }
+}
+
 @media (--large) {
-  .nav_contents,
+  .nav_container,
   .breadcrumbs_contents {
     margin: auto;
     max-width: var(--screen-width-xlarge);
