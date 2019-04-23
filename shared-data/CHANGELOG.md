@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.8.2-alpha.0"></a>
+## [3.8.2-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.8.1...v3.8.2-alpha.0) (2019-04-23)
+
+
+### Bug Fixes
+
+* **labware-library:** Take cornerOffsetFromSlot into account with render ([#3297](https://github.com/Opentrons/opentrons/issues/3297)) ([04a1ab8](https://github.com/Opentrons/opentrons/commit/04a1ab8))
+* **shared-data:** fix v2 labware definition ([#3289](https://github.com/Opentrons/opentrons/issues/3289)) ([e652fb7](https://github.com/Opentrons/opentrons/commit/e652fb7)), closes [#3271](https://github.com/Opentrons/opentrons/issues/3271)
+
+
+### Features
+
+* **api:** Add Geometry Logic For Thermocycler Configurations ([#3266](https://github.com/Opentrons/opentrons/issues/3266)) ([4d8e463](https://github.com/Opentrons/opentrons/commit/4d8e463))
+* **api:** add P10M 1.5 config data ([#3365](https://github.com/Opentrons/opentrons/issues/3365)) ([1332f63](https://github.com/Opentrons/opentrons/commit/1332f63))
+* **api:** define & execute v3 json protocols ([#3312](https://github.com/Opentrons/opentrons/issues/3312)) ([988407d](https://github.com/Opentrons/opentrons/commit/988407d)), closes [#3110](https://github.com/Opentrons/opentrons/issues/3110)
+* **api:** Set P10M1.5 pick up increment to 3mm ([#3374](https://github.com/Opentrons/opentrons/issues/3374)) ([f5b63d0](https://github.com/Opentrons/opentrons/commit/f5b63d0))
+* **api:** validate JSON protocols before executing ([#3318](https://github.com/Opentrons/opentrons/issues/3318)) ([9c15f7d](https://github.com/Opentrons/opentrons/commit/9c15f7d)), closes [#3250](https://github.com/Opentrons/opentrons/issues/3250)
+* **shared-data:** update P300M 1.5 pick up current to 0.9 A ([#3355](https://github.com/Opentrons/opentrons/issues/3355)) ([a2d9024](https://github.com/Opentrons/opentrons/commit/a2d9024))
+
+
+
+
+
 <a name="3.8.1"></a>
 ## [3.8.1](https://github.com/Opentrons/opentrons/compare/v3.8.0...v3.8.1) (2019-03-29)
 

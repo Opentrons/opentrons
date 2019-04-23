@@ -1,4 +1,4 @@
-# Changes from 3.8.0 to 3.8.1
+# Changes from 3.8.1 to 3.8.2
 
 For more details, please see the full [technical change log][changelog]
 
@@ -9,7 +9,12 @@ For more details, please see the full [technical change log][changelog]
 
 ### New features
 
-- Added support for upcoming pipette hardware revisions
+- You can now manually add robots by their IP in the app settings (the MORE button in the lower left)
+- Added support for more upcoming pipette hardware revisions
+
+### Bug fixes
+
+- Render the correct image for certain vial and tube racks
 
 ### Known issues
 
@@ -28,17 +33,14 @@ executing, but it does not ([#2020][2020])
 ## OT2 and Protocol API
 
 ### New Features
-- The robot now supports a move-to-slot JSON protocol command
-- The simulator now prints the run log when a protocol is being simulated
-- Added support for upcoming pipette hardware revisions
-
-### Bug fixes
-
-- Fixed an issue where the pipette mount offset and other factory calibration data was not loaded, causing tip probe failures. If this update does not resolve the problem, downgrade to 3.6.5 and then upgrade back to this version.
+- The robot now supports V3 JSON protocols; the schema is ([on our GitHub][schema-v3])
+- The messages given to the `pause` and `delay` commands in protocols are now published in the run log
+- Added support for more upcoming pipette hardware revisions
 
 
 ### Known issues
 - While the underlying definition is correct, there is a known API bug that is causing the robot to think a "50ml" tube in a "15/50ml" tuberack is the same height as the "15ml" tube
 - Extremely long aspirations and dispenses can incorrectly trigger a serial timeout issue. If you see such an issue, make sure your protocol’s combination of aspirate/dispense speeds and aspirate/dispense volumes does not include a command that will take more than 30 seconds.
 
+[schema-v3]: https://github.com/Opentrons/opentrons/blob/edge/shared-data/protocol-json-schema/protocolSchemaV3.json
 <!-- end:@opentrons/api -->
