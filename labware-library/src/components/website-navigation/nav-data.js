@@ -1,5 +1,5 @@
 // @flow
-import type { Submenu, LinksByName } from './types'
+import type { Submenu, ProtocolLinks, SupportLinks, SalesLinks } from './types'
 
 export const navLinkProps: Array<Submenu> = [
   {
@@ -63,7 +63,7 @@ export const navLinkProps: Array<Submenu> = [
   },
 ]
 
-export const protocolLinkProps: LinksByName = {
+export const protocolLinkProps: ProtocolLinks = {
   options: {
     name: 'Protocol Options',
     url: 'https://opentrons.com/protocols',
@@ -89,5 +89,57 @@ export const protocolLinkProps: LinksByName = {
     name: 'Github',
     url: 'https://github.com/Opentrons',
     description: 'Contribute to open source protocol repository',
+  },
+  bottomLink: {
+    name: 'Request a free custom protocol',
+    url: 'https://opentrons.com/request-protocol',
+  },
+}
+
+export const supportLinkProps: SupportLinks = {
+  start: {
+    name: 'OT-2 Start guide',
+    url:
+      'https://support.opentrons.com/guide-for-getting-started-with-the-ot-2',
+    description: "You recieved your robot, here's what's next",
+  },
+  help: {
+    name: 'Product Help',
+    url: 'https://support.opentrons.com/',
+    description: 'Answer common technical questions',
+  },
+  github: {
+    name: 'Github',
+    url: 'https://github.com/Opentrons',
+    description: 'Contribute to open source protocol repository',
+  },
+  labware: {
+    name: 'Labware Library',
+    url:
+      'https://intercom.help/opentrons-protocol-designer/intro/opentrons-standard-labware',
+    description: 'Understand what labware is compatible with the OT-2',
+  },
+  app: {
+    name: 'Install the app',
+    url: 'http://opentrons.com/ot-app',
+  },
+  support: {
+    name: 'Contact support',
+    url: 'http://opentrons.com/contact',
+  },
+}
+
+export const salesLinkProps: SalesLinks = {
+  order: {
+    name: 'Order online',
+    url: 'https://shop.opentrons.com/',
+  },
+  sales: {
+    name: 'Contact sales',
+    url: 'http://opentrons.com/contact',
+  },
+  demo: {
+    name: 'Schedule Demo',
+    url: 'http://opentrons.com/demo',
   },
 }

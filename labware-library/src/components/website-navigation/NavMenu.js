@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import NavLink from './NavLink'
 import styles from './styles.css'
 
 import type { Submenu } from './types'
@@ -20,15 +21,8 @@ export default function NavMenu(props: Props) {
           <div className={styles.dropdown_content}>
             <ul>
               {links.map((link, index) => (
-                <li key={index} className={styles.dropdown_item}>
-                  <a
-                    href={link.url}
-                    className={styles.dropdown_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {link.name}
-                  </a>
+                <li key={index}>
+                  <NavLink url={link.url} name={link.name} />
                 </li>
               ))}
             </ul>

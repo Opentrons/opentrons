@@ -12,6 +12,7 @@ export type Link = {|
   url?: string,
   to?: string, // TODO: (ka 2019-4-18): refactor component to take ?Links
   description?: string,
+  cta?: boolean,
 |}
 
 export type Submenu = {|
@@ -20,8 +21,33 @@ export type Submenu = {|
   bottomLink?: Link,
 |}
 
-export type SubmenuName = 'options' | 'designer' | 'library' | 'api' | 'github'
+export type ProtocolSubmenuName =
+  | 'options'
+  | 'designer'
+  | 'library'
+  | 'api'
+  | 'github'
 
-export type LinksByName = {
-  [SubmenuName]: Link,
+export type ProtocolLinks = {
+  [ProtocolSubmenuName]: Link,
+  bottomLink: Link,
+}
+
+export type SupportSubmenuName =
+  | 'start'
+  | 'help'
+  | 'github'
+  | 'labware'
+  | 'app'
+  | 'protocol'
+  | 'support'
+
+export type SupportLinks = {
+  [SupportSubmenuName]: Link,
+}
+
+export type SalesSubmenuName = 'order' | 'sales' | 'demo'
+
+export type SalesLinks = {
+  [SalesSubmenuName]: Link,
 }
