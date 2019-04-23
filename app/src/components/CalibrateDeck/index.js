@@ -22,6 +22,7 @@ import {
   home,
   startDeckCalibration,
   deckCalibrationCommand,
+  clearDeckCalibration,
   makeGetDeckCalibrationCommandState,
   makeGetDeckCalibrationStartState,
 } from '../../http-api-client'
@@ -52,7 +53,7 @@ function CalibrateDeck(props: CalibrateDeckProps) {
     startRequest,
     commandRequest,
     pipetteProps,
-    parentUrl,
+    exitError,
     match: { path },
   } = props
 
@@ -60,7 +61,7 @@ function CalibrateDeck(props: CalibrateDeckProps) {
     return (
       <ErrorModal
         description={ERROR_DESCRIPTION}
-        closeUrl={parentUrl}
+        close={exitError}
         error={{ name: 'BadData', message: BAD_PIPETTE_ERROR }}
       />
     )
@@ -70,7 +71,7 @@ function CalibrateDeck(props: CalibrateDeckProps) {
     return (
       <ErrorModal
         description={ERROR_DESCRIPTION}
-        closeUrl={parentUrl}
+        close={exitError}
         error={commandRequest.error}
       />
     )
@@ -89,18 +90,20 @@ function CalibrateDeck(props: CalibrateDeckProps) {
 
             // conflict: token already issued
             if (status === 409) {
-              return <InUseModal {...props} />
+              return (
+                <InUseModal forceStart={props.forceStart} close={exitError} />
+              )
             }
 
             // forbidden: no pipette attached
             if (status === 403) {
-              return <NoPipetteModal {...props} />
+              return <NoPipetteModal close={exitError} />
             }
 
             return (
               <ErrorModal
                 description={ERROR_DESCRIPTION}
-                closeUrl={parentUrl}
+                close={exitError}
                 error={error}
               />
             )
@@ -192,6 +195,9 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
           home(robot)
         )
       ),
+    // exit from error modal
+    exitError: () =>
+      dispatch(chainActions(clearDeckCalibration(robot), push(parentUrl))),
     // cancel button click in exit alert modal
     back: () => dispatch(goBack()),
   }
