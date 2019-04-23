@@ -61,6 +61,7 @@ export { getRobotApiState } from './reducer'
 export {
   startDeckCalibration,
   deckCalibrationCommand,
+  clearDeckCalibration,
   makeGetDeckCalibrationStartState,
   makeGetDeckCalibrationCommandState,
 } from './calibration'

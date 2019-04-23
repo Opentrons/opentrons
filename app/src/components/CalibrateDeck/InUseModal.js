@@ -1,22 +1,23 @@
 // @flow
 import * as React from 'react'
-import { Link } from 'react-router-dom'
 
 import { AlertModal, CheckboxField } from '@opentrons/components'
-import type { CalibrateDeckProps } from './types'
 
-type State = {
+type Props = {|
+  close: () => mixed,
+  forceStart: () => mixed,
+|}
+
+type State = {|
   checkOne: boolean,
   checkTwo: boolean,
   checkThree: boolean,
-}
+|}
+
 const HEADING = 'Robot is currently in use'
 
-export default class InUseModal extends React.Component<
-  CalibrateDeckProps,
-  State
-> {
-  constructor(props: CalibrateDeckProps) {
+export default class InUseModal extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props)
 
     this.state = {
@@ -27,14 +28,14 @@ export default class InUseModal extends React.Component<
   }
 
   render() {
-    const { parentUrl, forceStart } = this.props
+    const { close, forceStart } = this.props
     const canContinue = Object.keys(this.state).every(k => this.state[k])
 
     return (
       <AlertModal
         heading={HEADING}
         buttons={[
-          { children: 'cancel', Component: Link, to: parentUrl },
+          { children: 'cancel', onClick: close },
           {
             children: 'interrupt',
             onClick: forceStart,

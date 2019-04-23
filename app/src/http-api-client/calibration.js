@@ -12,6 +12,7 @@ import type {
   ApiFailureAction,
 } from './actions'
 
+import { chainActions } from '../util'
 import { apiRequest, apiSuccess, apiFailure, clearApiResponse } from './actions'
 import client from './client'
 
@@ -130,6 +131,14 @@ export function deckCalibrationCommand(
   }
 }
 
+export function clearDeckCalibration(robot: RobotService): ThunkPromiseAction {
+  const clearDeck = clearApiResponse(robot, DECK)
+  const clearDeckStart = clearApiResponse(robot, DECK_START)
+
+  // $FlowFixMe: (mc, 2019-04-23) http-api-client types need to be redone
+  return dispatch => dispatch(chainActions(clearDeck, clearDeckStart))
+}
+
 export function calibrationReducer(state: ?CalState, action: Action): CalState {
   if (!state) return {}
 
@@ -143,15 +152,21 @@ export function calibrationReducer(state: ?CalState, action: Action): CalState {
           robot: { name },
         },
       } = action
-      const stateByName = state[name] || {}
-
-      return {
-        ...state,
-        [name]: {
-          ...stateByName,
-          [path]: { request, inProgress: true, response: null, error: null },
-        },
+      const stateByName = {
+        ...state[name],
+        [path]: { request, inProgress: true, response: null, error: null },
       }
+
+      if (path === DECK_START) {
+        stateByName[DECK] = {
+          request: null,
+          response: null,
+          error: null,
+          inProgress: false,
+        }
+      }
+
+      return { ...state, [name]: stateByName }
     }
 
     case 'api:SUCCESS': {

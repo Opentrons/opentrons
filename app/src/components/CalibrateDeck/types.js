@@ -33,6 +33,7 @@ export type DP = {|
   forceStart: () => mixed,
   jog: Jog,
   exit: () => mixed,
+  exitError: () => mixed,
   back: () => mixed,
 |}
 
