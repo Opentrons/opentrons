@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.8.2-alpha.0"></a>
+## [3.8.2-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.8.1...v3.8.2-alpha.0) (2019-04-23)
+
+
+### Features
+
+* **components:** use transparent gray for button hover ([#3281](https://github.com/Opentrons/opentrons/issues/3281)) ([b724151](https://github.com/Opentrons/opentrons/commit/b724151))
+
+
+
+
+
 <a name="3.8.1"></a>
 ## [3.8.1](https://github.com/Opentrons/opentrons/compare/v3.8.0...v3.8.1) (2019-03-29)
 
