@@ -634,7 +634,7 @@ Object {
     "min": 0,
     "type": "float",
     "units": "mm",
-    "value": 1,
+    "value": 3,
   },
   "pickUpPresses": Object {
     "max": 10,
