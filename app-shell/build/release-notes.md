@@ -20,8 +20,7 @@ For more details, please see the full [technical change log][changelog]
 ### Known issues
 
 - The app's run log is still having problems displaying the current run step, especially if pauses and resumes are involved ([#2047][2047])
-- The app should prevent you from starting a pipette swap while a protocol is
-executing, but it does not ([#2020][2020])
+- The app should prevent you from starting a pipette swap while a protocol is executing, but it does not ([#2020][2020])
 - If a protocol run encounters an error, the app will suppress the error message instead of displaying it ([#1828][1828])
 
 [2047]: https://github.com/Opentrons/opentrons/issues/2047
