@@ -22,6 +22,10 @@
         "yDimension": { "$ref": "#/definitions/positiveNumber" },
         "zDimension": { "$ref": "#/definitions/positiveNumber" }
       }
+    },
+    "pathDValue": {
+      "type": "string",
+      "description": "A valid d-attribute value for an svg path. Note: uses physical coordinate system which has origin at the bottom, front, left of the robot's workspace."
     }
   },
 
@@ -160,6 +164,41 @@
                 ]
               }
             ]
+          }
+        },
+
+        "layers": {
+          "type": "array",
+          "description": "Layered feature groups of the deck.",
+          "items": {
+            "type": "object",
+            "required": ["id", "displayName"],
+            "properties": {
+              "id": {
+                "description": "Unique identifier for layer",
+                "type": "string"
+              },
+              "displayName": {
+                "description": "An optional human-readable nickname for this layer Eg \"Slot Ridges\" or \"Door Stops\"",
+                "type": "string"
+              },
+              "features": {
+                "type": "array",
+                "description": "Individual features within a layer",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "position": {"$ref": "#/definitions/xyzArray"},
+                    "boundingBox": {"$ref": "#/definitions/boundingBox"},
+                    "footprint": {"$ref": "#/definitions/pathDValue"}
+                  },
+                  "oneOf": [
+                    {"required": ["boundingBox", "position"]},
+                    {"required": ["footprint"]}
+                  ]
+                }
+              }
+            }
           }
         }
       }
