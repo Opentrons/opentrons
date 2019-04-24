@@ -26,6 +26,14 @@
     "pathDValue": {
       "type": "string",
       "description": "A valid d-attribute value for an svg path. Note: uses physical coordinate system which has origin at the bottom, front, left of the robot's workspace."
+    },
+    "feature": {
+      "type": "object",
+      "description": "A physical feature of the deck",
+      "required": ["footprint"],
+      "properties": {
+        "footprint": {"$ref": "#/definitions/pathDValue"}
+      }
     }
   },
 
@@ -165,42 +173,16 @@
               }
             ]
           }
-        },
-
-        "layers": {
-          "type": "array",
-          "description": "Layered feature groups of the deck.",
-          "items": {
-            "type": "object",
-            "required": ["id", "displayName"],
-            "properties": {
-              "id": {
-                "description": "Unique identifier for layer",
-                "type": "string"
-              },
-              "displayName": {
-                "description": "An optional human-readable nickname for this layer Eg \"Slot Ridges\" or \"Door Stops\"",
-                "type": "string"
-              },
-              "features": {
-                "type": "array",
-                "description": "Individual features within a layer",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "position": {"$ref": "#/definitions/xyzArray"},
-                    "boundingBox": {"$ref": "#/definitions/boundingBox"},
-                    "footprint": {"$ref": "#/definitions/pathDValue"}
-                  },
-                  "oneOf": [
-                    {"required": ["boundingBox", "position"]},
-                    {"required": ["footprint"]}
-                  ]
-                }
-              }
-            }
-          }
         }
+      }
+    },
+    "layers": {
+      "type": "object",
+      "description": "Layered feature groups of the deck.",
+      "additionalProperties": {
+        "type": "array",
+        "description": "Individual features within a layer",
+        "items": {"$ref": "#/definitions/feature"}
       }
     }
   }
