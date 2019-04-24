@@ -1,7 +1,7 @@
 // flow
 import * as React from 'react'
 import Logo from './Logo'
-import NavList from './NavList'
+import { NavList } from './NavList'
 import MenuButton from './MenuButton'
 import styles from './styles.css'
 

@@ -15,7 +15,7 @@ type State = {| menu: null | MenuName |}
 
 type Props = {||}
 
-export default class NavList extends React.Component<Props, State> {
+export class NavList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = { menu: null }

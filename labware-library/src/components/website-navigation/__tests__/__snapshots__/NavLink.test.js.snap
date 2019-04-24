@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`NavLink component renders 1`] = `
+<div
+  className="link_group"
+>
+  <a
+    className="link_title"
+    href="bar"
+    rel="noopener noreferrer"
+    target="_blank"
+  >
+    foo
+  </a>
+</div>
+`;

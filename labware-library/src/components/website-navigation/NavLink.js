@@ -14,7 +14,8 @@ export default function NavLink(props: Link) {
         target="_blank"
         rel="noopener noreferrer"
       >
-        {props.name} {props.cta && <span>&nbsp; &gt;</span>}
+        {props.name}
+        {props.cta && <span>&nbsp; &gt;</span>}
       </a>
       {props.description && (
         <div className={styles.link_description}>{props.description}</div>
