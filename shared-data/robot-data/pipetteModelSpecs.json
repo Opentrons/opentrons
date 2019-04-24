@@ -3135,21 +3135,21 @@
         "type": "float"
       },
       "bottom": {
-        "value": -20,
+        "value": -10,
         "min": -2,
         "max": 19.0,
         "units": "mm",
         "type": "float"
       },
       "blowout": {
-        "value": -25,
+        "value": -14,
         "min": -4,
         "max": 10,
         "units": "mm",
         "type": "float"
       },
       "dropTip": {
-        "value": -30,
+        "value": -28,
         "min": -6,
         "max": 2,
         "units": "mm",
