@@ -54,8 +54,8 @@ class HTTPServer(object):
                 '/logs', self.log_file_path, show_index=True)
         else:
             from .endpoints import logs
-            self.app.router.add_get('/logs/serial.log', logs.get_serial_log)
-            self.app.router.add_get('/logs/api.log', logs.get_api_log)
+            self.app.router.add_get('/logs/{syslog_identifier}',
+                                    logs.get_logs_by_id)
         self.app.router.add_post(
             '/server/restart', endpoints.restart)
         self.app.router.add_post(

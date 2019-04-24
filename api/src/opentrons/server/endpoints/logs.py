@@ -120,26 +120,20 @@ async def _get_log_response(syslog_selector: str, record_count: int,
         return web.Response(text=_format_text(records))
 
 
-async def get_serial_log(request: web.Request) -> web.Response:
-    """ Get the robot serial log.
+async def get_logs_by_id(request: web.Request) -> web.Response:
+    """ Get logs from the robot.
 
-    GET /logs/api.log -> 200 OK, log contents in body
+    GET /logs/:syslog_identifier -> 200 OK, log contents in body
 
-    Optionally, the request body can be json with any of the following keys:
-    - ``'format'``: ``'json'`` or ``'text'`` (default: text). Controls log
-      format.
-    - ``records``: int. Count of records to limit the dump to.
-      Default: 40000. Limit: 1000000
-    """
-    opts = await _get_options(request, 40000)
-    return await _get_log_response(
-        'opentrons-api-serial', opts['records'], opts['format'])
+    The syslog identifier is an a string that something has logged to as the
+    syslog id. It may not be blank (i.e. GET /logs/ is not allowed). The
+    identifier is sent to systemd and therefore invalid syslog ids will result
+    in an empty response body, not a 404.
 
-
-async def get_api_log(request: web.Request) -> web.Response:
-    """ Get the robot API log.
-
-    GET /logs/api.log -> 200 OK, log contents in body
+    In addition to actual syslog identifiers, for backwards compatibility the
+    path can be ``serial.log``, which corresponds to syslog id
+    ``opentrons-api-serial`` or ``api.log``, which corresponds to syslog id
+    ``opentrons-api``.
 
     Optionally, the request body can be json with any of the following keys:
     - ``'format'``: ``'json'`` or ``'text'`` (default: text). Controls log
@@ -147,6 +141,11 @@ async def get_api_log(request: web.Request) -> web.Response:
     - ``records``: int. Count of records to limit the dump to. Default: 15000.
       Limit: 1000000
     """
+    ident = request.match_info['syslog_identifier']
+    if ident == 'api.log':
+        ident = 'opentrons-api'
+    elif ident == 'serial.log':
+        ident = 'opentrons-api-serial'
     opts = await _get_options(request, 15000)
     return await _get_log_response(
-        'opentrons-api', opts['records'], opts['format'])
+        ident, opts['records'], opts['format'])
