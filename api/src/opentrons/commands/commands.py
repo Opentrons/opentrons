@@ -3,7 +3,6 @@ from opentrons.broker import Broker
 
 import functools
 import inspect
-import logging
 from typing import Union, Sequence, List, Any
 
 from opentrons.legacy_api.containers import (Well as OldWell,
@@ -12,8 +11,6 @@ from opentrons.legacy_api.containers import (Well as OldWell,
                                              location_to_list)
 from opentrons.protocol_api.labware import Well, Labware, ModuleGeometry
 from opentrons.types import Location
-
-MODULE_LOG = logging.getLogger(__name__)
 
 
 def is_new_loc(location: Union[Location, Well, None,
