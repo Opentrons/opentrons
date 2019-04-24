@@ -29,7 +29,6 @@ async def _get_options(request: web.Request,
     try:
         body = await request.json()
     except json.JSONDecodeError:
-        LOG.exception("Bad request format to logs.get_options")
         return response
 
     if 'format' in body:
