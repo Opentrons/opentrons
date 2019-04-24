@@ -265,8 +265,6 @@ async def available_ssids() -> List[Dict[str, Any]]:
     Returns a list of the SSIDs. They may contain spaces and should be escaped
     if later passed to a shell.
     """
-    if not config.IS_ROBOT:
-        return []
     fields = ['ssid', 'signal', 'active', 'security']
     cmd = ['--terse',
            '--fields',
@@ -288,8 +286,6 @@ async def available_ssids() -> List[Dict[str, Any]]:
 
 async def is_connected() -> str:
     """ Return nmcli's connection measure: none/portal/limited/full/unknown"""
-    if not config.IS_ROBOT:
-        return 'none'
     res, _ = await _call(['networking', 'connectivity'])
     return res
 
@@ -306,8 +302,6 @@ async def connections(
     If for_type is not None, it should be a str containing an element of
     CONNECTION_TYPES, and results will be limited to that connection type.
     """
-    if not config.IS_ROBOT:
-        return []
     fields = ['name', 'type', 'active']
     res, _ = await _call(['-t', '-f', ','.join(fields), 'connection', 'show'])
     found = _dict_from_terse_tabular(
@@ -332,8 +326,6 @@ async def connection_exists(ssid: str) -> Optional[str]:
     """ If there is already a connection for this ssid, return the name of
     the connection; if there is not, return None.
     """
-    if not config.IS_ROBOT:
-        return None
     nmcli_conns = await connections()
     for wifi in [c['name']
                  for c in nmcli_conns if c['type'] == 'wireless']:
@@ -455,8 +447,6 @@ async def configure(ssid: str,
     The ssid and security_type arguments are mandatory; the others have
     different requirements depending on the security type.
     """
-    if not config.IS_ROBOT:
-        return True, 'dev'
     already = await connection_exists(ssid)
     if already:
         # TODO(seth, 8/29/2018): We may need to do connection modifies
@@ -523,9 +513,6 @@ async def iface_info(which_iface: NETWORK_IFACES) -> Dict[str, Optional[str]]:
 
     which_iface should be a string in IFACE_NAMES.
     """
-    if not config.IS_ROBOT:
-        result: Dict[str, Optional[str]] = {}
-        return result
     # example device info lines
     #  GENERAL.HWADDR:B8:27:EB:24:D1:D0
     #  IP4.ADDRESS[1]:10.10.2.221/22

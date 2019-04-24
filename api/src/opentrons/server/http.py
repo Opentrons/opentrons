@@ -2,7 +2,7 @@ import logging
 from . import endpoints as endp
 from .endpoints import (networking, control, settings, update)
 from opentrons.deck_calibration import endpoints as dc_endp
-from opentrons.config import IS_ROBOT
+
 
 from .endpoints import serverlib_fallback as endpoints
 log = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ class HTTPServer(object):
             '/health', endp.health)
         self.app.router.add_get(
             '/networking/status', networking.status)
-        # TODO(tm, 2019-04-22): remove once Run App has moved to /networking/*
+        # TODO(mc, 2018-10-12): s/wifi/networking
         self.app.router.add_get(
             '/wifi/list', networking.list_networks)
         self.app.router.add_post(
@@ -28,17 +28,6 @@ class HTTPServer(object):
             '/wifi/keys/{key_uuid}', networking.remove_key)
         self.app.router.add_get(
             '/wifi/eap-options', networking.eap_options)
-        # Duplicate of /wifi/* endpoints for future versions of Run App
-        self.app.router.add_get(
-            '/networking/list', networking.list_networks)
-        self.app.router.add_post(
-            '/networking/configure', networking.configure)
-        self.app.router.add_post('/networking/keys', networking.add_key)
-        self.app.router.add_get('/networking/keys', networking.list_keys)
-        self.app.router.add_delete(
-            '/networking/keys/{key_uuid}', networking.remove_key)
-        self.app.router.add_get(
-            '/networking/eap-options', networking.eap_options)
         self.app.router.add_post(
             '/identify', control.identify)
         self.app.router.add_get(
@@ -49,10 +38,6 @@ class HTTPServer(object):
             '/modules/{serial}', control.execute_module_command)
         self.app.router.add_post(
             '/camera/picture', control.take_picture)
-        if not IS_ROBOT:
-            # This is to suppress exceptions for development servers
-            self.app.router.add_get(
-                '/server/update/health', endp.health)
         self.app.router.add_post(
             '/server/update', endpoints.update_api)
         self.app.router.add_post(

@@ -51,7 +51,7 @@ class SessionManager(object):
 
         self._session_lock = True
         try:
-            session_short_id = str(uuid4().fields[0])
+            session_short_id = hex(uuid4().fields[0])
             session_logger = self._command_logger.getChild(session_short_id)
             self._broker.set_logger(session_logger)
             self.session = Session.build_and_prep(
@@ -90,6 +90,7 @@ class Session(object):
 
     def __init__(self, name, text, hardware, loop, broker):
         self._broker = broker
+        self._default_logger = self._broker.logger
         self._sim_logger = self._broker.logger.getChild('sim')
         self._run_logger = self._broker.logger.getChild('run')
         self._loop = loop
@@ -159,7 +160,6 @@ class Session(object):
         self.errors.clear()
 
     def _simulate(self):
-        self._broker.set_logger(self._sim_logger)
         self._reset()
 
         stack = []
@@ -266,7 +266,15 @@ class Session(object):
             parsed = ast.parse(self.protocol_text, filename=self.name)
             self.metadata = extract_metadata(parsed)
             self._protocol = compile(parsed, filename=self.name, mode='exec')
-        commands = self._simulate()
+
+        try:
+            self._broker.set_logger(self._sim_logger)
+            commands = self._simulate()
+        except Exception:
+            raise
+        finally:
+            self._broker.set_logger(self._default_logger)
+
         self.commands = tree.from_list(commands)
 
         self.containers = self.get_containers()
@@ -291,9 +299,7 @@ class Session(object):
         self.set_state('running')
         return self
 
-    def run(self):  # noqa(C901)
-        self._broker.set_logger(self._run_logger)
-
+    def _run(self):  # noqa(C901)
         def on_command(message):
             if message['$'] == 'before':
                 self.log_append()
@@ -338,6 +344,14 @@ class Session(object):
         finally:
             _unsubscribe()
 
+    def run(self):
+        try:
+            self._broker.set_logger(self._run_logger)
+            self._run()
+        except Exception:
+            raise
+        finally:
+            self._broker.set_logger(self._default_logger)
         return self
 
     def identify(self):
