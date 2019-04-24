@@ -1,17 +1,17 @@
 // @flow
-import type { Submenu } from './types'
+import type { Submenu, ProtocolLinks, SupportLinks, SalesLinks } from './types'
 
 export const navLinkProps: Array<Submenu> = [
   {
-    name: 'about',
+    name: 'About',
     links: [
-      { name: 'mission', url: 'https://opentrons.com/about' },
-      { name: 'our team', url: 'https://opentrons.com/team' },
-      { name: 'blog', url: 'https://blog.opentrons.com' },
+      { name: 'Mission', url: 'https://opentrons.com/about' },
+      { name: 'Our Team', url: 'https://opentrons.com/team' },
+      { name: 'Blog', url: 'https://blog.opentrons.com' },
     ],
   },
   {
-    name: 'products',
+    name: 'Products',
     links: [
       { name: 'OT-2 Robot', url: 'https://opentrons.com/ot-2' },
       { name: 'OT-2 Pipettes', url: 'https://opentrons.com/pipettes' },
@@ -30,12 +30,12 @@ export const navLinkProps: Array<Submenu> = [
       },
     ],
     bottomLink: {
-      name: 'shop all products',
+      name: 'Shop All Products',
       url: 'https://shop.opentrons.com',
     },
   },
   {
-    name: 'applications',
+    name: 'Applications',
     links: [
       { name: 'PCR Sample Prep', url: 'https://opentrons.com/pcr-sample-prep' },
       {
@@ -62,3 +62,84 @@ export const navLinkProps: Array<Submenu> = [
     ],
   },
 ]
+
+export const protocolLinkProps: ProtocolLinks = {
+  options: {
+    name: 'Protocol Options',
+    url: 'https://opentrons.com/protocols',
+    description: 'Gain an overview of our protocol creation options',
+  },
+  designer: {
+    name: 'Protocol Designer',
+    url: 'https://opentrons.com/protocols/designer',
+    description: 'Use our graphical user interface to design protocols',
+  },
+  library: {
+    name: 'Protocol Library',
+    url: 'https://protocols.opentrons.com',
+    description: 'Explore our open source database of protocols',
+  },
+  api: {
+    name: 'Python API',
+    url: 'https://docs.opentrons.com/',
+    description:
+      'Maximum customization for anyone with Python and basic wetlab skills',
+  },
+  github: {
+    name: 'GitHub',
+    url: 'https://github.com/Opentrons',
+    description: 'Contribute to our open source protocol repository',
+  },
+  bottomLink: {
+    name: 'Request a free custom protocol',
+    url: 'https://opentrons.com/request-protocol',
+  },
+}
+
+export const supportLinkProps: SupportLinks = {
+  start: {
+    name: 'OT-2 Start guide',
+    url:
+      'https://support.opentrons.com/guide-for-getting-started-with-the-ot-2',
+    description: "You recieved your robot, here's what's next",
+  },
+  help: {
+    name: 'Product Help',
+    url: 'https://support.opentrons.com/',
+    description: 'Answer common technical questions',
+  },
+  github: {
+    name: 'GitHub',
+    url: 'https://github.com/Opentrons',
+    description: 'Contribute to our open source protocol repository',
+  },
+  labware: {
+    name: 'Labware Library',
+    url:
+      'https://intercom.help/opentrons-protocol-designer/intro/opentrons-standard-labware',
+    description: 'Understand what labware is compatible with the OT-2',
+  },
+  app: {
+    name: 'Install the App',
+    url: 'http://opentrons.com/ot-app',
+  },
+  support: {
+    name: 'Contact Support',
+    url: 'http://opentrons.com/contact',
+  },
+}
+
+export const salesLinkProps: SalesLinks = {
+  order: {
+    name: 'Order Online',
+    url: 'https://shop.opentrons.com/',
+  },
+  sales: {
+    name: 'Contact Sales',
+    url: 'http://opentrons.com/contact',
+  },
+  demo: {
+    name: 'Schedule Demo',
+    url: 'http://opentrons.com/demo',
+  },
+}

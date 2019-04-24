@@ -5,10 +5,10 @@ import * as React from 'react'
 import styles from './styles.css'
 
 export const SUBDOMAIN_NAV_LINKS = [
-  { name: 'python api', url: 'https://docs.opentrons.com/' },
-  { name: 'labware library', url: './' },
-  { name: 'protocol library', url: 'https://protocols.opentrons.com/' },
-  { name: 'protocol designer', url: 'https://designer.opentrons.com/' },
+  { name: 'Python API', url: 'https://docs.opentrons.com/' },
+  { name: 'Labware Library', url: './' },
+  { name: 'Protocol Library', url: 'https://protocols.opentrons.com/' },
+  { name: 'Protocol Designer', url: 'https://designer.opentrons.com/' },
 ]
 
 export function SubdomainNav() {
