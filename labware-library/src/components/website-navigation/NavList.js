@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import cx from 'classnames'
 import { ClickOutside } from '@opentrons/components'
 
 import { navLinkProps } from './nav-data'
@@ -35,7 +36,9 @@ export default class NavList extends React.Component<Props, State> {
             {navLinkProps.map(subnav => (
               <li
                 key={subnav.name}
-                className={styles.nav_link}
+                className={cx(styles.nav_link, {
+                  [styles.active]: !menu || menu === subnav.name,
+                })}
                 role="button"
                 onClick={() => this.toggle(subnav.name)}
               >
@@ -43,14 +46,18 @@ export default class NavList extends React.Component<Props, State> {
               </li>
             ))}
             <li
-              className={styles.nav_link}
+              className={cx(styles.nav_link, {
+                [styles.active]: !menu || menu === 'protocols',
+              })}
               role="button"
               onClick={() => this.toggle('protocols')}
             >
               <ProtocolMenu active={menu === 'protocols'} />
             </li>
             <li
-              className={styles.nav_link}
+              className={cx(styles.nav_link, {
+                [styles.active]: !menu || menu === 'support',
+              })}
               role="button"
               onClick={() => this.toggle('support')}
             >

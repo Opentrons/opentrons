@@ -12,7 +12,6 @@ type Props = {|
 
 export default function NavMenu(props: Props) {
   const { name, links, bottomLink, active } = props
-
   return (
     <>
       <span>{name}</span>

@@ -11,6 +11,7 @@ export default function SupportMenu(props: Props) {
   const { active } = props
   const { start, help, github, labware, app, support } = supportLinkProps
   const { order, sales, demo } = salesLinkProps
+
   return (
     <>
       <span>Support & Sales</span>
