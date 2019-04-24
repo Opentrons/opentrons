@@ -46,7 +46,8 @@ def _balena_config(level_value: int) -> Dict[str, Any]:
             },
             'opentrons.drivers.serial_communication': {
                 'handlers': ['serial'],
-                'level': logging.DEBUG
+                'level': logging.DEBUG,
+                'propagate': False
             }
         }
     }
@@ -81,6 +82,7 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
             'opentrons.drivers.serial_communication': {
                 'handlers': ['serial'],
                 'level': logging.DEBUG,
+                'propagate': False
             },
             'opentrons': {
                 'handlers': ['api'],
