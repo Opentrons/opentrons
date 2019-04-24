@@ -324,3 +324,25 @@ async def test_incorrect_modify_pipette_settings(
         '/settings/pipettes/{}'.format(test_id),
         json=out_of_range)
     assert resp.status == 412
+
+
+async def test_set_log_level(
+        async_server, loop, async_client):
+    # Check input sanitization
+    resp = await async_client.post('/settings/log_level', json={})
+    assert resp.status == 400
+    body = await resp.json()
+    assert 'message' in body
+    resp = await async_client.post('/settings/log_level',
+                                   json={'log_level': 'oafajhshda'})
+    assert resp.status == 400
+    body = await resp.json()
+    assert 'message'in body
+
+    assert async_server['com.opentrons.hardware'].config.log_level != 'error'
+    resp = await async_client.post('/settings/log_level',
+                                   json={'log_level': 'error'})
+    assert resp.status == 200
+    body = await resp.json()
+    assert 'message' in body
+    assert async_server['com.opentrons.hardware'].config.log_level == 'error'

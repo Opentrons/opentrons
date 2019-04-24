@@ -1,3 +1,4 @@
+from json import JSONDecodeError
 import logging
 import os
 import shutil
@@ -200,3 +201,38 @@ async def modify_pipette_settings(request: web.Request) -> web.Response:
     pc.save_overrides(pipette_id, data['fields'], whole_config.get('model'))
     updated_configs = {'fields': pc.list_mutable_configs(pipette_id)}
     return web.json_response(updated_configs, status=200)
+
+
+async def set_log_level(request: web.Request) -> web.Response:
+    """
+    Set the log level of the API logs (serial logs are unaffected)
+
+    POST /settings/log_level {"log_level": str level} -> 200 OK
+
+    The level has to be in ("debug", "info", "warning", "error")
+    """
+
+    try:
+        body = await request.json()
+    except JSONDecodeError:
+        return web.json_response(status=400,
+                                 data={"message": "Request must be json"})
+    if 'log_level' not in body:
+        return web.json_response(
+            status=400,
+            data={"message": "body must have log_level key"})
+
+    log_level = body['log_level'].upper()
+    level_val = getattr(logging, log_level, None)
+    if level_val is None:
+        return web.json_response(
+            status=400,
+            data={"message": f"invalid log_level {log_level}"})
+
+    logging.getLogger('opentrons').setLevel(level_val)
+    hw = request.app['com.opentrons.hardware']
+    hw.update_config(log_level=log_level)
+    rc.save_robot_settings(hw.config)
+    return web.json_response(
+        status=200,
+        data={'message': f'log_level set to {log_level}'})

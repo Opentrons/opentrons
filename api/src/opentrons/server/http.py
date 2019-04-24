@@ -83,6 +83,8 @@ class HTTPServer(object):
         self.app.router.add_post(
             '/settings', settings.set_advanced_setting)
         self.app.router.add_post(
+            '/settings/log_level', settings.set_log_level)
+        self.app.router.add_post(
             '/settings/reset', settings.reset)
         self.app.router.add_get(
             '/settings/reset/options', settings.available_resets)
