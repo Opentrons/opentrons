@@ -66,13 +66,13 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
         'handlers': {
             'api': {
                 'class': 'systemd.journal.JournalHandler',
-                'level': level_value,
+                'level': logging.DEBUG,
                 'formatter': 'message_only',
                 'SYSLOG_IDENTIFIER': 'opentrons-api',
             },
             'serial': {
                 'class': 'systemd.journal.JournalHandler',
-                'level': level_value,
+                'level': logging.DEBUG,
                 'formatter': 'message_only',
                 'SYSLOG_IDENTIFIER': 'opentrons-api-serial',
             }
@@ -80,7 +80,7 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
         'loggers': {
             'opentrons.drivers.serial_communication': {
                 'handlers': ['serial'],
-                'level': level_value,
+                'level': logging.DEBUG,
             },
             'opentrons': {
                 'handlers': ['api'],

@@ -1,5 +1,6 @@
 import logging
 from . import endpoints as endp
+from opentrons import config
 from .endpoints import (networking, control, settings, update)
 from opentrons.deck_calibration import endpoints as dc_endp
 
@@ -48,8 +49,13 @@ class HTTPServer(object):
             '/update/ignore', endpoints.get_ignore_version)
         self.app.router.add_post(
             '/update/ignore', endpoints.set_ignore_version)
-        self.app.router.add_static(
-            '/logs', self.log_file_path, show_index=True)
+        if config.OT_SYSTEM_VERSION < 2:
+            self.app.router.add_static(
+                '/logs', self.log_file_path, show_index=True)
+        else:
+            from .endpoints import logs
+            self.app.router.add_get('/logs/serial.log', logs.get_serial_log)
+            self.app.router.add_get('/logs/api.log', logs.get_api_log)
         self.app.router.add_post(
             '/server/restart', endpoints.restart)
         self.app.router.add_post(
