@@ -47,21 +47,21 @@ export class NavList extends React.Component<Props, State> {
             ))}
             <li
               className={cx(styles.nav_link, {
-                [styles.active]: !menu || menu === 'protocols',
+                [styles.active]: !menu || menu === 'Protocols',
               })}
               role="button"
-              onClick={() => this.toggle('protocols')}
+              onClick={() => this.toggle('Protocols')}
             >
-              <ProtocolMenu active={menu === 'protocols'} />
+              <ProtocolMenu active={menu === 'Protocols'} />
             </li>
             <li
               className={cx(styles.nav_link, {
-                [styles.active]: !menu || menu === 'support',
+                [styles.active]: !menu || menu === 'Support',
               })}
               role="button"
-              onClick={() => this.toggle('support')}
+              onClick={() => this.toggle('Support')}
             >
-              <SupportMenu active={menu === 'support'} />
+              <SupportMenu active={menu === 'Support'} />
             </li>
           </ul>
         )}

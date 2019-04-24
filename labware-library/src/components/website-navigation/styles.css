@@ -41,7 +41,6 @@
 
   --link-text: {
     font-weight: var(--fw-semibold);
-    text-transform: capitalize;
     font-size: var(--fs-body-2);
     cursor: pointer;
   }

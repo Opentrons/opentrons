@@ -3,15 +3,15 @@ import type { Submenu, ProtocolLinks, SupportLinks, SalesLinks } from './types'
 
 export const navLinkProps: Array<Submenu> = [
   {
-    name: 'about',
+    name: 'About',
     links: [
-      { name: 'mission', url: 'https://opentrons.com/about' },
-      { name: 'our team', url: 'https://opentrons.com/team' },
-      { name: 'blog', url: 'https://blog.opentrons.com' },
+      { name: 'Mission', url: 'https://opentrons.com/about' },
+      { name: 'Our Team', url: 'https://opentrons.com/team' },
+      { name: 'Blog', url: 'https://blog.opentrons.com' },
     ],
   },
   {
-    name: 'products',
+    name: 'Products',
     links: [
       { name: 'OT-2 Robot', url: 'https://opentrons.com/ot-2' },
       { name: 'OT-2 Pipettes', url: 'https://opentrons.com/pipettes' },
@@ -30,12 +30,12 @@ export const navLinkProps: Array<Submenu> = [
       },
     ],
     bottomLink: {
-      name: 'shop all products',
+      name: 'Shop All Products',
       url: 'https://shop.opentrons.com',
     },
   },
   {
-    name: 'applications',
+    name: 'Applications',
     links: [
       { name: 'PCR Sample Prep', url: 'https://opentrons.com/pcr-sample-prep' },
       {
@@ -83,12 +83,12 @@ export const protocolLinkProps: ProtocolLinks = {
     name: 'Python API',
     url: 'https://docs.opentrons.com/',
     description:
-      'Maximum customization for anyone with python and basic wetlab skills',
+      'Maximum customization for anyone with Python and basic wetlab skills',
   },
   github: {
-    name: 'Github',
+    name: 'GitHub',
     url: 'https://github.com/Opentrons',
-    description: 'Contribute to open source protocol repository',
+    description: 'Contribute to our open source protocol repository',
   },
   bottomLink: {
     name: 'Request a free custom protocol',
@@ -109,9 +109,9 @@ export const supportLinkProps: SupportLinks = {
     description: 'Answer common technical questions',
   },
   github: {
-    name: 'Github',
+    name: 'GitHub',
     url: 'https://github.com/Opentrons',
-    description: 'Contribute to open source protocol repository',
+    description: 'Contribute to our open source protocol repository',
   },
   labware: {
     name: 'Labware Library',
@@ -120,22 +120,22 @@ export const supportLinkProps: SupportLinks = {
     description: 'Understand what labware is compatible with the OT-2',
   },
   app: {
-    name: 'Install the app',
+    name: 'Install the App',
     url: 'http://opentrons.com/ot-app',
   },
   support: {
-    name: 'Contact support',
+    name: 'Contact Support',
     url: 'http://opentrons.com/contact',
   },
 }
 
 export const salesLinkProps: SalesLinks = {
   order: {
-    name: 'Order online',
+    name: 'Order Online',
     url: 'https://shop.opentrons.com/',
   },
   sales: {
-    name: 'Contact sales',
+    name: 'Contact Sales',
     url: 'http://opentrons.com/contact',
   },
   demo: {

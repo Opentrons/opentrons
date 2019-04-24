@@ -1,11 +1,11 @@
 // @flow
 
 export type MenuName =
-  | 'about'
-  | 'products'
-  | 'applications'
-  | 'protocols'
-  | 'support'
+  | 'About'
+  | 'Products'
+  | 'Applications'
+  | 'Protocols'
+  | 'Support'
 
 export type Link = {|
   name: string,
