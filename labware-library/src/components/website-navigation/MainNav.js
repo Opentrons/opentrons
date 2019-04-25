@@ -5,12 +5,17 @@ import { NavList } from './NavList'
 import MenuButton from './MenuButton'
 import styles from './styles.css'
 
-export function MainNav() {
+import type { MobileNavProps } from './types'
+
+export function MainNav(props: MobileNavProps) {
   return (
     <div className={styles.main_nav_contents}>
       <Logo />
       <NavList />
-      <MenuButton />
+      <MenuButton
+        onMobileClick={props.onMobileClick}
+        isMobileOpen={props.isMobileOpen}
+      />
     </div>
   )
 }

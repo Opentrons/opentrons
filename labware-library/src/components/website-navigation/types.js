@@ -51,3 +51,8 @@ export type SalesSubmenuName = 'order' | 'sales' | 'demo'
 export type SalesLinks = {
   [SalesSubmenuName]: Link,
 }
+
+export type MobileNavProps = {|
+  isMobileOpen: boolean,
+  onMobileClick?: (event: SyntheticMouseEvent<>) => mixed,
+|}

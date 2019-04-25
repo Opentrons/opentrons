@@ -3,29 +3,19 @@ import * as React from 'react'
 import cx from 'classnames'
 import styles from './styles.css'
 import { Icon } from '@opentrons/components'
-import type { ButtonProps, IconProps } from '@opentrons/components'
+import type { IconProps } from '@opentrons/components'
+import type { MobileNavProps } from './types'
 
-type State = {
-  isOpen: boolean,
-}
-
-export default class MenuButton extends React.Component<ButtonProps, State> {
-  constructor(props: ButtonProps) {
-    super(props)
-    this.state = { isOpen: false }
-  }
-
-  render() {
-    const iconName = this.state.isOpen ? 'close' : 'menu'
-    return (
-      <ClickableIcon
-        title="menu"
-        name={iconName}
-        className={styles.menu_button}
-        onClick={() => this.setState({ isOpen: !this.state.isOpen })}
-      />
-    )
-  }
+export default function MenuButton(props: MobileNavProps) {
+  const iconName = props.isMobileOpen ? 'close' : 'menu'
+  return (
+    <ClickableIcon
+      title="menu"
+      name={iconName}
+      className={styles.menu_button}
+      onClick={props.onMobileClick}
+    />
+  )
 }
 
 // ONEOFF: Needed for overriding button styles, possible candidate for ui/

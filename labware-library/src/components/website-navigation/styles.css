@@ -272,8 +272,36 @@
   }
 }
 
+.mobile_nav {
+  display: block;
+  position: fixed;
+  width: 100%;
+  z-index: 900;
+  padding: 1rem;
+  background-color: white;
+
+  /* Added this for contrast with page - does not match design */
+  box-shadow: var(--shadow-1);
+}
+
+.mobile_nav_item {
+  @apply --flex-start;
+
+  padding: 2rem;
+  height: 3rem;
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+}
+
+@media (--medium) {
+  .mobile_nav_item {
+    justify-content: center;
+  }
+}
+
 @media (--desktop) {
-  .menu_button {
+  .menu_button,
+  .mobile_nav {
     display: none;
   }
 
