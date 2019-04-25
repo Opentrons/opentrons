@@ -1039,11 +1039,19 @@ class SmoothieDriver_3_0_0:
 
     def update_steps_per_mm(self, data):
         # Using M92, update steps per mm for a given axis
-        cmd = ''
-        for axis, value in data.items():
-            cmd = f'{cmd} {axis}{value}'
-            self.steps_per_mm[axis] = value
-        self._send_command(GCODES['STEPS_PER_MM'] + cmd)
+        if isinstance(data, str):
+            # Unfortunately update server calls driver._setup() before the
+            # update can correctly load the robot_config change on disk.
+            # Need to account for old command format to avoid this issue.
+            self._send_command(data)
+        else:
+            cmd = ''
+            for axis, value in data.items():
+                cmd = f'{cmd} {axis}{value}'
+                print(cmd)
+                self.steps_per_mm[axis] = value
+            print(GCODES['STEPS_PER_MM'] + cmd)
+            self._send_command(GCODES['STEPS_PER_MM'] + cmd)
 
     def _read_from_pipette(self, gcode, mount) -> Optional[str]:
         '''

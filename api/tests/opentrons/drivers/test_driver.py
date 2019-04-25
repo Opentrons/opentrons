@@ -2,7 +2,7 @@ from threading import Thread
 import pytest
 
 from tests.opentrons.conftest import fuzzy_assert
-
+from opentrons.config.robot_configs import DEFAULT_STEPS_PER_MM
 
 def position(x, y, z, a, b, c):
     return {axis: value for axis, value in zip('XYZABC', [x, y, z, a, b, c])}
@@ -311,6 +311,14 @@ def test_set_active_current(smoothie, monkeypatch):
     # from pprint import pprint
     # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
+
+
+def test_steps_per_mm(smoothie, monkeypatch):
+    # Check that steps_per_mm dict gets loaded with defaults on start
+    assert smoothie.steps_per_mm == {}
+    smoothie._setup()
+    assert smoothie.steps_per_mm == DEFAULT_STEPS_PER_MM
+
 
 
 def test_set_acceleration(smoothie, monkeypatch):
