@@ -267,6 +267,14 @@ class API(HardwareAPILike):
                             self._config.instrument_offset[mount.name.lower()],
                             instrument_data['id'])
                 self._attached_instruments[mount] = p
+                if 'v2' in model:
+                    # Check if new model of pipettes, load smoothie configs
+                    # for this particular model
+                    axis = 'B' if mount == 'left' else 'C'
+                    self._driver.update_steps_per_mm({axis: 2133.33})
+                    # TODO(LC25-4-2019): Modify configs to update to as
+                    # testing informs better values
+                    self._driver.update_pipette_config(axis, {'home': 172.15})
             else:
                 self._attached_instruments[mount] = None
         mod_log.info("Instruments found: {}".format(

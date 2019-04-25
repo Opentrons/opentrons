@@ -14,7 +14,7 @@ from opentrons.data_storage import database, old_container_loading,\
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as fflags
-from opentrons.config.robot_configs import load
+from opentrons.config.robot_configs import load, DEFAULT_STEPS_PER_MM
 from opentrons.legacy_api import containers, modules
 from opentrons.legacy_api.containers import Container, load_new_labware,\
     save_new_offsets
@@ -275,14 +275,18 @@ class Robot(CommandPublisher):
         log.debug("Updating instrument model cache")
         for mount in self.model_by_mount.keys():
             model_value = self._driver.read_pipette_model(mount)
-            if 'v2' in model_value:
+            axis = 'B' if mount == 'left' else 'C'
+            if model_value and 'v2' in model_value:
                 # Check if new model of pipettes, load smoothie configs
                 # for this particular model
-                axis = 'B' if mount == 'left' else 'C'
-                self._driver.update_steps_per_mm(axis, 2133.33)
+                self._driver.update_steps_per_mm({axis: 2133.33})
                 # TODO(LC25-4-2019): Modify configs to update to as
                 # testing informs better values
                 self._driver.update_pipette_config(axis, {'home': 172.15})
+            else:
+                if self._driver.steps_per_mm.get(axis) != DEFAULT_STEPS_PER_MM[axis]:
+                    self._driver.update_steps_per_mm({axis: DEFAULT_STEPS_PER_MM[axis]})
+
             if model_value:
                 id_response = self._driver.read_pipette_id(mount)
             else:

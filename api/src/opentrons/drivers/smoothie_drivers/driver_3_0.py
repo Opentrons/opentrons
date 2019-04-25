@@ -302,7 +302,7 @@ class SmoothieDriver_3_0_0:
         self._saved_max_speed_settings = self._max_speed_settings.copy()
         self._combined_speed = float(DEFAULT_AXES_SPEED)
         self._saved_axes_speed = float(self._combined_speed)
-
+        self._steps_per_mm = {}
         self._acceleration = config.acceleration.copy()
         self._saved_acceleration = config.acceleration.copy()
 
@@ -442,7 +442,7 @@ class SmoothieDriver_3_0_0:
         - retract from endstop distance M365.3
         '''
         gcodes = {
-            'retract': 'M365.3'
+            'retract': 'M365.3',
             'debounce': 'M365.2',
             'max_travel': 'M365.1',
             'home': 'M365.0'}
@@ -451,9 +451,9 @@ class SmoothieDriver_3_0_0:
         for key, value in data.items():
             if key == 'debounce':
                 # debounce variable for all axes, so do not specify an axis
-                cmd = ' ' + 'O' + value
+                cmd = f' O{value}'
             else:
-                cmd = ' ' + axis + value
+                cmd = f' {axis}{value}'
             res = self._send_command(gcodes[key] + cmd)
             if res is None:
                 raise ValueError(
@@ -600,6 +600,15 @@ class SmoothieDriver_3_0_0:
     @property
     def speed(self):
         pass
+
+    @property
+    def steps_per_mm(self):
+        return self._steps_per_mm
+
+    @steps_per_mm.setter
+    def steps_per_mm(self, axis, mm):
+        # Keep track of any updates to the steps per mm per axis
+        self._steps_per_mm[axis] = mm
 
     def set_speed(self, value):
         ''' set total axes movement speed in mm/second'''
@@ -1020,7 +1029,7 @@ class SmoothieDriver_3_0_0:
             # use gpio to reset into a known state
             self._smoothie_reset()
         self._reset_from_error()
-        self._send_command(self._config.steps_per_mm)
+        self.update_steps_per_mm(self._config.steps_per_mm)
         self._send_command(GCODES['ABSOLUTE_COORDS'])
         self._save_current(self.current, axes_active=False)
         self.update_position(default=self.homed_position)
@@ -1028,9 +1037,12 @@ class SmoothieDriver_3_0_0:
         self.pop_speed()
         self.pop_acceleration()
 
-    def update_steps_per_mm(self, axis, value):
+    def update_steps_per_mm(self, data):
         # Using M92, update steps per mm for a given axis
-        cmd = ' ' + axis + value
+        cmd = ''
+        for axis, value in data.items():
+            cmd = f'{cmd} {axis}{value}'
+            self.steps_per_mm[axis] = value
         self._send_command(GCODES['STEPS_PER_MM'] + cmd)
 
     def _read_from_pipette(self, gcode, mount) -> Optional[str]:
