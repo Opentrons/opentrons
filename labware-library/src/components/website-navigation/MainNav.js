@@ -1,4 +1,4 @@
-// flow
+// @flow
 import * as React from 'react'
 import Logo from './Logo'
 import { NavList } from './NavList'

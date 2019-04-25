@@ -53,6 +53,6 @@ export type SalesLinks = {
 }
 
 export type MobileNavProps = {|
-  isMobileOpen: boolean,
+  isMobileOpen?: boolean,
   onMobileClick?: (event: SyntheticMouseEvent<>) => mixed,
 |}
