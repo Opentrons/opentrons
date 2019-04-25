@@ -435,8 +435,10 @@ def do_publish(broker, cmd, f, when, res, meta, *args, **kwargs):
         broker.publish,
         topic=command_types.COMMAND)
     call_args = _get_args(f, args, kwargs)
-    broker.logger.info("{}: {}".format(
-        f.__qualname__, {k: v for k, v in call_args.items() if str(k) != 'self'}))
+    if when == 'before':
+        broker.logger.info("{}: {}".format(
+            f.__qualname__,
+            {k: v for k, v in call_args.items() if str(k) != 'self'}))
     command_args = dict(
         zip(
             reversed(inspect.getfullargspec(cmd).args),
