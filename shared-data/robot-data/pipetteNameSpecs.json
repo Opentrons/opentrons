@@ -2,7 +2,7 @@
   "p10_single": {
     "displayName": "P10 Single-Channel",
     "minVolume": 1,
-    "maxVolume": 10,
+    "maxVolume": 20,
     "channels": 1,
     "defaultAspirateFlowRate": {
       "value": 5,
