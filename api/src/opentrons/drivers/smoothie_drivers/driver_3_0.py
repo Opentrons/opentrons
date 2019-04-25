@@ -79,7 +79,7 @@ GCODES = {'HOME': 'G28.2',
           'PUSH_SPEED': 'M120',
           'POP_SPEED': 'M121',
           'SET_SPEED': 'G0F',
-          'CONFIGURE_INSTRUMENT': 'M365',
+          'STEPS_PER_MM': 'M92',
           'READ_INSTRUMENT_ID': 'M369',
           'WRITE_INSTRUMENT_ID': 'M370',
           'READ_INSTRUMENT_MODEL': 'M371',
@@ -432,14 +432,41 @@ class SmoothieDriver_3_0_0:
         self._write_to_pipette(
             GCODES['WRITE_INSTRUMENT_MODEL'], mount, data_string)
 
-    def update_pipette_config(self, mount, data):
+    def update_pipette_config(self, axis, data):
         '''
         Updates the following configs for a given pipette mount based on
         the detected pipette type:
-        - homing positions
-        -
+        - homing positions M365.0
+        - Max Travel M365.1
+        - endstop debounce M365.2 (NOT for zprobe debounce)
+        - retract from endstop distance M365.3
         '''
-        return None
+        gcodes = {
+            'retract': 'M365.3'
+            'debounce': 'M365.2',
+            'max_travel': 'M365.1',
+            'home': 'M365.0'}
+
+        res_msg = f'The following configs were updated for {axis}: '
+        for key, value in data.items():
+            if key == 'debounce':
+                # debounce variable for all axes, so do not specify an axis
+                cmd = ' ' + 'O' + value
+            else:
+                cmd = ' ' + axis + value
+            res = self._send_command(gcodes[key] + cmd)
+            if res is None:
+                raise ValueError(
+                    f'{key} was not updated to {value} on {axis} axis')
+            _parse_command(res)
+
+        def _parse_command(result):
+            # ensure smoothie received code and changed value through
+            # return message. Format of return message:
+            # <Axis> (or E for endstop) updated <Value>
+            arr_result = result.strip().split(' ')
+            res_msg = res_msg + arr_result[0] + ',' + arr_result[2]
+        return res_msg
     # FIXME (JG 9/28/17): Should have a more thought out
     # way of simulating vs really running
     def connect(self, port=None):
@@ -1000,6 +1027,11 @@ class SmoothieDriver_3_0_0:
         self.pop_axis_max_speed()
         self.pop_speed()
         self.pop_acceleration()
+
+    def update_steps_per_mm(self, axis, value):
+        # Using M92, update steps per mm for a given axis
+        cmd = ' ' + axis + value
+        self._send_command(GCODES['STEPS_PER_MM'] + cmd)
 
     def _read_from_pipette(self, gcode, mount) -> Optional[str]:
         '''

@@ -254,7 +254,8 @@ def _build_config(deck_cal: List[List[float]],
     cfg = robot_config(
         name=robot_settings.get('name', 'Ada Lovelace'),
         version=int(robot_settings.get('version', ROBOT_CONFIG_VERSION)),
-        steps_per_mm=robot_settings.get('steps_per_mm', DEFAULT_STEPS_PER_MM),
+        steps_per_mm=robot_settings.get(
+            'steps_per_mm', DEFAULT_STEPS_PER_MM),
         acceleration=_build_acceleration(robot_settings.get('acceleration')),
         gantry_calibration=deck_cal or DEFAULT_DECK_CALIBRATION,
         instrument_offset=build_fallback_instrument_offset(robot_settings),

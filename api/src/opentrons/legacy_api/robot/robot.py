@@ -275,6 +275,14 @@ class Robot(CommandPublisher):
         log.debug("Updating instrument model cache")
         for mount in self.model_by_mount.keys():
             model_value = self._driver.read_pipette_model(mount)
+            if 'v2' in model_value:
+                # Check if new model of pipettes, load smoothie configs
+                # for this particular model
+                axis = 'B' if mount == 'left' else 'C'
+                self._driver.update_steps_per_mm(axis, 2133.33)
+                # TODO(LC25-4-2019): Modify configs to update to as
+                # testing informs better values
+                self._driver.update_pipette_config(axis, {'home': 172.15})
             if model_value:
                 id_response = self._driver.read_pipette_id(mount)
             else:
