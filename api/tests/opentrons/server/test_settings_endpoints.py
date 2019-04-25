@@ -339,10 +339,10 @@ async def test_set_log_level(
     body = await resp.json()
     assert 'message'in body
 
-    assert async_server['com.opentrons.hardware'].config.log_level != 'error'
+    assert async_server['com.opentrons.hardware'].config.log_level != 'ERROR'
     resp = await async_client.post('/settings/log_level',
                                    json={'log_level': 'error'})
     assert resp.status == 200
     body = await resp.json()
     assert 'message' in body
-    assert async_server['com.opentrons.hardware'].config.log_level == 'error'
+    assert async_server['com.opentrons.hardware'].config.log_level == 'ERROR'

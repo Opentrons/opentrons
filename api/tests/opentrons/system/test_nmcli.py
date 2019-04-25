@@ -61,8 +61,10 @@ mock_connected:60:yes:WPA2
 mock_bad_security:50:no:foobar
 --:40:no:'''
 
-    expected_cmd = ['--terse', '--fields',
-                    'ssid,signal,active,security', 'device', 'wifi', 'list']
+    expected_cmds = iter(
+        (['device', 'wifi', 'rescan'],
+         ['--terse', '--fields',
+          'ssid,signal,active,security', 'device', 'wifi', 'list']))
 
     expected = [
         {'ssid': 'mock_wpa2', 'signal': 90, 'active': False,
@@ -78,8 +80,8 @@ mock_bad_security:50:no:foobar
         # note entry for 'ssid': '--' is expected to be filterd out
     ]
 
-    async def mock_call(cmd):
-        assert cmd == expected_cmd
+    async def mock_call(cmd, suppress_err=False):
+        assert cmd == next(expected_cmds)
         return mock_nmcli_output, ''
 
     monkeypatch.setattr(nmcli, '_call', mock_call)
