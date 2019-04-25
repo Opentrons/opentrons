@@ -63,6 +63,9 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
     castValue: Number,
   },
+  aspirate_mmFromBottom: {
+    castValue: Number,
+  },
   aspirate_wells: {
     getErrors: composeErrors(requiredField, minimumWellCount(1)),
     maskValue: defaultTo([]),
@@ -82,6 +85,9 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   },
   dispense_mix_volume: {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: Number,
+  },
+  dispense_mmFromBottom: {
     castValue: Number,
   },
   dispense_wells: {
