@@ -55,6 +55,9 @@ class CalibrationManager:
             assert instrument.tip_racks,\
                 'No known tipracks for {}'.format(instrument)
             tip_length = instrument.tip_racks[0]._container.tip_length
+            # TODO (tm, 2019-04-22): This warns "coroutine not awaited" in
+            # TODO: test. The test fixture probably needs to be modified to get
+            # TODO: a synchronous adapter instead of a raw hardware_control API
             measured_center = self._hardware.locate_tip_probe_center(
                 mount, tip_length)
         else:

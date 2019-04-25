@@ -213,7 +213,7 @@ class Controller:
                               modeset: bool) -> str:
         msg = await self._smoothie_driver.update_firmware(
             filename, loop, modeset)
-        self.update_fw_version()
+        await self.update_fw_version()
         return msg
 
     def engaged_axes(self) -> Dict[str, bool]:
@@ -223,12 +223,15 @@ class Controller:
         self._smoothie_driver.disengage_axis(''.join(axes))
 
     def set_lights(self, button: Optional[bool], rails: Optional[bool]):
-        if button is not None:
-            gpio.set_button_light(blue=button)
-        if rails is not None:
-            gpio.set_rail_lights(rails)
+        if opentrons.config.IS_ROBOT:
+            if button is not None:
+                gpio.set_button_light(blue=button)
+            if rails is not None:
+                gpio.set_rail_lights(rails)
 
     def get_lights(self) -> Dict[str, bool]:
+        if not opentrons.config.IS_ROBOT:
+            return {}
         return {'button': gpio.get_button_light()[2],
                 'rails': gpio.get_rail_lights()}
 
