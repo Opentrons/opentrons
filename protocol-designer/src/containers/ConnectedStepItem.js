@@ -2,12 +2,17 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import isEmpty from 'lodash/isEmpty'
+import mapValues from 'lodash/mapValues'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import type { BaseState, ThunkDispatch } from '../types'
 
 import type { SubstepIdentifier } from '../steplist/types'
 import * as substepSelectors from '../top-selectors/substeps'
 import { selectors as dismissSelectors } from '../dismiss'
-import { selectors as stepFormSelectors } from '../step-forms'
+import {
+  selectors as stepFormSelectors,
+  type LabwareEntity,
+} from '../step-forms'
 import {
   selectors as stepsSelectors,
   actions as stepsActions,
@@ -19,10 +24,10 @@ import StepItem from '../components/steplist/StepItem' // TODO Ian 2018-05-10 wh
 
 type Props = React.ElementProps<typeof StepItem>
 
-type OP = {
+type OP = {|
   stepId: $PropertyType<Props, 'stepId'>,
   stepNumber: $PropertyType<Props, 'stepNumber'>,
-}
+|}
 
 type SP = {|
   stepType: $PropertyType<Props, 'stepType'>,
@@ -37,17 +42,20 @@ type SP = {|
   hovered: $PropertyType<Props, 'hovered'>,
   hoveredSubstep: $PropertyType<Props, 'hoveredSubstep'>,
   labwareNicknamesById: $PropertyType<Props, 'labwareNicknamesById'>,
-  labwareTypesById: $PropertyType<Props, 'labwareTypesById'>,
+  labwareDefDisplayNamesById: $PropertyType<
+    Props,
+    'labwareDefDisplayNamesById'
+  >,
   ingredNames: $PropertyType<Props, 'ingredNames'>,
 |}
 
-type DP = $Diff<$Diff<Props, SP>, OP>
+type DP = $Diff<$Diff<$Exact<Props>, SP>, OP>
 
-const makeMapStateToProps = () => {
+const makeMapStateToProps: () => (BaseState, OP) => SP = () => {
   const getArgsAndErrors = stepFormSelectors.makeGetArgsAndErrorsWithId()
   const getStep = stepFormSelectors.makeGetStepWithId()
 
-  return (state: BaseState, ownProps: OP): SP => {
+  return (state, ownProps) => {
     const { stepId } = ownProps
 
     const argsAndErrors = getArgsAndErrors(state, { stepId })
@@ -86,7 +94,10 @@ const makeMapStateToProps = () => {
       hovered: hoveredStep === stepId && !hoveredSubstep,
 
       labwareNicknamesById: uiLabwareSelectors.getLabwareNicknamesById(state),
-      labwareTypesById: stepFormSelectors.getLabwareTypesById(state),
+      labwareDefDisplayNamesById: mapValues(
+        stepFormSelectors.getLabwareEntities(state),
+        (l: LabwareEntity) => getLabwareDisplayName(l.def)
+      ),
       ingredNames: labwareIngredSelectors.getLiquidNamesById(state),
     }
   }
@@ -104,7 +115,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export default connect(
+export default connect<Props, OP, SP, DP, _, _>(
   makeMapStateToProps,
   mapDispatchToProps
 )(StepItem)

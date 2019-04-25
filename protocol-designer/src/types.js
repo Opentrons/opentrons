@@ -2,7 +2,6 @@
 import type { RootState as Analytics } from './analytics'
 import type { RootState as Dismiss } from './dismiss'
 import type { RootState as FileData } from './file-data'
-import type { RootState as LabwareDefs } from './labware-defs'
 import type { RootState as LabwareIngred } from './labware-ingred/reducers'
 import type { RootState as LoadFile } from './load-file'
 import type { RootState as Navigation } from './navigation'
@@ -14,7 +13,6 @@ export type BaseState = {
   analytics: Analytics,
   dismiss: Dismiss,
   fileData: FileData,
-  labwareDefs: LabwareDefs,
   labwareIngred: LabwareIngred,
   loadFile: LoadFile,
   navigation: Navigation,
@@ -33,6 +31,9 @@ export type ThunkAction<A> = (
   dispatch: ThunkDispatch<A>,
   getState: GetState
 ) => A
+
+// TODO(mc, 2018-04-18): make actual Action union type for PD
+export type Action = { type: string, payload?: mixed, metadata?: mixed }
 
 export type WellVolumes = { [wellName: string]: number }
 // TODO LATER Ian 2018-02-19 type for containers.json

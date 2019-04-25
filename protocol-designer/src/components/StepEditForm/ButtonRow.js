@@ -9,16 +9,19 @@ import { selectors as stepsSelectors } from '../../ui/steps'
 import type { BaseState, ThunkDispatch } from '../../types'
 import styles from './StepEditForm.css'
 
-type OP = {
+type OP = {|
   onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
   onDelete?: (event: SyntheticEvent<>) => mixed,
-}
-type SP = { canSave?: ?boolean }
-type DP = {
+|}
+
+type SP = {| canSave?: ?boolean |}
+
+type DP = {|
   onCancel: (event: SyntheticEvent<>) => mixed,
   onSave: (event: SyntheticEvent<>) => mixed,
-}
-type Props = OP & SP & DP
+|}
+
+type Props = { ...OP, ...SP, ...DP }
 
 const ButtonRow = (props: Props) => {
   const { canSave, onDelete, onSave, onCancel, onClickMoreOptions } = props
@@ -62,7 +65,7 @@ const DTP = (dispatch: ThunkDispatch<*>): DP => ({
   onSave: () => dispatch(steplistActions.saveStepForm()),
 })
 
-export default connect(
+export default connect<Props, OP, SP, DP, _, _>(
   STP,
   DTP
 )(ButtonRow)

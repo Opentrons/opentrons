@@ -106,6 +106,7 @@ export function _calculateWellCoord(
     y: round(rowIdx * spacing.row + offset.y, 2),
     z: round(offset.z - well.depth, 2),
   }
+  // NOTE: Ian 2019-04-16 this silly "if circular" is to make Flow happy
   if (well.shape === 'circular') return { ...well, ...coords }
   return {
     ...well,

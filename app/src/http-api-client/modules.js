@@ -80,14 +80,18 @@ const MODULES: 'modules' = 'modules'
 
 export function fetchModules(robot: RobotService): ThunkPromiseAction {
   return dispatch => {
+    // $FlowFixMe: (mc, 2019-04-18) http-api-client types need to be redone
     dispatch(apiRequest(robot, MODULES, null))
 
-    return client(robot, 'GET', MODULES)
-      .then(
-        (resp: FetchModulesResponse) => apiSuccess(robot, MODULES, resp),
-        (err: ApiRequestError) => apiFailure(robot, MODULES, err)
-      )
-      .then(dispatch)
+    return (
+      client(robot, 'GET', MODULES)
+        .then(
+          (resp: FetchModulesResponse) => apiSuccess(robot, MODULES, resp),
+          (err: ApiRequestError) => apiFailure(robot, MODULES, err)
+        )
+        // $FlowFixMe: (mc, 2019-04-18) http-api-client types need to be redone
+        .then(dispatch)
+    )
   }
 }
 
@@ -99,15 +103,19 @@ export function fetchModuleData(
 ): ThunkPromiseAction {
   return dispatch => {
     const fetchDataPath = `${MODULES}/${serial}/${DATA}`
+    // $FlowFixMe: (mc, 2019-04-18) http-api-client types need to be redone
     dispatch(apiRequest(robot, fetchDataPath, null))
 
-    return client(robot, 'GET', fetchDataPath)
-      .then(
-        (resp: FetchModuleDataResponse) =>
-          apiSuccess(robot, fetchDataPath, resp),
-        (err: ApiRequestError) => apiFailure(robot, fetchDataPath, err)
-      )
-      .then(dispatch)
+    return (
+      client(robot, 'GET', fetchDataPath)
+        .then(
+          (resp: FetchModuleDataResponse) =>
+            apiSuccess(robot, fetchDataPath, resp),
+          (err: ApiRequestError) => apiFailure(robot, fetchDataPath, err)
+        )
+        // $FlowFixMe: (mc, 2019-04-18) http-api-client types need to be redone
+        .then(dispatch)
+    )
   }
 }
 
@@ -118,14 +126,19 @@ export function setTargetTemp(
 ): ThunkPromiseAction {
   return dispatch => {
     const setTempPath = `${MODULES}/${serial}`
+    // $FlowFixMe: (mc, 2019-04-18) http-api-client types need to be redone
     dispatch(apiRequest(robot, setTempPath, command))
 
-    return client(robot, 'POST', setTempPath, command)
-      .then(
-        (resp: SetTemperatureResponse) => apiSuccess(robot, setTempPath, resp),
-        (err: ApiRequestError) => apiFailure(robot, setTempPath, err)
-      )
-      .then(dispatch)
+    return (
+      client(robot, 'POST', setTempPath, command)
+        .then(
+          (resp: SetTemperatureResponse) =>
+            apiSuccess(robot, setTempPath, resp),
+          (err: ApiRequestError) => apiFailure(robot, setTempPath, err)
+        )
+        // $FlowFixMe: (mc, 2019-04-18) http-api-client types need to be redone
+        .then(dispatch)
+    )
   }
 }
 
@@ -142,7 +155,7 @@ export function makeGetRobotModules() {
       const modulesCall = state[MODULES]
 
       // TODO: remove this block when feature flag removed
-      if (modulesCall?.response) {
+      if (modulesCall && modulesCall.response) {
         return {
           ...modulesCall,
           response: {

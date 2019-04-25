@@ -1,31 +1,28 @@
 // @flow
 import * as React from 'react'
-import { type Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import CalibrationInfoContent from '../CalibrationInfoContent'
 import { PrimaryButton } from '@opentrons/components'
 
+import { actions as robotActions } from '../../robot'
 import attachSingle from '../../img/attach_tip_single.png'
 import attachMulti from '../../img/attach_tip_multi.png'
 
-import { actions as robotActions, type Mount, type Channels } from '../../robot'
+import type { Dispatch } from '../../types'
+import type { TipProbeProps } from './types'
 
-type OwnProps = {
-  mount: Mount,
-  channels: Channels,
-  volume: number,
-}
+type OP = TipProbeProps
 
-type DispatchProps = {
-  onProbeTipClick: () => void,
-}
+type DP = {| onProbeTipClick: () => void |}
 
-export default connect(
+type Props = { ...OP, ...DP }
+
+export default connect<Props, OP, {||}, DP, _, _>(
   null,
   mapDispatchToProps
 )(AttachTipPanel)
 
-function AttachTipPanel(props: OwnProps & DispatchProps) {
+function AttachTipPanel(props: Props) {
   const { volume, channels, onProbeTipClick } = props
 
   const leftChildren = (
@@ -53,14 +50,12 @@ function AttachTipPanel(props: OwnProps & DispatchProps) {
   )
 }
 
-function mapDispatchToProps(
-  dispatch: Dispatch<*>,
-  ownProps: OwnProps
-): DispatchProps {
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   const mount = ownProps.mount
 
   return {
     onProbeTipClick: () => {
+      // $FlowFixMe: robotActions.probeTip is not typed
       dispatch(robotActions.probeTip(mount))
     },
   }

@@ -1,4 +1,5 @@
 // @flow
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import dependentFieldsUpdateMoveLiquid, {
   updatePatchBlowoutFields,
 } from '../dependentFieldsUpdateMoveLiquid'
@@ -8,13 +9,22 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../../../../step-generation'
 
+const fixtureTiprack10Ul = {
+  parameters: { isTiprack: true },
+  wells: { A1: { totalLiquidVolume: 1000 } },
+}
 let pipetteEntities
 let labwareEntities
 let handleFormHelper
 
 beforeEach(() => {
   pipetteEntities = {
-    pipetteId: { name: 'p10_single', tiprackModel: 'tiprack-10ul' },
+    pipetteId: {
+      name: 'p10_single',
+      spec: getPipetteNameSpecs('p10_single'),
+      tiprackModel: 'tiprack-10ul',
+      tiprackLabwareDef: fixtureTiprack10Ul,
+    },
   }
   labwareEntities = {}
   handleFormHelper = (patch, baseForm) =>

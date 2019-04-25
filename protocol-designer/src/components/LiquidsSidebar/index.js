@@ -9,21 +9,19 @@ import listButtonStyles from '../listButtons.css'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import type { OrderedLiquids } from '../../labware-ingred/types'
 import * as labwareIngredActions from '../../labware-ingred/actions'
-import type { BaseState } from '../../types'
+import type { BaseState, ThunkDispatch } from '../../types'
 
-type Props = {
+type SP = {|
   liquids: OrderedLiquids,
   selectedLiquid: ?string,
+|}
+
+type DP = {|
   createNewLiquid: () => mixed,
   selectLiquid: (liquidId: string) => mixed,
-}
+|}
 
-type SP = {
-  liquids: $PropertyType<Props, 'liquids'>,
-  selectedLiquid: $PropertyType<Props, 'selectedLiquid'>,
-}
-
-type DP = $Diff<Props, SP>
+type Props = {| ...SP, ...DP |}
 
 function LiquidsSidebar(props: Props) {
   const { liquids, selectedLiquid, createNewLiquid, selectLiquid } = props
@@ -58,7 +56,7 @@ function mapStateToProps(state: BaseState): SP {
   }
 }
 
-function mapDispatchToProps(dispatch: Dispatch<*>): DP {
+function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   return {
     selectLiquid: liquidGroupId =>
       dispatch(labwareIngredActions.selectLiquidGroup(liquidGroupId)),
@@ -67,7 +65,7 @@ function mapDispatchToProps(dispatch: Dispatch<*>): DP {
   }
 }
 
-export default connect(
+export default connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(LiquidsSidebar)

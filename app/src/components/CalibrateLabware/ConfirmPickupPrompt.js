@@ -2,12 +2,12 @@
 // pickup confirmation prompt component for ConfirmPickupContents
 import * as React from 'react'
 
-import type { Labware, Pipette } from '../../robot'
+import type { Pipette } from '../../robot'
 
 import { PrimaryButton } from '@opentrons/components'
 import styles from './styles.css'
 
-type Props = Labware & {
+type Props = {
   calibrator: Pipette,
   onNoClick: () => void,
   onYesClick: () => void,

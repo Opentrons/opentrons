@@ -16,8 +16,8 @@ import type {
 } from './types'
 
 // require all definitions in the definitions2 directory
-// $FlowFixMe: require.context is webpack-specific method
-const definitionsContext = require.context(
+// require.context is webpack-specific method
+const definitionsContext = (require: any).context(
   '@opentrons/shared-data/definitions2',
   true, // traverse subdirectories
   /\.json$/, // import filter

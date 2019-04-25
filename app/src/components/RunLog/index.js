@@ -1,15 +1,18 @@
 // @flow
 import { connect } from 'react-redux'
-import type { State } from '../../types'
+
 import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../robot'
 
 import CommandList from './CommandList'
-import ConfirmCancelModal from './ConfirmCancelModal'
 
+import type { State, Dispatch } from '../../types'
 import type { SessionStatus } from '../../robot'
+import type { CommandListProps } from './CommandList'
+
+export { default as ConfirmCancelModal } from './ConfirmCancelModal'
 
 type SP = {|
   commands: Array<any>,
@@ -21,11 +24,10 @@ type DP = {|
   onResetClick: () => mixed,
 |}
 
-export default connect(
+export default connect<CommandListProps, {||}, _, _, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(CommandList)
-export { ConfirmCancelModal }
 
 function mapStateToProps(state: State): SP {
   return {

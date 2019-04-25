@@ -18,9 +18,11 @@ type SP = {|
   module: ?SessionModule,
 |}
 
-type Props = { ...$Exact<LabwareComponentProps>, ...SP }
+type Props = { ...OP, ...SP }
 
-export default connect(mapStateToProps)(LabwareComponent)
+export default connect<Props, OP, SP, _, _, _>(mapStateToProps)(
+  LabwareComponent
+)
 
 function LabwareComponent(props: Props) {
   const { labware, module } = props

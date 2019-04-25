@@ -15,7 +15,7 @@ import { PipetteTabs, Pipettes } from '../../components/calibrate-pipettes'
 import SessionHeader from '../../components/SessionHeader'
 
 import type { ContextRouter } from 'react-router'
-import type { State } from '../../types'
+import type { State, Dispatch } from '../../types'
 import type { Pipette } from '../../robot'
 import type { PipettesResponse } from '../../http-api-client'
 import type { Robot } from '../../discovery'
@@ -38,7 +38,7 @@ type Props = {
   changePipetteUrl: string,
 }
 
-export default connect(
+export default connect<Props, OP, SP, {||}, State, Dispatch>(
   makeMapStateToProps,
   null,
   mergeProps

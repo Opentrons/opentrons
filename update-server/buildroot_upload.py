@@ -10,10 +10,16 @@ This requires aiohttp
 
 import argparse
 import asyncio
+import enum
 import json
 import sys
 
 import aiohttp
+
+
+class UPDATE_KIND(enum.Enum):
+    UPDATE = enum.auto()
+    MIGRATE = enum.auto()
 
 
 async def poll_status(sess, token, root):
@@ -22,9 +28,9 @@ async def poll_status(sess, token, root):
     return await resp.json()
 
 
-async def do_update(update_file, host, kind):
+async def do_update(update_file: str, host: str, kind: UPDATE_KIND):
     async with aiohttp.ClientSession() as session:
-        if kind == 'migrate':
+        if kind == UPDATE_KIND.MIGRATE:
             root = host + '/server/update/migration'
             filename = 'ot2-migration.zip'
         else:
@@ -95,13 +101,18 @@ async def do_update(update_file, host, kind):
                 sys.exit(-1)
 
         print("Restarting...")
-        resp = await session.post(host+'/server/update/restart')
+        if kind == UPDATE_KIND.MIGRATE:
+            resp = await session.post(host+'/server/update/restart')
+        else:
+            resp = await session.post(host+'/server/restart')
         if resp.status != 200:
             try:
                 body = await resp.json()
                 print(f'Error restarting: {resp.status}: '
                       f'{body["error"]: body["message"]}')
-            except (json.JSONDecodeError, KeyError):
+            except (json.JSONDecodeError,
+                    KeyError,
+                    aiohttp.client_exceptions.ContentTypeError):
                 body = await resp.text()
                 print(f'Error restarting: {resp.status}: {body}')
             sys.exit(-1)
@@ -132,7 +143,10 @@ def main():
                         help='The IP of the robot')
     args = parser.parse_args()
     asyncio.get_event_loop().run_until_complete(
-        do_update(args.update, assure_host(args.host), args.action))
+        do_update(
+            args.update,
+            assure_host(args.host),
+            UPDATE_KIND[args.action.upper()]))
 
 
 if __name__ == '__main__':

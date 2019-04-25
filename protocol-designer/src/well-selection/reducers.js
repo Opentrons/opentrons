@@ -3,6 +3,7 @@ import omit from 'lodash/omit'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 
+import type { Action } from '../types'
 import type { Wells } from '../labware-ingred/types'
 
 type WellSelectionAction = {
@@ -58,7 +59,7 @@ export type RootState = {|
   selectedWells: SelectedWellsState,
 |}
 
-const rootReducer = combineReducers({
+const rootReducer = combineReducers<_, Action>({
   selectedWells,
 })
 

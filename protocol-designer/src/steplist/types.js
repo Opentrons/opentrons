@@ -113,6 +113,6 @@ export type StepArgsAndErrors = {
 }
 
 export type StepFormContextualState = {
-  labware: LabwareEntities,
-  pipettes: PipetteEntities,
+  labwareEntities: LabwareEntities,
+  pipetteEntities: PipetteEntities,
 }

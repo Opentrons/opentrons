@@ -6,11 +6,12 @@
 .app {
   height: 100%;
 
-  /* Nav height */
-  padding-top: var(--size-2);
+  /* nav height */
+  padding-top: var(--size-main-nav);
 
   &.breadcrumbs_visible {
-    padding-top: calc(2 * var(--size-2));
+    /* nav + breadcrumbs height */
+    padding-top: calc(var(--size-main-nav) + var(--size-2));
   }
 }
 
@@ -67,6 +68,18 @@
 
     &.sidebar_large_only {
       padding-left: var(--spacing-7);
+    }
+  }
+}
+
+@media (--desktop) {
+  .app {
+    /* total nav height */
+    padding-top: var(--size-total-nav);
+
+    &.breadcrumbs_visible {
+      /* total nav + breadcrumbs height */
+      padding-top: calc(var(--size-total-nav) + var(--size-2));
     }
   }
 }

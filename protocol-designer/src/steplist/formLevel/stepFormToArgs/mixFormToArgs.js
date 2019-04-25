@@ -1,36 +1,27 @@
 // @flow
 import assert from 'assert'
-import { getLabware } from '@opentrons/shared-data'
-import intersection from 'lodash/intersection'
+import { DEFAULT_CHANGE_TIP_OPTION } from '../../../constants'
+import { getOrderedWells } from '../../utils'
 import type { FormData } from '../../../form-types'
 import type { MixArgs } from '../../../step-generation'
-import { DEFAULT_CHANGE_TIP_OPTION } from '../../../constants'
-import { orderWells } from '../../utils'
 
 type MixStepArgs = MixArgs
 
-// TODO: BC 2018-10-30 move getting labwareDef into hydration layer upstream
 const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
   const { labware, pipette } = hydratedFormData
   const touchTip = Boolean(hydratedFormData['mix_touchTip_checkbox'])
   const touchTipMmFromBottom = hydratedFormData['mix_touchTip_mmFromBottom']
 
-  let wells = hydratedFormData.wells || []
+  let unorderedWells = hydratedFormData.wells || []
   const orderFirst = hydratedFormData.mix_wellOrder_first
   const orderSecond = hydratedFormData.mix_wellOrder_second
 
-  // TODO: Ian 2019-01-15 use getOrderedWells instead of orderWells to avoid this duplicated code
-  const labwareDef = labware && getLabware(labware.type)
-  if (labwareDef) {
-    const allWellsOrdered = orderWells(
-      labwareDef.ordering,
-      orderFirst,
-      orderSecond
-    )
-    wells = intersection(allWellsOrdered, wells)
-  } else {
-    console.warn('the specified labware definition could not be located')
-  }
+  const orderedWells = getOrderedWells(
+    unorderedWells,
+    labware.def,
+    orderFirst,
+    orderSecond
+  )
 
   const volume = hydratedFormData.volume
   const times = hydratedFormData.times
@@ -60,7 +51,7 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
     name: `Mix ${hydratedFormData.id}`, // TODO real name for steps
     description: 'description would be here 2018-03-01', // TODO get from form
     labware: labware.id,
-    wells,
+    wells: orderedWells,
     volume,
     times,
     touchTip,

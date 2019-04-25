@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.8.2"></a>
+## [3.8.2](https://github.com/opentrons/opentrons/compare/v3.8.1...v3.8.2) (2019-04-23)
+
+
+### Bug Fixes
+
+* **api:** Correctly specify jsonschema in setup.py install_requires ([#3377](https://github.com/opentrons/opentrons/issues/3377)) ([a79d7ab](https://github.com/opentrons/opentrons/commit/a79d7ab))
+* **api:** Do not sleep in simulated delays ([#3347](https://github.com/opentrons/opentrons/issues/3347)) ([e12e200](https://github.com/opentrons/opentrons/commit/e12e200)), closes [#3346](https://github.com/opentrons/opentrons/issues/3346)
+* **api:** Remove module load regression in V2 ([#3288](https://github.com/opentrons/opentrons/issues/3288)) ([7fe143a](https://github.com/opentrons/opentrons/commit/7fe143a))
+* **app:** Clear deck cal request states on wizard exit ([#3378](https://github.com/opentrons/opentrons/issues/3378)) ([408b8aa](https://github.com/opentrons/opentrons/commit/408b8aa))
+* **app:** Disable manual ip double submit on enter keypress ([#3376](https://github.com/opentrons/opentrons/issues/3376)) ([81291ca](https://github.com/opentrons/opentrons/commit/81291ca))
+* **app:** render correct image for vial and tube racks ([#3298](https://github.com/opentrons/opentrons/issues/3298)) ([b9e1ebb](https://github.com/opentrons/opentrons/commit/b9e1ebb)), closes [#3294](https://github.com/opentrons/opentrons/issues/3294)
+* **labware-library:** Take cornerOffsetFromSlot into account with render ([#3297](https://github.com/opentrons/opentrons/issues/3297)) ([04a1ab8](https://github.com/opentrons/opentrons/commit/04a1ab8))
+* **protocol-designer:** fix trough over-aspirate bug ([#3280](https://github.com/opentrons/opentrons/issues/3280)) ([c0b0333](https://github.com/opentrons/opentrons/commit/c0b0333))
+* **shared-data:** fix v2 labware definition ([#3289](https://github.com/opentrons/opentrons/issues/3289)) ([e652fb7](https://github.com/opentrons/opentrons/commit/e652fb7)), closes [#3271](https://github.com/opentrons/opentrons/issues/3271)
+* **update-server:** Create ~/.ssh/authorized_keys if needed ([#3351](https://github.com/opentrons/opentrons/issues/3351)) ([c2836bb](https://github.com/opentrons/opentrons/commit/c2836bb))
+* **update-server:** Fix some issues with br update, test, fast flow ([#3352](https://github.com/opentrons/opentrons/issues/3352)) ([6e4d2f6](https://github.com/opentrons/opentrons/commit/6e4d2f6))
+
+
+### Features
+
+* **api:** Add Geometry Logic For Thermocycler Configurations ([#3266](https://github.com/opentrons/opentrons/issues/3266)) ([4d8e463](https://github.com/opentrons/opentrons/commit/4d8e463))
+* **api:** add P10M 1.5 config data ([#3365](https://github.com/opentrons/opentrons/issues/3365)) ([1332f63](https://github.com/opentrons/opentrons/commit/1332f63))
+* **api:** define & execute v3 json protocols ([#3312](https://github.com/opentrons/opentrons/issues/3312)) ([988407d](https://github.com/opentrons/opentrons/commit/988407d)), closes [#3110](https://github.com/opentrons/opentrons/issues/3110)
+* **api:** publish pause and delay commands in python and JSON ([#3310](https://github.com/opentrons/opentrons/issues/3310)) ([5656d65](https://github.com/opentrons/opentrons/commit/5656d65)), closes [#3308](https://github.com/opentrons/opentrons/issues/3308)
+* **api:** Set P10M1.5 pick up increment to 3mm ([#3374](https://github.com/opentrons/opentrons/issues/3374)) ([f5b63d0](https://github.com/opentrons/opentrons/commit/f5b63d0))
+* **api:** validate JSON protocols before executing ([#3318](https://github.com/opentrons/opentrons/issues/3318)) ([9c15f7d](https://github.com/opentrons/opentrons/commit/9c15f7d)), closes [#3250](https://github.com/opentrons/opentrons/issues/3250)
+* **api:** wire up TC deactivate, and add module cmd exec endpoint ([#3264](https://github.com/opentrons/opentrons/issues/3264)) ([483122a](https://github.com/opentrons/opentrons/commit/483122a)), closes [#2981](https://github.com/opentrons/opentrons/issues/2981)
+* **app:** Enable adding manual robot IP addresses in app settings ([#3284](https://github.com/opentrons/opentrons/issues/3284)) ([c34fcfa](https://github.com/opentrons/opentrons/commit/c34fcfa)), closes [#2741](https://github.com/opentrons/opentrons/issues/2741)
+* **components:** use transparent gray for button hover ([#3281](https://github.com/opentrons/opentrons/issues/3281)) ([b724151](https://github.com/opentrons/opentrons/commit/b724151))
+* **protocol-designer:** show tooltips on disabled fields in Transfer form ([#3286](https://github.com/opentrons/opentrons/issues/3286)) ([a9cc612](https://github.com/opentrons/opentrons/commit/a9cc612)), closes [#3259](https://github.com/opentrons/opentrons/issues/3259)
+* **shared-data:** update P300M 1.5 pick up current to 0.9 A ([#3355](https://github.com/opentrons/opentrons/issues/3355)) ([a2d9024](https://github.com/opentrons/opentrons/commit/a2d9024))
+* **update-server:** add buildroot migration ([#3321](https://github.com/opentrons/opentrons/issues/3321)) ([76d6b28](https://github.com/opentrons/opentrons/commit/76d6b28)), closes [#2880](https://github.com/opentrons/opentrons/issues/2880) [#2881](https://github.com/opentrons/opentrons/issues/2881)
+* **update-server:** Add SSH public key management for buildroot ([#3339](https://github.com/opentrons/opentrons/issues/3339)) ([ef02433](https://github.com/opentrons/opentrons/commit/ef02433)), closes [#3320](https://github.com/opentrons/opentrons/issues/3320)
+* **update-server:** Set buildroot hostname ([#3356](https://github.com/opentrons/opentrons/issues/3356)) ([1addcf7](https://github.com/opentrons/opentrons/commit/1addcf7))
+
+
+### Performance Improvements
+
+* **protocol-designer:** avoid selector recomputation in step forms ([#3292](https://github.com/opentrons/opentrons/issues/3292)) ([41c40c5](https://github.com/opentrons/opentrons/commit/41c40c5))
+* **protocol-designer:** fix selectors used by allSubsteps ([#3287](https://github.com/opentrons/opentrons/issues/3287)) ([54dfa53](https://github.com/opentrons/opentrons/commit/54dfa53))
+
+
+
+
+
 <a name="3.8.1"></a>
 ## [3.8.1](https://github.com/opentrons/opentrons/compare/v3.8.0...v3.8.1) (2019-03-29)
 

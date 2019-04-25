@@ -7,7 +7,7 @@ import EditableTextField from '../../EditableTextField'
 import styles from './labwareDetailsCard.css'
 
 type Props = {
-  labwareType: string,
+  labwareDefDisplayName: string,
   nickname: string,
   renameLabware: (name: string) => mixed,
 }
@@ -20,7 +20,9 @@ export default function LabwareDetailsCard(props: Props) {
           <span className={cx(styles.label, styles.column_1_3)}>
             {i18n.t('form.generic.labware_type')}
           </span>
-          <span className={styles.column_2_3}>{props.labwareType}</span>
+          <span className={styles.column_2_3}>
+            {props.labwareDefDisplayName}
+          </span>
         </div>
       </PDListItem>
       <PDListItem border>

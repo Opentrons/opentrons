@@ -12,6 +12,8 @@ type Props = {
   showHint: boolean,
 }
 
+type SP = $Exact<Props>
+
 function StartingDeckStateTerminalItem(props: Props) {
   const { showHint } = props
   const hintContents = (
@@ -27,11 +29,13 @@ function StartingDeckStateTerminalItem(props: Props) {
   )
 }
 
-function mapStateToProps(state: BaseState): Props {
+function mapStateToProps(state: BaseState): SP {
   // since default-trash counts as 1, labwareCount <= 1 means "user did not add labware"
   const noLabware =
     Object.keys(stepFormSelectors.getLabwareEntities(state)).length <= 1
   return { showHint: noLabware }
 }
 
-export default connect(mapStateToProps)(StartingDeckStateTerminalItem)
+export default connect<Props, {||}, SP, _, _, _>(mapStateToProps)(
+  StartingDeckStateTerminalItem
+)

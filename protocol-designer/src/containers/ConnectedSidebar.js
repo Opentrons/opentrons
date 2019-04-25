@@ -38,7 +38,7 @@ function Sidebar(props: Props) {
   return null
 }
 
-function mapStateToProps(state: BaseState): Props {
+function mapStateToProps(state: BaseState): $Exact<Props> {
   const page = selectors.getCurrentPage(state)
   const liquidPlacementMode =
     labwareIngredSelectors.getSelectedLabwareId(state) != null
@@ -49,4 +49,4 @@ function mapStateToProps(state: BaseState): Props {
   }
 }
 
-export default connect(mapStateToProps)(Sidebar)
+export default connect<Props, {||}, _, _, _, _>(mapStateToProps)(Sidebar)

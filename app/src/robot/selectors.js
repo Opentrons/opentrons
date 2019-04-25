@@ -133,12 +133,14 @@ function traverseCommands(commandsById, parentIsCurrent) {
   }
 }
 
+// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getCommands = createSelector(
   (state: State) => session(state).protocolCommands,
   (state: State) => session(state).protocolCommandsById,
   (commands, commandsById) => commands.map(traverseCommands(commandsById, true))
 )
 
+// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getRunProgress = createSelector(
   getCommands,
   (commands): number => {
@@ -165,6 +167,7 @@ export function getStartTime(state: State) {
   return session(state).startTime
 }
 
+// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getRunSeconds = createSelector(
   getStartTime,
   (state: State) => session(state).runTime,
@@ -175,6 +178,7 @@ export const getRunSeconds = createSelector(
   }
 )
 
+// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getRunTime = createSelector(
   getRunSeconds,
   (runSeconds): string => {
@@ -194,6 +198,7 @@ export function getPipettesByMount(state: State) {
   return session(state).pipettesByMount
 }
 
+// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getPipettes = createSelector(
   getPipettesByMount,
   (state: State) => calibration(state).probedByMount,
@@ -242,6 +247,7 @@ export const getPipettes = createSelector(
   }
 )
 
+// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getNextPipette = createSelector(
   getPipettes,
   (pipettes): ?Pipette => {
@@ -253,6 +259,7 @@ export const getNextPipette = createSelector(
 
 // returns the mount of the pipette to use for deckware calibration
 // TODO(mc, 2018-02-07): be smarter about the backup case
+// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getCalibrator = createSelector(
   getPipettes,
   (pipettes): ?Pipette => pipettes.find(i => i.tipOn) || pipettes[0]
@@ -260,13 +267,14 @@ export const getCalibrator = createSelector(
 
 // TODO(mc, 2018-02-07): remove this selector in favor of the one above
 export function getCalibratorMount(state: State): ?Mount {
-  const calibrator = getCalibrator(state)
+  const calibrator: ?Pipette = getCalibrator(state)
 
   if (!calibrator) return null
 
   return calibrator.mount
 }
 
+// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getPipettesCalibrated = createSelector(
   getPipettes,
   (pipettes): boolean => pipettes.length !== 0 && pipettes.every(i => i.probed)
@@ -289,7 +297,7 @@ export const getModules: OutputSelector<
     let modules = modulesBySlot
     if (!tcEnabled) {
       modules = omitBy(modulesBySlot, m => {
-        return m.name === 'thermocycler'
+        return m?.name === 'thermocycler'
       })
     }
     return Object.keys(modules)
@@ -302,6 +310,7 @@ export function getLabwareBySlot(state: State) {
   return session(state).labwareBySlot
 }
 
+// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getLabware = createSelector(
   getPipettesByMount,
   getLabwareBySlot,
@@ -370,37 +379,44 @@ export function getDeckPopulated(state: State) {
   return calibration(state).deckPopulated
 }
 
+// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getUnconfirmedLabware = createSelector(
   getLabware,
   labware => labware.filter(lw => lw.type && !lw.confirmed)
 )
 
+// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getTipracks = createSelector(
   getLabware,
   labware => labware.filter(lw => lw.type && lw.isTiprack)
 )
 
+// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getNotTipracks = createSelector(
   getLabware,
   labware => labware.filter(lw => lw.type && !lw.isTiprack)
 )
 
+// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getUnconfirmedTipracks = createSelector(
   getUnconfirmedLabware,
   labware => labware.filter(lw => lw.type && lw.isTiprack)
 )
 
+// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getNextLabware = createSelector(
   getUnconfirmedTipracks,
   getUnconfirmedLabware,
   (tipracks, labware) => tipracks[0] || labware[0]
 )
 
+// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getTipracksConfirmed = createSelector(
   getUnconfirmedTipracks,
   (remaining): boolean => remaining.length === 0
 )
 
+// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getLabwareConfirmed = createSelector(
   getUnconfirmedLabware,
   (remaining): boolean => remaining.length === 0
@@ -420,9 +436,11 @@ export function getOffsetUpdateInProgress(state: State): boolean {
 
 // get current pipette selector factory
 // to be used by a react-router Route component
-export const makeGetCurrentPipette = () =>
-  createSelector(
+export const makeGetCurrentPipette = () => {
+  // $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
+  return createSelector(
     (_, props: ContextRouter) => props.match.params.mount,
     getPipettes,
     (mount, pipettes) => pipettes.find(i => i.mount === mount)
   )
+}

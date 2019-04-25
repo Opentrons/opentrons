@@ -16,7 +16,7 @@ import StatusCard from './StatusCard'
 import CardContentRow from './CardContentRow'
 import StatusItem from './StatusItem'
 
-import type { State } from '../../types'
+import type { State, Dispatch } from '../../types'
 import type {
   TempDeckModule,
   FetchTemperatureDataResponse,
@@ -25,16 +25,16 @@ import type { Robot } from '../../discovery'
 
 const POLL_TEMPDECK_INTERVAL_MS = 1000
 
-type SP = {
+type SP = {|
   _robot: ?Robot,
   tempdeck: ?TempDeckModule,
   tempdeckData: ?FetchTemperatureDataResponse,
-}
+|}
 
-type DP = {
+type DP = {|
   _fetchModules: (_robot: Robot) => mixed,
   _fetchModuleData: (_robot: Robot, serial: string) => mixed,
-}
+|}
 
 type Props = {
   tempdeck: ?TempDeckModule,
@@ -88,6 +88,7 @@ class TempDeckStatusCard extends React.Component<Props> {
 function makeSTP(): (state: State) => SP {
   const getRobotModules = makeGetRobotModules()
   const getRobotModuleData = makeGetRobotModuleData()
+
   return state => {
     const _robot = getConnectedRobot(state)
     const modulesCall = _robot && getRobotModules(state, _robot)
@@ -131,7 +132,7 @@ function mergeProps(stateProps: SP, dispatchProps: DP): Props {
   }
 }
 
-export default connect(
+export default connect<Props, {||}, SP, DP, State, Dispatch>(
   makeSTP,
   mapDTP,
   mergeProps

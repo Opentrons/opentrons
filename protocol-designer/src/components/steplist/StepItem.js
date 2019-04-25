@@ -34,7 +34,7 @@ type StepItemProps = {
   ingredNames: WellIngredientNames,
 
   labwareNicknamesById: { [labwareId: string]: string },
-  labwareTypesById: { [labwareId: string]: ?string },
+  labwareDefDisplayNamesById: { [labwareId: string]: ?string },
   highlightSubstep: SubstepIdentifier => mixed,
   selectStep: (stepId: StepIdType) => mixed,
   onStepContextMenu?: (event?: SyntheticEvent<>) => mixed,
@@ -99,7 +99,7 @@ function getStepItemContents(stepItemProps: StepItemProps) {
     stepType,
     substeps,
     labwareNicknamesById,
-    labwareTypesById,
+    labwareDefDisplayNamesById,
     hoveredSubstep,
     highlightSubstep,
     ingredNames,
@@ -125,9 +125,11 @@ function getStepItemContents(stepItemProps: StepItemProps) {
       <AspirateDispenseHeader
         key="moveLiquid-header"
         sourceLabwareNickname={labwareNicknamesById[sourceLabwareId]}
-        sourceLabwareType={labwareTypesById[sourceLabwareId]}
+        sourceLabwareDefDisplayName={
+          labwareDefDisplayNamesById[sourceLabwareId]
+        }
         destLabwareNickname={labwareNicknamesById[destLabwareId]}
-        destLabwareType={labwareTypesById[destLabwareId]}
+        destLabwareDefDisplayName={labwareDefDisplayNamesById[destLabwareId]}
       />
     )
   }
@@ -140,7 +142,7 @@ function getStepItemContents(stepItemProps: StepItemProps) {
         volume={rawForm.volume}
         times={rawForm.times}
         labwareNickname={labwareNicknamesById[mixLabwareId]}
-        labwareType={labwareTypesById[mixLabwareId]}
+        labwareDefDisplayName={labwareDefDisplayNamesById[mixLabwareId]}
       />
     )
   }

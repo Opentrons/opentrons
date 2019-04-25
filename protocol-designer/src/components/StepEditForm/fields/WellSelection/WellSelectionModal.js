@@ -26,28 +26,30 @@ import WellSelectionInstructions from '../../../WellSelectionInstructions'
 import styles from './WellSelectionModal.css'
 import modalStyles from '../../../modals/modal.css'
 
-type OP = {
+type OP = {|
   pipetteId: ?string,
   labwareId: ?string,
   isOpen: boolean,
   onCloseClick: (e: ?SyntheticEvent<*>) => mixed,
   name: StepFieldName,
-}
-type SP = {
+|}
+
+type SP = {|
   pipetteSpec: ?PipetteNameSpecs,
   initialSelectedWells: Array<string>,
   wellContents: ContentsByWell,
   containerType: string,
   ingredNames: WellIngredientNames,
-}
-type DP = { saveWellSelection: Wells => mixed }
+|}
 
-type Props = OP & SP & DP
+type DP = {| saveWellSelection: Wells => mixed |}
+
+type Props = {| ...OP, ...SP, ...DP |}
 type State = { selectedWells: Wells, highlightedWells: Wells }
 
 class WellSelectionModal extends React.Component<Props, State> {
   state = { selectedWells: {}, highlightedWells: {} }
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
     const initialSelectedWells = reduce(
       this.props.initialSelectedWells,
@@ -169,7 +171,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>, ownProps: OP): DP {
   }
 }
 
-export default connect(
+export default connect<Props, OP, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(WellSelectionModal)

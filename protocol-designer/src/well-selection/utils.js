@@ -13,7 +13,7 @@ type WellSetByWell = Array<Array<string>>
 
 /** Compute all well sets for a labware type.
  * A well set is array of 8 wells that an 8 channel pipettes can fit into,
- * eg ['A1', 'C1', 'D1', 'E1', 'G1', 'I1', 'K1', 'M1'] is a well set in a 384 plate.
+ * eg ['A1', 'C1', 'E1', 'G1', 'I1', 'K1', 'M1', 'O1'] is a well set in a 384 plate.
  **/
 function _getAllWellSetsForLabwareDeprecated(
   labwareName: string
@@ -63,16 +63,15 @@ function _getWellSetForMultichannelDeprecated(
   return allWellSets.find((wellSet: Array<string>) => wellSet.includes(well))
 }
 
-export const getWellSetForMultichannelDeprecated = memoize(
+export const getWellSetForMultichannelDeprecated = memoize<Array<string>, _>(
   _getWellSetForMultichannelDeprecated,
   (labwareName: string, well: string) => `$LABWARE:${labwareName}--WELL:${well}`
 )
 
 /** Compute all well sets for a labware type.
  * A well set is array of 8 wells that an 8 channel pipettes can fit into,
- * eg ['A1', 'C1', 'D1', 'E1', 'G1', 'I1', 'K1', 'M1'] is a well set in a 384 plate.
+ * eg ['A1', 'C1', 'E1', 'G1', 'I1', 'K1', 'M1', 'O1'] is a well set in a 384 plate.
  **/
-// TODO IMMEDIATELY - break out and memoize
 function _getAllWellSetsForLabware(
   labwareDef: LabwareDefinition2
 ): WellSetByWell {

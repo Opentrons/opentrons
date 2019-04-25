@@ -28,9 +28,11 @@ type SP = {|
 
 type Props = { ...OP, ...SP }
 
-export default withRouter(connect(mapStateToProps)(UploadPage))
+export default withRouter<{||}>(
+  connect<Props, OP, SP, _, _, _>(mapStateToProps)(UploadPage)
+)
 
-function mapStateToProps(state: State, ownProps: OP): SP {
+function mapStateToProps(state: State): SP {
   return {
     robot: getConnectedRobot(state),
     filename: getProtocolFilename(state),

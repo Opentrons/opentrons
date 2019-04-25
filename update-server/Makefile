@@ -67,7 +67,7 @@ wheel: clean
 bootstrap: wheel
 	curl -X POST \
 		-H "Content-Type: multipart/form-data" \
-		-F "whl=@$(wheel)" \
+		-F "whl=@$(wheel_file)" \
 		http://$(host):31950/server/update/bootstrap
 
 .PHONY: restart

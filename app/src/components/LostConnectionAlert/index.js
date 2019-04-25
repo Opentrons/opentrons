@@ -14,14 +14,15 @@ import { AlertModal } from '@opentrons/components'
 import { Portal } from '../portal'
 import ModalCopy from './ModalCopy'
 
+import type { ContextRouter } from 'react-router'
 import type { State, Dispatch } from '../../types'
 
 type SP = {| ok: ?boolean |}
 type DP = {| disconnect: () => mixed |}
 type Props = { ...SP, ...DP }
 
-export default withRouter(
-  connect(
+export default withRouter<{||}>(
+  connect<Props, ContextRouter, SP, DP, State, Dispatch>(
     mapStateToProps,
     mapDispatchToProps
   )(LostConnectionAlert)

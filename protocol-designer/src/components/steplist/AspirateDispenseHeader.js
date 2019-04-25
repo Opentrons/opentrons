@@ -9,17 +9,17 @@ import { Portal } from './TooltipPortal'
 
 type AspirateDispenseHeaderProps = {
   sourceLabwareNickname: ?string,
-  sourceLabwareType: ?string,
+  sourceLabwareDefDisplayName: ?string,
   destLabwareNickname: ?string,
-  destLabwareType: ?string,
+  destLabwareDefDisplayName: ?string,
 }
 
 function AspirateDispenseHeader(props: AspirateDispenseHeaderProps) {
   const {
     sourceLabwareNickname,
-    sourceLabwareType,
+    sourceLabwareDefDisplayName,
     destLabwareNickname,
-    destLabwareType,
+    destLabwareDefDisplayName,
   } = props
 
   return (
@@ -41,7 +41,7 @@ function AspirateDispenseHeader(props: AspirateDispenseHeaderProps) {
           tooltipComponent={
             <LabwareTooltipContents
               labwareNickname={sourceLabwareNickname}
-              labwareType={sourceLabwareType}
+              labwareDefDisplayName={sourceLabwareDefDisplayName}
             />
           }
         >
@@ -61,7 +61,7 @@ function AspirateDispenseHeader(props: AspirateDispenseHeaderProps) {
           tooltipComponent={
             <LabwareTooltipContents
               labwareNickname={destLabwareNickname}
-              labwareType={destLabwareType}
+              labwareDefDisplayName={destLabwareDefDisplayName}
             />
           }
         >

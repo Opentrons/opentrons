@@ -65,7 +65,7 @@ type HydratedFormData = any
 export const incompatibleLabware = (fields: HydratedFormData): ?FormError => {
   const { labware, pipette } = fields
   if (!labware || !pipette) return null
-  return !canPipetteUseLabware(pipette.name, labware.type)
+  return !canPipetteUseLabware(pipette.spec, labware.def)
     ? FORM_ERRORS.INCOMPATIBLE_LABWARE
     : null
 }
@@ -75,7 +75,7 @@ export const incompatibleDispenseLabware = (
 ): ?FormError => {
   const { dispense_labware, pipette } = fields
   if (!dispense_labware || !pipette) return null
-  return !canPipetteUseLabware(pipette.name, dispense_labware.type)
+  return !canPipetteUseLabware(pipette.spec, dispense_labware.def)
     ? FORM_ERRORS.INCOMPATIBLE_DISPENSE_LABWARE
     : null
 }
@@ -85,7 +85,7 @@ export const incompatibleAspirateLabware = (
 ): ?FormError => {
   const { aspirate_labware, pipette } = fields
   if (!aspirate_labware || !pipette) return null
-  return !canPipetteUseLabware(pipette.name, aspirate_labware.type)
+  return !canPipetteUseLabware(pipette.spec, aspirate_labware.def)
     ? FORM_ERRORS.INCOMPATIBLE_ASPIRATE_LABWARE
     : null
 }

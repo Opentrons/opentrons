@@ -8,7 +8,10 @@ import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
-import { getPipetteNameSpecs, getLabware } from '@opentrons/shared-data'
+import {
+  getPipetteNameSpecs,
+  getLabwareDisplayName,
+} from '@opentrons/shared-data'
 import i18n from '../../localization'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import {
@@ -18,10 +21,10 @@ import {
   stepFormToArgs,
 } from '../../steplist/formLevel'
 import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
-import { addSpecsToPipetteInvariantProps } from '../utils'
+import { denormalizePipetteEntities } from '../utils'
 import {
   selectors as labwareDefSelectors,
-  type DefsByLabwareId,
+  type LabwareDefByDefId,
 } from '../../labware-defs'
 
 import type { FormWarning } from '../../steplist/formLevel'
@@ -34,85 +37,84 @@ import type {
   StepItemData,
   StepFormContextualState,
 } from '../../steplist/types'
+import type { CommandCreatorArgs } from '../../step-generation/types'
 import type {
   InitialDeckSetup,
-  LabwareEntities,
-  LabwareEntity,
+  NormalizedLabwareById,
+  NormalizedLabware,
   LabwareOnDeck,
+  LabwareEntity,
+  LabwareEntities,
   PipetteEntities,
   PipetteOnDeck,
   FormPipettesByMount,
 } from '../types'
 import type { RootState } from '../reducers'
 
+// TODO: Ian 2019-04-10 SHIM REMOVAL #3335
+const FALLBACK_DEF = '54d2f430-d602-11e8-80b1-6965467d172c'
+
 const rootSelector = (state: BaseState): RootState => state.stepForms
 
-// NOTE Ian 2019-02-14: in Redux containers world, you probably only care about
-// the labware type, in which case you ought to use `getLabwareTypesById` instead.
-// `getLabwareEntities` is intended for uses tied to the LabwareEntities type
-// (which currently contains only `type`, but may expand)
-export const getLabwareEntities: Selector<LabwareEntities> = createSelector(
+// NOTE Ian 2019-04-15: outside of this file, you probably only care about
+// the labware entity in its denormalized representation, in which case you ought
+// to use `getLabwareEntities` instead.
+// `_getNormalizedLabwareById` is intended for uses tied to the NormalizedLabware type
+const _getNormalizedLabwareById: Selector<NormalizedLabwareById> = createSelector(
   rootSelector,
   state => state.labwareInvariantProperties
 )
 
+// TODO: Ian 2019-04-15 remove this selector completely. DEPRECATED.
+// Removal blocked by: BrowseLabwareModal/HighlightableLabware/LiquidPlacementModal/WellSelectionModal (all use SelectableLabware)
 export const getLabwareTypesById: Selector<LabwareTypeById> = createSelector(
-  getLabwareEntities,
-  labwareEntities =>
-    mapValues(labwareEntities, (labware: LabwareEntity) => labware.type)
+  _getNormalizedLabwareById,
+  normalizedLabwareById =>
+    mapValues(normalizedLabwareById, (l: NormalizedLabware) => l.type)
 )
 
-// NOTE: this mapping should be reviewed before using it in migration later
-const V1_NAME_TO_V2_OTID = {
-  '12-well-plate': 'a4961650-54c9-11e9-989a-e90aec2c3723',
-  '24-well-plate': '4373e820-54c9-11e9-9364-556fc2c8a783',
-  '384-plate': 'cf69e110-f50e-11e8-bb2a-e7b1dd90654d',
-  '48-well-plate': '3d53c440-f50d-11e8-bb2a-e7b1dd90654d',
-  '6-well-plate': 'bd10e8d0-f4da-11e8-bb2a-e7b1dd90654d',
-  '96-PCR-flat': 'a07a3f50-ec38-11e8-a3cc-d7bd32b6c4b1',
-  '96-flat': '54d2f430-d602-11e8-80b1-6965467d172c',
-  'biorad-hardshell-96-PCR': 'a07a3f50-ec38-11e8-a3cc-d7bd32b6c4b1',
-  'opentrons-aluminum-block-2ml-eppendorf':
-    'cf9cbb20-f401-11e8-a244-69cb0fde6293',
-  'opentrons-aluminum-block-2ml-screwcap':
-    'cf9cbb20-f401-11e8-a244-69cb0fde6293',
-  'opentrons-aluminum-block-96-PCR-plate':
-    'd88a5b70-f4c9-11e8-83b8-c3ba5d2a3baa',
-  'opentrons-tiprack-300ul': '3d278f00-ffe0-11e8-abfa-95044b186e81',
-  'opentrons-tuberack-1.5ml-eppendorf': '9467f4b0-fa3d-11e8-b76d-25864338afc4',
-  'opentrons-tuberack-15_50ml': 'f65f2960-0f76-11e9-8659-e18ed15996f5',
-  'opentrons-tuberack-15ml': 'e57a7130-54c8-11e9-a8d4-c1917c1bf74f',
-  'opentrons-tuberack-2ml-eppendorf': 'b28e5eb0-e8f0-11e8-b93b-5f6727dde048',
-  'opentrons-tuberack-2ml-screwcap': 'e8c55910-e8f1-11e8-b93b-5f6727dde048',
-  'opentrons-tuberack-50ml': '23784a80-5563-11e9-bf87-f7b718396190',
-  'tiprack-1000ul': 'd4e462c0-ffde-11e8-abfa-95044b186e81',
-  'tiprack-10ul': '88154cc0-ffde-11e8-abfa-95044b186e81',
-  'trough-12row': 'a41d9ef0-f4b6-11e8-90c2-7106f0eae5a7',
+function _hydrateLabwareEntity(
+  l: NormalizedLabware,
+  labwareId: string,
+  defs: LabwareDefByDefId
+): LabwareEntity {
+  return {
+    ...l,
+    id: labwareId,
+    def: defs[l.type] || defs[FALLBACK_DEF],
+  }
 }
 
-// TODO: Ian 2019-04-10 SHIM REMOVAL #3335
-export const getLabwareDefByLabwareId: Selector<DefsByLabwareId> = createSelector(
+export const getLabwareEntities: Selector<LabwareEntities> = createSelector(
+  _getNormalizedLabwareById,
   labwareDefSelectors.getLabwareDefsById,
-  getLabwareEntities,
-  (defs, labwareEntities) =>
-    mapValues(labwareEntities, (labware: LabwareEntity) => {
-      const defId = labware.type
-      if (defId in defs) {
-        return defs[defId]
-      } else if (defId in V1_NAME_TO_V2_OTID) {
-        return defs[V1_NAME_TO_V2_OTID[defId]]
-      }
-      console.warn(
-        `No def in V1_NAME_TO_V2_OTID for "${defId}", using 96 generic for now`
-      )
-      return defs[V1_NAME_TO_V2_OTID['96-flat']]
-    })
+  (normalizedLabwareById, labwareDefs) =>
+    mapValues(normalizedLabwareById, (l: NormalizedLabware, id: string) =>
+      _hydrateLabwareEntity(l, id, labwareDefs)
+    )
+)
+
+// Special version of `getLabwareEntities` selector for use in step-forms reducers
+export const _getLabwareEntitiesRootState: RootState => LabwareEntities = createSelector(
+  rs => rs.labwareInvariantProperties,
+  labwareDefSelectors._getLabwareDefsByIdRootState,
+  (normalizedLabwareById, labwareDefs) =>
+    mapValues(normalizedLabwareById, (l: NormalizedLabware, id: string) =>
+      _hydrateLabwareEntity(l, id, labwareDefs)
+    )
 )
 
 export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
   state => rootSelector(state).pipetteInvariantProperties,
-  pipetteInvariantProperties =>
-    addSpecsToPipetteInvariantProps(pipetteInvariantProperties)
+  labwareDefSelectors.getLabwareDefsById,
+  denormalizePipetteEntities
+)
+
+// Special version of `getPipetteEntities` selector for use in step-forms reducers
+export const _getPipetteEntitiesRootState: RootState => PipetteEntities = createSelector(
+  rs => rs.pipetteInvariantProperties,
+  labwareDefSelectors._getLabwareDefsByIdRootState,
+  denormalizePipetteEntities
 )
 
 export const getInitialDeckSetupStepForm = (state: BaseState) =>
@@ -122,11 +124,7 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   getInitialDeckSetupStepForm,
   getLabwareEntities,
   getPipetteEntities,
-  (
-    initialSetupStep,
-    labwareInvariantProperties,
-    pipetteInvariantProperties
-  ) => {
+  (initialSetupStep, labwareEntities, pipetteEntities) => {
     assert(
       initialSetupStep && initialSetupStep.stepType === 'manualIntervention',
       'expected initial deck setup step to be "manualIntervention" step'
@@ -139,13 +137,13 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
       labware: mapValues(
         labwareLocations,
         (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
-          return { slot, ...labwareInvariantProperties[labwareId] }
+          return { slot, ...labwareEntities[labwareId] }
         }
       ),
       pipettes: mapValues(
         pipetteLocations,
         (mount: Mount, pipetteId: string): PipetteOnDeck => {
-          return { mount, ...pipetteInvariantProperties[pipetteId] }
+          return { mount, ...pipetteEntities[pipetteId] }
         }
       ),
     }
@@ -203,17 +201,15 @@ export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup>
         pipetteOnDeck: PipetteOnDeck,
         pipetteId
       ) => {
-        const pipetteSpec = getPipetteNameSpecs(pipetteOnDeck.name)
-        const tiprackSpec = getLabware(pipetteOnDeck.tiprackModel)
+        const pipetteSpec = pipetteOnDeck.spec
+        const tiprackDef = pipetteOnDeck.tiprackLabwareDef
 
         const pipetteForInstrumentGroup = {
           mount: pipetteOnDeck.mount,
           channels: pipetteSpec ? pipetteSpec.channels : undefined,
           description: _getPipetteDisplayName(pipetteOnDeck.name),
           isDisabled: false,
-          tiprackModel: tiprackSpec
-            ? `${tiprackSpec.metadata.tipVolume || '?'} uL`
-            : undefined,
+          tiprackModel: getLabwareDisplayName(tiprackDef),
           tiprack: { model: pipetteOnDeck.tiprackModel },
         }
 
@@ -236,14 +232,14 @@ export const getPipettesForEditPipetteForm: Selector<FormPipettesByMount> = crea
         pipetteOnDeck: PipetteOnDeck,
         id
       ): FormPipettesByMount => {
-        const pipetteSpec = getPipetteNameSpecs(pipetteOnDeck.name)
-        const tiprackSpec = getLabware(pipetteOnDeck.tiprackModel)
+        const pipetteSpec = pipetteOnDeck.spec
+        const tiprackDef = pipetteOnDeck.tiprackLabwareDef
 
-        if (!pipetteSpec || !tiprackSpec) return acc
+        if (!pipetteSpec || !tiprackDef) return acc
 
         const pipetteForInstrumentGroup = {
           pipetteName: pipetteOnDeck.name,
-          tiprackModel: tiprackSpec.metadata.name,
+          tiprackModel: getLabwareDisplayName(tiprackDef),
         }
 
         return {
@@ -323,7 +319,7 @@ const _getFormAndFieldErrorsFromHydratedForm = (
 export const getHydrationContext: Selector<StepFormContextualState> = createSelector(
   getLabwareEntities,
   getPipetteEntities,
-  (labware, pipettes) => ({ labware, pipettes })
+  (labwareEntities, pipetteEntities) => ({ labwareEntities, pipetteEntities })
 )
 
 export const getUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSelector(
@@ -350,7 +346,13 @@ const getStepFormWithId = (state: BaseState, props: { stepId: StepIdType }) => {
 }
 
 export const makeGetArgsAndErrorsWithId = () => {
-  return createSelector(
+  return createSelector<
+    BaseState,
+    { stepId: StepIdType },
+    { stepArgs: CommandCreatorArgs | null, errors?: StepFormAndFieldErrors },
+    _,
+    _
+  >(
     getStepFormWithId,
     getHydrationContext,
     (stepForm, contextualState) => {
@@ -366,6 +368,7 @@ export const makeGetArgsAndErrorsWithId = () => {
 // TODO: Brian&Ian 2019-04-02 this is TEMPORARY, should be removed once legacySteps reducer is removed
 // only need it because stepType should exist evergreen outside of legacySteps but doesn't yet
 export const makeGetStepWithId = () => {
+  // $FlowFixMe: selector is untyped. hiding error due to TODO above
   return createSelector(
     getStepFormWithId,
     getLegacyStepWithId,
@@ -409,7 +412,7 @@ export const getArgsAndErrorsByStepId: Selector<{
 
 // TODO: BC&IL 2019-04-02 this is being recomputed every time any field in unsaved forms is changed
 // this should only be computed once when a form is opened
-export const getIsNewStepForm = createSelector(
+export const getIsNewStepForm: Selector<boolean> = createSelector(
   getUnsavedForm,
   getSavedStepForms,
   (formData, savedForms) =>

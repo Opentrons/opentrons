@@ -1,18 +1,52 @@
 // @flow
+import assert from 'assert'
 import isUndefined from 'lodash/isUndefined'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import omitBy from 'lodash/omitBy'
 import flow from 'lodash/flow'
-import { getPipetteCapacity } from '../../pipettes/pipetteData'
+import { getLabware, getPipetteNameSpecs } from '@opentrons/shared-data'
 import type {
   FileLabwareV1 as FileLabware,
   FilePipetteV1 as FilePipette,
 } from '@opentrons/shared-data'
-import type { PipetteEntities } from '../../step-forms'
 import type { FormPatch } from '../../steplist/actions'
 import type { PDProtocolFile } from '../../file-types'
 import type { FormData } from '../../form-types'
+
+type LegacyPipetteEntities = {
+  [pipetteId: string]: {
+    id: string,
+    tiprackModel: string,
+    mount: string,
+    name?: string,
+    model?: string,
+  },
+}
+
+function getPipetteCapacityLegacy(
+  pipette: $Values<LegacyPipetteEntities>
+): number {
+  // hacky model to name ('p10_single_v1.3' -> 'p10_single') fallback
+  const pipetteName = pipette.name || (pipette.model || '').split('_v')[0]
+  if (!pipetteName) {
+    throw new Error(
+      `expected pipette name or model in migration. Pipette: "${JSON.stringify(
+        pipette
+      )}"`
+    )
+  }
+  const specs = getPipetteNameSpecs(pipetteName)
+  const tiprackDef = getLabware(pipette.tiprackModel)
+  if (specs && tiprackDef && tiprackDef.metadata.tipVolume) {
+    return Math.min(specs.maxVolume, tiprackDef.metadata.tipVolume)
+  }
+  assert(
+    false,
+    `Expected spec and tiprack def for pipette ${pipette ? pipette.id : '???'}`
+  )
+  return NaN
+}
 
 // NOTE: these constants are copied here because
 // the default-values key did not exist for most protocols
@@ -35,7 +69,7 @@ export const initialDeckSetupStepForm = {
 function _updatePatchPathField(
   patch: FormPatch,
   rawForm: FormData,
-  pipetteEntities: PipetteEntities
+  pipetteEntities: LegacyPipetteEntities
 ) {
   const appliedPatch = { ...rawForm, ...patch }
   const { path, changeTip } = appliedPatch
@@ -49,7 +83,8 @@ function _updatePatchPathField(
   }
 
   const numericVolume = Number(appliedPatch.volume) || 0
-  const pipetteCapacity = getPipetteCapacity(
+  console.log({ pipetteEntities, appliedPatch })
+  const pipetteCapacity = getPipetteCapacityLegacy(
     pipetteEntities[appliedPatch.pipette]
   )
   let pipetteCapacityExceeded = numericVolume > pipetteCapacity

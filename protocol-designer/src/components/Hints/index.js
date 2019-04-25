@@ -13,12 +13,12 @@ import EXAMPLE_WATCH_LIQUIDS_MOVE_IMAGE from '../../images/example_watch_liquids
 import type { HintKey } from '../../tutorial'
 import type { BaseState, ThunkDispatch } from '../../types'
 
-type SP = { hint: ?HintKey }
-type DP = {
+type SP = {| hint: ?HintKey |}
+type DP = {|
   removeHint: (HintKey, boolean) => mixed,
   selectTerminalItem: TerminalItemId => mixed,
-}
-type Props = SP & DP
+|}
+type Props = {| ...SP, ...DP |}
 
 type State = { rememberDismissal: boolean }
 
@@ -32,12 +32,12 @@ class Hints extends React.Component<Props, State> {
     this.setState({ rememberDismissal: !this.state.rememberDismissal })
   }
 
-  makeHandleCloseClick = hint => {
+  makeHandleCloseClick = (hint: HintKey) => {
     const { rememberDismissal } = this.state
     return () => this.props.removeHint(hint, rememberDismissal)
   }
 
-  renderHintContents = hint => {
+  renderHintContents = (hint: HintKey) => {
     switch (hint) {
       case 'add_liquids_and_labware':
         return (
@@ -114,7 +114,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(stepsActions.selectTerminalItem(terminalId)),
 })
 
-export default connect(
+export default connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(Hints)

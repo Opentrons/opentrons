@@ -1,6 +1,6 @@
 // @flow
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { DefsByLabwareId } from './types'
+import type { LabwareDefByDefId } from './types'
 // TODO: Ian 2019-04-11 getAllDefinitions also exists (differently) in labware-library,
 // should reconcile differences & make a general util fn imported from shared-data
 
@@ -15,7 +15,7 @@ const definitionsContext = require.context(
 
 let definitions = null
 
-export function getAllDefinitions(): DefsByLabwareId {
+export function getAllDefinitions(): LabwareDefByDefId {
   // NOTE: unlike labware-library, no filtering out trashes here (we need 'em)
   // also, more convenient & performant to make a map {otId: def} not an array
   if (!definitions) {

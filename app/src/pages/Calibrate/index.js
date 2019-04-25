@@ -11,23 +11,21 @@ import { selectors as robotSelectors } from '../../robot'
 import CalibratePipettes from './Pipettes'
 import CalibrateLabware from './Labware'
 
-type SP = {
+type OP = {| match: Match |}
+
+type SP = {|
   nextPipette: Pipette,
   labware: Array<Labware>,
   nextLabware: Labware,
   isTipsProbed: boolean,
-}
+|}
 
-type Props = SP & {
-  match: Match,
-}
+type Props = { ...OP, ...SP }
 
-export default connect(mapStateToProps)(Calibrate)
+export default connect<Props, OP, SP, _, _, _>(mapStateToProps)(Calibrate)
 
 function Calibrate(props: Props) {
-  const {
-    match: { path },
-  } = props
+  const { path } = props.match
 
   return (
     <Switch>
@@ -47,7 +45,7 @@ function mapStateToProps(state: State): SP {
   }
 }
 
-function getRedirectUrl(props: Props) {
+function getRedirectUrl(props: Props): string {
   const { nextPipette, labware, nextLabware, isTipsProbed } = props
 
   if (!isTipsProbed && nextPipette) {

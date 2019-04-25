@@ -9,7 +9,7 @@
   },
   "name": "protocol-library-kludge",
   "private": true,
-  "version": "3.8.1",
+  "version": "3.8.2",
   "productName": "Opentrons Protocol Library",
   "description": "Protocol library stuff (WIP)",
   "main": "src/index.js",
@@ -19,7 +19,7 @@
   "homepage": "https://github.com/Opentrons/opentrons",
   "license": "Apache-2.0",
   "dependencies": {
-    "@opentrons/components": "3.8.1",
+    "@opentrons/components": "3.8.2",
     "classnames": "^2.2.5",
     "lodash": "^4.17.4",
     "react": "^16.6.3",
@@ -29,7 +29,7 @@
     "react-router-dom": "^4.1.1"
   },
   "devDependencies": {
-    "flow-bin": "^0.82.0",
+    "flow-bin": "^0.97.0",
     "flow-typed": "^2.5.1"
   }
 }

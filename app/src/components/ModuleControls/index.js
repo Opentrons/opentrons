@@ -37,7 +37,7 @@ type DP = {|
 
 type Props = { ...OP, ...SP, ...DP }
 
-export default connect(
+export default connect<Props, OP, SP, DP, State, Dispatch>(
   makeSTP,
   mapDTP
 )(ModuleControls)

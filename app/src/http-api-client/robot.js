@@ -51,8 +51,8 @@ type RobotMoveResponse = {
 }
 
 type RobotHomeRequest =
-  | { target: 'robot' }
-  | { target: 'pipette', mount: Mount }
+  | {| target: 'robot' |}
+  | {| target: 'pipette', mount: Mount |}
 
 type RobotHomeResponse = {
   message: string,
@@ -118,27 +118,31 @@ export function moveRobotTo(
   const { position, mount } = request
 
   return dispatch => {
+    // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
     dispatch(apiRequest(robot, MOVE, request))
 
-    return client(robot, 'GET', POSITIONS)
-      .then((response: RobotPositionsResponse) => {
-        const positionInfo = response.positions
-        const { target } = positionInfo[position]
-        const point =
-          position === 'change_pipette'
-            ? positionInfo[position][mount]
-            : positionInfo[position].point
+    return (
+      client(robot, 'GET', POSITIONS)
+        .then((response: RobotPositionsResponse) => {
+          const positionInfo = response.positions
+          const { target } = positionInfo[position]
+          const point =
+            position === 'change_pipette'
+              ? positionInfo[position][mount]
+              : positionInfo[position].point
 
-        let body = { target, point, mount }
-        if (request.pipette) body = { ...body, model: request.pipette.model }
+          let body = { target, point, mount }
+          if (request.pipette) body = { ...body, model: request.pipette.model }
 
-        return client(robot, 'POST', MOVE, body)
-      })
-      .then(
-        (resp: RobotMoveResponse) => apiSuccess(robot, MOVE, resp),
-        (err: ApiRequestError) => apiFailure(robot, MOVE, err)
-      )
-      .then(dispatch)
+          return client(robot, 'POST', MOVE, body)
+        })
+        .then(
+          (resp: RobotMoveResponse) => apiSuccess(robot, MOVE, resp),
+          (err: ApiRequestError) => apiFailure(robot, MOVE, err)
+        )
+        // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
+        .then(dispatch)
+    )
   }
 }
 
@@ -146,27 +150,35 @@ export function home(robot: RobotService, mount?: Mount): ThunkPromiseAction {
   return dispatch => {
     const body = mount ? { target: 'pipette', mount } : { target: 'robot' }
 
+    // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
     dispatch(apiRequest(robot, HOME, body))
 
-    return client(robot, 'POST', HOME, body)
-      .then(
-        (resp: RobotHomeResponse) => apiSuccess(robot, HOME, resp),
-        (err: ApiRequestError) => apiFailure(robot, HOME, err)
-      )
-      .then(dispatch)
+    return (
+      client(robot, 'POST', HOME, body)
+        .then(
+          (resp: RobotHomeResponse) => apiSuccess(robot, HOME, resp),
+          (err: ApiRequestError) => apiFailure(robot, HOME, err)
+        )
+        // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
+        .then(dispatch)
+    )
   }
 }
 
 export function fetchRobotLights(robot: RobotService): ThunkPromiseAction {
   return dispatch => {
+    // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
     dispatch(apiRequest(robot, LIGHTS, null))
 
-    return client(robot, 'GET', LIGHTS)
-      .then(
-        (resp: RobotLightsResponse) => apiSuccess(robot, LIGHTS, resp),
-        (err: ApiRequestError) => apiFailure(robot, LIGHTS, err)
-      )
-      .then(dispatch)
+    return (
+      client(robot, 'GET', LIGHTS)
+        .then(
+          (resp: RobotLightsResponse) => apiSuccess(robot, LIGHTS, resp),
+          (err: ApiRequestError) => apiFailure(robot, LIGHTS, err)
+        )
+        // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
+        .then(dispatch)
+    )
   }
 }
 
@@ -189,14 +201,18 @@ export function setRobotLights(
   const request: RobotLightsRequest = { on }
 
   return dispatch => {
+    // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
     dispatch(apiRequest(robot, LIGHTS, request))
 
-    return client(robot, 'POST', LIGHTS, request)
-      .then(
-        (resp: RobotLightsResponse) => apiSuccess(robot, LIGHTS, resp),
-        (err: ApiRequestError) => apiFailure(robot, LIGHTS, err)
-      )
-      .then(dispatch)
+    return (
+      client(robot, 'POST', LIGHTS, request)
+        .then(
+          (resp: RobotLightsResponse) => apiSuccess(robot, LIGHTS, resp),
+          (err: ApiRequestError) => apiFailure(robot, LIGHTS, err)
+        )
+        // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
+        .then(dispatch)
+    )
   }
 }
 

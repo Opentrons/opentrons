@@ -27,15 +27,19 @@ function getLabwareFieldForPositioningField(
   return fieldMap[fieldName]
 }
 
-type OP = { fieldName: TipOffsetFields, className?: string }
-type SP = {
+type OP = {| fieldName: TipOffsetFields, className?: string |}
+
+type SP = {|
   disabled: boolean,
   mmFromBottom: ?string,
   wellHeightMM: ?number,
-}
+|}
+
+type Props = { ...OP, ...SP }
 
 type TipPositionInputState = { isModalOpen: boolean }
-class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
+
+class TipPositionInput extends React.Component<Props, TipPositionInputState> {
   state: TipPositionInputState = { isModalOpen: false }
 
   handleOpen = () => {
@@ -84,6 +88,7 @@ class TipPositionInput extends React.Component<OP & SP, TipPositionInputState> {
               fieldName={fieldName}
               closeModal={this.handleClose}
               wellHeightMM={wellHeightMM}
+              // $FlowFixMe: mmFromBottom is typed as a number in TipPositionModal
               mmFromBottom={mmFromBottom}
               isOpen={this.state.isModalOpen}
             />
@@ -111,9 +116,8 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   let wellHeightMM = null
   const labwareId: ?string = rawForm && rawForm[labwareFieldName]
   if (labwareId != null) {
-    const labwareDef = stepFormSelectors.getLabwareDefByLabwareId(state)[
-      labwareId
-    ]
+    const labwareDef = stepFormSelectors.getLabwareEntities(state)[labwareId]
+      .def
 
     // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
     const firstWell = labwareDef.wells['A1']
@@ -127,4 +131,4 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-export default connect(mapSTP)(TipPositionInput)
+export default connect<Props, OP, SP, _, _, _>(mapSTP)(TipPositionInput)

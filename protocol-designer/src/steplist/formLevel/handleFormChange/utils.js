@@ -2,10 +2,13 @@
 import assert from 'assert'
 import round from 'lodash/round'
 import uniq from 'lodash/uniq'
-import { canPipetteUseLabware, getLabware } from '@opentrons/shared-data'
+import { canPipetteUseLabware } from '@opentrons/shared-data'
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
-import { getWellSetForMultichannelDeprecated } from '../../../well-selection/utils'
-import type { PipetteChannels } from '@opentrons/shared-data'
+import { getWellSetForMultichannel } from '../../../well-selection/utils'
+import type {
+  LabwareDefinition2,
+  PipetteChannels,
+} from '@opentrons/shared-data'
 import type { FormPatch } from '../../actions/types'
 import type { FormData, StepFieldName } from '../../../form-types'
 import type { LabwareEntities, PipetteEntities } from '../../../step-forms'
@@ -22,18 +25,18 @@ export function chainPatchUpdaters(
 // given an array of primary wells (for a multichannel), return all unique wells
 // included in that set. Used to convert multi to single.
 export function getAllWellsFromPrimaryWells(
-  primaryWells: ?Array<string>,
-  labwareType: ?string
+  primaryWells: Array<string>,
+  labwareDef: LabwareDefinition2
 ): Array<string> {
-  if (!labwareType || !primaryWells) {
-    return []
-  }
-
-  const _labwareType = labwareType // TODO Ian 2018-05-04 remove this weird flow workaround
-
   const allWells = primaryWells.reduce((acc: Array<string>, well: string) => {
-    const nextWellSet = getWellSetForMultichannelDeprecated(_labwareType, well)
+    const nextWellSet = getWellSetForMultichannel(labwareDef, well)
     // filter out any nulls (but you shouldn't get any)
+    if (!nextWellSet) {
+      console.warn(`got empty well set, something weird may be happening`, {
+        primaryWells,
+        labwareDef,
+      })
+    }
     return nextWellSet ? [...acc, ...nextWellSet] : acc
   }, [])
 
@@ -108,26 +111,18 @@ export function getDefaultWells(args: GetDefaultWellsArgs): Array<string> {
   )
     return []
 
-  const labwareType = labwareEntities[labwareId].type
+  const labwareDef = labwareEntities[labwareId].def
   const pipetteCanUseLabware = canPipetteUseLabware(
-    pipetteEntities[pipetteId].name,
-    labwareType
+    pipetteEntities[pipetteId].spec,
+    labwareDef
   )
   if (!pipetteCanUseLabware) return []
 
-  const labwareSpec = getLabware(labwareType)
-  assert(
-    labwareSpec,
-    `expected labwareSpec at this point in _getDefaultWells. labware id: ${labwareId}`
-  )
-
   const isSingleWellLabware =
-    labwareSpec &&
-    labwareSpec.ordering.length === 1 &&
-    labwareSpec.ordering[0].length === 1
+    labwareDef.ordering.length === 1 && labwareDef.ordering[0].length === 1
 
-  if (labwareSpec && isSingleWellLabware) {
-    const well = labwareSpec.ordering[0][0]
+  if (isSingleWellLabware) {
+    const well = labwareDef.ordering[0][0]
     assert(
       well === 'A1',
       `sanity check: expected single-well labware ${labwareId} to have only the well 'A1'`

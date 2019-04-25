@@ -32,6 +32,11 @@
   --size-third: calc(100% / 3);
   --size-two-thirds: calc(200% / 3);
 
+  /* main navigation specific width and height sizes */
+  --size-subdomain-nav: 2rem; /* 32px */
+  --size-main-nav: 5rem; /* 80px */
+  --size-total-nav: calc(var(--size-subdomain-nav) + var(--size-main-nav));
+
   /* aspect ratios */
   --aspect: {
     position: relative;

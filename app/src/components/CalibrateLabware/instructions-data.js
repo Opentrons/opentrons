@@ -324,7 +324,7 @@ export function getInstructionsByType(props: LabwareCalibrationProps) {
 }
 
 function getTypeKey(props: LabwareCalibrationProps) {
-  const { type, isTiprack } = props
+  const { type, isTiprack } = props.labware
   let typeKey
   if (isTiprack) {
     typeKey = 'tiprack'
@@ -341,9 +341,7 @@ function getTypeKey(props: LabwareCalibrationProps) {
 }
 
 function getChannelsKey(props: LabwareCalibrationProps) {
-  const {
-    calibrator: { channels },
-  } = props
+  const { channels } = props.calibrator
   const channelsKey = channels === 8 ? 'multi' : 'single'
   return channelsKey
 }

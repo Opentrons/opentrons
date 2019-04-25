@@ -14,22 +14,28 @@ import {
 } from '../../../step-forms'
 import FilePipettesModal from '../FilePipettesModal'
 import type { BaseState, ThunkDispatch } from '../../../types'
-import type { PipetteOnDeck } from '../../../step-forms'
+import type {
+  PipetteOnDeck,
+  FormPipettesByMount,
+  NormalizedPipette,
+} from '../../../step-forms'
 import type { StepIdType } from '../../../form-types'
 
 type Props = ElementProps<typeof FilePipettesModal>
 
-type SP = {
+type SP = {|
+  initialPipetteValues: FormPipettesByMount,
   _prevPipettes: { [pipetteId: string]: PipetteOnDeck },
   _orderedStepIds: Array<StepIdType>,
-}
+|}
 
-type OP = {
+type OP = {|
   closeModal: () => mixed,
-}
+|}
 
 const mapSTP = (state: BaseState): SP => {
   const initialPipettes = stepFormSelectors.getPipettesForEditPipetteForm(state)
+
   return {
     initialPipetteValues: initialPipettes,
     _prevPipettes: stepFormSelectors.getInitialDeckSetup(state).pipettes, // TODO: Ian 2019-01-02 when multi-step editing is supported, don't use initial deck state. Instead, show the pipettes available for the selected step range
@@ -57,7 +63,14 @@ const makeUpdatePipettes = (
 ) => ({ pipettes: newPipetteArray }) => {
   const prevPipetteIds = Object.keys(prevPipettes)
   let usedPrevPipettes: Array<string> = [] // IDs of pipettes in prevPipettes that were already put into nextPipettes
-  let nextPipettes: { [pipetteId: string]: PipetteOnDeck } = {}
+  let nextPipettes: {
+    [pipetteId: string]: {
+      mount: string,
+      name: string,
+      tiprackModel: string,
+      id: string,
+    },
+  } = {}
 
   // from array of pipettes from Edit Pipette form (with no IDs),
   // assign IDs and populate nextPipettes
@@ -68,23 +81,28 @@ const makeUpdatePipettes = (
         const alreadyUsed = usedPrevPipettes.some(usedId => usedId === id)
         return !alreadyUsed && prevPipette.name === newPipette.name
       })
-      const pipetteId: ?string = candidatePipetteIds[0]
+      let pipetteId: ?string = candidatePipetteIds[0]
       if (pipetteId) {
         // update used pipette list
         usedPrevPipettes.push(pipetteId)
-        nextPipettes[pipetteId] = newPipette
+        nextPipettes[pipetteId] = { ...newPipette, id: pipetteId }
       } else {
-        nextPipettes[uuid()] = newPipette
+        const newId = uuid()
+        nextPipettes[newId] = { ...newPipette, id: newId }
       }
     }
   })
 
   dispatch(
     stepFormActions.createPipettes(
-      mapValues(nextPipettes, (p: $Values<typeof nextPipettes>) => ({
-        name: p.name,
-        tiprackModel: p.tiprackModel,
-      }))
+      mapValues(
+        nextPipettes,
+        (p: $Values<typeof nextPipettes>): NormalizedPipette => ({
+          id: p.id,
+          name: p.name,
+          tiprackModel: p.tiprackModel,
+        })
+      )
     )
   )
 
@@ -160,7 +178,7 @@ const mergeProps = (
   }
 }
 
-export default connect(
+export default connect<Props, OP, SP, {||}, _, _>(
   mapSTP,
   null,
   mergeProps

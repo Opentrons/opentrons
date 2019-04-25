@@ -12,14 +12,15 @@ import type { LabwareComponentProps } from '@opentrons/components'
 import type { State } from '../../types'
 import type { SessionModule } from '../../robot'
 
-type OP = LabwareComponentProps
+type OP = $Exact<LabwareComponentProps>
 
-type Props = {
-  module: ?SessionModule,
-  present: boolean,
-}
+type SP = {| module: ?SessionModule, present: boolean |}
 
-export default connect(makeMapStateToProps)(ReviewModuleItem)
+type Props = { ...OP, ...SP }
+
+export default connect<Props, OP, SP, _, _, _>(makeMapStateToProps)(
+  ReviewModuleItem
+)
 
 function ReviewModuleItem(props: Props) {
   if (!props.module) return null
@@ -32,7 +33,7 @@ function ReviewModuleItem(props: Props) {
   )
 }
 
-function makeMapStateToProps(): (state: State, ownProps: OP) => Props {
+function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
   // TODO(mc, 2018-07-23): this logic is duplicated because can only get props
   // into Deck.props.LabwareComponent via redux
   const getRobotModules = makeGetRobotModules()

@@ -8,6 +8,11 @@ import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 
+import {
+  rootReducer as labwareDefsRootReducer,
+  type RootState as LabwareDefsRootState,
+} from '../../labware-defs'
+
 import { INITIAL_DECK_SETUP_STEP_ID, FIXED_TRASH_ID } from '../../constants.js'
 import { getPDMetadata } from '../../file-types'
 import {
@@ -15,6 +20,10 @@ import {
   handleFormChange,
 } from '../../steplist/formLevel'
 import { cancelStepForm } from '../../steplist/actions'
+import {
+  _getPipetteEntitiesRootState,
+  _getLabwareEntitiesRootState,
+} from '../selectors'
 
 import type { LoadFileAction } from '../../load-file'
 import type {
@@ -41,18 +50,13 @@ import type {
   SaveStepFormAction,
 } from '../../steplist/actions'
 import type { StepItemData } from '../../steplist/types'
-import type { PipetteEntity, LabwareEntities } from '../types'
+import type { NormalizedPipetteById, NormalizedLabwareById } from '../types'
 import type {
   CreatePipettesAction,
   DeletePipettesAction,
   SubstituteStepFormPipettesAction,
 } from '../actions'
-import {
-  addSpecsToPipetteInvariantProps,
-  getIdsInRange,
-  getLabwareIdInSlot,
-  pipetteModelToName,
-} from '../utils'
+import { getIdsInRange, getLabwareIdInSlot, pipetteModelToName } from '../utils'
 
 type FormState = FormData | null
 
@@ -76,8 +80,8 @@ export const unsavedForm = (
       const fieldUpdate = handleFormChange(
         action.payload.update,
         unsavedFormState,
-        addSpecsToPipetteInvariantProps(rootState.pipetteInvariantProperties),
-        rootState.labwareInvariantProperties
+        _getPipetteEntitiesRootState(rootState),
+        _getLabwareEntitiesRootState(rootState)
       )
       return {
         ...unsavedFormState,
@@ -115,10 +119,8 @@ export const unsavedForm = (
           ...handleFormChange(
             { pipette: substitutionMap[unsavedFormState.pipette] },
             unsavedFormState,
-            addSpecsToPipetteInvariantProps(
-              rootState.pipetteInvariantProperties
-            ),
-            rootState.labwareInvariantProperties
+            _getPipetteEntitiesRootState(rootState),
+            _getLabwareEntitiesRootState(rootState)
           ),
         }
       }
@@ -261,10 +263,8 @@ export const savedStepForms = (
                 ...handleFormChange(
                   { [fieldName]: null },
                   acc,
-                  addSpecsToPipetteInvariantProps(
-                    rootState.pipetteInvariantProperties
-                  ),
-                  rootState.labwareInvariantProperties
+                  _getPipetteEntitiesRootState(rootState),
+                  _getLabwareEntitiesRootState(rootState)
                 ),
               }
             } else {
@@ -297,10 +297,8 @@ export const savedStepForms = (
             ...handleFormChange(
               { pipette: null },
               form,
-              addSpecsToPipetteInvariantProps(
-                rootState.pipetteInvariantProperties
-              ),
-              rootState.labwareInvariantProperties
+              _getPipetteEntitiesRootState(rootState),
+              _getLabwareEntitiesRootState(rootState)
             ),
           }
         }
@@ -328,8 +326,8 @@ export const savedStepForms = (
         const updatedFields = handleFormChange(
           { pipette: substitutionMap[prevStepForm.pipette] },
           prevStepForm,
-          addSpecsToPipetteInvariantProps(rootState.pipetteInvariantProperties),
-          rootState.labwareInvariantProperties
+          _getPipetteEntitiesRootState(rootState),
+          _getLabwareEntitiesRootState(rootState)
         )
 
         return {
@@ -368,10 +366,8 @@ export const savedStepForms = (
           ...handleFormChange(
             action.payload.update,
             previousForm,
-            addSpecsToPipetteInvariantProps(
-              rootState.pipetteInvariantProperties
-            ),
-            rootState.labwareInvariantProperties
+            _getPipetteEntitiesRootState(rootState),
+            _getLabwareEntitiesRootState(rootState)
           ),
         },
       }
@@ -395,15 +391,18 @@ export const savedStepForms = (
   }
 }
 
-const initialLabwareState: LabwareEntities = {
+const initialLabwareState: NormalizedLabwareById = {
   [FIXED_TRASH_ID]: { type: 'fixed-trash' },
 }
 
 // MIGRATION NOTE: copied from `containers` reducer. Slot + UI stuff stripped out.
-export const labwareInvariantProperties = handleActions(
+export const labwareInvariantProperties = handleActions<
+  NormalizedLabwareById,
+  *
+>(
   {
     CREATE_CONTAINER: (
-      state: LabwareEntities,
+      state: NormalizedLabwareById,
       action: CreateContainerAction
     ) => {
       return {
@@ -412,7 +411,7 @@ export const labwareInvariantProperties = handleActions(
       }
     },
     DUPLICATE_LABWARE: (
-      state: LabwareEntities,
+      state: NormalizedLabwareById,
       action: DuplicateLabwareAction
     ) => {
       return {
@@ -423,15 +422,15 @@ export const labwareInvariantProperties = handleActions(
       }
     },
     DELETE_CONTAINER: (
-      state: LabwareEntities,
+      state: NormalizedLabwareById,
       action: DeleteContainerAction
-    ): LabwareEntities => {
+    ): NormalizedLabwareById => {
       return omit(state, action.payload.labwareId)
     },
     LOAD_FILE: (
-      state: LabwareEntities,
+      state: NormalizedLabwareById,
       action: LoadFileAction
-    ): LabwareEntities => {
+    ): NormalizedLabwareById => {
       const { file } = action.payload
       return mapValues(
         file.labware,
@@ -445,15 +444,16 @@ export const labwareInvariantProperties = handleActions(
 )
 
 const initialPipetteState = {}
-export type PipetteInvariantState = {
-  [pipetteId: string]: $Diff<PipetteEntity, { spec: * }>,
-}
-export const pipetteInvariantProperties = handleActions(
+
+export const pipetteInvariantProperties = handleActions<
+  NormalizedPipetteById,
+  *
+>(
   {
     LOAD_FILE: (
-      state: PipetteInvariantState,
+      state: NormalizedPipetteById,
       action: LoadFileAction
-    ): PipetteInvariantState => {
+    ): NormalizedPipetteById => {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
       return mapValues(
@@ -461,13 +461,14 @@ export const pipetteInvariantProperties = handleActions(
         (
           filePipette: FilePipette,
           pipetteId: string
-        ): $Values<PipetteInvariantState> => {
+        ): $Values<NormalizedPipetteById> => {
           const tiprackModel = metadata.pipetteTiprackAssignments[pipetteId]
           assert(
             tiprackModel,
             `expected tiprackModel in file metadata for pipette ${pipetteId}`
           )
           return {
+            id: pipetteId,
             name: filePipette.name || pipetteModelToName(filePipette.model),
             tiprackModel,
           }
@@ -475,18 +476,18 @@ export const pipetteInvariantProperties = handleActions(
       )
     },
     CREATE_PIPETTES: (
-      state: PipetteInvariantState,
+      state: NormalizedPipetteById,
       action: CreatePipettesAction
-    ): PipetteInvariantState => {
+    ): NormalizedPipetteById => {
       return {
         ...state,
         ...action.payload,
       }
     },
     DELETE_PIPETTES: (
-      state: PipetteInvariantState,
+      state: NormalizedPipetteById,
       action: DeletePipettesAction
-    ): PipetteInvariantState => {
+    ): NormalizedPipetteById => {
       return omit(state, action.payload)
     },
   },
@@ -495,7 +496,7 @@ export const pipetteInvariantProperties = handleActions(
 
 type OrderedStepIdsState = Array<StepIdType>
 const initialOrderedStepIdsState = []
-export const orderedStepIds = handleActions(
+export const orderedStepIds = handleActions<OrderedStepIdsState, *>(
   {
     ADD_STEP: (state: OrderedStepIdsState, action: AddStepAction) => [
       ...state,
@@ -550,7 +551,7 @@ export const orderedStepIds = handleActions(
 // move to not having "pristine" steps
 type LegacyStepsState = { [StepIdType]: StepItemData }
 const initialLegacyStepState: LegacyStepsState = {}
-export const legacySteps = handleActions(
+export const legacySteps = handleActions<LegacyStepsState, *>(
   {
     ADD_STEP: (state, action: AddStepAction): LegacyStepsState => ({
       ...state,
@@ -601,8 +602,9 @@ export const legacySteps = handleActions(
 
 export type RootState = {
   orderedStepIds: OrderedStepIdsState,
-  labwareInvariantProperties: LabwareEntities,
-  pipetteInvariantProperties: PipetteInvariantState,
+  labwareDefs: LabwareDefsRootState,
+  labwareInvariantProperties: NormalizedLabwareById,
+  pipetteInvariantProperties: NormalizedPipetteById,
   legacySteps: LegacyStepsState,
   savedStepForms: SavedStepFormState,
   unsavedForm: FormState,
@@ -623,6 +625,7 @@ const rootReducer = (state: RootState, action: any) => {
       prevStateFallback.pipetteInvariantProperties,
       action
     ),
+    labwareDefs: labwareDefsRootReducer(prevStateFallback.labwareDefs, action),
     legacySteps: legacySteps(prevStateFallback.legacySteps, action),
     // 'forms' reducers get full rootReducer state
     savedStepForms: savedStepForms(state, action),

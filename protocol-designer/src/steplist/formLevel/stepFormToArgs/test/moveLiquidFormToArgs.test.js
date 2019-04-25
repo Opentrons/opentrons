@@ -13,7 +13,9 @@ jest.mock('../../../utils')
 describe('move liquid step form -> command creator args', () => {
   let hydratedForm: ?HydratedMoveLiquidFormData = null
   const sourceLabwareType = '96-flat'
+  const sourceLabwareDef = { otId: 'sourceLabwareMock' }
   const destLabwareType = '96-deep-well'
+  const destLabwareDef = { otId: 'destLabwareMock' }
   beforeEach(() => {
     // $FlowFixMe: mock methods
     getOrderedWells.mockClear()
@@ -31,7 +33,11 @@ describe('move liquid step form -> command creator args', () => {
         volume: 10,
         path: 'single',
         changeTip: 'always',
-        aspirate_labware: { id: 'sourceLabwareId', type: sourceLabwareType },
+        aspirate_labware: {
+          id: 'sourceLabwareId',
+          type: sourceLabwareType,
+          def: sourceLabwareDef,
+        },
         aspirate_wells: ['B1'],
         aspirate_wellOrder_first: 'l2r',
         aspirate_wellOrder_second: 't2b',
@@ -43,7 +49,11 @@ describe('move liquid step form -> command creator args', () => {
         aspirate_mix_volume: null,
         aspirate_mix_times: null,
 
-        dispense_labware: { id: 'destLabwareId', type: destLabwareType },
+        dispense_labware: {
+          id: 'destLabwareId',
+          type: destLabwareType,
+          def: destLabwareDef,
+        },
         dispense_wells: ['B2'],
         dispense_wellOrder_first: 'r2l',
         dispense_wellOrder_second: 'b2t',
@@ -72,13 +82,13 @@ describe('move liquid step form -> command creator args', () => {
     expect(getOrderedWells).toHaveBeenCalledTimes(2)
     expect(getOrderedWells).toHaveBeenCalledWith(
       ['B1'],
-      sourceLabwareType,
+      sourceLabwareDef,
       'l2r',
       't2b'
     )
     expect(getOrderedWells).toHaveBeenCalledWith(
       ['B2'],
-      destLabwareType,
+      destLabwareDef,
       'r2l',
       'b2t'
     )

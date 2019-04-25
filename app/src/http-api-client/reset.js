@@ -47,15 +47,19 @@ export type ResetState = {|
 
 export function fetchResetOptions(robot: RobotService): ThunkPromiseAction {
   return dispatch => {
+    // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
     dispatch(apiRequest(robot, OPTIONS_PATH, null))
 
-    return client(robot, 'GET', OPTIONS_PATH)
-      .then(
-        (resp: FetchResetOptionsResponse) =>
-          apiSuccess(robot, OPTIONS_PATH, resp),
-        (err: ApiRequestError) => apiFailure(robot, OPTIONS_PATH, err)
-      )
-      .then(dispatch)
+    return (
+      client(robot, 'GET', OPTIONS_PATH)
+        .then(
+          (resp: FetchResetOptionsResponse) =>
+            apiSuccess(robot, OPTIONS_PATH, resp),
+          (err: ApiRequestError) => apiFailure(robot, OPTIONS_PATH, err)
+        )
+        // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
+        .then(dispatch)
+    )
   }
 }
 
@@ -65,14 +69,18 @@ export function resetRobotData(
 ): ThunkPromiseAction {
   const request: ResetRobotRequest = options
   return dispatch => {
+    // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
     dispatch(apiRequest(robot, RESET_PATH, request))
 
-    return client(robot, 'POST', RESET_PATH, request)
-      .then(
-        (resp: ResetRobotResponse) => apiSuccess(robot, RESET_PATH, resp),
-        (err: ApiRequestError) => apiFailure(robot, RESET_PATH, err)
-      )
-      .then(dispatch)
+    return (
+      client(robot, 'POST', RESET_PATH, request)
+        .then(
+          (resp: ResetRobotResponse) => apiSuccess(robot, RESET_PATH, resp),
+          (err: ApiRequestError) => apiFailure(robot, RESET_PATH, err)
+        )
+        // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
+        .then(dispatch)
+    )
   }
 }
 
@@ -96,6 +104,7 @@ export function makeGetRobotResetRequest() {
     ResetRobotRequest
   > = createSelector(
     getRobotApiState,
+    // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
     state => state[RESET_PATH] || { inProgress: false }
   )
   return selector

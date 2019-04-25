@@ -183,5 +183,5 @@ async def remove(request: web.Request) -> web.Response:
         data={
             'message': f'Key {requested_hash} deleted. '
             'Restart robot to take effect',
-            'restart_url': '/server/update/restart'},
+            'restart_url': '/server/restart'},
         status=200)

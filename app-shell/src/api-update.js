@@ -66,8 +66,7 @@ function getVersionFromFilename(filename: string): string {
 
   assert(match, `could not parse version from "${filename}"`)
 
-  // $FlowFixMe: assert above means `match` exists here
-  const [baseVersion, shortLabel, labelVersion] = match.slice(1)
+  const [baseVersion, shortLabel, labelVersion] = (match || []).slice(1)
   const label =
     shortLabel && labelVersion
       ? `-${SHORT_LABEL_TO_LABEL[shortLabel]}.${labelVersion}`

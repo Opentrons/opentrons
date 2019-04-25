@@ -15,26 +15,23 @@ import type { BaseState, ThunkDispatch } from '../../types'
 
 type Props = React.ElementProps<typeof FileSidebar>
 
-type SP = {
+type SP = {|
   canDownload: boolean,
   downloadData: ?{
     fileData: Object,
     fileName: string,
   },
-}
-
-type MP = {
   _canCreateNew: ?boolean,
   _hasUnsavedChanges: ?boolean,
-}
+|}
 
-export default connect(
+export default connect<Props, {||}, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps
 )(FileSidebar)
 
-function mapStateToProps(state: BaseState): SP & MP {
+function mapStateToProps(state: BaseState): SP {
   const protocolName =
     fileDataSelectors.getFileMetadata(state)['protocol-name'] || 'untitled'
   const fileData = fileDataSelectors.createFile(state)
@@ -55,7 +52,7 @@ function mapStateToProps(state: BaseState): SP & MP {
 }
 
 function mergeProps(
-  stateProps: SP & MP,
+  stateProps: SP,
   dispatchProps: { dispatch: ThunkDispatch<*> }
 ): Props {
   const {

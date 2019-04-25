@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.8.2"></a>
+## [3.8.2](https://github.com/Opentrons/opentrons/compare/v3.8.1...v3.8.2) (2019-04-23)
+
+
+### Bug Fixes
+
+* **api:** Do not sleep in simulated delays ([#3347](https://github.com/Opentrons/opentrons/issues/3347)) ([e12e200](https://github.com/Opentrons/opentrons/commit/e12e200)), closes [#3346](https://github.com/Opentrons/opentrons/issues/3346)
+* **api:** Remove module load regression in V2 ([#3288](https://github.com/Opentrons/opentrons/issues/3288)) ([7fe143a](https://github.com/Opentrons/opentrons/commit/7fe143a))
+
+
+### Features
+
+* **api:** Add Geometry Logic For Thermocycler Configurations ([#3266](https://github.com/Opentrons/opentrons/issues/3266)) ([4d8e463](https://github.com/Opentrons/opentrons/commit/4d8e463))
+* **api:** define & execute v3 json protocols ([#3312](https://github.com/Opentrons/opentrons/issues/3312)) ([988407d](https://github.com/Opentrons/opentrons/commit/988407d)), closes [#3110](https://github.com/Opentrons/opentrons/issues/3110)
+* **api:** publish pause and delay commands in python and JSON ([#3310](https://github.com/Opentrons/opentrons/issues/3310)) ([5656d65](https://github.com/Opentrons/opentrons/commit/5656d65)), closes [#3308](https://github.com/Opentrons/opentrons/issues/3308)
+* **api:** validate JSON protocols before executing ([#3318](https://github.com/Opentrons/opentrons/issues/3318)) ([9c15f7d](https://github.com/Opentrons/opentrons/commit/9c15f7d)), closes [#3250](https://github.com/Opentrons/opentrons/issues/3250)
+* **api:** wire up TC deactivate, and add module cmd exec endpoint ([#3264](https://github.com/Opentrons/opentrons/issues/3264)) ([483122a](https://github.com/Opentrons/opentrons/commit/483122a)), closes [#2981](https://github.com/Opentrons/opentrons/issues/2981)
+* **update-server:** add buildroot migration ([#3321](https://github.com/Opentrons/opentrons/issues/3321)) ([76d6b28](https://github.com/Opentrons/opentrons/commit/76d6b28)), closes [#2880](https://github.com/Opentrons/opentrons/issues/2880) [#2881](https://github.com/Opentrons/opentrons/issues/2881)
+
+
+
+
+
 <a name="3.8.1"></a>
 ## [3.8.1](https://github.com/Opentrons/opentrons/compare/v3.8.0...v3.8.1) (2019-03-29)
 

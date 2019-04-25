@@ -5,7 +5,14 @@ import { push, goBack } from 'react-router-redux'
 import { Switch, Route, withRouter } from 'react-router'
 
 import type { State, Dispatch } from '../../types'
-import type { OP, SP, DP, CalibrateDeckProps, CalibrationStep } from './types'
+import type {
+  WithRouterOP,
+  OP,
+  SP,
+  DP,
+  CalibrateDeckProps,
+  CalibrationStep,
+} from './types'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { chainActions } from '../../util'
@@ -15,6 +22,7 @@ import {
   home,
   startDeckCalibration,
   deckCalibrationCommand,
+  clearDeckCalibration,
   makeGetDeckCalibrationCommandState,
   makeGetDeckCalibrationStartState,
 } from '../../http-api-client'
@@ -33,8 +41,8 @@ const BAD_PIPETTE_ERROR = 'Unexpected pipette response from robot'
 const ERROR_DESCRIPTION =
   'An unexpected error has cleared your deck calibration progress, please try again.'
 
-export default withRouter(
-  connect(
+export default withRouter<WithRouterOP>(
+  connect<CalibrateDeckProps, OP, SP, _, _, _>(
     makeMapStateToProps,
     mapDispatchToProps
   )(CalibrateDeck)
@@ -45,7 +53,7 @@ function CalibrateDeck(props: CalibrateDeckProps) {
     startRequest,
     commandRequest,
     pipetteProps,
-    parentUrl,
+    exitError,
     match: { path },
   } = props
 
@@ -53,7 +61,7 @@ function CalibrateDeck(props: CalibrateDeckProps) {
     return (
       <ErrorModal
         description={ERROR_DESCRIPTION}
-        closeUrl={parentUrl}
+        close={exitError}
         error={{ name: 'BadData', message: BAD_PIPETTE_ERROR }}
       />
     )
@@ -63,7 +71,7 @@ function CalibrateDeck(props: CalibrateDeckProps) {
     return (
       <ErrorModal
         description={ERROR_DESCRIPTION}
-        closeUrl={parentUrl}
+        close={exitError}
         error={commandRequest.error}
       />
     )
@@ -82,25 +90,27 @@ function CalibrateDeck(props: CalibrateDeckProps) {
 
             // conflict: token already issued
             if (status === 409) {
-              return <InUseModal {...props} />
+              return (
+                <InUseModal forceStart={props.forceStart} close={exitError} />
+              )
             }
 
             // forbidden: no pipette attached
             if (status === 403) {
-              return <NoPipetteModal {...props} />
+              return <NoPipetteModal close={exitError} />
             }
 
             return (
               <ErrorModal
                 description={ERROR_DESCRIPTION}
-                closeUrl={parentUrl}
+                close={exitError}
                 error={error}
               />
             )
           }
 
           if (pipetteProps && pipetteProps.pipette) {
-            return <ClearDeckAlert {...props} {...pipetteProps} />
+            return <ClearDeckAlert {...props} />
           }
 
           return null
@@ -185,6 +195,9 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
           home(robot)
         )
       ),
+    // exit from error modal
+    exitError: () =>
+      dispatch(chainActions(clearDeckCalibration(robot), push(parentUrl))),
     // cancel button click in exit alert modal
     back: () => dispatch(goBack()),
   }

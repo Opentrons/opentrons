@@ -7,12 +7,24 @@ import { updateReducer } from './update'
 import { apiUpdateReducer } from './api-update'
 
 import type { Service } from '@opentrons/discovery-client'
-import type { Middleware, ThunkAction } from '../types'
+import type {
+  Middleware,
+  ThunkAction,
+  Action,
+  Dispatch,
+  GetState,
+} from '../types'
 import type { ViewableRobot } from '../discovery'
 import type { Config } from '../config'
 import type { ShellUpdateAction } from './update'
 
-export type ShellAction = ShellUpdateAction
+type ShellLogsDownloadAction = {|
+  type: 'shell:DOWNLOAD_LOGS',
+  payload: {| logUrls: Array<string> |},
+  meta: {| shell: true |},
+|}
+
+export type ShellAction = ShellUpdateAction | ShellLogsDownloadAction
 
 const {
   ipcRenderer,
@@ -32,7 +44,7 @@ const API_RELEASE_NOTES = CURRENT_RELEASE_NOTES.replace(
 )
 export { CURRENT_VERSION, CURRENT_RELEASE_NOTES, API_RELEASE_NOTES }
 
-export const shellReducer = combineReducers({
+export const shellReducer = combineReducers<_, Action>({
   update: updateReducer,
   apiUpdate: apiUpdateReducer,
 })
@@ -63,7 +75,7 @@ export function getShellRobots(): Array<Service> {
 }
 
 export function downloadLogs(robot: ViewableRobot): ThunkAction {
-  return (dispatch, getState) => {
+  return (dispatch: Dispatch, getState: GetState) => {
     const logPaths = robot.health && robot.health.logs
 
     if (logPaths) {

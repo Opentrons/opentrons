@@ -239,10 +239,8 @@ describe('updateStepFormKeys', () => {
         )
         each(
           migratedFile['designer-application'].data.savedStepForms,
-          stepForm => {
-            console.log({ fieldName, addedFields, stepForm })
+          stepForm =>
             expect(stepForm[fieldName]).toEqual(addedFields[fieldName])
-          }
         )
       })
     })

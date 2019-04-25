@@ -1,7 +1,6 @@
 // @flow
 // info panel for labware calibration page
 import * as React from 'react'
-import type { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 import capitalize from 'lodash/capitalize'
@@ -9,33 +8,30 @@ import capitalize from 'lodash/capitalize'
 import {
   selectors as robotSelectors,
   actions as robotActions,
-  type Mount,
-  type Labware,
-  type LabwareType,
 } from '../../robot'
 
 import { PrimaryButton } from '@opentrons/components'
 import CalibrationInfoBox from '../CalibrationInfoBox'
 import CalibrationInfoContent from '../CalibrationInfoContent'
 
+import type { Mount, Labware, LabwareType } from '../../robot'
+import type { State, Dispatch } from '../../types'
+
 // TODO(mc, 2018-02-05): match screens instead of using this old component
 // import ConfirmCalibrationPrompt from '../deck/ConfirmCalibrationPrompt'
 
-type OwnProps = {
-  labware: ?Labware,
-}
+type OP = {| labware: ?Labware |}
 
-type StateProps = {
+type SP = {|
   _buttonTarget: ?Labware,
   _buttonTargetIsNext: boolean,
   _calibratorMount: ?Mount,
-}
+|}
 
-type DispatchProps = {
-  dispatch: Dispatch<*>,
-}
+type DP = {| dispatch: Dispatch |}
 
-type Props = OwnProps & {
+type Props = {
+  ...OP,
   button: ?{
     type: LabwareType,
     isNext: boolean,
@@ -44,7 +40,7 @@ type Props = OwnProps & {
   },
 }
 
-export default connect(
+export default connect<Props, OP, SP, {||}, State, Dispatch>(
   mapStateToProps,
   null,
   mergeProps
@@ -94,7 +90,7 @@ function InfoBox(props: Props) {
   )
 }
 
-function mapStateToProps(state, ownProps: OwnProps): StateProps {
+function mapStateToProps(state: State, ownProps: OP): SP {
   const { labware } = ownProps
   const _nextLabware =
     !labware || labware.calibration === 'confirmed'
@@ -116,11 +112,7 @@ function mapStateToProps(state, ownProps: OwnProps): StateProps {
   }
 }
 
-function mergeProps(
-  stateProps: StateProps,
-  dispatchProps: DispatchProps,
-  ownProps: OwnProps
-): Props {
+function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   const { _buttonTarget, _buttonTargetIsNext, _calibratorMount } = stateProps
   const { dispatch } = dispatchProps
   const targetConfirmed = _buttonTarget && _buttonTarget.confirmed
@@ -137,6 +129,7 @@ function mergeProps(
           dispatch(robotActions.moveTo(_calibratorMount, _buttonTarget.slot))
           dispatch(push(`/calibrate/labware/${_buttonTarget.slot}`))
         } else if (_calibratorMount) {
+          // $FlowFixMe: robotActions.returnTip is not typed
           dispatch(robotActions.returnTip(_calibratorMount))
           dispatch(push(`/run`))
         }

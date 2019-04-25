@@ -9,26 +9,27 @@ import { startDeckCalibration } from '../../http-api-client'
 import { Card, OutlineButton } from '@opentrons/components'
 import { CardContentFlex, CardContentFull } from '../layout'
 
+import type { Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery'
 
-type OP = {
+type OP = {|
   robot: ViewableRobot,
   calibrateDeckUrl: string,
   disabled: boolean,
-}
+|}
 
 type DP = {|
   start: () => mixed,
 |}
 
-type Props = { ...$Exact<OP>, ...DP }
+type Props = { ...OP, ...DP }
 
 const TITLE = 'Deck Calibration'
 // const LAST_RUN_LABEL = 'Last Run'
 const CALIBRATION_MESSAGE =
   'Calibrate your robot to initial factory settings to ensure accuracy.'
 
-export default connect(
+export default connect<Props, OP, _, _, _, _>(
   null,
   mapDispatchToProps
 )(CalibrationCard)

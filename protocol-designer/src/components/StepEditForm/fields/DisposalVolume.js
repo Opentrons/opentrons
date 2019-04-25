@@ -22,12 +22,14 @@ import type { BaseState } from '../../../types'
 import type { FocusHandlers } from '../types'
 import styles from '../StepEditForm.css'
 
-type SP = {
+type OP = {| focusHandlers: FocusHandlers |}
+
+type SP = {|
   disposalDestinationOptions: Options,
   maxDisposalVolume: ?number,
-}
+|}
 
-type Props = SP & { focusHandlers: FocusHandlers }
+type Props = { ...OP, ...SP }
 
 const DisposalVolumeField = (props: Props) => (
   <FormGroup label={i18n.t('form.step_edit_form.multiDispenseOptionsLabel')}>
@@ -120,4 +122,4 @@ const mapSTP = (state: BaseState): SP => {
   }
 }
 
-export default connect(mapSTP)(DisposalVolumeField)
+export default connect<Props, OP, SP, _, _, _>(mapSTP)(DisposalVolumeField)

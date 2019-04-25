@@ -79,11 +79,10 @@ const updatePatchOnPipetteChannelChange = (
   } else if (multiToSingle) {
     // multi-channel to single-channel: convert primary wells to all wells
     const labwareId = appliedPatch.labware
-    const labwareType =
-      labwareId && labwareEntities[labwareId] && labwareEntities[labwareId].type
+    const labwareDef = labwareEntities[labwareId].def
 
     update = {
-      wells: getAllWellsFromPrimaryWells(appliedPatch.wells, labwareType),
+      wells: getAllWellsFromPrimaryWells(appliedPatch.wells, labwareDef),
     }
   }
   return { ...patch, ...update }
