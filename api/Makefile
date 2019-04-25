@@ -24,6 +24,10 @@ pipenv_opts += $(and $(CI),--keep-outdated --clear)
 wheel_file = dist/opentrons-$(shell $(python) ../scripts/python_build_utils.py api normalize_version)-py2.py3-none-any.whl
 wheel_pattern := dist/opentrons-%-py2.py3-none-any.whl
 
+# These variables are for simulating python protocols
+sim_log_level ?= info
+simfile ?=
+
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
 # make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
@@ -128,6 +132,10 @@ local-install: wheel
 .PHONY: local-shell
 local-shell: local-install
 	pipenv shell
+
+.PHONY: simulate
+simulate: local-install
+	-$(python) -m opentrons.simulate -l $(sim_log_level) $(simfile)
 
 .PHONY: deploy-staging
 deploy-staging: wheel
