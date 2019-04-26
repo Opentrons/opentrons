@@ -8,7 +8,7 @@
     "email": "engineering@opentrons.com"
   },
   "name": "protocol-designer",
-  "productName": "Opentrons Protocol Designer Prototype",
+  "productName": "Opentrons Protocol Designer BETA",
   "private": true,
   "version": "3.8.2",
   "description": "Protocol designer app",
