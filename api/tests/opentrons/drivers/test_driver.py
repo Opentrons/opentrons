@@ -319,6 +319,10 @@ def test_steps_per_mm(smoothie, monkeypatch):
     assert smoothie.steps_per_mm == {}
     smoothie._setup()
     assert smoothie.steps_per_mm == DEFAULT_STEPS_PER_MM
+    smoothie.update_steps_per_mm({'Z': 450})
+    expected = DEFAULT_STEPS_PER_MM
+    expected['Z'] = 450
+    assert smoothie.steps_per_mm == expected
 
 
 def test_set_acceleration(smoothie, monkeypatch):
