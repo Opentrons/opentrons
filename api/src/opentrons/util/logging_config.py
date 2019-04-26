@@ -48,7 +48,11 @@ def _balena_config(level_value: int) -> Dict[str, Any]:
                 'handlers': ['serial'],
                 'level': logging.DEBUG,
                 'propagate': False
-            }
+            },
+            '__main__': {
+                'handlers': ['api'],
+                'level': level_value
+            },
         }
     }
 
@@ -87,6 +91,10 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
             'opentrons': {
                 'handlers': ['api'],
                 'level': level_value,
+            },
+            '__main__': {
+                'handlers': ['api'],
+                'level': level_value
             },
         },
 
