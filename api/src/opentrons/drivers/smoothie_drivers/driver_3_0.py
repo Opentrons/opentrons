@@ -448,6 +448,15 @@ class SmoothieDriver_3_0_0:
             'home': 'M365.0'}
 
         res_msg = f'The following configs were updated for {axis}: '
+
+        def _parse_command(result):
+            # ensure smoothie received code and changed value through
+            # return message. Format of return message:
+            # <Axis> (or E for endstop) updated <Value>
+            nonlocal res_msg
+            arr_result = result.strip().split(' ')
+            res_msg = res_msg + arr_result[0] + ',' + arr_result[2]
+
         for key, value in data.items():
             if key == 'debounce':
                 # debounce variable for all axes, so do not specify an axis
@@ -460,13 +469,8 @@ class SmoothieDriver_3_0_0:
                     f'{key} was not updated to {value} on {axis} axis')
             _parse_command(res)
 
-        def _parse_command(result):
-            # ensure smoothie received code and changed value through
-            # return message. Format of return message:
-            # <Axis> (or E for endstop) updated <Value>
-            arr_result = result.strip().split(' ')
-            res_msg = res_msg + arr_result[0] + ',' + arr_result[2]
         return res_msg
+
     # FIXME (JG 9/28/17): Should have a more thought out
     # way of simulating vs really running
     def connect(self, port=None):
@@ -1048,9 +1052,7 @@ class SmoothieDriver_3_0_0:
             cmd = ''
             for axis, value in data.items():
                 cmd = f'{cmd} {axis}{value}'
-                print(cmd)
                 self.steps_per_mm[axis] = value
-            print(GCODES['STEPS_PER_MM'] + cmd)
             self._send_command(GCODES['STEPS_PER_MM'] + cmd)
 
     def _read_from_pipette(self, gcode, mount) -> Optional[str]:

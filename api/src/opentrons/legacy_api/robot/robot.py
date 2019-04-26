@@ -284,8 +284,10 @@ class Robot(CommandPublisher):
                 # testing informs better values
                 self._driver.update_pipette_config(axis, {'home': 172.15})
             else:
-                if self._driver.steps_per_mm.get(axis) != DEFAULT_STEPS_PER_MM[axis]:
-                    self._driver.update_steps_per_mm({axis: DEFAULT_STEPS_PER_MM[axis]})
+                if self._driver.steps_per_mm.get(axis) \
+                        != DEFAULT_STEPS_PER_MM[axis]:
+                    self._driver.update_steps_per_mm(
+                        {axis: DEFAULT_STEPS_PER_MM[axis]})
 
             if model_value:
                 id_response = self._driver.read_pipette_id(mount)
