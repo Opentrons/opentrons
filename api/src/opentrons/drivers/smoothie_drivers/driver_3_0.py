@@ -848,7 +848,7 @@ class SmoothieDriver_3_0_0:
         self._handle_return(cmd_ret, GCODES['HOME'] in command)
         wait_ret = serial_communication.write_and_return(
             GCODES['WAIT'] + SMOOTHIE_COMMAND_TERMINATOR,
-            SMOOTHIE_ACK, self._connection, timeout=300)
+            SMOOTHIE_ACK, self._connection, timeout=12000)
         wait_ret = self._remove_unwanted_characters(
             GCODES['WAIT'], wait_ret)
         self._handle_return(wait_ret, GCODES['HOME'] in command)
