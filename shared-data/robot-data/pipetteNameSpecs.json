@@ -45,7 +45,7 @@
     },
     "minVolume": 1,
     "maxVolume": 20,
-    "channels": 1,
+    "channels": 1
   },
   "p50_single": {
     "displayName": "P50 Single-Channel",
@@ -109,7 +109,7 @@
     },
     "minVolume": 20,
     "maxVolume": 300,
-    "channels": 1,
+    "channels": 1
   },
   "p300_multi": {
     "displayName": "P300 8-Channel",
