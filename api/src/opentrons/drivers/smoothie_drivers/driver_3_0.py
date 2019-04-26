@@ -87,13 +87,14 @@ GCODES = {'HOME': 'G28.2',
           'SET_CURRENT': 'M907',
           'DISENGAGE_MOTOR': 'M18',
           'HOMING_STATUS': 'G28.6',
-          'ACCELERATION': 'M204 S10000'}
+          'ACCELERATION': 'M204 S10000',
+          'WAIT': 'M400'}
 
 # Number of digits after the decimal point for coordinates being sent
 # to Smoothie
 GCODE_ROUNDING_PRECISION = 3
 
-SMOOTHIE_COMMAND_TERMINATOR = 'M400\r\n\r\n'
+SMOOTHIE_COMMAND_TERMINATOR = '\r\n\r\n'
 SMOOTHIE_ACK = 'ok\r\nok\r\n'
 
 
@@ -840,23 +841,29 @@ class SmoothieDriver_3_0_0:
         """
         if self.simulating:
             return
+        cmd_ret = self._write_with_retries(
+            command + SMOOTHIE_COMMAND_TERMINATOR,
+            5.0, DEFAULT_COMMAND_RETRIES)
+        cmd_ret = self._remove_unwanted_characters(command, cmd_ret)
+        self._handle_return(cmd_ret, GCODES['HOME'] in command)
+        wait_ret = serial_communication.write_and_return(
+            GCODES['WAIT'] + SMOOTHIE_COMMAND_TERMINATOR,
+            SMOOTHIE_ACK, self._connection, timeout=300)
+        wait_ret = self._remove_unwanted_characters(
+            GCODES['WAIT'], wait_ret)
+        self._handle_return(wait_ret, GCODES['HOME'] in command)
+        return cmd_ret.strip()
 
-        command_line = command + ' ' + SMOOTHIE_COMMAND_TERMINATOR
-        ret_code = self._recursive_write_and_return(
-            command_line, timeout, DEFAULT_COMMAND_RETRIES)
-
-        ret_code = self._remove_unwanted_characters(command_line, ret_code)
-
+    def _handle_return(self, ret_code: str, was_home: bool):
         # Smoothieware returns error state if a switch was hit while moving
         if (ERROR_KEYWORD in ret_code.lower()) or \
                 (ALARM_KEYWORD in ret_code.lower()):
             self._reset_from_error()
             error_axis = ret_code.strip()[-1]
-            if GCODES['HOME'] not in command and error_axis in 'XYZABC':
+            if not was_home and error_axis in 'XYZABC':
+                log.warning(f"alarm/error in {ret_code}, homing {error_axis}")
                 self.home(error_axis)
             raise SmoothieError(ret_code)
-
-        return ret_code.strip()
 
     def _remove_unwanted_characters(self, command, response):
         # smoothieware can enter a weird state, where it repeats back
@@ -881,24 +888,25 @@ class SmoothieDriver_3_0_0:
 
         return modified_response
 
-    def _recursive_write_and_return(self, cmd, timeout, retries):
-        try:
-            return serial_communication.write_and_return(
-                cmd,
-                SMOOTHIE_ACK,
-                self._connection,
-                timeout=timeout)
-        except serial_communication.SerialNoResponse as e:
-            retries -= 1
-            if retries <= 0:
-                raise e
-            if not self.simulating:
-                sleep(DEFAULT_STABILIZE_DELAY)
-            if self._connection:
-                self._connection.close()
-                self._connection.open()
-            return self._recursive_write_and_return(
-                cmd, timeout, retries)
+    def _write_with_retries(self, cmd: str, timeout: float, retries: int):
+        for attempt in range(retries):
+            try:
+                ret = serial_communication.write_and_return(
+                    cmd,
+                    SMOOTHIE_ACK,
+                    self._connection,
+                    timeout=timeout)
+                if attempt != 0:
+                    log.warning(
+                        f"required {attempt} retries for {cmd.strip()}")
+                return ret
+            except serial_communication.SerialNoResponse:
+                if not self.simulating:
+                    sleep(DEFAULT_STABILIZE_DELAY)
+                if self._connection:
+                    self._connection.close()
+                    self._connection.open()
+        raise serial_communication.SerialNoResponse()
 
     def _home_x(self):
         log.debug("_home_x")
@@ -982,15 +990,22 @@ class SmoothieDriver_3_0_0:
         except serial_communication.SerialNoResponse:
             # incase motor-driver is stuck in bootloader and unresponsive,
             # use gpio to reset into a known state
+            log.debug("wait for ack failed, resetting")
             self._smoothie_reset()
+        log.debug("wait for ack done")
         self._reset_from_error()
+        log.debug("_reset")
         self._send_command(self._config.steps_per_mm)
+        log.debug("sent steps")
         self._send_command(GCODES['ABSOLUTE_COORDS'])
+        log.debug("sent abs")
         self._save_current(self.current, axes_active=False)
+        log.debug("sent current")
         self.update_position(default=self.homed_position)
         self.pop_axis_max_speed()
         self.pop_speed()
         self.pop_acceleration()
+        log.debug("setup done")
 
     def _read_from_pipette(self, gcode, mount) -> Optional[str]:
         '''
@@ -1452,7 +1467,14 @@ class SmoothieDriver_3_0_0:
         if self.simulating:
             return 'Did nothing (simulating)'
 
-        smoothie_update._ensure_programmer_executable()
+        try:
+            smoothie_update._ensure_programmer_executable()
+        except OSError as ose:
+            if ose.errno == 30:
+                # This is "read only filesystem" and happens on buildroot
+                pass
+            else:
+                raise
 
         if not self.is_connected():
             self._connect_to_port()
