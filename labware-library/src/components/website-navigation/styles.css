@@ -273,12 +273,12 @@
 }
 
 .mobile_nav {
-  display: block;
   position: fixed;
   width: 100%;
+  padding: 0;
+  padding-bottom: var(--spacing-5);
+  background-color: var(--c-white);
   z-index: 900;
-  padding: 1rem;
-  background-color: white;
 
   /* Added this for contrast with page - does not match design */
   box-shadow: var(--shadow-1);
@@ -287,15 +287,60 @@
 .mobile_nav_item {
   @apply --flex-start;
 
-  padding: 2rem;
-  height: 3rem;
+  padding: var(--spacing-7);
+  height: var(--size-2);
   font-weight: var(--fw-semibold);
   cursor: pointer;
+
+  &:first-child {
+    padding-top: 2.5rem;
+  }
+}
+
+.mobile_menu {
+  position: fixed;
+  top: var(--size-main-nav);
+  right: 0;
+  width: 100%;
+  min-height: calc(100vh - var(--size-main-nav));
+  margin: 0 -100% 0 0;
+  background-color: var(--c-white);
+  box-shadow: var(--shadow-1);
+  z-index: 950;
+  transition: margin 0.5s linear;
+
+  &.active {
+    margin: 0;
+  }
+}
+
+.mobile_menu_heading {
+  @apply --flex-start;
+
+  height: 5rem;
+  border-bottom: var(--bd-light);
+}
+
+.mobile_menu_icon {
+  position: absolute;
+  left: 0;
+  width: 3rem;
+}
+
+.mobile_menu_title {
+  width: 100%;
+  text-align: center;
+  font-size: var(--fs-default);
+  font-weight: var(--fw-semibold);
 }
 
 @media (--medium) {
   .mobile_nav_item {
     justify-content: center;
+  }
+
+  .mobile_menu {
+    min-height: 30rem;
   }
 }
 
