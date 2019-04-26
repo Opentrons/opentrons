@@ -130,10 +130,6 @@ class Robot(CommandPublisher):
         self.model_by_mount = {'left': {'model': None, 'id': None},
                                'right': {'model': None, 'id': None}}
 
-        # TODO (artyom, 09182017): once protocol development experience
-        # in the light of Session concept is fully fleshed out, we need
-        # to properly communicate deprecation of commands. For now we'll
-        # leave it as is for compatibility with documentation.
         self._commands = []
         self._unsubscribe_commands = None
         self.reset()
