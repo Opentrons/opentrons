@@ -93,6 +93,7 @@ export const protocolLinkProps: ProtocolLinks = {
   bottomLink: {
     name: 'Request a free custom protocol',
     url: 'https://opentrons.com/request-protocol',
+    cta: true,
   },
 }
 
@@ -126,6 +127,7 @@ export const supportLinkProps: SupportLinks = {
   support: {
     name: 'Contact Support',
     url: 'http://opentrons.com/contact',
+    cta: true,
   },
 }
 

@@ -2,12 +2,17 @@
 import * as React from 'react'
 import styles from './styles.css'
 import MobileMenu from './MobileMenu'
+import MobileContent from './MobileContent'
+import ProtocolMobileContent from './ProtocolMobileContent'
+import SupportMobileContent from './SupportMobileContent'
+
 import {
   navLinkProps,
   protocolLinkProps,
   supportLinkProps,
   salesLinkProps,
 } from './nav-data'
+
 import type { MenuName } from './types'
 
 type State = {| menu: null | MenuName |}
@@ -39,7 +44,9 @@ export class MobileNav extends React.Component<Props, State> {
               {...subnav}
               active={menu === subnav.name}
               onClick={() => this.toggle(subnav.name)}
-            />
+            >
+              <MobileContent {...subnav} />
+            </MobileMenu>
           </li>
         ))}
         <li className={styles.mobile_nav_item} role="button">
@@ -48,7 +55,9 @@ export class MobileNav extends React.Component<Props, State> {
             name="Protocols"
             active={menu === 'Protocols'}
             onClick={() => this.toggle('Protocols')}
-          />
+          >
+            <ProtocolMobileContent />
+          </MobileMenu>
         </li>
         <li className={styles.mobile_nav_item} role="button">
           <MobileMenu
@@ -57,7 +66,9 @@ export class MobileNav extends React.Component<Props, State> {
             name="Support & Sales"
             active={menu === 'Support'}
             onClick={() => this.toggle('Support')}
-          />
+          >
+            <SupportMobileContent />
+          </MobileMenu>
         </li>
       </ul>
     )
