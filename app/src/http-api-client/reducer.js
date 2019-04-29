@@ -9,7 +9,6 @@ import type { State, Action } from '../types'
 import type { BaseRobot } from '../robot'
 import type { HealthState } from './health'
 import type { PipettesState } from './pipettes'
-import type { ModulesState } from './modules'
 import type { MotorsState } from './motors'
 import type { ResetState } from './reset'
 import type { SettingsState } from './settings'
@@ -18,7 +17,6 @@ import type { NetworkingState } from './networking'
 export type RobotApiState = {|
   ...HealthState,
   ...PipettesState,
-  ...ModulesState,
   ...MotorsState,
   ...ResetState,
   ...SettingsState,

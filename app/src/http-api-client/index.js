@@ -5,7 +5,6 @@ import apiReducer from './reducer'
 import { calibrationReducer, type CalibrationAction } from './calibration'
 import type { HealthAction } from './health'
 import type { PipettesAction } from './pipettes'
-import type { ModulesAction } from './modules'
 import type { MotorsAction } from './motors'
 import type { ResetAction } from './reset'
 import { robotReducer, type RobotAction } from './robot'
@@ -47,7 +46,6 @@ export type State = $Call<typeof reducer>
 export type HttpApiAction =
   | CalibrationAction
   | HealthAction
-  | ModulesAction
   | MotorsAction
   | NetworkingAction
   | PipettesAction
@@ -67,8 +65,6 @@ export {
 } from './calibration'
 
 export * from './health'
-
-export * from './modules'
 
 export * from './reset'
 

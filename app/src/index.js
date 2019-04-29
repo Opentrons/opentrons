@@ -7,10 +7,12 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 import createHistory from 'history/createHashHistory'
 import { ConnectedRouter, routerMiddleware } from 'react-router-redux'
+import { createEpicMiddleware } from 'redux-observable'
 
 import createLogger from './logger'
 import { checkShellUpdate, shellMiddleware } from './shell'
 
+import { robotApiEpic } from './robot-api'
 import { apiClientMiddleware as robotApiMiddleware } from './robot'
 import { initializeAnalytics, analyticsMiddleware } from './analytics'
 import { initializeSupport, supportMiddleware } from './support'
@@ -24,9 +26,11 @@ import App from './components/App'
 const log = createLogger(__filename)
 
 const history = createHistory()
+const epicMiddlware = createEpicMiddleware()
 
 const middleware = applyMiddleware(
   thunk,
+  epicMiddlware,
   robotApiMiddleware(),
   shellMiddleware,
   analyticsMiddleware,
@@ -41,6 +45,8 @@ const composeEnhancers =
   compose
 
 const store = createStore(reducer, composeEnhancers(middleware))
+
+epicMiddlware.run(robotApiEpic)
 
 const renderApp = () =>
   ReactDom.render(

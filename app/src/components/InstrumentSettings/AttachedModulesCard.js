@@ -4,65 +4,61 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 
 import { Card, IntervalWrapper } from '@opentrons/components'
-import { fetchModules, makeGetRobotModules } from '../../http-api-client'
+import { fetchModules, getModulesState } from '../../robot-api'
 import ModulesCardContents from './ModulesCardContents'
 import { getConfig } from '../../config'
 
 import type { State, Dispatch } from '../../types'
-import type { Module } from '../../http-api-client'
+import type { Module } from '../../robot-api'
 import type { Robot } from '../../discovery'
 
 type OP = {| robot: Robot |}
 
 type SP = {|
-  modules: ?Array<Module>,
-  refreshing: boolean,
-  __featureEnabled: boolean,
+  modules: Array<Module>,
+  __tempControlsEnabled: boolean,
 |}
 
-type DP = {| refresh: () => mixed |}
+type DP = {| fetchModules: () => mixed |}
 
 type Props = { ...OP, ...SP, ...DP }
 
 const TITLE = 'Modules'
+const POLL_MODULE_INTERVAL_MS = 2000
 
 export default connect<Props, OP, SP, DP, State, Dispatch>(
-  makeMapStateToProps,
+  mapStateToProps,
   mapDispatchToProps
 )(AttachedModulesCard)
 
 function AttachedModulesCard(props: Props) {
   return (
-    <IntervalWrapper interval={2000} refresh={props.refresh}>
+    <IntervalWrapper
+      interval={POLL_MODULE_INTERVAL_MS}
+      refresh={props.fetchModules}
+    >
       <Card title={TITLE} column>
         <ModulesCardContents
           modules={props.modules}
           robot={props.robot}
-          showControls={props.__featureEnabled}
+          showControls={props.__tempControlsEnabled}
         />
       </Card>
     </IntervalWrapper>
   )
 }
 
-function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
-  const getRobotModules = makeGetRobotModules()
-
-  return (state, ownProps) => {
-    const modulesCall = getRobotModules(state, ownProps.robot)
-    const modulesResponse = modulesCall.response
-    const modules = modulesResponse && modulesResponse.modules
-    const devInternal = getConfig(state).devInternal
-    return {
-      modules: modules,
-      refreshing: modulesCall.inProgress,
-      __featureEnabled: !!devInternal && !!devInternal.tempdeckControls,
-    }
+function mapStateToProps(state: State, ownProps: OP): SP {
+  return {
+    modules: getModulesState(state, ownProps.robot.name),
+    __tempControlsEnabled: Boolean(
+      getConfig(state).devInternal?.tempdeckControls
+    ),
   }
 }
 
 function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   return {
-    refresh: () => dispatch(fetchModules(ownProps.robot)),
+    fetchModules: () => dispatch(fetchModules(ownProps.robot)),
   }
 }

@@ -5,11 +5,7 @@ import { connect } from 'react-redux'
 
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { selectors as robotSelectors } from '../../robot'
-import {
-  makeGetRobotModules,
-  fetchModules,
-  type FetchModulesResponse,
-} from '../../http-api-client'
+import { getModulesState, fetchModules } from '../../robot-api'
 
 import { RefreshWrapper } from '../Page'
 import InfoSection from './InfoSection'
@@ -20,12 +16,13 @@ import InstrumentWarning from './InstrumentWarning'
 import type { State, Dispatch } from '../../types'
 import type { SessionModule } from '../../robot'
 import type { Robot } from '../../discovery'
+import type { Module } from '../../robot-api'
 
 type OP = {| robot: Robot |}
 
 type SP = {|
   modules: Array<SessionModule>,
-  actualModules: ?FetchModulesResponse,
+  actualModules: Array<Module>,
   attachModulesUrl: string,
 |}
 
@@ -36,7 +33,7 @@ type Props = { ...OP, ...SP, ...DP }
 const TITLE = 'Required Modules'
 
 export default connect<Props, OP, SP, DP, _, _>(
-  makeMapStateToProps,
+  mapStateToProps,
   mapDispatchToProps
 )(ProtocolModulesCard)
 
@@ -47,17 +44,9 @@ function ProtocolModulesCard(props: Props) {
 
   const moduleInfo = modules.map(module => {
     const displayName = getModuleDisplayName(module.name)
+    const modulesMatch = actualModules.some(m => m.name === module.name)
 
-    const actualModel =
-      actualModules && actualModules.modules.find(m => m.name === module.name)
-
-    const modulesMatch = actualModel != null && actualModel.name === module.name
-
-    return {
-      ...module,
-      displayName,
-      modulesMatch,
-    }
+    return { ...module, displayName, modulesMatch }
   })
 
   const modulesMatch = moduleInfo.every(m => m.modulesMatch)
@@ -80,19 +69,15 @@ function ProtocolModulesCard(props: Props) {
   )
 }
 
-function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
-  const getActualModules = makeGetRobotModules()
+function mapStateToProps(state: State, ownProps: OP): SP {
+  const { robot } = ownProps
+  const actualModules = getModulesState(state, robot.name)
 
-  return (state, ownProps) => {
-    const { robot } = ownProps
-    const modulesCall = getActualModules(state, robot)
-
-    return {
-      modules: robotSelectors.getModules(state),
-      actualModules: modulesCall && modulesCall.response,
-      // TODO(mc, 2018-10-10): pass this prop down from page
-      attachModulesUrl: `/robots/${robot.name}/instruments`,
-    }
+  return {
+    actualModules,
+    modules: robotSelectors.getModules(state),
+    // TODO(mc, 2018-10-10): pass this prop down from page
+    attachModulesUrl: `/robots/${robot.name}/instruments`,
   }
 }
 

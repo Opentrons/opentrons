@@ -4,7 +4,7 @@ import * as React from 'react'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { LabeledValue } from '@opentrons/components'
 
-import type { Module } from '../../http-api-client'
+import type { Module } from '../../robot-api'
 
 import styles from './styles.css'
 

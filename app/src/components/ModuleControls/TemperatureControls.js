@@ -6,7 +6,7 @@ import TempField from './TempField'
 
 import styles from './styles.css'
 
-import type { SetTemperatureRequest } from '../../http-api-client'
+import type { SetTemperatureRequest } from '../../robot-api'
 
 type Props = {
   setTemp: (request: SetTemperatureRequest) => mixed,
@@ -14,17 +14,16 @@ type Props = {
 
 export default class TemperatureControls extends React.Component<Props> {
   inputRef: { current: null | HTMLInputElement }
+
   constructor(props: Props) {
     super(props)
     this.inputRef = React.createRef()
   }
 
   deactivateModule = () => {
-    const request = {
-      command_type: 'deactivate',
-    }
-    this.props.setTemp(request)
+    this.props.setTemp({ command_type: 'deactivate' })
   }
+
   render() {
     return (
       <Formik

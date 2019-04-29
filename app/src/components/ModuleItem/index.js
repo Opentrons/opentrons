@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 
-import type { Module } from '../../http-api-client'
+import type { Module } from '../../robot-api'
 import type { Robot } from '../../discovery'
 
 import ModuleImage from './ModuleImage'
@@ -28,7 +28,9 @@ export default function ModuleItem(props: Props) {
         <ModuleInfo module={module} />
         <ModuleUpdate availableUpdate={props.availableUpdate} />
       </div>
-      {showControls && <ModuleControls robot={robot} module={module} />}
+      {showControls && module.name === 'tempdeck' && (
+        <ModuleControls robot={robot} module={module} />
+      )}
     </div>
   )
 }
