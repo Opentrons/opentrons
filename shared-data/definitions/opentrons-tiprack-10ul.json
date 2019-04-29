@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "name": "tiprack-10ul",
+    "name": "opentrons-tiprack-10ul",
     "format": "96-standard",
     "tipVolume": 10,
     "displayCategory": "tiprack",
