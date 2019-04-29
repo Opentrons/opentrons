@@ -1,48 +1,42 @@
 // @flow
 // render labware definition to SVG
-// TODO(mc, 2019-03-27): Move this component to components library for usage in
-//   app and protocol-designer
 import * as React from 'react'
 import flatMap from 'lodash/flatMap'
 import cx from 'classnames'
 
-import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
 import { LabwareOutline } from '@opentrons/components'
-import styles from './styles.css'
+import styles from './robotLabware.css'
 
 import type {
-  LabwareDefinition,
+  LabwareDefinition2,
   LabwareParameters,
   LabwareOffset,
   LabwareWell,
-} from '../../types'
+} from '@opentrons/shared-data'
 
-export type LabwareRenderProps = {
-  definition: LabwareDefinition,
+type Props = {
+  definition: LabwareDefinition2,
+  transform?: string,
 }
 
-export type LabwareWellRenderProps = {
+type WellProps = {
   well: LabwareWell,
   parameters: LabwareParameters,
   cornerOffsetFromSlot: LabwareOffset,
 }
 
-export default function LabwareRender(props: LabwareRenderProps) {
+export default function RobotLabware(props: Props) {
   const { parameters, ordering, cornerOffsetFromSlot, wells } = props.definition
   const { isTiprack } = parameters
 
-  // SVG coordinate system is flipped in Y from our definitions
-  const transform = `translate(0,${SLOT_RENDER_HEIGHT}) scale(1,-1)`
-  const viewBox = `0 0 ${SLOT_RENDER_WIDTH} ${SLOT_RENDER_HEIGHT}`
-
   return (
-    <svg className={styles.labware_render} viewBox={viewBox}>
+    <g transform={props.transform}>
       <g className={styles.labware_detail_group}>
         <LabwareOutline
           className={cx({ [styles.tiprack_outline]: isTiprack })}
         />
       </g>
-      <g className={styles.well_group} transform={transform}>
+      <g className={styles.well_group}>
         {flatMap(
           ordering,
           // all arguments typed to stop Flow from complaining
@@ -60,11 +54,11 @@ export default function LabwareRender(props: LabwareRenderProps) {
           }
         )}
       </g>
-    </svg>
+    </g>
   )
 }
 
-function Well(props: LabwareWellRenderProps) {
+function Well(props: WellProps) {
   const { well, parameters, cornerOffsetFromSlot } = props
   const { isTiprack } = parameters
 

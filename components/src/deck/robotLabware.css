@@ -1,11 +1,5 @@
 @import '@opentrons/components';
 
-.labware_render {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
 .labware_detail_group {
   fill: none;
   stroke: var(--c-black);
