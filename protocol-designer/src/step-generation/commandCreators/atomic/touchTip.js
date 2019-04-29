@@ -2,6 +2,7 @@
 // import cloneDeep from 'lodash/cloneDeep'
 import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
 import type {
+  InvariantContext,
   RobotState,
   CommandCreator,
   CommandCreatorError,
@@ -9,6 +10,7 @@ import type {
 } from '../../types'
 
 const touchTip = (args: TouchTipArgs): CommandCreator => (
+  invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {
   /** touchTip with given args. Requires tip. */

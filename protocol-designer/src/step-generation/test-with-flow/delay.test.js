@@ -9,6 +9,9 @@ const getRobotInitialState = (): any => {
   return {}
 }
 
+// neither should InvariantContext
+const invariantContext: any = {}
+
 describe('delay indefinitely', () => {
   test('...', () => {
     const robotInitialState = getRobotInitialState()
@@ -19,7 +22,7 @@ describe('delay indefinitely', () => {
       description: 'description',
       name: 'name',
       wait: true,
-    })(robotInitialState)
+    })(invariantContext, robotInitialState)
 
     expect(result.robotState).toEqual(getRobotInitialState())
     expect(result.robotState).toBe(robotInitialState) // same object
@@ -46,7 +49,7 @@ describe('delay for a given time', () => {
       description: 'description',
       name: 'name',
       wait: 95.5,
-    })(robotInitialState)
+    })(invariantContext, robotInitialState)
 
     expect(result.robotState).toEqual(getRobotInitialState())
     expect(result.robotState).toBe(robotInitialState) // same object

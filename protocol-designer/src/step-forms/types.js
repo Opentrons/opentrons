@@ -53,6 +53,17 @@ export type LabwareEntities = {
   [labwareId: string]: LabwareEntity,
 }
 
+// =========== TEMPORAL ONLY =====
+// Temporal properties (eg location) that are time-variant
+
+export type LabwareTemporalProperties = {|
+  slot: DeckSlot,
+|}
+
+export type PipetteTemporalProperties = {|
+  mount: Mount,
+|}
+
 // =========== ON DECK ========
 
 // The "on deck" types are entities with added properties (slot / mount)
@@ -60,12 +71,12 @@ export type LabwareEntities = {
 
 export type LabwareOnDeck = {|
   ...LabwareEntity,
-  slot: DeckSlot,
+  ...LabwareTemporalProperties,
 |}
 
 export type PipetteOnDeck = {|
   ...PipetteEntity,
-  mount: Mount,
+  ...PipetteTemporalProperties,
 |}
 
 export type InitialDeckSetup = {

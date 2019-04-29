@@ -1,12 +1,16 @@
 // @flow
 import cloneDeep from 'lodash/cloneDeep'
-import { getNextTiprack, getPipetteSpecFromId } from '../../robotStateSelectors'
-import { tiprackWellNamesByCol } from '../../data'
-import { insufficientTips } from '../../errorCreators'
-import type { RobotState, CommandCreator } from '../../types'
+import { getNextTiprack } from '../../robotStateSelectors'
+import {
+  insufficientTips,
+  labwareDoesNotExist,
+  pipetteDoesNotExist,
+} from '../../errorCreators'
+import type { CommandCreator, InvariantContext, RobotState } from '../../types'
 import dropTip from './dropTip'
 
 const replaceTip = (pipetteId: string): CommandCreator => (
+  invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {
   /**
@@ -16,8 +20,7 @@ const replaceTip = (pipetteId: string): CommandCreator => (
   */
   let robotState = cloneDeep(prevRobotState)
 
-  const pipetteSpec = getPipetteSpecFromId(pipetteId, robotState)
-  const nextTiprack = getNextTiprack(pipetteId, robotState)
+  const nextTiprack = getNextTiprack(pipetteId, invariantContext, robotState)
 
   if (!nextTiprack) {
     // no valid next tip / tiprack, bail out
@@ -27,7 +30,7 @@ const replaceTip = (pipetteId: string): CommandCreator => (
   }
 
   // drop tip if you have one
-  const dropTipResult = dropTip(pipetteId)(robotState)
+  const dropTipResult = dropTip(pipetteId)(invariantContext, robotState)
   if (dropTipResult.errors) {
     return dropTipResult
   }
@@ -49,6 +52,28 @@ const replaceTip = (pipetteId: string): CommandCreator => (
   // pipette now has tip
   robotState.tipState.pipettes[pipetteId] = true
 
+  // TODO: Ian 2019-04-18 make this robotState tipState mutation a result of
+  // processing JSON commands, not done inside a command creator
+  const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
+  if (!pipetteSpec)
+    return {
+      errors: [
+        pipetteDoesNotExist({ actionName: 'replaceTip', pipette: pipetteId }),
+      ],
+    }
+
+  const labwareDef =
+    invariantContext.labwareEntities[nextTiprack.tiprackId]?.def
+  if (!labwareDef) {
+    return {
+      errors: [
+        labwareDoesNotExist({
+          actionName: 'replaceTip',
+          labware: nextTiprack.tiprackId,
+        }),
+      ],
+    }
+  }
   // remove tips from tiprack
   if (pipetteSpec.channels === 1 && nextTiprack.well) {
     robotState.tipState.tipracks[nextTiprack.tiprackId][
@@ -56,7 +81,7 @@ const replaceTip = (pipetteId: string): CommandCreator => (
     ] = false
   }
   if (pipetteSpec.channels === 8) {
-    const allWells = tiprackWellNamesByCol.find(
+    const allWells = labwareDef.ordering.find(
       col => col[0] === nextTiprack.well
     )
     if (!allWells) {

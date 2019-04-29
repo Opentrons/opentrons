@@ -1,5 +1,5 @@
 // @flow
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { fixtureP10Single } from '@opentrons/shared-data/fixtures'
 import dependentFieldsUpdateMoveLiquid, {
   updatePatchBlowoutFields,
 } from '../dependentFieldsUpdateMoveLiquid'
@@ -21,7 +21,7 @@ beforeEach(() => {
   pipetteEntities = {
     pipetteId: {
       name: 'p10_single',
-      spec: getPipetteNameSpecs('p10_single'),
+      spec: fixtureP10Single,
       tiprackModel: 'tiprack-10ul',
       tiprackLabwareDef: fixtureTiprack10Ul,
     },

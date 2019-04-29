@@ -1,12 +1,19 @@
 // @flow
-import { getLabware, getPipetteNameSpecs } from '@opentrons/shared-data'
-import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
-import range from 'lodash/range'
-import reduce from 'lodash/reduce'
-import { reduceCommandCreators } from '../../utils'
-import { tiprackWellNamesFlat } from '../../'
-import type { RobotState, PipetteData, LabwareData } from '../../'
+import {
+  fixtureTrash,
+  fixture96Plate,
+  fixture12Trough,
+  fixtureTipRack10Ul,
+  fixtureTipRack300Ul,
+  fixtureP10Single,
+  fixtureP10Multi,
+  fixtureP300Single,
+  fixtureP300Multi,
+} from '@opentrons/shared-data/fixtures'
+import { makeInitialRobotState, reduceCommandCreators } from '../../utils'
+import { tiprackWellNamesFlat } from './data'
+import type { InvariantContext, RobotState } from '../../'
 import type {
   CommandsAndRobotState,
   CommandCreatorErrorResponse,
@@ -15,10 +22,11 @@ import type {
 /** Used to wrap command creators in tests, effectively casting their results
  **  to normal response or error response
  **/
-export const commandCreatorNoErrors = (command: *) => (commandArgs: *) => (
-  state: RobotState
+export const commandCreatorNoErrors = (command: any) => (commandArgs: *) => (
+  invariantContext: InvariantContext,
+  robotState: RobotState
 ): CommandsAndRobotState => {
-  const result = command(commandArgs)(state)
+  const result = command(commandArgs)(invariantContext, robotState)
   if (result.errors) {
     throw new Error('expected no errors, got ' + JSON.stringify(result.errors))
   }
@@ -26,9 +34,10 @@ export const commandCreatorNoErrors = (command: *) => (commandArgs: *) => (
 }
 
 export const commandCreatorHasErrors = (command: *) => (commandArgs: *) => (
-  state: RobotState
+  invariantContext: InvariantContext,
+  robotState: RobotState
 ): CommandCreatorErrorResponse => {
-  const result = command(commandArgs)(state)
+  const result = command(commandArgs)(invariantContext, robotState)
   if (!result.errors) {
     throw new Error('expected errors')
   }
@@ -37,8 +46,13 @@ export const commandCreatorHasErrors = (command: *) => (commandArgs: *) => (
 
 export const compoundCommandCreatorNoErrors = (command: *) => (
   commandArgs: *
-) => (state: RobotState): CommandsAndRobotState => {
-  const result = reduceCommandCreators(command(commandArgs)(state))(state)
+) => (
+  invariantContext: InvariantContext,
+  robotState: RobotState
+): CommandsAndRobotState => {
+  const result = reduceCommandCreators(
+    command(commandArgs)(invariantContext, robotState)
+  )(invariantContext, robotState)
   if (result.errors) {
     throw new Error('expected no errors, got ' + JSON.stringify(result.errors))
   }
@@ -47,8 +61,13 @@ export const compoundCommandCreatorNoErrors = (command: *) => (
 
 export const compoundCommandCreatorHasErrors = (command: *) => (
   commandArgs: *
-) => (state: RobotState): CommandCreatorErrorResponse => {
-  const result = reduceCommandCreators(command(commandArgs)(state))(state)
+) => (
+  invariantContext: InvariantContext,
+  robotState: RobotState
+): CommandCreatorErrorResponse => {
+  const result = reduceCommandCreators(
+    command(commandArgs)(invariantContext, robotState)
+  )(invariantContext, robotState)
   if (!result.errors) {
     throw new Error('expected errors')
   }
@@ -59,12 +78,13 @@ export const compoundCommandCreatorHasErrors = (command: *) => (
 type WellTipState = { [wellName: string]: boolean }
 export function getTiprackTipstate(filled: ?boolean): WellTipState {
   return tiprackWellNamesFlat.reduce(
-    (acc, wellName) => ({ ...acc, [wellName]: !!filled }),
+    (acc, wellName) => ({ ...acc, [wellName]: Boolean(filled) }),
     {}
   )
 }
 
 // Eg A2 B2 C2 D2 E2 F2 G2 H2 keys
+// NOTE: this assumes standard 96-tiprack
 export function getTipColumn<T>(
   index: number,
   filled: T
@@ -80,220 +100,160 @@ export function getTipColumn<T>(
     )
 }
 
-export const all8ChTipIds = range(8)
-
-export function createTipLiquidState<T>(
-  channels: number,
-  contents: T
-): { [tipId: string]: T } {
-  return range(channels).reduce(
-    (tipIdAcc, tipId) => ({
-      ...tipIdAcc,
-      [tipId]: contents,
-    }),
-    {}
-  )
-}
-
-export function createLabwareLiquidState<T>(
-  labwareType: string,
-  contents: T
-): { [well: string]: T } {
-  return mapValues(getWellsForLabware(labwareType), () => contents)
-}
-
-// TODO Ian 2018-03-14: these pipette fixtures should use file-data/pipetteData.js,
-// which should in turn be lifted out to a general pipette data project?
-export const p300Single: PipetteData = {
-  mount: 'right',
-  name: 'p300_single',
-  tiprackModel: 'opentrons-tiprack-300ul',
-}
-
-export const p300Multi: PipetteData = {
-  mount: 'left',
-  name: 'p300_multi',
-  tiprackModel: 'opentrons-tiprack-300ul',
-}
-
-export function getWellsForLabware(labwareType: string) {
-  const labware = getLabware(labwareType)
-  if (!labware) {
-    throw new Error(`Labware "${labwareType}" not found.`)
-  }
-  if (!labware.wells) {
-    throw new Error(`Labware "${labwareType} has no wells!"`)
-  }
-  return labware.wells
-}
-
-export function createEmptyLiquidState(args: {
-  sourcePlateType?: string,
-  destPlateType?: string,
-  pipettes: $PropertyType<RobotState, 'pipettes'>,
-}) {
-  const { sourcePlateType, destPlateType, pipettes } = args
-
-  const sourceLabware = sourcePlateType
-    ? // $FlowFixMe: Missing type annotation for `T`
-      { sourcePlateId: createLabwareLiquidState(sourcePlateType, {}) }
-    : {}
-
-  const destLabware = destPlateType
-    ? // $FlowFixMe: Missing type annotation for `T`
-      { destPlateId: createLabwareLiquidState(destPlateType, {}) }
-    : {}
-
-  return {
-    pipettes: reduce(
-      pipettes,
-      (acc, pipetteData: PipetteData, pipetteId: string) => {
-        const pipetteSpec = getPipetteNameSpecs(pipetteData.name)
-        if (!pipetteSpec) {
-          throw Error(
-            `no pipette spec for ${
-              pipetteData.name
-            }, cannot make tip liquid state for fixture`
-          )
-        }
-        return {
-          ...acc,
-          [pipetteId]: createTipLiquidState(pipetteSpec.channels, {}),
-        }
-      },
-      {}
-    ),
-    labware: {
-      ...sourceLabware,
-      ...destLabware,
-      trashId: { A1: {} },
-    },
-  }
-}
-
-type SubtractLiquidState = { liquidState: * }
-type RobotStateNoLiquidState = $Diff<RobotState, SubtractLiquidState>
-
-type CreateRobotArgs = {
-  sourcePlateType: string,
-  destPlateType?: string,
-  tipracks: Array<10 | 200 | 300 | 1000>,
-  fillPipetteTips: boolean,
-  fillTiprackTips?: boolean,
-}
-/** RobotState with empty liquid state */
-export function createRobotState(args: CreateRobotArgs): RobotState {
-  const { labware, pipettes, tipState } = createRobotStateFixture(args)
-
-  return {
-    labware,
-    pipettes,
-    tipState,
-    liquidState: createEmptyLiquidState({
-      ...args,
-      pipettes: { p300SingleId: p300Single, p300MultiId: p300Multi },
-    }),
-  }
-}
-
-function getTiprackType(volume: number): string {
-  const tiprackMap = {
-    '1000': 'tiprack-1000ul',
-    '300': 'opentrons-tiprack-300ul',
-    '200': 'tiprack-200ul',
-    '10': 'tiprack-10ul',
-  }
-  const result = tiprackMap[volume]
-  if (!result) {
-    throw new Error(
-      `No tiprack in getTiprackType for tiprack volume: ${volume}`
-    )
-  }
-  return result
-}
-
-/** RobotState without liquidState key, for use with jest's `toMatchObject` */
-export function createRobotStateFixture(
-  args: CreateRobotArgs
-): RobotStateNoLiquidState {
-  function _getTiprackSlot(
-    tiprackIndex: number,
-    occupiedSlots: Array<string>
-  ): string {
-    const slot = (tiprackIndex + 1).toString()
-    if (occupiedSlots.includes(slot)) {
-      throw new Error(
-        `Cannot create tiprack at slot ${slot}, slot is occupied by other labware`
-      )
-    }
-    return slot.toString()
-  }
-
-  const pipettes = {
-    p300SingleId: p300Single,
-    p300MultiId: p300Multi,
-  }
-
-  const destLabware = args.destPlateType
-    ? {
-        destPlateId: {
-          slot: '11',
-          type: args.destPlateType,
-        },
-      }
-    : {}
-
-  const baseLabware = {
-    ...destLabware,
-    sourcePlateId: {
-      slot: '10',
-      type: args.sourcePlateType,
-    },
+// standard context fixtures to use across tests
+export function makeContext(): InvariantContext {
+  const labwareEntities = {
     trashId: {
-      slot: '12',
-      type: 'fixed-trash',
+      id: 'trashId',
+      type: fixtureTrash.otId,
+      def: fixtureTrash,
+    },
+    sourcePlateId: {
+      id: 'sourcePlateId',
+      type: fixture96Plate.otId,
+      def: fixture96Plate,
+    },
+    destPlateId: {
+      id: 'destPlateId',
+      type: fixture96Plate.otId,
+      def: fixture96Plate,
+    },
+    troughId: {
+      id: 'troughId',
+      type: fixture12Trough.otId,
+      def: fixture12Trough,
+    },
+    tiprack1Id: {
+      id: 'tiprack1Id',
+      type: fixtureTipRack300Ul.otId,
+      def: fixtureTipRack300Ul,
+    },
+    tiprack2Id: {
+      id: 'tiprack2Id',
+      type: fixtureTipRack300Ul.otId,
+      def: fixtureTipRack300Ul,
+    },
+    tiprack3Id: {
+      id: 'tiprack3Id',
+      type: fixtureTipRack300Ul.otId,
+      def: fixtureTipRack300Ul,
     },
   }
 
-  const occupiedSlots = map(
-    baseLabware,
-    (labwareData: LabwareData, labwareId) => labwareData.slot
-  )
-
-  const tiprackLabware = args.tipracks.reduce(
-    (acc, tiprackVolume, tiprackIndex) => {
-      return {
-        ...acc,
-        [`tiprack${tiprackIndex + 1}Id`]: {
-          slot: _getTiprackSlot(tiprackIndex, occupiedSlots),
-          type: getTiprackType(tiprackVolume),
-          name: `Tip rack ${tiprackIndex + 1}`,
-        },
-      }
+  const pipetteEntities = {
+    p10SingleId: {
+      name: 'p10_single',
+      id: 'p10SingleId',
+      tiprackModel: fixtureTipRack10Ul.otId,
+      tiprackLabwareDef: fixtureTipRack10Ul,
+      spec: fixtureP10Single,
     },
-    {}
-  )
-
-  return {
-    pipettes,
-
-    labware: {
-      ...baseLabware,
-      ...tiprackLabware,
+    p10MultiId: {
+      name: 'p10_multi',
+      id: 'p10MultiId',
+      tiprackModel: fixtureTipRack10Ul.otId,
+      tiprackLabwareDef: fixtureTipRack10Ul,
+      spec: fixtureP10Multi,
     },
-
-    tipState: {
-      tipracks: Object.keys(tiprackLabware).reduce(
-        (acc, tiprackId) => ({
-          ...acc,
-          [tiprackId]: getTiprackTipstate(args.fillTiprackTips),
-        }),
-        {}
-      ),
-      pipettes: {
-        p300SingleId: args.fillPipetteTips,
-        p300MultiId: args.fillPipetteTips,
-      },
+    p300SingleId: {
+      name: 'p300_single',
+      id: 'p300SingleId',
+      tiprackModel: fixtureTipRack300Ul.otId,
+      tiprackLabwareDef: fixtureTipRack300Ul,
+      spec: fixtureP300Single,
+    },
+    p300MultiId: {
+      name: 'p300_multi',
+      id: 'p300MultiId',
+      tiprackModel: fixtureTipRack300Ul.otId,
+      tiprackLabwareDef: fixtureTipRack300Ul,
+      spec: fixtureP300Multi,
     },
   }
+  return { labwareEntities, pipetteEntities }
+}
+
+export const makeState = (args: {|
+  invariantContext: InvariantContext,
+  labwareLocations: $PropertyType<RobotState, 'labware'>,
+  pipetteLocations: $PropertyType<RobotState, 'pipettes'>,
+  tiprackSetting: { [labwareId: string]: boolean },
+|}) => {
+  const {
+    invariantContext,
+    labwareLocations,
+    pipetteLocations,
+    tiprackSetting,
+  } = args
+  let robotState = makeInitialRobotState({
+    invariantContext,
+    labwareLocations,
+    pipetteLocations,
+  })
+  // overwrite tiprack tip state using tiprackSetting arg
+  robotState.tipState.tipracks = mapValues(tiprackSetting, setting =>
+    getTiprackTipstate(setting)
+  )
+  return robotState
+}
+
+// ===== "STANDARDS" for uniformity across tests =====
+export const makeStateArgsStandard = () => ({
+  pipetteLocations: {
+    p300SingleId: { mount: 'left' },
+    p300MultiId: { mount: 'right' },
+  },
+  labwareLocations: {
+    tiprack1Id: { slot: '1' },
+    tiprack2Id: { slot: '5' },
+    sourcePlateId: { slot: '2' },
+    destPlateId: { slot: '3' },
+    trashId: { slot: '12' },
+  },
+})
+export const getInitialRobotStateStandard = (
+  invariantContext: InvariantContext
+) => {
+  const initialRobotState = makeState({
+    ...makeStateArgsStandard(),
+    invariantContext,
+    tiprackSetting: { tiprack1Id: true, tiprack2Id: true },
+  })
+  return initialRobotState
+}
+
+export const getRobotStateWithTipStandard = (
+  invariantContext: InvariantContext
+) => {
+  const robotStateWithTip = makeState({
+    ...makeStateArgsStandard(),
+    invariantContext,
+    tiprackSetting: { tiprack1Id: true, tiprack2Id: true },
+  })
+  robotStateWithTip.tipState.pipettes.p300SingleId = true
+  return robotStateWithTip
+}
+
+export const getRobotStatePickedUpTipStandard = (
+  invariantContext: InvariantContext
+) => {
+  const robotStatePickedUpOneTip = makeState({
+    ...makeStateArgsStandard(),
+    invariantContext,
+    tiprackSetting: { tiprack1Id: true },
+  })
+  robotStatePickedUpOneTip.tipState.pipettes.p300SingleId = true
+  robotStatePickedUpOneTip.tipState.tipracks.tiprack1Id.A1 = false
+  return robotStatePickedUpOneTip
+}
+
+export const getRobotInitialStateNoTipsRemain = (
+  invariantContext: InvariantContext
+) => {
+  const robotInitialStateNoTipsRemain = makeState({
+    ...makeStateArgsStandard(),
+    invariantContext,
+    tiprackSetting: { tiprack1Id: false, tiprack2Id: false },
+  })
+  return robotInitialStateNoTipsRemain
 }

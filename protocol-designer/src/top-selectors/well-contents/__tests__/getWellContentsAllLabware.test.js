@@ -1,11 +1,11 @@
+import {
+  fixture96Plate,
+  fixtureTrash,
+  fixture24TubeRack,
+} from '@opentrons/shared-data/fixtures'
 import getWellContentsAllLabware from '../getWellContentsAllLabware'
 
 jest.mock('../../../labware-defs/utils')
-
-// TODO Ian 2019-04-12: create representative fixtures, don't use real defs
-const fixtureFixedTrash = require('@opentrons/shared-data/definitions2/opentrons_1_trash_1.1_l.json')
-const fixtureTubeRack = require('@opentrons/shared-data/definitions2/opentrons_24_tuberack_2_ml_screwcap.json')
-const fixture96Plate = require('@opentrons/shared-data/definitions2/generic_96_wellplate_380_ul.json')
 
 describe('getWellContentsAllLabware', () => {
   const container1MaxVolume = fixture96Plate.wells.A1.totalLiquidVolume
@@ -24,10 +24,10 @@ describe('getWellContentsAllLabware', () => {
     }
 
     labwareEntities = {
-      FIXED_TRASH_ID: { def: fixtureFixedTrash },
+      FIXED_TRASH_ID: { def: fixtureTrash },
       container1Id: { def: fixture96Plate },
       container2Id: { def: fixture96Plate },
-      container3Id: { def: fixtureTubeRack },
+      container3Id: { def: fixture24TubeRack },
     }
 
     ingredsByLabwareXXSingleIngred = {

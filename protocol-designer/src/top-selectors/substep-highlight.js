@@ -1,6 +1,6 @@
 // @flow
 import { createSelector } from 'reselect'
-import { computeWellAccessDeprecated } from '@opentrons/shared-data'
+import { computeWellAccess } from '@opentrons/shared-data'
 
 import mapValues from 'lodash/mapValues'
 
@@ -12,19 +12,20 @@ import { selectors as stepsSelectors } from '../ui/steps'
 
 import type { Selector } from '../types'
 import type { SubstepItemData } from '../steplist/types'
+import type { PipetteEntity, LabwareEntity } from '../step-forms'
 
 type AllWellHighlights = { [wellName: string]: true } // NOTE: all keys are true. There's a TODO in HighlightableLabware.js about making this a Set of well strings
 type AllWellHighlightsAllLabware = { [labwareId: string]: AllWellHighlights }
 
 function _wellsForPipette(
-  pipetteChannels: 1 | 8,
-  labwareType: string,
+  pipetteEntity: PipetteEntity,
+  labwareEntity: LabwareEntity,
   wells: Array<string>
 ): Array<string> {
   // `wells` is all the wells that pipette's channel 1 interacts with.
-  if (pipetteChannels === 8) {
+  if (pipetteEntity.spec.channels === 8) {
     return wells.reduce((acc, well) => {
-      const setOfWellsForMulti = computeWellAccessDeprecated(labwareType, well)
+      const setOfWellsForMulti = computeWellAccess(labwareEntity.def, well)
 
       return setOfWellsForMulti ? [...acc, ...setOfWellsForMulti] : acc // setOfWellsForMulti is null
     }, [])
@@ -36,22 +37,22 @@ function _wellsForPipette(
 function _getSelectedWellsForStep(
   stepArgs: StepGeneration.CommandCreatorArgs,
   labwareId: string,
-  robotState: StepGeneration.RobotState
+  invariantContext: StepGeneration.InvariantContext
 ): Array<string> {
   if (stepArgs.commandCreatorFnName === 'delay') {
     return []
   }
 
   const pipetteId = stepArgs.pipette
-  const pipetteSpec = StepGeneration.getPipetteSpecFromId(pipetteId, robotState)
-  const labwareType = StepGeneration.getLabwareType(labwareId, robotState)
+  const pipetteEntity = invariantContext.pipetteEntities[pipetteId]
+  const labwareEntity = invariantContext.labwareEntities[labwareId]
 
-  if (!pipetteSpec || !labwareType) {
+  if (!pipetteEntity || !labwareEntity) {
     return []
   }
 
   const getWells = (wells: Array<string>) =>
-    _wellsForPipette(pipetteSpec.channels, labwareType, wells)
+    _wellsForPipette(pipetteEntity, labwareEntity, wells)
 
   let wells = []
 
@@ -146,6 +147,7 @@ function _getSelectedWellsForSubstep(
 
 export const wellHighlightsByLabwareId: Selector<AllWellHighlightsAllLabware> = createSelector(
   fileDataSelectors.getRobotStateTimeline,
+  stepFormSelectors.getInvariantContext,
   stepFormSelectors.getArgsAndErrorsByStepId,
   stepsSelectors.getHoveredStepId,
   stepsSelectors.getHoveredSubstep,
@@ -153,6 +155,7 @@ export const wellHighlightsByLabwareId: Selector<AllWellHighlightsAllLabware> = 
   stepFormSelectors.getOrderedStepIds,
   (
     robotStateTimeline,
+    invariantContext,
     allStepArgsAndErrors,
     hoveredStepId,
     hoveredSubstep,
@@ -195,7 +198,7 @@ export const wellHighlightsByLabwareId: Selector<AllWellHighlightsAllLabware> = 
           selectedWells = _getSelectedWellsForStep(
             stepArgs,
             labwareId,
-            robotState
+            invariantContext
           )
         }
 

@@ -1,0 +1,43 @@
+{
+  "ordering": [["A1"]],
+  "otId": "fixtureTrash",
+  "deprecated": false,
+  "metadata": {
+    "displayCategory": "trash",
+    "displayVolumeUnits": "L",
+    "displayName": "Tall Fixed Trash",
+    "tags": ["trash", "opentrons", "tall"]
+  },
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "dimensions": {
+    "overallLength": 172.86,
+    "overallWidth": 165.86,
+    "overallHeight": 82
+  },
+  "parameters": {
+    "format": "trash",
+    "isTiprack": false,
+    "loadName": "opentrons_1_trash_1.1_l",
+    "isMagneticModuleCompatible": false,
+    "quirks": ["fixedTrash", "centerMultichannelOnWells"]
+  },
+  "wells": {
+    "A1": {
+      "shape": "rectangular",
+      "length": 165.67,
+      "width": 107.11,
+      "totalLiquidVolume": 1100000,
+      "depth": 77,
+      "x": 82.84,
+      "y": 53.56,
+      "z": 5
+    }
+  },
+  "brand": {
+    "brand": "Opentrons"
+  }
+}

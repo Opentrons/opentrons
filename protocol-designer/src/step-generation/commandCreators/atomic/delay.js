@@ -1,7 +1,13 @@
 // @flow
-import type { DelayArgs, RobotState, CommandCreator } from '../../types'
+import type {
+  DelayArgs,
+  InvariantContext,
+  RobotState,
+  CommandCreator,
+} from '../../types'
 
 const delay = (args: DelayArgs): CommandCreator => (
+  invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {
   return {

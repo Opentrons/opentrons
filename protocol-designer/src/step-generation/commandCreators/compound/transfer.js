@@ -1,11 +1,11 @@
 // @flow
 import assert from 'assert'
 import zip from 'lodash/zip'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import type {
   TransferArgs,
+  InvariantContext,
   RobotState,
   CommandCreator,
   CompoundCommandCreator,
@@ -15,6 +15,7 @@ import { aspirate, dispense, replaceTip, touchTip } from '../atomic'
 import { mixUtil } from './mix'
 
 const transfer = (args: TransferArgs): CompoundCommandCreator => (
+  invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {
   /**
@@ -47,11 +48,10 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...
   const actionName = 'transfer'
 
-  const pipetteData = prevRobotState.pipettes[args.pipette]
-  const pipetteSpec =
-    pipetteData && pipetteData.name && getPipetteNameSpecs(pipetteData.name)
-
-  if (!pipetteData || !pipetteSpec) {
+  if (
+    !prevRobotState.pipettes[args.pipette] ||
+    !invariantContext.pipetteEntities[args.pipette]
+  ) {
     // bail out before doing anything else
     return [
       _robotState => ({
@@ -64,6 +64,7 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
       }),
     ]
   }
+  const pipetteSpec = invariantContext.pipetteEntities[args.pipette].spec
 
   const {
     aspirateFlowRateUlSec,
@@ -74,7 +75,7 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
 
   const effectiveTransferVol = getPipetteWithTipMaxVol(
     args.pipette,
-    prevRobotState
+    invariantContext
   )
   const pipetteMinVol = pipetteSpec.minVolume
 
