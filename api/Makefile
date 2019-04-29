@@ -151,7 +151,7 @@ push: wheel
 push-buildroot: wheel
 	scp -i $(br_ssh_key) $(br_ssh_opts) $(wheel_file) root@$(host):/data/
 	ssh -i $(br_ssh_key) $(br_ssh_opts) root@$(host) \
-"function cleanup () { rm -f /data/$(wheel_file) && mount -o remount,ro / && systemctl start opentrons-api-server; } ;\
+"function cleanup () { rm -f /data/opentrons*.whl && mount -o remount,ro / && systemctl start opentrons-api-server; } ;\
 systemctl stop opentrons-api-server &&\
 mount -o remount,rw / &&\
 cd /usr/lib/python3.7/site-packages &&\

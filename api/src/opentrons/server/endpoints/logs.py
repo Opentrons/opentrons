@@ -1,10 +1,9 @@
 import asyncio
 import collections
 import datetime
-import json
 import logging
 import syslog
-from typing import Any, Deque, Dict, List
+from typing import Any, Deque, Dict, List, Mapping
 
 from aiohttp import web
 import systemd.journal as journal
@@ -15,8 +14,8 @@ LOG = logging.getLogger(__name__)
 MAX_RECORDS = 1000000
 
 
-async def _get_options(request: web.Request,
-                       default_length: int) -> Dict[str, Any]:
+def _get_options(params: Mapping[str, str],
+                 default_length: int) -> Dict[str, Any]:
     """ Parse options from a request. Should leave the request able to
     be read again since it only uses the content-preserving
     :py:meth:`aiohttp.web.Request.json`. Will not fail; malformed
@@ -26,24 +25,22 @@ async def _get_options(request: web.Request,
         'format': 'json',
         'records': default_length
     }
-    try:
-        body = await request.json()
-    except json.JSONDecodeError:
-        return response
 
-    if 'format' in body:
-        if body['format'] not in ('text', 'json'):
-            LOG.error(f"Bad log format requested: {body['format']}")
+    print({k: v for k, v in params.items()})
+
+    if 'format' in params:
+        if params['format'] not in ('text', 'json'):
+            LOG.error(f"Bad log format requested: {params['format']}")
         else:
-            response['format'] = body['format']
+            response['format'] = params['format']
 
-    if 'records' in body:
+    if 'records' in params:
         try:
-            records = int(body['records'])
+            records = int(params['records'])
             if records <= 0 or records > MAX_RECORDS:
                 raise ValueError(records)
         except (ValueError, TypeError):
-            LOG.exception(f"Bad records count requested: {body['records']}")
+            LOG.exception(f"Bad records count requested: {params['records']}")
         else:
             response['records'] = records
     return response
@@ -124,6 +121,11 @@ async def get_logs_by_id(request: web.Request) -> web.Response:
 
     GET /logs/:syslog_identifier -> 200 OK, log contents in body
 
+    This endpoint accepts the following (optional) query parameters:
+    - ``format``: ``json`` or ``text`` (default: text). Controls log format.
+    - ``records``: int. Count of records to limit the dump to. Default: 15000.
+      Limit: 1000000
+
     The syslog identifier is an a string that something has logged to as the
     syslog id. It may not be blank (i.e. GET /logs/ is not allowed). The
     identifier is sent to systemd and therefore invalid syslog ids will result
@@ -134,17 +136,14 @@ async def get_logs_by_id(request: web.Request) -> web.Response:
     ``opentrons-api-serial`` or ``api.log``, which corresponds to syslog id
     ``opentrons-api``.
 
-    Optionally, the request body can be json with any of the following keys:
-    - ``'format'``: ``'json'`` or ``'text'`` (default: text). Controls log
-      format.
-    - ``records``: int. Count of records to limit the dump to. Default: 15000.
-      Limit: 1000000
+    For instance, ``GET /logs/api.log?format=json`` gives the API logs in json
+    format.
     """
     ident = request.match_info['syslog_identifier']
     if ident == 'api.log':
         ident = 'opentrons-api'
     elif ident == 'serial.log':
         ident = 'opentrons-api-serial'
-    opts = await _get_options(request, 15000)
+    opts = _get_options(request.query, 15000)
     return await _get_log_response(
         ident, opts['records'], opts['format'])
