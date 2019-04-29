@@ -3,13 +3,14 @@ from logging.config import dictConfig
 import sys
 from typing import Any, Dict
 
-from opentrons.config import CONFIG, OT_SYSTEM_VERSION
+from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
 
 
 def _balena_config(level_value: int) -> Dict[str, Any]:
     serial_log_filename = CONFIG['serial_log_file']
     api_log_filename = CONFIG['api_log_file']
     return {
+        'version': 1,
         'formatters': {
             'basic': {
                 'format':
@@ -101,11 +102,18 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
     }
 
 
-def _config(system_version: int, level_value: int) -> Dict[str, Any]:
-    if system_version < 2:
-        return _balena_config(level_value)
-    else:
-        return _buildroot_config(level_value)
+def _host_config(level_value: int) -> Dict[str, Any]:
+    """ Host logging, for now the same as balena logging
+    """
+    return _balena_config(level_value)
+
+
+def _config(arch: SystemArchitecture, level_value: int) -> Dict[str, Any]:
+    return {
+        SystemArchitecture.BALENA: _balena_config,
+        SystemArchitecture.BUILDROOT: _buildroot_config,
+        SystemArchitecture.HOST: _host_config
+    }[arch](level_value)
 
 
 def log_init(level_name: str):
@@ -121,5 +129,5 @@ def log_init(level_name: str):
             f'Defaulting to {fallback_log_level}\n')
         ot_log_level = fallback_log_level
     level_value = logging._nameToLevel[ot_log_level]
-    logging_config = _config(OT_SYSTEM_VERSION, level_value)
+    logging_config = _config(ARCHITECTURE, level_value)
     dictConfig(logging_config)
