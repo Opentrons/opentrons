@@ -923,7 +923,7 @@
       }
     },
     "p20_single_v2": {
-      "name": "p20_single_v2",
+      "name": "p20_single",
       "top": {
         "value": 19.5,
         "min": -45,
@@ -2295,7 +2295,7 @@
       }
     },
     "p300_single_v2": {
-      "name": "p300_single_v2",
+      "name": "p300_single",
       "top": {
         "value": 19.5,
         "min": 5,
@@ -3257,7 +3257,7 @@
       }
   },
   "p1000_single_v2": {
-    "name": "p1000_single_v2",
+    "name": "p1000_single",
     "top": {
       "value": 19.5,
       "min": 5,
