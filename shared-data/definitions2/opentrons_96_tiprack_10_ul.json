@@ -1019,6 +1019,7 @@
     "format": "96Standard",
     "isTiprack": true,
     "tipLength": 39.2,
+    "tipOverlap": 3.29,
     "isMagneticModuleCompatible": false,
     "loadName": "opentrons_96_tiprack_10_ul"
   }
