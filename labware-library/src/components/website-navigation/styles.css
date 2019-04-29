@@ -75,7 +75,7 @@
 
   height: 100%;
   width: 100%;
-  padding: var(--spacing-5) 0;
+  padding: var(--spacing-3) 0;
 }
 
 .logo {
@@ -264,7 +264,7 @@
 .menu_button {
   @apply --transition-color;
 
-  flex: 0 0 5rem;
+  flex: 0 0 4rem;
   color: var(--c-font-dark);
 
   &:hover {
@@ -272,8 +272,81 @@
   }
 }
 
+.mobile_nav {
+  position: fixed;
+  width: 100%;
+  padding: 0;
+  padding-bottom: var(--spacing-5);
+  background-color: var(--c-white);
+  z-index: 900;
+
+  /* Added this for contrast with page - does not match design */
+  box-shadow: var(--shadow-1);
+}
+
+.mobile_nav_item {
+  @apply --flex-start;
+
+  padding: var(--spacing-7);
+  height: var(--size-2);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+
+  &:first-child {
+    padding-top: 2.5rem;
+  }
+}
+
+.mobile_menu {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  min-height: calc(100vh - var(--size-main-nav));
+  margin: 0 -100% 0 0;
+  background-color: var(--c-white);
+  box-shadow: var(--shadow-1);
+  z-index: 950;
+  transition: margin 0.5s linear;
+
+  &.active {
+    margin: 0;
+  }
+}
+
+.mobile_menu_heading {
+  @apply --flex-start;
+
+  height: 5rem;
+  border-bottom: var(--bd-light);
+}
+
+.mobile_menu_icon {
+  position: absolute;
+  left: 0;
+  width: var(--size-2);
+}
+
+.mobile_menu_title {
+  width: 100%;
+  text-align: center;
+  font-size: var(--fs-default);
+  font-weight: var(--fw-semibold);
+}
+
+@media (--medium) {
+  .mobile_nav_item {
+    justify-content: center;
+  }
+
+  .mobile_menu {
+    min-height: 30rem;
+  }
+}
+
 @media (--desktop) {
-  .menu_button {
+  .menu_button,
+  .mobile_nav {
     display: none;
   }
 

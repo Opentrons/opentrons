@@ -1,26 +1,31 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Nav component renders 1`] = `
-<nav
-  className="nav"
->
-  <div
-    className="subdomain_nav_wrapper"
+<Fragment>
+  <nav
+    className="nav"
   >
     <div
-      className="nav_container"
+      className="subdomain_nav_wrapper"
     >
-      <SubdomainNav />
+      <div
+        className="nav_container"
+      >
+        <SubdomainNav />
+      </div>
     </div>
-  </div>
-  <div
-    className="main_nav_wrapper"
-  >
     <div
-      className="nav_container"
+      className="main_nav_wrapper"
     >
-      <MainNav />
+      <div
+        className="nav_container"
+      >
+        <MainNav
+          isMobileOpen={false}
+          onMobileClick={[Function]}
+        />
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
+</Fragment>
 `;
