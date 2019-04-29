@@ -75,7 +75,7 @@
 
   height: 100%;
   width: 100%;
-  padding: var(--spacing-5) 0;
+  padding: var(--spacing-3) 0;
 }
 
 .logo {
@@ -264,7 +264,7 @@
 .menu_button {
   @apply --transition-color;
 
-  flex: 0 0 5rem;
+  flex: 0 0 4rem;
   color: var(--c-font-dark);
 
   &:hover {
@@ -299,7 +299,7 @@
 
 .mobile_menu {
   position: fixed;
-  top: var(--size-main-nav);
+  bottom: 0;
   right: 0;
   width: 100%;
   min-height: calc(100vh - var(--size-main-nav));
@@ -324,7 +324,7 @@
 .mobile_menu_icon {
   position: absolute;
   left: 0;
-  width: 3rem;
+  width: var(--size-2);
 }
 
 .mobile_menu_title {

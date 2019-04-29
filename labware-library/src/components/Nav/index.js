@@ -23,6 +23,10 @@ export default class Nav extends React.Component<Props, State> {
     document.body && document.body.classList.toggle('no_scroll')
   }
 
+  componentWillUnmount() {
+    document.body && document.body.classList.remove('no_scroll')
+  }
+
   render() {
     return (
       <>
@@ -35,7 +39,7 @@ export default class Nav extends React.Component<Props, State> {
           <div className={styles.main_nav_wrapper}>
             <div className={styles.nav_container}>
               <MainNav
-                onMobileClick={() => this.toggle()}
+                onMobileClick={this.toggle}
                 isMobileOpen={this.state.isOpen}
               />
             </div>
