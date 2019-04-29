@@ -13,8 +13,8 @@ import type { StepIdType } from '../../form-types'
 import type {
   LabwareOnDeck,
   PipetteOnDeck,
-  TemporalLabware,
-  TemporalPipette,
+  LabwareTemporalProperties,
+  PipetteTemporalProperties,
 } from '../../step-forms'
 
 const getInvariantContext: Selector<StepGeneration.InvariantContext> = createSelector(
@@ -61,21 +61,25 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   stepFormSelectors.getInvariantContext,
   getLabwareLiquidState,
   (initialDeckSetup, invariantContext, labwareLiquidState) => {
-    const labware: { [labwareId: string]: TemporalLabware } = mapValues(
+    const labware: {
+      [labwareId: string]: LabwareTemporalProperties,
+    } = mapValues(
       initialDeckSetup.labware,
-      (l: LabwareOnDeck): TemporalLabware => ({
+      (l: LabwareOnDeck): LabwareTemporalProperties => ({
         slot: l.slot,
       })
     )
 
-    const pipettes: { [pipetteId: string]: TemporalPipette } = mapValues(
+    const pipettes: {
+      [pipetteId: string]: PipetteTemporalProperties,
+    } = mapValues(
       initialDeckSetup.pipettes,
-      (p: PipetteOnDeck): TemporalPipette => ({
+      (p: PipetteOnDeck): PipetteTemporalProperties => ({
         mount: p.mount,
       })
     )
 
-    let robotState = StepGeneration.makeInitialRobotState({
+    const robotState = StepGeneration.makeInitialRobotState({
       invariantContext,
       labwareLocations: labware,
       pipetteLocations: pipettes,

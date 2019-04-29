@@ -4,8 +4,8 @@ import type {
   PipetteLabwareFieldsV1 as PipetteLabwareFields,
 } from '@opentrons/shared-data'
 import type {
-  TemporalLabware,
-  TemporalPipette,
+  LabwareTemporalProperties,
+  PipetteTemporalProperties,
   LabwareEntities,
   PipetteEntities,
 } from '../step-forms'
@@ -187,10 +187,10 @@ export type InvariantContext = {|
 // TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": `TimelineFrame`?
 export type RobotState = {|
   pipettes: {
-    [pipetteId: string]: TemporalPipette,
+    [pipetteId: string]: PipetteTemporalProperties,
   },
   labware: {
-    [labwareId: string]: TemporalLabware,
+    [labwareId: string]: LabwareTemporalProperties,
   },
   tipState: {
     tipracks: {

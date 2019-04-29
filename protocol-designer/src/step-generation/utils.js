@@ -329,8 +329,8 @@ export function makeInitialRobotState(args: {|
     tipState: {
       pipettes: reduce(
         pipetteLocations,
-        (acc, temporalPipette, id) =>
-          temporalPipette.mount ? { ...acc, [id]: false } : acc,
+        (acc, pipetteTemporalProperties, id) =>
+          pipetteTemporalProperties.mount ? { ...acc, [id]: false } : acc,
         {}
       ),
       tipracks: reduce(

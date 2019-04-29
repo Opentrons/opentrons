@@ -56,11 +56,11 @@ export type LabwareEntities = {
 // =========== TEMPORAL ONLY =====
 // Temporal properties (eg location) that are time-variant
 
-export type TemporalLabware = {|
+export type LabwareTemporalProperties = {|
   slot: DeckSlot,
 |}
 
-export type TemporalPipette = {|
+export type PipetteTemporalProperties = {|
   mount: Mount,
 |}
 
@@ -71,12 +71,12 @@ export type TemporalPipette = {|
 
 export type LabwareOnDeck = {|
   ...LabwareEntity,
-  ...TemporalLabware,
+  ...LabwareTemporalProperties,
 |}
 
 export type PipetteOnDeck = {|
   ...PipetteEntity,
-  ...TemporalPipette,
+  ...PipetteTemporalProperties,
 |}
 
 export type InitialDeckSetup = {
