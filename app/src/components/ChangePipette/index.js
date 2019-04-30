@@ -9,12 +9,14 @@ import {
   getPipetteModelSpecs,
 } from '@opentrons/shared-data'
 
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type {
+  PipetteNameSpecs,
+  PipetteModelSpecs,
+} from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
 import type { Mount } from '../../robot'
 import type { Robot } from '../../discovery'
 import type { Direction, ChangePipetteProps } from './types'
-
 import type { RobotHome, RobotMove } from '../../http-api-client'
 
 import {
