@@ -30,10 +30,6 @@ export default class MobileList extends React.Component<Props, State> {
   toggle = (name: MenuName) =>
     this.setState({ menu: this.state.menu !== name ? name : null })
 
-  componentWillUnmount() {
-    document.body && document.body.classList.remove('no_scroll')
-  }
-
   render() {
     const { menu } = this.state
     return (

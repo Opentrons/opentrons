@@ -329,7 +329,7 @@
   right: 0;
   width: 100%;
   min-height: calc(100vh - var(--size-mobile-nav));
-  margin: 0 -100% 0 0;
+  margin: 0 -105% 0 0;
   background-color: var(--c-white);
   box-shadow: var(--shadow-1);
   z-index: 950;
