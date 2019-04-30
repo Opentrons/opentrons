@@ -7,7 +7,7 @@
   height: 100%;
 
   /* nav height */
-  padding-top: var(--size-main-nav);
+  padding-top: var(--size-mobile-nav);
 
   &.breadcrumbs_visible {
     /* nav + breadcrumbs height */
@@ -39,6 +39,10 @@
 }
 
 @media (--medium) {
+  .app {
+    padding-top: var(--size-main-nav);
+  }
+
   .page {
     height: 100%;
     overflow: hidden;

@@ -2,20 +2,15 @@
 import * as React from 'react'
 import Logo from './Logo'
 import { NavList } from './NavList'
-import MenuButton from './MenuButton'
+import MobileNav from './MobileNav'
 import styles from './styles.css'
 
-import type { MobileNavProps } from './types'
-
-export function MainNav(props: MobileNavProps) {
+export function MainNav() {
   return (
     <div className={styles.main_nav_contents}>
       <Logo />
       <NavList />
-      <MenuButton
-        onMobileClick={props.onMobileClick}
-        isMobileOpen={props.isMobileOpen}
-      />
+      <MobileNav />
     </div>
   )
 }
