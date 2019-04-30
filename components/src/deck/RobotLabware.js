@@ -1,5 +1,5 @@
 // @flow
-// render labware definition to SVG
+// Render labware definition to SVG. XY is in robot coordinates.
 import * as React from 'react'
 import flatMap from 'lodash/flatMap'
 import cx from 'classnames'
@@ -16,7 +16,6 @@ import type {
 
 type Props = {
   definition: LabwareDefinition2,
-  transform?: string,
 }
 
 type WellProps = {
@@ -30,7 +29,7 @@ export default function RobotLabware(props: Props) {
   const { isTiprack } = parameters
 
   return (
-    <g transform={props.transform}>
+    <g>
       <g className={styles.labware_detail_group}>
         <LabwareOutline
           className={cx({ [styles.tiprack_outline]: isTiprack })}
