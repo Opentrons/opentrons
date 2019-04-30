@@ -23,9 +23,9 @@ are project specific  */
 
 .main_nav_wrapper {
   width: 100%;
-  height: var(--size-main-nav);
+  height: var(--size-mobile-nav);
   background-color: var(--c-white);
-  box-shadow: var(--shadow-1);
+  border-bottom: var(--bd-light);
 }
 
 .nav_container {
@@ -74,6 +74,10 @@ are project specific  */
 }
 
 @media (--medium) {
+  .main_nav_wrapper {
+    height: var(--size-main-nav);
+  }
+
   .nav_container,
   .breadcrumbs_contents {
     padding-left: var(--spacing-7);
@@ -87,6 +91,11 @@ are project specific  */
     width: 100%;
     height: var(--size-subdomain-nav);
     background-color: var(--c-lightest-gray);
+  }
+
+  .main_nav_wrapper {
+    border: none;
+    box-shadow: var(--shadow-1);
   }
 
   .breadcrumbs {

@@ -1,6 +1,12 @@
 // @flow
-import merge from 'lodash/merge'
-import { createRobotState, commandCreatorNoErrors } from './fixtures'
+import {
+  getInitialRobotStateStandard,
+  getRobotStateWithTipStandard,
+  makeStateArgsStandard,
+  makeContext,
+  makeState,
+  commandCreatorNoErrors,
+} from './fixtures'
 import _dropTip from '../commandCreators/atomic/dropTip'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
@@ -10,28 +16,14 @@ const dropTip = commandCreatorNoErrors(_dropTip)
 jest.mock('../dispenseUpdateLiquidState')
 
 describe('dropTip', () => {
+  let invariantContext
   let initialRobotState
   let robotStateWithTip
 
   beforeEach(() => {
-    initialRobotState = createRobotState({
-      sourcePlateType: 'trough-12row',
-      destPlateType: '96-flat',
-      fillTiprackTips: true,
-      fillPipetteTips: false,
-      tipracks: [300, 300],
-    })
-
-    robotStateWithTip = {
-      ...initialRobotState,
-      tipState: {
-        ...initialRobotState.tipState,
-        pipettes: {
-          ...initialRobotState.tipState.pipettes,
-          p300SingleId: true,
-        },
-      },
-    }
+    invariantContext = makeContext()
+    initialRobotState = getInitialRobotStateStandard(invariantContext)
+    robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
 
     // $FlowFixMe: mock methods
     updateLiquidState.mockClear()
@@ -39,33 +31,25 @@ describe('dropTip', () => {
     updateLiquidState.mockReturnValue(initialRobotState.liquidState)
   })
 
+  // TODO Ian 2019-04-19: this is a ONE-OFF fixture
   function makeRobotState(args: {
     singleHasTips: boolean,
     multiHasTips: boolean,
   }) {
-    return merge(
-      {},
-      createRobotState({
-        sourcePlateType: 'trough-12row',
-        destPlateType: '96-flat',
-        tipracks: [300, 300],
-        fillPipetteTips: false,
-        fillTiprackTips: true,
-      }),
-      {
-        tipState: {
-          pipettes: {
-            p300SingleId: args.singleHasTips,
-            p300MultiId: args.multiHasTips,
-          },
-        },
-      }
-    )
+    let _robotState = makeState({
+      ...makeStateArgsStandard(),
+      invariantContext,
+      tiprackSetting: { tiprack1Id: true },
+    })
+    _robotState.tipState.pipettes.p300SingleId = args.singleHasTips
+    _robotState.tipState.pipettes.p300MultiId = args.multiHasTips
+    return _robotState
   }
 
   describe('replaceTip: single channel', () => {
     test('drop tip if there is a tip', () => {
       const result = dropTip('p300SingleId')(
+        invariantContext,
         makeRobotState({ singleHasTips: true, multiHasTips: true })
       )
 
@@ -89,7 +73,10 @@ describe('dropTip', () => {
         singleHasTips: false,
         multiHasTips: true,
       })
-      const result = dropTip('p300SingleId')(initialRobotState)
+      const result = dropTip('p300SingleId')(
+        invariantContext,
+        initialRobotState
+      )
       expect(result.commands).toEqual([])
       expect(result.robotState).toEqual(initialRobotState)
     })
@@ -98,6 +85,7 @@ describe('dropTip', () => {
   describe('Multi-channel dropTip', () => {
     test('drop tip if there is a tip', () => {
       const result = dropTip('p300MultiId')(
+        invariantContext,
         makeRobotState({ singleHasTips: true, multiHasTips: true })
       )
       expect(result.commands).toEqual([
@@ -120,7 +108,7 @@ describe('dropTip', () => {
         singleHasTips: true,
         multiHasTips: false,
       })
-      const result = dropTip('p300MultiId')(initialRobotState)
+      const result = dropTip('p300MultiId')(invariantContext, initialRobotState)
       expect(result.commands).toEqual([])
       expect(result.robotState).toEqual(initialRobotState)
     })
@@ -139,16 +127,15 @@ describe('dropTip', () => {
         multiHasTips: true,
       })
 
-      const result = dropTip('p300MultiId')(initialRobotState)
+      const result = dropTip('p300MultiId')(invariantContext, initialRobotState)
 
       expect(updateLiquidState).toHaveBeenCalledWith(
         {
+          invariantContext,
           pipetteId: 'p300MultiId',
           labwareId: 'trashId',
           useFullVolume: true,
           well: 'A1',
-          labwareType: 'fixed-trash',
-          pipetteData: robotStateWithTip.pipettes.p300MultiId,
         },
         robotStateWithTip.liquidState
       )

@@ -4,6 +4,7 @@ import { repeatArray, blowoutUtil } from '../../utils'
 import * as errorCreators from '../../errorCreators'
 import type {
   MixArgs,
+  InvariantContext,
   RobotState,
   CommandCreator,
   CompoundCommandCreator,
@@ -57,6 +58,7 @@ export function mixUtil(args: {
 }
 
 const mix = (data: MixArgs): CompoundCommandCreator => (
+  invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {
   /**
@@ -85,7 +87,10 @@ const mix = (data: MixArgs): CompoundCommandCreator => (
   } = data
 
   // Errors
-  if (!prevRobotState.pipettes[pipette]) {
+  if (
+    !prevRobotState.pipettes[pipette] ||
+    !invariantContext.pipetteEntities[pipette]
+  ) {
     // bail out before doing anything else
     return [
       _robotState => ({

@@ -1,12 +1,12 @@
 import {
+  fixture12Trough,
+  fixture96Plate,
+  fixture384Plate,
+} from '@opentrons/shared-data/fixtures'
+import {
   getWellSetForMultichannel,
   getWellSetForMultichannelDeprecated,
 } from '../utils'
-
-// TODO Ian 2019-04-12: create representative fixtures, don't use real defs
-const fixture96Plate = require('@opentrons/shared-data/definitions2/generic_96_wellplate_380_ul.json')
-const fixture384Plate = require('@opentrons/shared-data/definitions2/corning_384_wellplate_112_ul.json')
-const fixture12Trough = require('@opentrons/shared-data/definitions2/usa_scientific_12_trough_22_ml.json')
 
 describe('getWellSetForMultichannel (integration test)', () => {
   test('96-flat', () => {

@@ -83,7 +83,6 @@ function _updatePatchPathField(
   }
 
   const numericVolume = Number(appliedPatch.volume) || 0
-  console.log({ pipetteEntities, appliedPatch })
   const pipetteCapacity = getPipetteCapacityLegacy(
     pipetteEntities[appliedPatch.pipette]
   )

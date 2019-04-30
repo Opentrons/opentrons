@@ -1,23 +1,41 @@
 // @flow
 import {
+  fixture96Plate,
+  fixtureTipRack10Ul,
+  fixtureTipRack300Ul,
+  fixtureTrash,
+  fixtureP10Single,
+  fixtureP300Multi,
+} from '@opentrons/shared-data/fixtures'
+import {
   reduceCommandCreators,
   commandCreatorsTimeline,
   splitLiquid,
   mergeLiquid,
   AIR,
   repeatArray,
+  makeInitialRobotState,
 } from '../utils'
+import type { InvariantContext } from '../types'
+
+let invariantContext
 
 // NOTE: using 'any' types all over here so I don't have to write a longer test with real RobotState
 type CountState = { count: number }
-const addCreator: any = (num: number) => (prevState: CountState) => ({
+const addCreator: any = (num: number) => (
+  invariantContext: InvariantContext,
+  prevState: CountState
+) => ({
   commands: [`command: add ${num}`],
   robotState: { count: prevState.count + num },
 })
 
-const addCreatorWithWarning: any = (num: number) => (prevState: CountState) => {
+const addCreatorWithWarning: any = (num: number) => (
+  invariantContext: InvariantContext,
+  prevState: CountState
+) => {
   // adds a warning for no meaningful reason
-  const result = addCreator(num)(prevState)
+  const result = addCreator(num)(invariantContext, prevState)
   return {
     ...result,
     warnings: [
@@ -29,12 +47,18 @@ const addCreatorWithWarning: any = (num: number) => (prevState: CountState) => {
   }
 }
 
-const multiplyCreator: any = (num: number) => (prevState: CountState) => ({
+const multiplyCreator: any = (num: number) => (
+  invariantContext: InvariantContext,
+  prevState: CountState
+) => ({
   commands: [`command: multiply by ${num}`],
   robotState: { count: prevState.count * num },
 })
 
-const divideCreator: any = (num: number) => (prevState: CountState) => {
+const divideCreator: any = (num: number) => (
+  invariantContext: InvariantContext,
+  prevState: CountState
+) => {
   if (num === 0) {
     return {
       errors: [
@@ -52,13 +76,17 @@ const divideCreator: any = (num: number) => (prevState: CountState) => {
   }
 }
 
+beforeEach(() => {
+  invariantContext = { pipetteEntities: {}, labwareEntities: {} }
+})
+
 describe('reduceCommandCreators', () => {
   test('basic command creators', () => {
     const initialState: any = { count: 0 }
     const result: any = reduceCommandCreators([
       addCreator(1),
       multiplyCreator(2),
-    ])(initialState)
+    ])(invariantContext, initialState)
 
     expect(result.robotState).toEqual({ count: 2 })
 
@@ -74,7 +102,7 @@ describe('reduceCommandCreators', () => {
       addCreator(4),
       divideCreator(0),
       multiplyCreator(3),
-    ])(initialState)
+    ])(invariantContext, initialState)
 
     expect(result).toEqual({
       robotState: { count: 9 }, // last valid state before division error
@@ -96,7 +124,7 @@ describe('reduceCommandCreators', () => {
       addCreatorWithWarning(3),
       multiplyCreator(2),
       addCreatorWithWarning(1),
-    ])(initialState)
+    ])(invariantContext, initialState)
 
     expect(result).toEqual({
       robotState: { count: 17 },
@@ -116,7 +144,7 @@ describe('commandCreatorsTimeline', () => {
       addCreatorWithWarning(4),
       divideCreator(0),
       multiplyCreator(3),
-    ])(initialState)
+    ])(invariantContext, initialState)
 
     expect(result).toEqual({
       // error-creating "divide by zero" commands's index in the command creators array
@@ -147,7 +175,7 @@ describe('commandCreatorsTimeline', () => {
       addCreatorWithWarning(3),
       multiplyCreator(2),
       addCreatorWithWarning(1),
-    ])(initialState)
+    ])(invariantContext, initialState)
 
     expect(result.timeline).toEqual([
       // add 3 w/ warning
@@ -370,4 +398,61 @@ describe('repeatArray', () => {
       [3, 4],
     ])
   })
+})
+
+describe('makeInitialRobotState', () => {
+  expect(
+    makeInitialRobotState({
+      invariantContext: {
+        pipetteEntities: {
+          p10SingleId: {
+            id: 'p10SingleId',
+            name: 'p10_single',
+            spec: fixtureP10Single,
+            tiprackModel: fixtureTipRack10Ul.otId,
+            tiprackLabwareDef: fixtureTipRack10Ul,
+          },
+          p300MultiId: {
+            id: 'p300MultiId',
+            name: 'p300_multi',
+            spec: fixtureP300Multi,
+            tiprackModel: fixtureTipRack300Ul.otId,
+            tiprackLabwareDef: fixtureTipRack300Ul,
+          },
+        },
+        labwareEntities: {
+          somePlateId: {
+            id: 'somePlateId',
+            type: fixture96Plate.otId,
+            def: fixture96Plate,
+          },
+          tiprack10Id: {
+            id: 'tiprack10Id',
+            type: fixtureTipRack10Ul.otId,
+            def: fixtureTipRack10Ul,
+          },
+          tiprack300Id: {
+            id: 'tiprack300Id',
+            type: fixtureTipRack300Ul.otId,
+            def: fixtureTipRack300Ul,
+          },
+          trashId: {
+            id: 'trashId',
+            type: fixtureTrash.otId,
+            def: fixtureTrash,
+          },
+        },
+      },
+      labwareLocations: {
+        somePlateId: { slot: '1' },
+        tiprack10Id: { slot: '2' },
+        tiprack300Id: { slot: '3' },
+        trashId: { slot: '12' },
+      },
+      pipetteLocations: {
+        p10SingleId: { mount: 'left' },
+        p300MultiId: { mount: 'right' },
+      },
+    })
+  ).toMatchSnapshot()
 })

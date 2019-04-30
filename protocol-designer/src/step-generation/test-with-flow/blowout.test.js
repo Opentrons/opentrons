@@ -2,7 +2,9 @@
 import { expectTimelineError } from './testMatchers'
 import _blowout from '../commandCreators/atomic/blowout'
 import {
-  createRobotState,
+  makeContext,
+  getInitialRobotStateStandard,
+  getRobotStateWithTipStandard,
   commandCreatorNoErrors,
   commandCreatorHasErrors,
 } from './fixtures'
@@ -15,28 +17,14 @@ const blowoutWithErrors = commandCreatorHasErrors(_blowout)
 jest.mock('../dispenseUpdateLiquidState')
 
 describe('blowout', () => {
+  let invariantContext
   let initialRobotState
   let robotStateWithTip
 
   beforeEach(() => {
-    initialRobotState = createRobotState({
-      sourcePlateType: 'trough-12row',
-      destPlateType: '96-flat',
-      fillTiprackTips: true,
-      fillPipetteTips: false,
-      tipracks: [300, 300],
-    })
-
-    robotStateWithTip = {
-      ...initialRobotState,
-      tipState: {
-        ...initialRobotState.tipState,
-        pipettes: {
-          ...initialRobotState.tipState.pipettes,
-          p300SingleId: true,
-        },
-      },
-    }
+    invariantContext = makeContext()
+    initialRobotState = getInitialRobotStateStandard(invariantContext)
+    robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
 
     // $FlowFixMe: mock methods
     updateLiquidState.mockClear()
@@ -49,7 +37,7 @@ describe('blowout', () => {
       pipette: 'p300SingleId',
       labware: 'sourcePlateId',
       well: 'A1',
-    })(robotStateWithTip)
+    })(invariantContext, robotStateWithTip)
 
     expect(result.commands).toEqual([
       {
@@ -70,7 +58,7 @@ describe('blowout', () => {
       pipette: 'badPipette',
       labware: 'sourcePlateId',
       well: 'A1',
-    })(robotStateWithTip)
+    })(invariantContext, robotStateWithTip)
 
     expectTimelineError(result.errors, 'PIPETTE_DOES_NOT_EXIST')
   })
@@ -80,7 +68,7 @@ describe('blowout', () => {
       pipette: 'p300SingleId',
       labware: 'badLabware',
       well: 'A1',
-    })(robotStateWithTip)
+    })(invariantContext, robotStateWithTip)
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
@@ -93,7 +81,7 @@ describe('blowout', () => {
       pipette: 'p300SingleId',
       labware: 'sourcePlateId',
       well: 'A1',
-    })(initialRobotState)
+    })(invariantContext, initialRobotState)
 
     expect(result.errors).toHaveLength(1)
     expect(result.errors[0]).toMatchObject({
@@ -113,16 +101,15 @@ describe('blowout', () => {
         pipette: 'p300SingleId',
         labware: 'sourcePlateId',
         well: 'A1',
-      })(robotStateWithTip)
+      })(invariantContext, robotStateWithTip)
 
       expect(updateLiquidState).toHaveBeenCalledWith(
         {
+          invariantContext,
           pipetteId: 'p300SingleId',
           labwareId: 'sourcePlateId',
           useFullVolume: true,
           well: 'A1',
-          labwareType: 'trough-12row',
-          pipetteData: robotStateWithTip.pipettes.p300SingleId,
         },
         robotStateWithTip.liquidState
       )

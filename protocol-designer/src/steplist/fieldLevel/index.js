@@ -17,19 +17,19 @@ import {
 } from './processing'
 import type { StepFieldName } from '../../form-types'
 import type { LabwareEntity, PipetteEntity } from '../../step-forms'
-import type { StepFormContextualState } from '../types'
+import type { InvariantContext } from '../../step-generation'
 
 export type { StepFieldName }
 
 const getLabwareEntity = (
-  state: StepFormContextualState,
+  state: InvariantContext,
   id: string
 ): LabwareEntity => {
   return state.labwareEntities[id]
 }
 
 const getPipetteEntity = (
-  state: StepFormContextualState,
+  state: InvariantContext,
   id: string
 ): PipetteEntity => {
   return state.pipetteEntities[id]
@@ -39,7 +39,7 @@ type StepFieldHelpers = {|
   getErrors?: mixed => Array<string>,
   maskValue?: ValueMasker,
   castValue?: ValueCaster,
-  hydrate?: (state: StepFormContextualState, id: string) => mixed,
+  hydrate?: (state: InvariantContext, id: string) => mixed,
 |}
 const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   aspirate_airGap_volume: {
@@ -153,7 +153,7 @@ export const maskField = (name: StepFieldName, value: mixed): mixed => {
 }
 
 export const hydrateField = (
-  state: StepFormContextualState,
+  state: InvariantContext,
   name: StepFieldName,
   value: string
 ): mixed => {

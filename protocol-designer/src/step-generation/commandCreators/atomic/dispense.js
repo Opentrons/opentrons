@@ -3,6 +3,7 @@ import * as errorCreators from '../../errorCreators'
 import updateLiquidState from '../../dispenseUpdateLiquidState'
 import type { AspirateDispenseArgsV1 as AspirateDispenseArgs } from '@opentrons/shared-data'
 import type {
+  InvariantContext,
   RobotState,
   CommandCreator,
   CommandCreatorError,
@@ -10,6 +11,7 @@ import type {
 
 /** Dispense with given args. Requires tip. */
 const dispense = (args: AspirateDispenseArgs): CommandCreator => (
+  invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {
   const { pipette, volume, labware, well, offsetFromBottomMm } = args
@@ -53,10 +55,9 @@ const dispense = (args: AspirateDispenseArgs): CommandCreator => (
       ...prevRobotState,
       liquidState: updateLiquidState(
         {
+          invariantContext,
           pipetteId: pipette,
-          pipetteData: prevRobotState.pipettes[pipette],
           labwareId: labware,
-          labwareType: prevRobotState.labware[labware].type,
           volume,
           well,
         },

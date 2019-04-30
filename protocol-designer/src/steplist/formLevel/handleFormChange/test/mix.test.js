@@ -1,10 +1,7 @@
 // @flow
+import { fixture96Plate, fixtureTrash } from '@opentrons/shared-data/fixtures'
 import dependentFieldsUpdateMix from '../dependentFieldsUpdateMix'
 import { DEFAULT_MM_FROM_BOTTOM_DISPENSE } from '../../../../constants'
-
-// TODO Ian 2019-04-12: create representative fixtures, don't use real defs
-const fixture96Plate = require('@opentrons/shared-data/definitions2/generic_96_wellplate_380_ul.json')
-const fixtureTrash = require('@opentrons/shared-data/definitions2/opentrons_1_trash_1.1_l.json')
 
 let pipetteEntities
 let labwareEntities

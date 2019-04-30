@@ -33,17 +33,16 @@ function getTipHighlighted(
   labwareId: string,
   labwareDef: LabwareDefinition2,
   wellName: string,
-  commandsAndRobotState: StepGeneration.CommandsAndRobotState
+  commandsAndRobotState: StepGeneration.CommandsAndRobotState,
+  invariantContext: StepGeneration.InvariantContext
 ): boolean {
-  const { commands, robotState } = commandsAndRobotState
+  const { commands } = commandsAndRobotState
   const commandUsesTip = (c: Command) => {
     if (c.command === 'pick-up-tip' && c.params.labware === labwareId) {
       const commandWellName = c.params.well
       const pipetteId = c.params.pipette
-      const pipetteSpec = StepGeneration.getPipetteSpecFromId(
-        pipetteId,
-        robotState
-      )
+      const pipetteSpec =
+        invariantContext.pipetteEntities[pipetteId]?.spec || {}
 
       if (pipetteSpec.channels === 1) {
         return commandWellName === wellName
@@ -95,7 +94,7 @@ const getLastValidTips: GetTipSelector = createSelector(
 
 export const getTipsForCurrentStep: GetTipSelector = createSelector(
   stepFormSelectors.getOrderedStepIds,
-  stepFormSelectors.getLabwareEntities,
+  stepFormSelectors.getInvariantContext,
   fileDataSelectors.getRobotStateTimeline,
   stepsSelectors.getHoveredStepId,
   stepsSelectors.getActiveItem,
@@ -106,7 +105,7 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
   getAllSubsteps,
   (
     orderedStepIds,
-    labwareEntities,
+    invariantContext,
     robotStateTimeline,
     hoveredStepId,
     activeItem,
@@ -116,7 +115,7 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
     hoveredSubstepIdentifier,
     allSubsteps
   ) => {
-    const labwareDef = labwareEntities[labwareId].def
+    const labwareDef = invariantContext.labwareEntities[labwareId].def
     if (!activeItem.isStep) {
       const terminalId = activeItem.id
       if (terminalId === START_TERMINAL_ITEM_ID) {
@@ -196,7 +195,8 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
           labwareId,
           labwareDef,
           wellName,
-          currentFrame
+          currentFrame,
+          invariantContext
         )
       }
 
