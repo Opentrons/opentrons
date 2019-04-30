@@ -12,12 +12,12 @@ const writeFile = promisify(fs.writeFile)
 // Furthermore, the .ai file should contain no groups and all layers
 // will be directly translated to layer groups in the JSON output
 
-const USAGE =
-  'Expected Params Not Present:   (e.g. node ./scripts/generateDeckLayersFromSVG ./path/to/source/svg ./path/to/output/dir)'
-assert(process.argv[2] && process.argv[3], USAGE)
-
 const svgPath = process.argv[2]
 const buildDir = process.argv[3]
+
+const USAGE =
+  'Expected Params Not Present:   (e.g. node ./scripts/generateDeckLayersFromSVG ./path/to/source/svg ./path/to/output/dir)'
+assert(svgPath && buildDir, USAGE)
 
 readFile(svgPath, 'utf8')
   .then(data => {
