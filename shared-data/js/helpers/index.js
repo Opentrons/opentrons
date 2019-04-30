@@ -8,7 +8,7 @@ export {
 } from './computeWellAccess'
 export { default as getWellTotalVolume } from './getWellTotalVolume'
 export { default as wellIsRect } from './wellIsRect'
-export { default as getLayersForDeck } from './getLayersForDeck'
+export { default as getDeckLayers } from './getDeckLayers'
 export * from './volume'
 
 export const getLabwareDisplayName = (labwareDef: LabwareDefinition2) =>

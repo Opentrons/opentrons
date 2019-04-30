@@ -1,3 +1,5 @@
+import { getDeckLayers } from "./helpers";
+
 // @flow
 export type WellDefinition = {
   diameter?: number, // NOTE: presence of diameter indicates a circular well
@@ -122,4 +124,57 @@ export type LabwareDefinition2 = {|
   brand: LabwareBrand,
   ordering: Array<Array<string>>,
   wells: LabwareWellMap,
+|}
+
+export type DeckOffset = {|
+  x: number,
+  y: number,
+  z: number,
+|}
+
+export type Dimensions = {|
+  xDimension: number,
+  yDimension: number,
+  zDimension: number,
+|}
+
+export type DeckRobot = {|
+  model: string,
+|}
+
+export type CoordinateTuple = [number, number, number]
+export type DeckSlot = {|
+  id: string,
+  position: CoordinateTuple,
+  boundingBox: Dimensions,
+  displayName: string,
+|}
+export type DeckCalibrationPoint = {|
+  id: string,
+  position: CoordinateTuple,
+  displayName: string,
+|}
+export type DeckLocations = {|
+  orderedSlots: Array<DeckSlot>,
+  calibrationPoints: Array<DeckCalibrationPoint>,
+|}
+
+export type DeckMetadata = {|
+  displayName: string,
+  tags: Array<string>,
+|}
+
+export type DeckLayer = {|
+  footprint: string,
+|}
+
+export type DeckDefinition = {|
+  otId: string,
+  loadName: string,
+  cornerOffsetFromOrigin: DeckOffset,
+  dimensions: Dimensions,
+  robot: DeckRobot,
+  locations: DeckLocations,
+  metadata: DeckMetadata,
+  layers: { [string]: DeckLayer },
 |}

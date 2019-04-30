@@ -31,3 +31,7 @@
   text-anchor: middle;
   fill: white;
 }
+
+.working_space {
+  transform: scale(1, -1) /* reflect horizontally about the center of the DOM elem */
+}

@@ -43,9 +43,9 @@ function ProtocolEditor() {
             <MainPageModalPortalRoot />
 
             {/* <ConnectedMainPanel /> */}
-            <svg style={{'transform': 'scale(1, -1)'}}>
+            <div style={{ height: '500px', width: '500px' }}>
               <WorkingSpace />
-            </svg>
+            </div>
           </div>
         </div>
       </div>
