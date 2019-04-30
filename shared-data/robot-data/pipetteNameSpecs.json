@@ -32,7 +32,7 @@
     "channels": 8
   },
   "p+20_single": {
-    "displayName": "P20 Single-Channel",
+    "displayName": "P20+ Single-Channel",
     "defaultAspirateFlowRate": {
       "value": 5,
       "min": 0.001,
@@ -96,7 +96,7 @@
     "maxVolume": 300
   },
   "p+300_single": {
-    "displayName": "P300 Single-Channel",
+    "displayName": "P300+ Single-Channel",
     "defaultAspirateFlowRate": {
       "value": 150,
       "min": 0.001,
@@ -144,7 +144,7 @@
     "maxVolume": 1000
   },
   "p+1000_single": {
-    "displayName": "P1000 Single-Channel",
+    "displayName": "P1000+ Single-Channel",
     "defaultAspirateFlowRate": {
       "value": 500,
       "min": 50,

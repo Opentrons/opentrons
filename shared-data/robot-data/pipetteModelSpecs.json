@@ -960,7 +960,7 @@
         "type": "float"
       },
       "pickUpDistance": {
-        "value": 11,
+        "value": 14,
         "min": 1,
         "max": 20,
         "units": "mm",
@@ -1023,7 +1023,7 @@
       ],
       "quirks": [],
       "tipLength": {
-        "value": 30.9,
+        "value": 31.15,
         "units": "mm",
         "type": "float",
         "min": 0,
