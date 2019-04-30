@@ -5,4 +5,3 @@
 export * from './SubdomainNav'
 export { MainNav } from './MainNav'
 export { NavList } from './NavList'
-export { MobileNav } from './MobileNav'
