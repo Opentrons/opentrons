@@ -4,7 +4,6 @@ import cx from 'classnames'
 import { Link } from 'react-router-dom'
 
 import { Icon, PrimaryButton, ModalPage } from '@opentrons/components'
-import { getPipetteChannelsByDisplayName } from '@opentrons/shared-data'
 
 import type { ChangePipetteProps } from './types'
 import { getDiagramSrc } from './InstructionStep'
@@ -14,7 +13,7 @@ const EXIT_BUTTON_MESSAGE = 'exit pipette setup'
 const EXIT_BUTTON_MESSAGE_WRONG = 'keep pipette and exit setup'
 
 // note: direction prop is not valid inside this component
-// display messages based on presence of wantedPipetteName and actualPipette
+// display messages based on presence of wantedPipette and actualPipette
 export default function ConfirmPipette(props: ChangePipetteProps) {
   const { success, attachedWrong, actualPipette } = props
 
@@ -39,7 +38,7 @@ export default function ConfirmPipette(props: ChangePipetteProps) {
 }
 
 function Status(props: ChangePipetteProps) {
-  const { displayName, wantedPipetteName, attachedWrong, success } = props
+  const { displayName, wantedPipette, attachedWrong, success } = props
   const iconName = success ? 'check-circle' : 'close-circle'
   const iconClass = cx(styles.confirm_icon, {
     [styles.success]: success,
@@ -48,12 +47,12 @@ function Status(props: ChangePipetteProps) {
 
   let message
 
-  if (wantedPipetteName && success) {
-    message = `${displayName} successfully attached.`
-  } else if (wantedPipetteName) {
+  if (wantedPipette && success) {
+    message = `${wantedPipette.displayName} successfully attached.`
+  } else if (wantedPipette) {
     message = attachedWrong
       ? `Incorrect pipette attached (${displayName})`
-      : `Unable to detect ${wantedPipetteName || ''}.`
+      : `Unable to detect ${wantedPipette.displayName || ''}.`
   } else {
     message = success ? 'Pipette is detached' : 'Pipette is not detached'
   }
@@ -67,26 +66,26 @@ function Status(props: ChangePipetteProps) {
 }
 
 function StatusDetails(props: ChangePipetteProps) {
-  const { success, attachedWrong, wantedPipetteName, actualPipette } = props
+  const { success, attachedWrong, wantedPipette, actualPipette } = props
 
   if (!success) {
-    if (wantedPipetteName && attachedWrong) {
+    if (wantedPipette && attachedWrong) {
       return (
         <p className={styles.confirm_failure_instructions}>
-          The attached pipette does not match the {wantedPipetteName} pipette
-          you had originally selected.
+          The attached pipette does not match the {wantedPipette.displayName}{' '}
+          pipette you had originally selected.
         </p>
       )
     }
 
-    if (wantedPipetteName) {
+    if (wantedPipette) {
       return (
         <div>
           <img
             className={styles.confirm_diagram}
             src={getDiagramSrc({
               ...props,
-              channels: getPipetteChannelsByDisplayName(wantedPipetteName),
+              channels: wantedPipette.channels,
               diagram: 'tab',
               direction: 'attach',
             })}
@@ -129,16 +128,16 @@ function TryAgainButton(props: ChangePipetteProps) {
     baseUrl,
     checkPipette,
     attachedWrong,
-    wantedPipetteName,
+    wantedPipette,
     actualPipette,
   } = props
 
   let buttonProps
 
-  if (wantedPipetteName && attachedWrong) {
+  if (wantedPipette && attachedWrong) {
     buttonProps = {
       Component: Link,
-      to: baseUrl.replace(`/${wantedPipetteName}`, ''),
+      to: baseUrl.replace(`/${wantedPipette.name}`, ''),
       children: 'detach and try again',
     }
   } else if (actualPipette) {

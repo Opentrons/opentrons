@@ -1,5 +1,8 @@
 // @flow
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type {
+  PipetteNameSpecs,
+  PipetteModelSpecs,
+} from '@opentrons/shared-data'
 import type { Mount } from '../../robot'
 
 import type { RobotMove, RobotHome } from '../../http-api-client'
@@ -12,7 +15,7 @@ export type ChangePipetteProps = {
   title: string,
   subtitle: string,
   mount: Mount,
-  wantedPipetteName: ?string,
+  wantedPipette: ?PipetteNameSpecs,
   actualPipette: ?PipetteModelSpecs,
   displayName: string,
   direction: Direction,

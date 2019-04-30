@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 
-import { getPipetteDisplayNames } from '@opentrons/shared-data'
+import { getAllPipetteNames, getPipetteNameSpecs } from '@opentrons/shared-data'
 import { DropdownField } from '@opentrons/components'
 import styles from './styles.css'
 
@@ -11,7 +11,10 @@ export type PipetteSelectionProps = {
   onChange: $PropertyType<React.ElementProps<typeof DropdownField>, 'onChange'>,
 }
 
-const OPTIONS = getPipetteDisplayNames().map(name => ({ name, value: name }))
+const OPTIONS = getAllPipetteNames().map(name => ({
+  name: getPipetteNameSpecs(name)?.displayName || name,
+  value: name,
+}))
 
 export default function PipetteSelection(props: PipetteSelectionProps) {
   return (
