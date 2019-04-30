@@ -139,9 +139,11 @@ export const salesLinkProps: SalesLinks = {
   sales: {
     name: 'Contact Sales',
     url: 'http://opentrons.com/contact',
+    cta: true,
   },
   demo: {
     name: 'Schedule Demo',
     url: 'http://opentrons.com/demo',
+    cta: true,
   },
 }
