@@ -20,7 +20,10 @@ exports[`Nav component renders 1`] = `
       <div
         className="nav_container"
       >
-        <MainNav />
+        <MainNav
+          isMobileOpen={false}
+          onMobileClick={[Function]}
+        />
       </div>
     </div>
   </nav>

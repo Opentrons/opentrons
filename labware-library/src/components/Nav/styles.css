@@ -76,6 +76,8 @@ are project specific  */
 @media (--medium) {
   .main_nav_wrapper {
     height: var(--size-main-nav);
+    border: none;
+    box-shadow: var(--shadow-1);
   }
 
   .nav_container,
@@ -91,11 +93,6 @@ are project specific  */
     width: 100%;
     height: var(--size-subdomain-nav);
     background-color: var(--c-lightest-gray);
-  }
-
-  .main_nav_wrapper {
-    border: none;
-    box-shadow: var(--shadow-1);
   }
 
   .breadcrumbs {

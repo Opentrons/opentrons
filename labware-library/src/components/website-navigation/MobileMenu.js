@@ -9,7 +9,6 @@ import type { Submenu } from './types'
 type Props = {|
   ...Submenu,
   active: boolean,
-  children?: React.Node,
   onClick: () => mixed,
 |}
 
@@ -23,7 +22,6 @@ export default function MobileMenu(props: Props) {
           <Icon className={styles.mobile_menu_icon} name="arrow-left" />
           <h3 className={styles.mobile_menu_title}>{name}</h3>
         </div>
-        {props.children}
       </div>
     </>
   )
