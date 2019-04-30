@@ -1,12 +1,32 @@
 // @flow
 // standalone render of a labware framed by a slot
+// TODO IMMEDIATELY: separate out the flip from the rest of it all -> SlotView
 import * as React from 'react'
 
 import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
-import RobotLabware from './RobotLabware'
-import styles from './labwareRender.css'
+import {
+  WellLabels,
+  WellStroke,
+  WellFill,
+  StaticLabware,
+} from './labwareInternals'
+import styles from './labwareRender.css' // TODO IMMEDIATELY: move to labwareInternals???
 
-type Props = React.ElementProps<typeof RobotLabware>
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
+type Props = {
+  definition: LabwareDefinition2,
+  showLabels: boolean,
+  missingTips?: Set<string>,
+  highlightedWells?: Set<string>,
+  /** CSS color to fill specified wells */
+  wellFill?: { [wellName: string]: string },
+  /** Optional callback, called with well name when that well is moused over */
+  onMouseOverWell?: (wellName: string) => mixed,
+  /** Special class which, together with 'data-wellname' on the well elements,
+    allows drag-to-select behavior */
+  selectableWellClass?: string,
+}
 
 export default function LabwareRender(props: Props) {
   // SVG coordinate system is flipped in Y from our robot coordinate system.
@@ -22,7 +42,24 @@ export default function LabwareRender(props: Props) {
       viewBox={viewBox}
       style={{ transform }}
     >
-      <RobotLabware definition={props.definition} />
+      {/* NOTE: the selection stuff could get its own layer */}
+      <StaticLabware
+        definition={props.definition}
+        onMouseOverWell={props.onMouseOverWell}
+        selectableWellClass={props.selectableWellClass}
+      />
+      {props.wellFill && (
+        <WellFill definition={props.definition} fillByWell={props.wellFill} />
+      )}
+      {props.highlightedWells && (
+        <WellStroke
+          strokeType="highlight"
+          definition={props.definition}
+          wells={props.highlightedWells}
+        />
+      )}
+      {/* TODO IMMEDIATELY handle onMouseOverWell and selectableWellClass */}
+      {props.showLabels && <WellLabels definition={props.definition} />}
     </svg>
   )
 }

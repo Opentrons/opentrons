@@ -1,3 +1,4 @@
+// TODO IMMEDIATELY: replace with labwareInternals
 // @flow
 // Render labware definition to SVG. XY is in robot coordinates.
 import * as React from 'react'
@@ -24,7 +25,21 @@ type WellProps = {
   cornerOffsetFromSlot: LabwareOffset,
 }
 
-export default function RobotLabware(props: Props) {
+type StaticLabwareProps = {
+  definition: LabwareDefinition2,
+  showLabels: boolean,
+  missingTips?: Set<string>,
+  highlightedWells?: Set<string>,
+  /** CSS color to fill specified wells */
+  wellFill?: { [wellName: string]: string },
+  /** Optional callback, called with well name when that well is moused over */
+  onMouseOverWell?: (wellName: string) => mixed,
+  /** Special class which, together with 'data-wellname' on the well elements,
+    allows drag-to-select behavior */
+  selectableWellClass?: string,
+}
+
+export function StaticLabware(props: StaticLabwareProps) {
   const { parameters, ordering, cornerOffsetFromSlot, wells } = props.definition
   const { isTiprack } = parameters
 
@@ -57,6 +72,7 @@ export default function RobotLabware(props: Props) {
   )
 }
 
+// TODO: Ian 2019-04-30 Disambiguate this from older Well in Well.js
 function Well(props: WellProps) {
   const { well, parameters, cornerOffsetFromSlot } = props
   const { isTiprack } = parameters
@@ -95,4 +111,22 @@ function Well(props: WellProps) {
 
   console.warn('Invalid well', well)
   return null
+}
+
+export default function RobotLabware(props: Props) {
+  const { definition } = props
+
+  const exampleStyle = { stroke: 'red', fill: 'blue' }
+  return (
+    <g>
+      <Well
+        style={exampleStyle}
+        well={definition.wells['A1']}
+        parameters={definition.parameters}
+        cornerOffsetFromSlot={definition.cornerOffsetFromSlot}
+      />
+
+      <StaticLabware definition={definition} />
+    </g>
+  )
 }
