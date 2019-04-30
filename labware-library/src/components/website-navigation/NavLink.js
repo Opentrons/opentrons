@@ -5,10 +5,10 @@ import styles from './styles.css'
 
 import type { Link } from './types'
 
-type Props = {
+type Props = {|
   ...Link,
   className?: string,
-}
+|}
 
 export default function NavLink(props: Props) {
   return (
