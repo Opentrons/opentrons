@@ -1,4 +1,4 @@
-# Changes from 3.8.1 to 3.8.2
+# Changes from 3.8.2 to 3.8.3
 
 For more details, please see the full [technical change log][changelog]
 
@@ -9,13 +9,7 @@ For more details, please see the full [technical change log][changelog]
 
 ### New features
 
-- You can now manually add robots by their IP in the app settings (the MORE button in the lower left)
-- Added support for more upcoming pipette hardware revisions
-
 ### Bug fixes
-
-- Render the correct image for certain vial and tube racks
-- Fix an issue where an error in deck calibration could leave the robot unable to do deck calibration again until the app was restarted
 
 ### Known issues
 
@@ -33,8 +27,7 @@ For more details, please see the full [technical change log][changelog]
 ## OT2 and Protocol API
 
 ### New Features
-- The messages given to the `pause` and `delay` commands in protocols are now published in the run log
-- Added support for more upcoming pipette hardware revisions
+- There is a more accurate definition for white-labeled Opentrons 10ul tips. You can load it via `opentrons-tiprack-10ul`
 
 
 ### Known issues

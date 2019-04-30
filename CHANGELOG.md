@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.8.3"></a>
+## [3.8.3](https://github.com/opentrons/opentrons/compare/v3.8.2...v3.8.3) (2019-04-30)
+
+
+### Features
+
+* **api:** Add new 10ul tiprack ([#3393](https://github.com/opentrons/opentrons/issues/3393)) ([a7c15cc](https://github.com/opentrons/opentrons/commit/a7c15cc))
+
+
+
+
+
 <a name="3.8.3-alpha.0"></a>
 ## [3.8.3-alpha.0](https://github.com/opentrons/opentrons/compare/v3.8.2...v3.8.3-alpha.0) (2019-04-30)
 
