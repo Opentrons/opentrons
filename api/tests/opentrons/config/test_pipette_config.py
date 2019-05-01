@@ -16,7 +16,7 @@ defs = json.loads(
                           (c.startswith('p1000')
                            or c.startswith('p300_multi')
                            or c.endswith('1.5')
-                           or c.endswith('v2'))])
+                           or c.endswith('v2.0'))])
 def test_versioned_aspiration(pipette_model, monkeypatch):
 
     monkeypatch.setattr(ff, 'use_old_aspiration_functions',
