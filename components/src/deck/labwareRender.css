@@ -1,7 +1,11 @@
 @import '@opentrons/components';
 
-.labware_render {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
+.highlighted_well {
+  stroke: var(--c-highlight);
+  fill: transparent;
+}
+
+.missing_tip {
+  stroke: var(--c-near-black);
+  fill: var(--c-light-gray);
 }

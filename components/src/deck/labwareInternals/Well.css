@@ -1,17 +1,6 @@
 @import '@opentrons/components';
 
-.labware_detail_group {
-  fill: none;
-  stroke: var(--c-black);
-  stroke-width: 1;
-}
-
-.tiprack_outline {
-  fill: var(--c-plate-bg);
-  stroke: var(--c-charcoal);
-}
-
-.well_group {
+.default_well {
   fill: var(--c-white);
   stroke: var(--c-black);
 
@@ -21,4 +10,8 @@
    *   small in the thumbnails
    */
   stroke-width: 0.6;
+}
+
+.tip {
+  stroke: var(--c-near-black);
 }

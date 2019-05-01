@@ -1,38 +1,17 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
+import RobotCoordsText from '../RobotCoordsText'
 import styles from './wellLabels.css'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
+// magic layout numbers to make the letters close to the edges of the labware
+const LETTER_COLUMN_X = 4
+const NUMBER_COLUMN_Y_FROM_TOP = 5
 
 type Props = {
   definition: LabwareDefinition2,
 }
-
-type TextProps = {
-  x: number | string,
-  y: number | string,
-  children?: React.Node,
-}
-
-// TODO IMMEDIATELY: make own file, deck/RobotCoordsText.js
-/** SVG text reflected to use take robot coordinates as props */
-function RobotCoordsText(props: TextProps) {
-  const { x, y, children, ...additionalProps } = props
-  return (
-    <text
-      {...additionalProps}
-      x={x}
-      y={-1 * y}
-      style={{ transform: 'scale(1, -1)' }}
-    >
-      {children}
-    </text>
-  )
-}
-
-// magic numbers to make the letters close to the edges of the labware
-const LETTER_COLUMN_X = 4
-const NUMBER_COLUMN_Y_FROM_TOP = 5
 
 const makeLabels = (args: {
   definition: LabwareDefinition2,

@@ -10,15 +10,3 @@
   fill: var(--c-plate-bg);
   stroke: var(--c-charcoal);
 }
-
-.well_group {
-  fill: var(--c-white);
-  stroke: var(--c-black);
-
-  /*
-   * TODO(mc, 2019-03-28): align this value with components library; 0.4 looks
-   *   a little too small on retina at labware library sizes and especially too
-   *   small in the thumbnails
-   */
-  stroke-width: 0.6;
-}

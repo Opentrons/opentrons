@@ -10,12 +10,14 @@ import styles from './staticLabware.css'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-type Props = {
+type Props = {|
   definition: LabwareDefinition2,
-}
+  selectableWellClass?: string,
+  onMouseOverWell?: (wellName: string) => mixed,
+|}
 
 export default function StaticLabware(props: Props) {
-  const { parameters, ordering, cornerOffsetFromSlot, wells } = props.definition
+  const { parameters, ordering } = props.definition
   const { isTiprack } = parameters
 
   return (
@@ -25,18 +27,18 @@ export default function StaticLabware(props: Props) {
           className={cx({ [styles.tiprack_outline]: isTiprack })}
         />
       </g>
-      <g className={styles.well_group}>
+      <g>
         {flatMap(
           ordering,
-          // all arguments typed to stop Flow from complaining
           (row: Array<string>, i: number, c: Array<Array<string>>) => {
             return row.map(wellName => {
               return (
                 <Well
                   key={wellName}
-                  well={wells[wellName]}
-                  parameters={parameters}
-                  cornerOffsetFromSlot={cornerOffsetFromSlot}
+                  wellName={wellName}
+                  definition={props.definition}
+                  onMouseOverWell={props.onMouseOverWell}
+                  selectableWellClass={props.selectableWellClass}
                 />
               )
             })
