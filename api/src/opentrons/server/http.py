@@ -1,5 +1,6 @@
 import logging
 from . import endpoints as endp
+from opentrons import config
 from .endpoints import (networking, control, settings, update)
 from opentrons.deck_calibration import endpoints as dc_endp
 
@@ -48,8 +49,15 @@ class HTTPServer(object):
             '/update/ignore', endpoints.get_ignore_version)
         self.app.router.add_post(
             '/update/ignore', endpoints.set_ignore_version)
-        self.app.router.add_static(
-            '/logs', self.log_file_path, show_index=True)
+
+        if config.ARCHITECTURE == config.SystemArchitecture.BUILDROOT:
+            from .endpoints import logs
+            self.app.router.add_get('/logs/{syslog_identifier}',
+                                    logs.get_logs_by_id)
+        else:
+            self.app.router.add_static(
+                '/logs', self.log_file_path, show_index=True)
+
         self.app.router.add_post(
             '/server/restart', endpoints.restart)
         self.app.router.add_post(
@@ -76,6 +84,8 @@ class HTTPServer(object):
             '/settings', settings.get_advanced_settings)
         self.app.router.add_post(
             '/settings', settings.set_advanced_setting)
+        self.app.router.add_post(
+            '/settings/log_level', settings.set_log_level)
         self.app.router.add_post(
             '/settings/reset', settings.reset)
         self.app.router.add_get(

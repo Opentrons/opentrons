@@ -29,7 +29,9 @@ import logging
 from pathlib import Path
 import re
 import shutil
+import subprocess
 import sys
+from enum import Enum, auto
 from typing import Dict, NamedTuple, Optional, Union
 
 _CONFIG_FILENAME = 'config.json'
@@ -41,9 +43,50 @@ log = logging.getLogger(__file__)
 IS_WIN = sys.platform.startswith('win')
 IS_OSX = sys.platform == 'darwin'
 IS_LINUX = sys.platform.startswith('linux')
-IS_ROBOT = IS_LINUX and os.environ.get('RUNNING_ON_PI')
-IS_VIRTUAL = os.environ.get('ENABLE_VIRTUAL_SMOOTHIE')
+IS_ROBOT = bool(IS_LINUX and os.environ.get('RUNNING_ON_PI'))
 #: This is the correct thing to check to see if we’re running on a robot
+IS_VIRTUAL = bool(os.environ.get('ENABLE_VIRTUAL_SMOOTHIE'))
+
+
+class SystemArchitecture(Enum):
+    HOST = auto()
+    BALENA = auto()
+    BUILDROOT = auto()
+
+
+ARCHITECTURE: SystemArchitecture = SystemArchitecture.HOST
+#: The system architecture running
+
+OT_SYSTEM_VERSION = '0.0.0'
+#: The semver string of the system
+
+
+if IS_ROBOT:
+    if 'OT_SYSTEM_VERSION' in os.environ:
+        OT_SYSTEM_VERSION = os.environ['OT_SYSTEM_VERSION']
+        ARCHITECTURE = SystemArchitecture.BALENA
+    else:
+        try:
+            with open('/etc/VERSION.json') as vj:
+                contents = json.load(vj)
+            OT_SYSTEM_VERSION = contents['buildroot_version']
+            ARCHITECTURE = SystemArchitecture.BUILDROOT
+        except Exception:
+            log.exception("Could not find version file in /etc/VERSION.json")
+
+
+def name() -> str:
+    if IS_ROBOT and ARCHITECTURE == SystemArchitecture.BALENA:
+        return 'opentrons-{}'.format(
+            os.environ.get('RESIN_DEVICE_NAME_AT_INIT', 'dev'))
+    if IS_ROBOT and ARCHITECTURE == SystemArchitecture.BUILDROOT:
+        try:
+            return subprocess.check_output(
+                ['hostnamectl', '--pretty', 'status']).strip().decode()
+        except Exception:
+            log.exception(
+                "Couldn't load name from /etc/machine-info, defaulting to dev")
+    return 'opentrons-dev'
 
 
 class ConfigElementType(enum.Enum):

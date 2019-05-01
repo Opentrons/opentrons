@@ -12,28 +12,44 @@ from aiohttp import web
 
 LOG = logging.getLogger(__name__)
 
+try:
+    # systemd journal is available, we can use its handler
+    import systemd.journal  # noqa(F401)
+
+    def _handler_for(topic_name: str,
+                     log_level: int):
+        return {'class': 'systemd.journal.JournalHandler',
+                'formatter': 'message_only',
+                'level': log_level,
+                'SYSLOG_IDENTIFIER': topic_name}
+
+except ImportError:
+    # systemd journal isn't available, probably running tests
+
+    def _handler_for(topic_name: str,
+                     log_level: int):
+        return {
+            'class': 'logging.StreamHandler',
+            'formatter': 'basic',
+            'level': log_level,
+        }
+
 
 def configure_logging(level: int):
     config = {
         'version': 1,
         'formatters': {
-            'noTime': {
+            'basic': {
                 'format': '%(name)s %(levelname)s %(message)s'
-            }
+            },
+            'message_only': {
+                'format': '%(message)s'
+            },
         },
         'handlers': {
-            'journald': {
-                'class': 'logging.StreamHandler',
-                'formatter': 'noTime',
-                'level': level,
-            },
+            'journald': _handler_for('opentrons-update', level)
         },
         'loggers': {
-            'aiohttp.access': {
-                'handlers': ['journald'],
-                'level': logging.ERROR,
-                'propagate': False
-            },
             'otupdate': {
                 'handlers': ['journald'],
                 'level': level,

@@ -14,7 +14,8 @@ from numpy import dot, array
 import opentrons
 from opentrons import robot, instruments, types
 from opentrons.hardware_control import adapters
-from opentrons.config import robot_configs, feature_flags
+from opentrons.config import (robot_configs, feature_flags,
+                              SystemArchitecture, ARCHITECTURE)
 from opentrons.util.calibration_functions import probe_instrument
 from opentrons.util.linal import solve, add_z, apply_transform
 from . import (
@@ -544,7 +545,10 @@ def main():
 
 def notify_and_restart():
     print('Exiting configuration tool and restarting system')
-    os.system("kill 1")
+    if ARCHITECTURE == SystemArchitecture.BALENA:
+        os.system("kill 1")
+    else:
+        os.system('reboot')
 
 
 if __name__ == "__main__":
