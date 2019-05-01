@@ -1,4 +1,5 @@
 from threading import Thread
+from unittest.mock import Mock
 import pytest
 
 from tests.opentrons.conftest import fuzzy_assert
@@ -360,6 +361,15 @@ def test_steps_per_mm(smoothie, monkeypatch):
     expected = DEFAULT_STEPS_PER_MM
     expected['Z'] = 450
     assert smoothie.steps_per_mm == expected
+
+
+def test_pipette_configs(smoothie, monkeypatch):
+    axis_value = 'home updated 175'
+    smoothie._send_command = Mock(return_value=axis_value)
+
+    res = smoothie.update_pipette_config('Z', {'home': 175})
+    expected_return = {'Z': {'home': 175}}
+    assert res == expected_return
 
 
 def test_set_acceleration(smoothie, monkeypatch):

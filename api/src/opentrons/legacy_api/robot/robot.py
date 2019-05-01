@@ -271,19 +271,20 @@ class Robot(CommandPublisher):
         log.debug("Updating instrument model cache")
         for mount in self.model_by_mount.keys():
             model_value = self._driver.read_pipette_model(mount)
-            axis = 'B' if mount == 'left' else 'C'
+            plunger_axis = 'B' if mount == 'left' else 'C'
+            mount_axis = 'Z' if mount =='left' else 'A'
             if model_value and 'v2' in model_value:
                 # Check if new model of pipettes, load smoothie configs
                 # for this particular model
-                self._driver.update_steps_per_mm({axis: 2133.33})
+                self._driver.update_steps_per_mm({plunger_axis: 2133.33})
                 # TODO(LC25-4-2019): Modify configs to update to as
                 # testing informs better values
-                self._driver.update_pipette_config(axis, {'home': 172.15})
-            else:
-                if self._driver.steps_per_mm.get(axis) \
-                        != DEFAULT_STEPS_PER_MM[axis]:
-                    self._driver.update_steps_per_mm(
-                        {axis: DEFAULT_STEPS_PER_MM[axis]})
+                self._driver.update_pipette_config(mount_axis, {'home': 172.15})
+            elif model_value:
+                self._driver.update_steps_per_mm(
+                    {plunger_axis: DEFAULT_STEPS_PER_MM[plunger_axis]})
+
+                self._driver.update_pipette_config(mount_axis, {'home': 220})
 
             if model_value:
                 id_response = self._driver.read_pipette_id(mount)

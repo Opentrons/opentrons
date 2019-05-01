@@ -448,15 +448,7 @@ class SmoothieDriver_3_0_0:
             'max_travel': 'M365.1',
             'home': 'M365.0'}
 
-        res_msg = f'The following configs were updated for {axis}: '
-
-        def _parse_command(result):
-            # ensure smoothie received code and changed value through
-            # return message. Format of return message:
-            # <Axis> (or E for endstop) updated <Value>
-            nonlocal res_msg
-            arr_result = result.strip().split(' ')
-            res_msg = res_msg + arr_result[0] + ',' + arr_result[2]
+        res_msg = {axis: {}}
 
         for key, value in data.items():
             if key == 'debounce':
@@ -468,7 +460,11 @@ class SmoothieDriver_3_0_0:
             if res is None:
                 raise ValueError(
                     f'{key} was not updated to {value} on {axis} axis')
-            _parse_command(res)
+            # ensure smoothie received code and changed value through
+            # return message. Format of return message:
+            # <Axis> (or E for endstop) updated <Value>
+            arr_result = res.strip().split(' ')
+            res_msg[axis][str(arr_result[0])] = int(arr_result[2])
 
         return res_msg
 
