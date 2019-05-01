@@ -442,6 +442,9 @@ class SmoothieDriver_3_0_0:
         - endstop debounce M365.2 (NOT for zprobe debounce)
         - retract from endstop distance M365.3
         '''
+        if self.simulating:
+            return {axis: data}
+
         gcodes = {
             'retract': 'M365.3',
             'debounce': 'M365.2',
@@ -605,11 +608,6 @@ class SmoothieDriver_3_0_0:
     @property
     def steps_per_mm(self):
         return self._steps_per_mm
-
-    @steps_per_mm.setter
-    def steps_per_mm(self, axis, mm):
-        # Keep track of any updates to the steps per mm per axis
-        self._steps_per_mm[axis] = mm
 
     def set_speed(self, value):
         ''' set total axes movement speed in mm/second'''
@@ -1054,6 +1052,10 @@ class SmoothieDriver_3_0_0:
 
     def update_steps_per_mm(self, data):
         # Using M92, update steps per mm for a given axis
+        if self.simulating:
+            self.steps_per_mm.update(data)
+            return
+
         if isinstance(data, str):
             # Unfortunately update server calls driver._setup() before the
             # update can correctly load the robot_config change on disk.
