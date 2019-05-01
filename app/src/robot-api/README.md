@@ -6,7 +6,7 @@ Are you adding state for a robot's HTTP endpoint to the app? Add it here!
 
 Side-effects (i.e. making HTTP calls) are handled by the [redux-observable](https://github.com/redux-observable/redux-observable) middleware. redux-observable and, by extension, [RxJS](https://rxjs.dev) were selected because:
 
-- Observables are more powerful that `thunks` while being just as (if not more) readable
+- Observables are more powerful than `thunks` while being just as (if not more) readable
   - Specifically, RxJS observables are _highly_ composable
 - Problems that were hard (e.g. custom timeouts for `fetch`) become trivial thanks to the Observable model and utilities provided by RxJS
 - RxJS handles WebSockets well, which will help with the notifications API
