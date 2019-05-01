@@ -31,6 +31,22 @@
     },
     "channels": 8
   },
+  "p+20_single": {
+    "displayName": "P20+ Single-Channel",
+    "defaultAspirateFlowRate": {
+      "value": 5,
+      "min": 0.001,
+      "max": 5000
+    },
+    "defaultDispenseFlowRate": {
+      "value": 10,
+      "min": 0.001,
+      "max": 5000
+    },
+    "minVolume": 1,
+    "maxVolume": 20,
+    "channels": 1
+  },
   "p50_single": {
     "displayName": "P50 Single-Channel",
     "defaultAspirateFlowRate": {
@@ -79,6 +95,22 @@
     "minVolume": 30,
     "maxVolume": 300
   },
+  "p+300_single": {
+    "displayName": "P300+ Single-Channel",
+    "defaultAspirateFlowRate": {
+      "value": 150,
+      "min": 0.001,
+      "max": 600
+    },
+    "defaultDispenseFlowRate": {
+      "value": 300,
+      "min": 0.001,
+      "max": 600
+    },
+    "channels": 1,
+    "minVolume": 20,
+    "maxVolume": 300
+  },
   "p300_multi": {
     "displayName": "P300 8-Channel",
     "defaultAspirateFlowRate": {
@@ -97,6 +129,22 @@
   },
   "p1000_single": {
     "displayName": "P1000 Single-Channel",
+    "defaultAspirateFlowRate": {
+      "value": 500,
+      "min": 50,
+      "max": 2000
+    },
+    "defaultDispenseFlowRate": {
+      "value": 1000,
+      "min": 50,
+      "max": 2000
+    },
+    "channels": 1,
+    "minVolume": 100,
+    "maxVolume": 1000
+  },
+  "p+1000_single": {
+    "displayName": "P1000+ Single-Channel",
     "defaultAspirateFlowRate": {
       "value": 500,
       "min": 50,
