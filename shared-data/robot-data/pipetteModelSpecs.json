@@ -922,7 +922,7 @@
         "max": 100
       }
     },
-    "p+20_single_v2": {
+    "p+20_single_v2.0": {
       "name": "p+20_single",
       "top": {
         "value": 19.5,
@@ -2294,7 +2294,7 @@
         "max": 100
       }
     },
-    "p+300_single_v2": {
+    "p+300_single_v2.0": {
       "name": "p+300_single",
       "top": {
         "value": 19.5,
@@ -3256,7 +3256,7 @@
         "max": 100
       }
     },
-    "p+1000_single_v2": {
+    "p+1000_single_v2.0": {
       "name": "p+1000_single",
       "top": {
         "value": 19.5,
