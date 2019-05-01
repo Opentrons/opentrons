@@ -6,7 +6,9 @@ After=nginx.service
 [Service]
 Type=exec
 ExecStart=python -m opentrons.main -U /run/aiohttp.sock
-Environment=OT_SMOOTHIE_ID=AMA
+# Stop the button blinking
+ExecStartPost=systemctl stop opentrons-gpio-setup.service
+Environment=OT_SMOOTHIE_ID=AMA RUNNING_ON_PI=true
 
 [Install]
 WantedBy=opentrons.target

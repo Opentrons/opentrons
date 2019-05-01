@@ -12,7 +12,7 @@ async def test_health(virtual_smoothie_env, loop, test_client):
         'api_version': __version__,
         'fw_version': 'Virtual Smoothie',
         'logs': ['/logs/serial.log', '/logs/api.log'],
-        'system_version': 'unknown'
+        'system_version': '0.0.0'
     })
     resp = await cli.get('/health')
     text = await resp.text()

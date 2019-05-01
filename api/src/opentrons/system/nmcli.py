@@ -265,6 +265,12 @@ async def available_ssids() -> List[Dict[str, Any]]:
     Returns a list of the SSIDs. They may contain spaces and should be escaped
     if later passed to a shell.
     """
+    # Force nmcli to actually scan rather than reuse cached results. We ignore
+    # errors here because NetworkManager yells at you if you do it twice in a
+    # row without another operation in between
+    cmd = ['device', 'wifi', 'rescan']
+    _1, _2 = await _call(cmd, suppress_err=True)
+
     fields = ['ssid', 'signal', 'active', 'security']
     cmd = ['--terse',
            '--fields',
@@ -380,8 +386,11 @@ def _add_eap_args(eap_args: Dict[str, str]) -> List[str]:
             if ta['type'] == 'file':
                 # Keyfiles must be prepended with file:// so nm-cli
                 # knows that we’re not giving it DER-encoded blobs
-                _make_host_symlink_if_necessary()
-                path = _rewrite_key_path_to_host_path(eap_args[ta['name']])
+                if config.ARCHITECTURE == config.SystemArchitecture.BALENA:
+                    _make_host_symlink_if_necessary()
+                    path = _rewrite_key_path_to_host_path(eap_args[ta['name']])
+                else:
+                    path = eap_args[ta['name']]
                 val = 'file://' + path
             else:
                 val = eap_args[ta['name']]
@@ -567,7 +576,7 @@ async def iface_info(which_iface: NETWORK_IFACES) -> Dict[str, Optional[str]]:
     return info
 
 
-async def _call(cmd: List[str]) -> Tuple[str, str]:
+async def _call(cmd: List[str], suppress_err: bool = False) -> Tuple[str, str]:
     """
     Runs the command in a subprocess and returns the captured stdout output.
     :param cmd: a list of arguments to nmcli. Should not include nmcli itself.
@@ -587,7 +596,7 @@ async def _call(cmd: List[str]) -> Tuple[str, str]:
     out_str, err_str = out.decode().strip(), err.decode().strip()
     sanitized = sanitize_args(to_exec)
     log.debug('{}: stdout={}'.format(' '.join(sanitized), out_str))
-    if err_str:
+    if err_str and not suppress_err:
         log.info('{}: stderr={}'.format(' '.join(sanitized), err_str))
     return out_str, err_str
 
