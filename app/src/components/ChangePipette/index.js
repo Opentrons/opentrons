@@ -4,16 +4,18 @@ import { connect } from 'react-redux'
 import { push, goBack } from 'react-router-redux'
 import { Switch, Route, withRouter, type Match } from 'react-router'
 import {
+  getPipetteNameSpecs,
   getPipetteModelSpecs,
-  getPipetteDisplayNames,
 } from '@opentrons/shared-data'
 
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type {
+  PipetteNameSpecs,
+  PipetteModelSpecs,
+} from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
 import type { Mount } from '../../robot'
 import type { Robot } from '../../discovery'
 import type { Direction, ChangePipetteProps } from './types'
-
 import type { RobotHome, RobotMove } from '../../http-api-client'
 
 import {
@@ -42,15 +44,13 @@ type Props = {
 const TITLE = 'Pipette Setup'
 // used to guarentee mount param in route is left or right
 const RE_MOUNT = '(left|right)'
-// used to guarentee model param in route is a pipettes model
-const RE_NAME = `(${getPipetteDisplayNames().join('|')})`
 
 type OP = {|
   title: string,
   subtitle: string,
   mount: Mount,
   robot: Robot,
-  wantedPipetteName: ?string,
+  wantedPipette: ?PipetteNameSpecs,
   baseUrl: string,
   confirmUrl: string,
   exitUrl: string,
@@ -122,20 +122,20 @@ function makeMapStateToProps(): (State, OP) => SP {
   const getRobotPipettes = makeGetRobotPipettes()
 
   return (state, ownProps) => {
-    const { mount, wantedPipetteName } = ownProps
+    const { mount, wantedPipette } = ownProps
     const pipettes = getRobotPipettes(state, ownProps.robot).response
     const model = pipettes && pipettes[mount] && pipettes[mount].model
     const actualPipette = model ? getPipetteModelSpecs(model) : null
     const direction = actualPipette ? 'detach' : 'attach'
 
     const success =
-      (actualPipette && actualPipette.displayName === wantedPipetteName) ||
-      (!actualPipette && !wantedPipetteName)
+      actualPipette?.name === wantedPipette?.name ||
+      (!actualPipette && !wantedPipette)
 
-    const attachedWrong = !!(!success && wantedPipetteName && actualPipette)
+    const attachedWrong = !!(!success && wantedPipette && actualPipette)
 
     const displayName =
-      (actualPipette && actualPipette.displayName) || wantedPipetteName || ''
+      actualPipette?.displayName || wantedPipette?.displayName || ''
 
     return {
       actualPipette,
@@ -181,11 +181,14 @@ export default function ChangePipette(props: Props) {
 
   return (
     <Route
-      path={`${path}/:mount${RE_MOUNT}/:name${RE_NAME}?`}
+      path={`${path}/:mount${RE_MOUNT}/:name?`}
       render={propsWithMount => {
         const { params, url: baseUrl } = propsWithMount.match
         const mount: Mount = (params.mount: any)
-        const wantedPipetteName = params.name || null
+
+        const wantedPipette = params.name
+          ? getPipetteNameSpecs(params.name)
+          : null
 
         return (
           <ConnectedChangePipetteRouter
@@ -193,7 +196,7 @@ export default function ChangePipette(props: Props) {
             title={TITLE}
             subtitle={`${mount} mount`}
             mount={mount}
-            wantedPipetteName={wantedPipetteName}
+            wantedPipette={wantedPipette}
             parentUrl={parentUrl}
             baseUrl={baseUrl}
             confirmUrl={`${baseUrl}/confirm`}

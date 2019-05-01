@@ -20,25 +20,12 @@ export type PipetteModelSpecs = {
   tipLength: { value: number },
 } & PipetteNameSpecs
 
-export type PipetteModel =
-  | 'p10_single'
-  | 'p50_single'
-  | 'p300_single'
-  | 'p1000_single'
-  | 'p10_multi'
-  | 'p50_multi'
-  | 'p300_multi'
-
 type SortableProps = 'maxVolume' | 'channels'
 
 // models sorted by channels and then volume by default
 const ALL_PIPETTE_NAMES: Array<string> = Object.keys(pipetteNameSpecs).sort(
   comparePipettes(['channels', 'maxVolume'])
 )
-
-const ALL_PIPETTES: Array<PipetteNameSpecs> = ALL_PIPETTE_NAMES.map(
-  getPipetteNameSpecs
-).filter(Boolean)
 
 // use a name like 'p10_single' to get specs true for all models under that name
 export function getPipetteNameSpecs(name: string): ?PipetteNameSpecs {
@@ -64,37 +51,6 @@ export function getAllPipetteNames(
   if (sortBy.length) models.sort(comparePipettes(sortBy))
 
   return models
-}
-
-export function getPipetteDisplayNames(
-  ...sortBy: Array<SortableProps>
-): Array<string> {
-  return getAllPipetteNames(...sortBy).reduce(
-    (result, model) => {
-      const { seen, names } = result
-      const { displayName } = getPipetteNameSpecs(model) || { displayName: '' }
-
-      if (displayName && !seen[displayName]) {
-        seen[displayName] = true
-        names.push(displayName)
-      }
-
-      return { seen, names }
-    },
-    { seen: {}, names: [] }
-  ).names
-}
-
-// TODO: Ian + Mike 2018-11-06 - DEPRECATED! This function can and should go
-// away once we can switch the app to checking `name` rather than `displayName`
-// or `model` for pipette correctness
-export function getPipetteChannelsByDisplayName(
-  name: ?string
-): PipetteChannels {
-  const match = ALL_PIPETTES.find(p => p.displayName === name)
-
-  // default to single-channel if name doesn't match
-  return match ? match.channels : 1
 }
 
 function comparePipettes(sortBy: Array<SortableProps>) {

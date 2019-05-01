@@ -3,27 +3,23 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 import capitalize from 'lodash/capitalize'
 
-import type { ChangePipetteProps } from './types'
-
-import { getPipetteChannelsByDisplayName } from '@opentrons/shared-data'
-import {
-  ModalPage,
-  PrimaryButton,
-  type ButtonProps,
-} from '@opentrons/components'
+import { ModalPage, PrimaryButton } from '@opentrons/components'
 import PipetteSelection from './PipetteSelection'
 import InstructionStep from './InstructionStep'
 import styles from './styles.css'
+
+import type { ButtonProps } from '@opentrons/components'
+import type { ChangePipetteProps } from './types'
 
 const ATTACH_CONFIRM = 'have robot check connection'
 const DETACH_CONFIRM = 'confirm pipette is detached'
 
 export default function Instructions(props: ChangePipetteProps) {
-  const { wantedPipetteName, actualPipette, direction, displayName } = props
+  const { wantedPipette, actualPipette, direction, displayName } = props
 
   const titleBar = {
     ...props,
-    back: wantedPipetteName
+    back: wantedPipette
       ? { onClick: props.back }
       : { Component: Link, to: props.exitUrl, children: 'exit' },
   }
@@ -36,11 +32,11 @@ export default function Instructions(props: ChangePipetteProps) {
       heading={heading}
       contentsClassName={styles.modal_contents}
     >
-      {!actualPipette && !wantedPipetteName && (
+      {!actualPipette && !wantedPipette && (
         <PipetteSelection onChange={props.onPipetteSelect} />
       )}
 
-      {(actualPipette || wantedPipetteName) && (
+      {(actualPipette || wantedPipette) && (
         <div>
           <Steps {...props} />
           <CheckButton onClick={props.confirmPipette}>
@@ -56,7 +52,7 @@ function Steps(props: ChangePipetteProps) {
   const { direction } = props
   const channels = props.actualPipette
     ? props.actualPipette.channels
-    : getPipetteChannelsByDisplayName(props.wantedPipetteName)
+    : props.wantedPipette?.channels || 1
 
   let stepOne
   let stepTwo
