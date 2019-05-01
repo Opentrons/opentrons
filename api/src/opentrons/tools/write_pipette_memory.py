@@ -41,6 +41,11 @@ MODELS = {
         'P3HSV15': 'p300_single_v1.5',
         'P3HMV15': 'p300_multi_v1.5',
         'P1KSV15': 'p1000_single_v1.5'
+    },
+    'v2': {
+        'P3HSV20': 'p+300_single_v2.0',
+        'P1KSV20': 'p+1000_single_v2.0',
+        'P20SV20': 'p+20_single_v2.0',
     }
 }
 
