@@ -85,4 +85,16 @@
     margin: 0.5rem 1rem;
     font-weight: var(--fw-regular);
   };
+
+  --font-form-default: {
+    font-size: var(--fs-body-1);
+    font-weight: var(--fw-regular);
+    color: var(--c-font-dark);
+  };
+
+  --font-form-caption: {
+    font-size: var(--fs-caption);
+    font-weight: var(--fw-semibold);
+    color: var(--c-med-gray);
+  };
 }
