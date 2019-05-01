@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 import { push, goBack } from 'react-router-redux'
 import { Switch, Route, withRouter, type Match } from 'react-router'
 import {
-  getAllPipetteNames,
   getPipetteNameSpecs,
   getPipetteModelSpecs,
 } from '@opentrons/shared-data'
@@ -45,8 +44,6 @@ type Props = {
 const TITLE = 'Pipette Setup'
 // used to guarentee mount param in route is left or right
 const RE_MOUNT = '(left|right)'
-// used to guarentee model param in route is a pipettes model
-const RE_NAME = `(${getAllPipetteNames().join('|')})`
 
 type OP = {|
   title: string,
@@ -184,10 +181,11 @@ export default function ChangePipette(props: Props) {
 
   return (
     <Route
-      path={`${path}/:mount${RE_MOUNT}/:name${RE_NAME}?`}
+      path={`${path}/:mount${RE_MOUNT}/:name?`}
       render={propsWithMount => {
         const { params, url: baseUrl } = propsWithMount.match
         const mount: Mount = (params.mount: any)
+
         const wantedPipette = params.name
           ? getPipetteNameSpecs(params.name)
           : null
