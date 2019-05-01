@@ -464,7 +464,7 @@ class SmoothieDriver_3_0_0:
             # return message. Format of return message:
             # <Axis> (or E for endstop) updated <Value>
             arr_result = res.strip().split(' ')
-            res_msg[axis][str(arr_result[0])] = int(arr_result[2])
+            res_msg[axis][str(arr_result[0])] = float(arr_result[2])
 
         return res_msg
 
