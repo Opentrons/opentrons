@@ -19,14 +19,14 @@ describe('test helper functions', () => {
     // If smaller than slot, positive values
     // If larger than slot, negative values
     const smallerDims = {
-      overallLength: 100,
-      overallWidth: 80,
-      overallHeight: 10,
+      xDimension: 100,
+      yDimension: 80,
+      zDimension: 10,
     }
     const largerDims = {
-      overallLength: 200,
-      overallWidth: 90,
-      overallHeight: 10,
+      xDimension: 200,
+      yDimension: 90,
+      zDimension: 10,
     }
     const offset = _calculateCornerOffset(smallerDims)
     const offset2 = _calculateCornerOffset(largerDims)
@@ -115,9 +115,9 @@ describe('test createIrregularLabware function', () => {
         isMagneticModuleCompatible: false,
       },
       dimensions: {
-        overallLength: 127.76,
-        overallWidth: 85.48,
-        overallHeight: 64.48,
+        xDimension: 127.76,
+        yDimension: 85.48,
+        zDimension: 64.48,
       },
       well: [
         {

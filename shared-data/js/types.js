@@ -51,9 +51,9 @@ export type LabwareMetadata = {|
 |}
 
 export type LabwareDimensions = {|
-  overallLength: number,
-  overallWidth: number,
-  overallHeight: number,
+  xDimension: number,
+  yDimension: number,
+  zDimension: number,
 |}
 
 export type LabwareOffset = {|
@@ -86,8 +86,8 @@ type LabwareWellShapeProperties =
     |}
   | {|
       shape: 'rectangular',
-      length: number,
-      width: number,
+      xDimension: number,
+      yDimension: number,
     |}
 
 // well without x,y,z

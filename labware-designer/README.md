@@ -76,9 +76,9 @@ const options = {
   },
   offset: { x: 14.38, y: 11.24, z: 14.35 },
   dimensions: {
-    overallLength: 127.76,
-    overallWidth: 85.48,
-    overallHeight: 14.35,
+    xDimension: 127.76,
+    yDimension: 85.48,
+    zDimension: 14.35,
   },
   grid: { row: 8, column: 12 },
   spacing: { row: 9, column: 9 },
@@ -128,9 +128,9 @@ const options = {
     isMagneticModuleCompatible: false,
   },
   dimensions: {
-    overallLength: 127.75,
-    overallWidth: 85.5,
-    overallHeight: 123.76,
+    xDimension: 127.75,
+    yDimension: 85.5,
+    zDimension: 123.76,
   },
   offset: [{ x: 13.88, y: 17.75, z: 123.76 }, { x: 71.38, y: 25.25, z: 119.8 }],
   grid: [{ row: 3, column: 2 }, { row: 2, column: 2 }],
@@ -341,9 +341,9 @@ Example:
 
 ```js
 const dimensions = {
-  overallLength: 127.76,
-  overallWidth: 85.48,
-  overallHeight: 14.35,
+  xDimension: 127.76,
+  yDimension: 85.48,
+  zDimension: 14.35,
 }
 ```
 
@@ -351,15 +351,15 @@ Fields:
 
 | field         | type   | required | description                  |
 | ------------- | ------ | -------- | ---------------------------- |
-| overallLength | number | yes      | X-axis measurement in **mm** |
-| overallWidth  | number | yes      | Y-axis measurement in **mm** |
-| overallHeight | number | yes      | Z-axis measurement in **mm** |
+| xDimension | number | yes      | X-axis measurement in **mm** |
+| yDimension  | number | yes      | Y-axis measurement in **mm** |
+| zDimension | number | yes      | Z-axis measurement in **mm** |
 
-- `overallLength` is the outer dimension of the labware in the X-axis
+- `xDimension` is the outer dimension of the labware in the X-axis
   - Usually equal to the length of the slot (127.76 mm)
-- `overallWidth` is the outer dimension of the labware in the Y-axis
+- `yDimension` is the outer dimension of the labware in the Y-axis
   - Usually equal to the width of the slot (85.48 mm)
-- `overallHeight` is the outer dimension of the labware in the Z-axis
+- `zDimension` is the outer dimension of the labware in the Z-axis
   - Usually the same as the top the well
   - Can be higher in case of some kind of vertical protrusion.
 

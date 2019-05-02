@@ -17,9 +17,9 @@
     "displayVolumeUnits": "mL"
   },
   "dimensions": {
-    "overallLength": 127.76,
-    "overallWidth": 85.48,
-    "overallHeight": 125.76
+    "xDimension": 127.76,
+    "yDimension": 85.48,
+    "zDimension": 125.76
   },
   "otId": "e57a7130-54c8-11e9-a8d4-c1917c1bf74f",
   "deprecated": false,

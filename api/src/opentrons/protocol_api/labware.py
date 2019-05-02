@@ -63,8 +63,8 @@ class Well:
         self._has_tip = has_tip
         self._shape = well_shapes.get(well_props['shape'])
         if self._shape is WellShape.RECTANGULAR:
-            self._length = well_props['length']
-            self._width = well_props['width']
+            self._length = well_props['xDimension']
+            self._width = well_props['yDimension']
             self._diameter = None
         elif self._shape is WellShape.CIRCULAR:
             self._length = None
@@ -432,10 +432,10 @@ class Labware:
         """
         The z-coordinate of the tallest single point anywhere on the labware.
 
-        This is drawn from the 'dimensions'/'overallHeight' elements of the
+        This is drawn from the 'dimensions'/'zDimension' elements of the
         labware definition and takes into account the calibration offset.
         """
-        return self._dimensions['overallHeight'] + self._calibrated_offset.z
+        return self._dimensions['zDimension'] + self._calibrated_offset.z
 
     @property
     def is_tiprack(self) -> bool:

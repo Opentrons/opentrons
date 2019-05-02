@@ -66,7 +66,8 @@ function _findWellAt(
     // Not circular, must be a rectangular well
     // For rectangular wells, (x, y) is at the center.
     return (
-      Math.abs(x - well.x) <= well.length && Math.abs(y - well.y) <= well.width
+      Math.abs(x - well.x) <= well.xDimension &&
+      Math.abs(y - well.y) <= well.yDimension
     )
   })
 }

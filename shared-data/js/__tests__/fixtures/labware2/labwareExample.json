@@ -22,9 +22,9 @@
     "z": 0
   },
   "dimensions": {
-    "overallLength": 127.76,
-    "overallWidth": 85.48,
-    "overallHeight": 50
+    "xDimension": 127.76,
+    "yDimension": 85.48,
+    "zDimension": 50
   },
   "ordering": [["A1"], ["A2"]],
   "wells": {

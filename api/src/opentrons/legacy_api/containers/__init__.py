@@ -168,8 +168,8 @@ def _load_new_well(well_data, saved_offset, format):
 
     if format == 'trough':
         well_tuple = (
-            well_data['x'] - well_data['length']/2 + saved_offset.x,
-            well_data['y'] + well_data['width']/2 + saved_offset.y,
+            well_data['x'] - well_data['xDimension']/2 + saved_offset.x,
+            well_data['y'] + well_data['yDimension']/2 + saved_offset.y,
             well_data['z'] + saved_offset.z)
     else:
         well_tuple = (

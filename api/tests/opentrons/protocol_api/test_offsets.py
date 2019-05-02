@@ -47,9 +47,9 @@ minimalLabwareDef = {
         }
     },
     "dimensions": {
-        "overallLength": 1.0,
-        "overallWidth": 2.0,
-        "overallHeight": 3.0
+        "xDimension": 1.0,
+        "yDimension": 2.0,
+        "zDimension": 3.0
     }
 }
 

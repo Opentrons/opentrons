@@ -138,12 +138,12 @@ def test_no_labware_loc():
     no_from_well = plan_moves(no_well, lw1.wells()[1].top(), deck, 7.0, 15.0)
     check_arc_basic(no_from_well, no_well, lw1.wells()[1].top())
     assert no_from_well[0][0].z\
-        == labware_def['dimensions']['overallHeight'] + 7.0
+        == labware_def['dimensions']['zDimension'] + 7.0
 
     no_to_well = plan_moves(lw1.wells()[1].top(), no_well, deck, 7.0, 15.0)
     check_arc_basic(no_to_well, lw1.wells()[1].top(), no_well)
     assert no_to_well[0][0].z\
-        == labware_def['dimensions']['overallHeight'] + 7.0
+        == labware_def['dimensions']['zDimension'] + 7.0
 
 
 def test_arc_tall_point():

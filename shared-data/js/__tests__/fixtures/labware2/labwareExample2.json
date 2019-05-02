@@ -21,9 +21,9 @@
     "z": 0
   },
   "dimensions": {
-    "overallLength": 50,
-    "overallWidth": 50,
-    "overallHeight": 50
+    "xDimension": 50,
+    "yDimension": 50,
+    "zDimension": 50
   },
   "ordering": [["A1", "B1", "C1"], ["A2", "B2", "C2"]],
   "wells": {
