@@ -10,7 +10,7 @@ import styles from './labwareRender.css'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-type Props = {|
+export type LabwareRenderProps = {|
   definition: LabwareDefinition2,
   showLabels?: boolean,
   missingTips?: Set<string>,
@@ -24,7 +24,7 @@ type Props = {|
   selectableWellClass?: string,
 |}
 
-export default function LabwareRender(props: Props) {
+export default function LabwareRender(props: LabwareRenderProps) {
   return (
     <g>
       <StaticLabware

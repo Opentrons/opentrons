@@ -4,12 +4,12 @@ import map from 'lodash/map'
 import Well from './Well'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-type Props = {|
+export type FilledWellsProps = {|
   definition: LabwareDefinition2,
   fillByWell: { [wellName: string]: string },
 |}
 
-function FilledWells(props: Props) {
+function FilledWells(props: FilledWellsProps) {
   const { definition, fillByWell } = props
   return map<*, *, React.Node>(
     fillByWell,
@@ -26,4 +26,4 @@ function FilledWells(props: Props) {
   )
 }
 
-export default React.memo<Props>(FilledWells)
+export default React.memo<FilledWellsProps>(FilledWells)

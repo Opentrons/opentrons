@@ -10,13 +10,13 @@ import styles from './staticLabware.css'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-type Props = {|
+export type StaticLabwareProps = {|
   definition: LabwareDefinition2,
   selectableWellClass?: string,
   onMouseOverWell?: (wellName: string) => mixed,
 |}
 
-function StaticLabware(props: Props) {
+function StaticLabware(props: StaticLabwareProps) {
   const { parameters, ordering } = props.definition
   const { isTiprack } = parameters
 
@@ -49,4 +49,4 @@ function StaticLabware(props: Props) {
   )
 }
 
-export default React.memo<Props>(StaticLabware)
+export default React.memo<StaticLabwareProps>(StaticLabware)

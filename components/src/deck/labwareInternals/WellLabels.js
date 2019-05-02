@@ -9,9 +9,9 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 const LETTER_COLUMN_X = 4
 const NUMBER_COLUMN_Y_FROM_TOP = 5
 
-type Props = {
+export type WellLabelsProps = {|
   definition: LabwareDefinition2,
-}
+|}
 
 const makeLabels = (args: {
   definition: LabwareDefinition2,
@@ -38,7 +38,7 @@ const makeLabels = (args: {
     )
   })
 
-function WellLabels(props: Props) {
+function WellLabels(props: WellLabelsProps) {
   const { definition } = props
   const letterColumn = definition.ordering[0]
   const numberRow = definition.ordering.map(wellCol => wellCol[0])
@@ -59,4 +59,4 @@ function WellLabels(props: Props) {
   )
 }
 
-export default React.memo<Props>(WellLabels)
+export default React.memo<WellLabelsProps>(WellLabels)

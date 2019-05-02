@@ -1,7 +1,5 @@
 // @flow
-import StaticLabware from './StaticLabware'
-import StyledWells from './StyledWells'
-import WellLabels from './WellLabels'
-import FilledWells from './FilledWells'
-
-export { StaticLabware, StyledWells, WellLabels, FilledWells }
+export { default as StaticLabware } from './StaticLabware'
+export { default as StyledWells } from './StyledWells'
+export { default as WellLabels } from './WellLabels'
+export { default as FilledWells } from './FilledWells'

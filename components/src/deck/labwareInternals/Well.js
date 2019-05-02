@@ -6,7 +6,7 @@ import styles from './Well.css'
 
 import { getIsTiprack, type LabwareDefinition2 } from '@opentrons/shared-data'
 
-type WellProps = {|
+export type WellProps = {|
   /** if included, overrides the default classname */
   className?: ?string,
   /** fill inline style */
