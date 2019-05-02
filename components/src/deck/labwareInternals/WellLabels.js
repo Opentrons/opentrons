@@ -38,7 +38,7 @@ const makeLabels = (args: {
     )
   })
 
-export default function WellLabels(props: Props) {
+function WellLabels(props: Props) {
   const { definition } = props
   const letterColumn = definition.ordering[0]
   const numberRow = definition.ordering.map(wellCol => wellCol[0])
@@ -58,3 +58,5 @@ export default function WellLabels(props: Props) {
     </g>
   )
 }
+
+export default React.memo<Props>(WellLabels)

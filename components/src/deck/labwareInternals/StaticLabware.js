@@ -16,7 +16,7 @@ type Props = {|
   onMouseOverWell?: (wellName: string) => mixed,
 |}
 
-export default function StaticLabware(props: Props) {
+function StaticLabware(props: Props) {
   const { parameters, ordering } = props.definition
   const { isTiprack } = parameters
 
@@ -48,3 +48,5 @@ export default function StaticLabware(props: Props) {
     </g>
   )
 }
+
+export default React.memo<Props>(StaticLabware)

@@ -22,7 +22,7 @@ type WellProps = {|
   onMouseOverWell?: (wellName: string) => mixed,
 |}
 
-export default function Well(props: WellProps) {
+function Well(props: WellProps) {
   const { definition, wellName, fill, onMouseOverWell } = props
 
   if (!definition.wells[wellName]) {
@@ -91,3 +91,5 @@ export default function Well(props: WellProps) {
   console.warn('Invalid well', well)
   return null
 }
+
+export default React.memo<WellProps>(Well)

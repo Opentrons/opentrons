@@ -2,8 +2,8 @@
 import * as React from 'react'
 import {
   WellLabels,
-  StyledWell,
-  WellFill,
+  StyledWells,
+  FilledWells,
   StaticLabware,
 } from './labwareInternals'
 import styles from './labwareRender.css'
@@ -33,10 +33,13 @@ export default function LabwareRender(props: Props) {
         selectableWellClass={props.selectableWellClass}
       />
       {props.wellFill && (
-        <WellFill definition={props.definition} fillByWell={props.wellFill} />
+        <FilledWells
+          definition={props.definition}
+          fillByWell={props.wellFill}
+        />
       )}
       {props.highlightedWells && (
-        <StyledWell
+        <StyledWells
           noInnerTipCircle
           className={styles.highlighted_well}
           definition={props.definition}
@@ -44,7 +47,7 @@ export default function LabwareRender(props: Props) {
         />
       )}
       {props.missingTips && (
-        <StyledWell
+        <StyledWells
           noInnerTipCircle
           className={styles.missing_tip}
           definition={props.definition}

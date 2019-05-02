@@ -1,7 +1,7 @@
 // @flow
 import StaticLabware from './StaticLabware'
-import StyledWell from './StyledWell'
+import StyledWells from './StyledWells'
 import WellLabels from './WellLabels'
-import WellFill from './WellFill'
+import FilledWells from './FilledWells'
 
-export { StaticLabware, StyledWell, WellLabels, WellFill }
+export { StaticLabware, StyledWells, WellLabels, FilledWells }

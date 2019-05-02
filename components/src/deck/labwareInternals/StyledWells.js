@@ -3,14 +3,14 @@ import * as React from 'react'
 import Well from './Well'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-type StyledWellProps = {|
+type Props = {|
   className: string,
   definition: LabwareDefinition2,
   noInnerTipCircle?: boolean,
   wells: Set<string>,
 |}
 
-export default function StyledWell(props: StyledWellProps) {
+function StyledWell(props: Props) {
   const { className, definition, noInnerTipCircle } = props
   const wells = [...props.wells]
   return wells.map<*, *, React.Node>(wellName => {
@@ -25,3 +25,5 @@ export default function StyledWell(props: StyledWellProps) {
     )
   })
 }
+
+export default React.memo<Props>(StyledWell)
