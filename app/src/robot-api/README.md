@@ -25,10 +25,16 @@ Before adding client state for an endpoint, either identify or create a file in 
    - Most endpoints can hopefully use the default endpoint epic
 
    ```js
-   import { createBaseRequestEpic, GET } from '../utils'
+   // app/src/robot-api/resources/my-thing.js
+
+   import { createBaseRequestEpic } from '../utils'
    // ...
-   const MY_THING_PATH = '/thing/:id'
-   const myThingEpic = createBaseRequestEpic(GET, MY_THING_PATH)
+
+   // call createBaseRequestEpic w/ the action type that should trigger the epic
+   export const FETCH_MY_THING: 'robotHttp:FETCH_MY_THING' =
+     'robotHttp:FETCH_MY_THING'
+
+   export const fetchMyThingEpic = createBaseRequestEpic(FETCH_MY_THING)
    ```
 
    - See `setTargetTempEpic` in `app/src/robot-api/resources/modules.js` for an example of an epic that needs more than the base functionality and layers that logic on top of the base
@@ -36,8 +42,10 @@ Before adding client state for an endpoint, either identify or create a file in 
 2. Add the epic to the exported combined epic (or create the combined epic if it doesn't exist)
 
    ```js
-   export const allThingsEpic = combineEpics(
-     myThingEpic
+   // app/src/robot-api/resources/my-thing.js
+
+   export const myThingEpic = combineEpics(
+     fetchMyThingEpic
      // ...
    )
    ```
@@ -45,27 +53,46 @@ Before adding client state for an endpoint, either identify or create a file in 
 3. Add an action creator to trigger the epic
 
    ```js
-   import { apiCall, GET } from '../utils'
-   import type { RobotHost } from '../types'
+   // app/src/robot-api/types.js
+
    // ...
-   export const fetchMyThing = (host: RobotHost, id: string) =>
-     apiCall({ host, method: GET, path: `/thing/${id}` })
+   export type ApiAction =
+     | {| type: 'robotApi:FETCH_HEALTH', payload: ApiRequest |}
+     | {| type: 'robotApi:FETCH_MY_THING', payload: ApiRequest |}
+   ```
+
+   ```js
+   // app/src/robot-api/resources/my-thing.js
+
+   import { apiCall, GET } from '../utils'
+   import type { RobotHost, ApiAction } from '../types'
+   // ...
+   export const fetchMyThing = (host: RobotHost, id: string): ApiAction => ({
+     type: FETCH_MY_THING,
+     payload: { host, method: GET, path: `/my-thing/${id}` },
+   })
    ```
 
 4. Add any necessary logic to the reducer to handle your action
 
    ```js
-   import type { ApiAction, ThingState as State } from '../types'
+   import pathToRegexp from 'path-to-regexp'
+   import { passResponseAction } from '../utils'
+   // NOTE: be sure to define any necessary model types in types.js
+   import type { ApiActionLike, ThingState as State } from '../types'
 
    // ...
    const INITIAL_STATE: State = {}
-   const RE_THING_PATH = pathToRegexp(MY_THING_PATH)
+   const MY_THING_PATH = '/my-thing/:id'
+   const RE_MY_THING_PATH = pathToRegexp(MY_THING_PATH)
 
-   export function thingReducer(
+   export function myThingReducer(
      state: State = INITIAL_STATE,
-     action: ApiAction
+     action: ApiActionLike
    ): State {
-     if (action.type === API_RESPONSE) {
+     const response = passResponseAction(action)
+
+     if (response) {
        const { path, body } = action.payload
        const thingIdMatch = path.match(RE_THING_PATH)
 
@@ -81,7 +108,25 @@ Before adding client state for an endpoint, either identify or create a file in 
    }
    ```
 
-5. If epic and/or reducer were new, add them to the overall resource epic and reducer in `app/src/robot-api/resources/index.js`
+5. If epic and/or reducer were new, add them to the overall resource epic and reducer
+
+   ```js
+   // app/src/robot-api/resources/index.js
+
+   import {myThingReducer, myThingEpic} from './resources'
+
+   export const resourcesReducer = combineReducers<_, ApiActionLike>({
+     // ...
+     myThing: myThingReducer,
+     // ...
+   })
+
+   export const robotApiEpic = combineEpics(
+     // ...
+     myThingEpic
+     // ...
+   )
+   ```
 
 6. Add any necessary selectors
 
@@ -91,21 +136,26 @@ Before adding client state for an endpoint, either identify or create a file in 
 
    // ...
 
-   export function getResourceState(
+   export function getMyThingState(
      state: AppState,
      robotName: string
    ): ThingState | null {
      const robotState = getRobotApiState(state, robotName)
 
-     return = robotState?.resources.thing || null
+     return = robotState?.resources.myThing || null
    }
    ```
 
-### note about response Flow types
+### note about Flow types
 
-Right now, our types for the HTTP response objects are non-existent. One of the misadventures with `http-api-client` was trying to strictly type all responses with Flow. It turns out this was hard, probably slowed Flow to a crawl, and didn't really get us anywhere.
+In the interest of action inspectability and overall DX, internal API lifecycle objects and actions are very loosely typed. Things to watch out for:
 
-For now, HTTP responses are typed as `any`, to be cast in the reducer. In the future, we should look into runtime schema checking to verify response shape before we cast to an actual type.
+- Response body's (`responseAction.payload.body`) are currently typed as `any`, which means you'll need to cast them
+  - In the furture this casting should be the job of functions that also check response schemas
+- rxjs operators need to be explicitly typed
+- Inside epics and reducers, we're usually throwing around `ApiActionLike`s, which have `type: string` rather than string constants
+  - This is so we can append method and path information to action types so the Redux devtools are actually usable
+  - See `passRequestAction`, `passResponseAction`, and `passErrorAction` in `app/src/robot-api/utils.js` for help casting/filtering an `ApiActionLike` to something more specific
 
 ## background
 

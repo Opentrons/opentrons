@@ -1,30 +1,36 @@
 // @flow
 // modules endpoints
-import { of } from 'rxjs'
-import { filter, switchMap } from 'rxjs/operators'
+import { of as observableOf } from 'rxjs'
+import { switchMap } from 'rxjs/operators'
 import { combineEpics } from 'redux-observable'
 import pathToRegexp from 'path-to-regexp'
 
 import {
   getRobotApiState,
   createBaseRequestEpic,
-  apiCall,
+  passResponseAction,
   GET,
   POST,
-  API_RESPONSE,
 } from '../utils'
 
-import type { State as AppState, Action, Epic } from '../../types'
+import type { State as AppState, ActionLike, Epic } from '../../types'
 import type {
   RobotHost,
   ApiAction,
-  ApiResponseAction,
+  ApiActionLike,
   Module,
   SetTemperatureRequest,
   ModulesState as State,
 } from '../types'
 
 const INITIAL_STATE: State = []
+
+export const FETCH_MODULES: 'robotHttp:FETCH_MODULES' =
+  'robotHttp:FETCH_MODULES'
+export const FETCH_MODULE_DATA: 'robotHttp:FETCH_MODULE_DATA' =
+  'robotHttp:FETCH_MODULE_DATA'
+export const SET_MODULE_TARGET_TEMP: 'robotHttp:SET_MODULE_TARGET_TEMP' =
+  'robotHttp:SET_MODULE_TARGET_TEMP'
 
 export const MODULES_PATH = '/modules'
 // TODO(mc, 2019-04-29): these endpoints should not have different paths
@@ -34,34 +40,49 @@ export const MODULE_BY_SERIAL_PATH = '/modules/:serial'
 const RE_MODULE_DATA_PATH = pathToRegexp(MODULE_DATA_PATH)
 const RE_MODULE_BY_SERIAL_PATH = pathToRegexp(MODULE_BY_SERIAL_PATH)
 
-export const fetchModules = (host: RobotHost) =>
-  apiCall({ method: GET, path: MODULES_PATH, host })
+export const fetchModules = (host: RobotHost): ApiAction => ({
+  type: FETCH_MODULES,
+  payload: { host, method: GET, path: MODULES_PATH },
+})
 
-export const fetchModuleData = (host: RobotHost, serial: string) =>
-  apiCall({ method: GET, path: `/modules/${serial}/data`, host })
+export const fetchModuleData = (
+  host: RobotHost,
+  serial: string
+): ApiAction => ({
+  type: FETCH_MODULE_DATA,
+  payload: { host, method: GET, path: `/modules/${serial}/data` },
+})
 
 export const setTargetTemp = (
   host: RobotHost,
   serial: string,
   body: SetTemperatureRequest
-) => apiCall({ method: POST, path: `/modules/${serial}`, host, body })
+): ApiAction => ({
+  type: SET_MODULE_TARGET_TEMP,
+  payload: { host, body, method: POST, path: `/modules/${serial}` },
+})
 
-const fetchModulesEpic = createBaseRequestEpic('GET', MODULES_PATH)
-const fetchModuleDataEpic = createBaseRequestEpic('GET', MODULE_DATA_PATH)
-
-// after POST /modules/:serial completes, call GET /modules/:serial/data
-const _setTargetTempEpic = createBaseRequestEpic('POST', MODULE_BY_SERIAL_PATH)
+const fetchModulesEpic = createBaseRequestEpic(FETCH_MODULES)
+const fetchModuleDataEpic = createBaseRequestEpic(FETCH_MODULE_DATA)
 
 const setTargetTempEpic: Epic = action$ => {
-  return _setTargetTempEpic(action$).pipe(
-    filter<Action, ApiResponseAction>(a => a.type === API_RESPONSE),
-    switchMap<ApiResponseAction, _, ApiAction>(action => {
-      const { host, path } = action.payload
-      const results: Array<ApiAction> = [action]
-      const serialMatch = path.match(RE_MODULE_BY_SERIAL_PATH)
-      if (serialMatch) results.push(fetchModuleData(host, serialMatch[1]))
+  const baseEpic = createBaseRequestEpic(SET_MODULE_TARGET_TEMP)
 
-      return of(...results)
+  return baseEpic(action$).pipe(
+    switchMap<ApiActionLike, _, ApiActionLike>(action => {
+      const response = passResponseAction(action)
+      if (response) {
+        const { host, path } = response.payload
+        const serialMatch = path.match(RE_MODULE_BY_SERIAL_PATH)
+
+        // if POST /modules/:serial completes, call GET /modules/:serial/data
+        if (serialMatch) {
+          const refresh = fetchModuleData(host, serialMatch[1])
+          return observableOf(action, ((refresh: any): ApiActionLike))
+        }
+      }
+
+      return observableOf(action)
     })
   )
 }
@@ -74,10 +95,12 @@ export const modulesEpic = combineEpics(
 
 export function modulesReducer(
   state: State = INITIAL_STATE,
-  action: ApiAction
+  action: ActionLike
 ): State {
-  if (action.type === API_RESPONSE) {
-    const { path, body } = action.payload
+  const response = passResponseAction(action)
+
+  if (response) {
+    const { path, body } = response.payload
 
     if (path === MODULES_PATH) {
       return (body.modules: Array<Module>)

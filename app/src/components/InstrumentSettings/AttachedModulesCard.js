@@ -24,7 +24,7 @@ type DP = {| fetchModules: () => mixed |}
 type Props = { ...OP, ...SP, ...DP }
 
 const TITLE = 'Modules'
-const POLL_MODULE_INTERVAL_MS = 2000
+const POLL_MODULE_INTERVAL_MS = 5000
 
 export default connect<Props, OP, SP, DP, State, Dispatch>(
   mapStateToProps,

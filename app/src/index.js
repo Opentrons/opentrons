@@ -12,13 +12,13 @@ import { createEpicMiddleware } from 'redux-observable'
 import createLogger from './logger'
 import { checkShellUpdate, shellMiddleware } from './shell'
 
-import { robotApiEpic } from './robot-api'
 import { apiClientMiddleware as robotApiMiddleware } from './robot'
 import { initializeAnalytics, analyticsMiddleware } from './analytics'
 import { initializeSupport, supportMiddleware } from './support'
 import { startDiscovery, discoveryMiddleware } from './discovery'
 
-import reducer from './reducer'
+import rootReducer from './reducer'
+import rootEpic from './epic'
 
 // components
 import App from './components/App'
@@ -44,9 +44,9 @@ const composeEnhancers =
     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({ maxAge: 200 })) ||
   compose
 
-const store = createStore(reducer, composeEnhancers(middleware))
+const store = createStore(rootReducer, composeEnhancers(middleware))
 
-epicMiddlware.run(robotApiEpic)
+epicMiddlware.run(rootEpic)
 
 const renderApp = () =>
   ReactDom.render(

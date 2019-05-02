@@ -24,6 +24,8 @@ export type Action =
   | DiscoveryAction
   | ProtocolAction
 
+export type ActionLike = {| type: string, payload: any |}
+
 export type State = $Call<reducer, {}, Action>
 
 export type GetState = () => State
@@ -51,6 +53,6 @@ type ThunkDispatch = (thunk: ThunkAction) => ?Action
 
 type ThunkPromiseDispatch = (thunk: ThunkPromiseAction) => Promise<?Action>
 
-export type Epic = (action$: Observable<Action>) => Observable<Action>
+export type Epic = (action$: Observable<Action>) => Observable<ActionLike>
 
 export type Error = { name: string, message: string }

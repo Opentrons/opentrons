@@ -1,57 +1,79 @@
 // @flow
-import { of } from 'rxjs'
-import { filter, switchMap } from 'rxjs/operators'
-import pathToRegexp from 'path-to-regexp'
+import { of as observableOf, concat as observableConcat } from 'rxjs'
+import { switchMap } from 'rxjs/operators'
+import { ofType } from 'redux-observable'
 
 import fetch from './fetch'
 
-import type { State, Action, Epic } from '../types'
+import type { State, Epic, Action, ActionLike } from '../types'
 import type {
   Method,
-  ApiCall,
+  ApiRequest,
   ApiResponse,
   ApiAction,
-  ApiCallAction,
+  ApiActionLike,
+  ApiRequestAction,
   ApiResponseAction,
+  ApiErrorAction,
+  ApiActionType,
   RobotApiState,
 } from './types'
 
 export const GET: Method = 'GET'
 export const POST: Method = 'POST'
 
-export const API_CALL: 'api:CALL' = 'api:CALL'
+export const API_ACTION_PREFIX = 'robotHttp'
+export const API_REQUEST_PREFIX = `${API_ACTION_PREFIX}:REQUEST`
+export const API_RESPONSE_PREFIX = `${API_ACTION_PREFIX}:RESPONSE`
+export const API_ERROR_PREFIX = `${API_ACTION_PREFIX}:ERROR`
 
-export const apiCall = (payload: ApiCall): ApiCallAction => ({
-  type: API_CALL,
+const apiRequest = (payload: ApiRequest): ApiRequestAction => ({
+  type: `${API_REQUEST_PREFIX}__${payload.method}__${payload.path}`,
   payload,
 })
 
-export const API_RESPONSE: 'api:RESPONSE' = 'api:RESPONSE'
-
-export const apiResponse = (payload: ApiResponse): ApiResponseAction => ({
-  type: API_RESPONSE,
+const apiResponse = (payload: ApiResponse): ApiResponseAction => ({
+  type: `${API_RESPONSE_PREFIX}__${payload.method}__${payload.path}`,
   payload,
 })
 
-export const API_ERROR: 'api:ERROR' = 'api:ERROR'
-
-export const apiError = (payload: ApiResponse): ApiAction => ({
-  type: API_ERROR,
+const apiError = (payload: ApiResponse): ApiErrorAction => ({
+  type: `${API_ERROR_PREFIX}__${payload.method}__${payload.path}`,
   payload,
 })
 
-export const createBaseRequestEpic = (method: Method, path: string): Epic => {
-  const pathMatcher = pathToRegexp(path)
+export const passApiAction = (
+  action: Action | ActionLike
+): ApiActionLike | null =>
+  action.type.startsWith(API_ACTION_PREFIX) ? (action: any) : null
 
+export const passRequestAction = (
+  action: ActionLike
+): ApiRequestAction | null =>
+  action.type.startsWith(API_REQUEST_PREFIX) ? (action: any) : null
+
+export const passResponseAction = (
+  action: ActionLike
+): ApiResponseAction | null =>
+  action.type.startsWith(API_RESPONSE_PREFIX) ? (action: any) : null
+
+export const passErrorAction = (action: ActionLike): ApiErrorAction | null =>
+  action.type.startsWith(API_ERROR_PREFIX) ? (action: any) : null
+
+export const createBaseRequestEpic = (type: ApiActionType): Epic => {
   return action$ =>
     action$.pipe(
-      filter<Action, ApiCallAction>(
-        a => a.type === API_CALL && pathMatcher.test(a.payload.path)
-      ),
-      switchMap<ApiCallAction, _, ApiResponse>(a => fetch(a.payload)),
-      switchMap<ApiResponse, _, ApiAction>(response =>
-        of(response.ok ? apiResponse(response) : apiError(response))
-      )
+      ofType(type),
+      switchMap<ApiAction, _, _>(a => {
+        const requestAction = observableOf(apiRequest(a.payload))
+        const responseAction = fetch(a.payload).pipe(
+          switchMap<ApiResponse, _, ApiActionLike>(resp =>
+            observableOf(resp.ok ? apiResponse(resp) : apiError(resp))
+          )
+        )
+
+        return observableConcat(requestAction, responseAction)
+      })
     )
 }
 

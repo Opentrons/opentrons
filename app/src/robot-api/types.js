@@ -9,7 +9,7 @@ export type RobotHost = {
   port: number,
 }
 
-export type ApiCall = {|
+export type ApiRequest = {|
   host: RobotHost,
   method: Method,
   path: string,
@@ -27,13 +27,26 @@ export type ApiResponse = {|
 
 // action types
 
-export type ApiCallAction = {| type: 'api:CALL', payload: ApiCall |}
+export type ApiAction =
+  | {| type: 'robotHttp:FETCH_HEALTH', payload: ApiRequest |}
+  | {| type: 'robotHttp:FETCH_MODULES', payload: ApiRequest |}
+  | {| type: 'robotHttp:FETCH_MODULE_DATA', payload: ApiRequest |}
+  | {| type: 'robotHttp:SET_MODULE_TARGET_TEMP', payload: ApiRequest |}
 
-export type ApiResponseAction = {| type: 'api:RESPONSE', payload: ApiResponse |}
+export type ApiActionType = $PropertyType<ApiAction, 'type'>
 
-export type ApiErrorAction = {| type: 'api:ERROR', payload: ApiResponse |}
+// internal, request lifecycle types
+// only for use inside observables
+export type ApiRequestAction = {| type: string, payload: ApiRequest |}
 
-export type ApiAction = ApiCallAction | ApiResponseAction | ApiErrorAction
+export type ApiResponseAction = {| type: string, payload: ApiResponse |}
+
+export type ApiErrorAction = {| type: string, payload: ApiResponse |}
+
+export type ApiActionLike = {|
+  type: string,
+  payload: ApiRequest | ApiResponse,
+|}
 
 // resource types
 

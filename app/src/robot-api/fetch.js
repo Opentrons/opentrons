@@ -1,16 +1,16 @@
 // @flow
 // simple fetch wrapper to format URL for robot and parse JSON response
-import { of } from 'rxjs'
+import { of as observableOf } from 'rxjs'
 import { fromFetch } from 'rxjs/fetch'
 import { timeout, switchMap, catchError } from 'rxjs/operators'
 
 import type { Observable } from 'rxjs'
-import type { ApiCall, ApiResponse } from './types'
+import type { ApiRequest, ApiResponse } from './types'
 
 const DEFAULT_TIMEOUT_MS = 30000
 
 export default function fetchWrapper(
-  call: ApiCall,
+  call: ApiRequest,
   timeoutMs: number = DEFAULT_TIMEOUT_MS
 ): Observable<ApiResponse> {
   const { host, path, method, body: reqBody } = call
@@ -34,7 +34,7 @@ export default function fetchWrapper(
       }))
     ),
     catchError(error =>
-      of({
+      observableOf({
         host,
         path,
         method,
